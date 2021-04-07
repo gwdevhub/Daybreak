@@ -1,13 +1,13 @@
 ﻿using Daybreak.Services.ApplicationDetection;
 using Daybreak.Services.ApplicationLifetime;
 using Daybreak.Services.Bloogum;
+using Daybreak.Services.Configuration;
 using Daybreak.Services.Credentials;
 using Daybreak.Services.Logging;
 using Daybreak.Services.Screenshots;
 using Daybreak.Services.ViewManagement;
 using Daybreak.Views;
 using Microsoft.Web.WebView2.Core;
-using Palletizer.WPF.Services.ConfigurationManager;
 using Slim;
 using System.Extensions;
 

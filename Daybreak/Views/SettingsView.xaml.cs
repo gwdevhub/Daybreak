@@ -1,13 +1,10 @@
-﻿using Daybreak.Configuration;
-using Daybreak.Models;
+﻿using Daybreak.Models;
+using Daybreak.Services.Configuration;
 using Daybreak.Services.Credentials;
 using Daybreak.Services.ViewManagement;
 using Microsoft.Win32;
-using Palletizer.WPF.Services.ConfigurationManager;
 using System.Extensions;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Extensions;
 
 namespace Daybreak.Views
 {
@@ -36,8 +33,13 @@ namespace Daybreak.Views
         {
             var config = this.configurationManager.GetConfiguration();
             var creds = this.credentialManager.GetCredentials();
-            this.UsernameTextbox.Text = creds.Username;
-            this.PasswordBox.Password = creds.Password;
+            creds.DoAny(
+                onSome: (credentials) =>
+                {
+                    this.UsernameTextbox.Text = credentials.Username;
+                    this.PasswordBox.Password = credentials.Password;
+
+                }); 
             this.CharacterTextbox.Text = config.CharacterName;
             this.GamePathTextbox.Text = config.GamePath;
         }

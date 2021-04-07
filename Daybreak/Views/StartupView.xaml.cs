@@ -1,10 +1,9 @@
 ﻿using Daybreak.Services.ApplicationDetection;
+using Daybreak.Services.Configuration;
 using Daybreak.Services.ViewManagement;
-using Palletizer.WPF.Services.ConfigurationManager;
 using System;
 using System.Extensions;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;

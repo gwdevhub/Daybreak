@@ -1,6 +1,6 @@
 ﻿using Daybreak.Configuration;
 
-namespace Palletizer.WPF.Services.ConfigurationManager
+namespace Daybreak.Services.Configuration
 {
     public interface IConfigurationManager
     {

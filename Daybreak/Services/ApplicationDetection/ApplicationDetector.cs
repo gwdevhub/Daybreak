@@ -1,5 +1,5 @@
-﻿using Daybreak.Services.Credentials;
-using Palletizer.WPF.Services.ConfigurationManager;
+﻿using Daybreak.Services.Configuration;
+using Daybreak.Services.Credentials;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -41,15 +41,18 @@ namespace Daybreak.Services.ApplicationDetection
             }
 
             var auth = this.credentialManager.GetCredentials();
-            if (auth is null)
-            {
-                throw new InvalidOperationException($"No credentials available");
-            }
-
-            if (Process.Start(executable, new List<string> { "-email", auth.Username, "-password", auth.Password, "-character", configuration.CharacterName }) is null)
-            {
-                throw new InvalidOperationException($"Unable to launch executable");
-            }
+            auth.Do(
+                onSome: (credentials) =>
+                {
+                    if (Process.Start(executable, new List<string> { "-email", credentials.Username, "-password", credentials.Password, "-character", configuration.CharacterName }) is null)
+                    {
+                        throw new InvalidOperationException($"Unable to launch executable");
+                    }
+                },
+                onNone: () =>
+                {
+                    throw new InvalidOperationException($"No credentials available");
+                });
         }
 
         private static bool GuildwarsProcessDetected()

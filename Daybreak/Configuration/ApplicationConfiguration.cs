@@ -12,5 +12,9 @@ namespace Daybreak.Configuration
         public string LeftBrowserDefault { get; set; }
         [JsonProperty("RightBrowserDefault")]
         public string RightBrowserDefault { get; set; }
+        [JsonProperty("ProtectedUsername")]
+        public string ProtectedUsername { get; set; }
+        [JsonProperty("ProtectedPassword")]
+        public string ProtectedPassword { get; set; }
     }
 }

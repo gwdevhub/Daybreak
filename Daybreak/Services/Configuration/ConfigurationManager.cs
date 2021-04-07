@@ -4,7 +4,7 @@ using Daybreak.Utils;
 using System;
 using System.IO;
 
-namespace Palletizer.WPF.Services.ConfigurationManager
+namespace Daybreak.Services.Configuration
 {
     public sealed class ConfigurationManager : IConfigurationManager
     {

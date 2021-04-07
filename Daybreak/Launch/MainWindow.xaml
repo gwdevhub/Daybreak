@@ -72,7 +72,7 @@
         <Grid x:Name="Container" Grid.Row="1">
         </Grid>
         <wcl:TitleBar x:Name="Titlebar"
-                      Background="Transparent" Text="" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"
+                      Background="Transparent" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"
                       WindowState="Normal" MinimizeButtonClicked="TitleBar_MinimizeButtonClicked"
                       MaximizeButtonClicked="TitleBar_MaximizeButtonClicked"
                       RestoreButtonClicked="TitleBar_RestoreButtonClicked"
