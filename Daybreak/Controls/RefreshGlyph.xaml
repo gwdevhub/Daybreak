@@ -1,0 +1,22 @@
+﻿<UserControl x:Class="Daybreak.Controls.RefreshGlyph"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Daybreak.Controls"
+             mc:Ignorable="d"
+             x:Name="_this"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Viewbox>
+        <Grid>
+            <Ellipse x:Name="BackgroundEllipse" Fill="{Binding ElementName=_this, Path=Foreground}" Visibility="Visible" Opacity="0.1" />
+            <Path
+                Data="m316.1,208c0,60 -48.5,108.2 -108.1,108.2s-108.1,-48.5 -108.1,-108.2c0,-59.6 48.5,-108.1 108.1,-108.1l0,55.8l96,-55.7l-96,-64l0,44c-70.7,0 -128,57.4 -128,128.1c0,70.8 57.3,128.1 128,128.1c70.7,0 128,-57.1 128,-128.1l-19.9,0l0,-0.1z"
+                Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"></Path>
+            <Path
+                Data="m208,0c-114.9,0 -208,93.1 -208,208s93.1,208 208,208c114.9,0 208,-93.1 208,-208s-93.1,-208 -208,-208zm0,398.7c-105.1,0 -190.7,-85.5 -190.7,-190.7c0,-105.1 85.5,-190.7 190.7,-190.7c105.1,0 190.7,85.5 190.7,190.7c0,105.1 -85.6,190.7 -190.7,190.7z"
+                Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"></Path>
+            <Ellipse Fill="Transparent" MouseEnter="Ellipse_MouseEnter" MouseLeave="Ellipse_MouseLeave" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"></Ellipse>
+        </Grid>
+    </Viewbox>
+</UserControl>

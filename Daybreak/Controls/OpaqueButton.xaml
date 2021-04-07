@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="Daybreak.Controls.OpaqueButton"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Daybreak.Controls"
+             mc:Ignorable="d"
+             x:Name="_this"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
+    </UserControl.Resources>
+    <Grid>
+        <Rectangle Fill="{Binding ElementName=_this, Path=TransparentBackground, Mode=OneWay}"
+                   Opacity="{Binding ElementName=_this, Path=BackgroundOpacity, Mode=OneWay}"></Rectangle>
+        <TextBlock Background="Transparent" Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                   Text="{Binding ElementName=_this, Path=Text, Mode=OneWay}"
+                   FontSize="{Binding ElementName=_this, Path=FontSize, Mode=OneWay}"
+                   FontFamily="{Binding ElementName=_this, Path=FontFamily, Mode=OneWay}"
+                   FontStretch="{Binding ElementName=_this, Path=FontStretch, Mode=OneWay}"
+                   FontWeight="{Binding ElementName=_this, Path=FontWeight, Mode=OneWay}"
+                   FontStyle="{Binding ElementName=_this, Path=FontStyle, Mode=OneWay}"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center"></TextBlock>
+        <Rectangle Fill="{Binding ElementName=_this, Path=Highlight, Mode=OneWay}"
+                   Opacity="{Binding ElementName=_this, Path=HighlightOpacity, Mode=OneWay}"
+                   Visibility="{Binding ElementName=_this, Path=HighlightVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"></Rectangle>
+        <Rectangle MouseEnter="Rectangle_MouseEnter" MouseLeave="Rectangle_MouseLeave"
+                   MouseLeftButtonDown="Rectangle_MouseLeftButtonDown" Fill="Transparent"
+                   Cursor="Hand"></Rectangle>
+    </Grid>
+</UserControl>
