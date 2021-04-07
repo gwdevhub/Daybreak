@@ -1,6 +1,8 @@
 # Daybreak
 Custom client for Guildwars.
 
+![Alt Text](https://media1.giphy.com/media/Z32o0OZ5pZHDOIodzD/giphy.gif)
+
 ## Features
 Automatically detect if guildwars is running or not. Includes the ability to launch guildwars from the client.
 
