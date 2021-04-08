@@ -7,7 +7,7 @@ Requires standalone version https://developer.microsoft.com/microsoft-edge/webvi
 ## Features
 Automatically detect if guildwars is running or not. Includes the ability to launch guildwars from the client.
 
-Manages username and password combination. Stores them in Windows Credential Manager.
+Manages username and password combination.
 
 Ability to set a character name which gets autoloaded during launch.
 
