@@ -14,7 +14,7 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibility"></BooleanToVisibilityConverter>
     </UserControl.Resources>
-    <Grid Background="Transparent">
+    <Grid Background="Transparent" x:Name="ViewContainer">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
@@ -28,13 +28,17 @@
                                Foreground="White" FontSize="36" Width="250" Height="60" VerticalAlignment="Bottom" Margin="0, 0, 0, 30"
                                IsEnabled="{Binding ElementName=_this, Path=LaunchButtonEnabled, Mode=OneWay}"
                                Clicked="OpaqueButton_Clicked" Grid.Row="1" Grid.ColumnSpan="3"></controls:OpaqueButton>
-        <controls:ChromiumBrowserWrapper Grid.Column="2" Margin="10" Address="{Binding ElementName=_this, Path=RightBrowserAddress, Mode=OneWay}"
-                                         Foreground="White" FavoriteUriChanged="RightBrowser_FavoriteUriChanged"
-                                         FavoriteAddress="{Binding ElementName=_this, Path=RightBrowserFavoriteAddress, Mode=OneWay}"/>
-
-        <controls:ChromiumBrowserWrapper Grid.Column="0" Margin="10" Address="{Binding ElementName=_this, Path=LeftBrowserAddress, Mode=OneWay}"
-                                         Foreground="White" FavoriteUriChanged="LeftBrowser_FavoriteUriChanged"
-                                         FavoriteAddress="{Binding ElementName=_this, Path=LeftBrowserFavoriteAddress, Mode=OneWay}"/>
-
+        <Grid x:Name="RightContainer" Grid.Column="2" Margin="10">
+            <controls:ChromiumBrowserWrapper Address="{Binding ElementName=_this, Path=RightBrowserAddress, Mode=OneWay}"
+                                             Foreground="White" FavoriteUriChanged="RightBrowser_FavoriteUriChanged"
+                                             FavoriteAddress="{Binding ElementName=_this, Path=RightBrowserFavoriteAddress, Mode=OneWay}"
+                                             MaximizeClicked="RightChromiumBrowserWrapper_MaximizeClicked"/>
+        </Grid>
+        <Grid x:Name="LeftContainer" Grid.Column="0" Margin="10">
+            <controls:ChromiumBrowserWrapper Address="{Binding ElementName=_this, Path=LeftBrowserAddress, Mode=OneWay}"
+                                             Foreground="White" FavoriteUriChanged="LeftBrowser_FavoriteUriChanged"
+                                             FavoriteAddress="{Binding ElementName=_this, Path=LeftBrowserFavoriteAddress, Mode=OneWay}"
+                                             MaximizeClicked="LeftChromiumBrowserWrapper_MaximizeClicked"/>
+        </Grid>
     </Grid>
 </UserControl>

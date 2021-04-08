@@ -134,7 +134,6 @@ namespace Daybreak.Launch
             {
                 var avgColor = GetAverageColor(bitmapImage);
                 var luminace = GetLuminace(avgColor);
-                Debug.WriteLine(luminace);
                 if (luminace < 0.15)
                 {
                     this.Foreground = Brushes.White;

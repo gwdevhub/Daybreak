@@ -20,6 +20,7 @@ namespace Daybreak.Controls
         public readonly static DependencyProperty AddressBarReadonlyProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, bool>(nameof(AddressBarReadonly));
 
         public event EventHandler<string> FavoriteUriChanged;
+        public event EventHandler MaximizeClicked;
 
         private readonly CoreWebView2Environment coreWebView2Environment;
         private readonly IConfigurationManager configurationManager;
@@ -62,6 +63,11 @@ namespace Daybreak.Controls
             }
         }
 
+        public void ReinitializeBrowser()
+        {
+            this.InitializeBrowser();
+        }
+
         private async void InitializeBrowser()
         {
             await this.WebBrowser.EnsureCoreWebView2Async(this.coreWebView2Environment);
@@ -76,7 +82,8 @@ namespace Daybreak.Controls
             if (e.Key == System.Windows.Input.Key.Enter)
             {
                 var newAddress = sender.As<TextBox>().Text;
-                if (string.IsNullOrWhiteSpace(newAddress))
+                newAddress = SanitizeAddress(newAddress);
+                if (newAddress is null)
                 {
                     return;
                 }
@@ -95,19 +102,19 @@ namespace Daybreak.Controls
         private void BackButton_Clicked(object sender, EventArgs e)
         {
             this.WebBrowser.GoBack();
-            this.Address = this.WebBrowser.Source.AbsoluteUri;
+            this.Address = this.WebBrowser.Source.ToString();
         }
 
         private void ForwardButton_Clicked(object sender, EventArgs e)
         {
             this.WebBrowser.GoForward();
-            this.Address = this.WebBrowser.Source.AbsoluteUri;
+            this.Address = this.WebBrowser.Source.ToString();
         }
 
         private void RefreshGlyph_Clicked(object sender, EventArgs e)
         {
             this.WebBrowser.Reload();
-            this.Address = this.WebBrowser.Source.AbsoluteUri;
+            this.Address = this.WebBrowser.Source.ToString();
         }
 
         private void CancelGlyph_Clicked(object sender, EventArgs e)
@@ -121,6 +128,11 @@ namespace Daybreak.Controls
             this.FavoriteUriChanged?.Invoke(this, this.FavoriteAddress);
         }
 
+        private void MaximizeButton_Clicked(object sender, EventArgs e)
+        {
+            this.MaximizeClicked?.Invoke(this, e);
+        }
+
         private void CheckFavoriteAddress()
         {
             if (this.Address == this.FavoriteAddress)
@@ -131,6 +143,27 @@ namespace Daybreak.Controls
             {
                 this.FavoriteButton.IsEnabled = true;
             }
+        }
+
+        private static string SanitizeAddress(string address)
+        {
+            if (string.IsNullOrWhiteSpace(address))
+            {
+                return null;
+            }
+
+            if (address.StartsWith("www") is false &&
+                address.StartsWith("http") is false)
+            {
+                address = "https://www." + address;
+            }
+            else if (address.StartsWith("www"))
+            {
+                address = "https://" + address;
+            }
+
+            Uri.TryCreate(address, UriKind.Absolute, out var uri);
+            return uri?.ToString();
         }
     }
 }

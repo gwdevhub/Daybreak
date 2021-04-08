@@ -52,9 +52,14 @@
                      BorderThickness="1" VerticalAlignment="Center" VerticalContentAlignment="Center"
                      BorderBrush="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
                      PreviewKeyDown="TextBox_PreviewKeyDown"></TextBox>
-            <local:StarGlyph Grid.Column="2" Height="30" Width="30" Margin="5"
+            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <local:StarGlyph Height="30" Width="30" Margin="5"
                              Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
                              Clicked="StarGlyph_Clicked" x:Name="FavoriteButton"></local:StarGlyph>
+                <local:MaximizeButton Height="30" Width="30" Margin="5"
+                             Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                             Clicked="MaximizeButton_Clicked"></local:MaximizeButton>
+            </StackPanel>
         </Grid>
     </Grid>
 </UserControl>

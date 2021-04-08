@@ -1,4 +1,5 @@
-﻿using Daybreak.Services.ApplicationDetection;
+﻿using Daybreak.Controls;
+using Daybreak.Services.ApplicationDetection;
 using Daybreak.Services.Configuration;
 using Daybreak.Services.ViewManagement;
 using System;
@@ -30,6 +31,9 @@ namespace Daybreak.Views
         private readonly IViewManager viewManager;
         private readonly IConfigurationManager configurationManager;
         private readonly CancellationTokenSource cancellationTokenSource = new();
+
+        private bool leftBrowserMaximized = false;
+        private bool rightBrowserMaximized = false;
 
         public string RightBrowserFavoriteAddress
         {
@@ -129,6 +133,42 @@ namespace Daybreak.Views
             var config = this.configurationManager.GetConfiguration();
             config.RightBrowserDefault = e;
             this.configurationManager.SaveConfiguration(config);
+        }
+
+        private void LeftChromiumBrowserWrapper_MaximizeClicked(object sender, EventArgs e)
+        {
+            if (this.leftBrowserMaximized)
+            {
+                this.ViewContainer.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
+                this.ViewContainer.ColumnDefinitions[1].Width = new GridLength(1, GridUnitType.Star);
+                this.ViewContainer.ColumnDefinitions[2].Width = new GridLength(1, GridUnitType.Star);
+            }
+            else
+            {
+                this.ViewContainer.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
+                this.ViewContainer.ColumnDefinitions[1].Width = new GridLength(0, GridUnitType.Star);
+                this.ViewContainer.ColumnDefinitions[2].Width = new GridLength(0, GridUnitType.Star);
+            }
+
+            this.leftBrowserMaximized = !this.leftBrowserMaximized;
+        }
+
+        private void RightChromiumBrowserWrapper_MaximizeClicked(object sender, EventArgs e)
+        {
+            if (this.rightBrowserMaximized)
+            {
+                this.ViewContainer.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
+                this.ViewContainer.ColumnDefinitions[1].Width = new GridLength(1, GridUnitType.Star);
+                this.ViewContainer.ColumnDefinitions[2].Width = new GridLength(1, GridUnitType.Star);
+            }
+            else
+            {
+                this.ViewContainer.ColumnDefinitions[0].Width = new GridLength(0, GridUnitType.Star);
+                this.ViewContainer.ColumnDefinitions[1].Width = new GridLength(0, GridUnitType.Star);
+                this.ViewContainer.ColumnDefinitions[2].Width = new GridLength(1, GridUnitType.Star);
+            }
+
+            this.rightBrowserMaximized = !this.rightBrowserMaximized;
         }
     }
 }

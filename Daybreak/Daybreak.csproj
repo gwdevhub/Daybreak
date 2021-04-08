@@ -37,6 +37,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="Controls\MaximizeButton.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Controls\StarGlyph.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
