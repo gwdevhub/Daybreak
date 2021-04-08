@@ -39,7 +39,8 @@ namespace Daybreak.Views
                     this.UsernameTextbox.Text = credentials.Username;
                     this.PasswordBox.Password = credentials.Password;
 
-                }); 
+                });
+            this.AddressBarReadonlyTextbox.Text = config.AddressBarReadonly.ToString();
             this.CharacterTextbox.Text = config.CharacterName;
             this.GamePathTextbox.Text = config.GamePath;
         }
@@ -49,6 +50,11 @@ namespace Daybreak.Views
             var currentConfig = this.configurationManager.GetConfiguration();
             currentConfig.CharacterName = this.CharacterTextbox.Text;
             currentConfig.GamePath = this.GamePathTextbox.Text;
+            if (bool.TryParse(this.AddressBarReadonlyTextbox.Text, out var addressBarReadonly))
+            {
+                currentConfig.AddressBarReadonly = addressBarReadonly;
+            }
+
             this.configurationManager.SaveConfiguration(currentConfig);
             this.credentialManager.StoreCredentials(new LoginCredentials { Username = this.UsernameTextbox.Text, Password = this.PasswordBox.Password });
             this.viewManager.ShowView<StartupView>();

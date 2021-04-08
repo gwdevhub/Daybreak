@@ -1,4 +1,5 @@
 ﻿using Daybreak.Launch;
+using Daybreak.Services.Configuration;
 using Microsoft.Web.WebView2.Core;
 using System;
 using System.Extensions;
@@ -16,32 +17,38 @@ namespace Daybreak.Controls
         public readonly static DependencyProperty AddressProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, string>(nameof(Address));
         public readonly static DependencyProperty FavoriteAddressProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, string>(nameof(FavoriteAddress));
         public readonly static DependencyProperty NavigatingProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, bool>(nameof(Navigating));
+        public readonly static DependencyProperty AddressBarReadonlyProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, bool>(nameof(AddressBarReadonly));
 
         public event EventHandler<string> FavoriteUriChanged;
 
         private readonly CoreWebView2Environment coreWebView2Environment;
+        private readonly IConfigurationManager configurationManager;
 
         public string Address
         {
             get => this.GetTypedValue<string>(AddressProperty);
             set => this.SetTypedValue(AddressProperty, value);
         }
-
         public string FavoriteAddress
         {
             get => this.GetTypedValue<string>(FavoriteAddressProperty);
             set => this.SetTypedValue(FavoriteAddressProperty, value);
         }
-
         public bool Navigating
         {
             get => this.GetTypedValue<bool>(NavigatingProperty);
             private set => this.SetTypedValue<bool>(NavigatingProperty, value);
         }
+        public bool AddressBarReadonly
+        {
+            get => this.GetTypedValue<bool>(AddressBarReadonlyProperty);
+            private set => this.SetTypedValue<bool>(AddressBarReadonlyProperty, value);
+        }
 
         public ChromiumBrowserWrapper()
         {
             this.coreWebView2Environment = Launcher.ApplicationServiceManager.GetService<CoreWebView2Environment>();
+            this.configurationManager = Launcher.ApplicationServiceManager.GetService<IConfigurationManager>();
             this.InitializeComponent();
             this.InitializeBrowser();
         }
@@ -58,9 +65,26 @@ namespace Daybreak.Controls
         private async void InitializeBrowser()
         {
             await this.WebBrowser.EnsureCoreWebView2Async(this.coreWebView2Environment);
+            this.AddressBarReadonly = this.configurationManager.GetConfiguration().AddressBarReadonly;
             this.WebBrowser.CoreWebView2.NewWindowRequested += (browser, args) => args.Handled = true;
             this.WebBrowser.NavigationStarting += (browser, args) => this.Navigating = true;
             this.WebBrowser.NavigationCompleted += (browser, args) => this.Navigating = false;
+        }
+
+        private void TextBox_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                var newAddress = sender.As<TextBox>().Text;
+                if (string.IsNullOrWhiteSpace(newAddress))
+                {
+                    return;
+                }
+
+                this.Address = newAddress;
+                this.WebBrowser.CoreWebView2.Navigate(this.Address);
+                e.Handled = true;
+            }
         }
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
@@ -71,16 +95,19 @@ namespace Daybreak.Controls
         private void BackButton_Clicked(object sender, EventArgs e)
         {
             this.WebBrowser.GoBack();
+            this.Address = this.WebBrowser.Source.AbsoluteUri;
         }
 
         private void ForwardButton_Clicked(object sender, EventArgs e)
         {
             this.WebBrowser.GoForward();
+            this.Address = this.WebBrowser.Source.AbsoluteUri;
         }
 
         private void RefreshGlyph_Clicked(object sender, EventArgs e)
         {
             this.WebBrowser.Reload();
+            this.Address = this.WebBrowser.Source.AbsoluteUri;
         }
 
         private void CancelGlyph_Clicked(object sender, EventArgs e)

@@ -16,5 +16,7 @@ namespace Daybreak.Configuration
         public string ProtectedUsername { get; set; }
         [JsonProperty("ProtectedPassword")]
         public string ProtectedPassword { get; set; }
+        [JsonProperty("AddressBarReadonly")]
+        public bool AddressBarReadonly { get; set; } = true;
     }
 }

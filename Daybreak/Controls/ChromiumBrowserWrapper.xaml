@@ -48,9 +48,10 @@
             </WrapPanel>
             <TextBox Text="{Binding ElementName=_this, Path=Address, Mode=OneWay}" FontSize="16" 
                      Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
-                     Grid.Column="1" IsReadOnly="True" Background="Transparent"
+                     Grid.Column="1" IsReadOnly="{Binding ElementName=_this, Path=AddressBarReadonly, Mode=OneWay}" Background="Transparent"
                      BorderThickness="1" VerticalAlignment="Center" VerticalContentAlignment="Center"
-                     BorderBrush="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"></TextBox>
+                     BorderBrush="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                     PreviewKeyDown="TextBox_PreviewKeyDown"></TextBox>
             <local:StarGlyph Grid.Column="2" Height="30" Width="30" Margin="5"
                              Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
                              Clicked="StarGlyph_Clicked" x:Name="FavoriteButton"></local:StarGlyph>
