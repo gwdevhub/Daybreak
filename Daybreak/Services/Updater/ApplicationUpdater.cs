@@ -22,6 +22,7 @@ namespace Daybreak.Services.Updater
         private const string OutputPathTag = "{OUTPUTPATh}";
         private const string Url = "https://github.com/AlexMacocian/Daybreak/releases/latest";
         private const string DownloadUrl = $"https://github.com/AlexMacocian/Daybreak/releases/download/v{VersionTag}/Daybreakv{VersionTag}.zip";
+        private const string SetExecutionPolicy = $"Set-ExecutionPolicy RemoteSigned -Scope CurrentUser";
         private const string DelayCommand = "Start-Sleep -m 3000";
         private const string ExtractCommandTemplate = $"Expand-Archive -Path '{InputFileTag}' -DestinationPath '{OutputPathTag}' -Force";
         private const string RunClientCommand = @".\Daybreak.exe";
@@ -99,7 +100,8 @@ namespace Daybreak.Services.Updater
         public void FinalizeUpdate()
         {
             File.WriteAllLines(ExtractAndRunPs1, new List<string>()
-            { 
+            {
+                SetExecutionPolicy,
                 DelayCommand,
                 ExtractCommandTemplate
                     .Replace(InputFileTag, Path.GetFullPath(TempFile))
