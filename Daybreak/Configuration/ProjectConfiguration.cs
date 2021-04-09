@@ -5,6 +5,7 @@ using Daybreak.Services.Configuration;
 using Daybreak.Services.Credentials;
 using Daybreak.Services.Logging;
 using Daybreak.Services.Screenshots;
+using Daybreak.Services.Updater;
 using Daybreak.Services.ViewManagement;
 using Daybreak.Views;
 using Microsoft.Web.WebView2.Core;
@@ -29,6 +30,7 @@ namespace Daybreak.Configuration
             serviceProducer.RegisterSingleton<IScreenshotProvider, ScreenshotProvider>();
             serviceProducer.RegisterSingleton<IConfigurationManager, ConfigurationManager>();
             serviceProducer.RegisterSingleton<IBloogumClient, BloogumClient>();
+            serviceProducer.RegisterSingleton<IApplicationUpdater, ApplicationUpdater>();
             serviceProducer.RegisterSingleton<CoreWebView2Environment, CoreWebView2Environment>((sp) => TaskExtensions.RunSync(() => CoreWebView2Environment.CreateAsync(null, "BrowserData", null)));
         }
         public static void RegisterLifetimeServices(IApplicationLifetimeProducer applicationLifetimeProducer)
@@ -44,6 +46,8 @@ namespace Daybreak.Configuration
 
             viewProducer.RegisterView<MainView>();
             viewProducer.RegisterView<SettingsView>();
+            viewProducer.RegisterView<AskUpdateView>();
+            viewProducer.RegisterView<UpdateView>();
         }
     }
 }

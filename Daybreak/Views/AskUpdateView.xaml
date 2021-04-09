@@ -1,0 +1,21 @@
+﻿<UserControl x:Class="Daybreak.Views.AskUpdateView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Daybreak.Views"
+             mc:Ignorable="d"
+             xmlns:controls="clr-namespace:Daybreak.Controls"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Width="400" Height="200"
+          Background="White">
+        <TextBlock Text="An update has been detected. Do you wish to update?" FontSize="20" TextWrapping="Wrap"
+                   Foreground="Black"></TextBlock>
+        <controls:OpaqueButton Text="No" Foreground="Black" TransparentBackground="Gray" BackgroundOpacity="0.2" Width="50" Height="30"
+                               FontSize="16" HorizontalAlignment="Center" Margin="0, 0, 80, 0"
+                               Clicked="NoButton_Clicked"></controls:OpaqueButton>
+        <controls:OpaqueButton Text="Yes" Foreground="Black" TransparentBackground="Gray" BackgroundOpacity="0.2" Width="50" Height="30"
+                               FontSize="16" HorizontalAlignment="Center" Margin="80, 0, 0, 0"
+                               Clicked="YesButton_Clicked"></controls:OpaqueButton>
+    </Grid>
+</UserControl>

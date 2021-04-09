@@ -1,5 +1,6 @@
 ﻿using Daybreak.Services.Bloogum;
 using Daybreak.Services.Screenshots;
+using Daybreak.Services.Updater;
 using Daybreak.Services.ViewManagement;
 using Daybreak.Views;
 using Pepa.Wpf.Utilities;
@@ -26,6 +27,7 @@ namespace Daybreak.Launch
         private readonly IViewManager viewManager;
         private readonly IScreenshotProvider screenshotProvider;
         private readonly IBloogumClient bloogumClient;
+        private readonly IApplicationUpdater applicationUpdater;
         private readonly CancellationTokenSource cancellationToken = new();
 
         public string CreditText
@@ -37,18 +39,20 @@ namespace Daybreak.Launch
         public MainWindow(
             IViewManager viewManager,
             IScreenshotProvider screenshotProvider,
-            IBloogumClient bloogumClient)
+            IBloogumClient bloogumClient,
+            IApplicationUpdater applicationUpdater)
         {
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.screenshotProvider = screenshotProvider.ThrowIfNull(nameof(screenshotProvider));
             this.bloogumClient = bloogumClient.ThrowIfNull(nameof(bloogumClient));
+            this.applicationUpdater = applicationUpdater.ThrowIfNull(nameof(applicationUpdater));
             InitializeComponent();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            this.viewManager.ShowView<MainView>();
             this.SetupImageCycle();
+            this.CheckForUpdates();
         }
 
         private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -142,6 +146,19 @@ namespace Daybreak.Launch
                 {
                     this.Foreground = Brushes.Black;
                 }
+            }
+        }
+
+        private async void CheckForUpdates()
+        {
+            var updateAvailable = await this.applicationUpdater.UpdateAvailable().ConfigureAwait(true);
+            if (updateAvailable)
+            {
+                this.viewManager.ShowView<AskUpdateView>();
+            }
+            else
+            {
+                this.viewManager.ShowView<MainView>();
             }
         }
 
