@@ -100,7 +100,7 @@ namespace Daybreak.Updater
             Console.WriteLine("Downloaded latest version...");
             fs.Close();
             Console.WriteLine("Extracting zip file...");
-            ZipFile.ExtractToDirectory(TempFile, Directory.GetCurrentDirectory());
+            ZipFile.ExtractToDirectory(TempFile, Directory.GetCurrentDirectory(), true);
             Console.WriteLine("Launching client...");
             Process.Start($"{ProcessName}.exe");
         }
