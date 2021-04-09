@@ -3,6 +3,7 @@ Custom client for Guildwars.
 Requires standalone version https://developer.microsoft.com/microsoft-edge/webview2.
 
 ![Alt Text](https://media1.giphy.com/media/Z32o0OZ5pZHDOIodzD/giphy.gif)
+![Alt Text](https://media0.giphy.com/media/aQ8Wl7lsuhT0AblCPI/giphy.gif)
 
 ## Features
 Automatically detect if guildwars is running or not. Includes the ability to launch guildwars from the client.
