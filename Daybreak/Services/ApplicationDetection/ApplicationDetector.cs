@@ -11,12 +11,14 @@ namespace Daybreak.Services.ApplicationDetection
 {
     public class ApplicationDetector : IApplicationDetector
     {
+        private const string ToolboxProcessName = "GWToolbox";
         private const string ProcessName = "gw";
 
         private readonly IConfigurationManager configurationManager;
         private readonly ICredentialManager credentialManager;
 
         public bool IsGuildwarsRunning => GuildwarsProcessDetected();
+        public bool IsToolboxRunning => GuildwarsToolboxProcessDetected();
 
         public ApplicationDetector(
             IConfigurationManager configurationManager,
@@ -46,7 +48,7 @@ namespace Daybreak.Services.ApplicationDetection
                 {
                     if (Process.Start(executable, new List<string> { "-email", credentials.Username, "-password", credentials.Password, "-character", configuration.CharacterName }) is null)
                     {
-                        throw new InvalidOperationException($"Unable to launch executable");
+                        throw new InvalidOperationException($"Unable to launch {executable}");
                     }
                 },
                 onNone: () =>
@@ -55,10 +57,29 @@ namespace Daybreak.Services.ApplicationDetection
                 });
         }
 
+        public void LaunchGuildwarsToolbox()
+        {
+            var configuration = this.configurationManager.GetConfiguration();
+            var executable = configuration.ToolboxPath;
+            if (File.Exists(executable) is false)
+            {
+                throw new InvalidOperationException($"Guildwars executable doesn't exist at {executable}");
+            }
+
+            if (Process.Start(executable) is null)
+            {
+                throw new InvalidOperationException($"Unable to launch {executable}");
+            }
+        }
+
         private static bool GuildwarsProcessDetected()
         {
-            var process = Process.GetProcessesByName(ProcessName).FirstOrDefault();
-            return process is not null;
+            return Process.GetProcessesByName(ProcessName).FirstOrDefault() is not null;
+        }
+
+        private static bool GuildwarsToolboxProcessDetected()
+        {
+            return Process.GetProcessesByName(ToolboxProcessName).FirstOrDefault() is not null;
         }
     }
 }

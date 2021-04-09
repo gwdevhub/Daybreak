@@ -14,18 +14,20 @@ namespace Daybreak.Views
     /// <summary>
     /// Interaction logic for StartupView.xaml
     /// </summary>
-    public partial class StartupView : UserControl
+    public partial class MainView : UserControl
     {
         public static readonly DependencyProperty LaunchButtonEnabledProperty =
-            DependencyPropertyExtensions.Register<StartupView, bool>(nameof(LaunchButtonEnabled));
+            DependencyPropertyExtensions.Register<MainView, bool>(nameof(LaunchButtonEnabled));
+        public static readonly DependencyProperty LaunchToolboxButtonEnabledProperty =
+            DependencyPropertyExtensions.Register<MainView, bool>(nameof(LaunchToolboxButtonEnabled));
         public static readonly DependencyProperty RightBrowserAddressProperty =
-            DependencyPropertyExtensions.Register<StartupView, string>(nameof(RightBrowserAddress));
+            DependencyPropertyExtensions.Register<MainView, string>(nameof(RightBrowserAddress));
         public static readonly DependencyProperty LeftBrowserAddressProperty =
-            DependencyPropertyExtensions.Register<StartupView, string>(nameof(LeftBrowserAddress));
+            DependencyPropertyExtensions.Register<MainView, string>(nameof(LeftBrowserAddress));
         public static readonly DependencyProperty RightBrowserFavoriteAddressProperty =
-            DependencyPropertyExtensions.Register<StartupView, string>(nameof(RightBrowserFavoriteAddress));
+            DependencyPropertyExtensions.Register<MainView, string>(nameof(RightBrowserFavoriteAddress));
         public static readonly DependencyProperty LeftBrowserFavoriteAddressProperty =
-            DependencyPropertyExtensions.Register<StartupView, string>(nameof(LeftBrowserFavoriteAddress));
+            DependencyPropertyExtensions.Register<MainView, string>(nameof(LeftBrowserFavoriteAddress));
 
         private readonly IApplicationDetector applicationDetector;
         private readonly IViewManager viewManager;
@@ -60,8 +62,13 @@ namespace Daybreak.Views
             get => this.GetTypedValue<bool>(LaunchButtonEnabledProperty);
             set => this.SetTypedValue(LaunchButtonEnabledProperty, value);
         }
+        public bool LaunchToolboxButtonEnabled
+        {
+            get => this.GetTypedValue<bool>(LaunchToolboxButtonEnabledProperty);
+            set => this.SetTypedValue(LaunchToolboxButtonEnabledProperty, value);
+        }
 
-        public StartupView(
+        public MainView(
             IApplicationDetector applicationDetector,
             IViewManager viewManager,
             IConfigurationManager configurationManager)
@@ -90,14 +97,8 @@ namespace Daybreak.Views
 
         private void CheckGameState()
         {
-            if (applicationDetector.IsGuildwarsRunning)
-            {
-                this.LaunchButtonEnabled = false;
-            }
-            else
-            {
-                this.LaunchButtonEnabled = true;
-            }
+            this.LaunchButtonEnabled = applicationDetector.IsGuildwarsRunning is false;
+            this.LaunchToolboxButtonEnabled = applicationDetector.IsToolboxRunning is false;
         }
 
         private void StartupView_Loaded(object sender, RoutedEventArgs e)
@@ -109,11 +110,23 @@ namespace Daybreak.Views
             this.cancellationTokenSource.Cancel();
         }
 
-        private void OpaqueButton_Clicked(object sender, EventArgs e)
+        private void LaunchButton_Clicked(object sender, EventArgs e)
         {
             try
             {
                 this.applicationDetector.LaunchGuildwars();
+            }
+            catch
+            {
+                this.viewManager.ShowView<SettingsView>();
+            }
+        }
+
+        private void LaunchToolboxButton_Clicked(object sender, EventArgs e)
+        {
+            try
+            {
+                this.applicationDetector.LaunchGuildwarsToolbox();
             }
             catch
             {

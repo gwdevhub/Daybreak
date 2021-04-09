@@ -6,6 +6,8 @@ namespace Daybreak.Configuration
     {
         [JsonProperty("GamePath")]
         public string GamePath { get; set; }
+        [JsonProperty("ToolboxPath")]
+        public string ToolboxPath { get; set; }
         [JsonProperty("CharacterName")]
         public string CharacterName { get; set; }
         [JsonProperty("LeftBrowserDefault")]

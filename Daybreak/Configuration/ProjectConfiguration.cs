@@ -42,7 +42,7 @@ namespace Daybreak.Configuration
         {
             viewProducer.ThrowIfNull(nameof(viewProducer));
 
-            viewProducer.RegisterView<StartupView>();
+            viewProducer.RegisterView<MainView>();
             viewProducer.RegisterView<SettingsView>();
         }
     }

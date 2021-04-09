@@ -47,7 +47,7 @@ namespace Daybreak.Launch
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            this.viewManager.ShowView<StartupView>();
+            this.viewManager.ShowView<MainView>();
             this.SetupImageCycle();
         }
 

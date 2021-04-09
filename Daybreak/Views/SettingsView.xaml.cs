@@ -43,6 +43,7 @@ namespace Daybreak.Views
             this.AddressBarReadonlyTextbox.Text = config.AddressBarReadonly.ToString();
             this.CharacterTextbox.Text = config.CharacterName;
             this.GamePathTextbox.Text = config.GamePath;
+            this.ToolboxPathTextbox.Text = config.ToolboxPath;
         }
 
         private void SaveButton_Clicked(object sender, System.EventArgs e)
@@ -50,6 +51,7 @@ namespace Daybreak.Views
             var currentConfig = this.configurationManager.GetConfiguration();
             currentConfig.CharacterName = this.CharacterTextbox.Text;
             currentConfig.GamePath = this.GamePathTextbox.Text;
+            currentConfig.ToolboxPath = this.ToolboxPathTextbox.Text;
             if (bool.TryParse(this.AddressBarReadonlyTextbox.Text, out var addressBarReadonly))
             {
                 currentConfig.AddressBarReadonly = addressBarReadonly;
@@ -57,10 +59,10 @@ namespace Daybreak.Views
 
             this.configurationManager.SaveConfiguration(currentConfig);
             this.credentialManager.StoreCredentials(new LoginCredentials { Username = this.UsernameTextbox.Text, Password = this.PasswordBox.Password });
-            this.viewManager.ShowView<StartupView>();
+            this.viewManager.ShowView<MainView>();
         }
 
-        private void FilePickerGlyph_Clicked(object sender, System.EventArgs e)
+        private void GameFilePickerGlyph_Clicked(object sender, System.EventArgs e)
         {
             var filePicker = new OpenFileDialog()
             {
@@ -75,9 +77,24 @@ namespace Daybreak.Views
             }
         }
 
+        private void ToolboxFilePickerGlyph_Clicked(object sender, System.EventArgs e)
+        {
+            var filePicker = new OpenFileDialog()
+            {
+                CheckFileExists = true,
+                CheckPathExists = true,
+                DefaultExt = "exe",
+                Multiselect = false
+            };
+            if (filePicker.ShowDialog() is true)
+            {
+                this.ToolboxPathTextbox.Text = filePicker.FileName;
+            }
+        }
+
         private void BackButton_Clicked(object sender, System.EventArgs e)
         {
-            this.viewManager.ShowView<StartupView>();
+            this.viewManager.ShowView<MainView>();
         }
     }
 }
