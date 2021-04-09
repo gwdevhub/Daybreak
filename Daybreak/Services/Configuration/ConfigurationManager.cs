@@ -1,7 +1,9 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Exceptions;
+using Daybreak.Services.Logging;
 using Daybreak.Utils;
 using System;
+using System.Extensions;
 using System.IO;
 
 namespace Daybreak.Services.Configuration
@@ -11,9 +13,11 @@ namespace Daybreak.Services.Configuration
         private const string ConfigName = "Daybreak.config.json";
 
         private ApplicationConfiguration applicationConfiguration;
+        private readonly ILogger logger;
 
-        public ConfigurationManager()
+        public ConfigurationManager(ILogger logger)
         {
+            this.logger = logger.ThrowIfNull(nameof(logger));
             try
             {
                 var serializedConfig = File.ReadAllText(ConfigName);
@@ -21,7 +25,8 @@ namespace Daybreak.Services.Configuration
             }
             catch(Exception e)
             {
-                throw new FatalException("Failed to load application configuration. See inner exception for details", e);
+                this.logger.LogWarning($"No configuration detected. Loading default configuration. Details: {e}");
+                this.applicationConfiguration = new ApplicationConfiguration();
             }
         }
 

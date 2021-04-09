@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Daybreak.Updater": {
+      "commandName": "Project",
+      "commandLineArgs": "-update"
+    }
+  }
+}
