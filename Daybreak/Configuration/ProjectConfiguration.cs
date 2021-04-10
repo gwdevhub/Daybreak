@@ -39,6 +39,7 @@ namespace Daybreak.Configuration
 
             applicationLifetimeProducer.RegisterService<ILoggingDatabase>();
             applicationLifetimeProducer.RegisterService<IScreenshotProvider>();
+            applicationLifetimeProducer.RegisterService<IApplicationUpdater>();
         }
         public static void RegisterViews(IViewProducer viewProducer)
         {
