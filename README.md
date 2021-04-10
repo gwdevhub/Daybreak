@@ -1,6 +1,6 @@
 # Daybreak
 Custom client for Guildwars.
-Requires standalone version https://developer.microsoft.com/microsoft-edge/webview2.
+Requires webview2 runtime https://go.microsoft.com/fwlink/p/?LinkId=2124703.
 
 ![Alt Text](https://media1.giphy.com/media/Z32o0OZ5pZHDOIodzD/giphy.gif)
 ![Alt Text](https://media0.giphy.com/media/aQ8Wl7lsuhT0AblCPI/giphy.gif)
