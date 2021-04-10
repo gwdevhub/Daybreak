@@ -1,8 +1,12 @@
 ﻿using Daybreak.Launch;
 using Daybreak.Services.Configuration;
+using Daybreak.Services.Logging;
+using Daybreak.Utils;
 using Microsoft.Web.WebView2.Core;
 using System;
+using System.Diagnostics;
 using System.Extensions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
@@ -14,16 +18,20 @@ namespace Daybreak.Controls
     /// </summary>
     public partial class ChromiumBrowserWrapper : UserControl
     {
+        private const string BrowserDownloadLink = "https://developer.microsoft.com/en-us/microsoft-edge/webview2/";
+
         public readonly static DependencyProperty AddressProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, string>(nameof(Address));
         public readonly static DependencyProperty FavoriteAddressProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, string>(nameof(FavoriteAddress));
         public readonly static DependencyProperty NavigatingProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, bool>(nameof(Navigating));
         public readonly static DependencyProperty AddressBarReadonlyProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, bool>(nameof(AddressBarReadonly));
+        public readonly static DependencyProperty BrowserSupportedProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, bool>(nameof(BrowserSupported), new PropertyMetadata(true));
 
         public event EventHandler<string> FavoriteUriChanged;
         public event EventHandler MaximizeClicked;
 
-        private readonly CoreWebView2Environment coreWebView2Environment;
         private readonly IConfigurationManager configurationManager;
+        private readonly ILogger logger;
+        private CoreWebView2Environment coreWebView2Environment;
 
         public string Address
         {
@@ -45,12 +53,18 @@ namespace Daybreak.Controls
             get => this.GetTypedValue<bool>(AddressBarReadonlyProperty);
             private set => this.SetTypedValue<bool>(AddressBarReadonlyProperty, value);
         }
+        public bool BrowserSupported
+        {
+            get => this.GetTypedValue<bool>(BrowserSupportedProperty);
+            private set => this.SetTypedValue<bool>(BrowserSupportedProperty, value);
+        }
 
         public ChromiumBrowserWrapper()
         {
-            this.coreWebView2Environment = Launcher.ApplicationServiceManager.GetService<CoreWebView2Environment>();
             this.configurationManager = Launcher.ApplicationServiceManager.GetService<IConfigurationManager>();
+            this.logger = Launcher.ApplicationServiceManager.GetService<ILogger>();
             this.InitializeComponent();
+            this.InitializeEnvironment();
             this.InitializeBrowser();
         }
 
@@ -68,13 +82,51 @@ namespace Daybreak.Controls
             this.InitializeBrowser();
         }
 
-        private async void InitializeBrowser()
+        private void InitializeEnvironment()
         {
-            await this.WebBrowser.EnsureCoreWebView2Async(this.coreWebView2Environment);
-            this.AddressBarReadonly = this.configurationManager.GetConfiguration().AddressBarReadonly;
-            this.WebBrowser.CoreWebView2.NewWindowRequested += (browser, args) => args.Handled = true;
-            this.WebBrowser.NavigationStarting += (browser, args) => this.Navigating = true;
-            this.WebBrowser.NavigationCompleted += (browser, args) => this.Navigating = false;
+            try
+            {
+                this.coreWebView2Environment = System.Extensions.TaskExtensions.RunSync(() => CoreWebView2Environment.CreateAsync(null, "BrowserData", null));
+                this.BrowserSupported = true;
+            }
+            catch(Exception e)
+            {
+                this.logger.LogWarning($"Browser initialization failed. Details: {e}");
+                this.BrowserSupported = false;
+            }
+        }
+
+        private async Task InitializeBrowser()
+        {
+            if (this.BrowserSupported is true)
+            {
+                await this.WebBrowser.EnsureCoreWebView2Async(this.coreWebView2Environment);
+                this.AddressBarReadonly = this.configurationManager.GetConfiguration().AddressBarReadonly;
+                this.WebBrowser.CoreWebView2.NewWindowRequested += (browser, args) => args.Handled = true;
+                this.WebBrowser.NavigationStarting += (browser, args) => this.Navigating = true;
+                this.WebBrowser.NavigationCompleted += (browser, args) => this.Navigating = false;
+            }
+        }
+
+        private async void RetryInitializeButton_Clicked(object sender, EventArgs e)
+        {
+            this.InitializeEnvironment();
+            try
+            {
+                await this.InitializeBrowser();
+            }
+            catch
+            {
+                this.BrowserSupported = false;
+            }
+        }
+
+        private void Hyperlink_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (Uri.TryCreate(BrowserDownloadLink, UriKind.Absolute, out var uri))
+            {
+                Process.Start("explorer.exe", uri.ToString());
+            }
         }
 
         private void TextBox_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)

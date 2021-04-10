@@ -19,8 +19,9 @@
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <wv2:WebView2 x:Name="WebBrowser" Source="{Binding ElementName=_this, Path=Address, Mode=TwoWay}"></wv2:WebView2>
-        <Grid Grid.Row="1" Background="#80808080">
+        <wv2:WebView2 x:Name="WebBrowser" Source="{Binding ElementName=_this, Path=Address, Mode=TwoWay}"
+                      IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"></wv2:WebView2>
+        <Grid Grid.Row="1" Background="#80808080" IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
@@ -51,15 +52,32 @@
                      Grid.Column="1" IsReadOnly="{Binding ElementName=_this, Path=AddressBarReadonly, Mode=OneWay}" Background="Transparent"
                      BorderThickness="1" VerticalAlignment="Center" VerticalContentAlignment="Center"
                      BorderBrush="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
-                     PreviewKeyDown="TextBox_PreviewKeyDown"></TextBox>
+                     PreviewKeyDown="TextBox_PreviewKeyDown"
+                     IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"></TextBox>
             <StackPanel Grid.Column="2" Orientation="Horizontal">
                 <local:StarGlyph Height="30" Width="30" Margin="5"
                              Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                             IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"
                              Clicked="StarGlyph_Clicked" x:Name="FavoriteButton"></local:StarGlyph>
                 <local:MaximizeButton Height="30" Width="30" Margin="5"
                              Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                             IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"
                              Clicked="MaximizeButton_Clicked"></local:MaximizeButton>
             </StackPanel>
         </Grid>
+        <Grid Grid.RowSpan="2" Background="Gray"
+              Visibility="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay,Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Foreground="White" Text="Browser not supported." FontSize="26" TextWrapping="Wrap"></TextBlock>
+                <TextBlock Foreground="White" Text="Download the Evergreen Bootstrapper from here:" FontSize="26" TextWrapping="Wrap" />
+                <TextBox Background="Transparent" BorderBrush="Transparent" BorderThickness="0"
+                         Text="https://go.microsoft.com/fwlink/p/?LinkId=2124703"
+                         IsReadOnly="True" Margin="0, 0, 0, 30" FontSize="22" Foreground="Blue"
+                         PreviewMouseLeftButtonDown="Hyperlink_PreviewMouseLeftButtonDown" Cursor="Hand"
+                         TextWrapping="Wrap"></TextBox>
+                <TextBlock Foreground="White" Text="Restart after the installation." FontSize="26" TextWrapping="Wrap" />
+            </StackPanel>
+        </Grid>
+        
     </Grid>
 </UserControl>

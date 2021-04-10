@@ -31,7 +31,6 @@ namespace Daybreak.Configuration
             serviceProducer.RegisterSingleton<IConfigurationManager, ConfigurationManager>();
             serviceProducer.RegisterSingleton<IBloogumClient, BloogumClient>();
             serviceProducer.RegisterSingleton<IApplicationUpdater, ApplicationUpdater>();
-            serviceProducer.RegisterSingleton<CoreWebView2Environment, CoreWebView2Environment>((sp) => TaskExtensions.RunSync(() => CoreWebView2Environment.CreateAsync(null, "BrowserData", null)));
         }
         public static void RegisterLifetimeServices(IApplicationLifetimeProducer applicationLifetimeProducer)
         {
