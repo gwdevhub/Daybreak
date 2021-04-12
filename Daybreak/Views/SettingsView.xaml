@@ -17,6 +17,8 @@
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"></ColumnDefinition>
@@ -50,5 +52,9 @@
         <TextBlock Text="Address bar readonly: " FontSize="22" Foreground="White" Grid.Row="6"/>
         <TextBox Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Grid.Row="6"
                  x:Name="AddressBarReadonlyTextbox" FontSize="22" Background="Transparent" Foreground="White"></TextBox>
+        <TextBlock Text="Experimental" FontSize="26" Foreground="White" Grid.Row="7" Grid.ColumnSpan="2" HorizontalAlignment="Center"/>
+        <TextBlock Text="Multi-launch support: " FontSize="22" Foreground="White" Grid.Row="8"/>
+        <TextBox Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Grid.Row="8"
+                 x:Name="MultiLaunchSupportTextbox" FontSize="22" Background="Transparent" Foreground="White"></TextBox>
     </Grid>
 </UserControl>

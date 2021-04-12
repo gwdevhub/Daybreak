@@ -44,6 +44,7 @@ namespace Daybreak.Views
             this.CharacterTextbox.Text = config.CharacterName;
             this.GamePathTextbox.Text = config.GamePath;
             this.ToolboxPathTextbox.Text = config.ToolboxPath;
+            this.MultiLaunchSupportTextbox.Text = config.ExperimentalFeatures.MultiLaunchSupport.ToString();
         }
 
         private void SaveButton_Clicked(object sender, System.EventArgs e)
@@ -55,6 +56,11 @@ namespace Daybreak.Views
             if (bool.TryParse(this.AddressBarReadonlyTextbox.Text, out var addressBarReadonly))
             {
                 currentConfig.AddressBarReadonly = addressBarReadonly;
+            }
+
+            if (bool.TryParse(this.MultiLaunchSupportTextbox.Text, out var multiLaunchSupport))
+            {
+                currentConfig.ExperimentalFeatures.MultiLaunchSupport = multiLaunchSupport;
             }
 
             this.configurationManager.SaveConfiguration(currentConfig);

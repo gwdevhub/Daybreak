@@ -4,6 +4,7 @@ using Daybreak.Services.Bloogum;
 using Daybreak.Services.Configuration;
 using Daybreak.Services.Credentials;
 using Daybreak.Services.Logging;
+using Daybreak.Services.Mutex;
 using Daybreak.Services.Screenshots;
 using Daybreak.Services.Updater;
 using Daybreak.Services.ViewManagement;
@@ -31,6 +32,7 @@ namespace Daybreak.Configuration
             serviceProducer.RegisterSingleton<IConfigurationManager, ConfigurationManager>();
             serviceProducer.RegisterSingleton<IBloogumClient, BloogumClient>();
             serviceProducer.RegisterSingleton<IApplicationUpdater, ApplicationUpdater>();
+            serviceProducer.RegisterSingleton<IMutexHandler, MutexHandler>();
         }
         public static void RegisterLifetimeServices(IApplicationLifetimeProducer applicationLifetimeProducer)
         {
