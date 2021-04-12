@@ -1,7 +1,9 @@
 ﻿using Daybreak.Models;
 using Daybreak.Services.Configuration;
 using Daybreak.Services.Credentials;
+using Daybreak.Services.Logging;
 using Daybreak.Services.Mutex;
+using Daybreak.Utils;
 using Microsoft.Win32;
 using Pepa.Wpf.Utilities;
 using System;
@@ -11,6 +13,8 @@ using System.Extensions;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security;
+using System.Security.Permissions;
 
 namespace Daybreak.Services.ApplicationDetection
 {
@@ -23,6 +27,7 @@ namespace Daybreak.Services.ApplicationDetection
         private readonly IConfigurationManager configurationManager;
         private readonly ICredentialManager credentialManager;
         private readonly IMutexHandler mutexHandler;
+        private readonly ILogger logger;
 
         public bool IsGuildwarsRunning => this.GuildwarsProcessDetected();
         public bool IsToolboxRunning => GuildwarsToolboxProcessDetected();
@@ -30,8 +35,10 @@ namespace Daybreak.Services.ApplicationDetection
         public ApplicationDetector(
             IConfigurationManager configurationManager,
             ICredentialManager credentialManager,
-            IMutexHandler mutexHandler)
+            IMutexHandler mutexHandler,
+            ILogger logger)
         {
+            this.logger = logger.ThrowIfNull(nameof(logger));
             this.mutexHandler = mutexHandler.ThrowIfNull(nameof(mutexHandler));
             this.credentialManager = credentialManager.ThrowIfNull(nameof(credentialManager));
             this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
@@ -77,7 +84,7 @@ namespace Daybreak.Services.ApplicationDetection
             }
         }
 
-        private void LaunchGuildwarsProcess(string email, SecureString password, string character)
+        private void LaunchGuildwarsProcess(string email, Models.SecureString password, string character)
         {
             var executable = this.configurationManager.GetConfiguration().GamePath;
             if (File.Exists(executable) is false)
@@ -121,10 +128,17 @@ namespace Daybreak.Services.ApplicationDetection
         private void SetRegistryGuildwarsPath()
         {
             var gamePath = this.configurationManager.GetConfiguration().GamePath;
-            var registryKey = GetGuildwarsRegistryKey(true);
-            registryKey.SetValue("Path", gamePath);
-            registryKey.SetValue("Src", gamePath);
-            registryKey.Close();
+            try
+            {
+                var registryKey = GetGuildwarsRegistryKey(true);
+                registryKey.SetValue("Path", gamePath);
+                registryKey.SetValue("Src", gamePath);
+                registryKey.Close();
+            }
+            catch (SecurityException ex)
+            {
+                this.logger.LogCritical($"Multi-launch requires administrator rights. Details: {ex}");
+            }
         }
 
         private RegistryKey GetGuildwarsRegistryKey(bool write)
