@@ -2,9 +2,9 @@
 Custom client for Guildwars.
 Requires webview2 runtime https://go.microsoft.com/fwlink/p/?LinkId=2124703.
 
-![Alt Text](https://media1.giphy.com/media/Z32o0OZ5pZHDOIodzD/giphy.gif)
-![Alt Text](https://media0.giphy.com/media/aQ8Wl7lsuhT0AblCPI/giphy.gif)
-![Alt Text](https://media2.giphy.com/media/s06PtxgeAAZtoJhTx6/giphy.gif)
+![Showcase 1](https://media1.giphy.com/media/Z32o0OZ5pZHDOIodzD/giphy.gif)
+![Showcase 2](https://media0.giphy.com/media/aQ8Wl7lsuhT0AblCPI/giphy.gif)
+![Showcase 3](https://media2.giphy.com/media/s06PtxgeAAZtoJhTx6/giphy.gif)
 
 # Examples/Usage
 To modify any settings, press the settings button on the titlebar
