@@ -44,15 +44,10 @@ namespace Daybreak.Services.ApplicationDetection
             this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
         }
 
-        public void LaunchGuildwars()
+        public async void LaunchGuildwars()
         {
             var configuration = this.configurationManager.GetConfiguration();
-            if (string.IsNullOrEmpty(configuration.CharacterName))
-            {
-                throw new InvalidOperationException($"No character name set");
-            }
-
-            var auth = this.credentialManager.GetCredentials();
+            var auth = await this.credentialManager.GetDefaultCredentials().ConfigureAwait(false);
             auth.Do(
                 onSome: (credentials) =>
                 {
@@ -61,7 +56,7 @@ namespace Daybreak.Services.ApplicationDetection
                         ClearGwLocks();
                     }
 
-                    LaunchGuildwarsProcess(credentials.Username, credentials.Password, configuration.CharacterName);
+                    LaunchGuildwarsProcess(credentials.Username, credentials.Password, credentials.CharacterName);
                 },
                 onNone: () =>
                 {
@@ -92,7 +87,20 @@ namespace Daybreak.Services.ApplicationDetection
                 throw new InvalidOperationException($"Guildwars executable doesn't exist at {executable}");
             }
 
-            if (Process.Start(executable, new List<string> { "-email", email, "-password", password, "-character", character }) is null)
+            var args = new List<string>()
+            {
+                "-email",
+                email,
+                "-password",
+                password
+            };
+            if (!string.IsNullOrWhiteSpace(character))
+            {
+                args.Add("-character");
+                args.Add(character);
+            }
+
+            if (Process.Start(executable, args) is null)
             {
                 throw new InvalidOperationException($"Unable to launch {executable}");
             }
@@ -141,7 +149,7 @@ namespace Daybreak.Services.ApplicationDetection
             }
         }
 
-        private RegistryKey GetGuildwarsRegistryKey(bool write)
+        private static RegistryKey GetGuildwarsRegistryKey(bool write)
         {
             var gwKey = Registry.CurrentUser.OpenSubKey("SOFTWARE")?.OpenSubKey("ArenaNet")?.OpenSubKey("Guild Wars", write);
             if (gwKey is not null)

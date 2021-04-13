@@ -21,7 +21,7 @@
                     VerticalAlignment="Top" HorizontalAlignment="Left" StrokeThickness="3" Width="47.25" Height="3" />
             <Rectangle Stroke="{Binding ElementName=_this, Path=Foreground}" Margin="39.375, 85.625, 0, 0" 
                     VerticalAlignment="Top" HorizontalAlignment="Left" StrokeThickness="3" Width="47.25" Height="3" />
-            <Ellipse Stroke="{Binding ElementName=_this, Path=Foreground}" Width="128" Height="128" StrokeThickness="5" Fill="Transparent"
+            <Ellipse Stroke="{Binding ElementName=_this, Path=Foreground}" Width="128" Height="128" StrokeThickness="8" Fill="Transparent"
                      MouseEnter="Ellipse_MouseEnter" MouseLeave="Ellipse_MouseLeave" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"></Ellipse>
         </Grid>
     </Viewbox>

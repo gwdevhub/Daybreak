@@ -120,7 +120,7 @@ namespace Daybreak.Launch
 
         private void SettingsButton_Clicked(object sender, EventArgs e)
         {
-            this.viewManager.ShowView<SettingsView>();
+            this.viewManager.ShowView<SettingsCategoryView>();
         }
 
         private void CreditTextBox_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

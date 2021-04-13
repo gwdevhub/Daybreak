@@ -1,0 +1,45 @@
+﻿<UserControl x:Class="Daybreak.Controls.TileButton"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Daybreak.Controls"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:behaviors="clr-namespace:Daybreak.Behaviors"
+             xmlns:converters="clr-namespace:Daybreak.Converters"
+             x:Name="_this"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:TileButtonHighlightConverter x:Key="HighlightConverter"></converters:TileButtonHighlightConverter>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <ContentPresenter x:Name="Content" Margin="5" 
+                              Content="{Binding ElementName=_this, Path=InnerContent}"></ContentPresenter>
+        <Border BorderBrush="{Binding ElementName=_this, Path=BorderBrush}" 
+                BorderThickness="{Binding ElementName=_this, Path=BorderThickness}"
+                Opacity="{Binding ElementName=_this, Path=Highlighted, Converter={StaticResource HighlightConverter}}"
+                Grid.RowSpan="2">
+        </Border>
+        <TextBlock Grid.Row="1" Text="{Binding ElementName=_this, Path=Title}" 
+                   FontSize="{Binding ElementName=_this, Path=FontSize}"
+                   FontFamily="{Binding ElementName=_this, Path=FontFamily}"
+                   Foreground="{Binding ElementName=_this, Path=Foreground}"
+                   VerticalAlignment="Center" HorizontalAlignment="Stretch" TextWrapping="Wrap"
+                   TextAlignment="Center">
+            <i:Interaction.Behaviors>
+                <behaviors:ScaleFontWithSize MaxFontSize="22"></behaviors:ScaleFontWithSize>
+            </i:Interaction.Behaviors>
+        </TextBlock>
+        <Rectangle Fill="Transparent"
+                   MouseEnter="Grid_MouseEnter" 
+                   MouseLeave="Grid_MouseLeave"
+                   MouseLeftButtonDown="Rectangle_MouseLeftButtonDown"
+                   Grid.RowSpan="2">
+        </Rectangle>
+    </Grid>
+</UserControl>

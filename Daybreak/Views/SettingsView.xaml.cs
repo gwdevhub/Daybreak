@@ -1,10 +1,11 @@
-﻿using Daybreak.Models;
-using Daybreak.Services.Configuration;
-using Daybreak.Services.Credentials;
+﻿using Daybreak.Services.Configuration;
 using Daybreak.Services.ViewManagement;
 using Microsoft.Win32;
+using System;
 using System.Extensions;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Extensions;
 
 namespace Daybreak.Views
 {
@@ -13,17 +14,51 @@ namespace Daybreak.Views
     /// </summary>
     public partial class SettingsView : UserControl
     {
+        public static readonly DependencyProperty GamePathProperty =
+            DependencyPropertyExtensions.Register<SettingsView, string>(nameof(GamePath));
+        public static readonly DependencyProperty ToolboxPathProperty =
+            DependencyPropertyExtensions.Register<SettingsView, string>(nameof(ToolboxPath));
+        public static readonly DependencyProperty AddressBarReadonlyProperty =
+            DependencyPropertyExtensions.Register<SettingsView, bool>(nameof(AddressBarReadonly));
+        public static readonly DependencyProperty LeftBrowserUrlProperty =
+            DependencyPropertyExtensions.Register<SettingsView, string>(nameof(LeftBrowserUrl));
+        public static readonly DependencyProperty RightBrowserUrlProperty =
+            DependencyPropertyExtensions.Register<SettingsView, string>(nameof(RightBrowserUrl));
+
         private readonly IConfigurationManager configurationManager;
-        private readonly ICredentialManager credentialManager;
         private readonly IViewManager viewManager;
+
+        public string GamePath
+        {
+            get => this.GetTypedValue<string>(GamePathProperty);
+            set => this.SetValue(GamePathProperty, value);
+        }
+        public string ToolboxPath
+        {
+            get => this.GetTypedValue<string>(ToolboxPathProperty);
+            set => this.SetValue(ToolboxPathProperty, value);
+        }
+        public bool AddressBarReadonly
+        {
+            get => this.GetTypedValue<bool>(AddressBarReadonlyProperty);
+            set => this.SetValue(AddressBarReadonlyProperty, value);
+        }
+        public string LeftBrowserUrl
+        {
+            get => this.GetTypedValue<string>(LeftBrowserUrlProperty);
+            set => this.SetValue(LeftBrowserUrlProperty, value);
+        }
+        public string RightBrowserUrl
+        {
+            get => this.GetTypedValue<string>(RightBrowserUrlProperty);
+            set => this.SetValue(RightBrowserUrlProperty, value);
+        }
 
         public SettingsView(
             IConfigurationManager configurationManager,
-            ICredentialManager credentialManager,
             IViewManager viewManager)
         {
             this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
-            this.credentialManager = credentialManager.ThrowIfNull(nameof(credentialManager));
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.InitializeComponent();
             this.LoadSettings();
@@ -32,43 +67,26 @@ namespace Daybreak.Views
         private void LoadSettings()
         {
             var config = this.configurationManager.GetConfiguration();
-            var creds = this.credentialManager.GetCredentials();
-            creds.DoAny(
-                onSome: (credentials) =>
-                {
-                    this.UsernameTextbox.Text = credentials.Username;
-                    this.PasswordBox.Password = credentials.Password;
-
-                });
-            this.AddressBarReadonlyTextbox.Text = config.AddressBarReadonly.ToString();
-            this.CharacterTextbox.Text = config.CharacterName;
-            this.GamePathTextbox.Text = config.GamePath;
-            this.ToolboxPathTextbox.Text = config.ToolboxPath;
-            this.MultiLaunchSupportTextbox.Text = config.ExperimentalFeatures.MultiLaunchSupport.ToString();
+            this.AddressBarReadonly = config.AddressBarReadonly;
+            this.GamePath = config.GamePath;
+            this.ToolboxPath = config.ToolboxPath;
+            this.LeftBrowserUrl = config.LeftBrowserDefault;
+            this.RightBrowserUrl = config.RightBrowserDefault;
         }
 
-        private void SaveButton_Clicked(object sender, System.EventArgs e)
+        private void SaveButton_Clicked(object sender, EventArgs e)
         {
             var currentConfig = this.configurationManager.GetConfiguration();
-            currentConfig.CharacterName = this.CharacterTextbox.Text;
-            currentConfig.GamePath = this.GamePathTextbox.Text;
-            currentConfig.ToolboxPath = this.ToolboxPathTextbox.Text;
-            if (bool.TryParse(this.AddressBarReadonlyTextbox.Text, out var addressBarReadonly))
-            {
-                currentConfig.AddressBarReadonly = addressBarReadonly;
-            }
-
-            if (bool.TryParse(this.MultiLaunchSupportTextbox.Text, out var multiLaunchSupport))
-            {
-                currentConfig.ExperimentalFeatures.MultiLaunchSupport = multiLaunchSupport;
-            }
-
+            currentConfig.GamePath = this.GamePath;
+            currentConfig.ToolboxPath = this.ToolboxPath;
+            currentConfig.AddressBarReadonly = this.AddressBarReadonly;
+            currentConfig.LeftBrowserDefault = this.LeftBrowserUrl;
+            currentConfig.RightBrowserDefault = this.RightBrowserUrl;
             this.configurationManager.SaveConfiguration(currentConfig);
-            this.credentialManager.StoreCredentials(new LoginCredentials { Username = this.UsernameTextbox.Text, Password = this.PasswordBox.Password });
-            this.viewManager.ShowView<MainView>();
+            this.viewManager.ShowView<SettingsCategoryView>();
         }
 
-        private void GameFilePickerGlyph_Clicked(object sender, System.EventArgs e)
+        private void GameFilePickerGlyph_Clicked(object sender, EventArgs e)
         {
             var filePicker = new OpenFileDialog()
             {
@@ -79,11 +97,11 @@ namespace Daybreak.Views
             };
             if (filePicker.ShowDialog() is true)
             {
-                this.GamePathTextbox.Text = filePicker.FileName;
+                this.GamePath = filePicker.FileName;
             }
         }
 
-        private void ToolboxFilePickerGlyph_Clicked(object sender, System.EventArgs e)
+        private void ToolboxFilePickerGlyph_Clicked(object sender, EventArgs e)
         {
             var filePicker = new OpenFileDialog()
             {
@@ -94,13 +112,23 @@ namespace Daybreak.Views
             };
             if (filePicker.ShowDialog() is true)
             {
-                this.ToolboxPathTextbox.Text = filePicker.FileName;
+                this.ToolboxPath = filePicker.FileName;
             }
         }
 
-        private void BackButton_Clicked(object sender, System.EventArgs e)
+        private void BackButton_Clicked(object sender, EventArgs e)
         {
-            this.viewManager.ShowView<MainView>();
+            this.viewManager.ShowView<SettingsCategoryView>();
+        }
+
+        private void LeftBrowserUrl_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            this.LeftBrowserUrl = sender.As<TextBox>().Text;
+        }
+
+        private void RightBrowserUrl_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            this.RightBrowserUrl = sender.As<TextBox>().Text;
         }
     }
 }

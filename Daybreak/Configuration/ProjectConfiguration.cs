@@ -9,7 +9,6 @@ using Daybreak.Services.Screenshots;
 using Daybreak.Services.Updater;
 using Daybreak.Services.ViewManagement;
 using Daybreak.Views;
-using Microsoft.Web.WebView2.Core;
 using Slim;
 using System.Extensions;
 
@@ -50,6 +49,9 @@ namespace Daybreak.Configuration
             viewProducer.RegisterView<SettingsView>();
             viewProducer.RegisterView<AskUpdateView>();
             viewProducer.RegisterView<UpdateView>();
+            viewProducer.RegisterView<SettingsCategoryView>();
+            viewProducer.RegisterView<AccountsView>();
+            viewProducer.RegisterView<ExperimentalSettingsView>();
         }
     }
 }
