@@ -12,28 +12,28 @@
                              Clicked="BackButton_Clicked" VerticalAlignment="Top" HorizontalAlignment="Left"></controls:BackButton>
         <WrapPanel Orientation="Vertical" VerticalAlignment="Bottom">
             <WrapPanel Orientation="Horizontal">
-                <controls:TileButton Grid.Row="5" Title="Account settings" Foreground="White" BorderBrush="White" BorderThickness="2"
+                <controls:TileButton Title="Account settings" Foreground="White" BorderBrush="White" BorderThickness="2"
                              HighlightColor="White" Clicked="AccountButton_Clicked" Width="150" Height="150">
                     <controls:TileButton.InnerContent>
                         <controls:AvatarGlyph></controls:AvatarGlyph>
                     </controls:TileButton.InnerContent>
                 </controls:TileButton>
-                <controls:TileButton Grid.Row="5" Grid.Column="1" Title="Launcher settings" Foreground="White" BorderBrush="White" BorderThickness="2"
+                <controls:TileButton Title="Guildwars settings" Foreground="White" BorderBrush="White" BorderThickness="2"
+                             HighlightColor="White" Clicked="FileButton_Clicked" Height="150" Width="150">
+                    <controls:TileButton.InnerContent>
+                        <controls:FileGlyph></controls:FileGlyph>
+                    </controls:TileButton.InnerContent>
+                </controls:TileButton>
+                <controls:TileButton Title="Launcher settings" Foreground="White" BorderBrush="White" BorderThickness="2"
                              HighlightColor="White" Clicked="LauncherButton_Clicked" Width="150" Height="150">
                     <controls:TileButton.InnerContent>
                         <controls:GoldenArrowGlyph></controls:GoldenArrowGlyph>
                     </controls:TileButton.InnerContent>
                 </controls:TileButton>
-                <controls:TileButton Grid.Row="5" Grid.Column="2" Title="Experimental settings" Foreground="White" BorderBrush="White" BorderThickness="2"
+                <controls:TileButton Title="Experimental settings" Foreground="White" BorderBrush="White" BorderThickness="2"
                              HighlightColor="White" Clicked="ExperimentalButton_Clicked" Height="150" Width="150">
                     <controls:TileButton.InnerContent>
                         <controls:ExperimentGlyph></controls:ExperimentGlyph>
-                    </controls:TileButton.InnerContent>
-                </controls:TileButton>
-                <controls:TileButton Grid.Row="5" Grid.Column="2" Title="Guildwars settings" Foreground="White" BorderBrush="White" BorderThickness="2"
-                             HighlightColor="White" Clicked="FileButton_Clicked" Height="150" Width="150">
-                    <controls:TileButton.InnerContent>
-                        <controls:FileGlyph></controls:FileGlyph>
                     </controls:TileButton.InnerContent>
                 </controls:TileButton>
             </WrapPanel>

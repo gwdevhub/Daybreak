@@ -159,7 +159,19 @@ namespace Daybreak.Launch
             else
             {
                 this.viewManager.ShowView<MainView>();
+                this.PeriodicallyCheckForUpdates();
             }
+        }
+
+        private void PeriodicallyCheckForUpdates()
+        {
+            TaskExtensions.RunPeriodicAsync(async () =>
+            {
+                if (await this.applicationUpdater.UpdateAvailable())
+                {
+                    this.Dispatcher.Invoke(() => this.viewManager.ShowView<AskUpdateView>());
+                }
+            }, TimeSpan.FromMinutes(15), TimeSpan.FromMinutes(15), CancellationToken.None);
         }
 
         private static Color GetAverageColor(BitmapSource bitmap)
