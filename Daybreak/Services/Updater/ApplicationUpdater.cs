@@ -93,7 +93,7 @@ namespace Daybreak.Services.Updater
 
         public async Task<bool> UpdateAvailable()
         {
-            var version = string.Join('.', this.CurrentVersion.Split('.').Take(3));
+            var version = string.Join('.', this.CurrentVersion.Split('.'));
             var maybeLatestVersion = await this.GetLatestVersion();
             return maybeLatestVersion.Switch(
                 onSome: latestVersion => string.Compare(version, latestVersion, true) < 0,
