@@ -1,4 +1,4 @@
-﻿using Daybreak.Services.ApplicationDetection;
+﻿using Daybreak.Services.ApplicationLauncher;
 using Daybreak.Services.ApplicationLifetime;
 using Daybreak.Services.Bloogum;
 using Daybreak.Services.Configuration;
@@ -26,7 +26,7 @@ namespace Daybreak.Configuration
             serviceProducer.RegisterSingleton<ILogger, Logger>();
             serviceProducer.RegisterSingleton<ApplicationLifetimeManager>();
             serviceProducer.RegisterSingleton<ViewManager>();
-            serviceProducer.RegisterSingleton<IApplicationDetector, ApplicationDetector>();
+            serviceProducer.RegisterSingleton<IApplicationLauncher, ApplicationLauncher>();
             serviceProducer.RegisterSingleton<IScreenshotProvider, ScreenshotProvider>();
             serviceProducer.RegisterSingleton<IConfigurationManager, ConfigurationManager>();
             serviceProducer.RegisterSingleton<IBloogumClient, BloogumClient>();

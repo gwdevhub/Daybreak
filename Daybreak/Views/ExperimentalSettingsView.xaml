@@ -66,7 +66,7 @@
             </Style>
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid Background="#20202020">
+    <Grid Background="#A0202020">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
@@ -75,9 +75,13 @@
                              Clicked="BackButton_Clicked" VerticalAlignment="Top" HorizontalAlignment="Left"></controls:BackButton>
         <controls:SaveButton Foreground="White" Height="30" Width="30" Grid.Column="0" Margin="5"
                              Clicked="SaveButton_Clicked" VerticalAlignment="Top" HorizontalAlignment="Right"></controls:SaveButton>
-        <TextBlock FontSize="22" Foreground="White" HorizontalAlignment="Center" TextWrapping="Wrap"
-                   Text="Warning! Functionality under development! These settings might have unintended consequences, including breaking the GuildWars TOS."
-                   Margin="50, 0, 50, 0"></TextBlock>
+        <StackPanel Margin="50, 0, 50, 0" HorizontalAlignment="Center">
+            <TextBlock FontSize="22" Foreground="White" TextWrapping="Wrap"
+                   Text="Experimental settings" HorizontalAlignment="Center"></TextBlock>
+            <TextBlock FontSize="16" Foreground="White" TextWrapping="Wrap"
+                   Text="Warning! Functionality under development! These settings might have unintended consequences, including breaking the GuildWars TOS."></TextBlock>
+        </StackPanel>
+        
         <Rectangle Fill="White" Height="1" VerticalAlignment="Bottom"></Rectangle>
         <Grid Grid.Row="1" HorizontalAlignment="Center" Margin="0, 15, 0, 0">
             <WrapPanel>

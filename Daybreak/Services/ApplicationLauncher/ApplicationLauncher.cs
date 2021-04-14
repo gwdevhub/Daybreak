@@ -1,24 +1,22 @@
-﻿using Daybreak.Models;
+﻿using Daybreak.Exceptions;
 using Daybreak.Services.Configuration;
 using Daybreak.Services.Credentials;
 using Daybreak.Services.Logging;
 using Daybreak.Services.Mutex;
 using Daybreak.Utils;
 using Microsoft.Win32;
-using Pepa.Wpf.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Extensions;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Security;
-using System.Security.Permissions;
+using System.Threading.Tasks;
 
-namespace Daybreak.Services.ApplicationDetection
+namespace Daybreak.Services.ApplicationLauncher
 {
-    public class ApplicationDetector : IApplicationDetector
+    public class ApplicationLauncher : IApplicationLauncher
     {
         private const string ToolboxProcessName = "GWToolbox";
         private const string ProcessName = "gw";
@@ -32,7 +30,7 @@ namespace Daybreak.Services.ApplicationDetection
         public bool IsGuildwarsRunning => this.GuildwarsProcessDetected();
         public bool IsToolboxRunning => GuildwarsToolboxProcessDetected();
 
-        public ApplicationDetector(
+        public ApplicationLauncher(
             IConfigurationManager configurationManager,
             ICredentialManager credentialManager,
             IMutexHandler mutexHandler,
@@ -44,7 +42,7 @@ namespace Daybreak.Services.ApplicationDetection
             this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
         }
 
-        public async void LaunchGuildwars()
+        public async Task LaunchGuildwars()
         {
             var configuration = this.configurationManager.GetConfiguration();
             var auth = await this.credentialManager.GetDefaultCredentials().ConfigureAwait(false);
@@ -60,23 +58,26 @@ namespace Daybreak.Services.ApplicationDetection
                 },
                 onNone: () =>
                 {
-                    throw new InvalidOperationException($"No credentials available");
+                    throw new CredentialsNotFoundException($"No credentials available");
                 });
         }
 
-        public void LaunchGuildwarsToolbox()
+        public Task LaunchGuildwarsToolbox()
         {
-            var configuration = this.configurationManager.GetConfiguration();
-            var executable = configuration.ToolboxPath;
-            if (File.Exists(executable) is false)
+            return Task.Run(() =>
             {
-                throw new InvalidOperationException($"Guildwars executable doesn't exist at {executable}");
-            }
+                var configuration = this.configurationManager.GetConfiguration();
+                var executable = configuration.ToolboxPath;
+                if (File.Exists(executable) is false)
+                {
+                    throw new ExecutableNotFoundException($"Guildwars executable doesn't exist at {executable}");
+                }
 
-            if (Process.Start(executable) is null)
-            {
-                throw new InvalidOperationException($"Unable to launch {executable}");
-            }
+                if (Process.Start(executable) is null)
+                {
+                    throw new InvalidOperationException($"Unable to launch {executable}");
+                }
+            });
         }
 
         private void LaunchGuildwarsProcess(string email, Models.SecureString password, string character)
@@ -84,7 +85,7 @@ namespace Daybreak.Services.ApplicationDetection
             var executable = this.configurationManager.GetConfiguration().GamePath;
             if (File.Exists(executable) is false)
             {
-                throw new InvalidOperationException($"Guildwars executable doesn't exist at {executable}");
+                throw new ExecutableNotFoundException($"Guildwars executable doesn't exist at {executable}");
             }
 
             var args = new List<string>()

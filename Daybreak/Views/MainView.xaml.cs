@@ -1,5 +1,6 @@
 ﻿using Daybreak.Controls;
-using Daybreak.Services.ApplicationDetection;
+using Daybreak.Exceptions;
+using Daybreak.Services.ApplicationLauncher;
 using Daybreak.Services.Configuration;
 using Daybreak.Services.ViewManagement;
 using System;
@@ -29,7 +30,7 @@ namespace Daybreak.Views
         public static readonly DependencyProperty LeftBrowserFavoriteAddressProperty =
             DependencyPropertyExtensions.Register<MainView, string>(nameof(LeftBrowserFavoriteAddress));
 
-        private readonly IApplicationDetector applicationDetector;
+        private readonly IApplicationLauncher applicationDetector;
         private readonly IViewManager viewManager;
         private readonly IConfigurationManager configurationManager;
         private readonly CancellationTokenSource cancellationTokenSource = new();
@@ -69,7 +70,7 @@ namespace Daybreak.Views
         }
 
         public MainView(
-            IApplicationDetector applicationDetector,
+            IApplicationLauncher applicationDetector,
             IViewManager viewManager,
             IConfigurationManager configurationManager)
         {
@@ -110,15 +111,19 @@ namespace Daybreak.Views
             this.cancellationTokenSource.Cancel();
         }
 
-        private void LaunchButton_Clicked(object sender, EventArgs e)
+        private async void LaunchButton_Clicked(object sender, EventArgs e)
         {
             try
             {
-                this.applicationDetector.LaunchGuildwars();
+                await this.applicationDetector.LaunchGuildwars();
             }
-            catch
+            catch (CredentialsNotFoundException)
             {
-                this.viewManager.ShowView<SettingsView>();
+                this.viewManager.ShowView<AccountsView>();
+            }
+            catch (ExecutableNotFoundException)
+            {
+
             }
         }
 

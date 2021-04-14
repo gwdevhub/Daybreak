@@ -44,7 +44,12 @@ namespace Daybreak.Views
 
         private void AddButton_Clicked(object sender, EventArgs e)
         {
-            this.Accounts.Add(new LoginCredentials());
+            var newCredentials = new LoginCredentials();
+            this.Accounts.Add(newCredentials);
+            if (this.Accounts.Count == 1)
+            {
+                this.SetAccountAsDefault(newCredentials);
+            }
         }
 
         private async void SaveButton_Clicked(object sender, EventArgs e)
@@ -57,16 +62,25 @@ namespace Daybreak.Views
         {
             var creds = sender.As<AccountTemplate>()?.DataContext?.As<LoginCredentials>();
             this.Accounts.Remove(creds);
+            if (this.Accounts.Count > 0 && creds.Default is true)
+            {
+                this.SetAccountAsDefault(this.Accounts.First());
+            }
         }
 
         private void AccountTemplate_DefaultClicked(object sender, EventArgs e)
         {
             var creds = sender.As<AccountTemplate>()?.DataContext?.As<LoginCredentials>();
-            foreach(var cred in this.Accounts)
+            this.SetAccountAsDefault(creds);
+        }
+
+        private void SetAccountAsDefault(LoginCredentials loginCredentials)
+        {
+            foreach (var cred in this.Accounts)
             {
                 cred.Default = false;
             }
-            creds.Default = true;
+            loginCredentials.Default = true;
             var view = CollectionViewSource.GetDefaultView(this.Accounts);
             view.Refresh();
         }
