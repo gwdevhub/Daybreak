@@ -123,7 +123,7 @@ namespace Daybreak.Views
             }
             catch (ExecutableNotFoundException)
             {
-
+                this.viewManager.ShowView<ExecutablesView>();
             }
         }
 

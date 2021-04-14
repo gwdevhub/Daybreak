@@ -82,8 +82,13 @@ namespace Daybreak.Services.ApplicationLauncher
 
         private void LaunchGuildwarsProcess(string email, Models.SecureString password, string character)
         {
-            var executable = this.configurationManager.GetConfiguration().GamePath;
-            if (File.Exists(executable) is false)
+            var executable = this.configurationManager.GetConfiguration().GuildwarsPaths.Where(path => path.Default).FirstOrDefault();
+            if (executable is null)
+            {
+                throw new ExecutableNotFoundException($"No executable selected");
+            }
+
+            if (File.Exists(executable.Path) is false)
             {
                 throw new ExecutableNotFoundException($"Guildwars executable doesn't exist at {executable}");
             }
@@ -101,7 +106,7 @@ namespace Daybreak.Services.ApplicationLauncher
                 args.Add(character);
             }
 
-            if (Process.Start(executable, args) is null)
+            if (Process.Start(executable.Path, args) is null)
             {
                 throw new InvalidOperationException($"Unable to launch {executable}");
             }
@@ -113,7 +118,13 @@ namespace Daybreak.Services.ApplicationLauncher
             {
                 try
                 {
-                    using var stream = File.OpenWrite(this.configurationManager.GetConfiguration().GamePath);
+                    var path = this.configurationManager.GetConfiguration().GuildwarsPaths.Where(path => path.Default).FirstOrDefault();
+                    if (path is null)
+                    {
+                        return false;
+                    }
+
+                    using var stream = File.OpenWrite(path.Path);
                     return false;
                 }
                 catch
@@ -136,7 +147,13 @@ namespace Daybreak.Services.ApplicationLauncher
 
         private void SetRegistryGuildwarsPath()
         {
-            var gamePath = this.configurationManager.GetConfiguration().GamePath;
+            var path = this.configurationManager.GetConfiguration().GuildwarsPaths.Where(path => path.Default).FirstOrDefault();
+            if (path is null)
+            {
+                throw new ExecutableNotFoundException("No executable currently selected");
+            }
+
+            var gamePath = path.Path;
             try
             {
                 var registryKey = GetGuildwarsRegistryKey(true);

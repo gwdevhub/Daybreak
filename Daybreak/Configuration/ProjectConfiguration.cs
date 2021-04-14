@@ -52,6 +52,7 @@ namespace Daybreak.Configuration
             viewProducer.RegisterView<SettingsCategoryView>();
             viewProducer.RegisterView<AccountsView>();
             viewProducer.RegisterView<ExperimentalSettingsView>();
+            viewProducer.RegisterView<ExecutablesView>();
         }
     }
 }

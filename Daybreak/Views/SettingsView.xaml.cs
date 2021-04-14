@@ -14,8 +14,6 @@ namespace Daybreak.Views
     /// </summary>
     public partial class SettingsView : UserControl
     {
-        public static readonly DependencyProperty GamePathProperty =
-            DependencyPropertyExtensions.Register<SettingsView, string>(nameof(GamePath));
         public static readonly DependencyProperty ToolboxPathProperty =
             DependencyPropertyExtensions.Register<SettingsView, string>(nameof(ToolboxPath));
         public static readonly DependencyProperty AddressBarReadonlyProperty =
@@ -28,11 +26,6 @@ namespace Daybreak.Views
         private readonly IConfigurationManager configurationManager;
         private readonly IViewManager viewManager;
 
-        public string GamePath
-        {
-            get => this.GetTypedValue<string>(GamePathProperty);
-            set => this.SetValue(GamePathProperty, value);
-        }
         public string ToolboxPath
         {
             get => this.GetTypedValue<string>(ToolboxPathProperty);
@@ -68,7 +61,6 @@ namespace Daybreak.Views
         {
             var config = this.configurationManager.GetConfiguration();
             this.AddressBarReadonly = config.AddressBarReadonly;
-            this.GamePath = config.GamePath;
             this.ToolboxPath = config.ToolboxPath;
             this.LeftBrowserUrl = config.LeftBrowserDefault;
             this.RightBrowserUrl = config.RightBrowserDefault;
@@ -77,28 +69,12 @@ namespace Daybreak.Views
         private void SaveButton_Clicked(object sender, EventArgs e)
         {
             var currentConfig = this.configurationManager.GetConfiguration();
-            currentConfig.GamePath = this.GamePath;
             currentConfig.ToolboxPath = this.ToolboxPath;
             currentConfig.AddressBarReadonly = this.AddressBarReadonly;
             currentConfig.LeftBrowserDefault = this.LeftBrowserUrl;
             currentConfig.RightBrowserDefault = this.RightBrowserUrl;
             this.configurationManager.SaveConfiguration(currentConfig);
             this.viewManager.ShowView<SettingsCategoryView>();
-        }
-
-        private void GameFilePickerGlyph_Clicked(object sender, EventArgs e)
-        {
-            var filePicker = new OpenFileDialog()
-            {
-                CheckFileExists = true,
-                CheckPathExists = true,
-                DefaultExt = "exe",
-                Multiselect = false
-            };
-            if (filePicker.ShowDialog() is true)
-            {
-                this.GamePath = filePicker.FileName;
-            }
         }
 
         private void ToolboxFilePickerGlyph_Clicked(object sender, EventArgs e)

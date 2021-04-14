@@ -33,6 +33,11 @@ namespace Daybreak.Views
             this.viewManager.ShowView<ExperimentalSettingsView>();
         }
 
+        private void FileButton_Clicked(object sender, System.EventArgs e)
+        {
+            this.viewManager.ShowView<ExecutablesView>();
+        }
+
         private void BackButton_Clicked(object sender, System.EventArgs e)
         {
             this.viewManager.ShowView<MainView>();

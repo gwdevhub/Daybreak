@@ -1,0 +1,14 @@
+﻿<UserControl x:Class="Daybreak.Controls.FileGlyph"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Daybreak.Controls"
+             mc:Ignorable="d"
+             x:Name="_this"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Viewbox>
+        <Path Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+            Data="m52,0l-40,0c-6.627,0 -12,5.373 -12,12l0,72c0,6.627 5.373,12 12,12l55.875,0c6.627,0 12.125,-5.373 12.125,-12l0,-56c-4,-4 -22,-22 -28,-28zm0,11.178l16.709,16.822l-16.709,0l0,-16.822zm15.875,76.822l-55.875,0c-2.206,0 -4,-1.794 -4,-4l0,-72c0,-2.206 1.794,-4 4,-4l32,0l0,20l0,8l8,0l20,0l0,48c0,2.168 -1.889,4 -4.125,4z"></Path>
+    </Viewbox>
+</UserControl>

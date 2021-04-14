@@ -8,14 +8,17 @@
              x:Name="_this"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <Rectangle x:Name="BackgroundEllipse" Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" Visibility="Visible" Opacity="0.1" />
-        <Viewbox>
-            <StackPanel Orientation="Horizontal">
-                <Ellipse Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" Height="1" Width="1"></Ellipse>
-                <Ellipse Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" Height="1" Width="1"></Ellipse>
-                <Ellipse Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" Height="1" Width="1"></Ellipse>
-            </StackPanel>
+        <Ellipse x:Name="BackgroundEllipse" Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" Visibility="Visible" Opacity="0.1" />
+        <Viewbox Stretch="Fill">
+            <Grid>
+                <Ellipse Height="4" Width="4" StrokeThickness="0.2" Stroke="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"></Ellipse>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Ellipse Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" Height="1" Width="1"></Ellipse>
+                    <Ellipse Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" Height="1" Width="1"></Ellipse>
+                    <Ellipse Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" Height="1" Width="1"></Ellipse>
+                </StackPanel>
+            </Grid>
         </Viewbox>
-        <Rectangle Fill="Transparent" MouseEnter="Ellipse_MouseEnter" MouseLeave="Ellipse_MouseLeave" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"></Rectangle>
+        <Ellipse Fill="Transparent" MouseEnter="Ellipse_MouseEnter" MouseLeave="Ellipse_MouseLeave" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"></Ellipse>
     </Grid>
 </UserControl>

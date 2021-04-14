@@ -30,6 +30,12 @@
                         <controls:ExperimentGlyph></controls:ExperimentGlyph>
                     </controls:TileButton.InnerContent>
                 </controls:TileButton>
+                <controls:TileButton Grid.Row="5" Grid.Column="2" Title="Guildwars settings" Foreground="White" BorderBrush="White" BorderThickness="2"
+                             HighlightColor="White" Clicked="FileButton_Clicked" Height="150" Width="150">
+                    <controls:TileButton.InnerContent>
+                        <controls:FileGlyph></controls:FileGlyph>
+                    </controls:TileButton.InnerContent>
+                </controls:TileButton>
             </WrapPanel>
         </WrapPanel>
     </Grid>

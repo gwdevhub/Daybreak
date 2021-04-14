@@ -86,19 +86,12 @@
                              Clicked="BackButton_Clicked"></controls:BackButton>
         <controls:SaveButton Foreground="White" Height="30" Width="30" Grid.Column="1" HorizontalAlignment="Right" Margin="5"
                              Clicked="SaveButton_Clicked"></controls:SaveButton>
-        <TextBlock Text="Game path: " FontSize="22" Foreground="White" Grid.Row="1"></TextBlock>
-        <TextBox Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Grid.Row="1"
-                 FontSize="22" Margin="0, 0, 30, 0" Background="Transparent" Foreground="White"
-                 Text="{Binding ElementName=_this, Path=GamePath, Mode=TwoWay}"></TextBox>
-        <controls:FilePickerGlyph Grid.Row="1" Grid.Column="1" Height="30" Width="30" HorizontalAlignment="Right"
-                                  Foreground="White" BorderBrush="Gray" BorderThickness="1"
-                                  Clicked="GameFilePickerGlyph_Clicked"></controls:FilePickerGlyph>
         <TextBlock Text="Toolbox path: " FontSize="22" Foreground="White" Grid.Row="2"></TextBlock>
         <TextBox Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Grid.Row="2"
                  FontSize="22" Margin="0, 0, 30, 0" Background="Transparent" Foreground="White"
                  Text="{Binding ElementName=_this, Path=ToolboxPath, Mode=TwoWay}"></TextBox>
         <controls:FilePickerGlyph Grid.Row="2" Grid.Column="1" Height="30" Width="30" HorizontalAlignment="Right"
-                                  Foreground="White" BorderBrush="Gray" BorderThickness="1"
+                                  Foreground="White" BorderBrush="Gray" BorderThickness="0"
                                   Clicked="ToolboxFilePickerGlyph_Clicked"></controls:FilePickerGlyph>
         <TextBlock Text="Address bar readonly: " FontSize="22" Foreground="White" Grid.Row="3"/>
         <ToggleButton Grid.Column="1" HorizontalAlignment="Center" HorizontalContentAlignment="Stretch" Grid.Row="3" Style="{StaticResource AnimatedSwitch}" Height="30" Width="40"
