@@ -5,6 +5,7 @@ using Daybreak.Services.Logging;
 using Daybreak.Services.Mutex;
 using Daybreak.Utils;
 using Microsoft.Win32;
+using Pepa.Wpf.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,12 +13,15 @@ using System.Extensions;
 using System.IO;
 using System.Linq;
 using System.Security;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Daybreak.Services.ApplicationLauncher
 {
     public class ApplicationLauncher : IApplicationLauncher
     {
+        private const string TexModProcessName = "TexMod";
+        private const string UModProcessName = "uMod";
         private const string ToolboxProcessName = "GWToolbox";
         private const string ProcessName = "gw";
         private const string ArenaNetMutex = "AN-Mute";
@@ -27,6 +31,7 @@ namespace Daybreak.Services.ApplicationLauncher
         private readonly IMutexHandler mutexHandler;
         private readonly ILogger logger;
 
+        public bool IsTexmodRunning => TexModProcessDetected();
         public bool IsGuildwarsRunning => this.GuildwarsProcessDetected();
         public bool IsToolboxRunning => GuildwarsToolboxProcessDetected();
 
@@ -71,6 +76,24 @@ namespace Daybreak.Services.ApplicationLauncher
                 if (File.Exists(executable) is false)
                 {
                     throw new ExecutableNotFoundException($"Guildwars executable doesn't exist at {executable}");
+                }
+
+                if (Process.Start(executable) is null)
+                {
+                    throw new InvalidOperationException($"Unable to launch {executable}");
+                }
+            });
+        }
+
+        public Task LaunchTexmod()
+        {
+            return Task.Run(() =>
+            {
+                var configuration = this.configurationManager.GetConfiguration();
+                var executable = configuration.TexmodPath;
+                if (File.Exists(executable) is false)
+                {
+                    throw new ExecutableNotFoundException($"Texmod executable doesn't exist at {executable}");
                 }
 
                 if (Process.Start(executable) is null)
@@ -132,7 +155,7 @@ namespace Daybreak.Services.ApplicationLauncher
                 }
             }
 
-            return Process.GetProcessesByName(ProcessName).FirstOrDefault() is not null;
+            return Process.GetProcessesByName(ProcessName).Any();
         }
 
         private void ClearGwLocks()
@@ -197,7 +220,14 @@ namespace Daybreak.Services.ApplicationLauncher
 
         private static bool GuildwarsToolboxProcessDetected()
         {
-            return Process.GetProcessesByName(ToolboxProcessName).FirstOrDefault() is not null;
+            return Process.GetProcessesByName(ToolboxProcessName).Any();
+        }
+
+        private static bool TexModProcessDetected()
+        {
+            return Process.GetProcesses()
+                .Where(process => string.Equals(process.ProcessName, UModProcessName, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(process.ProcessName, TexModProcessName, StringComparison.OrdinalIgnoreCase)).Any();
         }
     }
 }

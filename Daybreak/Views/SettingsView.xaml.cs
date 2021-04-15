@@ -14,6 +14,8 @@ namespace Daybreak.Views
     /// </summary>
     public partial class SettingsView : UserControl
     {
+        public static readonly DependencyProperty TexmodPathProperty =
+            DependencyPropertyExtensions.Register<SettingsView, string>(nameof(TexmodPath));
         public static readonly DependencyProperty ToolboxPathProperty =
             DependencyPropertyExtensions.Register<SettingsView, string>(nameof(ToolboxPath));
         public static readonly DependencyProperty AddressBarReadonlyProperty =
@@ -28,6 +30,11 @@ namespace Daybreak.Views
         private readonly IConfigurationManager configurationManager;
         private readonly IViewManager viewManager;
 
+        public string TexmodPath
+        {
+            get => this.GetTypedValue<string>(TexmodPathProperty);
+            set => this.SetValue(TexmodPathProperty, value);
+        }
         public bool ToolboxAutoLaunch
         {
             get => this.GetTypedValue<bool>(ToolboxAutoLaunchProperty);
@@ -72,6 +79,7 @@ namespace Daybreak.Views
             this.LeftBrowserUrl = config.LeftBrowserDefault;
             this.RightBrowserUrl = config.RightBrowserDefault;
             this.ToolboxAutoLaunch = config.ToolboxAutoLaunch;
+            this.TexmodPath = config.TexmodPath;
         }
 
         private void SaveButton_Clicked(object sender, EventArgs e)
@@ -82,6 +90,7 @@ namespace Daybreak.Views
             currentConfig.LeftBrowserDefault = this.LeftBrowserUrl;
             currentConfig.RightBrowserDefault = this.RightBrowserUrl;
             currentConfig.ToolboxAutoLaunch = this.ToolboxAutoLaunch;
+            currentConfig.TexmodPath = this.TexmodPath;
             this.configurationManager.SaveConfiguration(currentConfig);
             this.viewManager.ShowView<SettingsCategoryView>();
         }
@@ -98,6 +107,21 @@ namespace Daybreak.Views
             if (filePicker.ShowDialog() is true)
             {
                 this.ToolboxPath = filePicker.FileName;
+            }
+        }
+
+        private void TexmodFilePickerGlyph_Clicked(object sender, EventArgs e)
+        {
+            var filePicker = new OpenFileDialog()
+            {
+                CheckFileExists = true,
+                CheckPathExists = true,
+                DefaultExt = "exe",
+                Multiselect = false
+            };
+            if (filePicker.ShowDialog() is true)
+            {
+                this.TexmodPath = filePicker.FileName;
             }
         }
 

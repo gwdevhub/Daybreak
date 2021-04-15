@@ -6,7 +6,9 @@ namespace Daybreak.Services.ApplicationLauncher
     {
         bool IsGuildwarsRunning { get; }
         bool IsToolboxRunning { get; }
+        bool IsTexmodRunning { get; }
         Task LaunchGuildwars();
         Task LaunchGuildwarsToolbox();
+        Task LaunchTexmod();
     }
 }

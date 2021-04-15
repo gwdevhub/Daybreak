@@ -22,6 +22,8 @@ namespace Daybreak.Views
             DependencyPropertyExtensions.Register<MainView, bool>(nameof(LaunchButtonEnabled));
         public static readonly DependencyProperty LaunchToolboxButtonEnabledProperty =
             DependencyPropertyExtensions.Register<MainView, bool>(nameof(LaunchToolboxButtonEnabled));
+        public static readonly DependencyProperty LaunchTexmodButtonEnabledProperty =
+            DependencyPropertyExtensions.Register<MainView, bool>(nameof(LaunchTexmodButtonEnabled));
         public static readonly DependencyProperty RightBrowserAddressProperty =
             DependencyPropertyExtensions.Register<MainView, string>(nameof(RightBrowserAddress));
         public static readonly DependencyProperty LeftBrowserAddressProperty =
@@ -69,6 +71,11 @@ namespace Daybreak.Views
             get => this.GetTypedValue<bool>(LaunchToolboxButtonEnabledProperty);
             set => this.SetTypedValue(LaunchToolboxButtonEnabledProperty, value);
         }
+        public bool LaunchTexmodButtonEnabled
+        {
+            get => this.GetTypedValue<bool>(LaunchTexmodButtonEnabledProperty);
+            set => this.SetTypedValue(LaunchTexmodButtonEnabledProperty, value);
+        }
 
         public MainView(
             IApplicationLauncher applicationDetector,
@@ -99,8 +106,9 @@ namespace Daybreak.Views
 
         private void CheckGameState()
         {
-            this.LaunchButtonEnabled = applicationDetector.IsGuildwarsRunning is false;
-            this.LaunchToolboxButtonEnabled = applicationDetector.IsToolboxRunning is false;
+            this.LaunchButtonEnabled = this.applicationDetector.IsGuildwarsRunning is false;
+            this.LaunchToolboxButtonEnabled = this.applicationDetector.IsToolboxRunning is false;
+            this.LaunchTexmodButtonEnabled = this.applicationDetector.IsTexmodRunning is false;
         }
 
         private void StartupView_Loaded(object sender, RoutedEventArgs e)
@@ -139,6 +147,18 @@ namespace Daybreak.Views
             try
             {
                 this.applicationDetector.LaunchGuildwarsToolbox();
+            }
+            catch
+            {
+                this.viewManager.ShowView<SettingsView>();
+            }
+        }
+
+        private void LaunchTexmodButton_Clicked(object sender, EventArgs e)
+        {
+            try
+            {
+                this.applicationDetector.LaunchTexmod();
             }
             catch
             {

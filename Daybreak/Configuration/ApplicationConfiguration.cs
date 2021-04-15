@@ -8,6 +8,8 @@ namespace Daybreak.Configuration
     {
         [JsonProperty("ToolboxPath")]
         public string ToolboxPath { get; set; }
+        [JsonProperty("TexmodPath")]
+        public string TexmodPath { get; set; }
         [JsonProperty("ToolboxAutoLaunch")]
         public bool ToolboxAutoLaunch { get; set; }
         [JsonProperty("LeftBrowserDefault")]
