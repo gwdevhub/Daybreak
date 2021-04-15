@@ -8,10 +8,12 @@ namespace Daybreak.Configuration
     {
         [JsonProperty("ToolboxPath")]
         public string ToolboxPath { get; set; }
+        [JsonProperty("ToolboxAutoLaunch")]
+        public bool ToolboxAutoLaunch { get; set; }
         [JsonProperty("LeftBrowserDefault")]
-        public string LeftBrowserDefault { get; set; }
+        public string LeftBrowserDefault { get; set; } = "https://gwpvx.fandom.com/wiki/PvX_wiki";
         [JsonProperty("RightBrowserDefault")]
-        public string RightBrowserDefault { get; set; }
+        public string RightBrowserDefault { get; set; } = "https://wiki.guildwars.com/wiki/Quick_access_links";
         [JsonProperty("GuildwarsPaths")]
         public List<GuildwarsPath> GuildwarsPaths { get; set; } = new();
         [JsonProperty("ProtectedLoginCredentials")]

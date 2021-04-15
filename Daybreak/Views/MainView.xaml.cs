@@ -6,6 +6,7 @@ using Daybreak.Services.ViewManagement;
 using System;
 using System.Extensions;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
@@ -116,6 +117,12 @@ namespace Daybreak.Views
             try
             {
                 await this.applicationDetector.LaunchGuildwars();
+                if (this.configurationManager.GetConfiguration().ToolboxAutoLaunch is true)
+                {
+                    var delay = this.configurationManager.GetConfiguration().ExperimentalFeatures.ToolboxAutoLaunchDelay;
+                    await Task.Delay(delay);
+                    await this.applicationDetector.LaunchGuildwarsToolbox();
+                }
             }
             catch (CredentialsNotFoundException)
             {

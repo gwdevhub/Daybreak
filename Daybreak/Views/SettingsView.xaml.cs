@@ -22,10 +22,17 @@ namespace Daybreak.Views
             DependencyPropertyExtensions.Register<SettingsView, string>(nameof(LeftBrowserUrl));
         public static readonly DependencyProperty RightBrowserUrlProperty =
             DependencyPropertyExtensions.Register<SettingsView, string>(nameof(RightBrowserUrl));
+        public static readonly DependencyProperty ToolboxAutoLaunchProperty =
+            DependencyPropertyExtensions.Register<SettingsView, bool>(nameof(ToolboxAutoLaunch));
 
         private readonly IConfigurationManager configurationManager;
         private readonly IViewManager viewManager;
 
+        public bool ToolboxAutoLaunch
+        {
+            get => this.GetTypedValue<bool>(ToolboxAutoLaunchProperty);
+            set => this.SetValue(ToolboxAutoLaunchProperty, value);
+        }
         public string ToolboxPath
         {
             get => this.GetTypedValue<string>(ToolboxPathProperty);
@@ -64,6 +71,7 @@ namespace Daybreak.Views
             this.ToolboxPath = config.ToolboxPath;
             this.LeftBrowserUrl = config.LeftBrowserDefault;
             this.RightBrowserUrl = config.RightBrowserDefault;
+            this.ToolboxAutoLaunch = config.ToolboxAutoLaunch;
         }
 
         private void SaveButton_Clicked(object sender, EventArgs e)
@@ -73,6 +81,7 @@ namespace Daybreak.Views
             currentConfig.AddressBarReadonly = this.AddressBarReadonly;
             currentConfig.LeftBrowserDefault = this.LeftBrowserUrl;
             currentConfig.RightBrowserDefault = this.RightBrowserUrl;
+            currentConfig.ToolboxAutoLaunch = this.ToolboxAutoLaunch;
             this.configurationManager.SaveConfiguration(currentConfig);
             this.viewManager.ShowView<SettingsCategoryView>();
         }

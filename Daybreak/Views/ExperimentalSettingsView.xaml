@@ -81,14 +81,23 @@
             <TextBlock FontSize="16" Foreground="White" TextWrapping="Wrap"
                    Text="Warning! Functionality under development! These settings might have unintended consequences, including breaking the GuildWars TOS."></TextBlock>
         </StackPanel>
-        
         <Rectangle Fill="White" Height="1" VerticalAlignment="Bottom"></Rectangle>
-        <Grid Grid.Row="1" HorizontalAlignment="Center" Margin="0, 15, 0, 0">
-            <WrapPanel>
-                <TextBlock Text="Multi-launch support" Foreground="White" FontSize="22" VerticalAlignment="Center" Margin="0, 0, 15, 0"></TextBlock>
+        <Grid Grid.Row="1" HorizontalAlignment="Stretch" Margin="0, 15, 0, 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <TextBlock Text="Multi-launch support" Foreground="White" FontSize="22" VerticalAlignment="Center" Margin="0, 0, 15, 0" Height="30"></TextBlock>
+                <TextBlock Text="GWToolbox startup delay (in ms)" Foreground="White" FontSize="22" VerticalAlignment="Center" Margin="0, 0, 15, 0" Height="30"></TextBlock>
+            </StackPanel>
+            <StackPanel Grid.Column="1">
                 <ToggleButton IsChecked="{Binding ElementName=_this, Path=MultiLaunch, Mode=TwoWay}" Style="{StaticResource AnimatedSwitch}"
                               Height="30" Width="60"></ToggleButton>
-            </WrapPanel>
+                <TextBox Background="Transparent" Foreground="White" FontSize="16" Height="30" 
+                         PreviewTextInput="TextBox_AllowNumbersOnly" Text="{Binding ElementName=_this, Path=GWToolboxLaunchDelay, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         CommandManager.PreviewCanExecute="TextBox_DisallowPaste"></TextBox>
+            </StackPanel>
         </Grid>
     </Grid>
 </UserControl>

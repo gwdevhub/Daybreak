@@ -70,12 +70,6 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
-            <RowDefinition Height="auto"></RowDefinition>
-            <RowDefinition Height="auto"></RowDefinition>
-            <RowDefinition Height="auto"></RowDefinition>
-            <RowDefinition Height="auto"></RowDefinition>
-            <RowDefinition Height="auto"></RowDefinition>
-            <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"></ColumnDefinition>
@@ -86,25 +80,34 @@
                              Clicked="BackButton_Clicked"></controls:BackButton>
         <controls:SaveButton Foreground="White" Height="30" Width="30" Grid.Column="1" HorizontalAlignment="Right" Margin="5"
                              Clicked="SaveButton_Clicked"></controls:SaveButton>
-        <TextBlock Text="Toolbox path: " FontSize="22" Foreground="White" Grid.Row="2"></TextBlock>
-        <TextBox Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Grid.Row="2"
+        <StackPanel Orientation="Vertical" Grid.Row="1">
+            <TextBlock Text="GWToolbox path: " FontSize="22" Foreground="White"></TextBlock>
+            <TextBlock Text="GWToolbox auto-launch: " FontSize="22" Foreground="White"></TextBlock>
+            <TextBlock Text="Address bar readonly: " FontSize="22" Foreground="White"/>
+            <TextBlock Text="Left browser homepage: " FontSize="22" Foreground="White"></TextBlock>
+            <TextBlock Text="Right browser homepage: " FontSize="22" Foreground="White"></TextBlock>
+        </StackPanel>
+        <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="1">
+            <Grid>
+                <TextBox HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
                  FontSize="22" Margin="0, 0, 30, 0" Background="Transparent" Foreground="White"
                  Text="{Binding ElementName=_this, Path=ToolboxPath, Mode=TwoWay}"></TextBox>
-        <controls:FilePickerGlyph Grid.Row="2" Grid.Column="1" Height="30" Width="30" HorizontalAlignment="Right"
+                <controls:FilePickerGlyph Height="30" Width="30" HorizontalAlignment="Right"
                                   Foreground="White" BorderBrush="Gray" BorderThickness="0"
                                   Clicked="ToolboxFilePickerGlyph_Clicked"></controls:FilePickerGlyph>
-        <TextBlock Text="Address bar readonly: " FontSize="22" Foreground="White" Grid.Row="3"/>
-        <ToggleButton Grid.Column="1" HorizontalAlignment="Center" HorizontalContentAlignment="Stretch" Grid.Row="3" Style="{StaticResource AnimatedSwitch}" Height="30" Width="40"
+            </Grid>
+            <ToggleButton HorizontalAlignment="Center" HorizontalContentAlignment="Stretch" Style="{StaticResource AnimatedSwitch}" Height="30" Width="40"
+                      FontSize="22" Background="Transparent" Foreground="White" IsChecked="{Binding ElementName=_this, Path=ToolboxAutoLaunch, Mode=TwoWay}"></ToggleButton>
+            <ToggleButton HorizontalAlignment="Center" HorizontalContentAlignment="Stretch" Style="{StaticResource AnimatedSwitch}" Height="30" Width="40"
                       FontSize="22" Background="Transparent" Foreground="White" IsChecked="{Binding ElementName=_this, Path=AddressBarReadonly, Mode=TwoWay}"></ToggleButton>
-        <TextBlock Text="Left browser homepage: " FontSize="22" Foreground="White" Grid.Row="4"></TextBlock>
-        <TextBox Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Grid.Row="4"
+            <TextBox HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
                  FontSize="22" Background="Transparent" Foreground="White"
                  Text="{Binding ElementName=_this, Path=LeftBrowserUrl, Mode=TwoWay}"
                  TextChanged="LeftBrowserUrl_TextChanged"></TextBox>
-        <TextBlock Text="Right browser homepage: " FontSize="22" Foreground="White" Grid.Row="5"></TextBlock>
-        <TextBox Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Grid.Row="5"
+            <TextBox HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
                  FontSize="22" Background="Transparent" Foreground="White"
                  Text="{Binding ElementName=_this, Path=RightBrowserUrl, Mode=TwoWay}"
                  TextChanged="RightBrowserUrl_TextChanged"></TextBox>
+        </StackPanel>
     </Grid>
 </UserControl>

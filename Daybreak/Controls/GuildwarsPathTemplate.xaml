@@ -27,7 +27,7 @@
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <TextBlock FontSize="22" Text="Path:" Foreground="White" Margin="5" Grid.Row="0" HorizontalAlignment="Right"></TextBlock>
-            <TextBox Foreground="White" Background="Transparent" Text="{Binding ElementName=_this, Path=Path, Mode=TwoWay}"
+            <TextBox Foreground="White" Background="Transparent" Text="{Binding ElementName=_this, Path=Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      BorderThickness="1" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1"
                      FontSize="22" TextChanged="TextBox_TextChanged" Margin="5"></TextBox>
         </Grid>

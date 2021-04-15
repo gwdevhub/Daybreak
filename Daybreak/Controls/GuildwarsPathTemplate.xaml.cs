@@ -47,7 +47,6 @@ namespace Daybreak.Controls
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            this.Path = sender.As<TextBox>()?.Text;
             this.DataContext.As<GuildwarsPath>().Path = this.Path;
         }
 

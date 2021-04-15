@@ -66,13 +66,11 @@ namespace Daybreak.Controls
 
         private void UsernameTextbox_TextChanged(object sender, EventArgs e)
         {
-            this.Username = sender.As<TextBox>()?.Text;
             this.DataContext.As<LoginCredentials>().Username = this.Username;
         }
 
         private void CharacterNameTextbox_TextChanged(object sender, EventArgs e)
         {
-            this.CharacterName = sender.As<TextBox>()?.Text;
             this.DataContext.As<LoginCredentials>().CharacterName = this.CharacterName;
         }
 

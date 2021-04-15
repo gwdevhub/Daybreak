@@ -124,8 +124,7 @@ namespace Daybreak.Services.ApplicationLauncher
                         return false;
                     }
 
-                    using var stream = File.OpenWrite(path.Path);
-                    return false;
+                    return Process.GetProcessesByName(ProcessName).Where(process => string.Equals(path.Path, process.MainModule.FileName, StringComparison.Ordinal)).Any();
                 }
                 catch
                 {
