@@ -24,6 +24,8 @@ namespace Daybreak.Views
             DependencyPropertyExtensions.Register<MainView, bool>(nameof(LaunchToolboxButtonEnabled));
         public static readonly DependencyProperty LaunchTexmodButtonEnabledProperty =
             DependencyPropertyExtensions.Register<MainView, bool>(nameof(LaunchTexmodButtonEnabled));
+        public static readonly DependencyProperty BrowsersEnabledProperty =
+            DependencyPropertyExtensions.Register<MainView, bool>(nameof(BrowsersEnabled), new PropertyMetadata(true));
         public static readonly DependencyProperty RightBrowserAddressProperty =
             DependencyPropertyExtensions.Register<MainView, string>(nameof(RightBrowserAddress));
         public static readonly DependencyProperty LeftBrowserAddressProperty =
@@ -76,6 +78,11 @@ namespace Daybreak.Views
             get => this.GetTypedValue<bool>(LaunchTexmodButtonEnabledProperty);
             set => this.SetTypedValue(LaunchTexmodButtonEnabledProperty, value);
         }
+        public bool BrowsersEnabled
+        {
+            get => this.GetTypedValue<bool>(BrowsersEnabledProperty);
+            set => this.SetTypedValue(BrowsersEnabledProperty, value);
+        }
 
         public MainView(
             IApplicationLauncher applicationDetector,
@@ -93,10 +100,17 @@ namespace Daybreak.Views
         private void NavigateToDefaults()
         {
             var applicationConfiguration = this.configurationManager.GetConfiguration();
-            this.LeftBrowserFavoriteAddress = applicationConfiguration.LeftBrowserDefault;
-            this.RightBrowserFavoriteAddress = applicationConfiguration.RightBrowserDefault;
-            this.LeftBrowserAddress = applicationConfiguration.LeftBrowserDefault;
-            this.RightBrowserAddress = applicationConfiguration.RightBrowserDefault;
+            if (applicationConfiguration.BrowsersEnabled)
+            {
+                this.LeftBrowserFavoriteAddress = applicationConfiguration.LeftBrowserDefault;
+                this.RightBrowserFavoriteAddress = applicationConfiguration.RightBrowserDefault;
+                this.LeftBrowserAddress = applicationConfiguration.LeftBrowserDefault;
+                this.RightBrowserAddress = applicationConfiguration.RightBrowserDefault;
+            }
+            else
+            {
+                this.BrowsersEnabled = false;
+            }
         }
 
         private void PeriodicallyCheckGameState()

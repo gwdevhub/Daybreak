@@ -20,6 +20,8 @@ namespace Daybreak.Views
             DependencyPropertyExtensions.Register<SettingsView, string>(nameof(ToolboxPath));
         public static readonly DependencyProperty AddressBarReadonlyProperty =
             DependencyPropertyExtensions.Register<SettingsView, bool>(nameof(AddressBarReadonly));
+        public static readonly DependencyProperty BrowsersEnabledProperty =
+            DependencyPropertyExtensions.Register<SettingsView, bool>(nameof(BrowsersEnabled));
         public static readonly DependencyProperty LeftBrowserUrlProperty =
             DependencyPropertyExtensions.Register<SettingsView, string>(nameof(LeftBrowserUrl));
         public static readonly DependencyProperty RightBrowserUrlProperty =
@@ -60,6 +62,11 @@ namespace Daybreak.Views
             get => this.GetTypedValue<string>(RightBrowserUrlProperty);
             set => this.SetValue(RightBrowserUrlProperty, value);
         }
+        public bool BrowsersEnabled
+        {
+            get => this.GetTypedValue<bool>(BrowsersEnabledProperty);
+            set => this.SetValue(BrowsersEnabledProperty, value);
+        }
 
         public SettingsView(
             IConfigurationManager configurationManager,
@@ -80,6 +87,7 @@ namespace Daybreak.Views
             this.RightBrowserUrl = config.RightBrowserDefault;
             this.ToolboxAutoLaunch = config.ToolboxAutoLaunch;
             this.TexmodPath = config.TexmodPath;
+            this.BrowsersEnabled = config.BrowsersEnabled;
         }
 
         private void SaveButton_Clicked(object sender, EventArgs e)
@@ -91,6 +99,7 @@ namespace Daybreak.Views
             currentConfig.RightBrowserDefault = this.RightBrowserUrl;
             currentConfig.ToolboxAutoLaunch = this.ToolboxAutoLaunch;
             currentConfig.TexmodPath = this.TexmodPath;
+            currentConfig.BrowsersEnabled = this.BrowsersEnabled;
             this.configurationManager.SaveConfiguration(currentConfig);
             this.viewManager.ShowView<SettingsCategoryView>();
         }

@@ -23,6 +23,7 @@ namespace Daybreak.Controls
         public readonly static DependencyProperty AddressProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, string>(nameof(Address));
         public readonly static DependencyProperty FavoriteAddressProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, string>(nameof(FavoriteAddress));
         public readonly static DependencyProperty NavigatingProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, bool>(nameof(Navigating));
+        public readonly static DependencyProperty BrowserEnabledProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, bool>(nameof(BrowserEnabled));
         public readonly static DependencyProperty AddressBarReadonlyProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, bool>(nameof(AddressBarReadonly));
         public readonly static DependencyProperty BrowserSupportedProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, bool>(nameof(BrowserSupported), new PropertyMetadata(true));
 
@@ -53,6 +54,11 @@ namespace Daybreak.Controls
             get => this.GetTypedValue<bool>(AddressBarReadonlyProperty);
             private set => this.SetTypedValue<bool>(AddressBarReadonlyProperty, value);
         }
+        public bool BrowserEnabled
+        {
+            get => this.GetTypedValue<bool>(BrowserEnabledProperty);
+            private set => this.SetTypedValue<bool>(BrowserEnabledProperty, value);
+        }
         public bool BrowserSupported
         {
             get => this.GetTypedValue<bool>(BrowserSupportedProperty);
@@ -77,13 +83,19 @@ namespace Daybreak.Controls
             }
         }
 
-        public void ReinitializeBrowser()
+        public async void ReinitializeBrowser()
         {
-            this.InitializeBrowser();
+            await this.InitializeBrowser();
         }
 
         private void InitializeEnvironment()
         {
+            if (this.configurationManager.GetConfiguration().BrowsersEnabled is false)
+            {
+                this.BrowserSupported = false;
+                return;
+            }
+
             try
             {
                 this.coreWebView2Environment = System.Extensions.TaskExtensions.RunSync(() => CoreWebView2Environment.CreateAsync(null, "BrowserData", null));

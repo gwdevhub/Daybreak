@@ -84,7 +84,8 @@
             <TextBlock Text="Texmod path" FontSize="22" Foreground="White"></TextBlock>
             <TextBlock Text="GWToolbox path: " FontSize="22" Foreground="White"></TextBlock>
             <TextBlock Text="GWToolbox auto-launch: " FontSize="22" Foreground="White"></TextBlock>
-            <TextBlock Text="Address bar readonly: " FontSize="22" Foreground="White"/>
+            <TextBlock Text="Browsers enabled: " FontSize="22" Foreground="White"/>
+            <TextBlock Text="Browsers address bar readonly: " FontSize="22" Foreground="White"/>
             <TextBlock Text="Left browser homepage: " FontSize="22" Foreground="White"></TextBlock>
             <TextBlock Text="Right browser homepage: " FontSize="22" Foreground="White"></TextBlock>
         </StackPanel>
@@ -106,9 +107,11 @@
                                   Clicked="ToolboxFilePickerGlyph_Clicked"></controls:FilePickerGlyph>
             </Grid>
             <ToggleButton HorizontalAlignment="Center" HorizontalContentAlignment="Stretch" Style="{StaticResource AnimatedSwitch}" Height="30" Width="40"
-                      FontSize="22" Background="Transparent" Foreground="White" IsChecked="{Binding ElementName=_this, Path=ToolboxAutoLaunch, Mode=TwoWay}"></ToggleButton>
+                      FontSize="22" Foreground="White" IsChecked="{Binding ElementName=_this, Path=ToolboxAutoLaunch, Mode=TwoWay}"></ToggleButton>
             <ToggleButton HorizontalAlignment="Center" HorizontalContentAlignment="Stretch" Style="{StaticResource AnimatedSwitch}" Height="30" Width="40"
-                      FontSize="22" Background="Transparent" Foreground="White" IsChecked="{Binding ElementName=_this, Path=AddressBarReadonly, Mode=TwoWay}"></ToggleButton>
+                      FontSize="22" Foreground="White" IsChecked="{Binding ElementName=_this, Path=BrowsersEnabled, Mode=TwoWay}"></ToggleButton>
+            <ToggleButton HorizontalAlignment="Center" HorizontalContentAlignment="Stretch" Style="{StaticResource AnimatedSwitch}" Height="30" Width="40"
+                      FontSize="22" Foreground="White" IsChecked="{Binding ElementName=_this, Path=AddressBarReadonly, Mode=TwoWay}"></ToggleButton>
             <TextBox HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
                  FontSize="22" Background="Transparent" Foreground="White"
                  Text="{Binding ElementName=_this, Path=LeftBrowserUrl, Mode=TwoWay}"

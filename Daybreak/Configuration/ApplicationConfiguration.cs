@@ -6,6 +6,8 @@ namespace Daybreak.Configuration
 {
     public sealed class ApplicationConfiguration
     {
+        [JsonProperty("BrowsersEnabled")]
+        public bool BrowsersEnabled { get; set; } = true;
         [JsonProperty("ToolboxPath")]
         public string ToolboxPath { get; set; }
         [JsonProperty("TexmodPath")]
