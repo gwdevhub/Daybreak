@@ -192,6 +192,11 @@ namespace Daybreak.Controls
             this.FavoriteUriChanged?.Invoke(this, this.FavoriteAddress);
         }
 
+        private void HomeButton_Clicked(object sender, EventArgs e)
+        {
+            this.WebBrowser.CoreWebView2.Navigate(this.FavoriteAddress);
+        }
+
         private void MaximizeButton_Clicked(object sender, EventArgs e)
         {
             this.MaximizeClicked?.Invoke(this, e);

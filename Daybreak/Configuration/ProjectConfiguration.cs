@@ -5,6 +5,7 @@ using Daybreak.Services.Configuration;
 using Daybreak.Services.Credentials;
 using Daybreak.Services.Logging;
 using Daybreak.Services.Mutex;
+using Daybreak.Services.Runtime;
 using Daybreak.Services.Screenshots;
 using Daybreak.Services.Updater;
 using Daybreak.Services.ViewManagement;
@@ -14,7 +15,6 @@ using System.Extensions;
 
 namespace Daybreak.Configuration
 {
-    // TODO: Credit http://bloogum.net/guildwars/
     public static class ProjectConfiguration
     {
         public static void RegisterServices(IServiceProducer serviceProducer)
@@ -32,6 +32,7 @@ namespace Daybreak.Configuration
             serviceProducer.RegisterSingleton<IBloogumClient, BloogumClient>();
             serviceProducer.RegisterSingleton<IApplicationUpdater, ApplicationUpdater>();
             serviceProducer.RegisterSingleton<IMutexHandler, MutexHandler>();
+            serviceProducer.RegisterSingleton<IRuntimeStore, RuntimeStore>();
         }
         public static void RegisterLifetimeServices(IApplicationLifetimeProducer applicationLifetimeProducer)
         {

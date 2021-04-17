@@ -84,6 +84,10 @@
                  Text="{Binding ElementName=_this, Path=CreditText, Mode=OneWay}" IsReadOnly="True" VerticalAlignment="Bottom"
                  HorizontalAlignment="Right" Margin="0, 0, 20, 30" FontSize="22" Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
                  PreviewMouseLeftButtonDown="CreditTextBox_MouseLeftButtonDown" Cursor="Hand"></TextBox>
+        <TextBox Grid.Row="1" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Opacity="0.6"
+                 Text="{Binding ElementName=_this, Path=CurrentVersionText, Mode=OneWay}" IsReadOnly="True" VerticalAlignment="Bottom"
+                 HorizontalAlignment="Right" Margin="0, 0, 20, 10" FontSize="10" Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                 PreviewMouseLeftButtonDown="CreditTextBox_MouseLeftButtonDown" Cursor="Hand"></TextBox>
         <wcl:Border OnResize="Border_OnResize" Grid.RowSpan="2" Active="True"></wcl:Border>
     </Grid>
 </Window>

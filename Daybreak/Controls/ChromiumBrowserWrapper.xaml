@@ -55,6 +55,10 @@
                      PreviewKeyDown="TextBox_PreviewKeyDown"
                      IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"></TextBox>
             <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <local:HomeButton Width="30" Height="30" Margin="5"
+                                  Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                                  IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"
+                                  Clicked="HomeButton_Clicked"></local:HomeButton>
                 <local:StarGlyph Height="30" Width="30" Margin="5"
                              Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
                              IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"

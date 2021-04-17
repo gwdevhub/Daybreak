@@ -1,6 +1,9 @@
 ﻿using Daybreak.Models;
 using Daybreak.Services.Logging;
+using Daybreak.Services.Runtime;
+using Daybreak.Services.ViewManagement;
 using Daybreak.Utils;
+using Daybreak.Views;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -10,12 +13,15 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Daybreak.Services.Updater
 {
     public sealed class ApplicationUpdater : IApplicationUpdater
     {
+        private const string UpdateDesiredKey = "UpdateDesired";
         private const string ExecutionPolicyKey = "ExecutionPolicy";
         private const string UpdatedKey = "Updating";
         private const string RegistryKey = "Daybreak";
@@ -36,13 +42,21 @@ namespace Daybreak.Services.Updater
         private const string RemoveTempFile = $"Remove-item {TempFile}";
         private const string RemovePs1 = $"Remove-item {ExtractAndRunPs1}";
 
+        private readonly CancellationTokenSource updateCancellationTokenSource = new();
         private readonly ILogger logger;
+        private readonly IViewManager viewManager;
+        private readonly IRuntimeStore runtimeStore;
         private readonly HttpClient httpClient = new();
 
         public string CurrentVersion => Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
-        public ApplicationUpdater(ILogger logger)
+        public ApplicationUpdater(
+            ILogger logger,
+            IRuntimeStore runtimeStore,
+            IViewManager viewManager)
         {
+            this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
+            this.runtimeStore = runtimeStore.ThrowIfNull(nameof(runtimeStore));
             this.logger = logger.ThrowIfNull(nameof(logger));
         }
 
@@ -102,6 +116,23 @@ namespace Daybreak.Services.Updater
                     this.logger.LogWarning("Failed to retrieve latest version");
                     return false;
                 }).ExtractValue();
+        }
+
+        public void PeriodicallyCheckForUpdates()
+        {
+            System.Extensions.TaskExtensions.RunPeriodicAsync(async () =>
+            {
+                if (this.runtimeStore.TryGetValue<bool>(UpdateDesiredKey, out var desiringUpdate) && desiringUpdate is false)
+                {
+                    this.updateCancellationTokenSource.Cancel();
+                    return;
+                }
+
+                if (await this.UpdateAvailable())
+                {
+                    Application.Current.Dispatcher.Invoke(() => this.viewManager.ShowView<AskUpdateView>());
+                }
+            }, TimeSpan.FromMinutes(15), TimeSpan.FromMinutes(15), this.updateCancellationTokenSource.Token);
         }
 
         public void FinalizeUpdate()

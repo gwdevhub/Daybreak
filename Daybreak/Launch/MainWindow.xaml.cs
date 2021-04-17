@@ -1,4 +1,5 @@
 ﻿using Daybreak.Services.Bloogum;
+using Daybreak.Services.Runtime;
 using Daybreak.Services.Screenshots;
 using Daybreak.Services.Updater;
 using Daybreak.Services.ViewManagement;
@@ -23,6 +24,7 @@ namespace Daybreak.Launch
     public partial class MainWindow : Window
     {
         public static readonly DependencyProperty CreditTextProperty = DependencyPropertyExtensions.Register<MainWindow, string>(nameof(CreditText));
+        public static readonly DependencyProperty CurrentVersionTextProperty = DependencyPropertyExtensions.Register<MainWindow, string>(nameof(CurrentVersionText));
 
         private readonly IViewManager viewManager;
         private readonly IScreenshotProvider screenshotProvider;
@@ -36,6 +38,12 @@ namespace Daybreak.Launch
             set => this.SetValue(CreditTextProperty, value);
         }
 
+        public string CurrentVersionText
+        {
+            get => this.GetTypedValue<string>(CurrentVersionTextProperty);
+            set => this.SetValue(CurrentVersionTextProperty, value);
+        }
+
         public MainWindow(
             IViewManager viewManager,
             IScreenshotProvider screenshotProvider,
@@ -46,7 +54,8 @@ namespace Daybreak.Launch
             this.screenshotProvider = screenshotProvider.ThrowIfNull(nameof(screenshotProvider));
             this.bloogumClient = bloogumClient.ThrowIfNull(nameof(bloogumClient));
             this.applicationUpdater = applicationUpdater.ThrowIfNull(nameof(applicationUpdater));
-            InitializeComponent();
+            this.InitializeComponent();
+            this.CurrentVersionText = this.applicationUpdater.CurrentVersion;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -165,13 +174,7 @@ namespace Daybreak.Launch
 
         private void PeriodicallyCheckForUpdates()
         {
-            TaskExtensions.RunPeriodicAsync(async () =>
-            {
-                if (await this.applicationUpdater.UpdateAvailable())
-                {
-                    this.Dispatcher.Invoke(() => this.viewManager.ShowView<AskUpdateView>());
-                }
-            }, TimeSpan.FromMinutes(15), TimeSpan.FromMinutes(15), CancellationToken.None);
+            this.applicationUpdater.PeriodicallyCheckForUpdates();
         }
 
         private static Color GetAverageColor(BitmapSource bitmap)

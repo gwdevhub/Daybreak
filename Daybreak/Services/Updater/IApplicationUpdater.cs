@@ -8,6 +8,7 @@ namespace Daybreak.Services.Updater
     {
         string CurrentVersion { get; }
         void FinalizeUpdate();
+        void PeriodicallyCheckForUpdates();
         Task<bool> UpdateAvailable();
         Task<bool> DownloadUpdate(UpdateStatus updateStatus);
     }
