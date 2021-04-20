@@ -18,6 +18,8 @@ namespace Daybreak.Views
     /// </summary>
     public partial class MainView : UserControl
     {
+        public static readonly DependencyProperty ButtonsVisibleProperty =
+            DependencyPropertyExtensions.Register<MainView, bool>(nameof(ButtonsVisible), new PropertyMetadata(true));
         public static readonly DependencyProperty LaunchButtonEnabledProperty =
             DependencyPropertyExtensions.Register<MainView, bool>(nameof(LaunchButtonEnabled));
         public static readonly DependencyProperty LaunchToolboxButtonEnabledProperty =
@@ -43,6 +45,11 @@ namespace Daybreak.Views
         private bool leftBrowserMaximized = false;
         private bool rightBrowserMaximized = false;
 
+        public bool ButtonsVisible
+        {
+            get => this.GetTypedValue<bool>(ButtonsVisibleProperty);
+            set => this.SetTypedValue(ButtonsVisibleProperty, value);
+        }
         public string RightBrowserFavoriteAddress
         {
             get => this.GetTypedValue<string>(RightBrowserFavoriteAddressProperty);
@@ -210,6 +217,7 @@ namespace Daybreak.Views
             }
 
             this.leftBrowserMaximized = !this.leftBrowserMaximized;
+            this.ButtonsVisible = !this.leftBrowserMaximized;
         }
 
         private void RightChromiumBrowserWrapper_MaximizeClicked(object sender, EventArgs e)
@@ -228,6 +236,7 @@ namespace Daybreak.Views
             }
 
             this.rightBrowserMaximized = !this.rightBrowserMaximized;
+            this.ButtonsVisible = !this.rightBrowserMaximized;
         }
     }
 }

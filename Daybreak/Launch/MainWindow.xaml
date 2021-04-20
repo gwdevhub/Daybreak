@@ -69,8 +69,6 @@
                 </controls:ImageViewer.Effect>
             </controls:ImageViewer>
         </Border>
-        <Grid x:Name="Container" Grid.Row="1">
-        </Grid>
         <wcl:TitleBar x:Name="Titlebar"
                       Background="Transparent" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"
                       WindowState="Normal" MinimizeButtonClicked="TitleBar_MinimizeButtonClicked"
@@ -80,13 +78,15 @@
                       Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"></wcl:TitleBar>
         <ToggleButton Style="{StaticResource Window_SettingsButton}" Width="50" Height="30" HorizontalAlignment="Right"
                       Margin="0, 0, 150, 0" Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" Click="SettingsButton_Clicked"></ToggleButton>
-        <TextBox Grid.Row="1" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Opacity="0.6"
-                 Text="{Binding ElementName=_this, Path=CreditText, Mode=OneWay}" IsReadOnly="True" VerticalAlignment="Bottom"
+        <controls:OpaqueButton Grid.Row="1" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Opacity="0.6"
+                 Text="{Binding ElementName=_this, Path=CreditText, Mode=OneWay}" VerticalAlignment="Bottom"
                  HorizontalAlignment="Right" Margin="0, 0, 20, 30" FontSize="22" Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
-                 PreviewMouseLeftButtonDown="CreditTextBox_MouseLeftButtonDown" Cursor="Hand"></TextBox>
+                 Clicked="CreditTextBox_MouseLeftButtonDown" Cursor="Hand"></controls:OpaqueButton>
         <TextBox Grid.Row="1" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Opacity="0.6"
                  Text="{Binding ElementName=_this, Path=CurrentVersionText, Mode=OneWay}" IsReadOnly="True" VerticalAlignment="Bottom"
                  HorizontalAlignment="Right" Margin="0, 0, 20, 10" FontSize="10" Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"></TextBox>
+        <Grid x:Name="Container" Grid.Row="1">
+        </Grid>
         <wcl:Border OnResize="Border_OnResize" Grid.RowSpan="2" Active="True"></wcl:Border>
     </Grid>
 </Window>

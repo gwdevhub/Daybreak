@@ -132,7 +132,7 @@ namespace Daybreak.Launch
             this.viewManager.ShowView<SettingsCategoryView>();
         }
 
-        private void CreditTextBox_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void CreditTextBox_MouseLeftButtonDown(object sender, EventArgs e)
         {
             if (Uri.TryCreate(this.CreditText, UriKind.Absolute, out var uri))
             {
