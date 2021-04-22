@@ -45,3 +45,13 @@ To adjust executables, go into Guildwars settings. Clicking on the star next to 
 
 To enable multiboxing (multi-launch), go into Experimental settings. Then, switch between executables/accounts and launch them.
 ![Multibox toggle](https://i.imgur.com/vEFF2pb.png)
+
+To manage builds, go into Settings, Builds. Here you can select/remove builds.
+![Builds list view](https://i.imgur.com/OFxnFcZ.png)
+
+Doubleclick on one of the builds to enter the template management view. Here you can click on skills to open the wiki page of the skill. You can adjust professions, attributes and add/remove skills.
+![Builds management view](https://i.imgur.com/exKWJb8.png)
+
+To dynamically load a build, while browsing in the browsers from the main page, select and rightclick any text on the page that might be a template. If it is a template, the client will open a context menu with a button called "Load build template". Click on that button to load the build and switch to build template view.
+
+![Dynamically load build](https://i.imgur.com/V5vvgsg.png)
