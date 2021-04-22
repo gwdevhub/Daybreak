@@ -6,6 +6,7 @@ Requires webview2 runtime https://go.microsoft.com/fwlink/p/?LinkId=2124703.
 ![Showcase 2](https://media0.giphy.com/media/aQ8Wl7lsuhT0AblCPI/giphy.gif)
 ![Showcase 3](https://media2.giphy.com/media/s06PtxgeAAZtoJhTx6/giphy.gif)
 ![Build Management Showcase](https://media2.giphy.com/media/C399pwfypdZvkmoJpi/giphy.gif)
+![Dynamic build loading](https://media2.giphy.com/media/UKtJaoBk6NeuOmE8al/giphy.gif)
 
 # Features
 Automatically detect if guildwars is running or not. Includes the ability to launch guildwars from the client.
