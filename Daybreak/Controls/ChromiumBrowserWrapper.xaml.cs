@@ -138,6 +138,7 @@ namespace Daybreak.Controls
             {
                 await this.WebBrowser.EnsureCoreWebView2Async(this.coreWebView2Environment);
                 this.AddressBarReadonly = this.configurationManager.GetConfiguration().AddressBarReadonly;
+                this.CanDownloadBuild = this.configurationManager.GetConfiguration().ExperimentalFeatures.DynamicBuildLoading;
                 this.WebBrowser.CoreWebView2.NewWindowRequested += (browser, args) => args.Handled = true;
                 this.WebBrowser.NavigationStarting += (browser, args) =>
                 {

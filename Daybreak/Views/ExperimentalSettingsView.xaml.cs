@@ -19,6 +19,8 @@ namespace Daybreak.Views
             DependencyPropertyExtensions.Register<ExperimentalSettingsView, bool>(nameof(MultiLaunch));
         public static readonly DependencyProperty GWToolboxLaunchDelayProperty =
             DependencyPropertyExtensions.Register<ExperimentalSettingsView, string>(nameof(GWToolboxLaunchDelay));
+        public static readonly DependencyProperty DynamicBuildLoadingProperty =
+            DependencyPropertyExtensions.Register<ExperimentalSettingsView, bool>(nameof(DynamicBuildLoading));
 
         private readonly IViewManager viewManager;
         private readonly IConfigurationManager configurationManager;
@@ -32,6 +34,11 @@ namespace Daybreak.Views
         {
             get => this.GetTypedValue<string>(GWToolboxLaunchDelayProperty);
             set => this.SetValue(GWToolboxLaunchDelayProperty, value);
+        }
+        public bool DynamicBuildLoading
+        {
+            get => this.GetTypedValue<bool>(DynamicBuildLoadingProperty);
+            set => this.SetValue(DynamicBuildLoadingProperty, value);
         }
 
         public ExperimentalSettingsView(
@@ -49,12 +56,14 @@ namespace Daybreak.Views
             var config = this.configurationManager.GetConfiguration();
             this.MultiLaunch = config.ExperimentalFeatures.MultiLaunchSupport;
             this.GWToolboxLaunchDelay = config.ExperimentalFeatures.ToolboxAutoLaunchDelay.ToString();
+            this.DynamicBuildLoading = config.ExperimentalFeatures.DynamicBuildLoading;
         }
 
         private void SaveExperimentalSettings()
         {
             var config = this.configurationManager.GetConfiguration();
             config.ExperimentalFeatures.MultiLaunchSupport = this.MultiLaunch;
+            config.ExperimentalFeatures.DynamicBuildLoading = this.DynamicBuildLoading;
             if (int.TryParse(this.GWToolboxLaunchDelay, out var gwToolboxLaunchDelay))
             {
                 config.ExperimentalFeatures.ToolboxAutoLaunchDelay = gwToolboxLaunchDelay;
