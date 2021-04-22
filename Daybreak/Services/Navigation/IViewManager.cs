@@ -8,5 +8,8 @@ namespace Daybreak.Services.ViewManagement
 
         void ShowView<T>()
             where T : UserControl;
+
+        void ShowView<T>(object dataContext)
+            where T : UserControl;
     }
 }

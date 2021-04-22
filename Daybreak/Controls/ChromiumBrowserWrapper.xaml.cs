@@ -1,4 +1,7 @@
 ﻿using Daybreak.Launch;
+using Daybreak.Models.Browser;
+using Daybreak.Models.Builds;
+using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Configuration;
 using Daybreak.Services.Logging;
 using Daybreak.Utils;
@@ -26,14 +29,29 @@ namespace Daybreak.Controls
         public readonly static DependencyProperty BrowserEnabledProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, bool>(nameof(BrowserEnabled));
         public readonly static DependencyProperty AddressBarReadonlyProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, bool>(nameof(AddressBarReadonly));
         public readonly static DependencyProperty BrowserSupportedProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, bool>(nameof(BrowserSupported), new PropertyMetadata(true));
+        public readonly static DependencyProperty ControlsEnabledProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, bool>(nameof(ControlsEnabled), new PropertyMetadata(true));
+        public readonly static DependencyProperty CanNavigateProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, bool>(nameof(CanNavigate), new PropertyMetadata(true));
+        public readonly static DependencyProperty CanDownloadBuildProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, bool>(nameof(CanDownloadBuild), new PropertyMetadata(false));
 
         public event EventHandler<string> FavoriteUriChanged;
         public event EventHandler MaximizeClicked;
+        public event EventHandler<Build> BuildDecoded;
 
         private readonly IConfigurationManager configurationManager;
         private readonly ILogger logger;
+        private readonly IBuildTemplateManager buildTemplateManager;
         private CoreWebView2Environment coreWebView2Environment;
 
+        public bool CanDownloadBuild
+        {
+            get => this.GetTypedValue<bool>(CanDownloadBuildProperty);
+            set => this.SetTypedValue<bool>(CanDownloadBuildProperty, value);
+        }
+        public bool CanNavigate
+        {
+            get => this.GetTypedValue<bool>(CanNavigateProperty);
+            set => this.SetTypedValue<bool>(CanNavigateProperty, value);
+        }
         public string Address
         {
             get => this.GetTypedValue<string>(AddressProperty);
@@ -52,7 +70,7 @@ namespace Daybreak.Controls
         public bool AddressBarReadonly
         {
             get => this.GetTypedValue<bool>(AddressBarReadonlyProperty);
-            private set => this.SetTypedValue<bool>(AddressBarReadonlyProperty, value);
+            set => this.SetTypedValue<bool>(AddressBarReadonlyProperty, value);
         }
         public bool BrowserEnabled
         {
@@ -64,11 +82,17 @@ namespace Daybreak.Controls
             get => this.GetTypedValue<bool>(BrowserSupportedProperty);
             private set => this.SetTypedValue<bool>(BrowserSupportedProperty, value);
         }
+        public bool ControlsEnabled
+        {
+            get => this.GetTypedValue<bool>(ControlsEnabledProperty);
+            set => this.SetTypedValue<bool>(ControlsEnabledProperty, value);
+        }
 
         public ChromiumBrowserWrapper()
         {
             this.configurationManager = Launcher.ApplicationServiceManager.GetService<IConfigurationManager>();
             this.logger = Launcher.ApplicationServiceManager.GetService<ILogger>();
+            this.buildTemplateManager = Launcher.ApplicationServiceManager.GetService<IBuildTemplateManager>();
             this.InitializeComponent();
             this.InitializeEnvironment();
             this.InitializeBrowser();
@@ -115,8 +139,22 @@ namespace Daybreak.Controls
                 await this.WebBrowser.EnsureCoreWebView2Async(this.coreWebView2Environment);
                 this.AddressBarReadonly = this.configurationManager.GetConfiguration().AddressBarReadonly;
                 this.WebBrowser.CoreWebView2.NewWindowRequested += (browser, args) => args.Handled = true;
-                this.WebBrowser.NavigationStarting += (browser, args) => this.Navigating = true;
+                this.WebBrowser.NavigationStarting += (browser, args) =>
+                {
+                    if (this.CanNavigate is false && args.Uri != this.Address)
+                    {
+                        args.Cancel = true;
+                    }
+                    else
+                    {
+                        this.Navigating = true;
+                    }
+                };
                 this.WebBrowser.NavigationCompleted += (browser, args) => this.Navigating = false;
+                this.WebBrowser.WebMessageReceived += this.CoreWebView2_WebMessageReceived;
+                this.WebBrowser.CoreWebView2.Settings.AreDevToolsEnabled = false;
+                this.WebBrowser.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
+                await this.WebBrowser.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(Scripts.AlterContextMenu);
             }
         }
 
@@ -158,9 +196,55 @@ namespace Daybreak.Controls
             }
         }
 
+        private void CoreWebView2_WebMessageReceived(object sender, CoreWebView2WebMessageReceivedEventArgs args)
+        {
+            BrowserPayload payload = default;
+            try
+            {
+                payload = args.WebMessageAsJson.Deserialize<BrowserPayload>();
+            }
+            catch(Exception e)
+            {
+                this.logger.LogError(e);
+            }
+            if (payload?.Key == BrowserPayload.PayloadKeys.ContextMenu)
+            {
+                var contextMenuPayload = args.WebMessageAsJson.Deserialize<BrowserPayload<OnContextMenuPayload>>();
+                if (this.CanDownloadBuild is false)
+                {
+                    return;
+                }
+
+                var maybeTemplate = contextMenuPayload.Value.Selection;
+                Task.Run(() =>
+                {
+                    try
+                    {
+                        var build = this.buildTemplateManager.DecodeTemplate(maybeTemplate);
+                        this.Dispatcher.Invoke(() =>
+                        {
+                            this.ContextMenu.DataContext = build;
+                            this.ContextMenu.IsOpen = true;
+                        });
+                    }
+                    catch(Exception e)
+                    {
+                        this.logger.LogWarning($"Exception when decoding template {maybeTemplate}. Details {e}");
+                    }
+                });
+            }
+        }
+
+        private void LoadBuildTemplateButton_Click(object sender, EventArgs e)
+        {
+            var build = this.ContextMenu.DataContext.As<Build>();
+            this.ContextMenu.IsOpen = false;
+            this.BuildDecoded?.Invoke(this, build);
+        }
+
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
-            this.WebBrowser.Dispose();
+            this.WebBrowser?.Dispose();
         }
 
         private void BackButton_Clicked(object sender, EventArgs e)

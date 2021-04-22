@@ -1,8 +1,31 @@
-﻿namespace Daybreak.Models.Builds
+﻿using System.ComponentModel;
+
+namespace Daybreak.Models.Builds
 {
-    public sealed class AttributeEntry
+    public sealed class AttributeEntry : INotifyPropertyChanged
     {
-        public Attribute Attribute { get; set; }
-        public int Points { get; set; }
+        private Attribute attribute;
+        private int points;
+
+        public Attribute Attribute
+        {
+            get => this.attribute;
+            set
+            {
+                this.attribute = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Attribute)));
+            }
+        }
+        public int Points
+        {
+            get => this.points;
+            set
+            {
+                this.points = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Points)));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

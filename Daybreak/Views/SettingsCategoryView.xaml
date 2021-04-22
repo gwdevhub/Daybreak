@@ -36,6 +36,12 @@
                         <controls:ExperimentGlyph></controls:ExperimentGlyph>
                     </controls:TileButton.InnerContent>
                 </controls:TileButton>
+                <controls:TileButton Title="Builds" Foreground="White" BorderBrush="White" BorderThickness="2"
+                             HighlightColor="White" Clicked="BuildsButton_Clicked" Height="150" Width="150">
+                    <controls:TileButton.InnerContent>
+                        <controls:FireballGlyph></controls:FireballGlyph>
+                    </controls:TileButton.InnerContent>
+                </controls:TileButton>
             </WrapPanel>
         </WrapPanel>
     </Grid>

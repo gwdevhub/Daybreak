@@ -1,5 +1,5 @@
-﻿using Daybreak.Controls;
-using Daybreak.Exceptions;
+﻿using Daybreak.Exceptions;
+using Daybreak.Models.Builds;
 using Daybreak.Services.ApplicationLauncher;
 using Daybreak.Services.Configuration;
 using Daybreak.Services.ViewManagement;
@@ -185,6 +185,11 @@ namespace Daybreak.Views
             {
                 this.viewManager.ShowView<SettingsView>();
             }
+        }
+
+        private void ChromiumBrowserWrapper_BuildDecoded(object sender, Models.Builds.Build e)
+        {
+            this.viewManager.ShowView<BuildTemplateView>(new BuildEntry { Build = e, Name = string.Empty });
         }
 
         private void LeftBrowser_FavoriteUriChanged(object sender, string e)

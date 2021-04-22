@@ -14,6 +14,18 @@
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" TriggerValue="True"></converters:BooleanToVisibilityConverter>
         <converters:BooleanToVisibilityConverter x:Key="ReverseBooleanToVisibilityConverter" TriggerValue="False"></converters:BooleanToVisibilityConverter>
     </UserControl.Resources>
+    <UserControl.ContextMenu>
+        <ContextMenu>
+            <ContextMenu.Template>
+                <ControlTemplate>
+                    <StackPanel Margin="10">
+                        <local:OpaqueButton Text="Load build template" Foreground="White" Background="#F0202020" BackgroundOpacity="0.4"
+                                            Clicked="LoadBuildTemplateButton_Click" FontSize="16" Height="40" Width="200"></local:OpaqueButton>
+                    </StackPanel>
+                </ControlTemplate>
+            </ContextMenu.Template>
+        </ContextMenu>
+    </UserControl.ContextMenu>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
@@ -21,7 +33,8 @@
         </Grid.RowDefinitions>
         <wv2:WebView2 x:Name="WebBrowser" Source="{Binding ElementName=_this, Path=Address, Mode=TwoWay}"
                       IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"></wv2:WebView2>
-        <Grid Grid.Row="1" Background="#80808080" IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}">
+        <Grid Grid.Row="1" Background="#80808080" IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"
+              Visibility="{Binding ElementName=_this, Path=ControlsEnabled, Mode=OneWay, Converter={StaticResource ReverseBooleanToVisibilityConverter}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>

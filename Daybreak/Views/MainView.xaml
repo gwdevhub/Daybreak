@@ -43,13 +43,17 @@
             <controls:ChromiumBrowserWrapper Address="{Binding ElementName=_this, Path=RightBrowserAddress, Mode=OneWay}"
                                              Foreground="White" FavoriteUriChanged="RightBrowser_FavoriteUriChanged"
                                              FavoriteAddress="{Binding ElementName=_this, Path=RightBrowserFavoriteAddress, Mode=OneWay}"
-                                             MaximizeClicked="RightChromiumBrowserWrapper_MaximizeClicked"/>
+                                             MaximizeClicked="RightChromiumBrowserWrapper_MaximizeClicked"
+                                             BuildDecoded="ChromiumBrowserWrapper_BuildDecoded"
+                                             CanDownloadBuild="True"/>
         </Grid>
         <Grid Grid.Column="0" Margin="10" Visibility="{Binding ElementName=_this, Path=BrowsersEnabled, Mode=OneWay, Converter={StaticResource BooleanToVisibility}}">
             <controls:ChromiumBrowserWrapper Address="{Binding ElementName=_this, Path=LeftBrowserAddress, Mode=OneWay}"
                                              Foreground="White" FavoriteUriChanged="LeftBrowser_FavoriteUriChanged"
                                              FavoriteAddress="{Binding ElementName=_this, Path=LeftBrowserFavoriteAddress, Mode=OneWay}"
-                                             MaximizeClicked="LeftChromiumBrowserWrapper_MaximizeClicked"/>
+                                             MaximizeClicked="LeftChromiumBrowserWrapper_MaximizeClicked"
+                                             BuildDecoded="ChromiumBrowserWrapper_BuildDecoded"
+                                             CanDownloadBuild="True"/>
         </Grid>
     </Grid>
 </UserControl>

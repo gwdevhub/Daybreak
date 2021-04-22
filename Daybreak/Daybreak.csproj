@@ -14,6 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.32" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.774.44" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Slim" Version="1.2.1" />
@@ -24,24 +25,31 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Controls\StarGlyph.xaml.cs">
+    <Compile Update="Controls\Buttons\MinusButton.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Controls\CancelButton.xaml.cs">
+    <Compile Update="Controls\Glyphs\StarGlyph.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Controls\Buttons\CancelButton.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="Controls\MaximizeButton.xaml">
+    <Page Update="Controls\Buttons\MinusButton.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Controls\StarGlyph.xaml">
+    <Page Update="Controls\Buttons\MaximizeButton.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Controls\CancelButton.xaml">
+    <Page Update="Controls\Glyphs\StarGlyph.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Controls\Buttons\CancelButton.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>

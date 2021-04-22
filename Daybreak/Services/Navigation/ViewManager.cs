@@ -36,5 +36,13 @@ namespace Daybreak.Services.ViewManagement
             this.container.Children.Clear();
             this.container.Children.Add(view);
         }
+
+        public void ShowView<T>(object dataContext) where T : UserControl
+        {
+            var view = this.serviceManager.GetService<T>();
+            this.container.Children.Clear();
+            this.container.Children.Add(view);
+            view.DataContext = dataContext;
+        }
     }
 }

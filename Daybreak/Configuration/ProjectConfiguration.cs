@@ -4,6 +4,7 @@ using Daybreak.Services.Bloogum;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Configuration;
 using Daybreak.Services.Credentials;
+using Daybreak.Services.IconRetrieve;
 using Daybreak.Services.Logging;
 using Daybreak.Services.Mutex;
 using Daybreak.Services.Runtime;
@@ -35,6 +36,7 @@ namespace Daybreak.Configuration
             serviceProducer.RegisterSingleton<IMutexHandler, MutexHandler>();
             serviceProducer.RegisterSingleton<IRuntimeStore, RuntimeStore>();
             serviceProducer.RegisterSingleton<IBuildTemplateManager, BuildTemplateManager>();
+            serviceProducer.RegisterSingleton<IIconRetriever, IconRetriever>();
         }
         public static void RegisterLifetimeServices(IApplicationLifetimeProducer applicationLifetimeProducer)
         {
@@ -56,6 +58,8 @@ namespace Daybreak.Configuration
             viewProducer.RegisterView<AccountsView>();
             viewProducer.RegisterView<ExperimentalSettingsView>();
             viewProducer.RegisterView<ExecutablesView>();
+            viewProducer.RegisterView<BuildTemplateView>();
+            viewProducer.RegisterView<BuildsListView>();
         }
     }
 }

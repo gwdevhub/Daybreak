@@ -5,6 +5,7 @@ using Daybreak.Utils;
 using System;
 using System.Collections.Generic;
 using System.Extensions;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -13,6 +14,7 @@ namespace Daybreak.Services.BuildTemplates
     public sealed class BuildTemplateManager : IBuildTemplateManager
     {
         private const string DecodingLookupTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+        private readonly static string BuildsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Guild Wars\\Templates\\Skills";
 
         private readonly ILogger logger;
 
@@ -20,6 +22,78 @@ namespace Daybreak.Services.BuildTemplates
             ILogger logger)
         {
             this.logger = logger.ThrowIfNull(nameof(logger));
+        }
+
+        public BuildEntry CreateBuild()
+        {
+            var emptyBuild = new Build();
+            var builds = GetBuilds();
+            var baseName = "New build";
+            var name = baseName;
+            int count = 0;
+            while(builds.Where(b => b.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).Any())
+            {
+                name = baseName + count;
+                count++;
+            }
+
+            var entry = new BuildEntry { Build = emptyBuild, Name = name, PreviousName = string.Empty };
+            this.SaveBuild(entry);
+            return entry;
+        }
+
+        public BuildEntry CreateBuild(string name)
+        {
+            var emptyBuild = new Build();
+            var entry = new BuildEntry { Build = emptyBuild, Name = name, PreviousName = string.Empty };
+            this.SaveBuild(entry);
+            return entry;
+        }
+
+        public void SaveBuild(BuildEntry buildEntry)
+        {
+            var encodedBuild = this.EncodeTemplate(buildEntry.Build);
+            File.WriteAllText($"{BuildsPath}\\{buildEntry.Name}.txt", encodedBuild);
+            if (string.IsNullOrWhiteSpace(buildEntry.PreviousName))
+            {
+                return;
+            }
+
+            File.Delete($"{BuildsPath}\\{buildEntry.PreviousName}.txt");
+        }
+
+        public void RemoveBuild(BuildEntry buildEntry)
+        {
+            if (File.Exists($"{BuildsPath}\\{buildEntry.Name}.txt"))
+            {
+                File.Delete($"{BuildsPath}\\{buildEntry.Name}.txt");
+            }
+
+            if (File.Exists($"{BuildsPath}\\{buildEntry.PreviousName}.txt"))
+            {
+                File.Delete($"{BuildsPath}\\{buildEntry.PreviousName}.txt");
+            }
+        }
+
+        public IEnumerable<BuildEntry> GetBuilds()
+        {
+            foreach (var file in Directory.GetFiles(BuildsPath))
+            {
+                Build build = default;
+                try
+                {
+                    build = this.DecodeTemplate(File.ReadAllText(file));
+                }
+                catch(Exception e)
+                {
+                    this.logger.LogError($"Failed to decode template from file {file}. Details: {e}");
+                }
+                
+                if (build is not null)
+                {
+                    yield return new BuildEntry { Build = build, Name = Path.GetFileNameWithoutExtension(file), PreviousName = Path.GetFileNameWithoutExtension(file) };
+                }
+            }
         }
 
         public Build DecodeTemplate(string template)
@@ -45,7 +119,8 @@ namespace Daybreak.Services.BuildTemplates
 
             var build = new Build()
             {
-                BuildMetadata = buildMetadata
+                BuildMetadata = buildMetadata,
+                Skills = new()
             };
 
             if (Profession.TryParse(buildMetadata.PrimaryProfessionId, out var primaryProfession) is false)
@@ -200,7 +275,7 @@ namespace Daybreak.Services.BuildTemplates
             stream.Write(buildMetadata.SecondaryProfessionId, finalProfessionIdLength);
             
             stream.Write(buildMetadata.AttributeCount, 4);
-            var desiredAttributesLength = GetBitLength(buildMetadata.AttributesIds.Max());
+            var desiredAttributesLength = GetBitLength(buildMetadata.AttributesIds.Any() ? buildMetadata.AttributesIds.Max() : 0);
             var attributesLength = Math.Max(desiredAttributesLength - 4, 0);
             var finalAttributesLength = attributesLength + 4;
             stream.Write(attributesLength, 4);
