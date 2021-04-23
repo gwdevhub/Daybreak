@@ -1,4 +1,5 @@
 ﻿using Daybreak.Services.Bloogum;
+using Daybreak.Services.Privilege;
 using Daybreak.Services.Runtime;
 using Daybreak.Services.Screenshots;
 using Daybreak.Services.Updater;
@@ -25,11 +26,13 @@ namespace Daybreak.Launch
     {
         public static readonly DependencyProperty CreditTextProperty = DependencyPropertyExtensions.Register<MainWindow, string>(nameof(CreditText));
         public static readonly DependencyProperty CurrentVersionTextProperty = DependencyPropertyExtensions.Register<MainWindow, string>(nameof(CurrentVersionText));
+        public static readonly DependencyProperty IsRunningAsAdminProperty = DependencyPropertyExtensions.Register<MainWindow, bool>(nameof(IsRunningAsAdmin));
 
         private readonly IViewManager viewManager;
         private readonly IScreenshotProvider screenshotProvider;
         private readonly IBloogumClient bloogumClient;
         private readonly IApplicationUpdater applicationUpdater;
+        private readonly IPrivilegeManager privilegeManager;
         private readonly CancellationTokenSource cancellationToken = new();
 
         public string CreditText
@@ -44,18 +47,27 @@ namespace Daybreak.Launch
             set => this.SetValue(CurrentVersionTextProperty, value);
         }
 
+        public bool IsRunningAsAdmin
+        {
+            get => this.GetTypedValue<bool>(IsRunningAsAdminProperty);
+            set => this.SetValue(IsRunningAsAdminProperty, value);
+        }
+
         public MainWindow(
             IViewManager viewManager,
             IScreenshotProvider screenshotProvider,
             IBloogumClient bloogumClient,
-            IApplicationUpdater applicationUpdater)
+            IApplicationUpdater applicationUpdater,
+            IPrivilegeManager privilegeManager)
         {
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.screenshotProvider = screenshotProvider.ThrowIfNull(nameof(screenshotProvider));
             this.bloogumClient = bloogumClient.ThrowIfNull(nameof(bloogumClient));
             this.applicationUpdater = applicationUpdater.ThrowIfNull(nameof(applicationUpdater));
+            this.privilegeManager = privilegeManager.ThrowIfNull(nameof(privilegeManager));
             this.InitializeComponent();
             this.CurrentVersionText = this.applicationUpdater.CurrentVersion;
+            this.IsRunningAsAdmin = this.privilegeManager.AdminPrivileges;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
