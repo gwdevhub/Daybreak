@@ -5,6 +5,7 @@ namespace Daybreak.Services.BuildTemplates
 {
     public interface IBuildTemplateManager
     {
+        bool IsTemplate(string template);
         BuildEntry CreateBuild();
         BuildEntry CreateBuild(string name);
         void SaveBuild(BuildEntry buildEntry);

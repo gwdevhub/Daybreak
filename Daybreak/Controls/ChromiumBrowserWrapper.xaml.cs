@@ -155,7 +155,10 @@ namespace Daybreak.Controls
                 this.WebBrowser.WebMessageReceived += this.CoreWebView2_WebMessageReceived;
                 this.WebBrowser.CoreWebView2.Settings.AreDevToolsEnabled = false;
                 this.WebBrowser.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
-                await this.WebBrowser.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(Scripts.AlterContextMenu);
+                if (this.CanDownloadBuild)
+                {
+                    await this.WebBrowser.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(Scripts.SendSelectionOnContextMenu);
+                }
             }
         }
 
@@ -211,12 +214,17 @@ namespace Daybreak.Controls
             if (payload?.Key == BrowserPayload.PayloadKeys.ContextMenu)
             {
                 var contextMenuPayload = args.WebMessageAsJson.Deserialize<BrowserPayload<OnContextMenuPayload>>();
-                if (this.CanDownloadBuild is false)
+                var maybeTemplate = contextMenuPayload.Value.Selection;
+                if (string.IsNullOrWhiteSpace(maybeTemplate))
                 {
                     return;
                 }
 
-                var maybeTemplate = contextMenuPayload.Value.Selection;
+                if (this.buildTemplateManager.IsTemplate(maybeTemplate) is false)
+                {
+                    return;
+                }
+
                 Task.Run(() =>
                 {
                     try

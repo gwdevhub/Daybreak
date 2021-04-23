@@ -89,6 +89,7 @@ namespace Daybreak.Models.Builds
             Motivation,
             Leadership,
             ScytheMastery,
+            EarthPrayers,
             WindPrayers,
             EarthMagic,
             Mysticism

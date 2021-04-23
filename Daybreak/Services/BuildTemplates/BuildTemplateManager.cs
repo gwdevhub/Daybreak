@@ -24,6 +24,21 @@ namespace Daybreak.Services.BuildTemplates
             this.logger = logger.ThrowIfNull(nameof(logger));
         }
 
+        public bool IsTemplate(string template)
+        {
+            if (template.IsNullOrWhiteSpace())
+            {
+                return false;
+            }
+
+            if (template.Where(c => DecodingLookupTable.Contains(c) is false).Any())
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public BuildEntry CreateBuild()
         {
             var emptyBuild = new Build();
