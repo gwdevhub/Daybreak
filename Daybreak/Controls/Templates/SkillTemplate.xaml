@@ -17,8 +17,11 @@
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <Image VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-               Source="{Binding ElementName=_this, Path=ImageSource, Mode=OneWay}"></Image>
+        <Image VerticalAlignment="Top" HorizontalAlignment="Left"
+               Width="{Binding ElementName=_this, Path=ActualWidth, Mode=OneWay}"
+               Height="{Binding ElementName=_this, Path=ActualWidth, Mode=OneWay}"
+               Source="{Binding ElementName=_this, Path=ImageSource, Mode=OneWay}"
+               Stretch="UniformToFill"></Image>
         <Border BorderThickness="5" BorderBrush="Black"></Border>
         <Border BorderThickness="5" BorderBrush="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
                 Opacity="{Binding ElementName=_this, Path=BorderOpacity, Mode=OneWay}"></Border>
