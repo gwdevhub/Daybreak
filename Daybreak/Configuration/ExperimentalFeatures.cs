@@ -10,5 +10,7 @@ namespace Daybreak.Configuration
         public int ToolboxAutoLaunchDelay { get; set; } = 5000;
         [JsonProperty("DynamicBuildLoading")]
         public bool DynamicBuildLoading { get; set; } = true;
+        [JsonProperty("LaunchGuildwarsAsCurrentUser")]
+        public bool LaunchGuildwarsAsCurrentUser { get; set; } = true;
     }
 }

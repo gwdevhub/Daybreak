@@ -129,6 +129,18 @@ namespace Daybreak.Services.ApplicationLauncher
                 args.Add(character);
             }
 
+            var identity = this.configurationManager.GetConfiguration().ExperimentalFeatures.LaunchGuildwarsAsCurrentUser ?
+                System.Security.Principal.WindowsIdentity.GetCurrent().Name :
+                System.Security.Principal.WindowsIdentity.GetAnonymous().Name;
+            this.logger.LogInformation($"Launching guildwars as [{identity}] identity");
+            var process = new Process()
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    Arguments = string.Join(" ", args),
+                    UserName = identity
+                }
+            };
             if (Process.Start(executable.Path, args) is null)
             {
                 throw new InvalidOperationException($"Unable to launch {executable}");

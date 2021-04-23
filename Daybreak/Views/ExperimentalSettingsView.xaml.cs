@@ -21,10 +21,17 @@ namespace Daybreak.Views
             DependencyPropertyExtensions.Register<ExperimentalSettingsView, string>(nameof(GWToolboxLaunchDelay));
         public static readonly DependencyProperty DynamicBuildLoadingProperty =
             DependencyPropertyExtensions.Register<ExperimentalSettingsView, bool>(nameof(DynamicBuildLoading));
+        public static readonly DependencyProperty LaunchAsCurrentUserProperty =
+            DependencyPropertyExtensions.Register<ExperimentalSettingsView, bool>(nameof(LaunchAsCurrentUser));
 
         private readonly IViewManager viewManager;
         private readonly IConfigurationManager configurationManager;
 
+        public bool LaunchAsCurrentUser
+        {
+            get => this.GetTypedValue<bool>(LaunchAsCurrentUserProperty);
+            set => this.SetValue(LaunchAsCurrentUserProperty, value);
+        }
         public bool MultiLaunch
         {
             get => this.GetTypedValue<bool>(MultiLaunchProperty);
@@ -57,6 +64,7 @@ namespace Daybreak.Views
             this.MultiLaunch = config.ExperimentalFeatures.MultiLaunchSupport;
             this.GWToolboxLaunchDelay = config.ExperimentalFeatures.ToolboxAutoLaunchDelay.ToString();
             this.DynamicBuildLoading = config.ExperimentalFeatures.DynamicBuildLoading;
+            this.LaunchAsCurrentUser = config.ExperimentalFeatures.LaunchGuildwarsAsCurrentUser;
         }
 
         private void SaveExperimentalSettings()
@@ -64,6 +72,7 @@ namespace Daybreak.Views
             var config = this.configurationManager.GetConfiguration();
             config.ExperimentalFeatures.MultiLaunchSupport = this.MultiLaunch;
             config.ExperimentalFeatures.DynamicBuildLoading = this.DynamicBuildLoading;
+            config.ExperimentalFeatures.LaunchGuildwarsAsCurrentUser = this.LaunchAsCurrentUser;
             if (int.TryParse(this.GWToolboxLaunchDelay, out var gwToolboxLaunchDelay))
             {
                 config.ExperimentalFeatures.ToolboxAutoLaunchDelay = gwToolboxLaunchDelay;
