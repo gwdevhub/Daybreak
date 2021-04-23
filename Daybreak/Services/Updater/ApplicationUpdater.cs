@@ -265,7 +265,8 @@ namespace Daybreak.Services.Updater
                     RedirectStandardInput = true,
                     RedirectStandardOutput = true,
                     WindowStyle = ProcessWindowStyle.Maximized,
-                    WorkingDirectory = Directory.GetCurrentDirectory()
+                    WorkingDirectory = Directory.GetCurrentDirectory(),
+                    Verb = "runas"
                 },
             };
             this.logger.LogInformation("Created extractor script. Attempting to launch powershell");
