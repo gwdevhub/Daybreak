@@ -25,11 +25,11 @@
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
                 <ColumnDefinition Width="auto"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="Primary Profession: " FontSize="16" Foreground="White"></TextBlock>
-            <ListView FontSize="16" Foreground="White" Grid.Column="1" BorderThickness="0"
+            <TextBlock Text="Primary Profession: " FontSize="16" Foreground="White" Grid.Column="1"></TextBlock>
+            <ListView FontSize="16" Foreground="White" Grid.Column="2" BorderThickness="0"
                       Background="Transparent" ItemsSource="{Binding ElementName=_this, Path=Professions, Mode=OneWay}"
                       SelectedItem="{Binding ElementName=_this, Path=PrimaryProfession, Mode=TwoWay}" Height="30"
                       SelectionMode="Single" ScrollViewer.VerticalScrollBarVisibility="Disabled"
@@ -43,17 +43,17 @@
                     <behaviors:ScrollIntoView></behaviors:ScrollIntoView>
                 </interactivity:Interaction.Behaviors>
             </ListView>
-            <local:HelpButton Grid.Column="2" Foreground="White" Width="20" Height="20" Margin="3"
+            <local:HelpButton Grid.Column="0" Foreground="White" Width="20" Height="20" Margin="3"
                               Clicked="HelpButtonPrimary_Clicked" Cursor="Hand"></local:HelpButton>
         </Grid>
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
                 <ColumnDefinition Width="auto"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="Secondary Profession: " FontSize="16" Foreground="White"></TextBlock>
-            <ListView FontSize="16" Foreground="White" Grid.Column="1" BorderThickness="0"
+            <TextBlock Text="Secondary Profession: " FontSize="16" Foreground="White" Grid.Column="1"></TextBlock>
+            <ListView FontSize="16" Foreground="White" Grid.Column="2" BorderThickness="0"
                       Background="Transparent" ItemsSource="{Binding ElementName=_this, Path=Professions, Mode=OneWay}"
                       SelectedItem="{Binding ElementName=_this, Path=SecondaryProfession, Mode=TwoWay}" Height="30"
                       SelectionMode="Single" ScrollViewer.VerticalScrollBarVisibility="Disabled"
@@ -67,7 +67,7 @@
                     <behaviors:ScrollIntoView></behaviors:ScrollIntoView>
                 </interactivity:Interaction.Behaviors>
             </ListView>
-            <local:HelpButton Grid.Column="2" Foreground="White" Width="20" Height="20" Margin="3"
+            <local:HelpButton Grid.Column="0" Foreground="White" Width="20" Height="20" Margin="3"
                               Clicked="HelpButtonSecondary_Clicked" Cursor="Hand"></local:HelpButton>
         </Grid>
         <Grid Grid.Row="3">

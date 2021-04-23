@@ -48,15 +48,22 @@ namespace Daybreak.Controls
 
         private void SkillTemplate_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if (e.NewValue is Skill skill && skill != Skill.NoSkill)
+            if (e.NewValue is Skill skill)
             {
-                Task.Run(() => GetImageStream(skill)).ContinueWith((previousTask) =>
+                if (skill != Skill.NoSkill)
                 {
-                    this.Dispatcher.Invoke(() =>
+                    Task.Run(() => GetImageStream(skill)).ContinueWith((previousTask) =>
                     {
-                        this.ImageSource = GetImageSource(previousTask.Result);
+                        this.Dispatcher.Invoke(() =>
+                        {
+                            this.ImageSource = GetImageSource(previousTask.Result);
+                        });
                     });
-                });
+                }
+                else if (this.ImageSource is not null)
+                {
+                    this.ImageSource = null;
+                }
             }
         }
 
