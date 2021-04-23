@@ -10,5 +10,6 @@ namespace Daybreak.Services.ApplicationLauncher
         Task LaunchGuildwars();
         Task LaunchGuildwarsToolbox();
         Task LaunchTexmod();
+        void RestartDaybreakAsAdmin();
     }
 }

@@ -21,6 +21,7 @@ namespace Daybreak.Services.Updater
 {
     public sealed class ApplicationUpdater : IApplicationUpdater
     {
+        private const string LaunchActionName = "Launch_Daybreak";
         private const string UpdateDesiredKey = "UpdateDesired";
         private const string ExecutionPolicyKey = "ExecutionPolicy";
         private const string UpdatedKey = "Updating";
@@ -32,13 +33,20 @@ namespace Daybreak.Services.Updater
         private const string OutputPathTag = "{OUTPUTPATH}";
         private const string ExecutionPolicyTag = "{EXECUTIONPOLICY}";
         private const string ProcessIdTag = "{PROCESSID}";
+        private const string ExecutableNameTag = "{EXECUTABLE}";
+        private const string WorkingDirectoryTag = "{WORKINGDIRECTORY}";
         private const string Url = "https://github.com/AlexMacocian/Daybreak/releases/latest";
         private const string DownloadUrl = $"https://github.com/AlexMacocian/Daybreak/releases/download/v{VersionTag}/Daybreakv{VersionTag}.zip";
         private const string GetExecutionPolicyCommand = "Get-ExecutionPolicy -Scope CurrentUser";
         private const string SetExecutionPolicyCommand = $"Set-ExecutionPolicy {ExecutionPolicyTag} -Scope CurrentUser";
         private const string WaitCommand = $"Wait-Process -Id {ProcessIdTag}";
         private const string ExtractCommandTemplate = $"Expand-Archive -Path '{InputFileTag}' -DestinationPath '{OutputPathTag}' -Force";
-        private const string RunClientCommand = @".\Daybreak.exe";
+        private const string PrepareScheduledAction = $"$action = New-ScheduledTaskAction -Execute {ExecutableNameTag} -WorkingDirectory {WorkingDirectoryTag}";
+        private const string PrepareTriggerForAction = $"$trigger = New-ScheduledTaskTrigger -Once -At (Get-Date)";
+        private const string RegisterScheduledAction = $"Register-ScheduledTask -Action $action -Trigger $trigger -TaskName {LaunchActionName} | Out-Null";
+        private const string LaunchScheduledAction = $"Start-ScheduledTask -TaskName {LaunchActionName}";
+        private const string SleepOneSecond = $"Start-Sleep -s 1";
+        private const string UnregisterScheduledAction = $"Unregister-ScheduledTask -TaskName {LaunchActionName} -Confirm:$false";
         private const string RemoveTempFile = $"Remove-item {TempFile}";
         private const string RemovePs1 = $"Remove-item {ExtractAndRunPs1}";
 
@@ -251,8 +259,15 @@ namespace Daybreak.Services.Updater
                     .Replace(InputFileTag, Path.GetFullPath(TempFile))
                     .Replace(OutputPathTag, Directory.GetCurrentDirectory()),
                 RemoveTempFile,
+                PrepareScheduledAction
+                    .Replace(ExecutableNameTag, Process.GetCurrentProcess()?.MainModule?.FileName)
+                    .Replace(WorkingDirectoryTag, Directory.GetCurrentDirectory()),
+                PrepareTriggerForAction,
+                RegisterScheduledAction,
+                LaunchScheduledAction,
+                SleepOneSecond,
+                UnregisterScheduledAction,
                 RemovePs1,
-                RunClientCommand
             });
             var process = new Process()
             {
@@ -260,10 +275,7 @@ namespace Daybreak.Services.Updater
                 {
                     FileName = "powershell.exe",
                     Arguments = $@"{Directory.GetCurrentDirectory()}\{ExtractAndRunPs1}",
-                    UseShellExecute = false,
-                    RedirectStandardError = true,
-                    RedirectStandardInput = true,
-                    RedirectStandardOutput = true,
+                    UseShellExecute = true,
                     WindowStyle = ProcessWindowStyle.Maximized,
                     WorkingDirectory = Directory.GetCurrentDirectory(),
                     Verb = "runas"

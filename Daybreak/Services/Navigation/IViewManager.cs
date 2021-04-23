@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Windows.Controls;
 
 namespace Daybreak.Services.ViewManagement
 {
@@ -11,5 +12,9 @@ namespace Daybreak.Services.ViewManagement
 
         void ShowView<T>(object dataContext)
             where T : UserControl;
+
+        void ShowView(Type type);
+
+        void ShowView(Type type, object dataContext);
     }
 }

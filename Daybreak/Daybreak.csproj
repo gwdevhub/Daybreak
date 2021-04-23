@@ -9,8 +9,7 @@
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
     <LangVersion>preview</LangVersion>
     <ApplicationIcon>Daybreak.ico</ApplicationIcon>
-    <Version>0.7.7</Version>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Version>0.8.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

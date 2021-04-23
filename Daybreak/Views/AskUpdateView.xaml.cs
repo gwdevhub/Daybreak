@@ -1,4 +1,5 @@
 ﻿using Daybreak.Services.Logging;
+using Daybreak.Services.Privilege;
 using Daybreak.Services.Runtime;
 using Daybreak.Services.Updater;
 using Daybreak.Services.ViewManagement;
@@ -18,16 +19,30 @@ namespace Daybreak.Views
         private readonly ILogger logger;
         private readonly IViewManager viewManager;
         private readonly IRuntimeStore runtimeStore;
+        private readonly IPrivilegeManager privilegeManager;
 
         public AskUpdateView(
             ILogger logger,
             IViewManager viewManager,
-            IRuntimeStore runtimeStore)
+            IRuntimeStore runtimeStore,
+            IPrivilegeManager privilegeManager)
         {
             this.logger = logger.ThrowIfNull(nameof(logger));
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.runtimeStore = runtimeStore.ThrowIfNull(nameof(runtimeStore));
+            this.privilegeManager = privilegeManager.ThrowIfNull(nameof(privilegeManager));
             this.InitializeComponent();
+        }
+
+        private bool CheckIfAdmin()
+        {
+            if (this.privilegeManager.AdminPrivileges is false)
+            {
+                this.privilegeManager.RequestAdminPrivileges<MainView>("Application needs to be in administrator mode in order to update.");
+                return false;
+            }
+
+            return true;
         }
 
         private void NoButton_Clicked(object sender, System.EventArgs e)
@@ -41,6 +56,11 @@ namespace Daybreak.Views
         {
             this.logger.LogInformation("User accepted update");
             this.runtimeStore.StoreValue(UpdateDesiredKey, true);
+            if (this.CheckIfAdmin() is false)
+            {
+                return;
+            }
+
             this.viewManager.ShowView<UpdateView>();
         }
     }

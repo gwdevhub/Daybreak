@@ -1,6 +1,7 @@
 ﻿using Slim;
 using System;
 using System.Extensions;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Daybreak.Services.ViewManagement
@@ -32,17 +33,33 @@ namespace Daybreak.Services.ViewManagement
 
         public void ShowView<T>() where T : UserControl
         {
-            var view = this.serviceManager.GetService<T>();
-            this.container.Children.Clear();
-            this.container.Children.Add(view);
+            this.ShowViewInner(typeof(T), null);
         }
 
         public void ShowView<T>(object dataContext) where T : UserControl
         {
-            var view = this.serviceManager.GetService<T>();
-            this.container.Children.Clear();
-            this.container.Children.Add(view);
-            view.DataContext = dataContext;
+            this.ShowViewInner(typeof(T), dataContext);
+        }
+
+        public void ShowView(Type type)
+        {
+            this.ShowViewInner(type, null);
+        }
+
+        public void ShowView(Type type, object dataContext)
+        {
+            this.ShowViewInner(type, dataContext);
+        }
+
+        private void ShowViewInner(Type viewType, object dataContext)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                var view = this.serviceManager.GetService(viewType).As<UserControl>();
+                this.container.Children.Clear();
+                this.container.Children.Add(view);
+                view.DataContext = dataContext;
+            });
         }
     }
 }

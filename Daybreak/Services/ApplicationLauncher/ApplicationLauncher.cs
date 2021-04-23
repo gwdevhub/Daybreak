@@ -3,7 +3,9 @@ using Daybreak.Services.Configuration;
 using Daybreak.Services.Credentials;
 using Daybreak.Services.Logging;
 using Daybreak.Services.Mutex;
+using Daybreak.Services.Privilege;
 using Daybreak.Utils;
+using Daybreak.Views;
 using Microsoft.Win32;
 using Pepa.Wpf.Utilities;
 using System;
@@ -15,6 +17,7 @@ using System.Linq;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Daybreak.Services.ApplicationLauncher
 {
@@ -30,6 +33,7 @@ namespace Daybreak.Services.ApplicationLauncher
         private readonly ICredentialManager credentialManager;
         private readonly IMutexHandler mutexHandler;
         private readonly ILogger logger;
+        private readonly IPrivilegeManager privilegeManager;
 
         public bool IsTexmodRunning => TexModProcessDetected();
         public bool IsGuildwarsRunning => this.GuildwarsProcessDetected();
@@ -39,12 +43,14 @@ namespace Daybreak.Services.ApplicationLauncher
             IConfigurationManager configurationManager,
             ICredentialManager credentialManager,
             IMutexHandler mutexHandler,
-            ILogger logger)
+            ILogger logger,
+            IPrivilegeManager privilegeManager)
         {
             this.logger = logger.ThrowIfNull(nameof(logger));
             this.mutexHandler = mutexHandler.ThrowIfNull(nameof(mutexHandler));
             this.credentialManager = credentialManager.ThrowIfNull(nameof(credentialManager));
             this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
+            this.privilegeManager = privilegeManager.ThrowIfNull(nameof(privilegeManager));
         }
 
         public async Task LaunchGuildwars()
@@ -56,6 +62,12 @@ namespace Daybreak.Services.ApplicationLauncher
                 {
                     if (configuration.ExperimentalFeatures.MultiLaunchSupport is true)
                     {
+                        if (this.privilegeManager.AdminPrivileges is false)
+                        {
+                            this.privilegeManager.RequestAdminPrivileges<MainView>("You need administrator rights in order to start using multi-launch");
+                            return;
+                        }
+
                         ClearGwLocks();
                     }
 
@@ -101,6 +113,33 @@ namespace Daybreak.Services.ApplicationLauncher
                     throw new InvalidOperationException($"Unable to launch {executable}");
                 }
             });
+        }
+
+        public void RestartDaybreakAsAdmin()
+        {
+            this.logger.LogInformation("Restarting daybreak with admin rights");
+            var processName = Process.GetCurrentProcess()?.MainModule?.FileName;
+            if (processName.IsNullOrWhiteSpace() || File.Exists(processName) is false)
+            {
+                throw new InvalidOperationException("Unable to find executable. Aborting restart");
+            }
+
+            var process = new Process()
+            {
+                StartInfo = new()
+                {
+                    Verb = "runas",
+                    WorkingDirectory = Environment.CurrentDirectory,
+                    UseShellExecute = true,
+                    FileName = processName
+                }
+            };
+            if (process.Start() is false)
+            {
+                throw new InvalidOperationException($"Unable to start {processName} as admin");
+            }
+
+            Application.Current.Shutdown();
         }
 
         private void LaunchGuildwarsProcess(string email, Models.SecureString password, string character)
