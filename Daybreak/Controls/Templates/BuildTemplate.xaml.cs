@@ -1,6 +1,7 @@
 ﻿using Daybreak.Launch;
 using Daybreak.Models.Builds;
 using Daybreak.Services.IconRetrieve;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Extensions;
@@ -20,8 +21,8 @@ namespace Daybreak.Controls
     /// </summary>
     public partial class BuildTemplate : UserControl
     {
-        private const string SkillNamePlaceholder = "[NAME]";
-        private const string BaseAddress = $"https://wiki.guildwars.com/wiki/{SkillNamePlaceholder}";
+        private const string InfoNamePlaceholder = "[NAME]";
+        private const string BaseAddress = $"https://wiki.guildwars.com/wiki/{InfoNamePlaceholder}";
 
         public readonly static DependencyProperty PrimaryProfessionProperty =
             DependencyPropertyExtensions.Register<BuildTemplate, Profession>(nameof(PrimaryProfession), new PropertyMetadata(Profession.None));
@@ -137,8 +138,8 @@ namespace Daybreak.Controls
 
         private void Grid_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            this.SkillBrowser.Width = 0;
-            this.SkillsListView.Width = 0;
+            this.HideSkillListView();
+            this.HideInfoBrowser();
         }
 
         private void LoadAttributes()
@@ -244,21 +245,79 @@ namespace Daybreak.Controls
             this.Skill7 = build.Build.Skills[7];
         }
 
+        private void BrowseToInfo(string infoName)
+        {
+            var address = BaseAddress.Replace(InfoNamePlaceholder, infoName.Replace(" ", "_"));
+            this.SkillBrowser.Address = address;
+            this.ShowInfoBrowser();
+        }
+
+        private void ShowInfoBrowser()
+        {
+            this.SkillBrowser.Width = 400;
+            this.SkillsListView.Width = 0;
+        }
+
+        private void HideInfoBrowser()
+        {
+            this.SkillBrowser.Width = 0;
+        }
+
+        private void ShowSkillListView()
+        {
+            this.SkillBrowser.Width = 0;
+            this.SkillsListView.Width = 400;
+        }
+
+        private void HideSkillListView()
+        {
+            this.SkillsListView.Width = 0;
+        }
+
+        private void HelpButtonPrimary_Clicked(object sender, System.EventArgs e)
+        {
+            if (this.PrimaryProfession == Profession.None)
+            {
+                return;
+            }
+
+            this.BrowseToInfo(PrimaryProfession.Name);
+            if (e is RoutedEventArgs routedEventArgs)
+            {
+                routedEventArgs.Handled = true;
+            }
+        }
+
+        private void HelpButtonSecondary_Clicked(object sender, System.EventArgs e)
+        {
+            if (this.SecondaryProfession == Profession.None)
+            {
+                return;
+            }
+
+            this.BrowseToInfo(this.SecondaryProfession.Name);
+            if (e is RoutedEventArgs routedEventArgs)
+            {
+                routedEventArgs.Handled = true;
+            }
+        }
+
+        private void AttributeTemplate_HelpClicked(object sender, AttributeEntry e)
+        {
+            this.BrowseToInfo(e.Attribute.Name);
+        }
+
         private void SkillTemplate_Clicked(object sender, RoutedEventArgs e)
         {
             var skill = sender.As<SkillTemplate>().DataContext.As<Skill>();
             if (skill == Skill.NoSkill)
             {
-                this.SkillsListView.Width = 400;
-                this.SkillBrowser.Width = 0;
+                this.ShowSkillListView();
                 this.selectingSkillTemplate = sender.As<SkillTemplate>();
             }
             else
             {
-                var address = BaseAddress.Replace(SkillNamePlaceholder, skill.Name.Replace(" ", "_"));
-                this.SkillBrowser.Address = address;
-                this.SkillBrowser.Width = 400;
-                this.SkillsListView.Width = 0;
+                this.BrowseToInfo(skill.Name);
             }
             e.Handled = true;
         }
@@ -272,12 +331,12 @@ namespace Daybreak.Controls
         {
             if (this.selectingSkillTemplate is null)
             {
-                this.SkillsListView.Width = 0;
+                this.HideSkillListView();
                 return;
             }
 
             this.selectingSkillTemplate.DataContext = sender.As<ListView>().SelectedItem;
-            this.SkillsListView.Width = 0;
+            this.HideSkillListView();
             this.loadedBuild.Build.Skills[0] = Skill0;
             this.loadedBuild.Build.Skills[1] = Skill1;
             this.loadedBuild.Build.Skills[2] = Skill2;
@@ -288,9 +347,21 @@ namespace Daybreak.Controls
             this.loadedBuild.Build.Skills[7] = Skill7;
         }
 
-        private void ListView_DisableMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        private void ListView_NavigateWithMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
         {
             e.Handled = true;
+            if (e.Delta > 0)
+            {
+                sender.As<ListView>().SelectedIndex = sender.As<ListView>().SelectedIndex > 0 ?
+                    sender.As<ListView>().SelectedIndex - 1 :
+                    0;
+            }
+            else
+            {
+                sender.As<ListView>().SelectedIndex = sender.As<ListView>().SelectedIndex < sender.As<ListView>().Items.Count - 1 ?
+                    sender.As<ListView>().SelectedIndex + 1 :
+                    sender.As<ListView>().Items.Count;
+            }
         }
     }
 }

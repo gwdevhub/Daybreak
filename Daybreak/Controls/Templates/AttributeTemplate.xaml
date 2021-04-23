@@ -4,17 +4,22 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Controls"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
+             x:Name="_this"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <WrapPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="10, 0, 10, 0">
+            <local:HelpButton Width="20" Height="20" Margin="3, 0, 3, 0" Foreground="White"
+                              Clicked="HelpButton_Clicked" Cursor="Hand"></local:HelpButton>
             <TextBlock Text="{Binding Attribute.Name}" FontSize="16" Foreground="White"></TextBlock>
         </WrapPanel>
         <WrapPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="10, 0, 10, 0">
-            <local:MinusButton Foreground="White" Height="20" Clicked="MinusButton_Clicked"></local:MinusButton>
+            <local:MinusButton Foreground="White" Height="20" Clicked="MinusButton_Clicked" Cursor="Hand"
+                               IsEnabled="{Binding ElementName=_this, Path=CanSubtract, Mode=OneWay}"></local:MinusButton>
             <TextBox Background="Transparent" Foreground="White" FontSize="16" IsReadOnly="True" Width="30"
                      Text="{Binding Points}"></TextBox>
-            <local:AddButton Foreground="White" Height="20" Clicked="AddButton_Clicked"></local:AddButton>
+            <local:AddButton Foreground="White" Height="20" Clicked="AddButton_Clicked" Cursor="Hand"
+                             IsEnabled="{Binding ElementName=_this, Path=CanAdd, Mode=OneWay}"></local:AddButton>
         </WrapPanel>
     </Grid>
 </UserControl>

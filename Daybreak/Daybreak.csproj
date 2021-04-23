@@ -9,7 +9,7 @@
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
     <LangVersion>preview</LangVersion>
     <ApplicationIcon>Daybreak.ico</ApplicationIcon>
-    <Version>0.7.3</Version>
+    <Version>0.7.4</Version>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
@@ -25,6 +25,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Controls\Buttons\HelpButton.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Controls\Buttons\MinusButton.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -37,6 +40,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="Controls\Buttons\HelpButton.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Controls\Buttons\MinusButton.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>

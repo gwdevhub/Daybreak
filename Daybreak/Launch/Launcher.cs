@@ -9,6 +9,8 @@ using Microsoft.Web.WebView2.Wpf;
 using Slim;
 using System;
 using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Extensions;
@@ -44,6 +46,18 @@ namespace Daybreak.Launch
             {
                 MessageBox.Show(fatalException.ToString());
                 return false;
+            }
+            else if (e is AggregateException aggregateException)
+            {
+                if (aggregateException.InnerExceptions.FirstOrDefault() is COMException comException &&
+                    comException.Message.Contains("Invalid window handle"))
+                {
+                    /* 
+                     * Ignore exception caused by browser failing to initialize due to missing window.
+                     * Likely caused by switching windows before browser was initialized.
+                     */
+                    return true;
+                }
             }
 
             MessageBox.Show(e.ToString());

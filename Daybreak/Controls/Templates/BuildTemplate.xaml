@@ -26,13 +26,14 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="auto"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <TextBlock Text="Primary Profession: " FontSize="16" Foreground="White"></TextBlock>
-            <ListView FontSize="16" Foreground="White" Grid.Column="1"
+            <ListView FontSize="16" Foreground="White" Grid.Column="1" BorderThickness="0"
                       Background="Transparent" ItemsSource="{Binding ElementName=_this, Path=Professions, Mode=OneWay}"
-                      SelectedItem="{Binding ElementName=_this, Path=PrimaryProfession, Mode=TwoWay}" Height="25"
+                      SelectedItem="{Binding ElementName=_this, Path=PrimaryProfession, Mode=TwoWay}" Height="30"
                       SelectionMode="Single" ScrollViewer.VerticalScrollBarVisibility="Disabled"
-                      PreviewMouseWheel="ListView_DisableMouseWheel">
+                      PreviewMouseWheel="ListView_NavigateWithMouseWheel">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Name, Mode=OneWay}"></TextBlock>
@@ -42,18 +43,21 @@
                     <behaviors:ScrollIntoView></behaviors:ScrollIntoView>
                 </interactivity:Interaction.Behaviors>
             </ListView>
+            <local:HelpButton Grid.Column="2" Foreground="White" Width="20" Height="20" Margin="3"
+                              Clicked="HelpButtonPrimary_Clicked" Cursor="Hand"></local:HelpButton>
         </Grid>
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="auto"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <TextBlock Text="Secondary Profession: " FontSize="16" Foreground="White"></TextBlock>
-            <ListView FontSize="16" Foreground="White" Grid.Column="1"
+            <ListView FontSize="16" Foreground="White" Grid.Column="1" BorderThickness="0"
                       Background="Transparent" ItemsSource="{Binding ElementName=_this, Path=Professions, Mode=OneWay}"
-                      SelectedItem="{Binding ElementName=_this, Path=SecondaryProfession, Mode=TwoWay}" Height="25"
+                      SelectedItem="{Binding ElementName=_this, Path=SecondaryProfession, Mode=TwoWay}" Height="30"
                       SelectionMode="Single" ScrollViewer.VerticalScrollBarVisibility="Disabled"
-                      PreviewMouseWheel="ListView_DisableMouseWheel">
+                      PreviewMouseWheel="ListView_NavigateWithMouseWheel">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Name, Mode=OneWay}"></TextBlock>
@@ -63,13 +67,15 @@
                     <behaviors:ScrollIntoView></behaviors:ScrollIntoView>
                 </interactivity:Interaction.Behaviors>
             </ListView>
+            <local:HelpButton Grid.Column="2" Foreground="White" Width="20" Height="20" Margin="3"
+                              Clicked="HelpButtonSecondary_Clicked" Cursor="Hand"></local:HelpButton>
         </Grid>
         <Grid Grid.Row="3">
             <ListBox Background="Transparent" ItemsSource="{Binding ElementName=_this, Path=Attributes, Mode=OneWay}"
-                     HorizontalContentAlignment="Stretch">
+                     HorizontalContentAlignment="Stretch" BorderThickness="0">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <local:AttributeTemplate></local:AttributeTemplate>
+                        <local:AttributeTemplate HelpClicked="AttributeTemplate_HelpClicked"></local:AttributeTemplate>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
@@ -90,42 +96,42 @@
                 <RowDefinition Height="auto"></RowDefinition>
             </Grid.RowDefinitions>
             <local:SkillTemplate Grid.Column="0"
-                                 Foreground="White"
+                                 Foreground="White" Cursor="Hand"
                                  FontSize="22" DataContext="{Binding ElementName=_this, Path=Skill0, Mode=TwoWay}"
                                  VerticalAlignment="Stretch" Clicked="SkillTemplate_Clicked"
                                  RemoveClicked="SkillTemplate_RemoveClicked"></local:SkillTemplate>
             <local:SkillTemplate Grid.Column="1"
-                                 Foreground="White"
+                                 Foreground="White" Cursor="Hand"
                                  FontSize="22" DataContext="{Binding ElementName=_this, Path=Skill1, Mode=TwoWay}"
                                  VerticalAlignment="Stretch" Clicked="SkillTemplate_Clicked"
                                  RemoveClicked="SkillTemplate_RemoveClicked"></local:SkillTemplate>
             <local:SkillTemplate Grid.Column="2"
-                                 Foreground="White"
+                                 Foreground="White" Cursor="Hand"
                                  FontSize="22" DataContext="{Binding ElementName=_this, Path=Skill2, Mode=TwoWay}"
                                  VerticalAlignment="Stretch" Clicked="SkillTemplate_Clicked"
                                  RemoveClicked="SkillTemplate_RemoveClicked"></local:SkillTemplate>
             <local:SkillTemplate Grid.Column="3"
-                                 Foreground="White"
+                                 Foreground="White" Cursor="Hand"
                                  FontSize="22" DataContext="{Binding ElementName=_this, Path=Skill3, Mode=TwoWay}"
                                  VerticalAlignment="Stretch" Clicked="SkillTemplate_Clicked"
                                  RemoveClicked="SkillTemplate_RemoveClicked"></local:SkillTemplate>
             <local:SkillTemplate Grid.Column="4"
-                                 Foreground="White"
+                                 Foreground="White" Cursor="Hand"
                                  FontSize="22" DataContext="{Binding ElementName=_this, Path=Skill4, Mode=TwoWay}"
                                  VerticalAlignment="Stretch" Clicked="SkillTemplate_Clicked"
                                  RemoveClicked="SkillTemplate_RemoveClicked"></local:SkillTemplate>
             <local:SkillTemplate Grid.Column="5"
-                                 Foreground="White"
+                                 Foreground="White" Cursor="Hand"
                                  FontSize="22" DataContext="{Binding ElementName=_this, Path=Skill5, Mode=TwoWay}"
                                  VerticalAlignment="Stretch" Clicked="SkillTemplate_Clicked"
                                  RemoveClicked="SkillTemplate_RemoveClicked"></local:SkillTemplate>
             <local:SkillTemplate Grid.Column="6"
-                                 Foreground="White"
+                                 Foreground="White" Cursor="Hand"
                                  FontSize="22" DataContext="{Binding ElementName=_this, Path=Skill6, Mode=TwoWay}"
                                  VerticalAlignment="Stretch" Clicked="SkillTemplate_Clicked"
                                  RemoveClicked="SkillTemplate_RemoveClicked"></local:SkillTemplate>
             <local:SkillTemplate Grid.Column="7"
-                                 Foreground="White"
+                                 Foreground="White" Cursor="Hand"
                                  FontSize="22" DataContext="{Binding ElementName=_this, Path=Skill7, Mode=TwoWay}"
                                  VerticalAlignment="Stretch" Clicked="SkillTemplate_Clicked"
                                  RemoveClicked="SkillTemplate_RemoveClicked"></local:SkillTemplate>
