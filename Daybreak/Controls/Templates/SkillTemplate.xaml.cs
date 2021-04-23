@@ -48,9 +48,9 @@ namespace Daybreak.Controls
 
         private void SkillTemplate_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if (e.NewValue is Skill)
+            if (e.NewValue is Skill skill && skill != Skill.NoSkill)
             {
-                Task.Run(() => GetImageStream(e.NewValue.As<Skill>())).ContinueWith((previousTask) =>
+                Task.Run(() => GetImageStream(skill)).ContinueWith((previousTask) =>
                 {
                     this.Dispatcher.Invoke(() =>
                     {

@@ -68,13 +68,12 @@ namespace Daybreak.Services.BuildTemplates
         public void SaveBuild(BuildEntry buildEntry)
         {
             var encodedBuild = this.EncodeTemplate(buildEntry.Build);
-            File.WriteAllText($"{BuildsPath}\\{buildEntry.Name}.txt", encodedBuild);
             if (string.IsNullOrWhiteSpace(buildEntry.PreviousName))
             {
-                return;
+                File.Delete($"{BuildsPath}\\{buildEntry.PreviousName}.txt");
             }
 
-            File.Delete($"{BuildsPath}\\{buildEntry.PreviousName}.txt");
+            File.WriteAllText($"{BuildsPath}\\{buildEntry.Name}.txt", encodedBuild);
         }
 
         public void RemoveBuild(BuildEntry buildEntry)
