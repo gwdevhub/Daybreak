@@ -2,9 +2,11 @@
 using Daybreak.Models.Builds;
 using Daybreak.Services.ApplicationLauncher;
 using Daybreak.Services.Configuration;
+using Daybreak.Services.Screens;
 using Daybreak.Services.ViewManagement;
 using System;
 using System.Extensions;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -40,6 +42,7 @@ namespace Daybreak.Views
         private readonly IApplicationLauncher applicationDetector;
         private readonly IViewManager viewManager;
         private readonly IConfigurationManager configurationManager;
+        private readonly IScreenManager screenManager;
         private readonly CancellationTokenSource cancellationTokenSource = new();
 
         private bool leftBrowserMaximized = false;
@@ -94,8 +97,10 @@ namespace Daybreak.Views
         public MainView(
             IApplicationLauncher applicationDetector,
             IViewManager viewManager,
-            IConfigurationManager configurationManager)
+            IConfigurationManager configurationManager,
+            IScreenManager screenManager)
         {
+            this.screenManager = screenManager.ThrowIfNull(nameof(screenManager));
             this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
             this.applicationDetector = applicationDetector.ThrowIfNull(nameof(applicationDetector));
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
@@ -145,7 +150,16 @@ namespace Daybreak.Views
         {
             try
             {
-                await this.applicationDetector.LaunchGuildwars();
+                if (await this.applicationDetector.LaunchGuildwars() is false)
+                {
+                    return;
+                }
+
+                if (this.configurationManager.GetConfiguration().SetGuildwarsWindowSizeOnLaunch)
+                {
+                    this.screenManager.MoveGuildwarsToScreen(this.screenManager.Screens.Skip(this.configurationManager.GetConfiguration().DesiredGuildwarsScreen).First());
+                }
+
                 if (this.configurationManager.GetConfiguration().ToolboxAutoLaunch is true)
                 {
                     var delay = this.configurationManager.GetConfiguration().ExperimentalFeatures.ToolboxAutoLaunchDelay;

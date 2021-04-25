@@ -23,6 +23,7 @@ namespace Daybreak.Services.ApplicationLauncher
 {
     public class ApplicationLauncher : IApplicationLauncher
     {
+        private const int MaxRetries = 10;
         private const string TexModProcessName = "TexMod";
         private const string UModProcessName = "uMod";
         private const string ToolboxProcessName = "GWToolbox";
@@ -53,30 +54,31 @@ namespace Daybreak.Services.ApplicationLauncher
             this.privilegeManager = privilegeManager.ThrowIfNull(nameof(privilegeManager));
         }
 
-        public async Task LaunchGuildwars()
+        public async Task<bool> LaunchGuildwars()
         {
             var configuration = this.configurationManager.GetConfiguration();
             var auth = await this.credentialManager.GetDefaultCredentials().ConfigureAwait(false);
-            auth.Do(
-                onSome: (credentials) =>
+            return await auth.Switch(
+                onSome: async (credentials) =>
                 {
                     if (configuration.ExperimentalFeatures.MultiLaunchSupport is true)
                     {
                         if (this.privilegeManager.AdminPrivileges is false)
                         {
                             this.privilegeManager.RequestAdminPrivileges<MainView>("You need administrator rights in order to start using multi-launch");
-                            return;
+                            return false;
                         }
 
                         ClearGwLocks();
                     }
 
-                    LaunchGuildwarsProcess(credentials.Username, credentials.Password, credentials.CharacterName);
+                    return await LaunchGuildwarsProcess(credentials.Username, credentials.Password, credentials.CharacterName);
                 },
                 onNone: () =>
                 {
                     throw new CredentialsNotFoundException($"No credentials available");
-                });
+                })
+                .ExtractValue();
         }
 
         public Task LaunchGuildwarsToolbox()
@@ -142,7 +144,7 @@ namespace Daybreak.Services.ApplicationLauncher
             Application.Current.Shutdown();
         }
 
-        private void LaunchGuildwarsProcess(string email, Models.SecureString password, string character)
+        private async Task<bool> LaunchGuildwarsProcess(string email, Models.SecureString password, string character)
         {
             var executable = this.configurationManager.GetConfiguration().GuildwarsPaths.Where(path => path.Default).FirstOrDefault();
             if (executable is null)
@@ -183,6 +185,27 @@ namespace Daybreak.Services.ApplicationLauncher
             if (Process.Start(executable.Path, args) is null)
             {
                 throw new InvalidOperationException($"Unable to launch {executable}");
+            }
+
+            var retries = 0;
+            while (true)
+            {
+                await Task.Delay(1000);
+                retries++;
+                var gwProcess = Process.GetProcessesByName("gw").FirstOrDefault();
+                if (gwProcess is null && retries < MaxRetries)
+                {
+                    continue;
+                }
+                else if (gwProcess is null && retries >= MaxRetries)
+                {
+                    throw new InvalidOperationException("Newly launched gw process not detected");
+                }
+
+                if (gwProcess.MainWindowHandle != IntPtr.Zero)
+                {
+                    return true;
+                }
             }
         }
 

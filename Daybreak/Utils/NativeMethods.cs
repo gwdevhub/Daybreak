@@ -7,6 +7,10 @@ namespace Pepa.Wpf.Utilities
 {
     static class NativeMethods
     {
+        public static uint SWP_SHOWWINDOW = 0x0040;
+        public static IntPtr HWND_TOPMOST = new(-1);
+        public static IntPtr HWND_TOP = IntPtr.Zero;
+
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct SystemHandleInformation
         {
@@ -105,5 +109,9 @@ namespace Pepa.Wpf.Utilities
         public static extern NtStatus NtQuerySystemInformation(SystemInformationClass SystemInformationClass, IntPtr SystemInformation, int SystemInformationLength, out int ReturnLength);
         [DllImport("kernel32.dll")]
         public static extern bool QueryFullProcessImageName(IntPtr hProcess, uint dwFlags, StringBuilder lpExeName, ref uint lpdwSize);
+        [DllImport("user32.dll")]
+        public static extern bool SetWindowPos(IntPtr hwnd, IntPtr insertAfter, int x, int y, int cx, int cy, uint flags);
+        [DllImport("user32.dll")]
+        public static extern bool ShowWindow(IntPtr hwnd, int cmd);
     }
 }

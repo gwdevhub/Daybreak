@@ -9,6 +9,7 @@ using Daybreak.Services.Logging;
 using Daybreak.Services.Mutex;
 using Daybreak.Services.Privilege;
 using Daybreak.Services.Runtime;
+using Daybreak.Services.Screens;
 using Daybreak.Services.Screenshots;
 using Daybreak.Services.Updater;
 using Daybreak.Services.ViewManagement;
@@ -39,6 +40,7 @@ namespace Daybreak.Configuration
             serviceProducer.RegisterSingleton<IBuildTemplateManager, BuildTemplateManager>();
             serviceProducer.RegisterSingleton<IIconRetriever, IconRetriever>();
             serviceProducer.RegisterSingleton<IPrivilegeManager, PrivilegeManager>();
+            serviceProducer.RegisterSingleton<IScreenManager, ScreenManager>();
         }
         public static void RegisterLifetimeServices(IApplicationLifetimeProducer applicationLifetimeProducer)
         {
@@ -63,6 +65,7 @@ namespace Daybreak.Configuration
             viewProducer.RegisterView<BuildTemplateView>();
             viewProducer.RegisterView<BuildsListView>();
             viewProducer.RegisterView<RequestElevationView>();
+            viewProducer.RegisterView<ScreenChoiceView>();
         }
     }
 }

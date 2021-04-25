@@ -28,6 +28,10 @@ namespace Daybreak.Views
             DependencyPropertyExtensions.Register<SettingsView, string>(nameof(RightBrowserUrl));
         public static readonly DependencyProperty ToolboxAutoLaunchProperty =
             DependencyPropertyExtensions.Register<SettingsView, bool>(nameof(ToolboxAutoLaunch));
+        public static readonly DependencyProperty AutoPlaceOnScreenProperty =
+            DependencyPropertyExtensions.Register<SettingsView, bool>(nameof(AutoPlaceOnScreen));
+        public static readonly DependencyProperty DesiredScreenProperty =
+            DependencyPropertyExtensions.Register<SettingsView, string>(nameof(DesiredScreen));
 
         private readonly IConfigurationManager configurationManager;
         private readonly IViewManager viewManager;
@@ -67,6 +71,16 @@ namespace Daybreak.Views
             get => this.GetTypedValue<bool>(BrowsersEnabledProperty);
             set => this.SetValue(BrowsersEnabledProperty, value);
         }
+        public bool AutoPlaceOnScreen
+        {
+            get => this.GetTypedValue<bool>(AutoPlaceOnScreenProperty);
+            set => this.SetValue(AutoPlaceOnScreenProperty, value);
+        }
+        public string DesiredScreen
+        {
+            get => this.GetTypedValue<string>(DesiredScreenProperty);
+            set => this.SetValue(DesiredScreenProperty, value);
+        }
 
         public SettingsView(
             IConfigurationManager configurationManager,
@@ -88,6 +102,8 @@ namespace Daybreak.Views
             this.ToolboxAutoLaunch = config.ToolboxAutoLaunch;
             this.TexmodPath = config.TexmodPath;
             this.BrowsersEnabled = config.BrowsersEnabled;
+            this.AutoPlaceOnScreen = config.SetGuildwarsWindowSizeOnLaunch;
+            this.DesiredScreen = config.DesiredGuildwarsScreen.ToString();
         }
 
         private void SaveButton_Clicked(object sender, EventArgs e)
@@ -100,6 +116,8 @@ namespace Daybreak.Views
             currentConfig.ToolboxAutoLaunch = this.ToolboxAutoLaunch;
             currentConfig.TexmodPath = this.TexmodPath;
             currentConfig.BrowsersEnabled = this.BrowsersEnabled;
+            currentConfig.SetGuildwarsWindowSizeOnLaunch = this.AutoPlaceOnScreen;
+            currentConfig.DesiredGuildwarsScreen = int.Parse(this.DesiredScreen);
             this.configurationManager.SaveConfiguration(currentConfig);
             this.viewManager.ShowView<SettingsCategoryView>();
         }
@@ -134,19 +152,22 @@ namespace Daybreak.Views
             }
         }
 
+        private void ScreenPickerGlyph_Clicked(object sender, EventArgs e)
+        {
+            this.viewManager.ShowView<ScreenChoiceView>();
+        }
+
         private void BackButton_Clicked(object sender, EventArgs e)
         {
             this.viewManager.ShowView<SettingsCategoryView>();
         }
 
-        private void LeftBrowserUrl_TextChanged(object sender, TextChangedEventArgs e)
+        private void TextBox_AllowOnlyNumbers(object sender, System.Windows.Input.TextCompositionEventArgs e)
         {
-            this.LeftBrowserUrl = sender.As<TextBox>().Text;
-        }
-
-        private void RightBrowserUrl_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            this.RightBrowserUrl = sender.As<TextBox>().Text;
+            if (int.TryParse(e.Text, out _) is false)
+            {
+                e.Handled = true;
+            }
         }
     }
 }

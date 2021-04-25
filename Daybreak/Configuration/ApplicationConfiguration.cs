@@ -6,6 +6,10 @@ namespace Daybreak.Configuration
 {
     public sealed class ApplicationConfiguration
     {
+        [JsonProperty("SetGuildwarsWindowSizeOnLaunch")]
+        public bool SetGuildwarsWindowSizeOnLaunch { get; set; }
+        [JsonProperty("DesiredGuildwarsScreen")]
+        public int DesiredGuildwarsScreen { get; set; }
         [JsonProperty("BrowsersEnabled")]
         public bool BrowsersEnabled { get; set; } = true;
         [JsonProperty("ToolboxPath")]
