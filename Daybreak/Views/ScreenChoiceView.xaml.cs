@@ -75,7 +75,7 @@ namespace Daybreak.Views
         private void SaveButton_Clicked(object sender, EventArgs e)
         {
             this.configurationManager.GetConfiguration().DesiredGuildwarsScreen = this.selectedId;
-            this.viewManager.ShowView<SettingsView>();
+            this.viewManager.ShowView<SettingsCategoryView>();
         }
     }
 }
