@@ -157,7 +157,13 @@ namespace Daybreak.Views
 
                 if (this.configurationManager.GetConfiguration().SetGuildwarsWindowSizeOnLaunch)
                 {
-                    this.screenManager.MoveGuildwarsToScreen(this.screenManager.Screens.Skip(this.configurationManager.GetConfiguration().DesiredGuildwarsScreen).First());
+                    var id = this.configurationManager.GetConfiguration().DesiredGuildwarsScreen;
+                    var desiredScreen = this.screenManager.Screens.Skip(id).FirstOrDefault();
+                    if (desiredScreen is null)
+                    {
+                        throw new InvalidOperationException($"Unable to set guildwars on desired screen. No screen with id {id}");
+                    }
+                    this.screenManager.MoveGuildwarsToScreen(desiredScreen);
                 }
 
                 if (this.configurationManager.GetConfiguration().ToolboxAutoLaunch is true)
