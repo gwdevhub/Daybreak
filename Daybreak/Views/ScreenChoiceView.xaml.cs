@@ -1,12 +1,15 @@
 ﻿using Daybreak.Controls.Templates;
 using Daybreak.Models;
+using Daybreak.Services.ApplicationLauncher;
 using Daybreak.Services.Configuration;
 using Daybreak.Services.Screens;
 using Daybreak.Services.ViewManagement;
 using System;
 using System.Extensions;
 using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Extensions;
 using System.Windows.Media;
 
 namespace Daybreak.Views
@@ -16,21 +19,34 @@ namespace Daybreak.Views
     /// </summary>
     public partial class ScreenChoiceView : UserControl
     {
+        public static readonly DependencyProperty CanTestProperty =
+            DependencyPropertyExtensions.Register<ScreenChoiceView, bool>(nameof(CanTest));
+        
         private readonly IScreenManager screenManager;
         private readonly IViewManager viewManager;
         private readonly IConfigurationManager configurationManager;
+        private readonly IApplicationLauncher applicationLauncher;
         private int selectedId;
+
+        public bool CanTest
+        {
+            get => this.GetTypedValue<bool>(CanTestProperty);
+            set => this.SetValue(CanTestProperty, value);
+        }
 
         public ScreenChoiceView(
             IViewManager viewManager,
             IScreenManager screenManager,
-            IConfigurationManager configurationManager)
+            IConfigurationManager configurationManager,
+            IApplicationLauncher applicationLauncher)
         {
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.screenManager = screenManager.ThrowIfNull(nameof(screenManager));
             this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
+            this.applicationLauncher = applicationLauncher.ThrowIfNull(nameof(applicationLauncher));
             this.InitializeComponent();
             this.selectedId = configurationManager.GetConfiguration().DesiredGuildwarsScreen;
+            this.CanTest = applicationLauncher.IsGuildwarsRunning;
             this.SetupView();
         }
 
@@ -76,6 +92,17 @@ namespace Daybreak.Views
         {
             this.configurationManager.GetConfiguration().DesiredGuildwarsScreen = this.selectedId;
             this.viewManager.ShowView<SettingsCategoryView>();
+        }
+
+        private void OpaqueButton_Clicked(object sender, EventArgs e)
+        {
+            var screen = this.screenManager.Screens.Skip(this.selectedId).FirstOrDefault();
+            if (screen is null)
+            {
+                throw new InvalidOperationException($"Unable to test placement. No screen with id {this.selectedId}");
+            }
+
+            this.screenManager.MoveGuildwarsToScreen(screen);
         }
     }
 }
