@@ -163,6 +163,7 @@ namespace Daybreak.Views
                     {
                         throw new InvalidOperationException($"Unable to set guildwars on desired screen. No screen with id {id}");
                     }
+                    await Task.Delay(1000);
                     this.screenManager.MoveGuildwarsToScreen(desiredScreen);
                 }
 

@@ -190,7 +190,7 @@ namespace Daybreak.Services.ApplicationLauncher
             var retries = 0;
             while (true)
             {
-                await Task.Delay(1000);
+                await Task.Delay(100);
                 retries++;
                 var gwProcess = Process.GetProcessesByName("gw").FirstOrDefault();
                 if (gwProcess is null && retries < MaxRetries)
@@ -202,10 +202,21 @@ namespace Daybreak.Services.ApplicationLauncher
                     throw new InvalidOperationException("Newly launched gw process not detected");
                 }
 
-                if (gwProcess.MainWindowHandle != IntPtr.Zero)
+                if (gwProcess.MainWindowHandle == IntPtr.Zero)
                 {
-                    return true;
+                    continue;
                 }
+
+                int titleLength = NativeMethods.GetWindowTextLength(gwProcess.MainWindowHandle);
+                var titleBuffer = new StringBuilder(titleLength);
+                var readCount = NativeMethods.GetWindowText(gwProcess.MainWindowHandle, titleBuffer, titleLength + 1);
+                var title = titleBuffer.ToString();
+                if (title != "Guild Wars")
+                {
+                    continue;
+                }
+
+                return true;
             }
         }
 
