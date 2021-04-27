@@ -1,4 +1,5 @@
 ﻿using Daybreak.Services.Configuration;
+using Daybreak.Services.Shortcuts;
 using Daybreak.Services.ViewManagement;
 using Microsoft.Win32;
 using System;
@@ -6,13 +7,14 @@ using System.Extensions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
+using System.Windows.Forms;
 
 namespace Daybreak.Views
 {
     /// <summary>
     /// Interaction logic for SettingsView.xaml
     /// </summary>
-    public partial class SettingsView : UserControl
+    public partial class SettingsView : System.Windows.Controls.UserControl
     {
         public static readonly DependencyProperty TexmodPathProperty =
             DependencyPropertyExtensions.Register<SettingsView, string>(nameof(TexmodPath));
@@ -32,9 +34,14 @@ namespace Daybreak.Views
             DependencyPropertyExtensions.Register<SettingsView, bool>(nameof(AutoPlaceOnScreen));
         public static readonly DependencyProperty DesiredScreenProperty =
             DependencyPropertyExtensions.Register<SettingsView, string>(nameof(DesiredScreen));
+        public static readonly DependencyProperty ShortcutFolderProperty =
+            DependencyPropertyExtensions.Register<SettingsView, string>(nameof(ShortcutFolder));
+        public static readonly DependencyProperty ShortcutPlacedProperty =
+            DependencyPropertyExtensions.Register<SettingsView, bool>(nameof(ShortcutPlaced));
 
         private readonly IConfigurationManager configurationManager;
         private readonly IViewManager viewManager;
+        private readonly IShortcutManager shortcutManager;
 
         public string TexmodPath
         {
@@ -81,11 +88,23 @@ namespace Daybreak.Views
             get => this.GetTypedValue<string>(DesiredScreenProperty);
             set => this.SetValue(DesiredScreenProperty, value);
         }
+        public string ShortcutFolder
+        {
+            get => this.GetTypedValue<string>(ShortcutFolderProperty);
+            set => this.SetValue(ShortcutFolderProperty, value);
+        }
+        public bool ShortcutPlaced
+        {
+            get => this.GetTypedValue<bool>(ShortcutPlacedProperty);
+            set => this.SetValue(ShortcutPlacedProperty, value);
+        }
 
         public SettingsView(
             IConfigurationManager configurationManager,
-            IViewManager viewManager)
+            IViewManager viewManager,
+            IShortcutManager shortcutManager)
         {
+            this.shortcutManager = shortcutManager.ThrowIfNull(nameof(shortcutManager));
             this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.InitializeComponent();
@@ -104,6 +123,8 @@ namespace Daybreak.Views
             this.BrowsersEnabled = config.BrowsersEnabled;
             this.AutoPlaceOnScreen = config.SetGuildwarsWindowSizeOnLaunch;
             this.DesiredScreen = config.DesiredGuildwarsScreen.ToString();
+            this.ShortcutFolder = config.ShortcutLocation;
+            this.ShortcutPlaced = this.shortcutManager.ShortcutEnabled;
         }
 
         private void SaveButton_Clicked(object sender, EventArgs e)
@@ -118,13 +139,14 @@ namespace Daybreak.Views
             currentConfig.BrowsersEnabled = this.BrowsersEnabled;
             currentConfig.SetGuildwarsWindowSizeOnLaunch = this.AutoPlaceOnScreen;
             currentConfig.DesiredGuildwarsScreen = int.Parse(this.DesiredScreen);
+            currentConfig.ShortcutLocation = this.ShortcutFolder;
             this.configurationManager.SaveConfiguration(currentConfig);
             this.viewManager.ShowView<SettingsCategoryView>();
         }
 
         private void ToolboxFilePickerGlyph_Clicked(object sender, EventArgs e)
         {
-            var filePicker = new OpenFileDialog()
+            var filePicker = new Microsoft.Win32.OpenFileDialog()
             {
                 CheckFileExists = true,
                 CheckPathExists = true,
@@ -139,7 +161,7 @@ namespace Daybreak.Views
 
         private void TexmodFilePickerGlyph_Clicked(object sender, EventArgs e)
         {
-            var filePicker = new OpenFileDialog()
+            var filePicker = new Microsoft.Win32.OpenFileDialog()
             {
                 CheckFileExists = true,
                 CheckPathExists = true,
@@ -149,6 +171,21 @@ namespace Daybreak.Views
             if (filePicker.ShowDialog() is true)
             {
                 this.TexmodPath = filePicker.FileName;
+            }
+        }
+
+        private void ShortcutFolderPickerGlyph_Clicked(object sender, EventArgs e)
+        {
+            var folderPicker = new FolderBrowserDialog()
+            {
+                Description = "Select shortcut folder",
+                UseDescriptionForTitle = true,
+                SelectedPath = this.ShortcutFolder,
+                ShowNewFolderButton = true
+            };
+            if (folderPicker.ShowDialog() is DialogResult.OK)
+            {
+                this.ShortcutFolder = folderPicker.SelectedPath;
             }
         }
 
@@ -168,6 +205,16 @@ namespace Daybreak.Views
             {
                 e.Handled = true;
             }
+        }
+
+        private void ShortcutEnabled_Checked(object sender, RoutedEventArgs e)
+        {
+            this.shortcutManager.ShortcutEnabled = true;
+        }
+
+        private void ShortcutEnabled_Unchecked(object sender, RoutedEventArgs e)
+        {
+            this.shortcutManager.ShortcutEnabled = false;
         }
     }
 }

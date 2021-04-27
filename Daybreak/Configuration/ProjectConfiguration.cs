@@ -11,6 +11,7 @@ using Daybreak.Services.Privilege;
 using Daybreak.Services.Runtime;
 using Daybreak.Services.Screens;
 using Daybreak.Services.Screenshots;
+using Daybreak.Services.Shortcuts;
 using Daybreak.Services.Updater;
 using Daybreak.Services.ViewManagement;
 using Daybreak.Views;
@@ -41,6 +42,7 @@ namespace Daybreak.Configuration
             serviceProducer.RegisterSingleton<IIconRetriever, IconRetriever>();
             serviceProducer.RegisterSingleton<IPrivilegeManager, PrivilegeManager>();
             serviceProducer.RegisterSingleton<IScreenManager, ScreenManager>();
+            serviceProducer.RegisterSingleton<IShortcutManager, ShortcutManager>();
         }
         public static void RegisterLifetimeServices(IApplicationLifetimeProducer applicationLifetimeProducer)
         {

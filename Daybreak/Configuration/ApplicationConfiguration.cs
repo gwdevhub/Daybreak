@@ -1,5 +1,6 @@
 ﻿using Daybreak.Models;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace Daybreak.Configuration
@@ -30,5 +31,7 @@ namespace Daybreak.Configuration
         public bool AddressBarReadonly { get; set; } = true;
         [JsonProperty("ExperimentalFeatures")]
         public ExperimentalFeatures ExperimentalFeatures { get; set; } = new();
+        [JsonProperty("ShortcutLocation")]
+        public string ShortcutLocation { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
     }
 }
