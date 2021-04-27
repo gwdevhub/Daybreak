@@ -25,6 +25,12 @@ Ability to set default page for each of the two browser windows.
 
 Rotates screenshots from "Screenshots" folder. If no screenshots are present in the folder, downloads and rotates images from http://bloogum.net/guildwars (link to page is visible when showing images from the website).
 
+Manages build templates. Load/save builds from the guildwars build folder. Ability to dynamically load build templates from the embeded browsers. Opens embeded browser for professions, attributes and skills when selected.
+
+Screen placing/binding. If enabled, places guildwars executable on desired screen at launch.
+
+Shortcut management. Can manage automatically shortcuts to desired folder.
+
 # Examples/Usage
 
 ## Settings.
