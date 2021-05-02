@@ -1,6 +1,8 @@
-﻿namespace Daybreak.Services.Shortcuts
+﻿using Daybreak.Services.ApplicationLifetime;
+
+namespace Daybreak.Services.Shortcuts
 {
-    public interface IShortcutManager
+    public interface IShortcutManager : IApplicationLifetimeService
     {
         bool ShortcutEnabled { get; set; }
     }

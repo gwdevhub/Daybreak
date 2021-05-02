@@ -3,7 +3,6 @@ using ShellLink;
 using System.Diagnostics;
 using System.Extensions;
 using System.IO;
-using System.Linq;
 
 namespace Daybreak.Services.Shortcuts
 {
@@ -31,6 +30,21 @@ namespace Daybreak.Services.Shortcuts
         public ShortcutManager(IConfigurationManager configurationManager)
         {
             this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
+            this.configurationManager.ConfigurationChanged += (_, _) => this.LoadConfiguration();
+            this.LoadConfiguration();
+        }
+
+        private void LoadConfiguration()
+        {
+            var shortcutEnabled = this.configurationManager.GetConfiguration().PlaceShortcut;
+            if (shortcutEnabled && this.ShortcutEnabled is false)
+            {
+                this.ShortcutEnabled = true;
+            }
+            else if (shortcutEnabled is false && this.ShortcutEnabled is true)
+            {
+                this.ShortcutEnabled = false;
+            }
         }
 
         private bool ShortcutExists()
@@ -81,6 +95,14 @@ namespace Daybreak.Services.Shortcuts
             var shortcutFolder = this.configurationManager.GetConfiguration().ShortcutLocation;
             var shortcutPath = $"{shortcutFolder}\\{ShortcutName}";
             File.Delete(shortcutPath);
+        }
+
+        public void OnStartup()
+        {
+        }
+
+        public void OnClosing()
+        {
         }
     }
 }

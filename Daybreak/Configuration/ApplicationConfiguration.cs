@@ -33,5 +33,7 @@ namespace Daybreak.Configuration
         public ExperimentalFeatures ExperimentalFeatures { get; set; } = new();
         [JsonProperty("ShortcutLocation")]
         public string ShortcutLocation { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+        [JsonProperty("PlaceShortcut")]
+        public bool PlaceShortcut { get; set; }
     }
 }

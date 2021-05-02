@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using Daybreak.Models;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Daybreak.Configuration
 {
@@ -12,5 +14,9 @@ namespace Daybreak.Configuration
         public bool DynamicBuildLoading { get; set; } = true;
         [JsonProperty("LaunchGuildwarsAsCurrentUser")]
         public bool LaunchGuildwarsAsCurrentUser { get; set; } = true;
+        [JsonProperty("CanInterceptKeys")]
+        public bool CanInterceptKeys { get; set; }
+        [JsonProperty("Macros")]
+        public List<KeyMacro> Macros { get; set; } = new();
     }
 }

@@ -5,6 +5,8 @@ using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Configuration;
 using Daybreak.Services.Credentials;
 using Daybreak.Services.IconRetrieve;
+using Daybreak.Services.KeyboardHook;
+using Daybreak.Services.KeyboardMacros;
 using Daybreak.Services.Logging;
 using Daybreak.Services.Mutex;
 using Daybreak.Services.Privilege;
@@ -17,6 +19,7 @@ using Daybreak.Services.ViewManagement;
 using Daybreak.Views;
 using Slim;
 using System.Extensions;
+using WindowsInput;
 
 namespace Daybreak.Configuration
 {
@@ -43,6 +46,9 @@ namespace Daybreak.Configuration
             serviceProducer.RegisterSingleton<IPrivilegeManager, PrivilegeManager>();
             serviceProducer.RegisterSingleton<IScreenManager, ScreenManager>();
             serviceProducer.RegisterSingleton<IShortcutManager, ShortcutManager>();
+            serviceProducer.RegisterSingleton<IKeyboardHookService, KeyboardHookService>();
+            serviceProducer.RegisterSingleton<IMacroService, MacroService>();
+            serviceProducer.RegisterSingleton<IInputSimulator, InputSimulator>();
         }
         public static void RegisterLifetimeServices(IApplicationLifetimeProducer applicationLifetimeProducer)
         {
@@ -51,6 +57,9 @@ namespace Daybreak.Configuration
             applicationLifetimeProducer.RegisterService<ILoggingDatabase>();
             applicationLifetimeProducer.RegisterService<IScreenshotProvider>();
             applicationLifetimeProducer.RegisterService<IApplicationUpdater>();
+            applicationLifetimeProducer.RegisterService<IKeyboardHookService>();
+            applicationLifetimeProducer.RegisterService<IMacroService>();
+            applicationLifetimeProducer.RegisterService<IShortcutManager>();
         }
         public static void RegisterViews(IViewProducer viewProducer)
         {

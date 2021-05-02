@@ -41,7 +41,6 @@ namespace Daybreak.Views
 
         private readonly IConfigurationManager configurationManager;
         private readonly IViewManager viewManager;
-        private readonly IShortcutManager shortcutManager;
 
         public string TexmodPath
         {
@@ -104,7 +103,6 @@ namespace Daybreak.Views
             IViewManager viewManager,
             IShortcutManager shortcutManager)
         {
-            this.shortcutManager = shortcutManager.ThrowIfNull(nameof(shortcutManager));
             this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.InitializeComponent();
@@ -124,7 +122,8 @@ namespace Daybreak.Views
             this.AutoPlaceOnScreen = config.SetGuildwarsWindowSizeOnLaunch;
             this.DesiredScreen = config.DesiredGuildwarsScreen.ToString();
             this.ShortcutFolder = config.ShortcutLocation;
-            this.ShortcutPlaced = this.shortcutManager.ShortcutEnabled;
+            this.ShortcutPlaced = config.PlaceShortcut;
+            
         }
 
         private void SaveButton_Clicked(object sender, EventArgs e)
@@ -140,6 +139,7 @@ namespace Daybreak.Views
             currentConfig.SetGuildwarsWindowSizeOnLaunch = this.AutoPlaceOnScreen;
             currentConfig.DesiredGuildwarsScreen = int.Parse(this.DesiredScreen);
             currentConfig.ShortcutLocation = this.ShortcutFolder;
+            currentConfig.PlaceShortcut = this.ShortcutPlaced;
             this.configurationManager.SaveConfiguration(currentConfig);
             this.viewManager.ShowView<SettingsCategoryView>();
         }
@@ -205,16 +205,6 @@ namespace Daybreak.Views
             {
                 e.Handled = true;
             }
-        }
-
-        private void ShortcutEnabled_Checked(object sender, RoutedEventArgs e)
-        {
-            this.shortcutManager.ShortcutEnabled = true;
-        }
-
-        private void ShortcutEnabled_Unchecked(object sender, RoutedEventArgs e)
-        {
-            this.shortcutManager.ShortcutEnabled = false;
         }
     }
 }

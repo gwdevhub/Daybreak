@@ -179,10 +179,11 @@ namespace Daybreak.Services.ApplicationLauncher
                 StartInfo = new ProcessStartInfo
                 {
                     Arguments = string.Join(" ", args),
-                    UserName = identity
+                    FileName = executable.Path,
+                    RedirectStandardInput = true
                 }
             };
-            if (Process.Start(executable.Path, args) is null)
+            if (process.Start() is false)
             {
                 throw new InvalidOperationException($"Unable to launch {executable}");
             }

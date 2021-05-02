@@ -14,14 +14,15 @@
 
   <ItemGroup>
     <PackageReference Include="HtmlAgilityPack" Version="1.11.32" />
+    <PackageReference Include="InputSimulator" Version="1.0.4" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.818.41" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="securifybv.ShellLink" Version="0.1.0" />
-    <PackageReference Include="Slim" Version="1.2.1" />
+    <PackageReference Include="Slim" Version="1.2.2" />
     <PackageReference Include="System.Windows.Interactivity.WPF" Version="2.0.20525" />
     <PackageReference Include="SystemExtensions.NetStandard" Version="1.1.4" />
     <PackageReference Include="WCL" Version="1.0.2" />
-    <PackageReference Include="WpfExtended" Version="0.2.0" />
+    <PackageReference Include="WpfExtended" Version="0.2.1" />
     <PackageReference Include="WpfScreenHelper" Version="1.0.0" />
   </ItemGroup>
 

@@ -23,6 +23,8 @@ namespace Daybreak.Views
             DependencyPropertyExtensions.Register<ExperimentalSettingsView, bool>(nameof(DynamicBuildLoading));
         public static readonly DependencyProperty LaunchAsCurrentUserProperty =
             DependencyPropertyExtensions.Register<ExperimentalSettingsView, bool>(nameof(LaunchAsCurrentUser));
+        public static readonly DependencyProperty MacrosEnabledProperty =
+            DependencyPropertyExtensions.Register<ExperimentalSettingsView, bool>(nameof(MacrosEnabled));
 
         private readonly IViewManager viewManager;
         private readonly IConfigurationManager configurationManager;
@@ -47,6 +49,11 @@ namespace Daybreak.Views
             get => this.GetTypedValue<bool>(DynamicBuildLoadingProperty);
             set => this.SetValue(DynamicBuildLoadingProperty, value);
         }
+        public bool MacrosEnabled
+        {
+            get => this.GetTypedValue<bool>(MacrosEnabledProperty);
+            set => this.SetValue(MacrosEnabledProperty, value);
+        }
 
         public ExperimentalSettingsView(
             IViewManager viewManager,
@@ -65,6 +72,7 @@ namespace Daybreak.Views
             this.GWToolboxLaunchDelay = config.ExperimentalFeatures.ToolboxAutoLaunchDelay.ToString();
             this.DynamicBuildLoading = config.ExperimentalFeatures.DynamicBuildLoading;
             this.LaunchAsCurrentUser = config.ExperimentalFeatures.LaunchGuildwarsAsCurrentUser;
+            this.MacrosEnabled = config.ExperimentalFeatures.CanInterceptKeys;
         }
 
         private void SaveExperimentalSettings()
@@ -73,6 +81,7 @@ namespace Daybreak.Views
             config.ExperimentalFeatures.MultiLaunchSupport = this.MultiLaunch;
             config.ExperimentalFeatures.DynamicBuildLoading = this.DynamicBuildLoading;
             config.ExperimentalFeatures.LaunchGuildwarsAsCurrentUser = this.LaunchAsCurrentUser;
+            config.ExperimentalFeatures.CanInterceptKeys = this.MacrosEnabled;
             if (int.TryParse(this.GWToolboxLaunchDelay, out var gwToolboxLaunchDelay))
             {
                 config.ExperimentalFeatures.ToolboxAutoLaunchDelay = gwToolboxLaunchDelay;

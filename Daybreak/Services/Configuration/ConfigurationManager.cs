@@ -1,5 +1,4 @@
 ﻿using Daybreak.Configuration;
-using Daybreak.Exceptions;
 using Daybreak.Services.Logging;
 using Daybreak.Utils;
 using System;
@@ -14,6 +13,8 @@ namespace Daybreak.Services.Configuration
 
         private ApplicationConfiguration applicationConfiguration;
         private readonly ILogger logger;
+
+        public event EventHandler ConfigurationChanged;
 
         public ConfigurationManager(ILogger logger)
         {
@@ -39,6 +40,7 @@ namespace Daybreak.Services.Configuration
         {
             File.WriteAllText(ConfigName, applicationConfiguration.Serialize());
             this.applicationConfiguration = applicationConfiguration;
+            this.ConfigurationChanged?.Invoke(this, new EventArgs());
         }
     }
 }
