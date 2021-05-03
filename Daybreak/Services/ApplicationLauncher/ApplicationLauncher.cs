@@ -179,8 +179,7 @@ namespace Daybreak.Services.ApplicationLauncher
                 StartInfo = new ProcessStartInfo
                 {
                     Arguments = string.Join(" ", args),
-                    FileName = executable.Path,
-                    RedirectStandardInput = true
+                    FileName = executable.Path
                 }
             };
             if (process.Start() is false)

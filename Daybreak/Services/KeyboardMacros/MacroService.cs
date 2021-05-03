@@ -115,7 +115,7 @@ namespace Daybreak.Services.KeyboardMacros
 
         private void HandleMacro(KeyMacro keyMacro)
         {
-            this.inputSimulator.Keyboard.KeyDown(keyMacro.TargetKey.Cast<int>().Cast<VirtualKeyCode>());
+            this.inputSimulator.Keyboard.KeyPress(keyMacro.TargetKey.Cast<int>().Cast<VirtualKeyCode>());
         }
 
         private static bool MacroContainsKey(KeyMacro keyMacro, Keys lastKey)
