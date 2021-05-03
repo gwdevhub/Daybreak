@@ -25,7 +25,6 @@ jobs:
     runs-on: windows-latest
 
     env:
-      Build_Version: "0.0.0"
       Solution_Path: Daybreak.sln
       Test_Project_Path: Daybreak.Tests\Daybreak.Tests.csproj
       Wpf_Project_Path: Daybreak\Daybreal.csproj
@@ -59,7 +58,7 @@ jobs:
       run: |
         Import-Module .\Scripts\GetBuildVersion.ps1
         $version = GetBuildVersion
-        echo "Build_Version=$version" >> $GITHUB_ENV
+        echo "Build_Version=$version" >> $Env
         echo $Env
       shell: pwsh
 
@@ -68,6 +67,6 @@ jobs:
       run: |
         Import-Module .\Scripts\BuildRelease.ps1
         Write-Host $Env:GITHUB_REF
-        BuildRelease -version $env.Build_Version
+        BuildRelease -version $Env.Build_Version
       shell: pwsh
     
