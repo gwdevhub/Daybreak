@@ -63,4 +63,8 @@
     </Page>
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="echo.&gt;$(Version).version" />
+  </Target>
+
 </Project>
