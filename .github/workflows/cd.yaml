@@ -59,7 +59,7 @@ jobs:
       run: |
         Import-Module .\Scripts\GetBuildVersion.ps1
         $version = GetBuildVersion
-        echo "::set-env name=Build_Version::$version"
+        echo "Build_Version=$version" >> $GITHUB_ENV
         echo $Env
       shell: pwsh
 
