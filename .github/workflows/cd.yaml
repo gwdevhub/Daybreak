@@ -58,7 +58,7 @@ jobs:
       run: |
         Import-Module .\Scripts\GetBuildVersion.ps1
         $version = GetBuildVersion
-        echo "BUILD_VERSION=$version"
+        ${{env.BUILD_VERSION}}=$version
         echo $Env
       shell: pwsh
 
