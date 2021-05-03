@@ -58,7 +58,7 @@ jobs:
     - name: Get build version
       run: |
         Import-Module .\Scripts\GetBuildVersion.ps1
-        $env.Build_Version = GetBuildVersion
+        GetBuildVersion > $Build_Version
         echo $Env
       shell: pwsh
 
@@ -67,6 +67,6 @@ jobs:
       run: |
         Import-Module .\Scripts\BuildRelease.ps1
         Write-Host $Env:GITHUB_REF
-        BuildRelease -version $Env:Build_Version
+        BuildRelease -version $Build_Version
       shell: pwsh
     
