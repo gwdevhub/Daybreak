@@ -3,7 +3,7 @@
 
 # This continuous integration pipeline is triggered anytime a user pushes code to the repo.
 # This pipeline builds the Wpf project, runs unit tests, then saves the MSIX build artifact.
-name:  Daybreak CI Pipeline
+name:  Daybreak CD Pipeline
 
 # Trigger on every master branch push and pull request
 on:
@@ -58,7 +58,8 @@ jobs:
       run: |
         Import-Module .\Scripts\GetBuildVersion.ps1
         $version = GetBuildVersion
-        echo "BUILD_VERSION=$version" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
+        echo "BUILD_VERSION=$version"
+        echo $Env
       shell: pwsh
 
     # Create release binaries
