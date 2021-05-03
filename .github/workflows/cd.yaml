@@ -60,6 +60,7 @@ jobs:
         Import-Module .\Scripts\GetBuildVersion.ps1
         Write-Host $Env:GITHUB_REF
         $version = GetBuildVersion
+        echo $version
         BuildRelease -version $version
       shell: pwsh
     
