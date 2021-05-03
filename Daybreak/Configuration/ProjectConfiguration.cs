@@ -5,8 +5,6 @@ using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Configuration;
 using Daybreak.Services.Credentials;
 using Daybreak.Services.IconRetrieve;
-using Daybreak.Services.KeyboardHook;
-using Daybreak.Services.KeyboardMacros;
 using Daybreak.Services.Logging;
 using Daybreak.Services.Mutex;
 using Daybreak.Services.Privilege;
@@ -19,7 +17,6 @@ using Daybreak.Services.ViewManagement;
 using Daybreak.Views;
 using Slim;
 using System.Extensions;
-using WindowsInput;
 
 namespace Daybreak.Configuration
 {

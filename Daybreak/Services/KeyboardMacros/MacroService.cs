@@ -5,16 +5,11 @@ using Daybreak.Services.Logging;
 using Pepa.Wpf.Utilities;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Extensions;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using WindowsInput;
-using WindowsInput.Native;
 
 namespace Daybreak.Services.KeyboardMacros
 {
@@ -24,7 +19,6 @@ namespace Daybreak.Services.KeyboardMacros
         private readonly ILogger logger;
         private readonly IKeyboardHookService keyboardHookService;
         private readonly IConfigurationManager configurationManager;
-        private readonly IInputSimulator inputSimulator;
         private readonly HashSet<Keys> KeysDown = new();
 
         private IEnumerable<KeyMacro> loadedMacros;
@@ -34,13 +28,11 @@ namespace Daybreak.Services.KeyboardMacros
         public MacroService(
             ILogger logger,
             IKeyboardHookService keyboardHookService,
-            IConfigurationManager configurationManager,
-            IInputSimulator inputSimulator)
+            IConfigurationManager configurationManager)
         {
             this.logger = logger.ThrowIfNull(nameof(logger));
             this.keyboardHookService = keyboardHookService.ThrowIfNull(nameof(keyboardHookService));
             this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
-            this.inputSimulator = inputSimulator.ThrowIfNull(nameof(inputSimulator));
 
             this.configurationManager.ConfigurationChanged += (s, e) => this.LoadConfiguration();
             this.LoadConfiguration();
@@ -115,7 +107,7 @@ namespace Daybreak.Services.KeyboardMacros
 
         private void HandleMacro(KeyMacro keyMacro)
         {
-            this.inputSimulator.Keyboard.KeyPress(keyMacro.TargetKey.Cast<int>().Cast<VirtualKeyCode>());
+            // TODO: Propagate key to guildwars executable.
         }
 
         private static bool MacroContainsKey(KeyMacro keyMacro, Keys lastKey)
