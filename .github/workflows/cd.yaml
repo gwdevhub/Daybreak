@@ -53,20 +53,13 @@ jobs:
         Configuration: Release
         RuntimeIdentifier: win-${{ matrix.targetplatform }}
 
-    # Get build version
-    - name: Get build version
-      run: |
-        Import-Module .\Scripts\GetBuildVersion.ps1
-        $version = GetBuildVersion
-        echo "Build_Version=$version" >> $GITHUB_ENV
-        echo $Env
-      shell: pwsh
-
     # Create release binaries
     - name: Create release binaries
       run: |
         Import-Module .\Scripts\BuildRelease.ps1
+        Import-Module .\Scripts\GetBuildVersion.ps1
         Write-Host $Env:GITHUB_REF
-        BuildRelease -version $Env.Build_Version
+        $version = GetBuildVersion
+        BuildRelease -version $version
       shell: pwsh
     
