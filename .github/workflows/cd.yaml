@@ -83,6 +83,6 @@ jobs:
         files: .\Publish\$env:ReleaseName
         fail_on_unmatched_files: true
       env:
-        ReleaseName: daybreakv${{Version}}.zip
+        ReleaseName: daybreakv$(env:Version).zip
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
