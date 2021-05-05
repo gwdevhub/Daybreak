@@ -3,8 +3,6 @@ Param(
     [string]$version
 ) #end param
 
-Write-Output "Publishing solution"
-dotnet publish .\Daybreak\Daybreak.csproj -c Release -r win-x64 -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained true -o .\Publish
 Write-Output "Deleting pdb file"
 Remove-item .\Publish\Daybreak.pdb
 $zipPath = "Publish\daybreakv$version.zip"
