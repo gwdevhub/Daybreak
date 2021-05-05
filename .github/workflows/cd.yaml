@@ -51,7 +51,6 @@ jobs:
     - name:  Restore the Wpf application to populate the obj folder
       run: msbuild $env:Solution_Path /t:Restore /p:Configuration=$env:Configuration /p:RuntimeIdentifier=$env:RuntimeIdentifier
       env:
-        Configuration: Release
         RuntimeIdentifier: win-${{ matrix.targetplatform }}
 
     # Build Daybreak project
@@ -64,8 +63,11 @@ jobs:
         $version = .\Scripts\GetBuildVersion.ps1
         echo "::set-env name=Version::$version"
 
+    # Publish release
     - name: Publish release
-      run: dotnet publish .\Daybreak\Daybreak.csproj -c $env:Configuration -r win-x64 -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained true -o .\Publish
+      run: dotnet publish .\Daybreak\Daybreak.csproj -c $env:Configuration -r env:RuntimeIdentifier -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained true -o .\Publish
+      env:
+        RuntimeIdentifier: win-${{ matrix.targetplatform }}
 
     # Create release payload
     - name: Create release payload
@@ -73,4 +75,14 @@ jobs:
         Write-Host $env
         .\Scripts\BuildRelease.ps1 -version $env:Version
       shell: pwsh
+
+    # Post new release to github
+    - name: Post release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: .\Publish\$env:ReleaseName
+        fail_on_unmatched_files: true
+      env:
+        ReleaseName: daybreakv${{Version}}.zip
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
