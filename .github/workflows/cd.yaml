@@ -65,7 +65,7 @@ jobs:
 
     # Publish release
     - name: Publish release
-      run: dotnet publish .\Daybreak\Daybreak.csproj -c $env:Configuration -r env:RuntimeIdentifier -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained true -o .\Publish
+      run: dotnet publish .\Daybreak\Daybreak.csproj -c $env:Configuration -r $env:RuntimeIdentifier -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained true -o .\Publish
       env:
         RuntimeIdentifier: win-${{ matrix.targetplatform }}
 
