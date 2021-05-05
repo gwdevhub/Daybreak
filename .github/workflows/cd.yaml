@@ -66,7 +66,7 @@ jobs:
         Write-Host $Env:GITHUB_REF
         $version = GetBuildVersion
         echo $version
-        "Version=$version" | Out-File $GITHUB_ENV -Append
+        "Version=$version" | Out-File $env -Append
         BuildRelease -version $version
       shell: pwsh
     
