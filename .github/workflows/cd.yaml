@@ -73,6 +73,27 @@ jobs:
         .\Scripts\BuildRelease.ps1 -version $env:Version
       shell: pwsh
 
+    # Get latest release
+    - name: Get latest release tag
+      id: download_release
+      uses: Xotl/cool-github-releases@v1.1.2
+      with:
+        mode: download
+        github_token: ${{ env.GITHUB_TOKEN }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    # Generate changelog
+    - name: Generate changelog
+      id: gen_changelog
+      uses: mikepenz/release-changelog-builder-action@v1.8.0
+      with:
+        fromTag: ${{ steps.download_release.outputs.tag_name }}
+        toTag: ${{ env.Version }}
+        token: ${{ env.GITHUB_TOKEN }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     # Post new release to github
     - name: Post release
       uses: Xotl/cool-github-releases@v1.1.2
@@ -83,6 +104,7 @@ jobs:
         assets: .\Publish\daybreakv${{ env.Version }}.zip
         github_token: ${{ env.GITHUB_TOKEN }}
         replace_assets: true
+        body_mrkdwn: ${{ steps.gen_changelog.outputs.changelog }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
