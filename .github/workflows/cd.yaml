@@ -62,12 +62,12 @@ jobs:
       run: |
         Import-Module .\Scripts\GetBuildVersion.ps1
         $version = GetBuildVersion
-        echo "Version=$version" >> $env
-        Write-Host $env
+        echo "Version=$version" >> $GITHUB_ENV
 
     # Create release binaries
     - name: Create release binaries
       run: |
+        Write-Host $env
         Import-Module .\Scripts\BuildRelease.ps1
         BuildRelease -version $env:Version
       shell: pwsh
