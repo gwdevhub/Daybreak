@@ -85,6 +85,7 @@ jobs:
         release_name: Daybreak v${{ env.Version }}
         assets: .\Publish\daybreakv${{ env.Version }}.zip
         github_token: ${{ env.GITHUB_TOKEN }}
+        replace_assets: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
