@@ -43,6 +43,7 @@ jobs:
       with:
         mode: download
         github_token: ${{ env.GITHUB_TOKEN }}
+        assets: README.md
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
