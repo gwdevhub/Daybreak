@@ -58,16 +58,16 @@ jobs:
     - name: Build Daybreak project
       run: dotnet build Daybreak -c $env:Configuration
 
+    - name: Set version variable
+      run: |
+        Import-Module .\Scripts\GetBuildVersion.ps1
+        $version = GetBuildVersion
+        echo "Version=$version" >> $GITHUB_ENV
+
     # Create release binaries
     - name: Create release binaries
       run: |
         Import-Module .\Scripts\BuildRelease.ps1
-        Import-Module .\Scripts\GetBuildVersion.ps1
-        Write-Host "Releasing"
-        Write-Host $Env:GITHUB_REF
-        $version = GetBuildVersion
-        echo $version
-        echo "Version=$version" >> $GITHUB_ENV
-        BuildRelease -version $version
+        BuildRelease -version $env:Version
       shell: pwsh
     
