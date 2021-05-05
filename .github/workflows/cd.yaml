@@ -25,6 +25,7 @@ jobs:
     runs-on: windows-latest
 
     env:
+      Configuration: Release
       Solution_Path: Daybreak.sln
       Test_Project_Path: Daybreak.Tests\Daybreak.Tests.csproj
       Wpf_Project_Path: Daybreak\Daybreal.csproj
