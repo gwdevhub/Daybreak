@@ -40,12 +40,9 @@ jobs:
     # Generate changelog
     - name: Generate changelog
       id: gen_changelog
-      uses: mikepenz/release-changelog-builder-action@v1.8.0
-      with:
-        token: ${{ env.GITHUB_TOKEN }}
-        commitMode: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        $changeLog = git log --pretty=format:"%s" 'v0.8.5^'...v0.8.8.1
+        echo "::set-env name=Changelog::$changeLog"
 
     - name: Print changelog
       run: |
@@ -100,7 +97,7 @@ jobs:
         assets: .\Publish\daybreakv${{ env.Version }}.zip
         github_token: ${{ env.GITHUB_TOKEN }}
         replace_assets: true
-        body_mrkdwn: ${{ steps.gen_changelog.outputs.changelog }}
+        body_mrkdwn: ${{ env.Changelog }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
