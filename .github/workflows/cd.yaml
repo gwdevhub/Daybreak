@@ -3,14 +3,11 @@
 
 # This continuous integration pipeline is triggered anytime a user pushes code to the repo.
 # This pipeline builds the Wpf project, runs unit tests, then saves the MSIX build artifact.
-name:  Daybreak CI Pipeline
+name:  Daybreak CD Pipeline
 
 # Trigger on every master branch push and pull request
 on:
   push:
-    branches:
-      - master
-  pull_request:
     branches:
       - master
 
@@ -25,6 +22,7 @@ jobs:
     runs-on: windows-latest
 
     env:
+      Configuration: Release
       Solution_Path: Daybreak.sln
       Test_Project_Path: Daybreak.Tests\Daybreak.Tests.csproj
       Wpf_Project_Path: Daybreak\Daybreal.csproj
@@ -46,13 +44,45 @@ jobs:
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v1.0.1
 
-    # Test
-    - name: Execute Unit Tests
-      run: dotnet test $env:Test_Project_Path
-
     # Restore the application
     - name:  Restore the Wpf application to populate the obj folder
       run: msbuild $env:Solution_Path /t:Restore /p:Configuration=$env:Configuration /p:RuntimeIdentifier=$env:RuntimeIdentifier
       env:
-        Configuration: Debug
         RuntimeIdentifier: win-${{ matrix.targetplatform }}
+
+    # Build Daybreak project
+    - name: Build Daybreak project
+      run: dotnet build Daybreak -c $env:Configuration
+
+    # Set release version environment variable
+    - name: Set version variable
+      run: |
+        $version = .\Scripts\GetBuildVersion.ps1
+        echo "::set-env name=Version::$version"
+
+    # Publish release
+    - name: Publish release
+      run: dotnet publish .\Daybreak\Daybreak.csproj -c $env:Configuration -r $env:RuntimeIdentifier -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained true -o .\Publish
+      env:
+        RuntimeIdentifier: win-${{ matrix.targetplatform }}
+
+    # Create release payload
+    - name: Create release payload
+      run: |
+        Write-Host $env
+        .\Scripts\BuildRelease.ps1 -version $env:Version
+      shell: pwsh
+
+    # Post new release to github
+    - name: Post release
+      uses: Xotl/cool-github-releases@v1.1.2
+      with:
+        mode: update
+        tag_name: v${{ env.Version }}
+        release_name: Daybreak v${{ env.Version }}
+        assets: .\Publish\daybreakv${{ env.Version }}.zip
+        github_token: ${{ env.GITHUB_TOKEN }}
+        replace_assets: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
