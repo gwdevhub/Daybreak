@@ -37,6 +37,20 @@ jobs:
       with:
         fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
 
+    # Generate changelog
+    - name: Generate changelog
+      id: gen_changelog
+      uses: mikepenz/release-changelog-builder-action@v1.8.0
+      with:
+        token: ${{ env.GITHUB_TOKEN }}
+        commitMode: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Print changelog
+      run: |
+        echo ${{ steps.gen_changelog.outputs.changelog }}
+
     # Install the .NET Core workload
     - name: Install .NET Core
       uses: actions/setup-dotnet@v1
@@ -75,16 +89,6 @@ jobs:
         Write-Host $env
         .\Scripts\BuildRelease.ps1 -version $env:Version
       shell: pwsh
-
-    # Generate changelog
-    - name: Generate changelog
-      id: gen_changelog
-      uses: mikepenz/release-changelog-builder-action@v1.8.0
-      with:
-        token: ${{ env.GITHUB_TOKEN }}
-        commitMode: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     # Post new release to github
     - name: Post release
