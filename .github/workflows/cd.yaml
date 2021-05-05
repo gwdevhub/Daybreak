@@ -63,10 +63,11 @@ jobs:
       run: |
         Import-Module .\Scripts\BuildRelease.ps1
         Import-Module .\Scripts\GetBuildVersion.ps1
+        Write-Host "Releasing"
         Write-Host $Env:GITHUB_REF
         $version = GetBuildVersion
         echo $version
-        "Version=$version" | Out-File $env -Append
+        "Version=$version" | Out-File $Env -Append
         BuildRelease -version $version
       shell: pwsh
     
