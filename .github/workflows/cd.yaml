@@ -46,14 +46,14 @@ jobs:
     - name: Generate changelog
       id: gen_changelog
       run: |
-        $changeLog = git log --no-merges --pretty="%h - %s (%an)" ${{ env.LatestReleaseTag }}..HEAD
+        $changeLog = git log --no-merges --pretty="%h - %s (%an)\n" ${{ env.LatestReleaseTag }}..HEAD
         echo "::set-env name=Changelog::$changeLog"
       env:
         LatestReleaseTag: ${{steps.get_latest_tag.outputs.tag}}
 
     - name: Print changelog
       run: |
-        echo ${{ env.Changelog }}
+        echo "${{ env.Changelog }}"
 
     # Install the .NET Core workload
     - name: Install .NET Core
