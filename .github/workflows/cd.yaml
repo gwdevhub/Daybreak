@@ -58,13 +58,17 @@ jobs:
     - name: Build Daybreak project
       run: dotnet build Daybreak -c $env:Configuration
 
+    # Set release version environment variable
     - name: Set version variable
       run: |
         $version = .\Scripts\GetBuildVersion.ps1
         echo "::set-env name=Version::$version"
 
-    # Create release binaries
-    - name: Create release binaries
+    - name: Publish release
+      run: dotnet publish .\Daybreak\Daybreak.csproj -c $env:Configuration -r win-x64 -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained true -o .\Publish
+
+    # Create release payload
+    - name: Create release payload
       run: |
         Write-Host $env
         .\Scripts\BuildRelease.ps1 -version $env:Version
