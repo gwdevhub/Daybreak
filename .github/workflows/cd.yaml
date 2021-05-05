@@ -83,10 +83,8 @@ jobs:
         mode: update
         tag_name: v${{ env.Version }}
         release_name: Daybreak v${{ env.Version }}
-        assets: .\Publish\daybreakv${{ env.Version }}
+        assets: .\Publish\daybreakv${{ env.Version }}.zip
         github_token: ${{ env.GITHUB_TOKEN }}
       env:
-        ReleaseName: daybreakv{{ $env.Version }}.zip
-        TagName: v{{ $env.Version }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
