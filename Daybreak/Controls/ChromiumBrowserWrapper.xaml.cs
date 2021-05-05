@@ -19,19 +19,11 @@ namespace Daybreak.Controls
     /// <summary>
     /// Interaction logic for ChromiumBrowserWrapper.xaml
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Fields used by source generator for DependencyProperty")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
     public partial class ChromiumBrowserWrapper : UserControl
     {
         private const string BrowserDownloadLink = "https://developer.microsoft.com/en-us/microsoft-edge/webview2/";
-
-        public readonly static DependencyProperty AddressProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, string>(nameof(Address));
-        public readonly static DependencyProperty FavoriteAddressProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, string>(nameof(FavoriteAddress));
-        public readonly static DependencyProperty NavigatingProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, bool>(nameof(Navigating));
-        public readonly static DependencyProperty BrowserEnabledProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, bool>(nameof(BrowserEnabled));
-        public readonly static DependencyProperty AddressBarReadonlyProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, bool>(nameof(AddressBarReadonly));
-        public readonly static DependencyProperty BrowserSupportedProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, bool>(nameof(BrowserSupported), new PropertyMetadata(true));
-        public readonly static DependencyProperty ControlsEnabledProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, bool>(nameof(ControlsEnabled), new PropertyMetadata(true));
-        public readonly static DependencyProperty CanNavigateProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, bool>(nameof(CanNavigate), new PropertyMetadata(true));
-        public readonly static DependencyProperty CanDownloadBuildProperty = DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, bool>(nameof(CanDownloadBuild), new PropertyMetadata(false));
 
         public event EventHandler<string> FavoriteUriChanged;
         public event EventHandler MaximizeClicked;
@@ -42,51 +34,24 @@ namespace Daybreak.Controls
         private readonly IBuildTemplateManager buildTemplateManager;
         private CoreWebView2Environment coreWebView2Environment;
 
-        public bool CanDownloadBuild
-        {
-            get => this.GetTypedValue<bool>(CanDownloadBuildProperty);
-            set => this.SetTypedValue<bool>(CanDownloadBuildProperty, value);
-        }
-        public bool CanNavigate
-        {
-            get => this.GetTypedValue<bool>(CanNavigateProperty);
-            set => this.SetTypedValue<bool>(CanNavigateProperty, value);
-        }
-        public string Address
-        {
-            get => this.GetTypedValue<string>(AddressProperty);
-            set => this.SetTypedValue(AddressProperty, value);
-        }
-        public string FavoriteAddress
-        {
-            get => this.GetTypedValue<string>(FavoriteAddressProperty);
-            set => this.SetTypedValue(FavoriteAddressProperty, value);
-        }
-        public bool Navigating
-        {
-            get => this.GetTypedValue<bool>(NavigatingProperty);
-            private set => this.SetTypedValue<bool>(NavigatingProperty, value);
-        }
-        public bool AddressBarReadonly
-        {
-            get => this.GetTypedValue<bool>(AddressBarReadonlyProperty);
-            set => this.SetTypedValue<bool>(AddressBarReadonlyProperty, value);
-        }
-        public bool BrowserEnabled
-        {
-            get => this.GetTypedValue<bool>(BrowserEnabledProperty);
-            private set => this.SetTypedValue<bool>(BrowserEnabledProperty, value);
-        }
-        public bool BrowserSupported
-        {
-            get => this.GetTypedValue<bool>(BrowserSupportedProperty);
-            private set => this.SetTypedValue<bool>(BrowserSupportedProperty, value);
-        }
-        public bool ControlsEnabled
-        {
-            get => this.GetTypedValue<bool>(ControlsEnabledProperty);
-            set => this.SetTypedValue<bool>(ControlsEnabledProperty, value);
-        }
+        [GenerateDependencyProperty(InitialValue = true)]
+        private bool canDownloadBuild;
+        [GenerateDependencyProperty(InitialValue = true)]
+        private bool canNavigate;
+        [GenerateDependencyProperty(InitialValue = true)]
+        private bool controlsEnabled;
+        [GenerateDependencyProperty(InitialValue = true)]
+        private bool browserSupported;
+        [GenerateDependencyProperty]
+        private bool addressBarReadonly;
+        [GenerateDependencyProperty]
+        private bool browserEnabled;
+        [GenerateDependencyProperty]
+        private bool navigating;
+        [GenerateDependencyProperty]
+        private string favoriteAddress;
+        [GenerateDependencyProperty]
+        private string address;
 
         public ChromiumBrowserWrapper()
         {

@@ -10,37 +10,21 @@ namespace Daybreak.Controls
     /// <summary>
     /// Interaction logic for AccountTemplate.xaml
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Fields used by source generator for DependencyProperty")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
     public partial class AccountTemplate : UserControl
     {
-        public static readonly DependencyProperty UsernameProperty = DependencyPropertyExtensions.Register<AccountTemplate, string>(nameof(Username));
-        public static readonly DependencyProperty CharacterNameProperty = DependencyPropertyExtensions.Register<AccountTemplate, string>(nameof(CharacterName));
-        public static readonly DependencyProperty PasswordProperty = DependencyPropertyExtensions.Register<AccountTemplate, string>(nameof(Password));
-        public static readonly DependencyProperty IsDefaultProperty = DependencyPropertyExtensions.Register<AccountTemplate, bool>(nameof(IsDefault));
-
-
         public event EventHandler RemoveClicked;
         public event EventHandler DefaultClicked;
-
-        public string Username
-        {
-            get => this.GetTypedValue<string>(UsernameProperty);
-            set => this.SetValue(UsernameProperty, value);
-        }
-        public string Password
-        {
-            get => this.GetTypedValue<string>(PasswordProperty);
-            set => this.SetValue(PasswordProperty, value);
-        }
-        public string CharacterName
-        {
-            get => this.GetTypedValue<string>(CharacterNameProperty);
-            set => this.SetValue(CharacterNameProperty, value);
-        }
-        public bool IsDefault
-        {
-            get => this.GetTypedValue<bool>(IsDefaultProperty);
-            set => this.SetValue(IsDefaultProperty, value);
-        }
+        
+        [GenerateDependencyProperty]
+        private string username;
+        [GenerateDependencyProperty]
+        private string password;
+        [GenerateDependencyProperty]
+        private string characterName;
+        [GenerateDependencyProperty]
+        private bool isDefault;
 
         public AccountTemplate()
         {

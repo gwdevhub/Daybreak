@@ -1,7 +1,6 @@
 ﻿using Daybreak.Models;
 using Daybreak.Services.ApplicationLauncher;
 using Daybreak.Services.Logging;
-using Daybreak.Services.Privilege;
 using Daybreak.Services.ViewManagement;
 using Daybreak.Utils;
 using System.Extensions;

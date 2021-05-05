@@ -1,103 +1,48 @@
-﻿using Daybreak.Launch;
-using Daybreak.Models.Builds;
-using Daybreak.Services.IconRetrieve;
-using System.Collections;
+﻿using Daybreak.Models.Builds;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Extensions;
-using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace Daybreak.Controls
 {
     /// <summary>
     /// Interaction logic for BuildTemplate.xaml
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Fields used by source generator for DependencyProperty")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
     public partial class BuildTemplate : UserControl
     {
         private const string InfoNamePlaceholder = "[NAME]";
         private const string BaseAddress = $"https://wiki.guildwars.com/wiki/{InfoNamePlaceholder}";
 
-        public readonly static DependencyProperty PrimaryProfessionProperty =
-            DependencyPropertyExtensions.Register<BuildTemplate, Profession>(nameof(PrimaryProfession), new PropertyMetadata(Profession.None));
-        public readonly static DependencyProperty SecondaryProfessionProperty =
-            DependencyPropertyExtensions.Register<BuildTemplate, Profession>(nameof(SecondaryProfession), new PropertyMetadata(Profession.None));
-        public readonly static DependencyProperty Skill0Property =
-            DependencyPropertyExtensions.Register<BuildTemplate, Skill>(nameof(Skill0), new PropertyMetadata(Skill.NoSkill));
-        public readonly static DependencyProperty Skill1Property =
-            DependencyPropertyExtensions.Register<BuildTemplate, Skill>(nameof(Skill1), new PropertyMetadata(Skill.NoSkill));
-        public readonly static DependencyProperty Skill2Property =
-            DependencyPropertyExtensions.Register<BuildTemplate, Skill>(nameof(Skill2), new PropertyMetadata(Skill.NoSkill));
-        public readonly static DependencyProperty Skill3Property =
-            DependencyPropertyExtensions.Register<BuildTemplate, Skill>(nameof(Skill3), new PropertyMetadata(Skill.NoSkill));
-        public readonly static DependencyProperty Skill4Property =
-            DependencyPropertyExtensions.Register<BuildTemplate, Skill>(nameof(Skill4), new PropertyMetadata(Skill.NoSkill));
-        public readonly static DependencyProperty Skill5Property =
-            DependencyPropertyExtensions.Register<BuildTemplate, Skill>(nameof(Skill5), new PropertyMetadata(Skill.NoSkill));
-        public readonly static DependencyProperty Skill6Property =
-            DependencyPropertyExtensions.Register<BuildTemplate, Skill>(nameof(Skill6), new PropertyMetadata(Skill.NoSkill));
-        public readonly static DependencyProperty Skill7Property =
-            DependencyPropertyExtensions.Register<BuildTemplate, Skill>(nameof(Skill7), new PropertyMetadata(Skill.NoSkill));
-
+        private bool loadedProperties = false;
         private BuildEntry loadedBuild;
         private SkillTemplate selectingSkillTemplate;
 
-        public Profession PrimaryProfession
-        {
-            get => this.GetTypedValue<Profession>(PrimaryProfessionProperty);
-            set => this.SetValue(PrimaryProfessionProperty, value);
-        }
-        public Profession SecondaryProfession
-        {
-            get => this.GetTypedValue<Profession>(SecondaryProfessionProperty);
-            set => this.SetValue(SecondaryProfessionProperty, value);
-        }
-        public Skill Skill0
-        {
-            get => this.GetTypedValue<Skill>(Skill0Property);
-            set => this.SetValue(Skill0Property, value);
-        }
-        public Skill Skill1
-        {
-            get => this.GetTypedValue<Skill>(Skill1Property);
-            set => this.SetValue(Skill1Property, value);
-        }
-        public Skill Skill2
-        {
-            get => this.GetTypedValue<Skill>(Skill2Property);
-            set => this.SetValue(Skill2Property, value);
-        }
-        public Skill Skill3
-        {
-            get => this.GetTypedValue<Skill>(Skill3Property);
-            set => this.SetValue(Skill3Property, value);
-        }
-        public Skill Skill4
-        {
-            get => this.GetTypedValue<Skill>(Skill4Property);
-            set => this.SetValue(Skill4Property, value);
-        }
-        public Skill Skill5
-        {
-            get => this.GetTypedValue<Skill>(Skill5Property);
-            set => this.SetValue(Skill5Property, value);
-        }
-        public Skill Skill6
-        {
-            get => this.GetTypedValue<Skill>(Skill6Property);
-            set => this.SetValue(Skill6Property, value);
-        }
-        public Skill Skill7
-        {
-            get => this.GetTypedValue<Skill>(Skill7Property);
-            set => this.SetValue(Skill7Property, value);
-        }
+        [GenerateDependencyProperty]
+        private Profession primaryProfession;
+        [GenerateDependencyProperty]
+        private Profession secondaryProfession;
+        [GenerateDependencyProperty]
+        private Skill skill0;
+        [GenerateDependencyProperty]
+        private Skill skill1;
+        [GenerateDependencyProperty]
+        private Skill skill2;
+        [GenerateDependencyProperty]
+        private Skill skill3;
+        [GenerateDependencyProperty]
+        private Skill skill4;
+        [GenerateDependencyProperty]
+        private Skill skill5;
+        [GenerateDependencyProperty]
+        private Skill skill6;
+        [GenerateDependencyProperty]
+        private Skill skill7;
         public ObservableCollection<Skill> AvailableSkills { get; } = new ObservableCollection<Skill>();
         public ObservableCollection<AttributeEntry> Attributes { get; } = new ObservableCollection<AttributeEntry>();
         public ObservableCollection<Profession> Professions { get; } = new ObservableCollection<Profession>(Profession.Professions);
@@ -105,12 +50,18 @@ namespace Daybreak.Controls
         public BuildTemplate()
         {
             this.InitializeComponent();
+            this.InitializeProperties();
             this.DataContextChanged += BuildTemplate_DataContextChanged;
         }
 
         protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
             base.OnPropertyChanged(e);
+            if (this.loadedProperties is false)
+            {
+                return;
+            }
+
             if (e.Property == PrimaryProfessionProperty || e.Property == SecondaryProfessionProperty)
             {
                 if (e.Property == PrimaryProfessionProperty)
@@ -124,6 +75,21 @@ namespace Daybreak.Controls
                 this.LoadSkills();
                 this.LoadAttributes();
             }
+        }
+
+        private void InitializeProperties()
+        {
+            this.PrimaryProfession = Profession.None;
+            this.SecondaryProfession = Profession.None;
+            this.Skill0 = Skill.NoSkill;
+            this.Skill1 = Skill.NoSkill;
+            this.Skill2 = Skill.NoSkill;
+            this.Skill3 = Skill.NoSkill;
+            this.Skill4 = Skill.NoSkill;
+            this.Skill5 = Skill.NoSkill;
+            this.Skill6 = Skill.NoSkill;
+            this.Skill7 = Skill.NoSkill;
+            this.loadedProperties = true;
         }
 
         private void BuildTemplate_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)

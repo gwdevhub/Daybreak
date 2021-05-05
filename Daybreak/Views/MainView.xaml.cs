@@ -18,27 +18,10 @@ namespace Daybreak.Views
     /// <summary>
     /// Interaction logic for StartupView.xaml
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Fields used by source generator for DependencyProperty")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
     public partial class MainView : UserControl
     {
-        public static readonly DependencyProperty ButtonsVisibleProperty =
-            DependencyPropertyExtensions.Register<MainView, bool>(nameof(ButtonsVisible), new PropertyMetadata(true));
-        public static readonly DependencyProperty LaunchButtonEnabledProperty =
-            DependencyPropertyExtensions.Register<MainView, bool>(nameof(LaunchButtonEnabled));
-        public static readonly DependencyProperty LaunchToolboxButtonEnabledProperty =
-            DependencyPropertyExtensions.Register<MainView, bool>(nameof(LaunchToolboxButtonEnabled));
-        public static readonly DependencyProperty LaunchTexmodButtonEnabledProperty =
-            DependencyPropertyExtensions.Register<MainView, bool>(nameof(LaunchTexmodButtonEnabled));
-        public static readonly DependencyProperty BrowsersEnabledProperty =
-            DependencyPropertyExtensions.Register<MainView, bool>(nameof(BrowsersEnabled), new PropertyMetadata(true));
-        public static readonly DependencyProperty RightBrowserAddressProperty =
-            DependencyPropertyExtensions.Register<MainView, string>(nameof(RightBrowserAddress));
-        public static readonly DependencyProperty LeftBrowserAddressProperty =
-            DependencyPropertyExtensions.Register<MainView, string>(nameof(LeftBrowserAddress));
-        public static readonly DependencyProperty RightBrowserFavoriteAddressProperty =
-            DependencyPropertyExtensions.Register<MainView, string>(nameof(RightBrowserFavoriteAddress));
-        public static readonly DependencyProperty LeftBrowserFavoriteAddressProperty =
-            DependencyPropertyExtensions.Register<MainView, string>(nameof(LeftBrowserFavoriteAddress));
-
         private readonly IApplicationLauncher applicationDetector;
         private readonly IViewManager viewManager;
         private readonly IConfigurationManager configurationManager;
@@ -48,51 +31,24 @@ namespace Daybreak.Views
         private bool leftBrowserMaximized = false;
         private bool rightBrowserMaximized = false;
 
-        public bool ButtonsVisible
-        {
-            get => this.GetTypedValue<bool>(ButtonsVisibleProperty);
-            set => this.SetTypedValue(ButtonsVisibleProperty, value);
-        }
-        public string RightBrowserFavoriteAddress
-        {
-            get => this.GetTypedValue<string>(RightBrowserFavoriteAddressProperty);
-            set => this.SetTypedValue(RightBrowserFavoriteAddressProperty, value);
-        }
-        public string LeftBrowserFavoriteAddress
-        {
-            get => this.GetTypedValue<string>(LeftBrowserFavoriteAddressProperty);
-            set => this.SetTypedValue(LeftBrowserFavoriteAddressProperty, value);
-        }
-        public string RightBrowserAddress
-        {
-            get => this.GetTypedValue<string>(RightBrowserAddressProperty);
-            set => this.SetTypedValue(RightBrowserAddressProperty, value);
-        }
-        public string LeftBrowserAddress
-        {
-            get => this.GetTypedValue<string>(LeftBrowserAddressProperty);
-            set => this.SetTypedValue(LeftBrowserAddressProperty, value);
-        }
-        public bool LaunchButtonEnabled
-        {
-            get => this.GetTypedValue<bool>(LaunchButtonEnabledProperty);
-            set => this.SetTypedValue(LaunchButtonEnabledProperty, value);
-        }
-        public bool LaunchToolboxButtonEnabled
-        {
-            get => this.GetTypedValue<bool>(LaunchToolboxButtonEnabledProperty);
-            set => this.SetTypedValue(LaunchToolboxButtonEnabledProperty, value);
-        }
-        public bool LaunchTexmodButtonEnabled
-        {
-            get => this.GetTypedValue<bool>(LaunchTexmodButtonEnabledProperty);
-            set => this.SetTypedValue(LaunchTexmodButtonEnabledProperty, value);
-        }
-        public bool BrowsersEnabled
-        {
-            get => this.GetTypedValue<bool>(BrowsersEnabledProperty);
-            set => this.SetTypedValue(BrowsersEnabledProperty, value);
-        }
+        [GenerateDependencyProperty(InitialValue = true)]
+        private bool buttonsVisible;
+        [GenerateDependencyProperty]
+        private string rightBrowserFavoriteAddress;
+        [GenerateDependencyProperty]
+        private string leftBrowserFavoriteAddress;
+        [GenerateDependencyProperty]
+        private string rightBrowserAddress;
+        [GenerateDependencyProperty]
+        private string leftBrowserAddress;
+        [GenerateDependencyProperty]
+        private bool launchButtonEnabled;
+        [GenerateDependencyProperty]
+        private bool launchToolboxButtonEnabled;
+        [GenerateDependencyProperty]
+        private bool launchTexmodButtonEnabled;
+        [GenerateDependencyProperty(InitialValue = true)]
+        private bool browsersEnabled;
 
         public MainView(
             IApplicationLauncher applicationDetector,

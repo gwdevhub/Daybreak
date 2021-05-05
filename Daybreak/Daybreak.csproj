@@ -9,6 +9,7 @@
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
     <LangVersion>preview</LangVersion>
     <ApplicationIcon>Daybreak.ico</ApplicationIcon>
+    <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
     <Version>0.8.6</Version>
   </PropertyGroup>
 
@@ -22,6 +23,7 @@
     <PackageReference Include="SystemExtensions.NetStandard" Version="1.1.4" />
     <PackageReference Include="WCL" Version="1.0.2" />
     <PackageReference Include="WpfExtended" Version="0.2.1" />
+    <PackageReference Include="WpfExtended.SourceGeneration" Version="0.1.1" />
     <PackageReference Include="WpfScreenHelper" Version="1.0.0" />
   </ItemGroup>
 

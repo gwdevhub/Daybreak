@@ -14,89 +14,35 @@ namespace Daybreak.Views
     /// <summary>
     /// Interaction logic for SettingsView.xaml
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Fields used by source generator for DependencyProperty")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
     public partial class SettingsView : System.Windows.Controls.UserControl
     {
-        public static readonly DependencyProperty TexmodPathProperty =
-            DependencyPropertyExtensions.Register<SettingsView, string>(nameof(TexmodPath));
-        public static readonly DependencyProperty ToolboxPathProperty =
-            DependencyPropertyExtensions.Register<SettingsView, string>(nameof(ToolboxPath));
-        public static readonly DependencyProperty AddressBarReadonlyProperty =
-            DependencyPropertyExtensions.Register<SettingsView, bool>(nameof(AddressBarReadonly));
-        public static readonly DependencyProperty BrowsersEnabledProperty =
-            DependencyPropertyExtensions.Register<SettingsView, bool>(nameof(BrowsersEnabled));
-        public static readonly DependencyProperty LeftBrowserUrlProperty =
-            DependencyPropertyExtensions.Register<SettingsView, string>(nameof(LeftBrowserUrl));
-        public static readonly DependencyProperty RightBrowserUrlProperty =
-            DependencyPropertyExtensions.Register<SettingsView, string>(nameof(RightBrowserUrl));
-        public static readonly DependencyProperty ToolboxAutoLaunchProperty =
-            DependencyPropertyExtensions.Register<SettingsView, bool>(nameof(ToolboxAutoLaunch));
-        public static readonly DependencyProperty AutoPlaceOnScreenProperty =
-            DependencyPropertyExtensions.Register<SettingsView, bool>(nameof(AutoPlaceOnScreen));
-        public static readonly DependencyProperty DesiredScreenProperty =
-            DependencyPropertyExtensions.Register<SettingsView, string>(nameof(DesiredScreen));
-        public static readonly DependencyProperty ShortcutFolderProperty =
-            DependencyPropertyExtensions.Register<SettingsView, string>(nameof(ShortcutFolder));
-        public static readonly DependencyProperty ShortcutPlacedProperty =
-            DependencyPropertyExtensions.Register<SettingsView, bool>(nameof(ShortcutPlaced));
-
         private readonly IConfigurationManager configurationManager;
         private readonly IViewManager viewManager;
 
-        public string TexmodPath
-        {
-            get => this.GetTypedValue<string>(TexmodPathProperty);
-            set => this.SetValue(TexmodPathProperty, value);
-        }
-        public bool ToolboxAutoLaunch
-        {
-            get => this.GetTypedValue<bool>(ToolboxAutoLaunchProperty);
-            set => this.SetValue(ToolboxAutoLaunchProperty, value);
-        }
-        public string ToolboxPath
-        {
-            get => this.GetTypedValue<string>(ToolboxPathProperty);
-            set => this.SetValue(ToolboxPathProperty, value);
-        }
-        public bool AddressBarReadonly
-        {
-            get => this.GetTypedValue<bool>(AddressBarReadonlyProperty);
-            set => this.SetValue(AddressBarReadonlyProperty, value);
-        }
-        public string LeftBrowserUrl
-        {
-            get => this.GetTypedValue<string>(LeftBrowserUrlProperty);
-            set => this.SetValue(LeftBrowserUrlProperty, value);
-        }
-        public string RightBrowserUrl
-        {
-            get => this.GetTypedValue<string>(RightBrowserUrlProperty);
-            set => this.SetValue(RightBrowserUrlProperty, value);
-        }
-        public bool BrowsersEnabled
-        {
-            get => this.GetTypedValue<bool>(BrowsersEnabledProperty);
-            set => this.SetValue(BrowsersEnabledProperty, value);
-        }
-        public bool AutoPlaceOnScreen
-        {
-            get => this.GetTypedValue<bool>(AutoPlaceOnScreenProperty);
-            set => this.SetValue(AutoPlaceOnScreenProperty, value);
-        }
-        public string DesiredScreen
-        {
-            get => this.GetTypedValue<string>(DesiredScreenProperty);
-            set => this.SetValue(DesiredScreenProperty, value);
-        }
-        public string ShortcutFolder
-        {
-            get => this.GetTypedValue<string>(ShortcutFolderProperty);
-            set => this.SetValue(ShortcutFolderProperty, value);
-        }
-        public bool ShortcutPlaced
-        {
-            get => this.GetTypedValue<bool>(ShortcutPlacedProperty);
-            set => this.SetValue(ShortcutPlacedProperty, value);
-        }
+        [GenerateDependencyProperty]
+        private string texmodPath;
+        [GenerateDependencyProperty]
+        private bool toolboxAutoLaunch;
+        [GenerateDependencyProperty]
+        private string toolboxPath;
+        [GenerateDependencyProperty]
+        private bool addressBarReadonly;
+        [GenerateDependencyProperty]
+        private string leftBrowserUrl;
+        [GenerateDependencyProperty]
+        private string rightBrowserUrl;
+        [GenerateDependencyProperty]
+        private bool browsersEnabled;
+        [GenerateDependencyProperty]
+        private bool autoPlaceOnScreen;
+        [GenerateDependencyProperty]
+        private string desiredScreen;
+        [GenerateDependencyProperty]
+        private string shortcutFolder;
+        [GenerateDependencyProperty]
+        private bool shortcutPlaced;
 
         public SettingsView(
             IConfigurationManager configurationManager,

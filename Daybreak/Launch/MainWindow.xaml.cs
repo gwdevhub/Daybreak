@@ -22,12 +22,10 @@ namespace Daybreak.Launch
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Fields used by source generator for DependencyProperty")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
     public partial class MainWindow : Window
     {
-        public static readonly DependencyProperty CreditTextProperty = DependencyPropertyExtensions.Register<MainWindow, string>(nameof(CreditText));
-        public static readonly DependencyProperty CurrentVersionTextProperty = DependencyPropertyExtensions.Register<MainWindow, string>(nameof(CurrentVersionText));
-        public static readonly DependencyProperty IsRunningAsAdminProperty = DependencyPropertyExtensions.Register<MainWindow, bool>(nameof(IsRunningAsAdmin));
-
         private readonly IViewManager viewManager;
         private readonly IScreenshotProvider screenshotProvider;
         private readonly IBloogumClient bloogumClient;
@@ -35,23 +33,12 @@ namespace Daybreak.Launch
         private readonly IPrivilegeManager privilegeManager;
         private readonly CancellationTokenSource cancellationToken = new();
 
-        public string CreditText
-        {
-            get => this.GetTypedValue<string>(CreditTextProperty);
-            set => this.SetValue(CreditTextProperty, value);
-        }
-
-        public string CurrentVersionText
-        {
-            get => this.GetTypedValue<string>(CurrentVersionTextProperty);
-            set => this.SetValue(CurrentVersionTextProperty, value);
-        }
-
-        public bool IsRunningAsAdmin
-        {
-            get => this.GetTypedValue<bool>(IsRunningAsAdminProperty);
-            set => this.SetValue(IsRunningAsAdminProperty, value);
-        }
+        [GenerateDependencyProperty]
+        private string creditText;
+        [GenerateDependencyProperty]
+        private string currentVersionText;
+        [GenerateDependencyProperty]
+        private bool isRunningAsAdmin;
 
         public MainWindow(
             IViewManager viewManager,

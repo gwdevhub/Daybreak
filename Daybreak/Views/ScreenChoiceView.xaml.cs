@@ -17,22 +17,18 @@ namespace Daybreak.Views
     /// <summary>
     /// Interaction logic for ScreenChoiceView.xaml
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Fields used by source generator for DependencyProperty")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
     public partial class ScreenChoiceView : UserControl
-    {
-        public static readonly DependencyProperty CanTestProperty =
-            DependencyPropertyExtensions.Register<ScreenChoiceView, bool>(nameof(CanTest));
-        
+    {        
         private readonly IScreenManager screenManager;
         private readonly IViewManager viewManager;
         private readonly IConfigurationManager configurationManager;
         private readonly IApplicationLauncher applicationLauncher;
         private int selectedId;
 
-        public bool CanTest
-        {
-            get => this.GetTypedValue<bool>(CanTestProperty);
-            set => this.SetValue(CanTestProperty, value);
-        }
+        [GenerateDependencyProperty]
+        private bool canTest;
 
         public ScreenChoiceView(
             IViewManager viewManager,

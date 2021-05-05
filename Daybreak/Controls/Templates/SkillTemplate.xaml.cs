@@ -16,28 +16,19 @@ namespace Daybreak.Controls
     /// <summary>
     /// Interaction logic for SkillTemplate.xaml
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Fields used by source generator for DependencyProperty")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
     public partial class SkillTemplate : UserControl
     {
-        public readonly static DependencyProperty ImageSourceProperty =
-            DependencyPropertyExtensions.Register<SkillTemplate, ImageSource>(nameof(ImageSource));
-        public readonly static DependencyProperty BorderOpacityProperty =
-            DependencyPropertyExtensions.Register<SkillTemplate, double>(nameof(BorderOpacity), new PropertyMetadata(0d));
-
         public event EventHandler<RoutedEventArgs> Clicked;
         public event EventHandler RemoveClicked;
 
         private readonly IIconRetriever iconRetriever;
 
-        public ImageSource ImageSource
-        {
-            get => this.GetTypedValue<ImageSource>(ImageSourceProperty);
-            set => this.SetValue(ImageSourceProperty, value);
-        }
-        public double BorderOpacity
-        {
-            get => this.GetTypedValue<double>(BorderOpacityProperty);
-            set => this.SetValue(BorderOpacityProperty, value);
-        }
+        [GenerateDependencyProperty]
+        private ImageSource imageSource;
+        [GenerateDependencyProperty]
+        private double borderOpacity;
 
         public SkillTemplate()
         {

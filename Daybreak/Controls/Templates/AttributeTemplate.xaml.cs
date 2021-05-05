@@ -10,26 +10,16 @@ namespace Daybreak.Controls
     /// <summary>
     /// Interaction logic for AttributeTemplate.xaml
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Fields used by source generator for DependencyProperty")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
     public partial class AttributeTemplate : UserControl
     {
-        public readonly static DependencyProperty CanAddProperty =
-            DependencyPropertyExtensions.Register<AttributeTemplate, bool>(nameof(CanAdd), new PropertyMetadata(false));
-        public readonly static DependencyProperty CanSubtractProperty =
-            DependencyPropertyExtensions.Register<AttributeTemplate, bool>(nameof(CanSubtract), new PropertyMetadata(false));
-
         public event EventHandler<AttributeEntry> HelpClicked;
-
-        public bool CanAdd
-        {
-            get => this.GetTypedValue<bool>(CanAddProperty);
-            private set => this.SetValue(CanAddProperty, value);
-        }
-
-        public bool CanSubtract
-        {
-            get => this.GetTypedValue<bool>(CanSubtractProperty);
-            private set => this.SetValue(CanSubtractProperty, value);
-        }
+        
+        [GenerateDependencyProperty(InitialValue = false)]
+        private bool canAdd;
+        [GenerateDependencyProperty(InitialValue = false)]
+        private bool canSubtract;
 
         public AttributeTemplate()
         {

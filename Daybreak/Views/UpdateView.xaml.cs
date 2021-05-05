@@ -12,37 +12,22 @@ namespace Daybreak.Views
     /// <summary>
     /// Interaction logic for UpdateView.xaml
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Fields used by source generator for DependencyProperty")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
     public partial class UpdateView : UserControl
     {
-        public readonly static DependencyProperty DescriptionProperty =
-            DependencyPropertyExtensions.Register<UpdateView, string>(nameof(Description));
-        public readonly static DependencyProperty ProgressValueProperty =
-            DependencyPropertyExtensions.Register<UpdateView, double>(nameof(ProgressValue));
-        public readonly static DependencyProperty ContinueButtonEnabledProperty =
-            DependencyPropertyExtensions.Register<UpdateView, bool>(nameof(ContinueButtonEnabled));
-
         private readonly ILogger logger;
         private readonly IViewManager viewManager;
         private readonly IApplicationUpdater applicationUpdater;
         private readonly UpdateStatus updateStatus = new();
 
         private bool success = false;
-
-        public string Description
-        {
-            get => this.GetTypedValue<string>(DescriptionProperty);
-            set => this.SetValue(DescriptionProperty, value);
-        }
-        public double ProgressValue
-        {
-            get => this.GetTypedValue<double>(ProgressValueProperty);
-            set => this.SetValue(ProgressValueProperty, value);
-        }
-        public bool ContinueButtonEnabled
-        {
-            get => this.GetTypedValue<bool>(ContinueButtonEnabledProperty);
-            set => this.SetValue(ContinueButtonEnabledProperty, value);
-        }
+        [GenerateDependencyProperty]
+        private string description;
+        [GenerateDependencyProperty]
+        private double progressValue;
+        [GenerateDependencyProperty]
+        private bool continueButtonEnabled;
 
         public UpdateView(
             IApplicationUpdater applicationUpdater,

@@ -1,5 +1,4 @@
-﻿using Daybreak.Utils;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -39,7 +38,7 @@ namespace Daybreak.Controls
             }
 
             nextVisible.Source = imageSource;
-            this.Transition(currentVisible, nextVisible);
+            Transition(currentVisible, nextVisible);
         }
 
         private Image CurrentVisible()
@@ -64,7 +63,7 @@ namespace Daybreak.Controls
                 return this.Image1;
             }
         }
-        private void Transition(Image from, Image to)
+        private static void Transition(Image from, Image to)
         {
             to.Visibility = Visibility.Visible;
             to.Opacity = 0;

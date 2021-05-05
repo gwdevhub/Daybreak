@@ -11,26 +11,16 @@ namespace Daybreak.Controls.Templates
     /// <summary>
     /// Interaction logic for ScreenTemplate.xaml
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Fields used by source generator for DependencyProperty")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
     public partial class ScreenTemplate : UserControl
     {
-        public static readonly DependencyProperty ScreenIdProperty =
-            DependencyPropertyExtensions.Register<ScreenTemplate, string>(nameof(ScreenId));
-        public static readonly DependencyProperty HighlightProperty =
-            DependencyPropertyExtensions.Register<ScreenTemplate, Brush>(nameof(Highlight));
-
         public event EventHandler<Screen> Clicked;
 
-        public string ScreenId
-        {
-            get => this.GetTypedValue<string>(ScreenIdProperty);
-            set => this.SetValue(ScreenIdProperty, value);
-        }
-
-        public Brush Highlight
-        {
-            get => this.GetTypedValue<Brush>(HighlightProperty);
-            set => this.SetValue(HighlightProperty, value);
-        }
+        [GenerateDependencyProperty]
+        private string screenId;
+        [GenerateDependencyProperty]
+        private Brush highlight;
 
         public ScreenTemplate()
         {

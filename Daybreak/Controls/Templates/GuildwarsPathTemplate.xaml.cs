@@ -11,24 +11,17 @@ namespace Daybreak.Controls
     /// <summary>
     /// Interaction logic for GuildwarsPathTemplate.xaml
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Fields used by source generator for DependencyProperty")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
     public partial class GuildwarsPathTemplate : UserControl
     {
-        public static readonly DependencyProperty PathProperty = DependencyPropertyExtensions.Register<GuildwarsPathTemplate, string>(nameof(Path));
-        public static readonly DependencyProperty IsDefaultProperty = DependencyPropertyExtensions.Register<GuildwarsPathTemplate, bool>(nameof(IsDefault));
-
         public event EventHandler RemoveClicked;
         public event EventHandler DefaultClicked;
 
-        public string Path
-        {
-            get => this.GetTypedValue<string>(PathProperty);
-            set => this.SetValue(PathProperty, value);
-        }
-        public bool IsDefault
-        {
-            get => this.GetTypedValue<bool>(IsDefaultProperty);
-            set => this.SetValue(IsDefaultProperty, value);
-        }
+        [GenerateDependencyProperty]
+        private string path;
+        [GenerateDependencyProperty]
+        private bool isDefault;
 
         public GuildwarsPathTemplate()
         {
