@@ -60,15 +60,13 @@ jobs:
 
     - name: Set version variable
       run: |
-        Import-Module .\Scripts\GetBuildVersion.ps1
-        $version = GetBuildVersion
+        $version = .\Scripts\GetBuildVersion.ps1
         echo "::set-env name=Version::$version"
 
     # Create release binaries
     - name: Create release binaries
       run: |
         Write-Host $env
-        Import-Module .\Scripts\BuildRelease.ps1
-        BuildRelease -version $env:Version
+        .\Scripts\BuildRelease.ps1 -version $env:Version
       shell: pwsh
     
