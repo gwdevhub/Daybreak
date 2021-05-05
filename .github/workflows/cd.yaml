@@ -10,7 +10,10 @@ on:
   push:
     branches:
       - master
-
+  pull_request:
+    branches:
+      - master
+      
 jobs:
 
   build:
@@ -89,7 +92,6 @@ jobs:
       uses: mikepenz/release-changelog-builder-action@v1.8.0
       with:
         fromTag: ${{ steps.download_release.outputs.tag_name }}
-        toTag: ${{ env.Version }}
         token: ${{ env.GITHUB_TOKEN }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
