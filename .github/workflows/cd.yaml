@@ -82,11 +82,8 @@ jobs:
       with:
         mode: update
         tag_name: v${{ env.Version }}
-      with:
-        files: .\Publish\$env:ReleaseName
-        fail_on_unmatched_files: true
-        name: Daybreak $env:TagName
-        tag_name: $env:TagName
+        release_name: Daybreak v${{ env.Version }}
+        assets: .\Publish\$env:ReleaseName
       env:
         ReleaseName: daybreakv{{ $env.Version }}.zip
         TagName: v{{ $env.Version }}
