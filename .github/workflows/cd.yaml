@@ -85,7 +85,7 @@ jobs:
         name: Daybreak $env:TagName
         tag_name: $env:TagName
       env:
-        ReleaseName: daybreakv$(env:Version).zip
-        TagName: v$(env:Version)
+        ReleaseName: daybreakv{{ env.Version }}.zip
+        TagName: v{{ env.Version }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
