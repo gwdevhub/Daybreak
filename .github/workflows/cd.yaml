@@ -54,6 +54,10 @@ jobs:
         Configuration: Release
         RuntimeIdentifier: win-${{ matrix.targetplatform }}
 
+    # Build Daybreak project
+    - name: Build Daybreak project
+      run: dotnet build Daybreak -c $env:Configuration
+
     # Create release binaries
     - name: Create release binaries
       run: |
