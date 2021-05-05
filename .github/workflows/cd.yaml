@@ -46,7 +46,7 @@ jobs:
 
     - name: Print changelog
       run: |
-        echo ${{ steps.gen_changelog.outputs.changelog }}
+        echo ${{ env.Changelog }}
 
     # Install the .NET Core workload
     - name: Install .NET Core
