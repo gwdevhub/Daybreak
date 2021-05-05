@@ -37,15 +37,10 @@ jobs:
       with:
         fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
 
-    - name: Get latest release
-      id: get_latest_release
-      uses: Xotl/cool-github-releases@v1.1.2
-      with:
-        mode: download
-        github_token: ${{ env.GITHUB_TOKEN }}
-        assets: README.md
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Get Latest Tag
+      id: get_latest_tag
+      uses: WyriHaximus/github-action-get-previous-tag@v1
+
 
     # Generate changelog
     - name: Generate changelog
@@ -54,7 +49,7 @@ jobs:
         $changeLog = git log --no-merges --pretty="%h - %s (%an)" v${{ env.LatestReleaseTag }}..HEAD
         echo "::set-env name=Changelog::$changeLog"
       env:
-        LatestReleaseTag: ${{steps.get_latest_release.outputs.tag_name}}
+        LatestReleaseTag: ${{steps.get_latest_tag.outputs.tag}}
 
     - name: Print changelog
       run: |
