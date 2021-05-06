@@ -1,4 +1,5 @@
 ﻿using Daybreak.Services.Bloogum;
+using Daybreak.Services.Configuration;
 using Daybreak.Services.Privilege;
 using Daybreak.Services.Runtime;
 using Daybreak.Services.Screenshots;
@@ -31,7 +32,10 @@ namespace Daybreak.Launch
         private readonly IBloogumClient bloogumClient;
         private readonly IApplicationUpdater applicationUpdater;
         private readonly IPrivilegeManager privilegeManager;
+        private readonly IConfigurationManager configurationManager;
         private readonly CancellationTokenSource cancellationToken = new();
+
+        private bool canCheckUpdate = false;
 
         [GenerateDependencyProperty]
         private string creditText;
@@ -45,16 +49,26 @@ namespace Daybreak.Launch
             IScreenshotProvider screenshotProvider,
             IBloogumClient bloogumClient,
             IApplicationUpdater applicationUpdater,
-            IPrivilegeManager privilegeManager)
+            IPrivilegeManager privilegeManager,
+            IConfigurationManager configurationManager)
         {
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.screenshotProvider = screenshotProvider.ThrowIfNull(nameof(screenshotProvider));
             this.bloogumClient = bloogumClient.ThrowIfNull(nameof(bloogumClient));
             this.applicationUpdater = applicationUpdater.ThrowIfNull(nameof(applicationUpdater));
             this.privilegeManager = privilegeManager.ThrowIfNull(nameof(privilegeManager));
+            this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
             this.InitializeComponent();
-            this.CurrentVersionText = this.applicationUpdater.CurrentVersion;
+            this.LoadConfiguration();
+            this.configurationManager.ConfigurationChanged += (s, e) => this.LoadConfiguration();
+            this.CurrentVersionText = this.applicationUpdater.CurrentVersion.ToString();
             this.IsRunningAsAdmin = this.privilegeManager.AdminPrivileges;
+        }
+
+        private void LoadConfiguration()
+        {
+            var configuration = this.configurationManager.GetConfiguration();
+            this.canCheckUpdate = configuration.AutoCheckUpdate;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -139,6 +153,11 @@ namespace Daybreak.Launch
             }
         }
 
+        private void VersionText_Clicked(object sender, EventArgs e)
+        {
+            this.viewManager.ShowView<VersionManagementView>();
+        }
+
         private void SetImage(ImageSource imageSource)
         {
             this.ImageViewer.ShowImage(imageSource);
@@ -159,7 +178,7 @@ namespace Daybreak.Launch
 
         private async void CheckForUpdates()
         {
-            var updateAvailable = await this.applicationUpdater.UpdateAvailable().ConfigureAwait(true);
+            var updateAvailable = this.canCheckUpdate is true && await this.applicationUpdater.UpdateAvailable().ConfigureAwait(true);
             if (updateAvailable)
             {
                 this.viewManager.ShowView<AskUpdateView>();

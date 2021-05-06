@@ -69,6 +69,7 @@ namespace Daybreak.Configuration
             viewProducer.RegisterView<BuildsListView>();
             viewProducer.RegisterView<RequestElevationView>();
             viewProducer.RegisterView<ScreenChoiceView>();
+            viewProducer.RegisterView<VersionManagementView>();
         }
     }
 }

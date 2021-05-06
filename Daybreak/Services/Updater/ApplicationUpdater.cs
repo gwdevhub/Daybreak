@@ -1,4 +1,6 @@
-﻿using Daybreak.Models;
+﻿using Daybreak.Exceptions;
+using Daybreak.Models;
+using Daybreak.Models.Github;
 using Daybreak.Services.Logging;
 using Daybreak.Services.Runtime;
 using Daybreak.Services.ViewManagement;
@@ -16,6 +18,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using Version = Daybreak.Models.Versioning.Version;
 
 namespace Daybreak.Services.Updater
 {
@@ -35,8 +38,10 @@ namespace Daybreak.Services.Updater
         private const string ProcessIdTag = "{PROCESSID}";
         private const string ExecutableNameTag = "{EXECUTABLE}";
         private const string WorkingDirectoryTag = "{WORKINGDIRECTORY}";
+        private const string RefTagPrefix = "/refs/tags";
+        private const string VersionListUrl = "https://api.github.com/repos/AlexMacocian/Daybreak/git/refs/tags";
         private const string Url = "https://github.com/AlexMacocian/Daybreak/releases/latest";
-        private const string DownloadUrl = $"https://github.com/AlexMacocian/Daybreak/releases/download/v{VersionTag}/Daybreakv{VersionTag}.zip";
+        private const string DownloadUrl = $"https://github.com/AlexMacocian/Daybreak/releases/download/{VersionTag}/Daybreak{VersionTag}.zip";
         private const string GetExecutionPolicyCommand = "Get-ExecutionPolicy -Scope CurrentUser";
         private const string SetExecutionPolicyCommand = $"Set-ExecutionPolicy {ExecutionPolicyTag} -Scope CurrentUser";
         private const string WaitCommand = $"Wait-Process -Id {ProcessIdTag}";
@@ -56,7 +61,7 @@ namespace Daybreak.Services.Updater
         private readonly IRuntimeStore runtimeStore;
         private readonly HttpClient httpClient = new();
 
-        public string CurrentVersion => Assembly.GetExecutingAssembly().GetName().Version.ToString();
+        public Version CurrentVersion { get; }
 
         public ApplicationUpdater(
             ILogger logger,
@@ -66,31 +71,38 @@ namespace Daybreak.Services.Updater
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.runtimeStore = runtimeStore.ThrowIfNull(nameof(runtimeStore));
             this.logger = logger.ThrowIfNull(nameof(logger));
+            this.httpClient.DefaultRequestHeaders.Add("user-agent", "Daybreak Client");
+            if (Version.TryParse(Assembly.GetExecutingAssembly().GetName().Version.ToString(), out var currentVersion))
+            {
+                if (currentVersion.HasPrefix is false)
+                {
+                    currentVersion = Version.Parse("v" + currentVersion);
+                }
+
+                this.CurrentVersion = currentVersion;
+            }
+            else
+            {
+                throw new FatalException($"Application version is invalid: {Assembly.GetExecutingAssembly().GetName().Version}");
+            }
         }
 
-        public async Task<bool> DownloadUpdate(UpdateStatus updateStatus)
+        public async Task<bool> DownloadUpdate(Version version, UpdateStatus updateStatus)
         {
-            updateStatus.CurrentStep = UpdateStatus.CheckingLatestVersion;
-            var latestVersion = (await this.GetLatestVersion()).ExtractValue();
-            if (latestVersion is null)
+            updateStatus.CurrentStep = UpdateStatus.InitializingDownload;
+            var uri = DownloadUrl.Replace(VersionTag, version.ToString());
+            using var response = await this.httpClient.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead);
+            if (response.IsSuccessStatusCode is false)
             {
-                this.logger.LogWarning("Failed to retrieve latest version. Aborting update");
+                updateStatus.CurrentStep = UpdateStatus.FailedDownload;
+                this.logger.LogError($"Failed to download update. Details: {await response.Content.ReadAsStringAsync()}");
                 return false;
             }
 
-            using var downloadLatestResponse = await this.httpClient.GetAsync(
-                DownloadUrl.Replace(VersionTag, latestVersion));
-
-            if (downloadLatestResponse.IsSuccessStatusCode is false)
-            {
-                this.logger.LogWarning("Failed to download latest version. Aborting udpate");
-                return false;
-            }
-
+            using var downloadStream = await this.httpClient.GetStreamAsync(uri);
             this.logger.LogInformation("Beginning update download");
-            var downloadStream = await downloadLatestResponse.Content.ReadAsStreamAsync();
             var fileStream = File.OpenWrite(TempFile);
-            var downloadSize = (double)downloadStream.Length;
+            var downloadSize = (double)response.Content.Headers.ContentLength;
             var buffer = new byte[1024];
             var length = 0;
             double downloaded = 0;
@@ -113,17 +125,48 @@ namespace Daybreak.Services.Updater
             return true;
         }
 
+        public async Task<bool> DownloadLatestUpdate(UpdateStatus updateStatus)
+        {
+            updateStatus.CurrentStep = UpdateStatus.CheckingLatestVersion;
+            var latestVersion = (await this.GetLatestVersion()).ExtractValue();
+            if (latestVersion is null)
+            {
+                this.logger.LogWarning("Failed to retrieve latest version. Aborting update");
+                return false;
+            }
+
+            if (Version.TryParse(latestVersion, out var parsedVersion) is false)
+            {
+                throw new InvalidOperationException($"Could not parse retrieved version: {latestVersion}");
+            }
+
+            return await this.DownloadUpdate(parsedVersion, updateStatus);
+        }
+
         public async Task<bool> UpdateAvailable()
         {
-            var version = string.Join('.', this.CurrentVersion.Split('.'));
             var maybeLatestVersion = await this.GetLatestVersion();
             return maybeLatestVersion.Switch(
-                onSome: latestVersion => string.Compare(version, latestVersion, true) < 0,
+                onSome: latestVersion => string.Compare(this.CurrentVersion.ToString().Trim('v'), latestVersion, true) < 0,
                 onNone: () =>
                 {
                     this.logger.LogWarning("Failed to retrieve latest version");
                     return false;
                 }).ExtractValue();
+        }
+
+        public async Task<IEnumerable<Version>> GetVersions()
+        {
+            this.logger.LogInformation($"Retrieving version list from {VersionListUrl}");
+            var response = await this.httpClient.GetAsync(VersionListUrl);
+            if (response.IsSuccessStatusCode)
+            {
+                var serializedList = await response.Content.ReadAsStringAsync();
+                var versionList = serializedList.Deserialize<GithubRefTag[]>();
+                return versionList.Select(v => v.Ref.Remove(0, RefTagPrefix.Length)).Select(v => new Version(v));
+            }
+
+            return new List<Version>();
         }
 
         public void PeriodicallyCheckForUpdates()

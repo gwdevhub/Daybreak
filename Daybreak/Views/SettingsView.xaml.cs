@@ -43,11 +43,12 @@ namespace Daybreak.Views
         private string shortcutFolder;
         [GenerateDependencyProperty]
         private bool shortcutPlaced;
+        [GenerateDependencyProperty]
+        private bool autoCheckUpdate;
 
         public SettingsView(
             IConfigurationManager configurationManager,
-            IViewManager viewManager,
-            IShortcutManager shortcutManager)
+            IViewManager viewManager)
         {
             this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
@@ -69,7 +70,7 @@ namespace Daybreak.Views
             this.DesiredScreen = config.DesiredGuildwarsScreen.ToString();
             this.ShortcutFolder = config.ShortcutLocation;
             this.ShortcutPlaced = config.PlaceShortcut;
-            
+            this.AutoCheckUpdate = config.AutoCheckUpdate;
         }
 
         private void SaveButton_Clicked(object sender, EventArgs e)
@@ -86,6 +87,7 @@ namespace Daybreak.Views
             currentConfig.DesiredGuildwarsScreen = int.Parse(this.DesiredScreen);
             currentConfig.ShortcutLocation = this.ShortcutFolder;
             currentConfig.PlaceShortcut = this.ShortcutPlaced;
+            currentConfig.AutoCheckUpdate = this.AutoCheckUpdate;
             this.configurationManager.SaveConfiguration(currentConfig);
             this.viewManager.ShowView<SettingsCategoryView>();
         }

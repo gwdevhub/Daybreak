@@ -86,15 +86,18 @@
                  HorizontalAlignment="Right" Margin="0, 0, 20, 30" FontSize="22" Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
                  Clicked="CreditTextBox_MouseLeftButtonDown" Cursor="Hand"></controls:OpaqueButton>
         <WrapPanel Grid.Row="1"  Margin="0, 0, 20, 10" VerticalAlignment="Bottom" HorizontalAlignment="Right">
-            <TextBox Grid.Row="1" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Opacity="0.6"
-                     Text="{Binding ElementName=_this, Path=CurrentVersionText, Mode=OneWay}" IsReadOnly="True" FontSize="10"
-                     Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"></TextBox>
-            <TextBox Grid.Row="1" Background="Transparent" Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" 
+            <controls:OpaqueButton Grid.Row="1" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Opacity="0.6"
+                     Text="{Binding ElementName=_this, Path=CurrentVersionText, Mode=OneWay}" FontSize="10"
+                     Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                     Clicked="VersionText_Clicked"></controls:OpaqueButton>
+            <controls:OpaqueButton Grid.Row="1" Background="Transparent" Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" 
                      Opacity="0.6" Text=" - " FontSize="10" BorderBrush="Transparent" BorderThickness="0"
-                     Visibility="{Binding ElementName=_this, Path=IsRunningAsAdmin, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"></TextBox>
-            <TextBox Grid.Row="1" Background="Transparent" Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" 
+                     Visibility="{Binding ElementName=_this, Path=IsRunningAsAdmin, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                     Clicked="VersionText_Clicked"></controls:OpaqueButton>
+            <controls:OpaqueButton Grid.Row="1" Background="Transparent" Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" 
                      Opacity="0.6" Text="[Admin]" FontSize="10" BorderBrush="Transparent" BorderThickness="0"
-                     Visibility="{Binding ElementName=_this, Path=IsRunningAsAdmin, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"></TextBox>
+                     Visibility="{Binding ElementName=_this, Path=IsRunningAsAdmin, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                     Clicked="VersionText_Clicked"></controls:OpaqueButton>
         </WrapPanel>
         <Grid x:Name="Container" Grid.Row="1">
         </Grid>
