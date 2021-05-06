@@ -42,6 +42,12 @@
                         <controls:FireballGlyph></controls:FireballGlyph>
                     </controls:TileButton.InnerContent>
                 </controls:TileButton>
+                <controls:TileButton Title="Version management" Foreground="White" BorderBrush="White" BorderThickness="2"
+                             HighlightColor="White" Clicked="VersionButton_Clicked" Height="150" Width="150">
+                    <controls:TileButton.InnerContent>
+                        <controls:StaticGlyph></controls:StaticGlyph>
+                    </controls:TileButton.InnerContent>
+                </controls:TileButton>
             </WrapPanel>
         </WrapPanel>
     </Grid>

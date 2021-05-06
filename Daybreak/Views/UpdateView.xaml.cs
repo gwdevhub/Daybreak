@@ -3,9 +3,11 @@ using Daybreak.Services.Logging;
 using Daybreak.Services.Updater;
 using Daybreak.Services.ViewManagement;
 using Daybreak.Utils;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
+using Version = Daybreak.Models.Versioning.Version;
 
 namespace Daybreak.Views
 {
@@ -56,8 +58,14 @@ namespace Daybreak.Views
 
         private async void UpdateView_Loaded(object sender, RoutedEventArgs e)
         {
+            if (this.DataContext is not Version version)
+            {
+                this.viewManager.ShowView<MainView>();
+                throw new InvalidOperationException("No version specified for download");
+            }
+
             this.logger.LogInformation("Starting update procedure");
-            var success = await applicationUpdater.DownloadUpdate(updateStatus).ConfigureAwait(true);
+            var success = await applicationUpdater.DownloadUpdate(version, updateStatus).ConfigureAwait(true);
             if (success is false)
             {
                 this.logger.LogError("Update procedure failed");
