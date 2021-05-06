@@ -5,7 +5,6 @@
 # This pipeline builds the Wpf project, runs unit tests, then saves the MSIX build artifact.
 name:  Daybreak CD Pipeline
 
-# Trigger on every master branch push and pull request
 on:
   push:
     branches:
@@ -26,7 +25,7 @@ jobs:
       Solution_Path: Daybreak.sln
       Test_Project_Path: Daybreak.Tests\Daybreak.Tests.csproj
       Wpf_Project_Path: Daybreak\Daybreal.csproj
-      Actions_Allow_Unsecure_Commands: true # Allows AddPAth and SetEnv commands
+      Actions_Allow_Unsecure_Commands: true
 
     steps:
     - name: Checkout
