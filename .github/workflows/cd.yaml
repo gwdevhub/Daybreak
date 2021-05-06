@@ -5,12 +5,8 @@
 # This pipeline builds the Wpf project, runs unit tests, then saves the MSIX build artifact.
 name:  Daybreak CD Pipeline
 
-# Trigger on every master branch push and pull request
 on:
   push:
-    branches:
-      - master
-  pull_request:
     branches:
       - master
       
@@ -29,73 +25,63 @@ jobs:
       Solution_Path: Daybreak.sln
       Test_Project_Path: Daybreak.Tests\Daybreak.Tests.csproj
       Wpf_Project_Path: Daybreak\Daybreal.csproj
-      Actions_Allow_Unsecure_Commands: true # Allows AddPAth and SetEnv commands
+      Actions_Allow_Unsecure_Commands: true
 
     steps:
     - name: Checkout
       uses: actions/checkout@v2
       with:
-        fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
+        fetch-depth: 0
 
     - name: Get Latest Tag
-      id: get_latest_tag
+      id: getLatestTag
       uses: WyriHaximus/github-action-get-previous-tag@v1
 
-
-    # Generate changelog
     - name: Generate changelog
       id: gen_changelog
       run: |
         $changeLog = git log --no-merges --pretty="%h - %s (%an)<br />" ${{ env.LatestReleaseTag }}..HEAD
         echo "::set-env name=Changelog::$changeLog"
       env:
-        LatestReleaseTag: ${{steps.get_latest_tag.outputs.tag}}
+        LatestReleaseTag: ${{steps.getLatestTag.outputs.tag}}
 
     - name: Print changelog
       run: |
         echo "${{ env.Changelog }}"
 
-    # Install the .NET Core workload
     - name: Install .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '5.0.202'
 
-    # Add  MsBuild to the PATH: https://github.com/microsoft/setup-msbuild
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v1.0.1
 
-    # Restore the application
-    - name:  Restore the Wpf application to populate the obj folder
+    - name:  Restore project
       run: msbuild $env:Solution_Path /t:Restore /p:Configuration=$env:Configuration /p:RuntimeIdentifier=$env:RuntimeIdentifier
       env:
         RuntimeIdentifier: win-${{ matrix.targetplatform }}
 
-    # Build Daybreak project
     - name: Build Daybreak project
       run: dotnet build Daybreak -c $env:Configuration
 
-    # Set release version environment variable
     - name: Set version variable
       run: |
         $version = .\Scripts\GetBuildVersion.ps1
         echo "::set-env name=Version::$version"
 
-    # Publish release
-    - name: Publish release
+    - name: Create publish files
       run: dotnet publish .\Daybreak\Daybreak.csproj -c $env:Configuration -r $env:RuntimeIdentifier -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained true -o .\Publish
       env:
         RuntimeIdentifier: win-${{ matrix.targetplatform }}
 
-    # Create release payload
-    - name: Create release payload
+    - name: Pack publish files
       run: |
         Write-Host $env
         .\Scripts\BuildRelease.ps1 -version $env:Version
       shell: pwsh
 
-    # Post new release to github
-    - name: Post release
+    - name: Publish release
       uses: Xotl/cool-github-releases@v1.1.2
       with:
         mode: update
