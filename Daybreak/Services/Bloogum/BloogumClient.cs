@@ -1,10 +1,10 @@
 ﻿using Daybreak.Services.Bloogum.Models;
+using Daybreak.Services.Http;
 using Daybreak.Services.Logging;
 using Daybreak.Utils;
 using System;
 using System.Extensions;
 using System.IO;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Daybreak.Services.Bloogum
@@ -12,15 +12,16 @@ namespace Daybreak.Services.Bloogum
     public sealed class BloogumClient : IBloogumClient
     {
         private const string BaseAddress = "http://bloogum.net/guildwars";
-        private readonly HttpClient httpClient;
+        private readonly IHttpClient<BloogumClient> httpClient;
         private readonly ILogger logger;
         private readonly Random random = new();
 
-        public BloogumClient(ILogger logger)
+        public BloogumClient(
+            ILogger logger,
+            IHttpClient<BloogumClient> httpClient)
         {
             this.logger = logger.ThrowIfNull(nameof(logger));
-
-            this.httpClient = new HttpClient();
+            this.httpClient = httpClient.ThrowIfNull(nameof(httpClient));
         }
 
         public async Task<Optional<Stream>> GetRandomScreenShot()

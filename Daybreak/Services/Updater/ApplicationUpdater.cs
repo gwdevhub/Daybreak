@@ -59,14 +59,15 @@ namespace Daybreak.Services.Updater
         private readonly ILogger logger;
         private readonly IViewManager viewManager;
         private readonly IRuntimeStore runtimeStore;
-        private readonly HttpClient httpClient = new();
+        private readonly IHttpClient<ApplicationUpdater> httpClient;
 
         public Version CurrentVersion { get; }
 
         public ApplicationUpdater(
             ILogger logger,
             IRuntimeStore runtimeStore,
-            IViewManager viewManager)
+            IViewManager viewManager,
+            IHttpClient<ApplicationUpdater> httpClient)
         {
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.runtimeStore = runtimeStore.ThrowIfNull(nameof(runtimeStore));
@@ -78,6 +79,8 @@ namespace Daybreak.Services.Updater
                 {
                     currentVersion = Version.Parse("v" + currentVersion);
                 }
+            this.httpClient = httpClient.ThrowIfNull(nameof(httpClient));
+        }
 
                 this.CurrentVersion = currentVersion;
             }

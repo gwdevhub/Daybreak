@@ -4,6 +4,7 @@ using Daybreak.Services.Bloogum;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Configuration;
 using Daybreak.Services.Credentials;
+using Daybreak.Services.Http;
 using Daybreak.Services.IconRetrieve;
 using Daybreak.Services.Logging;
 using Daybreak.Services.Mutex;
@@ -22,6 +23,13 @@ namespace Daybreak.Configuration
 {
     public static class ProjectConfiguration
     {
+        public static void RegisterFactories(IServiceManager serviceManager)
+        {
+            serviceManager.ThrowIfNull(nameof(serviceManager));
+
+            serviceManager.RegisterResolver(new HttpClientFactory());
+        }
+
         public static void RegisterServices(IServiceProducer serviceProducer)
         {
             serviceProducer.ThrowIfNull(nameof(serviceProducer));

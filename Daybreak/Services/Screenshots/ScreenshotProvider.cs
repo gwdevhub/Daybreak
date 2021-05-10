@@ -14,7 +14,7 @@ namespace Daybreak.Services.Screenshots
     {
         private const string ScreenshotsFolder = "Screenshots";
 
-        private readonly List<string> Screenshots = new List<string>();
+        private readonly List<string> Screenshots = new();
         private readonly ILogger logger;
         private int innerCount = 0;
 
