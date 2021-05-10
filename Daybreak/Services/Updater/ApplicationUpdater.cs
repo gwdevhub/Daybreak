@@ -72,6 +72,8 @@ namespace Daybreak.Services.Updater
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.runtimeStore = runtimeStore.ThrowIfNull(nameof(runtimeStore));
             this.logger = logger.ThrowIfNull(nameof(logger));
+            this.httpClient = httpClient.ThrowIfNull(nameof(httpClient));
+        }
             this.httpClient.DefaultRequestHeaders.Add("user-agent", "Daybreak Client");
             if (Version.TryParse(Assembly.GetExecutingAssembly().GetName().Version.ToString(), out var currentVersion))
             {
