@@ -1,6 +1,7 @@
 ﻿using Daybreak.Exceptions;
 using Daybreak.Models;
 using Daybreak.Models.Github;
+using Daybreak.Services.Http;
 using Daybreak.Services.Logging;
 using Daybreak.Services.Runtime;
 using Daybreak.Services.ViewManagement;
@@ -73,7 +74,6 @@ namespace Daybreak.Services.Updater
             this.runtimeStore = runtimeStore.ThrowIfNull(nameof(runtimeStore));
             this.logger = logger.ThrowIfNull(nameof(logger));
             this.httpClient = httpClient.ThrowIfNull(nameof(httpClient));
-        }
             this.httpClient.DefaultRequestHeaders.Add("user-agent", "Daybreak Client");
             if (Version.TryParse(Assembly.GetExecutingAssembly().GetName().Version.ToString(), out var currentVersion))
             {
@@ -81,8 +81,6 @@ namespace Daybreak.Services.Updater
                 {
                     currentVersion = Version.Parse("v" + currentVersion);
                 }
-            this.httpClient = httpClient.ThrowIfNull(nameof(httpClient));
-        }
 
                 this.CurrentVersion = currentVersion;
             }
