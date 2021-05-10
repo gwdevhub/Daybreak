@@ -30,6 +30,7 @@ namespace Daybreak.Launch
 
         protected override void RegisterServices(IServiceProducer serviceProducer)
         {
+            ProjectConfiguration.RegisterFactories(this.ServiceManager);
             ProjectConfiguration.RegisterServices(this.ServiceManager);
             ProjectConfiguration.RegisterLifetimeServices(this.ServiceManager.GetService<IApplicationLifetimeManager>());
             ProjectConfiguration.RegisterViews(this.ServiceManager.GetService<IViewManager>());

@@ -1,4 +1,5 @@
 ﻿using Daybreak.Models;
+using Daybreak.Services.Http;
 using Daybreak.Services.Logging;
 using Daybreak.Services.Runtime;
 using Daybreak.Services.ViewManagement;
@@ -54,18 +55,20 @@ namespace Daybreak.Services.Updater
         private readonly ILogger logger;
         private readonly IViewManager viewManager;
         private readonly IRuntimeStore runtimeStore;
-        private readonly HttpClient httpClient = new();
+        private readonly IHttpClient<ApplicationUpdater> httpClient;
 
         public string CurrentVersion => Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
         public ApplicationUpdater(
             ILogger logger,
             IRuntimeStore runtimeStore,
-            IViewManager viewManager)
+            IViewManager viewManager,
+            IHttpClient<ApplicationUpdater> httpClient)
         {
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.runtimeStore = runtimeStore.ThrowIfNull(nameof(runtimeStore));
             this.logger = logger.ThrowIfNull(nameof(logger));
+            this.httpClient = httpClient.ThrowIfNull(nameof(httpClient));
         }
 
         public async Task<bool> DownloadUpdate(UpdateStatus updateStatus)
