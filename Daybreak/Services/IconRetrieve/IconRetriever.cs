@@ -1,4 +1,5 @@
 ﻿using Daybreak.Models.Builds;
+using Daybreak.Services.Http;
 using Daybreak.Services.Logging;
 using Daybreak.Utils;
 using HtmlAgilityPack;
@@ -6,7 +7,6 @@ using System;
 using System.Extensions;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Daybreak.Services.IconRetrieve
@@ -17,13 +17,15 @@ namespace Daybreak.Services.IconRetrieve
         private const string BaseUrl = "https://wiki.guildwars.com";
         private const string QueryUrl = $"wiki/File:{NamePlaceholder}.jpg";
 
-        private readonly HttpClient httpClient = new();
+        private readonly IHttpClient<IconRetriever> httpClient;
         private readonly ILogger logger;
 
         public IconRetriever(
-            ILogger logger)
+            ILogger logger,
+            IHttpClient<IconRetriever> httpClient)
         {
             this.logger = logger.ThrowIfNull(nameof(logger));
+            this.httpClient = httpClient.ThrowIfNull(nameof(httpClient));
             this.httpClient.BaseAddress = new Uri(BaseUrl);
         }
 

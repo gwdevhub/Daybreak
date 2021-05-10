@@ -1,6 +1,7 @@
 ﻿using Daybreak.Exceptions;
 using Daybreak.Models;
 using Daybreak.Models.Github;
+using Daybreak.Services.Http;
 using Daybreak.Services.Logging;
 using Daybreak.Services.Runtime;
 using Daybreak.Services.ViewManagement;
@@ -59,18 +60,20 @@ namespace Daybreak.Services.Updater
         private readonly ILogger logger;
         private readonly IViewManager viewManager;
         private readonly IRuntimeStore runtimeStore;
-        private readonly HttpClient httpClient = new();
+        private readonly IHttpClient<ApplicationUpdater> httpClient;
 
         public Version CurrentVersion { get; }
 
         public ApplicationUpdater(
             ILogger logger,
             IRuntimeStore runtimeStore,
-            IViewManager viewManager)
+            IViewManager viewManager,
+            IHttpClient<ApplicationUpdater> httpClient)
         {
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.runtimeStore = runtimeStore.ThrowIfNull(nameof(runtimeStore));
             this.logger = logger.ThrowIfNull(nameof(logger));
+            this.httpClient = httpClient.ThrowIfNull(nameof(httpClient));
             this.httpClient.DefaultRequestHeaders.Add("user-agent", "Daybreak Client");
             if (Version.TryParse(Assembly.GetExecutingAssembly().GetName().Version.ToString(), out var currentVersion))
             {
