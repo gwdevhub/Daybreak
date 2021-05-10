@@ -12,7 +12,6 @@ namespace Daybreak.Services.Http
     public interface IHttpClient<TScope>
     {
         Uri BaseAddress { get; set; }
-        static IWebProxy DefaultProxy { get; set; }
         HttpRequestHeaders DefaultRequestHeaders { get; }
         Version DefaultRequestVersion { get; set; }
         HttpVersionPolicy DefaultVersionPolicy { get; set; }
@@ -24,7 +23,6 @@ namespace Daybreak.Services.Http
         Task<HttpResponseMessage> DeleteAsync(string requestUri, CancellationToken cancellationToken);
         Task<HttpResponseMessage> DeleteAsync(Uri requestUri);
         Task<HttpResponseMessage> DeleteAsync(Uri requestUri, CancellationToken cancellationToken);
-
         Task<HttpResponseMessage> GetAsync(string requestUri);
         Task<HttpResponseMessage> GetAsync(string requestUri, HttpCompletionOption completionOption);
         Task<HttpResponseMessage> GetAsync(string requestUri, HttpCompletionOption completionOption, CancellationToken cancellationToken);
