@@ -1,9 +1,8 @@
-﻿using Daybreak.Services.Logging;
-using Daybreak.Services.Privilege;
+﻿using Daybreak.Services.Privilege;
 using Daybreak.Services.Runtime;
 using Daybreak.Services.Updater;
 using Daybreak.Services.ViewManagement;
-using Daybreak.Utils;
+using Microsoft.Extensions.Logging;
 using System.Extensions;
 using System.Linq;
 using System.Windows.Controls;
@@ -17,14 +16,14 @@ namespace Daybreak.Views
     {
         private const string UpdateDesiredKey = "UpdateDesired";
 
-        private readonly ILogger logger;
+        private readonly ILogger<AskUpdateView> logger;
         private readonly IViewManager viewManager;
         private readonly IRuntimeStore runtimeStore;
         private readonly IPrivilegeManager privilegeManager;
         private readonly IApplicationUpdater applicationUpdater;
 
         public AskUpdateView(
-            ILogger logger,
+            ILogger<AskUpdateView> logger,
             IViewManager viewManager,
             IRuntimeStore runtimeStore,
             IPrivilegeManager privilegeManager,

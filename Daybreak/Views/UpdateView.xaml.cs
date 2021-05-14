@@ -1,8 +1,7 @@
 ﻿using Daybreak.Models;
-using Daybreak.Services.Logging;
 using Daybreak.Services.Updater;
 using Daybreak.Services.ViewManagement;
-using Daybreak.Utils;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,7 +17,7 @@ namespace Daybreak.Views
     [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
     public partial class UpdateView : UserControl
     {
-        private readonly ILogger logger;
+        private readonly ILogger<UpdateView> logger;
         private readonly IViewManager viewManager;
         private readonly IApplicationUpdater applicationUpdater;
         private readonly UpdateStatus updateStatus = new();
@@ -33,7 +32,7 @@ namespace Daybreak.Views
 
         public UpdateView(
             IApplicationUpdater applicationUpdater,
-            ILogger logger,
+            ILogger<UpdateView> logger,
             IViewManager viewManager)
         {
             this.applicationUpdater = applicationUpdater;

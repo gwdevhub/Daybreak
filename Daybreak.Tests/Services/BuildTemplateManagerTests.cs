@@ -1,7 +1,7 @@
 ﻿using Daybreak.Models.Builds;
 using Daybreak.Services.BuildTemplates;
-using Daybreak.Services.Logging;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Collections.Generic;
@@ -17,7 +17,7 @@ namespace Daybreak.Tests.Services
         [TestInitialize]
         public void Initialize()
         {
-            buildTemplateManager = new BuildTemplateManager(new Mock<ILogger>().Object);
+            buildTemplateManager = new BuildTemplateManager(new Mock<ILogger<BuildTemplateManager>>().Object);
         }
 
         [TestMethod]

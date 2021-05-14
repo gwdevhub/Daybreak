@@ -1,9 +1,8 @@
 ﻿using Daybreak.Services.Bloogum.Models;
-using Daybreak.Services.Http;
-using Daybreak.Services.Logging;
-using Daybreak.Utils;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Extensions;
+using System.Http;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -17,7 +16,7 @@ namespace Daybreak.Services.Bloogum
         private readonly Random random = new();
 
         public BloogumClient(
-            ILogger logger,
+            ILogger<BloogumClient> logger,
             IHttpClient<BloogumClient> httpClient)
         {
             this.logger = logger.ThrowIfNull(nameof(logger));
@@ -54,7 +53,7 @@ namespace Daybreak.Services.Bloogum
             }
             catch(Exception e)
             {
-                this.logger.LogError(e);
+                this.logger.LogError(e.ToString());
                 return Optional.None<Stream>();
             }
         }

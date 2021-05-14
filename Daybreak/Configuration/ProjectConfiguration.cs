@@ -4,9 +4,7 @@ using Daybreak.Services.Bloogum;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Configuration;
 using Daybreak.Services.Credentials;
-using Daybreak.Services.Http;
 using Daybreak.Services.IconRetrieve;
-using Daybreak.Services.Logging;
 using Daybreak.Services.Mutex;
 using Daybreak.Services.Privilege;
 using Daybreak.Services.Runtime;
@@ -23,20 +21,11 @@ namespace Daybreak.Configuration
 {
     public static class ProjectConfiguration
     {
-        public static void RegisterFactories(IServiceManager serviceManager)
-        {
-            serviceManager.ThrowIfNull(nameof(serviceManager));
-
-            serviceManager.RegisterResolver(new HttpClientFactory());
-        }
-
         public static void RegisterServices(IServiceProducer serviceProducer)
         {
             serviceProducer.ThrowIfNull(nameof(serviceProducer));
 
             serviceProducer.RegisterSingleton<ICredentialManager, CredentialManager>();
-            serviceProducer.RegisterSingleton<ILoggingDatabase, FlatLoggingDatabase>();
-            serviceProducer.RegisterSingleton<ILogger, Logger>();
             serviceProducer.RegisterSingleton<ApplicationLifetimeManager>();
             serviceProducer.RegisterSingleton<ViewManager>();
             serviceProducer.RegisterSingleton<IApplicationLauncher, ApplicationLauncher>();
@@ -56,7 +45,6 @@ namespace Daybreak.Configuration
         {
             applicationLifetimeProducer.ThrowIfNull(nameof(applicationLifetimeProducer));
 
-            applicationLifetimeProducer.RegisterService<ILoggingDatabase>();
             applicationLifetimeProducer.RegisterService<IScreenshotProvider>();
             applicationLifetimeProducer.RegisterService<IApplicationUpdater>();
             applicationLifetimeProducer.RegisterService<IShortcutManager>();

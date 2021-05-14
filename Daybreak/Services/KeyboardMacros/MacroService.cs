@@ -1,7 +1,7 @@
 ﻿using Daybreak.Models;
 using Daybreak.Services.Configuration;
 using Daybreak.Services.KeyboardHook;
-using Daybreak.Services.Logging;
+using Microsoft.Extensions.Logging;
 using Pepa.Wpf.Utilities;
 using System;
 using System.Collections.Generic;
@@ -16,7 +16,6 @@ namespace Daybreak.Services.KeyboardMacros
     public sealed class MacroService : IMacroService
     {
         private readonly CancellationTokenSource cancellationTokenSource = new();
-        private readonly ILogger logger;
         private readonly IKeyboardHookService keyboardHookService;
         private readonly IConfigurationManager configurationManager;
         private readonly HashSet<Keys> KeysDown = new();
@@ -26,11 +25,9 @@ namespace Daybreak.Services.KeyboardMacros
         private IntPtr gwWindowHwnd;
 
         public MacroService(
-            ILogger logger,
             IKeyboardHookService keyboardHookService,
             IConfigurationManager configurationManager)
         {
-            this.logger = logger.ThrowIfNull(nameof(logger));
             this.keyboardHookService = keyboardHookService.ThrowIfNull(nameof(keyboardHookService));
             this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
 
