@@ -1,10 +1,9 @@
 ﻿using Daybreak.Models.Builds;
-using Daybreak.Services.Http;
-using Daybreak.Services.Logging;
-using Daybreak.Utils;
 using HtmlAgilityPack;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Extensions;
+using System.Http;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,10 +17,10 @@ namespace Daybreak.Services.IconRetrieve
         private const string QueryUrl = $"wiki/File:{NamePlaceholder}.jpg";
 
         private readonly IHttpClient<IconRetriever> httpClient;
-        private readonly ILogger logger;
+        private readonly ILogger<IconRetriever> logger;
 
         public IconRetriever(
-            ILogger logger,
+            ILogger<IconRetriever> logger,
             IHttpClient<IconRetriever> httpClient)
         {
             this.logger = logger.ThrowIfNull(nameof(logger));

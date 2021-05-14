@@ -81,13 +81,13 @@ namespace Daybreak.Services.Bloogum.Models
                     new Category("stingraystrand", 15),
                     new Category("fishermenshaven", 4),
                     new Category("riversideprovince", 31),
-                    new Category("sanctumcay", 21)
+                    new Category("sanctumcay", 21),
+                    new Category("majestysrest", 14)
             });
         public static readonly Location MaguumaJungle = new(
             "maguuma",
             new List<Category>
             {
-                    new Category("majestysrest", 14),
                     new Category("druidsoverlook", 1),
                     new Category("sagelands", 27),
                     new Category("thewilds", 19),

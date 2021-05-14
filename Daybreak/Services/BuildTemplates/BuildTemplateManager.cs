@@ -1,7 +1,6 @@
 ﻿using Daybreak.Models.Builds;
 using Daybreak.Services.BuildTemplates.Models;
-using Daybreak.Services.Logging;
-using Daybreak.Utils;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Extensions;
@@ -16,10 +15,10 @@ namespace Daybreak.Services.BuildTemplates
         private const string DecodingLookupTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
         private readonly static string BuildsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Guild Wars\\Templates\\Skills";
 
-        private readonly ILogger logger;
+        private readonly ILogger<BuildTemplateManager> logger;
 
         public BuildTemplateManager(
-            ILogger logger)
+            ILogger<BuildTemplateManager> logger)
         {
             this.logger = logger.ThrowIfNull(nameof(logger));
         }
@@ -229,8 +228,10 @@ namespace Daybreak.Services.BuildTemplates
         {
             var curedTemplate = template.Trim();
 
-            var buildMetadata = new BuildMetadata();
-            buildMetadata.Base64Decoded = template.Select(c => DecodingLookupTable.IndexOf(c)).ToList();
+            var buildMetadata = new BuildMetadata
+            {
+                Base64Decoded = template.Select(c => DecodingLookupTable.IndexOf(c)).ToList(),
+            };
             buildMetadata.BinaryDecoded = buildMetadata.Base64Decoded.Select(b => ToBitString(b)).ToList();
 
             var stream = new DecodeCharStream(buildMetadata.BinaryDecoded.ToArray());

@@ -1,6 +1,5 @@
 ﻿using Daybreak.Models;
-using Daybreak.Services.Logging;
-using Daybreak.Utils;
+using Microsoft.Extensions.Logging;
 using Pepa.Wpf.Utilities;
 using System;
 using System.ComponentModel;
@@ -15,7 +14,7 @@ namespace Daybreak.Services.KeyboardHook
     // https://stackoverflow.com/questions/604410/global-keyboard-capture-in-c-sharp-application
     public sealed class KeyboardHookService : IKeyboardHookService, IDisposable
     {
-        private readonly ILogger logger;
+        private readonly ILogger<KeyboardHookService> logger;
         private IntPtr windowsHookHandle;
         private IntPtr user32LibraryHandle;
         private NativeMethods.HookProc hookProc;
@@ -23,7 +22,7 @@ namespace Daybreak.Services.KeyboardHook
         public event EventHandler<KeyboardHookEventArgs> KeyboardPressed;
 
         public KeyboardHookService(
-            ILogger logger)
+            ILogger<KeyboardHookService> logger)
         {
             this.logger = logger.ThrowIfNull(nameof(logger));
             this.Setup();

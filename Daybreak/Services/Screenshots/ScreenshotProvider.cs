@@ -1,5 +1,4 @@
-﻿using Daybreak.Services.Logging;
-using Daybreak.Utils;
+﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Extensions;
@@ -15,10 +14,10 @@ namespace Daybreak.Services.Screenshots
         private const string ScreenshotsFolder = "Screenshots";
 
         private readonly List<string> Screenshots = new();
-        private readonly ILogger logger;
+        private readonly ILogger<ScreenshotProvider> logger;
         private int innerCount = 0;
 
-        public ScreenshotProvider(ILogger logger)
+        public ScreenshotProvider(ILogger<ScreenshotProvider> logger)
         {
             this.logger = logger.ThrowIfNull(nameof(logger));
             if (Directory.Exists(ScreenshotsFolder) is false)

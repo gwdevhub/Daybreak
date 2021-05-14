@@ -1,6 +1,5 @@
 ﻿using Daybreak.Models;
-using Daybreak.Services.Logging;
-using Daybreak.Utils;
+using Microsoft.Extensions.Logging;
 using Pepa.Wpf.Utilities;
 using System;
 using System.Collections.Generic;
@@ -12,13 +11,13 @@ namespace Daybreak.Services.Screens
 {
     public sealed class ScreenManager : IScreenManager
     {
-        private readonly ILogger logger;
+        private readonly ILogger<ScreenManager> logger;
 
         public IEnumerable<Screen> Screens { get; } = WpfScreenHelper.Screen.AllScreens
             .Select((screen, index) => new Screen { Id = index, Size = screen.Bounds });
 
         public ScreenManager(
-            ILogger logger)
+            ILogger<ScreenManager> logger)
         {
             this.logger = logger.ThrowIfNull(nameof(logger));
         }

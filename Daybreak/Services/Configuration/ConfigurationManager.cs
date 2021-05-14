@@ -1,6 +1,6 @@
 ﻿using Daybreak.Configuration;
-using Daybreak.Services.Logging;
 using Daybreak.Utils;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Extensions;
 using System.IO;
@@ -12,11 +12,11 @@ namespace Daybreak.Services.Configuration
         private const string ConfigName = "Daybreak.config.json";
 
         private ApplicationConfiguration applicationConfiguration;
-        private readonly ILogger logger;
+        private readonly ILogger<ConfigurationManager> logger;
 
         public event EventHandler ConfigurationChanged;
 
-        public ConfigurationManager(ILogger logger)
+        public ConfigurationManager(ILogger<ConfigurationManager> logger)
         {
             this.logger = logger.ThrowIfNull(nameof(logger));
             try

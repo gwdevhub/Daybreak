@@ -1,17 +1,17 @@
 ﻿using Daybreak.Exceptions;
 using Daybreak.Models;
 using Daybreak.Models.Github;
-using Daybreak.Services.Http;
-using Daybreak.Services.Logging;
 using Daybreak.Services.Runtime;
 using Daybreak.Services.ViewManagement;
 using Daybreak.Utils;
 using Daybreak.Views;
+using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Extensions;
+using System.Http;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -57,7 +57,7 @@ namespace Daybreak.Services.Updater
         private const string RemovePs1 = $"Remove-item {ExtractAndRunPs1}";
 
         private readonly CancellationTokenSource updateCancellationTokenSource = new();
-        private readonly ILogger logger;
+        private readonly ILogger<ApplicationUpdater> logger;
         private readonly IViewManager viewManager;
         private readonly IRuntimeStore runtimeStore;
         private readonly IHttpClient<ApplicationUpdater> httpClient;
@@ -65,7 +65,7 @@ namespace Daybreak.Services.Updater
         public Version CurrentVersion { get; }
 
         public ApplicationUpdater(
-            ILogger logger,
+            ILogger<ApplicationUpdater> logger,
             IRuntimeStore runtimeStore,
             IViewManager viewManager,
             IHttpClient<ApplicationUpdater> httpClient)

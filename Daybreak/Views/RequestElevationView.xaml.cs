@@ -1,8 +1,7 @@
 ﻿using Daybreak.Models;
 using Daybreak.Services.ApplicationLauncher;
-using Daybreak.Services.Logging;
 using Daybreak.Services.ViewManagement;
-using Daybreak.Utils;
+using Microsoft.Extensions.Logging;
 using System.Extensions;
 using System.Windows.Controls;
 
@@ -15,12 +14,12 @@ namespace Daybreak.Views
     {
         private readonly IApplicationLauncher applicationLauncher;
         private readonly IViewManager viewManager;
-        private readonly ILogger logger;
+        private readonly ILogger<RequestElevationView> logger;
 
         public RequestElevationView(
             IApplicationLauncher applicationLauncher,
             IViewManager viewManager,
-            ILogger logger)
+            ILogger<RequestElevationView> logger)
         {
             this.applicationLauncher = applicationLauncher.ThrowIfNull(nameof(applicationLauncher));
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));

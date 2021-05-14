@@ -1,7 +1,6 @@
 ﻿using Daybreak.Models;
 using Daybreak.Services.Configuration;
-using Daybreak.Services.Logging;
-using Daybreak.Utils;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Extensions;
@@ -15,11 +14,11 @@ namespace Daybreak.Services.Credentials
     public sealed class CredentialManager : ICredentialManager
     {
         private static readonly byte[] Entropy = Convert.FromBase64String("R3VpbGR3YXJz");
-        private readonly ILogger logger;
+        private readonly ILogger<CredentialManager> logger;
         private readonly IConfigurationManager configurationManager;
 
         public CredentialManager(
-            ILogger logger,
+            ILogger<CredentialManager> logger,
             IConfigurationManager configurationManager)
         {
             this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));

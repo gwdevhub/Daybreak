@@ -1,19 +1,19 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Exceptions;
 using Daybreak.Services.ApplicationLifetime;
-using Daybreak.Services.Logging;
 using Daybreak.Services.ViewManagement;
 using Daybreak.Utils;
-using Microsoft.Web.WebView2.Core;
-using Microsoft.Web.WebView2.Wpf;
+using Microsoft.Extensions.Logging;
+using NReco.Logging.File;
 using Slim;
 using System;
-using System.IO;
+using System.Extensions;
 using System.Linq;
+using System.Net.Http;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Extensions;
+using System.Windows.Extensions.Http;
 
 namespace Daybreak.Launch
 {
@@ -28,9 +28,25 @@ namespace Daybreak.Launch
             return LaunchMainWindow();
         }
 
+        protected override ILoggerFactory SetupLoggerFactory()
+        {
+            var factory = new LoggerFactory();
+            factory.AddProvider(new FileLoggerProvider("Daybreak.db"));
+            return factory;
+        }
+        protected override void SetupServiceManager(IServiceManager serviceManager)
+        {
+            serviceManager.RegisterResolver(
+                new HttpClientResolver()
+                .WithHttpMessageHandlerFactory((serviceProvider, categoryType) =>
+                {
+                    var loggerType = typeof(ILogger<>).MakeGenericType(categoryType);
+                    var logger = serviceProvider.GetService(loggerType).As<ILogger>();
+                    return new LoggingHttpHandler(logger, new HttpClientHandler());
+                }));
+        }
         protected override void RegisterServices(IServiceProducer serviceProducer)
         {
-            ProjectConfiguration.RegisterFactories(this.ServiceManager);
             ProjectConfiguration.RegisterServices(this.ServiceManager);
             ProjectConfiguration.RegisterLifetimeServices(this.ServiceManager.GetService<IApplicationLifetimeManager>());
             ProjectConfiguration.RegisterViews(this.ServiceManager.GetService<IViewManager>());
@@ -42,9 +58,10 @@ namespace Daybreak.Launch
                 return false;
             }
 
-            this.ServiceManager.GetService<ILogger>().LogCritical(e);
+            this.ServiceManager.GetService<ILogger>().LogCritical(e, $"Unhandled exception");
             if (e is FatalException fatalException)
             {
+                this.ServiceManager.GetService<ILogger>().LogCritical(e, $"{nameof(FatalException)} encountered. Closing application.");
                 MessageBox.Show(fatalException.ToString());
                 return false;
             }

@@ -1,11 +1,10 @@
 ﻿using Daybreak.Exceptions;
 using Daybreak.Services.Configuration;
 using Daybreak.Services.Credentials;
-using Daybreak.Services.Logging;
 using Daybreak.Services.Mutex;
 using Daybreak.Services.Privilege;
-using Daybreak.Utils;
 using Daybreak.Views;
+using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using Pepa.Wpf.Utilities;
 using System;
@@ -33,7 +32,7 @@ namespace Daybreak.Services.ApplicationLauncher
         private readonly IConfigurationManager configurationManager;
         private readonly ICredentialManager credentialManager;
         private readonly IMutexHandler mutexHandler;
-        private readonly ILogger logger;
+        private readonly ILogger<ApplicationLauncher> logger;
         private readonly IPrivilegeManager privilegeManager;
 
         public bool IsTexmodRunning => TexModProcessDetected();
@@ -44,7 +43,7 @@ namespace Daybreak.Services.ApplicationLauncher
             IConfigurationManager configurationManager,
             ICredentialManager credentialManager,
             IMutexHandler mutexHandler,
-            ILogger logger,
+            ILogger<ApplicationLauncher> logger,
             IPrivilegeManager privilegeManager)
         {
             this.logger = logger.ThrowIfNull(nameof(logger));

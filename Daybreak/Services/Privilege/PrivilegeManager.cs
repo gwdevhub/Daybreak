@@ -1,8 +1,7 @@
 ﻿using Daybreak.Models;
-using Daybreak.Services.Logging;
 using Daybreak.Services.ViewManagement;
-using Daybreak.Utils;
 using Daybreak.Views;
+using Microsoft.Extensions.Logging;
 using System.Extensions;
 using System.Security.Principal;
 using System.Windows.Controls;
@@ -14,11 +13,11 @@ namespace Daybreak.Services.Privilege
         public bool AdminPrivileges => new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
 
         private readonly IViewManager viewManager;
-        private readonly ILogger logger;
+        private readonly ILogger<PrivilegeManager> logger;
 
         public PrivilegeManager(
             IViewManager viewManager,
-            ILogger logger)
+            ILogger<PrivilegeManager> logger)
         {
             this.logger = logger.ThrowIfNull(nameof(logger));
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));

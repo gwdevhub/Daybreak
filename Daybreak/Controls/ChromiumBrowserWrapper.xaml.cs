@@ -3,8 +3,8 @@ using Daybreak.Models.Browser;
 using Daybreak.Models.Builds;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Configuration;
-using Daybreak.Services.Logging;
 using Daybreak.Utils;
+using Microsoft.Extensions.Logging;
 using Microsoft.Web.WebView2.Core;
 using System;
 using System.Diagnostics;
@@ -30,7 +30,7 @@ namespace Daybreak.Controls
         public event EventHandler<Build> BuildDecoded;
 
         private readonly IConfigurationManager configurationManager;
-        private readonly ILogger logger;
+        private readonly ILogger<ChromiumBrowserWrapper> logger;
         private readonly IBuildTemplateManager buildTemplateManager;
         private CoreWebView2Environment coreWebView2Environment;
 
@@ -56,7 +56,7 @@ namespace Daybreak.Controls
         public ChromiumBrowserWrapper()
         {
             this.configurationManager = Launcher.ApplicationServiceManager.GetService<IConfigurationManager>();
-            this.logger = Launcher.ApplicationServiceManager.GetService<ILogger>();
+            this.logger = Launcher.ApplicationServiceManager.GetService<ILogger<ChromiumBrowserWrapper>>();
             this.buildTemplateManager = Launcher.ApplicationServiceManager.GetService<IBuildTemplateManager>();
             this.InitializeComponent();
             this.InitializeEnvironment();
@@ -174,7 +174,7 @@ namespace Daybreak.Controls
             }
             catch(Exception e)
             {
-                this.logger.LogError(e);
+                this.logger.LogError(e, $"Exception encountered when deserializing {nameof(BrowserPayload)}");
             }
             if (payload?.Key == BrowserPayload.PayloadKeys.ContextMenu)
             {
