@@ -5,6 +5,7 @@ using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Configuration;
 using Daybreak.Services.Credentials;
 using Daybreak.Services.IconRetrieve;
+using Daybreak.Services.Logging;
 using Daybreak.Services.Mutex;
 using Daybreak.Services.Privilege;
 using Daybreak.Services.Runtime;
@@ -14,13 +15,40 @@ using Daybreak.Services.Shortcuts;
 using Daybreak.Services.Updater;
 using Daybreak.Services.ViewManagement;
 using Daybreak.Views;
+using Microsoft.Extensions.Http.Logging;
+using Microsoft.Extensions.Logging;
 using Slim;
 using System.Extensions;
+using System.Net.Http;
+using System.Windows.Extensions.Http;
+using System.Windows.Extensions;
+using LiteDB;
 
 namespace Daybreak.Configuration
 {
     public static class ProjectConfiguration
     {
+        public static void RegisterResolvers(IServiceManager serviceManager)
+        {
+            serviceManager.ThrowIfNull(nameof(serviceManager));
+
+            serviceManager.RegisterLoggerFactory((sp) =>
+            {
+                var factory = new LoggerFactory();
+                factory.AddProvider(new JsonLoggerProvider(sp.GetService<ILogsManager>()));
+                return factory;
+            });
+            serviceManager.RegisterResolver(
+                new HttpClientResolver()
+                .WithHttpMessageHandlerFactory((serviceProvider, categoryType) =>
+                {
+                    var loggerType = typeof(ILogger<>).MakeGenericType(categoryType);
+                    var logger = serviceProvider.GetService(loggerType).As<ILogger>();
+                    var handler = new LoggingHttpMessageHandler(logger) { InnerHandler = new HttpClientHandler() };
+                    return handler;
+                }));
+        }
+
         public static void RegisterServices(IServiceProducer serviceProducer)
         {
             serviceProducer.ThrowIfNull(nameof(serviceProducer));
@@ -40,6 +68,8 @@ namespace Daybreak.Configuration
             serviceProducer.RegisterSingleton<IPrivilegeManager, PrivilegeManager>();
             serviceProducer.RegisterSingleton<IScreenManager, ScreenManager>();
             serviceProducer.RegisterSingleton<IShortcutManager, ShortcutManager>();
+            serviceProducer.RegisterSingleton<ILogsManager, JsonLogsManager>();
+            serviceProducer.RegisterSingleton<ILiteDatabase, LiteDatabase>(sp => new LiteDatabase("Daybreak.db"));
         }
         public static void RegisterLifetimeServices(IApplicationLifetimeProducer applicationLifetimeProducer)
         {
@@ -66,6 +96,7 @@ namespace Daybreak.Configuration
             viewProducer.RegisterView<RequestElevationView>();
             viewProducer.RegisterView<ScreenChoiceView>();
             viewProducer.RegisterView<VersionManagementView>();
+            viewProducer.RegisterView<LogsView>();
         }
     }
 }

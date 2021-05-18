@@ -43,6 +43,11 @@ namespace Daybreak.Views
             this.viewManager.ShowView<VersionManagementView>(this);
         }
 
+        private void LogsButton_Clicked(object sender, System.EventArgs e)
+        {
+            this.viewManager.ShowView<LogsView>();
+        }
+
         private void FileButton_Clicked(object sender, System.EventArgs e)
         {
             this.viewManager.ShowView<ExecutablesView>();
