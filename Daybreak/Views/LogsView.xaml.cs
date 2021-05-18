@@ -1,4 +1,4 @@
-﻿using Daybreak.Services.Logs;
+﻿using Daybreak.Services.Logging;
 using Daybreak.Services.ViewManagement;
 using System;
 using System.Collections.ObjectModel;

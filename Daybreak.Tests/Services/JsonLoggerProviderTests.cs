@@ -1,4 +1,4 @@
-﻿using Daybreak.Services.Logs;
+﻿using Daybreak.Services.Logging;
 using FluentAssertions;
 using LiteDB;
 using Microsoft.Extensions.Logging;

@@ -5,7 +5,7 @@ using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Configuration;
 using Daybreak.Services.Credentials;
 using Daybreak.Services.IconRetrieve;
-using Daybreak.Services.Logs;
+using Daybreak.Services.Logging;
 using Daybreak.Services.Mutex;
 using Daybreak.Services.Privilege;
 using Daybreak.Services.Runtime;
