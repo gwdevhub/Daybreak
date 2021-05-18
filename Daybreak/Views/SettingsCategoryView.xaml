@@ -48,6 +48,12 @@
                         <controls:StaticGlyph></controls:StaticGlyph>
                     </controls:TileButton.InnerContent>
                 </controls:TileButton>
+                <controls:TileButton Title="Logs" Foreground="White" BorderBrush="White" BorderThickness="2"
+                             HighlightColor="White" Clicked="LogsButton_Clicked" Height="150" Width="150">
+                    <controls:TileButton.InnerContent>
+                        <controls:LogsGlyph></controls:LogsGlyph>
+                    </controls:TileButton.InnerContent>
+                </controls:TileButton>
             </WrapPanel>
         </WrapPanel>
     </Grid>

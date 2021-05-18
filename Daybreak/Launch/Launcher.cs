@@ -2,18 +2,15 @@
 using Daybreak.Exceptions;
 using Daybreak.Services.ApplicationLifetime;
 using Daybreak.Services.ViewManagement;
-using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
-using NReco.Logging.File;
 using Slim;
 using System;
-using System.Extensions;
+using System.IO;
 using System.Linq;
-using System.Net.Http;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Extensions;
-using System.Windows.Extensions.Http;
 
 namespace Daybreak.Launch
 {
@@ -28,22 +25,9 @@ namespace Daybreak.Launch
             return LaunchMainWindow();
         }
 
-        protected override ILoggerFactory SetupLoggerFactory()
-        {
-            var factory = new LoggerFactory();
-            factory.AddProvider(new FileLoggerProvider("Daybreak.db"));
-            return factory;
-        }
         protected override void SetupServiceManager(IServiceManager serviceManager)
         {
-            serviceManager.RegisterResolver(
-                new HttpClientResolver()
-                .WithHttpMessageHandlerFactory((serviceProvider, categoryType) =>
-                {
-                    var loggerType = typeof(ILogger<>).MakeGenericType(categoryType);
-                    var logger = serviceProvider.GetService(loggerType).As<ILogger>();
-                    return new LoggingHttpHandler(logger, new HttpClientHandler());
-                }));
+            ProjectConfiguration.RegisterResolvers(serviceManager);
         }
         protected override void RegisterServices(IServiceProducer serviceProducer)
         {
@@ -63,6 +47,14 @@ namespace Daybreak.Launch
             {
                 this.ServiceManager.GetService<ILogger>().LogCritical(e, $"{nameof(FatalException)} encountered. Closing application.");
                 MessageBox.Show(fatalException.ToString());
+                File.WriteAllText("crash.log", e.ToString());
+                return false;
+            }
+            else if (e is TargetInvocationException targetInvocationException && e.InnerException is FatalException innerFatalException)
+            {
+                this.ServiceManager.GetService<ILogger>().LogCritical(e, $"{nameof(FatalException)} encountered. Closing application.");
+                MessageBox.Show(innerFatalException.ToString());
+                File.WriteAllText("crash.log", e.ToString());
                 return false;
             }
             else if (e is AggregateException aggregateException)
