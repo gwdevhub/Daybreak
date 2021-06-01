@@ -50,6 +50,7 @@
             </DataGrid.RowStyle>
             <DataGrid.Columns>
                 <DataGridTextColumn IsReadOnly="True" Header="DateTime" Binding="{Binding LogTime}" ElementStyle="{StaticResource WrapText}" Width="auto"/>
+                <DataGridTextColumn IsReadOnly="True" Header="CV" Binding="{Binding CorrelationVector}" ElementStyle="{StaticResource WrapText}" Width="auto"/>
                 <DataGridTextColumn IsReadOnly="True" Header="Category" Binding="{Binding Category}" ElementStyle="{StaticResource WrapText}" Width="auto"/>
                 <DataGridTextColumn IsReadOnly="True" Header="LogLevel" Binding="{Binding LogLevel}" ElementStyle="{StaticResource WrapText}" Width="auto"/>
                 <DataGridTextColumn IsReadOnly="True" Header="EventId" Binding="{Binding EventId}" ElementStyle="{StaticResource WrapText}" Width="auto"/>

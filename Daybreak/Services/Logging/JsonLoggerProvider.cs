@@ -20,7 +20,7 @@ namespace Daybreak.Services.Logging
         {
             if (this.correlationVector is not null)
             {
-                log.Message = $"[{this.correlationVector.Value}] {log.Message}";
+                log.CorrelationVector = this.correlationVector.Value.ToString();
                 this.correlationVector.Increment();
             }
 
