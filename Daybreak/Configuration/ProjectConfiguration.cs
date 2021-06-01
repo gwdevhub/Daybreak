@@ -21,8 +21,8 @@ using Slim;
 using System.Extensions;
 using System.Net.Http;
 using System.Windows.Extensions.Http;
-using System.Windows.Extensions;
 using LiteDB;
+using Daybreak.Controls;
 
 namespace Daybreak.Configuration
 {
@@ -32,12 +32,7 @@ namespace Daybreak.Configuration
         {
             serviceManager.ThrowIfNull(nameof(serviceManager));
 
-            serviceManager.RegisterLoggerFactory((sp) =>
-            {
-                var factory = new LoggerFactory();
-                factory.AddProvider(new JsonLoggerProvider(sp.GetService<ILogsManager>()));
-                return factory;
-            });
+            serviceManager.RegisterScoped<ILoggerFactory, CVLoggerFactory>((sp) => new CVLoggerFactory(sp.GetService<ILogsManager>()));
             serviceManager.RegisterResolver(
                 new HttpClientResolver()
                 .WithHttpMessageHandlerFactory((serviceProvider, categoryType) =>
@@ -53,23 +48,23 @@ namespace Daybreak.Configuration
         {
             serviceProducer.ThrowIfNull(nameof(serviceProducer));
 
-            serviceProducer.RegisterSingleton<ICredentialManager, CredentialManager>();
             serviceProducer.RegisterSingleton<ApplicationLifetimeManager>();
             serviceProducer.RegisterSingleton<ViewManager>();
-            serviceProducer.RegisterSingleton<IApplicationLauncher, ApplicationLauncher>();
-            serviceProducer.RegisterSingleton<IScreenshotProvider, ScreenshotProvider>();
             serviceProducer.RegisterSingleton<IConfigurationManager, ConfigurationManager>();
-            serviceProducer.RegisterSingleton<IBloogumClient, BloogumClient>();
-            serviceProducer.RegisterSingleton<IApplicationUpdater, ApplicationUpdater>();
-            serviceProducer.RegisterSingleton<IMutexHandler, MutexHandler>();
-            serviceProducer.RegisterSingleton<IRuntimeStore, RuntimeStore>();
-            serviceProducer.RegisterSingleton<IBuildTemplateManager, BuildTemplateManager>();
-            serviceProducer.RegisterSingleton<IIconRetriever, IconRetriever>();
-            serviceProducer.RegisterSingleton<IPrivilegeManager, PrivilegeManager>();
-            serviceProducer.RegisterSingleton<IScreenManager, ScreenManager>();
-            serviceProducer.RegisterSingleton<IShortcutManager, ShortcutManager>();
-            serviceProducer.RegisterSingleton<ILogsManager, JsonLogsManager>();
             serviceProducer.RegisterSingleton<ILiteDatabase, LiteDatabase>(sp => new LiteDatabase("Daybreak.db"));
+            serviceProducer.RegisterSingleton<IRuntimeStore, RuntimeStore>();
+            serviceProducer.RegisterSingleton<IMutexHandler, MutexHandler>();
+            serviceProducer.RegisterSingleton<IShortcutManager, ShortcutManager>();
+            serviceProducer.RegisterScoped<ICredentialManager, CredentialManager>();
+            serviceProducer.RegisterScoped<IApplicationLauncher, ApplicationLauncher>();
+            serviceProducer.RegisterScoped<IScreenshotProvider, ScreenshotProvider>();
+            serviceProducer.RegisterScoped<IBloogumClient, BloogumClient>();
+            serviceProducer.RegisterScoped<IApplicationUpdater, ApplicationUpdater>();
+            serviceProducer.RegisterScoped<IBuildTemplateManager, BuildTemplateManager>();
+            serviceProducer.RegisterScoped<IIconRetriever, IconRetriever>();
+            serviceProducer.RegisterScoped<IPrivilegeManager, PrivilegeManager>();
+            serviceProducer.RegisterScoped<IScreenManager, ScreenManager>();
+            serviceProducer.RegisterScoped<ILogsManager, JsonLogsManager>();
         }
         public static void RegisterLifetimeServices(IApplicationLifetimeProducer applicationLifetimeProducer)
         {

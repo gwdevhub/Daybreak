@@ -1,5 +1,4 @@
-﻿using Daybreak.Launch;
-using Daybreak.Models.Browser;
+﻿using Daybreak.Models.Browser;
 using Daybreak.Models.Builds;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Configuration;
@@ -29,9 +28,9 @@ namespace Daybreak.Controls
         public event EventHandler MaximizeClicked;
         public event EventHandler<Build> BuildDecoded;
 
-        private readonly IConfigurationManager configurationManager;
-        private readonly ILogger<ChromiumBrowserWrapper> logger;
-        private readonly IBuildTemplateManager buildTemplateManager;
+        private IConfigurationManager configurationManager;
+        private ILogger<ChromiumBrowserWrapper> logger;
+        private IBuildTemplateManager buildTemplateManager;
         private CoreWebView2Environment coreWebView2Environment;
 
         [GenerateDependencyProperty(InitialValue = true)]
@@ -40,7 +39,7 @@ namespace Daybreak.Controls
         private bool canNavigate;
         [GenerateDependencyProperty(InitialValue = true)]
         private bool controlsEnabled;
-        [GenerateDependencyProperty(InitialValue = true)]
+        [GenerateDependencyProperty]
         private bool browserSupported;
         [GenerateDependencyProperty]
         private bool addressBarReadonly;
@@ -55,12 +54,8 @@ namespace Daybreak.Controls
 
         public ChromiumBrowserWrapper()
         {
-            this.configurationManager = Launcher.ApplicationServiceManager.GetService<IConfigurationManager>();
-            this.logger = Launcher.ApplicationServiceManager.GetService<ILogger<ChromiumBrowserWrapper>>();
-            this.buildTemplateManager = Launcher.ApplicationServiceManager.GetService<IBuildTemplateManager>();
             this.InitializeComponent();
-            this.InitializeEnvironment();
-            this.InitializeBrowser();
+            this.WebBrowser.IsEnabled = false;
         }
 
         protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -70,6 +65,18 @@ namespace Daybreak.Controls
             {
                 this.CheckFavoriteAddress();
             }
+        }
+
+        public async void InitializeBrowser(
+            IConfigurationManager configurationManager,
+            IBuildTemplateManager buildTemplateManager,
+            ILogger<ChromiumBrowserWrapper> logger)
+        {
+            this.configurationManager = configurationManager;
+            this.buildTemplateManager = buildTemplateManager;
+            this.logger = logger;
+            this.InitializeEnvironment();
+            await this.InitializeBrowser();
         }
 
         public async void ReinitializeBrowser()
@@ -101,6 +108,7 @@ namespace Daybreak.Controls
         {
             if (this.BrowserSupported is true)
             {
+                this.WebBrowser.IsEnabled = true;
                 await this.WebBrowser.EnsureCoreWebView2Async(this.coreWebView2Environment);
                 this.AddressBarReadonly = this.configurationManager.GetConfiguration().AddressBarReadonly;
                 this.CanDownloadBuild = this.configurationManager.GetConfiguration().ExperimentalFeatures.DynamicBuildLoading;
