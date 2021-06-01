@@ -1,6 +1,10 @@
-﻿using Daybreak.Models.Builds;
+﻿using Daybreak.Controls;
+using Daybreak.Models.Builds;
 using Daybreak.Services.BuildTemplates;
+using Daybreak.Services.Configuration;
+using Daybreak.Services.IconRetrieve;
 using Daybreak.Services.ViewManagement;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Extensions;
 using System.Linq;
@@ -39,11 +43,15 @@ namespace Daybreak.Views
 
         public BuildTemplateView(
             IViewManager viewManager,
-            IBuildTemplateManager buildTemplateManager)
+            IBuildTemplateManager buildTemplateManager,
+            IIconRetriever iconRetriever,
+            IConfigurationManager configurationManager,
+            ILogger<ChromiumBrowserWrapper> logger)
         {
             this.buildTemplateManager = buildTemplateManager.ThrowIfNull(nameof(buildTemplateManager));
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.InitializeComponent();
+            this.BuildTemplate.InitializeTemplate(iconRetriever, configurationManager, buildTemplateManager, logger);
             this.DataContextChanged += (sender, contextArgs) =>
             {
                 if (contextArgs.NewValue is BuildEntry)

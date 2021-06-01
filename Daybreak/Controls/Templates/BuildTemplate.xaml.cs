@@ -1,4 +1,8 @@
 ﻿using Daybreak.Models.Builds;
+using Daybreak.Services.BuildTemplates;
+using Daybreak.Services.Configuration;
+using Daybreak.Services.IconRetrieve;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Extensions;
@@ -52,6 +56,23 @@ namespace Daybreak.Controls
             this.InitializeComponent();
             this.InitializeProperties();
             this.DataContextChanged += BuildTemplate_DataContextChanged;
+        }
+
+        public void InitializeTemplate(
+            IIconRetriever iconRetriever,
+            IConfigurationManager configurationManager,
+            IBuildTemplateManager buildTemplateManager,
+            ILogger<ChromiumBrowserWrapper> logger)
+        {
+            this.SkillBrowser.InitializeBrowser(configurationManager, buildTemplateManager, logger);
+            this.SkillTemplate0.InitializeSkillTemplate(iconRetriever);
+            this.SkillTemplate1.InitializeSkillTemplate(iconRetriever);
+            this.SkillTemplate2.InitializeSkillTemplate(iconRetriever);
+            this.SkillTemplate3.InitializeSkillTemplate(iconRetriever);
+            this.SkillTemplate4.InitializeSkillTemplate(iconRetriever);
+            this.SkillTemplate5.InitializeSkillTemplate(iconRetriever);
+            this.SkillTemplate6.InitializeSkillTemplate(iconRetriever);
+            this.SkillTemplate7.InitializeSkillTemplate(iconRetriever);
         }
 
         protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)

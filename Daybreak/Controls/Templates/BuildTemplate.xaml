@@ -95,42 +95,42 @@
                 <RowDefinition Height="*"></RowDefinition>
                 <RowDefinition Height="auto"></RowDefinition>
             </Grid.RowDefinitions>
-            <local:SkillTemplate Grid.Column="0"
+            <local:SkillTemplate Grid.Column="0" x:Name="SkillTemplate0"
                                  Foreground="White" Cursor="Hand"
                                  FontSize="22" DataContext="{Binding ElementName=_this, Path=Skill0, Mode=TwoWay}"
                                  VerticalAlignment="Stretch" Clicked="SkillTemplate_Clicked"
                                  RemoveClicked="SkillTemplate_RemoveClicked"></local:SkillTemplate>
-            <local:SkillTemplate Grid.Column="1"
+            <local:SkillTemplate Grid.Column="1" x:Name="SkillTemplate1"
                                  Foreground="White" Cursor="Hand"
                                  FontSize="22" DataContext="{Binding ElementName=_this, Path=Skill1, Mode=TwoWay}"
                                  VerticalAlignment="Stretch" Clicked="SkillTemplate_Clicked"
                                  RemoveClicked="SkillTemplate_RemoveClicked"></local:SkillTemplate>
-            <local:SkillTemplate Grid.Column="2"
+            <local:SkillTemplate Grid.Column="2" x:Name="SkillTemplate2"
                                  Foreground="White" Cursor="Hand"
                                  FontSize="22" DataContext="{Binding ElementName=_this, Path=Skill2, Mode=TwoWay}"
                                  VerticalAlignment="Stretch" Clicked="SkillTemplate_Clicked"
                                  RemoveClicked="SkillTemplate_RemoveClicked"></local:SkillTemplate>
-            <local:SkillTemplate Grid.Column="3"
+            <local:SkillTemplate Grid.Column="3" x:Name="SkillTemplate3"
                                  Foreground="White" Cursor="Hand"
                                  FontSize="22" DataContext="{Binding ElementName=_this, Path=Skill3, Mode=TwoWay}"
                                  VerticalAlignment="Stretch" Clicked="SkillTemplate_Clicked"
                                  RemoveClicked="SkillTemplate_RemoveClicked"></local:SkillTemplate>
-            <local:SkillTemplate Grid.Column="4"
+            <local:SkillTemplate Grid.Column="4" x:Name="SkillTemplate4"
                                  Foreground="White" Cursor="Hand"
                                  FontSize="22" DataContext="{Binding ElementName=_this, Path=Skill4, Mode=TwoWay}"
                                  VerticalAlignment="Stretch" Clicked="SkillTemplate_Clicked"
                                  RemoveClicked="SkillTemplate_RemoveClicked"></local:SkillTemplate>
-            <local:SkillTemplate Grid.Column="5"
+            <local:SkillTemplate Grid.Column="5" x:Name="SkillTemplate5"
                                  Foreground="White" Cursor="Hand"
                                  FontSize="22" DataContext="{Binding ElementName=_this, Path=Skill5, Mode=TwoWay}"
                                  VerticalAlignment="Stretch" Clicked="SkillTemplate_Clicked"
                                  RemoveClicked="SkillTemplate_RemoveClicked"></local:SkillTemplate>
-            <local:SkillTemplate Grid.Column="6"
+            <local:SkillTemplate Grid.Column="6" x:Name="SkillTemplate6"
                                  Foreground="White" Cursor="Hand"
                                  FontSize="22" DataContext="{Binding ElementName=_this, Path=Skill6, Mode=TwoWay}"
                                  VerticalAlignment="Stretch" Clicked="SkillTemplate_Clicked"
                                  RemoveClicked="SkillTemplate_RemoveClicked"></local:SkillTemplate>
-            <local:SkillTemplate Grid.Column="7"
+            <local:SkillTemplate Grid.Column="7" x:Name="SkillTemplate7"
                                  Foreground="White" Cursor="Hand"
                                  FontSize="22" DataContext="{Binding ElementName=_this, Path=Skill7, Mode=TwoWay}"
                                  VerticalAlignment="Stretch" Clicked="SkillTemplate_Clicked"

@@ -1,9 +1,12 @@
-﻿using Daybreak.Exceptions;
+﻿using Daybreak.Controls;
+using Daybreak.Exceptions;
 using Daybreak.Models.Builds;
 using Daybreak.Services.ApplicationLauncher;
+using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Configuration;
 using Daybreak.Services.Screens;
 using Daybreak.Services.ViewManagement;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Extensions;
 using System.Linq;
@@ -26,6 +29,8 @@ namespace Daybreak.Views
         private readonly IViewManager viewManager;
         private readonly IConfigurationManager configurationManager;
         private readonly IScreenManager screenManager;
+        private readonly IBuildTemplateManager buildTemplateManager;
+        private readonly ILogger<ChromiumBrowserWrapper> browserLogger;
         private readonly CancellationTokenSource cancellationTokenSource = new();
 
         private bool leftBrowserMaximized = false;
@@ -54,15 +59,26 @@ namespace Daybreak.Views
             IApplicationLauncher applicationDetector,
             IViewManager viewManager,
             IConfigurationManager configurationManager,
-            IScreenManager screenManager)
+            IScreenManager screenManager,
+            IBuildTemplateManager buildTemplateManager,
+            ILogger<ChromiumBrowserWrapper> browserLogger)
         {
+            this.browserLogger = browserLogger;
+            this.buildTemplateManager = buildTemplateManager.ThrowIfNull(nameof(buildTemplateManager));
             this.screenManager = screenManager.ThrowIfNull(nameof(screenManager));
             this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
             this.applicationDetector = applicationDetector.ThrowIfNull(nameof(applicationDetector));
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.InitializeComponent();
             this.PeriodicallyCheckGameState();
+            this.InitializeBrowsers();
             this.NavigateToDefaults();
+        }
+
+        private void InitializeBrowsers()
+        {
+            this.LeftWebBrowser.InitializeBrowser(this.configurationManager, this.buildTemplateManager, this.browserLogger);
+            this.RightWebBrowser.InitializeBrowser(this.configurationManager, this.buildTemplateManager, this.browserLogger);
         }
 
         private void NavigateToDefaults()

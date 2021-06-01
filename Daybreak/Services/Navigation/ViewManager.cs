@@ -1,4 +1,6 @@
-﻿using Slim;
+﻿using Daybreak.Models;
+using Microsoft.CorrelationVector;
+using Slim;
 using System;
 using System.Extensions;
 using System.Windows;
@@ -53,9 +55,11 @@ namespace Daybreak.Services.ViewManagement
 
         private void ShowViewInner(Type viewType, object dataContext)
         {
+            var scopedManager = this.serviceManager.CreateScope();
+            scopedManager.As<IServiceManager>().RegisterScoped<ScopeMetadata, ScopeMetadata>((sp) => new ScopeMetadata(new CorrelationVector()));
             Application.Current.Dispatcher.Invoke(() =>
             {
-                var view = this.serviceManager.GetService(viewType).As<UserControl>();
+                var view = scopedManager.GetService(viewType).As<UserControl>();
                 this.container.Children.Clear();
                 this.container.Children.Add(view);
                 view.DataContext = dataContext;

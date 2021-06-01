@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.31005.135
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Daybreak", "Daybreak\Daybreak.csproj", "{AA45C2B1-8BD0-466C-9271-699F168905AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daybreak.Tests", "Daybreak.Tests\Daybreak.Tests.csproj", "{C911C1C2-6566-419C-89C7-F802EB3FE709}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Daybreak.Tests", "Daybreak.Tests\Daybreak.Tests.csproj", "{C911C1C2-6566-419C-89C7-F802EB3FE709}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,12 +17,12 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{AA45C2B1-8BD0-466C-9271-699F168905AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AA45C2B1-8BD0-466C-9271-699F168905AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AA45C2B1-8BD0-466C-9271-699F168905AF}.Debug|x64.ActiveCfg = Debug|x64
-		{AA45C2B1-8BD0-466C-9271-699F168905AF}.Debug|x64.Build.0 = Debug|x64
+		{AA45C2B1-8BD0-466C-9271-699F168905AF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AA45C2B1-8BD0-466C-9271-699F168905AF}.Debug|x64.Build.0 = Debug|Any CPU
 		{AA45C2B1-8BD0-466C-9271-699F168905AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AA45C2B1-8BD0-466C-9271-699F168905AF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AA45C2B1-8BD0-466C-9271-699F168905AF}.Release|x64.ActiveCfg = Release|x64
-		{AA45C2B1-8BD0-466C-9271-699F168905AF}.Release|x64.Build.0 = Release|x64
+		{AA45C2B1-8BD0-466C-9271-699F168905AF}.Release|x64.ActiveCfg = Release|Any CPU
+		{AA45C2B1-8BD0-466C-9271-699F168905AF}.Release|x64.Build.0 = Release|Any CPU
 		{C911C1C2-6566-419C-89C7-F802EB3FE709}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C911C1C2-6566-419C-89C7-F802EB3FE709}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C911C1C2-6566-419C-89C7-F802EB3FE709}.Debug|x64.ActiveCfg = Debug|Any CPU

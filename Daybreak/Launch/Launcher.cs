@@ -27,11 +27,13 @@ namespace Daybreak.Launch
 
         protected override void SetupServiceManager(IServiceManager serviceManager)
         {
+            ApplicationServiceManager = this.ServiceManager;
             ProjectConfiguration.RegisterResolvers(serviceManager);
         }
         protected override void RegisterServices(IServiceProducer serviceProducer)
         {
             ProjectConfiguration.RegisterServices(this.ServiceManager);
+            ServiceManager.BuildSingletons();
             ProjectConfiguration.RegisterLifetimeServices(this.ServiceManager.GetService<IApplicationLifetimeManager>());
             ProjectConfiguration.RegisterViews(this.ServiceManager.GetService<IViewManager>());
         }
@@ -75,7 +77,6 @@ namespace Daybreak.Launch
         }
         protected override void ApplicationStarting()
         {
-            ApplicationServiceManager = this.ServiceManager;
             this.ServiceManager.GetService<IApplicationLifetimeManager>().OnStartup();
             this.RegisterViewContainer();
         }

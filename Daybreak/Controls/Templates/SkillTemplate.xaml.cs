@@ -23,7 +23,7 @@ namespace Daybreak.Controls
         public event EventHandler<RoutedEventArgs> Clicked;
         public event EventHandler RemoveClicked;
 
-        private readonly IIconRetriever iconRetriever;
+        private IIconRetriever iconRetriever;
 
         [GenerateDependencyProperty]
         private ImageSource imageSource;
@@ -32,9 +32,13 @@ namespace Daybreak.Controls
 
         public SkillTemplate()
         {
-            this.iconRetriever = Launcher.ApplicationServiceManager.GetService<IIconRetriever>();
             this.InitializeComponent();
             this.DataContextChanged += SkillTemplate_DataContextChanged;
+        }
+
+        public void InitializeSkillTemplate(IIconRetriever iconRetriever)
+        {
+            this.iconRetriever = iconRetriever;
         }
 
         private void SkillTemplate_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -43,11 +47,11 @@ namespace Daybreak.Controls
             {
                 if (skill != Skill.NoSkill)
                 {
-                    Task.Run(() => GetImageStream(skill)).ContinueWith((previousTask) =>
+                    Task.Run(() => this.GetImageStream(skill)).ContinueWith((previousTask) =>
                     {
                         this.Dispatcher.Invoke(() =>
                         {
-                            this.ImageSource = GetImageSource(previousTask.Result);
+                            this.ImageSource = this.GetImageSource(previousTask.Result);
                         });
                     });
                 }
@@ -88,6 +92,11 @@ namespace Daybreak.Controls
         }
         private async Task<Stream> GetImageStream(Skill skill)
         {
+            if (this.iconRetriever is null)
+            {
+                return null;
+            }
+
             var maybeStream = await this.iconRetriever.GetIcon(skill);
             return maybeStream.ExtractValue();
         }
