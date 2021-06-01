@@ -16,5 +16,7 @@ namespace Daybreak.Models
         public LogLevel LogLevel { get; set; }
         [JsonProperty("Message")]
         public string Message { get; set; }
+        [JsonProperty("CorrelationVector")]
+        public string CorrelationVector { get; set; }
     }
 }
