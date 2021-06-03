@@ -12,6 +12,7 @@
     <Grid Background="#A0202020">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid HorizontalAlignment="Stretch">
@@ -35,7 +36,17 @@
             <controls:SaveButton Foreground="White" Height="30" Width="30" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5"
                              Clicked="SaveButton_Clicked" Grid.Column="2" IsEnabled="{Binding ElementName=_this, Path=SaveButtonEnabled, Mode=OneWay}"></controls:SaveButton>
         </Grid>
-        <controls:BuildTemplate x:Name="BuildTemplate" Grid.Row="1" DataContext="{Binding ElementName=_this, Path=CurrentBuild, Mode=OneWay}">
+        <Grid Grid.Row="1" Margin="10, 0, 10, 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Code: " Foreground="White" Background="Transparent" FontSize="16"></TextBlock>
+            <TextBox Grid.Column="1" Foreground="White" Background="Transparent" FontSize="16"
+                     Text="{Binding ElementName=_this, Path=CurrentBuildCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     KeyDown="BuildCodeTextBox_KeyDown"></TextBox>
+        </Grid>
+        <controls:BuildTemplate x:Name="BuildTemplate" Grid.Row="2" DataContext="{Binding ElementName=_this, Path=CurrentBuild, Mode=OneWay}">
         </controls:BuildTemplate>
     </Grid>
 </UserControl>

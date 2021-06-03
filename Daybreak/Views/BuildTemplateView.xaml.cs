@@ -11,6 +11,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
+using System.Windows.Input;
 
 namespace Daybreak.Views
 {
@@ -21,51 +22,67 @@ namespace Daybreak.Views
     {
         private const string DisallowedChars = "\r\n\\/.";
 
-        public readonly static DependencyProperty CurrentBuildProperty =
-            DependencyPropertyExtensions.Register<BuildTemplateView, BuildEntry>(nameof(CurrentBuild));
-        public readonly static DependencyProperty SaveButtonEnabledProperty =
-            DependencyPropertyExtensions.Register<BuildTemplateView, bool>(nameof(SaveButtonEnabled), new PropertyMetadata(false));
-
         private readonly IViewManager viewManager;
         private readonly IBuildTemplateManager buildTemplateManager;
+        private readonly ILogger<BuildTemplateView> logger;
 
-        public bool SaveButtonEnabled
-        {
-            get => this.GetTypedValue<bool>(SaveButtonEnabledProperty);
-            set => this.SetValue(SaveButtonEnabledProperty, value);
-        }
-
-        public BuildEntry CurrentBuild
-        {
-            get => this.GetTypedValue<BuildEntry>(CurrentBuildProperty);
-            set => this.SetValue(CurrentBuildProperty, value);
-        }
+        [GenerateDependencyProperty(InitialValue = false)]
+        private bool saveButtonEnabled;
+        [GenerateDependencyProperty]
+        private BuildEntry currentBuild;
+        [GenerateDependencyProperty]
+        private string currentBuildCode;
 
         public BuildTemplateView(
             IViewManager viewManager,
             IBuildTemplateManager buildTemplateManager,
             IIconRetriever iconRetriever,
             IConfigurationManager configurationManager,
-            ILogger<ChromiumBrowserWrapper> logger)
+            ILogger<ChromiumBrowserWrapper> chromiumLogger,
+            ILogger<BuildTemplateView> logger)
         {
             this.buildTemplateManager = buildTemplateManager.ThrowIfNull(nameof(buildTemplateManager));
+            this.logger = logger.ThrowIfNull(nameof(logger));
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.InitializeComponent();
-            this.BuildTemplate.InitializeTemplate(iconRetriever, configurationManager, buildTemplateManager, logger);
+            this.BuildTemplate.InitializeTemplate(iconRetriever, configurationManager, buildTemplateManager, chromiumLogger);
             this.DataContextChanged += (sender, contextArgs) =>
             {
                 if (contextArgs.NewValue is BuildEntry)
                 {
+                    this.logger.LogInformation("Received data context. Setting current build");
                     this.CurrentBuild = contextArgs.NewValue.As<BuildEntry>();
+                    this.CurrentBuildCode = this.buildTemplateManager.EncodeTemplate(this.CurrentBuild.Build);
                 }
             };
         }
 
+        private void BuildCodeTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                this.logger.LogInformation($"Attempting to decode provided template {sender.As<TextBox>().Text}");
+                try
+                {
+                    this.CurrentBuild = new BuildEntry
+                    {
+                        Name = this.CurrentBuild.Name,
+                        PreviousName = this.CurrentBuild.PreviousName,
+                        Build = this.buildTemplateManager.DecodeTemplate(sender.As<TextBox>().Text)
+                    };
+
+                    this.logger.LogInformation($"Template {sender.As<TextBox>().Text} decoded");
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException($"Failed to decode template {sender.As<TextBox>().Text}", ex);
+                }
+            }
+        }
         private void BackButton_Clicked(object sender, EventArgs e)
         {
             this.viewManager.ShowView<BuildsListView>();
         }
-
         private void SaveButton_Clicked(object sender, EventArgs e)
         {
             this.buildTemplateManager.SaveBuild(this.CurrentBuild);
@@ -79,7 +96,6 @@ namespace Daybreak.Views
                 e.Handled = true;
             }
         }
-
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(sender.As<TextBox>().Text))
