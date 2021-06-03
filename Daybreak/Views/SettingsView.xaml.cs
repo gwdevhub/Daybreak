@@ -45,6 +45,8 @@ namespace Daybreak.Views
         private bool shortcutPlaced;
         [GenerateDependencyProperty]
         private bool autoCheckUpdate;
+        [GenerateDependencyProperty]
+        private bool keepLocalIconCache;
 
         public SettingsView(
             IConfigurationManager configurationManager,
@@ -71,6 +73,7 @@ namespace Daybreak.Views
             this.ShortcutFolder = config.ShortcutLocation;
             this.ShortcutPlaced = config.PlaceShortcut;
             this.AutoCheckUpdate = config.AutoCheckUpdate;
+            this.KeepLocalIconCache = config.KeepLocalIconCache;
         }
 
         private void SaveButton_Clicked(object sender, EventArgs e)
@@ -88,6 +91,7 @@ namespace Daybreak.Views
             currentConfig.ShortcutLocation = this.ShortcutFolder;
             currentConfig.PlaceShortcut = this.ShortcutPlaced;
             currentConfig.AutoCheckUpdate = this.AutoCheckUpdate;
+            currentConfig.KeepLocalIconCache = this.KeepLocalIconCache;
             this.configurationManager.SaveConfiguration(currentConfig);
             this.viewManager.ShowView<SettingsCategoryView>();
         }

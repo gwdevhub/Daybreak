@@ -94,6 +94,7 @@
                 <TextBlock Text="Desired screen id: " FontSize="22" Foreground="White" Height="30"></TextBlock>
                 <TextBlock Text="Place Shortcut: " FontSize="22" Foreground="White" Height="30"></TextBlock>
                 <TextBlock Text="Shortcut folder: " FontSize="22" Foreground="White" Height="30"></TextBlock>
+                <TextBlock Text="Keep local cache of icons: " FontSize="22" Foreground="White" Height="30"></TextBlock>
             </StackPanel>
             <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="1">
                 <ToggleButton HorizontalAlignment="Center" HorizontalContentAlignment="Stretch" Style="{StaticResource AnimatedSwitch}" Height="30" Width="40"
@@ -148,6 +149,8 @@
                                       Foreground="White" BorderBrush="Gray" BorderThickness="0"
                                       Clicked="ShortcutFolderPickerGlyph_Clicked"></controls:FilePickerGlyph>
                 </Grid>
+                <ToggleButton HorizontalAlignment="Center" HorizontalContentAlignment="Stretch" Style="{StaticResource AnimatedSwitch}" Height="30" Width="40"
+                            FontSize="22" Foreground="White" IsChecked="{Binding ElementName=_this, Path=KeepLocalIconCache, Mode=TwoWay}"></ToggleButton>
             </StackPanel>
         </Grid>
     </ScrollViewer>
