@@ -1,11 +1,11 @@
-﻿using Daybreak.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using WpfExtended.Logging;
+using WpfExtended.Models;
 
 namespace Daybreak.Services.Logging
 {
-    public interface ILogsManager
+    public interface ILogsManager : ILogsWriter
     {
-        void WriteLog(Log log);
         IEnumerable<Log> GetLogs();
         int DeleteLogs();
     }

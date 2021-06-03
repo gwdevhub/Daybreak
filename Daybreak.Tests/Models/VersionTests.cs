@@ -10,6 +10,8 @@ namespace Daybreak.Tests.Models
     [TestClass]
     public class VersionTests
     {
+        [DataRow("v0.1.0.0.1", "v0.1.0.0.1")]
+        [DataRow("v0.1.0.0.1.0.0.0.0", "v0.1.0.0.1")]
         [DataRow("v0.1.0", "v0.1")]
         [DataRow("0.1.0", "0.1")]
         [DataRow("v0.1.0.0.0", "v0.1")]

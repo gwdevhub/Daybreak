@@ -68,6 +68,10 @@ namespace Daybreak.Models.Versioning
                 {
                     parts.RemoveAt(i);
                 }
+                else
+                {
+                    break;
+                }
             }
 
             parsedVersion = new Version

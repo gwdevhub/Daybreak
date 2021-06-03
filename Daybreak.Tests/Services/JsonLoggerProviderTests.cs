@@ -4,6 +4,7 @@ using LiteDB;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
+using WpfExtended.Logging;
 
 namespace Daybreak.Tests.Services
 {
@@ -20,7 +21,7 @@ namespace Daybreak.Tests.Services
             File.Delete("Daybreak.db");
             this.liteDatabase = new LiteDatabase("Daybreak.db");
             this.logsManager = new JsonLogsManager(this.liteDatabase);
-            this.loggerProvider = new JsonLoggerProvider(this.logsManager);
+            this.loggerProvider = new CVLoggerProvider(this.logsManager);
         }
 
         [TestCleanup]

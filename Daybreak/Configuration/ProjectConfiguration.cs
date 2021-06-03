@@ -22,7 +22,7 @@ using System.Extensions;
 using System.Net.Http;
 using System.Windows.Extensions.Http;
 using LiteDB;
-using Daybreak.Controls;
+using System.Windows.Extensions;
 
 namespace Daybreak.Configuration
 {
@@ -32,7 +32,6 @@ namespace Daybreak.Configuration
         {
             serviceManager.ThrowIfNull(nameof(serviceManager));
 
-            serviceManager.RegisterScoped<ILoggerFactory, CVLoggerFactory>((sp) => new CVLoggerFactory(sp.GetService<ILogsManager>()));
             serviceManager.RegisterResolver(
                 new HttpClientResolver()
                 .WithHttpMessageHandlerFactory((serviceProvider, categoryType) =>
@@ -64,7 +63,7 @@ namespace Daybreak.Configuration
             serviceProducer.RegisterScoped<IIconRetriever, IconRetriever>();
             serviceProducer.RegisterScoped<IPrivilegeManager, PrivilegeManager>();
             serviceProducer.RegisterScoped<IScreenManager, ScreenManager>();
-            serviceProducer.RegisterScoped<ILogsManager, JsonLogsManager>();
+            serviceProducer.RegisterLogWriter<ILogsManager, JsonLogsManager>();
         }
         public static void RegisterLifetimeServices(IApplicationLifetimeProducer applicationLifetimeProducer)
         {

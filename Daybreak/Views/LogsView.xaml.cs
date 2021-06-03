@@ -4,7 +4,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Extensions;
 using System.Windows.Controls;
-using Daybreak.Models;
+using WpfExtended.Models;
 
 namespace Daybreak.Views
 {
