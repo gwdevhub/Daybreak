@@ -75,7 +75,7 @@
                      HorizontalContentAlignment="Stretch" BorderThickness="0">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <local:AttributeTemplate HelpClicked="AttributeTemplate_HelpClicked"></local:AttributeTemplate>
+                        <local:AttributeTemplate HelpClicked="AttributeTemplate_HelpClicked" AttributeChanged="AttributeTemplate_AttributeChanged"></local:AttributeTemplate>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>

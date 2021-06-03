@@ -43,10 +43,10 @@
             </Grid.ColumnDefinitions>
             <TextBlock Text="Code: " Foreground="White" Background="Transparent" FontSize="16"></TextBlock>
             <TextBox Grid.Column="1" Foreground="White" Background="Transparent" FontSize="16"
-                     Text="{Binding ElementName=_this, Path=CurrentBuildCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                     KeyDown="BuildCodeTextBox_KeyDown"></TextBox>
+                     Text="{Binding ElementName=_this, Path=CurrentBuildCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
         </Grid>
-        <controls:BuildTemplate x:Name="BuildTemplate" Grid.Row="2" DataContext="{Binding ElementName=_this, Path=CurrentBuild, Mode=OneWay}">
+        <controls:BuildTemplate x:Name="BuildTemplate" Grid.Row="2" DataContext="{Binding ElementName=_this, Path=CurrentBuild, Mode=OneWay}"
+                                BuildChanged="BuildTemplate_BuildChanged">
         </controls:BuildTemplate>
     </Grid>
 </UserControl>
