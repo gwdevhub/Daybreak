@@ -1,4 +1,5 @@
 ﻿using Daybreak.Models.Builds;
+using Daybreak.Services.Configuration;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 using System;
@@ -15,20 +16,48 @@ namespace Daybreak.Services.IconRetrieve
         private const string NamePlaceholder = "[SKILLNAME]";
         private const string BaseUrl = "https://wiki.guildwars.com";
         private const string QueryUrl = $"wiki/File:{NamePlaceholder}.jpg";
+        private const string IconsDirectoryName = "Icons";
+        private const string IconsLocation = $"{IconsDirectoryName}/{NamePlaceholder}.jpg";
 
         private readonly IHttpClient<IconRetriever> httpClient;
         private readonly ILogger<IconRetriever> logger;
+        private readonly IConfigurationManager configurationManager;
 
         public IconRetriever(
             ILogger<IconRetriever> logger,
-            IHttpClient<IconRetriever> httpClient)
+            IHttpClient<IconRetriever> httpClient,
+            IConfigurationManager configurationManager)
         {
             this.logger = logger.ThrowIfNull(nameof(logger));
             this.httpClient = httpClient.ThrowIfNull(nameof(httpClient));
+            this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
             this.httpClient.BaseAddress = new Uri(BaseUrl);
+            if (Directory.Exists(IconsDirectoryName) is false)
+            {
+                Directory.CreateDirectory(IconsDirectoryName);
+            }
         }
 
         public async Task<Optional<Stream>> GetIcon(Skill skill)
+        {
+            if (this.configurationManager.GetConfiguration().KeepLocalIconCache)
+            {
+                this.logger.LogInformation($"{nameof(IconRetriever)} configured to look first in cache before downloading icons");
+                var maybeIcon = await this.GetLocalIcon(skill);
+                if (maybeIcon.ExtractValue() is Stream stream)
+                {
+                    return stream;
+                }
+            }
+            else
+            {
+                this.logger.LogInformation($"{nameof(IconRetriever)} configured to skip local cache. Downloading icon");
+            }
+
+            return await this.DownloadIcon(skill);
+        }
+
+        private async Task<Optional<Stream>> DownloadIcon(Skill skill)
         {
             var curedSkillName = skill.Name
                 .Replace(" ", "_");
@@ -56,11 +85,40 @@ namespace Daybreak.Services.IconRetrieve
             if (response.IsSuccessStatusCode)
             {
                 this.logger.LogInformation("Retrieved latest icon stream");
-                return new MemoryStream(await iconResponse.Content.ReadAsByteArrayAsync());
+                var iconData = await iconResponse.Content.ReadAsByteArrayAsync();
+                if (this.configurationManager.GetConfiguration().KeepLocalIconCache)
+                {
+                    await this.SaveIconLocally(skill, iconData);
+                }
+                return new MemoryStream(iconData);
             }
 
             this.logger.LogError($"Failed to retrieve icon from {BaseUrl + "/" + url}");
             return Optional.None<Stream>();
+        }
+
+        private async Task<Optional<Stream>> GetLocalIcon(Skill skill)
+        {
+            var curedSkillName = skill.Name
+                .Replace(" ", "_")
+                .Replace("\"", "");
+            this.logger.LogInformation("Checking local icon cache");
+            if (File.Exists(IconsLocation.Replace(NamePlaceholder, curedSkillName)))
+            {
+                this.logger.LogInformation("Local icon cache found. Retrieving icon");
+                return new MemoryStream(await File.ReadAllBytesAsync(IconsLocation.Replace(NamePlaceholder, curedSkillName)));
+            }
+
+            this.logger.LogWarning("No local icon cache found");
+            return Optional.None<Stream>();
+        }
+
+        private async Task SaveIconLocally(Skill skill, byte[] data)
+        {
+            var curedSkillName = skill.Name
+                .Replace(" ", "_")
+                .Replace("\"", "");
+            await File.WriteAllBytesAsync(IconsLocation.Replace(NamePlaceholder, curedSkillName), data);
         }
 
         private static string GetHref(HtmlDocument doc)
