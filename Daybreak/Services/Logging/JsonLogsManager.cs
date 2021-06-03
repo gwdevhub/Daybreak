@@ -1,7 +1,7 @@
-﻿using Daybreak.Models;
-using LiteDB;
+﻿using LiteDB;
 using System.Collections.Generic;
 using System.Extensions;
+using WpfExtended.Models;
 
 namespace Daybreak.Services.Logging
 {
