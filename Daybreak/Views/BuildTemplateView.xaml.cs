@@ -22,6 +22,8 @@ namespace Daybreak.Views
     {
         private const string DisallowedChars = "\r\n\\/.";
 
+        private bool supressDecode = false;
+
         private readonly IViewManager viewManager;
         private readonly IBuildTemplateManager buildTemplateManager;
         private readonly ILogger<BuildTemplateView> logger;
@@ -57,26 +59,46 @@ namespace Daybreak.Views
             };
         }
 
-        private void BuildCodeTextBox_KeyDown(object sender, KeyEventArgs e)
+        protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
-            if (e.Key == Key.Enter)
+            base.OnPropertyChanged(e);
+            if (e.Property == CurrentBuildCodeProperty && this.supressDecode is false)
             {
-                this.logger.LogInformation($"Attempting to decode provided template {sender.As<TextBox>().Text}");
+                this.logger.LogInformation($"Attempting to decode provided template {this.CurrentBuildCode}");
                 try
                 {
                     this.CurrentBuild = new BuildEntry
                     {
                         Name = this.CurrentBuild.Name,
                         PreviousName = this.CurrentBuild.PreviousName,
-                        Build = this.buildTemplateManager.DecodeTemplate(sender.As<TextBox>().Text)
+                        Build = this.buildTemplateManager.DecodeTemplate(this.CurrentBuildCode)
                     };
 
-                    this.logger.LogInformation($"Template {sender.As<TextBox>().Text} decoded");
+                    this.logger.LogInformation($"Template {CurrentBuildCode} decoded");
                 }
-                catch (Exception ex)
+                catch
                 {
-                    throw new InvalidOperationException($"Failed to decode template {sender.As<TextBox>().Text}", ex);
+                    this.logger.LogWarning($"Failed to decode {this.CurrentBuildCode}. Reverting to default build");
+                    this.CurrentBuild = new BuildEntry
+                    {
+                        Name = this.CurrentBuild.Name,
+                        PreviousName = this.CurrentBuild.PreviousName,
+                        Build = new Build()
+                    };
                 }
+            }
+        }
+
+        private void BuildTemplate_BuildChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                this.supressDecode = true;
+                this.CurrentBuildCode = this.buildTemplateManager.EncodeTemplate(this.CurrentBuild.Build);
+            }
+            finally
+            {
+                this.supressDecode = false;
             }
         }
         private void BackButton_Clicked(object sender, EventArgs e)

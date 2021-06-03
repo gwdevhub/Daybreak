@@ -15,6 +15,7 @@ namespace Daybreak.Controls
     public partial class AttributeTemplate : UserControl
     {
         public event EventHandler<AttributeEntry> HelpClicked;
+        public event EventHandler<AttributeEntry> AttributeChanged;
         
         [GenerateDependencyProperty(InitialValue = false)]
         private bool canAdd;
@@ -50,6 +51,7 @@ namespace Daybreak.Controls
                 this.DataContext.As<AttributeEntry>().Points--;
                 this.CanSubtract = this.DataContext.As<AttributeEntry>().Points > 0;
                 this.CanAdd = true;
+                this.AttributeChanged?.Invoke(this, this.DataContext.As<AttributeEntry>());
             }
         }
 
@@ -60,6 +62,7 @@ namespace Daybreak.Controls
                 this.DataContext.As<AttributeEntry>().Points++;
                 this.CanAdd = this.DataContext.As<AttributeEntry>().Points < 12;
                 this.CanSubtract = true;
+                this.AttributeChanged?.Invoke(this, this.DataContext.As<AttributeEntry>());
             }
         }
 

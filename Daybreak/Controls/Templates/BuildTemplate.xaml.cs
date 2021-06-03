@@ -3,6 +3,7 @@ using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Configuration;
 using Daybreak.Services.IconRetrieve;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Extensions;
@@ -23,9 +24,12 @@ namespace Daybreak.Controls
         private const string InfoNamePlaceholder = "[NAME]";
         private const string BaseAddress = $"https://wiki.guildwars.com/wiki/{InfoNamePlaceholder}";
 
+        private bool suppressBuildChanged = false;
         private bool loadedProperties = false;
         private BuildEntry loadedBuild;
         private SkillTemplate selectingSkillTemplate;
+
+        public event EventHandler BuildChanged;
 
         [GenerateDependencyProperty]
         private Profession primaryProfession;
@@ -95,6 +99,33 @@ namespace Daybreak.Controls
                 }
                 this.LoadSkills();
                 this.LoadAttributes();
+                if (this.suppressBuildChanged is false)
+                {
+                    this.BuildChanged?.Invoke(this, new EventArgs());
+                }
+            }
+
+            if (e.Property == Skill0Property ||
+                e.Property == Skill1Property ||
+                e.Property == Skill2Property ||
+                e.Property == Skill3Property ||
+                e.Property == Skill4Property ||
+                e.Property == Skill5Property ||
+                e.Property == Skill6Property ||
+                e.Property == Skill7Property)
+            {
+                if (this.suppressBuildChanged is false)
+                {
+                    this.loadedBuild.Build.Skills[0] = this.Skill0;
+                    this.loadedBuild.Build.Skills[1] = this.Skill1;
+                    this.loadedBuild.Build.Skills[2] = this.Skill2;
+                    this.loadedBuild.Build.Skills[3] = this.Skill3;
+                    this.loadedBuild.Build.Skills[4] = this.Skill4;
+                    this.loadedBuild.Build.Skills[5] = this.Skill5;
+                    this.loadedBuild.Build.Skills[6] = this.Skill6;
+                    this.loadedBuild.Build.Skills[7] = this.Skill7;
+                    this.BuildChanged?.Invoke(this, new EventArgs());
+                }
             }
         }
 
@@ -218,6 +249,7 @@ namespace Daybreak.Controls
 
         private void LoadBuild()
         {
+            this.suppressBuildChanged = true;
             var build = this.DataContext.As<BuildEntry>();
             this.loadedBuild = build;
             this.PrimaryProfession = build.Build.Primary;
@@ -230,6 +262,7 @@ namespace Daybreak.Controls
             this.Skill5 = build.Build.Skills[5];
             this.Skill6 = build.Build.Skills[6];
             this.Skill7 = build.Build.Skills[7];
+            this.suppressBuildChanged = false;
         }
 
         private void BrowseToInfo(string infoName)
@@ -292,6 +325,11 @@ namespace Daybreak.Controls
         private void AttributeTemplate_HelpClicked(object sender, AttributeEntry e)
         {
             this.BrowseToInfo(e.Attribute.Name);
+        }
+
+        private void AttributeTemplate_AttributeChanged(object sender, AttributeEntry e)
+        {
+            this.BuildChanged?.Invoke(this, new EventArgs());
         }
 
         private void SkillTemplate_Clicked(object sender, RoutedEventArgs e)
