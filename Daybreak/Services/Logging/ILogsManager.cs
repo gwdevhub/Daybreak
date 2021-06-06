@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Daybreak.Models;
+using System.Collections.Generic;
 using WpfExtended.Logging;
-using WpfExtended.Models;
 
 namespace Daybreak.Services.Logging
 {

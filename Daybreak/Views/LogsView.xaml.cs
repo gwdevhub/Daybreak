@@ -1,10 +1,10 @@
-﻿using Daybreak.Services.Logging;
+﻿using Daybreak.Models;
+using Daybreak.Services.Logging;
 using Daybreak.Services.ViewManagement;
 using System;
 using System.Collections.ObjectModel;
 using System.Extensions;
 using System.Windows.Controls;
-using WpfExtended.Models;
 
 namespace Daybreak.Views
 {
