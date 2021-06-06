@@ -1,4 +1,5 @@
 ﻿using LiteDB;
+using System;
 using System.Collections.Generic;
 using System.Extensions;
 using WpfExtended.Models;
@@ -14,17 +15,27 @@ namespace Daybreak.Services.Logging
             this.liteDatabase = liteDatabase.ThrowIfNull(nameof(liteDatabase));
         }
 
-        public IEnumerable<Log> GetLogs()
+        public IEnumerable<Models.Log> GetLogs()
         {
-            return this.liteDatabase.GetCollection<Log>().FindAll();
+            return this.liteDatabase.GetCollection<Models.Log>().FindAll();
         }
         public void WriteLog(Log log)
         {
-            this.liteDatabase.GetCollection<Log>().Insert(log);
+            var dbLog = new Models.Log
+            {
+                EventId = log.EventId,
+                Message = log.Exception is null ? log.Message : $"{log.Message}{Environment.NewLine}{log.Exception}",
+                Category = log.Category,
+                LogLevel = log.LogLevel,
+                LogTime = log.LogTime,
+                CorrelationVector = log.CorrelationVector
+            };
+
+            this.liteDatabase.GetCollection<Models.Log>().Insert(dbLog);
         }
         public int DeleteLogs()
         {
-            return this.liteDatabase.GetCollection<Log>().DeleteAll();
+            return this.liteDatabase.GetCollection<Models.Log>().DeleteAll();
         }
     }
 }

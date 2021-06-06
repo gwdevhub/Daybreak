@@ -16,7 +16,7 @@ namespace Daybreak.Launch
 {
     public sealed class Launcher : ExtendedApplication<MainWindow>
     {
-        public static IServiceManager ApplicationServiceManager { get; private set; }
+        private ILogger logger;
         private readonly static Launcher launcher = new();
 
         [STAThread]
@@ -27,7 +27,6 @@ namespace Daybreak.Launch
 
         protected override void SetupServiceManager(IServiceManager serviceManager)
         {
-            ApplicationServiceManager = this.ServiceManager;
             ProjectConfiguration.RegisterResolvers(serviceManager);
         }
         protected override void RegisterServices(IServiceProducer serviceProducer)
@@ -44,17 +43,16 @@ namespace Daybreak.Launch
                 return false;
             }
 
-            this.ServiceManager.GetService<ILogger>().LogCritical(e, $"Unhandled exception");
             if (e is FatalException fatalException)
             {
-                this.ServiceManager.GetService<ILogger>().LogCritical(e, $"{nameof(FatalException)} encountered. Closing application.");
+                this.logger.LogCritical(e, $"{nameof(FatalException)} encountered. Closing application");
                 MessageBox.Show(fatalException.ToString());
                 File.WriteAllText("crash.log", e.ToString());
                 return false;
             }
             else if (e is TargetInvocationException targetInvocationException && e.InnerException is FatalException innerFatalException)
             {
-                this.ServiceManager.GetService<ILogger>().LogCritical(e, $"{nameof(FatalException)} encountered. Closing application.");
+                this.logger.LogCritical(e, $"{nameof(FatalException)} encountered. Closing application");
                 MessageBox.Show(innerFatalException.ToString());
                 File.WriteAllText("crash.log", e.ToString());
                 return false;
@@ -72,12 +70,14 @@ namespace Daybreak.Launch
                 }
             }
 
+            this.logger.LogError(e, $"Unhandled exception caught {e.GetType()}");
             MessageBox.Show(e.ToString());
             return true;
         }
         protected override void ApplicationStarting()
         {
             this.ServiceManager.GetService<IApplicationLifetimeManager>().OnStartup();
+            this.logger = this.ServiceManager.GetService<ILogger<Launcher>>();
             this.RegisterViewContainer();
         }
         protected override void ApplicationClosing()

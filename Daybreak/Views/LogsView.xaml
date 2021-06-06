@@ -54,7 +54,13 @@
                 <DataGridTextColumn IsReadOnly="True" Header="Category" Binding="{Binding Category}" ElementStyle="{StaticResource WrapText}" Width="auto"/>
                 <DataGridTextColumn IsReadOnly="True" Header="LogLevel" Binding="{Binding LogLevel}" ElementStyle="{StaticResource WrapText}" Width="auto"/>
                 <DataGridTextColumn IsReadOnly="True" Header="EventId" Binding="{Binding EventId}" ElementStyle="{StaticResource WrapText}" Width="auto"/>
-                <DataGridTextColumn IsReadOnly="True" Header="Message" Binding="{Binding Message}" ElementStyle="{StaticResource WrapText}" Width="*"/>
+                <DataGridTemplateColumn IsReadOnly="True" Header="Message" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <controls:LogMessageTemplate Message="{Binding Message}" Foreground="White"></controls:LogMessageTemplate>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>
