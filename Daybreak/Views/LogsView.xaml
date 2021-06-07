@@ -24,6 +24,12 @@
                             Clicked="BinButton_Clicked"></controls:BinButton>
         <controls:RefreshGlyph Foreground="White" Height="30" Width="30" HorizontalAlignment="Right" Margin="0, 5, 45, 5"
                                Clicked="RefreshGlyph_Clicked"></controls:RefreshGlyph>
+        <controls:BackButton Foreground="White" Height="30" Width="30" HorizontalAlignment="Right" Margin="0, 5, 85, 5"
+                             Clicked="ExportButton_Clicked">
+            <controls:BackButton.RenderTransform>
+                <RotateTransform Angle="270" CenterX="15" CenterY="15"></RotateTransform>
+            </controls:BackButton.RenderTransform>
+        </controls:BackButton>
         <DataGrid IsReadOnly="True" Background="Transparent" Foreground="White" Grid.Row="1"
                   ItemsSource="{Binding ElementName=_this, Path=Logs, Mode=OneWay}" HorizontalScrollBarVisibility="Disabled"
                   AutoGenerateColumns="False" HeadersVisibility="Column" EnableColumnVirtualization="True"

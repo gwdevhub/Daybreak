@@ -22,6 +22,9 @@ namespace Daybreak.Controls
     [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
     public partial class ChromiumBrowserWrapper : UserControl
     {
+        public static readonly DependencyProperty AddressProperty =
+            DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, string>(nameof(Address));
+        
         private const string BrowserDownloadLink = "https://developer.microsoft.com/en-us/microsoft-edge/webview2/";
 
         public event EventHandler<string> FavoriteUriChanged;
@@ -49,8 +52,17 @@ namespace Daybreak.Controls
         private bool navigating;
         [GenerateDependencyProperty]
         private string favoriteAddress;
-        [GenerateDependencyProperty]
-        private string address;
+        public string Address
+        {
+            get => this.GetTypedValue<string>(AddressProperty);
+            set
+            {
+                if (this.BrowserSupported is true)
+                {
+                    this.SetValue(AddressProperty, value);
+                }
+            }
+        }
 
         public ChromiumBrowserWrapper()
         {
