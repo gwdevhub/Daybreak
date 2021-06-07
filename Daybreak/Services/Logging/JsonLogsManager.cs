@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Extensions;
+using System.Linq.Expressions;
 using WpfExtended.Models;
 
 namespace Daybreak.Services.Logging
@@ -15,6 +16,10 @@ namespace Daybreak.Services.Logging
             this.liteDatabase = liteDatabase.ThrowIfNull(nameof(liteDatabase));
         }
 
+        public IEnumerable<Models.Log> GetLogs(Expression<Func<Models.Log, bool>> filter)
+        {
+            return this.liteDatabase.GetCollection<Models.Log>().Find(filter);
+        }
         public IEnumerable<Models.Log> GetLogs()
         {
             return this.liteDatabase.GetCollection<Models.Log>().FindAll();

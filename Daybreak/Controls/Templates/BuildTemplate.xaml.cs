@@ -274,13 +274,19 @@ namespace Daybreak.Controls
 
         private void ShowInfoBrowser()
         {
-            this.SkillBrowser.Width = 400;
-            this.SkillsListView.Width = 0;
+            if (this.SkillBrowser.BrowserSupported is true)
+            {
+                this.SkillBrowser.Width = 400;
+                this.SkillsListView.Width = 0;
+            }
         }
 
         private void HideInfoBrowser()
         {
-            this.SkillBrowser.Width = 0;
+            if (this.SkillBrowser.BrowserSupported is true)
+            {
+                this.SkillBrowser.Width = 0;
+            }
         }
 
         private void ShowSkillListView()
