@@ -1,5 +1,5 @@
-﻿using Daybreak.Services.Privilege;
-using Daybreak.Services.Runtime;
+﻿using Daybreak.Services.Configuration;
+using Daybreak.Services.Privilege;
 using Daybreak.Services.Updater;
 using Daybreak.Services.ViewManagement;
 using Microsoft.Extensions.Logging;
@@ -14,24 +14,22 @@ namespace Daybreak.Views
     /// </summary>
     public partial class AskUpdateView : UserControl
     {
-        private const string UpdateDesiredKey = "UpdateDesired";
-
         private readonly ILogger<AskUpdateView> logger;
         private readonly IViewManager viewManager;
-        private readonly IRuntimeStore runtimeStore;
+        private readonly IConfigurationManager configurationManager;
         private readonly IPrivilegeManager privilegeManager;
         private readonly IApplicationUpdater applicationUpdater;
 
         public AskUpdateView(
             ILogger<AskUpdateView> logger,
             IViewManager viewManager,
-            IRuntimeStore runtimeStore,
+            IConfigurationManager configurationManager,
             IPrivilegeManager privilegeManager,
             IApplicationUpdater applicationUpdater)
         {
             this.logger = logger.ThrowIfNull(nameof(logger));
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
-            this.runtimeStore = runtimeStore.ThrowIfNull(nameof(runtimeStore));
+            this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
             this.privilegeManager = privilegeManager.ThrowIfNull(nameof(privilegeManager));
             this.applicationUpdater = applicationUpdater.ThrowIfNull(nameof(applicationUpdater));
             this.InitializeComponent();
@@ -51,14 +49,18 @@ namespace Daybreak.Views
         private void NoButton_Clicked(object sender, System.EventArgs e)
         {
             this.logger.LogInformation("User declined update");
-            this.runtimeStore.StoreValue(UpdateDesiredKey, false);
+            var config = this.configurationManager.GetConfiguration();
+            config.AutoCheckUpdate = false;
+            this.configurationManager.SaveConfiguration(config);
             this.viewManager.ShowView<MainView>();
         }
 
         private async void YesButton_Clicked(object sender, System.EventArgs e)
         {
             this.logger.LogInformation("User accepted update");
-            this.runtimeStore.StoreValue(UpdateDesiredKey, true);
+            var config = this.configurationManager.GetConfiguration();
+            config.AutoCheckUpdate = false;
+            this.configurationManager.SaveConfiguration(config);
             if (this.CheckIfAdmin() is false)
             {
                 return;

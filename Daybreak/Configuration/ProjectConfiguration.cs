@@ -1,5 +1,4 @@
 ﻿using Daybreak.Services.ApplicationLauncher;
-using Daybreak.Services.ApplicationLifetime;
 using Daybreak.Services.Bloogum;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Configuration;
@@ -8,7 +7,6 @@ using Daybreak.Services.IconRetrieve;
 using Daybreak.Services.Logging;
 using Daybreak.Services.Mutex;
 using Daybreak.Services.Privilege;
-using Daybreak.Services.Runtime;
 using Daybreak.Services.Screens;
 using Daybreak.Services.Screenshots;
 using Daybreak.Services.Shortcuts;
@@ -47,11 +45,9 @@ namespace Daybreak.Configuration
         {
             serviceProducer.ThrowIfNull(nameof(serviceProducer));
 
-            serviceProducer.RegisterSingleton<ApplicationLifetimeManager>();
             serviceProducer.RegisterSingleton<ViewManager>();
             serviceProducer.RegisterSingleton<IConfigurationManager, ConfigurationManager>();
             serviceProducer.RegisterSingleton<ILiteDatabase, LiteDatabase>(sp => new LiteDatabase("Daybreak.db"));
-            serviceProducer.RegisterSingleton<IRuntimeStore, RuntimeStore>();
             serviceProducer.RegisterSingleton<IMutexHandler, MutexHandler>();
             serviceProducer.RegisterSingleton<IShortcutManager, ShortcutManager>();
             serviceProducer.RegisterScoped<ICredentialManager, CredentialManager>();
@@ -65,14 +61,7 @@ namespace Daybreak.Configuration
             serviceProducer.RegisterScoped<IScreenManager, ScreenManager>();
             serviceProducer.RegisterLogWriter<ILogsManager, JsonLogsManager>();
         }
-        public static void RegisterLifetimeServices(IApplicationLifetimeProducer applicationLifetimeProducer)
-        {
-            applicationLifetimeProducer.ThrowIfNull(nameof(applicationLifetimeProducer));
 
-            applicationLifetimeProducer.RegisterService<IScreenshotProvider>();
-            applicationLifetimeProducer.RegisterService<IApplicationUpdater>();
-            applicationLifetimeProducer.RegisterService<IShortcutManager>();
-        }
         public static void RegisterViews(IViewProducer viewProducer)
         {
             viewProducer.ThrowIfNull(nameof(viewProducer));
