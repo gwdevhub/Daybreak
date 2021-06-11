@@ -1,8 +1,8 @@
 ﻿using Daybreak.Models;
 using Daybreak.Models.Versioning;
-using Daybreak.Services.ApplicationLifetime;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.Updater
 {

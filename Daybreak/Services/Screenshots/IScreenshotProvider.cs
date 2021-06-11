@@ -1,5 +1,5 @@
-﻿using Daybreak.Services.ApplicationLifetime;
-using System.Extensions;
+﻿using System.Extensions;
+using System.Windows.Extensions.Services;
 using System.Windows.Media;
 
 namespace Daybreak.Services.Screenshots

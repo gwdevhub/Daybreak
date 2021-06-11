@@ -1,6 +1,5 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Exceptions;
-using Daybreak.Services.ApplicationLifetime;
 using Daybreak.Services.ViewManagement;
 using Microsoft.Extensions.Logging;
 using Slim;
@@ -33,7 +32,6 @@ namespace Daybreak.Launch
         {
             ProjectConfiguration.RegisterServices(this.ServiceManager);
             ServiceManager.BuildSingletons();
-            ProjectConfiguration.RegisterLifetimeServices(this.ServiceManager.GetService<IApplicationLifetimeManager>());
             ProjectConfiguration.RegisterViews(this.ServiceManager.GetService<IViewManager>());
         }
         protected override bool HandleException(Exception e)
@@ -86,13 +84,11 @@ namespace Daybreak.Launch
         }
         protected override void ApplicationStarting()
         {
-            this.ServiceManager.GetService<IApplicationLifetimeManager>().OnStartup();
             this.logger = this.ServiceManager.GetService<ILogger<Launcher>>();
             this.RegisterViewContainer();
         }
         protected override void ApplicationClosing()
         {
-            this.ServiceManager.GetService<IApplicationLifetimeManager>().OnClosing();
         }
 
         private void RegisterViewContainer()

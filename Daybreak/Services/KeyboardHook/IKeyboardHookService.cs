@@ -1,6 +1,6 @@
 ﻿using Daybreak.Models;
-using Daybreak.Services.ApplicationLifetime;
 using System;
+using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.KeyboardHook
 {

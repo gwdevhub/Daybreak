@@ -1,7 +1,7 @@
 ﻿using Daybreak.Exceptions;
 using Daybreak.Models;
 using Daybreak.Models.Github;
-using Daybreak.Services.Runtime;
+using Daybreak.Services.Configuration;
 using Daybreak.Services.ViewManagement;
 using Daybreak.Utils;
 using Daybreak.Views;
@@ -26,7 +26,6 @@ namespace Daybreak.Services.Updater
     public sealed class ApplicationUpdater : IApplicationUpdater
     {
         private const string LaunchActionName = "Launch_Daybreak";
-        private const string UpdateDesiredKey = "UpdateDesired";
         private const string ExecutionPolicyKey = "ExecutionPolicy";
         private const string UpdatedKey = "Updating";
         private const string RegistryKey = "Daybreak";
@@ -59,19 +58,19 @@ namespace Daybreak.Services.Updater
         private readonly CancellationTokenSource updateCancellationTokenSource = new();
         private readonly ILogger<ApplicationUpdater> logger;
         private readonly IViewManager viewManager;
-        private readonly IRuntimeStore runtimeStore;
+        private readonly IConfigurationManager configurationManager;
         private readonly IHttpClient<ApplicationUpdater> httpClient;
 
         public Version CurrentVersion { get; }
 
         public ApplicationUpdater(
             ILogger<ApplicationUpdater> logger,
-            IRuntimeStore runtimeStore,
+            IConfigurationManager configurationManager,
             IViewManager viewManager,
             IHttpClient<ApplicationUpdater> httpClient)
         {
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
-            this.runtimeStore = runtimeStore.ThrowIfNull(nameof(runtimeStore));
+            this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
             this.logger = logger.ThrowIfNull(nameof(logger));
             this.httpClient = httpClient.ThrowIfNull(nameof(httpClient));
             this.httpClient.DefaultRequestHeaders.Add("user-agent", "Daybreak Client");
@@ -176,7 +175,7 @@ namespace Daybreak.Services.Updater
         {
             System.Extensions.TaskExtensions.RunPeriodicAsync(async () =>
             {
-                if (this.runtimeStore.TryGetValue<bool>(UpdateDesiredKey, out var desiringUpdate) && desiringUpdate is false)
+                if (this.configurationManager.GetConfiguration().AutoCheckUpdate is false)
                 {
                     this.updateCancellationTokenSource.Cancel();
                     return;

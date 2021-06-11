@@ -1,7 +1,6 @@
 ﻿using Daybreak.Services.Bloogum;
 using Daybreak.Services.Configuration;
 using Daybreak.Services.Privilege;
-using Daybreak.Services.Runtime;
 using Daybreak.Services.Screenshots;
 using Daybreak.Services.Updater;
 using Daybreak.Services.ViewManagement;
