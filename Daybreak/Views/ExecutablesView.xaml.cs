@@ -1,4 +1,5 @@
-﻿using Daybreak.Controls;
+﻿using Daybreak.Configuration;
+using Daybreak.Controls;
 using Daybreak.Models;
 using Daybreak.Services.Configuration;
 using Daybreak.Services.ViewManagement;
@@ -9,6 +10,7 @@ using System.Extensions;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Extensions;
 
 namespace Daybreak.Views
 {
@@ -17,15 +19,15 @@ namespace Daybreak.Views
     /// </summary>
     public partial class ExecutablesView : UserControl
     {
-        private readonly IConfigurationManager configurationManager;
+        private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions;
         private readonly IViewManager viewManager;
         public ObservableCollection<GuildwarsPath> Paths { get; } = new();
 
         public ExecutablesView(
-            IConfigurationManager configurationManager,
+            ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions,
             IViewManager viewManager)
         {
-            this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
+            this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull(nameof(liveUpdateableOptions));
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.InitializeComponent();
             this.GetPaths();
@@ -33,7 +35,7 @@ namespace Daybreak.Views
 
         private void GetPaths()
         {
-            this.Paths.AddRange(this.configurationManager.GetConfiguration().GuildwarsPaths);
+            this.Paths.AddRange(this.liveUpdateableOptions.Value.GuildwarsPaths);
         }
 
         private void BackButton_Clicked(object sender, EventArgs e)
@@ -53,9 +55,8 @@ namespace Daybreak.Views
 
         private void SaveButton_Clicked(object sender, EventArgs e)
         {
-            var config = this.configurationManager.GetConfiguration();
-            config.GuildwarsPaths = this.Paths.ToList();
-            this.configurationManager.SaveConfiguration(config);
+            this.liveUpdateableOptions.Value.GuildwarsPaths = this.Paths.ToList();
+            this.liveUpdateableOptions.UpdateOption();
             this.viewManager.ShowView<SettingsCategoryView>();
         }
 

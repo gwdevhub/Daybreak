@@ -1,4 +1,5 @@
-﻿using Daybreak.Services.Configuration;
+﻿using Daybreak.Configuration;
+using Daybreak.Services.Configuration;
 using Daybreak.Services.Shortcuts;
 using Daybreak.Services.ViewManagement;
 using Microsoft.Win32;
@@ -18,7 +19,7 @@ namespace Daybreak.Views
     [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
     public partial class SettingsView : System.Windows.Controls.UserControl
     {
-        private readonly IConfigurationManager configurationManager;
+        private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions;
         private readonly IViewManager viewManager;
 
         [GenerateDependencyProperty]
@@ -49,10 +50,10 @@ namespace Daybreak.Views
         private bool keepLocalIconCache;
 
         public SettingsView(
-            IConfigurationManager configurationManager,
+            ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions,
             IViewManager viewManager)
         {
-            this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
+            this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull(nameof(liveUpdateableOptions));
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.InitializeComponent();
             this.LoadSettings();
@@ -60,7 +61,7 @@ namespace Daybreak.Views
 
         private void LoadSettings()
         {
-            var config = this.configurationManager.GetConfiguration();
+            var config = this.liveUpdateableOptions.Value;
             this.AddressBarReadonly = config.AddressBarReadonly;
             this.ToolboxPath = config.ToolboxPath;
             this.LeftBrowserUrl = config.LeftBrowserDefault;
@@ -78,7 +79,7 @@ namespace Daybreak.Views
 
         private void SaveButton_Clicked(object sender, EventArgs e)
         {
-            var currentConfig = this.configurationManager.GetConfiguration();
+            var currentConfig = this.liveUpdateableOptions.Value;
             currentConfig.ToolboxPath = this.ToolboxPath;
             currentConfig.AddressBarReadonly = this.AddressBarReadonly;
             currentConfig.LeftBrowserDefault = this.LeftBrowserUrl;
@@ -92,7 +93,7 @@ namespace Daybreak.Views
             currentConfig.PlaceShortcut = this.ShortcutPlaced;
             currentConfig.AutoCheckUpdate = this.AutoCheckUpdate;
             currentConfig.KeepLocalIconCache = this.KeepLocalIconCache;
-            this.configurationManager.SaveConfiguration(currentConfig);
+            this.liveUpdateableOptions.UpdateOption();
             this.viewManager.ShowView<SettingsCategoryView>();
         }
 

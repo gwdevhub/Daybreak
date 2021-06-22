@@ -21,6 +21,7 @@ using System.Net.Http;
 using System.Windows.Extensions.Http;
 using LiteDB;
 using System.Windows.Extensions;
+using Daybreak.Services.Options;
 
 namespace Daybreak.Configuration
 {
@@ -39,6 +40,7 @@ namespace Daybreak.Configuration
                     var handler = new LoggingHttpMessageHandler(logger) { InnerHandler = new HttpClientHandler() };
                     return handler;
                 }));
+            serviceManager.RegisterOptionsManager<ApplicationConfigurationOptionsManager>();
         }
 
         public static void RegisterServices(IServiceProducer serviceProducer)

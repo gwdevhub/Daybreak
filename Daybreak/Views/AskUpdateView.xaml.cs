@@ -1,4 +1,5 @@
-﻿using Daybreak.Services.Configuration;
+﻿using Daybreak.Configuration;
+using Daybreak.Services.Configuration;
 using Daybreak.Services.Privilege;
 using Daybreak.Services.Updater;
 using Daybreak.Services.ViewManagement;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using System.Extensions;
 using System.Linq;
 using System.Windows.Controls;
+using System.Windows.Extensions;
 
 namespace Daybreak.Views
 {
@@ -16,20 +18,20 @@ namespace Daybreak.Views
     {
         private readonly ILogger<AskUpdateView> logger;
         private readonly IViewManager viewManager;
-        private readonly IConfigurationManager configurationManager;
+        private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveOptions;
         private readonly IPrivilegeManager privilegeManager;
         private readonly IApplicationUpdater applicationUpdater;
 
         public AskUpdateView(
             ILogger<AskUpdateView> logger,
             IViewManager viewManager,
-            IConfigurationManager configurationManager,
+            ILiveUpdateableOptions<ApplicationConfiguration> liveOptions,
             IPrivilegeManager privilegeManager,
             IApplicationUpdater applicationUpdater)
         {
             this.logger = logger.ThrowIfNull(nameof(logger));
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
-            this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
+            this.liveOptions = liveOptions.ThrowIfNull(nameof(liveOptions));
             this.privilegeManager = privilegeManager.ThrowIfNull(nameof(privilegeManager));
             this.applicationUpdater = applicationUpdater.ThrowIfNull(nameof(applicationUpdater));
             this.InitializeComponent();
@@ -49,18 +51,14 @@ namespace Daybreak.Views
         private void NoButton_Clicked(object sender, System.EventArgs e)
         {
             this.logger.LogInformation("User declined update");
-            var config = this.configurationManager.GetConfiguration();
-            config.AutoCheckUpdate = false;
-            this.configurationManager.SaveConfiguration(config);
+            this.liveOptions.Value.AutoCheckUpdate = false;
+            this.liveOptions.UpdateOption();
             this.viewManager.ShowView<MainView>();
         }
 
         private async void YesButton_Clicked(object sender, System.EventArgs e)
         {
             this.logger.LogInformation("User accepted update");
-            var config = this.configurationManager.GetConfiguration();
-            config.AutoCheckUpdate = false;
-            this.configurationManager.SaveConfiguration(config);
             if (this.CheckIfAdmin() is false)
             {
                 return;

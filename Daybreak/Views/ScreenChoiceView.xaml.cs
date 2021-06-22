@@ -1,4 +1,5 @@
-﻿using Daybreak.Controls.Templates;
+﻿using Daybreak.Configuration;
+using Daybreak.Controls.Templates;
 using Daybreak.Models;
 using Daybreak.Services.ApplicationLauncher;
 using Daybreak.Services.Configuration;
@@ -23,7 +24,7 @@ namespace Daybreak.Views
     {        
         private readonly IScreenManager screenManager;
         private readonly IViewManager viewManager;
-        private readonly IConfigurationManager configurationManager;
+        private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
         private readonly IApplicationLauncher applicationLauncher;
         private int selectedId;
 
@@ -33,15 +34,15 @@ namespace Daybreak.Views
         public ScreenChoiceView(
             IViewManager viewManager,
             IScreenManager screenManager,
-            IConfigurationManager configurationManager,
+            ILiveOptions<ApplicationConfiguration> liveOptions,
             IApplicationLauncher applicationLauncher)
         {
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.screenManager = screenManager.ThrowIfNull(nameof(screenManager));
-            this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
+            this.liveOptions = liveOptions.ThrowIfNull(nameof(liveOptions));
             this.applicationLauncher = applicationLauncher.ThrowIfNull(nameof(applicationLauncher));
             this.InitializeComponent();
-            this.selectedId = configurationManager.GetConfiguration().DesiredGuildwarsScreen;
+            this.selectedId = this.liveOptions.Value.DesiredGuildwarsScreen;
             this.CanTest = applicationLauncher.IsGuildwarsRunning;
             this.SetupView();
         }
@@ -86,7 +87,7 @@ namespace Daybreak.Views
 
         private void SaveButton_Clicked(object sender, EventArgs e)
         {
-            this.configurationManager.GetConfiguration().DesiredGuildwarsScreen = this.selectedId;
+            this.liveOptions.Value.DesiredGuildwarsScreen = this.selectedId;
             this.viewManager.ShowView<SettingsCategoryView>();
         }
 

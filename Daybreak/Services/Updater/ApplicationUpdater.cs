@@ -1,4 +1,5 @@
-﻿using Daybreak.Exceptions;
+﻿using Daybreak.Configuration;
+using Daybreak.Exceptions;
 using Daybreak.Models;
 using Daybreak.Models.Github;
 using Daybreak.Services.Configuration;
@@ -19,6 +20,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Extensions;
 using Version = Daybreak.Models.Versioning.Version;
 
 namespace Daybreak.Services.Updater
@@ -58,19 +60,19 @@ namespace Daybreak.Services.Updater
         private readonly CancellationTokenSource updateCancellationTokenSource = new();
         private readonly ILogger<ApplicationUpdater> logger;
         private readonly IViewManager viewManager;
-        private readonly IConfigurationManager configurationManager;
+        private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
         private readonly IHttpClient<ApplicationUpdater> httpClient;
 
         public Version CurrentVersion { get; }
 
         public ApplicationUpdater(
             ILogger<ApplicationUpdater> logger,
-            IConfigurationManager configurationManager,
+            ILiveOptions<ApplicationConfiguration> liveOptions,
             IViewManager viewManager,
             IHttpClient<ApplicationUpdater> httpClient)
         {
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
-            this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
+            this.liveOptions = liveOptions.ThrowIfNull(nameof(liveOptions));
             this.logger = logger.ThrowIfNull(nameof(logger));
             this.httpClient = httpClient.ThrowIfNull(nameof(httpClient));
             this.httpClient.DefaultRequestHeaders.Add("user-agent", "Daybreak Client");
@@ -175,7 +177,7 @@ namespace Daybreak.Services.Updater
         {
             System.Extensions.TaskExtensions.RunPeriodicAsync(async () =>
             {
-                if (this.configurationManager.GetConfiguration().AutoCheckUpdate is false)
+                if (this.liveOptions.Value.AutoCheckUpdate is false)
                 {
                     this.updateCancellationTokenSource.Cancel();
                     return;
