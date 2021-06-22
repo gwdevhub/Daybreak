@@ -1,4 +1,5 @@
-﻿using Daybreak.Controls;
+﻿using Daybreak.Configuration;
+using Daybreak.Controls;
 using Daybreak.Exceptions;
 using Daybreak.Models.Builds;
 using Daybreak.Services.ApplicationLauncher;
@@ -27,7 +28,7 @@ namespace Daybreak.Views
     {
         private readonly IApplicationLauncher applicationDetector;
         private readonly IViewManager viewManager;
-        private readonly IConfigurationManager configurationManager;
+        private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveOptions;
         private readonly IScreenManager screenManager;
         private readonly IBuildTemplateManager buildTemplateManager;
         private readonly ILogger<ChromiumBrowserWrapper> browserLogger;
@@ -58,7 +59,7 @@ namespace Daybreak.Views
         public MainView(
             IApplicationLauncher applicationDetector,
             IViewManager viewManager,
-            IConfigurationManager configurationManager,
+            ILiveUpdateableOptions<ApplicationConfiguration> liveOptions,
             IScreenManager screenManager,
             IBuildTemplateManager buildTemplateManager,
             ILogger<ChromiumBrowserWrapper> browserLogger)
@@ -66,7 +67,7 @@ namespace Daybreak.Views
             this.browserLogger = browserLogger;
             this.buildTemplateManager = buildTemplateManager.ThrowIfNull(nameof(buildTemplateManager));
             this.screenManager = screenManager.ThrowIfNull(nameof(screenManager));
-            this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
+            this.liveOptions = liveOptions.ThrowIfNull(nameof(liveOptions));
             this.applicationDetector = applicationDetector.ThrowIfNull(nameof(applicationDetector));
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.InitializeComponent();
@@ -77,13 +78,13 @@ namespace Daybreak.Views
 
         private void InitializeBrowsers()
         {
-            this.LeftWebBrowser.InitializeBrowser(this.configurationManager, this.buildTemplateManager, this.browserLogger);
-            this.RightWebBrowser.InitializeBrowser(this.configurationManager, this.buildTemplateManager, this.browserLogger);
+            this.LeftWebBrowser.InitializeBrowser(this.liveOptions, this.buildTemplateManager, this.browserLogger);
+            this.RightWebBrowser.InitializeBrowser(this.liveOptions, this.buildTemplateManager, this.browserLogger);
         }
 
         private void NavigateToDefaults()
         {
-            var applicationConfiguration = this.configurationManager.GetConfiguration();
+            var applicationConfiguration = this.liveOptions.Value;
             if (applicationConfiguration.BrowsersEnabled)
             {
                 this.LeftBrowserFavoriteAddress = applicationConfiguration.LeftBrowserDefault;
@@ -127,9 +128,9 @@ namespace Daybreak.Views
                     return;
                 }
 
-                if (this.configurationManager.GetConfiguration().SetGuildwarsWindowSizeOnLaunch)
+                if (this.liveOptions.Value.SetGuildwarsWindowSizeOnLaunch)
                 {
-                    var id = this.configurationManager.GetConfiguration().DesiredGuildwarsScreen;
+                    var id = this.liveOptions.Value.DesiredGuildwarsScreen;
                     var desiredScreen = this.screenManager.Screens.Skip(id).FirstOrDefault();
                     if (desiredScreen is null)
                     {
@@ -139,9 +140,9 @@ namespace Daybreak.Views
                     this.screenManager.MoveGuildwarsToScreen(desiredScreen);
                 }
 
-                if (this.configurationManager.GetConfiguration().ToolboxAutoLaunch is true)
+                if (this.liveOptions.Value.ToolboxAutoLaunch is true)
                 {
-                    var delay = this.configurationManager.GetConfiguration().ExperimentalFeatures.ToolboxAutoLaunchDelay;
+                    var delay = this.liveOptions.Value.ExperimentalFeatures.ToolboxAutoLaunchDelay;
                     await Task.Delay(delay);
                     await this.applicationDetector.LaunchGuildwarsToolbox();
                 }
@@ -180,23 +181,23 @@ namespace Daybreak.Views
             }
         }
 
-        private void ChromiumBrowserWrapper_BuildDecoded(object sender, Models.Builds.Build e)
+        private void ChromiumBrowserWrapper_BuildDecoded(object sender, Build e)
         {
             this.viewManager.ShowView<BuildTemplateView>(new BuildEntry { Build = e, Name = string.Empty });
         }
 
         private void LeftBrowser_FavoriteUriChanged(object sender, string e)
         {
-            var config = this.configurationManager.GetConfiguration();
+            var config = this.liveOptions.Value;
             config.LeftBrowserDefault = e;
-            this.configurationManager.SaveConfiguration(config);
+            this.liveOptions.UpdateOption();
         }
 
         private void RightBrowser_FavoriteUriChanged(object sender, string e)
         {
-            var config = this.configurationManager.GetConfiguration();
+            var config = this.liveOptions.Value;
             config.RightBrowserDefault = e;
-            this.configurationManager.SaveConfiguration(config);
+            this.liveOptions.UpdateOption();
         }
 
         private void LeftChromiumBrowserWrapper_MaximizeClicked(object sender, EventArgs e)

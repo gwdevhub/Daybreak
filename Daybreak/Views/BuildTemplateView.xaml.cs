@@ -1,4 +1,5 @@
-﻿using Daybreak.Controls;
+﻿using Daybreak.Configuration;
+using Daybreak.Controls;
 using Daybreak.Models.Builds;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Configuration;
@@ -39,7 +40,7 @@ namespace Daybreak.Views
             IViewManager viewManager,
             IBuildTemplateManager buildTemplateManager,
             IIconRetriever iconRetriever,
-            IConfigurationManager configurationManager,
+            ILiveOptions<ApplicationConfiguration> liveOptions,
             ILogger<ChromiumBrowserWrapper> chromiumLogger,
             ILogger<BuildTemplateView> logger)
         {
@@ -47,7 +48,7 @@ namespace Daybreak.Views
             this.logger = logger.ThrowIfNull(nameof(logger));
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.InitializeComponent();
-            this.BuildTemplate.InitializeTemplate(iconRetriever, configurationManager, buildTemplateManager, chromiumLogger);
+            this.BuildTemplate.InitializeTemplate(iconRetriever, liveOptions, buildTemplateManager, chromiumLogger);
             this.DataContextChanged += (sender, contextArgs) =>
             {
                 if (contextArgs.NewValue is BuildEntry)

@@ -1,4 +1,5 @@
-﻿using Daybreak.Models.Builds;
+﻿using Daybreak.Configuration;
+using Daybreak.Models.Builds;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Configuration;
 using Daybreak.Services.IconRetrieve;
@@ -64,11 +65,11 @@ namespace Daybreak.Controls
 
         public void InitializeTemplate(
             IIconRetriever iconRetriever,
-            IConfigurationManager configurationManager,
+            ILiveOptions<ApplicationConfiguration> liveOptions,
             IBuildTemplateManager buildTemplateManager,
             ILogger<ChromiumBrowserWrapper> logger)
         {
-            this.SkillBrowser.InitializeBrowser(configurationManager, buildTemplateManager, logger);
+            this.SkillBrowser.InitializeBrowser(liveOptions, buildTemplateManager, logger);
             this.SkillTemplate0.InitializeSkillTemplate(iconRetriever);
             this.SkillTemplate1.InitializeSkillTemplate(iconRetriever);
             this.SkillTemplate2.InitializeSkillTemplate(iconRetriever);

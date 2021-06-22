@@ -1,4 +1,5 @@
-﻿using Daybreak.Models;
+﻿using Daybreak.Configuration;
+using Daybreak.Models;
 using Daybreak.Services.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Extensions;
 
 namespace Daybreak.Services.Credentials
 {
@@ -15,13 +17,13 @@ namespace Daybreak.Services.Credentials
     {
         private static readonly byte[] Entropy = Convert.FromBase64String("R3VpbGR3YXJz");
         private readonly ILogger<CredentialManager> logger;
-        private readonly IConfigurationManager configurationManager;
+        private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveOptions;
 
         public CredentialManager(
             ILogger<CredentialManager> logger,
-            IConfigurationManager configurationManager)
+            ILiveUpdateableOptions<ApplicationConfiguration> liveOptions)
         {
-            this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
+            this.liveOptions = liveOptions.ThrowIfNull(nameof(liveOptions));
             this.logger = logger.ThrowIfNull(nameof(logger));
         }
 
@@ -53,7 +55,7 @@ namespace Daybreak.Services.Credentials
             return Task.Run(() =>
             {
                 this.logger.LogInformation("Retrieving credentials");
-                var config = this.configurationManager.GetConfiguration();
+                var config = this.liveOptions.Value;
                 if (config.ProtectedLoginCredentials is null || config.ProtectedLoginCredentials.Count == 0)
                 {
                     this.logger.LogInformation("No credentials found");
@@ -73,13 +75,12 @@ namespace Daybreak.Services.Credentials
             return Task.Run(() =>
             {
                 this.logger.LogInformation("Storing credentials");
-                var config = this.configurationManager.GetConfiguration();
-                config.ProtectedLoginCredentials = loginCredentials
+                this.liveOptions.Value.ProtectedLoginCredentials = loginCredentials
                     .Select(ProtectCredentials)
                     .Where(CredentialsProtected)
                     .Select(ExtractProtectedCredentials)
                     .ToList();
-                this.configurationManager.SaveConfiguration(config);
+                this.liveOptions.UpdateOption();
             });   
         }
 

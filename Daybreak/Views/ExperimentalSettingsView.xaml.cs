@@ -1,4 +1,5 @@
-﻿using Daybreak.Services.Configuration;
+﻿using Daybreak.Configuration;
+using Daybreak.Services.Configuration;
 using Daybreak.Services.ViewManagement;
 using System;
 using System.Extensions;
@@ -27,7 +28,7 @@ namespace Daybreak.Views
             DependencyPropertyExtensions.Register<ExperimentalSettingsView, bool>(nameof(MacrosEnabled));
 
         private readonly IViewManager viewManager;
-        private readonly IConfigurationManager configurationManager;
+        private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions;
 
         public bool LaunchAsCurrentUser
         {
@@ -57,17 +58,17 @@ namespace Daybreak.Views
 
         public ExperimentalSettingsView(
             IViewManager viewManager,
-            IConfigurationManager configurationManager)
+            ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions)
         {
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
-            this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
+            this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull(nameof(liveUpdateableOptions));
             this.InitializeComponent();
             this.LoadExperimentalSettings();
         }
 
         private void LoadExperimentalSettings()
         {
-            var config = this.configurationManager.GetConfiguration();
+            var config = this.liveUpdateableOptions.Value;
             this.MultiLaunch = config.ExperimentalFeatures.MultiLaunchSupport;
             this.GWToolboxLaunchDelay = config.ExperimentalFeatures.ToolboxAutoLaunchDelay.ToString();
             this.DynamicBuildLoading = config.ExperimentalFeatures.DynamicBuildLoading;
@@ -77,7 +78,7 @@ namespace Daybreak.Views
 
         private void SaveExperimentalSettings()
         {
-            var config = this.configurationManager.GetConfiguration();
+            var config = this.liveUpdateableOptions.Value;
             config.ExperimentalFeatures.MultiLaunchSupport = this.MultiLaunch;
             config.ExperimentalFeatures.DynamicBuildLoading = this.DynamicBuildLoading;
             config.ExperimentalFeatures.LaunchGuildwarsAsCurrentUser = this.LaunchAsCurrentUser;
@@ -87,7 +88,7 @@ namespace Daybreak.Views
                 config.ExperimentalFeatures.ToolboxAutoLaunchDelay = gwToolboxLaunchDelay;
             }
 
-            this.configurationManager.SaveConfiguration(config);
+            this.liveUpdateableOptions.UpdateOption();
         }
 
         private void SaveButton_Clicked(object sender, EventArgs e)

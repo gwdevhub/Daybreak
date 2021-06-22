@@ -1,4 +1,5 @@
-﻿using Daybreak.Models.Browser;
+﻿using Daybreak.Configuration;
+using Daybreak.Models.Browser;
 using Daybreak.Models.Builds;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Configuration;
@@ -31,7 +32,7 @@ namespace Daybreak.Controls
         public event EventHandler MaximizeClicked;
         public event EventHandler<Build> BuildDecoded;
 
-        private IConfigurationManager configurationManager;
+        private ILiveOptions<ApplicationConfiguration> liveOptions;
         private ILogger<ChromiumBrowserWrapper> logger;
         private IBuildTemplateManager buildTemplateManager;
         private CoreWebView2Environment coreWebView2Environment;
@@ -80,11 +81,11 @@ namespace Daybreak.Controls
         }
 
         public async void InitializeBrowser(
-            IConfigurationManager configurationManager,
+            ILiveOptions<ApplicationConfiguration> liveOptions,
             IBuildTemplateManager buildTemplateManager,
             ILogger<ChromiumBrowserWrapper> logger)
         {
-            this.configurationManager = configurationManager;
+            this.liveOptions = liveOptions;
             this.buildTemplateManager = buildTemplateManager;
             this.logger = logger;
             this.InitializeEnvironment();
@@ -98,7 +99,7 @@ namespace Daybreak.Controls
 
         private void InitializeEnvironment()
         {
-            if (this.configurationManager.GetConfiguration().BrowsersEnabled is false)
+            if (this.liveOptions.Value.BrowsersEnabled is false)
             {
                 this.BrowserSupported = false;
                 return;
@@ -122,8 +123,8 @@ namespace Daybreak.Controls
             {
                 this.WebBrowser.IsEnabled = true;
                 await this.WebBrowser.EnsureCoreWebView2Async(this.coreWebView2Environment);
-                this.AddressBarReadonly = this.configurationManager.GetConfiguration().AddressBarReadonly;
-                this.CanDownloadBuild = this.configurationManager.GetConfiguration().ExperimentalFeatures.DynamicBuildLoading;
+                this.AddressBarReadonly = this.liveOptions.Value.AddressBarReadonly;
+                this.CanDownloadBuild = this.liveOptions.Value.ExperimentalFeatures.DynamicBuildLoading;
                 this.WebBrowser.CoreWebView2.NewWindowRequested += (browser, args) => args.Handled = true;
                 this.WebBrowser.NavigationStarting += (browser, args) =>
                 {

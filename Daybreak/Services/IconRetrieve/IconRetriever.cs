@@ -1,4 +1,5 @@
-﻿using Daybreak.Models.Builds;
+﻿using Daybreak.Configuration;
+using Daybreak.Models.Builds;
 using Daybreak.Services.Configuration;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
@@ -8,6 +9,7 @@ using System.Http;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Extensions;
 
 namespace Daybreak.Services.IconRetrieve
 {
@@ -21,16 +23,16 @@ namespace Daybreak.Services.IconRetrieve
 
         private readonly IHttpClient<IconRetriever> httpClient;
         private readonly ILogger<IconRetriever> logger;
-        private readonly IConfigurationManager configurationManager;
+        private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
 
         public IconRetriever(
             ILogger<IconRetriever> logger,
             IHttpClient<IconRetriever> httpClient,
-            IConfigurationManager configurationManager)
+            ILiveOptions<ApplicationConfiguration> liveOptions)
         {
             this.logger = logger.ThrowIfNull(nameof(logger));
             this.httpClient = httpClient.ThrowIfNull(nameof(httpClient));
-            this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
+            this.liveOptions = liveOptions.ThrowIfNull(nameof(liveOptions));
             this.httpClient.BaseAddress = new Uri(BaseUrl);
             if (Directory.Exists(IconsDirectoryName) is false)
             {
@@ -40,7 +42,7 @@ namespace Daybreak.Services.IconRetrieve
 
         public async Task<Optional<Stream>> GetIcon(Skill skill)
         {
-            if (this.configurationManager.GetConfiguration().KeepLocalIconCache)
+            if (this.liveOptions.Value.KeepLocalIconCache)
             {
                 this.logger.LogInformation($"{nameof(IconRetriever)} configured to look first in cache before downloading icons");
                 var maybeIcon = await this.GetLocalIcon(skill);
@@ -86,9 +88,9 @@ namespace Daybreak.Services.IconRetrieve
             {
                 this.logger.LogInformation("Retrieved latest icon stream");
                 var iconData = await iconResponse.Content.ReadAsByteArrayAsync();
-                if (this.configurationManager.GetConfiguration().KeepLocalIconCache)
+                if (this.liveOptions.Value.KeepLocalIconCache)
                 {
-                    await this.SaveIconLocally(skill, iconData);
+                    await SaveIconLocally(skill, iconData);
                 }
                 return new MemoryStream(iconData);
             }
@@ -113,7 +115,7 @@ namespace Daybreak.Services.IconRetrieve
             return Optional.None<Stream>();
         }
 
-        private async Task SaveIconLocally(Skill skill, byte[] data)
+        private static async Task SaveIconLocally(Skill skill, byte[] data)
         {
             var curedSkillName = skill.Name
                 .Replace(" ", "_")

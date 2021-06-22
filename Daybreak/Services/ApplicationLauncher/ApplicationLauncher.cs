@@ -1,4 +1,5 @@
-﻿using Daybreak.Exceptions;
+﻿using Daybreak.Configuration;
+using Daybreak.Exceptions;
 using Daybreak.Services.Configuration;
 using Daybreak.Services.Credentials;
 using Daybreak.Services.Mutex;
@@ -17,6 +18,7 @@ using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Extensions;
 
 namespace Daybreak.Services.ApplicationLauncher
 {
@@ -29,7 +31,7 @@ namespace Daybreak.Services.ApplicationLauncher
         private const string ProcessName = "gw";
         private const string ArenaNetMutex = "AN-Mute";
 
-        private readonly IConfigurationManager configurationManager;
+        private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
         private readonly ICredentialManager credentialManager;
         private readonly IMutexHandler mutexHandler;
         private readonly ILogger<ApplicationLauncher> logger;
@@ -40,7 +42,7 @@ namespace Daybreak.Services.ApplicationLauncher
         public bool IsToolboxRunning => GuildwarsToolboxProcessDetected();
 
         public ApplicationLauncher(
-            IConfigurationManager configurationManager,
+            ILiveOptions<ApplicationConfiguration> liveOptions,
             ICredentialManager credentialManager,
             IMutexHandler mutexHandler,
             ILogger<ApplicationLauncher> logger,
@@ -49,13 +51,13 @@ namespace Daybreak.Services.ApplicationLauncher
             this.logger = logger.ThrowIfNull(nameof(logger));
             this.mutexHandler = mutexHandler.ThrowIfNull(nameof(mutexHandler));
             this.credentialManager = credentialManager.ThrowIfNull(nameof(credentialManager));
-            this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
+            this.liveOptions = liveOptions.ThrowIfNull(nameof(liveOptions));
             this.privilegeManager = privilegeManager.ThrowIfNull(nameof(privilegeManager));
         }
 
         public async Task<bool> LaunchGuildwars()
         {
-            var configuration = this.configurationManager.GetConfiguration();
+            var configuration = this.liveOptions.Value;
             var auth = await this.credentialManager.GetDefaultCredentials().ConfigureAwait(false);
             return await auth.Switch(
                 onSome: async (credentials) =>
@@ -84,7 +86,7 @@ namespace Daybreak.Services.ApplicationLauncher
         {
             return Task.Run(() =>
             {
-                var configuration = this.configurationManager.GetConfiguration();
+                var configuration = this.liveOptions.Value;
                 var executable = configuration.ToolboxPath;
                 if (File.Exists(executable) is false)
                 {
@@ -102,7 +104,7 @@ namespace Daybreak.Services.ApplicationLauncher
         {
             return Task.Run(() =>
             {
-                var configuration = this.configurationManager.GetConfiguration();
+                var configuration = this.liveOptions.Value;
                 var executable = configuration.TexmodPath;
                 if (File.Exists(executable) is false)
                 {
@@ -145,7 +147,7 @@ namespace Daybreak.Services.ApplicationLauncher
 
         private async Task<bool> LaunchGuildwarsProcess(string email, Models.SecureString password, string character)
         {
-            var executable = this.configurationManager.GetConfiguration().GuildwarsPaths.Where(path => path.Default).FirstOrDefault();
+            var executable = this.liveOptions.Value.GuildwarsPaths.Where(path => path.Default).FirstOrDefault();
             if (executable is null)
             {
                 throw new ExecutableNotFoundException($"No executable selected");
@@ -169,7 +171,7 @@ namespace Daybreak.Services.ApplicationLauncher
                 args.Add(character);
             }
 
-            var identity = this.configurationManager.GetConfiguration().ExperimentalFeatures.LaunchGuildwarsAsCurrentUser ?
+            var identity = this.liveOptions.Value.ExperimentalFeatures.LaunchGuildwarsAsCurrentUser ?
                 System.Security.Principal.WindowsIdentity.GetCurrent().Name :
                 System.Security.Principal.WindowsIdentity.GetAnonymous().Name;
             this.logger.LogInformation($"Launching guildwars as [{identity}] identity");
@@ -221,11 +223,11 @@ namespace Daybreak.Services.ApplicationLauncher
 
         private bool GuildwarsProcessDetected()
         {
-            if (this.configurationManager.GetConfiguration().ExperimentalFeatures.MultiLaunchSupport is true)
+            if (this.liveOptions.Value.ExperimentalFeatures.MultiLaunchSupport is true)
             {
                 try
                 {
-                    var path = this.configurationManager.GetConfiguration().GuildwarsPaths.Where(path => path.Default).FirstOrDefault();
+                    var path = this.liveOptions.Value.GuildwarsPaths.Where(path => path.Default).FirstOrDefault();
                     if (path is null)
                     {
                         return false;
@@ -253,7 +255,7 @@ namespace Daybreak.Services.ApplicationLauncher
 
         private void SetRegistryGuildwarsPath()
         {
-            var path = this.configurationManager.GetConfiguration().GuildwarsPaths.Where(path => path.Default).FirstOrDefault();
+            var path = this.liveOptions.Value.GuildwarsPaths.Where(path => path.Default).FirstOrDefault();
             if (path is null)
             {
                 throw new ExecutableNotFoundException("No executable currently selected");
