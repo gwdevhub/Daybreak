@@ -41,6 +41,11 @@ namespace Daybreak.Launch
                 return false;
             }
 
+            if (this.logger is null)
+            {
+                return false;
+            }
+
             if (e is FatalException fatalException)
             {
                 this.logger.LogCritical(e, $"{nameof(FatalException)} encountered. Closing application");
