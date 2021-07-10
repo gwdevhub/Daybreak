@@ -44,7 +44,7 @@ namespace Daybreak.Services.Updater
         private const string Url = "https://github.com/AlexMacocian/Daybreak/releases/latest";
         private const string DownloadUrl = $"https://github.com/AlexMacocian/Daybreak/releases/download/{VersionTag}/Daybreak{VersionTag}.zip";
         private const string GetExecutionPolicyCommand = "Get-ExecutionPolicy -Scope CurrentUser";
-        private const string SetExecutionPolicyCommand = $"Set-ExecutionPolicy {ExecutionPolicyTag} -Scope CurrentUser";
+        private const string SetExecutionPolicyCommand = $"Set-ExecutionPolicy {ExecutionPolicyTag} -Scope CurrentUser -Force";
         private const string WaitCommand = $"Wait-Process -Id {ProcessIdTag}";
         private const string ExtractCommandTemplate = $"Expand-Archive -Path '{InputFileTag}' -DestinationPath '{OutputPathTag}' -Force";
         private const string PrepareScheduledAction = $"$action = New-ScheduledTaskAction -Execute {ExecutableNameTag} -WorkingDirectory {WorkingDirectoryTag}";
