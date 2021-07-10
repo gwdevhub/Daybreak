@@ -2,13 +2,12 @@
 using Daybreak.Controls.Templates;
 using Daybreak.Models;
 using Daybreak.Services.ApplicationLauncher;
-using Daybreak.Services.Configuration;
 using Daybreak.Services.Screens;
 using Daybreak.Services.ViewManagement;
 using System;
+using System.Configuration;
 using System.Extensions;
 using System.Linq;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 using System.Windows.Media;
@@ -60,8 +59,8 @@ namespace Daybreak.Views
                     VerticalAlignment = System.Windows.VerticalAlignment.Top,
                     HorizontalAlignment = System.Windows.HorizontalAlignment.Left,
                     Foreground = screen.Id == this.selectedId ? Brushes.LightGreen : Brushes.White
-            };
-                screenTemplate.Clicked += ScreenTemplate_Clicked;
+                };
+                screenTemplate.Clicked += this.ScreenTemplate_Clicked;
                 this.ScreenContainer.Children.Add(screenTemplate);
             }
         }

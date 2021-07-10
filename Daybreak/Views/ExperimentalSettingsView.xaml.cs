@@ -1,7 +1,7 @@
 ﻿using Daybreak.Configuration;
-using Daybreak.Services.Configuration;
 using Daybreak.Services.ViewManagement;
 using System;
+using System.Configuration;
 using System.Extensions;
 using System.Linq;
 using System.Windows;

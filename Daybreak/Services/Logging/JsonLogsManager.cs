@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Extensions;
 using System.Linq.Expressions;
-using WpfExtended.Models;
+using System.Logging;
 
 namespace Daybreak.Services.Logging
 {

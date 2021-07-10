@@ -1,12 +1,12 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Models.Builds;
 using Daybreak.Services.BuildTemplates;
-using Daybreak.Services.Configuration;
 using Daybreak.Services.IconRetrieve;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Configuration;
 using System.Extensions;
 using System.Linq;
 using System.Windows;
@@ -60,7 +60,7 @@ namespace Daybreak.Controls
         {
             this.InitializeComponent();
             this.InitializeProperties();
-            this.DataContextChanged += BuildTemplate_DataContextChanged;
+            this.DataContextChanged += this.BuildTemplate_DataContextChanged;
         }
 
         public void InitializeTemplate(
@@ -98,6 +98,7 @@ namespace Daybreak.Controls
                 {
                     this.loadedBuild.Build.Secondary = this.SecondaryProfession;
                 }
+
                 this.LoadSkills();
                 this.LoadAttributes();
                 if (this.suppressBuildChanged is false)
@@ -193,55 +194,62 @@ namespace Daybreak.Controls
         private void LoadSkills()
         {
             var possibleSkills = Skill.Skills
-                .Where(s => s.Profession == PrimaryProfession || s.Profession == SecondaryProfession || s.Profession == Profession.None)
+                .Where(s => s.Profession == this.PrimaryProfession || s.Profession == this.SecondaryProfession || s.Profession == Profession.None)
                 .Where(s => s != Skill.NoSkill)
                 .OrderBy(s => s.Name);
             this.AvailableSkills.ClearAnd().AddRange(possibleSkills);
 
-            if (this.Skill0.Profession != PrimaryProfession &&
-                this.Skill0.Profession != SecondaryProfession &&
+            if (this.Skill0.Profession != this.PrimaryProfession &&
+                this.Skill0.Profession != this.SecondaryProfession &&
                 this.Skill0.Profession != Profession.None)
             {
                 this.Skill0 = Skill.NoSkill;
             }
-            if (this.Skill1.Profession != PrimaryProfession &&
-                this.Skill1.Profession != SecondaryProfession &&
+
+            if (this.Skill1.Profession != this.PrimaryProfession &&
+                this.Skill1.Profession != this.SecondaryProfession &&
                 this.Skill1.Profession != Profession.None)
             {
                 this.Skill1 = Skill.NoSkill;
             }
-            if (this.Skill2.Profession != PrimaryProfession &&
-                this.Skill2.Profession != SecondaryProfession &&
+
+            if (this.Skill2.Profession != this.PrimaryProfession &&
+                this.Skill2.Profession != this.SecondaryProfession &&
                 this.Skill2.Profession != Profession.None)
             {
                 this.Skill2 = Skill.NoSkill;
             }
-            if (this.Skill3.Profession != PrimaryProfession &&
-                this.Skill3.Profession != SecondaryProfession &&
+
+            if (this.Skill3.Profession != this.PrimaryProfession &&
+                this.Skill3.Profession != this.SecondaryProfession &&
                 this.Skill3.Profession != Profession.None)
             {
                 this.Skill3 = Skill.NoSkill;
             }
-            if (this.Skill4.Profession != PrimaryProfession &&
-                this.Skill4.Profession != SecondaryProfession &&
+
+            if (this.Skill4.Profession != this.PrimaryProfession &&
+                this.Skill4.Profession != this.SecondaryProfession &&
                 this.Skill4.Profession != Profession.None)
             {
                 this.Skill4 = Skill.NoSkill;
             }
-            if (this.Skill5.Profession != PrimaryProfession &&
-                this.Skill5.Profession != SecondaryProfession &&
+
+            if (this.Skill5.Profession != this.PrimaryProfession &&
+                this.Skill5.Profession != this.SecondaryProfession &&
                 this.Skill5.Profession != Profession.None)
             {
                 this.Skill5 = Skill.NoSkill;
             }
-            if (this.Skill6.Profession != PrimaryProfession &&
-                this.Skill6.Profession != SecondaryProfession &&
+
+            if (this.Skill6.Profession != this.PrimaryProfession &&
+                this.Skill6.Profession != this.SecondaryProfession &&
                 this.Skill6.Profession != Profession.None)
             {
                 this.Skill6 = Skill.NoSkill;
             }
-            if (this.Skill7.Profession != PrimaryProfession &&
-                this.Skill7.Profession != SecondaryProfession &&
+
+            if (this.Skill7.Profession != this.PrimaryProfession &&
+                this.Skill7.Profession != this.SecondaryProfession &&
                 this.Skill7.Profession != Profession.None)
             {
                 this.Skill7 = Skill.NoSkill;
@@ -308,7 +316,7 @@ namespace Daybreak.Controls
                 return;
             }
 
-            this.BrowseToInfo(PrimaryProfession.Name);
+            this.BrowseToInfo(this.PrimaryProfession.Name);
             if (e is RoutedEventArgs routedEventArgs)
             {
                 routedEventArgs.Handled = true;
@@ -351,6 +359,7 @@ namespace Daybreak.Controls
             {
                 this.BrowseToInfo(skill.Name);
             }
+
             e.Handled = true;
         }
 
@@ -369,14 +378,14 @@ namespace Daybreak.Controls
 
             this.selectingSkillTemplate.DataContext = sender.As<ListView>().SelectedItem;
             this.HideSkillListView();
-            this.loadedBuild.Build.Skills[0] = Skill0;
-            this.loadedBuild.Build.Skills[1] = Skill1;
-            this.loadedBuild.Build.Skills[2] = Skill2;
-            this.loadedBuild.Build.Skills[3] = Skill3;
-            this.loadedBuild.Build.Skills[4] = Skill4;
-            this.loadedBuild.Build.Skills[5] = Skill5;
-            this.loadedBuild.Build.Skills[6] = Skill6;
-            this.loadedBuild.Build.Skills[7] = Skill7;
+            this.loadedBuild.Build.Skills[0] = this.Skill0;
+            this.loadedBuild.Build.Skills[1] = this.Skill1;
+            this.loadedBuild.Build.Skills[2] = this.Skill2;
+            this.loadedBuild.Build.Skills[3] = this.Skill3;
+            this.loadedBuild.Build.Skills[4] = this.Skill4;
+            this.loadedBuild.Build.Skills[5] = this.Skill5;
+            this.loadedBuild.Build.Skills[6] = this.Skill6;
+            this.loadedBuild.Build.Skills[7] = this.Skill7;
         }
 
         private void ListView_NavigateWithMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)

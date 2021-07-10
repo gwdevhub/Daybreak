@@ -1,16 +1,14 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Controls;
 using Daybreak.Models;
-using Daybreak.Services.Configuration;
 using Daybreak.Services.ViewManagement;
-using Microsoft.Win32;
 using System;
 using System.Collections.ObjectModel;
+using System.Configuration;
 using System.Extensions;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Extensions;
 
 namespace Daybreak.Views
 {
@@ -82,6 +80,7 @@ namespace Daybreak.Views
             {
                 path.Default = false;
             }
+
             gwPath.Default = true;
             var view = CollectionViewSource.GetDefaultView(this.Paths);
             view.Refresh();

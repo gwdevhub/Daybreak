@@ -1,16 +1,14 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Models;
-using Daybreak.Services.Configuration;
 using Daybreak.Services.KeyboardHook;
-using Microsoft.Extensions.Logging;
 using Pepa.Wpf.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Extensions;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Windows.Extensions;
 using System.Windows.Forms;
 
 namespace Daybreak.Services.KeyboardMacros
@@ -55,7 +53,7 @@ namespace Daybreak.Services.KeyboardMacros
             },
             TimeSpan.Zero,
             TimeSpan.FromMilliseconds(33),
-            cancellationTokenSource.Token);
+            this.cancellationTokenSource.Token);
         }
 
         private void KeyboardHookService_KeyboardPressed(object sender, KeyboardHookEventArgs e)

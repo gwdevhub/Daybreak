@@ -1,10 +1,10 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Services.Configuration;
 using ShellLink;
+using System.Configuration;
 using System.Diagnostics;
 using System.Extensions;
 using System.IO;
-using System.Windows.Extensions;
 
 namespace Daybreak.Services.Shortcuts
 {

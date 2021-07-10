@@ -2,14 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using WpfExtended.Logging;
+using System.Logging;
 
 namespace Daybreak.Services.Logging
 {
     public interface ILogsManager : ILogsWriter
     {
-        IEnumerable<Log> GetLogs(Expression<Func<Log, bool>> filter);
-        IEnumerable<Log> GetLogs();
+        IEnumerable<Models.Log> GetLogs(Expression<Func<Models.Log, bool>> filter);
+        IEnumerable<Models.Log> GetLogs();
         int DeleteLogs();
     }
 }
