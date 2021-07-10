@@ -2,11 +2,11 @@
 using Daybreak.Models.Browser;
 using Daybreak.Models.Builds;
 using Daybreak.Services.BuildTemplates;
-using Daybreak.Services.Configuration;
 using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using Microsoft.Web.WebView2.Core;
 using System;
+using System.Configuration;
 using System.Diagnostics;
 using System.Extensions;
 using System.Threading.Tasks;
@@ -197,6 +197,7 @@ namespace Daybreak.Controls
             {
                 this.logger.LogError(e, $"Exception encountered when deserializing {nameof(BrowserPayload)}");
             }
+
             if (payload?.Key == BrowserPayload.PayloadKeys.ContextMenu)
             {
                 var contextMenuPayload = args.WebMessageAsJson.Deserialize<BrowserPayload<OnContextMenuPayload>>();

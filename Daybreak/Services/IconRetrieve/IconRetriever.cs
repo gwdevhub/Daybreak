@@ -1,15 +1,14 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Models.Builds;
-using Daybreak.Services.Configuration;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Configuration;
 using System.Extensions;
 using System.Http;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Extensions;
 
 namespace Daybreak.Services.IconRetrieve
 {
@@ -92,6 +91,7 @@ namespace Daybreak.Services.IconRetrieve
                 {
                     await SaveIconLocally(skill, iconData);
                 }
+
                 return new MemoryStream(iconData);
             }
 

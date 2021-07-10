@@ -3,10 +3,9 @@ using FluentAssertions;
 using LiteDB;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.IO;
 using System.Linq;
-using WpfExtended.Logging;
+using System.Logging;
 
 namespace Daybreak.Tests.Services
 {

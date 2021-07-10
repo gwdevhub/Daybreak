@@ -1,6 +1,5 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Exceptions;
-using Daybreak.Services.Configuration;
 using Daybreak.Services.Credentials;
 using Daybreak.Services.Mutex;
 using Daybreak.Services.Privilege;
@@ -10,6 +9,7 @@ using Microsoft.Win32;
 using Pepa.Wpf.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Extensions;
 using System.IO;
@@ -18,7 +18,6 @@ using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Extensions;
 
 namespace Daybreak.Services.ApplicationLauncher
 {
@@ -70,10 +69,10 @@ namespace Daybreak.Services.ApplicationLauncher
                             return false;
                         }
 
-                        ClearGwLocks();
+                        this.ClearGwLocks();
                     }
 
-                    return await LaunchGuildwarsProcess(credentials.Username, credentials.Password, credentials.CharacterName);
+                    return await this.LaunchGuildwarsProcess(credentials.Username, credentials.Password, credentials.CharacterName);
                 },
                 onNone: () =>
                 {

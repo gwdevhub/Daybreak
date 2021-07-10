@@ -1,13 +1,12 @@
 ﻿using Daybreak.Configuration;
-using Daybreak.Services.Configuration;
 using Daybreak.Services.Privilege;
 using Daybreak.Services.Updater;
 using Daybreak.Services.ViewManagement;
 using Microsoft.Extensions.Logging;
+using System.Configuration;
 using System.Extensions;
 using System.Linq;
 using System.Windows.Controls;
-using System.Windows.Extensions;
 
 namespace Daybreak.Views
 {

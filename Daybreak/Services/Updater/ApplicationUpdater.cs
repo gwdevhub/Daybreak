@@ -2,7 +2,6 @@
 using Daybreak.Exceptions;
 using Daybreak.Models;
 using Daybreak.Models.Github;
-using Daybreak.Services.Configuration;
 using Daybreak.Services.ViewManagement;
 using Daybreak.Utils;
 using Daybreak.Views;
@@ -10,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Extensions;
 using System.Http;
@@ -20,7 +20,6 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Extensions;
 using Version = Daybreak.Models.Versioning.Version;
 
 namespace Daybreak.Services.Updater

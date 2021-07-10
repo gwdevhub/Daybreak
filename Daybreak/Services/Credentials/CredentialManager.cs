@@ -1,15 +1,14 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Models;
-using Daybreak.Services.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Extensions;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Extensions;
 
 namespace Daybreak.Services.Credentials
 {
@@ -64,9 +63,9 @@ namespace Daybreak.Services.Credentials
 
                 return config
                     .ProtectedLoginCredentials
-                    .Select(UnprotectCredentials)
-                    .Where(CredentialsUnprotected)
-                    .Select(ExtractCredentials)
+                    .Select(this.UnprotectCredentials)
+                    .Where(this.CredentialsUnprotected)
+                    .Select(this.ExtractCredentials)
                     .ToList();
             });
         }
@@ -76,9 +75,9 @@ namespace Daybreak.Services.Credentials
             {
                 this.logger.LogInformation("Storing credentials");
                 this.liveOptions.Value.ProtectedLoginCredentials = loginCredentials
-                    .Select(ProtectCredentials)
-                    .Where(CredentialsProtected)
-                    .Select(ExtractProtectedCredentials)
+                    .Select(this.ProtectCredentials)
+                    .Where(this.CredentialsProtected)
+                    .Select(this.ExtractProtectedCredentials)
                     .ToList();
                 this.liveOptions.UpdateOption();
             });   

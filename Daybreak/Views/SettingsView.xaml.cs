@@ -1,12 +1,8 @@
 ﻿using Daybreak.Configuration;
-using Daybreak.Services.Configuration;
-using Daybreak.Services.Shortcuts;
 using Daybreak.Services.ViewManagement;
-using Microsoft.Win32;
 using System;
+using System.Configuration;
 using System.Extensions;
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Extensions;
 using System.Windows.Forms;
 

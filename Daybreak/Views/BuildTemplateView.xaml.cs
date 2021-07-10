@@ -2,17 +2,16 @@
 using Daybreak.Controls;
 using Daybreak.Models.Builds;
 using Daybreak.Services.BuildTemplates;
-using Daybreak.Services.Configuration;
 using Daybreak.Services.IconRetrieve;
 using Daybreak.Services.ViewManagement;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Configuration;
 using System.Extensions;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
-using System.Windows.Input;
 
 namespace Daybreak.Views
 {

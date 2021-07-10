@@ -4,11 +4,11 @@ using Daybreak.Exceptions;
 using Daybreak.Models.Builds;
 using Daybreak.Services.ApplicationLauncher;
 using Daybreak.Services.BuildTemplates;
-using Daybreak.Services.Configuration;
 using Daybreak.Services.Screens;
 using Daybreak.Services.ViewManagement;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Configuration;
 using System.Extensions;
 using System.Linq;
 using System.Threading;
@@ -136,6 +136,7 @@ namespace Daybreak.Views
                     {
                         throw new InvalidOperationException($"Unable to set guildwars on desired screen. No screen with id {id}");
                     }
+
                     await Task.Delay(1000);
                     this.screenManager.MoveGuildwarsToScreen(desiredScreen);
                 }

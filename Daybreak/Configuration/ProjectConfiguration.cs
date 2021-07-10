@@ -18,10 +18,9 @@ using Microsoft.Extensions.Logging;
 using Slim;
 using System.Extensions;
 using System.Net.Http;
-using System.Windows.Extensions.Http;
 using LiteDB;
-using System.Windows.Extensions;
 using Daybreak.Services.Options;
+using System.Http;
 
 namespace Daybreak.Configuration
 {

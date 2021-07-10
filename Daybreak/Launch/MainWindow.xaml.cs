@@ -1,6 +1,5 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Services.Bloogum;
-using Daybreak.Services.Configuration;
 using Daybreak.Services.Privilege;
 using Daybreak.Services.Screenshots;
 using Daybreak.Services.Updater;
@@ -8,6 +7,7 @@ using Daybreak.Services.ViewManagement;
 using Daybreak.Views;
 using Pepa.Wpf.Utilities;
 using System;
+using System.Configuration;
 using System.Diagnostics;
 using System.Extensions;
 using System.Threading;

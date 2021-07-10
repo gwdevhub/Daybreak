@@ -1,8 +1,8 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Services.Configuration;
 using System;
+using System.Configuration;
 using System.Extensions;
-using System.Windows.Extensions;
 
 namespace Daybreak.Services.Options
 {
