@@ -5,9 +5,9 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Configuration;
 using System.Extensions;
-using System.Http;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Daybreak.Services.IconRetrieve

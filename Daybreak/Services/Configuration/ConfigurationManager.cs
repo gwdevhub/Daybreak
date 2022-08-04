@@ -26,7 +26,7 @@ namespace Daybreak.Services.Configuration
             }
             catch(Exception e)
             {
-                this.logger.LogWarning($"No configuration detected. Loading default configuration. Details: {e}");
+                this.logger.LogWarning(e, $"Failed to load configuration. Falling back to default configuration");
                 this.applicationConfiguration = new ApplicationConfiguration();
             }
         }

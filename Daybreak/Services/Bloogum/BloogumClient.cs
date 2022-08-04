@@ -2,8 +2,8 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Extensions;
-using System.Http;
 using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Daybreak.Services.Bloogum

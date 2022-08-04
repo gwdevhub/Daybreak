@@ -56,7 +56,6 @@ namespace Daybreak.Services.ViewManagement
         private void ShowViewInner(Type viewType, object dataContext)
         {
             var scopedManager = this.serviceManager.CreateScope();
-            scopedManager.As<IServiceManager>().RegisterScoped<ScopeMetadata, ScopeMetadata>((sp) => new ScopeMetadata(new CorrelationVector()));
             Application.Current.Dispatcher.Invoke(() =>
             {
                 var view = scopedManager.GetService(viewType).As<UserControl>();
