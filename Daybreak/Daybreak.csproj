@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
@@ -10,7 +10,7 @@
     <LangVersion>preview</LangVersion>
     <ApplicationIcon>Daybreak.ico</ApplicationIcon>
     <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
-    <Version>0.9.2.8</Version>
+    <Version>0.9.2.9</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -77,7 +77,7 @@
   <Target Name="RemoveDuplicateAnalyzers" BeforeTargets="CoreCompile">
 		<!-- Work around https://github.com/dotnet/wpf/issues/6792 -->
     <ItemGroup>
-      <FilteredAnalyzer Include="@(Analyzer->Distinct())" />
+      <FilteredAnalyzer Include="@(Analyzer-&gt;Distinct())" />
       <Analyzer Remove="@(Analyzer)" />
       <Analyzer Include="@(FilteredAnalyzer)" />
     </ItemGroup>
