@@ -5,6 +5,7 @@ Param(
 
 Write-Output "Deleting pdb file"
 Remove-item .\Publish\Daybreak.pdb
+Remove-item .\Publish\Daybreak.Installer.pdb
 $zipPath = "Publish\daybreakv$version.zip"
 Write-Output "Compressing binaries to $zipPath"
 Compress-Archive .\Publish\* $zipPath -Force

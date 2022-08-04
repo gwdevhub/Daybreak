@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Pipelines", "Pipelines", "{
 		.github\workflows\ci.yaml = .github\workflows\ci.yaml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daybreak.Installer", "Daybreak.Installer\Daybreak.Installer.csproj", "{4E2BB805-135D-4F02-8C53-3D8B6876D323}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,14 @@ Global
 		{C911C1C2-6566-419C-89C7-F802EB3FE709}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C911C1C2-6566-419C-89C7-F802EB3FE709}.Release|x64.ActiveCfg = Release|Any CPU
 		{C911C1C2-6566-419C-89C7-F802EB3FE709}.Release|x64.Build.0 = Release|Any CPU
+		{4E2BB805-135D-4F02-8C53-3D8B6876D323}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E2BB805-135D-4F02-8C53-3D8B6876D323}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E2BB805-135D-4F02-8C53-3D8B6876D323}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4E2BB805-135D-4F02-8C53-3D8B6876D323}.Debug|x64.Build.0 = Debug|Any CPU
+		{4E2BB805-135D-4F02-8C53-3D8B6876D323}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E2BB805-135D-4F02-8C53-3D8B6876D323}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E2BB805-135D-4F02-8C53-3D8B6876D323}.Release|x64.ActiveCfg = Release|Any CPU
+		{4E2BB805-135D-4F02-8C53-3D8B6876D323}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
