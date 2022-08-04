@@ -4,6 +4,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Extensions;
+using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 using Version = Daybreak.Models.Versioning.Version;
@@ -39,7 +40,7 @@ namespace Daybreak.Views
 
         private async void LoadVersionList()
         {
-            this.Versions.ClearAnd().AddRange(await this.applicationUpdater.GetVersions());
+            this.Versions.ClearAnd().AddRange((await this.applicationUpdater.GetVersions()).Reverse());
         }
 
         private void CurrentVersion_Clicked(object sender, EventArgs e)

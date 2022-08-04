@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Microsoft.Xaml.Behaviors;
+using System;
 using System.Extensions;
 using System.Windows.Controls;
-using System.Windows.Interactivity;
 
 namespace Daybreak.Behaviors
 {
