@@ -10,6 +10,7 @@ if (File.Exists(tempFile) is false)
 {
     Console.ForegroundColor = ConsoleColor.Red;
     Console.WriteLine("Unable to find launcher package. Aborting installation");
+    Console.ReadKey();
     return;
 }
 
@@ -25,4 +26,16 @@ catch
 Console.WriteLine("Deleting package");
 File.Delete(tempFile);
 Console.WriteLine("Launching application");
-Process.Start(executableName);
+var process = new Process
+{
+    StartInfo = new ProcessStartInfo
+    {
+        FileName = executableName
+    }
+};
+
+if (process.Start() is false)
+{
+    Console.WriteLine("Failed to launch application");
+    Console.ReadKey();
+}
