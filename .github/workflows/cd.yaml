@@ -70,8 +70,13 @@ jobs:
         $version = .\Scripts\GetBuildVersion.ps1
         echo "::set-env name=Version::$version"
 
-    - name: Create publish files
+    - name: Create publish launcher files
       run: dotnet publish .\Daybreak\Daybreak.csproj -c $env:Configuration -r $env:RuntimeIdentifier -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained true -o .\Publish
+      env:
+        RuntimeIdentifier: win-${{ matrix.targetplatform }}
+
+    - name: Create publish installer files
+      run: dotnet publish .\Daybreak.Installer\Daybreak.Installer.csproj -c $env:Configuration -r $env:RuntimeIdentifier -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained true -o .\Publish
       env:
         RuntimeIdentifier: win-${{ matrix.targetplatform }}
 

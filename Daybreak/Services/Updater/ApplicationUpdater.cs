@@ -3,7 +3,6 @@ using Daybreak.Exceptions;
 using Daybreak.Models;
 using Daybreak.Models.Github;
 using Daybreak.Services.ViewManagement;
-using Daybreak.Utils;
 using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
@@ -12,7 +11,6 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.Extensions;
-using System.Http;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -26,35 +24,15 @@ namespace Daybreak.Services.Updater
 {
     public sealed class ApplicationUpdater : IApplicationUpdater
     {
-        private const string LaunchActionName = "Launch_Daybreak";
-        private const string ExecutionPolicyKey = "ExecutionPolicy";
+        private const string InstallerFileName = "Daybreak.Installer.exe";
         private const string UpdatedKey = "Updating";
         private const string RegistryKey = "Daybreak";
-        private const string ExtractAndRunPs1 = "ExtractAndRun.ps1";
         private const string TempFile = "tempfile.zip";
         private const string VersionTag = "{VERSION}";
-        private const string InputFileTag = "{INPUTFILE}";
-        private const string OutputPathTag = "{OUTPUTPATH}";
-        private const string ExecutionPolicyTag = "{EXECUTIONPOLICY}";
-        private const string ProcessIdTag = "{PROCESSID}";
-        private const string ExecutableNameTag = "{EXECUTABLE}";
-        private const string WorkingDirectoryTag = "{WORKINGDIRECTORY}";
         private const string RefTagPrefix = "/refs/tags";
         private const string VersionListUrl = "https://api.github.com/repos/AlexMacocian/Daybreak/git/refs/tags";
         private const string Url = "https://github.com/AlexMacocian/Daybreak/releases/latest";
         private const string DownloadUrl = $"https://github.com/AlexMacocian/Daybreak/releases/download/{VersionTag}/Daybreak{VersionTag}.zip";
-        private const string GetExecutionPolicyCommand = "Get-ExecutionPolicy -Scope CurrentUser";
-        private const string SetExecutionPolicyCommand = $"Set-ExecutionPolicy {ExecutionPolicyTag} -Scope CurrentUser -Force";
-        private const string WaitCommand = $"Wait-Process -Id {ProcessIdTag}";
-        private const string ExtractCommandTemplate = $"Expand-Archive -Path '{InputFileTag}' -DestinationPath '{OutputPathTag}' -Force";
-        private const string PrepareScheduledAction = $"$action = New-ScheduledTaskAction -Execute {ExecutableNameTag} -WorkingDirectory {WorkingDirectoryTag}";
-        private const string PrepareTriggerForAction = $"$trigger = New-ScheduledTaskTrigger -Once -At (Get-Date)";
-        private const string RegisterScheduledAction = $"Register-ScheduledTask -Action $action -Trigger $trigger -TaskName {LaunchActionName} | Out-Null";
-        private const string LaunchScheduledAction = $"Start-ScheduledTask -TaskName {LaunchActionName}";
-        private const string SleepOneSecond = $"Start-Sleep -s 1";
-        private const string UnregisterScheduledAction = $"Unregister-ScheduledTask -TaskName {LaunchActionName} -Confirm:$false";
-        private const string RemoveTempFile = $"Remove-item {TempFile}";
-        private const string RemovePs1 = $"Remove-item {ExtractAndRunPs1}";
 
         private readonly CancellationTokenSource updateCancellationTokenSource = new();
         private readonly ILogger<ApplicationUpdater> logger;
@@ -191,23 +169,7 @@ namespace Daybreak.Services.Updater
 
         public void FinalizeUpdate()
         {
-            var maybeExecutionPolicy = this.RetrieveExecutionPolicy();
-            maybeExecutionPolicy.DoAny(
-                onNone: () =>
-                {
-                    throw new InvalidOperationException("Failed to retrieve execution policy");
-                });
-
-            var executionPolicy = maybeExecutionPolicy.ExtractValue();
-            if (executionPolicy is not ExecutionPolicies.Bypass ||
-                executionPolicy is not ExecutionPolicies.Unrestricted)
-            {
-                this.logger.LogInformation($"Execution policy is set to {executionPolicy}. Setting to {ExecutionPolicies.Bypass}");
-            }
-
-            SaveExecutionPolicyValueToRegistry(executionPolicy);
             MarkUpdateInRegistry();
-            this.SetExecutionPolicy(ExecutionPolicies.Bypass);
             this.LaunchExtractor();
         }
 
@@ -216,16 +178,6 @@ namespace Daybreak.Services.Updater
             if (UpdateMarkedInRegistry())
             {
                 UnmarkUpdateInRegistry();
-                var maybeExecutionPolicy = LoadExecutionPolicyValueFromRegistry();
-                maybeExecutionPolicy.Do(
-                    onSome: policy =>
-                    {
-                        SetExecutionPolicy(policy);
-                    },
-                    onNone: () =>
-                    {
-                        throw new InvalidOperationException("Found update marked in registry but no execution policy");
-                    });
             }
         }
 
@@ -245,92 +197,19 @@ namespace Daybreak.Services.Updater
             return Optional.None<string>();
         }
 
-        private Optional<ExecutionPolicies> RetrieveExecutionPolicy()
-        {
-            var process = new Process()
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "powershell",
-                    Arguments = GetExecutionPolicyCommand,
-                    UseShellExecute = false,
-                    RedirectStandardError = true,
-                    RedirectStandardInput = true,
-                    RedirectStandardOutput = true
-                }
-            };
-            process.Start();
-            this.logger.LogInformation("Checking current execution policy");
-            var output = process.StandardOutput.ReadToEnd();
-            if (!Enum.TryParse(typeof(ExecutionPolicies), output, out var executionPolicy))
-            {
-                var error = process.StandardError.ReadToEnd();
-                this.logger.LogError($"Failed to retrieve current user execution policy. Stdout: {output}. Stderr: {error}");
-                return Optional.None<ExecutionPolicies>();
-            }
-
-            return executionPolicy.Cast<ExecutionPolicies>();
-        }
-
-        private void SetExecutionPolicy(ExecutionPolicies executionPolicy)
-        {
-            var process = new Process()
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "powershell",
-                    Arguments = SetExecutionPolicyCommand.Replace(ExecutionPolicyTag, executionPolicy.ToString()),
-                    UseShellExecute = false,
-                    RedirectStandardError = true,
-                    RedirectStandardInput = true,
-                    RedirectStandardOutput = true
-                }
-            };
-            process.Start();
-            this.logger.LogInformation($"Setting execution policy to {executionPolicy}");
-            var output = process.StandardOutput.ReadToEnd();
-            if (!string.IsNullOrWhiteSpace(output))
-            {
-                var error = process.StandardError.ReadToEnd();
-                throw new InvalidOperationException($"Failed to set execution policy to {executionPolicy}. Stdout: {output}. Stderr: {error}");
-            }
-        }
-
         private void LaunchExtractor()
         {
-            File.WriteAllLines(ExtractAndRunPs1, new List<string>()
-            {
-                WaitCommand.Replace(ProcessIdTag, Environment.ProcessId.ToString()),
-                ExtractCommandTemplate
-                    .Replace(InputFileTag, Path.GetFullPath(TempFile))
-                    .Replace(OutputPathTag, Directory.GetCurrentDirectory()),
-                RemoveTempFile,
-                PrepareScheduledAction
-                    .Replace(ExecutableNameTag, Process.GetCurrentProcess()?.MainModule?.FileName)
-                    .Replace(WorkingDirectoryTag, Directory.GetCurrentDirectory()),
-                PrepareTriggerForAction,
-                RegisterScheduledAction,
-                LaunchScheduledAction,
-                SleepOneSecond,
-                UnregisterScheduledAction,
-                RemovePs1,
-            });
             var process = new Process()
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "powershell.exe",
-                    Arguments = $@"{Directory.GetCurrentDirectory()}\{ExtractAndRunPs1}",
-                    UseShellExecute = true,
-                    WindowStyle = ProcessWindowStyle.Maximized,
-                    WorkingDirectory = Directory.GetCurrentDirectory(),
-                    Verb = "runas"
-                },
+                    FileName = InstallerFileName
+                }
             };
-            this.logger.LogInformation("Created extractor script. Attempting to launch powershell");
+            this.logger.LogInformation("Launching installer");
             if (process.Start() is false)
             {
-                throw new InvalidOperationException("Failed to create and start powershell script");
+                throw new InvalidOperationException("Failed to launch installer");
             }
         }
 
@@ -366,40 +245,6 @@ namespace Daybreak.Services.Updater
             }
 
             return false;
-        }
-
-        private static void SaveExecutionPolicyValueToRegistry(ExecutionPolicies executionPolicy)
-        {
-            var homeRegistryKey = GetOrCreateHomeKey();
-            homeRegistryKey.SetValue(ExecutionPolicyKey, executionPolicy.ToString());
-            homeRegistryKey.Close();
-        }
-
-        private static Optional<ExecutionPolicies> LoadExecutionPolicyValueFromRegistry()
-        {
-            var homeRegistryKey = GetOrCreateHomeKey();
-            var executionPolicy = homeRegistryKey.GetValue(ExecutionPolicyKey);
-            homeRegistryKey.Close();
-            
-            if (executionPolicy is null)
-            {
-                return Optional.None<ExecutionPolicies>();
-            }
-            else if (executionPolicy is string executionPolicyString)
-            {
-                if (Enum.TryParse<ExecutionPolicies>(executionPolicyString, out var executionPolicyValue))
-                {
-                    return executionPolicyValue;
-                }
-                else
-                {
-                    throw new InvalidOperationException($"Found execution policy with value {executionPolicy}");
-                }
-            }
-            else
-            {
-                throw new InvalidOperationException($"Found execution policy of type {executionPolicy.GetType()}.");
-            }
         }
 
         private static RegistryKey GetOrCreateHomeKey()
