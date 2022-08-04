@@ -21,6 +21,8 @@ using System.Net.Http;
 using LiteDB;
 using Daybreak.Services.Options;
 using System.Http;
+using Daybreak.Models;
+using Microsoft.CorrelationVector;
 
 namespace Daybreak.Configuration
 {
@@ -46,7 +48,7 @@ namespace Daybreak.Configuration
         {
             serviceProducer.ThrowIfNull(nameof(serviceProducer));
 
-            serviceProducer.RegisterSingleton<ViewManager>();
+            serviceProducer.RegisterSingleton<ViewManager>(registerAllInterfaces: true);
             serviceProducer.RegisterSingleton<IConfigurationManager, ConfigurationManager>();
             serviceProducer.RegisterSingleton<ILiteDatabase, LiteDatabase>(sp => new LiteDatabase("Daybreak.db"));
             serviceProducer.RegisterSingleton<IMutexHandler, MutexHandler>();
@@ -61,6 +63,7 @@ namespace Daybreak.Configuration
             serviceProducer.RegisterScoped<IPrivilegeManager, PrivilegeManager>();
             serviceProducer.RegisterScoped<IScreenManager, ScreenManager>();
             serviceProducer.RegisterLogWriter<ILogsManager, JsonLogsManager>();
+            serviceProducer.RegisterScoped((sp) => new ScopeMetadata(new CorrelationVector()));
         }
 
         public static void RegisterViews(IViewProducer viewProducer)

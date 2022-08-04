@@ -9,49 +9,45 @@ namespace Daybreak.Models
     [Serializable]
     public sealed class SecureString
     {
-        public static SecureString Empty { get => new SecureString(string.Empty); }
+        public static SecureString Empty { get => new(string.Empty); }
 
         private byte[] encryptedBytes;
         private readonly byte[] key;
 
         private byte[] DecryptedValue
         {
-            get => encryptedBytes.DecryptBytes(key);
-            set => encryptedBytes = value.EncryptBytes(key);
+            get => this.encryptedBytes.DecryptBytes(key);
+            set => this.encryptedBytes = value.EncryptBytes(key);
         }
         [JsonProperty("value")]
         public string Value
         {
             get
             {
-                return encryptedBytes.DecryptBytes(key).AsString();
+                return this.encryptedBytes.DecryptBytes(key).AsString();
             }
             set
             {
-                encryptedBytes = value.AsBytes().EncryptBytes(key);
+                this.encryptedBytes = value.AsBytes().EncryptBytes(key);
             }
         }
         private SecureString(byte[] value)
         {
-            key = new byte[32];
-            using (var crypto = new RNGCryptoServiceProvider())
-            {
-                crypto.GetBytes(key);
-            }
+            this.key = new byte[32];
+            using var crypto = RandomNumberGenerator.Create();
+            crypto.GetBytes(key);
             this.DecryptedValue = value;
         }
         public SecureString(string value)
         {
-            key = new byte[32];
-            using (var crypto = new RNGCryptoServiceProvider())
-            {
-                crypto.GetBytes(key);
-            }
+            this.key = new byte[32];
+            using var crypto = RandomNumberGenerator.Create();
+            crypto.GetBytes(key);
             this.Value = value;
         }
 
         public static implicit operator string(SecureString ss) => ss is null ? string.Empty : ss.Value;
-        public static implicit operator SecureString(string s) => new SecureString(s);
+        public static implicit operator SecureString(string s) => new(s);
         public static SecureString operator +(SecureString ss1, SecureString ss2)
         {
             if (ss1 is null) throw new ArgumentNullException(nameof(ss1));
@@ -123,12 +119,12 @@ namespace Daybreak.Models
 
         public override int GetHashCode()
         {
-            return Value.GetHashCode();
+            return this.Value.GetHashCode();
         }
 
         public override string ToString()
         {
-            return Value;
+            return this.Value;
         }
     }
 }
