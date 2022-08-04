@@ -36,17 +36,6 @@ namespace Daybreak.Views
             this.InitializeComponent();
         }
 
-        private bool CheckIfAdmin()
-        {
-            if (this.privilegeManager.AdminPrivileges is false)
-            {
-                this.privilegeManager.RequestAdminPrivileges<MainView>("Application needs to be in administrator mode in order to update.");
-                return false;
-            }
-
-            return true;
-        }
-
         private void NoButton_Clicked(object sender, System.EventArgs e)
         {
             this.logger.LogInformation("User declined update");
@@ -58,11 +47,6 @@ namespace Daybreak.Views
         private async void YesButton_Clicked(object sender, System.EventArgs e)
         {
             this.logger.LogInformation("User accepted update");
-            if (this.CheckIfAdmin() is false)
-            {
-                return;
-            }
-
             var latestVersion = (await this.applicationUpdater.GetVersions()).Last();
             this.viewManager.ShowView<UpdateView>(latestVersion);
         }
