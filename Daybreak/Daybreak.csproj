@@ -74,4 +74,12 @@
     <Exec Command="echo.&gt;$(Version).version" />
   </Target>
 
+  <Target Name="RemoveDuplicateAnalyzers" BeforeTargets="CoreCompile">
+		<!-- Work around https://github.com/dotnet/wpf/issues/6792 -->
+    <ItemGroup>
+      <FilteredAnalyzer Include="@(Analyzer->Distinct())" />
+      <Analyzer Remove="@(Analyzer)" />
+      <Analyzer Include="@(FilteredAnalyzer)" />
+    </ItemGroup>
+  </Target>
 </Project>
