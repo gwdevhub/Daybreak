@@ -20,7 +20,6 @@ using System.Extensions;
 using System.Net.Http;
 using LiteDB;
 using Daybreak.Services.Options;
-using System.Http;
 using Daybreak.Models;
 using Microsoft.CorrelationVector;
 
@@ -32,15 +31,13 @@ namespace Daybreak.Configuration
         {
             serviceManager.ThrowIfNull(nameof(serviceManager));
 
-            serviceManager.RegisterResolver(
-                new HttpClientResolver()
-                .WithHttpMessageHandlerFactory((serviceProvider, categoryType) =>
-                {
-                    var loggerType = typeof(ILogger<>).MakeGenericType(categoryType);
-                    var logger = serviceProvider.GetService(loggerType).As<ILogger>();
-                    var handler = new LoggingHttpMessageHandler(logger) { InnerHandler = new HttpClientHandler() };
-                    return handler;
-                }));
+            serviceManager.RegisterHttpFactory((serviceProvider, categoryType) =>
+            {
+                var loggerType = typeof(ILogger<>).MakeGenericType(categoryType);
+                var logger = serviceProvider.GetService(loggerType).As<ILogger>();
+                var handler = new LoggingHttpMessageHandler(logger) { InnerHandler = new HttpClientHandler() };
+                return handler;
+            });
             serviceManager.RegisterOptionsManager<ApplicationConfigurationOptionsManager>();
         }
 
