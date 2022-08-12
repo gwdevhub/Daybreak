@@ -40,6 +40,7 @@ jobs:
 
     - name: Check version difference
       run: |
-        .\Scripts\CompareVersions -currentVersion ${{ env.Version }} -lastVersion ${{ env.LatestReleaseTag }}
+        $currentVersion = "v" + ${{ env.Version }}
+        .\Scripts\CompareVersions -currentVersion $currentVersion -lastVersion ${{ env.LatestReleaseTag }}
       env:
         LatestReleaseTag: ${{ steps.getLatestTag.outputs.tag }}
