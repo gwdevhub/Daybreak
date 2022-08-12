@@ -3,7 +3,6 @@ using Daybreak.Models.Builds;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.IconRetrieve;
 using Microsoft.Extensions.Logging;
-using Services.IconRetrieve;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

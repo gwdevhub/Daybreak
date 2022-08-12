@@ -2,7 +2,7 @@
 using Models;
 using System.Threading;
 
-namespace Services.IconRetrieve
+namespace Daybreak.Services.IconRetrieve
 {
     public interface IIconBrowser
     {

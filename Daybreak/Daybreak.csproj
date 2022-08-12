@@ -10,7 +10,7 @@
     <LangVersion>preview</LangVersion>
     <ApplicationIcon>Daybreak.ico</ApplicationIcon>
     <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
-    <Version>0.9.3.3</Version>
+    <Version>0.9.3.4</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -45,6 +45,9 @@
     <Compile Update="Controls\Buttons\CancelButton.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\IconDownloadView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -65,6 +68,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Controls\Buttons\CancelButton.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\IconDownloadView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>

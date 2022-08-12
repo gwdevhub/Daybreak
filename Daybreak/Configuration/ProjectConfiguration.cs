@@ -22,7 +22,7 @@ using LiteDB;
 using Daybreak.Services.Options;
 using Daybreak.Models;
 using Microsoft.CorrelationVector;
-using Services.IconRetrieve;
+using System.Logging;
 
 namespace Daybreak.Configuration
 {
@@ -61,7 +61,18 @@ namespace Daybreak.Configuration
             serviceProducer.RegisterScoped<IIconRetriever, IconRetriever>();
             serviceProducer.RegisterScoped<IPrivilegeManager, PrivilegeManager>();
             serviceProducer.RegisterScoped<IScreenManager, ScreenManager>();
-            serviceProducer.RegisterLogWriter<ILogsManager, JsonLogsManager>();
+            serviceProducer.RegisterSingleton<ILogsManager, JsonLogsManager>();
+            serviceProducer.RegisterSingleton<IDebugLogsWriter, Services.Logging.DebugLogsWriter>();
+            serviceProducer.RegisterSingleton<ILoggerFactory, LoggerFactory>(sp =>
+            {
+                var factory = new LoggerFactory();
+                factory.AddProvider(new CVLoggerProvider(sp.GetService<ILogsWriter>()));
+                return factory;
+            });
+            serviceProducer.RegisterSingleton<ILogsWriter, CompositeLogsWriter>(sp => new CompositeLogsWriter(
+                sp.GetService<ILogsManager>(),
+                sp.GetService<IDebugLogsWriter>()));
+            
             serviceProducer.RegisterScoped((sp) => new ScopeMetadata(new CorrelationVector()));
         }
 
@@ -83,6 +94,7 @@ namespace Daybreak.Configuration
             viewProducer.RegisterView<ScreenChoiceView>();
             viewProducer.RegisterView<VersionManagementView>();
             viewProducer.RegisterView<LogsView>();
+            viewProducer.RegisterView<IconDownloadView>();
         }
     }
 }

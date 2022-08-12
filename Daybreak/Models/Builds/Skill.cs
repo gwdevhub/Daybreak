@@ -143,7 +143,7 @@ namespace Daybreak.Models.Builds
         public static Skill Flurry { get; } = new() { Id = 344, Name = "Flurry", Profession = Profession.Warrior };
         public static Skill Frenzy { get; } = new() { Id = 346, Name = "Frenzy", Profession = Profession.Warrior };
         public static Skill Coward { get; } = new() { Id = 869, Name = "\"Coward!\"", Profession = Profession.Warrior };
-        public static Skill OnYourKnees { get; } = new() { Id = 906, Name = "On Your Knees!", Profession = Profession.Warrior };
+        public static Skill OnYourKnees { get; } = new() { Id = 906, Name = "\"On Your Knees!\"", Profession = Profession.Warrior };
         public static Skill YoureAllAlone { get; } = new() { Id = 1412, Name = "\"You're All Alone!\"", Profession = Profession.Warrior };
         public static Skill FrenziedDefense { get; } = new() { Id = 1700, Name = "Frenzied Defense", Profession = Profession.Warrior };
         public static Skill Grapple { get; } = new() { Id = 2011, Name = "Grapple", Profession = Profession.Warrior };
@@ -702,7 +702,7 @@ namespace Daybreak.Models.Builds
         public static Skill Echo { get; } = new() { Id = 74, Name = "Echo", Profession = Profession.Mesmer };
         public static Skill ArcaneEcho { get; } = new() { Id = 75, Name = "Arcane Echo", Profession = Profession.Mesmer };
         public static Skill Epidemic { get; } = new() { Id = 78, Name = "Epidemic", Profession = Profession.Mesmer };
-        public static Skill LyssasBalance { get; } = new() { Id = 877, Name = "Lyssa's Balance, Profession = Profession.Mesmer" };
+        public static Skill LyssasBalance { get; } = new() { Id = 877, Name = "Lyssa's Balance", Profession = Profession.Mesmer };
         public static Skill SignetofDisenchantment { get; } = new() { Id = 882, Name = "Signet of Disenchantment", Profession = Profession.Mesmer };
         public static Skill ShatterStorm { get; } = new() { Id = 933, Name = "Shatter Storm", Profession = Profession.Mesmer };
         public static Skill ExpelHexes { get; } = new() { Id = 954, Name = "Expel Hexes", Profession = Profession.Mesmer };
@@ -1053,7 +1053,7 @@ namespace Daybreak.Models.Builds
         public static Skill FeastofSouls { get; } = new() { Id = 980, Name = "Feast of Souls", Profession = Profession.Ritualist };
         public static Skill RitualLord { get; } = new() { Id = 1217, Name = "Ritual Lord", Profession = Profession.Ritualist };
         public static Skill AttunedWasSongkai { get; } = new() { Id = 1220, Name = "Attuned Was Songkai", Profession = Profession.Ritualist };
-        public static Skill AnguishedWasLingwah { get; } = new() { Id = 1223, Name = "Anguished Was Lingwah, Profession = Profession.Ritualist" };
+        public static Skill AnguishedWasLingwah { get; } = new() { Id = 1223, Name = "Anguished Was Lingwah", Profession = Profession.Ritualist };
         public static Skill ExplosiveGrowth { get; } = new() { Id = 1229, Name = "Explosive Growth", Profession = Profession.Ritualist };
         public static Skill BoonofCreation { get; } = new() { Id = 1230, Name = "Boon of Creation", Profession = Profession.Ritualist };
         public static Skill SpiritChanneling { get; } = new() { Id = 1231, Name = "Spirit Channeling", Profession = Profession.Ritualist };
@@ -1483,8 +1483,8 @@ namespace Daybreak.Models.Builds
         public static Skill VolfenBlessing { get; } = new() { Id = 2379, Name = "Volfen Blessing", Profession = Profession.None };
         public static Skill TimeWard { get; } = new() { Id = 3422, Name = "Time Ward", Profession = Profession.Mesmer };
         public static Skill SoulTaker { get; } = new() { Id = 3423, Name = "Soul Taker", Profession = Profession.Necromancer };
-        public static Skill OverTheLimit { get; } = new() { Id = 3424, Name = "Over The Limit", Profession = Profession.Elementalist };
-        public static Skill JudgementStrike { get; } = new() { Id = 3425, Name = "Judgement Strike", Profession = Profession.Monk };
+        public static Skill OverTheLimit { get; } = new() { Id = 3424, Name = "Over The Limit", AlternativeName = "Over the Limit", Profession = Profession.Elementalist };
+        public static Skill JudgementStrike { get; } = new() { Id = 3425, Name = "Judgement Strike", AlternativeName = "Judgment Strike", Profession = Profession.Monk };
         public static Skill SevenWeaponsStance { get; } = new() { Id = 3426, Name = "Seven Weapons Stance", Profession = Profession.Warrior };
         public static Skill Togetherasone { get; } = new() { Id = 3427, Name = "\"Together as one!\"", Profession = Profession.Ranger };
         public static Skill ShadowTheft { get; } = new() { Id = 3428, Name = "Shadow Theft", Profession = Profession.Assassin };
@@ -3022,6 +3022,7 @@ namespace Daybreak.Models.Builds
         public Profession Profession { get; private set; }
         public string Name { get; private set; }
         public int Id { get; private set; }
+        public string AlternativeName { get; private set; }
         private Skill()
         {
         }
