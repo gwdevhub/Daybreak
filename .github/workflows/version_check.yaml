@@ -1,0 +1,45 @@
+name:  Daybreak Version Check
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+
+  build:
+
+    strategy:
+      matrix:
+        targetplatform: [x64]
+
+    runs-on: windows-latest
+
+    env:
+      Configuration: Release
+      Solution_Path: Daybreak.sln
+      Actions_Allow_Unsecure_Commands: true
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    
+    - name: Get Latest Tag
+      id: getLatestTag
+      uses: WyriHaximus/github-action-get-previous-tag@v1
+
+    - name: Build Daybreak project
+      run: dotnet build Daybreak -c $env:Configuration
+
+    - name: Set version variable
+      run: |
+        $version = .\Scripts\GetBuildVersion.ps1
+        echo "::set-env name=Version::$version"
+
+    - name: Check version difference
+      run: |
+        .\Scripts\CompareVersions -currentVersion ${{ env.Version }} -lastVersion ${{ env.LatestReleaseTag }}
+      env:
+        LatestReleaseTag: ${{ steps.getLatestTag.outputs.tag }}

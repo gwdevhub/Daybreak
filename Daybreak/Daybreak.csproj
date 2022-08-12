@@ -10,7 +10,7 @@
     <LangVersion>preview</LangVersion>
     <ApplicationIcon>Daybreak.ico</ApplicationIcon>
     <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
-    <Version>0.9.3.4</Version>
+    <Version>0.9.3.5</Version>
   </PropertyGroup>
 
   <ItemGroup>
