@@ -5,7 +5,6 @@ using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.IconRetrieve;
 using Daybreak.Services.ViewManagement;
 using Microsoft.Extensions.Logging;
-using Services.IconRetrieve;
 using System;
 using System.Configuration;
 using System.Extensions;

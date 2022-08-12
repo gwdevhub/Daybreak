@@ -1,4 +1,5 @@
-﻿using Daybreak.Utils;
+﻿using Daybreak.Models.Builds;
+using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using Microsoft.Web.WebView2.Wpf;
 using Models;
@@ -7,13 +8,14 @@ using System;
 using System.Collections.Concurrent;
 using System.Core.Extensions;
 using System.Extensions;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
-namespace Services.IconRetrieve
+namespace Daybreak.Services.IconRetrieve
 {
     public sealed class IconBrowser : IIconBrowser
     {
@@ -23,6 +25,8 @@ namespace Services.IconRetrieve
         private const string BaseUrl = "https://wiki.guildwars.com";
         private const string QueryUrl = $"wiki/File:{NamePlaceholder}.jpg";
         private const string NamePlaceholder = "[SKILLNAME]";
+        private const string IconsDirectoryName = "Icons";
+        private const string IconsLocation = $"{IconsDirectoryName}/{NamePlaceholder}.jpg";
 
         private readonly ConcurrentQueue<IconRequest> iconRequests = new();
         private readonly ILogger<IconBrowser> logger;
@@ -62,7 +66,8 @@ namespace Services.IconRetrieve
                     continue;
                 }
 
-                this.logger.LogInformation($"Retrieving {request.Skill.Name} icon");
+                var logger = this.logger.CreateScopedLogger(nameof(this.PeriodicallyServeRequests), request.Skill?.Name);
+                logger.LogInformation($"Retrieving icon");
                 while(this.webView2 is null)
                 {
                     if (this.cancellationToken.IsCancellationRequested)
@@ -70,23 +75,21 @@ namespace Services.IconRetrieve
                         return;
                     }
 
-                    this.logger.LogInformation($"Browser is not yet initialized. Waiting");
+                    logger.LogInformation($"Browser is not yet initialized. Waiting");
                     await Task.Delay(1000);
                 }
-
-                await Application.Current.Dispatcher.InvokeAsync(async () =>
-                {
-                    await this.webView2.EnsureCoreWebView2Async();
-                }, DispatcherPriority.Render);
                 
-                var curedSkillName = request.Skill.Name.Replace(" ", "_");
+                var curedSkillName = request.Skill.AlternativeName.IsNullOrWhiteSpace() ?
+                    request.Skill.Name.Replace(" ", "_") :
+                    request.Skill.AlternativeName.Replace(" ", "_");
                 var skillIconUrl = $"{BaseUrl}/{QueryUrl.Replace(NamePlaceholder, curedSkillName)}";
-                this.logger.LogInformation($"Looking for icon at {skillIconUrl}");
+                logger.LogInformation($"Looking for icon at {skillIconUrl}");
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     this.webView2.Source = new Uri(skillIconUrl);
                 });
+
                 for(var i = 0; i < 5; i++)
                 {
                     if (this.cancellationToken.IsCancellationRequested)
@@ -94,24 +97,24 @@ namespace Services.IconRetrieve
                         return;
                     }
 
-                    this.logger.LogInformation("Executing extraction script");
+                    logger.LogInformation("Executing extraction script");
                     var responseTask = await Application.Current.Dispatcher.InvokeAsync(async () =>
                     {
                         return await this.webView2.ExecuteScriptAsync(Scripts.GetHrefFromSkillPage);
                     });
                     var response = await responseTask;
-                    this.logger.LogInformation("Parsing response");
+                    logger.LogInformation("Parsing response");
                     var iconPayload = JsonConvert.DeserializeObject<IconPayload>(response);
                     if (iconPayload is null)
                     {
-                        this.logger.LogInformation("Bad response");
+                        logger.LogInformation("Bad response");
                         await Task.Delay(1000);
                         continue;
                     }
 
                     if (iconPayload.SkillUrl != skillIconUrl.Replace("\"", "%22"))
                     {
-                        this.logger.LogInformation("Retrieved icon doesn't match");
+                        logger.LogInformation("Retrieved icon doesn't match");
                         await Task.Delay(1000);
                         continue;
                     }
@@ -120,18 +123,41 @@ namespace Services.IconRetrieve
                     if (potentialBase64 == FaultyBase64 ||
                         potentialBase64 == LargeFaultyBase64)
                     {
-                        this.logger.LogInformation("Faulty base64 retrieved");
+                        logger.LogInformation("Faulty base64 retrieved");
+                        await Task.Delay(1000);
                         continue;
                     }
 
+                    byte[] bytes;
+                    try
+                    {
+                        bytes = Convert.FromBase64String(potentialBase64);
+                    }
+                    catch
+                    {
+                        logger.LogError("Failed to parse base64");
+                        await Task.Delay(1000);
+                        continue;
+                    }
+
+                    await SaveIconLocally(request.Skill, bytes);
                     request.IconBase64 = potentialBase64;
                     request.Finished = true;
                     break;
                 }
 
-                this.logger.LogError($"Failed to retrieve icon for {request.Skill.Name}");
+                logger.LogError($"Failed to retrieve icon");
                 request.Finished = true;
             }
+        }
+
+        private static async Task<string> SaveIconLocally(Skill skill, byte[] data)
+        {
+            var curedSkillName = skill.Name
+                .Replace(" ", "_")
+                .Replace("\"", "");
+            await File.WriteAllBytesAsync(IconsLocation.Replace(NamePlaceholder, curedSkillName), data);
+            return curedSkillName;
         }
     }
 }
