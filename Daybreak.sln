@@ -11,9 +11,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Pipelines", "Pipelines", "{
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\cd.yaml = .github\workflows\cd.yaml
 		.github\workflows\ci.yaml = .github\workflows\ci.yaml
+		.github\workflows\version_check.yaml = .github\workflows\version_check.yaml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daybreak.Installer", "Daybreak.Installer\Daybreak.Installer.csproj", "{4E2BB805-135D-4F02-8C53-3D8B6876D323}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Daybreak.Installer", "Daybreak.Installer\Daybreak.Installer.csproj", "{4E2BB805-135D-4F02-8C53-3D8B6876D323}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{41AE8C5D-25E1-4B08-8D65-868552421A63}"
+	ProjectSection(SolutionItems) = preProject
+		Scripts\BuildRelease.ps1 = Scripts\BuildRelease.ps1
+		Scripts\GetBuildVersion.ps1 = Scripts\GetBuildVersion.ps1
+		Scripts\CompareVersions.ps1 = Scripts\CompareVersions.ps1
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
