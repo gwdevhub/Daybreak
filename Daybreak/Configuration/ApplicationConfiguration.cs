@@ -37,7 +37,5 @@ namespace Daybreak.Configuration
         public bool PlaceShortcut { get; set; }
         [JsonProperty("AutoCheckUpdate")]
         public bool AutoCheckUpdate { get; set; } = true;
-        [JsonProperty("KeepLocalIconCache")]
-        public bool KeepLocalIconCache { get; set; } = true;
     }
 }

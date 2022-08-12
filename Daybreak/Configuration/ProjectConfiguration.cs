@@ -22,6 +22,7 @@ using LiteDB;
 using Daybreak.Services.Options;
 using Daybreak.Models;
 using Microsoft.CorrelationVector;
+using Services.IconRetrieve;
 
 namespace Daybreak.Configuration
 {
@@ -50,6 +51,7 @@ namespace Daybreak.Configuration
             serviceProducer.RegisterSingleton<ILiteDatabase, LiteDatabase>(sp => new LiteDatabase("Daybreak.db"));
             serviceProducer.RegisterSingleton<IMutexHandler, MutexHandler>();
             serviceProducer.RegisterSingleton<IShortcutManager, ShortcutManager>();
+            serviceProducer.RegisterSingleton<IIconBrowser, IconBrowser>();
             serviceProducer.RegisterScoped<ICredentialManager, CredentialManager>();
             serviceProducer.RegisterScoped<IApplicationLauncher, ApplicationLauncher>();
             serviceProducer.RegisterScoped<IScreenshotProvider, ScreenshotProvider>();

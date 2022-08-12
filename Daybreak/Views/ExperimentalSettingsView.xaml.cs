@@ -16,45 +16,21 @@ namespace Daybreak.Views
     /// </summary>
     public partial class ExperimentalSettingsView : UserControl
     {
-        public static readonly DependencyProperty MultiLaunchProperty =
-            DependencyPropertyExtensions.Register<ExperimentalSettingsView, bool>(nameof(MultiLaunch));
-        public static readonly DependencyProperty GWToolboxLaunchDelayProperty =
-            DependencyPropertyExtensions.Register<ExperimentalSettingsView, string>(nameof(GWToolboxLaunchDelay));
-        public static readonly DependencyProperty DynamicBuildLoadingProperty =
-            DependencyPropertyExtensions.Register<ExperimentalSettingsView, bool>(nameof(DynamicBuildLoading));
-        public static readonly DependencyProperty LaunchAsCurrentUserProperty =
-            DependencyPropertyExtensions.Register<ExperimentalSettingsView, bool>(nameof(LaunchAsCurrentUser));
-        public static readonly DependencyProperty MacrosEnabledProperty =
-            DependencyPropertyExtensions.Register<ExperimentalSettingsView, bool>(nameof(MacrosEnabled));
+        [GenerateDependencyProperty]
+        private bool launchAsCurrentUser;
+        [GenerateDependencyProperty]
+        private bool multiLaunch;
+        [GenerateDependencyProperty]
+        private bool dynamicBuildLoading;
+        [GenerateDependencyProperty]
+        private bool macrosEnabled;
+        [GenerateDependencyProperty]
+        public string gWToolboxLaunchDelay;
+        [GenerateDependencyProperty]
+        public bool downloadIcons;
 
         private readonly IViewManager viewManager;
         private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions;
-
-        public bool LaunchAsCurrentUser
-        {
-            get => this.GetTypedValue<bool>(LaunchAsCurrentUserProperty);
-            set => this.SetValue(LaunchAsCurrentUserProperty, value);
-        }
-        public bool MultiLaunch
-        {
-            get => this.GetTypedValue<bool>(MultiLaunchProperty);
-            set => this.SetValue(MultiLaunchProperty, value);
-        }
-        public string GWToolboxLaunchDelay
-        {
-            get => this.GetTypedValue<string>(GWToolboxLaunchDelayProperty);
-            set => this.SetValue(GWToolboxLaunchDelayProperty, value);
-        }
-        public bool DynamicBuildLoading
-        {
-            get => this.GetTypedValue<bool>(DynamicBuildLoadingProperty);
-            set => this.SetValue(DynamicBuildLoadingProperty, value);
-        }
-        public bool MacrosEnabled
-        {
-            get => this.GetTypedValue<bool>(MacrosEnabledProperty);
-            set => this.SetValue(MacrosEnabledProperty, value);
-        }
 
         public ExperimentalSettingsView(
             IViewManager viewManager,
@@ -74,6 +50,7 @@ namespace Daybreak.Views
             this.DynamicBuildLoading = config.ExperimentalFeatures.DynamicBuildLoading;
             this.LaunchAsCurrentUser = config.ExperimentalFeatures.LaunchGuildwarsAsCurrentUser;
             this.MacrosEnabled = config.ExperimentalFeatures.CanInterceptKeys;
+            this.DownloadIcons = config.ExperimentalFeatures.DownloadIcons;
         }
 
         private void SaveExperimentalSettings()
@@ -83,6 +60,7 @@ namespace Daybreak.Views
             config.ExperimentalFeatures.DynamicBuildLoading = this.DynamicBuildLoading;
             config.ExperimentalFeatures.LaunchGuildwarsAsCurrentUser = this.LaunchAsCurrentUser;
             config.ExperimentalFeatures.CanInterceptKeys = this.MacrosEnabled;
+            config.ExperimentalFeatures.DownloadIcons = this.DownloadIcons;
             if (int.TryParse(this.GWToolboxLaunchDelay, out var gwToolboxLaunchDelay))
             {
                 config.ExperimentalFeatures.ToolboxAutoLaunchDelay = gwToolboxLaunchDelay;

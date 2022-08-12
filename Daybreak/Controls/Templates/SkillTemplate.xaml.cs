@@ -1,10 +1,6 @@
-﻿using Daybreak.Launch;
-using Daybreak.Models.Builds;
+﻿using Daybreak.Models.Builds;
 using Daybreak.Services.IconRetrieve;
 using System;
-using System.Extensions;
-using System.IO;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
@@ -41,19 +37,17 @@ namespace Daybreak.Controls
             this.iconRetriever = iconRetriever;
         }
 
-        private void SkillTemplate_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private async void SkillTemplate_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             if (e.NewValue is Skill skill)
             {
                 if (skill != Skill.NoSkill)
                 {
-                    Task.Run(() => this.GetImageStream(skill)).ContinueWith((previousTask) =>
+                    var maybeUri = await this.iconRetriever.GetIconUri(skill).ConfigureAwait(true);
+                    if (maybeUri.ExtractValue() is Uri uri)
                     {
-                        this.Dispatcher.Invoke(() =>
-                        {
-                            this.ImageSource = this.GetImageSource(previousTask.Result);
-                        });
-                    });
+                        this.ImageSource = new BitmapImage(uri);
+                    }
                 }
                 else if (this.ImageSource is not null)
                 {
@@ -89,33 +83,6 @@ namespace Daybreak.Controls
             }
 
             return false;
-        }
-        private async Task<Stream> GetImageStream(Skill skill)
-        {
-            if (this.iconRetriever is null)
-            {
-                return null;
-            }
-
-            var maybeStream = await this.iconRetriever.GetIcon(skill);
-            return maybeStream.ExtractValue();
-        }
-        private ImageSource GetImageSource(Stream stream)
-        {
-            if (stream is null)
-            {
-                return null;
-            }
-
-            return this.Dispatcher.Invoke(() =>
-            {
-                var bitmapImage = new BitmapImage();
-                bitmapImage.BeginInit();
-                bitmapImage.StreamSource = stream;
-                bitmapImage.CacheOption = BitmapCacheOption.OnDemand;
-                bitmapImage.EndInit();
-                return bitmapImage;
-            });
         }
     }
 }

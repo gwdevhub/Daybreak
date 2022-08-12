@@ -8,6 +8,7 @@ namespace Daybreak.Models.Browser
         [JsonConverter(typeof(StringEnumConverter))]
         public enum PayloadKeys
         {
+            None,
             ContextMenu
         }
 

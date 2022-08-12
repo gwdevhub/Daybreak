@@ -16,6 +16,8 @@ namespace Daybreak.Configuration
         public bool LaunchGuildwarsAsCurrentUser { get; set; } = true;
         [JsonProperty("CanInterceptKeys")]
         public bool CanInterceptKeys { get; set; }
+        [JsonProperty("DownloadIcons")]
+        public bool DownloadIcons { get; set; }
         [JsonProperty("Macros")]
         public List<KeyMacro> Macros { get; set; } = new();
     }
