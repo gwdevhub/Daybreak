@@ -3,12 +3,15 @@ using Daybreak.Models.Builds;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.IconRetrieve;
 using Microsoft.Extensions.Logging;
+using Services.IconRetrieve;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
+using System.Core.Extensions;
 using System.Extensions;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
@@ -27,8 +30,10 @@ namespace Daybreak.Controls
 
         private bool suppressBuildChanged = false;
         private bool loadedProperties = false;
+        private IIconBrowser iconBrowser;
         private BuildEntry loadedBuild;
         private SkillTemplate selectingSkillTemplate;
+        private CancellationTokenSource cancellationTokenSource = new();
 
         public event EventHandler BuildChanged;
 
@@ -65,11 +70,14 @@ namespace Daybreak.Controls
 
         public void InitializeTemplate(
             IIconRetriever iconRetriever,
+            IIconBrowser iconBrowser,
             ILiveOptions<ApplicationConfiguration> liveOptions,
             IBuildTemplateManager buildTemplateManager,
             ILogger<ChromiumBrowserWrapper> logger)
         {
+            this.iconBrowser = iconBrowser.ThrowIfNull();
             this.SkillBrowser.InitializeBrowser(liveOptions, buildTemplateManager, logger);
+            this.iconBrowser.InitializeWebView(this.SkillBrowser.WebBrowser, this.cancellationTokenSource.Token);
             this.SkillTemplate0.InitializeSkillTemplate(iconRetriever);
             this.SkillTemplate1.InitializeSkillTemplate(iconRetriever);
             this.SkillTemplate2.InitializeSkillTemplate(iconRetriever);
@@ -129,6 +137,11 @@ namespace Daybreak.Controls
                     this.BuildChanged?.Invoke(this, new EventArgs());
                 }
             }
+        }
+
+        private void BuildTemplate_Unloaded(object sender, RoutedEventArgs e)
+        {
+            this.cancellationTokenSource.Cancel();
         }
 
         private void InitializeProperties()

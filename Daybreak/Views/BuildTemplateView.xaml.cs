@@ -5,6 +5,7 @@ using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.IconRetrieve;
 using Daybreak.Services.ViewManagement;
 using Microsoft.Extensions.Logging;
+using Services.IconRetrieve;
 using System;
 using System.Configuration;
 using System.Extensions;
@@ -39,6 +40,7 @@ namespace Daybreak.Views
             IViewManager viewManager,
             IBuildTemplateManager buildTemplateManager,
             IIconRetriever iconRetriever,
+            IIconBrowser iconBrowser,
             ILiveOptions<ApplicationConfiguration> liveOptions,
             ILogger<ChromiumBrowserWrapper> chromiumLogger,
             ILogger<BuildTemplateView> logger)
@@ -47,7 +49,7 @@ namespace Daybreak.Views
             this.logger = logger.ThrowIfNull(nameof(logger));
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.InitializeComponent();
-            this.BuildTemplate.InitializeTemplate(iconRetriever, liveOptions, buildTemplateManager, chromiumLogger);
+            this.BuildTemplate.InitializeTemplate(iconRetriever, iconBrowser, liveOptions, buildTemplateManager, chromiumLogger);
             this.DataContextChanged += (sender, contextArgs) =>
             {
                 if (contextArgs.NewValue is BuildEntry)
