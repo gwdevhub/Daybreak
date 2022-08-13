@@ -102,5 +102,15 @@
         <Grid x:Name="Container" Grid.Row="1">
         </Grid>
         <wcl:Border OnResize="Border_OnResize" Grid.RowSpan="2" Active="True"></wcl:Border>
+        <controls:ChromiumBrowserWrapper x:Name="BackgroundWebView"
+                                         ControlsEnabled="True"
+                                         AddressBarReadonly="True"
+                                         CanNavigate="False"
+                                         CanDownloadBuild="False"
+                                         BrowserEnabled="True"
+                                         VerticalAlignment="Stretch"
+                                         HorizontalAlignment="Stretch"
+                                         Visibility="Visible"
+                                         Grid.Row="1"></controls:ChromiumBrowserWrapper>
     </Grid>
 </Window>

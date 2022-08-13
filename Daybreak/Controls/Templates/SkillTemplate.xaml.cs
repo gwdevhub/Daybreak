@@ -19,7 +19,7 @@ namespace Daybreak.Controls
         public event EventHandler<RoutedEventArgs> Clicked;
         public event EventHandler RemoveClicked;
 
-        private IIconRetriever iconRetriever;
+        private IIconCache iconRetriever;
 
         [GenerateDependencyProperty]
         private ImageSource imageSource;
@@ -32,7 +32,7 @@ namespace Daybreak.Controls
             this.DataContextChanged += SkillTemplate_DataContextChanged;
         }
 
-        public void InitializeSkillTemplate(IIconRetriever iconRetriever)
+        public void InitializeSkillTemplate(IIconCache iconRetriever)
         {
             this.iconRetriever = iconRetriever;
         }

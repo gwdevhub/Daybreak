@@ -73,13 +73,13 @@ namespace Daybreak.Views
             this.InitializeComponent();
             this.PeriodicallyCheckGameState();
             this.InitializeBrowsers();
-            this.NavigateToDefaults();
         }
 
-        private void InitializeBrowsers()
+        private async void InitializeBrowsers()
         {
-            this.LeftWebBrowser.InitializeBrowser(this.liveOptions, this.buildTemplateManager, this.browserLogger);
-            this.RightWebBrowser.InitializeBrowser(this.liveOptions, this.buildTemplateManager, this.browserLogger);
+            await this.LeftWebBrowser.InitializeBrowser(this.liveOptions, this.buildTemplateManager, this.browserLogger);
+            await this.RightWebBrowser.InitializeBrowser(this.liveOptions, this.buildTemplateManager, this.browserLogger);
+            this.NavigateToDefaults();
         }
 
         private void NavigateToDefaults()
@@ -91,6 +91,8 @@ namespace Daybreak.Views
                 this.RightBrowserFavoriteAddress = applicationConfiguration.RightBrowserDefault;
                 this.LeftBrowserAddress = applicationConfiguration.LeftBrowserDefault;
                 this.RightBrowserAddress = applicationConfiguration.RightBrowserDefault;
+                this.LeftWebBrowser.WebBrowser.CoreWebView2.Navigate(applicationConfiguration.LeftBrowserDefault);
+                this.RightWebBrowser.WebBrowser.CoreWebView2.Navigate(applicationConfiguration.RightBrowserDefault);
             }
             else
             {

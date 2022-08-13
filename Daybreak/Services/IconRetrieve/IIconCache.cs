@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Daybreak.Services.IconRetrieve
 {
-    public interface IIconRetriever
+    public interface IIconCache
     {
         Task<Optional<Uri>> GetIconUri(Skill skill);
     }

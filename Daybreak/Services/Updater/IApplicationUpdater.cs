@@ -1,4 +1,4 @@
-﻿using Daybreak.Models;
+﻿using Daybreak.Models.Progress;
 using Daybreak.Models.Versioning;
 using System.Collections.Generic;
 using System.Threading.Tasks;

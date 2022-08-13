@@ -1,4 +1,4 @@
-﻿namespace Models
+﻿namespace Daybreak.Models
 {
     public sealed class IconPayload
     {

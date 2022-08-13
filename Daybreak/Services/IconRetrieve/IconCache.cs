@@ -1,9 +1,6 @@
-﻿using Daybreak.Configuration;
-using Daybreak.Models.Builds;
+﻿using Daybreak.Models.Builds;
 using Microsoft.Extensions.Logging;
-using Models;
 using System;
-using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 using System.IO;
@@ -11,16 +8,16 @@ using System.Threading.Tasks;
 
 namespace Daybreak.Services.IconRetrieve
 {
-    public sealed class IconRetriever : IIconRetriever
+    public sealed class IconCache : IIconCache
     {
         private const string NamePlaceholder = "[SKILLNAME]";
         private const string IconsDirectoryName = "Icons";
         private const string IconsLocation = $"{IconsDirectoryName}/{NamePlaceholder}.jpg";
 
-        private readonly ILogger<IconRetriever> logger;
+        private readonly ILogger<IconCache> logger;
 
-        public IconRetriever(
-            ILogger<IconRetriever> logger)
+        public IconCache(
+            ILogger<IconCache> logger)
         {
             this.logger = logger.ThrowIfNull();
             if (Directory.Exists(IconsDirectoryName) is false)
