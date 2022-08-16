@@ -5,6 +5,8 @@ using Daybreak.Models.Builds;
 using Daybreak.Models.Progress;
 using Daybreak.Services.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Web.WebView2.Core;
+using Microsoft.Web.WebView2.Wpf;
 using System;
 using System.Configuration;
 using System.Core.Extensions;
@@ -12,6 +14,7 @@ using System.Extensions;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.IconRetrieve
@@ -24,7 +27,7 @@ namespace Daybreak.Services.IconRetrieve
         private readonly ILogger<IconDownloader> logger;
         private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
         private readonly ILogger<ChromiumBrowserWrapper> browserLogger;
-        private ChromiumBrowserWrapper browserWrapper;
+        private WebView2 browserWrapper;
         private CancellationTokenSource cancellationTokenSource;
         private IconDownloadStatus iconDownloadStatus;
 
@@ -48,7 +51,7 @@ namespace Daybreak.Services.IconRetrieve
             this.HookIntoConfigurationChanges();
         }
 
-        public void SetBrowser(ChromiumBrowserWrapper chromiumBrowserWrapper)
+        public void SetBrowser(WebView2 chromiumBrowserWrapper)
         {
             if (this.browserWrapper is not null)
             {
@@ -63,21 +66,6 @@ namespace Daybreak.Services.IconRetrieve
             while(this.browserWrapper is null)
             {
                 await Task.Delay(100);
-            }
-
-            await this.browserWrapper.InitializeBrowser(this.liveOptions, null, this.browserLogger);
-
-            if (this.browserWrapper.BrowserSupported is false ||
-                this.browserWrapper.BrowserEnabled is false)
-            {
-                this.logger.LogError("Browser is not supported. Cannot download icons");
-                if (this.iconDownloadStatus is null)
-                {
-                    this.iconDownloadStatus = new IconDownloadStatus();
-                }
-
-                this.iconDownloadStatus.CurrentStep = IconDownloadStatus.BrowserNotSupported;
-                return this.iconDownloadStatus;
             }
 
             this.logger.LogInformation("Starting download");
@@ -103,6 +91,13 @@ namespace Daybreak.Services.IconRetrieve
         private async Task DownloadIcons()
         {
             this.logger.LogInformation("Beginning icon download");
+            if (await TestBrowserSupported() is false)
+            {
+                this.logger.LogError("Browser not supported. Icon downloading stopped");
+                this.iconDownloadStatus.CurrentStep = IconDownloadStatus.BrowserNotSupported;
+                return;
+            }
+
             this.iconBrowser.InitializeWebView(this.browserWrapper, this.cancellationTokenSource.Token);
             var progressIncrement = 100d / Skill.Skills.Count();
             var incomplete = false;
@@ -163,6 +158,26 @@ namespace Daybreak.Services.IconRetrieve
             {
                 this.DownloadComplete = true;
             }
+        }
+
+        private static async Task<bool> TestBrowserSupported()
+        {
+            CoreWebView2Environment coreWebView2Environment;
+            try
+            {
+                var task = await Application.Current.Dispatcher.InvokeAsync(async () =>
+                {
+                    return await CoreWebView2Environment.CreateAsync().ConfigureAwait(true);
+                });
+
+                coreWebView2Environment = await task;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            return coreWebView2Environment is not null;
         }
 
         private void HookIntoConfigurationChanges()
