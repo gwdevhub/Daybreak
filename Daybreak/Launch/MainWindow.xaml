@@ -104,8 +104,8 @@
         </Grid>
         <wcl:Border OnResize="Border_OnResize" Grid.RowSpan="2" Active="True"></wcl:Border>
         <webview:WebView2 x:Name="BackgroundWebView"
-                                         VerticalAlignment="Stretch"
-                                         HorizontalAlignment="Stretch"
+                                         VerticalAlignment="Center"
+                                         HorizontalAlignment="Center"
                                          Visibility="Collapsed"
                                          Grid.Row="1"></webview:WebView2>
     </Grid>

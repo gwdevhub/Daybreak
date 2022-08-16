@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Extensions;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
@@ -19,7 +20,7 @@ namespace Daybreak.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return GetVisibility(value);
+            return this.GetVisibility(value);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -29,17 +30,24 @@ namespace Daybreak.Converters
 
         private object GetVisibility(object value)
         {
-            if (!(value is bool))
-                return DependencyProperty.UnsetValue;
-            bool objValue = (bool)value;
+            if (value is not bool)
+            {
+                return this.IsHidden ?
+                    Visibility.Hidden :
+                    Visibility.Collapsed;
+            }
+
+            var objValue = value.Cast<bool>();
             if ((objValue && TriggerValue && IsHidden) || (!objValue && !TriggerValue && IsHidden))
             {
                 return Visibility.Hidden;
             }
+
             if ((objValue && TriggerValue && !IsHidden) || (!objValue && !TriggerValue && !IsHidden))
             {
                 return Visibility.Collapsed;
             }
+
             return Visibility.Visible;
         }
     }
