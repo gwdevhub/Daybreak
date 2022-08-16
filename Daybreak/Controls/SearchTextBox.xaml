@@ -1,0 +1,34 @@
+﻿<UserControl x:Class="Daybreak.Controls.SearchTextBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Daybreak.Controls"
+             x:Name="_this"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
+    </UserControl.Resources>
+    <Grid>
+        <TextBox Foreground="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=Foreground, Mode=OneWay}"
+                 FontSize="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=FontSize, Mode=OneWay}"
+                 FontFamily="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=FontFamily, Mode=OneWay}"
+                 FontStretch="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=FontStretch, Mode=OneWay}"
+                 FontWeight="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=FontWeight, Mode=OneWay}"
+                 FontStyle="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=FontStyle, Mode=OneWay}"
+                 TextChanged="TextBox_TextChanged"
+                 Background="Transparent"/>
+        <TextBlock  Text="Search"
+                    Background="Transparent"
+                    Opacity="0.5"
+                    IsHitTestVisible="False"
+                    FontSize="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=FontSize, Mode=OneWay}"
+                    FontFamily="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=FontFamily, Mode=OneWay}"
+                    FontStretch="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=FontStretch, Mode=OneWay}"
+                    FontWeight="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=FontWeight, Mode=OneWay}"
+                    FontStyle="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=FontStyle, Mode=OneWay}"
+                    Foreground="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=Foreground, Mode=OneWay}"
+                    Visibility="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=PlaceholderVisibility, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+    </Grid>
+</UserControl>
