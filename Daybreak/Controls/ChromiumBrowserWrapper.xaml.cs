@@ -44,8 +44,8 @@ namespace Daybreak.Controls
         private bool canNavigate;
         [GenerateDependencyProperty(InitialValue = true)]
         private bool controlsEnabled;
-        [GenerateDependencyProperty]
-        private bool browserSupported;
+        [GenerateDependencyProperty(InitialValue = null)]
+        private bool? browserSupported;
         [GenerateDependencyProperty]
         private bool addressBarReadonly;
         [GenerateDependencyProperty]

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
@@ -98,11 +99,40 @@ namespace Daybreak.Services.IconRetrieve
                 return;
             }
 
-            this.iconBrowser.InitializeWebView(this.browserWrapper, this.cancellationTokenSource.Token);
             var progressIncrement = 100d / Skill.Skills.Count();
-            var incomplete = false;
             var progressValue = 0d;
-            foreach (var skill in Skill.Skills.OrderBy(s => s.Name))
+            var skillsToDownload = new List<Skill>();
+            foreach(var skill in Skill.Skills.OrderBy(s => s.Name))
+            {
+                if (skill == Skill.NoSkill)
+                {
+                    continue;
+                }
+
+                var logger = this.logger.CreateScopedLogger(nameof(this.DownloadIcons), skill.Name);
+                logger.LogInformation("Verifying if icon exists");
+                this.iconDownloadStatus.CurrentStep = IconDownloadStatus.Checking(skill.Name, progressValue);
+                if ((await this.iconCache.GetIconUri(skill)).ExtractValue() is not null)
+                {
+                    progressValue += progressIncrement;
+                    await Task.Delay(1);
+                    continue;
+                }
+
+                skillsToDownload.Add(skill);
+            }
+
+            if (skillsToDownload.Count == 0)
+            {
+                this.logger.LogInformation("No icons missing. Stopping download");
+                this.iconDownloadStatus.CurrentStep = IconDownloadStatus.Finished;
+                return;
+            }
+
+            this.iconBrowser.InitializeWebView(this.browserWrapper, this.cancellationTokenSource.Token);
+            
+            var incomplete = false;
+            foreach (var skill in skillsToDownload)
             {
                 if (this.cancellationTokenSource?.IsCancellationRequested is null or true)
                 {
@@ -114,17 +144,7 @@ namespace Daybreak.Services.IconRetrieve
                 {
                     progressValue += progressIncrement;
                     continue;
-                }
-
-                var logger = this.logger.CreateScopedLogger(nameof(this.DownloadIcons), skill.Name);
-                logger.LogInformation("Verifying if icon exists");
-                this.iconDownloadStatus.CurrentStep = IconDownloadStatus.Checking(skill.Name, progressValue);
-                if ((await this.iconCache.GetIconUri(skill)).ExtractValue() is not null)
-                {
-                    logger.LogInformation("Icon exists");
-                    progressValue += progressIncrement;
-                    continue;
-                }
+                }                
 
                 logger.LogInformation("Downloading icon");
                 this.iconDownloadStatus.CurrentStep = IconDownloadStatus.Downloading(skill.Name, progressValue);
@@ -156,6 +176,12 @@ namespace Daybreak.Services.IconRetrieve
             }
             else
             {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    this.browserWrapper.IsEnabled = false;
+                    this.browserWrapper.Dispose();
+                });
+                this.iconDownloadStatus.CurrentStep = IconDownloadStatus.Finished;
                 this.DownloadComplete = true;
             }
         }
