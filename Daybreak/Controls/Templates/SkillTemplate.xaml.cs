@@ -19,7 +19,7 @@ namespace Daybreak.Controls
         public event EventHandler<RoutedEventArgs> Clicked;
         public event EventHandler RemoveClicked;
 
-        private IIconRetriever iconRetriever;
+        private IIconCache iconRetriever;
 
         [GenerateDependencyProperty]
         private ImageSource imageSource;
@@ -32,13 +32,19 @@ namespace Daybreak.Controls
             this.DataContextChanged += SkillTemplate_DataContextChanged;
         }
 
-        public void InitializeSkillTemplate(IIconRetriever iconRetriever)
+        public void InitializeSkillTemplate(IIconCache iconRetriever)
         {
             this.iconRetriever = iconRetriever;
+            this.SkillTemplate_DataContextChanged(this, new DependencyPropertyChangedEventArgs(UserControl.DataContextProperty, null, this.DataContext));
         }
 
         private async void SkillTemplate_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
+            if (this.iconRetriever is null)
+            {
+                return;
+            }
+
             if (e.NewValue is Skill skill)
             {
                 if (skill != Skill.NoSkill)

@@ -46,21 +46,6 @@ namespace Daybreak.Configuration
         {
             serviceProducer.ThrowIfNull(nameof(serviceProducer));
 
-            serviceProducer.RegisterSingleton<ViewManager>(registerAllInterfaces: true);
-            serviceProducer.RegisterSingleton<IConfigurationManager, ConfigurationManager>();
-            serviceProducer.RegisterSingleton<ILiteDatabase, LiteDatabase>(sp => new LiteDatabase("Daybreak.db"));
-            serviceProducer.RegisterSingleton<IMutexHandler, MutexHandler>();
-            serviceProducer.RegisterSingleton<IShortcutManager, ShortcutManager>();
-            serviceProducer.RegisterSingleton<IIconBrowser, IconBrowser>();
-            serviceProducer.RegisterScoped<ICredentialManager, CredentialManager>();
-            serviceProducer.RegisterScoped<IApplicationLauncher, ApplicationLauncher>();
-            serviceProducer.RegisterScoped<IScreenshotProvider, ScreenshotProvider>();
-            serviceProducer.RegisterScoped<IBloogumClient, BloogumClient>();
-            serviceProducer.RegisterScoped<IApplicationUpdater, ApplicationUpdater>();
-            serviceProducer.RegisterScoped<IBuildTemplateManager, BuildTemplateManager>();
-            serviceProducer.RegisterScoped<IIconRetriever, IconRetriever>();
-            serviceProducer.RegisterScoped<IPrivilegeManager, PrivilegeManager>();
-            serviceProducer.RegisterScoped<IScreenManager, ScreenManager>();
             serviceProducer.RegisterSingleton<ILogsManager, JsonLogsManager>();
             serviceProducer.RegisterSingleton<IDebugLogsWriter, Services.Logging.DebugLogsWriter>();
             serviceProducer.RegisterSingleton<ILoggerFactory, LoggerFactory>(sp =>
@@ -72,8 +57,24 @@ namespace Daybreak.Configuration
             serviceProducer.RegisterSingleton<ILogsWriter, CompositeLogsWriter>(sp => new CompositeLogsWriter(
                 sp.GetService<ILogsManager>(),
                 sp.GetService<IDebugLogsWriter>()));
-            
+
             serviceProducer.RegisterScoped((sp) => new ScopeMetadata(new CorrelationVector()));
+            serviceProducer.RegisterSingleton<ViewManager>(registerAllInterfaces: true);
+            serviceProducer.RegisterSingleton<IConfigurationManager, ConfigurationManager>();
+            serviceProducer.RegisterSingleton<ILiteDatabase, LiteDatabase>(sp => new LiteDatabase("Daybreak.db"));
+            serviceProducer.RegisterSingleton<IMutexHandler, MutexHandler>();
+            serviceProducer.RegisterSingleton<IShortcutManager, ShortcutManager>();
+            serviceProducer.RegisterSingleton<IIconBrowser, IconBrowser>();
+            serviceProducer.RegisterSingleton<IIconDownloader, IconDownloader>();
+            serviceProducer.RegisterScoped<ICredentialManager, CredentialManager>();
+            serviceProducer.RegisterScoped<IApplicationLauncher, ApplicationLauncher>();
+            serviceProducer.RegisterScoped<IScreenshotProvider, ScreenshotProvider>();
+            serviceProducer.RegisterScoped<IBloogumClient, BloogumClient>();
+            serviceProducer.RegisterScoped<IApplicationUpdater, ApplicationUpdater>();
+            serviceProducer.RegisterScoped<IBuildTemplateManager, BuildTemplateManager>();
+            serviceProducer.RegisterScoped<IIconCache, IconCache>();
+            serviceProducer.RegisterScoped<IPrivilegeManager, PrivilegeManager>();
+            serviceProducer.RegisterScoped<IScreenManager, ScreenManager>();
         }
 
         public static void RegisterViews(IViewProducer viewProducer)

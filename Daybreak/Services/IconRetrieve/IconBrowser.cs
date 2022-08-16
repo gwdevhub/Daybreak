@@ -1,8 +1,10 @@
-﻿using Daybreak.Models.Builds;
+﻿using Daybreak.Controls;
+using Daybreak.Models;
+using Daybreak.Models.Builds;
 using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
+using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
-using Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -13,7 +15,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Threading;
 
 namespace Daybreak.Services.IconRetrieve
 {
@@ -30,7 +31,7 @@ namespace Daybreak.Services.IconRetrieve
 
         private readonly ConcurrentQueue<IconRequest> iconRequests = new();
         private readonly ILogger<IconBrowser> logger;
-        private WebView2 webView2;
+        private WebView2 browserWrapper;
         private CancellationToken cancellationToken;
 
         public IconBrowser(
@@ -41,7 +42,7 @@ namespace Daybreak.Services.IconRetrieve
 
         public void InitializeWebView(WebView2 webView2, CancellationToken cancellationToken)
         {
-            this.webView2 = webView2.ThrowIfNull();
+            this.browserWrapper = webView2.ThrowIfNull();
             this.cancellationToken = cancellationToken;
             Task.Run(this.PeriodicallyServeRequests, cancellationToken);
         }
@@ -53,102 +54,116 @@ namespace Daybreak.Services.IconRetrieve
 
         private async Task PeriodicallyServeRequests()
         {
-            while(true)
+            while(this.cancellationToken.IsCancellationRequested is false)
+            {
+                await Application.Current.Dispatcher.InvokeAsync(async () =>
+                {
+                    await this.ServeRequest();
+                });
+            }
+        }
+
+        private async Task ServeRequest()
+        {
+            if (this.cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
+            if (this.iconRequests.TryDequeue(out var request) is false)
+            {
+                await Task.Delay(1000);
+                return;
+            }
+
+            var logger = this.logger.CreateScopedLogger(nameof(this.PeriodicallyServeRequests), request.Skill?.Name);
+            logger.LogInformation($"Retrieving icon");
+            while (this.browserWrapper is null)
             {
                 if (this.cancellationToken.IsCancellationRequested)
                 {
                     return;
                 }
 
-                if (this.iconRequests.TryDequeue(out var request) is false)
+                logger.LogInformation($"Browser is not yet initialized. Waiting");
+                await Task.Delay(1000);
+            }
+
+            try
+            {
+                await this.browserWrapper.EnsureCoreWebView2Async();
+            }
+            catch(Exception e)
+            {
+
+            }
+
+            var curedSkillName = request.Skill.AlternativeName.IsNullOrWhiteSpace() ?
+                request.Skill.Name.Replace(" ", "_") :
+                request.Skill.AlternativeName.Replace(" ", "_");
+            var skillIconUrl = $"{BaseUrl}/{QueryUrl.Replace(NamePlaceholder, curedSkillName)}";
+            logger.LogInformation($"Looking for icon at {skillIconUrl}");
+
+            this.browserWrapper.CoreWebView2.Navigate(skillIconUrl);
+
+            for (var i = 0; i < 5; i++)
+            {
+                if (this.cancellationToken.IsCancellationRequested)
                 {
+                    return;
+                }
+
+                logger.LogInformation("Executing extraction script");
+                var responseTask = await Application.Current.Dispatcher.InvokeAsync(async () =>
+                {
+                    return await this.browserWrapper.ExecuteScriptAsync(Scripts.GetHrefFromSkillPage);
+                });
+                var response = await responseTask;
+                logger.LogInformation("Parsing response");
+                var iconPayload = JsonConvert.DeserializeObject<IconPayload>(response);
+                if (iconPayload is null)
+                {
+                    logger.LogInformation("Bad response");
                     await Task.Delay(1000);
                     continue;
                 }
 
-                var logger = this.logger.CreateScopedLogger(nameof(this.PeriodicallyServeRequests), request.Skill?.Name);
-                logger.LogInformation($"Retrieving icon");
-                while(this.webView2 is null)
+                if (iconPayload.SkillUrl != skillIconUrl.Replace("\"", "%22"))
                 {
-                    if (this.cancellationToken.IsCancellationRequested)
-                    {
-                        return;
-                    }
-
-                    logger.LogInformation($"Browser is not yet initialized. Waiting");
+                    logger.LogInformation("Retrieved icon doesn't match");
                     await Task.Delay(1000);
-                }
-                
-                var curedSkillName = request.Skill.AlternativeName.IsNullOrWhiteSpace() ?
-                    request.Skill.Name.Replace(" ", "_") :
-                    request.Skill.AlternativeName.Replace(" ", "_");
-                var skillIconUrl = $"{BaseUrl}/{QueryUrl.Replace(NamePlaceholder, curedSkillName)}";
-                logger.LogInformation($"Looking for icon at {skillIconUrl}");
-
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    this.webView2.Source = new Uri(skillIconUrl);
-                });
-
-                for(var i = 0; i < 5; i++)
-                {
-                    if (this.cancellationToken.IsCancellationRequested)
-                    {
-                        return;
-                    }
-
-                    logger.LogInformation("Executing extraction script");
-                    var responseTask = await Application.Current.Dispatcher.InvokeAsync(async () =>
-                    {
-                        return await this.webView2.ExecuteScriptAsync(Scripts.GetHrefFromSkillPage);
-                    });
-                    var response = await responseTask;
-                    logger.LogInformation("Parsing response");
-                    var iconPayload = JsonConvert.DeserializeObject<IconPayload>(response);
-                    if (iconPayload is null)
-                    {
-                        logger.LogInformation("Bad response");
-                        await Task.Delay(1000);
-                        continue;
-                    }
-
-                    if (iconPayload.SkillUrl != skillIconUrl.Replace("\"", "%22"))
-                    {
-                        logger.LogInformation("Retrieved icon doesn't match");
-                        await Task.Delay(1000);
-                        continue;
-                    }
-
-                    var potentialBase64 = iconPayload.SkillImage.Split(',').Skip(1).FirstOrDefault();
-                    if (potentialBase64 == FaultyBase64 ||
-                        potentialBase64 == LargeFaultyBase64)
-                    {
-                        logger.LogInformation("Faulty base64 retrieved");
-                        await Task.Delay(1000);
-                        continue;
-                    }
-
-                    byte[] bytes;
-                    try
-                    {
-                        bytes = Convert.FromBase64String(potentialBase64);
-                    }
-                    catch
-                    {
-                        logger.LogError("Failed to parse base64");
-                        await Task.Delay(1000);
-                        continue;
-                    }
-
-                    await SaveIconLocally(request.Skill, bytes);
-                    request.IconBase64 = potentialBase64;
-                    request.Finished = true;
-                    break;
+                    continue;
                 }
 
-                logger.LogError($"Failed to retrieve icon");
+                var potentialBase64 = iconPayload.SkillImage.Split(',').Skip(1).FirstOrDefault();
+                if (potentialBase64 == FaultyBase64 ||
+                    potentialBase64 == LargeFaultyBase64)
+                {
+                    logger.LogInformation("Faulty base64 retrieved");
+                    await Task.Delay(1000);
+                    continue;
+                }
+
+                byte[] bytes;
+                try
+                {
+                    bytes = Convert.FromBase64String(potentialBase64);
+                }
+                catch
+                {
+                    logger.LogError("Failed to parse base64");
+                    await Task.Delay(1000);
+                    continue;
+                }
+
+                await SaveIconLocally(request.Skill, bytes);
+                request.IconBase64 = potentialBase64;
                 request.Finished = true;
+                break;
             }
+
+            logger.LogError($"Failed to retrieve icon");
+            request.Finished = true;
         }
 
         private static async Task<string> SaveIconLocally(Skill skill, byte[] data)

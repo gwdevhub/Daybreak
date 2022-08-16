@@ -1,4 +1,4 @@
-﻿using Daybreak.Models;
+﻿using Daybreak.Models.Progress;
 using Daybreak.Services.Updater;
 using Daybreak.Services.ViewManagement;
 using Microsoft.Extensions.Logging;
@@ -51,7 +51,7 @@ namespace Daybreak.Views
                     this.ProgressValue = downloadUpdateStep.Progress * 100;
                 }
 
-                this.Description = this.updateStatus.CurrentStep.Name;
+                this.Description = this.updateStatus.CurrentStep.Description;
             });
         }
 
