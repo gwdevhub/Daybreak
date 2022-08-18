@@ -1,7 +1,7 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Exceptions;
-using Daybreak.Models;
 using Daybreak.Models.Github;
+using Daybreak.Models.Progress;
 using Daybreak.Services.ViewManagement;
 using Daybreak.Views;
 using Microsoft.Extensions.Logging;

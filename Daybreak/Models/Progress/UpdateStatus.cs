@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Daybreak.Models
+namespace Daybreak.Models.Progress
 {
     public sealed class UpdateStatus : INotifyPropertyChanged
     {
@@ -17,30 +17,26 @@ namespace Daybreak.Models
 
         public UpdateStep CurrentStep
         {
-            get => this.currentStep;
+            get => currentStep;
             set
             {
-                this.currentStep = value;
-                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentStep)));
+                currentStep = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentStep)));
             }
         }
 
-        public class UpdateStep
+        public class UpdateStep : LoadStatus
         {
-            public string Name { get; }
-            internal UpdateStep(string name)
+            public UpdateStep(string name) : base(name)
             {
-                this.Name = name;
             }
         }
         public class DownloadUpdateStep : UpdateStep
         {
             internal DownloadUpdateStep(string name, double progress) : base(name)
             {
-                this.Progress = progress;
+                Progress = progress;
             }
-
-            public double Progress { get; }
         }
     }
 }
