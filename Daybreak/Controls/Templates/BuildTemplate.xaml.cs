@@ -14,6 +14,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
+using Utils;
 
 namespace Daybreak.Controls
 {
@@ -36,6 +37,8 @@ namespace Daybreak.Controls
 
         public event EventHandler BuildChanged;
 
+        [GenerateDependencyProperty]
+        private string skillSearchText;
         [GenerateDependencyProperty]
         private Profession primaryProfession;
         [GenerateDependencyProperty]
@@ -84,6 +87,9 @@ namespace Daybreak.Controls
             this.SkillTemplate5.InitializeSkillTemplate(iconRetriever);
             this.SkillTemplate6.InitializeSkillTemplate(iconRetriever);
             this.SkillTemplate7.InitializeSkillTemplate(iconRetriever);
+
+            this.HideSkillListView();
+            this.HideInfoBrowser();
         }
 
         protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -207,6 +213,9 @@ namespace Daybreak.Controls
             var possibleSkills = Skill.Skills
                 .Where(s => s.Profession == this.PrimaryProfession || s.Profession == this.SecondaryProfession || s.Profession == Profession.None)
                 .Where(s => s != Skill.NoSkill)
+                .Where(s => this.SkillSearchText.IsNullOrWhiteSpace() ?
+                            true :
+                            StringUtils.MatchesSearchString(s.Name.Replace("\"", "").Replace("!", ""), this.SkillSearchText.Replace("\"", "").Replace("!", "")))
                 .OrderBy(s => s.Name);
             this.AvailableSkills.ClearAnd().AddRange(possibleSkills);
 
@@ -297,7 +306,7 @@ namespace Daybreak.Controls
             if (this.SkillBrowser.BrowserSupported is true)
             {
                 this.SkillBrowser.Width = 400;
-                this.SkillsListView.Width = 0;
+                this.SkillListContainer.Width = 0;
             }
         }
 
@@ -312,12 +321,12 @@ namespace Daybreak.Controls
         private void ShowSkillListView()
         {
             this.SkillBrowser.Width = 0;
-            this.SkillsListView.Width = 400;
+            this.SkillListContainer.Width = 400;
         }
 
         private void HideSkillListView()
         {
-            this.SkillsListView.Width = 0;
+            this.SkillListContainer.Width = 0;
         }
 
         private void HelpButtonPrimary_Clicked(object sender, System.EventArgs e)
@@ -363,6 +372,7 @@ namespace Daybreak.Controls
             var skill = sender.As<SkillTemplate>().DataContext.As<Skill>();
             if (skill == Skill.NoSkill)
             {
+                this.SkillSearchText = string.Empty;
                 this.ShowSkillListView();
                 this.selectingSkillTemplate = sender.As<SkillTemplate>();
             }
@@ -372,6 +382,11 @@ namespace Daybreak.Controls
             }
 
             e.Handled = true;
+        }
+
+        private void SearchTextBox_TextChanged(object sender, string e)
+        {
+            this.LoadSkills();
         }
 
         private void SkillTemplate_RemoveClicked(object sender, System.EventArgs e)
@@ -414,6 +429,17 @@ namespace Daybreak.Controls
                     sender.As<ListView>().SelectedIndex + 1 :
                     sender.As<ListView>().Items.Count;
             }
+        }
+
+        private void ScrollViewer_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        {
+            if (sender is not ScrollViewer scrollViewer)
+            {
+                return;
+            }
+
+            e.Handled = true;
+            scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - e.Delta);
         }
     }
 }
