@@ -19,7 +19,8 @@
                  FontStyle="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=FontStyle, Mode=OneWay}"
                  TextChanged="TextBox_TextChanged"
                  Background="Transparent"/>
-        <TextBlock  Text="Search"
+        <TextBlock  Margin="5, 0, 0, 0"
+                    Text="Search"
                     Background="Transparent"
                     Opacity="0.5"
                     IsHitTestVisible="False"

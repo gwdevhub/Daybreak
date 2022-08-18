@@ -2,9 +2,12 @@
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.ViewManagement;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Extensions;
+using System.Linq;
 using System.Windows.Controls;
+using Utils;
 
 namespace Daybreak.Views
 {
@@ -15,6 +18,8 @@ namespace Daybreak.Views
     {
         private readonly IViewManager viewManager;
         private readonly IBuildTemplateManager buildTemplateManager;
+
+        private IEnumerable<BuildEntry> buildEntries;
 
         public ObservableCollection<BuildEntry> BuildEntries { get; } = new ObservableCollection<BuildEntry>();
 
@@ -30,7 +35,8 @@ namespace Daybreak.Views
 
         private void LoadBuilds()
         {
-            this.BuildEntries.ClearAnd().AddRange(this.buildTemplateManager.GetBuilds());
+            this.buildEntries = this.buildTemplateManager.GetBuilds();
+            this.BuildEntries.ClearAnd().AddRange(this.buildEntries);
         }
 
         private void ListView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -53,6 +59,13 @@ namespace Daybreak.Views
         {
             this.buildTemplateManager.RemoveBuild(e);
             this.LoadBuilds();
+        }
+
+        private void SearchTextBox_TextChanged(object sender, string e)
+        {
+            this.BuildEntries.Clear();
+            this.BuildEntries.AddRange(
+                this.buildEntries.Where(b => StringUtils.MatchesSearchString(b.Name, e)));
         }
     }
 }

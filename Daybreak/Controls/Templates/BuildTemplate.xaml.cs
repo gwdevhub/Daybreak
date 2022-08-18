@@ -216,9 +216,7 @@ namespace Daybreak.Controls
                 .Where(s => s != Skill.NoSkill)
                 .Where(s => this.SkillSearchText.IsNullOrWhiteSpace() ?
                             true :
-                            StringUtils.DamerauLevenshteinDistance(
-                                this.SkillSearchText.Replace("\"", "").Replace("!", "").ToLower(), 
-                                s.Name.Substring(0, Math.Min(s.Name.Length, this.SkillSearchText.Length)).Replace("\"", "").Replace("!", "").ToLower()) < 3)
+                            StringUtils.MatchesSearchString(s.Name.Replace("\"", "").Replace("!", ""), this.SkillSearchText.Replace("\"", "").Replace("!", "")))
                 .OrderBy(s => s.Name);
             this.AvailableSkills.ClearAnd().AddRange(possibleSkills);
 
@@ -432,6 +430,17 @@ namespace Daybreak.Controls
                     sender.As<ListView>().SelectedIndex + 1 :
                     sender.As<ListView>().Items.Count;
             }
+        }
+
+        private void ScrollViewer_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        {
+            if (sender is not ScrollViewer scrollViewer)
+            {
+                return;
+            }
+
+            e.Handled = true;
+            scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - e.Delta);
         }
     }
 }

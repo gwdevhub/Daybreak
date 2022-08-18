@@ -38,12 +38,5 @@ namespace Daybreak.Controls
             this.SearchText = searchText;
             this.TextChanged?.Invoke(this, searchText);
         }
-
-        protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
-        {
-            if (e.Property == SearchTextProperty)
-            {
-            }
-        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Utils
 {
@@ -34,6 +35,19 @@ namespace Utils
             }
 
             return matrix[height - 1, width - 1];
+        }
+
+        /// <summary>
+        /// Returns true if stringToSearch is somewhat close to searchString.
+        /// </summary>
+        /// <param name="stringToSearch"></param>
+        /// <param name="searchString"></param>
+        /// <returns>True if strings match.</returns>
+        public static bool MatchesSearchString(string stringToSearch, string searchString)
+        {
+            // Return true if either the distance between the entire text and the searchstring is small enough, or if any of the words are close to the search string.
+            return DamerauLevenshteinDistance(stringToSearch.ToLower()[..Math.Min(stringToSearch.Length, searchString.Length)], searchString.ToLower()) < 3 ||
+                stringToSearch.Split(' ').Any(word => DamerauLevenshteinDistance(word.ToLower()[..Math.Min(word.Length, searchString.Length)], searchString.ToLower()) < 3);
         }
     }
 }

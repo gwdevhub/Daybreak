@@ -162,14 +162,15 @@
                     <RowDefinition Height="auto"></RowDefinition>
                     <RowDefinition Height="*"></RowDefinition>
                 </Grid.RowDefinitions>
-                <local:SearchTextBox    FontSize="14"
+                <local:SearchTextBox    FontSize="20"
                                         Foreground="White"
                                         Background="Transparent"
                                         SearchText="{Binding ElementName=_this, Path=SkillSearchText, Mode=TwoWay}"
                                         TextChanged="SearchTextBox_TextChanged"></local:SearchTextBox>
                 <ScrollViewer VerticalScrollBarVisibility="Hidden"
                               HorizontalScrollBarVisibility="Disabled"
-                              Grid.Row="1">
+                              Grid.Row="1"
+                              PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
                     <ListView x:Name="SkillsListView" Background="Transparent"
                         ItemsSource="{Binding ElementName=_this, Path=AvailableSkills, Mode=OneWay}" MouseDoubleClick="ListView_MouseDoubleClick">
                         <ListView.ItemTemplate>
