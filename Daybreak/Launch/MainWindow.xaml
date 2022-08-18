@@ -2,7 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:webview="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         xmlns:local="clr-namespace:Daybreak.Launch"
         xmlns:wcl="clr-namespace:WCL;assembly=WCL"
         mc:Ignorable="d"
@@ -102,5 +103,10 @@
         <Grid x:Name="Container" Grid.Row="1">
         </Grid>
         <wcl:Border OnResize="Border_OnResize" Grid.RowSpan="2" Active="True"></wcl:Border>
+        <webview:WebView2 x:Name="BackgroundWebView"
+                                         VerticalAlignment="Center"
+                                         HorizontalAlignment="Center"
+                                         Visibility="Collapsed"
+                                         Grid.Row="1"></webview:WebView2>
     </Grid>
 </Window>

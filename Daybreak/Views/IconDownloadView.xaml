@@ -7,28 +7,17 @@
              xmlns:controls="clr-namespace:Daybreak.Controls"
              mc:Ignorable="d"
              x:Name="_this"
-             Unloaded="IconDownloadView_Unloaded"
              Loaded="IconDownloadView_Loaded"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
     </UserControl.Resources>
     <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Background="White" MinHeight="200" MinWidth="400">
-        <controls:ChromiumBrowserWrapper x:Name="WebView"
-                                         ControlsEnabled="False"
-                                         AddressBarReadonly="True"
-                                         CanNavigate="False"
-                                         CanDownloadBuild="False"
-                                         VerticalAlignment="Center"
-                                         HorizontalAlignment="Center"
-                                         Visibility="Visible"
-                                         Width="0"
-                                         Height="0"></controls:ChromiumBrowserWrapper>
         <StackPanel VerticalAlignment="Center">
             <TextBlock Text="{Binding ElementName=_this, Path=Description, Mode=OneWay}" Margin="10, 0, 10, 0" Foreground="Black"
                        TextWrapping="Wrap" HorizontalAlignment="Center" FontSize="16"></TextBlock>
             <ProgressBar Minimum="0" Maximum="100" Value="{Binding ElementName=_this, Path=ProgressValue, Mode=OneWay}" Width="300" Height="20"></ProgressBar>
-            <controls:OpaqueButton Text="Cancel" BackgroundOpacity="0.2" TransparentBackground="Gray" HorizontalAlignment="Center" Margin="10" Width="50" Height="25"
+            <controls:OpaqueButton Text="Continue" BackgroundOpacity="0.2" TransparentBackground="Gray" HorizontalAlignment="Center" Margin="10" Width="80" Height="25"
                                    Clicked="OpaqueButton_Clicked" Foreground="Black" FontSize="16"></controls:OpaqueButton>
         </StackPanel>
     </Grid>

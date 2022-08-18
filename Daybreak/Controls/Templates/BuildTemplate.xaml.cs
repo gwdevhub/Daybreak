@@ -70,16 +70,15 @@ namespace Daybreak.Controls
             this.DataContextChanged += this.BuildTemplate_DataContextChanged;
         }
 
-        public void InitializeTemplate(
-            IIconRetriever iconRetriever,
+        public async void InitializeTemplate(
+            IIconCache iconRetriever,
             IIconBrowser iconBrowser,
             ILiveOptions<ApplicationConfiguration> liveOptions,
             IBuildTemplateManager buildTemplateManager,
             ILogger<ChromiumBrowserWrapper> logger)
         {
             this.iconBrowser = iconBrowser.ThrowIfNull();
-            this.SkillBrowser.InitializeBrowser(liveOptions, buildTemplateManager, logger);
-            this.iconBrowser.InitializeWebView(this.SkillBrowser.WebBrowser, this.cancellationTokenSource.Token);
+            await this.SkillBrowser.InitializeBrowser(liveOptions, buildTemplateManager, logger);
             this.SkillTemplate0.InitializeSkillTemplate(iconRetriever);
             this.SkillTemplate1.InitializeSkillTemplate(iconRetriever);
             this.SkillTemplate2.InitializeSkillTemplate(iconRetriever);

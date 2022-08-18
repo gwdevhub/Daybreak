@@ -38,7 +38,7 @@ namespace Daybreak.Views
         public BuildTemplateView(
             IViewManager viewManager,
             IBuildTemplateManager buildTemplateManager,
-            IIconRetriever iconRetriever,
+            IIconCache iconRetriever,
             IIconBrowser iconBrowser,
             ILiveOptions<ApplicationConfiguration> liveOptions,
             ILogger<ChromiumBrowserWrapper> chromiumLogger,

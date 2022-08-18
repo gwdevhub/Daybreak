@@ -1,6 +1,6 @@
 ﻿using Daybreak.Models.Builds;
 
-namespace Models
+namespace Daybreak.Models
 {
     public sealed class IconRequest
     {

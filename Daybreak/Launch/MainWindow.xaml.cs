@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Services.Bloogum;
+using Daybreak.Services.IconRetrieve;
 using Daybreak.Services.Privilege;
 using Daybreak.Services.Screenshots;
 using Daybreak.Services.Updater;
@@ -8,6 +9,7 @@ using Daybreak.Views;
 using Pepa.Wpf.Utilities;
 using System;
 using System.Configuration;
+using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.Threading;
@@ -32,6 +34,7 @@ namespace Daybreak.Launch
         private readonly IBloogumClient bloogumClient;
         private readonly IApplicationUpdater applicationUpdater;
         private readonly IPrivilegeManager privilegeManager;
+        private readonly IIconDownloader iconDownloader;
         private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
         private readonly CancellationTokenSource cancellationToken = new();
 
@@ -48,14 +51,16 @@ namespace Daybreak.Launch
             IBloogumClient bloogumClient,
             IApplicationUpdater applicationUpdater,
             IPrivilegeManager privilegeManager,
+            IIconDownloader iconDownloader,
             ILiveOptions<ApplicationConfiguration> liveOptions)
         {
-            this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
-            this.screenshotProvider = screenshotProvider.ThrowIfNull(nameof(screenshotProvider));
-            this.bloogumClient = bloogumClient.ThrowIfNull(nameof(bloogumClient));
-            this.applicationUpdater = applicationUpdater.ThrowIfNull(nameof(applicationUpdater));
-            this.privilegeManager = privilegeManager.ThrowIfNull(nameof(privilegeManager));
-            this.liveOptions = liveOptions.ThrowIfNull(nameof(liveOptions));
+            this.viewManager = viewManager.ThrowIfNull();
+            this.screenshotProvider = screenshotProvider.ThrowIfNull();
+            this.bloogumClient = bloogumClient.ThrowIfNull();
+            this.applicationUpdater = applicationUpdater.ThrowIfNull();
+            this.privilegeManager = privilegeManager.ThrowIfNull();
+            this.iconDownloader = iconDownloader.ThrowIfNull();
+            this.liveOptions = liveOptions.ThrowIfNull();
             this.InitializeComponent();
             this.CurrentVersionText = this.applicationUpdater.CurrentVersion.ToString();
             this.IsRunningAsAdmin = this.privilegeManager.AdminPrivileges;
@@ -66,6 +71,7 @@ namespace Daybreak.Launch
         {
             this.SetupImageCycle();
             this.CheckForUpdates();
+            this.SetupBackgroundBrowser();
         }
 
         private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -99,6 +105,11 @@ namespace Daybreak.Launch
         private void Border_OnResize(object sender, WCL.Border.ResizeDirection e)
         {
             NativeMethods.SendMessage(new WindowInteropHelper(this).Handle, NativeMethods.WM_SYSCOMMAND, (IntPtr)e, IntPtr.Zero);
+        }
+
+        private void SetupBackgroundBrowser()
+        {
+            this.iconDownloader.SetBrowser(this.BackgroundWebView);
         }
 
         private void SetupImageCycle()

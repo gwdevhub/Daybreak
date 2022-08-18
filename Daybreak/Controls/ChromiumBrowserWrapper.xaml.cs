@@ -28,6 +28,8 @@ namespace Daybreak.Controls
         
         private const string BrowserDownloadLink = "https://developer.microsoft.com/en-us/microsoft-edge/webview2/";
 
+        private static CoreWebView2Environment coreWebView2Environment;
+
         public event EventHandler<string> FavoriteUriChanged;
         public event EventHandler MaximizeClicked;
         public event EventHandler<Build> BuildDecoded;
@@ -35,16 +37,15 @@ namespace Daybreak.Controls
         private ILiveOptions<ApplicationConfiguration> liveOptions;
         private ILogger<ChromiumBrowserWrapper> logger;
         private IBuildTemplateManager buildTemplateManager;
-        private CoreWebView2Environment coreWebView2Environment;
-
+        
         [GenerateDependencyProperty(InitialValue = true)]
         private bool canDownloadBuild;
         [GenerateDependencyProperty(InitialValue = true)]
         private bool canNavigate;
         [GenerateDependencyProperty(InitialValue = true)]
         private bool controlsEnabled;
-        [GenerateDependencyProperty]
-        private bool browserSupported;
+        [GenerateDependencyProperty(InitialValue = null)]
+        private bool? browserSupported;
         [GenerateDependencyProperty]
         private bool addressBarReadonly;
         [GenerateDependencyProperty]
@@ -80,7 +81,7 @@ namespace Daybreak.Controls
             }
         }
 
-        public async void InitializeBrowser(
+        public async Task InitializeBrowser(
             ILiveOptions<ApplicationConfiguration> liveOptions,
             IBuildTemplateManager buildTemplateManager,
             ILogger<ChromiumBrowserWrapper> logger)
@@ -107,7 +108,11 @@ namespace Daybreak.Controls
 
             try
             {
-                this.coreWebView2Environment = System.Extensions.TaskExtensions.RunSync(() => CoreWebView2Environment.CreateAsync(null, "BrowserData", null));
+                if (coreWebView2Environment is null)
+                {
+                    coreWebView2Environment = System.Extensions.TaskExtensions.RunSync(() => CoreWebView2Environment.CreateAsync(null, "BrowserData", null));
+                }
+
                 this.BrowserSupported = true;
             }
             catch(Exception e)
@@ -122,7 +127,8 @@ namespace Daybreak.Controls
             if (this.BrowserSupported is true)
             {
                 this.WebBrowser.IsEnabled = true;
-                await this.WebBrowser.EnsureCoreWebView2Async(this.coreWebView2Environment);
+                this.BrowserEnabled = true;
+                await this.WebBrowser.EnsureCoreWebView2Async(coreWebView2Environment);
                 this.AddressBarReadonly = this.liveOptions.Value.AddressBarReadonly;
                 this.CanDownloadBuild = this.liveOptions.Value.ExperimentalFeatures.DynamicBuildLoading;
                 this.WebBrowser.CoreWebView2.NewWindowRequested += (browser, args) => args.Handled = true;
@@ -203,6 +209,11 @@ namespace Daybreak.Controls
                 var contextMenuPayload = args.WebMessageAsJson.Deserialize<BrowserPayload<OnContextMenuPayload>>();
                 var maybeTemplate = contextMenuPayload.Value.Selection;
                 if (string.IsNullOrWhiteSpace(maybeTemplate))
+                {
+                    return;
+                }
+
+                if (this.buildTemplateManager is null)
                 {
                     return;
                 }
