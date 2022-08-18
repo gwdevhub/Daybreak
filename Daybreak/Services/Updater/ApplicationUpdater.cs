@@ -24,6 +24,7 @@ namespace Daybreak.Services.Updater
 {
     public sealed class ApplicationUpdater : IApplicationUpdater
     {
+        private const string TemporaryInstallerFileName = "Daybreak.Installer.Temp.exe";
         private const string InstallerFileName = "Daybreak.Installer.exe";
         private const string UpdatedKey = "Updating";
         private const string RegistryKey = "Daybreak";
@@ -177,6 +178,7 @@ namespace Daybreak.Services.Updater
         {
             if (UpdateMarkedInRegistry())
             {
+                PerformPostUpdateActions();
                 UnmarkUpdateInRegistry();
             }
         }
@@ -256,6 +258,20 @@ namespace Daybreak.Services.Updater
             }
 
             return homeRegistryKey;
+        }
+
+        private static void PerformPostUpdateActions()
+        {
+            RenameInstallerIfAvailable();
+        }
+
+        private static void RenameInstallerIfAvailable()
+        {
+            if (File.Exists(TemporaryInstallerFileName))
+            {
+                File.Copy(TemporaryInstallerFileName, InstallerFileName, true);
+                File.Delete(TemporaryInstallerFileName);
+            }
         }
     }
 }
