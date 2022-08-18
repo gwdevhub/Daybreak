@@ -25,6 +25,11 @@ catch
 }
 Console.WriteLine("Deleting package");
 File.Delete(tempFile);
+
+Console.WriteLine("Deleting browser caches");
+Directory.Delete("BrowserData", true);
+Directory.Delete("Daybreak.exe.WebView2", true);
+
 Console.WriteLine("Launching application");
 var process = new Process
 {
