@@ -23,6 +23,9 @@ using Daybreak.Services.Options;
 using Daybreak.Models;
 using Microsoft.CorrelationVector;
 using System.Logging;
+using Daybreak.Services.Updater.PostUpdate;
+using System.Core.Extensions;
+using Daybreak.Services.Updater.PostUpdate.Actions;
 
 namespace Daybreak.Configuration
 {
@@ -30,7 +33,7 @@ namespace Daybreak.Configuration
     {
         public static void RegisterResolvers(IServiceManager serviceManager)
         {
-            serviceManager.ThrowIfNull(nameof(serviceManager));
+            serviceManager.ThrowIfNull();
 
             serviceManager.RegisterHttpFactory((serviceProvider, categoryType) =>
             {
@@ -44,7 +47,7 @@ namespace Daybreak.Configuration
 
         public static void RegisterServices(IServiceProducer serviceProducer)
         {
-            serviceProducer.ThrowIfNull(nameof(serviceProducer));
+            serviceProducer.ThrowIfNull();
 
             serviceProducer.RegisterSingleton<ILogsManager, JsonLogsManager>();
             serviceProducer.RegisterSingleton<IDebugLogsWriter, Services.Logging.DebugLogsWriter>();
@@ -60,6 +63,7 @@ namespace Daybreak.Configuration
 
             serviceProducer.RegisterScoped((sp) => new ScopeMetadata(new CorrelationVector()));
             serviceProducer.RegisterSingleton<ViewManager>(registerAllInterfaces: true);
+            serviceProducer.RegisterSingleton<PostUpdateActionManager>(registerAllInterfaces: true);
             serviceProducer.RegisterSingleton<IConfigurationManager, ConfigurationManager>();
             serviceProducer.RegisterSingleton<ILiteDatabase, LiteDatabase>(sp => new LiteDatabase("Daybreak.db"));
             serviceProducer.RegisterSingleton<IMutexHandler, MutexHandler>();
@@ -79,7 +83,7 @@ namespace Daybreak.Configuration
 
         public static void RegisterViews(IViewProducer viewProducer)
         {
-            viewProducer.ThrowIfNull(nameof(viewProducer));
+            viewProducer.ThrowIfNull();
 
             viewProducer.RegisterView<MainView>();
             viewProducer.RegisterView<SettingsView>();
@@ -96,6 +100,13 @@ namespace Daybreak.Configuration
             viewProducer.RegisterView<VersionManagementView>();
             viewProducer.RegisterView<LogsView>();
             viewProducer.RegisterView<IconDownloadView>();
+        }
+
+        public static void RegisterPostUpdateActions(IPostUpdateActionProducer postUpdateActionProducer)
+        {
+            postUpdateActionProducer.ThrowIfNull();
+
+            postUpdateActionProducer.AddPostUpdateAction<RenameInstallerAction>();
         }
     }
 }

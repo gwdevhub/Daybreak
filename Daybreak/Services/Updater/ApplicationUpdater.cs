@@ -2,6 +2,7 @@
 using Daybreak.Exceptions;
 using Daybreak.Models.Github;
 using Daybreak.Models.Progress;
+using Daybreak.Services.Updater.PostUpdate;
 using Daybreak.Services.ViewManagement;
 using Daybreak.Views;
 using Microsoft.Extensions.Logging;
@@ -9,6 +10,7 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.IO;
@@ -36,24 +38,29 @@ namespace Daybreak.Services.Updater
         private const string DownloadUrl = $"https://github.com/AlexMacocian/Daybreak/releases/download/{VersionTag}/Daybreak{VersionTag}.zip";
 
         private readonly CancellationTokenSource updateCancellationTokenSource = new();
-        private readonly ILogger<ApplicationUpdater> logger;
         private readonly IViewManager viewManager;
+        private readonly IPostUpdateActionProvider postUpdateActionProvider;
         private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
         private readonly IHttpClient<ApplicationUpdater> httpClient;
+        private readonly ILogger<ApplicationUpdater> logger;
 
         public Version CurrentVersion { get; }
 
         public ApplicationUpdater(
-            ILogger<ApplicationUpdater> logger,
-            ILiveOptions<ApplicationConfiguration> liveOptions,
             IViewManager viewManager,
-            IHttpClient<ApplicationUpdater> httpClient)
+            IPostUpdateActionProvider postUpdateActionProvider,
+            ILiveOptions<ApplicationConfiguration> liveOptions,
+            IHttpClient<ApplicationUpdater> httpClient,
+            ILogger<ApplicationUpdater> logger)
         {
-            this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
-            this.liveOptions = liveOptions.ThrowIfNull(nameof(liveOptions));
-            this.logger = logger.ThrowIfNull(nameof(logger));
-            this.httpClient = httpClient.ThrowIfNull(nameof(httpClient));
+            this.viewManager = viewManager.ThrowIfNull();
+            this.postUpdateActionProvider = postUpdateActionProvider.ThrowIfNull();
+            this.liveOptions = liveOptions.ThrowIfNull();
+            this.httpClient = httpClient.ThrowIfNull();
+            this.logger = logger.ThrowIfNull();
+
             this.httpClient.DefaultRequestHeaders.Add("user-agent", "Daybreak Client");
+
             if (Version.TryParse(Assembly.GetExecutingAssembly().GetName().Version.ToString(), out var currentVersion))
             {
                 if (currentVersion.HasPrefix is false)
@@ -178,8 +185,8 @@ namespace Daybreak.Services.Updater
         {
             if (UpdateMarkedInRegistry())
             {
-                PerformPostUpdateActions();
                 UnmarkUpdateInRegistry();
+                this.ExecutePostUpdateActions();
             }
         }
 
@@ -212,6 +219,18 @@ namespace Daybreak.Services.Updater
             if (process.Start() is false)
             {
                 throw new InvalidOperationException("Failed to launch installer");
+            }
+        }
+
+        private async void ExecutePostUpdateActions()
+        {
+            this.logger.LogInformation("Executing post-update actions");
+            foreach(var action in this.postUpdateActionProvider.GetPostUpdateActions())
+            {
+                this.logger.LogInformation($"Starting [{action.GetType().Name}]");
+                action.DoPostUpdateAction();
+                await action.DoPostUpdateActionAsync();
+                this.logger.LogInformation($"Finished [{action.GetType().Name}]");
             }
         }
 
@@ -258,20 +277,6 @@ namespace Daybreak.Services.Updater
             }
 
             return homeRegistryKey;
-        }
-
-        private static void PerformPostUpdateActions()
-        {
-            RenameInstallerIfAvailable();
-        }
-
-        private static void RenameInstallerIfAvailable()
-        {
-            if (File.Exists(TemporaryInstallerFileName))
-            {
-                File.Copy(TemporaryInstallerFileName, InstallerFileName, true);
-                File.Delete(TemporaryInstallerFileName);
-            }
         }
     }
 }
