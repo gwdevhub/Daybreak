@@ -26,7 +26,7 @@ namespace Daybreak.Controls
         public GuildwarsPathTemplate()
         {
             this.InitializeComponent();
-            this.DataContextChanged += GuildwarsPathTemplate_DataContextChanged;
+            this.DataContextChanged += this.GuildwarsPathTemplate_DataContextChanged;
         }
 
         private void GuildwarsPathTemplate_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)

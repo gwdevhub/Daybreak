@@ -13,7 +13,7 @@ namespace Daybreak.Controls
 
         public BuildEntryTemplate()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
         private void BinButton_Clicked(object sender, EventArgs e)

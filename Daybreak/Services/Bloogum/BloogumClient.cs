@@ -38,7 +38,7 @@ namespace Daybreak.Services.Bloogum
             this.logger.LogInformation($"Retrieving image from {BaseAddress}/{url}");
             try
             {
-                var response = await httpClient.GetAsync($"{BaseAddress}/{url}").ConfigureAwait(false);
+                var response = await this.httpClient.GetAsync($"{BaseAddress}/{url}").ConfigureAwait(false);
                 if (response.IsSuccessStatusCode)
                 {
                     this.logger.LogInformation("Received success status code");

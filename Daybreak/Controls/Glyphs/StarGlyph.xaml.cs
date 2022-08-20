@@ -13,7 +13,7 @@ namespace Daybreak.Controls
 
         public StarGlyph()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
         private void Ellipse_MouseEnter(object sender, MouseEventArgs e)

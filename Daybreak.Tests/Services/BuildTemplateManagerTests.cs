@@ -17,7 +17,7 @@ namespace Daybreak.Tests.Services
         [TestInitialize]
         public void Initialize()
         {
-            buildTemplateManager = new BuildTemplateManager(new Mock<ILogger<BuildTemplateManager>>().Object);
+            this.buildTemplateManager = new BuildTemplateManager(new Mock<ILogger<BuildTemplateManager>>().Object);
         }
 
         [TestMethod]

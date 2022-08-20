@@ -17,11 +17,11 @@ namespace Daybreak.Models.Progress
 
         public IconDownloadStep CurrentStep
         {
-            get => currentStep;
+            get => this.currentStep;
             set
             {
-                currentStep = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentStep)));
+                this.currentStep = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CurrentStep)));
             }
         }
 

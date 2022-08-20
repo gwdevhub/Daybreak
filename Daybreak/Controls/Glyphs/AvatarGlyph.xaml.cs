@@ -22,7 +22,7 @@ namespace Daybreak.Controls
     {
         public AvatarGlyph()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

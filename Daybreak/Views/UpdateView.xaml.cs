@@ -38,7 +38,7 @@ namespace Daybreak.Views
             this.applicationUpdater = applicationUpdater;
             this.logger = logger;
             this.viewManager = viewManager;
-            this.updateStatus.PropertyChanged += UpdateStatus_PropertyChanged;
+            this.updateStatus.PropertyChanged += this.UpdateStatus_PropertyChanged;
             this.InitializeComponent();
         }
 
@@ -64,7 +64,7 @@ namespace Daybreak.Views
             }
 
             this.logger.LogInformation("Starting update procedure");
-            var success = await applicationUpdater.DownloadUpdate(version, updateStatus).ConfigureAwait(true);
+            var success = await this.applicationUpdater.DownloadUpdate(version, this.updateStatus).ConfigureAwait(true);
             if (success is false)
             {
                 this.logger.LogError("Update procedure failed");

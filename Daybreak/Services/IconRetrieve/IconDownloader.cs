@@ -78,7 +78,7 @@ namespace Daybreak.Services.IconRetrieve
 
             this.cancellationTokenSource = new();
             this.iconDownloadStatus = new IconDownloadStatus();
-            Task.Run(this.DownloadIcons);
+            _ = Task.Run(this.DownloadIcons);
             return this.iconDownloadStatus;
         }
 
@@ -144,9 +144,9 @@ namespace Daybreak.Services.IconRetrieve
                 {
                     progressValue += progressIncrement;
                     continue;
-                }                
+                }
 
-                logger.LogInformation("Downloading icon");
+                this.logger.LogInformation("Downloading icon");
                 this.iconDownloadStatus.CurrentStep = IconDownloadStatus.Downloading(skill.Name, progressValue);
                 var request = new IconRequest { Skill = skill };
                 this.iconBrowser.QueueIconRequest(request);
@@ -158,12 +158,12 @@ namespace Daybreak.Services.IconRetrieve
 
                 if (request.IconBase64.IsNullOrWhiteSpace())
                 {
-                    logger.LogWarning("Failed to download icon");
+                    this.logger.LogWarning("Failed to download icon");
                     incomplete = true;
                 }
                 else
                 {
-                    logger.LogInformation("Downloaded icon");
+                    this.logger.LogInformation("Downloaded icon");
                 }
 
                 progressValue += progressIncrement;

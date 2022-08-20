@@ -86,7 +86,7 @@ namespace Daybreak.Services.KeyboardHook
                     }
 
                     this.windowsHookHandle = IntPtr.Zero;
-                    this.hookProc -= LowLevelKeyboardProc;
+                    this.hookProc -= this.LowLevelKeyboardProc;
                 }
             }
 
@@ -104,12 +104,12 @@ namespace Daybreak.Services.KeyboardHook
 
         ~KeyboardHookService()
         {
-            Dispose(false);
+            this.Dispose(false);
         }
 
         public void Dispose()
         {
-            Dispose(true);
+            this.Dispose(true);
             GC.SuppressFinalize(this);
         }
     }

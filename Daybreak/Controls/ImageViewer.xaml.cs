@@ -20,7 +20,7 @@ namespace Daybreak.Controls
 
         public ImageViewer()
         {
-            InitializeComponent();
+            this.InitializeComponent();
             this.Image1.Visibility = Visibility.Visible;
             this.Image1.Opacity = 1;
             this.Image2.Visibility = Visibility.Hidden;

@@ -2978,7 +2978,7 @@ namespace Daybreak.Models.Builds
             WeaponsofThreeForges,
             VowofRevolution,
             HeroicRefrain,
-        };
+        }.OrderBy(s => s.Name).ToList();
 
         public static bool TryParse(int id, out Skill skill)
         {

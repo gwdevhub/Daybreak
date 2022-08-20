@@ -17,11 +17,11 @@ namespace Daybreak.Models.Progress
 
         public UpdateStep CurrentStep
         {
-            get => currentStep;
+            get => this.currentStep;
             set
             {
-                currentStep = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentStep)));
+                this.currentStep = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CurrentStep)));
             }
         }
 
@@ -35,7 +35,7 @@ namespace Daybreak.Models.Progress
         {
             internal DownloadUpdateStep(string name, double progress) : base(name)
             {
-                Progress = progress;
+                this.Progress = progress;
             }
         }
     }

@@ -16,33 +16,33 @@ namespace Daybreak.Models
 
         private byte[] DecryptedValue
         {
-            get => this.encryptedBytes.DecryptBytes(key);
-            set => this.encryptedBytes = value.EncryptBytes(key);
+            get => this.encryptedBytes.DecryptBytes(this.key);
+            set => this.encryptedBytes = value.EncryptBytes(this.key);
         }
         [JsonProperty("value")]
         public string Value
         {
             get
             {
-                return this.encryptedBytes.DecryptBytes(key).AsString();
+                return this.encryptedBytes.DecryptBytes(this.key).AsString();
             }
             set
             {
-                this.encryptedBytes = value.AsBytes().EncryptBytes(key);
+                this.encryptedBytes = value.AsBytes().EncryptBytes(this.key);
             }
         }
         private SecureString(byte[] value)
         {
             this.key = new byte[32];
             using var crypto = RandomNumberGenerator.Create();
-            crypto.GetBytes(key);
+            crypto.GetBytes(this.key);
             this.DecryptedValue = value;
         }
         public SecureString(string value)
         {
             this.key = new byte[32];
             using var crypto = RandomNumberGenerator.Create();
-            crypto.GetBytes(key);
+            crypto.GetBytes(this.key);
             this.Value = value;
         }
 

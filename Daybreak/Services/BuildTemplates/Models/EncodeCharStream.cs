@@ -13,7 +13,7 @@ namespace Daybreak.Services.BuildTemplates.Models
 
         public string GetEncodedString()
         {
-            return innerStringBuilder.ToString();
+            return this.innerStringBuilder.ToString();
         }
 
         private void EncodeToBinary(int value, int count)

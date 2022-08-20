@@ -10,7 +10,7 @@ namespace Daybreak.Controls
     {
         public CircularLoadingWidget()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
         protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)

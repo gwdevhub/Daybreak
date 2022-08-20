@@ -33,9 +33,9 @@ namespace Daybreak.Views
             this.LoadBuilds();
         }
 
-        private void LoadBuilds()
+        private async void LoadBuilds()
         {
-            this.buildEntries = this.buildTemplateManager.GetBuilds();
+            this.buildEntries = await this.buildTemplateManager.GetBuilds().ToListAsync();
             this.BuildEntries.ClearAnd().AddRange(this.buildEntries);
         }
 
@@ -55,13 +55,13 @@ namespace Daybreak.Views
             this.viewManager.ShowView<BuildTemplateView>(build);
         }
 
-        private void BuildEntryTemplate_RemoveClicked(object sender, BuildEntry e)
+        private void BuildEntryTemplate_RemoveClicked(object _, BuildEntry e)
         {
             this.buildTemplateManager.RemoveBuild(e);
             this.LoadBuilds();
         }
 
-        private void SearchTextBox_TextChanged(object sender, string e)
+        private void SearchTextBox_TextChanged(object _, string e)
         {
             this.BuildEntries.Clear();
             this.BuildEntries.AddRange(

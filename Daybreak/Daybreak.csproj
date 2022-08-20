@@ -10,8 +10,12 @@
     <LangVersion>preview</LangVersion>
     <ApplicationIcon>Daybreak.ico</ApplicationIcon>
     <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
-    <Version>0.9.5</Version>
+    <Version>0.9.5.1</Version>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="LiteDB" Version="5.0.12" />
@@ -24,6 +28,7 @@
     <PackageReference Include="NReco.Logging.File" Version="1.1.5" />
     <PackageReference Include="securifybv.ShellLink" Version="0.1.0" />
     <PackageReference Include="Slim" Version="1.7.3" />
+    <PackageReference Include="System.Linq.Async" Version="6.0.1" />
     <PackageReference Include="SystemExtensions.NetCore" Version="1.0.1" />
     <PackageReference Include="SystemExtensions.NetStandard" Version="1.5.0" />
     <PackageReference Include="WCL" Version="1.0.2" />

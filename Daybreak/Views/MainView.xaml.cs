@@ -184,19 +184,19 @@ namespace Daybreak.Views
             }
         }
 
-        private void ChromiumBrowserWrapper_BuildDecoded(object sender, Build e)
+        private void ChromiumBrowserWrapper_BuildDecoded(object _, Build e)
         {
             this.viewManager.ShowView<BuildTemplateView>(new BuildEntry { Build = e, Name = string.Empty });
         }
 
-        private void LeftBrowser_FavoriteUriChanged(object sender, string e)
+        private void LeftBrowser_FavoriteUriChanged(object _, string e)
         {
             var config = this.liveOptions.Value;
             config.LeftBrowserDefault = e;
             this.liveOptions.UpdateOption();
         }
 
-        private void RightBrowser_FavoriteUriChanged(object sender, string e)
+        private void RightBrowser_FavoriteUriChanged(object _, string e)
         {
             var config = this.liveOptions.Value;
             config.RightBrowserDefault = e;

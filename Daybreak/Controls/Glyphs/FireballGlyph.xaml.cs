@@ -22,7 +22,7 @@ namespace Daybreak.Controls
     {
         public FireballGlyph()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

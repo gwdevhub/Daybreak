@@ -16,7 +16,7 @@ namespace Daybreak.Models
         /// <summary>
         /// The VirtualCode converted to typeof(Keys) for higher usability.
         /// </summary>
-        public Keys Key { get { return (Keys)VirtualCode; } }
+        public Keys Key { get { return (Keys)this.VirtualCode; } }
 
         /// <summary>
         /// A hardware scan code for the key. 

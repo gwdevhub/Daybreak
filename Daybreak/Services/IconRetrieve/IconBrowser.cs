@@ -95,7 +95,7 @@ namespace Daybreak.Services.IconRetrieve
             }
             catch(Exception e)
             {
-
+                this.logger.LogError(e, "Encountered error when initializing browser");
             }
 
             var curedSkillName = request.Skill.AlternativeName.IsNullOrWhiteSpace() ?

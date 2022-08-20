@@ -25,7 +25,7 @@ namespace Daybreak.Controls.Templates
         public ScreenTemplate()
         {
             this.InitializeComponent();
-            this.DataContextChanged += ScreenTemplate_DataContextChanged;
+            this.DataContextChanged += this.ScreenTemplate_DataContextChanged;
         }
 
         protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)

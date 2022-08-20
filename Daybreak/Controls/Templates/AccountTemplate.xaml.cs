@@ -29,7 +29,7 @@ namespace Daybreak.Controls
         public AccountTemplate()
         {
             this.InitializeComponent();
-            this.DataContextChanged += AccountTemplate_DataContextChanged;
+            this.DataContextChanged += this.AccountTemplate_DataContextChanged;
         }
 
         private void AccountTemplate_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
