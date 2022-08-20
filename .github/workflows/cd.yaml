@@ -53,7 +53,7 @@ jobs:
         echo "${{ env.Changelog }}"
 
     - name: Install .NET Core
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v2
       with:
         dotnet-version: '6.x'
 
@@ -90,7 +90,7 @@ jobs:
       shell: pwsh
 
     - name: Publish release
-      uses: Xotl/cool-github-releases@v1.1.2
+      uses: Xotl/cool-github-releases@v1.1.7
       with:
         mode: update
         tag_name: v${{ env.Version }}
