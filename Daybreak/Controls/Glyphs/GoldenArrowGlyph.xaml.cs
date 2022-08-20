@@ -22,7 +22,7 @@ namespace Daybreak.Controls
     {
         public GoldenArrowGlyph()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Daybreak.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return GetVerticalAlignment(value);
+            return this.GetVerticalAlignment(value);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -167,19 +167,25 @@
                                         Background="Transparent"
                                         SearchText="{Binding ElementName=_this, Path=SkillSearchText, Mode=TwoWay}"
                                         TextChanged="SearchTextBox_TextChanged"></local:SearchTextBox>
-                <ScrollViewer VerticalScrollBarVisibility="Hidden"
-                              HorizontalScrollBarVisibility="Disabled"
-                              Grid.Row="1"
-                              PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
-                    <ListView x:Name="SkillsListView" Background="Transparent"
-                        ItemsSource="{Binding ElementName=_this, Path=AvailableSkills, Mode=OneWay}" MouseDoubleClick="ListView_MouseDoubleClick">
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock FontSize="16" Foreground="White" TextWrapping="Wrap" Text="{Binding Name}"></TextBlock>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                </ScrollViewer>
+                <ListView x:Name="SkillsListView"
+                          Grid.Row="1"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                          ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                          Background="Transparent"
+                          ItemsSource="{Binding ElementName=_this, Path=AvailableSkills, Mode=OneWay}"
+                          MouseDoubleClick="ListView_MouseDoubleClick">
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel>
+                            </VirtualizingStackPanel>
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock FontSize="16" Foreground="White" TextWrapping="Wrap" Text="{Binding Name}"></TextBlock>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
             </Grid>
         </Grid>
     </Grid>

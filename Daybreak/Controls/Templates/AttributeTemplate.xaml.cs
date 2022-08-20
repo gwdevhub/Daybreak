@@ -25,7 +25,7 @@ namespace Daybreak.Controls
         public AttributeTemplate()
         {
             this.InitializeComponent();
-            this.DataContextChanged += AttributeTemplate_DataContextChanged;
+            this.DataContextChanged += this.AttributeTemplate_DataContextChanged;
         }
 
         private void AttributeTemplate_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)

@@ -13,7 +13,7 @@ namespace Daybreak.Behaviors
         protected override void OnAttached()
         {
             base.OnAttached();
-            this.AssociatedObject.SelectionChanged += AssociatedObject_SelectionChanged;
+            this.AssociatedObject.SelectionChanged += this.AssociatedObject_SelectionChanged;
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace Daybreak.Behaviors
         {
             base.OnDetaching();
             this.AssociatedObject.SelectionChanged -=
-                AssociatedObject_SelectionChanged;
+                this.AssociatedObject_SelectionChanged;
 
         }
     }

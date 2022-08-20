@@ -70,7 +70,7 @@ namespace Daybreak.Controls
 
         public OpaqueButton()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
         private void Rectangle_MouseEnter(object sender, MouseEventArgs e)

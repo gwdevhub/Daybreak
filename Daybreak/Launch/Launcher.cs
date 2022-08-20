@@ -32,7 +32,7 @@ namespace Daybreak.Launch
         protected override void RegisterServices(IServiceProducer serviceProducer)
         {
             ProjectConfiguration.RegisterServices(this.ServiceManager);
-            ServiceManager.BuildSingletons();
+            this.ServiceManager.BuildSingletons();
             ProjectConfiguration.RegisterViews(this.ServiceManager.GetService<IViewManager>());
             ProjectConfiguration.RegisterPostUpdateActions(this.ServiceManager.GetService<IPostUpdateActionProducer>());
         }

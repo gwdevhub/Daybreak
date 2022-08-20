@@ -13,7 +13,7 @@ namespace Daybreak.Models.Builds
             set
             {
                 this.attribute = value;
-                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Attribute)));
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Attribute)));
             }
         }
         public int Points
@@ -22,7 +22,7 @@ namespace Daybreak.Models.Builds
             set
             {
                 this.points = value;
-                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Points)));
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Points)));
             }
         }
 

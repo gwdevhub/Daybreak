@@ -9,7 +9,7 @@ namespace Daybreak.Controls
     {
         public FileGlyph()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

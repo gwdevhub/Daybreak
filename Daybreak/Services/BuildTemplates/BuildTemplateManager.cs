@@ -7,6 +7,7 @@ using System.Extensions;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Daybreak.Services.BuildTemplates
 {
@@ -41,16 +42,7 @@ namespace Daybreak.Services.BuildTemplates
         public BuildEntry CreateBuild()
         {
             var emptyBuild = new Build();
-            var builds = GetBuilds();
-            var baseName = "New build";
-            var name = baseName;
-            int count = 0;
-            while(builds.Where(b => b.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).Any())
-            {
-                name = baseName + count;
-                count++;
-            }
-
+            var name = Guid.NewGuid().ToString();
             var entry = new BuildEntry { Build = emptyBuild, Name = name, PreviousName = string.Empty };
             this.SaveBuild(entry);
             return entry;
@@ -88,19 +80,18 @@ namespace Daybreak.Services.BuildTemplates
             }
         }
 
-        public IEnumerable<BuildEntry> GetBuilds()
+        public async IAsyncEnumerable<BuildEntry> GetBuilds()
         {
             foreach (var file in Directory.GetFiles(BuildsPath))
             {
-                Build build = default;
-                try
-                {
-                    build = this.DecodeTemplate(File.ReadAllText(file));
-                }
-                catch(Exception e)
-                {
-                    this.logger.LogError($"Failed to decode template from file {file}. Details: {e}");
-                }
+                var maybeBuild = this.DecodeTemplateInner(await File.ReadAllTextAsync(file));
+                var build = maybeBuild.Switch(
+                    onSuccess: build => build,
+                    onFailure: exception =>
+                    {
+                        this.logger.LogError(exception, "Failed to parse build");
+                        return default;
+                    });
                 
                 if (build is not null)
                 {
@@ -111,7 +102,21 @@ namespace Daybreak.Services.BuildTemplates
 
         public Build DecodeTemplate(string template)
         {
-            return this.DecodeTemplateInner(template);
+            var maybeTemplate = this.DecodeTemplateInner(template);
+            return maybeTemplate.Switch(
+                onSuccess: build => build,
+                onFailure: exception => throw exception);
+        }
+
+        public bool TryDecodeTemplate(string template, out Build build)
+        {
+            var maybeBuild = this.DecodeTemplateInner(template);
+            (var result, var parsedBuild) = maybeBuild.Switch(
+                onSuccess: parsedBuild => (true, parsedBuild),
+                onFailure: _ => (false, null));
+
+            build = parsedBuild;
+            return result;
         }
 
         public string EncodeTemplate(Build build)
@@ -119,7 +124,7 @@ namespace Daybreak.Services.BuildTemplates
             return this.EncodeTemplateInner(build);
         }
 
-        private Build DecodeTemplateInner(string template)
+        private Result<Build, Exception> DecodeTemplateInner(string template)
         {
             this.logger.LogInformation("Attempting to decode template");
             var buildMetadata = ParseEncodedTemplate(template);
@@ -127,7 +132,7 @@ namespace Daybreak.Services.BuildTemplates
             if (buildMetadata.VersionNumber != 0)
             {
                 this.logger.LogError($"Expected version number to be 0 but found {buildMetadata.VersionNumber}");
-                throw new InvalidOperationException($"Failed to parse template");
+                return new InvalidOperationException($"Failed to parse template");
             }
 
             var build = new Build()
@@ -139,14 +144,14 @@ namespace Daybreak.Services.BuildTemplates
             if (Profession.TryParse(buildMetadata.PrimaryProfessionId, out var primaryProfession) is false)
             {
                 this.logger.LogError($"Failed to parse profession with id {buildMetadata.PrimaryProfessionId}");
-                throw new InvalidOperationException($"Failed to parse template");
+                return new InvalidOperationException($"Failed to parse template");
             }
 
             build.Primary = primaryProfession;
             if (Profession.TryParse(buildMetadata.SecondaryProfessionId, out var secondaryProfession) is false)
             {
                 this.logger.LogError($"Failed to parse profession with id {buildMetadata.SecondaryProfessionId}");
-                throw new InvalidOperationException($"Failed to parse template");
+                return new InvalidOperationException($"Failed to parse template");
             }
 
             build.Secondary = secondaryProfession;
@@ -155,7 +160,7 @@ namespace Daybreak.Services.BuildTemplates
                 if (Daybreak.Models.Builds.Attribute.TryParse(buildMetadata.AttributesIds[i], out var attribute) is false)
                 {
                     this.logger.LogError($"Failed to parse attribute with id {buildMetadata.AttributesIds[i]}");
-                    throw new InvalidOperationException($"Failed to parse template");
+                    return new InvalidOperationException($"Failed to parse template");
                 }
 
                 build.Attributes.Add(new AttributeEntry { Attribute = attribute, Points = buildMetadata.AttributePoints[i] });
@@ -166,7 +171,7 @@ namespace Daybreak.Services.BuildTemplates
                 if (Skill.TryParse(buildMetadata.SkillIds[i], out var skill) is false)
                 {
                     this.logger.LogError($"Failed to parse skill with id {buildMetadata.SkillIds[i]}");
-                    throw new InvalidOperationException($"Failed to parse template");
+                    return new InvalidOperationException($"Failed to parse template");
                 }
 
                 build.Skills.Add(skill);

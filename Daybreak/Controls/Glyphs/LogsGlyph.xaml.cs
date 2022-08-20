@@ -9,7 +9,7 @@ namespace Daybreak.Controls
     {
         public LogsGlyph()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

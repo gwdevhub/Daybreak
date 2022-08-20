@@ -75,7 +75,7 @@ namespace Daybreak.Views
                         Build = this.buildTemplateManager.DecodeTemplate(this.CurrentBuildCode)
                     };
 
-                    this.logger.LogInformation($"Template {CurrentBuildCode} decoded");
+                    this.logger.LogInformation($"Template {this.CurrentBuildCode} decoded");
                 }
                 catch
                 {

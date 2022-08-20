@@ -12,7 +12,7 @@ namespace Daybreak.Controls
         public event EventHandler Clicked;
         public BinButton()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
         private void Ellipse_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

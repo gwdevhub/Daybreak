@@ -22,7 +22,7 @@ namespace Daybreak.Controls
     {
         public ExperimentGlyph()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

@@ -38,12 +38,12 @@ namespace Daybreak.Converters
             }
 
             var objValue = value.Cast<bool>();
-            if ((objValue && TriggerValue && IsHidden) || (!objValue && !TriggerValue && IsHidden))
+            if ((objValue && this.TriggerValue && this.IsHidden) || (!objValue && !this.TriggerValue && this.IsHidden))
             {
                 return Visibility.Hidden;
             }
 
-            if ((objValue && TriggerValue && !IsHidden) || (!objValue && !TriggerValue && !IsHidden))
+            if ((objValue && this.TriggerValue && !this.IsHidden) || (!objValue && !this.TriggerValue && !this.IsHidden))
             {
                 return Visibility.Collapsed;
             }

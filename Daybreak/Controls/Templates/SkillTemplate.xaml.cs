@@ -29,7 +29,7 @@ namespace Daybreak.Controls
         public SkillTemplate()
         {
             this.InitializeComponent();
-            this.DataContextChanged += SkillTemplate_DataContextChanged;
+            this.DataContextChanged += this.SkillTemplate_DataContextChanged;
         }
 
         public void InitializeSkillTemplate(IIconCache iconRetriever)

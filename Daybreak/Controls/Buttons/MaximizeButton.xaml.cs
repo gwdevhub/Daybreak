@@ -13,17 +13,17 @@ namespace Daybreak.Controls
 
         public MaximizeButton()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
         private void Ellipse_MouseEnter(object sender, MouseEventArgs e)
         {
-            BackgroundEllipse.Visibility = System.Windows.Visibility.Visible;
+            this.BackgroundEllipse.Visibility = System.Windows.Visibility.Visible;
         }
 
         private void Ellipse_MouseLeave(object sender, MouseEventArgs e)
         {
-            BackgroundEllipse.Visibility = System.Windows.Visibility.Hidden;
+            this.BackgroundEllipse.Visibility = System.Windows.Visibility.Hidden;
         }
 
         private void Ellipse_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

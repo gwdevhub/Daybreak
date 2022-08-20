@@ -30,10 +30,10 @@ namespace Daybreak.Models.Versioning
 
         public override string ToString()
         {
-            var version = string.Join('.', parts.OfType<VersionNumberToken>());
-            if (parts.Last() is VersionStringToken)
+            var version = string.Join('.', this.parts.OfType<VersionNumberToken>());
+            if (this.parts.Last() is VersionStringToken)
             {
-                version += "-" + parts.Last();
+                version += "-" + this.parts.Last();
             }
 
             if (this.HasPrefix)

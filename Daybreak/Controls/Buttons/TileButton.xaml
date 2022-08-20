@@ -18,8 +18,8 @@
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <ContentPresenter x:Name="Content" Margin="5" 
-                              Content="{Binding ElementName=_this, Path=InnerContent}"></ContentPresenter>
+        <ContentPresenter Margin="5" 
+                          Content="{Binding ElementName=_this, Path=InnerContent}"></ContentPresenter>
         <Border BorderBrush="{Binding ElementName=_this, Path=BorderBrush}" 
                 BorderThickness="{Binding ElementName=_this, Path=BorderThickness}"
                 Opacity="{Binding ElementName=_this, Path=Highlighted, Converter={StaticResource HighlightConverter}}"

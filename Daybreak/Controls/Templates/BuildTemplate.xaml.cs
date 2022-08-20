@@ -11,6 +11,7 @@ using System.Core.Extensions;
 using System.Extensions;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
@@ -208,17 +209,8 @@ namespace Daybreak.Controls
             this.loadedBuild.Build.Attributes = this.Attributes.ToList();
         }
 
-        private void LoadSkills()
+        private async void LoadSkills()
         {
-            var possibleSkills = Skill.Skills
-                .Where(s => s.Profession == this.PrimaryProfession || s.Profession == this.SecondaryProfession || s.Profession == Profession.None)
-                .Where(s => s != Skill.NoSkill)
-                .Where(s => this.SkillSearchText.IsNullOrWhiteSpace() ?
-                            true :
-                            StringUtils.MatchesSearchString(s.Name.Replace("\"", "").Replace("!", ""), this.SkillSearchText.Replace("\"", "").Replace("!", "")))
-                .OrderBy(s => s.Name);
-            this.AvailableSkills.ClearAnd().AddRange(possibleSkills);
-
             if (this.Skill0.Profession != this.PrimaryProfession &&
                 this.Skill0.Profession != this.SecondaryProfession &&
                 this.Skill0.Profession != Profession.None)
@@ -274,7 +266,11 @@ namespace Daybreak.Controls
             {
                 this.Skill7 = Skill.NoSkill;
             }
+
+            var filteredSkills = await this.FilterSkills(this.SkillSearchText).ToListAsync().ConfigureAwait(true);
+            this.AvailableSkills.ClearAnd().AddRange(filteredSkills);
         }
+
 
         private void LoadBuild()
         {
@@ -357,13 +353,14 @@ namespace Daybreak.Controls
             }
         }
 
-        private void AttributeTemplate_HelpClicked(object sender, AttributeEntry e)
+        private void AttributeTemplate_HelpClicked(object _, AttributeEntry e)
         {
             this.BrowseToInfo(e.Attribute.Name);
         }
 
-        private void AttributeTemplate_AttributeChanged(object sender, AttributeEntry e)
+        private void AttributeTemplate_AttributeChanged(object _, AttributeEntry e)
         {
+            e.ThrowIfNull();
             this.BuildChanged?.Invoke(this, new EventArgs());
         }
 
@@ -384,8 +381,9 @@ namespace Daybreak.Controls
             e.Handled = true;
         }
 
-        private void SearchTextBox_TextChanged(object sender, string e)
+        private void SearchTextBox_TextChanged(object _, string e)
         {
+            e.ThrowIfNull();
             this.LoadSkills();
         }
 
@@ -440,6 +438,40 @@ namespace Daybreak.Controls
 
             e.Handled = true;
             scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - e.Delta);
+        }
+
+        private async IAsyncEnumerable<Skill> FilterSkills(string searchTerm)
+        {
+            // Replace symbols to ease search
+            searchTerm = searchTerm?.Replace("\"", "").Replace("!", "");
+            
+            foreach (var skill in Skill.Skills)
+            {
+                if (skill == Skill.NoSkill)
+                {
+                    continue;
+                }
+
+                if (skill.Profession != this.PrimaryProfession &&
+                    skill.Profession != this.SecondaryProfession &&
+                    skill.Profession != Profession.None)
+                {
+                    continue;
+                }
+
+                if (searchTerm.IsNullOrWhiteSpace())
+                {
+                    yield return skill;
+                    continue;
+                }
+
+                var matchesName = await Task.Run(() => StringUtils.MatchesSearchString(skill.Name.Replace("\"", "").Replace("!", ""), searchTerm));
+                if (matchesName)
+                {
+                    yield return skill;
+                    continue;
+                }
+            }
         }
     }
 }

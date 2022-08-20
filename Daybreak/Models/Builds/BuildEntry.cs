@@ -15,7 +15,7 @@ namespace Daybreak.Models.Builds
             set
             {
                 this.name = value;
-                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Name)));
             }
         }
         public Build Build
@@ -24,7 +24,7 @@ namespace Daybreak.Models.Builds
             set
             {
                 this.build = value;
-                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Build)));
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Build)));
             }
         }
     }

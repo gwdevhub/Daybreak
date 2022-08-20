@@ -21,7 +21,7 @@ namespace Daybreak.Views
         {
             this.liveOptions = liveOptions.ThrowIfNull();
             this.viewManager = viewManager.ThrowIfNull();
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
         private void AccountButton_Clicked(object sender, System.EventArgs e)
