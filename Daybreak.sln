@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Pipelines", "Pipelines", "{
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\cd.yaml = .github\workflows\cd.yaml
 		.github\workflows\ci.yaml = .github\workflows\ci.yaml
+		.github\workflows\codeql-analysis.yml = .github\workflows\codeql-analysis.yml
+		.github\dependabot.yml = .github\dependabot.yml
 		.github\workflows\version_check.yaml = .github\workflows\version_check.yaml
 	EndProjectSection
 EndProject
@@ -26,6 +28,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0E30DDA0-2111-4E6C-851E-01DC34124FC2}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		.github\CODEOWNERS = .github\CODEOWNERS
 	EndProjectSection
 EndProject
 Global
