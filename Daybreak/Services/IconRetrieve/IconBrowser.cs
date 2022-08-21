@@ -1,4 +1,5 @@
-﻿using Daybreak.Controls;
+﻿using Daybreak.Configuration;
+using Daybreak.Controls;
 using Daybreak.Models;
 using Daybreak.Models.Builds;
 using Daybreak.Utils;
@@ -8,6 +9,7 @@ using Microsoft.Web.WebView2.Wpf;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
+using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 using System.IO;
@@ -30,17 +32,24 @@ namespace Daybreak.Services.IconRetrieve
         private const string IconsLocation = $"{IconsDirectoryName}/{NamePlaceholder}.jpg";
 
         private readonly ConcurrentQueue<IconRequest> iconRequests = new();
+        private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
+        private readonly ILogger<ChromiumBrowserWrapper> browserLogger;
         private readonly ILogger<IconBrowser> logger;
-        private WebView2 browserWrapper;
+
+        private ChromiumBrowserWrapper browserWrapper;
         private CancellationToken cancellationToken;
 
         public IconBrowser(
+            ILiveOptions<ApplicationConfiguration> liveOptions,
+            ILogger<ChromiumBrowserWrapper> browserLogger,
             ILogger<IconBrowser> logger)
         {
+            this.liveOptions = liveOptions.ThrowIfNull();
+            this.browserLogger = browserLogger.ThrowIfNull();
             this.logger = logger.ThrowIfNull();
         }
 
-        public void InitializeWebView(WebView2 webView2, CancellationToken cancellationToken)
+        public void InitializeWebView(ChromiumBrowserWrapper webView2, CancellationToken cancellationToken)
         {
             this.browserWrapper = webView2.ThrowIfNull();
             this.cancellationToken = cancellationToken;
@@ -91,7 +100,7 @@ namespace Daybreak.Services.IconRetrieve
 
             try
             {
-                await this.browserWrapper.EnsureCoreWebView2Async();
+                await this.browserWrapper.InitializeBrowser(this.liveOptions, null, this.browserLogger);
             }
             catch(Exception e)
             {
@@ -104,7 +113,7 @@ namespace Daybreak.Services.IconRetrieve
             var skillIconUrl = $"{BaseUrl}/{QueryUrl.Replace(NamePlaceholder, curedSkillName)}";
             logger.LogInformation($"Looking for icon at {skillIconUrl}");
 
-            this.browserWrapper.CoreWebView2.Navigate(skillIconUrl);
+            this.browserWrapper.Address = skillIconUrl;
 
             for (var i = 0; i < 5; i++)
             {
@@ -116,7 +125,7 @@ namespace Daybreak.Services.IconRetrieve
                 logger.LogInformation("Executing extraction script");
                 var responseTask = await Application.Current.Dispatcher.InvokeAsync(async () =>
                 {
-                    return await this.browserWrapper.ExecuteScriptAsync(Scripts.GetHrefFromSkillPage);
+                    return await this.browserWrapper.WebBrowser.ExecuteScriptAsync(Scripts.GetHrefFromSkillPage);
                 });
                 var response = await responseTask;
                 logger.LogInformation("Parsing response");

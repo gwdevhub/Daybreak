@@ -28,7 +28,7 @@ namespace Daybreak.Services.IconRetrieve
         private readonly ILogger<IconDownloader> logger;
         private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
         private readonly ILogger<ChromiumBrowserWrapper> browserLogger;
-        private WebView2 browserWrapper;
+        private ChromiumBrowserWrapper browserWrapper;
         private CancellationTokenSource cancellationTokenSource;
         private IconDownloadStatus iconDownloadStatus;
 
@@ -52,7 +52,7 @@ namespace Daybreak.Services.IconRetrieve
             this.HookIntoConfigurationChanges();
         }
 
-        public void SetBrowser(WebView2 chromiumBrowserWrapper)
+        public void SetBrowser(ChromiumBrowserWrapper chromiumBrowserWrapper)
         {
             if (this.browserWrapper is not null)
             {
@@ -179,7 +179,7 @@ namespace Daybreak.Services.IconRetrieve
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     this.browserWrapper.IsEnabled = false;
-                    this.browserWrapper.Dispose();
+                    this.browserWrapper.WebBrowser.Dispose();
                 });
                 this.iconDownloadStatus.CurrentStep = IconDownloadStatus.Finished;
                 this.DownloadComplete = true;
