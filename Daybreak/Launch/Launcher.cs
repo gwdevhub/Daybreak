@@ -16,8 +16,11 @@ namespace Daybreak.Launch
 {
     public sealed class Launcher : ExtendedApplication<MainWindow>
     {
+        public readonly static Launcher Instance = new();
+
         private ILogger logger;
-        private readonly static Launcher launcher = new();
+
+        public IServiceManager ApplicationServiceManager => this.ServiceManager;
 
         [STAThread]
         public static int Main()
@@ -106,7 +109,7 @@ namespace Daybreak.Launch
         }
         private static int LaunchMainWindow()
         {
-            return launcher.Run();
+            return Instance.Run();
         }
     }
 }

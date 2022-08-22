@@ -67,5 +67,10 @@ namespace Daybreak.Views
             this.BuildEntries.AddRange(
                 this.buildEntries.Where(b => StringUtils.MatchesSearchString(b.Name, e)));
         }
+
+        private void SynchronizeButton_Clicked(object sender, EventArgs e)
+        {
+            this.viewManager.ShowView<BuildsSynchronizationView>();
+        }
     }
 }

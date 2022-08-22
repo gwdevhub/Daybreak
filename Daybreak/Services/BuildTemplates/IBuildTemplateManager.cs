@@ -8,6 +8,7 @@ namespace Daybreak.Services.BuildTemplates
         bool IsTemplate(string template);
         BuildEntry CreateBuild();
         BuildEntry CreateBuild(string name);
+        void ClearBuilds();
         void SaveBuild(BuildEntry buildEntry);
         void RemoveBuild(BuildEntry buildEntry);
         IAsyncEnumerable<BuildEntry> GetBuilds();

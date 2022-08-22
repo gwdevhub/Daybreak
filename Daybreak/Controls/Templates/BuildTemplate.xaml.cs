@@ -79,7 +79,7 @@ namespace Daybreak.Controls
             ILogger<ChromiumBrowserWrapper> logger)
         {
             this.iconBrowser = iconBrowser.ThrowIfNull();
-            await this.SkillBrowser.InitializeBrowser(liveOptions, buildTemplateManager, logger);
+            await this.SkillBrowser.InitializeDefaultBrowser(liveOptions, buildTemplateManager, logger);
             this.SkillTemplate0.InitializeSkillTemplate(iconRetriever);
             this.SkillTemplate1.InitializeSkillTemplate(iconRetriever);
             this.SkillTemplate2.InitializeSkillTemplate(iconRetriever);

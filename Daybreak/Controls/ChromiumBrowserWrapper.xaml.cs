@@ -81,7 +81,16 @@ namespace Daybreak.Controls
             }
         }
 
-        public async Task InitializeBrowser(
+        public async Task InitializeDefaultBrowser()
+        {
+            var options = Launch.Launcher.Instance.ApplicationServiceManager.GetService<ILiveOptions<ApplicationConfiguration>>();
+            var buildTemplateManager = Launch.Launcher.Instance.ApplicationServiceManager.GetService<IBuildTemplateManager>();
+            var logger = Launch.Launcher.Instance.ApplicationServiceManager.GetService<ILogger<ChromiumBrowserWrapper>>();
+
+            await this.InitializeDefaultBrowser(options, buildTemplateManager, logger);
+        }
+
+        public async Task InitializeDefaultBrowser(
             ILiveOptions<ApplicationConfiguration> liveOptions,
             IBuildTemplateManager buildTemplateManager,
             ILogger<ChromiumBrowserWrapper> logger)

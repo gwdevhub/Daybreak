@@ -10,7 +10,7 @@
     <LangVersion>preview</LangVersion>
     <ApplicationIcon>Daybreak.ico</ApplicationIcon>
     <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
-    <Version>0.9.5.4</Version>
+    <Version>0.9.6</Version>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <UserSecretsId>cfb2a489-db80-448d-a969-80270f314c46</UserSecretsId>
   </PropertyGroup>
@@ -36,7 +36,7 @@
   <ItemGroup>
     <PackageReference Include="LiteDB" Version="5.0.12" />
     <PackageReference Include="Microsoft.CorrelationVector" Version="1.0.42" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1293.44" />
@@ -55,6 +55,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Controls\Buttons\SynchronizeButton.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Controls\Buttons\HelpButton.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -73,6 +76,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="Controls\Buttons\SynchronizeButton.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Controls\Buttons\HelpButton.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
