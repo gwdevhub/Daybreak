@@ -62,8 +62,8 @@ jobs:
 
     - name: Setup project secrets
       run: |
-        dotnet user-secrets --project $env:Wpf_ProjectPath set AadApplicationId "${{ secrets.AadApplicationId }}"
-        dotnet user-secrets --project $env:Wpf_ProjectPath set AadTenantId "${{ secrets.AadTenantId }}"
+        dotnet user-secrets --project Daybreak\Daybreak.csproj set AadApplicationId "${{ secrets.AadApplicationId }}"
+        dotnet user-secrets --project Daybreak\Daybreak.csproj set AadTenantId "${{ secrets.AadTenantId }}"
 
     - name:  Restore project
       run: msbuild $env:Solution_Path /t:Restore /p:Configuration=$env:Configuration /p:RuntimeIdentifier=$env:RuntimeIdentifier
