@@ -30,8 +30,6 @@ namespace Daybreak.Views
         private readonly IViewManager viewManager;
         private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveOptions;
         private readonly IScreenManager screenManager;
-        private readonly IBuildTemplateManager buildTemplateManager;
-        private readonly ILogger<ChromiumBrowserWrapper> browserLogger;
         private readonly CancellationTokenSource cancellationTokenSource = new();
 
         private bool leftBrowserMaximized = false;
@@ -60,12 +58,8 @@ namespace Daybreak.Views
             IApplicationLauncher applicationDetector,
             IViewManager viewManager,
             ILiveUpdateableOptions<ApplicationConfiguration> liveOptions,
-            IScreenManager screenManager,
-            IBuildTemplateManager buildTemplateManager,
-            ILogger<ChromiumBrowserWrapper> browserLogger)
+            IScreenManager screenManager)
         {
-            this.browserLogger = browserLogger;
-            this.buildTemplateManager = buildTemplateManager.ThrowIfNull(nameof(buildTemplateManager));
             this.screenManager = screenManager.ThrowIfNull(nameof(screenManager));
             this.liveOptions = liveOptions.ThrowIfNull(nameof(liveOptions));
             this.applicationDetector = applicationDetector.ThrowIfNull(nameof(applicationDetector));
@@ -77,8 +71,8 @@ namespace Daybreak.Views
 
         private async void InitializeBrowsers()
         {
-            await this.LeftWebBrowser.InitializeBrowser(this.liveOptions, this.buildTemplateManager, this.browserLogger);
-            await this.RightWebBrowser.InitializeBrowser(this.liveOptions, this.buildTemplateManager, this.browserLogger);
+            await this.LeftWebBrowser.InitializeDefaultBrowser();
+            await this.RightWebBrowser.InitializeDefaultBrowser();
             this.NavigateToDefaults();
         }
 

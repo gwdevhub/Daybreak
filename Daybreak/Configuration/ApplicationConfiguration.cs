@@ -37,5 +37,7 @@ namespace Daybreak.Configuration
         public bool PlaceShortcut { get; set; }
         [JsonProperty("AutoCheckUpdate")]
         public bool AutoCheckUpdate { get; set; } = true;
+        [JsonProperty("ProtectedGraphAccessToken")]
+        public string ProtectedGraphAccessToken { get; set; }
     }
 }

@@ -80,6 +80,14 @@ namespace Daybreak.Services.BuildTemplates
             }
         }
 
+        public void ClearBuilds()
+        {
+            foreach(var file in Directory.GetFiles(BuildsPath))
+            {
+                File.Delete(file);
+            }
+        }
+
         public async IAsyncEnumerable<BuildEntry> GetBuilds()
         {
             foreach (var file in Directory.GetFiles(BuildsPath))

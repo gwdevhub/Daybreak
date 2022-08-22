@@ -26,6 +26,7 @@ using System.Logging;
 using Daybreak.Services.Updater.PostUpdate;
 using System.Core.Extensions;
 using Daybreak.Services.Updater.PostUpdate.Actions;
+using Daybreak.Services.Graph;
 
 namespace Daybreak.Configuration
 {
@@ -79,6 +80,7 @@ namespace Daybreak.Configuration
             serviceProducer.RegisterScoped<IIconCache, IconCache>();
             serviceProducer.RegisterScoped<IPrivilegeManager, PrivilegeManager>();
             serviceProducer.RegisterScoped<IScreenManager, ScreenManager>();
+            serviceProducer.RegisterScoped<IGraphClient, GraphClient>();
         }
 
         public static void RegisterViews(IViewProducer viewProducer)
@@ -100,6 +102,8 @@ namespace Daybreak.Configuration
             viewProducer.RegisterView<VersionManagementView>();
             viewProducer.RegisterView<LogsView>();
             viewProducer.RegisterView<IconDownloadView>();
+            viewProducer.RegisterView<GraphAuthorizationView>();
+            viewProducer.RegisterView<BuildsSynchronizationView>();
         }
 
         public static void RegisterPostUpdateActions(IPostUpdateActionProducer postUpdateActionProducer)

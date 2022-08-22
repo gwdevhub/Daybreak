@@ -32,20 +32,14 @@ namespace Daybreak.Services.IconRetrieve
         private const string IconsLocation = $"{IconsDirectoryName}/{NamePlaceholder}.jpg";
 
         private readonly ConcurrentQueue<IconRequest> iconRequests = new();
-        private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
-        private readonly ILogger<ChromiumBrowserWrapper> browserLogger;
         private readonly ILogger<IconBrowser> logger;
 
         private ChromiumBrowserWrapper browserWrapper;
         private CancellationToken cancellationToken;
 
         public IconBrowser(
-            ILiveOptions<ApplicationConfiguration> liveOptions,
-            ILogger<ChromiumBrowserWrapper> browserLogger,
             ILogger<IconBrowser> logger)
         {
-            this.liveOptions = liveOptions.ThrowIfNull();
-            this.browserLogger = browserLogger.ThrowIfNull();
             this.logger = logger.ThrowIfNull();
         }
 
@@ -100,7 +94,7 @@ namespace Daybreak.Services.IconRetrieve
 
             try
             {
-                await this.browserWrapper.InitializeBrowser(this.liveOptions, null, this.browserLogger);
+                await this.browserWrapper.InitializeDefaultBrowser();
             }
             catch(Exception e)
             {

@@ -19,6 +19,16 @@ public static class SecretManager
         return SecretsHolder.Value<string>(secretKey.Key);
     }
 
+    public static T GetSecret<T>(SecretKeys secretKey)
+    {
+        if (SecretsHolder is null)
+        {
+            LoadSecrets();
+        }
+
+        return SecretsHolder.Value<T>(secretKey.Key);
+    }
+
     private static void LoadSecrets()
     {
         var serializedSecrets = Assembly.GetExecutingAssembly().GetManifestResourceStream("Daybreak.secrets.json").ReadAllBytes().GetString();
