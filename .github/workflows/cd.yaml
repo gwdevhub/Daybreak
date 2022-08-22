@@ -27,7 +27,7 @@ jobs:
       Configuration: Release
       Solution_Path: Daybreak.sln
       Test_Project_Path: Daybreak.Tests\Daybreak.Tests.csproj
-      Wpf_Project_Path: Daybreak\Daybreal.csproj
+      Wpf_Project_Path: Daybreak\Daybreak.csproj
       Actions_Allow_Unsecure_Commands: true
 
     steps:
@@ -59,6 +59,10 @@ jobs:
 
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v1.0.1
+
+    - name: Setup project secrets
+      run: |
+        #dotnet user-secrets --project $env:Wpf_ProjectPath set secretName "${{ secrets.secretName }}"
 
     - name:  Restore project
       run: msbuild $env:Solution_Path /t:Restore /p:Configuration=$env:Configuration /p:RuntimeIdentifier=$env:RuntimeIdentifier
