@@ -16,7 +16,8 @@ public interface IGraphClient
     Task<Result<bool, Exception>> PerformAuthorizationFlow(ChromiumBrowserWrapper chromiumBrowserWrapper, CancellationToken cancellationToken = default);
     Task<Result<bool, Exception>> UploadBuilds();
     Task<Result<bool, Exception>> DownloadBuilds();
-    Task<Result<List<BuildFile>, Exception>> RetrieveBuildsList();
-    Task<Result<DateTime, Exception>> GetLastUpdateTime();
+    Task<Result<bool, Exception>> UploadBuild(string buildName);
+    Task<Result<bool, Exception>> DownloadBuild(string buildName);
+    IAsyncEnumerable<BuildFile> RetrieveBuildsList();
     void ResetAuthorization();
 }
