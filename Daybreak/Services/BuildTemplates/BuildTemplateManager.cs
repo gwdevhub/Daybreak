@@ -80,6 +80,22 @@ namespace Daybreak.Services.BuildTemplates
             }
         }
 
+        public async Task<Result<BuildEntry, Exception>> GetBuild(string name)
+        {
+            if (File.Exists($"{BuildsPath}/{name}.txt") is false)
+            {
+                return new InvalidOperationException("Unable to find build file");
+            }
+
+            var content = await File.ReadAllTextAsync($"{BuildsPath}/{name}.txt");
+            if (this.TryDecodeTemplate(content, out var build) is false)
+            {
+                return new InvalidOperationException("Unable to parse build file");
+            }
+
+            return new BuildEntry { Build = build, Name = name, PreviousName = name };
+        }
+
         public void ClearBuilds()
         {
             foreach(var file in Directory.GetFiles(BuildsPath))
@@ -260,7 +276,7 @@ namespace Daybreak.Services.BuildTemplates
                 buildMetadata.NewTemplate = false;
             }
 
-            buildMetadata.ProfessionIdLength = stream.Read(2) * 2 + 4;
+            buildMetadata.ProfessionIdLength = (stream.Read(2) * 2) + 4;
             buildMetadata.PrimaryProfessionId = stream.Read(buildMetadata.ProfessionIdLength);
             buildMetadata.SecondaryProfessionId = stream.Read(buildMetadata.ProfessionIdLength);
             buildMetadata.AttributeCount = stream.Read(4);
@@ -297,7 +313,7 @@ namespace Daybreak.Services.BuildTemplates
             
             var desiredProfessionIdLength = GetBitLength(new List<int> { buildMetadata.PrimaryProfessionId, buildMetadata.SecondaryProfessionId }.Max());
             var professionIdLength = Math.Max((desiredProfessionIdLength - 4) / 2, 0);
-            var finalProfessionIdLength = professionIdLength * 2 + 4;
+            var finalProfessionIdLength = (professionIdLength * 2) + 4;
             stream.Write(professionIdLength, 2);
             stream.Write(buildMetadata.PrimaryProfessionId, finalProfessionIdLength);
             stream.Write(buildMetadata.SecondaryProfessionId, finalProfessionIdLength);

@@ -1,5 +1,8 @@
 ﻿using Daybreak.Models.Builds;
+using System;
 using System.Collections.Generic;
+using System.Extensions;
+using System.Threading.Tasks;
 
 namespace Daybreak.Services.BuildTemplates
 {
@@ -12,6 +15,7 @@ namespace Daybreak.Services.BuildTemplates
         void SaveBuild(BuildEntry buildEntry);
         void RemoveBuild(BuildEntry buildEntry);
         IAsyncEnumerable<BuildEntry> GetBuilds();
+        Task<Result<BuildEntry, Exception>> GetBuild(string name);
         Build DecodeTemplate(string template);
         bool TryDecodeTemplate(string template, out Build build);
         string EncodeTemplate(Build build);
