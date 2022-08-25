@@ -24,11 +24,32 @@ catch
 
 }
 Console.WriteLine("Deleting package");
-File.Delete(tempFile);
+try
+{
+    File.Delete(tempFile);
+}
+catch(Exception e)
+{
+    Console.WriteLine($"Failed to delete {tempFile}.\n{e}");
+}
 
 Console.WriteLine("Deleting browser caches");
-Directory.Delete("BrowserData", true);
-Directory.Delete("Daybreak.exe.WebView2", true);
+try
+{
+    Directory.Delete("BrowserData", true);
+}
+catch(Exception e)
+{
+    Console.WriteLine($"Failed to delete BrowserData.\n{e}");
+}
+try
+{
+    Directory.Delete("Daybreak.exe.WebView2", true);
+}
+catch(Exception e)
+{
+    Console.WriteLine($"Failed to delete Daybreak.exe.WebView2.\n{e}");
+}
 
 Console.WriteLine("Launching application");
 var process = new Process
