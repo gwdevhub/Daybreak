@@ -3,7 +3,7 @@ using System;
 
 namespace Daybreak.Services.Graph.Models;
 
-public sealed class DriveItem
+public sealed class FileItem
 {
     [JsonProperty("@microsoft.graph.downloadUrl")]
     public string DownloadUrl { get; set; }
