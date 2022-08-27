@@ -42,6 +42,8 @@ public partial class BuildsSynchronizationView : UserControl
     private BuildWithTemplateCode selectedLocalBuild;
     [GenerateDependencyProperty]
     private bool showLoading;
+    [GenerateDependencyProperty]
+    private bool synchronized;
 
     public BuildsSynchronizationView(
         IBuildTemplateManager buildTemplateManager,
@@ -84,6 +86,17 @@ public partial class BuildsSynchronizationView : UserControl
         this.RemoteBuildEntries.ClearAnd().AddRange(builds);
         var localBuilds = await this.buildTemplateManager.GetBuilds().ToListAsync();
         this.LocalBuildEntries.ClearAnd().AddRange(localBuilds.Select(build => new BuildWithTemplateCode { Build = build, TemplateCode = this.buildTemplateManager.EncodeTemplate(build.Build) }));
+
+        if (this.LocalBuildEntries.Count == this.RemoteBuildEntries.Count &&
+            this.LocalBuildEntries.Select(b => b.Build.Name).Except(this.RemoteBuildEntries.Select(b => b.FileName)).None() &&
+            this.LocalBuildEntries.Select(b => b.TemplateCode).Except(this.RemoteBuildEntries.Select(b => b.TemplateCode)).None())
+        {
+            this.Synchronized = true;
+        }
+        else
+        {
+            this.Synchronized = false;
+        }
     }
 
     private void BackButton_Clicked(object sender, EventArgs e)
