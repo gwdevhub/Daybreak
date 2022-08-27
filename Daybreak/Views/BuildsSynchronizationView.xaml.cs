@@ -13,6 +13,7 @@ using System;
 using Daybreak.Services.BuildTemplates;
 using System.Linq;
 using Daybreak.Models;
+using System.Collections.Generic;
 
 namespace Daybreak.Views;
 
@@ -74,7 +75,13 @@ public partial class BuildsSynchronizationView : UserControl
 
     private async Task PopulateBuilds()
     {
-        this.RemoteBuildEntries.ClearAnd().AddRange(await this.graphClient.RetrieveBuildsList().ToListAsync());
+        var getBuildsResponse = await this.graphClient.RetrieveBuildsList();
+        if (getBuildsResponse.TryExtractSuccess(out var builds) is false)
+        {
+            builds = new List<BuildFile>();
+        }
+
+        this.RemoteBuildEntries.ClearAnd().AddRange(builds);
         var localBuilds = await this.buildTemplateManager.GetBuilds().ToListAsync();
         this.LocalBuildEntries.ClearAnd().AddRange(localBuilds.Select(build => new BuildWithTemplateCode { Build = build, TemplateCode = this.buildTemplateManager.EncodeTemplate(build.Build) }));
     }
