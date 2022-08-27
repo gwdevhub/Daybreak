@@ -18,6 +18,6 @@ public interface IGraphClient
     Task<Result<bool, Exception>> DownloadBuilds();
     Task<Result<bool, Exception>> UploadBuild(string buildName);
     Task<Result<bool, Exception>> DownloadBuild(string buildName);
-    IAsyncEnumerable<BuildFile> RetrieveBuildsList();
+    Task<Result<IEnumerable<BuildFile>, Exception>> RetrieveBuildsList();
     void ResetAuthorization();
 }

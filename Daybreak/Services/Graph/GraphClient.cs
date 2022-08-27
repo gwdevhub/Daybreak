@@ -39,12 +39,8 @@ public sealed class GraphClient : IGraphClient
     private const string GraphBaseUrl = "https://graph.microsoft.com/v1.0/";
     private const string TokenUrlPlaceholder = $"https://login.microsoftonline.com/consumers/oauth2/v2.0/token";
     private const string AuthorizationUrlPlaceholder = $"https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id={ClientIdPlaceholder}&response_type=code&redirect_uri={RedirectUriPlaceholder}&response_mode=query&scope={ScopesPlaceholder}&state={StatePlaceholder}";
-    private const string SyncFolderUri = $"me/drive/root:/Daybreak/Builds{SuffixPlaceholder}";
-    private const string SyncFileUri = $"me/drive/root:/Daybreak/Builds/{FilenamePlaceholder}{ContentSuffix}";
+    private const string SyncFileUri = $"me/drive/root:/Daybreak/Builds/daybreak.json{ContentSuffix}";
     private const string ContentSuffix = ":/content";
-    private const string ChildrenSuffix = ":/children";
-    private const string SuffixPlaceholder = "[Suffix]";
-    private const string FilenamePlaceholder = "[File]";
 
     private static readonly byte[] Entropy = Convert.FromBase64String("R3VpbGR3YXJz");
     private static readonly string ApplicationId = SecretManager.GetSecret(SecretKeys.AadApplicationId);
@@ -54,6 +50,8 @@ public sealed class GraphClient : IGraphClient
     private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions;
     private readonly IHttpClient<GraphClient> httpClient;
     private readonly ILogger<GraphClient> logger;
+
+    private List<BuildFile> buildsCache;
 
     public GraphClient(
         IBuildTemplateManager buildTemplateManager,
@@ -131,17 +129,27 @@ public sealed class GraphClient : IGraphClient
 
     public async Task<Result<bool, Exception>> UploadBuilds()
     {
-        await this.buildTemplateManager.GetBuilds()
-            .ForEachAsync(async buildEntry => await this.PutFileItem(buildEntry));
-        return true;
+        var builds = await this.buildTemplateManager.GetBuilds().ToListAsync();
+        return await this.PutBuilds(builds);
     }
 
     public async Task<Result<bool, Exception>> DownloadBuilds()
     {
-        var builds = this.RetrieveBuildsList();
+        var retrieveBuildsResponse = await this.RetrieveBuildsList();
+        if (retrieveBuildsResponse.TryExtractFailure(out var failure))
+        {
+            this.logger.LogError(failure, "Unable to download builds");
+            return false;
+        }
+
+        if (retrieveBuildsResponse.TryExtractSuccess(out var builds) is false)
+        {
+            this.logger.LogError("Unexpected error occured");
+            return false;
+        }
 
         this.buildTemplateManager.ClearBuilds();
-        var compiledBuilds = await builds.Select(buildFile =>
+        var compiledBuilds = this.buildsCache.Select(buildFile =>
         {
             if (this.buildTemplateManager.TryDecodeTemplate(buildFile.TemplateCode, out var build) is false)
             {
@@ -154,7 +162,7 @@ public sealed class GraphClient : IGraphClient
                 Name = buildFile.FileName,
                 PreviousName = buildFile.FileName
             };
-        }).Where(entry => entry is not null).ToListAsync();
+        }).Where(entry => entry is not null).ToList();
         _ = compiledBuilds.Do(this.buildTemplateManager.SaveBuild).ToList();
 
         return true;
@@ -162,10 +170,21 @@ public sealed class GraphClient : IGraphClient
 
     public async Task<Result<bool, Exception>> DownloadBuild(string buildName)
     {
-        var builds = this.RetrieveBuildsList();
+        var retrieveBuildsResponse = await this.RetrieveBuildsList();
+        if (retrieveBuildsResponse.TryExtractFailure(out var failure))
+        {
+            this.logger.LogError(failure, "Unable to download builds");
+            return false;
+        }
 
-        var compiledBuilds = await builds
-            .Where(build => build.FileName == buildName)
+        if (retrieveBuildsResponse.TryExtractSuccess(out var builds) is false)
+        {
+            this.logger.LogError("Unexpected error occured");
+            return false;
+        }
+
+        var compiledBuilds = this.buildsCache
+            .Where(b => b.FileName == buildName)
             .Select(buildFile =>
         {
             if (this.buildTemplateManager.TryDecodeTemplate(buildFile.TemplateCode, out var build) is false)
@@ -179,7 +198,7 @@ public sealed class GraphClient : IGraphClient
                 Name = buildFile.FileName,
                 PreviousName = buildFile.FileName
             };
-        }).Where(entry => entry is not null).ToListAsync();
+        }).Where(entry => entry is not null).ToList();
         _ = compiledBuilds.Do(this.buildTemplateManager.SaveBuild).ToList();
 
         return true;
@@ -194,35 +213,15 @@ public sealed class GraphClient : IGraphClient
                 onFailure: exception => exception);
         }
 
-        return await this.PutFileItem(buildEntry);
+        return await this.PutBuild(buildEntry);
     }
 
-    public async IAsyncEnumerable<BuildFile> RetrieveBuildsList()
+    public async Task<Result<IEnumerable<BuildFile>, Exception>> RetrieveBuildsList()
     {
-        var folderResult = await this.GetFolderItem();
-        if (folderResult.ExtractValue() is not FolderItem folder)
-        {
-            folder = new FolderItem { Files = new List<FileItem>() };
-        }
-
-        var retrieveContentTasks = folder.Files
-            .Where(file => file.Name.EndsWith(".txt"))
-            .Select(async file =>
-            {
-                var response = await this.httpClient.GetAsync(file.DownloadUrl);
-                if (response.IsSuccessStatusCode is false)
-                {
-                    return null;
-                }
-
-                return new BuildFile { FileName = file.Name.Replace(".txt", string.Empty), TemplateCode = await response.Content.ReadAsStringAsync() };
-            })
-            .ToList();
-        
-        foreach(var task in retrieveContentTasks)
-        {
-            yield return await task;
-        }
+        var maybeBuildsBackup = await this.GetBuildsBackup();
+        var buildsBackup = maybeBuildsBackup.ExtractValue();
+        this.buildsCache = buildsBackup;
+        return buildsBackup;
     }
 
     public void ResetAuthorization()
@@ -230,23 +229,77 @@ public sealed class GraphClient : IGraphClient
         this.ResetAccessToken();
     }
 
-    private async Task<bool> PutFileItem(BuildEntry buildEntry)
+    private async Task<bool> PutBuild(BuildEntry buildEntry)
     {
-        using var stringContent = new StringContent(this.buildTemplateManager.EncodeTemplate(buildEntry.Build));
-        var response = await this.httpClient.PutAsync(SyncFileUri.Replace(FilenamePlaceholder, $"{buildEntry.Name}.txt"), stringContent);
-        return response.IsSuccessStatusCode;
-    }
-
-    private async Task<Optional<FolderItem>> GetFolderItem()
-    {
-        var response = await this.httpClient.GetAsync(SyncFolderUri.Replace(SuffixPlaceholder, ChildrenSuffix));
-        if (response.IsSuccessStatusCode is false)
+        if (this.buildsCache is null)
         {
-            return Optional.None<FolderItem>();
+            _ = await this.RetrieveBuildsList();
         }
 
-        var driveItemContent = await response.Content.ReadAsStringAsync();
-        return JsonConvert.DeserializeObject<FolderItem>(driveItemContent);
+        var buildFile = new BuildFile
+        {
+            FileName = buildEntry.Name,
+            TemplateCode = this.buildTemplateManager.EncodeTemplate(buildEntry.Build)
+        };
+
+        var buildList = this.buildsCache ?? new List<BuildFile>();
+        // Remove the previous version of the build
+        buildList = buildList.Where(b => b.FileName != buildEntry.Name).ToList();
+        // Add new version of the build
+        buildList.Add(buildFile);
+        // Order by name
+        buildList = buildList.OrderBy(b => b.FileName).ToList();
+
+        using var stringContent = new StringContent(JsonConvert.SerializeObject(buildList));
+        var response = await this.httpClient.PutAsync(SyncFileUri, stringContent);
+        if (response.IsSuccessStatusCode is false)
+        {
+            return false;
+        }
+
+        this.buildsCache = buildList;
+        return true;
+    }
+
+    private async Task<bool> PutBuilds(List<BuildEntry> buildEntries)
+    {
+        var buildFiles = buildEntries.Select(buildEntry => new BuildFile
+        {
+            FileName = buildEntry.Name,
+            TemplateCode = this.buildTemplateManager.EncodeTemplate(buildEntry.Build)
+        });
+
+        var buildList = new List<BuildFile>();
+        buildList.AddRange(buildFiles);
+        buildList = buildList.OrderBy(b => b.FileName).ToList();
+
+        using var stringContent = new StringContent(JsonConvert.SerializeObject(buildList));
+        var response = await this.httpClient.PutAsync(SyncFileUri, stringContent);
+        if (response.IsSuccessStatusCode is false)
+        {
+            return false;
+        }
+
+        this.buildsCache = buildList;
+        return true;
+    }
+
+    private async Task<Optional<List<BuildFile>>> GetBuildsBackup()
+    {
+        var fileItemResponse = await this.httpClient.GetAsync(SyncFileUri);
+        if (fileItemResponse.IsSuccessStatusCode is false)
+        {
+            return Optional.None<List<BuildFile>>();
+        }
+
+        var driveItemContent = await fileItemResponse.Content.ReadAsStringAsync();
+        var backup = JsonConvert.DeserializeObject<List<BuildFile>>(driveItemContent);
+        if (backup is null)
+        {
+            return Optional.None<List<BuildFile>>();
+        }
+
+        return backup;
     }
 
     private static async Task<Result<string, Exception>> RetrieveAuthorizationCode(
