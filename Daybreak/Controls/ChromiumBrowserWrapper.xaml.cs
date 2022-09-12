@@ -3,6 +3,7 @@ using Daybreak.Models.Browser;
 using Daybreak.Models.Builds;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Utils;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Web.WebView2.Core;
 using System;
@@ -83,9 +84,9 @@ namespace Daybreak.Controls
 
         public async Task InitializeDefaultBrowser()
         {
-            var options = Launch.Launcher.Instance.ApplicationServiceManager.GetService<ILiveOptions<ApplicationConfiguration>>();
-            var buildTemplateManager = Launch.Launcher.Instance.ApplicationServiceManager.GetService<IBuildTemplateManager>();
-            var logger = Launch.Launcher.Instance.ApplicationServiceManager.GetService<ILogger<ChromiumBrowserWrapper>>();
+            var options = Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILiveOptions<ApplicationConfiguration>>();
+            var buildTemplateManager = Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IBuildTemplateManager>();
+            var logger = Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILogger<ChromiumBrowserWrapper>>();
 
             await this.InitializeDefaultBrowser(options, buildTemplateManager, logger);
         }

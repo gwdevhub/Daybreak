@@ -1,10 +1,17 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Exceptions;
+using Daybreak.Services.IconRetrieve;
+using Daybreak.Services.Privilege;
+using Daybreak.Services.Screenshots;
+using Daybreak.Services.Updater;
 using Daybreak.Services.Updater.PostUpdate;
 using Daybreak.Services.ViewManagement;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Slim;
+using Slim.Integration.ServiceCollection;
 using System;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -20,7 +27,7 @@ namespace Daybreak.Launch
 
         private ILogger logger;
 
-        public IServiceManager ApplicationServiceManager => this.ServiceManager;
+        public System.IServiceProvider ApplicationServiceProvider => this.ServiceProvider;
 
         [STAThread]
         public static int Main()
@@ -28,16 +35,15 @@ namespace Daybreak.Launch
             return LaunchMainWindow();
         }
 
-        protected override void SetupServiceManager(IServiceManager serviceManager)
+        protected override System.IServiceProvider SetupServiceProvider(IServiceCollection services)
         {
+            var serviceManager = new ServiceManager();
             ProjectConfiguration.RegisterResolvers(serviceManager);
+            return services.BuildSlimServiceProvider(serviceManager);
         }
-        protected override void RegisterServices(IServiceProducer serviceProducer)
+        protected override void RegisterServices(IServiceCollection services)
         {
-            ProjectConfiguration.RegisterServices(this.ServiceManager);
-            this.ServiceManager.BuildSingletons();
-            ProjectConfiguration.RegisterViews(this.ServiceManager.GetService<IViewManager>());
-            ProjectConfiguration.RegisterPostUpdateActions(this.ServiceManager.GetService<IPostUpdateActionProducer>());
+            ProjectConfiguration.RegisterServices(services);
         }
         protected override bool HandleException(Exception e)
         {
@@ -94,7 +100,10 @@ namespace Daybreak.Launch
         }
         protected override void ApplicationStarting()
         {
-            this.logger = this.ServiceManager.GetService<ILogger<Launcher>>();
+            ProjectConfiguration.RegisterViews(this.ServiceProvider.GetService<IViewManager>());
+            ProjectConfiguration.RegisterPostUpdateActions(this.ServiceProvider.GetService<IPostUpdateActionProducer>());
+
+            this.logger = this.ServiceProvider.GetRequiredService<ILogger<Launcher>>();
             this.RegisterViewContainer();
         }
         protected override void ApplicationClosing()
@@ -103,8 +112,8 @@ namespace Daybreak.Launch
 
         private void RegisterViewContainer()
         {
-            var viewManager = this.ServiceManager.GetService<IViewManager>();
-            var mainWindow = this.ServiceManager.GetService<MainWindow>();
+            var viewManager = this.ServiceProvider.GetRequiredService<IViewManager>();
+            var mainWindow = this.ServiceProvider.GetRequiredService<MainWindow>();
             viewManager.RegisterContainer(mainWindow.Container);
         }
         private static int LaunchMainWindow()

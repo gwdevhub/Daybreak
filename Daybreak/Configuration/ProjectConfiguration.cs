@@ -27,6 +27,7 @@ using Daybreak.Services.Updater.PostUpdate;
 using System.Core.Extensions;
 using Daybreak.Services.Updater.PostUpdate.Actions;
 using Daybreak.Services.Graph;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Daybreak.Configuration
 {
@@ -36,51 +37,72 @@ namespace Daybreak.Configuration
         {
             serviceManager.ThrowIfNull();
 
-            serviceManager.RegisterHttpFactory((serviceProvider, categoryType) =>
-            {
-                var loggerType = typeof(ILogger<>).MakeGenericType(categoryType);
-                var logger = serviceProvider.GetService(loggerType).As<ILogger>();
-                var handler = new LoggingHttpMessageHandler(logger) { InnerHandler = new HttpClientHandler() };
-                return handler;
-            });
             serviceManager.RegisterOptionsManager<ApplicationConfigurationOptionsManager>();
+            serviceManager.RegisterResolver(new LoggerResolver());
+            serviceManager
+                .RegisterHttpClient<ApplicationUpdater>()
+                    .WithMessageHandler(sp =>
+                    {
+                        var logger = sp.GetService<ILogger<ApplicationUpdater>>();
+                        return new LoggingHttpMessageHandler(logger) { InnerHandler = new HttpClientHandler() };
+                    })
+                    .Build()
+                .RegisterHttpClient<BloogumClient>()
+                    .WithMessageHandler(sp =>
+                    {
+                        var logger = sp.GetService<ILogger<BloogumClient>>();
+                        return new LoggingHttpMessageHandler(logger) { InnerHandler = new HttpClientHandler() };
+                    })
+                    .Build()
+                .RegisterHttpClient<GraphClient>()
+                    .WithMessageHandler(sp =>
+                    {
+                        var logger = sp.GetService<ILogger<GraphClient>>();
+                        return new LoggingHttpMessageHandler(logger) { InnerHandler = new HttpClientHandler() };
+                    })
+                    .Build();
         }
 
-        public static void RegisterServices(IServiceProducer serviceProducer)
+        public static void RegisterServices(IServiceCollection services)
         {
-            serviceProducer.ThrowIfNull();
+            services.ThrowIfNull();
 
-            serviceProducer.RegisterSingleton<ILogsManager, JsonLogsManager>();
-            serviceProducer.RegisterSingleton<IDebugLogsWriter, Services.Logging.DebugLogsWriter>();
-            serviceProducer.RegisterSingleton<ILoggerFactory, LoggerFactory>(sp =>
+            services.AddSingleton<ILogsManager, JsonLogsManager>();
+            services.AddSingleton<IDebugLogsWriter, Services.Logging.DebugLogsWriter>();
+            services.AddSingleton<ILoggerFactory, LoggerFactory>(sp =>
             {
                 var factory = new LoggerFactory();
                 factory.AddProvider(new CVLoggerProvider(sp.GetService<ILogsWriter>()));
                 return factory;
             });
-            serviceProducer.RegisterSingleton<ILogsWriter, CompositeLogsWriter>(sp => new CompositeLogsWriter(
+            services.AddSingleton<ILogsWriter, CompositeLogsWriter>(sp => new CompositeLogsWriter(
                 sp.GetService<ILogsManager>(),
                 sp.GetService<IDebugLogsWriter>()));
 
-            serviceProducer.RegisterScoped((sp) => new ScopeMetadata(new CorrelationVector()));
-            serviceProducer.RegisterSingleton<ViewManager>(registerAllInterfaces: true);
-            serviceProducer.RegisterSingleton<PostUpdateActionManager>(registerAllInterfaces: true);
-            serviceProducer.RegisterSingleton<IConfigurationManager, ConfigurationManager>();
-            serviceProducer.RegisterSingleton<ILiteDatabase, LiteDatabase>(sp => new LiteDatabase("Daybreak.db"));
-            serviceProducer.RegisterSingleton<IMutexHandler, MutexHandler>();
-            serviceProducer.RegisterSingleton<IShortcutManager, ShortcutManager>();
-            serviceProducer.RegisterSingleton<IIconBrowser, IconBrowser>();
-            serviceProducer.RegisterSingleton<IIconDownloader, IconDownloader>();
-            serviceProducer.RegisterScoped<ICredentialManager, CredentialManager>();
-            serviceProducer.RegisterScoped<IApplicationLauncher, ApplicationLauncher>();
-            serviceProducer.RegisterScoped<IScreenshotProvider, ScreenshotProvider>();
-            serviceProducer.RegisterScoped<IBloogumClient, BloogumClient>();
-            serviceProducer.RegisterScoped<IApplicationUpdater, ApplicationUpdater>();
-            serviceProducer.RegisterScoped<IBuildTemplateManager, BuildTemplateManager>();
-            serviceProducer.RegisterScoped<IIconCache, IconCache>();
-            serviceProducer.RegisterScoped<IPrivilegeManager, PrivilegeManager>();
-            serviceProducer.RegisterScoped<IScreenManager, ScreenManager>();
-            serviceProducer.RegisterScoped<IGraphClient, GraphClient>();
+            services.AddScoped((sp) => new ScopeMetadata(new CorrelationVector()));
+            services.AddSingleton<ViewManager>();
+            services.AddSingleton<IViewManager, ViewManager>(sp => sp.GetRequiredService<ViewManager>());
+            services.AddSingleton<IViewProducer, ViewManager>(sp => sp.GetRequiredService<ViewManager>());
+            services.AddSingleton<PostUpdateActionManager>();
+            services.AddSingleton<IPostUpdateActionManager>(sp => sp.GetRequiredService<PostUpdateActionManager>());
+            services.AddSingleton<IPostUpdateActionProducer>(sp => sp.GetRequiredService<PostUpdateActionManager>());
+            services.AddSingleton<IPostUpdateActionProvider>(sp => sp.GetRequiredService<PostUpdateActionManager>());
+            services.AddSingleton<IConfigurationManager, ConfigurationManager>();
+            services.AddSingleton<ILiteDatabase, LiteDatabase>(sp => new LiteDatabase("Daybreak.db"));
+            services.AddSingleton<IMutexHandler, MutexHandler>();
+            services.AddSingleton<IShortcutManager, ShortcutManager>();
+            services.AddSingleton<IIconBrowser, IconBrowser>();
+            services.AddSingleton<IIconDownloader, IconDownloader>();
+            services.AddScoped<ICredentialManager, CredentialManager>();
+            services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
+            services.AddScoped<IScreenshotProvider, ScreenshotProvider>();
+            services.AddScoped<IBloogumClient, BloogumClient>();
+            services.AddScoped<IApplicationUpdater, ApplicationUpdater>();
+            services.AddScoped<IBuildTemplateManager, BuildTemplateManager>();
+            services.AddScoped<IIconCache, IconCache>();
+            services.AddScoped<IPrivilegeManager, PrivilegeManager>();
+            services.AddScoped<IScreenManager, ScreenManager>();
+            services.AddScoped<IGraphClient, GraphClient>();
         }
 
         public static void RegisterViews(IViewProducer viewProducer)
