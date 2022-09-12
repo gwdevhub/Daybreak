@@ -10,7 +10,7 @@
     <LangVersion>preview</LangVersion>
     <ApplicationIcon>Daybreak.ico</ApplicationIcon>
     <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
-    <Version>0.9.6.6</Version>
+    <Version>0.9.6.7</Version>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <UserSecretsId>cfb2a489-db80-448d-a969-80270f314c46</UserSecretsId>
   </PropertyGroup>
@@ -44,14 +44,14 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NReco.Logging.File" Version="1.1.5" />
     <PackageReference Include="securifybv.ShellLink" Version="0.1.0" />
-    <PackageReference Include="Slim" Version="1.8.1" />
+    <PackageReference Include="Slim" Version="1.9.2" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
     <PackageReference Include="SystemExtensions.NetCore" Version="1.0.1" />
     <PackageReference Include="SystemExtensions.NetStandard" Version="1.5.0" />
     <PackageReference Include="WCL" Version="1.0.2" />
-    <PackageReference Include="WpfExtended" Version="0.6.2" />
+    <PackageReference Include="WpfExtended" Version="0.7.1" />
     <PackageReference Include="WpfExtended.SourceGeneration" Version="0.1.1" />
-    <PackageReference Include="WpfScreenHelper" Version="2.0.0" />
+    <PackageReference Include="WpfScreenHelper" Version="2.1.0" />
   </ItemGroup>
 
   <ItemGroup>
