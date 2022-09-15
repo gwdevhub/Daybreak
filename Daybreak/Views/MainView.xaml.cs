@@ -30,8 +30,8 @@ namespace Daybreak.Views
         private readonly IViewManager viewManager;
         private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveOptions;
         private readonly IScreenManager screenManager;
-        private readonly CancellationTokenSource cancellationTokenSource = new();
 
+        private CancellationTokenSource cancellationTokenSource = new();
         private bool leftBrowserMaximized = false;
         private bool rightBrowserMaximized = false;
 
@@ -65,7 +65,6 @@ namespace Daybreak.Views
             this.applicationDetector = applicationDetector.ThrowIfNull(nameof(applicationDetector));
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.InitializeComponent();
-            this.PeriodicallyCheckGameState();
             this.InitializeBrowsers();
         }
 
@@ -96,6 +95,7 @@ namespace Daybreak.Views
 
         private void PeriodicallyCheckGameState()
         {
+            this.cancellationTokenSource = new CancellationTokenSource();
             System.Extensions.TaskExtensions.RunPeriodicAsync(() => this.Dispatcher.Invoke(this.CheckGameState), TimeSpan.Zero, TimeSpan.FromSeconds(1), this.cancellationTokenSource.Token);
         }
 
@@ -108,10 +108,12 @@ namespace Daybreak.Views
 
         private void StartupView_Loaded(object sender, RoutedEventArgs e)
         {
+            this.PeriodicallyCheckGameState();
         }
 
         private void StartupView_Unloaded(object sender, RoutedEventArgs e)
         {
+            this.cancellationTokenSource?.Cancel();
         }
 
         private async void LaunchButton_Clicked(object sender, EventArgs e)
