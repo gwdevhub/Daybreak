@@ -6,5 +6,7 @@ namespace Daybreak.Services.ViewManagement
     {
         void RegisterView<T>()
             where T : UserControl;
+        void RegisterPermanentView<T>()
+            where T : UserControl;
     }
 }

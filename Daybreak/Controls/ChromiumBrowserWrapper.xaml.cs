@@ -55,6 +55,8 @@ namespace Daybreak.Controls
         private bool navigating;
         [GenerateDependencyProperty]
         private string favoriteAddress;
+        [GenerateDependencyProperty(InitialValue = false)]
+        private bool preventDispose;
         public string Address
         {
             get => this.GetTypedValue<string>(AddressProperty);
@@ -261,6 +263,11 @@ namespace Daybreak.Controls
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
+            if (this.PreventDispose)
+            {
+                return;
+            }
+
             this.WebBrowser?.Dispose();
         }
 

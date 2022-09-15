@@ -46,7 +46,8 @@
                                              FavoriteAddress="{Binding ElementName=_this, Path=RightBrowserFavoriteAddress, Mode=OneWay}"
                                              MaximizeClicked="RightChromiumBrowserWrapper_MaximizeClicked"
                                              BuildDecoded="ChromiumBrowserWrapper_BuildDecoded"
-                                             CanDownloadBuild="True"/>
+                                             CanDownloadBuild="True"
+                                             PreventDispose="True"/>
         </Grid>
         <Grid Grid.Column="0" Margin="10" Visibility="{Binding ElementName=_this, Path=BrowsersEnabled, Mode=OneWay, Converter={StaticResource BooleanToVisibility}}">
             <controls:ChromiumBrowserWrapper x:Name="LeftWebBrowser"
@@ -55,7 +56,8 @@
                                              FavoriteAddress="{Binding ElementName=_this, Path=LeftBrowserFavoriteAddress, Mode=OneWay}"
                                              MaximizeClicked="LeftChromiumBrowserWrapper_MaximizeClicked"
                                              BuildDecoded="ChromiumBrowserWrapper_BuildDecoded"
-                                             CanDownloadBuild="True"/>
+                                             CanDownloadBuild="True"
+                                             PreventDispose="True"/>
         </Grid>
     </Grid>
 </UserControl>

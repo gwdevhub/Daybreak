@@ -1,6 +1,4 @@
-﻿using Daybreak.Models;
-using Microsoft.CorrelationVector;
-using Slim;
+﻿using Slim;
 using System;
 using System.Extensions;
 using System.Windows;
@@ -28,9 +26,16 @@ namespace Daybreak.Services.ViewManagement
             this.container = panel;
         }
 
-        public void RegisterView<T>() where T : UserControl
+        public void RegisterView<T>()
+            where T : UserControl
         {
             this.serviceManager.RegisterTransient<T, T>();
+        }
+
+        public void RegisterPermanentView<T>()
+            where T : UserControl
+        {
+            this.serviceManager.RegisterSingleton<T, T>();
         }
 
         public void ShowView<T>() where T : UserControl

@@ -112,7 +112,6 @@ namespace Daybreak.Views
 
         private void StartupView_Unloaded(object sender, RoutedEventArgs e)
         {
-            this.cancellationTokenSource.Cancel();
         }
 
         private async void LaunchButton_Clicked(object sender, EventArgs e)
