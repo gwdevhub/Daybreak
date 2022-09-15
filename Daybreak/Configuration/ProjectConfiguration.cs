@@ -109,7 +109,7 @@ namespace Daybreak.Configuration
         {
             viewProducer.ThrowIfNull();
 
-            viewProducer.RegisterView<MainView>();
+            viewProducer.RegisterPermanentView<MainView>();
             viewProducer.RegisterView<SettingsView>();
             viewProducer.RegisterView<AskUpdateView>();
             viewProducer.RegisterView<UpdateView>();
