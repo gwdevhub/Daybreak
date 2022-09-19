@@ -1,7 +1,6 @@
 ﻿using Daybreak.Models;
 using Daybreak.Services.Logging;
 using Daybreak.Services.ViewManagement;
-using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System;
@@ -18,19 +17,16 @@ namespace Daybreak.Views
     /// </summary>
     public partial class LogsView : UserControl
     {
-        private readonly IViewManager viewManager;
         private readonly ILogsManager logManager;
         private readonly ILogger<LogsView> logger;
 
         public ObservableCollection<Log> Logs { get; } = new ObservableCollection<Log>();
 
         public LogsView(
-            IViewManager viewManager,
             ILogsManager logManager,
             ILogger<LogsView> logger)
         {
             this.logManager = logManager.ThrowIfNull(nameof(logManager));
-            this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.logger = logger.ThrowIfNull(nameof(logger));
             this.InitializeComponent();
             this.UpdateLogs();
@@ -61,10 +57,6 @@ namespace Daybreak.Views
             {
                 this.logger.LogInformation("Exporting canceled");
             }
-        }
-        private void BackButton_Clicked(object sender, EventArgs e)
-        {
-            this.viewManager.ShowView<SettingsCategoryView>();
         }
         private void BinButton_Clicked(object sender, EventArgs e)
         {

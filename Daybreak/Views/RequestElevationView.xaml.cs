@@ -42,7 +42,7 @@ namespace Daybreak.Views
             else
             {
                 this.logger.LogWarning("Elevation request context is not set. Returning to home page");
-                this.viewManager.ShowView<MainView>();
+                this.viewManager.ShowView<CompanionView>();
             }
         }
     }

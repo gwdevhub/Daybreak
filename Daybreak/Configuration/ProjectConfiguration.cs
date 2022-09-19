@@ -29,110 +29,108 @@ using Daybreak.Services.Updater.PostUpdate.Actions;
 using Daybreak.Services.Graph;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Daybreak.Configuration
+namespace Daybreak.Configuration;
+
+public static class ProjectConfiguration
 {
-    public static class ProjectConfiguration
+    public static void RegisterResolvers(IServiceManager serviceManager)
     {
-        public static void RegisterResolvers(IServiceManager serviceManager)
+        serviceManager.ThrowIfNull();
+
+        serviceManager.RegisterOptionsManager<ApplicationConfigurationOptionsManager>();
+        serviceManager.RegisterResolver(new LoggerResolver());
+        serviceManager
+            .RegisterHttpClient<ApplicationUpdater>()
+                .WithMessageHandler(sp =>
+                {
+                    var logger = sp.GetService<ILogger<ApplicationUpdater>>();
+                    return new LoggingHttpMessageHandler(logger) { InnerHandler = new HttpClientHandler() };
+                })
+                .Build()
+            .RegisterHttpClient<BloogumClient>()
+                .WithMessageHandler(sp =>
+                {
+                    var logger = sp.GetService<ILogger<BloogumClient>>();
+                    return new LoggingHttpMessageHandler(logger) { InnerHandler = new HttpClientHandler() };
+                })
+                .Build()
+            .RegisterHttpClient<GraphClient>()
+                .WithMessageHandler(sp =>
+                {
+                    var logger = sp.GetService<ILogger<GraphClient>>();
+                    return new LoggingHttpMessageHandler(logger) { InnerHandler = new HttpClientHandler() };
+                })
+                .Build();
+    }
+
+    public static void RegisterServices(IServiceCollection services)
+    {
+        services.ThrowIfNull();
+
+        services.AddSingleton<ILogsManager, JsonLogsManager>();
+        services.AddSingleton<IDebugLogsWriter, Services.Logging.DebugLogsWriter>();
+        services.AddSingleton<ILoggerFactory, LoggerFactory>(sp =>
         {
-            serviceManager.ThrowIfNull();
+            var factory = new LoggerFactory();
+            factory.AddProvider(new CVLoggerProvider(sp.GetService<ILogsWriter>()));
+            return factory;
+        });
+        services.AddSingleton<ILogsWriter, CompositeLogsWriter>(sp => new CompositeLogsWriter(
+            sp.GetService<ILogsManager>(),
+            sp.GetService<IDebugLogsWriter>()));
 
-            serviceManager.RegisterOptionsManager<ApplicationConfigurationOptionsManager>();
-            serviceManager.RegisterResolver(new LoggerResolver());
-            serviceManager
-                .RegisterHttpClient<ApplicationUpdater>()
-                    .WithMessageHandler(sp =>
-                    {
-                        var logger = sp.GetService<ILogger<ApplicationUpdater>>();
-                        return new LoggingHttpMessageHandler(logger) { InnerHandler = new HttpClientHandler() };
-                    })
-                    .Build()
-                .RegisterHttpClient<BloogumClient>()
-                    .WithMessageHandler(sp =>
-                    {
-                        var logger = sp.GetService<ILogger<BloogumClient>>();
-                        return new LoggingHttpMessageHandler(logger) { InnerHandler = new HttpClientHandler() };
-                    })
-                    .Build()
-                .RegisterHttpClient<GraphClient>()
-                    .WithMessageHandler(sp =>
-                    {
-                        var logger = sp.GetService<ILogger<GraphClient>>();
-                        return new LoggingHttpMessageHandler(logger) { InnerHandler = new HttpClientHandler() };
-                    })
-                    .Build();
-        }
+        services.AddScoped((sp) => new ScopeMetadata(new CorrelationVector()));
+        services.AddSingleton<ViewManager>();
+        services.AddSingleton<IViewManager, ViewManager>(sp => sp.GetRequiredService<ViewManager>());
+        services.AddSingleton<IViewProducer, ViewManager>(sp => sp.GetRequiredService<ViewManager>());
+        services.AddSingleton<PostUpdateActionManager>();
+        services.AddSingleton<IPostUpdateActionManager>(sp => sp.GetRequiredService<PostUpdateActionManager>());
+        services.AddSingleton<IPostUpdateActionProducer>(sp => sp.GetRequiredService<PostUpdateActionManager>());
+        services.AddSingleton<IPostUpdateActionProvider>(sp => sp.GetRequiredService<PostUpdateActionManager>());
+        services.AddSingleton<IConfigurationManager, ConfigurationManager>();
+        services.AddSingleton<ILiteDatabase, LiteDatabase>(sp => new LiteDatabase("Daybreak.db"));
+        services.AddSingleton<IMutexHandler, MutexHandler>();
+        services.AddSingleton<IShortcutManager, ShortcutManager>();
+        services.AddSingleton<IIconBrowser, IconBrowser>();
+        services.AddSingleton<IIconDownloader, IconDownloader>();
+        services.AddScoped<ICredentialManager, CredentialManager>();
+        services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
+        services.AddScoped<IScreenshotProvider, ScreenshotProvider>();
+        services.AddScoped<IBloogumClient, BloogumClient>();
+        services.AddScoped<IApplicationUpdater, ApplicationUpdater>();
+        services.AddScoped<IBuildTemplateManager, BuildTemplateManager>();
+        services.AddScoped<IIconCache, IconCache>();
+        services.AddScoped<IPrivilegeManager, PrivilegeManager>();
+        services.AddScoped<IScreenManager, ScreenManager>();
+        services.AddScoped<IGraphClient, GraphClient>();
+    }
 
-        public static void RegisterServices(IServiceCollection services)
-        {
-            services.ThrowIfNull();
+    public static void RegisterViews(IViewProducer viewProducer)
+    {
+        viewProducer.ThrowIfNull();
 
-            services.AddSingleton<ILogsManager, JsonLogsManager>();
-            services.AddSingleton<IDebugLogsWriter, Services.Logging.DebugLogsWriter>();
-            services.AddSingleton<ILoggerFactory, LoggerFactory>(sp =>
-            {
-                var factory = new LoggerFactory();
-                factory.AddProvider(new CVLoggerProvider(sp.GetService<ILogsWriter>()));
-                return factory;
-            });
-            services.AddSingleton<ILogsWriter, CompositeLogsWriter>(sp => new CompositeLogsWriter(
-                sp.GetService<ILogsManager>(),
-                sp.GetService<IDebugLogsWriter>()));
+        viewProducer.RegisterPermanentView<CompanionView>();
+        viewProducer.RegisterView<SettingsView>();
+        viewProducer.RegisterView<AskUpdateView>();
+        viewProducer.RegisterView<UpdateView>();
+        viewProducer.RegisterView<AccountsView>();
+        viewProducer.RegisterView<ExperimentalSettingsView>();
+        viewProducer.RegisterView<ExecutablesView>();
+        viewProducer.RegisterView<BuildTemplateView>();
+        viewProducer.RegisterView<BuildsListView>();
+        viewProducer.RegisterView<RequestElevationView>();
+        viewProducer.RegisterView<ScreenChoiceView>();
+        viewProducer.RegisterView<VersionManagementView>();
+        viewProducer.RegisterView<LogsView>();
+        viewProducer.RegisterView<IconDownloadView>();
+        viewProducer.RegisterView<GraphAuthorizationView>();
+        viewProducer.RegisterView<BuildsSynchronizationView>();
+    }
 
-            services.AddScoped((sp) => new ScopeMetadata(new CorrelationVector()));
-            services.AddSingleton<ViewManager>();
-            services.AddSingleton<IViewManager, ViewManager>(sp => sp.GetRequiredService<ViewManager>());
-            services.AddSingleton<IViewProducer, ViewManager>(sp => sp.GetRequiredService<ViewManager>());
-            services.AddSingleton<PostUpdateActionManager>();
-            services.AddSingleton<IPostUpdateActionManager>(sp => sp.GetRequiredService<PostUpdateActionManager>());
-            services.AddSingleton<IPostUpdateActionProducer>(sp => sp.GetRequiredService<PostUpdateActionManager>());
-            services.AddSingleton<IPostUpdateActionProvider>(sp => sp.GetRequiredService<PostUpdateActionManager>());
-            services.AddSingleton<IConfigurationManager, ConfigurationManager>();
-            services.AddSingleton<ILiteDatabase, LiteDatabase>(sp => new LiteDatabase("Daybreak.db"));
-            services.AddSingleton<IMutexHandler, MutexHandler>();
-            services.AddSingleton<IShortcutManager, ShortcutManager>();
-            services.AddSingleton<IIconBrowser, IconBrowser>();
-            services.AddSingleton<IIconDownloader, IconDownloader>();
-            services.AddScoped<ICredentialManager, CredentialManager>();
-            services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
-            services.AddScoped<IScreenshotProvider, ScreenshotProvider>();
-            services.AddScoped<IBloogumClient, BloogumClient>();
-            services.AddScoped<IApplicationUpdater, ApplicationUpdater>();
-            services.AddScoped<IBuildTemplateManager, BuildTemplateManager>();
-            services.AddScoped<IIconCache, IconCache>();
-            services.AddScoped<IPrivilegeManager, PrivilegeManager>();
-            services.AddScoped<IScreenManager, ScreenManager>();
-            services.AddScoped<IGraphClient, GraphClient>();
-        }
+    public static void RegisterPostUpdateActions(IPostUpdateActionProducer postUpdateActionProducer)
+    {
+        postUpdateActionProducer.ThrowIfNull();
 
-        public static void RegisterViews(IViewProducer viewProducer)
-        {
-            viewProducer.ThrowIfNull();
-
-            viewProducer.RegisterPermanentView<MainView>();
-            viewProducer.RegisterView<SettingsView>();
-            viewProducer.RegisterView<AskUpdateView>();
-            viewProducer.RegisterView<UpdateView>();
-            viewProducer.RegisterView<SettingsCategoryView>();
-            viewProducer.RegisterView<AccountsView>();
-            viewProducer.RegisterView<ExperimentalSettingsView>();
-            viewProducer.RegisterView<ExecutablesView>();
-            viewProducer.RegisterView<BuildTemplateView>();
-            viewProducer.RegisterView<BuildsListView>();
-            viewProducer.RegisterView<RequestElevationView>();
-            viewProducer.RegisterView<ScreenChoiceView>();
-            viewProducer.RegisterView<VersionManagementView>();
-            viewProducer.RegisterView<LogsView>();
-            viewProducer.RegisterView<IconDownloadView>();
-            viewProducer.RegisterView<GraphAuthorizationView>();
-            viewProducer.RegisterView<BuildsSynchronizationView>();
-        }
-
-        public static void RegisterPostUpdateActions(IPostUpdateActionProducer postUpdateActionProducer)
-        {
-            postUpdateActionProducer.ThrowIfNull();
-
-            postUpdateActionProducer.AddPostUpdateAction<RenameInstallerAction>();
-        }
+        postUpdateActionProducer.AddPostUpdateAction<RenameInstallerAction>();
     }
 }

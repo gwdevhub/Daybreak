@@ -86,7 +86,6 @@ namespace Daybreak.Views
             currentConfig.PlaceShortcut = this.ShortcutPlaced;
             currentConfig.AutoCheckUpdate = this.AutoCheckUpdate;
             this.liveUpdateableOptions.UpdateOption();
-            this.viewManager.ShowView<SettingsCategoryView>();
         }
 
         private void ToolboxFilePickerGlyph_Clicked(object sender, EventArgs e)
@@ -137,11 +136,6 @@ namespace Daybreak.Views
         private void ScreenPickerGlyph_Clicked(object sender, EventArgs e)
         {
             this.viewManager.ShowView<ScreenChoiceView>();
-        }
-
-        private void BackButton_Clicked(object sender, EventArgs e)
-        {
-            this.viewManager.ShowView<SettingsCategoryView>();
         }
 
         private void TextBox_AllowOnlyNumbers(object sender, System.Windows.Input.TextCompositionEventArgs e)

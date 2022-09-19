@@ -44,11 +44,6 @@ namespace Daybreak.Views
             this.viewManager.ShowView<BuildTemplateView>(sender.As<ListView>().SelectedItem);
         }
 
-        private void BackButton_Clicked(object sender, EventArgs e)
-        {
-            this.viewManager.ShowView<SettingsCategoryView>();
-        }
-
         private void AddButton_Clicked(object sender, EventArgs e)
         {
             var build = this.buildTemplateManager.CreateBuild();

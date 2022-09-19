@@ -59,7 +59,7 @@ namespace Daybreak.Views
         {
             if (this.DataContext is not Version version)
             {
-                this.viewManager.ShowView<MainView>();
+                this.viewManager.ShowView<CompanionView>();
                 throw new InvalidOperationException("No version specified for download");
             }
 
@@ -87,7 +87,7 @@ namespace Daybreak.Views
             }
             else
             {
-                this.viewManager.ShowView<MainView>();
+                this.viewManager.ShowView<CompanionView>();
             }
         }
     }

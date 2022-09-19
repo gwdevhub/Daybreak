@@ -87,7 +87,7 @@ namespace Daybreak.Views
         private void SaveButton_Clicked(object sender, EventArgs e)
         {
             this.liveOptions.Value.DesiredGuildwarsScreen = this.selectedId;
-            this.viewManager.ShowView<SettingsCategoryView>();
+            this.viewManager.ShowView<SettingsView>();
         }
 
         private void OpaqueButton_Clicked(object sender, EventArgs e)

@@ -18,15 +18,12 @@ namespace Daybreak.Views
     public partial class ExecutablesView : UserControl
     {
         private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions;
-        private readonly IViewManager viewManager;
         public ObservableCollection<GuildwarsPath> Paths { get; } = new();
 
         public ExecutablesView(
-            ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions,
-            IViewManager viewManager)
+            ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions)
         {
             this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull(nameof(liveUpdateableOptions));
-            this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.InitializeComponent();
             this.GetPaths();
         }
@@ -34,11 +31,6 @@ namespace Daybreak.Views
         private void GetPaths()
         {
             this.Paths.AddRange(this.liveUpdateableOptions.Value.GuildwarsPaths);
-        }
-
-        private void BackButton_Clicked(object sender, EventArgs e)
-        {
-            this.viewManager.ShowView<SettingsCategoryView>();
         }
 
         private void AddButton_Clicked(object sender, EventArgs e)
@@ -55,7 +47,6 @@ namespace Daybreak.Views
         {
             this.liveUpdateableOptions.Value.GuildwarsPaths = this.Paths.ToList();
             this.liveUpdateableOptions.UpdateOption();
-            this.viewManager.ShowView<SettingsCategoryView>();
         }
 
         private void GuildwarsPathTemplate_DefaultClicked(object sender, EventArgs e)

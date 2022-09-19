@@ -41,7 +41,7 @@ namespace Daybreak.Views
             this.logger.LogInformation("User declined update");
             this.liveOptions.Value.AutoCheckUpdate = false;
             this.liveOptions.UpdateOption();
-            this.viewManager.ShowView<MainView>();
+            this.viewManager.ShowView<CompanionView>();
         }
 
         private async void YesButton_Clicked(object sender, System.EventArgs e)

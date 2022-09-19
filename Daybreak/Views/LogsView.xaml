@@ -18,8 +18,6 @@
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
-        <controls:BackButton Foreground="White" Height="30" Width="30" HorizontalAlignment="Left" Margin="5"
-                             Clicked="BackButton_Clicked"></controls:BackButton>
         <controls:BinButton Foreground="White" Height="30" Width="30" HorizontalAlignment="Right" Margin="5"
                             Clicked="BinButton_Clicked"></controls:BinButton>
         <controls:RefreshGlyph Foreground="White" Height="30" Width="30" HorizontalAlignment="Right" Margin="0, 5, 45, 5"
