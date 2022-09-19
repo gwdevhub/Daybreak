@@ -17,16 +17,13 @@ namespace Daybreak.Views
     public partial class AccountsView : UserControl
     {
         private readonly ICredentialManager credentialManager;
-        private readonly IViewManager viewManager;
 
         public ObservableCollection<LoginCredentials> Accounts { get; } = new();
 
         public AccountsView(
-            ICredentialManager credentialManager,
-            IViewManager viewManager)
+            ICredentialManager credentialManager)
         {
             this.credentialManager = credentialManager.ThrowIfNull(nameof(credentialManager));
-            this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.InitializeComponent();
             this.GetCredentials();
         }
@@ -35,11 +32,6 @@ namespace Daybreak.Views
         {
             var creds = await this.credentialManager.GetCredentialList().ConfigureAwait(true);
             this.Accounts.AddRange(creds);
-        }
-
-        private void BackButton_Clicked(object sender, EventArgs e)
-        {
-            this.viewManager.ShowView<SettingsCategoryView>();
         }
 
         private void AddButton_Clicked(object sender, EventArgs e)
@@ -55,7 +47,6 @@ namespace Daybreak.Views
         private async void SaveButton_Clicked(object sender, EventArgs e)
         {
             await this.credentialManager.StoreCredentials(this.Accounts.ToList()).ConfigureAwait(true);
-            this.viewManager.ShowView<SettingsCategoryView>();
         }
 
         private void AccountTemplate_RemoveClicked(object sender, EventArgs e)

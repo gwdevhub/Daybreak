@@ -65,7 +65,7 @@ namespace Daybreak.Services.ApplicationLauncher
                     {
                         if (this.privilegeManager.AdminPrivileges is false)
                         {
-                            this.privilegeManager.RequestAdminPrivileges<MainView>("You need administrator rights in order to start using multi-launch");
+                            this.privilegeManager.RequestAdminPrivileges<CompanionView>("You need administrator rights in order to start using multi-launch");
                             return false;
                         }
 

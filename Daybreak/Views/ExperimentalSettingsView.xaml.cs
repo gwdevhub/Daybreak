@@ -4,7 +4,6 @@ using System;
 using System.Configuration;
 using System.Extensions;
 using System.Linq;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 using System.Windows.Input;
@@ -29,14 +28,11 @@ namespace Daybreak.Views
         [GenerateDependencyProperty]
         public bool downloadIcons;
 
-        private readonly IViewManager viewManager;
         private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions;
 
         public ExperimentalSettingsView(
-            IViewManager viewManager,
             ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions)
         {
-            this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull(nameof(liveUpdateableOptions));
             this.InitializeComponent();
             this.LoadExperimentalSettings();
@@ -72,12 +68,6 @@ namespace Daybreak.Views
         private void SaveButton_Clicked(object sender, EventArgs e)
         {
             this.SaveExperimentalSettings();
-            this.viewManager.ShowView<SettingsCategoryView>();
-        }
-
-        private void BackButton_Clicked(object sender, EventArgs e)
-        {
-            this.viewManager.ShowView<SettingsCategoryView>();
         }
 
         private void TextBox_AllowNumbersOnly(object sender, TextCompositionEventArgs e)

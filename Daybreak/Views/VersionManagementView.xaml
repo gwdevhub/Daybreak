@@ -14,8 +14,6 @@
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
-        <controls:BackButton Foreground="White" Height="30" Width="30" Grid.Column="0" HorizontalAlignment="Left" Margin="5"
-                                Clicked="BackButton_Clicked"></controls:BackButton>
         <TextBlock Text="Manage application version" FontSize="18" Foreground="White" HorizontalAlignment="Center"></TextBlock>
         <WrapPanel Grid.Row="1" HorizontalAlignment="Center" Margin="10">
             <TextBlock Text="Current version: " Foreground="White" FontSize="16"></TextBlock>

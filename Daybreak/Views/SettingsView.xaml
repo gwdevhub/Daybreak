@@ -77,8 +77,6 @@
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <TextBlock Text="Launcher settings" FontSize="22" Foreground="White" HorizontalAlignment="Center" Grid.ColumnSpan="2"></TextBlock>
-            <controls:BackButton Foreground="White" Height="30" Width="30" Grid.Column="0" HorizontalAlignment="Left" Margin="5"
-                                Clicked="BackButton_Clicked"></controls:BackButton>
             <controls:SaveButton Foreground="White" Height="30" Width="30" Grid.Column="1" HorizontalAlignment="Right" Margin="5"
                                 Clicked="SaveButton_Clicked"></controls:SaveButton>
             <StackPanel Orientation="Vertical" Grid.Row="1">

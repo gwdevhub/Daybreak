@@ -14,10 +14,13 @@ using System.Diagnostics;
 using System.Extensions;
 using System.Threading;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Extensions;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 
 namespace Daybreak.Launch
@@ -44,6 +47,8 @@ namespace Daybreak.Launch
         private string currentVersionText;
         [GenerateDependencyProperty]
         private bool isRunningAsAdmin;
+        [GenerateDependencyProperty]
+        private bool isShowingDropdown;
 
         public MainWindow(
             IViewManager viewManager,
@@ -76,6 +81,12 @@ namespace Daybreak.Launch
 
         private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            if (e.ChangedButton is not MouseButton.Left &&
+                e.LeftButton is not MouseButtonState.Pressed)
+            {
+                return;
+            }
+
             this.DragMove();
         }
 
@@ -144,7 +155,46 @@ namespace Daybreak.Launch
 
         private void SettingsButton_Clicked(object sender, EventArgs e)
         {
-            this.viewManager.ShowView<SettingsCategoryView>();
+            sender.As<ToggleButton>().IsEnabled = false;
+            var widthAnimation = new DoubleAnimation
+            {
+                From = this.IsShowingDropdown ?
+                    this.MenuContainer.ActualWidth :
+                    0,
+                To = this.IsShowingDropdown ?
+                    0 :
+                    300,
+                Duration = new Duration(TimeSpan.FromMilliseconds(200)),
+                DecelerationRatio = 0.7
+            };
+
+            var opacityAnimation = new DoubleAnimation
+            {
+                From = this.IsShowingDropdown ?
+                    this.MenuContainer.Opacity :
+                    0,
+                To = this.IsShowingDropdown ?
+                    0 :
+                    1,
+                Duration = new Duration(TimeSpan.FromMilliseconds(100)),
+                DecelerationRatio = 0.7
+            };
+
+            var storyBoard = new Storyboard();
+            storyBoard.Children.Add(widthAnimation);
+            Storyboard.SetTarget(widthAnimation, this.MenuContainer);
+            Storyboard.SetTargetProperty(widthAnimation, new PropertyPath(Grid.WidthProperty));
+            storyBoard.Children.Add(opacityAnimation);
+            Storyboard.SetTarget(opacityAnimation, this.MenuContainer);
+            Storyboard.SetTargetProperty(opacityAnimation, new PropertyPath(Grid.OpacityProperty));
+
+            storyBoard.Completed += (_, _) =>
+            {
+                sender.As<ToggleButton>().IsEnabled = true;
+                this.IsShowingDropdown = !this.IsShowingDropdown;
+            };
+
+            storyBoard.Begin();
         }
 
         private void CreditTextBox_MouseLeftButtonDown(object sender, EventArgs e)
@@ -187,7 +237,7 @@ namespace Daybreak.Launch
             }
             else
             {
-                this.viewManager.ShowView<MainView>();
+                this.viewManager.ShowView<CompanionView>();
                 this.PeriodicallyCheckForUpdates();
             }
         }

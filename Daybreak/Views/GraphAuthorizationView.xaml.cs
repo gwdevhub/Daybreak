@@ -38,14 +38,14 @@ public partial class GraphAuthorizationView : UserControl
         if (authorizationResult.TryExtractFailure(out var failure))
         {
             this.logger.LogError(failure, "Authorization failed");
-            this.viewManager.ShowView<MainView>();
+            this.viewManager.ShowView<CompanionView>();
             return;
         }
 
         if (this.DataContext is not ViewRedirectContext redirectContext)
         {
             this.logger.LogError("Cannot redirect to proper view. No view set in context");
-            this.viewManager.ShowView<MainView>();
+            this.viewManager.ShowView<CompanionView>();
             return;
         }
 

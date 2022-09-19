@@ -12,11 +12,7 @@
         <Viewbox Stretch="Fill">
             <Grid>
                 <Ellipse Height="4" Width="4" StrokeThickness="0.2" Stroke="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"></Ellipse>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Ellipse Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" Height="1" Width="1"></Ellipse>
-                    <Ellipse Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" Height="1" Width="1"></Ellipse>
-                    <Ellipse Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" Height="1" Width="1"></Ellipse>
-                </StackPanel>
+                <local:ThreeDotsGlyph Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" Padding="0.5"></local:ThreeDotsGlyph>
             </Grid>
         </Viewbox>
         <Ellipse Fill="Transparent" MouseEnter="Ellipse_MouseEnter" MouseLeave="Ellipse_MouseLeave" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"></Ellipse>

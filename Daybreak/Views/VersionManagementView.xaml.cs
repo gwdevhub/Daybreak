@@ -77,17 +77,5 @@ namespace Daybreak.Views
 
             this.viewManager.ShowView<UpdateView>(desiredVersion);
         }
-
-        private void BackButton_Clicked(object sender, EventArgs e)
-        {
-            if (this.DataContext is UserControl userControl)
-            {
-                this.viewManager.ShowView(userControl.GetType());
-            }
-            else
-            {
-                this.viewManager.ShowView<MainView>();
-            }
-        }
     }
 }

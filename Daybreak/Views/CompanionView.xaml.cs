@@ -1,12 +1,9 @@
 ﻿using Daybreak.Configuration;
-using Daybreak.Controls;
 using Daybreak.Exceptions;
 using Daybreak.Models.Builds;
 using Daybreak.Services.ApplicationLauncher;
-using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Screens;
 using Daybreak.Services.ViewManagement;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Configuration;
 using System.Extensions;
@@ -24,7 +21,7 @@ namespace Daybreak.Views
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Fields used by source generator for DependencyProperty")]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
-    public partial class MainView : UserControl
+    public partial class CompanionView : UserControl
     {
         private readonly IApplicationLauncher applicationDetector;
         private readonly IViewManager viewManager;
@@ -54,7 +51,7 @@ namespace Daybreak.Views
         [GenerateDependencyProperty(InitialValue = true)]
         private bool browsersEnabled;
 
-        public MainView(
+        public CompanionView(
             IApplicationLauncher applicationDetector,
             IViewManager viewManager,
             ILiveUpdateableOptions<ApplicationConfiguration> liveOptions,
