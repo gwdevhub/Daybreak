@@ -14,6 +14,7 @@ public interface IGraphClient
     Task<Result<User, Exception>> GetUserProfile<TViewType>()
         where TViewType : UserControl;
     Task<Result<bool, Exception>> PerformAuthorizationFlow(ChromiumBrowserWrapper chromiumBrowserWrapper, CancellationToken cancellationToken = default);
+    Task<Result<bool, Exception>> LogOut();
     Task<Result<bool, Exception>> UploadBuilds();
     Task<Result<bool, Exception>> DownloadBuilds();
     Task<Result<bool, Exception>> UploadBuild(string buildName);

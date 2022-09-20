@@ -18,6 +18,16 @@
                                    Width="40"></local:GoldenArrowGlyph>
             </buttons:MenuButton.InnerContent>
         </buttons:MenuButton>
+        <buttons:MenuButton Title="Manage builds" 
+                            Foreground="White"
+                            HighlightColor="White"
+                            Height="30"
+                            Clicked="ManageBuildsButton_Clicked">
+            <buttons:MenuButton.InnerContent>
+                <local:FireballGlyph Foreground="White"
+                                       Width="40"></local:FireballGlyph>
+            </buttons:MenuButton.InnerContent>
+        </buttons:MenuButton>
         <buttons:MenuButton Title="Account settings" 
                             Foreground="White"
                             HighlightColor="White"
@@ -57,16 +67,6 @@
             <buttons:MenuButton.InnerContent>
                 <local:ExperimentGlyph Foreground="White"
                                        Width="40"></local:ExperimentGlyph>
-            </buttons:MenuButton.InnerContent>
-        </buttons:MenuButton>
-        <buttons:MenuButton Title="Manage builds" 
-                            Foreground="White"
-                            HighlightColor="White"
-                            Height="30"
-                            Clicked="ManageBuildsButton_Clicked">
-            <buttons:MenuButton.InnerContent>
-                <local:FireballGlyph Foreground="White"
-                                       Width="40"></local:FireballGlyph>
             </buttons:MenuButton.InnerContent>
         </buttons:MenuButton>
         <buttons:MenuButton Title="Manage client version" 

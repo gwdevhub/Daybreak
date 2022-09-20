@@ -166,4 +166,25 @@ public partial class BuildsSynchronizationView : UserControl
         this.ButtonsEnabled = true;
         this.ShowLoading = false;
     }
+
+    private async void LogOutButton_Clicked(object sender, EventArgs e)
+    {
+        this.ButtonsEnabled = false;
+        this.ShowLoading = true;
+        var result = await this.graphClient.LogOut();
+        result.Do(
+            onSuccess: logOutSuccess =>
+            {
+                if (logOutSuccess)
+                {
+                    this.viewManager.ShowView<BuildsListView>();
+                }
+            },
+            onFailure: failure =>
+            {
+                this.logger.LogError(failure, "Failed to log out");
+            });
+        this.ButtonsEnabled = true;
+        this.ShowLoading = false;
+    }
 }

@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
@@ -26,8 +27,8 @@ namespace Daybreak.Services.Graph;
 
 public sealed class GraphClient : IGraphClient
 {
-    private const string Scopes = "Files.Read Files.Read.All Files.ReadWrite Files.ReadWrite.All User.Read";
-    private const string RedirectUri = "http://localhost";
+    private const string Scopes = "Files.Read Files.Read.All Files.ReadWrite Files.ReadWrite.All User.Read offline_access";
+    private const string RedirectUri = "http://localhost:42111";
 
     private const string QueryStateKey = "state";
     private const string QueryCodeKey = "code";
@@ -35,9 +36,11 @@ public sealed class GraphClient : IGraphClient
     private const string RedirectUriPlaceholder = "[RedirectUri]";
     private const string ScopesPlaceholder = "[Scopes]";
     private const string StatePlaceholder = "[State]";
+    private const string RefreshTokenPlaceholder = "[RefreshToken]";
     private const string ProfileEndpoint = "me";
     private const string GraphBaseUrl = "https://graph.microsoft.com/v1.0/";
     private const string TokenUrlPlaceholder = $"https://login.microsoftonline.com/consumers/oauth2/v2.0/token";
+    private const string RefreshTokenUrlPlaceholder = $"https://login.microsoftonline.com/consumers/oauth2/v2.0/token?client_id={ClientIdPlaceholder}&refresh_token={RefreshTokenPlaceholder}";
     private const string AuthorizationUrlPlaceholder = $"https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id={ClientIdPlaceholder}&response_type=code&redirect_uri={RedirectUriPlaceholder}&response_mode=query&scope={ScopesPlaceholder}&state={StatePlaceholder}";
     private const string SyncFileUri = $"me/drive/root:/Daybreak/Builds/daybreak.json{ContentSuffix}";
     private const string ContentSuffix = ":/content";
@@ -85,11 +88,20 @@ public sealed class GraphClient : IGraphClient
         return maybeAccessToken.Switch(
             onSuccess: token =>
             {
-                var accessToken = AccessToken.FromTokenResponse(token);
-                this.SaveAccessToken(accessToken);
+                this.SaveTokenResponse(token);
                 return true;
             },
             onFailure: exception => exception);
+    }
+
+    public Task<Result<bool, Exception>> LogOut()
+    {
+        this.ResetAccessToken();
+        this.ResetRefreshToken();
+        this.ResetAuthorization();
+
+        //TODO: Currently revoking only one refresh token is not supported. Follow up when MS Graph implements refresh token revocation.
+        return Task.FromResult(Result<bool, Exception>.Success(true));
     }
 
     public async Task<Result<User, Exception>> GetUserProfile<TViewType>()
@@ -104,8 +116,15 @@ public sealed class GraphClient : IGraphClient
 
         if (DateTime.Now > accessToken.ExpirationDate)
         {
-            this.viewManager.ShowView<GraphAuthorizationView>(new ViewRedirectContext { CallingView = typeof(TViewType) });
-            return new InvalidOperationException("Client authorization expired");
+            var maybeToken = await this.RefreshAccessToken();
+            if (maybeToken.ExtractValue() is not TokenResponse tokenResponse)
+            {
+                this.viewManager.ShowView<GraphAuthorizationView>(new ViewRedirectContext { CallingView = typeof(TViewType) });
+                return new InvalidOperationException("Client authorization expired");
+            }
+
+            (var newAccessToken, _) = this.SaveTokenResponse(tokenResponse);
+            accessToken = newAccessToken;
         }
 
         this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken.Token);
@@ -227,6 +246,30 @@ public sealed class GraphClient : IGraphClient
     public void ResetAuthorization()
     {
         this.ResetAccessToken();
+        this.ResetRefreshToken();
+    }
+
+    private async Task<Optional<TokenResponse>> RefreshAccessToken()
+    {
+        var maybeRefreshToken = this.LoadRefreshToken();
+        if (maybeRefreshToken.ExtractValue() is not RefreshToken refreshToken)
+        {
+            return Optional.None<TokenResponse>();
+        }
+
+        using var httpContent = new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            { "client_id", ApplicationId },
+            { "refresh_token", refreshToken.Token },
+            { "grant_type", "refresh_token" }
+        });
+        using var response = await this.httpClient.PostAsync(TokenUrlPlaceholder, httpContent);
+        if (response.IsSuccessStatusCode is false)
+        {
+            return Optional.None<TokenResponse>();
+        }
+
+        return JsonConvert.DeserializeObject<TokenResponse>(await response.Content.ReadAsStringAsync());
     }
 
     private async Task<bool> PutBuild(BuildEntry buildEntry)
@@ -320,7 +363,19 @@ public sealed class GraphClient : IGraphClient
                 .Replace(' ', '+'))
             .Replace(StatePlaceholder, state);
 
-        while (chromiumBrowserWrapper.Address.StartsWith(RedirectUri) is false)
+        NameValueCollection query = null;
+        bool finished = false;
+        chromiumBrowserWrapper.WebBrowser.CoreWebView2.SourceChanged += (_, sourceArgs) =>
+        {
+            if (chromiumBrowserWrapper.Address.StartsWith(RedirectUri))
+            {
+                query = HttpUtility.ParseQueryString(chromiumBrowserWrapper.Address.Split('?').Skip(1).FirstOrDefault());
+                finished = true;
+                chromiumBrowserWrapper.WebBrowser.CoreWebView2.NavigateToString(string.Empty);
+            }
+        };
+
+        while (finished is false)
         {
             if (cancellationToken.IsCancellationRequested)
             {
@@ -330,8 +385,7 @@ public sealed class GraphClient : IGraphClient
             await Task.Delay(1000, cancellationToken).ConfigureAwait(true);
         }
 
-        var query = HttpUtility.ParseQueryString(chromiumBrowserWrapper.Address.Split('?').Skip(1).FirstOrDefault());
-        if (query.GetValues(QueryStateKey) is string[] states is false)
+        if (query?.GetValues(QueryStateKey) is string[] states is false)
         {
             throw new InvalidOperationException("Response doesn't have state key in response");
         }
@@ -388,6 +442,16 @@ public sealed class GraphClient : IGraphClient
         return JsonConvert.DeserializeObject<TokenResponse>(await response.Content.ReadAsStringAsync());
     }
 
+    private (AccessToken, RefreshToken) SaveTokenResponse(TokenResponse token)
+    {
+        var accessToken = AccessToken.FromTokenResponse(token);
+        var refreshToken = RefreshToken.FromTokenResponse(token);
+        this.SaveAccessToken(accessToken);
+        this.SaveRefreshToken(refreshToken);
+
+        return (accessToken, refreshToken);
+    }
+
     private void ResetAccessToken()
     {
         this.liveUpdateableOptions.Value.ProtectedGraphAccessToken = null;
@@ -398,6 +462,19 @@ public sealed class GraphClient : IGraphClient
     {
         var codeBytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(token));
         this.liveUpdateableOptions.Value.ProtectedGraphAccessToken = Convert.ToBase64String(ProtectedData.Protect(codeBytes, Entropy, DataProtectionScope.CurrentUser));
+        this.liveUpdateableOptions.UpdateOption();
+    }
+
+    private void SaveRefreshToken(RefreshToken refreshToken)
+    {
+        var codeBytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(refreshToken));
+        this.liveUpdateableOptions.Value.ProtectedGraphRefreshToken = Convert.ToBase64String(ProtectedData.Protect(codeBytes, Entropy, DataProtectionScope.CurrentUser));
+        this.liveUpdateableOptions.UpdateOption();
+    }
+
+    private void ResetRefreshToken()
+    {
+        this.liveUpdateableOptions.Value.ProtectedGraphRefreshToken = null;
         this.liveUpdateableOptions.UpdateOption();
     }
 
@@ -419,6 +496,27 @@ public sealed class GraphClient : IGraphClient
             this.logger.LogError(e, "Failed to load access token. Resetting access token");
             this.ResetAccessToken();
             return Optional.None<AccessToken>();
+        }
+    }
+
+    private Optional<RefreshToken> LoadRefreshToken()
+    {
+        var protectedCode = this.liveUpdateableOptions.Value.ProtectedGraphRefreshToken;
+        if (protectedCode.IsNullOrWhiteSpace())
+        {
+            return Optional.None<RefreshToken>();
+        }
+
+        var codeBytes = ProtectedData.Unprotect(Convert.FromBase64String(protectedCode), Entropy, DataProtectionScope.CurrentUser);
+        try
+        {
+            return JsonConvert.DeserializeObject<RefreshToken>(Encoding.UTF8.GetString(codeBytes));
+        }
+        catch (Exception e)
+        {
+            this.logger.LogError(e, "Failed to load refresh token. Resetting refresh token");
+            this.ResetAccessToken();
+            return Optional.None<RefreshToken>();
         }
     }
 
