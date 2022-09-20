@@ -25,6 +25,15 @@
         <controls:BackButton Foreground="White" Height="30" Width="30" Grid.Column="0" HorizontalAlignment="Left" Margin="5"
                              Clicked="BackButton_Clicked" VerticalAlignment="Top"
                              IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"></controls:BackButton>
+        <controls:OpaqueButton  Text="Log Out"
+                                Foreground="White"
+                                Background="DarkGray"
+                                HorizontalAlignment="Right"
+                                Padding="5"
+                                Margin="5"
+                                Clicked="LogOutButton_Clicked"
+                                Width="80"
+                                IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"/>
         <WrapPanel HorizontalAlignment="Center">
             <TextBlock
                    Text="Build templates synchronization"
@@ -42,7 +51,6 @@
                                 Visibility="{Binding ElementName=_this, Path=Synchronized, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
             </Grid>
         </WrapPanel>
-        
         <WrapPanel HorizontalAlignment="Center"
                    Grid.Row="1">
             <TextBlock Text="Logged in as: "

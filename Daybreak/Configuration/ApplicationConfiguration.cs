@@ -39,5 +39,7 @@ namespace Daybreak.Configuration
         public bool AutoCheckUpdate { get; set; } = true;
         [JsonProperty("ProtectedGraphAccessToken")]
         public string ProtectedGraphAccessToken { get; set; }
+        [JsonProperty("ProtectedGraphRefreshToken")]
+        public string ProtectedGraphRefreshToken { get; set; }
     }
 }

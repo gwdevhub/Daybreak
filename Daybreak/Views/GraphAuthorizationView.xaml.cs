@@ -2,7 +2,6 @@
 using Daybreak.Services.Graph.Models;
 using Daybreak.Services.ViewManagement;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Core.Extensions;
 using System.Threading;
 using System.Windows;
