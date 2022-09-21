@@ -1,9 +1,5 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Exceptions;
-using Daybreak.Services.IconRetrieve;
-using Daybreak.Services.Privilege;
-using Daybreak.Services.Screenshots;
-using Daybreak.Services.Updater;
 using Daybreak.Services.Updater.PostUpdate;
 using Daybreak.Services.ViewManagement;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using Slim;
 using Slim.Integration.ServiceCollection;
 using System;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection;
