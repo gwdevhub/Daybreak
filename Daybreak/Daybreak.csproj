@@ -106,7 +106,7 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
-
+	
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
     <Exec Command="echo.&gt;$(Version).version" />
   </Target>

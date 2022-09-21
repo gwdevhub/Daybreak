@@ -3,9 +3,9 @@ using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 
-namespace Pepa.Wpf.Utilities
+namespace Daybreak.Utils
 {
-    static class NativeMethods
+    internal static class NativeMethods
     {
         public static uint WM_KEYDOWN = 0x0100;
         public static uint SWP_SHOWWINDOW = 0x0040;
