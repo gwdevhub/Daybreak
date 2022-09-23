@@ -1,6 +1,6 @@
 ﻿using Daybreak.Models.Progress;
+using Daybreak.Services.Navigation;
 using Daybreak.Services.Updater;
-using Daybreak.Services.ViewManagement;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Windows;

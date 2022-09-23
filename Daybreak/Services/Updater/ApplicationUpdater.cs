@@ -2,8 +2,8 @@
 using Daybreak.Exceptions;
 using Daybreak.Models.Github;
 using Daybreak.Models.Progress;
+using Daybreak.Services.Navigation;
 using Daybreak.Services.Updater.PostUpdate;
-using Daybreak.Services.ViewManagement;
 using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;

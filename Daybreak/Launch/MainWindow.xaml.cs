@@ -1,10 +1,10 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Services.Bloogum;
 using Daybreak.Services.IconRetrieve;
+using Daybreak.Services.Navigation;
 using Daybreak.Services.Privilege;
 using Daybreak.Services.Screenshots;
 using Daybreak.Services.Updater;
-using Daybreak.Services.ViewManagement;
 using Daybreak.Utils;
 using Daybreak.Views;
 using System;

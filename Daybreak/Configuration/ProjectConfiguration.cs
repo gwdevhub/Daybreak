@@ -11,7 +11,6 @@ using Daybreak.Services.Screens;
 using Daybreak.Services.Screenshots;
 using Daybreak.Services.Shortcuts;
 using Daybreak.Services.Updater;
-using Daybreak.Services.ViewManagement;
 using Daybreak.Views;
 using Microsoft.Extensions.Http.Logging;
 using Microsoft.Extensions.Logging;
@@ -28,6 +27,7 @@ using System.Core.Extensions;
 using Daybreak.Services.Updater.PostUpdate.Actions;
 using Daybreak.Services.Graph;
 using Microsoft.Extensions.DependencyInjection;
+using Daybreak.Services.Navigation;
 
 namespace Daybreak.Configuration;
 

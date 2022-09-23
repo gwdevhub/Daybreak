@@ -1,7 +1,7 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Exceptions;
+using Daybreak.Services.Navigation;
 using Daybreak.Services.Updater.PostUpdate;
-using Daybreak.Services.ViewManagement;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Slim;

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace Utils
+namespace Daybreak.Utils
 {
     public static class StringUtils
     {
@@ -18,7 +18,7 @@ namespace Utils
             {
                 for (var i = 1; i < width; i++)
                 {
-                    var cost = (s[j - 1] == t[i - 1]) ? 0 : 1;
+                    var cost = s[j - 1] == t[i - 1] ? 0 : 1;
                     var insertion = matrix[j, i - 1] + 1;
                     var deletion = matrix[j - 1, i] + 1;
                     var substitution = matrix[j - 1, i - 1] + cost;

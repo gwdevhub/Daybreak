@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace Daybreak.Services.ViewManagement
+namespace Daybreak.Services.Navigation
 {
     public interface IViewProducer
     {

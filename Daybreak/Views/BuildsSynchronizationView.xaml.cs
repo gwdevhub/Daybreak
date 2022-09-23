@@ -4,7 +4,6 @@ using System.Core.Extensions;
 using System.Windows;
 using System.Windows.Extensions;
 using System.Windows.Controls;
-using Daybreak.Services.ViewManagement;
 using System.Collections.ObjectModel;
 using Daybreak.Services.Graph.Models;
 using System.Extensions;
@@ -14,6 +13,7 @@ using Daybreak.Services.BuildTemplates;
 using System.Linq;
 using Daybreak.Models;
 using System.Collections.Generic;
+using Daybreak.Services.Navigation;
 
 namespace Daybreak.Views;
 

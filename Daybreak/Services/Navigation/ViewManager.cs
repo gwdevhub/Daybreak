@@ -4,7 +4,7 @@ using System.Extensions;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Daybreak.Services.ViewManagement
+namespace Daybreak.Services.Navigation
 {
     public sealed class ViewManager : IViewManager
     {

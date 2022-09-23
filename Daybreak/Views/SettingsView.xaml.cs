@@ -1,5 +1,5 @@
 ﻿using Daybreak.Configuration;
-using Daybreak.Services.ViewManagement;
+using Daybreak.Services.Navigation;
 using System;
 using System.Configuration;
 using System.Extensions;

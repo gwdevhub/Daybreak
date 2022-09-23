@@ -2,8 +2,8 @@
 using Daybreak.Exceptions;
 using Daybreak.Models.Builds;
 using Daybreak.Services.ApplicationLauncher;
+using Daybreak.Services.Navigation;
 using Daybreak.Services.Screens;
-using Daybreak.Services.ViewManagement;
 using System;
 using System.Configuration;
 using System.Extensions;
