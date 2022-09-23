@@ -1,7 +1,6 @@
 ﻿using Daybreak.Controls;
 using Daybreak.Models;
 using Daybreak.Services.Credentials;
-using Daybreak.Services.ViewManagement;
 using System;
 using System.Collections.ObjectModel;
 using System.Extensions;

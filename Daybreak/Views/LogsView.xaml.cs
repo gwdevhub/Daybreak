@@ -1,6 +1,5 @@
 ﻿using Daybreak.Models;
 using Daybreak.Services.Logging;
-using Daybreak.Services.ViewManagement;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System;

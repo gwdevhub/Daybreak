@@ -1,7 +1,6 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Controls;
 using Daybreak.Models;
-using Daybreak.Services.ViewManagement;
 using System;
 using System.Collections.ObjectModel;
 using System.Configuration;
