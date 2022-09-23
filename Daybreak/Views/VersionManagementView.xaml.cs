@@ -1,5 +1,5 @@
-﻿using Daybreak.Services.Updater;
-using Daybreak.Services.ViewManagement;
+﻿using Daybreak.Services.Navigation;
+using Daybreak.Services.Updater;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;

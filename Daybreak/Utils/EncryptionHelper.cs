@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Security.Cryptography;
 
-namespace Daybreak
+namespace Daybreak.Utils
 {
     internal static class EncryptionHelper
     {

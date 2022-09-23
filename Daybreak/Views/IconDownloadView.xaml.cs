@@ -1,6 +1,6 @@
 ﻿using Daybreak.Models.Progress;
 using Daybreak.Services.IconRetrieve;
-using Daybreak.Services.ViewManagement;
+using Daybreak.Services.Navigation;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Core.Extensions;

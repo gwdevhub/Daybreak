@@ -3,7 +3,7 @@ using Daybreak.Controls;
 using Daybreak.Models.Builds;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Graph.Models;
-using Daybreak.Services.ViewManagement;
+using Daybreak.Services.Navigation;
 using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;

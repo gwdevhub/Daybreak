@@ -3,7 +3,7 @@ using Daybreak.Controls;
 using Daybreak.Models.Builds;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.IconRetrieve;
-using Daybreak.Services.ViewManagement;
+using Daybreak.Services.Navigation;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Configuration;

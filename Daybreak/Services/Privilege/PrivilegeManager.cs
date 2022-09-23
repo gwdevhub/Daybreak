@@ -1,5 +1,5 @@
 ﻿using Daybreak.Models;
-using Daybreak.Services.ViewManagement;
+using Daybreak.Services.Navigation;
 using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using System.Extensions;

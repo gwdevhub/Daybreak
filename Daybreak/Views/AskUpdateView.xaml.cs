@@ -1,7 +1,7 @@
 ﻿using Daybreak.Configuration;
+using Daybreak.Services.Navigation;
 using Daybreak.Services.Privilege;
 using Daybreak.Services.Updater;
-using Daybreak.Services.ViewManagement;
 using Microsoft.Extensions.Logging;
 using System.Configuration;
 using System.Extensions;
