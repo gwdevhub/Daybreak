@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Exceptions;
+using Daybreak.Scanner;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Updater.PostUpdate;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,6 +28,8 @@ namespace Daybreak.Launch
         [STAThread]
         public static int Main()
         {
+            Scanner.Scanner.Scan("TOTALCMD64");
+
             return LaunchMainWindow();
         }
 

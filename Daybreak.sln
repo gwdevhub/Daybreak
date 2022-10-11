@@ -31,6 +31,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.github\CODEOWNERS = .github\CODEOWNERS
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daybreak.Scanner", "Daybreak.Scanner\Daybreak.Scanner.csproj", "{B0936456-8DA6-4817-95F9-0B1DDC377665}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,14 @@ Global
 		{4E2BB805-135D-4F02-8C53-3D8B6876D323}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4E2BB805-135D-4F02-8C53-3D8B6876D323}.Release|x64.ActiveCfg = Release|Any CPU
 		{4E2BB805-135D-4F02-8C53-3D8B6876D323}.Release|x64.Build.0 = Release|Any CPU
+		{B0936456-8DA6-4817-95F9-0B1DDC377665}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0936456-8DA6-4817-95F9-0B1DDC377665}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0936456-8DA6-4817-95F9-0B1DDC377665}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B0936456-8DA6-4817-95F9-0B1DDC377665}.Debug|x64.Build.0 = Debug|Any CPU
+		{B0936456-8DA6-4817-95F9-0B1DDC377665}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0936456-8DA6-4817-95F9-0B1DDC377665}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0936456-8DA6-4817-95F9-0B1DDC377665}.Release|x64.ActiveCfg = Release|Any CPU
+		{B0936456-8DA6-4817-95F9-0B1DDC377665}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

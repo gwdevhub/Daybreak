@@ -55,6 +55,10 @@
     <PackageReference Include="WpfExtended.SourceGeneration" Version="0.1.1" />
     <PackageReference Include="WpfScreenHelper" Version="2.1.0" />
   </ItemGroup>
+	
+  <ItemGroup>
+    <ProjectReference Include="..\Daybreak.Scanner\Daybreak.Scanner.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Update="Controls\Buttons\SynchronizeButton.xaml.cs">
