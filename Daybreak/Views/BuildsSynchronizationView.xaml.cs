@@ -27,8 +27,8 @@ public partial class BuildsSynchronizationView : UserControl
     private readonly IViewManager viewManager;
     private readonly ILogger<BuildsSynchronizationView> logger;
 
-    public ObservableCollection<BuildFile> RemoteBuildEntries { get; } = new();
-    public ObservableCollection<BuildWithTemplateCode> LocalBuildEntries { get; } = new();
+    public ObservableCollection<SynchronizationBuild> RemoteBuildEntries { get; } = new();
+    public ObservableCollection<SynchronizationBuild> LocalBuildEntries { get; } = new();
 
     [GenerateDependencyProperty(InitialValue = true)]
     private bool buttonsEnabled;
@@ -37,9 +37,9 @@ public partial class BuildsSynchronizationView : UserControl
     [GenerateDependencyProperty]
     private string lastUploadDate;
     [GenerateDependencyProperty]
-    private BuildFile selectedRemoteBuild;
+    private SynchronizationBuild selectedRemoteBuild;
     [GenerateDependencyProperty]
-    private BuildWithTemplateCode selectedLocalBuild;
+    private SynchronizationBuild selectedLocalBuild;
     [GenerateDependencyProperty]
     private bool showLoading;
     [GenerateDependencyProperty]
@@ -78,18 +78,28 @@ public partial class BuildsSynchronizationView : UserControl
     private async Task PopulateBuilds()
     {
         var getBuildsResponse = await this.graphClient.RetrieveBuildsList();
-        if (getBuildsResponse.TryExtractSuccess(out var builds) is false)
+        if (getBuildsResponse.TryExtractSuccess(out var remoteBuildFiles) is false)
         {
-            builds = new List<BuildFile>();
+            remoteBuildFiles = new List<BuildFile>();
         }
 
-        this.RemoteBuildEntries.ClearAnd().AddRange(builds);
-        var localBuilds = await this.buildTemplateManager.GetBuilds().ToListAsync();
-        this.LocalBuildEntries.ClearAnd().AddRange(localBuilds.Select(build => new BuildWithTemplateCode { Build = build, TemplateCode = this.buildTemplateManager.EncodeTemplate(build.Build) }));
+        var localBuildFiles = await this.buildTemplateManager.GetBuilds().ToListAsync();
 
-        if (this.LocalBuildEntries.Count == this.RemoteBuildEntries.Count &&
-            this.LocalBuildEntries.Select(b => b.Build.Name).Except(this.RemoteBuildEntries.Select(b => b.FileName)).None() &&
-            this.LocalBuildEntries.Select(b => b.TemplateCode).Except(this.RemoteBuildEntries.Select(b => b.TemplateCode)).None())
+        var remoteBuilds = remoteBuildFiles.Select(buildFile => new SynchronizationBuild { Name = buildFile.FileName, TemplateCode = buildFile.TemplateCode })
+            .ToList();
+        var localBuilds = localBuildFiles.Select(build => new SynchronizationBuild { Name = build.Name, TemplateCode = this.buildTemplateManager.EncodeTemplate(build.Build) })
+            .ToList();
+
+        var changedLocalBuilds = localBuilds.Where(
+            localBuild => remoteBuilds.None(remoteBuild => localBuild.Name + localBuild.TemplateCode == remoteBuild.Name + remoteBuild.TemplateCode))
+            .ToList();
+        var changedRemoteBuilds = remoteBuilds.Where(
+            remoteBuild => localBuilds.None(localBuild => localBuild.Name + localBuild.TemplateCode == remoteBuild.Name + remoteBuild.TemplateCode))
+            .ToList();
+
+        if (localBuilds.Any() &&
+            changedLocalBuilds.None() &&
+            changedRemoteBuilds.None())
         {
             this.Synchronized = true;
         }
@@ -97,6 +107,14 @@ public partial class BuildsSynchronizationView : UserControl
         {
             this.Synchronized = false;
         }
+
+        foreach(var build in changedLocalBuilds.Concat(changedRemoteBuilds))
+        {
+            build.Changed = true;
+        }
+
+        this.RemoteBuildEntries.ClearAnd().AddRange(remoteBuilds);
+        this.LocalBuildEntries.ClearAnd().AddRange(localBuilds);
     }
 
     private void BackButton_Clicked(object sender, EventArgs e)
@@ -107,14 +125,14 @@ public partial class BuildsSynchronizationView : UserControl
     private async void UploadButton_Clicked(object sender, EventArgs e)
     {
         // TODO: Handle failures to upload
-        if (this.SelectedLocalBuild is not BuildWithTemplateCode buildWithTemplateCode)
+        if (this.SelectedLocalBuild is not SynchronizationBuild build)
         {
             return;
         }
 
         this.ButtonsEnabled = false;
         this.ShowLoading = true;
-        await this.graphClient.UploadBuild(buildWithTemplateCode.Build.Name);
+        await this.graphClient.UploadBuild(build.Name);
         await this.PopulateBuilds();
         this.ButtonsEnabled = true;
         this.ShowLoading = false;
@@ -122,14 +140,14 @@ public partial class BuildsSynchronizationView : UserControl
 
     private async void DownloadButton_Clicked(object sender, EventArgs e)
     {
-        if (this.SelectedRemoteBuild is not BuildFile buildFile)
+        if (this.SelectedRemoteBuild is not SynchronizationBuild build)
         {
             return;
         }
 
         this.ButtonsEnabled = false;
         this.ShowLoading = true;
-        await this.graphClient.DownloadBuild(buildFile.FileName);
+        await this.graphClient.DownloadBuild(build.Name);
         await this.PopulateBuilds();
         this.ButtonsEnabled = true;
         this.ShowLoading = false;

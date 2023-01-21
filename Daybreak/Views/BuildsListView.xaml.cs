@@ -36,7 +36,7 @@ namespace Daybreak.Views
         private async void LoadBuilds()
         {
             this.buildEntries = await this.buildTemplateManager.GetBuilds().ToListAsync();
-            this.BuildEntries.ClearAnd().AddRange(this.buildEntries);
+            this.BuildEntries.ClearAnd().AddRange(this.buildEntries.OrderBy(b => b.Name));
         }
 
         private void ListView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)

@@ -44,7 +44,6 @@ namespace Daybreak.Services.BuildTemplates
             var emptyBuild = new Build();
             var name = Guid.NewGuid().ToString();
             var entry = new BuildEntry { Build = emptyBuild, Name = name, PreviousName = string.Empty };
-            this.SaveBuild(entry);
             return entry;
         }
 
@@ -52,19 +51,24 @@ namespace Daybreak.Services.BuildTemplates
         {
             var emptyBuild = new Build();
             var entry = new BuildEntry { Build = emptyBuild, Name = name, PreviousName = string.Empty };
-            this.SaveBuild(entry);
             return entry;
         }
 
         public void SaveBuild(BuildEntry buildEntry)
         {
             var encodedBuild = this.EncodeTemplate(buildEntry.Build);
-            if (string.IsNullOrWhiteSpace(buildEntry.PreviousName))
+            var newPath = Path.Combine(BuildsPath, $"{buildEntry.Name}.txt");
+            if (string.IsNullOrWhiteSpace(buildEntry.PreviousName) is false)
             {
-                File.Delete($"{BuildsPath}\\{buildEntry.PreviousName}.txt");
+                var oldPath = Path.GetFullPath(Path.Combine(BuildsPath, $"{buildEntry.PreviousName}.txt"));
+                if (File.Exists(oldPath))
+                {
+                    File.Delete(oldPath);
+                }
             }
 
-            File.WriteAllText($"{BuildsPath}\\{buildEntry.Name}.txt", encodedBuild);
+            Directory.CreateDirectory(Path.GetDirectoryName(newPath));
+            File.WriteAllText(newPath, encodedBuild);
         }
 
         public void RemoveBuild(BuildEntry buildEntry)
@@ -82,12 +86,13 @@ namespace Daybreak.Services.BuildTemplates
 
         public async Task<Result<BuildEntry, Exception>> GetBuild(string name)
         {
-            if (File.Exists($"{BuildsPath}/{name}.txt") is false)
+            var path = Path.Combine(BuildsPath, $"{name}.txt");
+            if (File.Exists(path) is false)
             {
                 return new InvalidOperationException("Unable to find build file");
             }
 
-            var content = await File.ReadAllTextAsync($"{BuildsPath}/{name}.txt");
+            var content = await File.ReadAllTextAsync(path);
             if (this.TryDecodeTemplate(content, out var build) is false)
             {
                 return new InvalidOperationException("Unable to parse build file");
@@ -98,7 +103,7 @@ namespace Daybreak.Services.BuildTemplates
 
         public void ClearBuilds()
         {
-            foreach(var file in Directory.GetFiles(BuildsPath))
+            foreach(var file in Directory.GetFiles(BuildsPath, "*.txt", SearchOption.AllDirectories))
             {
                 File.Delete(file);
             }
@@ -106,7 +111,12 @@ namespace Daybreak.Services.BuildTemplates
 
         public async IAsyncEnumerable<BuildEntry> GetBuilds()
         {
-            foreach (var file in Directory.GetFiles(BuildsPath))
+            if (Directory.Exists(BuildsPath) is false)
+            {
+                yield break;
+            }
+
+            foreach (var file in Directory.GetFiles(BuildsPath, "*.txt", SearchOption.AllDirectories))
             {
                 var maybeBuild = this.DecodeTemplateInner(await File.ReadAllTextAsync(file));
                 var build = maybeBuild.Switch(
@@ -119,7 +129,7 @@ namespace Daybreak.Services.BuildTemplates
                 
                 if (build is not null)
                 {
-                    yield return new BuildEntry { Build = build, Name = Path.GetFileNameWithoutExtension(file), PreviousName = Path.GetFileNameWithoutExtension(file) };
+                    yield return new BuildEntry { Build = build, Name = Path.GetRelativePath(BuildsPath, file).Replace(".txt", string.Empty), PreviousName = Path.GetRelativePath(BuildsPath, file).Replace(".txt", string.Empty) };
                 }
             }
         }

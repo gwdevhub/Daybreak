@@ -14,6 +14,7 @@
     <UserControl.Resources>
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" TriggerValue="False"></converters:BooleanToVisibilityConverter>
         <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" TriggerValue="True"></converters:BooleanToVisibilityConverter>
+        <BooleanToVisibilityConverter x:Key="BaseBooleanToVisibilityConverter"></BooleanToVisibilityConverter>
     </UserControl.Resources>
     <Grid
         Background="#A0202020">
@@ -96,9 +97,12 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid>
+                            <Rectangle Fill="LawnGreen"
+                                       Opacity="0.2"
+                                       Visibility="{Binding Changed, Converter={StaticResource BooleanToVisibilityConverter}}"></Rectangle>
                             <TextBlock FontSize="14"
                                    Foreground="White"
-                                   Text="{Binding Build.Name}"
+                                   Text="{Binding Name}"
                                    HorizontalAlignment="Left"></TextBlock>
                             <TextBlock FontSize="14"
                                    Foreground="White"
@@ -134,13 +138,16 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid>
+                            <Rectangle Fill="Red"
+                                       Visibility="{Binding Changed, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                       Opacity="0.2"></Rectangle>
                             <TextBlock FontSize="14"
                                    Foreground="White"
                                    Text="{Binding TemplateCode}"
                                    HorizontalAlignment="Left"></TextBlock>
                             <TextBlock FontSize="14"
                                    Foreground="White"
-                                   Text="{Binding FileName}"
+                                   Text="{Binding Name}"
                                    HorizontalAlignment="Right"></TextBlock>
                         </Grid>
                     </DataTemplate>
