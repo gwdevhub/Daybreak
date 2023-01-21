@@ -20,7 +20,7 @@ namespace Daybreak.Views
     /// </summary>
     public partial class BuildTemplateView : UserControl
     {
-        private const string DisallowedChars = "\r\n\\/.";
+        private const string DisallowedChars = "\r\n/.";
 
         private bool supressDecode = false;
 
