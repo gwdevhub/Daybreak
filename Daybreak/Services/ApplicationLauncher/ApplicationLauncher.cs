@@ -167,7 +167,7 @@ namespace Daybreak.Services.ApplicationLauncher
             if (!string.IsNullOrWhiteSpace(character))
             {
                 args.Add("-character");
-                args.Add(character);
+                args.Add($"\"character\"");
             }
 
             var identity = this.liveOptions.Value.ExperimentalFeatures.LaunchGuildwarsAsCurrentUser ?
