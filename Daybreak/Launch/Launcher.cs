@@ -28,8 +28,6 @@ namespace Daybreak.Launch
         [STAThread]
         public static int Main()
         {
-            Scanner.Scanner.Scan("TOTALCMD64");
-
             return LaunchMainWindow();
         }
 
