@@ -69,6 +69,7 @@ public static class ProjectConfiguration
 
         services.AddSingleton<ILogsManager, JsonLogsManager>();
         services.AddSingleton<IDebugLogsWriter, Services.Logging.DebugLogsWriter>();
+        services.AddSingleton<IEventViewerLogsWriter, EventViewerLogsWriter>();
         services.AddSingleton<ILoggerFactory, LoggerFactory>(sp =>
         {
             var factory = new LoggerFactory();
@@ -77,7 +78,8 @@ public static class ProjectConfiguration
         });
         services.AddSingleton<ILogsWriter, CompositeLogsWriter>(sp => new CompositeLogsWriter(
             sp.GetService<ILogsManager>()!,
-            sp.GetService<IDebugLogsWriter>()!));
+            sp.GetService<IDebugLogsWriter>()!,
+            sp.GetService<IEventViewerLogsWriter>()!));
 
         services.AddScoped((sp) => new ScopeMetadata(new CorrelationVector()));
         services.AddSingleton<ViewManager>();

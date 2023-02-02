@@ -89,7 +89,7 @@ namespace Daybreak.Launch
                 return true;
             }
 
-            this.logger.LogError(e, $"Unhandled exception caught {e.GetType()}");
+            this.logger.LogError(e, $"Unhandled exception caught {e.GetType()}. {e}");
             MessageBox.Show(e.ToString());
             return true;
         }
