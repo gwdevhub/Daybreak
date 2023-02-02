@@ -21,7 +21,7 @@ namespace Daybreak.Services.Mutex
             for (int i = 0; i < Marshal.ReadInt32(systemHandle); i++)
             {
                 var currentOffset = IntPtr.Size + i * Marshal.SizeOf(typeof(NativeMethods.SystemHandleInformation));
-                currentHandleInfo = (NativeMethods.SystemHandleInformation)Marshal.PtrToStructure(new IntPtr(basePointer + currentOffset), typeof(NativeMethods.SystemHandleInformation));
+                currentHandleInfo = (NativeMethods.SystemHandleInformation)Marshal.PtrToStructure(new IntPtr(basePointer + currentOffset), typeof(NativeMethods.SystemHandleInformation))!;
                 if (currentHandleInfo.OwnerPID == (uint)targetProcess.Id)
                 {
                     processHandles.Add(currentHandleInfo);
@@ -108,7 +108,7 @@ namespace Daybreak.Services.Mutex
             var infoBufferSize = Marshal.SizeOf(typeof(NativeMethods.ObjectBasicInformation));
             var pInfoBuffer = Marshal.AllocHGlobal(infoBufferSize);
             NativeMethods.NtQueryObject(handle, NativeMethods.ObjectInformationClass.ObjectBasicInformation, pInfoBuffer, infoBufferSize, out _);
-            NativeMethods.ObjectBasicInformation objInfo = (NativeMethods.ObjectBasicInformation)Marshal.PtrToStructure(pInfoBuffer, typeof(NativeMethods.ObjectBasicInformation));
+            NativeMethods.ObjectBasicInformation objInfo = (NativeMethods.ObjectBasicInformation)Marshal.PtrToStructure(pInfoBuffer, typeof(NativeMethods.ObjectBasicInformation))!;
             Marshal.FreeHGlobal(pInfoBuffer);
             if (objInfo.NameInformationLength == 0)
             {
@@ -125,7 +125,7 @@ namespace Daybreak.Services.Mutex
             var baseAddress = stringBuffer.ToInt64();
             var offset = IntPtr.Size * 2;
             var handleName = Marshal.PtrToStringUni(new IntPtr(baseAddress + offset));
-            return handleName;
+            return handleName!;
         }
 
         private static bool CloseOwnedHandle(uint processId, IntPtr handleToClose)

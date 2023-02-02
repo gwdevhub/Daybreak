@@ -34,14 +34,14 @@ namespace Daybreak.Views
 
         [GenerateDependencyProperty(InitialValue = true)]
         private bool buttonsVisible;
-        [GenerateDependencyProperty]
-        private string rightBrowserFavoriteAddress;
-        [GenerateDependencyProperty]
-        private string leftBrowserFavoriteAddress;
-        [GenerateDependencyProperty]
-        private string rightBrowserAddress;
-        [GenerateDependencyProperty]
-        private string leftBrowserAddress;
+        [GenerateDependencyProperty(InitialValue = "")]
+        private string rightBrowserFavoriteAddress = "";
+        [GenerateDependencyProperty(InitialValue = "")]
+        private string leftBrowserFavoriteAddress = "";
+        [GenerateDependencyProperty(InitialValue = "")]
+        private string rightBrowserAddress = "";
+        [GenerateDependencyProperty(InitialValue = "")]
+        private string leftBrowserAddress = "";
         [GenerateDependencyProperty]
         private bool launchButtonEnabled;
         [GenerateDependencyProperty]

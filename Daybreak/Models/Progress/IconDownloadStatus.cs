@@ -13,7 +13,7 @@ namespace Daybreak.Models.Progress
 
         private IconDownloadStep currentStep = StartingStep;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public IconDownloadStep CurrentStep
         {

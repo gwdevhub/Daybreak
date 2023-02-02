@@ -14,15 +14,15 @@ namespace Daybreak.Configuration
         [JsonProperty("BrowsersEnabled")]
         public bool BrowsersEnabled { get; set; } = true;
         [JsonProperty("ToolboxPath")]
-        public string ToolboxPath { get; set; }
+        public string? ToolboxPath { get; set; }
         [JsonProperty("TexmodPath")]
-        public string TexmodPath { get; set; }
+        public string? TexmodPath { get; set; }
         [JsonProperty("ToolboxAutoLaunch")]
         public bool ToolboxAutoLaunch { get; set; }
         [JsonProperty("LeftBrowserDefault")]
-        public string LeftBrowserDefault { get; set; } = "https://gwpvx.fandom.com/wiki/PvX_wiki";
+        public string? LeftBrowserDefault { get; set; } = "https://gwpvx.fandom.com/wiki/PvX_wiki";
         [JsonProperty("RightBrowserDefault")]
-        public string RightBrowserDefault { get; set; } = "https://wiki.guildwars.com/wiki/Quick_access_links";
+        public string? RightBrowserDefault { get; set; } = "https://wiki.guildwars.com/wiki/Quick_access_links";
         [JsonProperty("GuildwarsPaths")]
         public List<GuildwarsPath> GuildwarsPaths { get; set; } = new();
         [JsonProperty("ProtectedLoginCredentials")]
@@ -32,14 +32,14 @@ namespace Daybreak.Configuration
         [JsonProperty("ExperimentalFeatures")]
         public ExperimentalFeatures ExperimentalFeatures { get; set; } = new();
         [JsonProperty("ShortcutLocation")]
-        public string ShortcutLocation { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+        public string? ShortcutLocation { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         [JsonProperty("PlaceShortcut")]
         public bool PlaceShortcut { get; set; }
         [JsonProperty("AutoCheckUpdate")]
         public bool AutoCheckUpdate { get; set; } = true;
         [JsonProperty("ProtectedGraphAccessToken")]
-        public string ProtectedGraphAccessToken { get; set; }
+        public string? ProtectedGraphAccessToken { get; set; }
         [JsonProperty("ProtectedGraphRefreshToken")]
-        public string ProtectedGraphRefreshToken { get; set; }
+        public string? ProtectedGraphRefreshToken { get; set; }
     }
 }

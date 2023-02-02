@@ -48,7 +48,7 @@ public partial class GraphAuthorizationView : UserControl
             return;
         }
 
-        this.viewManager.ShowView(redirectContext.CallingView);
+        this.viewManager.ShowView(redirectContext.CallingView!);
     }
 
     private void UserControl_Unloaded(object sender, RoutedEventArgs e)

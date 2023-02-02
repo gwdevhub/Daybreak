@@ -58,7 +58,7 @@ namespace Daybreak.Models.Versioning
         {
             if (TryParseParts(version, out var parts, out var hasPrefix) is false)
             {
-                parsedVersion = null;
+                parsedVersion = default!;
                 return false;
             }
 
@@ -85,7 +85,7 @@ namespace Daybreak.Models.Versioning
         private static bool TryParseParts(string version, out List<VersionToken> parts, out bool hasPrefix)
         {
             hasPrefix = false;
-            parts = null;
+            parts = default!;
             if (version.IsNullOrWhiteSpace())
             {
                 return false;

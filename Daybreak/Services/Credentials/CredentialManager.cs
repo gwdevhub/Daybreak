@@ -87,8 +87,8 @@ namespace Daybreak.Services.Credentials
         {
             try
             {
-                var usrbytes = Convert.FromBase64String(protectedLoginCredentials.ProtectedUsername);
-                var psdBytes = Convert.FromBase64String(protectedLoginCredentials.ProtectedPassword);
+                var usrbytes = Convert.FromBase64String(protectedLoginCredentials.ProtectedUsername!);
+                var psdBytes = Convert.FromBase64String(protectedLoginCredentials.ProtectedPassword!);
                 return new LoginCredentials
                 {
                     Username = Encoding.UTF8.GetString(ProtectedData.Unprotect(usrbytes, Entropy, DataProtectionScope.LocalMachine)),
@@ -107,8 +107,8 @@ namespace Daybreak.Services.Credentials
         {
             try
             {
-                var usrBytes = Encoding.UTF8.GetBytes(loginCredentials.Username);
-                var psdBytes = Encoding.UTF8.GetBytes(loginCredentials.Password);
+                var usrBytes = Encoding.UTF8.GetBytes(loginCredentials.Username!);
+                var psdBytes = Encoding.UTF8.GetBytes(loginCredentials.Password!);
                 return new ProtectedLoginCredentials
                 {
                     ProtectedUsername = Convert.ToBase64String(ProtectedData.Protect(usrBytes, Entropy, DataProtectionScope.LocalMachine)),

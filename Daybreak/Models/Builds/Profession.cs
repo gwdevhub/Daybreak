@@ -33,7 +33,7 @@ namespace Daybreak.Models.Builds
         };
         public static bool TryParse(int id, out Profession profession)
         {
-            profession = Professions.Where(prof => prof.Id == id).FirstOrDefault();
+            profession = Professions.Where(prof => prof.Id == id).FirstOrDefault()!;
             if (profession is null)
             {
                 return false;
@@ -43,7 +43,7 @@ namespace Daybreak.Models.Builds
         }
         public static bool TryParse(string name, out Profession profession)
         {
-            profession = Professions.Where(prof => prof.Name == name).FirstOrDefault();
+            profession = Professions.Where(prof => prof.Name == name).FirstOrDefault()!;
             if (profession is null)
             {
                 return false;
@@ -70,10 +70,10 @@ namespace Daybreak.Models.Builds
             return profession;
         }
 
-        public string Name { get; private set; }
+        public string? Name { get; private set; }
         public int Id { get; set; }
-        public Attribute PrimaryAttribute { get; private set; }
-        public List<Attribute> Attributes { get; private set; }
+        public Attribute? PrimaryAttribute { get; private set; }
+        public List<Attribute>? Attributes { get; private set; }
         private Profession()
         {
         }

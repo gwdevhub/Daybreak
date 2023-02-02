@@ -5,8 +5,8 @@ namespace Daybreak.Services.Graph.Models;
 public sealed class User
 {
     [JsonProperty("displayName")]
-    public string DisplayName { get; set; }
+    public string? DisplayName { get; set; }
 
     [JsonProperty("mail")]
-    public string Email { get; set; }
+    public string? Email { get; set; }
 }

@@ -14,7 +14,7 @@ namespace Daybreak.Services.Configuration
         private ApplicationConfiguration applicationConfiguration;
         private readonly ILogger<ConfigurationManager> logger;
 
-        public event EventHandler ConfigurationChanged;
+        public event EventHandler? ConfigurationChanged;
 
         public ConfigurationManager(ILogger<ConfigurationManager> logger)
         {

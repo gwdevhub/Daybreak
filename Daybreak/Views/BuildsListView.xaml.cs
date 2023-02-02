@@ -19,7 +19,7 @@ namespace Daybreak.Views
         private readonly IViewManager viewManager;
         private readonly IBuildTemplateManager buildTemplateManager;
 
-        private IEnumerable<BuildEntry> buildEntries;
+        private IEnumerable<BuildEntry>? buildEntries;
 
         public ObservableCollection<BuildEntry> BuildEntries { get; } = new ObservableCollection<BuildEntry>();
 
@@ -60,7 +60,7 @@ namespace Daybreak.Views
         {
             this.BuildEntries.Clear();
             this.BuildEntries.AddRange(
-                this.buildEntries.Where(b => StringUtils.MatchesSearchString(b.Name, e)));
+                this.buildEntries!.Where(b => StringUtils.MatchesSearchString(b.Name!, e)));
         }
 
         private void SynchronizeButton_Clicked(object sender, EventArgs e)

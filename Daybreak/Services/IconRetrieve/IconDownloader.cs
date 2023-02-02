@@ -28,9 +28,9 @@ namespace Daybreak.Services.IconRetrieve
         private readonly ILogger<IconDownloader> logger;
         private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
         private readonly ILogger<ChromiumBrowserWrapper> browserLogger;
-        private ChromiumBrowserWrapper browserWrapper;
-        private CancellationTokenSource cancellationTokenSource;
-        private IconDownloadStatus iconDownloadStatus;
+        private ChromiumBrowserWrapper? browserWrapper;
+        private CancellationTokenSource? cancellationTokenSource;
+        private IconDownloadStatus? iconDownloadStatus;
 
         public bool DownloadComplete { get; private set; }
         public bool Downloading => this.cancellationTokenSource is not null;
@@ -73,7 +73,7 @@ namespace Daybreak.Services.IconRetrieve
             if (this.Downloading)
             {
                 this.logger.LogInformation("Download already running");
-                return this.iconDownloadStatus;
+                return this.iconDownloadStatus!;
             }
 
             this.cancellationTokenSource = new();
@@ -86,7 +86,7 @@ namespace Daybreak.Services.IconRetrieve
         {
             this.cancellationTokenSource?.Cancel();
             this.cancellationTokenSource?.Dispose();
-            this.cancellationTokenSource = null;
+            this.cancellationTokenSource = default!;
         }
 
         private async Task DownloadIcons()
@@ -95,7 +95,7 @@ namespace Daybreak.Services.IconRetrieve
             if (await TestBrowserSupported() is false)
             {
                 this.logger.LogError("Browser not supported. Icon downloading stopped");
-                this.iconDownloadStatus.CurrentStep = IconDownloadStatus.BrowserNotSupported;
+                this.iconDownloadStatus!.CurrentStep = IconDownloadStatus.BrowserNotSupported;
                 return;
             }
 
@@ -111,7 +111,7 @@ namespace Daybreak.Services.IconRetrieve
 
                 var logger = this.logger.CreateScopedLogger(nameof(this.DownloadIcons), skill.Name);
                 logger.LogInformation("Verifying if icon exists");
-                this.iconDownloadStatus.CurrentStep = IconDownloadStatus.Checking(skill.Name, progressValue);
+                this.iconDownloadStatus!.CurrentStep = IconDownloadStatus.Checking(skill.Name!, progressValue);
                 if ((await this.iconCache.GetIconUri(skill)).ExtractValue() is not null)
                 {
                     progressValue += progressIncrement;
@@ -125,18 +125,18 @@ namespace Daybreak.Services.IconRetrieve
             if (skillsToDownload.Count == 0)
             {
                 this.logger.LogInformation("No icons missing. Stopping download");
-                this.iconDownloadStatus.CurrentStep = IconDownloadStatus.Finished;
+                this.iconDownloadStatus!.CurrentStep = IconDownloadStatus.Finished;
                 return;
             }
 
-            this.iconBrowser.InitializeWebView(this.browserWrapper, this.cancellationTokenSource.Token);
+            this.iconBrowser.InitializeWebView(this.browserWrapper!, this.cancellationTokenSource!.Token);
             
             var incomplete = false;
             foreach (var skill in skillsToDownload)
             {
                 if (this.cancellationTokenSource?.IsCancellationRequested is null or true)
                 {
-                    this.iconDownloadStatus.CurrentStep = IconDownloadStatus.Stopped(progressValue);
+                    this.iconDownloadStatus!.CurrentStep = IconDownloadStatus.Stopped(progressValue);
                     return;
                 }
 
@@ -147,7 +147,7 @@ namespace Daybreak.Services.IconRetrieve
                 }
 
                 this.logger.LogInformation("Downloading icon");
-                this.iconDownloadStatus.CurrentStep = IconDownloadStatus.Downloading(skill.Name, progressValue);
+                this.iconDownloadStatus!.CurrentStep = IconDownloadStatus.Downloading(skill.Name!, progressValue);
                 var request = new IconRequest { Skill = skill };
                 this.iconBrowser.QueueIconRequest(request);
 
@@ -178,10 +178,10 @@ namespace Daybreak.Services.IconRetrieve
             {
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    this.browserWrapper.IsEnabled = false;
+                    this.browserWrapper!.IsEnabled = false;
                     this.browserWrapper.WebBrowser.Dispose();
                 });
-                this.iconDownloadStatus.CurrentStep = IconDownloadStatus.Finished;
+                this.iconDownloadStatus!.CurrentStep = IconDownloadStatus.Finished;
                 this.DownloadComplete = true;
             }
         }

@@ -72,7 +72,7 @@ namespace Daybreak.Services.ApplicationLauncher
                         this.ClearGwLocks();
                     }
 
-                    return await this.LaunchGuildwarsProcess(credentials.Username, credentials.Password, credentials.CharacterName);
+                    return await this.LaunchGuildwarsProcess(credentials.Username!, credentials.Password!, credentials.CharacterName!);
                 },
                 onNone: () =>
                 {
@@ -162,7 +162,7 @@ namespace Daybreak.Services.ApplicationLauncher
                 "-email",
                 email,
                 "-password",
-                password
+                password!
             };
             if (!string.IsNullOrWhiteSpace(character))
             {
@@ -202,7 +202,7 @@ namespace Daybreak.Services.ApplicationLauncher
                     throw new InvalidOperationException("Newly launched gw process not detected");
                 }
 
-                if (gwProcess.MainWindowHandle == IntPtr.Zero)
+                if (gwProcess!.MainWindowHandle == IntPtr.Zero)
                 {
                     continue;
                 }
@@ -232,7 +232,7 @@ namespace Daybreak.Services.ApplicationLauncher
                         return false;
                     }
 
-                    return Process.GetProcessesByName(ProcessName).Where(process => string.Equals(path.Path, process.MainModule.FileName, StringComparison.Ordinal)).Any();
+                    return Process.GetProcessesByName(ProcessName).Where(process => string.Equals(path.Path, process.MainModule!.FileName, StringComparison.Ordinal)).Any();
                 }
                 catch
                 {
@@ -264,8 +264,8 @@ namespace Daybreak.Services.ApplicationLauncher
             try
             {
                 var registryKey = GetGuildwarsRegistryKey(true);
-                registryKey.SetValue("Path", gamePath);
-                registryKey.SetValue("Src", gamePath);
+                registryKey.SetValue("Path", gamePath!);
+                registryKey.SetValue("Src", gamePath!);
                 registryKey.Close();
             }
             catch (SecurityException ex)

@@ -51,6 +51,11 @@ namespace Daybreak.Views
         private void AccountTemplate_RemoveClicked(object sender, EventArgs e)
         {
             var creds = sender.As<AccountTemplate>()?.DataContext?.As<LoginCredentials>();
+            if (creds is null)
+            {
+                return;
+            }
+
             this.Accounts.Remove(creds);
             if (this.Accounts.Count > 0 && creds.Default is true)
             {
@@ -61,6 +66,11 @@ namespace Daybreak.Views
         private void AccountTemplate_DefaultClicked(object sender, EventArgs e)
         {
             var creds = sender.As<AccountTemplate>()?.DataContext?.As<LoginCredentials>();
+            if (creds is null)
+            {
+                return;
+            }
+
             this.SetAccountAsDefault(creds);
         }
 

@@ -42,9 +42,9 @@ namespace Daybreak.Launch
         private readonly CancellationTokenSource cancellationToken = new();
 
         [GenerateDependencyProperty]
-        private string creditText;
+        private string creditText = string.Empty;
         [GenerateDependencyProperty]
-        private string currentVersionText;
+        private string currentVersionText = string.Empty;
         [GenerateDependencyProperty]
         private bool isRunningAsAdmin;
         [GenerateDependencyProperty]

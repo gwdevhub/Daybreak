@@ -16,13 +16,13 @@ namespace Daybreak.Controls
     [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
     public partial class SkillTemplate : UserControl
     {
-        public event EventHandler<RoutedEventArgs> Clicked;
-        public event EventHandler RemoveClicked;
+        public event EventHandler<RoutedEventArgs>? Clicked;
+        public event EventHandler? RemoveClicked;
 
-        private IIconCache iconRetriever;
+        private IIconCache? iconRetriever;
 
         [GenerateDependencyProperty]
-        private ImageSource imageSource;
+        private ImageSource imageSource = default!;
         [GenerateDependencyProperty]
         private double borderOpacity;
 

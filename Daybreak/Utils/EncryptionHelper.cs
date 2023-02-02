@@ -6,19 +6,20 @@ namespace Daybreak.Utils
 {
     internal static class EncryptionHelper
     {
-        private static Aes aesAlgorithm;
+        private static Aes? AesAlgorithm;
         private static Aes Aes
         {
             get
             {
-                if (aesAlgorithm is null)
+                if (AesAlgorithm is null)
                 {
-                    aesAlgorithm = Aes.Create();
-                    aesAlgorithm.Mode = CipherMode.CBC;
-                    aesAlgorithm.BlockSize = 128;
-                    aesAlgorithm.Padding = PaddingMode.PKCS7;
+                    AesAlgorithm = Aes.Create();
+                    AesAlgorithm.Mode = CipherMode.CBC;
+                    AesAlgorithm.BlockSize = 128;
+                    AesAlgorithm.Padding = PaddingMode.PKCS7;
                 }
-                return aesAlgorithm;
+
+                return AesAlgorithm;
             }
         }
         private static int Iterations { get; } = 10000;
@@ -31,7 +32,7 @@ namespace Daybreak.Utils
             var saltBytes = Generate128BitsOfRandomEntropy();
             var ivBytes = Generate128BitsOfRandomEntropy();
 
-            using var password = new Rfc2898DeriveBytes(key, saltBytes, Iterations);
+            using var password = new Rfc2898DeriveBytes(key, saltBytes, Iterations, HashAlgorithmName.MD5);
             var keyBytes = password.GetBytes(Aes.KeySize / 8);
             using var encryptor = Aes.CreateEncryptor(keyBytes, ivBytes);
             using var memoryStream = new MemoryStream();
@@ -57,7 +58,7 @@ namespace Daybreak.Utils
             encryptedStream.Read(ivBytes, 0, ivBytes.Length);
             encryptedStream.Read(cipherBytes, 0, cipherBytes.Length);
 
-            using var password = new Rfc2898DeriveBytes(key, saltBytes, Iterations);
+            using var password = new Rfc2898DeriveBytes(key, saltBytes, Iterations, HashAlgorithmName.MD5);
             var keyBytes = password.GetBytes(Aes.KeySize / 8);
             using var decryptor = Aes.CreateDecryptor(keyBytes, ivBytes);
             using var memoryStream = new MemoryStream(cipherBytes);

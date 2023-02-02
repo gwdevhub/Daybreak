@@ -11,12 +11,12 @@ namespace Daybreak.Controls
     /// </summary>
     public partial class SearchTextBox : UserControl
     {
-        public event EventHandler<string> TextChanged;
+        public event EventHandler<string>? TextChanged;
 
         [GenerateDependencyProperty(InitialValue = true)]
         private bool placeholderVisibility;
         [GenerateDependencyProperty]
-        private string searchText;
+        private string searchText = default!;
 
         public SearchTextBox()
         {

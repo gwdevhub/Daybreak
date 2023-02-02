@@ -11,16 +11,16 @@ namespace Daybreak.Controls.Buttons;
 /// </summary>
 public partial class MenuButton : UserControl
 {
-    public event EventHandler Clicked;
+    public event EventHandler? Clicked;
 
     [GenerateDependencyProperty]
     private bool highlighted;
     [GenerateDependencyProperty]
-    private Brush highlightColor;
+    private Brush highlightColor = default!;
     [GenerateDependencyProperty]
-    private FrameworkElement innerContent;
-    [GenerateDependencyProperty]
-    private string title;
+    private FrameworkElement innerContent = default!;
+    [GenerateDependencyProperty(InitialValue = "")]
+    private string title = string.Empty;
 
     public MenuButton()
     {

@@ -20,7 +20,7 @@ namespace Daybreak.Launch
     {
         public readonly static Launcher Instance = new();
 
-        private ILogger logger;
+        private ILogger? logger;
 
         public System.IServiceProvider ApplicationServiceProvider => this.ServiceProvider;
 
@@ -79,7 +79,7 @@ namespace Daybreak.Launch
                     return true;
                 }
             }
-            else if (e.Message.Contains("Invalid window handle.") && e.StackTrace.Contains("CoreWebView2Environment.CreateCoreWebView2ControllerAsync"))
+            else if (e.Message.Contains("Invalid window handle.") && e.StackTrace?.Contains("CoreWebView2Environment.CreateCoreWebView2ControllerAsync") is true)
             {
                 /*
                  * Ignore exception caused by browser failing to initialize due to missing window.
@@ -95,8 +95,8 @@ namespace Daybreak.Launch
         }
         protected override void ApplicationStarting()
         {
-            ProjectConfiguration.RegisterViews(this.ServiceProvider.GetService<IViewManager>());
-            ProjectConfiguration.RegisterPostUpdateActions(this.ServiceProvider.GetService<IPostUpdateActionProducer>());
+            ProjectConfiguration.RegisterViews(this.ServiceProvider.GetService<IViewManager>()!);
+            ProjectConfiguration.RegisterPostUpdateActions(this.ServiceProvider.GetService<IPostUpdateActionProducer>()!);
 
             this.logger = this.ServiceProvider.GetRequiredService<ILogger<Launcher>>();
             this.RegisterViewContainer();

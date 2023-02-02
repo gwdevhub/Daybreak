@@ -23,7 +23,7 @@ namespace Daybreak.Views
         private readonly ILogger<IconDownloadView> logger;
 
         [GenerateDependencyProperty]
-        private string description;
+        private string description = string.Empty;
         [GenerateDependencyProperty]
         private double progressValue;
 

@@ -9,7 +9,7 @@ namespace Daybreak.Services.Navigation
     public sealed class ViewManager : IViewManager
     {
         private readonly IServiceManager serviceManager;
-        private Panel container;
+        private Panel? container;
 
         public ViewManager(IServiceManager serviceManager)
         {
@@ -50,7 +50,7 @@ namespace Daybreak.Services.Navigation
 
         public void ShowView(Type type)
         {
-            this.ShowViewInner(type, null);
+            this.ShowViewInner(type, default);
         }
 
         public void ShowView(Type type, object dataContext)
@@ -58,11 +58,16 @@ namespace Daybreak.Services.Navigation
             this.ShowViewInner(type, dataContext);
         }
 
-        private void ShowViewInner(Type viewType, object dataContext)
+        private void ShowViewInner(Type viewType, object? dataContext)
         {
             var scopedManager = this.serviceManager.CreateScope();
             Application.Current.Dispatcher.Invoke(() =>
             {
+                if (this.container is null)
+                {
+                    throw new InvalidOperationException("Cannot show a view without a registered container");
+                }
+
                 var view = scopedManager.GetService(viewType).As<UserControl>();
                 this.container.Children.Clear();
                 this.container.Children.Add(view);

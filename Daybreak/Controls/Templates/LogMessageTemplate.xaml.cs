@@ -13,7 +13,7 @@ namespace Daybreak.Controls
         private bool expanded;
 
         [GenerateDependencyProperty]
-        private string message;
+        private string message = string.Empty;
 
         public LogMessageTemplate()
         {

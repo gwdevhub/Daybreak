@@ -51,12 +51,22 @@ namespace Daybreak.Views
         private void GuildwarsPathTemplate_DefaultClicked(object sender, EventArgs e)
         {
             var path = sender.As<GuildwarsPathTemplate>()?.DataContext?.As<GuildwarsPath>();
+            if (path is null)
+            {
+                return;
+            }
+
             this.SetPathAsDefault(path);
         }
 
         private void GuildwarsPathTemplate_RemoveClicked(object sender, EventArgs e)
         {
             var path = sender.As<GuildwarsPathTemplate>()?.DataContext?.As<GuildwarsPath>();
+            if (path is null)
+            {
+                return;
+            }
+
             this.Paths.Remove(path);
             if (this.Paths.Count > 0 && path.Default is true)
             {

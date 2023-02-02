@@ -2982,7 +2982,7 @@ namespace Daybreak.Models.Builds
 
         public static bool TryParse(int id, out Skill skill)
         {
-            skill = Skills.Where(skill => skill.Id == id).FirstOrDefault();
+            skill = Skills.Where(skill => skill.Id == id).FirstOrDefault()!;
             if (skill is null)
             {
                 return false;
@@ -2992,7 +2992,7 @@ namespace Daybreak.Models.Builds
         }
         public static bool TryParse(string name, out Skill skill)
         {
-            skill = Skills.Where(skill => skill.Name == name).FirstOrDefault();
+            skill = Skills.Where(skill => skill.Name == name).FirstOrDefault()!;
             if (skill is null)
             {
                 return false;
@@ -3019,10 +3019,10 @@ namespace Daybreak.Models.Builds
             return skill;
         }
 
-        public Profession Profession { get; private set; }
-        public string Name { get; private set; }
-        public int Id { get; private set; }
-        public string AlternativeName { get; private set; }
+        public Profession? Profession { get; private set; }
+        public string? Name { get; private set; }
+        public int? Id { get; private set; }
+        public string? AlternativeName { get; private set; }
         private Skill()
         {
         }

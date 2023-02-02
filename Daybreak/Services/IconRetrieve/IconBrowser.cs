@@ -34,7 +34,7 @@ namespace Daybreak.Services.IconRetrieve
         private readonly ConcurrentQueue<IconRequest> iconRequests = new();
         private readonly ILogger<IconBrowser> logger;
 
-        private ChromiumBrowserWrapper browserWrapper;
+        private ChromiumBrowserWrapper? browserWrapper;
         private CancellationToken cancellationToken;
 
         public IconBrowser(
@@ -101,9 +101,9 @@ namespace Daybreak.Services.IconRetrieve
                 this.logger.LogError(e, "Encountered error when initializing browser");
             }
 
-            var curedSkillName = request.Skill.AlternativeName.IsNullOrWhiteSpace() ?
-                request.Skill.Name.Replace(" ", "_") :
-                request.Skill.AlternativeName.Replace(" ", "_");
+            var curedSkillName = request.Skill!.AlternativeName.IsNullOrWhiteSpace() ?
+                request.Skill.Name!.Replace(" ", "_") :
+                request.Skill.AlternativeName!.Replace(" ", "_");
             var skillIconUrl = $"{BaseUrl}/{QueryUrl.Replace(NamePlaceholder, curedSkillName)}";
             logger.LogInformation($"Looking for icon at {skillIconUrl}");
 
@@ -138,7 +138,7 @@ namespace Daybreak.Services.IconRetrieve
                     continue;
                 }
 
-                var potentialBase64 = iconPayload.SkillImage.Split(',').Skip(1).FirstOrDefault();
+                var potentialBase64 = iconPayload.SkillImage!.Split(',').Skip(1).FirstOrDefault();
                 if (potentialBase64 == FaultyBase64 ||
                     potentialBase64 == LargeFaultyBase64)
                 {
@@ -150,7 +150,7 @@ namespace Daybreak.Services.IconRetrieve
                 byte[] bytes;
                 try
                 {
-                    bytes = Convert.FromBase64String(potentialBase64);
+                    bytes = Convert.FromBase64String(potentialBase64!);
                 }
                 catch
                 {
@@ -160,7 +160,7 @@ namespace Daybreak.Services.IconRetrieve
                 }
 
                 await SaveIconLocally(request.Skill, bytes);
-                request.IconBase64 = potentialBase64;
+                request.IconBase64 = potentialBase64!;
                 request.Finished = true;
                 break;
             }
@@ -171,11 +171,11 @@ namespace Daybreak.Services.IconRetrieve
 
         private static async Task<string> SaveIconLocally(Skill skill, byte[] data)
         {
-            var curedSkillName = skill.Name
+            var curedSkillName = skill.Name?
                 .Replace(" ", "_")
                 .Replace("\"", "");
             await File.WriteAllBytesAsync(IconsLocation.Replace(NamePlaceholder, curedSkillName), data);
-            return curedSkillName;
+            return curedSkillName!;
         }
     }
 }

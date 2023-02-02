@@ -23,7 +23,7 @@ namespace Daybreak.Views
         [GenerateDependencyProperty]
         private bool macrosEnabled;
         [GenerateDependencyProperty]
-        public string gWToolboxLaunchDelay;
+        public string gWToolboxLaunchDelay = string.Empty;
         [GenerateDependencyProperty]
         public bool downloadIcons;
 

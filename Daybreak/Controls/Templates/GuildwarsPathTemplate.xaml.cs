@@ -15,11 +15,11 @@ namespace Daybreak.Controls
     [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
     public partial class GuildwarsPathTemplate : UserControl
     {
-        public event EventHandler RemoveClicked;
-        public event EventHandler DefaultClicked;
+        public event EventHandler? RemoveClicked;
+        public event EventHandler? DefaultClicked;
 
         [GenerateDependencyProperty]
-        private string path;
+        private string path = string.Empty;
         [GenerateDependencyProperty]
         private bool isDefault;
 

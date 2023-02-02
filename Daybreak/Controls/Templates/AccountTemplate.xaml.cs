@@ -14,15 +14,15 @@ namespace Daybreak.Controls
     [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
     public partial class AccountTemplate : UserControl
     {
-        public event EventHandler RemoveClicked;
-        public event EventHandler DefaultClicked;
+        public event EventHandler? RemoveClicked;
+        public event EventHandler? DefaultClicked;
         
         [GenerateDependencyProperty]
-        private string username;
+        private string username = string.Empty;
         [GenerateDependencyProperty]
-        private string password;
+        private string password = string.Empty;
         [GenerateDependencyProperty]
-        private string characterName;
+        private string characterName = string.Empty;
         [GenerateDependencyProperty]
         private bool isDefault;
 
