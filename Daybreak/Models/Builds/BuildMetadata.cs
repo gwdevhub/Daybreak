@@ -4,8 +4,8 @@ namespace Daybreak.Models.Builds
 {
     public sealed class BuildMetadata
     {
-        public List<int> Base64Decoded { get; set; }
-        public List<string> BinaryDecoded { get; set; }
+        public List<int>? Base64Decoded { get; set; }
+        public List<string>? BinaryDecoded { get; set; }
         public int Header { get; set; }
         public int VersionNumber { get; set; }
         public int ProfessionIdLength { get; set; }

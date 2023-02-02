@@ -9,7 +9,7 @@ namespace Daybreak.Controls
     /// </summary>
     public partial class BuildEntryTemplate : UserControl
     {
-        public event EventHandler<BuildEntry> RemoveClicked;
+        public event EventHandler<BuildEntry>? RemoveClicked;
 
         public BuildEntryTemplate()
         {

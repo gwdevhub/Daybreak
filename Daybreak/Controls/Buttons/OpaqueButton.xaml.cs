@@ -12,61 +12,20 @@ namespace Daybreak.Controls
     /// </summary>
     public partial class OpaqueButton : UserControl
     {
-        public static readonly DependencyProperty TextProperty =
-            DependencyPropertyExtensions.Register<OpaqueButton, string>(nameof(Text));
+        public event EventHandler? Clicked;
 
-        public static readonly DependencyProperty TransparentBackgroundProperty =
-            DependencyPropertyExtensions.Register<OpaqueButton, Brush>(nameof(TransparentBackground));
-
-        public static readonly DependencyProperty HighlightProperty =
-            DependencyPropertyExtensions.Register<OpaqueButton, Brush>(nameof(Highlight));
-
-        public static readonly DependencyProperty BackgroundOpacityProperty =
-            DependencyPropertyExtensions.Register<OpaqueButton, double>(nameof(BackgroundOpacity));
-
-        public static readonly DependencyProperty HighlightOpacityProperty =
-            DependencyPropertyExtensions.Register<OpaqueButton, double>(nameof(HighlightOpacity));
-
-        public static readonly DependencyProperty HighlightVisibleProperty =
-            DependencyPropertyExtensions.Register<OpaqueButton, bool>(nameof(HighlightVisible));
-
-        public event EventHandler Clicked;
-
-        public string Text
-        {
-            get => this.GetTypedValue<string>(TextProperty);
-            set => this.SetTypedValue(TextProperty, value);
-        }
-
-        public Brush TransparentBackground
-        {
-            get => this.GetTypedValue<Brush>(TransparentBackgroundProperty);
-            set => this.SetTypedValue(TransparentBackgroundProperty, value);
-        }
-
-        public Brush Highlight
-        {
-            get => this.GetTypedValue<Brush>(HighlightProperty);
-            set => this.SetTypedValue(HighlightProperty, value);
-        }
-
-        public double BackgroundOpacity
-        {
-            get => this.GetTypedValue<double>(BackgroundOpacityProperty);
-            set => this.SetTypedValue(BackgroundOpacityProperty, value);
-        }
-
-        public double HighlightOpacity
-        {
-            get => this.GetTypedValue<double>(HighlightOpacityProperty);
-            set => this.SetTypedValue(HighlightOpacityProperty, value);
-        }
-
-        public bool HighlightVisible
-        {
-            get => this.GetTypedValue<bool>(HighlightVisibleProperty);
-            set => this.SetTypedValue(HighlightVisibleProperty, value);
-        }
+        [GenerateDependencyProperty(InitialValue = "")]
+        private string text = string.Empty;
+        [GenerateDependencyProperty]
+        private Brush transparentBackground = default!;
+        [GenerateDependencyProperty]
+        private Brush highlight = default!;
+        [GenerateDependencyProperty]
+        public double backgroundOpacity;
+        [GenerateDependencyProperty]
+        public double highlightOpacity;
+        [GenerateDependencyProperty]
+        public bool highlightVisible;
 
         public OpaqueButton()
         {

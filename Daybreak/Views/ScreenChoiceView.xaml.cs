@@ -60,7 +60,7 @@ namespace Daybreak.Views
                     HorizontalAlignment = System.Windows.HorizontalAlignment.Left,
                     Foreground = screen.Id == this.selectedId ? Brushes.LightGreen : Brushes.White
                 };
-                screenTemplate.Clicked += this.ScreenTemplate_Clicked;
+                screenTemplate.Clicked += this.ScreenTemplate_Clicked!;
                 this.ScreenContainer.Children.Add(screenTemplate);
             }
         }

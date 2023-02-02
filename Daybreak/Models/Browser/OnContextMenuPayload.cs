@@ -9,6 +9,6 @@ namespace Daybreak.Models.Browser
         [JsonProperty("Y")]
         public double Y { get; set; }
         [JsonProperty("Selection")]
-        public string Selection { get; set; }
+        public string? Selection { get; set; }
     }
 }

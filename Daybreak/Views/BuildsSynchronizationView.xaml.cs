@@ -33,13 +33,13 @@ public partial class BuildsSynchronizationView : UserControl
     [GenerateDependencyProperty(InitialValue = true)]
     private bool buttonsEnabled;
     [GenerateDependencyProperty]
-    private string displayName;
+    private string displayName = string.Empty;
     [GenerateDependencyProperty]
-    private string lastUploadDate;
+    private string lastUploadDate = string.Empty;
     [GenerateDependencyProperty]
-    private SynchronizationBuild selectedRemoteBuild;
+    private SynchronizationBuild selectedRemoteBuild = default!;
     [GenerateDependencyProperty]
-    private SynchronizationBuild selectedLocalBuild;
+    private SynchronizationBuild selectedLocalBuild = default!;
     [GenerateDependencyProperty]
     private bool showLoading;
     [GenerateDependencyProperty]
@@ -85,9 +85,9 @@ public partial class BuildsSynchronizationView : UserControl
 
         var localBuildFiles = await this.buildTemplateManager.GetBuilds().ToListAsync();
 
-        var remoteBuilds = remoteBuildFiles.Select(buildFile => new SynchronizationBuild { Name = buildFile.FileName, TemplateCode = buildFile.TemplateCode })
+        var remoteBuilds = remoteBuildFiles.Select(buildFile => new SynchronizationBuild { Name = buildFile.FileName!, TemplateCode = buildFile.TemplateCode! })
             .ToList();
-        var localBuilds = localBuildFiles.Select(build => new SynchronizationBuild { Name = build.Name, TemplateCode = this.buildTemplateManager.EncodeTemplate(build.Build) })
+        var localBuilds = localBuildFiles.Select(build => new SynchronizationBuild { Name = build.Name!, TemplateCode = this.buildTemplateManager.EncodeTemplate(build.Build!) })
             .ToList();
 
         var changedLocalBuilds = localBuilds.Where(
@@ -132,7 +132,7 @@ public partial class BuildsSynchronizationView : UserControl
 
         this.ButtonsEnabled = false;
         this.ShowLoading = true;
-        await this.graphClient.UploadBuild(build.Name);
+        await this.graphClient.UploadBuild(build.Name!);
         await this.PopulateBuilds();
         this.ButtonsEnabled = true;
         this.ShowLoading = false;
@@ -147,7 +147,7 @@ public partial class BuildsSynchronizationView : UserControl
 
         this.ButtonsEnabled = false;
         this.ShowLoading = true;
-        await this.graphClient.DownloadBuild(build.Name);
+        await this.graphClient.DownloadBuild(build.Name!);
         await this.PopulateBuilds();
         this.ButtonsEnabled = true;
         this.ShowLoading = false;

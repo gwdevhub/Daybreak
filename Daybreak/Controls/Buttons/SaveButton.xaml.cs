@@ -9,7 +9,7 @@ namespace Daybreak.Controls
     /// </summary>
     public partial class SaveButton : UserControl
     {
-        public event EventHandler Clicked;
+        public event EventHandler? Clicked;
 
         public SaveButton()
         {

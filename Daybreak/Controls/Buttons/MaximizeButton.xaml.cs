@@ -9,7 +9,7 @@ namespace Daybreak.Controls
     /// </summary>
     public partial class MaximizeButton : UserControl
     {
-        public event EventHandler Clicked;
+        public event EventHandler? Clicked;
 
         public MaximizeButton()
         {

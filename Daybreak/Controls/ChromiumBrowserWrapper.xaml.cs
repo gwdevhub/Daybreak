@@ -29,15 +29,15 @@ namespace Daybreak.Controls
         
         private const string BrowserDownloadLink = "https://developer.microsoft.com/en-us/microsoft-edge/webview2/";
 
-        private static CoreWebView2Environment coreWebView2Environment;
+        private static CoreWebView2Environment? coreWebView2Environment;
 
-        public event EventHandler<string> FavoriteUriChanged;
-        public event EventHandler MaximizeClicked;
-        public event EventHandler<Build> BuildDecoded;
+        public event EventHandler<string>? FavoriteUriChanged;
+        public event EventHandler? MaximizeClicked;
+        public event EventHandler<Build>? BuildDecoded;
 
-        private ILiveOptions<ApplicationConfiguration> liveOptions;
-        private ILogger<ChromiumBrowserWrapper> logger;
-        private IBuildTemplateManager buildTemplateManager;
+        private ILiveOptions<ApplicationConfiguration>? liveOptions;
+        private ILogger<ChromiumBrowserWrapper>? logger;
+        private IBuildTemplateManager? buildTemplateManager;
         
         [GenerateDependencyProperty(InitialValue = true)]
         private bool canDownloadBuild;
@@ -54,7 +54,7 @@ namespace Daybreak.Controls
         [GenerateDependencyProperty]
         private bool navigating;
         [GenerateDependencyProperty]
-        private string favoriteAddress;
+        private string favoriteAddress = string.Empty;
         [GenerateDependencyProperty(InitialValue = false)]
         private bool preventDispose;
         public string Address
@@ -112,7 +112,7 @@ namespace Daybreak.Controls
 
         private void InitializeEnvironment()
         {
-            if (this.liveOptions.Value.BrowsersEnabled is false)
+            if (this.liveOptions!.Value.BrowsersEnabled is false)
             {
                 this.BrowserSupported = false;
                 return;
@@ -120,16 +120,13 @@ namespace Daybreak.Controls
 
             try
             {
-                if (coreWebView2Environment is null)
-                {
-                    coreWebView2Environment = System.Extensions.TaskExtensions.RunSync(() => CoreWebView2Environment.CreateAsync(null, "BrowserData", null));
-                }
+                coreWebView2Environment ??= System.Extensions.TaskExtensions.RunSync(() => CoreWebView2Environment.CreateAsync(null, "BrowserData", null));
 
                 this.BrowserSupported = true;
             }
             catch(Exception e)
             {
-                this.logger.LogWarning($"Browser initialization failed. Details: {e}");
+                this.logger!.LogWarning($"Browser initialization failed. Details: {e}");
                 this.BrowserSupported = false;
             }
         }
@@ -141,7 +138,7 @@ namespace Daybreak.Controls
                 this.WebBrowser.IsEnabled = true;
                 this.BrowserEnabled = true;
                 await this.WebBrowser.EnsureCoreWebView2Async(coreWebView2Environment);
-                this.AddressBarReadonly = this.liveOptions.Value.AddressBarReadonly;
+                this.AddressBarReadonly = this.liveOptions!.Value.AddressBarReadonly;
                 this.CanDownloadBuild = this.liveOptions.Value.ExperimentalFeatures.DynamicBuildLoading;
                 this.WebBrowser.CoreWebView2.NewWindowRequested += (browser, args) => args.Handled = true;
                 this.WebBrowser.NavigationStarting += (browser, args) =>
@@ -156,7 +153,7 @@ namespace Daybreak.Controls
                     }
                 };
                 this.WebBrowser.NavigationCompleted += (browser, args) => this.Navigating = false;
-                this.WebBrowser.WebMessageReceived += this.CoreWebView2_WebMessageReceived;
+                this.WebBrowser.WebMessageReceived += this.CoreWebView2_WebMessageReceived!;
                 this.WebBrowser.CoreWebView2.Settings.AreDevToolsEnabled = false;
                 this.WebBrowser.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
                 if (this.CanDownloadBuild)
@@ -193,7 +190,7 @@ namespace Daybreak.Controls
             {
                 var newAddress = sender.As<TextBox>().Text;
                 newAddress = SanitizeAddress(newAddress);
-                if (newAddress is null)
+                if (newAddress.IsNullOrWhiteSpace())
                 {
                     return;
                 }
@@ -206,20 +203,20 @@ namespace Daybreak.Controls
 
         private void CoreWebView2_WebMessageReceived(object sender, CoreWebView2WebMessageReceivedEventArgs args)
         {
-            BrowserPayload payload = default;
+            BrowserPayload payload = default!;
             try
             {
                 payload = args.WebMessageAsJson.Deserialize<BrowserPayload>();
             }
             catch(Exception e)
             {
-                this.logger.LogError(e, $"Exception encountered when deserializing {nameof(BrowserPayload)}");
+                this.logger!.LogError(e, $"Exception encountered when deserializing {nameof(BrowserPayload)}");
             }
 
             if (payload?.Key == BrowserPayload.PayloadKeys.ContextMenu)
             {
                 var contextMenuPayload = args.WebMessageAsJson.Deserialize<BrowserPayload<OnContextMenuPayload>>();
-                var maybeTemplate = contextMenuPayload.Value.Selection;
+                var maybeTemplate = contextMenuPayload.Value!.Selection;
                 if (string.IsNullOrWhiteSpace(maybeTemplate))
                 {
                     return;
@@ -248,7 +245,7 @@ namespace Daybreak.Controls
                     }
                     catch(Exception e)
                     {
-                        this.logger.LogWarning($"Exception when decoding template {maybeTemplate}. Details {e}");
+                        this.logger!.LogWarning($"Exception when decoding template {maybeTemplate}. Details {e}");
                     }
                 });
             }
@@ -326,7 +323,7 @@ namespace Daybreak.Controls
         {
             if (string.IsNullOrWhiteSpace(address))
             {
-                return null;
+                return default!;
             }
 
             if (address.StartsWith("www") is false &&
@@ -340,7 +337,7 @@ namespace Daybreak.Controls
             }
 
             Uri.TryCreate(address, UriKind.Absolute, out var uri);
-            return uri?.ToString();
+            return uri?.ToString() ?? string.Empty;
         }
     }
 }

@@ -34,6 +34,7 @@ namespace Daybreak.Views
             this.applicationUpdater = applicationUpdater.ThrowIfNull(nameof(applicationUpdater));
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
             this.InitializeComponent();
+            this.currentVersion = this.applicationUpdater.CurrentVersion;
             this.CurrentVersion = this.applicationUpdater.CurrentVersion;
             this.LoadVersionList();
         }

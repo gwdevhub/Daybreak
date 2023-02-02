@@ -54,7 +54,7 @@ public sealed class GraphClient : IGraphClient
     private readonly IHttpClient<GraphClient> httpClient;
     private readonly ILogger<GraphClient> logger;
 
-    private List<BuildFile> buildsCache;
+    private List<BuildFile>? buildsCache;
 
     public GraphClient(
         IBuildTemplateManager buildTemplateManager,
@@ -138,7 +138,7 @@ public sealed class GraphClient : IGraphClient
         try
         {
             var profile = JsonConvert.DeserializeObject<User>(await response.Content.ReadAsStringAsync());
-            return profile;
+            return profile!;
         }
         catch(Exception e)
         {
@@ -168,9 +168,9 @@ public sealed class GraphClient : IGraphClient
         }
 
         this.buildTemplateManager.ClearBuilds();
-        var compiledBuilds = this.buildsCache.Select(buildFile =>
+        var compiledBuilds = this.buildsCache?.Select(buildFile =>
         {
-            if (this.buildTemplateManager.TryDecodeTemplate(buildFile.TemplateCode, out var build) is false)
+            if (this.buildTemplateManager.TryDecodeTemplate(buildFile.TemplateCode!, out var build) is false)
             {
                 return null;
             }
@@ -182,7 +182,7 @@ public sealed class GraphClient : IGraphClient
                 PreviousName = buildFile.FileName
             };
         }).Where(entry => entry is not null).ToList();
-        _ = compiledBuilds.Do(this.buildTemplateManager.SaveBuild).ToList();
+        _ = compiledBuilds.Do(this.buildTemplateManager.SaveBuild!).ToList();
 
         return true;
     }
@@ -202,11 +202,11 @@ public sealed class GraphClient : IGraphClient
             return false;
         }
 
-        var compiledBuilds = this.buildsCache
+        var compiledBuilds = this.buildsCache?
             .Where(b => b.FileName == buildName)
             .Select(buildFile =>
         {
-            if (this.buildTemplateManager.TryDecodeTemplate(buildFile.TemplateCode, out var build) is false)
+            if (this.buildTemplateManager.TryDecodeTemplate(buildFile.TemplateCode!, out var build) is false)
             {
                 return null;
             }
@@ -218,7 +218,7 @@ public sealed class GraphClient : IGraphClient
                 PreviousName = buildFile.FileName
             };
         }).Where(entry => entry is not null).ToList();
-        _ = compiledBuilds.Do(this.buildTemplateManager.SaveBuild).ToList();
+        _ = compiledBuilds.Do(this.buildTemplateManager.SaveBuild!).ToList();
 
         return true;
     }
@@ -260,7 +260,7 @@ public sealed class GraphClient : IGraphClient
         using var httpContent = new FormUrlEncodedContent(new Dictionary<string, string>
         {
             { "client_id", ApplicationId },
-            { "refresh_token", refreshToken.Token },
+            { "refresh_token", refreshToken.Token! },
             { "grant_type", "refresh_token" }
         });
         using var response = await this.httpClient.PostAsync(TokenUrlPlaceholder, httpContent);
@@ -269,7 +269,7 @@ public sealed class GraphClient : IGraphClient
             return Optional.None<TokenResponse>();
         }
 
-        return JsonConvert.DeserializeObject<TokenResponse>(await response.Content.ReadAsStringAsync());
+        return JsonConvert.DeserializeObject<TokenResponse>(await response.Content.ReadAsStringAsync())!;
     }
 
     private async Task<bool> PutBuild(BuildEntry buildEntry)
@@ -282,7 +282,7 @@ public sealed class GraphClient : IGraphClient
         var buildFile = new BuildFile
         {
             FileName = buildEntry.Name,
-            TemplateCode = this.buildTemplateManager.EncodeTemplate(buildEntry.Build)
+            TemplateCode = this.buildTemplateManager.EncodeTemplate(buildEntry.Build!)
         };
 
         var buildList = this.buildsCache ?? new List<BuildFile>();
@@ -309,7 +309,7 @@ public sealed class GraphClient : IGraphClient
         var buildFiles = buildEntries.Select(buildEntry => new BuildFile
         {
             FileName = buildEntry.Name,
-            TemplateCode = this.buildTemplateManager.EncodeTemplate(buildEntry.Build)
+            TemplateCode = this.buildTemplateManager.EncodeTemplate(buildEntry.Build!)
         });
 
         var buildList = new List<BuildFile>();
@@ -363,13 +363,13 @@ public sealed class GraphClient : IGraphClient
                 .Replace(' ', '+'))
             .Replace(StatePlaceholder, state);
 
-        NameValueCollection query = null;
+        NameValueCollection query = default!;
         bool finished = false;
         chromiumBrowserWrapper.WebBrowser.CoreWebView2.SourceChanged += (_, sourceArgs) =>
         {
             if (chromiumBrowserWrapper.Address.StartsWith(RedirectUri))
             {
-                query = HttpUtility.ParseQueryString(chromiumBrowserWrapper.Address.Split('?').Skip(1).FirstOrDefault());
+                query = HttpUtility.ParseQueryString(chromiumBrowserWrapper.Address.Split('?').Skip(1).FirstOrDefault()!);
                 finished = true;
                 chromiumBrowserWrapper.WebBrowser.CoreWebView2.NavigateToString(string.Empty);
             }
@@ -439,7 +439,7 @@ public sealed class GraphClient : IGraphClient
             return new InvalidOperationException($"Invalid access token response. Status code [{response.StatusCode}]");
         }
 
-        return JsonConvert.DeserializeObject<TokenResponse>(await response.Content.ReadAsStringAsync());
+        return JsonConvert.DeserializeObject<TokenResponse>(await response.Content.ReadAsStringAsync())!;
     }
 
     private (AccessToken, RefreshToken) SaveTokenResponse(TokenResponse token)
@@ -486,10 +486,10 @@ public sealed class GraphClient : IGraphClient
             return Optional.None<AccessToken>();
         }
 
-        var codeBytes = ProtectedData.Unprotect(Convert.FromBase64String(protectedCode), Entropy, DataProtectionScope.CurrentUser);
+        var codeBytes = ProtectedData.Unprotect(Convert.FromBase64String(protectedCode!), Entropy, DataProtectionScope.CurrentUser);
         try
         {
-            return JsonConvert.DeserializeObject<AccessToken>(Encoding.UTF8.GetString(codeBytes));
+            return JsonConvert.DeserializeObject<AccessToken>(Encoding.UTF8.GetString(codeBytes))!;
         }
         catch(Exception e)
         {
@@ -507,10 +507,10 @@ public sealed class GraphClient : IGraphClient
             return Optional.None<RefreshToken>();
         }
 
-        var codeBytes = ProtectedData.Unprotect(Convert.FromBase64String(protectedCode), Entropy, DataProtectionScope.CurrentUser);
+        var codeBytes = ProtectedData.Unprotect(Convert.FromBase64String(protectedCode!), Entropy, DataProtectionScope.CurrentUser);
         try
         {
-            return JsonConvert.DeserializeObject<RefreshToken>(Encoding.UTF8.GetString(codeBytes));
+            return JsonConvert.DeserializeObject<RefreshToken>(Encoding.UTF8.GetString(codeBytes))!;
         }
         catch (Exception e)
         {

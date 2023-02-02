@@ -37,7 +37,7 @@ namespace Daybreak.Views
             if (this.DataContext is ElevationRequest elevationRequest)
             {
                 this.logger.LogWarning($"Elevation request denied. Showing {elevationRequest.View} with {elevationRequest.DataContext}");
-                this.viewManager.ShowView(elevationRequest.View, elevationRequest.DataContext);
+                this.viewManager.ShowView(elevationRequest.View!, elevationRequest.DataContext!);
             }
             else
             {

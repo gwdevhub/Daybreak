@@ -39,7 +39,7 @@ namespace Daybreak.Services.IconRetrieve
 
         private Optional<Uri> GetLocalIcon(Skill skill)
         {
-            var curedSkillName = skill.Name
+            var curedSkillName = skill.Name?
                 .Replace(" ", "_")
                 .Replace("\"", "");
             this.logger.LogInformation("Checking local icon cache");

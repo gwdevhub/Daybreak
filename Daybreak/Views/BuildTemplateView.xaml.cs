@@ -31,9 +31,9 @@ namespace Daybreak.Views
         [GenerateDependencyProperty(InitialValue = false)]
         private bool saveButtonEnabled;
         [GenerateDependencyProperty]
-        private BuildEntry currentBuild;
+        private BuildEntry currentBuild = default!;
         [GenerateDependencyProperty]
-        private string currentBuildCode;
+        private string currentBuildCode = string.Empty;
 
         public BuildTemplateView(
             IViewManager viewManager,
@@ -55,7 +55,7 @@ namespace Daybreak.Views
                 {
                     this.logger.LogInformation("Received data context. Setting current build");
                     this.CurrentBuild = contextArgs.NewValue.As<BuildEntry>();
-                    this.CurrentBuildCode = this.buildTemplateManager.EncodeTemplate(this.CurrentBuild.Build);
+                    this.CurrentBuildCode = this.buildTemplateManager.EncodeTemplate(this.CurrentBuild.Build!);
                 }
             };
         }
@@ -95,7 +95,7 @@ namespace Daybreak.Views
             try
             {
                 this.supressDecode = true;
-                this.CurrentBuildCode = this.buildTemplateManager.EncodeTemplate(this.CurrentBuild.Build);
+                this.CurrentBuildCode = this.buildTemplateManager.EncodeTemplate(this.CurrentBuild.Build!);
             }
             finally
             {

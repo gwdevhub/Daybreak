@@ -23,8 +23,8 @@ namespace Daybreak.Views
         private readonly UpdateStatus updateStatus = new();
 
         private bool success = false;
-        [GenerateDependencyProperty]
-        private string description;
+        [GenerateDependencyProperty(InitialValue = "")]
+        private string description = string.Empty;
         [GenerateDependencyProperty]
         private double progressValue;
         [GenerateDependencyProperty]
@@ -38,7 +38,7 @@ namespace Daybreak.Views
             this.applicationUpdater = applicationUpdater;
             this.logger = logger;
             this.viewManager = viewManager;
-            this.updateStatus.PropertyChanged += this.UpdateStatus_PropertyChanged;
+            this.updateStatus.PropertyChanged += this.UpdateStatus_PropertyChanged!;
             this.InitializeComponent();
         }
 

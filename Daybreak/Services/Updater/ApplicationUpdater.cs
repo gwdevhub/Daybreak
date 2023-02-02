@@ -61,7 +61,7 @@ namespace Daybreak.Services.Updater
 
             this.httpClient.DefaultRequestHeaders.Add("user-agent", "Daybreak Client");
 
-            if (Version.TryParse(Assembly.GetExecutingAssembly().GetName().Version.ToString(), out var currentVersion))
+            if (Version.TryParse(Assembly.GetExecutingAssembly()!.GetName()!.Version!.ToString(), out var currentVersion))
             {
                 if (currentVersion.HasPrefix is false)
                 {
@@ -91,7 +91,7 @@ namespace Daybreak.Services.Updater
             using var downloadStream = await this.httpClient.GetStreamAsync(uri);
             this.logger.LogInformation("Beginning update download");
             var fileStream = File.OpenWrite(TempFile);
-            var downloadSize = (double)response.Content.Headers.ContentLength;
+            var downloadSize = (double)response.Content!.Headers!.ContentLength!;
             var buffer = new byte[1024];
             var length = 0;
             double downloaded = 0;
@@ -152,7 +152,7 @@ namespace Daybreak.Services.Updater
             {
                 var serializedList = await response.Content.ReadAsStringAsync();
                 var versionList = serializedList.Deserialize<GithubRefTag[]>();
-                return versionList.Select(v => v.Ref.Remove(0, RefTagPrefix.Length)).Select(v => new Version(v));
+                return versionList.Select(v => v.Ref!.Remove(0, RefTagPrefix.Length)).Select(v => new Version(v));
             }
 
             return new List<Version>();
@@ -199,7 +199,7 @@ namespace Daybreak.Services.Updater
             using var response = await this.httpClient.GetAsync(Url);
             if (response.IsSuccessStatusCode)
             {
-                var versionTag = response.RequestMessage.RequestUri.ToString().Split('/').Last().TrimStart('v');
+                var versionTag = response.RequestMessage!.RequestUri!.ToString().Split('/').Last().TrimStart('v');
                 return versionTag;
             }
 
@@ -270,11 +270,8 @@ namespace Daybreak.Services.Updater
 
         private static RegistryKey GetOrCreateHomeKey()
         {
-            var homeRegistryKey = Registry.CurrentUser.OpenSubKey("Software", true).OpenSubKey(RegistryKey, true);
-            if (homeRegistryKey is null)
-            {
-                homeRegistryKey = Registry.CurrentUser.OpenSubKey("Software", true).CreateSubKey(RegistryKey, true);
-            }
+            var homeRegistryKey = Registry.CurrentUser.OpenSubKey("Software", true)?.OpenSubKey(RegistryKey, true);
+            homeRegistryKey ??= Registry.CurrentUser.OpenSubKey("Software", true)!.CreateSubKey(RegistryKey, true);
 
             return homeRegistryKey;
         }

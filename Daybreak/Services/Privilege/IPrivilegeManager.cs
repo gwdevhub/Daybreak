@@ -6,7 +6,7 @@ namespace Daybreak.Services.Privilege
     {
         bool AdminPrivileges { get; }
 
-        void RequestAdminPrivileges<TCancelView>(string messageToUser, object dataContextOfCancelView = null)
+        void RequestAdminPrivileges<TCancelView>(string messageToUser, object? dataContextOfCancelView = null)
             where TCancelView : UserControl;
     }
 }

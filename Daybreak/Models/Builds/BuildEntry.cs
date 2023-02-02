@@ -4,12 +4,12 @@ namespace Daybreak.Models.Builds
 {
     public sealed class BuildEntry : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-        private string name;
-        private Build build;
+        public event PropertyChangedEventHandler? PropertyChanged;
+        private string? name;
+        private Build? build;
 
-        public string PreviousName { get; set; }
-        public string Name
+        public string? PreviousName { get; set; }
+        public string? Name
         {
             get => this.name;
             set
@@ -18,7 +18,7 @@ namespace Daybreak.Models.Builds
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Name)));
             }
         }
-        public Build Build
+        public Build? Build
         {
             get => this.build;
             set

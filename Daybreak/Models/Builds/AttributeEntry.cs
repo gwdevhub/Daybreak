@@ -4,10 +4,10 @@ namespace Daybreak.Models.Builds
 {
     public sealed class AttributeEntry : INotifyPropertyChanged
     {
-        private Attribute attribute;
+        private Attribute? attribute;
         private int points;
 
-        public Attribute Attribute
+        public Attribute? Attribute
         {
             get => this.attribute;
             set
@@ -26,6 +26,6 @@ namespace Daybreak.Models.Builds
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
     }
 }

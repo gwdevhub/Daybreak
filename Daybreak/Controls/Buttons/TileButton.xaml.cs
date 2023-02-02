@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Extensions;
 using System.Windows.Media;
 
 namespace Daybreak.Controls;
@@ -10,44 +11,20 @@ namespace Daybreak.Controls;
 /// </summary>
 public partial class TileButton : UserControl
 {
-    public event EventHandler Clicked;
+    public event EventHandler? Clicked;
 
-    public static readonly DependencyProperty HighlightedProperty =
-        DependencyProperty.Register("Highlighted", typeof(bool), typeof(TileButton), null);
-    public static readonly DependencyProperty HighlightColorProperty =
-        DependencyProperty.Register("HighlightColor", typeof(Brush), typeof(TileButton), null);
-    public static readonly DependencyProperty InnerContentProperty =
-        DependencyProperty.Register("InnerContent", typeof(FrameworkElement), typeof(TileButton), null);
-    public static readonly DependencyProperty TitleProperty =
-        DependencyProperty.Register("Title", typeof(string), typeof(TileButton), null);
+    [GenerateDependencyProperty]
+    public bool highlighted;
+    [GenerateDependencyProperty(InitialValue = "")]
+    public string title = string.Empty;
+    [GenerateDependencyProperty]
+    public FrameworkElement InnerContent = default!;
+    [GenerateDependencyProperty]
+    public Brush HighlightColor = default!;
 
     public TileButton()
     {
         this.InitializeComponent();
-    }
-
-    public bool Highlighted
-    {
-        get => (bool)this.GetValue(HighlightedProperty);
-        set => this.SetValue(HighlightedProperty, value);
-    }
-
-    public string Title
-    {
-        get => this.GetValue(TitleProperty) as string;
-        set => this.SetValue(TitleProperty, value);
-    }
-
-    public FrameworkElement InnerContent
-    {
-        get => this.GetValue(InnerContentProperty) as FrameworkElement;
-        set => this.SetValue(InnerContentProperty, value);
-    }
-
-    public Brush HighlightColor
-    {
-        get => this.GetValue(HighlightColorProperty) as Brush;
-        set => this.SetValue(HighlightColorProperty, value);
     }
 
     private void Grid_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)

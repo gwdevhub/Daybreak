@@ -44,21 +44,21 @@ public static class ProjectConfiguration
                 .WithMessageHandler(sp =>
                 {
                     var logger = sp.GetService<ILogger<ApplicationUpdater>>();
-                    return new LoggingHttpMessageHandler(logger) { InnerHandler = new HttpClientHandler() };
+                    return new LoggingHttpMessageHandler(logger!) { InnerHandler = new HttpClientHandler() };
                 })
                 .Build()
             .RegisterHttpClient<BloogumClient>()
                 .WithMessageHandler(sp =>
                 {
                     var logger = sp.GetService<ILogger<BloogumClient>>();
-                    return new LoggingHttpMessageHandler(logger) { InnerHandler = new HttpClientHandler() };
+                    return new LoggingHttpMessageHandler(logger!) { InnerHandler = new HttpClientHandler() };
                 })
                 .Build()
             .RegisterHttpClient<GraphClient>()
                 .WithMessageHandler(sp =>
                 {
                     var logger = sp.GetService<ILogger<GraphClient>>();
-                    return new LoggingHttpMessageHandler(logger) { InnerHandler = new HttpClientHandler() };
+                    return new LoggingHttpMessageHandler(logger!) { InnerHandler = new HttpClientHandler() };
                 })
                 .Build();
     }
@@ -76,8 +76,8 @@ public static class ProjectConfiguration
             return factory;
         });
         services.AddSingleton<ILogsWriter, CompositeLogsWriter>(sp => new CompositeLogsWriter(
-            sp.GetService<ILogsManager>(),
-            sp.GetService<IDebugLogsWriter>()));
+            sp.GetService<ILogsManager>()!,
+            sp.GetService<IDebugLogsWriter>()!));
 
         services.AddScoped((sp) => new ScopeMetadata(new CorrelationVector()));
         services.AddSingleton<ViewManager>();

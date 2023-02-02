@@ -15,12 +15,12 @@ namespace Daybreak.Controls.Templates
     [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
     public partial class ScreenTemplate : UserControl
     {
-        public event EventHandler<Screen> Clicked;
+        public event EventHandler<Screen>? Clicked;
 
         [GenerateDependencyProperty]
-        private string screenId;
+        private string screenId = string.Empty;
         [GenerateDependencyProperty]
-        private Brush highlight;
+        private Brush highlight = default!;
 
         public ScreenTemplate()
         {

@@ -13,7 +13,7 @@ namespace Daybreak.Models.Progress
 
         private UpdateStep currentStep = StartingStep;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public UpdateStep CurrentStep
         {

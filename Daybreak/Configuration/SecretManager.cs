@@ -7,7 +7,7 @@ namespace Daybreak.Configuration;
 
 public static class SecretManager
 {
-    private static JObject SecretsHolder;
+    private static JObject? SecretsHolder;
 
     public static string GetSecret(SecretKeys secretKey)
     {
@@ -16,7 +16,7 @@ public static class SecretManager
             LoadSecrets();
         }
 
-        return SecretsHolder.Value<string>(secretKey.Key);
+        return SecretsHolder!.Value<string>(secretKey.Key)!;
     }
 
     public static T GetSecret<T>(SecretKeys secretKey)
@@ -26,7 +26,7 @@ public static class SecretManager
             LoadSecrets();
         }
 
-        return SecretsHolder.Value<T>(secretKey.Key);
+        return SecretsHolder!.Value<T>(secretKey.Key)!;
     }
 
     private static void LoadSecrets()

@@ -97,7 +97,7 @@ namespace Daybreak.Models.Builds
 
         public static bool TryParse(int id, out Attribute attribute)
         {
-            attribute = Attributes.Where(attr => attr.Id == id).FirstOrDefault();
+            attribute = Attributes.Where(attr => attr.Id == id).FirstOrDefault()!;
             if (attribute is null)
             {
                 return false;
@@ -107,7 +107,7 @@ namespace Daybreak.Models.Builds
         }
         public static bool TryParse(string name, out Attribute attribute)
         {
-            attribute = Attributes.Where(attr => attr.Name == name).FirstOrDefault();
+            attribute = Attributes.Where(attr => attr.Name == name).FirstOrDefault()!;
             if (attribute is null)
             {
                 return false;
@@ -135,7 +135,7 @@ namespace Daybreak.Models.Builds
         }
 
         public int Id { get; private set; }
-        public string Name { get; private set; }
+        public string? Name { get; private set; }
         private Attribute()
         {
         }

@@ -19,25 +19,25 @@ namespace Daybreak.Views
         private readonly IViewManager viewManager;
 
         [GenerateDependencyProperty]
-        private string texmodPath;
+        private string texmodPath = string.Empty;
         [GenerateDependencyProperty]
         private bool toolboxAutoLaunch;
         [GenerateDependencyProperty]
-        private string toolboxPath;
+        private string toolboxPath = string.Empty;
         [GenerateDependencyProperty]
         private bool addressBarReadonly;
         [GenerateDependencyProperty]
-        private string leftBrowserUrl;
+        private string leftBrowserUrl = string.Empty;
         [GenerateDependencyProperty]
-        private string rightBrowserUrl;
+        private string rightBrowserUrl = string.Empty;
         [GenerateDependencyProperty]
         private bool browsersEnabled;
         [GenerateDependencyProperty]
         private bool autoPlaceOnScreen;
         [GenerateDependencyProperty]
-        private string desiredScreen;
+        private string desiredScreen = string.Empty;
         [GenerateDependencyProperty]
-        private string shortcutFolder;
+        private string shortcutFolder = string.Empty;
         [GenerateDependencyProperty]
         private bool shortcutPlaced;
         [GenerateDependencyProperty]

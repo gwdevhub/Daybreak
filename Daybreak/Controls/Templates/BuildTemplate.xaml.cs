@@ -31,35 +31,35 @@ namespace Daybreak.Controls
 
         private bool suppressBuildChanged = false;
         private bool loadedProperties = false;
-        private IIconBrowser iconBrowser;
-        private BuildEntry loadedBuild;
-        private SkillTemplate selectingSkillTemplate;
-        private CancellationTokenSource cancellationTokenSource = new();
+        private IIconBrowser? iconBrowser;
+        private BuildEntry? loadedBuild;
+        private SkillTemplate? selectingSkillTemplate;
+        private CancellationTokenSource? cancellationTokenSource = new();
 
-        public event EventHandler BuildChanged;
+        public event EventHandler? BuildChanged;
 
         [GenerateDependencyProperty]
-        private string skillSearchText;
+        private string skillSearchText = string.Empty;
         [GenerateDependencyProperty]
-        private Profession primaryProfession;
+        private Profession primaryProfession = default!;
         [GenerateDependencyProperty]
-        private Profession secondaryProfession;
+        private Profession secondaryProfession = default!;
         [GenerateDependencyProperty]
-        private Skill skill0;
+        private Skill skill0 = default!;
         [GenerateDependencyProperty]
-        private Skill skill1;
+        private Skill skill1 = default!;
         [GenerateDependencyProperty]
-        private Skill skill2;
+        private Skill skill2 = default!;
         [GenerateDependencyProperty]
-        private Skill skill3;
+        private Skill skill3 = default!;
         [GenerateDependencyProperty]
-        private Skill skill4;
+        private Skill skill4 = default!;
         [GenerateDependencyProperty]
-        private Skill skill5;
+        private Skill skill5 = default!;
         [GenerateDependencyProperty]
-        private Skill skill6;
+        private Skill skill6 = default!;
         [GenerateDependencyProperty]
-        private Skill skill7;
+        private Skill skill7 = default!;
         public ObservableCollection<Skill> AvailableSkills { get; } = new ObservableCollection<Skill>();
         public ObservableCollection<AttributeEntry> Attributes { get; } = new ObservableCollection<AttributeEntry>();
         public ObservableCollection<Profession> Professions { get; } = new ObservableCollection<Profession>(Profession.Professions);
@@ -105,11 +105,11 @@ namespace Daybreak.Controls
             {
                 if (e.Property == PrimaryProfessionProperty)
                 {
-                    this.loadedBuild.Build.Primary = this.PrimaryProfession;
+                    this.loadedBuild!.Build!.Primary = this.PrimaryProfession;
                 }
                 else
                 {
-                    this.loadedBuild.Build.Secondary = this.SecondaryProfession;
+                    this.loadedBuild!.Build!.Secondary = this.SecondaryProfession;
                 }
 
                 this.LoadSkills();
@@ -131,14 +131,14 @@ namespace Daybreak.Controls
             {
                 if (this.suppressBuildChanged is false)
                 {
-                    this.loadedBuild.Build.Skills[0] = this.Skill0;
-                    this.loadedBuild.Build.Skills[1] = this.Skill1;
-                    this.loadedBuild.Build.Skills[2] = this.Skill2;
-                    this.loadedBuild.Build.Skills[3] = this.Skill3;
-                    this.loadedBuild.Build.Skills[4] = this.Skill4;
-                    this.loadedBuild.Build.Skills[5] = this.Skill5;
-                    this.loadedBuild.Build.Skills[6] = this.Skill6;
-                    this.loadedBuild.Build.Skills[7] = this.Skill7;
+                    this.loadedBuild!.Build!.Skills[0] = this.Skill0;
+                    this.loadedBuild!.Build!.Skills[1] = this.Skill1;
+                    this.loadedBuild!.Build!.Skills[2] = this.Skill2;
+                    this.loadedBuild!.Build!.Skills[3] = this.Skill3;
+                    this.loadedBuild!.Build!.Skills[4] = this.Skill4;
+                    this.loadedBuild!.Build!.Skills[5] = this.Skill5;
+                    this.loadedBuild!.Build!.Skills[6] = this.Skill6;
+                    this.loadedBuild!.Build!.Skills[7] = this.Skill7;
                     this.BuildChanged?.Invoke(this, new EventArgs());
                 }
             }
@@ -146,7 +146,7 @@ namespace Daybreak.Controls
 
         private void BuildTemplate_Unloaded(object sender, RoutedEventArgs e)
         {
-            this.cancellationTokenSource.Cancel();
+            this.cancellationTokenSource?.Cancel();
         }
 
         private void InitializeProperties()
@@ -186,17 +186,17 @@ namespace Daybreak.Controls
             if (this.PrimaryProfession != Profession.None)
             {
                 possibleAttributes.Add(new AttributeEntry { Attribute = this.PrimaryProfession.PrimaryAttribute });
-                possibleAttributes.AddRange(this.PrimaryProfession.Attributes.Select(a => new AttributeEntry { Attribute = a }));
+                possibleAttributes.AddRange(this.PrimaryProfession.Attributes!.Select(a => new AttributeEntry { Attribute = a }));
             }
 
             if (this.SecondaryProfession != Profession.None && this.SecondaryProfession != this.PrimaryProfession)
             {
-                possibleAttributes.AddRange(this.SecondaryProfession.Attributes.Select(a => new AttributeEntry { Attribute = a }));
+                possibleAttributes.AddRange(this.SecondaryProfession.Attributes!.Select(a => new AttributeEntry { Attribute = a }));
             }
 
             this.Attributes.ClearAnd().AddRange(possibleAttributes.Select(entry =>
             {
-                var maybePresentAttribute = this.loadedBuild.Build.Attributes.Where(buildEntry => entry.Attribute == buildEntry.Attribute).FirstOrDefault();
+                var maybePresentAttribute = this.loadedBuild!.Build!.Attributes.Where(buildEntry => entry.Attribute == buildEntry.Attribute).FirstOrDefault();
                 if (maybePresentAttribute is null)
                 {
                     return entry;
@@ -206,7 +206,7 @@ namespace Daybreak.Controls
                 return entry;
             }));
 
-            this.loadedBuild.Build.Attributes = this.Attributes.ToList();
+            this.loadedBuild!.Build!.Attributes = this.Attributes.ToList();
         }
 
         private async void LoadSkills()
@@ -277,7 +277,7 @@ namespace Daybreak.Controls
             this.suppressBuildChanged = true;
             var build = this.DataContext.As<BuildEntry>();
             this.loadedBuild = build;
-            this.PrimaryProfession = build.Build.Primary;
+            this.PrimaryProfession = build.Build!.Primary;
             this.SecondaryProfession = build.Build.Secondary;
             this.Skill0 = build.Build.Skills[0];
             this.Skill1 = build.Build.Skills[1];
@@ -332,7 +332,7 @@ namespace Daybreak.Controls
                 return;
             }
 
-            this.BrowseToInfo(this.PrimaryProfession.Name);
+            this.BrowseToInfo(this.PrimaryProfession.Name!);
             if (e is RoutedEventArgs routedEventArgs)
             {
                 routedEventArgs.Handled = true;
@@ -346,7 +346,7 @@ namespace Daybreak.Controls
                 return;
             }
 
-            this.BrowseToInfo(this.SecondaryProfession.Name);
+            this.BrowseToInfo(this.SecondaryProfession.Name!);
             if (e is RoutedEventArgs routedEventArgs)
             {
                 routedEventArgs.Handled = true;
@@ -355,7 +355,7 @@ namespace Daybreak.Controls
 
         private void AttributeTemplate_HelpClicked(object _, AttributeEntry e)
         {
-            this.BrowseToInfo(e.Attribute.Name);
+            this.BrowseToInfo(e.Attribute?.Name!);
         }
 
         private void AttributeTemplate_AttributeChanged(object _, AttributeEntry e)
@@ -375,7 +375,7 @@ namespace Daybreak.Controls
             }
             else
             {
-                this.BrowseToInfo(skill.Name);
+                this.BrowseToInfo(skill.Name!);
             }
 
             e.Handled = true;
@@ -402,14 +402,14 @@ namespace Daybreak.Controls
 
             this.selectingSkillTemplate.DataContext = sender.As<ListView>().SelectedItem;
             this.HideSkillListView();
-            this.loadedBuild.Build.Skills[0] = this.Skill0;
-            this.loadedBuild.Build.Skills[1] = this.Skill1;
-            this.loadedBuild.Build.Skills[2] = this.Skill2;
-            this.loadedBuild.Build.Skills[3] = this.Skill3;
-            this.loadedBuild.Build.Skills[4] = this.Skill4;
-            this.loadedBuild.Build.Skills[5] = this.Skill5;
-            this.loadedBuild.Build.Skills[6] = this.Skill6;
-            this.loadedBuild.Build.Skills[7] = this.Skill7;
+            this.loadedBuild!.Build!.Skills[0] = this.Skill0;
+            this.loadedBuild!.Build!.Skills[1] = this.Skill1;
+            this.loadedBuild!.Build!.Skills[2] = this.Skill2;
+            this.loadedBuild!.Build!.Skills[3] = this.Skill3;
+            this.loadedBuild!.Build!.Skills[4] = this.Skill4;
+            this.loadedBuild!.Build!.Skills[5] = this.Skill5;
+            this.loadedBuild!.Build!.Skills[6] = this.Skill6;
+            this.loadedBuild!.Build!.Skills[7] = this.Skill7;
         }
 
         private void ListView_NavigateWithMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
@@ -443,7 +443,7 @@ namespace Daybreak.Controls
         private async IAsyncEnumerable<Skill> FilterSkills(string searchTerm)
         {
             // Replace symbols to ease search
-            searchTerm = searchTerm?.Replace("\"", "").Replace("!", "");
+            searchTerm = searchTerm?.Replace("\"", "").Replace("!", "")!;
             
             foreach (var skill in Skill.Skills)
             {
@@ -465,7 +465,7 @@ namespace Daybreak.Controls
                     continue;
                 }
 
-                var matchesName = await Task.Run(() => StringUtils.MatchesSearchString(skill.Name.Replace("\"", "").Replace("!", ""), searchTerm));
+                var matchesName = await Task.Run(() => StringUtils.MatchesSearchString(skill.Name!.Replace("\"", "").Replace("!", ""), searchTerm!));
                 if (matchesName)
                 {
                     yield return skill;

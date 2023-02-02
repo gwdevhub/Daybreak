@@ -19,6 +19,6 @@ namespace Daybreak.Models.Browser
     public sealed class BrowserPayload<T> : BrowserPayload
     {
         [JsonProperty("Value")]
-        public T Value { get; set; }
+        public T? Value { get; set; }
     }
 }

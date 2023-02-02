@@ -14,8 +14,8 @@ namespace Daybreak.Controls
     [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
     public partial class AttributeTemplate : UserControl
     {
-        public event EventHandler<AttributeEntry> HelpClicked;
-        public event EventHandler<AttributeEntry> AttributeChanged;
+        public event EventHandler<AttributeEntry>? HelpClicked;
+        public event EventHandler<AttributeEntry>? AttributeChanged;
         
         [GenerateDependencyProperty(InitialValue = false)]
         private bool canAdd;

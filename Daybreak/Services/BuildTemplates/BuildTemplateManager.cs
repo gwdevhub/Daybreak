@@ -56,7 +56,7 @@ namespace Daybreak.Services.BuildTemplates
 
         public void SaveBuild(BuildEntry buildEntry)
         {
-            var encodedBuild = this.EncodeTemplate(buildEntry.Build);
+            var encodedBuild = this.EncodeTemplate(buildEntry.Build!);
             var newPath = Path.Combine(BuildsPath, $"{buildEntry.Name}.txt");
             if (string.IsNullOrWhiteSpace(buildEntry.PreviousName) is false)
             {
@@ -67,7 +67,7 @@ namespace Daybreak.Services.BuildTemplates
                 }
             }
 
-            Directory.CreateDirectory(Path.GetDirectoryName(newPath));
+            Directory.CreateDirectory(Path.GetDirectoryName(newPath)!);
             File.WriteAllText(newPath, encodedBuild);
         }
 
@@ -124,7 +124,7 @@ namespace Daybreak.Services.BuildTemplates
                     onFailure: exception =>
                     {
                         this.logger.LogError(exception, "Failed to parse build");
-                        return default;
+                        return default!;
                     });
                 
                 if (build is not null)
@@ -147,7 +147,7 @@ namespace Daybreak.Services.BuildTemplates
             var maybeBuild = this.DecodeTemplateInner(template);
             (var result, var parsedBuild) = maybeBuild.Switch(
                 onSuccess: parsedBuild => (true, parsedBuild),
-                onFailure: _ => (false, null));
+                onFailure: _ => (false, default!));
 
             build = parsedBuild;
             return result;
@@ -225,9 +225,9 @@ namespace Daybreak.Services.BuildTemplates
                 PrimaryProfessionId = build.Primary.Id,
                 SecondaryProfessionId = build.Secondary.Id,
                 AttributeCount = build.Attributes.Count,
-                AttributesIds = build.Attributes.Select(attrEntry => attrEntry.Attribute.Id).ToList(),
+                AttributesIds = build.Attributes.Select(attrEntry => attrEntry.Attribute!.Id).ToList(),
                 AttributePoints = build.Attributes.Select(attrEntry => attrEntry.Points).ToList(),
-                SkillIds = build.Skills.Select(skill => skill.Id).ToList(),
+                SkillIds = build.Skills.Select(skill => skill.Id!.Value).ToList(),
                 TailPresent = true
             };
 

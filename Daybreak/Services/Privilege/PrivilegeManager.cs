@@ -23,11 +23,11 @@ namespace Daybreak.Services.Privilege
             this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
         }
 
-        public void RequestAdminPrivileges<TCancelView>(string messageToUser, object dataContextOfCancelView = null)
+        public void RequestAdminPrivileges<TCancelView>(string messageToUser, object? dataContextOfCancelView = default)
             where TCancelView : UserControl
         {
             this.logger.LogInformation("Requesting admin privileges");
-            this.viewManager.ShowView<RequestElevationView>(new ElevationRequest { View = typeof(TCancelView), DataContext = dataContextOfCancelView, MessageToUser = messageToUser });
+            this.viewManager.ShowView<RequestElevationView>(new ElevationRequest { View = typeof(TCancelView), DataContext = dataContextOfCancelView!, MessageToUser = messageToUser });
         }
     }
 }
