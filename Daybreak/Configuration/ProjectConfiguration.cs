@@ -28,6 +28,8 @@ using Daybreak.Services.Updater.PostUpdate.Actions;
 using Daybreak.Services.Graph;
 using Microsoft.Extensions.DependencyInjection;
 using Daybreak.Services.Navigation;
+using Daybreak.Services.Onboarding;
+using Daybreak.Services.Menu;
 
 namespace Daybreak.Configuration;
 
@@ -89,6 +91,8 @@ public static class ProjectConfiguration
         services.AddSingleton<IPostUpdateActionManager>(sp => sp.GetRequiredService<PostUpdateActionManager>());
         services.AddSingleton<IPostUpdateActionProducer>(sp => sp.GetRequiredService<PostUpdateActionManager>());
         services.AddSingleton<IPostUpdateActionProvider>(sp => sp.GetRequiredService<PostUpdateActionManager>());
+        services.AddSingleton<IMenuService, MenuService>();
+        services.AddSingleton<IMenuServiceInitializer, MenuService>(sp => sp.GetRequiredService<IMenuService>().As<MenuService>());
         services.AddSingleton<IConfigurationManager, ConfigurationManager>();
         services.AddSingleton<ILiteDatabase, LiteDatabase>(sp => new LiteDatabase("Daybreak.db"));
         services.AddSingleton<IMutexHandler, MutexHandler>();
@@ -105,6 +109,7 @@ public static class ProjectConfiguration
         services.AddScoped<IPrivilegeManager, PrivilegeManager>();
         services.AddScoped<IScreenManager, ScreenManager>();
         services.AddScoped<IGraphClient, GraphClient>();
+        services.AddScoped<IOnboardingService, OnboardingService>();
     }
 
     public static void RegisterViews(IViewProducer viewProducer)
@@ -127,6 +132,7 @@ public static class ProjectConfiguration
         viewProducer.RegisterView<IconDownloadView>();
         viewProducer.RegisterView<GraphAuthorizationView>();
         viewProducer.RegisterView<BuildsSynchronizationView>();
+        viewProducer.RegisterView<OnboardingView>();
     }
 
     public static void RegisterPostUpdateActions(IPostUpdateActionProducer postUpdateActionProducer)

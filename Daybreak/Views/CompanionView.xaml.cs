@@ -1,11 +1,14 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Exceptions;
+using Daybreak.Models;
 using Daybreak.Models.Builds;
 using Daybreak.Services.ApplicationLauncher;
 using Daybreak.Services.Navigation;
+using Daybreak.Services.Onboarding;
 using Daybreak.Services.Screens;
 using System;
 using System.Configuration;
+using System.Core.Extensions;
 using System.Extensions;
 using System.Linq;
 using System.Threading;
@@ -23,6 +26,7 @@ namespace Daybreak.Views
     [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
     public partial class CompanionView : UserControl
     {
+        private readonly IOnboardingService onboardingService;
         private readonly IApplicationLauncher applicationDetector;
         private readonly IViewManager viewManager;
         private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveOptions;
@@ -52,15 +56,17 @@ namespace Daybreak.Views
         private bool browsersEnabled;
 
         public CompanionView(
+            IOnboardingService onboardingService,
             IApplicationLauncher applicationDetector,
             IViewManager viewManager,
             ILiveUpdateableOptions<ApplicationConfiguration> liveOptions,
             IScreenManager screenManager)
         {
-            this.screenManager = screenManager.ThrowIfNull(nameof(screenManager));
-            this.liveOptions = liveOptions.ThrowIfNull(nameof(liveOptions));
-            this.applicationDetector = applicationDetector.ThrowIfNull(nameof(applicationDetector));
-            this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
+            this.onboardingService = onboardingService.ThrowIfNull();
+            this.screenManager = screenManager.ThrowIfNull();
+            this.liveOptions = liveOptions.ThrowIfNull();
+            this.applicationDetector = applicationDetector.ThrowIfNull();
+            this.viewManager = viewManager.ThrowIfNull();
             this.InitializeComponent();
             this.InitializeBrowsers();
         }
@@ -115,40 +121,41 @@ namespace Daybreak.Views
 
         private async void LaunchButton_Clicked(object sender, EventArgs e)
         {
-            try
+            var onboardingStage = await this.onboardingService.CheckOnboardingStage();
+            if (onboardingStage is OnboardingStage.Default)
             {
-                if (await this.applicationDetector.LaunchGuildwars() is false)
-                {
-                    return;
-                }
-
-                if (this.liveOptions.Value.SetGuildwarsWindowSizeOnLaunch)
-                {
-                    var id = this.liveOptions.Value.DesiredGuildwarsScreen;
-                    var desiredScreen = this.screenManager.Screens.Skip(id).FirstOrDefault();
-                    if (desiredScreen is null)
-                    {
-                        throw new InvalidOperationException($"Unable to set guildwars on desired screen. No screen with id {id}");
-                    }
-
-                    await Task.Delay(1000);
-                    this.screenManager.MoveGuildwarsToScreen(desiredScreen);
-                }
-
-                if (this.liveOptions.Value.ToolboxAutoLaunch is true)
-                {
-                    var delay = this.liveOptions.Value.ExperimentalFeatures.ToolboxAutoLaunchDelay;
-                    await Task.Delay(delay);
-                    await this.applicationDetector.LaunchGuildwarsToolbox();
-                }
+                throw new InvalidOperationException($"Unexpected onboarding stage {onboardingStage}");
             }
-            catch (CredentialsNotFoundException)
+
+            if (onboardingStage is OnboardingStage.NeedsCredentials or OnboardingStage.NeedsExecutable)
             {
-                this.viewManager.ShowView<AccountsView>();
+                this.viewManager.ShowView<OnboardingView>(onboardingStage);
+                return;
             }
-            catch (ExecutableNotFoundException)
+
+            if (await this.applicationDetector.LaunchGuildwars() is false)
             {
-                this.viewManager.ShowView<ExecutablesView>();
+                return;
+            }
+
+            if (this.liveOptions.Value.SetGuildwarsWindowSizeOnLaunch)
+            {
+                var id = this.liveOptions.Value.DesiredGuildwarsScreen;
+                var desiredScreen = this.screenManager.Screens.Skip(id).FirstOrDefault();
+                if (desiredScreen is null)
+                {
+                    throw new InvalidOperationException($"Unable to set guildwars on desired screen. No screen with id {id}");
+                }
+
+                await Task.Delay(1000);
+                this.screenManager.MoveGuildwarsToScreen(desiredScreen);
+            }
+
+            if (this.liveOptions.Value.ToolboxAutoLaunch is true)
+            {
+                var delay = this.liveOptions.Value.ExperimentalFeatures.ToolboxAutoLaunchDelay;
+                await Task.Delay(delay);
+                await this.applicationDetector.LaunchGuildwarsToolbox();
             }
         }
 
