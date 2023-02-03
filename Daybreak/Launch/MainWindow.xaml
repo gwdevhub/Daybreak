@@ -121,7 +121,8 @@
                   Background="#A0202020">
             <controls:MenuList Margin="0, 30, 0, 0"/>
         </Grid>
-        <ToggleButton Style="{StaticResource Window_SettingsButton}"
+        <ToggleButton x:Name="OpeningSettingsButton"
+                      Style="{StaticResource Window_SettingsButton}"
                       Width="50"
                       Height="30"
                       HorizontalAlignment="Left"
@@ -129,7 +130,8 @@
                       Grid.ColumnSpan="2"
                       Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
                       Click="SettingsButton_Clicked"></ToggleButton>
-        <ToggleButton Style="{StaticResource Window_SettingsButton}"
+        <ToggleButton x:Name="ClosingSettingsButton"
+                      Style="{StaticResource Window_SettingsButton}"
                       Width="50"
                       Height="30"
                       HorizontalAlignment="Left"

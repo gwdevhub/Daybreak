@@ -1,6 +1,7 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Services.Bloogum;
 using Daybreak.Services.IconRetrieve;
+using Daybreak.Services.Menu;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Privilege;
 using Daybreak.Services.Screenshots;
@@ -32,6 +33,7 @@ namespace Daybreak.Launch
     [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
     public partial class MainWindow : Window
     {
+        private readonly IMenuServiceInitializer menuServiceInitializer;
         private readonly IViewManager viewManager;
         private readonly IScreenshotProvider screenshotProvider;
         private readonly IBloogumClient bloogumClient;
@@ -51,6 +53,7 @@ namespace Daybreak.Launch
         private bool isShowingDropdown;
 
         public MainWindow(
+            IMenuServiceInitializer menuServiceInitializer,
             IViewManager viewManager,
             IScreenshotProvider screenshotProvider,
             IBloogumClient bloogumClient,
@@ -59,6 +62,7 @@ namespace Daybreak.Launch
             IIconDownloader iconDownloader,
             ILiveOptions<ApplicationConfiguration> liveOptions)
         {
+            this.menuServiceInitializer = menuServiceInitializer.ThrowIfNull();
             this.viewManager = viewManager.ThrowIfNull();
             this.screenshotProvider = screenshotProvider.ThrowIfNull();
             this.bloogumClient = bloogumClient.ThrowIfNull();
@@ -69,6 +73,7 @@ namespace Daybreak.Launch
             this.InitializeComponent();
             this.CurrentVersionText = this.applicationUpdater.CurrentVersion.ToString();
             this.IsRunningAsAdmin = this.privilegeManager.AdminPrivileges;
+            this.SetupMenuService();
         }
 
 
@@ -155,7 +160,35 @@ namespace Daybreak.Launch
 
         private void SettingsButton_Clicked(object sender, EventArgs e)
         {
-            sender.As<ToggleButton>().IsEnabled = false;
+            this.ToggleDropdownMenu();
+        }
+
+        private void OpenDropdownMenu()
+        {
+            if (this.IsShowingDropdown)
+            {
+                return;
+            }
+
+            this.ToggleDropdownMenu();
+        }
+
+        private void CloseDropdownMenu()
+        {
+            if (!this.IsShowingDropdown)
+            {
+                return;
+            }
+
+            this.ToggleDropdownMenu();
+        }
+
+        private void ToggleDropdownMenu()
+        {
+            var button = this.IsShowingDropdown ?
+                this.ClosingSettingsButton :
+                this.OpeningSettingsButton;
+            button.IsEnabled = false;
             var widthAnimation = new DoubleAnimation
             {
                 From = this.IsShowingDropdown ?
@@ -190,7 +223,7 @@ namespace Daybreak.Launch
 
             storyBoard.Completed += (_, _) =>
             {
-                sender.As<ToggleButton>().IsEnabled = true;
+                button.IsEnabled = true;
                 this.IsShowingDropdown = !this.IsShowingDropdown;
             };
 
@@ -245,6 +278,11 @@ namespace Daybreak.Launch
         private void PeriodicallyCheckForUpdates()
         {
             this.applicationUpdater.PeriodicallyCheckForUpdates();
+        }
+
+        private void SetupMenuService()
+        {
+            this.menuServiceInitializer.InitializeMenuService(this.OpenDropdownMenu, this.CloseDropdownMenu, this.ToggleDropdownMenu);
         }
 
         private static Color GetAverageColor(BitmapSource bitmap)
