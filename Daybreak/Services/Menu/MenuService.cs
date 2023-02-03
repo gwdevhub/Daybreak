@@ -39,7 +39,7 @@ public sealed class MenuService : IMenuService, IMenuServiceInitializer
     {
         if (this.initialized is false)
         {
-            this.logger.LogError($"Called {nameof(this.CloseMenu)} before initializing {nameof(MenuService)}");
+            this.logger.LogError($"Called {nameof(this.OpenMenu)} before initializing {nameof(MenuService)}");
         }
 
         this.openMenuAction?.Invoke();
@@ -49,7 +49,7 @@ public sealed class MenuService : IMenuService, IMenuServiceInitializer
     {
         if (this.initialized is false)
         {
-            this.logger.LogError($"Called {nameof(this.CloseMenu)} before initializing {nameof(MenuService)}");
+            this.logger.LogError($"Called {nameof(this.ToggleMenu)} before initializing {nameof(MenuService)}");
         }
 
         this.toggleMenuAction?.Invoke();
