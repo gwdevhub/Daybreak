@@ -44,7 +44,7 @@
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1518.46" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-    <PackageReference Include="NReco.Logging.File" Version="1.1.5" />
+    <PackageReference Include="NReco.Logging.File" Version="1.1.6" />
     <PackageReference Include="securifybv.ShellLink" Version="0.1.0" />
     <PackageReference Include="Slim" Version="1.9.2" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
