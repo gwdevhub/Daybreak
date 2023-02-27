@@ -6,58 +6,57 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
 
-namespace Daybreak.Tests.Services
+namespace Daybreak.Tests.Services;
+
+[TestClass]
+public class ApplicationConfigurationOptionsManagerTests
 {
-    [TestClass]
-    public class ApplicationConfigurationOptionsManagerTests
+    private ApplicationConfigurationOptionsManager applicationConfigurationOptionsManager;
+
+    [TestInitialize]
+    public void TestInitialize()
     {
-        private ApplicationConfigurationOptionsManager applicationConfigurationOptionsManager;
+        var configurationManagerMock = new Mock<IConfigurationManager>();
+        configurationManagerMock
+            .Setup(u => u.GetConfiguration())
+            .Returns(new ApplicationConfiguration());
 
-        [TestInitialize]
-        public void TestInitialize()
+        this.applicationConfigurationOptionsManager = new ApplicationConfigurationOptionsManager(configurationManagerMock.Object);
+    }
+
+    [TestMethod]
+    public void GetApplicationConfiguration_ReturnsObject()
+    {
+        var config = this.applicationConfigurationOptionsManager.GetOptions<ApplicationConfiguration>();
+
+        config.Should().NotBeNull();
+    }
+
+    [TestMethod]
+    public void GetOtherOptions_ThrowsInvalidOperationException()
+    {
+        var action = new Action(() =>
         {
-            var configurationManagerMock = new Mock<IConfigurationManager>();
-            configurationManagerMock
-                .Setup(u => u.GetConfiguration())
-                .Returns(new ApplicationConfiguration());
+            this.applicationConfigurationOptionsManager.GetOptions<object>();
+        });
 
-            this.applicationConfigurationOptionsManager = new ApplicationConfigurationOptionsManager(configurationManagerMock.Object);
-        }
+        action.Should().Throw<InvalidOperationException>();
+    }
 
-        [TestMethod]
-        public void GetApplicationConfiguration_ReturnsObject()
+    [TestMethod]
+    public void UpdateOptions_OnApplicationConfiguration_Succeeds()
+    {
+        this.applicationConfigurationOptionsManager.UpdateOptions(new ApplicationConfiguration());
+    }
+
+    [TestMethod]
+    public void UpdateOptions_OnOthers_ThrowsInvalidOperationException()
+    {
+        var action = new Action(() =>
         {
-            var config = this.applicationConfigurationOptionsManager.GetOptions<ApplicationConfiguration>();
+            this.applicationConfigurationOptionsManager.UpdateOptions(new object());
+        });
 
-            config.Should().NotBeNull();
-        }
-
-        [TestMethod]
-        public void GetOtherOptions_ThrowsInvalidOperationException()
-        {
-            var action = new Action(() =>
-            {
-                this.applicationConfigurationOptionsManager.GetOptions<object>();
-            });
-
-            action.Should().Throw<InvalidOperationException>();
-        }
-
-        [TestMethod]
-        public void UpdateOptions_OnApplicationConfiguration_Succeeds()
-        {
-            this.applicationConfigurationOptionsManager.UpdateOptions(new ApplicationConfiguration());
-        }
-
-        [TestMethod]
-        public void UpdateOptions_OnOthers_ThrowsInvalidOperationException()
-        {
-            var action = new Action(() =>
-            {
-                this.applicationConfigurationOptionsManager.UpdateOptions(new object());
-            });
-
-            action.Should().Throw<InvalidOperationException>();
-        }
+        action.Should().Throw<InvalidOperationException>();
     }
 }

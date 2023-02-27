@@ -4,51 +4,50 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace Daybreak.Converters
+namespace Daybreak.Converters;
+
+public class BooleanToVisibilityConverter : IValueConverter
 {
-    public class BooleanToVisibilityConverter : IValueConverter
+    /// <summary>
+    /// Set to true if you want to show control when boolean value is true.
+    /// Set to false if you want to hide/collapse control when value is true.
+    /// </summary>
+    public bool TriggerValue { get; set; } = true;
+    /// <summary>
+    /// Set to true if you just want to hide the control, else set to false if you want to collapse the control.
+    /// </summary>
+    public bool IsHidden { get; set; }
+
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        /// <summary>
-        /// Set to true if you want to show control when boolean value is true.
-        /// Set to false if you want to hide/collapse control when value is true.
-        /// </summary>
-        public bool TriggerValue { get; set; } = true;
-        /// <summary>
-        /// Set to true if you just want to hide the control, else set to false if you want to collapse the control.
-        /// </summary>
-        public bool IsHidden { get; set; }
+        return this.GetVisibility(value);
+    }
 
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+
+    private object GetVisibility(object value)
+    {
+        if (value is not bool)
         {
-            return this.GetVisibility(value);
+            return this.IsHidden ?
+                Visibility.Hidden :
+                Visibility.Collapsed;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        var objValue = value.Cast<bool>();
+        if ((objValue && this.TriggerValue && this.IsHidden) || (!objValue && !this.TriggerValue && this.IsHidden))
         {
-            throw new NotImplementedException();
+            return Visibility.Hidden;
         }
 
-        private object GetVisibility(object value)
+        if ((objValue && this.TriggerValue && !this.IsHidden) || (!objValue && !this.TriggerValue && !this.IsHidden))
         {
-            if (value is not bool)
-            {
-                return this.IsHidden ?
-                    Visibility.Hidden :
-                    Visibility.Collapsed;
-            }
-
-            var objValue = value.Cast<bool>();
-            if ((objValue && this.TriggerValue && this.IsHidden) || (!objValue && !this.TriggerValue && this.IsHidden))
-            {
-                return Visibility.Hidden;
-            }
-
-            if ((objValue && this.TriggerValue && !this.IsHidden) || (!objValue && !this.TriggerValue && !this.IsHidden))
-            {
-                return Visibility.Collapsed;
-            }
-
-            return Visibility.Visible;
+            return Visibility.Collapsed;
         }
+
+        return Visibility.Visible;
     }
 }

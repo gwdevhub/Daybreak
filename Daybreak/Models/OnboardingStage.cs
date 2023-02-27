@@ -1,10 +1,9 @@
-﻿namespace Daybreak.Models
+﻿namespace Daybreak.Models;
+
+public enum OnboardingStage
 {
-    public enum OnboardingStage
-    {
-        Default,
-        NeedsCredentials,
-        NeedsExecutable,
-        Complete
-    }
+    Default,
+    NeedsCredentials,
+    NeedsExecutable,
+    Complete
 }

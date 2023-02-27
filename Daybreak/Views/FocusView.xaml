@@ -1,0 +1,120 @@
+﻿<UserControl x:Class="Daybreak.Views.FocusView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Daybreak.Views"
+             xmlns:controls="clr-namespace:Daybreak.Controls"
+             mc:Ignorable="d" 
+             Loaded="FocusView_Loaded"
+             Unloaded="FocusView_Unloaded"
+             x:Name="_this"
+             PreviewMouseLeftButtonDown="FocusView_PreviewMouseLeftButtonDown"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="auto"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Rectangle Fill="Transparent"
+                   PreviewMouseLeftButtonDown="FocusView_PreviewMouseLeftButtonDown"
+                   VerticalAlignment="Stretch"
+                   HorizontalAlignment="Stretch"
+                   IsHitTestVisible="False"></Rectangle>
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Hidden"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Center"
+                      Grid.Column="0">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Background="#A0202020">
+                <WrapPanel
+                    Margin="5">
+                    <TextBlock Text="Account: " FontSize="22"></TextBlock>
+                    <TextBlock Text="{Binding ElementName=_this, Path=GameData.Email, Mode=OneWay}"
+                               FontSize="22"></TextBlock>
+                </WrapPanel>
+                <WrapPanel
+                    Margin="5">
+                    <TextBlock Text="Character: " FontSize="22"></TextBlock>
+                    <TextBlock Text="{Binding ElementName=_this, Path=GameData.CharacterName, Mode=OneWay}"
+                               FontSize="22"></TextBlock>
+                </WrapPanel>
+                <WrapPanel
+                    Margin="5">
+                    <TextBlock Text="Level: " FontSize="22"></TextBlock>
+                    <TextBlock Text="{Binding ElementName=_this, Path=GameData.Level, Mode=OneWay}"
+                               FontSize="22"></TextBlock>
+                </WrapPanel>
+                <WrapPanel
+                    Margin="5">
+                    <TextBlock Text="Skill Points: " FontSize="22"></TextBlock>
+                    <TextBlock Text="{Binding ElementName=_this, Path=GameData.CurrentSkillPoints, Mode=OneWay}"
+                               FontSize="22"></TextBlock>
+                </WrapPanel>
+                <WrapPanel
+                    Margin="5">
+                    <TextBlock Text="Experience: " FontSize="22"></TextBlock>
+                    <TextBlock Text="{Binding ElementName=_this, Path=GameData.Experience, Mode=OneWay}"
+                               FontSize="22"></TextBlock>
+                </WrapPanel>
+                <WrapPanel
+                    Margin="5">
+                    <TextBlock Text="Current Quest: " FontSize="22"></TextBlock>
+                    <TextBlock Text="{Binding ElementName=_this, Path=GameData.Quest.Name, Mode=OneWay}"
+                               FontSize="22" Foreground="Blue"
+                               Cursor="Hand"
+                               MouseLeftButtonDown="Quest_MouseLeftButtonDown"></TextBlock>
+                </WrapPanel>
+                <WrapPanel
+                    Margin="5">
+                    <TextBlock Text="Kurzick Points: " FontSize="22"></TextBlock>
+                    <TextBlock Text="{Binding ElementName=_this, Path=GameData.CurrentKurzickPoints, Mode=OneWay}"
+                               FontSize="22"></TextBlock>
+                </WrapPanel>
+                <WrapPanel
+                    Margin="5">
+                    <TextBlock Text="Luxon Points: " FontSize="22"></TextBlock>
+                    <TextBlock Text="{Binding ElementName=_this, Path=GameData.CurrentLuxonPoints, Mode=OneWay}"
+                               FontSize="22"></TextBlock>
+                </WrapPanel>
+                <WrapPanel
+                    Margin="5">
+                    <TextBlock Text="Balthazar Points: " FontSize="22"></TextBlock>
+                    <TextBlock Text="{Binding ElementName=_this, Path=GameData.CurrentBalthazarPoints, Mode=OneWay}"
+                               FontSize="22"></TextBlock>
+                </WrapPanel>
+                <WrapPanel
+                    Margin="5">
+                    <TextBlock Text="Imperial Points: " FontSize="22"></TextBlock>
+                    <TextBlock Text="{Binding ElementName=_this, Path=GameData.CurrentImperialPoints, Mode=OneWay}"
+                               FontSize="22"></TextBlock>
+                </WrapPanel>
+                <WrapPanel 
+                    Margin="5"
+                    Visibility="{Binding ElementName=_this, Path=GameData.HardModeUnlocked, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock Text="Foes Killed: " FontSize="22"></TextBlock>
+                    <TextBlock Text="{Binding ElementName=_this, Path=GameData.FoesKilled, Mode=OneWay}"
+                               FontSize="22"></TextBlock>
+                </WrapPanel>
+                <WrapPanel 
+                    Margin="5"
+                    Visibility="{Binding ElementName=_this, Path=GameData.HardModeUnlocked, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock Text="Foes To Kill: " FontSize="22"></TextBlock>
+                    <TextBlock Text="{Binding ElementName=_this, Path=GameData.FoesToKill, Mode=OneWay}"
+                               FontSize="22"></TextBlock>
+                </WrapPanel>
+            </StackPanel>
+        </ScrollViewer>
+        <controls:ChromiumBrowserWrapper
+            x:Name="Browser"
+            Grid.Column="1"
+            ControlsEnabled="False"
+            Width="0"
+            AddressBarReadonly="True"
+            CanNavigate="True"
+            Margin="0, 0, 0, 60"></controls:ChromiumBrowserWrapper>
+    </Grid>
+</UserControl>

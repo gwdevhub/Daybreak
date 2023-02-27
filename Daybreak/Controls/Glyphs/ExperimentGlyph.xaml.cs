@@ -13,16 +13,15 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Daybreak.Controls
+namespace Daybreak.Controls;
+
+/// <summary>
+/// Interaction logic for ExperimentGlyph.xaml
+/// </summary>
+public partial class ExperimentGlyph : UserControl
 {
-    /// <summary>
-    /// Interaction logic for ExperimentGlyph.xaml
-    /// </summary>
-    public partial class ExperimentGlyph : UserControl
+    public ExperimentGlyph()
     {
-        public ExperimentGlyph()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

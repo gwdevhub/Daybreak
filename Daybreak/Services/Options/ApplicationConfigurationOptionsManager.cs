@@ -4,36 +4,35 @@ using System;
 using System.Configuration;
 using System.Extensions;
 
-namespace Daybreak.Services.Options
+namespace Daybreak.Services.Options;
+
+public sealed class ApplicationConfigurationOptionsManager : IOptionsManager
 {
-    public sealed class ApplicationConfigurationOptionsManager : IOptionsManager
+    private readonly IConfigurationManager configurationManager;
+
+    public ApplicationConfigurationOptionsManager(IConfigurationManager configurationManager)
     {
-        private readonly IConfigurationManager configurationManager;
+        this.configurationManager = configurationManager;
+    }
 
-        public ApplicationConfigurationOptionsManager(IConfigurationManager configurationManager)
+    public T GetOptions<T>() where T : class
+    {
+        if (typeof(T) == typeof(ApplicationConfiguration))
         {
-            this.configurationManager = configurationManager;
+            return this.configurationManager.GetConfiguration().Cast<T>();
         }
 
-        public T GetOptions<T>() where T : class
-        {
-            if (typeof(T) == typeof(ApplicationConfiguration))
-            {
-                return this.configurationManager.GetConfiguration().Cast<T>();
-            }
+        throw new InvalidOperationException($"{nameof(ApplicationConfigurationOptionsManager)} cannot return options of type {typeof(T).Name}");
+    }
 
-            throw new InvalidOperationException($"{nameof(ApplicationConfigurationOptionsManager)} cannot return options of type {typeof(T).Name}");
+    public void UpdateOptions<T>(T value) where T : class
+    {
+        if (typeof(T) == typeof(ApplicationConfiguration))
+        {
+            this.configurationManager.SaveConfiguration(value.Cast<ApplicationConfiguration>());
+            return;
         }
 
-        public void UpdateOptions<T>(T value) where T : class
-        {
-            if (typeof(T) == typeof(ApplicationConfiguration))
-            {
-                this.configurationManager.SaveConfiguration(value.Cast<ApplicationConfiguration>());
-                return;
-            }
-
-            throw new InvalidOperationException($"{nameof(ApplicationConfigurationOptionsManager)} cannot save options of type {typeof(T).Name}");
-        }
+        throw new InvalidOperationException($"{nameof(ApplicationConfigurationOptionsManager)} cannot save options of type {typeof(T).Name}");
     }
 }

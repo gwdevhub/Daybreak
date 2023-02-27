@@ -1,15 +1,14 @@
 ﻿using System.Windows.Controls;
 
-namespace Daybreak.Controls
+namespace Daybreak.Controls;
+
+/// <summary>
+/// Interaction logic for AvatarGlyph.xaml
+/// </summary>
+public partial class AvatarGlyph : UserControl
 {
-    /// <summary>
-    /// Interaction logic for AvatarGlyph.xaml
-    /// </summary>
-    public partial class AvatarGlyph : UserControl
+    public AvatarGlyph()
     {
-        public AvatarGlyph()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

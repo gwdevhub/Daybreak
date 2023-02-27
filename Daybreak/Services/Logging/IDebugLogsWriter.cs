@@ -1,8 +1,7 @@
 ﻿using System.Logging;
 
-namespace Daybreak.Services.Logging
+namespace Daybreak.Services.Logging;
+
+public interface IDebugLogsWriter : ILogsWriter
 {
-    public interface IDebugLogsWriter : ILogsWriter
-    {
-    }
 }

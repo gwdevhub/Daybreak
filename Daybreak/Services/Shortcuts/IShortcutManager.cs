@@ -1,9 +1,8 @@
 ﻿using System.Windows.Extensions.Services;
 
-namespace Daybreak.Services.Shortcuts
+namespace Daybreak.Services.Shortcuts;
+
+public interface IShortcutManager : IApplicationLifetimeService
 {
-    public interface IShortcutManager : IApplicationLifetimeService
-    {
-        bool ShortcutEnabled { get; set; }
-    }
+    bool ShortcutEnabled { get; set; }
 }

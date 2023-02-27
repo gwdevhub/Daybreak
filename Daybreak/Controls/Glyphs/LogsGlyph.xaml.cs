@@ -1,15 +1,14 @@
 ﻿using System.Windows.Controls;
 
-namespace Daybreak.Controls
+namespace Daybreak.Controls;
+
+/// <summary>
+/// Interaction logic for LogsGlyph.xaml
+/// </summary>
+public partial class LogsGlyph : UserControl
 {
-    /// <summary>
-    /// Interaction logic for LogsGlyph.xaml
-    /// </summary>
-    public partial class LogsGlyph : UserControl
+    public LogsGlyph()
     {
-        public LogsGlyph()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

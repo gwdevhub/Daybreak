@@ -2,10 +2,9 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Daybreak.Services.Bloogum
+namespace Daybreak.Services.Bloogum;
+
+public interface IBloogumClient
 {
-    public interface IBloogumClient
-    {
-        Task<Optional<Stream>> GetRandomScreenShot();
-    }
+    Task<Optional<Stream>> GetRandomScreenShot();
 }

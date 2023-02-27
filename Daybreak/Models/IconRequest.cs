@@ -1,11 +1,10 @@
-﻿using Daybreak.Models.Builds;
+﻿using Daybreak.Models.Guildwars;
 
-namespace Daybreak.Models
+namespace Daybreak.Models;
+
+public sealed class IconRequest
 {
-    public sealed class IconRequest
-    {
-        public Skill? Skill { get; set; }
-        public string? IconBase64 { get; set; }
-        public bool Finished { get; set; }
-    }
+    public Skill? Skill { get; set; }
+    public string? IconBase64 { get; set; }
+    public bool Finished { get; set; }
 }

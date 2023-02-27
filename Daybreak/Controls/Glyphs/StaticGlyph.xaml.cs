@@ -1,15 +1,14 @@
 ﻿using System.Windows.Controls;
 
-namespace Daybreak.Controls
+namespace Daybreak.Controls;
+
+/// <summary>
+/// Interaction logic for StaticGlyph.xaml
+/// </summary>
+public partial class StaticGlyph : UserControl
 {
-    /// <summary>
-    /// Interaction logic for StaticGlyph.xaml
-    /// </summary>
-    public partial class StaticGlyph : UserControl
+    public StaticGlyph()
     {
-        public StaticGlyph()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

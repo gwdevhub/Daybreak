@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Windows.Controls;
 
-namespace Daybreak.Services.Navigation
+namespace Daybreak.Services.Navigation;
+
+public interface IViewManager : IViewProducer
 {
-    public interface IViewManager : IViewProducer
-    {
-        void RegisterContainer(Panel panel);
+    void RegisterContainer(Panel panel);
 
-        void ShowView<T>()
-            where T : UserControl;
+    void ShowView<T>()
+        where T : UserControl;
 
-        void ShowView<T>(object dataContext)
-            where T : UserControl;
+    void ShowView<T>(object dataContext)
+        where T : UserControl;
 
-        void ShowView(Type type);
+    void ShowView(Type type);
 
-        void ShowView(Type type, object dataContext);
-    }
+    void ShowView(Type type, object dataContext);
 }

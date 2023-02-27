@@ -30,6 +30,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Onboarding;
 using Daybreak.Services.Menu;
+using Daybreak.Services.Scanner;
 
 namespace Daybreak.Configuration;
 
@@ -110,13 +111,15 @@ public static class ProjectConfiguration
         services.AddScoped<IScreenManager, ScreenManager>();
         services.AddScoped<IGraphClient, GraphClient>();
         services.AddScoped<IOnboardingService, OnboardingService>();
+        services.AddScoped<IGuildwarsMemoryReader, GuildwarsMemoryReader>();
+        services.AddScoped<IMemoryScanner, MemoryScanner>();
     }
 
     public static void RegisterViews(IViewProducer viewProducer)
     {
         viewProducer.ThrowIfNull();
 
-        viewProducer.RegisterPermanentView<CompanionView>();
+        viewProducer.RegisterPermanentView<LauncherView>();
         viewProducer.RegisterView<SettingsView>();
         viewProducer.RegisterView<AskUpdateView>();
         viewProducer.RegisterView<UpdateView>();
@@ -133,6 +136,7 @@ public static class ProjectConfiguration
         viewProducer.RegisterView<GraphAuthorizationView>();
         viewProducer.RegisterView<BuildsSynchronizationView>();
         viewProducer.RegisterView<OnboardingView>();
+        viewProducer.RegisterView<FocusView>();
     }
 
     public static void RegisterPostUpdateActions(IPostUpdateActionProducer postUpdateActionProducer)

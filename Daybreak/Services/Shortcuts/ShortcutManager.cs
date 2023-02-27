@@ -6,110 +6,109 @@ using System.Diagnostics;
 using System.Extensions;
 using System.IO;
 
-namespace Daybreak.Services.Shortcuts
+namespace Daybreak.Services.Shortcuts;
+
+//TODO: Fix dependency on IConfigurationManager
+public sealed class ShortcutManager : IShortcutManager
 {
-    //TODO: Fix dependency on IConfigurationManager
-    public sealed class ShortcutManager : IShortcutManager
+    private const string ShortcutName = "Daybreak.lnk";
+
+    private readonly IConfigurationManager configurationManager;
+    private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
+
+    public bool ShortcutEnabled {
+        get => this.ShortcutExists();
+        set
+        {
+            if (value is true)
+            {
+                this.CreateShortcut();
+            }
+            else
+            {
+                this.RemoveShortcut();
+            }
+        }
+    }
+
+    public ShortcutManager(
+        IConfigurationManager configurationManager,
+        ILiveOptions<ApplicationConfiguration> liveOptions)
     {
-        private const string ShortcutName = "Daybreak.lnk";
+        this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
+        this.liveOptions = liveOptions.ThrowIfNull(nameof(liveOptions));
+        this.configurationManager.ConfigurationChanged += (_, _) => this.LoadConfiguration();
+        this.LoadConfiguration();
+    }
 
-        private readonly IConfigurationManager configurationManager;
-        private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
-
-        public bool ShortcutEnabled {
-            get => this.ShortcutExists();
-            set
-            {
-                if (value is true)
-                {
-                    this.CreateShortcut();
-                }
-                else
-                {
-                    this.RemoveShortcut();
-                }
-            }
-        }
-
-        public ShortcutManager(
-            IConfigurationManager configurationManager,
-            ILiveOptions<ApplicationConfiguration> liveOptions)
+    private void LoadConfiguration()
+    {
+        var shortcutEnabled = this.liveOptions.Value.PlaceShortcut;
+        if (shortcutEnabled && this.ShortcutEnabled is false)
         {
-            this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
-            this.liveOptions = liveOptions.ThrowIfNull(nameof(liveOptions));
-            this.configurationManager.ConfigurationChanged += (_, _) => this.LoadConfiguration();
-            this.LoadConfiguration();
+            this.ShortcutEnabled = true;
         }
-
-        private void LoadConfiguration()
+        else if (shortcutEnabled is false && this.ShortcutEnabled is true)
         {
-            var shortcutEnabled = this.liveOptions.Value.PlaceShortcut;
-            if (shortcutEnabled && this.ShortcutEnabled is false)
-            {
-                this.ShortcutEnabled = true;
-            }
-            else if (shortcutEnabled is false && this.ShortcutEnabled is true)
-            {
-                this.ShortcutEnabled = false;
-            }
+            this.ShortcutEnabled = false;
         }
+    }
 
-        private bool ShortcutExists()
+    private bool ShortcutExists()
+    {
+        var shortcutFolder = this.liveOptions.Value.ShortcutLocation;
+        var shortcutPath = $"{shortcutFolder}\\{ShortcutName}";
+        if (File.Exists(shortcutPath))
         {
-            var shortcutFolder = this.liveOptions.Value.ShortcutLocation;
-            var shortcutPath = $"{shortcutFolder}\\{ShortcutName}";
-            if (File.Exists(shortcutPath))
+            var shortcut = Shortcut.ReadFromFile(shortcutPath);
+            var currentExecutable = Process.GetCurrentProcess()?.MainModule?.FileName;
+            if (shortcut.ExtraData?.EnvironmentVariableDataBlock?.TargetAnsi?.Equals(currentExecutable) is true)
             {
-                var shortcut = Shortcut.ReadFromFile(shortcutPath);
-                var currentExecutable = Process.GetCurrentProcess()?.MainModule?.FileName;
-                if (shortcut.ExtraData?.EnvironmentVariableDataBlock?.TargetAnsi?.Equals(currentExecutable) is true)
-                {
-                    return true;
-                }
-
-                return false;
+                return true;
             }
 
             return false;
         }
 
-        private void CreateShortcut()
-        {
-            if (this.ShortcutExists())
-            {
-                return;
-            }
+        return false;
+    }
 
-            var shortcutFolder = this.liveOptions.Value.ShortcutLocation;
-            var shortcutPath = $"{shortcutFolder}\\{ShortcutName}";
-            var currentExecutable = Process.GetCurrentProcess()?.MainModule?.FileName;
-            var shortcut = Shortcut.CreateShortcut(currentExecutable);
-            shortcut.StringData = new ShellLink.Structures.StringData
-            {
-                WorkingDir = Path.GetDirectoryName(currentExecutable),
-                RelativePath = "Daybreak.exe"
-            };
-            shortcut.WriteToFile(shortcutPath);
+    private void CreateShortcut()
+    {
+        if (this.ShortcutExists())
+        {
+            return;
         }
 
-        private void RemoveShortcut()
+        var shortcutFolder = this.liveOptions.Value.ShortcutLocation;
+        var shortcutPath = $"{shortcutFolder}\\{ShortcutName}";
+        var currentExecutable = Process.GetCurrentProcess()?.MainModule?.FileName;
+        var shortcut = Shortcut.CreateShortcut(currentExecutable);
+        shortcut.StringData = new ShellLink.Structures.StringData
         {
-            if (this.ShortcutExists() is false)
-            {
-                return;
-            }
+            WorkingDir = Path.GetDirectoryName(currentExecutable),
+            RelativePath = "Daybreak.exe"
+        };
+        shortcut.WriteToFile(shortcutPath);
+    }
 
-            var shortcutFolder = this.liveOptions.Value.ShortcutLocation;
-            var shortcutPath = $"{shortcutFolder}\\{ShortcutName}";
-            File.Delete(shortcutPath);
+    private void RemoveShortcut()
+    {
+        if (this.ShortcutExists() is false)
+        {
+            return;
         }
 
-        public void OnStartup()
-        {
-        }
+        var shortcutFolder = this.liveOptions.Value.ShortcutLocation;
+        var shortcutPath = $"{shortcutFolder}\\{ShortcutName}";
+        File.Delete(shortcutPath);
+    }
 
-        public void OnClosing()
-        {
-        }
+    public void OnStartup()
+    {
+    }
+
+    public void OnClosing()
+    {
     }
 }

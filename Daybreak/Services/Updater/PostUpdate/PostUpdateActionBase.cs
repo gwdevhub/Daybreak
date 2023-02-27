@@ -1,16 +1,15 @@
 ﻿using System.Threading.Tasks;
 
-namespace Daybreak.Services.Updater.PostUpdate
-{
-    public abstract class PostUpdateActionBase
-    {
-        public virtual void DoPostUpdateAction()
-        {
-        }
+namespace Daybreak.Services.Updater.PostUpdate;
 
-        public virtual Task DoPostUpdateActionAsync()
-        {
-            return Task.CompletedTask;
-        }
+public abstract class PostUpdateActionBase
+{
+    public virtual void DoPostUpdateAction()
+    {
+    }
+
+    public virtual Task DoPostUpdateActionAsync()
+    {
+        return Task.CompletedTask;
     }
 }

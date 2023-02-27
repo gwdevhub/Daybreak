@@ -1,24 +1,23 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Daybreak.Exceptions
+namespace Daybreak.Exceptions;
+
+public sealed class FatalException : Exception
 {
-    public sealed class FatalException : Exception
+    public FatalException()
     {
-        public FatalException()
-        {
-        }
+    }
 
-        public FatalException(string message) : base(message)
-        {
-        }
+    public FatalException(string message) : base(message)
+    {
+    }
 
-        public FatalException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
+    public FatalException(SerializationInfo info, StreamingContext context) : base(info, context)
+    {
+    }
 
-        public FatalException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
+    public FatalException(string message, Exception innerException) : base(message, innerException)
+    {
     }
 }

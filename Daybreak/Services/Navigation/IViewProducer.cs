@@ -1,12 +1,11 @@
 ﻿using System.Windows.Controls;
 
-namespace Daybreak.Services.Navigation
+namespace Daybreak.Services.Navigation;
+
+public interface IViewProducer
 {
-    public interface IViewProducer
-    {
-        void RegisterView<T>()
-            where T : UserControl;
-        void RegisterPermanentView<T>()
-            where T : UserControl;
-    }
+    void RegisterView<T>()
+        where T : UserControl;
+    void RegisterPermanentView<T>()
+        where T : UserControl;
 }
