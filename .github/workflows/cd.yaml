@@ -95,7 +95,7 @@ jobs:
       shell: pwsh
 
     - name: Publish release
-      uses: Xotl/cool-github-releases@v1.1.7
+      uses: Xotl/cool-github-releases@v1.1.8
       with:
         mode: update
         tag_name: v${{ env.Version }}
