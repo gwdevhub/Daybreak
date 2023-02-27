@@ -1,15 +1,16 @@
-﻿using System.Threading.Tasks;
+﻿using System.Diagnostics;
+using System.Threading.Tasks;
 
-namespace Daybreak.Services.ApplicationLauncher
+namespace Daybreak.Services.ApplicationLauncher;
+
+public interface IApplicationLauncher
 {
-    public interface IApplicationLauncher
-    {
-        bool IsGuildwarsRunning { get; }
-        bool IsToolboxRunning { get; }
-        bool IsTexmodRunning { get; }
-        Task<bool> LaunchGuildwars();
-        Task LaunchGuildwarsToolbox();
-        Task LaunchTexmod();
-        void RestartDaybreakAsAdmin();
-    }
+    bool IsTexmodRunning { get; }
+    bool IsGuildwarsRunning { get; }
+    bool IsToolboxRunning { get; }
+    Process? RunningGuildwarsProcess { get; }
+    Task<Process?> LaunchGuildwars();
+    Task LaunchGuildwarsToolbox();
+    Task LaunchTexmod();
+    void RestartDaybreakAsAdmin();
 }

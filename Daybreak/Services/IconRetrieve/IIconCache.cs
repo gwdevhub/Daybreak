@@ -1,12 +1,11 @@
-﻿using Daybreak.Models.Builds;
+﻿using Daybreak.Models.Guildwars;
 using System;
 using System.Extensions;
 using System.Threading.Tasks;
 
-namespace Daybreak.Services.IconRetrieve
+namespace Daybreak.Services.IconRetrieve;
+
+public interface IIconCache
 {
-    public interface IIconCache
-    {
-        Task<Optional<Uri>> GetIconUri(Skill skill);
-    }
+    Task<Optional<Uri>> GetIconUri(Skill skill);
 }

@@ -13,16 +13,15 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Daybreak.Controls
+namespace Daybreak.Controls;
+
+/// <summary>
+/// Interaction logic for FireballGlyph.xaml
+/// </summary>
+public partial class FireballGlyph : UserControl
 {
-    /// <summary>
-    /// Interaction logic for FireballGlyph.xaml
-    /// </summary>
-    public partial class FireballGlyph : UserControl
+    public FireballGlyph()
     {
-        public FireballGlyph()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

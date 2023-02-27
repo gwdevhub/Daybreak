@@ -1,8 +1,8 @@
-﻿namespace Daybreak.Utils
+﻿namespace Daybreak.Utils;
+
+public static class Scripts
 {
-    public static class Scripts
-    {
-        public const string SendSelectionOnContextMenu = @"
+    public const string SendSelectionOnContextMenu = @"
             document.addEventListener('contextmenu', function (event)
             {
                 var text = '';
@@ -32,7 +32,7 @@
                 window.chrome.webview.postMessage(jsonObject);
             });";
 
-        public const string GetHrefFromSkillPage = @"
+    public const string GetHrefFromSkillPage = @"
             new function(){
                 var img = document.getElementsByClassName('fullImageLink')[0].childNodes[0].childNodes[0];
                 function getDataUrl(img) {
@@ -58,5 +58,4 @@
                 window.chrome.webview.postMessage(jsonObject);
                 return jsonObject;
             }";
-    }
 }

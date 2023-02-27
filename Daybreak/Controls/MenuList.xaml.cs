@@ -7,72 +7,71 @@ using System;
 using System.Configuration;
 using System.Windows.Controls;
 
-namespace Daybreak.Controls
+namespace Daybreak.Controls;
+
+/// <summary>
+/// Interaction logic for MenuList.xaml
+/// </summary>
+public partial class MenuList : UserControl
 {
-    /// <summary>
-    /// Interaction logic for MenuList.xaml
-    /// </summary>
-    public partial class MenuList : UserControl
+    public MenuList()
     {
-        public MenuList()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
+    }
 
-        private void GameCompanionButton_Clicked(object sender, EventArgs e)
-        {
-            var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
-            viewManager.ShowView<CompanionView>();
-        }
+    private void GameCompanionButton_Clicked(object sender, EventArgs e)
+    {
+        var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
+        viewManager.ShowView<LauncherView>();
+    }
 
-        private void AccountSettingsButton_Clicked(object sender, EventArgs e)
-        {
-            var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
-            viewManager.ShowView<AccountsView>();
-        }
+    private void AccountSettingsButton_Clicked(object sender, EventArgs e)
+    {
+        var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
+        viewManager.ShowView<AccountsView>();
+    }
 
-        private void GuildwarsSettingsButton_Clicked(object sender, EventArgs e)
-        {
-            var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
-            viewManager.ShowView<ExecutablesView>();
-        }
+    private void GuildwarsSettingsButton_Clicked(object sender, EventArgs e)
+    {
+        var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
+        viewManager.ShowView<ExecutablesView>();
+    }
 
-        private void LauncherSettingsButton_Clicked(object sender, EventArgs e)
-        {
-            var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
-            viewManager.ShowView<SettingsView>();
-        }
+    private void LauncherSettingsButton_Clicked(object sender, EventArgs e)
+    {
+        var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
+        viewManager.ShowView<SettingsView>();
+    }
 
-        private void ExperimentalSettingsButton_Clicked(object sender, EventArgs e)
-        {
-            var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
-            viewManager.ShowView<ExperimentalSettingsView>();
-        }
+    private void ExperimentalSettingsButton_Clicked(object sender, EventArgs e)
+    {
+        var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
+        viewManager.ShowView<ExperimentalSettingsView>();
+    }
 
-        private void ManageBuildsButton_Clicked(object sender, EventArgs e)
+    private void ManageBuildsButton_Clicked(object sender, EventArgs e)
+    {
+        var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
+        var options = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILiveOptions<ApplicationConfiguration>>();
+        if (options.Value.ExperimentalFeatures.DownloadIcons)
         {
-            var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
-            var options = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILiveOptions<ApplicationConfiguration>>();
-            if (options.Value.ExperimentalFeatures.DownloadIcons)
-            {
-                viewManager.ShowView<IconDownloadView>();
-            }
-            else
-            {
-                viewManager.ShowView<BuildsListView>();
-            }
+            viewManager.ShowView<IconDownloadView>();
         }
+        else
+        {
+            viewManager.ShowView<BuildsListView>();
+        }
+    }
 
-        private void VersionManagementButton_Clicked(object sender, EventArgs e)
-        {
-            var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
-            viewManager.ShowView<VersionManagementView>();
-        }
+    private void VersionManagementButton_Clicked(object sender, EventArgs e)
+    {
+        var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
+        viewManager.ShowView<VersionManagementView>();
+    }
 
-        private void LogsButton_Clicked(object sender, EventArgs e)
-        {
-            var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
-            viewManager.ShowView<LogsView>();
-        }
+    private void LogsButton_Clicked(object sender, EventArgs e)
+    {
+        var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
+        viewManager.ShowView<LogsView>();
     }
 }

@@ -5,88 +5,87 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 
-namespace Daybreak.Controls
+namespace Daybreak.Controls;
+
+/// <summary>
+/// Interaction logic for ImageViewer.xaml
+/// </summary>
+public partial class ImageViewer : UserControl
 {
-    /// <summary>
-    /// Interaction logic for ImageViewer.xaml
-    /// </summary>
-    public partial class ImageViewer : UserControl
+    public ImageSource ImageSource
     {
-        public ImageSource ImageSource
+        get => this.CurrentVisible().Source;
+        set => this.ShowImage(value);
+    }
+
+    public ImageViewer()
+    {
+        this.InitializeComponent();
+        this.Image1.Visibility = Visibility.Visible;
+        this.Image1.Opacity = 1;
+        this.Image2.Visibility = Visibility.Hidden;
+        this.Image2.Opacity = 0;
+    }
+
+    public async void ShowImage(ImageSource imageSource)
+    {
+        var currentVisible = this.CurrentVisible();
+        var nextVisible = this.NextVisible();
+
+        if (nextVisible.Source is BitmapImage bitmapImage)
         {
-            get => this.CurrentVisible().Source;
-            set => this.ShowImage(value);
+            await bitmapImage.StreamSource.DisposeAsync().ConfigureAwait(true);
         }
 
-        public ImageViewer()
-        {
-            this.InitializeComponent();
-            this.Image1.Visibility = Visibility.Visible;
-            this.Image1.Opacity = 1;
-            this.Image2.Visibility = Visibility.Hidden;
-            this.Image2.Opacity = 0;
-        }
+        nextVisible.Source = imageSource;
+        Transition(currentVisible, nextVisible);
+    }
 
-        public async void ShowImage(ImageSource imageSource)
+    private Image CurrentVisible()
+    {
+        if (this.Image1.Visibility == Visibility.Visible)
         {
-            var currentVisible = this.CurrentVisible();
-            var nextVisible = this.NextVisible();
-
-            if (nextVisible.Source is BitmapImage bitmapImage)
-            {
-                await bitmapImage.StreamSource.DisposeAsync().ConfigureAwait(true);
-            }
-
-            nextVisible.Source = imageSource;
-            Transition(currentVisible, nextVisible);
+            return this.Image1;
         }
-
-        private Image CurrentVisible()
+        else
         {
-            if (this.Image1.Visibility == Visibility.Visible)
-            {
-                return this.Image1;
-            }
-            else
-            {
-                return this.Image2;
-            }
+            return this.Image2;
         }
-        private Image NextVisible()
+    }
+    private Image NextVisible()
+    {
+        if (this.Image1.Visibility == Visibility.Visible)
         {
-            if (this.Image1.Visibility == Visibility.Visible)
-            {
-                return this.Image2;
-            }
-            else
-            {
-                return this.Image1;
-            }
+            return this.Image2;
         }
-        private static void Transition(Image from, Image to)
+        else
         {
-            to.Visibility = Visibility.Visible;
-            to.Opacity = 0;
-            from.Visibility = Visibility.Visible;
-            from.Opacity = 1;
-            var showAnimation = new DoubleAnimation()
-            {
-                From = 0,
-                To = 1,
-                Duration = TimeSpan.FromSeconds(1.5)
-            };
-            var hideAnimation = new DoubleAnimation
-            {
-                From = 1,
-                To = 0,
-                Duration = TimeSpan.FromSeconds(1.5)
-            };
-            hideAnimation.Completed += (s, e) =>
-            {
-                from.Visibility = Visibility.Hidden;
-                to.BeginAnimation(Image.OpacityProperty, showAnimation);
-            };
-            from.BeginAnimation(Image.OpacityProperty, hideAnimation);
+            return this.Image1;
         }
+    }
+    private static void Transition(Image from, Image to)
+    {
+        to.Visibility = Visibility.Visible;
+        to.Opacity = 0;
+        from.Visibility = Visibility.Visible;
+        from.Opacity = 1;
+        var showAnimation = new DoubleAnimation()
+        {
+            From = 0,
+            To = 1,
+            Duration = TimeSpan.FromSeconds(1.5)
+        };
+        var hideAnimation = new DoubleAnimation
+        {
+            From = 1,
+            To = 0,
+            Duration = TimeSpan.FromSeconds(1.5)
+        };
+        hideAnimation.Completed += (s, e) =>
+        {
+            from.Visibility = Visibility.Hidden;
+            to.BeginAnimation(Image.OpacityProperty, showAnimation);
+        };
+        from.BeginAnimation(Image.OpacityProperty, hideAnimation);
     }
 }

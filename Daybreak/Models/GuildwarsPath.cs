@@ -1,12 +1,11 @@
 ﻿using Newtonsoft.Json;
 
-namespace Daybreak.Models
+namespace Daybreak.Models;
+
+public sealed class GuildwarsPath
 {
-    public sealed class GuildwarsPath
-    {
-        [JsonProperty("path")]
-        public string? Path { get; set; }
-        [JsonProperty("default")]
-        public bool Default { get; set; }
-    }
+    [JsonProperty("path")]
+    public string? Path { get; set; }
+    [JsonProperty("default")]
+    public bool Default { get; set; }
 }

@@ -1,13 +1,12 @@
-﻿namespace Daybreak.Models
+﻿namespace Daybreak.Models;
+
+public enum ExecutionPolicies
 {
-    public enum ExecutionPolicies
-    {
-        AllSigned,
-        Bypass,
-        Default,
-        RemoteSigned,
-        Restricted,
-        Undefined,
-        Unrestricted
-    }
+    AllSigned,
+    Bypass,
+    Default,
+    RemoteSigned,
+    Restricted,
+    Undefined,
+    Unrestricted
 }

@@ -1,12 +1,11 @@
 ﻿using System.Windows.Controls;
 
-namespace Daybreak.Services.Privilege
-{
-    public interface IPrivilegeManager
-    {
-        bool AdminPrivileges { get; }
+namespace Daybreak.Services.Privilege;
 
-        void RequestAdminPrivileges<TCancelView>(string messageToUser, object? dataContextOfCancelView = null)
-            where TCancelView : UserControl;
-    }
+public interface IPrivilegeManager
+{
+    bool AdminPrivileges { get; }
+
+    void RequestAdminPrivileges<TCancelView>(string messageToUser, object? dataContextOfCancelView = null)
+        where TCancelView : UserControl;
 }

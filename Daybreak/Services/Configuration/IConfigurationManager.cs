@@ -1,12 +1,11 @@
 ﻿using Daybreak.Configuration;
 using System;
 
-namespace Daybreak.Services.Configuration
+namespace Daybreak.Services.Configuration;
+
+public interface IConfigurationManager
 {
-    public interface IConfigurationManager
-    {
-        event EventHandler ConfigurationChanged;
-        ApplicationConfiguration GetConfiguration();
-        void SaveConfiguration(ApplicationConfiguration applicationConfiguration);
-    }
+    event EventHandler ConfigurationChanged;
+    ApplicationConfiguration GetConfiguration();
+    void SaveConfiguration(ApplicationConfiguration applicationConfiguration);
 }

@@ -3,34 +3,33 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Extensions;
 
-namespace Daybreak.Controls
+namespace Daybreak.Controls;
+
+/// <summary>
+/// Interaction logic for LogTemplate.xaml
+/// </summary>
+public partial class LogMessageTemplate : UserControl
 {
-    /// <summary>
-    /// Interaction logic for LogTemplate.xaml
-    /// </summary>
-    public partial class LogMessageTemplate : UserControl
+    private bool expanded;
+
+    [GenerateDependencyProperty]
+    private string message = string.Empty;
+
+    public LogMessageTemplate()
     {
-        private bool expanded;
+        this.InitializeComponent();
+    }
 
-        [GenerateDependencyProperty]
-        private string message = string.Empty;
-
-        public LogMessageTemplate()
+    private void TextBox_MouseLeftButtonDown(object sender, MouseButtonEventArgs eventArgs)
+    {
+        this.expanded = !this.expanded;
+        if (this.expanded)
         {
-            this.InitializeComponent();
+            sender.As<TextBlock>().MaxHeight = double.MaxValue;
         }
-
-        private void TextBox_MouseLeftButtonDown(object sender, MouseButtonEventArgs eventArgs)
+        else
         {
-            this.expanded = !this.expanded;
-            if (this.expanded)
-            {
-                sender.As<TextBlock>().MaxHeight = double.MaxValue;
-            }
-            else
-            {
-                sender.As<TextBlock>().MaxHeight = 18;
-            }
+            sender.As<TextBlock>().MaxHeight = 18;
         }
     }
 }

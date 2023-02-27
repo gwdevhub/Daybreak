@@ -3,16 +3,17 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <RootNamespace>Daybreak</RootNamespace>
+    <!--Unable to migrate to .net 7 due to issues with font families not being found #140-->
     <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
-    <Platforms>AnyCPU</Platforms>
+    <Platforms>AnyCPU;x86</Platforms>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <LangVersion>preview</LangVersion>
     <ApplicationIcon>Daybreak.ico</ApplicationIcon>
     <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
-    <Version>0.9.7.7</Version>
+    <Version>0.9.8</Version>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <UserSecretsId>cfb2a489-db80-448d-a969-80270f314c46</UserSecretsId>
   </PropertyGroup>
@@ -41,10 +42,9 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1518.46" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1587.40" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-    <PackageReference Include="NReco.Logging.File" Version="1.1.5" />
     <PackageReference Include="securifybv.ShellLink" Version="0.1.0" />
     <PackageReference Include="Slim" Version="1.9.2" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />

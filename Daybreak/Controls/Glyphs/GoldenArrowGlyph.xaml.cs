@@ -13,16 +13,15 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Daybreak.Controls
+namespace Daybreak.Controls;
+
+/// <summary>
+/// Interaction logic for GoldenArrowGlyph.xaml
+/// </summary>
+public partial class GoldenArrowGlyph : UserControl
 {
-    /// <summary>
-    /// Interaction logic for GoldenArrowGlyph.xaml
-    /// </summary>
-    public partial class GoldenArrowGlyph : UserControl
+    public GoldenArrowGlyph()
     {
-        public GoldenArrowGlyph()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

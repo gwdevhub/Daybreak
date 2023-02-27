@@ -1,35 +1,34 @@
 ﻿using System.Text;
 
-namespace Daybreak.Services.BuildTemplates.Models
+namespace Daybreak.Services.BuildTemplates.Models;
+
+public sealed class EncodeCharStream
 {
-    public sealed class EncodeCharStream
+    private readonly StringBuilder innerStringBuilder = new StringBuilder();
+
+    public void Write(int value, int count)
     {
-        private readonly StringBuilder innerStringBuilder = new StringBuilder();
+        this.EncodeToBinary(value, count);
+    }
 
-        public void Write(int value, int count)
+    public string GetEncodedString()
+    {
+        return this.innerStringBuilder.ToString();
+    }
+
+    private void EncodeToBinary(int value, int count)
+    {
+        while(value > 0 && count > 0)
         {
-            this.EncodeToBinary(value, count);
+            this.innerStringBuilder.Append(value % 2 == 1 ? '1' : '0');
+            value /= 2;
+            count--;
         }
 
-        public string GetEncodedString()
+        while (count > 0)
         {
-            return this.innerStringBuilder.ToString();
-        }
-
-        private void EncodeToBinary(int value, int count)
-        {
-            while(value > 0 && count > 0)
-            {
-                this.innerStringBuilder.Append(value % 2 == 1 ? '1' : '0');
-                value /= 2;
-                count--;
-            }
-
-            while (count > 0)
-            {
-                this.innerStringBuilder.Append('0');
-                count--;
-            }
+            this.innerStringBuilder.Append('0');
+            count--;
         }
     }
 }

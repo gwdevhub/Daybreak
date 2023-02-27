@@ -1,9 +1,8 @@
 ﻿using System.Diagnostics;
 
-namespace Daybreak.Services.Mutex
+namespace Daybreak.Services.Mutex;
+
+public interface IMutexHandler
 {
-    public interface IMutexHandler
-    {
-        void CloseMutex(Process process, string mutexName);
-    }
+    void CloseMutex(Process process, string mutexName);
 }

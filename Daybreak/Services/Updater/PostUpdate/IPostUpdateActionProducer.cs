@@ -1,8 +1,7 @@
-﻿namespace Daybreak.Services.Updater.PostUpdate
+﻿namespace Daybreak.Services.Updater.PostUpdate;
+
+public interface IPostUpdateActionProducer
 {
-    public interface IPostUpdateActionProducer
-    {
-        void AddPostUpdateAction<T>()
-            where T : PostUpdateActionBase;
-    }
+    void AddPostUpdateAction<T>()
+        where T : PostUpdateActionBase;
 }

@@ -1,15 +1,14 @@
 ﻿using System.Windows.Controls;
 
-namespace Daybreak.Controls
+namespace Daybreak.Controls;
+
+/// <summary>
+/// Interaction logic for FileGlyph.xaml
+/// </summary>
+public partial class FileGlyph : UserControl
 {
-    /// <summary>
-    /// Interaction logic for FileGlyph.xaml
-    /// </summary>
-    public partial class FileGlyph : UserControl
+    public FileGlyph()
     {
-        public FileGlyph()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

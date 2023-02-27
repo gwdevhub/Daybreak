@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace Daybreak.Services.Updater.PostUpdate
+namespace Daybreak.Services.Updater.PostUpdate;
+
+public interface IPostUpdateActionProvider
 {
-    public interface IPostUpdateActionProvider
-    {
-        IEnumerable<PostUpdateActionBase> GetPostUpdateActions();
-    }
+    IEnumerable<PostUpdateActionBase> GetPostUpdateActions();
 }
