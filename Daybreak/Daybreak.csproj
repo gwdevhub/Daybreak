@@ -3,7 +3,8 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <RootNamespace>Daybreak</RootNamespace>
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <!--Unable to migrate to .net 7 due to issues with font families not being found #140-->
+    <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>

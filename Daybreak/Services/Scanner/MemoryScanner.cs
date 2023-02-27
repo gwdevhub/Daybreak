@@ -187,7 +187,7 @@ public sealed class MemoryScanner : IMemoryScanner
                     return new IntPtr(BitConverter.ToUInt32(this.Memory, scan));
                 }
 
-                return new IntPtr(this.ModuleStartAddress + scan);
+                return new IntPtr(this.ModuleStartAddress.ToInt32() + scan);
             }
         }
 
