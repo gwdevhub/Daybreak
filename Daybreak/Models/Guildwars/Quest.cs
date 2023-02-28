@@ -1161,8 +1161,12 @@ public sealed class Quest
     public static readonly Quest OperationCrushSpirits = new() { Id = 1179, Name = "Operation Crush Spirits", WikiUrl = "https://wiki.guildwars.com/wiki/Operation:_Crush_Spirits" };
     public static readonly Quest FightinginaWinterWonderland = new() { Id = 1180, Name = "Fighting in a Winter Wonderland", WikiUrl = "https://wiki.guildwars.com/wiki/Fighting_in_a_Winter_Wonderland" };
     public static readonly Quest VanguardBountyBlazefiendGriefblade = new() { Id = 1182, Name = "Vanguard Bounty Blazefiend Griefblade", WikiUrl = "https://wiki.guildwars.com/wiki/Vanguard_Bounty:_Blazefiend_Griefblade" };
+    public static readonly Quest VanguardBountyCountessNadya = new() { Id = 1183, Name = "Vanguard Bounty Countess Nadya", WikiUrl = "https://wiki.guildwars.com/wiki/Vanguard_Bounty:_Countess_Nadya" };
     public static readonly Quest VanguardBountyUtiniWupwup = new() { Id = 1184, Name = "Vanguard Bounty Utini Wupwup", WikiUrl = "https://wiki.guildwars.com/wiki/Vanguard_Bounty:_Utini_Wupwup" };
+    public static readonly Quest VanguardRescueFarmerHamnet = new() { Id = 1185, Name = "Vanguard Rescue Farmer Hamnet", WikiUrl = "https://wiki.guildwars.com/wiki/Vanguard_Rescue:_Farmer_Hamnet" };
+    public static readonly Quest VanguardRescueFootmanTate = new() { Id = 1186, Name = "Vanguard Rescue Footman Tate", WikiUrl = "https://wiki.guildwars.com/wiki/Vanguard_Rescue:_Footman_Tate" };
     public static readonly Quest VanguardRescueSavetheAscalonianNoble = new() { Id = 1187, Name = "Vanguard Rescue Save the Ascalonian Noble", WikiUrl = "https://wiki.guildwars.com/wiki/Vanguard_Rescue:_Save_the_Ascalonian_Noble" };
+    public static readonly Quest VanguardAnnihilationCharr = new() { Id = 1188, Name = "Vanguard Annihilation Charr", WikiUrl = "https://wiki.guildwars.com/wiki/Vanguard_Annihilation:_Charr" };
     public static readonly Quest VanguardAnnihilationBandits = new() { Id = 1189, Name = "Vanguard Annihilation Bandits", WikiUrl = "https://wiki.guildwars.com/wiki/Vanguard_Annihilation:_Bandits" };
     public static readonly Quest VanguardAnnihilationUndead = new() { Id = 1190, Name = "Vanguard Annihilation Undead", WikiUrl = "https://wiki.guildwars.com/wiki/Vanguard_Annihilation:_Undead" };
     public static readonly Quest AnvilRockZaishenVanquish = new() { Id = 1191, Name = "Anvil Rock (Zaishen vanquish)", WikiUrl = "https://wiki.guildwars.com/wiki/Anvil_Rock_(Zaishen_vanquish)" };
@@ -2558,10 +2562,14 @@ public sealed class Quest
         OperationCrushSpirits,
         FightinginaWinterWonderland,
         VanguardBountyBlazefiendGriefblade,
+        VanguardBountyCountessNadya,
         VanguardBountyUtiniWupwup,
         VanguardRescueSavetheAscalonianNoble,
+        VanguardRescueFarmerHamnet,
+        VanguardRescueFootmanTate,
         VanguardAnnihilationBandits,
         VanguardAnnihilationUndead,
+        VanguardAnnihilationCharr,
         AnvilRockZaishenVanquish,
         ArborstoneZaishenVanquish,
         WitmansFollyZaishenVanquish,
