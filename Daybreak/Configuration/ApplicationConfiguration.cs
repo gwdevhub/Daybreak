@@ -1,4 +1,5 @@
-﻿using Daybreak.Models;
+﻿using Daybreak.Configuration.FocusView;
+using Daybreak.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -41,4 +42,6 @@ public sealed class ApplicationConfiguration
     public string? ProtectedGraphAccessToken { get; set; }
     [JsonProperty("ProtectedGraphRefreshToken")]
     public string? ProtectedGraphRefreshToken { get; set; }
+    [JsonProperty("FocusViewOptions")]
+    public FocusViewOptions FocusViewOptions { get; set; } = new FocusViewOptions();
 }

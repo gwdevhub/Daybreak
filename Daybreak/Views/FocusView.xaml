@@ -5,116 +5,153 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Views"
              xmlns:controls="clr-namespace:Daybreak.Controls"
+             xmlns:templates="clr-namespace:Daybreak.Controls.Templates"
              mc:Ignorable="d" 
              Loaded="FocusView_Loaded"
              Unloaded="FocusView_Unloaded"
              x:Name="_this"
-             PreviewMouseLeftButtonDown="FocusView_PreviewMouseLeftButtonDown"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.1*"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
-            <ColumnDefinition Width="auto"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="0.1*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Rectangle Fill="Transparent"
-                   PreviewMouseLeftButtonDown="FocusView_PreviewMouseLeftButtonDown"
-                   VerticalAlignment="Stretch"
-                   HorizontalAlignment="Stretch"
-                   IsHitTestVisible="False"></Rectangle>
-        <ScrollViewer HorizontalScrollBarVisibility="Disabled"
-                      VerticalScrollBarVisibility="Hidden"
-                      VerticalAlignment="Center"
-                      HorizontalAlignment="Center"
-                      Grid.Column="0">
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Background="#A0202020">
-                <WrapPanel
-                    Margin="5">
-                    <TextBlock Text="Account: " FontSize="22"></TextBlock>
-                    <TextBlock Text="{Binding ElementName=_this, Path=GameData.Email, Mode=OneWay}"
-                               FontSize="22"></TextBlock>
-                </WrapPanel>
-                <WrapPanel
-                    Margin="5">
-                    <TextBlock Text="Character: " FontSize="22"></TextBlock>
-                    <TextBlock Text="{Binding ElementName=_this, Path=GameData.CharacterName, Mode=OneWay}"
-                               FontSize="22"></TextBlock>
-                </WrapPanel>
-                <WrapPanel
-                    Margin="5">
-                    <TextBlock Text="Level: " FontSize="22"></TextBlock>
-                    <TextBlock Text="{Binding ElementName=_this, Path=GameData.Level, Mode=OneWay}"
-                               FontSize="22"></TextBlock>
-                </WrapPanel>
-                <WrapPanel
-                    Margin="5">
-                    <TextBlock Text="Skill Points: " FontSize="22"></TextBlock>
-                    <TextBlock Text="{Binding ElementName=_this, Path=GameData.CurrentSkillPoints, Mode=OneWay}"
-                               FontSize="22"></TextBlock>
-                </WrapPanel>
-                <WrapPanel
-                    Margin="5">
-                    <TextBlock Text="Experience: " FontSize="22"></TextBlock>
-                    <TextBlock Text="{Binding ElementName=_this, Path=GameData.Experience, Mode=OneWay}"
-                               FontSize="22"></TextBlock>
-                </WrapPanel>
-                <WrapPanel
-                    Margin="5">
-                    <TextBlock Text="Current Quest: " FontSize="22"></TextBlock>
-                    <TextBlock Text="{Binding ElementName=_this, Path=GameData.Quest.Name, Mode=OneWay}"
-                               FontSize="22" Foreground="Blue"
-                               Cursor="Hand"
-                               MouseLeftButtonDown="Quest_MouseLeftButtonDown"></TextBlock>
-                </WrapPanel>
-                <WrapPanel
-                    Margin="5">
-                    <TextBlock Text="Kurzick Points: " FontSize="22"></TextBlock>
-                    <TextBlock Text="{Binding ElementName=_this, Path=GameData.CurrentKurzickPoints, Mode=OneWay}"
-                               FontSize="22"></TextBlock>
-                </WrapPanel>
-                <WrapPanel
-                    Margin="5">
-                    <TextBlock Text="Luxon Points: " FontSize="22"></TextBlock>
-                    <TextBlock Text="{Binding ElementName=_this, Path=GameData.CurrentLuxonPoints, Mode=OneWay}"
-                               FontSize="22"></TextBlock>
-                </WrapPanel>
-                <WrapPanel
-                    Margin="5">
-                    <TextBlock Text="Balthazar Points: " FontSize="22"></TextBlock>
-                    <TextBlock Text="{Binding ElementName=_this, Path=GameData.CurrentBalthazarPoints, Mode=OneWay}"
-                               FontSize="22"></TextBlock>
-                </WrapPanel>
-                <WrapPanel
-                    Margin="5">
-                    <TextBlock Text="Imperial Points: " FontSize="22"></TextBlock>
-                    <TextBlock Text="{Binding ElementName=_this, Path=GameData.CurrentImperialPoints, Mode=OneWay}"
-                               FontSize="22"></TextBlock>
-                </WrapPanel>
-                <WrapPanel 
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.1*"></RowDefinition>
+            <RowDefinition Height="0.6*"></RowDefinition>
+            <RowDefinition Height="0.2*"></RowDefinition>
+            <RowDefinition Height="0.1*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <controls:ResourceBar 
+                Grid.Column="1"
+                Grid.ColumnSpan="2"
+                Grid.Row="2"
+                Height="30"
+                CurrentResourceValue="{Binding ElementName=_this, Path=CurrentExperienceInLevel, Mode=OneWay}"
+                MaxResourceValue="{Binding ElementName=_this, Path=NextLevelExperienceThreshold, Mode=OneWay}"
+                VerticalAlignment="Bottom"
+                HorizontalAlignment="Center"
+                BarColor="#a026ff00"
+                Foreground="White"
+                FontSize="22"
+                Cursor="Hand"
+                Text="{Binding ElementName=_this, Path=ExperienceBarText, Mode=OneWay}"
+                MouseLeftButtonDown="ExperienceBar_MouseLeftButtonDown"></controls:ResourceBar>
+        <controls:ResourceBar 
+                Grid.Column="1"
+                Grid.Row="2"
+                Margin="0, 0, 20, 80"
+                Height="30"
+                CurrentResourceValue="{Binding ElementName=_this, Path=GameData.User.CurrentKurzickPoints, Mode=OneWay}"
+                MaxResourceValue="{Binding ElementName=_this, Path=GameData.User.TotalKurzickPoints, Mode=OneWay}"
+                VerticalAlignment="Bottom"
+                HorizontalAlignment="Left"
+                BarColor="#a00b00ff"
+                Foreground="White"
+                FontSize="22"
+                Cursor="Hand"
+                Text="{Binding ElementName=_this, Path=KurzickBarText, Mode=OneWay}"
+                MouseLeftButtonDown="KurzickBar_MouseLeftButtonDown"></controls:ResourceBar>
+        <controls:ResourceBar 
+                Grid.Column="1"
+                Grid.Row="2"
+                Margin="0, 0, 20, 40"
+                Height="30"
+                CurrentResourceValue="{Binding ElementName=_this, Path=GameData.User.CurrentLuxonPoints, Mode=OneWay}"
+                MaxResourceValue="{Binding ElementName=_this, Path=GameData.User.TotalLuxonPoints, Mode=OneWay}"
+                VerticalAlignment="Bottom"
+                HorizontalAlignment="Left"
+                BarColor="#a0ff3400"
+                Foreground="White"
+                FontSize="22"
+                Cursor="Hand"
+                Text="{Binding ElementName=_this, Path=LuxonBarText, Mode=OneWay}"
+                MouseLeftButtonDown="LuxonBar_MouseLeftButtonDown"></controls:ResourceBar>
+        <controls:ResourceBar 
+                Grid.Column="2"
+                Grid.Row="2"
+                Margin="20, 0, 0, 80"
+                Height="30"
+                CurrentResourceValue="{Binding ElementName=_this, Path=GameData.User.CurrentImperialPoints, Mode=OneWay}"
+                MaxResourceValue="{Binding ElementName=_this, Path=GameData.User.TotalImperialPoints, Mode=OneWay}"
+                VerticalAlignment="Bottom"
+                HorizontalAlignment="Left"
+                BarColor="#a0a800ff"
+                Foreground="White"
+                FontSize="22"
+                Cursor="Hand"
+                Text="{Binding ElementName=_this, Path=ImperialBarText, Mode=OneWay}"
+                MouseLeftButtonDown="ImperialBar_MouseLeftButtonDown"></controls:ResourceBar>
+        <controls:ResourceBar 
+                Grid.Column="2"
+                Grid.Row="2"
+                Margin="20, 0, 0, 40"
+                Height="30"
+                CurrentResourceValue="{Binding ElementName=_this, Path=GameData.User.CurrentBalthazarPoints, Mode=OneWay}"
+                MaxResourceValue="{Binding ElementName=_this, Path=GameData.User.TotalBalthazarPoints, Mode=OneWay}"
+                VerticalAlignment="Bottom"
+                HorizontalAlignment="Left"
+                BarColor="#a0ffb200"
+                Foreground="White"
+                FontSize="22"
+                Cursor="Hand"
+                Text="{Binding ElementName=_this, Path=BalthazarBarText, Mode=OneWay}"
+                MouseLeftButtonDown="BalthazarBar_MouseLeftButtonDown"></controls:ResourceBar>
+        <Grid
+            Grid.Row="1"
+            Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <StackPanel
+                Grid.Row="0"
+                Margin="0, 0, 10, 0">
+                <TextBlock 
+                    FontSize="18"
                     Margin="5"
-                    Visibility="{Binding ElementName=_this, Path=GameData.HardModeUnlocked, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <TextBlock Text="Foes Killed: " FontSize="22"></TextBlock>
-                    <TextBlock Text="{Binding ElementName=_this, Path=GameData.FoesKilled, Mode=OneWay}"
-                               FontSize="22"></TextBlock>
-                </WrapPanel>
-                <WrapPanel 
+                    Text="Current Quest"></TextBlock>
+                <TextBlock
+                    Text="{Binding ElementName=_this, Path=GameData.MainPlayer.Quest.Name, Mode=OneWay}"
+                    Cursor="Hand"
+                    FontSize="20"
+                    MouseLeftButtonDown="CurrentQuest_MouseLeftButtonDown"></TextBlock>
+                <Rectangle 
+                    Height="1"
+                    Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"></Rectangle>
+                <TextBlock 
+                    FontSize="18"
                     Margin="5"
-                    Visibility="{Binding ElementName=_this, Path=GameData.HardModeUnlocked, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <TextBlock Text="Foes To Kill: " FontSize="22"></TextBlock>
-                    <TextBlock Text="{Binding ElementName=_this, Path=GameData.FoesToKill, Mode=OneWay}"
-                               FontSize="22"></TextBlock>
-                </WrapPanel>
+                    Text="Quest Log"></TextBlock>
             </StackPanel>
-        </ScrollViewer>
+            <ScrollViewer
+                    VerticalScrollBarVisibility="Auto"
+                    HorizontalScrollBarVisibility="Disabled"
+                    Grid.Row="1">
+                <templates:QuestLogTemplate
+                        Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                        Quests="{Binding ElementName=_this,Path=GameData.MainPlayer.QuestLog, Mode=OneWay}"
+                        MapClicked="QuestLogTemplate_MapClicked"
+                        QuestClicked="QuestLogTemplate_QuestClicked">
+                </templates:QuestLogTemplate>
+            </ScrollViewer>
+        </Grid>
+        
         <controls:ChromiumBrowserWrapper
             x:Name="Browser"
-            Grid.Column="1"
-            ControlsEnabled="False"
-            Width="0"
-            AddressBarReadonly="True"
+            Grid.Column="2"
+            Grid.Row="1"
+            Margin="10, 0, 0, 0"
+            ControlsEnabled="True"
+            AddressBarReadonly="False"
             CanNavigate="True"
-            Margin="0, 0, 0, 60"></controls:ChromiumBrowserWrapper>
+            Address="{Binding ElementName=_this, Path=BrowserAddress, Mode=TwoWay}"
+            MaximizeClicked="Browser_MaximizeClicked"
+            PreventDispose="True"></controls:ChromiumBrowserWrapper>
     </Grid>
 </UserControl>

@@ -31,6 +31,7 @@ using Daybreak.Services.Navigation;
 using Daybreak.Services.Onboarding;
 using Daybreak.Services.Menu;
 using Daybreak.Services.Scanner;
+using Daybreak.Services.Experience;
 
 namespace Daybreak.Configuration;
 
@@ -113,6 +114,7 @@ public static class ProjectConfiguration
         services.AddScoped<IOnboardingService, OnboardingService>();
         services.AddScoped<IGuildwarsMemoryReader, GuildwarsMemoryReader>();
         services.AddScoped<IMemoryScanner, MemoryScanner>();
+        services.AddScoped<IExperienceCalculator, ExperienceCalculator>();
     }
 
     public static void RegisterViews(IViewProducer viewProducer)
@@ -120,6 +122,7 @@ public static class ProjectConfiguration
         viewProducer.ThrowIfNull();
 
         viewProducer.RegisterPermanentView<LauncherView>();
+        viewProducer.RegisterPermanentView<Views.FocusView>();
         viewProducer.RegisterView<SettingsView>();
         viewProducer.RegisterView<AskUpdateView>();
         viewProducer.RegisterView<UpdateView>();
@@ -136,7 +139,6 @@ public static class ProjectConfiguration
         viewProducer.RegisterView<GraphAuthorizationView>();
         viewProducer.RegisterView<BuildsSynchronizationView>();
         viewProducer.RegisterView<OnboardingView>();
-        viewProducer.RegisterView<FocusView>();
     }
 
     public static void RegisterPostUpdateActions(IPostUpdateActionProducer postUpdateActionProducer)

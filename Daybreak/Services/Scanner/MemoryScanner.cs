@@ -1,8 +1,11 @@
-﻿using Daybreak.Utils;
+﻿using Daybreak.Models.Interop;
+using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
@@ -118,6 +121,36 @@ public sealed class MemoryScanner : IMemoryScanner
         return ret;
     }
 
+    public T[] ReadArray<T>(IntPtr address, int size)
+    {
+        this.ValidateReadScanner();
+        var itemSize = Marshal.SizeOf(typeof(T));
+        var buffer = Marshal.AllocHGlobal(size * itemSize);
+
+        NativeMethods.ReadProcessMemory(this.Process!.Handle,
+            address,
+            buffer,
+            size * itemSize,
+            out _
+        );
+
+        var retArray = new T[size];
+        var arrayPointer = buffer;
+        for (var i = 0; i < size; i++)
+        {
+            retArray[i] = (T)Marshal.PtrToStructure(arrayPointer, typeof(T))!;
+            arrayPointer += itemSize;
+        }
+       
+        Marshal.FreeHGlobal(buffer);
+        return retArray;
+    }
+
+    public T[] ReadArray<T>(GuildwarsArray guildwarsArray)
+    {
+        return this.ReadArray<T>(guildwarsArray.Buffer, (int)guildwarsArray.Size);
+    }
+
     public byte[]? ReadBytes(IntPtr address, int size)
     {
         this.ValidateReadScanner();
@@ -153,7 +186,7 @@ public sealed class MemoryScanner : IMemoryScanner
         return this.Read<T>(Base + finalPointerOffset);
     }
 
-    public IntPtr ScanForPtr(byte[] pattern, bool readptr = false)
+    public IntPtr ScanForPtr(byte[] pattern, string? mask = default, bool readptr = false)
     {
         this.ValidateReadScanner();
         if (pattern?.Length == 0)
@@ -171,6 +204,13 @@ public sealed class MemoryScanner : IMemoryScanner
             var matched = true;
             for (var patternIndex = 0; patternIndex < pattern.Length; ++patternIndex)
             {
+                if (mask is not null &&
+                    mask.Length > patternIndex &&
+                    mask[patternIndex] == '?')
+                {
+                    continue;
+                }
+
                 var memoryValue = this.Memory[scan + patternIndex];
                 var signatureValue = pattern[patternIndex];
                 if (memoryValue != signatureValue)

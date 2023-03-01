@@ -69,17 +69,19 @@
                      IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"></TextBox>
             <StackPanel Grid.Column="2" Orientation="Horizontal">
                 <local:HomeButton Width="30" Height="30" Margin="5"
+                                  Visibility="{Binding ElementName=_this, Path=HomeButtonVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
                                   Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
                                   IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"
                                   Clicked="HomeButton_Clicked"></local:HomeButton>
                 <local:StarGlyph Height="30" Width="30" Margin="5"
-                             Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
-                             IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"
-                             Clicked="StarGlyph_Clicked" x:Name="FavoriteButton"></local:StarGlyph>
+                                 Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                                 Visibility="{Binding ElementName=_this, Path=HomeButtonVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                 IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"
+                                 Clicked="StarGlyph_Clicked" x:Name="FavoriteButton"></local:StarGlyph>
                 <local:MaximizeButton Height="30" Width="30" Margin="5"
-                             Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
-                             IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"
-                             Clicked="MaximizeButton_Clicked"></local:MaximizeButton>
+                                 Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                                 IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"
+                                 Clicked="MaximizeButton_Clicked"></local:MaximizeButton>
             </StackPanel>
         </Grid>
         <Grid Grid.RowSpan="2" Background="Gray"
