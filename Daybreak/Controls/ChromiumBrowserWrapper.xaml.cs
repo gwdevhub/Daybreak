@@ -57,6 +57,11 @@ public partial class ChromiumBrowserWrapper : UserControl
     private string favoriteAddress = string.Empty;
     [GenerateDependencyProperty(InitialValue = false)]
     private bool preventDispose;
+    [GenerateDependencyProperty(InitialValue = true)]
+    private bool homeButtonVisible = true;
+    [GenerateDependencyProperty(InitialValue = true)]
+    private bool favoriteButtonVisible = true;
+
     public string Address
     {
         get => this.GetTypedValue<string>(AddressProperty);

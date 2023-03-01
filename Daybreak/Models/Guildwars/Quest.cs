@@ -2849,4 +2849,8 @@ public sealed class Quest
         
         return quest;
     }
+
+    private Quest()
+    {
+    }
 }
