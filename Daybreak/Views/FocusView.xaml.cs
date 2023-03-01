@@ -193,7 +193,7 @@ public partial class FocusView : UserControl
         }
     }
 
-    private void FocusView_Loaded(object sender, System.Windows.RoutedEventArgs e)
+    private void FocusView_Loaded(object sender, RoutedEventArgs e)
     {
         this.BrowserAddress = this.liveUpdateableOptions.Value.FocusViewOptions.BrowserUrl;
 
@@ -212,7 +212,7 @@ public partial class FocusView : UserControl
         TaskExtensions.RunPeriodicAsync(this.UpdateGameData, TimeSpan.Zero, TimeSpan.FromSeconds(1), this.cancellationTokenSource.Token);
     }
 
-    private void FocusView_Unloaded(object sender, System.Windows.RoutedEventArgs e)
+    private void FocusView_Unloaded(object sender, RoutedEventArgs e)
     {
         this.cancellationTokenSource?.Cancel();
         this.cancellationTokenSource = null;
