@@ -30,11 +30,15 @@ public partial class BuildTemplate : UserControl
     private const string InfoNamePlaceholder = "[NAME]";
     private const string BaseAddress = $"https://wiki.guildwars.com/wiki/{InfoNamePlaceholder}";
 
+    private bool showingSkillList = false;
+    private bool replacingSecondaryProfession;
+    private bool replacingPrimaryProfession;
     private bool suppressBuildChanged = false;
     private bool loadedProperties = false;
     private IIconBrowser? iconBrowser;
     private BuildEntry? loadedBuild;
     private SkillTemplate? selectingSkillTemplate;
+    private List<Skill>? skillListCache;
     private CancellationTokenSource? cancellationTokenSource = new();
 
     public event EventHandler? BuildChanged;
@@ -269,7 +273,7 @@ public partial class BuildTemplate : UserControl
         }
 
         var filteredSkills = await this.FilterSkills(this.SkillSearchText).ToListAsync().ConfigureAwait(true);
-        this.AvailableSkills.ClearAnd().AddRange(filteredSkills);
+        this.PrepareSkillListCache(filteredSkills);
     }
 
     private void LoadBuild()
@@ -301,8 +305,9 @@ public partial class BuildTemplate : UserControl
     {
         if (this.SkillBrowser.BrowserSupported is true)
         {
+            this.HideSkillListView();
+            this.HideProfessionListView();
             this.SkillBrowser.Width = 400;
-            this.SkillListContainer.Width = 0;
         }
     }
 
@@ -316,13 +321,87 @@ public partial class BuildTemplate : UserControl
 
     private void ShowSkillListView()
     {
-        this.SkillBrowser.Width = 0;
+        this.HideInfoBrowser();
+        this.HideProfessionListView();
         this.SkillListContainer.Width = 400;
+        this.SkillListContainer.Visibility = Visibility.Visible;
+        this.showingSkillList = true;
+        if (this.skillListCache?.Except(this.AvailableSkills).None() is true &&
+            this.skillListCache.Count == this.AvailableSkills.Count)
+        {
+            return;
+        }
+
+        this.AvailableSkills.ClearAnd().AddRange(this.skillListCache);
     }
 
     private void HideSkillListView()
     {
+        this.SkillListContainer.Visibility = Visibility.Hidden;
         this.SkillListContainer.Width = 0;
+        this.showingSkillList = false;
+    }
+
+    private void ShowProfessionListView()
+    {
+        this.HideInfoBrowser();
+        this.HideSkillListView();
+        this.ProfessionListView.Width = 400;
+        this.ProfessionListView.Visibility = Visibility.Visible;
+    }
+
+    private void HideProfessionListView()
+    {
+        this.ProfessionListView.Visibility = Visibility.Hidden;
+        this.ProfessionListView.Width = 0;
+    }
+
+    private void PrepareSkillListCache(List<Skill> skills)
+    {
+        /*
+         * To improve application performance, only load the skill list when it is showing.
+         * Otherwise, defer the loading to when the skill list will show.
+         */
+
+        this.skillListCache = skills;
+        if (this.showingSkillList)
+        {
+            this.ShowSkillListView();
+        }
+    }
+
+    private async IAsyncEnumerable<Skill> FilterSkills(string searchTerm)
+    {
+        // Replace symbols to ease search
+        searchTerm = searchTerm?.Replace("\"", "").Replace("!", "")!;
+
+        foreach (var skill in Skill.Skills)
+        {
+            if (skill == Skill.NoSkill)
+            {
+                continue;
+            }
+
+            if (skill.Profession != this.PrimaryProfession &&
+                skill.Profession != this.SecondaryProfession &&
+                skill.Profession != Profession.None)
+            {
+                continue;
+            }
+
+            if (searchTerm.IsNullOrWhiteSpace())
+            {
+                yield return skill;
+                continue;
+            }
+
+            var matchesName = await Task.Run(() => StringUtils.MatchesSearchString(skill.Name!.Replace("\"", "").Replace("!", ""), searchTerm!));
+            if (matchesName)
+            {
+                yield return skill;
+                continue;
+            }
+        }
     }
 
     private void HelpButtonPrimary_Clicked(object sender, System.EventArgs e)
@@ -392,7 +471,7 @@ public partial class BuildTemplate : UserControl
         sender.As<SkillTemplate>().DataContext = Skill.NoSkill;
     }
 
-    private void ListView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void SkillListView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
         if (this.selectingSkillTemplate is null)
         {
@@ -410,6 +489,21 @@ public partial class BuildTemplate : UserControl
         this.loadedBuild!.Build!.Skills[5] = this.Skill5;
         this.loadedBuild!.Build!.Skills[6] = this.Skill6;
         this.loadedBuild!.Build!.Skills[7] = this.Skill7;
+    }
+
+    private void ProfessionListView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        var selected = sender.As<ListView>().SelectedItem.As<Profession>();
+        if (this.replacingPrimaryProfession)
+        {
+            this.PrimaryProfession = selected;
+        }
+        else if (this.replacingSecondaryProfession)
+        {
+            this.SecondaryProfession = selected;
+        }
+
+        this.HideProfessionListView();
     }
 
     private void ListView_NavigateWithMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
@@ -440,37 +534,17 @@ public partial class BuildTemplate : UserControl
         scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - e.Delta);
     }
 
-    private async IAsyncEnumerable<Skill> FilterSkills(string searchTerm)
+    private void SecondaryProfessionButton_Clicked(object sender, EventArgs e)
     {
-        // Replace symbols to ease search
-        searchTerm = searchTerm?.Replace("\"", "").Replace("!", "")!;
-        
-        foreach (var skill in Skill.Skills)
-        {
-            if (skill == Skill.NoSkill)
-            {
-                continue;
-            }
+        this.replacingPrimaryProfession = false;
+        this.replacingSecondaryProfession = true;
+        this.ShowProfessionListView();
+    }
 
-            if (skill.Profession != this.PrimaryProfession &&
-                skill.Profession != this.SecondaryProfession &&
-                skill.Profession != Profession.None)
-            {
-                continue;
-            }
-
-            if (searchTerm.IsNullOrWhiteSpace())
-            {
-                yield return skill;
-                continue;
-            }
-
-            var matchesName = await Task.Run(() => StringUtils.MatchesSearchString(skill.Name!.Replace("\"", "").Replace("!", ""), searchTerm!));
-            if (matchesName)
-            {
-                yield return skill;
-                continue;
-            }
-        }
+    private void PrimaryProfessionButton_Clicked(object sender, EventArgs e)
+    {
+        this.replacingPrimaryProfession = true;
+        this.replacingSecondaryProfession = false;
+        this.ShowProfessionListView();
     }
 }

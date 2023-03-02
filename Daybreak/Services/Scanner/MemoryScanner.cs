@@ -99,6 +99,7 @@ public sealed class MemoryScanner : IMemoryScanner
         this.Memory = default;
         this.Size = default;
         this.ModuleStartAddress = default;
+        this.Scanning = false;
         Monitor.Exit(LockObject);
     }
 

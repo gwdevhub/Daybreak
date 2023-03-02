@@ -4,8 +4,8 @@ namespace Daybreak.Configuration.FocusView;
 
 public sealed class FocusViewOptions
 {
-    [JsonProperty("EnergyDisplay")]
-    public EnergyDisplay EnergyDisplay { get; set; }
+    [JsonProperty("ExperienceDisplay")]
+    public ExperienceDisplay ExperienceDisplay { get; set; }
     [JsonProperty("KurzickPointsDisplay")]
     public PointsDisplay KurzickPointsDisplay { get; set; }
     [JsonProperty("LuxonPointsDisplay")]
@@ -16,6 +16,10 @@ public sealed class FocusViewOptions
     public PointsDisplay ImperialPointsDisplay { get; set; }
     [JsonProperty("VanquishingDisplay")]
     public PointsDisplay VanquishingDisplay { get; set; }
+    [JsonProperty("HealthDisplay")]
+    public PointsDisplay HealthDisplay { get; set; }
+    [JsonProperty("EnergyDisplay")]
+    public PointsDisplay EnergyDisplay { get; set; }
     [JsonProperty("BrowserUrl")]
     public string? BrowserUrl { get; set; } = string.Empty;
 }

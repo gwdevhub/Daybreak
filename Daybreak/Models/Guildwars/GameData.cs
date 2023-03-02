@@ -9,4 +9,5 @@ public sealed class GameData
     public List<PlayerInformation>? Party { get; init; }
     public UserInformation? User { get; init; }
     public SessionInformation? Session { get; init; }
+    public List<WorldPlayerInformation>? WorldPlayers { get; init; }
 }

@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Extensions;
 using System.Linq;
 using System.Windows.Controls;
+using System.Windows.Extensions;
 
 namespace Daybreak.Views;
 
@@ -20,6 +21,9 @@ public partial class BuildsListView : UserControl
     private readonly IBuildTemplateManager buildTemplateManager;
 
     private IEnumerable<BuildEntry>? buildEntries;
+
+    [GenerateDependencyProperty]
+    private bool loading;
 
     public ObservableCollection<BuildEntry> BuildEntries { get; } = new ObservableCollection<BuildEntry>();
 
@@ -35,8 +39,10 @@ public partial class BuildsListView : UserControl
 
     private async void LoadBuilds()
     {
+        this.Loading = true;
         this.buildEntries = await this.buildTemplateManager.GetBuilds().ToListAsync();
         this.BuildEntries.ClearAnd().AddRange(this.buildEntries.OrderBy(b => b.Name));
+        this.Loading = false;
     }
 
     private void ListView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)

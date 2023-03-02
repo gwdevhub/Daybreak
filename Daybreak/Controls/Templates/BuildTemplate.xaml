@@ -11,6 +11,9 @@
              x:Name="_this"
              Unloaded="BuildTemplate_Unloaded"
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
+    </UserControl.Resources>
     <Grid Background="Transparent" MouseLeftButtonDown="Grid_MouseLeftButtonDown">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"></RowDefinition>
@@ -30,20 +33,15 @@
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <TextBlock Text="Primary Profession: " FontSize="16" Foreground="White" Grid.Column="1"></TextBlock>
-            <ListView FontSize="16" Foreground="White" Grid.Column="2" BorderThickness="0"
-                      Background="Transparent" ItemsSource="{Binding ElementName=_this, Path=Professions, Mode=OneWay}"
-                      SelectedItem="{Binding ElementName=_this, Path=PrimaryProfession, Mode=TwoWay}" Height="30"
-                      SelectionMode="Single" ScrollViewer.VerticalScrollBarVisibility="Disabled"
-                      PreviewMouseWheel="ListView_NavigateWithMouseWheel">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Name, Mode=OneWay}"></TextBlock>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-                <interactivity:Interaction.Behaviors>
-                    <behaviors:ScrollIntoView></behaviors:ScrollIntoView>
-                </interactivity:Interaction.Behaviors>
-            </ListView>
+            <local:OpaqueButton Grid.Column="2"
+                                Text="{Binding ElementName=_this, Path=PrimaryProfession.Name, Mode=OneWay}"
+                                Foreground="White"
+                                Highlight="White"
+                                HighlightOpacity="0.4"
+                                FontSize="16"
+                                TextHorizontalAlignment="Left"
+                                Margin="0, 0, 10, 0"
+                                Clicked="PrimaryProfessionButton_Clicked"></local:OpaqueButton>
             <local:HelpButton Grid.Column="0" Foreground="White" Width="20" Height="20" Margin="3"
                               Clicked="HelpButtonPrimary_Clicked" Cursor="Hand"></local:HelpButton>
         </Grid>
@@ -54,20 +52,15 @@
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <TextBlock Text="Secondary Profession: " FontSize="16" Foreground="White" Grid.Column="1"></TextBlock>
-            <ListView FontSize="16" Foreground="White" Grid.Column="2" BorderThickness="0"
-                      Background="Transparent" ItemsSource="{Binding ElementName=_this, Path=Professions, Mode=OneWay}"
-                      SelectedItem="{Binding ElementName=_this, Path=SecondaryProfession, Mode=TwoWay}" Height="30"
-                      SelectionMode="Single" ScrollViewer.VerticalScrollBarVisibility="Disabled"
-                      PreviewMouseWheel="ListView_NavigateWithMouseWheel">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Name, Mode=OneWay}"></TextBlock>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-                <interactivity:Interaction.Behaviors>
-                    <behaviors:ScrollIntoView></behaviors:ScrollIntoView>
-                </interactivity:Interaction.Behaviors>
-            </ListView>
+            <local:OpaqueButton Grid.Column="2"
+                                Text="{Binding ElementName=_this, Path=SecondaryProfession.Name, Mode=OneWay}"
+                                Foreground="White"
+                                Highlight="White"
+                                HighlightOpacity="0.4"
+                                FontSize="16"
+                                TextHorizontalAlignment="Left"
+                                Margin="0, 0, 10, 0"
+                                Clicked="SecondaryProfessionButton_Clicked"></local:OpaqueButton>
             <local:HelpButton Grid.Column="0" Foreground="White" Width="20" Height="20" Margin="3"
                               Clicked="HelpButtonSecondary_Clicked" Cursor="Hand"></local:HelpButton>
         </Grid>
@@ -170,10 +163,11 @@
                 <ListView x:Name="SkillsListView"
                           Grid.Row="1"
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                          ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto"
                           Background="Transparent"
+                          ScrollViewer.CanContentScroll="False"
                           ItemsSource="{Binding ElementName=_this, Path=AvailableSkills, Mode=OneWay}"
-                          MouseDoubleClick="ListView_MouseDoubleClick">
+                          MouseDoubleClick="SkillListView_MouseDoubleClick">
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <VirtualizingStackPanel>
@@ -187,6 +181,29 @@
                     </ListView.ItemTemplate>
                 </ListView>
             </Grid>
+        </Grid>
+        <Grid Grid.Column="1" Grid.RowSpan="6">
+            <ListView x:Name="ProfessionListView"
+                          Width="0"
+                          HorizontalAlignment="Right"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          Background="Transparent"
+                          ScrollViewer.CanContentScroll="False"
+                          ItemsSource="{Binding ElementName=_this, Path=Professions, Mode=OneWay}"
+                          MouseDoubleClick="ProfessionListView_MouseDoubleClick">
+                <ListView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel>
+                        </VirtualizingStackPanel>
+                    </ItemsPanelTemplate>
+                </ListView.ItemsPanel>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock FontSize="16" Foreground="White" TextWrapping="Wrap" Text="{Binding Name}"></TextBlock>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
         </Grid>
     </Grid>
 </UserControl>

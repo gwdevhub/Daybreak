@@ -1,8 +1,9 @@
 ﻿namespace Daybreak.Configuration.FocusView;
 
-public enum EnergyDisplay
+public enum ExperienceDisplay
 {
     TotalCurretAndTotalMax,
     CurrentLevelCurrentAndCurrentLevelMax,
-    RemainingUntilNextLevel
+    RemainingUntilNextLevel,
+    Percentage
 }
