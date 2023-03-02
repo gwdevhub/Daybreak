@@ -12,6 +12,7 @@
                             Foreground="White"
                             HighlightColor="White"
                             Height="30"
+                            Cursor="Hand"
                             Clicked="GameCompanionButton_Clicked">
             <buttons:MenuButton.InnerContent>
                 <local:GoldenArrowGlyph Foreground="White"
@@ -22,6 +23,7 @@
                             Foreground="White"
                             HighlightColor="White"
                             Height="30"
+                            Cursor="Hand"
                             Clicked="ManageBuildsButton_Clicked">
             <buttons:MenuButton.InnerContent>
                 <local:FireballGlyph Foreground="White"
@@ -32,6 +34,7 @@
                             Foreground="White"
                             HighlightColor="White"
                             Height="30"
+                            Cursor="Hand"
                             Clicked="AccountSettingsButton_Clicked">
             <buttons:MenuButton.InnerContent>
                 <local:AvatarGlyph Foreground="White"
@@ -42,6 +45,7 @@
                             Foreground="White"
                             HighlightColor="White"
                             Height="30"
+                            Cursor="Hand"
                             Clicked="GuildwarsSettingsButton_Clicked">
             <buttons:MenuButton.InnerContent>
                 <local:FileGlyph Foreground="White"
@@ -52,6 +56,7 @@
                             Foreground="White"
                             HighlightColor="White"
                             Height="30"
+                            Cursor="Hand"
                             Clicked="LauncherSettingsButton_Clicked">
             <buttons:MenuButton.InnerContent>
                 <local:CogGlyph Foreground="White"
@@ -63,6 +68,7 @@
                             Foreground="White"
                             HighlightColor="White"
                             Height="30"
+                            Cursor="Hand"
                             Clicked="ExperimentalSettingsButton_Clicked">
             <buttons:MenuButton.InnerContent>
                 <local:ExperimentGlyph Foreground="White"
@@ -73,6 +79,7 @@
                             Foreground="White"
                             HighlightColor="White"
                             Height="30"
+                            Cursor="Hand"
                             Clicked="VersionManagementButton_Clicked">
             <buttons:MenuButton.InnerContent>
                 <local:StaticGlyph Foreground="White"
@@ -83,6 +90,7 @@
                             Foreground="White"
                             HighlightColor="White"
                             Height="30"
+                            Cursor="Hand"
                             Clicked="LogsButton_Clicked">
             <buttons:MenuButton.InnerContent>
                 <local:LogsGlyph Foreground="White"

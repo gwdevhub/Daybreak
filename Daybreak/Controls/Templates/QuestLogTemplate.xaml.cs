@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Extensions;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace Daybreak.Controls.Templates;
@@ -60,36 +61,22 @@ public partial class QuestLogTemplate : UserControl
         foreach(var grouping in this.questLogCache)
         {
             var location = grouping.Key;
-            var locationTextBlock = new TextBlock
+            var locationTextBlock = new OpaqueButton
             {
                 Text = grouping.Key?.Name ?? UncategorizedQuestsString,
                 FontSize = 18,
-                Margin = new Thickness(5),
                 Cursor = grouping.Key is null ? Cursors.Arrow : Cursors.Hand,
-                HorizontalAlignment = HorizontalAlignment.Left
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                TextHorizontalAlignment = HorizontalAlignment.Left,
+                Highlight = Brushes.White,
+                HighlightOpacity = grouping.Key is null ? 0 : 0.6
             };
 
             locationTextBlock.MouseLeftButtonDown += (_, _) => this.OnMapClicked(location);
             this.ItemStackPanel.Children.Add(locationTextBlock);
-            foreach(var questMetadata in grouping)
-            {
-                var quest = questMetadata.Quest;
-                var questTextBlock = new TextBlock
-                {
-                    Text = quest?.Name,
-                    FontSize = 20,
-                    Cursor = Cursors.Hand,
-                    HorizontalAlignment = HorizontalAlignment.Left
-                };
-
-                questTextBlock.MouseLeftButtonDown += (_, _) => this.OnQuestClicked(quest);
-                this.ItemStackPanel.Children.Add(questTextBlock);
-            }
-
             var rectangle = new Rectangle
             {
                 Height = 1,
-                Margin = new Thickness(0, 0, 0, 10)
             };
 
             var rectangleForegroundBinding = new Binding("Foreground")
@@ -99,6 +86,30 @@ public partial class QuestLogTemplate : UserControl
 
             rectangle.SetBinding(Rectangle.FillProperty, rectangleForegroundBinding);
             this.ItemStackPanel.Children.Add(rectangle);
+            foreach (var questMetadata in grouping)
+            {
+                var quest = questMetadata.Quest;
+                var questTextBlock = new OpaqueButton
+                {
+                    Text = quest?.Name,
+                    FontSize = 20,
+                    Cursor = Cursors.Hand,
+                    Highlight = Brushes.White,
+                    HighlightOpacity = 0.6,
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    TextHorizontalAlignment = HorizontalAlignment.Left
+                };
+
+                questTextBlock.MouseLeftButtonDown += (_, _) => this.OnQuestClicked(quest);
+                this.ItemStackPanel.Children.Add(questTextBlock);
+            }
+
+            this.ItemStackPanel.Children.Add(new Rectangle
+            {
+                Fill = Brushes.Transparent,
+                Height = 10,
+                HorizontalAlignment = HorizontalAlignment.Stretch
+            });
         }
     }
 

@@ -232,14 +232,18 @@
                     FontSize="18"
                     Margin="10"
                     Text="Current Quest"></TextBlock>
-                <TextBlock
-                    Text="{Binding ElementName=_this, Path=GameData.MainPlayer.Quest.Name, Mode=OneWay}"
-                    Cursor="Hand"
-                    FontSize="20"
-                    MouseLeftButtonDown="CurrentQuest_MouseLeftButtonDown"></TextBlock>
                 <Rectangle 
                     Height="1"
                     Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"></Rectangle>
+                <controls:OpaqueButton
+                    Text="{Binding ElementName=_this, Path=GameData.MainPlayer.Quest.Name, Mode=OneWay}"
+                    Highlight="White"
+                    HighlightOpacity="0.6"
+                    HorizontalAlignment="Stretch"
+                    TextHorizontalAlignment="Left"
+                    Cursor="Hand"
+                    FontSize="20"
+                    MouseLeftButtonDown="CurrentQuest_MouseLeftButtonDown"></controls:OpaqueButton>
             </StackPanel>
             <TextBlock 
                     Background="#F0212121"
