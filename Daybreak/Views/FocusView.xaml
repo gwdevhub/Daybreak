@@ -7,6 +7,7 @@
              xmlns:controls="clr-namespace:Daybreak.Controls"
              xmlns:templates="clr-namespace:Daybreak.Controls.Templates"
              mc:Ignorable="d" 
+             Foreground="White"
              Loaded="FocusView_Loaded"
              Unloaded="FocusView_Unloaded"
              x:Name="_this"
@@ -16,105 +17,220 @@
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="0.1*"></ColumnDefinition>
+            <ColumnDefinition Width="0.01*"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
-            <ColumnDefinition Width="0.1*"></ColumnDefinition>
+            <ColumnDefinition Width="0.01*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="0.1*"></RowDefinition>
-            <RowDefinition Height="0.6*"></RowDefinition>
-            <RowDefinition Height="0.2*"></RowDefinition>
-            <RowDefinition Height="0.1*"></RowDefinition>
+            <RowDefinition Height="0*"></RowDefinition>
+            <RowDefinition Height="1*"></RowDefinition>
+            <RowDefinition Height="118"></RowDefinition>
         </Grid.RowDefinitions>
-        <controls:ResourceBar 
+        <Grid
+            Margin="0, 2, 0, 0"
+            Grid.Column="1"
+            Grid.ColumnSpan="2"
+            Grid.Row="2"
+            Grid.RowSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="0.1*"></ColumnDefinition>
+                <ColumnDefinition Width="0.3*"></ColumnDefinition>
+                <ColumnDefinition Width="0.1*"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <controls:VerticalResourceBar
                 Grid.Column="1"
-                Grid.ColumnSpan="2"
-                Grid.Row="2"
-                Height="30"
+                Grid.ColumnSpan="3"
                 CurrentResourceValue="{Binding ElementName=_this, Path=CurrentExperienceInLevel, Mode=OneWay}"
                 MaxResourceValue="{Binding ElementName=_this, Path=NextLevelExperienceThreshold, Mode=OneWay}"
-                VerticalAlignment="Bottom"
-                HorizontalAlignment="Center"
-                BarColor="#a026ff00"
+                Text="{Binding ElementName=_this,Path=ExperienceBarText, Mode=OneWay}"
+                BarColor="#6076FF03"
                 Foreground="White"
-                FontSize="22"
+                Height="113"
+                FontSize="14"
                 Cursor="Hand"
-                Text="{Binding ElementName=_this, Path=ExperienceBarText, Mode=OneWay}"
-                MouseLeftButtonDown="ExperienceBar_MouseLeftButtonDown"></controls:ResourceBar>
-        <controls:ResourceBar 
-                Grid.Column="1"
+                MouseLeftButtonDown="ExperienceBar_MouseLeftButtonDown">
+                <controls:VerticalResourceBar.OpacityMask>
+                    <DrawingBrush>
+                        <DrawingBrush.Drawing>
+                            <DrawingGroup>
+                                <GeometryDrawing Brush="#FFFFFFFF">
+                                    <GeometryDrawing.Geometry>
+                                        <PathGeometry>
+                                            <PathGeometry.Figures>
+                                                <PathFigure IsClosed="True" StartPoint="5, 1">
+                                                    <PathSegmentCollection>
+                                                        <LineSegment Point="1, 5"></LineSegment>
+                                                        <LineSegment Point="5, 9"></LineSegment>
+                                                        <LineSegment Point="15, 9"></LineSegment>
+                                                        <LineSegment Point="19, 5"></LineSegment>
+                                                        <LineSegment Point="15, 1"></LineSegment>
+                                                    </PathSegmentCollection>
+                                                </PathFigure>
+                                            </PathGeometry.Figures>
+                                        </PathGeometry>
+                                    </GeometryDrawing.Geometry>
+                                </GeometryDrawing>
+                            </DrawingGroup>
+                        </DrawingBrush.Drawing>
+                    </DrawingBrush>
+                </controls:VerticalResourceBar.OpacityMask>
+            </controls:VerticalResourceBar>
+            <StackPanel
+                Height="116"
+                VerticalAlignment="Center"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
                 Grid.Row="2"
-                Margin="0, 0, 20, 80"
-                Height="30"
-                CurrentResourceValue="{Binding ElementName=_this, Path=GameData.User.CurrentKurzickPoints, Mode=OneWay}"
-                MaxResourceValue="{Binding ElementName=_this, Path=GameData.User.TotalKurzickPoints, Mode=OneWay}"
-                VerticalAlignment="Bottom"
-                HorizontalAlignment="Left"
-                BarColor="#a00b00ff"
-                Foreground="White"
-                FontSize="22"
-                Cursor="Hand"
-                Text="{Binding ElementName=_this, Path=KurzickBarText, Mode=OneWay}"
-                MouseLeftButtonDown="KurzickBar_MouseLeftButtonDown"></controls:ResourceBar>
-        <controls:ResourceBar 
-                Grid.Column="1"
+                Grid.RowSpan="2">
+                <StackPanel.OpacityMask>
+                    <DrawingBrush>
+                        <DrawingBrush.Drawing>
+                            <DrawingGroup>
+                                <GeometryDrawing Brush="#FFFFFFFF">
+                                    <GeometryDrawing.Geometry>
+                                        <PathGeometry>
+                                            <PathGeometry.Figures>
+                                                <PathFigure IsClosed="True" StartPoint="1, 1">
+                                                    <PathSegmentCollection>
+                                                        <LineSegment Point="1, 9"></LineSegment>
+                                                        <LineSegment Point="21, 9"></LineSegment>
+                                                        <LineSegment Point="19, 5"></LineSegment>
+                                                        <LineSegment Point="21, 1"></LineSegment>
+                                                    </PathSegmentCollection>
+                                                </PathFigure>
+                                            </PathGeometry.Figures>
+                                        </PathGeometry>
+                                    </GeometryDrawing.Geometry>
+                                </GeometryDrawing>
+                            </DrawingGroup>
+                        </DrawingBrush.Drawing>
+                    </DrawingBrush>
+                </StackPanel.OpacityMask>
+                <controls:HorizontalResourceBar 
+                    Margin="0, 2, 0, 2"
+                    Height="25"
+                    CurrentResourceValue="{Binding ElementName=_this, Path=CurrentKurzick, Mode=OneWay}"
+                    MaxResourceValue="{Binding ElementName=_this, Path=TotalKurzick, Mode=OneWay}"
+                    VerticalAlignment="Bottom"
+                    HorizontalAlignment="Left"
+                    BarColor="#603D5AFE"
+                    Foreground="White"
+                    FontSize="14"
+                    Cursor="Hand"
+                    Text="{Binding ElementName=_this, Path=KurzickBarText, Mode=OneWay}"
+                    MouseLeftButtonDown="KurzickBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
+                <controls:HorizontalResourceBar 
+                    Margin="0, 2, 0, 2"
+                    Height="25"
+                    CurrentResourceValue="{Binding ElementName=_this, Path=CurrentLuxon, Mode=OneWay}"
+                    MaxResourceValue="{Binding ElementName=_this, Path=TotalLuxon, Mode=OneWay}"
+                    VerticalAlignment="Bottom"
+                    HorizontalAlignment="Left"
+                    BarColor="#60FF9100"
+                    Foreground="White"
+                    FontSize="14"
+                    Cursor="Hand"
+                    Text="{Binding ElementName=_this, Path=LuxonBarText, Mode=OneWay}"
+                    MouseLeftButtonDown="LuxonBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
+                <controls:HorizontalResourceBar 
+                    Margin="0, 2, 0, 2"
+                    Height="25"
+                    CurrentResourceValue="{Binding ElementName=_this, Path=CurrentImperial, Mode=OneWay}"
+                    MaxResourceValue="{Binding ElementName=_this, Path=TotalImperial, Mode=OneWay}"
+                    VerticalAlignment="Bottom"
+                    HorizontalAlignment="Left"
+                    BarColor="#60651FFF"
+                    Foreground="White"
+                    FontSize="14"
+                    Cursor="Hand"
+                    Text="{Binding ElementName=_this, Path=ImperialBarText, Mode=OneWay}"
+                    MouseLeftButtonDown="ImperialBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
+                <controls:HorizontalResourceBar
+                    Margin="0, 2, 0, 2"
+                    Height="25"
+                    CurrentResourceValue="{Binding ElementName=_this, Path=CurrentBalthazar, Mode=OneWay}"
+                    MaxResourceValue="{Binding ElementName=_this, Path=TotalBalthazar, Mode=OneWay}"
+                    VerticalAlignment="Bottom"
+                    HorizontalAlignment="Left"
+                    BarColor="#60FFEA00"
+                    Foreground="White"
+                    FontSize="14"
+                    Cursor="Hand"
+                    Text="{Binding ElementName=_this, Path=BalthazarBarText, Mode=OneWay}"
+                    MouseLeftButtonDown="BalthazarBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
+            </StackPanel>
+            <StackPanel
+                Height="116"
+                VerticalAlignment="Center"
+                Grid.Column="3"
+                Grid.ColumnSpan="2"
                 Grid.Row="2"
-                Margin="0, 0, 20, 40"
-                Height="30"
-                CurrentResourceValue="{Binding ElementName=_this, Path=GameData.User.CurrentLuxonPoints, Mode=OneWay}"
-                MaxResourceValue="{Binding ElementName=_this, Path=GameData.User.TotalLuxonPoints, Mode=OneWay}"
-                VerticalAlignment="Bottom"
-                HorizontalAlignment="Left"
-                BarColor="#a0ff3400"
-                Foreground="White"
-                FontSize="22"
-                Cursor="Hand"
-                Text="{Binding ElementName=_this, Path=LuxonBarText, Mode=OneWay}"
-                MouseLeftButtonDown="LuxonBar_MouseLeftButtonDown"></controls:ResourceBar>
-        <controls:ResourceBar 
-                Grid.Column="2"
-                Grid.Row="2"
-                Margin="20, 0, 0, 80"
-                Height="30"
-                CurrentResourceValue="{Binding ElementName=_this, Path=GameData.User.CurrentImperialPoints, Mode=OneWay}"
-                MaxResourceValue="{Binding ElementName=_this, Path=GameData.User.TotalImperialPoints, Mode=OneWay}"
-                VerticalAlignment="Bottom"
-                HorizontalAlignment="Left"
-                BarColor="#a0a800ff"
-                Foreground="White"
-                FontSize="22"
-                Cursor="Hand"
-                Text="{Binding ElementName=_this, Path=ImperialBarText, Mode=OneWay}"
-                MouseLeftButtonDown="ImperialBar_MouseLeftButtonDown"></controls:ResourceBar>
-        <controls:ResourceBar 
-                Grid.Column="2"
-                Grid.Row="2"
-                Margin="20, 0, 0, 40"
-                Height="30"
-                CurrentResourceValue="{Binding ElementName=_this, Path=GameData.User.CurrentBalthazarPoints, Mode=OneWay}"
-                MaxResourceValue="{Binding ElementName=_this, Path=GameData.User.TotalBalthazarPoints, Mode=OneWay}"
-                VerticalAlignment="Bottom"
-                HorizontalAlignment="Left"
-                BarColor="#a0ffb200"
-                Foreground="White"
-                FontSize="22"
-                Cursor="Hand"
-                Text="{Binding ElementName=_this, Path=BalthazarBarText, Mode=OneWay}"
-                MouseLeftButtonDown="BalthazarBar_MouseLeftButtonDown"></controls:ResourceBar>
+                Grid.RowSpan="2"
+                Visibility="{Binding ElementName=_this, Path=Vanquishing, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <StackPanel.OpacityMask>
+                    <DrawingBrush>
+                        <DrawingBrush.Drawing>
+                            <DrawingGroup>
+                                <GeometryDrawing Brush="#FFFFFFFF">
+                                    <GeometryDrawing.Geometry>
+                                        <PathGeometry>
+                                            <PathGeometry.Figures>
+                                                <PathFigure IsClosed="True" StartPoint="1, 1">
+                                                    <PathSegmentCollection>
+                                                        <LineSegment Point="3, 5"></LineSegment>
+                                                        <LineSegment Point="1, 9"></LineSegment>
+                                                        <LineSegment Point="21, 9"></LineSegment>
+                                                        <LineSegment Point="21, 1"></LineSegment>
+                                                    </PathSegmentCollection>
+                                                </PathFigure>
+                                            </PathGeometry.Figures>
+                                        </PathGeometry>
+                                    </GeometryDrawing.Geometry>
+                                </GeometryDrawing>
+                            </DrawingGroup>
+                        </DrawingBrush.Drawing>
+                    </DrawingBrush>
+                </StackPanel.OpacityMask>
+                <controls:HorizontalResourceBar 
+                    Margin="0, 3, 0, 3"
+                    Height="53"
+                    CurrentResourceValue="{Binding ElementName=_this, Path=FoesKilled, Mode=OneWay}"
+                    MaxResourceValue="{Binding ElementName=_this, Path=TotalFoes, Mode=OneWay}"
+                    VerticalAlignment="Bottom"
+                    HorizontalAlignment="Left"
+                    BarColor="#60D50000"
+                    Foreground="White"
+                    FontSize="14"
+                    Cursor="Hand"
+                    Text="{Binding ElementName=_this, Path=VanquishingText, Mode=OneWay}"
+                    FillAlignment="Right"
+                    MouseLeftButtonDown="VanquishingBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
+                <!--The following rectangle is a placeholder so that masking will work properly. Will replace it later with something more useful-->
+                <Rectangle Height="53"
+                           Margin="0, 3, 0, 3"
+                           HorizontalAlignment="Stretch"
+                           Fill="Transparent"></Rectangle>
+            </StackPanel>
+        </Grid>
         <Grid
             Grid.Row="1"
             Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"></RowDefinition>
+                <RowDefinition Height="10"></RowDefinition>
+                <RowDefinition Height="auto"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
             <StackPanel
+                Background="#F0212121"
                 Grid.Row="0"
-                Margin="0, 0, 10, 0">
+                Margin="0, 0, 5, 0">
                 <TextBlock 
                     FontSize="18"
-                    Margin="5"
+                    Margin="10"
                     Text="Current Quest"></TextBlock>
                 <TextBlock
                     Text="{Binding ElementName=_this, Path=GameData.MainPlayer.Quest.Name, Mode=OneWay}"
@@ -124,15 +240,20 @@
                 <Rectangle 
                     Height="1"
                     Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"></Rectangle>
-                <TextBlock 
-                    FontSize="18"
-                    Margin="5"
-                    Text="Quest Log"></TextBlock>
             </StackPanel>
+            <TextBlock 
+                    Background="#F0212121"
+                    Grid.Row="2"
+                    FontSize="18"
+                    Margin="0, 0, 5, 0"
+                    Padding="10"
+                    Text="Quest Log"></TextBlock>
             <ScrollViewer
+                    Background="#F0212121"
                     VerticalScrollBarVisibility="Auto"
                     HorizontalScrollBarVisibility="Disabled"
-                    Grid.Row="1">
+                    Grid.Row="3"
+                    Margin="0, 0, 5, 0">
                 <templates:QuestLogTemplate
                         Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
                         Quests="{Binding ElementName=_this,Path=GameData.MainPlayer.QuestLog, Mode=OneWay}"
@@ -141,12 +262,11 @@
                 </templates:QuestLogTemplate>
             </ScrollViewer>
         </Grid>
-        
         <controls:ChromiumBrowserWrapper
             x:Name="Browser"
             Grid.Column="2"
             Grid.Row="1"
-            Margin="10, 0, 0, 0"
+            Margin="5, 0, 0, 0"
             ControlsEnabled="True"
             AddressBarReadonly="False"
             CanNavigate="True"
