@@ -11,6 +11,9 @@ public readonly struct UserContext
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x28)]
     public readonly byte[] PlayerNameBytes;
 
+    [FieldOffset(0x0124)]
+    public readonly uint MapId;
+
     [FieldOffset(0x01B0)]
     public readonly int Language;
 

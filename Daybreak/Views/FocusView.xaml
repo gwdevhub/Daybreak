@@ -111,8 +111,8 @@
                 <controls:HorizontalResourceBar 
                     Margin="0, 2, 0, 2"
                     Height="{Binding ElementName=_this, Path=LeftSideBarSize, Mode=OneWay}"
-                    CurrentResourceValue="{Binding ElementName=_this, Path=CurrentKurzick, Mode=OneWay}"
-                    MaxResourceValue="{Binding ElementName=_this, Path=TotalKurzick, Mode=OneWay}"
+                    CurrentResourceValue="{Binding ElementName=_this, Path=GameData.User.CurrentKurzickPoints, Mode=OneWay}"
+                    MaxResourceValue="{Binding ElementName=_this, Path=GameData.User.MaxKurzickPoints, Mode=OneWay}"
                     VerticalAlignment="Bottom"
                     HorizontalAlignment="Left"
                     BarColor="#603D5AFE"
@@ -124,8 +124,8 @@
                 <controls:HorizontalResourceBar 
                     Margin="0, 2, 0, 2"
                     Height="{Binding ElementName=_this, Path=LeftSideBarSize, Mode=OneWay}"
-                    CurrentResourceValue="{Binding ElementName=_this, Path=CurrentLuxon, Mode=OneWay}"
-                    MaxResourceValue="{Binding ElementName=_this, Path=TotalLuxon, Mode=OneWay}"
+                    CurrentResourceValue="{Binding ElementName=_this, Path=GameData.User.CurrentLuxonPoints, Mode=OneWay}"
+                    MaxResourceValue="{Binding ElementName=_this, Path=GameData.User.MaxLuxonPoints, Mode=OneWay}"
                     VerticalAlignment="Bottom"
                     HorizontalAlignment="Left"
                     BarColor="#60FF9100"
@@ -137,8 +137,8 @@
                 <controls:HorizontalResourceBar 
                     Margin="0, 2, 0, 2"
                     Height="{Binding ElementName=_this, Path=LeftSideBarSize, Mode=OneWay}"
-                    CurrentResourceValue="{Binding ElementName=_this, Path=CurrentImperial, Mode=OneWay}"
-                    MaxResourceValue="{Binding ElementName=_this, Path=TotalImperial, Mode=OneWay}"
+                    CurrentResourceValue="{Binding ElementName=_this, Path=GameData.User.CurrentImperialPoints, Mode=OneWay}"
+                    MaxResourceValue="{Binding ElementName=_this, Path=GameData.User.MaxImperialPoints, Mode=OneWay}"
                     VerticalAlignment="Bottom"
                     HorizontalAlignment="Left"
                     BarColor="#60651FFF"
@@ -150,8 +150,8 @@
                 <controls:HorizontalResourceBar
                     Margin="0, 2, 0, 2"
                     Height="{Binding ElementName=_this, Path=LeftSideBarSize, Mode=OneWay}"
-                    CurrentResourceValue="{Binding ElementName=_this, Path=CurrentBalthazar, Mode=OneWay}"
-                    MaxResourceValue="{Binding ElementName=_this, Path=TotalBalthazar, Mode=OneWay}"
+                    CurrentResourceValue="{Binding ElementName=_this, Path=GameData.User.CurrentBalthazarPoints, Mode=OneWay}"
+                    MaxResourceValue="{Binding ElementName=_this, Path=GameData.User.MaxBalthazarPoints, Mode=OneWay}"
                     VerticalAlignment="Bottom"
                     HorizontalAlignment="Left"
                     BarColor="#60FFEA00"
@@ -194,7 +194,7 @@
                 <controls:HorizontalResourceBar 
                     Margin="0, 2, 0, 2"
                     Height="{Binding ElementName=_this, Path=RightSideBarSize, Mode=OneWay}"
-                    CurrentResourceValue="{Binding ElementName=_this, Path=FoesKilled, Mode=OneWay}"
+                    CurrentResourceValue="{Binding ElementName=_this, Path=GameData.Session.FoesKilled, Mode=OneWay}"
                     MaxResourceValue="{Binding ElementName=_this, Path=TotalFoes, Mode=OneWay}"
                     VerticalAlignment="Bottom"
                     HorizontalAlignment="Left"
@@ -243,11 +243,34 @@
                 <RowDefinition Height="auto"></RowDefinition>
                 <RowDefinition Height="10"></RowDefinition>
                 <RowDefinition Height="auto"></RowDefinition>
+                <RowDefinition Height="10"></RowDefinition>
+                <RowDefinition Height="auto"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
             <StackPanel
                 Background="#F0212121"
                 Grid.Row="0"
+                Margin="0, 0, 5, 0">
+                <TextBlock 
+                    FontSize="18"
+                    Margin="10"
+                    Text="Current Map"></TextBlock>
+                <Rectangle 
+                    Height="1"
+                    Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"></Rectangle>
+                <controls:OpaqueButton
+                    Text="{Binding ElementName=_this, Path=GameData.Session.CurrentMap.Name, Mode=OneWay}"
+                    Highlight="White"
+                    HighlightOpacity="0.6"
+                    HorizontalAlignment="Stretch"
+                    TextHorizontalAlignment="Left"
+                    Cursor="Hand"
+                    FontSize="20"
+                    MouseLeftButtonDown="CurrentMap_MouseLeftButtonDown"></controls:OpaqueButton>
+            </StackPanel>
+            <StackPanel
+                Background="#F0212121"
+                Grid.Row="2"
                 Margin="0, 0, 5, 0">
                 <TextBlock 
                     FontSize="18"
@@ -268,7 +291,7 @@
             </StackPanel>
             <TextBlock 
                     Background="#F0212121"
-                    Grid.Row="2"
+                    Grid.Row="4"
                     FontSize="18"
                     Margin="0, 0, 5, 0"
                     Padding="10"
@@ -277,7 +300,7 @@
                     Background="#F0212121"
                     VerticalScrollBarVisibility="Auto"
                     HorizontalScrollBarVisibility="Disabled"
-                    Grid.Row="3"
+                    Grid.Row="5"
                     Margin="0, 0, 5, 0">
                 <templates:QuestLogTemplate
                         Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"

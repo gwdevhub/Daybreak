@@ -163,10 +163,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
         //var entityArray = this.memoryScanner.ReadPtrChain<GuildwarsArray>(this.GetEntityArrayPointer(), 0x0, 0x0);
         //var entities = this.memoryScanner.ReadArray<EntityContext>(entityArray);
 
-        var email = ParseAndCleanWCharArray(userContext.PlayerEmailBytes);
-        var name = ParseAndCleanWCharArray(userContext.PlayerNameBytes);
-
-        this.GameData = this.AggregateGameData(gameContext, instanceContext, mapEntities, players, professions, quests, email, name, playerEntityId);
+        this.GameData = this.AggregateGameData(gameContext, instanceContext, mapEntities, players, professions, quests, userContext, playerEntityId);
     }
 
     private IntPtr GetPlayerIdPointer()
@@ -196,10 +193,12 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
         PlayerContext[] players,
         ProfessionsContext[] professions,
         QuestContext[] quests,
-        string email,
-        string name,
+        UserContext userContext,
         int mainPlayerEntityId)
     {
+        var email = ParseAndCleanWCharArray(userContext.PlayerEmailBytes);
+        var name = ParseAndCleanWCharArray(userContext.PlayerNameBytes);
+        _ = Map.TryParse((int)userContext.MapId, out var currentMap);
         var partyMembers = professions
             .Where(p => p.AgentId != mainPlayerEntityId)
             .Select(p => GetPlayerInformation((int)p.AgentId, instanceContext, entities, professions))
@@ -212,6 +211,8 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
             .Select(p => GetWorldPlayerInformation(p, this.memoryScanner.ReadWString(p.NamePointer, 0x40), instanceContext, entities, professions))
             .ToList();
 
+        
+        
         var userInformation = new UserInformation
         {
             Email = email,
@@ -234,7 +235,8 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
         var sessionInformation = new SessionInformation
         {
             FoesKilled = gameContext.FoesKilled,
-            FoesToKill = gameContext.FoesToKill
+            FoesToKill = gameContext.FoesToKill,
+            CurrentMap = currentMap
         };
 
         return new GameData

@@ -1,9 +1,11 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Controls;
 using Daybreak.Models;
+using Daybreak.Services.Navigation;
 using System;
 using System.Collections.ObjectModel;
 using System.Configuration;
+using System.Core.Extensions;
 using System.Extensions;
 using System.Linq;
 using System.Windows.Controls;
@@ -16,13 +18,16 @@ namespace Daybreak.Views;
 /// </summary>
 public partial class ExecutablesView : UserControl
 {
+    private readonly IViewManager viewManager;
     private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions;
     public ObservableCollection<GuildwarsPath> Paths { get; } = new();
 
     public ExecutablesView(
+        IViewManager viewManager,
         ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions)
     {
-        this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull(nameof(liveUpdateableOptions));
+        this.viewManager = viewManager.ThrowIfNull();
+        this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
         this.InitializeComponent();
         this.GetPaths();
     }
@@ -46,6 +51,7 @@ public partial class ExecutablesView : UserControl
     {
         this.liveUpdateableOptions.Value.GuildwarsPaths = this.Paths.ToList();
         this.liveUpdateableOptions.UpdateOption();
+        this.viewManager.ShowView<LauncherView>();
     }
 
     private void GuildwarsPathTemplate_DefaultClicked(object sender, EventArgs e)

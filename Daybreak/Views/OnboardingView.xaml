@@ -10,12 +10,12 @@
              x:Name="_this"
              DataContextChanged="UserControl_DataContextChanged"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Background="White" MinHeight="200" MinWidth="400">
+    <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Background="#F0212121" MinHeight="200" MinWidth="400">
         <StackPanel VerticalAlignment="Center">
-            <TextBlock Text="{Binding ElementName=_this, Path=Description, Mode=OneWay}" Margin="10, 0, 10, 0" Foreground="Black"
+            <TextBlock Text="{Binding ElementName=_this, Path=Description, Mode=OneWay}" Margin="10, 0, 10, 0" Foreground="White"
                        TextWrapping="Wrap" HorizontalAlignment="Center" FontSize="16"></TextBlock>
             <controls:OpaqueButton Text="Ok" BackgroundOpacity="0.2" TransparentBackground="Gray" HorizontalAlignment="Center" Margin="10" Width="50" Height="25"
-                                   Clicked="OpaqueButton_Clicked" Foreground="Black" FontSize="16"></controls:OpaqueButton>
+                                   Clicked="OpaqueButton_Clicked" Foreground="White" Highlight="White" HighlightOpacity="0.6" FontSize="16" Cursor="Hand"></controls:OpaqueButton>
         </StackPanel>
     </Grid>
 </UserControl>

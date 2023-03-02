@@ -7,21 +7,21 @@
              mc:Ignorable="d" 
              xmlns:controls="clr-namespace:Daybreak.Controls"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Background="White" MinHeight="200" MinWidth="400">
+    <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Background="#F0212121" MinHeight="200" MinWidth="400">
         <StackPanel VerticalAlignment="Center" Orientation="Vertical">
-            <TextBlock Text="{Binding MessageToUser}" Margin="10, 0, 10, 0" Foreground="Black"
+            <TextBlock Text="{Binding MessageToUser}" Margin="10, 0, 10, 0" Foreground="White"
                        TextWrapping="Wrap" HorizontalAlignment="Center" FontSize="16"></TextBlock>
             <TextBlock Text="Do you want to restart the application with administrator rights?" HorizontalAlignment="Center"
-                       FontSize="16" Foreground="Black" Margin="10, 0, 10, 10" TextWrapping="Wrap"></TextBlock>
+                       FontSize="16" Foreground="White" Margin="10, 0, 10, 10" TextWrapping="Wrap"></TextBlock>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"></ColumnDefinition>
                     <ColumnDefinition Width="*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <controls:OpaqueButton Text="Yes" BackgroundOpacity="0.2" TransparentBackground="Gray" HorizontalAlignment="Center" Margin="10" Width="50" Height="25"
-                                   Clicked="YesButton_Clicked" Foreground="Black" FontSize="16"></controls:OpaqueButton>
+                                   Clicked="YesButton_Clicked" Foreground="White" Highlight="White" HighlightOpacity="0.6" FontSize="16" Cursor="Hand"></controls:OpaqueButton>
                 <controls:OpaqueButton Text="No" BackgroundOpacity="0.2" TransparentBackground="Gray" HorizontalAlignment="Center" Margin="10" Width="50" Height="25"
-                                   Clicked="NoButton_Clicked" Foreground="Black" Grid.Column="1" FontSize="16"></controls:OpaqueButton>
+                                   Clicked="NoButton_Clicked" Foreground="White" Highlight="White" HighlightOpacity="0.6" Grid.Column="1" FontSize="16" Cursor="Hand"></controls:OpaqueButton>
             </Grid>
         </StackPanel>
     </Grid>
