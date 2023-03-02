@@ -23,7 +23,7 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type ToggleButton}">
-                            <Grid>
+                            <Grid Cursor="Hand">
                                 <Rectangle x:Name="OverlayRect" Fill="{TemplateBinding Background}" Opacity="0"></Rectangle>
                                 <controls:ThreeDotsGlyph Margin="13"></controls:ThreeDotsGlyph>
                             </Grid>

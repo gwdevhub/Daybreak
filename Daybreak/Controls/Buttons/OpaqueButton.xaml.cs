@@ -26,6 +26,10 @@ public partial class OpaqueButton : UserControl
     public double highlightOpacity;
     [GenerateDependencyProperty]
     public bool highlightVisible;
+    [GenerateDependencyProperty(InitialValue = VerticalAlignment.Center)]
+    public VerticalAlignment textVerticalAlignment;
+    [GenerateDependencyProperty(InitialValue = HorizontalAlignment.Center)]
+    public HorizontalAlignment textHorizontalAlignment;
 
     public OpaqueButton()
     {

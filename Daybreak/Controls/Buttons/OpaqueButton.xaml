@@ -20,13 +20,12 @@
                    FontStretch="{Binding ElementName=_this, Path=FontStretch, Mode=OneWay}"
                    FontWeight="{Binding ElementName=_this, Path=FontWeight, Mode=OneWay}"
                    FontStyle="{Binding ElementName=_this, Path=FontStyle, Mode=OneWay}"
-                   VerticalAlignment="Center"
-                   HorizontalAlignment="Center"></TextBlock>
+                   VerticalAlignment="{Binding ElementName=_this, Path=TextVerticalAlignment, Mode=OneWay}"
+                   HorizontalAlignment="{Binding ElementName=_this, Path=TextHorizontalAlignment, Mode=OneWay}"></TextBlock>
         <Rectangle Fill="{Binding ElementName=_this, Path=Highlight, Mode=OneWay}"
                    Opacity="{Binding ElementName=_this, Path=HighlightOpacity, Mode=OneWay}"
                    Visibility="{Binding ElementName=_this, Path=HighlightVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"></Rectangle>
         <Rectangle MouseEnter="Rectangle_MouseEnter" MouseLeave="Rectangle_MouseLeave"
-                   MouseLeftButtonDown="Rectangle_MouseLeftButtonDown" Fill="Transparent"
-                   Cursor="Hand"></Rectangle>
+                   MouseLeftButtonDown="Rectangle_MouseLeftButtonDown" Fill="Transparent"></Rectangle>
     </Grid>
 </UserControl>

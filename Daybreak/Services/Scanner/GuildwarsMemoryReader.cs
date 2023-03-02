@@ -99,7 +99,19 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
     {
         var cancellationTokenSource = new CancellationTokenSource();
         this.cancellationTokenSource = cancellationTokenSource;
-        System.Extensions.TaskExtensions.RunPeriodicAsync(() => this.ReadGameMemory(cancellationTokenSource.Token), TimeSpan.Zero, TimeSpan.FromSeconds(1), cancellationTokenSource.Token);
+        System.Extensions.TaskExtensions.RunPeriodicAsync(() => this.SafeReadGameMemory(cancellationTokenSource.Token), TimeSpan.Zero, TimeSpan.FromSeconds(1), cancellationTokenSource.Token);
+    }
+
+    private void SafeReadGameMemory(CancellationToken cancellationToken)
+    {
+        try
+        {
+            this.ReadGameMemory(cancellationToken);
+        }
+        catch(Exception e)
+        {
+            this.logger.LogError(e, "Exception encountered when reading game memory");
+        }
     }
 
     private void ReadGameMemory(CancellationToken cancellationToken)
