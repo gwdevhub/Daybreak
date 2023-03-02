@@ -14,6 +14,8 @@ public sealed class FocusViewOptions
     public PointsDisplay BalthazarPointsDisplay { get; set; }
     [JsonProperty("ImperialPointsDisplay")]
     public PointsDisplay ImperialPointsDisplay { get; set; }
+    [JsonProperty("VanquishingDisplay")]
+    public PointsDisplay VanquishingDisplay { get; set; }
     [JsonProperty("BrowserUrl")]
     public string? BrowserUrl { get; set; } = string.Empty;
 }

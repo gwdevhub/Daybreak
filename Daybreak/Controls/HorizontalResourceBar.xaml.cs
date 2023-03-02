@@ -8,7 +8,7 @@ namespace Daybreak.Controls;
 /// <summary>
 /// Interaction logic for ResourceBar.xaml
 /// </summary>
-public partial class ResourceBar : UserControl
+public partial class HorizontalResourceBar : UserControl
 {
     [GenerateDependencyProperty]
     private double currentResourceValue;
@@ -18,8 +18,10 @@ public partial class ResourceBar : UserControl
     private Brush barColor;
     [GenerateDependencyProperty]
     private string text;
+    [GenerateDependencyProperty(InitialValue = HorizontalAlignment.Left)]
+    private HorizontalAlignment fillAlignment;
 
-    public ResourceBar()
+    public HorizontalResourceBar()
     {
         this.InitializeComponent();
         this.MaxResourceValue = 1;
@@ -27,4 +29,6 @@ public partial class ResourceBar : UserControl
         this.barColor = Brushes.Transparent;
         this.text = string.Empty;
     }
+
+    
 }

@@ -33,7 +33,7 @@
                                         <Condition Property="IsMouseOver" Value="True"></Condition>
                                     </MultiTrigger.Conditions>
                                     <MultiTrigger.Setters>
-                                        <Setter Property="Opacity" TargetName="OverlayRect" Value="0.5"></Setter>
+                                        <Setter Property="Opacity" TargetName="OverlayRect" Value="1"></Setter>
                                     </MultiTrigger.Setters>
                                 </MultiTrigger>
                                 <MultiTrigger>
@@ -118,7 +118,7 @@
                   Grid.RowSpan="2"
                   VerticalAlignment="Stretch"
                   HorizontalAlignment="Left"
-                  Background="#A0202020">
+                  Background="#F0212121">
             <controls:MenuList Margin="0, 30, 0, 0"/>
         </Grid>
         <ToggleButton x:Name="OpeningSettingsButton"
@@ -126,6 +126,7 @@
                       Width="50"
                       Height="30"
                       HorizontalAlignment="Left"
+                      Background="#F0212121"
                       Margin="0, 0, 0, 0"
                       Grid.ColumnSpan="2"
                       Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
@@ -138,6 +139,7 @@
                       Margin="0, 0, 0, 0"
                       Grid.ColumnSpan="2"
                       Foreground="White"
+                      Background="#F09E9E9E"
                       Visibility="{Binding ElementName=_this, Path=IsShowingDropdown, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
                       Click="SettingsButton_Clicked"></ToggleButton>
         <wcl:Border OnResize="Border_OnResize" Grid.RowSpan="2" Grid.ColumnSpan="2" Active="True"></wcl:Border>

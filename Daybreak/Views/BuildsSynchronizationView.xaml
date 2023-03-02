@@ -17,7 +17,7 @@
         <BooleanToVisibilityConverter x:Key="BaseBooleanToVisibilityConverter"></BooleanToVisibilityConverter>
     </UserControl.Resources>
     <Grid
-        Background="#A0202020">
+        Background="#F0212121">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
@@ -174,7 +174,7 @@
             </StackPanel>
         </Grid>
         <Grid Grid.RowSpan="3"
-              Background="#A0202020"
+              Background="#F0212121"
               Visibility="{Binding ElementName=_this, Path=ShowLoading, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
             <controls:CircularLoadingWidget MaxWidth="200"
                                             MaxHeight="200"/>

@@ -24,17 +24,17 @@
             <ColumnDefinition Width="*"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <controls:OpaqueButton Text="Launch game" Highlight="White" TransparentBackground="Black" HighlightOpacity="0.3" BackgroundOpacity="0.2"
+        <controls:OpaqueButton Text="Launch game" Highlight="White" TransparentBackground="#F0212121" HighlightOpacity="0.3" BackgroundOpacity="1"
                                Foreground="White" FontSize="36" Width="250" Height="60" VerticalAlignment="Bottom"
                                IsEnabled="{Binding ElementName=_this, Path=LaunchButtonEnabled, Mode=OneWay}"
                                Clicked="LaunchButton_Clicked" Grid.Row="0" Grid.ColumnSpan="3"
                                Visibility="{Binding ElementName=_this, Path=ButtonsVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibility}}"></controls:OpaqueButton>
-        <controls:OpaqueButton Text="Launch toolbox" Highlight="White" TransparentBackground="Black" HighlightOpacity="0.3" BackgroundOpacity="0.2"
+        <controls:OpaqueButton Text="Launch toolbox" Highlight="White" TransparentBackground="#F0212121" HighlightOpacity="0.3" BackgroundOpacity="1"
                                Foreground="White" FontSize="24" Width="200" Height="40" Margin="0, 10, 0, 10"
                                IsEnabled="{Binding ElementName=_this, Path=LaunchToolboxButtonEnabled, Mode=OneWay}"
                                Clicked="LaunchToolboxButton_Clicked" Grid.Row="1" Grid.ColumnSpan="2"
                                Visibility="{Binding ElementName=_this, Path=ButtonsVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibility}}"></controls:OpaqueButton>
-        <controls:OpaqueButton Text="Launch texmod" Highlight="White" TransparentBackground="Black" HighlightOpacity="0.3" BackgroundOpacity="0.2"
+        <controls:OpaqueButton Text="Launch texmod" Highlight="White" TransparentBackground="#F0212121" HighlightOpacity="0.3" BackgroundOpacity="1"
                                Foreground="White" FontSize="24" Width="200" Height="40" Margin="0, 10, 0, 10"
                                IsEnabled="{Binding ElementName=_this, Path=LaunchTexmodButtonEnabled, Mode=OneWay}"
                                Clicked="LaunchTexmodButton_Clicked" Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="1"

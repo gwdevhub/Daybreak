@@ -44,7 +44,7 @@ public sealed class ExperienceCalculator : IExperienceCalculator
             var previousLevelExperience = 0U;
             foreach (var threshold in ExperienceThreshold)
             {
-                if (currentTotalExperience >= threshold)
+                if (threshold >= currentTotalExperience)
                 {
                     break;
                 }
@@ -96,6 +96,7 @@ public sealed class ExperienceCalculator : IExperienceCalculator
         if (currentTotalExperience < ExperienceCalculationThreshold)
         {
             var totalXpForNextLevel = 0U;
+            var totalXpForPreviousLevel = 0U;
             foreach (var threshold in ExperienceThreshold)
             {
                 if (currentTotalExperience < threshold)
@@ -103,9 +104,11 @@ public sealed class ExperienceCalculator : IExperienceCalculator
                     totalXpForNextLevel = threshold;
                     break;
                 }
+
+                totalXpForPreviousLevel = threshold;
             }
 
-            return totalXpForNextLevel;
+            return totalXpForNextLevel - totalXpForPreviousLevel;
         }
         else
         {

@@ -8,7 +8,7 @@
              xmlns:controls="clr-namespace:Daybreak.Controls"
              x:Name="_this"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid Background="#A0202020">
+    <Grid Background="#F0212121">
         <TextBlock HorizontalAlignment="Center" Text="Executables settings" FontSize="22" Foreground="White"></TextBlock>
         <controls:AddButton Foreground="White" Height="30" Width="30" Grid.Column="0" HorizontalAlignment="Right" Margin="5, 5, 45, 5"
                              Clicked="AddButton_Clicked" VerticalAlignment="Top"></controls:AddButton>
