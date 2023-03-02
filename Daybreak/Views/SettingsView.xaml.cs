@@ -86,6 +86,7 @@ public partial class SettingsView : System.Windows.Controls.UserControl
         currentConfig.PlaceShortcut = this.ShortcutPlaced;
         currentConfig.AutoCheckUpdate = this.AutoCheckUpdate;
         this.liveUpdateableOptions.UpdateOption();
+        this.viewManager.ShowView<LauncherView>();
     }
 
     private void ToolboxFilePickerGlyph_Clicked(object sender, EventArgs e)

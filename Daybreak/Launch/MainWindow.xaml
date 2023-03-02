@@ -148,8 +148,9 @@
                                          HorizontalAlignment="Center"
                                          Visibility="Visible"
                                          ControlsEnabled="False"
-                                         CanNavigate="False"
+                                         CanNavigate="True"
                                          CanDownloadBuild="False"
-                                         Grid.Row="1"></controls:ChromiumBrowserWrapper>
+                                         Grid.Row="1"
+                                         Grid.Column="1"></controls:ChromiumBrowserWrapper>
     </Grid>
 </Window>

@@ -42,22 +42,6 @@ public partial class FocusView : UserControl
     [GenerateDependencyProperty]
     private string experienceBarText = string.Empty;
     [GenerateDependencyProperty]
-    private double currentKurzick;
-    [GenerateDependencyProperty]
-    private double totalKurzick;
-    [GenerateDependencyProperty]
-    private double currentLuxon;
-    [GenerateDependencyProperty]
-    private double totalLuxon;
-    [GenerateDependencyProperty]
-    private double currentImperial;
-    [GenerateDependencyProperty]
-    private double totalImperial;
-    [GenerateDependencyProperty]
-    private double currentBalthazar;
-    [GenerateDependencyProperty]
-    private double totalBalthazar;
-    [GenerateDependencyProperty]
     private string luxonBarText = string.Empty;
     [GenerateDependencyProperty]
     private string kurzickBarText = string.Empty;
@@ -67,14 +51,6 @@ public partial class FocusView : UserControl
     private string balthazarBarText = string.Empty;
 
     [GenerateDependencyProperty]
-    private double currentHealth;
-    [GenerateDependencyProperty]
-    private double maxHealth;
-    [GenerateDependencyProperty]
-    private double currentEnergy;
-    [GenerateDependencyProperty]
-    private double maxEnergy;
-    [GenerateDependencyProperty]
     private string healthBarText = string.Empty;
     [GenerateDependencyProperty]
     private string energyBarText = string.Empty;
@@ -82,9 +58,7 @@ public partial class FocusView : UserControl
     [GenerateDependencyProperty]
     private bool vanquishing;
     [GenerateDependencyProperty]
-    private double foesKilled;
-    [GenerateDependencyProperty]
-    private double totalFoes;
+    private uint totalFoes;
     [GenerateDependencyProperty]
     private string vanquishingText = string.Empty;
 
@@ -169,21 +143,8 @@ public partial class FocusView : UserControl
 
             this.CurrentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(this.GameData.MainPlayer!.Experience);
             this.NextLevelExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(this.GameData.MainPlayer!.Experience);
-            this.CurrentLuxon = (double)this.GameData.User.CurrentLuxonPoints;
-            this.CurrentKurzick = (double)this.GameData.User.CurrentKurzickPoints;
-            this.CurrentImperial = (double)this.GameData.User.CurrentImperialPoints;
-            this.CurrentBalthazar = (double)this.GameData.User.CurrentBalthazarPoints;
-            this.TotalLuxon = (double)this.GameData.User.MaxLuxonPoints;
-            this.TotalKurzick = (double)this.GameData.User.MaxKurzickPoints;
-            this.TotalImperial = (double)this.GameData.User.MaxImperialPoints;
-            this.TotalBalthazar = (double)this.GameData.User.MaxBalthazarPoints;
-            this.FoesKilled = (double)this.GameData.Session.FoesKilled;
-            this.TotalFoes = (double)this.GameData.Session.FoesKilled + (double)this.GameData.Session.FoesToKill;
+            this.TotalFoes = this.GameData.Session.FoesKilled + this.GameData.Session.FoesToKill;
             this.Vanquishing = this.GameData.Session.FoesToKill + this.GameData.Session.FoesKilled > 0U;
-            this.CurrentEnergy = (double)this.GameData.MainPlayer.CurrentEnergy;
-            this.MaxEnergy = (double)this.GameData.MainPlayer.MaxEnergy;
-            this.CurrentHealth = (double)this.GameData.MainPlayer.CurrentHealth;
-            this.MaxHealth = (double)this.GameData.MainPlayer.MaxHealth;
             this.UpdateExperienceText();
             this.UpdateLuxonText();
             this.UpdateKurzickText();
@@ -212,16 +173,16 @@ public partial class FocusView : UserControl
             case Configuration.FocusView.ExperienceDisplay.CurrentLevelCurrentAndCurrentLevelMax:
                 var currentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(this.GameData.MainPlayer!.Experience);
                 var nextLevelExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(this.GameData.MainPlayer!.Experience);
-                this.ExperienceBarText = $"{currentExperienceInLevel} / {nextLevelExperienceThreshold} XP";
+                this.ExperienceBarText = $"{(int)currentExperienceInLevel} / {(int)nextLevelExperienceThreshold} XP";
                 break;
             case Configuration.FocusView.ExperienceDisplay.TotalCurretAndTotalMax:
                 var currentTotalExperience = this.GameData.MainPlayer!.Experience;
                 var requiredTotalExperience = this.experienceCalculator.GetTotalExperienceForNextLevel(currentTotalExperience);
-                this.ExperienceBarText = $"{currentTotalExperience} / {requiredTotalExperience} XP";
+                this.ExperienceBarText = $"{(int)currentTotalExperience} / {(int)requiredTotalExperience} XP";
                 break;
             case Configuration.FocusView.ExperienceDisplay.RemainingUntilNextLevel:
                 var remainingExperience = this.experienceCalculator.GetRemainingExperienceForNextLevel(this.GameData.MainPlayer!.Experience);
-                this.ExperienceBarText = $"Remaining {remainingExperience} XP";
+                this.ExperienceBarText = $"Remaining {(int)remainingExperience} XP";
                 break;
             case Configuration.FocusView.ExperienceDisplay.Percentage:
                 var currentExperienceInLevel2 = this.experienceCalculator.GetExperienceForCurrentLevel(this.GameData.MainPlayer!.Experience);
@@ -236,13 +197,13 @@ public partial class FocusView : UserControl
         switch (this.liveUpdateableOptions.Value.FocusViewOptions.LuxonPointsDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.LuxonBarText = $"{this.CurrentLuxon} / {this.TotalLuxon} Luxon Points";
+                this.LuxonBarText = $"{this.GameData.User!.CurrentLuxonPoints} / {this.GameData.User.MaxLuxonPoints} Luxon Points";
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.LuxonBarText = $"Remaining {this.TotalLuxon - this.CurrentLuxon} Luxon Points";
+                this.LuxonBarText = $"Remaining {this.GameData.User!.MaxLuxonPoints - this.GameData.User.CurrentLuxonPoints} Luxon Points";
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.LuxonBarText = $"{(int)(this.CurrentLuxon / this.TotalLuxon * 100)}% Luxon Points";
+                this.LuxonBarText = $"{(int)((double)this.GameData.User!.CurrentLuxonPoints / (double)this.GameData.User.MaxLuxonPoints * 100)}% Luxon Points";
                 break;
         }
     }
@@ -252,13 +213,13 @@ public partial class FocusView : UserControl
         switch (this.liveUpdateableOptions.Value.FocusViewOptions.KurzickPointsDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.KurzickBarText = $"{this.CurrentKurzick} / {this.TotalKurzick} Kurzick Points";
+                this.KurzickBarText = $"{this.GameData.User!.CurrentKurzickPoints} / {this.GameData.User.MaxKurzickPoints} Kurzick Points";
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.KurzickBarText = $"Remaining {this.TotalKurzick - this.CurrentKurzick} Kurzick Points";
+                this.KurzickBarText = $"Remaining {this.GameData.User!.MaxKurzickPoints - this.GameData.User.CurrentKurzickPoints} Kurzick Points";
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.KurzickBarText = $"{(int)(this.CurrentKurzick / this.TotalKurzick * 100)}% Kurzick Points";
+                this.KurzickBarText = $"{(int)((double)this.GameData.User!.CurrentKurzickPoints / (double)this.GameData.User.MaxKurzickPoints * 100)}% Kurzick Points";
                 break;
         }
     }
@@ -268,13 +229,13 @@ public partial class FocusView : UserControl
         switch (this.liveUpdateableOptions.Value.FocusViewOptions.ImperialPointsDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.ImperialBarText = $"{this.CurrentImperial} / {this.TotalImperial} Imperial Points";
+                this.ImperialBarText = $"{this.GameData.User!.CurrentImperialPoints} / {this.GameData.User.MaxImperialPoints} Imperial Points";
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.ImperialBarText = $"Remaining {this.TotalImperial - this.CurrentImperial} Imperial Points";
+                this.ImperialBarText = $"Remaining {this.GameData.User!.MaxImperialPoints - this.GameData.User.CurrentImperialPoints} Imperial Points";
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.ImperialBarText = $"{(int)(this.CurrentImperial / this.TotalImperial * 100)}% Imperial Points";
+                this.ImperialBarText = $"{(int)((double)this.GameData.User!.CurrentImperialPoints / (double)this.GameData.User.MaxImperialPoints * 100)}% Imperial Points";
                 break;
         }
     }
@@ -284,13 +245,13 @@ public partial class FocusView : UserControl
         switch (this.liveUpdateableOptions.Value.FocusViewOptions.BalthazarPointsDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.BalthazarBarText = $"{this.CurrentBalthazar} / {this.TotalBalthazar} Balthazar Points";
+                this.BalthazarBarText = $"{this.GameData.User!.CurrentBalthazarPoints} / {this.GameData.User.MaxBalthazarPoints} Balthazar Points";
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.BalthazarBarText = $"Remaining {this.TotalBalthazar - this.CurrentBalthazar} Balthazar Points";
+                this.BalthazarBarText = $"Remaining {this.GameData.User!.MaxBalthazarPoints - this.GameData.User.CurrentBalthazarPoints} Balthazar Points";
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.BalthazarBarText = $"{(int)(this.CurrentBalthazar / this.TotalBalthazar * 100)}% Balthazar Points";
+                this.BalthazarBarText = $"{(int)((double)this.GameData.User!.CurrentBalthazarPoints / (double)this.GameData.User.MaxBalthazarPoints * 100)}% Balthazar Points";
                 break;
         }
     }
@@ -300,13 +261,13 @@ public partial class FocusView : UserControl
         switch (this.liveUpdateableOptions.Value.FocusViewOptions.VanquishingDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.VanquishingText = $"{this.FoesKilled} / {this.TotalFoes} Foes Killed";
+                this.VanquishingText = $"{this.GameData.Session!.FoesKilled} / {(int)this.TotalFoes} Foes Killed";
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.VanquishingText = $"Remaining {this.TotalFoes - this.FoesKilled} Foes";
+                this.VanquishingText = $"Remaining {this.GameData.Session!.FoesToKill} Foes";
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.VanquishingText = $"{(int)(this.FoesKilled / this.TotalFoes * 100)}% Foes Killed";
+                this.VanquishingText = $"{(int)((double)this.GameData.Session!.FoesKilled / (double)this.TotalFoes * 100)}% Foes Killed";
                 break;
         }
     }
@@ -316,13 +277,13 @@ public partial class FocusView : UserControl
         switch (this.liveUpdateableOptions.Value.FocusViewOptions.HealthDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.HealthBarText = $"{this.CurrentHealth} / {this.MaxHealth} Health";
+                this.HealthBarText = $"{(int)this.GameData.MainPlayer!.CurrentHealth} / {(int)this.GameData.MainPlayer.MaxHealth} Health";
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.HealthBarText = $"Remaining {this.CurrentHealth} Health";
+                this.HealthBarText = $"Remaining {(int)this.GameData.MainPlayer!.CurrentHealth} Health";
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.HealthBarText = $"{(int)(this.CurrentHealth / this.MaxHealth * 100)}% Health";
+                this.HealthBarText = $"{(int)(this.GameData.MainPlayer!.CurrentHealth / this.GameData.MainPlayer.MaxHealth * 100)}% Health";
                 break;
         }
     }
@@ -332,13 +293,13 @@ public partial class FocusView : UserControl
         switch (this.liveUpdateableOptions.Value.FocusViewOptions.EnergyDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.EnergyBarText = $"{this.CurrentEnergy} / {this.MaxEnergy} Energy";
+                this.EnergyBarText = $"{(int)this.GameData.MainPlayer!.CurrentEnergy} / {(int)this.GameData.MainPlayer.MaxEnergy} Energy";
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.EnergyBarText = $"Remaining {this.CurrentEnergy} Energy";
+                this.EnergyBarText = $"Remaining {(int)this.GameData.MainPlayer!.CurrentEnergy} Energy";
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.EnergyBarText = $"{(int)(this.CurrentEnergy / this.MaxEnergy * 100)}% Energy";
+                this.EnergyBarText = $"{(int)(this.GameData.MainPlayer!.CurrentEnergy / this.GameData.MainPlayer.MaxEnergy * 100)}% Energy";
                 break;
         }
     }
@@ -517,6 +478,14 @@ public partial class FocusView : UserControl
     private void CurrentQuest_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
         if (this.GameData.MainPlayer?.Quest?.WikiUrl is string url)
+        {
+            this.BrowserAddress = url;
+        }
+    }
+
+    private void CurrentMap_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (this.GameData.Session?.CurrentMap?.WikiUrl is string url)
         {
             this.BrowserAddress = url;
         }

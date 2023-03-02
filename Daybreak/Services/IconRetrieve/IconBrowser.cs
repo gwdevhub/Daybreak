@@ -108,6 +108,7 @@ public sealed class IconBrowser : IIconBrowser
         logger.LogInformation($"Looking for icon at {skillIconUrl}");
 
         this.browserWrapper.Address = skillIconUrl;
+        this.browserWrapper.WebBrowser.CoreWebView2.Navigate(skillIconUrl);
 
         for (var i = 0; i < 5; i++)
         {

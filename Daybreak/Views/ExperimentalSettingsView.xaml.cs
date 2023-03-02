@@ -1,6 +1,8 @@
 ﻿using Daybreak.Configuration;
+using Daybreak.Services.Navigation;
 using System;
 using System.Configuration;
+using System.Core.Extensions;
 using System.Extensions;
 using System.Linq;
 using System.Windows.Controls;
@@ -14,6 +16,8 @@ namespace Daybreak.Views;
 /// </summary>
 public partial class ExperimentalSettingsView : UserControl
 {
+    private readonly IViewManager viewManager;
+        
     [GenerateDependencyProperty]
     private bool launchAsCurrentUser;
     [GenerateDependencyProperty]
@@ -32,9 +36,11 @@ public partial class ExperimentalSettingsView : UserControl
     private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions;
 
     public ExperimentalSettingsView(
+        IViewManager viewManager,
         ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions)
     {
-        this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull(nameof(liveUpdateableOptions));
+        this.viewManager = viewManager.ThrowIfNull();
+        this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
         this.InitializeComponent();
         this.LoadExperimentalSettings();
     }
@@ -66,6 +72,7 @@ public partial class ExperimentalSettingsView : UserControl
         }
 
         this.liveUpdateableOptions.UpdateOption();
+        this.viewManager.ShowView<LauncherView>();
     }
 
     private void SaveButton_Clicked(object sender, EventArgs e)

@@ -8,19 +8,19 @@
              xmlns:controls="clr-namespace:Daybreak.Controls"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Width="400" Height="200"
-          Background="White">
+          Background="#F0212121">
         <StackPanel VerticalAlignment="Center" Orientation="Vertical">
             <TextBlock Text="An update has been detected. Do you want to download the update?" HorizontalAlignment="Center"
-                       FontSize="16" Foreground="Black" Margin="10, 0, 10, 10" TextWrapping="Wrap"></TextBlock>
+                       FontSize="16" Foreground="White" Margin="10, 0, 10, 10" TextWrapping="Wrap"></TextBlock>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"></ColumnDefinition>
                     <ColumnDefinition Width="*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <controls:OpaqueButton Text="Yes" BackgroundOpacity="0.2" TransparentBackground="Gray" HorizontalAlignment="Center" Margin="10" Width="50" Height="25"
-                                   Clicked="YesButton_Clicked" Foreground="Black" FontSize="16"></controls:OpaqueButton>
-                <controls:OpaqueButton Text="No" BackgroundOpacity="0.2" TransparentBackground="Gray" HorizontalAlignment="Center" Margin="10" Width="50" Height="25"
-                                   Clicked="NoButton_Clicked" Foreground="Black" Grid.Column="1" FontSize="16"></controls:OpaqueButton>
+                <controls:OpaqueButton Text="Yes" BackgroundOpacity="0.2" TransparentBackground="Gray" Highlight="White" HighlightOpacity="0.6" HorizontalAlignment="Center" Margin="10" Width="50" Height="25"
+                                   Clicked="YesButton_Clicked" Foreground="White" FontSize="16" Cursor="Hand"></controls:OpaqueButton>
+                <controls:OpaqueButton Text="No" BackgroundOpacity="0.2" TransparentBackground="Gray" Highlight="White" HighlightOpacity="0.6" HorizontalAlignment="Center" Margin="10" Width="50" Height="25"
+                                   Clicked="NoButton_Clicked" Foreground="White" Grid.Column="1" FontSize="16" Cursor="Hand"></controls:OpaqueButton>
             </Grid>
         </StackPanel>
     </Grid>

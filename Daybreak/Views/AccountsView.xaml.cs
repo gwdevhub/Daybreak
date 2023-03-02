@@ -1,8 +1,10 @@
 ﻿using Daybreak.Controls;
 using Daybreak.Models;
 using Daybreak.Services.Credentials;
+using Daybreak.Services.Navigation;
 using System;
 using System.Collections.ObjectModel;
+using System.Core.Extensions;
 using System.Extensions;
 using System.Linq;
 using System.Windows.Controls;
@@ -15,14 +17,17 @@ namespace Daybreak.Views;
 /// </summary>
 public partial class AccountsView : UserControl
 {
+    private readonly IViewManager viewManager;
     private readonly ICredentialManager credentialManager;
 
     public ObservableCollection<LoginCredentials> Accounts { get; } = new();
 
     public AccountsView(
+        IViewManager viewManager,
         ICredentialManager credentialManager)
     {
-        this.credentialManager = credentialManager.ThrowIfNull(nameof(credentialManager));
+        this.viewManager = viewManager.ThrowIfNull();
+        this.credentialManager = credentialManager.ThrowIfNull();
         this.InitializeComponent();
         this.GetCredentials();
     }
@@ -46,6 +51,7 @@ public partial class AccountsView : UserControl
     private async void SaveButton_Clicked(object sender, EventArgs e)
     {
         await this.credentialManager.StoreCredentials(this.Accounts.ToList()).ConfigureAwait(true);
+        this.viewManager.ShowView<LauncherView>();
     }
 
     private void AccountTemplate_RemoveClicked(object sender, EventArgs e)
