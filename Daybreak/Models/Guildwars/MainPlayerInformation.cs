@@ -2,7 +2,7 @@
 
 namespace Daybreak.Models.Guildwars;
 
-public sealed class MainPlayerInformation : PlayerInformation
+public sealed class MainPlayerInformation : WorldPlayerInformation
 {
     public string? Name { get; init; }
     public bool HardModeUnlocked { get; init; }

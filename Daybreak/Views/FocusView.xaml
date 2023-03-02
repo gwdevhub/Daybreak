@@ -79,7 +79,6 @@
                 </controls:VerticalResourceBar.OpacityMask>
             </controls:VerticalResourceBar>
             <StackPanel
-                Height="116"
                 VerticalAlignment="Center"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
@@ -111,7 +110,7 @@
                 </StackPanel.OpacityMask>
                 <controls:HorizontalResourceBar 
                     Margin="0, 2, 0, 2"
-                    Height="25"
+                    Height="{Binding ElementName=_this, Path=LeftSideBarSize, Mode=OneWay}"
                     CurrentResourceValue="{Binding ElementName=_this, Path=CurrentKurzick, Mode=OneWay}"
                     MaxResourceValue="{Binding ElementName=_this, Path=TotalKurzick, Mode=OneWay}"
                     VerticalAlignment="Bottom"
@@ -124,7 +123,7 @@
                     MouseLeftButtonDown="KurzickBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
                 <controls:HorizontalResourceBar 
                     Margin="0, 2, 0, 2"
-                    Height="25"
+                    Height="{Binding ElementName=_this, Path=LeftSideBarSize, Mode=OneWay}"
                     CurrentResourceValue="{Binding ElementName=_this, Path=CurrentLuxon, Mode=OneWay}"
                     MaxResourceValue="{Binding ElementName=_this, Path=TotalLuxon, Mode=OneWay}"
                     VerticalAlignment="Bottom"
@@ -137,7 +136,7 @@
                     MouseLeftButtonDown="LuxonBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
                 <controls:HorizontalResourceBar 
                     Margin="0, 2, 0, 2"
-                    Height="25"
+                    Height="{Binding ElementName=_this, Path=LeftSideBarSize, Mode=OneWay}"
                     CurrentResourceValue="{Binding ElementName=_this, Path=CurrentImperial, Mode=OneWay}"
                     MaxResourceValue="{Binding ElementName=_this, Path=TotalImperial, Mode=OneWay}"
                     VerticalAlignment="Bottom"
@@ -150,7 +149,7 @@
                     MouseLeftButtonDown="ImperialBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
                 <controls:HorizontalResourceBar
                     Margin="0, 2, 0, 2"
-                    Height="25"
+                    Height="{Binding ElementName=_this, Path=LeftSideBarSize, Mode=OneWay}"
                     CurrentResourceValue="{Binding ElementName=_this, Path=CurrentBalthazar, Mode=OneWay}"
                     MaxResourceValue="{Binding ElementName=_this, Path=TotalBalthazar, Mode=OneWay}"
                     VerticalAlignment="Bottom"
@@ -163,13 +162,11 @@
                     MouseLeftButtonDown="BalthazarBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
             </StackPanel>
             <StackPanel
-                Height="116"
                 VerticalAlignment="Center"
                 Grid.Column="3"
                 Grid.ColumnSpan="2"
                 Grid.Row="2"
-                Grid.RowSpan="2"
-                Visibility="{Binding ElementName=_this, Path=Vanquishing, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                Grid.RowSpan="2">
                 <StackPanel.OpacityMask>
                     <DrawingBrush>
                         <DrawingBrush.Drawing>
@@ -195,24 +192,48 @@
                     </DrawingBrush>
                 </StackPanel.OpacityMask>
                 <controls:HorizontalResourceBar 
-                    Margin="0, 3, 0, 3"
-                    Height="53"
+                    Margin="0, 2, 0, 2"
+                    Height="{Binding ElementName=_this, Path=RightSideBarSize, Mode=OneWay}"
                     CurrentResourceValue="{Binding ElementName=_this, Path=FoesKilled, Mode=OneWay}"
                     MaxResourceValue="{Binding ElementName=_this, Path=TotalFoes, Mode=OneWay}"
+                    VerticalAlignment="Bottom"
+                    HorizontalAlignment="Left"
+                    BarColor="#60DD2C00"
+                    Foreground="White"
+                    FontSize="14"
+                    Cursor="Hand"
+                    Text="{Binding ElementName=_this, Path=VanquishingText, Mode=OneWay}"
+                    FillAlignment="Right"
+                    Visibility="{Binding ElementName=_this, Path=Vanquishing, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                    MouseLeftButtonDown="VanquishingBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
+                <controls:HorizontalResourceBar 
+                    Margin="0, 2, 0, 2"
+                    Height="{Binding ElementName=_this, Path=RightSideBarSize, Mode=OneWay}"
+                    CurrentResourceValue="{Binding ElementName=_this, Path=GameData.MainPlayer.CurrentHealth, Mode=OneWay}"
+                    MaxResourceValue="{Binding ElementName=_this, Path=GameData.MainPlayer.MaxHealth, Mode=OneWay}"
                     VerticalAlignment="Bottom"
                     HorizontalAlignment="Left"
                     BarColor="#60D50000"
                     Foreground="White"
                     FontSize="14"
                     Cursor="Hand"
-                    Text="{Binding ElementName=_this, Path=VanquishingText, Mode=OneWay}"
+                    Text="{Binding ElementName=_this, Path=HealthBarText, Mode=OneWay}"
                     FillAlignment="Right"
-                    MouseLeftButtonDown="VanquishingBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
-                <!--The following rectangle is a placeholder so that masking will work properly. Will replace it later with something more useful-->
-                <Rectangle Height="53"
-                           Margin="0, 3, 0, 3"
-                           HorizontalAlignment="Stretch"
-                           Fill="Transparent"></Rectangle>
+                    MouseLeftButtonDown="HealthBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
+                <controls:HorizontalResourceBar 
+                    Margin="0, 2, 0, 2"
+                    Height="{Binding ElementName=_this, Path=RightSideBarSize, Mode=OneWay}"
+                    CurrentResourceValue="{Binding ElementName=_this, Path=GameData.MainPlayer.CurrentEnergy, Mode=OneWay}"
+                    MaxResourceValue="{Binding ElementName=_this, Path=GameData.MainPlayer.MaxEnergy, Mode=OneWay}"
+                    VerticalAlignment="Bottom"
+                    HorizontalAlignment="Left"
+                    BarColor="#6018FFFF"
+                    Foreground="White"
+                    FontSize="14"
+                    Cursor="Hand"
+                    Text="{Binding ElementName=_this, Path=EnergyBarText, Mode=OneWay}"
+                    FillAlignment="Right"
+                    MouseLeftButtonDown="EnergyBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
             </StackPanel>
         </Grid>
         <Grid

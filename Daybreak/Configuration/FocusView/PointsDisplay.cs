@@ -3,5 +3,6 @@
 public enum PointsDisplay
 {
     CurrentAndMax,
-    Remaining
+    Remaining,
+    Percentage
 }

@@ -8,6 +8,9 @@
              mc:Ignorable="d" 
              x:Name="_this"
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
+    </UserControl.Resources>
     <Grid Background="#F0212121">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"></RowDefinition>
@@ -30,5 +33,9 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
+        <controls:CircularLoadingWidget Grid.RowSpan="3"
+                                        Width="100"
+                                        Height="100"
+                                        Visibility="{Binding ElementName=_this, Path=Loading, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"></controls:CircularLoadingWidget>
     </Grid>
 </UserControl>

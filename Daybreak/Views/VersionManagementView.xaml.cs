@@ -25,6 +25,9 @@ public partial class VersionManagementView : UserControl
     [GenerateDependencyProperty]
     private Version currentVersion;
 
+    [GenerateDependencyProperty]
+    private bool loading;
+
     public ObservableCollection<Version> Versions { get; } = new();
 
     public VersionManagementView(
@@ -41,7 +44,9 @@ public partial class VersionManagementView : UserControl
 
     private async void LoadVersionList()
     {
+        this.Loading = true;
         this.Versions.ClearAnd().AddRange((await this.applicationUpdater.GetVersions()).Reverse());
+        this.Loading = false;
     }
 
     private void CurrentVersion_Clicked(object sender, EventArgs e)
