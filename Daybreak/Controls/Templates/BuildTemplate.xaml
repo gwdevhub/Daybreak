@@ -34,7 +34,7 @@
             </Grid.ColumnDefinitions>
             <TextBlock Text="Primary Profession: " FontSize="16" Foreground="White" Grid.Column="1"></TextBlock>
             <local:OpaqueButton Grid.Column="2"
-                                Text="{Binding ElementName=_this, Path=PrimaryProfession.Name, Mode=OneWay}"
+                                Text="{Binding ElementName=_this, Path=BuildEntry.Primary.Name, Mode=OneWay}"
                                 Foreground="White"
                                 Highlight="White"
                                 HighlightOpacity="0.4"
@@ -53,7 +53,7 @@
             </Grid.ColumnDefinitions>
             <TextBlock Text="Secondary Profession: " FontSize="16" Foreground="White" Grid.Column="1"></TextBlock>
             <local:OpaqueButton Grid.Column="2"
-                                Text="{Binding ElementName=_this, Path=SecondaryProfession.Name, Mode=OneWay}"
+                                Text="{Binding ElementName=_this, Path=BuildEntry.Secondary.Name, Mode=OneWay}"
                                 Foreground="White"
                                 Highlight="White"
                                 HighlightOpacity="0.4"
@@ -65,11 +65,13 @@
                               Clicked="HelpButtonSecondary_Clicked" Cursor="Hand"></local:HelpButton>
         </Grid>
         <Grid Grid.Row="3">
-            <ListBox Background="Transparent" ItemsSource="{Binding ElementName=_this, Path=Attributes, Mode=OneWay}"
+            <ListBox Background="Transparent" ItemsSource="{Binding ElementName=_this, Path=BuildEntry.Attributes, Mode=OneWay}"
                      HorizontalContentAlignment="Stretch" BorderThickness="0">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <local:AttributeTemplate HelpClicked="AttributeTemplate_HelpClicked" AttributeChanged="AttributeTemplate_AttributeChanged"></local:AttributeTemplate>
+                        <local:AttributeTemplate HelpClicked="AttributeTemplate_HelpClicked"
+                                                 AttributeChanged="AttributeTemplate_AttributeChanged"
+                                                 Loaded="AttributeTemplate_Loaded"></local:AttributeTemplate>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
@@ -91,60 +93,60 @@
             </Grid.RowDefinitions>
             <local:SkillTemplate Grid.Column="0" x:Name="SkillTemplate0"
                                  Foreground="White" Cursor="Hand"
-                                 FontSize="22" DataContext="{Binding ElementName=_this, Path=Skill0, Mode=TwoWay}"
+                                 FontSize="22" DataContext="{Binding ElementName=_this, Path=BuildEntry.FirstSkill, Mode=TwoWay}"
                                  VerticalAlignment="Stretch" Clicked="SkillTemplate_Clicked"
                                  RemoveClicked="SkillTemplate_RemoveClicked"></local:SkillTemplate>
             <local:SkillTemplate Grid.Column="1" x:Name="SkillTemplate1"
                                  Foreground="White" Cursor="Hand"
-                                 FontSize="22" DataContext="{Binding ElementName=_this, Path=Skill1, Mode=TwoWay}"
+                                 FontSize="22" DataContext="{Binding ElementName=_this, Path=BuildEntry.SecondSkill, Mode=TwoWay}"
                                  VerticalAlignment="Stretch" Clicked="SkillTemplate_Clicked"
                                  RemoveClicked="SkillTemplate_RemoveClicked"></local:SkillTemplate>
             <local:SkillTemplate Grid.Column="2" x:Name="SkillTemplate2"
                                  Foreground="White" Cursor="Hand"
-                                 FontSize="22" DataContext="{Binding ElementName=_this, Path=Skill2, Mode=TwoWay}"
+                                 FontSize="22" DataContext="{Binding ElementName=_this, Path=BuildEntry.ThirdSkill, Mode=TwoWay}"
                                  VerticalAlignment="Stretch" Clicked="SkillTemplate_Clicked"
                                  RemoveClicked="SkillTemplate_RemoveClicked"></local:SkillTemplate>
             <local:SkillTemplate Grid.Column="3" x:Name="SkillTemplate3"
                                  Foreground="White" Cursor="Hand"
-                                 FontSize="22" DataContext="{Binding ElementName=_this, Path=Skill3, Mode=TwoWay}"
+                                 FontSize="22" DataContext="{Binding ElementName=_this, Path=BuildEntry.FourthSkill, Mode=TwoWay}"
                                  VerticalAlignment="Stretch" Clicked="SkillTemplate_Clicked"
                                  RemoveClicked="SkillTemplate_RemoveClicked"></local:SkillTemplate>
             <local:SkillTemplate Grid.Column="4" x:Name="SkillTemplate4"
                                  Foreground="White" Cursor="Hand"
-                                 FontSize="22" DataContext="{Binding ElementName=_this, Path=Skill4, Mode=TwoWay}"
+                                 FontSize="22" DataContext="{Binding ElementName=_this, Path=BuildEntry.FifthSkill, Mode=TwoWay}"
                                  VerticalAlignment="Stretch" Clicked="SkillTemplate_Clicked"
                                  RemoveClicked="SkillTemplate_RemoveClicked"></local:SkillTemplate>
             <local:SkillTemplate Grid.Column="5" x:Name="SkillTemplate5"
                                  Foreground="White" Cursor="Hand"
-                                 FontSize="22" DataContext="{Binding ElementName=_this, Path=Skill5, Mode=TwoWay}"
+                                 FontSize="22" DataContext="{Binding ElementName=_this, Path=BuildEntry.SixthSkill, Mode=TwoWay}"
                                  VerticalAlignment="Stretch" Clicked="SkillTemplate_Clicked"
                                  RemoveClicked="SkillTemplate_RemoveClicked"></local:SkillTemplate>
             <local:SkillTemplate Grid.Column="6" x:Name="SkillTemplate6"
                                  Foreground="White" Cursor="Hand"
-                                 FontSize="22" DataContext="{Binding ElementName=_this, Path=Skill6, Mode=TwoWay}"
+                                 FontSize="22" DataContext="{Binding ElementName=_this, Path=BuildEntry.SeventhSkill, Mode=TwoWay}"
                                  VerticalAlignment="Stretch" Clicked="SkillTemplate_Clicked"
                                  RemoveClicked="SkillTemplate_RemoveClicked"></local:SkillTemplate>
             <local:SkillTemplate Grid.Column="7" x:Name="SkillTemplate7"
                                  Foreground="White" Cursor="Hand"
-                                 FontSize="22" DataContext="{Binding ElementName=_this, Path=Skill7, Mode=TwoWay}"
+                                 FontSize="22" DataContext="{Binding ElementName=_this, Path=BuildEntry.EigthSkill, Mode=TwoWay}"
                                  VerticalAlignment="Stretch" Clicked="SkillTemplate_Clicked"
                                  RemoveClicked="SkillTemplate_RemoveClicked"></local:SkillTemplate>
             <TextBlock Grid.Column="0" Grid.Row="1" TextWrapping="Wrap" FontSize="16"
-                       Foreground="White" Text="{Binding ElementName=_this, Path=Skill0.Name, Mode=OneWay}"></TextBlock>
+                       Foreground="White" Text="{Binding ElementName=_this, Path=BuildEntry.FirstSkill.Name, Mode=OneWay}"></TextBlock>
             <TextBlock Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" FontSize="16"
-                       Foreground="White" Text="{Binding ElementName=_this, Path=Skill1.Name, Mode=OneWay}"></TextBlock>
+                       Foreground="White" Text="{Binding ElementName=_this, Path=BuildEntry.SecondSkill.Name, Mode=OneWay}"></TextBlock>
             <TextBlock Grid.Column="2" Grid.Row="1" TextWrapping="Wrap" FontSize="16"
-                       Foreground="White" Text="{Binding ElementName=_this, Path=Skill2.Name, Mode=OneWay}"></TextBlock>
+                       Foreground="White" Text="{Binding ElementName=_this, Path=BuildEntry.ThirdSkill.Name, Mode=OneWay}"></TextBlock>
             <TextBlock Grid.Column="3" Grid.Row="1" TextWrapping="Wrap" FontSize="16"
-                       Foreground="White" Text="{Binding ElementName=_this, Path=Skill3.Name, Mode=OneWay}"></TextBlock>
+                       Foreground="White" Text="{Binding ElementName=_this, Path=BuildEntry.FourthSkill.Name, Mode=OneWay}"></TextBlock>
             <TextBlock Grid.Column="4" Grid.Row="1" TextWrapping="Wrap" FontSize="16"
-                       Foreground="White" Text="{Binding ElementName=_this, Path=Skill4.Name, Mode=OneWay}"></TextBlock>
+                       Foreground="White" Text="{Binding ElementName=_this, Path=BuildEntry.FifthSkill.Name, Mode=OneWay}"></TextBlock>
             <TextBlock Grid.Column="5" Grid.Row="1" TextWrapping="Wrap" FontSize="16"
-                       Foreground="White" Text="{Binding ElementName=_this, Path=Skill5.Name, Mode=OneWay}"></TextBlock>
+                       Foreground="White" Text="{Binding ElementName=_this, Path=BuildEntry.SixthSkill.Name, Mode=OneWay}"></TextBlock>
             <TextBlock Grid.Column="6" Grid.Row="1" TextWrapping="Wrap" FontSize="16"
-                       Foreground="White" Text="{Binding ElementName=_this, Path=Skill6.Name, Mode=OneWay}"></TextBlock>
+                       Foreground="White" Text="{Binding ElementName=_this, Path=BuildEntry.SeventhSkill.Name, Mode=OneWay}"></TextBlock>
             <TextBlock Grid.Column="7" Grid.Row="1" TextWrapping="Wrap" FontSize="16"
-                       Foreground="White" Text="{Binding ElementName=_this, Path=Skill7.Name, Mode=OneWay}"></TextBlock>
+                       Foreground="White" Text="{Binding ElementName=_this, Path=BuildEntry.EigthSkill.Name, Mode=OneWay}"></TextBlock>
         </Grid>
         <Grid Grid.Column="1" Grid.RowSpan="6">
             <local:ChromiumBrowserWrapper x:Name="SkillBrowser" ControlsEnabled="False" Width="0" AddressBarReadonly="True" CanNavigate="True"></local:ChromiumBrowserWrapper>

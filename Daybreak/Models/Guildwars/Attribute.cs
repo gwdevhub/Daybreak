@@ -6,48 +6,48 @@ namespace Daybreak.Models.Guildwars;
 
 public sealed class Attribute
 {
-    public static Attribute FastCasting { get; } = new() { Name = "Fast Casting", Id = 0 };
-    public static Attribute IllusionMagic { get; } = new() { Name = "Illusion Magic", Id = 1 };
-    public static Attribute DominationMagic { get; } = new() { Name = "Domination Magic", Id = 2 };
-    public static Attribute InspirationMagic { get; } = new() { Name = "Inspiration Magic", Id = 3 };
-    public static Attribute BloodMagic { get; } = new() { Name = "Blood Magic", Id = 4 };
-    public static Attribute DeathMagic { get; } = new() { Name = "Death Magic", Id = 5 };
-    public static Attribute SoulReaping { get; } = new() { Name = "Soul Reaping", Id = 6 };
-    public static Attribute Curses { get; } = new() { Name = "Curses", Id = 7 };
-    public static Attribute AirMagic { get; } = new() { Name = "Air Magic", Id = 8 };
-    public static Attribute EarthMagic { get; } = new() { Name = "Earth Magic", Id = 9 };
-    public static Attribute FireMagic { get; } = new() { Name = "Fire Magic", Id = 10 };
-    public static Attribute WaterMagic { get; } = new() { Name = "Water Magic", Id = 11 };
-    public static Attribute EnergyStorage { get; } = new() { Name = "Energy Storage", Id = 12 };
-    public static Attribute HealingPrayers { get; } = new() { Name = "Healing Prayers", Id = 13 };
-    public static Attribute SmitingPrayers { get; } = new() { Name = "Smiting Prayers", Id = 14 };
-    public static Attribute ProtectionPrayers { get; } = new() { Name = "Protection Prayers", Id = 15 };
-    public static Attribute DivineFavor { get; } = new() { Name = "Divine Favor", Id = 16 };
-    public static Attribute Strength { get; } = new() { Name = "Strength", Id = 17 };
-    public static Attribute AxeMastery { get; } = new() { Name = "Axe Mastery", Id = 18 };
-    public static Attribute HammerMastery { get; } = new() { Name = "Hammer Mastery", Id = 19 };
-    public static Attribute Swordsmanship { get; } = new() { Name = "Swordsmanship", Id = 20};
-    public static Attribute Tactics { get; } = new() { Name = "Tactics", Id = 21 };
-    public static Attribute BeastMastery { get; } = new() { Name = "Beast Mastery", Id = 22 };
-    public static Attribute Expertise { get; } = new() { Name = "Expertise", Id = 23 };
-    public static Attribute WildernessSurvival { get; } = new() { Name = "Wilderness Survival", Id = 24 };
-    public static Attribute Marksmanship { get; } = new() { Name = "Marksmanship", Id = 25 };
-    public static Attribute DaggerMastery { get; } = new() { Name = "Dagger Mastery", Id = 29 };
-    public static Attribute DeadlyArts { get; } = new() { Name = "Deadly Arts", Id = 30 };
-    public static Attribute ShadowArts { get; } = new() { Name = "Shadow Arts", Id = 31 };
-    public static Attribute Communing { get; } = new() { Name = "Communing", Id = 32 };
-    public static Attribute RestorationMagic { get; } = new() { Name = "Restoration Magic", Id = 33 };
-    public static Attribute ChannelingMagic { get; } = new() { Name = "Channeling Magic", Id = 34 };
-    public static Attribute CriticalStrikes { get; } = new() { Name = "Critical Strikes", Id = 35 };
-    public static Attribute SpawningPower { get; } = new() { Name = "Spawning Power", Id = 36 };
-    public static Attribute SpearMastery { get; } = new() { Name = "Spear Mastery", Id = 37 };
-    public static Attribute Command { get; } = new() { Name = "Command", Id = 38 };
-    public static Attribute Motivation { get; } = new() { Name = "Motivation", Id = 39 };
-    public static Attribute Leadership { get; } = new() { Name = "Leadership", Id = 40 };
-    public static Attribute ScytheMastery { get; } = new() { Name = "Scythe Mastery", Id = 41 };
-    public static Attribute WindPrayers { get; } = new() { Name = "Wind Prayers", Id = 42 };
-    public static Attribute EarthPrayers { get; } = new() { Name = "Earth Prayers", Id = 43 };
-    public static Attribute Mysticism { get; } = new() { Name = "Mysticism", Id = 44 };
+    public static Attribute FastCasting { get; } = new() { Name = "Fast Casting", Id = 0, Profession = Profession.Mesmer };
+    public static Attribute IllusionMagic { get; } = new() { Name = "Illusion Magic", Id = 1, Profession = Profession.Mesmer };
+    public static Attribute DominationMagic { get; } = new() { Name = "Domination Magic", Id = 2, Profession = Profession.Mesmer };
+    public static Attribute InspirationMagic { get; } = new() { Name = "Inspiration Magic", Id = 3, Profession = Profession.Mesmer };
+    public static Attribute BloodMagic { get; } = new() { Name = "Blood Magic", Id = 4, Profession = Profession.Necromancer };
+    public static Attribute DeathMagic { get; } = new() { Name = "Death Magic", Id = 5, Profession = Profession.Necromancer };
+    public static Attribute SoulReaping { get; } = new() { Name = "Soul Reaping", Id = 6, Profession = Profession.Necromancer };
+    public static Attribute Curses { get; } = new() { Name = "Curses", Id = 7, Profession = Profession.Necromancer };
+    public static Attribute AirMagic { get; } = new() { Name = "Air Magic", Id = 8, Profession = Profession.Elementalist };
+    public static Attribute EarthMagic { get; } = new() { Name = "Earth Magic", Id = 9, Profession = Profession.Elementalist };
+    public static Attribute FireMagic { get; } = new() { Name = "Fire Magic", Id = 10, Profession = Profession.Elementalist };
+    public static Attribute WaterMagic { get; } = new() { Name = "Water Magic", Id = 11, Profession = Profession.Elementalist };
+    public static Attribute EnergyStorage { get; } = new() { Name = "Energy Storage", Id = 12, Profession = Profession.Elementalist };
+    public static Attribute HealingPrayers { get; } = new() { Name = "Healing Prayers", Id = 13, Profession = Profession.Monk };
+    public static Attribute SmitingPrayers { get; } = new() { Name = "Smiting Prayers", Id = 14, Profession = Profession.Monk };
+    public static Attribute ProtectionPrayers { get; } = new() { Name = "Protection Prayers", Id = 15, Profession = Profession.Monk };
+    public static Attribute DivineFavor { get; } = new() { Name = "Divine Favor", Id = 16, Profession = Profession.Monk };
+    public static Attribute Strength { get; } = new() { Name = "Strength", Id = 17, Profession = Profession.Warrior };
+    public static Attribute AxeMastery { get; } = new() { Name = "Axe Mastery", Id = 18, Profession = Profession.Warrior };
+    public static Attribute HammerMastery { get; } = new() { Name = "Hammer Mastery", Id = 19, Profession = Profession.Warrior };
+    public static Attribute Swordsmanship { get; } = new() { Name = "Swordsmanship", Id = 20, Profession = Profession.Warrior };
+    public static Attribute Tactics { get; } = new() { Name = "Tactics", Id = 21, Profession = Profession.Warrior };
+    public static Attribute BeastMastery { get; } = new() { Name = "Beast Mastery", Id = 22, Profession = Profession.Ranger };
+    public static Attribute Expertise { get; } = new() { Name = "Expertise", Id = 23, Profession = Profession.Ranger };
+    public static Attribute WildernessSurvival { get; } = new() { Name = "Wilderness Survival", Id = 24, Profession = Profession.Ranger };
+    public static Attribute Marksmanship { get; } = new() { Name = "Marksmanship", Id = 25, Profession = Profession.Ranger };
+    public static Attribute DaggerMastery { get; } = new() { Name = "Dagger Mastery", Id = 29, Profession = Profession.Assassin };
+    public static Attribute DeadlyArts { get; } = new() { Name = "Deadly Arts", Id = 30, Profession = Profession.Assassin };
+    public static Attribute ShadowArts { get; } = new() { Name = "Shadow Arts", Id = 31, Profession = Profession.Assassin };
+    public static Attribute Communing { get; } = new() { Name = "Communing", Id = 32, Profession = Profession.Ritualist };
+    public static Attribute RestorationMagic { get; } = new() { Name = "Restoration Magic", Id = 33, Profession = Profession.Ritualist };
+    public static Attribute ChannelingMagic { get; } = new() { Name = "Channeling Magic", Id = 34, Profession = Profession.Ritualist };
+    public static Attribute CriticalStrikes { get; } = new() { Name = "Critical Strikes", Id = 35, Profession = Profession.Assassin };
+    public static Attribute SpawningPower { get; } = new() { Name = "Spawning Power", Id = 36, Profession = Profession.Ritualist };
+    public static Attribute SpearMastery { get; } = new() { Name = "Spear Mastery", Id = 37, Profession = Profession.Paragon };
+    public static Attribute Command { get; } = new() { Name = "Command", Id = 38, Profession = Profession.Paragon };
+    public static Attribute Motivation { get; } = new() { Name = "Motivation", Id = 39, Profession = Profession.Paragon };
+    public static Attribute Leadership { get; } = new() { Name = "Leadership", Id = 40, Profession = Profession.Paragon };
+    public static Attribute ScytheMastery { get; } = new() { Name = "Scythe Mastery", Id = 41, Profession = Profession.Dervish };
+    public static Attribute WindPrayers { get; } = new() { Name = "Wind Prayers", Id = 42, Profession = Profession.Dervish };
+    public static Attribute EarthPrayers { get; } = new() { Name = "Earth Prayers", Id = 43, Profession = Profession.Dervish };
+    public static Attribute Mysticism { get; } = new() { Name = "Mysticism", Id = 44, Profession = Profession.Dervish };
     public static IEnumerable<Attribute> Attributes { get; } = new List<Attribute>
     {
         FastCasting,
@@ -136,6 +136,7 @@ public sealed class Attribute
 
     public int Id { get; private set; }
     public string? Name { get; private set; }
+    public Profession? Profession { get; private set; }
     private Attribute()
     {
     }

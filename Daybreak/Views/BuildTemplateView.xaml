@@ -40,10 +40,15 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="auto"></ColumnDefinition>
+                <ColumnDefinition Width="auto"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <TextBlock Text="Code: " Foreground="White" Background="Transparent" FontSize="16"></TextBlock>
             <TextBox Grid.Column="1" Foreground="White" Background="Transparent" FontSize="16"
                      Text="{Binding ElementName=_this, Path=CurrentBuildCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+            <TextBlock Grid.Column="2" Text="Points: " Foreground="White" Background="Transparent" FontSize="16" Margin="10, 0, 0, 0"></TextBlock>
+            <TextBox Grid.Column="3" Foreground="White" Background="Transparent" FontSize="16"
+                     Text="{Binding ElementName=_this, Path=AttributePoints, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
         </Grid>
         <controls:BuildTemplate x:Name="BuildTemplate" Grid.Row="2" DataContext="{Binding ElementName=_this, Path=CurrentBuild, Mode=OneWay}"
                                 BuildChanged="BuildTemplate_BuildChanged">

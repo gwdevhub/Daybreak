@@ -8,6 +8,7 @@ using Daybreak.Services.Navigation;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Configuration;
+using System.Core.Extensions;
 using System.Extensions;
 using System.Linq;
 using System.Windows;
@@ -23,10 +24,9 @@ public partial class BuildTemplateView : UserControl
 {
     private const string DisallowedChars = "\r\n/.";
 
-    private bool supressDecode = false;
-
     private readonly IViewManager viewManager;
     private readonly IBuildTemplateManager buildTemplateManager;
+    private readonly IAttributePointCalculator attributePointCalculator;
     private readonly ILogger<BuildTemplateView> logger;
 
     [GenerateDependencyProperty(InitialValue = false)]
@@ -35,28 +35,33 @@ public partial class BuildTemplateView : UserControl
     private BuildEntry currentBuild = default!;
     [GenerateDependencyProperty]
     private string currentBuildCode = string.Empty;
+    [GenerateDependencyProperty]
+    private int attributePoints;
 
     public BuildTemplateView(
         IViewManager viewManager,
         IBuildTemplateManager buildTemplateManager,
         IIconCache iconRetriever,
         IIconBrowser iconBrowser,
+        IAttributePointCalculator attributePointCalculator,
         ILiveOptions<ApplicationConfiguration> liveOptions,
         ILogger<ChromiumBrowserWrapper> chromiumLogger,
         ILogger<BuildTemplateView> logger)
     {
-        this.buildTemplateManager = buildTemplateManager.ThrowIfNull(nameof(buildTemplateManager));
-        this.logger = logger.ThrowIfNull(nameof(logger));
-        this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
+        this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
+        this.logger = logger.ThrowIfNull();
+        this.viewManager = viewManager.ThrowIfNull();
+        this.attributePointCalculator = attributePointCalculator.ThrowIfNull();
         this.InitializeComponent();
-        this.BuildTemplate.InitializeTemplate(iconRetriever, iconBrowser, liveOptions, buildTemplateManager, chromiumLogger);
+        this.BuildTemplate.InitializeTemplate(attributePointCalculator, iconRetriever, iconBrowser, liveOptions, buildTemplateManager, chromiumLogger);
         this.DataContextChanged += (sender, contextArgs) =>
         {
-            if (contextArgs.NewValue is BuildEntry)
+            if (contextArgs.NewValue is BuildEntry buildEntry)
             {
                 this.logger.LogInformation("Received data context. Setting current build");
-                this.CurrentBuild = contextArgs.NewValue.As<BuildEntry>();
+                this.CurrentBuild = buildEntry;
                 this.CurrentBuildCode = this.buildTemplateManager.EncodeTemplate(this.CurrentBuild.Build!);
+                this.AttributePoints = this.attributePointCalculator.GetRemainingFreePoints(this.CurrentBuild.Build!);
             }
         };
     }
@@ -64,7 +69,7 @@ public partial class BuildTemplateView : UserControl
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);
-        if (e.Property == CurrentBuildCodeProperty && this.supressDecode is false)
+        if (e.Property == CurrentBuildCodeProperty)
         {
             this.logger.LogInformation($"Attempting to decode provided template {this.CurrentBuildCode}");
             try
@@ -88,6 +93,8 @@ public partial class BuildTemplateView : UserControl
                     Build = new Build()
                 };
             }
+
+            this.AttributePoints = this.attributePointCalculator.GetRemainingFreePoints(this.CurrentBuild.Build!);
         }
     }
 
@@ -95,12 +102,11 @@ public partial class BuildTemplateView : UserControl
     {
         try
         {
-            this.supressDecode = true;
             this.CurrentBuildCode = this.buildTemplateManager.EncodeTemplate(this.CurrentBuild.Build!);
+            this.AttributePoints = this.attributePointCalculator.GetRemainingFreePoints(this.CurrentBuild.Build!);
         }
         finally
         {
-            this.supressDecode = false;
         }
     }
     private void BackButton_Clicked(object sender, EventArgs e)

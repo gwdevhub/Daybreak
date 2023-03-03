@@ -1,5 +1,7 @@
 ﻿using Daybreak.Models.Builds;
+using Daybreak.Services.BuildTemplates;
 using System;
+using System.Core.Extensions;
 using System.Extensions;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,7 +18,9 @@ public partial class AttributeTemplate : UserControl
 {
     public event EventHandler<AttributeEntry>? HelpClicked;
     public event EventHandler<AttributeEntry>? AttributeChanged;
-    
+
+    private IAttributePointCalculator? attributePointCalculator;
+
     [GenerateDependencyProperty(InitialValue = false)]
     private bool canAdd;
     [GenerateDependencyProperty(InitialValue = false)]
@@ -26,6 +30,23 @@ public partial class AttributeTemplate : UserControl
     {
         this.InitializeComponent();
         this.DataContextChanged += this.AttributeTemplate_DataContextChanged;
+    }
+    
+    public void InitializeAttributeTemplate(
+        int attributePoints,
+        IAttributePointCalculator attributePointCalculator)
+    {
+        this.attributePointCalculator = attributePointCalculator.ThrowIfNull();
+        var remainingPoints = attributePoints;
+        var requiredPointsForNextLevel = this.attributePointCalculator?.GetPointsRequiredToIncreaseRank(this.DataContext.As<AttributeEntry>().Points) ?? 0;
+        if (remainingPoints < requiredPointsForNextLevel)
+        {
+            this.CanAdd = false;
+        }
+        else if (this.DataContext.As<AttributeEntry>().Points < 12)
+        {
+            this.CanAdd = true;
+        }
     }
 
     private void AttributeTemplate_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)

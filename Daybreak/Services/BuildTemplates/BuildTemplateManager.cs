@@ -190,15 +190,31 @@ public sealed class BuildTemplateManager : IBuildTemplateManager
         }
 
         build.Secondary = secondaryProfession;
+        /*
+         * Prepopulate the attributes first and then populate the attribute points based on ids.
+         */
+
+        if (primaryProfession != Profession.None)
+        {
+            build.Attributes.Add(new AttributeEntry { Attribute = primaryProfession.PrimaryAttribute });
+            build.Attributes.AddRange(primaryProfession.Attributes!.Select(a => new AttributeEntry { Attribute = a }));
+        }
+        
+        if (secondaryProfession != Profession.None)
+        {
+            build.Attributes.AddRange(secondaryProfession.Attributes!.Select(a => new AttributeEntry { Attribute = a }));
+        }
+
         for(int i = 0; i < buildMetadata.AttributeCount; i++)
         {
-            if (Daybreak.Models.Guildwars.Attribute.TryParse(buildMetadata.AttributesIds[i], out var attribute) is false)
+            var attributeId = buildMetadata.AttributesIds[i];
+            var maybeAttribute = build.Attributes.FirstOrDefault(a => a.Attribute!.Id == attributeId);
+            if (maybeAttribute is null)
             {
-                this.logger.LogError($"Failed to parse attribute with id {buildMetadata.AttributesIds[i]}");
-                return new InvalidOperationException($"Failed to parse template");
+                this.logger.LogError($"Failed to parse attribute with id {attributeId} for professions {primaryProfession.Name}/{secondaryProfession.Name}");
             }
 
-            build.Attributes.Add(new AttributeEntry { Attribute = attribute, Points = buildMetadata.AttributePoints[i] });
+            maybeAttribute!.Points = buildMetadata.AttributePoints[i];
         }
 
         for(int i = 0; i < 8; i++)
