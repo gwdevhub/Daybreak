@@ -158,42 +158,58 @@ public sealed class BuildEntry : INotifyPropertyChanged
 
     private void UpdateSkills()
     {
-        if (this.FirstSkill.Profession != this.Primary && this.FirstSkill.Profession != this.Secondary)
+        if (this.FirstSkill.Profession != Profession.None &&
+            this.FirstSkill.Profession != this.Primary &&
+            this.FirstSkill.Profession != this.Secondary)
         {
             this.FirstSkill = Skill.NoSkill;
         }
 
-        if (this.SecondSkill.Profession != this.Primary && this.SecondSkill.Profession != this.Secondary)
+        if (this.SecondSkill.Profession != Profession.None &&
+            this.SecondSkill.Profession != this.Primary &&
+            this.SecondSkill.Profession != this.Secondary)
         {
             this.SecondSkill = Skill.NoSkill;
         }
 
-        if (this.ThirdSkill.Profession != this.Primary && this.ThirdSkill.Profession != this.Secondary)
+        if (this.ThirdSkill.Profession != Profession.None &&
+            this.ThirdSkill.Profession != this.Primary &&
+            this.ThirdSkill.Profession != this.Secondary)
         {
             this.ThirdSkill = Skill.NoSkill;
         }
 
-        if (this.FourthSkill.Profession != this.Primary && this.FourthSkill.Profession != this.Secondary)
+        if (this.FourthSkill.Profession != Profession.None &&
+            this.FourthSkill.Profession != this.Primary &&
+            this.FourthSkill.Profession != this.Secondary)
         {
             this.FourthSkill = Skill.NoSkill;
         }
 
-        if (this.FifthSkill.Profession != this.Primary && this.FifthSkill.Profession != this.Secondary)
+        if (this.FifthSkill.Profession != Profession.None &&
+            this.FifthSkill.Profession != this.Primary &&
+            this.FifthSkill.Profession != this.Secondary)
         {
             this.FifthSkill = Skill.NoSkill;
         }
 
-        if (this.SixthSkill.Profession != this.Primary && this.SixthSkill.Profession != this.Secondary)
+        if (this.SixthSkill.Profession != Profession.None &&
+            this.SixthSkill.Profession != this.Primary &&
+            this.SixthSkill.Profession != this.Secondary)
         {
             this.SixthSkill = Skill.NoSkill;
         }
 
-        if (this.SeventhSkill.Profession != this.Primary && this.SeventhSkill.Profession != this.Secondary)
+        if (this.SeventhSkill.Profession != Profession.None &&
+            this.SeventhSkill.Profession != this.Primary &&
+            this.SeventhSkill.Profession != this.Secondary)
         {
             this.SeventhSkill = Skill.NoSkill;
         }
 
-        if (this.EigthSkill.Profession != this.Primary && this.EigthSkill.Profession != this.Secondary)
+        if (this.EigthSkill.Profession != Profession.None &&
+            this.EigthSkill.Profession != this.Primary &&
+            this.EigthSkill.Profession != this.Secondary)
         {
             this.EigthSkill = Skill.NoSkill;
         }

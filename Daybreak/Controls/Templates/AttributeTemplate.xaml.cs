@@ -37,10 +37,11 @@ public partial class AttributeTemplate : UserControl
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);
-        if (e.Property == AttributePointsProperty)
+        if (e.Property == AttributePointsProperty &&
+            this.DataContext is AttributeEntry attributeEntry)
         {
             var remainingPoints = this.AttributePoints;
-            var requiredPointsForNextLevel = this.attributePointCalculator?.GetPointsRequiredToIncreaseRank(this.DataContext.As<AttributeEntry>().Points) ?? 0;
+            var requiredPointsForNextLevel = this.attributePointCalculator?.GetPointsRequiredToIncreaseRank(attributeEntry.Points) ?? 0;
             if (remainingPoints < requiredPointsForNextLevel)
             {
                 this.CanAdd = false;
