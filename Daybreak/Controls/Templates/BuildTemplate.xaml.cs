@@ -436,6 +436,6 @@ public partial class BuildTemplate : UserControl
 
     private void AttributeTemplate_Loaded(object sender, RoutedEventArgs e)
     {
-        sender.As<AttributeTemplate>().InitializeAttributeTemplate(this.AttributePoints, this.attributePointCalculator!);
+        sender.As<AttributeTemplate>().InitializeAttributeTemplate(this.attributePointCalculator!);
     }
 }

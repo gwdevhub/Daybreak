@@ -25,28 +25,37 @@ public partial class AttributeTemplate : UserControl
     private bool canAdd;
     [GenerateDependencyProperty(InitialValue = false)]
     private bool canSubtract;
+    [GenerateDependencyProperty]
+    private int attributePoints;
 
     public AttributeTemplate()
     {
         this.InitializeComponent();
         this.DataContextChanged += this.AttributeTemplate_DataContextChanged;
     }
-    
+
+    protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+        if (e.Property == AttributePointsProperty)
+        {
+            var remainingPoints = this.AttributePoints;
+            var requiredPointsForNextLevel = this.attributePointCalculator?.GetPointsRequiredToIncreaseRank(this.DataContext.As<AttributeEntry>().Points) ?? 0;
+            if (remainingPoints < requiredPointsForNextLevel)
+            {
+                this.CanAdd = false;
+            }
+            else if (this.DataContext.As<AttributeEntry>().Points < 12)
+            {
+                this.CanAdd = true;
+            }
+        }
+    }
+
     public void InitializeAttributeTemplate(
-        int attributePoints,
         IAttributePointCalculator attributePointCalculator)
     {
         this.attributePointCalculator = attributePointCalculator.ThrowIfNull();
-        var remainingPoints = attributePoints;
-        var requiredPointsForNextLevel = this.attributePointCalculator?.GetPointsRequiredToIncreaseRank(this.DataContext.As<AttributeEntry>().Points) ?? 0;
-        if (remainingPoints < requiredPointsForNextLevel)
-        {
-            this.CanAdd = false;
-        }
-        else if (this.DataContext.As<AttributeEntry>().Points < 12)
-        {
-            this.CanAdd = true;
-        }
     }
 
     private void AttributeTemplate_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)

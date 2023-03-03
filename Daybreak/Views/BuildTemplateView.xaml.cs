@@ -29,6 +29,8 @@ public partial class BuildTemplateView : UserControl
     private readonly IAttributePointCalculator attributePointCalculator;
     private readonly ILogger<BuildTemplateView> logger;
 
+    private bool preventDecode = false;
+
     [GenerateDependencyProperty(InitialValue = false)]
     private bool saveButtonEnabled;
     [GenerateDependencyProperty]
@@ -69,7 +71,8 @@ public partial class BuildTemplateView : UserControl
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);
-        if (e.Property == CurrentBuildCodeProperty)
+        if (e.Property == CurrentBuildCodeProperty &&
+            this.preventDecode is false)
         {
             this.logger.LogInformation($"Attempting to decode provided template {this.CurrentBuildCode}");
             try
@@ -102,7 +105,9 @@ public partial class BuildTemplateView : UserControl
     {
         try
         {
+            this.preventDecode = true;
             this.CurrentBuildCode = this.buildTemplateManager.EncodeTemplate(this.CurrentBuild.Build!);
+            this.preventDecode = false;
             this.AttributePoints = this.attributePointCalculator.GetRemainingFreePoints(this.CurrentBuild.Build!);
         }
         finally

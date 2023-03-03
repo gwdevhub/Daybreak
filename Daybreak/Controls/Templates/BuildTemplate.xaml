@@ -71,7 +71,8 @@
                     <DataTemplate>
                         <local:AttributeTemplate HelpClicked="AttributeTemplate_HelpClicked"
                                                  AttributeChanged="AttributeTemplate_AttributeChanged"
-                                                 Loaded="AttributeTemplate_Loaded"></local:AttributeTemplate>
+                                                 Loaded="AttributeTemplate_Loaded"
+                                                 AttributePoints="{Binding Path=AttributePoints, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"></local:AttributeTemplate>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
