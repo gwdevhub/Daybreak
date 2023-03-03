@@ -115,6 +115,7 @@ public static class ProjectConfiguration
         services.AddScoped<IGuildwarsMemoryReader, GuildwarsMemoryReader>();
         services.AddScoped<IMemoryScanner, MemoryScanner>();
         services.AddScoped<IExperienceCalculator, ExperienceCalculator>();
+        services.AddScoped<IAttributePointCalculator, AttributePointCalculator>();
     }
 
     public static void RegisterViews(IViewProducer viewProducer)

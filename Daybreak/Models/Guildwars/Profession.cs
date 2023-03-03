@@ -6,7 +6,7 @@ namespace Daybreak.Models.Guildwars;
 
 public sealed class Profession
 {
-    public static Profession None { get; } = new() { Name = "None", Id = 0, };
+    public static Profession None { get; } = new() { Name = "None", Id = 0 };
     public static Profession Warrior { get; } = new() { Name = "Warrior", Id = 1, PrimaryAttribute = Attribute.Strength, Attributes = new List<Attribute> { Attribute.AxeMastery, Attribute.HammerMastery, Attribute.Swordsmanship, Attribute.Tactics } };
     public static Profession Ranger { get; } = new() { Name = "Ranger", Id = 2, PrimaryAttribute = Attribute.Expertise, Attributes = new List<Attribute> { Attribute.BeastMastery, Attribute.Marksmanship, Attribute.WildernessSurvival } };
     public static Profession Monk { get; } = new() { Name = "Monk", Id = 3, PrimaryAttribute = Attribute.DivineFavor, Attributes = new List<Attribute> { Attribute.HealingPrayers, Attribute.SmitingPrayers, Attribute.ProtectionPrayers } };
@@ -73,7 +73,7 @@ public sealed class Profession
     public string? Name { get; private set; }
     public int Id { get; set; }
     public Attribute? PrimaryAttribute { get; private set; }
-    public List<Attribute>? Attributes { get; private set; }
+    public List<Attribute> Attributes { get; private set; } = new List<Attribute>();
     private Profession()
     {
     }

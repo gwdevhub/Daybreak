@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
@@ -33,10 +34,8 @@ public partial class BuildTemplate : UserControl
     private bool showingSkillList = false;
     private bool replacingSecondaryProfession;
     private bool replacingPrimaryProfession;
-    private bool suppressBuildChanged = false;
-    private bool loadedProperties = false;
     private IIconBrowser? iconBrowser;
-    private BuildEntry? loadedBuild;
+    private IAttributePointCalculator? attributePointCalculator;
     private SkillTemplate? selectingSkillTemplate;
     private List<Skill>? skillListCache;
     private CancellationTokenSource? cancellationTokenSource = new();
@@ -46,25 +45,10 @@ public partial class BuildTemplate : UserControl
     [GenerateDependencyProperty]
     private string skillSearchText = string.Empty;
     [GenerateDependencyProperty]
-    private Profession primaryProfession = default!;
+    private BuildEntry buildEntry;
     [GenerateDependencyProperty]
-    private Profession secondaryProfession = default!;
-    [GenerateDependencyProperty]
-    private Skill skill0 = default!;
-    [GenerateDependencyProperty]
-    private Skill skill1 = default!;
-    [GenerateDependencyProperty]
-    private Skill skill2 = default!;
-    [GenerateDependencyProperty]
-    private Skill skill3 = default!;
-    [GenerateDependencyProperty]
-    private Skill skill4 = default!;
-    [GenerateDependencyProperty]
-    private Skill skill5 = default!;
-    [GenerateDependencyProperty]
-    private Skill skill6 = default!;
-    [GenerateDependencyProperty]
-    private Skill skill7 = default!;
+    private int attributePoints;
+
     public ObservableCollection<Skill> AvailableSkills { get; } = new ObservableCollection<Skill>();
     public ObservableCollection<AttributeEntry> Attributes { get; } = new ObservableCollection<AttributeEntry>();
     public ObservableCollection<Profession> Professions { get; } = new ObservableCollection<Profession>(Profession.Professions);
@@ -72,17 +56,19 @@ public partial class BuildTemplate : UserControl
     public BuildTemplate()
     {
         this.InitializeComponent();
-        this.InitializeProperties();
+        this.buildEntry = new BuildEntry();
         this.DataContextChanged += this.BuildTemplate_DataContextChanged;
     }
 
     public async void InitializeTemplate(
+        IAttributePointCalculator attributePointCalculator,
         IIconCache iconRetriever,
         IIconBrowser iconBrowser,
         ILiveOptions<ApplicationConfiguration> liveOptions,
         IBuildTemplateManager buildTemplateManager,
         ILogger<ChromiumBrowserWrapper> logger)
     {
+        this.attributePointCalculator = attributePointCalculator.ThrowIfNull();
         this.iconBrowser = iconBrowser.ThrowIfNull();
         await this.SkillBrowser.InitializeDefaultBrowser(liveOptions, buildTemplateManager, logger);
         this.SkillTemplate0.InitializeSkillTemplate(iconRetriever);
@@ -98,200 +84,35 @@ public partial class BuildTemplate : UserControl
         this.HideInfoBrowser();
     }
 
-    protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
-    {
-        base.OnPropertyChanged(e);
-        if (this.loadedProperties is false)
-        {
-            return;
-        }
-
-        if (e.Property == PrimaryProfessionProperty || e.Property == SecondaryProfessionProperty)
-        {
-            if (e.Property == PrimaryProfessionProperty)
-            {
-                this.loadedBuild!.Build!.Primary = this.PrimaryProfession;
-            }
-            else
-            {
-                this.loadedBuild!.Build!.Secondary = this.SecondaryProfession;
-            }
-
-            this.LoadSkills();
-            this.LoadAttributes();
-            if (this.suppressBuildChanged is false)
-            {
-                this.BuildChanged?.Invoke(this, new EventArgs());
-            }
-        }
-
-        if (e.Property == Skill0Property ||
-            e.Property == Skill1Property ||
-            e.Property == Skill2Property ||
-            e.Property == Skill3Property ||
-            e.Property == Skill4Property ||
-            e.Property == Skill5Property ||
-            e.Property == Skill6Property ||
-            e.Property == Skill7Property)
-        {
-            if (this.suppressBuildChanged is false)
-            {
-                this.loadedBuild!.Build!.Skills[0] = this.Skill0;
-                this.loadedBuild!.Build!.Skills[1] = this.Skill1;
-                this.loadedBuild!.Build!.Skills[2] = this.Skill2;
-                this.loadedBuild!.Build!.Skills[3] = this.Skill3;
-                this.loadedBuild!.Build!.Skills[4] = this.Skill4;
-                this.loadedBuild!.Build!.Skills[5] = this.Skill5;
-                this.loadedBuild!.Build!.Skills[6] = this.Skill6;
-                this.loadedBuild!.Build!.Skills[7] = this.Skill7;
-                this.BuildChanged?.Invoke(this, new EventArgs());
-            }
-        }
-    }
-
     private void BuildTemplate_Unloaded(object sender, RoutedEventArgs e)
     {
         this.cancellationTokenSource?.Cancel();
     }
 
-    private void InitializeProperties()
-    {
-        this.PrimaryProfession = Profession.None;
-        this.SecondaryProfession = Profession.None;
-        this.Skill0 = Skill.NoSkill;
-        this.Skill1 = Skill.NoSkill;
-        this.Skill2 = Skill.NoSkill;
-        this.Skill3 = Skill.NoSkill;
-        this.Skill4 = Skill.NoSkill;
-        this.Skill5 = Skill.NoSkill;
-        this.Skill6 = Skill.NoSkill;
-        this.Skill7 = Skill.NoSkill;
-        this.loadedProperties = true;
-    }
-
     private void BuildTemplate_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
-        if(e.NewValue is BuildEntry)
+        if(e.NewValue is BuildEntry buildEntry)
         {
-            this.LoadBuild();
-            this.LoadSkills();
-            this.LoadAttributes();
-        }
-    }
-
-    private void Grid_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-    {
-        this.HideSkillListView();
-        this.HideInfoBrowser();
-    }
-
-    private void LoadAttributes()
-    {
-        var possibleAttributes = new List<AttributeEntry>();
-        if (this.PrimaryProfession != Profession.None)
-        {
-            possibleAttributes.Add(new AttributeEntry { Attribute = this.PrimaryProfession.PrimaryAttribute });
-            possibleAttributes.AddRange(this.PrimaryProfession.Attributes!.Select(a => new AttributeEntry { Attribute = a }));
-        }
-
-        if (this.SecondaryProfession != Profession.None && this.SecondaryProfession != this.PrimaryProfession)
-        {
-            possibleAttributes.AddRange(this.SecondaryProfession.Attributes!.Select(a => new AttributeEntry { Attribute = a }));
-        }
-
-        this.Attributes.ClearAnd().AddRange(possibleAttributes.Select(entry =>
-        {
-            var maybePresentAttribute = this.loadedBuild!.Build!.Attributes.Where(buildEntry => entry.Attribute == buildEntry.Attribute).FirstOrDefault();
-            if (maybePresentAttribute is null)
+            if (this.BuildEntry is not null)
             {
-                return entry;
+                this.BuildEntry.PropertyChanged -= this.BuildEntry_Changed;
             }
+            
+            this.BuildEntry = buildEntry;
+            this.BuildEntry.PropertyChanged += this.BuildEntry_Changed;
+            this.AttributePoints = this.attributePointCalculator!.GetRemainingFreePoints(this.BuildEntry.Build!);
+        }
+    }
 
-            entry.Points = maybePresentAttribute.Points;
-            return entry;
-        }));
-
-        this.loadedBuild!.Build!.Attributes = this.Attributes.ToList();
+    private void BuildEntry_Changed(object? sender, PropertyChangedEventArgs propertyChangedEventArgs)
+    {
+        this.LoadSkills();
     }
 
     private async void LoadSkills()
     {
-        if (this.Skill0.Profession != this.PrimaryProfession &&
-            this.Skill0.Profession != this.SecondaryProfession &&
-            this.Skill0.Profession != Profession.None)
-        {
-            this.Skill0 = Skill.NoSkill;
-        }
-
-        if (this.Skill1.Profession != this.PrimaryProfession &&
-            this.Skill1.Profession != this.SecondaryProfession &&
-            this.Skill1.Profession != Profession.None)
-        {
-            this.Skill1 = Skill.NoSkill;
-        }
-
-        if (this.Skill2.Profession != this.PrimaryProfession &&
-            this.Skill2.Profession != this.SecondaryProfession &&
-            this.Skill2.Profession != Profession.None)
-        {
-            this.Skill2 = Skill.NoSkill;
-        }
-
-        if (this.Skill3.Profession != this.PrimaryProfession &&
-            this.Skill3.Profession != this.SecondaryProfession &&
-            this.Skill3.Profession != Profession.None)
-        {
-            this.Skill3 = Skill.NoSkill;
-        }
-
-        if (this.Skill4.Profession != this.PrimaryProfession &&
-            this.Skill4.Profession != this.SecondaryProfession &&
-            this.Skill4.Profession != Profession.None)
-        {
-            this.Skill4 = Skill.NoSkill;
-        }
-
-        if (this.Skill5.Profession != this.PrimaryProfession &&
-            this.Skill5.Profession != this.SecondaryProfession &&
-            this.Skill5.Profession != Profession.None)
-        {
-            this.Skill5 = Skill.NoSkill;
-        }
-
-        if (this.Skill6.Profession != this.PrimaryProfession &&
-            this.Skill6.Profession != this.SecondaryProfession &&
-            this.Skill6.Profession != Profession.None)
-        {
-            this.Skill6 = Skill.NoSkill;
-        }
-
-        if (this.Skill7.Profession != this.PrimaryProfession &&
-            this.Skill7.Profession != this.SecondaryProfession &&
-            this.Skill7.Profession != Profession.None)
-        {
-            this.Skill7 = Skill.NoSkill;
-        }
-
         var filteredSkills = await this.FilterSkills(this.SkillSearchText).ToListAsync().ConfigureAwait(true);
         this.PrepareSkillListCache(filteredSkills);
-    }
-
-    private void LoadBuild()
-    {
-        this.suppressBuildChanged = true;
-        var build = this.DataContext.As<BuildEntry>();
-        this.loadedBuild = build;
-        this.PrimaryProfession = build.Build!.Primary;
-        this.SecondaryProfession = build.Build.Secondary;
-        this.Skill0 = build.Build.Skills[0];
-        this.Skill1 = build.Build.Skills[1];
-        this.Skill2 = build.Build.Skills[2];
-        this.Skill3 = build.Build.Skills[3];
-        this.Skill4 = build.Build.Skills[4];
-        this.Skill5 = build.Build.Skills[5];
-        this.Skill6 = build.Build.Skills[6];
-        this.Skill7 = build.Build.Skills[7];
-        this.suppressBuildChanged = false;
     }
 
     private void BrowseToInfo(string infoName)
@@ -382,8 +203,8 @@ public partial class BuildTemplate : UserControl
                 continue;
             }
 
-            if (skill.Profession != this.PrimaryProfession &&
-                skill.Profession != this.SecondaryProfession &&
+            if (skill.Profession != this.BuildEntry!.Primary &&
+                skill.Profession != this.BuildEntry!.Secondary &&
                 skill.Profession != Profession.None)
             {
                 continue;
@@ -404,14 +225,20 @@ public partial class BuildTemplate : UserControl
         }
     }
 
+    private void Grid_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        this.HideSkillListView();
+        this.HideInfoBrowser();
+    }
+
     private void HelpButtonPrimary_Clicked(object sender, System.EventArgs e)
     {
-        if (this.PrimaryProfession == Profession.None)
+        if (this.BuildEntry!.Primary == Profession.None)
         {
             return;
         }
-
-        this.BrowseToInfo(this.PrimaryProfession.Name!);
+        
+        this.BrowseToInfo(this.BuildEntry.Primary.Name!);
         if (e is RoutedEventArgs routedEventArgs)
         {
             routedEventArgs.Handled = true;
@@ -420,12 +247,12 @@ public partial class BuildTemplate : UserControl
 
     private void HelpButtonSecondary_Clicked(object sender, System.EventArgs e)
     {
-        if (this.SecondaryProfession == Profession.None)
+        if (this.BuildEntry!.Secondary == Profession.None)
         {
             return;
         }
 
-        this.BrowseToInfo(this.SecondaryProfession.Name!);
+        this.BrowseToInfo(this.BuildEntry.Secondary.Name!);
         if (e is RoutedEventArgs routedEventArgs)
         {
             routedEventArgs.Handled = true;
@@ -441,6 +268,7 @@ public partial class BuildTemplate : UserControl
     {
         e.ThrowIfNull();
         this.BuildChanged?.Invoke(this, new EventArgs());
+        this.AttributePoints = this.attributePointCalculator!.GetRemainingFreePoints(this.BuildEntry.Build!);
     }
 
     private void SkillTemplate_Clicked(object sender, RoutedEventArgs e)
@@ -468,7 +296,38 @@ public partial class BuildTemplate : UserControl
 
     private void SkillTemplate_RemoveClicked(object sender, System.EventArgs e)
     {
-        sender.As<SkillTemplate>().DataContext = Skill.NoSkill;
+        if (sender == this.SkillTemplate0)
+        {
+            this.BuildEntry.FirstSkill = Skill.NoSkill;
+        }
+        else if (sender == this.SkillTemplate1)
+        {
+            this.BuildEntry.SecondSkill = Skill.NoSkill;
+        }
+        else if (sender == this.SkillTemplate2)
+        {
+            this.BuildEntry.ThirdSkill = Skill.NoSkill;
+        }
+        else if (sender == this.SkillTemplate3)
+        {
+            this.BuildEntry.FourthSkill = Skill.NoSkill;
+        }
+        else if (sender == this.SkillTemplate4)
+        {
+            this.BuildEntry.FifthSkill = Skill.NoSkill;
+        }
+        else if (sender == this.SkillTemplate5)
+        {
+            this.BuildEntry.SixthSkill = Skill.NoSkill;
+        }
+        else if (sender == this.SkillTemplate6)
+        {
+            this.BuildEntry.SeventhSkill = Skill.NoSkill;
+        }
+        else if (sender == this.SkillTemplate7)
+        {
+            this.BuildEntry.EigthSkill = Skill.NoSkill;
+        }
     }
 
     private void SkillListView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -479,16 +338,41 @@ public partial class BuildTemplate : UserControl
             return;
         }
 
-        this.selectingSkillTemplate.DataContext = sender.As<ListView>().SelectedItem;
+        var selectedSkilll = sender.As<ListView>().SelectedItem.As<Skill>();
+        if (this.selectingSkillTemplate == this.SkillTemplate0)
+        {
+            this.BuildEntry.FirstSkill = selectedSkilll;
+        }
+        else if (this.selectingSkillTemplate == this.SkillTemplate1)
+        {
+            this.BuildEntry.SecondSkill = selectedSkilll;
+        }
+        else if (this.selectingSkillTemplate == this.SkillTemplate2)
+        {
+            this.BuildEntry.ThirdSkill = selectedSkilll;
+        }
+        else if (this.selectingSkillTemplate == this.SkillTemplate3)
+        {
+            this.BuildEntry.FourthSkill = selectedSkilll;
+        }
+        else if (this.selectingSkillTemplate == this.SkillTemplate4)
+        {
+            this.BuildEntry.FifthSkill = selectedSkilll;
+        }
+        else if (this.selectingSkillTemplate == this.SkillTemplate5)
+        {
+            this.BuildEntry.SixthSkill = selectedSkilll;
+        }
+        else if (this.selectingSkillTemplate == this.SkillTemplate6)
+        {
+            this.BuildEntry.SeventhSkill = selectedSkilll;
+        }
+        else if (this.selectingSkillTemplate == this.SkillTemplate7)
+        {
+            this.BuildEntry.EigthSkill = selectedSkilll;
+        }
+
         this.HideSkillListView();
-        this.loadedBuild!.Build!.Skills[0] = this.Skill0;
-        this.loadedBuild!.Build!.Skills[1] = this.Skill1;
-        this.loadedBuild!.Build!.Skills[2] = this.Skill2;
-        this.loadedBuild!.Build!.Skills[3] = this.Skill3;
-        this.loadedBuild!.Build!.Skills[4] = this.Skill4;
-        this.loadedBuild!.Build!.Skills[5] = this.Skill5;
-        this.loadedBuild!.Build!.Skills[6] = this.Skill6;
-        this.loadedBuild!.Build!.Skills[7] = this.Skill7;
     }
 
     private void ProfessionListView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -496,11 +380,11 @@ public partial class BuildTemplate : UserControl
         var selected = sender.As<ListView>().SelectedItem.As<Profession>();
         if (this.replacingPrimaryProfession)
         {
-            this.PrimaryProfession = selected;
+            this.BuildEntry!.Primary = selected;
         }
         else if (this.replacingSecondaryProfession)
         {
-            this.SecondaryProfession = selected;
+            this.BuildEntry!.Secondary = selected;
         }
 
         this.HideProfessionListView();
@@ -538,6 +422,7 @@ public partial class BuildTemplate : UserControl
     {
         this.replacingPrimaryProfession = false;
         this.replacingSecondaryProfession = true;
+        this.Professions.ClearAnd().AddRange(Profession.Professions.Where(p => p != this.BuildEntry?.Secondary));
         this.ShowProfessionListView();
     }
 
@@ -545,6 +430,12 @@ public partial class BuildTemplate : UserControl
     {
         this.replacingPrimaryProfession = true;
         this.replacingSecondaryProfession = false;
+        this.Professions.ClearAnd().AddRange(Profession.Professions.Where(p => p != this.BuildEntry?.Primary));
         this.ShowProfessionListView();
+    }
+
+    private void AttributeTemplate_Loaded(object sender, RoutedEventArgs e)
+    {
+        sender.As<AttributeTemplate>().InitializeAttributeTemplate(this.AttributePoints, this.attributePointCalculator!);
     }
 }
