@@ -1,4 +1,6 @@
-﻿namespace Daybreak.Models.Guildwars;
+﻿using System.Collections.Generic;
+
+namespace Daybreak.Models.Guildwars;
 
 public class WorldPlayerInformation : PlayerInformation
 {

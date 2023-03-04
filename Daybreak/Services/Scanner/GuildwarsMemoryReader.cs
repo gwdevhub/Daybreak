@@ -1,17 +1,19 @@
 ﻿using Daybreak.Models;
+using Daybreak.Models.Builds;
 using Daybreak.Models.Guildwars;
 using Daybreak.Models.Interop;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.Linq;
 using System.Logging;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 
 namespace Daybreak.Services.Scanner;
 
@@ -25,6 +27,8 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
     private IntPtr playerIdPointer;
     private IntPtr entityArrayPointer;
     private volatile CancellationTokenSource? cancellationTokenSource;
+
+    public bool Faulty { get; private set; }
 
     public bool Running => this.cancellationTokenSource is not null && this.cancellationTokenSource.IsCancellationRequested is false;
 
@@ -121,9 +125,12 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
         try
         {
             this.ReadGameMemory(cancellationToken);
+            this.Faulty = false;
         }
         catch(Exception e)
         {
+            this.GameData = null;
+            this.Faulty = true;
             this.logger.LogError(e, "Exception encountered when reading game memory");
         }
     }
@@ -157,13 +164,16 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
         var professions = this.memoryScanner.ReadArray<ProfessionsContext>(gameContext.Professions);
         var players = this.memoryScanner.ReadArray<PlayerContext>(gameContext.Players);
         var quests = this.memoryScanner.ReadArray<QuestContext>(gameContext.QuestLog);
+        var skills = this.memoryScanner.ReadArray<SkillbarContext>(gameContext.Skillbars);
+        var partyAttributes = this.memoryScanner.ReadArray<PartyAttributesContext>(gameContext.PartyAttributes);
         var playerEntityId = this.memoryScanner.ReadPtrChain<int>(this.GetPlayerIdPointer(), 0x0, 0x0);
+        
         
         // The following lines would retrieve all entities, including item entities.
         //var entityArray = this.memoryScanner.ReadPtrChain<GuildwarsArray>(this.GetEntityArrayPointer(), 0x0, 0x0);
         //var entities = this.memoryScanner.ReadArray<EntityContext>(entityArray);
 
-        this.GameData = this.AggregateGameData(gameContext, instanceContext, mapEntities, players, professions, quests, userContext, playerEntityId);
+        this.GameData = this.AggregateGameData(gameContext, instanceContext, mapEntities, players, professions, quests, userContext, skills, partyAttributes, playerEntityId);
     }
 
     private IntPtr GetPlayerIdPointer()
@@ -185,7 +195,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
 
         return this.entityArrayPointer;
     }
-
+    
     private GameData AggregateGameData(
         GameContext gameContext,
         InstanceContext instanceContext,
@@ -194,6 +204,8 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
         ProfessionsContext[] professions,
         QuestContext[] quests,
         UserContext userContext,
+        SkillbarContext[] skills,
+        PartyAttributesContext[] partyAttributes,
         int mainPlayerEntityId)
     {
         var email = ParseAndCleanWCharArray(userContext.PlayerEmailBytes);
@@ -201,14 +213,14 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
         _ = Map.TryParse((int)userContext.MapId, out var currentMap);
         var partyMembers = professions
             .Where(p => p.AgentId != mainPlayerEntityId)
-            .Select(p => GetPlayerInformation((int)p.AgentId, instanceContext, entities, professions))
+            .Select(p => GetPlayerInformation((int)p.AgentId, instanceContext, entities, professions, skills, partyAttributes))
             .ToList();
 
-        var mainPlayer = GetMainPlayerInformation(mainPlayerEntityId, name, gameContext, instanceContext, entities, professions, quests);
+        var mainPlayer = GetMainPlayerInformation(mainPlayerEntityId, name, gameContext, instanceContext, entities, professions, quests, skills, partyAttributes);
 
         var worldPlayers = players
             .Where(p => p.AgentId != mainPlayerEntityId)
-            .Select(p => GetWorldPlayerInformation(p, this.memoryScanner.ReadWString(p.NamePointer, 0x40), instanceContext, entities, professions))
+            .Select(p => GetWorldPlayerInformation(p, this.memoryScanner.ReadWString(p.NamePointer, 0x40), instanceContext, entities, professions, skills, partyAttributes))
             .ToList();
 
         
@@ -245,7 +257,8 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
             MainPlayer = mainPlayer,
             Session = sessionInformation,
             User = userInformation,
-            WorldPlayers = worldPlayers
+            WorldPlayers = worldPlayers,
+            Valid = entities.Length > 0 || players.Length > 0 || professions.Length > 0 || quests.Length > 0 || skills.Length > 0 || partyAttributes.Length > 0
         };
     }
     
@@ -256,9 +269,11 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
         InstanceContext instanceContext,
         MapEntityContext[] entities,
         ProfessionsContext[] professions,
-        QuestContext[] quests)
+        QuestContext[] quests,
+        SkillbarContext[] skillbars,
+        PartyAttributesContext[] partyAttributes)
     {
-        var playerInformation = GetPlayerInformation(mainPlayerId, instanceContext, entities, professions);
+        var playerInformation = GetPlayerInformation(mainPlayerId, instanceContext, entities, professions, skillbars, partyAttributes);
         _ = Quest.TryParse((int)gameContext.QuestId, out var quest);
         var questLog = quests
             .Select(q =>
@@ -288,7 +303,8 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
             Name = name,
             Experience = gameContext.Experience,
             Level = gameContext.Level,
-            Morale = gameContext.Morale
+            Morale = gameContext.Morale,
+            CurrentBuild = playerInformation.CurrentBuild
         };
     }
 
@@ -297,9 +313,11 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
         string name,
         InstanceContext instanceContext,
         MapEntityContext[] entities,
-        ProfessionsContext[] professions)
+        ProfessionsContext[] professions,
+        SkillbarContext[] skillbars,
+        PartyAttributesContext[] partyAttributes)
     {
-        var playerInformation = GetPlayerInformation(playerContext.AgentId, instanceContext, entities, professions);
+        var playerInformation = GetPlayerInformation(playerContext.AgentId, instanceContext, entities, professions, skillbars, partyAttributes);
         return new WorldPlayerInformation
         {
             PrimaryProfession = playerInformation.PrimaryProfession,
@@ -312,6 +330,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
             EnergyRegen = playerInformation.EnergyRegen,
             HealthRegen = playerInformation.HealthRegen,
             Name = name,
+            CurrentBuild = playerInformation.CurrentBuild
         };
     }
 
@@ -319,7 +338,9 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
         int playerId,
         InstanceContext instanceContext,
         MapEntityContext[] entities,
-        ProfessionsContext[] professions)
+        ProfessionsContext[] professions,
+        SkillbarContext[] skillbars,
+        PartyAttributesContext[] partyAttributes)
     {
         var entityContext = entities.Skip(playerId).FirstOrDefault();
         var professionContext = professions.Where(p => p.AgentId == playerId).FirstOrDefault();
@@ -331,6 +352,44 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
             .Where(p => p is not null && p != Profession.None)
             .OrderBy(p => p.Id)
             .ToList();
+        var maybeSkillbarContext = skillbars.Select(s => (SkillbarContext?) s).FirstOrDefault(s => s?.AgentId == playerId);
+        var maybePartyAttributesContext = partyAttributes.Select(p => (PartyAttributesContext?) p).FirstOrDefault(p => p?.AgentId == playerId);
+        Build? build = null;
+        if (maybeSkillbarContext is SkillbarContext skillbarContext &&
+            maybePartyAttributesContext is PartyAttributesContext attributesContext &&
+            primaryProfession is not null &&
+            secondaryProfession is not null)
+        {
+            var attributes = new List<Models.Guildwars.Attribute> { primaryProfession.PrimaryAttribute! }
+                .Concat(primaryProfession.Attributes)
+                .Concat(secondaryProfession.Attributes)
+                .Select(a => new AttributeEntry { Attribute = a })
+                .ToList();
+            foreach(var attribute in attributesContext.Attributes)
+            {
+                if (attribute.Id < 0 || attribute.Id > 44)
+                {
+                    continue;
+                }
+
+                var maybeAttributeEntry = attributes.FirstOrDefault(a => a.Attribute!.Id == attribute.Id);
+                if (maybeAttributeEntry is not AttributeEntry attributeEntry)
+                {
+                    continue;
+                }
+
+                attributeEntry.Points = (int)attribute.BaseLevel;
+            }
+
+            build = new Build
+            {
+                Primary = primaryProfession,
+                Secondary = secondaryProfession,
+                Attributes = attributes,
+                Skills = skillbarContext.Skills.Select(s => Skill.Parse((int)s.Id)).ToList()
+            };
+        }
+        
         (var currentHp, var currentEnergy) = ApplyEnergyAndHealthRegen(instanceContext, entityContext);
         return new PlayerInformation
         {
@@ -342,7 +401,8 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
             MaxHealth = entityContext.MaxHealth,
             MaxEnergy = entityContext.MaxEnergy,
             HealthRegen = entityContext.HealthRegen,
-            EnergyRegen = entityContext.EnergyRegen
+            EnergyRegen = entityContext.EnergyRegen,
+            CurrentBuild = build
         };
     }
 
@@ -377,5 +437,6 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
         this.cancellationTokenSource?.Cancel();
         this.cancellationTokenSource?.Dispose();
         this.cancellationTokenSource = null;
+        this.Faulty = false;
     }
 }
