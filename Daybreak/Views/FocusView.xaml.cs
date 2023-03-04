@@ -1,7 +1,9 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Models;
+using Daybreak.Models.Builds;
 using Daybreak.Models.Guildwars;
 using Daybreak.Services.ApplicationLauncher;
+using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Experience;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Scanner;
@@ -15,6 +17,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
+using System.Windows.Media.Animation;
 
 namespace Daybreak.Views;
 
@@ -23,8 +26,12 @@ namespace Daybreak.Views;
 /// </summary>
 public partial class FocusView : UserControl
 {
+    private const string InfoNamePlaceholder = "[NAME]";
+    private const string WikiBaseAddress = $"https://wiki.guildwars.com/wiki/{InfoNamePlaceholder}";
+    private const string BuildsAddress = $"https://gwpvx.fandom.com/wiki/Category:Builds_by_category";
     private const double BarsTotalSize = 116; // Size of the bars on one side of the screen.
 
+    private readonly IBuildTemplateManager buildTemplateManager;
     private readonly IApplicationLauncher applicationLauncher;
     private readonly IGuildwarsMemoryReader guildwarsMemoryReader;
     private readonly IExperienceCalculator experienceCalculator;
@@ -74,6 +81,7 @@ public partial class FocusView : UserControl
     private bool browserMaximized = false;
 
     public FocusView(
+        IBuildTemplateManager buildTemplateManager,
         IApplicationLauncher applicationLauncher,
         IGuildwarsMemoryReader guildwarsMemoryReader,
         IExperienceCalculator experienceCalculator,
@@ -81,6 +89,7 @@ public partial class FocusView : UserControl
         ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions,
         ILogger<FocusView> logger)
     {
+        this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
         this.applicationLauncher = applicationLauncher.ThrowIfNull();
         this.guildwarsMemoryReader = guildwarsMemoryReader.ThrowIfNull();
         this.experienceCalculator = experienceCalculator.ThrowIfNull();
@@ -126,7 +135,8 @@ public partial class FocusView : UserControl
             this.viewManager.ShowView<LauncherView>();
         }
 
-        if (this.guildwarsMemoryReader.Running is false)
+        if (this.guildwarsMemoryReader.Running is false ||
+            this.guildwarsMemoryReader.Faulty)
         {
             this.guildwarsMemoryReader.Initialize(this.applicationLauncher.RunningGuildwarsProcess!);
         }
@@ -134,6 +144,7 @@ public partial class FocusView : UserControl
         this.Dispatcher.Invoke(() =>
         {
             this.GameData = this.guildwarsMemoryReader.GameData;
+            this.Browser.Visibility = this.GameData?.Valid is true ? Visibility.Visible : Visibility.Collapsed;
             if (this.GameData?.MainPlayer is null ||
                 this.GameData?.User is null ||
                 this.GameData?.Session is null)
@@ -488,6 +499,37 @@ public partial class FocusView : UserControl
         if (this.GameData.Session?.CurrentMap?.WikiUrl is string url)
         {
             this.BrowserAddress = url;
+        }
+    }
+
+    private void MetaBuilds_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        this.BrowserAddress = BuildsAddress;
+    }
+
+    private void PrimaryProfession_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (this.GameData.MainPlayer?.PrimaryProfession?.Name is string professionName)
+        {
+            this.BrowserAddress = WikiBaseAddress.Replace(InfoNamePlaceholder, professionName);
+        }
+    }
+
+    private void SecondaryProfession_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (this.GameData.MainPlayer?.SecondaryProfession?.Name is string professionName)
+        {
+            this.BrowserAddress = WikiBaseAddress.Replace(InfoNamePlaceholder, professionName);
+        }
+    }
+
+    private void EditBuild_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (this.GameData.MainPlayer?.CurrentBuild is Build build)
+        {
+            var buildEntry = this.buildTemplateManager.CreateBuild();
+            buildEntry.Build = build;
+            this.viewManager.ShowView<BuildTemplateView>(buildEntry);
         }
     }
 

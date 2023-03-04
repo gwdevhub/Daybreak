@@ -5,6 +5,7 @@ namespace Daybreak.Models;
 
 public sealed class GameData
 {
+    public bool Valid { get; init; }
     public MainPlayerInformation? MainPlayer { get; init; }
     public List<PlayerInformation>? Party { get; init; }
     public UserInformation? User { get; init; }

@@ -12,6 +12,9 @@ public readonly struct GameContext
     ///Array of type <see cref="MapEntityContext"/>.
     public readonly GuildwarsArray MapEntities;
 
+    [FieldOffset(0x0030)]
+    public readonly GuildwarsArray PartyAttributes;
+
     [FieldOffset(0x04AC)]
     public readonly uint QuestId;
 
@@ -21,9 +24,12 @@ public readonly struct GameContext
     [FieldOffset(0x0608)]
     public readonly uint HardModeUnlocked;
 
-    [FieldOffset(0x640)]
+    [FieldOffset(0x0640)]
     ///Array of type <see cref="ProfessionsContext"/>
     public readonly GuildwarsArray Professions;
+
+    [FieldOffset(0x0674)]
+    public readonly GuildwarsArray Skillbars;
 
     [FieldOffset(0x06C4)]
     public readonly uint Experience;

@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Views"
              xmlns:controls="clr-namespace:Daybreak.Controls"
+             xmlns:converters="clr-namespace:Daybreak.Converters"
              xmlns:templates="clr-namespace:Daybreak.Controls.Templates"
              mc:Ignorable="d" 
              Foreground="White"
@@ -14,6 +15,7 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
+        <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" TriggerValue="True" ></converters:BooleanToVisibilityConverter>
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -32,7 +34,8 @@
             Grid.Column="1"
             Grid.ColumnSpan="2"
             Grid.Row="2"
-            Grid.RowSpan="2">
+            Grid.RowSpan="2"
+            Visibility="{Binding ElementName=_this, Path=GameData.Valid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"></ColumnDefinition>
                 <ColumnDefinition Width="0.1*"></ColumnDefinition>
@@ -238,8 +241,11 @@
         </Grid>
         <Grid
             Grid.Row="1"
-            Grid.Column="1">
+            Grid.Column="1"
+            Visibility="{Binding ElementName=_this, Path=GameData.Valid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.RowDefinitions>
+                <RowDefinition Height="auto"></RowDefinition>
+                <RowDefinition Height="10"></RowDefinition>
                 <RowDefinition Height="auto"></RowDefinition>
                 <RowDefinition Height="10"></RowDefinition>
                 <RowDefinition Height="auto"></RowDefinition>
@@ -250,6 +256,74 @@
             <StackPanel
                 Background="#F0212121"
                 Grid.Row="0"
+                Margin="0, 0, 5, 0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock 
+                        Grid.Column="0"
+                        FontSize="18"
+                        Margin="10"
+                        Text="Current Character"
+                        HorizontalAlignment="Left"></TextBlock>
+                    <TextBlock 
+                        Grid.Column="1"
+                        FontSize="18"
+                        Margin="10"
+                        Text="{Binding ElementName=_this, Path=GameData.MainPlayer.Name, Mode=OneWay}"
+                        HorizontalAlignment="Center"></TextBlock>
+                    <controls:OpaqueButton
+                        Grid.Column="2"
+                        Text="Edit Build"
+                        Highlight="White"
+                        HighlightOpacity="0.6"
+                        Margin="10"
+                        HorizontalAlignment="Stretch"
+                        TextHorizontalAlignment="Center"
+                        Cursor="Hand"
+                        FontSize="18"
+                        MouseLeftButtonDown="EditBuild_MouseLeftButtonDown"></controls:OpaqueButton>
+                    <controls:OpaqueButton
+                        Grid.Column="3"
+                        Text="Meta Builds"
+                        Highlight="White"
+                        HighlightOpacity="0.6"
+                        Margin="10"
+                        HorizontalAlignment="Stretch"
+                        TextHorizontalAlignment="Right"
+                        Cursor="Hand"
+                        FontSize="18"
+                        MouseLeftButtonDown="MetaBuilds_MouseLeftButtonDown"></controls:OpaqueButton>
+                </Grid>
+                <Rectangle 
+                    Height="1"
+                    Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"></Rectangle>
+                <controls:OpaqueButton
+                    Text="{Binding ElementName=_this, Path=GameData.MainPlayer.PrimaryProfession.Name, Mode=OneWay}"
+                    Highlight="White"
+                    HighlightOpacity="0.6"
+                    HorizontalAlignment="Stretch"
+                    TextHorizontalAlignment="Left"
+                    Cursor="Hand"
+                    FontSize="20"
+                    MouseLeftButtonDown="PrimaryProfession_MouseLeftButtonDown"></controls:OpaqueButton>
+                <controls:OpaqueButton
+                    Text="{Binding ElementName=_this, Path=GameData.MainPlayer.SecondaryProfession.Name, Mode=OneWay}"
+                    Highlight="White"
+                    HighlightOpacity="0.6"
+                    HorizontalAlignment="Stretch"
+                    TextHorizontalAlignment="Left"
+                    Cursor="Hand"
+                    FontSize="20"
+                    MouseLeftButtonDown="SecondaryProfession_MouseLeftButtonDown"></controls:OpaqueButton>
+            </StackPanel>
+            <StackPanel
+                Background="#F0212121"
+                Grid.Row="2"
                 Margin="0, 0, 5, 0">
                 <TextBlock 
                     FontSize="18"
@@ -270,7 +344,7 @@
             </StackPanel>
             <StackPanel
                 Background="#F0212121"
-                Grid.Row="2"
+                Grid.Row="4"
                 Margin="0, 0, 5, 0">
                 <TextBlock 
                     FontSize="18"
@@ -291,7 +365,7 @@
             </StackPanel>
             <TextBlock 
                     Background="#F0212121"
-                    Grid.Row="4"
+                    Grid.Row="6"
                     FontSize="18"
                     Margin="0, 0, 5, 0"
                     Padding="10"
@@ -300,7 +374,7 @@
                     Background="#F0212121"
                     VerticalScrollBarVisibility="Auto"
                     HorizontalScrollBarVisibility="Disabled"
-                    Grid.Row="5"
+                    Grid.Row="7"
                     Margin="0, 0, 5, 0">
                 <templates:QuestLogTemplate
                         Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
@@ -321,5 +395,10 @@
             Address="{Binding ElementName=_this, Path=BrowserAddress, Mode=TwoWay}"
             MaximizeClicked="Browser_MaximizeClicked"
             PreventDispose="True"></controls:ChromiumBrowserWrapper>
+        <controls:CircularLoadingWidget Grid.ColumnSpan="4"
+                                        Grid.RowSpan="3"
+                                        Width="100"
+                                        Height="100"
+                                        Visibility="{Binding ElementName=_this, Path=GameData.Valid, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"></controls:CircularLoadingWidget>
     </Grid>
 </UserControl>
