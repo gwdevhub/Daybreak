@@ -262,22 +262,15 @@
                         <ColumnDefinition Width="*"></ColumnDefinition>
                         <ColumnDefinition Width="*"></ColumnDefinition>
                         <ColumnDefinition Width="*"></ColumnDefinition>
-                        <ColumnDefinition Width="*"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <TextBlock 
                         Grid.Column="0"
                         FontSize="18"
                         Margin="10"
-                        Text="Current Character"
-                        HorizontalAlignment="Left"></TextBlock>
-                    <TextBlock 
-                        Grid.Column="1"
-                        FontSize="18"
-                        Margin="10"
                         Text="{Binding ElementName=_this, Path=GameData.MainPlayer.Name, Mode=OneWay}"
-                        HorizontalAlignment="Center"></TextBlock>
+                        HorizontalAlignment="Left"></TextBlock>
                     <controls:OpaqueButton
-                        Grid.Column="2"
+                        Grid.Column="1"
                         Text="Edit Build"
                         Highlight="White"
                         HighlightOpacity="0.6"
@@ -288,7 +281,7 @@
                         FontSize="18"
                         MouseLeftButtonDown="EditBuild_MouseLeftButtonDown"></controls:OpaqueButton>
                     <controls:OpaqueButton
-                        Grid.Column="3"
+                        Grid.Column="2"
                         Text="Meta Builds"
                         Highlight="White"
                         HighlightOpacity="0.6"
