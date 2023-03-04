@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Daybreak.Models.Versioning;
 
-public sealed class Version
+public sealed class Version : IEquatable<Version>, IComparable<Version>
 {
     private List<VersionToken> parts = new();
 
@@ -42,6 +42,77 @@ public sealed class Version
         }
 
         return version;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is Version otherVersion)
+        {
+            return this.Equals(otherVersion);
+        }
+
+        return base.Equals(obj);
+    }
+
+    public bool Equals(Version? other)
+    {
+        return this.CompareTo(other) == 0;
+    }
+
+    public int CompareTo(Version? other)
+    {
+        var thisTokens = this.VersionTokens.ToList();
+        var otherTokens = other?.VersionTokens.ToList();
+        if (otherTokens is null)
+        {
+            return 1;
+        }
+
+        var comparisonIndex = 0;
+        for(; comparisonIndex < Math.Min(thisTokens.Count, otherTokens.Count); comparisonIndex++)
+        {
+            var thisVersionToken = thisTokens[comparisonIndex];
+            var otherVersionToken = otherTokens[comparisonIndex];
+            if (thisVersionToken is VersionNumberToken thisVersionNumberToken && otherVersionToken is VersionNumberToken otherVersionNumberToken)
+            {
+                if (thisVersionNumberToken.Number < otherVersionNumberToken.Number)
+                {
+                    return -1;
+                }
+                else if (thisVersionNumberToken.Number > otherVersionNumberToken.Number)
+                {
+                    return 1;
+                }
+            }
+            else if (thisVersionToken is VersionNumberToken && otherVersionToken is VersionStringToken)
+            {
+                return 1;
+            }
+            else if (thisVersionToken is VersionStringToken && otherVersionToken is VersionNumberToken)
+            {
+                return -1;
+            }
+            else if (thisVersionToken is VersionStringToken thisVersionStringToken && otherVersionToken is VersionStringToken otherVersionStringToken)
+            {
+                return string.Compare(thisVersionStringToken.Token, otherVersionStringToken.Token, StringComparison.Ordinal);
+            }
+        }
+
+        if (thisTokens.Count == otherTokens.Count)
+        {
+            return 0;
+        }
+
+        if (thisTokens.Count > otherTokens.Count)
+        {
+            return 1;
+        }
+        else
+        {
+            return -1;
+        }
+
+        throw new InvalidOperationException($"Failed to compare {this.ToString()} with {other.ToString()}");
     }
 
     public static Version Parse(string version)
@@ -81,7 +152,7 @@ public sealed class Version
         };
         return true;
     }
-
+    
     private static bool TryParseParts(string version, out List<VersionToken> parts, out bool hasPrefix)
     {
         hasPrefix = false;

@@ -124,19 +124,14 @@ public sealed class ApplicationUpdater : IApplicationUpdater
             return false;
         }
 
-        if (Version.TryParse(latestVersion, out var parsedVersion) is false)
-        {
-            throw new InvalidOperationException($"Could not parse retrieved version: {latestVersion}");
-        }
-
-        return await this.DownloadUpdate(parsedVersion, updateStatus);
+        return await this.DownloadUpdate(latestVersion, updateStatus);
     }
 
     public async Task<bool> UpdateAvailable()
     {
         var maybeLatestVersion = await this.GetLatestVersion();
         return maybeLatestVersion.Switch(
-            onSome: latestVersion => string.Compare(this.CurrentVersion.ToString().Trim('v'), latestVersion, true) < 0,
+            onSome: latestVersion => this.CurrentVersion.CompareTo(latestVersion) < 0,
             onNone: () =>
             {
                 this.logger.LogWarning("Failed to retrieve latest version");
@@ -194,16 +189,21 @@ public sealed class ApplicationUpdater : IApplicationUpdater
     {
     }
 
-    private async Task<Optional<string>> GetLatestVersion()
+    private async Task<Optional<Version>> GetLatestVersion()
     {
         using var response = await this.httpClient.GetAsync(Url);
         if (response.IsSuccessStatusCode)
         {
             var versionTag = response.RequestMessage!.RequestUri!.ToString().Split('/').Last().TrimStart('v');
-            return versionTag;
+            if (Version.TryParse(versionTag, out var parsedVersion))
+            {
+                return parsedVersion;
+            }
+
+            return Optional.None<Version>();
         }
 
-        return Optional.None<string>();
+        return Optional.None<Version>();
     }
 
     private void LaunchExtractor()

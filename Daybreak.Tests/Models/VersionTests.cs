@@ -132,4 +132,55 @@ public class VersionTests
             action.Should().NotThrow<ArgumentException>();
         }
     }
+
+    [DataRow("v0.1.0.0.1", "v0.1.0.0.1", true)]
+    [DataRow("v0.1.0.0.1.0.0.0.0", "v0.1.0.0.1", true)]
+    [DataRow("v0.1.0", "v0.1", true)]
+    [DataRow("0.1.0", "0.1", true)]
+    [DataRow("v0.1.0.0.0", "v0.1", true)]
+    [DataRow("0.1.0.0.0", "0.1", true)]
+    [DataRow("v0", "v0", true)]
+    [DataRow("0", "0", true)]
+    [DataRow("v0.1", "v0.1", true)]
+    [DataRow("0.1-release", "0.1-release", true)]
+    [DataRow("v0.1-release", "v0.1-release", true)]
+    [DataRow("v0.1.0.0", "v0.1.0.0.1", false)]
+    [DataRow("v0.1.0.0.1", "v0.1.0.0", false)]
+    [DataRow("v0.9.8.9", "v0.9.8.10", false)]
+    [DataRow("0.1-release", "0.2-release", false)]
+    [DataRow("v1.1-release", "v0.1-release", false)]
+    [TestMethod]
+    public void Equals(string version, string version2, bool result)
+    {
+        var parsedVersion1 = Version.Parse(version);
+        var parsedVersion2 = Version.Parse(version2);
+
+        parsedVersion1.Equals(parsedVersion2).Should().Be(result);
+    }
+
+    [DataRow("v0.1.0.0.1", "v0.1.0.0.1", 0)]
+    [DataRow("v0.1.0.0.1.0.0.0.0", "v0.1.0.0.1", 0)]
+    [DataRow("v0.1.0", "v0.1", 0)]
+    [DataRow("0.1.0", "0.1", 0)]
+    [DataRow("v0.1.0.0.0", "v0.1", 0)]
+    [DataRow("0.1.0.0.0", "0.1", 0)]
+    [DataRow("v0", "v0", 0)]
+    [DataRow("0", "0", 0)]
+    [DataRow("v0.1", "v0.1", 0)]
+    [DataRow("0.1-release", "0.1-release", 0)]
+    [DataRow("v0.1-release", "v0.1-release", 0)]
+    [DataRow("v0.1.0.0", "v0.1.0.0.1", -1)]
+    [DataRow("v0.1.0.0.1", "v0.1.0.0", 1)]
+    [DataRow("v0.9.8.9", "v0.9.8.10", -1)]
+    [DataRow("v0.9.8.10", "v0.9.8.9", 1)]
+    [DataRow("0.1-release", "0.2-release", -1)]
+    [DataRow("v1.1-release", "v0.1-release", 1)]
+    [TestMethod]
+    public void CompareTo(string version, string version2, int comparisonResult)
+    {
+        var parsedVersion1 = Version.Parse(version);
+        var parsedVersion2 = Version.Parse(version2);
+
+        parsedVersion1.CompareTo(parsedVersion2).Should().Be(comparisonResult);
+    }
 }
