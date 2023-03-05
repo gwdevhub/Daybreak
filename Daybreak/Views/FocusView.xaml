@@ -389,6 +389,7 @@
             Address="{Binding ElementName=_this, Path=BrowserAddress, Mode=TwoWay}"
             MaximizeClicked="Browser_MaximizeClicked"
             Visibility="Hidden"
+            BuildDecoded="Browser_BuildDecoded"
             PreventDispose="True"></controls:ChromiumBrowserWrapper>
         <controls:CircularLoadingWidget Grid.ColumnSpan="4"
                                         Grid.RowSpan="3"

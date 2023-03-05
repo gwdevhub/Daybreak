@@ -351,6 +351,8 @@ public sealed class GraphClient : IGraphClient
     {
         chromiumBrowserWrapper.ThrowIfNull();
 
+        await chromiumBrowserWrapper.ReinitializeBrowser();
+
         var state = GetNewState();
 
         chromiumBrowserWrapper.Address = AuthorizationUrlPlaceholder

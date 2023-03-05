@@ -1,6 +1,5 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Models;
-using Daybreak.Models.Builds;
 using Daybreak.Models.Guildwars;
 using Daybreak.Services.ApplicationLauncher;
 using Daybreak.Services.BuildTemplates;
@@ -11,14 +10,11 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Configuration;
 using System.Core.Extensions;
-using System.Drawing.Printing;
 using System.Extensions;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Extensions;
-using System.Windows.Media.Animation;
 
 namespace Daybreak.Views;
 
@@ -27,9 +23,6 @@ namespace Daybreak.Views;
 /// </summary>
 public partial class FocusView : UserControl
 {
-    private const string InfoNamePlaceholder = "[NAME]";
-    private const string WikiBaseAddress = $"https://wiki.guildwars.com/wiki/{InfoNamePlaceholder}";
-    private const string BuildsAddress = $"https://gwpvx.fandom.com/wiki/Category:Builds_by_category";
     private const double BarsTotalSize = 116; // Size of the bars on one side of the screen.
 
     private readonly IBuildTemplateManager buildTemplateManager;
@@ -315,7 +308,7 @@ public partial class FocusView : UserControl
         }
     }
 
-    private void FocusView_Loaded(object sender, RoutedEventArgs e)
+    private void FocusView_Loaded(object _, RoutedEventArgs e)
     {
         this.UpdateRightSideBarsLayout();
         this.BrowserAddress = this.liveUpdateableOptions.Value.FocusViewOptions.BrowserUrl;
@@ -324,14 +317,14 @@ public partial class FocusView : UserControl
         TaskExtensions.RunPeriodicAsync(this.UpdateGameData, TimeSpan.Zero, TimeSpan.FromSeconds(1), this.cancellationTokenSource.Token);
     }
 
-    private void FocusView_Unloaded(object sender, RoutedEventArgs e)
+    private void FocusView_Unloaded(object _, RoutedEventArgs e)
     {
         this.cancellationTokenSource?.Cancel();
         this.cancellationTokenSource = null;
         this.guildwarsMemoryReader?.Stop();
     }
 
-    private void ExperienceBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void ExperienceBar_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
         switch (this.liveUpdateableOptions.Value.FocusViewOptions.ExperienceDisplay)
         {
@@ -353,7 +346,7 @@ public partial class FocusView : UserControl
         this.UpdateExperienceText();
     }
 
-    private void LuxonBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void LuxonBar_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
         switch (this.liveUpdateableOptions.Value.FocusViewOptions.LuxonPointsDisplay)
         {
@@ -372,7 +365,7 @@ public partial class FocusView : UserControl
         this.UpdateLuxonText();
     }
 
-    private void KurzickBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void KurzickBar_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
         switch (this.liveUpdateableOptions.Value.FocusViewOptions.KurzickPointsDisplay)
         {
@@ -391,7 +384,7 @@ public partial class FocusView : UserControl
         this.UpdateKurzickText();
     }
 
-    private void ImperialBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void ImperialBar_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
         switch (this.liveUpdateableOptions.Value.FocusViewOptions.ImperialPointsDisplay)
         {
@@ -410,7 +403,7 @@ public partial class FocusView : UserControl
         this.UpdateImperialText();
     }
 
-    private void BalthazarBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void BalthazarBar_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
         switch (this.liveUpdateableOptions.Value.FocusViewOptions.BalthazarPointsDisplay)
         {
@@ -429,7 +422,7 @@ public partial class FocusView : UserControl
         this.UpdateBalthazarText();
     }
 
-    private void VanquishingBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void VanquishingBar_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
         switch (this.liveUpdateableOptions.Value.FocusViewOptions.VanquishingDisplay)
         {
@@ -448,7 +441,7 @@ public partial class FocusView : UserControl
         this.UpdateVanquishingText();
     }
 
-    private void HealthBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void HealthBar_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
         switch (this.liveUpdateableOptions.Value.FocusViewOptions.HealthDisplay)
         {
@@ -467,7 +460,7 @@ public partial class FocusView : UserControl
         this.UpdateHealthText();
     }
 
-    private void EnergyBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void EnergyBar_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
         switch (this.liveUpdateableOptions.Value.FocusViewOptions.EnergyDisplay)
         {
@@ -486,7 +479,7 @@ public partial class FocusView : UserControl
         this.UpdateEnergyText();
     }
 
-    private void CurrentQuest_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void CurrentQuest_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
         if (this.GameData.MainPlayer?.Quest?.WikiUrl is string url)
         {
@@ -494,7 +487,7 @@ public partial class FocusView : UserControl
         }
     }
 
-    private void CurrentMap_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void CurrentMap_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
         if (this.GameData.Session?.CurrentMap?.WikiUrl is string url)
         {
@@ -502,28 +495,34 @@ public partial class FocusView : UserControl
         }
     }
 
-    private void MetaBuilds_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void MetaBuilds_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
-        this.BrowserAddress = BuildsAddress;
-    }
-
-    private void PrimaryProfession_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-    {
-        if (this.GameData.MainPlayer?.PrimaryProfession?.Name is string professionName)
+        if (this.GameData?.MainPlayer?.PrimaryProfession is not null &&
+            this.GameData.MainPlayer.PrimaryProfession != Profession.None)
         {
-            this.BrowserAddress = WikiBaseAddress.Replace(InfoNamePlaceholder, professionName);
+            this.BrowserAddress = this.GameData.MainPlayer.PrimaryProfession.BuildsUrl;
         }
     }
 
-    private void SecondaryProfession_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void PrimaryProfession_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
-        if (this.GameData.MainPlayer?.SecondaryProfession?.Name is string professionName)
+        if (this.GameData?.MainPlayer?.PrimaryProfession is not null &&
+            this.GameData.MainPlayer.PrimaryProfession != Profession.None)
         {
-            this.BrowserAddress = WikiBaseAddress.Replace(InfoNamePlaceholder, professionName);
+            this.BrowserAddress = this.GameData.MainPlayer.PrimaryProfession.WikiUrl;
         }
     }
 
-    private void EditBuild_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void SecondaryProfession_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (this.GameData?.MainPlayer?.SecondaryProfession is not null &&
+            this.GameData.MainPlayer.SecondaryProfession != Profession.None)
+        {
+            this.BrowserAddress = this.GameData.MainPlayer.SecondaryProfession.WikiUrl;
+        }
+    }
+
+    private void EditBuild_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
         if (this.GameData.MainPlayer?.CurrentBuild is Build build)
         {
@@ -533,7 +532,7 @@ public partial class FocusView : UserControl
         }
     }
 
-    private void Browser_MaximizeClicked(object sender, EventArgs e)
+    private void Browser_MaximizeClicked(object _, EventArgs e)
     {
         this.browserMaximized = !this.browserMaximized;
         if (this.browserMaximized)
@@ -552,6 +551,18 @@ public partial class FocusView : UserControl
             Grid.SetColumnSpan(this.Browser, 1);
             this.Browser.Margin = new Thickness(10, 0, 0, 0);
         }
+    }
+
+    private void Browser_BuildDecoded(object _, Build e)
+    {
+        if (e is null)
+        {
+            return;
+        }
+
+        var buildEntry = this.buildTemplateManager.CreateBuild();
+        buildEntry.Build = e;
+        this.viewManager.ShowView<BuildTemplateView>(buildEntry);
     }
 
     private void QuestLogTemplate_MapClicked(object _, Map e)

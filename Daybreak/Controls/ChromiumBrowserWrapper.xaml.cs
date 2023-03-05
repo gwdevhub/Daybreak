@@ -105,7 +105,7 @@ public partial class ChromiumBrowserWrapper : UserControl
         }
     }
 
-    public async void ReinitializeBrowser()
+    public async Task ReinitializeBrowser()
     {
         await this.InitializeBrowser();
     }
