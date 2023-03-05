@@ -16,6 +16,7 @@ using System.Extensions;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Extensions;
 using System.Windows.Media.Animation;
 
@@ -41,6 +42,9 @@ public partial class FocusView : UserControl
 
     [GenerateDependencyProperty]
     private GameData gameData;
+
+    [GenerateDependencyProperty]
+    private bool mainPlayerDataValid;
 
     [GenerateDependencyProperty]
     private double currentExperienceInLevel;
@@ -101,7 +105,6 @@ public partial class FocusView : UserControl
         this.InitializeComponent();
 
         this.LeftSideBarSize = 25;
-        this.InitializeBrowser();
     }
 
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -122,11 +125,6 @@ public partial class FocusView : UserControl
         base.OnPropertyChanged(e);
     }
 
-    private async void InitializeBrowser()
-    {
-        await this.Browser.InitializeDefaultBrowser();
-    }
-
     private void UpdateGameData()
     {
         if (this.applicationLauncher.IsGuildwarsRunning is false)
@@ -144,7 +142,6 @@ public partial class FocusView : UserControl
         this.Dispatcher.Invoke(() =>
         {
             this.GameData = this.guildwarsMemoryReader.GameData;
-            this.Browser.Visibility = this.GameData?.Valid is true ? Visibility.Visible : Visibility.Collapsed;
             if (this.GameData?.MainPlayer is null ||
                 this.GameData?.User is null ||
                 this.GameData?.Session is null)
@@ -156,6 +153,9 @@ public partial class FocusView : UserControl
             this.NextLevelExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(this.GameData.MainPlayer!.Experience);
             this.TotalFoes = this.GameData.Session.FoesKilled + this.GameData.Session.FoesToKill;
             this.Vanquishing = this.GameData.Session.FoesToKill + this.GameData.Session.FoesKilled > 0U;
+            this.MainPlayerDataValid = this.GameData.Valid && this.GameData.MainPlayer.MaxHealth > 0U && this.GameData.MainPlayer.MaxEnergy > 0U;
+
+            this.Browser.Visibility = this.MainPlayerDataValid is true ? Visibility.Visible : Visibility.Collapsed;
             this.UpdateExperienceText();
             this.UpdateLuxonText();
             this.UpdateKurzickText();

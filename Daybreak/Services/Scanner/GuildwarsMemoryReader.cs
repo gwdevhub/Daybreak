@@ -153,6 +153,14 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
          */
         var globalContext = this.memoryScanner.ReadPtrChain<GlobalContext>(this.memoryScanner.ModuleStartAddress, finalPointerOffset: 0x0, 0x00629244, 0xC, 0xC);
 
+        if (globalContext.GameContext.ToInt32() == 0x0 ||
+            globalContext.UserContext.ToInt32() == 0x0 ||
+            globalContext.InstanceContext.ToInt32() == 0x0)
+        {
+            this.GameData = new GameData { Valid = false };
+            return;
+        }
+
         // GameContext struct is offset by 0x07C due to the memory layout of the structure.
         var gameContext = this.memoryScanner.Read<GameContext>(globalContext.GameContext + GameContext.BaseOffset);
         // UserContext struct is offset by 0x074 due to the memory layout of the structure.

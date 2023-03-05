@@ -229,7 +229,7 @@ public sealed class Map
     public static readonly Map UnwakingWaters = new() { Id = 227, Name = "Unwaking Waters", WikiUrl = "https://wiki.guildwars.com/wiki/Unwaking_Waters" };
     public static readonly Map GrenzFrontierMission = new() { Id = 228, Name = "Grenz Frontier", WikiUrl = "https://wiki.guildwars.com/wiki/Grenz_Frontier" };
     public static readonly Map AmatzBasin = new() { Id = 229, Name = "Amatz Basin", WikiUrl = "https://wiki.guildwars.com/wiki/Amatz_Basin" };
-    public static readonly Map ShadowsPassage = new() { Id = 231, Name = "Shadow's Passage", WikiUrl = "https://wiki.guildwars.com/wiki/Shadow's_Passage" };
+    public static readonly Map ShadowsPassage = new() { Id = 232, Name = "Shadow's Passage", WikiUrl = "https://wiki.guildwars.com/wiki/Shadow's_Passage" };
     public static readonly Map RaisuPalace = new() { Id = 233, Name = "Raisu Palace", WikiUrl = "https://wiki.guildwars.com/wiki/Raisu_Palace" };
     public static readonly Map TheAuriosMines = new() { Id = 234, Name = "The Aurios Mines", WikiUrl = "https://wiki.guildwars.com/wiki/The_Aurios_Mines" };
     public static readonly Map PanjiangPeninsula = new() { Id = 235, Name = "Panjiang Peninsula", WikiUrl = "https://wiki.guildwars.com/wiki/Panjiang_Peninsula" };
