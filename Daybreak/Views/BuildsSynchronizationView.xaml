@@ -176,8 +176,8 @@
         <Grid Grid.RowSpan="3"
               Background="#F0212121"
               Visibility="{Binding ElementName=_this, Path=ShowLoading, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <controls:CircularLoadingWidget MaxWidth="200"
-                                            MaxHeight="200"/>
+            <controls:CircularLoadingWidget MaxWidth="100"
+                                            MaxHeight="100"/>
         </Grid>
     </Grid>
 </UserControl>
