@@ -43,11 +43,7 @@ public partial class BuildTemplateView : UserControl
     public BuildTemplateView(
         IViewManager viewManager,
         IBuildTemplateManager buildTemplateManager,
-        IIconCache iconRetriever,
-        IIconBrowser iconBrowser,
         IAttributePointCalculator attributePointCalculator,
-        ILiveOptions<ApplicationConfiguration> liveOptions,
-        ILogger<ChromiumBrowserWrapper> chromiumLogger,
         ILogger<BuildTemplateView> logger)
     {
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
@@ -55,7 +51,6 @@ public partial class BuildTemplateView : UserControl
         this.viewManager = viewManager.ThrowIfNull();
         this.attributePointCalculator = attributePointCalculator.ThrowIfNull();
         this.InitializeComponent();
-        this.BuildTemplate.InitializeTemplate(attributePointCalculator, iconRetriever, iconBrowser, liveOptions, buildTemplateManager, chromiumLogger);
         this.DataContextChanged += (sender, contextArgs) =>
         {
             if (contextArgs.NewValue is BuildEntry buildEntry)

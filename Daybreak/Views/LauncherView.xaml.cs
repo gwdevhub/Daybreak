@@ -71,27 +71,21 @@ public partial class LauncherView : UserControl
         this.applicationDetector = applicationDetector.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
         this.InitializeComponent();
-        this.InitializeBrowsers();
-    }
-
-    private async void InitializeBrowsers()
-    {
-        await this.LeftWebBrowser.InitializeDefaultBrowser();
-        await this.RightWebBrowser.InitializeDefaultBrowser();
         this.NavigateToDefaults();
     }
 
-    private void NavigateToDefaults()
+    private async void NavigateToDefaults()
     {
         var applicationConfiguration = this.liveOptions.Value;
         if (applicationConfiguration.BrowsersEnabled)
         {
+            await this.LeftWebBrowser.InitializationTask();
+            await this.RightWebBrowser.InitializationTask();
+
             this.LeftBrowserFavoriteAddress = applicationConfiguration.LeftBrowserDefault;
             this.RightBrowserFavoriteAddress = applicationConfiguration.RightBrowserDefault;
             this.LeftBrowserAddress = applicationConfiguration.LeftBrowserDefault;
             this.RightBrowserAddress = applicationConfiguration.RightBrowserDefault;
-            this.LeftWebBrowser.WebBrowser.CoreWebView2.Navigate(applicationConfiguration.LeftBrowserDefault);
-            this.RightWebBrowser.WebBrowser.CoreWebView2.Navigate(applicationConfiguration.RightBrowserDefault);
         }
         else
         {

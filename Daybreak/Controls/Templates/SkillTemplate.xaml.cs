@@ -1,6 +1,9 @@
-﻿using Daybreak.Models.Guildwars;
+﻿using Daybreak.Launch;
+using Daybreak.Models.Guildwars;
 using Daybreak.Services.IconRetrieve;
+using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Core.Extensions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
@@ -27,15 +30,16 @@ public partial class SkillTemplate : UserControl
     private double borderOpacity;
 
     public SkillTemplate()
+        : this(Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IIconCache>())
     {
-        this.InitializeComponent();
-        this.DataContextChanged += this.SkillTemplate_DataContextChanged;
     }
 
-    public void InitializeSkillTemplate(IIconCache iconRetriever)
+    public SkillTemplate(
+        IIconCache iconCache)
     {
-        this.iconRetriever = iconRetriever;
-        this.SkillTemplate_DataContextChanged(this, new DependencyPropertyChangedEventArgs(UserControl.DataContextProperty, null, this.DataContext));
+        this.iconRetriever = iconCache.ThrowIfNull();
+        this.InitializeComponent();
+        this.DataContextChanged += this.SkillTemplate_DataContextChanged;
     }
 
     private async void SkillTemplate_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)

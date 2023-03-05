@@ -92,15 +92,6 @@ public sealed class IconBrowser : IIconBrowser
             await Task.Delay(1000);
         }
 
-        try
-        {
-            await this.browserWrapper.InitializeDefaultBrowser();
-        }
-        catch(Exception e)
-        {
-            this.logger.LogError(e, "Encountered error when initializing browser");
-        }
-
         var curedSkillName = request.Skill!.AlternativeName.IsNullOrWhiteSpace() ?
             request.Skill.Name!.Replace(" ", "_") :
             request.Skill.AlternativeName!.Replace(" ", "_");

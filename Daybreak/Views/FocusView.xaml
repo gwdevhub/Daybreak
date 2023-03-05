@@ -35,7 +35,7 @@
             Grid.ColumnSpan="2"
             Grid.Row="2"
             Grid.RowSpan="2"
-            Visibility="{Binding ElementName=_this, Path=GameData.Valid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+            Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"></ColumnDefinition>
                 <ColumnDefinition Width="0.1*"></ColumnDefinition>
@@ -242,7 +242,7 @@
         <Grid
             Grid.Row="1"
             Grid.Column="1"
-            Visibility="{Binding ElementName=_this, Path=GameData.Valid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+            Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"></RowDefinition>
                 <RowDefinition Height="10"></RowDefinition>
@@ -385,13 +385,16 @@
             ControlsEnabled="True"
             AddressBarReadonly="False"
             CanNavigate="True"
+            CanDownloadBuild="True"
             Address="{Binding ElementName=_this, Path=BrowserAddress, Mode=TwoWay}"
             MaximizeClicked="Browser_MaximizeClicked"
+            Visibility="Hidden"
+            BuildDecoded="Browser_BuildDecoded"
             PreventDispose="True"></controls:ChromiumBrowserWrapper>
         <controls:CircularLoadingWidget Grid.ColumnSpan="4"
                                         Grid.RowSpan="3"
                                         Width="100"
                                         Height="100"
-                                        Visibility="{Binding ElementName=_this, Path=GameData.Valid, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"></controls:CircularLoadingWidget>
+                                        Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"></controls:CircularLoadingWidget>
     </Grid>
 </UserControl>

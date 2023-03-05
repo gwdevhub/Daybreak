@@ -20,6 +20,7 @@ namespace Daybreak.Services.Scanner;
 /// </summary>
 public sealed class MemoryScanner : IMemoryScanner
 {
+    private const double MaximumReadSize = 10e9;
     private static readonly object LockObject = new();
 
     private readonly ILogger<MemoryScanner> logger;
@@ -125,8 +126,15 @@ public sealed class MemoryScanner : IMemoryScanner
     public T[] ReadArray<T>(IntPtr address, int size)
     {
         this.ValidateReadScanner();
+
         var itemSize = Marshal.SizeOf(typeof(T));
-        var buffer = Marshal.AllocHGlobal(size * itemSize);
+        var readSize = size * itemSize;
+        if (readSize > MaximumReadSize)
+        {
+            throw new InvalidOperationException($"Expected size to read is too large. Size {readSize}");
+        }
+
+        var buffer = Marshal.AllocHGlobal(readSize);
 
         NativeMethods.ReadProcessMemory(this.Process!.Handle,
             address,
@@ -237,6 +245,11 @@ public sealed class MemoryScanner : IMemoryScanner
 
     private byte[]? ReadBytesNonLocking(IntPtr address, int size)
     {
+        if (size > MaximumReadSize)
+        {
+            throw new InvalidOperationException($"Expected size to read is too large. Size {size}");
+        }
+
         var buffer = Marshal.AllocHGlobal(size);
 
         NativeMethods.ReadProcessMemory(this.Process!.Handle,

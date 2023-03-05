@@ -44,6 +44,17 @@ public sealed class Version : IEquatable<Version>, IComparable<Version>
         return version;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        foreach(var versionToken in this.VersionTokens)
+        {
+            hashCode += versionToken.GetHashCode();
+        }
+
+        return hashCode;
+    }
+
     public override bool Equals(object? obj)
     {
         if (obj is Version otherVersion)

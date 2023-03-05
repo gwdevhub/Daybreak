@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Web.WebView2.Core;
 using System;
 using System.Configuration;
+using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.Threading.Tasks;
@@ -35,9 +36,10 @@ public partial class ChromiumBrowserWrapper : UserControl
     public event EventHandler? MaximizeClicked;
     public event EventHandler<Build>? BuildDecoded;
 
-    private ILiveOptions<ApplicationConfiguration>? liveOptions;
-    private ILogger<ChromiumBrowserWrapper>? logger;
-    private IBuildTemplateManager? buildTemplateManager;
+    private readonly Task initializationTask;
+    private readonly ILiveOptions<ApplicationConfiguration>? liveOptions;
+    private readonly ILogger<ChromiumBrowserWrapper>? logger;
+    private readonly IBuildTemplateManager? buildTemplateManager;
     
     [GenerateDependencyProperty(InitialValue = true)]
     private bool canDownloadBuild;
@@ -75,9 +77,23 @@ public partial class ChromiumBrowserWrapper : UserControl
     }
 
     public ChromiumBrowserWrapper()
+        : this(Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILiveOptions<ApplicationConfiguration>>(),
+              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IBuildTemplateManager>(),
+              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILogger<ChromiumBrowserWrapper>>())
     {
+    }
+
+    public ChromiumBrowserWrapper(
+        ILiveOptions<ApplicationConfiguration> liveOptions,
+        IBuildTemplateManager buildTemplateManager,
+        ILogger<ChromiumBrowserWrapper> logger)
+    {
+        this.liveOptions = liveOptions.ThrowIfNull();
+        this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
+        this.logger = logger.ThrowIfNull();
+        this.initializationTask = this.InitializeBrowser();
+
         this.InitializeComponent();
-        this.WebBrowser.IsEnabled = false;
     }
 
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -89,29 +105,16 @@ public partial class ChromiumBrowserWrapper : UserControl
         }
     }
 
-    public async Task InitializeDefaultBrowser()
+    public async Task ReinitializeBrowser()
     {
-        var options = Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILiveOptions<ApplicationConfiguration>>();
-        var buildTemplateManager = Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IBuildTemplateManager>();
-        var logger = Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILogger<ChromiumBrowserWrapper>>();
-
-        await this.InitializeDefaultBrowser(options, buildTemplateManager, logger);
-    }
-
-    public async Task InitializeDefaultBrowser(
-        ILiveOptions<ApplicationConfiguration> liveOptions,
-        IBuildTemplateManager buildTemplateManager,
-        ILogger<ChromiumBrowserWrapper> logger)
-    {
-        this.liveOptions = liveOptions;
-        this.buildTemplateManager = buildTemplateManager;
-        this.logger = logger;
-        this.InitializeEnvironment();
         await this.InitializeBrowser();
     }
 
-    public async void ReinitializeBrowser()
+    public Task InitializationTask() => this.initializationTask;
+
+    private async void UserControl_Initialized(object sender, EventArgs e)
     {
+        this.InitializeEnvironment();
         await this.InitializeBrowser();
     }
 

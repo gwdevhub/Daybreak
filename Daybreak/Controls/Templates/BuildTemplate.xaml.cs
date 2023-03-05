@@ -1,9 +1,11 @@
 ﻿using Daybreak.Configuration;
+using Daybreak.Launch;
 using Daybreak.Models.Builds;
 using Daybreak.Models.Guildwars;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.IconRetrieve;
 using Daybreak.Utils;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -34,7 +36,6 @@ public partial class BuildTemplate : UserControl
     private bool showingSkillList = false;
     private bool replacingSecondaryProfession;
     private bool replacingPrimaryProfession;
-    private IIconBrowser? iconBrowser;
     private IAttributePointCalculator? attributePointCalculator;
     private SkillTemplate? selectingSkillTemplate;
     private List<Skill>? skillListCache;
@@ -54,34 +55,21 @@ public partial class BuildTemplate : UserControl
     public ObservableCollection<Profession> Professions { get; } = new ObservableCollection<Profession>(Profession.Professions);
 
     public BuildTemplate()
+        : this(Launcher.Instance.ApplicationServiceProvider.GetService<IAttributePointCalculator>()!)
     {
-        this.InitializeComponent();
-        this.buildEntry = new BuildEntry();
-        this.DataContextChanged += this.BuildTemplate_DataContextChanged;
+        
     }
-
-    public async void InitializeTemplate(
-        IAttributePointCalculator attributePointCalculator,
-        IIconCache iconRetriever,
-        IIconBrowser iconBrowser,
-        ILiveOptions<ApplicationConfiguration> liveOptions,
-        IBuildTemplateManager buildTemplateManager,
-        ILogger<ChromiumBrowserWrapper> logger)
+    
+    public BuildTemplate(
+        IAttributePointCalculator attributePointCalculator)
     {
         this.attributePointCalculator = attributePointCalculator.ThrowIfNull();
-        this.iconBrowser = iconBrowser.ThrowIfNull();
-        await this.SkillBrowser.InitializeDefaultBrowser(liveOptions, buildTemplateManager, logger);
-        this.SkillTemplate0.InitializeSkillTemplate(iconRetriever);
-        this.SkillTemplate1.InitializeSkillTemplate(iconRetriever);
-        this.SkillTemplate2.InitializeSkillTemplate(iconRetriever);
-        this.SkillTemplate3.InitializeSkillTemplate(iconRetriever);
-        this.SkillTemplate4.InitializeSkillTemplate(iconRetriever);
-        this.SkillTemplate5.InitializeSkillTemplate(iconRetriever);
-        this.SkillTemplate6.InitializeSkillTemplate(iconRetriever);
-        this.SkillTemplate7.InitializeSkillTemplate(iconRetriever);
 
+        this.InitializeComponent();
         this.HideSkillListView();
         this.HideInfoBrowser();
+        this.buildEntry = new BuildEntry();
+        this.DataContextChanged += this.BuildTemplate_DataContextChanged;
     }
 
     private void BuildTemplate_Unloaded(object sender, RoutedEventArgs e)

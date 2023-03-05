@@ -350,7 +350,8 @@ public sealed class GraphClient : IGraphClient
         CancellationToken cancellationToken = default)
     {
         chromiumBrowserWrapper.ThrowIfNull();
-        await chromiumBrowserWrapper.InitializeDefaultBrowser();
+
+        await chromiumBrowserWrapper.ReinitializeBrowser();
 
         var state = GetNewState();
 
