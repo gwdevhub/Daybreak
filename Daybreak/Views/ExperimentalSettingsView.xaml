@@ -92,6 +92,7 @@
                 <TextBlock Text="Launch gw as current user" Foreground="White" FontSize="22" Height="30"></TextBlock>
                 <TextBlock Text="Download icons" Foreground="White" FontSize="22" Height="30"></TextBlock>
                 <TextBlock Text="Enable Focus view" Foreground="White" FontSize="22" Height="30"></TextBlock>
+                <TextBlock Text="Memory reader frequency (in ms)" Foreground="White" FontSize="22" Height="30"></TextBlock>
             </StackPanel>
             <StackPanel Grid.Column="1">
                 <ToggleButton IsChecked="{Binding ElementName=_this, Path=MultiLaunch, Mode=TwoWay}" Style="{StaticResource AnimatedSwitch}"
@@ -107,6 +108,17 @@
                               Height="30" Width="60"></ToggleButton>
                 <ToggleButton IsChecked="{Binding ElementName=_this, Path=FocusViewEnabled, Mode=TwoWay}" Style="{StaticResource AnimatedSwitch}"
                               Height="30" Width="60"></ToggleButton>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Slider Minimum="16" Maximum="1000" Value="{Binding ElementName=_this, Path=MemoryReaderFrequency, Mode=TwoWay}"
+                            VerticalAlignment="Center" Interval="16" SmallChange="16" LargeChange="100"></Slider>
+                    <TextBox Text="{Binding ElementName=_this, Path=MemoryReaderFrequency, Mode=TwoWay, StringFormat=N2, UpdateSourceTrigger=PropertyChanged}" FontSize="22" Height="30" MinWidth="30"
+                               Grid.Column="1" Margin="10, 0, 0, 0"
+                             TextChanged="MemoryReaderLatencyBox_TextChanged" PreviewTextInput="TextBox_AllowNumbersOnly"></TextBox>
+                </Grid>
             </StackPanel>
         </Grid>
     </Grid>

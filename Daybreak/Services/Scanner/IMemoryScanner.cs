@@ -21,5 +21,6 @@ public interface IMemoryScanner
     byte[]? ReadBytes(IntPtr address, int size);
     string ReadWString(IntPtr address, int maxsize);
     T ReadPtrChain<T>(IntPtr Base, int finalPointerOffset = 0, params int[] offsets);
+    IntPtr ScanForAssertion(string? assertionFile, string? assertionMessage);
     IntPtr ScanForPtr(byte[] pattern, string? mask = default, bool readptr = false);
 }

@@ -85,6 +85,12 @@ public readonly struct GameContext
     [FieldOffset(0x790)]
     public readonly GuildwarsArray Players;
 
+    [FieldOffset(0x7A0)]
+    public readonly GuildwarsArray Titles;
+
+    [FieldOffset(0x7B0)]
+    public readonly GuildwarsArray TitlesTiers;
+
     [FieldOffset(0x07D0)]
     public readonly uint FoesKilled;
 

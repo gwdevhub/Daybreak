@@ -2,12 +2,9 @@
 using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
-using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -241,6 +238,60 @@ public sealed class MemoryScanner : IMemoryScanner
         }
 
         return IntPtr.Zero;
+    }
+
+    public IntPtr ScanForAssertion(string? assertionFile, string? assertionMessage)
+    {
+        this.ValidateReadScanner();
+        var mask = new StringBuilder(64);
+        for (var i = 0; i < 64; i++)
+        {
+            mask.Append('\0');
+        }
+
+        var assertionBytes = new byte[] { 0xBA, 0x0, 0x0, 0x0, 0x0, 0xB9, 0x0, 0x0, 0x0, 0x0 };
+        var assertionMask = "x????x????";
+        if (assertionMessage is not null)
+        {
+            var assertionMessageBytes = Encoding.ASCII.GetBytes(assertionMessage);
+            for (var i = 0; i < assertionMessage.Length; i++)
+            {
+                mask[i] = 'x';
+            }
+
+            mask[assertionMessage.Length] = 'x';
+            mask[assertionMessage.Length + 1] = '\0';
+            var rdataPtr = this.ScanForPtr(assertionMessageBytes, mask.ToString(), false);
+            if (rdataPtr == IntPtr.Zero)
+            {
+                return IntPtr.Zero;
+            }
+
+            assertionBytes[6] = (byte)rdataPtr.ToInt32();
+            assertionBytes[7] = (byte)(rdataPtr.ToInt32() >> 8);
+            assertionBytes[8] = (byte)(rdataPtr.ToInt32() >> 16);
+            assertionBytes[9] = (byte)(rdataPtr.ToInt32() >> 24);
+        }
+        
+        if (assertionFile is not null)
+        {
+            var assertionFileBytes = Encoding.ASCII.GetBytes(assertionFile);
+            for (var i = 0; i < assertionFile.Length; i++)
+            {
+                mask[i] = 'x';
+            }
+
+            mask[assertionFile.Length] = 'x';
+            mask[assertionFile.Length + 1] = '\0';
+            var rdataPtr = this.ScanForPtr(assertionFileBytes, mask.ToString(), false);
+
+            assertionBytes[1] = (byte)rdataPtr.ToInt32();
+            assertionBytes[2] = (byte)(rdataPtr.ToInt32() >> 8);
+            assertionBytes[3] = (byte)(rdataPtr.ToInt32() >> 16);
+            assertionBytes[4] = (byte)(rdataPtr.ToInt32() >> 24);
+        }
+
+        return this.ScanForPtr(assertionBytes, assertionMask, false);
     }
 
     private byte[]? ReadBytesNonLocking(IntPtr address, int size)

@@ -1,0 +1,20 @@
+﻿<UserControl x:Class="Daybreak.Controls.Glyphs.GaugeGlyph"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Daybreak.Controls.Glyphs"
+             mc:Ignorable="d" 
+             Name="_this"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Viewbox>
+        <Grid>
+            <Path Stroke="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                  Data="m13.5,13.5c1.44772,-1.44772 2.5,-3.29086 2.5,-5.5c0,-4.41828 -3.58172,-8 -8,-8s-8,3.58172 -8,8c0,2.20914 1.05228,4.05228 2.5,5.5"></Path>
+            <Path Stroke="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                  Data="m8,8l-4,-4"></Path>
+            <Ellipse Margin="6, 7.5, 6, 6" Width="1.5" Height="1.5"
+                     Stroke="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"></Ellipse>
+        </Grid>
+    </Viewbox>
+</UserControl>

@@ -20,6 +20,8 @@ public sealed class ExperimentalFeatures
     public bool DownloadIcons { get; set; }
     [JsonProperty("FocusViewEnabled")]
     public bool FocusViewEnabled { get; set; }
+    [JsonProperty("MemoryReaderFrequency")]
+    public double MemoryReaderFrequency { get; set; } = 16;
     [JsonProperty("Macros")]
     public List<KeyMacro> Macros { get; set; } = new();
 }

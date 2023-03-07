@@ -32,6 +32,8 @@ public partial class ExperimentalSettingsView : UserControl
     public bool downloadIcons;
     [GenerateDependencyProperty]
     public bool focusViewEnabled;
+    [GenerateDependencyProperty]
+    private double memoryReaderFrequency;
 
     private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions;
 
@@ -55,6 +57,7 @@ public partial class ExperimentalSettingsView : UserControl
         this.MacrosEnabled = config.ExperimentalFeatures.CanInterceptKeys;
         this.DownloadIcons = config.ExperimentalFeatures.DownloadIcons;
         this.FocusViewEnabled = config.ExperimentalFeatures.FocusViewEnabled;
+        this.MemoryReaderFrequency = config.ExperimentalFeatures.MemoryReaderFrequency;
     }
 
     private void SaveExperimentalSettings()
@@ -66,6 +69,7 @@ public partial class ExperimentalSettingsView : UserControl
         config.ExperimentalFeatures.CanInterceptKeys = this.MacrosEnabled;
         config.ExperimentalFeatures.DownloadIcons = this.DownloadIcons;
         config.ExperimentalFeatures.FocusViewEnabled = this.FocusViewEnabled;
+        config.ExperimentalFeatures.MemoryReaderFrequency = this.MemoryReaderFrequency;
         if (int.TryParse(this.GWToolboxLaunchDelay, out var gwToolboxLaunchDelay))
         {
             config.ExperimentalFeatures.ToolboxAutoLaunchDelay = gwToolboxLaunchDelay;
@@ -91,6 +95,18 @@ public partial class ExperimentalSettingsView : UserControl
         {
             e.CanExecute = false;
             e.Handled = true;
+        }
+    }
+
+    private void MemoryReaderLatencyBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (this.MemoryReaderFrequency < 16)
+        {
+            this.MemoryReaderFrequency = 16;
+        }
+        else if (this.MemoryReaderFrequency > 1000)
+        {
+            this.MemoryReaderFrequency = 1000;
         }
     }
 }
