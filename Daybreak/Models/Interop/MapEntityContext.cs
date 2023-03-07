@@ -7,27 +7,34 @@ public readonly struct MapEntityContext
 {
     [FieldOffset(0x00)]
     public readonly float CurrentEnergy;
+
     [FieldOffset(0x04)]
     public readonly float MaxEnergy;
+
     /// <summary>
     /// Amount of regen in one second.
     /// </summary>
     [FieldOffset(0x08)]
     public readonly float EnergyRegen;
+
     /// <summary>
     /// Milliseconds since the last information update from the server.
     /// </summary>
     [FieldOffset(0x0C)]
     public readonly int SkillTimestamp;
+
     [FieldOffset(0x20)]
     public readonly float CurrentHealth;
+
     [FieldOffset(0x24)]
     public readonly float MaxHealth;
+
     /// <summary>
     /// Amount of regen in one second.
     /// </summary>
     [FieldOffset(0x28)]
     public readonly float HealthRegen;
+
     /// <summary>
     /// Flags containing the current effects on the entity.
     /// 0x0001 Bleeding

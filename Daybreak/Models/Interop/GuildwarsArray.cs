@@ -7,7 +7,10 @@ namespace Daybreak.Models.Interop;
 public readonly struct GuildwarsArray
 {
     public readonly IntPtr Buffer;
+
     public readonly uint Capacity;
+
     public readonly uint Size;
+
     public readonly uint Param;
 }

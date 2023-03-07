@@ -24,6 +24,9 @@ public readonly struct PlayerContext
     [FieldOffset(0x002C)]
     public readonly uint PartyLeaderPlayerNumber;
 
+    [FieldOffset(0x0030)]
+    public readonly uint ActiveTitleTier;
+
     [FieldOffset(0x0034)]
     public readonly uint PlayerNumber;
 

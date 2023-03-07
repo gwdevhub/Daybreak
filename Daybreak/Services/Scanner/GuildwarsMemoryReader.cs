@@ -1,31 +1,41 @@
-﻿using Daybreak.Models;
+﻿using Daybreak.Configuration;
+using Daybreak.Models;
 using Daybreak.Models.Builds;
 using Daybreak.Models.Guildwars;
 using Daybreak.Models.Interop;
+using Daybreak.Models.Metrics;
+using Daybreak.Services.Metrics;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using System.Extensions;
 using System.Linq;
 using System.Logging;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 
 namespace Daybreak.Services.Scanner;
 
 public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
 {
     private const int RetryInitializationCount = 15;
+    private const string LatencyMeterName = "Memory Reader Latency";
+    private const string LatencyMeterUnitsName = "Milliseconds";
+    private const string LatencyMeterDescription = "Amount of milliseconds elapsed while reading memory. P95 aggregation";
 
     private readonly IMemoryScanner memoryScanner;
+    private readonly Histogram<double> latencyMeter;
+    private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
     private readonly ILogger<GuildwarsMemoryReader> logger;
 
     private IntPtr playerIdPointer;
     private IntPtr entityArrayPointer;
+    private IntPtr titleDataPointer;
     private volatile CancellationTokenSource? cancellationTokenSource;
 
     public bool Faulty { get; private set; }
@@ -38,9 +48,13 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
 
     public GuildwarsMemoryReader(
         IMemoryScanner memoryScanner,
+        IMetricsService metricsService,
+        ILiveOptions<ApplicationConfiguration> liveOptions,
         ILogger<GuildwarsMemoryReader> logger)
     {
         this.memoryScanner = memoryScanner.ThrowIfNull();
+        this.latencyMeter = metricsService.ThrowIfNull().CreateHistogram<double>(LatencyMeterName, LatencyMeterUnitsName, LatencyMeterDescription, AggregationTypes.P95);
+        this.liveOptions = liveOptions.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
     }
     
@@ -117,14 +131,29 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
     {
         var cancellationTokenSource = new CancellationTokenSource();
         this.cancellationTokenSource = cancellationTokenSource;
-        System.Extensions.TaskExtensions.RunPeriodicAsync(() => this.SafeReadGameMemory(cancellationTokenSource.Token), TimeSpan.Zero, TimeSpan.FromSeconds(1), cancellationTokenSource.Token);
+        _ = Task.Run(() => this.RecursivelyReadGameMemory(this.cancellationTokenSource.Token), this.cancellationTokenSource.Token);
+    }
+    
+    private async Task RecursivelyReadGameMemory(CancellationToken cancellationToken)
+    {
+        if (cancellationToken.IsCancellationRequested)
+        {
+            return;
+        }
+
+        this.SafeReadGameMemory(cancellationToken);
+        await Task.Delay((int)this.liveOptions.Value.ExperimentalFeatures.MemoryReaderFrequency);
+        _ = Task.Run(() => this.RecursivelyReadGameMemory(cancellationToken), cancellationToken);
     }
 
     private void SafeReadGameMemory(CancellationToken cancellationToken)
     {
         try
         {
+            var stopWatch = Stopwatch.StartNew();
             this.ReadGameMemory(cancellationToken);
+            stopWatch.Stop();
+            this.latencyMeter.Record(stopWatch.Elapsed.TotalMilliseconds);
             this.Faulty = false;
         }
         catch(Exception e)
@@ -175,13 +204,32 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
         var skills = this.memoryScanner.ReadArray<SkillbarContext>(gameContext.Skillbars);
         var partyAttributes = this.memoryScanner.ReadArray<PartyAttributesContext>(gameContext.PartyAttributes);
         var playerEntityId = this.memoryScanner.ReadPtrChain<int>(this.GetPlayerIdPointer(), 0x0, 0x0);
+        var titles = this.memoryScanner.ReadArray<TitleContext>(gameContext.Titles);
+        var titleTiers = this.memoryScanner.ReadArray<TitleTierContext>(gameContext.TitlesTiers);
+        
+        
+        // The following lines would retrieve all titles infos.
+        //var titleDataPtr = this.memoryScanner.Read<IntPtr>(this.GetTitleDataPointer());
+        //var titleInfos = this.memoryScanner.ReadArray<TitleInfo>(titleDataPtr, 48);
         
         
         // The following lines would retrieve all entities, including item entities.
         //var entityArray = this.memoryScanner.ReadPtrChain<GuildwarsArray>(this.GetEntityArrayPointer(), 0x0, 0x0);
         //var entities = this.memoryScanner.ReadArray<EntityContext>(entityArray);
 
-        this.GameData = this.AggregateGameData(gameContext, instanceContext, mapEntities, players, professions, quests, userContext, skills, partyAttributes, playerEntityId);
+        this.GameData = this.AggregateGameData(
+            gameContext,
+            instanceContext,
+            mapEntities,
+            players,
+            professions,
+            quests,
+            userContext,
+            skills,
+            partyAttributes,
+            titles,
+            titleTiers,
+            playerEntityId);
     }
 
     private IntPtr GetPlayerIdPointer()
@@ -203,6 +251,16 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
 
         return this.entityArrayPointer;
     }
+
+    private IntPtr GetTitleDataPointer()
+    {
+        if (this.titleDataPointer == IntPtr.Zero)
+        {
+            this.titleDataPointer = this.memoryScanner.ScanForAssertion("p:\\code\\gw\\const\\consttitle.cpp", "index < arrsize(s_titleClientData)") + 0x12;
+        }
+
+        return this.titleDataPointer;
+    }
     
     private GameData AggregateGameData(
         GameContext gameContext,
@@ -214,6 +272,8 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
         UserContext userContext,
         SkillbarContext[] skills,
         PartyAttributesContext[] partyAttributes,
+        TitleContext[] titles,
+        TitleTierContext[] titleTiers,
         int mainPlayerEntityId)
     {
         var email = ParseAndCleanWCharArray(userContext.PlayerEmailBytes);
@@ -224,11 +284,21 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
             .Select(p => GetPlayerInformation((int)p.AgentId, instanceContext, entities, professions, skills, partyAttributes))
             .ToList();
 
-        var mainPlayer = GetMainPlayerInformation(mainPlayerEntityId, name, gameContext, instanceContext, entities, professions, quests, skills, partyAttributes);
+        var mainPlayer = this.GetMainPlayerInformation(
+            gameContext,
+            instanceContext,
+            players.FirstOrDefault(p => p.AgentId == mainPlayerEntityId),
+            entities,
+            professions,
+            quests,
+            skills,
+            partyAttributes,
+            titles,
+            titleTiers);
 
         var worldPlayers = players
             .Where(p => p.AgentId != mainPlayerEntityId)
-            .Select(p => GetWorldPlayerInformation(p, this.memoryScanner.ReadWString(p.NamePointer, 0x40), instanceContext, entities, professions, skills, partyAttributes))
+            .Select(p => this.GetWorldPlayerInformation(p, instanceContext, entities, professions, skills, partyAttributes, titles, titleTiers))
             .ToList();
 
         
@@ -270,18 +340,19 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
         };
     }
     
-    private static MainPlayerInformation GetMainPlayerInformation(
-        int mainPlayerId,
-        string name,
+    private MainPlayerInformation GetMainPlayerInformation(
         GameContext gameContext,
         InstanceContext instanceContext,
+        PlayerContext playerContext,
         MapEntityContext[] entities,
         ProfessionsContext[] professions,
         QuestContext[] quests,
         SkillbarContext[] skillbars,
-        PartyAttributesContext[] partyAttributes)
+        PartyAttributesContext[] partyAttributes,
+        TitleContext[] titles,
+        TitleTierContext[] titleTiers)
     {
-        var playerInformation = GetPlayerInformation(mainPlayerId, instanceContext, entities, professions, skillbars, partyAttributes);
+        var playerInformation = this.GetWorldPlayerInformation(playerContext, instanceContext, entities, professions, skillbars, partyAttributes, titles, titleTiers);
         _ = Quest.TryParse((int)gameContext.QuestId, out var quest);
         var questLog = quests
             .Select(q =>
@@ -308,24 +379,63 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
             HealthRegen = playerInformation.HealthRegen,
             Quest = quest,
             QuestLog = questLog,
-            Name = name,
+            Name = playerInformation.Name,
             Experience = gameContext.Experience,
             Level = gameContext.Level,
             Morale = gameContext.Morale,
-            CurrentBuild = playerInformation.CurrentBuild
+            CurrentBuild = playerInformation.CurrentBuild,
+            TitleInformation = playerInformation.TitleInformation
         };
     }
 
-    private static WorldPlayerInformation GetWorldPlayerInformation(
+    private WorldPlayerInformation GetWorldPlayerInformation(
         PlayerContext playerContext,
-        string name,
         InstanceContext instanceContext,
         MapEntityContext[] entities,
         ProfessionsContext[] professions,
         SkillbarContext[] skillbars,
-        PartyAttributesContext[] partyAttributes)
+        PartyAttributesContext[] partyAttributes,
+        TitleContext[] titles,
+        TitleTierContext[] titleTiers)
     {
+        var name = this.memoryScanner.ReadWString(playerContext.NamePointer, 0x40);
         var playerInformation = GetPlayerInformation(playerContext.AgentId, instanceContext, entities, professions, skillbars, partyAttributes);
+        var maybeCurrentTitleContext = (TitleContext?)null;
+        var maybeCurrentTitle = (Title?)null;
+        for(var i = 0; i < titles.Length; i++)
+        {
+            var title = titles[i];
+            if (title.CurrentTitleTierIndex == playerContext.ActiveTitleTier)
+            {
+                maybeCurrentTitleContext = title;
+                _ = Title.TryParse(i, out maybeCurrentTitle);
+                break;
+            }
+        }
+
+        var maybeTitleTier = (TitleTierContext?)null;
+        if (maybeCurrentTitleContext is TitleContext currentTitle)
+        {
+            maybeTitleTier = titleTiers[currentTitle.CurrentTitleTierIndex];
+        }
+
+        var titleInformation = (TitleInformation?)null;
+        if (maybeCurrentTitleContext is not null && maybeTitleTier is not null)
+        {
+            titleInformation = new TitleInformation
+            {
+                CurrentPoints = maybeCurrentTitleContext?.CurrentPoints,
+                IsPercentage = maybeCurrentTitleContext?.IsPercentage,
+                PointsForCurrentRank = maybeCurrentTitleContext?.PointsNeededForCurrentRank,
+                PointsForNextRank = maybeTitleTier?.TierNumber == maybeCurrentTitleContext?.MaxTitleRank ?
+                    maybeCurrentTitleContext?.CurrentPoints :
+                    maybeCurrentTitleContext?.PointsNeededForNextRank,
+                TierNumber = maybeTitleTier?.TierNumber,
+                MaxTierNumber = maybeCurrentTitleContext?.MaxTitleRank,
+                Title = maybeCurrentTitle
+            };
+        }
+
         return new WorldPlayerInformation
         {
             PrimaryProfession = playerInformation.PrimaryProfession,
@@ -338,7 +448,8 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
             EnergyRegen = playerInformation.EnergyRegen,
             HealthRegen = playerInformation.HealthRegen,
             Name = name,
-            CurrentBuild = playerInformation.CurrentBuild
+            CurrentBuild = playerInformation.CurrentBuild,
+            TitleInformation = titleInformation
         };
     }
 

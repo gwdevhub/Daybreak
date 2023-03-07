@@ -32,6 +32,8 @@ using Daybreak.Services.Onboarding;
 using Daybreak.Services.Menu;
 using Daybreak.Services.Scanner;
 using Daybreak.Services.Experience;
+using Daybreak.Services.Metrics;
+using Daybreak.Services.Monitoring;
 
 namespace Daybreak.Configuration;
 
@@ -87,6 +89,8 @@ public static class ProjectConfiguration
 
         services.AddScoped((sp) => new ScopeMetadata(new CorrelationVector()));
         services.AddSingleton<ViewManager>();
+        services.AddSingleton<ProcessorUsageMonitor>();
+        services.AddSingleton<MemoryUsageMonitor>();
         services.AddSingleton<IViewManager, ViewManager>(sp => sp.GetRequiredService<ViewManager>());
         services.AddSingleton<IViewProducer, ViewManager>(sp => sp.GetRequiredService<ViewManager>());
         services.AddSingleton<PostUpdateActionManager>();
@@ -101,6 +105,7 @@ public static class ProjectConfiguration
         services.AddSingleton<IShortcutManager, ShortcutManager>();
         services.AddSingleton<IIconBrowser, IconBrowser>();
         services.AddSingleton<IIconDownloader, IconDownloader>();
+        services.AddSingleton<IMetricsService, MetricsService>();
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
         services.AddScoped<IScreenshotProvider, ScreenshotProvider>();
@@ -140,6 +145,7 @@ public static class ProjectConfiguration
         viewProducer.RegisterView<GraphAuthorizationView>();
         viewProducer.RegisterView<BuildsSynchronizationView>();
         viewProducer.RegisterView<OnboardingView>();
+        viewProducer.RegisterView<MetricsView>();
     }
 
     public static void RegisterPostUpdateActions(IPostUpdateActionProducer postUpdateActionProducer)

@@ -1,0 +1,44 @@
+﻿<UserControl x:Class="Daybreak.Views.MetricsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Daybreak.Views"
+             xmlns:scottPlot="clr-namespace:ScottPlot;assembly=ScottPlot"
+             mc:Ignorable="d" 
+             Loaded="UserControl_Loaded"
+             x:Name="_this"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Background="#F0212121">
+        <ListBox ItemsSource="{Binding ElementName=_this, Path=Metrics, Mode=OneWay}"
+                  Background="Transparent">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel></VirtualizingStackPanel>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel HorizontalAlignment="Stretch"
+                                Margin="0, 0, 0, 20">
+                        <TextBlock Text="{Binding Instrument.Name}"
+                                   Foreground="White"
+                                   FontSize="14"
+                                   VerticalAlignment="Center"></TextBlock>
+                        <TextBlock Text="{Binding Instrument.Description}"
+                                   Foreground="White"
+                                   FontSize="11"
+                                   VerticalAlignment="Center"></TextBlock>
+                        <WpfPlot Loaded="WpfPlot_Loaded" HorizontalContentAlignment="Stretch"
+                                 Height="300"></WpfPlot>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</UserControl>

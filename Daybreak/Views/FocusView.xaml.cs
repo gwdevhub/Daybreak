@@ -12,9 +12,11 @@ using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
+using System.Windows.Media.Animation;
 
 namespace Daybreak.Views;
 
@@ -60,9 +62,20 @@ public partial class FocusView : UserControl
     private string energyBarText = string.Empty;
 
     [GenerateDependencyProperty]
+    private bool titleActive;
+    [GenerateDependencyProperty]
+    private string titleText = string.Empty;
+    [GenerateDependencyProperty]
+    private string titleRankName = string.Empty;
+    [GenerateDependencyProperty]
+    private int pointsInCurrentRank;
+    [GenerateDependencyProperty]
+    private int pointsForNextRank;
+
+    [GenerateDependencyProperty]
     private bool vanquishing;
     [GenerateDependencyProperty]
-    private uint totalFoes;
+    private int totalFoes;
     [GenerateDependencyProperty]
     private string vanquishingText = string.Empty;
 
@@ -114,6 +127,11 @@ public partial class FocusView : UserControl
         {
             this.UpdateRightSideBarsLayout();
         }
+        else if (e.Property == TitleActiveProperty &&
+            e.OldValue != e.NewValue)
+        {
+            this.UpdateRightSideBarsLayout();
+        }
 
         base.OnPropertyChanged(e);
     }
@@ -144,9 +162,39 @@ public partial class FocusView : UserControl
 
             this.CurrentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(this.GameData.MainPlayer!.Experience);
             this.NextLevelExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(this.GameData.MainPlayer!.Experience);
-            this.TotalFoes = this.GameData.Session.FoesKilled + this.GameData.Session.FoesToKill;
+            this.TotalFoes = (int)(this.GameData.Session.FoesKilled + this.GameData.Session.FoesToKill);
             this.Vanquishing = this.GameData.Session.FoesToKill + this.GameData.Session.FoesKilled > 0U;
+            this.TitleActive = this.GameData.MainPlayer.TitleInformation is not null && this.GameData.MainPlayer.TitleInformation.IsValid;
+
             this.MainPlayerDataValid = this.GameData.Valid && this.GameData.MainPlayer.MaxHealth > 0U && this.GameData.MainPlayer.MaxEnergy > 0U;
+            if (this.GameData.MainPlayer.TitleInformation is TitleInformation titleInformation && titleInformation.IsValid)
+            {
+                if (titleInformation.Title is not null)
+                {
+                    var rankIndex = (int)titleInformation.TierNumber! - 1;
+                    this.TitleRankName = titleInformation.Title.Tiers![rankIndex];
+                }
+                else
+                {
+                    this.TitleRankName = string.Empty;
+                }
+
+                if (titleInformation.MaxTierNumber == titleInformation.TierNumber)
+                {
+                    this.PointsInCurrentRank = (int)titleInformation.CurrentPoints!;
+                    this.PointsForNextRank = (int)titleInformation.CurrentPoints!;
+                }
+                else if (titleInformation.IsPercentage is false)
+                {
+                    this.PointsInCurrentRank = (int)((uint)titleInformation.CurrentPoints! - (uint)titleInformation.PointsForCurrentRank!);
+                    this.PointsForNextRank = (int)((uint)titleInformation.PointsForNextRank! - (uint)titleInformation.PointsForCurrentRank!);
+                }
+                else
+                {
+                    this.PointsInCurrentRank = (int)(uint)titleInformation.CurrentPoints!;
+                    this.PointsForNextRank = (int)(uint)titleInformation.PointsForNextRank!;
+                }
+            }
 
             this.Browser.Visibility = this.MainPlayerDataValid is true ? Visibility.Visible : Visibility.Collapsed;
             this.UpdateExperienceText();
@@ -157,6 +205,7 @@ public partial class FocusView : UserControl
             this.UpdateVanquishingText();
             this.UpdateHealthText();
             this.UpdateEnergyText();
+            this.UpdateTitleText();
         },
         System.Windows.Threading.DispatcherPriority.ApplicationIdle);
     }
@@ -164,7 +213,17 @@ public partial class FocusView : UserControl
     private void UpdateRightSideBarsLayout()
     {
         // If vanquishing, there's 3 bars, otherwise there's only 2 bars
-        var bars = this.Vanquishing ? 3 : 2;
+        var bars = 2;
+        if (this.Vanquishing)
+        {
+            bars += 1;
+        }
+
+        if (this.TitleActive)
+        {
+            bars += 1;
+        }
+        
         var marginsTotalSize = 4 * bars;
         var finalBarSize = (BarsTotalSize - marginsTotalSize) / bars;
         this.RightSideBarSize = finalBarSize;
@@ -308,13 +367,38 @@ public partial class FocusView : UserControl
         }
     }
 
+    private void UpdateTitleText()
+    {
+        if (this.GameData.MainPlayer?.TitleInformation?.IsPercentage is true)
+        {
+            this.TitleText = $"{(double?)this.GameData.MainPlayer?.TitleInformation?.CurrentPoints / 10d}%";
+        }
+        else
+        {
+            this.TitleText = $"{this.GameData.MainPlayer?.TitleInformation?.CurrentPoints}/{this.GameData.MainPlayer?.TitleInformation?.PointsForNextRank}";
+        }
+    }
+
+    private async Task PeriodicallyUpdateGameData(CancellationToken cancellationToken)
+    {
+        if (this.cancellationTokenSource is null ||
+            this.cancellationTokenSource?.IsCancellationRequested is true)
+        {
+            return;
+        }
+
+        this.UpdateGameData();
+        await Task.Delay((int)this.liveUpdateableOptions.Value.ExperimentalFeatures.MemoryReaderFrequency, cancellationToken);
+        _ = Task.Run(() => this.PeriodicallyUpdateGameData(this.cancellationTokenSource!.Token), this.cancellationTokenSource!.Token);
+    }
+
     private void FocusView_Loaded(object _, RoutedEventArgs e)
     {
         this.UpdateRightSideBarsLayout();
         this.BrowserAddress = this.liveUpdateableOptions.Value.FocusViewOptions.BrowserUrl;
         this.cancellationTokenSource?.Cancel();
         this.cancellationTokenSource = new CancellationTokenSource();
-        TaskExtensions.RunPeriodicAsync(this.UpdateGameData, TimeSpan.Zero, TimeSpan.FromSeconds(1), this.cancellationTokenSource.Token);
+        Task.Run(() => this.PeriodicallyUpdateGameData(this.cancellationTokenSource.Token));
     }
 
     private void FocusView_Unloaded(object _, RoutedEventArgs e)
@@ -529,6 +613,14 @@ public partial class FocusView : UserControl
             var buildEntry = this.buildTemplateManager.CreateBuild();
             buildEntry.Build = build;
             this.viewManager.ShowView<BuildTemplateView>(buildEntry);
+        }
+    }
+
+    private void Title_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (this.GameData.MainPlayer?.TitleInformation?.Title is Title title)
+        {
+            this.BrowserAddress = title.WikiUrl;
         }
     }
 

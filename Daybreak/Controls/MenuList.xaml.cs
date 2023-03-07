@@ -74,4 +74,10 @@ public partial class MenuList : UserControl
         var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
         viewManager.ShowView<LogsView>();
     }
+
+    private void MetricsButton_Clicked(object sender, EventArgs e)
+    {
+        var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
+        viewManager.ShowView<MetricsView>();
+    }
 }

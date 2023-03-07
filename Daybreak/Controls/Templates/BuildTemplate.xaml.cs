@@ -50,9 +50,10 @@ public partial class BuildTemplate : UserControl
     [GenerateDependencyProperty]
     private int attributePoints;
 
-    public ObservableCollection<Skill> AvailableSkills { get; } = new ObservableCollection<Skill>();
-    public ObservableCollection<AttributeEntry> Attributes { get; } = new ObservableCollection<AttributeEntry>();
-    public ObservableCollection<Profession> Professions { get; } = new ObservableCollection<Profession>(Profession.Professions);
+    [GenerateDependencyProperty]
+    private List<Skill> availableSkills = new();
+    [GenerateDependencyProperty]
+    private List<Profession> professions = new();
 
     public BuildTemplate()
         : this(Launcher.Instance.ApplicationServiceProvider.GetService<IAttributePointCalculator>()!)
@@ -89,6 +90,7 @@ public partial class BuildTemplate : UserControl
             this.BuildEntry = buildEntry;
             this.BuildEntry.PropertyChanged += this.BuildEntry_Changed;
             this.AttributePoints = this.attributePointCalculator!.GetRemainingFreePoints(this.BuildEntry.Build!);
+            this.LoadSkills();
         }
     }
 
@@ -135,13 +137,14 @@ public partial class BuildTemplate : UserControl
         this.SkillListContainer.Width = 400;
         this.SkillListContainer.Visibility = Visibility.Visible;
         this.showingSkillList = true;
-        if (this.skillListCache?.Except(this.AvailableSkills).None() is true &&
+        if (this.AvailableSkills is not null &&
+            this.skillListCache?.Except(this.AvailableSkills).None() is true &&
             this.skillListCache.Count == this.AvailableSkills.Count)
         {
             return;
         }
 
-        this.AvailableSkills.ClearAnd().AddRange(this.skillListCache);
+        this.AvailableSkills = this.skillListCache;
     }
 
     private void HideSkillListView()
@@ -378,39 +381,11 @@ public partial class BuildTemplate : UserControl
         this.HideProfessionListView();
     }
 
-    private void ListView_NavigateWithMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
-    {
-        e.Handled = true;
-        if (e.Delta > 0)
-        {
-            sender.As<ListView>().SelectedIndex = sender.As<ListView>().SelectedIndex > 0 ?
-                sender.As<ListView>().SelectedIndex - 1 :
-                0;
-        }
-        else
-        {
-            sender.As<ListView>().SelectedIndex = sender.As<ListView>().SelectedIndex < sender.As<ListView>().Items.Count - 1 ?
-                sender.As<ListView>().SelectedIndex + 1 :
-                sender.As<ListView>().Items.Count;
-        }
-    }
-
-    private void ScrollViewer_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
-    {
-        if (sender is not ScrollViewer scrollViewer)
-        {
-            return;
-        }
-
-        e.Handled = true;
-        scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - e.Delta);
-    }
-
     private void SecondaryProfessionButton_Clicked(object sender, EventArgs e)
     {
         this.replacingPrimaryProfession = false;
         this.replacingSecondaryProfession = true;
-        this.Professions.ClearAnd().AddRange(Profession.Professions.Where(p => p != this.BuildEntry?.Secondary));
+        this.Professions = Profession.Professions.Where(p => p != this.BuildEntry?.Secondary).ToList();
         this.ShowProfessionListView();
     }
 

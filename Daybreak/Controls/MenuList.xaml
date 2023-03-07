@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Controls"
              xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
+             xmlns:glyphs="clr-namespace:Daybreak.Controls.Glyphs"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel>
@@ -95,6 +96,17 @@
             <buttons:MenuButton.InnerContent>
                 <local:LogsGlyph Foreground="White"
                                        Width="40"></local:LogsGlyph>
+            </buttons:MenuButton.InnerContent>
+        </buttons:MenuButton>
+        <buttons:MenuButton Title="Metrics" 
+                            Foreground="White"
+                            HighlightColor="White"
+                            Height="30"
+                            Cursor="Hand"
+                            Clicked="MetricsButton_Clicked">
+            <buttons:MenuButton.InnerContent>
+                <glyphs:GaugeGlyph Foreground="White"
+                                       Width="40"></glyphs:GaugeGlyph>
             </buttons:MenuButton.InnerContent>
         </buttons:MenuButton>
     </StackPanel>

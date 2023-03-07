@@ -3,11 +3,13 @@ using Daybreak.Services.Logging;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Extensions;
 using System.IO;
 using System.Linq;
 using System.Windows.Controls;
+using System.Windows.Extensions;
 
 namespace Daybreak.Views;
 
@@ -19,7 +21,8 @@ public partial class LogsView : UserControl
     private readonly ILogsManager logManager;
     private readonly ILogger<LogsView> logger;
 
-    public ObservableCollection<Log> Logs { get; } = new ObservableCollection<Log>();
+    [GenerateDependencyProperty]
+    private List<Log> logs = new();
 
     public LogsView(
         ILogsManager logManager,
@@ -33,8 +36,9 @@ public partial class LogsView : UserControl
 
     private void UpdateLogs()
     {
-        this.Logs.ClearAnd().AddRange(this.logManager.GetLogs(l => l.LogLevel < Microsoft.Extensions.Logging.LogLevel.Trace));
+        this.Logs = this.logManager.GetLogs(l => l.LogLevel < Microsoft.Extensions.Logging.LogLevel.Trace).ToList();
     }
+
     private async void ExportButton_Clicked(object sender, EventArgs e)
     {
         this.logger.LogInformation("Exporting logs");
@@ -57,11 +61,13 @@ public partial class LogsView : UserControl
             this.logger.LogInformation("Exporting canceled");
         }
     }
+    
     private void BinButton_Clicked(object sender, EventArgs e)
     {
         this.logManager.DeleteLogs();
         this.UpdateLogs();
     }
+    
     private void RefreshGlyph_Clicked(object sender, EventArgs e)
     {
         this.UpdateLogs();

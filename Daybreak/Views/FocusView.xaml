@@ -212,6 +212,20 @@
                 <controls:HorizontalResourceBar 
                     Margin="0, 2, 0, 2"
                     Height="{Binding ElementName=_this, Path=RightSideBarSize, Mode=OneWay}"
+                    CurrentResourceValue="{Binding ElementName=_this, Path=PointsInCurrentRank, Mode=OneWay}"
+                    MaxResourceValue="{Binding ElementName=_this, Path=PointsForNextRank, Mode=OneWay}"
+                    VerticalAlignment="Bottom"
+                    HorizontalAlignment="Left"
+                    BarColor="#6000E676"
+                    Foreground="White"
+                    FontSize="14"
+                    Cursor="Hand"
+                    Text="{Binding ElementName=_this, Path=TitleText, Mode=OneWay}"
+                    FillAlignment="Right"
+                    Visibility="{Binding ElementName=_this, Path=TitleActive, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                <controls:HorizontalResourceBar 
+                    Margin="0, 2, 0, 2"
+                    Height="{Binding ElementName=_this, Path=RightSideBarSize, Mode=OneWay}"
                     CurrentResourceValue="{Binding ElementName=_this, Path=GameData.MainPlayer.CurrentHealth, Mode=OneWay}"
                     MaxResourceValue="{Binding ElementName=_this, Path=GameData.MainPlayer.MaxHealth, Mode=OneWay}"
                     VerticalAlignment="Bottom"
@@ -245,18 +259,16 @@
             Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"></RowDefinition>
-                <RowDefinition Height="10"></RowDefinition>
                 <RowDefinition Height="auto"></RowDefinition>
-                <RowDefinition Height="10"></RowDefinition>
                 <RowDefinition Height="auto"></RowDefinition>
-                <RowDefinition Height="10"></RowDefinition>
+                <RowDefinition Height="auto"></RowDefinition>
                 <RowDefinition Height="auto"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
             <StackPanel
                 Background="#F0212121"
                 Grid.Row="0"
-                Margin="0, 0, 5, 0">
+                Margin="0, 0, 5, 10">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"></ColumnDefinition>
@@ -316,8 +328,49 @@
             </StackPanel>
             <StackPanel
                 Background="#F0212121"
+                Grid.Row="1"
+                Margin="0, 0, 5, 10"
+                Visibility="{Binding ElementName=_this, Path=GameData.MainPlayer.TitleInformation.IsValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock 
+                        Grid.Column="0"
+                        FontSize="18"
+                        Margin="10"
+                        Text="Title Track"
+                        HorizontalAlignment="Left"></TextBlock>
+                    <controls:OpaqueButton
+                        Grid.Column="1"
+                        Text="{Binding ElementName=_this, Path=GameData.MainPlayer.TitleInformation.Title.Name, Mode=OneWay}"
+                        Highlight="White"
+                        HighlightOpacity="0.6"
+                        Margin="10"
+                        HorizontalAlignment="Stretch"
+                        TextHorizontalAlignment="Center"
+                        Cursor="Hand"
+                        FontSize="18"
+                        MouseLeftButtonDown="Title_MouseLeftButtonDown"></controls:OpaqueButton>
+                </Grid>
+                <Rectangle 
+                    Height="1"
+                    Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"></Rectangle>
+                <controls:OpaqueButton
+                    Text="{Binding ElementName=_this, Path=TitleRankName, Mode=OneWay}"
+                    Highlight="White"
+                    HighlightOpacity="0.6"
+                    HorizontalAlignment="Stretch"
+                    TextHorizontalAlignment="Left"
+                    Cursor="Hand"
+                    FontSize="20"
+                    MouseLeftButtonDown="Title_MouseLeftButtonDown"></controls:OpaqueButton>
+            </StackPanel>
+            <StackPanel
+                Background="#F0212121"
                 Grid.Row="2"
-                Margin="0, 0, 5, 0">
+                Margin="0, 0, 5, 10">
                 <TextBlock 
                     FontSize="18"
                     Margin="10"
@@ -337,8 +390,8 @@
             </StackPanel>
             <StackPanel
                 Background="#F0212121"
-                Grid.Row="4"
-                Margin="0, 0, 5, 0">
+                Grid.Row="3"
+                Margin="0, 0, 5, 10">
                 <TextBlock 
                     FontSize="18"
                     Margin="10"
@@ -358,7 +411,7 @@
             </StackPanel>
             <TextBlock 
                     Background="#F0212121"
-                    Grid.Row="6"
+                    Grid.Row="4"
                     FontSize="18"
                     Margin="0, 0, 5, 0"
                     Padding="10"
@@ -367,7 +420,7 @@
                     Background="#F0212121"
                     VerticalScrollBarVisibility="Auto"
                     HorizontalScrollBarVisibility="Disabled"
-                    Grid.Row="7"
+                    Grid.Row="5"
                     Margin="0, 0, 5, 0">
                 <templates:QuestLogTemplate
                         Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
