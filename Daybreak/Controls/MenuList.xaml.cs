@@ -5,6 +5,7 @@ using Daybreak.Views;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Configuration;
+using System.Core.Extensions;
 using System.Windows.Controls;
 
 namespace Daybreak.Controls;
@@ -14,70 +15,79 @@ namespace Daybreak.Controls;
 /// </summary>
 public partial class MenuList : UserControl
 {
+    private readonly IViewManager viewManager;
+    private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
+
     public MenuList()
+        : this(
+              Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>(),
+              Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILiveOptions<ApplicationConfiguration>>())
     {
         this.InitializeComponent();
     }
 
+    private MenuList(
+        IViewManager viewManager,
+        ILiveOptions<ApplicationConfiguration> liveOptions)
+    {
+        this.viewManager = viewManager.ThrowIfNull();
+        this.liveOptions = liveOptions.ThrowIfNull();
+    }
+
     private void GameCompanionButton_Clicked(object sender, EventArgs e)
     {
-        var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
-        viewManager.ShowView<LauncherView>();
+        this.viewManager.ShowView<LauncherView>();
     }
 
     private void AccountSettingsButton_Clicked(object sender, EventArgs e)
     {
-        var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
-        viewManager.ShowView<AccountsView>();
+        this.viewManager.ShowView<AccountsView>();
     }
 
     private void GuildwarsSettingsButton_Clicked(object sender, EventArgs e)
     {
-        var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
-        viewManager.ShowView<ExecutablesView>();
+        this.viewManager.ShowView<ExecutablesView>();
     }
 
     private void LauncherSettingsButton_Clicked(object sender, EventArgs e)
     {
-        var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
-        viewManager.ShowView<SettingsView>();
+        this.viewManager.ShowView<SettingsView>();
     }
 
     private void ExperimentalSettingsButton_Clicked(object sender, EventArgs e)
     {
-        var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
-        viewManager.ShowView<ExperimentalSettingsView>();
+        this.viewManager.ShowView<ExperimentalSettingsView>();
     }
 
     private void ManageBuildsButton_Clicked(object sender, EventArgs e)
     {
-        var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
-        var options = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILiveOptions<ApplicationConfiguration>>();
-        if (options.Value.ExperimentalFeatures.DownloadIcons)
+        if (this.liveOptions.Value.ExperimentalFeatures.DownloadIcons)
         {
-            viewManager.ShowView<IconDownloadView>();
+            this.viewManager.ShowView<IconDownloadView>();
         }
         else
         {
-            viewManager.ShowView<BuildsListView>();
+            this.viewManager.ShowView<BuildsListView>();
         }
     }
 
     private void VersionManagementButton_Clicked(object sender, EventArgs e)
     {
-        var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
-        viewManager.ShowView<VersionManagementView>();
+        this.viewManager.ShowView<VersionManagementView>();
     }
-
+    
     private void LogsButton_Clicked(object sender, EventArgs e)
     {
-        var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
-        viewManager.ShowView<LogsView>();
+        this.viewManager.ShowView<LogsView>();
     }
 
     private void MetricsButton_Clicked(object sender, EventArgs e)
     {
-        var viewManager = Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>();
-        viewManager.ShowView<MetricsView>();
+        this.viewManager.ShowView<MetricsView>();
+    }
+
+    private void DownloadGuildwarsButton_Clicked(object sender, EventArgs e)
+    {
+        this.viewManager.ShowView<DownloadView>();
     }
 }
