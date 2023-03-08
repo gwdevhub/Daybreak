@@ -479,7 +479,9 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
             primaryProfession is not null &&
             secondaryProfession is not null)
         {
-            var attributes = new List<Models.Guildwars.Attribute> { primaryProfession.PrimaryAttribute! }
+            var attributes = (primaryProfession.PrimaryAttribute is null ?
+                new List<Models.Guildwars.Attribute>() :
+                new List<Models.Guildwars.Attribute> { primaryProfession.PrimaryAttribute! })
                 .Concat(primaryProfession.Attributes)
                 .Concat(secondaryProfession.Attributes)
                 .Select(a => new AttributeEntry { Attribute = a })
@@ -505,7 +507,10 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader, IDisposable
                 Primary = primaryProfession,
                 Secondary = secondaryProfession,
                 Attributes = attributes,
-                Skills = skillbarContext.Skills.Select(s => Skill.Parse((int)s.Id)).ToList()
+                Skills = skillbarContext.Skills.Select(s =>
+                        Skill.TryParse((int)s.Id, out var parsedSkill) ?
+                        parsedSkill :
+                        Skill.NoSkill).ToList()
             };
         }
         
