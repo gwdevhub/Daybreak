@@ -31,6 +31,17 @@
                                        Width="40"></local:FireballGlyph>
             </buttons:MenuButton.InnerContent>
         </buttons:MenuButton>
+        <buttons:MenuButton Title="Download Guildwars" 
+                            Foreground="White"
+                            HighlightColor="White"
+                            Height="30"
+                            Cursor="Hand"
+                            Clicked="DownloadGuildwarsButton_Clicked">
+            <buttons:MenuButton.InnerContent>
+                <glyphs:DownloadGlyph Foreground="White"
+                                       Width="40"></glyphs:DownloadGlyph>
+            </buttons:MenuButton.InnerContent>
+        </buttons:MenuButton>
         <buttons:MenuButton Title="Account settings" 
                             Foreground="White"
                             HighlightColor="White"

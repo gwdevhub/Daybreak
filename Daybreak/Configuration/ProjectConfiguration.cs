@@ -34,11 +34,16 @@ using Daybreak.Services.Scanner;
 using Daybreak.Services.Experience;
 using Daybreak.Services.Metrics;
 using Daybreak.Services.Monitoring;
+using System.Net;
+using System.Net.Http.Headers;
+using Daybreak.Services.Downloads;
 
 namespace Daybreak.Configuration;
 
 public static class ProjectConfiguration
 {
+    private const string DaybreakUserAgent = "Daybreak";
+
     public static void RegisterResolvers(IServiceManager serviceManager)
     {
         serviceManager.ThrowIfNull();
@@ -52,6 +57,7 @@ public static class ProjectConfiguration
                     var logger = sp.GetService<ILogger<ApplicationUpdater>>();
                     return new LoggingHttpMessageHandler(logger!) { InnerHandler = new HttpClientHandler() };
                 })
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<BloogumClient>()
                 .WithMessageHandler(sp =>
@@ -59,6 +65,7 @@ public static class ProjectConfiguration
                     var logger = sp.GetService<ILogger<BloogumClient>>();
                     return new LoggingHttpMessageHandler(logger!) { InnerHandler = new HttpClientHandler() };
                 })
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<GraphClient>()
                 .WithMessageHandler(sp =>
@@ -66,6 +73,15 @@ public static class ProjectConfiguration
                     var logger = sp.GetService<ILogger<GraphClient>>();
                     return new LoggingHttpMessageHandler(logger!) { InnerHandler = new HttpClientHandler() };
                 })
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
+                .Build()
+            .RegisterHttpClient<DownloadService>()
+                .WithMessageHandler(sp =>
+                {
+                    var logger = sp.GetService<ILogger<GraphClient>>();
+                    return new LoggingHttpMessageHandler(logger!) { InnerHandler = new HttpClientHandler() };
+                })
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build();
     }
 
@@ -121,6 +137,7 @@ public static class ProjectConfiguration
         services.AddScoped<IMemoryScanner, MemoryScanner>();
         services.AddScoped<IExperienceCalculator, ExperienceCalculator>();
         services.AddScoped<IAttributePointCalculator, AttributePointCalculator>();
+        services.AddScoped<IDownloadService, DownloadService>();
     }
 
     public static void RegisterViews(IViewProducer viewProducer)
@@ -146,6 +163,7 @@ public static class ProjectConfiguration
         viewProducer.RegisterView<BuildsSynchronizationView>();
         viewProducer.RegisterView<OnboardingView>();
         viewProducer.RegisterView<MetricsView>();
+        viewProducer.RegisterView<DownloadView>();
     }
 
     public static void RegisterPostUpdateActions(IPostUpdateActionProducer postUpdateActionProducer)
@@ -153,5 +171,10 @@ public static class ProjectConfiguration
         postUpdateActionProducer.ThrowIfNull();
 
         postUpdateActionProducer.AddPostUpdateAction<RenameInstallerAction>();
+    }
+
+    private static void SetupDaybreakUserAgent(HttpRequestHeaders httpRequestHeaders)
+    {
+        httpRequestHeaders.ThrowIfNull().TryAddWithoutValidation("User-Agent", DaybreakUserAgent);
     }
 }

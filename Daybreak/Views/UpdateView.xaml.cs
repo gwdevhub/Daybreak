@@ -3,6 +3,7 @@ using Daybreak.Services.Navigation;
 using Daybreak.Services.Updater;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Core.Extensions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
@@ -35,9 +36,9 @@ public partial class UpdateView : UserControl
         ILogger<UpdateView> logger,
         IViewManager viewManager)
     {
-        this.applicationUpdater = applicationUpdater;
-        this.logger = logger;
-        this.viewManager = viewManager;
+        this.applicationUpdater = applicationUpdater.ThrowIfNull();
+        this.logger = logger.ThrowIfNull();
+        this.viewManager = viewManager.ThrowIfNull();
         this.updateStatus.PropertyChanged += this.UpdateStatus_PropertyChanged!;
         this.InitializeComponent();
     }
