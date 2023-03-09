@@ -11,6 +11,7 @@ using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -27,8 +28,12 @@ public partial class ChromiumBrowserWrapper : UserControl
 {
     public static readonly DependencyProperty AddressProperty =
         DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, string>(nameof(Address));
-    
+
+    private const string BrowserSearchPlaceholder = "[PLACEHOLDER]";
+    private const string BrowserSearchLink = $"https://www.google.com/search?q={BrowserSearchPlaceholder}";
     private const string BrowserDownloadLink = "https://developer.microsoft.com/en-us/microsoft-edge/webview2/";
+
+    private static readonly Regex WebAddressRegex = new("^((http|ftp|https)://)?([\\w_-]+(?:(?:\\.[\\w_-]+)+))([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?", RegexOptions.Compiled);
 
     private static CoreWebView2Environment? coreWebView2Environment;
 
@@ -196,14 +201,19 @@ public partial class ChromiumBrowserWrapper : UserControl
     {
         if (e.Key == System.Windows.Input.Key.Enter)
         {
-            var newAddress = sender.As<TextBox>().Text;
-            newAddress = SanitizeAddress(newAddress);
-            if (newAddress.IsNullOrWhiteSpace())
+            var input = sender.As<TextBox>().Text;
+            var maybeAddress = SanitizeAddress(input);
+            // If input is address, navigate to address. Otherwise search for the text input in Google
+            if (Uri.TryCreate(maybeAddress, UriKind.Absolute, out _))
             {
-                return;
+                this.Address = maybeAddress;
+            }
+            else
+            {
+                var address = BrowserSearchLink.Replace(BrowserSearchPlaceholder, maybeAddress);
+                this.Address = address;
             }
 
-            this.Address = newAddress;
             this.WebBrowser.CoreWebView2.Navigate(this.Address);
             e.Handled = true;
         }
@@ -332,6 +342,11 @@ public partial class ChromiumBrowserWrapper : UserControl
         if (string.IsNullOrWhiteSpace(address))
         {
             return default!;
+        }
+
+        if (WebAddressRegex.IsMatch(address) is false)
+        {
+            return address;
         }
 
         if (address.StartsWith("www") is false &&
