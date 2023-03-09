@@ -136,7 +136,7 @@ public partial class FocusView : UserControl
         base.OnPropertyChanged(e);
     }
 
-    private void UpdateGameData()
+    private async void UpdateGameData()
     {
         if (this.applicationLauncher.IsGuildwarsRunning is false)
         {
@@ -144,15 +144,17 @@ public partial class FocusView : UserControl
             this.viewManager.ShowView<LauncherView>();
         }
 
-        if (this.guildwarsMemoryReader.Running is false ||
-            this.guildwarsMemoryReader.Faulty)
+        await this.guildwarsMemoryReader.EnsureInitialized();
+
+        var maybeGameData = await this.guildwarsMemoryReader.ReadGameData();
+        if (maybeGameData is not GameData gameData)
         {
-            this.guildwarsMemoryReader.Initialize(this.applicationLauncher.RunningGuildwarsProcess!);
+            return;
         }
 
         this.Dispatcher.Invoke(() =>
         {
-            this.GameData = this.guildwarsMemoryReader.GameData;
+            this.GameData = gameData;
             if (this.GameData?.MainPlayer is null ||
                 this.GameData?.User is null ||
                 this.GameData?.Session is null)
@@ -169,10 +171,11 @@ public partial class FocusView : UserControl
             this.MainPlayerDataValid = this.GameData.Valid && this.GameData.MainPlayer.MaxHealth > 0U && this.GameData.MainPlayer.MaxEnergy > 0U;
             if (this.GameData.MainPlayer.TitleInformation is TitleInformation titleInformation && titleInformation.IsValid)
             {
-                if (titleInformation.Title is not null)
+                if (titleInformation.Title is not null &&
+                    titleInformation.Title.Tiers!.Count > titleInformation.TierNumber - 1)
                 {
                     var rankIndex = (int)titleInformation.TierNumber! - 1;
-                    this.TitleRankName = titleInformation.Title.Tiers![rankIndex];
+                    this.TitleRankName = $"{titleInformation.Title.Tiers![rankIndex]} ({titleInformation.TierNumber}/{titleInformation.MaxTierNumber})";
                 }
                 else
                 {
@@ -371,11 +374,11 @@ public partial class FocusView : UserControl
     {
         if (this.GameData.MainPlayer?.TitleInformation?.IsPercentage is true)
         {
-            this.TitleText = $"{(double?)this.GameData.MainPlayer?.TitleInformation?.CurrentPoints / 10d}%";
+            this.TitleText = $"{(double?)this.GameData.MainPlayer?.TitleInformation?.CurrentPoints / 10d}% Rank Progress";
         }
         else
         {
-            this.TitleText = $"{this.GameData.MainPlayer?.TitleInformation?.CurrentPoints}/{this.GameData.MainPlayer?.TitleInformation?.PointsForNextRank}";
+            this.TitleText = $"{this.GameData.MainPlayer?.TitleInformation?.CurrentPoints}/{this.GameData.MainPlayer?.TitleInformation?.PointsForNextRank} Rank Progress";
         }
     }
 
