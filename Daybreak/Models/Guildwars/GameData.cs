@@ -11,4 +11,5 @@ public sealed class GameData
     public UserInformation? User { get; init; }
     public SessionInformation? Session { get; init; }
     public List<WorldPlayerInformation>? WorldPlayers { get; init; }
+    public List<LivingEntity>? LivingEntities { get; init; }
 }

@@ -17,6 +17,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 using System.Windows.Media.Animation;
+using System.Windows.Threading;
 
 namespace Daybreak.Views;
 
@@ -34,9 +35,15 @@ public partial class FocusView : UserControl
     private readonly IViewManager viewManager;
     private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions;
     private readonly ILogger<FocusView> logger;
+    private readonly DispatcherTimer gameDataTimer = new(DispatcherPriority.ApplicationIdle);
+
+    private int cachedMapId = -1;
 
     [GenerateDependencyProperty]
     private GameData gameData;
+
+    [GenerateDependencyProperty]
+    private PathingData pathingData;
 
     [GenerateDependencyProperty]
     private bool mainPlayerDataValid;
@@ -87,7 +94,6 @@ public partial class FocusView : UserControl
     [GenerateDependencyProperty]
     private string browserAddress = string.Empty;
 
-    private CancellationTokenSource? cancellationTokenSource;
     private bool browserMaximized = false;
 
     public FocusView(
@@ -107,17 +113,19 @@ public partial class FocusView : UserControl
         this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
         this.gameData = new GameData();
+        this.pathingData = new PathingData();
 
         this.InitializeComponent();
 
         this.LeftSideBarSize = 25;
+        this.gameDataTimer.Tick += (_, _) => this.UpdateGameData();
+        this.gameDataTimer.Interval = TimeSpan.FromMilliseconds(this.liveUpdateableOptions.Value.ExperimentalFeatures.MemoryReaderFrequency);
     }
 
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
     {
         if (e.Property == BrowserAddressProperty &&
-            this.Browser.BrowserEnabled &&
-            this.cancellationTokenSource is not null) //CancellationToken is null only when the view is unloaded. Using this to not overwrite the previous browserurl with the uninitialized value of the address.
+            this.Browser.BrowserEnabled)
         {
             this.liveUpdateableOptions.Value.FocusViewOptions.BrowserUrl = this.BrowserAddress;
             this.liveUpdateableOptions.UpdateOption();
@@ -135,6 +143,27 @@ public partial class FocusView : UserControl
 
         base.OnPropertyChanged(e);
     }
+    
+    private async void UpdatePathingData()
+    {
+        if (this.applicationLauncher.IsGuildwarsRunning is false)
+        {
+            this.logger.LogInformation($"Executable is not running. Returning to {nameof(LauncherView)}");
+            this.viewManager.ShowView<LauncherView>();
+        }
+
+        await this.guildwarsMemoryReader.EnsureInitialized().ConfigureAwait(true);
+        
+        var maybePathingData = await this.guildwarsMemoryReader.ReadPathingData().ConfigureAwait(true);
+        if (maybePathingData is not PathingData pathingData ||
+            pathingData.Trapezoids is null)
+        {
+            return;
+        }
+
+        this.cachedMapId = this.GameData.Session!.CurrentMap!.Id;
+        this.PathingData = pathingData;
+    }
 
     private async void UpdateGameData()
     {
@@ -144,73 +173,74 @@ public partial class FocusView : UserControl
             this.viewManager.ShowView<LauncherView>();
         }
 
-        await this.guildwarsMemoryReader.EnsureInitialized();
+        await this.guildwarsMemoryReader.EnsureInitialized().ConfigureAwait(true);
 
-        var maybeGameData = await this.guildwarsMemoryReader.ReadGameData();
+        var maybeGameData = await this.guildwarsMemoryReader.ReadGameData().ConfigureAwait(true);
         if (maybeGameData is not GameData gameData)
         {
             return;
         }
 
-        this.Dispatcher.Invoke(() =>
+        this.GameData = gameData;
+        if (this.GameData?.MainPlayer is null ||
+            this.GameData?.User is null ||
+            this.GameData?.Session is null)
         {
-            this.GameData = gameData;
-            if (this.GameData?.MainPlayer is null ||
-                this.GameData?.User is null ||
-                this.GameData?.Session is null)
+            return;
+        }
+
+        if (this.GameData.Session.CurrentMap!.Id != this.cachedMapId)
+        {
+            this.UpdatePathingData();
+        }
+
+        this.CurrentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(this.GameData.MainPlayer!.Experience);
+        this.NextLevelExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(this.GameData.MainPlayer!.Experience);
+        this.TotalFoes = (int)(this.GameData.Session.FoesKilled + this.GameData.Session.FoesToKill);
+        this.Vanquishing = this.GameData.Session.FoesToKill + this.GameData.Session.FoesKilled > 0U;
+        this.TitleActive = this.GameData.MainPlayer.TitleInformation is not null && this.GameData.MainPlayer.TitleInformation.IsValid;
+
+        this.MainPlayerDataValid = this.GameData.Valid && this.GameData.MainPlayer.MaxHealth > 0U && this.GameData.MainPlayer.MaxEnergy > 0U;
+        if (this.GameData.MainPlayer.TitleInformation is TitleInformation titleInformation && titleInformation.IsValid)
+        {
+            if (titleInformation.Title is not null &&
+                titleInformation.Title.Tiers!.Count > titleInformation.TierNumber - 1)
             {
-                return;
+                var rankIndex = (int)titleInformation.TierNumber! - 1;
+                this.TitleRankName = $"{titleInformation.Title.Tiers![rankIndex]} ({titleInformation.TierNumber}/{titleInformation.MaxTierNumber})";
+            }
+            else
+            {
+                this.TitleRankName = string.Empty;
             }
 
-            this.CurrentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(this.GameData.MainPlayer!.Experience);
-            this.NextLevelExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(this.GameData.MainPlayer!.Experience);
-            this.TotalFoes = (int)(this.GameData.Session.FoesKilled + this.GameData.Session.FoesToKill);
-            this.Vanquishing = this.GameData.Session.FoesToKill + this.GameData.Session.FoesKilled > 0U;
-            this.TitleActive = this.GameData.MainPlayer.TitleInformation is not null && this.GameData.MainPlayer.TitleInformation.IsValid;
-
-            this.MainPlayerDataValid = this.GameData.Valid && this.GameData.MainPlayer.MaxHealth > 0U && this.GameData.MainPlayer.MaxEnergy > 0U;
-            if (this.GameData.MainPlayer.TitleInformation is TitleInformation titleInformation && titleInformation.IsValid)
+            if (titleInformation.MaxTierNumber == titleInformation.TierNumber)
             {
-                if (titleInformation.Title is not null &&
-                    titleInformation.Title.Tiers!.Count > titleInformation.TierNumber - 1)
-                {
-                    var rankIndex = (int)titleInformation.TierNumber! - 1;
-                    this.TitleRankName = $"{titleInformation.Title.Tiers![rankIndex]} ({titleInformation.TierNumber}/{titleInformation.MaxTierNumber})";
-                }
-                else
-                {
-                    this.TitleRankName = string.Empty;
-                }
-
-                if (titleInformation.MaxTierNumber == titleInformation.TierNumber)
-                {
-                    this.PointsInCurrentRank = (int)titleInformation.CurrentPoints!;
-                    this.PointsForNextRank = (int)titleInformation.CurrentPoints!;
-                }
-                else if (titleInformation.IsPercentage is false)
-                {
-                    this.PointsInCurrentRank = (int)((uint)titleInformation.CurrentPoints! - (uint)titleInformation.PointsForCurrentRank!);
-                    this.PointsForNextRank = (int)((uint)titleInformation.PointsForNextRank! - (uint)titleInformation.PointsForCurrentRank!);
-                }
-                else
-                {
-                    this.PointsInCurrentRank = (int)(uint)titleInformation.CurrentPoints!;
-                    this.PointsForNextRank = (int)(uint)titleInformation.PointsForNextRank!;
-                }
+                this.PointsInCurrentRank = (int)titleInformation.CurrentPoints!;
+                this.PointsForNextRank = (int)titleInformation.CurrentPoints!;
             }
+            else if (titleInformation.IsPercentage is false)
+            {
+                this.PointsInCurrentRank = (int)((uint)titleInformation.CurrentPoints! - (uint)titleInformation.PointsForCurrentRank!);
+                this.PointsForNextRank = (int)((uint)titleInformation.PointsForNextRank! - (uint)titleInformation.PointsForCurrentRank!);
+            }
+            else
+            {
+                this.PointsInCurrentRank = (int)(uint)titleInformation.CurrentPoints!;
+                this.PointsForNextRank = (int)(uint)titleInformation.PointsForNextRank!;
+            }
+        }
 
-            this.Browser.Visibility = this.MainPlayerDataValid is true ? Visibility.Visible : Visibility.Collapsed;
-            this.UpdateExperienceText();
-            this.UpdateLuxonText();
-            this.UpdateKurzickText();
-            this.UpdateImperialText();
-            this.UpdateBalthazarText();
-            this.UpdateVanquishingText();
-            this.UpdateHealthText();
-            this.UpdateEnergyText();
-            this.UpdateTitleText();
-        },
-        System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+        this.Browser.Visibility = this.MainPlayerDataValid is true ? Visibility.Visible : Visibility.Collapsed;
+        this.UpdateExperienceText();
+        this.UpdateLuxonText();
+        this.UpdateKurzickText();
+        this.UpdateImperialText();
+        this.UpdateBalthazarText();
+        this.UpdateVanquishingText();
+        this.UpdateHealthText();
+        this.UpdateEnergyText();
+        this.UpdateTitleText();
     }
 
     private void UpdateRightSideBarsLayout()
@@ -382,32 +412,16 @@ public partial class FocusView : UserControl
         }
     }
 
-    private async Task PeriodicallyUpdateGameData(CancellationToken cancellationToken)
-    {
-        if (this.cancellationTokenSource is null ||
-            this.cancellationTokenSource?.IsCancellationRequested is true)
-        {
-            return;
-        }
-
-        this.UpdateGameData();
-        await Task.Delay((int)this.liveUpdateableOptions.Value.ExperimentalFeatures.MemoryReaderFrequency, cancellationToken);
-        _ = Task.Run(() => this.PeriodicallyUpdateGameData(this.cancellationTokenSource!.Token), this.cancellationTokenSource!.Token);
-    }
-
     private void FocusView_Loaded(object _, RoutedEventArgs e)
     {
         this.UpdateRightSideBarsLayout();
         this.BrowserAddress = this.liveUpdateableOptions.Value.FocusViewOptions.BrowserUrl;
-        this.cancellationTokenSource?.Cancel();
-        this.cancellationTokenSource = new CancellationTokenSource();
-        Task.Run(() => this.PeriodicallyUpdateGameData(this.cancellationTokenSource.Token));
+        this.gameDataTimer.Start();
     }
 
     private void FocusView_Unloaded(object _, RoutedEventArgs e)
     {
-        this.cancellationTokenSource?.Cancel();
-        this.cancellationTokenSource = null;
+        this.gameDataTimer.Stop();
         this.guildwarsMemoryReader?.Stop();
     }
 

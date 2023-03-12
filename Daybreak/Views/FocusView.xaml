@@ -430,20 +430,36 @@
                 </templates:QuestLogTemplate>
             </ScrollViewer>
         </Grid>
-        <controls:ChromiumBrowserWrapper
-            x:Name="Browser"
+        <Grid 
             Grid.Column="2"
             Grid.Row="1"
-            Margin="5, 0, 0, 0"
-            ControlsEnabled="True"
-            AddressBarReadonly="False"
-            CanNavigate="True"
-            CanDownloadBuild="True"
-            Address="{Binding ElementName=_this, Path=BrowserAddress, Mode=TwoWay}"
-            MaximizeClicked="Browser_MaximizeClicked"
-            Visibility="Hidden"
-            BuildDecoded="Browser_BuildDecoded"
-            PreventDispose="True"></controls:ChromiumBrowserWrapper>
+            Margin="5, 0, 0, 0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <controls:ChromiumBrowserWrapper
+                x:Name="Browser"
+                Grid.Row="0"
+                ControlsEnabled="True"
+                AddressBarReadonly="False"
+                CanNavigate="True"
+                CanDownloadBuild="True"
+                Address="{Binding ElementName=_this, Path=BrowserAddress, Mode=TwoWay}"
+                MaximizeClicked="Browser_MaximizeClicked"
+                Visibility="Hidden"
+                BuildDecoded="Browser_BuildDecoded"
+                PreventDispose="True"></controls:ChromiumBrowserWrapper>
+            <controls:GuildwarsMinimap
+                Margin="0, 5, 0, 0"
+                Background="#F0212121"
+                Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                GameData="{Binding ElementName=_this, Path=GameData, Mode=OneWay}"
+                PathingData="{Binding ElementName=_this, Path=PathingData, Mode=OneWay}"
+                Zoom="0.05"
+                ClipToBounds="False"
+                Grid.Row="1"></controls:GuildwarsMinimap>
+        </Grid>
         <controls:CircularLoadingWidget Grid.ColumnSpan="4"
                                         Grid.RowSpan="3"
                                         Width="100"

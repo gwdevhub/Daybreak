@@ -55,6 +55,7 @@
     <PackageReference Include="WpfExtended" Version="0.7.1" />
     <PackageReference Include="WpfExtended.SourceGeneration" Version="0.1.1" />
     <PackageReference Include="WpfScreenHelper" Version="2.1.0" />
+    <PackageReference Include="WriteableBitmapEx" Version="1.6.8" />
   </ItemGroup>
 
   <ItemGroup>
@@ -65,6 +66,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Controls\Buttons\MinusButton.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Controls\Glyphs\MapGlyph.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Controls\Glyphs\StarGlyph.xaml.cs">
