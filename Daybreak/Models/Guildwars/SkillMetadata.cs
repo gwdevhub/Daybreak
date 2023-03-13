@@ -1,6 +1,6 @@
 ﻿namespace Daybreak.Models.Guildwars;
 
-public sealed class SkillMetadata
+public readonly struct SkillMetadata
 {
     public Skill? Skill { get; init; }
     public uint Adrenaline1 { get; init; }

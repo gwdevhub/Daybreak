@@ -99,6 +99,16 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         return Task.Run(() => this.SafeReadGameMemory(this.ReadPathingDataInternal));
     }
 
+    public Task<PathingMetadata?> ReadPathingMetaData()
+    {
+        if (this.memoryScanner.Scanning is false)
+        {
+            return Task.FromResult<PathingMetadata?>(default);
+        }
+
+        return Task.Run(() => this.SafeReadGameMemory(this.ReadPathingMetaDataInternal));
+    }
+
     private async Task InitializeSafe(Process process, ScopedLogger<GuildwarsMemoryReader> scopedLogger)
     {
         scopedLogger.LogInformation($"Initializing {nameof(GuildwarsMemoryReader)}");
@@ -216,7 +226,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
             playerEntityId);
     }
 
-    private PathingData ReadPathingDataInternal()
+    private PathingData? ReadPathingDataInternal()
     {
         var globalContext = this.memoryScanner.ReadPtrChain<GlobalContext>(this.memoryScanner.ModuleStartAddress, finalPointerOffset: 0x0, 0x00629244, 0xC, 0xC);
         var mapContext = this.memoryScanner.Read<MapContext>(globalContext.MapContext);
@@ -225,17 +235,15 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         var pathingMaps = this.memoryScanner.ReadArray<PathingMap>(pathingMapContext.PathingMapArray);
         var pathingTrapezoidMapping = pathingMaps
             .Select(pathingMap => (pathingMap, this.memoryScanner.ReadArray<PathingTrapezoid>(pathingMap.TrapezoidArray, (int)pathingMap.TrapezoidCount)))
-            .Select((mapping) => (mapping.pathingMap, mapping.Item2, mapping.Item2.Select(trapezoid => trapezoid.AdjacentPathingTrapezoids.Select(adjacentPtr => this.memoryScanner.Read<PathingTrapezoid>(adjacentPtr)).ToArray()).ToArray()))
             .ToArray();
 
         var trapezoidList = new List<Trapezoid>();
         foreach(var mapping in pathingTrapezoidMapping)
         {
-            var (_, pathingTrapezoids, adjacentTrapezoids) = mapping;
+            var (_, pathingTrapezoids) = mapping;
             for (var i = 0; i < pathingTrapezoids.Length; i++)
             {
                 var pathingTrapezoid = pathingTrapezoids[i];
-                var adjacent = adjacentTrapezoids[i];
                 trapezoidList.Add(new Trapezoid
                 {
                     Id = pathingTrapezoid.Id,
@@ -245,12 +253,21 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
                     XBL = pathingTrapezoid.XBL,
                     XBR = pathingTrapezoid.XBR,
                     YB = pathingTrapezoid.YB,
-                    AdjacentIds = adjacent.Select(a => a.Id).ToArray()
                 });
             }
         }
 
         return new PathingData { Trapezoids = trapezoidList };
+    }
+
+    private PathingMetadata? ReadPathingMetaDataInternal()
+    {
+        var globalContext = this.memoryScanner.ReadPtrChain<GlobalContext>(this.memoryScanner.ModuleStartAddress, finalPointerOffset: 0x0, 0x00629244, 0xC, 0xC);
+        var mapContext = this.memoryScanner.Read<MapContext>(globalContext.MapContext);
+
+        var pathingMapContext = this.memoryScanner.ReadPtrChain<PathingMapContext>(mapContext.PathingMapContextPtr, 0x0, 0x0);
+
+        return new PathingMetadata { TrapezoidCount = (int)pathingMapContext.PathingMapArray.Size };
     }
 
     private IntPtr GetPlayerIdPointer()
@@ -454,7 +471,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
                 _ = Map.TryParse((int)q.MapTo, out var mapTo);
                 return new QuestMetadata { Quest = parsedQuest, From = mapFrom, To = mapTo };
             })
-            .Where(q => q?.Quest is not null)
+            .Where(q => q.Quest is not null)
             .ToList();
 
         return new MainPlayerInformation

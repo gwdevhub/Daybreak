@@ -1,6 +1,6 @@
 ﻿namespace Daybreak.Models.Guildwars;
 
-public sealed class LivingEntity
+public readonly struct LivingEntity
 {
     public int Id { get; init; }
 

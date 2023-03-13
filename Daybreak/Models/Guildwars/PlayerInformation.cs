@@ -2,7 +2,7 @@
 
 namespace Daybreak.Models.Guildwars;
 
-public class PlayerInformation
+public readonly struct PlayerInformation
 {
     public int Id { get; init; }
     public int Level { get; init; }

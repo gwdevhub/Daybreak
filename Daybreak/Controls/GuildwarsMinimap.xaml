@@ -8,14 +8,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <Image x:Name="MapDrawingHost" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-               RenderTransformOrigin="0.5, 0.5">
-            <Image.RenderTransform>
-                <TransformGroup>
-                    <TranslateTransform x:Name="MapTranslateTransform"></TranslateTransform>
-                    <ScaleTransform x:Name="MapScaleTransform"></ScaleTransform>
-                </TransformGroup>
-            </Image.RenderTransform>
+        <Image x:Name="MapDrawingHost" VerticalAlignment="Top" HorizontalAlignment="Left" Stretch="None">
         </Image>
         <Image x:Name="EntitiesDrawingHost" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
     </Grid>

@@ -11,12 +11,9 @@ using System;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
-using System.Windows.Media.Animation;
 using System.Windows.Threading;
 
 namespace Daybreak.Views;
@@ -36,8 +33,6 @@ public partial class FocusView : UserControl
     private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions;
     private readonly ILogger<FocusView> logger;
     private readonly DispatcherTimer gameDataTimer = new(DispatcherPriority.ApplicationIdle);
-
-    private int cachedMapId = -1;
 
     [GenerateDependencyProperty]
     private GameData gameData;
@@ -90,6 +85,8 @@ public partial class FocusView : UserControl
     private double leftSideBarSize;
     [GenerateDependencyProperty]
     private double rightSideBarSize;
+    [GenerateDependencyProperty]
+    private bool faultyPathingData;
 
     [GenerateDependencyProperty]
     private string browserAddress = string.Empty;
@@ -156,12 +153,12 @@ public partial class FocusView : UserControl
         
         var maybePathingData = await this.guildwarsMemoryReader.ReadPathingData().ConfigureAwait(true);
         if (maybePathingData is not PathingData pathingData ||
-            pathingData.Trapezoids is null)
+            pathingData.Trapezoids is null ||
+            pathingData.Trapezoids.Count == 0)
         {
             return;
         }
 
-        this.cachedMapId = this.GameData.Session!.CurrentMap!.Id;
         this.PathingData = pathingData;
     }
 
@@ -182,26 +179,27 @@ public partial class FocusView : UserControl
         }
 
         this.GameData = gameData;
-        if (this.GameData?.MainPlayer is null ||
-            this.GameData?.User is null ||
-            this.GameData?.Session is null)
+        if (this.GameData.MainPlayer is null ||
+            this.GameData.User is null ||
+            this.GameData.Session is null)
         {
             return;
         }
 
-        if (this.GameData.Session.CurrentMap!.Id != this.cachedMapId)
+        var pathingMeta = await this.guildwarsMemoryReader.ReadPathingMetaData();
+        if (pathingMeta?.TrapezoidCount != this.PathingData.Trapezoids?.Count)
         {
             this.UpdatePathingData();
         }
 
-        this.CurrentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(this.GameData.MainPlayer!.Experience);
-        this.NextLevelExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(this.GameData.MainPlayer!.Experience);
-        this.TotalFoes = (int)(this.GameData.Session.FoesKilled + this.GameData.Session.FoesToKill);
-        this.Vanquishing = this.GameData.Session.FoesToKill + this.GameData.Session.FoesKilled > 0U;
-        this.TitleActive = this.GameData.MainPlayer.TitleInformation is not null && this.GameData.MainPlayer.TitleInformation.IsValid;
+        this.CurrentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(this.GameData.MainPlayer!.Value.Experience);
+        this.NextLevelExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(this.GameData.MainPlayer!.Value.Experience);
+        this.TotalFoes = (int)(this.GameData.Session.Value.FoesKilled + this.GameData.Session.Value.FoesToKill);
+        this.Vanquishing = this.GameData.Session.Value.FoesToKill + this.GameData.Session.Value.FoesKilled > 0U;
+        this.TitleActive = this.GameData.MainPlayer.Value.TitleInformation is not null && this.GameData.MainPlayer.Value.TitleInformation.Value.IsValid;
 
-        this.MainPlayerDataValid = this.GameData.Valid && this.GameData.MainPlayer.MaxHealth > 0U && this.GameData.MainPlayer.MaxEnergy > 0U;
-        if (this.GameData.MainPlayer.TitleInformation is TitleInformation titleInformation && titleInformation.IsValid)
+        this.MainPlayerDataValid = this.GameData.Valid && this.GameData.MainPlayer.Value.MaxHealth > 0U && this.GameData.MainPlayer.Value.MaxEnergy > 0U;
+        if (this.GameData.MainPlayer.Value.TitleInformation is TitleInformation titleInformation && titleInformation.IsValid)
         {
             if (titleInformation.Title is not null &&
                 titleInformation.Title.Tiers!.Count > titleInformation.TierNumber - 1)
@@ -267,22 +265,22 @@ public partial class FocusView : UserControl
         switch (this.liveUpdateableOptions.Value.FocusViewOptions.ExperienceDisplay)
         {
             case Configuration.FocusView.ExperienceDisplay.CurrentLevelCurrentAndCurrentLevelMax:
-                var currentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(this.GameData.MainPlayer!.Experience);
-                var nextLevelExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(this.GameData.MainPlayer!.Experience);
+                var currentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(this.GameData.MainPlayer!.Value.Experience);
+                var nextLevelExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(this.GameData.MainPlayer!.Value.Experience);
                 this.ExperienceBarText = $"{(int)currentExperienceInLevel} / {(int)nextLevelExperienceThreshold} XP";
                 break;
             case Configuration.FocusView.ExperienceDisplay.TotalCurretAndTotalMax:
-                var currentTotalExperience = this.GameData.MainPlayer!.Experience;
+                var currentTotalExperience = this.GameData.MainPlayer!.Value.Experience;
                 var requiredTotalExperience = this.experienceCalculator.GetTotalExperienceForNextLevel(currentTotalExperience);
                 this.ExperienceBarText = $"{(int)currentTotalExperience} / {(int)requiredTotalExperience} XP";
                 break;
             case Configuration.FocusView.ExperienceDisplay.RemainingUntilNextLevel:
-                var remainingExperience = this.experienceCalculator.GetRemainingExperienceForNextLevel(this.GameData.MainPlayer!.Experience);
+                var remainingExperience = this.experienceCalculator.GetRemainingExperienceForNextLevel(this.GameData.MainPlayer!.Value.Experience);
                 this.ExperienceBarText = $"Remaining {(int)remainingExperience} XP";
                 break;
             case Configuration.FocusView.ExperienceDisplay.Percentage:
-                var currentExperienceInLevel2 = this.experienceCalculator.GetExperienceForCurrentLevel(this.GameData.MainPlayer!.Experience);
-                var nextLevelExperienceThreshold2 = this.experienceCalculator.GetNextExperienceThreshold(this.GameData.MainPlayer!.Experience);
+                var currentExperienceInLevel2 = this.experienceCalculator.GetExperienceForCurrentLevel(this.GameData.MainPlayer!.Value.Experience);
+                var nextLevelExperienceThreshold2 = this.experienceCalculator.GetNextExperienceThreshold(this.GameData.MainPlayer!.Value.Experience);
                 this.ExperienceBarText = $"{(int)((double)currentExperienceInLevel2 / (double)nextLevelExperienceThreshold2 * 100)}% XP";
                 break;
         }
@@ -357,13 +355,13 @@ public partial class FocusView : UserControl
         switch (this.liveUpdateableOptions.Value.FocusViewOptions.VanquishingDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.VanquishingText = $"{this.GameData.Session!.FoesKilled} / {(int)this.TotalFoes} Foes Killed";
+                this.VanquishingText = $"{this.GameData.Session!.Value.FoesKilled} / {(int)this.TotalFoes} Foes Killed";
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.VanquishingText = $"Remaining {this.GameData.Session!.FoesToKill} Foes";
+                this.VanquishingText = $"Remaining {this.GameData.Session!.Value.FoesToKill} Foes";
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.VanquishingText = $"{(int)((double)this.GameData.Session!.FoesKilled / (double)this.TotalFoes * 100)}% Foes Killed";
+                this.VanquishingText = $"{(int)((double)this.GameData.Session!.Value.FoesKilled / (double)this.TotalFoes * 100)}% Foes Killed";
                 break;
         }
     }
@@ -373,13 +371,13 @@ public partial class FocusView : UserControl
         switch (this.liveUpdateableOptions.Value.FocusViewOptions.HealthDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.HealthBarText = $"{(int)this.GameData.MainPlayer!.CurrentHealth} / {(int)this.GameData.MainPlayer.MaxHealth} Health";
+                this.HealthBarText = $"{(int)this.GameData.MainPlayer!.Value.CurrentHealth} / {(int)this.GameData.MainPlayer.Value.MaxHealth} Health";
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.HealthBarText = $"Remaining {(int)this.GameData.MainPlayer!.CurrentHealth} Health";
+                this.HealthBarText = $"Remaining {(int)this.GameData.MainPlayer!.Value.CurrentHealth} Health";
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.HealthBarText = $"{(int)(this.GameData.MainPlayer!.CurrentHealth / this.GameData.MainPlayer.MaxHealth * 100)}% Health";
+                this.HealthBarText = $"{(int)(this.GameData.MainPlayer!.Value.CurrentHealth / this.GameData.MainPlayer.Value.MaxHealth * 100)}% Health";
                 break;
         }
     }
@@ -389,13 +387,13 @@ public partial class FocusView : UserControl
         switch (this.liveUpdateableOptions.Value.FocusViewOptions.EnergyDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.EnergyBarText = $"{(int)this.GameData.MainPlayer!.CurrentEnergy} / {(int)this.GameData.MainPlayer.MaxEnergy} Energy";
+                this.EnergyBarText = $"{(int)this.GameData.MainPlayer!.Value.CurrentEnergy} / {(int)this.GameData.MainPlayer.Value.MaxEnergy} Energy";
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.EnergyBarText = $"Remaining {(int)this.GameData.MainPlayer!.CurrentEnergy} Energy";
+                this.EnergyBarText = $"Remaining {(int)this.GameData.MainPlayer!.Value.CurrentEnergy} Energy";
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.EnergyBarText = $"{(int)(this.GameData.MainPlayer!.CurrentEnergy / this.GameData.MainPlayer.MaxEnergy * 100)}% Energy";
+                this.EnergyBarText = $"{(int)(this.GameData.MainPlayer!.Value.CurrentEnergy / this.GameData.MainPlayer.Value.MaxEnergy * 100)}% Energy";
                 break;
         }
     }
@@ -598,28 +596,28 @@ public partial class FocusView : UserControl
 
     private void MetaBuilds_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
-        if (this.GameData?.MainPlayer?.PrimaryProfession is not null &&
-            this.GameData.MainPlayer.PrimaryProfession != Profession.None)
+        if (this.GameData.MainPlayer?.PrimaryProfession is not null &&
+            this.GameData.MainPlayer?.PrimaryProfession != Profession.None)
         {
-            this.BrowserAddress = this.GameData.MainPlayer.PrimaryProfession.BuildsUrl;
+            this.BrowserAddress = this.GameData.MainPlayer!.Value.PrimaryProfession.BuildsUrl;
         }
     }
 
     private void PrimaryProfession_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
-        if (this.GameData?.MainPlayer?.PrimaryProfession is not null &&
-            this.GameData.MainPlayer.PrimaryProfession != Profession.None)
+        if (this.GameData.MainPlayer?.PrimaryProfession is not null &&
+            this.GameData.MainPlayer?.PrimaryProfession != Profession.None)
         {
-            this.BrowserAddress = this.GameData.MainPlayer.PrimaryProfession.WikiUrl;
+            this.BrowserAddress = this.GameData.MainPlayer!.Value.PrimaryProfession.WikiUrl;
         }
     }
 
     private void SecondaryProfession_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
-        if (this.GameData?.MainPlayer?.SecondaryProfession is not null &&
-            this.GameData.MainPlayer.SecondaryProfession != Profession.None)
+        if (this.GameData.MainPlayer?.SecondaryProfession is not null &&
+            this.GameData.MainPlayer?.SecondaryProfession != Profession.None)
         {
-            this.BrowserAddress = this.GameData.MainPlayer.SecondaryProfession.WikiUrl;
+            this.BrowserAddress = this.GameData.MainPlayer!.Value.SecondaryProfession.WikiUrl;
         }
     }
 

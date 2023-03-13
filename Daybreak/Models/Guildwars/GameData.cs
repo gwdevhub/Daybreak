@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Daybreak.Models;
 
-public sealed class GameData
+public readonly struct GameData
 {
     public bool Valid { get; init; }
     public MainPlayerInformation? MainPlayer { get; init; }

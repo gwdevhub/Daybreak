@@ -2,7 +2,7 @@
 
 namespace Daybreak.Models.Guildwars;
 
-public sealed class PathingData
+public readonly struct PathingData
 {
-    public List<Trapezoid> Trapezoids { get; init; } = new();
+    public List<Trapezoid> Trapezoids { get; init; }
 }

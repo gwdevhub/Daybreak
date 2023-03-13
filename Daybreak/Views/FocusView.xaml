@@ -457,7 +457,7 @@
                 GameData="{Binding ElementName=_this, Path=GameData, Mode=OneWay}"
                 PathingData="{Binding ElementName=_this, Path=PathingData, Mode=OneWay}"
                 Zoom="0.05"
-                ClipToBounds="False"
+                ClipToBounds="True"
                 Grid.Row="1"></controls:GuildwarsMinimap>
         </Grid>
         <controls:CircularLoadingWidget Grid.ColumnSpan="4"

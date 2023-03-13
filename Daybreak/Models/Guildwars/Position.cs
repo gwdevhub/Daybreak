@@ -1,6 +1,6 @@
 ﻿namespace Daybreak.Models.Guildwars;
 
-public sealed class Position
+public readonly struct Position
 {
     public float X { get; init; }
     public float Y { get; init; }

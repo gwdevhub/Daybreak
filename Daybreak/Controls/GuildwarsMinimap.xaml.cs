@@ -12,6 +12,11 @@ using System.Core.Extensions;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System;
+using System.IO;
+using System.Windows.Media.Media3D;
+using System.Xml.Linq;
+using System.Diagnostics;
+using Daybreak.Utils;
 
 namespace Daybreak.Controls;
 
@@ -26,6 +31,8 @@ public partial class GuildwarsMinimap : UserControl
     private bool resizeEntities;
     private double mapMinWidth;
     private double mapMinHeight;
+    private double mapWidth;
+    private double mapHeight;
     private Point originPoint = new(0, 0);
 
     [GenerateDependencyProperty]
@@ -47,7 +54,7 @@ public partial class GuildwarsMinimap : UserControl
             e.Property == ActualWidthProperty ||
             e.Property == GameDataProperty)
         {
-            if (this.GameData is null)
+            if (!this.GameData.Valid)
             {
                 return;
             }
@@ -58,17 +65,26 @@ public partial class GuildwarsMinimap : UserControl
                 this.resizeEntities = true;
             }
 
-            // TODO: Properly translate and scale the minimap to match the entities position
+            if (!double.IsFinite(this.mapWidth) ||
+                !double.IsFinite(this.mapHeight) ||
+                !double.IsFinite(this.mapMinWidth) ||
+                !double.IsFinite(this.mapMinHeight))
+            {
+                return;
+            }
+
             var screenVirtualWidth = this.ActualWidth / this.Zoom;
             var screenVirtualHeight = this.ActualHeight / this.Zoom;
-            this.originPoint = new Point(this.GameData.MainPlayer!.Position!.X - (screenVirtualWidth / 2), this.GameData.MainPlayer!.Position!.Y + (screenVirtualHeight / 2));
-            this.MapTranslateTransform.X = -(this.GameData.MainPlayer.Position.X - this.mapMinWidth) / 10 * this.Zoom + (this.ActualWidth * this.Zoom) / 2;
-            this.MapTranslateTransform.Y = (this.GameData.MainPlayer.Position.Y - this.mapMinHeight) / 10 * this.Zoom + (this.ActualHeight * this.Zoom) / 2;
-            this.MapScaleTransform.ScaleX = 1 / this.Zoom;
-            this.MapScaleTransform.ScaleY = -1 / this.Zoom;
+            var position = this.GameData.MainPlayer!.Value.Position!.Value;
+            this.originPoint = new Point(position.X - (screenVirtualWidth / 2), position.Y + (screenVirtualHeight / 2));
+
+            var adjustedPosition = new Point((int)((position.X - this.mapMinWidth / this.Zoom) * this.Zoom), (int)(this.mapHeight / this.Zoom - position.Y + this.mapMinHeight / this.Zoom) * this.Zoom);
+            this.MapDrawingHost.Margin = new Thickness((-adjustedPosition.X + this.ActualWidth / 2), (-adjustedPosition.Y + this.ActualHeight / 2), 0, 0);
             this.DrawEntities();
         }
-        else if (e.Property == PathingDataProperty)
+        if (e.Property == PathingDataProperty ||
+            e.Property == ActualWidthProperty ||
+            e.Property == ActualHeightProperty)
         {
             this.DrawMap();
         }
@@ -81,8 +97,7 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
-        if (this.PathingData is null ||
-            this.PathingData.Trapezoids is null)
+        if (this.PathingData.Trapezoids is null)
         {
             return;
         }
@@ -91,7 +106,7 @@ public partial class GuildwarsMinimap : UserControl
         var maxHeight = double.MinValue;
         var minWidth = double.MaxValue;
         var minHeight = double.MaxValue;
-        foreach (var trapezoid in this.PathingData?.Trapezoids!)
+        foreach (var trapezoid in this.PathingData.Trapezoids!)
         {
             if (trapezoid.YT < minHeight)
             {
@@ -126,21 +141,32 @@ public partial class GuildwarsMinimap : UserControl
 
         var width = maxWidth - minWidth;
         var height = maxHeight - minHeight;
-        this.mapMinHeight = minHeight;
-        this.mapMinWidth = minWidth;
+        this.mapMinHeight = minHeight * this.Zoom;
+        this.mapMinWidth = minWidth * this.Zoom;
+        this.mapWidth = width * this.Zoom;
+        this.mapHeight = height * this.Zoom;
 
-        var bitmap = BitmapFactory.New((int)width / 10, (int)height / 10);
+        if (width <= 0 || height <= 0 ||
+            !double.IsFinite(width) ||
+            !double.IsFinite(height))
+        {
+            return;
+        }
+
+        var bitmap = BitmapFactory.New((int)(width * this.Zoom), (int)(height * this.Zoom));
         this.MapDrawingHost.Source = bitmap;
+        this.MapDrawingHost.Width = width * this.Zoom;
+        this.MapDrawingHost.Height = height * this.Zoom;
 
         using var bitmapContext = bitmap.GetBitmapContext();
         bitmap.Clear(Colors.Transparent);
-        foreach (var trapezoid in this.PathingData?.Trapezoids!)
+        foreach (var trapezoid in this.PathingData.Trapezoids!)
         {
-            var a = new Point((int)((trapezoid.XTL - minWidth) / 10), (int)((trapezoid.YT - minHeight) / 10));
-            var b = new Point((int)((trapezoid.XTR - minWidth) / 10), (int)((trapezoid.YT - minHeight) / 10));
-            var c = new Point((int)((trapezoid.XBR - minWidth) / 10), (int)((trapezoid.YB - minHeight) / 10));
-            var d = new Point((int)((trapezoid.XBL - minWidth) / 10), (int)((trapezoid.YB - minHeight) / 10));
-            var e = new Point((int)((trapezoid.XTL - minWidth) / 10), (int)((trapezoid.YT - minHeight) / 10));
+            var a = new Point((int)((trapezoid.XTL - minWidth) * this.Zoom), (int)((height - trapezoid.YT + minHeight) * this.Zoom));
+            var b = new Point((int)((trapezoid.XTR - minWidth) * this.Zoom), (int)((height - trapezoid.YT + minHeight) * this.Zoom));
+            var c = new Point((int)((trapezoid.XBR - minWidth) * this.Zoom), (int)((height - trapezoid.YB + minHeight) * this.Zoom));
+            var d = new Point((int)((trapezoid.XBL - minWidth) * this.Zoom), (int)((height - trapezoid.YB + minHeight) * this.Zoom));
+            var e = new Point((int)((trapezoid.XTL - minWidth) * this.Zoom), (int)((height - trapezoid.YT + minHeight) * this.Zoom));
 
             bitmap.FillPolygon(new int[] { (int)a.X, (int)a.Y, (int)b.X, (int)b.Y, (int)c.X, (int)c.Y, (int)d.X, (int)d.Y, (int)e.X, (int)e.Y, (int)a.X, (int)a.Y }, Colors.White);
         }
@@ -155,8 +181,7 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
-        if (this.GameData is null ||
-            this.GameData.Valid is false)
+        if (this.GameData.Valid is false)
         {
             return;
         }
@@ -169,51 +194,52 @@ public partial class GuildwarsMinimap : UserControl
         }
 
         bitmap.Clear(Colors.Transparent);
-        this.FillEllipse(this.GameData.MainPlayer!.Position!, bitmap, Colors.Green);
+        using var context = bitmap.GetBitmapContext();
+        this.FillEllipse(this.GameData.MainPlayer!.Value.Position!.Value, bitmap, Colors.Green);
 
         foreach (var partyMember in this.GameData.Party!)
         {
-            this.FillEllipse(partyMember!.Position!, bitmap, Colors.LightGreen);
+            this.FillEllipse(partyMember.Position!.Value, bitmap, Colors.LightGreen);
         }
 
         foreach (var player in this.GameData.WorldPlayers!)
         {
-            this.FillEllipse(player!.Position!, bitmap, Colors.CornflowerBlue);
+            this.FillEllipse(player.Position!.Value, bitmap, Colors.CornflowerBlue);
         }
 
         foreach (var livingEntity in this.GameData.LivingEntities!)
         {
             if (livingEntity.State is LivingEntityState.Dead)
             {
-                this.FillEllipse(livingEntity.Position!, bitmap, Colors.Gray);
+                this.FillEllipse(livingEntity.Position!.Value, bitmap, Colors.Gray);
             }
             else if (livingEntity.State is LivingEntityState.Boss)
             {
-                this.FillEllipse(livingEntity.Position!, bitmap, Colors.DarkRed);
+                this.FillEllipse(livingEntity.Position!.Value, bitmap, Colors.DarkRed);
             }
             else if (livingEntity.Allegiance is LivingEntityAllegiance.AllyNonAttackable)
             {
-                this.FillEllipse(livingEntity!.Position!, bitmap, Colors.Green);
+                this.FillEllipse(livingEntity.Position!.Value, bitmap, Colors.Green);
             }
             else if (livingEntity.Allegiance is LivingEntityAllegiance.Neutral)
             {
-                this.FillEllipse(livingEntity!.Position!, bitmap, Colors.Gray);
+                this.FillEllipse(livingEntity.Position!.Value, bitmap, Colors.Gray);
             }
             else if (livingEntity.Allegiance is LivingEntityAllegiance.Enemy)
             {
-                this.FillEllipse(livingEntity!.Position!, bitmap, Colors.Red);
+                this.FillTriangle(livingEntity.Position!.Value, bitmap, Colors.Red);
             }
             else if (livingEntity.Allegiance is LivingEntityAllegiance.SpiritOrPet)
             {
-                this.FillTriangle(livingEntity!.Position!, bitmap, Colors.Green);
+                this.FillTriangle(livingEntity.Position!.Value, bitmap, Colors.Green);
             }
             else if (livingEntity.Allegiance is LivingEntityAllegiance.Minion)
             {
-                this.FillEllipse(livingEntity!.Position!, bitmap, Colors.Green);
+                this.FillTriangle(livingEntity.Position!.Value, bitmap, Colors.Green);
             }
             else if (livingEntity.Allegiance is LivingEntityAllegiance.NpcOrMinipet)
             {
-                this.FillTriangle(livingEntity!.Position!, bitmap, Colors.LimeGreen);
+                this.FillTriangle(livingEntity.Position!.Value, bitmap, Colors.LimeGreen);
             }
         }
 
@@ -222,9 +248,17 @@ public partial class GuildwarsMinimap : UserControl
 
     private void FillEllipse(Position position, WriteableBitmap bitmap, Color color)
     {
+        var x = (int)((position!.X - this.originPoint.X) * this.Zoom);
+        var y = 0 - (int)((position!.Y - this.originPoint.Y) * this.Zoom);
+        if (x < 0 || x > bitmap.Width ||
+            y < 0 || y > bitmap.Height)
+        {
+            return;
+        }
+
         bitmap.FillEllipseCentered(
-                (int)((position!.X - this.originPoint.X) * this.Zoom),
-                0 - (int)((position!.Y - this.originPoint.Y) * this.Zoom),
+                x,
+                y,
                 (int)(100 * this.Zoom),
                 (int)(100 * this.Zoom),
                 color);
@@ -232,6 +266,14 @@ public partial class GuildwarsMinimap : UserControl
 
     private void FillTriangle(Position position, WriteableBitmap bitmap, Color color)
     {
+        var x = (int)((position!.X - this.originPoint.X) * this.Zoom);
+        var y = 0 - (int)((position!.Y - this.originPoint.Y) * this.Zoom);
+        if (x < 0 || x > bitmap.Width ||
+            y < 0 || y > bitmap.Height)
+        {
+            return;
+        }
+
         bitmap.FillTriangle(
             (int)((position.X - this.originPoint.X - 100) * this.Zoom),
             0 - (int)((position.Y - this.originPoint.Y + 100) * this.Zoom),

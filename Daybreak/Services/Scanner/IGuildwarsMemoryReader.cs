@@ -9,5 +9,6 @@ public interface IGuildwarsMemoryReader
     Task EnsureInitialized();
     Task<GameData?> ReadGameData();
     Task<PathingData?> ReadPathingData();
+    Task<PathingMetadata?> ReadPathingMetaData();
     void Stop();
 }

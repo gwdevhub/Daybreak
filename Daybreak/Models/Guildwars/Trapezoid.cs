@@ -3,8 +3,6 @@
 public readonly struct Trapezoid
 {
     public uint Id { get; init; }
-    
-    public uint[] AdjacentIds { get; init; }
 
     public float XTL { get; init; }
 
