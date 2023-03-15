@@ -8,9 +8,13 @@ using Daybreak.Services.Navigation;
 using Daybreak.Services.Scanner;
 using Microsoft.Extensions.Logging;
 using System;
+using System.ComponentModel.Design.Serialization;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
@@ -32,7 +36,6 @@ public partial class FocusView : UserControl
     private readonly IViewManager viewManager;
     private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions;
     private readonly ILogger<FocusView> logger;
-    private readonly DispatcherTimer gameDataTimer = new(DispatcherPriority.ApplicationIdle);
 
     [GenerateDependencyProperty]
     private GameData gameData;
@@ -92,6 +95,7 @@ public partial class FocusView : UserControl
     private string browserAddress = string.Empty;
 
     private bool browserMaximized = false;
+    private CancellationTokenSource? cancellationTokenSource;
 
     public FocusView(
         IBuildTemplateManager buildTemplateManager,
@@ -115,8 +119,6 @@ public partial class FocusView : UserControl
         this.InitializeComponent();
 
         this.LeftSideBarSize = 25;
-        this.gameDataTimer.Tick += (_, _) => this.UpdateGameData();
-        this.gameDataTimer.Interval = TimeSpan.FromMilliseconds(this.liveUpdateableOptions.Value.ExperimentalFeatures.MemoryReaderFrequency);
     }
 
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -140,8 +142,13 @@ public partial class FocusView : UserControl
 
         base.OnPropertyChanged(e);
     }
-    
-    private async void UpdatePathingData()
+
+    private TimeSpan GetMemoryReaderLatency()
+    {
+        return TimeSpan.FromMilliseconds(this.liveUpdateableOptions.Value.ExperimentalFeatures.MemoryReaderFrequency);
+    }
+
+    private async Task UpdatePathingData()
     {
         if (this.applicationLauncher.IsGuildwarsRunning is false)
         {
@@ -162,7 +169,7 @@ public partial class FocusView : UserControl
         this.PathingData = pathingData;
     }
 
-    private async void UpdateGameData()
+    private async Task UpdateGameData()
     {
         if (this.applicationLauncher.IsGuildwarsRunning is false)
         {
@@ -178,18 +185,19 @@ public partial class FocusView : UserControl
             return;
         }
 
-        this.GameData = gameData;
-        if (this.GameData.MainPlayer is null ||
-            this.GameData.User is null ||
-            this.GameData.Session is null)
+        if (gameData.MainPlayer is null ||
+            gameData.User is null ||
+            gameData.Session is null)
         {
             return;
         }
 
+        this.GameData = gameData;
+
         var pathingMeta = await this.guildwarsMemoryReader.ReadPathingMetaData();
         if (pathingMeta?.TrapezoidCount != this.PathingData.Trapezoids?.Count)
         {
-            this.UpdatePathingData();
+            await this.UpdatePathingData();
         }
 
         this.CurrentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(this.GameData.MainPlayer!.Value.Experience);
@@ -410,16 +418,29 @@ public partial class FocusView : UserControl
         }
     }
 
-    private void FocusView_Loaded(object _, RoutedEventArgs e)
+    private async void FocusView_Loaded(object _, RoutedEventArgs e)
     {
         this.UpdateRightSideBarsLayout();
         this.BrowserAddress = this.liveUpdateableOptions.Value.FocusViewOptions.BrowserUrl;
-        this.gameDataTimer.Start();
+        this.cancellationTokenSource?.Dispose();
+        this.cancellationTokenSource = new CancellationTokenSource();
+        var cancellationToken = this.cancellationTokenSource.Token;
+        var memoryReaderLatency = this.GetMemoryReaderLatency();
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            await this.UpdateGameData().ConfigureAwait(true);
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
+            await Task.Delay(memoryReaderLatency, cancellationToken).ConfigureAwait(true);
+        }
     }
 
     private void FocusView_Unloaded(object _, RoutedEventArgs e)
     {
-        this.gameDataTimer.Stop();
+        this.cancellationTokenSource?.Cancel();
         this.guildwarsMemoryReader?.Stop();
     }
 
@@ -652,11 +673,11 @@ public partial class FocusView : UserControl
         }
         else
         {
-            Grid.SetRow(this.Browser, 1);
+            Grid.SetRow(this.Browser, 2);
             Grid.SetColumn(this.Browser, 2);
             Grid.SetRowSpan(this.Browser, 1);
             Grid.SetColumnSpan(this.Browser, 1);
-            this.Browser.Margin = new Thickness(10, 0, 0, 0);
+            this.Browser.Margin = new Thickness(5, 0, 0, 0);
         }
     }
 

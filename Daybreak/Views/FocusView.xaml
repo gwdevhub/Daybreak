@@ -26,14 +26,15 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="0*"></RowDefinition>
-            <RowDefinition Height="1*"></RowDefinition>
+            <RowDefinition Height="0.5*"></RowDefinition>
+            <RowDefinition Height="0.5*"></RowDefinition>
             <RowDefinition Height="118"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid
             Margin="0, 2, 0, 0"
             Grid.Column="1"
             Grid.ColumnSpan="2"
-            Grid.Row="2"
+            Grid.Row="3"
             Grid.RowSpan="2"
             Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.ColumnDefinitions>
@@ -255,6 +256,7 @@
         </Grid>
         <Grid
             Grid.Row="1"
+            Grid.RowSpan="2"
             Grid.Column="1"
             Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.RowDefinitions>
@@ -430,17 +432,21 @@
                 </templates:QuestLogTemplate>
             </ScrollViewer>
         </Grid>
-        <Grid 
-            Grid.Column="2"
-            Grid.Row="1"
-            Margin="5, 0, 0, 0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"></RowDefinition>
-                <RowDefinition Height="*"></RowDefinition>
-            </Grid.RowDefinitions>
-            <controls:ChromiumBrowserWrapper
+        <controls:GuildwarsMinimap
+                Grid.Column="2"
+                Grid.Row="1"    
+                Margin="5, 0, 0, 5"
+                Background="#F0212121"
+                Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                GameData="{Binding ElementName=_this, Path=GameData, Mode=OneWay}"
+                PathingData="{Binding ElementName=_this, Path=PathingData, Mode=OneWay}"
+                Zoom="0.04"
+                ClipToBounds="True"></controls:GuildwarsMinimap>
+        <controls:ChromiumBrowserWrapper
                 x:Name="Browser"
-                Grid.Row="0"
+                Grid.Row="2"
+                Grid.Column="2"
+                Margin="5, 0, 0, 0"
                 ControlsEnabled="True"
                 AddressBarReadonly="False"
                 CanNavigate="True"
@@ -450,18 +456,8 @@
                 Visibility="Hidden"
                 BuildDecoded="Browser_BuildDecoded"
                 PreventDispose="True"></controls:ChromiumBrowserWrapper>
-            <controls:GuildwarsMinimap
-                Margin="0, 5, 0, 0"
-                Background="#F0212121"
-                Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                GameData="{Binding ElementName=_this, Path=GameData, Mode=OneWay}"
-                PathingData="{Binding ElementName=_this, Path=PathingData, Mode=OneWay}"
-                Zoom="0.05"
-                ClipToBounds="True"
-                Grid.Row="1"></controls:GuildwarsMinimap>
-        </Grid>
         <controls:CircularLoadingWidget Grid.ColumnSpan="4"
-                                        Grid.RowSpan="3"
+                                        Grid.RowSpan="4"
                                         Width="100"
                                         Height="100"
                                         Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"></controls:CircularLoadingWidget>

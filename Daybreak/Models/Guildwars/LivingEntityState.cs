@@ -6,5 +6,6 @@ public enum LivingEntityState
     Dead,
     Boss,
     Spirit,
-    Player
+    Player,
+    ToBeCleanedUp
 }

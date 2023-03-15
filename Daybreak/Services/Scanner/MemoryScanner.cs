@@ -17,7 +17,7 @@ namespace Daybreak.Services.Scanner;
 /// </summary>
 public sealed class MemoryScanner : IMemoryScanner
 {
-    private const double MaximumReadSize = 10e9;
+    private const double MaximumReadSize = 10e8;
     private static readonly object LockObject = new();
 
     private readonly ILogger<MemoryScanner> logger;

@@ -2,9 +2,10 @@
 
 namespace Daybreak.Models.Guildwars;
 
-public readonly struct MainPlayerInformation
+public readonly struct MainPlayerInformation : IEntity
 {
     public string? Name { get; init; }
+    public uint Timer { get; init; }
     public TitleInformation? TitleInformation { get; init; }
     public int Id { get; init; }
     public int Level { get; init; }

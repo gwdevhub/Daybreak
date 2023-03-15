@@ -1,8 +1,10 @@
 ﻿namespace Daybreak.Models.Guildwars;
 
-public readonly struct LivingEntity
+public readonly struct LivingEntity : IEntity
 {
     public int Id { get; init; }
+
+    public uint Timer { get; init; }
 
     public Position? Position { get; init; }
 

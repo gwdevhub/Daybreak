@@ -233,6 +233,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
 
         var pathingMapContext = this.memoryScanner.ReadPtrChain<PathingMapContext>(mapContext.PathingMapContextPtr, 0x0, 0x0);
         var pathingMaps = this.memoryScanner.ReadArray<PathingMap>(pathingMapContext.PathingMapArray);
+
         var pathingTrapezoidMapping = pathingMaps
             .Select(pathingMap => (pathingMap, this.memoryScanner.ReadArray<PathingTrapezoid>(pathingMap.TrapezoidArray, (int)pathingMap.TrapezoidCount)))
             .ToArray();
@@ -266,8 +267,9 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         var mapContext = this.memoryScanner.Read<MapContext>(globalContext.MapContext);
 
         var pathingMapContext = this.memoryScanner.ReadPtrChain<PathingMapContext>(mapContext.PathingMapContextPtr, 0x0, 0x0);
+        var pathingMaps = this.memoryScanner.ReadArray<PathingMap>(pathingMapContext.PathingMapArray);
 
-        return new PathingMetadata { TrapezoidCount = (int)pathingMapContext.PathingMapArray.Size };
+        return new PathingMetadata { TrapezoidCount = (int)pathingMaps.Select(p => p.TrapezoidCount).Sum(count => count) };
     }
 
     private IntPtr GetPlayerIdPointer()
@@ -371,7 +373,8 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         {
             FoesKilled = gameContext.FoesKilled,
             FoesToKill = gameContext.FoesToKill,
-            CurrentMap = currentMap
+            CurrentMap = currentMap,
+            InstanceTimer = instanceContext.Timer
         };
 
         return new GameData
@@ -408,6 +411,9 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
                 case EntityState.Dead:
                     state = LivingEntityState.Dead;
                     break;
+                case EntityState.ToBeCleanedUp:
+                    state = LivingEntityState.ToBeCleanedUp;
+                    break;
             }
 
             var allegiance = LivingEntityAllegiance.Unknown;
@@ -436,6 +442,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
             list.Add(new LivingEntity
             {
                 Id = (int)livingEntity.AgentId,
+                Timer = livingEntity.Timer,
                 Level = (int)livingEntity.Level,
                 Position = new Position { X = livingEntity.Position.X, Y = livingEntity.Position.Y },
                 PrimaryProfession = primaryProfession,
@@ -477,6 +484,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         return new MainPlayerInformation
         {
             Id = playerInformation.Id,
+            Timer = playerInformation.Timer,
             Position = playerInformation.Position,
             PrimaryProfession = playerInformation.PrimaryProfession,
             SecondaryProfession = playerInformation.SecondaryProfession,
@@ -551,6 +559,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         return new WorldPlayerInformation
         {
             Id = playerInformation.Id,
+            Timer = playerInformation.Timer,
             Level = playerInformation.Level,
             Position = playerInformation.Position,
             PrimaryProfession = playerInformation.PrimaryProfession,
@@ -636,6 +645,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         return new PlayerInformation
         {
             Id = playerId,
+            Timer = entityContext.Value.Timer,
             Level = entityContext.Value.Level,
             PrimaryProfession = primaryProfession,
             SecondaryProfession = secondaryProfession,
