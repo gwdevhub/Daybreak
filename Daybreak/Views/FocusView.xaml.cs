@@ -8,17 +8,14 @@ using Daybreak.Services.Navigation;
 using Daybreak.Services.Scanner;
 using Microsoft.Extensions.Logging;
 using System;
-using System.ComponentModel.Design.Serialization;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
-using System.Windows.Threading;
 
 namespace Daybreak.Views;
 
