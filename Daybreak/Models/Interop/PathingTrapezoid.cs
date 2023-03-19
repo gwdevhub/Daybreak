@@ -8,7 +8,7 @@ public readonly struct PathingTrapezoid
     public readonly uint Id;
 
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4)]
-    public readonly IntPtr[] AdjacentPathingTrapezoids;
+    public readonly int[] AdjacentPathingTrapezoids;
 
     private readonly uint H0014;
 

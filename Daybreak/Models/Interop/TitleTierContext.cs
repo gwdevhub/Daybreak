@@ -8,7 +8,7 @@ public readonly struct TitleTierContext
 
     public readonly uint TierNumber;
 
-    public readonly IntPtr TierNamePtr;
+    public readonly int TierNamePtr;
 
     public bool IsPercentageBased => (this.Props & 1) != 0;
 }

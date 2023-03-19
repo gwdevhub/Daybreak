@@ -23,6 +23,7 @@ namespace Daybreak.Services.Scanner;
 
 public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
 {
+    private const int MaxTrapezoidCount = 1000000;
     private const int RetryInitializationCount = 15;
     private const string LatencyMeterName = "Memory Reader Latency";
     private const string LatencyMeterUnitsName = "Milliseconds";
@@ -34,9 +35,9 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
     private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
     private readonly ILogger<GuildwarsMemoryReader> logger;
 
-    private IntPtr playerIdPointer;
-    private IntPtr entityArrayPointer;
-    private IntPtr titleDataPointer;
+    private int playerIdPointer;
+    private int entityArrayPointer;
+    private int titleDataPointer;
 
     public GuildwarsMemoryReader(
         IApplicationLauncher applicationLauncher,
@@ -180,9 +181,9 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
          */
         var globalContext = this.memoryScanner.ReadPtrChain<GlobalContext>(this.memoryScanner.ModuleStartAddress, finalPointerOffset: 0x0, 0x00629244, 0xC, 0xC);
 
-        if (globalContext.GameContext.ToInt32() == 0x0 ||
-            globalContext.UserContext.ToInt32() == 0x0 ||
-            globalContext.InstanceContext.ToInt32() == 0x0)
+        if (globalContext.GameContext == 0x0 ||
+            globalContext.UserContext == 0x0 ||
+            globalContext.InstanceContext == 0x0)
         {
             return new GameData { Valid = false };
         }
@@ -194,6 +195,17 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         // InstanceContext struct is offset by 0x01AC due to memory layout of the structure.
         var instanceContext = this.memoryScanner.Read<InstanceContext>(globalContext.InstanceContext + InstanceContext.BaseOffset);
         
+        if (gameContext.MapEntities.Size > 10000 ||
+            gameContext.Professions.Size > 10000 ||
+            gameContext.Players.Size > 1000 ||
+            gameContext.QuestLog.Size > 10000 ||
+            gameContext.Skillbars.Size > 100 ||
+            gameContext.PartyAttributes.Size > 1000 ||
+            gameContext.Titles.Size > 1000 ||
+            gameContext.TitlesTiers.Size > 10000)
+        {
+            return new GameData { Valid = false };
+        }
 
         var mapEntities = this.memoryScanner.ReadArray<MapEntityContext>(gameContext.MapEntities);
         var professions = this.memoryScanner.ReadArray<ProfessionsContext>(gameContext.Professions);
@@ -207,7 +219,12 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
 
         // The following lines would retrieve all entities, including item entities.
         var entityPointersArray = this.memoryScanner.ReadPtrChain<GuildwarsArray>(this.GetEntityArrayPointer(), 0x0, 0x0);
-        var entityPointers = this.memoryScanner.ReadArray<IntPtr>(entityPointersArray);
+        if (entityPointersArray.Size > 10000)
+        {
+            return new GameData { Valid = false };
+        }
+
+        var entityPointers = this.memoryScanner.ReadArray<int>(entityPointersArray);
         var entities = entityPointers.Select(ptr => this.memoryScanner.Read<EntityContext>(ptr + EntityContext.EntityContextBaseOffset)).ToArray();
 
         return this.AggregateGameData(
@@ -232,28 +249,33 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         var mapContext = this.memoryScanner.Read<MapContext>(globalContext.MapContext);
 
         var pathingMapContext = this.memoryScanner.ReadPtrChain<PathingMapContext>(mapContext.PathingMapContextPtr, 0x0, 0x0);
-        var pathingMaps = this.memoryScanner.ReadArray<PathingMap>(pathingMapContext.PathingMapArray);
+        if (pathingMapContext.PathingMapArray.Size > 10000)
+        {
+            return default;
+        }
 
-        var pathingTrapezoidMapping = pathingMaps
-            .Select(pathingMap => (pathingMap, this.memoryScanner.ReadArray<PathingTrapezoid>(pathingMap.TrapezoidArray, (int)pathingMap.TrapezoidCount)))
-            .ToArray();
+        var pathingMaps = this.memoryScanner.ReadArray<PathingMap>(pathingMapContext.PathingMapArray);
+        var trapezoidsCount = (int)pathingMaps.Select(p => p.TrapezoidCount).Sum(count => count);
+        if (trapezoidsCount > MaxTrapezoidCount)
+        {
+            return default;
+        }
 
         var trapezoidList = new List<Trapezoid>();
-        foreach(var mapping in pathingTrapezoidMapping)
+        foreach(var pathingMap in pathingMaps)
         {
-            var (_, pathingTrapezoids) = mapping;
-            for (var i = 0; i < pathingTrapezoids.Length; i++)
+            var pathingTrapezoids = this.memoryScanner.ReadArray<PathingTrapezoid>(pathingMap.TrapezoidArray, (int)pathingMap.TrapezoidCount);
+            foreach(var trapezoid in pathingTrapezoids)
             {
-                var pathingTrapezoid = pathingTrapezoids[i];
                 trapezoidList.Add(new Trapezoid
                 {
-                    Id = pathingTrapezoid.Id,
-                    XTL = pathingTrapezoid.XTL,
-                    XTR = pathingTrapezoid.XTR,
-                    YT = pathingTrapezoid.YT,
-                    XBL = pathingTrapezoid.XBL,
-                    XBR = pathingTrapezoid.XBR,
-                    YB = pathingTrapezoid.YB,
+                    Id = trapezoid.Id,
+                    XTL = trapezoid.XTL,
+                    XTR = trapezoid.XTR,
+                    YT = trapezoid.YT,
+                    XBL = trapezoid.XBL,
+                    XBR = trapezoid.XBR,
+                    YB = trapezoid.YB,
                 });
             }
         }
@@ -272,9 +294,9 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         return new PathingMetadata { TrapezoidCount = (int)pathingMaps.Select(p => p.TrapezoidCount).Sum(count => count) };
     }
 
-    private IntPtr GetPlayerIdPointer()
+    private int GetPlayerIdPointer()
     {
-        if (this.playerIdPointer == IntPtr.Zero)
+        if (this.playerIdPointer == 0)
         {
             this.playerIdPointer = this.memoryScanner.ScanForPtr(new byte[] { 0x5D, 0xE9, 0x00, 0x00, 0x00, 0x00, 0x55, 0x8B, 0xEC, 0x53 }, "xx????xxxx") - 0xE;
         }
@@ -282,9 +304,9 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         return this.playerIdPointer;
     }
 
-    private IntPtr GetEntityArrayPointer()
+    private int GetEntityArrayPointer()
     {
-        if (this.entityArrayPointer == IntPtr.Zero)
+        if (this.entityArrayPointer == 0)
         {
             this.entityArrayPointer = this.memoryScanner.ScanForPtr(new byte[] { 0xFF, 0x50, 0x10, 0x47, 0x83, 0xC6, 0x04, 0x3B, 0xFB, 0x75, 0xE1 }, "xxxxxxxxxxx") + 0xD;
         }
@@ -292,9 +314,9 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         return this.entityArrayPointer;
     }
 
-    private IntPtr GetTitleDataPointer()
+    private int GetTitleDataPointer()
     {
-        if (this.titleDataPointer == IntPtr.Zero)
+        if (this.titleDataPointer == 0)
         {
             this.titleDataPointer = this.memoryScanner.ScanForAssertion("p:\\code\\gw\\const\\consttitle.cpp", "index < arrsize(s_titleClientData)") + 0x12;
         }
@@ -302,7 +324,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         return this.titleDataPointer;
     }
     
-    private GameData AggregateGameData(
+    private unsafe GameData AggregateGameData(
         GameContext gameContext,
         InstanceContext instanceContext,
         MapEntityContext[] mapEntities,
@@ -317,8 +339,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         TitleTierContext[] titleTiers,
         int mainPlayerEntityId)
     {
-        var email = ParseAndCleanWCharArray(userContext.PlayerEmailBytes);
-        var name = ParseAndCleanWCharArray(userContext.PlayerNameBytes);
+        var name = userContext.PlayerName;
         _ = Map.TryParse((int)userContext.MapId, out var currentMap);
         var partyMembers = professions
             .Where(p => p.AgentId != mainPlayerEntityId)
@@ -352,7 +373,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         
         var userInformation = new UserInformation
         {
-            Email = email,
+            Email = userContext.PlayerEmailFirstChar + (userContext.PlayerEmailSecondChar + userContext.PlayerEmailRemaining),
             CurrentKurzickPoints = gameContext.CurrentKurzick,
             TotalKurzickPoints = gameContext.TotalKurzick,
             MaxKurzickPoints = gameContext.MaxKurzick,
@@ -605,8 +626,8 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
             secondaryProfession is not null)
         {
             var attributes = (primaryProfession.PrimaryAttribute is null ?
-                new List<Models.Guildwars.Attribute>() :
-                new List<Models.Guildwars.Attribute> { primaryProfession.PrimaryAttribute! })
+                new List<Daybreak.Models.Guildwars.Attribute>() :
+                new List<Daybreak.Models.Guildwars.Attribute> { primaryProfession.PrimaryAttribute! })
                 .Concat(primaryProfession.Attributes)
                 .Concat(secondaryProfession.Attributes)
                 .Select(a => new AttributeEntry { Attribute = a })
@@ -627,12 +648,24 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
                 attributeEntry.Points = (int)attribute.BaseLevel;
             }
 
+            var skillContexts = new SkillContext[]
+            {
+                skillbarContext.Skill0,
+                skillbarContext.Skill1,
+                skillbarContext.Skill2,
+                skillbarContext.Skill3,
+                skillbarContext.Skill4,
+                skillbarContext.Skill5,
+                skillbarContext.Skill6,
+                skillbarContext.Skill7,
+            };
+
             build = new Build
             {
                 Primary = primaryProfession,
                 Secondary = secondaryProfession,
                 Attributes = attributes,
-                Skills = skillbarContext.Skills.Select(s =>
+                Skills = skillContexts.Select(s =>
                         Skill.TryParse((int)s.Id, out var parsedSkill) ?
                         parsedSkill :
                         Skill.NoSkill).ToList()
@@ -684,6 +717,18 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
     private static string ParseAndCleanWCharArray(byte[] bytes)
     {
         var str = Encoding.Unicode.GetString(bytes);
+        var indexOfNull = str.IndexOf('\0');
+        if (indexOfNull > 0)
+        {
+            str = str[..indexOfNull];
+        }
+
+        return str;
+    }
+
+    private static unsafe string ParseAndCleanWCharPointer(byte* bytes, int byteCount)
+    {
+        var str = Encoding.Unicode.GetString(bytes, byteCount);
         var indexOfNull = str.IndexOf('\0');
         if (indexOfNull > 0)
         {

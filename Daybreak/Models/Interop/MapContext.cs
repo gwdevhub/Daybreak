@@ -14,5 +14,5 @@ public readonly struct MapContext
     /// Ptr for the PathingMap. Needs to follow this pointer and then next pointer as well to reach the PathingMapContext.
     /// </summary>
     [FieldOffset(0x0074)]
-    public readonly IntPtr PathingMapContextPtr;
+    public readonly int PathingMapContextPtr;
 }

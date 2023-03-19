@@ -19,7 +19,7 @@ public readonly struct PlayerContext
     public readonly uint SecondaryProfession;
 
     [FieldOffset(0x0028)]
-    public readonly IntPtr NamePointer;
+    public readonly int NamePointer;
 
     [FieldOffset(0x002C)]
     public readonly uint PartyLeaderPlayerNumber;

@@ -138,6 +138,7 @@ public static class ProjectConfiguration
         services.AddScoped<IExperienceCalculator, ExperienceCalculator>();
         services.AddScoped<IAttributePointCalculator, AttributePointCalculator>();
         services.AddScoped<IDownloadService, DownloadService>();
+        services.AddScoped<IGuildwarsEntityDebouncer, GuildwarsEntityDebouncer>();
     }
 
     public static void RegisterViews(IViewProducer viewProducer)

@@ -2,22 +2,30 @@
 
 namespace Daybreak.Models.Interop;
 
-[StructLayout(LayoutKind.Explicit)]
-public readonly struct SkillbarContext
+[StructLayout(LayoutKind.Sequential, Pack = 0, Size = 0xBC)]
+public readonly unsafe struct SkillbarContext
 {
-    [FieldOffset(0x0000)]
     public readonly uint AgentId;
 
-    [FieldOffset(0x0004)]
-    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x08)]
-    public readonly SkillContext[] Skills;
+    public readonly SkillContext Skill0;
 
-    [FieldOffset(0x00A4)]
+    public readonly SkillContext Skill1;
+
+    public readonly SkillContext Skill2;
+
+    public readonly SkillContext Skill3;
+
+    public readonly SkillContext Skill4;
+
+    public readonly SkillContext Skill5;
+
+    public readonly SkillContext Skill6;
+
+    public readonly SkillContext Skill7;
+
     public readonly uint Disabled;
 
-    [FieldOffset(0x00B0)]
     public readonly uint Casting;
 
-    [FieldOffset(0x00B8)]
     public readonly uint H00B8;
 }

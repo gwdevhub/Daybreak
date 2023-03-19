@@ -20,9 +20,9 @@ public readonly struct TitleContext
 
     public readonly uint MaxTitleTierIndex;
 
-    public readonly IntPtr H0020;
+    public readonly int H0020;
 
-    public readonly IntPtr H0024;
+    public readonly int H0024;
 
     public bool IsPercentage => (this.Props & 1U) != 0;
 

@@ -18,13 +18,14 @@ namespace Daybreak.Services.Scanner;
 public sealed class MemoryScanner : IMemoryScanner
 {
     private const double MaximumReadSize = 10e8;
+    private const double MaximumArraySize = 10e5;
     private static readonly object LockObject = new();
 
     private readonly ILogger<MemoryScanner> logger;
 
     private bool scanning;
 
-    public IntPtr ModuleStartAddress { get; private set; }
+    public int ModuleStartAddress { get; private set; }
     public byte[]? Memory { get; private set; }
     public int Size { get; private set; }
     public bool Scanning
@@ -101,7 +102,7 @@ public sealed class MemoryScanner : IMemoryScanner
         Monitor.Exit(LockObject);
     }
 
-    public T Read<T>(IntPtr address)
+    public T Read<T>(int address)
     {
         this.ValidateReadScanner();
         var size = Marshal.SizeOf(typeof(T));
@@ -120,9 +121,13 @@ public sealed class MemoryScanner : IMemoryScanner
         return ret;
     }
 
-    public T[] ReadArray<T>(IntPtr address, int size)
+    public T[] ReadArray<T>(int address, int size)
     {
         this.ValidateReadScanner();
+        if (size > MaximumArraySize)
+        {
+            throw new InvalidOperationException($"Expected size to read is too large. Array size {size}");
+        }
 
         var itemSize = Marshal.SizeOf(typeof(T));
         var readSize = size * itemSize;
@@ -157,13 +162,13 @@ public sealed class MemoryScanner : IMemoryScanner
         return this.ReadArray<T>(guildwarsArray.Buffer, (int)guildwarsArray.Size);
     }
 
-    public byte[]? ReadBytes(IntPtr address, int size)
+    public byte[]? ReadBytes(int address, int size)
     {
         this.ValidateReadScanner();
         return this.ReadBytesNonLocking(address, size);
     }
 
-    public string ReadWString(IntPtr address, int maxsize)
+    public string ReadWString(int address, int maxsize)
     {
         this.ValidateReadScanner();
         var rawbytes = this.ReadBytes(address, maxsize);
@@ -181,18 +186,18 @@ public sealed class MemoryScanner : IMemoryScanner
         return ret;
     }
 
-    public T ReadPtrChain<T>(IntPtr Base, int finalPointerOffset = 0, params int[] offsets)
+    public T ReadPtrChain<T>(int Base, int finalPointerOffset = 0, params int[] offsets)
     {
         this.ValidateReadScanner();
         foreach (var offset in offsets)
         {
-            Base = this.Read<IntPtr>(Base + offset);
+            Base = this.Read<int>(Base + offset);
         }
 
         return this.Read<T>(Base + finalPointerOffset);
     }
 
-    public IntPtr ScanForPtr(byte[] pattern, string? mask = default, bool readptr = false)
+    public int ScanForPtr(byte[] pattern, string? mask = default, bool readptr = false)
     {
         this.ValidateReadScanner();
         if (pattern?.Length == 0)
@@ -230,17 +235,17 @@ public sealed class MemoryScanner : IMemoryScanner
             {
                 if (readptr)
                 {
-                    return new IntPtr(BitConverter.ToUInt32(this.Memory, scan));
+                    return (int)BitConverter.ToUInt32(this.Memory, scan);
                 }
 
-                return new IntPtr(this.ModuleStartAddress.ToInt32() + scan);
+                return this.ModuleStartAddress + scan;
             }
         }
 
-        return IntPtr.Zero;
+        return 0;
     }
 
-    public IntPtr ScanForAssertion(string? assertionFile, string? assertionMessage)
+    public int ScanForAssertion(string? assertionFile, string? assertionMessage)
     {
         this.ValidateReadScanner();
         var mask = new StringBuilder(64);
@@ -262,15 +267,15 @@ public sealed class MemoryScanner : IMemoryScanner
             mask[assertionMessage.Length] = 'x';
             mask[assertionMessage.Length + 1] = '\0';
             var rdataPtr = this.ScanForPtr(assertionMessageBytes, mask.ToString(), false);
-            if (rdataPtr == IntPtr.Zero)
+            if (rdataPtr == 0)
             {
-                return IntPtr.Zero;
+                return 0;
             }
 
-            assertionBytes[6] = (byte)rdataPtr.ToInt32();
-            assertionBytes[7] = (byte)(rdataPtr.ToInt32() >> 8);
-            assertionBytes[8] = (byte)(rdataPtr.ToInt32() >> 16);
-            assertionBytes[9] = (byte)(rdataPtr.ToInt32() >> 24);
+            assertionBytes[6] = (byte)rdataPtr;
+            assertionBytes[7] = (byte)(rdataPtr >> 8);
+            assertionBytes[8] = (byte)(rdataPtr >> 16);
+            assertionBytes[9] = (byte)(rdataPtr >> 24);
         }
         
         if (assertionFile is not null)
@@ -285,16 +290,16 @@ public sealed class MemoryScanner : IMemoryScanner
             mask[assertionFile.Length + 1] = '\0';
             var rdataPtr = this.ScanForPtr(assertionFileBytes, mask.ToString(), false);
 
-            assertionBytes[1] = (byte)rdataPtr.ToInt32();
-            assertionBytes[2] = (byte)(rdataPtr.ToInt32() >> 8);
-            assertionBytes[3] = (byte)(rdataPtr.ToInt32() >> 16);
-            assertionBytes[4] = (byte)(rdataPtr.ToInt32() >> 24);
+            assertionBytes[1] = (byte)rdataPtr;
+            assertionBytes[2] = (byte)(rdataPtr >> 8);
+            assertionBytes[3] = (byte)(rdataPtr >> 16);
+            assertionBytes[4] = (byte)(rdataPtr >> 24);
         }
 
         return this.ScanForPtr(assertionBytes, assertionMask, false);
     }
 
-    private byte[]? ReadBytesNonLocking(IntPtr address, int size)
+    private byte[]? ReadBytesNonLocking(int address, int size)
     {
         if (size > MaximumReadSize)
         {
@@ -325,7 +330,7 @@ public sealed class MemoryScanner : IMemoryScanner
         }
     }
 
-    private (IntPtr StartAddress, int Size) GetModuleInfo(Process process)
+    private (int StartAddress, int Size) GetModuleInfo(Process process)
     {
         try
         {
@@ -336,7 +341,7 @@ public sealed class MemoryScanner : IMemoryScanner
                 if (module.ModuleName != null &&
                     module.ModuleName.StartsWith(name, StringComparison.OrdinalIgnoreCase))
                 {
-                    return (module.BaseAddress, module.ModuleMemorySize);
+                    return (module.BaseAddress.ToInt32(), module.ModuleMemorySize);
                 }
             }
         }
@@ -345,6 +350,6 @@ public sealed class MemoryScanner : IMemoryScanner
             this.logger.LogError(e, "Failed to get module info");
         }
 
-        return (IntPtr.Zero, 0);
+        return (0, 0);
     }
 }

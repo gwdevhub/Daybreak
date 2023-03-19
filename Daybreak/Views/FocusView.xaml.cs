@@ -179,13 +179,18 @@ public partial class FocusView : UserControl
         var maybeGameData = await this.guildwarsMemoryReader.ReadGameData().ConfigureAwait(true);
         if (maybeGameData is not GameData gameData)
         {
+            this.MainPlayerDataValid = false;
+            this.Browser.Visibility = this.MainPlayerDataValid is true ? Visibility.Visible : Visibility.Collapsed;
             return;
         }
 
         if (gameData.MainPlayer is null ||
             gameData.User is null ||
-            gameData.Session is null)
+            gameData.Session is null ||
+            gameData.Valid is false)
         {
+            this.MainPlayerDataValid = false;
+            this.Browser.Visibility = this.MainPlayerDataValid is true ? Visibility.Visible : Visibility.Collapsed;
             return;
         }
 
