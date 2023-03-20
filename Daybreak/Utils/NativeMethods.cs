@@ -134,5 +134,5 @@ internal static class NativeMethods
     [DllImport("user32.dll")]
     public static extern IntPtr GetForegroundWindow();
     [DllImport("kernel32.dll", SetLastError = true)]
-    internal static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, IntPtr lpBuffer, int nSize, out IntPtr lpNumberOfBytesRead);
+    internal static extern bool ReadProcessMemory(IntPtr hProcess, int lpBaseAddress, IntPtr lpBuffer, int nSize, out int lpNumberOfBytesRead);
 }

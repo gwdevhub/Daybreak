@@ -8,14 +8,15 @@
     <UseWPF>true</UseWPF>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
-    <Platforms>AnyCPU;x86</Platforms>
+    <Platforms>AnyCPU;x86;x64</Platforms>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <LangVersion>preview</LangVersion>
     <ApplicationIcon>Daybreak.ico</ApplicationIcon>
     <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
-    <Version>0.9.8.17</Version>
+    <Version>0.9.8.18</Version>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <UserSecretsId>cfb2a489-db80-448d-a969-80270f314c46</UserSecretsId>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -55,6 +56,7 @@
     <PackageReference Include="WpfExtended" Version="0.7.1" />
     <PackageReference Include="WpfExtended.SourceGeneration" Version="0.1.1" />
     <PackageReference Include="WpfScreenHelper" Version="2.1.0" />
+    <PackageReference Include="WriteableBitmapEx" Version="1.6.8" />
   </ItemGroup>
 
   <ItemGroup>
@@ -65,6 +67,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Controls\Buttons\MinusButton.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Controls\Glyphs\MapGlyph.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Controls\Glyphs\StarGlyph.xaml.cs">

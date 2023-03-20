@@ -8,19 +8,33 @@ public sealed class EventViewerLogsWriter : IEventViewerLogsWriter
 {
     private const string AppName = "Daybreak";
     private const string LogType = "Application";
-        
+
+    private readonly bool initialized = true;
+
     public EventViewerLogsWriter()
     {
-        if (EventLog.SourceExists(AppName))
+        try
         {
-            return;
+            if (EventLog.SourceExists(AppName))
+            {
+                return;
+            }
+
+            EventLog.CreateEventSource(AppName, LogType);
         }
-        
-        EventLog.CreateEventSource(AppName, LogType);
+        catch
+        {
+            this.initialized = false;
+        }
     }
 
     public void WriteLog(Log log)
     {
+        if (this.initialized is false)
+        {
+            return;
+        }
+
         if (log.LogLevel is not LogLevel.Critical)
         {
             return;

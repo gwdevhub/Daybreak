@@ -6,7 +6,7 @@ namespace Daybreak.Models.Interop;
 [StructLayout(LayoutKind.Sequential)]
 public readonly struct GuildwarsArray
 {
-    public readonly IntPtr Buffer;
+    public readonly int Buffer;
 
     public readonly uint Capacity;
 

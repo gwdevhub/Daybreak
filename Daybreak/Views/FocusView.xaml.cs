@@ -16,7 +16,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
-using System.Windows.Media.Animation;
 
 namespace Daybreak.Views;
 
@@ -37,6 +36,9 @@ public partial class FocusView : UserControl
 
     [GenerateDependencyProperty]
     private GameData gameData;
+
+    [GenerateDependencyProperty]
+    private PathingData pathingData;
 
     [GenerateDependencyProperty]
     private bool mainPlayerDataValid;
@@ -83,12 +85,14 @@ public partial class FocusView : UserControl
     private double leftSideBarSize;
     [GenerateDependencyProperty]
     private double rightSideBarSize;
+    [GenerateDependencyProperty]
+    private bool faultyPathingData;
 
     [GenerateDependencyProperty]
     private string browserAddress = string.Empty;
 
-    private CancellationTokenSource? cancellationTokenSource;
     private bool browserMaximized = false;
+    private CancellationTokenSource? cancellationTokenSource;
 
     public FocusView(
         IBuildTemplateManager buildTemplateManager,
@@ -107,6 +111,7 @@ public partial class FocusView : UserControl
         this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
         this.gameData = new GameData();
+        this.pathingData = new PathingData();
 
         this.InitializeComponent();
 
@@ -116,8 +121,7 @@ public partial class FocusView : UserControl
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
     {
         if (e.Property == BrowserAddressProperty &&
-            this.Browser.BrowserEnabled &&
-            this.cancellationTokenSource is not null) //CancellationToken is null only when the view is unloaded. Using this to not overwrite the previous browserurl with the uninitialized value of the address.
+            this.Browser.BrowserEnabled)
         {
             this.liveUpdateableOptions.Value.FocusViewOptions.BrowserUrl = this.BrowserAddress;
             this.liveUpdateableOptions.UpdateOption();
@@ -136,7 +140,12 @@ public partial class FocusView : UserControl
         base.OnPropertyChanged(e);
     }
 
-    private async void UpdateGameData()
+    private TimeSpan GetMemoryReaderLatency()
+    {
+        return TimeSpan.FromMilliseconds(this.liveUpdateableOptions.Value.ExperimentalFeatures.MemoryReaderFrequency);
+    }
+
+    private async Task UpdatePathingData()
     {
         if (this.applicationLauncher.IsGuildwarsRunning is false)
         {
@@ -144,73 +153,102 @@ public partial class FocusView : UserControl
             this.viewManager.ShowView<LauncherView>();
         }
 
-        await this.guildwarsMemoryReader.EnsureInitialized();
-
-        var maybeGameData = await this.guildwarsMemoryReader.ReadGameData();
-        if (maybeGameData is not GameData gameData)
+        await this.guildwarsMemoryReader.EnsureInitialized().ConfigureAwait(true);
+        
+        var maybePathingData = await this.guildwarsMemoryReader.ReadPathingData().ConfigureAwait(true);
+        if (maybePathingData is not PathingData pathingData ||
+            pathingData.Trapezoids is null ||
+            pathingData.Trapezoids.Count == 0)
         {
             return;
         }
 
-        this.Dispatcher.Invoke(() =>
+        this.PathingData = pathingData;
+    }
+
+    private async Task UpdateGameData()
+    {
+        if (this.applicationLauncher.IsGuildwarsRunning is false)
         {
-            this.GameData = gameData;
-            if (this.GameData?.MainPlayer is null ||
-                this.GameData?.User is null ||
-                this.GameData?.Session is null)
-            {
-                return;
-            }
+            this.logger.LogInformation($"Executable is not running. Returning to {nameof(LauncherView)}");
+            this.viewManager.ShowView<LauncherView>();
+        }
 
-            this.CurrentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(this.GameData.MainPlayer!.Experience);
-            this.NextLevelExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(this.GameData.MainPlayer!.Experience);
-            this.TotalFoes = (int)(this.GameData.Session.FoesKilled + this.GameData.Session.FoesToKill);
-            this.Vanquishing = this.GameData.Session.FoesToKill + this.GameData.Session.FoesKilled > 0U;
-            this.TitleActive = this.GameData.MainPlayer.TitleInformation is not null && this.GameData.MainPlayer.TitleInformation.IsValid;
+        await this.guildwarsMemoryReader.EnsureInitialized().ConfigureAwait(true);
 
-            this.MainPlayerDataValid = this.GameData.Valid && this.GameData.MainPlayer.MaxHealth > 0U && this.GameData.MainPlayer.MaxEnergy > 0U;
-            if (this.GameData.MainPlayer.TitleInformation is TitleInformation titleInformation && titleInformation.IsValid)
-            {
-                if (titleInformation.Title is not null &&
-                    titleInformation.Title.Tiers!.Count > titleInformation.TierNumber - 1)
-                {
-                    var rankIndex = (int)titleInformation.TierNumber! - 1;
-                    this.TitleRankName = $"{titleInformation.Title.Tiers![rankIndex]} ({titleInformation.TierNumber}/{titleInformation.MaxTierNumber})";
-                }
-                else
-                {
-                    this.TitleRankName = string.Empty;
-                }
-
-                if (titleInformation.MaxTierNumber == titleInformation.TierNumber)
-                {
-                    this.PointsInCurrentRank = (int)titleInformation.CurrentPoints!;
-                    this.PointsForNextRank = (int)titleInformation.CurrentPoints!;
-                }
-                else if (titleInformation.IsPercentage is false)
-                {
-                    this.PointsInCurrentRank = (int)((uint)titleInformation.CurrentPoints! - (uint)titleInformation.PointsForCurrentRank!);
-                    this.PointsForNextRank = (int)((uint)titleInformation.PointsForNextRank! - (uint)titleInformation.PointsForCurrentRank!);
-                }
-                else
-                {
-                    this.PointsInCurrentRank = (int)(uint)titleInformation.CurrentPoints!;
-                    this.PointsForNextRank = (int)(uint)titleInformation.PointsForNextRank!;
-                }
-            }
-
+        var maybeGameData = await this.guildwarsMemoryReader.ReadGameData().ConfigureAwait(true);
+        if (maybeGameData is not GameData gameData)
+        {
+            this.MainPlayerDataValid = false;
             this.Browser.Visibility = this.MainPlayerDataValid is true ? Visibility.Visible : Visibility.Collapsed;
-            this.UpdateExperienceText();
-            this.UpdateLuxonText();
-            this.UpdateKurzickText();
-            this.UpdateImperialText();
-            this.UpdateBalthazarText();
-            this.UpdateVanquishingText();
-            this.UpdateHealthText();
-            this.UpdateEnergyText();
-            this.UpdateTitleText();
-        },
-        System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+            return;
+        }
+
+        if (gameData.MainPlayer is null ||
+            gameData.User is null ||
+            gameData.Session is null ||
+            gameData.Valid is false)
+        {
+            this.MainPlayerDataValid = false;
+            this.Browser.Visibility = this.MainPlayerDataValid is true ? Visibility.Visible : Visibility.Collapsed;
+            return;
+        }
+
+        this.GameData = gameData;
+
+        var pathingMeta = await this.guildwarsMemoryReader.ReadPathingMetaData();
+        if (pathingMeta?.TrapezoidCount != this.PathingData.Trapezoids?.Count)
+        {
+            await this.UpdatePathingData();
+        }
+
+        this.CurrentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(this.GameData.MainPlayer!.Value.Experience);
+        this.NextLevelExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(this.GameData.MainPlayer!.Value.Experience);
+        this.TotalFoes = (int)(this.GameData.Session.Value.FoesKilled + this.GameData.Session.Value.FoesToKill);
+        this.Vanquishing = this.GameData.Session.Value.FoesToKill + this.GameData.Session.Value.FoesKilled > 0U;
+        this.TitleActive = this.GameData.MainPlayer.Value.TitleInformation is not null && this.GameData.MainPlayer.Value.TitleInformation.Value.IsValid;
+
+        this.MainPlayerDataValid = this.GameData.Valid && this.GameData.MainPlayer.Value.MaxHealth > 0U && this.GameData.MainPlayer.Value.MaxEnergy > 0U;
+        if (this.GameData.MainPlayer.Value.TitleInformation is TitleInformation titleInformation && titleInformation.IsValid)
+        {
+            if (titleInformation.Title is not null &&
+                titleInformation.Title.Tiers!.Count > titleInformation.TierNumber - 1)
+            {
+                var rankIndex = (int)titleInformation.TierNumber! - 1;
+                this.TitleRankName = $"{titleInformation.Title.Tiers![rankIndex]} ({titleInformation.TierNumber}/{titleInformation.MaxTierNumber})";
+            }
+            else
+            {
+                this.TitleRankName = string.Empty;
+            }
+
+            if (titleInformation.MaxTierNumber == titleInformation.TierNumber)
+            {
+                this.PointsInCurrentRank = (int)titleInformation.CurrentPoints!;
+                this.PointsForNextRank = (int)titleInformation.CurrentPoints!;
+            }
+            else if (titleInformation.IsPercentage is false)
+            {
+                this.PointsInCurrentRank = (int)((uint)titleInformation.CurrentPoints! - (uint)titleInformation.PointsForCurrentRank!);
+                this.PointsForNextRank = (int)((uint)titleInformation.PointsForNextRank! - (uint)titleInformation.PointsForCurrentRank!);
+            }
+            else
+            {
+                this.PointsInCurrentRank = (int)(uint)titleInformation.CurrentPoints!;
+                this.PointsForNextRank = (int)(uint)titleInformation.PointsForNextRank!;
+            }
+        }
+
+        this.Browser.Visibility = this.MainPlayerDataValid is true ? Visibility.Visible : Visibility.Collapsed;
+        this.UpdateExperienceText();
+        this.UpdateLuxonText();
+        this.UpdateKurzickText();
+        this.UpdateImperialText();
+        this.UpdateBalthazarText();
+        this.UpdateVanquishingText();
+        this.UpdateHealthText();
+        this.UpdateEnergyText();
+        this.UpdateTitleText();
     }
 
     private void UpdateRightSideBarsLayout()
@@ -237,22 +275,22 @@ public partial class FocusView : UserControl
         switch (this.liveUpdateableOptions.Value.FocusViewOptions.ExperienceDisplay)
         {
             case Configuration.FocusView.ExperienceDisplay.CurrentLevelCurrentAndCurrentLevelMax:
-                var currentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(this.GameData.MainPlayer!.Experience);
-                var nextLevelExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(this.GameData.MainPlayer!.Experience);
+                var currentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(this.GameData.MainPlayer!.Value.Experience);
+                var nextLevelExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(this.GameData.MainPlayer!.Value.Experience);
                 this.ExperienceBarText = $"{(int)currentExperienceInLevel} / {(int)nextLevelExperienceThreshold} XP";
                 break;
             case Configuration.FocusView.ExperienceDisplay.TotalCurretAndTotalMax:
-                var currentTotalExperience = this.GameData.MainPlayer!.Experience;
+                var currentTotalExperience = this.GameData.MainPlayer!.Value.Experience;
                 var requiredTotalExperience = this.experienceCalculator.GetTotalExperienceForNextLevel(currentTotalExperience);
                 this.ExperienceBarText = $"{(int)currentTotalExperience} / {(int)requiredTotalExperience} XP";
                 break;
             case Configuration.FocusView.ExperienceDisplay.RemainingUntilNextLevel:
-                var remainingExperience = this.experienceCalculator.GetRemainingExperienceForNextLevel(this.GameData.MainPlayer!.Experience);
+                var remainingExperience = this.experienceCalculator.GetRemainingExperienceForNextLevel(this.GameData.MainPlayer!.Value.Experience);
                 this.ExperienceBarText = $"Remaining {(int)remainingExperience} XP";
                 break;
             case Configuration.FocusView.ExperienceDisplay.Percentage:
-                var currentExperienceInLevel2 = this.experienceCalculator.GetExperienceForCurrentLevel(this.GameData.MainPlayer!.Experience);
-                var nextLevelExperienceThreshold2 = this.experienceCalculator.GetNextExperienceThreshold(this.GameData.MainPlayer!.Experience);
+                var currentExperienceInLevel2 = this.experienceCalculator.GetExperienceForCurrentLevel(this.GameData.MainPlayer!.Value.Experience);
+                var nextLevelExperienceThreshold2 = this.experienceCalculator.GetNextExperienceThreshold(this.GameData.MainPlayer!.Value.Experience);
                 this.ExperienceBarText = $"{(int)((double)currentExperienceInLevel2 / (double)nextLevelExperienceThreshold2 * 100)}% XP";
                 break;
         }
@@ -327,13 +365,13 @@ public partial class FocusView : UserControl
         switch (this.liveUpdateableOptions.Value.FocusViewOptions.VanquishingDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.VanquishingText = $"{this.GameData.Session!.FoesKilled} / {(int)this.TotalFoes} Foes Killed";
+                this.VanquishingText = $"{this.GameData.Session!.Value.FoesKilled} / {(int)this.TotalFoes} Foes Killed";
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.VanquishingText = $"Remaining {this.GameData.Session!.FoesToKill} Foes";
+                this.VanquishingText = $"Remaining {this.GameData.Session!.Value.FoesToKill} Foes";
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.VanquishingText = $"{(int)((double)this.GameData.Session!.FoesKilled / (double)this.TotalFoes * 100)}% Foes Killed";
+                this.VanquishingText = $"{(int)((double)this.GameData.Session!.Value.FoesKilled / (double)this.TotalFoes * 100)}% Foes Killed";
                 break;
         }
     }
@@ -343,13 +381,13 @@ public partial class FocusView : UserControl
         switch (this.liveUpdateableOptions.Value.FocusViewOptions.HealthDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.HealthBarText = $"{(int)this.GameData.MainPlayer!.CurrentHealth} / {(int)this.GameData.MainPlayer.MaxHealth} Health";
+                this.HealthBarText = $"{(int)this.GameData.MainPlayer!.Value.CurrentHealth} / {(int)this.GameData.MainPlayer.Value.MaxHealth} Health";
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.HealthBarText = $"Remaining {(int)this.GameData.MainPlayer!.CurrentHealth} Health";
+                this.HealthBarText = $"Remaining {(int)this.GameData.MainPlayer!.Value.CurrentHealth} Health";
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.HealthBarText = $"{(int)(this.GameData.MainPlayer!.CurrentHealth / this.GameData.MainPlayer.MaxHealth * 100)}% Health";
+                this.HealthBarText = $"{(int)(this.GameData.MainPlayer!.Value.CurrentHealth / this.GameData.MainPlayer.Value.MaxHealth * 100)}% Health";
                 break;
         }
     }
@@ -359,13 +397,13 @@ public partial class FocusView : UserControl
         switch (this.liveUpdateableOptions.Value.FocusViewOptions.EnergyDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.EnergyBarText = $"{(int)this.GameData.MainPlayer!.CurrentEnergy} / {(int)this.GameData.MainPlayer.MaxEnergy} Energy";
+                this.EnergyBarText = $"{(int)this.GameData.MainPlayer!.Value.CurrentEnergy} / {(int)this.GameData.MainPlayer.Value.MaxEnergy} Energy";
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.EnergyBarText = $"Remaining {(int)this.GameData.MainPlayer!.CurrentEnergy} Energy";
+                this.EnergyBarText = $"Remaining {(int)this.GameData.MainPlayer!.Value.CurrentEnergy} Energy";
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.EnergyBarText = $"{(int)(this.GameData.MainPlayer!.CurrentEnergy / this.GameData.MainPlayer.MaxEnergy * 100)}% Energy";
+                this.EnergyBarText = $"{(int)(this.GameData.MainPlayer!.Value.CurrentEnergy / this.GameData.MainPlayer.Value.MaxEnergy * 100)}% Energy";
                 break;
         }
     }
@@ -382,32 +420,29 @@ public partial class FocusView : UserControl
         }
     }
 
-    private async Task PeriodicallyUpdateGameData(CancellationToken cancellationToken)
-    {
-        if (this.cancellationTokenSource is null ||
-            this.cancellationTokenSource?.IsCancellationRequested is true)
-        {
-            return;
-        }
-
-        this.UpdateGameData();
-        await Task.Delay((int)this.liveUpdateableOptions.Value.ExperimentalFeatures.MemoryReaderFrequency, cancellationToken);
-        _ = Task.Run(() => this.PeriodicallyUpdateGameData(this.cancellationTokenSource!.Token), this.cancellationTokenSource!.Token);
-    }
-
-    private void FocusView_Loaded(object _, RoutedEventArgs e)
+    private async void FocusView_Loaded(object _, RoutedEventArgs e)
     {
         this.UpdateRightSideBarsLayout();
         this.BrowserAddress = this.liveUpdateableOptions.Value.FocusViewOptions.BrowserUrl;
-        this.cancellationTokenSource?.Cancel();
+        this.cancellationTokenSource?.Dispose();
         this.cancellationTokenSource = new CancellationTokenSource();
-        Task.Run(() => this.PeriodicallyUpdateGameData(this.cancellationTokenSource.Token));
+        var cancellationToken = this.cancellationTokenSource.Token;
+        var memoryReaderLatency = this.GetMemoryReaderLatency();
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            await this.UpdateGameData().ConfigureAwait(true);
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
+            await Task.Delay(memoryReaderLatency, cancellationToken).ConfigureAwait(true);
+        }
     }
 
     private void FocusView_Unloaded(object _, RoutedEventArgs e)
     {
         this.cancellationTokenSource?.Cancel();
-        this.cancellationTokenSource = null;
         this.guildwarsMemoryReader?.Stop();
     }
 
@@ -584,28 +619,28 @@ public partial class FocusView : UserControl
 
     private void MetaBuilds_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
-        if (this.GameData?.MainPlayer?.PrimaryProfession is not null &&
-            this.GameData.MainPlayer.PrimaryProfession != Profession.None)
+        if (this.GameData.MainPlayer?.PrimaryProfession is not null &&
+            this.GameData.MainPlayer?.PrimaryProfession != Profession.None)
         {
-            this.BrowserAddress = this.GameData.MainPlayer.PrimaryProfession.BuildsUrl;
+            this.BrowserAddress = this.GameData.MainPlayer!.Value.PrimaryProfession.BuildsUrl;
         }
     }
 
     private void PrimaryProfession_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
-        if (this.GameData?.MainPlayer?.PrimaryProfession is not null &&
-            this.GameData.MainPlayer.PrimaryProfession != Profession.None)
+        if (this.GameData.MainPlayer?.PrimaryProfession is not null &&
+            this.GameData.MainPlayer?.PrimaryProfession != Profession.None)
         {
-            this.BrowserAddress = this.GameData.MainPlayer.PrimaryProfession.WikiUrl;
+            this.BrowserAddress = this.GameData.MainPlayer!.Value.PrimaryProfession.WikiUrl;
         }
     }
 
     private void SecondaryProfession_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
-        if (this.GameData?.MainPlayer?.SecondaryProfession is not null &&
-            this.GameData.MainPlayer.SecondaryProfession != Profession.None)
+        if (this.GameData.MainPlayer?.SecondaryProfession is not null &&
+            this.GameData.MainPlayer?.SecondaryProfession != Profession.None)
         {
-            this.BrowserAddress = this.GameData.MainPlayer.SecondaryProfession.WikiUrl;
+            this.BrowserAddress = this.GameData.MainPlayer!.Value.SecondaryProfession.WikiUrl;
         }
     }
 
@@ -640,11 +675,11 @@ public partial class FocusView : UserControl
         }
         else
         {
-            Grid.SetRow(this.Browser, 1);
+            Grid.SetRow(this.Browser, 2);
             Grid.SetColumn(this.Browser, 2);
             Grid.SetRowSpan(this.Browser, 1);
             Grid.SetColumnSpan(this.Browser, 1);
-            this.Browser.Margin = new Thickness(10, 0, 0, 0);
+            this.Browser.Margin = new Thickness(5, 0, 0, 0);
         }
     }
 

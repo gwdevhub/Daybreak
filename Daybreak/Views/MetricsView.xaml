@@ -10,7 +10,8 @@
              x:Name="_this"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Background="#F0212121">
-        <ListBox ItemsSource="{Binding ElementName=_this, Path=Metrics, Mode=OneWay}"
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <ListBox ItemsSource="{Binding ElementName=_this, Path=Metrics, Mode=OneWay}"
                   Background="Transparent">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -40,5 +41,6 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+        </ScrollViewer>
     </Grid>
 </UserControl>
