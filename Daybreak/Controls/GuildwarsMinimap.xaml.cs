@@ -23,11 +23,14 @@ public partial class GuildwarsMinimap : UserControl
     private readonly IGuildwarsEntityDebouncer guildwarsEntityDebouncer;
 
     private bool resizeEntities;
+    private bool dragging;
     private double mapMinWidth;
     private double mapMinHeight;
     private double mapWidth;
     private double mapHeight;
     private Point originPoint = new(0, 0);
+    private Vector originOffset = new(0, 0);
+    private Point initialClickPoint = new(0, 0);
     private DebounceResponse? cachedDebounceResponse;
 
     [GenerateDependencyProperty]
@@ -36,8 +39,6 @@ public partial class GuildwarsMinimap : UserControl
     private GameData gameData = new();
     [GenerateDependencyProperty]
     private double zoom = 0.08;
-
-    public event EventHandler<IEntity>? ClickedEntity;
 
     public GuildwarsMinimap()
         :this(Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IGuildwarsEntityDebouncer>())
@@ -69,25 +70,36 @@ public partial class GuildwarsMinimap : UserControl
         else if (e.Property == GameDataProperty &&
                 this.GameData.Valid)
         {
-            var debounceResponse = this.guildwarsEntityDebouncer.DebounceEntities(this.gameData);
-            if (!double.IsFinite(this.mapWidth) ||
-                !double.IsFinite(this.mapHeight) ||
-                !double.IsFinite(this.mapMinWidth) ||
-                !double.IsFinite(this.mapMinHeight))
-            {
-                return;
-            }
-
-            var screenVirtualWidth = this.ActualWidth / this.Zoom;
-            var screenVirtualHeight = this.ActualHeight / this.Zoom;
-            var position = debounceResponse.MainPlayer.Position!.Value;
-            this.originPoint = new Point(position.X - (screenVirtualWidth / 2), position.Y + (screenVirtualHeight / 2));
-
-            var adjustedPosition = new Point((int)((position.X - this.mapMinWidth / this.Zoom) * this.Zoom), (int)(this.mapHeight / this.Zoom - position.Y + this.mapMinHeight / this.Zoom) * this.Zoom);
-            this.MapDrawingHost.Margin = new Thickness((-adjustedPosition.X + this.ActualWidth / 2), (-adjustedPosition.Y + this.ActualHeight / 2), 0, 0);
-            this.DrawEntities(debounceResponse);
-            this.cachedDebounceResponse = debounceResponse;
+            this.UpdateGameData();
         }
+    }
+
+    private void UpdateGameData()
+    {
+        var debounceResponse = this.guildwarsEntityDebouncer.DebounceEntities(this.gameData);
+        if (!double.IsFinite(this.mapWidth) ||
+            !double.IsFinite(this.mapHeight) ||
+            !double.IsFinite(this.mapMinWidth) ||
+            !double.IsFinite(this.mapMinHeight))
+        {
+            return;
+        }
+
+        var screenVirtualWidth = this.ActualWidth / this.Zoom;
+        var screenVirtualHeight = this.ActualHeight / this.Zoom;
+        var position = debounceResponse.MainPlayer.Position!.Value;
+        this.originPoint = new Point(
+            position.X - (screenVirtualWidth / 2) - (this.originOffset.X / this.Zoom),
+            position.Y + (screenVirtualHeight / 2) + (this.originOffset.Y / this.Zoom));
+
+        var adjustedPosition = new Point((int)((position.X - this.mapMinWidth / this.Zoom) * this.Zoom), (int)(this.mapHeight / this.Zoom - position.Y + this.mapMinHeight / this.Zoom) * this.Zoom);
+        this.MapDrawingHost.Margin = new Thickness(
+            (-adjustedPosition.X + this.ActualWidth / 2) + this.originOffset.X,
+            (-adjustedPosition.Y + this.ActualHeight / 2) + this.originOffset.Y,
+            0,
+            0);
+        this.DrawEntities(debounceResponse);
+        this.cachedDebounceResponse = debounceResponse;
     }
 
     private void DrawMap()
@@ -279,58 +291,40 @@ public partial class GuildwarsMinimap : UserControl
             color);
     }
 
-    private void GuildwarsMinimap_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-    {
-        if (this.cachedDebounceResponse is null)
-        {
-            return;
-        }
-
-        var mousePos = Mouse.GetPosition(this);
-        var clickedEntity = this.cachedDebounceResponse.LivingEntities.OfType<IEntity>()
-            .Concat(this.cachedDebounceResponse.Party.OfType<IEntity>())
-            .Concat(this.cachedDebounceResponse.WorldPlayers.OfType<IEntity>())
-            .Append(this.cachedDebounceResponse.MainPlayer.As<IEntity>())
-            .FirstOrDefault(e => this.MouseOverEntity(e, mousePos));
-
-        if (clickedEntity is null)
-        {
-            return;
-        }
-
-        this.ClickedEntity?.Invoke(this, clickedEntity);
-    }
-
-    private void GuildwarsMinimap_MouseMove(object sender, MouseEventArgs e)
-    {
-        if (this.cachedDebounceResponse is null)
-        {
-            return;
-        }
-
-        var mousePos = Mouse.GetPosition(this);
-        var clickedEntity = this.cachedDebounceResponse.LivingEntities.OfType<IEntity>()
-            .Concat(this.cachedDebounceResponse.Party.OfType<IEntity>())
-            .Concat(this.cachedDebounceResponse.WorldPlayers.OfType<IEntity>())
-            .Append(this.cachedDebounceResponse.MainPlayer.As<IEntity>())
-            .FirstOrDefault(e => this.MouseOverEntity(e, mousePos));
-
-        if (clickedEntity is null)
-        {
-            this.ForceCursor = false;
-            this.Cursor = Cursors.Arrow;
-            return;
-        }
-
-        this.ForceCursor = true;
-        this.Cursor = Cursors.Hand;
-    }
-
     private bool MouseOverEntity(IEntity entity, Point mousePosition)
     {
         var x = (int)((entity.Position!.Value.X - this.originPoint.X) * this.Zoom);
         var y = 0 - (int)((entity.Position!.Value.Y - this.originPoint.Y) * this.Zoom);
 
         return Math.Pow(mousePosition.X - x, 2) + Math.Pow(mousePosition.Y - y, 2) < Math.Pow(100 * this.Zoom, 2);
+    }
+
+    private void GuildwarsMinimap_MouseDown(object sender, MouseButtonEventArgs e)
+    {
+        this.initialClickPoint = Mouse.GetPosition(this);
+        this.dragging = true;
+    }
+
+    private void GuildwarsMinimap_MouseUp(object sender, MouseButtonEventArgs e)
+    {
+        this.dragging = false;
+        this.originOffset = new(0, 0);
+    }
+
+    private void GuildwarsMinimap_MouseMove(object sender, MouseEventArgs e)
+    {
+        if (this.dragging is false)
+        {
+            return;
+        }
+
+        var mousePosition = e.GetPosition(this);
+        this.originOffset = mousePosition - this.initialClickPoint;
+    }
+
+    private void GuildwarsMinimap_MouseWheel(object sender, MouseWheelEventArgs e)
+    {
+        var delta = e.Delta > 0 ? 0.1 : -0.1;
+        this.Zoom += this.Zoom * delta;
     }
 }

@@ -7,7 +7,9 @@
              x:Name="_this"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
-             MouseDoubleClick="GuildwarsMinimap_MouseDoubleClick"
+             MouseWheel="GuildwarsMinimap_MouseWheel"
+             MouseDown="GuildwarsMinimap_MouseDown"
+             MouseUp="GuildwarsMinimap_MouseUp"
              MouseMove="GuildwarsMinimap_MouseMove">
     <Grid>
         <Image x:Name="MapDrawingHost" VerticalAlignment="Top" HorizontalAlignment="Left" Stretch="None">

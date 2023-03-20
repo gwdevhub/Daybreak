@@ -44,4 +44,6 @@ public sealed class ApplicationConfiguration
     public string? ProtectedGraphRefreshToken { get; set; }
     [JsonProperty("FocusViewOptions")]
     public FocusViewOptions FocusViewOptions { get; set; } = new FocusViewOptions();
+    [JsonProperty("ScreenManagerOptions")]
+    public ScreenManagerOptions ScreenManagerOptions { get; set; } = new ScreenManagerOptions();
 }
