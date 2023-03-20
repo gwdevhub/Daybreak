@@ -3,7 +3,6 @@ using Daybreak.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-
 namespace Daybreak.Configuration;
 
 public sealed class ApplicationConfiguration
