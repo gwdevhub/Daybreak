@@ -38,10 +38,18 @@ public sealed class ScreenManager : IScreenManager, IApplicationLifetimeService
     public void MoveWindowToSavedPosition()
     {
         var screenOptions = this.liveUpdateableOptions.Value.ScreenManagerOptions;
+        var dpiScale = VisualTreeHelper.GetDpi(this.host);
         var desiredX = screenOptions.X;
         var desiredY = screenOptions.Y;
         var desiredWidth = screenOptions.Width;
         var desiredHeight = screenOptions.Height;
+        if (screenOptions.DpiX > 0 && screenOptions.DpiY > 0)
+        {
+            desiredX *= dpiScale.DpiScaleX / screenOptions.DpiX;
+            desiredY *= dpiScale.DpiScaleY / screenOptions.DpiY;
+            desiredWidth *= dpiScale.DpiScaleX / screenOptions.DpiX;
+            desiredHeight *= dpiScale.DpiScaleY / screenOptions.DpiY;
+        }
 
         // Validate that the desired position will be at least partially on screen.
         var validPosition = false;
@@ -76,10 +84,12 @@ public sealed class ScreenManager : IScreenManager, IApplicationLifetimeService
         var dpiScale = VisualTreeHelper.GetDpi(this.host);
         var options = new ScreenManagerOptions
         {
-            X = this.host.WindowState is WindowState.Normal ? this.host.Left * dpiScale.DpiScaleX : 0,
-            Y = this.host.WindowState is WindowState.Normal ? this.host.Top * dpiScale.DpiScaleY : 0,
-            Width = this.host.WindowState is WindowState.Normal ? this.host.ActualWidth * dpiScale.DpiScaleX : 0,
-            Height = this.host.WindowState is WindowState.Normal ? this.host.ActualHeight * dpiScale.DpiScaleY : 0,
+            X = this.host.WindowState is WindowState.Normal ? this.host.Left : 0,
+            Y = this.host.WindowState is WindowState.Normal ? this.host.Top : 0,
+            Width = this.host.WindowState is WindowState.Normal ? this.host.ActualWidth : 0,
+            Height = this.host.WindowState is WindowState.Normal ? this.host.ActualHeight : 0,
+            DpiX = dpiScale.DpiScaleX,
+            DpiY = dpiScale.DpiScaleY
         };
 
         this.liveUpdateableOptions.Value.ScreenManagerOptions = options;
