@@ -11,6 +11,7 @@ using Daybreak.Services.Scanner;
 using Microsoft.Extensions.DependencyInjection;
 using System.Core.Extensions;
 using System.Windows.Input;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Daybreak.Controls;
@@ -20,7 +21,9 @@ namespace Daybreak.Controls;
 /// </summary>
 public partial class GuildwarsMinimap : UserControl
 {
+    private const float PositionRadius = 150;
     private readonly IGuildwarsEntityDebouncer guildwarsEntityDebouncer;
+    private readonly Color positionHistoryColor = Color.FromArgb(155, Colors.Red.R, Colors.Red.G, Colors.Red.B);
 
     private bool resizeEntities;
     private bool dragging;
@@ -32,6 +35,7 @@ public partial class GuildwarsMinimap : UserControl
     private Vector originOffset = new(0, 0);
     private Point initialClickPoint = new(0, 0);
     private DebounceResponse? cachedDebounceResponse;
+    private List<Position> mainPlayerPositionHistory = new();
 
     [GenerateDependencyProperty]
     private PathingData pathingData = new();
@@ -39,6 +43,8 @@ public partial class GuildwarsMinimap : UserControl
     private GameData gameData = new();
     [GenerateDependencyProperty]
     private double zoom = 0.08;
+    [GenerateDependencyProperty(InitialValue = true)]
+    private bool drawPositionHistory = true;
 
     public GuildwarsMinimap()
         :this(Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IGuildwarsEntityDebouncer>())
@@ -61,10 +67,14 @@ public partial class GuildwarsMinimap : UserControl
         {
             this.resizeEntities = true;
         }
-        else if (e.Property == PathingDataProperty ||
-                 e.Property == ZoomProperty)
+        else if (e.Property == PathingDataProperty)
         {
             this.guildwarsEntityDebouncer.ClearCaches();
+            this.mainPlayerPositionHistory.Clear();
+            this.DrawMap();
+        }
+        else if (e.Property == ZoomProperty)
+        {
             this.DrawMap();
         }
         else if (e.Property == GameDataProperty &&
@@ -98,8 +108,25 @@ public partial class GuildwarsMinimap : UserControl
             (-adjustedPosition.Y + this.ActualHeight / 2) + this.originOffset.Y,
             0,
             0);
+        this.ManageMainPlayerPositionHistory();
         this.DrawEntities(debounceResponse);
         this.cachedDebounceResponse = debounceResponse;
+    }
+
+    private void ManageMainPlayerPositionHistory()
+    {
+        if (this.cachedDebounceResponse is null)
+        {
+            return;
+        }
+
+        var currentPosition = this.cachedDebounceResponse.MainPlayer.Position ?? throw new InvalidOperationException("Unexpected main player null position");
+        if (this.mainPlayerPositionHistory.Any(oldPosition => this.PositionsCollide(oldPosition, currentPosition)))
+        {
+            return;
+        }
+
+        this.mainPlayerPositionHistory.Add(currentPosition);
     }
 
     private void DrawMap()
@@ -190,6 +217,9 @@ public partial class GuildwarsMinimap : UserControl
 
         bitmap.Clear(Colors.Transparent);
         using var context = bitmap.GetBitmapContext();
+
+        this.DrawMainPlayerPositionHistory(bitmap);
+
         this.FillEllipse(debounceResponse.MainPlayer.Position, bitmap, Colors.Green);
 
         foreach (var partyMember in debounceResponse.Party)
@@ -240,6 +270,24 @@ public partial class GuildwarsMinimap : UserControl
             {
                 this.FillTriangle(livingEntity.Position, bitmap, Colors.LimeGreen);
             }
+        }
+    }
+
+    private void DrawMainPlayerPositionHistory(WriteableBitmap writeableBitmap)
+    {
+        if (!this.DrawPositionHistory)
+        {
+            return;
+        }
+
+        if (this.cachedDebounceResponse is null)
+        {
+            return;
+        }
+
+        foreach(var position in this.mainPlayerPositionHistory)
+        {
+            this.FillEllipse(position, writeableBitmap, this.positionHistoryColor);
         }
     }
 
@@ -297,6 +345,14 @@ public partial class GuildwarsMinimap : UserControl
         var y = 0 - (int)((entity.Position!.Value.Y - this.originPoint.Y) * this.Zoom);
 
         return Math.Pow(mousePosition.X - x, 2) + Math.Pow(mousePosition.Y - y, 2) < Math.Pow(100 * this.Zoom, 2);
+    }
+
+    private bool PositionsCollide(Position position1, Position position2)
+    {
+        var a = PositionRadius + PositionRadius;
+        var dx = position1.X - position2.X;
+        var dy = position1.Y - position2.Y;
+        return a * a > ((dx * dx) + (dy * dy));
     }
 
     private void GuildwarsMinimap_MouseDown(object sender, MouseButtonEventArgs e)
