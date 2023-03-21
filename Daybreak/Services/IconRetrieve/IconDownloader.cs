@@ -146,7 +146,8 @@ public sealed class IconDownloader : IIconDownloader, IApplicationLifetimeServic
                 continue;
             }
 
-            this.logger.LogInformation("Downloading icon");
+            var logger = this.logger.CreateScopedLogger(nameof(this.DownloadIcons), skill.Name);
+            logger.LogInformation("Downloading icon");
             this.iconDownloadStatus!.CurrentStep = IconDownloadStatus.Downloading(skill.Name!, progressValue);
             var request = new IconRequest { Skill = skill };
             this.iconBrowser.QueueIconRequest(request);
@@ -158,12 +159,12 @@ public sealed class IconDownloader : IIconDownloader, IApplicationLifetimeServic
 
             if (request.IconBase64.IsNullOrWhiteSpace())
             {
-                this.logger.LogWarning("Failed to download icon");
+                logger.LogWarning("Failed to download icon");
                 incomplete = true;
             }
             else
             {
-                this.logger.LogInformation("Downloaded icon");
+                logger.LogInformation("Downloaded icon");
             }
 
             progressValue += progressIncrement;
