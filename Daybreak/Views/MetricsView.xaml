@@ -10,9 +10,9 @@
              x:Name="_this"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Background="#F0212121">
-        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" PanningMode="VerticalFirst">
             <ListBox ItemsSource="{Binding ElementName=_this, Path=Metrics, Mode=OneWay}"
-                  Background="Transparent">
+                  Background="Transparent" ScrollViewer.VerticalScrollBarVisibility="Disabled">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel></VirtualizingStackPanel>

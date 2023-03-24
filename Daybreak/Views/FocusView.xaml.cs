@@ -92,6 +92,7 @@ public partial class FocusView : UserControl
     private string browserAddress = string.Empty;
 
     private bool browserMaximized = false;
+    private bool minimapMaximized = false;
     private CancellationTokenSource? cancellationTokenSource;
 
     public FocusView(
@@ -239,7 +240,11 @@ public partial class FocusView : UserControl
             }
         }
 
-        this.Browser.Visibility = this.MainPlayerDataValid is true ? Visibility.Visible : Visibility.Collapsed;
+        this.Browser.Visibility = this.MainPlayerDataValid is true ?
+            this.minimapMaximized ?
+                Visibility.Hidden :
+                Visibility.Visible :
+            Visibility.Collapsed;
         this.UpdateExperienceText();
         this.UpdateLuxonText();
         this.UpdateKurzickText();
@@ -713,5 +718,28 @@ public partial class FocusView : UserControl
         }
 
         this.BrowserAddress = e.WikiUrl;
+    }
+
+    private void GuildwarsMinimap_MaximizeClicked(object sender, EventArgs e)
+    {
+        this.minimapMaximized = !this.minimapMaximized;
+        if (this.minimapMaximized)
+        {
+            Grid.SetRow(this.Minimap, 0);
+            Grid.SetColumn(this.Minimap, 0);
+            Grid.SetRowSpan(this.Minimap, int.MaxValue);
+            Grid.SetColumnSpan(this.Minimap, int.MaxValue);
+            this.Minimap.Margin = new Thickness(0);
+            this.Browser.Visibility = Visibility.Hidden;
+        }
+        else
+        {
+            Grid.SetRow(this.Minimap, 1);
+            Grid.SetColumn(this.Minimap, 2);
+            Grid.SetRowSpan(this.Minimap, 1);
+            Grid.SetColumnSpan(this.Minimap, 1);
+            this.Minimap.Margin = new Thickness(5, 0, 0, 5);
+            this.Browser.Visibility = Visibility.Visible;
+        }
     }
 }
