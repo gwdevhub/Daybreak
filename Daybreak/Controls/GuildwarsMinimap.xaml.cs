@@ -45,6 +45,10 @@ public partial class GuildwarsMinimap : UserControl
     private double zoom = 0.08;
     [GenerateDependencyProperty(InitialValue = true)]
     private bool drawPositionHistory = true;
+    [GenerateDependencyProperty]
+    private bool controlsVisible;
+
+    public event EventHandler? MaximizeClicked;
 
     public GuildwarsMinimap()
         :this(Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IGuildwarsEntityDebouncer>())
@@ -71,10 +75,12 @@ public partial class GuildwarsMinimap : UserControl
         {
             this.guildwarsEntityDebouncer.ClearCaches();
             this.mainPlayerPositionHistory.Clear();
+            this.UpdateGameData();
             this.DrawMap();
         }
         else if (e.Property == ZoomProperty)
         {
+            this.UpdateGameData();
             this.DrawMap();
         }
         else if (e.Property == GameDataProperty &&
@@ -86,7 +92,12 @@ public partial class GuildwarsMinimap : UserControl
 
     private void UpdateGameData()
     {
-        var debounceResponse = this.guildwarsEntityDebouncer.DebounceEntities(this.gameData);
+        if(this.GameData.Valid is false)
+        {
+            return;
+        }
+
+        var debounceResponse = this.guildwarsEntityDebouncer.DebounceEntities(this.GameData);
         if (!double.IsFinite(this.mapWidth) ||
             !double.IsFinite(this.mapHeight) ||
             !double.IsFinite(this.mapMinWidth) ||
@@ -355,32 +366,94 @@ public partial class GuildwarsMinimap : UserControl
         return a * a > ((dx * dx) + (dy * dy));
     }
 
-    private void GuildwarsMinimap_MouseDown(object sender, MouseButtonEventArgs e)
-    {
-        this.initialClickPoint = Mouse.GetPosition(this);
-        this.dragging = true;
-    }
-
-    private void GuildwarsMinimap_MouseUp(object sender, MouseButtonEventArgs e)
-    {
-        this.dragging = false;
-        this.originOffset = new(0, 0);
-    }
-
-    private void GuildwarsMinimap_MouseMove(object sender, MouseEventArgs e)
+    private void DragMinimap()
     {
         if (this.dragging is false)
         {
             return;
         }
 
-        var mousePosition = e.GetPosition(this);
+        var mousePosition = Mouse.GetPosition(this);
         this.originOffset = mousePosition - this.initialClickPoint;
+        this.UpdateGameData();
+    }
+
+    private IEntity? CheckMouseOverEntity(IEnumerable<IEntity> entities)
+    {
+        if (this.GameData.Valid is false)
+        {
+            return default;
+        }
+
+        var mousePoint = Mouse.GetPosition(this);
+        foreach(var entity in entities)
+        {
+            if (this.MouseOverEntity(entity, mousePoint))
+            {
+                this.Cursor = Cursors.Hand;
+                return entity;
+            }
+        }
+
+        this.Cursor = default;
+        return default;
+    }
+
+    private void GuildwarsMinimap_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        this.initialClickPoint = Mouse.GetPosition(this);
+        this.dragging = true;
+    }
+
+    private void GuildwarsMinimap_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        this.dragging = false;
+        this.originOffset = new(0, 0);
+        this.UpdateGameData();
+    }
+
+    private void GuildwarsMinimap_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        var maybeWorldPlayer = this.CheckMouseOverEntity(this.GameData.WorldPlayers!.OfType<IEntity>());
+        if (maybeWorldPlayer is WorldPlayerInformation worldPlayerInformation &&
+            this.TryFindResource("WorldPlayerContextMenu") is ContextMenu worldPlayerContextMenu)
+        {
+            this.ContextMenu = worldPlayerContextMenu;
+            this.ContextMenu.DataContext = worldPlayerInformation;
+            this.ContextMenu.IsOpen = true;
+            return;
+        }
+
+        this.ContextMenu = default;
+    }
+
+    private void GuildwarsMinimap_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+    {
+    }
+
+    private void GuildwarsMinimap_MouseMove(object sender, MouseEventArgs e)
+    {
+        if (this.GameData.Valid is false)
+        {
+            return;
+        }
+
+        this.DragMinimap();
+        this.CheckMouseOverEntity(this.GameData.WorldPlayers!.OfType<IEntity>());
     }
 
     private void GuildwarsMinimap_MouseWheel(object sender, MouseWheelEventArgs e)
     {
         var delta = e.Delta > 0 ? 0.1 : -0.1;
         this.Zoom += this.Zoom * delta;
+    }
+
+    private void MaximizeButton_Clicked(object sender, EventArgs e)
+    {
+        this.MaximizeClicked?.Invoke(this, e);
+        if (e is  MouseButtonEventArgs mouseButtonEventArgs)
+        {
+            mouseButtonEventArgs.Handled = true;
+        }
     }
 }

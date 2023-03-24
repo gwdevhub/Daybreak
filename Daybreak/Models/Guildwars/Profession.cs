@@ -6,7 +6,7 @@ namespace Daybreak.Models.Guildwars;
 
 public sealed class Profession
 {
-    public static Profession None { get; } = new() { Name = "None", Id = 0 };
+    public static Profession None { get; } = new() { Name = "None", Id = 0, Alias = "Any" };
     public static Profession Warrior { get; } = new()
     { 
         Name = "Warrior",

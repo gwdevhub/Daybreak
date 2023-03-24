@@ -433,6 +433,7 @@
             </ScrollViewer>
         </Grid>
         <controls:GuildwarsMinimap
+                x:Name="Minimap"
                 Grid.Column="2"
                 Grid.Row="1"    
                 Margin="5, 0, 0, 5"
@@ -441,6 +442,8 @@
                 GameData="{Binding ElementName=_this, Path=GameData, Mode=OneWay}"
                 PathingData="{Binding ElementName=_this, Path=PathingData, Mode=OneWay}"
                 Zoom="0.04"
+                ControlsVisible="True"
+                MaximizeClicked="GuildwarsMinimap_MaximizeClicked"
                 ClipToBounds="True"></controls:GuildwarsMinimap>
         <controls:ChromiumBrowserWrapper
                 x:Name="Browser"

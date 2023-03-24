@@ -360,7 +360,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
             entities);
 
         var worldPlayers = players
-            .Where(p => p.AgentId != mainPlayerEntityId)
+            .Where(p => p.AgentId != mainPlayerEntityId && p.AgentId != 0)
             .Select(p => this.GetWorldPlayerInformation(p, instanceContext, mapEntities, professions, skills, partyAttributes, titles, titleTiers, entities))
             .ToList();
 

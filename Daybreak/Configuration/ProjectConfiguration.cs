@@ -37,6 +37,7 @@ using Daybreak.Services.Monitoring;
 using System.Net;
 using System.Net.Http.Headers;
 using Daybreak.Services.Downloads;
+using Daybreak.Services.ExceptionHandling;
 
 namespace Daybreak.Configuration;
 
@@ -139,6 +140,7 @@ public static class ProjectConfiguration
         services.AddScoped<IAttributePointCalculator, AttributePointCalculator>();
         services.AddScoped<IDownloadService, DownloadService>();
         services.AddScoped<IGuildwarsEntityDebouncer, GuildwarsEntityDebouncer>();
+        services.AddScoped<IExceptionHandler, ExceptionHandler>();
     }
 
     public static void RegisterViews(IViewProducer viewProducer)
