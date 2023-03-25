@@ -216,6 +216,8 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         var playerEntityId = this.memoryScanner.ReadPtrChain<int>(this.GetPlayerIdPointer(), 0x0, 0x0);
         var titles = this.memoryScanner.ReadArray<TitleContext>(gameContext.Titles);
         var titleTiers = this.memoryScanner.ReadArray<TitleTierContext>(gameContext.TitlesTiers);
+        // var npcs = this.memoryScanner.ReadArray<NpcContext>(gameContext.Npcs);
+        // var entityInfos = this.memoryScanner.ReadArray<EntityContext>(gameContext.EntityInfos);
 
         // The following lines would retrieve all entities, including item entities.
         var entityPointersArray = this.memoryScanner.ReadPtrChain<GuildwarsArray>(this.GetEntityArrayPointer(), 0x0, 0x0);
