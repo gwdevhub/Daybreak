@@ -320,6 +320,6 @@ public partial class MainWindow : Window
         double R = color.ScR;
         double G = color.ScG;
         double B = color.ScB;
-        return 0.299 * R + 0.587 * G + 0.114 * B;
+        return (0.299 * R) + (0.587 * G) + (0.114 * B);
     }
 }
