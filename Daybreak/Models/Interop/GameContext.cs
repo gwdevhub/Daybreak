@@ -82,6 +82,15 @@ public readonly struct GameContext
     [FieldOffset(0x0748)]
     public readonly uint MaxImperial;
 
+    [FieldOffset(0x0750)]
+    public readonly GuildwarsArray EntityInfos;
+
+    [FieldOffset(0x0770)]
+    public readonly GuildwarsArray MissionMapIcons;
+
+    [FieldOffset(0x0780)]
+    public readonly GuildwarsArray Npcs;
+
     [FieldOffset(0x790)]
     public readonly GuildwarsArray Players;
 

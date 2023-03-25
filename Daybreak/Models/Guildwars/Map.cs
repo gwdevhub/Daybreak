@@ -369,6 +369,7 @@ public sealed class Map
     public static readonly Map ForumHighlands = new() { Id = 399, Name = "Forum Highlands", WikiUrl = "https://wiki.guildwars.com/wiki/Forum_Highlands" };
     public static readonly Map KainengCenterSunspearsinCantha = new() { Id = 400, Name = "Kaineng Center", WikiUrl = "https://wiki.guildwars.com/wiki/Kaineng_Center" };
     public static readonly Map ResplendentMakuun = new() { Id = 401, Name = "Resplendent Makuun", WikiUrl = "https://wiki.guildwars.com/wiki/Resplendent_Makuun" };
+    public static readonly Map ResplendentMakuun2 = new() { Id = 402, Name = "Resplendent Makuun", WikiUrl = "https://wiki.guildwars.com/wiki/Resplendent_Makuun" };
     public static readonly Map HonurHillOutpost = new() { Id = 403, Name = "Honur Hill", WikiUrl = "https://wiki.guildwars.com/wiki/Honur_Hill" };
     public static readonly Map WildernessofBahdza = new() { Id = 404, Name = "Wilderness of Bahdza", WikiUrl = "https://wiki.guildwars.com/wiki/Wilderness_of_Bahdza" };
     public static readonly Map VehtendiValley = new() { Id = 405, Name = "Vehtendi Valley", WikiUrl = "https://wiki.guildwars.com/wiki/Vehtendi_Valley" };
@@ -1069,6 +1070,7 @@ public sealed class Map
         ForumHighlands,
         KainengCenterSunspearsinCantha,
         ResplendentMakuun,
+        ResplendentMakuun2,
         HonurHillOutpost,
         WildernessofBahdza,
         VehtendiValley,

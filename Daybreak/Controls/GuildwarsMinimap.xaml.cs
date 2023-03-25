@@ -430,6 +430,16 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
+        var maybePartyMember = this.CheckMouseOverEntity(this.GameData.Party!.OfType<IEntity>());
+        if (maybePartyMember is PlayerInformation partyMember &&
+            this.TryFindResource("PlayerContextMenu") is ContextMenu playerContextMenu)
+        {
+            this.ContextMenu = playerContextMenu;
+            this.ContextMenu.DataContext = partyMember;
+            this.ContextMenu.IsOpen = true;
+            return;
+        }
+
         var maybeLivingEntity = this.CheckMouseOverEntity(this.GameData.LivingEntities!.OfType<IEntity>());
         if (maybeLivingEntity is LivingEntity livingEntity &&
             this.TryFindResource("LivingEntityContextMenu") is ContextMenu livingEntityContextMenu)
@@ -455,6 +465,11 @@ public partial class GuildwarsMinimap : UserControl
         }
 
         this.DragMinimap();
+        if (this.CheckMouseOverEntity(this.GameData.Party!.OfType<IEntity>()) is not null)
+        {
+            return;
+        }
+
         if (this.CheckMouseOverEntity(this.GameData.WorldPlayers!.OfType<IEntity>()) is not null)
         {
             return;

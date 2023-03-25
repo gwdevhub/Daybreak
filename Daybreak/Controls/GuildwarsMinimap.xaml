@@ -36,6 +36,13 @@
                 </ControlTemplate>
             </ContextMenu.Template>
         </ContextMenu>
+        <ContextMenu x:Key="PlayerContextMenu">
+            <ContextMenu.Template>
+                <ControlTemplate>
+                    <local:PlayerContextMenu DataContext="{Binding DataContext, RelativeSource={RelativeSource TemplatedParent}}"></local:PlayerContextMenu>
+                </ControlTemplate>
+            </ContextMenu.Template>
+        </ContextMenu>
     </UserControl.Resources>
     <Grid>
         <Image x:Name="MapDrawingHost" VerticalAlignment="Top" HorizontalAlignment="Left" Stretch="Fill"/>
