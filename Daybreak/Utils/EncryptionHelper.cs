@@ -51,7 +51,7 @@ internal static class EncryptionHelper
     {
         var saltBytes = new byte[Aes.BlockSize / 8];
         var ivBytes = new byte[Aes.BlockSize / 8];
-        var cipherBytes = new byte[bytes.Length - Aes.BlockSize / 4];
+        var cipherBytes = new byte[bytes.Length - (Aes.BlockSize / 4)];
 
         using var encryptedStream = new MemoryStream(bytes);
         encryptedStream.Read(saltBytes, 0, saltBytes.Length);

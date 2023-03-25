@@ -22,10 +22,23 @@
                 </ControlTemplate>
             </ContextMenu.Template>
         </ContextMenu>
+        <ContextMenu x:Key="MainPlayerContextMenu">
+            <ContextMenu.Template>
+                <ControlTemplate>
+                    <local:MainPlayerContextMenu DataContext="{Binding DataContext, RelativeSource={RelativeSource TemplatedParent}}"></local:MainPlayerContextMenu>
+                </ControlTemplate>
+            </ContextMenu.Template>
+        </ContextMenu>
+        <ContextMenu x:Key="LivingEntityContextMenu">
+            <ContextMenu.Template>
+                <ControlTemplate>
+                    <local:LivingEntityContextMenu DataContext="{Binding DataContext, RelativeSource={RelativeSource TemplatedParent}}"></local:LivingEntityContextMenu>
+                </ControlTemplate>
+            </ContextMenu.Template>
+        </ContextMenu>
     </UserControl.Resources>
     <Grid>
-        <Image x:Name="MapDrawingHost" VerticalAlignment="Top" HorizontalAlignment="Left" Stretch="None">
-        </Image>
+        <Image x:Name="MapDrawingHost" VerticalAlignment="Top" HorizontalAlignment="Left" Stretch="Fill"/>
         <Image x:Name="EntitiesDrawingHost" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
         <Grid Background="#F0212121"
               VerticalAlignment="Bottom"

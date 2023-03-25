@@ -43,7 +43,7 @@ namespace Daybreak.Services.Monitoring
 
             var endCpuUsage = this.currentProcess.TotalProcessorTime;
             var elapsedTicks = stopwatch.ElapsedTicks;
-            var usage = ((double)(endCpuUsage - startCpuUsage).Ticks / (double)elapsedTicks) / this.processorCount * 100d;
+            var usage = (double)(endCpuUsage - startCpuUsage).Ticks / (double)elapsedTicks / this.processorCount * 100d;
 
             this.processorTimeHistogram.Record(usage);
             _ = Task.Run(this.PeriodicallyCheckCPU);

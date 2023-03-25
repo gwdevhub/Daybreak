@@ -57,7 +57,7 @@ public sealed class ExperienceCalculator : IExperienceCalculator
         else
         {
             var experienceOverThreshold = currentTotalExperience - ExperienceCalculationThreshold;
-            var currentExperience = (experienceOverThreshold % MaxExperienceRequirement);
+            var currentExperience = experienceOverThreshold % MaxExperienceRequirement;
             return currentExperience;
         }
     }

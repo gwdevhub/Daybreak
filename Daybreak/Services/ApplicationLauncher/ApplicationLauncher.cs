@@ -147,12 +147,7 @@ public class ApplicationLauncher : IApplicationLauncher
 
     private async Task<Process?> LaunchGuildwarsProcess(string email, Models.SecureString password, string character)
     {
-        var executable = this.liveOptions.Value.GuildwarsPaths.Where(path => path.Default).FirstOrDefault();
-        if (executable is null)
-        {
-            throw new ExecutableNotFoundException($"No executable selected");
-        }
-
+        var executable = this.liveOptions.Value.GuildwarsPaths.Where(path => path.Default).FirstOrDefault() ?? throw new ExecutableNotFoundException($"No executable selected");
         if (File.Exists(executable.Path) is false)
         {
             throw new ExecutableNotFoundException($"Guildwars executable doesn't exist at {executable}");
@@ -255,12 +250,7 @@ public class ApplicationLauncher : IApplicationLauncher
 
     private void SetRegistryGuildwarsPath()
     {
-        var path = this.liveOptions.Value.GuildwarsPaths.Where(path => path.Default).FirstOrDefault();
-        if (path is null)
-        {
-            throw new ExecutableNotFoundException("No executable currently selected");
-        }
-
+        var path = this.liveOptions.Value.GuildwarsPaths.Where(path => path.Default).FirstOrDefault() ?? throw new ExecutableNotFoundException("No executable currently selected");
         var gamePath = path.Path;
         try
         {

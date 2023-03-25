@@ -20,7 +20,7 @@ public sealed class MutexHandler : IMutexHandler
         NativeMethods.SystemHandleInformation currentHandleInfo;
         for (int i = 0; i < Marshal.ReadInt32(systemHandle); i++)
         {
-            var currentOffset = IntPtr.Size + i * Marshal.SizeOf(typeof(NativeMethods.SystemHandleInformation));
+            var currentOffset = IntPtr.Size + (i * Marshal.SizeOf(typeof(NativeMethods.SystemHandleInformation)));
             currentHandleInfo = (NativeMethods.SystemHandleInformation)Marshal.PtrToStructure(new IntPtr(basePointer + currentOffset), typeof(NativeMethods.SystemHandleInformation))!;
             if (currentHandleInfo.OwnerPID == (uint)targetProcess.Id)
             {

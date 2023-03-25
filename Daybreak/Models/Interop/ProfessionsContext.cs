@@ -18,6 +18,6 @@ public readonly struct ProfessionsContext
 
     public bool ProfessionUnlocked(int professionId)
     {
-        return (this.UnlockedProfessionsFlags & 1U << professionId) != 0;
+        return (this.UnlockedProfessionsFlags & (1U << professionId)) != 0;
     }
 }
