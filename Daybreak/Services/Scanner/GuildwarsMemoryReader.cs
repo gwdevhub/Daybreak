@@ -271,14 +271,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
             {
                 trapezoidList.Add(new Trapezoid
                 {
-                    Id = trapezoid.Id,
-                    AdjacentTrapezoidIds = trapezoid.AdjacentPathingTrapezoids
-                        .Where(address => address > 0)
-                        .Select(this.memoryScanner.Read<PathingTrapezoid>)
-                        .Select(pathingTrapezoid => (int)pathingTrapezoid.Id)
-                        .Where(id => id >= 0 && id < trapezoidsCount)
-                        .Distinct()
-                        .ToArray(),
+                    Id = (int)trapezoid.Id,
                     XTL = trapezoid.XTL,
                     XTR = trapezoid.XTR,
                     YT = trapezoid.YT,
@@ -289,7 +282,18 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
             }
         }
 
-        return new PathingData { Trapezoids = trapezoidList };
+        var adjacencyList = new List<List<int>>(trapezoidList.Count);
+        for(var i = 0; i < trapezoidList.Count; i++)
+        {
+            adjacencyList.Add(new List<int>());
+        }
+
+        foreach(var trapezoid in trapezoidList)
+        {
+            adjacencyList[trapezoid.Id] = BuildAdjacentPathingTrapezoids(trapezoid, trapezoidList);
+        }
+
+        return new PathingData { Trapezoids = trapezoidList, AdjacencyArray = adjacencyList };
     }
 
     private PathingMetadata? ReadPathingMetaDataInternal()
@@ -741,6 +745,63 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         }
 
         return str;
+    }
+
+    private static List<int> BuildAdjacentPathingTrapezoids(Trapezoid currentTrapezoid, IEnumerable<Trapezoid> trapezoids)
+    {
+        var adjacentTrapezoids = new List<int>();
+
+        foreach(var trapezoid in trapezoids)
+        {
+            if (trapezoid.Id == currentTrapezoid.Id)
+            {
+                continue;
+            }
+
+            // Check if the trapezoids are on the same level
+            if (trapezoid.YT == currentTrapezoid.YT &&
+                trapezoid.YB == currentTrapezoid.YB)
+            {
+                //Check if the trapezoid is to the left of the currentTrapezoid
+                if (trapezoid.XTR == currentTrapezoid.XTL &&
+                    trapezoid.XBR == currentTrapezoid.XBL)
+                {
+                    adjacentTrapezoids.Add(trapezoid.Id);
+                    continue;
+                }
+
+                //Check if the trapezoid is to the right of the currentTrapezoid
+                if (trapezoid.XTL == currentTrapezoid.XTR &&
+                    trapezoid.XBL == currentTrapezoid.XBR)
+                {
+                    adjacentTrapezoids.Add(trapezoid.Id);
+                    continue;
+                }
+            }
+
+            //Check if the trapezoids are on the same column
+            if (Math.Min(trapezoid.XBL, currentTrapezoid.XTL) <= currentTrapezoid.XTL &&
+                Math.Min(trapezoid.XBL, currentTrapezoid.XTL) <= trapezoid.XBL &&
+                Math.Max(trapezoid.XBR, currentTrapezoid.XTR) >= currentTrapezoid.XTR &&
+                Math.Max(trapezoid.XBR, currentTrapezoid.XTR) >= trapezoid.XBR)
+            {
+                //Check if the trapezoid is directly above the current trapezoid
+                if (trapezoid.YB == currentTrapezoid.YT)
+                {
+                    adjacentTrapezoids.Add(trapezoid.Id);
+                    continue;
+                }
+
+                //Check if the trapezoid is directly below the current trapezoid
+                if (trapezoid.YT == currentTrapezoid.YB)
+                {
+                    adjacentTrapezoids.Add(trapezoid.Id);
+                    continue;
+                }
+            }
+        }
+
+        return adjacentTrapezoids;
     }
 
     private static unsafe string ParseAndCleanWCharPointer(byte* bytes, int byteCount)
