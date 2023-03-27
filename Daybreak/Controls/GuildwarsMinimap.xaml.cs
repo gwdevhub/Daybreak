@@ -13,6 +13,9 @@ using System.Core.Extensions;
 using System.Windows.Input;
 using System.Collections.Generic;
 using System.Linq;
+using Daybreak.Services.Pathfinding;
+using System.Windows.Media.Media3D;
+using Daybreak.Services.Pathfinding.Models;
 
 namespace Daybreak.Controls;
 
@@ -27,6 +30,7 @@ public partial class GuildwarsMinimap : UserControl
     private const float PositionRadius = 150;
 
     private readonly List<Position> mainPlayerPositionHistory = new();
+    private readonly IPathfinder pathfinder;
     private readonly IGuildwarsEntityDebouncer guildwarsEntityDebouncer;
     private readonly Color positionHistoryColor = Color.FromArgb(155, Colors.Red.R, Colors.Red.G, Colors.Red.B);
 
@@ -55,13 +59,17 @@ public partial class GuildwarsMinimap : UserControl
     public event EventHandler? MaximizeClicked;
 
     public GuildwarsMinimap()
-        :this(Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IGuildwarsEntityDebouncer>())
+        :this(
+             Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IPathfinder>(),
+             Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IGuildwarsEntityDebouncer>())
     {
     }
 
     public GuildwarsMinimap(
+        IPathfinder pathfinder,
         IGuildwarsEntityDebouncer guildwarsEntityDebouncer)
     {
+        this.pathfinder = pathfinder.ThrowIfNull();
         this.guildwarsEntityDebouncer = guildwarsEntityDebouncer.ThrowIfNull();
 
         this.InitializeComponent();
@@ -124,6 +132,9 @@ public partial class GuildwarsMinimap : UserControl
             0);
         this.MapDrawingHost.Height = this.mapHeight * this.Zoom;
         this.MapDrawingHost.Width = this.mapWidth * this.Zoom;
+        this.MapPathfindingHost.Margin = this.MapDrawingHost.Margin;
+        this.MapPathfindingHost.Height = this.mapHeight * this.Zoom;
+        this.MapPathfindingHost.Width = this.mapWidth * this.Zoom;
         this.ManageMainPlayerPositionHistory();
         this.DrawEntities(debounceResponse);
         this.cachedDebounceResponse = debounceResponse;
@@ -222,6 +233,35 @@ public partial class GuildwarsMinimap : UserControl
         }
     }
     
+    private void DrawPath(PathfindingResponse pathfindingResponse)
+    {
+        if (this.mapWidth <= 0 ||
+            this.mapHeight <= 0 ||
+            !double.IsFinite(this.mapWidth) ||
+            !double.IsFinite(this.mapHeight))
+        {
+            return;
+        }
+
+        var bitmap = BitmapFactory.New((int)(this.mapWidth / MapDownscaleFactor), (int)(this.mapHeight / MapDownscaleFactor));
+        this.MapPathfindingHost.Source = bitmap;
+        this.MapPathfindingHost.Width = this.mapWidth * this.Zoom;
+        this.MapPathfindingHost.Height = this.mapHeight * this.Zoom;
+
+        using var bitmapContext = bitmap.GetBitmapContext();
+        bitmap.Clear(Colors.Transparent);
+        foreach(var segment in pathfindingResponse.Pathing!)
+        {
+            bitmap.DrawLineAa(
+                (int)((segment.StartPoint.X - this.mapVirtualMinWidth) / MapDownscaleFactor),
+                (int)((this.mapHeight - segment.StartPoint.Y + this.mapVirtualMinHeight) / MapDownscaleFactor),
+                (int)((segment.EndPoint.X - this.mapVirtualMinWidth) / MapDownscaleFactor),
+                (int)((this.mapHeight - segment.EndPoint.Y + this.mapVirtualMinHeight) / MapDownscaleFactor),
+                Colors.Red,
+                10);
+        }
+    }
+
     private void DrawEntities(DebounceResponse debounceResponse)
     {
         if (this.EntitiesDrawingHost.Source is not WriteableBitmap bitmap || this.resizeEntities)
@@ -490,6 +530,34 @@ public partial class GuildwarsMinimap : UserControl
     {
         var delta = e.Delta > 0 ? 0.1 : -0.1;
         this.Zoom += this.Zoom * delta;
+    }
+
+    private void GuildwarsMinimap_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (this.PathingData.Trapezoids is not List<Trapezoid> trapezoids ||
+            trapezoids.Count == 0)
+        {
+            return;
+        }
+
+        if (this.cachedDebounceResponse?.MainPlayer is not MainPlayerInformation mainPlayerInformation ||
+            mainPlayerInformation.Position is not Position playerPosition)
+        {
+            return;
+        }
+
+        var playerPoint = new Point(playerPosition.X, playerPosition.Y);
+        var screenPosition = Mouse.GetPosition(this);
+        var virtualPosition = new Point(
+            (screenPosition.X / this.Zoom) + this.originPoint.X - this.originOffset.X,
+            -(screenPosition.Y / this.Zoom) + this.originPoint.Y + this.originOffset.Y);
+
+        var pathFindingResult = this.pathfinder.CalculatePath(trapezoids, playerPoint, virtualPosition);
+        pathFindingResult.DoAny(
+            onSuccess: response =>
+            {
+                this.DrawPath(response);
+            });
     }
 
     private void MaximizeButton_Clicked(object sender, EventArgs e)
