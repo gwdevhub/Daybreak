@@ -6,6 +6,7 @@ using Daybreak.Models.Interop;
 using Daybreak.Models.Metrics;
 using Daybreak.Services.ApplicationLauncher;
 using Daybreak.Services.Metrics;
+using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -13,16 +14,20 @@ using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
+using System.Drawing.Printing;
 using System.Extensions;
 using System.Linq;
 using System.Logging;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Daybreak.Services.Scanner;
 
 public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
 {
+    // How lenient is the algorithm in finding adjacent vertices in the pathing map. Higher means more lenient/more adjacent vertices.
+    private const double MapAdjacencyLeniency = 1;
     private const int MaxTrapezoidCount = 1000000;
     private const int RetryInitializationCount = 15;
     private const string LatencyMeterName = "Memory Reader Latency";
@@ -759,45 +764,64 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
             }
 
             // Check if the trapezoids are on the same level
-            if (trapezoid.YT == currentTrapezoid.YT &&
-                trapezoid.YB == currentTrapezoid.YB)
+            if (Math.Max(trapezoid.YT, currentTrapezoid.YT) + MapAdjacencyLeniency >= trapezoid.YT &&
+                Math.Max(trapezoid.YT, currentTrapezoid.YT) + MapAdjacencyLeniency >= currentTrapezoid.YT &&
+                Math.Min(trapezoid.YB, currentTrapezoid.YB) - MapAdjacencyLeniency <= trapezoid.YB &&
+                Math.Min(trapezoid.YB, currentTrapezoid.YB) - MapAdjacencyLeniency <= currentTrapezoid.YB)
             {
                 //Check if the trapezoid is to the left of the currentTrapezoid
-                if (trapezoid.XTR == currentTrapezoid.XTL &&
-                    trapezoid.XBR == currentTrapezoid.XBL)
+                if (Math.Abs(trapezoid.XTR - currentTrapezoid.XTL) <= MapAdjacencyLeniency &&
+                    Math.Abs(trapezoid.XBR - currentTrapezoid.XBL) <= MapAdjacencyLeniency)
                 {
                     adjacentTrapezoids.Add(trapezoid.Id);
                     continue;
                 }
 
                 //Check if the trapezoid is to the right of the currentTrapezoid
-                if (trapezoid.XTL == currentTrapezoid.XTR &&
-                    trapezoid.XBL == currentTrapezoid.XBR)
+                if (Math.Abs(trapezoid.XTL - currentTrapezoid.XTR) <= MapAdjacencyLeniency &&
+                    Math.Abs(trapezoid.XBL - currentTrapezoid.XBR) <= MapAdjacencyLeniency)
+                {
+                    adjacentTrapezoids.Add(trapezoid.Id);
+                    continue;
+                }
+
+                //Check if the trapezoid is to the left of the currentTrapezoid but their height differs
+                if (MathUtils.DistanceBetweenTwoLineSegments(
+                    new Point(trapezoid.XTR, trapezoid.YT), new Point(trapezoid.XBR, trapezoid.YB),
+                    new Point(currentTrapezoid.XTL, currentTrapezoid.YT), new Point(currentTrapezoid.XBL, currentTrapezoid.YB)) < MapAdjacencyLeniency)
+                {
+                    adjacentTrapezoids.Add(trapezoid.Id);
+                    continue;
+                }
+
+                //Check if the trapezoid is to the right of the currentTrapezoid but their height differs
+                if (MathUtils.DistanceBetweenTwoLineSegments(
+                    new Point(trapezoid.XTL, trapezoid.YT), new Point(trapezoid.XBL, trapezoid.YB),
+                    new Point(currentTrapezoid.XTR, currentTrapezoid.YT), new Point(currentTrapezoid.XBR, currentTrapezoid.YB)) <= MapAdjacencyLeniency)
                 {
                     adjacentTrapezoids.Add(trapezoid.Id);
                     continue;
                 }
             }
 
-            //Check if the trapezoids are on the same column
-            if (Math.Min(trapezoid.XBL, currentTrapezoid.XTL) <= currentTrapezoid.XTL &&
-                Math.Min(trapezoid.XBL, currentTrapezoid.XTL) <= trapezoid.XBL &&
-                Math.Max(trapezoid.XBR, currentTrapezoid.XTR) >= currentTrapezoid.XTR &&
-                Math.Max(trapezoid.XBR, currentTrapezoid.XTR) >= trapezoid.XBR)
+            //Check if the trapezoid is above currentTrapezoid
+            if (MathUtils.DistanceBetweenTwoLineSegments(
+                new Point(trapezoid.XBL, trapezoid.YB), new Point(trapezoid.XBR, trapezoid.YB),
+                new Point(currentTrapezoid.XTL, currentTrapezoid.YT), new Point(currentTrapezoid.XTR, currentTrapezoid.YT)) <= MapAdjacencyLeniency &&
+                Math.Abs(trapezoid.YB - currentTrapezoid.YT) <= MapAdjacencyLeniency)
             {
-                //Check if the trapezoid is directly above the current trapezoid
-                if (trapezoid.YB == currentTrapezoid.YT)
-                {
-                    adjacentTrapezoids.Add(trapezoid.Id);
-                    continue;
-                }
+                adjacentTrapezoids.Add(trapezoid.Id);
+                continue;
+            }
 
-                //Check if the trapezoid is directly below the current trapezoid
-                if (trapezoid.YT == currentTrapezoid.YB)
-                {
-                    adjacentTrapezoids.Add(trapezoid.Id);
-                    continue;
-                }
+            //Check if the trapezoid is below currentTrapezoid
+            if (MathUtils.DistanceBetweenTwoLineSegments(
+                new Point(trapezoid.XTL, trapezoid.YT), new Point(trapezoid.XTR, trapezoid.YT),
+                new Point(currentTrapezoid.XBL, currentTrapezoid.YB), new Point(currentTrapezoid.XBR, currentTrapezoid.YB)) <= MapAdjacencyLeniency &&
+                Math.Abs(trapezoid.YT - currentTrapezoid.YB) <= MapAdjacencyLeniency)
+            {
+                adjacentTrapezoids.Add(trapezoid.Id);
+                continue;
             }
         }
 

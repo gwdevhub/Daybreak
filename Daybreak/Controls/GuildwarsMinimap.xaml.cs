@@ -135,7 +135,11 @@ public partial class GuildwarsMinimap : UserControl
             position.X - (screenVirtualWidth / 2) - (this.originOffset.X / this.Zoom),
             position.Y + (screenVirtualHeight / 2) + (this.originOffset.Y / this.Zoom));
 
-        var adjustedPosition = new Point((int)((position.X - this.mapVirtualMinWidth) * this.Zoom), (int)(this.mapHeight - position.Y + this.mapVirtualMinHeight) * this.Zoom);        
+        var adjustedPosition = new Point((int)((position.X - this.mapVirtualMinWidth) * this.Zoom), (int)(this.mapHeight - position.Y + this.mapVirtualMinHeight) * this.Zoom);
+
+        //TODO: Delete
+        this.DrawMap();
+        
         this.MapDrawingHost.Margin = new Thickness(
             -adjustedPosition.X + (this.ActualWidth / 2) + this.originOffset.X,
             -adjustedPosition.Y + (this.ActualHeight / 2) + this.originOffset.Y,
@@ -233,6 +237,26 @@ public partial class GuildwarsMinimap : UserControl
         using var bitmapContext = bitmap.GetBitmapContext();
         bitmap.Clear(Colors.Transparent);
 
+        var colors = new Color[this.PathingData.Trapezoids.Count];
+        for(var i = 0; i < colors.Length; i++)
+        {
+            var trapezoid = this.PathingData.Trapezoids[i];
+            if (colors[trapezoid.Id] != default)
+            {
+                continue;
+            }
+
+            colors[trapezoid.Id] = Colors.White;
+            if (MathUtils.PointInsideTrapezoid(trapezoid, new Point(this.GameData.MainPlayer!.Value.Position!.Value.X, this.GameData.MainPlayer.Value.Position!.Value.Y)))
+            {
+                colors[trapezoid.Id] = Colors.Red;
+                foreach(var adjacent in this.PathingData.AdjacencyArray[trapezoid.Id])
+                {
+                    colors[adjacent] = Colors.HotPink;
+                }
+            }
+        }
+
         foreach (var trapezoid in this.PathingData.Trapezoids!)
         {
             var a = new Point((int)((trapezoid.XTL - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YT + minHeight) / MapDownscaleFactor));
@@ -241,7 +265,7 @@ public partial class GuildwarsMinimap : UserControl
             var d = new Point((int)((trapezoid.XBL - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YB + minHeight) / MapDownscaleFactor));
             var e = new Point((int)((trapezoid.XTL - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YT + minHeight) / MapDownscaleFactor));
 
-            bitmap.FillPolygon(new int[] { (int)a.X, (int)a.Y, (int)b.X, (int)b.Y, (int)c.X, (int)c.Y, (int)d.X, (int)d.Y, (int)e.X, (int)e.Y, (int)a.X, (int)a.Y }, Colors.White);
+            bitmap.FillPolygon(new int[] { (int)a.X, (int)a.Y, (int)b.X, (int)b.Y, (int)c.X, (int)c.Y, (int)d.X, (int)d.Y, (int)e.X, (int)e.Y, (int)a.X, (int)a.Y }, colors[trapezoid.Id]);
         }
     }
     
