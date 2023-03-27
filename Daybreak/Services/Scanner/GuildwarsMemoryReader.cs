@@ -272,6 +272,13 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
                 trapezoidList.Add(new Trapezoid
                 {
                     Id = trapezoid.Id,
+                    AdjacentTrapezoidIds = trapezoid.AdjacentPathingTrapezoids
+                        .Where(address => address > 0)
+                        .Select(this.memoryScanner.Read<PathingTrapezoid>)
+                        .Select(pathingTrapezoid => (int)pathingTrapezoid.Id)
+                        .Where(id => id >= 0 && id < trapezoidsCount)
+                        .Distinct()
+                        .ToArray(),
                     XTL = trapezoid.XTL,
                     XTR = trapezoid.XTR,
                     YT = trapezoid.YT,

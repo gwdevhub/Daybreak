@@ -14,7 +14,8 @@
              MouseRightButtonUp="GuildwarsMinimap_MouseRightButtonUp"
              MouseMove="GuildwarsMinimap_MouseMove"
              Loaded="GuildwarsMinimap_Loaded"
-             Unloaded="GuildwarsMinimap_Unloaded">
+             Unloaded="GuildwarsMinimap_Unloaded"
+             MouseDoubleClick="GuildwarsMinimap_MouseDoubleClick">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
         <ContextMenu x:Key="WorldPlayerContextMenu">
@@ -56,6 +57,7 @@
     </UserControl.Resources>
     <Grid>
         <Image x:Name="MapDrawingHost" VerticalAlignment="Top" HorizontalAlignment="Left" Stretch="Fill"/>
+        <Image x:Name="MapPathfindingHost" VerticalAlignment="Top" HorizontalAlignment="Left" Stretch="Fill"/>
         <Image x:Name="EntitiesDrawingHost" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
         <Grid Background="#F0212121"
               VerticalAlignment="Bottom"
