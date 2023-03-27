@@ -32,6 +32,15 @@ public abstract class PathfindingFailure
         }
     }
 
+    public sealed class NoPathFound : PathfindingFailure
+    {
+        public override string Reason => "No path found";
+
+        public NoPathFound()
+        {
+        }
+    }
+
     public sealed class UnexpectedFailure : PathfindingFailure
     {
         public override string Reason => "Encountered unexpected failure";

@@ -16,6 +16,7 @@ using System.Linq;
 using Daybreak.Services.Pathfinding;
 using System.Windows.Media.Media3D;
 using Daybreak.Services.Pathfinding.Models;
+using Daybreak.Utils;
 
 namespace Daybreak.Controls;
 
@@ -124,7 +125,7 @@ public partial class GuildwarsMinimap : UserControl
             position.X - (screenVirtualWidth / 2) - (this.originOffset.X / this.Zoom),
             position.Y + (screenVirtualHeight / 2) + (this.originOffset.Y / this.Zoom));
 
-        var adjustedPosition = new Point((int)((position.X - this.mapVirtualMinWidth) * this.Zoom), (int)(this.mapHeight - position.Y + this.mapVirtualMinHeight) * this.Zoom);
+        var adjustedPosition = new Point((int)((position.X - this.mapVirtualMinWidth) * this.Zoom), (int)(this.mapHeight - position.Y + this.mapVirtualMinHeight) * this.Zoom);        
         this.MapDrawingHost.Margin = new Thickness(
             -adjustedPosition.X + (this.ActualWidth / 2) + this.originOffset.X,
             -adjustedPosition.Y + (this.ActualHeight / 2) + this.originOffset.Y,
@@ -221,6 +222,7 @@ public partial class GuildwarsMinimap : UserControl
 
         using var bitmapContext = bitmap.GetBitmapContext();
         bitmap.Clear(Colors.Transparent);
+
         foreach (var trapezoid in this.PathingData.Trapezoids!)
         {
             var a = new Point((int)((trapezoid.XTL - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YT + minHeight) / MapDownscaleFactor));
@@ -552,7 +554,7 @@ public partial class GuildwarsMinimap : UserControl
             (screenPosition.X / this.Zoom) + this.originPoint.X - this.originOffset.X,
             -(screenPosition.Y / this.Zoom) + this.originPoint.Y + this.originOffset.Y);
 
-        var pathFindingResult = this.pathfinder.CalculatePath(trapezoids, playerPoint, virtualPosition);
+        var pathFindingResult = this.pathfinder.CalculatePath(this.PathingData, playerPoint, virtualPosition);
         pathFindingResult.DoAny(
             onSuccess: response =>
             {

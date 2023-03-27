@@ -1,15 +1,14 @@
 ﻿using System.Windows.Controls;
 
-namespace Daybreak.Controls.Glyphs
+namespace Daybreak.Controls.Glyphs;
+
+/// <summary>
+/// Interaction logic for MapGlyph.xaml
+/// </summary>
+public partial class MapGlyph : UserControl
 {
-    /// <summary>
-    /// Interaction logic for MapGlyph.xaml
-    /// </summary>
-    public partial class MapGlyph : UserControl
+    public MapGlyph()
     {
-        public MapGlyph()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

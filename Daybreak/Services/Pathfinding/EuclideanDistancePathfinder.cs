@@ -3,7 +3,6 @@ using Daybreak.Services.Pathfinding.Models;
 using Daybreak.Utils;
 using System.Collections.Generic;
 using System.Extensions;
-using System.Linq;
 using System.Windows;
 
 namespace Daybreak.Services.Pathfinding;
@@ -13,7 +12,7 @@ namespace Daybreak.Services.Pathfinding;
 /// </summary>
 public sealed class EuclideanDistancePathfinder : IPathfinder
 {
-    public Result<PathfindingResponse, PathfindingFailure> CalculatePath(List<Trapezoid> map, Point startPoint, Point endPoint)
+    public Result<PathfindingResponse, PathfindingFailure> CalculatePath(PathingData map, Point startPoint, Point endPoint)
     {
         /*
          * Find the start and end trapezoids.
@@ -48,12 +47,17 @@ public sealed class EuclideanDistancePathfinder : IPathfinder
             };
         }
 
-        var trapezoidPath = GetTrapezoidPath(map, startTrapezoid, endTrapezoid);
-        var pathfinding = new List<PathSegment>();
-        for(var i = 0; i < trapezoidPath.Count - 2; i++)
+        var maybeTrapezoidPath = GetTrapezoidPath(map, startTrapezoid, endTrapezoid);
+        if (maybeTrapezoidPath is not List<int> trapezoidPath)
         {
-            var currentTrapezoid = map[trapezoidPath[i]];
-            var nextTrapezoid = map[trapezoidPath[i + 1]];
+            return new PathfindingFailure.NoPathFound();
+        }
+
+        var pathfinding = new List<PathSegment>();
+        for(var i = 0; i < trapezoidPath.Count - 1; i++)
+        {
+            var currentTrapezoid = map.Trapezoids[trapezoidPath[i]];
+            var nextTrapezoid = map.Trapezoids[trapezoidPath[i + 1]];
             var currentY = (currentTrapezoid.YT + currentTrapezoid.YB) / 2;
             var currentX = (((currentTrapezoid.XTL + currentTrapezoid.XBL) / 2) + ((currentTrapezoid.XTR + currentTrapezoid.XBR) / 2)) / 2;
             var nextY = (nextTrapezoid.YT + nextTrapezoid.YB) / 2;
@@ -71,9 +75,9 @@ public sealed class EuclideanDistancePathfinder : IPathfinder
         };
     }
 
-    private static Trapezoid? GetContainingTrapezoid(List<Trapezoid> map, Point point)
+    private static Trapezoid? GetContainingTrapezoid(PathingData map, Point point)
     {
-        foreach(var trapezoid in map)
+        foreach(var trapezoid in map.Trapezoids)
         {
             if (MathUtils.PointInsideTrapezoid(trapezoid, point))
             {
@@ -84,9 +88,10 @@ public sealed class EuclideanDistancePathfinder : IPathfinder
         return default;
     }
 
-    private static List<int> GetTrapezoidPath(List<Trapezoid> trapezoids, Trapezoid startTrapezoid, Trapezoid endTrapezoid)
+    private static List<int>? GetTrapezoidPath(PathingData map, Trapezoid startTrapezoid, Trapezoid endTrapezoid)
     {
-        var visited = new int[trapezoids.Count];
+        bool found = false;
+        var visited = new int[map.Trapezoids.Count];
         var visitationQueue = new Queue<Trapezoid>();
         visitationQueue.Enqueue(startTrapezoid);
         visited[startTrapezoid.Id] = (int)startTrapezoid.Id + 1;
@@ -95,10 +100,11 @@ public sealed class EuclideanDistancePathfinder : IPathfinder
         {
             if (currentTrapezoid.Id == endTrapezoid.Id)
             {
+                found = true;
                 break;
             }
 
-            foreach(var adjacentTrapezoidId in currentTrapezoid.AdjacentTrapezoidIds)
+            foreach(var adjacentTrapezoidId in map.AdjacencyArray[currentTrapezoid.Id])
             {
                 if (visited[adjacentTrapezoidId] > 0)
                 {
@@ -106,8 +112,12 @@ public sealed class EuclideanDistancePathfinder : IPathfinder
                 }
 
                 visited[adjacentTrapezoidId] = (int)currentTrapezoid.Id + 1;
-                visitationQueue.Enqueue(trapezoids[adjacentTrapezoidId]);
+                visitationQueue.Enqueue(map.Trapezoids[adjacentTrapezoidId]);
             }
+        }
+        if (!found)
+        {
+            return default;
         }
 
         var backTrackingList = new List<int>();
