@@ -87,31 +87,54 @@ public static class MathUtils
             Ccw(p11, p12, p21) != Ccw(p11, p12, p22);
     }
 
-    public static double DistanceBetweenTwoLineSegments(Point line1Start, Point line1End, Point line2Start, Point line2End)
+    public static bool LineSegmentsIntersect(Point p1, Point p2, Point p3, Point p4)
     {
-        return DistanceBetweenTwoLineSegments(
-            new Vector3((float)line1Start.X, (float)line1Start.Y, 0),
-            new Vector3((float)line1End.X, (float)line1End.Y, 0),
-            new Vector3((float)line2Start.X, (float)line2Start.Y, 0),
-            new Vector3((float)line2End.X, (float)line2End.Y, 0));
+        if (DoColinearLineSegmentsIntersect(p1, p2, p3, p4))
+        {
+            return true;
+        }
+
+        var dx12 = p2.X - p1.X;
+        var dy12 = p2.Y - p1.Y;
+        var dx34 = p4.X - p3.X;
+        var dy34 = p4.Y - p3.Y;
+
+        var denominator = (dy12 * dx34) - (dx12 * dy34);
+
+        if (denominator == 0)
+            return false;
+
+        var t1 = (((p1.X - p3.X) * dy34) + ((p3.Y - p1.Y) * dx34)) / denominator;
+
+        if (double.IsInfinity(t1))
+            return false;
+
+        var intersectionPoint = new Point(p1.X + (dx12 * t1), p1.Y + (dy12 * t1));
+
+        if (p1.X == p2.X)
+            return intersectionPoint.Y >= Math.Min(p3.Y, p4.Y) && intersectionPoint.Y <= Math.Max(p3.Y, p4.Y);
+        else
+            return intersectionPoint.X >= Math.Min(p1.X, p2.X) && intersectionPoint.X <= Math.Max(p1.X, p2.X);
     }
 
-    public static float DistanceBetweenTwoLineSegments(Vector3 line1Start, Vector3 line1End, Vector3 line2Start, Vector3 line2End)
+    public static double DistanceBetweenTwoLineSegments(Point line1Start, Point line1End, Point line2Start, Point line2End)
     {
-        Vector3 u = line1End - line1Start;
-        Vector3 v = line2End - line2Start;
-        Vector3 w = line1Start - line2Start;
+        var u = line1End - line1Start;
+        var v = line2End - line2Start;
+        var w = line1Start - line2Start;
 
-        float a = Vector3.Dot(u, u);
-        float b = Vector3.Dot(u, v);
-        float c = Vector3.Dot(v, v);
-        float d = Vector3.Dot(u, w);
-        float e = Vector3.Dot(v, w);
+        var a = u * u;
+        var b = u * v;
+        var c = v * v;
+        var d = u * v;
+        var e = v * w;
 
-        float D = a * c - b * b;
-        float sc, sN, sD = D;
-        float tc, tN, tD = D;
+        var D = (a * c) - (b * b);
+        var sD = D;
+        var tD = D;
 
+        double sN;
+        double tN;
         if (D < 0.0001f)
         {
             sN = 0.0f;
@@ -121,8 +144,8 @@ public static class MathUtils
         }
         else
         {
-            sN = (b * e - c * d);
-            tN = (a * e - b * d);
+            sN = (b * e) - (c * d);
+            tN = (a * e) - (b * d);
 
             if (sN < 0.0f)
             {
@@ -162,16 +185,68 @@ public static class MathUtils
                 sN = sD;
             else
             {
-                sN = (-d + b);
+                sN = -d + b;
                 sD = a;
             }
         }
 
-        sc = (Math.Abs(sN) < 0.0001f ? 0.0f : sN / sD);
-        tc = (Math.Abs(tN) < 0.0001f ? 0.0f : tN / tD);
+        double sc = Math.Abs(sN) < 0.0001f ? 0.0f : sN / sD;
+        double tc = Math.Abs(tN) < 0.0001f ? 0.0f : tN / tD;
 
-        Vector3 dP = w + (sc * u) - (tc * v);
+        var dP = w + (sc * u) - (tc * v);
 
-        return dP.Length();
+        return dP.Length;
+    }
+
+    public static Point ClosestPointOnLineSegment(Point v1, Point v2, Point p)
+    {
+        var length = (v2 - v1).Length;
+        var dir = v2 - v1;
+        dir.Normalize();
+        var dot = dir * (p - v1);
+        dot = Math.Clamp(dot, 0, length);
+        return v1 + (dir * dot);
+    }
+
+    public static bool DoColinearLineSegmentsIntersect(Point p1, Point p2, Point p3, Point p4)
+    {
+        if (p1.X > p2.X)
+        {
+            Swap(ref p1, ref p2);
+        }
+
+        if (p3.X > p4.X)
+        {
+            Swap(ref p3, ref p4);
+        }
+
+        if (p1.X > p4.X || p3.X > p2.X)
+        {
+            return false;
+        }
+
+        if (p1.Y > p2.Y)
+        {
+            Swap(ref p1, ref p2);
+        }
+
+        if (p3.Y > p4.Y)
+        {
+            Swap(ref p3, ref p4);
+        }
+
+        if (p1.Y > p4.Y || p3.Y > p2.Y)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private static void Swap(ref Point point1, ref Point point2)
+    {
+        var temp = point1;
+        point1 = point2;
+        point2 = temp;
     }
 }
