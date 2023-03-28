@@ -1,6 +1,7 @@
 ﻿using Daybreak.Models.Guildwars;
 using Daybreak.Services.Pathfinding.Models;
 using Daybreak.Utils;
+using Microsoft.VisualBasic;
 using System.Collections.Generic;
 using System.Extensions;
 using System.Windows;
@@ -54,20 +55,26 @@ public sealed class EuclideanDistancePathfinder : IPathfinder
         }
 
         var pathfinding = new List<PathSegment>();
-        for(var i = 0; i < trapezoidPath.Count - 1; i++)
+        var currentPoint = startPoint;
+        for(var i = 1; i < trapezoidPath.Count; i++)
         {
-            var currentTrapezoid = map.Trapezoids[trapezoidPath[i]];
-            var nextTrapezoid = map.Trapezoids[trapezoidPath[i + 1]];
-            var currentY = (currentTrapezoid.YT + currentTrapezoid.YB) / 2;
-            var currentX = (((currentTrapezoid.XTL + currentTrapezoid.XBL) / 2) + ((currentTrapezoid.XTR + currentTrapezoid.XBR) / 2)) / 2;
-            var nextY = (nextTrapezoid.YT + nextTrapezoid.YB) / 2;
-            var nextX = (((nextTrapezoid.XTL + nextTrapezoid.XBL) / 2) + ((nextTrapezoid.XTR + nextTrapezoid.XBR) / 2)) / 2;
+            var nextTrapezoid = map.Trapezoids[trapezoidPath[i]];
+            var closestNextPoint = GetClosestPointInTrapezoid(currentPoint, nextTrapezoid);
             pathfinding.Add(new PathSegment
             {
-                StartPoint = new Point(currentX, currentY),
-                EndPoint = new Point(nextX, nextY)
+                StartPoint = currentPoint,
+                EndPoint = closestNextPoint
             });
+
+            currentPoint = closestNextPoint;
         }
+
+        // Add the last straight line from the edge of the trapezoid to the destination point
+        pathfinding.Add(new PathSegment
+        {
+            StartPoint = currentPoint,
+            EndPoint = endPoint
+        });
 
         return new PathfindingResponse
         {
@@ -90,32 +97,49 @@ public sealed class EuclideanDistancePathfinder : IPathfinder
 
     private static List<int>? GetTrapezoidPath(PathingData map, Trapezoid startTrapezoid, Trapezoid endTrapezoid)
     {
-        bool found = false;
+        var minDistance = double.MaxValue;
         var visited = new int[map.Trapezoids.Count];
-        var visitationQueue = new Queue<Trapezoid>();
-        visitationQueue.Enqueue(startTrapezoid);
+        var distanceFromVisited = new double[map.Trapezoids.Count];
+        var visitationQueue = new Queue<(Trapezoid Trapezoid, double CurrentPathDistance)>();
+        visitationQueue.Enqueue((startTrapezoid, 0));
         visited[startTrapezoid.Id] = (int)startTrapezoid.Id + 1;
 
-        while(visitationQueue.TryDequeue(out var currentTrapezoid))
+        while(visitationQueue.TryDequeue(out var tuple))
         {
+            var currentTrapezoid = tuple.Trapezoid;
+            var currentDistance = tuple.CurrentPathDistance;
+            if (currentDistance > minDistance)
+            {
+                continue;
+            }
+
             if (currentTrapezoid.Id == endTrapezoid.Id)
             {
-                found = true;
-                break;
+                minDistance = currentDistance;
+                continue;
             }
 
             foreach(var adjacentTrapezoidId in map.AdjacencyArray[currentTrapezoid.Id])
             {
+                var nextTrapezoid = map.Trapezoids[adjacentTrapezoidId];
+                var distanceToNextTrapezoid = DistanceSquaredBetweenTwoTrapezoidCenters(currentTrapezoid, nextTrapezoid);
+                if (currentDistance + distanceToNextTrapezoid > minDistance)
+                {
+                    continue;
+                }
+
                 if (visited[adjacentTrapezoidId] > 0)
                 {
                     continue;
                 }
 
-                visited[adjacentTrapezoidId] = (int)currentTrapezoid.Id + 1;
-                visitationQueue.Enqueue(map.Trapezoids[adjacentTrapezoidId]);
+                visited[adjacentTrapezoidId] = currentTrapezoid.Id + 1;
+                distanceFromVisited[adjacentTrapezoidId] = distanceToNextTrapezoid;
+                visitationQueue.Enqueue((nextTrapezoid, currentDistance + distanceToNextTrapezoid));
             }
         }
-        if (!found)
+
+        if (minDistance == double.MaxValue)
         {
             return default;
         }
@@ -133,5 +157,41 @@ public sealed class EuclideanDistancePathfinder : IPathfinder
 
             currentTrapezoidId = visited[currentTrapezoidId] - 1;
         }
+    }
+
+    private static Point GetClosestPointInTrapezoid(Point startingPoint, Trapezoid destination)
+    {
+        var trapezoidPoints = new Point[]
+        {
+            new Point(destination.XTL, destination.YT),
+            new Point(destination.XTR, destination.YT),
+            new Point(destination.XBR, destination.YB),
+            new Point(destination.XBL, destination.YB)
+        };
+
+        var closestPoint = new Point();
+        var closestDistance = double.MaxValue;
+        for(var i = 0; i < trapezoidPoints.Length - 1; i++)
+        {
+            var closestPointToSegment = MathUtils.ClosestPointOnLineSegment(trapezoidPoints[i], trapezoidPoints[i + 1], startingPoint);
+            var distanceToSegment = (startingPoint - closestPointToSegment).LengthSquared;
+            if (distanceToSegment < closestDistance &&
+                distanceToSegment > 0)
+            {
+                closestDistance = distanceToSegment;
+                closestPoint = closestPointToSegment;
+            }
+        }
+
+        return closestPoint;
+    }
+
+    private static double DistanceSquaredBetweenTwoTrapezoidCenters(Trapezoid trapezoid1, Trapezoid trapezoid2)
+    {
+        var y1 = (trapezoid1.YT + trapezoid1.YB) / 2;
+        var x1 = (((trapezoid1.XTL + trapezoid1.XBL) / 2) + ((trapezoid1.XTR + trapezoid1.XBR) / 2)) / 2;
+        var y2 = (trapezoid2.YT + trapezoid2.YB) / 2;
+        var x2 = (((trapezoid2.XTL + trapezoid2.XBL) / 2) + ((trapezoid2.XTR + trapezoid2.XBR) / 2)) / 2;
+        return (new Point(x1, y1) - new Point(x2, y2)).LengthSquared;
     }
 }

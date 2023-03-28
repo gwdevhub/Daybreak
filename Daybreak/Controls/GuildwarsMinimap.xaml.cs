@@ -227,6 +227,7 @@ public partial class GuildwarsMinimap : UserControl
         using var bitmapContext = bitmap.GetBitmapContext();
         bitmap.Clear(Colors.Transparent);
 
+        //TODO: Delete
         var colors = new Color[this.PathingData.Trapezoids.Count];
         for(var i = 0; i < colors.Length; i++)
         {
