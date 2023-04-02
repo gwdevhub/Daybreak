@@ -13,10 +13,12 @@ using System.Core.Extensions;
 using System.Windows.Input;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
+using System.Windows.Threading;
 
 namespace Daybreak.Controls;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Using source generators to autoimplement dependency properties")]
+[System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Using source generators to auto-implement dependency properties")]
 /// <summary>
 /// Interaction logic for GuildwarsMinimap.xaml
 /// </summary>
@@ -26,9 +28,13 @@ public partial class GuildwarsMinimap : UserControl
     private const int EntitySize = 100;
     private const float PositionRadius = 150;
 
+    private static readonly Lazy<(Point[] OuterPoints, Point[] InnerPoints)> StarCoordinates = new(GetStarGlyphPoints);
+
+    private readonly DispatcherTimer dispatcherTimer = new(DispatcherPriority.ApplicationIdle);
     private readonly List<Position> mainPlayerPositionHistory = new();
     private readonly IGuildwarsEntityDebouncer guildwarsEntityDebouncer;
     private readonly Color positionHistoryColor = Color.FromArgb(155, Colors.Red.R, Colors.Red.G, Colors.Red.B);
+    private readonly TimeSpan offsetRevertDelay = TimeSpan.FromSeconds(3);
 
     private bool resizeEntities;
     private bool dragging;
@@ -36,8 +42,10 @@ public partial class GuildwarsMinimap : UserControl
     private double mapVirtualMinHeight;
     private double mapWidth;
     private double mapHeight;
+    private DateTime offsetRevertTime = DateTime.Now;
+    private double offsetRevert = 0;
     private Point originPoint = new(0, 0);
-    private Vector originOffset = new(0, 0);
+    private System.Windows.Vector originOffset = new(0, 0);
     private Point initialClickPoint = new(0, 0);
     private DebounceResponse? cachedDebounceResponse;
     
@@ -53,6 +61,7 @@ public partial class GuildwarsMinimap : UserControl
     private bool controlsVisible;
 
     public event EventHandler? MaximizeClicked;
+    public event EventHandler<QuestMetadata>? QuestMetadataClicked;
 
     public GuildwarsMinimap()
         :this(Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IGuildwarsEntityDebouncer>())
@@ -63,7 +72,8 @@ public partial class GuildwarsMinimap : UserControl
         IGuildwarsEntityDebouncer guildwarsEntityDebouncer)
     {
         this.guildwarsEntityDebouncer = guildwarsEntityDebouncer.ThrowIfNull();
-
+        this.dispatcherTimer.Tick += (_, _) => this.ApplyOffsetRevert();
+        this.dispatcherTimer.Interval = TimeSpan.FromMilliseconds(16);
         this.InitializeComponent();
     }
 
@@ -236,6 +246,8 @@ public partial class GuildwarsMinimap : UserControl
 
         this.DrawMainPlayerPositionHistory(bitmap);
 
+        this.DrawQuestObjectives(bitmap, debounceResponse);
+
         this.FillEllipse(debounceResponse.MainPlayer.Position, bitmap, Colors.Green);
 
         foreach (var partyMember in debounceResponse.Party.Where(p => IsValidEntity(p)))
@@ -260,7 +272,7 @@ public partial class GuildwarsMinimap : UserControl
             }
             else if (livingEntity.State is LivingEntityState.Boss)
             {
-                this.FillEllipse(livingEntity.Position, bitmap, Colors.DarkRed);
+                this.FillStar(livingEntity.Position, bitmap, Colors.DarkRed);
             }
             else if (livingEntity.Allegiance is LivingEntityAllegiance.AllyNonAttackable)
             {
@@ -289,6 +301,17 @@ public partial class GuildwarsMinimap : UserControl
         }
     }
 
+    private void DrawQuestObjectives(WriteableBitmap writeableBitmap, DebounceResponse debounceResponse)
+    {
+        var currentMapQuests = debounceResponse.MainPlayer.QuestLog!
+            .Where(v => v.Position.GetValueOrDefault().X != 0 && v.Position.GetValueOrDefault().Y != 0);
+
+        foreach(var questMetaData in currentMapQuests)
+        {
+            this.FillStar(questMetaData.Position, writeableBitmap, Colors.Green);
+        }
+    }
+
     private void DrawMainPlayerPositionHistory(WriteableBitmap writeableBitmap)
     {
         if (!this.DrawPositionHistory)
@@ -307,17 +330,49 @@ public partial class GuildwarsMinimap : UserControl
         }
     }
 
-    private void FillEllipse(Position? position, WriteableBitmap bitmap, Color color)
+    private void FillStar(Position? position, WriteableBitmap bitmap, Color color)
     {
-        if (position.HasValue is false)
+        if (!this.EntityOnScreen(position, bitmap, out var x, out var y))
         {
             return;
         }
 
-        var x = (int)((position.Value.X - this.originPoint.X) * this.Zoom);
-        var y = 0 - (int)((position.Value.Y - this.originPoint.Y) * this.Zoom);
-        if (x < 0 || x > bitmap.Width ||
-            y < 0 || y > bitmap.Height)
+        (var outerPoints, var innerPoints) = StarCoordinates.Value;
+
+        for(var i = 1; i <= 5; i++)
+        {
+            var outerPoint = outerPoints[i % 5];
+            var innerPointPrev = innerPoints[(i - 1) % 5];
+            var innerPointNext = innerPoints[(i + 1) % 5];
+            bitmap.FillTriangle(
+                x + (int)(innerPointPrev.X * this.Zoom), y + (int)(innerPointPrev.Y * this.Zoom),
+                x + (int)(outerPoint.X * this.Zoom), y + (int)(outerPoint.Y * this.Zoom),
+                x + (int)(innerPointNext.X * this.Zoom), y + (int)(innerPointNext.Y * this.Zoom),
+                color);
+        }
+
+        bitmap.FillTriangle(
+            x + (int)(innerPoints[0].X * this.Zoom), y + (int)(innerPoints[0].Y * this.Zoom),
+            x + (int)(innerPoints[1].X * this.Zoom), y + (int)(innerPoints[1].Y * this.Zoom),
+            x + (int)(innerPoints[2].X * this.Zoom), y + (int)(innerPoints[2].Y * this.Zoom),
+            color);
+
+        bitmap.FillTriangle(
+            x + (int)(innerPoints[2].X * this.Zoom), y + (int)(innerPoints[2].Y * this.Zoom),
+            x + (int)(innerPoints[3].X * this.Zoom), y + (int)(innerPoints[3].Y * this.Zoom),
+            x + (int)(innerPoints[4].X * this.Zoom), y + (int)(innerPoints[4].Y * this.Zoom),
+            color);
+
+        bitmap.FillTriangle(
+            x + (int)(innerPoints[0].X * this.Zoom), y + (int)(innerPoints[0].Y * this.Zoom),
+            x + (int)(innerPoints[2].X * this.Zoom), y + (int)(innerPoints[2].Y * this.Zoom),
+            x + (int)(innerPoints[4].X * this.Zoom), y + (int)(innerPoints[4].Y * this.Zoom),
+            color);
+    }
+
+    private void FillEllipse(Position? position, WriteableBitmap bitmap, Color color)
+    {
+        if (!this.EntityOnScreen(position, bitmap, out var x, out var y))
         {
             return;
         }
@@ -332,21 +387,13 @@ public partial class GuildwarsMinimap : UserControl
 
     private void FillTriangle(Position? position, WriteableBitmap bitmap, Color color)
     {
-        if (position.HasValue is false)
-        {
-            return;
-        }
-
-        var x = (int)((position.Value.X - this.originPoint.X) * this.Zoom);
-        var y = 0 - (int)((position.Value.Y - this.originPoint.Y) * this.Zoom);
-        if (x < 0 || x > bitmap.Width ||
-            y < 0 || y > bitmap.Height)
+        if (!this.EntityOnScreen(position, bitmap, out _, out _))
         {
             return;
         }
 
         bitmap.FillTriangle(
-            (int)((position.Value.X - this.originPoint.X - EntitySize) * this.Zoom),
+            (int)((position!.Value.X - this.originPoint.X - EntitySize) * this.Zoom),
             0 - (int)((position.Value.Y - this.originPoint.Y + EntitySize) * this.Zoom),
             (int)((position.Value.X - this.originPoint.X) * this.Zoom),
             0 - (int)((position.Value.Y - this.originPoint.Y - EntitySize) * this.Zoom),
@@ -355,7 +402,27 @@ public partial class GuildwarsMinimap : UserControl
             color);
     }
 
-    private bool MouseOverEntity(IEntity entity, Point mousePosition)
+    private bool EntityOnScreen(Position? position, WriteableBitmap bitmap, out int x, out int y)
+    {
+        x = 0;
+        y = 0;
+        if (position.HasValue is false)
+        {
+            return false;
+        }
+
+        x = (int)((position.Value.X - this.originPoint.X) * this.Zoom);
+        y = 0 - (int)((position.Value.Y - this.originPoint.Y) * this.Zoom);
+        if (x < 0 || x > bitmap.Width ||
+            y < 0 || y > bitmap.Height)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private bool MouseOverEntity(IPositionalEntity entity, Point mousePosition)
     {
         var x = (int)((entity.Position!.Value.X - this.originPoint.X) * this.Zoom);
         var y = 0 - (int)((entity.Position!.Value.Y - this.originPoint.Y) * this.Zoom);
@@ -371,11 +438,26 @@ public partial class GuildwarsMinimap : UserControl
         }
 
         var mousePosition = Mouse.GetPosition(this);
+        this.offsetRevert = 0;
         this.originOffset = mousePosition - this.initialClickPoint;
+        this.offsetRevertTime = DateTime.Now + this.offsetRevertDelay;
         this.UpdateGameData();
     }
 
-    private IEntity? CheckMouseOverEntity(IEnumerable<IEntity> entities)
+    private void ApplyOffsetRevert()
+    {
+        if (DateTime.Now < this.offsetRevertTime)
+        {
+            return;
+        }
+
+        this.offsetRevert = 0.0001 + this.offsetRevert * 1.0001;
+        this.offsetRevert = Math.Min(99, this.offsetRevert);
+        this.originOffset /= (1 + this.offsetRevert);
+        this.UpdateGameData();
+    }
+
+    private IPositionalEntity? CheckMouseOverEntity(IEnumerable<IPositionalEntity> entities)
     {
         if (this.GameData.Valid is false)
         {
@@ -398,15 +480,15 @@ public partial class GuildwarsMinimap : UserControl
 
     private void GuildwarsMinimap_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        this.initialClickPoint = Mouse.GetPosition(this);
+        this.initialClickPoint = Mouse.GetPosition(this) - this.originOffset;
+        this.offsetRevert = 0;
+        this.offsetRevertTime = DateTime.Now + this.offsetRevertDelay;
         this.dragging = true;
     }
 
     private void GuildwarsMinimap_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
         this.dragging = false;
-        this.originOffset = new(0, 0);
-        this.UpdateGameData();
     }
 
     private void GuildwarsMinimap_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -450,6 +532,16 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
+        var maybeQuestMetadata = this.CheckMouseOverEntity(this.GameData.MainPlayer?.QuestLog!.OfType<IPositionalEntity>()!);
+        if (maybeQuestMetadata is QuestMetadata questMetadata &&
+            this.TryFindResource("QuestContextMenu") is ContextMenu questContextMenu)
+        {
+            this.ContextMenu = questContextMenu;
+            this.ContextMenu.DataContext = questMetadata;
+            this.ContextMenu.IsOpen = true;
+            return;
+        }
+
         this.ContextMenu = default;
     }
 
@@ -484,12 +576,37 @@ public partial class GuildwarsMinimap : UserControl
         {
             return;
         }
+
+        if (this.CheckMouseOverEntity(this.GameData.MainPlayer!.Value.QuestLog!.OfType<IPositionalEntity>()) is not null)
+        {
+            return;
+        }
     }
 
     private void GuildwarsMinimap_MouseWheel(object sender, MouseWheelEventArgs e)
     {
         var delta = e.Delta > 0 ? 0.1 : -0.1;
         this.Zoom += this.Zoom * delta;
+    }
+
+    private void GuildwarsMinimap_Loaded(object sender, RoutedEventArgs e)
+    {
+        this.dispatcherTimer.Start();
+    }
+
+    private void GuildwarsMinimap_Unloaded(object sender, RoutedEventArgs e)
+    {
+        this.dispatcherTimer.Stop();
+    }
+
+    private void QuestContextMenu_QuestContextMenuClicked(object _, QuestMetadata? quest)
+    {
+        if (quest is not QuestMetadata)
+        {
+            return;
+        }
+
+        this.QuestMetadataClicked?.Invoke(this, quest.Value);
     }
 
     private void MaximizeButton_Clicked(object sender, EventArgs e)
@@ -518,5 +635,31 @@ public partial class GuildwarsMinimap : UserControl
         }
 
         return true;
+    }
+
+    private static (Point[] OuterPoints, Point[] InnerPoints) GetStarGlyphPoints()
+    {
+        var entitySize = EntitySize * 1.5;
+        var halfSize = entitySize / 2;
+
+        var outerPoints = new Point[]
+        {
+            new Point(entitySize * Math.Cos((2 * Math.PI * 0 / 5) - (Math.PI / 10)), entitySize * Math.Sin((2 * Math.PI * 0 / 5) - (Math.PI / 10))),
+            new Point(entitySize * Math.Cos((2 * Math.PI * 1 / 5) - (Math.PI / 10)), entitySize * Math.Sin((2 * Math.PI * 1 / 5) - (Math.PI / 10))),
+            new Point(entitySize * Math.Cos((2 * Math.PI * 2 / 5) - (Math.PI / 10)), entitySize * Math.Sin((2 * Math.PI * 2 / 5) - (Math.PI / 10))),
+            new Point(entitySize * Math.Cos((2 * Math.PI * 3 / 5) - (Math.PI / 10)), entitySize * Math.Sin((2 * Math.PI * 3 / 5) - (Math.PI / 10))),
+            new Point(entitySize * Math.Cos((2 * Math.PI * 4 / 5) - (Math.PI / 10)), entitySize * Math.Sin((2 * Math.PI * 4 / 5) - (Math.PI / 10))),
+        };
+
+        var innerPoints = new Point[]
+        {
+            new Point(halfSize * Math.Cos((2 * Math.PI * 0 / 5) + (2 * Math.PI / 10) - (Math.PI / 10)), halfSize * Math.Sin((2 * Math.PI * 0 / 5) + (2 * Math.PI / 10) - (Math.PI / 10))),
+            new Point(halfSize * Math.Cos((2 * Math.PI * 1 / 5) + (2 * Math.PI / 10) - (Math.PI / 10)), halfSize * Math.Sin((2 * Math.PI * 1 / 5) + (2 * Math.PI / 10) - (Math.PI / 10))),
+            new Point(halfSize * Math.Cos((2 * Math.PI * 2 / 5) + (2 * Math.PI / 10) - (Math.PI / 10)), halfSize * Math.Sin((2 * Math.PI * 2 / 5) + (2 * Math.PI / 10) - (Math.PI / 10))),
+            new Point(halfSize * Math.Cos((2 * Math.PI * 3 / 5) + (2 * Math.PI / 10) - (Math.PI / 10)), halfSize * Math.Sin((2 * Math.PI * 3 / 5) + (2 * Math.PI / 10) - (Math.PI / 10))),
+            new Point(halfSize * Math.Cos((2 * Math.PI * 4 / 5) + (2 * Math.PI / 10) - (Math.PI / 10)), halfSize * Math.Sin((2 * Math.PI * 4 / 5) + (2 * Math.PI / 10) - (Math.PI / 10))),
+        };
+
+        return (outerPoints, innerPoints);
     }
 }

@@ -12,7 +12,9 @@
              MouseLeftButtonUp="GuildwarsMinimap_MouseLeftButtonUp"
              MouseRightButtonDown="GuildwarsMinimap_MouseRightButtonDown"
              MouseRightButtonUp="GuildwarsMinimap_MouseRightButtonUp"
-             MouseMove="GuildwarsMinimap_MouseMove">
+             MouseMove="GuildwarsMinimap_MouseMove"
+             Loaded="GuildwarsMinimap_Loaded"
+             Unloaded="GuildwarsMinimap_Unloaded">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
         <ContextMenu x:Key="WorldPlayerContextMenu">
@@ -40,6 +42,14 @@
             <ContextMenu.Template>
                 <ControlTemplate>
                     <local:PlayerContextMenu DataContext="{Binding DataContext, RelativeSource={RelativeSource TemplatedParent}}"></local:PlayerContextMenu>
+                </ControlTemplate>
+            </ContextMenu.Template>
+        </ContextMenu>
+        <ContextMenu x:Key="QuestContextMenu">
+            <ContextMenu.Template>
+                <ControlTemplate>
+                    <local:QuestContextMenu DataContext="{Binding DataContext, RelativeSource={RelativeSource TemplatedParent}}"
+                                            QuestContextMenuClicked="QuestContextMenu_QuestContextMenuClicked"></local:QuestContextMenu>
                 </ControlTemplate>
             </ContextMenu.Template>
         </ContextMenu>
