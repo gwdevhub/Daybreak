@@ -444,6 +444,7 @@
                 Zoom="0.04"
                 ControlsVisible="True"
                 MaximizeClicked="GuildwarsMinimap_MaximizeClicked"
+                QuestMetadataClicked="GuildwarsMinimap_QuestMetadataClicked"
                 ClipToBounds="True"></controls:GuildwarsMinimap>
         <controls:ChromiumBrowserWrapper
                 x:Name="Browser"

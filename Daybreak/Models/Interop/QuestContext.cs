@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace Daybreak.Models.Interop;
 
@@ -10,6 +11,9 @@ public readonly struct QuestContext
 
     [FieldOffset(0x0014)]
     public readonly uint MapFrom;
+
+    [FieldOffset(0x0018)]
+    public readonly Vector3 Marker;
 
     [FieldOffset(0x0028)]
     public readonly uint MapTo;

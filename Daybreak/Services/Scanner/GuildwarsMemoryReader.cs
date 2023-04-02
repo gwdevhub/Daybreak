@@ -499,7 +499,15 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
                 _ = Quest.TryParse((int)q.QuestId, out var parsedQuest);
                 _ = Map.TryParse((int)q.MapFrom, out var mapFrom);
                 _ = Map.TryParse((int)q.MapTo, out var mapTo);
-                return new QuestMetadata { Quest = parsedQuest, From = mapFrom, To = mapTo };
+                return new QuestMetadata
+                {
+                    Quest = parsedQuest,
+                    From = mapFrom,
+                    To = mapTo,
+                    Position = float.IsFinite(q.Marker.X) && float.IsFinite(q.Marker.Y) ?
+                        new Position { X = q.Marker.X, Y = q.Marker.Y } :
+                        default
+                };
             })
             .Where(q => q.Quest is not null)
             .ToList();

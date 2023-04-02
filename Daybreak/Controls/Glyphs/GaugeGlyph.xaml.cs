@@ -1,15 +1,14 @@
 ﻿using System.Windows.Controls;
 
-namespace Daybreak.Controls.Glyphs
+namespace Daybreak.Controls.Glyphs;
+
+/// <summary>
+/// Interaction logic for GaugeGlyph.xaml
+/// </summary>
+public partial class GaugeGlyph : UserControl
 {
-    /// <summary>
-    /// Interaction logic for GaugeGlyph.xaml
-    /// </summary>
-    public partial class GaugeGlyph : UserControl
+    public GaugeGlyph()
     {
-        public GaugeGlyph()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }

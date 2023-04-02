@@ -742,4 +742,9 @@ public partial class FocusView : UserControl
             this.Browser.Visibility = Visibility.Visible;
         }
     }
+
+    private void GuildwarsMinimap_QuestMetadataClicked(object _, QuestMetadata e)
+    {
+        this.BrowserAddress = e.Quest!.WikiUrl;
+    }
 }
