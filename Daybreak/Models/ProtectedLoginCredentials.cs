@@ -4,12 +4,12 @@ namespace Daybreak.Models;
 
 public sealed class ProtectedLoginCredentials
 {
-    [JsonProperty("ProtectedUsername")]
+    [JsonProperty(nameof(ProtectedUsername))]
     public string? ProtectedUsername { get; set; }
-    [JsonProperty("ProtectedPassword")]
+    [JsonProperty(nameof(ProtectedPassword))]
     public string? ProtectedPassword { get; set; }
-    [JsonProperty("CharacterName")]
+    [JsonProperty(nameof(CharacterName))]
     public string? CharacterName { get; set; }
-    [JsonProperty("Default")]
+    [JsonProperty(nameof(Default))]
     public bool Default { get; set; }
 }

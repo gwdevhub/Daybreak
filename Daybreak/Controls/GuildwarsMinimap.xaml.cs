@@ -64,12 +64,6 @@ public partial class GuildwarsMinimap : UserControl
     [GenerateDependencyProperty]
     private bool controlsVisible;
 
-    //TODO: Delete
-    [GenerateDependencyProperty]
-    private int currentTrapezoid;
-    [GenerateDependencyProperty]
-    private IEnumerable<int> neighboringTrapezoids;
-
     public event EventHandler? MaximizeClicked;
     public event EventHandler<QuestMetadata>? QuestMetadataClicked;
 
@@ -86,7 +80,6 @@ public partial class GuildwarsMinimap : UserControl
     {
         this.pathfinder = pathfinder.ThrowIfNull();
         this.guildwarsEntityDebouncer = guildwarsEntityDebouncer.ThrowIfNull();
-        this.neighboringTrapezoids = Enumerable.Empty<int>();
 
         this.dispatcherTimer.Tick += (_, _) => this.ApplyOffsetRevert();
         this.dispatcherTimer.Interval = TimeSpan.FromMilliseconds(16);
@@ -143,9 +136,6 @@ public partial class GuildwarsMinimap : UserControl
             position.Y + (screenVirtualHeight / 2) + (this.originOffset.Y / this.Zoom));
 
         var adjustedPosition = new Point((int)((position.X - this.mapVirtualMinWidth) * this.Zoom), (int)(this.mapHeight - position.Y + this.mapVirtualMinHeight) * this.Zoom);
-
-        //TODO: Delete
-        this.DrawMap();
         
         this.MapDrawingHost.Margin = new Thickness(
             -adjustedPosition.X + (this.ActualWidth / 2) + this.originOffset.X,
@@ -244,33 +234,6 @@ public partial class GuildwarsMinimap : UserControl
         using var bitmapContext = bitmap.GetBitmapContext();
         bitmap.Clear(Colors.Transparent);
 
-        //TODO: Delete
-        var colors = new Color[this.PathingData.Trapezoids.Count];
-        for(var i = 0; i < colors.Length; i++)
-        {
-            var trapezoid = this.PathingData.Trapezoids[i];
-            if (colors[trapezoid.Id] != default)
-            {
-                continue;
-            }
-
-            colors[trapezoid.Id] = Colors.White;
-            if (MathUtils.PointInsideTrapezoid(trapezoid, new Point(this.GameData.MainPlayer!.Value.Position!.Value.X, this.GameData.MainPlayer.Value.Position!.Value.Y)))
-            {
-                colors[trapezoid.Id] = Colors.Red;
-                foreach(var adjacent in this.PathingData.AdjacencyArray[trapezoid.Id])
-                {
-                    colors[adjacent] = Colors.HotPink;
-                }
-
-                if (this.CurrentTrapezoid != trapezoid.Id)
-                {
-                    this.CurrentTrapezoid = trapezoid.Id;
-                    this.NeighboringTrapezoids = this.PathingData.AdjacencyArray[trapezoid.Id];
-                }
-            }
-        }
-
         foreach (var trapezoid in this.PathingData.Trapezoids!)
         {
             var a = new Point((int)((trapezoid.XTL - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YT + minHeight) / MapDownscaleFactor));
@@ -278,15 +241,11 @@ public partial class GuildwarsMinimap : UserControl
             var c = new Point((int)((trapezoid.XBR - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YB + minHeight) / MapDownscaleFactor));
             var d = new Point((int)((trapezoid.XBL - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YB + minHeight) / MapDownscaleFactor));
 
-            bitmap.FillPolygon(new int[] { (int)a.X, (int)a.Y, (int)b.X, (int)b.Y, (int)c.X, (int)c.Y, (int)d.X, (int)d.Y, (int)a.X, (int)a.Y }, colors[trapezoid.Id]);
-            bitmap.DrawLine((int)a.X, (int)a.Y, (int)b.X, (int)b.Y, Colors.Black);
-            bitmap.DrawLine((int)b.X, (int)b.Y, (int)c.X, (int)c.Y, Colors.Black);
-            bitmap.DrawLine((int)c.X, (int)c.Y, (int)d.X, (int)d.Y, Colors.Black);
-            bitmap.DrawLine((int)d.X, (int)d.Y, (int)a.X, (int)a.Y, Colors.Black);
+            bitmap.FillPolygon(new int[] { (int)a.X, (int)a.Y, (int)b.X, (int)b.Y, (int)c.X, (int)c.Y, (int)d.X, (int)d.Y, (int)a.X, (int)a.Y }, Colors.White);
         }
     }
     
-    private void DrawPath(PathfindingResponse pathfindingResponse)
+    private void DrawPath(WriteableBitmap bitmap, params (PathfindingResponse PathfindingResponse, Color Color)[] paths)
     {
         if (this.mapWidth <= 0 ||
             this.mapHeight <= 0 ||
@@ -296,22 +255,23 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
-        var bitmap = BitmapFactory.New((int)(this.mapWidth / MapDownscaleFactor), (int)(this.mapHeight / MapDownscaleFactor));
-        this.MapPathfindingHost.Source = bitmap;
-        this.MapPathfindingHost.Width = this.mapWidth * this.Zoom;
-        this.MapPathfindingHost.Height = this.mapHeight * this.Zoom;
-
-        using var bitmapContext = bitmap.GetBitmapContext();
-        bitmap.Clear(Colors.Transparent);
-        foreach(var segment in pathfindingResponse.Pathing!)
+        if (paths.Length <= 0)
         {
-            bitmap.DrawLineAa(
-                (int)((segment.StartPoint.X - this.mapVirtualMinWidth) / MapDownscaleFactor),
-                (int)((this.mapHeight - segment.StartPoint.Y + this.mapVirtualMinHeight) / MapDownscaleFactor),
-                (int)((segment.EndPoint.X - this.mapVirtualMinWidth) / MapDownscaleFactor),
-                (int)((this.mapHeight - segment.EndPoint.Y + this.mapVirtualMinHeight) / MapDownscaleFactor),
-                Colors.Red,
-                2);
+            return;
+        }
+
+        foreach((var response, var color) in paths)
+        {
+            foreach (var segment in response.Pathing!)
+            {
+                var startPosition = new Position { X = (float)segment.StartPoint.X, Y = (float)segment.StartPoint.Y };
+                var endPosition = new Position { X = (float)segment.EndPoint.X, Y = (float)segment.EndPoint.Y };
+                if (this.EntityOnScreen(startPosition, bitmap, out var startX, out var startY) &&
+                    this.EntityOnScreen(endPosition, bitmap, out var endX, out var endY))
+                {
+                    bitmap.DrawLineAa(startX, startY, endX, endY, color, (int)(EntitySize * this.Zoom));
+                }
+            }
         }
     }
 
@@ -386,13 +346,28 @@ public partial class GuildwarsMinimap : UserControl
 
     private void DrawQuestObjectives(WriteableBitmap writeableBitmap, DebounceResponse debounceResponse)
     {
+        if (this.PathingData.Trapezoids is null)
+        {
+            return;
+        }
+
         var currentMapQuests = debounceResponse.MainPlayer.QuestLog!
             .Where(v => v.Position.GetValueOrDefault().X != 0 && v.Position.GetValueOrDefault().Y != 0);
 
+        var pathToObjectives = new List<PathfindingResponse>();
         foreach(var questMetaData in currentMapQuests)
         {
             this.FillStar(questMetaData.Position, writeableBitmap, Colors.Green);
+
+            var pathToObjective = this.pathfinder.CalculatePath(
+                this.PathingData,
+                new Point(debounceResponse.MainPlayer.Position!.Value.X, debounceResponse.MainPlayer.Position.Value.Y),
+                new Point(questMetaData.Position!.Value.X, questMetaData.Position.Value.Y));
+            pathToObjective.DoAny(
+                onSuccess: pathToObjectives.Add);
         }
+
+        this.DrawPath(writeableBitmap, pathToObjectives.Select(p => (p, Color.FromArgb(255, 255, 132, 0))).ToArray());
     }
 
     private void DrawMainPlayerPositionHistory(WriteableBitmap writeableBitmap)
@@ -534,9 +509,9 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
-        this.offsetRevert = 0.0001 + this.offsetRevert * 1.0001;
+        this.offsetRevert = 0.0001 + (this.offsetRevert * 1.0001);
         this.offsetRevert = Math.Min(99, this.offsetRevert);
-        this.originOffset /= (1 + this.offsetRevert);
+        this.originOffset /= 1 + this.offsetRevert;
         this.UpdateGameData();
     }
 
@@ -690,34 +665,6 @@ public partial class GuildwarsMinimap : UserControl
         }
 
         this.QuestMetadataClicked?.Invoke(this, quest.Value);
-    }
-
-    private void GuildwarsMinimap_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-    {
-        if (this.PathingData.Trapezoids is not List<Trapezoid> trapezoids ||
-            trapezoids.Count == 0)
-        {
-            return;
-        }
-
-        if (this.cachedDebounceResponse?.MainPlayer is not MainPlayerInformation mainPlayerInformation ||
-            mainPlayerInformation.Position is not Position playerPosition)
-        {
-            return;
-        }
-
-        var playerPoint = new Point(playerPosition.X, playerPosition.Y);
-        var screenPosition = Mouse.GetPosition(this);
-        var virtualPosition = new Point(
-            (screenPosition.X / this.Zoom) + this.originPoint.X - this.originOffset.X,
-            -(screenPosition.Y / this.Zoom) + this.originPoint.Y + this.originOffset.Y);
-
-        var pathFindingResult = this.pathfinder.CalculatePath(this.PathingData, playerPoint, virtualPosition);
-        pathFindingResult.DoAny(
-            onSuccess: response =>
-            {
-                this.DrawPath(response);
-            });
     }
 
     private void MaximizeButton_Clicked(object sender, EventArgs e)

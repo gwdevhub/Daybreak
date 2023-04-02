@@ -8,42 +8,42 @@ namespace Daybreak.Configuration;
 
 public sealed class ApplicationConfiguration
 {
-    [JsonProperty("SetGuildwarsWindowSizeOnLaunch")]
+    [JsonProperty(nameof(SetGuildwarsWindowSizeOnLaunch))]
     public bool SetGuildwarsWindowSizeOnLaunch { get; set; }
-    [JsonProperty("DesiredGuildwarsScreen")]
+    [JsonProperty(nameof(DesiredGuildwarsScreen))]
     public int DesiredGuildwarsScreen { get; set; }
-    [JsonProperty("BrowsersEnabled")]
+    [JsonProperty(nameof(BrowsersEnabled))]
     public bool BrowsersEnabled { get; set; } = true;
-    [JsonProperty("ToolboxPath")]
+    [JsonProperty(nameof(ToolboxPath))]
     public string? ToolboxPath { get; set; }
-    [JsonProperty("TexmodPath")]
+    [JsonProperty(nameof(TexmodPath))]
     public string? TexmodPath { get; set; }
-    [JsonProperty("ToolboxAutoLaunch")]
+    [JsonProperty(nameof(ToolboxAutoLaunch))]
     public bool ToolboxAutoLaunch { get; set; }
-    [JsonProperty("LeftBrowserDefault")]
+    [JsonProperty(nameof(LeftBrowserDefault))]
     public string? LeftBrowserDefault { get; set; } = "https://gwpvx.fandom.com/wiki/PvX_wiki";
-    [JsonProperty("RightBrowserDefault")]
+    [JsonProperty(nameof(RightBrowserDefault))]
     public string? RightBrowserDefault { get; set; } = "https://wiki.guildwars.com/wiki/Quick_access_links";
-    [JsonProperty("GuildwarsPaths")]
+    [JsonProperty(nameof(GuildwarsPaths))]
     public List<GuildwarsPath> GuildwarsPaths { get; set; } = new();
-    [JsonProperty("ProtectedLoginCredentials")]
+    [JsonProperty(nameof(ProtectedLoginCredentials))]
     public List<ProtectedLoginCredentials> ProtectedLoginCredentials { get; set; } = new();
-    [JsonProperty("AddressBarReadonly")]
+    [JsonProperty(nameof(AddressBarReadonly))]
     public bool AddressBarReadonly { get; set; } = true;
-    [JsonProperty("ExperimentalFeatures")]
+    [JsonProperty(nameof(ExperimentalFeatures))]
     public ExperimentalFeatures ExperimentalFeatures { get; set; } = new();
-    [JsonProperty("ShortcutLocation")]
+    [JsonProperty(nameof(ShortcutLocation))]
     public string? ShortcutLocation { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-    [JsonProperty("PlaceShortcut")]
+    [JsonProperty(nameof(PlaceShortcut))]
     public bool PlaceShortcut { get; set; }
-    [JsonProperty("AutoCheckUpdate")]
+    [JsonProperty(nameof(AutoCheckUpdate))]
     public bool AutoCheckUpdate { get; set; } = true;
-    [JsonProperty("ProtectedGraphAccessToken")]
+    [JsonProperty(nameof(ProtectedGraphAccessToken))]
     public string? ProtectedGraphAccessToken { get; set; }
-    [JsonProperty("ProtectedGraphRefreshToken")]
+    [JsonProperty(nameof(ProtectedGraphRefreshToken))]
     public string? ProtectedGraphRefreshToken { get; set; }
-    [JsonProperty("FocusViewOptions")]
+    [JsonProperty(nameof(FocusViewOptions))]
     public FocusViewOptions FocusViewOptions { get; set; } = new FocusViewOptions();
-    [JsonProperty("ScreenManagerOptions")]
+    [JsonProperty(nameof(ScreenManagerOptions))]
     public ScreenManagerOptions ScreenManagerOptions { get; set; } = new ScreenManagerOptions();
 }

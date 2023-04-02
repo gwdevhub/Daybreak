@@ -4,10 +4,10 @@ namespace Daybreak.Models.Browser;
 
 public sealed class OnContextMenuPayload
 {
-    [JsonProperty("X")]
+    [JsonProperty(nameof(X))]
     public double X { get; set; }
-    [JsonProperty("Y")]
+    [JsonProperty(nameof(Y))]
     public double Y { get; set; }
-    [JsonProperty("Selection")]
+    [JsonProperty(nameof(Selection))]
     public string? Selection { get; set; }
 }

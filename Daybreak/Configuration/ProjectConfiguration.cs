@@ -142,7 +142,7 @@ public static class ProjectConfiguration
         services.AddScoped<IDownloadService, DownloadService>();
         services.AddScoped<IGuildwarsEntityDebouncer, GuildwarsEntityDebouncer>();
         services.AddScoped<IExceptionHandler, ExceptionHandler>();
-        services.AddScoped<IPathfinder, EuclideanDistancePathfinder>();
+        services.AddScoped<IPathfinder, StupidPathfinder>();
     }
 
     public static void RegisterViews(IViewProducer viewProducer)

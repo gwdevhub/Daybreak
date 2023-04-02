@@ -19,6 +19,7 @@ using System.Extensions;
 using System.Linq;
 using System.Logging;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -58,7 +59,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         this.logger = logger.ThrowIfNull();
     }
     
-    public async Task EnsureInitialized()
+    public async Task EnsureInitialized(CancellationToken cancellationToken)
     {
         var scoppedLogger = this.logger.CreateScopedLogger(nameof(this.EnsureInitialized), default);
         var currentGuildwarsProcess = this.applicationLauncher.RunningGuildwarsProcess;
@@ -70,6 +71,11 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
 
         try
         {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                throw new TaskCanceledException();
+            }
+
             await this.InitializeSafe(currentGuildwarsProcess, scoppedLogger);
         }
         catch(Exception e)
@@ -85,34 +91,34 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         this.memoryScanner?.EndScanner();
     }
 
-    public Task<GameData?> ReadGameData()
+    public Task<GameData?> ReadGameData(CancellationToken cancellationToken)
     {
         if (this.memoryScanner.Scanning is false)
         {
             return Task.FromResult<GameData?>(default);
         }
 
-        return Task.Run(() => this.SafeReadGameMemory(this.ReadGameDataInternal));
+        return Task.Run(() => this.SafeReadGameMemory(this.ReadGameDataInternal), cancellationToken);
     }
 
-    public Task<PathingData?> ReadPathingData()
+    public Task<PathingData?> ReadPathingData(CancellationToken cancellationToken)
     {
         if (this.memoryScanner.Scanning is false)
         {
             return Task.FromResult<PathingData?>(default);
         }
 
-        return Task.Run(() => this.SafeReadGameMemory(this.ReadPathingDataInternal));
+        return Task.Run(() => this.SafeReadGameMemory(this.ReadPathingDataInternal), cancellationToken);
     }
 
-    public Task<PathingMetadata?> ReadPathingMetaData()
+    public Task<PathingMetadata?> ReadPathingMetaData(CancellationToken cancellationToken)
     {
         if (this.memoryScanner.Scanning is false)
         {
             return Task.FromResult<PathingMetadata?>(default);
         }
 
-        return Task.Run(() => this.SafeReadGameMemory(this.ReadPathingMetaDataInternal));
+        return Task.Run(() => this.SafeReadGameMemory(this.ReadPathingMetaDataInternal), cancellationToken);
     }
 
     private async Task InitializeSafe(Process process, ScopedLogger<GuildwarsMemoryReader> scopedLogger)
@@ -293,10 +299,10 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
             adjacencyList.Add(new List<int>());
         }
 
-        foreach(var trapezoid in trapezoidList)
+        Parallel.ForEach(trapezoidList, (trapezoid) =>
         {
             adjacencyList[trapezoid.Id] = BuildAdjacentPathingTrapezoids(trapezoid, trapezoidList).Distinct().ToList();
-        }
+        });
 
         return new PathingData { Trapezoids = trapezoidList, AdjacencyArray = adjacencyList };
     }
@@ -755,7 +761,6 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
     private static List<int> BuildAdjacentPathingTrapezoids(Trapezoid currentTrapezoid, IEnumerable<Trapezoid> trapezoids)
     {
         var adjacentTrapezoids = new List<int>();
-
         foreach(var trapezoid in trapezoids)
         {
             if (trapezoid.Id == currentTrapezoid.Id)
@@ -784,7 +789,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
                     adjacentTrapezoids.Add(trapezoid.Id);
                     continue;
                 }
-
+            
                 //Check if the trapezoid is to the left of the currentTrapezoid but their height differs
                 if (MathUtils.DistanceBetweenTwoLineSegments(
                     new Point(trapezoid.XTR, trapezoid.YT), new Point(trapezoid.XBR, trapezoid.YB),

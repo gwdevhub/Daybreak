@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
+using System.Windows.Threading;
 
 namespace Daybreak.Views;
 
@@ -39,6 +40,9 @@ public partial class FocusView : UserControl
 
     [GenerateDependencyProperty]
     private PathingData pathingData;
+
+    [GenerateDependencyProperty]
+    private bool loadingPathingData;
 
     [GenerateDependencyProperty]
     private bool mainPlayerDataValid;
@@ -94,6 +98,7 @@ public partial class FocusView : UserControl
     private bool browserMaximized = false;
     private bool minimapMaximized = false;
     private CancellationTokenSource? cancellationTokenSource;
+    private CancellationTokenSource? loadingPathingDataCancellationTokenSource;
 
     public FocusView(
         IBuildTemplateManager buildTemplateManager,
@@ -146,7 +151,7 @@ public partial class FocusView : UserControl
         return TimeSpan.FromMilliseconds(this.liveUpdateableOptions.Value.ExperimentalFeatures.MemoryReaderFrequency);
     }
 
-    private async Task UpdatePathingData()
+    private async Task UpdatePathingData(CancellationToken cancellationToken)
     {
         if (this.applicationLauncher.IsGuildwarsRunning is false)
         {
@@ -154,9 +159,14 @@ public partial class FocusView : UserControl
             this.viewManager.ShowView<LauncherView>();
         }
 
-        await this.guildwarsMemoryReader.EnsureInitialized().ConfigureAwait(true);
+        this.Dispatcher.Invoke(() =>
+        {
+            this.LoadingPathingData = true;
+        });
+
+        await this.guildwarsMemoryReader.EnsureInitialized(cancellationToken);
         
-        var maybePathingData = await this.guildwarsMemoryReader.ReadPathingData().ConfigureAwait(true);
+        var maybePathingData = await this.guildwarsMemoryReader.ReadPathingData(cancellationToken);
         if (maybePathingData is not PathingData pathingData ||
             pathingData.Trapezoids is null ||
             pathingData.Trapezoids.Count == 0)
@@ -164,7 +174,11 @@ public partial class FocusView : UserControl
             return;
         }
 
-        this.PathingData = pathingData;
+        this.Dispatcher.Invoke(() =>
+        {
+            this.PathingData = pathingData;
+            this.LoadingPathingData = false;
+        });
     }
 
     private async Task UpdateGameData()
@@ -175,9 +189,9 @@ public partial class FocusView : UserControl
             this.viewManager.ShowView<LauncherView>();
         }
 
-        await this.guildwarsMemoryReader.EnsureInitialized().ConfigureAwait(true);
+        await this.guildwarsMemoryReader.EnsureInitialized(this.cancellationTokenSource?.Token ?? CancellationToken.None).ConfigureAwait(true);
 
-        var maybeGameData = await this.guildwarsMemoryReader.ReadGameData().ConfigureAwait(true);
+        var maybeGameData = await this.guildwarsMemoryReader.ReadGameData(this.cancellationTokenSource?.Token ?? CancellationToken.None).ConfigureAwait(true);
         if (maybeGameData is not GameData gameData)
         {
             this.MainPlayerDataValid = false;
@@ -197,10 +211,17 @@ public partial class FocusView : UserControl
 
         this.GameData = gameData;
 
-        var pathingMeta = await this.guildwarsMemoryReader.ReadPathingMetaData();
-        if (pathingMeta?.TrapezoidCount != this.PathingData.Trapezoids?.Count)
+        var pathingMeta = await this.guildwarsMemoryReader.ReadPathingMetaData(this.cancellationTokenSource?.Token ?? CancellationToken.None);
+        if (pathingMeta?.TrapezoidCount != this.PathingData.Trapezoids?.Count &&
+            this.loadingPathingDataCancellationTokenSource is null)
         {
-            await this.UpdatePathingData();
+            this.loadingPathingDataCancellationTokenSource = new CancellationTokenSource();
+            _ = Task.Run(() => this.UpdatePathingData(this.loadingPathingDataCancellationTokenSource.Token), this.loadingPathingDataCancellationTokenSource.Token)
+                .ContinueWith(_ =>
+                {
+                    this.loadingPathingDataCancellationTokenSource.Dispose();
+                    this.loadingPathingDataCancellationTokenSource = null;
+                });
         }
 
         this.CurrentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(this.GameData.MainPlayer!.Value.Experience);
@@ -448,6 +469,9 @@ public partial class FocusView : UserControl
     private void FocusView_Unloaded(object _, RoutedEventArgs e)
     {
         this.cancellationTokenSource?.Cancel();
+        this.cancellationTokenSource = null;
+        this.loadingPathingDataCancellationTokenSource?.Cancel();
+        this.loadingPathingDataCancellationTokenSource = null;
         this.guildwarsMemoryReader?.Stop();
     }
 
@@ -725,20 +749,20 @@ public partial class FocusView : UserControl
         this.minimapMaximized = !this.minimapMaximized;
         if (this.minimapMaximized)
         {
-            Grid.SetRow(this.Minimap, 0);
-            Grid.SetColumn(this.Minimap, 0);
-            Grid.SetRowSpan(this.Minimap, int.MaxValue);
-            Grid.SetColumnSpan(this.Minimap, int.MaxValue);
-            this.Minimap.Margin = new Thickness(0);
+            Grid.SetRow(this.MinimapHolder, 0);
+            Grid.SetColumn(this.MinimapHolder, 0);
+            Grid.SetRowSpan(this.MinimapHolder, int.MaxValue);
+            Grid.SetColumnSpan(this.MinimapHolder, int.MaxValue);
+            this.MinimapHolder.Margin = new Thickness(0);
             this.Browser.Visibility = Visibility.Hidden;
         }
         else
         {
-            Grid.SetRow(this.Minimap, 1);
-            Grid.SetColumn(this.Minimap, 2);
-            Grid.SetRowSpan(this.Minimap, 1);
-            Grid.SetColumnSpan(this.Minimap, 1);
-            this.Minimap.Margin = new Thickness(5, 0, 0, 5);
+            Grid.SetRow(this.MinimapHolder, 1);
+            Grid.SetColumn(this.MinimapHolder, 2);
+            Grid.SetRowSpan(this.MinimapHolder, 1);
+            Grid.SetColumnSpan(this.MinimapHolder, 1);
+            this.MinimapHolder.Margin = new Thickness(5, 0, 0, 5);
             this.Browser.Visibility = Visibility.Visible;
         }
     }

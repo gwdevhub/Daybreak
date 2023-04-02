@@ -1,9 +1,6 @@
 ﻿using Daybreak.Models.Guildwars;
-using ScottPlot.Statistics;
 using System;
 using System.Windows;
-using System.Windows.Media.Animation;
-using System.Windows.Media.Media3D;
 
 namespace Daybreak.Utils;
 
@@ -71,7 +68,7 @@ public static class MathUtils
             Ccw(p11, p12, p21) != Ccw(p11, p12, p22);
     }
 
-    public static bool LineSegmentsIntersect(Point p1, Point p2, Point p3, Point p4, out Point? intersectionPoint)
+    public static bool LineSegmentsIntersect(Point p1, Point p2, Point p3, Point p4, out Point? intersectionPoint, double epsilon = 0)
     {
         intersectionPoint = default;
         var denominator = ((p1.X - p2.X) * (p3.Y - p4.Y)) - ((p1.Y - p2.Y) * (p3.X - p4.X));
@@ -143,14 +140,14 @@ public static class MathUtils
         var y = ((((p1.X * p2.Y) - (p1.Y * p2.X)) * (p3.Y - p4.Y)) - ((p1.Y - p2.Y) * ((p3.X * p4.Y) - (p3.Y * p4.X)))) / denominator;
         intersectionPoint = new Point(x, y);
         return
-            x >= Math.Min(p1.X, p2.X) &&
-            x <= Math.Max(p1.X, p2.X) &&
-            x >= Math.Min(p3.X, p4.X) &&
-            x <= Math.Max(p3.X, p4.X) &&
-            y >= Math.Min(p1.Y, p2.Y) &&
-            y <= Math.Max(p1.Y, p2.Y) &&
-            y >= Math.Min(p3.Y, p4.Y) &&
-            y <= Math.Max(p3.Y, p4.Y);
+            x >= Math.Min(p1.X, p2.X) - epsilon &&
+            x <= Math.Max(p1.X, p2.X) + epsilon &&
+            x >= Math.Min(p3.X, p4.X) - epsilon &&
+            x <= Math.Max(p3.X, p4.X) + epsilon &&
+            y >= Math.Min(p1.Y, p2.Y) - epsilon &&
+            y <= Math.Max(p1.Y, p2.Y) + epsilon &&
+            y >= Math.Min(p3.Y, p4.Y) - epsilon &&
+            y <= Math.Max(p3.Y, p4.Y) + epsilon;
     }
 
     public static double DistanceBetweenTwoLineSegments(Point line1Start, Point line1End, Point line2Start, Point line2End)
@@ -186,7 +183,7 @@ public static class MathUtils
         {
             return v1;
         }
-        else if (nx > 0)
+        else if (nx > 1)
         {
             return v2;
         }

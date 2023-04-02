@@ -14,8 +14,7 @@
              MouseRightButtonUp="GuildwarsMinimap_MouseRightButtonUp"
              MouseMove="GuildwarsMinimap_MouseMove"
              Loaded="GuildwarsMinimap_Loaded"
-             Unloaded="GuildwarsMinimap_Unloaded"
-             MouseDoubleClick="GuildwarsMinimap_MouseDoubleClick">
+             Unloaded="GuildwarsMinimap_Unloaded">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
         <ContextMenu x:Key="WorldPlayerContextMenu">
