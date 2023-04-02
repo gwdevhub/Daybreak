@@ -246,21 +246,19 @@ public partial class GuildwarsMinimap : UserControl
 
         this.DrawMainPlayerPositionHistory(bitmap);
 
-        this.DrawQuestObjectives(bitmap, debounceResponse);
-
         this.FillEllipse(debounceResponse.MainPlayer.Position, bitmap, Colors.Green);
 
-        foreach (var partyMember in debounceResponse.Party.Where(p => IsValidEntity(p)))
+        foreach (var partyMember in debounceResponse.Party.Where(p => IsValidPositionalEntity(p)))
         {
             this.FillEllipse(partyMember.Position, bitmap, Colors.Green);
         }
 
-        foreach (var player in debounceResponse.WorldPlayers.Where(p => IsValidEntity(p)))
+        foreach (var player in debounceResponse.WorldPlayers.Where(p => IsValidPositionalEntity(p)))
         {
             this.FillEllipse(player.Position, bitmap, Colors.CornflowerBlue);
         }
 
-        foreach (var livingEntity in debounceResponse.LivingEntities.Where(p => IsValidEntity(p)))
+        foreach (var livingEntity in debounceResponse.LivingEntities.Where(p => IsValidPositionalEntity(p)))
         {
             if (livingEntity.State is LivingEntityState.ToBeCleanedUp)
             {
@@ -299,16 +297,40 @@ public partial class GuildwarsMinimap : UserControl
                 this.FillTriangle(livingEntity.Position, bitmap, Colors.LimeGreen);
             }
         }
+
+        this.DrawQuestObjectives(bitmap);
     }
 
-    private void DrawQuestObjectives(WriteableBitmap writeableBitmap, DebounceResponse debounceResponse)
+    private void DrawQuestObjectives(WriteableBitmap writeableBitmap)
     {
-        var currentMapQuests = debounceResponse.MainPlayer.QuestLog!
+        var currentMapQuests = this.GameData.MainPlayer!.Value.QuestLog!
             .Where(v => v.Position.GetValueOrDefault().X != 0 && v.Position.GetValueOrDefault().Y != 0);
 
-        foreach(var questMetaData in currentMapQuests)
+        var screenVirtualWidth = this.ActualWidth / this.Zoom;
+        var screenVirtualHeight = this.ActualHeight / this.Zoom;
+        foreach (var questMetaData in currentMapQuests)
         {
-            this.FillStar(questMetaData.Position, writeableBitmap, Colors.Green);
+            if (!this.EntityOnScreen(questMetaData.Position, writeableBitmap, out var x, out var y))
+            {
+                var questPoint = new Point(questMetaData.Position!.Value.X, questMetaData.Position.Value.Y);
+                var position = new Position
+                {
+                    X = (float)Math.Clamp(
+                        questPoint.X, 
+                        Math.Min(this.originPoint.X + (EntitySize * this.Zoom), this.originPoint.X + screenVirtualWidth - (EntitySize * this.Zoom)),
+                        Math.Max(this.originPoint.X + (EntitySize * this.Zoom), this.originPoint.X + screenVirtualWidth - (EntitySize * this.Zoom))),
+                    Y = (float)Math.Clamp(
+                        questPoint.Y,
+                        Math.Min(this.originPoint.Y - screenVirtualHeight + (EntitySize * this.Zoom), this.originPoint.Y - (EntitySize * this.Zoom)),
+                        Math.Max(this.originPoint.Y - screenVirtualHeight + (EntitySize * this.Zoom), this.originPoint.Y - (EntitySize * this.Zoom))),
+                };
+
+                this.FillStar(position, writeableBitmap, Colors.BlueViolet);
+            }
+            else
+            {
+                this.FillStar(questMetaData.Position, writeableBitmap, Colors.BlueViolet);
+            }
         }
     }
 
@@ -451,14 +473,19 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
-        this.offsetRevert = 0.0001 + this.offsetRevert * 1.0001;
+        this.offsetRevert = 0.0001 + (this.offsetRevert * 1.0001);
         this.offsetRevert = Math.Min(99, this.offsetRevert);
-        this.originOffset /= (1 + this.offsetRevert);
+        this.originOffset /= 1 + this.offsetRevert;
         this.UpdateGameData();
     }
 
-    private IPositionalEntity? CheckMouseOverEntity(IEnumerable<IPositionalEntity> entities)
+    private IPositionalEntity? CheckMouseOverEntity(IEnumerable<IPositionalEntity>? maybeEntities)
     {
+        if (maybeEntities is not IEnumerable<IPositionalEntity> entities)
+        {
+            return default;
+        }
+
         if (this.GameData.Valid is false)
         {
             return default;
@@ -493,6 +520,16 @@ public partial class GuildwarsMinimap : UserControl
 
     private void GuildwarsMinimap_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
     {
+        var maybeQuestMetadata = this.CheckMouseOverEntity(this.GameData.MainPlayer?.QuestLog?.OfType<IPositionalEntity>().Where(IsValidPositionalEntity));
+        if (maybeQuestMetadata is QuestMetadata questMetadata &&
+            this.TryFindResource("QuestContextMenu") is ContextMenu questContextMenu)
+        {
+            this.ContextMenu = questContextMenu;
+            this.ContextMenu.DataContext = questMetadata;
+            this.ContextMenu.IsOpen = true;
+            return;
+        }
+
         if (this.CheckMouseOverEntity(Enumerable.Repeat(this.GameData.MainPlayer.As<IEntity>(), 1)) is MainPlayerInformation &&
             this.TryFindResource("MainPlayerContextMenu") is ContextMenu mainPlayerContextMenu)
         {
@@ -502,7 +539,7 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
-        var maybeWorldPlayer = this.CheckMouseOverEntity(this.GameData.WorldPlayers!.OfType<IEntity>());
+        var maybeWorldPlayer = this.CheckMouseOverEntity(this.GameData.WorldPlayers?.OfType<IEntity>().Where(IsValidPositionalEntity));
         if (maybeWorldPlayer is WorldPlayerInformation worldPlayerInformation &&
             this.TryFindResource("WorldPlayerContextMenu") is ContextMenu worldPlayerContextMenu)
         {
@@ -512,7 +549,7 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
-        var maybePartyMember = this.CheckMouseOverEntity(this.GameData.Party!.OfType<IEntity>());
+        var maybePartyMember = this.CheckMouseOverEntity(this.GameData.Party?.OfType<IEntity>().Where(IsValidPositionalEntity));
         if (maybePartyMember is PlayerInformation partyMember &&
             this.TryFindResource("PlayerContextMenu") is ContextMenu playerContextMenu)
         {
@@ -522,22 +559,12 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
-        var maybeLivingEntity = this.CheckMouseOverEntity(this.GameData.LivingEntities!.OfType<IEntity>());
+        var maybeLivingEntity = this.CheckMouseOverEntity(this.GameData.LivingEntities?.OfType<IEntity>().Where(IsValidPositionalEntity));
         if (maybeLivingEntity is LivingEntity livingEntity &&
             this.TryFindResource("LivingEntityContextMenu") is ContextMenu livingEntityContextMenu)
         {
             this.ContextMenu = livingEntityContextMenu;
             this.ContextMenu.DataContext = livingEntity;
-            this.ContextMenu.IsOpen = true;
-            return;
-        }
-
-        var maybeQuestMetadata = this.CheckMouseOverEntity(this.GameData.MainPlayer?.QuestLog!.OfType<IPositionalEntity>()!);
-        if (maybeQuestMetadata is QuestMetadata questMetadata &&
-            this.TryFindResource("QuestContextMenu") is ContextMenu questContextMenu)
-        {
-            this.ContextMenu = questContextMenu;
-            this.ContextMenu.DataContext = questMetadata;
             this.ContextMenu.IsOpen = true;
             return;
         }
@@ -626,7 +653,7 @@ public partial class GuildwarsMinimap : UserControl
         return a * a > ((dx * dx) + (dy * dy));
     }
 
-    private static bool IsValidEntity(IEntity entity)
+    private static bool IsValidPositionalEntity(IPositionalEntity entity)
     {
         if (entity.Position?.X == 0 &&
             entity.Position?.Y == 0)
