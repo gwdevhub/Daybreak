@@ -1,7 +1,9 @@
 ﻿using Daybreak.Models.Guildwars;
-using System.Numerics;
+using ScottPlot.Statistics;
 using System;
 using System.Windows;
+using System.Windows.Media.Animation;
+using System.Windows.Media.Media3D;
 
 namespace Daybreak.Utils;
 
@@ -9,13 +11,6 @@ public static class MathUtils
 {
     public static bool PointInsideTrapezoid(Trapezoid trapezoid, Point point)
     {
-        /*
-         * To determine if a point is inside a trapezoid,
-         * perform a raycast and count the number of intersections
-         * from the point to the edges of the trapezoid. If the number is odd,
-         * the point is inside the trapezoid. Otherwise, it is outside.
-         */
-
         var trapezoidPoints = new Point[]
         {
             new Point(trapezoid.XTL, trapezoid.YT),
@@ -53,27 +48,16 @@ public static class MathUtils
         return false;
     }
 
-    public static bool PointInsidePolygon(Point[] polygon, Point point)
+    public static bool PointInsideTriangle(Point t1, Point t2, Point t3, Point p)
     {
-        var isInside = false;
-        for (var i = 0; i < polygon.Length; i++)
-        {
-            var j = (i + 1) % polygon.Length;
-            var p1 = polygon[i];
-            var p2 = polygon[j];
-            // Check if the lines cross the horizontal line at Y
-            if ((p1.Y <= point.Y && p2.Y > point.Y) || (p2.Y <= point.Y && p1.Y > point.Y))
-            {
-                // Check the point on the X axis where it crosses the line.
-                var cross = (p2.X - p1.X) * (point.Y - p1.Y) / (p2.Y - p1.Y) + p1.X;
-                if (cross < point.X)
-                {
-                    isInside = !isInside;
-                }
-            }
-        }
+        var d1 = Sign(p, t1, t2);
+        var d2 = Sign(p, t2, t3);
+        var d3 = Sign(p, t3, t1);
 
-        return isInside;
+        var has_neg = (d1 < 0) || (d2 < 0) || (d3 < 0);
+        var has_pos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+
+        return !(has_neg && has_pos);
     }
 
     public static bool LinesIntersect(Point p11, Point p12, Point p21, Point p22)
@@ -87,166 +71,133 @@ public static class MathUtils
             Ccw(p11, p12, p21) != Ccw(p11, p12, p22);
     }
 
-    public static bool LineSegmentsIntersect(Point p1, Point p2, Point p3, Point p4)
+    public static bool LineSegmentsIntersect(Point p1, Point p2, Point p3, Point p4, out Point? intersectionPoint)
     {
-        if (DoColinearLineSegmentsIntersect(p1, p2, p3, p4))
+        intersectionPoint = default;
+        var denominator = ((p1.X - p2.X) * (p3.Y - p4.Y)) - ((p1.Y - p2.Y) * (p3.X - p4.X));
+
+        // If denominator is 0, lines are either parallel or colinear
+        if (denominator == 0)
         {
-            return true;
+            // Lines are vertical. Slope is undefined
+            if (p2.X - p1.X == 0)
+            {
+                // Lines are not collinear if they're not on the same X-coordinate
+                if (p3.X - p1.X != 0)
+                {
+                    return false;
+                }
+
+                // If p3 is between p1 and p2, the lines are overlapping.
+                if (p3.Y > Math.Min(p2.Y, p1.Y) &&
+                    p3.Y < Math.Max(p2.Y, p1.Y))
+                {
+                    intersectionPoint = p3;
+                    return true;
+                }
+
+                // If p4 is between p1 and p2, the lines are overlapping.
+                if (p4.Y > Math.Min(p2.Y, p1.Y) &&
+                    p4.Y < Math.Max(p2.Y, p1.Y))
+                {
+                    intersectionPoint = p3;
+                    return true;
+                }
+
+                return false;
+            }
+
+            // Calculate the slope
+            var slope = (p2.Y - p1.Y) / (p2.X - p1.X);
+
+            /*
+             * The lines are colinear if the equation for line1 is equal with the equation for line2.
+             * This means that we should be able to substitute p1 with p3 or p2 with p4.
+             * We will substitute p1 with p3.
+             */
+            if (p2.Y - p3.Y != slope * (p2.X - p3.X))
+            {
+                return false;
+            }
+
+            // If p3 is between p1 and p2, the lines are overlapping.
+            if (p3.Y > Math.Min(p2.Y, p1.Y) &&
+                p3.Y < Math.Max(p2.Y, p1.Y))
+            {
+                intersectionPoint = p3;
+                return true;
+            }
+
+            // If p4 is between p1 and p2, the lines are overlapping.
+            if (p4.Y > Math.Min(p2.Y, p1.Y) &&
+                p4.Y < Math.Max(p2.Y, p1.Y))
+            {
+                intersectionPoint = p3;
+                return true;
+            }
+
+            return false;
         }
 
-        var dx12 = p2.X - p1.X;
-        var dy12 = p2.Y - p1.Y;
-        var dx34 = p4.X - p3.X;
-        var dy34 = p4.Y - p3.Y;
-
-        var denominator = (dy12 * dx34) - (dx12 * dy34);
-
-        if (denominator == 0)
-            return false;
-
-        var t1 = (((p1.X - p3.X) * dy34) + ((p3.Y - p1.Y) * dx34)) / denominator;
-
-        if (double.IsInfinity(t1))
-            return false;
-
-        var intersectionPoint = new Point(p1.X + (dx12 * t1), p1.Y + (dy12 * t1));
-
-        if (p1.X == p2.X)
-            return intersectionPoint.Y >= Math.Min(p3.Y, p4.Y) && intersectionPoint.Y <= Math.Max(p3.Y, p4.Y);
-        else
-            return intersectionPoint.X >= Math.Min(p1.X, p2.X) && intersectionPoint.X <= Math.Max(p1.X, p2.X);
+        var x = ((((p1.X * p2.Y) - (p1.Y * p2.X)) * (p3.X - p4.X)) - ((p1.X - p2.X) * ((p3.X * p4.Y) - (p3.Y * p4.X)))) / denominator;
+        var y = ((((p1.X * p2.Y) - (p1.Y * p2.X)) * (p3.Y - p4.Y)) - ((p1.Y - p2.Y) * ((p3.X * p4.Y) - (p3.Y * p4.X)))) / denominator;
+        intersectionPoint = new Point(x, y);
+        return
+            x >= Math.Min(p1.X, p2.X) &&
+            x <= Math.Max(p1.X, p2.X) &&
+            x >= Math.Min(p3.X, p4.X) &&
+            x <= Math.Max(p3.X, p4.X) &&
+            y >= Math.Min(p1.Y, p2.Y) &&
+            y <= Math.Max(p1.Y, p2.Y) &&
+            y >= Math.Min(p3.Y, p4.Y) &&
+            y <= Math.Max(p3.Y, p4.Y);
     }
 
     public static double DistanceBetweenTwoLineSegments(Point line1Start, Point line1End, Point line2Start, Point line2End)
     {
-        var u = line1End - line1Start;
-        var v = line2End - line2Start;
-        var w = line1Start - line2Start;
-
-        var a = u * u;
-        var b = u * v;
-        var c = v * v;
-        var d = u * v;
-        var e = v * w;
-
-        var D = (a * c) - (b * b);
-        var sD = D;
-        var tD = D;
-
-        double sN;
-        double tN;
-        if (D < 0.0001f)
+        var closestPoints = new []
         {
-            sN = 0.0f;
-            sD = 1.0f;
-            tN = e;
-            tD = c;
-        }
-        else
-        {
-            sN = (b * e) - (c * d);
-            tN = (a * e) - (b * d);
+            (line2Start, ClosestPointOnLineSegment(line1Start, line1End, line2Start)),
+            (line2End, ClosestPointOnLineSegment(line1Start, line1End, line2End)),
+            (line1Start, ClosestPointOnLineSegment(line2Start, line2End, line1Start)),
+            (line1End, ClosestPointOnLineSegment(line2Start, line2End, line1End))
+        };
 
-            if (sN < 0.0f)
+        var distance = (closestPoints[0].Item1 - closestPoints[0].Item2).LengthSquared;
+        for(var i = 1; i < closestPoints.Length; i++)
+        {
+            var newDistance = (closestPoints[1].Item1 - closestPoints[1].Item2).LengthSquared;
+            if (newDistance < distance)
             {
-                sN = 0.0f;
-                tN = e;
-                tD = c;
-            }
-            else if (sN > sD)
-            {
-                sN = sD;
-                tN = e + b;
-                tD = c;
+                distance = newDistance;
             }
         }
 
-        if (tN < 0.0f)
-        {
-            tN = 0.0f;
-
-            if (-d < 0.0f)
-                sN = 0.0f;
-            else if (-d > a)
-                sN = sD;
-            else
-            {
-                sN = -d;
-                sD = a;
-            }
-        }
-        else if (tN > tD)
-        {
-            tN = tD;
-
-            if ((-d + b) < 0.0f)
-                sN = 0.0f;
-            else if ((-d + b) > a)
-                sN = sD;
-            else
-            {
-                sN = -d + b;
-                sD = a;
-            }
-        }
-
-        double sc = Math.Abs(sN) < 0.0001f ? 0.0f : sN / sD;
-        double tc = Math.Abs(tN) < 0.0001f ? 0.0f : tN / tD;
-
-        var dP = w + (sc * u) - (tc * v);
-
-        return dP.Length;
+        return Math.Sqrt(distance);
     }
 
     public static Point ClosestPointOnLineSegment(Point v1, Point v2, Point p)
     {
-        var length = (v2 - v1).Length;
-        var dir = v2 - v1;
-        dir.Normalize();
-        var dot = dir * (p - v1);
-        dot = Math.Clamp(dot, 0, length);
-        return v1 + (dir * dot);
+        var d = v2 - v1;
+        var distance = d.LengthSquared;
+        var nx = (p - v1) * d / distance;
+
+        if (nx < 0)
+        {
+            return v1;
+        }
+        else if (nx > 0)
+        {
+            return v2;
+        }
+        else
+        {
+            return (d * nx) + v1;
+        }
     }
 
-    public static bool DoColinearLineSegmentsIntersect(Point p1, Point p2, Point p3, Point p4)
+    private static double Sign(Point p1, Point p2, Point p3)
     {
-        if (p1.X > p2.X)
-        {
-            Swap(ref p1, ref p2);
-        }
-
-        if (p3.X > p4.X)
-        {
-            Swap(ref p3, ref p4);
-        }
-
-        if (p1.X > p4.X || p3.X > p2.X)
-        {
-            return false;
-        }
-
-        if (p1.Y > p2.Y)
-        {
-            Swap(ref p1, ref p2);
-        }
-
-        if (p3.Y > p4.Y)
-        {
-            Swap(ref p3, ref p4);
-        }
-
-        if (p1.Y > p4.Y || p3.Y > p2.Y)
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    private static void Swap(ref Point point1, ref Point point2)
-    {
-        var temp = point1;
-        point1 = point2;
-        point2 = temp;
+        return ((p1.X - p3.X) * (p2.Y - p3.Y)) - ((p2.X - p3.X) * (p1.Y - p3.Y));
     }
 }

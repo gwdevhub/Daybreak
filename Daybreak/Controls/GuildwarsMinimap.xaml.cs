@@ -14,7 +14,6 @@ using System.Windows.Input;
 using System.Collections.Generic;
 using System.Linq;
 using Daybreak.Services.Pathfinding;
-using System.Windows.Media.Media3D;
 using Daybreak.Services.Pathfinding.Models;
 using System.Numerics;
 using System.Windows.Threading;
@@ -65,6 +64,12 @@ public partial class GuildwarsMinimap : UserControl
     [GenerateDependencyProperty]
     private bool controlsVisible;
 
+    //TODO: Delete
+    [GenerateDependencyProperty]
+    private int currentTrapezoid;
+    [GenerateDependencyProperty]
+    private IEnumerable<int> neighboringTrapezoids;
+
     public event EventHandler? MaximizeClicked;
     public event EventHandler<QuestMetadata>? QuestMetadataClicked;
 
@@ -81,6 +86,8 @@ public partial class GuildwarsMinimap : UserControl
     {
         this.pathfinder = pathfinder.ThrowIfNull();
         this.guildwarsEntityDebouncer = guildwarsEntityDebouncer.ThrowIfNull();
+        this.neighboringTrapezoids = Enumerable.Empty<int>();
+
         this.dispatcherTimer.Tick += (_, _) => this.ApplyOffsetRevert();
         this.dispatcherTimer.Interval = TimeSpan.FromMilliseconds(16);
         this.InitializeComponent();
@@ -255,6 +262,12 @@ public partial class GuildwarsMinimap : UserControl
                 {
                     colors[adjacent] = Colors.HotPink;
                 }
+
+                if (this.CurrentTrapezoid != trapezoid.Id)
+                {
+                    this.CurrentTrapezoid = trapezoid.Id;
+                    this.NeighboringTrapezoids = this.PathingData.AdjacencyArray[trapezoid.Id];
+                }
             }
         }
 
@@ -264,9 +277,12 @@ public partial class GuildwarsMinimap : UserControl
             var b = new Point((int)((trapezoid.XTR - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YT + minHeight) / MapDownscaleFactor));
             var c = new Point((int)((trapezoid.XBR - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YB + minHeight) / MapDownscaleFactor));
             var d = new Point((int)((trapezoid.XBL - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YB + minHeight) / MapDownscaleFactor));
-            var e = new Point((int)((trapezoid.XTL - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YT + minHeight) / MapDownscaleFactor));
 
-            bitmap.FillPolygon(new int[] { (int)a.X, (int)a.Y, (int)b.X, (int)b.Y, (int)c.X, (int)c.Y, (int)d.X, (int)d.Y, (int)e.X, (int)e.Y, (int)a.X, (int)a.Y }, colors[trapezoid.Id]);
+            bitmap.FillPolygon(new int[] { (int)a.X, (int)a.Y, (int)b.X, (int)b.Y, (int)c.X, (int)c.Y, (int)d.X, (int)d.Y, (int)a.X, (int)a.Y }, colors[trapezoid.Id]);
+            bitmap.DrawLine((int)a.X, (int)a.Y, (int)b.X, (int)b.Y, Colors.Black);
+            bitmap.DrawLine((int)b.X, (int)b.Y, (int)c.X, (int)c.Y, Colors.Black);
+            bitmap.DrawLine((int)c.X, (int)c.Y, (int)d.X, (int)d.Y, Colors.Black);
+            bitmap.DrawLine((int)d.X, (int)d.Y, (int)a.X, (int)a.Y, Colors.Black);
         }
     }
     
@@ -295,7 +311,7 @@ public partial class GuildwarsMinimap : UserControl
                 (int)((segment.EndPoint.X - this.mapVirtualMinWidth) / MapDownscaleFactor),
                 (int)((this.mapHeight - segment.EndPoint.Y + this.mapVirtualMinHeight) / MapDownscaleFactor),
                 Colors.Red,
-                10);
+                2);
         }
     }
 
