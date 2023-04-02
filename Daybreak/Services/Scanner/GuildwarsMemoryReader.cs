@@ -295,7 +295,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
 
         foreach(var trapezoid in trapezoidList)
         {
-            adjacencyList[trapezoid.Id] = BuildAdjacentPathingTrapezoids(trapezoid, trapezoidList);
+            adjacencyList[trapezoid.Id] = BuildAdjacentPathingTrapezoids(trapezoid, trapezoidList).Distinct().ToList();
         }
 
         return new PathingData { Trapezoids = trapezoidList, AdjacencyArray = adjacencyList };
@@ -794,22 +794,6 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
                     adjacentTrapezoids.Add(trapezoid.Id);
                     continue;
                 }
-            }
-
-            // Check if the trapezoid is directly above currentTrapezoid
-            if (MathUtils.LineSegmentsIntersect(
-                new Point(trapezoid.XBL, trapezoid.YB), new Point(trapezoid.XBR, trapezoid.YB),
-                new Point(currentTrapezoid.XTL, currentTrapezoid.YT), new Point(currentTrapezoid.XTR, currentTrapezoid.YT)))
-            {
-                adjacentTrapezoids.Add(trapezoid.Id);
-            }
-
-            // Check if the trapezoid is directly below currentTrapezoid
-            if (MathUtils.LineSegmentsIntersect(
-                new Point(trapezoid.XTL, trapezoid.YT), new Point(trapezoid.XTR, trapezoid.YT),
-                new Point(currentTrapezoid.XBL, currentTrapezoid.YB), new Point(currentTrapezoid.XBR, currentTrapezoid.YB)))
-            {
-                adjacentTrapezoids.Add(trapezoid.Id);
             }
 
             //Check if the trapezoid is above currentTrapezoid
