@@ -4,6 +4,7 @@ using Daybreak.Services.IconRetrieve;
 using Daybreak.Services.Menu;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Privilege;
+using Daybreak.Services.Screens;
 using Daybreak.Services.Screenshots;
 using Daybreak.Services.Updater;
 using Daybreak.Utils;
@@ -16,7 +17,6 @@ using System.Extensions;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Extensions;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -29,7 +29,7 @@ namespace Daybreak.Launch;
 /// <summary>
 /// Interaction logic for MainWindow.xaml
 /// </summary>
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Fields used by source generator for DependencyProperty")]
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add read-only modifier", Justification = "Fields used by source generator for DependencyProperty")]
 [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
 public partial class MainWindow : Window
 {
@@ -51,6 +51,8 @@ public partial class MainWindow : Window
     private bool isRunningAsAdmin;
     [GenerateDependencyProperty]
     private bool isShowingDropdown;
+
+    public event EventHandler<MainWindow>? WindowParametersChanged;
 
     public MainWindow(
         IMenuServiceInitializer menuServiceInitializer,
@@ -76,6 +78,22 @@ public partial class MainWindow : Window
         this.SetupMenuService();
     }
 
+    protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+        if (this.IsLoaded is false)
+        {
+            return;
+        }
+
+        if (e.Property == LeftProperty ||
+            e.Property == TopProperty ||
+            e.Property == ActualWidthProperty ||
+            e.Property == ActualHeightProperty)
+        {
+            this.WindowParametersChanged?.Invoke(this, this);
+        }
+    }
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
