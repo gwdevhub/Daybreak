@@ -81,13 +81,18 @@ public sealed class ScreenManager : IScreenManager, IApplicationLifetimeService
 
     public void SaveWindowPositionAndSize()
     {
+        if (this.host.WindowState is not WindowState.Normal)
+        {
+            return;
+        }
+
         var dpiScale = VisualTreeHelper.GetDpi(this.host);
         var options = new ScreenManagerOptions
         {
-            X = this.host.WindowState is WindowState.Normal ? this.host.Left : 0,
-            Y = this.host.WindowState is WindowState.Normal ? this.host.Top : 0,
-            Width = this.host.WindowState is WindowState.Normal ? this.host.ActualWidth : 0,
-            Height = this.host.WindowState is WindowState.Normal ? this.host.ActualHeight : 0,
+            X = this.host.Left,
+            Y = this.host.Top,
+            Width = this.host.ActualWidth,
+            Height = this.host.ActualHeight,
             DpiX = dpiScale.DpiScaleX,
             DpiY = dpiScale.DpiScaleY
         };
@@ -111,6 +116,7 @@ public sealed class ScreenManager : IScreenManager, IApplicationLifetimeService
 
     public void OnStartup()
     {
+        this.host.WindowParametersChanged += (_, _) => this.SaveWindowPositionAndSize();
         this.MoveWindowToSavedPosition();
     }
 

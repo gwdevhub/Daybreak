@@ -1,5 +1,4 @@
 ﻿using Daybreak.Configuration;
-using Daybreak.Exceptions;
 using Daybreak.Services.ExceptionHandling;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Updater.PostUpdate;
@@ -8,11 +7,6 @@ using Microsoft.Extensions.Logging;
 using Slim;
 using Slim.Integration.ServiceCollection;
 using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Windows;
 using System.Windows.Extensions;
 
 namespace Daybreak.Launch;
