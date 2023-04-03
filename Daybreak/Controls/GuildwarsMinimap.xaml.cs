@@ -266,11 +266,9 @@ public partial class GuildwarsMinimap : UserControl
             {
                 var startPosition = new Position { X = (float)segment.StartPoint.X, Y = (float)segment.StartPoint.Y };
                 var endPosition = new Position { X = (float)segment.EndPoint.X, Y = (float)segment.EndPoint.Y };
-                if (this.EntityOnScreen(startPosition, bitmap, out var startX, out var startY) &&
-                    this.EntityOnScreen(endPosition, bitmap, out var endX, out var endY))
-                {
-                    bitmap.DrawLineAa(startX, startY, endX, endY, color, (int)(EntitySize * this.Zoom));
-                }
+                this.EntityOnScreen(startPosition, bitmap, out var startX, out var startY);
+                this.EntityOnScreen(endPosition, bitmap, out var endX, out var endY);
+                bitmap.DrawLineAa(startX, startY, endX, endY, color, (int)(EntitySize * this.Zoom));
             }
         }
     }
@@ -341,10 +339,10 @@ public partial class GuildwarsMinimap : UserControl
             }
         }
 
-        this.DrawQuestObjectives(bitmap);
+        this.DrawQuestObjectives(bitmap, debounceResponse);
     }
 
-    private void DrawQuestObjectives(WriteableBitmap writeableBitmap)
+    private void DrawQuestObjectives(WriteableBitmap writeableBitmap, DebounceResponse debounceResponse)
     {
         if (this.PathingData.Trapezoids is null)
         {
@@ -380,6 +378,37 @@ public partial class GuildwarsMinimap : UserControl
                 this.FillStar(questMetaData.Position, writeableBitmap, Colors.BlueViolet);
             }
         }
+
+        var pathingResponses = currentMapQuests
+            .Select(questMetaData =>
+            {
+                return this.pathfinder.CalculatePath(
+                    this.PathingData,
+                    new Point
+                    {
+                        X = debounceResponse.MainPlayer.Position!.Value.X,
+                        Y = debounceResponse.MainPlayer.Position!.Value.Y,
+                    },
+                    new Point
+                    {
+                        X = questMetaData.Position!.Value.X,
+                        Y = questMetaData.Position!.Value.Y
+                    });
+            })
+            .Select(result =>
+            {
+                if (result.TryExtractSuccess(out var response))
+                {
+                    return response;
+                }
+
+                return default;
+            })
+            .OfType<PathfindingResponse>()
+            .Select(response => (response, Colors.DarkOrange))
+            .ToArray();
+
+        this.DrawPath(writeableBitmap, pathingResponses);
     }
 
     private void DrawMainPlayerPositionHistory(WriteableBitmap writeableBitmap)

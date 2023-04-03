@@ -301,6 +301,11 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
 
         Parallel.ForEach(trapezoidList, (trapezoid) =>
         {
+            if (trapezoid.Id < 0 || trapezoid.Id > adjacencyList.Count)
+            {
+                return;
+            }
+
             adjacencyList[trapezoid.Id] = BuildAdjacentPathingTrapezoids(trapezoid, trapezoidList).Distinct().ToList();
         });
 
