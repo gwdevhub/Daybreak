@@ -171,6 +171,8 @@ public partial class FocusView : UserControl
             pathingData.Trapezoids is null ||
             pathingData.Trapezoids.Count == 0)
         {
+            await Task.Delay(1000, cancellationToken);
+            await this.UpdatePathingData(cancellationToken);
             return;
         }
 

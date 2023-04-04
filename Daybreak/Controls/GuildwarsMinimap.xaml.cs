@@ -303,7 +303,8 @@ public partial class GuildwarsMinimap : UserControl
 
     private void DrawEntities(DebounceResponse debounceResponse)
     {
-        if (this.EntitiesDrawingHost.Source is not WriteableBitmap bitmap || this.resizeEntities)
+        if (this.EntitiesDrawingHost.Source is not WriteableBitmap bitmap || this.resizeEntities ||
+            bitmap.PixelHeight != (int)this.ActualHeight || bitmap.PixelWidth != this.ActualWidth)
         {
             bitmap = BitmapFactory.New((int)this.ActualWidth, (int)this.ActualHeight);
             this.EntitiesDrawingHost.Source = bitmap;
