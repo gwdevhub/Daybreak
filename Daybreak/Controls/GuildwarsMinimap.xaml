@@ -56,7 +56,6 @@
     </UserControl.Resources>
     <Grid>
         <Image x:Name="MapDrawingHost" VerticalAlignment="Top" HorizontalAlignment="Left" Stretch="Fill"/>
-        <Image x:Name="MapPathfindingHost" VerticalAlignment="Top" HorizontalAlignment="Left" Stretch="Fill"/>
         <Image x:Name="EntitiesDrawingHost" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
         <StackPanel VerticalAlignment="Top" HorizontalAlignment="Right">
             <TextBlock Text="{Binding ElementName=_this, Path=CurrentTrapezoid, Mode=OneWay}" />

@@ -150,9 +150,6 @@ public partial class GuildwarsMinimap : UserControl
             0);
         this.MapDrawingHost.Height = this.mapHeight * this.Zoom;
         this.MapDrawingHost.Width = this.mapWidth * this.Zoom;
-        this.MapPathfindingHost.Margin = this.MapDrawingHost.Margin;
-        this.MapPathfindingHost.Height = this.mapHeight * this.Zoom;
-        this.MapPathfindingHost.Width = this.mapWidth * this.Zoom;
         this.cachedDebounceResponse = debounceResponse;
         this.ManageMainPlayerPositionHistory();
         this.DrawEntities(debounceResponse);
