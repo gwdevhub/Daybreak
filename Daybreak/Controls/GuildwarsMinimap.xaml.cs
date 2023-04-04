@@ -374,25 +374,13 @@ public partial class GuildwarsMinimap : UserControl
 
         var currentMapQuests = this.GameData.MainPlayer!.Value.QuestLog!
             .Where(v => v.Position.GetValueOrDefault().X != 0 && v.Position.GetValueOrDefault().Y != 0);
-
-        var screenVirtualWidth = this.ActualWidth / this.Zoom;
-        var screenVirtualHeight = this.ActualHeight / this.Zoom;
         foreach (var questMetaData in currentMapQuests)
         {
+            var position = this.ForceOnScreenPosition(questMetaData.Position!.Value);
             if (!this.EntityOnScreen(questMetaData.Position, writeableBitmap, out var x, out var y))
             {
                 var questPoint = new Point(questMetaData.Position!.Value.X, questMetaData.Position.Value.Y);
-                var position = new Position
-                {
-                    X = (float)Math.Clamp(
-                        questPoint.X, 
-                        Math.Min(this.originPoint.X + (EntitySize * this.Zoom), this.originPoint.X + screenVirtualWidth - (EntitySize * this.Zoom)),
-                        Math.Max(this.originPoint.X + (EntitySize * this.Zoom), this.originPoint.X + screenVirtualWidth - (EntitySize * this.Zoom))),
-                    Y = (float)Math.Clamp(
-                        questPoint.Y,
-                        Math.Min(this.originPoint.Y - screenVirtualHeight + (EntitySize * this.Zoom), this.originPoint.Y - (EntitySize * this.Zoom)),
-                        Math.Max(this.originPoint.Y - screenVirtualHeight + (EntitySize * this.Zoom), this.originPoint.Y - (EntitySize * this.Zoom))),
-                };
+                
 
                 this.FillStar(position, writeableBitmap, Colors.BlueViolet);
             }
@@ -526,6 +514,11 @@ public partial class GuildwarsMinimap : UserControl
 
     private bool EntityOnScreen(Position? position, WriteableBitmap bitmap, out int x, out int y)
     {
+        return this.EntityOnScreen(position, bitmap.PixelWidth, bitmap.PixelHeight, out x, out y);
+    }
+
+    private bool EntityOnScreen(Position? position, int screenWidth, int screenHeight, out int x, out int y)
+    {
         x = 0;
         y = 0;
         if (position.HasValue is false)
@@ -535,8 +528,8 @@ public partial class GuildwarsMinimap : UserControl
 
         x = (int)((position.Value.X - this.originPoint.X) * this.Zoom);
         y = 0 - (int)((position.Value.Y - this.originPoint.Y) * this.Zoom);
-        if (x < 0 || x > bitmap.Width ||
-            y < 0 || y > bitmap.Height)
+        if (x < 0 || x > screenWidth ||
+            y < 0 || y > screenHeight)
         {
             return false;
         }
@@ -573,6 +566,11 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
+        if (this.ContextMenu?.IsOpen is true)
+        {
+            return;
+        }
+
         this.offsetRevert = 0.0001 + (this.offsetRevert * 1.0001);
         this.offsetRevert = Math.Min(99, this.offsetRevert);
         this.originOffset /= 1 + this.offsetRevert;
@@ -605,6 +603,24 @@ public partial class GuildwarsMinimap : UserControl
         return default;
     }
 
+    private Position ForceOnScreenPosition(Position entityPosition)
+    {
+        var screenVirtualWidth = this.ActualWidth / this.Zoom;
+        var screenVirtualHeight = this.ActualHeight / this.Zoom;
+        var finalEntitySize = EntitySize * this.Zoom;
+        return new Position
+        {
+            X = (float)Math.Clamp(
+                entityPosition.X,
+                Math.Min(this.originPoint.X + finalEntitySize, this.originPoint.X + screenVirtualWidth - finalEntitySize),
+                Math.Max(this.originPoint.X + finalEntitySize, this.originPoint.X + screenVirtualWidth - finalEntitySize)),
+            Y = (float)Math.Clamp(
+                entityPosition.Y,
+                Math.Min(this.originPoint.Y - screenVirtualHeight + finalEntitySize, this.originPoint.Y - finalEntitySize),
+                Math.Max(this.originPoint.Y - screenVirtualHeight + finalEntitySize, this.originPoint.Y - finalEntitySize)),
+        };
+    }
+
     private void GuildwarsMinimap_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         this.initialClickPoint = Mouse.GetPosition(this) - this.originOffset;
@@ -620,7 +636,35 @@ public partial class GuildwarsMinimap : UserControl
 
     private void GuildwarsMinimap_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
     {
-        var maybeQuestMetadata = this.CheckMouseOverEntity(this.GameData.MainPlayer?.QuestLog?.OfType<IPositionalEntity>().Where(IsValidPositionalEntity));
+        var maybeOffScreenQuestMetadata = this.CheckMouseOverEntity(
+            this.GameData.MainPlayer?.QuestLog?
+                .Where(q => IsValidPositionalEntity(q))
+                .Where(entity => !this.EntityOnScreen(entity.Position, (int)this.EntitiesDrawingHost.ActualWidth, (int)this.EntitiesDrawingHost.ActualHeight, out _, out _))
+                .Select(oldQuestMetadata =>
+                {
+                    var onScreenPosition = this.ForceOnScreenPosition(oldQuestMetadata.Position!.Value);
+                    return new QuestMetadata
+                    {
+                        From = oldQuestMetadata.From,
+                        To = oldQuestMetadata.To,
+                        Quest = oldQuestMetadata.Quest,
+                        Position = onScreenPosition
+                    };
+                })
+                .OfType<IPositionalEntity>());
+        if (maybeOffScreenQuestMetadata is QuestMetadata offscreenQuestMetadata &&
+            this.TryFindResource("QuestContextMenu") is ContextMenu offscreenQuestContextMenu)
+        {
+            this.ContextMenu = offscreenQuestContextMenu;
+            this.ContextMenu.DataContext = offscreenQuestMetadata;
+            this.ContextMenu.IsOpen = true;
+            return;
+        }
+
+        var maybeQuestMetadata = this.CheckMouseOverEntity(
+            this.GameData.MainPlayer?.QuestLog?
+                .OfType<IPositionalEntity>().Where(IsValidPositionalEntity)
+                .Where(entity => this.EntityOnScreen(entity.Position, (int)this.EntitiesDrawingHost.ActualWidth, (int)this.EntitiesDrawingHost.ActualHeight, out _, out _)));
         if (maybeQuestMetadata is QuestMetadata questMetadata &&
             this.TryFindResource("QuestContextMenu") is ContextMenu questContextMenu)
         {
@@ -704,7 +748,27 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
-        if (this.CheckMouseOverEntity(this.GameData.MainPlayer!.Value.QuestLog!.OfType<IPositionalEntity>()) is not null)
+        if (this.CheckMouseOverEntity(this.GameData.MainPlayer!.Value.QuestLog!
+                .Where(entity => this.EntityOnScreen(entity.Position, (int)this.EntitiesDrawingHost.ActualWidth, (int)this.EntitiesDrawingHost.ActualHeight, out _, out _))
+                .OfType<IPositionalEntity>()) is not null)
+        {
+            return;
+        }
+
+        if (this.CheckMouseOverEntity(this.GameData.MainPlayer!.Value.QuestLog!
+                .Where(entity => !this.EntityOnScreen(entity.Position, (int)this.EntitiesDrawingHost.ActualWidth, (int)this.EntitiesDrawingHost.ActualHeight, out _, out _))
+                .Select(oldQuestMetadata =>
+                {
+                    var onScreenPosition = this.ForceOnScreenPosition(oldQuestMetadata.Position!.Value);
+                    return new QuestMetadata
+                    {
+                        From = oldQuestMetadata.From,
+                        To = oldQuestMetadata.To,
+                        Quest = oldQuestMetadata.Quest,
+                        Position = onScreenPosition
+                    };
+                })
+                .OfType<IPositionalEntity>()) is not null)
         {
             return;
         }
@@ -713,7 +777,14 @@ public partial class GuildwarsMinimap : UserControl
     private void GuildwarsMinimap_MouseWheel(object sender, MouseWheelEventArgs e)
     {
         var delta = e.Delta > 0 ? 0.1 : -0.1;
-        this.Zoom += this.Zoom * delta;
+        var previousZoom = this.Zoom;
+        var newZoom = this.Zoom + this.Zoom * delta;
+        this.originOffset *= newZoom / previousZoom;
+        this.initialClickPoint = new Point(
+            this.initialClickPoint.X * newZoom / previousZoom,
+            this.initialClickPoint.Y * newZoom / previousZoom);
+
+        this.Zoom = newZoom;
     }
 
     private void GuildwarsMinimap_Loaded(object sender, RoutedEventArgs e)
