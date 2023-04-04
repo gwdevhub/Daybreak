@@ -14,23 +14,18 @@ using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
-using System.Drawing.Printing;
 using System.Extensions;
-using System.Globalization;
 using System.Linq;
 using System.Logging;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media.Media3D;
 
 namespace Daybreak.Services.Scanner;
 
 public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
 {
-    // How lenient is the algorithm in finding adjacent vertices in the pathing map. Higher means more lenient/more adjacent vertices.
-    private const double MapAdjacencyLeniency = 1;
     private const int MaxTrapezoidCount = 1000000;
     private const int RetryInitializationCount = 15;
     private const string LatencyMeterName = "Memory Reader Latency";
