@@ -10,7 +10,7 @@ public readonly struct PathingMap
     public readonly uint ZPlane;
 
     [FieldOffset(0x0018)]
-    public readonly int TrapezoidArray;
+    public readonly uint TrapezoidArray;
 
     [FieldOffset(0x001C)]
     public readonly uint TrapezoidCount;

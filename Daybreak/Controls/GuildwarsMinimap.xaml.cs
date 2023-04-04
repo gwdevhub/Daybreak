@@ -13,8 +13,13 @@ using System.Core.Extensions;
 using System.Windows.Input;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
+using Daybreak.Services.Pathfinding;
+using Daybreak.Services.Pathfinding.Models;
 using System.Windows.Threading;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Configuration;
+using Daybreak.Configuration;
 
 namespace Daybreak.Controls;
 
@@ -27,15 +32,19 @@ public partial class GuildwarsMinimap : UserControl
     private const int MapDownscaleFactor = 10;
     private const int EntitySize = 100;
     private const float PositionRadius = 150;
+    // Minimum amount of milliseconds to pass between calculating paths to objectives
+    private const int MinPathCalculationFrequency = 1000;
 
     private static readonly Lazy<(Point[] OuterPoints, Point[] InnerPoints)> StarCoordinates = new(GetStarGlyphPoints);
 
     private readonly DispatcherTimer dispatcherTimer = new(DispatcherPriority.ApplicationIdle);
     private readonly List<Position> mainPlayerPositionHistory = new();
+    private readonly IPathfinder pathfinder;
     private readonly IGuildwarsEntityDebouncer guildwarsEntityDebouncer;
     private readonly Color positionHistoryColor = Color.FromArgb(155, Colors.Red.R, Colors.Red.G, Colors.Red.B);
     private readonly TimeSpan offsetRevertDelay = TimeSpan.FromSeconds(3);
 
+    private bool calculatingPathToObjectives = false;
     private bool resizeEntities;
     private bool dragging;
     private double mapVirtualMinWidth;
@@ -45,9 +54,10 @@ public partial class GuildwarsMinimap : UserControl
     private DateTime offsetRevertTime = DateTime.Now;
     private double offsetRevert = 0;
     private Point originPoint = new(0, 0);
-    private System.Windows.Vector originOffset = new(0, 0);
+    private Vector originOffset = new(0, 0);
     private Point initialClickPoint = new(0, 0);
     private DebounceResponse? cachedDebounceResponse;
+    private PathfindingCache? pathfindingCache;
     
     [GenerateDependencyProperty]
     private PathingData pathingData = new();
@@ -64,14 +74,19 @@ public partial class GuildwarsMinimap : UserControl
     public event EventHandler<QuestMetadata>? QuestMetadataClicked;
 
     public GuildwarsMinimap()
-        :this(Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IGuildwarsEntityDebouncer>())
+        :this(
+             Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IPathfinder>(),
+             Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IGuildwarsEntityDebouncer>())
     {
     }
 
     public GuildwarsMinimap(
+        IPathfinder pathfinder,
         IGuildwarsEntityDebouncer guildwarsEntityDebouncer)
     {
+        this.pathfinder = pathfinder.ThrowIfNull();
         this.guildwarsEntityDebouncer = guildwarsEntityDebouncer.ThrowIfNull();
+
         this.dispatcherTimer.Tick += (_, _) => this.ApplyOffsetRevert();
         this.dispatcherTimer.Interval = TimeSpan.FromMilliseconds(16);
         this.InitializeComponent();
@@ -127,6 +142,7 @@ public partial class GuildwarsMinimap : UserControl
             position.Y + (screenVirtualHeight / 2) + (this.originOffset.Y / this.Zoom));
 
         var adjustedPosition = new Point((int)((position.X - this.mapVirtualMinWidth) * this.Zoom), (int)(this.mapHeight - position.Y + this.mapVirtualMinHeight) * this.Zoom);
+        
         this.MapDrawingHost.Margin = new Thickness(
             -adjustedPosition.X + (this.ActualWidth / 2) + this.originOffset.X,
             -adjustedPosition.Y + (this.ActualHeight / 2) + this.originOffset.Y,
@@ -134,9 +150,9 @@ public partial class GuildwarsMinimap : UserControl
             0);
         this.MapDrawingHost.Height = this.mapHeight * this.Zoom;
         this.MapDrawingHost.Width = this.mapWidth * this.Zoom;
+        this.cachedDebounceResponse = debounceResponse;
         this.ManageMainPlayerPositionHistory();
         this.DrawEntities(debounceResponse);
-        this.cachedDebounceResponse = debounceResponse;
     }
 
     private void ManageMainPlayerPositionHistory()
@@ -220,18 +236,71 @@ public partial class GuildwarsMinimap : UserControl
 
         using var bitmapContext = bitmap.GetBitmapContext();
         bitmap.Clear(Colors.Transparent);
-        foreach (var trapezoid in this.PathingData.Trapezoids!)
+
+        foreach (var trapezoid in this.PathingData.Trapezoids)
         {
             var a = new Point((int)((trapezoid.XTL - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YT + minHeight) / MapDownscaleFactor));
             var b = new Point((int)((trapezoid.XTR - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YT + minHeight) / MapDownscaleFactor));
             var c = new Point((int)((trapezoid.XBR - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YB + minHeight) / MapDownscaleFactor));
             var d = new Point((int)((trapezoid.XBL - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YB + minHeight) / MapDownscaleFactor));
-            var e = new Point((int)((trapezoid.XTL - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YT + minHeight) / MapDownscaleFactor));
 
-            bitmap.FillPolygon(new int[] { (int)a.X, (int)a.Y, (int)b.X, (int)b.Y, (int)c.X, (int)c.Y, (int)d.X, (int)d.Y, (int)e.X, (int)e.Y, (int)a.X, (int)a.Y }, Colors.White);
+            bitmap.FillPolygon(new int[] { (int)a.X, (int)a.Y, (int)b.X, (int)b.Y, (int)c.X, (int)c.Y, (int)d.X, (int)d.Y, (int)a.X, (int)a.Y }, Colors.White);
         }
     }
     
+    private void DrawPaths(WriteableBitmap bitmap, PathfindingCache? pathfindingCache)
+    {
+        if (pathfindingCache is null)
+        {
+            return;
+        }
+
+        if (this.mapWidth <= 0 ||
+            this.mapHeight <= 0 ||
+            !double.IsFinite(this.mapWidth) ||
+            !double.IsFinite(this.mapHeight))
+        {
+            return;
+        }
+
+        if (pathfindingCache.PathfindingResponses.Count <= 0)
+        {
+            return;
+        }
+
+        for(var i = 0; i < this.pathfindingCache?.PathfindingResponses.Count; i++)
+        {
+            var response = this.pathfindingCache.PathfindingResponses[i];
+            var color = this.pathfindingCache.Colors[i];
+            var currentPosVector = new Vector(double.NaN, double.NaN);
+            foreach (var segment in response.Pathing!)
+            {
+                var startPosition = new Position { X = (float)segment.StartPoint.X, Y = (float)segment.StartPoint.Y };
+                var endPosition = new Position { X = (float)segment.EndPoint.X, Y = (float)segment.EndPoint.Y };
+                if (double.IsNaN(currentPosVector.X) || double.IsNaN(currentPosVector.Y))
+                {
+                    currentPosVector = new Vector(startPosition.X, startPosition.Y);
+                }
+                var endVector = new Vector(endPosition.X, endPosition.Y);
+                var direction = endVector - currentPosVector;
+                direction.Normalize();
+                var increment = direction * (PositionRadius + PositionRadius);
+
+                while (currentPosVector.X != endPosition.X && currentPosVector.Y != endPosition.Y)
+                {
+                    var remaining = endVector - currentPosVector;
+                    if (remaining.LengthSquared < increment.LengthSquared)
+                    {
+                        break;
+                    }
+
+                    currentPosVector += increment;
+                    this.FillEllipse(new Position { X = (float)currentPosVector.X, Y = (float)currentPosVector.Y }, bitmap, color);
+                }
+            }
+        }
+    }
+
     private void DrawEntities(DebounceResponse debounceResponse)
     {
         if (this.EntitiesDrawingHost.Source is not WriteableBitmap bitmap || this.resizeEntities)
@@ -241,10 +310,13 @@ public partial class GuildwarsMinimap : UserControl
             this.resizeEntities = false;
         }
 
+        this.CalculatePathsToObjectives();
+
         bitmap.Clear(Colors.Transparent);
         using var context = bitmap.GetBitmapContext();
 
         this.DrawMainPlayerPositionHistory(bitmap);
+        this.DrawPaths(bitmap, this.pathfindingCache);
 
         this.FillEllipse(debounceResponse.MainPlayer.Position, bitmap, Colors.Green);
 
@@ -303,8 +375,12 @@ public partial class GuildwarsMinimap : UserControl
 
     private void DrawQuestObjectives(WriteableBitmap writeableBitmap)
     {
-        var currentMapQuests = this.GameData.MainPlayer!.Value.QuestLog!
-            .Where(v => v.Position.GetValueOrDefault().X != 0 && v.Position.GetValueOrDefault().Y != 0);
+        if (this.PathingData.Trapezoids is null)
+        {
+            return;
+        }
+
+        var currentMapQuests = this.GameData.MainPlayer!.Value.QuestLog!.Where(QuestVisible);
         foreach (var questMetaData in currentMapQuests)
         {
             var position = this.ForceOnScreenPosition(questMetaData.Position!.Value);
@@ -313,11 +389,11 @@ public partial class GuildwarsMinimap : UserControl
                 var questPoint = new Point(questMetaData.Position!.Value.X, questMetaData.Position.Value.Y);
                 
 
-                this.FillStar(position, writeableBitmap, Colors.BlueViolet);
+                this.FillStar(position, writeableBitmap, GetQuestColor(questMetaData));
             }
             else
             {
-                this.FillStar(questMetaData.Position, writeableBitmap, Colors.BlueViolet);
+                this.FillStar(questMetaData.Position, writeableBitmap, GetQuestColor(questMetaData));
             }
         }
     }
@@ -475,6 +551,60 @@ public partial class GuildwarsMinimap : UserControl
         this.offsetRevert = Math.Min(99, this.offsetRevert);
         this.originOffset /= 1 + this.offsetRevert;
         this.UpdateGameData();
+    }
+
+    private async void CalculatePathsToObjectives()
+    {
+        if (this.calculatingPathToObjectives)
+        {
+            return;
+        }
+
+        this.calculatingPathToObjectives = true;
+        var currentMapQuests = this.GameData.MainPlayer?.QuestLog?.Where(QuestVisible).ToList();
+        if (currentMapQuests is null)
+        {
+            this.calculatingPathToObjectives = false;
+            return;
+        }
+
+        var pathfindingTasks = currentMapQuests
+            .Select(questMetaData =>
+            {
+                return this.pathfinder.CalculatePath(
+                    this.PathingData,
+                    new Point
+                    {
+                        X = this.cachedDebounceResponse?.MainPlayer.Position?.X ?? 0,
+                        Y = this.cachedDebounceResponse?.MainPlayer.Position?.Y ?? 0,
+                    },
+                    new Point
+                    {
+                        X = questMetaData.Position!.Value.X,
+                        Y = questMetaData.Position!.Value.Y
+                    },
+                    CancellationToken.None);
+            })
+            .ToList();
+
+        await Task.WhenAll(pathfindingTasks.Append(Task.Delay(MinPathCalculationFrequency)));
+        var paths = new List<PathfindingResponse>();
+        var colors = new List<Color>();
+        for(var i = 0; i < currentMapQuests.Count; i++)
+        {
+            var quest = currentMapQuests[i];
+            var result = await pathfindingTasks[i];
+            if (result.TryExtractSuccess(out var pathfindingResponse))
+            {
+                paths.Add(pathfindingResponse);
+                var questColor = GetQuestColor(quest);
+                var pathColor = Color.FromArgb(100, questColor.R, questColor.G, questColor.B);
+                colors.Add(pathColor);
+            }
+        }
+
+        this.pathfindingCache = new PathfindingCache { PathfindingResponses = paths, Colors = colors };
+        this.calculatingPathToObjectives = false;
     }
 
     private IPositionalEntity? CheckMouseOverEntity(IEnumerable<IPositionalEntity>? maybeEntities)
@@ -759,5 +889,15 @@ public partial class GuildwarsMinimap : UserControl
         };
 
         return (outerPoints, innerPoints);
+    }
+
+    private static bool QuestVisible(QuestMetadata questMetadata)
+    {
+        return questMetadata.Position.GetValueOrDefault().X != 0 && questMetadata.Position.GetValueOrDefault().Y != 0;
+    }
+
+    private static Color GetQuestColor(QuestMetadata questMetadata)
+    {
+        return QuestObjectiveColors.Colors[questMetadata.Quest?.Id % QuestObjectiveColors.Colors.Count ?? 0];
     }
 }

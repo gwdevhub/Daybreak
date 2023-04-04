@@ -34,6 +34,8 @@ public partial class ExperimentalSettingsView : UserControl
     public bool focusViewEnabled;
     [GenerateDependencyProperty]
     private double memoryReaderFrequency;
+    [GenerateDependencyProperty]
+    private bool pathfindingEnabled;
 
     private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions;
 
@@ -58,6 +60,7 @@ public partial class ExperimentalSettingsView : UserControl
         this.DownloadIcons = config.ExperimentalFeatures.DownloadIcons;
         this.FocusViewEnabled = config.ExperimentalFeatures.FocusViewEnabled;
         this.MemoryReaderFrequency = config.ExperimentalFeatures.MemoryReaderFrequency;
+        this.PathfindingEnabled = config.ExperimentalFeatures.EnablePathfinding;
     }
 
     private void SaveExperimentalSettings()
@@ -70,6 +73,7 @@ public partial class ExperimentalSettingsView : UserControl
         config.ExperimentalFeatures.DownloadIcons = this.DownloadIcons;
         config.ExperimentalFeatures.FocusViewEnabled = this.FocusViewEnabled;
         config.ExperimentalFeatures.MemoryReaderFrequency = this.MemoryReaderFrequency;
+        config.ExperimentalFeatures.EnablePathfinding = this.PathfindingEnabled;
         if (int.TryParse(this.GWToolboxLaunchDelay, out var gwToolboxLaunchDelay))
         {
             config.ExperimentalFeatures.ToolboxAutoLaunchDelay = gwToolboxLaunchDelay;

@@ -25,9 +25,9 @@ public sealed class MemoryScanner : IMemoryScanner
 
     private bool scanning;
 
-    public int ModuleStartAddress { get; private set; }
+    public uint ModuleStartAddress { get; private set; }
     public byte[]? Memory { get; private set; }
-    public int Size { get; private set; }
+    public uint Size { get; private set; }
     public bool Scanning
     {
         get
@@ -102,7 +102,7 @@ public sealed class MemoryScanner : IMemoryScanner
         Monitor.Exit(LockObject);
     }
 
-    public T Read<T>(int address)
+    public T Read<T>(uint address)
     {
         this.ValidateReadScanner();
         var size = Marshal.SizeOf(typeof(T));
@@ -111,7 +111,7 @@ public sealed class MemoryScanner : IMemoryScanner
         NativeMethods.ReadProcessMemory(this.Process!.Handle,
             address,
             buffer,
-            size,
+            (uint)size,
             out _
         );
 
@@ -121,7 +121,7 @@ public sealed class MemoryScanner : IMemoryScanner
         return ret;
     }
 
-    public T[] ReadArray<T>(int address, int size)
+    public T[] ReadArray<T>(uint address, uint size)
     {
         this.ValidateReadScanner();
         if (size > MaximumArraySize)
@@ -130,18 +130,18 @@ public sealed class MemoryScanner : IMemoryScanner
         }
 
         var itemSize = Marshal.SizeOf(typeof(T));
-        var readSize = size * itemSize;
+        var readSize = (int)size * itemSize;
         if (readSize > MaximumReadSize)
         {
             throw new InvalidOperationException($"Expected size to read is too large. Size {readSize}");
         }
 
-        var buffer = Marshal.AllocHGlobal(readSize);
+        var buffer = Marshal.AllocHGlobal((int)readSize);
 
         NativeMethods.ReadProcessMemory(this.Process!.Handle,
             address,
             buffer,
-            size * itemSize,
+            (uint)readSize,
             out _
         );
 
@@ -159,16 +159,16 @@ public sealed class MemoryScanner : IMemoryScanner
 
     public T[] ReadArray<T>(GuildwarsArray guildwarsArray)
     {
-        return this.ReadArray<T>(guildwarsArray.Buffer, (int)guildwarsArray.Size);
+        return this.ReadArray<T>(guildwarsArray.Buffer, guildwarsArray.Size);
     }
 
-    public byte[]? ReadBytes(int address, int size)
+    public byte[]? ReadBytes(uint address, uint size)
     {
         this.ValidateReadScanner();
         return this.ReadBytesNonLocking(address, size);
     }
 
-    public string ReadWString(int address, int maxsize)
+    public string ReadWString(uint address, uint maxsize)
     {
         this.ValidateReadScanner();
         var rawbytes = this.ReadBytes(address, maxsize);
@@ -186,18 +186,18 @@ public sealed class MemoryScanner : IMemoryScanner
         return ret;
     }
 
-    public T ReadPtrChain<T>(int Base, int finalPointerOffset = 0, params int[] offsets)
+    public T ReadPtrChain<T>(uint Base, uint finalPointerOffset = 0, params uint[] offsets)
     {
         this.ValidateReadScanner();
         foreach (var offset in offsets)
         {
-            Base = this.Read<int>(Base + offset);
+            Base = this.Read<uint>(Base + offset);
         }
 
         return this.Read<T>(Base + finalPointerOffset);
     }
 
-    public int ScanForPtr(byte[] pattern, string? mask = default, bool readptr = false)
+    public uint ScanForPtr(byte[] pattern, string? mask = default, bool readptr = false)
     {
         this.ValidateReadScanner();
         if (pattern?.Length == 0)
@@ -205,7 +205,7 @@ public sealed class MemoryScanner : IMemoryScanner
             throw new ArgumentException("Pattern cannot be empty");
         }
 
-        for (var scan = 0; scan < this.Size; ++scan)
+        for (var scan = 0U; scan < this.Size; ++scan)
         {
             if (this.Memory![scan] != pattern![0])
             {
@@ -235,7 +235,7 @@ public sealed class MemoryScanner : IMemoryScanner
             {
                 if (readptr)
                 {
-                    return (int)BitConverter.ToUInt32(this.Memory, scan);
+                    return BitConverter.ToUInt32(this.Memory, (int)scan);
                 }
 
                 return this.ModuleStartAddress + scan;
@@ -245,7 +245,7 @@ public sealed class MemoryScanner : IMemoryScanner
         return 0;
     }
 
-    public int ScanForAssertion(string? assertionFile, string? assertionMessage)
+    public uint ScanForAssertion(string? assertionFile, string? assertionMessage)
     {
         this.ValidateReadScanner();
         var mask = new StringBuilder(64);
@@ -299,14 +299,14 @@ public sealed class MemoryScanner : IMemoryScanner
         return this.ScanForPtr(assertionBytes, assertionMask, false);
     }
 
-    private byte[]? ReadBytesNonLocking(int address, int size)
+    private byte[]? ReadBytesNonLocking(uint address, uint size)
     {
         if (size > MaximumReadSize)
         {
             throw new InvalidOperationException($"Expected size to read is too large. Size {size}");
         }
 
-        var buffer = Marshal.AllocHGlobal(size);
+        var buffer = Marshal.AllocHGlobal((int)size);
 
         NativeMethods.ReadProcessMemory(this.Process!.Handle,
             address,
@@ -316,7 +316,7 @@ public sealed class MemoryScanner : IMemoryScanner
         );
 
         var ret = new byte[size];
-        Marshal.Copy(buffer, ret, 0, size);
+        Marshal.Copy(buffer, ret, 0, (int)size);
         Marshal.FreeHGlobal(buffer);
 
         return ret;
@@ -330,7 +330,7 @@ public sealed class MemoryScanner : IMemoryScanner
         }
     }
 
-    private (int StartAddress, int Size) GetModuleInfo(Process process)
+    private (uint StartAddress, uint Size) GetModuleInfo(Process process)
     {
         try
         {
@@ -341,7 +341,7 @@ public sealed class MemoryScanner : IMemoryScanner
                 if (module.ModuleName != null &&
                     module.ModuleName.StartsWith(name, StringComparison.OrdinalIgnoreCase))
                 {
-                    return (module.BaseAddress.ToInt32(), module.ModuleMemorySize);
+                    return ((uint)module.BaseAddress.ToInt32(), (uint)module.ModuleMemorySize);
                 }
             }
         }

@@ -2,7 +2,9 @@
 
 public readonly struct Trapezoid
 {
-    public uint Id { get; init; }
+    public int Id { get; init; }
+
+    public int PathingMapId { get; init; }
 
     public float XTL { get; init; }
 

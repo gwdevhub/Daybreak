@@ -1,12 +1,11 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace Daybreak.Models.Interop;
 
 [StructLayout(LayoutKind.Explicit)]
 public readonly struct GameContext
 {
-    public const int BaseOffset = 0x007C;
+    public const uint BaseOffset = 0x007C;
 
     [FieldOffset(0x0000)]
     ///Array of type <see cref="MapEntityContext"/>.

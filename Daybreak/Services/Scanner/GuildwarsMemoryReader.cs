@@ -6,6 +6,7 @@ using Daybreak.Models.Interop;
 using Daybreak.Models.Metrics;
 using Daybreak.Services.ApplicationLauncher;
 using Daybreak.Services.Metrics;
+using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,9 @@ using System.Extensions;
 using System.Linq;
 using System.Logging;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Daybreak.Services.Scanner;
 
@@ -35,9 +38,9 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
     private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
     private readonly ILogger<GuildwarsMemoryReader> logger;
 
-    private int playerIdPointer;
-    private int entityArrayPointer;
-    private int titleDataPointer;
+    private uint playerIdPointer;
+    private uint entityArrayPointer;
+    private uint titleDataPointer;
 
     public GuildwarsMemoryReader(
         IApplicationLauncher applicationLauncher,
@@ -53,7 +56,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         this.logger = logger.ThrowIfNull();
     }
     
-    public async Task EnsureInitialized()
+    public async Task EnsureInitialized(CancellationToken cancellationToken)
     {
         var scoppedLogger = this.logger.CreateScopedLogger(nameof(this.EnsureInitialized), default);
         var currentGuildwarsProcess = this.applicationLauncher.RunningGuildwarsProcess;
@@ -65,6 +68,11 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
 
         try
         {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                throw new TaskCanceledException();
+            }
+
             await this.InitializeSafe(currentGuildwarsProcess, scoppedLogger);
         }
         catch(Exception e)
@@ -80,34 +88,34 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         this.memoryScanner?.EndScanner();
     }
 
-    public Task<GameData?> ReadGameData()
+    public Task<GameData?> ReadGameData(CancellationToken cancellationToken)
     {
         if (this.memoryScanner.Scanning is false)
         {
             return Task.FromResult<GameData?>(default);
         }
 
-        return Task.Run(() => this.SafeReadGameMemory(this.ReadGameDataInternal));
+        return Task.Run(() => this.SafeReadGameMemory(this.ReadGameDataInternal), cancellationToken);
     }
 
-    public Task<PathingData?> ReadPathingData()
+    public Task<PathingData?> ReadPathingData(CancellationToken cancellationToken)
     {
         if (this.memoryScanner.Scanning is false)
         {
             return Task.FromResult<PathingData?>(default);
         }
 
-        return Task.Run(() => this.SafeReadGameMemory(this.ReadPathingDataInternal));
+        return Task.Run(() => this.SafeReadGameMemory(this.ReadPathingDataInternal), cancellationToken);
     }
 
-    public Task<PathingMetadata?> ReadPathingMetaData()
+    public Task<PathingMetadata?> ReadPathingMetaData(CancellationToken cancellationToken)
     {
         if (this.memoryScanner.Scanning is false)
         {
             return Task.FromResult<PathingMetadata?>(default);
         }
 
-        return Task.Run(() => this.SafeReadGameMemory(this.ReadPathingMetaDataInternal));
+        return Task.Run(() => this.SafeReadGameMemory(this.ReadPathingMetaDataInternal), cancellationToken);
     }
 
     private async Task InitializeSafe(Process process, ScopedLogger<GuildwarsMemoryReader> scopedLogger)
@@ -226,7 +234,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
             return new GameData { Valid = false };
         }
 
-        var entityPointers = this.memoryScanner.ReadArray<int>(entityPointersArray);
+        var entityPointers = this.memoryScanner.ReadArray<uint>(entityPointersArray);
         var entities = entityPointers.Select(ptr => this.memoryScanner.Read<EntityContext>(ptr + EntityContext.EntityContextBaseOffset)).ToArray();
 
         return this.AggregateGameData(
@@ -264,14 +272,21 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         }
 
         var trapezoidList = new List<Trapezoid>();
-        foreach(var pathingMap in pathingMaps)
+        var adjacencyList = new List<List<int>>();
+        var ogPathingMapList = new List<List<int>>();
+        for (var pathingMapIndex = 0; pathingMapIndex < pathingMaps.Length; pathingMapIndex++)
         {
-            var pathingTrapezoids = this.memoryScanner.ReadArray<PathingTrapezoid>(pathingMap.TrapezoidArray, (int)pathingMap.TrapezoidCount);
+            var pathingMap = pathingMaps[pathingMapIndex];
+            var pathingMapList = new List<int>();
+            ogPathingMapList.Add(pathingMapList);
+            var pathingTrapezoids = this.memoryScanner.ReadArray<PathingTrapezoid>(pathingMap.TrapezoidArray, pathingMap.TrapezoidCount);
             foreach(var trapezoid in pathingTrapezoids)
             {
+                pathingMapList.Add((int)trapezoid.Id);
                 trapezoidList.Add(new Trapezoid
                 {
-                    Id = trapezoid.Id,
+                    Id = (int)trapezoid.Id,
+                    PathingMapId = pathingMapIndex,
                     XTL = trapezoid.XTL,
                     XTR = trapezoid.XTR,
                     YT = trapezoid.YT,
@@ -279,10 +294,40 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
                     XBR = trapezoid.XBR,
                     YB = trapezoid.YB,
                 });
+
+                var trapezoidAdjacencyList = new List<int>();
+                adjacencyList.Add(trapezoidAdjacencyList);
+                foreach(var adjacentAddress in new uint[]
+                    {
+                        trapezoid.AdjacentPathingTrapezoid1,
+                        trapezoid.AdjacentPathingTrapezoid2,
+                        trapezoid.AdjacentPathingTrapezoid3,
+                        trapezoid.AdjacentPathingTrapezoid4
+                    })
+                {
+                    if (adjacentAddress == 0)
+                    {
+                        continue;
+                    }
+
+                    var adjacentTrapezoid = this.memoryScanner.Read<PathingTrapezoid>(adjacentAddress);
+                    trapezoidAdjacencyList.Add((int)adjacentTrapezoid.Id);
+                }
+                
             }
         }
 
-        return new PathingData { Trapezoids = trapezoidList };
+        var computedPathingMaps = BuildPathingMaps(trapezoidList, adjacencyList);
+        var computedAdjacencyList = BuildFinalAdjacencyList(trapezoidList, computedPathingMaps, adjacencyList);
+
+        return new PathingData
+        {
+            Trapezoids = trapezoidList,
+            OriginalAdjacencyList = adjacencyList,
+            ComputedPathingMaps = computedPathingMaps,
+            OriginalPathingMaps = ogPathingMapList,
+            ComputedAdjacencyList = computedAdjacencyList
+        };
     }
 
     private PathingMetadata? ReadPathingMetaDataInternal()
@@ -296,7 +341,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         return new PathingMetadata { TrapezoidCount = (int)pathingMaps.Select(p => p.TrapezoidCount).Sum(count => count) };
     }
 
-    private int GetPlayerIdPointer()
+    private uint GetPlayerIdPointer()
     {
         if (this.playerIdPointer == 0)
         {
@@ -306,7 +351,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         return this.playerIdPointer;
     }
 
-    private int GetEntityArrayPointer()
+    private uint GetEntityArrayPointer()
     {
         if (this.entityArrayPointer == 0)
         {
@@ -316,7 +361,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         return this.entityArrayPointer;
     }
 
-    private int GetTitleDataPointer()
+    private uint GetTitleDataPointer()
     {
         if (this.titleDataPointer == 0)
         {
@@ -734,6 +779,113 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         }
 
         return str;
+    }
+
+    private static List<List<int>> BuildPathingMaps(List<Trapezoid> trapezoids, List<List<int>> adjacencyArray)
+    {
+        var visited = new bool[trapezoids.Count];
+        var pathingMaps = new List<List<int>>();
+        foreach (var trapezoid in trapezoids)
+        {
+            if (visited[trapezoid.Id] is false)
+            {
+                var currentPathingMap = new List<int>();
+                pathingMaps.Add(currentPathingMap);
+                var queue = new Queue<int>();
+                queue.Enqueue(trapezoid.Id);
+                while (queue.TryDequeue(out var currentId))
+                {
+                    if (visited[currentId] is true)
+                    {
+                        continue;
+                    }
+
+                    visited[currentId] = true;
+                    currentPathingMap.Add(currentId);
+                    foreach (var adjacentId in adjacencyArray[currentId])
+                    {
+                        queue.Enqueue(adjacentId);
+                    }
+                }
+            }
+        }
+
+        return pathingMaps;
+    }
+
+    private static List<List<int>> BuildFinalAdjacencyList(List<Trapezoid> trapezoids, List<List<int>> computedPathingMaps, List<List<int>> originalAdjacencyList)
+    {
+        var adjacencyList = new List<List<int>>();
+        for(var i = 0; i < trapezoids.Count; i++)
+        {
+            adjacencyList.Add(originalAdjacencyList[i].ToList());
+        }
+
+        for(var i = 0; i < computedPathingMaps.Count; i++)
+        {
+            var currentPathingMap = computedPathingMaps[i];
+            Parallel.For(i + 1, computedPathingMaps.Count - 1, j =>
+            {
+                var otherPathingMap = computedPathingMaps[j];
+                foreach (var currentTrapezoidId in currentPathingMap)
+                {
+                    var currentPoints = MathUtils.GetTrapezoidPoints(trapezoids[currentTrapezoidId]);
+                    foreach (var otherTrapezoidId in otherPathingMap)
+                    {
+                        var otherPoints = MathUtils.GetTrapezoidPoints(trapezoids[otherTrapezoidId]);
+                        if (TrapezoidsAdjacent(currentPoints, otherPoints))
+                        {
+                            adjacencyList[currentTrapezoidId].Add(otherTrapezoidId);
+                            adjacencyList[otherTrapezoidId].Add(currentTrapezoidId);
+                        }
+                    }
+                }
+            });
+        }
+
+        return adjacencyList;
+    }
+
+    private static bool TrapezoidsAdjacent(Point[] currentPoints, Point[] otherPoints)
+    {
+        var curBoundingRectangle = GetBoundingRectangle(currentPoints);
+        var otherBoundingRectangle = GetBoundingRectangle(otherPoints);
+        if (!curBoundingRectangle.IntersectsWith(otherBoundingRectangle))
+        {
+            return false;
+        }
+
+        for (var x = 0; x < currentPoints.Length; x++)
+        {
+            for (var y = 0; y < otherPoints.Length; y++)
+            {
+                if (MathUtils.LineSegmentsIntersect(currentPoints[x], currentPoints[(x + 1) % currentPoints.Length],
+                    otherPoints[y], otherPoints[(y + 1) % otherPoints.Length], out _, epsilon: 0.1))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static Rect GetBoundingRectangle(Point[] points)
+    {
+        var minX = double.MaxValue;
+        var maxX = double.MinValue;
+        var minY = double.MaxValue;
+        var maxY = double.MinValue;
+        for (var i = 0; i < points.Length; i++)
+        {
+            var curPoint = points[i];
+            if (curPoint.X < minX) minX = curPoint.X;
+            if (curPoint.X > maxX) maxX = curPoint.X;
+            if (curPoint.Y < minY) minY = curPoint.Y;
+            if (curPoint.Y > maxY) maxY = curPoint.Y;
+        }
+
+        return new Rect(minX, minY, maxX - minX, maxY - minY);
     }
 
     private static unsafe string ParseAndCleanWCharPointer(byte* bytes, int byteCount)

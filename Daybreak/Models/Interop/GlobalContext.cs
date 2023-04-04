@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace Daybreak.Models.Interop;
 
@@ -7,14 +6,14 @@ namespace Daybreak.Models.Interop;
 public readonly struct GlobalContext
 {
     [FieldOffset(0x0008)]
-    public readonly int InstanceContext;
+    public readonly uint InstanceContext;
 
     [FieldOffset(0x0014)]
-    public readonly int MapContext;
+    public readonly uint MapContext;
 
     [FieldOffset(0x002C)]
-    public readonly int GameContext;
+    public readonly uint GameContext;
 
     [FieldOffset(0x0044)]
-    public readonly int UserContext;
+    public readonly uint UserContext;
 }

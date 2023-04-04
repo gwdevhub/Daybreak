@@ -38,6 +38,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using Daybreak.Services.Downloads;
 using Daybreak.Services.ExceptionHandling;
+using Daybreak.Services.Pathfinding;
 
 namespace Daybreak.Configuration;
 
@@ -141,6 +142,7 @@ public static class ProjectConfiguration
         services.AddScoped<IDownloadService, DownloadService>();
         services.AddScoped<IGuildwarsEntityDebouncer, GuildwarsEntityDebouncer>();
         services.AddScoped<IExceptionHandler, ExceptionHandler>();
+        services.AddScoped<IPathfinder, StupidPathfinder>();
     }
 
     public static void RegisterViews(IViewProducer viewProducer)

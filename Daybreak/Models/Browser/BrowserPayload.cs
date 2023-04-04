@@ -12,12 +12,12 @@ public class BrowserPayload
         ContextMenu
     }
 
-    [JsonProperty("Key")]
+    [JsonProperty(nameof(Key))]
     public PayloadKeys Key { get; set; }
 }
 
 public sealed class BrowserPayload<T> : BrowserPayload
 {
-    [JsonProperty("Value")]
+    [JsonProperty(nameof(Value))]
     public T? Value { get; set; }
 }

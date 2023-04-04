@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace Daybreak.Models.Interop;
 
@@ -19,7 +18,7 @@ public readonly struct PlayerContext
     public readonly uint SecondaryProfession;
 
     [FieldOffset(0x0028)]
-    public readonly int NamePointer;
+    public readonly uint NamePointer;
 
     [FieldOffset(0x002C)]
     public readonly uint PartyLeaderPlayerNumber;
