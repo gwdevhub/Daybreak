@@ -5,7 +5,7 @@ namespace Daybreak.Models.Interop;
 [StructLayout(LayoutKind.Explicit)]
 public readonly struct EntityContext
 {
-    public const int EntityContextBaseOffset = 0x0014;
+    public const uint EntityContextBaseOffset = 0x0014;
 
     [FieldOffset(0x0000)]
     public readonly uint Timer;

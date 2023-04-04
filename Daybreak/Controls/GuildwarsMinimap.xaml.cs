@@ -234,14 +234,37 @@ public partial class GuildwarsMinimap : UserControl
         using var bitmapContext = bitmap.GetBitmapContext();
         bitmap.Clear(Colors.Transparent);
 
+        var colors = new Color[this.PathingData.Trapezoids.Count];
         foreach (var trapezoid in this.PathingData.Trapezoids!)
         {
+            var color = Color.FromArgb(255, (byte)(2.55 * Random.Shared.Next(0, 100)), (byte)(2.55 * Random.Shared.Next(0, 100)), (byte)(2.55 * Random.Shared.Next(0, 100)));
+
+            if (colors[trapezoid.Id] == default)
+            {
+                var queue = new Queue<int>();
+                queue.Enqueue(trapezoid.Id);
+                while(queue.TryDequeue(out var currentId))
+                {
+                    if (colors[currentId] != default)
+                    {
+                        continue;
+                    }
+
+                    colors[currentId] = color;
+                    foreach(var adjacentId in this.PathingData.AdjacencyArray[currentId])
+                    {
+                        queue.Enqueue(adjacentId);
+                    }
+                }
+            }
+
+            color = colors[trapezoid.Id];
             var a = new Point((int)((trapezoid.XTL - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YT + minHeight) / MapDownscaleFactor));
             var b = new Point((int)((trapezoid.XTR - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YT + minHeight) / MapDownscaleFactor));
             var c = new Point((int)((trapezoid.XBR - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YB + minHeight) / MapDownscaleFactor));
             var d = new Point((int)((trapezoid.XBL - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YB + minHeight) / MapDownscaleFactor));
 
-            bitmap.FillPolygon(new int[] { (int)a.X, (int)a.Y, (int)b.X, (int)b.Y, (int)c.X, (int)c.Y, (int)d.X, (int)d.Y, (int)a.X, (int)a.Y }, Colors.White);
+            bitmap.FillPolygon(new int[] { (int)a.X, (int)a.Y, (int)b.X, (int)b.Y, (int)c.X, (int)c.Y, (int)d.X, (int)d.Y, (int)a.X, (int)a.Y }, color);
         }
     }
     
@@ -379,36 +402,36 @@ public partial class GuildwarsMinimap : UserControl
             }
         }
 
-        var pathingResponses = currentMapQuests
-            .Select(questMetaData =>
-            {
-                return this.pathfinder.CalculatePath(
-                    this.PathingData,
-                    new Point
-                    {
-                        X = debounceResponse.MainPlayer.Position!.Value.X,
-                        Y = debounceResponse.MainPlayer.Position!.Value.Y,
-                    },
-                    new Point
-                    {
-                        X = questMetaData.Position!.Value.X,
-                        Y = questMetaData.Position!.Value.Y
-                    });
-            })
-            .Select(result =>
-            {
-                if (result.TryExtractSuccess(out var response))
-                {
-                    return response;
-                }
+        //var pathingResponses = currentMapQuests
+        //    .Select(questMetaData =>
+        //    {
+        //        return this.pathfinder.CalculatePath(
+        //            this.PathingData,
+        //            new Point
+        //            {
+        //                X = debounceResponse.MainPlayer.Position!.Value.X,
+        //                Y = debounceResponse.MainPlayer.Position!.Value.Y,
+        //            },
+        //            new Point
+        //            {
+        //                X = questMetaData.Position!.Value.X,
+        //                Y = questMetaData.Position!.Value.Y
+        //            });
+        //    })
+        //    .Select(result =>
+        //    {
+        //        if (result.TryExtractSuccess(out var response))
+        //        {
+        //            return response;
+        //        }
 
-                return default;
-            })
-            .OfType<PathfindingResponse>()
-            .Select(response => (response, Colors.DarkOrange))
-            .ToArray();
+        //        return default;
+        //    })
+        //    .OfType<PathfindingResponse>()
+        //    .Select(response => (response, Colors.DarkOrange))
+        //    .ToArray();
 
-        this.DrawPath(writeableBitmap, pathingResponses);
+        //this.DrawPath(writeableBitmap, pathingResponses);
     }
 
     private void DrawMainPlayerPositionHistory(WriteableBitmap writeableBitmap)

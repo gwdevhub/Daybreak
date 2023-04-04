@@ -41,9 +41,9 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
     private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
     private readonly ILogger<GuildwarsMemoryReader> logger;
 
-    private int playerIdPointer;
-    private int entityArrayPointer;
-    private int titleDataPointer;
+    private uint playerIdPointer;
+    private uint entityArrayPointer;
+    private uint titleDataPointer;
 
     public GuildwarsMemoryReader(
         IApplicationLauncher applicationLauncher,
@@ -237,7 +237,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
             return new GameData { Valid = false };
         }
 
-        var entityPointers = this.memoryScanner.ReadArray<int>(entityPointersArray);
+        var entityPointers = this.memoryScanner.ReadArray<uint>(entityPointersArray);
         var entities = entityPointers.Select(ptr => this.memoryScanner.Read<EntityContext>(ptr + EntityContext.EntityContextBaseOffset)).ToArray();
 
         return this.AggregateGameData(
@@ -275,9 +275,10 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         }
 
         var trapezoidList = new List<Trapezoid>();
-        foreach(var pathingMap in pathingMaps)
+        var adjacencyList = new List<List<int>>();
+        foreach (var pathingMap in pathingMaps)
         {
-            var pathingTrapezoids = this.memoryScanner.ReadArray<PathingTrapezoid>(pathingMap.TrapezoidArray, (int)pathingMap.TrapezoidCount);
+            var pathingTrapezoids = this.memoryScanner.ReadArray<PathingTrapezoid>(pathingMap.TrapezoidArray, pathingMap.TrapezoidCount);
             foreach(var trapezoid in pathingTrapezoids)
             {
                 trapezoidList.Add(new Trapezoid
@@ -290,24 +291,28 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
                     XBR = trapezoid.XBR,
                     YB = trapezoid.YB,
                 });
+
+                var trapezoidAdjacencyList = new List<int>();
+                adjacencyList.Add(trapezoidAdjacencyList);
+                foreach(var adjacentAddress in new uint[]
+                    {
+                        trapezoid.AdjacentPathingTrapezoid1,
+                        trapezoid.AdjacentPathingTrapezoid2,
+                        trapezoid.AdjacentPathingTrapezoid3,
+                        trapezoid.AdjacentPathingTrapezoid4
+                    })
+                {
+                    if (adjacentAddress == 0)
+                    {
+                        continue;
+                    }
+
+                    var adjacentTrapezoid = this.memoryScanner.Read<PathingTrapezoid>(adjacentAddress);
+                    trapezoidAdjacencyList.Add((int)adjacentTrapezoid.Id);
+                }
+                
             }
         }
-
-        var adjacencyList = new List<List<int>>(trapezoidList.Count);
-        for(var i = 0; i < trapezoidList.Count; i++)
-        {
-            adjacencyList.Add(new List<int>());
-        }
-
-        Parallel.ForEach(trapezoidList, (trapezoid) =>
-        {
-            if (trapezoid.Id < 0 || trapezoid.Id > adjacencyList.Count)
-            {
-                return;
-            }
-
-            adjacencyList[trapezoid.Id] = BuildAdjacentPathingTrapezoids(trapezoid, trapezoidList).Distinct().ToList();
-        });
 
         return new PathingData { Trapezoids = trapezoidList, AdjacencyArray = adjacencyList };
     }
@@ -323,7 +328,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         return new PathingMetadata { TrapezoidCount = (int)pathingMaps.Select(p => p.TrapezoidCount).Sum(count => count) };
     }
 
-    private int GetPlayerIdPointer()
+    private uint GetPlayerIdPointer()
     {
         if (this.playerIdPointer == 0)
         {
@@ -333,7 +338,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         return this.playerIdPointer;
     }
 
-    private int GetEntityArrayPointer()
+    private uint GetEntityArrayPointer()
     {
         if (this.entityArrayPointer == 0)
         {
@@ -343,7 +348,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         return this.entityArrayPointer;
     }
 
-    private int GetTitleDataPointer()
+    private uint GetTitleDataPointer()
     {
         if (this.titleDataPointer == 0)
         {

@@ -2,6 +2,7 @@
 using Daybreak.Services.Pathfinding.Models;
 using Daybreak.Utils;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Extensions;
 using System.Windows;
 
@@ -101,17 +102,16 @@ public sealed class StupidPathfinder : IPathfinder
         var minDistance = double.MaxValue;
         var visited = new int[map.Trapezoids.Count];
         var distanceFromVisited = new double[map.Trapezoids.Count];
-        var vertexCountMap = new int[map.Trapezoids.Count];
-        var visitationQueue = new Queue<(Trapezoid Trapezoid, double CurrentPathDistance, int VertexCount)>();
-        visitationQueue.Enqueue((startTrapezoid, 0, 0));
+        var visitationQueue = new Queue<(Trapezoid Trapezoid, double CurrentPathDistance)>();
+        visitationQueue.Enqueue((startTrapezoid, 0));
         visited[startTrapezoid.Id] = (int)startTrapezoid.Id + 1;
 
         while(visitationQueue.TryDequeue(out var tuple))
         {
             var currentTrapezoid = tuple.Trapezoid;
             var currentDistance = tuple.CurrentPathDistance;
-            var currentVertexCount = tuple.VertexCount;
-            if (currentDistance / DistanceHeursiticMultiplier > minDistance)
+            Debug.WriteLine(currentTrapezoid.Id);
+            if (currentDistance > minDistance)
             {
                 continue;
             }
@@ -126,21 +126,20 @@ public sealed class StupidPathfinder : IPathfinder
             {
                 var nextTrapezoid = map.Trapezoids[adjacentTrapezoidId];
                 var distanceToNextTrapezoid = DistanceSquaredBetweenTwoTrapezoidCenters(currentTrapezoid, nextTrapezoid);
-                if ((currentDistance + distanceToNextTrapezoid) / DistanceHeursiticMultiplier > minDistance)
+                if (currentDistance + distanceToNextTrapezoid > minDistance)
                 {
                     continue;
                 }
 
                 if (visited[adjacentTrapezoidId] > 0 &&
-                    vertexCountMap[adjacentTrapezoidId] <= currentVertexCount + 1)
+                    distanceFromVisited[adjacentTrapezoidId] <= distanceToNextTrapezoid)
                 {
                     continue;
                 }
 
                 visited[adjacentTrapezoidId] = currentTrapezoid.Id + 1;
                 distanceFromVisited[adjacentTrapezoidId] = distanceToNextTrapezoid;
-                vertexCountMap[adjacentTrapezoidId] = currentVertexCount + 1;
-                visitationQueue.Enqueue((nextTrapezoid, currentDistance + distanceToNextTrapezoid, currentVertexCount + 1));
+                visitationQueue.Enqueue((nextTrapezoid, currentDistance + distanceToNextTrapezoid));
             }
         }
 

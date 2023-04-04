@@ -1,13 +1,16 @@
-﻿using System.Runtime.InteropServices;
-
-namespace Daybreak.Models.Interop;
+﻿namespace Daybreak.Models.Interop;
 
 public readonly struct PathingTrapezoid
 {
     public readonly uint Id;
 
-    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4)]
-    public readonly int[] AdjacentPathingTrapezoids;
+    public readonly uint AdjacentPathingTrapezoid1;
+
+    public readonly uint AdjacentPathingTrapezoid2;
+
+    public readonly uint AdjacentPathingTrapezoid3;
+
+    public readonly uint AdjacentPathingTrapezoid4;
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Used for proper padding")]
     private readonly uint H0014;

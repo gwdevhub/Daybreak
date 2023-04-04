@@ -5,7 +5,7 @@ namespace Daybreak.Models.Interop;
 [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode)]
 public readonly struct UserContext
 {
-    public const int BaseOffset = 0x0074;
+    public const uint BaseOffset = 0x0074;
 
     [FieldOffset(0x0000)]
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 0x28)]

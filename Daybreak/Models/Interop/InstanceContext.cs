@@ -2,7 +2,7 @@
 
 public readonly struct InstanceContext
 {
-    public const int BaseOffset = 0x01AC;
+    public const uint BaseOffset = 0x01AC;
     
     /// <summary>
     /// Milliseconds since the instance was joined.
