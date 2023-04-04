@@ -1,9 +1,14 @@
-﻿using Daybreak.Models.Guildwars;
+﻿using Daybreak.Configuration;
+using Daybreak.Models.Guildwars;
 using Daybreak.Services.Pathfinding.Models;
 using Daybreak.Utils;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Configuration;
+using System.Core.Extensions;
 using System.Extensions;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace Daybreak.Services.Pathfinding;
@@ -14,22 +19,47 @@ namespace Daybreak.Services.Pathfinding;
 public sealed class StupidPathfinder : IPathfinder
 {
     private const double PathStep = 1;
-    private const double DistanceHeursiticMultiplier = 10;
 
-    public Result<PathfindingResponse, PathfindingFailure> CalculatePath(PathingData map, Point startPoint, Point endPoint)
+    private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
+    private readonly ILogger<StupidPathfinder> logger;
+
+    public StupidPathfinder(
+        ILiveOptions<ApplicationConfiguration> liveOptions,
+        ILogger<StupidPathfinder> logger)
     {
+        this.liveOptions = liveOptions.ThrowIfNull();
+        this.logger = logger.ThrowIfNull();
+    }
+
+    public Task<Result<PathfindingResponse, PathfindingFailure>> CalculatePath(PathingData map, Point startPoint, Point endPoint, CancellationToken cancellationToken)
+    {
+        return Task.Factory.StartNew(() => this.CalculatePathInternal(map, startPoint, endPoint), cancellationToken);
+    }
+
+    private Result<PathfindingResponse, PathfindingFailure> CalculatePathInternal(PathingData map, Point startPoint, Point endPoint)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.CalculatePath), string.Empty);
+        if (this.liveOptions.Value.ExperimentalFeatures.EnablePathfinding is false)
+        {
+            scopedLogger.LogInformation("Pathfinding is disabled");
+            return new PathfindingFailure.PathfindingDisabled();
+        }
+
         if (GetContainingTrapezoid(map, startPoint) is not Trapezoid startTrapezoid)
         {
+            scopedLogger.LogInformation("Start point not in map");
             return new PathfindingFailure.StartPointNotInMap(startPoint);
         }
 
         if (GetContainingTrapezoid(map, endPoint) is not Trapezoid endTrapezoid)
         {
+            scopedLogger.LogInformation("End point not in map");
             return new PathfindingFailure.StartPointNotInMap(endPoint);
         }
 
         if (GetTrapezoidPath(map, startTrapezoid, endTrapezoid) is not List<int> pathList)
         {
+            scopedLogger.LogInformation("Unable to find an initial path");
             return new PathfindingFailure.NoPathFound();
         }
 
@@ -37,19 +67,20 @@ public sealed class StupidPathfinder : IPathfinder
         var currentPoint = startPoint;
         var currentDirection = endPoint - currentPoint;
         currentDirection.Normalize();
-        for(var i = 0; i < pathList.Count - 1; i++)
+        for (var i = 0; i < pathList.Count - 1; i++)
         {
             var currentTrapezoid = map.Trapezoids[pathList[i]];
             var nextTrapezoid = map.Trapezoids[pathList[i + 1]];
             var currentTrajectoryEndPoint = new Point(currentDirection.X * 10e6, currentDirection.Y * 10e6);
             if (LineSegmentIntersectsTrapezoid(currentPoint, currentTrajectoryEndPoint, currentTrapezoid) is not Point intersectionPoint)
             {
+                scopedLogger.LogInformation("Unable to find an optimal path");
                 return new PathfindingFailure.NoPathFound();
             }
 
             var validPoint = false;
             intersectionPoint += (currentDirection * PathStep);
-            for(var j = i + 1; j < pathList.Count; j++)
+            for (var j = i + 1; j < pathList.Count; j++)
             {
                 var subsequentTrapezoid = map.Trapezoids[pathList[j]];
                 if (MathUtils.PointInsideTrapezoid(subsequentTrapezoid, intersectionPoint))
@@ -86,6 +117,11 @@ public sealed class StupidPathfinder : IPathfinder
 
     private static Trapezoid? GetContainingTrapezoid(PathingData map, Point point)
     {
+        if (map.Trapezoids is null)
+        {
+            return default;
+        }
+
         foreach(var trapezoid in map.Trapezoids)
         {
             if (MathUtils.PointInsideTrapezoid(trapezoid, point))
@@ -110,7 +146,6 @@ public sealed class StupidPathfinder : IPathfinder
         {
             var currentTrapezoid = tuple.Trapezoid;
             var currentDistance = tuple.CurrentPathDistance;
-            Debug.WriteLine(currentTrapezoid.Id);
             if (currentDistance > minDistance)
             {
                 continue;
@@ -122,7 +157,7 @@ public sealed class StupidPathfinder : IPathfinder
                 continue;
             }
 
-            foreach(var adjacentTrapezoidId in map.AdjacencyArray[currentTrapezoid.Id])
+            foreach(var adjacentTrapezoidId in map.ComputedAdjacencyList[currentTrapezoid.Id])
             {
                 var nextTrapezoid = map.Trapezoids[adjacentTrapezoidId];
                 var distanceToNextTrapezoid = DistanceSquaredBetweenTwoTrapezoidCenters(currentTrapezoid, nextTrapezoid);
@@ -132,13 +167,14 @@ public sealed class StupidPathfinder : IPathfinder
                 }
 
                 if (visited[adjacentTrapezoidId] > 0 &&
-                    distanceFromVisited[adjacentTrapezoidId] <= distanceToNextTrapezoid)
+                    distanceFromVisited[adjacentTrapezoidId] > 0 &&
+                    distanceFromVisited[adjacentTrapezoidId] <= currentDistance + distanceToNextTrapezoid)
                 {
                     continue;
                 }
 
                 visited[adjacentTrapezoidId] = currentTrapezoid.Id + 1;
-                distanceFromVisited[adjacentTrapezoidId] = distanceToNextTrapezoid;
+                distanceFromVisited[adjacentTrapezoidId] = currentDistance + distanceToNextTrapezoid;
                 visitationQueue.Enqueue((nextTrapezoid, currentDistance + distanceToNextTrapezoid));
             }
         }
@@ -165,7 +201,7 @@ public sealed class StupidPathfinder : IPathfinder
 
     private static Point GetClosestPointInTrapezoid(Point startingPoint, Trapezoid destination)
     {
-        var trapezoidPoints = GetTrapezoidPoints(destination);
+        var trapezoidPoints = MathUtils.GetTrapezoidPoints(destination);
 
         var closestPoint = new Point();
         var closestDistance = double.MaxValue;
@@ -186,7 +222,7 @@ public sealed class StupidPathfinder : IPathfinder
 
     private static Point? LineSegmentIntersectsTrapezoid(Point p1, Point p2, Trapezoid trapezoid)
     {
-        var trapezoidPoints = GetTrapezoidPoints(trapezoid);
+        var trapezoidPoints = MathUtils.GetTrapezoidPoints(trapezoid);
         for(var i = 0; i < trapezoidPoints.Length; i++)
         {
             var p3 = trapezoidPoints[i];
@@ -207,16 +243,5 @@ public sealed class StupidPathfinder : IPathfinder
         var y2 = (trapezoid2.YT + trapezoid2.YB) / 2;
         var x2 = (((trapezoid2.XTL + trapezoid2.XBL) / 2) + ((trapezoid2.XTR + trapezoid2.XBR) / 2)) / 2;
         return (new Point(x1, y1) - new Point(x2, y2)).LengthSquared;
-    }
-
-    private static Point[] GetTrapezoidPoints(Trapezoid trapezoid)
-    {
-        return new Point[]
-        {
-            new Point(trapezoid.XTL, trapezoid.YT),
-            new Point(trapezoid.XTR, trapezoid.YT),
-            new Point(trapezoid.XBR, trapezoid.YB),
-            new Point(trapezoid.XBL, trapezoid.YB)
-        };
     }
 }

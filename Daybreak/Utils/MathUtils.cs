@@ -45,29 +45,6 @@ public static class MathUtils
         return false;
     }
 
-    public static bool PointInsideTriangle(Point t1, Point t2, Point t3, Point p)
-    {
-        var d1 = Sign(p, t1, t2);
-        var d2 = Sign(p, t2, t3);
-        var d3 = Sign(p, t3, t1);
-
-        var has_neg = (d1 < 0) || (d2 < 0) || (d3 < 0);
-        var has_pos = (d1 > 0) || (d2 > 0) || (d3 > 0);
-
-        return !(has_neg && has_pos);
-    }
-
-    public static bool LinesIntersect(Point p11, Point p12, Point p21, Point p22)
-    {
-        bool Ccw(Point p1, Point p2, Point p3)
-        {
-            return (p3.Y - p1.Y) * (p2.X - p1.X) > (p2.Y - p1.Y) * (p3.X - p1.X);
-        }
-
-        return Ccw(p11, p21, p22) != Ccw(p12, p21, p22) &&
-            Ccw(p11, p12, p21) != Ccw(p11, p12, p22);
-    }
-
     public static bool LineSegmentsIntersect(Point p1, Point p2, Point p3, Point p4, out Point? intersectionPoint, double epsilon = 0)
     {
         intersectionPoint = default;
@@ -150,29 +127,6 @@ public static class MathUtils
             y <= Math.Max(p3.Y, p4.Y) + epsilon;
     }
 
-    public static double DistanceBetweenTwoLineSegments(Point line1Start, Point line1End, Point line2Start, Point line2End)
-    {
-        var closestPoints = new []
-        {
-            (line2Start, ClosestPointOnLineSegment(line1Start, line1End, line2Start)),
-            (line2End, ClosestPointOnLineSegment(line1Start, line1End, line2End)),
-            (line1Start, ClosestPointOnLineSegment(line2Start, line2End, line1Start)),
-            (line1End, ClosestPointOnLineSegment(line2Start, line2End, line1End))
-        };
-
-        var distance = (closestPoints[0].Item1 - closestPoints[0].Item2).LengthSquared;
-        for(var i = 1; i < closestPoints.Length; i++)
-        {
-            var newDistance = (closestPoints[1].Item1 - closestPoints[1].Item2).LengthSquared;
-            if (newDistance < distance)
-            {
-                distance = newDistance;
-            }
-        }
-
-        return Math.Sqrt(distance);
-    }
-
     public static Point ClosestPointOnLineSegment(Point v1, Point v2, Point p)
     {
         var d = v2 - v1;
@@ -193,8 +147,14 @@ public static class MathUtils
         }
     }
 
-    private static double Sign(Point p1, Point p2, Point p3)
+    public static Point[] GetTrapezoidPoints(Trapezoid trapezoid)
     {
-        return ((p1.X - p3.X) * (p2.Y - p3.Y)) - ((p2.X - p3.X) * (p1.Y - p3.Y));
+        return new Point[]
+        {
+            new Point(trapezoid.XTL, trapezoid.YT),
+            new Point(trapezoid.XTR, trapezoid.YT),
+            new Point(trapezoid.XBR, trapezoid.YB),
+            new Point(trapezoid.XBL, trapezoid.YB)
+        };
     }
 }

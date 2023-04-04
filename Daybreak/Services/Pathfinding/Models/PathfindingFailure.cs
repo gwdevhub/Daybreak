@@ -10,6 +10,15 @@ public abstract class PathfindingFailure
     {
     }
 
+    public sealed class PathfindingDisabled : PathfindingFailure
+    {
+        public override string Reason => "Pathfinding is disabled";
+
+        public PathfindingDisabled()
+        {
+        }
+    }
+
     public sealed class StartPointNotInMap : PathfindingFailure
     {
         public override string Reason => "Starting point is not inside the map";

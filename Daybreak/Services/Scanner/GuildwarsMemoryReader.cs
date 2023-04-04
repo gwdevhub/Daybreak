@@ -16,12 +16,14 @@ using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Drawing.Printing;
 using System.Extensions;
+using System.Globalization;
 using System.Linq;
 using System.Logging;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media.Media3D;
 
 namespace Daybreak.Services.Scanner;
 
@@ -276,14 +278,20 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
 
         var trapezoidList = new List<Trapezoid>();
         var adjacencyList = new List<List<int>>();
-        foreach (var pathingMap in pathingMaps)
+        var ogPathingMapList = new List<List<int>>();
+        for (var pathingMapIndex = 0; pathingMapIndex < pathingMaps.Length; pathingMapIndex++)
         {
+            var pathingMap = pathingMaps[pathingMapIndex];
+            var pathingMapList = new List<int>();
+            ogPathingMapList.Add(pathingMapList);
             var pathingTrapezoids = this.memoryScanner.ReadArray<PathingTrapezoid>(pathingMap.TrapezoidArray, pathingMap.TrapezoidCount);
             foreach(var trapezoid in pathingTrapezoids)
             {
+                pathingMapList.Add((int)trapezoid.Id);
                 trapezoidList.Add(new Trapezoid
                 {
                     Id = (int)trapezoid.Id,
+                    PathingMapId = pathingMapIndex,
                     XTL = trapezoid.XTL,
                     XTR = trapezoid.XTR,
                     YT = trapezoid.YT,
@@ -314,7 +322,17 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
             }
         }
 
-        return new PathingData { Trapezoids = trapezoidList, AdjacencyArray = adjacencyList };
+        var computedPathingMaps = BuildPathingMaps(trapezoidList, adjacencyList);
+        var computedAdjacencyList = BuildFinalAdjacencyList(trapezoidList, computedPathingMaps, adjacencyList);
+
+        return new PathingData
+        {
+            Trapezoids = trapezoidList,
+            OriginalAdjacencyList = adjacencyList,
+            ComputedPathingMaps = computedPathingMaps,
+            OriginalPathingMaps = ogPathingMapList,
+            ComputedAdjacencyList = computedAdjacencyList
+        };
     }
 
     private PathingMetadata? ReadPathingMetaDataInternal()
@@ -768,79 +786,111 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         return str;
     }
 
-    private static List<int> BuildAdjacentPathingTrapezoids(Trapezoid currentTrapezoid, IEnumerable<Trapezoid> trapezoids)
+    private static List<List<int>> BuildPathingMaps(List<Trapezoid> trapezoids, List<List<int>> adjacencyArray)
     {
-        var adjacentTrapezoids = new List<int>();
-        foreach(var trapezoid in trapezoids)
+        var visited = new bool[trapezoids.Count];
+        var pathingMaps = new List<List<int>>();
+        foreach (var trapezoid in trapezoids)
         {
-            if (trapezoid.Id == currentTrapezoid.Id)
+            if (visited[trapezoid.Id] is false)
             {
-                continue;
-            }
-
-            // Check if the trapezoids are on the same level
-            if (Math.Max(trapezoid.YT, currentTrapezoid.YT) + MapAdjacencyLeniency >= trapezoid.YT &&
-                Math.Max(trapezoid.YT, currentTrapezoid.YT) + MapAdjacencyLeniency >= currentTrapezoid.YT &&
-                Math.Min(trapezoid.YB, currentTrapezoid.YB) - MapAdjacencyLeniency <= trapezoid.YB &&
-                Math.Min(trapezoid.YB, currentTrapezoid.YB) - MapAdjacencyLeniency <= currentTrapezoid.YB)
-            {
-                //Check if the trapezoid is to the left of the currentTrapezoid
-                if (Math.Abs(trapezoid.XTR - currentTrapezoid.XTL) <= MapAdjacencyLeniency &&
-                    Math.Abs(trapezoid.XBR - currentTrapezoid.XBL) <= MapAdjacencyLeniency)
+                var currentPathingMap = new List<int>();
+                pathingMaps.Add(currentPathingMap);
+                var queue = new Queue<int>();
+                queue.Enqueue(trapezoid.Id);
+                while (queue.TryDequeue(out var currentId))
                 {
-                    adjacentTrapezoids.Add(trapezoid.Id);
-                    continue;
-                }
+                    if (visited[currentId] is true)
+                    {
+                        continue;
+                    }
 
-                //Check if the trapezoid is to the right of the currentTrapezoid
-                if (Math.Abs(trapezoid.XTL - currentTrapezoid.XTR) <= MapAdjacencyLeniency &&
-                    Math.Abs(trapezoid.XBL - currentTrapezoid.XBR) <= MapAdjacencyLeniency)
-                {
-                    adjacentTrapezoids.Add(trapezoid.Id);
-                    continue;
+                    visited[currentId] = true;
+                    currentPathingMap.Add(currentId);
+                    foreach (var adjacentId in adjacencyArray[currentId])
+                    {
+                        queue.Enqueue(adjacentId);
+                    }
                 }
-            
-                //Check if the trapezoid is to the left of the currentTrapezoid but their height differs
-                if (MathUtils.DistanceBetweenTwoLineSegments(
-                    new Point(trapezoid.XTR, trapezoid.YT), new Point(trapezoid.XBR, trapezoid.YB),
-                    new Point(currentTrapezoid.XTL, currentTrapezoid.YT), new Point(currentTrapezoid.XBL, currentTrapezoid.YB)) < MapAdjacencyLeniency)
-                {
-                    adjacentTrapezoids.Add(trapezoid.Id);
-                    continue;
-                }
-
-                //Check if the trapezoid is to the right of the currentTrapezoid but their height differs
-                if (MathUtils.DistanceBetweenTwoLineSegments(
-                    new Point(trapezoid.XTL, trapezoid.YT), new Point(trapezoid.XBL, trapezoid.YB),
-                    new Point(currentTrapezoid.XTR, currentTrapezoid.YT), new Point(currentTrapezoid.XBR, currentTrapezoid.YB)) <= MapAdjacencyLeniency)
-                {
-                    adjacentTrapezoids.Add(trapezoid.Id);
-                    continue;
-                }
-            }
-
-            //Check if the trapezoid is above currentTrapezoid
-            if (MathUtils.DistanceBetweenTwoLineSegments(
-                new Point(trapezoid.XBL, trapezoid.YB), new Point(trapezoid.XBR, trapezoid.YB),
-                new Point(currentTrapezoid.XTL, currentTrapezoid.YT), new Point(currentTrapezoid.XTR, currentTrapezoid.YT)) <= MapAdjacencyLeniency &&
-                Math.Abs(trapezoid.YB - currentTrapezoid.YT) <= MapAdjacencyLeniency)
-            {
-                adjacentTrapezoids.Add(trapezoid.Id);
-                continue;
-            }
-
-            //Check if the trapezoid is below currentTrapezoid
-            if (MathUtils.DistanceBetweenTwoLineSegments(
-                new Point(trapezoid.XTL, trapezoid.YT), new Point(trapezoid.XTR, trapezoid.YT),
-                new Point(currentTrapezoid.XBL, currentTrapezoid.YB), new Point(currentTrapezoid.XBR, currentTrapezoid.YB)) <= MapAdjacencyLeniency &&
-                Math.Abs(trapezoid.YT - currentTrapezoid.YB) <= MapAdjacencyLeniency)
-            {
-                adjacentTrapezoids.Add(trapezoid.Id);
-                continue;
             }
         }
 
-        return adjacentTrapezoids;
+        return pathingMaps;
+    }
+
+    private static List<List<int>> BuildFinalAdjacencyList(List<Trapezoid> trapezoids, List<List<int>> computedPathingMaps, List<List<int>> originalAdjacencyList)
+    {
+        var adjacencyList = new List<List<int>>();
+        for(var i = 0; i < trapezoids.Count; i++)
+        {
+            adjacencyList.Add(originalAdjacencyList[i].ToList());
+        }
+
+        for(var i = 0; i < computedPathingMaps.Count; i++)
+        {
+            var currentPathingMap = computedPathingMaps[i];
+            Parallel.For(i + 1, computedPathingMaps.Count - 1, j =>
+            {
+                var otherPathingMap = computedPathingMaps[j];
+                foreach (var currentTrapezoidId in currentPathingMap)
+                {
+                    var currentPoints = MathUtils.GetTrapezoidPoints(trapezoids[currentTrapezoidId]);
+                    foreach (var otherTrapezoidId in otherPathingMap)
+                    {
+                        var otherPoints = MathUtils.GetTrapezoidPoints(trapezoids[otherTrapezoidId]);
+                        if (TrapezoidsAdjacent(currentPoints, otherPoints))
+                        {
+                            adjacencyList[currentTrapezoidId].Add(otherTrapezoidId);
+                            adjacencyList[otherTrapezoidId].Add(currentTrapezoidId);
+                        }
+                    }
+                }
+            });
+        }
+
+        return adjacencyList;
+    }
+
+    private static bool TrapezoidsAdjacent(Point[] currentPoints, Point[] otherPoints)
+    {
+        var curBoundingRectangle = GetBoundingRectangle(currentPoints);
+        var otherBoundingRectangle = GetBoundingRectangle(otherPoints);
+        if (!curBoundingRectangle.IntersectsWith(otherBoundingRectangle))
+        {
+            return false;
+        }
+
+        for (var x = 0; x < currentPoints.Length; x++)
+        {
+            for (var y = 0; y < otherPoints.Length; y++)
+            {
+                if (MathUtils.LineSegmentsIntersect(currentPoints[x], currentPoints[(x + 1) % currentPoints.Length],
+                    otherPoints[y], otherPoints[(y + 1) % otherPoints.Length], out _, epsilon: 0.1))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static Rect GetBoundingRectangle(Point[] points)
+    {
+        var minX = double.MaxValue;
+        var maxX = double.MinValue;
+        var minY = double.MaxValue;
+        var maxY = double.MinValue;
+        for (var i = 0; i < points.Length; i++)
+        {
+            var curPoint = points[i];
+            if (curPoint.X < minX) minX = curPoint.X;
+            if (curPoint.X > maxX) maxX = curPoint.X;
+            if (curPoint.Y < minY) minY = curPoint.Y;
+            if (curPoint.Y > maxY) maxY = curPoint.Y;
+        }
+
+        return new Rect(minX, minY, maxX - minX, maxY - minY);
     }
 
     private static unsafe string ParseAndCleanWCharPointer(byte* bytes, int byteCount)

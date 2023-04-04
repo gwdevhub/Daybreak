@@ -12,6 +12,8 @@ public sealed class ExperimentalFeatures
     public int ToolboxAutoLaunchDelay { get; set; } = 5000;
     [JsonProperty(nameof(DynamicBuildLoading))]
     public bool DynamicBuildLoading { get; set; } = true;
+    [JsonProperty(nameof(EnablePathfinding))]
+    public bool EnablePathfinding { get; set; } = true;
     [JsonProperty(nameof(LaunchGuildwarsAsCurrentUser))]
     public bool LaunchGuildwarsAsCurrentUser { get; set; } = true;
     [JsonProperty(nameof(CanInterceptKeys))]
