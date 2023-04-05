@@ -13,7 +13,7 @@ public sealed class ExperimentalFeatures
     [JsonProperty(nameof(DynamicBuildLoading))]
     public bool DynamicBuildLoading { get; set; } = true;
     [JsonProperty(nameof(EnablePathfinding))]
-    public bool EnablePathfinding { get; set; } = true;
+    public bool EnablePathfinding { get; set; } = false;
     [JsonProperty(nameof(LaunchGuildwarsAsCurrentUser))]
     public bool LaunchGuildwarsAsCurrentUser { get; set; } = true;
     [JsonProperty(nameof(CanInterceptKeys))]

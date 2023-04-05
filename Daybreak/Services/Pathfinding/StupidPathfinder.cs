@@ -1,11 +1,15 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Models.Guildwars;
+using Daybreak.Services.Metrics;
 using Daybreak.Services.Pathfinding.Models;
 using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
+using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using System.Extensions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,22 +22,45 @@ namespace Daybreak.Services.Pathfinding;
 /// </summary>
 public sealed class StupidPathfinder : IPathfinder
 {
+    private const string LatencyMetricName = "Pathfinding Latency";
+    private const string LatencyMetricUnit = "Milliseconds";
+    private const string LatencyMetricDescription = "Amount of milliseconds elapsed while running the pathfinding algorithm. P95 aggregation";
     private const double PathStep = 1;
 
+    private readonly Histogram<long> latencyMetric;
     private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
     private readonly ILogger<StupidPathfinder> logger;
 
     public StupidPathfinder(
+        IMetricsService metricsService,
         ILiveOptions<ApplicationConfiguration> liveOptions,
         ILogger<StupidPathfinder> logger)
     {
         this.liveOptions = liveOptions.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
+        this.latencyMetric = metricsService.ThrowIfNull().CreateHistogram<long>(LatencyMetricName, LatencyMetricUnit, LatencyMetricDescription, Daybreak.Models.Metrics.AggregationTypes.P95);
     }
 
     public Task<Result<PathfindingResponse, PathfindingFailure>> CalculatePath(PathingData map, Point startPoint, Point endPoint, CancellationToken cancellationToken)
     {
-        return Task.Factory.StartNew(() => this.CalculatePathInternal(map, startPoint, endPoint), cancellationToken);
+        return Task.Factory.StartNew(() =>
+        {
+            var scopedLogger = this.logger.CreateScopedLogger(nameof(this.CalculatePath), string.Empty);
+            try
+            {
+                var sw = Stopwatch.StartNew();
+                var result = this.CalculatePathInternal(map, startPoint, endPoint);
+                var ms = sw.ElapsedMilliseconds;
+                this.latencyMetric.Record(ms);
+                return result;
+            }
+            catch(Exception e)
+            {
+                scopedLogger.LogError(e, "Encountered exception during pathfinding");
+            }
+
+            return new PathfindingFailure.UnexpectedFailure();
+        }, cancellationToken);
     }
 
     private Result<PathfindingResponse, PathfindingFailure> CalculatePathInternal(PathingData map, Point startPoint, Point endPoint)
@@ -79,7 +106,7 @@ public sealed class StupidPathfinder : IPathfinder
             }
 
             var validPoint = false;
-            intersectionPoint += (currentDirection * PathStep);
+            intersectionPoint += currentDirection * PathStep;
             for (var j = i + 1; j < pathList.Count; j++)
             {
                 var subsequentTrapezoid = map.Trapezoids[pathList[j]];
@@ -135,51 +162,34 @@ public sealed class StupidPathfinder : IPathfinder
 
     private static List<int>? GetTrapezoidPath(PathingData map, Trapezoid startTrapezoid, Trapezoid endTrapezoid)
     {
-        var minDistance = double.MaxValue;
+        var found = false;
         var visited = new int[map.Trapezoids.Count];
-        var distanceFromVisited = new double[map.Trapezoids.Count];
-        var visitationQueue = new Queue<(Trapezoid Trapezoid, double CurrentPathDistance)>();
-        visitationQueue.Enqueue((startTrapezoid, 0));
+        var visitationQueue = new Queue<Trapezoid>();
+        visitationQueue.Enqueue(startTrapezoid);
         visited[startTrapezoid.Id] = (int)startTrapezoid.Id + 1;
 
-        while(visitationQueue.TryDequeue(out var tuple))
+        while(visitationQueue.TryDequeue(out var currentTrapezoid))
         {
-            var currentTrapezoid = tuple.Trapezoid;
-            var currentDistance = tuple.CurrentPathDistance;
-            if (currentDistance > minDistance)
-            {
-                continue;
-            }
-
             if (currentTrapezoid.Id == endTrapezoid.Id)
             {
-                minDistance = currentDistance;
-                continue;
+                found = true;
+                break;
             }
 
             foreach(var adjacentTrapezoidId in map.ComputedAdjacencyList[currentTrapezoid.Id])
             {
                 var nextTrapezoid = map.Trapezoids[adjacentTrapezoidId];
-                var distanceToNextTrapezoid = DistanceSquaredBetweenTwoTrapezoidCenters(currentTrapezoid, nextTrapezoid);
-                if (currentDistance + distanceToNextTrapezoid > minDistance)
-                {
-                    continue;
-                }
-
-                if (visited[adjacentTrapezoidId] > 0 &&
-                    distanceFromVisited[adjacentTrapezoidId] > 0 &&
-                    distanceFromVisited[adjacentTrapezoidId] <= currentDistance + distanceToNextTrapezoid)
+                if (visited[adjacentTrapezoidId] > 0)
                 {
                     continue;
                 }
 
                 visited[adjacentTrapezoidId] = currentTrapezoid.Id + 1;
-                distanceFromVisited[adjacentTrapezoidId] = currentDistance + distanceToNextTrapezoid;
-                visitationQueue.Enqueue((nextTrapezoid, currentDistance + distanceToNextTrapezoid));
+                visitationQueue.Enqueue(nextTrapezoid);
             }
         }
 
-        if (minDistance == double.MaxValue)
+        if (!found)
         {
             return default;
         }
@@ -235,13 +245,5 @@ public sealed class StupidPathfinder : IPathfinder
 
         return default;
     }
-    
-    private static double DistanceSquaredBetweenTwoTrapezoidCenters(Trapezoid trapezoid1, Trapezoid trapezoid2)
-    {
-        var y1 = (trapezoid1.YT + trapezoid1.YB) / 2;
-        var x1 = (((trapezoid1.XTL + trapezoid1.XBL) / 2) + ((trapezoid1.XTR + trapezoid1.XBR) / 2)) / 2;
-        var y2 = (trapezoid2.YT + trapezoid2.YB) / 2;
-        var x2 = (((trapezoid2.XTL + trapezoid2.XBL) / 2) + ((trapezoid2.XTR + trapezoid2.XBR) / 2)) / 2;
-        return (new Point(x1, y1) - new Point(x2, y2)).LengthSquared;
-    }
+
 }

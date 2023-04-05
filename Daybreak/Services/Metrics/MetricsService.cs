@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.Metrics;
+using System.Threading;
 
 namespace Daybreak.Services.Metrics;
 
@@ -13,6 +14,7 @@ public sealed class MetricsService : IMetricsService, IDisposable
     private const string MetricsNamespace = "Daybreak";
     private const string MetricsStoreName = "MetricsStore";
 
+    private readonly object metricStoreLock = new object();
     private readonly MeterListener meterListener;
     private readonly Meter daybreakMeter;
     private readonly ConcurrentDictionary<string, LinkedList<Metric>> metricStore = new();
@@ -109,6 +111,10 @@ public sealed class MetricsService : IMetricsService, IDisposable
 
     private void MeasurementRecorded<T>(Instrument instrument, T measurement, ReadOnlySpan<KeyValuePair<string, object?>> tags, object? state)
     {
+        while(Monitor.TryEnter(this.metricStoreLock) is false)
+        {
+        }
+
         if (measurement is null)
         {
             return;
@@ -125,6 +131,8 @@ public sealed class MetricsService : IMetricsService, IDisposable
         {
             metrics.RemoveFirst();
         }
+
+        Monitor.Exit(this.metricStoreLock);
     }
 
     public void Dispose()
