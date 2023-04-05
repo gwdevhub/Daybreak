@@ -18,8 +18,6 @@ using Daybreak.Services.Pathfinding.Models;
 using System.Windows.Threading;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Configuration;
-using Daybreak.Configuration;
 
 namespace Daybreak.Controls;
 
@@ -33,7 +31,7 @@ public partial class GuildwarsMinimap : UserControl
     private const int EntitySize = 100;
     private const float PositionRadius = 150;
     // Minimum amount of milliseconds to pass between calculating paths to objectives
-    private const int MinPathCalculationFrequency = 1000;
+    private const int MinPathCalculationFrequency = 500;
 
     private static readonly Lazy<(Point[] OuterPoints, Point[] InnerPoints)> StarCoordinates = new(GetStarGlyphPoints);
 
