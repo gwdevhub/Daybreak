@@ -34,14 +34,16 @@
         <ContextMenu x:Key="LivingEntityContextMenu">
             <ContextMenu.Template>
                 <ControlTemplate>
-                    <local:LivingEntityContextMenu DataContext="{Binding DataContext, RelativeSource={RelativeSource TemplatedParent}}"></local:LivingEntityContextMenu>
+                    <local:LivingEntityContextMenu DataContext="{Binding DataContext, RelativeSource={RelativeSource TemplatedParent}}"
+                                                   LivingEntityContextMenuClicked="LivingEntityContextMenu_LivingEntityContextMenuClicked"></local:LivingEntityContextMenu>
                 </ControlTemplate>
             </ContextMenu.Template>
         </ContextMenu>
         <ContextMenu x:Key="PlayerContextMenu">
             <ContextMenu.Template>
                 <ControlTemplate>
-                    <local:PlayerContextMenu DataContext="{Binding DataContext, RelativeSource={RelativeSource TemplatedParent}}"></local:PlayerContextMenu>
+                    <local:PlayerContextMenu DataContext="{Binding DataContext, RelativeSource={RelativeSource TemplatedParent}}"
+                                             PlayerContextMenuClicked="PlayerContextMenu_PlayerContextMenuClicked"></local:PlayerContextMenu>
                 </ControlTemplate>
             </ContextMenu.Template>
         </ContextMenu>

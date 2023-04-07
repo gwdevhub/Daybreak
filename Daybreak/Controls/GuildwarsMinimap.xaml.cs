@@ -70,6 +70,8 @@ public partial class GuildwarsMinimap : UserControl
 
     public event EventHandler? MaximizeClicked;
     public event EventHandler<QuestMetadata>? QuestMetadataClicked;
+    public event EventHandler<LivingEntity>? LivingEntityClicked;
+    public event EventHandler<PlayerInformation>? PlayerInformationClicked;
 
     public GuildwarsMinimap()
         :this(
@@ -834,6 +836,26 @@ public partial class GuildwarsMinimap : UserControl
         }
 
         this.QuestMetadataClicked?.Invoke(this, quest.Value);
+    }
+
+    private void PlayerContextMenu_PlayerContextMenuClicked(object _, PlayerInformation? playerInformation)
+    {
+        if (playerInformation is not PlayerInformation)
+        {
+            return;
+        }
+
+        this.PlayerInformationClicked?.Invoke(this, playerInformation.Value);
+    }
+
+    private void LivingEntityContextMenu_LivingEntityContextMenuClicked(object _, LivingEntity? livingEntity)
+    {
+        if (livingEntity is not LivingEntity)
+        {
+            return;
+        }
+
+        this.LivingEntityClicked?.Invoke(this, livingEntity.Value);
     }
 
     private void MaximizeButton_Clicked(object sender, EventArgs e)

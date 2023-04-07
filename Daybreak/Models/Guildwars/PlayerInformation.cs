@@ -12,6 +12,8 @@ public readonly struct PlayerInformation : IEntity
     public Profession? SecondaryProfession { get; init; }
     public List<Profession>? UnlockedProfession { get; init; }
     public Build? CurrentBuild { get; init; }
+    public Npc? NpcDefinition { get; init; }
+    public uint ModelType { get; init; }
     public float CurrentHealth { get; init; }
     public float MaxHealth { get; init; }
     public float CurrentEnergy { get; init; }

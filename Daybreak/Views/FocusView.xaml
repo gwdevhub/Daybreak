@@ -448,6 +448,8 @@
                 ControlsVisible="True"
                 MaximizeClicked="GuildwarsMinimap_MaximizeClicked"
                 QuestMetadataClicked="GuildwarsMinimap_QuestMetadataClicked"
+                LivingEntityClicked="GuildwarsMinimap_LivingEntityClicked"
+                PlayerInformationClicked="GuildwarsMinimap_PlayerInformationClicked"
                 ClipToBounds="True"></controls:GuildwarsMinimap>
             <controls:CircularLoadingWidget Height="100"
                                             Width="100"

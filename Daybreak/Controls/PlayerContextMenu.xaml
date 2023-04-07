@@ -9,8 +9,13 @@
              d:DesignHeight="300" d:DesignWidth="100"
              Margin="5, 0, 5, 0">
     <StackPanel Background="#F0212121">
-        <TextBlock 
-            Text="Party Member" FontSize="16" Foreground="White"></TextBlock>
+        <TextBlock Text="Party Member" FontSize="16" Foreground="White"></TextBlock>
+        <TextBlock Text="{Binding NpcDefinition.Name}" Foreground="LightBlue" Cursor="Hand"
+                   MouseLeftButtonDown="TextBlock_MouseLeftButtonDown"></TextBlock>
+        <WrapPanel>
+            <TextBlock Text="Id: " Foreground="White"></TextBlock>
+            <TextBlock Text="{Binding ModelType, Mode=OneWay}" Foreground="White"></TextBlock>
+        </WrapPanel>
         <WrapPanel>
             <TextBlock Text="Lvl: " Foreground="White"></TextBlock>
             <TextBlock Text="{Binding Level, Mode=OneWay}" Foreground="White"></TextBlock>

@@ -773,4 +773,24 @@ public partial class FocusView : UserControl
     {
         this.BrowserAddress = e.Quest!.WikiUrl;
     }
+
+    private void GuildwarsMinimap_LivingEntityClicked(object _, LivingEntity e)
+    {
+        if (e.NpcDefinition?.WikiUrl.IsNullOrWhiteSpace() is true)
+        {
+            return;
+        }
+
+        this.BrowserAddress = e.NpcDefinition!.WikiUrl;
+    }
+
+    private void GuildwarsMinimap_PlayerInformationClicked(object _, PlayerInformation e)
+    {
+        if (e.NpcDefinition?.WikiUrl.IsNullOrWhiteSpace() is true)
+        {
+            return;
+        }
+
+        this.BrowserAddress = e.NpcDefinition!.WikiUrl;
+    }
 }

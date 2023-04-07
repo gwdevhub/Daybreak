@@ -6,6 +6,10 @@ public readonly struct LivingEntity : IEntity
 
     public uint Timer { get; init; }
 
+    public uint? ModelType { get; init; }
+
+    public Npc? NpcDefinition { get; init; }
+
     public Position? Position { get; init; }
 
     public Profession? PrimaryProfession { get; init; }

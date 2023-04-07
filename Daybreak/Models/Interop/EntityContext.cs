@@ -16,6 +16,9 @@ public readonly struct EntityContext
     [FieldOffset(0x001C)]
     public readonly uint ZCoords;
 
+    [FieldOffset(0x0044)]
+    public readonly uint NameProperties;
+
     [FieldOffset(0x0060)]
     public readonly GamePosition Position;
 
@@ -23,7 +26,7 @@ public readonly struct EntityContext
     public readonly EntityType EntityType;
 
     [FieldOffset(0x00E0)]
-    public readonly ushort PlayerNumber;
+    public readonly ushort EntityModelType;
 
     [FieldOffset(0x00E2)]
     public readonly ushort AgentModelType;
