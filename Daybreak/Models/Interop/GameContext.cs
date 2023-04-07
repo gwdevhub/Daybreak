@@ -20,6 +20,9 @@ public readonly struct GameContext
     [FieldOffset(0x04B0)]
     public readonly GuildwarsArray QuestLog;
 
+    [FieldOffset(0x0518)]
+    public readonly GuildwarsArray HeroInfos;
+
     [FieldOffset(0x0608)]
     public readonly uint HardModeUnlocked;
 

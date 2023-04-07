@@ -224,8 +224,6 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         var playerEntityId = this.memoryScanner.ReadPtrChain<int>(this.GetPlayerIdPointer(), 0x0, 0x0);
         var titles = this.memoryScanner.ReadArray<TitleContext>(gameContext.Titles);
         var titleTiers = this.memoryScanner.ReadArray<TitleTierContext>(gameContext.TitlesTiers);
-        // var npcs = this.memoryScanner.ReadArray<NpcContext>(gameContext.Npcs);
-        // var entityInfos = this.memoryScanner.ReadArray<EntityContext>(gameContext.EntityInfos);
 
         // The following lines would retrieve all entities, including item entities.
         var entityPointersArray = this.memoryScanner.ReadPtrChain<GuildwarsArray>(this.GetEntityArrayPointer(), 0x0, 0x0);
@@ -457,7 +455,8 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         };
     }
     
-    private List<LivingEntity> GetLivingEntities(EntityContext[] livingEntities)
+    private List<LivingEntity> GetLivingEntities(
+        EntityContext[] livingEntities)
     {
         var list = new List<LivingEntity>();
         foreach(var livingEntity in livingEntities)
@@ -507,11 +506,18 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
                     break;
             }
 
+            if (!Npc.TryParse(livingEntity.EntityModelType, out var npc))
+            {
+                npc = Npc.Unknown;
+            }
+
             list.Add(new LivingEntity
             {
                 Id = (int)livingEntity.AgentId,
                 Timer = livingEntity.Timer,
                 Level = (int)livingEntity.Level,
+                NpcDefinition = npc,
+                ModelType = livingEntity.EntityModelType,
                 Position = new Position { X = livingEntity.Position.X, Y = livingEntity.Position.Y },
                 PrimaryProfession = primaryProfession,
                 SecondaryProfession = secondaryProfession,
@@ -729,12 +735,18 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         
         (var currentHp, var currentEnergy) = ApplyEnergyAndHealthRegen(instanceContext, mapEntityContext);
         EntityContext? entityContext = entities.FirstOrDefault(e => e.AgentId == playerId);
+        if (!Npc.TryParse(entityContext?.EntityModelType ?? 0, out var npc))
+        {
+            npc = Npc.Unknown;
+        }
 
         return new PlayerInformation
         {
             Id = playerId,
-            Timer = entityContext.Value.Timer,
+            Timer = entityContext!.Value.Timer,
             Level = entityContext.Value.Level,
+            NpcDefinition = npc,
+            ModelType = entityContext.Value.EntityModelType,
             PrimaryProfession = primaryProfession,
             SecondaryProfession = secondaryProfession,
             UnlockedProfession = unlockedProfessions,
