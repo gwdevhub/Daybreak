@@ -2,9 +2,9 @@
 using System.Core.Extensions;
 using System.IO;
 
-namespace Daybreak.Services.Updater.PostUpdate.Actions;
+namespace Daybreak.Services.Startup.Actions;
 
-public sealed class RenameInstallerAction : PostUpdateActionBase
+public sealed class RenameInstallerAction : StartupActionBase
 {
     private const string TemporaryInstallerFileName = "Daybreak.Installer.Temp.exe";
     private const string InstallerFileName = "Daybreak.Installer.exe";
@@ -17,7 +17,7 @@ public sealed class RenameInstallerAction : PostUpdateActionBase
         this.logger = logger.ThrowIfNull();
     }
 
-    public override void DoPostUpdateAction()
+    public override void ExecuteOnStartup()
     {
         if (File.Exists(TemporaryInstallerFileName))
         {

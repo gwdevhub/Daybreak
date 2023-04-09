@@ -1,6 +1,7 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Services.ExceptionHandling;
 using Daybreak.Services.Navigation;
+using Daybreak.Services.Startup;
 using Daybreak.Services.Updater.PostUpdate;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -45,8 +46,9 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
 
     protected override void ApplicationStarting()
     {
-        ProjectConfiguration.RegisterViews(this.ServiceProvider.GetService<IViewManager>()!);
-        ProjectConfiguration.RegisterPostUpdateActions(this.ServiceProvider.GetService<IPostUpdateActionProducer>()!);
+        ProjectConfiguration.RegisterViews(this.ServiceProvider.GetRequiredService<IViewManager>()!);
+        ProjectConfiguration.RegisterPostUpdateActions(this.ServiceProvider.GetRequiredService<IPostUpdateActionProducer>()!);
+        ProjectConfiguration.RegisterStartupActions(this.ServiceProvider.GetRequiredService<IStartupActionProducer>()!);
 
         this.logger = this.ServiceProvider.GetRequiredService<ILogger<Launcher>>();
         this.exceptionHandler = this.ServiceProvider.GetRequiredService<IExceptionHandler>();

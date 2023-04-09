@@ -24,7 +24,6 @@ using Microsoft.CorrelationVector;
 using System.Logging;
 using Daybreak.Services.Updater.PostUpdate;
 using System.Core.Extensions;
-using Daybreak.Services.Updater.PostUpdate.Actions;
 using Daybreak.Services.Graph;
 using Microsoft.Extensions.DependencyInjection;
 using Daybreak.Services.Navigation;
@@ -34,11 +33,12 @@ using Daybreak.Services.Scanner;
 using Daybreak.Services.Experience;
 using Daybreak.Services.Metrics;
 using Daybreak.Services.Monitoring;
-using System.Net;
 using System.Net.Http.Headers;
 using Daybreak.Services.Downloads;
 using Daybreak.Services.ExceptionHandling;
 using Daybreak.Services.Pathfinding;
+using Daybreak.Services.Startup;
+using Daybreak.Services.Startup.Actions;
 
 namespace Daybreak.Configuration;
 
@@ -124,6 +124,7 @@ public static class ProjectConfiguration
         services.AddSingleton<IIconBrowser, IconBrowser>();
         services.AddSingleton<IIconDownloader, IconDownloader>();
         services.AddSingleton<IMetricsService, MetricsService>();
+        services.AddSingleton<IStartupActionProducer, StartupActionManager>();
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
         services.AddScoped<IScreenshotProvider, ScreenshotProvider>();
@@ -171,11 +172,16 @@ public static class ProjectConfiguration
         viewProducer.RegisterView<DownloadView>();
     }
 
+    public static void RegisterStartupActions(IStartupActionProducer startupActionProducer)
+    {
+        startupActionProducer.ThrowIfNull();
+
+        startupActionProducer.RegisterAction<RenameInstallerAction>();
+    }
+
     public static void RegisterPostUpdateActions(IPostUpdateActionProducer postUpdateActionProducer)
     {
         postUpdateActionProducer.ThrowIfNull();
-
-        postUpdateActionProducer.AddPostUpdateAction<RenameInstallerAction>();
     }
 
     private static void SetupDaybreakUserAgent(HttpRequestHeaders httpRequestHeaders)
