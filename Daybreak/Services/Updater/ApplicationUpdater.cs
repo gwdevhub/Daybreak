@@ -26,7 +26,6 @@ namespace Daybreak.Services.Updater;
 
 public sealed class ApplicationUpdater : IApplicationUpdater
 {
-    private const string TemporaryInstallerFileName = "Daybreak.Installer.Temp.exe";
     private const string InstallerFileName = "Daybreak.Installer.exe";
     private const string UpdatedKey = "Updating";
     private const string RegistryKey = "Daybreak";
