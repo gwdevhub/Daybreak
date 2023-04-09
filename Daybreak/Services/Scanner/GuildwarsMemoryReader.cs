@@ -41,6 +41,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
     private uint playerIdPointer;
     private uint entityArrayPointer;
     private uint titleDataPointer;
+    private uint targetIdPointer;
 
     public GuildwarsMemoryReader(
         IApplicationLauncher applicationLauncher,
@@ -222,6 +223,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         var skills = this.memoryScanner.ReadArray<SkillbarContext>(gameContext.Skillbars);
         var partyAttributes = this.memoryScanner.ReadArray<PartyAttributesContext>(gameContext.PartyAttributes);
         var playerEntityId = this.memoryScanner.ReadPtrChain<int>(this.GetPlayerIdPointer(), 0x0, 0x0);
+        var targetEntityId = this.memoryScanner.ReadPtrChain<int>(this.GetTargetIdPointer(), 0x0, 0x0);
         var titles = this.memoryScanner.ReadArray<TitleContext>(gameContext.Titles);
         var titleTiers = this.memoryScanner.ReadArray<TitleTierContext>(gameContext.TitlesTiers);
 
@@ -248,7 +250,8 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
             partyAttributes,
             titles,
             titleTiers,
-            playerEntityId);
+            playerEntityId,
+            targetEntityId);
     }
 
     private PathingData? ReadPathingDataInternal()
@@ -368,7 +371,17 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
 
         return this.titleDataPointer;
     }
-    
+
+    private uint GetTargetIdPointer()
+    {
+        if (this.targetIdPointer == 0)
+        {
+            this.targetIdPointer = this.memoryScanner.ScanForPtr(new byte[] { 0x3B, 0xDF, 0x0F, 0x95 }, "xxxx") + 0xB;
+        }
+
+        return this.targetIdPointer;
+    }
+
     private unsafe GameData AggregateGameData(
         GameContext gameContext,
         InstanceContext instanceContext,
@@ -382,7 +395,8 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         PartyAttributesContext[] partyAttributes,
         TitleContext[] titles,
         TitleTierContext[] titleTiers,
-        int mainPlayerEntityId)
+        int mainPlayerEntityId,
+        int targetEntityId)
     {
         var name = userContext.PlayerName;
         _ = Map.TryParse((int)userContext.MapId, out var currentMap);
@@ -440,7 +454,8 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
             FoesKilled = gameContext.FoesKilled,
             FoesToKill = gameContext.FoesToKill,
             CurrentMap = currentMap,
-            InstanceTimer = instanceContext.Timer
+            InstanceTimer = instanceContext.Timer,
+            CurrentTargetId = targetEntityId
         };
 
         return new GameData
