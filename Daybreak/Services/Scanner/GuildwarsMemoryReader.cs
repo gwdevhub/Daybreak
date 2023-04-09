@@ -217,6 +217,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         }
 
         var mapEntities = this.memoryScanner.ReadArray<MapEntityContext>(gameContext.MapEntities);
+        var mapIcons = this.memoryScanner.ReadArray<MapIconContext>(gameContext.MissionMapIcons);
         var professions = this.memoryScanner.ReadArray<ProfessionsContext>(gameContext.Professions);
         var players = this.memoryScanner.ReadArray<PlayerContext>(gameContext.Players);
         var quests = this.memoryScanner.ReadArray<QuestContext>(gameContext.QuestLog);
@@ -250,6 +251,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
             partyAttributes,
             titles,
             titleTiers,
+            mapIcons,
             playerEntityId,
             targetEntityId);
     }
@@ -395,6 +397,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         PartyAttributesContext[] partyAttributes,
         TitleContext[] titles,
         TitleTierContext[] titleTiers,
+        MapIconContext[] mapIcons,
         int mainPlayerEntityId,
         int targetEntityId)
     {
@@ -404,6 +407,8 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
             .Where(p => p.AgentId != mainPlayerEntityId)
             .Select(p => GetPlayerInformation((int)p.AgentId, instanceContext, mapEntities, professions, skills, partyAttributes, entities))
             .ToList();
+
+        var parsedMapIcons = GetMapIcons(mapIcons);
 
         var mainPlayer = this.GetMainPlayerInformation(
             gameContext,
@@ -466,10 +471,11 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
             User = userInformation,
             WorldPlayers = worldPlayers,
             LivingEntities = livingEntities,
-            Valid = mapEntities.Length > 0 || players.Length > 0 || professions.Length > 0 || quests.Length > 0 || skills.Length > 0 || partyAttributes.Length > 0 || entities.Length > 0
+            MapIcons = parsedMapIcons,
+            Valid = mapEntities.Length > 0 || players.Length > 0 || professions.Length > 0 || partyAttributes.Length > 0 || entities.Length > 0
         };
     }
-    
+
     private List<LivingEntity> GetLivingEntities(
         EntityContext[] livingEntities)
     {
@@ -780,6 +786,24 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
                 } :
                 default
         };
+    }
+
+    private static List<MapIcon> GetMapIcons(MapIconContext[] mapIconContexts)
+    {
+        var retList = new List<MapIcon>();
+        foreach(var mapIconContext in mapIconContexts)
+        {
+            if (GuildwarsIcon.TryParse((int)mapIconContext.Id, out var icon))
+            {
+                retList.Add(new MapIcon
+                {
+                    Icon = icon,
+                    Position = new Position { X = mapIconContext.X, Y = mapIconContext.Y }
+                });
+            }
+        }
+
+        return retList;
     }
 
     private static (float CurrentHp, float CurrentEnergy) ApplyEnergyAndHealthRegen(InstanceContext instanceContext, MapEntityContext entityContext)
