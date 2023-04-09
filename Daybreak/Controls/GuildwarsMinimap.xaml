@@ -67,5 +67,13 @@
                                  Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
                                  Clicked="MaximizeButton_Clicked"></local:MaximizeButton>
         </Grid>
+        <WrapPanel Background="#F0212121" VerticalAlignment="Top" HorizontalAlignment="Right" >
+            <TextBlock Text="{Binding ElementName=_this, Path=TargetEntityId, Mode=OneWay}" Foreground="White"
+                       FontSize="16" Padding="5" ></TextBlock>
+            <TextBlock Text=" - " Foreground="White"
+                       FontSize="16" Padding="5" ></TextBlock>
+            <TextBlock Text="{Binding ElementName=_this, Path=TargetEntityModelId, Mode=OneWay}" Foreground="White"
+                       FontSize="16" Padding="5" ></TextBlock>
+        </WrapPanel>
     </Grid>
 </UserControl>

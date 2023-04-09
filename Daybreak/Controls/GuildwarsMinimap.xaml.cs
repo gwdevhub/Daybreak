@@ -29,6 +29,7 @@ public partial class GuildwarsMinimap : UserControl
 {
     private const int MapDownscaleFactor = 10;
     private const int EntitySize = 100;
+    private const int OutlineSize = 20;
     private const float PositionRadius = 150;
     // Minimum amount of milliseconds to pass between calculating paths to objectives
     private const int MinPathCalculationFrequency = 500;
@@ -40,6 +41,7 @@ public partial class GuildwarsMinimap : UserControl
     private readonly IPathfinder pathfinder;
     private readonly IGuildwarsEntityDebouncer guildwarsEntityDebouncer;
     private readonly Color positionHistoryColor = Color.FromArgb(155, Colors.Red.R, Colors.Red.G, Colors.Red.B);
+    private readonly Color outlineColor = Colors.Chocolate;
     private readonly TimeSpan offsetRevertDelay = TimeSpan.FromSeconds(3);
 
     private bool calculatingPathToObjectives = false;
@@ -67,6 +69,10 @@ public partial class GuildwarsMinimap : UserControl
     private bool drawPositionHistory = true;
     [GenerateDependencyProperty]
     private bool controlsVisible;
+    [GenerateDependencyProperty]
+    private int targetEntityId;
+    [GenerateDependencyProperty]
+    private int targetEntityModelId;
 
     public event EventHandler? MaximizeClicked;
     public event EventHandler<QuestMetadata>? QuestMetadataClicked;
@@ -134,6 +140,8 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
+        this.TargetEntityId = this.GameData.Session?.CurrentTargetId ?? 0;
+        this.TargetEntityModelId = (int?)this.GameData.LivingEntities?.FirstOrDefault(e => e.Id == this.TargetEntityId).ModelType ?? 0;
         var screenVirtualWidth = this.ActualWidth / this.Zoom;
         var screenVirtualHeight = this.ActualHeight / this.Zoom;
         var position = debounceResponse.MainPlayer.Position!.Value;
@@ -321,17 +329,31 @@ public partial class GuildwarsMinimap : UserControl
 
         this.FillEllipse(debounceResponse.MainPlayer.Position, bitmap, Colors.Green);
 
-        foreach (var partyMember in debounceResponse.Party.Where(p => IsValidPositionalEntity(p)))
+        foreach (var partyMember in debounceResponse.Party.Where(p => IsValidPositionalEntity(p)).OrderBy(p => p.Id == this.TargetEntityId))
         {
-            this.FillEllipse(partyMember.Position, bitmap, Colors.Green);
+            if (partyMember.Id == this.TargetEntityId)
+            {
+                this.OutlinedFilledEllipse(partyMember.Position, bitmap, this.outlineColor, Colors.Green);
+            }
+            else
+            {
+                this.FillEllipse(partyMember.Position, bitmap, Colors.Green);
+            }
         }
 
-        foreach (var player in debounceResponse.WorldPlayers.Where(p => IsValidPositionalEntity(p)))
+        foreach (var player in debounceResponse.WorldPlayers.Where(p => IsValidPositionalEntity(p)).OrderBy(p => p.Id == this.TargetEntityId))
         {
-            this.FillEllipse(player.Position, bitmap, Colors.CornflowerBlue);
+            if (player.Id == this.TargetEntityId)
+            {
+                this.OutlinedFilledEllipse(player.Position, bitmap, this.outlineColor, Colors.CornflowerBlue);
+            }
+            else
+            {
+                this.FillEllipse(player.Position, bitmap, Colors.CornflowerBlue);
+            }
         }
 
-        foreach (var livingEntity in debounceResponse.LivingEntities.Where(p => IsValidPositionalEntity(p)))
+        foreach (var livingEntity in debounceResponse.LivingEntities.Where(p => IsValidPositionalEntity(p)).OrderBy(p => p.Id == this.TargetEntityId))
         {
             if (livingEntity.State is LivingEntityState.ToBeCleanedUp)
             {
@@ -339,36 +361,94 @@ public partial class GuildwarsMinimap : UserControl
             }
             else if (livingEntity.State is LivingEntityState.Dead)
             {
-                this.FillEllipse(livingEntity.Position, bitmap, Colors.Gray);
+                if (livingEntity.Id == this.TargetEntityId)
+                {
+                    this.OutlinedFilledEllipse(livingEntity.Position, bitmap, this.outlineColor, Colors.Gray);
+                }
+                else
+                {
+                    this.FillEllipse(livingEntity.Position, bitmap, Colors.Gray);
+                }
+
+                continue;
             }
             else if (livingEntity.State is LivingEntityState.Boss)
             {
-                this.FillStar(livingEntity.Position, bitmap, Colors.DarkRed);
+                if (livingEntity.Id == this.TargetEntityId)
+                {
+                    this.OutlinedFilledStar(livingEntity.Position, bitmap, this.outlineColor, Colors.DarkRed);
+                }
+                else
+                {
+                    this.FillStar(livingEntity.Position, bitmap, Colors.DarkRed);
+                }
+
+                continue;
             }
-            else if (livingEntity.Allegiance is LivingEntityAllegiance.AllyNonAttackable)
+
+            switch (livingEntity.Allegiance)
             {
-                this.FillEllipse(livingEntity.Position, bitmap, Colors.Green);
-            }
-            else if (livingEntity.Allegiance is LivingEntityAllegiance.Neutral)
-            {
-                this.FillEllipse(livingEntity.Position, bitmap, Colors.LightSteelBlue);
-            }
-            else if (livingEntity.Allegiance is LivingEntityAllegiance.Enemy)
-            {
-                this.FillTriangle(livingEntity.Position, bitmap, Colors.Red);
-            }
-            else if (livingEntity.Allegiance is LivingEntityAllegiance.SpiritOrPet)
-            {
-                this.FillTriangle(livingEntity.Position, bitmap, Colors.Green);
-            }
-            else if (livingEntity.Allegiance is LivingEntityAllegiance.Minion)
-            {
-                this.FillTriangle(livingEntity.Position, bitmap, Colors.Green);
-            }
-            else if (livingEntity.Allegiance is LivingEntityAllegiance.NpcOrMinipet)
-            {
-                this.FillTriangle(livingEntity.Position, bitmap, Colors.LimeGreen);
-            }
+                case LivingEntityAllegiance.AllyNonAttackable:
+                    if (livingEntity.Id == this.TargetEntityId)
+                    {
+                        this.OutlinedFilledEllipse(livingEntity.Position, bitmap, this.outlineColor, Colors.Green);
+                    }
+                    else
+                    {
+                        this.FillEllipse(livingEntity.Position, bitmap, Colors.Green);
+                    }
+
+                    break;
+
+                case LivingEntityAllegiance.Neutral:
+                    if (livingEntity.Id == this.TargetEntityId)
+                    {
+                        this.OutlinedFilledEllipse(livingEntity.Position, bitmap, this.outlineColor, Colors.LightSteelBlue);
+                    }
+                    else
+                    {
+                        this.FillEllipse(livingEntity.Position, bitmap, Colors.LightSteelBlue);
+                    }
+
+                    break;
+
+                case LivingEntityAllegiance.Enemy:
+                    if (livingEntity.Id == this.TargetEntityId)
+                    {
+                        this.OutlinedFilledTriangle(livingEntity.Position, bitmap, this.outlineColor, Colors.Red);
+                    }
+                    else
+                    {
+                        this.FillTriangle(livingEntity.Position, bitmap, Colors.Red);
+                    }
+
+                    break;
+
+                case LivingEntityAllegiance.SpiritOrPet:
+                case LivingEntityAllegiance.Minion:
+                    if (livingEntity.Id == this.TargetEntityId)
+                    {
+                        this.OutlinedFilledTriangle(livingEntity.Position, bitmap, this.outlineColor, Colors.Green);
+                    }
+                    else
+                    {
+                        this.FillTriangle(livingEntity.Position, bitmap, Colors.Green);
+                    }
+
+                    break;
+
+                case LivingEntityAllegiance.NpcOrMinipet:
+                    if (livingEntity.Id == this.TargetEntityId)
+                    {
+                        this.OutlinedFilledTriangle(livingEntity.Position, bitmap, this.outlineColor, Colors.LimeGreen);
+                    }
+                    else
+                    {
+                        this.FillTriangle(livingEntity.Position, bitmap, Colors.LimeGreen);
+                    }
+
+                    break;
+            };
         }
 
         this.DrawQuestObjectives(bitmap);
@@ -457,6 +537,40 @@ public partial class GuildwarsMinimap : UserControl
             color);
     }
 
+    private void OutlinedFilledStar(Position? position, WriteableBitmap bitmap, Color outlineColor, Color fillColor)
+    {
+        if (!this.EntityOnScreen(position, bitmap, out var x, out var y))
+        {
+            return;
+        }
+
+        this.FillStar(position, bitmap, fillColor);
+
+        (var outerPoints, var innerPoints) = StarCoordinates.Value;
+
+        for (var i = 1; i <= 5; i++)
+        {
+            var outerPoint = outerPoints[i % 5];
+            var innerPointPrev = innerPoints[(i - 1) % 5];
+            var innerPointNext = innerPoints[(i + 1) % 5];
+            bitmap.DrawLineAa(
+                x + (int)(innerPointPrev.X * this.Zoom), y + (int)(innerPointPrev.Y * this.Zoom),
+                x + (int)(outerPoint.X * this.Zoom), y + (int)(outerPoint.Y * this.Zoom),
+                outlineColor,
+                (int)Math.Ceiling(OutlineSize * this.Zoom));
+            bitmap.DrawLineAa(
+                x + (int)(outerPoint.X * this.Zoom), y + (int)(outerPoint.Y * this.Zoom),
+                x + (int)(innerPointNext.X * this.Zoom), y + (int)(innerPointNext.Y * this.Zoom),
+                outlineColor,
+                (int)Math.Ceiling(OutlineSize * this.Zoom));
+            bitmap.DrawLineAa(
+                x + (int)(innerPointNext.X * this.Zoom), y + (int)(innerPointNext.Y * this.Zoom),
+                x + (int)(innerPointPrev.X * this.Zoom), y + (int)(innerPointPrev.Y * this.Zoom),
+                outlineColor,
+                (int)Math.Ceiling(OutlineSize * this.Zoom));
+        }
+    }
+
     private void FillEllipse(Position? position, WriteableBitmap bitmap, Color color)
     {
         if (!this.EntityOnScreen(position, bitmap, out var x, out var y))
@@ -470,6 +584,23 @@ public partial class GuildwarsMinimap : UserControl
                 (int)(EntitySize * this.Zoom),
                 (int)(EntitySize * this.Zoom),
                 color);
+    }
+
+    private void OutlinedFilledEllipse(Position? position, WriteableBitmap bitmap, Color outlineColor, Color fillColor)
+    {
+        if (!this.EntityOnScreen(position, bitmap, out var x, out var y))
+        {
+            return;
+        }
+
+        bitmap.FillEllipseCentered(
+                x,
+                y,
+                (int)Math.Ceiling((EntitySize + OutlineSize) * this.Zoom),
+                (int)Math.Ceiling((EntitySize + OutlineSize) * this.Zoom),
+                outlineColor);
+
+        this.FillEllipse(position, bitmap, fillColor);
     }
 
     private void FillTriangle(Position? position, WriteableBitmap bitmap, Color color)
@@ -487,6 +618,40 @@ public partial class GuildwarsMinimap : UserControl
             (int)((position.Value.X - this.originPoint.X + EntitySize) * this.Zoom),
             0 - (int)((position.Value.Y - this.originPoint.Y + EntitySize) * this.Zoom),
             color);
+    }
+
+    private void OutlinedFilledTriangle(Position? position, WriteableBitmap bitmap, Color outlineColor, Color fillColor)
+    {
+        if (!this.EntityOnScreen(position, bitmap, out _, out _))
+        {
+            return;
+        }
+
+        this.FillTriangle(position, bitmap, fillColor);
+
+        bitmap.DrawLineAa(
+            (int)((position!.Value.X - this.originPoint.X - EntitySize) * this.Zoom),
+            0 - (int)((position.Value.Y - this.originPoint.Y + EntitySize) * this.Zoom),
+            (int)((position.Value.X - this.originPoint.X) * this.Zoom),
+            0 - (int)((position.Value.Y - this.originPoint.Y - EntitySize) * this.Zoom),
+            outlineColor,
+            (int)Math.Ceiling(OutlineSize * this.Zoom));
+
+        bitmap.DrawLineAa(
+            (int)((position.Value.X - this.originPoint.X) * this.Zoom),
+            0 - (int)((position.Value.Y - this.originPoint.Y - EntitySize) * this.Zoom),
+            (int)((position.Value.X - this.originPoint.X + EntitySize) * this.Zoom),
+            0 - (int)((position.Value.Y - this.originPoint.Y + EntitySize) * this.Zoom),
+            outlineColor,
+            (int)Math.Ceiling(OutlineSize * this.Zoom));
+
+        bitmap.DrawLineAa(
+            (int)((position.Value.X - this.originPoint.X + EntitySize) * this.Zoom),
+            0 - (int)((position.Value.Y - this.originPoint.Y + EntitySize) * this.Zoom),
+            (int)((position.Value.X - this.originPoint.X - EntitySize) * this.Zoom),
+            0 - (int)((position.Value.Y - this.originPoint.Y + EntitySize) * this.Zoom),
+            outlineColor,
+            (int)Math.Ceiling(OutlineSize * this.Zoom));
     }
 
     private bool EntityOnScreen(Position? position, WriteableBitmap bitmap, out int x, out int y)
@@ -714,7 +879,7 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
-        var maybeWorldPlayer = this.CheckMouseOverEntity(this.GameData.WorldPlayers?.OfType<IEntity>().Where(IsValidPositionalEntity));
+        var maybeWorldPlayer = this.CheckMouseOverEntity(this.GameData.WorldPlayers?.OfType<IEntity>().Where(IsValidPositionalEntity).OrderByDescending(p => p.Id == this.TargetEntityId));
         if (maybeWorldPlayer is WorldPlayerInformation worldPlayerInformation &&
             this.TryFindResource("WorldPlayerContextMenu") is ContextMenu worldPlayerContextMenu)
         {
@@ -724,7 +889,7 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
-        var maybePartyMember = this.CheckMouseOverEntity(this.GameData.Party?.OfType<IEntity>().Where(IsValidPositionalEntity));
+        var maybePartyMember = this.CheckMouseOverEntity(this.GameData.Party?.OfType<IEntity>().Where(IsValidPositionalEntity).OrderByDescending(p => p.Id == this.TargetEntityId));
         if (maybePartyMember is PlayerInformation partyMember &&
             this.TryFindResource("PlayerContextMenu") is ContextMenu playerContextMenu)
         {
@@ -734,7 +899,7 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
-        var maybeLivingEntity = this.CheckMouseOverEntity(this.GameData.LivingEntities?.OfType<IEntity>().Where(IsValidPositionalEntity));
+        var maybeLivingEntity = this.CheckMouseOverEntity(this.GameData.LivingEntities?.OfType<IEntity>().Where(IsValidPositionalEntity).OrderByDescending(p => p.Id == this.TargetEntityId));
         if (maybeLivingEntity is LivingEntity livingEntity &&
             this.TryFindResource("LivingEntityContextMenu") is ContextMenu livingEntityContextMenu)
         {
