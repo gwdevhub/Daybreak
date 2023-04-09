@@ -793,4 +793,14 @@ public partial class FocusView : UserControl
 
         this.BrowserAddress = e.NpcDefinition!.WikiUrl;
     }
+
+    private void GuildwarsMinimap_MapIconClicked(object _, MapIcon e)
+    {
+        if (e.Icon?.WikiUrl.IsNullOrWhiteSpace() is true)
+        {
+            return;
+        }
+
+        this.BrowserAddress = e.Icon!.WikiUrl;
+    }
 }

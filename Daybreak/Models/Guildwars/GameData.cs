@@ -12,4 +12,5 @@ public readonly struct GameData
     public SessionInformation? Session { get; init; }
     public List<WorldPlayerInformation>? WorldPlayers { get; init; }
     public List<LivingEntity>? LivingEntities { get; init; }
+    public List<MapIcon>? MapIcons { get; init; }
 }

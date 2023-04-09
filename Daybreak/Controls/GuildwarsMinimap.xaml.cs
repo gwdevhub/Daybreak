@@ -78,6 +78,7 @@ public partial class GuildwarsMinimap : UserControl
     public event EventHandler<QuestMetadata>? QuestMetadataClicked;
     public event EventHandler<LivingEntity>? LivingEntityClicked;
     public event EventHandler<PlayerInformation>? PlayerInformationClicked;
+    public event EventHandler<MapIcon>? MapIconClicked;
 
     public GuildwarsMinimap()
         :this(
@@ -327,6 +328,8 @@ public partial class GuildwarsMinimap : UserControl
         this.DrawMainPlayerPositionHistory(bitmap);
         this.DrawPaths(bitmap, this.pathfindingCache);
 
+        this.DrawMapIcons(bitmap);
+
         this.FillEllipse(debounceResponse.MainPlayer.Position, bitmap, Colors.Green);
 
         foreach (var partyMember in debounceResponse.Party.Where(p => IsValidPositionalEntity(p)).OrderBy(p => p.Id == this.TargetEntityId))
@@ -497,6 +500,23 @@ public partial class GuildwarsMinimap : UserControl
         }
     }
 
+    private void DrawMapIcons(WriteableBitmap writeableBitmap)
+    {
+        var mapIcons = this.GameData.MapIcons;
+        if (mapIcons is null)
+        {
+            return;
+        }
+
+        foreach(var mapIcon in mapIcons)
+        {
+            if (mapIcon.Icon == GuildwarsIcon.ResurrectionShrine)
+            {
+                this.OutlinedCross(mapIcon.Position, writeableBitmap, Colors.CornflowerBlue);
+            }
+        }
+    }
+
     private void FillStar(Position? position, WriteableBitmap bitmap, Color color)
     {
         if (!this.EntityOnScreen(position, bitmap, out var x, out var y))
@@ -652,6 +672,29 @@ public partial class GuildwarsMinimap : UserControl
             0 - (int)((position.Value.Y - this.originPoint.Y + EntitySize) * this.Zoom),
             outlineColor,
             (int)Math.Ceiling(OutlineSize * this.Zoom));
+    }
+
+    private void OutlinedCross(Position? position, WriteableBitmap bitmap, Color color)
+    {
+        if (!this.EntityOnScreen(position, bitmap, out var x, out var y))
+        {
+            return;
+        }
+
+        var thickness = EntitySize / 3 * this.Zoom;
+        var height = EntitySize * 3 * this.Zoom;
+        var width = EntitySize * 2 * this.Zoom;
+        var height3 = height / 3;
+        var height2 = height3 * 2;
+        bitmap.FillRectangle(
+            (int)(x - thickness), (int)(y - height3),
+            (int)(x + thickness), (int)(y + height2),
+            color);
+
+        bitmap.FillRectangle(
+            (int)(x - width / 2), (int)(y - thickness),
+            (int)(x + width / 2), (int)(y + thickness),
+            color);
     }
 
     private bool EntityOnScreen(Position? position, WriteableBitmap bitmap, out int x, out int y)
@@ -909,6 +952,16 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
+        var maybeMapIcon = this.CheckMouseOverEntity(this.GameData.MapIcons?.OfType<IPositionalEntity>().Where(IsValidPositionalEntity));
+        if (maybeMapIcon is MapIcon mapIcon &&
+            this.TryFindResource("MapIconContextMenu") is ContextMenu mapIconContextMenu)
+        {
+            this.ContextMenu = mapIconContextMenu;
+            this.ContextMenu.DataContext = mapIcon;
+            this.ContextMenu.IsOpen = true;
+            return;
+        }
+
         this.ContextMenu = default;
     }
 
@@ -940,6 +993,11 @@ public partial class GuildwarsMinimap : UserControl
         }
 
         if (this.CheckMouseOverEntity(this.GameData.LivingEntities!.OfType<IEntity>()) is not null)
+        {
+            return;
+        }
+
+        if (this.CheckMouseOverEntity(this.GameData.MapIcons!.OfType<IPositionalEntity>()) is not null)
         {
             return;
         }
@@ -1021,6 +1079,16 @@ public partial class GuildwarsMinimap : UserControl
         }
 
         this.LivingEntityClicked?.Invoke(this, livingEntity.Value);
+    }
+
+    private void MapIconContextMenu_MapIconContextMenuClicked(object _, MapIcon? mapIcon)
+    {
+        if (mapIcon is not MapIcon)
+        {
+            return;
+        }
+
+        this.MapIconClicked?.Invoke(this, mapIcon.Value);
     }
 
     private void MaximizeButton_Clicked(object sender, EventArgs e)
