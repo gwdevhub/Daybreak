@@ -458,13 +458,20 @@ public partial class FocusView : UserControl
         var memoryReaderLatency = this.GetMemoryReaderLatency();
         while (!cancellationToken.IsCancellationRequested)
         {
-            await this.UpdateGameData().ConfigureAwait(true);
-            if (cancellationToken.IsCancellationRequested)
+            try
             {
-                return;
-            }
+                await this.UpdateGameData().ConfigureAwait(true);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return;
+                }
 
-            await Task.Delay(memoryReaderLatency, cancellationToken).ConfigureAwait(true);
+                await Task.Delay(memoryReaderLatency, cancellationToken).ConfigureAwait(true);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Encountered non-terminating exception. Silently continuing");
+            }
         }
     }
 

@@ -1,4 +1,5 @@
 ﻿using Daybreak.Configuration;
+using Daybreak.Services.Drawing;
 using Daybreak.Services.ExceptionHandling;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Startup;
@@ -49,6 +50,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
         ProjectConfiguration.RegisterViews(this.ServiceProvider.GetRequiredService<IViewManager>()!);
         ProjectConfiguration.RegisterPostUpdateActions(this.ServiceProvider.GetRequiredService<IPostUpdateActionProducer>()!);
         ProjectConfiguration.RegisterStartupActions(this.ServiceProvider.GetRequiredService<IStartupActionProducer>()!);
+        ProjectConfiguration.RegisterDrawingModules(this.ServiceProvider.GetRequiredService<IDrawingModuleProducer>()!);
 
         this.logger = this.ServiceProvider.GetRequiredService<ILogger<Launcher>>();
         this.exceptionHandler = this.ServiceProvider.GetRequiredService<IExceptionHandler>();
