@@ -39,6 +39,10 @@ using Daybreak.Services.ExceptionHandling;
 using Daybreak.Services.Pathfinding;
 using Daybreak.Services.Startup;
 using Daybreak.Services.Startup.Actions;
+using Daybreak.Services.Drawing;
+using Daybreak.Services.Drawing.Modules.Entities;
+using Daybreak.Services.Drawing.Modules.MapIcons;
+using Daybreak.Services.Drawing.Modules;
 
 namespace Daybreak.Configuration;
 
@@ -144,6 +148,8 @@ public static class ProjectConfiguration
         services.AddScoped<IGuildwarsEntityDebouncer, GuildwarsEntityDebouncer>();
         services.AddScoped<IExceptionHandler, ExceptionHandler>();
         services.AddScoped<IPathfinder, StupidPathfinder>();
+        services.AddScoped<IDrawingService, DrawingService>();
+        services.AddScoped<IDrawingModuleProducer, DrawingService>(sp => sp.GetRequiredService<IDrawingService>().As<DrawingService>());
     }
 
     public static void RegisterViews(IViewProducer viewProducer)
@@ -182,6 +188,30 @@ public static class ProjectConfiguration
     public static void RegisterPostUpdateActions(IPostUpdateActionProducer postUpdateActionProducer)
     {
         postUpdateActionProducer.ThrowIfNull();
+    }
+
+    public static void RegisterDrawingModules(IDrawingModuleProducer drawingModuleProducer)
+    {
+        drawingModuleProducer.ThrowIfNull();
+
+
+        drawingModuleProducer.RegisterDrawingModule<DeadEntityDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<NeutralEntityDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<AlliedCreatureEntityDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<AllyEntityDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<EnemyEntityDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<BossEntityDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<NpcEntityDrawingModule>();
+
+        drawingModuleProducer.RegisterDrawingModule<ResurrectionShrineDrawingModule>();
+
+        drawingModuleProducer.RegisterDrawingModule<PathfindingDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<PlayerPositionHistoryDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<QuestObjectiveDrawingModule>();
+
+        drawingModuleProducer.RegisterDrawingModule<MainPlayerDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<PartyMemberDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<WorldPlayerDrawingModule>();
     }
 
     private static void SetupDaybreakUserAgent(HttpRequestHeaders httpRequestHeaders)

@@ -18,6 +18,7 @@ using Daybreak.Services.Pathfinding.Models;
 using System.Windows.Threading;
 using System.Threading;
 using System.Threading.Tasks;
+using Daybreak.Services.Drawing;
 
 namespace Daybreak.Controls;
 
@@ -29,18 +30,15 @@ public partial class GuildwarsMinimap : UserControl
 {
     private const int MapDownscaleFactor = 10;
     private const int EntitySize = 100;
-    private const int OutlineSize = 20;
     private const float PositionRadius = 150;
     // Minimum amount of milliseconds to pass between calculating paths to objectives
     private const int MinPathCalculationFrequency = 500;
 
-    private static readonly Lazy<(Point[] OuterPoints, Point[] InnerPoints)> StarCoordinates = new(GetStarGlyphPoints);
-
     private readonly DispatcherTimer dispatcherTimer = new(DispatcherPriority.ApplicationIdle);
     private readonly List<Position> mainPlayerPositionHistory = new();
     private readonly IPathfinder pathfinder;
+    private readonly IDrawingService drawingService;
     private readonly IGuildwarsEntityDebouncer guildwarsEntityDebouncer;
-    private readonly Color positionHistoryColor = Color.FromArgb(155, Colors.Red.R, Colors.Red.G, Colors.Red.B);
     private readonly Color outlineColor = Colors.Chocolate;
     private readonly TimeSpan offsetRevertDelay = TimeSpan.FromSeconds(3);
 
@@ -83,15 +81,18 @@ public partial class GuildwarsMinimap : UserControl
     public GuildwarsMinimap()
         :this(
              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IPathfinder>(),
+             Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IDrawingService>(),
              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IGuildwarsEntityDebouncer>())
     {
     }
 
     public GuildwarsMinimap(
         IPathfinder pathfinder,
+        IDrawingService drawingService,
         IGuildwarsEntityDebouncer guildwarsEntityDebouncer)
     {
         this.pathfinder = pathfinder.ThrowIfNull();
+        this.drawingService = drawingService.ThrowIfNull();
         this.guildwarsEntityDebouncer = guildwarsEntityDebouncer.ThrowIfNull();
 
         this.dispatcherTimer.Tick += (_, _) => this.ApplyOffsetRevert();
@@ -136,7 +137,8 @@ public partial class GuildwarsMinimap : UserControl
         if (!double.IsFinite(this.mapWidth) ||
             !double.IsFinite(this.mapHeight) ||
             !double.IsFinite(this.mapVirtualMinWidth) ||
-            !double.IsFinite(this.mapVirtualMinHeight))
+            !double.IsFinite(this.mapVirtualMinHeight) ||
+            debounceResponse.MainPlayer.Position is null)
         {
             return;
         }
@@ -161,7 +163,7 @@ public partial class GuildwarsMinimap : UserControl
         this.MapDrawingHost.Width = this.mapWidth * this.Zoom;
         this.cachedDebounceResponse = debounceResponse;
         this.ManageMainPlayerPositionHistory();
-        this.DrawEntities(debounceResponse);
+        this.DrawEntities();
     }
 
     private void ManageMainPlayerPositionHistory()
@@ -256,64 +258,18 @@ public partial class GuildwarsMinimap : UserControl
             bitmap.FillPolygon(new int[] { (int)a.X, (int)a.Y, (int)b.X, (int)b.Y, (int)c.X, (int)c.Y, (int)d.X, (int)d.Y, (int)a.X, (int)a.Y }, Colors.White);
         }
     }
-    
-    private void DrawPaths(WriteableBitmap bitmap, PathfindingCache? pathfindingCache)
+
+    private void DrawEntities()
     {
-        if (pathfindingCache is null)
+        if (this.ActualWidth == 0 || this.ActualHeight == 0)
         {
             return;
         }
 
-        if (this.mapWidth <= 0 ||
-            this.mapHeight <= 0 ||
-            !double.IsFinite(this.mapWidth) ||
-            !double.IsFinite(this.mapHeight))
-        {
-            return;
-        }
-
-        if (pathfindingCache.PathfindingResponses.Count <= 0)
-        {
-            return;
-        }
-
-        for(var i = 0; i < this.pathfindingCache?.PathfindingResponses.Count; i++)
-        {
-            var response = this.pathfindingCache.PathfindingResponses[i];
-            var color = this.pathfindingCache.Colors[i];
-            var currentPosVector = new Vector(double.NaN, double.NaN);
-            foreach (var segment in response.Pathing!)
-            {
-                var startPosition = new Position { X = (float)segment.StartPoint.X, Y = (float)segment.StartPoint.Y };
-                var endPosition = new Position { X = (float)segment.EndPoint.X, Y = (float)segment.EndPoint.Y };
-                if (double.IsNaN(currentPosVector.X) || double.IsNaN(currentPosVector.Y))
-                {
-                    currentPosVector = new Vector(startPosition.X, startPosition.Y);
-                }
-                var endVector = new Vector(endPosition.X, endPosition.Y);
-                var direction = endVector - currentPosVector;
-                direction.Normalize();
-                var increment = direction * (PositionRadius + PositionRadius);
-
-                while (currentPosVector.X != endPosition.X && currentPosVector.Y != endPosition.Y)
-                {
-                    var remaining = endVector - currentPosVector;
-                    if (remaining.LengthSquared < increment.LengthSquared)
-                    {
-                        break;
-                    }
-
-                    currentPosVector += increment;
-                    this.FillEllipse(new Position { X = (float)currentPosVector.X, Y = (float)currentPosVector.Y }, bitmap, color);
-                }
-            }
-        }
-    }
-
-    private void DrawEntities(DebounceResponse debounceResponse)
-    {
-        if (this.EntitiesDrawingHost.Source is not WriteableBitmap bitmap || this.resizeEntities ||
-            bitmap.PixelHeight != (int)this.ActualHeight || bitmap.PixelWidth != this.ActualWidth)
+        if (this.EntitiesDrawingHost.Source is not WriteableBitmap bitmap ||
+            this.resizeEntities ||
+            bitmap.PixelHeight != (int)this.ActualHeight ||
+            bitmap.PixelWidth != (int)this.ActualWidth)
         {
             bitmap = BitmapFactory.New((int)this.ActualWidth, (int)this.ActualHeight);
             this.EntitiesDrawingHost.Source = bitmap;
@@ -325,401 +281,18 @@ public partial class GuildwarsMinimap : UserControl
         bitmap.Clear(Colors.Transparent);
         using var context = bitmap.GetBitmapContext();
 
-        this.DrawMainPlayerPositionHistory(bitmap);
-        this.DrawPaths(bitmap, this.pathfindingCache);
-
-        this.DrawMapIcons(bitmap);
-
-        this.FillEllipse(debounceResponse.MainPlayer.Position, bitmap, Colors.Green);
-
-        foreach (var partyMember in debounceResponse.Party.Where(p => IsValidPositionalEntity(p)).OrderBy(p => p.Id == this.TargetEntityId))
-        {
-            if (partyMember.Id == this.TargetEntityId)
-            {
-                this.OutlinedFilledEllipse(partyMember.Position, bitmap, this.outlineColor, Colors.Green);
-            }
-            else
-            {
-                this.FillEllipse(partyMember.Position, bitmap, Colors.Green);
-            }
-        }
-
-        foreach (var player in debounceResponse.WorldPlayers.Where(p => IsValidPositionalEntity(p)).OrderBy(p => p.Id == this.TargetEntityId))
-        {
-            if (player.Id == this.TargetEntityId)
-            {
-                this.OutlinedFilledEllipse(player.Position, bitmap, this.outlineColor, Colors.CornflowerBlue);
-            }
-            else
-            {
-                this.FillEllipse(player.Position, bitmap, Colors.CornflowerBlue);
-            }
-        }
-
-        foreach (var livingEntity in debounceResponse.LivingEntities.Where(p => IsValidPositionalEntity(p)).OrderBy(p => p.Id == this.TargetEntityId))
-        {
-            if (livingEntity.State is LivingEntityState.ToBeCleanedUp)
-            {
-                continue;
-            }
-            else if (livingEntity.State is LivingEntityState.Dead)
-            {
-                if (livingEntity.Id == this.TargetEntityId)
-                {
-                    this.OutlinedFilledEllipse(livingEntity.Position, bitmap, this.outlineColor, Colors.Gray);
-                }
-                else
-                {
-                    this.FillEllipse(livingEntity.Position, bitmap, Colors.Gray);
-                }
-
-                continue;
-            }
-            else if (livingEntity.State is LivingEntityState.Boss)
-            {
-                if (livingEntity.Id == this.TargetEntityId)
-                {
-                    this.OutlinedFilledStar(livingEntity.Position, bitmap, this.outlineColor, Colors.DarkRed);
-                }
-                else
-                {
-                    this.FillStar(livingEntity.Position, bitmap, Colors.DarkRed);
-                }
-
-                continue;
-            }
-
-            switch (livingEntity.Allegiance)
-            {
-                case LivingEntityAllegiance.AllyNonAttackable:
-                    if (livingEntity.Id == this.TargetEntityId)
-                    {
-                        this.OutlinedFilledEllipse(livingEntity.Position, bitmap, this.outlineColor, Colors.Green);
-                    }
-                    else
-                    {
-                        this.FillEllipse(livingEntity.Position, bitmap, Colors.Green);
-                    }
-
-                    break;
-
-                case LivingEntityAllegiance.Neutral:
-                    if (livingEntity.Id == this.TargetEntityId)
-                    {
-                        this.OutlinedFilledEllipse(livingEntity.Position, bitmap, this.outlineColor, Colors.LightSteelBlue);
-                    }
-                    else
-                    {
-                        this.FillEllipse(livingEntity.Position, bitmap, Colors.LightSteelBlue);
-                    }
-
-                    break;
-
-                case LivingEntityAllegiance.Enemy:
-                    if (livingEntity.Id == this.TargetEntityId)
-                    {
-                        this.OutlinedFilledTriangle(livingEntity.Position, bitmap, this.outlineColor, Colors.Red);
-                    }
-                    else
-                    {
-                        this.FillTriangle(livingEntity.Position, bitmap, Colors.Red);
-                    }
-
-                    break;
-
-                case LivingEntityAllegiance.SpiritOrPet:
-                case LivingEntityAllegiance.Minion:
-                    if (livingEntity.Id == this.TargetEntityId)
-                    {
-                        this.OutlinedFilledTriangle(livingEntity.Position, bitmap, this.outlineColor, Colors.Green);
-                    }
-                    else
-                    {
-                        this.FillTriangle(livingEntity.Position, bitmap, Colors.Green);
-                    }
-
-                    break;
-
-                case LivingEntityAllegiance.NpcOrMinipet:
-                    if (livingEntity.Id == this.TargetEntityId)
-                    {
-                        this.OutlinedFilledTriangle(livingEntity.Position, bitmap, this.outlineColor, Colors.LimeGreen);
-                    }
-                    else
-                    {
-                        this.FillTriangle(livingEntity.Position, bitmap, Colors.LimeGreen);
-                    }
-
-                    break;
-            };
-        }
-
-        this.DrawQuestObjectives(bitmap);
-    }
-
-    private void DrawQuestObjectives(WriteableBitmap writeableBitmap)
-    {
-        if (this.PathingData.Trapezoids is null)
-        {
-            return;
-        }
-
-        var currentMapQuests = this.GameData.MainPlayer!.Value.QuestLog!.Where(QuestVisible);
-        foreach (var questMetaData in currentMapQuests)
-        {
-            var position = this.ForceOnScreenPosition(questMetaData.Position!.Value);
-            if (!this.EntityOnScreen(questMetaData.Position, writeableBitmap, out var x, out var y))
-            {
-                var questPoint = new Point(questMetaData.Position!.Value.X, questMetaData.Position.Value.Y);
-                
-
-                this.FillStar(position, writeableBitmap, GetQuestColor(questMetaData));
-            }
-            else
-            {
-                this.FillStar(questMetaData.Position, writeableBitmap, GetQuestColor(questMetaData));
-            }
-        }
-    }
-
-    private void DrawMainPlayerPositionHistory(WriteableBitmap writeableBitmap)
-    {
-        if (!this.DrawPositionHistory)
-        {
-            return;
-        }
-
-        if (this.cachedDebounceResponse is null)
-        {
-            return;
-        }
-
-        foreach(var position in this.mainPlayerPositionHistory)
-        {
-            this.FillEllipse(position, writeableBitmap, this.positionHistoryColor);
-        }
-    }
-
-    private void DrawMapIcons(WriteableBitmap writeableBitmap)
-    {
-        var mapIcons = this.GameData.MapIcons;
-        if (mapIcons is null)
-        {
-            return;
-        }
-
-        foreach(var mapIcon in mapIcons)
-        {
-            if (mapIcon.Icon == GuildwarsIcon.ResurrectionShrine)
-            {
-                this.OutlinedCross(mapIcon.Position, writeableBitmap, Colors.CornflowerBlue);
-            }
-        }
-    }
-
-    private void FillStar(Position? position, WriteableBitmap bitmap, Color color)
-    {
-        if (!this.EntityOnScreen(position, bitmap, out var x, out var y))
-        {
-            return;
-        }
-
-        (var outerPoints, var innerPoints) = StarCoordinates.Value;
-
-        for(var i = 1; i <= 5; i++)
-        {
-            var outerPoint = outerPoints[i % 5];
-            var innerPointPrev = innerPoints[(i - 1) % 5];
-            var innerPointNext = innerPoints[(i + 1) % 5];
-            bitmap.FillTriangle(
-                x + (int)(innerPointPrev.X * this.Zoom), y + (int)(innerPointPrev.Y * this.Zoom),
-                x + (int)(outerPoint.X * this.Zoom), y + (int)(outerPoint.Y * this.Zoom),
-                x + (int)(innerPointNext.X * this.Zoom), y + (int)(innerPointNext.Y * this.Zoom),
-                color);
-        }
-
-        bitmap.FillTriangle(
-            x + (int)(innerPoints[0].X * this.Zoom), y + (int)(innerPoints[0].Y * this.Zoom),
-            x + (int)(innerPoints[1].X * this.Zoom), y + (int)(innerPoints[1].Y * this.Zoom),
-            x + (int)(innerPoints[2].X * this.Zoom), y + (int)(innerPoints[2].Y * this.Zoom),
-            color);
-
-        bitmap.FillTriangle(
-            x + (int)(innerPoints[2].X * this.Zoom), y + (int)(innerPoints[2].Y * this.Zoom),
-            x + (int)(innerPoints[3].X * this.Zoom), y + (int)(innerPoints[3].Y * this.Zoom),
-            x + (int)(innerPoints[4].X * this.Zoom), y + (int)(innerPoints[4].Y * this.Zoom),
-            color);
-
-        bitmap.FillTriangle(
-            x + (int)(innerPoints[0].X * this.Zoom), y + (int)(innerPoints[0].Y * this.Zoom),
-            x + (int)(innerPoints[2].X * this.Zoom), y + (int)(innerPoints[2].Y * this.Zoom),
-            x + (int)(innerPoints[4].X * this.Zoom), y + (int)(innerPoints[4].Y * this.Zoom),
-            color);
-    }
-
-    private void OutlinedFilledStar(Position? position, WriteableBitmap bitmap, Color outlineColor, Color fillColor)
-    {
-        if (!this.EntityOnScreen(position, bitmap, out var x, out var y))
-        {
-            return;
-        }
-
-        this.FillStar(position, bitmap, fillColor);
-
-        (var outerPoints, var innerPoints) = StarCoordinates.Value;
-
-        for (var i = 1; i <= 5; i++)
-        {
-            var outerPoint = outerPoints[i % 5];
-            var innerPointPrev = innerPoints[(i - 1) % 5];
-            var innerPointNext = innerPoints[(i + 1) % 5];
-            bitmap.DrawLineAa(
-                x + (int)(innerPointPrev.X * this.Zoom), y + (int)(innerPointPrev.Y * this.Zoom),
-                x + (int)(outerPoint.X * this.Zoom), y + (int)(outerPoint.Y * this.Zoom),
-                outlineColor,
-                (int)Math.Ceiling(OutlineSize * this.Zoom));
-            bitmap.DrawLineAa(
-                x + (int)(outerPoint.X * this.Zoom), y + (int)(outerPoint.Y * this.Zoom),
-                x + (int)(innerPointNext.X * this.Zoom), y + (int)(innerPointNext.Y * this.Zoom),
-                outlineColor,
-                (int)Math.Ceiling(OutlineSize * this.Zoom));
-            bitmap.DrawLineAa(
-                x + (int)(innerPointNext.X * this.Zoom), y + (int)(innerPointNext.Y * this.Zoom),
-                x + (int)(innerPointPrev.X * this.Zoom), y + (int)(innerPointPrev.Y * this.Zoom),
-                outlineColor,
-                (int)Math.Ceiling(OutlineSize * this.Zoom));
-        }
-    }
-
-    private void FillEllipse(Position? position, WriteableBitmap bitmap, Color color)
-    {
-        if (!this.EntityOnScreen(position, bitmap, out var x, out var y))
-        {
-            return;
-        }
-
-        bitmap.FillEllipseCentered(
-                x,
-                y,
-                (int)(EntitySize * this.Zoom),
-                (int)(EntitySize * this.Zoom),
-                color);
-    }
-
-    private void OutlinedFilledEllipse(Position? position, WriteableBitmap bitmap, Color outlineColor, Color fillColor)
-    {
-        if (!this.EntityOnScreen(position, bitmap, out var x, out var y))
-        {
-            return;
-        }
-
-        bitmap.FillEllipseCentered(
-                x,
-                y,
-                (int)Math.Ceiling((EntitySize + OutlineSize) * this.Zoom),
-                (int)Math.Ceiling((EntitySize + OutlineSize) * this.Zoom),
-                outlineColor);
-
-        this.FillEllipse(position, bitmap, fillColor);
-    }
-
-    private void FillTriangle(Position? position, WriteableBitmap bitmap, Color color)
-    {
-        if (!this.EntityOnScreen(position, bitmap, out _, out _))
-        {
-            return;
-        }
-
-        bitmap.FillTriangle(
-            (int)((position!.Value.X - this.originPoint.X - EntitySize) * this.Zoom),
-            0 - (int)((position.Value.Y - this.originPoint.Y + EntitySize) * this.Zoom),
-            (int)((position.Value.X - this.originPoint.X) * this.Zoom),
-            0 - (int)((position.Value.Y - this.originPoint.Y - EntitySize) * this.Zoom),
-            (int)((position.Value.X - this.originPoint.X + EntitySize) * this.Zoom),
-            0 - (int)((position.Value.Y - this.originPoint.Y + EntitySize) * this.Zoom),
-            color);
-    }
-
-    private void OutlinedFilledTriangle(Position? position, WriteableBitmap bitmap, Color outlineColor, Color fillColor)
-    {
-        if (!this.EntityOnScreen(position, bitmap, out _, out _))
-        {
-            return;
-        }
-
-        this.FillTriangle(position, bitmap, fillColor);
-
-        bitmap.DrawLineAa(
-            (int)((position!.Value.X - this.originPoint.X - EntitySize) * this.Zoom),
-            0 - (int)((position.Value.Y - this.originPoint.Y + EntitySize) * this.Zoom),
-            (int)((position.Value.X - this.originPoint.X) * this.Zoom),
-            0 - (int)((position.Value.Y - this.originPoint.Y - EntitySize) * this.Zoom),
-            outlineColor,
-            (int)Math.Ceiling(OutlineSize * this.Zoom));
-
-        bitmap.DrawLineAa(
-            (int)((position.Value.X - this.originPoint.X) * this.Zoom),
-            0 - (int)((position.Value.Y - this.originPoint.Y - EntitySize) * this.Zoom),
-            (int)((position.Value.X - this.originPoint.X + EntitySize) * this.Zoom),
-            0 - (int)((position.Value.Y - this.originPoint.Y + EntitySize) * this.Zoom),
-            outlineColor,
-            (int)Math.Ceiling(OutlineSize * this.Zoom));
-
-        bitmap.DrawLineAa(
-            (int)((position.Value.X - this.originPoint.X + EntitySize) * this.Zoom),
-            0 - (int)((position.Value.Y - this.originPoint.Y + EntitySize) * this.Zoom),
-            (int)((position.Value.X - this.originPoint.X - EntitySize) * this.Zoom),
-            0 - (int)((position.Value.Y - this.originPoint.Y + EntitySize) * this.Zoom),
-            outlineColor,
-            (int)Math.Ceiling(OutlineSize * this.Zoom));
-    }
-
-    private void OutlinedCross(Position? position, WriteableBitmap bitmap, Color color)
-    {
-        if (!this.EntityOnScreen(position, bitmap, out var x, out var y))
-        {
-            return;
-        }
-
-        var thickness = EntitySize / 3 * this.Zoom;
-        var height = EntitySize * 3 * this.Zoom;
-        var width = EntitySize * 2 * this.Zoom;
-        var height3 = height / 3;
-        var height2 = height3 * 2;
-        bitmap.FillRectangle(
-            (int)(x - thickness), (int)(y - height3),
-            (int)(x + thickness), (int)(y + height2),
-            color);
-
-        bitmap.FillRectangle(
-            (int)(x - width / 2), (int)(y - thickness),
-            (int)(x + width / 2), (int)(y + thickness),
-            color);
-    }
-
-    private bool EntityOnScreen(Position? position, WriteableBitmap bitmap, out int x, out int y)
-    {
-        return this.EntityOnScreen(position, bitmap.PixelWidth, bitmap.PixelHeight, out x, out y);
-    }
-
-    private bool EntityOnScreen(Position? position, int screenWidth, int screenHeight, out int x, out int y)
-    {
-        x = 0;
-        y = 0;
-        if (position.HasValue is false)
-        {
-            return false;
-        }
-
-        x = (int)((position.Value.X - this.originPoint.X) * this.Zoom);
-        y = 0 - (int)((position.Value.Y - this.originPoint.Y) * this.Zoom);
-        if (x < 0 || x > screenWidth ||
-            y < 0 || y > screenHeight)
-        {
-            return false;
-        }
-
-        return true;
+        this.drawingService.UpdateDrawingParameters(
+            (int)this.ActualWidth,
+            (int)this.ActualHeight,
+            this.originPoint,
+            this.Zoom,
+            PositionRadius,
+            EntitySize);
+        this.drawingService.DrawMainPlayerPositionHistory(bitmap, this.mainPlayerPositionHistory);
+        this.drawingService.DrawPaths(bitmap, this.pathfindingCache);
+        this.drawingService.DrawQuestObjectives(bitmap, this.GameData.MainPlayer?.QuestLog ?? new List<QuestMetadata>());
+        this.drawingService.DrawMapIcons(bitmap, this.GameData.MapIcons ?? new List<MapIcon>());
+        this.drawingService.DrawEntities(bitmap, this.cachedDebounceResponse ?? new DebounceResponse(), this.TargetEntityId);
     }
 
     private bool MouseOverEntity(IPositionalEntity entity, Point mousePosition)
@@ -770,7 +343,7 @@ public partial class GuildwarsMinimap : UserControl
         }
 
         this.calculatingPathToObjectives = true;
-        var currentMapQuests = this.GameData.MainPlayer?.QuestLog?.Where(QuestVisible).ToList();
+        var currentMapQuests = this.GameData.MainPlayer?.QuestLog?.Where(q => IsValidPositionalEntity(q)).ToList();
         if (currentMapQuests is null)
         {
             this.calculatingPathToObjectives = false;
@@ -878,7 +451,7 @@ public partial class GuildwarsMinimap : UserControl
         var maybeOffScreenQuestMetadata = this.CheckMouseOverEntity(
             this.GameData.MainPlayer?.QuestLog?
                 .Where(q => IsValidPositionalEntity(q))
-                .Where(entity => !this.EntityOnScreen(entity.Position, (int)this.EntitiesDrawingHost.ActualWidth, (int)this.EntitiesDrawingHost.ActualHeight, out _, out _))
+                .Where(entity => !this.drawingService.IsEntityOnScreen(entity.Position, out _, out _))
                 .Select(oldQuestMetadata =>
                 {
                     var onScreenPosition = this.ForceOnScreenPosition(oldQuestMetadata.Position!.Value);
@@ -903,7 +476,7 @@ public partial class GuildwarsMinimap : UserControl
         var maybeQuestMetadata = this.CheckMouseOverEntity(
             this.GameData.MainPlayer?.QuestLog?
                 .OfType<IPositionalEntity>().Where(IsValidPositionalEntity)
-                .Where(entity => this.EntityOnScreen(entity.Position, (int)this.EntitiesDrawingHost.ActualWidth, (int)this.EntitiesDrawingHost.ActualHeight, out _, out _)));
+                .Where(entity => this.drawingService.IsEntityOnScreen(entity.Position, out _, out _)));
         if (maybeQuestMetadata is QuestMetadata questMetadata &&
             this.TryFindResource("QuestContextMenu") is ContextMenu questContextMenu)
         {
@@ -1003,14 +576,14 @@ public partial class GuildwarsMinimap : UserControl
         }
 
         if (this.CheckMouseOverEntity(this.GameData.MainPlayer!.Value.QuestLog!
-                .Where(entity => this.EntityOnScreen(entity.Position, (int)this.EntitiesDrawingHost.ActualWidth, (int)this.EntitiesDrawingHost.ActualHeight, out _, out _))
+                .Where(entity => this.drawingService.IsEntityOnScreen(entity.Position, out _, out _))
                 .OfType<IPositionalEntity>()) is not null)
         {
             return;
         }
 
         if (this.CheckMouseOverEntity(this.GameData.MainPlayer!.Value.QuestLog!
-                .Where(entity => !this.EntityOnScreen(entity.Position, (int)this.EntitiesDrawingHost.ActualWidth, (int)this.EntitiesDrawingHost.ActualHeight, out _, out _))
+                .Where(entity => !this.drawingService.IsEntityOnScreen(entity.Position, out _, out _))
                 .Select(oldQuestMetadata =>
                 {
                     var onScreenPosition = this.ForceOnScreenPosition(oldQuestMetadata.Position!.Value);
@@ -1117,37 +690,6 @@ public partial class GuildwarsMinimap : UserControl
         }
 
         return true;
-    }
-
-    private static (Point[] OuterPoints, Point[] InnerPoints) GetStarGlyphPoints()
-    {
-        var entitySize = EntitySize * 1.5;
-        var halfSize = entitySize / 2;
-
-        var outerPoints = new Point[]
-        {
-            new Point(entitySize * Math.Cos((2 * Math.PI * 0 / 5) - (Math.PI / 10)), entitySize * Math.Sin((2 * Math.PI * 0 / 5) - (Math.PI / 10))),
-            new Point(entitySize * Math.Cos((2 * Math.PI * 1 / 5) - (Math.PI / 10)), entitySize * Math.Sin((2 * Math.PI * 1 / 5) - (Math.PI / 10))),
-            new Point(entitySize * Math.Cos((2 * Math.PI * 2 / 5) - (Math.PI / 10)), entitySize * Math.Sin((2 * Math.PI * 2 / 5) - (Math.PI / 10))),
-            new Point(entitySize * Math.Cos((2 * Math.PI * 3 / 5) - (Math.PI / 10)), entitySize * Math.Sin((2 * Math.PI * 3 / 5) - (Math.PI / 10))),
-            new Point(entitySize * Math.Cos((2 * Math.PI * 4 / 5) - (Math.PI / 10)), entitySize * Math.Sin((2 * Math.PI * 4 / 5) - (Math.PI / 10))),
-        };
-
-        var innerPoints = new Point[]
-        {
-            new Point(halfSize * Math.Cos((2 * Math.PI * 0 / 5) + (2 * Math.PI / 10) - (Math.PI / 10)), halfSize * Math.Sin((2 * Math.PI * 0 / 5) + (2 * Math.PI / 10) - (Math.PI / 10))),
-            new Point(halfSize * Math.Cos((2 * Math.PI * 1 / 5) + (2 * Math.PI / 10) - (Math.PI / 10)), halfSize * Math.Sin((2 * Math.PI * 1 / 5) + (2 * Math.PI / 10) - (Math.PI / 10))),
-            new Point(halfSize * Math.Cos((2 * Math.PI * 2 / 5) + (2 * Math.PI / 10) - (Math.PI / 10)), halfSize * Math.Sin((2 * Math.PI * 2 / 5) + (2 * Math.PI / 10) - (Math.PI / 10))),
-            new Point(halfSize * Math.Cos((2 * Math.PI * 3 / 5) + (2 * Math.PI / 10) - (Math.PI / 10)), halfSize * Math.Sin((2 * Math.PI * 3 / 5) + (2 * Math.PI / 10) - (Math.PI / 10))),
-            new Point(halfSize * Math.Cos((2 * Math.PI * 4 / 5) + (2 * Math.PI / 10) - (Math.PI / 10)), halfSize * Math.Sin((2 * Math.PI * 4 / 5) + (2 * Math.PI / 10) - (Math.PI / 10))),
-        };
-
-        return (outerPoints, innerPoints);
-    }
-
-    private static bool QuestVisible(QuestMetadata questMetadata)
-    {
-        return questMetadata.Position.GetValueOrDefault().X != 0 && questMetadata.Position.GetValueOrDefault().Y != 0;
     }
 
     private static Color GetQuestColor(QuestMetadata questMetadata)
