@@ -16,7 +16,7 @@ public abstract class StarDrawingModuleBase : DrawingModuleBase
         {
             var outerPoint = outerPoints[i % 5];
             var innerPointPrev = innerPoints[(i - 1) % 5];
-            var innerPointNext = innerPoints[(i + 1) % 5];
+            var innerPointNext = innerPoints[i % 5];
             bitmap.FillTriangle(
                 x + (int)(innerPointPrev.X * entitySize), y + (int)(innerPointPrev.Y * entitySize),
                 x + (int)(outerPoint.X * entitySize), y + (int)(outerPoint.Y * entitySize),
@@ -51,7 +51,7 @@ public abstract class StarDrawingModuleBase : DrawingModuleBase
         {
             var outerPoint = outerPoints[i % 5];
             var innerPointPrev = innerPoints[(i - 1) % 5];
-            var innerPointNext = innerPoints[(i + 1) % 5];
+            var innerPointNext = innerPoints[i % 5];
             bitmap.DrawLineAa(
                 x + (int)(innerPointPrev.X * entitySize), y + (int)(innerPointPrev.Y * entitySize),
                 x + (int)(outerPoint.X * entitySize), y + (int)(outerPoint.Y * entitySize),
@@ -60,11 +60,6 @@ public abstract class StarDrawingModuleBase : DrawingModuleBase
             bitmap.DrawLineAa(
                 x + (int)(outerPoint.X * entitySize), y + (int)(outerPoint.Y * entitySize),
                 x + (int)(innerPointNext.X * entitySize), y + (int)(innerPointNext.Y * entitySize),
-                color,
-                thickness);
-            bitmap.DrawLineAa(
-                x + (int)(innerPointNext.X * entitySize), y + (int)(innerPointNext.Y * entitySize),
-                x + (int)(innerPointPrev.X * entitySize), y + (int)(innerPointPrev.Y * entitySize),
                 color,
                 thickness);
         }
@@ -76,20 +71,20 @@ public abstract class StarDrawingModuleBase : DrawingModuleBase
 
         var outerPoints = new Point[]
         {
-            new Point(Math.Cos(2 * Math.PI * 0 / 5 - Math.PI / 10), Math.Sin(2 * Math.PI * 0 / 5 - Math.PI / 10)),
-            new Point(Math.Cos(2 * Math.PI * 1 / 5 - Math.PI / 10), Math.Sin(2 * Math.PI * 1 / 5 - Math.PI / 10)),
-            new Point(Math.Cos(2 * Math.PI * 2 / 5 - Math.PI / 10), Math.Sin(2 * Math.PI * 2 / 5 - Math.PI / 10)),
-            new Point(Math.Cos(2 * Math.PI * 3 / 5 - Math.PI / 10), Math.Sin(2 * Math.PI * 3 / 5 - Math.PI / 10)),
-            new Point(Math.Cos(2 * Math.PI * 4 / 5 - Math.PI / 10), Math.Sin(2 * Math.PI * 4 / 5 - Math.PI / 10)),
+            new Point(Math.Cos((2 * Math.PI * 0 / 5) - (Math.PI / 10)), Math.Sin((2 * Math.PI * 0 / 5) - (Math.PI / 10))),
+            new Point(Math.Cos((2 * Math.PI * 1 / 5) - (Math.PI / 10)), Math.Sin((2 * Math.PI * 1 / 5) - (Math.PI / 10))),
+            new Point(Math.Cos((2 * Math.PI * 2 / 5) - (Math.PI / 10)), Math.Sin((2 * Math.PI * 2 / 5) - (Math.PI / 10))),
+            new Point(Math.Cos((2 * Math.PI * 3 / 5) - (Math.PI / 10)), Math.Sin((2 * Math.PI * 3 / 5) - (Math.PI / 10))),
+            new Point(Math.Cos((2 * Math.PI * 4 / 5) - (Math.PI / 10)), Math.Sin((2 * Math.PI * 4 / 5) - (Math.PI / 10))),
         };
 
         var innerPoints = new Point[]
         {
-            new Point(halfSize * Math.Cos(2 * Math.PI * 0 / 5 + 2 * Math.PI / 10 - Math.PI / 10), halfSize * Math.Sin(2 * Math.PI * 0 / 5 + 2 * Math.PI / 10 - Math.PI / 10)),
-            new Point(halfSize * Math.Cos(2 * Math.PI * 1 / 5 + 2 * Math.PI / 10 - Math.PI / 10), halfSize * Math.Sin(2 * Math.PI * 1 / 5 + 2 * Math.PI / 10 - Math.PI / 10)),
-            new Point(halfSize * Math.Cos(2 * Math.PI * 2 / 5 + 2 * Math.PI / 10 - Math.PI / 10), halfSize * Math.Sin(2 * Math.PI * 2 / 5 + 2 * Math.PI / 10 - Math.PI / 10)),
-            new Point(halfSize * Math.Cos(2 * Math.PI * 3 / 5 + 2 * Math.PI / 10 - Math.PI / 10), halfSize * Math.Sin(2 * Math.PI * 3 / 5 + 2 * Math.PI / 10 - Math.PI / 10)),
-            new Point(halfSize * Math.Cos(2 * Math.PI * 4 / 5 + 2 * Math.PI / 10 - Math.PI / 10), halfSize * Math.Sin(2 * Math.PI * 4 / 5 + 2 * Math.PI / 10 - Math.PI / 10)),
+            new Point(halfSize * Math.Cos((2 * Math.PI * 0 / 5) + (2 * Math.PI / 10) - (Math.PI / 10)), halfSize * Math.Sin((2 * Math.PI * 0 / 5) + (2 * Math.PI / 10) - (Math.PI / 10))),
+            new Point(halfSize * Math.Cos((2 * Math.PI * 1 / 5) + (2 * Math.PI / 10) - (Math.PI / 10)), halfSize * Math.Sin((2 * Math.PI * 1 / 5) + (2 * Math.PI / 10) - (Math.PI / 10))),
+            new Point(halfSize * Math.Cos((2 * Math.PI * 2 / 5) + (2 * Math.PI / 10) - (Math.PI / 10)), halfSize * Math.Sin((2 * Math.PI * 2 / 5) + (2 * Math.PI / 10) - (Math.PI / 10))),
+            new Point(halfSize * Math.Cos((2 * Math.PI * 3 / 5) + (2 * Math.PI / 10) - (Math.PI / 10)), halfSize * Math.Sin((2 * Math.PI * 3 / 5) + (2 * Math.PI / 10) - (Math.PI / 10))),
+            new Point(halfSize * Math.Cos((2 * Math.PI * 4 / 5) + (2 * Math.PI / 10) - (Math.PI / 10)), halfSize * Math.Sin((2 * Math.PI * 4 / 5) + (2 * Math.PI / 10) - (Math.PI / 10))),
         };
 
         return (outerPoints, innerPoints);
