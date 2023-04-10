@@ -199,8 +199,8 @@ public static class ProjectConfiguration
         drawingModuleProducer.RegisterDrawingModule<NeutralEntityDrawingModule>();
         drawingModuleProducer.RegisterDrawingModule<AlliedCreatureEntityDrawingModule>();
         drawingModuleProducer.RegisterDrawingModule<AllyEntityDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<EnemyEntityDrawingModule>();
         drawingModuleProducer.RegisterDrawingModule<BossEntityDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<EnemyEntityDrawingModule>();
         drawingModuleProducer.RegisterDrawingModule<NpcEntityDrawingModule>();
 
         drawingModuleProducer.RegisterDrawingModule<ResurrectionShrineDrawingModule>();

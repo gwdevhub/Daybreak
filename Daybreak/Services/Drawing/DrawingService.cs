@@ -136,7 +136,7 @@ public sealed class DrawingService : IDrawingService, IDrawingModuleProducer
                 {
                     if (!this.IsEntityOnScreen(position, out var finalX, out var finalY))
                     {
-                        break;
+                        continue;
                     }
 
                     module.DrawPlayerPositionHistory(finalX, finalY, this.finalEntitySize, bitmap);
