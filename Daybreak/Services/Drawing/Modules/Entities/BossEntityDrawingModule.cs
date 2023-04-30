@@ -7,6 +7,7 @@ namespace Daybreak.Services.Drawing.Modules.Entities;
 public sealed class BossEntityDrawingModule : StarTargetedEntityDrawingModuleBase
 {
     protected override Color FillColor { get; } = Colors.DarkRed;
+    protected override bool HasMinimumSize => true;
 
     public override bool CanDrawEntity(IEntity entity)
     {

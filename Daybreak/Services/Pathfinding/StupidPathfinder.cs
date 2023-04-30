@@ -74,14 +74,32 @@ public sealed class StupidPathfinder : IPathfinder
 
         if (GetContainingTrapezoid(map, startPoint) is not Trapezoid startTrapezoid)
         {
-            scopedLogger.LogInformation("Start point not in map");
-            return new PathfindingFailure.StartPointNotInMap(startPoint);
+            scopedLogger.LogInformation("Start point not in map. Getting closest start point in map");
+            (var maybeClosestPoint, var maybeClosestTrapezoid) = GetClosestTrapezoidAndInnerPointToPoint(map.Trapezoids, startPoint);
+            if (maybeClosestPoint is not Point newStartPoint ||
+                maybeClosestTrapezoid is not Trapezoid newStartTrapezoid)
+            {
+                scopedLogger.LogError("Unable to find closest start point in map");
+                return new PathfindingFailure.UnexpectedFailure();
+            }
+
+            startPoint = newStartPoint;
+            startTrapezoid = newStartTrapezoid;
         }
 
         if (GetContainingTrapezoid(map, endPoint) is not Trapezoid endTrapezoid)
         {
-            scopedLogger.LogInformation("End point not in map");
-            return new PathfindingFailure.StartPointNotInMap(endPoint);
+            scopedLogger.LogInformation("End point not in map. Getting closest end point in map");
+            (var maybeClosestPoint, var maybeClosestTrapezoid) = GetClosestTrapezoidAndInnerPointToPoint(map.Trapezoids, endPoint);
+            if (maybeClosestPoint is not Point newEndPoint ||
+                maybeClosestTrapezoid is not Trapezoid newEndTrapezoid)
+            {
+                scopedLogger.LogError("Unable to find closest end point in map");
+                return new PathfindingFailure.UnexpectedFailure();
+            }
+
+            endPoint = newEndPoint;
+            endTrapezoid = newEndTrapezoid;
         }
 
         if (GetTrapezoidPath(map, startTrapezoid, endTrapezoid) is not List<int> pathList)
@@ -246,4 +264,23 @@ public sealed class StupidPathfinder : IPathfinder
         return default;
     }
 
+    private static (Point? ClosestPoint, Trapezoid? ClosestTrapezoid) GetClosestTrapezoidAndInnerPointToPoint(List<Trapezoid> trapezoids, Point point)
+    {
+        var distance = double.MaxValue;
+        var closestPoint = (Point?) null;
+        var closestTrapezoid = (Trapezoid?) null;
+        foreach(var trapezoid in trapezoids)
+        {
+            var p = GetClosestPointInTrapezoid(point, trapezoid);
+            var d = (p - point).LengthSquared;
+            if (d < distance)
+            {
+                closestPoint = p;
+                distance = d;
+                closestTrapezoid = trapezoid;
+            }
+        }
+
+        return (closestPoint, closestTrapezoid);
+    }
 }

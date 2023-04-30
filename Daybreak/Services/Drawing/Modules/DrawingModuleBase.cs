@@ -5,6 +5,10 @@ using System.Windows.Media.Imaging;
 namespace Daybreak.Services.Drawing.Modules;
 public abstract class DrawingModuleBase
 {
+    protected const int MinimumSize = 10;
+
+    protected virtual bool HasMinimumSize => false;
+
     public virtual bool CanDrawPlayerPositionHistory => false;
 
     public virtual bool CanDrawPathfinding => false;

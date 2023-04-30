@@ -204,6 +204,7 @@ public static class ProjectConfiguration
         drawingModuleProducer.RegisterDrawingModule<NpcEntityDrawingModule>();
 
         drawingModuleProducer.RegisterDrawingModule<ResurrectionShrineDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<CollectorDrawingModule>();
 
         drawingModuleProducer.RegisterDrawingModule<PathfindingDrawingModule>();
         drawingModuleProducer.RegisterDrawingModule<PlayerPositionHistoryDrawingModule>();

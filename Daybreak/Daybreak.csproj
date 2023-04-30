@@ -13,11 +13,19 @@
     <LangVersion>preview</LangVersion>
     <ApplicationIcon>Daybreak.ico</ApplicationIcon>
     <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
-    <Version>0.9.8.35</Version>
+    <Version>0.9.8.36</Version>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <UserSecretsId>cfb2a489-db80-448d-a969-80270f314c46</UserSecretsId>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Services\Drawing\Resources\Bag.svg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Services\Drawing\Resources\Bag.svg" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
@@ -49,6 +57,7 @@
     <PackageReference Include="ScottPlot.WPF" Version="4.1.63" />
     <PackageReference Include="securifybv.ShellLink" Version="0.1.0" />
     <PackageReference Include="Slim" Version="1.9.2" />
+    <PackageReference Include="Svg" Version="3.4.4" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
     <PackageReference Include="SystemExtensions.NetCore" Version="1.0.1" />
     <PackageReference Include="SystemExtensions.NetStandard" Version="1.5.0" />

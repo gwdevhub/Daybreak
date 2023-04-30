@@ -7,6 +7,12 @@ public abstract class TriangleDrawingModuleBase : DrawingModuleBase
 {
     protected void DrawFilledTriangle(WriteableBitmap bitmap, int x, int y, int entitySize, Color color)
     {
+        if (this.HasMinimumSize &&
+            entitySize < MinimumSize)
+        {
+            entitySize = MinimumSize;
+        }
+
         bitmap.FillTriangle(
             x - entitySize, y - entitySize,
             x + entitySize, y - entitySize,
@@ -16,6 +22,12 @@ public abstract class TriangleDrawingModuleBase : DrawingModuleBase
 
     protected void DrawOutlinedTriangle(WriteableBitmap bitmap, int x, int y, int entitySize, int thickness, Color color)
     {
+        if (this.HasMinimumSize &&
+            entitySize < MinimumSize)
+        {
+            entitySize = MinimumSize;
+        }
+
         bitmap.DrawLineAa(
             x - entitySize, y - entitySize,
             x + entitySize, y - entitySize,

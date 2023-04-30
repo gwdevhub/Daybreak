@@ -11,6 +11,12 @@ public abstract class StarDrawingModuleBase : DrawingModuleBase
 
     protected void DrawFilledStar(WriteableBitmap bitmap, int x, int y, int entitySize, Color color)
     {
+        if (this.HasMinimumSize &&
+            entitySize < MinimumSize)
+        {
+            entitySize = MinimumSize;
+        }
+
         (var outerPoints, var innerPoints) = StarCoordinates.Value;
         for (var i = 1; i <= 5; i++)
         {
@@ -45,6 +51,12 @@ public abstract class StarDrawingModuleBase : DrawingModuleBase
 
     protected void DrawOutlinedStar(WriteableBitmap bitmap, int x, int y, int entitySize, int thickness, Color color)
     {
+        if (this.HasMinimumSize &&
+            entitySize < MinimumSize)
+        {
+            entitySize = MinimumSize;
+        }
+
         (var outerPoints, var innerPoints) = StarCoordinates.Value;
 
         for (var i = 1; i <= 5; i++)

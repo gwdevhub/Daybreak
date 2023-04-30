@@ -6,6 +6,8 @@ namespace Daybreak.Services.Drawing.Modules;
 
 public sealed class QuestObjectiveDrawingModule : StarDrawingModuleBase
 {
+    protected override bool HasMinimumSize => true;
+
     public override bool CanDrawQuestObjectives => true;
 
     public override void DrawQuestObjective(int finalX, int finalY, int size, WriteableBitmap bitmap, Color color)

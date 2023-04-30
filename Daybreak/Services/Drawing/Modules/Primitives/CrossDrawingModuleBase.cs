@@ -7,6 +7,12 @@ public abstract class CrossDrawingModuleBase : DrawingModuleBase
 {
     protected void DrawCross(WriteableBitmap bitmap, int x, int y, int entitySize, Color color)
     {
+        if (this.HasMinimumSize &&
+            entitySize < MinimumSize)
+        {
+            entitySize = MinimumSize;
+        }
+
         var thickness = entitySize / 3;
         var height = entitySize * 3;
         var width = entitySize * 2;
