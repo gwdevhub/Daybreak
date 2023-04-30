@@ -7,10 +7,12 @@ namespace Daybreak.Models.Guildwars;
 public sealed class GuildwarsIcon
 {
     public static GuildwarsIcon ResurrectionShrine { get; } = new GuildwarsIcon { Id = 191474, Name = "Resurrection Shrine", WikiUrl = "https://wiki.guildwars.com/wiki/Resurrection_Shrine" };
+    public static GuildwarsIcon Collector { get; } = new GuildwarsIcon { Id = 191482, Name = "Collector", WikiUrl = "https://wiki.guildwars.com/wiki/Collector" };
 
     public static List<GuildwarsIcon> Icons { get; } = new()
     {
-        ResurrectionShrine
+        ResurrectionShrine,
+        Collector
     };
 
     public static bool TryParse(int id, out GuildwarsIcon icon)

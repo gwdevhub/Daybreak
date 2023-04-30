@@ -7,6 +7,8 @@ namespace Daybreak.Services.Drawing.Modules.MapIcons;
 
 public sealed class ResurrectionShrineDrawingModule : CrossDrawingModuleBase
 {
+    protected override bool HasMinimumSize => true;
+
     public override bool CanDrawMapIcon(MapIcon mapIcon)
     {
         return mapIcon.Icon == GuildwarsIcon.ResurrectionShrine;
