@@ -793,12 +793,26 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         var retList = new List<MapIcon>();
         foreach(var mapIconContext in mapIconContexts)
         {
+            var affiliation = mapIconContext.Affiliation switch
+            {
+                TeamColor.Gray => Affiliation.Gray,
+                TeamColor.GrayNeutral => Affiliation.GrayNeutral,
+                TeamColor.Teal => Affiliation.Teal,
+                TeamColor.Yellow => Affiliation.Yellow,
+                TeamColor.Purple => Affiliation.Purple,
+                TeamColor.Blue => Affiliation.Blue,
+                TeamColor.Red => Affiliation.Red,
+                TeamColor.Green => Affiliation.Green,
+                _ => throw new InvalidOperationException($"Unknown affiliation {mapIconContext.Affiliation}")
+            };
+
             if (GuildwarsIcon.TryParse((int)mapIconContext.Id, out var icon))
             {
                 retList.Add(new MapIcon
                 {
                     Icon = icon,
-                    Position = new Position { X = mapIconContext.X, Y = mapIconContext.Y }
+                    Position = new Position { X = mapIconContext.X, Y = mapIconContext.Y },
+                    Affiliation = affiliation
                 });
             }
         }

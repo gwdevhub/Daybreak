@@ -21,7 +21,7 @@ public abstract class DrawingModuleBase
 
     public virtual void DrawEntity(int finalX, int finalY, int size, WriteableBitmap bitmap, bool targeted) { }
 
-    public virtual void DrawMapIcon(int finalX, int finalY, int size, WriteableBitmap bitmap) { }
+    public virtual void DrawMapIcon(int finalX, int finalY, int size, WriteableBitmap bitmap, Affiliation affiliation) { }
 
     public virtual void DrawPlayerPositionHistory(int finalX, int finalY, int size, WriteableBitmap bitmap) { }
 

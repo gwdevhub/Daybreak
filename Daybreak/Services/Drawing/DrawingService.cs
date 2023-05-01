@@ -168,7 +168,7 @@ public sealed class DrawingService : IDrawingService, IDrawingModuleProducer
                         break;
                     }
 
-                    module.DrawMapIcon(finalX, finalY, this.finalEntitySize, bitmap);
+                    module.DrawMapIcon(finalX, finalY, this.finalEntitySize, bitmap, mapIcon.Affiliation!.Value);
                 }
             }
         }
