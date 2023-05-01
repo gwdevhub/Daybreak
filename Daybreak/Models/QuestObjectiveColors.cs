@@ -17,6 +17,7 @@ public static class QuestObjectiveColors
     public readonly static Color Amber = Color.FromArgb(255, 255, 171, 0);
     public readonly static Color Orange = Color.FromArgb(255, 255, 109, 0);
     public readonly static Color DeepOrange = Color.FromArgb(255, 221, 44, 0);
+    public readonly static Color Green = Color.FromArgb(255, 56, 142, 60);
 
     public readonly static List<Color> Colors = new()
     {
@@ -33,5 +34,6 @@ public static class QuestObjectiveColors
         Red,
         Cyan,
         Teal,
+        Green
     };
 }

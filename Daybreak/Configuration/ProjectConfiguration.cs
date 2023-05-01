@@ -205,6 +205,13 @@ public static class ProjectConfiguration
 
         drawingModuleProducer.RegisterDrawingModule<ResurrectionShrineDrawingModule>();
         drawingModuleProducer.RegisterDrawingModule<CollectorDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<GateDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<StairsDownDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<StairsUpDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<CircledStarDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<AreaMapDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<DungeonBossDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<DungeonKeyDrawingModule>();
 
         drawingModuleProducer.RegisterDrawingModule<PathfindingDrawingModule>();
         drawingModuleProducer.RegisterDrawingModule<PlayerPositionHistoryDrawingModule>();

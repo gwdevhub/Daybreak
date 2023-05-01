@@ -8,11 +8,25 @@ public sealed class GuildwarsIcon
 {
     public static GuildwarsIcon ResurrectionShrine { get; } = new GuildwarsIcon { Id = 191474, Name = "Resurrection Shrine", WikiUrl = "https://wiki.guildwars.com/wiki/Resurrection_Shrine" };
     public static GuildwarsIcon Collector { get; } = new GuildwarsIcon { Id = 191482, Name = "Collector", WikiUrl = "https://wiki.guildwars.com/wiki/Collector" };
+    public static GuildwarsIcon AreaMap { get; } = new GuildwarsIcon { Id = 302781, Name = "Area Map" };
+    public static GuildwarsIcon StairsUp { get; } = new GuildwarsIcon { Id = 302783, Name = "Stairs Up" };
+    public static GuildwarsIcon StairsDown { get; } = new GuildwarsIcon { Id = 302784, Name = "Stairs Down" };
+    public static GuildwarsIcon Gate { get; } = new GuildwarsIcon { Id = 191464, Name = "Gate", WikiUrl = "" };
+    public static GuildwarsIcon Star { get; } = new GuildwarsIcon { Id = 191472, Name = "Star", WikiUrl = "" };
+    public static GuildwarsIcon DungeonBoss { get; } = new GuildwarsIcon { Id = 302779, Name = "Dungeon Boss" };
+    public static GuildwarsIcon DungeonKey { get; } = new GuildwarsIcon { Id = 302777, Name = "Dungeon Key" };
 
     public static List<GuildwarsIcon> Icons { get; } = new()
     {
         ResurrectionShrine,
-        Collector
+        Collector,
+        AreaMap,
+        StairsUp,
+        StairsDown,
+        Gate,
+        Star,
+        DungeonBoss,
+        DungeonKey
     };
 
     public static bool TryParse(int id, out GuildwarsIcon icon)
@@ -58,6 +72,7 @@ public sealed class GuildwarsIcon
     }
 
     public int Id { get; init; }
+    public Affiliation Affiliation { get; init; }
     public string? Name { get; init; }
     public string? WikiUrl { get; init; }
 
