@@ -47,7 +47,7 @@ public partial class UpdateView : UserControl
     {
         this.Dispatcher.Invoke(() =>
         {
-            if (this.updateStatus.CurrentStep is UpdateStatus.DownloadUpdateStep downloadUpdateStep)
+            if (this.updateStatus.CurrentStep is DownloadStatus.DownloadProgressStep downloadUpdateStep)
             {
                 this.ProgressValue = downloadUpdateStep.Progress * 100;
             }

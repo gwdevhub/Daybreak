@@ -1,4 +1,4 @@
-﻿using Daybreak.Configuration;
+﻿using Daybreak.Configuration.Options;
 using Daybreak.Services.Navigation;
 using System;
 using System.Configuration;
@@ -25,10 +25,6 @@ public partial class ExperimentalSettingsView : UserControl
     [GenerateDependencyProperty]
     private bool dynamicBuildLoading;
     [GenerateDependencyProperty]
-    private bool macrosEnabled;
-    [GenerateDependencyProperty]
-    public string gWToolboxLaunchDelay = string.Empty;
-    [GenerateDependencyProperty]
     public bool downloadIcons;
     [GenerateDependencyProperty]
     public bool focusViewEnabled;
@@ -37,49 +33,50 @@ public partial class ExperimentalSettingsView : UserControl
     [GenerateDependencyProperty]
     private bool pathfindingEnabled;
 
-    private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions;
+    private readonly ILiveUpdateableOptions<LauncherOptions> launcherOptions;
+    private readonly ILiveUpdateableOptions<BrowserOptions> browserOptions;
+    private readonly ILiveUpdateableOptions<FocusViewOptions> focusViewOptions;
 
     public ExperimentalSettingsView(
         IViewManager viewManager,
-        ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions)
+        ILiveUpdateableOptions<LauncherOptions> launcherOptions,
+        ILiveUpdateableOptions<BrowserOptions> browserOptions,
+        ILiveUpdateableOptions<FocusViewOptions> focusViewOptions)
     {
         this.viewManager = viewManager.ThrowIfNull();
-        this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
+        this.launcherOptions = launcherOptions.ThrowIfNull();
+        this.browserOptions = browserOptions.ThrowIfNull();
+        this.focusViewOptions = focusViewOptions.ThrowIfNull();
         this.InitializeComponent();
         this.LoadExperimentalSettings();
     }
 
     private void LoadExperimentalSettings()
     {
-        var config = this.liveUpdateableOptions.Value;
-        this.MultiLaunch = config.ExperimentalFeatures.MultiLaunchSupport;
-        this.GWToolboxLaunchDelay = config.ExperimentalFeatures.ToolboxAutoLaunchDelay.ToString();
-        this.DynamicBuildLoading = config.ExperimentalFeatures.DynamicBuildLoading;
-        this.LaunchAsCurrentUser = config.ExperimentalFeatures.LaunchGuildwarsAsCurrentUser;
-        this.MacrosEnabled = config.ExperimentalFeatures.CanInterceptKeys;
-        this.DownloadIcons = config.ExperimentalFeatures.DownloadIcons;
-        this.FocusViewEnabled = config.ExperimentalFeatures.FocusViewEnabled;
-        this.MemoryReaderFrequency = config.ExperimentalFeatures.MemoryReaderFrequency;
-        this.PathfindingEnabled = config.ExperimentalFeatures.EnablePathfinding;
+        this.MultiLaunch = this.launcherOptions.Value.MultiLaunchSupport;
+        this.DynamicBuildLoading = this.browserOptions.Value.DynamicBuildLoading;
+        this.LaunchAsCurrentUser = this.launcherOptions.Value.LaunchGuildwarsAsCurrentUser;
+        this.DownloadIcons = this.launcherOptions.Value.DownloadIcons;
+        this.FocusViewEnabled = this.focusViewOptions.Value.Enabled;
+        this.MemoryReaderFrequency = this.focusViewOptions.Value.MemoryReaderFrequency;
+        this.PathfindingEnabled = this.focusViewOptions.Value.EnablePathfinding;
     }
 
     private void SaveExperimentalSettings()
     {
-        var config = this.liveUpdateableOptions.Value;
-        config.ExperimentalFeatures.MultiLaunchSupport = this.MultiLaunch;
-        config.ExperimentalFeatures.DynamicBuildLoading = this.DynamicBuildLoading;
-        config.ExperimentalFeatures.LaunchGuildwarsAsCurrentUser = this.LaunchAsCurrentUser;
-        config.ExperimentalFeatures.CanInterceptKeys = this.MacrosEnabled;
-        config.ExperimentalFeatures.DownloadIcons = this.DownloadIcons;
-        config.ExperimentalFeatures.FocusViewEnabled = this.FocusViewEnabled;
-        config.ExperimentalFeatures.MemoryReaderFrequency = this.MemoryReaderFrequency;
-        config.ExperimentalFeatures.EnablePathfinding = this.PathfindingEnabled;
-        if (int.TryParse(this.GWToolboxLaunchDelay, out var gwToolboxLaunchDelay))
-        {
-            config.ExperimentalFeatures.ToolboxAutoLaunchDelay = gwToolboxLaunchDelay;
-        }
-
-        this.liveUpdateableOptions.UpdateOption();
+        var launcherOptions = this.launcherOptions.Value;
+        var focusViewOptions = this.focusViewOptions.Value;
+        var browserOptions = this.browserOptions.Value;
+        launcherOptions.MultiLaunchSupport = this.MultiLaunch;
+        browserOptions.DynamicBuildLoading = this.DynamicBuildLoading;
+        launcherOptions.LaunchGuildwarsAsCurrentUser = this.LaunchAsCurrentUser;
+        launcherOptions.DownloadIcons = this.DownloadIcons;
+        focusViewOptions.Enabled = this.FocusViewEnabled;
+        focusViewOptions.MemoryReaderFrequency = this.MemoryReaderFrequency;
+        focusViewOptions.EnablePathfinding = this.PathfindingEnabled;
+        this.launcherOptions.UpdateOption();
+        this.browserOptions.UpdateOption();
+        this.focusViewOptions.UpdateOption();
         this.viewManager.ShowView<LauncherView>();
     }
 
@@ -90,7 +87,7 @@ public partial class ExperimentalSettingsView : UserControl
 
     private void TextBox_AllowNumbersOnly(object sender, TextCompositionEventArgs e)
     {
-        e.Handled = e.Text.Select(c => char.IsDigit(c)).All(result => result is true) is false;
+        e.Handled = e.Text.Select(char.IsDigit).All(result => result is true) is false;
     }
 
     private void TextBox_DisallowPaste(object sender, CanExecuteRoutedEventArgs e)

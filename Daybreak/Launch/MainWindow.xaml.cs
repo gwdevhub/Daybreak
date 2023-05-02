@@ -1,10 +1,9 @@
-﻿using Daybreak.Configuration;
+﻿using Daybreak.Configuration.Options;
 using Daybreak.Services.Bloogum;
 using Daybreak.Services.IconRetrieve;
 using Daybreak.Services.Menu;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Privilege;
-using Daybreak.Services.Screens;
 using Daybreak.Services.Screenshots;
 using Daybreak.Services.Updater;
 using Daybreak.Utils;
@@ -40,7 +39,7 @@ public partial class MainWindow : Window
     private readonly IApplicationUpdater applicationUpdater;
     private readonly IPrivilegeManager privilegeManager;
     private readonly IIconDownloader iconDownloader;
-    private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
+    private readonly ILiveOptions<LauncherOptions> launcherOptions;
     private readonly CancellationTokenSource cancellationToken = new();
 
     [GenerateDependencyProperty]
@@ -62,7 +61,7 @@ public partial class MainWindow : Window
         IApplicationUpdater applicationUpdater,
         IPrivilegeManager privilegeManager,
         IIconDownloader iconDownloader,
-        ILiveOptions<ApplicationConfiguration> liveOptions)
+        ILiveOptions<LauncherOptions> launcherOptions)
     {
         this.menuServiceInitializer = menuServiceInitializer.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
@@ -71,7 +70,7 @@ public partial class MainWindow : Window
         this.applicationUpdater = applicationUpdater.ThrowIfNull();
         this.privilegeManager = privilegeManager.ThrowIfNull();
         this.iconDownloader = iconDownloader.ThrowIfNull();
-        this.liveOptions = liveOptions.ThrowIfNull();
+        this.launcherOptions = launcherOptions.ThrowIfNull();
         this.InitializeComponent();
         this.CurrentVersionText = this.applicationUpdater.CurrentVersion.ToString();
         this.IsRunningAsAdmin = this.privilegeManager.AdminPrivileges;
@@ -281,7 +280,7 @@ public partial class MainWindow : Window
 
     private async void CheckForUpdates()
     {
-        var updateAvailable = this.liveOptions.Value.AutoCheckUpdate is true && await this.applicationUpdater.UpdateAvailable().ConfigureAwait(true);
+        var updateAvailable = this.launcherOptions.Value.AutoCheckUpdate is true && await this.applicationUpdater.UpdateAvailable().ConfigureAwait(true);
         if (updateAvailable)
         {
             this.viewManager.ShowView<AskUpdateView>();

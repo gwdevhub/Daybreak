@@ -42,6 +42,17 @@
                                        Width="40"></glyphs:DownloadGlyph>
             </buttons:MenuButton.InnerContent>
         </buttons:MenuButton>
+        <buttons:MenuButton Title="Setup uMod" 
+                            Foreground="White"
+                            HighlightColor="White"
+                            Height="30"
+                            Cursor="Hand"
+                            Clicked="UModButton_Clicked">
+            <buttons:MenuButton.InnerContent>
+                <glyphs:UModGlyph Foreground="White"
+                                       Width="40"></glyphs:UModGlyph>
+            </buttons:MenuButton.InnerContent>
+        </buttons:MenuButton>
         <buttons:MenuButton Title="Account settings" 
                             Foreground="White"
                             HighlightColor="White"

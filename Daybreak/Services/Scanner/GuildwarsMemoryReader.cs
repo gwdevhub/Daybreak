@@ -1,5 +1,4 @@
-﻿using Daybreak.Configuration;
-using Daybreak.Models;
+﻿using Daybreak.Models;
 using Daybreak.Models.Builds;
 using Daybreak.Models.Guildwars;
 using Daybreak.Models.Interop;
@@ -35,7 +34,6 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
     private readonly IApplicationLauncher applicationLauncher;
     private readonly IMemoryScanner memoryScanner;
     private readonly Histogram<double> latencyMeter;
-    private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
     private readonly ILogger<GuildwarsMemoryReader> logger;
 
     private uint playerIdPointer;
@@ -47,13 +45,11 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         IApplicationLauncher applicationLauncher,
         IMemoryScanner memoryScanner,
         IMetricsService metricsService,
-        ILiveOptions<ApplicationConfiguration> liveOptions,
         ILogger<GuildwarsMemoryReader> logger)
     {
         this.applicationLauncher = applicationLauncher.ThrowIfNull();
         this.memoryScanner = memoryScanner.ThrowIfNull();
         this.latencyMeter = metricsService.ThrowIfNull().CreateHistogram<double>(LatencyMeterName, LatencyMeterUnitsName, LatencyMeterDescription, AggregationTypes.P95);
-        this.liveOptions = liveOptions.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
     }
     
@@ -135,7 +131,8 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
             await this.ResilientBeginScanner(scopedLogger, process!);
         }
 
-        if (!this.memoryScanner.Scanning)
+        if (this.memoryScanner.Scanning is false &&
+            process?.HasExited is false)
         {
             await this.ResilientBeginScanner(scopedLogger, process!);
         }

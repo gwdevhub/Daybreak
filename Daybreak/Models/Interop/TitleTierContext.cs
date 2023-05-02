@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Daybreak.Models.Interop;
+﻿namespace Daybreak.Models.Interop;
 
 public readonly struct TitleTierContext
 {

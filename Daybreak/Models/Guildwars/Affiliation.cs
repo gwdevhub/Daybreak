@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Daybreak.Models.Guildwars;
+﻿namespace Daybreak.Models.Guildwars;
 
 public enum Affiliation
 {

@@ -1,4 +1,4 @@
-﻿using Daybreak.Configuration;
+﻿using Daybreak.Configuration.Options;
 using Daybreak.Exceptions;
 using Daybreak.Services.Credentials;
 using Daybreak.Services.Mutex;
@@ -10,6 +10,7 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.IO;
@@ -24,45 +25,43 @@ namespace Daybreak.Services.ApplicationLauncher;
 public class ApplicationLauncher : IApplicationLauncher
 {
     private const int MaxRetries = 10;
-    private const string TexModProcessName = "TexMod";
-    private const string UModProcessName = "uMod";
-    private const string ToolboxProcessName = "GWToolbox";
     private const string ProcessName = "gw";
     private const string ArenaNetMutex = "AN-Mute";
 
-    private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
+    private readonly ILiveOptions<UModOptions> uModOptions;
+    private readonly ILiveOptions<LauncherOptions> launcherOptions;
     private readonly ICredentialManager credentialManager;
     private readonly IMutexHandler mutexHandler;
     private readonly ILogger<ApplicationLauncher> logger;
     private readonly IPrivilegeManager privilegeManager;
 
-    public bool IsTexmodRunning => TexModProcessDetected();
     public bool IsGuildwarsRunning => this.GetGuildwarsProcess() is not null;
-    public bool IsToolboxRunning => GuildwarsToolboxProcessDetected();
     public Process? RunningGuildwarsProcess => this.GetGuildwarsProcess();
 
     public ApplicationLauncher(
-        ILiveOptions<ApplicationConfiguration> liveOptions,
+        ILiveOptions<UModOptions> uModOptions,
+        ILiveOptions<LauncherOptions> launcherOptions,
         ICredentialManager credentialManager,
         IMutexHandler mutexHandler,
         ILogger<ApplicationLauncher> logger,
         IPrivilegeManager privilegeManager)
     {
-        this.logger = logger.ThrowIfNull(nameof(logger));
-        this.mutexHandler = mutexHandler.ThrowIfNull(nameof(mutexHandler));
-        this.credentialManager = credentialManager.ThrowIfNull(nameof(credentialManager));
-        this.liveOptions = liveOptions.ThrowIfNull(nameof(liveOptions));
-        this.privilegeManager = privilegeManager.ThrowIfNull(nameof(privilegeManager));
+        this.logger = logger.ThrowIfNull();
+        this.mutexHandler = mutexHandler.ThrowIfNull();
+        this.credentialManager = credentialManager.ThrowIfNull();
+        this.launcherOptions = launcherOptions.ThrowIfNull();
+        this.uModOptions = uModOptions.ThrowIfNull();
+        this.privilegeManager = privilegeManager.ThrowIfNull();
     }
 
     public async Task<Process?> LaunchGuildwars()
     {
-        var configuration = this.liveOptions.Value;
+        var configuration = this.launcherOptions.Value;
         var auth = await this.credentialManager.GetDefaultCredentials().ConfigureAwait(false);
         return await auth.Switch<Task<Process?>>(
             onSome: async (credentials) =>
             {
-                if (configuration.ExperimentalFeatures.MultiLaunchSupport is true)
+                if (configuration.MultiLaunchSupport is true)
                 {
                     if (this.privilegeManager.AdminPrivileges is false)
                     {
@@ -73,6 +72,11 @@ public class ApplicationLauncher : IApplicationLauncher
                     this.ClearGwLocks();
                 }
 
+                if (this.uModOptions.Value.Enabled)
+                {
+                    await this.LaunchUMod();
+                }
+
                 return await this.LaunchGuildwarsProcess(credentials.Username!, credentials.Password!, credentials.CharacterName!);
             },
             onNone: () =>
@@ -80,42 +84,6 @@ public class ApplicationLauncher : IApplicationLauncher
                 throw new CredentialsNotFoundException($"No credentials available");
             })
             .ExtractValue();
-    }
-
-    public Task LaunchGuildwarsToolbox()
-    {
-        return Task.Run(() =>
-        {
-            var configuration = this.liveOptions.Value;
-            var executable = configuration.ToolboxPath;
-            if (File.Exists(executable) is false)
-            {
-                throw new ExecutableNotFoundException($"Guildwars executable doesn't exist at {executable}");
-            }
-
-            if (Process.Start(executable) is null)
-            {
-                throw new InvalidOperationException($"Unable to launch {executable}");
-            }
-        });
-    }
-
-    public Task LaunchTexmod()
-    {
-        return Task.Run(() =>
-        {
-            var configuration = this.liveOptions.Value;
-            var executable = configuration.TexmodPath;
-            if (File.Exists(executable) is false)
-            {
-                throw new ExecutableNotFoundException($"Texmod executable doesn't exist at {executable}");
-            }
-
-            if (Process.Start(executable) is null)
-            {
-                throw new InvalidOperationException($"Unable to launch {executable}");
-            }
-        });
     }
 
     public void RestartDaybreakAsAdmin()
@@ -147,7 +115,7 @@ public class ApplicationLauncher : IApplicationLauncher
 
     private async Task<Process?> LaunchGuildwarsProcess(string email, Models.SecureString password, string character)
     {
-        var executable = this.liveOptions.Value.GuildwarsPaths.Where(path => path.Default).FirstOrDefault() ?? throw new ExecutableNotFoundException($"No executable selected");
+        var executable = this.launcherOptions.Value.GuildwarsPaths.Where(path => path.Default).FirstOrDefault() ?? throw new ExecutableNotFoundException($"No executable selected");
         if (File.Exists(executable.Path) is false)
         {
             throw new ExecutableNotFoundException($"Guildwars executable doesn't exist at {executable}");
@@ -166,7 +134,7 @@ public class ApplicationLauncher : IApplicationLauncher
             args.Add($"\"character\"");
         }
 
-        var identity = this.liveOptions.Value.ExperimentalFeatures.LaunchGuildwarsAsCurrentUser ?
+        var identity = this.launcherOptions.Value.LaunchGuildwarsAsCurrentUser ?
             System.Security.Principal.WindowsIdentity.GetCurrent().Name :
             System.Security.Principal.WindowsIdentity.GetAnonymous().Name;
         this.logger.LogInformation($"Launching guildwars as [{identity}] identity");
@@ -216,13 +184,72 @@ public class ApplicationLauncher : IApplicationLauncher
         }
     }
 
+    private async Task<Process?> LaunchUMod()
+    {
+        if(this.uModOptions.Value.Enabled is false)
+        {
+            throw new InvalidOperationException("Cannot launch uMod. uMod is disabled");
+        }
+
+        var executable = this.uModOptions.Value.Path;
+        if (File.Exists(executable) is false)
+        {
+            throw new ExecutableNotFoundException($"uMod executable doesn't exist at {executable}");
+        }
+
+        this.logger.LogInformation($"Launching uMod");
+        var process = new Process()
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = executable
+            }
+        };
+        if (process.Start() is false)
+        {
+            throw new InvalidOperationException($"Unable to launch {executable}");
+        }
+
+        var retries = 0;
+        while (true)
+        {
+            await Task.Delay(100);
+            retries++;
+            var uModProcess = Process.GetProcessesByName("uMod").FirstOrDefault();
+            if (uModProcess is null && retries < MaxRetries)
+            {
+                continue;
+            }
+            else if (uModProcess is null && retries >= MaxRetries)
+            {
+                throw new InvalidOperationException("Newly launched gw process not detected");
+            }
+
+            if (uModProcess!.MainWindowHandle == IntPtr.Zero)
+            {
+                continue;
+            }
+
+            int titleLength = NativeMethods.GetWindowTextLength(uModProcess.MainWindowHandle);
+            var titleBuffer = new StringBuilder(titleLength);
+            var readCount = NativeMethods.GetWindowText(uModProcess.MainWindowHandle, titleBuffer, titleLength + 1);
+            var title = titleBuffer.ToString();
+            if (title != "uMod V 1.0")
+            {
+                continue;
+            }
+
+            return uModProcess;
+        }
+    }
+
     private Process? GetGuildwarsProcess()
     {
-        if (this.liveOptions.Value.ExperimentalFeatures.MultiLaunchSupport is true)
+        if (this.launcherOptions.Value.MultiLaunchSupport is true)
         {
             try
             {
-                var path = this.liveOptions.Value.GuildwarsPaths.Where(path => path.Default).FirstOrDefault();
+                var path = this.launcherOptions.Value.GuildwarsPaths.Where(path => path.Default).FirstOrDefault();
                 if (path is null)
                 {
                     return null;
@@ -250,7 +277,7 @@ public class ApplicationLauncher : IApplicationLauncher
 
     private void SetRegistryGuildwarsPath()
     {
-        var path = this.liveOptions.Value.GuildwarsPaths.Where(path => path.Default).FirstOrDefault() ?? throw new ExecutableNotFoundException("No executable currently selected");
+        var path = this.launcherOptions.Value.GuildwarsPaths.Where(path => path.Default).FirstOrDefault() ?? throw new ExecutableNotFoundException("No executable currently selected");
         var gamePath = path.Path;
         try
         {
@@ -292,17 +319,5 @@ public class ApplicationLauncher : IApplicationLauncher
         }
 
         throw new InvalidOperationException("Could not find registry key for guildwars.");
-    }
-
-    private static bool GuildwarsToolboxProcessDetected()
-    {
-        return Process.GetProcessesByName(ToolboxProcessName).Any();
-    }
-
-    private static bool TexModProcessDetected()
-    {
-        return Process.GetProcesses()
-            .Where(process => string.Equals(process.ProcessName, UModProcessName, StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(process.ProcessName, TexModProcessName, StringComparison.OrdinalIgnoreCase)).Any();
     }
 }

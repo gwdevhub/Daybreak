@@ -1,4 +1,4 @@
-﻿using Daybreak.Configuration;
+﻿using Daybreak.Configuration.Options;
 using Daybreak.Models;
 using Microsoft.Extensions.Logging;
 using System;
@@ -16,11 +16,11 @@ public sealed class CredentialManager : ICredentialManager
 {
     private static readonly byte[] Entropy = Convert.FromBase64String("R3VpbGR3YXJz");
     private readonly ILogger<CredentialManager> logger;
-    private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveOptions;
+    private readonly ILiveUpdateableOptions<LauncherOptions> liveOptions;
 
     public CredentialManager(
         ILogger<CredentialManager> logger,
-        ILiveUpdateableOptions<ApplicationConfiguration> liveOptions)
+        ILiveUpdateableOptions<LauncherOptions> liveOptions)
     {
         this.liveOptions = liveOptions.ThrowIfNull(nameof(liveOptions));
         this.logger = logger.ThrowIfNull(nameof(logger));

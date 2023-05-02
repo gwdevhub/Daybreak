@@ -1,15 +1,11 @@
-﻿using Daybreak.Configuration;
-using Daybreak.Controls;
+﻿using Daybreak.Controls;
 using Daybreak.Models;
 using Daybreak.Models.Guildwars;
 using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
-using Microsoft.Web.WebView2.Core;
-using Microsoft.Web.WebView2.Wpf;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
-using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 using System.IO;

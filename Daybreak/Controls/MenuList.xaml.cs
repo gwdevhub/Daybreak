@@ -1,4 +1,4 @@
-﻿using Daybreak.Configuration;
+﻿using Daybreak.Configuration.Options;
 using Daybreak.Launch;
 using Daybreak.Services.Navigation;
 using Daybreak.Views;
@@ -16,19 +16,19 @@ namespace Daybreak.Controls;
 public partial class MenuList : UserControl
 {
     private readonly IViewManager viewManager;
-    private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
+    private readonly ILiveOptions<LauncherOptions> liveOptions;
 
     public MenuList()
         : this(
               Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>(),
-              Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILiveOptions<ApplicationConfiguration>>())
+              Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILiveOptions<LauncherOptions>>())
     {
         this.InitializeComponent();
     }
 
     private MenuList(
         IViewManager viewManager,
-        ILiveOptions<ApplicationConfiguration> liveOptions)
+        ILiveOptions<LauncherOptions> liveOptions)
     {
         this.viewManager = viewManager.ThrowIfNull();
         this.liveOptions = liveOptions.ThrowIfNull();
@@ -61,7 +61,7 @@ public partial class MenuList : UserControl
 
     private void ManageBuildsButton_Clicked(object sender, EventArgs e)
     {
-        if (this.liveOptions.Value.ExperimentalFeatures.DownloadIcons)
+        if (this.liveOptions.Value.DownloadIcons)
         {
             this.viewManager.ShowView<IconDownloadView>();
         }
@@ -88,6 +88,11 @@ public partial class MenuList : UserControl
 
     private void DownloadGuildwarsButton_Clicked(object sender, EventArgs e)
     {
-        this.viewManager.ShowView<DownloadView>();
+        this.viewManager.ShowView<GuildwarsDownloadView>();
+    }
+
+    private void UModButton_Clicked(object sender, EventArgs e)
+    {
+        this.viewManager.ShowView<UModInstallerView>();
     }
 }

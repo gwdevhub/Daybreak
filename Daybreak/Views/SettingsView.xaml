@@ -81,13 +81,12 @@
                                 Clicked="SaveButton_Clicked"></controls:SaveButton>
             <StackPanel Orientation="Vertical" Grid.Row="1">
                 <TextBlock Text="Auto check for updates: " FontSize="22" Foreground="White" Height="30"></TextBlock>
-                <TextBlock Text="Texmod path: " FontSize="22" Foreground="White" Height="30"></TextBlock>
-                <TextBlock Text="GWToolbox auto-launch: " FontSize="22" Foreground="White" Height="30"></TextBlock>
+                <TextBlock Text="uMod enabled: " FontSize="22" Foreground="White" Height="30"></TextBlock>
+                <TextBlock Text="uMod path: " FontSize="22" Foreground="White" Height="30"></TextBlock>
+                <TextBlock Text="GWToolbox enabled: " FontSize="22" Foreground="White" Height="30"></TextBlock>
                 <TextBlock Text="GWToolbox path: " FontSize="22" Foreground="White" Height="30"></TextBlock>
                 <TextBlock Text="Browsers enabled: " FontSize="22" Foreground="White" Height="30"/>
                 <TextBlock Text="Browsers address bar readonly: " FontSize="22" Foreground="White" Height="30"/>
-                <TextBlock Text="Left browser homepage: " FontSize="22" Foreground="White" Height="30"></TextBlock>
-                <TextBlock Text="Right browser homepage: " FontSize="22" Foreground="White" Height="30"></TextBlock>
                 <TextBlock Text="Auto-place on desired screen: " FontSize="22" Foreground="White" Height="30"></TextBlock>
                 <TextBlock Text="Desired screen id: " FontSize="22" Foreground="White" Height="30"></TextBlock>
                 <TextBlock Text="Place Shortcut: " FontSize="22" Foreground="White" Height="30"></TextBlock>
@@ -96,16 +95,18 @@
             <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="1">
                 <ToggleButton HorizontalAlignment="Center" HorizontalContentAlignment="Stretch" Style="{StaticResource AnimatedSwitch}" Height="30" Width="40"
                             FontSize="22" Foreground="White" IsChecked="{Binding ElementName=_this, Path=AutoCheckUpdate, Mode=TwoWay}"></ToggleButton>
+                <ToggleButton HorizontalAlignment="Center" HorizontalContentAlignment="Stretch" Style="{StaticResource AnimatedSwitch}" Height="30" Width="40"
+                            FontSize="22" Foreground="White" IsChecked="{Binding ElementName=_this, Path=UModEnabled, Mode=TwoWay}"></ToggleButton>
                 <Grid Height="30">
                     <TextBox HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
                     FontSize="22" Margin="0, 0, 30, 0" Background="Transparent" Foreground="White"
-                    Text="{Binding ElementName=_this, Path=TexmodPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                    Text="{Binding ElementName=_this, Path=UModPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                     <controls:FilePickerGlyph Height="30" Width="30" HorizontalAlignment="Right"
                                     Foreground="White" BorderBrush="Gray" BorderThickness="0"
-                                    Clicked="TexmodFilePickerGlyph_Clicked"></controls:FilePickerGlyph>
+                                    Clicked="UModFilePickerGlyph_Clicked"></controls:FilePickerGlyph>
                 </Grid>
                 <ToggleButton HorizontalAlignment="Center" HorizontalContentAlignment="Stretch" Style="{StaticResource AnimatedSwitch}" Height="30" Width="40"
-                        FontSize="22" Foreground="White" IsChecked="{Binding ElementName=_this, Path=ToolboxAutoLaunch, Mode=TwoWay}"></ToggleButton>
+                        FontSize="22" Foreground="White" IsChecked="{Binding ElementName=_this, Path=ToolboxEnabled, Mode=TwoWay}"></ToggleButton>
                 <Grid Height="30">
                     <TextBox HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
                     FontSize="22" Margin="0, 0, 30, 0" Background="Transparent" Foreground="White"
@@ -118,12 +119,6 @@
                           FontSize="22" Foreground="White" IsChecked="{Binding ElementName=_this, Path=BrowsersEnabled, Mode=TwoWay}"></ToggleButton>
                 <ToggleButton HorizontalAlignment="Center" HorizontalContentAlignment="Stretch" Style="{StaticResource AnimatedSwitch}" Height="30" Width="40"
                         FontSize="22" Foreground="White" IsChecked="{Binding ElementName=_this, Path=AddressBarReadonly, Mode=TwoWay}"></ToggleButton>
-                <TextBox HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
-                    FontSize="22" Background="Transparent" Foreground="White" Height="30"
-                    Text="{Binding ElementName=_this, Path=LeftBrowserUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                <TextBox HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
-                    FontSize="22" Background="Transparent" Foreground="White" Height="30"
-                    Text="{Binding ElementName=_this, Path=RightBrowserUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                 <ToggleButton HorizontalAlignment="Center" HorizontalContentAlignment="Stretch" Style="{StaticResource AnimatedSwitch}" Height="30" Width="40"
                         FontSize="22" Foreground="White" IsChecked="{Binding ElementName=_this, Path=AutoPlaceOnScreen, Mode=TwoWay}"></ToggleButton>
                 <Grid Height="30">

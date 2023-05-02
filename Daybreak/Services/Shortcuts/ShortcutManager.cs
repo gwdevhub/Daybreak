@@ -1,5 +1,5 @@
-﻿using Daybreak.Configuration;
-using Daybreak.Services.Configuration;
+﻿using Daybreak.Configuration.Options;
+using Daybreak.Services.Options;
 using ShellLink;
 using System.Configuration;
 using System.Diagnostics;
@@ -13,8 +13,7 @@ public sealed class ShortcutManager : IShortcutManager
 {
     private const string ShortcutName = "Daybreak.lnk";
 
-    private readonly IConfigurationManager configurationManager;
-    private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
+    private readonly ILiveOptions<LauncherOptions> liveOptions;
 
     public bool ShortcutEnabled {
         get => this.ShortcutExists();
@@ -32,12 +31,11 @@ public sealed class ShortcutManager : IShortcutManager
     }
 
     public ShortcutManager(
-        IConfigurationManager configurationManager,
-        ILiveOptions<ApplicationConfiguration> liveOptions)
+        IOptionsUpdateHook optionsUpdateHook,
+        ILiveOptions<LauncherOptions> liveOptions)
     {
-        this.configurationManager = configurationManager.ThrowIfNull(nameof(configurationManager));
         this.liveOptions = liveOptions.ThrowIfNull(nameof(liveOptions));
-        this.configurationManager.ConfigurationChanged += (_, _) => this.LoadConfiguration();
+        optionsUpdateHook.RegisterHook<LauncherOptions>(this.LoadConfiguration);
         this.LoadConfiguration();
     }
 

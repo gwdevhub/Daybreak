@@ -2,7 +2,6 @@
 using System.Diagnostics.Metrics;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using System;
 using System.Windows.Extensions.Services;
 using System.Core.Extensions;
 

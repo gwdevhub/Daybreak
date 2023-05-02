@@ -1,7 +1,6 @@
 ﻿using Daybreak.Services.ApplicationLauncher;
 using Daybreak.Services.Bloogum;
 using Daybreak.Services.BuildTemplates;
-using Daybreak.Services.Configuration;
 using Daybreak.Services.Credentials;
 using Daybreak.Services.IconRetrieve;
 using Daybreak.Services.Logging;
@@ -43,6 +42,10 @@ using Daybreak.Services.Drawing;
 using Daybreak.Services.Drawing.Modules.Entities;
 using Daybreak.Services.Drawing.Modules.MapIcons;
 using Daybreak.Services.Drawing.Modules;
+using Daybreak.Services.Guildwars;
+using Daybreak.Configuration.Options;
+using System.Configuration;
+using Daybreak.Services.UMod;
 
 namespace Daybreak.Configuration;
 
@@ -54,7 +57,7 @@ public static class ProjectConfiguration
     {
         serviceManager.ThrowIfNull();
 
-        serviceManager.RegisterOptionsManager<ApplicationConfigurationOptionsManager>();
+        serviceManager.RegisterOptionsManager<OptionsManager>();
         serviceManager.RegisterResolver(new LoggerResolver());
         serviceManager
             .RegisterHttpClient<ApplicationUpdater>()
@@ -121,7 +124,6 @@ public static class ProjectConfiguration
         services.AddSingleton<IPostUpdateActionProvider>(sp => sp.GetRequiredService<PostUpdateActionManager>());
         services.AddSingleton<IMenuService, MenuService>();
         services.AddSingleton<IMenuServiceInitializer, MenuService>(sp => sp.GetRequiredService<IMenuService>().As<MenuService>());
-        services.AddSingleton<IConfigurationManager, ConfigurationManager>();
         services.AddSingleton<ILiteDatabase, LiteDatabase>(sp => new LiteDatabase("Daybreak.db"));
         services.AddSingleton<IMutexHandler, MutexHandler>();
         services.AddSingleton<IShortcutManager, ShortcutManager>();
@@ -129,6 +131,8 @@ public static class ProjectConfiguration
         services.AddSingleton<IIconDownloader, IconDownloader>();
         services.AddSingleton<IMetricsService, MetricsService>();
         services.AddSingleton<IStartupActionProducer, StartupActionManager>();
+        services.AddSingleton<IOptionsProducer, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().As<OptionsManager>());
+        services.AddSingleton<IOptionsUpdateHook, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().As<OptionsManager>());
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
         services.AddScoped<IScreenshotProvider, ScreenshotProvider>();
@@ -145,11 +149,13 @@ public static class ProjectConfiguration
         services.AddScoped<IExperienceCalculator, ExperienceCalculator>();
         services.AddScoped<IAttributePointCalculator, AttributePointCalculator>();
         services.AddScoped<IDownloadService, DownloadService>();
+        services.AddScoped<IGuildwarsInstaller, GuildwarsInstaller>();
         services.AddScoped<IGuildwarsEntityDebouncer, GuildwarsEntityDebouncer>();
         services.AddScoped<IExceptionHandler, ExceptionHandler>();
         services.AddScoped<IPathfinder, StupidPathfinder>();
         services.AddScoped<IDrawingService, DrawingService>();
         services.AddScoped<IDrawingModuleProducer, DrawingService>(sp => sp.GetRequiredService<IDrawingService>().As<DrawingService>());
+        services.AddScoped<IUModService, UModService>();
     }
 
     public static void RegisterViews(IViewProducer viewProducer)
@@ -175,7 +181,8 @@ public static class ProjectConfiguration
         viewProducer.RegisterView<BuildsSynchronizationView>();
         viewProducer.RegisterView<OnboardingView>();
         viewProducer.RegisterView<MetricsView>();
-        viewProducer.RegisterView<DownloadView>();
+        viewProducer.RegisterView<GuildwarsDownloadView>();
+        viewProducer.RegisterView<UModInstallerView>();
     }
 
     public static void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -220,6 +227,19 @@ public static class ProjectConfiguration
         drawingModuleProducer.RegisterDrawingModule<MainPlayerDrawingModule>();
         drawingModuleProducer.RegisterDrawingModule<PartyMemberDrawingModule>();
         drawingModuleProducer.RegisterDrawingModule<WorldPlayerDrawingModule>();
+    }
+
+    public static void RegisterOptions(IOptionsProducer optionsProducer)
+    {
+        optionsProducer.ThrowIfNull();
+
+        optionsProducer.RegisterOptions<BrowserOptions>();
+        optionsProducer.RegisterOptions<BuildSynchronizationOptions>();
+        optionsProducer.RegisterOptions<FocusViewOptions>();
+        optionsProducer.RegisterOptions<LauncherOptions>();
+        optionsProducer.RegisterOptions<ToolboxOptions>();
+        optionsProducer.RegisterOptions<UModOptions>();
+        optionsProducer.RegisterOptions<ScreenManagerOptions>();
     }
 
     private static void SetupDaybreakUserAgent(HttpRequestHeaders httpRequestHeaders)

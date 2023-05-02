@@ -1,4 +1,4 @@
-﻿using Daybreak.Configuration;
+﻿using Daybreak.Configuration.Options;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Privilege;
 using Daybreak.Services.Updater;
@@ -17,14 +17,14 @@ public partial class AskUpdateView : UserControl
 {
     private readonly ILogger<AskUpdateView> logger;
     private readonly IViewManager viewManager;
-    private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveOptions;
+    private readonly ILiveUpdateableOptions<LauncherOptions> liveOptions;
     private readonly IPrivilegeManager privilegeManager;
     private readonly IApplicationUpdater applicationUpdater;
 
     public AskUpdateView(
         ILogger<AskUpdateView> logger,
         IViewManager viewManager,
-        ILiveUpdateableOptions<ApplicationConfiguration> liveOptions,
+        ILiveUpdateableOptions<LauncherOptions> liveOptions,
         IPrivilegeManager privilegeManager,
         IApplicationUpdater applicationUpdater)
     {

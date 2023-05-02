@@ -1,7 +1,6 @@
 ﻿using Daybreak.Models;
 using Daybreak.Models.Guildwars;
 using Daybreak.Services.Scanner.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 

@@ -75,6 +75,13 @@ public sealed class MemoryScanner : IMemoryScanner
 
         this.Process = process;
         (var startAddress, var size) = this.GetModuleInfo(process);
+        if (startAddress == 0 &&
+            size == 0)
+        {
+            Monitor.Exit(LockObject);
+            return;
+        }
+
         this.ModuleStartAddress = startAddress;
         this.Size = size;
         this.Memory = this.ReadBytesNonLocking(this.ModuleStartAddress, this.Size);
@@ -327,6 +334,12 @@ public sealed class MemoryScanner : IMemoryScanner
         if (!this.Scanning)
         {
             throw new InvalidOperationException("Scanner is not running");
+        }
+
+        if (this.Process is null ||
+            this.Process?.HasExited is true)
+        {
+            throw new InvalidOperationException("Process has exited");
         }
     }
 

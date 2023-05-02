@@ -1,9 +1,7 @@
-﻿using Daybreak.Configuration;
-using Daybreak.Exceptions;
+﻿using Daybreak.Configuration.Options;
 using Daybreak.Models;
 using Daybreak.Services.Credentials;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Configuration;
 using System.Core.Extensions;
 using System.IO;
@@ -15,12 +13,12 @@ namespace Daybreak.Services.Onboarding;
 public sealed class OnboardingService : IOnboardingService
 {
     private readonly ICredentialManager credentialManager;
-    private readonly ILiveOptions<ApplicationConfiguration> options;
+    private readonly ILiveOptions<LauncherOptions> options;
     private readonly ILogger<OnboardingService> logger;
 
     public OnboardingService(
         ICredentialManager credentialManager,
-        ILiveOptions<ApplicationConfiguration> liveOptions,
+        ILiveOptions<LauncherOptions> liveOptions,
         ILogger<OnboardingService> logger)
     {
         this.credentialManager = credentialManager.ThrowIfNull();

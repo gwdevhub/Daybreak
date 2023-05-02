@@ -1,12 +1,11 @@
-﻿using Daybreak.Configuration;
+﻿using Daybreak.Configuration.Options;
 using Daybreak.Controls;
 using Daybreak.Models;
 using Daybreak.Models.Guildwars;
 using Daybreak.Models.Progress;
-using Daybreak.Services.Configuration;
+using Daybreak.Services.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Web.WebView2.Core;
-using Microsoft.Web.WebView2.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -24,9 +23,8 @@ public sealed class IconDownloader : IIconDownloader, IApplicationLifetimeServic
 {
     private readonly IIconBrowser iconBrowser;
     private readonly IIconCache iconCache;
-    private readonly IConfigurationManager configurationManager;
     private readonly ILogger<IconDownloader> logger;
-    private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
+    private readonly ILiveOptions<LauncherOptions> liveOptions;
     private readonly ILogger<ChromiumBrowserWrapper> browserLogger;
     private ChromiumBrowserWrapper? browserWrapper;
     private CancellationTokenSource? cancellationTokenSource;
@@ -36,20 +34,29 @@ public sealed class IconDownloader : IIconDownloader, IApplicationLifetimeServic
     public bool Downloading => this.cancellationTokenSource is not null;
 
     public IconDownloader(
+        IOptionsUpdateHook optionsUpdateHook,
         IIconBrowser iconBrowser,
         IIconCache iconCache,
-        IConfigurationManager configurationManager,
         ILogger<IconDownloader> logger,
-        ILiveOptions<ApplicationConfiguration> liveOptions,
+        ILiveOptions<LauncherOptions> liveOptions,
         ILogger<ChromiumBrowserWrapper> browserLogger)
     {
         this.iconBrowser = iconBrowser.ThrowIfNull();
         this.iconCache = iconCache.ThrowIfNull();
-        this.configurationManager = configurationManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
         this.liveOptions = liveOptions.ThrowIfNull();
         this.browserLogger = browserLogger.ThrowIfNull();
-        this.HookIntoConfigurationChanges();
+        optionsUpdateHook.ThrowIfNull()!.RegisterHook<LauncherOptions>(async () =>
+        {
+            if (this.liveOptions.Value.DownloadIcons)
+            {
+                await this.StartIconDownload();
+            }
+            else
+            {
+                this.CancelIconDownload();
+            }
+        });
     }
 
     public void SetBrowser(ChromiumBrowserWrapper chromiumBrowserWrapper)
@@ -207,26 +214,9 @@ public sealed class IconDownloader : IIconDownloader, IApplicationLifetimeServic
         return coreWebView2Environment is not null;
     }
 
-    private void HookIntoConfigurationChanges()
-    {
-        this.configurationManager.ConfigurationChanged += async (_, _) =>
-        {
-            var configuration = this.configurationManager.GetConfiguration();
-            if (configuration.ExperimentalFeatures.DownloadIcons)
-            {
-                await this.StartIconDownload();
-            }
-            else
-            {
-                this.CancelIconDownload();
-            }
-        };
-    }
-
     public async void OnStartup()
     {
-        var configuration = this.configurationManager.GetConfiguration();
-        if (configuration.ExperimentalFeatures.DownloadIcons)
+        if (this.liveOptions.Value.DownloadIcons)
         {
             await this.StartIconDownload();
         }

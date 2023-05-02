@@ -1,4 +1,4 @@
-﻿using Daybreak.Configuration;
+﻿using Daybreak.Configuration.Options;
 using Daybreak.Models.Browser;
 using Daybreak.Models.Guildwars;
 using Daybreak.Services.BuildTemplates;
@@ -42,7 +42,7 @@ public partial class ChromiumBrowserWrapper : UserControl
     public event EventHandler<Build>? BuildDecoded;
 
     private readonly Task initializationTask;
-    private readonly ILiveOptions<ApplicationConfiguration>? liveOptions;
+    private readonly ILiveOptions<BrowserOptions>? liveOptions;
     private readonly ILogger<ChromiumBrowserWrapper>? logger;
     private readonly IBuildTemplateManager? buildTemplateManager;
     
@@ -82,14 +82,14 @@ public partial class ChromiumBrowserWrapper : UserControl
     }
 
     public ChromiumBrowserWrapper()
-        : this(Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILiveOptions<ApplicationConfiguration>>(),
+        : this(Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILiveOptions<BrowserOptions>>(),
               Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IBuildTemplateManager>(),
               Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILogger<ChromiumBrowserWrapper>>())
     {
     }
 
     public ChromiumBrowserWrapper(
-        ILiveOptions<ApplicationConfiguration> liveOptions,
+        ILiveOptions<BrowserOptions> liveOptions,
         IBuildTemplateManager buildTemplateManager,
         ILogger<ChromiumBrowserWrapper> logger)
     {
@@ -125,7 +125,7 @@ public partial class ChromiumBrowserWrapper : UserControl
 
     private void InitializeEnvironment()
     {
-        if (this.liveOptions!.Value.BrowsersEnabled is false)
+        if (this.liveOptions!.Value.Enabled is false)
         {
             this.BrowserSupported = false;
             return;
@@ -152,7 +152,7 @@ public partial class ChromiumBrowserWrapper : UserControl
             this.BrowserEnabled = true;
             await this.WebBrowser.EnsureCoreWebView2Async(coreWebView2Environment);
             this.AddressBarReadonly = this.liveOptions!.Value.AddressBarReadonly;
-            this.CanDownloadBuild = this.liveOptions.Value.ExperimentalFeatures.DynamicBuildLoading;
+            this.CanDownloadBuild = this.liveOptions.Value.DynamicBuildLoading;
             this.WebBrowser.CoreWebView2.NewWindowRequested += (browser, args) => args.Handled = true;
             this.WebBrowser.NavigationStarting += (browser, args) =>
             {

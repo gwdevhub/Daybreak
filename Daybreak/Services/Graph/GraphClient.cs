@@ -1,4 +1,5 @@
 ﻿using Daybreak.Configuration;
+using Daybreak.Configuration.Options;
 using Daybreak.Controls;
 using Daybreak.Models.Builds;
 using Daybreak.Services.BuildTemplates;
@@ -36,11 +37,9 @@ public sealed class GraphClient : IGraphClient
     private const string RedirectUriPlaceholder = "[RedirectUri]";
     private const string ScopesPlaceholder = "[Scopes]";
     private const string StatePlaceholder = "[State]";
-    private const string RefreshTokenPlaceholder = "[RefreshToken]";
     private const string ProfileEndpoint = "me";
     private const string GraphBaseUrl = "https://graph.microsoft.com/v1.0/";
     private const string TokenUrlPlaceholder = $"https://login.microsoftonline.com/consumers/oauth2/v2.0/token";
-    private const string RefreshTokenUrlPlaceholder = $"https://login.microsoftonline.com/consumers/oauth2/v2.0/token?client_id={ClientIdPlaceholder}&refresh_token={RefreshTokenPlaceholder}";
     private const string AuthorizationUrlPlaceholder = $"https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id={ClientIdPlaceholder}&response_type=code&redirect_uri={RedirectUriPlaceholder}&response_mode=query&scope={ScopesPlaceholder}&state={StatePlaceholder}";
     private const string SyncFileUri = $"me/drive/root:/Daybreak/Builds/daybreak.json{ContentSuffix}";
     private const string ContentSuffix = ":/content";
@@ -50,7 +49,7 @@ public sealed class GraphClient : IGraphClient
 
     private readonly IBuildTemplateManager buildTemplateManager;
     private readonly IViewManager viewManager;
-    private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions;
+    private readonly ILiveUpdateableOptions<BuildSynchronizationOptions> liveUpdateableOptions;
     private readonly IHttpClient<GraphClient> httpClient;
     private readonly ILogger<GraphClient> logger;
 
@@ -59,7 +58,7 @@ public sealed class GraphClient : IGraphClient
     public GraphClient(
         IBuildTemplateManager buildTemplateManager,
         IViewManager viewManager,
-        ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions,
+        ILiveUpdateableOptions<BuildSynchronizationOptions> liveUpdateableOptions,
         IHttpClient<GraphClient> httpClient,
         ILogger<GraphClient> logger)
     {

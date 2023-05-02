@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Configuration;
+﻿namespace Daybreak.Configuration.Options;
 
 public sealed class ScreenManagerOptions
 {
