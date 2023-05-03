@@ -41,5 +41,5 @@ public sealed class FocusViewOptions
     public PointsDisplay EnergyDisplay { get; set; }
 
     [JsonProperty(nameof(BrowserUrl))]
-    public string? BrowserUrl { get; set; } = string.Empty;
+    public string? BrowserUrl { get; set; } = "https://wiki.guildwars.com/wiki/Main_Page";
 }
