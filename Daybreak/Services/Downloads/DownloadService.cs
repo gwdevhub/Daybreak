@@ -44,6 +44,8 @@ public sealed class DownloadService : IDownloadService
 
         using var downloadStream = await this.httpClient.GetStreamAsync(downloadUri);
         this.logger.LogInformation("Beginning download");
+        var fileInfo = new FileInfo(destinationPath);
+        fileInfo.Directory?.Create();
         var fileStream = File.OpenWrite(destinationPath);
         var downloadSize = (double)response.Content!.Headers!.ContentLength!;
         var buffer = new byte[1024];

@@ -1,5 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Models;
+using Daybreak.Models.Onboarding;
 using Daybreak.Services.ApplicationLauncher;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Onboarding;
@@ -97,14 +97,14 @@ public partial class LauncherView : UserControl
     private async void LaunchButton_Clicked(object sender, EventArgs e)
     {
         var onboardingStage = await this.onboardingService.CheckOnboardingStage();
-        if (onboardingStage is OnboardingStage.Default)
+        if (onboardingStage is LauncherOnboardingStage.Default)
         {
             throw new InvalidOperationException($"Unexpected onboarding stage {onboardingStage}");
         }
 
-        if (onboardingStage is OnboardingStage.NeedsCredentials or OnboardingStage.NeedsExecutable)
+        if (onboardingStage is LauncherOnboardingStage.NeedsCredentials or LauncherOnboardingStage.NeedsExecutable)
         {
-            this.viewManager.ShowView<OnboardingView>(onboardingStage);
+            this.viewManager.ShowView<LauncherOnboardingView>(onboardingStage);
             return;
         }
 

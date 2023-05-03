@@ -3,20 +3,20 @@ using Daybreak.Services.Navigation;
 using Daybreak.Services.UMod;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
+using System.Extensions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 
-namespace Daybreak.Views;
+namespace Daybreak.Views.Onboarding.UMod;
 /// <summary>
 /// Interaction logic for UModInstallerView.xaml
 /// </summary>
-public partial class UModInstallerView : UserControl
+public partial class UModInstallingView : UserControl
 {
-    private readonly ILogger<UModInstallerView> logger;
+    private readonly ILogger<UModInstallingView> logger;
     private readonly IViewManager viewManager;
     private readonly IUModService uModService;
-    private readonly UModInstallationStatus installationStatus = new();
 
     [GenerateDependencyProperty(InitialValue = "")]
     private string description = string.Empty;
@@ -27,41 +27,44 @@ public partial class UModInstallerView : UserControl
     [GenerateDependencyProperty(InitialValue = false)]
     private bool progressVisible;
 
-    public UModInstallerView(
+    public UModInstallingView(
         IUModService uModService,
-        ILogger<UModInstallerView> logger,
+        ILogger<UModInstallingView> logger,
         IViewManager viewManager)
     {
         this.uModService = uModService.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
-        this.installationStatus.PropertyChanged += this.DownloadStatus_PropertyChanged!;
         this.InitializeComponent();
     }
 
-    private void DownloadStatus_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void DownloadStatus_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
+        var installationStatus = sender.As<UModInstallationStatus>();
         this.Dispatcher.Invoke(() =>
         {
             this.ProgressVisible = false;
-            if (this.installationStatus.CurrentStep is DownloadStatus.DownloadProgressStep downloadUpdateStep)
+            if (installationStatus.CurrentStep is DownloadStatus.DownloadProgressStep downloadUpdateStep)
             {
                 this.ProgressValue = downloadUpdateStep.Progress * 100;
                 this.ProgressVisible = true;
             }
 
-            this.Description = this.installationStatus.CurrentStep.Description;
+            this.Description = installationStatus.CurrentStep.Description;
         });
     }
 
     private async void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
-        await this.uModService.SetupUMod(this.installationStatus);
+        var installationStatus = new UModInstallationStatus();
+        installationStatus.PropertyChanged += this.DownloadStatus_PropertyChanged;
+        await this.uModService.SetupUMod(installationStatus);
+        installationStatus.PropertyChanged -= this.DownloadStatus_PropertyChanged;
         this.ContinueButtonEnabled = true;
     }
 
     private void OpaqueButton_Clicked(object sender, System.EventArgs e)
     {
-        this.viewManager.ShowView<LauncherView>();
+        this.viewManager.ShowView<UModSwitchView>();
     }
 }

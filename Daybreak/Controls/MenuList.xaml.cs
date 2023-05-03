@@ -2,6 +2,8 @@
 using Daybreak.Launch;
 using Daybreak.Services.Navigation;
 using Daybreak.Views;
+using Daybreak.Views.Onboarding.Toolbox;
+using Daybreak.Views.Onboarding.UMod;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Configuration;
@@ -93,6 +95,11 @@ public partial class MenuList : UserControl
 
     private void UModButton_Clicked(object sender, EventArgs e)
     {
-        this.viewManager.ShowView<UModInstallerView>();
+        this.viewManager.ShowView<UModOnboardingEntryView>();
+    }
+
+    private void ToolboxButton_Clicked(object sender, EventArgs e)
+    {
+        this.viewManager.ShowView<ToolboxOnboardingEntryView>();
     }
 }

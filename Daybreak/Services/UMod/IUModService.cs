@@ -6,7 +6,9 @@ public interface IUModService
 {
     bool UModExists { get; }
 
-    bool Enabled { get; }
+    bool Enabled { get; set; }
+
+    bool LoadUModFromDisk();
 
     Task<bool> SetupUMod(UModInstallationStatus uModInstallationStatus);
 }

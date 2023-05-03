@@ -3,6 +3,7 @@ using Daybreak.Models;
 using Daybreak.Models.Progress;
 using Daybreak.Services.Downloads;
 using Microsoft.Extensions.Logging;
+using Microsoft.Win32;
 using System.Configuration;
 using System.Core.Extensions;
 using System.IO;
@@ -28,7 +29,15 @@ public sealed class UModService : IUModService
 
     public bool UModExists => File.Exists(this.uModOptions.Value.Path);
 
-    public bool Enabled => this.uModOptions.Value.Enabled;
+    public bool Enabled
+    {
+        get => this.uModOptions.Value.Enabled;
+        set
+        {
+            this.uModOptions.Value.Enabled = value;
+            this.uModOptions.UpdateOption();
+        }
+    }
 
     public UModService(
         IDownloadService downloadService,
@@ -40,6 +49,26 @@ public sealed class UModService : IUModService
         this.launcherOptions = launcherOptions.ThrowIfNull();
         this.uModOptions = uModOptions.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
+    }
+
+    public bool LoadUModFromDisk()
+    {
+        var filePicker = new OpenFileDialog
+        {
+            Filter = "Executable Files (*.exe)|*.exe",
+            Multiselect = false,
+            RestoreDirectory = true,
+            Title = "Please select the uMod executable"
+        };
+        if (filePicker.ShowDialog() is false)
+        {
+            return false;
+        }
+
+        var fileName = filePicker.FileName;
+        this.uModOptions.Value.Path = Path.GetFullPath(fileName);
+        this.uModOptions.UpdateOption();
+        return true;
     }
 
     public async Task<bool> SetupUMod(UModInstallationStatus uModInstallationStatus)
@@ -59,15 +88,20 @@ public sealed class UModService : IUModService
         }
 
         var guildWarsDirectory = Path.GetDirectoryName(guildwarsPath.Path);
+        var d3d9SourceFilePath = Path.Combine(UModDirectory, D3D9Dll);
         var d3d9DestinationFilePath = Path.Combine(guildWarsDirectory, D3D9Dll);
-        if (File.Exists(d3d9DestinationFilePath))
+        if (MustBackupD3D9Dll(d3d9SourceFilePath, d3d9DestinationFilePath))
         {
             this.logger.LogInformation($"Found an existing {D3D9Dll} file. Saving it as {D3D9DllBackup}");
             var d3d9DestinationBackupFilePath = Path.Combine(guildWarsDirectory, D3D9DllBackup);
+            if (File.Exists(d3d9DestinationBackupFilePath))
+            {
+                File.Delete(d3d9DestinationBackupFilePath);
+            }
+
             File.Move(d3d9DestinationFilePath, d3d9DestinationBackupFilePath);
         }
 
-        var d3d9SourceFilePath = Path.Combine(UModDirectory, D3D9Dll);
         this.logger.LogInformation($"Copying {d3d9SourceFilePath} to {d3d9DestinationFilePath}");
         File.Copy(d3d9SourceFilePath, d3d9DestinationFilePath);
 
@@ -77,7 +111,7 @@ public sealed class UModService : IUModService
 
     private async Task<bool> SetupUModExecutable(UModInstallationStatus uModInstallationStatus)
     {
-        if (Directory.Exists(UModDirectory))
+        if (File.Exists(this.uModOptions.Value.Path))
         {
             return true;
         }
@@ -91,8 +125,20 @@ public sealed class UModService : IUModService
         ZipFile.ExtractToDirectory(ArchiveName, Directory.GetCurrentDirectory(), true);
         var uModOptions = this.uModOptions.Value;
         uModOptions.Path = Path.GetFullPath(Path.Combine(UModDirectory, UModExecutable));
-        uModOptions.Enabled = true;
         this.uModOptions.UpdateOption();
         return true;
+    }
+
+    private static bool MustBackupD3D9Dll(string sourcePath, string destinationPath)
+    {
+        if (!File.Exists(destinationPath))
+        {
+            return false;
+        }
+
+        var sourceInfo = new FileInfo(sourcePath);
+        var destinationInfo = new FileInfo(destinationPath);
+        return sourceInfo.Length != destinationInfo.Length ||
+            sourceInfo.CreationTimeUtc != destinationInfo.CreationTimeUtc;
     }
 }

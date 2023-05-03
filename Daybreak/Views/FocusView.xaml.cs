@@ -220,7 +220,7 @@ public partial class FocusView : UserControl
             _ = Task.Run(() => this.UpdatePathingData(this.loadingPathingDataCancellationTokenSource.Token), this.loadingPathingDataCancellationTokenSource.Token)
                 .ContinueWith(_ =>
                 {
-                    this.loadingPathingDataCancellationTokenSource.Dispose();
+                    this.loadingPathingDataCancellationTokenSource?.Dispose();
                     this.loadingPathingDataCancellationTokenSource = null;
                 });
         }

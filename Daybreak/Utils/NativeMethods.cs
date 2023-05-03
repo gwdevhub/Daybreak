@@ -15,6 +15,23 @@ internal static class NativeMethods
 
     public delegate IntPtr HookProc(int nCode, IntPtr wParam, IntPtr lParam);
 
+    [StructLayout(LayoutKind.Sequential)]
+    public readonly struct RECT
+    {
+        public readonly int Left, Top, Right, Bottom;
+
+        public int Height => this.Bottom - this.Top;
+
+        public int Width => this.Right - this.Left;
+
+        public RECT(int left, int top, int right, int bottom)
+        {
+            this.Left = left;
+            this.Top = top;
+            this.Right = right;
+            this.Bottom = bottom;
+        }
+    }
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct SystemHandleInformation
     {
@@ -48,7 +65,26 @@ internal static class NativeMethods
         public uint Status;
         public ulong Information;
     }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct WindowInfo
+    {
+        public uint cbSize;
+        public RECT rcWindow;
+        public RECT rcClient;
+        public uint dwStyle;
+        public uint dwExStyle;
+        public uint dwWindowStatus;
+        public uint cxWindowBorders;
+        public uint cyWindowBorders;
+        public ushort atomWindowType;
+        public ushort wCreatorVersion;
 
+        public WindowInfo(bool? _) : this()   // Allows automatic initialization of "cbSize" with "new WINDOWINFO(null/true/false)".
+        {
+            this.cbSize = (uint)(Marshal.SizeOf(typeof(WindowInfo)));
+        }
+
+    }
     [Flags]
     public enum DuplicateOptions : uint
     {
@@ -134,5 +170,8 @@ internal static class NativeMethods
     [DllImport("user32.dll")]
     public static extern IntPtr GetForegroundWindow();
     [DllImport("kernel32.dll", SetLastError = true)]
-    internal static extern bool ReadProcessMemory(IntPtr hProcess, uint lpBaseAddress, IntPtr lpBuffer, uint nSize, out uint lpNumberOfBytesRead);
+    public static extern bool ReadProcessMemory(IntPtr hProcess, uint lpBaseAddress, IntPtr lpBuffer, uint nSize, out uint lpNumberOfBytesRead);
+    [return: MarshalAs(UnmanagedType.Bool)]
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern bool GetWindowInfo(IntPtr hwnd, ref WindowInfo pwi);
 }

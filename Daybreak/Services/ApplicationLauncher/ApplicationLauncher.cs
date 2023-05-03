@@ -3,6 +3,7 @@ using Daybreak.Exceptions;
 using Daybreak.Services.Credentials;
 using Daybreak.Services.Mutex;
 using Daybreak.Services.Privilege;
+using Daybreak.Services.Scanner;
 using Daybreak.Utils;
 using Daybreak.Views;
 using Microsoft.Extensions.Logging;
@@ -17,6 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Security;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -29,6 +31,7 @@ public class ApplicationLauncher : IApplicationLauncher
     private const string ArenaNetMutex = "AN-Mute";
 
     private readonly ILiveOptions<UModOptions> uModOptions;
+    private readonly ILiveOptions<ToolboxOptions> toolboxOptions;
     private readonly ILiveOptions<LauncherOptions> launcherOptions;
     private readonly ICredentialManager credentialManager;
     private readonly IMutexHandler mutexHandler;
@@ -40,6 +43,7 @@ public class ApplicationLauncher : IApplicationLauncher
 
     public ApplicationLauncher(
         ILiveOptions<UModOptions> uModOptions,
+        ILiveOptions<ToolboxOptions> toolboxOptions,
         ILiveOptions<LauncherOptions> launcherOptions,
         ICredentialManager credentialManager,
         IMutexHandler mutexHandler,
@@ -51,6 +55,7 @@ public class ApplicationLauncher : IApplicationLauncher
         this.credentialManager = credentialManager.ThrowIfNull();
         this.launcherOptions = launcherOptions.ThrowIfNull();
         this.uModOptions = uModOptions.ThrowIfNull();
+        this.toolboxOptions = toolboxOptions.ThrowIfNull();
         this.privilegeManager = privilegeManager.ThrowIfNull();
     }
 
@@ -77,7 +82,15 @@ public class ApplicationLauncher : IApplicationLauncher
                     await this.LaunchUMod();
                 }
 
-                return await this.LaunchGuildwarsProcess(credentials.Username!, credentials.Password!, credentials.CharacterName!);
+                var gwProcess = await this.LaunchGuildwarsProcess(credentials.Username!, credentials.Password!, credentials.CharacterName!);
+
+                if (this.toolboxOptions.Value.Enabled)
+                {
+                    await Task.Delay(5000);
+                    await this.LaunchToolbox();
+                }
+
+                return gwProcess;
             },
             onNone: () =>
             {
@@ -180,6 +193,13 @@ public class ApplicationLauncher : IApplicationLauncher
                 continue;
             }
 
+            var windowInfo = new NativeMethods.WindowInfo(true);
+            NativeMethods.GetWindowInfo(gwProcess.MainWindowHandle, ref windowInfo);
+            if (windowInfo.rcWindow.Width == 0 || windowInfo.rcWindow.Height == 0)
+            {
+                continue;
+            }
+
             return gwProcess;
         }
     }
@@ -222,7 +242,7 @@ public class ApplicationLauncher : IApplicationLauncher
             }
             else if (uModProcess is null && retries >= MaxRetries)
             {
-                throw new InvalidOperationException("Newly launched gw process not detected");
+                throw new InvalidOperationException("Newly launched uMod process not detected");
             }
 
             if (uModProcess!.MainWindowHandle == IntPtr.Zero)
@@ -230,9 +250,9 @@ public class ApplicationLauncher : IApplicationLauncher
                 continue;
             }
 
-            int titleLength = NativeMethods.GetWindowTextLength(uModProcess.MainWindowHandle);
+            var titleLength = NativeMethods.GetWindowTextLength(uModProcess.MainWindowHandle);
             var titleBuffer = new StringBuilder(titleLength);
-            var readCount = NativeMethods.GetWindowText(uModProcess.MainWindowHandle, titleBuffer, titleLength + 1);
+            _ = NativeMethods.GetWindowText(uModProcess.MainWindowHandle, titleBuffer, titleLength + 1);
             var title = titleBuffer.ToString();
             if (title != "uMod V 1.0")
             {
@@ -240,6 +260,65 @@ public class ApplicationLauncher : IApplicationLauncher
             }
 
             return uModProcess;
+        }
+    }
+
+    private async Task<Process?> LaunchToolbox()
+    {
+        if (this.toolboxOptions.Value.Enabled is false)
+        {
+            throw new InvalidOperationException("Cannot launch GWToolbox. GWToolbox is disabled");
+        }
+
+        var executable = this.toolboxOptions.Value.Path;
+        if (File.Exists(executable) is false)
+        {
+            throw new ExecutableNotFoundException($"GWToolbox executable doesn't exist at {executable}");
+        }
+
+        this.logger.LogInformation($"Launching GWToolbox");
+        var process = new Process()
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = executable
+            }
+        };
+        if (process.Start() is false)
+        {
+            throw new InvalidOperationException($"Unable to launch {executable}");
+        }
+
+        var retries = 0;
+        while (true)
+        {
+            await Task.Delay(100);
+            retries++;
+            var toolboxProcess = Process.GetProcessesByName("GWToolboxpp").FirstOrDefault();
+            if (toolboxProcess is null && retries < MaxRetries)
+            {
+                continue;
+            }
+            else if (toolboxProcess is null && retries >= MaxRetries)
+            {
+                throw new InvalidOperationException("Newly launched GWToolbox process not detected");
+            }
+
+            if (toolboxProcess!.MainWindowHandle == IntPtr.Zero)
+            {
+                continue;
+            }
+
+            var titleLength = NativeMethods.GetWindowTextLength(toolboxProcess.MainWindowHandle);
+            var titleBuffer = new StringBuilder(titleLength);
+            _ = NativeMethods.GetWindowText(toolboxProcess.MainWindowHandle, titleBuffer, titleLength + 1);
+            var title = titleBuffer.ToString();
+            if (title != "GWToolbox - Launch")
+            {
+                continue;
+            }
+
+            return toolboxProcess;
         }
     }
 

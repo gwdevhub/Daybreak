@@ -9,7 +9,6 @@ using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
@@ -26,7 +25,7 @@ namespace Daybreak.Services.Scanner;
 public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
 {
     private const int MaxTrapezoidCount = 1000000;
-    private const int RetryInitializationCount = 15;
+    private const int RetryInitializationCount = 5;
     private const string LatencyMeterName = "Memory Reader Latency";
     private const string LatencyMeterUnitsName = "Milliseconds";
     private const string LatencyMeterDescription = "Amount of milliseconds elapsed while reading memory. P95 aggregation";
@@ -83,6 +82,16 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         var scoppedLogger = this.logger.CreateScopedLogger(nameof(this.Stop), default);
         scoppedLogger.LogInformation($"Stopping {nameof(GuildwarsMemoryReader)}");
         this.memoryScanner?.EndScanner();
+    }
+
+    public Task<LoginData?> ReadLoginData(CancellationToken cancellationToken)
+    {
+        if (this.memoryScanner.Scanning is false)
+        {
+            return Task.FromResult<LoginData?>(default);
+        }
+
+        return Task.Run(() => this.SafeReadGameMemory(this.ReadLoginDataInternal), cancellationToken);
     }
 
     public Task<GameData?> ReadGameData(CancellationToken cancellationToken)
@@ -172,6 +181,24 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
             this.logger.LogError(e, "Exception encountered when reading game memory");
             return default;
         }
+    }
+
+    private LoginData? ReadLoginDataInternal()
+    {
+        var globalContext = this.memoryScanner.ReadPtrChain<GlobalContext>(this.memoryScanner.ModuleStartAddress, finalPointerOffset: 0x0, 0x00629244, 0xC, 0xC);
+        if (globalContext.GameContext == 0x0 ||
+            globalContext.UserContext == 0x0 ||
+            globalContext.InstanceContext == 0x0)
+        {
+            return default;
+        }
+
+        var userContext = this.memoryScanner.Read<UserContext>(globalContext.UserContext + UserContext.BaseOffset);
+        return new LoginData
+        {
+            Email = userContext.PlayerEmailFirstChar + (userContext.PlayerEmailSecondChar + userContext.PlayerEmailRemaining),
+            PlayerName = userContext.PlayerName
+        };
     }
 
     private GameData? ReadGameDataInternal()

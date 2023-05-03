@@ -53,6 +53,17 @@
                                        Width="40"></glyphs:UModGlyph>
             </buttons:MenuButton.InnerContent>
         </buttons:MenuButton>
+        <buttons:MenuButton Title="Setup GWToolboxpp" 
+                            Foreground="White"
+                            HighlightColor="White"
+                            Height="30"
+                            Cursor="Hand"
+                            Clicked="ToolboxButton_Clicked">
+            <buttons:MenuButton.InnerContent>
+                <glyphs:GWToolboxGlyph Foreground="White"
+                                       Width="40"></glyphs:GWToolboxGlyph>
+            </buttons:MenuButton.InnerContent>
+        </buttons:MenuButton>
         <buttons:MenuButton Title="Account settings" 
                             Foreground="White"
                             HighlightColor="White"

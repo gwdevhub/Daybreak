@@ -46,6 +46,9 @@ using Daybreak.Services.Guildwars;
 using Daybreak.Configuration.Options;
 using System.Configuration;
 using Daybreak.Services.UMod;
+using Daybreak.Services.Toolbox;
+using Daybreak.Views.Onboarding.UMod;
+using Daybreak.Views.Onboarding.Toolbox;
 
 namespace Daybreak.Configuration;
 
@@ -156,6 +159,7 @@ public static class ProjectConfiguration
         services.AddScoped<IDrawingService, DrawingService>();
         services.AddScoped<IDrawingModuleProducer, DrawingService>(sp => sp.GetRequiredService<IDrawingService>().As<DrawingService>());
         services.AddScoped<IUModService, UModService>();
+        services.AddScoped<IToolboxService, ToolboxService>();
     }
 
     public static void RegisterViews(IViewProducer viewProducer)
@@ -179,10 +183,19 @@ public static class ProjectConfiguration
         viewProducer.RegisterView<IconDownloadView>();
         viewProducer.RegisterView<GraphAuthorizationView>();
         viewProducer.RegisterView<BuildsSynchronizationView>();
-        viewProducer.RegisterView<OnboardingView>();
+        viewProducer.RegisterView<LauncherOnboardingView>();
         viewProducer.RegisterView<MetricsView>();
         viewProducer.RegisterView<GuildwarsDownloadView>();
-        viewProducer.RegisterView<UModInstallerView>();
+        viewProducer.RegisterView<UModInstallingView>();
+        viewProducer.RegisterView<UModInstallationChoiceView>();
+        viewProducer.RegisterView<UModOnboardingEntryView>();
+        viewProducer.RegisterView<UModSwitchView>();
+        viewProducer.RegisterView<UModWikiView>();
+        viewProducer.RegisterView<ToolboxInstallationView>();
+        viewProducer.RegisterView<ToolboxInstallationChoiceView>();
+        viewProducer.RegisterView<ToolboxOnboardingEntryView>();
+        viewProducer.RegisterView<ToolboxSwitchView>();
+        viewProducer.RegisterView<ToolboxHomepageView>();
     }
 
     public static void RegisterStartupActions(IStartupActionProducer startupActionProducer)
