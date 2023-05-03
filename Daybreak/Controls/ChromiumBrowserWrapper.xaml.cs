@@ -11,6 +11,8 @@ using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
+using System.Globalization;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
@@ -40,6 +42,7 @@ public partial class ChromiumBrowserWrapper : UserControl
     public event EventHandler<string>? FavoriteUriChanged;
     public event EventHandler? MaximizeClicked;
     public event EventHandler<Build>? BuildDecoded;
+    public event EventHandler<DownloadPayload>? DownloadingFile;
 
     private readonly Task initializationTask;
     private readonly ILiveOptions<BrowserOptions>? liveOptions;
@@ -50,6 +53,8 @@ public partial class ChromiumBrowserWrapper : UserControl
     private bool canDownloadBuild;
     [GenerateDependencyProperty(InitialValue = true)]
     private bool canNavigate;
+    [GenerateDependencyProperty(InitialValue = false)]
+    private bool canDownloadFiles;
     [GenerateDependencyProperty(InitialValue = true)]
     private bool controlsEnabled;
     [GenerateDependencyProperty(InitialValue = null)]
@@ -68,6 +73,8 @@ public partial class ChromiumBrowserWrapper : UserControl
     private bool homeButtonVisible = true;
     [GenerateDependencyProperty(InitialValue = true)]
     private bool favoriteButtonVisible = true;
+    [GenerateDependencyProperty]
+    private string downloadsDirectory = string.Empty;
 
     public string Address
     {
@@ -133,7 +140,11 @@ public partial class ChromiumBrowserWrapper : UserControl
 
         try
         {
-            coreWebView2Environment ??= System.Extensions.TaskExtensions.RunSync(() => CoreWebView2Environment.CreateAsync(null, "BrowserData", null));
+            coreWebView2Environment ??= System.Extensions.TaskExtensions.RunSync(() => CoreWebView2Environment.CreateAsync(null, "BrowserData", new CoreWebView2EnvironmentOptions
+            {
+                EnableTrackingPrevention = true,
+                AllowSingleSignOnUsingOSPrimaryAccount = true
+            }));
 
             this.BrowserSupported = true;
         }
@@ -164,6 +175,33 @@ public partial class ChromiumBrowserWrapper : UserControl
                 {
                     this.Navigating = true;
                 }
+            };
+            this.WebBrowser.CoreWebView2.DownloadStarting += (browser, args) =>
+            {
+                if (this.CanDownloadFiles is false)
+                {
+                    this.logger?.LogInformation("Downloads are disallowed. Cancelling download");
+                    args.Cancel = true;
+                }
+
+                if (this.DownloadsDirectory.IsNullOrWhiteSpace())
+                {
+                    this.logger?.LogInformation("No downloads directory specified. Downloading to default directory");
+                    return;
+                }
+
+                var fileName = Path.GetFileName(args.ResultFilePath);
+                var finalPath = Path.GetFullPath(Path.Combine(this.DownloadsDirectory, fileName));
+                var downloadPayload = new DownloadPayload { ResultingFilePath = finalPath, CanDownload = true };
+                this.DownloadingFile?.Invoke(this, downloadPayload);
+                if (!downloadPayload.CanDownload)
+                {
+                    args.Cancel = true;
+                    this.logger?.LogInformation("Download blocked by handler. Cancelling download");
+                    return;
+                }
+
+                args.ResultFilePath = finalPath;
             };
             this.WebBrowser.NavigationCompleted += (browser, args) => this.Navigating = false;
             this.WebBrowser.WebMessageReceived += this.CoreWebView2_WebMessageReceived!;

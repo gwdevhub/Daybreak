@@ -98,6 +98,5 @@
                 <TextBlock Foreground="White" Text="Restart after the installation." FontSize="26" TextWrapping="Wrap" />
             </StackPanel>
         </Grid>
-        
     </Grid>
 </UserControl>

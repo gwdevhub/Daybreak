@@ -190,7 +190,7 @@ public static class ProjectConfiguration
         viewProducer.RegisterView<UModInstallationChoiceView>();
         viewProducer.RegisterView<UModOnboardingEntryView>();
         viewProducer.RegisterView<UModSwitchView>();
-        viewProducer.RegisterView<UModWikiView>();
+        viewProducer.RegisterView<UModBrowserView>();
         viewProducer.RegisterView<ToolboxInstallationView>();
         viewProducer.RegisterView<ToolboxInstallationChoiceView>();
         viewProducer.RegisterView<ToolboxOnboardingEntryView>();

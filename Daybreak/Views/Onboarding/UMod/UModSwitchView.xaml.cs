@@ -12,6 +12,7 @@ namespace Daybreak.Views.Onboarding.UMod;
 public partial class UModSwitchView : UserControl
 {
     private const string WikiLink = "https://code.google.com/archive/p/texmod/wikis/uMod.wiki";
+    private const string ModsLink = "https://wiki.guildwars.com/wiki/Player-made_Modifications#Shared_player_content";
 
     private readonly IUModService uModService;
     private readonly IViewManager viewManager;
@@ -46,6 +47,11 @@ public partial class UModSwitchView : UserControl
 
     private void Wiki_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-        this.viewManager.ShowView<UModWikiView>();
+        this.viewManager.ShowView<UModBrowserView>(WikiLink);
+    }
+
+    private void Mods_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        this.viewManager.ShowView<UModBrowserView>(ModsLink);
     }
 }

@@ -17,7 +17,7 @@ public partial class ToolboxSwitchView : UserControl
     private readonly ILogger<ToolboxSwitchView> logger;
 
     [GenerateDependencyProperty]
-    private bool uModEnabled;
+    private bool toolboxEnabled;
 
     public ToolboxSwitchView(
         IToolboxService toolboxService,
@@ -29,7 +29,7 @@ public partial class ToolboxSwitchView : UserControl
         this.logger = logger.ThrowIfNull();
 
         this.InitializeComponent();
-        this.UModEnabled = this.toolboxService.Enabled;
+        this.ToolboxEnabled = this.toolboxService.Enabled;
     }
 
     private void OpaqueButtonNo_Clicked(object sender, System.EventArgs e)

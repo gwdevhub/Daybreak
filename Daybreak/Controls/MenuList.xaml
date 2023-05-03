@@ -9,138 +9,165 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel>
-        <buttons:MenuButton Title="Game companion" 
-                            Foreground="White"
-                            HighlightColor="White"
-                            Height="30"
-                            Cursor="Hand"
-                            Clicked="GameCompanionButton_Clicked">
-            <buttons:MenuButton.InnerContent>
-                <local:GoldenArrowGlyph Foreground="White"
+        <local:ExpandableMenuSection
+            SectionTitle="Guild Wars" Foreground="White"
+            FontSize="16">
+            <local:ExpandableMenuSection.Children>
+                <buttons:MenuButton Title="Game companion" 
+                                    FontSize="12"
+                                    Foreground="White"
+                                    HighlightColor="White"
+                                    Height="30"
+                                    Cursor="Hand"
+                                    Clicked="GameCompanionButton_Clicked">
+                    <buttons:MenuButton.InnerContent>
+                        <local:GoldenArrowGlyph Foreground="White"
                                    Width="40"></local:GoldenArrowGlyph>
-            </buttons:MenuButton.InnerContent>
-        </buttons:MenuButton>
-        <buttons:MenuButton Title="Manage builds" 
-                            Foreground="White"
-                            HighlightColor="White"
-                            Height="30"
-                            Cursor="Hand"
-                            Clicked="ManageBuildsButton_Clicked">
-            <buttons:MenuButton.InnerContent>
-                <local:FireballGlyph Foreground="White"
+                    </buttons:MenuButton.InnerContent>
+                </buttons:MenuButton>
+                <buttons:MenuButton Title="Manage builds" 
+                                    FontSize="12"
+                                    Foreground="White"
+                                    HighlightColor="White"
+                                    Height="30"
+                                    Cursor="Hand"
+                                    Clicked="ManageBuildsButton_Clicked">
+                    <buttons:MenuButton.InnerContent>
+                        <local:FireballGlyph Foreground="White"
                                        Width="40"></local:FireballGlyph>
-            </buttons:MenuButton.InnerContent>
-        </buttons:MenuButton>
-        <buttons:MenuButton Title="Download Guildwars" 
-                            Foreground="White"
-                            HighlightColor="White"
-                            Height="30"
-                            Cursor="Hand"
-                            Clicked="DownloadGuildwarsButton_Clicked">
-            <buttons:MenuButton.InnerContent>
-                <glyphs:DownloadGlyph Foreground="White"
+                    </buttons:MenuButton.InnerContent>
+                </buttons:MenuButton>
+                <buttons:MenuButton Title="Download Guildwars" 
+                                    FontSize="12"
+                                    Foreground="White"
+                                    HighlightColor="White"
+                                    Height="30"
+                                    Cursor="Hand"
+                                    Clicked="DownloadGuildwarsButton_Clicked">
+                    <buttons:MenuButton.InnerContent>
+                        <glyphs:DownloadGlyph Foreground="White"
                                        Width="40"></glyphs:DownloadGlyph>
-            </buttons:MenuButton.InnerContent>
-        </buttons:MenuButton>
-        <buttons:MenuButton Title="Setup uMod" 
+                    </buttons:MenuButton.InnerContent>
+                </buttons:MenuButton>
+            </local:ExpandableMenuSection.Children>
+        </local:ExpandableMenuSection>
+        <local:ExpandableMenuSection
+            SectionTitle="Mods" Foreground="White"
+            FontSize="16">
+            <local:ExpandableMenuSection.Children>
+                <buttons:MenuButton Title="uMod" 
                             Foreground="White"
                             HighlightColor="White"
                             Height="30"
                             Cursor="Hand"
                             Clicked="UModButton_Clicked">
-            <buttons:MenuButton.InnerContent>
-                <glyphs:UModGlyph Foreground="White"
+                    <buttons:MenuButton.InnerContent>
+                        <glyphs:UModGlyph Foreground="White"
                                        Width="40"></glyphs:UModGlyph>
-            </buttons:MenuButton.InnerContent>
-        </buttons:MenuButton>
-        <buttons:MenuButton Title="Setup GWToolboxpp" 
+                    </buttons:MenuButton.InnerContent>
+                </buttons:MenuButton>
+                <buttons:MenuButton Title="GWToolboxpp" 
                             Foreground="White"
                             HighlightColor="White"
                             Height="30"
                             Cursor="Hand"
                             Clicked="ToolboxButton_Clicked">
-            <buttons:MenuButton.InnerContent>
-                <glyphs:GWToolboxGlyph Foreground="White"
+                    <buttons:MenuButton.InnerContent>
+                        <glyphs:GWToolboxGlyph Foreground="White"
                                        Width="40"></glyphs:GWToolboxGlyph>
-            </buttons:MenuButton.InnerContent>
-        </buttons:MenuButton>
-        <buttons:MenuButton Title="Account settings" 
+                    </buttons:MenuButton.InnerContent>
+                </buttons:MenuButton>
+            </local:ExpandableMenuSection.Children>
+        </local:ExpandableMenuSection>
+        <local:ExpandableMenuSection
+            SectionTitle="Settings" Foreground="White"
+            FontSize="16">
+            <local:ExpandableMenuSection.Children>
+                <buttons:MenuButton Title="Accounts" 
                             Foreground="White"
                             HighlightColor="White"
                             Height="30"
                             Cursor="Hand"
                             Clicked="AccountSettingsButton_Clicked">
-            <buttons:MenuButton.InnerContent>
-                <local:AvatarGlyph Foreground="White"
+                    <buttons:MenuButton.InnerContent>
+                        <local:AvatarGlyph Foreground="White"
                                    Width="40"></local:AvatarGlyph>
-            </buttons:MenuButton.InnerContent>
-        </buttons:MenuButton>
-        <buttons:MenuButton Title="Guildwars settings" 
+                    </buttons:MenuButton.InnerContent>
+                </buttons:MenuButton>
+                <buttons:MenuButton Title="Executables" 
                             Foreground="White"
                             HighlightColor="White"
                             Height="30"
                             Cursor="Hand"
                             Clicked="GuildwarsSettingsButton_Clicked">
-            <buttons:MenuButton.InnerContent>
-                <local:FileGlyph Foreground="White"
+                    <buttons:MenuButton.InnerContent>
+                        <local:FileGlyph Foreground="White"
                                  Width="40"></local:FileGlyph>
-            </buttons:MenuButton.InnerContent>
-        </buttons:MenuButton>
-        <buttons:MenuButton Title="Launcher settings" 
+                    </buttons:MenuButton.InnerContent>
+                </buttons:MenuButton>
+                <buttons:MenuButton Title="Launcher" 
                             Foreground="White"
                             HighlightColor="White"
                             Height="30"
                             Cursor="Hand"
                             Clicked="LauncherSettingsButton_Clicked">
-            <buttons:MenuButton.InnerContent>
-                <local:CogGlyph Foreground="White"
+                    <buttons:MenuButton.InnerContent>
+                        <local:CogGlyph Foreground="White"
                                 Width="40"
                                 Height="20"></local:CogGlyph>
-            </buttons:MenuButton.InnerContent>
-        </buttons:MenuButton>
-        <buttons:MenuButton Title="Experimental settings" 
+                    </buttons:MenuButton.InnerContent>
+                </buttons:MenuButton>
+                <buttons:MenuButton Title="Experimental" 
                             Foreground="White"
                             HighlightColor="White"
                             Height="30"
                             Cursor="Hand"
                             Clicked="ExperimentalSettingsButton_Clicked">
-            <buttons:MenuButton.InnerContent>
-                <local:ExperimentGlyph Foreground="White"
+                    <buttons:MenuButton.InnerContent>
+                        <local:ExperimentGlyph Foreground="White"
                                        Width="40"></local:ExperimentGlyph>
-            </buttons:MenuButton.InnerContent>
-        </buttons:MenuButton>
-        <buttons:MenuButton Title="Manage client version" 
+                    </buttons:MenuButton.InnerContent>
+                </buttons:MenuButton>
+            </local:ExpandableMenuSection.Children>
+        </local:ExpandableMenuSection>
+        <local:ExpandableMenuSection
+            SectionTitle="Diagnostics" Foreground="White"
+            FontSize="16">
+            <local:ExpandableMenuSection.Children>
+                <buttons:MenuButton Title="Manage client version" 
                             Foreground="White"
                             HighlightColor="White"
                             Height="30"
                             Cursor="Hand"
                             Clicked="VersionManagementButton_Clicked">
-            <buttons:MenuButton.InnerContent>
-                <local:StaticGlyph Foreground="White"
+                    <buttons:MenuButton.InnerContent>
+                        <local:StaticGlyph Foreground="White"
                                        Width="40"></local:StaticGlyph>
-            </buttons:MenuButton.InnerContent>
-        </buttons:MenuButton>
-        <buttons:MenuButton Title="Logs" 
+                    </buttons:MenuButton.InnerContent>
+                </buttons:MenuButton>
+                <buttons:MenuButton Title="Logs" 
                             Foreground="White"
                             HighlightColor="White"
                             Height="30"
                             Cursor="Hand"
                             Clicked="LogsButton_Clicked">
-            <buttons:MenuButton.InnerContent>
-                <local:LogsGlyph Foreground="White"
+                    <buttons:MenuButton.InnerContent>
+                        <local:LogsGlyph Foreground="White"
                                        Width="40"></local:LogsGlyph>
-            </buttons:MenuButton.InnerContent>
-        </buttons:MenuButton>
-        <buttons:MenuButton Title="Metrics" 
+                    </buttons:MenuButton.InnerContent>
+                </buttons:MenuButton>
+                <buttons:MenuButton Title="Metrics" 
                             Foreground="White"
                             HighlightColor="White"
                             Height="30"
                             Cursor="Hand"
                             Clicked="MetricsButton_Clicked">
-            <buttons:MenuButton.InnerContent>
-                <glyphs:GaugeGlyph Foreground="White"
+                    <buttons:MenuButton.InnerContent>
+                        <glyphs:GaugeGlyph Foreground="White"
                                        Width="40"></glyphs:GaugeGlyph>
-            </buttons:MenuButton.InnerContent>
-        </buttons:MenuButton>
+                    </buttons:MenuButton.InnerContent>
+                </buttons:MenuButton>
+            </local:ExpandableMenuSection.Children>
+        </local:ExpandableMenuSection>
     </StackPanel>
 </UserControl>

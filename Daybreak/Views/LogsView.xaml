@@ -18,6 +18,11 @@
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
+        <TextBlock FontSize="16" Foreground="White"
+                   Margin="10, 0, 0, 0"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Left"
+                   Text="Latest 100 log lines"></TextBlock>
         <controls:BinButton Foreground="White" Height="30" Width="30" HorizontalAlignment="Right" Margin="5"
                             Clicked="BinButton_Clicked"></controls:BinButton>
         <controls:RefreshGlyph Foreground="White" Height="30" Width="30" HorizontalAlignment="Right" Margin="0, 5, 45, 5"

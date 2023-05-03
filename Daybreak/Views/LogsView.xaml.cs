@@ -35,7 +35,7 @@ public partial class LogsView : UserControl
 
     private void UpdateLogs()
     {
-        this.Logs = this.logManager.GetLogs(l => l.LogLevel < Microsoft.Extensions.Logging.LogLevel.Trace).ToList();
+        this.Logs = this.logManager.GetLogs(l => l.LogLevel < LogLevel.Trace).TakeLast(100).ToList();
     }
 
     private async void ExportButton_Clicked(object sender, EventArgs e)
