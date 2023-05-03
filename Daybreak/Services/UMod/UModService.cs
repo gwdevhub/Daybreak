@@ -9,7 +9,7 @@ using System.Core.Extensions;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Daybreak.Services.UMod;
@@ -156,12 +156,22 @@ public sealed class UModService : IUModService
             return;
         }
 
+        /*
+         * uMod expects a modlist file with Add_true:Path_To_Tbf for each tbf.
+         * To make uMod auto-load the template, it needs to be saved in uMod_SaveFiles.txt.
+         * uMod_SaveFiles.txt has a weird format where each character is appended with \0.
+         */
         var defaultTemplateFile = Path.Combine(UModDirectory, UModDefaultTemplateFile);
         var modListPath = Path.GetFullPath(Path.Combine(UModDirectory, UModModListFile));
         var gwPath = Path.GetFullPath(guildwarsPath.Path!);
-        var entry = $"{gwPath}|{modListPath}";
+        var entry = $"{gwPath}|{modListPath}\r\n";
+        var finalSb = new StringBuilder();
+        foreach(var c in entry)
+        {
+            finalSb.Append(c).Append('\0');
+        }
 
-        await File.WriteAllLinesAsync(defaultTemplateFile, new string[] { string.Empty, entry });
+        await File.WriteAllLinesAsync(defaultTemplateFile, new string[] { finalSb.ToString() } );
     }
 
     private static async Task SetupModListFile()

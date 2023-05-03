@@ -144,7 +144,7 @@ public class ApplicationLauncher : IApplicationLauncher
         if (!string.IsNullOrWhiteSpace(character))
         {
             args.Add("-character");
-            args.Add($"\"character\"");
+            args.Add($"\"{character}\"");
         }
 
         var identity = this.launcherOptions.Value.LaunchGuildwarsAsCurrentUser ?
@@ -217,6 +217,12 @@ public class ApplicationLauncher : IApplicationLauncher
             throw new ExecutableNotFoundException($"uMod executable doesn't exist at {executable}");
         }
 
+        if (Process.GetProcessesByName("uMod").FirstOrDefault() is Process existingProcess)
+        {
+            this.logger.LogInformation("uMod is already running");
+            return existingProcess;
+        }
+
         this.logger.LogInformation($"Launching uMod");
         var process = new Process()
         {
@@ -275,6 +281,12 @@ public class ApplicationLauncher : IApplicationLauncher
         if (File.Exists(executable) is false)
         {
             throw new ExecutableNotFoundException($"GWToolbox executable doesn't exist at {executable}");
+        }
+
+        if (Process.GetProcessesByName("GWToolboxpp").FirstOrDefault() is Process existingProcess)
+        {
+            this.logger.LogInformation("GWToolboxpp is already running");
+            return existingProcess;
         }
 
         this.logger.LogInformation($"Launching GWToolbox");
