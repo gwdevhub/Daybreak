@@ -1,13 +1,9 @@
-﻿using Daybreak.Configuration;
-using Daybreak.Controls;
-using Daybreak.Models.Builds;
+﻿using Daybreak.Models.Builds;
 using Daybreak.Models.Guildwars;
 using Daybreak.Services.BuildTemplates;
-using Daybreak.Services.IconRetrieve;
 using Daybreak.Services.Navigation;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Linq;

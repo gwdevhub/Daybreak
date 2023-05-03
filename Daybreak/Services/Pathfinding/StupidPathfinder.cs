@@ -1,4 +1,4 @@
-﻿using Daybreak.Configuration;
+﻿using Daybreak.Configuration.Options;
 using Daybreak.Models.Guildwars;
 using Daybreak.Services.Metrics;
 using Daybreak.Services.Pathfinding.Models;
@@ -28,12 +28,12 @@ public sealed class StupidPathfinder : IPathfinder
     private const double PathStep = 1;
 
     private readonly Histogram<long> latencyMetric;
-    private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
+    private readonly ILiveOptions<FocusViewOptions> liveOptions;
     private readonly ILogger<StupidPathfinder> logger;
 
     public StupidPathfinder(
         IMetricsService metricsService,
-        ILiveOptions<ApplicationConfiguration> liveOptions,
+        ILiveOptions<FocusViewOptions> liveOptions,
         ILogger<StupidPathfinder> logger)
     {
         this.liveOptions = liveOptions.ThrowIfNull();
@@ -66,7 +66,7 @@ public sealed class StupidPathfinder : IPathfinder
     private Result<PathfindingResponse, PathfindingFailure> CalculatePathInternal(PathingData map, Point startPoint, Point endPoint)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.CalculatePath), string.Empty);
-        if (this.liveOptions.Value.ExperimentalFeatures.EnablePathfinding is false)
+        if (this.liveOptions.Value.EnablePathfinding is false)
         {
             scopedLogger.LogInformation("Pathfinding is disabled");
             return new PathfindingFailure.PathfindingDisabled();

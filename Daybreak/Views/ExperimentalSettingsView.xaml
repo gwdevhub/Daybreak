@@ -87,7 +87,6 @@
             </Grid.ColumnDefinitions>
             <StackPanel Margin="0, 0, 15, 0">
                 <TextBlock Text="Multi-launch support" Foreground="White" FontSize="22" Height="30"></TextBlock>
-                <TextBlock Text="GWToolbox startup delay (in ms)" Foreground="White" FontSize="22" Height="30"></TextBlock>
                 <TextBlock Text="Detect build templates (in browser)" Foreground="White" FontSize="22" Height="30"></TextBlock>
                 <TextBlock Text="Launch gw as current user" Foreground="White" FontSize="22" Height="30"></TextBlock>
                 <TextBlock Text="Download icons" Foreground="White" FontSize="22" Height="30"></TextBlock>
@@ -98,9 +97,6 @@
             <StackPanel Grid.Column="1">
                 <ToggleButton IsChecked="{Binding ElementName=_this, Path=MultiLaunch, Mode=TwoWay}" Style="{StaticResource AnimatedSwitch}"
                               Height="30" Width="60"></ToggleButton>
-                <TextBox Background="Transparent" Foreground="White" FontSize="16" Height="30" 
-                         PreviewTextInput="TextBox_AllowNumbersOnly" Text="{Binding ElementName=_this, Path=GWToolboxLaunchDelay, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         CommandManager.PreviewCanExecute="TextBox_DisallowPaste"></TextBox>
                 <ToggleButton IsChecked="{Binding ElementName=_this, Path=DynamicBuildLoading, Mode=TwoWay}" Style="{StaticResource AnimatedSwitch}"
                               Height="30" Width="60"></ToggleButton>
                 <ToggleButton IsChecked="{Binding ElementName=_this, Path=LaunchAsCurrentUser, Mode=TwoWay}" Style="{StaticResource AnimatedSwitch}"

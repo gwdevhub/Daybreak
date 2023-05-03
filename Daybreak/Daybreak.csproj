@@ -13,7 +13,7 @@
     <LangVersion>preview</LangVersion>
     <ApplicationIcon>Daybreak.ico</ApplicationIcon>
     <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
-    <Version>0.9.8.38</Version>
+    <Version>0.9.8.39</Version>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <UserSecretsId>cfb2a489-db80-448d-a969-80270f314c46</UserSecretsId>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -81,69 +81,12 @@
     <PackageReference Include="SystemExtensions.NetCore" Version="1.0.1" />
     <PackageReference Include="SystemExtensions.NetStandard" Version="1.5.0" />
     <PackageReference Include="WCL" Version="1.0.2" />
-    <PackageReference Include="WpfExtended" Version="0.7.1" />
+    <PackageReference Include="WpfExtended" Version="0.7.2" />
     <PackageReference Include="WpfExtended.SourceGeneration" Version="0.1.1" />
     <PackageReference Include="WpfScreenHelper" Version="2.1.0" />
     <PackageReference Include="WriteableBitmapEx" Version="1.6.8" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Controls\Buttons\SynchronizeButton.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Controls\Buttons\HelpButton.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Controls\Buttons\MinusButton.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Controls\Glyphs\MapGlyph.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Controls\Glyphs\StarGlyph.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Controls\Buttons\CancelButton.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Controls\VerticalResourceBar.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Views\IconDownloadView.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="Controls\Buttons\SynchronizeButton.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Controls\Buttons\HelpButton.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Controls\Buttons\MinusButton.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Controls\Buttons\MaximizeButton.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Controls\Glyphs\StarGlyph.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Controls\Buttons\CancelButton.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\IconDownloadView.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
 	
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
     <Exec Command="echo.&gt;$(Version).version" />

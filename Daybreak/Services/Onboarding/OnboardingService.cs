@@ -1,9 +1,7 @@
-﻿using Daybreak.Configuration;
-using Daybreak.Exceptions;
-using Daybreak.Models;
+﻿using Daybreak.Configuration.Options;
+using Daybreak.Models.Onboarding;
 using Daybreak.Services.Credentials;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Configuration;
 using System.Core.Extensions;
 using System.IO;
@@ -15,12 +13,12 @@ namespace Daybreak.Services.Onboarding;
 public sealed class OnboardingService : IOnboardingService
 {
     private readonly ICredentialManager credentialManager;
-    private readonly ILiveOptions<ApplicationConfiguration> options;
+    private readonly ILiveOptions<LauncherOptions> options;
     private readonly ILogger<OnboardingService> logger;
 
     public OnboardingService(
         ICredentialManager credentialManager,
-        ILiveOptions<ApplicationConfiguration> liveOptions,
+        ILiveOptions<LauncherOptions> liveOptions,
         ILogger<OnboardingService> logger)
     {
         this.credentialManager = credentialManager.ThrowIfNull();
@@ -28,7 +26,7 @@ public sealed class OnboardingService : IOnboardingService
         this.logger = logger.ThrowIfNull();
     }
 
-    public async Task<OnboardingStage> CheckOnboardingStage()
+    public async Task<LauncherOnboardingStage> CheckOnboardingStage()
     {
         this.logger.LogInformation("Verifying if user is completely onboarded");
         var maybeCredentials = await this.credentialManager.GetDefaultCredentials();
@@ -36,7 +34,7 @@ public sealed class OnboardingService : IOnboardingService
         if (credentials is null)
         {
             this.logger.LogError("No default credentials found. User needs to set default credentials");
-            return OnboardingStage.NeedsCredentials;
+            return LauncherOnboardingStage.NeedsCredentials;
         }
 
         var config = this.options.Value;
@@ -44,16 +42,16 @@ public sealed class OnboardingService : IOnboardingService
         if (executable is null)
         {
             this.logger.LogError("No default Guildwars executable found. User needs to set default Guildwars executable");
-            return OnboardingStage.NeedsExecutable;
+            return LauncherOnboardingStage.NeedsExecutable;
         }
 
         if (File.Exists(executable.Path) is false)
         {
             this.logger.LogError("Default Guildwars executable does not exist. User needs to set default Guildwars executable");
-            return OnboardingStage.NeedsExecutable;
+            return LauncherOnboardingStage.NeedsExecutable;
         }
 
         this.logger.LogInformation("User is onboarded");
-        return OnboardingStage.Complete;
+        return LauncherOnboardingStage.Complete;
     }
 }

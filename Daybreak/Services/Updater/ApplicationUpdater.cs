@@ -1,7 +1,8 @@
-﻿using Daybreak.Configuration;
+﻿using Daybreak.Configuration.Options;
 using Daybreak.Exceptions;
 using Daybreak.Models.Github;
 using Daybreak.Models.Progress;
+using Daybreak.Services.Downloads;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Updater.PostUpdate;
 using Daybreak.Views;
@@ -13,7 +14,6 @@ using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
@@ -38,8 +38,9 @@ public sealed class ApplicationUpdater : IApplicationUpdater
 
     private readonly CancellationTokenSource updateCancellationTokenSource = new();
     private readonly IViewManager viewManager;
+    private readonly IDownloadService downloadService;
     private readonly IPostUpdateActionProvider postUpdateActionProvider;
-    private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
+    private readonly ILiveOptions<LauncherOptions> liveOptions;
     private readonly IHttpClient<ApplicationUpdater> httpClient;
     private readonly ILogger<ApplicationUpdater> logger;
 
@@ -47,18 +48,18 @@ public sealed class ApplicationUpdater : IApplicationUpdater
 
     public ApplicationUpdater(
         IViewManager viewManager,
+        IDownloadService downloadService,
         IPostUpdateActionProvider postUpdateActionProvider,
-        ILiveOptions<ApplicationConfiguration> liveOptions,
+        ILiveOptions<LauncherOptions> liveOptions,
         IHttpClient<ApplicationUpdater> httpClient,
         ILogger<ApplicationUpdater> logger)
     {
         this.viewManager = viewManager.ThrowIfNull();
+        this.downloadService = downloadService.ThrowIfNull();
         this.postUpdateActionProvider = postUpdateActionProvider.ThrowIfNull();
         this.liveOptions = liveOptions.ThrowIfNull();
         this.httpClient = httpClient.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
-
-        this.httpClient.DefaultRequestHeaders.Add("user-agent", "Daybreak Client");
 
         if (Version.TryParse(Assembly.GetExecutingAssembly()!.GetName()!.Version!.ToString(), out var currentVersion))
         {
@@ -77,39 +78,16 @@ public sealed class ApplicationUpdater : IApplicationUpdater
 
     public async Task<bool> DownloadUpdate(Version version, UpdateStatus updateStatus)
     {
-        updateStatus.CurrentStep = UpdateStatus.InitializingDownload;
+        updateStatus.CurrentStep = DownloadStatus.InitializingDownload;
         var uri = DownloadUrl.Replace(VersionTag, version.ToString());
-        using var response = await this.httpClient.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead);
-        if (response.IsSuccessStatusCode is false)
+        if (await this.downloadService.DownloadFile(uri, TempFile, updateStatus) is false)
         {
-            updateStatus.CurrentStep = UpdateStatus.FailedDownload;
-            this.logger.LogError($"Failed to download update. Details: {await response.Content.ReadAsStringAsync()}");
+            this.logger.LogError("Failed to download update file");
             return false;
         }
 
-        using var downloadStream = await this.httpClient.GetStreamAsync(uri);
-        this.logger.LogInformation("Beginning update download");
-        var fileStream = File.OpenWrite(TempFile);
-        var downloadSize = (double)response.Content!.Headers!.ContentLength!;
-        var buffer = new byte[1024];
-        var length = 0;
-        double downloaded = 0;
-        var tickTime = DateTime.Now;
-        while (downloadStream.CanRead && (length = await downloadStream.ReadAsync(buffer)) > 0)
-        {
-            downloaded += length;
-            await fileStream.WriteAsync(buffer, 0, length);
-            if ((DateTime.Now - tickTime).TotalMilliseconds > 50)
-            {
-                tickTime = DateTime.Now;
-                updateStatus.CurrentStep = UpdateStatus.Downloading(downloaded / downloadSize);
-            }
-        }
-
-        updateStatus.CurrentStep = UpdateStatus.Downloading(1);
-        updateStatus.CurrentStep = UpdateStatus.DownloadFinished;
-        fileStream.Close();
-        this.logger.LogInformation("Downloaded update");
+        updateStatus.CurrentStep = UpdateStatus.PendingRestart;
+        this.logger.LogInformation("Downloaded update file");
         return true;
     }
 

@@ -1,4 +1,4 @@
-﻿using Daybreak.Configuration;
+﻿using Daybreak.Configuration.Options;
 using Daybreak.Controls.Templates;
 using Daybreak.Models;
 using Daybreak.Services.ApplicationLauncher;
@@ -23,7 +23,7 @@ public partial class ScreenChoiceView : UserControl
 {        
     private readonly IScreenManager screenManager;
     private readonly IViewManager viewManager;
-    private readonly ILiveOptions<ApplicationConfiguration> liveOptions;
+    private readonly ILiveOptions<LauncherOptions> liveOptions;
     private readonly IApplicationLauncher applicationLauncher;
     private int selectedId;
 
@@ -33,7 +33,7 @@ public partial class ScreenChoiceView : UserControl
     public ScreenChoiceView(
         IViewManager viewManager,
         IScreenManager screenManager,
-        ILiveOptions<ApplicationConfiguration> liveOptions,
+        ILiveOptions<LauncherOptions> liveOptions,
         IApplicationLauncher applicationLauncher)
     {
         this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
@@ -92,12 +92,8 @@ public partial class ScreenChoiceView : UserControl
 
     private void OpaqueButton_Clicked(object sender, EventArgs e)
     {
-        var screen = this.screenManager.Screens.Skip(this.selectedId).FirstOrDefault();
-        if (screen is null)
-        {
+        var screen = this.screenManager.Screens.Skip(this.selectedId).FirstOrDefault() ??
             throw new InvalidOperationException($"Unable to test placement. No screen with id {this.selectedId}");
-        }
-
         this.screenManager.MoveGuildwarsToScreen(screen);
     }
 }

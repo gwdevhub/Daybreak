@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Extensions;
 using System.IO;
 using System.Linq;

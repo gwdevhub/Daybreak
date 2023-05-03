@@ -1,4 +1,4 @@
-﻿using Daybreak.Configuration;
+﻿using Daybreak.Configuration.Options;
 using Daybreak.Launch;
 using Daybreak.Models;
 using Daybreak.Utils;
@@ -19,7 +19,7 @@ namespace Daybreak.Services.Screens;
 public sealed class ScreenManager : IScreenManager, IApplicationLifetimeService
 {
     private readonly MainWindow host;
-    private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions;
+    private readonly ILiveUpdateableOptions<ScreenManagerOptions> liveUpdateableOptions;
     private readonly ILogger<ScreenManager> logger;
 
     public IEnumerable<Screen> Screens { get; } = WpfScreenHelper.Screen.AllScreens
@@ -27,7 +27,7 @@ public sealed class ScreenManager : IScreenManager, IApplicationLifetimeService
 
     public ScreenManager(
         MainWindow host,
-        ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions,
+        ILiveUpdateableOptions<ScreenManagerOptions> liveUpdateableOptions,
         ILogger<ScreenManager> logger)
     {
         this.host = host.ThrowIfNull();
@@ -37,7 +37,7 @@ public sealed class ScreenManager : IScreenManager, IApplicationLifetimeService
 
     public void MoveWindowToSavedPosition()
     {
-        var screenOptions = this.liveUpdateableOptions.Value.ScreenManagerOptions;
+        var screenOptions = this.liveUpdateableOptions.Value;
         var dpiScale = VisualTreeHelper.GetDpi(this.host);
         var desiredX = screenOptions.X;
         var desiredY = screenOptions.Y;
@@ -87,17 +87,13 @@ public sealed class ScreenManager : IScreenManager, IApplicationLifetimeService
         }
 
         var dpiScale = VisualTreeHelper.GetDpi(this.host);
-        var options = new ScreenManagerOptions
-        {
-            X = this.host.Left,
-            Y = this.host.Top,
-            Width = this.host.ActualWidth,
-            Height = this.host.ActualHeight,
-            DpiX = dpiScale.DpiScaleX,
-            DpiY = dpiScale.DpiScaleY
-        };
-
-        this.liveUpdateableOptions.Value.ScreenManagerOptions = options;
+        var config = this.liveUpdateableOptions.Value;
+        config.X = this.host.Left;
+        config.Y = this.host.Top;
+        config.Width = this.host.ActualWidth;
+        config.Height = this.host.ActualHeight;
+        config.DpiX = dpiScale.DpiScaleX;
+        config.DpiY = dpiScale.DpiScaleY;
         this.liveUpdateableOptions.UpdateOption();
     }
 

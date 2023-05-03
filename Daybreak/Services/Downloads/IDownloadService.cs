@@ -5,5 +5,5 @@ namespace Daybreak.Services.Downloads;
 
 public interface IDownloadService
 {
-    Task<bool> DownloadGuildwars(string destinationPath, DownloadStatus downloadStatus);
+    Task<bool> DownloadFile(string downloadUri, string destinationPath, DownloadStatus downloadStatus);
 }

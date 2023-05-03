@@ -1,4 +1,4 @@
-﻿using Daybreak.Configuration;
+﻿using Daybreak.Configuration.Options;
 using Daybreak.Controls;
 using Daybreak.Models;
 using Daybreak.Services.Navigation;
@@ -19,12 +19,12 @@ namespace Daybreak.Views;
 public partial class ExecutablesView : UserControl
 {
     private readonly IViewManager viewManager;
-    private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions;
+    private readonly ILiveUpdateableOptions<LauncherOptions> liveUpdateableOptions;
     public ObservableCollection<GuildwarsPath> Paths { get; } = new();
 
     public ExecutablesView(
         IViewManager viewManager,
-        ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions)
+        ILiveUpdateableOptions<LauncherOptions> liveUpdateableOptions)
     {
         this.viewManager = viewManager.ThrowIfNull();
         this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();

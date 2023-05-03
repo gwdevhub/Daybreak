@@ -1,4 +1,4 @@
-﻿using Daybreak.Configuration;
+﻿using Daybreak.Configuration.Options;
 using Daybreak.Models;
 using Daybreak.Models.Guildwars;
 using Daybreak.Services.ApplicationLauncher;
@@ -16,7 +16,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
-using System.Windows.Threading;
 
 namespace Daybreak.Views;
 
@@ -32,7 +31,7 @@ public partial class FocusView : UserControl
     private readonly IGuildwarsMemoryReader guildwarsMemoryReader;
     private readonly IExperienceCalculator experienceCalculator;
     private readonly IViewManager viewManager;
-    private readonly ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions;
+    private readonly ILiveUpdateableOptions<FocusViewOptions> liveUpdateableOptions;
     private readonly ILogger<FocusView> logger;
 
     [GenerateDependencyProperty]
@@ -106,7 +105,7 @@ public partial class FocusView : UserControl
         IGuildwarsMemoryReader guildwarsMemoryReader,
         IExperienceCalculator experienceCalculator,
         IViewManager viewManager,
-        ILiveUpdateableOptions<ApplicationConfiguration> liveUpdateableOptions,
+        ILiveUpdateableOptions<FocusViewOptions> liveUpdateableOptions,
         ILogger<FocusView> logger)
     {
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
@@ -129,7 +128,7 @@ public partial class FocusView : UserControl
         if (e.Property == BrowserAddressProperty &&
             this.Browser.BrowserEnabled)
         {
-            this.liveUpdateableOptions.Value.FocusViewOptions.BrowserUrl = this.BrowserAddress;
+            this.liveUpdateableOptions.Value.BrowserUrl = this.BrowserAddress;
             this.liveUpdateableOptions.UpdateOption();
         }
         else if (e.Property == VanquishingProperty &&
@@ -148,7 +147,7 @@ public partial class FocusView : UserControl
 
     private TimeSpan GetMemoryReaderLatency()
     {
-        return TimeSpan.FromMilliseconds(this.liveUpdateableOptions.Value.ExperimentalFeatures.MemoryReaderFrequency);
+        return TimeSpan.FromMilliseconds(this.liveUpdateableOptions.Value.MemoryReaderFrequency);
     }
 
     private async Task UpdatePathingData(CancellationToken cancellationToken)
@@ -221,7 +220,7 @@ public partial class FocusView : UserControl
             _ = Task.Run(() => this.UpdatePathingData(this.loadingPathingDataCancellationTokenSource.Token), this.loadingPathingDataCancellationTokenSource.Token)
                 .ContinueWith(_ =>
                 {
-                    this.loadingPathingDataCancellationTokenSource.Dispose();
+                    this.loadingPathingDataCancellationTokenSource?.Dispose();
                     this.loadingPathingDataCancellationTokenSource = null;
                 });
         }
@@ -300,7 +299,7 @@ public partial class FocusView : UserControl
 
     private void UpdateExperienceText()
     {
-        switch (this.liveUpdateableOptions.Value.FocusViewOptions.ExperienceDisplay)
+        switch (this.liveUpdateableOptions.Value.ExperienceDisplay)
         {
             case Configuration.FocusView.ExperienceDisplay.CurrentLevelCurrentAndCurrentLevelMax:
                 var currentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(this.GameData.MainPlayer!.Value.Experience);
@@ -326,7 +325,7 @@ public partial class FocusView : UserControl
 
     private void UpdateLuxonText()
     {
-        switch (this.liveUpdateableOptions.Value.FocusViewOptions.LuxonPointsDisplay)
+        switch (this.liveUpdateableOptions.Value.LuxonPointsDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
                 this.LuxonBarText = $"{this.GameData.User!.CurrentLuxonPoints} / {this.GameData.User.MaxLuxonPoints} Luxon Points";
@@ -342,7 +341,7 @@ public partial class FocusView : UserControl
 
     private void UpdateKurzickText()
     {
-        switch (this.liveUpdateableOptions.Value.FocusViewOptions.KurzickPointsDisplay)
+        switch (this.liveUpdateableOptions.Value.KurzickPointsDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
                 this.KurzickBarText = $"{this.GameData.User!.CurrentKurzickPoints} / {this.GameData.User.MaxKurzickPoints} Kurzick Points";
@@ -358,7 +357,7 @@ public partial class FocusView : UserControl
 
     private void UpdateImperialText()
     {
-        switch (this.liveUpdateableOptions.Value.FocusViewOptions.ImperialPointsDisplay)
+        switch (this.liveUpdateableOptions.Value.ImperialPointsDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
                 this.ImperialBarText = $"{this.GameData.User!.CurrentImperialPoints} / {this.GameData.User.MaxImperialPoints} Imperial Points";
@@ -374,7 +373,7 @@ public partial class FocusView : UserControl
 
     private void UpdateBalthazarText()
     {
-        switch (this.liveUpdateableOptions.Value.FocusViewOptions.BalthazarPointsDisplay)
+        switch (this.liveUpdateableOptions.Value.BalthazarPointsDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
                 this.BalthazarBarText = $"{this.GameData.User!.CurrentBalthazarPoints} / {this.GameData.User.MaxBalthazarPoints} Balthazar Points";
@@ -390,7 +389,7 @@ public partial class FocusView : UserControl
 
     private void UpdateVanquishingText()
     {
-        switch (this.liveUpdateableOptions.Value.FocusViewOptions.VanquishingDisplay)
+        switch (this.liveUpdateableOptions.Value.VanquishingDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
                 this.VanquishingText = $"{this.GameData.Session!.Value.FoesKilled} / {(int)this.TotalFoes} Foes Killed";
@@ -406,7 +405,7 @@ public partial class FocusView : UserControl
 
     private void UpdateHealthText()
     {
-        switch (this.liveUpdateableOptions.Value.FocusViewOptions.HealthDisplay)
+        switch (this.liveUpdateableOptions.Value.HealthDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
                 this.HealthBarText = $"{(int)this.GameData.MainPlayer!.Value.CurrentHealth} / {(int)this.GameData.MainPlayer.Value.MaxHealth} Health";
@@ -422,7 +421,7 @@ public partial class FocusView : UserControl
 
     private void UpdateEnergyText()
     {
-        switch (this.liveUpdateableOptions.Value.FocusViewOptions.EnergyDisplay)
+        switch (this.liveUpdateableOptions.Value.EnergyDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
                 this.EnergyBarText = $"{(int)this.GameData.MainPlayer!.Value.CurrentEnergy} / {(int)this.GameData.MainPlayer.Value.MaxEnergy} Energy";
@@ -451,7 +450,7 @@ public partial class FocusView : UserControl
     private async void FocusView_Loaded(object _, RoutedEventArgs e)
     {
         this.UpdateRightSideBarsLayout();
-        this.BrowserAddress = this.liveUpdateableOptions.Value.FocusViewOptions.BrowserUrl;
+        this.BrowserAddress = this.liveUpdateableOptions.Value.BrowserUrl;
         this.cancellationTokenSource?.Dispose();
         this.cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = this.cancellationTokenSource.Token;
@@ -486,19 +485,19 @@ public partial class FocusView : UserControl
 
     private void ExperienceBar_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
-        switch (this.liveUpdateableOptions.Value.FocusViewOptions.ExperienceDisplay)
+        switch (this.liveUpdateableOptions.Value.ExperienceDisplay)
         {
             case Configuration.FocusView.ExperienceDisplay.CurrentLevelCurrentAndCurrentLevelMax:
-                this.liveUpdateableOptions.Value.FocusViewOptions.ExperienceDisplay = Configuration.FocusView.ExperienceDisplay.TotalCurretAndTotalMax;
+                this.liveUpdateableOptions.Value.ExperienceDisplay = Configuration.FocusView.ExperienceDisplay.TotalCurretAndTotalMax;
                 break;
             case Configuration.FocusView.ExperienceDisplay.TotalCurretAndTotalMax:
-                this.liveUpdateableOptions.Value.FocusViewOptions.ExperienceDisplay = Configuration.FocusView.ExperienceDisplay.RemainingUntilNextLevel;
+                this.liveUpdateableOptions.Value.ExperienceDisplay = Configuration.FocusView.ExperienceDisplay.RemainingUntilNextLevel;
                 break;
             case Configuration.FocusView.ExperienceDisplay.RemainingUntilNextLevel:
-                this.liveUpdateableOptions.Value.FocusViewOptions.ExperienceDisplay = Configuration.FocusView.ExperienceDisplay.Percentage;
+                this.liveUpdateableOptions.Value.ExperienceDisplay = Configuration.FocusView.ExperienceDisplay.Percentage;
                 break;
             case Configuration.FocusView.ExperienceDisplay.Percentage:
-                this.liveUpdateableOptions.Value.FocusViewOptions.ExperienceDisplay = Configuration.FocusView.ExperienceDisplay.CurrentLevelCurrentAndCurrentLevelMax;
+                this.liveUpdateableOptions.Value.ExperienceDisplay = Configuration.FocusView.ExperienceDisplay.CurrentLevelCurrentAndCurrentLevelMax;
                 break;
         }
 
@@ -508,16 +507,16 @@ public partial class FocusView : UserControl
 
     private void LuxonBar_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
-        switch (this.liveUpdateableOptions.Value.FocusViewOptions.LuxonPointsDisplay)
+        switch (this.liveUpdateableOptions.Value.LuxonPointsDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.liveUpdateableOptions.Value.FocusViewOptions.LuxonPointsDisplay = Configuration.FocusView.PointsDisplay.Remaining;
+                this.liveUpdateableOptions.Value.LuxonPointsDisplay = Configuration.FocusView.PointsDisplay.Remaining;
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.liveUpdateableOptions.Value.FocusViewOptions.LuxonPointsDisplay = Configuration.FocusView.PointsDisplay.Percentage;
+                this.liveUpdateableOptions.Value.LuxonPointsDisplay = Configuration.FocusView.PointsDisplay.Percentage;
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.liveUpdateableOptions.Value.FocusViewOptions.LuxonPointsDisplay = Configuration.FocusView.PointsDisplay.CurrentAndMax;
+                this.liveUpdateableOptions.Value.LuxonPointsDisplay = Configuration.FocusView.PointsDisplay.CurrentAndMax;
                 break;
         }
 
@@ -527,16 +526,16 @@ public partial class FocusView : UserControl
 
     private void KurzickBar_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
-        switch (this.liveUpdateableOptions.Value.FocusViewOptions.KurzickPointsDisplay)
+        switch (this.liveUpdateableOptions.Value.KurzickPointsDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.liveUpdateableOptions.Value.FocusViewOptions.KurzickPointsDisplay = Configuration.FocusView.PointsDisplay.Remaining;
+                this.liveUpdateableOptions.Value.KurzickPointsDisplay = Configuration.FocusView.PointsDisplay.Remaining;
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.liveUpdateableOptions.Value.FocusViewOptions.KurzickPointsDisplay = Configuration.FocusView.PointsDisplay.Percentage;
+                this.liveUpdateableOptions.Value.KurzickPointsDisplay = Configuration.FocusView.PointsDisplay.Percentage;
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.liveUpdateableOptions.Value.FocusViewOptions.KurzickPointsDisplay = Configuration.FocusView.PointsDisplay.CurrentAndMax;
+                this.liveUpdateableOptions.Value.KurzickPointsDisplay = Configuration.FocusView.PointsDisplay.CurrentAndMax;
                 break;
         }
 
@@ -546,16 +545,16 @@ public partial class FocusView : UserControl
 
     private void ImperialBar_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
-        switch (this.liveUpdateableOptions.Value.FocusViewOptions.ImperialPointsDisplay)
+        switch (this.liveUpdateableOptions.Value.ImperialPointsDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.liveUpdateableOptions.Value.FocusViewOptions.ImperialPointsDisplay = Configuration.FocusView.PointsDisplay.Remaining;
+                this.liveUpdateableOptions.Value.ImperialPointsDisplay = Configuration.FocusView.PointsDisplay.Remaining;
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.liveUpdateableOptions.Value.FocusViewOptions.ImperialPointsDisplay = Configuration.FocusView.PointsDisplay.Percentage;
+                this.liveUpdateableOptions.Value.ImperialPointsDisplay = Configuration.FocusView.PointsDisplay.Percentage;
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.liveUpdateableOptions.Value.FocusViewOptions.ImperialPointsDisplay = Configuration.FocusView.PointsDisplay.CurrentAndMax;
+                this.liveUpdateableOptions.Value.ImperialPointsDisplay = Configuration.FocusView.PointsDisplay.CurrentAndMax;
                 break;
         }
 
@@ -565,16 +564,16 @@ public partial class FocusView : UserControl
 
     private void BalthazarBar_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
-        switch (this.liveUpdateableOptions.Value.FocusViewOptions.BalthazarPointsDisplay)
+        switch (this.liveUpdateableOptions.Value.BalthazarPointsDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.liveUpdateableOptions.Value.FocusViewOptions.BalthazarPointsDisplay = Configuration.FocusView.PointsDisplay.Remaining;
+                this.liveUpdateableOptions.Value.BalthazarPointsDisplay = Configuration.FocusView.PointsDisplay.Remaining;
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.liveUpdateableOptions.Value.FocusViewOptions.BalthazarPointsDisplay = Configuration.FocusView.PointsDisplay.Percentage;
+                this.liveUpdateableOptions.Value.BalthazarPointsDisplay = Configuration.FocusView.PointsDisplay.Percentage;
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.liveUpdateableOptions.Value.FocusViewOptions.BalthazarPointsDisplay = Configuration.FocusView.PointsDisplay.CurrentAndMax;
+                this.liveUpdateableOptions.Value.BalthazarPointsDisplay = Configuration.FocusView.PointsDisplay.CurrentAndMax;
                 break;
         }
 
@@ -584,16 +583,16 @@ public partial class FocusView : UserControl
 
     private void VanquishingBar_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
-        switch (this.liveUpdateableOptions.Value.FocusViewOptions.VanquishingDisplay)
+        switch (this.liveUpdateableOptions.Value.VanquishingDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.liveUpdateableOptions.Value.FocusViewOptions.VanquishingDisplay = Configuration.FocusView.PointsDisplay.Remaining;
+                this.liveUpdateableOptions.Value.VanquishingDisplay = Configuration.FocusView.PointsDisplay.Remaining;
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.liveUpdateableOptions.Value.FocusViewOptions.VanquishingDisplay = Configuration.FocusView.PointsDisplay.Percentage;
+                this.liveUpdateableOptions.Value.VanquishingDisplay = Configuration.FocusView.PointsDisplay.Percentage;
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.liveUpdateableOptions.Value.FocusViewOptions.VanquishingDisplay = Configuration.FocusView.PointsDisplay.CurrentAndMax;
+                this.liveUpdateableOptions.Value.VanquishingDisplay = Configuration.FocusView.PointsDisplay.CurrentAndMax;
                 break;
         }
 
@@ -603,16 +602,16 @@ public partial class FocusView : UserControl
 
     private void HealthBar_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
-        switch (this.liveUpdateableOptions.Value.FocusViewOptions.HealthDisplay)
+        switch (this.liveUpdateableOptions.Value.HealthDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.liveUpdateableOptions.Value.FocusViewOptions.HealthDisplay = Configuration.FocusView.PointsDisplay.Remaining;
+                this.liveUpdateableOptions.Value.HealthDisplay = Configuration.FocusView.PointsDisplay.Remaining;
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.liveUpdateableOptions.Value.FocusViewOptions.HealthDisplay = Configuration.FocusView.PointsDisplay.Percentage;
+                this.liveUpdateableOptions.Value.HealthDisplay = Configuration.FocusView.PointsDisplay.Percentage;
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.liveUpdateableOptions.Value.FocusViewOptions.HealthDisplay = Configuration.FocusView.PointsDisplay.CurrentAndMax;
+                this.liveUpdateableOptions.Value.HealthDisplay = Configuration.FocusView.PointsDisplay.CurrentAndMax;
                 break;
         }
 
@@ -622,16 +621,16 @@ public partial class FocusView : UserControl
 
     private void EnergyBar_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
-        switch (this.liveUpdateableOptions.Value.FocusViewOptions.EnergyDisplay)
+        switch (this.liveUpdateableOptions.Value.EnergyDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.liveUpdateableOptions.Value.FocusViewOptions.EnergyDisplay = Configuration.FocusView.PointsDisplay.Remaining;
+                this.liveUpdateableOptions.Value.EnergyDisplay = Configuration.FocusView.PointsDisplay.Remaining;
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.liveUpdateableOptions.Value.FocusViewOptions.EnergyDisplay = Configuration.FocusView.PointsDisplay.Percentage;
+                this.liveUpdateableOptions.Value.EnergyDisplay = Configuration.FocusView.PointsDisplay.Percentage;
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.liveUpdateableOptions.Value.FocusViewOptions.EnergyDisplay = Configuration.FocusView.PointsDisplay.CurrentAndMax;
+                this.liveUpdateableOptions.Value.EnergyDisplay = Configuration.FocusView.PointsDisplay.CurrentAndMax;
                 break;
         }
 
