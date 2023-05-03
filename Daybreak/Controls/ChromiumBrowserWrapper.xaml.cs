@@ -43,6 +43,7 @@ public partial class ChromiumBrowserWrapper : UserControl
     public event EventHandler? MaximizeClicked;
     public event EventHandler<Build>? BuildDecoded;
     public event EventHandler<DownloadPayload>? DownloadingFile;
+    public event EventHandler<string>? DownloadedFile;
 
     private readonly Task initializationTask;
     private readonly ILiveOptions<BrowserOptions>? liveOptions;
@@ -202,6 +203,8 @@ public partial class ChromiumBrowserWrapper : UserControl
                 }
 
                 args.ResultFilePath = finalPath;
+
+                args.DownloadOperation.StateChanged += this.DownloadOperation_StateChanged;
             };
             this.WebBrowser.NavigationCompleted += (browser, args) => this.Navigating = false;
             this.WebBrowser.WebMessageReceived += this.CoreWebView2_WebMessageReceived!;
@@ -305,6 +308,24 @@ public partial class ChromiumBrowserWrapper : UserControl
                 }
             });
         }
+    }
+
+    private void DownloadOperation_StateChanged(object? sender, object? e)
+    {
+        if (sender is not CoreWebView2DownloadOperation downloadOperation)
+        {
+            return;
+        }
+
+        if (downloadOperation.State != CoreWebView2DownloadState.Completed &&
+            downloadOperation.State != CoreWebView2DownloadState.Interrupted)
+        {
+            return;
+        }
+
+        downloadOperation.StateChanged -= this.DownloadOperation_StateChanged;
+        var filePath = Path.GetFullPath(downloadOperation.ResultFilePath);
+        this.DownloadedFile?.Invoke(this, filePath);
     }
 
     private void LoadBuildTemplateButton_Click(object sender, EventArgs e)

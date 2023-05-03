@@ -11,4 +11,6 @@ public interface IUModService
     bool LoadUModFromDisk();
 
     Task<bool> SetupUMod(UModInstallationStatus uModInstallationStatus);
+
+    Task<bool> AddMod(string pathToTpf);
 }

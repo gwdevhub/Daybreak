@@ -9,6 +9,7 @@ using System.Core.Extensions;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Daybreak.Services.UMod;
@@ -21,6 +22,8 @@ public sealed class UModService : IUModService
     private const string D3D9Dll = "d3d9.dll";
     private const string D3D9DllBackup = "d3d9.dll.backup";
     private const string UModExecutable = "uMod.exe";
+    private const string UModDefaultTemplateFile = "uMod_SaveFiles.txt";
+    private const string UModModListFile = "ModList.txt";
 
     private readonly IDownloadService downloadService;
     private readonly ILiveOptions<LauncherOptions> launcherOptions;
@@ -109,6 +112,19 @@ public sealed class UModService : IUModService
         return true;
     }
 
+    public async Task<bool> AddMod(string pathToTpf)
+    {
+        if (this.uModOptions.Value.AutoEnableMods is false)
+        {
+            return false;
+        }
+
+        var modListPath = Path.Combine(UModDirectory, UModModListFile);
+        var tpfPath = Path.GetFullPath(pathToTpf);
+        await File.AppendAllLinesAsync(modListPath, new string[] { $"Add_true:{tpfPath}" });
+        return true;
+    }
+
     private async Task<bool> SetupUModExecutable(UModInstallationStatus uModInstallationStatus)
     {
         if (File.Exists(this.uModOptions.Value.Path))
@@ -126,7 +142,32 @@ public sealed class UModService : IUModService
         var uModOptions = this.uModOptions.Value;
         uModOptions.Path = Path.GetFullPath(Path.Combine(UModDirectory, UModExecutable));
         this.uModOptions.UpdateOption();
+        await this.SetupDefaultTemplateFile();
+        await SetupModListFile();
         return true;
+    }
+
+    private async Task SetupDefaultTemplateFile()
+    {
+        var maybeGuildwarsPath = this.launcherOptions.Value.GuildwarsPaths.Where(a => a.Default).FirstOrDefault();
+        if (maybeGuildwarsPath is not GuildwarsPath guildwarsPath)
+        {
+            this.logger.LogError("Unable to create default template file. No guild wars executable found");
+            return;
+        }
+
+        var defaultTemplateFile = Path.Combine(UModDirectory, UModDefaultTemplateFile);
+        var modListPath = Path.GetFullPath(Path.Combine(UModDirectory, UModModListFile));
+        var gwPath = Path.GetFullPath(guildwarsPath.Path!);
+        var entry = $"{gwPath}|{modListPath}";
+
+        await File.WriteAllLinesAsync(defaultTemplateFile, new string[] { string.Empty, entry });
+    }
+
+    private static async Task SetupModListFile()
+    {
+        var modListPath = Path.Combine(UModDirectory, UModModListFile);
+        await File.WriteAllTextAsync(modListPath, string.Empty);
     }
 
     private static bool MustBackupD3D9Dll(string sourcePath, string destinationPath)
