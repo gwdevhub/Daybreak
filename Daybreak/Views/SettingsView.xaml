@@ -83,6 +83,7 @@
                 <TextBlock Text="Auto check for updates: " FontSize="22" Foreground="White" Height="30"></TextBlock>
                 <TextBlock Text="uMod enabled: " FontSize="22" Foreground="White" Height="30"></TextBlock>
                 <TextBlock Text="uMod path: " FontSize="22" Foreground="White" Height="30"></TextBlock>
+                <TextBlock Text="uMod auto-enable mods: " FontSize="22" Foreground="White" Height="30"></TextBlock>
                 <TextBlock Text="GWToolbox enabled: " FontSize="22" Foreground="White" Height="30"></TextBlock>
                 <TextBlock Text="GWToolbox path: " FontSize="22" Foreground="White" Height="30"></TextBlock>
                 <TextBlock Text="Browsers enabled: " FontSize="22" Foreground="White" Height="30"/>
@@ -105,6 +106,8 @@
                                     Foreground="White" BorderBrush="Gray" BorderThickness="0"
                                     Clicked="UModFilePickerGlyph_Clicked"></controls:FilePickerGlyph>
                 </Grid>
+                <ToggleButton HorizontalAlignment="Center" HorizontalContentAlignment="Stretch" Style="{StaticResource AnimatedSwitch}" Height="30" Width="40"
+                        FontSize="22" Foreground="White" IsChecked="{Binding ElementName=_this, Path=UModAutoEnableMods, Mode=TwoWay}"></ToggleButton>
                 <ToggleButton HorizontalAlignment="Center" HorizontalContentAlignment="Stretch" Style="{StaticResource AnimatedSwitch}" Height="30" Width="40"
                         FontSize="22" Foreground="White" IsChecked="{Binding ElementName=_this, Path=ToolboxEnabled, Mode=TwoWay}"></ToggleButton>
                 <Grid Height="30">

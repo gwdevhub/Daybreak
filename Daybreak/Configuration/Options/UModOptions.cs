@@ -11,4 +11,7 @@ public sealed class UModOptions
 
     [JsonProperty(nameof(Enabled))]
     public bool Enabled { get; set; }
+
+    [JsonProperty(nameof(AutoEnableMods))]
+    public bool AutoEnableMods { get; set; }
 }

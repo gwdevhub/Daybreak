@@ -222,7 +222,8 @@ public class ApplicationLauncher : IApplicationLauncher
         {
             StartInfo = new ProcessStartInfo
             {
-                FileName = executable
+                FileName = executable,
+                WorkingDirectory = Path.GetDirectoryName(executable)
             }
         };
         if (process.Start() is false)

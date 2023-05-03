@@ -15,6 +15,7 @@
                                          CanNavigate="True"
                                          CanDownloadFiles="True"
                                          DownloadsDirectory="uMod/Mods"
-                                         DownloadingFile="ChromiumBrowserWrapper_DownloadingFile"></controls:ChromiumBrowserWrapper>
+                                         DownloadingFile="ChromiumBrowserWrapper_DownloadingFile"
+                                         DownloadedFile="ChromiumBrowserWrapper_DownloadedFile"></controls:ChromiumBrowserWrapper>
     </Grid>
 </UserControl>

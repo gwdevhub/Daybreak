@@ -1,4 +1,9 @@
-﻿using System.IO;
+﻿using Daybreak.Configuration.Options;
+using Daybreak.Services.UMod;
+using ScottPlot.Control.EventProcess;
+using System.Configuration;
+using System.Core.Extensions;
+using System.IO;
 using System.Windows.Controls;
 
 namespace Daybreak.Views.Onboarding.UMod;
@@ -9,8 +14,16 @@ public partial class UModBrowserView : UserControl
 {
     private const string WhitelistedExtension = ".tpf";
 
-    public UModBrowserView()
+    private readonly IUModService uModService;
+    private readonly ILiveOptions<UModOptions> liveOptions;
+
+    public UModBrowserView(
+        IUModService uModService,
+        ILiveOptions<UModOptions> liveOptions)
     {
+        this.uModService = uModService.ThrowIfNull();
+        this.liveOptions = liveOptions.ThrowIfNull();
+
         this.InitializeComponent();
     }
 
@@ -30,5 +43,18 @@ public partial class UModBrowserView : UserControl
 
         e.CanDownload = false;
         return;
+    }
+
+    private void ChromiumBrowserWrapper_DownloadedFile(object _, string e)
+    {
+        /*
+         * A tpf file has been downloaded.
+         * Automatically add it to the managed mods list.
+         */
+
+        if (this.liveOptions.Value.AutoEnableMods)
+        {
+            this.uModService.AddMod(e);
+        }
     }
 }

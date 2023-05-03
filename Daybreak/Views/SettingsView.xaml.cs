@@ -27,6 +27,8 @@ public partial class SettingsView : System.Windows.Controls.UserControl
     [GenerateDependencyProperty]
     private string uModPath = string.Empty;
     [GenerateDependencyProperty]
+    private bool uModAutoEnableMods;
+    [GenerateDependencyProperty]
     private bool toolboxEnabled;
     [GenerateDependencyProperty]
     private string toolboxPath = string.Empty;
@@ -69,6 +71,7 @@ public partial class SettingsView : System.Windows.Controls.UserControl
         this.ToolboxEnabled = this.toolboxOptions.Value.Enabled;
         this.UModPath = this.uModOptions.Value.Path;
         this.UModEnabled = this.uModOptions.Value.Enabled;
+        this.UModAutoEnableMods = this.uModOptions.Value.AutoEnableMods;
         this.AutoPlaceOnScreen = this.launcherOptions.Value.SetGuildwarsWindowSizeOnLaunch;
         this.DesiredScreen = this.launcherOptions.Value.DesiredGuildwarsScreen.ToString();
         this.ShortcutFolder = this.launcherOptions.Value.ShortcutLocation;
@@ -88,6 +91,7 @@ public partial class SettingsView : System.Windows.Controls.UserControl
         toolboxOptions.Enabled = this.ToolboxEnabled;
         umodOptions.Path = this.UModPath;
         umodOptions.Enabled = this.UModEnabled;
+        umodOptions.AutoEnableMods = this.UModAutoEnableMods;
         launcherOptions.SetGuildwarsWindowSizeOnLaunch = this.AutoPlaceOnScreen;
         if (int.TryParse(this.DesiredScreen, out var desiredScreen) is false)
         {

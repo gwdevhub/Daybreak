@@ -12,9 +12,9 @@
             <TextBlock Text="Do you already have GWToolboxpp installed on your PC?" Margin="10, 0, 10, 0" Foreground="White"
                        TextWrapping="Wrap" HorizontalAlignment="Center" FontSize="16"></TextBlock>
             <Grid MaxWidth="200">
-                <controls:OpaqueButton Text="No" BackgroundOpacity="0.2" TransparentBackground="Gray" HorizontalAlignment="Left" Margin="10" Width="50" Height="25"
+                <controls:OpaqueButton Text="No" BackgroundOpacity="0.2" TransparentBackground="Gray" HorizontalAlignment="Right" Margin="10" Width="50" Height="25"
                                    Clicked="OpaqueButtonNo_Clicked" Foreground="White" FontSize="16" Highlight="White" HighlightOpacity="0.6"></controls:OpaqueButton>
-                <controls:OpaqueButton Text="Yes" BackgroundOpacity="0.2" TransparentBackground="Gray" HorizontalAlignment="Right" Margin="10" Width="50" Height="25"
+                <controls:OpaqueButton Text="Yes" BackgroundOpacity="0.2" TransparentBackground="Gray" HorizontalAlignment="Left" Margin="10" Width="50" Height="25"
                                    Clicked="OpaqueButtonYes_Clicked" Foreground="White" FontSize="16" Highlight="White" HighlightOpacity="0.6"></controls:OpaqueButton>
             </Grid>
         </StackPanel>
