@@ -1,5 +1,8 @@
-﻿namespace Daybreak.Configuration.Options;
+﻿using Daybreak.Attributes;
 
+namespace Daybreak.Configuration.Options;
+
+[OptionsName(Name = "Screen Manager")]
 public sealed class ScreenManagerOptions
 {
     public double X { get; set; }

@@ -22,16 +22,32 @@
                            TextWrapping="Wrap" FontSize="16" HorizontalAlignment="Center"
                            MouseLeftButtonDown="Wiki_MouseLeftButtonDown"></TextBlock>
             </WrapPanel>
-            <TextBlock Text="GWToolboxpp is currently enabled. Do you want to disable it?" Margin="10, 0, 10, 0" Foreground="White"
+            <WrapPanel Margin="10, 0, 10, 0">
+                <TextBlock Text="GWToolbox is currently " Foreground="White"
                        TextWrapping="Wrap" FontSize="16" HorizontalAlignment="Center"
-                       Visibility="{Binding ElementName=_this, Path=UModEnabled, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"></TextBlock>
-            <TextBlock Text="GWToolboxpp is currently disabled. Do you want to enable it?" Margin="10, 0, 10, 0" Foreground="White"
+                       Visibility="{Binding ElementName=_this, Path=ToolboxEnabled, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"></TextBlock>
+                <TextBlock Text="enabled" Foreground="LightGreen"
                        TextWrapping="Wrap" FontSize="16" HorizontalAlignment="Center"
-                       Visibility="{Binding ElementName=_this, Path=UModEnabled, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"></TextBlock>
+                       Visibility="{Binding ElementName=_this, Path=ToolboxEnabled, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"></TextBlock>
+                <TextBlock Text=". Do you want to disable it?" Foreground="White"
+                       TextWrapping="Wrap" FontSize="16" HorizontalAlignment="Center"
+                       Visibility="{Binding ElementName=_this, Path=ToolboxEnabled, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"></TextBlock>
+            </WrapPanel>
+            <WrapPanel Margin="10, 0, 10, 0">
+                <TextBlock Text="GWToolbox is currently " Foreground="White"
+                       TextWrapping="Wrap" FontSize="16" HorizontalAlignment="Center"
+                       Visibility="{Binding ElementName=_this, Path=ToolboxEnabled, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"></TextBlock>
+                <TextBlock Text="disabled" Foreground="PaleVioletRed"
+                       TextWrapping="Wrap" FontSize="16" HorizontalAlignment="Center"
+                       Visibility="{Binding ElementName=_this, Path=ToolboxEnabled, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"></TextBlock>
+                <TextBlock Text=". Do you want to enable it?" Foreground="White"
+                       TextWrapping="Wrap" FontSize="16" HorizontalAlignment="Center"
+                       Visibility="{Binding ElementName=_this, Path=ToolboxEnabled, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"></TextBlock>
+            </WrapPanel>
             <Grid MaxWidth="200">
-                <controls:OpaqueButton Text="No" BackgroundOpacity="0.2" TransparentBackground="Gray" HorizontalAlignment="Left" Margin="10" Width="50" Height="25"
+                <controls:OpaqueButton Text="No" BackgroundOpacity="0.2" TransparentBackground="Gray" HorizontalAlignment="Right" Margin="10" Width="50" Height="25"
                                    Clicked="OpaqueButtonNo_Clicked" Foreground="White" FontSize="16" Highlight="White" HighlightOpacity="0.6" Cursor="Hand"></controls:OpaqueButton>
-                <controls:OpaqueButton Text="Yes" BackgroundOpacity="0.2" TransparentBackground="Gray" HorizontalAlignment="Right" Margin="10" Width="50" Height="25"
+                <controls:OpaqueButton Text="Yes" BackgroundOpacity="0.2" TransparentBackground="Gray" HorizontalAlignment="Left" Margin="10" Width="50" Height="25"
                                    Clicked="OpaqueButtonYes_Clicked" Foreground="White" FontSize="16" Highlight="White" HighlightOpacity="0.6" Cursor="Hand"></controls:OpaqueButton>
             </Grid>
         </StackPanel>

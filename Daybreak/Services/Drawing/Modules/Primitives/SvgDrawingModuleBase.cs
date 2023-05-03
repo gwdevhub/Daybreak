@@ -34,10 +34,6 @@ public abstract class SvgDrawingModuleBase : DrawingModuleBase
             this.bitmapCache.Add(combination, cachedSvg);
         }
 
-        using var stream = System.IO.File.OpenWrite("test.png");
-        var encoder = new PngBitmapEncoder();
-        encoder.Frames.Add(BitmapFrame.Create(cachedSvg));
-        encoder.Save(stream);
         bitmap.Blit(new Rect(x - entitySize, y - entitySize, entitySize + entitySize, entitySize + entitySize), cachedSvg, new Rect(0, 0, cachedSvg.Width, cachedSvg.Height), WriteableBitmapExtensions.BlendMode.Alpha);
     }
 
