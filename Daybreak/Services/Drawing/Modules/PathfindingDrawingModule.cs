@@ -10,6 +10,6 @@ public sealed class PathfindingDrawingModule : CircleDrawingModuleBase
 
     public override void DrawPathFinding(int finalX, int finalY, int size, WriteableBitmap bitmap, Color color)
     {
-        this.DrawCircle(bitmap, finalX, finalY, size, color);
+        this.DrawFilledCircle(bitmap, finalX, finalY, size, color);
     }
 }

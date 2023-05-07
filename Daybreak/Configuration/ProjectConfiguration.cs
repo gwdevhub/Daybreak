@@ -240,6 +240,8 @@ public static class ProjectConfiguration
         drawingModuleProducer.RegisterDrawingModule<MainPlayerDrawingModule>();
         drawingModuleProducer.RegisterDrawingModule<PartyMemberDrawingModule>();
         drawingModuleProducer.RegisterDrawingModule<WorldPlayerDrawingModule>();
+
+        drawingModuleProducer.RegisterDrawingModule<EngagementAreaDrawingModule>();
     }
 
     public static void RegisterOptions(IOptionsProducer optionsProducer)

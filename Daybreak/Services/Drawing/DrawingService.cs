@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 namespace Daybreak.Services.Drawing;
 public sealed class DrawingService : IDrawingService, IDrawingModuleProducer
 {
+    private const int EngagementAreaMultiplier = 9;
+
     private readonly IServiceManager serviceManager;
     private readonly Lazy<IEnumerable<DrawingModuleBase>> modules;
 
@@ -258,6 +260,45 @@ public sealed class DrawingService : IDrawingService, IDrawingModuleProducer
                 {
                     this.IsEntityOnScreen(position, out var finalOnscreenX, out var finalOnscreenY);
                     module.DrawQuestObjective(finalX, finalY, this.finalEntitySize, bitmap, GetQuestColor(questMetadata));
+                }
+            }
+        }
+    }
+
+    public void DrawEngagementArea(WriteableBitmap bitmap, DebounceResponse debounceResponse)
+    {
+        if (bitmap is null)
+        {
+            return;
+        }
+
+        if (debounceResponse is null ||
+            debounceResponse.MainPlayer.Position is null ||
+            debounceResponse.WorldPlayers is null |
+            debounceResponse.Party is null ||
+            debounceResponse.LivingEntities is null)
+        {
+            return;
+        }
+
+        var entities = debounceResponse.LivingEntities.OfType<IEntity>()
+            .Concat(debounceResponse.Party!.OfType<IEntity>())
+            .Concat(debounceResponse.WorldPlayers!.OfType<IEntity>())
+            .Append(debounceResponse.MainPlayer)
+            .Where(IsValidPositionalEntity);
+
+        foreach (var entity in entities)
+        {
+            foreach (var module in this.modules.Value)
+            {
+                if (module.CanDrawEngagementArea(entity))
+                {
+                    if (this.IsEntityOnScreen(entity.Position, out var finalX, out var finalY))
+                    {
+                        module.DrawEngagementArea(finalX, finalY, this.finalEntitySize * EngagementAreaMultiplier, bitmap);
+                    }
+
+                    break;
                 }
             }
         }

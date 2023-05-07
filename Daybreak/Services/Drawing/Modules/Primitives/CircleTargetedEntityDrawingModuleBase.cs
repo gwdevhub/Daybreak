@@ -12,7 +12,7 @@ public abstract class CircleTargetedEntityDrawingModuleBase : CircleEntityDrawin
         if (targeted)
         {
             var outlineSize = size + (size / 5);
-            this.DrawCircle(bitmap, finalX, finalY, outlineSize, this.OutlineColor);
+            this.DrawFilledCircle(bitmap, finalX, finalY, outlineSize, this.OutlineColor);
         }
 
         base.DrawEntity(finalX, finalY, size, bitmap, targeted);

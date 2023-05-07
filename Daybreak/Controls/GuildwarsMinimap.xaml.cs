@@ -288,6 +288,7 @@ public partial class GuildwarsMinimap : UserControl
             this.Zoom,
             PositionRadius,
             EntitySize);
+        this.drawingService.DrawEngagementArea(bitmap, this.cachedDebounceResponse ?? new DebounceResponse());
         this.drawingService.DrawMainPlayerPositionHistory(bitmap, this.mainPlayerPositionHistory);
         this.drawingService.DrawPaths(bitmap, this.pathfindingCache);
         this.drawingService.DrawQuestObjectives(bitmap, this.GameData.MainPlayer?.QuestLog ?? new List<QuestMetadata>());

@@ -12,6 +12,6 @@ public sealed class PlayerPositionHistoryDrawingModule : CircleDrawingModuleBase
 
     public override void DrawPlayerPositionHistory(int finalX, int finalY, int size, WriteableBitmap bitmap)
     {
-        this.DrawCircle(bitmap, finalX, finalY, size, this.positionHistoryColor);
+        this.DrawFilledCircle(bitmap, finalX, finalY, size, this.positionHistoryColor);
     }
 }
