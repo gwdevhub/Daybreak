@@ -144,6 +144,7 @@ public sealed class UModService : IUModService
         this.uModOptions.UpdateOption();
         await this.SetupDefaultTemplateFile();
         await SetupModListFile();
+        File.Delete(ArchiveName);
         return true;
     }
 

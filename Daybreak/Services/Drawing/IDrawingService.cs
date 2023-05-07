@@ -19,5 +19,7 @@ public interface IDrawingService
 
     void DrawMapIcons(WriteableBitmap bitmap, List<MapIcon> mapIcons);
 
+    void DrawEngagementArea(WriteableBitmap bitmap, DebounceResponse debounceResponse);
+
     bool IsEntityOnScreen(Position? position, out int x, out int y);
 }

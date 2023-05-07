@@ -19,6 +19,8 @@ public abstract class DrawingModuleBase
 
     public virtual bool CanDrawMapIcon(MapIcon mapIcon) => false;
 
+    public virtual bool CanDrawEngagementArea(IEntity entity) => false;
+
     public virtual void DrawEntity(int finalX, int finalY, int size, WriteableBitmap bitmap, bool targeted) { }
 
     public virtual void DrawMapIcon(int finalX, int finalY, int size, WriteableBitmap bitmap, Affiliation affiliation) { }
@@ -28,4 +30,6 @@ public abstract class DrawingModuleBase
     public virtual void DrawPathFinding(int finalX, int finalY, int size, WriteableBitmap bitmap, Color color) { }
 
     public virtual void DrawQuestObjective(int finalX, int finalY, int size, WriteableBitmap bitmap, Color color) { }
+
+    public virtual void DrawEngagementArea(int finalX, int finalY, int size, WriteableBitmap bitmap) { }
 }
