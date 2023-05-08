@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Slim;
 using Slim.Integration.ServiceCollection;
 using System;
+using System.Windows;
 using System.Windows.Extensions;
 
 namespace Daybreak.Launch;
@@ -26,6 +27,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
     [STAThread]
     public static int Main()
     {
+        RegisterMahAppsStyle();
         return LaunchMainWindow();
     }
 
@@ -70,8 +72,25 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
         viewManager.RegisterContainer(mainWindow.Container);
     }
 
+
     private static int LaunchMainWindow()
     {
         return Instance.Run();
+    }
+
+    private static void RegisterMahAppsStyle()
+    {
+        Instance.Resources.MergedDictionaries.Add(new ResourceDictionary
+        {
+            Source = new Uri("pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml", UriKind.RelativeOrAbsolute)
+        });
+        Instance.Resources.MergedDictionaries.Add(new ResourceDictionary
+        {
+            Source = new Uri("pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml", UriKind.RelativeOrAbsolute)
+        });
+        Instance.Resources.MergedDictionaries.Add(new ResourceDictionary
+        {
+            Source = new Uri("pack://application:,,,/MahApps.Metro;component/Styles/Themes/Dark.Steel.xaml", UriKind.RelativeOrAbsolute)
+        });
     }
 }

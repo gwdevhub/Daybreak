@@ -4,16 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Controls"
-             xmlns:interactivity="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:behaviors="clr-namespace:Daybreak.Behaviors"
-             xmlns:converters="clr-namespace:Daybreak.Converters"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              mc:Ignorable="d"
              x:Name="_this"
              Unloaded="BuildTemplate_Unloaded"
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
-    </UserControl.Resources>
     <Grid Background="Transparent" MouseLeftButtonDown="Grid_MouseLeftButtonDown">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"></RowDefinition>
@@ -33,15 +28,12 @@
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <TextBlock Text="Primary Profession: " FontSize="16" Foreground="White" Grid.Column="1"></TextBlock>
-            <local:OpaqueButton Grid.Column="2"
-                                Text="{Binding ElementName=_this, Path=BuildEntry.Primary.Name, Mode=OneWay}"
-                                Foreground="White"
-                                Highlight="White"
-                                HighlightOpacity="0.4"
-                                FontSize="16"
-                                TextHorizontalAlignment="Left"
-                                Margin="0, 0, 10, 0"
-                                Clicked="PrimaryProfessionButton_Clicked"></local:OpaqueButton>
+            <mah:SplitButton 
+                ItemsSource="{Binding ElementName=_this, Path=Professions, Mode=OneWay}"
+                SelectedItem="{Binding ElementName=_this, Path=BuildEntry.Primary, Mode=TwoWay}"
+                FontSize="16"
+                Foreground="White"
+                Grid.Column="2"></mah:SplitButton>
             <local:HelpButton Grid.Column="0" Foreground="White" Width="20" Height="20" Margin="3"
                               Clicked="HelpButtonPrimary_Clicked" Cursor="Hand"></local:HelpButton>
         </Grid>
@@ -52,15 +44,12 @@
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <TextBlock Text="Secondary Profession: " FontSize="16" Foreground="White" Grid.Column="1"></TextBlock>
-            <local:OpaqueButton Grid.Column="2"
-                                Text="{Binding ElementName=_this, Path=BuildEntry.Secondary.Name, Mode=OneWay}"
-                                Foreground="White"
-                                Highlight="White"
-                                HighlightOpacity="0.4"
-                                FontSize="16"
-                                TextHorizontalAlignment="Left"
-                                Margin="0, 0, 10, 0"
-                                Clicked="SecondaryProfessionButton_Clicked"></local:OpaqueButton>
+            <mah:SplitButton 
+                ItemsSource="{Binding ElementName=_this, Path=Professions, Mode=OneWay}"
+                SelectedItem="{Binding ElementName=_this, Path=BuildEntry.Secondary, Mode=TwoWay}"
+                FontSize="16"
+                Foreground="White"
+                Grid.Column="2"></mah:SplitButton>
             <local:HelpButton Grid.Column="0" Foreground="White" Width="20" Height="20" Margin="3"
                               Clicked="HelpButtonSecondary_Clicked" Cursor="Hand"></local:HelpButton>
         </Grid>
@@ -184,29 +173,6 @@
                     </ListView.ItemTemplate>
                 </ListView>
             </Grid>
-        </Grid>
-        <Grid Grid.Column="1" Grid.RowSpan="6">
-            <ListView x:Name="ProfessionListView"
-                          Width="0"
-                          HorizontalAlignment="Right"
-                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                          ScrollViewer.VerticalScrollBarVisibility="Auto"
-                          Background="Transparent"
-                          ScrollViewer.CanContentScroll="False"
-                          ItemsSource="{Binding ElementName=_this, Path=Professions, Mode=OneWay}"
-                          MouseDoubleClick="ProfessionListView_MouseDoubleClick">
-                <ListView.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel>
-                        </VirtualizingStackPanel>
-                    </ItemsPanelTemplate>
-                </ListView.ItemsPanel>
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock FontSize="16" Foreground="White" TextWrapping="Wrap" Text="{Binding Name}"></TextBlock>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
         </Grid>
     </Grid>
 </UserControl>

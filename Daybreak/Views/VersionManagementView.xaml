@@ -17,7 +17,8 @@
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
-        <TextBlock Text="Manage application version" FontSize="18" Foreground="White" HorizontalAlignment="Center"></TextBlock>
+        <TextBlock Text="Manage application version" FontSize="22" Foreground="White" HorizontalAlignment="Center"></TextBlock>
+        <Rectangle Fill="White" VerticalAlignment="Top" Height="1" Margin="0, 39, 0, 0"></Rectangle>
         <WrapPanel Grid.Row="1" HorizontalAlignment="Center" Margin="10">
             <TextBlock Text="Current version: " Foreground="White" FontSize="16"></TextBlock>
             <controls:OpaqueButton Text="{Binding ElementName=_this, Path=CurrentVersion.VersionString, Mode=OneWay}" Foreground="White" FontSize="16"

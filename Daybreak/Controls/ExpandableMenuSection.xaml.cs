@@ -35,7 +35,9 @@ public partial class ExpandableMenuSection : UserControl
         {
             desiredHeight += child.DesiredSize.Height > 0 ?
                 child.DesiredSize.Height :
-                child.Height;
+                double.IsNaN(child.Height) ?
+                    0 :
+                    child.Height;
         }
 
         var doubleAnimation = new DoubleAnimation();
