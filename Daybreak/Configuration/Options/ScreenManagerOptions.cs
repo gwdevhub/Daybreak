@@ -3,6 +3,7 @@
 namespace Daybreak.Configuration.Options;
 
 [OptionsName(Name = "Screen Manager")]
+[OptionsIgnore]
 public sealed class ScreenManagerOptions
 {
     public double X { get; set; }

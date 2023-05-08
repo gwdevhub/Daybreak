@@ -6,8 +6,8 @@ using Daybreak.Services.Navigation;
 using Daybreak.Services.Privilege;
 using Daybreak.Services.Screenshots;
 using Daybreak.Services.Updater;
-using Daybreak.Utils;
 using Daybreak.Views;
+using MahApps.Metro.Controls;
 using System;
 using System.Configuration;
 using System.Core.Extensions;
@@ -18,7 +18,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 using System.Windows.Input;
-using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
@@ -30,7 +29,7 @@ namespace Daybreak.Launch;
 /// </summary>
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add read-only modifier", Justification = "Fields used by source generator for DependencyProperty")]
 [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
-public partial class MainWindow : Window
+public partial class MainWindow : MetroWindow
 {
     private readonly IMenuServiceInitializer menuServiceInitializer;
     private readonly IViewManager viewManager;
@@ -101,7 +100,7 @@ public partial class MainWindow : Window
         this.SetupBackgroundBrowser();
     }
 
-    private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         if (e.ChangedButton is not MouseButton.Left &&
             e.LeftButton is not MouseButtonState.Pressed)
@@ -110,34 +109,6 @@ public partial class MainWindow : Window
         }
 
         this.DragMove();
-    }
-
-    private void TitleBar_MinimizeButtonClicked(object sender, EventArgs e)
-    {
-        this.WindowState = WindowState.Minimized;
-        this.Titlebar.WindowState = WindowState.Minimized;
-    }
-
-    private void TitleBar_MaximizeButtonClicked(object sender, EventArgs e)
-    {
-        this.WindowState = WindowState.Maximized;
-        this.Titlebar.WindowState = WindowState.Maximized;
-    }
-
-    private void TitleBar_RestoreButtonClicked(object sender, EventArgs e)
-    {
-        this.WindowState = WindowState.Normal;
-        this.Titlebar.WindowState = WindowState.Normal;
-    }
-
-    private void TitleBar_CloseButtonClicked(object sender, EventArgs e)
-    {
-        this.Close();
-    }
-
-    private void Border_OnResize(object sender, WCL.Border.ResizeDirection e)
-    {
-        NativeMethods.SendMessage(new WindowInteropHelper(this).Handle, NativeMethods.WM_SYSCOMMAND, (IntPtr)e, IntPtr.Zero);
     }
 
     private void SetupBackgroundBrowser()

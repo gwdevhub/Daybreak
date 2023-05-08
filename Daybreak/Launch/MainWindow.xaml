@@ -1,20 +1,21 @@
-﻿<Window x:Class="Daybreak.Launch.MainWindow"
+﻿<mah:MetroWindow x:Class="Daybreak.Launch.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:Daybreak.Launch"
-        xmlns:wcl="clr-namespace:WCL;assembly=WCL"
         mc:Ignorable="d"
         xmlns:controls="clr-namespace:Daybreak.Controls"
-        xmlns:converters="clr-namespace:Daybreak.Converters"
+        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:effects="clr-namespace:System.Windows.Media.Extensions.Effects;assembly=WpfExtended"
         WindowStyle="None"
-        ResizeMode="NoResize"
+        ResizeMode="CanResize"
         Loaded="Window_Loaded"
         x:Name="_this"
         Foreground="White"
+        BorderBrush="Gray"
+        GlowBrush="Gray"
         Title="Daybreak"
+        ShowTitleBar="False"
         d:DesignHeight="450" d:DesignWidth="800">
     <Window.Resources>
         <ResourceDictionary>
@@ -65,20 +66,12 @@
                 <BlurEffect Radius="5" KernelType="Gaussian" RenderingBias="Performance"></BlurEffect>
             </Border.Effect>
             <controls:ImageViewer x:Name="ImageViewer"
-                                  MouseDown="TitleBar_MouseLeftButtonDown">
+                                  MouseDown="Window_MouseLeftButtonDown">
                 <controls:ImageViewer.Effect>
                     <effects:LightStreak Attenuation="0.4" BrightThreshold="0.9"></effects:LightStreak>
                 </controls:ImageViewer.Effect>
             </controls:ImageViewer>
         </Border>
-        <wcl:TitleBar x:Name="Titlebar"
-                      Grid.ColumnSpan="2"
-                      Background="Transparent" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"
-                      WindowState="Normal" MinimizeButtonClicked="TitleBar_MinimizeButtonClicked"
-                      MaximizeButtonClicked="TitleBar_MaximizeButtonClicked"
-                      RestoreButtonClicked="TitleBar_RestoreButtonClicked"
-                      CloseButtonClicked="TitleBar_CloseButtonClicked"
-                      Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"></wcl:TitleBar>
         <controls:OpaqueButton Grid.Row="1"
                                Grid.Column="1"
                                Background="Transparent"
@@ -142,7 +135,6 @@
                       Background="#F09E9E9E"
                       Visibility="{Binding ElementName=_this, Path=IsShowingDropdown, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
                       Click="SettingsButton_Clicked"></ToggleButton>
-        <wcl:Border OnResize="Border_OnResize" Grid.RowSpan="2" Grid.ColumnSpan="2" Active="True"></wcl:Border>
         <controls:ChromiumBrowserWrapper x:Name="BackgroundWebView"
                                          VerticalAlignment="Center"
                                          HorizontalAlignment="Center"
@@ -153,4 +145,4 @@
                                          Grid.Row="1"
                                          Grid.Column="1"></controls:ChromiumBrowserWrapper>
     </Grid>
-</Window>
+</mah:MetroWindow>

@@ -79,17 +79,6 @@ public partial class ScreenChoiceView : UserControl
         }
     }
 
-    private void BackButton_Clicked(object sender, EventArgs e)
-    {
-        this.viewManager.ShowView<SettingsView>();
-    }
-
-    private void SaveButton_Clicked(object sender, EventArgs e)
-    {
-        this.liveOptions.Value.DesiredGuildwarsScreen = this.selectedId;
-        this.viewManager.ShowView<SettingsView>();
-    }
-
     private void OpaqueButton_Clicked(object sender, EventArgs e)
     {
         var screen = this.screenManager.Screens.Skip(this.selectedId).FirstOrDefault() ??

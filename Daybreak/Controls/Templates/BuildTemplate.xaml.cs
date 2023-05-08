@@ -6,6 +6,7 @@ using Daybreak.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Core.Extensions;
 using System.Extensions;
@@ -36,8 +37,6 @@ public partial class BuildTemplate : UserControl
     private List<Skill>? skillListCache;
     private CancellationTokenSource? cancellationTokenSource = new();
 
-    public event EventHandler? BuildChanged;
-
     [GenerateDependencyProperty]
     private string skillSearchText = string.Empty;
     [GenerateDependencyProperty]
@@ -47,8 +46,9 @@ public partial class BuildTemplate : UserControl
 
     [GenerateDependencyProperty]
     private List<Skill> availableSkills = new();
-    [GenerateDependencyProperty]
-    private List<Profession> professions = new();
+
+    public event EventHandler? BuildChanged;
+    public ObservableCollection<Profession> Professions { get; } = new ObservableCollection<Profession>();
 
     public BuildTemplate()
         : this(Launcher.Instance.ApplicationServiceProvider.GetService<IAttributePointCalculator>()!)
@@ -66,6 +66,7 @@ public partial class BuildTemplate : UserControl
         this.HideInfoBrowser();
         this.buildEntry = new BuildEntry();
         this.DataContextChanged += this.BuildTemplate_DataContextChanged;
+        this.Professions.ClearAnd().AddRange(Profession.Professions);
     }
 
     private void BuildTemplate_Unloaded(object sender, RoutedEventArgs e)
@@ -112,7 +113,6 @@ public partial class BuildTemplate : UserControl
         if (this.SkillBrowser.BrowserSupported is true)
         {
             this.HideSkillListView();
-            this.HideProfessionListView();
             this.SkillBrowser.Width = 400;
         }
     }
@@ -128,7 +128,6 @@ public partial class BuildTemplate : UserControl
     private void ShowSkillListView()
     {
         this.HideInfoBrowser();
-        this.HideProfessionListView();
         this.SkillListContainer.Width = 400;
         this.SkillListContainer.Visibility = Visibility.Visible;
         this.showingSkillList = true;
@@ -147,20 +146,6 @@ public partial class BuildTemplate : UserControl
         this.SkillListContainer.Visibility = Visibility.Hidden;
         this.SkillListContainer.Width = 0;
         this.showingSkillList = false;
-    }
-
-    private void ShowProfessionListView()
-    {
-        this.HideInfoBrowser();
-        this.HideSkillListView();
-        this.ProfessionListView.Width = 400;
-        this.ProfessionListView.Visibility = Visibility.Visible;
-    }
-
-    private void HideProfessionListView()
-    {
-        this.ProfessionListView.Visibility = Visibility.Hidden;
-        this.ProfessionListView.Width = 0;
     }
 
     private void PrepareSkillListCache(List<Skill> skills)
@@ -359,37 +344,6 @@ public partial class BuildTemplate : UserControl
         }
 
         this.HideSkillListView();
-    }
-
-    private void ProfessionListView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
-    {
-        var selected = sender.As<ListView>().SelectedItem.As<Profession>();
-        if (this.replacingPrimaryProfession)
-        {
-            this.BuildEntry!.Primary = selected;
-        }
-        else if (this.replacingSecondaryProfession)
-        {
-            this.BuildEntry!.Secondary = selected;
-        }
-
-        this.HideProfessionListView();
-    }
-
-    private void SecondaryProfessionButton_Clicked(object sender, EventArgs e)
-    {
-        this.replacingPrimaryProfession = false;
-        this.replacingSecondaryProfession = true;
-        this.Professions = Profession.Professions.Where(p => p != this.BuildEntry?.Secondary).ToList();
-        this.ShowProfessionListView();
-    }
-
-    private void PrimaryProfessionButton_Clicked(object sender, EventArgs e)
-    {
-        this.replacingPrimaryProfession = true;
-        this.replacingSecondaryProfession = false;
-        this.Professions.ClearAnd().AddRange(Profession.Professions.Where(p => p != this.BuildEntry?.Primary));
-        this.ShowProfessionListView();
     }
 
     private void AttributeTemplate_Loaded(object sender, RoutedEventArgs e)

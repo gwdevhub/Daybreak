@@ -51,16 +51,6 @@ public partial class MenuList : UserControl
         this.viewManager.ShowView<ExecutablesView>();
     }
 
-    private void LauncherSettingsButton_Clicked(object sender, EventArgs e)
-    {
-        this.viewManager.ShowView<SettingsView>();
-    }
-
-    private void ExperimentalSettingsButton_Clicked(object sender, EventArgs e)
-    {
-        this.viewManager.ShowView<ExperimentalSettingsView>();
-    }
-
     private void ManageBuildsButton_Clicked(object sender, EventArgs e)
     {
         if (this.liveOptions.Value.DownloadIcons)

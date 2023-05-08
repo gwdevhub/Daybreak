@@ -18,7 +18,7 @@
             <ColumnDefinition Width="*"></ColumnDefinition>
             <ColumnDefinition Width="auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Grid HorizontalAlignment="Stretch">
+        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"></RowDefinition>
             </Grid.RowDefinitions>
@@ -26,10 +26,10 @@
                 <ColumnDefinition Width="auto"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <TextBlock FontSize="22" Text="Path:" Foreground="White" Margin="5" Grid.Row="0" HorizontalAlignment="Right"></TextBlock>
+            <TextBlock FontSize="16" Text="Path:" Foreground="White" Margin="5" Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Center"></TextBlock>
             <TextBox Foreground="White" Background="Transparent" Text="{Binding ElementName=_this, Path=Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      BorderThickness="1" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1"
-                     FontSize="22" TextChanged="TextBox_TextChanged" Margin="5"></TextBox>
+                     FontSize="16" TextChanged="TextBox_TextChanged" Margin="5"></TextBox>
         </Grid>
         <WrapPanel Grid.Column="1">
             <local:FilePickerGlyph Width="30" Height="30" Foreground="White" VerticalAlignment="Top" Margin="5"

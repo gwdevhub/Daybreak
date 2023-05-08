@@ -136,6 +136,7 @@ public static class ProjectConfiguration
         services.AddSingleton<IStartupActionProducer, StartupActionManager>();
         services.AddSingleton<IOptionsProducer, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().As<OptionsManager>());
         services.AddSingleton<IOptionsUpdateHook, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().As<OptionsManager>());
+        services.AddSingleton<IOptionsProvider, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().As<OptionsManager>());
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
         services.AddScoped<IScreenshotProvider, ScreenshotProvider>();
@@ -168,11 +169,9 @@ public static class ProjectConfiguration
 
         viewProducer.RegisterPermanentView<LauncherView>();
         viewProducer.RegisterPermanentView<Views.FocusView>();
-        viewProducer.RegisterView<SettingsView>();
         viewProducer.RegisterView<AskUpdateView>();
         viewProducer.RegisterView<UpdateView>();
         viewProducer.RegisterView<AccountsView>();
-        viewProducer.RegisterView<ExperimentalSettingsView>();
         viewProducer.RegisterView<ExecutablesView>();
         viewProducer.RegisterView<BuildTemplateView>();
         viewProducer.RegisterView<BuildsListView>();
@@ -196,6 +195,7 @@ public static class ProjectConfiguration
         viewProducer.RegisterView<ToolboxOnboardingEntryView>();
         viewProducer.RegisterView<ToolboxSwitchView>();
         viewProducer.RegisterView<ToolboxHomepageView>();
+        viewProducer.RegisterView<OptionSectionView>();
     }
 
     public static void RegisterStartupActions(IStartupActionProducer startupActionProducer)
