@@ -338,6 +338,6 @@ public sealed class DrawingService : IDrawingService, IDrawingModuleProducer
 
     private static Color GetQuestColor(QuestMetadata questMetadata)
     {
-        return QuestObjectiveColors.Colors[questMetadata.Quest?.Id % QuestObjectiveColors.Colors.Count ?? 0];
+        return ColorPalette.Colors[questMetadata.Quest?.Id % ColorPalette.Colors.Count ?? 0];
     }
 }

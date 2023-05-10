@@ -6,22 +6,25 @@
              xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
              xmlns:local="clr-namespace:Daybreak.Controls"
              xmlns:converters="clr-namespace:Daybreak.Converters"
+             xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              mc:Ignorable="d"
+             Loaded="UserControl_Loaded"
              Unloaded="UserControl_Unloaded"
              x:Name="_this"
-             Initialized="UserControl_Initialized"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" TriggerValue="True"></converters:BooleanToVisibilityConverter>
-        <converters:BooleanToVisibilityConverter x:Key="ReverseBooleanToVisibilityConverter" TriggerValue="False"></converters:BooleanToVisibilityConverter>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
+        <converters:BooleanToVisibilityConverter x:Key="ReverseBooleanToVisibilityConverter" TriggerValue="True"></converters:BooleanToVisibilityConverter>
     </UserControl.Resources>
     <UserControl.ContextMenu>
         <ContextMenu>
             <ContextMenu.Template>
                 <ControlTemplate>
                     <StackPanel Margin="10">
-                        <local:OpaqueButton Text="Load build template" Foreground="White" Background="#F0212121" BackgroundOpacity="0.4"
-                                            Clicked="LoadBuildTemplateButton_Click" FontSize="16" Height="40" Width="200"></local:OpaqueButton>
+                        <buttons:MenuButton Title="Load build template" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                            Background="{DynamicResource MahApps.Brushes.ThemeBackground}"
+                                            HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                                            Clicked="LoadBuildTemplateButton_Click" FontSize="16" Height="40" Width="200"></buttons:MenuButton>
                     </StackPanel>
                 </ControlTemplate>
             </ContextMenu.Template>
@@ -32,33 +35,32 @@
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <wv2:WebView2 x:Name="WebBrowser" Source="{Binding ElementName=_this, Path=Address, Mode=TwoWay}"
-                      IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"></wv2:WebView2>
-        <Grid Grid.Row="1" Background="#F0212121" IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"
-              Visibility="{Binding ElementName=_this, Path=ControlsEnabled, Mode=OneWay, Converter={StaticResource ReverseBooleanToVisibilityConverter}}">
+        <wv2:WebView2 x:Name="WebBrowser"
+                      IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"
+                      Visibility="{Binding ElementName=_this, Path=BrowserEnabled, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"></wv2:WebView2>
+        <Grid Grid.Row="1" Background="{DynamicResource Daybreak.Brushes.Background}" IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"
+              Visibility="{Binding ElementName=_this, Path=ControlsEnabled, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
                 <ColumnDefinition Width="auto"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <WrapPanel>
-                <local:BackButton Height="30" Width="30" Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                <buttons:BackButton Height="30" Width="30"
                                   Clicked="BackButton_Clicked" Margin="5" Cursor="Hand"
-                                  IsEnabled="{Binding ElementName=WebBrowser, Path=CanGoBack, Mode=OneWay}"></local:BackButton>
-                <local:BackButton Height="30" Width="30" Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                                  IsEnabled="{Binding ElementName=WebBrowser, Path=CanGoBack, Mode=OneWay}"></buttons:BackButton>
+                <buttons:BackButton Height="30" Width="30"
                                   Clicked="ForwardButton_Clicked" Margin="5" Cursor="Hand"
                                   IsEnabled="{Binding ElementName=WebBrowser, Path=CanGoForward, Mode=OneWay}">
-                    <local:BackButton.RenderTransform>
+                    <buttons:BackButton.RenderTransform>
                         <RotateTransform Angle="180" CenterX="15" CenterY="15"></RotateTransform>
-                    </local:BackButton.RenderTransform>
-                </local:BackButton>
+                    </buttons:BackButton.RenderTransform>
+                </buttons:BackButton>
                 <Grid Height="30" Width="30" Margin="5">
-                    <local:RefreshGlyph Height="30" Width="30" Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
-                                        Clicked="RefreshGlyph_Clicked" Cursor="Hand"
-                                        Visibility="{Binding ElementName=_this, Path=Navigating, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"></local:RefreshGlyph>
-                    <local:CancelButton Height="30" Width="30" Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
-                                        Clicked="CancelGlyph_Clicked" Cursor="Hand"
-                                        Visibility="{Binding ElementName=_this, Path=Navigating, Mode=OneWay, Converter={StaticResource ReverseBooleanToVisibilityConverter}}"></local:CancelButton>
+                    <buttons:RefreshButton Height="30" Width="30" Clicked="RefreshGlyph_Clicked" Cursor="Hand"
+                                        Visibility="{Binding ElementName=_this, Path=Navigating, Mode=OneWay, Converter={StaticResource ReverseBooleanToVisibilityConverter}}"></buttons:RefreshButton>
+                    <buttons:RefreshButton Height="30" Width="30" Clicked="CancelGlyph_Clicked" Cursor="Hand"
+                                        Visibility="{Binding ElementName=_this, Path=Navigating, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"></buttons:RefreshButton>
                 </Grid>
             </WrapPanel>
             <TextBox Text="{Binding ElementName=_this, Path=Address, Mode=OneWay}" FontSize="16" 
@@ -69,33 +71,39 @@
                      PreviewKeyDown="TextBox_PreviewKeyDown"
                      IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"></TextBox>
             <StackPanel Grid.Column="2" Orientation="Horizontal">
-                <local:HomeButton Width="30" Height="30" Margin="5"
-                                  Visibility="{Binding ElementName=_this, Path=HomeButtonVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                  Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
-                                  IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"
-                                  Clicked="HomeButton_Clicked"></local:HomeButton>
-                <local:StarGlyph Height="30" Width="30" Margin="5"
-                                 Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
-                                 Visibility="{Binding ElementName=_this, Path=HomeButtonVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                 IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"
-                                 Clicked="StarGlyph_Clicked" x:Name="FavoriteButton"></local:StarGlyph>
-                <local:MaximizeButton Height="30" Width="30" Margin="5"
-                                 Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
-                                 IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"
-                                 Clicked="MaximizeButton_Clicked"></local:MaximizeButton>
+                <buttons:HomeButton Width="30" Height="30" Margin="5"
+                                    Visibility="{Binding ElementName=_this, Path=HomeButtonVisible, Mode=OneWay, Converter={StaticResource ReverseBooleanToVisibilityConverter}}"
+                                    Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                                    IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"
+                                    Clicked="HomeButton_Clicked"></buttons:HomeButton>
+                <buttons:StarButton Height="30" Width="30" Margin="5"
+                                    Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                                    Visibility="{Binding ElementName=_this, Path=HomeButtonVisible, Mode=OneWay, Converter={StaticResource ReverseBooleanToVisibilityConverter}}"
+                                    IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"
+                                    Clicked="StarGlyph_Clicked" x:Name="FavoriteButton"></buttons:StarButton>
+                <buttons:MaximizeButton Height="30" Width="30" Margin="5"
+                                    Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                                    IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"
+                                    Clicked="MaximizeButton_Clicked"></buttons:MaximizeButton>
             </StackPanel>
         </Grid>
-        <Grid Grid.RowSpan="2" Background="Gray"
-              Visibility="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay,Converter={StaticResource BooleanToVisibilityConverter}}">
+        <Grid Grid.RowSpan="2" Background="{StaticResource Daybreak.Brushes.Background}"
+              Visibility="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay,Converter={StaticResource ReverseBooleanToVisibilityConverter}}">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <TextBlock Foreground="White" Text="Browser not supported." FontSize="26" TextWrapping="Wrap"></TextBlock>
-                <TextBlock Foreground="White" Text="Download the Evergreen Bootstrapper from here:" FontSize="26" TextWrapping="Wrap" />
+                <TextBlock Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Text="Browser not supported." FontSize="26" TextWrapping="Wrap"></TextBlock>
+                <TextBlock Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Text="Download the Evergreen Bootstrapper from here:" FontSize="26" TextWrapping="Wrap" />
                 <TextBox Background="Transparent" BorderBrush="Transparent" BorderThickness="0"
                          Text="https://go.microsoft.com/fwlink/p/?LinkId=2124703"
-                         IsReadOnly="True" Margin="0, 0, 0, 30" FontSize="22" Foreground="Blue"
+                         IsReadOnly="True" Margin="0, 0, 0, 30" FontSize="22" Foreground="{StaticResource MahApps.Brushes.Accent}"
                          PreviewMouseLeftButtonDown="Hyperlink_PreviewMouseLeftButtonDown" Cursor="Hand"
                          TextWrapping="Wrap"></TextBox>
-                <TextBlock Foreground="White" Text="Restart after the installation." FontSize="26" TextWrapping="Wrap" />
+                <TextBlock Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Text="Restart after the installation." FontSize="26" TextWrapping="Wrap" />
+            </StackPanel>
+        </Grid>
+        <Grid Grid.RowSpan="2" Background="{StaticResource Daybreak.Brushes.Background}"
+              Visibility="{Binding ElementName=_this, Path=ShowBrowserDisabledMessage, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Text="Browser is disabled." FontSize="26" TextWrapping="Wrap"></TextBlock>
             </StackPanel>
         </Grid>
     </Grid>

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Windows.Controls;
-using System.Windows.Input;
 
-namespace Daybreak.Controls;
+namespace Daybreak.Controls.Buttons;
 
 /// <summary>
 /// Interaction logic for BinButton.xaml
@@ -10,26 +9,14 @@ namespace Daybreak.Controls;
 public partial class BinButton : UserControl
 {
     public event EventHandler? Clicked;
+
     public BinButton()
     {
         this.InitializeComponent();
     }
 
-    private void Ellipse_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    private void HighlightButton_Clicked(object sender, EventArgs e)
     {
-        if (e.ChangedButton == MouseButton.Left)
-        {
-            this.Clicked?.Invoke(this, e);
-        }
-    }
-
-    private void Ellipse_MouseEnter(object sender, MouseEventArgs e)
-    {
-        this.BackgroundEllipse.Visibility = System.Windows.Visibility.Visible;
-    }
-
-    private void Ellipse_MouseLeave(object sender, MouseEventArgs e)
-    {
-        this.BackgroundEllipse.Visibility = System.Windows.Visibility.Hidden;
+        this.Clicked?.Invoke(this, e);
     }
 }

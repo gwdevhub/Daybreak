@@ -18,6 +18,6 @@ public sealed class DungeonBossDrawingModule : EmbeddedSvgDrawingModuleBase<Dung
 
     public override void DrawMapIcon(int finalX, int finalY, int size, WriteableBitmap bitmap, Affiliation affiliation)
     {
-        this.DrawSvg(bitmap, finalX, finalY, size, Colors.Transparent, QuestObjectiveColors.Red);
+        this.DrawSvg(bitmap, finalX, finalY, size, Colors.Transparent, ColorPalette.Red);
     }
 }

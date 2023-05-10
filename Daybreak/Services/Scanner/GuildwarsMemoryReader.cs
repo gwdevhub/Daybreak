@@ -126,7 +126,6 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
 
     private async Task InitializeSafe(Process process, ScopedLogger<GuildwarsMemoryReader> scopedLogger)
     {
-        scopedLogger.LogInformation($"Initializing {nameof(GuildwarsMemoryReader)}");
         if (this.memoryScanner.Process is null ||
             this.memoryScanner.Process.HasExited ||
             this.memoryScanner.Process.MainModule?.FileName != process?.MainModule?.FileName)
@@ -136,13 +135,15 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
                 scopedLogger.LogInformation("Scanner is already scanning a different process. Restart scanner and target the new process");
                 this.memoryScanner.EndScanner();
             }
-            
+
+            scopedLogger.LogInformation($"Initializing {nameof(GuildwarsMemoryReader)}");
             await this.ResilientBeginScanner(scopedLogger, process!);
         }
 
         if (this.memoryScanner.Scanning is false &&
             process?.HasExited is false)
         {
+            scopedLogger.LogInformation($"Initializing {nameof(GuildwarsMemoryReader)}");
             await this.ResilientBeginScanner(scopedLogger, process!);
         }
     }

@@ -9,7 +9,7 @@
              Loaded="UserControl_Loaded"
              x:Name="_this"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid Background="#F0212121">
+    <Grid Background="{StaticResource Daybreak.Brushes.Background}">
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" PanningMode="VerticalFirst">
             <ItemsControl ItemsSource="{Binding ElementName=_this, Path=Metrics, Mode=OneWay}"
                   Background="Transparent" ScrollViewer.VerticalScrollBarVisibility="Disabled">
@@ -23,11 +23,11 @@
                         <StackPanel HorizontalAlignment="Stretch"
                                     Margin="0, 0, 0, 20">
                             <TextBlock Text="{Binding Instrument.Name}"
-                                       Foreground="White"
+                                       Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                        FontSize="14"
                                     VerticalAlignment="Center"></TextBlock>
                             <TextBlock Text="{Binding Instrument.Description}"
-                                       Foreground="White"
+                                       Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                        FontSize="11"
                                     VerticalAlignment="Center"></TextBlock>
                             <WpfPlot Loaded="WpfPlot_Loaded" HorizontalContentAlignment="Stretch"

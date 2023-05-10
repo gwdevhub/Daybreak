@@ -6,16 +6,17 @@
              xmlns:local="clr-namespace:Daybreak.Controls"
              xmlns:guildwars="clr-namespace:Daybreak.Models.Guildwars"
              mc:Ignorable="d" 
+             Background="{StaticResource Daybreak.Brushes.Background}"
              d:DataContext="{d:DesignInstance Type=guildwars:WorldPlayerInformation, IsDesignTimeCreatable=True}"
              d:DesignHeight="300" d:DesignWidth="100">
-    <StackPanel Background="#F0212121">
+    <StackPanel>
         <TextBlock 
             Margin="5, 0, 5, 0"
-            Text="{Binding Name, Mode=OneWay}" FontSize="16" Foreground="White"></TextBlock>
+            Text="{Binding Name, Mode=OneWay}" FontSize="16" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
         <WrapPanel
             Margin="5, 0, 5, 0">
-            <TextBlock Text="Lvl: " Foreground="White"></TextBlock>
-            <TextBlock Text="{Binding Level, Mode=OneWay}" Foreground="White"></TextBlock>
+            <TextBlock Text="Lvl: " Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
+            <TextBlock Text="{Binding Level, Mode=OneWay}" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
         </WrapPanel>
     </StackPanel>
 </UserControl>

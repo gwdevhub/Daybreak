@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Views"
              xmlns:controls="clr-namespace:Daybreak.Controls"
+             xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              mc:Ignorable="d" 
              x:Name="_this"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -13,48 +14,46 @@
             <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
     </UserControl.Resources>
-    <Grid Background="#F0212121">
+    <Grid Background="{StaticResource Daybreak.Brushes.Background}">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
-        <TextBlock FontSize="16" Foreground="White"
+        <TextBlock FontSize="16" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                    Margin="10, 0, 0, 0"
                    VerticalAlignment="Center"
                    HorizontalAlignment="Left"
                    Text="Latest 100 log lines"></TextBlock>
-        <controls:BinButton Foreground="White" Height="30" Width="30" HorizontalAlignment="Right" Margin="5"
-                            Clicked="BinButton_Clicked"></controls:BinButton>
-        <controls:RefreshGlyph Foreground="White" Height="30" Width="30" HorizontalAlignment="Right" Margin="0, 5, 45, 5"
-                               Clicked="RefreshGlyph_Clicked"></controls:RefreshGlyph>
-        <controls:BackButton Foreground="White" Height="30" Width="30" HorizontalAlignment="Right" Margin="0, 5, 85, 5"
+        <buttons:BinButton  Height="30" Width="30" HorizontalAlignment="Right" Margin="5"
+                            Clicked="BinButton_Clicked"></buttons:BinButton>
+        <buttons:RefreshButton Height="30" Width="30" HorizontalAlignment="Right" Margin="0, 5, 45, 5"
+                               Clicked="RefreshGlyph_Clicked"></buttons:RefreshButton>
+        <buttons:BackButton  Height="30" Width="30" HorizontalAlignment="Right" Margin="0, 5, 85, 5"
                              Clicked="ExportButton_Clicked">
-            <controls:BackButton.RenderTransform>
+            <buttons:BackButton.RenderTransform>
                 <RotateTransform Angle="270" CenterX="15" CenterY="15"></RotateTransform>
-            </controls:BackButton.RenderTransform>
-        </controls:BackButton>
-        <DataGrid IsReadOnly="True" Background="Transparent" Foreground="White" Grid.Row="1"
+            </buttons:BackButton.RenderTransform>
+        </buttons:BackButton>
+        <DataGrid IsReadOnly="True" Background="Transparent" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Grid.Row="1"
                   ItemsSource="{Binding ElementName=_this, Path=Logs, Mode=OneWay}" HorizontalScrollBarVisibility="Disabled"
                   AutoGenerateColumns="False" HeadersVisibility="Column" EnableColumnVirtualization="True"
                   EnableRowVirtualization="True">
             <DataGrid.ColumnHeaderStyle>
                 <Style TargetType="{x:Type DataGridColumnHeader}">
-                    <Setter Property="Foreground" Value="White"></Setter>
+                    <Setter Property="Foreground" Value="{StaticResource MahApps.Brushes.ThemeForeground}"></Setter>
                     <Setter Property="Background" Value="Transparent"></Setter>
-                    <Setter Property="BorderBrush" Value="#80808080"></Setter>
                     <Setter Property="BorderThickness" Value="1"></Setter>
                 </Style>
             </DataGrid.ColumnHeaderStyle>
             <DataGrid.CellStyle>
                 <Style TargetType="{x:Type DataGridCell}">
-                    <Setter Property="BorderBrush" Value="#80808080"></Setter>
                     <Setter Property="BorderThickness" Value="1"></Setter>
                 </Style>
             </DataGrid.CellStyle>
             <DataGrid.RowStyle>
                 <Style TargetType="{x:Type DataGridRow}">
                     <Setter Property="Background" Value="Transparent"></Setter>
-                    <Setter Property="Foreground" Value="White"></Setter>
+                    <Setter Property="Foreground" Value="{StaticResource MahApps.Brushes.ThemeForeground}"></Setter>
                 </Style>
             </DataGrid.RowStyle>
             <DataGrid.Columns>
@@ -66,7 +65,7 @@
                 <DataGridTemplateColumn IsReadOnly="True" Header="Message" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <controls:LogMessageTemplate Message="{Binding Message}" Foreground="White"></controls:LogMessageTemplate>
+                            <controls:LogMessageTemplate Message="{Binding Message}" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></controls:LogMessageTemplate>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

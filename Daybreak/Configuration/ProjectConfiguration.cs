@@ -49,6 +49,7 @@ using Daybreak.Services.UMod;
 using Daybreak.Services.Toolbox;
 using Daybreak.Views.Onboarding.UMod;
 using Daybreak.Views.Onboarding.Toolbox;
+using Daybreak.Services.Themes;
 
 namespace Daybreak.Configuration;
 
@@ -137,6 +138,7 @@ public static class ProjectConfiguration
         services.AddSingleton<IOptionsProducer, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().As<OptionsManager>());
         services.AddSingleton<IOptionsUpdateHook, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().As<OptionsManager>());
         services.AddSingleton<IOptionsProvider, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().As<OptionsManager>());
+        services.AddSingleton<IThemeManager, ThemeManager>();
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
         services.AddScoped<IScreenshotProvider, ScreenshotProvider>();
@@ -248,6 +250,7 @@ public static class ProjectConfiguration
     {
         optionsProducer.ThrowIfNull();
 
+        optionsProducer.RegisterOptions<ThemeOptions>();
         optionsProducer.RegisterOptions<BrowserOptions>();
         optionsProducer.RegisterOptions<BuildSynchronizationOptions>();
         optionsProducer.RegisterOptions<FocusViewOptions>();

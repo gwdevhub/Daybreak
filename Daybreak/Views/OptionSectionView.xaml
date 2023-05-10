@@ -4,25 +4,24 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Views"
-             xmlns:buttons="clr-namespace:Daybreak.Controls"
+             xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              mc:Ignorable="d" 
              x:Name="_this"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid Background="#F0212121">
+    <Grid Background="{StaticResource Daybreak.Brushes.Background}">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <buttons:SaveButton Height="30" Width="30"
-                            Foreground="White"
                             HorizontalAlignment="Right"
                             Margin="5"
                             Clicked="SaveButton_Clicked"></buttons:SaveButton>
         <TextBlock FontSize="22"
-                   Foreground="White"
+                   Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                    Text="{Binding ElementName=_this, Path=Title, Mode=OneWay}"
                    HorizontalAlignment="Center"></TextBlock>
-        <Rectangle Fill="White" Height="1" VerticalAlignment="Bottom"></Rectangle>
+        <Rectangle Fill="{StaticResource MahApps.Brushes.ThemeForeground}" Height="1" VerticalAlignment="Bottom"></Rectangle>
         <ScrollViewer Grid.Row="1"
                       HorizontalScrollBarVisibility="Disabled"
                       VerticalScrollBarVisibility="Auto">
@@ -40,7 +39,7 @@
                                                 VerticalAlignment="Center"
                                                 DataContext="{Binding}"
                                                 Margin="5"
-                                                Foreground="White"
+                                                Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                                 Clicked="HelpButton_Clicked"
                                                 MouseLeave="HelpButton_MouseLeave">
                                 <buttons:HelpButton.ToolTip>
@@ -50,18 +49,18 @@
                             <Grid Grid.Column="1"
                                   Height="{Binding Template.ActualHeight}">
                                 <TextBlock Text="{Binding Heading.Title}"
-                                           Foreground="White"
+                                           Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                            VerticalAlignment="Center"
                                            FontSize="16"/>
                             </Grid>
                             <Rectangle Grid.Column="1"
-                                       Fill="White"
+                                       Fill="{StaticResource MahApps.Brushes.ThemeForeground}"
                                        Width="1"
                                        HorizontalAlignment="Right"
                                        VerticalAlignment="Stretch" />
                             <ContentControl Content="{Binding Template}"
                                             Grid.Column="2" />
-                            <Rectangle Fill="White"
+                            <Rectangle Fill="{StaticResource MahApps.Brushes.ThemeForeground}"
                                        Height="1"
                                        HorizontalAlignment="Stretch"
                                        VerticalAlignment="Bottom"

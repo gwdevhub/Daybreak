@@ -16,7 +16,7 @@
                     HorizontalAlignment="Stretch"
                     Height="{Binding ElementName=_this, Path=MaxResourceValue, Mode=TwoWay}"></Rectangle>
                 <Rectangle
-                    Fill="#F0212121"
+                    Fill="{DynamicResource MahApps.Brushes.ThemeBackground}"
                     VerticalAlignment="Stretch"
                     HorizontalAlignment="Stretch"></Rectangle>
                 <Rectangle 

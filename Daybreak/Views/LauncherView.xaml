@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Views"
-             xmlns:controls="clr-namespace:Daybreak.Controls"
+             xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              xmlns:effects="clr-namespace:System.Windows.Media.Extensions.Effects;assembly=WpfExtended"
              mc:Ignorable="d"
              x:Name="_this"
@@ -15,11 +15,16 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibility"></BooleanToVisibilityConverter>
     </UserControl.Resources>
     <Grid x:Name="ViewContainer">
-        <controls:OpaqueButton Text="Launch Guild Wars" Highlight="White" TransparentBackground="#F0212121" HighlightOpacity="0.3" BackgroundOpacity="1"
-                               Foreground="White" FontSize="36" Width="350" Height="60"
-                               IsEnabled="{Binding ElementName=_this, Path=LaunchButtonEnabled, Mode=OneWay}"
-                               Clicked="LaunchButton_Clicked" Grid.Row="0" Grid.ColumnSpan="3"
-                               Cursor="Hand"
-                               Visibility="{Binding ElementName=_this, Path=ButtonsVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibility}}"></controls:OpaqueButton>
+        <buttons:HighlightButton 
+                            Title="Launch Guild Wars"
+                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                            Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                            HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                            Background="{DynamicResource Daybreak.Brushes.Background}"
+                            FontSize="36" Width="350" Height="60"
+                            IsEnabled="{Binding ElementName=_this, Path=LaunchButtonEnabled, Mode=OneWay}"
+                            Clicked="LaunchButton_Clicked" Grid.Row="0" Grid.ColumnSpan="3"
+                            Cursor="Hand"
+                            Visibility="{Binding ElementName=_this, Path=ButtonsVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibility}}"></buttons:HighlightButton>
     </Grid>
 </UserControl>

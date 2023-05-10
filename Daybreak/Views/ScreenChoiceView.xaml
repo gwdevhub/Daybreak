@@ -5,22 +5,24 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Views"
              xmlns:controls="clr-namespace:Daybreak.Controls"
+             xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              mc:Ignorable="d" 
              x:Name="_this"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid Background="#F0212121">
+    <Grid Background="{StaticResource Daybreak.Brushes.Background}">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
-        <controls:BackButton Foreground="White" Height="30" Width="30" Grid.Column="0" HorizontalAlignment="Left" Margin="5"
-                             Clicked="BackButton_Clicked"></controls:BackButton>
-        <TextBlock Text="Choose screen" FontSize="18" Foreground="White" HorizontalAlignment="Center"></TextBlock>
-        <controls:OpaqueButton Text="Test" Foreground="White" HighlightOpacity="0.3" Highlight="White" FontSize="18" Width="80"
-                               HorizontalAlignment="Right" Margin="0, 0, 50, 0" Clicked="OpaqueButton_Clicked"
-                               IsEnabled="{Binding ElementName=_this, Path=CanTest, Mode=OneWay}"></controls:OpaqueButton>
-        <controls:SaveButton Foreground="White" Height="30" Width="30" Grid.Column="1" HorizontalAlignment="Right" Margin="5"
-                             Clicked="SaveButton_Clicked"></controls:SaveButton>
+        <buttons:BackButton  Height="30" Width="30" Grid.Column="0" HorizontalAlignment="Left" Margin="5"
+                             Clicked="BackButton_Clicked"></buttons:BackButton>
+        <TextBlock Text="Choose screen" FontSize="18" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" HorizontalAlignment="Center"></TextBlock>
+        <buttons:HighlightButton Title="Test" Background="{StaticResource MahApps.Brushes.ThemeBackground}" HorizontalAlignment="Right" Margin="0, 0, 50, 0"
+                                 FontSize="16" Width="50" Height="30" Clicked="OpaqueButton_Clicked" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                 HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                 HorizontalContentAlignment="Center" VerticalContentAlignment="Center"></buttons:HighlightButton>
+        <buttons:SaveButton Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Height="30" Width="30" Grid.Column="1" HorizontalAlignment="Right" Margin="5"
+                                 Clicked="SaveButton_Clicked"></buttons:SaveButton>
         <Viewbox Grid.Row="1">
             <Grid x:Name="ScreenContainer"></Grid>
         </Viewbox>

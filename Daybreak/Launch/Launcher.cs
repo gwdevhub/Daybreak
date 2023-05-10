@@ -1,4 +1,5 @@
-﻿using Daybreak.Configuration;
+﻿using ControlzEx.Theming;
+using Daybreak.Configuration;
 using Daybreak.Services.Drawing;
 using Daybreak.Services.ExceptionHandling;
 using Daybreak.Services.Navigation;
@@ -10,8 +11,11 @@ using Microsoft.Extensions.Logging;
 using Slim;
 using Slim.Integration.ServiceCollection;
 using System;
+using System.Collections;
+using System.Linq;
 using System.Windows;
 using System.Windows.Extensions;
+using System.Windows.Media;
 
 namespace Daybreak.Launch;
 
@@ -80,17 +84,24 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
 
     private static void RegisterMahAppsStyle()
     {
+        RegisterMahAppsComponent("Styles/Fonts.xaml");
+        RegisterMahAppsComponent("Styles/Controls.xaml");
+        RegisterMahAppsComponent("Styles/Themes/Light.Steel.xaml");
+        
+        //TODO: Hacky way to initialize a theme before startup and option loading
+        RegisterDaybreakComponent();
+    }
+
+    private static void RegisterMahAppsComponent(string component)
+    {
         Instance.Resources.MergedDictionaries.Add(new ResourceDictionary
         {
-            Source = new Uri("pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml", UriKind.RelativeOrAbsolute)
+            Source = new Uri($"pack://application:,,,/MahApps.Metro;component/{component}", UriKind.RelativeOrAbsolute)
         });
-        Instance.Resources.MergedDictionaries.Add(new ResourceDictionary
-        {
-            Source = new Uri("pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml", UriKind.RelativeOrAbsolute)
-        });
-        Instance.Resources.MergedDictionaries.Add(new ResourceDictionary
-        {
-            Source = new Uri("pack://application:,,,/MahApps.Metro;component/Styles/Themes/Dark.Steel.xaml", UriKind.RelativeOrAbsolute)
-        });
+    }
+
+    private static void RegisterDaybreakComponent()
+    {
+        Instance.Resources.MergedDictionaries[2].Add("Daybreak.Brushes.Background", new SolidColorBrush(Colors.Transparent));
     }
 }

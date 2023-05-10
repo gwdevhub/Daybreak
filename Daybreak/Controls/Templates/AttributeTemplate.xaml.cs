@@ -7,7 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 
-namespace Daybreak.Controls;
+namespace Daybreak.Controls.Templates;
 
 /// <summary>
 /// Interaction logic for AttributeTemplate.xaml

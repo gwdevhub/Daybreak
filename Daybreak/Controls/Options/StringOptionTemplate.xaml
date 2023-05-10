@@ -11,9 +11,9 @@
         <TextBox Background="Transparent"
                  Text="{Binding ElementName=_this, Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  BorderBrush="Transparent"
-                 Foreground="White"
+                 Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                  FontSize="16"
-                 CaretBrush="White"
+                 CaretBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
                  VerticalContentAlignment="Center"
                  VerticalAlignment="Stretch"
                  TextWrapping="Wrap"></TextBox>

@@ -6,21 +6,40 @@
              xmlns:local="clr-namespace:Daybreak.Views"
              mc:Ignorable="d"
              xmlns:controls="clr-namespace:Daybreak.Controls"
+             xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Width="400" Height="200"
-          Background="#F0212121">
+          Background="{StaticResource Daybreak.Brushes.Background}">
         <StackPanel VerticalAlignment="Center" Orientation="Vertical">
             <TextBlock Text="An update has been detected. Do you want to download the update?" HorizontalAlignment="Center"
-                       FontSize="16" Foreground="White" Margin="10, 0, 10, 10" TextWrapping="Wrap"></TextBlock>
-            <Grid>
+                       FontSize="16" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Margin="10, 0, 10, 10" TextWrapping="Wrap"></TextBlock>
+            <Grid MaxWidth="600">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"></ColumnDefinition>
                     <ColumnDefinition Width="*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <controls:OpaqueButton Text="Yes" BackgroundOpacity="0.2" TransparentBackground="Gray" Highlight="White" HighlightOpacity="0.6" HorizontalAlignment="Center" Margin="10" Width="50" Height="25"
-                                   Clicked="YesButton_Clicked" Foreground="White" FontSize="16" Cursor="Hand"></controls:OpaqueButton>
-                <controls:OpaqueButton Text="No" BackgroundOpacity="0.2" TransparentBackground="Gray" Highlight="White" HighlightOpacity="0.6" HorizontalAlignment="Center" Margin="10" Width="50" Height="25"
-                                   Clicked="NoButton_Clicked" Foreground="White" Grid.Column="1" FontSize="16" Cursor="Hand"></controls:OpaqueButton>
+                <buttons:MenuButton Title="No"
+                                    Grid.Column="0"
+                                    HorizontalAlignment="Center"
+                                    Height="30"
+                                    Width="60"
+                                    HorizontalContentAlignment="Center"
+                                    FontSize="16"
+                                    Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                    Background="{StaticResource MahApps.Brushes.ThemeBackground}"
+                                    HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                    Clicked="NoButton_Clicked"></buttons:MenuButton>
+                <buttons:MenuButton Title="Yes"
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Center"
+                                    Height="30"
+                                    Width="60"
+                                    HorizontalContentAlignment="Center"
+                                    FontSize="16"
+                                    Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                    Background="{StaticResource MahApps.Brushes.ThemeBackground}"
+                                    HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                    Clicked="YesButton_Clicked"></buttons:MenuButton>
             </Grid>
         </StackPanel>
     </Grid>

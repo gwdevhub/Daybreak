@@ -5,25 +5,26 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:guildwars="clr-namespace:Daybreak.Models.Guildwars"
              mc:Ignorable="d" 
+             Background="{StaticResource Daybreak.Brushes.Background}"
              d:DataContext="{d:DesignInstance Type=guildwars:PlayerInformation, IsDesignTimeCreatable=True}"
              d:DesignHeight="300" d:DesignWidth="100"
              Margin="5, 0, 5, 0">
-    <StackPanel Background="#F0212121">
-        <TextBlock Text="Party Member" FontSize="16" Foreground="White"></TextBlock>
-        <TextBlock Text="{Binding NpcDefinition.Name}" Foreground="LightBlue" Cursor="Hand"
+    <StackPanel>
+        <TextBlock Text="Party Member" FontSize="16" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
+        <TextBlock Text="{Binding NpcDefinition.Name}" Foreground="{StaticResource MahApps.Brushes.Accent}" Cursor="Hand"
                    MouseLeftButtonDown="TextBlock_MouseLeftButtonDown"></TextBlock>
         <WrapPanel>
-            <TextBlock Text="Id: " Foreground="White"></TextBlock>
-            <TextBlock Text="{Binding ModelType, Mode=OneWay}" Foreground="White"></TextBlock>
+            <TextBlock Text="Id: " Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
+            <TextBlock Text="{Binding ModelType, Mode=OneWay}" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
         </WrapPanel>
         <WrapPanel>
-            <TextBlock Text="Lvl: " Foreground="White"></TextBlock>
-            <TextBlock Text="{Binding Level, Mode=OneWay}" Foreground="White"></TextBlock>
+            <TextBlock Text="Lvl: " Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
+            <TextBlock Text="{Binding Level, Mode=OneWay}" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
         </WrapPanel>
         <WrapPanel>
-            <TextBlock Text="{Binding PrimaryProfession.Alias, Mode=OneWay}" Foreground="White"></TextBlock>
-            <TextBlock Text="/" Foreground="White"></TextBlock>
-            <TextBlock Text="{Binding SecondaryProfession.Alias, Mode=OneWay}" Foreground="White"></TextBlock>
+            <TextBlock Text="{Binding PrimaryProfession.Alias, Mode=OneWay}" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
+            <TextBlock Text="/" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
+            <TextBlock Text="{Binding SecondaryProfession.Alias, Mode=OneWay}" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
         </WrapPanel>
     </StackPanel>
 </UserControl>
