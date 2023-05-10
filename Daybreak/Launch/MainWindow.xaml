@@ -7,13 +7,14 @@
         xmlns:controls="clr-namespace:Daybreak.Controls"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:effects="clr-namespace:System.Windows.Media.Extensions.Effects;assembly=WpfExtended"
+        xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
+        xmlns:glyphs="clr-namespace:Daybreak.Controls.Glyphs"
         WindowStyle="None"
         ResizeMode="CanResize"
         Loaded="Window_Loaded"
         x:Name="_this"
         Foreground="White"
         BorderBrush="Gray"
-        GlowBrush="Gray"
         Title="Daybreak"
         ShowTitleBar="False"
         d:DesignHeight="450" d:DesignWidth="800">
@@ -26,7 +27,7 @@
                         <ControlTemplate TargetType="{x:Type ToggleButton}">
                             <Grid Cursor="Hand">
                                 <Rectangle x:Name="OverlayRect" Fill="{TemplateBinding Background}" Opacity="0"></Rectangle>
-                                <controls:ThreeDotsGlyph Margin="13"></controls:ThreeDotsGlyph>
+                                <glyphs:ThreeDotsGlyph Margin="13"></glyphs:ThreeDotsGlyph>
                             </Grid>
                             <ControlTemplate.Triggers>
                                 <MultiTrigger>
@@ -50,9 +51,10 @@
                     </Setter.Value>
                 </Setter>
             </Style>
+            <SolidColorBrush x:Key="ViewBackground" Color="{StaticResource StaticResource MahApps.Colors.ThemeBackground}" Opacity="0.8" />
         </ResourceDictionary>
     </Window.Resources>
-    <Grid Background="Black">
+    <Grid Background="Transparent">
         <Grid.RowDefinitions>
             <RowDefinition Height="30"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
@@ -72,36 +74,36 @@
                 </controls:ImageViewer.Effect>
             </controls:ImageViewer>
         </Border>
-        <controls:OpaqueButton Grid.Row="1"
+        <buttons:MenuButton    Grid.Row="1"
                                Grid.Column="1"
                                Background="Transparent"
                                BorderBrush="Transparent"
                                BorderThickness="0"
                                Opacity="0.6"
-                               Text="{Binding ElementName=_this, Path=CreditText, Mode=OneWay}"
+                               Title="{Binding ElementName=_this, Path=CreditText, Mode=OneWay}"
                                VerticalAlignment="Bottom"
                                HorizontalAlignment="Right" 
                                Margin="0, 0, 20, 30" 
                                FontSize="22" 
                                Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
-                 Clicked="CreditTextBox_MouseLeftButtonDown" Cursor="Hand"></controls:OpaqueButton>
+                 Clicked="CreditTextBox_MouseLeftButtonDown" Cursor="Hand"></buttons:MenuButton>
         <WrapPanel Grid.Row="1"
                    Grid.Column="1"
                    Margin="0, 0, 20, 10"
                    VerticalAlignment="Bottom"
                    HorizontalAlignment="Right">
-            <controls:OpaqueButton Grid.Row="1" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Opacity="0.6"
-                     Text="{Binding ElementName=_this, Path=CurrentVersionText, Mode=OneWay}" FontSize="10"
+            <buttons:MenuButton Grid.Row="1" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Opacity="0.6"
+                     Title="{Binding ElementName=_this, Path=CurrentVersionText, Mode=OneWay}" FontSize="10"
                      Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
-                     Clicked="VersionText_Clicked"></controls:OpaqueButton>
-            <controls:OpaqueButton Grid.Row="1" Background="Transparent" Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" 
-                     Opacity="0.6" Text=" - " FontSize="10" BorderBrush="Transparent" BorderThickness="0"
+                     Clicked="VersionText_Clicked"></buttons:MenuButton>
+            <buttons:MenuButton Grid.Row="1" Background="Transparent" Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" 
+                     Opacity="0.6" Title=" - " FontSize="10" BorderBrush="Transparent" BorderThickness="0"
                      Visibility="{Binding ElementName=_this, Path=IsRunningAsAdmin, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                     Clicked="VersionText_Clicked"></controls:OpaqueButton>
-            <controls:OpaqueButton Grid.Row="1" Background="Transparent" Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" 
-                     Opacity="0.6" Text="[Admin]" FontSize="10" BorderBrush="Transparent" BorderThickness="0"
+                     Clicked="VersionText_Clicked"></buttons:MenuButton>
+            <buttons:MenuButton Grid.Row="1" Background="Transparent" Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" 
+                     Opacity="0.6" Title="[Admin]" FontSize="10" BorderBrush="Transparent" BorderThickness="0"
                      Visibility="{Binding ElementName=_this, Path=IsRunningAsAdmin, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                     Clicked="VersionText_Clicked"></controls:OpaqueButton>
+                     Clicked="VersionText_Clicked"></buttons:MenuButton>
         </WrapPanel>
         <Grid x:Name="Container"
                   Grid.Column="1"
@@ -111,7 +113,7 @@
                   Grid.RowSpan="2"
                   VerticalAlignment="Stretch"
                   HorizontalAlignment="Left"
-                  Background="#F0212121">
+                  Background="{DynamicResource Daybreak.Brushes.Background}">
             <controls:MenuList Margin="0, 30, 0, 0"/>
         </Grid>
         <ToggleButton x:Name="OpeningSettingsButton"

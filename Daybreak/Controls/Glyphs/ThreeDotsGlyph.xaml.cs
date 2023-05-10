@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace Daybreak.Controls;
+namespace Daybreak.Controls.Glyphs;
 
 /// <summary>
 /// Interaction logic for ThreeDotsGlyph.xaml

@@ -10,7 +10,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid
-        Background="#F0212121">
+        Background="{StaticResource Daybreak.Brushes.Background}">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
@@ -19,7 +19,7 @@
             Text="Please login to access OneDrive files"
             HorizontalAlignment="Center"
             FontSize="24"
-            Foreground="White"/>
+            Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"/>
         <controls:ChromiumBrowserWrapper
             x:Name="BrowserWrapper"
             Grid.Row="1"

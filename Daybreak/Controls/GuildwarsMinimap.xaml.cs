@@ -19,6 +19,7 @@ using System.Windows.Threading;
 using System.Threading;
 using System.Threading.Tasks;
 using Daybreak.Services.Drawing;
+using Daybreak.Services.Themes;
 
 namespace Daybreak.Controls;
 
@@ -39,6 +40,7 @@ public partial class GuildwarsMinimap : UserControl
     private readonly IPathfinder pathfinder;
     private readonly IDrawingService drawingService;
     private readonly IGuildwarsEntityDebouncer guildwarsEntityDebouncer;
+    private readonly IThemeManager themeManager;
     private readonly Color outlineColor = Colors.Chocolate;
     private readonly TimeSpan offsetRevertDelay = TimeSpan.FromSeconds(3);
 
@@ -82,18 +84,21 @@ public partial class GuildwarsMinimap : UserControl
         :this(
              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IPathfinder>(),
              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IDrawingService>(),
-             Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IGuildwarsEntityDebouncer>())
+             Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IGuildwarsEntityDebouncer>(),
+             Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IThemeManager>())
     {
     }
 
     public GuildwarsMinimap(
         IPathfinder pathfinder,
         IDrawingService drawingService,
-        IGuildwarsEntityDebouncer guildwarsEntityDebouncer)
+        IGuildwarsEntityDebouncer guildwarsEntityDebouncer,
+        IThemeManager themeManager)
     {
         this.pathfinder = pathfinder.ThrowIfNull();
         this.drawingService = drawingService.ThrowIfNull();
         this.guildwarsEntityDebouncer = guildwarsEntityDebouncer.ThrowIfNull();
+        this.themeManager = themeManager.ThrowIfNull();
 
         this.dispatcherTimer.Tick += (_, _) => this.ApplyOffsetRevert();
         this.dispatcherTimer.Interval = TimeSpan.FromMilliseconds(16);
@@ -247,7 +252,7 @@ public partial class GuildwarsMinimap : UserControl
 
         using var bitmapContext = bitmap.GetBitmapContext();
         bitmap.Clear(Colors.Transparent);
-
+        var color = this.themeManager.GetForegroundColor();
         foreach (var trapezoid in this.PathingData.Trapezoids)
         {
             var a = new Point((int)((trapezoid.XTL - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YT + minHeight) / MapDownscaleFactor));
@@ -255,7 +260,7 @@ public partial class GuildwarsMinimap : UserControl
             var c = new Point((int)((trapezoid.XBR - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YB + minHeight) / MapDownscaleFactor));
             var d = new Point((int)((trapezoid.XBL - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YB + minHeight) / MapDownscaleFactor));
 
-            bitmap.FillPolygon(new int[] { (int)a.X, (int)a.Y, (int)b.X, (int)b.Y, (int)c.X, (int)c.Y, (int)d.X, (int)d.Y, (int)a.X, (int)a.Y }, Colors.White);
+            bitmap.FillPolygon(new int[] { (int)a.X, (int)a.Y, (int)b.X, (int)b.Y, (int)c.X, (int)c.Y, (int)d.X, (int)d.Y, (int)a.X, (int)a.Y }, color);
         }
     }
 
@@ -618,6 +623,7 @@ public partial class GuildwarsMinimap : UserControl
     private void GuildwarsMinimap_Loaded(object sender, RoutedEventArgs e)
     {
         this.dispatcherTimer.Start();
+        this.DrawMap();
     }
 
     private void GuildwarsMinimap_Unloaded(object sender, RoutedEventArgs e)
@@ -695,6 +701,6 @@ public partial class GuildwarsMinimap : UserControl
 
     private static Color GetQuestColor(QuestMetadata questMetadata)
     {
-        return QuestObjectiveColors.Colors[questMetadata.Quest?.Id % QuestObjectiveColors.Colors.Count ?? 0];
+        return ColorPalette.Colors[questMetadata.Quest?.Id % ColorPalette.Colors.Count ?? 0];
     }
 }

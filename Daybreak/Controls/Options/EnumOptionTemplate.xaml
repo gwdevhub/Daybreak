@@ -11,6 +11,8 @@
     <Grid>
         <mah:SplitButton ItemsSource="{Binding ElementName=_this, Path=PossibleEnumValues, Mode=OneWay}"
                          FontSize="16"
-                         SelectedItem="{Binding ElementName=_this, Path=Value, Mode=TwoWay}"></mah:SplitButton>
+                         Background="Transparent"
+                         SelectedItem="{Binding ElementName=_this, Path=Value, Mode=TwoWay}">
+        </mah:SplitButton>
     </Grid>
 </UserControl>

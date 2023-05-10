@@ -1,4 +1,5 @@
-﻿using Daybreak.Launch;
+﻿using Daybreak.Controls.Templates;
+using Daybreak.Launch;
 using Daybreak.Models.Builds;
 using Daybreak.Models.Guildwars;
 using Daybreak.Services.BuildTemplates;
@@ -17,7 +18,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 
-namespace Daybreak.Controls;
+namespace Daybreak.Controls.Templates;
 
 /// <summary>
 /// Interaction logic for BuildTemplate.xaml

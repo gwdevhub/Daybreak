@@ -10,8 +10,8 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid VerticalAlignment="Center" HorizontalAlignment="Stretch">
         <mah:ToggleSwitch VerticalContentAlignment="Center"
-                          Foreground="White"
                           HorizontalAlignment="Center"
+                          Cursor="Hand"
                           IsOn="{Binding ElementName=_this, Path=Value, Mode=TwoWay}"></mah:ToggleSwitch>
     </Grid>
 </UserControl>

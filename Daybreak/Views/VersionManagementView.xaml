@@ -5,44 +5,51 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Views"
              xmlns:controls="clr-namespace:Daybreak.Controls"
+             xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              mc:Ignorable="d"
              x:Name="_this"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
     </UserControl.Resources>
-    <Grid Background="#F0212121">
+    <Grid Background="{StaticResource Daybreak.Brushes.Background}">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
-        <TextBlock Text="Manage application version" FontSize="22" Foreground="White" HorizontalAlignment="Center"></TextBlock>
-        <Rectangle Fill="White" VerticalAlignment="Top" Height="1" Margin="0, 39, 0, 0"></Rectangle>
+        <TextBlock Text="Manage application version" FontSize="22" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" HorizontalAlignment="Center"></TextBlock>
+        <Rectangle Fill="{StaticResource MahApps.Brushes.ThemeForeground}" VerticalAlignment="Top" Height="1" Margin="0, 39, 0, 0"></Rectangle>
         <WrapPanel Grid.Row="1" HorizontalAlignment="Center" Margin="10">
-            <TextBlock Text="Current version: " Foreground="White" FontSize="16"></TextBlock>
-            <controls:OpaqueButton Text="{Binding ElementName=_this, Path=CurrentVersion.VersionString, Mode=OneWay}" Foreground="White" FontSize="16"
-                       Cursor="Hand" BorderBrush="Transparent" BorderThickness="0" Clicked="CurrentVersion_Clicked"></controls:OpaqueButton>
+            <TextBlock Text="Current version: " Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" FontSize="16"></TextBlock>
+            <buttons:MenuButton Title="{Binding ElementName=_this, Path=CurrentVersion.VersionString, Mode=OneWay}"
+                                Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" FontSize="16"
+                                Cursor="Hand" BorderBrush="Transparent" BorderThickness="0" Clicked="CurrentVersion_Clicked"></buttons:MenuButton>
         </WrapPanel>
         <ListView Grid.Row="2"
                   Background="Transparent" ItemsSource="{Binding ElementName=_this, Path=Versions, Mode=OneWay}"
-                  HorizontalContentAlignment="Stretch" Width="230" ScrollViewer.CanContentScroll="True"
+                  HorizontalContentAlignment="Stretch" ScrollViewer.CanContentScroll="True"
                   ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Auto">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Grid Margin="5">
-                        <controls:OpaqueButton Text="{Binding VersionString}" Clicked="DesiredVersion_Clicked"
-                                                   Foreground="White" FontSize="16" BorderThickness="0"
-                                                   HorizontalAlignment="Left"></controls:OpaqueButton>
-                        <controls:BackButton Foreground="White" Width="30" Height="30" HorizontalAlignment="Right"
-                                             Clicked="DesiredVersion_DownloadButton_Clicked">
-                            <controls:BackButton.RenderTransform>
+                        <buttons:MenuButton Title="{Binding VersionString}" Clicked="DesiredVersion_Clicked"
+                                            Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" FontSize="16" BorderThickness="0"
+                                            HorizontalAlignment="Left"></buttons:MenuButton>
+                        <buttons:BackButton Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Width="30" Height="30" HorizontalAlignment="Right"
+                                            Clicked="DesiredVersion_DownloadButton_Clicked">
+                            <buttons:BackButton.RenderTransform>
                                 <RotateTransform Angle="270" CenterX="15" CenterY="15"></RotateTransform>
-                            </controls:BackButton.RenderTransform>
-                        </controls:BackButton>
+                            </buttons:BackButton.RenderTransform>
+                        </buttons:BackButton>
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MahApps.Styles.ListViewItem}">
+                    <Setter Property="Background" Value="Transparent"></Setter>
+                </Style>
+            </ListView.ItemContainerStyle>
         </ListView>
         <controls:CircularLoadingWidget Grid.RowSpan="4"
                                         Width="100"

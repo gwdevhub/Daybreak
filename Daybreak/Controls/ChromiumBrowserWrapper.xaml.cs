@@ -2,10 +2,13 @@
 using Daybreak.Models.Browser;
 using Daybreak.Models.Guildwars;
 using Daybreak.Services.BuildTemplates;
+using Daybreak.Services.Options;
 using Daybreak.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Web.WebView2.Core;
+using Microsoft.Web.WebView2.Wpf;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Configuration;
 using System.Core.Extensions;
@@ -14,6 +17,7 @@ using System.Extensions;
 using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -36,8 +40,9 @@ public partial class ChromiumBrowserWrapper : UserControl
     private const string BrowserDownloadLink = "https://developer.microsoft.com/en-us/microsoft-edge/webview2/";
 
     private static readonly Regex WebAddressRegex = new("^((http|ftp|https)://)?([\\w_-]+(?:(?:\\.[\\w_-]+)+))([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?", RegexOptions.Compiled);
+    private static readonly object Lock = new();
 
-    private static CoreWebView2Environment? coreWebView2Environment;
+    private static CoreWebView2Environment? CoreWebView2Environment;    
 
     public event EventHandler<string>? FavoriteUriChanged;
     public event EventHandler? MaximizeClicked;
@@ -46,9 +51,9 @@ public partial class ChromiumBrowserWrapper : UserControl
     public event EventHandler<string>? DownloadedFile;
 
     private readonly Task initializationTask;
-    private readonly ILiveOptions<BrowserOptions>? liveOptions;
-    private readonly ILogger<ChromiumBrowserWrapper>? logger;
-    private readonly IBuildTemplateManager? buildTemplateManager;
+    private readonly ILiveOptions<BrowserOptions> liveOptions;
+    private readonly ILogger<ChromiumBrowserWrapper> logger;
+    private readonly IBuildTemplateManager buildTemplateManager;
     
     [GenerateDependencyProperty(InitialValue = true)]
     private bool canDownloadBuild;
@@ -58,11 +63,11 @@ public partial class ChromiumBrowserWrapper : UserControl
     private bool canDownloadFiles;
     [GenerateDependencyProperty(InitialValue = true)]
     private bool controlsEnabled;
-    [GenerateDependencyProperty(InitialValue = null)]
-    private bool? browserSupported;
+    [GenerateDependencyProperty(InitialValue = false)]
+    private bool browserSupported;
     [GenerateDependencyProperty]
     private bool addressBarReadonly;
-    [GenerateDependencyProperty]
+    [GenerateDependencyProperty(InitialValue = false)]
     private bool browserEnabled;
     [GenerateDependencyProperty]
     private bool navigating;
@@ -76,17 +81,15 @@ public partial class ChromiumBrowserWrapper : UserControl
     private bool favoriteButtonVisible = true;
     [GenerateDependencyProperty]
     private string downloadsDirectory = string.Empty;
+    [GenerateDependencyProperty]
+    private bool showBrowserDisabledMessage;
+
+    private bool browserInitialized = false;
 
     public string Address
     {
         get => this.GetTypedValue<string>(AddressProperty);
-        set
-        {
-            if (this.BrowserSupported is true)
-            {
-                this.SetValue(AddressProperty, value);
-            }
-        }
+        set => this.SetValue(AddressProperty, value);
     }
 
     public ChromiumBrowserWrapper()
@@ -104,15 +107,26 @@ public partial class ChromiumBrowserWrapper : UserControl
         this.liveOptions = liveOptions.ThrowIfNull();
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
-        this.initializationTask = this.InitializeBrowser();
-
+        this.InitializeEnvironment();
         this.InitializeComponent();
+
+        this.initializationTask = Task.Run(this.InitializeBrowserSafe);
     }
 
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);
-        if (e.Property == AddressProperty || e.Property == FavoriteAddressProperty)
+        if (e.Property == AddressProperty)
+        {
+            if (this.BrowserSupported is true &&
+                this.browserInitialized is true &&
+                this.WebBrowser is not null &&
+                Uri.TryCreate(this.Address, UriKind.RelativeOrAbsolute, out var uri))
+            {
+                this.WebBrowser.Source = uri;
+            }
+        }
+        else if (e.Property == FavoriteAddressProperty)
         {
             this.CheckFavoriteAddress();
         }
@@ -120,28 +134,22 @@ public partial class ChromiumBrowserWrapper : UserControl
 
     public async Task ReinitializeBrowser()
     {
-        await this.InitializeBrowser();
+        await this.InitializeBrowserSafe();
     }
 
     public Task InitializationTask() => this.initializationTask;
 
-    private async void UserControl_Initialized(object sender, EventArgs e)
-    {
-        this.InitializeEnvironment();
-        await this.InitializeBrowser();
-    }
-
     private void InitializeEnvironment()
     {
-        if (this.liveOptions!.Value.Enabled is false)
-        {
-            this.BrowserSupported = false;
-            return;
-        }
-
         try
         {
-            coreWebView2Environment ??= System.Extensions.TaskExtensions.RunSync(() => CoreWebView2Environment.CreateAsync(null, "BrowserData", new CoreWebView2EnvironmentOptions
+            if (CoreWebView2Environment is not null)
+            {
+                this.BrowserSupported = true;
+                return;
+            }
+
+            CoreWebView2Environment ??= System.Extensions.TaskExtensions.RunSync(() => CoreWebView2Environment.CreateAsync(null, "BrowserData", new CoreWebView2EnvironmentOptions
             {
                 EnableTrackingPrevention = true,
                 AllowSingleSignOnUsingOSPrimaryAccount = true
@@ -156,73 +164,107 @@ public partial class ChromiumBrowserWrapper : UserControl
         }
     }
 
+    private async Task InitializeBrowserSafe()
+    {
+        await this.Dispatcher.InvokeAsync(async () =>
+        {
+            while (!Monitor.TryEnter(Lock))
+            {
+                await Task.Delay(100);
+            }
+
+            try
+            {
+                this.InitializeEnvironment();
+                await this.InitializeBrowser().ConfigureAwait(true);
+            }
+            finally
+            {
+                Monitor.Exit(Lock);
+            }
+        });
+    }
+
     private async Task InitializeBrowser()
     {
-        if (this.BrowserSupported is true)
+        this.BrowserEnabled = this.liveOptions!.Value.Enabled;
+        this.ShowBrowserDisabledMessage = this.BrowserSupported && !this.BrowserEnabled;
+        if (!this.BrowserSupported ||
+            !this.BrowserEnabled)
         {
-            this.WebBrowser.IsEnabled = true;
-            this.BrowserEnabled = true;
-            await this.WebBrowser.EnsureCoreWebView2Async(coreWebView2Environment);
-            this.AddressBarReadonly = this.liveOptions!.Value.AddressBarReadonly;
-            this.CanDownloadBuild = this.liveOptions.Value.DynamicBuildLoading;
-            this.WebBrowser.CoreWebView2.NewWindowRequested += (browser, args) => args.Handled = true;
-            this.WebBrowser.NavigationStarting += (browser, args) =>
-            {
-                if (this.CanNavigate is false && args.Uri != this.Address)
-                {
-                    args.Cancel = true;
-                }
-                else
-                {
-                    this.Navigating = true;
-                }
-            };
-            this.WebBrowser.CoreWebView2.DownloadStarting += (browser, args) =>
-            {
-                if (this.CanDownloadFiles is false)
-                {
-                    this.logger?.LogInformation("Downloads are disallowed. Cancelling download");
-                    args.Cancel = true;
-                }
-
-                if (this.DownloadsDirectory.IsNullOrWhiteSpace())
-                {
-                    this.logger?.LogInformation("No downloads directory specified. Downloading to default directory");
-                    return;
-                }
-
-                var fileName = Path.GetFileName(args.ResultFilePath);
-                var finalPath = Path.GetFullPath(Path.Combine(this.DownloadsDirectory, fileName));
-                var downloadPayload = new DownloadPayload { ResultingFilePath = finalPath, CanDownload = true };
-                this.DownloadingFile?.Invoke(this, downloadPayload);
-                if (!downloadPayload.CanDownload)
-                {
-                    args.Cancel = true;
-                    this.logger?.LogInformation("Download blocked by handler. Cancelling download");
-                    return;
-                }
-
-                args.ResultFilePath = finalPath;
-
-                args.DownloadOperation.StateChanged += this.DownloadOperation_StateChanged;
-            };
-            this.WebBrowser.NavigationCompleted += (browser, args) => this.Navigating = false;
-            this.WebBrowser.WebMessageReceived += this.CoreWebView2_WebMessageReceived!;
-            this.WebBrowser.CoreWebView2.Settings.AreDevToolsEnabled = false;
-            this.WebBrowser.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
-            if (this.CanDownloadBuild)
-            {
-                await this.WebBrowser.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(Scripts.SendSelectionOnContextMenu);
-            }
+            
+            return;
         }
+
+        this.ShowBrowserDisabledMessage = false;
+        await this.WebBrowser.EnsureCoreWebView2Async(CoreWebView2Environment);
+        if (this.Address is not null &&
+            Uri.TryCreate(this.Address, UriKind.RelativeOrAbsolute, out var uri))
+        {
+            this.WebBrowser.Source = uri;
+        }
+
+        this.WebBrowser.SourceChanged += (_, args) => this.Address = this.WebBrowser.Source.ToString();
+        this.AddressBarReadonly = this.liveOptions!.Value.AddressBarReadonly;
+        this.CanDownloadBuild = this.liveOptions.Value.DynamicBuildLoading;
+        this.WebBrowser.CoreWebView2.NewWindowRequested += (browser, args) => args.Handled = true;
+        this.WebBrowser.NavigationStarting += (browser, args) =>
+        {
+            if (this.CanNavigate is false && args.Uri != this.Address)
+            {
+                args.Cancel = true;
+            }
+            else
+            {
+                this.Navigating = true;
+            }
+        };
+        this.WebBrowser.CoreWebView2.DownloadStarting += (browser, args) =>
+        {
+            if (this.CanDownloadFiles is false)
+            {
+                this.logger?.LogInformation("Downloads are disallowed. Cancelling download");
+                args.Cancel = true;
+            }
+
+            if (this.DownloadsDirectory.IsNullOrWhiteSpace())
+            {
+                this.logger?.LogInformation("No downloads directory specified. Downloading to default directory");
+                return;
+            }
+
+            var fileName = Path.GetFileName(args.ResultFilePath);
+            var finalPath = Path.GetFullPath(Path.Combine(this.DownloadsDirectory, fileName));
+            var downloadPayload = new DownloadPayload { ResultingFilePath = finalPath, CanDownload = true };
+            this.DownloadingFile?.Invoke(this, downloadPayload);
+            if (!downloadPayload.CanDownload)
+            {
+                args.Cancel = true;
+                this.logger?.LogInformation("Download blocked by handler. Cancelling download");
+                return;
+            }
+
+            args.ResultFilePath = finalPath;
+
+            args.DownloadOperation.StateChanged += this.DownloadOperation_StateChanged;
+        };
+        this.WebBrowser.NavigationCompleted += (browser, args) => this.Navigating = false;
+        this.WebBrowser.WebMessageReceived += this.CoreWebView2_WebMessageReceived!;
+        this.WebBrowser.CoreWebView2.Settings.AreDevToolsEnabled = false;
+        this.WebBrowser.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
+        if (this.CanDownloadBuild)
+        {
+            await this.WebBrowser.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(Scripts.SendSelectionOnContextMenu);
+        }
+
+        this.browserInitialized = true;
     }
 
     private async void RetryInitializeButton_Clicked(object sender, EventArgs e)
     {
-        this.InitializeEnvironment();
         try
         {
-            await this.InitializeBrowser();
+            await this.InitializeBrowserSafe();
         }
         catch
         {
@@ -335,6 +377,11 @@ public partial class ChromiumBrowserWrapper : UserControl
         this.BuildDecoded?.Invoke(this, build);
     }
 
+    private async void UserControl_Loaded(object sender, RoutedEventArgs e)
+    {
+        await this.InitializeBrowserSafe();
+    }
+
     private void UserControl_Unloaded(object sender, RoutedEventArgs e)
     {
         if (this.PreventDispose)
@@ -343,6 +390,7 @@ public partial class ChromiumBrowserWrapper : UserControl
         }
 
         this.WebBrowser?.Dispose();
+        this.browserInitialized = false;
     }
 
     private void BackButton_Clicked(object sender, EventArgs e)

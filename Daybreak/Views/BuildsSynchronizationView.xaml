@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Views"
              xmlns:controls="clr-namespace:Daybreak.Controls"
+             xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              xmlns:glyps="clr-namespace:Daybreak.Controls.Glyphs"
              xmlns:converters="clr-namespace:Daybreak.Converters"
              Loaded="UserControl_Loaded"
@@ -17,36 +18,40 @@
         <BooleanToVisibilityConverter x:Key="BaseBooleanToVisibilityConverter"></BooleanToVisibilityConverter>
     </UserControl.Resources>
     <Grid
-        Background="#F0212121">
+        Background="{StaticResource Daybreak.Brushes.Background}">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
-        <controls:BackButton Foreground="White" Height="30" Width="30" Grid.Column="0" HorizontalAlignment="Left" Margin="5"
+        <buttons:BackButton  Height="30" Width="30" Grid.Column="0" HorizontalAlignment="Left" Margin="5"
                              Clicked="BackButton_Clicked" VerticalAlignment="Top"
-                             IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"></controls:BackButton>
-        <controls:OpaqueButton  Text="Log Out"
-                                Foreground="White"
-                                Background="DarkGray"
+                             IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"></buttons:BackButton>
+        <buttons:HighlightButton 
+                                Title="Log Out"
+                                Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                Background="{StaticResource Daybreak.Brushes.Background}"
+                                HighlightColor="{StaticResource MahApps.Brushes.Accent}"
                                 HorizontalAlignment="Right"
-                                Padding="5"
+                                HorizontalContentAlignment="Center"
+                                VerticalContentAlignment="Center"
+                                Width="80"
                                 Margin="5"
                                 Clicked="LogOutButton_Clicked"
-                                Width="80"
+                                Height="30"
                                 IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"/>
         <WrapPanel HorizontalAlignment="Center">
             <TextBlock
                    Text="Build templates synchronization"
                    FontSize="24"
-                   Foreground="White" />
+                   Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" />
             <Grid Margin="5"
                   VerticalAlignment="Center">
-                <glyps:GoodGlyph Foreground="LimeGreen"
+                <glyps:GoodGlyph Foreground="{StaticResource MahApps.Brushes.Accent}"
                                  Width="20"
                                  Height="20"
                                  Visibility="{Binding ElementName=_this, Path=Synchronized, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                <glyps:BadGlyph Foreground="OrangeRed"
+                <glyps:BadGlyph Foreground="{StaticResource MahApps.Brushes.SystemControlErrorTextForeground}"
                                 Width="20"
                                 Height="20"
                                 Visibility="{Binding ElementName=_this, Path=Synchronized, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
@@ -56,10 +61,10 @@
                    Grid.Row="1">
             <TextBlock Text="Logged in as: "
                            FontSize="20"
-                           Foreground="White"></TextBlock>
+                           Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
             <TextBlock Text="{Binding ElementName=_this, Path=DisplayName, Mode=OneWay}"
                            FontSize="20"
-                           Foreground="White"></TextBlock>
+                           Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
         </WrapPanel>
         <Grid Grid.Row="2">
             <Grid.RowDefinitions>
@@ -71,22 +76,30 @@
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0"
+            <Grid Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0"
                        Text="Local"
-                       FontSize="14"
-                       Foreground="White"
+                       FontSize="22"
+                       Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"/>
-            <controls:OpaqueButton  Grid.Column="0"
-                                    Text="Upload all"
-                                    Foreground="White"
-                                    Background="DarkGray"
+                <buttons:HighlightButton Grid.Column="1"
+                                    Title="Upload all"
+                                    Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                    Background="{StaticResource Daybreak.Brushes.Background}"
+                                    HighlightColor="{StaticResource MahApps.Brushes.Accent}"
                                     HorizontalAlignment="Right"
-                                    Padding="5"
-                                    Margin="5"
+                                    VerticalContentAlignment="Center"
+                                    HorizontalContentAlignment="Center"
+                                    Width="150"
+                                    Height="30"
                                     Clicked="UploadAllButton_Clicked"
-                                    Width="80"
                                     IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"/>
+            </Grid>
             <ListView 
                     Grid.Column="0"
                     Grid.Row="1"
@@ -97,37 +110,45 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid>
-                            <Rectangle Fill="LawnGreen"
+                            <Rectangle Fill="{StaticResource MahApps.Brushes.Accent}"
                                        Opacity="0.2"
                                        Visibility="{Binding Changed, Converter={StaticResource BooleanToVisibilityConverter}}"></Rectangle>
                             <TextBlock FontSize="14"
-                                   Foreground="White"
+                                   Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                    Text="{Binding Name}"
                                    HorizontalAlignment="Left"></TextBlock>
                             <TextBlock FontSize="14"
-                                   Foreground="White"
+                                   Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                    Text="{Binding TemplateCode}"
                                    HorizontalAlignment="Right"></TextBlock>
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <TextBlock Grid.Column="2"
+            <Grid Grid.Column="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="1"
                        Text="Remote"
-                       FontSize="14"
-                       Foreground="White"
+                       FontSize="22"
+                       Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"/>
-            <controls:OpaqueButton  Grid.Column="2"
-                                    Text="Download all"
-                                    Foreground="White"
-                                    Background="DarkGray"
+                <buttons:HighlightButton Grid.Column="0"
+                                    Title="Download all"
+                                    Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                    Background="{StaticResource Daybreak.Brushes.Background}"
+                                    HighlightColor="{StaticResource MahApps.Brushes.Accent}"
                                     HorizontalAlignment="Left"
-                                    Padding="5"
-                                    Margin="5"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    Height="30"
+                                    Width="150"
                                     Clicked="DownloadAllButton_Clicked"
-                                    Width="80"
                                     IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"/>
+            </Grid>
             <ListView 
                     Grid.Column="2"
                     Grid.Row="1"
@@ -138,15 +159,15 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid>
-                            <Rectangle Fill="Red"
+                            <Rectangle Fill="{StaticResource MahApps.Brushes.SystemControlErrorTextForeground}"
                                        Visibility="{Binding Changed, Converter={StaticResource BooleanToVisibilityConverter}}"
                                        Opacity="0.2"></Rectangle>
                             <TextBlock FontSize="14"
-                                   Foreground="White"
+                                   Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                    Text="{Binding TemplateCode}"
                                    HorizontalAlignment="Left"></TextBlock>
                             <TextBlock FontSize="14"
-                                   Foreground="White"
+                                   Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                    Text="{Binding Name}"
                                    HorizontalAlignment="Right"></TextBlock>
                         </Grid>
@@ -157,24 +178,34 @@
                         Grid.Column="1"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Center">
-                <controls:OpaqueButton  Text="Download Build"
-                                        Foreground="White"
-                                        Background="DarkGray"
+                <buttons:HighlightButton 
+                                        Title="Download Build"
+                                        Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                        Background="{StaticResource Daybreak.Brushes.Background}"
+                                        HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                        HorizontalContentAlignment="Center"
+                                        VerticalContentAlignment="Center"
                                         Margin="5"
-                                        Padding="5"
+                                        Height="30"
+                                        Width="100"
                                         Clicked="DownloadButton_Clicked"
-                                        IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"></controls:OpaqueButton>
-                <controls:OpaqueButton  Text="Upload Build"
-                                        Foreground="White"
-                                        Background="DarkGray"
+                                        IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"></buttons:HighlightButton>
+                <buttons:HighlightButton    
+                                        Title="Upload Build"
+                                        Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                        Background="{StaticResource Daybreak.Brushes.Background}"
+                                        HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                        HorizontalContentAlignment="Center"
+                                        VerticalContentAlignment="Center"
                                         Margin="5"
-                                        Padding="5"
+                                        Height="30"
+                                        Width="100"
                                         Clicked="UploadButton_Clicked"
-                                        IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"></controls:OpaqueButton>
+                                        IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"></buttons:HighlightButton>
             </StackPanel>
         </Grid>
         <Grid Grid.RowSpan="3"
-              Background="#F0212121"
+              Background="{StaticResource Daybreak.Brushes.Background}"
               Visibility="{Binding ElementName=_this, Path=ShowLoading, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
             <controls:CircularLoadingWidget MaxWidth="100"
                                             MaxHeight="100"/>

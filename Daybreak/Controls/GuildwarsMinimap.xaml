@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Controls"
+             xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              x:Name="_this"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
@@ -67,20 +68,20 @@
     <Grid>
         <Image x:Name="MapDrawingHost" VerticalAlignment="Top" HorizontalAlignment="Left" Stretch="Fill"/>
         <Image x:Name="EntitiesDrawingHost" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
-        <Grid Background="#F0212121"
+        <Grid Background="{DynamicResource Daybreak.Brushes.Background}"
               VerticalAlignment="Bottom"
               HorizontalAlignment="Right"
               Visibility="{Binding ElementName=_this, Path=ControlsVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <local:MaximizeButton Height="30" Width="30" Margin="5"
-                                 Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
-                                 Clicked="MaximizeButton_Clicked"></local:MaximizeButton>
+            <buttons:MaximizeButton Height="30" Width="30" Margin="5"
+                                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                    Clicked="MaximizeButton_Clicked"></buttons:MaximizeButton>
         </Grid>
-        <WrapPanel Background="#F0212121" VerticalAlignment="Top" HorizontalAlignment="Right" >
-            <TextBlock Text="{Binding ElementName=_this, Path=TargetEntityId, Mode=OneWay}" Foreground="White"
+        <WrapPanel Background="{DynamicResource Daybreak.Brushes.Background}" VerticalAlignment="Top" HorizontalAlignment="Right" >
+            <TextBlock Text="{Binding ElementName=_this, Path=TargetEntityId, Mode=OneWay}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                        FontSize="16" Padding="5" ></TextBlock>
-            <TextBlock Text=" - " Foreground="White"
+            <TextBlock Text=" - " Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                        FontSize="16" Padding="5" ></TextBlock>
-            <TextBlock Text="{Binding ElementName=_this, Path=TargetEntityModelId, Mode=OneWay}" Foreground="White"
+            <TextBlock Text="{Binding ElementName=_this, Path=TargetEntityModelId, Mode=OneWay}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                        FontSize="16" Padding="5" ></TextBlock>
         </WrapPanel>
     </Grid>

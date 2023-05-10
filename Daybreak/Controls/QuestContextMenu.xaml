@@ -6,12 +6,12 @@
              xmlns:local="clr-namespace:Daybreak.Controls"
              xmlns:guildwars="clr-namespace:Daybreak.Models.Guildwars"
              mc:Ignorable="d" 
-             Background="#F0212121"
+             Background="{StaticResource Daybreak.Brushes.Background}"
              d:DataContext="{d:DesignInstance Type=guildwars:QuestMetadata, IsDesignTimeCreatable=True}"
              d:DesignHeight="300" d:DesignWidth="100">
     <StackPanel Margin="5, 0, 5, 0">
-        <TextBlock Text="{Binding Quest.Name}" FontSize="16" Foreground="White" TextWrapping="Wrap"></TextBlock>
-        <TextBlock Text="{Binding Quest.WikiUrl}" TextWrapping="Wrap" Foreground="LightBlue" Cursor="Hand"
+        <TextBlock Text="{Binding Quest.Name}" FontSize="16" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" TextWrapping="Wrap"></TextBlock>
+        <TextBlock Text="{Binding Quest.WikiUrl}" TextWrapping="Wrap" Foreground="{StaticResource MahApps.Brushes.Accent}" Cursor="Hand"
                    MouseLeftButtonDown="TextBlock_MouseLeftButtonDown"></TextBlock>
     </StackPanel>
 </UserControl>

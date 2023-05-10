@@ -1,37 +1,40 @@
-﻿<UserControl x:Class="Daybreak.Controls.SynchronizeButton"
+﻿<UserControl x:Class="Daybreak.Controls.Buttons.SynchronizeButton"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Daybreak.Controls"
+             xmlns:local="clr-namespace:Daybreak.Controls.Buttons"
              mc:Ignorable="d"
              x:Name="_this"
              Cursor="Hand"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Viewbox>
-        <Grid>
-            <Ellipse x:Name="BackgroundEllipse" Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" Visibility="Visible" Opacity="0.1" Width="35" Height="35" />
-            <Ellipse Stroke="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" 
-                     StrokeThickness="3"/>
-            <Grid VerticalAlignment="Center"
-                  HorizontalAlignment="Center">
-                <Path Stroke="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
-                      StrokeThickness="1.5"
-                      Data="m19,15.6073c1.4937,-0.5852 3,-1.9184 3,-4.6073c0,-4 -3.3333,-5 -5,-5c0,-2 0,-6 -6,-6c-6,0 -6,4 -6,6c-1.66667,0 -5,1 -5,5c0,2.6889 1.50628,4.0221 3,4.6073" />
-                <Path StrokeThickness="1.5"
-                      Stroke="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
-                      Data="m6,17l1.76777,1.7678c1.56214,1.5621 4.09474,1.5621 5.65684,0l0.3536,-0.3536" />
-                <Path StrokeThickness="1.5"
-                      Stroke="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
-                      Data="m6.35355,19.4749l-0.35355,-2.4749l2.47482,0.3536l-2.12127,2.1213z" />
-                <Path StrokeThickness="1.5"
-                      Stroke="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
-                      Data="m14.77821,14.93927l-1.7678,-1.7677c-1.5621,-1.5621 -4.0948,-1.5621 -5.65685,0l-0.35356,0.3535" />
-                <Path StrokeThickness="1.5"
-                      Stroke="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
-                      Data="m14.1213,12l0.3536,2.4749l-2.4749,-0.3536l2.1213,-2.1213z" />
-            </Grid>
-            <Ellipse Fill="Transparent" MouseEnter="Ellipse_MouseEnter" MouseLeave="Ellipse_MouseLeave" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"></Ellipse>
-        </Grid>
-    </Viewbox>
+    <Grid>
+        <local:CircularButton Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                               Highlight="{StaticResource MahApps.Brushes.Accent}"
+                               Clicked="HighlightButton_Clicked">
+            <local:CircularButton.Content>
+                <Viewbox Stretch="Fill" Width="60" Height="60">
+                    <Grid>
+                        <Grid Width="30" Height="30" Margin="7.5, 7.5, 0, 0">
+                            <Path Stroke="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                StrokeThickness="2"
+                                Data="m19,15.6073c1.4937,-0.5852 3,-1.9184 3,-4.6073c0,-4 -3.3333,-5 -5,-5c0,-2 0,-6 -6,-6c-6,0 -6,4 -6,6c-1.66667,0 -5,1 -5,5c0,2.6889 1.50628,4.0221 3,4.6073" />
+                            <Path StrokeThickness="2"
+                                Stroke="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                Data="m6,17l1.76777,1.7678c1.56214,1.5621 4.09474,1.5621 5.65684,0l0.3536,-0.3536" />
+                            <Path StrokeThickness="2"
+                                Stroke="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                Data="m6.35355,19.4749l-0.35355,-2.4749l2.47482,0.3536l-2.12127,2.1213z" />
+                            <Path StrokeThickness="2"
+                                Stroke="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                Data="m14.77821,14.93927l-1.7678,-1.7677c-1.5621,-1.5621 -4.0948,-1.5621 -5.65685,0l-0.35356,0.3535" />
+                            <Path StrokeThickness="2"
+                                Stroke="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                Data="m14.1213,12l0.3536,2.4749l-2.4749,-0.3536l2.1213,-2.1213z" />
+                        </Grid>
+                    </Grid>
+                </Viewbox>
+            </local:CircularButton.Content>
+        </local:CircularButton>
+    </Grid>
 </UserControl>

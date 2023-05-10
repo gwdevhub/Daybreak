@@ -24,6 +24,7 @@
                     Background="Transparent"
                     Opacity="0.5"
                     IsHitTestVisible="False"
+                    VerticalAlignment="Center"
                     FontSize="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=FontSize, Mode=OneWay}"
                     FontFamily="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=FontFamily, Mode=OneWay}"
                     FontStretch="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=FontStretch, Mode=OneWay}"

@@ -1,25 +1,27 @@
-﻿<UserControl x:Class="Daybreak.Controls.AttributeTemplate"
+﻿<UserControl x:Class="Daybreak.Controls.Templates.AttributeTemplate"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Controls"
+             xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              mc:Ignorable="d"
              x:Name="_this"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+    <Grid Height="30">
         <WrapPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="10, 0, 10, 0">
-            <local:HelpButton Width="20" Height="20" Margin="3, 0, 3, 0" Foreground="White"
-                              Clicked="HelpButton_Clicked" Cursor="Hand"></local:HelpButton>
-            <TextBlock Text="{Binding Attribute.Name}" FontSize="16" Foreground="White"></TextBlock>
+            <buttons:HelpButton Width="20" Height="20" Margin="3, 5, 3, 0" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                Clicked="HelpButton_Clicked" Cursor="Hand"></buttons:HelpButton>
+            <TextBlock Text="{Binding Attribute.Name}" FontSize="16" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                       Margin="0, 3, 0, 0"></TextBlock>
         </WrapPanel>
         <WrapPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="10, 0, 10, 0">
-            <local:MinusButton Foreground="White" Height="20" Clicked="MinusButton_Clicked" Cursor="Hand"
-                               IsEnabled="{Binding ElementName=_this, Path=CanSubtract, Mode=OneWay}"></local:MinusButton>
-            <TextBox Background="Transparent" Foreground="White" FontSize="16" IsReadOnly="True" Width="30"
+            <buttons:MinusButton Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Height="20" Clicked="MinusButton_Clicked" Cursor="Hand"
+                                 IsEnabled="{Binding ElementName=_this, Path=CanSubtract, Mode=OneWay}" Margin="0, 0, 5, 0"></buttons:MinusButton>
+            <TextBox Background="Transparent" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" FontSize="16" IsReadOnly="True" Width="30"
                      Text="{Binding Points}"></TextBox>
-            <local:AddButton Foreground="White" Height="20" Clicked="AddButton_Clicked" Cursor="Hand"
-                             IsEnabled="{Binding ElementName=_this, Path=CanAdd, Mode=OneWay}"></local:AddButton>
+            <buttons:AddButton Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Height="20" Clicked="AddButton_Clicked" Cursor="Hand"
+                               IsEnabled="{Binding ElementName=_this, Path=CanAdd, Mode=OneWay}" Margin="5, 0, 0, 0"></buttons:AddButton>
         </WrapPanel>
     </Grid>
 </UserControl>

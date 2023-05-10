@@ -4,18 +4,43 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Views.Onboarding.UMod"
+             xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              mc:Ignorable="d" 
              xmlns:controls="clr-namespace:Daybreak.Controls"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Background="#F0212121" MinHeight="200" MinWidth="400">
+    <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Background="{StaticResource Daybreak.Brushes.Background}" MinHeight="200" MinWidth="400">
         <StackPanel VerticalAlignment="Center">
-            <TextBlock Text="Do you already have GWToolboxpp installed on your PC?" Margin="10, 0, 10, 0" Foreground="White"
+            <TextBlock Text="Do you already have GWToolboxpp installed on your PC?" Margin="10, 0, 10, 0" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                        TextWrapping="Wrap" HorizontalAlignment="Center" FontSize="16"></TextBlock>
-            <Grid MaxWidth="200">
-                <controls:OpaqueButton Text="No" BackgroundOpacity="0.2" TransparentBackground="Gray" HorizontalAlignment="Right" Margin="10" Width="50" Height="25"
-                                   Clicked="OpaqueButtonNo_Clicked" Foreground="White" FontSize="16" Highlight="White" HighlightOpacity="0.6"></controls:OpaqueButton>
-                <controls:OpaqueButton Text="Yes" BackgroundOpacity="0.2" TransparentBackground="Gray" HorizontalAlignment="Left" Margin="10" Width="50" Height="25"
-                                   Clicked="OpaqueButtonYes_Clicked" Foreground="White" FontSize="16" Highlight="White" HighlightOpacity="0.6"></controls:OpaqueButton>
+            <Grid MaxWidth="600">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <buttons:HighlightButton Title="No"
+                                    Grid.Column="0"
+                                    HorizontalAlignment="Center"
+                                    Height="30"
+                                    Width="60"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    FontSize="16"
+                                    Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                    Background="{StaticResource MahApps.Brushes.ThemeBackground}"
+                                    HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                    Clicked="OpaqueButtonNo_Clicked"></buttons:HighlightButton>
+                <buttons:HighlightButton Title="Yes"
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Center"
+                                    Height="30"
+                                    Width="60"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    FontSize="16"
+                                    Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                    Background="{StaticResource MahApps.Brushes.ThemeBackground}"
+                                    HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                    Clicked="OpaqueButtonYes_Clicked"></buttons:HighlightButton>
             </Grid>
         </StackPanel>
     </Grid>

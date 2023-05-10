@@ -16,11 +16,17 @@
                     HorizontalAlignment="{Binding ElementName=_this, Path=FillAlignment, Mode=OneWay}"
                     Width="{Binding ElementName=_this, Path=MaxResourceValue, Mode=TwoWay}"></Rectangle>
                 <Rectangle
-                Fill="#F0202020"
-                VerticalAlignment="Stretch"
-                HorizontalAlignment="Stretch"></Rectangle>
+                    Fill="{DynamicResource MahApps.Brushes.ThemeBackground}"
+                    VerticalAlignment="Stretch"
+                    HorizontalAlignment="Stretch"></Rectangle>
                 <Rectangle 
                     Fill="{Binding ElementName=_this, Path=BarColor, Mode=OneWay}"
+                    VerticalAlignment="Stretch"
+                    HorizontalAlignment="{Binding ElementName=_this, Path=FillAlignment, Mode=OneWay}"
+                    Width="{Binding ElementName=_this, Path=CurrentResourceValue, Mode=TwoWay}"></Rectangle>
+                <Rectangle 
+                    Fill="{DynamicResource Daybreak.Brushes.Background}"
+                    Opacity="0.6"
                     VerticalAlignment="Stretch"
                     HorizontalAlignment="{Binding ElementName=_this, Path=FillAlignment, Mode=OneWay}"
                     Width="{Binding ElementName=_this, Path=CurrentResourceValue, Mode=TwoWay}"></Rectangle>

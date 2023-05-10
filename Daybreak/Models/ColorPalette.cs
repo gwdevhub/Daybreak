@@ -2,7 +2,7 @@
 using System.Windows.Media;
 
 namespace Daybreak.Models;
-public static class QuestObjectiveColors
+public static class ColorPalette
 {
     public readonly static Color Red = Color.FromArgb(255, 213, 0, 0);
     public readonly static Color Pink = Color.FromArgb(255, 197, 17, 98);

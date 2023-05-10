@@ -1,14 +1,12 @@
-﻿using Daybreak.Models.Guildwars;
+﻿using Daybreak.Controls.Buttons;
+using Daybreak.Models.FocusView;
+using Daybreak.Models.Guildwars;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Extensions;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Shapes;
 
 namespace Daybreak.Controls.Templates;
 
@@ -22,6 +20,9 @@ public partial class QuestLogTemplate : UserControl
 
     [GenerateDependencyProperty]
     private List<QuestMetadata> quests;
+
+    [GenerateDependencyProperty]
+    private IEnumerable<QuestLogEntry> logEntries = default!;
 
     public event EventHandler<Map?>? MapClicked;
     public event EventHandler<Quest?>? QuestClicked;
@@ -56,61 +57,21 @@ public partial class QuestLogTemplate : UserControl
             return;
         }
 
-        this.ItemStackPanel.Children.Clear();
-
+        var logEntries = new List<QuestLogEntry>();
         foreach(var grouping in this.questLogCache)
         {
-            var location = grouping.Key;
-            var locationTextBlock = new OpaqueButton
-            {
-                Text = grouping.Key?.Name ?? UncategorizedQuestsString,
-                FontSize = 18,
-                Cursor = grouping.Key is null ? Cursors.Arrow : Cursors.Hand,
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                TextHorizontalAlignment = HorizontalAlignment.Left,
-                Highlight = Brushes.White,
-                HighlightOpacity = grouping.Key is null ? 0 : 0.6
-            };
-
-            locationTextBlock.MouseLeftButtonDown += (_, _) => this.OnMapClicked(location);
-            this.ItemStackPanel.Children.Add(locationTextBlock);
-            var rectangle = new Rectangle
-            {
-                Height = 1,
-            };
-
-            var rectangleForegroundBinding = new Binding("Foreground")
-            {
-                Source = this
-            };
-
-            rectangle.SetBinding(Rectangle.FillProperty, rectangleForegroundBinding);
-            this.ItemStackPanel.Children.Add(rectangle);
-            foreach (var questMetadata in grouping)
+            var location = grouping.Key?.Name ?? UncategorizedQuestsString;
+            logEntries.Add(new QuestLocationEntry { Title = location, Map = grouping.Key });
+            foreach(var questMetadata in grouping)
             {
                 var quest = questMetadata.Quest;
-                var questTextBlock = new OpaqueButton
-                {
-                    Text = quest?.Name,
-                    FontSize = 20,
-                    Cursor = Cursors.Hand,
-                    Highlight = Brushes.White,
-                    HighlightOpacity = 0.6,
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    TextHorizontalAlignment = HorizontalAlignment.Left
-                };
-
-                questTextBlock.MouseLeftButtonDown += (_, _) => this.OnQuestClicked(quest);
-                this.ItemStackPanel.Children.Add(questTextBlock);
+                logEntries.Add(new QuestEntry { Title = quest?.Name ?? string.Empty, Quest = quest });
             }
 
-            this.ItemStackPanel.Children.Add(new Rectangle
-            {
-                Fill = Brushes.Transparent,
-                Height = 10,
-                HorizontalAlignment = HorizontalAlignment.Stretch
-            });
+            logEntries.Add(new QuestLogSeparator());
         }
+
+        this.LogEntries = logEntries;
     }
 
     private bool DetectQuestLogChange(List<IGrouping<Map?, QuestMetadata>>? newQuestLog)
@@ -158,13 +119,27 @@ public partial class QuestLogTemplate : UserControl
         return false;
     }
 
-    private void OnMapClicked(Map? map)
+    private void LocationButton_Clicked(object sender, EventArgs e)
     {
+        if (sender is not MenuButton menuButton ||
+            menuButton.DataContext is not QuestLocationEntry questLocationEntry ||
+            questLocationEntry.Map is not Map map)
+        {
+            return;
+        }
+
         this.MapClicked?.Invoke(this, map);
     }
 
-    private void OnQuestClicked(Quest? quest)
+    private void QuestButton_Clicked(object sender, EventArgs e)
     {
+        if (sender is not MenuButton menuButton ||
+            menuButton.DataContext is not QuestEntry questEntry ||
+            questEntry.Quest is not Quest quest)
+        {
+            return;
+        }
+
         this.QuestClicked?.Invoke(this, quest);
     }
 }

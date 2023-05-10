@@ -11,7 +11,9 @@
     <Grid>
         <controls:ChromiumBrowserWrapper AddressBarReadonly="True"
                                          ControlsEnabled="False"
+                                         Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                          Address="{Binding ElementName=_this, Path=DataContext, Mode=OneWay}"
+                                         HomeButtonVisible="True"
                                          CanNavigate="True"
                                          CanDownloadFiles="True"
                                          DownloadsDirectory="uMod/Mods"

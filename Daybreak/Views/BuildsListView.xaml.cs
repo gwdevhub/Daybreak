@@ -45,11 +45,6 @@ public partial class BuildsListView : UserControl
         this.Loading = false;
     }
 
-    private void ListView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
-    {
-        this.viewManager.ShowView<BuildTemplateView>(sender.As<ListView>().SelectedItem);
-    }
-
     private void AddButton_Clicked(object sender, EventArgs e)
     {
         var build = this.buildTemplateManager.CreateBuild();
@@ -72,5 +67,10 @@ public partial class BuildsListView : UserControl
     private void SynchronizeButton_Clicked(object sender, EventArgs e)
     {
         this.viewManager.ShowView<BuildsSynchronizationView>();
+    }
+
+    private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        this.viewManager.ShowView<BuildTemplateView>(sender.As<ListView>().SelectedItem);
     }
 }

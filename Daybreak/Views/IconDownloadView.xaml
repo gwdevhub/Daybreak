@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Views"
              xmlns:controls="clr-namespace:Daybreak.Controls"
+             xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              mc:Ignorable="d"
              x:Name="_this"
              Loaded="IconDownloadView_Loaded"
@@ -12,14 +13,23 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
     </UserControl.Resources>
-    <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Background="#F0212121" MinHeight="200" MinWidth="400">
+    <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Background="{StaticResource Daybreak.Brushes.Background}" MinHeight="200" MinWidth="400">
         <StackPanel VerticalAlignment="Center">
-            <TextBlock Text="{Binding ElementName=_this, Path=Description, Mode=OneWay}" Margin="10, 0, 10, 0" Foreground="White"
+            <TextBlock Text="{Binding ElementName=_this, Path=Description, Mode=OneWay}" Margin="10, 0, 10, 0" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                        TextWrapping="Wrap" HorizontalAlignment="Center" FontSize="16"></TextBlock>
             <ProgressBar Minimum="0" Maximum="100" Value="{Binding ElementName=_this, Path=ProgressValue, Mode=OneWay}" Width="300" Height="20"></ProgressBar>
-            <controls:OpaqueButton Text="Continue" BackgroundOpacity="0.2" TransparentBackground="Gray" HorizontalAlignment="Center" Margin="10" Width="80" Height="25"
-                                   Clicked="OpaqueButton_Clicked" Foreground="White" Highlight="White" HighlightOpacity="0.6" FontSize="16"
-                                   Cursor="Hand"></controls:OpaqueButton>
+            <buttons:HighlightButton
+                                   Title="Continue"
+                                   Background="{StaticResource MahApps.Brushes.ThemeBackground}"
+                                   HorizontalAlignment="Center" 
+                                   Margin="10" Width="80" Height="25"
+                                   HorizontalContentAlignment="Center"
+                                   VerticalContentAlignment="Center"
+                                   Clicked="OpaqueButton_Clicked"
+                                   Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                   HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                   FontSize="16"
+                                   Cursor="Hand"></buttons:HighlightButton>
         </StackPanel>
     </Grid>
 </UserControl>

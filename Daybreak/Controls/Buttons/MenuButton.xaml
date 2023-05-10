@@ -24,7 +24,9 @@
             Opacity="{Binding ElementName=_this, Path=Highlighted, Converter={StaticResource HighlightConverter}}"
             Grid.ColumnSpan="2">
         </Rectangle>
-        <ContentPresenter Margin="5" 
+        <ContentPresenter Margin="5"
+                          HorizontalAlignment="{Binding ElementName=_this, Path=HorizontalContentAlignment, Mode=OneWay}"
+                          VerticalAlignment="{Binding ElementName=_this, Path=VerticalContentAlignment, Mode=OneWay}"
                           Content="{Binding ElementName=_this, Path=InnerContent, Mode=OneWay}" />
         <TextBlock Grid.Column="1" 
                    Text="{Binding ElementName=_this, Path=Title, Mode=OneWay}" 

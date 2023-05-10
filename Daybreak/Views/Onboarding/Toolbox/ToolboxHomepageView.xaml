@@ -11,6 +11,7 @@
         <controls:ChromiumBrowserWrapper AddressBarReadonly="True"
                                          ControlsEnabled="False"
                                          Address="https://www.gwtoolbox.com/"
-                                         CanNavigate="True"></controls:ChromiumBrowserWrapper>
+                                         CanNavigate="True"
+                                         Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></controls:ChromiumBrowserWrapper>
     </Grid>
 </UserControl>

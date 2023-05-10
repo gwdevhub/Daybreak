@@ -126,7 +126,8 @@ public sealed class IconBrowser : IIconBrowser
             var potentialBase64 = iconPayload.SkillImage!.Split(',').Skip(1).FirstOrDefault();
             if (potentialBase64 == IconCache.FaultyBase64 ||
                 potentialBase64 == IconCache.LargeFaultyBase64 ||
-                potentialBase64 == IconCache.FaultyBase64V2)
+                potentialBase64 == IconCache.FaultyBase64V2 ||
+                potentialBase64 == IconCache.FaultyBase64V3)
             {
                 logger.LogInformation("Faulty base64 retrieved");
                 await Task.Delay(1000);

@@ -76,6 +76,15 @@ public sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptions
         hooks.Add(action);
     }
 
+    public void UnregisterHook<TOptionsType>(Action action)
+        where TOptionsType : class
+    {
+        if (this.optionsUpdateHooks.TryGetValue(typeof(TOptionsType), out var hooks))
+        {
+            hooks?.Remove(action);
+        }
+    }
+
     public void UpdateOptions<T>(T value)
         where T : class
     {

@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Views.Onboarding.UMod"
              xmlns:controls="clr-namespace:Daybreak.Controls"
+             xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              xmlns:converters="clr-namespace:Daybreak.Converters"
              x:Name="_this"
              mc:Ignorable="d" 
@@ -13,42 +14,66 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
         <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" TriggerValue="True"></converters:BooleanToVisibilityConverter>
     </UserControl.Resources>
-    <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Background="#F0212121" MinHeight="200" MinWidth="400">
+    <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Background="{StaticResource Daybreak.Brushes.Background}" MinHeight="200" MinWidth="400">
         <StackPanel VerticalAlignment="Center">
             <WrapPanel Margin="10, 0, 10, 10" HorizontalAlignment="Center">
-                <TextBlock Text="Homepage: " Foreground="White"
+                <TextBlock Text="Homepage: " Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                            TextWrapping="Wrap" FontSize="16" HorizontalAlignment="Center"></TextBlock>
-                <TextBlock Text="gwtoolbox" Foreground="CornflowerBlue" Cursor="Hand"
+                <TextBlock Text="gwtoolbox" Foreground="{StaticResource MahApps.Brushes.Accent}" Cursor="Hand"
                            TextWrapping="Wrap" FontSize="16" HorizontalAlignment="Center"
                            MouseLeftButtonDown="Wiki_MouseLeftButtonDown"></TextBlock>
             </WrapPanel>
             <WrapPanel Margin="10, 0, 10, 0">
-                <TextBlock Text="GWToolbox is currently " Foreground="White"
+                <TextBlock Text="GWToolbox is currently " Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                        TextWrapping="Wrap" FontSize="16" HorizontalAlignment="Center"
                        Visibility="{Binding ElementName=_this, Path=ToolboxEnabled, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"></TextBlock>
-                <TextBlock Text="enabled" Foreground="LightGreen"
+                <TextBlock Text="enabled" Foreground="{StaticResource MahApps.Brushes.Accent}"
                        TextWrapping="Wrap" FontSize="16" HorizontalAlignment="Center"
                        Visibility="{Binding ElementName=_this, Path=ToolboxEnabled, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"></TextBlock>
-                <TextBlock Text=". Do you want to disable it?" Foreground="White"
+                <TextBlock Text=". Do you want to disable it?" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                        TextWrapping="Wrap" FontSize="16" HorizontalAlignment="Center"
                        Visibility="{Binding ElementName=_this, Path=ToolboxEnabled, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"></TextBlock>
             </WrapPanel>
             <WrapPanel Margin="10, 0, 10, 0">
-                <TextBlock Text="GWToolbox is currently " Foreground="White"
+                <TextBlock Text="GWToolbox is currently " Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                        TextWrapping="Wrap" FontSize="16" HorizontalAlignment="Center"
                        Visibility="{Binding ElementName=_this, Path=ToolboxEnabled, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"></TextBlock>
-                <TextBlock Text="disabled" Foreground="PaleVioletRed"
+                <TextBlock Text="disabled" Foreground="{StaticResource MahApps.Brushes.SystemControlErrorTextForeground}"
                        TextWrapping="Wrap" FontSize="16" HorizontalAlignment="Center"
                        Visibility="{Binding ElementName=_this, Path=ToolboxEnabled, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"></TextBlock>
-                <TextBlock Text=". Do you want to enable it?" Foreground="White"
+                <TextBlock Text=". Do you want to enable it?" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                        TextWrapping="Wrap" FontSize="16" HorizontalAlignment="Center"
                        Visibility="{Binding ElementName=_this, Path=ToolboxEnabled, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"></TextBlock>
             </WrapPanel>
-            <Grid MaxWidth="200">
-                <controls:OpaqueButton Text="No" BackgroundOpacity="0.2" TransparentBackground="Gray" HorizontalAlignment="Right" Margin="10" Width="50" Height="25"
-                                   Clicked="OpaqueButtonNo_Clicked" Foreground="White" FontSize="16" Highlight="White" HighlightOpacity="0.6" Cursor="Hand"></controls:OpaqueButton>
-                <controls:OpaqueButton Text="Yes" BackgroundOpacity="0.2" TransparentBackground="Gray" HorizontalAlignment="Left" Margin="10" Width="50" Height="25"
-                                   Clicked="OpaqueButtonYes_Clicked" Foreground="White" FontSize="16" Highlight="White" HighlightOpacity="0.6" Cursor="Hand"></controls:OpaqueButton>
+            <Grid MaxWidth="600">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <buttons:HighlightButton Title="No"
+                                    Grid.Column="0"
+                                    HorizontalAlignment="Center"
+                                    Height="30"
+                                    Width="60"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    FontSize="16"
+                                    Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                    Background="{StaticResource MahApps.Brushes.ThemeBackground}"
+                                    HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                    Clicked="OpaqueButtonNo_Clicked"></buttons:HighlightButton>
+                <buttons:HighlightButton Title="Yes"
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Center"
+                                    Height="30"
+                                    Width="60"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    FontSize="16"
+                                    Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                    Background="{StaticResource MahApps.Brushes.ThemeBackground}"
+                                    HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                    Clicked="OpaqueButtonYes_Clicked"></buttons:HighlightButton>
             </Grid>
         </StackPanel>
     </Grid>

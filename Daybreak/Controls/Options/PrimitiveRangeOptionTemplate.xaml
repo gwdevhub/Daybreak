@@ -17,7 +17,7 @@
                 Maximum="{Binding ElementName=_this, Path=MaxValue, Mode=OneWay}"
                 Value="{Binding ElementName=_this, Path=Value, Mode=TwoWay}" />
         <TextBlock FontSize="16"
-                   Foreground="White"
+                   Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                    Grid.Column="1"
                    Text="{Binding ElementName=_this, Path=Value, Mode=OneWay, StringFormat={}{0:#,#;-#,#;-}}"></TextBlock>
     </Grid>

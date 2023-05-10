@@ -376,7 +376,7 @@
     <Viewbox>
         <Canvas x:Name="LayoutRoot" VerticalAlignment="Top" Height="88" Width="88">
             <Grid Width="10.734" Height="10.004" Canvas.Left="38.614" Canvas.Top="0.331">
-                <Rectangle Fill="White" x:Name="block" RenderTransformOrigin="0.5,4.3689" OpacityMask="#00000000" VerticalAlignment="Top" Height="10.004">
+                <Rectangle Fill="{StaticResource MahApps.Brushes.ThemeForeground}" x:Name="block" RenderTransformOrigin="0.5,4.3689" OpacityMask="#00000000" VerticalAlignment="Top" Height="10.004">
                     <Rectangle.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform/>
@@ -386,7 +386,7 @@
                         </TransformGroup>
                     </Rectangle.RenderTransform>
                 </Rectangle>
-                <Rectangle x:Name="block1" Fill="White" RenderTransformOrigin="0.5,4.3689" OpacityMask="#0C000000" VerticalAlignment="Top" Height="10.004">
+                <Rectangle x:Name="block1" Fill="{StaticResource MahApps.Brushes.ThemeForeground}" RenderTransformOrigin="0.5,4.3689" OpacityMask="#0C000000" VerticalAlignment="Top" Height="10.004">
                     <Rectangle.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform ScaleX="0.99999999999999989" ScaleY="0.99999999999999989"/>
@@ -396,7 +396,7 @@
                         </TransformGroup>
                     </Rectangle.RenderTransform>
                 </Rectangle>
-                <Rectangle x:Name="block2" Fill="White" RenderTransformOrigin="0.5,4.3689" OpacityMask="#19000000" VerticalAlignment="Top" Height="10.004">
+                <Rectangle x:Name="block2" Fill="{StaticResource MahApps.Brushes.ThemeForeground}" RenderTransformOrigin="0.5,4.3689" OpacityMask="#19000000" VerticalAlignment="Top" Height="10.004">
                     <Rectangle.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform/>
@@ -406,7 +406,7 @@
                         </TransformGroup>
                     </Rectangle.RenderTransform>
                 </Rectangle>
-                <Rectangle x:Name="block3" Fill="White" RenderTransformOrigin="0.5,4.3689" OpacityMask="#26000000" VerticalAlignment="Top" Height="10.004">
+                <Rectangle x:Name="block3" Fill="{StaticResource MahApps.Brushes.ThemeForeground}" RenderTransformOrigin="0.5,4.3689" OpacityMask="#26000000" VerticalAlignment="Top" Height="10.004">
                     <Rectangle.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform ScaleX="0.99999999999999989" ScaleY="0.99999999999999989"/>
@@ -416,7 +416,7 @@
                         </TransformGroup>
                     </Rectangle.RenderTransform>
                 </Rectangle>
-                <Rectangle x:Name="block4" Fill="White" RenderTransformOrigin="0.5,4.3689" OpacityMask="#3D000000" VerticalAlignment="Top" Height="10.004">
+                <Rectangle x:Name="block4" Fill="{StaticResource MahApps.Brushes.ThemeForeground}" RenderTransformOrigin="0.5,4.3689" OpacityMask="#3D000000" VerticalAlignment="Top" Height="10.004">
                     <Rectangle.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform ScaleX="0.99999999999999989" ScaleY="0.99999999999999989"/>
@@ -426,7 +426,7 @@
                         </TransformGroup>
                     </Rectangle.RenderTransform>
                 </Rectangle>
-                <Rectangle x:Name="block5" Fill="White" RenderTransformOrigin="0.5,4.3689" OpacityMask="#56000000" VerticalAlignment="Top" Height="10.004">
+                <Rectangle x:Name="block5" Fill="{StaticResource MahApps.Brushes.ThemeForeground}" RenderTransformOrigin="0.5,4.3689" OpacityMask="#56000000" VerticalAlignment="Top" Height="10.004">
                     <Rectangle.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform ScaleX="0.99999999999999989" ScaleY="0.99999999999999989"/>
@@ -436,7 +436,7 @@
                         </TransformGroup>
                     </Rectangle.RenderTransform>
                 </Rectangle>
-                <Rectangle x:Name="block6" Fill="White" RenderTransformOrigin="0.5,4.3689" OpacityMask="#64000000" VerticalAlignment="Top" Height="10.004">
+                <Rectangle x:Name="block6" Fill="{StaticResource MahApps.Brushes.ThemeForeground}" RenderTransformOrigin="0.5,4.3689" OpacityMask="#64000000" VerticalAlignment="Top" Height="10.004">
                     <Rectangle.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform/>
@@ -446,7 +446,7 @@
                         </TransformGroup>
                     </Rectangle.RenderTransform>
                 </Rectangle>
-                <Rectangle x:Name="block7" Fill="White" RenderTransformOrigin="0.5,4.3689" OpacityMask="#72000000" VerticalAlignment="Top" Height="10.004">
+                <Rectangle x:Name="block7" Fill="{StaticResource MahApps.Brushes.ThemeForeground}" RenderTransformOrigin="0.5,4.3689" OpacityMask="#72000000" VerticalAlignment="Top" Height="10.004">
                     <Rectangle.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform ScaleX="0.99999999999999989" ScaleY="0.99999999999999989"/>
@@ -456,7 +456,7 @@
                         </TransformGroup>
                     </Rectangle.RenderTransform>
                 </Rectangle>
-                <Rectangle x:Name="block8" Fill="White" RenderTransformOrigin="0.5,4.3689" OpacityMask="#80000000" VerticalAlignment="Top" Height="10.004">
+                <Rectangle x:Name="block8" Fill="{StaticResource MahApps.Brushes.ThemeForeground}" RenderTransformOrigin="0.5,4.3689" OpacityMask="#80000000" VerticalAlignment="Top" Height="10.004">
                     <Rectangle.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform/>
@@ -466,8 +466,8 @@
                         </TransformGroup>
                     </Rectangle.RenderTransform>
                 </Rectangle>
-                <Rectangle x:Name="block9" Fill="White" OpacityMask="#8E000000" RenderTransformOrigin="0.5,4.3689" VerticalAlignment="Top" Height="10.004"/>
-                <Rectangle x:Name="block10" Fill="White" RenderTransformOrigin="0.5,4.3689" OpacityMask="#9C000000" VerticalAlignment="Top" Height="10.004">
+                <Rectangle x:Name="block9" Fill="{StaticResource MahApps.Brushes.ThemeForeground}" OpacityMask="#8E000000" RenderTransformOrigin="0.5,4.3689" VerticalAlignment="Top" Height="10.004"/>
+                <Rectangle x:Name="block10" Fill="{StaticResource MahApps.Brushes.ThemeForeground}" RenderTransformOrigin="0.5,4.3689" OpacityMask="#9C000000" VerticalAlignment="Top" Height="10.004">
                     <Rectangle.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform/>
@@ -477,7 +477,7 @@
                         </TransformGroup>
                     </Rectangle.RenderTransform>
                 </Rectangle>
-                <Rectangle x:Name="block11" Fill="White" RenderTransformOrigin="0.5,4.3689" OpacityMask="#AA000000" VerticalAlignment="Top" Height="10.004">
+                <Rectangle x:Name="block11" Fill="{StaticResource MahApps.Brushes.ThemeForeground}" RenderTransformOrigin="0.5,4.3689" OpacityMask="#AA000000" VerticalAlignment="Top" Height="10.004">
                     <Rectangle.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform ScaleX="0.99999999999999989" ScaleY="0.99999999999999989"/>
@@ -487,7 +487,7 @@
                         </TransformGroup>
                     </Rectangle.RenderTransform>
                 </Rectangle>
-                <Rectangle x:Name="block12" Fill="White" RenderTransformOrigin="0.5,4.3689" OpacityMask="#B8000000" VerticalAlignment="Top" Height="10.004">
+                <Rectangle x:Name="block12" Fill="{StaticResource MahApps.Brushes.ThemeForeground}" RenderTransformOrigin="0.5,4.3689" OpacityMask="#B8000000" VerticalAlignment="Top" Height="10.004">
                     <Rectangle.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform/>
@@ -497,7 +497,7 @@
                         </TransformGroup>
                     </Rectangle.RenderTransform>
                 </Rectangle>
-                <Rectangle x:Name="block13" Fill="White" RenderTransformOrigin="0.5,4.3689" OpacityMask="#C6000000" VerticalAlignment="Top" Height="10.004">
+                <Rectangle x:Name="block13" Fill="{StaticResource MahApps.Brushes.ThemeForeground}" RenderTransformOrigin="0.5,4.3689" OpacityMask="#C6000000" VerticalAlignment="Top" Height="10.004">
                     <Rectangle.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform ScaleX="0.99999999999999989" ScaleY="0.99999999999999989"/>
@@ -507,7 +507,7 @@
                         </TransformGroup>
                     </Rectangle.RenderTransform>
                 </Rectangle>
-                <Rectangle x:Name="block14" Fill="White" RenderTransformOrigin="0.5,4.3689" OpacityMask="#D4000000" VerticalAlignment="Top" Height="10.004">
+                <Rectangle x:Name="block14" Fill="{StaticResource MahApps.Brushes.ThemeForeground}" RenderTransformOrigin="0.5,4.3689" OpacityMask="#D4000000" VerticalAlignment="Top" Height="10.004">
                     <Rectangle.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform ScaleX="0.99999999999999989" ScaleY="0.99999999999999989"/>
@@ -517,7 +517,7 @@
                         </TransformGroup>
                     </Rectangle.RenderTransform>
                 </Rectangle>
-                <Rectangle x:Name="block15" Fill="White" RenderTransformOrigin="0.5,4.3689" OpacityMask="#E2000000" VerticalAlignment="Top" Height="10.004">
+                <Rectangle x:Name="block15" Fill="{StaticResource MahApps.Brushes.ThemeForeground}" RenderTransformOrigin="0.5,4.3689" OpacityMask="#E2000000" VerticalAlignment="Top" Height="10.004">
                     <Rectangle.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform ScaleX="0.99999999999999989" ScaleY="0.99999999999999989"/>
@@ -527,7 +527,7 @@
                         </TransformGroup>
                     </Rectangle.RenderTransform>
                 </Rectangle>
-                <Rectangle x:Name="block16" Fill="White" RenderTransformOrigin="0.5,4.3689" OpacityMask="#F0000000" VerticalAlignment="Top" Height="10.004">
+                <Rectangle x:Name="block16" Fill="{StaticResource MahApps.Brushes.ThemeForeground}" RenderTransformOrigin="0.5,4.3689" OpacityMask="#F0000000" VerticalAlignment="Top" Height="10.004">
                     <Rectangle.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform/>
@@ -537,7 +537,7 @@
                         </TransformGroup>
                     </Rectangle.RenderTransform>
                 </Rectangle>
-                <Rectangle x:Name="block17" Fill="White" RenderTransformOrigin="0.5,4.3689" OpacityMask="Black" VerticalAlignment="Top" Height="10.004">
+                <Rectangle x:Name="block17" Fill="{StaticResource MahApps.Brushes.ThemeForeground}" RenderTransformOrigin="0.5,4.3689" OpacityMask="Black" VerticalAlignment="Top" Height="10.004">
                     <Rectangle.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform ScaleX="0.99999999999999989" ScaleY="0.99999999999999989"/>

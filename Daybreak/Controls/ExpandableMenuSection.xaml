@@ -17,10 +17,10 @@
                     HorizontalAlignment="Stretch">
             <buttons:MenuButton 
                        Cursor="Hand"
-                       HighlightColor="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                       Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                       HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
                        Title="{Binding ElementName=_this, Path=SectionTitle, Mode=OneWay}"
                        FontSize="{Binding ElementName=_this, Path=FontSize, Mode=OneWay}"
-                       Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
                        Clicked="MenuButton_Clicked"
                        IsEnabled="{Binding ElementName=_this, Path=ExpanderButtonEnabled, Mode=OneWay}"
                        Height="30"></buttons:MenuButton>
