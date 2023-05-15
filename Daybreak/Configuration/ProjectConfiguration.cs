@@ -236,6 +236,8 @@ public static class ProjectConfiguration
         drawingModuleProducer.RegisterDrawingModule<AreaMapDrawingModule>();
         drawingModuleProducer.RegisterDrawingModule<DungeonBossDrawingModule>();
         drawingModuleProducer.RegisterDrawingModule<DungeonKeyDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<FlagDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<PersonDrawingModule>();
 
         drawingModuleProducer.RegisterDrawingModule<PathfindingDrawingModule>();
         drawingModuleProducer.RegisterDrawingModule<PlayerPositionHistoryDrawingModule>();
