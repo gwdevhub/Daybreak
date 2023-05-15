@@ -114,6 +114,9 @@
                   VerticalAlignment="Stretch"
                   HorizontalAlignment="Left"
                   Background="{DynamicResource Daybreak.Brushes.Background}">
+            <Border 
+                BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                BorderThickness="0, 0, 1, 0"/>
             <controls:MenuList Margin="0, 30, 0, 0"/>
         </Grid>
         <ToggleButton x:Name="OpeningSettingsButton"
@@ -137,14 +140,5 @@
                       Background="#F09E9E9E"
                       Visibility="{Binding ElementName=_this, Path=IsShowingDropdown, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
                       Click="SettingsButton_Clicked"></ToggleButton>
-        <controls:ChromiumBrowserWrapper x:Name="BackgroundWebView"
-                                         VerticalAlignment="Center"
-                                         HorizontalAlignment="Center"
-                                         Visibility="Visible"
-                                         ControlsEnabled="False"
-                                         CanNavigate="True"
-                                         CanDownloadBuild="False"
-                                         Grid.Row="1"
-                                         Grid.Column="1"></controls:ChromiumBrowserWrapper>
     </Grid>
 </mah:MetroWindow>

@@ -18,13 +18,14 @@
         <buttons:HighlightButton 
                             Title="Launch Guild Wars"
                             HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                            Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                            HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
-                            Background="{DynamicResource Daybreak.Brushes.Background}"
-                            FontSize="36" Width="350" Height="60"
+                            Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                            HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                            Background="{StaticResource Daybreak.Brushes.Background}"
+                            FontSize="36" Width="450" Height="150"
+                            BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                            BorderThickness="1"
                             IsEnabled="{Binding ElementName=_this, Path=LaunchButtonEnabled, Mode=OneWay}"
                             Clicked="LaunchButton_Clicked" Grid.Row="0" Grid.ColumnSpan="3"
-                            Cursor="Hand"
-                            Visibility="{Binding ElementName=_this, Path=ButtonsVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibility}}"></buttons:HighlightButton>
+                            Cursor="Hand"></buttons:HighlightButton>
     </Grid>
 </UserControl>

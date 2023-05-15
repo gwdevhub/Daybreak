@@ -23,12 +23,14 @@
                    Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
                    VerticalAlignment="{Binding ElementName=_this, Path=VerticalContentAlignment, Mode=OneWay}"
                    HorizontalAlignment="{Binding ElementName=_this, Path=HorizontalContentAlignment, Mode=OneWay}"
-                   TextWrapping="Wrap"
-                   TextAlignment="Center" />
+                   TextWrapping="{Binding ElementName=_this, Path=TextWrapping, Mode=OneWay}"
+                   TextAlignment="{Binding ElementName=_this, Path=TextAlignment, Mode=OneWay}"
+                   Padding="{Binding ElementName=_this, Path=TextPadding, Mode=OneWay}"/>
+        <ContentPresenter 
+            Content="{Binding ElementName=_this, Path=ButtonContent, Mode=OneWay}"/>
         <Rectangle Fill="Transparent"
                    MouseEnter="Grid_MouseEnter" 
                    MouseLeave="Grid_MouseLeave"
-                   MouseLeftButtonDown="Rectangle_MouseLeftButtonDown"
-                   Grid.ColumnSpan="2" />
+                   MouseLeftButtonDown="Rectangle_MouseLeftButtonDown" />
     </Grid>
 </UserControl>

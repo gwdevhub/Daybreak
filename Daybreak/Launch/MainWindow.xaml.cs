@@ -37,7 +37,6 @@ public partial class MainWindow : MetroWindow
     private readonly IBloogumClient bloogumClient;
     private readonly IApplicationUpdater applicationUpdater;
     private readonly IPrivilegeManager privilegeManager;
-    private readonly IIconDownloader iconDownloader;
     private readonly ILiveOptions<LauncherOptions> launcherOptions;
     private readonly CancellationTokenSource cancellationToken = new();
 
@@ -59,7 +58,6 @@ public partial class MainWindow : MetroWindow
         IBloogumClient bloogumClient,
         IApplicationUpdater applicationUpdater,
         IPrivilegeManager privilegeManager,
-        IIconDownloader iconDownloader,
         ILiveOptions<LauncherOptions> launcherOptions)
     {
         this.menuServiceInitializer = menuServiceInitializer.ThrowIfNull();
@@ -68,7 +66,6 @@ public partial class MainWindow : MetroWindow
         this.bloogumClient = bloogumClient.ThrowIfNull();
         this.applicationUpdater = applicationUpdater.ThrowIfNull();
         this.privilegeManager = privilegeManager.ThrowIfNull();
-        this.iconDownloader = iconDownloader.ThrowIfNull();
         this.launcherOptions = launcherOptions.ThrowIfNull();
         this.InitializeComponent();
         this.CurrentVersionText = this.applicationUpdater.CurrentVersion.ToString();
@@ -97,7 +94,6 @@ public partial class MainWindow : MetroWindow
     {
         this.SetupImageCycle();
         this.CheckForUpdates();
-        this.SetupBackgroundBrowser();
     }
 
     private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -109,11 +105,6 @@ public partial class MainWindow : MetroWindow
         }
 
         this.DragMove();
-    }
-
-    private void SetupBackgroundBrowser()
-    {
-        this.iconDownloader.SetBrowser(this.BackgroundWebView);
     }
 
     private void SetupImageCycle()

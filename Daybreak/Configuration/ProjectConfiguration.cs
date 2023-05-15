@@ -50,6 +50,10 @@ using Daybreak.Services.Toolbox;
 using Daybreak.Views.Onboarding.UMod;
 using Daybreak.Views.Onboarding.Toolbox;
 using Daybreak.Services.Themes;
+using Daybreak.Services.TradeChat;
+using Daybreak.Views.Trade;
+using System.Net.WebSockets;
+using Daybreak.Utils;
 
 namespace Daybreak.Configuration;
 
@@ -63,37 +67,34 @@ public static class ProjectConfiguration
 
         serviceManager.RegisterOptionsManager<OptionsManager>();
         serviceManager.RegisterResolver(new LoggerResolver());
+        serviceManager.RegisterResolver(new ClientWebSocketResolver());
         serviceManager
             .RegisterHttpClient<ApplicationUpdater>()
-                .WithMessageHandler(sp =>
-                {
-                    var logger = sp.GetService<ILogger<ApplicationUpdater>>();
-                    return new LoggingHttpMessageHandler(logger!) { InnerHandler = new HttpClientHandler() };
-                })
+                .WithMessageHandler(SetupLoggingAndMetrics<ApplicationUpdater>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<BloogumClient>()
-                .WithMessageHandler(sp =>
-                {
-                    var logger = sp.GetService<ILogger<BloogumClient>>();
-                    return new LoggingHttpMessageHandler(logger!) { InnerHandler = new HttpClientHandler() };
-                })
+                .WithMessageHandler(SetupLoggingAndMetrics<BloogumClient>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<GraphClient>()
-                .WithMessageHandler(sp =>
-                {
-                    var logger = sp.GetService<ILogger<GraphClient>>();
-                    return new LoggingHttpMessageHandler(logger!) { InnerHandler = new HttpClientHandler() };
-                })
+                .WithMessageHandler(SetupLoggingAndMetrics<GraphClient>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<DownloadService>()
-                .WithMessageHandler(sp =>
-                {
-                    var logger = sp.GetService<ILogger<GraphClient>>();
-                    return new LoggingHttpMessageHandler(logger!) { InnerHandler = new HttpClientHandler() };
-                })
+                .WithMessageHandler(SetupLoggingAndMetrics<DownloadService>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
+                .Build()
+            .RegisterHttpClient<TradeChatService<KamadanTradeChatOptions>>()
+                .WithMessageHandler(SetupLoggingAndMetrics<TradeChatService<KamadanTradeChatOptions>>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
+                .Build()
+            .RegisterHttpClient<TradeChatService<AscalonTradeChatOptions>>()
+                .WithMessageHandler(SetupLoggingAndMetrics<TradeChatService<AscalonTradeChatOptions>>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
+                .Build()
+            .RegisterHttpClient<IconCache>()
+                .WithMessageHandler(SetupLoggingAndMetrics<IconCache>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build();
     }
@@ -131,8 +132,6 @@ public static class ProjectConfiguration
         services.AddSingleton<ILiteDatabase, LiteDatabase>(sp => new LiteDatabase("Daybreak.db"));
         services.AddSingleton<IMutexHandler, MutexHandler>();
         services.AddSingleton<IShortcutManager, ShortcutManager>();
-        services.AddSingleton<IIconBrowser, IconBrowser>();
-        services.AddSingleton<IIconDownloader, IconDownloader>();
         services.AddSingleton<IMetricsService, MetricsService>();
         services.AddSingleton<IStartupActionProducer, StartupActionManager>();
         services.AddSingleton<IOptionsProducer, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().As<OptionsManager>());
@@ -163,14 +162,16 @@ public static class ProjectConfiguration
         services.AddScoped<IDrawingModuleProducer, DrawingService>(sp => sp.GetRequiredService<IDrawingService>().As<DrawingService>());
         services.AddScoped<IUModService, UModService>();
         services.AddScoped<IToolboxService, ToolboxService>();
+        services.AddScoped<ITradeChatService<KamadanTradeChatOptions>, TradeChatService<KamadanTradeChatOptions>>();
+        services.AddScoped<ITradeChatService<AscalonTradeChatOptions>, TradeChatService<AscalonTradeChatOptions>>();
     }
 
     public static void RegisterViews(IViewProducer viewProducer)
     {
         viewProducer.ThrowIfNull();
 
-        viewProducer.RegisterPermanentView<LauncherView>();
         viewProducer.RegisterPermanentView<Views.FocusView>();
+        viewProducer.RegisterView<LauncherView>();
         viewProducer.RegisterView<AskUpdateView>();
         viewProducer.RegisterView<UpdateView>();
         viewProducer.RegisterView<AccountsView>();
@@ -181,7 +182,6 @@ public static class ProjectConfiguration
         viewProducer.RegisterView<ScreenChoiceView>();
         viewProducer.RegisterView<VersionManagementView>();
         viewProducer.RegisterView<LogsView>();
-        viewProducer.RegisterView<IconDownloadView>();
         viewProducer.RegisterView<GraphAuthorizationView>();
         viewProducer.RegisterView<BuildsSynchronizationView>();
         viewProducer.RegisterView<LauncherOnboardingView>();
@@ -198,6 +198,8 @@ public static class ProjectConfiguration
         viewProducer.RegisterView<ToolboxSwitchView>();
         viewProducer.RegisterView<ToolboxHomepageView>();
         viewProducer.RegisterView<OptionSectionView>();
+        viewProducer.RegisterView<KamadanTradeChatView>();
+        viewProducer.RegisterView<AscalonTradeChatView>();
     }
 
     public static void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -258,10 +260,22 @@ public static class ProjectConfiguration
         optionsProducer.RegisterOptions<ToolboxOptions>();
         optionsProducer.RegisterOptions<UModOptions>();
         optionsProducer.RegisterOptions<ScreenManagerOptions>();
+        optionsProducer.RegisterOptions<KamadanTradeChatOptions>();
+        optionsProducer.RegisterOptions<AscalonTradeChatOptions>();
     }
 
     private static void SetupDaybreakUserAgent(HttpRequestHeaders httpRequestHeaders)
     {
         httpRequestHeaders.ThrowIfNull().TryAddWithoutValidation("User-Agent", DaybreakUserAgent);
+    }
+
+    private static HttpMessageHandler SetupLoggingAndMetrics<T>(System.IServiceProvider serviceProvider)
+    {
+        var logger = serviceProvider.GetRequiredService<ILogger<T>>();
+        var metricsService = serviceProvider.GetRequiredService<IMetricsService>();
+
+        return new MetricsHttpMessageHandler<T>(
+            metricsService,
+            new LoggingHttpMessageHandler(logger!) { InnerHandler = new HttpClientHandler() });
     }
 }

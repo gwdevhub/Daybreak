@@ -14,12 +14,14 @@
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
-        <buttons:BackButton  Height="30" Width="30" Grid.Column="0" HorizontalAlignment="Left" Margin="5"
-                             Clicked="BackButton_Clicked"></buttons:BackButton>
-        <TextBlock Text="Choose screen" FontSize="18" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" HorizontalAlignment="Center"></TextBlock>
+        <TextBlock Text="Choose screen" FontSize="18" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" HorizontalAlignment="Center" />
+        <Border BorderThickness="0, 0, 0, 1"
+                BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"/>
         <buttons:HighlightButton Title="Test" Background="{StaticResource MahApps.Brushes.ThemeBackground}" HorizontalAlignment="Right" Margin="0, 0, 50, 0"
                                  FontSize="16" Width="50" Height="30" Clicked="OpaqueButton_Clicked" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                  HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                 BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                 BorderThickness="1"
                                  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"></buttons:HighlightButton>
         <buttons:SaveButton Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Height="30" Width="30" Grid.Column="1" HorizontalAlignment="Right" Margin="5"
                                  Clicked="SaveButton_Clicked"></buttons:SaveButton>

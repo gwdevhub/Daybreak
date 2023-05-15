@@ -9,12 +9,15 @@
              xmlns:controls="clr-namespace:Daybreak.Controls"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Background="{StaticResource Daybreak.Brushes.Background}" MinHeight="200" MinWidth="400">
+        <Border BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                BorderThickness="1"/>
         <StackPanel VerticalAlignment="Center" Orientation="Vertical">
             <TextBlock Text="{Binding MessageToUser}" Margin="10, 0, 10, 0" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                        TextWrapping="Wrap" HorizontalAlignment="Center" FontSize="16"></TextBlock>
             <TextBlock Text="Do you want to restart the application with administrator rights?" HorizontalAlignment="Center"
                        FontSize="16" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Margin="10, 0, 10, 10" TextWrapping="Wrap"></TextBlock>
-            <Grid MaxWidth="600">
+            <Grid MaxWidth="600"
+                  Margin="10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"></ColumnDefinition>
                     <ColumnDefinition Width="*"></ColumnDefinition>
@@ -30,6 +33,8 @@
                                     Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                     Background="{StaticResource MahApps.Brushes.ThemeBackground}"
                                     HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                    BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                    BorderThickness="1"
                                     Clicked="NoButton_Clicked"></buttons:HighlightButton>
                 <buttons:HighlightButton Title="Yes"
                                     Grid.Column="1"
@@ -41,6 +46,8 @@
                                     FontSize="16"
                                     Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                     Background="{StaticResource MahApps.Brushes.ThemeBackground}"
+                                    BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                    BorderThickness="1"
                                     HighlightColor="{StaticResource MahApps.Brushes.Accent}"
                                     Clicked="YesButton_Clicked"></buttons:HighlightButton>
             </Grid>

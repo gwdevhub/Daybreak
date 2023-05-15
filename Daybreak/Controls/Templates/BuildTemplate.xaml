@@ -32,7 +32,7 @@
             <TextBlock Text="Primary Profession: " FontSize="16" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Grid.Column="1"
                        VerticalAlignment="Center"></TextBlock>
             <mah:SplitButton 
-                ItemsSource="{Binding ElementName=_this, Path=Professions, Mode=OneWay}"
+                ItemsSource="{Binding ElementName=_this, Path=PrimaryProfessions, Mode=OneWay}"
                 SelectedItem="{Binding ElementName=_this, Path=BuildEntry.Primary, Mode=TwoWay}"
                 FontSize="16"
                 Background="Transparent"
@@ -50,7 +50,7 @@
             <TextBlock Text="Secondary Profession: " FontSize="16" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Grid.Column="1"
                        VerticalAlignment="Center"></TextBlock>
             <mah:SplitButton 
-                ItemsSource="{Binding ElementName=_this, Path=Professions, Mode=OneWay}"
+                ItemsSource="{Binding ElementName=_this, Path=SecondaryProfessions, Mode=OneWay}"
                 SelectedItem="{Binding ElementName=_this, Path=BuildEntry.Secondary, Mode=TwoWay}"
                 FontSize="16"
                 Background="Transparent"
@@ -162,27 +162,54 @@
                                         Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                         Background="Transparent"
                                         SearchText="{Binding ElementName=_this, Path=SkillSearchText, Mode=TwoWay}"
-                                        TextChanged="SearchTextBox_TextChanged"></local:SearchTextBox>
-                <ListView x:Name="SkillsListView"
+                                        TextChanged="SearchTextBox_TextChanged"
+                                        DebounceDelay="0:0:0.5"/>
+                <ItemsControl x:Name="SkillsListView"
                           Grid.Row="1"
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                           ScrollViewer.VerticalScrollBarVisibility="Auto"
                           Background="Transparent"
-                          ScrollViewer.CanContentScroll="False"
+                          ScrollViewer.CanContentScroll="True"
                           ItemsSource="{Binding ElementName=_this, Path=AvailableSkills, Mode=OneWay}"
-                          MouseDoubleClick="SkillListView_MouseDoubleClick">
-                    <ListView.ItemsPanel>
+                          VirtualizingPanel.IsVirtualizing="True"
+                          VirtualizingPanel.VirtualizationMode="Recycling"
+                          VirtualizingPanel.IsVirtualizingWhenGrouping="True">
+                    <ItemsControl.Template>
+                        <ControlTemplate>
+                            <Border
+                            Padding="{TemplateBinding Control.Padding}"
+                            Background="{TemplateBinding Panel.Background}"
+                            BorderBrush="{TemplateBinding Border.BorderBrush}"
+                            BorderThickness="{TemplateBinding Border.BorderThickness}"
+                            SnapsToDevicePixels="True">
+                                <ScrollViewer Padding="{TemplateBinding Control.Padding}" Focusable="False">
+                                    <ItemsPresenter SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
+                                </ScrollViewer>
+                            </Border>
+                        </ControlTemplate>
+                    </ItemsControl.Template>
+                    <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <VirtualizingStackPanel>
                             </VirtualizingStackPanel>
                         </ItemsPanelTemplate>
-                    </ListView.ItemsPanel>
-                    <ListView.ItemTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock FontSize="16" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" TextWrapping="Wrap" Text="{Binding Name}"></TextBlock>
+                            <buttons:HighlightButton 
+                                FontSize="16" 
+                                Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                BorderThickness="0, 0, 0, 1"
+                                TextWrapping="Wrap" 
+                                Height="30"
+                                Title="{Binding Name}"
+                                Clicked="HighlightButton_Clicked"
+                                Cursor="Hand"></buttons:HighlightButton>
                         </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
             </Grid>
         </Grid>
     </Grid>

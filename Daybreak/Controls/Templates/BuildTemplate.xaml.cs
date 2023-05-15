@@ -1,5 +1,7 @@
-﻿using Daybreak.Controls.Templates;
+﻿using Daybreak.Controls.Buttons;
+using Daybreak.Controls.Templates;
 using Daybreak.Launch;
+using Daybreak.Models;
 using Daybreak.Models.Builds;
 using Daybreak.Models.Guildwars;
 using Daybreak.Services.BuildTemplates;
@@ -49,7 +51,8 @@ public partial class BuildTemplate : UserControl
     private List<Skill> availableSkills = new();
 
     public event EventHandler? BuildChanged;
-    public ObservableCollection<Profession> Professions { get; } = new ObservableCollection<Profession>();
+    public ObservableCollection<Profession> PrimaryProfessions { get; } = new();
+    public ObservableCollection<Profession> SecondaryProfessions { get; } = new();
 
     public BuildTemplate()
         : this(Launcher.Instance.ApplicationServiceProvider.GetService<IAttributePointCalculator>()!)
@@ -67,7 +70,6 @@ public partial class BuildTemplate : UserControl
         this.HideInfoBrowser();
         this.buildEntry = new BuildEntry();
         this.DataContextChanged += this.BuildTemplate_DataContextChanged;
-        this.Professions.ClearAnd().AddRange(Profession.Professions);
     }
 
     private void BuildTemplate_Unloaded(object sender, RoutedEventArgs e)
@@ -87,13 +89,63 @@ public partial class BuildTemplate : UserControl
             this.BuildEntry = buildEntry;
             this.BuildEntry.PropertyChanged += this.BuildEntry_Changed;
             this.AttributePoints = this.attributePointCalculator!.GetRemainingFreePoints(this.BuildEntry.Build!);
+            this.SetupProfessions();
             this.LoadSkills();
         }
     }
 
     private void BuildEntry_Changed(object? sender, PropertyChangedEventArgs propertyChangedEventArgs)
     {
+        this.SetupProfessions();
         this.LoadSkills();
+        this.BuildChanged?.Invoke(this, propertyChangedEventArgs);
+    }
+
+    private void SetupProfessions()
+    {
+        if (this.BuildEntry is not BuildEntry buildEntry ||
+            buildEntry.Primary is null ||
+            buildEntry.Secondary is null)
+        {
+            return;
+        }
+
+        var primaryProfessionsToAdd = Profession.Professions.Except(this.PrimaryProfessions).Where(p => p == Profession.None || p != buildEntry.Secondary).ToList();
+        var primaryProfessionsToRemove = this.PrimaryProfessions.Where(p => p != Profession.None && p == buildEntry.Secondary).ToList();
+        var secondaryProfessionsToAdd = Profession.Professions.Except(this.SecondaryProfessions).Where(p => p == Profession.None || p != buildEntry.Primary).ToList();
+        var secondaryProfessionsToRemove = this.SecondaryProfessions.Where(p => p != Profession.None && p == buildEntry.Primary).ToList();
+
+        if (primaryProfessionsToRemove.Count > 0)
+        {
+            foreach(var profession in primaryProfessionsToRemove)
+            {
+                this.PrimaryProfessions.Remove(profession);
+            }
+        }
+
+        if (primaryProfessionsToAdd.Count > 0)
+        {
+            foreach (var profession in primaryProfessionsToAdd)
+            {
+                this.PrimaryProfessions.Add(profession);
+            }
+        }
+
+        if (secondaryProfessionsToRemove.Count > 0)
+        {
+            foreach (var profession in secondaryProfessionsToRemove)
+            {
+                this.SecondaryProfessions.Remove(profession);
+            }
+        }
+
+        if (secondaryProfessionsToAdd.Count > 0)
+        {
+            foreach (var profession in secondaryProfessionsToAdd)
+            {
+                this.SecondaryProfessions.Add(profession);
+            }
+        }
     }
 
     private async void LoadSkills()
@@ -302,7 +354,12 @@ public partial class BuildTemplate : UserControl
         }
     }
 
-    private void SkillListView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void AttributeTemplate_Loaded(object sender, RoutedEventArgs e)
+    {
+        sender.As<AttributeTemplate>().InitializeAttributeTemplate(this.attributePointCalculator!);
+    }
+
+    private void HighlightButton_Clicked(object sender, EventArgs e)
     {
         if (this.selectingSkillTemplate is null)
         {
@@ -310,7 +367,7 @@ public partial class BuildTemplate : UserControl
             return;
         }
 
-        var selectedSkilll = sender.As<ListView>().SelectedItem.As<Skill>();
+        var selectedSkilll = sender.As<HighlightButton>().DataContext.As<Skill>();
         if (this.selectingSkillTemplate == this.SkillTemplate0)
         {
             this.BuildEntry.FirstSkill = selectedSkilll;
@@ -345,10 +402,5 @@ public partial class BuildTemplate : UserControl
         }
 
         this.HideSkillListView();
-    }
-
-    private void AttributeTemplate_Loaded(object sender, RoutedEventArgs e)
-    {
-        sender.As<AttributeTemplate>().InitializeAttributeTemplate(this.attributePointCalculator!);
     }
 }

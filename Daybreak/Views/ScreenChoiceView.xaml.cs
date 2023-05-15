@@ -23,7 +23,7 @@ public partial class ScreenChoiceView : UserControl
 {        
     private readonly IScreenManager screenManager;
     private readonly IViewManager viewManager;
-    private readonly ILiveOptions<LauncherOptions> liveOptions;
+    private readonly ILiveUpdateableOptions<LauncherOptions> liveOptions;
     private readonly IApplicationLauncher applicationLauncher;
     private int selectedId;
 
@@ -33,7 +33,7 @@ public partial class ScreenChoiceView : UserControl
     public ScreenChoiceView(
         IViewManager viewManager,
         IScreenManager screenManager,
-        ILiveOptions<LauncherOptions> liveOptions,
+        ILiveUpdateableOptions<LauncherOptions> liveOptions,
         IApplicationLauncher applicationLauncher)
     {
         this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
@@ -58,8 +58,11 @@ public partial class ScreenChoiceView : UserControl
                 Height = screen.Size.Height,
                 VerticalAlignment = System.Windows.VerticalAlignment.Top,
                 HorizontalAlignment = System.Windows.HorizontalAlignment.Left,
-                Foreground = screen.Id == this.selectedId ? Brushes.LightGreen : Brushes.White
+                Foreground = screen.Id == this.selectedId ?
+                this.FindResource("MahApps.Brushes.Accent") as Brush :
+                this.FindResource("MahApps.Brushes.ThemeForeground") as Brush
             };
+
             screenTemplate.Clicked += this.ScreenTemplate_Clicked!;
             this.ScreenContainer.Children.Add(screenTemplate);
         }
@@ -75,7 +78,9 @@ public partial class ScreenChoiceView : UserControl
         this.selectedId = screen.Id;
         foreach(var template in this.ScreenContainer.Children.OfType<ScreenTemplate>())
         {
-            template.Foreground = template.DataContext.As<Screen>().Id == this.selectedId ? Brushes.LightGreen : Brushes.White;
+            template.Foreground = template.DataContext.As<Screen>().Id == this.selectedId ?
+                this.FindResource("MahApps.Brushes.Accent") as Brush :
+                this.FindResource("MahApps.Brushes.ThemeForeground") as Brush;
         }
     }
 
@@ -84,5 +89,12 @@ public partial class ScreenChoiceView : UserControl
         var screen = this.screenManager.Screens.Skip(this.selectedId).FirstOrDefault() ??
             throw new InvalidOperationException($"Unable to test placement. No screen with id {this.selectedId}");
         this.screenManager.MoveGuildwarsToScreen(screen);
+    }
+
+    private void SaveButton_Clicked(object sender, EventArgs e)
+    {
+        this.liveOptions.Value.DesiredGuildwarsScreen = this.selectedId;
+        this.liveOptions.UpdateOption();
+        this.viewManager.ShowView<LauncherView>();
     }
 }

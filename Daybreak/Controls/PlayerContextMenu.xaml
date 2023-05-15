@@ -8,6 +8,8 @@
              Background="{StaticResource Daybreak.Brushes.Background}"
              d:DataContext="{d:DesignInstance Type=guildwars:PlayerInformation, IsDesignTimeCreatable=True}"
              d:DesignHeight="300" d:DesignWidth="100"
+             BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+             BorderThickness="1"
              Margin="5, 0, 5, 0">
     <StackPanel>
         <TextBlock Text="Party Member" FontSize="16" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>

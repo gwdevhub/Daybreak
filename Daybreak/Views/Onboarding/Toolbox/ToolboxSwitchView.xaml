@@ -15,6 +15,9 @@
         <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" TriggerValue="True"></converters:BooleanToVisibilityConverter>
     </UserControl.Resources>
     <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Background="{StaticResource Daybreak.Brushes.Background}" MinHeight="200" MinWidth="400">
+        <Border
+            BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+            BorderThickness="1"/>
         <StackPanel VerticalAlignment="Center">
             <WrapPanel Margin="10, 0, 10, 10" HorizontalAlignment="Center">
                 <TextBlock Text="Homepage: " Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
@@ -45,7 +48,8 @@
                        TextWrapping="Wrap" FontSize="16" HorizontalAlignment="Center"
                        Visibility="{Binding ElementName=_this, Path=ToolboxEnabled, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"></TextBlock>
             </WrapPanel>
-            <Grid MaxWidth="600">
+            <Grid MaxWidth="600"
+                  Margin="10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"></ColumnDefinition>
                     <ColumnDefinition Width="*"></ColumnDefinition>
@@ -61,6 +65,8 @@
                                     Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                     Background="{StaticResource MahApps.Brushes.ThemeBackground}"
                                     HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                    BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                    BorderThickness="1"
                                     Clicked="OpaqueButtonNo_Clicked"></buttons:HighlightButton>
                 <buttons:HighlightButton Title="Yes"
                                     Grid.Column="1"
@@ -73,6 +79,8 @@
                                     Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                     Background="{StaticResource MahApps.Brushes.ThemeBackground}"
                                     HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                    BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                    BorderThickness="1"
                                     Clicked="OpaqueButtonYes_Clicked"></buttons:HighlightButton>
             </Grid>
         </StackPanel>

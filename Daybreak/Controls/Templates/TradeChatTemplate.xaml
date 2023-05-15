@@ -1,0 +1,157 @@
+﻿<UserControl x:Class="Daybreak.Controls.Templates.TradeChatTemplate"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Daybreak.Controls.Templates"
+             xmlns:tradeModels="clr-namespace:Daybreak.Models.Trade"
+             xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
+             xmlns:controls="clr-namespace:Daybreak.Controls"
+             xmlns:converters="clr-namespace:Daybreak.Converters"
+             Unloaded="UserControl_Unloaded"
+             x:Name="_this"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:DateTimeConverter x:Key="DateTimeConverter"></converters:DateTimeConverter>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
+    </UserControl.Resources>
+    <Grid Background="Transparent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+            <controls:SearchTextBox
+                Grid.Column="0"
+                Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                FontSize="24"
+                DebounceDelay="0:0:1"
+                TextChanged="SearchTextBox_TextChanged"></controls:SearchTextBox>
+        </Grid>
+        <ItemsControl ItemsSource="{Binding ElementName=_this, Path=TraderMessages, Mode=OneWay}"
+                      ScrollViewer.VerticalScrollBarVisibility="Visible"
+                      VirtualizingPanel.IsVirtualizing="True"
+                      VirtualizingPanel.VirtualizationMode="Recycling"
+                      ScrollViewer.CanContentScroll="True"
+                      Grid.Row="1">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.Template>
+                <ControlTemplate>
+                    <Border
+                            Padding="{TemplateBinding Control.Padding}"
+                            Background="{TemplateBinding Panel.Background}"
+                            BorderBrush="{TemplateBinding Border.BorderBrush}"
+                            BorderThickness="{TemplateBinding Border.BorderThickness}"
+                            SnapsToDevicePixels="True">
+                        <ScrollViewer Padding="{TemplateBinding Control.Padding}" Focusable="False">
+                            <ItemsPresenter SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
+                        </ScrollViewer>
+                    </Border>
+                </ControlTemplate>
+            </ItemsControl.Template>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="tradeModels:TraderMessage">
+                    <local:TradeMessageTemplate
+                        MinHeight="40"
+                        TraderMessageClicked="TradeMessageTemplate_TraderMessageClicked" />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <Rectangle
+            Fill="{StaticResource Daybreak.Brushes.Background}"
+            Grid.RowSpan="2"
+            Visibility="{Binding ElementName=_this, Path=MessageOverlayVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"></Rectangle>
+        <Grid Grid.RowSpan="2"
+              MaxWidth="600"
+              MaxHeight="400"
+              VerticalAlignment="Center"
+              HorizontalAlignment="Center"
+              Background="{StaticResource MahApps.Brushes.ThemeBackground}"
+              Visibility="{Binding ElementName=_this, Path=MessageOverlayVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="auto"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Border
+                BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                BorderThickness="1"
+                Grid.RowSpan="4"></Border>
+            <WrapPanel
+                Margin="10, 10, 10, 0"
+                Grid.Row="0">
+                <TextBlock 
+                    Text="Player name: "
+                    Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                    FontSize="16"
+                    VerticalAlignment="Center"/>
+                <TextBox 
+                    Text="{Binding ElementName=_this, Path=SelectedTraderMessage.Sender, Mode=OneWay}"
+                    Foreground="{StaticResource MahApps.Brushes.Accent}"
+                    FontSize="16"
+                    TextWrapping="Wrap"
+                    IsReadOnly="True"
+                    IsReadOnlyCaretVisible="False"
+                    BorderThickness="0, 0, 0, 1"/>
+            </WrapPanel>
+            <WrapPanel
+                Margin="10, 0, 10, 0"
+                Grid.Row="1">
+                <TextBlock 
+                    Text="Message: "
+                    Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                    FontSize="16"
+                    VerticalAlignment="Center"/>
+                <TextBox
+                    Text="{Binding ElementName=_this, Path=SelectedTraderMessage.Message, Mode=OneWay}"
+                    Foreground="{StaticResource MahApps.Brushes.Accent}"
+                    FontSize="16"
+                    TextWrapping="Wrap"
+                    IsReadOnly="True"
+                    IsReadOnlyCaretVisible="False"
+                    BorderThickness="0, 0, 0, 1"/>
+            </WrapPanel>
+            <WrapPanel
+                Margin="10, 0, 10, 0"
+                Grid.Row="2">
+                <TextBlock 
+                    Text="Posted at: "
+                    Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                    FontSize="16"
+                    VerticalAlignment="Center"/>
+                <TextBox
+                    Text="{Binding ElementName=_this, Path=SelectedTraderMessage.Timestamp, Mode=OneWay, Converter={StaticResource DateTimeConverter}}"
+                    Foreground="{StaticResource MahApps.Brushes.Accent}"
+                    FontSize="16"
+                    TextWrapping="Wrap"
+                    IsReadOnly="True"
+                    IsReadOnlyCaretVisible="False"
+                    BorderThickness="0, 0, 0, 1"/>
+            </WrapPanel>
+            <buttons:HighlightButton
+                Grid.Row="3"
+                Title="Close"
+                Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                Background="{StaticResource Daybreak.Brushes.Background}"
+                FontSize="16"
+                HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                BorderThickness="1"
+                TextPadding="5"
+                Margin="10"
+                Clicked="CloseButton_Clicked"></buttons:HighlightButton>
+        </Grid>
+    </Grid>
+</UserControl>

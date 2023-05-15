@@ -54,7 +54,7 @@ public partial class SkillTemplate : UserControl
             if (skill != Skill.NoSkill)
             {
                 var maybeUri = await this.iconRetriever.GetIconUri(skill).ConfigureAwait(true);
-                if (maybeUri.ExtractValue() is Uri uri)
+                if (maybeUri is Uri uri)
                 {
                     this.ImageSource = new BitmapImage(uri);
                 }

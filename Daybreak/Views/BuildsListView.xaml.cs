@@ -1,4 +1,5 @@
-﻿using Daybreak.Models.Builds;
+﻿using Daybreak.Models;
+using Daybreak.Models.Builds;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Navigation;
 using Daybreak.Utils;
@@ -25,7 +26,7 @@ public partial class BuildsListView : UserControl
     [GenerateDependencyProperty]
     private bool loading;
 
-    public ObservableCollection<BuildEntry> BuildEntries { get; } = new ObservableCollection<BuildEntry>();
+    public SortedObservableCollection<BuildEntry, string> BuildEntries { get; } = new SortedObservableCollection<BuildEntry, string>(entry => entry.Name!);
 
     public BuildsListView(
         IViewManager viewManager,
@@ -59,18 +60,28 @@ public partial class BuildsListView : UserControl
 
     private void SearchTextBox_TextChanged(object _, string e)
     {
-        this.BuildEntries.Clear();
-        this.BuildEntries.AddRange(
-            this.buildEntries!.Where(b => StringUtils.MatchesSearchString(b.Name!, e)));
+        var selectedEntries = this.buildEntries!.Where(b => StringUtils.MatchesSearchString(b.Name!, e));
+
+        var entriesToRemove = this.BuildEntries.Except(selectedEntries).ToList();
+        var entriesToAdd = selectedEntries.Except(this.BuildEntries).ToList();
+        foreach(var buildEntry in  entriesToRemove)
+        {
+            this.BuildEntries.Remove(buildEntry);
+        }
+
+        foreach(var buildEntry in entriesToAdd)
+        {
+            this.BuildEntries.Add(buildEntry);
+        }
     }
 
-    private void SynchronizeButton_Clicked(object sender, EventArgs e)
+    private void SynchronizeButton_Clicked(object _, EventArgs __)
     {
         this.viewManager.ShowView<BuildsSynchronizationView>();
     }
 
-    private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void BuildEntryTemplate_EntryClicked(object _, BuildEntry e)
     {
-        this.viewManager.ShowView<BuildTemplateView>(sender.As<ListView>().SelectedItem);
+        this.viewManager.ShowView<BuildTemplateView>(e);
     }
 }

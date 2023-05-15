@@ -12,13 +12,21 @@
              DataContextChanged="UserControl_DataContextChanged"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Background="{StaticResource Daybreak.Brushes.Background}" MinHeight="200" MinWidth="400">
+        <Border 
+            BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+            BorderThickness="1"/>
         <StackPanel VerticalAlignment="Center">
             <TextBlock Text="{Binding ElementName=_this, Path=Description, Mode=OneWay}" Margin="10, 0, 10, 0" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                       TextWrapping="Wrap"></TextBlock>
+                       TextWrapping="Wrap"
+                       FontSize="16"
+                       MaxWidth="600"></TextBlock>
             <buttons:HighlightButton Title="Ok" Background="{StaticResource MahApps.Brushes.ThemeBackground}" HorizontalAlignment="Center"
-                                     FontSize="16" Margin="10" Width="50" Height="25" Clicked="OpaqueButton_Clicked" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                     FontSize="16" Margin="10" Width="50" Height="25" Clicked="OpaqueButton_Clicked"
+                                     Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                      HighlightColor="{StaticResource MahApps.Brushes.Accent}"
-                                     VerticalContentAlignment="Center" HorizontalContentAlignment="Center"></buttons:HighlightButton>
+                                     VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                                     BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                     BorderThickness="1"></buttons:HighlightButton>
         </StackPanel>
     </Grid>
 </UserControl>

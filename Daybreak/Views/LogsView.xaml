@@ -19,6 +19,8 @@
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
+        <Border BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                BorderThickness="0, 1, 0, 0"/>
         <TextBlock FontSize="16" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                    Margin="10, 0, 0, 0"
                    VerticalAlignment="Center"

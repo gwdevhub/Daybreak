@@ -1,5 +1,6 @@
 ﻿using Daybreak.Attributes;
 using Daybreak.Models;
+using Daybreak.Views;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ public sealed class LauncherOptions
 
     [JsonProperty(nameof(DesiredGuildwarsScreen))]
     [OptionName(Name = "Desired GuildWars Screen", Description = "Sets the screen on which the GuildWars window will be placed")]
+    [OptionSetterView<ScreenChoiceView>(Action = "Screen Selector")]
     public int DesiredGuildwarsScreen { get; set; }
 
     [JsonProperty(nameof(LaunchGuildwarsAsCurrentUser))]
@@ -46,6 +48,6 @@ public sealed class LauncherOptions
     public bool MultiLaunchSupport { get; set; }
 
     [JsonProperty(nameof(DownloadIcons))]
-    [OptionName(Name = "Download Icons", Description = "If true, the launcher will perform a check on the local icon cache and download any missing or corrupt icons")]
-    public bool DownloadIcons { get; set; }
+    [OptionName(Name = "Download Icons", Description = "If true, the launcher will download icons that are not found in the local cache")]
+    public bool DownloadIcons { get; set; } = true;
 }

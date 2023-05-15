@@ -25,7 +25,7 @@
                Source="{Binding ElementName=_this, Path=ImageSource, Mode=OneWay}"
                Stretch="UniformToFill"></Image>
         <Border BorderThickness="5" BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"></Border>
-        <Border BorderThickness="5" BorderBrush="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+        <Border BorderThickness="3" Margin="2" BorderBrush="{StaticResource MahApps.Brushes.Accent}"
                 Opacity="{Binding ElementName=_this, Path=BorderOpacity, Mode=OneWay}"></Border>
         <Rectangle Fill="Transparent" MouseEnter="Border_MouseEnter" MouseLeave="Border_MouseLeave"
                    VerticalAlignment="Stretch" HorizontalAlignment="Stretch" MouseLeftButtonDown="Rectangle_MouseLeftButtonDown"></Rectangle>
