@@ -8,6 +8,8 @@
              mc:Ignorable="d" 
              Background="{StaticResource Daybreak.Brushes.Background}"
              d:DataContext="{d:DesignInstance Type=guildwars:QuestMetadata, IsDesignTimeCreatable=True}"
+             BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+             BorderThickness="1"
              d:DesignHeight="300" d:DesignWidth="100">
     <StackPanel Margin="5, 0, 5, 0">
         <TextBlock Text="{Binding Quest.Name}" FontSize="16" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" TextWrapping="Wrap"></TextBlock>

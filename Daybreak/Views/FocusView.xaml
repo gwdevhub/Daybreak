@@ -83,6 +83,14 @@
                     </DrawingBrush>
                 </controls:VerticalResourceBar.OpacityMask>
             </controls:VerticalResourceBar>
+            <Viewbox
+                Grid.Column="1"
+                Grid.ColumnSpan="3"
+                Stretch="Fill">
+                <Polygon Points="0.1, 3.9, 3.2, 8, 10.8, 8, 13.9, 3.9, 10.9, 0.1, 3.1, 0.1"
+                         StrokeThickness="0.08"
+                         Stroke="{DynamicResource MahApps.Brushes.ThemeForeground}"></Polygon>
+            </Viewbox>
             <StackPanel
                 VerticalAlignment="Center"
                 Grid.Column="0"
@@ -125,6 +133,8 @@
                     FontSize="14"
                     Cursor="Hand"
                     Text="{Binding ElementName=_this, Path=KurzickBarText, Mode=OneWay}"
+                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                    BorderThickness="1"
                     MouseLeftButtonDown="KurzickBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
                 <controls:HorizontalResourceBar 
                     Margin="0, 2, 0, 2"
@@ -138,6 +148,8 @@
                     FontSize="14"
                     Cursor="Hand"
                     Text="{Binding ElementName=_this, Path=LuxonBarText, Mode=OneWay}"
+                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                    BorderThickness="1"
                     MouseLeftButtonDown="LuxonBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
                 <controls:HorizontalResourceBar 
                     Margin="0, 2, 0, 2"
@@ -150,6 +162,8 @@
                     Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                     FontSize="14"
                     Cursor="Hand"
+                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                    BorderThickness="1"
                     Text="{Binding ElementName=_this, Path=ImperialBarText, Mode=OneWay}"
                     MouseLeftButtonDown="ImperialBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
                 <controls:HorizontalResourceBar
@@ -163,11 +177,26 @@
                     Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                     FontSize="14"
                     Cursor="Hand"
+                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                    BorderThickness="1"
                     Text="{Binding ElementName=_this, Path=BalthazarBarText, Mode=OneWay}"
                     MouseLeftButtonDown="BalthazarBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
             </StackPanel>
+            <Viewbox
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Grid.Row="2"
+                Grid.RowSpan="2"
+                Stretch="Fill">
+                <Polygon Points="0, 10.1, 21.5, 10.1, 19.4, 5, 21.5, 0.1, 0, 0.1"
+                         StrokeThickness="0.08"
+                         Width="21.5"
+                         Height="10.2"
+                         Stroke="{DynamicResource MahApps.Brushes.ThemeForeground}"></Polygon>
+            </Viewbox>
             <StackPanel
                 VerticalAlignment="Center"
+                HorizontalAlignment="Stretch"
                 Grid.Column="3"
                 Grid.ColumnSpan="2"
                 Grid.Row="2"
@@ -209,6 +238,8 @@
                     Cursor="Hand"
                     Text="{Binding ElementName=_this, Path=VanquishingText, Mode=OneWay}"
                     FillAlignment="Right"
+                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                    BorderThickness="1"
                     Visibility="{Binding ElementName=_this, Path=Vanquishing, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
                     MouseLeftButtonDown="VanquishingBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
                 <controls:HorizontalResourceBar 
@@ -224,6 +255,8 @@
                     Cursor="Hand"
                     Text="{Binding ElementName=_this, Path=TitleText, Mode=OneWay}"
                     FillAlignment="Right"
+                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                    BorderThickness="1"
                     Visibility="{Binding ElementName=_this, Path=TitleActive, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
                 <controls:HorizontalResourceBar 
                     Margin="0, 2, 0, 2"
@@ -238,6 +271,8 @@
                     Cursor="Hand"
                     Text="{Binding ElementName=_this, Path=HealthBarText, Mode=OneWay}"
                     FillAlignment="Right"
+                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                    BorderThickness="1"
                     MouseLeftButtonDown="HealthBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
                 <controls:HorizontalResourceBar 
                     Margin="0, 2, 0, 2"
@@ -252,8 +287,23 @@
                     Cursor="Hand"
                     Text="{Binding ElementName=_this, Path=EnergyBarText, Mode=OneWay}"
                     FillAlignment="Right"
+                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                    BorderThickness="1"
                     MouseLeftButtonDown="EnergyBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
             </StackPanel>
+            <Viewbox
+                Grid.Column="3"
+                Grid.ColumnSpan="2"
+                Grid.Row="2"
+                Grid.RowSpan="2"
+                Stretch="Fill">
+                <Polygon Points="0, 10.1, 21.5, 10.1, 21.5, 0.1, 0, 0.1, 2.1, 5"
+                         StrokeThickness="0.08"
+                         HorizontalAlignment="Right"
+                         Height="10.2"
+                         Width="21.49"
+                         Stroke="{DynamicResource MahApps.Brushes.ThemeForeground}"></Polygon>
+            </Viewbox>
         </Grid>
         <Grid
             Grid.Row="1"
@@ -333,6 +383,10 @@
                     FontSize="20"
                     MouseLeftButtonDown="SecondaryProfession_MouseLeftButtonDown"></buttons:MenuButton>
             </StackPanel>
+            <Border Grid.Row="0"
+                    Margin="0, 0, 5, 10"
+                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                    BorderThickness="1"/>
             <StackPanel
                 Background="{DynamicResource Daybreak.Brushes.Background}"
                 Grid.Row="1"
@@ -375,6 +429,10 @@
                     FontSize="20"
                     MouseLeftButtonDown="Title_MouseLeftButtonDown"></buttons:MenuButton>
             </StackPanel>
+            <Border Grid.Row="1"
+                    Margin="0, 0, 5, 10"
+                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                    BorderThickness="1"/>
             <StackPanel
                 Background="{DynamicResource Daybreak.Brushes.Background}"
                 Grid.Row="2"
@@ -397,6 +455,10 @@
                     FontSize="20"
                     MouseLeftButtonDown="CurrentMap_MouseLeftButtonDown"></buttons:MenuButton>
             </StackPanel>
+            <Border Grid.Row="2"
+                    Margin="0, 0, 5, 10"
+                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                    BorderThickness="1"/>
             <StackPanel
                 Background="{DynamicResource Daybreak.Brushes.Background}"
                 Grid.Row="3"
@@ -411,13 +473,18 @@
                     Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"></Rectangle>
                 <buttons:MenuButton
                     Title="{Binding ElementName=_this, Path=GameData.MainPlayer.Quest.Name, Mode=OneWay}"
-                    HighlightColor="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                    HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
                     HorizontalAlignment="Stretch"
                     HorizontalContentAlignment="Left"
                     Cursor="Hand"
                     FontSize="20"
                     MouseLeftButtonDown="CurrentQuest_MouseLeftButtonDown"></buttons:MenuButton>
             </StackPanel>
+            <Border Grid.Row="3"
+                    Margin="0, 0, 5, 10"
+                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                    BorderThickness="1"/>
             <TextBlock 
                     Background="{DynamicResource Daybreak.Brushes.Background}"
                     Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
@@ -439,6 +506,11 @@
                         QuestClicked="QuestLogTemplate_QuestClicked">
                 </templates:QuestLogTemplate>
             </ScrollViewer>
+            <Border Grid.Row="4"
+                    Grid.RowSpan="2"
+                    Margin="0, 0, 5, 0"
+                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                    BorderThickness="1"/>
         </Grid>
         <Grid
             x:Name="MinimapHolder"
@@ -459,7 +531,9 @@
                 LivingEntityClicked="GuildwarsMinimap_LivingEntityClicked"
                 PlayerInformationClicked="GuildwarsMinimap_PlayerInformationClicked"
                 MapIconClicked="GuildwarsMinimap_MapIconClicked"
-                ClipToBounds="True"></controls:GuildwarsMinimap>
+                ClipToBounds="True"
+                BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                BorderThickness="1" />
             <controls:CircularLoadingWidget Height="100"
                                             Width="100"
                                             Visibility="{Binding ElementName=_this,Path=LoadingPathingData,Mode=OneWay,Converter={StaticResource BooleanToVisibilityConverter}}" />
@@ -477,6 +551,8 @@
                 MaximizeClicked="Browser_MaximizeClicked"
                 Visibility="Hidden"
                 BuildDecoded="Browser_BuildDecoded"
+                BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                BorderThickness="1"
                 PreventDispose="True"></controls:ChromiumBrowserWrapper>
         <controls:CircularLoadingWidget Grid.ColumnSpan="4"
                                         Grid.RowSpan="4"

@@ -14,6 +14,9 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
     </UserControl.Resources>
     <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Background="{StaticResource Daybreak.Brushes.Background}" MinHeight="200" MinWidth="400">
+        <Border
+            BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+            BorderThickness="1"/>
         <StackPanel VerticalAlignment="Center">
             <TextBlock Text="{Binding ElementName=_this, Path=Description, Mode=OneWay}" Margin="10, 0, 10, 0" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                        TextWrapping="Wrap" HorizontalAlignment="Center" FontSize="16"></TextBlock>
@@ -24,12 +27,15 @@
                                     HorizontalAlignment="Center"
                                     Height="30"
                                     Width="60"
+                                    Margin="10"
                                     HorizontalContentAlignment="Center"
                                     VerticalContentAlignment="Center"
                                     FontSize="16"
                                     Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                     Background="{StaticResource MahApps.Brushes.ThemeBackground}"
                                     HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                    BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                    BorderThickness="1"
                                     Clicked="OpaqueButton_Clicked"></buttons:HighlightButton>
         </StackPanel>
     </Grid>

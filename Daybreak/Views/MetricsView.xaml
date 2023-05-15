@@ -10,6 +10,8 @@
              x:Name="_this"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Background="{StaticResource Daybreak.Brushes.Background}">
+        <Border BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                BorderThickness="0, 1, 0, 0"/>
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" PanningMode="VerticalFirst">
             <ItemsControl ItemsSource="{Binding ElementName=_this, Path=Metrics, Mode=OneWay}"
                   Background="Transparent" ScrollViewer.VerticalScrollBarVisibility="Disabled">
@@ -20,19 +22,23 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel HorizontalAlignment="Stretch"
+                        <Grid>
+                            <Border BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                    BorderThickness="0, 0, 0, 1"/>
+                            <StackPanel HorizontalAlignment="Stretch"
                                     Margin="0, 0, 0, 20">
-                            <TextBlock Text="{Binding Instrument.Name}"
+                                <TextBlock Text="{Binding Instrument.Name}"
                                        Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                        FontSize="14"
                                     VerticalAlignment="Center"></TextBlock>
-                            <TextBlock Text="{Binding Instrument.Description}"
+                                <TextBlock Text="{Binding Instrument.Description}"
                                        Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                        FontSize="11"
                                     VerticalAlignment="Center"></TextBlock>
-                            <WpfPlot Loaded="WpfPlot_Loaded" HorizontalContentAlignment="Stretch"
+                                <WpfPlot Loaded="WpfPlot_Loaded" HorizontalContentAlignment="Stretch"
                                      Height="300"></WpfPlot>
-                        </StackPanel>
+                            </StackPanel>
+                        </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

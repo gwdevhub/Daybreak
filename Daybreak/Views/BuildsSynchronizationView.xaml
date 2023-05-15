@@ -24,6 +24,8 @@
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
+        <Border BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                BorderThickness="0, 1, 0, 0"/>
         <buttons:BackButton  Height="30" Width="30" Grid.Column="0" HorizontalAlignment="Left" Margin="5"
                              Clicked="BackButton_Clicked" VerticalAlignment="Top"
                              IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"></buttons:BackButton>
@@ -35,6 +37,8 @@
                                 HorizontalAlignment="Right"
                                 HorizontalContentAlignment="Center"
                                 VerticalContentAlignment="Center"
+                                BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                BorderThickness="1"
                                 Width="80"
                                 Margin="5"
                                 Clicked="LogOutButton_Clicked"
@@ -98,6 +102,8 @@
                                     Width="150"
                                     Height="30"
                                     Clicked="UploadAllButton_Clicked"
+                                    BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                    BorderThickness="1"
                                     IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"/>
             </Grid>
             <ListView 
@@ -147,6 +153,8 @@
                                     Height="30"
                                     Width="150"
                                     Clicked="DownloadAllButton_Clicked"
+                                    BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                    BorderThickness="1"
                                     IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"/>
             </Grid>
             <ListView 
@@ -189,6 +197,8 @@
                                         Height="30"
                                         Width="100"
                                         Clicked="DownloadButton_Clicked"
+                                        BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                        BorderThickness="1"
                                         IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"></buttons:HighlightButton>
                 <buttons:HighlightButton    
                                         Title="Upload Build"
@@ -201,6 +211,8 @@
                                         Height="30"
                                         Width="100"
                                         Clicked="UploadButton_Clicked"
+                                        BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                        BorderThickness="1"
                                         IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"></buttons:HighlightButton>
             </StackPanel>
         </Grid>

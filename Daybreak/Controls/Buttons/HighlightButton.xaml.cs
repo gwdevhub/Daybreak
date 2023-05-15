@@ -21,10 +21,18 @@ public partial class HighlightButton : UserControl
     private FrameworkElement innerContent = default!;
     [GenerateDependencyProperty(InitialValue = "")]
     private string title = string.Empty;
-    [GenerateDependencyProperty]
+    [GenerateDependencyProperty(InitialValue = HorizontalAlignment.Left)]
     private HorizontalAlignment horizontalContentAlignment = HorizontalAlignment.Left;
-    [GenerateDependencyProperty]
+    [GenerateDependencyProperty(InitialValue = VerticalAlignment.Top)]
     private VerticalAlignment verticalContentAlignment = VerticalAlignment.Top;
+    [GenerateDependencyProperty(InitialValue = TextAlignment.Center)]
+    private TextAlignment textAlignment = TextAlignment.Center;
+    [GenerateDependencyProperty(InitialValue = TextWrapping.Wrap)]
+    private TextWrapping textWrapping = TextWrapping.Wrap;
+    [GenerateDependencyProperty]
+    private Thickness textPadding = new Thickness(0);
+    [GenerateDependencyProperty]
+    private UIElement buttonContent = default!;
 
     public HighlightButton()
     {

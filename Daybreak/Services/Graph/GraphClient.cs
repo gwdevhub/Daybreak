@@ -17,6 +17,7 @@ using System.Extensions;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -28,6 +29,8 @@ namespace Daybreak.Services.Graph;
 
 public sealed class GraphClient : IGraphClient
 {
+    private const int MaxBrowserInitializationRetries = 5;
+
     private const string Scopes = "Files.Read Files.Read.All Files.ReadWrite Files.ReadWrite.All User.Read offline_access";
     private const string RedirectUri = "http://localhost:42111";
 
@@ -351,6 +354,18 @@ public sealed class GraphClient : IGraphClient
         chromiumBrowserWrapper.ThrowIfNull();
 
         await chromiumBrowserWrapper.ReinitializeBrowser();
+
+        var retries = 0;
+        while (chromiumBrowserWrapper.WebBrowser.CoreWebView2 is null)
+        {
+            retries++;
+            if (retries > MaxBrowserInitializationRetries)
+            {
+                throw new InvalidOperationException("Unable to initialize the embedded browser");
+            }
+
+            await Task.Delay(1000, cancellationToken);
+        }
 
         var state = GetNewState();
 

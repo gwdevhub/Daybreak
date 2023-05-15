@@ -1,5 +1,4 @@
 ﻿using Daybreak.Attributes;
-using Daybreak.Controls;
 using Daybreak.Controls.Buttons;
 using Daybreak.Controls.Options;
 using Daybreak.Models.Options;
@@ -7,15 +6,12 @@ using Daybreak.Services.Navigation;
 using Daybreak.Services.Options;
 using Daybreak.Validators;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
@@ -74,6 +70,7 @@ public partial class OptionSectionView : UserControl
             var propertyType = propertyInfo.PropertyType;
             (var name, var description) = this.GetNameAndDescription(propertyInfo);
             (var validator, var template) = GetValidatorAndTemplate(propertyInfo);
+            (var hasCustomSetter, var action, var customSetterViewType) = GetCustomSetter(propertyInfo);
             var converter = TypeDescriptor.GetConverter(propertyType);
             var getter = new Func<object>(() => propertyInfo.GetValue(this.currentOptions)!);
             var setter = new Action<object>((value) =>
@@ -101,7 +98,8 @@ public partial class OptionSectionView : UserControl
                     template.DesiredSize.Height :
                     0;
             var heading = new OptionHeading { Title = name, DesiredHeight = optionHeadingDesiredSize, Description = description };
-            this.OptionEntries.Add(new OptionEntry { Heading = heading, Template = template });
+            var optionSetter = new OptionSetter { HasCustomSetter = hasCustomSetter, CustomSetterAction = action, CustomSetterViewType = customSetterViewType };
+            this.OptionEntries.Add(new OptionEntry { Heading = heading, Template = template, Setter = optionSetter });
         }
     }
 
@@ -142,6 +140,32 @@ public partial class OptionSectionView : UserControl
         }
 
         return (name, description);
+    }
+
+    private static (bool HasCustomSetter, string? CustomSetterAction, Type? CustomSetterViewType) GetCustomSetter(PropertyInfo propertyInfo)
+    {
+        if (propertyInfo.GetCustomAttributes()
+                .FirstOrDefault(a =>
+                {
+                    var attributeType = a.GetType();
+                    if (!attributeType.IsGenericType)
+                    {
+                        return false;
+                    }
+
+                    return a.GetType().GetGenericTypeDefinition() == typeof(OptionSetterView<>);
+                }) is not object customSetterViewAttribute)
+        {
+            return (false, default, default);
+        }
+
+        var action = customSetterViewAttribute.GetType().GetProperty(nameof(OptionSetterView<UserControl>.Action))?
+            .GetValue(customSetterViewAttribute).As<string>();
+        var viewType = customSetterViewAttribute.GetType().GetGenericArguments().FirstOrDefault();
+
+        return (viewType is not null,
+            action,
+            viewType);
     }
 
     private static bool IsVisibleOption(PropertyInfo propertyInfo)
@@ -308,6 +332,22 @@ public partial class OptionSectionView : UserControl
     private static string GetDefaultDescription(string optionName, string optionSectionName)
     {
         return $"{optionName} property of {optionSectionName}";
+    }
+
+    private void CustomSetterButton_Clicked(object sender, EventArgs e)
+    {
+        if (sender is not HighlightButton highlightButton ||
+            highlightButton.DataContext is not OptionSetter optionSetter)
+        {
+            return;
+        }
+
+        if (!optionSetter.HasCustomSetter)
+        {
+            return;
+        }
+
+        this.viewManager.ShowView(optionSetter.CustomSetterViewType);
     }
 
     private void HelpButton_Clicked(object sender, EventArgs e)

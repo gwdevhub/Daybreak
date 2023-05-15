@@ -19,7 +19,7 @@
                  FontStyle="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=FontStyle, Mode=OneWay}"
                  TextChanged="TextBox_TextChanged"
                  Background="Transparent"/>
-        <TextBlock  Margin="5, 0, 0, 0"
+        <TextBlock  Margin="10, 0, 0, 0"
                     Text="Search"
                     Background="Transparent"
                     Opacity="0.5"
@@ -32,5 +32,12 @@
                     FontStyle="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=FontStyle, Mode=OneWay}"
                     Foreground="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=Foreground, Mode=OneWay}"
                     Visibility="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=PlaceholderVisibility, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        <local:CircularLoadingWidget 
+            HorizontalAlignment="Right"
+            VerticalAlignment="Center"
+            Margin="0, 0, 5, 0"
+            Height="{Binding ElementName=_this, Path=LoadingWidgetSize, Mode=OneWay}"
+            Width="{Binding ElementName=_this, Path=LoadingWidgetSize, Mode=OneWay}"
+            Visibility="{Binding ElementName=_this, Path=PendingSearch, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
     </Grid>
 </UserControl>

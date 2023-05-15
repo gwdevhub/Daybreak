@@ -32,11 +32,7 @@ public partial class LauncherView : UserControl
     private readonly IScreenManager screenManager;
 
     private CancellationTokenSource cancellationTokenSource = new();
-    private bool leftBrowserMaximized = false;
-    private bool rightBrowserMaximized = false;
 
-    [GenerateDependencyProperty(InitialValue = true)]
-    private bool buttonsVisible;
     [GenerateDependencyProperty]
     private bool launchButtonEnabled;
 
@@ -59,6 +55,7 @@ public partial class LauncherView : UserControl
 
     private void PeriodicallyCheckGameState()
     {
+        this.cancellationTokenSource?.Cancel();
         this.cancellationTokenSource = new CancellationTokenSource();
         System.Extensions.TaskExtensions.RunPeriodicAsync(() => this.Dispatcher.Invoke(this.CheckGameState), TimeSpan.Zero, TimeSpan.FromSeconds(1), this.cancellationTokenSource.Token);
     }

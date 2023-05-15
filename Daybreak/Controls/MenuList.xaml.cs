@@ -4,6 +4,7 @@ using Daybreak.Services.Navigation;
 using Daybreak.Views;
 using Daybreak.Views.Onboarding.Toolbox;
 using Daybreak.Views.Onboarding.UMod;
+using Daybreak.Views.Trade;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Configuration;
@@ -53,14 +54,7 @@ public partial class MenuList : UserControl
 
     private void ManageBuildsButton_Clicked(object sender, EventArgs e)
     {
-        if (this.liveOptions.Value.DownloadIcons)
-        {
-            this.viewManager.ShowView<IconDownloadView>();
-        }
-        else
-        {
-            this.viewManager.ShowView<BuildsListView>();
-        }
+        this.viewManager.ShowView<BuildsListView>();
     }
 
     private void VersionManagementButton_Clicked(object sender, EventArgs e)
@@ -91,5 +85,15 @@ public partial class MenuList : UserControl
     private void ToolboxButton_Clicked(object sender, EventArgs e)
     {
         this.viewManager.ShowView<ToolboxOnboardingEntryView>();
+    }
+
+    private void KamadanButton_Clicked(object sender, EventArgs e)
+    {
+        this.viewManager.ShowView<KamadanTradeChatView>();
+    }
+
+    private void AscalonButton_Clicked(object sender, EventArgs e)
+    {
+        this.viewManager.ShowView<AscalonTradeChatView>();
     }
 }

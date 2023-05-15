@@ -40,7 +40,7 @@ public sealed class GuildwarsInstaller : IGuildwarsInstaller
         var exePath = Path.Combine(destinationPath, InstallationFileName);
         if (!File.Exists(exePath))
         {
-            if ((await this.DownloadGuildwarsInstaller(destinationPath, installationStatus)) is false)
+            if ((await this.DownloadGuildwarsInstaller(exePath, installationStatus)) is false)
             {
                 throw new InvalidOperationException("Failed to download executable");
             }

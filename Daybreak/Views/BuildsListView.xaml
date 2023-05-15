@@ -18,6 +18,13 @@
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
+        <Border BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                BorderThickness="0, 1, 0, 0"/>
+        <TextBlock
+            FontSize="22"
+            Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+            HorizontalAlignment="Center"
+            Text="Manage builds"></TextBlock>
         <buttons:AddButton  Height="30" Width="30" Grid.Column="0" HorizontalAlignment="Right"
                             VerticalAlignment="Top" Margin="5" Clicked="AddButton_Clicked"></buttons:AddButton>
         <buttons:SynchronizeButton Height="30" Width="30" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5, 5, 45, 5"
@@ -25,20 +32,47 @@
         <controls:SearchTextBox Grid.Row="1"
                                 FontSize="24"
                                 Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                DebounceDelay="0:0:0.5"
                                 TextChanged="SearchTextBox_TextChanged"></controls:SearchTextBox>
-        <ListView Grid.Row="2" Background="Transparent" ItemsSource="{Binding ElementName=_this, Path=BuildEntries, Mode=OneWay}"
-                  SelectionChanged="ListView_SelectionChanged" HorizontalContentAlignment="Stretch" Cursor="Hand">
-            <ListView.ItemContainerStyle>
-                <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MahApps.Styles.ListViewItem}">
-                    <Setter Property="Background" Value="Transparent"></Setter>
-                </Style>
-            </ListView.ItemContainerStyle>
-            <ListView.ItemTemplate>
+        <ItemsControl
+            Grid.Row="2"
+            Background="Transparent"
+            ItemsSource="{Binding ElementName=_this, Path=BuildEntries, Mode=OneWay}"
+            ScrollViewer.VerticalScrollBarVisibility="Visible"
+            VirtualizingPanel.IsVirtualizing="True"
+            VirtualizingPanel.IsContainerVirtualizable="True"
+            VirtualizingPanel.VirtualizationMode="Recycling"
+            ScrollViewer.CanContentScroll="True"
+            HorizontalContentAlignment="Stretch">
+            <ItemsControl.Template>
+                <ControlTemplate>
+                    <Border
+                            Padding="{TemplateBinding Control.Padding}"
+                            Background="{TemplateBinding Panel.Background}"
+                            BorderBrush="{TemplateBinding Border.BorderBrush}"
+                            BorderThickness="{TemplateBinding Border.BorderThickness}"
+                            SnapsToDevicePixels="True">
+                        <ScrollViewer Padding="{TemplateBinding Control.Padding}" Focusable="False">
+                            <ItemsPresenter SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
+                        </ScrollViewer>
+                    </Border>
+                </ControlTemplate>
+            </ItemsControl.Template>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <controls:BuildEntryTemplate Margin="5" RemoveClicked="BuildEntryTemplate_RemoveClicked"></controls:BuildEntryTemplate>
+                    <controls:BuildEntryTemplate 
+                        Margin="0" 
+                        Cursor="Hand"
+                        RemoveClicked="BuildEntryTemplate_RemoveClicked"
+                        EntryClicked="BuildEntryTemplate_EntryClicked"></controls:BuildEntryTemplate>
                 </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
         <controls:CircularLoadingWidget Grid.RowSpan="3"
                                         Width="100"
                                         Height="100"

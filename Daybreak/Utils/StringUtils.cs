@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Extensions;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Daybreak.Utils;
 
 public static class StringUtils
 {
+    private const int SearchSensitivity = 2;
+    private static readonly Regex SplitIntoWordsRegex = new Regex(@"\W+", RegexOptions.Compiled);
+
     public static int DamerauLevenshteinDistance(string s, string t)
     {
         var (height, width) = (s.Length + 1, t.Length + 1);
@@ -45,8 +50,33 @@ public static class StringUtils
     /// <returns>True if strings match.</returns>
     public static bool MatchesSearchString(string stringToSearch, string searchString)
     {
+        return MatchSearchStringScore(stringToSearch, searchString) < SearchSensitivity;
+    }
+
+    /// <summary>
+    /// Returns the match string score
+    /// </summary>
+    /// <param name="stringToSearch"></param>
+    /// <param name="searchString"></param>
+    /// <returns>True if strings match.</returns>
+    public static int MatchSearchStringScore(string stringToSearch, string searchString)
+    {
+        if (searchString.IsNullOrWhiteSpace() ||
+            searchString.Length < SearchSensitivity)
+        {
+            return 0;
+        }
+
+        if (stringToSearch.IsNullOrWhiteSpace() ||
+            stringToSearch.Length < SearchSensitivity)
+        {
+            return 0;
+        }
+
         // Return true if either the distance between the entire text and the searchstring is small enough, or if any of the words are close to the search string.
-        return DamerauLevenshteinDistance(stringToSearch.ToLower()[..Math.Min(stringToSearch.Length, searchString.Length)], searchString.ToLower()) < 3 ||
-            stringToSearch.Split(' ').Any(word => DamerauLevenshteinDistance(word.ToLower()[..Math.Min(word.Length, searchString.Length)], searchString.ToLower()) < 3);
+        return Math.Min(
+            DamerauLevenshteinDistance(stringToSearch.ToLower()[..Math.Min(stringToSearch.Length, searchString.Length)], searchString.ToLower()),
+            SplitIntoWordsRegex.Split(stringToSearch.ToLower())
+                .Select(word => DamerauLevenshteinDistance(word.ToLower()[..Math.Min(word.Length, searchString.Length)], searchString.ToLower())).Min());
     }
 }

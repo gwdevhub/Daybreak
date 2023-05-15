@@ -8,6 +8,8 @@
              mc:Ignorable="d" 
              Background="{StaticResource Daybreak.Brushes.Background}"
              d:DataContext="{d:DesignInstance Type=guildwars:WorldPlayerInformation, IsDesignTimeCreatable=True}"
+             BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+             BorderThickness="1"
              d:DesignHeight="300" d:DesignWidth="100">
     <StackPanel>
         <TextBlock 
