@@ -13,7 +13,7 @@ public abstract class ColoredEmbeddedSvgDrawingModuleBase<TDerivingType> : Embed
         switch (affiliation)
         {
             case Affiliation.Gray:
-                this.DrawSvg(bitmap, finalX, finalY, size, this.StrokeColor, Colors.Gray);
+                this.DrawSvg(bitmap, finalX, finalY, size, this.StrokeColor, Colors.Red);
                 break;
             case Affiliation.Red:
                 this.DrawSvg(bitmap, finalX, finalY, size, this.StrokeColor, ColorPalette.Red);

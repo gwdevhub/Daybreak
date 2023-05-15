@@ -13,7 +13,7 @@
     <LangVersion>preview</LangVersion>
     <ApplicationIcon>Daybreak.ico</ApplicationIcon>
     <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
-    <Version>0.9.8.46</Version>
+    <Version>0.9.8.47</Version>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <UserSecretsId>cfb2a489-db80-448d-a969-80270f314c46</UserSecretsId>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -25,6 +25,8 @@
     <None Remove="Services\Drawing\Resources\Dungeon.svg" />
     <None Remove="Services\Drawing\Resources\DungeonBoss.svg" />
     <None Remove="Services\Drawing\Resources\DungeonKey.svg" />
+    <None Remove="Services\Drawing\Resources\Flag.svg" />
+    <None Remove="Services\Drawing\Resources\Person.svg" />
     <None Remove="Services\Drawing\Resources\Scroll.svg" />
     <None Remove="Services\Drawing\Resources\Skull.svg" />
     <None Remove="Services\Drawing\Resources\StairsDown.svg" />
@@ -36,6 +38,8 @@
     <EmbeddedResource Include="Services\Drawing\Resources\CircledStar.svg" />
     <EmbeddedResource Include="Services\Drawing\Resources\Dungeon.svg" />
     <EmbeddedResource Include="Services\Drawing\Resources\DungeonBoss.svg" />
+    <EmbeddedResource Include="Services\Drawing\Resources\Flag.svg" />
+    <EmbeddedResource Include="Services\Drawing\Resources\Person.svg" />
     <EmbeddedResource Include="Services\Drawing\Resources\Scroll.svg" />
     <EmbeddedResource Include="Services\Drawing\Resources\Skull.svg" />
     <EmbeddedResource Include="Services\Drawing\Resources\StairsDown.svg" />
