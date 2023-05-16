@@ -96,4 +96,9 @@ public partial class MenuList : UserControl
     {
         this.viewManager.ShowView<AscalonTradeChatView>();
     }
+
+    private void TraderQuotesButton_Clicked(object sender, EventArgs e)
+    {
+        this.viewManager.ShowView<PriceQuotesView>();
+    }
 }

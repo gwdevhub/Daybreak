@@ -2,15 +2,14 @@
 using System.Windows.Controls;
 
 namespace Daybreak.Controls.Buttons;
-
 /// <summary>
-/// Interaction logic for AddButton.xaml
+/// Interaction logic for CopyButton.xaml
 /// </summary>
-public partial class AddButton : UserControl
+public partial class CopyButton : UserControl
 {
     public event EventHandler? Clicked;
 
-    public AddButton()
+    public CopyButton()
     {
         this.InitializeComponent();
     }

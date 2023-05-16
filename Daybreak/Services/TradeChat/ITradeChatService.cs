@@ -1,4 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Models.Guildwars;
 using Daybreak.Models.Trade;
 using System;
 using System.Collections.Generic;
@@ -25,4 +26,6 @@ public interface ITradeChatService
     Task<IEnumerable<TraderQuote>> GetBuyQuotes(CancellationToken cancellationToken);
 
     Task<IEnumerable<TraderQuote>> GetSellQuotes(CancellationToken cancellationToken);
+
+    Task<IEnumerable<TraderQuote>> GetPricingHistory(ItemBase itemBase, CancellationToken cancellationToken, DateTime? from = default, DateTime? to = default);
 }

@@ -56,6 +56,13 @@
                                 Cursor="Hand"
                                 Clicked="AscalonButton_Clicked">
                     </buttons:MenuButton>
+                    <buttons:MenuButton Title="Trader Quotes" 
+                                Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                                Height="30"
+                                Cursor="Hand"
+                                Clicked="TraderQuotesButton_Clicked">
+                    </buttons:MenuButton>
                 </local:ExpandableMenuSection.Children>
             </local:ExpandableMenuSection>
             <local:ExpandableMenuSection

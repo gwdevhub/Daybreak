@@ -11,9 +11,9 @@ using System.Windows.Media.Imaging;
 
 namespace Daybreak.Controls.Templates;
 /// <summary>
-/// Interaction logic for TradeMaterialTemplate.xaml
+/// Interaction logic for TradeQuoteTemplate.xaml
 /// </summary>
-public partial class TradeMaterialTemplate : UserControl
+public partial class TradeQuoteTemplate : UserControl
 {
     private readonly IIconCache iconCache;
 
@@ -22,12 +22,12 @@ public partial class TradeMaterialTemplate : UserControl
     [GenerateDependencyProperty]
     private bool imageVisible;
 
-    public TradeMaterialTemplate() :
+    public TradeQuoteTemplate() :
         this(Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IIconCache>())
     {
     }
 
-    public TradeMaterialTemplate(
+    public TradeQuoteTemplate(
         IIconCache iconCache)
     {
         this.iconCache = iconCache.ThrowIfNull();
