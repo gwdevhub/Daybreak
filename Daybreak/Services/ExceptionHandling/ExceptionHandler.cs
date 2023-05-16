@@ -1,4 +1,5 @@
 ﻿using Daybreak.Exceptions;
+using Daybreak.Services.Notifications;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Core.Extensions;
@@ -13,11 +14,14 @@ namespace Daybreak.Services.ExceptionHandling;
 
 public sealed class ExceptionHandler : IExceptionHandler
 {
+    private readonly INotificationService notificationService;
     private readonly ILogger<ExceptionHandler> logger;
 
     public ExceptionHandler(
+        INotificationService notificationService,
         ILogger<ExceptionHandler> logger)
     {
+        this.notificationService = notificationService.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
     }
 
@@ -76,7 +80,7 @@ public sealed class ExceptionHandler : IExceptionHandler
         }
 
         this.logger.LogError(e, $"Unhandled exception caught {e.GetType()}");
-        MessageBox.Show(e.ToString());
+        this.notificationService.NotifyError("Error", e.ToString(), () => MessageBox.Show(e.ToString()));
         return true;
     }
 }

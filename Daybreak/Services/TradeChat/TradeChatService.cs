@@ -28,6 +28,12 @@ namespace Daybreak.Services.TradeChat;
 public sealed class TradeChatService<TChannelOptions> : ITradeChatService<TChannelOptions>, IDisposable
     where TChannelOptions : class, ITradeChatOptions, new()
 {
+    private const long MinEpochTime = 1420070400;
+
+    private const string ModelIdPlaceholder = "[MODELID]";
+    private const string FromPlaceholder = "[FROM]";
+    private const string ToPlaceholder = "[TO]";
+    private const string PricingHistory = $"pricing_history/{ModelIdPlaceholder}/{FromPlaceholder}/{ToPlaceholder}";
     private const string TraderQuotesUri = "trader_quotes";
     private const string LatestTradesUri = "m";
     private const string SearchQueryUri = $"s/{QueryPlaceholder}";
@@ -125,70 +131,138 @@ public sealed class TradeChatService<TChannelOptions> : ITradeChatService<TChann
         
     }
 
-    public async Task<IEnumerable<TraderQuote>> GetBuyQuotes(CancellationToken cancellationToken)
+    public Task<IEnumerable<TraderQuote>> GetBuyQuotes(CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetBuyQuotes), string.Empty);
-        var content = await this.GetAsync(TraderQuotesUri, default, scopedLogger, cancellationToken);
-        var response = JsonConvert.DeserializeObject<TraderQuotesResponse>(content);
-        var responseList = new List<TraderQuote>();
-        foreach (var buyQuote in response?.BuyQuotes!)
-        {
-            var itemIdString = buyQuote.Key;
-            var quote = buyQuote.Value;
-            if (!int.TryParse(itemIdString, out var itemId) ||
-                !ItemBase.TryParse(itemId, out var item))
-            {
-                scopedLogger.LogInformation($"Unable to parse item {itemIdString}. Skipping quote");
-                continue;
-            }
-
-            var traderQuote = new TraderQuote { Item = item, Price = quote.Price };
-            responseList.Add(traderQuote);
-        }
-
-        return responseList;
+        return this.GetBuyQuotesInternal(cancellationToken);
     }
 
-    public async Task<IEnumerable<TraderQuote>> GetSellQuotes(CancellationToken cancellationToken)
+    public Task<IEnumerable<TraderQuote>> GetSellQuotes(CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetSellQuotes), string.Empty);
-        var content = await this.GetAsync(TraderQuotesUri, default, scopedLogger, cancellationToken);
-        var response = JsonConvert.DeserializeObject<TraderQuotesResponse>(content);
-        var responseList = new List<TraderQuote>();
-        foreach (var buyQuote in response?.SellQuotes!)
+        return this.GetSellQuotesInternal(cancellationToken);
+    }
+
+    public Task<IEnumerable<TraderQuote>> GetPricingHistory(ItemBase itemBase, CancellationToken cancellationToken, DateTime? from = default, DateTime? to = default)
+    {
+        return this.GetPricingHistoryInternal(itemBase, cancellationToken, from, to);
+    }
+
+    private async Task<IEnumerable<TraderQuote>> GetBuyQuotesInternal(CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetBuyQuotes), string.Empty);
+        try
         {
-            var itemIdString = buyQuote.Key;
-            var quote = buyQuote.Value;
-            if (!int.TryParse(itemIdString, out var itemId) ||
-                !ItemBase.TryParse(itemId, out var item))
+            var content = await this.GetAsync(TraderQuotesUri, default, scopedLogger, cancellationToken);
+            var response = JsonConvert.DeserializeObject<TraderQuotesResponse>(content);
+            var responseList = new List<TraderQuote>();
+            foreach (var buyQuote in response?.BuyQuotes!)
             {
-                scopedLogger.LogInformation($"Unable to parse item {itemIdString}. Skipping quote");
-                continue;
+                var itemIdString = buyQuote.Key;
+                var quote = buyQuote.Value;
+                if (!int.TryParse(itemIdString, out var itemId) ||
+                    !ItemBase.TryParse(itemId, out var item))
+                {
+                    scopedLogger.LogInformation($"Unable to parse item {itemIdString}. Skipping quote");
+                    continue;
+                }
+
+                var traderQuote = new TraderQuote { Item = item, Price = quote.Price };
+                responseList.Add(traderQuote);
             }
 
-            var traderQuote = new TraderQuote { Item = item, Price = quote.Price };
-            responseList.Add(traderQuote);
+            return responseList;
         }
+        catch(Exception ex)
+        {
+            scopedLogger.LogError(ex, "Encountered exception");
+            return Enumerable.Empty<TraderQuote>();
+        }
+    }
 
-        return responseList;
+    private async Task<IEnumerable<TraderQuote>> GetSellQuotesInternal(CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetSellQuotes), string.Empty);
+        try
+        {
+            var content = await this.GetAsync(TraderQuotesUri, default, scopedLogger, cancellationToken);
+            var response = JsonConvert.DeserializeObject<TraderQuotesResponse>(content);
+            var responseList = new List<TraderQuote>();
+            foreach (var buyQuote in response?.SellQuotes!)
+            {
+                var itemIdString = buyQuote.Key;
+                var quote = buyQuote.Value;
+                if (!int.TryParse(itemIdString, out var itemId) ||
+                    !ItemBase.TryParse(itemId, out var item))
+                {
+                    scopedLogger.LogInformation($"Unable to parse item {itemIdString}. Skipping quote");
+                    continue;
+                }
+
+                var traderQuote = new TraderQuote { Item = item, Price = quote.Price };
+                responseList.Add(traderQuote);
+            }
+
+            return responseList;
+        }
+        catch(Exception ex)
+        {
+            scopedLogger.LogError(ex, "Encountered exception");
+            return Enumerable.Empty<TraderQuote>();
+        }
+    }
+
+    private async Task<IEnumerable<TraderQuote>> GetPricingHistoryInternal(ItemBase itemBase, CancellationToken cancellationToken, DateTime? from = default, DateTime? to = default)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetPricingHistory), itemBase.Id.ToString());
+        try
+        {
+            from ??= DateTimeOffset.FromUnixTimeSeconds(MinEpochTime).DateTime;
+            to ??= DateTime.UtcNow;
+            var response = await this.httpClient.GetAsync(
+                PricingHistory.Replace(ModelIdPlaceholder, itemBase.Id.ToString())
+                    .Replace(FromPlaceholder, new DateTimeOffset(from.Value).ToUnixTimeSeconds().ToString())
+                    .Replace(ToPlaceholder, new DateTimeOffset(to.Value).ToUnixTimeSeconds().ToString()), cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return Enumerable.Empty<TraderQuote>();
+            }
+
+            var responseString = await response.Content.ReadAsStringAsync();
+            var responseList = JsonConvert.DeserializeObject<List<TraderQuotePayload>>(responseString);
+            return responseList?.Select(p => new TraderQuote { Item = itemBase, Price = p.Price, Timestamp = p.TimeStamp }) ??
+                Enumerable.Empty<TraderQuote>();
+        }
+        catch(Exception ex)
+        {
+            scopedLogger.LogError(ex, "Encountered exception");
+            return Enumerable.Empty<TraderQuote>();
+        }
     }
 
     private async Task<IEnumerable<TraderMessage>> GetTradeMessagesInternal(string uri, DateTime? from, ScopedLogger<TradeChatService<TChannelOptions>> scopedLogger, CancellationToken cancellationToken)
     {
-        using var requestMessage = new HttpRequestMessage(HttpMethod.Get, new Uri(new Uri(this.options.Value.HttpsUri), uri));
-        if (from.HasValue)
+        try
         {
-            requestMessage.Headers.TryAddWithoutValidation(IfNoneMatchHeader, new DateTimeOffset(from.Value).ToUnixTimeSeconds().ToString());
-        }
+            using var requestMessage = new HttpRequestMessage(HttpMethod.Get, new Uri(new Uri(this.options.Value.HttpsUri), uri));
+            if (from.HasValue)
+            {
+                requestMessage.Headers.TryAddWithoutValidation(IfNoneMatchHeader, new DateTimeOffset(from.Value).ToUnixTimeSeconds().ToString());
+            }
 
-        var content = await this.GetAsync(uri, requestMessage, scopedLogger, cancellationToken);
-        var responses = JsonConvert.DeserializeObject<List<TraderMessageResponse>>(content) ?? Array.Empty<TraderMessageResponse>().As<IEnumerable<TraderMessageResponse>>();
-        return responses!.Select(t => new TraderMessage
+            var content = await this.GetAsync(uri, requestMessage, scopedLogger, cancellationToken);
+            var responses = JsonConvert.DeserializeObject<List<TraderMessageResponse>>(content) ?? Array.Empty<TraderMessageResponse>().As<IEnumerable<TraderMessageResponse>>();
+            return responses!.Select(t => new TraderMessage
+            {
+                Message = t.Message ?? string.Empty,
+                Sender = t.Sender ?? string.Empty,
+                Timestamp = DateTimeOffset.FromUnixTimeMilliseconds(t.Timestamp ?? 0).ToLocalTime().DateTime,
+            });
+        }
+        catch(Exception ex)
         {
-            Message = t.Message ?? string.Empty,
-            Sender = t.Sender ?? string.Empty,
-            Timestamp = DateTimeOffset.FromUnixTimeMilliseconds(t.Timestamp ?? 0).ToLocalTime().DateTime,
-        });
+            scopedLogger.LogError(ex, "Encountered exception");
+            return Enumerable.Empty<TraderMessage>();
+        }
     }
 
     private async Task<string> GetAsync(string? uri, HttpRequestMessage? httpRequestMessage, ScopedLogger<TradeChatService<TChannelOptions>> scopedLogger, CancellationToken cancellationToken)

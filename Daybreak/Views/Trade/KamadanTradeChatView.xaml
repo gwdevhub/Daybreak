@@ -9,9 +9,14 @@
              x:Name="_this"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Background="{StaticResource Daybreak.Brushes.Background}">
-        <templates:TradeMarketTemplate 
+        <Border BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                BorderThickness="0, 1, 0, 0"/>
+        <templates:TradeChatTemplate 
             TradeChatService="{Binding ElementName=_this, Path=TradeChatService, Mode=OneWay}"
             Title="Kamadan Trade Chat"
-            MarketUrl="{Binding ElementName=_this, Path=Options.HttpsUri, Mode=OneWay}"/>
+            PoweredBy="{Binding ElementName=_this, Path=Options.HttpsUri, Mode=OneWay}"
+            NameCopyClicked="TradeChatTemplate_NameCopyClicked"
+            MessageCopyClicked="TradeChatTemplate_MessageCopyClicked"
+            TimestampCopyClicked="TradeChatTemplate_TimestampCopyClicked"/>
     </Grid>
 </UserControl>

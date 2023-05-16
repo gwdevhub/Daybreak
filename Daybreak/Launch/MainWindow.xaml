@@ -9,6 +9,7 @@
         xmlns:effects="clr-namespace:System.Windows.Media.Extensions.Effects;assembly=WpfExtended"
         xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
         xmlns:glyphs="clr-namespace:Daybreak.Controls.Glyphs"
+        xmlns:notifications="clr-namespace:Daybreak.Controls.Notifications"
         WindowStyle="None"
         ResizeMode="CanResize"
         Loaded="Window_Loaded"
@@ -140,5 +141,11 @@
                       Background="#F09E9E9E"
                       Visibility="{Binding ElementName=_this, Path=IsShowingDropdown, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
                       Click="SettingsButton_Clicked"></ToggleButton>
+        <notifications:NotificationStackpanel 
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom"
+            Width="300"
+            Grid.RowSpan="2"
+            Grid.ColumnSpan="2"/>
     </Grid>
 </mah:MetroWindow>

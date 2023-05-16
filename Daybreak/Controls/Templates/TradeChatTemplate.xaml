@@ -19,9 +19,35 @@
     <Grid Background="Transparent">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
+        <Grid
+            Grid.Row="0"
+            Height="30">
+            <WrapPanel
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top">
+                <TextBlock 
+                    Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                    Text="Powered by: "
+                    FontSize="12"/>
+                <TextBlock 
+                    Foreground="{StaticResource MahApps.Brushes.Accent}"
+                    Text="{Binding ElementName=_this, Path=PoweredBy, Mode=OneWay}"
+                    FontSize="12"
+                    Cursor="Hand"
+                    MouseLeftButtonDown="TextBlock_MouseLeftButtonDown"/>
+            </WrapPanel>
+            <TextBlock Text="{Binding ElementName=_this, Path=Title, Mode=OneWay}"
+                       FontSize="22"
+                       HorizontalAlignment="Center"
+                       Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"/>
+            <Border 
+                BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                BorderThickness="0, 0, 0, 1"/>
+        </Grid>
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="auto" />
@@ -38,7 +64,7 @@
                       VirtualizingPanel.IsVirtualizing="True"
                       VirtualizingPanel.VirtualizationMode="Recycling"
                       ScrollViewer.CanContentScroll="True"
-                      Grid.Row="1">
+                      Grid.Row="2">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel />
@@ -68,9 +94,9 @@
         </ItemsControl>
         <Rectangle
             Fill="{StaticResource Daybreak.Brushes.Background}"
-            Grid.RowSpan="2"
+            Grid.RowSpan="3"
             Visibility="{Binding ElementName=_this, Path=MessageOverlayVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"></Rectangle>
-        <Grid Grid.RowSpan="2"
+        <Grid Grid.RowSpan="3"
               MaxWidth="600"
               MaxHeight="400"
               VerticalAlignment="Center"
@@ -103,6 +129,8 @@
                     IsReadOnly="True"
                     IsReadOnlyCaretVisible="False"
                     BorderThickness="0, 0, 0, 1"/>
+                <buttons:CopyButton Height="20" Width="20"
+                                    Clicked="NameCopyButton_Clicked"/>
             </WrapPanel>
             <WrapPanel
                 Margin="10, 0, 10, 0"
@@ -120,6 +148,8 @@
                     IsReadOnly="True"
                     IsReadOnlyCaretVisible="False"
                     BorderThickness="0, 0, 0, 1"/>
+                <buttons:CopyButton Height="20" Width="20"
+                                    Clicked="MessageCopyButton_Clicked"/>
             </WrapPanel>
             <WrapPanel
                 Margin="10, 0, 10, 0"
@@ -137,6 +167,8 @@
                     IsReadOnly="True"
                     IsReadOnlyCaretVisible="False"
                     BorderThickness="0, 0, 0, 1"/>
+                <buttons:CopyButton Height="20" Width="20"
+                                    Clicked="TimestampCopyButton_Clicked"/>
             </WrapPanel>
             <buttons:HighlightButton
                 Grid.Row="3"

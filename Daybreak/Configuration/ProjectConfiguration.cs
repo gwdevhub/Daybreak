@@ -54,6 +54,8 @@ using Daybreak.Services.TradeChat;
 using Daybreak.Views.Trade;
 using System.Net.WebSockets;
 using Daybreak.Utils;
+using Daybreak.Services.Notifications;
+using System.Runtime.CompilerServices;
 
 namespace Daybreak.Configuration;
 
@@ -128,16 +130,18 @@ public static class ProjectConfiguration
         services.AddSingleton<IPostUpdateActionProducer>(sp => sp.GetRequiredService<PostUpdateActionManager>());
         services.AddSingleton<IPostUpdateActionProvider>(sp => sp.GetRequiredService<PostUpdateActionManager>());
         services.AddSingleton<IMenuService, MenuService>();
-        services.AddSingleton<IMenuServiceInitializer, MenuService>(sp => sp.GetRequiredService<IMenuService>().As<MenuService>());
+        services.AddSingleton<IMenuServiceInitializer, MenuService>(sp => sp.GetRequiredService<IMenuService>().As<MenuService>()!);
         services.AddSingleton<ILiteDatabase, LiteDatabase>(sp => new LiteDatabase("Daybreak.db"));
         services.AddSingleton<IMutexHandler, MutexHandler>();
         services.AddSingleton<IShortcutManager, ShortcutManager>();
         services.AddSingleton<IMetricsService, MetricsService>();
         services.AddSingleton<IStartupActionProducer, StartupActionManager>();
-        services.AddSingleton<IOptionsProducer, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().As<OptionsManager>());
-        services.AddSingleton<IOptionsUpdateHook, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().As<OptionsManager>());
-        services.AddSingleton<IOptionsProvider, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().As<OptionsManager>());
+        services.AddSingleton<IOptionsProducer, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().As<OptionsManager>()!);
+        services.AddSingleton<IOptionsUpdateHook, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().As<OptionsManager>()!);
+        services.AddSingleton<IOptionsProvider, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().As<OptionsManager>()!);
         services.AddSingleton<IThemeManager, ThemeManager>();
+        services.AddSingleton<INotificationService, NotificationService>();
+        services.AddSingleton<INotificationProducer, NotificationService>(sp => sp.GetRequiredService<INotificationService>().As<NotificationService>()!);
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
         services.AddScoped<IScreenshotProvider, ScreenshotProvider>();
@@ -159,7 +163,7 @@ public static class ProjectConfiguration
         services.AddScoped<IExceptionHandler, ExceptionHandler>();
         services.AddScoped<IPathfinder, StupidPathfinder>();
         services.AddScoped<IDrawingService, DrawingService>();
-        services.AddScoped<IDrawingModuleProducer, DrawingService>(sp => sp.GetRequiredService<IDrawingService>().As<DrawingService>());
+        services.AddScoped<IDrawingModuleProducer, DrawingService>(sp => sp.GetRequiredService<IDrawingService>().As<DrawingService>()!);
         services.AddScoped<IUModService, UModService>();
         services.AddScoped<IToolboxService, ToolboxService>();
         services.AddScoped<ITradeChatService<KamadanTradeChatOptions>, TradeChatService<KamadanTradeChatOptions>>();
@@ -200,6 +204,7 @@ public static class ProjectConfiguration
         viewProducer.RegisterView<OptionSectionView>();
         viewProducer.RegisterView<KamadanTradeChatView>();
         viewProducer.RegisterView<AscalonTradeChatView>();
+        viewProducer.RegisterView<PriceQuotesView>();
     }
 
     public static void RegisterStartupActions(IStartupActionProducer startupActionProducer)
