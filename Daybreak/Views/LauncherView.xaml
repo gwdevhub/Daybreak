@@ -21,7 +21,7 @@
                             Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                             HighlightColor="{StaticResource MahApps.Brushes.Accent}"
                             Background="{StaticResource Daybreak.Brushes.Background}"
-                            FontSize="36" Width="450" Height="150"
+                            FontSize="36" Width="400" Height="100"
                             BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
                             BorderThickness="1"
                             IsEnabled="{Binding ElementName=_this, Path=LaunchButtonEnabled, Mode=OneWay}"

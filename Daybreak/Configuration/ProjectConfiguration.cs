@@ -55,7 +55,11 @@ using Daybreak.Views.Trade;
 using System.Net.WebSockets;
 using Daybreak.Utils;
 using Daybreak.Services.Notifications;
-using System.Runtime.CompilerServices;
+using Daybreak.Models.Trade;
+using Microsoft.Extensions.Options;
+using Daybreak.Services.TradeChat.Models;
+using Daybreak.Services.Charts;
+using Daybreak.Services.Images;
 
 namespace Daybreak.Configuration;
 
@@ -97,6 +101,14 @@ public static class ProjectConfiguration
                 .Build()
             .RegisterHttpClient<IconCache>()
                 .WithMessageHandler(SetupLoggingAndMetrics<IconCache>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
+                .Build()
+            .RegisterHttpClient<TraderQuoteService>()
+                .WithMessageHandler(SetupLoggingAndMetrics<TraderQuoteService>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
+                .Build()
+            .RegisterHttpClient<PriceHistoryService>()
+                .WithMessageHandler(SetupLoggingAndMetrics<PriceHistoryService>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build();
     }
@@ -142,6 +154,8 @@ public static class ProjectConfiguration
         services.AddSingleton<IThemeManager, ThemeManager>();
         services.AddSingleton<INotificationService, NotificationService>();
         services.AddSingleton<INotificationProducer, NotificationService>(sp => sp.GetRequiredService<INotificationService>().As<NotificationService>()!);
+        services.AddSingleton<ILiveChartInitializer, LiveChartInitializer>();
+        services.AddSingleton<IImageCache, ImageCache>();
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
         services.AddScoped<IScreenshotProvider, ScreenshotProvider>();
@@ -168,6 +182,9 @@ public static class ProjectConfiguration
         services.AddScoped<IToolboxService, ToolboxService>();
         services.AddScoped<ITradeChatService<KamadanTradeChatOptions>, TradeChatService<KamadanTradeChatOptions>>();
         services.AddScoped<ITradeChatService<AscalonTradeChatOptions>, TradeChatService<AscalonTradeChatOptions>>();
+        services.AddScoped<ITraderQuoteService, TraderQuoteService>();
+        services.AddScoped<IPriceHistoryDatabase, PriceHistoryDatabase>();
+        services.AddScoped<IPriceHistoryService, PriceHistoryService>();
     }
 
     public static void RegisterViews(IViewProducer viewProducer)
@@ -205,6 +222,7 @@ public static class ProjectConfiguration
         viewProducer.RegisterView<KamadanTradeChatView>();
         viewProducer.RegisterView<AscalonTradeChatView>();
         viewProducer.RegisterView<PriceQuotesView>();
+        viewProducer.RegisterView<PriceHistoryView>();
     }
 
     public static void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -222,7 +240,6 @@ public static class ProjectConfiguration
     public static void RegisterDrawingModules(IDrawingModuleProducer drawingModuleProducer)
     {
         drawingModuleProducer.ThrowIfNull();
-
 
         drawingModuleProducer.RegisterDrawingModule<DeadEntityDrawingModule>();
         drawingModuleProducer.RegisterDrawingModule<NeutralEntityDrawingModule>();
@@ -269,6 +286,26 @@ public static class ProjectConfiguration
         optionsProducer.RegisterOptions<ScreenManagerOptions>();
         optionsProducer.RegisterOptions<KamadanTradeChatOptions>();
         optionsProducer.RegisterOptions<AscalonTradeChatOptions>();
+        optionsProducer.RegisterOptions<LoggingOptions>();
+        optionsProducer.RegisterOptions<PriceHistoryOptions>();
+        optionsProducer.RegisterOptions<TraderQuotesOptions>();
+    }
+
+    public static void RegisterLiteCollections(IServiceCollection services)
+    {
+        RegisterLiteCollection<Models.Log, LoggingOptions>(services);
+        RegisterLiteCollection<TraderQuoteDTO, PriceHistoryOptions>(services);
+    }
+
+    private static void RegisterLiteCollection<TCollectionType, TOptionsType>(IServiceCollection services)
+        where TOptionsType : class, ILiteCollectionOptions<TCollectionType>
+    {
+        services.AddSingleton(sp =>
+        {
+            var options = sp.GetRequiredService<IOptions<TOptionsType>>();
+            var liteDatabase = sp.GetRequiredService<ILiteDatabase>();
+            return liteDatabase.GetCollection<TCollectionType>(options.Value.CollectionName, BsonAutoId.Int64);
+        });
     }
 
     private static void SetupDaybreakUserAgent(HttpRequestHeaders httpRequestHeaders)

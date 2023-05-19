@@ -1,8 +1,8 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Models.Guildwars;
 using HtmlAgilityPack;
+using MahApps.Metro.Controls;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System;
 using System.Configuration;
 using System.Core.Extensions;
@@ -39,7 +39,7 @@ public sealed class IconCache : IIconCache
         }
     }
 
-    public async Task<Uri?> GetIconUri(Skill skill)
+    public async Task<string?> GetIconUri(Skill skill)
     {
         if (skill is null ||
             skill.Name!.IsNullOrWhiteSpace())
@@ -48,15 +48,17 @@ public sealed class IconCache : IIconCache
         }
 
         var curedSkillName = CureSkillName(skill);
-        if (curedSkillName!.IsNullOrWhiteSpace())
+        var fileName = SkillFileSafeName(skill);
+        if (curedSkillName!.IsNullOrWhiteSpace() ||
+            fileName!.IsNullOrWhiteSpace())
         {
             return default;
         }
 
-        return await this.GetIconUriInternal(curedSkillName!);
+        return await this.GetIconUriInternal(curedSkillName!, fileName!);
     }
 
-    public async Task<Uri?> GetIconUri(ItemBase itemBase)
+    public async Task<string?> GetIconUri(ItemBase itemBase)
     {
         if (itemBase is null ||
             itemBase.Name!.IsNullOrWhiteSpace())
@@ -65,19 +67,21 @@ public sealed class IconCache : IIconCache
         }
 
         var curedMaterialName = CureName(itemBase.Name);
-        if (curedMaterialName!.IsNullOrWhiteSpace())
+        var fileName = FileSafeName(itemBase.Name);
+        if (curedMaterialName!.IsNullOrWhiteSpace() ||
+            fileName!.IsNullOrWhiteSpace())
         {
             return default;
         }
 
-        return await this.GetIconUriInternal(curedMaterialName!);
+        return await this.GetIconUriInternal(curedMaterialName!, fileName!);
     }
 
-    private async Task<Uri?> GetIconUriInternal(string curedName)
+    private async Task<string?> GetIconUriInternal(string curedName, string fileName)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetIconUriInternal), string.Empty);
-        var maybeIconUri = this.GetLocalIcon(curedName!);
-        if (maybeIconUri is Uri uri)
+        var maybeIconUri = this.GetLocalIcon(fileName);
+        if (maybeIconUri is string uri)
         {
             return uri;
         }
@@ -88,10 +92,10 @@ public sealed class IconCache : IIconCache
             return default;
         }
 
-        return await this.DownloadAndRetrieveIcon(curedName!);
+        return await this.DownloadAndRetrieveIcon(curedName, fileName);
     }
 
-    private async Task<Uri?> DownloadAndRetrieveIcon(string curedName)
+    private async Task<string?> DownloadAndRetrieveIcon(string curedName, string fileName)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(DownloadAndRetrieveIcon), curedName!);
         if (curedName is null)
@@ -112,7 +116,7 @@ public sealed class IconCache : IIconCache
             return default!;
         }
 
-        return await this.SaveLocalIcon(await response.Content.ReadAsByteArrayAsync(), curedName);
+        return await this.SaveLocalIcon(await response.Content.ReadAsByteArrayAsync(), fileName);
     }
 
     private async Task<Uri?> GetRemoteIconUri(string curedName)
@@ -132,7 +136,7 @@ public sealed class IconCache : IIconCache
         foreach (var imgElement in imgElements)
         {
             if (imgElement.GetAttributeValue<string>("src", string.Empty) is string src &&
-                src.Contains(curedName) &&
+                src.ToLower().Contains(curedName.ToLower()) &&
                 (Uri.TryCreate(src, UriKind.Absolute, out var iconUri) ||
                  Uri.TryCreate(new Uri(WikiUrl), src, out iconUri)))
             {
@@ -143,11 +147,10 @@ public sealed class IconCache : IIconCache
         return default;
     }
 
-    private Uri? GetLocalIcon(string name)
+    private string? GetLocalIcon(string name)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetLocalIcon), name);
-        var curedSkillName = CureName(name);
-        var filePath = IconsLocation.Replace(NamePlaceholder, curedSkillName);
+        var filePath = IconsLocation.Replace(NamePlaceholder, name);
         scopedLogger.LogInformation("Checking local icon cache");
         if (!File.Exists(filePath))
         {
@@ -156,10 +159,10 @@ public sealed class IconCache : IIconCache
         }
 
         scopedLogger.LogInformation("Local icon cache found. Retrieving icon");
-        return new Uri(AppDomain.CurrentDomain.BaseDirectory + "/" + IconsLocation.Replace(NamePlaceholder, curedSkillName), UriKind.Absolute);
+        return Path.GetFullPath(IconsLocation.Replace(NamePlaceholder, name));
     }
 
-    private async Task<Uri?> SaveLocalIcon(byte[] bytes, string name)
+    private async Task<string?> SaveLocalIcon(byte[] bytes, string name)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.SaveLocalIcon), name!);
         var filePath = IconsLocation.Replace(NamePlaceholder, name);
@@ -170,7 +173,7 @@ public sealed class IconCache : IIconCache
         }
 
         await File.WriteAllBytesAsync(filePath, bytes);
-        return new Uri(Path.GetFullPath(filePath));
+        return Path.GetFullPath(filePath);
     }
 
     private static string? CureSkillName(Skill? skill)
@@ -183,6 +186,16 @@ public sealed class IconCache : IIconCache
         return CureName(skill.AlternativeName!.IsNullOrWhiteSpace() ? skill.Name : skill.AlternativeName);
     }
 
+    private static string? SkillFileSafeName(Skill? skill)
+    {
+        if (skill is null)
+        {
+            return default;
+        }
+
+        return FileSafeName(skill.AlternativeName!.IsNullOrWhiteSpace() ? skill.Name : skill.AlternativeName);
+    }
+
     private static string? CureName(string? name)
     {
         return name?
@@ -190,5 +203,11 @@ public sealed class IconCache : IIconCache
             .Replace("'", "%27")
             .Replace("!", "%21")
             .Replace("\"", "%22");
+    }
+
+    private static string? FileSafeName(string? name)
+    {
+        return name?
+            .Replace("\"", string.Empty);
     }
 }

@@ -36,6 +36,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
     {
         var serviceManager = new ServiceManager();
         ProjectConfiguration.RegisterResolvers(serviceManager);
+        ProjectConfiguration.RegisterLiteCollections(services);
         return services.BuildSlimServiceProvider(serviceManager);
     }
 

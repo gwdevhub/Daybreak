@@ -21,7 +21,7 @@ public class JsonLoggerProviderTests
     {
         File.Delete("Daybreak.db");
         this.liteDatabase = new LiteDatabase("Daybreak.db");
-        this.logsManager = new JsonLogsManager(this.liteDatabase);
+        this.logsManager = new JsonLogsManager(this.liteDatabase.GetCollection<Daybreak.Models.Log>());
         this.loggerProvider = new CVLoggerProvider(this.logsManager);
     }
 

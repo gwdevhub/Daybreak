@@ -1,5 +1,6 @@
 ﻿using Daybreak.Models.Trade;
 using Daybreak.Services.IconRetrieve;
+using Daybreak.Services.Images;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Core.Extensions;
@@ -7,7 +8,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace Daybreak.Controls.Templates;
 /// <summary>
@@ -15,6 +15,7 @@ namespace Daybreak.Controls.Templates;
 /// </summary>
 public partial class TradeQuoteTemplate : UserControl
 {
+    private readonly IImageCache imageCache;
     private readonly IIconCache iconCache;
 
     [GenerateDependencyProperty]
@@ -23,13 +24,16 @@ public partial class TradeQuoteTemplate : UserControl
     private bool imageVisible;
 
     public TradeQuoteTemplate() :
-        this(Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IIconCache>())
+        this(Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IImageCache>(),
+            Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IIconCache>())
     {
     }
 
     public TradeQuoteTemplate(
+        IImageCache imageCache,
         IIconCache iconCache)
     {
+        this.imageCache = imageCache.ThrowIfNull();
         this.iconCache = iconCache.ThrowIfNull();
         this.InitializeComponent();
     }
@@ -41,7 +45,7 @@ public partial class TradeQuoteTemplate : UserControl
             return;
         }
 
-        var imageUri = await this.iconCache.GetIconUri(traderQuote.Item);
+        var imageUri = await this.iconCache.GetIconUri(traderQuote.Item!);
         if (imageUri is null)
         {
             this.ImageVisible = false;
@@ -49,6 +53,6 @@ public partial class TradeQuoteTemplate : UserControl
         }
 
         this.ImageVisible = true;
-        this.ImageSource = new BitmapImage(imageUri);
+        this.ImageSource = this.imageCache.GetImage(imageUri);
     }
 }

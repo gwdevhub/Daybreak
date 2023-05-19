@@ -6,25 +6,41 @@
              xmlns:local="clr-namespace:Daybreak.Views.Trade"
              xmlns:templates="clr-namespace:Daybreak.Controls.Templates"
              xmlns:traderModels="clr-namespace:Daybreak.Models.Trade"
+             xmlns:controls="clr-namespace:Daybreak.Controls"
+             xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              mc:Ignorable="d" 
              Loaded="UserControl_Loaded"
              x:Name="_this"
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
     <Grid
         Background="{StaticResource Daybreak.Brushes.Background}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
         <Border BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
-                BorderThickness="0, 1, 0, 0"/>
+                BorderThickness="0, 1, 0, 0"
+                Grid.RowSpan="3"/>
+        <TextBlock 
+            FontSize="22"
+            Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+            Text="Trader Quotes"
+            HorizontalAlignment="Center"/>
+        <controls:SearchTextBox
+            Grid.Row="1"
+            Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+            FontSize="24"
+            DebounceDelay="0:0:1"
+            TextChanged="SearchTextBox_TextChanged" />
         <ItemsControl
+                    Grid.Row="2"
                     ItemsSource="{Binding ElementName=_this, Path=TraderQuotes, Mode=OneWay}"
                     ScrollViewer.VerticalScrollBarVisibility="Auto"
-                    VirtualizingPanel.IsVirtualizing="True"
-                    VirtualizingPanel.VirtualizationMode="Recycling"
                     ScrollViewer.CanContentScroll="True">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <VirtualizingStackPanel />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
             <ItemsControl.Template>
                 <ControlTemplate>
                     <Border
@@ -41,12 +57,27 @@
             </ItemsControl.Template>
             <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="traderModels:TraderQuote">
-                    <templates:TradeQuoteTemplate 
+                    <buttons:HighlightButton
+                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                        HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                        Clicked="HighlightButton_Clicked">
+                        <buttons:HighlightButton.ButtonContent>
+                            <templates:TradeQuoteTemplate 
                                 BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
                                 BorderThickness="0, 0, 1, 1"
                                 MinHeight="40" />
+                        </buttons:HighlightButton.ButtonContent>
+                    </buttons:HighlightButton>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
+        <Grid
+            Visibility="{Binding ElementName=_this, Path=Loading, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+            Background="{StaticResource Daybreak.Brushes.Background}"
+            Grid.RowSpan="3">
+            <controls:CircularLoadingWidget
+                MaxWidth="200"
+                MaxHeight="200"/>
+        </Grid>
     </Grid>
 </UserControl>

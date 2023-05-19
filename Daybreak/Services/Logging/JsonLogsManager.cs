@@ -1,6 +1,7 @@
 ﻿using LiteDB;
 using System;
 using System.Collections.Generic;
+using System.Core.Extensions;
 using System.Extensions;
 using System.Linq.Expressions;
 using System.Logging;
@@ -9,20 +10,20 @@ namespace Daybreak.Services.Logging;
 
 public sealed class JsonLogsManager : ILogsManager
 {
-    private readonly ILiteDatabase liteDatabase;
+    private readonly ILiteCollection<Models.Log> collection;
 
-    public JsonLogsManager(ILiteDatabase liteDatabase)
+    public JsonLogsManager(ILiteCollection<Models.Log> collection)
     {
-        this.liteDatabase = liteDatabase.ThrowIfNull(nameof(liteDatabase));
+        this.collection = collection.ThrowIfNull();
     }
 
     public IEnumerable<Models.Log> GetLogs(Expression<Func<Models.Log, bool>> filter)
     {
-        return this.liteDatabase.GetCollection<Models.Log>().Find(filter);
+        return this.collection.Find(filter);
     }
     public IEnumerable<Models.Log> GetLogs()
     {
-        return this.liteDatabase.GetCollection<Models.Log>().FindAll();
+        return this.collection.FindAll();
     }
     public void WriteLog(Log log)
     {
@@ -36,10 +37,10 @@ public sealed class JsonLogsManager : ILogsManager
             CorrelationVector = log.CorrelationVector
         };
 
-        this.liteDatabase.GetCollection<Models.Log>().Insert(dbLog);
+        this.collection.Insert(dbLog);
     }
     public int DeleteLogs()
     {
-        return this.liteDatabase.GetCollection<Models.Log>().DeleteAll();
+        return this.collection.DeleteAll();
     }
 }

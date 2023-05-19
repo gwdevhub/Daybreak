@@ -22,10 +22,4 @@ public interface ITradeChatService
     Task<IEnumerable<TraderMessage>> GetTradesByQuery(string query, CancellationToken cancellationToken, DateTime? from = default, DateTime? to = default);
 
     Task<IEnumerable<TraderMessage>> GetTradesByUsername(string username, CancellationToken cancellationToken, DateTime? from = default, DateTime? to = default);
-
-    Task<IEnumerable<TraderQuote>> GetBuyQuotes(CancellationToken cancellationToken);
-
-    Task<IEnumerable<TraderQuote>> GetSellQuotes(CancellationToken cancellationToken);
-
-    Task<IEnumerable<TraderQuote>> GetPricingHistory(ItemBase itemBase, CancellationToken cancellationToken, DateTime? from = default, DateTime? to = default);
 }
