@@ -1,6 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Services.UMod;
-using ScottPlot.Control.EventProcess;
 using System.Configuration;
 using System.Core.Extensions;
 using System.IO;

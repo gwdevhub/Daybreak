@@ -4,7 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Views"
-             xmlns:scottPlot="clr-namespace:ScottPlot;assembly=ScottPlot"
+             xmlns:chart="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
+             xmlns:lvCore="clr-namespace:LiveChartsCore;assembly=LiveChartsCore"
              mc:Ignorable="d" 
              Loaded="UserControl_Loaded"
              x:Name="_this"
@@ -35,8 +36,18 @@
                                        Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                        FontSize="11"
                                     VerticalAlignment="Center"></TextBlock>
-                                <WpfPlot Loaded="WpfPlot_Loaded" HorizontalContentAlignment="Stretch"
-                                     Height="300"></WpfPlot>
+                                <chart:CartesianChart 
+                                    Loaded="CartesianChart_Loaded"
+                                    Title="{Binding ElementName=_this, Path=Title, Mode=OneWay}"
+                                    Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                    ZoomMode="X"
+                                    EasingFunction="{x:Static lvCore:EasingFunctions.BounceOut}"
+                                    AnimationsSpeed="0:0:0.1"
+                                    Background="{StaticResource MahApps.Brushes.ThemeBackground}"
+                                    XAxes="{Binding ElementName=_this, Path=XAxes, Mode=OneWay}"
+                                    YAxes="{Binding ElementName=_this, Path=YAxes, Mode=OneWay}"
+                                    Height="300">
+                                </chart:CartesianChart>
                             </StackPanel>
                         </Grid>
                     </DataTemplate>

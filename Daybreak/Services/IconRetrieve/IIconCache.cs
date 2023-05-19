@@ -6,6 +6,6 @@ namespace Daybreak.Services.IconRetrieve;
 
 public interface IIconCache
 {
-    Task<Uri?> GetIconUri(Skill skill);
-    Task<Uri?> GetIconUri(ItemBase itemBase);
+    Task<string?> GetIconUri(Skill skill);
+    Task<string?> GetIconUri(ItemBase itemBase);
 }

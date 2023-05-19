@@ -1,6 +1,7 @@
 ﻿using Daybreak.Launch;
 using Daybreak.Models.Guildwars;
 using Daybreak.Services.IconRetrieve;
+using Daybreak.Services.Images;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Core.Extensions;
@@ -22,7 +23,8 @@ public partial class SkillTemplate : UserControl
     public event EventHandler<RoutedEventArgs>? Clicked;
     public event EventHandler? RemoveClicked;
 
-    private IIconCache? iconRetriever;
+    private IImageCache imageCache;
+    private IIconCache iconRetriever;
 
     [GenerateDependencyProperty]
     private ImageSource imageSource = default!;
@@ -30,13 +32,16 @@ public partial class SkillTemplate : UserControl
     private double borderOpacity;
 
     public SkillTemplate()
-        : this(Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IIconCache>())
+        : this(Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IImageCache>(),
+              Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IIconCache>())
     {
     }
 
     public SkillTemplate(
+        IImageCache imageCache,
         IIconCache iconCache)
     {
+        this.imageCache = imageCache.ThrowIfNull();
         this.iconRetriever = iconCache.ThrowIfNull();
         this.InitializeComponent();
         this.DataContextChanged += this.SkillTemplate_DataContextChanged;
@@ -54,10 +59,7 @@ public partial class SkillTemplate : UserControl
             if (skill != Skill.NoSkill)
             {
                 var maybeUri = await this.iconRetriever.GetIconUri(skill).ConfigureAwait(true);
-                if (maybeUri is Uri uri)
-                {
-                    this.ImageSource = new BitmapImage(uri);
-                }
+                this.ImageSource = this.imageCache.GetImage(maybeUri);
             }
             else if (this.ImageSource is not null)
             {
