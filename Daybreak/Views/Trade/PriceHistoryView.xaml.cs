@@ -115,7 +115,7 @@ public partial class PriceHistoryView : UserControl
             {
                 Name = "Date",
                 LabelsPaint = this.foregroundPaint,
-                Labeler = (ticks) => new DateTime((long)ticks).ToString(),
+                Labeler = (ticks) => new DateTime((long)ticks).ToString("d"),
                 MinLimit = this.StartDateTime.Ticks,
                 MaxLimit = this.EndDateTime.Ticks,
                 MinStep = TimeSpan.FromHours(1).Ticks,
