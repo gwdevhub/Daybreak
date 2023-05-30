@@ -459,13 +459,15 @@ public partial class FocusView : UserControl
         {
             try
             {
-                await this.UpdateGameData().ConfigureAwait(true);
                 if (cancellationToken.IsCancellationRequested)
                 {
                     return;
                 }
 
-                await Task.Delay(memoryReaderLatency, cancellationToken).ConfigureAwait(true);
+                await Task.WhenAll(
+                    this.UpdateGameData(),
+                    Task.Delay(memoryReaderLatency, cancellationToken)).ConfigureAwait(true);
+                
             }
             catch (Exception ex)
             {

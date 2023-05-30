@@ -79,7 +79,7 @@ public partial class MetricsView : UserControl
             {
                 Name = "Time",
                 LabelsPaint = this.foregroundPaint,
-                Labeler = (ticks) => new DateTime((long)ticks).ToString("HH:mm:ss.ffff")
+                Labeler = (ticks) => new DateTime((long)ticks).ToString("HH:mm:ss")
             }
         };
 
@@ -136,5 +136,10 @@ public partial class MetricsView : UserControl
         var finalDataSet = orderedByValueDataSet.Take(valuesToTake).OrderBy(s => s.Timestamp);
 
         return finalDataSet;
+    }
+
+    private void InterceptScroll(object sender, System.Windows.Input.MouseWheelEventArgs e)
+    {
+        e.Handled = true;
     }
 }
