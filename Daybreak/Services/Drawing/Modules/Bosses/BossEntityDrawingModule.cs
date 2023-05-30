@@ -3,12 +3,12 @@ using Daybreak.Services.Drawing.Modules.Primitives;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace Daybreak.Services.Drawing.Modules.Entities;
+namespace Daybreak.Services.Drawing.Modules.Bosses;
 
-public sealed class BossEntityDrawingModule : EmbeddedSvgDrawingModuleBase<BossEntityDrawingModule>
+public abstract class BossEntityDrawingModule : EmbeddedSvgDrawingModuleBase<BossEntityDrawingModule>
 {
     private Color OutlineColor { get; } = Colors.Chocolate;
-    private Color FillColor { get; } = Colors.DarkRed;
+    protected abstract Color FillColor { get; }
 
     protected override bool HasMinimumSize => true;
 

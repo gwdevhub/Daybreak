@@ -60,6 +60,7 @@ using Microsoft.Extensions.Options;
 using Daybreak.Services.TradeChat.Models;
 using Daybreak.Services.Charts;
 using Daybreak.Services.Images;
+using Daybreak.Services.Drawing.Modules.Bosses;
 
 namespace Daybreak.Configuration;
 
@@ -245,7 +246,19 @@ public static class ProjectConfiguration
         drawingModuleProducer.RegisterDrawingModule<NeutralEntityDrawingModule>();
         drawingModuleProducer.RegisterDrawingModule<AlliedCreatureEntityDrawingModule>();
         drawingModuleProducer.RegisterDrawingModule<AllyEntityDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<BossEntityDrawingModule>();
+
+        drawingModuleProducer.RegisterDrawingModule<NeutralBossEntityDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<WarriorBossEntityDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<RangerBossEntityDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<MesmerBossEntityDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<NecromancerBossEntityDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<MonkBossEntityDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<ElementalistBossEntityDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<AssassinBossEntityDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<RitualistBossEntityDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<DervishBossEntityDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<ParagonBossEntityDrawingModule>();
+
         drawingModuleProducer.RegisterDrawingModule<EnemyEntityDrawingModule>();
         drawingModuleProducer.RegisterDrawingModule<NpcEntityDrawingModule>();
 
