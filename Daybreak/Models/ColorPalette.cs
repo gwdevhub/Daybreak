@@ -18,6 +18,11 @@ public static class ColorPalette
     public readonly static Color Orange = Color.FromArgb(255, 255, 109, 0);
     public readonly static Color DeepOrange = Color.FromArgb(255, 221, 44, 0);
     public readonly static Color Green = Color.FromArgb(255, 56, 142, 60);
+    public readonly static Color Lime = Color.FromArgb(255, 174, 234, 0);
+    public readonly static Color Magenta = Color.FromArgb(255, 213, 0, 249);
+    public readonly static Color Gold = Color.FromArgb(255, 255, 241, 118);
+    public readonly static Color BlueGrey = Color.FromArgb(255, 96, 125, 139);
+    public readonly static Color Grey = Color.FromArgb(255, 158, 158, 158);
 
     public readonly static List<Color> Colors = new()
     {
@@ -34,6 +39,11 @@ public static class ColorPalette
         Red,
         Cyan,
         Teal,
-        Green
+        Green,
+        Lime,
+        Magenta,
+        Gold,
+        BlueGrey,
+        Grey
     };
 }
