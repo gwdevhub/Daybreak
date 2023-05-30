@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Views"
              xmlns:controls="clr-namespace:Daybreak.Controls"
+             xmlns:minimap="clr-namespace:Daybreak.Controls.Minimap"
              xmlns:converters="clr-namespace:Daybreak.Converters"
              xmlns:templates="clr-namespace:Daybreak.Controls.Templates"
              xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
@@ -87,7 +88,7 @@
                 Grid.Column="1"
                 Grid.ColumnSpan="3"
                 Stretch="Fill">
-                <Polygon Points="0.1, 3.9, 3.2, 8, 10.8, 8, 13.9, 3.9, 10.9, 0.1, 3.1, 0.1"
+                <Polygon Points="0, 3.94, 3.2, 8, 10.9, 8, 13.9, 3.94, 10.9, 0.1, 3.1, 0.15"
                          StrokeThickness="0.08"
                          Stroke="{DynamicResource MahApps.Brushes.ThemeForeground}"></Polygon>
             </Viewbox>
@@ -519,7 +520,7 @@
             Grid.Column="2"
             Grid.Row="1"
             Margin="5, 0, 0, 5">
-            <controls:GuildwarsMinimap
+            <minimap:GuildwarsMinimap
                 x:Name="Minimap"
                 Visibility="{Binding ElementName=_this, Path=LoadingPathingData, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
                 GameData="{Binding ElementName=_this, Path=GameData, Mode=OneWay}"

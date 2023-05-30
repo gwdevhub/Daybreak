@@ -13,30 +13,40 @@
     <Grid Background="{StaticResource Daybreak.Brushes.Background}">
         <Border BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
                 BorderThickness="0, 1, 0, 0"/>
-        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" PanningMode="VerticalFirst">
-            <ItemsControl ItemsSource="{Binding ElementName=_this, Path=Metrics, Mode=OneWay}"
-                  Background="Transparent" ScrollViewer.VerticalScrollBarVisibility="Disabled">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel></VirtualizingStackPanel>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Grid>
-                            <Border BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+        <ItemsControl ItemsSource="{Binding ElementName=_this, Path=Metrics, Mode=OneWay}"
+                      Background="Transparent" ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <ItemsControl.Template>
+                <ControlTemplate>
+                    <Border
+                            Padding="{TemplateBinding Control.Padding}"
+                            Background="{TemplateBinding Panel.Background}"
+                            BorderBrush="{TemplateBinding Border.BorderBrush}"
+                            BorderThickness="{TemplateBinding Border.BorderThickness}"
+                            SnapsToDevicePixels="True">
+                        <ScrollViewer Padding="{TemplateBinding Control.Padding}" Focusable="False">
+                            <ItemsPresenter SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
+                        </ScrollViewer>
+                    </Border>
+                </ControlTemplate>
+            </ItemsControl.Template>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid
+                        Background="Transparent"
+                        MouseWheel="InterceptScroll">
+                        <Border BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
                                     BorderThickness="0, 0, 0, 1"/>
-                            <StackPanel HorizontalAlignment="Stretch"
+                        <StackPanel HorizontalAlignment="Stretch"
                                     Margin="0, 0, 0, 20">
-                                <TextBlock Text="{Binding Instrument.Name}"
+                            <TextBlock Text="{Binding Instrument.Name}"
                                        Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                        FontSize="14"
                                     VerticalAlignment="Center"></TextBlock>
-                                <TextBlock Text="{Binding Instrument.Description}"
+                            <TextBlock Text="{Binding Instrument.Description}"
                                        Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                        FontSize="11"
                                     VerticalAlignment="Center"></TextBlock>
-                                <chart:CartesianChart 
+                            <chart:CartesianChart 
                                     Loaded="CartesianChart_Loaded"
                                     Title="{Binding ElementName=_this, Path=Title, Mode=OneWay}"
                                     Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
@@ -47,12 +57,11 @@
                                     XAxes="{Binding ElementName=_this, Path=XAxes, Mode=OneWay}"
                                     YAxes="{Binding ElementName=_this, Path=YAxes, Mode=OneWay}"
                                     Height="300">
-                                </chart:CartesianChart>
-                            </StackPanel>
-                        </Grid>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
+                            </chart:CartesianChart>
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </Grid>
 </UserControl>

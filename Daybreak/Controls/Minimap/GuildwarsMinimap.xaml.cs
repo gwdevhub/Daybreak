@@ -20,8 +20,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Daybreak.Services.Drawing;
 using Daybreak.Services.Themes;
+using Daybreak.Services.Metrics;
+using System.Diagnostics.Metrics;
+using System.Diagnostics;
+using SkiaSharp;
+using SkiaSharp.Views.Desktop;
 
-namespace Daybreak.Controls;
+namespace Daybreak.Controls.Minimap;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Using source generators to auto-implement dependency properties")]
 /// <summary>
@@ -29,13 +34,17 @@ namespace Daybreak.Controls;
 /// </summary>
 public partial class GuildwarsMinimap : UserControl
 {
+    private const string DrawingLatencyName = "Minimap Drawing latency";
+    private const string DrawingLatencyUnitName = "ms";
+    private const string DrawingLatencyDescription = "The amount of time spent drawing the minimap entities. Measured in ms";
     private const int MapDownscaleFactor = 10;
     private const int EntitySize = 100;
     private const float PositionRadius = 150;
     // Minimum amount of milliseconds to pass between calculating paths to objectives
     private const int MinPathCalculationFrequency = 500;
 
-    private readonly DispatcherTimer dispatcherTimer = new(DispatcherPriority.ApplicationIdle);
+    private readonly Histogram<double> drawingLatency;
+    private readonly DispatcherTimer dispatcherTimer = new(DispatcherPriority.Render);
     private readonly List<Position> mainPlayerPositionHistory = new();
     private readonly IPathfinder pathfinder;
     private readonly IDrawingService drawingService;
@@ -58,6 +67,7 @@ public partial class GuildwarsMinimap : UserControl
     private Point initialClickPoint = new(0, 0);
     private DebounceResponse? cachedDebounceResponse;
     private PathfindingCache? pathfindingCache;
+    private SKSurface? entitySurface;
     
     [GenerateDependencyProperty]
     private PathingData pathingData = new();
@@ -85,7 +95,8 @@ public partial class GuildwarsMinimap : UserControl
              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IPathfinder>(),
              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IDrawingService>(),
              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IGuildwarsEntityDebouncer>(),
-             Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IThemeManager>())
+             Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IThemeManager>(),
+             Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IMetricsService>())
     {
     }
 
@@ -93,12 +104,14 @@ public partial class GuildwarsMinimap : UserControl
         IPathfinder pathfinder,
         IDrawingService drawingService,
         IGuildwarsEntityDebouncer guildwarsEntityDebouncer,
-        IThemeManager themeManager)
+        IThemeManager themeManager,
+        IMetricsService metricsService)
     {
         this.pathfinder = pathfinder.ThrowIfNull();
         this.drawingService = drawingService.ThrowIfNull();
         this.guildwarsEntityDebouncer = guildwarsEntityDebouncer.ThrowIfNull();
         this.themeManager = themeManager.ThrowIfNull();
+        this.drawingLatency = metricsService.CreateHistogram<double>(DrawingLatencyName, DrawingLatencyUnitName, DrawingLatencyDescription, Models.Metrics.AggregationTypes.P95);
 
         this.dispatcherTimer.Tick += (_, _) => this.ApplyOffsetRevert();
         this.dispatcherTimer.Interval = TimeSpan.FromMilliseconds(16);
@@ -285,7 +298,8 @@ public partial class GuildwarsMinimap : UserControl
 
         bitmap.Clear(Colors.Transparent);
         using var context = bitmap.GetBitmapContext();
-
+        var sw = Stopwatch.StartNew();
+        bitmap.Lock();
         this.drawingService.UpdateDrawingParameters(
             (int)this.ActualWidth,
             (int)this.ActualHeight,
@@ -299,6 +313,8 @@ public partial class GuildwarsMinimap : UserControl
         this.drawingService.DrawQuestObjectives(bitmap, this.GameData.MainPlayer?.QuestLog ?? new List<QuestMetadata>());
         this.drawingService.DrawMapIcons(bitmap, this.GameData.MapIcons ?? new List<MapIcon>());
         this.drawingService.DrawEntities(bitmap, this.cachedDebounceResponse ?? new DebounceResponse(), this.TargetEntityId);
+        bitmap.Unlock();
+        this.drawingLatency.Record(sw.ElapsedMilliseconds);
     }
 
     private bool MouseOverEntity(IPositionalEntity entity, Point mousePosition)
@@ -678,6 +694,21 @@ public partial class GuildwarsMinimap : UserControl
         {
             mouseButtonEventArgs.Handled = true;
         }
+    }
+
+    private void VerifySurface()
+    {
+        var peekPixels = this.entitySurface?.PeekPixels();
+        if (!this.resizeEntities &&
+            this.ActualWidth == peekPixels?.Width &&
+            this.ActualHeight == peekPixels?.Height)
+        {
+            return;
+        }
+
+        var imageInfo = new SKImageInfo((int)this.ActualWidth, (int)this.ActualHeight, SKColorType.Rgba8888, SKAlphaType.Premul);
+        var surface = SKSurface.Create(imageInfo);
+        this.entitySurface = surface;
     }
 
     private static bool PositionsCollide(Position position1, Position position2)
