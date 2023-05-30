@@ -9,12 +9,18 @@
              d:DataContext="{d:DesignInstance Type=guildwars:LivingEntity, IsDesignTimeCreatable=True}"
              BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
              BorderThickness="1"
+             x:Name="_this"
              d:DesignHeight="300" d:DesignWidth="100">
     <StackPanel Margin="5, 0, 5, 0">
         <TextBlock 
             Text="{Binding Allegiance, Mode=OneWay}" FontSize="16" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
         <TextBlock Text="{Binding NpcDefinition.Name}" Foreground="{StaticResource MahApps.Brushes.Accent}" Cursor="Hand"
-                   MouseLeftButtonDown="TextBlock_MouseLeftButtonDown"></TextBlock>
+                   MouseLeftButtonDown="NpcDefinitionTextBlock_MouseLeftButtonDown"></TextBlock>
+        <TextBlock Text="{Binding PrimaryProfession.Name}"
+                   Foreground="{StaticResource MahApps.Brushes.Accent}"
+                   Cursor="Hand"
+                   Visibility="{Binding ElementName=_this, Path=PrimaryProfessionVisible, Mode=OneWay}"
+                   MouseLeftButtonDown="PrimaryProfessionTextBlock_MouseLeftButtonDown"></TextBlock>
         <WrapPanel>
             <TextBlock Text="Id: " Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
             <TextBlock Text="{Binding ModelType, Mode=OneWay}" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
