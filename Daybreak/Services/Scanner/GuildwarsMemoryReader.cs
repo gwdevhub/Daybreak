@@ -252,6 +252,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         var targetEntityId = this.memoryScanner.ReadPtrChain<int>(this.GetTargetIdPointer(), 0x0, 0x0);
         var titles = this.memoryScanner.ReadArray<TitleContext>(gameContext.Titles);
         var titleTiers = this.memoryScanner.ReadArray<TitleTierContext>(gameContext.TitlesTiers);
+        var npcs = this.memoryScanner.ReadArray<NpcContext>(gameContext.Npcs);
 
         // The following lines would retrieve all entities, including item entities.
         var entityPointersArray = this.memoryScanner.ReadPtrChain<GuildwarsArray>(this.GetEntityArrayPointer(), 0x0, 0x0);
@@ -277,6 +278,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
             titles,
             titleTiers,
             mapIcons,
+            npcs,
             playerEntityId,
             targetEntityId);
     }
@@ -423,6 +425,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         TitleContext[] titles,
         TitleTierContext[] titleTiers,
         MapIconContext[] mapIcons,
+        NpcContext[] npcs,
         int mainPlayerEntityId,
         int targetEntityId)
     {
@@ -458,7 +461,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
             .Where(e => e.AgentId != mainPlayer.Id && partyMembers.None(p => p.Id == e.AgentId) && worldPlayers.None(p => p.Id == e.AgentId))
             .ToArray();
 
-        var livingEntities = this.GetLivingEntities(remainingEntities);
+        var livingEntities = this.GetLivingEntities(remainingEntities, npcs);
         
         var userInformation = new UserInformation
         {
@@ -502,13 +505,23 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
     }
 
     private List<LivingEntity> GetLivingEntities(
-        EntityContext[] livingEntities)
+        EntityContext[] livingEntities,
+        NpcContext[] npcs)
     {
         var list = new List<LivingEntity>();
         foreach(var livingEntity in livingEntities)
         {
             _ = Profession.TryParse((int)livingEntity.PrimaryProfessionId, out var primaryProfession);
             _ = Profession.TryParse((int)livingEntity.SecondaryProfessionId, out var secondaryProfession);
+            if (primaryProfession == Profession.None)
+            {
+                var maybeNpcContext = npcs.Skip(livingEntity.EntityModelType).FirstOrDefault();
+                if (Profession.TryParse((int)maybeNpcContext.Primary, out var actualPrimaryProfession))
+                {
+                    primaryProfession = actualPrimaryProfession;
+                }
+            }
+
             var state = LivingEntityState.Unknown;
             switch (livingEntity.State)
             {

@@ -532,6 +532,7 @@
                 LivingEntityClicked="GuildwarsMinimap_LivingEntityClicked"
                 PlayerInformationClicked="GuildwarsMinimap_PlayerInformationClicked"
                 MapIconClicked="GuildwarsMinimap_MapIconClicked"
+                ProfessionClicked="GuildwarsMinimap_ProfessionClicked"
                 ClipToBounds="True"
                 BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
                 BorderThickness="1" />

@@ -811,4 +811,14 @@ public partial class FocusView : UserControl
 
         this.BrowserAddress = e.Icon!.WikiUrl;
     }
+
+    private void GuildwarsMinimap_ProfessionClicked(object _, Profession e)
+    {
+        if (e.WikiUrl?.IsNullOrWhiteSpace() is true)
+        {
+            return;
+        }
+
+        this.BrowserAddress = e.WikiUrl;
+    }
 }

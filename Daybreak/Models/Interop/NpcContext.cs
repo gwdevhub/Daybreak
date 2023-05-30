@@ -5,6 +5,9 @@ namespace Daybreak.Models.Interop;
 [StructLayout(LayoutKind.Explicit)]
 public readonly struct NpcContext
 {
+    [FieldOffset(0x0000)]
+    public readonly uint ModelId;
+
     [FieldOffset(0x000C)]
     public readonly uint Sex;
 

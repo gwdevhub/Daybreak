@@ -89,6 +89,7 @@ public partial class GuildwarsMinimap : UserControl
     public event EventHandler<LivingEntity>? LivingEntityClicked;
     public event EventHandler<PlayerInformation>? PlayerInformationClicked;
     public event EventHandler<MapIcon>? MapIconClicked;
+    public event EventHandler<Profession?> ProfessionClicked;
 
     public GuildwarsMinimap()
         :this(
@@ -675,6 +676,16 @@ public partial class GuildwarsMinimap : UserControl
         }
 
         this.LivingEntityClicked?.Invoke(this, livingEntity.Value);
+    }
+
+    private void LivingEntityContextMenu_LivingEntityProfessionContextMenuClicked(object _, Profession? e)
+    {
+        if (e is not Profession profession)
+        {
+            return;
+        }
+
+        this.ProfessionClicked?.Invoke(this, profession);
     }
 
     private void MapIconContextMenu_MapIconContextMenuClicked(object _, MapIcon? mapIcon)

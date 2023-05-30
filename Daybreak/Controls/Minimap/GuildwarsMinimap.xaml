@@ -38,7 +38,8 @@
             <ContextMenu.Template>
                 <ControlTemplate>
                     <controls:LivingEntityContextMenu DataContext="{Binding DataContext, RelativeSource={RelativeSource TemplatedParent}}"
-                                                   LivingEntityContextMenuClicked="LivingEntityContextMenu_LivingEntityContextMenuClicked"></controls:LivingEntityContextMenu>
+                                                      LivingEntityContextMenuClicked="LivingEntityContextMenu_LivingEntityContextMenuClicked"
+                                                      LivingEntityProfessionContextMenuClicked="LivingEntityContextMenu_LivingEntityProfessionContextMenuClicked"></controls:LivingEntityContextMenu>
                 </ControlTemplate>
             </ContextMenu.Template>
         </ContextMenu>
