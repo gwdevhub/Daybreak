@@ -455,10 +455,6 @@ public partial class GuildwarsMinimap : UserControl
         };
     }
 
-    private void SKElement_PaintSurface(object sender, SKPaintSurfaceEventArgs e)
-    {
-    }
-
     private void GuildwarsMinimap_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         this.initialClickPoint = Mouse.GetPosition(this) - this.originOffset;
