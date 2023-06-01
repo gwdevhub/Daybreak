@@ -8,8 +8,8 @@ public sealed class PathfindingDrawingModule : CircleDrawingModuleBase
 {
     public override bool CanDrawPathfinding => true;
 
-    public override void DrawPathFinding(int finalX, int finalY, int size, WriteableBitmap bitmap, Color color)
+    public override void DrawPathFinding(int finalX, int finalY, int size, WriteableBitmap bitmap, Color color, Color shade)
     {
-        this.DrawFilledCircle(bitmap, finalX, finalY, size, color);
+        this.DrawFilledCircle(bitmap, finalX, finalY, size, color, shade);
     }
 }

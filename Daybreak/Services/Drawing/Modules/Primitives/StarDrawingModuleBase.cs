@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Daybreak.Utils;
+using System;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -9,7 +10,7 @@ public abstract class StarDrawingModuleBase : DrawingModuleBase
 {
     private static readonly Lazy<(Point[] OuterPoints, Point[] InnerPoints)> StarCoordinates = new(GetStarGlyphPoints);
 
-    protected void DrawFilledStar(WriteableBitmap bitmap, int x, int y, int entitySize, Color color)
+    protected void DrawFilledStar(WriteableBitmap bitmap, int x, int y, int entitySize, Color color, Color shade)
     {
         if (this.HasMinimumSize &&
             entitySize < MinimumSize)
@@ -17,6 +18,7 @@ public abstract class StarDrawingModuleBase : DrawingModuleBase
             entitySize = MinimumSize;
         }
 
+        var finalColor = ColorExtensions.AlphaBlend(color, shade);
         (var outerPoints, var innerPoints) = StarCoordinates.Value;
         for (var i = 1; i <= 5; i++)
         {
@@ -27,29 +29,29 @@ public abstract class StarDrawingModuleBase : DrawingModuleBase
                 x + (int)(innerPointPrev.X * entitySize), y + (int)(innerPointPrev.Y * entitySize),
                 x + (int)(outerPoint.X * entitySize), y + (int)(outerPoint.Y * entitySize),
                 x + (int)(innerPointNext.X * entitySize), y + (int)(innerPointNext.Y * entitySize),
-                color);
+                finalColor);
         }
 
         bitmap.FillTriangle(
             x + (int)(innerPoints[0].X * entitySize), y + (int)(innerPoints[0].Y * entitySize),
             x + (int)(innerPoints[1].X * entitySize), y + (int)(innerPoints[1].Y * entitySize),
             x + (int)(innerPoints[2].X * entitySize), y + (int)(innerPoints[2].Y * entitySize),
-            color);
+            finalColor);
 
         bitmap.FillTriangle(
             x + (int)(innerPoints[2].X * entitySize), y + (int)(innerPoints[2].Y * entitySize),
             x + (int)(innerPoints[3].X * entitySize), y + (int)(innerPoints[3].Y * entitySize),
             x + (int)(innerPoints[4].X * entitySize), y + (int)(innerPoints[4].Y * entitySize),
-            color);
+            finalColor);
 
         bitmap.FillTriangle(
             x + (int)(innerPoints[0].X * entitySize), y + (int)(innerPoints[0].Y * entitySize),
             x + (int)(innerPoints[2].X * entitySize), y + (int)(innerPoints[2].Y * entitySize),
             x + (int)(innerPoints[4].X * entitySize), y + (int)(innerPoints[4].Y * entitySize),
-            color);
+            finalColor);
     }
 
-    protected void DrawOutlinedStar(WriteableBitmap bitmap, int x, int y, int entitySize, int thickness, Color color)
+    protected void DrawOutlinedStar(WriteableBitmap bitmap, int x, int y, int entitySize, int thickness, Color color, Color shade)
     {
         if (this.HasMinimumSize &&
             entitySize < MinimumSize)
@@ -57,8 +59,8 @@ public abstract class StarDrawingModuleBase : DrawingModuleBase
             entitySize = MinimumSize;
         }
 
+        var finalColor = ColorExtensions.AlphaBlend(color, shade);
         (var outerPoints, var innerPoints) = StarCoordinates.Value;
-
         for (var i = 1; i <= 5; i++)
         {
             var outerPoint = outerPoints[i % 5];
@@ -67,12 +69,12 @@ public abstract class StarDrawingModuleBase : DrawingModuleBase
             bitmap.DrawLineAa(
                 x + (int)(innerPointPrev.X * entitySize), y + (int)(innerPointPrev.Y * entitySize),
                 x + (int)(outerPoint.X * entitySize), y + (int)(outerPoint.Y * entitySize),
-                color,
+                finalColor,
                 thickness);
             bitmap.DrawLineAa(
                 x + (int)(outerPoint.X * entitySize), y + (int)(outerPoint.Y * entitySize),
                 x + (int)(innerPointNext.X * entitySize), y + (int)(innerPointNext.Y * entitySize),
-                color,
+                finalColor,
                 thickness);
         }
     }

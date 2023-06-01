@@ -14,8 +14,8 @@ public sealed class StairsDownDrawingModule : EmbeddedSvgDrawingModuleBase<Stair
         return mapIcon.Icon == GuildwarsIcon.StairsDown;
     }
 
-    public override void DrawMapIcon(int finalX, int finalY, int size, WriteableBitmap bitmap, Affiliation _)
+    public override void DrawMapIcon(int finalX, int finalY, int size, WriteableBitmap bitmap, Affiliation _, Color shade)
     {
-        this.DrawSvg(bitmap, finalX, finalY, size, Colors.White, Colors.Red);
+        this.DrawSvg(bitmap, finalX, finalY, size, Colors.White, Colors.Red, shade);
     }
 }

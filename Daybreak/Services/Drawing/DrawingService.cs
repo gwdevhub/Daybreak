@@ -18,6 +18,7 @@ public sealed class DrawingService : IDrawingService, IDrawingModuleProducer
     private readonly IServiceManager serviceManager;
     private readonly Lazy<IEnumerable<DrawingModuleBase>> modules;
 
+    private Color foregroundColor;
     private float positionRadius;
     private int virtualScreenWidth, virtualScreenHeight, finalEntitySize;
     private Point originPoint;
@@ -30,13 +31,14 @@ public sealed class DrawingService : IDrawingService, IDrawingModuleProducer
         this.modules = new Lazy<IEnumerable<DrawingModuleBase>>(this.serviceManager.GetServicesOfType<DrawingModuleBase>, false);
     }
 
-    public void UpdateDrawingParameters(int screenWidth, int screenHeight, Point originPoint, double zoom, float positionRadius, int entitySize)
+    public void UpdateDrawingParameters(int screenWidth, int screenHeight, Point originPoint, double zoom, float positionRadius, int entitySize, Color foregroundColor)
     {
         screenWidth = screenWidth > 0 ? screenWidth : 0;
         screenHeight = screenHeight > 0 ? screenHeight : 0;
         this.originPoint = originPoint;
         this.zoom = zoom;
         this.positionRadius = positionRadius;
+        this.foregroundColor = Color.FromArgb(80, foregroundColor.R, foregroundColor.G, foregroundColor.B);
 
         this.virtualScreenWidth = (int)Math.Ceiling(screenWidth / this.zoom);
         this.virtualScreenHeight = (int)Math.Ceiling(screenHeight / this.zoom);
@@ -95,7 +97,7 @@ public sealed class DrawingService : IDrawingService, IDrawingModuleProducer
                 {
                     if (this.IsEntityOnScreen(entity.Position, out var finalX, out var finalY))
                     {
-                        module.DrawEntity(finalX, finalY, this.finalEntitySize, bitmap, false);
+                        module.DrawEntity(finalX, finalY, this.finalEntitySize, bitmap, false, this.foregroundColor);
                     }
 
                     break;
@@ -111,7 +113,7 @@ public sealed class DrawingService : IDrawingService, IDrawingModuleProducer
                 if (module.CanDrawEntity(targetedEntity))
                 {
                     this.IsEntityOnScreen(targetedEntity.Position, out var finalX, out var finalY);
-                    module.DrawEntity(finalX, finalY, this.finalEntitySize, bitmap, true);
+                    module.DrawEntity(finalX, finalY, this.finalEntitySize, bitmap, true, this.foregroundColor);
                     break;
                 }
             }
@@ -141,7 +143,7 @@ public sealed class DrawingService : IDrawingService, IDrawingModuleProducer
                         continue;
                     }
 
-                    module.DrawPlayerPositionHistory(finalX, finalY, this.finalEntitySize, bitmap);
+                    module.DrawPlayerPositionHistory(finalX, finalY, this.finalEntitySize, bitmap, this.foregroundColor);
                 }
             }
         }
@@ -170,7 +172,7 @@ public sealed class DrawingService : IDrawingService, IDrawingModuleProducer
                         break;
                     }
 
-                    module.DrawMapIcon(finalX, finalY, this.finalEntitySize, bitmap, mapIcon.Affiliation!.Value);
+                    module.DrawMapIcon(finalX, finalY, this.finalEntitySize, bitmap, mapIcon.Affiliation!.Value, this.foregroundColor);
                 }
             }
         }
@@ -228,7 +230,7 @@ public sealed class DrawingService : IDrawingService, IDrawingModuleProducer
                             break;
                         }
 
-                        module.DrawPathFinding(finalX, finalY, this.finalEntitySize, bitmap, color);
+                        module.DrawPathFinding(finalX, finalY, this.finalEntitySize, bitmap, color, this.foregroundColor);
                     }
                 }
             }
@@ -254,12 +256,12 @@ public sealed class DrawingService : IDrawingService, IDrawingModuleProducer
                 var position = this.ForceOnScreenPosition(questMetadata.Position!.Value);
                 if (this.IsEntityOnScreen(questMetadata.Position!.Value, out var finalX, out var finalY))
                 {
-                    module.DrawQuestObjective(finalX, finalY, this.finalEntitySize, bitmap, GetQuestColor(questMetadata));
+                    module.DrawQuestObjective(finalX, finalY, this.finalEntitySize, bitmap, GetQuestColor(questMetadata), this.foregroundColor);
                 }
                 else
                 {
                     this.IsEntityOnScreen(position, out var finalOnscreenX, out var finalOnscreenY);
-                    module.DrawQuestObjective(finalX, finalY, this.finalEntitySize, bitmap, GetQuestColor(questMetadata));
+                    module.DrawQuestObjective(finalX, finalY, this.finalEntitySize, bitmap, GetQuestColor(questMetadata), this.foregroundColor);
                 }
             }
         }
@@ -295,7 +297,7 @@ public sealed class DrawingService : IDrawingService, IDrawingModuleProducer
                 {
                     if (this.IsEntityOnScreen(entity.Position, out var finalX, out var finalY))
                     {
-                        module.DrawEngagementArea(finalX, finalY, this.finalEntitySize * EngagementAreaMultiplier, bitmap);
+                        module.DrawEngagementArea(finalX, finalY, this.finalEntitySize * EngagementAreaMultiplier, bitmap, this.foregroundColor);
                     }
 
                     break;

@@ -14,8 +14,8 @@ public sealed class ResurrectionShrineDrawingModule : CrossDrawingModuleBase
         return mapIcon.Icon == GuildwarsIcon.ResurrectionShrine;
     }
 
-    public override void DrawMapIcon(int finalX, int finalY, int size, WriteableBitmap bitmap, Affiliation _)
+    public override void DrawMapIcon(int finalX, int finalY, int size, WriteableBitmap bitmap, Affiliation _, Color shade)
     {
-        this.DrawCross(bitmap, finalX, finalY, size, Colors.CornflowerBlue);
+        this.DrawCross(bitmap, finalX, finalY, size, Colors.CornflowerBlue, shade);
     }
 }
