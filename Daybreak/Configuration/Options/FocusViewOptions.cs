@@ -16,10 +16,6 @@ public sealed class FocusViewOptions
     [OptionName(Name = "Memory Reader Frequency", Description = "Measured in ms. Sets how often should the launcher poll information from the game. Actual frequency is capped by the memory reading speed")]
     public double MemoryReaderFrequency { get; set; } = 0;
 
-    [JsonProperty(nameof(EnablePathfinding))]
-    [OptionName(Name = "Enable Pathfinding", Description = "If true, the mini-map will attempt to produce paths from the player position to objectives")]
-    public bool EnablePathfinding { get; set; } = true;
-
     [JsonProperty(nameof(ExperienceDisplay))]
     [OptionName(Name = "Experience Display Mode", Description = "Sets how should the experience display show the information")]
     public ExperienceDisplay ExperienceDisplay { get; set; }

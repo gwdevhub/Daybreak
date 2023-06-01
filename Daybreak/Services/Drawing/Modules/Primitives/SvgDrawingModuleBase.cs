@@ -1,4 +1,5 @@
 ﻿using Daybreak.Services.Drawing.Modules.Models;
+using Daybreak.Utils;
 using Svg;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ public abstract class SvgDrawingModuleBase : DrawingModuleBase
 
     protected abstract SvgDocument GetSvgDocument(Color fillColor, Color strokeColor);
 
-    protected void DrawSvg(WriteableBitmap bitmap, int x, int y, int entitySize, Color stroke, Color fill)
+    protected void DrawSvg(WriteableBitmap bitmap, int x, int y, int entitySize, Color stroke, Color fill, Color shade)
     {
         if (this.HasMinimumSize &&
             entitySize < MinimumSize)
@@ -27,7 +28,7 @@ public abstract class SvgDrawingModuleBase : DrawingModuleBase
             entitySize = MinimumSize;
         }
 
-        var combination = new ColorCombination { StrokeColor = stroke, FillColor = fill };
+        var combination = new ColorCombination { StrokeColor = ColorExtensions.AlphaBlend(stroke, shade), FillColor = ColorExtensions.AlphaBlend(fill, shade) };
         if (this.bitmapCache.TryGetValue(combination, out var cachedSvg) is false)
         {
             cachedSvg = this.CreateBitmapCache(combination.FillColor, combination.StrokeColor);

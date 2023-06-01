@@ -1,11 +1,12 @@
-﻿using System.Windows.Media;
+﻿using Daybreak.Utils;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace Daybreak.Services.Drawing.Modules.Primitives;
 
 public abstract class CrossDrawingModuleBase : DrawingModuleBase
 {
-    protected void DrawCross(WriteableBitmap bitmap, int x, int y, int entitySize, Color color)
+    protected void DrawCross(WriteableBitmap bitmap, int x, int y, int entitySize, Color color, Color shade)
     {
         if (this.HasMinimumSize &&
             entitySize < MinimumSize)
@@ -19,14 +20,15 @@ public abstract class CrossDrawingModuleBase : DrawingModuleBase
         var height3 = height / 3;
         var height2 = height3 * 2;
 
+        var finalColor = ColorExtensions.AlphaBlend(color, shade);
         bitmap.FillRectangle(
             x - thickness, y - height3,
             x + thickness, y + height2,
-            color);
+            finalColor);
 
         bitmap.FillRectangle(
-            x - width / 2, y - thickness,
-            x + width / 2, y + thickness,
-            color);
+            x - (width / 2), y - thickness,
+            x + (width / 2), y + thickness,
+            finalColor);
     }
 }

@@ -20,8 +20,8 @@ public abstract class BossEntityDrawingModule : EmbeddedSvgDrawingModuleBase<Bos
             livingEntity.State is LivingEntityState.Boss;
     }
 
-    public override void DrawEntity(int finalX, int finalY, int size, WriteableBitmap bitmap, bool targeted)
+    public override void DrawEntity(int finalX, int finalY, int size, WriteableBitmap bitmap, bool targeted, Color shade)
     {
-        this.DrawSvg(bitmap, finalX, finalY, size, targeted ? this.OutlineColor : this.FillColor, this.FillColor);
+        this.DrawSvg(bitmap, finalX, finalY, size, targeted ? this.OutlineColor : this.FillColor, this.FillColor, shade);
     }
 }

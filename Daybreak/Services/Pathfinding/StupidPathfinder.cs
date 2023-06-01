@@ -11,6 +11,7 @@ using System.Core.Extensions;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Extensions;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -28,12 +29,12 @@ public sealed class StupidPathfinder : IPathfinder
     private const double PathStep = 1;
 
     private readonly Histogram<long> latencyMetric;
-    private readonly ILiveOptions<FocusViewOptions> liveOptions;
+    private readonly ILiveOptions<PathfindingOptions> liveOptions;
     private readonly ILogger<StupidPathfinder> logger;
 
     public StupidPathfinder(
         IMetricsService metricsService,
-        ILiveOptions<FocusViewOptions> liveOptions,
+        ILiveOptions<PathfindingOptions> liveOptions,
         ILogger<StupidPathfinder> logger)
     {
         this.liveOptions = liveOptions.ThrowIfNull();
@@ -102,7 +103,7 @@ public sealed class StupidPathfinder : IPathfinder
             endTrapezoid = newEndTrapezoid;
         }
 
-        if (GetTrapezoidPath(map, startTrapezoid, endTrapezoid) is not List<int> pathList)
+        if (this.GetTrapezoidPath(map, startTrapezoid, endTrapezoid, startPoint) is not List<int> pathList)
         {
             scopedLogger.LogInformation("Unable to find an initial path");
             return new PathfindingFailure.NoPathFound();
@@ -178,7 +179,19 @@ public sealed class StupidPathfinder : IPathfinder
         return default;
     }
 
-    private static List<int>? GetTrapezoidPath(PathingData map, Trapezoid startTrapezoid, Trapezoid endTrapezoid)
+    private List<int>? GetTrapezoidPath(PathingData map, Trapezoid startTrapezoid, Trapezoid endTrapezoid, Point startPoint)
+    {
+        if (this.liveOptions.Value.ImprovedPathfinding)
+        {
+            return GetTrapezoidPath2(map, startTrapezoid, endTrapezoid, startPoint);
+        }
+        else
+        {
+            return GetTrapezoidPath1(map, startTrapezoid, endTrapezoid);
+        }
+    }
+
+    private static List<int>? GetTrapezoidPath1(PathingData map, Trapezoid startTrapezoid, Trapezoid endTrapezoid)
     {
         var found = false;
         var visited = new int[map.Trapezoids.Count];
@@ -186,7 +199,7 @@ public sealed class StupidPathfinder : IPathfinder
         visitationQueue.Enqueue(startTrapezoid);
         visited[startTrapezoid.Id] = (int)startTrapezoid.Id + 1;
 
-        while(visitationQueue.TryDequeue(out var currentTrapezoid))
+        while (visitationQueue.TryDequeue(out var currentTrapezoid))
         {
             if (currentTrapezoid.Id == endTrapezoid.Id)
             {
@@ -194,7 +207,7 @@ public sealed class StupidPathfinder : IPathfinder
                 break;
             }
 
-            foreach(var adjacentTrapezoidId in map.ComputedAdjacencyList[currentTrapezoid.Id])
+            foreach (var adjacentTrapezoidId in map.ComputedAdjacencyList[currentTrapezoid.Id])
             {
                 var nextTrapezoid = map.Trapezoids[adjacentTrapezoidId];
                 if (visited[adjacentTrapezoidId] > 0)
@@ -204,6 +217,80 @@ public sealed class StupidPathfinder : IPathfinder
 
                 visited[adjacentTrapezoidId] = currentTrapezoid.Id + 1;
                 visitationQueue.Enqueue(nextTrapezoid);
+            }
+        }
+
+        if (!found)
+        {
+            return default;
+        }
+
+        var backTrackingList = new List<int>();
+        var currentTrapezoidId = (int)endTrapezoid.Id;
+        while (true)
+        {
+            backTrackingList.Add(currentTrapezoidId);
+            if (currentTrapezoidId == startTrapezoid.Id)
+            {
+                backTrackingList.Reverse();
+                return backTrackingList;
+            }
+
+            currentTrapezoidId = visited[currentTrapezoidId] - 1;
+        }
+    }
+
+    private static List<int>? GetTrapezoidPath2(PathingData map, Trapezoid startTrapezoid, Trapezoid endTrapezoid, Point startPoint)
+    {
+        var found = false;
+        var visited = new int[map.Trapezoids.Count];
+        var distances = new double[map.Trapezoids.Count];
+        var minFoundDistance = double.MaxValue;
+        foreach(var trapezoid in map.Trapezoids)
+        {
+            distances[trapezoid.Id] = double.MaxValue;
+        }
+
+        var visitationQueue = new Queue<(Trapezoid CurrentTrapezoid, double CurrentDistance, Point PreviousPoint, int PreviousTrapezoidId)>();
+        foreach(var adjacentTrapezoidId in map.ComputedAdjacencyList[startTrapezoid.Id])
+        {
+            var nextTrapezoid = map.Trapezoids[adjacentTrapezoidId];
+            visitationQueue.Enqueue((nextTrapezoid, 0, startPoint, startTrapezoid.Id));
+            visited[nextTrapezoid.Id] = (int)startTrapezoid.Id + 1;
+        }
+
+        while(visitationQueue.TryDequeue(out var tuple))
+        {
+            var currentTrapezoid = tuple.CurrentTrapezoid;
+            var currentDistance = tuple.CurrentDistance;
+            var previousPoint = tuple.PreviousPoint;
+            var previousTrapezoidId = tuple.PreviousTrapezoidId;
+            var closestCurrentPoint = GetClosestPointInTrapezoid(previousPoint, currentTrapezoid);
+            var prevToCurrentDistance = (closestCurrentPoint - previousPoint).LengthSquared;
+            if (distances[currentTrapezoid.Id] <= currentDistance + prevToCurrentDistance)
+            {
+                continue;
+            }
+
+            currentDistance += prevToCurrentDistance;
+            if (minFoundDistance < currentDistance)
+            {
+                continue;
+            }
+
+            distances[currentTrapezoid.Id] = currentDistance;
+            visited[currentTrapezoid.Id] = previousTrapezoidId + 1;
+            if (currentTrapezoid.Id == endTrapezoid.Id)
+            {
+                found = true;
+                minFoundDistance = currentDistance;
+                continue;
+            }
+
+            foreach (var adjacentTrapezoidId in map.ComputedAdjacencyList[currentTrapezoid.Id])
+            {
+                var nextTrapezoid = map.Trapezoids[adjacentTrapezoidId];
+                visitationQueue.Enqueue((nextTrapezoid, currentDistance, closestCurrentPoint, currentTrapezoid.Id));
             }
         }
 

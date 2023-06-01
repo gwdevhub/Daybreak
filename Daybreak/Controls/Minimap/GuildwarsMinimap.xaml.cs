@@ -23,8 +23,6 @@ using Daybreak.Services.Themes;
 using Daybreak.Services.Metrics;
 using System.Diagnostics.Metrics;
 using System.Diagnostics;
-using SkiaSharp;
-using SkiaSharp.Views.Desktop;
 
 namespace Daybreak.Controls.Minimap;
 
@@ -40,8 +38,6 @@ public partial class GuildwarsMinimap : UserControl
     private const int MapDownscaleFactor = 10;
     private const int EntitySize = 100;
     private const float PositionRadius = 150;
-    // Minimum amount of milliseconds to pass between calculating paths to objectives
-    private const int MinPathCalculationFrequency = 500;
 
     private readonly Histogram<double> drawingLatency;
     private readonly DispatcherTimer dispatcherTimer = new(DispatcherPriority.Render);
@@ -65,9 +61,10 @@ public partial class GuildwarsMinimap : UserControl
     private Point originPoint = new(0, 0);
     private Vector originOffset = new(0, 0);
     private Point initialClickPoint = new(0, 0);
+    private Point lastPathfindingPoint = new(0, 0);
+    private int pathfindingObjectiveCount = 0;
     private DebounceResponse? cachedDebounceResponse;
     private PathfindingCache? pathfindingCache;
-    private SKSurface? entitySurface;
     
     [GenerateDependencyProperty]
     private PathingData pathingData = new();
@@ -131,6 +128,8 @@ public partial class GuildwarsMinimap : UserControl
         {
             this.guildwarsEntityDebouncer.ClearCaches();
             this.mainPlayerPositionHistory.Clear();
+            this.lastPathfindingPoint = new Point(0, 0);
+            this.pathfindingObjectiveCount = 0;
             this.UpdateGameData();
             this.DrawMap();
         }
@@ -297,6 +296,7 @@ public partial class GuildwarsMinimap : UserControl
 
         this.CalculatePathsToObjectives();
 
+        var foregroundColor = this.FindResource("MahApps.Colors.ThemeBackground").Cast<Color>();
         bitmap.Clear(Colors.Transparent);
         using var context = bitmap.GetBitmapContext();
         var sw = Stopwatch.StartNew();
@@ -307,7 +307,8 @@ public partial class GuildwarsMinimap : UserControl
             this.originPoint,
             this.Zoom,
             PositionRadius,
-            EntitySize);
+            EntitySize,
+            foregroundColor);
         this.drawingService.DrawEngagementArea(bitmap, this.cachedDebounceResponse ?? new DebounceResponse());
         this.drawingService.DrawMainPlayerPositionHistory(bitmap, this.mainPlayerPositionHistory);
         this.drawingService.DrawPaths(bitmap, this.pathfindingCache);
@@ -373,16 +374,30 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
+        var playerPosition = new Point
+        {
+            X = this.cachedDebounceResponse?.MainPlayer.Position?.X ?? 0,
+            Y = this.cachedDebounceResponse?.MainPlayer.Position?.Y ?? 0,
+        };
+
+        /*
+         * If we already calculated paths for the current objectives, return early.
+         */
+        if (currentMapQuests.Count == this.pathfindingObjectiveCount &&
+            (playerPosition - this.lastPathfindingPoint).Length < PositionRadius + PositionRadius)
+        {
+            this.calculatingPathToObjectives = false;
+            return;
+        }
+
+        this.pathfindingObjectiveCount = currentMapQuests.Count;
+        this.lastPathfindingPoint = playerPosition;
         var pathfindingTasks = currentMapQuests
             .Select(questMetaData =>
             {
                 return this.pathfinder.CalculatePath(
                     this.PathingData,
-                    new Point
-                    {
-                        X = this.cachedDebounceResponse?.MainPlayer.Position?.X ?? 0,
-                        Y = this.cachedDebounceResponse?.MainPlayer.Position?.Y ?? 0,
-                    },
+                    playerPosition,
                     new Point
                     {
                         X = questMetaData.Position!.Value.X,
@@ -392,7 +407,7 @@ public partial class GuildwarsMinimap : UserControl
             })
             .ToList();
 
-        await Task.WhenAll(pathfindingTasks.Append(Task.Delay(MinPathCalculationFrequency)));
+        await Task.WhenAll(pathfindingTasks);
         var paths = new List<PathfindingResponse>();
         var colors = new List<Color>();
         for(var i = 0; i < currentMapQuests.Count; i++)
@@ -401,7 +416,7 @@ public partial class GuildwarsMinimap : UserControl
             var result = await pathfindingTasks[i];
             if (result.TryExtractSuccess(out var pathfindingResponse))
             {
-                paths.Add(pathfindingResponse);
+                paths.Add(pathfindingResponse!);
                 var questColor = GetQuestColor(quest);
                 var pathColor = Color.FromArgb(100, questColor.R, questColor.G, questColor.B);
                 colors.Add(pathColor);
@@ -705,21 +720,6 @@ public partial class GuildwarsMinimap : UserControl
         {
             mouseButtonEventArgs.Handled = true;
         }
-    }
-
-    private void VerifySurface()
-    {
-        var peekPixels = this.entitySurface?.PeekPixels();
-        if (!this.resizeEntities &&
-            this.ActualWidth == peekPixels?.Width &&
-            this.ActualHeight == peekPixels?.Height)
-        {
-            return;
-        }
-
-        var imageInfo = new SKImageInfo((int)this.ActualWidth, (int)this.ActualHeight, SKColorType.Rgba8888, SKAlphaType.Premul);
-        var surface = SKSurface.Create(imageInfo);
-        this.entitySurface = surface;
     }
 
     private static bool PositionsCollide(Position position1, Position position2)

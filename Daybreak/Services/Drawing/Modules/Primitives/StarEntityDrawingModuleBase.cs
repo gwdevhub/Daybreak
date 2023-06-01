@@ -7,8 +7,8 @@ public abstract class StarEntityDrawingModuleBase : StarDrawingModuleBase
 {
     protected abstract Color FillColor { get; }
 
-    public override void DrawEntity(int finalX, int finalY, int size, WriteableBitmap bitmap, bool targeted)
+    public override void DrawEntity(int finalX, int finalY, int size, WriteableBitmap bitmap, bool targeted, Color shade)
     {
-        this.DrawFilledStar(bitmap, finalX, finalY, size, this.FillColor);
+        this.DrawFilledStar(bitmap, finalX, finalY, size, this.FillColor, shade);
     }
 }

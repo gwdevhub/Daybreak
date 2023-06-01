@@ -302,6 +302,7 @@ public static class ProjectConfiguration
         optionsProducer.RegisterOptions<LoggingOptions>();
         optionsProducer.RegisterOptions<PriceHistoryOptions>();
         optionsProducer.RegisterOptions<TraderQuotesOptions>();
+        optionsProducer.RegisterOptions<PathfindingOptions>();
     }
 
     public static void RegisterLiteCollections(IServiceCollection services)
