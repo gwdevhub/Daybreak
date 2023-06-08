@@ -2,6 +2,7 @@
 using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Linq;
@@ -109,6 +110,16 @@ public sealed class MemoryScanner : IMemoryScanner
         Monitor.Exit(LockObject);
     }
 
+    public T Read<T>(GuildwarsPointer<T> pointer, uint offset = 0)
+    {
+        if (pointer is GuildwarsPointer<string>)
+        {
+            return (T)(this.ReadWString(pointer.Address, 256) as object);
+        }
+
+        return this.Read<T>(pointer.Address + offset);
+    }
+
     public T Read<T>(uint address)
     {
         this.ValidateReadScanner();
@@ -164,9 +175,21 @@ public sealed class MemoryScanner : IMemoryScanner
         return retArray;
     }
 
-    public T[] ReadArray<T>(GuildwarsArray guildwarsArray)
+    public T[] ReadArray<T>(GuildwarsArray<T> guildwarsArray)
     {
-        return this.ReadArray<T>(guildwarsArray.Buffer, guildwarsArray.Size);
+        return this.ReadArray<T>(guildwarsArray.Buffer.Address, guildwarsArray.Size);
+    }
+
+    public T[] ReadArray<T>(GuildwarsPointerArray<T> guildwarsPointerArray)
+    {
+        var ptrs = this.ReadArray<uint>(guildwarsPointerArray.Buffer.Address, guildwarsPointerArray.Size);
+        var retList = new List<T>();
+        foreach(var ptr in ptrs)
+        {
+            retList.Add(this.Read<T>(ptr));
+        }
+
+        return retList.ToArray();
     }
 
     public byte[]? ReadBytes(uint address, uint size)

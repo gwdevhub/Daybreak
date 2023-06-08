@@ -13,7 +13,7 @@
                                Clicked="HighlightButton_Clicked">
             <local:CircularButton.Content>
                 <Viewbox Width="60" Height="60">
-                    <glyphs:RefreshGlyph Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}" Margin="0, 0, 60, 60"></glyphs:RefreshGlyph>
+                    <glyphs:RefreshGlyph Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}" Margin="0, 60, 60, 120"></glyphs:RefreshGlyph>
                 </Viewbox>
             </local:CircularButton.Content>
         </local:CircularButton>

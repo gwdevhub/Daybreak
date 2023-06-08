@@ -124,6 +124,16 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         return Task.Run(() => this.SafeReadGameMemory(this.ReadPathingMetaDataInternal), cancellationToken);
     }
 
+    public Task<InventoryData?> ReadInventory(CancellationToken cancellationToken)
+    {
+        if (this.memoryScanner.Scanning is false)
+        {
+            return Task.FromResult<InventoryData?>(default);
+        }
+
+        return Task.Run(() => this.SafeReadGameMemory(this.ReadInventoryDataInternal), cancellationToken);
+    }
+
     private async Task InitializeSafe(Process process, ScopedLogger<GuildwarsMemoryReader> scopedLogger)
     {
         if (this.memoryScanner.Process is null ||
@@ -187,14 +197,14 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
     private LoginData? ReadLoginDataInternal()
     {
         var globalContext = this.memoryScanner.ReadPtrChain<GlobalContext>(this.memoryScanner.ModuleStartAddress, finalPointerOffset: 0x0, 0x00629244, 0xC, 0xC);
-        if (globalContext.GameContext == 0x0 ||
-            globalContext.UserContext == 0x0 ||
-            globalContext.InstanceContext == 0x0)
+        if (!globalContext.GameContext.IsValid() ||
+            !globalContext.UserContext.IsValid() ||
+            !globalContext.InstanceContext.IsValid())
         {
             return default;
         }
 
-        var userContext = this.memoryScanner.Read<UserContext>(globalContext.UserContext + UserContext.BaseOffset);
+        var userContext = this.memoryScanner.Read(globalContext.UserContext, UserContext.BaseOffset);
         return new LoginData
         {
             Email = userContext.PlayerEmailFirstChar + (userContext.PlayerEmailSecondChar + userContext.PlayerEmailRemaining),
@@ -215,19 +225,19 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
          */
         var globalContext = this.memoryScanner.ReadPtrChain<GlobalContext>(this.memoryScanner.ModuleStartAddress, finalPointerOffset: 0x0, 0x00629244, 0xC, 0xC);
 
-        if (globalContext.GameContext == 0x0 ||
-            globalContext.UserContext == 0x0 ||
-            globalContext.InstanceContext == 0x0)
+        if (!globalContext.GameContext.IsValid() ||
+            !globalContext.UserContext.IsValid() ||
+            !globalContext.InstanceContext.IsValid())
         {
             return new GameData { Valid = false };
         }
 
         // GameContext struct is offset by 0x07C due to the memory layout of the structure.
-        var gameContext = this.memoryScanner.Read<GameContext>(globalContext.GameContext + GameContext.BaseOffset);
+        var gameContext = this.memoryScanner.Read(globalContext.GameContext, GameContext.BaseOffset);
         // UserContext struct is offset by 0x074 due to the memory layout of the structure.
-        var userContext = this.memoryScanner.Read<UserContext>(globalContext.UserContext + UserContext.BaseOffset);
+        var userContext = this.memoryScanner.Read(globalContext.UserContext, UserContext.BaseOffset);
         // InstanceContext struct is offset by 0x01AC due to memory layout of the structure.
-        var instanceContext = this.memoryScanner.Read<InstanceContext>(globalContext.InstanceContext + InstanceContext.BaseOffset);
+        var instanceContext = this.memoryScanner.Read(globalContext.InstanceContext, InstanceContext.BaseOffset);
         
         if (gameContext.MapEntities.Size > 10000 ||
             gameContext.Professions.Size > 10000 ||
@@ -241,27 +251,27 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
             return new GameData { Valid = false };
         }
 
-        var mapEntities = this.memoryScanner.ReadArray<MapEntityContext>(gameContext.MapEntities);
-        var mapIcons = this.memoryScanner.ReadArray<MapIconContext>(gameContext.MissionMapIcons);
-        var professions = this.memoryScanner.ReadArray<ProfessionsContext>(gameContext.Professions);
-        var players = this.memoryScanner.ReadArray<PlayerContext>(gameContext.Players);
-        var quests = this.memoryScanner.ReadArray<QuestContext>(gameContext.QuestLog);
-        var skills = this.memoryScanner.ReadArray<SkillbarContext>(gameContext.Skillbars);
-        var partyAttributes = this.memoryScanner.ReadArray<PartyAttributesContext>(gameContext.PartyAttributes);
+        var mapEntities = this.memoryScanner.ReadArray(gameContext.MapEntities);
+        var mapIcons = this.memoryScanner.ReadArray(gameContext.MissionMapIcons);
+        var professions = this.memoryScanner.ReadArray(gameContext.Professions);
+        var players = this.memoryScanner.ReadArray(gameContext.Players);
+        var quests = this.memoryScanner.ReadArray(gameContext.QuestLog);
+        var skills = this.memoryScanner.ReadArray(gameContext.Skillbars);
+        var partyAttributes = this.memoryScanner.ReadArray(gameContext.PartyAttributes);
         var playerEntityId = this.memoryScanner.ReadPtrChain<int>(this.GetPlayerIdPointer(), 0x0, 0x0);
         var targetEntityId = this.memoryScanner.ReadPtrChain<int>(this.GetTargetIdPointer(), 0x0, 0x0);
-        var titles = this.memoryScanner.ReadArray<TitleContext>(gameContext.Titles);
-        var titleTiers = this.memoryScanner.ReadArray<TitleTierContext>(gameContext.TitlesTiers);
-        var npcs = this.memoryScanner.ReadArray<NpcContext>(gameContext.Npcs);
+        var titles = this.memoryScanner.ReadArray(gameContext.Titles);
+        var titleTiers = this.memoryScanner.ReadArray(gameContext.TitlesTiers);
+        var npcs = this.memoryScanner.ReadArray(gameContext.Npcs);
 
         // The following lines would retrieve all entities, including item entities.
-        var entityPointersArray = this.memoryScanner.ReadPtrChain<GuildwarsArray>(this.GetEntityArrayPointer(), 0x0, 0x0);
+        var entityPointersArray = this.memoryScanner.ReadPtrChain<GenericGuildwarsArray>(this.GetEntityArrayPointer(), 0x0, 0x0);
         if (entityPointersArray.Size > 10000)
         {
             return new GameData { Valid = false };
         }
 
-        var entityPointers = this.memoryScanner.ReadArray<uint>(entityPointersArray);
+        var entityPointers = this.memoryScanner.ReadArray<uint>(entityPointersArray.Buffer, entityPointersArray.Size);
         var entities = entityPointers.Select(ptr => this.memoryScanner.Read<EntityContext>(ptr + EntityContext.EntityContextBaseOffset)).ToArray();
 
         return this.AggregateGameData(
@@ -286,7 +296,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
     private PathingData? ReadPathingDataInternal()
     {
         var globalContext = this.memoryScanner.ReadPtrChain<GlobalContext>(this.memoryScanner.ModuleStartAddress, finalPointerOffset: 0x0, 0x00629244, 0xC, 0xC);
-        var mapContext = this.memoryScanner.Read<MapContext>(globalContext.MapContext);
+        var mapContext = this.memoryScanner.Read(globalContext.MapContext);
 
         var pathingMapContext = this.memoryScanner.ReadPtrChain<PathingMapContext>(mapContext.PathingMapContextPtr, 0x0, 0x0);
         if (pathingMapContext.PathingMapArray.Size > 10000)
@@ -294,7 +304,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
             return default;
         }
 
-        var pathingMaps = this.memoryScanner.ReadArray<PathingMap>(pathingMapContext.PathingMapArray);
+        var pathingMaps = this.memoryScanner.ReadArray(pathingMapContext.PathingMapArray);
         var trapezoidsCount = (int)pathingMaps.Select(p => p.TrapezoidCount).Sum(count => count);
         if (trapezoidsCount > MaxTrapezoidCount)
         {
@@ -363,12 +373,44 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
     private PathingMetadata? ReadPathingMetaDataInternal()
     {
         var globalContext = this.memoryScanner.ReadPtrChain<GlobalContext>(this.memoryScanner.ModuleStartAddress, finalPointerOffset: 0x0, 0x00629244, 0xC, 0xC);
-        var mapContext = this.memoryScanner.Read<MapContext>(globalContext.MapContext);
+        var mapContext = this.memoryScanner.Read(globalContext.MapContext);
 
         var pathingMapContext = this.memoryScanner.ReadPtrChain<PathingMapContext>(mapContext.PathingMapContextPtr, 0x0, 0x0);
-        var pathingMaps = this.memoryScanner.ReadArray<PathingMap>(pathingMapContext.PathingMapArray);
+        var pathingMaps = this.memoryScanner.ReadArray(pathingMapContext.PathingMapArray);
 
         return new PathingMetadata { TrapezoidCount = (int)pathingMaps.Select(p => p.TrapezoidCount).Sum(count => count) };
+    }
+
+    private InventoryData? ReadInventoryDataInternal()
+    {
+        var globalContext = this.memoryScanner.ReadPtrChain<GlobalContext>(this.memoryScanner.ModuleStartAddress, finalPointerOffset: 0x0, 0x00629244, 0xC, 0xC);
+
+        if (!globalContext.GameContext.IsValid() ||
+            !globalContext.UserContext.IsValid() ||
+            !globalContext.InstanceContext.IsValid())
+        {
+            return default;
+        }
+
+        var itemContext = this.memoryScanner.Read(globalContext.ItemContext);
+        var inventory = this.memoryScanner.Read(itemContext.Inventory);
+        var inventoryData = new InventoryData
+        {
+            Backpack = this.GetBag(inventory.Backpack, 1, true),
+            BeltPouch = this.GetBag(inventory.BeltPouch, 1, true),
+            Bags = new List<Bag?>
+            {
+                this.GetBag(inventory.Bag1, 1, true),
+                this.GetBag(inventory.Bag2, 1, true)
+            },
+            EquipmentPack = this.GetBag(inventory.EquipmentPack, 1, true),
+            MaterialStorage = this.GetBag(inventory.MaterialStorage, 5, true),
+            UnclaimedItems = this.GetBag(inventory.UnclaimedItems, 3, true),
+            EquippedItems = this.GetBag(inventory.EquippedItems, 2, true),
+            StoragePanes = inventory.StoragePanes.Select(b => this.GetBag(b, 4, false)).ToList()
+        };
+
+        return inventoryData;
     }
 
     private uint GetPlayerIdPointer()
@@ -409,6 +451,70 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         }
 
         return this.targetIdPointer;
+    }
+
+    private Bag? GetBag(GuildwarsPointer<BagInfo> bagInfoPtr, uint expectedBagType, bool returnEmptyBag)
+    {
+        var bagInfo = this.memoryScanner.Read(bagInfoPtr);
+        if (!bagInfo.Items.Buffer.IsValid() ||
+            bagInfo.Items.Size > 100 ||
+            bagInfo.Type != expectedBagType)
+        {
+            return default;
+        }
+
+        var itemInfos = this.memoryScanner.ReadArray(bagInfo.Items);
+        var items = new List<IBagContent>();
+        for(var i = 0; i < Math.Min(bagInfo.ItemsCount, itemInfos.Length); i++)
+        {
+            var itemInfo = itemInfos[i];
+            if (itemInfo.Quantity == 0 ||
+                itemInfo.Quantity > 250 ||
+                itemInfo.ModifierArrayAddress == 0 ||
+                itemInfo.ModifierCount > 200 ||
+                itemInfo.ModelId == 0)
+            {
+                continue;
+            }
+
+            if (itemInfo.ContainingBagAddress != bagInfoPtr.Address)
+            {
+                continue;
+            }
+
+            var modifiers = this.memoryScanner.ReadArray<uint>(itemInfo.ModifierArrayAddress, itemInfo.ModifierCount);
+            if (ItemBase.TryParse((int)itemInfo.ModelId, out var item) &&
+                item is not ItemBase.Unknown)
+            {
+                items.Add(new BagItem
+                {
+                    Item = item ?? throw new InvalidOperationException($"Unable to create {nameof(BagItem)}. Expected item returned null"),
+                    Slot = itemInfo.Slot,
+                    Count = itemInfo.Quantity
+                });
+            }
+            else
+            {
+                items.Add(new UnknownBagItem
+                {
+                    ItemId = itemInfo.ModelId,
+                    Slot = itemInfo.Slot,
+                    Count = itemInfo.Quantity
+                });
+            }
+        }
+
+        if (items.Count == 0 &&
+            !returnEmptyBag)
+        {
+            return default;
+        }
+
+        return new Bag
+        {
+            Items = items,
+            Capacity = (int)Math.Max(bagInfo.ItemsCount, itemInfos.Length)
+        };
     }
 
     private unsafe GameData AggregateGameData(
@@ -659,7 +765,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         TitleTierContext[] titleTiers,
         EntityContext[] entities)
     {
-        var name = this.memoryScanner.ReadWString(playerContext.NamePointer, 0x40);
+        var name = this.memoryScanner.Read(playerContext.NamePointer);
         var playerInformation = GetPlayerInformation(playerContext.AgentId, instanceContext, mapEntities, professions, skillbars, partyAttributes, entities);
         var maybeCurrentTitleContext = (TitleContext?)null;
         var maybeCurrentTitle = (Title?)null;

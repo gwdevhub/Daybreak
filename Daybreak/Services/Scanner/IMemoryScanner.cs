@@ -13,9 +13,11 @@ public interface IMemoryScanner
 
     void BeginScanner(Process process);
     void EndScanner();
+    T Read<T>(GuildwarsPointer<T> pointer, uint offset = 0);
     T Read<T>(uint address);
     T[] ReadArray<T>(uint address, uint size);
-    T[] ReadArray<T>(GuildwarsArray guildwarsArray);
+    T[] ReadArray<T>(GuildwarsArray<T> guildwarsArray);
+    T[] ReadArray<T>(GuildwarsPointerArray<T> guildwarsPointerArray);
     byte[]? ReadBytes(uint address, uint size);
     string ReadWString(uint address, uint maxsize);
     T ReadPtrChain<T>(uint Base, uint finalPointerOffset = 0, params uint[] offsets);

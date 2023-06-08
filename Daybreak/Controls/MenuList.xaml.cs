@@ -1,6 +1,7 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Launch;
 using Daybreak.Services.Navigation;
+using Daybreak.Services.Notifications;
 using Daybreak.Views;
 using Daybreak.Views.Onboarding.Toolbox;
 using Daybreak.Views.Onboarding.UMod;
@@ -9,7 +10,11 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Configuration;
 using System.Core.Extensions;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Extensions;
 
 namespace Daybreak.Controls;
 
@@ -19,11 +24,20 @@ namespace Daybreak.Controls;
 public partial class MenuList : UserControl
 {
     private readonly IViewManager viewManager;
+    private readonly INotificationStorage notificationStorage;
     private readonly ILiveOptions<LauncherOptions> liveOptions;
+
+    private CancellationTokenSource? cancellationTokenSource;
+
+    [GenerateDependencyProperty]
+    private bool showingNotificationCount;
+    [GenerateDependencyProperty]
+    private int notificationCount;
 
     public MenuList()
         : this(
               Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>(),
+              Launcher.Instance.ApplicationServiceProvider.GetRequiredService<INotificationStorage>(),
               Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILiveOptions<LauncherOptions>>())
     {
         this.InitializeComponent();
@@ -31,9 +45,11 @@ public partial class MenuList : UserControl
 
     private MenuList(
         IViewManager viewManager,
+        INotificationStorage notificationStorage,
         ILiveOptions<LauncherOptions> liveOptions)
     {
         this.viewManager = viewManager.ThrowIfNull();
+        this.notificationStorage = notificationStorage.ThrowIfNull();
         this.liveOptions = liveOptions.ThrowIfNull();
     }
 
@@ -100,5 +116,48 @@ public partial class MenuList : UserControl
     private void TraderQuotesButton_Clicked(object sender, EventArgs e)
     {
         this.viewManager.ShowView<PriceQuotesView>();
+    }
+
+    private void NotificationsButton_Clicked(object sender, EventArgs e)
+    {
+        this.viewManager.ShowView<NotificationsView>();
+    }
+
+    private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
+    {
+        this.cancellationTokenSource = new CancellationTokenSource();
+        this.PeriodicallyCheckUnopenedNotifications(this.cancellationTokenSource.Token);
+    }
+
+    private void UserControl_Unloaded(object sender, System.Windows.RoutedEventArgs e)
+    {
+        this.cancellationTokenSource?.Cancel();
+        this.cancellationTokenSource?.Dispose();
+        this.cancellationTokenSource = default;
+    }
+
+    private async void PeriodicallyCheckUnopenedNotifications(CancellationToken cancellationToken)
+    {
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            var unopenedNotifications = this.notificationStorage.GetPendingNotifications().ToList();
+            if (unopenedNotifications.Any())
+            {
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ShowingNotificationCount = true;
+                    this.NotificationCount = unopenedNotifications.Count;
+                });
+            }
+            else
+            {
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ShowingNotificationCount = false;
+                });
+            }
+
+            await Task.Delay(5000, cancellationToken);
+        }
     }
 }

@@ -237,6 +237,8 @@ public partial class MainWindow : MetroWindow
             {
                 this.Foreground = Brushes.Black;
             }
+
+            this.WindowButtonCommands.Foreground = this.Foreground;
         }
     }
 

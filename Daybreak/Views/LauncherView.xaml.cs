@@ -1,7 +1,10 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Models.Notifications;
 using Daybreak.Models.Onboarding;
 using Daybreak.Services.ApplicationLauncher;
+using Daybreak.Services.InternetChecker;
 using Daybreak.Services.Navigation;
+using Daybreak.Services.Notifications;
 using Daybreak.Services.Onboarding;
 using Daybreak.Services.Screens;
 using System;
@@ -24,6 +27,7 @@ namespace Daybreak.Views;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
 public partial class LauncherView : UserControl
 {
+    private readonly IConnectivityStatus connectivityStatus;
     private readonly IOnboardingService onboardingService;
     private readonly IApplicationLauncher applicationDetector;
     private readonly IViewManager viewManager;
@@ -32,11 +36,14 @@ public partial class LauncherView : UserControl
     private readonly IScreenManager screenManager;
 
     private CancellationTokenSource cancellationTokenSource = new();
+    private bool gameRunning = false;
+    private bool internetAvailable = false;
 
     [GenerateDependencyProperty]
     private bool launchButtonEnabled;
 
     public LauncherView(
+        IConnectivityStatus connectivityStatus,
         IOnboardingService onboardingService,
         IApplicationLauncher applicationDetector,
         IViewManager viewManager,
@@ -44,6 +51,7 @@ public partial class LauncherView : UserControl
         ILiveOptions<LauncherOptions> launcherOptions,
         IScreenManager screenManager)
     {
+        this.connectivityStatus = connectivityStatus.ThrowIfNull();
         this.onboardingService = onboardingService.ThrowIfNull();
         this.screenManager = screenManager.ThrowIfNull();
         this.focusViewOptions = focusViewOptions.ThrowIfNull();
@@ -53,16 +61,20 @@ public partial class LauncherView : UserControl
         this.InitializeComponent();
     }
 
-    private void PeriodicallyCheckGameState()
+    private async void PeriodicallyCheckGameState(CancellationToken cancellationToken)
     {
-        this.cancellationTokenSource?.Cancel();
-        this.cancellationTokenSource = new CancellationTokenSource();
-        System.Extensions.TaskExtensions.RunPeriodicAsync(() => this.Dispatcher.Invoke(this.CheckGameState), TimeSpan.Zero, TimeSpan.FromSeconds(1), this.cancellationTokenSource.Token);
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            await this.Dispatcher.InvokeAsync(this.CheckGameState);
+            await Task.Delay(1000, cancellationToken);
+        }
     }
 
     private void CheckGameState()
     {
-        this.LaunchButtonEnabled = this.applicationDetector.IsGuildwarsRunning is false;
+        this.internetAvailable = this.connectivityStatus.IsInternetAvailable;
+        this.gameRunning = this.applicationDetector.IsGuildwarsRunning;
+        this.CheckLaunchButtonState();
         this.CheckAndSwitchToFocusView();
     }
 
@@ -81,9 +93,23 @@ public partial class LauncherView : UserControl
         this.viewManager.ShowView<FocusView>();
     }
 
+    private void CheckLaunchButtonState()
+    {
+        if (this.internetAvailable is false || this.gameRunning is true)
+        {
+            this.LaunchButtonEnabled = false;
+        }
+        else
+        {
+            this.LaunchButtonEnabled = true;
+        }
+    }
+
     private void StartupView_Loaded(object sender, RoutedEventArgs e)
     {
-        this.PeriodicallyCheckGameState();
+        this.cancellationTokenSource?.Cancel();
+        this.cancellationTokenSource = new CancellationTokenSource();
+        this.PeriodicallyCheckGameState(this.cancellationTokenSource.Token);
     }
 
     private void StartupView_Unloaded(object sender, RoutedEventArgs e)

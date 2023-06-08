@@ -55,12 +55,16 @@ using Daybreak.Views.Trade;
 using System.Net.WebSockets;
 using Daybreak.Utils;
 using Daybreak.Services.Notifications;
-using Daybreak.Models.Trade;
 using Microsoft.Extensions.Options;
 using Daybreak.Services.TradeChat.Models;
 using Daybreak.Services.Charts;
 using Daybreak.Services.Images;
 using Daybreak.Services.Drawing.Modules.Bosses;
+using Daybreak.Services.InternetChecker;
+using System;
+using Daybreak.Services.Sounds;
+using Daybreak.Services.Notifications.Models;
+using Daybreak.Models.Notifications.Handling;
 
 namespace Daybreak.Configuration;
 
@@ -111,6 +115,10 @@ public static class ProjectConfiguration
             .RegisterHttpClient<PriceHistoryService>()
                 .WithMessageHandler(SetupLoggingAndMetrics<PriceHistoryService>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
+                .Build()
+            .RegisterHttpClient<InternetCheckingService>()
+                .WithMessageHandler(SetupLoggingAndMetrics<InternetCheckingService>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build();
     }
 
@@ -155,8 +163,13 @@ public static class ProjectConfiguration
         services.AddSingleton<IThemeManager, ThemeManager>();
         services.AddSingleton<INotificationService, NotificationService>();
         services.AddSingleton<INotificationProducer, NotificationService>(sp => sp.GetRequiredService<INotificationService>().As<NotificationService>()!);
+        services.AddSingleton<INotificationHandlerProducer, NotificationService>(sp => sp.GetRequiredService<INotificationService>().As<NotificationService>()!);
         services.AddSingleton<ILiveChartInitializer, LiveChartInitializer>();
         services.AddSingleton<IImageCache, ImageCache>();
+        services.AddSingleton<ISoundService, SoundService>();
+        services.AddSingleton<IInternetCheckingService, InternetCheckingService>();
+        services.AddSingleton<IConnectivityStatus, ConnectivityStatus>();
+        services.AddSingleton<INotificationStorage, NotificationStorage>();
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
         services.AddScoped<IScreenshotProvider, ScreenshotProvider>();
@@ -224,6 +237,7 @@ public static class ProjectConfiguration
         viewProducer.RegisterView<AscalonTradeChatView>();
         viewProducer.RegisterView<PriceQuotesView>();
         viewProducer.RegisterView<PriceHistoryView>();
+        viewProducer.RegisterView<NotificationsView>();
     }
 
     public static void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -289,6 +303,7 @@ public static class ProjectConfiguration
     {
         optionsProducer.ThrowIfNull();
 
+        optionsProducer.RegisterOptions<SoundOptions>();
         optionsProducer.RegisterOptions<ThemeOptions>();
         optionsProducer.RegisterOptions<BrowserOptions>();
         optionsProducer.RegisterOptions<BuildSynchronizationOptions>();
@@ -303,12 +318,20 @@ public static class ProjectConfiguration
         optionsProducer.RegisterOptions<PriceHistoryOptions>();
         optionsProducer.RegisterOptions<TraderQuotesOptions>();
         optionsProducer.RegisterOptions<PathfindingOptions>();
+        optionsProducer.RegisterOptions<NotificationStorageOptions>();
     }
 
     public static void RegisterLiteCollections(IServiceCollection services)
     {
         RegisterLiteCollection<Models.Log, LoggingOptions>(services);
         RegisterLiteCollection<TraderQuoteDTO, PriceHistoryOptions>(services);
+        RegisterLiteCollection<NotificationDTO, NotificationStorageOptions>(services);
+    }
+
+    public static void RegisterNotificationHandlers(INotificationHandlerProducer notificationHandlerProducer)
+    {
+        notificationHandlerProducer.RegisterNotificationHandler<NoActionHandler>();
+        notificationHandlerProducer.RegisterNotificationHandler<MessageBoxHandler>();
     }
 
     private static void RegisterLiteCollection<TCollectionType, TOptionsType>(IServiceCollection services)

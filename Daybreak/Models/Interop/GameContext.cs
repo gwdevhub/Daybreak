@@ -8,30 +8,25 @@ public readonly struct GameContext
     public const uint BaseOffset = 0x007C;
 
     [FieldOffset(0x0000)]
-    ///Array of type <see cref="MapEntityContext"/>.
-    public readonly GuildwarsArray MapEntities;
+    public readonly GuildwarsArray<MapEntityContext> MapEntities;
 
     [FieldOffset(0x0030)]
-    public readonly GuildwarsArray PartyAttributes;
+    public readonly GuildwarsArray<PartyAttributesContext> PartyAttributes;
 
     [FieldOffset(0x04AC)]
     public readonly uint QuestId;
 
     [FieldOffset(0x04B0)]
-    public readonly GuildwarsArray QuestLog;
-
-    [FieldOffset(0x0518)]
-    public readonly GuildwarsArray HeroInfos;
+    public readonly GuildwarsArray<QuestContext> QuestLog;
 
     [FieldOffset(0x0608)]
     public readonly uint HardModeUnlocked;
 
     [FieldOffset(0x0640)]
-    ///Array of type <see cref="ProfessionsContext"/>
-    public readonly GuildwarsArray Professions;
+    public readonly GuildwarsArray<ProfessionsContext> Professions;
 
     [FieldOffset(0x0674)]
-    public readonly GuildwarsArray Skillbars;
+    public readonly GuildwarsArray<SkillbarContext> Skillbars;
 
     [FieldOffset(0x06C4)]
     public readonly uint Experience;
@@ -84,23 +79,20 @@ public readonly struct GameContext
     [FieldOffset(0x0748)]
     public readonly uint MaxImperial;
 
-    [FieldOffset(0x0750)]
-    public readonly GuildwarsArray EntityInfos;
-
     [FieldOffset(0x0770)]
-    public readonly GuildwarsArray MissionMapIcons;
+    public readonly GuildwarsArray<MapIconContext> MissionMapIcons;
 
     [FieldOffset(0x0780)]
-    public readonly GuildwarsArray Npcs;
+    public readonly GuildwarsArray<NpcContext> Npcs;
 
     [FieldOffset(0x790)]
-    public readonly GuildwarsArray Players;
+    public readonly GuildwarsArray<PlayerContext> Players;
 
     [FieldOffset(0x7A0)]
-    public readonly GuildwarsArray Titles;
+    public readonly GuildwarsArray<TitleContext> Titles;
 
     [FieldOffset(0x7B0)]
-    public readonly GuildwarsArray TitlesTiers;
+    public readonly GuildwarsArray<TitleTierContext> TitlesTiers;
 
     [FieldOffset(0x07D0)]
     public readonly uint FoesKilled;
