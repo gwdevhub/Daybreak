@@ -127,45 +127,6 @@ public sealed class Material : ItemBase
         VialOfInk
     };
 
-    public static bool TryParse(int id, out Material material)
-    {
-        material = All.Where(material => material.Id == id).FirstOrDefault()!;
-        if (material is null)
-        {
-            return false;
-        }
-
-        return true;
-    }
-    public static bool TryParse(string name, out Material material)
-    {
-        material = All.Where(material => material.Name == name).FirstOrDefault()!;
-        if (material is null)
-        {
-            return false;
-        }
-
-        return true;
-    }
-    public static Material Parse(int id)
-    {
-        if (TryParse(id, out var material) is false)
-        {
-            throw new InvalidOperationException($"Could not find a material with id {id}");
-        }
-
-        return material;
-    }
-    public static Material Parse(string name)
-    {
-        if (TryParse(name, out var material) is false)
-        {
-            throw new InvalidOperationException($"Could not find a material with name {name}");
-        }
-
-        return material;
-    }
-
     public string Multiple { get; init; } = default!;
     public string WikiUrl { get; init; } = default!;
 

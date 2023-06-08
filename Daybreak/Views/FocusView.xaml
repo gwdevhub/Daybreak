@@ -9,6 +9,7 @@
              xmlns:converters="clr-namespace:Daybreak.Converters"
              xmlns:templates="clr-namespace:Daybreak.Controls.Templates"
              xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
+             xmlns:components="clr-namespace:Daybreak.Controls.FocusViewComponents"
              mc:Ignorable="d" 
              Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
              Loaded="FocusView_Loaded"
@@ -21,296 +22,20 @@
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="0.01*"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
-            <ColumnDefinition Width="0.01*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="0*"></RowDefinition>
-            <RowDefinition Height="0.5*"></RowDefinition>
-            <RowDefinition Height="0.5*"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="118"></RowDefinition>
         </Grid.RowDefinitions>
-        <Grid
-            Margin="0, 2, 0, 0"
-            Grid.Column="1"
-            Grid.ColumnSpan="2"
-            Grid.Row="3"
-            Grid.RowSpan="2"
-            Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="0.1*"></ColumnDefinition>
-                <ColumnDefinition Width="0.3*"></ColumnDefinition>
-                <ColumnDefinition Width="0.1*"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <controls:VerticalResourceBar
-                Grid.Column="1"
-                Grid.ColumnSpan="3"
-                CurrentResourceValue="{Binding ElementName=_this, Path=CurrentExperienceInLevel, Mode=OneWay}"
-                MaxResourceValue="{Binding ElementName=_this, Path=NextLevelExperienceThreshold, Mode=OneWay}"
-                Text="{Binding ElementName=_this,Path=ExperienceBarText, Mode=OneWay}"
-                BarColor="{DynamicResource Daybreak.Brushes.Experience}"
-                Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                Height="113"
-                FontSize="14"
-                Cursor="Hand"
-                MouseLeftButtonDown="ExperienceBar_MouseLeftButtonDown">
-                <controls:VerticalResourceBar.OpacityMask>
-                    <DrawingBrush>
-                        <DrawingBrush.Drawing>
-                            <DrawingGroup>
-                                <GeometryDrawing Brush="#FFFFFFFF">
-                                    <GeometryDrawing.Geometry>
-                                        <PathGeometry>
-                                            <PathGeometry.Figures>
-                                                <PathFigure IsClosed="True" StartPoint="5, 1">
-                                                    <PathSegmentCollection>
-                                                        <LineSegment Point="1, 5"></LineSegment>
-                                                        <LineSegment Point="5, 9"></LineSegment>
-                                                        <LineSegment Point="15, 9"></LineSegment>
-                                                        <LineSegment Point="19, 5"></LineSegment>
-                                                        <LineSegment Point="15, 1"></LineSegment>
-                                                    </PathSegmentCollection>
-                                                </PathFigure>
-                                            </PathGeometry.Figures>
-                                        </PathGeometry>
-                                    </GeometryDrawing.Geometry>
-                                </GeometryDrawing>
-                            </DrawingGroup>
-                        </DrawingBrush.Drawing>
-                    </DrawingBrush>
-                </controls:VerticalResourceBar.OpacityMask>
-            </controls:VerticalResourceBar>
-            <Viewbox
-                Grid.Column="1"
-                Grid.ColumnSpan="3"
-                Stretch="Fill">
-                <Polygon Points="0, 3.94, 3.2, 8, 10.9, 8, 13.9, 3.94, 10.9, 0.1, 3.1, 0.15"
-                         StrokeThickness="0.08"
-                         Stroke="{DynamicResource MahApps.Brushes.ThemeForeground}"></Polygon>
-            </Viewbox>
-            <StackPanel
-                VerticalAlignment="Center"
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
-                Grid.Row="2"
-                Grid.RowSpan="2">
-                <StackPanel.OpacityMask>
-                    <DrawingBrush>
-                        <DrawingBrush.Drawing>
-                            <DrawingGroup>
-                                <GeometryDrawing Brush="#FFFFFFFF">
-                                    <GeometryDrawing.Geometry>
-                                        <PathGeometry>
-                                            <PathGeometry.Figures>
-                                                <PathFigure IsClosed="True" StartPoint="1, 1">
-                                                    <PathSegmentCollection>
-                                                        <LineSegment Point="1, 9"></LineSegment>
-                                                        <LineSegment Point="21, 9"></LineSegment>
-                                                        <LineSegment Point="19, 5"></LineSegment>
-                                                        <LineSegment Point="21, 1"></LineSegment>
-                                                    </PathSegmentCollection>
-                                                </PathFigure>
-                                            </PathGeometry.Figures>
-                                        </PathGeometry>
-                                    </GeometryDrawing.Geometry>
-                                </GeometryDrawing>
-                            </DrawingGroup>
-                        </DrawingBrush.Drawing>
-                    </DrawingBrush>
-                </StackPanel.OpacityMask>
-                <controls:HorizontalResourceBar 
-                    Margin="0, 2, 0, 2"
-                    Height="{Binding ElementName=_this, Path=LeftSideBarSize, Mode=OneWay}"
-                    CurrentResourceValue="{Binding ElementName=_this, Path=GameData.User.CurrentKurzickPoints, Mode=OneWay}"
-                    MaxResourceValue="{Binding ElementName=_this, Path=GameData.User.MaxKurzickPoints, Mode=OneWay}"
-                    VerticalAlignment="Bottom"
-                    HorizontalAlignment="Left"
-                    BarColor="{DynamicResource Daybreak.Brushes.Kurzick}"
-                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    FontSize="14"
-                    Cursor="Hand"
-                    Text="{Binding ElementName=_this, Path=KurzickBarText, Mode=OneWay}"
-                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    BorderThickness="1"
-                    MouseLeftButtonDown="KurzickBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
-                <controls:HorizontalResourceBar 
-                    Margin="0, 2, 0, 2"
-                    Height="{Binding ElementName=_this, Path=LeftSideBarSize, Mode=OneWay}"
-                    CurrentResourceValue="{Binding ElementName=_this, Path=GameData.User.CurrentLuxonPoints, Mode=OneWay}"
-                    MaxResourceValue="{Binding ElementName=_this, Path=GameData.User.MaxLuxonPoints, Mode=OneWay}"
-                    VerticalAlignment="Bottom"
-                    HorizontalAlignment="Left"
-                    BarColor="{DynamicResource Daybreak.Brushes.Luxon}"
-                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    FontSize="14"
-                    Cursor="Hand"
-                    Text="{Binding ElementName=_this, Path=LuxonBarText, Mode=OneWay}"
-                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    BorderThickness="1"
-                    MouseLeftButtonDown="LuxonBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
-                <controls:HorizontalResourceBar 
-                    Margin="0, 2, 0, 2"
-                    Height="{Binding ElementName=_this, Path=LeftSideBarSize, Mode=OneWay}"
-                    CurrentResourceValue="{Binding ElementName=_this, Path=GameData.User.CurrentImperialPoints, Mode=OneWay}"
-                    MaxResourceValue="{Binding ElementName=_this, Path=GameData.User.MaxImperialPoints, Mode=OneWay}"
-                    VerticalAlignment="Bottom"
-                    HorizontalAlignment="Left"
-                    BarColor="{DynamicResource Daybreak.Brushes.Imperial}"
-                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    FontSize="14"
-                    Cursor="Hand"
-                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    BorderThickness="1"
-                    Text="{Binding ElementName=_this, Path=ImperialBarText, Mode=OneWay}"
-                    MouseLeftButtonDown="ImperialBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
-                <controls:HorizontalResourceBar
-                    Margin="0, 2, 0, 2"
-                    Height="{Binding ElementName=_this, Path=LeftSideBarSize, Mode=OneWay}"
-                    CurrentResourceValue="{Binding ElementName=_this, Path=GameData.User.CurrentBalthazarPoints, Mode=OneWay}"
-                    MaxResourceValue="{Binding ElementName=_this, Path=GameData.User.MaxBalthazarPoints, Mode=OneWay}"
-                    VerticalAlignment="Bottom"
-                    HorizontalAlignment="Left"
-                    BarColor="{DynamicResource Daybreak.Brushes.Balthazar}"
-                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    FontSize="14"
-                    Cursor="Hand"
-                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    BorderThickness="1"
-                    Text="{Binding ElementName=_this, Path=BalthazarBarText, Mode=OneWay}"
-                    MouseLeftButtonDown="BalthazarBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
-            </StackPanel>
-            <Viewbox
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
-                Grid.Row="2"
-                Grid.RowSpan="2"
-                Stretch="Fill">
-                <Polygon Points="0, 10.1, 21.5, 10.1, 19.4, 5, 21.5, 0.1, 0, 0.1"
-                         StrokeThickness="0.08"
-                         Width="21.5"
-                         Height="10.2"
-                         Stroke="{DynamicResource MahApps.Brushes.ThemeForeground}"></Polygon>
-            </Viewbox>
-            <StackPanel
-                VerticalAlignment="Center"
-                HorizontalAlignment="Stretch"
-                Grid.Column="3"
-                Grid.ColumnSpan="2"
-                Grid.Row="2"
-                Grid.RowSpan="2">
-                <StackPanel.OpacityMask>
-                    <DrawingBrush>
-                        <DrawingBrush.Drawing>
-                            <DrawingGroup>
-                                <GeometryDrawing Brush="#FFFFFFFF">
-                                    <GeometryDrawing.Geometry>
-                                        <PathGeometry>
-                                            <PathGeometry.Figures>
-                                                <PathFigure IsClosed="True" StartPoint="1, 1">
-                                                    <PathSegmentCollection>
-                                                        <LineSegment Point="3, 5"></LineSegment>
-                                                        <LineSegment Point="1, 9"></LineSegment>
-                                                        <LineSegment Point="21, 9"></LineSegment>
-                                                        <LineSegment Point="21, 1"></LineSegment>
-                                                    </PathSegmentCollection>
-                                                </PathFigure>
-                                            </PathGeometry.Figures>
-                                        </PathGeometry>
-                                    </GeometryDrawing.Geometry>
-                                </GeometryDrawing>
-                            </DrawingGroup>
-                        </DrawingBrush.Drawing>
-                    </DrawingBrush>
-                </StackPanel.OpacityMask>
-                <controls:HorizontalResourceBar 
-                    Margin="0, 2, 0, 2"
-                    Height="{Binding ElementName=_this, Path=RightSideBarSize, Mode=OneWay}"
-                    CurrentResourceValue="{Binding ElementName=_this, Path=GameData.Session.FoesKilled, Mode=OneWay}"
-                    MaxResourceValue="{Binding ElementName=_this, Path=TotalFoes, Mode=OneWay}"
-                    VerticalAlignment="Bottom"
-                    HorizontalAlignment="Left"
-                    BarColor="{DynamicResource Daybreak.Brushes.Vanquish}"
-                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    FontSize="14"
-                    Cursor="Hand"
-                    Text="{Binding ElementName=_this, Path=VanquishingText, Mode=OneWay}"
-                    FillAlignment="Right"
-                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    BorderThickness="1"
-                    Visibility="{Binding ElementName=_this, Path=Vanquishing, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                    MouseLeftButtonDown="VanquishingBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
-                <controls:HorizontalResourceBar 
-                    Margin="0, 2, 0, 2"
-                    Height="{Binding ElementName=_this, Path=RightSideBarSize, Mode=OneWay}"
-                    CurrentResourceValue="{Binding ElementName=_this, Path=PointsInCurrentRank, Mode=OneWay}"
-                    MaxResourceValue="{Binding ElementName=_this, Path=PointsForNextRank, Mode=OneWay}"
-                    VerticalAlignment="Bottom"
-                    HorizontalAlignment="Left"
-                    BarColor="{DynamicResource Daybreak.Brushes.Rank}"
-                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    FontSize="14"
-                    Cursor="Hand"
-                    Text="{Binding ElementName=_this, Path=TitleText, Mode=OneWay}"
-                    FillAlignment="Right"
-                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    BorderThickness="1"
-                    Visibility="{Binding ElementName=_this, Path=TitleActive, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                <controls:HorizontalResourceBar 
-                    Margin="0, 2, 0, 2"
-                    Height="{Binding ElementName=_this, Path=RightSideBarSize, Mode=OneWay}"
-                    CurrentResourceValue="{Binding ElementName=_this, Path=GameData.MainPlayer.CurrentHealth, Mode=OneWay}"
-                    MaxResourceValue="{Binding ElementName=_this, Path=GameData.MainPlayer.MaxHealth, Mode=OneWay}"
-                    VerticalAlignment="Bottom"
-                    HorizontalAlignment="Left"
-                    BarColor="{DynamicResource Daybreak.Brushes.Health}"
-                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    FontSize="14"
-                    Cursor="Hand"
-                    Text="{Binding ElementName=_this, Path=HealthBarText, Mode=OneWay}"
-                    FillAlignment="Right"
-                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    BorderThickness="1"
-                    MouseLeftButtonDown="HealthBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
-                <controls:HorizontalResourceBar 
-                    Margin="0, 2, 0, 2"
-                    Height="{Binding ElementName=_this, Path=RightSideBarSize, Mode=OneWay}"
-                    CurrentResourceValue="{Binding ElementName=_this, Path=GameData.MainPlayer.CurrentEnergy, Mode=OneWay}"
-                    MaxResourceValue="{Binding ElementName=_this, Path=GameData.MainPlayer.MaxEnergy, Mode=OneWay}"
-                    VerticalAlignment="Bottom"
-                    HorizontalAlignment="Left"
-                    BarColor="{DynamicResource Daybreak.Brushes.Energy}"
-                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    FontSize="14"
-                    Cursor="Hand"
-                    Text="{Binding ElementName=_this, Path=EnergyBarText, Mode=OneWay}"
-                    FillAlignment="Right"
-                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    BorderThickness="1"
-                    MouseLeftButtonDown="EnergyBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
-            </StackPanel>
-            <Viewbox
-                Grid.Column="3"
-                Grid.ColumnSpan="2"
-                Grid.Row="2"
-                Grid.RowSpan="2"
-                Stretch="Fill">
-                <Polygon Points="0, 10.1, 21.5, 10.1, 21.5, 0.1, 0, 0.1, 2.1, 5"
-                         StrokeThickness="0.08"
-                         HorizontalAlignment="Right"
-                         Height="10.2"
-                         Width="21.49"
-                         Stroke="{DynamicResource MahApps.Brushes.ThemeForeground}"></Polygon>
-            </Viewbox>
-        </Grid>
-        <Grid
-            Grid.Row="1"
-            Grid.RowSpan="2"
-            Grid.Column="1"
-            Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+        <components:PlayerResourcesComponent Margin="5, 5, 5, 0"
+                                             Grid.ColumnSpan="2"
+                                             Grid.Row="1"
+                                             DataContext="{Binding ElementName=_this, Path=GameData, Mode=OneWay}"
+                                             Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        <Grid Margin="5, 0, 5, 0"
+              Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"></RowDefinition>
                 <RowDefinition Height="auto"></RowDefinition>
@@ -319,245 +44,92 @@
                 <RowDefinition Height="auto"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
-            <StackPanel
-                Background="{DynamicResource Daybreak.Brushes.Background}"
-                Grid.Row="0"
-                Margin="0, 0, 5, 10">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"></ColumnDefinition>
-                        <ColumnDefinition Width="*"></ColumnDefinition>
-                        <ColumnDefinition Width="*"></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock 
-                        Grid.Column="0"
-                        FontSize="18"
-                        Margin="10"
-                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                        Text="{Binding ElementName=_this, Path=GameData.MainPlayer.Name, Mode=OneWay}"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"></TextBlock>
-                    <buttons:HighlightButton
-                        Grid.Column="1"
-                        Title="Edit Build"
-                        HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
-                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                        Margin="10, 0, 10, 0"
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Center"
-                        VerticalContentAlignment="Center"
-                        Cursor="Hand"
-                        FontSize="18"
-                        MouseLeftButtonDown="EditBuild_MouseLeftButtonDown"></buttons:HighlightButton>
-                    <buttons:HighlightButton
-                        Grid.Column="2"
-                        Title="Meta Builds"
-                        HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
-                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                        Margin="10, 0, 0, 0"
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Center"
-                        VerticalContentAlignment="Center"
-                        Cursor="Hand"
-                        FontSize="18"
-                        MouseLeftButtonDown="MetaBuilds_MouseLeftButtonDown"></buttons:HighlightButton>
-                </Grid>
-                <Rectangle 
-                    Height="1"
-                    Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"></Rectangle>
-                <buttons:MenuButton
-                    Title="{Binding ElementName=_this, Path=GameData.MainPlayer.PrimaryProfession.Name, Mode=OneWay}"
-                    HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
-                    HorizontalAlignment="Stretch"
-                    HorizontalContentAlignment="Left"
-                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    Cursor="Hand"
-                    FontSize="20"
-                    MouseLeftButtonDown="PrimaryProfession_MouseLeftButtonDown"></buttons:MenuButton>
-                <buttons:MenuButton
-                    Title="{Binding ElementName=_this, Path=GameData.MainPlayer.SecondaryProfession.Name, Mode=OneWay}"
-                    HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
-                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    HorizontalAlignment="Stretch"
-                    HorizontalContentAlignment="Left"
-                    Cursor="Hand"
-                    FontSize="20"
-                    MouseLeftButtonDown="SecondaryProfession_MouseLeftButtonDown"></buttons:MenuButton>
-            </StackPanel>
-            <Border Grid.Row="0"
-                    Margin="0, 0, 5, 10"
-                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    BorderThickness="1"/>
-            <StackPanel
-                Background="{DynamicResource Daybreak.Brushes.Background}"
-                Grid.Row="1"
-                Margin="0, 0, 5, 10"
-                Visibility="{Binding ElementName=_this, Path=GameData.MainPlayer.TitleInformation.IsValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto"></ColumnDefinition>
-                        <ColumnDefinition Width="*"></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock 
-                        Grid.Column="0"
-                        FontSize="18"
-                        Margin="10"
-                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                        Text="Title Track"
-                        HorizontalAlignment="Left"></TextBlock>
-                    <buttons:MenuButton
-                        Grid.Column="1"
-                        Title="{Binding ElementName=_this, Path=GameData.MainPlayer.TitleInformation.Title.Name, Mode=OneWay}"
-                        HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
-                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                        Margin="10"
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Center"
-                        Cursor="Hand"
-                        FontSize="18"
-                        MouseLeftButtonDown="Title_MouseLeftButtonDown"></buttons:MenuButton>
-                </Grid>
-                <Rectangle 
-                    Height="1"
-                    Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"></Rectangle>
-                <buttons:MenuButton
-                    Title="{Binding ElementName=_this, Path=TitleRankName, Mode=OneWay}"
-                    HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
-                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    HorizontalAlignment="Stretch"
-                    HorizontalContentAlignment="Left"
-                    Cursor="Hand"
-                    FontSize="20"
-                    MouseLeftButtonDown="Title_MouseLeftButtonDown"></buttons:MenuButton>
-            </StackPanel>
-            <Border Grid.Row="1"
-                    Margin="0, 0, 5, 10"
-                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    BorderThickness="1"/>
-            <StackPanel
-                Background="{DynamicResource Daybreak.Brushes.Background}"
-                Grid.Row="2"
-                Margin="0, 0, 5, 10">
-                <TextBlock 
-                    FontSize="18"
-                    Margin="10"
-                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    Text="Current Map"></TextBlock>
-                <Rectangle 
-                    Height="1"
-                    Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"></Rectangle>
-                <buttons:MenuButton
-                    Title="{Binding ElementName=_this, Path=GameData.Session.CurrentMap.Name, Mode=OneWay}"
-                    HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
-                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    HorizontalAlignment="Stretch"
-                    HorizontalContentAlignment="Left"
-                    Cursor="Hand"
-                    FontSize="20"
-                    MouseLeftButtonDown="CurrentMap_MouseLeftButtonDown"></buttons:MenuButton>
-            </StackPanel>
-            <Border Grid.Row="2"
-                    Margin="0, 0, 5, 10"
-                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    BorderThickness="1"/>
-            <StackPanel
-                Background="{DynamicResource Daybreak.Brushes.Background}"
-                Grid.Row="3"
-                Margin="0, 0, 5, 10">
-                <TextBlock 
-                    FontSize="18"
-                    Margin="10"
-                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    Text="Current Quest"></TextBlock>
-                <Rectangle 
-                    Height="1"
-                    Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"></Rectangle>
-                <buttons:MenuButton
-                    Title="{Binding ElementName=_this, Path=GameData.MainPlayer.Quest.Name, Mode=OneWay}"
-                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
-                    HorizontalAlignment="Stretch"
-                    HorizontalContentAlignment="Left"
-                    Cursor="Hand"
-                    FontSize="20"
-                    MouseLeftButtonDown="CurrentQuest_MouseLeftButtonDown"></buttons:MenuButton>
-            </StackPanel>
-            <Border Grid.Row="3"
-                    Margin="0, 0, 5, 10"
-                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    BorderThickness="1"/>
-            <TextBlock 
-                    Background="{DynamicResource Daybreak.Brushes.Background}"
-                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    Grid.Row="4"
-                    FontSize="18"
-                    Margin="0, 0, 5, 0"
-                    Padding="10"
-                    Text="Quest Log"></TextBlock>
-            <ScrollViewer
-                    Background="{DynamicResource Daybreak.Brushes.Background}"
-                    VerticalScrollBarVisibility="Auto"
-                    HorizontalScrollBarVisibility="Disabled"
-                    Grid.Row="5"
-                    Margin="0, 0, 5, 0">
-                <templates:QuestLogTemplate
-                        Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
-                        Quests="{Binding ElementName=_this,Path=GameData.MainPlayer.QuestLog, Mode=OneWay}"
-                        MapClicked="QuestLogTemplate_MapClicked"
-                        QuestClicked="QuestLogTemplate_QuestClicked">
-                </templates:QuestLogTemplate>
-            </ScrollViewer>
-            <Border Grid.Row="4"
-                    Grid.RowSpan="2"
-                    Margin="0, 0, 5, 0"
-                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    BorderThickness="1"/>
+            <components:MainPlayerInformationComponent Grid.Row="0"
+                                                       DataContext="{Binding ElementName=_this, Path=GameData.MainPlayer, Mode=OneWay}"
+                                                       Margin="0, 0, 0, 10"
+                                                       NavigateToClicked="Component_NavigateToClicked"/>
+            <components:TitleInformationComponent Grid.Row="1"
+                                                  DataContext="{Binding ElementName=_this, Path=GameData.MainPlayer.TitleInformation, Mode=OneWay}"
+                                                  Visibility="{Binding ElementName=_this, Path=GameData.MainPlayer.TitleInformation.IsValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                  Margin="0, 0, 0, 10"
+                                                  NavigateToClicked="Component_NavigateToClicked"/>
+            <components:CurrentMapComponent Grid.Row="2"
+                                            DataContext="{Binding ElementName=_this, Path=GameData.Session.CurrentMap, Mode=OneWay}"
+                                            Margin="0, 0, 0, 10"
+                                            NavigateToClicked="Component_NavigateToClicked"/>
+            <components:CurrentQuestComponent Grid.Row="3"
+                                              Margin="0, 0, 0, 10"
+                                              DataContext="{Binding ElementName=_this, Path=GameData.MainPlayer.Quest, Mode=OneWay}"
+                                              NavigateToClicked="Component_NavigateToClicked"/>
+            <components:QuestLogComponent Grid.Row="4"
+                                          Grid.RowSpan="2"
+                                          NavigateToClicked="Component_NavigateToClicked"
+                                          DataContext="{Binding ElementName=_this, Path=GameData.MainPlayer.QuestLog, Mode=OneWay}"></components:QuestLogComponent>
         </Grid>
-        <Grid
-            x:Name="MinimapHolder"
-            Background="{DynamicResource Daybreak.Brushes.Background}"
-            Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-            Grid.Column="2"
-            Grid.Row="1"
-            Margin="5, 0, 0, 5">
-            <minimap:GuildwarsMinimap
-                x:Name="Minimap"
-                Visibility="{Binding ElementName=_this, Path=LoadingPathingData, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
-                GameData="{Binding ElementName=_this, Path=GameData, Mode=OneWay}"
-                PathingData="{Binding ElementName=_this, Path=PathingData, Mode=OneWay}"
-                Zoom="0.04"
-                ControlsVisible="True"
-                MaximizeClicked="GuildwarsMinimap_MaximizeClicked"
-                QuestMetadataClicked="GuildwarsMinimap_QuestMetadataClicked"
-                LivingEntityClicked="GuildwarsMinimap_LivingEntityClicked"
-                PlayerInformationClicked="GuildwarsMinimap_PlayerInformationClicked"
-                MapIconClicked="GuildwarsMinimap_MapIconClicked"
-                ProfessionClicked="GuildwarsMinimap_ProfessionClicked"
-                ClipToBounds="True"
-                BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                BorderThickness="1" />
-            <controls:CircularLoadingWidget Height="100"
-                                            Width="100"
-                                            Visibility="{Binding ElementName=_this,Path=LoadingPathingData,Mode=OneWay,Converter={StaticResource BooleanToVisibilityConverter}}" />
+        <Grid Grid.Column="1"
+              Margin="5, 0, 5, 0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.5*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1.5*"/>
+            </Grid.RowDefinitions>
+            <Grid x:Name="InventoryHolder"
+                  Margin="0, 0, 0, 10">
+                <components:InventoryComponent x:Name="InventoryComponent"
+                                               DataContext="{Binding ElementName=_this, Path=InventoryData, Mode=OneWay}"
+                                               MaximizeClicked="InventoryComponent_MaximizeClicked"/>
+            </Grid>
+            <Grid x:Name="MinimapHolder"
+                  Grid.Row="1"
+                  Margin="0, 0, 0, 10">
+                <Grid x:Name="MinimapComponent"
+                      Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <minimap:GuildwarsMinimap x:Name="Minimap"
+                                          Visibility="{Binding ElementName=_this, Path=LoadingPathingData, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                                          GameData="{Binding ElementName=_this, Path=GameData, Mode=OneWay}"
+                                          PathingData="{Binding ElementName=_this, Path=PathingData, Mode=OneWay}"
+                                          Zoom="0.04"
+                                          ControlsVisible="True"
+                                          MaximizeClicked="GuildwarsMinimap_MaximizeClicked"
+                                          QuestMetadataClicked="GuildwarsMinimap_QuestMetadataClicked"
+                                          LivingEntityClicked="GuildwarsMinimap_LivingEntityClicked"
+                                          PlayerInformationClicked="GuildwarsMinimap_PlayerInformationClicked"
+                                          MapIconClicked="GuildwarsMinimap_MapIconClicked"
+                                          ProfessionClicked="GuildwarsMinimap_ProfessionClicked"
+                                          ClipToBounds="True"
+                                          Background="{DynamicResource Daybreak.Brushes.Background}"
+                                          BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                          BorderThickness="1" />
+                    <controls:CircularLoadingWidget Height="100"
+                                                Width="100"
+                                                Visibility="{Binding ElementName=_this,Path=LoadingPathingData,Mode=OneWay,Converter={StaticResource BooleanToVisibilityConverter}}" />
+                </Grid>
+            </Grid>
+            <Grid x:Name="BrowserHolder"
+                  Grid.Row="2">
+                <controls:ChromiumBrowserWrapper
+                    x:Name="Browser"
+                    ControlsEnabled="True"
+                    AddressBarReadonly="False"
+                    CanNavigate="True"
+                    CanDownloadBuild="True"
+                    Address="{Binding ElementName=_this, Path=BrowserAddress, Mode=TwoWay}"
+                    MaximizeClicked="Browser_MaximizeClicked"
+                    Visibility="Hidden"
+                    BuildDecoded="Browser_BuildDecoded"
+                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                    BorderThickness="1"
+                    PreventDispose="True" />
+            </Grid>
         </Grid>
-        <controls:ChromiumBrowserWrapper
-                x:Name="Browser"
-                Grid.Row="2"
-                Grid.Column="2"
-                Margin="5, 0, 0, 0"
-                ControlsEnabled="True"
-                AddressBarReadonly="False"
-                CanNavigate="True"
-                CanDownloadBuild="True"
-                Address="{Binding ElementName=_this, Path=BrowserAddress, Mode=TwoWay}"
-                MaximizeClicked="Browser_MaximizeClicked"
-                Visibility="Hidden"
-                BuildDecoded="Browser_BuildDecoded"
-                BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                BorderThickness="1"
-                PreventDispose="True"></controls:ChromiumBrowserWrapper>
-        <controls:CircularLoadingWidget Grid.ColumnSpan="4"
-                                        Grid.RowSpan="4"
+        <Grid x:Name="FullScreenHolder" 
+              Grid.RowSpan="2"
+              Grid.ColumnSpan="2"
+              Margin="5, 0, 5, 0"
+              Background="{DynamicResource MahApps.Brushes.ThemeBackground}"
+              Visibility="Hidden"/>
+        <controls:CircularLoadingWidget Grid.ColumnSpan="2"
+                                        Grid.RowSpan="2"
                                         Width="100"
                                         Height="100"
                                         Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"></controls:CircularLoadingWidget>

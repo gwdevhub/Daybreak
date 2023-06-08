@@ -18,7 +18,7 @@ public readonly struct PlayerContext
     public readonly uint SecondaryProfession;
 
     [FieldOffset(0x0028)]
-    public readonly uint NamePointer;
+    public readonly GuildwarsPointer<string> NamePointer;
 
     [FieldOffset(0x002C)]
     public readonly uint PartyLeaderPlayerNumber;
@@ -34,7 +34,7 @@ public readonly struct PlayerContext
 
     [FieldOffset(0x003C)]
     //Ignore this field. Added so that the struct will have the proper size and be marshaled properly into the array.
-    private readonly GuildwarsArray HH3C;
+    private readonly GuildwarsArray<uint> HH3C;
 
     public bool Pvp => (this.PartyFlags & 0x800) != 0;
 }

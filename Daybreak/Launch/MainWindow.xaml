@@ -52,7 +52,6 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-            <SolidColorBrush x:Key="ViewBackground" Color="{StaticResource StaticResource MahApps.Colors.ThemeBackground}" Opacity="0.8" />
         </ResourceDictionary>
     </Window.Resources>
     <Grid Background="Transparent">
@@ -68,13 +67,16 @@
             <Border.Effect>
                 <BlurEffect Radius="5" KernelType="Gaussian" RenderingBias="Performance"></BlurEffect>
             </Border.Effect>
-            <controls:ImageViewer x:Name="ImageViewer"
-                                  MouseDown="Window_MouseLeftButtonDown">
+            <controls:ImageViewer x:Name="ImageViewer">
                 <controls:ImageViewer.Effect>
                     <effects:LightStreak Attenuation="0.4" BrightThreshold="0.9"></effects:LightStreak>
                 </controls:ImageViewer.Effect>
             </controls:ImageViewer>
         </Border>
+        <Rectangle Fill="Transparent"
+                   MouseDown="Window_MouseLeftButtonDown"
+                   Grid.RowSpan="2"
+                   Grid.ColumnSpan="2"></Rectangle>
         <buttons:MenuButton    Grid.Row="1"
                                Grid.Column="1"
                                Background="Transparent"
@@ -137,8 +139,8 @@
                       HorizontalAlignment="Left"
                       Margin="0, 0, 0, 0"
                       Grid.ColumnSpan="2"
-                      Foreground="White"
-                      Background="#F09E9E9E"
+                      Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                      Background="{DynamicResource MahApps.Brushes.ThemeBackground}"
                       Visibility="{Binding ElementName=_this, Path=IsShowingDropdown, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
                       Click="SettingsButton_Clicked"></ToggleButton>
         <notifications:NotificationStackpanel 

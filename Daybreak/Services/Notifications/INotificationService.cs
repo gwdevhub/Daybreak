@@ -1,9 +1,16 @@
-﻿using System;
+﻿using Daybreak.Models.Notifications;
+using Daybreak.Models.Notifications.Handling;
+using System;
 
 namespace Daybreak.Services.Notifications;
 
 public interface INotificationService
 {
-    void NotifyInformation(string title, string description, Action? onClick = default);
-    void NotifyError(string title, string description, Action? onClick = default);
+    NotificationToken NotifyInformation(string title, string description, string? metaData = default, DateTime? expirationTime = default, bool clickClosable = true);
+
+    NotificationToken NotifyError(string title, string description, string? metaData = default, DateTime? expirationTime = default, bool clickClosable = true);
+    NotificationToken NotifyInformation<THandlingType>(string title, string description, string? metaData = default, DateTime? expirationTime = default, bool dismissable = true)
+        where THandlingType : class, INotificationHandler;
+    NotificationToken NotifyError<THandlingType>(string title, string description, string? metaData = default, DateTime? expirationTime = default, bool dismissable = true)
+        where THandlingType : class, INotificationHandler;
 }

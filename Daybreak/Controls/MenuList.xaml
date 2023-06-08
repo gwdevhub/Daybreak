@@ -7,8 +7,14 @@
              xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              xmlns:glyphs="clr-namespace:Daybreak.Controls.Glyphs"
              xmlns:options="clr-namespace:Daybreak.Controls.Options"
+             Loaded="UserControl_Loaded"
+             Unloaded="UserControl_Unloaded"
+             x:Name="_this"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </UserControl.Resources>
     <Grid>
         <StackPanel>
             <local:ExpandableMenuSection
@@ -38,6 +44,23 @@
                     </buttons:MenuButton>
                 </local:ExpandableMenuSection.Children>
             </local:ExpandableMenuSection>
+            <Grid>
+                <TextBlock FontSize="16"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
+                           Margin="0, 0, 10, 0"
+                           Foreground="{DynamicResource MahApps.Brushes.Accent}"
+                           Visibility="{Binding ElementName=_this, Path=ShowingNotificationCount, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                           Text="{Binding ElementName=_this, Path=NotificationCount, Mode=OneWay}" />
+                <buttons:MenuButton FontSize="16"
+                                    Height="30"
+                                    Title="Notifications"
+                                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                    HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                    BorderThickness="0, 0, 0, 1"
+                                    Clicked="NotificationsButton_Clicked"/>
+            </Grid>
             <local:ExpandableMenuSection
                 SectionTitle="Trade" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                 FontSize="16">

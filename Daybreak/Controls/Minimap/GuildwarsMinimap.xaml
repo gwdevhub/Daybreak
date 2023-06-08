@@ -6,7 +6,6 @@
              xmlns:local="clr-namespace:Daybreak.Controls.Minimap"
              xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              xmlns:controls="clr-namespace:Daybreak.Controls"
-             xmlns:skia="clr-namespace:SkiaSharp.Views.WPF;assembly=SkiaSharp.Views.WPF"
              x:Name="_this"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
@@ -79,7 +78,9 @@
                                     Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                                     Clicked="MaximizeButton_Clicked"></buttons:MaximizeButton>
         </Grid>
-        <WrapPanel Background="{DynamicResource Daybreak.Brushes.Background}" VerticalAlignment="Top" HorizontalAlignment="Right" >
+        <WrapPanel Background="{DynamicResource Daybreak.Brushes.Background}"
+                   VerticalAlignment="Top"
+                   HorizontalAlignment="Right" >
             <TextBlock Text="{Binding ElementName=_this, Path=TargetEntityId, Mode=OneWay}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                        FontSize="16" Padding="5" ></TextBlock>
             <TextBlock Text=" - " Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"

@@ -38,14 +38,16 @@
                     Background="{DynamicResource Daybreak.Brushes.Background}"
                     Foreground="{DynamicResource MahApps.Brushes.Accent}"
                     HorizontalAlignment="Right"
-                    Expired="NotificationView_Expired"/>
+                    Expired="NotificationView_Expired"
+                    Closed="NotificationView_Closed"/>
             </DataTemplate>
             <DataTemplate x:Key="ErrorNotificationDataTemplate">
                 <local:NotificationView 
                     Background="{DynamicResource Daybreak.Brushes.Background}"
                     Foreground="{DynamicResource MahApps.Brushes.Accent}"
                     HorizontalAlignment="Right"
-                    Expired="NotificationView_Expired"/>
+                    Expired="NotificationView_Expired"
+                    Closed="NotificationView_Closed"/>
             </DataTemplate>
         </ItemsControl.Resources>
     </ItemsControl>

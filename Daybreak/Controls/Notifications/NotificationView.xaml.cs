@@ -16,9 +16,11 @@ public partial class NotificationView : UserControl
     private static readonly TimeSpan ExpirationDuration = TimeSpan.FromSeconds(5);
 
     public event EventHandler? Expired;
+    public event EventHandler? Closed;
 
     private DispatcherTimer? dispatcherTimer;
-    private DateTime notificationExpirationTime = DateTime.Now;
+    private DateTime showNotificationExpirationTime = DateTime.Now; // The default notification timeout. Can be extended by moving the mouse over the notification
+    private DateTime requestedNotificationExpirationTime = DateTime.Now; // Some notifications can have their desired timeouts. Don't make the notification disappear before this time
 
     public NotificationView()
     {
@@ -33,7 +35,8 @@ public partial class NotificationView : UserControl
             return;
         }
 
-        this.notificationExpirationTime = DateTime.Now + ExpirationDuration;
+        this.showNotificationExpirationTime = DateTime.Now + ExpirationDuration;
+        this.requestedNotificationExpirationTime = notificationWrapper.Notification?.ExpirationTime ?? DateTime.Now;
         if (this.dispatcherTimer is not null)
         {
             this.dispatcherTimer.Tick -= this.DispatcherTimer_Tick;
@@ -56,13 +59,18 @@ public partial class NotificationView : UserControl
 
     private void UserControl_PreviewMouseMove(object _, MouseEventArgs __)
     {
-        this.notificationExpirationTime = DateTime.Now + ExpirationDuration;
+        this.showNotificationExpirationTime = DateTime.Now + ExpirationDuration;
     }
 
     private void HighlightButton_Clicked(object sender, EventArgs e)
     {
         if (this.DataContext is not NotificationWrapper notificationWrapper ||
-            notificationWrapper.Notification is not INotification notification)
+            notificationWrapper.Notification is not ICancellableNotification notification)
+        {
+            return;
+        }
+
+        if (!notification.Dismissible)
         {
             return;
         }
@@ -72,24 +80,40 @@ public partial class NotificationView : UserControl
             this.dispatcherTimer.Tick -= this.DispatcherTimer_Tick;
         }
 
-        this.SlideOutAnimation();
-        notification?.OnClick?.Invoke();
+        this.SlideOutAnimation(this.Closed);
     }
 
     private void DispatcherTimer_Tick(object? sender, EventArgs __)
     {
-        if (DateTime.Now < this.notificationExpirationTime)
-        {
-            return;
-        }
-
         if (sender is not DispatcherTimer senderDispatcherTimer)
         {
             return;
         }
 
+        if (this.DataContext is not NotificationWrapper notificationWrapper ||
+            notificationWrapper.Notification is not ICancellableNotification notification)
+        {
+            senderDispatcherTimer.Tick -= this.DispatcherTimer_Tick;
+            this.SlideOutAnimation(this.Closed);
+            return;
+        }
+
+        if (notification.CancellationRequested)
+        {
+            senderDispatcherTimer.Tick -= this.DispatcherTimer_Tick;
+            this.SlideOutAnimation(this.Closed);
+            return;
+        }
+
+        if (DateTime.Now < this.showNotificationExpirationTime ||
+            DateTime.Now < this.requestedNotificationExpirationTime)
+        {
+            return;
+        }
+
+
         senderDispatcherTimer.Tick -= this.DispatcherTimer_Tick;
-        this.SlideOutAnimation();
+        this.SlideOutAnimation(this.Expired);
     }
 
     private void SlideInAnimation()
@@ -106,7 +130,7 @@ public partial class NotificationView : UserControl
         this.BeginAnimation(WidthProperty, doubleAnimation);
     }
 
-    private void SlideOutAnimation()
+    private void SlideOutAnimation(EventHandler? onCompleted)
     {
         var doubleAnimation = new DoubleAnimation
         {
@@ -119,7 +143,7 @@ public partial class NotificationView : UserControl
 
         doubleAnimation.Completed += (_, e) =>
         {
-            this.Expired?.Invoke(this, e);
+            onCompleted?.Invoke(this, e);
         };
         this.BeginAnimation(WidthProperty, doubleAnimation);
     }

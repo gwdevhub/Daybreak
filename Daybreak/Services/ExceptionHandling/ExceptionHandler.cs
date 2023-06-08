@@ -1,4 +1,5 @@
 ﻿using Daybreak.Exceptions;
+using Daybreak.Models.Notifications.Handling;
 using Daybreak.Services.Notifications;
 using Microsoft.Extensions.Logging;
 using System;
@@ -80,7 +81,7 @@ public sealed class ExceptionHandler : IExceptionHandler
         }
 
         this.logger.LogError(e, $"Unhandled exception caught {e.GetType()}");
-        this.notificationService.NotifyError("Error", e.ToString(), () => MessageBox.Show(e.ToString()));
+        this.notificationService.NotifyError<MessageBoxHandler>("Encountered exception", e.ToString());
         return true;
     }
 }

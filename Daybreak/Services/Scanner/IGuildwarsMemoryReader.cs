@@ -12,5 +12,6 @@ public interface IGuildwarsMemoryReader
     Task<GameData?> ReadGameData(CancellationToken cancellationToken);
     Task<PathingData?> ReadPathingData(CancellationToken cancellationToken);
     Task<PathingMetadata?> ReadPathingMetaData(CancellationToken cancellationToken);
+    Task<InventoryData?> ReadInventory(CancellationToken cancellationToken);
     void Stop();
 }

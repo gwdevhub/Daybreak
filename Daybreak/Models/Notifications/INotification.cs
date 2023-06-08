@@ -3,10 +3,13 @@ using System;
 
 namespace Daybreak.Models.Notifications;
 
-public interface INotification
+internal interface INotification
 {
-    public LogLevel Level { get; }
-    public string Title { get; }
-    public string Description { get; }
-    public Action? OnClick { get; }
+    string Id { get; }
+    LogLevel Level { get; }
+    string Title { get; }
+    string Description { get; }
+    string Metadata { get; }
+    DateTime ExpirationTime { get; }
+    bool Dismissible { get; }
 }
