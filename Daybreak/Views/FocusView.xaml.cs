@@ -53,6 +53,9 @@ public partial class FocusView : UserControl
     [GenerateDependencyProperty]
     private string browserAddress = string.Empty;
 
+    [GenerateDependencyProperty]
+    private bool inventoryVisible;
+
     private bool browserMaximized = false;
     private bool minimapMaximized = false;
     private bool inventoryMaximized = false;
@@ -238,11 +241,15 @@ public partial class FocusView : UserControl
     private void FocusView_Loaded(object _, RoutedEventArgs e)
     {
         this.BrowserAddress = this.liveUpdateableOptions.Value.BrowserUrl;
+        this.InventoryVisible = this.liveUpdateableOptions.Value.InventoryComponentVisible;
         this.cancellationTokenSource?.Dispose();
         this.cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = this.cancellationTokenSource.Token;
         this.PeriodicallyReadGameData(cancellationToken);
-        this.PeriodicallyReadInventoryData(cancellationToken);
+        if (this.InventoryVisible)
+        {
+            this.PeriodicallyReadInventoryData(cancellationToken);
+        }
     }
 
     private void FocusView_Unloaded(object _, RoutedEventArgs e)
