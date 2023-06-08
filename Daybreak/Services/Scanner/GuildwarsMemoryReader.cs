@@ -465,7 +465,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
 
         var itemInfos = this.memoryScanner.ReadArray(bagInfo.Items);
         var items = new List<IBagContent>();
-        for(var i = 0; i < Math.Min(bagInfo.ItemsCount, itemInfos.Length); i++)
+        for(var i = 0; i < itemInfos.Length; i++)
         {
             var itemInfo = itemInfos[i];
             if (itemInfo.Quantity == 0 ||

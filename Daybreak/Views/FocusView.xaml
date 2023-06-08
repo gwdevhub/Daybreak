@@ -69,15 +69,20 @@
         <Grid Grid.Column="1"
               Margin="5, 0, 5, 0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="0.5*"/>
+                <RowDefinition Height="auto"/>
                 <RowDefinition Height="1*"/>
                 <RowDefinition Height="1.5*"/>
             </Grid.RowDefinitions>
             <Grid x:Name="InventoryHolder"
-                  Margin="0, 0, 0, 10">
-                <components:InventoryComponent x:Name="InventoryComponent"
+                  MaxHeight="250">
+                <Grid x:Name="InventoryComponent"
+                      Visibility="{Binding ElementName=_this, Path=InventoryVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                      Margin="0, 0, 0, 10">
+                    <components:InventoryComponent
                                                DataContext="{Binding ElementName=_this, Path=InventoryData, Mode=OneWay}"
-                                               MaximizeClicked="InventoryComponent_MaximizeClicked"/>
+                                               MaximizeClicked="InventoryComponent_MaximizeClicked"
+                                               Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                </Grid>
             </Grid>
             <Grid x:Name="MinimapHolder"
                   Grid.Row="1"

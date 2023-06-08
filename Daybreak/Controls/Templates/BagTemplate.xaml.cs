@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
+using System.Windows.Media;
 
 namespace Daybreak.Controls.Templates;
 
@@ -22,10 +23,31 @@ public partial class BagTemplate : UserControl
         this.InitializeComponent();
     }
 
+    protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+        if (e.Property == DataContextProperty)
+        {
+            if (this.DataContext is not Bag bag ||
+                bag.Capacity > 100)
+            {
+                this.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                this.Visibility = Visibility.Visible;
+            }
+        }
+    }
+
     private void UserControl_DataContextChanged(object _, DependencyPropertyChangedEventArgs __)
     {
-        this.Visibility = Visibility.Hidden;
         if (this.DataContext is not Bag bag)
+        {
+            return;
+        }
+
+        if (!this.IsScreenVisible())
         {
             return;
         }
@@ -40,7 +62,6 @@ public partial class BagTemplate : UserControl
             this.SetupLayout(bag.Capacity);
         }
 
-        this.Visibility = Visibility.Visible;
         var distinctItems = bag.Items.DistinctBy(i => i.Slot).ToList();
         for (var i = 0; i < this.BagHolder.Children.Count; i++)
         {
@@ -80,5 +101,21 @@ public partial class BagTemplate : UserControl
             bagContentTemplate.HorizontalAlignment = HorizontalAlignment.Stretch;
             this.BagHolder.Children.Add(bagContentTemplate);
         }
+    }
+
+    private bool IsScreenVisible()
+    {
+        if (!this.IsVisible)
+            return false;
+
+        var container = VisualTreeHelper.GetParent(this) as FrameworkElement;
+        if (container is null)
+        {
+            return false;
+        }
+
+        var bounds = this.TransformToAncestor(container).TransformBounds(new Rect(0, 0, this.RenderSize.Width, this.RenderSize.Height));
+        var size = new Rect(0, 0, container.ActualWidth, container.ActualHeight);
+        return size.IntersectsWith(bounds);
     }
 }

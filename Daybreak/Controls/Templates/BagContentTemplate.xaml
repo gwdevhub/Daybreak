@@ -4,32 +4,37 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Controls.Templates"
+             xmlns:converters="clr-namespace:Daybreak.Converters"
              DataContextChanged="UserControl_DataContextChanged"
              x:Name="_this"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+             BorderThickness="0, 0, 1, 1"
+             d:DesignHeight="450" d:DesignWidth="800"
+             Height="30">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" TriggerValue="True"></converters:BooleanToVisibilityConverter>
     </UserControl.Resources>
-    <Grid>
+    <Grid
+        Visibility="{Binding ElementName=_this, Path=ContentVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
         <Image Source="{Binding ElementName=_this, Path=ImageSource, Mode=OneWay}"
                VerticalAlignment="Stretch"
                HorizontalAlignment="Stretch"
                Height="30"
-               Width="30"/>
-        <TextBlock Text="{Binding ElementName=_this, Path=DataContext.ItemId, Mode=OneWay}"
+               Width="30"
+               Visibility="{Binding ElementName=_this, Path=IconVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        <TextBlock Text="{Binding ElementName=_this, Path=ItemId, Mode=OneWay}"
                    FontSize="20"
                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                    VerticalAlignment="Center"
-                   HorizontalAlignment="Center"/>
-        <TextBlock Text="{Binding ElementName=_this, Path=DataContext.Count, Mode=OneWay}"
+                   HorizontalAlignment="Center"
+                   Visibility="{Binding ElementName=_this, Path=IconVisible, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+        <TextBlock Text="{Binding ElementName=_this, Path=Count, Mode=OneWay}"
                    FontSize="14"
                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                    VerticalAlignment="Top"
                    HorizontalAlignment="Left"
                    Margin="5"/>
-        <Border 
-            BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-            BorderThickness="1"/>
     </Grid>
 </UserControl>
