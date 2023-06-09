@@ -2,10 +2,12 @@
 using Daybreak.Launch;
 using Daybreak.Models;
 using Daybreak.Services.Options;
+using Daybreak.Utils;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Extensions.Services;
 using System.Windows.Media;
 
@@ -57,8 +59,10 @@ public sealed class ThemeManager : IThemeManager, IApplicationLifetimeService
         var mode = this.themeOptions.Value.DarkMode ? DarkMode : LightMode;
         var theme = this.themeOptions.Value.Theme.ToString();
         var definedTheme = themeManager.GetTheme(mode, theme);
-        var mahAppsResources = definedTheme?.Resources.MergedDictionaries.First().MergedDictionaries.First();
-        var definedBackgroundBrush = mahAppsResources["MahApps.Brushes.ThemeBackground"] as SolidColorBrush;
+        var mahAppsResources = definedTheme?.Resources.MergedDictionaries.First().MergedDictionaries.First()!;
+        var definedBackgroundBrush = mahAppsResources["MahApps.Brushes.ThemeBackground"].Cast<SolidColorBrush>();
+        var foregroundColor = mahAppsResources["MahApps.Colors.ThemeForeground"].Cast<Color>();
+        var foregroundColorToBlend = Color.FromArgb(80, foregroundColor.R, foregroundColor.G, foregroundColor.B);
         mahAppsResources["Daybreak.Brushes.Background"] = new SolidColorBrush(definedBackgroundBrush!.Color) { Opacity = 0.8 };
         mahAppsResources["Daybreak.Brushes.Kurzick"] = new SolidColorBrush(ColorPalette.Blue);
         mahAppsResources["Daybreak.Brushes.Luxon"] = new SolidColorBrush(ColorPalette.Orange);
@@ -69,6 +73,14 @@ public sealed class ThemeManager : IThemeManager, IApplicationLifetimeService
         mahAppsResources["Daybreak.Brushes.Energy"] = new SolidColorBrush(ColorPalette.Teal);
         mahAppsResources["Daybreak.Brushes.Rank"] = new SolidColorBrush(ColorPalette.Amber);
         mahAppsResources["Daybreak.Brushes.Vanquish"] = new SolidColorBrush(ColorPalette.Indigo);
+        foreach(var member in typeof(ColorPalette).GetMembers().OfType<FieldInfo>().Where(m => m.FieldType == typeof(Color)))
+        {
+            var color = member.GetValue(default)!.Cast<Color>();
+            var blendedColor = color.AlphaBlend(foregroundColorToBlend);
+            mahAppsResources[$"Daybreak.Brushes.{member.Name}"] = new SolidColorBrush(color);
+            mahAppsResources[$"Daybreak.BlendedBrushes.{member.Name}"] = new SolidColorBrush(blendedColor);
+        }
+
         themeManager.ChangeTheme(Launcher.Instance, mode, theme);
     }
 }

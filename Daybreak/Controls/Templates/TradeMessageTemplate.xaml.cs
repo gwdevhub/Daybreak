@@ -46,7 +46,6 @@ public partial class TradeMessageTemplate : UserControl
         }
 
         this.UpdateDispatcherTimer(traderMessageViewWrapper.UpdateTimer);
-
         if (traderMessageViewWrapper.Initialized)
         {
             return;

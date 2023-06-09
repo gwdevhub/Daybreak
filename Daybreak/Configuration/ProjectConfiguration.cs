@@ -199,6 +199,7 @@ public static class ProjectConfiguration
         services.AddScoped<ITraderQuoteService, TraderQuoteService>();
         services.AddScoped<IPriceHistoryDatabase, PriceHistoryDatabase>();
         services.AddScoped<IPriceHistoryService, PriceHistoryService>();
+        services.AddScoped<IWordHighlightingService, WordHighlightingService>();
     }
 
     public static void RegisterViews(IViewProducer viewProducer)

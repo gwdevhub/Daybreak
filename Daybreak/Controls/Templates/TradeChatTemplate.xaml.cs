@@ -1,8 +1,11 @@
-﻿using Daybreak.Models.Trade;
+﻿using Daybreak.Launch;
+using Daybreak.Models.Trade;
 using Daybreak.Services.TradeChat;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.Threading;
@@ -11,6 +14,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace Daybreak.Controls.Templates;
@@ -23,6 +27,7 @@ public partial class TradeChatTemplate : UserControl
     private readonly TimeSpan timeUpdateInterval = TimeSpan.FromSeconds(1);
     private readonly object collectionLock = new();
     private readonly DispatcherTimer dispatcherTimer = new();
+    private readonly IWordHighlightingService wordHighlightingService;
     private CancellationTokenSource? cancellationTokenSource;
     private DateTime? lastQueryTime;
     private DateTime nextQueryTime = DateTime.Now;
@@ -47,7 +52,13 @@ public partial class TradeChatTemplate : UserControl
     public ObservableCollection<TraderMessageViewWrapper> TraderMessages { get; } = new();
 
     public TradeChatTemplate()
+        : this(Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IWordHighlightingService>())
     {
+    }
+
+    private TradeChatTemplate(IWordHighlightingService wordHighlightingService)
+    {
+        this.wordHighlightingService = wordHighlightingService.ThrowIfNull();
         this.InitializeComponent();
     }
 
@@ -167,12 +178,17 @@ public partial class TradeChatTemplate : UserControl
 
     private async Task GetLiveData(CancellationToken cancellationToken)
     {
+        var foregroundColor = this.FindResource("MahApps.Brushes.ThemeForeground").Cast<SolidColorBrush>();
+        var buyColor = this.FindResource("Daybreak.Brushes.Blue").Cast<SolidColorBrush>();
+        var sellColor = this.FindResource("Daybreak.Brushes.DeepPurple").Cast<SolidColorBrush>();
+        var tradeColor = this.FindResource("Daybreak.Brushes.DeepOrange").Cast<SolidColorBrush>();
         await foreach(var tradeMessage in this.TradeChatService.GetLiveTraderMessages(cancellationToken))
         {
             var wrapper = new TraderMessageViewWrapper
             {
                 UpdateTimer = this.dispatcherTimer,
-                TraderMessage = tradeMessage
+                TraderMessage = tradeMessage,
+                ColoredTextElements = this.wordHighlightingService.ParseString(tradeMessage.Message, foregroundColor, buyColor, sellColor, tradeColor)
             };
 
             await this.Dispatcher.InvokeAsync(() => this.TraderMessages.Insert(0, wrapper));
@@ -183,6 +199,10 @@ public partial class TradeChatTemplate : UserControl
     {
         await this.Dispatcher.InvokeAsync(() =>
         {
+            var foregroundColor = this.FindResource("MahApps.Brushes.ThemeForeground").Cast<SolidColorBrush>();
+            var buyColor = this.FindResource("Daybreak.Brushes.Blue").Cast<SolidColorBrush>();
+            var sellColor = this.FindResource("Daybreak.Brushes.DeepPurple").Cast<SolidColorBrush>();
+            var tradeColor = this.FindResource("Daybreak.Brushes.DeepOrange").Cast<SolidColorBrush>();
             this.TraderMessages.Clear();
             foreach (var traderMessage in traderMessages)
             {
@@ -190,8 +210,9 @@ public partial class TradeChatTemplate : UserControl
                 {
                     UpdateTimer = this.dispatcherTimer,
                     TraderMessage = traderMessage,
-                    Initialized = !animate
-                });
+                    Initialized = !animate,
+                    ColoredTextElements = this.wordHighlightingService.ParseString(traderMessage.Message, foregroundColor, buyColor, sellColor, tradeColor)
+                }); ;
             }
         });
     }
