@@ -36,11 +36,21 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock 
-                        Text="{Binding TraderMessage.Message}"       
-                        FontSize="16"
-                        TextWrapping="Wrap"
-                        TextAlignment="Left" />
+                    <ItemsControl ItemsSource="{Binding ColoredTextElements, Mode=OneWay}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Text, Mode=OneWay}"
+                                           Foreground="{Binding Color, Mode=OneWay}"
+                                           FontSize="16"
+                                           Margin="2"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                     <TextBlock 
                         Grid.Column="1"
                         VerticalAlignment="Bottom"

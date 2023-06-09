@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows.Threading;
 
 namespace Daybreak.Models.Trade;
@@ -7,9 +8,20 @@ public sealed class TraderMessageViewWrapper : INotifyPropertyChanged
 {
     private TraderMessage? traderMessage;
     private DispatcherTimer? updateTimer;
+    private IEnumerable<ColoredTextElement>? coloredTextElements;
     private bool initialized;
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public IEnumerable<ColoredTextElement>? ColoredTextElements
+    {
+        get => this.coloredTextElements;
+        init
+        {
+            this.coloredTextElements = value;
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.ColoredTextElements)));
+        }
+    }
 
     public TraderMessage? TraderMessage
     {
