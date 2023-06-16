@@ -14,6 +14,12 @@ if (File.Exists(tempFile) is false)
     return;
 }
 
+while (Process.GetProcesses().Where(p => p.ProcessName == "Daybreak").Any())
+{
+    Console.WriteLine($"Detected Daybreak process is still running. Waiting 5s and retrying");
+    await Task.Delay(5000);
+}
+
 Console.WriteLine("Unpacking files...");
 try
 {
@@ -23,32 +29,31 @@ catch
 {
 
 }
-Console.WriteLine("Deleting package");
-try
-{
-    File.Delete(tempFile);
-}
-catch(Exception e)
-{
-    Console.WriteLine($"Failed to delete {tempFile}.\n{e}");
-}
 
 Console.WriteLine("Deleting browser caches");
 try
 {
     Directory.Delete("BrowserData", true);
 }
-catch(Exception e)
+catch(Exception)
 {
-    Console.WriteLine($"Failed to delete BrowserData.\n{e}");
 }
 try
 {
     Directory.Delete("Daybreak.exe.WebView2", true);
 }
-catch(Exception e)
+catch(Exception)
 {
-    Console.WriteLine($"Failed to delete Daybreak.exe.WebView2.\n{e}");
+}
+
+Console.WriteLine("Deleting package");
+try
+{
+    File.Delete(tempFile);
+}
+catch (Exception e)
+{
+    Console.WriteLine($"Failed to delete {tempFile}.\n{e}");
 }
 
 Console.WriteLine("Launching application");
