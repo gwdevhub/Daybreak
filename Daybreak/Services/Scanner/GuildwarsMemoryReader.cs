@@ -196,7 +196,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
 
     private LoginData? ReadLoginDataInternal()
     {
-        var globalContext = this.memoryScanner.ReadPtrChain<GlobalContext>(this.memoryScanner.ModuleStartAddress, finalPointerOffset: 0x0, 0x00629244, 0xC, 0xC);
+        var globalContext = this.memoryScanner.ReadPtrChain<GlobalContext>(this.memoryScanner.ModuleStartAddress, finalPointerOffset: 0x0, 0x00629204, 0x18);
         if (!globalContext.GameContext.IsValid() ||
             !globalContext.UserContext.IsValid() ||
             !globalContext.InstanceContext.IsValid())
@@ -217,13 +217,11 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         /*
          * The following offsets were reverse-engineered using pointer scanning. All of the following ones seem to currently work.
          * If any breaks, try the other ones from the list below.
-         * startAddress + 0061C118 -> +0x0 -> +0x18
-         * startAddress + 00629244 -> +0xC -> +0xC
-         * startAddress + 0062971C -> +0xC -> +0xC
-         * startAddress + 00AA9D58 -> +0xC -> +0xC
-         * startAddress + 00AA9D58 -> +0x0 -> +0xC -> +0xC
+         * startAddress + 00629204 -> +0x18
+         * startAddress + 006296B4 -> +0x18
+         * startAddress + 00AA9CE0 -> +0xC -> +0xC
          */
-        var globalContext = this.memoryScanner.ReadPtrChain<GlobalContext>(this.memoryScanner.ModuleStartAddress, finalPointerOffset: 0x0, 0x00629244, 0xC, 0xC);
+        var globalContext = this.memoryScanner.ReadPtrChain<GlobalContext>(this.memoryScanner.ModuleStartAddress, finalPointerOffset: 0x0, 0x00629204, 0x18);
 
         if (!globalContext.GameContext.IsValid() ||
             !globalContext.UserContext.IsValid() ||
@@ -295,7 +293,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
 
     private PathingData? ReadPathingDataInternal()
     {
-        var globalContext = this.memoryScanner.ReadPtrChain<GlobalContext>(this.memoryScanner.ModuleStartAddress, finalPointerOffset: 0x0, 0x00629244, 0xC, 0xC);
+        var globalContext = this.memoryScanner.ReadPtrChain<GlobalContext>(this.memoryScanner.ModuleStartAddress, finalPointerOffset: 0x0, 0x00629204, 0x18);
         var mapContext = this.memoryScanner.Read(globalContext.MapContext);
 
         var pathingMapContext = this.memoryScanner.ReadPtrChain<PathingMapContext>(mapContext.PathingMapContextPtr, 0x0, 0x0);
@@ -372,7 +370,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
 
     private PathingMetadata? ReadPathingMetaDataInternal()
     {
-        var globalContext = this.memoryScanner.ReadPtrChain<GlobalContext>(this.memoryScanner.ModuleStartAddress, finalPointerOffset: 0x0, 0x00629244, 0xC, 0xC);
+        var globalContext = this.memoryScanner.ReadPtrChain<GlobalContext>(this.memoryScanner.ModuleStartAddress, finalPointerOffset: 0x0, 0x00629204, 0x18);
         var mapContext = this.memoryScanner.Read(globalContext.MapContext);
 
         var pathingMapContext = this.memoryScanner.ReadPtrChain<PathingMapContext>(mapContext.PathingMapContextPtr, 0x0, 0x0);
@@ -383,8 +381,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
 
     private InventoryData? ReadInventoryDataInternal()
     {
-        var globalContext = this.memoryScanner.ReadPtrChain<GlobalContext>(this.memoryScanner.ModuleStartAddress, finalPointerOffset: 0x0, 0x00629244, 0xC, 0xC);
-
+        var globalContext = this.memoryScanner.ReadPtrChain<GlobalContext>(this.memoryScanner.ModuleStartAddress, finalPointerOffset: 0x0, 0x00629204, 0x18);
         if (!globalContext.GameContext.IsValid() ||
             !globalContext.UserContext.IsValid() ||
             !globalContext.InstanceContext.IsValid())
