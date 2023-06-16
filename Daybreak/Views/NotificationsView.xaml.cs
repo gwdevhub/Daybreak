@@ -1,6 +1,7 @@
 ﻿using Daybreak.Models.Notifications;
 using Daybreak.Services.Notifications;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;
 using System.Extensions;
@@ -48,7 +49,7 @@ public partial class NotificationsView : UserControl
     {
         while (!cancellationToken.IsCancellationRequested)
         {
-            var notifications = this.notificationProducer.GetAllNotifications();
+            var notifications = this.notificationProducer.GetAllNotifications().OrderBy(n => n.CreationTime);
             var notificationsToAdd = notifications.Where(n => this.Notifications.None(n2 => n2.Id == n.Id)).ToList();
             var notificationsToRemove = this.Notifications.Where(n => notifications.None(n2 => n2.Id == n.Id)).ToList();
             this.Notifications.AddRange(notificationsToAdd);
@@ -63,12 +64,18 @@ public partial class NotificationsView : UserControl
 
     private void NotificationTemplate_OpenClicked(object _, Notification e)
     {
-        this.notificationProducer.OpenNotification(e, false);
+        this.notificationProducer.OpenNotification(e, e.Dismissible);
     }
 
     private void NotificationTemplate_RemoveClicked(object _, Notification e)
     {
         this.notificationProducer.RemoveNotification(e);
         this.Notifications.Remove(e);
+    }
+
+    private void HighlightButton_Clicked(object sender, EventArgs e)
+    {
+        this.notificationProducer.RemoveAllNotifications();
+        this.Notifications.Clear();
     }
 }

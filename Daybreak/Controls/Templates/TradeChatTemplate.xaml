@@ -91,94 +91,18 @@
             Fill="{StaticResource Daybreak.Brushes.Background}"
             Grid.RowSpan="3"
             Visibility="{Binding ElementName=_this, Path=MessageOverlayVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"></Rectangle>
-        <Grid Grid.RowSpan="3"
+        <local:TradeChatMessageTemplate 
+              Grid.RowSpan="3"
               MaxWidth="600"
               MaxHeight="400"
               VerticalAlignment="Center"
               HorizontalAlignment="Center"
+              DataContext="{Binding ElementName=_this, Path=SelectedTraderMessage, Mode=OneWay}"
               Background="{StaticResource MahApps.Brushes.ThemeBackground}"
-              Visibility="{Binding ElementName=_this, Path=MessageOverlayVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"></RowDefinition>
-                <RowDefinition Height="*"></RowDefinition>
-                <RowDefinition Height="*"></RowDefinition>
-                <RowDefinition Height="auto"></RowDefinition>
-            </Grid.RowDefinitions>
-            <Border
-                BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
-                BorderThickness="1"
-                Grid.RowSpan="4"></Border>
-            <WrapPanel
-                Margin="10, 10, 10, 0"
-                Grid.Row="0">
-                <TextBlock 
-                    Text="Player name: "
-                    Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                    FontSize="16"
-                    VerticalAlignment="Center"/>
-                <TextBox 
-                    Text="{Binding ElementName=_this, Path=SelectedTraderMessage.Sender, Mode=OneWay}"
-                    Foreground="{StaticResource MahApps.Brushes.Accent}"
-                    FontSize="16"
-                    TextWrapping="Wrap"
-                    IsReadOnly="True"
-                    IsReadOnlyCaretVisible="False"
-                    BorderThickness="0, 0, 0, 1"/>
-                <buttons:CopyButton Height="20" Width="20"
-                                    Clicked="NameCopyButton_Clicked"/>
-            </WrapPanel>
-            <WrapPanel
-                Margin="10, 0, 10, 0"
-                Grid.Row="1">
-                <TextBlock 
-                    Text="Message: "
-                    Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                    FontSize="16"
-                    VerticalAlignment="Center"/>
-                <TextBox
-                    Text="{Binding ElementName=_this, Path=SelectedTraderMessage.Message, Mode=OneWay}"
-                    Foreground="{StaticResource MahApps.Brushes.Accent}"
-                    FontSize="16"
-                    TextWrapping="Wrap"
-                    IsReadOnly="True"
-                    IsReadOnlyCaretVisible="False"
-                    BorderThickness="0, 0, 0, 1"/>
-                <buttons:CopyButton Height="20" Width="20"
-                                    Clicked="MessageCopyButton_Clicked"/>
-            </WrapPanel>
-            <WrapPanel
-                Margin="10, 0, 10, 0"
-                Grid.Row="2">
-                <TextBlock 
-                    Text="Posted at: "
-                    Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                    FontSize="16"
-                    VerticalAlignment="Center"/>
-                <TextBox
-                    Text="{Binding ElementName=_this, Path=SelectedTraderMessage.Timestamp, Mode=OneWay, Converter={StaticResource DateTimeConverter}}"
-                    Foreground="{StaticResource MahApps.Brushes.Accent}"
-                    FontSize="16"
-                    TextWrapping="Wrap"
-                    IsReadOnly="True"
-                    IsReadOnlyCaretVisible="False"
-                    BorderThickness="0, 0, 0, 1"/>
-                <buttons:CopyButton Height="20" Width="20"
-                                    Clicked="TimestampCopyButton_Clicked"/>
-            </WrapPanel>
-            <buttons:HighlightButton
-                Grid.Row="3"
-                Title="Close"
-                Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                Background="{StaticResource Daybreak.Brushes.Background}"
-                FontSize="16"
-                HighlightColor="{StaticResource MahApps.Brushes.Accent}"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center"
-                BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
-                BorderThickness="1"
-                TextPadding="5"
-                Margin="10"
-                Clicked="CloseButton_Clicked"></buttons:HighlightButton>
-        </Grid>
+              Visibility="{Binding ElementName=_this, Path=MessageOverlayVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+              NameCopyClicked="TradeChatMessageTemplate_NameCopyClicked"
+              MessageCopyClicked="TradeChatMessageTemplate_MessageCopyClicked"
+              TimestampCopyClicked="TradeChatMessageTemplate_TimestampCopyClicked"
+              CloseButtonClicked="TradeChatMessageTemplate_CloseButtonClicked"/>
     </Grid>
 </UserControl>

@@ -1,8 +1,6 @@
 ﻿using Daybreak.Models.Notifications.Handling;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Daybreak.Models.Notifications;
 
@@ -14,6 +12,7 @@ public class Notification : ICancellableNotification
     public string Description { get; init; } = string.Empty;
     public string Metadata { get; init; } = string.Empty;
     public DateTime ExpirationTime { get; init; }
+    public DateTime CreationTime { get; init; } = DateTime.Now;
 
     public bool Dismissible { get; init; }
     public virtual Type? HandlingType { get; init; }

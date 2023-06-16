@@ -13,35 +13,47 @@
              MinHeight="50"
              Width="300"
              d:DesignHeight="450" d:DesignWidth="800">
-    <buttons:HighlightButton
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
+    </UserControl.Resources>
+    <Grid>
+        <buttons:HighlightButton
         HighlightColor="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
         Background="{Binding ElementName=_this, Path=Background, Mode=OneWay}"
         Width="{Binding ElementName=_this, Path=Width, Mode=OneTime}"
         Clicked="HighlightButton_Clicked">
-        <buttons:HighlightButton.ButtonContent>
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto"></RowDefinition>
-                    <RowDefinition Height="*"></RowDefinition>
-                </Grid.RowDefinitions>
-                <Border 
+            <buttons:HighlightButton.ButtonContent>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Border 
                     BorderThickness="1"
                     BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
                     Grid.RowSpan="2"/>
-                <TextBlock Text="{Binding Title, Mode=OneWay}"
+                    <TextBlock Text="{Binding Title, Mode=OneWay}"
                            Grid.Row="0"
                            FontSize="18"
                            Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                            HorizontalAlignment="Center"
                            Margin="5, 0, 5, 10"/>
-                <TextBlock Text="{Binding Description, Mode=OneWay}"
+                    <TextBlock Text="{Binding Description, Mode=OneWay}"
                            Margin="5, 0, 5, 0"
                            Grid.Row="1"
                            FontSize="14"
                            Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                            HorizontalAlignment="Left"
                            TextWrapping="Wrap"/>
-            </Grid>
-        </buttons:HighlightButton.ButtonContent>
-    </buttons:HighlightButton>
+                </Grid>
+            </buttons:HighlightButton.ButtonContent>
+        </buttons:HighlightButton>
+        <buttons:CancelButton Height="15"
+                              Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Top"
+                              Margin="5"
+                              Visibility="{Binding ElementName=_this, Path=Dismissible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                              Clicked="CancelButton_Clicked"></buttons:CancelButton>
+    </Grid>
 </UserControl>

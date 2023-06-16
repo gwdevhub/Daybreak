@@ -8,6 +8,7 @@ public sealed class NotificationDTO
     public string Id { get; init; }
     public LogLevel Level { get; init; }
     public DateTime ExpirationTime { get; init; }
+    public DateTime CreationTime { get; init; } = DateTime.Now;
     public string? Title { get; init; }
     public string? Description { get; init; }
     public string? MetaData { get; init; }

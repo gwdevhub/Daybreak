@@ -123,6 +123,11 @@ public partial class MenuList : UserControl
         this.viewManager.ShowView<NotificationsView>();
     }
 
+    private void TradeAlertsButton_Clicked(object sender, EventArgs e)
+    {
+        this.viewManager.ShowView<TradeAlertsView>();
+    }
+
     private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
     {
         this.cancellationTokenSource = new CancellationTokenSource();

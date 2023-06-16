@@ -43,4 +43,9 @@ internal sealed class NotificationStorage : INotificationStorage
     {
         this.liteCollection.Delete(notificationDTO.Id);
     }
+
+    public void RemoveAllNotifications()
+    {
+        this.liteCollection.DeleteAll();
+    }
 }

@@ -2,6 +2,7 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Extensions;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
@@ -17,6 +18,9 @@ public partial class NotificationView : UserControl
 
     public event EventHandler? Expired;
     public event EventHandler? Closed;
+
+    [GenerateDependencyProperty]
+    private bool dismissible;
 
     private DispatcherTimer? dispatcherTimer;
     private DateTime showNotificationExpirationTime = DateTime.Now; // The default notification timeout. Can be extended by moving the mouse over the notification
@@ -45,6 +49,7 @@ public partial class NotificationView : UserControl
         this.dispatcherTimer = notificationWrapper.DispatcherTimer;
         notificationWrapper.DispatcherTimer.Tick += this.DispatcherTimer_Tick;
         this.SlideInAnimation();
+        this.Dismissible = notificationWrapper.Notification?.Dismissible ?? false;
     }
 
     private void UserControl_Unloaded(object _, RoutedEventArgs __)
@@ -81,6 +86,27 @@ public partial class NotificationView : UserControl
         }
 
         this.SlideOutAnimation(this.Closed);
+    }
+
+    private void CancelButton_Clicked(object sender, EventArgs e)
+    {
+        if (this.DataContext is not NotificationWrapper notificationWrapper ||
+            notificationWrapper.Notification is not ICancellableNotification notification)
+        {
+            return;
+        }
+
+        if (!notification.Dismissible)
+        {
+            return;
+        }
+
+        if (this.dispatcherTimer is not null)
+        {
+            this.dispatcherTimer.Tick -= this.DispatcherTimer_Tick;
+        }
+
+        this.SlideOutAnimation(this.Expired);
     }
 
     private void DispatcherTimer_Tick(object? sender, EventArgs __)

@@ -5,8 +5,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Controls.Notifications"
              xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
+             xmlns:converters="clr-namespace:Daybreak.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:DateTimeConverter x:Key="DateTimeConverter" LongTime="True"></converters:DateTimeConverter>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></converters:BooleanToVisibilityConverter>
+    </UserControl.Resources>
     <Grid>
         <Border 
             BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
@@ -25,10 +30,20 @@
                                FontSize="20"
                                Grid.Row="0"
                                Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+                    <TextBlock Text="{Binding CreationTime, Mode=OneWay, Converter={StaticResource DateTimeConverter}}"
+                               FontSize="12"
+                               Grid.Row="0"
+                               HorizontalAlignment="Right"
+                               Margin="0, 0, 5, 0"
+                               Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
                     <TextBlock Text="{Binding Description, Mode=OneWay}"
                                FontSize="14"
                                Grid.Row="2"
                                Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+                    <Rectangle Grid.RowSpan="3"
+                               Fill="{DynamicResource MahApps.Brushes.Accent}"
+                               Visibility="{Binding Closed, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                               Opacity="0.3"/>
                 </Grid>
             </buttons:HighlightButton.ButtonContent>
         </buttons:HighlightButton>
