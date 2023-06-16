@@ -268,7 +268,7 @@ public sealed class TradeAlertingService : ITradeAlertingService, IApplicationLi
 
         if (isRegex)
         {
-            var regex = new Regex(toMatch, RegexOptions.None);
+            var regex = new Regex(toMatch, RegexOptions.IgnoreCase);
             return regex.IsMatch(toCheck);
         }
         else
