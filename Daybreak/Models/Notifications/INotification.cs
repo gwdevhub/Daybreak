@@ -11,5 +11,6 @@ internal interface INotification
     string Description { get; }
     string Metadata { get; }
     DateTime ExpirationTime { get; }
+    DateTime CreationTime { get; }
     bool Dismissible { get; }
 }

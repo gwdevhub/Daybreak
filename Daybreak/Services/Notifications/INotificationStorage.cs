@@ -14,4 +14,6 @@ public interface INotificationStorage
     void OpenNotification(NotificationDTO notificationDTO);
 
     void RemoveNotification(NotificationDTO notificationDTO);
+
+    void RemoveAllNotifications();
 }

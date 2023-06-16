@@ -78,11 +78,6 @@ public partial class TradeChatTemplate : UserControl
         this.SelectedTraderMessage = traderMessage;
     }
 
-    private void CloseButton_Clicked(object sender, EventArgs e)
-    {
-        this.MessageOverlayVisible = false;
-    }
-
     private void UserControl_Unloaded(object sender, RoutedEventArgs e)
     {
         this.cancellationTokenSource?.Cancel();
@@ -120,35 +115,6 @@ public partial class TradeChatTemplate : UserControl
         process.Start();
     }
 
-    private void NameCopyButton_Clicked(object sender, EventArgs e)
-    {
-        if (this.SelectedTraderMessage is null)
-        {
-            return;
-        }
-
-        this.NameCopyClicked?.Invoke(this, this.SelectedTraderMessage);
-    }
-
-    private void MessageCopyButton_Clicked(object sender, EventArgs e)
-    {
-        if (this.SelectedTraderMessage is null)
-        {
-            return;
-        }
-
-        this.MessageCopyClicked?.Invoke(this, this.SelectedTraderMessage);
-    }
-
-    private void TimestampCopyButton_Clicked(object sender, EventArgs e)
-    {
-        if (this.SelectedTraderMessage is null)
-        {
-            return;
-        }
-
-        this.TimestampCopyClicked?.Invoke(this, this.SelectedTraderMessage);
-    }
 
     private void InitializeLatestTrades()
     {
@@ -174,6 +140,26 @@ public partial class TradeChatTemplate : UserControl
     private async void InitializeLiveData()
     {
         await this.GetLiveData(this.cancellationTokenSource?.Token ?? CancellationToken.None);
+    }
+
+    private void TradeChatMessageTemplate_NameCopyClicked(object _, TraderMessage e)
+    {
+        this.NameCopyClicked?.Invoke(this, e);
+    }
+
+    private void TradeChatMessageTemplate_MessageCopyClicked(object _, TraderMessage e)
+    {
+        this.MessageCopyClicked?.Invoke(this, e);
+    }
+
+    private void TradeChatMessageTemplate_TimestampCopyClicked(object _, TraderMessage e)
+    {
+        this.TimestampCopyClicked?.Invoke(this, e);
+    }
+
+    private void TradeChatMessageTemplate_CloseButtonClicked(object _, EventArgs __)
+    {
+        this.MessageOverlayVisible = false;
     }
 
     private async Task GetLiveData(CancellationToken cancellationToken)

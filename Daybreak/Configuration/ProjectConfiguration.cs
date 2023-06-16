@@ -65,6 +65,7 @@ using System;
 using Daybreak.Services.Sounds;
 using Daybreak.Services.Notifications.Models;
 using Daybreak.Models.Notifications.Handling;
+using Daybreak.Services.TradeChat.Notifications;
 
 namespace Daybreak.Configuration;
 
@@ -170,6 +171,7 @@ public static class ProjectConfiguration
         services.AddSingleton<IInternetCheckingService, InternetCheckingService>();
         services.AddSingleton<IConnectivityStatus, ConnectivityStatus>();
         services.AddSingleton<INotificationStorage, NotificationStorage>();
+        services.AddSingleton<ITradeAlertingService, TradeAlertingService>();
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
         services.AddScoped<IScreenshotProvider, ScreenshotProvider>();
@@ -200,6 +202,7 @@ public static class ProjectConfiguration
         services.AddScoped<IPriceHistoryDatabase, PriceHistoryDatabase>();
         services.AddScoped<IPriceHistoryService, PriceHistoryService>();
         services.AddScoped<IWordHighlightingService, WordHighlightingService>();
+        services.AddScoped<ITradeHistoryDatabase, TradeHistoryDatabase>();
     }
 
     public static void RegisterViews(IViewProducer viewProducer)
@@ -239,6 +242,9 @@ public static class ProjectConfiguration
         viewProducer.RegisterView<PriceQuotesView>();
         viewProducer.RegisterView<PriceHistoryView>();
         viewProducer.RegisterView<NotificationsView>();
+        viewProducer.RegisterView<TradeAlertsView>();
+        viewProducer.RegisterView<TradeAlertSetupView>();
+        viewProducer.RegisterView<TradeNotificationView>();
     }
 
     public static void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -320,6 +326,8 @@ public static class ProjectConfiguration
         optionsProducer.RegisterOptions<TraderQuotesOptions>();
         optionsProducer.RegisterOptions<PathfindingOptions>();
         optionsProducer.RegisterOptions<NotificationStorageOptions>();
+        optionsProducer.RegisterOptions<TradeAlertingOptions>();
+        optionsProducer.RegisterOptions<TraderMessagesOptions>();
     }
 
     public static void RegisterLiteCollections(IServiceCollection services)
@@ -327,12 +335,14 @@ public static class ProjectConfiguration
         RegisterLiteCollection<Models.Log, LoggingOptions>(services);
         RegisterLiteCollection<TraderQuoteDTO, PriceHistoryOptions>(services);
         RegisterLiteCollection<NotificationDTO, NotificationStorageOptions>(services);
+        RegisterLiteCollection<TraderMessageDTO, TraderMessagesOptions>(services);
     }
 
     public static void RegisterNotificationHandlers(INotificationHandlerProducer notificationHandlerProducer)
     {
         notificationHandlerProducer.RegisterNotificationHandler<NoActionHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<MessageBoxHandler>();
+        notificationHandlerProducer.RegisterNotificationHandler<TradeMessageNotificationHandler>();
     }
 
     private static void RegisterLiteCollection<TCollectionType, TOptionsType>(IServiceCollection services)

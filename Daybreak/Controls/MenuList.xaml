@@ -65,6 +65,13 @@
                 SectionTitle="Trade" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                 FontSize="16">
                 <local:ExpandableMenuSection.Children>
+                    <buttons:MenuButton Title="Alerts" 
+                                Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                                Height="30"
+                                Cursor="Hand"
+                                Clicked="TradeAlertsButton_Clicked">
+                    </buttons:MenuButton>
                     <buttons:MenuButton Title="Kamadan" 
                                 Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                                 HighlightColor="{DynamicResource MahApps.Brushes.Accent}"

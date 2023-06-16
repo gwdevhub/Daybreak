@@ -104,6 +104,11 @@ public sealed class NotificationService : INotificationService, INotificationPro
         this.storage.RemoveNotification(ToDTO(notification));
     }
 
+    void INotificationProducer.RemoveAllNotifications()
+    {
+        this.storage.RemoveAllNotifications();
+    }
+
     async IAsyncEnumerable<Notification> INotificationProducer.Consume([EnumeratorCancellation] CancellationToken cancellationToken)
     {
         while (!cancellationToken.IsCancellationRequested)
@@ -174,6 +179,7 @@ public sealed class NotificationService : INotificationService, INotificationPro
             Title = dto.Title ?? string.Empty,
             Description = dto.Description ?? string.Empty,
             ExpirationTime = dto.ExpirationTime,
+            CreationTime = dto.CreationTime,
             Metadata = dto.MetaData ?? string.Empty,
             Dismissible = dto.Dismissible,
             Closed = dto.Closed,
@@ -190,6 +196,7 @@ public sealed class NotificationService : INotificationService, INotificationPro
             Title = notification.Title,
             Description = notification.Description,
             ExpirationTime = notification.ExpirationTime,
+            CreationTime = notification.CreationTime,
             MetaData = notification.Metadata,
             Dismissible = notification.Dismissible,
             Closed = notification.Closed,

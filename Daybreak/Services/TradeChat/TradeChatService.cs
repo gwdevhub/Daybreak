@@ -89,7 +89,7 @@ public sealed class TradeChatService<TChannelOptions> : ITradeChatService<TChann
     public async Task<IEnumerable<TraderMessage>> GetLatestTrades(CancellationToken cancellationToken, DateTime? from = default)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetLatestTrades), string.Empty);
-        return await this.GetTradeMessagesInternal(LatestTradesUri, default, scopedLogger, cancellationToken);
+        return await this.GetTradeMessagesInternal(LatestTradesUri, from, scopedLogger, cancellationToken);
     }
 
     public async Task<IEnumerable<TraderMessage>> GetTradesByQuery(string query, CancellationToken cancellationToken, DateTime? from = default, DateTime? to = default)

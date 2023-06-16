@@ -8,6 +8,7 @@ public interface INotificationProducer
 {
     void OpenNotification(Notification notification, bool storeNotification = true);
     void RemoveNotification(Notification notification);
+    void RemoveAllNotifications();
     IEnumerable<Notification> GetAllNotifications();
     IEnumerable<Notification> GetPendingNotifications();
     IAsyncEnumerable<Notification> Consume(CancellationToken cancellationToken);
