@@ -3,6 +3,7 @@ using Daybreak.Models.Notifications;
 using Daybreak.Models.Onboarding;
 using Daybreak.Services.ApplicationLauncher;
 using Daybreak.Services.InternetChecker;
+using Daybreak.Services.Menu;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Notifications;
 using Daybreak.Services.Onboarding;
@@ -27,6 +28,7 @@ namespace Daybreak.Views;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
 public partial class LauncherView : UserControl
 {
+    private readonly IMenuService menuService;
     private readonly IConnectivityStatus connectivityStatus;
     private readonly IOnboardingService onboardingService;
     private readonly IApplicationLauncher applicationDetector;
@@ -43,6 +45,7 @@ public partial class LauncherView : UserControl
     private bool launchButtonEnabled;
 
     public LauncherView(
+        IMenuService menuService,
         IConnectivityStatus connectivityStatus,
         IOnboardingService onboardingService,
         IApplicationLauncher applicationDetector,
@@ -51,6 +54,7 @@ public partial class LauncherView : UserControl
         ILiveOptions<LauncherOptions> launcherOptions,
         IScreenManager screenManager)
     {
+        this.menuService = menuService.ThrowIfNull();
         this.connectivityStatus = connectivityStatus.ThrowIfNull();
         this.onboardingService = onboardingService.ThrowIfNull();
         this.screenManager = screenManager.ThrowIfNull();
@@ -90,6 +94,7 @@ public partial class LauncherView : UserControl
             return;
         }
 
+        this.menuService.CloseMenu();
         this.viewManager.ShowView<FocusView>();
     }
 
