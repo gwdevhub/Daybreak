@@ -26,22 +26,25 @@
                                         HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
                                         Height="30"
                                         Cursor="Hand"
-                                        Clicked="GameCompanionButton_Clicked">
-                    </buttons:MenuButton>
+                                        Clicked="GameCompanionButton_Clicked" />
                     <buttons:MenuButton Title="Manage builds" 
                                         Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                                         HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
                                         Height="30"
                                         Cursor="Hand"
-                                        Clicked="ManageBuildsButton_Clicked">
-                    </buttons:MenuButton>
+                                        Clicked="ManageBuildsButton_Clicked" />
                     <buttons:MenuButton Title="Download Guild Wars" 
                                         Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                                         HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
                                         Height="30"
                                         Cursor="Hand"
-                                        Clicked="DownloadGuildwarsButton_Clicked">
-                    </buttons:MenuButton>
+                                        Clicked="DownloadGuildwarsButton_Clicked" />
+                    <buttons:MenuButton Title="Copy Guild Wars" 
+                                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                        HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                                        Height="30"
+                                        Cursor="Hand"
+                                        Clicked="CopyGuildwarsButton_Clicked" />
                 </local:ExpandableMenuSection.Children>
             </local:ExpandableMenuSection>
             <Grid>

@@ -66,6 +66,7 @@ using Daybreak.Services.Sounds;
 using Daybreak.Services.Notifications.Models;
 using Daybreak.Models.Notifications.Handling;
 using Daybreak.Services.TradeChat.Notifications;
+using Daybreak.Views.Copy;
 
 namespace Daybreak.Configuration;
 
@@ -203,6 +204,7 @@ public static class ProjectConfiguration
         services.AddScoped<IPriceHistoryService, PriceHistoryService>();
         services.AddScoped<IWordHighlightingService, WordHighlightingService>();
         services.AddScoped<ITradeHistoryDatabase, TradeHistoryDatabase>();
+        services.AddScoped<IGuildwarsCopyService, GuildwarsCopyService>();
     }
 
     public static void RegisterViews(IViewProducer viewProducer)
@@ -245,6 +247,8 @@ public static class ProjectConfiguration
         viewProducer.RegisterView<TradeAlertsView>();
         viewProducer.RegisterView<TradeAlertSetupView>();
         viewProducer.RegisterView<TradeNotificationView>();
+        viewProducer.RegisterView<GuildwarsCopySelectionView>();
+        viewProducer.RegisterView<GuildwarsCopyView>();
     }
 
     public static void RegisterStartupActions(IStartupActionProducer startupActionProducer)

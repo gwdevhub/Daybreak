@@ -3,6 +3,7 @@ using Daybreak.Launch;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Notifications;
 using Daybreak.Views;
+using Daybreak.Views.Copy;
 using Daybreak.Views.Onboarding.Toolbox;
 using Daybreak.Views.Onboarding.UMod;
 using Daybreak.Views.Trade;
@@ -91,6 +92,11 @@ public partial class MenuList : UserControl
     private void DownloadGuildwarsButton_Clicked(object sender, EventArgs e)
     {
         this.viewManager.ShowView<GuildwarsDownloadView>();
+    }
+
+    private void CopyGuildwarsButton_Clicked(object sender, EventArgs e)
+    {
+        this.viewManager.ShowView<GuildwarsCopySelectionView>();
     }
 
     private void UModButton_Clicked(object sender, EventArgs e)

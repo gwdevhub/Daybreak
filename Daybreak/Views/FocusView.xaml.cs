@@ -107,6 +107,8 @@ public partial class FocusView : UserControl
         {
             this.logger.LogInformation($"Executable is not running. Returning to {nameof(LauncherView)}");
             this.viewManager.ShowView<LauncherView>();
+            this.cancellationTokenSource?.Cancel();
+            return;
         }
 
         this.Dispatcher.Invoke(() =>
@@ -139,6 +141,8 @@ public partial class FocusView : UserControl
         {
             this.logger.LogInformation($"Executable is not running. Returning to {nameof(LauncherView)}");
             this.viewManager.ShowView<LauncherView>();
+            this.cancellationTokenSource?.Cancel();
+            return;
         }
 
         await this.guildwarsMemoryReader.EnsureInitialized(this.cancellationTokenSource?.Token ?? CancellationToken.None).ConfigureAwait(true);
