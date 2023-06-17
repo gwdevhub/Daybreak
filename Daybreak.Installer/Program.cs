@@ -14,7 +14,7 @@ if (File.Exists(tempFile) is false)
     return;
 }
 
-while (Process.GetProcesses().Where(p => p.ProcessName == "Daybreak").Any())
+while (Process.GetProcesses().Where(p => p.ProcessName == "Daybreak").FirstOrDefault()?.HasExited is false)
 {
     Console.WriteLine($"Detected Daybreak process is still running. Waiting 5s and retrying");
     await Task.Delay(5000);
