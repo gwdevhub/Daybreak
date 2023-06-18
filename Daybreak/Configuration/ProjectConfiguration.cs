@@ -286,6 +286,7 @@ public static class ProjectConfiguration
 
         drawingModuleProducer.RegisterDrawingModule<EnemyEntityDrawingModule>();
         drawingModuleProducer.RegisterDrawingModule<NpcEntityDrawingModule>();
+        drawingModuleProducer.RegisterDrawingModule<UnknownEntityDrawingModule>();
 
         drawingModuleProducer.RegisterDrawingModule<ResurrectionShrineDrawingModule>();
         drawingModuleProducer.RegisterDrawingModule<CollectorDrawingModule>();
