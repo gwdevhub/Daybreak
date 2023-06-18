@@ -981,6 +981,36 @@ public sealed class Npc
     public static readonly Npc InsatiableVakar = new() { Ids = new int[] { 8172 }, Name = "Insatiable Vakar", WikiUrl = "https://wiki.guildwars.com/wiki/Insatiable_Vakar" };
     public static readonly Npc WhiteMantleNecromancer = new() { Ids = new int[] { 8249 }, Name = "White Mantle Necromancer", WikiUrl = "https://wiki.guildwars.com/wiki/White_Mantle_Ritualist" };
     public static readonly Npc MinistryOfPurity = new() { Ids = new int[] { 8582 }, Name = "Ministry Of Purity", WikiUrl = "https://wiki.guildwars.com/wiki/Ministry_of_Purity" };
+    public static readonly Npc Julyia = new() { Ids = new int[] { 41 }, Name = "Julyia", WikiUrl = "https://wiki.guildwars.com/wiki/Julyia" };
+    public static readonly Npc Narcissia = new() { Ids = new int[] { 49 }, Name = "Narcissia", WikiUrl = "https://wiki.guildwars.com/wiki/Narcissia" };
+    public static readonly Npc ZenSiert = new() { Ids = new int[] { 50 }, Name = "Zen Siert", WikiUrl = "https://wiki.guildwars.com/wiki/Zen_Siert" };
+    public static readonly Npc VincentEvan = new() { Ids = new int[] { 44 }, Name = "Vincent Evan", WikiUrl = "https://wiki.guildwars.com/wiki/Vincent_Evan" };
+    public static readonly Npc CassieSanti = new() { Ids = new int[] { 39 }, Name = "Cassie Santi", WikiUrl = "https://wiki.guildwars.com/wiki/Cassie_Santi" };
+    public static readonly Npc DirkShadowrise = new() { Ids = new int[] { 43 }, Name = "Dirk Shadowrise", WikiUrl = "https://wiki.guildwars.com/wiki/Dirk_Shadowrise" };
+    public static readonly Npc LuzyFiera = new() { Ids = new int[] { 45 }, Name = "Luzy Fiera", WikiUrl = "https://wiki.guildwars.com/wiki/Luzy_Fiera" };
+    public static readonly Npc RuneTrader = new() { Ids = new int[] { 190 }, Name = "Rune Trader", WikiUrl = "https://wiki.guildwars.com/wiki/Rune_Trader" };
+    public static readonly Npc CraftingMaterialTrader = new() { Ids = new int[] { 191 }, Name = "Crafting Material Trader", WikiUrl = "https://wiki.guildwars.com/wiki/Crafting_Material_Trader" };
+    public static readonly Npc RareMaterialTrader = new() { Ids = new int[] { 192 }, Name = "Rare Material Trader", WikiUrl = "https://wiki.guildwars.com/wiki/Rare_Material_Trader" };
+    public static readonly Npc DyeTrader = new() { Ids = new int[] { 193 }, Name = "Dye Trader", WikiUrl = "https://wiki.guildwars.com/wiki/Dye_Trader" };
+    public static readonly Npc ScrollTrader = new() { Ids = new int[] { 194 }, Name = "Scroll Trader", WikiUrl = "https://wiki.guildwars.com/wiki/Scroll_Trader" };
+    public static readonly Npc Pudash = new() { Ids = new int[] { 31 }, Name = "Pudash", WikiUrl = "https://wiki.guildwars.com/wiki/Pudash" };
+    public static readonly Npc Blenkeh = new() { Ids = new int[] { 53 }, Name = "Blenkeh", WikiUrl = "https://wiki.guildwars.com/wiki/Blenkeh" };
+    public static readonly Npc MotokoKai = new() { Ids = new int[] { 46 }, Name = "Motoko Kai", WikiUrl = "https://wiki.guildwars.com/wiki/Motoko_Kai" };
+    public static readonly Npc ErrolHyl = new() { Ids = new int[] { 34 }, Name = "Errol Hyl", WikiUrl = "https://wiki.guildwars.com/wiki/Errol_Hyl" };
+    public static readonly Npc Merchant = new() { Ids = new int[] { 196 }, Name = "Merchant", WikiUrl = "https://wiki.guildwars.com/wiki/Merchant" };
+    public static readonly Npc Weaponsmith = new() { Ids = new int[] { 197 }, Name = "Weaponsmith", WikiUrl = "https://wiki.guildwars.com/wiki/Weaponsmith" };
+    public static readonly Npc SkillTrainer = new() { Ids = new int[] { 195 }, Name = "Skill Trainer", WikiUrl = "https://wiki.guildwars.com/wiki/Skill_Trainer" };
+    public static readonly Npc Dahlia = new() { Ids = new int[] { 32 }, Name = "Dahlia", WikiUrl = "https://wiki.guildwars.com/wiki/Dahlia" };
+    public static readonly Npc RedemptorFrohs = new() { Ids = new int[] { 40 }, Name = "Redemptor Frohs", WikiUrl = "https://wiki.guildwars.com/wiki/Redemptor_Frohs" };
+    public static readonly Npc AuroraAllesandra = new() { Ids = new int[] { 54 }, Name = "Aurora Allesandra", WikiUrl = "https://wiki.guildwars.com/wiki/Aurora_Allesandra" };
+    public static readonly Npc Hinata = new() { Ids = new int[] { 47 }, Name = "Hinata", WikiUrl = "https://wiki.guildwars.com/wiki/Hinata" };
+    public static readonly Npc LuluXan = new() { Ids = new int[] { 36 }, Name = "Lulu Xan", WikiUrl = "https://wiki.guildwars.com/wiki/Lulu_Xan" };
+    public static readonly Npc Bellicus = new() { Ids = new int[] { 42 }, Name = "Bellicus", WikiUrl = "https://wiki.guildwars.com/wiki/Bellicus" };
+    public static readonly Npc FestivalHatKeeper = new() { Ids = new int[] { 198 }, Name = "Festival Hat Keeper", WikiUrl = "https://wiki.guildwars.com/wiki/Festival_Hat_Keeper" };
+    public static readonly Npc GuildEmblemer = new() { Ids = new int[] { 199 }, Name = "Guild Emblemer", WikiUrl = "https://wiki.guildwars.com/wiki/Guild_Emblemer" };
+    public static readonly Npc Tannaros = new() { Ids = new int[] { 38 }, Name = "Tannaros", WikiUrl = "https://wiki.guildwars.com/wiki/Tannaros" };
+    public static readonly Npc Disenmaedel = new() { Ids = new int[] { 33 }, Name = "Disenmaedel", WikiUrl = "https://wiki.guildwars.com/wiki/Disenmaedel" };
+    public static readonly Npc KahXan = new() { Ids = new int[] { 48 }, Name = "Kah Xan", WikiUrl = "https://wiki.guildwars.com/wiki/Kah_Xan" };
 
     public static IEnumerable<Npc> Npcs { get; } = new List<Npc>()
     {
@@ -1958,6 +1988,36 @@ public sealed class Npc
         InsatiableVakar,
         WhiteMantleNecromancer,
         MinistryOfPurity,
+        Julyia,
+        Narcissia,
+        ZenSiert,
+        VincentEvan,
+        CassieSanti,
+        DirkShadowrise,
+        LuzyFiera,
+        RuneTrader,
+        CraftingMaterialTrader,
+        RareMaterialTrader,
+        DyeTrader,
+        ScrollTrader,
+        Pudash,
+        Blenkeh,
+        MotokoKai,
+        ErrolHyl,
+        Merchant,
+        Weaponsmith,
+        SkillTrainer,
+        Dahlia,
+        RedemptorFrohs,
+        AuroraAllesandra,
+        Hinata,
+        LuluXan,
+        Bellicus,
+        FestivalHatKeeper,
+        GuildEmblemer,
+        Tannaros,
+        Disenmaedel,
+        KahXan,
     };
 
 
