@@ -91,30 +91,29 @@ public sealed class DrawingService : IDrawingService, IDrawingModuleProducer
 
         foreach(var entity in nonTargetedEntities)
         {
-            foreach(var module in this.modules.Value)
+            if (!this.IsEntityOnScreen(entity.Position, out var finalX, out var finalY))
+            {
+                continue;
+            }
+            
+            foreach (var module in this.modules.Value)
             {
                 if (module.CanDrawEntity(entity))
                 {
-                    if (this.IsEntityOnScreen(entity.Position, out var finalX, out var finalY))
-                    {
-                        module.DrawEntity(finalX, finalY, this.finalEntitySize, bitmap, false, this.foregroundColor);
-                    }
-
-                    break;
+                    module.DrawEntity(finalX, finalY, this.finalEntitySize, bitmap, false, this.foregroundColor);
                 }
             }
         }
 
         var targetedEntity = entities.FirstOrDefault(entities => entities.Id == targetEntityId);
-        if (targetedEntity is not null)
+        if (targetedEntity is not null &&
+            this.IsEntityOnScreen(targetedEntity.Position, out var finalTargetedX, out var finalTargetedY))
         {
             foreach (var module in this.modules.Value)
             {
                 if (module.CanDrawEntity(targetedEntity))
                 {
-                    this.IsEntityOnScreen(targetedEntity.Position, out var finalX, out var finalY);
-                    module.DrawEntity(finalX, finalY, this.finalEntitySize, bitmap, true, this.foregroundColor);
-                    break;
+                    module.DrawEntity(finalTargetedX, finalTargetedY, this.finalEntitySize, bitmap, true, this.foregroundColor);
                 }
             }
         }
@@ -291,16 +290,16 @@ public sealed class DrawingService : IDrawingService, IDrawingModuleProducer
 
         foreach (var entity in entities)
         {
+            if (!this.IsEntityOnScreen(entity.Position, out var finalX, out var finalY))
+            {
+                continue;
+            }
+
             foreach (var module in this.modules.Value)
             {
                 if (module.CanDrawEngagementArea(entity))
                 {
-                    if (this.IsEntityOnScreen(entity.Position, out var finalX, out var finalY))
-                    {
-                        module.DrawEngagementArea(finalX, finalY, this.finalEntitySize * EngagementAreaMultiplier, bitmap, this.foregroundColor);
-                    }
-
-                    break;
+                    module.DrawEngagementArea(finalX, finalY, this.finalEntitySize * EngagementAreaMultiplier, bitmap, this.foregroundColor);
                 }
             }
         }

@@ -11,6 +11,7 @@ public sealed class EnemyEntityDrawingModule : TriangleTargetedEntityDrawingModu
     public override bool CanDrawEntity(IEntity entity)
     {
         return entity is LivingEntity livingEntity &&
-            livingEntity.Allegiance is LivingEntityAllegiance.Enemy;
+            livingEntity.Allegiance is LivingEntityAllegiance.Enemy &&
+            livingEntity.State is not LivingEntityState.Boss;
     }
 }
