@@ -205,6 +205,7 @@ public static class ProjectConfiguration
         services.AddScoped<IWordHighlightingService, WordHighlightingService>();
         services.AddScoped<ITradeHistoryDatabase, TradeHistoryDatabase>();
         services.AddScoped<IGuildwarsCopyService, GuildwarsCopyService>();
+        services.AddScoped<IItemHashService, ItemHashService>();
     }
 
     public static void RegisterViews(IViewProducer viewProducer)

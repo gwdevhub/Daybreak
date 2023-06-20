@@ -106,8 +106,8 @@ public partial class PriceHistoryView : UserControl
 
     private void PopulateChart()
     {
-        this.StartDateTime = DateTime.Now.AddDays(-1);
-        this.EndDateTime = DateTime.Now;
+        this.EndDateTime = this.traderQuotes.OrderByDescending(t => t.Timestamp).FirstOrDefault()?.Timestamp ?? DateTime.Now;
+        this.StartDateTime = this.EndDateTime - TimeSpan.FromDays(1);
 
         this.XAxes = new Axis[]
         {

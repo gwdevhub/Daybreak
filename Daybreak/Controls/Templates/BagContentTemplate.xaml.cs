@@ -3,11 +3,14 @@ using Daybreak.Models.Guildwars;
 using Daybreak.Services.IconRetrieve;
 using Daybreak.Services.Images;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Core.Extensions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
+using System.Windows.Input;
 using System.Windows.Media;
+using static Daybreak.Models.Guildwars.ItemBase;
 
 namespace Daybreak.Controls.Templates;
 
@@ -21,6 +24,10 @@ public partial class BagContentTemplate : UserControl
 
     private IBagContent? cachedBagContent;
     private string? cachedIconUri = default!;
+
+    public event EventHandler<ItemBase>? ItemClicked;
+    public event EventHandler<ItemBase>? ItemWikiClicked;
+    public event EventHandler<ItemBase>? PriceHistoryClicked;
 
     [GenerateDependencyProperty]
     private ImageSource imageSource = default!;
@@ -51,6 +58,48 @@ public partial class BagContentTemplate : UserControl
         this.imageCache = imageCache.ThrowIfNull();
         this.iconCache = iconCache.ThrowIfNull();
         this.InitializeComponent();
+    }
+
+    private void HighlightButton_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (this.DataContext is not BagItem bagItem ||
+            bagItem.Item is Unknown)
+        {
+            return;
+        }
+
+        var itemContextMenu = this.FindResource("BagItemContextMenu");
+        if (itemContextMenu is not ContextMenu bagItemContextMenu)
+        {
+            return;
+        }
+
+        this.ContextMenu = bagItemContextMenu;
+        this.ContextMenu.DataContext = bagItem;
+        this.ContextMenu.IsOpen = true;
+    }
+
+    private void HighlightButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (this.DataContext is not BagItem bagItem ||
+            bagItem.Item is Unknown)
+        {
+            return;
+        }
+
+        this.ItemClicked?.Invoke(this, bagItem.Item);
+    }
+
+    private void BagItemContextMenu_WikiClicked(object _, ItemBase e)
+    {
+        this.ItemWikiClicked?.Invoke(this, e);
+        this.ContextMenu.IsOpen = false;
+    }
+
+    private void BagItemContextMenu_PriceHistoryClicked(object _, ItemBase e)
+    {
+        this.PriceHistoryClicked?.Invoke(this, e);
+        this.ContextMenu.IsOpen = false;
     }
 
     private async void UserControl_DataContextChanged(object _, DependencyPropertyChangedEventArgs __)

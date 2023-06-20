@@ -4,11 +4,11 @@ using System.Linq;
 
 namespace Daybreak.Models.Guildwars;
 
-public sealed class Quest
+public sealed class Quest : IWikiEntity
 {
-    public int Id { get; private set; }
-    public string? Name { get; private set; }
-    public string? WikiUrl { get; private set; }
+    public int Id { get; init; }
+    public string? Name { get; init; }
+    public string? WikiUrl { get; init; }
 
     public static readonly Quest TheAscalonSettlement = new() { Id = 0, Name = "The Ascalon Settlement", WikiUrl = "https://wiki.guildwars.com/wiki/The_Ascalon_Settlement" };
     public static readonly Quest TheVillainyofGalrath = new() { Id = 1, Name = "The Villainy of Galrath", WikiUrl = "https://wiki.guildwars.com/wiki/The_Villainy_of_Galrath" };

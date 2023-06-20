@@ -1,4 +1,5 @@
-﻿using Daybreak.Services.TradeChat.Models;
+﻿using Daybreak.Models.Guildwars;
+using Daybreak.Services.TradeChat.Models;
 using System;
 using System.Collections.Generic;
 
@@ -6,7 +7,9 @@ namespace Daybreak.Services.TradeChat;
 
 public interface IPriceHistoryDatabase
 {
-    IEnumerable<TraderQuoteDTO> GetQuoteHistory(int itemId, DateTime? fromTimestamp, DateTime? toTimestamp);
+    IEnumerable<TraderQuoteDTO> GetLatestQuotes(TraderQuoteType traderQuoteType);
+
+    IEnumerable<TraderQuoteDTO> GetQuoteHistory(ItemBase item, DateTime? fromTimestamp, DateTime? toTimestamp);
 
     void AddTraderQuotes(IEnumerable<TraderQuoteDTO> traderQuotes);
 

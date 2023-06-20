@@ -15,6 +15,7 @@ using System.Diagnostics.Metrics;
 using System.Extensions;
 using System.Linq;
 using System.Logging;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -479,8 +480,8 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
                 continue;
             }
 
-            var modifiers = this.memoryScanner.ReadArray<uint>(itemInfo.ModifierArrayAddress, itemInfo.ModifierCount);
-            if (ItemBase.TryParse((int)itemInfo.ModelId, out var item) &&
+            var modifiers = this.memoryScanner.ReadArray<Daybreak.Models.Interop.ItemModifier>(itemInfo.ModifierArrayAddress, itemInfo.ModifierCount);
+            if (ItemBase.TryParse((int)itemInfo.ModelId, modifiers.Select(modifier => new Daybreak.Models.Guildwars.ItemModifier { Modifier = modifier.Modifier }), out var item) &&
                 item is not ItemBase.Unknown)
             {
                 items.Add(new BagItem

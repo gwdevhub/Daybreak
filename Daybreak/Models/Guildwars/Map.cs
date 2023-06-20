@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Daybreak.Models.Guildwars;
 
-public sealed class Map
+public sealed class Map : IWikiEntity
 {
     public int Id { get; private set; }
     public string? Name { get; private set; }

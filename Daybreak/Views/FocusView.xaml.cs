@@ -6,6 +6,7 @@ using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Experience;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Scanner;
+using Daybreak.Views.Trade;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Configuration;
@@ -380,5 +381,20 @@ public partial class FocusView : UserControl
         }
 
         this.BrowserAddress = e.WikiUrl;
+    }
+
+    private void InventoryComponent_ItemWikiClicked(object _, ItemBase e)
+    {
+        if (e is not IWikiEntity entity)
+        {
+            return;
+        }
+
+        this.BrowserAddress = entity.WikiUrl;
+    }
+
+    private void InventoryComponent_PriceHistoryClicked(object _, ItemBase e)
+    {
+        this.viewManager.ShowView<PriceHistoryView>(e);
     }
 }

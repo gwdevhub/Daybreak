@@ -1,0 +1,62 @@
+﻿<UserControl x:Class="Daybreak.Controls.Templates.BagItemMenu"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Daybreak.Controls.Templates"
+             xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
+             DataContextChanged="UserControl_DataContextChanged"
+             x:Name="_this"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel VerticalAlignment="Center"
+                HorizontalAlignment="Center">
+        <TextBlock Text="{Binding Name}"
+                   FontSize="16"
+                   Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                   HorizontalAlignment="Center"/>
+        <WrapPanel HorizontalAlignment="Center">
+            <TextBlock Text="Id: "
+                       FontSize="16"
+                       Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+            <TextBlock Text="{Binding Id}"
+                       FontSize="16"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+        </WrapPanel>
+        <WrapPanel HorizontalAlignment="Center">
+            <TextBlock Text="Wiki Url: "
+                       FontSize="16"
+                       Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+            <TextBlock Text="{Binding WikiUrl}"
+                       FontSize="16"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource MahApps.Brushes.Accent}"
+                       Cursor="Hand"
+                       MouseLeftButtonDown="WikiTextBlock_MouseLeftButtonDown"/>
+        </WrapPanel>
+        <WrapPanel HorizontalAlignment="Center">
+            <TextBlock Text="Modifiers Hash: "
+                       FontSize="16"
+                       Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+            <TextBox   Text="{Binding ElementName=_this, Path=ModHash, Mode=OneWay}"
+                       FontSize="10"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                       IsReadOnly="True"
+                       BorderThickness="0"
+                       Background="Transparent"/>
+        </WrapPanel>
+        <buttons:HighlightButton 
+            Title="Close"
+            FontSize="16"
+            HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+            Height="30"
+            TextAlignment="Center"
+            HorizontalContentAlignment="Center"
+            VerticalContentAlignment="Center"
+            BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+            BorderThickness="1"
+            Clicked="HighlightButton_Clicked"/>
+    </StackPanel>
+</UserControl>

@@ -55,7 +55,8 @@ public sealed class IconCache : IIconCache
             return default;
         }
 
-        return await this.GetIconUriInternal(curedSkillName!, fileName!);
+        var wikiUri = $"{WikiUrl}/wiki/{curedSkillName}";
+        return await this.GetIconUriInternal(curedSkillName!, fileName!, wikiUri, false);
     }
 
     public async Task<string?> GetIconUri(ItemBase itemBase)
@@ -66,18 +67,26 @@ public sealed class IconCache : IIconCache
             return default;
         }
 
-        var curedMaterialName = CureName(itemBase.Name);
+        var curedName = CureName(itemBase.Name);
         var fileName = FileSafeName(itemBase.Name);
-        if (curedMaterialName!.IsNullOrWhiteSpace() ||
+        if (curedName!.IsNullOrWhiteSpace() ||
             fileName!.IsNullOrWhiteSpace())
         {
             return default;
         }
 
-        return await this.GetIconUriInternal(curedMaterialName!, fileName!);
+        var wikiUri = $"{WikiUrl}/wiki/{curedName}";
+        var directLink = false;
+        if (itemBase is IIconUrlEntity iconUrlEntity)
+        {
+            wikiUri = iconUrlEntity.IconUrl;
+            directLink = true;
+        }
+
+        return await this.GetIconUriInternal(curedName!, fileName!, wikiUri!, directLink);
     }
 
-    private async Task<string?> GetIconUriInternal(string curedName, string fileName)
+    private async Task<string?> GetIconUriInternal(string curedName, string fileName, string wikiUri, bool directLink)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetIconUriInternal), string.Empty);
         var maybeIconUri = this.GetLocalIcon(fileName);
@@ -92,10 +101,10 @@ public sealed class IconCache : IIconCache
             return default;
         }
 
-        return await this.DownloadAndRetrieveIcon(curedName, fileName);
+        return await this.DownloadAndRetrieveIcon(curedName, fileName, wikiUri, directLink);
     }
 
-    private async Task<string?> DownloadAndRetrieveIcon(string curedName, string fileName)
+    private async Task<string?> DownloadAndRetrieveIcon(string curedName, string fileName, string wikiUri, bool directLink)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(DownloadAndRetrieveIcon), curedName!);
         if (curedName is null)
@@ -103,7 +112,12 @@ public sealed class IconCache : IIconCache
             return default;
         }
 
-        var remoteIconUri = await this.GetRemoteIconUri(curedName);
+        var remoteIconUri = new Uri(wikiUri);
+        if (!directLink)
+        {
+            remoteIconUri = await this.GetRemoteIconUri(curedName, wikiUri);
+        }
+
         if (remoteIconUri is null)
         {
             return default;
@@ -119,10 +133,10 @@ public sealed class IconCache : IIconCache
         return await this.SaveLocalIcon(await response.Content.ReadAsByteArrayAsync(), fileName);
     }
 
-    private async Task<Uri?> GetRemoteIconUri(string curedName)
+    private async Task<Uri?> GetRemoteIconUri(string curedName, string wikiUri)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(GetRemoteIconUri), curedName);
-        var skillPageResponse = await this.httpClient.GetAsync($"{WikiUrl}/wiki/{curedName}");
+        var skillPageResponse = await this.httpClient.GetAsync(wikiUri);
         if (!skillPageResponse.IsSuccessStatusCode)
         {
             scopedLogger.LogError($"Received [{skillPageResponse.StatusCode}]");

@@ -81,7 +81,9 @@
                     <components:InventoryComponent
                                                DataContext="{Binding ElementName=_this, Path=InventoryData, Mode=OneWay}"
                                                MaximizeClicked="InventoryComponent_MaximizeClicked"
-                                               Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                               Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                               ItemWikiClicked="InventoryComponent_ItemWikiClicked"
+                                               PriceHistoryClicked="InventoryComponent_PriceHistoryClicked"/>
                 </Grid>
             </Grid>
             <Grid x:Name="MinimapHolder"

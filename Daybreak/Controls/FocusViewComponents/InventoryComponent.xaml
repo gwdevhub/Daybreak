@@ -9,84 +9,158 @@
              Background="{DynamicResource Daybreak.Brushes.Background}"
              BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
              BorderThickness="1"
+             x:Name="_this"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </UserControl.Resources>
     <Grid>
         <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                       VerticalScrollBarVisibility="Auto">
             <StackPanel>
                 <templates:BagTemplate BagName="Equipped Items"
                                        DataContext="{Binding EquippedItems, Mode=OneWay}"
-                                       Margin="0, 0, 0, 20"></templates:BagTemplate>
+                                       Margin="0, 0, 0, 20"
+                                       ItemWikiClicked="BagTemplate_ItemWikiClicked"
+                                       PriceHistoryClicked="BagTemplate_PriceHistoryClicked"
+                                       ItemClicked="BagTemplate_ItemClicked"/>
                 <templates:BagTemplate BagName="Backpack"
                                        DataContext="{Binding Backpack, Mode=OneWay}"
-                                       Margin="0, 0, 0, 20"></templates:BagTemplate>
+                                       Margin="0, 0, 0, 20"
+                                       ItemWikiClicked="BagTemplate_ItemWikiClicked"
+                                       PriceHistoryClicked="BagTemplate_PriceHistoryClicked"
+                                       ItemClicked="BagTemplate_ItemClicked"/>
                 <templates:BagTemplate BagName="Belt Pouch"
                                        DataContext="{Binding BeltPouch, Mode=OneWay}"
-                                       Margin="0, 0, 0, 20"></templates:BagTemplate>
+                                       Margin="0, 0, 0, 20" 
+                                       ItemWikiClicked="BagTemplate_ItemWikiClicked"
+                                       PriceHistoryClicked="BagTemplate_PriceHistoryClicked"
+                                       ItemClicked="BagTemplate_ItemClicked"/>
                 <templates:BagTemplate BagName="Bag 1"
                                        DataContext="{Binding Bags[0], Mode=OneWay}"
-                                       Margin="0, 0, 0, 20"></templates:BagTemplate>
+                                       Margin="0, 0, 0, 20" 
+                                       ItemWikiClicked="BagTemplate_ItemWikiClicked"
+                                       PriceHistoryClicked="BagTemplate_PriceHistoryClicked"
+                                       ItemClicked="BagTemplate_ItemClicked"/>
                 <templates:BagTemplate BagName="Bag 2"
                                        DataContext="{Binding Bags[1], Mode=OneWay}"
-                                       Margin="0, 0, 0, 20"></templates:BagTemplate>
+                                       Margin="0, 0, 0, 20" 
+                                       ItemWikiClicked="BagTemplate_ItemWikiClicked"
+                                       PriceHistoryClicked="BagTemplate_PriceHistoryClicked"
+                                       ItemClicked="BagTemplate_ItemClicked"/>
                 <templates:BagTemplate BagName="Equipment Pack"
                                        DataContext="{Binding EquipmentPack, Mode=OneWay}"
-                                       Margin="0, 0, 0, 20"></templates:BagTemplate>
+                                       Margin="0, 0, 0, 20" 
+                                       ItemWikiClicked="BagTemplate_ItemWikiClicked"
+                                       PriceHistoryClicked="BagTemplate_PriceHistoryClicked"
+                                       ItemClicked="BagTemplate_ItemClicked"/>
                 <templates:BagTemplate BagName="Materials"
                                        DataContext="{Binding MaterialStorage, Mode=OneWay}"
-                                       Margin="0, 0, 0, 20"></templates:BagTemplate>
+                                       Margin="0, 0, 0, 20" 
+                                       ItemWikiClicked="BagTemplate_ItemWikiClicked"
+                                       PriceHistoryClicked="BagTemplate_PriceHistoryClicked"
+                                       ItemClicked="BagTemplate_ItemClicked"/>
                 <templates:BagTemplate BagName="Storage Pane 1"
                                        DataContext="{Binding StoragePanes[0], Mode=OneWay}"
-                                       Margin="0, 0, 0, 20"></templates:BagTemplate>
+                                       Margin="0, 0, 0, 20" 
+                                       ItemWikiClicked="BagTemplate_ItemWikiClicked"
+                                       PriceHistoryClicked="BagTemplate_PriceHistoryClicked"
+                                       ItemClicked="BagTemplate_ItemClicked"/>
                 <templates:BagTemplate BagName="Storage Pane 2"
                                        DataContext="{Binding StoragePanes[1], Mode=OneWay}"
-                                       Margin="0, 0, 0, 20"></templates:BagTemplate>
+                                       Margin="0, 0, 0, 20" 
+                                       ItemWikiClicked="BagTemplate_ItemWikiClicked"
+                                       PriceHistoryClicked="BagTemplate_PriceHistoryClicked"
+                                       ItemClicked="BagTemplate_ItemClicked"/>
                 <templates:BagTemplate BagName="Storage Pane 3"
                                        DataContext="{Binding StoragePanes[2], Mode=OneWay}"
-                                       Margin="0, 0, 0, 20"></templates:BagTemplate>
+                                       Margin="0, 0, 0, 20" 
+                                       ItemWikiClicked="BagTemplate_ItemWikiClicked"
+                                       PriceHistoryClicked="BagTemplate_PriceHistoryClicked"
+                                       ItemClicked="BagTemplate_ItemClicked"/>
                 <templates:BagTemplate BagName="Storage Pane 4"
                                        DataContext="{Binding StoragePanes[3], Mode=OneWay}"
-                                       Margin="0, 0, 0, 20"></templates:BagTemplate>
+                                       Margin="0, 0, 0, 20" 
+                                       ItemWikiClicked="BagTemplate_ItemWikiClicked"
+                                       PriceHistoryClicked="BagTemplate_PriceHistoryClicked"
+                                       ItemClicked="BagTemplate_ItemClicked"/>
                 <templates:BagTemplate BagName="Storage Pane 5"
                                        DataContext="{Binding StoragePanes[4], Mode=OneWay}"
-                                       Margin="0, 0, 0, 20"></templates:BagTemplate>
+                                       Margin="0, 0, 0, 20" 
+                                       ItemWikiClicked="BagTemplate_ItemWikiClicked"
+                                       PriceHistoryClicked="BagTemplate_PriceHistoryClicked"
+                                       ItemClicked="BagTemplate_ItemClicked"/>
                 <templates:BagTemplate BagName="Anniversary Storage"
                                        DataContext="{Binding StoragePanes[5], Mode=OneWay}"
-                                       Margin="0, 0, 0, 20"></templates:BagTemplate>
+                                       Margin="0, 0, 0, 20" 
+                                       ItemWikiClicked="BagTemplate_ItemWikiClicked"
+                                       PriceHistoryClicked="BagTemplate_PriceHistoryClicked"
+                                       ItemClicked="BagTemplate_ItemClicked"/>
                 <templates:BagTemplate BagName="Storage Pane 6"
                                        DataContext="{Binding StoragePanes[6], Mode=OneWay}"
-                                       Margin="0, 0, 0, 20"></templates:BagTemplate>
+                                       Margin="0, 0, 0, 20" 
+                                       ItemWikiClicked="BagTemplate_ItemWikiClicked"
+                                       PriceHistoryClicked="BagTemplate_PriceHistoryClicked"
+                                       ItemClicked="BagTemplate_ItemClicked"/>
                 <templates:BagTemplate BagName="Storage Pane 7"
                                        DataContext="{Binding StoragePanes[7], Mode=OneWay}"
-                                       Margin="0, 0, 0, 20"></templates:BagTemplate>
+                                       Margin="0, 0, 0, 20" 
+                                       ItemWikiClicked="BagTemplate_ItemWikiClicked"
+                                       PriceHistoryClicked="BagTemplate_PriceHistoryClicked"
+                                       ItemClicked="BagTemplate_ItemClicked"/>
                 <templates:BagTemplate BagName="Storage Pane 8"
                                        DataContext="{Binding StoragePanes[8], Mode=OneWay}"
-                                       Margin="0, 0, 0, 20"></templates:BagTemplate>
+                                       Margin="0, 0, 0, 20" 
+                                       ItemWikiClicked="BagTemplate_ItemWikiClicked"
+                                       PriceHistoryClicked="BagTemplate_PriceHistoryClicked"
+                                       ItemClicked="BagTemplate_ItemClicked"/>
                 <templates:BagTemplate BagName="Storage Pane 9"
                                        DataContext="{Binding StoragePanes[9], Mode=OneWay}"
-                                       Margin="0, 0, 0, 20"></templates:BagTemplate>
+                                       Margin="0, 0, 0, 20" 
+                                       ItemWikiClicked="BagTemplate_ItemWikiClicked"
+                                       PriceHistoryClicked="BagTemplate_PriceHistoryClicked"
+                                       ItemClicked="BagTemplate_ItemClicked"/>
                 <templates:BagTemplate BagName="Storage Pane 10"
                                        DataContext="{Binding StoragePanes[10], Mode=OneWay}"
-                                       Margin="0, 0, 0, 20"></templates:BagTemplate>
+                                       Margin="0, 0, 0, 20" 
+                                       ItemWikiClicked="BagTemplate_ItemWikiClicked"
+                                       PriceHistoryClicked="BagTemplate_PriceHistoryClicked"
+                                       ItemClicked="BagTemplate_ItemClicked"/>
                 <templates:BagTemplate BagName="Storage Pane 11"
                                        DataContext="{Binding StoragePanes[11], Mode=OneWay}"
-                                       Margin="0, 0, 0, 20"></templates:BagTemplate>
+                                       Margin="0, 0, 0, 20" 
+                                       ItemWikiClicked="BagTemplate_ItemWikiClicked"
+                                       PriceHistoryClicked="BagTemplate_PriceHistoryClicked"
+                                       ItemClicked="BagTemplate_ItemClicked"/>
                 <templates:BagTemplate BagName="Storage Pane 12"
                                        DataContext="{Binding StoragePanes[12], Mode=OneWay}"
-                                       Margin="0, 0, 0, 20"></templates:BagTemplate>
+                                       Margin="0, 0, 0, 20" 
+                                       ItemWikiClicked="BagTemplate_ItemWikiClicked"
+                                       PriceHistoryClicked="BagTemplate_PriceHistoryClicked"
+                                       ItemClicked="BagTemplate_ItemClicked"/>
                 <templates:BagTemplate BagName="Storage Pane 13"
                                        DataContext="{Binding StoragePanes[13], Mode=OneWay}"
-                                       Margin="0, 0, 0, 20"></templates:BagTemplate>
+                                       Margin="0, 0, 0, 20" 
+                                       ItemWikiClicked="BagTemplate_ItemWikiClicked"
+                                       PriceHistoryClicked="BagTemplate_PriceHistoryClicked"
+                                       ItemClicked="BagTemplate_ItemClicked"/>
             </StackPanel>
         </ScrollViewer>
         <Grid Background="{DynamicResource Daybreak.Brushes.Background}"
               VerticalAlignment="Bottom"
-              HorizontalAlignment="Right"
-              Visibility="{Binding ElementName=_this, Path=ControlsVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+              HorizontalAlignment="Right">
             <buttons:MaximizeButton Height="30" Width="30" Margin="5"
                                     Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                                     Clicked="MaximizeButton_Clicked"></buttons:MaximizeButton>
+        </Grid>
+        <Grid Background="{DynamicResource Daybreak.Brushes.Background}"
+              VerticalAlignment="Stretch"
+              HorizontalAlignment="Stretch"
+              Visibility="{Binding ElementName=_this,Path=BagItemMenuVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <templates:BagItemMenu DataContext="{Binding ElementName=_this, Path=SelectedItem, Mode=OneWay}"
+                                   CloseClicked="BagItemMenu_CloseClicked"
+                                   ItemWikiClicked="BagItemMenu_ItemWikiClicked"/>
         </Grid>
     </Grid>
 </UserControl>

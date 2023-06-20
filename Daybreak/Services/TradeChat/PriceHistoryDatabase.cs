@@ -1,4 +1,5 @@
-﻿using Daybreak.Services.TradeChat.Models;
+﻿using Daybreak.Models.Guildwars;
+using Daybreak.Services.TradeChat.Models;
 using LiteDB;
 using Microsoft.Extensions.Logging;
 using System;
@@ -9,13 +10,16 @@ using System.Extensions;
 namespace Daybreak.Services.TradeChat;
 public sealed class PriceHistoryDatabase : IPriceHistoryDatabase
 {
+    private readonly IItemHashService itemHashService;
     private readonly ILiteCollection<TraderQuoteDTO> collection;
     private readonly ILogger<PriceHistoryDatabase> logger;
 
     public PriceHistoryDatabase(
+        IItemHashService itemHashService,
         ILiteCollection<TraderQuoteDTO> collection,
         ILogger<PriceHistoryDatabase> logger)
     {
+        this.itemHashService = itemHashService.ThrowIfNull();
         this.collection = collection.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
     }
@@ -32,17 +36,28 @@ public sealed class PriceHistoryDatabase : IPriceHistoryDatabase
         scopedLogger.LogDebug("Inserted quotes");
     }
 
-    public IEnumerable<TraderQuoteDTO> GetQuoteHistory(int itemId, DateTime? fromTimestamp, DateTime? toTimestamp)
+    public IEnumerable<TraderQuoteDTO> GetLatestQuotes(TraderQuoteType traderQuoteType)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetQuoteHistory), itemId.ToString());
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetLatestQuotes), string.Empty);
+        scopedLogger.LogDebug($"Retrieving latest quotes");
+        var items = this.collection.Find(t => t.IsLatest == true && t.TraderQuoteType == traderQuoteType);
+        scopedLogger.LogDebug($"Retrieved latest quotes");
+        return items;
+    }
+
+    public IEnumerable<TraderQuoteDTO> GetQuoteHistory(ItemBase item, DateTime? fromTimestamp, DateTime? toTimestamp)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetQuoteHistory), item.Id.ToString());
         fromTimestamp ??= DateTime.MinValue;
         toTimestamp ??= DateTime.MaxValue;
-        scopedLogger.LogDebug($"Retrieving quotes for item {itemId} with timestamp between [{fromTimestamp}] and [{toTimestamp}]");
+        scopedLogger.LogDebug($"Retrieving quotes for item {item.Id} with timestamp between [{fromTimestamp}] and [{toTimestamp}]");
+        var modifiersHash = item.Modifiers is not null ? this.itemHashService.ComputeHash(item) : default;
         var items = this.collection.Find(t =>
-            t.ItemId == itemId &&
-            t.TimeStamp >= fromTimestamp&&
+            t.ItemId == item.Id &&
+            t.ModifiersHash == modifiersHash &&
+            t.TimeStamp >= fromTimestamp &&
             t.TimeStamp <= toTimestamp);
-        scopedLogger.LogDebug($"Retrieved quotes for item {itemId}");
+        scopedLogger.LogDebug($"Retrieved quotes for item {item.Id}");
         return items;
     }
 

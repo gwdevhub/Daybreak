@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Documents;
+﻿using System.Collections.Generic;
 
 namespace Daybreak.Models.Guildwars;
 
-public sealed class Material : ItemBase
+public sealed class Material : ItemBase, IWikiEntity
 {
     public static readonly Material Bone = new() { Id = 921, Name = "Bone", Multiple = "Bones", WikiUrl = "https://wiki.guildwars.com/wiki/Bone" };
     public static readonly Material BoltOfCloth = new() { Id = 925, Name = "Bolt of Cloth", Multiple = "Bolts of Cloth", WikiUrl = "https://wiki.guildwars.com/wiki/Bolt_of_Cloth" };
@@ -127,8 +124,8 @@ public sealed class Material : ItemBase
         VialOfInk
     };
 
-    public string Multiple { get; init; } = default!;
-    public string WikiUrl { get; init; } = default!;
+    public string? Multiple { get; init; }
+    public string? WikiUrl { get; init; }
 
     private Material()
     {

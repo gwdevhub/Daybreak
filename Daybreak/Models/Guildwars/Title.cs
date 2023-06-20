@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Daybreak.Models.Guildwars;
 
-public sealed class Title
+public sealed class Title : IWikiEntity
 {
     public static Title None { get; } = new Title { Id = 0xFF, };
     public static Title Hero { get; } = new Title { Id = 0, Name = "Hero", WikiUrl = "https://wiki.guildwars.com/wiki/Hero_(title)", Tiers = new List<string> { "Hero", "Fierce Hero", "Mighty Hero", "Deadly Hero", "Terrifying Hero", "Conquering Hero", "Subjugating Hero", "Vanquishing Hero", "Renowed Hero", "Illustrious Hero", "Eminent Hero", "King's Hero", "Emperor's Hero", "Balthazar's Hero", "Legendary Hero" } };
@@ -142,10 +142,10 @@ public sealed class Title
         return title;
     }
 
-    public int Id { get; private set; }
-    public string? Name { get; private set; }
-    public string? WikiUrl { get; private set; }
-    public List<string>? Tiers { get; private set; }
+    public int Id { get; init; }
+    public string? Name { get; init; }
+    public string? WikiUrl { get; init; }
+    public List<string>? Tiers { get; init; }
 
     private Title()
     {

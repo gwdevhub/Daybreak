@@ -26,17 +26,20 @@ public sealed class TraderQuoteService : ITraderQuoteService
 {
     private const string TraderQuotesUri = "trader_quotes";
 
+    private readonly IItemHashService itemHashService;
     private readonly IPriceHistoryDatabase priceHistoryDatabase;
     private readonly ILiveUpdateableOptions<TraderQuotesOptions> options;
     private readonly IHttpClient<TraderQuoteService> httpClient;
     private readonly ILogger<TraderQuoteService> logger;
 
     public TraderQuoteService(
+        IItemHashService itemHashService,
         IPriceHistoryDatabase priceHistoryDatabase,
         ILiveUpdateableOptions<TraderQuotesOptions> options,
         IHttpClient<TraderQuoteService> client,
         ILogger<TraderQuoteService> logger)
     {
+        this.itemHashService = itemHashService.ThrowIfNull();
         this.priceHistoryDatabase = priceHistoryDatabase.ThrowIfNull();
         this.options = options.ThrowIfNull();
         this.httpClient = client.ThrowIfNull();
@@ -63,11 +66,13 @@ public sealed class TraderQuoteService : ITraderQuoteService
             return buyQuotes;
         }
 
-        var quotes = this.priceHistoryDatabase.GetQuotesByInsertionTime(TraderQuoteType.Buy, this.options.Value.LastCheckTime);
+        var quotes = this.priceHistoryDatabase.GetLatestQuotes(TraderQuoteType.Buy);
         var retList = new List<TraderQuote>();
         foreach(var quoteDTO in quotes)
         {
-            if (!ItemBase.TryParse(quoteDTO.ItemId, out var item))
+            if (ItemBase.AllItems.FirstOrDefault(i =>
+                i.Id == quoteDTO.ItemId &&
+                (i.Modifiers is null || this.itemHashService.ComputeHash(i) == quoteDTO.ModifiersHash)) is not ItemBase item)
             {
                 continue;
             }
@@ -91,11 +96,13 @@ public sealed class TraderQuoteService : ITraderQuoteService
             return sellQuotes;
         }
 
-        var quotes = this.priceHistoryDatabase.GetQuotesByInsertionTime(TraderQuoteType.Sell, this.options.Value.LastCheckTime);
+        var quotes = this.priceHistoryDatabase.GetLatestQuotes(TraderQuoteType.Sell);
         var retList = new List<TraderQuote>();
         foreach (var quoteDTO in quotes)
         {
-            if (!ItemBase.TryParse(quoteDTO.ItemId, out var item))
+            if (ItemBase.AllItems.FirstOrDefault(i =>
+                i.Id == quoteDTO.ItemId &&
+                (i.Modifiers is null || this.itemHashService.ComputeHash(i) == quoteDTO.ModifiersHash)) is not ItemBase item)
             {
                 continue;
             }
@@ -119,12 +126,14 @@ public sealed class TraderQuoteService : ITraderQuoteService
         this.priceHistoryDatabase.AddTraderQuotes(buyQuotes
             .Select(
                 quote => new TraderQuoteDTO
-                { 
+                {
                     Price = quote.Price,
                     ItemId = quote.Item?.Id ?? 0,
+                    ModifiersHash = quote.Item?.Modifiers is null ? string.Empty : this.itemHashService.ComputeHash(quote.Item),
                     InsertionTime = insertionTime,
                     TimeStamp = quote.Timestamp ?? insertionTime,
                     TraderQuoteType = TraderQuoteType.Buy,
+                    IsLatest = true,
                 }));
 
         this.priceHistoryDatabase.AddTraderQuotes(sellQuotes
@@ -133,9 +142,11 @@ public sealed class TraderQuoteService : ITraderQuoteService
                 {
                     Price = quote.Price,
                     ItemId = quote.Item?.Id ?? 0,
+                    ModifiersHash = quote.Item?.Modifiers is null ? string.Empty : this.itemHashService.ComputeHash(quote.Item),
                     InsertionTime = insertionTime,
                     TimeStamp = quote.Timestamp ?? insertionTime,
-                    TraderQuoteType = TraderQuoteType.Sell
+                    TraderQuoteType = TraderQuoteType.Sell,
+                    IsLatest = true
                 }));
 
         this.options.Value.LastCheckTime = insertionTime;
@@ -154,15 +165,29 @@ public sealed class TraderQuoteService : ITraderQuoteService
             foreach (var buyQuote in response?.BuyQuotes!)
             {
                 var itemIdString = buyQuote.Key;
+                if (itemIdString.IsNullOrWhiteSpace())
+                {
+                    continue;
+                }
+
+                var idTokens = itemIdString.Split('-');
+                if (!int.TryParse(idTokens[0], out var id))
+                {
+                    scopedLogger.LogInformation($"Unable to parse item id {idTokens[0]}. Skipping quote");
+                    continue;
+                }
+
+                // TODO: Search by modifiers as well
                 var quote = buyQuote.Value;
-                if (!int.TryParse(itemIdString, out var itemId) ||
-                    !ItemBase.TryParse(itemId, out var item))
+                if (ItemBase.AllItems.FirstOrDefault(i =>
+                        i.Id == id &&
+                        (idTokens.Length <= 1 || this.itemHashService.ComputeHash(i)?.StartsWith(idTokens[1]) is true)) is not ItemBase item)
                 {
                     scopedLogger.LogInformation($"Unable to parse item {itemIdString}. Skipping quote");
                     continue;
                 }
 
-                var traderQuote = new TraderQuote { Item = item, Price = quote.Price };
+                var traderQuote = new TraderQuote { Item = item, Price = quote.Price, Timestamp = quote.TimeStamp };
                 responseList.Add(traderQuote);
             }
 
@@ -183,18 +208,32 @@ public sealed class TraderQuoteService : ITraderQuoteService
             var content = await this.GetAsync(TraderQuotesUri, default, scopedLogger, cancellationToken);
             var response = JsonConvert.DeserializeObject<TraderQuotesResponse>(content);
             var responseList = new List<TraderQuote>();
-            foreach (var buyQuote in response?.SellQuotes!)
+            foreach (var sellQuote in response?.SellQuotes!)
             {
-                var itemIdString = buyQuote.Key;
-                var quote = buyQuote.Value;
-                if (!int.TryParse(itemIdString, out var itemId) ||
-                    !ItemBase.TryParse(itemId, out var item))
+                var itemIdString = sellQuote.Key;
+                if (itemIdString.IsNullOrWhiteSpace())
+                {
+                    continue;
+                }
+
+                var idTokens = itemIdString.Split('-');
+                if (!int.TryParse(idTokens[0], out var id))
+                {
+                    scopedLogger.LogInformation($"Unable to parse item id {idTokens[0]}. Skipping quote");
+                    continue;
+                }
+
+                // TODO: Search by modifiers as well
+                var quote = sellQuote.Value;
+                if (ItemBase.AllItems.FirstOrDefault(i =>
+                        i.Id == id &&
+                        (idTokens.Length <= 1 || this.itemHashService.ComputeHash(i)?.StartsWith(idTokens[1]) is true)) is not ItemBase item)
                 {
                     scopedLogger.LogInformation($"Unable to parse item {itemIdString}. Skipping quote");
                     continue;
                 }
 
-                var traderQuote = new TraderQuote { Item = item, Price = quote.Price };
+                var traderQuote = new TraderQuote { Item = item, Price = quote.Price, Timestamp = quote.TimeStamp };
                 responseList.Add(traderQuote);
             }
 
