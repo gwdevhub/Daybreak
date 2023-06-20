@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Daybreak.Models.Guildwars;
 
-public sealed class Region
+public sealed class Region : IWikiEntity
 {
     public static Region Kryta { get; } = new Region { Id = 0, Name = "Kryta", WikiUrl = "https://wiki.guildwars.com/wiki/Kryta" };
     public static Region MaguumaJungle { get; } = new Region { Id = 1, Name = "Maguuma Jungle", WikiUrl = "https://wiki.guildwars.com/wiki/Maguuma_Jungle" };

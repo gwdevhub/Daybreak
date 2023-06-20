@@ -25,17 +25,20 @@ public sealed class PriceHistoryService : IPriceHistoryService
     private const string ToPlaceholder = "[TO]";
     private const string PricingHistory = $"pricing_history/{ModelIdPlaceholder}/{FromPlaceholder}/{ToPlaceholder}";
 
+    private readonly IItemHashService itemHashService;
     private readonly IPriceHistoryDatabase priceHistoryDatabase;
     private readonly ILiveUpdateableOptions<PriceHistoryOptions> options;
     private readonly IHttpClient<PriceHistoryService> httpClient;
     private readonly ILogger<PriceHistoryService> logger;
 
     public PriceHistoryService(
+        IItemHashService itemHashService,
         IPriceHistoryDatabase priceHistoryDatabase,
         ILiveUpdateableOptions<PriceHistoryOptions> options,
         IHttpClient<PriceHistoryService> client,
         ILogger<PriceHistoryService> logger)
     {
+        this.itemHashService = itemHashService.ThrowIfNull();
         this.priceHistoryDatabase = priceHistoryDatabase.ThrowIfNull();
         this.options = options.ThrowIfNull();
         this.httpClient = client.ThrowIfNull();
@@ -51,7 +54,8 @@ public sealed class PriceHistoryService : IPriceHistoryService
 
     private async Task<IEnumerable<TraderQuote>> UpdateCacheAndGetPriceHistory(ItemBase itemBase, CancellationToken cancellationToken, DateTime? from = default, DateTime? to = default)
     {
-        if (!this.options.Value.ItemHistoryMetadata.TryGetValue(itemBase.Id, out var lastQueryTime))
+        var itemId = itemBase.Modifiers is not null ? $"{itemBase.Id}-{this.itemHashService.ComputeHash(itemBase)}" : itemBase.Id.ToString();
+        if (!this.options.Value.ItemHistoryMetadata.TryGetValue(itemId, out var lastQueryTime))
         {
             lastQueryTime = MinEpochTime;
         }
@@ -59,22 +63,17 @@ public sealed class PriceHistoryService : IPriceHistoryService
         if (lastQueryTime + this.options.Value.UpdateInterval < DateTime.UtcNow)
         {
             await this.FetchAndUpdatePricingHistoryCache(itemBase, cancellationToken, lastQueryTime, DateTime.UtcNow);
-            this.options.Value.ItemHistoryMetadata[itemBase.Id] = DateTime.UtcNow;
+            this.options.Value.ItemHistoryMetadata[itemId] = DateTime.UtcNow;
             this.options.UpdateOption();
         }
 
-        var quotes = this.priceHistoryDatabase.GetQuoteHistory(itemBase.Id, from, to);
+        var quotes = this.priceHistoryDatabase.GetQuoteHistory(itemBase, from, to);
         var retList = new List<TraderQuote>();
         foreach(var quote in quotes)
         {
-            if (!ItemBase.TryParse(quote.ItemId, out var item))
-            {
-                continue;
-            }
-
             retList.Add(new TraderQuote
             {
-                Item = item,
+                Item = itemBase,
                 Price = quote.Price,
                 Timestamp = quote.TimeStamp
             });
@@ -92,6 +91,7 @@ public sealed class PriceHistoryService : IPriceHistoryService
             TimeStamp = quote.Timestamp ?? insertionTime,
             ItemId = quote.Item?.Id ?? 0,
             Price = quote.Price,
+            ModifiersHash = quote.Item?.Modifiers is not null ? this.itemHashService.ComputeHash(quote.Item) : default,
             TraderQuoteType = TraderQuoteType.Buy,
             InsertionTime = quote.Timestamp ?? insertionTime //Use timestamp as this method basically recreates the kamadan tradechat database
         }));
@@ -105,7 +105,7 @@ public sealed class PriceHistoryService : IPriceHistoryService
             from ??= MinEpochTime;
             to ??= DateTime.UtcNow;
             var response = await this.httpClient.GetAsync(
-                PricingHistory.Replace(ModelIdPlaceholder, itemBase.Id.ToString())
+                PricingHistory.Replace(ModelIdPlaceholder, this.GetItemId(itemBase))
                     .Replace(FromPlaceholder, new DateTimeOffset(from.Value).ToUnixTimeSeconds().ToString())
                     .Replace(ToPlaceholder, new DateTimeOffset(to.Value).ToUnixTimeSeconds().ToString()), cancellationToken);
 
@@ -124,5 +124,18 @@ public sealed class PriceHistoryService : IPriceHistoryService
             scopedLogger.LogError(ex, "Encountered exception");
             return Enumerable.Empty<TraderQuote>();
         }
+    }
+
+    private string GetItemId(ItemBase itemBase)
+    {
+        if (itemBase is not IItemModHash itemModHash ||
+            itemModHash.ModHash?.IsNullOrWhiteSpace() is true)
+        {
+            return itemBase.Modifiers is null ?
+                        itemBase.Id.ToString() :
+                        $"{itemBase.Id}-{this.itemHashService.ComputeHash(itemBase)}";
+        }
+
+        return $"{itemBase.Id}-{itemModHash.ModHash}";
     }
 }

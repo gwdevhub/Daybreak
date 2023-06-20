@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Daybreak.Models.Guildwars;
 
-public sealed class Profession
+public sealed class Profession : IWikiEntity
 {
     public static Profession None { get; } = new() { Name = "None", Id = 0, Alias = "Any" };
     public static Profession Warrior { get; } = new()
@@ -160,10 +160,10 @@ public sealed class Profession
         return profession;
     }
 
-    public string? WikiUrl { get; private set; }
-    public string? BuildsUrl { get; private set; }
-    public string? Alias { get; private set; }
-    public string? Name { get; private set; }
+    public string? WikiUrl { get; init; } = string.Empty;
+    public string? BuildsUrl { get; init; }
+    public string? Alias { get; init; }
+    public string? Name { get; init; }
     public int Id { get; set; }
     public Attribute? PrimaryAttribute { get; private set; }
     public List<Attribute> Attributes { get; private set; } = new List<Attribute>();

@@ -15,6 +15,10 @@ public partial class BagTemplate : UserControl
 {
     private const int ItemsPerRow = 5;
 
+    public event EventHandler<ItemBase>? ItemWikiClicked;
+    public event EventHandler<ItemBase>? PriceHistoryClicked;
+    public event EventHandler<ItemBase>? ItemClicked;
+
     [GenerateDependencyProperty]
     private string bagName = string.Empty;
 
@@ -75,10 +79,32 @@ public partial class BagTemplate : UserControl
         }
     }
 
+    private void BagContentTemplate_ItemWikiClicked(object? _, ItemBase e)
+    {
+        this.ItemWikiClicked?.Invoke(this, e);
+    }
+
+    private void BagContentTemplate_PriceHistoryClicked(object? _, ItemBase e)
+    {
+        this.PriceHistoryClicked?.Invoke(this, e);
+    }
+
+    private void BagContentTemplate_ItemClicked(object? _, ItemBase e)
+    {
+        this.ItemClicked?.Invoke(this, e);
+    }
+
     private void SetupLayout(int bagItemsCount)
     {
         this.BagHolder.RowDefinitions.Clear();
         this.BagHolder.ColumnDefinitions.Clear();
+        foreach(BagContentTemplate child in this.BagHolder.Children)
+        {
+            child.ItemWikiClicked -= this.BagContentTemplate_ItemWikiClicked;
+            child.PriceHistoryClicked -= this.BagContentTemplate_PriceHistoryClicked;
+            child.ItemClicked -= this.BagContentTemplate_ItemClicked;
+        }
+
         this.BagHolder.Children.Clear();
         var rows = Math.Ceiling((double)bagItemsCount / ItemsPerRow);
         for (var i = 0; i < ItemsPerRow; i++)
@@ -99,6 +125,9 @@ public partial class BagTemplate : UserControl
             Grid.SetRow(bagContentTemplate, currentIndex / ItemsPerRow);
             bagContentTemplate.VerticalAlignment = VerticalAlignment.Stretch;
             bagContentTemplate.HorizontalAlignment = HorizontalAlignment.Stretch;
+            bagContentTemplate.ItemWikiClicked += this.BagContentTemplate_ItemWikiClicked;
+            bagContentTemplate.PriceHistoryClicked += this.BagContentTemplate_PriceHistoryClicked;
+            bagContentTemplate.ItemClicked += this.BagContentTemplate_ItemClicked;
             this.BagHolder.Children.Add(bagContentTemplate);
         }
     }

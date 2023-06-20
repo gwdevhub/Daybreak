@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Daybreak.Models.Guildwars;
 
-public sealed class GuildwarsIcon
+public sealed class GuildwarsIcon : IWikiEntity
 {
     public static GuildwarsIcon ResurrectionShrine { get; } = new GuildwarsIcon { Id = 191474, Name = "Resurrection Shrine", WikiUrl = "https://wiki.guildwars.com/wiki/Resurrection_Shrine" };
     public static GuildwarsIcon Collector { get; } = new GuildwarsIcon { Id = 191482, Name = "Collector", WikiUrl = "https://wiki.guildwars.com/wiki/Collector" };

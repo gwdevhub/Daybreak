@@ -458,7 +458,7 @@ public sealed class Npc
     public static readonly Npc Nika = new() { Ids = new int[] { 3496 }, Name = "Nika", WikiUrl = "https://wiki.guildwars.com/wiki/Nika" };
     public static readonly Npc SeaguardHala = new() { Ids = new int[] { 3510, 3561, 3649 }, Name = "Seaguard Hala", WikiUrl = "https://wiki.guildwars.com/wiki/Seaguard_Hala" };
     public static readonly Npc Daeman = new() { Ids = new int[] { 3513, 3567, 3645 }, Name = "Daeman", WikiUrl = "https://wiki.guildwars.com/wiki/Daeman" };
-    public static readonly Npc CanthanFarmer = new() { Ids = new int[] { 3524 }, Name = "Canthan Farmer", WikiUrl = "https://wiki.guildwars.com/wiki/Guild_Wars_Wiki:Projects/NPC_models/Humans/Canthans" };
+    public static readonly Npc CanthanFarmer = new() { Ids = new int[] { 3524, 3254 }, Name = "Canthan Farmer", WikiUrl = "https://wiki.guildwars.com/wiki/Guild_Wars_Wiki:Projects/NPC_models/Humans/Canthans" };
     public static readonly Npc Argo = new() { Ids = new int[] { 3563, 3646 }, Name = "Argo", WikiUrl = "https://wiki.guildwars.com/wiki/Argo" };
     public static readonly Npc SeaguardGita = new() { Ids = new int[] { 3564, 3647 }, Name = "Seaguard Gita", WikiUrl = "https://wiki.guildwars.com/wiki/Seaguard_Gita" };
     public static readonly Npc SeaguardEli = new() { Ids = new int[] { 3565 }, Name = "Seaguard Eli", WikiUrl = "https://wiki.guildwars.com/wiki/Seaguard_Eli" };
@@ -697,7 +697,7 @@ public sealed class Npc
     public static readonly Npc MasterOfWhispers = new() { Ids = new int[] { 4464 }, Name = "Master Of Whispers", WikiUrl = "https://wiki.guildwars.com/wiki/Master_of_Whispers" };
     public static readonly Npc AcolyteJin = new() { Ids = new int[] { 4469 }, Name = "Acolyte Jin", WikiUrl = "https://wiki.guildwars.com/wiki/Acolyte_Jin" };
     public static readonly Npc AcolyteSousuke = new() { Ids = new int[] { 4487 }, Name = "Acolyte Sousuke", WikiUrl = "https://wiki.guildwars.com/wiki/Acolyte_Sousuke" };
-    public static readonly Npc Melonni = new() { Ids = new int[] { 4493 }, Name = "Melonni ", WikiUrl = "https://wiki.guildwars.com/wiki/Melonni" };
+    public static readonly Npc Melonni = new() { Ids = new int[] { 4493, 4496 }, Name = "Melonni ", WikiUrl = "https://wiki.guildwars.com/wiki/Melonni" };
     public static readonly Npc Khim = new() { Ids = new int[] { 4531, 4549, 4578 }, Name = "Khim", WikiUrl = "https://wiki.guildwars.com/wiki/Khim" };
     public static readonly Npc Herta = new() { Ids = new int[] { 4532, 4537, 4544, 4551, 4566, 4576, 5989 }, Name = "Herta", WikiUrl = "https://wiki.guildwars.com/wiki/Herta" };
     public static readonly Npc Gehraz = new() { Ids = new int[] { 4533, 4540, 4547, 4554, 4571, 4581 }, Name = "Gehraz", WikiUrl = "https://wiki.guildwars.com/wiki/Gehraz" };
@@ -706,7 +706,7 @@ public sealed class Npc
     public static readonly Npc Odurra = new() { Ids = new int[] { 4536, 4543, 4550, 4563, 4573 }, Name = "Odurra", WikiUrl = "https://wiki.guildwars.com/wiki/Odurra" };
     public static readonly Npc Timera = new() { Ids = new int[] { 4538, 4545, 4552 }, Name = "Timera", WikiUrl = "https://wiki.guildwars.com/wiki/Timera" };
     public static readonly Npc Abasi = new() { Ids = new int[] { 4539, 4553, 4546 }, Name = "Abasi", WikiUrl = "https://wiki.guildwars.com/wiki/Abasi" };
-    public static readonly Npc Sunspear = new() { Ids = new int[] { 4698, 4726, 4727, 4774, 4778, 4779, 4781, 4782, 4784, 4786, 4811 }, Name = "Sunspear", WikiUrl = "https://wiki.guildwars.com/wiki/Sunspear" };
+    public static readonly Npc Sunspear = new() { Ids = new int[] { 4698, 4726, 4727, 4774, 4778, 4779, 4781, 4782, 4784, 4786, 4811, 4739, 4738 }, Name = "Sunspear", WikiUrl = "https://wiki.guildwars.com/wiki/Sunspear" };
     public static readonly Npc SunspearOfficer = new() { Ids = new int[] { 4700, 4701, 4705, 4723 }, Name = "Sunspear Officer", WikiUrl = "https://wiki.guildwars.com/wiki/Guild_Wars_Wiki:Projects/NPC_models/Humans/Istani" };
     public static readonly Npc Dzajo = new() { Ids = new int[] { 4702 }, Name = "Dzajo", WikiUrl = "https://wiki.guildwars.com/wiki/Dzajo" };
     public static readonly Npc ShoreWatcher = new() { Ids = new int[] { 4704 }, Name = "Shorewatcher", WikiUrl = "https://wiki.guildwars.com/wiki/Shorewatcher" };
@@ -788,7 +788,7 @@ public sealed class Npc
     public static readonly Npc KournanChild = new() { Ids = new int[] { 5362, 5363 }, Name = "Kournan Child", WikiUrl = "https://wiki.guildwars.com/wiki/Kournan_Child" };
     public static readonly Npc KournanNoble = new() { Ids = new int[] { 5373, 5374 }, Name = "Kournan Noble", WikiUrl = "https://wiki.guildwars.com/wiki/Kournan_Noble" };
     public static readonly Npc KournanPeasant = new() { Ids = new int[] { 5375, 5376, 5377, 5378, 5379, 5380 }, Name = "Kournan Peasant", WikiUrl = "https://wiki.guildwars.com/wiki/Kournan_Peasant" };
-    public static readonly Npc WanderingPriest = new() { Ids = new int[] { 5383 }, Name = "Wandering Priest", WikiUrl = "https://wiki.guildwars.com/wiki/Wandering_Priest" };
+    public static readonly Npc WanderingPriest = new() { Ids = new int[] { 5383, 5384 }, Name = "Wandering Priest", WikiUrl = "https://wiki.guildwars.com/wiki/Wandering_Priest" };
     public static readonly Npc Ashnod = new() { Ids = new int[] { 5389 }, Name = "Ashnod", WikiUrl = "https://wiki.guildwars.com/wiki/Ashnod" };
     public static readonly Npc Raleva = new() { Ids = new int[] { 5390 }, Name = "Raleva", WikiUrl = "https://wiki.guildwars.com/wiki/Raleva" };
     public static readonly Npc KournanTrader = new() { Ids = new int[] { 5402 }, Name = "Kournan Trader", WikiUrl = "https://wiki.guildwars.com/wiki/Guild_Wars_Wiki:Projects/NPC_models/Humans/Kournans" };
@@ -1011,6 +1011,42 @@ public sealed class Npc
     public static readonly Npc Tannaros = new() { Ids = new int[] { 38 }, Name = "Tannaros", WikiUrl = "https://wiki.guildwars.com/wiki/Tannaros" };
     public static readonly Npc Disenmaedel = new() { Ids = new int[] { 33 }, Name = "Disenmaedel", WikiUrl = "https://wiki.guildwars.com/wiki/Disenmaedel" };
     public static readonly Npc KahXan = new() { Ids = new int[] { 48 }, Name = "Kah Xan", WikiUrl = "https://wiki.guildwars.com/wiki/Kah_Xan" };
+    public static readonly Npc Lonai = new() { Ids = new int[] { 4821 }, Name = "Lonai", WikiUrl = "https://wiki.guildwars.com/wiki/Lonai" };
+    public static readonly Npc Koss = new() { Ids = new int[] { 4475 }, Name = "Koss", WikiUrl = "https://wiki.guildwars.com/wiki/Koss" };
+    public static readonly Npc Dunkoro = new() { Ids = new int[] { 4483 }, Name = "Dunkoro", WikiUrl = "https://wiki.guildwars.com/wiki/Dunkoro" };
+    public static readonly Npc Smuggler = new() { Ids = new int[] { 5075 }, Name = "Smuggler", WikiUrl = "https://wiki.guildwars.com/wiki/Smuggler" };
+    public static readonly Npc Dalzid = new() { Ids = new int[] { 4742 }, Name = "Dalzid", WikiUrl = "https://wiki.guildwars.com/wiki/Dalzid" };
+    public static readonly Npc Burreh = new() { Ids = new int[] { 5386 }, Name = "Burreh", WikiUrl = "https://wiki.guildwars.com/wiki/Burreh" };
+    public static readonly Npc Benera = new() { Ids = new int[] { 5393 }, Name = "Benera", WikiUrl = "https://wiki.guildwars.com/wiki/Benera" };
+    public static readonly Npc Megundeh = new() { Ids = new int[] { 5399 }, Name = "Megundeh", WikiUrl = "https://wiki.guildwars.com/wiki/Megundeh" };
+    public static readonly Npc Shausha = new() { Ids = new int[] { 4740 }, Name = "Shausha", WikiUrl = "https://wiki.guildwars.com/wiki/Shausha" };
+    public static readonly Npc Ahamid = new() { Ids = new int[] { 4741 }, Name = "Ahamid", WikiUrl = "https://wiki.guildwars.com/wiki/Ahamid" };
+    public static readonly Npc Stasheh = new() { Ids = new int[] { 5398 }, Name = "Stasheh", WikiUrl = "https://wiki.guildwars.com/wiki/Stasheh" };
+    public static readonly Npc Marlani = new() { Ids = new int[] { 4743 }, Name = "Marlani", WikiUrl = "https://wiki.guildwars.com/wiki/Marlani" };
+    public static readonly Npc Sinbi = new() { Ids = new int[] { 5382 }, Name = "Sinbi", WikiUrl = "https://wiki.guildwars.com/wiki/Sinbi" };
+    public static readonly Npc Kerendu = new() { Ids = new int[] { 5401 }, Name = "Kerendu", WikiUrl = "https://wiki.guildwars.com/wiki/Kerendu" };
+    public static readonly Npc Nerashi = new() { Ids = new int[] { 4814 }, Name = "Nerashi", WikiUrl = "https://wiki.guildwars.com/wiki/Nerashi" };
+    public static readonly Npc VeldtBeetleLance = new() { Ids = new int[] { 4926 }, Name = "Veldt Beetle Lance", WikiUrl = "https://wiki.guildwars.com/wiki/Veldt_Beetle_Lance" };
+    public static readonly Npc VeldtNephila = new() { Ids = new int[] { 4902 }, Name = "Veldt Nephila", WikiUrl = "https://wiki.guildwars.com/wiki/Veldt_Nephila" };
+    public static readonly Npc VeldtBeetleQueen = new() { Ids = new int[] { 4923 }, Name = "Veldt Beetle Queen", WikiUrl = "https://wiki.guildwars.com/wiki/Veldt_Beetle_Queen" };
+    public static readonly Npc BladedVeldtTermite = new() { Ids = new int[] { 4924 }, Name = "Bladed Veldt Termite", WikiUrl = "https://wiki.guildwars.com/wiki/Bladed_Veldt_Termite" };
+    public static readonly Npc RampagingNtouka = new() { Ids = new int[] { 4915 }, Name = "Rampaging Ntouka", WikiUrl = "https://wiki.guildwars.com/wiki/Rampaging_Ntouka" };
+    public static readonly Npc CrestedNtoukaBird = new() { Ids = new int[] { 4913 }, Name = "Crested Ntouka Bird", WikiUrl = "https://wiki.guildwars.com/wiki/Crested_Ntouka_Bird" };
+    public static readonly Npc KournanEliteZealot = new() { Ids = new int[] { 5269 }, Name = "Kournan Elite Zealot", WikiUrl = "https://wiki.guildwars.com/wiki/Kournan_Elite_Zealot" };
+    public static readonly Npc KournanEliteSpear = new() { Ids = new int[] { 5270 }, Name = "Kournan Elite Spear", WikiUrl = "https://wiki.guildwars.com/wiki/Kournan_Elite_Spear" };
+    public static readonly Npc KournanEliteGuard = new() { Ids = new int[] { 5268 }, Name = "Kournan Elite Guard", WikiUrl = "https://wiki.guildwars.com/wiki/Kournan_Elite_Guard" };
+    public static readonly Npc KournanEliteScribe = new() { Ids = new int[] { 5267 }, Name = "Kournan Elite Scribe", WikiUrl = "https://wiki.guildwars.com/wiki/Kournan_Elite_Scribe" };
+    public static readonly Npc SpiritofUnion = new() { Ids = new int[] { 4224 }, Name = "Spirit of Union", WikiUrl = "https://wiki.guildwars.com/wiki/Spirit_of_Union" };
+    public static readonly Npc SpiritofShelter = new() { Ids = new int[] { 4223 }, Name = "Spirit of Shelter", WikiUrl = "https://wiki.guildwars.com/wiki/Spirit_of_Shelter" };
+    public static readonly Npc AdmiralKantoh = new() { Ids = new int[] { 5226 }, Name = "Admiral Kantoh", WikiUrl = "https://wiki.guildwars.com/wiki/Admiral_Kantoh" };
+    public static readonly Npc MirzaVeldrunner = new() { Ids = new int[] { 4950 }, Name = "Mirza Veldrunner", WikiUrl = "https://wiki.guildwars.com/wiki/Mirza_Veldrunner" };
+    public static readonly Npc CorsairTorturer = new() { Ids = new int[] { 5045 }, Name = "Corsair Torturer", WikiUrl = "https://wiki.guildwars.com/wiki/Corsair_Torturer" };
+    public static readonly Npc CorsairLieutenant = new() { Ids = new int[] { 5049 }, Name = "Corsair Lieutenant", WikiUrl = "https://wiki.guildwars.com/wiki/Corsair_Lieutenant" };
+    public static readonly Npc CorsairWindMaster = new() { Ids = new int[] { 5046 }, Name = "Corsair Wind Master", WikiUrl = "https://wiki.guildwars.com/wiki/Corsair_Wind_Master" };
+    public static readonly Npc SpiritofVampirism = new() { Ids = new int[] { 5723 }, Name = "Spirit of Vampirism", WikiUrl = "https://wiki.guildwars.com/wiki/Spirit_of_Vampirism" };
+    public static readonly Npc SpiritofSuffering = new() { Ids = new int[] { 4231 }, Name = "Spirit of Suffering", WikiUrl = "https://wiki.guildwars.com/wiki/Spirit_of_Suffering" };
+    public static readonly Npc SpiritofHate = new() { Ids = new int[] { 4230 }, Name = "Spirit of Hate", WikiUrl = "https://wiki.guildwars.com/wiki/Spirit_of_Hate" };
+    public static readonly Npc SpiritofAnger = new() { Ids = new int[] { 4229 }, Name = "Spirit of Anger", WikiUrl = "https://wiki.guildwars.com/wiki/Spirit_of_Anger" };
 
     public static IEnumerable<Npc> Npcs { get; } = new List<Npc>()
     {
@@ -2018,6 +2054,43 @@ public sealed class Npc
         Tannaros,
         Disenmaedel,
         KahXan,
+        Lonai,
+        Koss,
+        Dunkoro,
+        Smuggler,
+        Dalzid,
+        Burreh,
+        Benera,
+        Megundeh,
+        Shausha,
+        Ahamid,
+        Stasheh,
+        Marlani,
+        Sinbi,
+        Kerendu,
+        Nerashi,
+        VeldtBeetleLance,
+        VeldtNephila,
+        VeldtBeetleQueen,
+        BladedVeldtTermite,
+        RampagingNtouka,
+        CrestedNtoukaBird,
+        KournanEliteZealot,
+        KournanEliteSpear,
+        KournanEliteGuard,
+        KournanEliteScribe,
+        SpiritofUnion,
+        SpiritofShelter,
+        AdmiralKantoh,
+        MirzaVeldrunner,
+        CanthanFarmer,
+        CorsairTorturer,
+        CorsairLieutenant,
+        CorsairWindMaster,
+        SpiritofVampirism,
+        SpiritofSuffering,
+        SpiritofHate,
+        SpiritofAnger,
     };
 
 
