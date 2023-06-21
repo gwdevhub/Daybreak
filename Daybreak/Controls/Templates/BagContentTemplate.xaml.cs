@@ -25,7 +25,7 @@ public partial class BagContentTemplate : UserControl
     private IBagContent? cachedBagContent;
     private string? cachedIconUri = default!;
 
-    public event EventHandler<ItemBase>? ItemClicked;
+    public event EventHandler<IBagContent>? ItemClicked;
     public event EventHandler<ItemBase>? ItemWikiClicked;
     public event EventHandler<ItemBase>? PriceHistoryClicked;
 
@@ -81,13 +81,12 @@ public partial class BagContentTemplate : UserControl
 
     private void HighlightButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (this.DataContext is not BagItem bagItem ||
-            bagItem.Item is Unknown)
+        if (this.DataContext is not IBagContent bagContent)
         {
             return;
         }
 
-        this.ItemClicked?.Invoke(this, bagItem.Item);
+        this.ItemClicked?.Invoke(this, bagContent);
     }
 
     private void BagItemContextMenu_WikiClicked(object _, ItemBase e)

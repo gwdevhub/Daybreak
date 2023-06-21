@@ -9,33 +9,52 @@
              x:Name="_this"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <StackPanel VerticalAlignment="Center"
-                HorizontalAlignment="Center">
-        <TextBlock Text="{Binding Name}"
+    <Grid VerticalAlignment="Center"
+          HorizontalAlignment="Center">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock Text="{Binding Item.Name}"
                    FontSize="16"
+                   Grid.Row="0"
                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                    HorizontalAlignment="Center"/>
-        <WrapPanel HorizontalAlignment="Center">
+        <WrapPanel HorizontalAlignment="Center"
+                   Grid.Row="1">
             <TextBlock Text="Id: "
                        FontSize="16"
                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
-            <TextBlock Text="{Binding Id}"
+            <Grid>
+                <TextBlock Text="{Binding Item.Id}"
                        FontSize="16"
                        VerticalAlignment="Center"
                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+                <TextBlock Text="{Binding ItemId}"
+                       FontSize="16"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+            </Grid>
         </WrapPanel>
-        <WrapPanel HorizontalAlignment="Center">
+        <WrapPanel HorizontalAlignment="Center"
+                   Grid.Row="2">
             <TextBlock Text="Wiki Url: "
                        FontSize="16"
                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
-            <TextBlock Text="{Binding WikiUrl}"
+            <TextBlock Text="{Binding Item.WikiUrl}"
                        FontSize="16"
                        VerticalAlignment="Center"
                        Foreground="{DynamicResource MahApps.Brushes.Accent}"
                        Cursor="Hand"
                        MouseLeftButtonDown="WikiTextBlock_MouseLeftButtonDown"/>
         </WrapPanel>
-        <WrapPanel HorizontalAlignment="Center">
+        <WrapPanel HorizontalAlignment="Center"
+                   Grid.Row="3">
             <TextBlock Text="Modifiers Hash: "
                        FontSize="16"
                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
@@ -47,7 +66,77 @@
                        BorderThickness="0"
                        Background="Transparent"/>
         </WrapPanel>
+        <TextBlock Text="Modifiers"
+                   FontSize="16"
+                   Grid.Row="4"
+                   Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                   HorizontalAlignment="Center"/>
+        <ScrollViewer
+            Grid.Row="5">
+            <ItemsControl ItemsSource="{Binding Modifiers, Mode=OneWay}"
+                      VirtualizingPanel.IsVirtualizing="True"
+                      VirtualizingPanel.IsContainerVirtualizable="True"
+                      VirtualizingPanel.VirtualizationMode="Recycling">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <WrapPanel
+                                Grid.Row="0">
+                                <TextBlock Text="Identifier: "
+                                       FontSize="16"
+                                       Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+                                <TextBlock Text="{Binding Identifier}"
+                                       FontSize="16"
+                                       Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+                            </WrapPanel>
+                            <WrapPanel
+                                Grid.Row="1">
+                                <TextBlock Text="Argument1: "
+                                       FontSize="16"
+                                       Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+                                <TextBlock Text="{Binding Argument1}"
+                                       FontSize="16"
+                                       Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+                            </WrapPanel>
+                            <WrapPanel
+                                Grid.Row="2">
+                                <TextBlock Text="Argument2: "
+                                       FontSize="16"
+                                       Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+                                <TextBlock Text="{Binding Argument2}"
+                                       FontSize="16"
+                                       Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+                            </WrapPanel>
+                            <WrapPanel
+                                Grid.Row="3">
+                                <TextBlock Text="Packed value: "
+                                       FontSize="16"
+                                       Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+                                <TextBlock Text="{Binding Modifier}"
+                                       FontSize="16"
+                                       Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+                            </WrapPanel>
+                            <Border BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                    BorderThickness="0, 0, 0, 1"
+                                    Grid.Row="4"/>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
         <buttons:HighlightButton 
+            Grid.Row="6"
             Title="Close"
             FontSize="16"
             HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
@@ -58,5 +147,5 @@
             BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
             BorderThickness="1"
             Clicked="HighlightButton_Clicked"/>
-    </StackPanel>
+    </Grid>
 </UserControl>

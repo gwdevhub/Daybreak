@@ -18,7 +18,7 @@ public partial class InventoryComponent : UserControl
     private bool bagItemMenuVisible;
 
     [GenerateDependencyProperty]
-    private ItemBase selectedItem = default!;
+    private IBagContent selectedItem = default!;
 
     public InventoryComponent()
     {
@@ -40,7 +40,7 @@ public partial class InventoryComponent : UserControl
         this.PriceHistoryClicked?.Invoke(this, e);
     }
 
-    private void BagTemplate_ItemClicked(object _, ItemBase e)
+    private void BagTemplate_ItemClicked(object _, IBagContent e)
     {
         this.BagItemMenuVisible = true;
         this.SelectedItem = e;
