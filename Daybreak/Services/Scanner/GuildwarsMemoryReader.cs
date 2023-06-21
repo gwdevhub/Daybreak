@@ -125,7 +125,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         return Task.Run(() => this.SafeReadGameMemory(this.ReadPathingMetaDataInternal), cancellationToken);
     }
 
-    public Task<InventoryData?> ReadInventory(CancellationToken cancellationToken)
+    public Task<InventoryData?> ReadInventoryData(CancellationToken cancellationToken)
     {
         if (this.memoryScanner.Scanning is false)
         {
@@ -481,14 +481,16 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
             }
 
             var modifiers = this.memoryScanner.ReadArray<Daybreak.Models.Interop.ItemModifier>(itemInfo.ModifierArrayAddress, itemInfo.ModifierCount);
-            if (ItemBase.TryParse((int)itemInfo.ModelId, modifiers.Select(modifier => new Daybreak.Models.Guildwars.ItemModifier { Modifier = modifier.Modifier }), out var item) &&
+            var parsedModifiers = modifiers.Select(modifier => new Daybreak.Models.Guildwars.ItemModifier { Modifier = modifier.Modifier }).ToList();
+            if (ItemBase.TryParse((int)itemInfo.ModelId, parsedModifiers, out var item) &&
                 item is not ItemBase.Unknown)
             {
                 items.Add(new BagItem
                 {
                     Item = item ?? throw new InvalidOperationException($"Unable to create {nameof(BagItem)}. Expected item returned null"),
                     Slot = itemInfo.Slot,
-                    Count = itemInfo.Quantity
+                    Count = itemInfo.Quantity,
+                    Modifiers = parsedModifiers
                 });
             }
             else
@@ -497,7 +499,8 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
                 {
                     ItemId = itemInfo.ModelId,
                     Slot = itemInfo.Slot,
-                    Count = itemInfo.Quantity
+                    Count = itemInfo.Quantity,
+                    Modifiers = parsedModifiers
                 });
             }
         }

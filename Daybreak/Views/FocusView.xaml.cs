@@ -223,7 +223,7 @@ public partial class FocusView : UserControl
                     return;
                 }
 
-                var readInventoryTask = this.guildwarsMemoryReader.ReadInventory(cancellationToken);
+                var readInventoryTask = this.guildwarsMemoryReader.ReadInventoryData(cancellationToken);
                 await Task.WhenAll(
                     readInventoryTask,
                     Task.Delay(1000, cancellationToken)).ConfigureAwait(true);

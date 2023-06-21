@@ -41,21 +41,26 @@ public partial class BagItemMenu : UserControl
 
     private void UserControl_DataContextChanged(object _, DependencyPropertyChangedEventArgs e)
     {
-        if (this.DataContext is not ItemBase item)
+        if (this.DataContext is not IBagContent content)
         {
             return;
         }
 
-        this.ModHash = this.itemHashService.ComputeHash(item);
+        this.ModHash = this.itemHashService.ComputeHash(content);
     }
 
     private void WikiTextBlock_MouseLeftButtonDown(object _, MouseButtonEventArgs e)
     {
-        if (this.DataContext is not ItemBase item)
+        if (this.DataContext is not IBagContent content)
         {
             return;
         }
 
-        this.ItemWikiClicked?.Invoke(this, item);
+        if (content is not BagItem bagItem)
+        {
+            return;
+        }
+
+        this.ItemWikiClicked?.Invoke(this, bagItem.Item);
     }
 }

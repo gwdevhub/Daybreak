@@ -17,7 +17,7 @@ public partial class BagTemplate : UserControl
 
     public event EventHandler<ItemBase>? ItemWikiClicked;
     public event EventHandler<ItemBase>? PriceHistoryClicked;
-    public event EventHandler<ItemBase>? ItemClicked;
+    public event EventHandler<IBagContent>? ItemClicked;
 
     [GenerateDependencyProperty]
     private string bagName = string.Empty;
@@ -89,7 +89,7 @@ public partial class BagTemplate : UserControl
         this.PriceHistoryClicked?.Invoke(this, e);
     }
 
-    private void BagContentTemplate_ItemClicked(object? _, ItemBase e)
+    private void BagContentTemplate_ItemClicked(object? _, IBagContent e)
     {
         this.ItemClicked?.Invoke(this, e);
     }

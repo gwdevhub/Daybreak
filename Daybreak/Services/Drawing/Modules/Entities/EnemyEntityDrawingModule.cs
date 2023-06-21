@@ -12,6 +12,6 @@ public sealed class EnemyEntityDrawingModule : TriangleTargetedEntityDrawingModu
     {
         return entity is LivingEntity livingEntity &&
             livingEntity.Allegiance is LivingEntityAllegiance.Enemy &&
-            livingEntity.State is not LivingEntityState.Boss;
+            livingEntity.State is not LivingEntityState.Boss or LivingEntityState.Dead;
     }
 }
