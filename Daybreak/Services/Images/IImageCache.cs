@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows.Media;
 
 namespace Daybreak.Services.Images;
 
 public interface IImageCache
 {
-    ImageSource? GetImage(string? uri);
+    Task<ImageSource?> GetImage(string? uri);
 }

@@ -147,9 +147,9 @@ public partial class BagContentTemplate : UserControl
 
         this.IconVisible = true;
         this.cachedIconUri = iconUri;
-        await this.Dispatcher.InvokeAsync(() =>
+        await this.Dispatcher.InvokeAsync(async () =>
         {
-            this.ImageSource = this.imageCache.GetImage(iconUri);
+            this.ImageSource = await this.imageCache.GetImage(iconUri).ConfigureAwait(true);
             
         });
     }

@@ -53,6 +53,6 @@ public partial class TradeQuoteTemplate : UserControl
         }
 
         this.ImageVisible = true;
-        this.ImageSource = this.imageCache.GetImage(imageUri);
+        this.ImageSource = await this.imageCache.GetImage(imageUri).ConfigureAwait(true);
     }
 }
