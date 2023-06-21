@@ -3,6 +3,7 @@ using Daybreak.Services.Images.Models;
 using Daybreak.Services.Metrics;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Diagnostics;
@@ -12,6 +13,7 @@ using System.IO;
 using System.Logging;
 using System.Net.Cache;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -30,7 +32,7 @@ public sealed class ImageCache : IImageCache
     private static readonly object CacheLock = new();
 
     private readonly ILogger<ImageCache> logger;
-    private readonly Dictionary<string, ImageEntry> imageEntryCache = new();
+    private readonly ConcurrentDictionary<string, ImageEntry> imageEntryCache = new();
     private readonly Histogram<double> imageRetrievalLatency;
     private readonly Histogram<double> imageCacheSize;
     private double currentCacheSize = 0;
@@ -46,7 +48,7 @@ public sealed class ImageCache : IImageCache
             .CreateHistogram<double>(CacheSizeMetricName, CacheSizeMetricUnitName, CacheSizeMetricDescription, AggregationTypes.NoAggregate);
     }
 
-    public ImageSource? GetImage(string? uri)
+    public async Task<ImageSource?> GetImage(string? uri)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetImage), uri?.ToString() ?? string.Empty);
         if (uri is null)
@@ -56,11 +58,8 @@ public sealed class ImageCache : IImageCache
 
         try
         {
-            lock (CacheLock)
-            {
-                var imageSource = this.GetImageInternal(uri, scopedLogger);
-                return imageSource;
-            }
+            var imageSource = await this.GetImageInternal(uri, scopedLogger);
+            return imageSource;
         }
         catch(Exception ex)
         {
@@ -69,7 +68,7 @@ public sealed class ImageCache : IImageCache
         }
     }
 
-    private ImageSource GetImageInternal(string uri, ScopedLogger<ImageCache> scopedLogger)
+    private async Task<ImageSource> GetImageInternal(string uri, ScopedLogger<ImageCache> scopedLogger)
     {
         var stopwatch = Stopwatch.StartNew();
         if (this.imageEntryCache.TryGetValue(uri, out var entry))
@@ -80,6 +79,7 @@ public sealed class ImageCache : IImageCache
             return entry.ImageSource;
         }
 
+        while (!Monitor.TryEnter(CacheLock)) { }
         var fileInfo = new FileInfo(uri);
         if (this.currentCacheSize + fileInfo.Length > MaxCacheSize)
         {
@@ -89,7 +89,8 @@ public sealed class ImageCache : IImageCache
             scopedLogger.LogInformation($"New cache size: {this.currentCacheSize} bytes");
         }
 
-        var imageEntry = this.AddToCache(uri);
+        var imageEntry = await this.AddToCache(uri);
+        Monitor.Exit(CacheLock);
         this.imageRetrievalLatency.Record(stopwatch.ElapsedMilliseconds);
         this.imageCacheSize.Record(this.currentCacheSize);
         scopedLogger.LogInformation("Added image to cache");
@@ -119,23 +120,28 @@ public sealed class ImageCache : IImageCache
         this.currentCacheSize -= freedSpace;
     }
 
-    private ImageEntry AddToCache(string uri)
+    private async Task<ImageEntry> AddToCache(string uri)
     {
-        var memoryStream = new MemoryStream(File.ReadAllBytes(uri));
+        using var memoryStream = new MemoryStream(File.ReadAllBytes(uri));
         this.currentCacheSize += memoryStream.Length;
-        var bitmapImage = new BitmapImage();
-        bitmapImage.BeginInit();
-        bitmapImage.StreamSource = memoryStream;
-        bitmapImage.EndInit();
-
-        var imageEntry = new ImageEntry
+        return await Task.Run(() =>
         {
-            ImageSource = bitmapImage,
-            Size = memoryStream.Length,
-            Uri = uri
-        };
+            var bitmapImage = new BitmapImage();
+            bitmapImage.BeginInit();
+            bitmapImage.StreamSource = memoryStream;
+            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+            bitmapImage.EndInit();
+            bitmapImage.Freeze();
 
-        this.imageEntryCache[uri] = imageEntry;
-        return imageEntry;
+            var imageEntry = new ImageEntry
+            {
+                ImageSource = bitmapImage,
+                Size = memoryStream.Length,
+                Uri = uri
+            };
+
+            this.imageEntryCache[uri] = imageEntry;
+            return imageEntry;
+        });
     }
 }

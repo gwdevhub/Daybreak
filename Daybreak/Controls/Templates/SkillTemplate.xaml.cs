@@ -59,7 +59,7 @@ public partial class SkillTemplate : UserControl
             if (skill != Skill.NoSkill)
             {
                 var maybeUri = await this.iconRetriever.GetIconUri(skill).ConfigureAwait(true);
-                this.ImageSource = this.imageCache.GetImage(maybeUri);
+                this.ImageSource = await this.imageCache.GetImage(maybeUri).ConfigureAwait(true);
             }
             else if (this.ImageSource is not null)
             {
