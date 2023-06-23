@@ -15,7 +15,7 @@ public sealed class Npc
     public static readonly Npc PriestOfBalthazar = new() { Ids = new int[] { 218 }, Name = "Priest Of Balthazar", WikiUrl = "https://wiki.guildwars.com/wiki/Priest_of_Balthazar" };
     public static readonly Npc Tolkano = new() { Ids = new int[] { 219 }, Name = "Tolkano", WikiUrl = "https://wiki.guildwars.com/wiki/Tolkano" };
     public static readonly Npc XunlaiAgent = new() { Ids = new int[] { 220, 221, 3287 }, Name = "Xunlai Agent", WikiUrl = "https://wiki.guildwars.com/wiki/Xunlai_Agent" };
-    public static readonly Npc VabbianCommoner = new() { Ids = new int[] { 224, 5659, 5662, 5661 }, Name = "Vabbian Commoner", WikiUrl = "https://wiki.guildwars.com/wiki/Vabbian_Commoner" };
+    public static readonly Npc VabbianCommoner = new() { Ids = new int[] { 224, 5659, 5662, 5661, 5653 }, Name = "Vabbian Commoner", WikiUrl = "https://wiki.guildwars.com/wiki/Vabbian_Commoner" };
     public static readonly Npc VabbianArtisan = new() { Ids = new int[] { 1202 }, Name = "Vabbian Artisan", WikiUrl = "https://wiki.guildwars.com/wiki/Guild_Wars_Wiki:Projects/NPC_models/Humans/Vabbians" };
     public static readonly Npc AbaddonsCursed = new() { Ids = new int[] { 1338 }, Name = "Abaddon's Cursed", WikiUrl = "https://wiki.guildwars.com/wiki/Abaddon%27s_Cursed" };
     public static readonly Npc Lynx = new() { Ids = new int[] { 1342 }, Name = "Lynx", WikiUrl = "https://wiki.guildwars.com/wiki/Lynx" };
@@ -394,7 +394,7 @@ public sealed class Npc
     public static readonly Npc Jamei = new() { Ids = new int[] { 3219, 3941 }, Name = "Jamei", WikiUrl = "https://wiki.guildwars.com/wiki/Jamei" };
     public static readonly Npc TalonSilverwing = new() { Ids = new int[] { 3226, 3471, 3501, 5992 }, Name = "Talon Silverwing", WikiUrl = "https://wiki.guildwars.com/wiki/Talon_Silverwing" };
     public static readonly Npc CanthanGuardCaptain = new() { Ids = new int[] { 3231, 3338 }, Name = "Canthan Guard Captain", WikiUrl = "https://wiki.guildwars.com/wiki/Canthan_Guard_Captain" };
-    public static readonly Npc PalaceGuard = new() { Ids = new int[] { 3232 }, Name = "Palace Guard", WikiUrl = "https://wiki.guildwars.com/wiki/Palace_Guard" };
+    public static readonly Npc PalaceGuard = new() { Ids = new int[] { 3232, 5636 }, Name = "Palace Guard", WikiUrl = "https://wiki.guildwars.com/wiki/Palace_Guard" };
     public static readonly Npc CanthanChild = new() { Ids = new int[] { 3238 }, Name = "Canthan Child", WikiUrl = "https://wiki.guildwars.com/wiki/Canthan_Child" };
     public static readonly Npc CanthanNoble = new() { Ids = new int[] { 3241, 3242, 3243, 3244, 3304, 3317, 3333, 3334 }, Name = "Canthan Noble", WikiUrl = "https://wiki.guildwars.com/wiki/Canthan_Noble" };
     public static readonly Npc CanthanBarkeep = new() { Ids = new int[] { 3247, 3252 }, Name = "Canthan Barkeep", WikiUrl = "https://wiki.guildwars.com/wiki/Canthan_Peasant" };
@@ -693,7 +693,7 @@ public sealed class Npc
     public static readonly Npc BoklonBlackwater = new() { Ids = new int[] { 4414 }, Name = "Boklon Blackwater", WikiUrl = "https://wiki.guildwars.com/wiki/Boklon_Blackwater" };
     public static readonly Npc GlugKlugg = new() { Ids = new int[] { 4420 }, Name = "Glug Klugg", WikiUrl = "https://wiki.guildwars.com/wiki/Glug_Klugg" };
     public static readonly Npc ZhedShadowhoof = new() { Ids = new int[] { 4437, 4940 }, Name = "Zhed Shadowhoof", WikiUrl = "https://wiki.guildwars.com/wiki/Zhed_Shadowhoof" };
-    public static readonly Npc Tahlkora = new() { Ids = new int[] { 4456 }, Name = "Tahlkora", WikiUrl = "https://wiki.guildwars.com/wiki/Tahlkora" };
+    public static readonly Npc Tahlkora = new() { Ids = new int[] { 4456, 4459 }, Name = "Tahlkora", WikiUrl = "https://wiki.guildwars.com/wiki/Tahlkora" };
     public static readonly Npc MasterOfWhispers = new() { Ids = new int[] { 4464 }, Name = "Master Of Whispers", WikiUrl = "https://wiki.guildwars.com/wiki/Master_of_Whispers" };
     public static readonly Npc AcolyteJin = new() { Ids = new int[] { 4469 }, Name = "Acolyte Jin", WikiUrl = "https://wiki.guildwars.com/wiki/Acolyte_Jin" };
     public static readonly Npc AcolyteSousuke = new() { Ids = new int[] { 4487 }, Name = "Acolyte Sousuke", WikiUrl = "https://wiki.guildwars.com/wiki/Acolyte_Sousuke" };
@@ -797,7 +797,7 @@ public sealed class Npc
     public static readonly Npc RelentlessCorpse = new() { Ids = new int[] { 5542 }, Name = "Relentless Corpse", WikiUrl = "https://wiki.guildwars.com/wiki/Relentless_Corpse" };
     public static readonly Npc GhostlySunspearCommander = new() { Ids = new int[] { 5545 }, Name = "Ghostly Sunspear Commander", WikiUrl = "https://wiki.guildwars.com/wiki/Ghostly_Sunspear_Commander" };
     public static readonly Npc Kahdash = new() { Ids = new int[] { 5546 }, Name = "Kahdash", WikiUrl = "https://wiki.guildwars.com/wiki/Kahdash" };
-    public static readonly Npc VabbianGuard = new() { Ids = new int[] { 5632, 5639, 5645, 5634, 5647 }, Name = "Vabbian Guard", WikiUrl = "https://wiki.guildwars.com/wiki/Vabbian_Guard" };
+    public static readonly Npc VabbianGuard = new() { Ids = new int[] { 5632, 5639, 5645, 5634, 5647, 5637 }, Name = "Vabbian Guard", WikiUrl = "https://wiki.guildwars.com/wiki/Vabbian_Guard" };
     public static readonly Npc VabbianChild = new() { Ids = new int[] { 5649, 5648 }, Name = "Vabbian Child", WikiUrl = "https://wiki.guildwars.com/wiki/Vabbian_Child" };
     public static readonly Npc VabbianNoble = new() { Ids = new int[] { 5650, 5652 }, Name = "Vabbian Noble", WikiUrl = "https://wiki.guildwars.com/wiki/Vabbian_Noble" };
     public static readonly Npc RoyalChefHatundo = new() { Ids = new int[] { 5654 }, Name = "Royal Chef Hatundo", WikiUrl = "https://wiki.guildwars.com/wiki/Royal_Chef_Hatundo" };
@@ -1096,13 +1096,27 @@ public sealed class Npc
     public static readonly Npc WhistlingThornbrush = new() { Ids = new int[] { 4693 }, Name = "Whistling Thornbrush", WikiUrl = "https://wiki.guildwars.com/wiki/Whistling_Thornbrush" };
     public static readonly Npc MargoniteBowmaster = new() { Ids = new int[] { 5538 }, Name = "Margonite Bowmaster", WikiUrl = "https://wiki.guildwars.com/wiki/Margonite_Bowmaster" };
     public static readonly Npc VabbianDyeTrader = new() { Ids = new int[] { 5674 }, Name = "Vabbian Dye Trader", WikiUrl = "https://wiki.guildwars.com/wiki/Guild_Wars_Wiki:Projects/NPC_models/Humans/Vabbians" };
-    public static readonly Npc VabbianWeaponsmith = new() { Ids = new int[] { 5671 }, Name = "Vabbian Weaponsmith", WikiUrl = "https://wiki.guildwars.com/wiki/Guild_Wars_Wiki:Projects/NPC_models/Humans/Vabbians" };
+    public static readonly Npc VabbianWeaponsmith = new() { Ids = new int[] { 5671, 5672 }, Name = "Vabbian Weaponsmith", WikiUrl = "https://wiki.guildwars.com/wiki/Guild_Wars_Wiki:Projects/NPC_models/Humans/Vabbians" };
     public static readonly Npc ChumabthePrideful = new() { Ids = new int[] { 4658 }, Name = "Chumab the Prideful", WikiUrl = "https://wiki.guildwars.com/wiki/Chumab_the_Prideful" };
     public static readonly Npc YameshMindclouder = new() { Ids = new int[] { 4653 }, Name = "Yamesh Mindclouder", WikiUrl = "https://wiki.guildwars.com/wiki/Yamesh_Mindclouder" };
     public static readonly Npc JahaiRat = new() { Ids = new int[] { 4245 }, Name = "Jahai Rat", WikiUrl = "https://wiki.guildwars.com/wiki/Jahai_Rat" };
     public static readonly Npc BoltenLargebelly = new() { Ids = new int[] { 4656 }, Name = "Bolten Largebelly", WikiUrl = "https://wiki.guildwars.com/wiki/Bolten_Largebelly" };
     public static readonly Npc VabbianPriest = new() { Ids = new int[] { 5664 }, Name = "Vabbian Priest", WikiUrl = "https://wiki.guildwars.com/wiki/Vabbian_Priest" };
-
+    public static readonly Npc GeneralMorgahn = new() { Ids = new int[] { 4446 }, Name = "General Morgahn", WikiUrl = "https://wiki.guildwars.com/wiki/General_Morgahn" };
+    public static readonly Npc VabbianScholar = new() { Ids = new int[] { 5699 }, Name = "Vabbian Scholar", WikiUrl = "https://wiki.guildwars.com/wiki/Guild_Wars_Wiki:Projects/NPC_models/Humans/Vabbians" };
+    public static readonly Npc TheGreatZehtuka = new() { Ids = new int[] { 5697 }, Name = "The Great Zehtuka", WikiUrl = "https://wiki.guildwars.com/wiki/The_Great_Zehtuka" };
+    public static readonly Npc VabbiGuardCaptain = new() { Ids = new int[] { 5640 }, Name = "Vabbi Guard Captain", WikiUrl = "https://wiki.guildwars.com/wiki/Vabbi_Guard_Captain" };
+    public static readonly Npc PrinceAhmturtheMighty = new() { Ids = new int[] { 5692 }, Name = "Prince Ahmtur the Mighty", WikiUrl = "https://wiki.guildwars.com/wiki/Prince_Ahmtur_the_Mighty" };
+    public static readonly Npc LieutenantMurunda = new() { Ids = new int[] { 5641 }, Name = "Lieutenant Murunda", WikiUrl = "https://wiki.guildwars.com/wiki/Lieutenant_Murunda" };
+    public static readonly Npc PrinceBokkatheMagnificent = new() { Ids = new int[] { 5691 }, Name = "Prince Bokka the Magnificent", WikiUrl = "https://wiki.guildwars.com/wiki/Prince_Bokka_the_Magnificent" };
+    public static readonly Npc Goren = new() { Ids = new int[] { 4434 }, Name = "Goren", WikiUrl = "https://wiki.guildwars.com/wiki/Goren" };
+    public static readonly Npc PrinceMehtutheWise = new() { Ids = new int[] { 5693 }, Name = "Prince Mehtu the Wise", WikiUrl = "https://wiki.guildwars.com/wiki/Prince_Mehtu_the_Wise" };
+    public static readonly Npc VabbianBlacksmith = new() { Ids = new int[] { 5667 }, Name = "Vabbian Blacksmith", WikiUrl = "https://wiki.guildwars.com/wiki/Guild_Wars_Wiki:Projects/NPC_models/Humans/Vabbians" };
+    public static readonly Npc YammironEtherLord = new () { Ids = new int[] { 4636 }, Name = "Yammiron, Ether Lord", WikiUrl = "https://wiki.guildwars.com/wiki/Yammiron,_Ether_Lord" };
+    public static readonly Npc RoaringEther = new() { Ids = new int[] { 4675 }, Name = "Roaring Ether", WikiUrl = "https://wiki.guildwars.com/wiki/Roaring_Ether" };
+    public static readonly Npc SapphireDjinn = new() { Ids = new int[] { 4673 }, Name = "Sapphire Djinn", WikiUrl = "https://wiki.guildwars.com/wiki/Sapphire_Djinn" };
+    public static readonly Npc RubyDjinn = new() { Ids = new int[] { 4670 }, Name = "Ruby Djinn", WikiUrl = "https://wiki.guildwars.com/wiki/Ruby_Djinn" };
+    
     public static IEnumerable<Npc> Npcs { get; } = new List<Npc>()
     {
         Unknown,
@@ -2199,6 +2213,20 @@ public sealed class Npc
         JahaiRat,
         BoltenLargebelly,
         VabbianPriest,
+        GeneralMorgahn,
+        VabbianScholar,
+        TheGreatZehtuka,
+        VabbiGuardCaptain,
+        PrinceAhmturtheMighty,
+        LieutenantMurunda,
+        PrinceBokkatheMagnificent,
+        Goren,
+        PrinceMehtutheWise,
+        VabbianBlacksmith,
+        YammironEtherLord,
+        RoaringEther,
+        SapphireDjinn,
+        RubyDjinn,
     };
 
 
