@@ -331,6 +331,7 @@ public static class ProjectConfiguration
         optionsProducer.RegisterOptions<LauncherOptions>();
         optionsProducer.RegisterOptions<ToolboxOptions>();
         optionsProducer.RegisterOptions<UModOptions>();
+        optionsProducer.RegisterOptions<DSOALOptions>();
         optionsProducer.RegisterOptions<ScreenManagerOptions>();
         optionsProducer.RegisterOptions<KamadanTradeChatOptions>();
         optionsProducer.RegisterOptions<AscalonTradeChatOptions>();
@@ -341,7 +342,6 @@ public static class ProjectConfiguration
         optionsProducer.RegisterOptions<NotificationStorageOptions>();
         optionsProducer.RegisterOptions<TradeAlertingOptions>();
         optionsProducer.RegisterOptions<TraderMessagesOptions>();
-        optionsProducer.RegisterOptions<DSOALOptions>();
     }
 
     public static void RegisterLiteCollections(IServiceCollection services)
