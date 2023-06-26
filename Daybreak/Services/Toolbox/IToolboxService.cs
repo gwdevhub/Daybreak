@@ -1,13 +1,10 @@
 ﻿using Daybreak.Models.Progress;
+using Daybreak.Services.Mods;
 using System.Threading.Tasks;
 
 namespace Daybreak.Services.Toolbox;
-public interface IToolboxService
+public interface IToolboxService : IModService
 {
-    bool ToolboxExists { get; }
-
-    bool Enabled { get; set; }
-
     bool LoadToolboxFromDisk();
 
     Task<bool> SetupToolbox(ToolboxInstallationStatus toolboxInstallationStatus);

@@ -68,7 +68,12 @@ public sealed class ViewManager : IViewManager
                 throw new InvalidOperationException("Cannot show a view without a registered container");
             }
 
-            var view = scopedManager.GetService(viewType).As<UserControl>();
+            var view = scopedManager.GetService(viewType)?.As<UserControl>();
+            if (view is null)
+            {
+                throw new InvalidOperationException($"Unexpected error occured when attempting to show view {viewType.Name}");
+            }
+
             this.container.Children.Clear();
             this.container.Children.Add(view);
             view.DataContext = dataContext;

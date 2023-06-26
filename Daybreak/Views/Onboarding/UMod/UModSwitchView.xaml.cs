@@ -31,7 +31,7 @@ public partial class UModSwitchView : UserControl
         this.logger = logger.ThrowIfNull();
 
         this.InitializeComponent();
-        this.UModEnabled = this.uModService.Enabled;
+        this.UModEnabled = this.uModService.IsEnabled;
     }
 
     private void OpaqueButtonNo_Clicked(object sender, System.EventArgs e)
@@ -41,7 +41,7 @@ public partial class UModSwitchView : UserControl
 
     private void OpaqueButtonYes_Clicked(object sender, System.EventArgs e)
     {
-        this.uModService.Enabled = !this.uModService.Enabled;
+        this.uModService.IsEnabled = !this.uModService.IsEnabled;
         this.viewManager.ShowView<LauncherView>();
     }
 

@@ -67,6 +67,9 @@ using Daybreak.Services.Notifications.Models;
 using Daybreak.Models.Notifications.Handling;
 using Daybreak.Services.TradeChat.Notifications;
 using Daybreak.Views.Copy;
+using Daybreak.Services.DSOAL;
+using Daybreak.Services.Mods;
+using Daybreak.Views.Onboarding.DSOAL;
 
 namespace Daybreak.Configuration;
 
@@ -173,6 +176,7 @@ public static class ProjectConfiguration
         services.AddSingleton<IConnectivityStatus, ConnectivityStatus>();
         services.AddSingleton<INotificationStorage, NotificationStorage>();
         services.AddSingleton<ITradeAlertingService, TradeAlertingService>();
+        services.AddSingleton<IModsManager, ModsManager>();
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
         services.AddScoped<IScreenshotProvider, ScreenshotProvider>();
@@ -195,8 +199,6 @@ public static class ProjectConfiguration
         services.AddScoped<IPathfinder, StupidPathfinder>();
         services.AddScoped<IDrawingService, DrawingService>();
         services.AddScoped<IDrawingModuleProducer, DrawingService>(sp => sp.GetRequiredService<IDrawingService>().As<DrawingService>()!);
-        services.AddScoped<IUModService, UModService>();
-        services.AddScoped<IToolboxService, ToolboxService>();
         services.AddScoped<ITradeChatService<KamadanTradeChatOptions>, TradeChatService<KamadanTradeChatOptions>>();
         services.AddScoped<ITradeChatService<AscalonTradeChatOptions>, TradeChatService<AscalonTradeChatOptions>>();
         services.AddScoped<ITraderQuoteService, TraderQuoteService>();
@@ -250,6 +252,11 @@ public static class ProjectConfiguration
         viewProducer.RegisterView<TradeNotificationView>();
         viewProducer.RegisterView<GuildwarsCopySelectionView>();
         viewProducer.RegisterView<GuildwarsCopyView>();
+        viewProducer.RegisterView<DSOALInstallingView>();
+        viewProducer.RegisterView<DSOALOnboardingEntryView>();
+        viewProducer.RegisterView<DSOALSwitchView>();
+        viewProducer.RegisterView<DSOALHomepageView>();
+        viewProducer.RegisterView<DSOALBrowserView>();
     }
 
     public static void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -334,6 +341,7 @@ public static class ProjectConfiguration
         optionsProducer.RegisterOptions<NotificationStorageOptions>();
         optionsProducer.RegisterOptions<TradeAlertingOptions>();
         optionsProducer.RegisterOptions<TraderMessagesOptions>();
+        optionsProducer.RegisterOptions<DSOALOptions>();
     }
 
     public static void RegisterLiteCollections(IServiceCollection services)
@@ -349,6 +357,13 @@ public static class ProjectConfiguration
         notificationHandlerProducer.RegisterNotificationHandler<NoActionHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<MessageBoxHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<TradeMessageNotificationHandler>();
+    }
+
+    public static void RegisterMods(IModsManager modsManager)
+    {
+        modsManager.RegisterMod<IToolboxService, ToolboxService>();
+        modsManager.RegisterMod<IUModService, UModService>();
+        modsManager.RegisterMod<IDSOALService, DSOALService>();
     }
 
     private static void RegisterLiteCollection<TCollectionType, TOptionsType>(IServiceCollection services)
