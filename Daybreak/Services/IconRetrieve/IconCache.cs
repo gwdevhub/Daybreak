@@ -15,6 +15,7 @@ namespace Daybreak.Services.IconRetrieve;
 
 public sealed class IconCache : IIconCache
 {
+    private const string HighResolutionGalleryUrl = $"https://wiki.guildwars.com/wiki/File:{NamePlaceholder}_(large).jpg";
     private const string WikiUrl = "https://wiki.guildwars.com";
     private const string NamePlaceholder = "[NAME]";
     private const string IconsDirectoryName = "Icons";
@@ -53,6 +54,13 @@ public sealed class IconCache : IIconCache
             fileName!.IsNullOrWhiteSpace())
         {
             return default;
+        }
+
+        var highResWikiUri = $"{WikiUrl}/wiki/File:{curedSkillName}_(large).jpg";
+        var highResResult = await this.GetIconUriInternal(curedSkillName!, fileName!, highResWikiUri, false);
+        if (highResResult is string)
+        {
+            return highResResult;
         }
 
         var wikiUri = $"{WikiUrl}/wiki/{curedSkillName}";
