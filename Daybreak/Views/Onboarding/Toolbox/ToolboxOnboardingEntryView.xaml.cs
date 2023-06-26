@@ -28,7 +28,7 @@ public partial class ToolboxOnboardingEntryView : UserControl
 
     private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
     {
-        if (this.toolboxService.ToolboxExists)
+        if (this.toolboxService.IsInstalled)
         {
             this.viewManager.ShowView<ToolboxSwitchView>();
         }

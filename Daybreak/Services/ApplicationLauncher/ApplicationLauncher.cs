@@ -1,9 +1,9 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Exceptions;
 using Daybreak.Services.Credentials;
+using Daybreak.Services.Mods;
 using Daybreak.Services.Mutex;
 using Daybreak.Services.Privilege;
-using Daybreak.Services.Scanner;
 using Daybreak.Utils;
 using Daybreak.Views;
 using Microsoft.Extensions.Logging;
@@ -18,7 +18,6 @@ using System.IO;
 using System.Linq;
 using System.Security;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -30,11 +29,10 @@ public class ApplicationLauncher : IApplicationLauncher
     private const string ProcessName = "gw";
     private const string ArenaNetMutex = "AN-Mute";
 
-    private readonly ILiveOptions<UModOptions> uModOptions;
-    private readonly ILiveOptions<ToolboxOptions> toolboxOptions;
     private readonly ILiveOptions<LauncherOptions> launcherOptions;
     private readonly ICredentialManager credentialManager;
     private readonly IMutexHandler mutexHandler;
+    private readonly IModsManager modsManager;
     private readonly ILogger<ApplicationLauncher> logger;
     private readonly IPrivilegeManager privilegeManager;
 
@@ -42,11 +40,10 @@ public class ApplicationLauncher : IApplicationLauncher
     public Process? RunningGuildwarsProcess => this.GetGuildwarsProcess();
 
     public ApplicationLauncher(
-        ILiveOptions<UModOptions> uModOptions,
-        ILiveOptions<ToolboxOptions> toolboxOptions,
         ILiveOptions<LauncherOptions> launcherOptions,
         ICredentialManager credentialManager,
         IMutexHandler mutexHandler,
+        IModsManager modsManager,
         ILogger<ApplicationLauncher> logger,
         IPrivilegeManager privilegeManager)
     {
@@ -54,8 +51,7 @@ public class ApplicationLauncher : IApplicationLauncher
         this.mutexHandler = mutexHandler.ThrowIfNull();
         this.credentialManager = credentialManager.ThrowIfNull();
         this.launcherOptions = launcherOptions.ThrowIfNull();
-        this.uModOptions = uModOptions.ThrowIfNull();
-        this.toolboxOptions = toolboxOptions.ThrowIfNull();
+        this.modsManager = modsManager.ThrowIfNull();
         this.privilegeManager = privilegeManager.ThrowIfNull();
     }
 
@@ -66,6 +62,7 @@ public class ApplicationLauncher : IApplicationLauncher
         return await auth.Switch<Task<Process?>>(
             onSome: async (credentials) =>
             {
+                credentials.ThrowIfNull();
                 if (configuration.MultiLaunchSupport is true)
                 {
                     if (this.privilegeManager.AdminPrivileges is false)
@@ -77,19 +74,13 @@ public class ApplicationLauncher : IApplicationLauncher
                     this.ClearGwLocks();
                 }
 
-                if (this.uModOptions.Value.Enabled)
-                {
-                    await this.LaunchUMod();
-                }
-
                 var gwProcess = await this.LaunchGuildwarsProcess(credentials.Username!, credentials.Password!, credentials.CharacterName!);
-
-                if (this.toolboxOptions.Value.Enabled)
+                if (gwProcess is null)
                 {
-                    await Task.Delay(5000);
-                    await this.LaunchToolbox();
+                    return default;
                 }
 
+                
                 return gwProcess;
             },
             onNone: () =>
@@ -147,6 +138,11 @@ public class ApplicationLauncher : IApplicationLauncher
             args.Add($"\"{character}\"");
         }
 
+        foreach(var mod in this.modsManager.GetMods())
+        {
+            args.AddRange(mod.GetCustomArguments());
+        }
+
         var identity = this.launcherOptions.Value.LaunchGuildwarsAsCurrentUser ?
             System.Security.Principal.WindowsIdentity.GetCurrent().Name :
             System.Security.Principal.WindowsIdentity.GetAnonymous().Name;
@@ -156,9 +152,12 @@ public class ApplicationLauncher : IApplicationLauncher
             StartInfo = new ProcessStartInfo
             {
                 Arguments = string.Join(" ", args),
-                FileName = executable.Path
+                FileName = executable.Path,
             }
         };
+
+        var preLaunchActions = this.modsManager.GetMods().Select(m => m.OnGuildwarsStarting(process));
+        await Task.WhenAll(preLaunchActions);
         if (process.Start() is false)
         {
             throw new InvalidOperationException($"Unable to launch {executable}");
@@ -200,138 +199,9 @@ public class ApplicationLauncher : IApplicationLauncher
                 continue;
             }
 
+            var postLaunchActions = this.modsManager.GetMods().Select(m => m.OnGuildwarsStarted(gwProcess!));
+            await Task.WhenAll(postLaunchActions);
             return gwProcess;
-        }
-    }
-
-    private async Task<Process?> LaunchUMod()
-    {
-        if(this.uModOptions.Value.Enabled is false)
-        {
-            throw new InvalidOperationException("Cannot launch uMod. uMod is disabled");
-        }
-
-        var executable = this.uModOptions.Value.Path;
-        if (File.Exists(executable) is false)
-        {
-            throw new ExecutableNotFoundException($"uMod executable doesn't exist at {executable}");
-        }
-
-        if (Process.GetProcessesByName("uMod").FirstOrDefault() is Process existingProcess)
-        {
-            this.logger.LogInformation("uMod is already running");
-            return existingProcess;
-        }
-
-        this.logger.LogInformation($"Launching uMod");
-        var process = new Process()
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = executable,
-                WorkingDirectory = Path.GetDirectoryName(executable)
-            }
-        };
-        if (process.Start() is false)
-        {
-            throw new InvalidOperationException($"Unable to launch {executable}");
-        }
-
-        var retries = 0;
-        while (true)
-        {
-            await Task.Delay(100);
-            retries++;
-            var uModProcess = Process.GetProcessesByName("uMod").FirstOrDefault();
-            if (uModProcess is null && retries < MaxRetries)
-            {
-                continue;
-            }
-            else if (uModProcess is null && retries >= MaxRetries)
-            {
-                throw new InvalidOperationException("Newly launched uMod process not detected");
-            }
-
-            if (uModProcess!.MainWindowHandle == IntPtr.Zero)
-            {
-                continue;
-            }
-
-            var titleLength = NativeMethods.GetWindowTextLength(uModProcess.MainWindowHandle);
-            var titleBuffer = new StringBuilder(titleLength);
-            _ = NativeMethods.GetWindowText(uModProcess.MainWindowHandle, titleBuffer, titleLength + 1);
-            var title = titleBuffer.ToString();
-            if (title != "uMod V 1.0")
-            {
-                continue;
-            }
-
-            return uModProcess;
-        }
-    }
-
-    private async Task<Process?> LaunchToolbox()
-    {
-        if (this.toolboxOptions.Value.Enabled is false)
-        {
-            throw new InvalidOperationException("Cannot launch GWToolbox. GWToolbox is disabled");
-        }
-
-        var executable = this.toolboxOptions.Value.Path;
-        if (File.Exists(executable) is false)
-        {
-            throw new ExecutableNotFoundException($"GWToolbox executable doesn't exist at {executable}");
-        }
-
-        if (Process.GetProcessesByName("GWToolboxpp").FirstOrDefault() is Process existingProcess)
-        {
-            this.logger.LogInformation("GWToolboxpp is already running");
-            return existingProcess;
-        }
-
-        this.logger.LogInformation($"Launching GWToolbox");
-        var process = new Process()
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = executable
-            }
-        };
-        if (process.Start() is false)
-        {
-            throw new InvalidOperationException($"Unable to launch {executable}");
-        }
-
-        var retries = 0;
-        while (true)
-        {
-            await Task.Delay(100);
-            retries++;
-            var toolboxProcess = Process.GetProcessesByName("GWToolboxpp").FirstOrDefault();
-            if (toolboxProcess is null && retries < MaxRetries)
-            {
-                continue;
-            }
-            else if (toolboxProcess is null && retries >= MaxRetries)
-            {
-                throw new InvalidOperationException("Newly launched GWToolbox process not detected");
-            }
-
-            if (toolboxProcess!.MainWindowHandle == IntPtr.Zero)
-            {
-                continue;
-            }
-
-            var titleLength = NativeMethods.GetWindowTextLength(toolboxProcess.MainWindowHandle);
-            var titleBuffer = new StringBuilder(titleLength);
-            _ = NativeMethods.GetWindowText(toolboxProcess.MainWindowHandle, titleBuffer, titleLength + 1);
-            var title = titleBuffer.ToString();
-            if (title != "GWToolbox - Launch")
-            {
-                continue;
-            }
-
-            return toolboxProcess;
         }
     }
 

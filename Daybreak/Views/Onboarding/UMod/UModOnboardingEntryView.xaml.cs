@@ -28,7 +28,7 @@ public partial class UModOnboardingEntryView : UserControl
 
     private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
     {
-        if (this.uModService.UModExists)
+        if (this.uModService.IsInstalled)
         {
             this.viewManager.ShowView<UModSwitchView>();
         }

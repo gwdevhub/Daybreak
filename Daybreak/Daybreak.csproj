@@ -13,7 +13,7 @@
     <LangVersion>preview</LangVersion>
     <ApplicationIcon>Daybreak.ico</ApplicationIcon>
     <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
-    <Version>0.9.8.71</Version>
+    <Version>0.9.8.72</Version>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <UserSecretsId>cfb2a489-db80-448d-a969-80270f314c46</UserSecretsId>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -101,7 +101,7 @@
     <PackageReference Include="WpfScreenHelper" Version="2.1.0" />
     <PackageReference Include="WriteableBitmapEx" Version="1.6.8" />
   </ItemGroup>
-
+	
 	
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
     <Exec Command="echo.&gt;$(Version).version" />

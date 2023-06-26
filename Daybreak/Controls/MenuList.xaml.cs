@@ -4,6 +4,7 @@ using Daybreak.Services.Navigation;
 using Daybreak.Services.Notifications;
 using Daybreak.Views;
 using Daybreak.Views.Copy;
+using Daybreak.Views.Onboarding.DSOAL;
 using Daybreak.Views.Onboarding.Toolbox;
 using Daybreak.Views.Onboarding.UMod;
 using Daybreak.Views.Trade;
@@ -107,6 +108,11 @@ public partial class MenuList : UserControl
     private void ToolboxButton_Clicked(object sender, EventArgs e)
     {
         this.viewManager.ShowView<ToolboxOnboardingEntryView>();
+    }
+
+    private void DSOALButton_Clicked(object sender, EventArgs e)
+    {
+        this.viewManager.ShowView<DSOALOnboardingEntryView>();
     }
 
     private void KamadanButton_Clicked(object sender, EventArgs e)

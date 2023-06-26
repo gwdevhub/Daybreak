@@ -116,8 +116,15 @@
                             Cursor="Hand"
                             Clicked="ToolboxButton_Clicked">
                 </buttons:MenuButton>
+                <buttons:MenuButton Title="DSOAL" 
+                            Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                            HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                            Height="30"
+                            Cursor="Hand"
+                            Clicked="DSOALButton_Clicked">
+                </buttons:MenuButton>
             </local:ExpandableMenuSection.Children>
-        </local:ExpandableMenuSection>
+            </local:ExpandableMenuSection>
             <local:ExpandableMenuSection
                 SectionTitle="Settings" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                 FontSize="16">

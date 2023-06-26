@@ -1,17 +1,25 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Exceptions;
 using Daybreak.Models.Progress;
 using Daybreak.Services.Downloads;
+using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
+using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Daybreak.Services.Toolbox;
 
 public sealed class ToolboxService : IToolboxService
 {
+    private const int MaxRetries = 10;
     private const string ToolboxLatestUri = "https://github.com/HasKha/GWToolboxpp/releases/download/6.0_Release/gwtoolbox.exe";
     private const string ExecutableName = "GWToolboxpp.exe";
     private const string ToolboxDestinationDirectory = "GWToolbox";
@@ -21,9 +29,7 @@ public sealed class ToolboxService : IToolboxService
     private readonly ILiveUpdateableOptions<ToolboxOptions> toolboxOptions;
     private readonly ILogger<ToolboxService> logger;
 
-    public bool ToolboxExists => File.Exists(this.toolboxOptions.Value.Path);
-
-    public bool Enabled
+    public bool IsEnabled
     {
         get => this.toolboxOptions.Value.Enabled;
         set
@@ -32,6 +38,7 @@ public sealed class ToolboxService : IToolboxService
             this.toolboxOptions.UpdateOption();
         }
     }
+    public bool IsInstalled => File.Exists(this.toolboxOptions.Value.Path);
 
     public ToolboxService(
         IDownloadService downloadService,
@@ -43,6 +50,21 @@ public sealed class ToolboxService : IToolboxService
         this.launcherOptions = launcherOptions.ThrowIfNull();
         this.toolboxOptions = toolboxOptions.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
+    }
+
+    public Task OnGuildwarsStarting(Process process)
+    {
+        return Task.CompletedTask;
+    }
+
+    public async Task OnGuildwarsStarted(Process process)
+    {
+        await this.LaunchToolbox();
+    }
+
+    public IEnumerable<string> GetCustomArguments()
+    {
+        return Enumerable.Empty<string>();
     }
 
     public bool LoadToolboxFromDisk()
@@ -95,5 +117,71 @@ public sealed class ToolboxService : IToolboxService
         toolboxOptions.Path = Path.GetFullPath(destinationPath);
         this.toolboxOptions.UpdateOption();
         return true;
+    }
+
+    private async Task LaunchToolbox()
+    {
+        if (this.toolboxOptions.Value.Enabled is false)
+        {
+            return;
+        }
+
+        var executable = this.toolboxOptions.Value.Path;
+        if (File.Exists(executable) is false)
+        {
+            throw new ExecutableNotFoundException($"GWToolbox executable doesn't exist at {executable}");
+        }
+
+        if (Process.GetProcessesByName("GWToolboxpp").FirstOrDefault() is Process)
+        {
+            this.logger.LogInformation("GWToolboxpp is already running");
+            return;
+        }
+
+        await Task.Delay(5000);
+        this.logger.LogInformation($"Launching GWToolbox");
+        var process = new Process()
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = executable
+            }
+        };
+        if (process.Start() is false)
+        {
+            throw new InvalidOperationException($"Unable to launch {executable}");
+        }
+
+        var retries = 0;
+        while (true)
+        {
+            await Task.Delay(100);
+            retries++;
+            var toolboxProcess = Process.GetProcessesByName("GWToolboxpp").FirstOrDefault();
+            if (toolboxProcess is null && retries < MaxRetries)
+            {
+                continue;
+            }
+            else if (toolboxProcess is null && retries >= MaxRetries)
+            {
+                throw new InvalidOperationException("Newly launched GWToolbox process not detected");
+            }
+
+            if (toolboxProcess!.MainWindowHandle == IntPtr.Zero)
+            {
+                continue;
+            }
+
+            var titleLength = NativeMethods.GetWindowTextLength(toolboxProcess.MainWindowHandle);
+            var titleBuffer = new StringBuilder(titleLength);
+            _ = NativeMethods.GetWindowText(toolboxProcess.MainWindowHandle, titleBuffer, titleLength + 1);
+            var title = titleBuffer.ToString();
+            if (title != "GWToolbox - Launch")
+            {
+                continue;
+            }
+
+            return;
+        }
     }
 }

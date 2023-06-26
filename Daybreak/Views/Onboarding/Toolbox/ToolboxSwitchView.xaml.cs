@@ -1,6 +1,5 @@
 ﻿using Daybreak.Services.Navigation;
 using Daybreak.Services.Toolbox;
-using Daybreak.Views.Onboarding.UMod;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Windows.Controls;
@@ -29,7 +28,7 @@ public partial class ToolboxSwitchView : UserControl
         this.logger = logger.ThrowIfNull();
 
         this.InitializeComponent();
-        this.ToolboxEnabled = this.toolboxService.Enabled;
+        this.ToolboxEnabled = this.toolboxService.IsEnabled;
     }
 
     private void OpaqueButtonNo_Clicked(object sender, System.EventArgs e)
@@ -39,7 +38,7 @@ public partial class ToolboxSwitchView : UserControl
 
     private void OpaqueButtonYes_Clicked(object sender, System.EventArgs e)
     {
-        this.toolboxService.Enabled = !this.toolboxService.Enabled;
+        this.toolboxService.IsEnabled = !this.toolboxService.IsEnabled;
         this.viewManager.ShowView<LauncherView>();
     }
 
