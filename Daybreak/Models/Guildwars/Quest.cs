@@ -694,7 +694,7 @@ public sealed class Quest : IWikiEntity
     public static readonly Quest MelonniGoesRecruiting = new() { Id = 682, Name = "Melonni Goes Recruiting", WikiUrl = "https://wiki.guildwars.com/wiki/Melonni_Goes_Recruiting" };
     public static readonly Quest SecuringChampionsDawn = new() { Id = 683, Name = "Securing Champions Dawn", WikiUrl = "https://wiki.guildwars.com/wiki/Securing_Champion%27s_Dawn" };
     public static readonly Quest TheApostate = new() { Id = 685, Name = "The Apostate", WikiUrl = "https://wiki.guildwars.com/wiki/The_Apostate" };
-    public static readonly Quest BreakingtheBroken = new() { Id = 686, Name = "Breaking the Broken", WikiUrl = "https://wiki.guildwars.com/wiki/Breaking_the_Broken" };
+    //TODO: public static readonly Quest BreakingtheBroken = new() { Id = 686, Name = "Breaking the Broken", WikiUrl = "https://wiki.guildwars.com/wiki/Breaking_the_Broken" }; -- Commented out due to collision
     public static readonly Quest AFlickeringFlame = new() { Id = 687, Name = "A Flickering Flame", WikiUrl = "https://wiki.guildwars.com/wiki/A_Flickering_Flame" };
     public static readonly Quest DismembertheTitans = new() { Id = 688, Name = "Dismember the Titans", WikiUrl = "https://wiki.guildwars.com/wiki/Dismember_the_Titans" };
     public static readonly Quest CoverYourTracks = new() { Id = 689, Name = "Cover Your Tracks", WikiUrl = "https://wiki.guildwars.com/wiki/Cover_Your_Tracks" };
@@ -1126,7 +1126,7 @@ public sealed class Quest : IWikiEntity
     public static readonly Quest WantedInsatiableVakar = new() { Id = 1144, Name = "Wanted Insatiable Vakar", WikiUrl = "https://wiki.guildwars.com/wiki/Wanted:_Insatiable_Vakar" };
     public static readonly Quest WantedAmalektheUnmerciful = new() { Id = 1145, Name = "Wanted Amalek the Unmerciful", WikiUrl = "https://wiki.guildwars.com/wiki/Wanted:_Amalek_the_Unmerciful" };
     public static readonly Quest WantedJohtheHostile = new() { Id = 1146, Name = "Wanted Joh the Hostile", WikiUrl = "https://wiki.guildwars.com/wiki/Wanted:_Joh_the_Hostile" };
-    public static readonly Quest WantedGrevestheOverbearing = new() { Id = 1146, Name = "Wanted Greves the Overbearing", WikiUrl = "https://wiki.guildwars.com/wiki/Wanted:_Greves_the_Overbearing" };
+    public static readonly Quest WantedGrevestheOverbearing = new() { Id = 1147, Name = "Wanted Greves the Overbearing", WikiUrl = "https://wiki.guildwars.com/wiki/Wanted:_Greves_the_Overbearing" };
     public static readonly Quest WantedCalamitous = new() { Id = 1148, Name = "Wanted Calamitous", WikiUrl = "https://wiki.guildwars.com/wiki/Wanted:_Calamitous" };
     public static readonly Quest WantedLevtheCondemned = new() { Id = 1149, Name = "Wanted Lev the Condemned", WikiUrl = "https://wiki.guildwars.com/wiki/Wanted:_Lev_the_Condemned" };
     public static readonly Quest WantedVesstheDisputant = new() { Id = 1150, Name = "Wanted Vess the Disputant", WikiUrl = "https://wiki.guildwars.com/wiki/Wanted:_Vess_the_Disputant" };
@@ -1408,6 +1408,7 @@ public sealed class Quest : IWikiEntity
     public static readonly Quest ThePolarDepressed = new() { Id = 1437, Name = "The Polar Depressed", WikiUrl = "https://wiki.guildwars.com/wiki/The_Polar_Depressed" };
     public static readonly Quest TakeMySisterPlease = new() { Id = 1438, Name = "Take My Sister, Please", WikiUrl = "https://wiki.guildwars.com/wiki/Take_My_Sister,_Please" };
     public static readonly Quest PilgrimagetotheHallofHeroes = new() { Id = 1439, Name = "Pilgrimage to the Hall of Heroes", WikiUrl = "https://wiki.guildwars.com/wiki/Pilgrimage_to_the_Hall_of_Heroes" };
+    public static readonly Quest CrossingTheDesolation = new() { Id = 686, Name = "Crossing The Desolation", WikiUrl = "https://wiki.guildwars.com/wiki/Crossing_the_Desolation" };
 
     public static IEnumerable<Quest> Quests { get; } = new List<Quest>
     {
@@ -2095,7 +2096,7 @@ public sealed class Quest : IWikiEntity
         MelonniGoesRecruiting,
         SecuringChampionsDawn,
         TheApostate,
-        BreakingtheBroken,
+        //TODO: BreakingtheBroken, -- Commented out due to collision
         AFlickeringFlame,
         DismembertheTitans,
         CoverYourTracks,
@@ -2809,6 +2810,7 @@ public sealed class Quest : IWikiEntity
         ThePolarDepressed,
         TakeMySisterPlease,
         PilgrimagetotheHallofHeroes,
+        CrossingTheDesolation
     };
 
     public static bool TryParse(int id, out Quest quest)
