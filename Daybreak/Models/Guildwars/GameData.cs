@@ -1,7 +1,7 @@
 ﻿using Daybreak.Models.Guildwars;
 using System.Collections.Generic;
 
-namespace Daybreak.Models;
+namespace Daybreak.Models.Guildwars;
 
 public readonly struct GameData
 {

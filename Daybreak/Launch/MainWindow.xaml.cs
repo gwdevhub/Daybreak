@@ -123,17 +123,14 @@ public partial class MainWindow : MetroWindow
             },
             onNone: async () =>
             {
-                var maybeImageStream = await this.bloogumClient.GetRandomScreenShot().ConfigureAwait(true);
-                maybeImageStream.DoAny(
-                    onSome: (stream) =>
-                    {
-                        var bitmapImage = new BitmapImage();
-                        bitmapImage.BeginInit();
-                        bitmapImage.StreamSource = stream;
-                        bitmapImage.EndInit();
-                        this.SetImage(bitmapImage);
-                        this.CreditText = "http://bloogum.net/guildwars";
-                    });
+                var maybeImageSource = await this.bloogumClient.GetImage(true).ConfigureAwait(true);
+                if (maybeImageSource is null)
+                {
+                    return;
+                }
+
+                this.SetImage(maybeImageSource);
+                this.CreditText = "http://bloogum.net/guildwars";
             });
     }
 

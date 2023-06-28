@@ -208,6 +208,7 @@ public static class ProjectConfiguration
         services.AddScoped<ITradeHistoryDatabase, TradeHistoryDatabase>();
         services.AddScoped<IGuildwarsCopyService, GuildwarsCopyService>();
         services.AddScoped<IItemHashService, ItemHashService>();
+        services.AddScoped<IGuildwarsMemoryCache, GuildwarsMemoryCache>();
     }
 
     public static void RegisterViews(IViewProducer viewProducer)
@@ -328,6 +329,7 @@ public static class ProjectConfiguration
         optionsProducer.RegisterOptions<BrowserOptions>();
         optionsProducer.RegisterOptions<BuildSynchronizationOptions>();
         optionsProducer.RegisterOptions<FocusViewOptions>();
+        optionsProducer.RegisterOptions<MemoryReaderOptions>();
         optionsProducer.RegisterOptions<LauncherOptions>();
         optionsProducer.RegisterOptions<ToolboxOptions>();
         optionsProducer.RegisterOptions<UModOptions>();

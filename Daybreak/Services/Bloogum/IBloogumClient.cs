@@ -1,10 +1,9 @@
-﻿using System.Extensions;
-using System.IO;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace Daybreak.Services.Bloogum;
 
 public interface IBloogumClient
 {
-    Task<Optional<Stream>> GetRandomScreenShot();
+    Task<ImageSource?> GetImage(bool localized);
 }

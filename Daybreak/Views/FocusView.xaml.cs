@@ -27,7 +27,7 @@ public partial class FocusView : UserControl
 {
     private readonly IBuildTemplateManager buildTemplateManager;
     private readonly IApplicationLauncher applicationLauncher;
-    private readonly IGuildwarsMemoryReader guildwarsMemoryReader;
+    private readonly IGuildwarsMemoryCache guildwarsMemoryCache;
     private readonly IExperienceCalculator experienceCalculator;
     private readonly IViewManager viewManager;
     private readonly ILiveUpdateableOptions<FocusViewOptions> liveUpdateableOptions;
@@ -66,7 +66,7 @@ public partial class FocusView : UserControl
     public FocusView(
         IBuildTemplateManager buildTemplateManager,
         IApplicationLauncher applicationLauncher,
-        IGuildwarsMemoryReader guildwarsMemoryReader,
+        IGuildwarsMemoryCache guildwarsMemoryCache,
         IExperienceCalculator experienceCalculator,
         IViewManager viewManager,
         ILiveUpdateableOptions<FocusViewOptions> liveUpdateableOptions,
@@ -74,7 +74,7 @@ public partial class FocusView : UserControl
     {
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
         this.applicationLauncher = applicationLauncher.ThrowIfNull();
-        this.guildwarsMemoryReader = guildwarsMemoryReader.ThrowIfNull();
+        this.guildwarsMemoryCache = guildwarsMemoryCache.ThrowIfNull();
         this.experienceCalculator = experienceCalculator.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
         this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
@@ -97,11 +97,6 @@ public partial class FocusView : UserControl
         base.OnPropertyChanged(e);
     }
 
-    private TimeSpan GetMemoryReaderLatency()
-    {
-        return TimeSpan.FromMilliseconds(this.liveUpdateableOptions.Value.MemoryReaderFrequency);
-    }
-
     private async Task UpdatePathingData(CancellationToken cancellationToken)
     {
         if (this.applicationLauncher.IsGuildwarsRunning is false)
@@ -116,10 +111,8 @@ public partial class FocusView : UserControl
         {
             this.LoadingPathingData = true;
         });
-
-        await this.guildwarsMemoryReader.EnsureInitialized(cancellationToken);
         
-        var maybePathingData = await this.guildwarsMemoryReader.ReadPathingData(cancellationToken);
+        var maybePathingData = await this.guildwarsMemoryCache.ReadPathingData(cancellationToken);
         if (maybePathingData is not PathingData pathingData ||
             pathingData.Trapezoids is null ||
             pathingData.Trapezoids.Count == 0)
@@ -146,9 +139,7 @@ public partial class FocusView : UserControl
             return;
         }
 
-        await this.guildwarsMemoryReader.EnsureInitialized(this.cancellationTokenSource?.Token ?? CancellationToken.None).ConfigureAwait(true);
-
-        var maybeGameData = await this.guildwarsMemoryReader.ReadGameData(this.cancellationTokenSource?.Token ?? CancellationToken.None).ConfigureAwait(true);
+        var maybeGameData = await this.guildwarsMemoryCache.ReadGameData(this.cancellationTokenSource?.Token ?? CancellationToken.None).ConfigureAwait(true);
         if (maybeGameData is not GameData gameData)
         {
             this.MainPlayerDataValid = false;
@@ -168,7 +159,7 @@ public partial class FocusView : UserControl
 
         this.GameData = gameData;
         this.MainPlayerDataValid = true;
-        var pathingMeta = await this.guildwarsMemoryReader.ReadPathingMetaData(this.cancellationTokenSource?.Token ?? CancellationToken.None);
+        var pathingMeta = await this.guildwarsMemoryCache.ReadPathingMetaData(this.cancellationTokenSource?.Token ?? CancellationToken.None);
         if (pathingMeta?.TrapezoidCount != this.PathingData.Trapezoids?.Count &&
             this.loadingPathingDataCancellationTokenSource is null)
         {
@@ -190,7 +181,6 @@ public partial class FocusView : UserControl
 
     private async void PeriodicallyReadGameData(CancellationToken cancellationToken)
     {
-        var memoryReaderLatency = this.GetMemoryReaderLatency();
         while (!cancellationToken.IsCancellationRequested)
         {
             try
@@ -202,7 +192,7 @@ public partial class FocusView : UserControl
 
                 await Task.WhenAll(
                     this.UpdateGameData(),
-                    Task.Delay(memoryReaderLatency, cancellationToken)).ConfigureAwait(true);
+                    Task.Delay(1, cancellationToken)).ConfigureAwait(true);
 
             }
             catch (Exception ex)
@@ -223,7 +213,7 @@ public partial class FocusView : UserControl
                     return;
                 }
 
-                var readInventoryTask = this.guildwarsMemoryReader.ReadInventoryData(cancellationToken);
+                var readInventoryTask = this.guildwarsMemoryCache.ReadInventoryData(cancellationToken);
                 await Task.WhenAll(
                     readInventoryTask,
                     Task.Delay(1000, cancellationToken)).ConfigureAwait(true);
@@ -263,7 +253,6 @@ public partial class FocusView : UserControl
         this.cancellationTokenSource = null;
         this.loadingPathingDataCancellationTokenSource?.Cancel();
         this.loadingPathingDataCancellationTokenSource = null;
-        this.guildwarsMemoryReader?.Stop();
     }
 
     private void Browser_MaximizeClicked(object _, EventArgs e)
