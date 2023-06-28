@@ -11,11 +11,6 @@ public sealed class FocusViewOptions
     [OptionName(Name = "Enabled", Description = "If true, the focus view is enabled, showing live information from the game")]
     public bool Enabled { get; set; }
 
-    [JsonProperty(nameof(MemoryReaderFrequency))]
-    [OptionRange<double>(MinValue = 0, MaxValue = 1000)]
-    [OptionName(Name = "Memory Reader Frequency", Description = "Measured in ms. Sets how often should the launcher poll information from the game. Actual frequency is capped by the memory reading speed")]
-    public double MemoryReaderFrequency { get; set; } = 0;
-
     [OptionName(Name = "Inventory Component Enabled", Description = "If true, the focus view will show a component with the inventory contents")]
     public bool InventoryComponentVisible { get; set; }
 

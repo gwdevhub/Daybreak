@@ -24,7 +24,7 @@ public sealed class Map : IWikiEntity
     public static readonly Map TheWilds = new() { Id = 11, Name = "The Wilds", WikiUrl = "https://wiki.guildwars.com/wiki/The_Wilds" };
     public static readonly Map AuroraGlade = new() { Id = 12, Name = "Aurora Glade", WikiUrl = "https://wiki.guildwars.com/wiki/Aurora_Glade" };
     public static readonly Map DiessaLowlands = new() { Id = 13, Name = "Diessa Lowlands", WikiUrl = "https://wiki.guildwars.com/wiki/Diessa_Lowlands" };
-    public static readonly Map GatesofKryta = new() { Id = 14, Name = "Gates of Kryta", WikiUrl = "https://wiki.guildwars.com/wiki/Gates_of_Kryta" };
+    public static readonly Map GatesOfKryta = new() { Id = 14, Name = "Gates of Kryta", WikiUrl = "https://wiki.guildwars.com/wiki/Gates_of_Kryta" };
     public static readonly Map DAlessioSeaboard = new() { Id = 15, Name = "D'Alessio Seaboard", WikiUrl = "https://wiki.guildwars.com/wiki/D'Alessio_Seaboard" };
     public static readonly Map DivinityCoast = new() { Id = 16, Name = "Divinity Coast", WikiUrl = "https://wiki.guildwars.com/wiki/Divinity_Coast" };
     public static readonly Map TalmarkWilderness = new() { Id = 17, Name = "Talmark Wilderness", WikiUrl = "https://wiki.guildwars.com/wiki/Talmark_Wilderness" };
@@ -40,7 +40,7 @@ public sealed class Map : IWikiEntity
     public static readonly Map GriffonsMouth = new() { Id = 27, Name = "Griffons Mouth", WikiUrl = "https://wiki.guildwars.com/wiki/Griffons_Mouth" };
     public static readonly Map TheGreatNorthernWall = new() { Id = 28, Name = "The Great Northern Wall", WikiUrl = "https://wiki.guildwars.com/wiki/The_Great_Northern_Wall" };
     public static readonly Map FortRanik = new() { Id = 29, Name = "Fort Ranik", WikiUrl = "https://wiki.guildwars.com/wiki/Fort_Ranik" };
-    public static readonly Map RuinsofSurmia = new() { Id = 30, Name = "Ruins of Surmia", WikiUrl = "https://wiki.guildwars.com/wiki/Ruins_of_Surmia" };
+    public static readonly Map RuinsOfSurmia = new() { Id = 30, Name = "Ruins of Surmia", WikiUrl = "https://wiki.guildwars.com/wiki/Ruins_of_Surmia" };
     public static readonly Map XaquangSkyway = new() { Id = 31, Name = "Xaquang Skyway", WikiUrl = "https://wiki.guildwars.com/wiki/Xaquang_Skyway" };
     public static readonly Map NolaniAcademy = new() { Id = 32, Name = "Nolani Academy", WikiUrl = "https://wiki.guildwars.com/wiki/Nolani_Academy" };
     public static readonly Map OldAscalon = new() { Id = 33, Name = "Old Ascalon", WikiUrl = "https://wiki.guildwars.com/wiki/Old_Ascalon" };
@@ -59,10 +59,10 @@ public sealed class Map : IWikiEntity
     public static readonly Map TheFalls = new() { Id = 46, Name = "The Falls", WikiUrl = "https://wiki.guildwars.com/wiki/The_Falls" };
     public static readonly Map DryTop = new() { Id = 47, Name = "Dry Top", WikiUrl = "https://wiki.guildwars.com/wiki/Dry_Top" };
     public static readonly Map TangleRoot = new() { Id = 48, Name = "Tangle Root", WikiUrl = "https://wiki.guildwars.com/wiki/Tangle_Root" };
-    public static readonly Map HengeofDenraviOutpost = new() { Id = 49, Name = "Henge of Denravi", WikiUrl = "https://wiki.guildwars.com/wiki/Henge_of_Denravi" };
+    public static readonly Map HengeOfDenraviOutpost = new() { Id = 49, Name = "Henge of Denravi", WikiUrl = "https://wiki.guildwars.com/wiki/Henge_of_Denravi" };
     public static readonly Map SenjisCornerOutpost = new() { Id = 50, Name = "Senji's Corner", WikiUrl = "https://wiki.guildwars.com/wiki/Senji's_Corner" };
     public static readonly Map BurningIsleOutpost = new() { Id = 52, Name = "Burning Isle", WikiUrl = "https://wiki.guildwars.com/wiki/Burning_Isle" };
-    public static readonly Map TearsoftheFallen = new() { Id = 53, Name = "Tears of the Fallen", WikiUrl = "https://wiki.guildwars.com/wiki/Tears_of_the_Fallen" };
+    public static readonly Map TearsOfTheFallen = new() { Id = 53, Name = "Tears of the Fallen", WikiUrl = "https://wiki.guildwars.com/wiki/Tears_of_the_Fallen" };
     public static readonly Map ScoundrelsRise = new() { Id = 54, Name = "Scoundrel's Rise", WikiUrl = "https://wiki.guildwars.com/wiki/Scoundrel's_Rise" };
     public static readonly Map LionsArchOutpost = new() { Id = 55, Name = "Lions Arch", WikiUrl = "https://wiki.guildwars.com/wiki/Lions_Arch" };
     public static readonly Map CursedLands = new() { Id = 56, Name = "Cursed Lands", WikiUrl = "https://wiki.guildwars.com/wiki/Cursed_Lands" };
@@ -79,19 +79,19 @@ public sealed class Map : IWikiEntity
     public static readonly Map FrozenIsle = new() { Id = 68, Name = "Frozen Isle", WikiUrl = "https://wiki.guildwars.com/wiki/Frozen_Isle" };
     public static readonly Map NomadsIsle = new() { Id = 69, Name = "Nomads Isle", WikiUrl = "https://wiki.guildwars.com/wiki/Nomads_Isle" };
     public static readonly Map DruidsIsle = new() { Id = 70, Name = "Druids Isle", WikiUrl = "https://wiki.guildwars.com/wiki/Druids_Isle" };
-    public static readonly Map IsleoftheDeadguildhall = new() { Id = 71, Name = "Isle of the Dead", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_the_Dead" };
+    public static readonly Map IsleOfTheDeadGuildHall = new() { Id = 71, Name = "Isle of the Dead", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_the_Dead" };
     public static readonly Map TheUnderworld = new() { Id = 72, Name = "The Underworld", WikiUrl = "https://wiki.guildwars.com/wiki/The_Underworld" };
     public static readonly Map RiversideProvince = new() { Id = 73, Name = "Riverside Province", WikiUrl = "https://wiki.guildwars.com/wiki/Riverside_Province" };
-    public static readonly Map TheHallofHeroesarenaMission = new() { Id = 74, Name = "The Hall of Heroes", WikiUrl = "https://wiki.guildwars.com/wiki/The_Hall_of_Heroes" };
+    public static readonly Map TheHallOfHeroesArenaMission = new() { Id = 74, Name = "The Hall of Heroes", WikiUrl = "https://wiki.guildwars.com/wiki/The_Hall_of_Heroes" };
     public static readonly Map BrokenTowerMission = new() { Id = 76, Name = "Broken Tower", WikiUrl = "https://wiki.guildwars.com/wiki/Broken_Tower" };
-    public static readonly Map HousezuHeltzerOutpost = new() { Id = 77, Name = "House zu Heltzer", WikiUrl = "https://wiki.guildwars.com/wiki/House_zu_Heltzer" };
-    public static readonly Map TheCourtyardarenaMission = new() { Id = 78, Name = "The Courtyard", WikiUrl = "https://wiki.guildwars.com/wiki/The_Courtyard" };
+    public static readonly Map HouseZuHeltzerOutpost = new() { Id = 77, Name = "House zu Heltzer", WikiUrl = "https://wiki.guildwars.com/wiki/House_zu_Heltzer" };
+    public static readonly Map TheCourtyardArenaMission = new() { Id = 78, Name = "The Courtyard", WikiUrl = "https://wiki.guildwars.com/wiki/The_Courtyard" };
     public static readonly Map UnholyTemplesMission = new() { Id = 79, Name = "Unholy Temples", WikiUrl = "https://wiki.guildwars.com/wiki/Unholy_Temples" };
     public static readonly Map BurialMoundsMission = new() { Id = 80, Name = "Burial Mounds", WikiUrl = "https://wiki.guildwars.com/wiki/Burial_Mounds" };
     public static readonly Map AscalonCityOutpost = new() { Id = 81, Name = "Ascalon City", WikiUrl = "https://wiki.guildwars.com/wiki/Ascalon_City" };
-    public static readonly Map TombofthePrimevalKings = new() { Id = 82, Name = "Tomb of the Primeval Kings", WikiUrl = "https://wiki.guildwars.com/wiki/Tomb_of_the_Primeval_Kings" };
+    public static readonly Map TombOfThePrimevalKings = new() { Id = 82, Name = "Tomb of the Primeval Kings", WikiUrl = "https://wiki.guildwars.com/wiki/Tomb_of_the_Primeval_Kings" };
     public static readonly Map TheVaultMission = new() { Id = 83, Name = "The Vault", WikiUrl = "https://wiki.guildwars.com/wiki/The_Vault" };
-    public static readonly Map TheUnderworldarenaMission = new() { Id = 84, Name = "The Underworld", WikiUrl = "https://wiki.guildwars.com/wiki/The_Underworld" };
+    public static readonly Map TheUnderworldArenaMission = new() { Id = 84, Name = "The Underworld", WikiUrl = "https://wiki.guildwars.com/wiki/The_Underworld" };
     public static readonly Map AscalonArena = new() { Id = 85, Name = "Ascalon Arena", WikiUrl = "https://wiki.guildwars.com/wiki/Ascalon_Arena" };
     public static readonly Map SacredTemplesMission = new() { Id = 86, Name = "Sacred Temples", WikiUrl = "https://wiki.guildwars.com/wiki/Sacred_Temples" };
     public static readonly Map Icedome = new() { Id = 87, Name = "Icedome", WikiUrl = "https://wiki.guildwars.com/wiki/Icedome" };
@@ -123,13 +123,13 @@ public sealed class Map : IWikiEntity
     public static readonly Map ProphetsPath = new() { Id = 113, Name = "Prophet's Path", WikiUrl = "https://wiki.guildwars.com/wiki/Prophet's_Path" };
     public static readonly Map SaltFlats = new() { Id = 114, Name = "Salt Flats", WikiUrl = "https://wiki.guildwars.com/wiki/Salt_Flats" };
     public static readonly Map SkywardReach = new() { Id = 115, Name = "Skyward Reach", WikiUrl = "https://wiki.guildwars.com/wiki/Skyward_Reach" };
-    public static readonly Map DunesofDespair = new() { Id = 116, Name = "Dunes of Despair", WikiUrl = "https://wiki.guildwars.com/wiki/Dunes_of_Despair" };
+    public static readonly Map DunesOfDespair = new() { Id = 116, Name = "Dunes of Despair", WikiUrl = "https://wiki.guildwars.com/wiki/Dunes_of_Despair" };
     public static readonly Map ThirstyRiver = new() { Id = 117, Name = "Thirsty River", WikiUrl = "https://wiki.guildwars.com/wiki/Thirsty_River" };
     public static readonly Map ElonaReach = new() { Id = 118, Name = "Elona Reach", WikiUrl = "https://wiki.guildwars.com/wiki/Elona_Reach" };
     public static readonly Map AuguryRockMission = new() { Id = 119, Name = "Augury Rock", WikiUrl = "https://wiki.guildwars.com/wiki/Augury_Rock" };
     public static readonly Map TheDragonsLair = new() { Id = 120, Name = "The Dragons Lair", WikiUrl = "https://wiki.guildwars.com/wiki/The_Dragons_Lair" };
     public static readonly Map PerditionRock = new() { Id = 121, Name = "Perdition Rock", WikiUrl = "https://wiki.guildwars.com/wiki/Perdition_Rock" };
-    public static readonly Map RingofFire = new() { Id = 122, Name = "Ring of Fire", WikiUrl = "https://wiki.guildwars.com/wiki/Ring_of_Fire" };
+    public static readonly Map RingOfFire = new() { Id = 122, Name = "Ring of Fire", WikiUrl = "https://wiki.guildwars.com/wiki/Ring_of_Fire" };
     public static readonly Map AbaddonsMouth = new() { Id = 123, Name = "Abaddons Mouth", WikiUrl = "https://wiki.guildwars.com/wiki/Abaddons_Mouth" };
     public static readonly Map HellsPrecipice = new() { Id = 124, Name = "Hell's Precipice", WikiUrl = "https://wiki.guildwars.com/wiki/Hell's_Precipice" };
     public static readonly Map GoldenGatesMission = new() { Id = 125, Name = "Golden Gates", WikiUrl = "https://wiki.guildwars.com/wiki/Golden_Gates" };
@@ -144,7 +144,7 @@ public sealed class Map : IWikiEntity
     public static readonly Map FrontierGateOutpost = new() { Id = 135, Name = "Frontier Gate", WikiUrl = "https://wiki.guildwars.com/wiki/Frontier_Gate" };
     public static readonly Map BeetletunOutpost = new() { Id = 136, Name = "Beetletun", WikiUrl = "https://wiki.guildwars.com/wiki/Beetletun" };
     public static readonly Map FishermensHavenOutpost = new() { Id = 137, Name = "Fishermen's Haven", WikiUrl = "https://wiki.guildwars.com/wiki/Fishermen's_Haven" };
-    public static readonly Map TempleoftheAges = new() { Id = 138, Name = "Temple of the Ages", WikiUrl = "https://wiki.guildwars.com/wiki/Temple_of_the_Ages" };
+    public static readonly Map TempleOfTheAges = new() { Id = 138, Name = "Temple of the Ages", WikiUrl = "https://wiki.guildwars.com/wiki/Temple_of_the_Ages" };
     public static readonly Map VentarisRefugeOutpost = new() { Id = 139, Name = "Ventari's Refuge", WikiUrl = "https://wiki.guildwars.com/wiki/Ventari's_Refuge" };
     public static readonly Map DruidsOverlookOutpost = new() { Id = 140, Name = "Druid's Overlook", WikiUrl = "https://wiki.guildwars.com/wiki/Druid's_Overlook" };
     public static readonly Map MaguumaStadeOutpost = new() { Id = 141, Name = "Maguuma Stade", WikiUrl = "https://wiki.guildwars.com/wiki/Maguuma_Stade" };
@@ -153,9 +153,9 @@ public sealed class Map : IWikiEntity
     public static readonly Map TheCatacombs = new() { Id = 145, Name = "The Catacombs", WikiUrl = "https://wiki.guildwars.com/wiki/The_Catacombs" };
     public static readonly Map LakesideCounty = new() { Id = 146, Name = "Lakeside County", WikiUrl = "https://wiki.guildwars.com/wiki/Lakeside_County" };
     public static readonly Map TheNorthlands = new() { Id = 147, Name = "The Northlands", WikiUrl = "https://wiki.guildwars.com/wiki/The_Northlands" };
-    public static readonly Map AscalonCitypresearing = new() { Id = 148, Name = "Ascalon City", WikiUrl = "https://wiki.guildwars.com/wiki/Ascalon_City" };
+    public static readonly Map AscalonCityPresearing = new() { Id = 148, Name = "Ascalon City", WikiUrl = "https://wiki.guildwars.com/wiki/Ascalon_City" };
     public static readonly Map AscalonAcademy = new() { Id = 149, Name = "Ascalon Academy", WikiUrl = "https://wiki.guildwars.com/wiki/Ascalon_Academy" };
-    public static readonly Map AscalonAcademyPvPbattleMission = new() { Id = 150, Name = "Ascalon Academy", WikiUrl = "https://wiki.guildwars.com/wiki/Ascalon_Academy" };
+    public static readonly Map AscalonAcademyPvPBattleMission = new() { Id = 150, Name = "Ascalon Academy", WikiUrl = "https://wiki.guildwars.com/wiki/Ascalon_Academy" };
     public static readonly Map AscalonAcademyunk = new() { Id = 151, Name = "Ascalon Academy", WikiUrl = "https://wiki.guildwars.com/wiki/Ascalon_Academy" };
     public static readonly Map HeroesAudienceOutpost = new() { Id = 152, Name = "Heroes' Audience", WikiUrl = "https://wiki.guildwars.com/wiki/Heroes'_Audience" };
     public static readonly Map SeekersPassageOutpost = new() { Id = 153, Name = "Seeker's Passage", WikiUrl = "https://wiki.guildwars.com/wiki/Seeker's_Passage" };
@@ -167,11 +167,11 @@ public sealed class Map : IWikiEntity
     public static readonly Map CopperhammerMinesOutpost = new() { Id = 159, Name = "Copperhammer Mines", WikiUrl = "https://wiki.guildwars.com/wiki/Copperhammer_Mines" };
     public static readonly Map GreenHillsCounty = new() { Id = 160, Name = "Green Hills County", WikiUrl = "https://wiki.guildwars.com/wiki/Green_Hills_County" };
     public static readonly Map WizardsFolly = new() { Id = 161, Name = "Wizard's Folly", WikiUrl = "https://wiki.guildwars.com/wiki/Wizard's_Folly" };
-    public static readonly Map RegentValleypreSearing = new() { Id = 162, Name = "Regent Valley", WikiUrl = "https://wiki.guildwars.com/wiki/Regent_Valley" };
+    public static readonly Map RegentValleyPreSearing = new() { Id = 162, Name = "Regent Valley", WikiUrl = "https://wiki.guildwars.com/wiki/Regent_Valley" };
     public static readonly Map TheBarradinEstateOutpost = new() { Id = 163, Name = "The Barradin Estate", WikiUrl = "https://wiki.guildwars.com/wiki/The_Barradin_Estate" };
     public static readonly Map AshfordAbbeyOutpost = new() { Id = 164, Name = "Ashford Abbey", WikiUrl = "https://wiki.guildwars.com/wiki/Ashford_Abbey" };
     public static readonly Map FoiblesFairOutpost = new() { Id = 165, Name = "Foible's Fair", WikiUrl = "https://wiki.guildwars.com/wiki/Foible's_Fair" };
-    public static readonly Map FortRanikpreSearingOutpost = new() { Id = 166, Name = "Fort Ranik", WikiUrl = "https://wiki.guildwars.com/wiki/Fort_Ranik" };
+    public static readonly Map FortRanikPreSearingOutpost = new() { Id = 166, Name = "Fort Ranik", WikiUrl = "https://wiki.guildwars.com/wiki/Fort_Ranik" };
     public static readonly Map BurningIsleMission = new() { Id = 167, Name = "Burning Isle", WikiUrl = "https://wiki.guildwars.com/wiki/Burning_Isle" };
     public static readonly Map DruidsIsleMission = new() { Id = 168, Name = "Druids Isle", WikiUrl = "https://wiki.guildwars.com/wiki/Druids_Isle" };
     public static readonly Map FrozenIsleMission = new() { Id = 169, Name = "Frozen Isle", WikiUrl = "https://wiki.guildwars.com/wiki/Frozen_Isle" };
@@ -179,11 +179,11 @@ public sealed class Map : IWikiEntity
     public static readonly Map HuntersIsleMission = new() { Id = 172, Name = "Hunter's Isle", WikiUrl = "https://wiki.guildwars.com/wiki/Hunter's_Isle" };
     public static readonly Map WizardsIsleMission = new() { Id = 173, Name = "Wizard's Isle", WikiUrl = "https://wiki.guildwars.com/wiki/Wizard's_Isle" };
     public static readonly Map NomadsIsleMission = new() { Id = 174, Name = "Nomad's Isle", WikiUrl = "https://wiki.guildwars.com/wiki/Nomad's_Isle" };
-    public static readonly Map IsleoftheDeadguildhallMission = new() { Id = 175, Name = "Isle of the Dead", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_the_Dead" };
+    public static readonly Map IsleOfTheDeadGuildHallMission = new() { Id = 175, Name = "Isle of the Dead", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_the_Dead" };
     public static readonly Map FrozenIsleOutpost = new() { Id = 176, Name = "Frozen Isle", WikiUrl = "https://wiki.guildwars.com/wiki/Frozen_Isle" };
     public static readonly Map NomadsIsleOutpost = new() { Id = 177, Name = "Nomad's Isle", WikiUrl = "https://wiki.guildwars.com/wiki/Nomad's_Isle" };
     public static readonly Map DruidsIsleOutpost = new() { Id = 178, Name = "Druid's Isle", WikiUrl = "https://wiki.guildwars.com/wiki/Druid's_Isle" };
-    public static readonly Map IsleoftheDeadguildhallOutpost = new() { Id = 179, Name = "Isle of the Dead", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_the_Dead" };
+    public static readonly Map IsleOfTheDeadGuildHallOutpost = new() { Id = 179, Name = "Isle of the Dead", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_the_Dead" };
     public static readonly Map FortKogaMission = new() { Id = 180, Name = "Fort Koga", WikiUrl = "https://wiki.guildwars.com/wiki/Fort_Koga" };
     public static readonly Map ShiverpeakArena = new() { Id = 181, Name = "Shiverpeak Arena", WikiUrl = "https://wiki.guildwars.com/wiki/Shiverpeak_Arena" };
     public static readonly Map AmnoonArenaMission = new() { Id = 182, Name = "Amnoon Arena", WikiUrl = "https://wiki.guildwars.com/wiki/Amnoon_Arena" };
@@ -241,29 +241,29 @@ public sealed class Map : IWikiEntity
     public static readonly Map TheUndercity = new() { Id = 241, Name = "The Undercity", WikiUrl = "https://wiki.guildwars.com/wiki/The_Undercity" };
     public static readonly Map ShingJeaMonasteryOutpost = new() { Id = 242, Name = "Shing Jea Monastery", WikiUrl = "https://wiki.guildwars.com/wiki/Shing_Jea_Monastery" };
     public static readonly Map ShingJeaArena = new() { Id = 243, Name = "Shing Jea Arena", WikiUrl = "https://wiki.guildwars.com/wiki/Shing_Jea_Arena" };
-    public static readonly Map Arborstoneexplorable = new() { Id = 244, Name = "Arborstone", WikiUrl = "https://wiki.guildwars.com/wiki/Arborstone" };
-    public static readonly Map MinisterChosEstateexplorable = new() { Id = 245, Name = "Minister Cho's Estate", WikiUrl = "https://wiki.guildwars.com/wiki/Minister_Cho's_Estate" };
-    public static readonly Map ZenDaijunexplorable = new() { Id = 246, Name = "Zen Daijun", WikiUrl = "https://wiki.guildwars.com/wiki/Zen_Daijun" };
-    public static readonly Map BoreasSeabedexplorable = new() { Id = 247, Name = "Boreas Seabed", WikiUrl = "https://wiki.guildwars.com/wiki/Boreas_Seabed" };
-    public static readonly Map GreatTempleofBalthazarOutpost = new() { Id = 248, Name = "Great Temple of Balthazar", WikiUrl = "https://wiki.guildwars.com/wiki/Great_Temple_of_Balthazar" };
+    public static readonly Map ArborstoneExplorable = new() { Id = 244, Name = "Arborstone", WikiUrl = "https://wiki.guildwars.com/wiki/Arborstone" };
+    public static readonly Map MinisterChosEstateExplorable = new() { Id = 245, Name = "Minister Cho's Estate", WikiUrl = "https://wiki.guildwars.com/wiki/Minister_Cho's_Estate" };
+    public static readonly Map ZenDaijunExplorable = new() { Id = 246, Name = "Zen Daijun", WikiUrl = "https://wiki.guildwars.com/wiki/Zen_Daijun" };
+    public static readonly Map BoreasSeabedExplorable = new() { Id = 247, Name = "Boreas Seabed", WikiUrl = "https://wiki.guildwars.com/wiki/Boreas_Seabed" };
+    public static readonly Map GreatTempleOfBalthazarOutpost = new() { Id = 248, Name = "Great Temple of Balthazar", WikiUrl = "https://wiki.guildwars.com/wiki/Great_Temple_of_Balthazar" };
     public static readonly Map TsumeiVillageOutpost = new() { Id = 249, Name = "Tsumei Village", WikiUrl = "https://wiki.guildwars.com/wiki/Tsumei_Village" };
     public static readonly Map SeitungHarborOutpost = new() { Id = 250, Name = "Seitung Harbor", WikiUrl = "https://wiki.guildwars.com/wiki/Seitung_Harbor" };
     public static readonly Map RanMusuGardensOutpost = new() { Id = 251, Name = "Ran Musu Gardens", WikiUrl = "https://wiki.guildwars.com/wiki/Ran_Musu_Gardens" };
     public static readonly Map LinnokCourtyard = new() { Id = 252, Name = "Linnok Courtyard", WikiUrl = "https://wiki.guildwars.com/wiki/Linnok_Courtyard" };
     public static readonly Map DwaynaVsGrenth = new() { Id = 253, Name = "Dwayna Vs Grenth", WikiUrl = "https://wiki.guildwars.com/wiki/Dwayna_Vs_Grenth" };
-    public static readonly Map SunjiangDistrictexplorable = new() { Id = 254, Name = "Sunjiang District", WikiUrl = "https://wiki.guildwars.com/wiki/Sunjiang_District" };
-    public static readonly Map NahpuiQuarterexplorable = new() { Id = 257, Name = "Nahpui Quarter", WikiUrl = "https://wiki.guildwars.com/wiki/Nahpui_Quarter" };
+    public static readonly Map SunjiangDistrictExplorable = new() { Id = 254, Name = "Sunjiang District", WikiUrl = "https://wiki.guildwars.com/wiki/Sunjiang_District" };
+    public static readonly Map NahpuiQuarterExplorable = new() { Id = 257, Name = "Nahpui Quarter", WikiUrl = "https://wiki.guildwars.com/wiki/Nahpui_Quarter" };
     public static readonly Map UrgozsWarren = new() { Id = 266, Name = "Urgozs Warren", WikiUrl = "https://wiki.guildwars.com/wiki/Urgozs_Warren" };
-    public static readonly Map TahnnakaiTempleexplorable = new() { Id = 267, Name = "Tahnnakai Temple", WikiUrl = "https://wiki.guildwars.com/wiki/Tahnnakai_Temple" };
+    public static readonly Map TahnnakaiTempleExplorable = new() { Id = 267, Name = "Tahnnakai Temple", WikiUrl = "https://wiki.guildwars.com/wiki/Tahnnakai_Temple" };
     public static readonly Map AltrummRuins = new() { Id = 270, Name = "Altrumm Ruins", WikiUrl = "https://wiki.guildwars.com/wiki/Altrumm_Ruins" };
     public static readonly Map ZosShivrosChannel = new() { Id = 273, Name = "Zos Shivros Channel", WikiUrl = "https://wiki.guildwars.com/wiki/Zos_Shivros_Channel" };
     public static readonly Map DragonsThroat = new() { Id = 274, Name = "Dragon's Throat", WikiUrl = "https://wiki.guildwars.com/wiki/Dragon's_Throat" };
-    public static readonly Map IsleofWeepingStoneOutpost = new() { Id = 275, Name = "Isle of Weeping Stone", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Weeping_Stone" };
-    public static readonly Map IsleofJadeOutpost = new() { Id = 276, Name = "Isle of Jade", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Jade" };
+    public static readonly Map IsleOfWeepingStoneOutpost = new() { Id = 275, Name = "Isle of Weeping Stone", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Weeping_Stone" };
+    public static readonly Map IsleOfJadeOutpost = new() { Id = 276, Name = "Isle of Jade", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Jade" };
     public static readonly Map HarvestTempleOutpost = new() { Id = 277, Name = "Harvest Temple", WikiUrl = "https://wiki.guildwars.com/wiki/Harvest_Temple" };
     public static readonly Map BreakerHollowOutpost = new() { Id = 278, Name = "Breaker Hollow", WikiUrl = "https://wiki.guildwars.com/wiki/Breaker_Hollow" };
     public static readonly Map LeviathanPitsOutpost = new() { Id = 279, Name = "Leviathan Pits", WikiUrl = "https://wiki.guildwars.com/wiki/Leviathan_Pits" };
-    public static readonly Map IsleoftheNameless = new() { Id = 280, Name = "Isle of the Nameless", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_the_Nameless" };
+    public static readonly Map IsleOfTheNameless = new() { Id = 280, Name = "Isle of the Nameless", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_the_Nameless" };
     public static readonly Map ZaishenChallengeOutpost = new() { Id = 281, Name = "Zaishen Challenge", WikiUrl = "https://wiki.guildwars.com/wiki/Zaishen_Challenge" };
     public static readonly Map ZaishenEliteOutpost = new() { Id = 282, Name = "Zaishen Elite", WikiUrl = "https://wiki.guildwars.com/wiki/Zaishen_Elite" };
     public static readonly Map MaatuKeepOutpost = new() { Id = 283, Name = "Maatu Keep", WikiUrl = "https://wiki.guildwars.com/wiki/Maatu_Keep" };
@@ -326,16 +326,16 @@ public sealed class Map : IWikiEntity
     public static readonly Map BrawlersPitMission = new() { Id = 352, Name = "Brawler's Pit", WikiUrl = "https://wiki.guildwars.com/wiki/Brawler's_Pit" };
     public static readonly Map PetrifiedArenaMission = new() { Id = 353, Name = "Petrified Arena", WikiUrl = "https://wiki.guildwars.com/wiki/Petrified_Arena" };
     public static readonly Map SeabedArenaMission = new() { Id = 354, Name = "Seabed Arena", WikiUrl = "https://wiki.guildwars.com/wiki/Seabed_Arena" };
-    public static readonly Map IsleofWeepingStoneMission = new() { Id = 355, Name = "Isle of Weeping Stone", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Weeping_Stone" };
-    public static readonly Map IsleofJadeMission = new() { Id = 356, Name = "Isle of Jade", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Jade" };
+    public static readonly Map IsleOfWeepingStoneMission = new() { Id = 355, Name = "Isle of Weeping Stone", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Weeping_Stone" };
+    public static readonly Map IsleOfJadeMission = new() { Id = 356, Name = "Isle of Jade", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Jade" };
     public static readonly Map ImperialIsleMission = new() { Id = 357, Name = "Imperial Isle", WikiUrl = "https://wiki.guildwars.com/wiki/Imperial_Isle" };
-    public static readonly Map IsleofMeditationMission = new() { Id = 358, Name = "Isle of Meditation", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Meditation" };
+    public static readonly Map IsleOfMeditationMission = new() { Id = 358, Name = "Isle of Meditation", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Meditation" };
     public static readonly Map ImperialIsleOutpost = new() { Id = 359, Name = "Imperial Isle", WikiUrl = "https://wiki.guildwars.com/wiki/Imperial_Isle" };
-    public static readonly Map IsleofMeditationOutpost = new() { Id = 360, Name = "Isle of Meditation", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Meditation" };
-    public static readonly Map IsleofWeepingStone = new() { Id = 361, Name = "Isle of Weeping Stone", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Weeping_Stone" };
-    public static readonly Map IsleofJade = new() { Id = 362, Name = "Isle of Jade", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Jade" };
+    public static readonly Map IsleOfMeditationOutpost = new() { Id = 360, Name = "Isle of Meditation", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Meditation" };
+    public static readonly Map IsleOfWeepingStone = new() { Id = 361, Name = "Isle of Weeping Stone", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Weeping_Stone" };
+    public static readonly Map IsleOfJade = new() { Id = 362, Name = "Isle of Jade", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Jade" };
     public static readonly Map ImperialIsle = new() { Id = 363, Name = "Imperial Isle", WikiUrl = "https://wiki.guildwars.com/wiki/Imperial_Isle" };
-    public static readonly Map IsleofMeditation = new() { Id = 364, Name = "Isle of Meditation", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Meditation" };
+    public static readonly Map IsleOfMeditation = new() { Id = 364, Name = "Isle of Meditation", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Meditation" };
     public static readonly Map ShingJeaArenaMission = new() { Id = 365, Name = "Shing Jea Arena", WikiUrl = "https://wiki.guildwars.com/wiki/Shing_Jea_Arena" };
     public static readonly Map DragonArena = new() { Id = 367, Name = "Dragon Arena", WikiUrl = "https://wiki.guildwars.com/wiki/Dragon_Arena" };
     public static readonly Map JahaiBluffs = new() { Id = 369, Name = "Jahai Bluffs", WikiUrl = "https://wiki.guildwars.com/wiki/Jahai_Bluffs" };
@@ -350,8 +350,8 @@ public sealed class Map : IWikiEntity
     public static readonly Map DejarinEstate = new() { Id = 379, Name = "Dejarin Estate", WikiUrl = "https://wiki.guildwars.com/wiki/Dejarin_Estate" };
     public static readonly Map ArkjokWard = new() { Id = 380, Name = "Arkjok Ward", WikiUrl = "https://wiki.guildwars.com/wiki/Arkjok_Ward" };
     public static readonly Map YohlonHavenOutpost = new() { Id = 381, Name = "Yohlon Haven", WikiUrl = "https://wiki.guildwars.com/wiki/Yohlon_Haven" };
-    public static readonly Map GandaratheMoonFortress = new() { Id = 382, Name = "Gandara", WikiUrl = "https://wiki.guildwars.com/wiki/Gandara" };
-    public static readonly Map TheFloodplainofMahnkelon = new() { Id = 383, Name = "The Floodplain of Mahnkelon", WikiUrl = "https://wiki.guildwars.com/wiki/The_Floodplain_of_Mahnkelon" };
+    public static readonly Map GandaraTheMoonFortress = new() { Id = 382, Name = "Gandara", WikiUrl = "https://wiki.guildwars.com/wiki/Gandara" };
+    public static readonly Map TheFloodplainOfMahnkelon = new() { Id = 383, Name = "The Floodplain of Mahnkelon", WikiUrl = "https://wiki.guildwars.com/wiki/The_Floodplain_of_Mahnkelon" };
     public static readonly Map LionsArchSunspearsinKryta = new() { Id = 385, Name = "Lion's Arch", WikiUrl = "https://wiki.guildwars.com/wiki/Lion's_Arch" };
     public static readonly Map TuraisProcession = new() { Id = 386, Name = "Turai's Procession", WikiUrl = "https://wiki.guildwars.com/wiki/Turai's_Procession" };
     public static readonly Map SunspearSanctuaryOutpost = new() { Id = 387, Name = "Sunspear Sanctuary", WikiUrl = "https://wiki.guildwars.com/wiki/Sunspear_Sanctuary" };
@@ -360,27 +360,27 @@ public sealed class Map : IWikiEntity
     public static readonly Map JadeFlatsKurzickOutpost = new() { Id = 390, Name = "Jade Flats (Kurzick)", WikiUrl = "https://wiki.guildwars.com/wiki/Jade_Flats_(Kurzick)" };
     public static readonly Map JadeFlatsLuxonOutpost = new() { Id = 391, Name = "Jade Flats (Luxon)", WikiUrl = "https://wiki.guildwars.com/wiki/Jade_Flats_(Luxon)" };
     public static readonly Map YatendiCanyons = new() { Id = 392, Name = "Yatendi Canyons", WikiUrl = "https://wiki.guildwars.com/wiki/Yatendi_Canyons" };
-    public static readonly Map ChantryofSecretsOutpost = new() { Id = 393, Name = "Chantry of Secrets", WikiUrl = "https://wiki.guildwars.com/wiki/Chantry_of_Secrets" };
-    public static readonly Map GardenofSeborhin = new() { Id = 394, Name = "Garden of Seborhin", WikiUrl = "https://wiki.guildwars.com/wiki/Garden_of_Seborhin" };
-    public static readonly Map HoldingsofChokhin = new() { Id = 395, Name = "Holdings of Chokhin", WikiUrl = "https://wiki.guildwars.com/wiki/Holdings_of_Chokhin" };
+    public static readonly Map ChantryOfSecretsOutpost = new() { Id = 393, Name = "Chantry of Secrets", WikiUrl = "https://wiki.guildwars.com/wiki/Chantry_of_Secrets" };
+    public static readonly Map GardenOfSeborhin = new() { Id = 394, Name = "Garden of Seborhin", WikiUrl = "https://wiki.guildwars.com/wiki/Garden_of_Seborhin" };
+    public static readonly Map HoldingsOfChokhin = new() { Id = 395, Name = "Holdings of Chokhin", WikiUrl = "https://wiki.guildwars.com/wiki/Holdings_of_Chokhin" };
     public static readonly Map MihanuTownshipOutpost = new() { Id = 396, Name = "Mihanu Township", WikiUrl = "https://wiki.guildwars.com/wiki/Mihanu_Township" };
     public static readonly Map VehjinMines = new() { Id = 397, Name = "Vehjin Mines", WikiUrl = "https://wiki.guildwars.com/wiki/Vehjin_Mines" };
     public static readonly Map BasaltGrottoOutpost = new() { Id = 398, Name = "Basalt Grotto", WikiUrl = "https://wiki.guildwars.com/wiki/Basalt_Grotto" };
     public static readonly Map ForumHighlands = new() { Id = 399, Name = "Forum Highlands", WikiUrl = "https://wiki.guildwars.com/wiki/Forum_Highlands" };
-    public static readonly Map KainengCenterSunspearsinCantha = new() { Id = 400, Name = "Kaineng Center", WikiUrl = "https://wiki.guildwars.com/wiki/Kaineng_Center" };
+    public static readonly Map KainengCenterSunspearsInCantha = new() { Id = 400, Name = "Kaineng Center", WikiUrl = "https://wiki.guildwars.com/wiki/Kaineng_Center" };
     public static readonly Map ResplendentMakuun = new() { Id = 401, Name = "Resplendent Makuun", WikiUrl = "https://wiki.guildwars.com/wiki/Resplendent_Makuun" };
     public static readonly Map ResplendentMakuun2 = new() { Id = 402, Name = "Resplendent Makuun", WikiUrl = "https://wiki.guildwars.com/wiki/Resplendent_Makuun" };
     public static readonly Map HonurHillOutpost = new() { Id = 403, Name = "Honur Hill", WikiUrl = "https://wiki.guildwars.com/wiki/Honur_Hill" };
-    public static readonly Map WildernessofBahdza = new() { Id = 404, Name = "Wilderness of Bahdza", WikiUrl = "https://wiki.guildwars.com/wiki/Wilderness_of_Bahdza" };
+    public static readonly Map WildernessOfBahdza = new() { Id = 404, Name = "Wilderness of Bahdza", WikiUrl = "https://wiki.guildwars.com/wiki/Wilderness_of_Bahdza" };
     public static readonly Map VehtendiValley = new() { Id = 405, Name = "Vehtendi Valley", WikiUrl = "https://wiki.guildwars.com/wiki/Vehtendi_Valley" };
     public static readonly Map YahnurMarketOutpost = new() { Id = 407, Name = "Yahnur Market", WikiUrl = "https://wiki.guildwars.com/wiki/Yahnur_Market" };
-    public static readonly Map TheHiddenCityofAhdashim = new() { Id = 408, Name = "The Hidden City of Ahdashim", WikiUrl = "https://wiki.guildwars.com/wiki/The_Hidden_City_of_Ahdashim" };
+    public static readonly Map TheHiddenCityOfAhdashim = new() { Id = 408, Name = "The Hidden City of Ahdashim", WikiUrl = "https://wiki.guildwars.com/wiki/The_Hidden_City_of_Ahdashim" };
     public static readonly Map TheKodashBazaarOutpost = new() { Id = 414, Name = "The Kodash Bazaar", WikiUrl = "https://wiki.guildwars.com/wiki/The_Kodash_Bazaar" };
     public static readonly Map LionsGate = new() { Id = 415, Name = "Lion's Gate", WikiUrl = "https://wiki.guildwars.com/wiki/Lion's_Gate" };
-    public static readonly Map TheMirrorofLyss = new() { Id = 416, Name = "The Mirror of Lyss", WikiUrl = "https://wiki.guildwars.com/wiki/The_Mirror_of_Lyss" };
+    public static readonly Map TheMirrorOfLyss = new() { Id = 416, Name = "The Mirror of Lyss", WikiUrl = "https://wiki.guildwars.com/wiki/The_Mirror_of_Lyss" };
     public static readonly Map SecuretheRefuge = new() { Id = 420, Name = "Secure the Refuge", WikiUrl = "https://wiki.guildwars.com/wiki/Secure_the_Refuge" };
     public static readonly Map VentaCemetery = new() { Id = 421, Name = "Venta Cemetery", WikiUrl = "https://wiki.guildwars.com/wiki/Venta_Cemetery" };
-    public static readonly Map KamadanJewelofIstanexplorable = new() { Id = 422, Name = "Kamadan", WikiUrl = "https://wiki.guildwars.com/wiki/Kamadan" };
+    public static readonly Map KamadanJewelOfIstanExplorable = new() { Id = 422, Name = "Kamadan", WikiUrl = "https://wiki.guildwars.com/wiki/Kamadan" };
     public static readonly Map TheTribunal = new() { Id = 423, Name = "The Tribunal", WikiUrl = "https://wiki.guildwars.com/wiki/The_Tribunal" };
     public static readonly Map KodonurCrossroads = new() { Id = 424, Name = "Kodonur Crossroads", WikiUrl = "https://wiki.guildwars.com/wiki/Kodonur_Crossroads" };
     public static readonly Map RilohnRefuge = new() { Id = 425, Name = "Rilohn Refuge", WikiUrl = "https://wiki.guildwars.com/wiki/Rilohn_Refuge" };
@@ -388,50 +388,50 @@ public sealed class Map : IWikiEntity
     public static readonly Map ModdokCrevice = new() { Id = 427, Name = "Moddok Crevice", WikiUrl = "https://wiki.guildwars.com/wiki/Moddok_Crevice" };
     public static readonly Map TiharkOrchard = new() { Id = 428, Name = "Tihark Orchard", WikiUrl = "https://wiki.guildwars.com/wiki/Tihark_Orchard" };
     public static readonly Map Consulate = new() { Id = 429, Name = "Consulate", WikiUrl = "https://wiki.guildwars.com/wiki/Consulate" };
-    public static readonly Map PlainsofJarin = new() { Id = 430, Name = "Plains of Jarin", WikiUrl = "https://wiki.guildwars.com/wiki/Plains_of_Jarin" };
+    public static readonly Map PlainsOfJarin = new() { Id = 430, Name = "Plains of Jarin", WikiUrl = "https://wiki.guildwars.com/wiki/Plains_of_Jarin" };
     public static readonly Map SunspearGreatHallOutpost = new() { Id = 431, Name = "Sunspear Great Hall", WikiUrl = "https://wiki.guildwars.com/wiki/Sunspear_Great_Hall" };
-    public static readonly Map CliffsofDohjok = new() { Id = 432, Name = "Cliffs of Dohjok", WikiUrl = "https://wiki.guildwars.com/wiki/Cliffs_of_Dohjok" };
+    public static readonly Map CliffsOfDohjok = new() { Id = 432, Name = "Cliffs of Dohjok", WikiUrl = "https://wiki.guildwars.com/wiki/Cliffs_of_Dohjok" };
     public static readonly Map DzagonurBastion = new() { Id = 433, Name = "Dzagonur Bastion", WikiUrl = "https://wiki.guildwars.com/wiki/Dzagonur_Bastion" };
     public static readonly Map DashaVestibule = new() { Id = 434, Name = "Dasha Vestibule", WikiUrl = "https://wiki.guildwars.com/wiki/Dasha_Vestibule" };
-    public static readonly Map GrandCourtofSebelkeh = new() { Id = 435, Name = "Grand Court of Sebelkeh", WikiUrl = "https://wiki.guildwars.com/wiki/Grand_Court_of_Sebelkeh" };
+    public static readonly Map GrandCourtOfSebelkeh = new() { Id = 435, Name = "Grand Court of Sebelkeh", WikiUrl = "https://wiki.guildwars.com/wiki/Grand_Court_of_Sebelkeh" };
     public static readonly Map CommandPost = new() { Id = 436, Name = "Command Post", WikiUrl = "https://wiki.guildwars.com/wiki/Command_Post" };
     public static readonly Map JokosDomain = new() { Id = 437, Name = "Joko's Domain", WikiUrl = "https://wiki.guildwars.com/wiki/Joko's_Domain" };
     public static readonly Map BonePalaceOutpost = new() { Id = 438, Name = "Bone Palace", WikiUrl = "https://wiki.guildwars.com/wiki/Bone_Palace" };
     public static readonly Map TheRupturedHeart = new() { Id = 439, Name = "The Ruptured Heart", WikiUrl = "https://wiki.guildwars.com/wiki/The_Ruptured_Heart" };
-    public static readonly Map TheMouthofTormentOutpost = new() { Id = 440, Name = "The Mouth of Torment", WikiUrl = "https://wiki.guildwars.com/wiki/The_Mouth_of_Torment" };
+    public static readonly Map TheMouthOfTormentOutpost = new() { Id = 440, Name = "The Mouth of Torment", WikiUrl = "https://wiki.guildwars.com/wiki/The_Mouth_of_Torment" };
     public static readonly Map TheShatteredRavines = new() { Id = 441, Name = "The Shattered Ravines", WikiUrl = "https://wiki.guildwars.com/wiki/The_Shattered_Ravines" };
-    public static readonly Map LairoftheForgottenOutpost = new() { Id = 442, Name = "Lair of the Forgotten", WikiUrl = "https://wiki.guildwars.com/wiki/Lair_of_the_Forgotten" };
+    public static readonly Map LairOfTheForgottenOutpost = new() { Id = 442, Name = "Lair of the Forgotten", WikiUrl = "https://wiki.guildwars.com/wiki/Lair_of_the_Forgotten" };
     public static readonly Map PoisonedOutcrops = new() { Id = 443, Name = "Poisoned Outcrops", WikiUrl = "https://wiki.guildwars.com/wiki/Poisoned_Outcrops" };
     public static readonly Map TheSulfurousWastes = new() { Id = 444, Name = "The Sulfurous Wastes", WikiUrl = "https://wiki.guildwars.com/wiki/The_Sulfurous_Wastes" };
-    public static readonly Map TheEbonyCitadelofMallyxMission = new() { Id = 445, Name = "The Ebony Citadel of Mallyx", WikiUrl = "https://wiki.guildwars.com/wiki/The_Ebony_Citadel_of_Mallyx" };
+    public static readonly Map TheEbonyCitadelOfMallyxMission = new() { Id = 445, Name = "The Ebony Citadel of Mallyx", WikiUrl = "https://wiki.guildwars.com/wiki/The_Ebony_Citadel_of_Mallyx" };
     public static readonly Map TheAlkaliPan = new() { Id = 446, Name = "The Alkali Pan", WikiUrl = "https://wiki.guildwars.com/wiki/The_Alkali_Pan" };
     public static readonly Map ALandofHeroes = new() { Id = 447, Name = "Cliffs of Dohjok", WikiUrl = "https://wiki.guildwars.com/wiki/Cliffs_of_Dohjok" };
     public static readonly Map CrystalOverlook = new() { Id = 448, Name = "Crystal Overlook", WikiUrl = "https://wiki.guildwars.com/wiki/Crystal_Overlook" };
-    public static readonly Map KamadanJewelofIstanOutpost = new() { Id = 449, Name = "Kamadan", WikiUrl = "https://wiki.guildwars.com/wiki/Kamadan" };
-    public static readonly Map GateofTormentOutpost = new() { Id = 450, Name = "Gate of Torment", WikiUrl = "https://wiki.guildwars.com/wiki/Gate_of_Torment" };
+    public static readonly Map KamadanJewelOfIstanOutpost = new() { Id = 449, Name = "Kamadan", WikiUrl = "https://wiki.guildwars.com/wiki/Kamadan" };
+    public static readonly Map GateOfTormentOutpost = new() { Id = 450, Name = "Gate of Torment", WikiUrl = "https://wiki.guildwars.com/wiki/Gate_of_Torment" };
     public static readonly Map NightfallenGarden = new() { Id = 451, Name = "Nightfallen Garden", WikiUrl = "https://wiki.guildwars.com/wiki/Nightfallen_Garden" };
     public static readonly Map ChurrhirFields = new() { Id = 456, Name = "Churrhir Fields", WikiUrl = "https://wiki.guildwars.com/wiki/Churrhir_Fields" };
     public static readonly Map BeknurHarborOutpost = new() { Id = 457, Name = "Beknur Harbor", WikiUrl = "https://wiki.guildwars.com/wiki/Beknur_Harbor" };
     public static readonly Map TheUnderworld2 = new() { Id = 458, Name = "The Underworld", WikiUrl = "https://wiki.guildwars.com/wiki/The_Underworld" };
-    public static readonly Map HeartofAbaddon = new() { Id = 462, Name = "Heart of Abaddon", WikiUrl = "https://wiki.guildwars.com/wiki/Heart_of_Abaddon" };
+    public static readonly Map HeartOfAbaddon = new() { Id = 462, Name = "Heart of Abaddon", WikiUrl = "https://wiki.guildwars.com/wiki/Heart_of_Abaddon" };
     public static readonly Map TheUnderworld3 = new() { Id = 463, Name = "The Underworld", WikiUrl = "https://wiki.guildwars.com/wiki/The_Underworld" };
     public static readonly Map NightfallenCoast = new() { Id = 464, Name = "Nundu Bay", WikiUrl = "https://wiki.guildwars.com/wiki/Nundu_Bay" };
     public static readonly Map NightfallenJahai = new() { Id = 465, Name = "Nightfallen Jahai", WikiUrl = "https://wiki.guildwars.com/wiki/Nightfallen_Jahai" };
-    public static readonly Map DepthsofMadness = new() { Id = 466, Name = "Depths of Madness", WikiUrl = "https://wiki.guildwars.com/wiki/Depths_of_Madness" };
+    public static readonly Map DepthsOfMadness = new() { Id = 466, Name = "Depths of Madness", WikiUrl = "https://wiki.guildwars.com/wiki/Depths_of_Madness" };
     public static readonly Map RollerbeetleRacing = new() { Id = 467, Name = "Rollerbeetle Racing", WikiUrl = "https://wiki.guildwars.com/wiki/Rollerbeetle_Racing" };
-    public static readonly Map DomainofFear = new() { Id = 468, Name = "Domain of Fear", WikiUrl = "https://wiki.guildwars.com/wiki/Domain_of_Fear" };
-    public static readonly Map GateofFearOutpost = new() { Id = 469, Name = "Gate of Fear", WikiUrl = "https://wiki.guildwars.com/wiki/Gate_of_Fear" };
-    public static readonly Map DomainofPain = new() { Id = 470, Name = "Domain of Pain", WikiUrl = "https://wiki.guildwars.com/wiki/Domain_of_Pain" };
-    public static readonly Map BloodstoneFenquest = new() { Id = 471, Name = "Bloodstone Fen", WikiUrl = "https://wiki.guildwars.com/wiki/Bloodstone_Fen" };
-    public static readonly Map DomainofSecrets = new() { Id = 472, Name = "Domain of Secrets", WikiUrl = "https://wiki.guildwars.com/wiki/Domain_of_Secrets" };
-    public static readonly Map GateofSecretsOutpost = new() { Id = 473, Name = "Gate of Secrets", WikiUrl = "https://wiki.guildwars.com/wiki/Gate_of_Secrets" };
-    public static readonly Map DomainofAnguish = new() { Id = 474, Name = "Gate of Anguish", WikiUrl = "https://wiki.guildwars.com/wiki/Gate_of_Anguish" };
+    public static readonly Map DomainOfFear = new() { Id = 468, Name = "Domain of Fear", WikiUrl = "https://wiki.guildwars.com/wiki/Domain_of_Fear" };
+    public static readonly Map GateOfFearOutpost = new() { Id = 469, Name = "Gate of Fear", WikiUrl = "https://wiki.guildwars.com/wiki/Gate_of_Fear" };
+    public static readonly Map DomainOfPain = new() { Id = 470, Name = "Domain of Pain", WikiUrl = "https://wiki.guildwars.com/wiki/Domain_of_Pain" };
+    public static readonly Map BloodstoneFenQuest = new() { Id = 471, Name = "Bloodstone Fen", WikiUrl = "https://wiki.guildwars.com/wiki/Bloodstone_Fen" };
+    public static readonly Map DomainOfSecrets = new() { Id = 472, Name = "Domain of Secrets", WikiUrl = "https://wiki.guildwars.com/wiki/Domain_of_Secrets" };
+    public static readonly Map GateOfSecretsOutpost = new() { Id = 473, Name = "Gate of Secrets", WikiUrl = "https://wiki.guildwars.com/wiki/Gate_of_Secrets" };
+    public static readonly Map DomainOfAnguish = new() { Id = 474, Name = "Gate of Anguish", WikiUrl = "https://wiki.guildwars.com/wiki/Gate_of_Anguish" };
     public static readonly Map OozePitMission = new() { Id = 475, Name = "Oozez Pit", WikiUrl = "https://wiki.guildwars.com/wiki/Ooze_Pit" };
     public static readonly Map JennursHorde = new() { Id = 476, Name = "Jennur's Horde", WikiUrl = "https://wiki.guildwars.com/wiki/Jennur's_Horde" };
     public static readonly Map NunduBay = new() { Id = 477, Name = "Nundu Bay", WikiUrl = "https://wiki.guildwars.com/wiki/Nundu_Bay" };
-    public static readonly Map GateofDesolation = new() { Id = 478, Name = "Gate of Desolation", WikiUrl = "https://wiki.guildwars.com/wiki/Gate_of_Desolation" };
+    public static readonly Map GateOfDesolation = new() { Id = 478, Name = "Gate of Desolation", WikiUrl = "https://wiki.guildwars.com/wiki/Gate_of_Desolation" };
     public static readonly Map ChampionsDawnOutpost = new() { Id = 479, Name = "Champions Dawn", WikiUrl = "https://wiki.guildwars.com/wiki/Champions_Dawn" };
-    public static readonly Map RuinsofMorah = new() { Id = 480, Name = "Ruins of Morah", WikiUrl = "https://wiki.guildwars.com/wiki/Ruins_of_Morah" };
+    public static readonly Map RuinsOfMorah = new() { Id = 480, Name = "Ruins of Morah", WikiUrl = "https://wiki.guildwars.com/wiki/Ruins_of_Morah" };
     public static readonly Map FahranurTheFirstCity = new() { Id = 481, Name = "Fahranur", WikiUrl = "https://wiki.guildwars.com/wiki/Fahranur" };
     public static readonly Map BjoraMarches = new() { Id = 482, Name = "Bjora Marches", WikiUrl = "https://wiki.guildwars.com/wiki/Bjora_Marches" };
     public static readonly Map ZehlonReach = new() { Id = 483, Name = "Zehlon Reach", WikiUrl = "https://wiki.guildwars.com/wiki/Zehlon_Reach" };
@@ -441,19 +441,19 @@ public sealed class Map : IWikiEntity
     public static readonly Map BeknurHarbor = new() { Id = 487, Name = "Beknur Harbor", WikiUrl = "https://wiki.guildwars.com/wiki/Beknur_Harbor" };
     public static readonly Map MehtaniKeys = new() { Id = 488, Name = "Mehtani Keys", WikiUrl = "https://wiki.guildwars.com/wiki/Mehtani_Keys" };
     public static readonly Map KodlonuHamletOutpost = new() { Id = 489, Name = "Kodlonu Hamlet", WikiUrl = "https://wiki.guildwars.com/wiki/Kodlonu_Hamlet" };
-    public static readonly Map IslandofShehkah = new() { Id = 490, Name = "Island of Shehkah", WikiUrl = "https://wiki.guildwars.com/wiki/Island_of_Shehkah" };
+    public static readonly Map IslandOfShehkah = new() { Id = 490, Name = "Island of Shehkah", WikiUrl = "https://wiki.guildwars.com/wiki/Island_of_Shehkah" };
     public static readonly Map JokanurDiggings = new() { Id = 491, Name = "Jokanur Diggings", WikiUrl = "https://wiki.guildwars.com/wiki/Jokanur_Diggings" };
     public static readonly Map BlacktideDen = new() { Id = 492, Name = "Blacktide Den", WikiUrl = "https://wiki.guildwars.com/wiki/Blacktide_Den" };
     public static readonly Map ConsulateDocks = new() { Id = 493, Name = "Consulate Docks", WikiUrl = "https://wiki.guildwars.com/wiki/Consulate_Docks" };
-    public static readonly Map GateofPain = new() { Id = 494, Name = "Gate of Pain", WikiUrl = "https://wiki.guildwars.com/wiki/Gate_of_Pain" };
-    public static readonly Map GateofMadness = new() { Id = 495, Name = "Gate of Madness", WikiUrl = "https://wiki.guildwars.com/wiki/Gate_of_Madness" };
+    public static readonly Map GateOfPain = new() { Id = 494, Name = "Gate of Pain", WikiUrl = "https://wiki.guildwars.com/wiki/Gate_of_Pain" };
+    public static readonly Map GateOfMadness = new() { Id = 495, Name = "Gate of Madness", WikiUrl = "https://wiki.guildwars.com/wiki/Gate_of_Madness" };
     public static readonly Map AbaddonsGate = new() { Id = 496, Name = "Abaddons Gate", WikiUrl = "https://wiki.guildwars.com/wiki/Abaddons_Gate" };
     public static readonly Map SunspearArena = new() { Id = 497, Name = "Sunspear Arena", WikiUrl = "https://wiki.guildwars.com/wiki/Sunspear_Arena" };
     public static readonly Map IceCliffChasms = new() { Id = 498, Name = "Ice Cliff Chasms", WikiUrl = "https://wiki.guildwars.com/wiki/Ice_Cliff_Chasms" };
     public static readonly Map BokkaAmphitheatre = new() { Id = 500, Name = "Bokka Amphitheatre", WikiUrl = "https://wiki.guildwars.com/wiki/Bokka_Amphitheatre" };
     public static readonly Map RivenEarth = new() { Id = 501, Name = "Riven Earth", WikiUrl = "https://wiki.guildwars.com/wiki/Riven_Earth" };
     public static readonly Map TheAstralariumOutpost = new() { Id = 502, Name = "The Astralarium", WikiUrl = "https://wiki.guildwars.com/wiki/The_Astralarium" };
-    public static readonly Map ThroneofSecrets = new() { Id = 503, Name = "Throne Of Secrets", WikiUrl = "https://wiki.guildwars.com/wiki/Throne_of_Secrets" };
+    public static readonly Map ThroneOfSecrets = new() { Id = 503, Name = "Throne Of Secrets", WikiUrl = "https://wiki.guildwars.com/wiki/Throne_of_Secrets" };
     public static readonly Map ChurranuIslandArenaMission = new() { Id = 504, Name = "Churranu Island Arena", WikiUrl = "https://wiki.guildwars.com/wiki/Churranu_Island_Arena" };
     public static readonly Map ShingJeaMonasteryMission = new() { Id = 505, Name = "Shing Jea Monastery", WikiUrl = "https://wiki.guildwars.com/wiki/Shing_Jea_Monastery" };
     public static readonly Map HaijuLagoonMission = new() { Id = 506, Name = "Haiju Lagoon", WikiUrl = "https://wiki.guildwars.com/wiki/Haiju_Lagoon" };
@@ -465,21 +465,21 @@ public sealed class Map : IWikiEntity
     public static readonly Map DrakkarLake = new() { Id = 512, Name = "Drakkar Lake", WikiUrl = "https://wiki.guildwars.com/wiki/Drakkar_Lake" };
     public static readonly Map MinisterChosEstateMission2 = new() { Id = 514, Name = "Minister Cho's Estate", WikiUrl = "https://wiki.guildwars.com/wiki/Minister_Cho's_Estate" };
     public static readonly Map UnchartedIsleOutpost = new() { Id = 513, Name = "Uncharted Isle", WikiUrl = "https://wiki.guildwars.com/wiki/Uncharted_Isle" };
-    public static readonly Map IsleofWurmsOutpost = new() { Id = 530, Name = "Isle of Wurms", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Wurms" };
+    public static readonly Map IsleOfWurmsOutpost = new() { Id = 530, Name = "Isle of Wurms", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Wurms" };
     public static readonly Map UnchartedIsle = new() { Id = 531, Name = "Uncharted Isle", WikiUrl = "https://wiki.guildwars.com/wiki/Uncharted_Isle" };
-    public static readonly Map IsleofWurms = new() { Id = 532, Name = "Isle of Wurms", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Wurms" };
+    public static readonly Map IsleOfWurms = new() { Id = 532, Name = "Isle of Wurms", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Wurms" };
     public static readonly Map UnchartedIsleMission = new() { Id = 533, Name = "Uncharted Isle", WikiUrl = "https://wiki.guildwars.com/wiki/Uncharted_Isle" };
-    public static readonly Map IsleofWurmsMission = new() { Id = 534, Name = "Isle of Wurms", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Wurms" };
+    public static readonly Map IsleOfWurmsMission = new() { Id = 534, Name = "Isle of Wurms", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Wurms" };
     public static readonly Map SunspearArenaMission = new() { Id = 535, Name = "Sunspear Arena", WikiUrl = "https://wiki.guildwars.com/wiki/Sunspear_Arena" };
     public static readonly Map CorruptedIsleOutpost = new() { Id = 537, Name = "Corrupted Isle", WikiUrl = "https://wiki.guildwars.com/wiki/Corrupted_Isle" };
-    public static readonly Map IsleofSolitudeOutpost = new() { Id = 538, Name = "Isle of Solitude", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Solitude" };
+    public static readonly Map IsleOfSolitudeOutpost = new() { Id = 538, Name = "Isle of Solitude", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Solitude" };
     public static readonly Map CorruptedIsle = new() { Id = 539, Name = "Corrupted Isle", WikiUrl = "https://wiki.guildwars.com/wiki/Corrupted_Isle" };
-    public static readonly Map IsleofSolitude = new() { Id = 540, Name = "Isle of Solitude", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Solitude" };
+    public static readonly Map IsleOfSolitude = new() { Id = 540, Name = "Isle of Solitude", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Solitude" };
     public static readonly Map CorruptedIsleMission = new() { Id = 541, Name = "Corrupted Isle", WikiUrl = "https://wiki.guildwars.com/wiki/Corrupted_Isle" };
-    public static readonly Map IsleofSolitudeMission = new() { Id = 542, Name = "Isle of Solitude", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Solitude" };
+    public static readonly Map IsleOfSolitudeMission = new() { Id = 542, Name = "Isle of Solitude", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_Solitude" };
     public static readonly Map SunDocks = new() { Id = 543, Name = "Sun Docks", WikiUrl = "https://wiki.guildwars.com/wiki/Sun_Docks" };
     public static readonly Map ChahbekVillage = new() { Id = 544, Name = "Chahbek Village", WikiUrl = "https://wiki.guildwars.com/wiki/Chahbek_Village" };
-    public static readonly Map RemainsofSahlahja = new() { Id = 545, Name = "Remains of Sahlahja", WikiUrl = "https://wiki.guildwars.com/wiki/Remains_of_Sahlahja" };
+    public static readonly Map RemainsOfSahlahja = new() { Id = 545, Name = "Remains of Sahlahja", WikiUrl = "https://wiki.guildwars.com/wiki/Remains_of_Sahlahja" };
     public static readonly Map JagaMoraine = new() { Id = 546, Name = "Jaga Moraine", WikiUrl = "https://wiki.guildwars.com/wiki/Jaga_Moraine" };
     public static readonly Map BombardmentMission = new() { Id = 547, Name = "Bombardment", WikiUrl = "https://wiki.guildwars.com/wiki/Bombardment" };
     public static readonly Map NorrhartDomains = new() { Id = 548, Name = "Norrhart Domains", WikiUrl = "https://wiki.guildwars.com/wiki/Norrhart_Domains" };
@@ -491,7 +491,7 @@ public sealed class Map : IWikiEntity
     public static readonly Map DajkahInlet = new() { Id = 554, Name = "Dajkah Inlet", WikiUrl = "https://wiki.guildwars.com/wiki/Dajkah_Inlet" };
     public static readonly Map TheShadowNexus = new() { Id = 555, Name = "The Shadow Nexus", WikiUrl = "https://wiki.guildwars.com/wiki/The_Shadow_Nexus" };
     public static readonly Map SparkflySwamp = new() { Id = 556, Name = "Sparkfly Swamp", WikiUrl = "https://wiki.guildwars.com/wiki/Sparkfly_Swamp" };
-    public static readonly Map GateoftheNightfallenLandsOutpost = new() { Id = 559, Name = "Gate of the Nightfallen Lands", WikiUrl = "https://wiki.guildwars.com/wiki/Gate_of_the_Nightfallen_Lands" };
+    public static readonly Map GateOftheNightfallenLandsOutpost = new() { Id = 559, Name = "Gate of the Nightfallen Lands", WikiUrl = "https://wiki.guildwars.com/wiki/Gate_of_the_Nightfallen_Lands" };
     public static readonly Map CathedralofFlamesLevel1 = new() { Id = 560, Name = "Cathedral of Flames", WikiUrl = "https://wiki.guildwars.com/wiki/Cathedral_of_Flames" };
     public static readonly Map TheTroubledKeeper = new() { Id = 561, Name = "Gate of Torment", WikiUrl = "https://wiki.guildwars.com/wiki/Gate_of_Torment" };
     public static readonly Map VerdantCascades = new() { Id = 562, Name = "Verdant Cascades", WikiUrl = "https://wiki.guildwars.com/wiki/Verdant_Cascades" };
@@ -509,9 +509,9 @@ public sealed class Map : IWikiEntity
     public static readonly Map OolasLabLevel1 = new() { Id = 578, Name = "Oola's Lab", WikiUrl = "https://wiki.guildwars.com/wiki/Oola's_Lab" };
     public static readonly Map OolasLabLevel2 = new() { Id = 579, Name = "Oola's Lab: Level 2", WikiUrl = "https://wiki.guildwars.com/wiki/Oola's_Lab:_Level_2" };
     public static readonly Map OolasLabLevel3 = new() { Id = 580, Name = "Oola's Lab: Level 3", WikiUrl = "https://wiki.guildwars.com/wiki/Oola's_Lab:_Level_3" };
-    public static readonly Map ShardsofOrrLevel1 = new() { Id = 581, Name = "Shards of Orr", WikiUrl = "https://wiki.guildwars.com/wiki/Shards_of_Orr" };
-    public static readonly Map ShardsofOrrLevel2 = new() { Id = 582, Name = "Shards of Orr: Level 2", WikiUrl = "https://wiki.guildwars.com/wiki/Shards_of_Orr:_Level_2" };
-    public static readonly Map ShardsofOrrLevel3 = new() { Id = 583, Name = "Shards of Orr: Level 3", WikiUrl = "https://wiki.guildwars.com/wiki/Shards_of_Orr:_Level_3" };
+    public static readonly Map ShardsOfOrrLevel1 = new() { Id = 581, Name = "Shards of Orr", WikiUrl = "https://wiki.guildwars.com/wiki/Shards_of_Orr" };
+    public static readonly Map ShardsOfOrrLevel2 = new() { Id = 582, Name = "Shards of Orr: Level 2", WikiUrl = "https://wiki.guildwars.com/wiki/Shards_of_Orr:_Level_2" };
+    public static readonly Map ShardsOfOrrLevel3 = new() { Id = 583, Name = "Shards of Orr: Level 3", WikiUrl = "https://wiki.guildwars.com/wiki/Shards_of_Orr:_Level_3" };
     public static readonly Map ArachnisHauntLevel1 = new() { Id = 584, Name = "Arachni's Haunt", WikiUrl = "https://wiki.guildwars.com/wiki/Arachni's_Haunt" };
     public static readonly Map ArachnisHauntLevel2 = new() { Id = 585, Name = "Arachni's Haunt: Level 2", WikiUrl = "https://wiki.guildwars.com/wiki/Arachni's_Haunt:_Level_2" };
     public static readonly Map FetidRiverMission = new() { Id = 586, Name = "Fetid River", WikiUrl = "https://wiki.guildwars.com/wiki/Fetid_River" };
@@ -520,9 +520,9 @@ public sealed class Map : IWikiEntity
     public static readonly Map VloxenExcavationsLevel1 = new() { Id = 599, Name = "Vloxen Excavations", WikiUrl = "https://wiki.guildwars.com/wiki/Vloxen_Excavations" };
     public static readonly Map VloxenExcavationsLevel2 = new() { Id = 605, Name = "Vloxen Excavations: Level 2", WikiUrl = "https://wiki.guildwars.com/wiki/Vloxen_Excavations:_Level_2" };
     public static readonly Map VloxenExcavationsLevel3 = new() { Id = 606, Name = "Vloxen Excavations: Level 3", WikiUrl = "https://wiki.guildwars.com/wiki/Vloxen_Excavations:_Level_3" };
-    public static readonly Map HeartoftheShiverpeaksLevel1 = new() { Id = 607, Name = "Heart of the Shiverpeaks", WikiUrl = "https://wiki.guildwars.com/wiki/Heart_of_the_Shiverpeaks" };
-    public static readonly Map HeartoftheShiverpeaksLevel2 = new() { Id = 608, Name = "Heart of the Shiverpeaks: Level 2", WikiUrl = "https://wiki.guildwars.com/wiki/Heart_of_the_Shiverpeaks:_Level_2" };
-    public static readonly Map HeartoftheShiverpeaksLevel3 = new() { Id = 609, Name = "Heart of the Shiverpeaks: Level 3", WikiUrl = "https://wiki.guildwars.com/wiki/Heart_of_the_Shiverpeaks:_Level_3" };
+    public static readonly Map HeartOftheShiverpeaksLevel1 = new() { Id = 607, Name = "Heart of the Shiverpeaks", WikiUrl = "https://wiki.guildwars.com/wiki/Heart_of_the_Shiverpeaks" };
+    public static readonly Map HeartOftheShiverpeaksLevel2 = new() { Id = 608, Name = "Heart of the Shiverpeaks: Level 2", WikiUrl = "https://wiki.guildwars.com/wiki/Heart_of_the_Shiverpeaks:_Level_2" };
+    public static readonly Map HeartOftheShiverpeaksLevel3 = new() { Id = 609, Name = "Heart of the Shiverpeaks: Level 3", WikiUrl = "https://wiki.guildwars.com/wiki/Heart_of_the_Shiverpeaks:_Level_3" };
     public static readonly Map BloodstoneCavesLevel1 = new() { Id = 610, Name = "Bloodstone Caves", WikiUrl = "https://wiki.guildwars.com/wiki/Bloodstone_Caves" };
     public static readonly Map BloodstoneCavesLevel2 = new() { Id = 613, Name = "Bloodstone Caves: Level 2", WikiUrl = "https://wiki.guildwars.com/wiki/Bloodstone_Caves:_Level_2" };
     public static readonly Map BloodstoneCavesLevel3 = new() { Id = 614, Name = "Bloodstone Caves: Level 3", WikiUrl = "https://wiki.guildwars.com/wiki/Bloodstone_Caves:_Level_3" };
@@ -539,8 +539,8 @@ public sealed class Map : IWikiEntity
     public static readonly Map BattledepthsLevel1 = new() { Id = 625, Name = "Battledepths", WikiUrl = "https://wiki.guildwars.com/wiki/Battledepths" };
     public static readonly Map BattledepthsLevel2 = new() { Id = 626, Name = "Battledepths: Level 2", WikiUrl = "https://wiki.guildwars.com/wiki/Battledepths" };
     public static readonly Map BattledepthsLevel3 = new() { Id = 627, Name = "Battledepths: Level 3", WikiUrl = "https://wiki.guildwars.com/wiki/Battledepths" };
-    public static readonly Map SepulchreofDragrimmarLevel1 = new() { Id = 628, Name = "Sepulchre of Dragrimmar", WikiUrl = "https://wiki.guildwars.com/wiki/Sepulchre_of_Dragrimmar" };
-    public static readonly Map SepulchreofDragrimmarLevel2 = new() { Id = 629, Name = "Sepulchre of Dragrimmar: Level 2", WikiUrl = "https://wiki.guildwars.com/wiki/Sepulchre_of_Dragrimmar" };
+    public static readonly Map SepulchreOfDragrimmarLevel1 = new() { Id = 628, Name = "Sepulchre of Dragrimmar", WikiUrl = "https://wiki.guildwars.com/wiki/Sepulchre_of_Dragrimmar" };
+    public static readonly Map SepulchreOfDragrimmarLevel2 = new() { Id = 629, Name = "Sepulchre of Dragrimmar: Level 2", WikiUrl = "https://wiki.guildwars.com/wiki/Sepulchre_of_Dragrimmar" };
     public static readonly Map FrostmawsBurrowsLevel1 = new() { Id = 630, Name = "Frostmaws Burrows", WikiUrl = "https://wiki.guildwars.com/wiki/Frostmaws_Burrows" };
     public static readonly Map FrostmawsBurrowsLevel2 = new() { Id = 631, Name = "Frostmaws Burrows: Level 2", WikiUrl = "https://wiki.guildwars.com/wiki/Frostmaw's_Burrows" };
     public static readonly Map FrostmawsBurrowsLevel3 = new() { Id = 632, Name = "Frostmaws Burrows: Level 3", WikiUrl = "https://wiki.guildwars.com/wiki/Frostmaw's_Burrows" };
@@ -553,18 +553,18 @@ public sealed class Map : IWikiEntity
     public static readonly Map UmbralGrottoOutpost = new() { Id = 639, Name = "Umbral Grotto", WikiUrl = "https://wiki.guildwars.com/wiki/Umbral_Grotto" };
     public static readonly Map RataSumOutpost = new() { Id = 640, Name = "Rata Sum", WikiUrl = "https://wiki.guildwars.com/wiki/Rata_Sum" };
     public static readonly Map TarnishedHavenOutpost = new() { Id = 641, Name = "Tarnished Haven", WikiUrl = "https://wiki.guildwars.com/wiki/Tarnished_Haven" };
-    public static readonly Map EyeoftheNorthOutpost = new() { Id = 642, Name = "Eye of the North", WikiUrl = "https://wiki.guildwars.com/wiki/Eye_of_the_North" };
+    public static readonly Map EyeOfTheNorthOutpost = new() { Id = 642, Name = "Eye of the North", WikiUrl = "https://wiki.guildwars.com/wiki/Eye_of_the_North" };
     public static readonly Map SifhallaOutpost = new() { Id = 643, Name = "Sifhalla", WikiUrl = "https://wiki.guildwars.com/wiki/Sifhalla" };
     public static readonly Map GunnarsHoldOutpost = new() { Id = 644, Name = "Gunnar's Hold", WikiUrl = "https://wiki.guildwars.com/wiki/Gunnar's_Hold" };
     public static readonly Map OlafsteadOutpost = new() { Id = 645, Name = "Olafstead", WikiUrl = "https://wiki.guildwars.com/wiki/Olafstead" };
-    public static readonly Map HallofMonuments = new() { Id = 646, Name = "Hall of Monuments", WikiUrl = "https://wiki.guildwars.com/wiki/Hall_of_Monuments" };
+    public static readonly Map HallOfMonuments = new() { Id = 646, Name = "Hall of Monuments", WikiUrl = "https://wiki.guildwars.com/wiki/Hall_of_Monuments" };
     public static readonly Map DaladaUplands = new() { Id = 647, Name = "Dalada Uplands", WikiUrl = "https://wiki.guildwars.com/wiki/Dalada_Uplands" };
     public static readonly Map DoomloreShrineOutpost = new() { Id = 648, Name = "Doomlore Shrine", WikiUrl = "https://wiki.guildwars.com/wiki/Doomlore_Shrine" };
     public static readonly Map GrothmarWardowns = new() { Id = 649, Name = "Grothmar Wardowns", WikiUrl = "https://wiki.guildwars.com/wiki/Grothmar_Wardowns" };
     public static readonly Map LongeyesLedgeOutpost = new() { Id = 650, Name = "Longeye's Ledge", WikiUrl = "https://wiki.guildwars.com/wiki/Longeye's_Ledge" };
     public static readonly Map SacnothValley = new() { Id = 651, Name = "Sacnoth Valley", WikiUrl = "https://wiki.guildwars.com/wiki/Sacnoth_Valley" };
     public static readonly Map CentralTransferChamberOutpost = new() { Id = 652, Name = "Central Transfer Chamber", WikiUrl = "https://wiki.guildwars.com/wiki/Central_Transfer_Chamber" };
-    public static readonly Map CurseoftheNornbear = new() { Id = 653, Name = "Curse of the Nornbear", WikiUrl = "https://wiki.guildwars.com/wiki/Curse_of_the_Nornbear" };
+    public static readonly Map CurseOfTheNornbear = new() { Id = 653, Name = "Curse of the Nornbear", WikiUrl = "https://wiki.guildwars.com/wiki/Curse_of_the_Nornbear" };
     public static readonly Map BloodWashesBlood = new() { Id = 654, Name = "Blood Washes Blood", WikiUrl = "https://wiki.guildwars.com/wiki/Blood_Washes_Blood" };
     public static readonly Map AGateTooFarLevel1 = new() { Id = 655, Name = "A Gate Too Far", WikiUrl = "https://wiki.guildwars.com/wiki/A_Gate_Too_Far" };
     public static readonly Map AGateTooFarLevel2 = new() { Id = 656, Name = "A Gate Too Far", WikiUrl = "https://wiki.guildwars.com/wiki/A_Gate_Too_Far" };
@@ -572,19 +572,19 @@ public sealed class Map : IWikiEntity
     public static readonly Map TheElusiveGolemancerLevel1 = new() { Id = 658, Name = "Oola's Laboratory", WikiUrl = "https://wiki.guildwars.com/wiki/Oola's_Laboratory" };
     public static readonly Map TheElusiveGolemancerLevel2 = new() { Id = 659, Name = "Oola's Laboratory", WikiUrl = "https://wiki.guildwars.com/wiki/Oola's_Laboratory" };
     public static readonly Map TheElusiveGolemancerLevel3 = new() { Id = 660, Name = "Oola's Laboratory", WikiUrl = "https://wiki.guildwars.com/wiki/Oola's_Laboratory" };
-    public static readonly Map FindingtheBloodstoneLevel1 = new() { Id = 661, Name = "Finding The Bloodstone", WikiUrl = "https://wiki.guildwars.com/wiki/Finding_the_Bloodstone" };
-    public static readonly Map FindingtheBloodstoneLevel2 = new() { Id = 662, Name = "Finding The Bloodstone", WikiUrl = "https://wiki.guildwars.com/wiki/Finding_the_Bloodstone" };
-    public static readonly Map FindingtheBloodstoneLevel3 = new() { Id = 663, Name = "Finding The Bloodstone", WikiUrl = "https://wiki.guildwars.com/wiki/Finding_the_Bloodstone" };
+    public static readonly Map FindingTheBloodstoneLevel1 = new() { Id = 661, Name = "Finding The Bloodstone", WikiUrl = "https://wiki.guildwars.com/wiki/Finding_the_Bloodstone" };
+    public static readonly Map FindingTheBloodstoneLevel2 = new() { Id = 662, Name = "Finding The Bloodstone", WikiUrl = "https://wiki.guildwars.com/wiki/Finding_the_Bloodstone" };
+    public static readonly Map FindingTheBloodstoneLevel3 = new() { Id = 663, Name = "Finding The Bloodstone", WikiUrl = "https://wiki.guildwars.com/wiki/Finding_the_Bloodstone" };
     public static readonly Map GeniusOperatedLivingEnchantedManifestation = new() { Id = 664, Name = "Genius Operated Living Enchanted Manifestation", WikiUrl = "https://wiki.guildwars.com/wiki/Genius_Operated_Living_Enchanted_Manifestation" };
-    public static readonly Map AgainsttheCharr = new() { Id = 665, Name = "Against the Charr", WikiUrl = "https://wiki.guildwars.com/wiki/Against_the_Charr" };
-    public static readonly Map WarbandofBrothersLevel1 = new() { Id = 666, Name = "Warband of Brothers", WikiUrl = "https://wiki.guildwars.com/wiki/Warband_of_Brothers" };
-    public static readonly Map WarbandofBrothersLevel2 = new() { Id = 667, Name = "Warband of Brothers", WikiUrl = "https://wiki.guildwars.com/wiki/Warband_of_Brothers" };
-    public static readonly Map WarbandofBrothersLevel3 = new() { Id = 668, Name = "Warband of Brothers", WikiUrl = "https://wiki.guildwars.com/wiki/Warband_of_Brothers" };
-    public static readonly Map AssaultontheStronghold = new() { Id = 669, Name = "Freeing the Vanguard", WikiUrl = "https://wiki.guildwars.com/wiki/Assault_on_the_Stronghold" };
+    public static readonly Map AgainstTheCharr = new() { Id = 665, Name = "Against the Charr", WikiUrl = "https://wiki.guildwars.com/wiki/Against_the_Charr" };
+    public static readonly Map WarbandOfBrothersLevel1 = new() { Id = 666, Name = "Warband of Brothers", WikiUrl = "https://wiki.guildwars.com/wiki/Warband_of_Brothers" };
+    public static readonly Map WarbandOfBrothersLevel2 = new() { Id = 667, Name = "Warband of Brothers", WikiUrl = "https://wiki.guildwars.com/wiki/Warband_of_Brothers" };
+    public static readonly Map WarbandOfBrothersLevel3 = new() { Id = 668, Name = "Warband of Brothers", WikiUrl = "https://wiki.guildwars.com/wiki/Warband_of_Brothers" };
+    public static readonly Map AssaultOnTheStronghold = new() { Id = 669, Name = "Freeing the Vanguard", WikiUrl = "https://wiki.guildwars.com/wiki/Assault_on_the_Stronghold" };
     public static readonly Map DestructionsDepthsLevel1 = new() { Id = 670, Name = "Destruction's Depths", WikiUrl = "https://wiki.guildwars.com/wiki/Destruction's_Depths" };
     public static readonly Map DestructionsDepthsLevel2 = new() { Id = 671, Name = "Destruction's Depths", WikiUrl = "https://wiki.guildwars.com/wiki/Destruction's_Depths" };
     public static readonly Map DestructionsDepthsLevel3 = new() { Id = 672, Name = "Destruction's Depths", WikiUrl = "https://wiki.guildwars.com/wiki/Destruction's_Depths" };
-    public static readonly Map ATimeforHeroes = new() { Id = 673, Name = "A Time for Heroes", WikiUrl = "https://wiki.guildwars.com/wiki/A_Time_for_Heroes" };
+    public static readonly Map ATimeForHeroes = new() { Id = 673, Name = "A Time for Heroes", WikiUrl = "https://wiki.guildwars.com/wiki/A_Time_for_Heroes" };
     public static readonly Map WarbandTraining = new() { Id = 674, Name = "Steppe Practice", WikiUrl = "https://wiki.guildwars.com/wiki/Warband_Training" };
     public static readonly Map BorealStationOutpost = new() { Id = 675, Name = "Boreal Station", WikiUrl = "https://wiki.guildwars.com/wiki/Boreal_Station" };
     public static readonly Map CatacombsofKathandraxLevel3 = new() { Id = 676, Name = "Catacombs of Kathandrax: Level 3", WikiUrl = "https://wiki.guildwars.com/wiki/Catacombs_of_Kathandrax:_Level_3" };
@@ -610,7 +610,7 @@ public sealed class Map : IWikiEntity
     public static readonly Map ServicePracticeDummy = new() { Id = 697, Name = "The Eye of the North", WikiUrl = "https://wiki.guildwars.com/wiki/Eye_of_the_North_(outpost)" };
     public static readonly Map HeroTutorial = new() { Id = 698, Name = "Hero Tutorial", WikiUrl = "https://wiki.guildwars.com/wiki/Hero_Tutorial" };
     public static readonly Map TheNornFightingTournament = new() { Id = 699, Name = "The Norn Fighting Tournament", WikiUrl = "https://wiki.guildwars.com/wiki/The_Norn_Fighting_Tournament" };
-    public static readonly Map SecretLairoftheSnowmen = new() { Id = 701, Name = "Hundar's Resplendent Treasure Vault", WikiUrl = "" };
+    public static readonly Map SecretLairOftheSnowmen = new() { Id = 701, Name = "Hundar's Resplendent Treasure Vault", WikiUrl = "" };
     public static readonly Map NornBrawlingChampionship = new() { Id = 702, Name = "Norn Brawling Championship", WikiUrl = "https://wiki.guildwars.com/wiki/Norn_Brawling_Championship" };
     public static readonly Map KilroysPunchoutTraining = new() { Id = 703, Name = "Kilroys Punchout Training", WikiUrl = "" };
     public static readonly Map FronisIrontoesLairMission = new() { Id = 704, Name = "Fronis Irontoe's Lair", WikiUrl = "https://wiki.guildwars.com/wiki/Fronis_Irontoe's_Lair" };
@@ -630,25 +630,25 @@ public sealed class Map : IWikiEntity
     public static readonly Map SpecialOpsDragonsGullet = new() { Id = 728, Name = "(crash)", WikiUrl = "" };
     public static readonly Map SpecialOpsGrendichCourthouse = new() { Id = 729, Name = "Special Ops Grendich Courthouse", WikiUrl = "https://wiki.guildwars.com/wiki/Grendich_Courthouse" };
     public static readonly Map TheTenguAccords = new() { Id = 730, Name = "The Tengu Accords", WikiUrl = "https://wiki.guildwars.com/wiki/_The_Tengu_Accords" };
-    public static readonly Map TheBattleofJahai = new() { Id = 731, Name = "The Battle of Jahai", WikiUrl = "https://wiki.guildwars.com/wiki/The_Battle_of_Jahai" };
+    public static readonly Map TheBattleOfJahai = new() { Id = 731, Name = "The Battle of Jahai", WikiUrl = "https://wiki.guildwars.com/wiki/The_Battle_of_Jahai" };
     public static readonly Map TheFlightNorth = new() { Id = 732, Name = "The Flight North", WikiUrl = "https://wiki.guildwars.com/wiki/_The_Flight_North" };
-    public static readonly Map TheRiseoftheWhiteMantle = new() { Id = 733, Name = "The Rise of the White Mantle", WikiUrl = "https://wiki.guildwars.com/wiki/The_Rise_of_the_White_Mantle" };
-    public static readonly Map FindingtheBloodstoneMission = new() { Id = 734, Name = "Finding the Bloodstone Mission", WikiUrl = "https://wiki.guildwars.com/wiki/Finding_the_Bloodstone" };
+    public static readonly Map TheRiseOfTheWhiteMantle = new() { Id = 733, Name = "The Rise of the White Mantle", WikiUrl = "https://wiki.guildwars.com/wiki/The_Rise_of_the_White_Mantle" };
+    public static readonly Map FindingTheBloodstoneMission = new() { Id = 734, Name = "Finding the Bloodstone Mission", WikiUrl = "https://wiki.guildwars.com/wiki/Finding_the_Bloodstone" };
     public static readonly Map GeniusOperatedLivingEnchantedManifestationMission = new() { Id = 760, Name = "Genius Operated Living Enchanted Manifestation Mission", WikiUrl = "https://wiki.guildwars.com/wiki/Genius_Operated_Living_Enchanted_Manifestation" };
-    public static readonly Map AgainsttheCharrMission = new() { Id = 761, Name = "Against the Charr Mission", WikiUrl = "https://wiki.guildwars.com/wiki/Against_the_Charr" };
-    public static readonly Map WarbandofbrothersMission = new() { Id = 762, Name = "Warband of brothers Mission", WikiUrl = "https://wiki.guildwars.com/wiki/Warband_of_Brothers" };
-    public static readonly Map AssaultontheStrongholdMission = new() { Id = 763, Name = "Assault on the Stronghold Mission", WikiUrl = "https://wiki.guildwars.com/wiki/Assault_on_the_Stronghold" };
+    public static readonly Map AgainstTheCharrMission = new() { Id = 761, Name = "Against the Charr Mission", WikiUrl = "https://wiki.guildwars.com/wiki/Against_the_Charr" };
+    public static readonly Map WarbandOfBrothersMission = new() { Id = 762, Name = "Warband of brothers Mission", WikiUrl = "https://wiki.guildwars.com/wiki/Warband_of_Brothers" };
+    public static readonly Map AssaultOnTheStrongholdMission = new() { Id = 763, Name = "Assault on the Stronghold Mission", WikiUrl = "https://wiki.guildwars.com/wiki/Assault_on_the_Stronghold" };
     public static readonly Map DestructionsDepthsMission = new() { Id = 764, Name = "Destructions Depths Mission", WikiUrl = "https://wiki.guildwars.com/wiki/Destruction's_Depths" };
-    public static readonly Map ATimeforHeroesMission = new() { Id = 765, Name = "A Time for Heroes Mission", WikiUrl = "https://wiki.guildwars.com/wiki/A_Time_for_Heroes" };
-    public static readonly Map CurseoftheNornbearMission = new() { Id = 766, Name = "Curse of the Nornbear Mission", WikiUrl = "https://wiki.guildwars.com/wiki/Curse_of_the_Nornbear" };
+    public static readonly Map ATimeForHeroesMission = new() { Id = 765, Name = "A Time for Heroes Mission", WikiUrl = "https://wiki.guildwars.com/wiki/A_Time_for_Heroes" };
+    public static readonly Map CurseOfTheNornbearMission = new() { Id = 766, Name = "Curse of the Nornbear Mission", WikiUrl = "https://wiki.guildwars.com/wiki/Curse_of_the_Nornbear" };
     public static readonly Map BloodWashesBloodMission = new() { Id = 767, Name = "Blood Washes Blood Mission", WikiUrl = "https://wiki.guildwars.com/wiki/Blood_Washes_Blood" };
     public static readonly Map AGateTooFarMission = new() { Id = 768, Name = "A Gate Too Far Mission", WikiUrl = "https://wiki.guildwars.com/wiki/A_Gate_Too_Far" };
     public static readonly Map TheElusiveGolemancerMission = new() { Id = 769, Name = "The Elusive Golemancer Mission", WikiUrl = "https://wiki.guildwars.com/wiki/The_Elusive_Golemancer" };
-    public static readonly Map SecretLairoftheSnowmen2 = new() { Id = 770, Name = "Secret Lair of the Snowmen2", WikiUrl = "https://wiki.guildwars.com/wiki/Secret_Lair_of_the_Snowmen" };
-    public static readonly Map SecretLairoftheSnowmen3 = new() { Id = 782, Name = "Secret Lair of the Snowmen3", WikiUrl = "https://wiki.guildwars.com/wiki/Secret_Lair_of_the_Snowmen" };
-    public static readonly Map DroknarsForgecinematic = new() { Id = 783, Name = "Droknars Forge (cinematic)", WikiUrl = "https://wiki.guildwars.com/wiki/Droknar's_Forge" };
-    public static readonly Map IsleoftheNamelessPvP = new() { Id = 784, Name = "Isle of the Nameless PvP", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_the_Nameless_(PvP)" };
-    public static readonly Map TempleoftheAgesROX = new() { Id = 785, Name = "Temple of the Ages ROX", WikiUrl = "https://wiki.guildwars.com/wiki/Deactivating_R.O.X." };
+    public static readonly Map SecretLairOftheSnowmen2 = new() { Id = 770, Name = "Secret Lair of the Snowmen2", WikiUrl = "https://wiki.guildwars.com/wiki/Secret_Lair_of_the_Snowmen" };
+    public static readonly Map SecretLairOftheSnowmen3 = new() { Id = 782, Name = "Secret Lair of the Snowmen3", WikiUrl = "https://wiki.guildwars.com/wiki/Secret_Lair_of_the_Snowmen" };
+    public static readonly Map DroknarsForgeCinematic = new() { Id = 783, Name = "Droknars Forge (cinematic)", WikiUrl = "https://wiki.guildwars.com/wiki/Droknar's_Forge" };
+    public static readonly Map IsleOfTheNamelessPvP = new() { Id = 784, Name = "Isle of the Nameless PvP", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_the_Nameless_(PvP)" };
+    public static readonly Map TempleOfTheAgesROX = new() { Id = 785, Name = "Temple of the Ages ROX", WikiUrl = "https://wiki.guildwars.com/wiki/Deactivating_R.O.X." };
     public static readonly Map WajjunBazaarPOX = new() { Id = 789, Name = "Wajjun Bazaar POX", WikiUrl = "https://wiki.guildwars.com/wiki/Deactivating_P.O.X." };
     public static readonly Map BokkaAmphitheatreNOX = new() { Id = 790, Name = "Bokka Amphitheatre NOX", WikiUrl = "https://wiki.guildwars.com/wiki/Deactivating_N.O.X." };
     public static readonly Map SecretUndergroundLair = new() { Id = 791, Name = "Secret Underground Lair", WikiUrl = "https://wiki.guildwars.com/wiki/_Secret_Underground_Lair" };
@@ -665,14 +665,14 @@ public sealed class Map : IWikiEntity
     public static readonly Map AscalonCityWintersdayOutpost = new() { Id = 811, Name = "Ascalon City Wintersday (Outpost)", WikiUrl = "https://wiki.guildwars.com/wiki/Ascalon_City_(Wintersday)" };
     public static readonly Map DroknarsForgeHalloweenOutpost = new() { Id = 812, Name = "Droknars Forge Halloween (Outpost)", WikiUrl = "https://wiki.guildwars.com/wiki/Droknar's_Forge_(Halloween)" };
     public static readonly Map DroknarsForgeWintersdayOutpost = new() { Id = 813, Name = "Droknars Forge Wintersday (Outpost)", WikiUrl = "https://wiki.guildwars.com/wiki/Droknar's_Forge_(Halloween)" };
-    public static readonly Map TombofthePrimevalKingsHalloweenOutpost = new() { Id = 814, Name = "Tomb of the Primeval Kings Halloween (Outpost)", WikiUrl = "https://wiki.guildwars.com/wiki/Tomb_of_the_Primeval_Kings_(Halloween)" };
+    public static readonly Map TombOfThePrimevalKingsHalloweenOutpost = new() { Id = 814, Name = "Tomb of the Primeval Kings Halloween (Outpost)", WikiUrl = "https://wiki.guildwars.com/wiki/Tomb_of_the_Primeval_Kings_(Halloween)" };
     public static readonly Map ShingJeaMonasteryDragonFestivalOutpost = new() { Id = 815, Name = "Shing Jea Monastery Dragon Festival (Outpost)", WikiUrl = "https://wiki.guildwars.com/wiki/Shing_Jea_Monastery" };
     public static readonly Map ShingJeaMonasteryCanthanNewYearOutpost = new() { Id = 816, Name = "Shing Jea Monastery Canthan New Year (Outpost)", WikiUrl = "https://wiki.guildwars.com/wiki/Shing_Jea_Monastery" };
     public static readonly Map KainengCenterCanthanNewYearOutpost = new() { Id = 817, Name = "Kaineng Center Canthan New Year (Outpost)", WikiUrl = "https://wiki.guildwars.com/wiki/Kaineng_Center" };
-    public static readonly Map KamadanJewelofIstanHalloweenOutpost = new() { Id = 818, Name = "Kamadan Jewel of Istan Halloween (Outpost)", WikiUrl = "https://wiki.guildwars.com/wiki/Kamadan,_Jewel_of_Istan_(Halloween)" };
-    public static readonly Map KamadanJewelofIstanWintersdayOutpost = new() { Id = 819, Name = "Kamadan Jewel of Istan Wintersday (Outpost)", WikiUrl = "https://wiki.guildwars.com/wiki/Kamadan,_Jewel_of_Istan_(Wintersday)" };
-    public static readonly Map KamadanJewelofIstanCanthanNewYearOutpost = new() { Id = 820, Name = "Kamadan Jewel of Istan Canthan New Year (Outpost)", WikiUrl = "https://wiki.guildwars.com/wiki/Kamadan,_Jewel_of_Istan" };
-    public static readonly Map EyeoftheNorthOutpostWintersdayOutpost = new() { Id = 821, Name = "Eyeofthe North Outpost Wintersday (Outpost)", WikiUrl = "https://wiki.guildwars.com/wiki/Eye_of_the_North_(outpost)_(Wintersday)" };
+    public static readonly Map KamadanJewelOfIstanHalloweenOutpost = new() { Id = 818, Name = "Kamadan Jewel of Istan Halloween (Outpost)", WikiUrl = "https://wiki.guildwars.com/wiki/Kamadan,_Jewel_of_Istan_(Halloween)" };
+    public static readonly Map KamadanJewelOfIstanWintersdayOutpost = new() { Id = 819, Name = "Kamadan Jewel of Istan Wintersday (Outpost)", WikiUrl = "https://wiki.guildwars.com/wiki/Kamadan,_Jewel_of_Istan_(Wintersday)" };
+    public static readonly Map KamadanJewelOfIstanCanthanNewYearOutpost = new() { Id = 820, Name = "Kamadan Jewel of Istan Canthan New Year (Outpost)", WikiUrl = "https://wiki.guildwars.com/wiki/Kamadan,_Jewel_of_Istan" };
+    public static readonly Map EyeOfTheNorthOutpostWintersdayOutpost = new() { Id = 821, Name = "Eyeofthe North Outpost Wintersday (Outpost)", WikiUrl = "https://wiki.guildwars.com/wiki/Eye_of_the_North_(outpost)_(Wintersday)" };
     public static readonly Map WarinKrytaTalmarkWilderness = new() { Id = 822, Name = "War in Kryta Talmark Wilderness", WikiUrl = "https://wiki.guildwars.com/wiki/Talmark_Wilderness_(War_in_Kryta)" };
     public static readonly Map WarinKrytaTrialofZinn = new() { Id = 838, Name = "War in Kryta Trialof Zinn", WikiUrl = "https://wiki.guildwars.com/wiki/Trial_of_Zinn" };
     public static readonly Map WarinKrytaDivinityCoast = new() { Id = 839, Name = "War in Kryta Divinity Coast", WikiUrl = "https://wiki.guildwars.com/wiki/Divinity_Coast_(explorable_area)" };
@@ -686,24 +686,24 @@ public sealed class Map : IWikiEntity
     public static readonly Map WarinKrytaShadowsintheJungle = new() { Id = 847, Name = "War in Kryta Shadows in the Jungle", WikiUrl = "https://wiki.guildwars.com/wiki/Shadows_in_the_Jungle" };
     public static readonly Map WarinKrytaAVengeanceofBlades = new() { Id = 848, Name = "War in Kryta A Vengeance of Blades", WikiUrl = "https://wiki.guildwars.com/wiki/A_Vengeance_of_Blades" };
     public static readonly Map WarinKrytaAuspiciousBeginnings = new() { Id = 849, Name = "War in Kryta Auspicious Beginnings", WikiUrl = "https://wiki.guildwars.com/wiki/Auspicious_Beginnings" };
-    public static readonly Map Olafsteadcinematic = new() { Id = 850, Name = "Olafstead (cinematic)", WikiUrl = "https://wiki.guildwars.com/wiki/Olafstead" };
+    public static readonly Map OlafsteadCinematic = new() { Id = 850, Name = "Olafstead (cinematic)", WikiUrl = "https://wiki.guildwars.com/wiki/Olafstead" };
     public static readonly Map TheGreatSnowballFightoftheGodsOperationCrushSpirits = new() { Id = 855, Name = "The Great Snowball Fight of the Gods Operation Crush Spirits", WikiUrl = "https://wiki.guildwars.com/wiki/The_Great_Snowball_Fight_of_the_Gods_(outpost)" };
     public static readonly Map TheGreatSnowballFightoftheGodsFightinginaWinterWonderland = new() { Id = 856, Name = "The Great Snowball Fight of the Gods Fighting in a Winter Wonderland", WikiUrl = "https://wiki.guildwars.com/wiki/The_Great_Snowball_Fight_of_the_Gods" };
     public static readonly Map EmbarkBeach = new() { Id = 857, Name = "Embark Beach", WikiUrl = "https://wiki.guildwars.com/wiki/_Embark_Beach" };
-    public static readonly Map DragonsThroatareaWhatWaitsinShadow = new() { Id = 858, Name = "What Waits in Shadow", WikiUrl = "https://wiki.guildwars.com/wiki/What_Waits_in_Shadow" };
-    public static readonly Map KainengCenterWindsofChangeAChanceEncounter = new() { Id = 861, Name = "Winds of Change A Chance Encounter", WikiUrl = "https://wiki.guildwars.com/wiki/A_Chance_Encounter" };
-    public static readonly Map TheMarketplaceareaTrackingtheCorruption = new() { Id = 862, Name = "Tracking The Corruption", WikiUrl = "https://wiki.guildwars.com/wiki/Tracking_the_Corruption" };
-    public static readonly Map BukdekBywayWindsofChangeCanthaCourierCrisis = new() { Id = 863, Name = "Cantha Courier Crisis", WikiUrl = "https://wiki.guildwars.com/wiki/Cantha_Courier_Crisis" };
-    public static readonly Map TsumeiVillageWindsofChangeATreatysaTreaty = new() { Id = 864, Name = "A Treaty's a Treaty", WikiUrl = "https://wiki.guildwars.com/wiki/A_Treaty's_a_Treaty" };
-    public static readonly Map SeitungHarborareaDeadlyCargo = new() { Id = 865, Name = "Deadly Cargo", WikiUrl = "https://wiki.guildwars.com/wiki/Deadly_Cargo" };
-    public static readonly Map TahnnakaiTempleWindsofChangeTheRescueAttempt = new() { Id = 866, Name = "The Rescue Attempt", WikiUrl = "https://wiki.guildwars.com/wiki/The_Rescue_Attempt" };
-    public static readonly Map WajjunBazaarWindsofChangeViolenceintheStreets = new() { Id = 867, Name = "Violence in the Streets", WikiUrl = "https://wiki.guildwars.com/wiki/Violence_in_the_Streets" };
+    public static readonly Map DragonsThroatAreaWhatWaitsInShadow = new() { Id = 858, Name = "What Waits in Shadow", WikiUrl = "https://wiki.guildwars.com/wiki/What_Waits_in_Shadow" };
+    public static readonly Map KainengCenterWindsOfChangeAChanceEncounter = new() { Id = 861, Name = "Winds of Change A Chance Encounter", WikiUrl = "https://wiki.guildwars.com/wiki/A_Chance_Encounter" };
+    public static readonly Map TheMarketplaceAreaTrackingtheCorruption = new() { Id = 862, Name = "Tracking The Corruption", WikiUrl = "https://wiki.guildwars.com/wiki/Tracking_the_Corruption" };
+    public static readonly Map BukdekBywayWindsOfChangeCanthaCourierCrisis = new() { Id = 863, Name = "Cantha Courier Crisis", WikiUrl = "https://wiki.guildwars.com/wiki/Cantha_Courier_Crisis" };
+    public static readonly Map TsumeiVillageWindsOfChangeATreatysATreaty = new() { Id = 864, Name = "A Treaty's a Treaty", WikiUrl = "https://wiki.guildwars.com/wiki/A_Treaty's_a_Treaty" };
+    public static readonly Map SeitungHarborAreaDeadlyCargo = new() { Id = 865, Name = "Deadly Cargo", WikiUrl = "https://wiki.guildwars.com/wiki/Deadly_Cargo" };
+    public static readonly Map TahnnakaiTempleWindsOfChangeTheRescueAttempt = new() { Id = 866, Name = "The Rescue Attempt", WikiUrl = "https://wiki.guildwars.com/wiki/The_Rescue_Attempt" };
+    public static readonly Map WajjunBazaarWindsOfChangeViolenceInTheStreets = new() { Id = 867, Name = "Violence in the Streets", WikiUrl = "https://wiki.guildwars.com/wiki/Violence_in_the_Streets" };
     public static readonly Map ScarredPsycheMission = new() { Id = 868, Name = "Scarred Psyche Mission", WikiUrl = "https://wiki.guildwars.com/wiki/Scarred_Psyche" };
     public static readonly Map ShadowsPassageWindsofChangeCallingAllThugs = new() { Id = 869, Name = "Calling All Thugs", WikiUrl = "https://wiki.guildwars.com/wiki/Calling_All_Thugs" };
     public static readonly Map AltrummRuinsFindingJinnai = new() { Id = 870, Name = "Finding Jinnai", WikiUrl = "https://wiki.guildwars.com/wiki/Finding_Jinnai" };
-    public static readonly Map ShingJeaMonasteryRaidonShingJeaMonastery = new() { Id = 871, Name = "Raid on Shing Jea Monastery", WikiUrl = "https://wiki.guildwars.com/wiki/Raid_on_Shing_Jea_Monastery" };
-    public static readonly Map KainengCenterWindsofChangeRaidonKainengCenter = new() { Id = 872, Name = "Raid on Kaineng Center", WikiUrl = "https://wiki.guildwars.com/wiki/Raid_on_Kaineng_Center" };
-    public static readonly Map WajjunBazaarWindsofChangeMinistryofOppression = new() { Id = 873, Name = "Ministry of Oppression", WikiUrl = "https://wiki.guildwars.com/wiki/Ministry_of_Oppression" };
+    public static readonly Map ShingJeaMonasteryRaidOnShingJeaMonastery = new() { Id = 871, Name = "Raid on Shing Jea Monastery", WikiUrl = "https://wiki.guildwars.com/wiki/Raid_on_Shing_Jea_Monastery" };
+    public static readonly Map KainengCenterWindsOfChangeRaidonKainengCenter = new() { Id = 872, Name = "Raid on Kaineng Center", WikiUrl = "https://wiki.guildwars.com/wiki/Raid_on_Kaineng_Center" };
+    public static readonly Map WajjunBazaarWindsOfChangeMinistryOfOppression = new() { Id = 873, Name = "Ministry of Oppression", WikiUrl = "https://wiki.guildwars.com/wiki/Ministry_of_Oppression" };
     public static readonly Map TheFinalConfrontation = new() { Id = 874, Name = "The Final Confrontation", WikiUrl = "https://wiki.guildwars.com/wiki/_The_Final_Confrontation" };
     public static readonly Map LakesideCounty1070AE = new() { Id = 875, Name = "Lakeside County 1070AE", WikiUrl = "https://wiki.guildwars.com/wiki/Lakeside_County:_1070_AE" };
     public static readonly Map AshfordCatacombs1070AE = new() { Id = 876, Name = "Ashford Catacombs 1070AE", WikiUrl = "https://wiki.guildwars.com/wiki/Ashford_Catacombs:_1070_AE" };
@@ -725,7 +725,7 @@ public sealed class Map : IWikiEntity
         TheWilds,
         AuroraGlade,
         DiessaLowlands,
-        GatesofKryta,
+        GatesOfKryta,
         DAlessioSeaboard,
         DivinityCoast,
         TalmarkWilderness,
@@ -741,7 +741,7 @@ public sealed class Map : IWikiEntity
         GriffonsMouth,
         TheGreatNorthernWall,
         FortRanik,
-        RuinsofSurmia,
+        RuinsOfSurmia,
         XaquangSkyway,
         NolaniAcademy,
         OldAscalon,
@@ -760,10 +760,10 @@ public sealed class Map : IWikiEntity
         TheFalls,
         DryTop,
         TangleRoot,
-        HengeofDenraviOutpost,
+        HengeOfDenraviOutpost,
         SenjisCornerOutpost,
         BurningIsleOutpost,
-        TearsoftheFallen,
+        TearsOfTheFallen,
         ScoundrelsRise,
         LionsArchOutpost,
         CursedLands,
@@ -780,19 +780,19 @@ public sealed class Map : IWikiEntity
         FrozenIsle,
         NomadsIsle,
         DruidsIsle,
-        IsleoftheDeadguildhall,
+        IsleOfTheDeadGuildHall,
         TheUnderworld,
         RiversideProvince,
-        TheHallofHeroesarenaMission,
+        TheHallOfHeroesArenaMission,
         BrokenTowerMission,
-        HousezuHeltzerOutpost,
-        TheCourtyardarenaMission,
+        HouseZuHeltzerOutpost,
+        TheCourtyardArenaMission,
         UnholyTemplesMission,
         BurialMoundsMission,
         AscalonCityOutpost,
-        TombofthePrimevalKings,
+        TombOfThePrimevalKings,
         TheVaultMission,
-        TheUnderworldarenaMission,
+        TheUnderworldArenaMission,
         AscalonArena,
         SacredTemplesMission,
         Icedome,
@@ -824,13 +824,13 @@ public sealed class Map : IWikiEntity
         ProphetsPath,
         SaltFlats,
         SkywardReach,
-        DunesofDespair,
+        DunesOfDespair,
         ThirstyRiver,
         ElonaReach,
         AuguryRockMission,
         TheDragonsLair,
         PerditionRock,
-        RingofFire,
+        RingOfFire,
         AbaddonsMouth,
         HellsPrecipice,
         GoldenGatesMission,
@@ -845,7 +845,7 @@ public sealed class Map : IWikiEntity
         FrontierGateOutpost,
         BeetletunOutpost,
         FishermensHavenOutpost,
-        TempleoftheAges,
+        TempleOfTheAges,
         VentarisRefugeOutpost,
         DruidsOverlookOutpost,
         MaguumaStadeOutpost,
@@ -854,9 +854,9 @@ public sealed class Map : IWikiEntity
         TheCatacombs,
         LakesideCounty,
         TheNorthlands,
-        AscalonCitypresearing,
+        AscalonCityPresearing,
         AscalonAcademy,
-        AscalonAcademyPvPbattleMission,
+        AscalonAcademyPvPBattleMission,
         AscalonAcademyunk,
         HeroesAudienceOutpost,
         SeekersPassageOutpost,
@@ -868,11 +868,11 @@ public sealed class Map : IWikiEntity
         CopperhammerMinesOutpost,
         GreenHillsCounty,
         WizardsFolly,
-        RegentValleypreSearing,
+        RegentValleyPreSearing,
         TheBarradinEstateOutpost,
         AshfordAbbeyOutpost,
         FoiblesFairOutpost,
-        FortRanikpreSearingOutpost,
+        FortRanikPreSearingOutpost,
         BurningIsleMission,
         DruidsIsleMission,
         FrozenIsleMission,
@@ -880,11 +880,11 @@ public sealed class Map : IWikiEntity
         HuntersIsleMission,
         WizardsIsleMission,
         NomadsIsleMission,
-        IsleoftheDeadguildhallMission,
+        IsleOfTheDeadGuildHallMission,
         FrozenIsleOutpost,
         NomadsIsleOutpost,
         DruidsIsleOutpost,
-        IsleoftheDeadguildhallOutpost,
+        IsleOfTheDeadGuildHallOutpost,
         FortKogaMission,
         ShiverpeakArena,
         AmnoonArenaMission,
@@ -942,29 +942,29 @@ public sealed class Map : IWikiEntity
         TheUndercity,
         ShingJeaMonasteryOutpost,
         ShingJeaArena,
-        Arborstoneexplorable,
-        MinisterChosEstateexplorable,
-        ZenDaijunexplorable,
-        BoreasSeabedexplorable,
-        GreatTempleofBalthazarOutpost,
+        ArborstoneExplorable,
+        MinisterChosEstateExplorable,
+        ZenDaijunExplorable,
+        BoreasSeabedExplorable,
+        GreatTempleOfBalthazarOutpost,
         TsumeiVillageOutpost,
         SeitungHarborOutpost,
         RanMusuGardensOutpost,
         LinnokCourtyard,
         DwaynaVsGrenth,
-        SunjiangDistrictexplorable,
-        NahpuiQuarterexplorable,
+        SunjiangDistrictExplorable,
+        NahpuiQuarterExplorable,
         UrgozsWarren,
-        TahnnakaiTempleexplorable,
+        TahnnakaiTempleExplorable,
         AltrummRuins,
         ZosShivrosChannel,
         DragonsThroat,
-        IsleofWeepingStoneOutpost,
-        IsleofJadeOutpost,
+        IsleOfWeepingStoneOutpost,
+        IsleOfJadeOutpost,
         HarvestTempleOutpost,
         BreakerHollowOutpost,
         LeviathanPitsOutpost,
-        IsleoftheNameless,
+        IsleOfTheNameless,
         ZaishenChallengeOutpost,
         ZaishenEliteOutpost,
         MaatuKeepOutpost,
@@ -1027,16 +1027,16 @@ public sealed class Map : IWikiEntity
         BrawlersPitMission,
         PetrifiedArenaMission,
         SeabedArenaMission,
-        IsleofWeepingStoneMission,
-        IsleofJadeMission,
+        IsleOfWeepingStoneMission,
+        IsleOfJadeMission,
         ImperialIsleMission,
-        IsleofMeditationMission,
+        IsleOfMeditationMission,
         ImperialIsleOutpost,
-        IsleofMeditationOutpost,
-        IsleofWeepingStone,
-        IsleofJade,
+        IsleOfMeditationOutpost,
+        IsleOfWeepingStone,
+        IsleOfJade,
         ImperialIsle,
-        IsleofMeditation,
+        IsleOfMeditation,
         ShingJeaArenaMission,
         DragonArena,
         JahaiBluffs,
@@ -1051,8 +1051,8 @@ public sealed class Map : IWikiEntity
         DejarinEstate,
         ArkjokWard,
         YohlonHavenOutpost,
-        GandaratheMoonFortress,
-        TheFloodplainofMahnkelon,
+        GandaraTheMoonFortress,
+        TheFloodplainOfMahnkelon,
         LionsArchSunspearsinKryta,
         TuraisProcession,
         SunspearSanctuaryOutpost,
@@ -1061,27 +1061,27 @@ public sealed class Map : IWikiEntity
         JadeFlatsKurzickOutpost,
         JadeFlatsLuxonOutpost,
         YatendiCanyons,
-        ChantryofSecretsOutpost,
-        GardenofSeborhin,
-        HoldingsofChokhin,
+        ChantryOfSecretsOutpost,
+        GardenOfSeborhin,
+        HoldingsOfChokhin,
         MihanuTownshipOutpost,
         VehjinMines,
         BasaltGrottoOutpost,
         ForumHighlands,
-        KainengCenterSunspearsinCantha,
+        KainengCenterSunspearsInCantha,
         ResplendentMakuun,
         ResplendentMakuun2,
         HonurHillOutpost,
-        WildernessofBahdza,
+        WildernessOfBahdza,
         VehtendiValley,
         YahnurMarketOutpost,
-        TheHiddenCityofAhdashim,
+        TheHiddenCityOfAhdashim,
         TheKodashBazaarOutpost,
         LionsGate,
-        TheMirrorofLyss,
+        TheMirrorOfLyss,
         SecuretheRefuge,
         VentaCemetery,
-        KamadanJewelofIstanexplorable,
+        KamadanJewelOfIstanExplorable,
         TheTribunal,
         KodonurCrossroads,
         RilohnRefuge,
@@ -1089,50 +1089,50 @@ public sealed class Map : IWikiEntity
         ModdokCrevice,
         TiharkOrchard,
         Consulate,
-        PlainsofJarin,
+        PlainsOfJarin,
         SunspearGreatHallOutpost,
-        CliffsofDohjok,
+        CliffsOfDohjok,
         DzagonurBastion,
         DashaVestibule,
-        GrandCourtofSebelkeh,
+        GrandCourtOfSebelkeh,
         CommandPost,
         JokosDomain,
         BonePalaceOutpost,
         TheRupturedHeart,
-        TheMouthofTormentOutpost,
+        TheMouthOfTormentOutpost,
         TheShatteredRavines,
-        LairoftheForgottenOutpost,
+        LairOfTheForgottenOutpost,
         PoisonedOutcrops,
         TheSulfurousWastes,
-        TheEbonyCitadelofMallyxMission,
+        TheEbonyCitadelOfMallyxMission,
         TheAlkaliPan,
         ALandofHeroes,
         CrystalOverlook,
-        KamadanJewelofIstanOutpost,
-        GateofTormentOutpost,
+        KamadanJewelOfIstanOutpost,
+        GateOfTormentOutpost,
         NightfallenGarden,
         ChurrhirFields,
         BeknurHarborOutpost,
         TheUnderworld2,
-        HeartofAbaddon,
+        HeartOfAbaddon,
         TheUnderworld3,
         NightfallenCoast,
         NightfallenJahai,
-        DepthsofMadness,
+        DepthsOfMadness,
         RollerbeetleRacing,
-        DomainofFear,
-        GateofFearOutpost,
-        DomainofPain,
-        BloodstoneFenquest,
-        DomainofSecrets,
-        GateofSecretsOutpost,
-        DomainofAnguish,
+        DomainOfFear,
+        GateOfFearOutpost,
+        DomainOfPain,
+        BloodstoneFenQuest,
+        DomainOfSecrets,
+        GateOfSecretsOutpost,
+        DomainOfAnguish,
         OozePitMission,
         JennursHorde,
         NunduBay,
-        GateofDesolation,
+        GateOfDesolation,
         ChampionsDawnOutpost,
-        RuinsofMorah,
+        RuinsOfMorah,
         FahranurTheFirstCity,
         BjoraMarches,
         ZehlonReach,
@@ -1142,19 +1142,19 @@ public sealed class Map : IWikiEntity
         BeknurHarbor,
         MehtaniKeys,
         KodlonuHamletOutpost,
-        IslandofShehkah,
+        IslandOfShehkah,
         JokanurDiggings,
         BlacktideDen,
         ConsulateDocks,
-        GateofPain,
-        GateofMadness,
+        GateOfPain,
+        GateOfMadness,
         AbaddonsGate,
         SunspearArena,
         IceCliffChasms,
         BokkaAmphitheatre,
         RivenEarth,
         TheAstralariumOutpost,
-        ThroneofSecrets,
+        ThroneOfSecrets,
         ChurranuIslandArenaMission,
         ShingJeaMonasteryMission,
         HaijuLagoonMission,
@@ -1166,21 +1166,21 @@ public sealed class Map : IWikiEntity
         DrakkarLake,
         MinisterChosEstateMission2,
         UnchartedIsleOutpost,
-        IsleofWurmsOutpost,
+        IsleOfWurmsOutpost,
         UnchartedIsle,
-        IsleofWurms,
+        IsleOfWurms,
         UnchartedIsleMission,
-        IsleofWurmsMission,
+        IsleOfWurmsMission,
         SunspearArenaMission,
         CorruptedIsleOutpost,
-        IsleofSolitudeOutpost,
+        IsleOfSolitudeOutpost,
         CorruptedIsle,
-        IsleofSolitude,
+        IsleOfSolitude,
         CorruptedIsleMission,
-        IsleofSolitudeMission,
+        IsleOfSolitudeMission,
         SunDocks,
         ChahbekVillage,
-        RemainsofSahlahja,
+        RemainsOfSahlahja,
         JagaMoraine,
         BombardmentMission,
         NorrhartDomains,
@@ -1192,7 +1192,7 @@ public sealed class Map : IWikiEntity
         DajkahInlet,
         TheShadowNexus,
         SparkflySwamp,
-        GateoftheNightfallenLandsOutpost,
+        GateOftheNightfallenLandsOutpost,
         CathedralofFlamesLevel1,
         TheTroubledKeeper,
         VerdantCascades,
@@ -1210,9 +1210,9 @@ public sealed class Map : IWikiEntity
         OolasLabLevel1,
         OolasLabLevel2,
         OolasLabLevel3,
-        ShardsofOrrLevel1,
-        ShardsofOrrLevel2,
-        ShardsofOrrLevel3,
+        ShardsOfOrrLevel1,
+        ShardsOfOrrLevel2,
+        ShardsOfOrrLevel3,
         ArachnisHauntLevel1,
         ArachnisHauntLevel2,
         FetidRiverMission,
@@ -1221,9 +1221,9 @@ public sealed class Map : IWikiEntity
         VloxenExcavationsLevel1,
         VloxenExcavationsLevel2,
         VloxenExcavationsLevel3,
-        HeartoftheShiverpeaksLevel1,
-        HeartoftheShiverpeaksLevel2,
-        HeartoftheShiverpeaksLevel3,
+        HeartOftheShiverpeaksLevel1,
+        HeartOftheShiverpeaksLevel2,
+        HeartOftheShiverpeaksLevel3,
         BloodstoneCavesLevel1,
         BloodstoneCavesLevel2,
         BloodstoneCavesLevel3,
@@ -1240,8 +1240,8 @@ public sealed class Map : IWikiEntity
         BattledepthsLevel1,
         BattledepthsLevel2,
         BattledepthsLevel3,
-        SepulchreofDragrimmarLevel1,
-        SepulchreofDragrimmarLevel2,
+        SepulchreOfDragrimmarLevel1,
+        SepulchreOfDragrimmarLevel2,
         FrostmawsBurrowsLevel1,
         FrostmawsBurrowsLevel2,
         FrostmawsBurrowsLevel3,
@@ -1254,18 +1254,18 @@ public sealed class Map : IWikiEntity
         UmbralGrottoOutpost,
         RataSumOutpost,
         TarnishedHavenOutpost,
-        EyeoftheNorthOutpost,
+        EyeOfTheNorthOutpost,
         SifhallaOutpost,
         GunnarsHoldOutpost,
         OlafsteadOutpost,
-        HallofMonuments,
+        HallOfMonuments,
         DaladaUplands,
         DoomloreShrineOutpost,
         GrothmarWardowns,
         LongeyesLedgeOutpost,
         SacnothValley,
         CentralTransferChamberOutpost,
-        CurseoftheNornbear,
+        CurseOfTheNornbear,
         BloodWashesBlood,
         AGateTooFarLevel1,
         AGateTooFarLevel2,
@@ -1273,19 +1273,19 @@ public sealed class Map : IWikiEntity
         TheElusiveGolemancerLevel1,
         TheElusiveGolemancerLevel2,
         TheElusiveGolemancerLevel3,
-        FindingtheBloodstoneLevel1,
-        FindingtheBloodstoneLevel2,
-        FindingtheBloodstoneLevel3,
+        FindingTheBloodstoneLevel1,
+        FindingTheBloodstoneLevel2,
+        FindingTheBloodstoneLevel3,
         GeniusOperatedLivingEnchantedManifestation,
-        AgainsttheCharr,
-        WarbandofBrothersLevel1,
-        WarbandofBrothersLevel2,
-        WarbandofBrothersLevel3,
-        AssaultontheStronghold,
+        AgainstTheCharr,
+        WarbandOfBrothersLevel1,
+        WarbandOfBrothersLevel2,
+        WarbandOfBrothersLevel3,
+        AssaultOnTheStronghold,
         DestructionsDepthsLevel1,
         DestructionsDepthsLevel2,
         DestructionsDepthsLevel3,
-        ATimeforHeroes,
+        ATimeForHeroes,
         WarbandTraining,
         BorealStationOutpost,
         CatacombsofKathandraxLevel3,
@@ -1311,7 +1311,7 @@ public sealed class Map : IWikiEntity
         ServicePracticeDummy,
         HeroTutorial,
         TheNornFightingTournament,
-        SecretLairoftheSnowmen,
+        SecretLairOftheSnowmen,
         NornBrawlingChampionship,
         KilroysPunchoutTraining,
         FronisIrontoesLairMission,
@@ -1331,25 +1331,25 @@ public sealed class Map : IWikiEntity
         SpecialOpsDragonsGullet,
         SpecialOpsGrendichCourthouse,
         TheTenguAccords,
-        TheBattleofJahai,
+        TheBattleOfJahai,
         TheFlightNorth,
-        TheRiseoftheWhiteMantle,
-        FindingtheBloodstoneMission,
+        TheRiseOfTheWhiteMantle,
+        FindingTheBloodstoneMission,
         GeniusOperatedLivingEnchantedManifestationMission,
-        AgainsttheCharrMission,
-        WarbandofbrothersMission,
-        AssaultontheStrongholdMission,
+        AgainstTheCharrMission,
+        WarbandOfBrothersMission,
+        AssaultOnTheStrongholdMission,
         DestructionsDepthsMission,
-        ATimeforHeroesMission,
-        CurseoftheNornbearMission,
+        ATimeForHeroesMission,
+        CurseOfTheNornbearMission,
         BloodWashesBloodMission,
         AGateTooFarMission,
         TheElusiveGolemancerMission,
-        SecretLairoftheSnowmen2,
-        SecretLairoftheSnowmen3,
-        DroknarsForgecinematic,
-        IsleoftheNamelessPvP,
-        TempleoftheAgesROX,
+        SecretLairOftheSnowmen2,
+        SecretLairOftheSnowmen3,
+        DroknarsForgeCinematic,
+        IsleOfTheNamelessPvP,
+        TempleOfTheAgesROX,
         WajjunBazaarPOX,
         BokkaAmphitheatreNOX,
         SecretUndergroundLair,
@@ -1366,14 +1366,14 @@ public sealed class Map : IWikiEntity
         AscalonCityWintersdayOutpost,
         DroknarsForgeHalloweenOutpost,
         DroknarsForgeWintersdayOutpost,
-        TombofthePrimevalKingsHalloweenOutpost,
+        TombOfThePrimevalKingsHalloweenOutpost,
         ShingJeaMonasteryDragonFestivalOutpost,
         ShingJeaMonasteryCanthanNewYearOutpost,
         KainengCenterCanthanNewYearOutpost,
-        KamadanJewelofIstanHalloweenOutpost,
-        KamadanJewelofIstanWintersdayOutpost,
-        KamadanJewelofIstanCanthanNewYearOutpost,
-        EyeoftheNorthOutpostWintersdayOutpost,
+        KamadanJewelOfIstanHalloweenOutpost,
+        KamadanJewelOfIstanWintersdayOutpost,
+        KamadanJewelOfIstanCanthanNewYearOutpost,
+        EyeOfTheNorthOutpostWintersdayOutpost,
         WarinKrytaTalmarkWilderness,
         WarinKrytaTrialofZinn,
         WarinKrytaDivinityCoast,
@@ -1387,24 +1387,24 @@ public sealed class Map : IWikiEntity
         WarinKrytaShadowsintheJungle,
         WarinKrytaAVengeanceofBlades,
         WarinKrytaAuspiciousBeginnings,
-        Olafsteadcinematic,
+        OlafsteadCinematic,
         TheGreatSnowballFightoftheGodsOperationCrushSpirits,
         TheGreatSnowballFightoftheGodsFightinginaWinterWonderland,
         EmbarkBeach,
-        DragonsThroatareaWhatWaitsinShadow,
-        KainengCenterWindsofChangeAChanceEncounter,
-        TheMarketplaceareaTrackingtheCorruption,
-        BukdekBywayWindsofChangeCanthaCourierCrisis,
-        TsumeiVillageWindsofChangeATreatysaTreaty,
-        SeitungHarborareaDeadlyCargo,
-        TahnnakaiTempleWindsofChangeTheRescueAttempt,
-        WajjunBazaarWindsofChangeViolenceintheStreets,
+        DragonsThroatAreaWhatWaitsInShadow,
+        KainengCenterWindsOfChangeAChanceEncounter,
+        TheMarketplaceAreaTrackingtheCorruption,
+        BukdekBywayWindsOfChangeCanthaCourierCrisis,
+        TsumeiVillageWindsOfChangeATreatysATreaty,
+        SeitungHarborAreaDeadlyCargo,
+        TahnnakaiTempleWindsOfChangeTheRescueAttempt,
+        WajjunBazaarWindsOfChangeViolenceInTheStreets,
         ScarredPsycheMission,
         ShadowsPassageWindsofChangeCallingAllThugs,
         AltrummRuinsFindingJinnai,
-        ShingJeaMonasteryRaidonShingJeaMonastery,
-        KainengCenterWindsofChangeRaidonKainengCenter,
-        WajjunBazaarWindsofChangeMinistryofOppression,
+        ShingJeaMonasteryRaidOnShingJeaMonastery,
+        KainengCenterWindsOfChangeRaidonKainengCenter,
+        WajjunBazaarWindsOfChangeMinistryOfOppression,
         TheFinalConfrontation,
         LakesideCounty1070AE,
         AshfordCatacombs1070AE,

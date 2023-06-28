@@ -40,6 +40,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
     private uint entityArrayPointer;
     private uint titleDataPointer;
     private uint targetIdPointer;
+    private uint instanceInfoPointer;
 
     public GuildwarsMemoryReader(
         IApplicationLauncher applicationLauncher,
@@ -133,6 +134,16 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         }
 
         return Task.Run(() => this.SafeReadGameMemory(this.ReadInventoryDataInternal), cancellationToken);
+    }
+
+    public Task<WorldData?> ReadWorldData(CancellationToken cancellationToken)
+    {
+        if (this.memoryScanner.Scanning is false)
+        {
+            return Task.FromResult<WorldData?>(default);
+        }
+
+        return Task.Run(() => this.SafeReadGameMemory(this.ReadWorldDataInternal), cancellationToken);
     }
 
     private async Task InitializeSafe(Process process, ScopedLogger<GuildwarsMemoryReader> scopedLogger)
@@ -411,6 +422,35 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         return inventoryData;
     }
 
+    private WorldData? ReadWorldDataInternal()
+    {
+        var globalContext = this.memoryScanner.ReadPtrChain<GlobalContext>(this.memoryScanner.ModuleStartAddress, finalPointerOffset: 0x0, 0x00629204, 0x18);
+
+        if (!globalContext.GameContext.IsValid() ||
+            !globalContext.UserContext.IsValid() ||
+            !globalContext.InstanceContext.IsValid())
+        {
+            return default;
+        }
+
+        var userContext = this.memoryScanner.Read(globalContext.UserContext, UserContext.BaseOffset);
+        var instanceInfo = this.memoryScanner.ReadPtrChain<InstanceInfoContext>(this.GetInstanceInfoPointer(), 0x0, 0x0);
+        var areaInfo = this.memoryScanner.Read(instanceInfo.AreaInfo);
+
+        _ = Map.TryParse((int)userContext.MapId, out var map);
+        _ = Region.TryParse((int)areaInfo.RegionId, out var region);
+        _ = Continent.TryParse((int)areaInfo.ContinentId, out var continent);
+        _ = Campaign.TryParse((int)areaInfo.CampaignId, out var campaign);
+
+        return new WorldData
+        {
+            Campaign = campaign,
+            Continent = continent,
+            Region = region,
+            Map = map
+        };
+    }
+
     private uint GetPlayerIdPointer()
     {
         if (this.playerIdPointer == 0)
@@ -449,6 +489,16 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         }
 
         return this.targetIdPointer;
+    }
+
+    private uint GetInstanceInfoPointer()
+    {
+        if (this.instanceInfoPointer == 0)
+        {
+            this.instanceInfoPointer = this.memoryScanner.ScanForPtr(new byte[] { 0x6A, 0x2C, 0x50, 0xE8, 0x00, 0x00, 0x00, 0x00, 0x83, 0xC4, 0x08, 0xC7 }, "xxxx????xxxx") + 0xD;
+        }
+
+        return this.instanceInfoPointer;
     }
 
     private Bag? GetBag(GuildwarsPointer<BagInfo> bagInfoPtr, uint expectedBagType, bool returnEmptyBag)
