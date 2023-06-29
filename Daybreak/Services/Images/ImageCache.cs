@@ -136,7 +136,7 @@ public sealed class ImageCache : IImageCache
             bitmapImage.EndInit();
             bitmapImage.Freeze();
 
-            var size = bitmapImage.Format.BitsPerPixel * bitmapImage.PixelWidth * bitmapImage.PixelHeight;
+            var size = (bitmapImage.Format.BitsPerPixel / 8) * bitmapImage.PixelWidth * bitmapImage.PixelHeight;
             var imageEntry = new ImageEntry
             {
                 ImageSource = bitmapImage,
