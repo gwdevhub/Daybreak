@@ -43,7 +43,7 @@ public partial class LivingEntityContextMenu : UserControl
 
     private void NpcDefinitionTextBlock_MouseLeftButtonDown(object _, MouseButtonEventArgs e)
     {
-        this.LivingEntityContextMenuClicked?.Invoke(this, this.DataContext as LivingEntity? ?? default);
+        this.LivingEntityContextMenuClicked?.Invoke(this, this.DataContext as LivingEntity ?? default);
     }
 
     private void PrimaryProfessionTextBlock_MouseLeftButtonDown(object _, MouseButtonEventArgs e)

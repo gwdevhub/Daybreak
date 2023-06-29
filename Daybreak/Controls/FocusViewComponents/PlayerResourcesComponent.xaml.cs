@@ -281,18 +281,19 @@ public partial class PlayerResourcesComponent : UserControl
     private void UpdateGameData()
     {
         if (this.DataContext is not GameData gameData ||
-            gameData.MainPlayer is not MainPlayerInformation)
+            gameData.MainPlayer is null ||
+            gameData.Session is null)
         {
             return;
         }
 
-        this.CurrentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(gameData.MainPlayer!.Value.Experience);
-        this.NextLevelExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(gameData.MainPlayer!.Value.Experience);
-        this.TotalFoes = (int)(gameData.Session!.Value.FoesKilled + gameData.Session.Value.FoesToKill);
-        this.Vanquishing = gameData.Session.Value.FoesToKill + gameData.Session.Value.FoesKilled > 0U;
-        this.TitleActive = gameData.MainPlayer.Value.TitleInformation is not null && gameData.MainPlayer.Value.TitleInformation.Value.IsValid;
+        this.CurrentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(gameData.MainPlayer.Experience);
+        this.NextLevelExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(gameData.MainPlayer.Experience);
+        this.TotalFoes = (int)(gameData.Session.FoesKilled + gameData.Session.FoesToKill);
+        this.Vanquishing = gameData.Session.FoesToKill + gameData.Session.FoesKilled > 0U;
+        this.TitleActive = gameData.MainPlayer.TitleInformation is not null && gameData.MainPlayer.TitleInformation.IsValid;
 
-        if (gameData.MainPlayer.Value.TitleInformation is TitleInformation titleInformation && titleInformation.IsValid)
+        if (gameData.MainPlayer.TitleInformation is TitleInformation titleInformation && titleInformation.IsValid)
         {
             if (titleInformation.MaxTierNumber == titleInformation.TierNumber)
             {
@@ -324,7 +325,8 @@ public partial class PlayerResourcesComponent : UserControl
 
     private void UpdateExperienceText()
     {
-        if (this.DataContext is not GameData gameData)
+        if (this.DataContext is not GameData gameData ||
+            gameData.MainPlayer is null)
         {
             return;
         }
@@ -332,22 +334,22 @@ public partial class PlayerResourcesComponent : UserControl
         switch (this.liveOptions.Value.ExperienceDisplay)
         {
             case Configuration.FocusView.ExperienceDisplay.CurrentLevelCurrentAndCurrentLevelMax:
-                var currentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(gameData.MainPlayer!.Value.Experience);
-                var nextLevelExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(gameData.MainPlayer!.Value.Experience);
+                var currentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(gameData.MainPlayer.Experience);
+                var nextLevelExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(gameData.MainPlayer.Experience);
                 this.ExperienceBarText = $"{(int)currentExperienceInLevel} / {(int)nextLevelExperienceThreshold} XP";
                 break;
             case Configuration.FocusView.ExperienceDisplay.TotalCurretAndTotalMax:
-                var currentTotalExperience = gameData.MainPlayer!.Value.Experience;
+                var currentTotalExperience = gameData.MainPlayer.Experience;
                 var requiredTotalExperience = this.experienceCalculator.GetTotalExperienceForNextLevel(currentTotalExperience);
                 this.ExperienceBarText = $"{(int)currentTotalExperience} / {(int)requiredTotalExperience} XP";
                 break;
             case Configuration.FocusView.ExperienceDisplay.RemainingUntilNextLevel:
-                var remainingExperience = this.experienceCalculator.GetRemainingExperienceForNextLevel(gameData.MainPlayer!.Value.Experience);
+                var remainingExperience = this.experienceCalculator.GetRemainingExperienceForNextLevel(gameData.MainPlayer.Experience);
                 this.ExperienceBarText = $"Remaining {(int)remainingExperience} XP";
                 break;
             case Configuration.FocusView.ExperienceDisplay.Percentage:
-                var currentExperienceInLevel2 = this.experienceCalculator.GetExperienceForCurrentLevel(gameData.MainPlayer!.Value.Experience);
-                var nextLevelExperienceThreshold2 = this.experienceCalculator.GetNextExperienceThreshold(gameData.MainPlayer!.Value.Experience);
+                var currentExperienceInLevel2 = this.experienceCalculator.GetExperienceForCurrentLevel(gameData.MainPlayer.Experience);
+                var nextLevelExperienceThreshold2 = this.experienceCalculator.GetNextExperienceThreshold(gameData.MainPlayer.Experience);
                 this.ExperienceBarText = $"{(int)((double)currentExperienceInLevel2 / (double)nextLevelExperienceThreshold2 * 100)}% XP";
                 break;
         }
@@ -439,7 +441,8 @@ public partial class PlayerResourcesComponent : UserControl
 
     private void UpdateVanquishingText()
     {
-        if (this.DataContext is not GameData gameData)
+        if (this.DataContext is not GameData gameData ||
+            gameData.Session is null)
         {
             return;
         }
@@ -447,20 +450,21 @@ public partial class PlayerResourcesComponent : UserControl
         switch (this.liveOptions.Value.VanquishingDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.VanquishingText = $"{gameData.Session!.Value.FoesKilled} / {(int)this.TotalFoes} Foes Killed";
+                this.VanquishingText = $"{gameData.Session.FoesKilled} / {(int)this.TotalFoes} Foes Killed";
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.VanquishingText = $"Remaining {gameData.Session!.Value.FoesToKill} Foes";
+                this.VanquishingText = $"Remaining {gameData.Session.FoesToKill} Foes";
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.VanquishingText = $"{(int)((double)gameData.Session!.Value.FoesKilled / (double)this.TotalFoes * 100)}% Foes Killed";
+                this.VanquishingText = $"{(int)((double)gameData.Session.FoesKilled / (double)this.TotalFoes * 100)}% Foes Killed";
                 break;
         }
     }
 
     private void UpdateHealthText()
     {
-        if (this.DataContext is not GameData gameData)
+        if (this.DataContext is not GameData gameData ||
+            gameData.MainPlayer is null)
         {
             return;
         }
@@ -468,20 +472,21 @@ public partial class PlayerResourcesComponent : UserControl
         switch (this.liveOptions.Value.HealthDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.HealthBarText = $"{(int)gameData.MainPlayer!.Value.CurrentHealth} / {(int)gameData.MainPlayer.Value.MaxHealth} Health";
+                this.HealthBarText = $"{(int)gameData.MainPlayer.CurrentHealth} / {(int)gameData.MainPlayer.MaxHealth} Health";
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.HealthBarText = $"Remaining {(int)gameData.MainPlayer!.Value.CurrentHealth} Health";
+                this.HealthBarText = $"Remaining {(int)gameData.MainPlayer.CurrentHealth} Health";
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.HealthBarText = $"{(int)(gameData.MainPlayer!.Value.CurrentHealth / gameData.MainPlayer.Value.MaxHealth * 100)}% Health";
+                this.HealthBarText = $"{(int)(gameData.MainPlayer.CurrentHealth / gameData.MainPlayer.MaxHealth * 100)}% Health";
                 break;
         }
     }
 
     private void UpdateEnergyText()
     {
-        if (this.DataContext is not GameData gameData)
+        if (this.DataContext is not GameData gameData ||
+            gameData.MainPlayer is null)
         {
             return;
         }
@@ -489,13 +494,13 @@ public partial class PlayerResourcesComponent : UserControl
         switch (this.liveOptions.Value.EnergyDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.EnergyBarText = $"{(int)gameData.MainPlayer!.Value.CurrentEnergy} / {(int)gameData.MainPlayer.Value.MaxEnergy} Energy";
+                this.EnergyBarText = $"{(int)gameData.MainPlayer.CurrentEnergy} / {(int)gameData.MainPlayer.MaxEnergy} Energy";
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.EnergyBarText = $"Remaining {(int)gameData.MainPlayer!.Value.CurrentEnergy} Energy";
+                this.EnergyBarText = $"Remaining {(int)gameData.MainPlayer.CurrentEnergy} Energy";
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.EnergyBarText = $"{(int)(gameData.MainPlayer!.Value.CurrentEnergy / gameData.MainPlayer.Value.MaxEnergy * 100)}% Energy";
+                this.EnergyBarText = $"{(int)(gameData.MainPlayer.CurrentEnergy / gameData.MainPlayer.MaxEnergy * 100)}% Energy";
                 break;
         }
     }

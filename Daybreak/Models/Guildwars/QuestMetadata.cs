@@ -1,6 +1,6 @@
 ﻿namespace Daybreak.Models.Guildwars;
 
-public readonly struct QuestMetadata : IPositionalEntity
+public sealed class QuestMetadata : IPositionalEntity
 {
     public Quest? Quest { get; init; }
     public Position? Position { get; init; }

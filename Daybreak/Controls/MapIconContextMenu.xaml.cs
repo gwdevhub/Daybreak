@@ -19,6 +19,6 @@ public partial class MapIconContextMenu : UserControl
 
     private void TextBlock_MouseLeftButtonDown(object _, MouseButtonEventArgs e)
     {
-        this.MapIconContextMenuClicked?.Invoke(this, this.DataContext as MapIcon? ?? default);
+        this.MapIconContextMenuClicked?.Invoke(this, this.DataContext as MapIcon ?? default);
     }
 }

@@ -57,11 +57,13 @@ public partial class FocusView : UserControl
     [GenerateDependencyProperty]
     private bool inventoryVisible;
 
+    [GenerateDependencyProperty]
+    private bool minimapVisible;
+
     private bool browserMaximized = false;
     private bool minimapMaximized = false;
     private bool inventoryMaximized = false;
     private CancellationTokenSource? cancellationTokenSource;
-    private CancellationTokenSource? loadingPathingDataCancellationTokenSource;
 
     public FocusView(
         IBuildTemplateManager buildTemplateManager,
@@ -97,7 +99,7 @@ public partial class FocusView : UserControl
         base.OnPropertyChanged(e);
     }
 
-    private async Task UpdatePathingData(CancellationToken cancellationToken)
+    private async Task UpdatePathingData()
     {
         if (this.applicationLauncher.IsGuildwarsRunning is false)
         {
@@ -107,22 +109,23 @@ public partial class FocusView : UserControl
             return;
         }
 
-        this.Dispatcher.Invoke(() =>
+        var pathingMeta = await this.guildwarsMemoryCache.ReadPathingMetaData(this.cancellationTokenSource?.Token ?? CancellationToken.None);
+        if (pathingMeta?.TrapezoidCount == this.PathingData?.Trapezoids?.Count ||
+            this.cancellationTokenSource?.IsCancellationRequested is not false)
         {
-            this.LoadingPathingData = true;
-        });
-        
-        var maybePathingData = await this.guildwarsMemoryCache.ReadPathingData(cancellationToken);
+            return;
+        }
+
+        await this.Dispatcher.InvokeAsync(() => this.LoadingPathingData = true);
+        var maybePathingData = await this.guildwarsMemoryCache.ReadPathingData(this.cancellationTokenSource?.Token ?? CancellationToken.None);
         if (maybePathingData is not PathingData pathingData ||
             pathingData.Trapezoids is null ||
             pathingData.Trapezoids.Count == 0)
         {
-            await Task.Delay(1000, cancellationToken);
-            await this.UpdatePathingData(cancellationToken);
             return;
         }
 
-        this.Dispatcher.Invoke(() =>
+        await this.Dispatcher.InvokeAsync(() =>
         {
             this.PathingData = pathingData;
             this.LoadingPathingData = false;
@@ -159,24 +162,34 @@ public partial class FocusView : UserControl
 
         this.GameData = gameData;
         this.MainPlayerDataValid = true;
-        var pathingMeta = await this.guildwarsMemoryCache.ReadPathingMetaData(this.cancellationTokenSource?.Token ?? CancellationToken.None);
-        if (pathingMeta?.TrapezoidCount != this.PathingData.Trapezoids?.Count &&
-            this.loadingPathingDataCancellationTokenSource is null)
-        {
-            this.loadingPathingDataCancellationTokenSource = new CancellationTokenSource();
-            _ = Task.Run(() => this.UpdatePathingData(this.loadingPathingDataCancellationTokenSource.Token), this.loadingPathingDataCancellationTokenSource.Token)
-                .ContinueWith(_ =>
-                {
-                    this.loadingPathingDataCancellationTokenSource?.Dispose();
-                    this.loadingPathingDataCancellationTokenSource = null;
-                });
-        }
-
         this.Browser.Visibility = this.MainPlayerDataValid is true ?
             this.minimapMaximized ?
                 Visibility.Hidden :
                 Visibility.Visible :
             Visibility.Collapsed;
+    }
+
+    private async void PeriodicallyReadPathingData(CancellationToken cancellationToken)
+    {
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            try
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                await Task.WhenAll(
+                    this.UpdatePathingData(),
+                    Task.Delay(1000, cancellationToken)).ConfigureAwait(true);
+
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Encountered non-terminating exception. Silently continuing");
+            }
+        }
     }
 
     private async void PeriodicallyReadGameData(CancellationToken cancellationToken)
@@ -192,7 +205,7 @@ public partial class FocusView : UserControl
 
                 await Task.WhenAll(
                     this.UpdateGameData(),
-                    Task.Delay(1, cancellationToken)).ConfigureAwait(true);
+                    Task.Delay(16, cancellationToken)).ConfigureAwait(true);
 
             }
             catch (Exception ex)
@@ -219,12 +232,12 @@ public partial class FocusView : UserControl
                     Task.Delay(1000, cancellationToken)).ConfigureAwait(true);
 
                 var maybeInventoryData = await readInventoryTask;
-                if (!maybeInventoryData.HasValue)
+                if (maybeInventoryData is null)
                 {
                     continue;
                 }
 
-                this.InventoryData = maybeInventoryData.Value;
+                this.InventoryData = maybeInventoryData;
             }
             catch (Exception ex)
             {
@@ -237,6 +250,7 @@ public partial class FocusView : UserControl
     {
         this.BrowserAddress = this.liveUpdateableOptions.Value.BrowserUrl;
         this.InventoryVisible = this.liveUpdateableOptions.Value.InventoryComponentVisible;
+        this.MinimapVisible = this.liveUpdateableOptions.Value.MinimapComponentVisible;
         this.cancellationTokenSource?.Dispose();
         this.cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = this.cancellationTokenSource.Token;
@@ -245,14 +259,17 @@ public partial class FocusView : UserControl
         {
             this.PeriodicallyReadInventoryData(cancellationToken);
         }
+
+        if (this.MinimapVisible)
+        {
+            this.PeriodicallyReadPathingData(cancellationToken);
+        }
     }
 
     private void FocusView_Unloaded(object _, RoutedEventArgs e)
     {
         this.cancellationTokenSource?.Cancel();
         this.cancellationTokenSource = null;
-        this.loadingPathingDataCancellationTokenSource?.Cancel();
-        this.loadingPathingDataCancellationTokenSource = null;
     }
 
     private void Browser_MaximizeClicked(object _, EventArgs e)

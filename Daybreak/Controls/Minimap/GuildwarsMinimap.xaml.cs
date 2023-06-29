@@ -86,7 +86,7 @@ public partial class GuildwarsMinimap : UserControl
     public event EventHandler<LivingEntity>? LivingEntityClicked;
     public event EventHandler<PlayerInformation>? PlayerInformationClicked;
     public event EventHandler<MapIcon>? MapIconClicked;
-    public event EventHandler<Profession?> ProfessionClicked;
+    public event EventHandler<Profession>? ProfessionClicked;
 
     public GuildwarsMinimap()
         :this(
@@ -119,6 +119,11 @@ public partial class GuildwarsMinimap : UserControl
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);
+        if (!this.IsEnabled)
+        {
+            return;
+        }
+
         if (e.Property == ActualHeightProperty ||
             e.Property == ActualWidthProperty)
         {
@@ -146,7 +151,8 @@ public partial class GuildwarsMinimap : UserControl
 
     private void UpdateGameData()
     {
-        if(this.GameData.Valid is false)
+        if(this.GameData is null ||
+            this.GameData.Valid is false)
         {
             return;
         }
@@ -162,7 +168,7 @@ public partial class GuildwarsMinimap : UserControl
         }
 
         this.TargetEntityId = this.GameData.Session?.CurrentTargetId ?? 0;
-        this.TargetEntityModelId = (int?)this.GameData.LivingEntities?.FirstOrDefault(e => e.Id == this.TargetEntityId).ModelType ?? 0;
+        this.TargetEntityModelId = (int?)this.GameData.LivingEntities?.FirstOrDefault(e => e.Id == this.TargetEntityId)?.ModelType ?? 0;
         var screenVirtualWidth = this.ActualWidth / this.Zoom;
         var screenVirtualHeight = this.ActualHeight / this.Zoom;
         var position = debounceResponse.MainPlayer.Position!.Value;
@@ -202,7 +208,8 @@ public partial class GuildwarsMinimap : UserControl
 
     private void DrawMap()
     {
-        if (this.PathingData.Trapezoids is null)
+        if (this.PathingData is null ||
+            this.PathingData.Trapezoids is null)
         {
             return;
         }
@@ -582,23 +589,26 @@ public partial class GuildwarsMinimap : UserControl
 
     private void GuildwarsMinimap_MouseMove(object sender, MouseEventArgs e)
     {
-        if (this.GameData.Valid is false)
+        if (this.GameData.Valid is false ||
+            this.GameData.MainPlayer is null ||
+            this.GameData.Party is null ||
+            this.GameData.WorldPlayers is null)
         {
             return;
         }
 
         this.DragMinimap();
-        if (this.CheckMouseOverEntity(this.GameData.Party!.OfType<IEntity>()) is not null)
+        if (this.CheckMouseOverEntity(this.GameData.Party.OfType<IEntity>()) is not null)
         {
             return;
         }
 
-        if (this.CheckMouseOverEntity(this.GameData.WorldPlayers!.OfType<IEntity>()) is not null)
+        if (this.CheckMouseOverEntity(this.GameData.WorldPlayers.OfType<IEntity>()) is not null)
         {
             return;
         }
 
-        if (this.CheckMouseOverEntity(Enumerable.Repeat(this.GameData.MainPlayer.As<IEntity>(), 1)) is not null)
+        if (this.CheckMouseOverEntity(Enumerable.Repeat(this.GameData.MainPlayer.Cast<IEntity>(), 1)) is not null)
         {
             return;
         }
@@ -613,14 +623,14 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
-        if (this.CheckMouseOverEntity(this.GameData.MainPlayer!.Value.QuestLog!
+        if (this.CheckMouseOverEntity(this.GameData.MainPlayer.QuestLog!
                 .Where(entity => this.drawingService.IsEntityOnScreen(entity.Position, out _, out _))
                 .OfType<IPositionalEntity>()) is not null)
         {
             return;
         }
 
-        if (this.CheckMouseOverEntity(this.GameData.MainPlayer!.Value.QuestLog!
+        if (this.CheckMouseOverEntity(this.GameData.MainPlayer.QuestLog!
                 .Where(entity => !this.drawingService.IsEntityOnScreen(entity.Position, out _, out _))
                 .Select(oldQuestMetadata =>
                 {
@@ -665,32 +675,32 @@ public partial class GuildwarsMinimap : UserControl
 
     private void QuestContextMenu_QuestContextMenuClicked(object _, QuestMetadata? quest)
     {
-        if (quest is not QuestMetadata)
+        if (quest is null)
         {
             return;
         }
 
-        this.QuestMetadataClicked?.Invoke(this, quest.Value);
+        this.QuestMetadataClicked?.Invoke(this, quest);
     }
 
     private void PlayerContextMenu_PlayerContextMenuClicked(object _, PlayerInformation? playerInformation)
     {
-        if (playerInformation is not PlayerInformation)
+        if (playerInformation is null)
         {
             return;
         }
 
-        this.PlayerInformationClicked?.Invoke(this, playerInformation.Value);
+        this.PlayerInformationClicked?.Invoke(this, playerInformation);
     }
 
     private void LivingEntityContextMenu_LivingEntityContextMenuClicked(object _, LivingEntity? livingEntity)
     {
-        if (livingEntity is not LivingEntity)
+        if (livingEntity is null)
         {
             return;
         }
 
-        this.LivingEntityClicked?.Invoke(this, livingEntity.Value);
+        this.LivingEntityClicked?.Invoke(this, livingEntity);
     }
 
     private void LivingEntityContextMenu_LivingEntityProfessionContextMenuClicked(object _, Profession? e)
@@ -705,12 +715,12 @@ public partial class GuildwarsMinimap : UserControl
 
     private void MapIconContextMenu_MapIconContextMenuClicked(object _, MapIcon? mapIcon)
     {
-        if (mapIcon is not MapIcon)
+        if (mapIcon is null)
         {
             return;
         }
 
-        this.MapIconClicked?.Invoke(this, mapIcon.Value);
+        this.MapIconClicked?.Invoke(this, mapIcon);
     }
 
     private void MaximizeButton_Clicked(object sender, EventArgs e)

@@ -48,7 +48,7 @@ public sealed class BloogumClient : IBloogumClient
             }
 
             await CacheImage(localUri, imageStream);
-            
+            imageStream.Dispose();
         }
 
         return await this.imageCache.GetImage(localUri);
@@ -62,13 +62,13 @@ public sealed class BloogumClient : IBloogumClient
         }
 
         var worldInfo = await this.guildwarsMemoryCache.ReadWorldData(CancellationToken.None);
-        if (!worldInfo.HasValue)
+        if (worldInfo is null)
         {
             return GetRandomScreenShot();
         }
 
-        var validLocations = Location.Locations.Where(l => l.Region == worldInfo.Value.Region).ToList();
-        var validCategories = validLocations.SelectMany(l => l.Categories).Where(c => c.Map == worldInfo.Value.Map).ToList();
+        var validLocations = Location.Locations.Where(l => l.Region == worldInfo.Region).ToList();
+        var validCategories = validLocations.SelectMany(l => l.Categories).Where(c => c.Map == worldInfo.Map).ToList();
         if (validCategories.None())
         {
             if (validLocations.None())

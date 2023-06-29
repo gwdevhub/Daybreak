@@ -14,6 +14,9 @@ public sealed class FocusViewOptions
     [OptionName(Name = "Inventory Component Enabled", Description = "If true, the focus view will show a component with the inventory contents")]
     public bool InventoryComponentVisible { get; set; }
 
+    [OptionName(Name = "Minimap Component Enabled", Description = "If true, the focus view will show a minimap component")]
+    public bool MinimapComponentVisible { get; set; }
+
     [JsonProperty(nameof(ExperienceDisplay))]
     [OptionName(Name = "Experience Display Mode", Description = "Sets how should the experience display show the information")]
     public ExperienceDisplay ExperienceDisplay { get; set; }

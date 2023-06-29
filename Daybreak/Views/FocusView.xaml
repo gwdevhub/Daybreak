@@ -17,8 +17,10 @@
              x:Name="_this"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
-        <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" TriggerValue="True" ></converters:BooleanToVisibilityConverter>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" TriggerValue="True" />
+        <converters:BooleanToGridLengthConverter x:Key="InventoryComponentVisibilityConverter" VisibleValue="1*" />
+        <converters:BooleanToGridLengthConverter x:Key="MinimapComponentVisibilityConverter" VisibleValue="1*" />
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -69,8 +71,8 @@
         <Grid Grid.Column="1"
               Margin="5, 0, 5, 0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="1*"/>
+                <RowDefinition Height="{Binding ElementName=_this, Path=InventoryVisible, Mode=OneWay, Converter={StaticResource InventoryComponentVisibilityConverter}}" />
+                <RowDefinition Height="{Binding ElementName=_this, Path=MinimapVisible, Mode=OneWay, Converter={StaticResource MinimapComponentVisibilityConverter}}" />
                 <RowDefinition Height="1.5*"/>
             </Grid.RowDefinitions>
             <Grid x:Name="InventoryHolder"
@@ -83,7 +85,8 @@
                                                MaximizeClicked="InventoryComponent_MaximizeClicked"
                                                Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                ItemWikiClicked="InventoryComponent_ItemWikiClicked"
-                                               PriceHistoryClicked="InventoryComponent_PriceHistoryClicked"/>
+                                               PriceHistoryClicked="InventoryComponent_PriceHistoryClicked"
+                                               IsEnabled="{Binding ElementName=_this, Path=InventoryVisible, Mode=OneWay}"/>
                 </Grid>
             </Grid>
             <Grid x:Name="MinimapHolder"
@@ -106,7 +109,8 @@
                                           ClipToBounds="True"
                                           Background="{DynamicResource Daybreak.Brushes.Background}"
                                           BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                                          BorderThickness="1" />
+                                          BorderThickness="1"
+                                          IsEnabled="{Binding ElementName=_this, Path=MinimapVisible, Mode=OneWay}"/>
                     <controls:CircularLoadingWidget Height="100"
                                                 Width="100"
                                                 Visibility="{Binding ElementName=_this,Path=LoadingPathingData,Mode=OneWay,Converter={StaticResource BooleanToVisibilityConverter}}" />

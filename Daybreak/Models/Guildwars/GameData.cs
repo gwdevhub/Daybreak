@@ -1,9 +1,8 @@
-﻿using Daybreak.Models.Guildwars;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Daybreak.Models.Guildwars;
 
-public readonly struct GameData
+public sealed class GameData
 {
     public bool Valid { get; init; }
     public MainPlayerInformation? MainPlayer { get; init; }

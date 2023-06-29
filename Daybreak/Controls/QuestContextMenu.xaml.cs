@@ -19,6 +19,6 @@ public partial class QuestContextMenu : UserControl
 
     private void TextBlock_MouseLeftButtonDown(object _, MouseButtonEventArgs e)
     {
-        this.QuestContextMenuClicked?.Invoke(this, this.DataContext as QuestMetadata? ?? default);
+        this.QuestContextMenuClicked?.Invoke(this, this.DataContext as QuestMetadata ?? default);
     }
 }
