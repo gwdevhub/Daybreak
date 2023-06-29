@@ -5,47 +5,63 @@ namespace Daybreak.Models.Interop;
 [StructLayout(LayoutKind.Explicit)]
 public readonly struct EntityContext
 {
-    public const uint EntityContextBaseOffset = 0x0014;
-
-    [FieldOffset(0x0000)]
+    [FieldOffset(0x0014)]
     public readonly uint Timer;
 
-    [FieldOffset(0x0018)]
+    [FieldOffset(0x002C)]
     public readonly uint AgentId;
 
-    [FieldOffset(0x001C)]
+    [FieldOffset(0x0030)]
     public readonly uint ZCoords;
 
-    [FieldOffset(0x0044)]
+    [FieldOffset(0x0058)]
     public readonly uint NameProperties;
 
-    [FieldOffset(0x0060)]
+    [FieldOffset(0x0074)]
     public readonly GamePosition Position;
 
-    [FieldOffset(0x0088)]
+    [FieldOffset(0x009C)]
     public readonly EntityType EntityType;
 
-    [FieldOffset(0x00E0)]
+    [FieldOffset(0x00F4)]
     public readonly ushort EntityModelType;
 
-    [FieldOffset(0x00E2)]
+    [FieldOffset(0x00F6)]
     public readonly ushort AgentModelType;
 
-    [FieldOffset(0x00F6)]
+    [FieldOffset(0x010A)]
     public readonly byte PrimaryProfessionId;
 
-    [FieldOffset(0x00F7)]
+    [FieldOffset(0x010B)]
     public readonly byte SecondaryProfessionId;
 
-    [FieldOffset(0x00F8)]
+    [FieldOffset(0x010C)]
     public readonly byte Level;
 
-    [FieldOffset(0x00F9)]
+    [FieldOffset(0x010D)]
     public readonly PvpTeam TeamId;
 
-    [FieldOffset(0x0144)]
+    [FieldOffset(0x0114)]
+    public readonly float EnergyRegen; // Only works for main player
+
+    [FieldOffset(0x011C)]
+    public readonly float CurrentEnergyPercentage; // Only works for main player
+
+    [FieldOffset(0x0120)]
+    public readonly uint MaxEnergy; // Only works for main player
+
+    [FieldOffset(0x0128)]
+    public readonly float HealthRegen; // Only works for main player
+
+    [FieldOffset(0x0130)]
+    public readonly float CurrentHealthPercentage; // Only works for main player
+
+    [FieldOffset(0x0134)]
+    public readonly uint MaxHealth; // Only works for main player
+
+    [FieldOffset(0x0158)]
     public readonly EntityState State;
 
-    [FieldOffset(0x019D)]
+    [FieldOffset(0x01B1)]
     public readonly EntityAllegiance Allegiance;
 }

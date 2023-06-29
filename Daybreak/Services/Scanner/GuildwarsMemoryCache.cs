@@ -19,6 +19,9 @@ public sealed class GuildwarsMemoryCache : IGuildwarsMemoryCache
     private readonly CachedData<PathingData?> pathingDataCache = new();
     private readonly CachedData<PathingMetadata?> pathingMetadataCache = new();
     private readonly CachedData<WorldData?> worldDataCache = new();
+    private readonly CachedData<SessionData?> sessionDataCache = new();
+    private readonly CachedData<UserData?> userDataCache = new();
+    private readonly CachedData<MainPlayerData?> mainPlayerDataCache = new();
 
     public GuildwarsMemoryCache(
         IGuildwarsMemoryReader guildwarsMemoryReader,
@@ -56,6 +59,21 @@ public sealed class GuildwarsMemoryCache : IGuildwarsMemoryCache
     public Task<WorldData?> ReadWorldData(CancellationToken cancellationToken)
     {
         return this.ReadDataInternal(this.worldDataCache, this.guildwarsMemoryReader.ReadWorldData, cancellationToken);
+    }
+
+    public Task<SessionData?> ReadSessionData(CancellationToken cancellationToken)
+    {
+        return this.ReadDataInternal(this.sessionDataCache, this.guildwarsMemoryReader.ReadSessionData, cancellationToken);
+    }
+
+    public Task<UserData?> ReadUserData(CancellationToken cancellationToken)
+    {
+        return this.ReadDataInternal(this.userDataCache, this.guildwarsMemoryReader.ReadUserData, cancellationToken);
+    }
+
+    public Task<MainPlayerData?> ReadMainPlayerData(CancellationToken cancellationToken)
+    {
+        return this.ReadDataInternal(this.mainPlayerDataCache, this.guildwarsMemoryReader.ReadMainPlayerData, cancellationToken);
     }
 
     private async Task<T?> ReadDataInternal<T>(CachedData<T?> cachedData, Func<CancellationToken, Task<T?>> task, CancellationToken cancellationToken)

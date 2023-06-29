@@ -179,6 +179,18 @@ public sealed class MemoryScanner : IMemoryScanner
     {
         return this.ReadArray<T>(guildwarsArray.Buffer.Address, guildwarsArray.Size);
     }
+    
+    public T ReadItemAtIndex<T>(uint address, int index)
+    {
+        var itemSize = Marshal.SizeOf(typeof(T));
+        var itemAtIndexAddress = address + (index * itemSize);
+        return this.Read<T>((uint)itemAtIndexAddress);
+    }
+
+    public T ReadItemAtIndex<T>(GuildwarsArray<T> guildwarsArray, int index)
+    {
+        return this.ReadItemAtIndex<T>(guildwarsArray.Buffer.Address, index);
+    }
 
     public T[] ReadArray<T>(GuildwarsPointerArray<T> guildwarsPointerArray)
     {

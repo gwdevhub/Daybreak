@@ -17,8 +17,6 @@ namespace Daybreak.Controls.FocusViewComponents;
 /// </summary>
 public partial class PlayerResourcesComponent : UserControl
 {
-    private const double BarsTotalSize = 116; // Size of the bars on one side of the screen.
-
     private readonly IExperienceCalculator experienceCalculator;
     private readonly ILiveUpdateableOptions<FocusViewOptions> liveOptions;
 
@@ -58,11 +56,6 @@ public partial class PlayerResourcesComponent : UserControl
     [GenerateDependencyProperty]
     private string vanquishingText = string.Empty;
 
-    [GenerateDependencyProperty]
-    private double leftSideBarSize;
-    [GenerateDependencyProperty]
-    private double rightSideBarSize;
-
     public PlayerResourcesComponent()
         : this(
               Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IExperienceCalculator>(),
@@ -77,32 +70,15 @@ public partial class PlayerResourcesComponent : UserControl
         this.experienceCalculator = experienceCalculator.ThrowIfNull();
         this.liveOptions = liveOptions.ThrowIfNull();
         this.InitializeComponent();
-
-        this.LeftSideBarSize = 25;
     }
 
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);
-        if (e.Property == VanquishingProperty &&
-                e.OldValue != e.NewValue)
-        {
-            this.UpdateRightSideBarsLayout();
-        }
-        else if (e.Property == TitleActiveProperty &&
-            e.OldValue != e.NewValue)
-        {
-            this.UpdateRightSideBarsLayout();
-        }
-        else if (e.Property == DataContextProperty)
+        if (e.Property == DataContextProperty)
         {
             this.UpdateGameData();
         }
-    }
-
-    private void Control_Loaded(object sender, RoutedEventArgs e)
-    {
-        this.UpdateRightSideBarsLayout();
     }
 
     private void ExperienceBar_MouseLeftButtonDown(object _, MouseButtonEventArgs e)
@@ -260,40 +236,23 @@ public partial class PlayerResourcesComponent : UserControl
         this.UpdateEnergyText();
     }
 
-    private void UpdateRightSideBarsLayout()
-    {
-        var bars = 2;
-        if (this.Vanquishing)
-        {
-            bars += 1;
-        }
-
-        if (this.TitleActive)
-        {
-            bars += 1;
-        }
-
-        var marginsTotalSize = 4 * bars;
-        var finalBarSize = (BarsTotalSize - marginsTotalSize) / bars;
-        this.RightSideBarSize = finalBarSize;
-    }
-
     private void UpdateGameData()
     {
-        if (this.DataContext is not GameData gameData ||
-            gameData.MainPlayer is null ||
-            gameData.Session is null)
+        if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
+            mainPlayerResourceContext.User?.User is null ||
+            mainPlayerResourceContext.Session?.Session is null ||
+            mainPlayerResourceContext.Player?.PlayerInformation is null)
         {
             return;
         }
 
-        this.CurrentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(gameData.MainPlayer.Experience);
-        this.NextLevelExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(gameData.MainPlayer.Experience);
-        this.TotalFoes = (int)(gameData.Session.FoesKilled + gameData.Session.FoesToKill);
-        this.Vanquishing = gameData.Session.FoesToKill + gameData.Session.FoesKilled > 0U;
-        this.TitleActive = gameData.MainPlayer.TitleInformation is not null && gameData.MainPlayer.TitleInformation.IsValid;
+        this.CurrentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(mainPlayerResourceContext.Player.PlayerInformation.Experience);
+        this.NextLevelExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(mainPlayerResourceContext.Player.PlayerInformation.Experience);
+        this.TotalFoes = (int)(mainPlayerResourceContext.Session.Session.FoesKilled + mainPlayerResourceContext.Session.Session.FoesToKill);
+        this.Vanquishing = mainPlayerResourceContext.Session.Session.FoesToKill + mainPlayerResourceContext.Session.Session.FoesKilled > 0U;
+        this.TitleActive = mainPlayerResourceContext.Player.PlayerInformation.TitleInformation is not null && mainPlayerResourceContext.Player.PlayerInformation.TitleInformation.IsValid;
 
-        if (gameData.MainPlayer.TitleInformation is TitleInformation titleInformation && titleInformation.IsValid)
+        if (mainPlayerResourceContext.Player.PlayerInformation.TitleInformation is TitleInformation titleInformation && titleInformation.IsValid)
         {
             if (titleInformation.MaxTierNumber == titleInformation.TierNumber)
             {
@@ -325,8 +284,8 @@ public partial class PlayerResourcesComponent : UserControl
 
     private void UpdateExperienceText()
     {
-        if (this.DataContext is not GameData gameData ||
-            gameData.MainPlayer is null)
+        if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
+            mainPlayerResourceContext.Player?.PlayerInformation is null)
         {
             return;
         }
@@ -334,22 +293,22 @@ public partial class PlayerResourcesComponent : UserControl
         switch (this.liveOptions.Value.ExperienceDisplay)
         {
             case Configuration.FocusView.ExperienceDisplay.CurrentLevelCurrentAndCurrentLevelMax:
-                var currentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(gameData.MainPlayer.Experience);
-                var nextLevelExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(gameData.MainPlayer.Experience);
+                var currentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(mainPlayerResourceContext.Player.PlayerInformation.Experience);
+                var nextLevelExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(mainPlayerResourceContext.Player.PlayerInformation.Experience);
                 this.ExperienceBarText = $"{(int)currentExperienceInLevel} / {(int)nextLevelExperienceThreshold} XP";
                 break;
             case Configuration.FocusView.ExperienceDisplay.TotalCurretAndTotalMax:
-                var currentTotalExperience = gameData.MainPlayer.Experience;
+                var currentTotalExperience = mainPlayerResourceContext.Player.PlayerInformation.Experience;
                 var requiredTotalExperience = this.experienceCalculator.GetTotalExperienceForNextLevel(currentTotalExperience);
                 this.ExperienceBarText = $"{(int)currentTotalExperience} / {(int)requiredTotalExperience} XP";
                 break;
             case Configuration.FocusView.ExperienceDisplay.RemainingUntilNextLevel:
-                var remainingExperience = this.experienceCalculator.GetRemainingExperienceForNextLevel(gameData.MainPlayer.Experience);
+                var remainingExperience = this.experienceCalculator.GetRemainingExperienceForNextLevel(mainPlayerResourceContext.Player.PlayerInformation.Experience);
                 this.ExperienceBarText = $"Remaining {(int)remainingExperience} XP";
                 break;
             case Configuration.FocusView.ExperienceDisplay.Percentage:
-                var currentExperienceInLevel2 = this.experienceCalculator.GetExperienceForCurrentLevel(gameData.MainPlayer.Experience);
-                var nextLevelExperienceThreshold2 = this.experienceCalculator.GetNextExperienceThreshold(gameData.MainPlayer.Experience);
+                var currentExperienceInLevel2 = this.experienceCalculator.GetExperienceForCurrentLevel(mainPlayerResourceContext.Player.PlayerInformation.Experience);
+                var nextLevelExperienceThreshold2 = this.experienceCalculator.GetNextExperienceThreshold(mainPlayerResourceContext.Player.PlayerInformation.Experience);
                 this.ExperienceBarText = $"{(int)((double)currentExperienceInLevel2 / (double)nextLevelExperienceThreshold2 * 100)}% XP";
                 break;
         }
@@ -357,7 +316,8 @@ public partial class PlayerResourcesComponent : UserControl
 
     private void UpdateLuxonText()
     {
-        if (this.DataContext is not GameData gameData)
+        if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
+            mainPlayerResourceContext.User?.User is null)
         {
             return;
         }
@@ -365,20 +325,21 @@ public partial class PlayerResourcesComponent : UserControl
         switch (this.liveOptions.Value.LuxonPointsDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.LuxonBarText = $"{gameData.User!.CurrentLuxonPoints} / {gameData.User.MaxLuxonPoints} Luxon Points";
+                this.LuxonBarText = $"{mainPlayerResourceContext.User.User.CurrentLuxonPoints} / {mainPlayerResourceContext.User.User.MaxLuxonPoints} Luxon Points";
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.LuxonBarText = $"Remaining {gameData.User!.MaxLuxonPoints - gameData.User.CurrentLuxonPoints} Luxon Points";
+                this.LuxonBarText = $"Remaining {mainPlayerResourceContext.User.User.MaxLuxonPoints - mainPlayerResourceContext.User.User.CurrentLuxonPoints} Luxon Points";
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.LuxonBarText = $"{(int)((double)gameData.User!.CurrentLuxonPoints / (double)gameData.User.MaxLuxonPoints * 100)}% Luxon Points";
+                this.LuxonBarText = $"{(int)((double)mainPlayerResourceContext.User.User.CurrentLuxonPoints / (double)mainPlayerResourceContext.User.User.MaxLuxonPoints * 100)}% Luxon Points";
                 break;
         }
     }
 
     private void UpdateKurzickText()
     {
-        if (this.DataContext is not GameData gameData)
+        if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
+            mainPlayerResourceContext.User?.User is null)
         {
             return;
         }
@@ -386,20 +347,21 @@ public partial class PlayerResourcesComponent : UserControl
         switch (this.liveOptions.Value.KurzickPointsDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.KurzickBarText = $"{gameData.User!.CurrentKurzickPoints} / {gameData.User.MaxKurzickPoints} Kurzick Points";
+                this.KurzickBarText = $"{mainPlayerResourceContext.User.User.CurrentKurzickPoints} / {mainPlayerResourceContext.User.User.MaxKurzickPoints} Kurzick Points";
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.KurzickBarText = $"Remaining {gameData.User!.MaxKurzickPoints - gameData.User.CurrentKurzickPoints} Kurzick Points";
+                this.KurzickBarText = $"Remaining {mainPlayerResourceContext.User.User!.MaxKurzickPoints - mainPlayerResourceContext.User.User.CurrentKurzickPoints} Kurzick Points";
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.KurzickBarText = $"{(int)((double)gameData.User!.CurrentKurzickPoints / (double)gameData.User.MaxKurzickPoints * 100)}% Kurzick Points";
+                this.KurzickBarText = $"{(int)((double)mainPlayerResourceContext.User.User.CurrentKurzickPoints / (double)mainPlayerResourceContext.User.User.MaxKurzickPoints * 100)}% Kurzick Points";
                 break;
         }
     }
 
     private void UpdateImperialText()
     {
-        if (this.DataContext is not GameData gameData)
+        if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
+            mainPlayerResourceContext.User?.User is null)
         {
             return;
         }
@@ -407,20 +369,21 @@ public partial class PlayerResourcesComponent : UserControl
         switch (this.liveOptions.Value.ImperialPointsDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.ImperialBarText = $"{gameData.User!.CurrentImperialPoints} / {gameData.User.MaxImperialPoints} Imperial Points";
+                this.ImperialBarText = $"{mainPlayerResourceContext.User.User!.CurrentImperialPoints} / {mainPlayerResourceContext.User.User.MaxImperialPoints} Imperial Points";
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.ImperialBarText = $"Remaining {gameData.User!.MaxImperialPoints - gameData.User.CurrentImperialPoints} Imperial Points";
+                this.ImperialBarText = $"Remaining {mainPlayerResourceContext.User.User!.MaxImperialPoints - mainPlayerResourceContext.User.User.CurrentImperialPoints} Imperial Points";
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.ImperialBarText = $"{(int)((double)gameData.User!.CurrentImperialPoints / (double)gameData.User.MaxImperialPoints * 100)}% Imperial Points";
+                this.ImperialBarText = $"{(int)((double)mainPlayerResourceContext.User.User!.CurrentImperialPoints / (double)mainPlayerResourceContext.User.User.MaxImperialPoints * 100)}% Imperial Points";
                 break;
         }
     }
 
     private void UpdateBalthazarText()
     {
-        if (this.DataContext is not GameData gameData)
+        if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
+            mainPlayerResourceContext.User?.User is null)
         {
             return;
         }
@@ -428,21 +391,21 @@ public partial class PlayerResourcesComponent : UserControl
         switch (this.liveOptions.Value.BalthazarPointsDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.BalthazarBarText = $"{gameData.User!.CurrentBalthazarPoints} / {gameData.User.MaxBalthazarPoints} Balthazar Points";
+                this.BalthazarBarText = $"{mainPlayerResourceContext.User.User.CurrentBalthazarPoints} / {mainPlayerResourceContext.User.User.MaxBalthazarPoints} Balthazar Points";
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.BalthazarBarText = $"Remaining {gameData.User!.MaxBalthazarPoints - gameData.User.CurrentBalthazarPoints} Balthazar Points";
+                this.BalthazarBarText = $"Remaining {mainPlayerResourceContext.User.User.MaxBalthazarPoints - mainPlayerResourceContext.User.User.CurrentBalthazarPoints} Balthazar Points";
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.BalthazarBarText = $"{(int)((double)gameData.User!.CurrentBalthazarPoints / (double)gameData.User.MaxBalthazarPoints * 100)}% Balthazar Points";
+                this.BalthazarBarText = $"{(int)((double)mainPlayerResourceContext.User.User.CurrentBalthazarPoints / (double)mainPlayerResourceContext.User.User.MaxBalthazarPoints * 100)}% Balthazar Points";
                 break;
         }
     }
 
     private void UpdateVanquishingText()
     {
-        if (this.DataContext is not GameData gameData ||
-            gameData.Session is null)
+        if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
+            mainPlayerResourceContext.Session?.Session is null)
         {
             return;
         }
@@ -450,21 +413,21 @@ public partial class PlayerResourcesComponent : UserControl
         switch (this.liveOptions.Value.VanquishingDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.VanquishingText = $"{gameData.Session.FoesKilled} / {(int)this.TotalFoes} Foes Killed";
+                this.VanquishingText = $"{mainPlayerResourceContext.Session.Session.FoesKilled} / {(int)this.TotalFoes} Foes Killed";
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.VanquishingText = $"Remaining {gameData.Session.FoesToKill} Foes";
+                this.VanquishingText = $"Remaining {mainPlayerResourceContext.Session.Session.FoesToKill} Foes";
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.VanquishingText = $"{(int)((double)gameData.Session.FoesKilled / (double)this.TotalFoes * 100)}% Foes Killed";
+                this.VanquishingText = $"{(int)((double)mainPlayerResourceContext.Session.Session.FoesKilled / (double)this.TotalFoes * 100)}% Foes Killed";
                 break;
         }
     }
 
     private void UpdateHealthText()
     {
-        if (this.DataContext is not GameData gameData ||
-            gameData.MainPlayer is null)
+        if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
+            mainPlayerResourceContext.Player?.PlayerInformation is null)
         {
             return;
         }
@@ -472,21 +435,21 @@ public partial class PlayerResourcesComponent : UserControl
         switch (this.liveOptions.Value.HealthDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.HealthBarText = $"{(int)gameData.MainPlayer.CurrentHealth} / {(int)gameData.MainPlayer.MaxHealth} Health";
+                this.HealthBarText = $"{(int)mainPlayerResourceContext.Player.PlayerInformation.CurrentHealth} / {(int)mainPlayerResourceContext.Player.PlayerInformation.MaxHealth} Health";
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.HealthBarText = $"Remaining {(int)gameData.MainPlayer.CurrentHealth} Health";
+                this.HealthBarText = $"Remaining {(int)mainPlayerResourceContext.Player.PlayerInformation.CurrentHealth} Health";
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.HealthBarText = $"{(int)(gameData.MainPlayer.CurrentHealth / gameData.MainPlayer.MaxHealth * 100)}% Health";
+                this.HealthBarText = $"{(int)(mainPlayerResourceContext.Player.PlayerInformation.CurrentHealth / mainPlayerResourceContext.Player.PlayerInformation.MaxHealth * 100)}% Health";
                 break;
         }
     }
 
     private void UpdateEnergyText()
     {
-        if (this.DataContext is not GameData gameData ||
-            gameData.MainPlayer is null)
+        if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
+            mainPlayerResourceContext.Player?.PlayerInformation is null)
         {
             return;
         }
@@ -494,31 +457,32 @@ public partial class PlayerResourcesComponent : UserControl
         switch (this.liveOptions.Value.EnergyDisplay)
         {
             case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.EnergyBarText = $"{(int)gameData.MainPlayer.CurrentEnergy} / {(int)gameData.MainPlayer.MaxEnergy} Energy";
+                this.EnergyBarText = $"{(int)mainPlayerResourceContext.Player.PlayerInformation.CurrentEnergy} / {(int)mainPlayerResourceContext.Player.PlayerInformation.MaxEnergy} Energy";
                 break;
             case Configuration.FocusView.PointsDisplay.Remaining:
-                this.EnergyBarText = $"Remaining {(int)gameData.MainPlayer.CurrentEnergy} Energy";
+                this.EnergyBarText = $"Remaining {(int)mainPlayerResourceContext.Player.PlayerInformation.CurrentEnergy} Energy";
                 break;
             case Configuration.FocusView.PointsDisplay.Percentage:
-                this.EnergyBarText = $"{(int)(gameData.MainPlayer.CurrentEnergy / gameData.MainPlayer.MaxEnergy * 100)}% Energy";
+                this.EnergyBarText = $"{(int)(mainPlayerResourceContext.Player.PlayerInformation.CurrentEnergy / mainPlayerResourceContext.Player.PlayerInformation.MaxEnergy * 100)}% Energy";
                 break;
         }
     }
 
     private void UpdateTitleText()
     {
-        if (this.DataContext is not GameData gameData)
+        if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
+            mainPlayerResourceContext.Player?.PlayerInformation is null)
         {
             return;
         }
 
-        if (gameData.MainPlayer?.TitleInformation?.IsPercentage is true)
+        if (mainPlayerResourceContext.Player.PlayerInformation.TitleInformation?.IsPercentage is true)
         {
-            this.TitleText = $"{(double?)gameData.MainPlayer?.TitleInformation?.CurrentPoints / 10d}% Rank Progress";
+            this.TitleText = $"{(double?)mainPlayerResourceContext.Player.PlayerInformation.TitleInformation?.CurrentPoints / 10d}% Rank Progress";
         }
         else
         {
-            this.TitleText = $"{gameData.MainPlayer?.TitleInformation?.CurrentPoints}/{gameData.MainPlayer?.TitleInformation?.PointsForNextRank} Rank Progress";
+            this.TitleText = $"{mainPlayerResourceContext.Player.PlayerInformation.TitleInformation?.CurrentPoints}/{mainPlayerResourceContext.Player.PlayerInformation.TitleInformation?.PointsForNextRank} Rank Progress";
         }
     }
 }

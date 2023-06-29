@@ -34,7 +34,7 @@
         <components:PlayerResourcesComponent Margin="5, 5, 5, 0"
                                              Grid.ColumnSpan="2"
                                              Grid.Row="1"
-                                             DataContext="{Binding ElementName=_this, Path=GameData, Mode=OneWay}"
+                                             DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext, Mode=OneWay}"
                                              Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         <Grid Margin="5, 0, 5, 0"
               Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -47,26 +47,26 @@
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
             <components:MainPlayerInformationComponent Grid.Row="0"
-                                                       DataContext="{Binding ElementName=_this, Path=GameData.MainPlayer, Mode=OneWay}"
+                                                       DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext.Player.PlayerInformation, Mode=OneWay}"
                                                        Margin="0, 0, 0, 10"
                                                        NavigateToClicked="Component_NavigateToClicked"/>
             <components:TitleInformationComponent Grid.Row="1"
-                                                  DataContext="{Binding ElementName=_this, Path=GameData.MainPlayer.TitleInformation, Mode=OneWay}"
-                                                  Visibility="{Binding ElementName=_this, Path=GameData.MainPlayer.TitleInformation.IsValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                  DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext.Player.PlayerInformation.TitleInformation, Mode=OneWay}"
+                                                  Visibility="{Binding ElementName=_this, Path=MainPlayerResourceContext.Player.PlayerInformation.TitleInformation.IsValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                   Margin="0, 0, 0, 10"
                                                   NavigateToClicked="Component_NavigateToClicked"/>
             <components:CurrentMapComponent Grid.Row="2"
-                                            DataContext="{Binding ElementName=_this, Path=GameData.Session.CurrentMap, Mode=OneWay}"
+                                            DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext.Session.Session.CurrentMap, Mode=OneWay}"
                                             Margin="0, 0, 0, 10"
                                             NavigateToClicked="Component_NavigateToClicked"/>
             <components:CurrentQuestComponent Grid.Row="3"
                                               Margin="0, 0, 0, 10"
-                                              DataContext="{Binding ElementName=_this, Path=GameData.MainPlayer.Quest, Mode=OneWay}"
+                                              DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext.Player.PlayerInformation.Quest, Mode=OneWay}"
                                               NavigateToClicked="Component_NavigateToClicked"/>
             <components:QuestLogComponent Grid.Row="4"
                                           Grid.RowSpan="2"
                                           NavigateToClicked="Component_NavigateToClicked"
-                                          DataContext="{Binding ElementName=_this, Path=GameData.MainPlayer.QuestLog, Mode=OneWay}"></components:QuestLogComponent>
+                                          DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext.Player.PlayerInformation.QuestLog, Mode=OneWay}"></components:QuestLogComponent>
         </Grid>
         <Grid Grid.Column="1"
               Margin="5, 0, 5, 0">

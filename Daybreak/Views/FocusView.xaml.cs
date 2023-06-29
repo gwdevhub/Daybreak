@@ -46,6 +46,9 @@ public partial class FocusView : UserControl
     private PathingData pathingData;
 
     [GenerateDependencyProperty]
+    private MainPlayerResourceContext mainPlayerResourceContext;
+
+    [GenerateDependencyProperty]
     private bool loadingPathingData;
 
     [GenerateDependencyProperty]
@@ -113,6 +116,7 @@ public partial class FocusView : UserControl
         if (pathingMeta?.TrapezoidCount == this.PathingData?.Trapezoids?.Count ||
             this.cancellationTokenSource?.IsCancellationRequested is not false)
         {
+            await this.Dispatcher.InvokeAsync(() => this.LoadingPathingData = false);
             return;
         }
 
@@ -130,43 +134,6 @@ public partial class FocusView : UserControl
             this.PathingData = pathingData;
             this.LoadingPathingData = false;
         });
-    }
-
-    private async Task UpdateGameData()
-    {
-        if (this.applicationLauncher.IsGuildwarsRunning is false)
-        {
-            this.logger.LogInformation($"Executable is not running. Returning to {nameof(LauncherView)}");
-            this.viewManager.ShowView<LauncherView>();
-            this.cancellationTokenSource?.Cancel();
-            return;
-        }
-
-        var maybeGameData = await this.guildwarsMemoryCache.ReadGameData(this.cancellationTokenSource?.Token ?? CancellationToken.None).ConfigureAwait(true);
-        if (maybeGameData is not GameData gameData)
-        {
-            this.MainPlayerDataValid = false;
-            this.Browser.Visibility = this.MainPlayerDataValid is true ? Visibility.Visible : Visibility.Collapsed;
-            return;
-        }
-
-        if (gameData.MainPlayer is null ||
-            gameData.User is null ||
-            gameData.Session is null ||
-            gameData.Valid is false)
-        {
-            this.MainPlayerDataValid = false;
-            this.Browser.Visibility = this.MainPlayerDataValid is true ? Visibility.Visible : Visibility.Collapsed;
-            return;
-        }
-
-        this.GameData = gameData;
-        this.MainPlayerDataValid = true;
-        this.Browser.Visibility = this.MainPlayerDataValid is true ?
-            this.minimapMaximized ?
-                Visibility.Hidden :
-                Visibility.Visible :
-            Visibility.Collapsed;
     }
 
     private async void PeriodicallyReadPathingData(CancellationToken cancellationToken)
@@ -203,10 +170,18 @@ public partial class FocusView : UserControl
                     return;
                 }
 
+                var readGameDataTask = this.guildwarsMemoryCache.ReadGameData(cancellationToken);
                 await Task.WhenAll(
-                    this.UpdateGameData(),
+                    readGameDataTask,
                     Task.Delay(16, cancellationToken)).ConfigureAwait(true);
 
+                var maybeGameData = await readGameDataTask;
+                if (maybeGameData is null)
+                {
+                    continue;
+                }
+
+                this.GameData = maybeGameData;
             }
             catch (Exception ex)
             {
@@ -246,6 +221,64 @@ public partial class FocusView : UserControl
         }
     }
 
+    private async void PeriodicallyReadMainPlayerContextData(CancellationToken cancellationToken)
+    {
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            try
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                if (this.applicationLauncher.IsGuildwarsRunning is false)
+                {
+                    this.logger.LogInformation($"Executable is not running. Returning to {nameof(LauncherView)}");
+                    this.viewManager.ShowView<LauncherView>();
+                    this.cancellationTokenSource?.Cancel();
+                    return;
+                }
+
+                var readUserDataTask = this.guildwarsMemoryCache.ReadUserData(cancellationToken);
+                var readSessionDataTask = this.guildwarsMemoryCache.ReadSessionData(cancellationToken);
+                var readMainPlayerDataTask = this.guildwarsMemoryCache.ReadMainPlayerData(cancellationToken);
+                await Task.WhenAll(
+                    readUserDataTask,
+                    readSessionDataTask,
+                    readMainPlayerDataTask,
+                    Task.Delay(16, cancellationToken)).ConfigureAwait(true);
+
+                var userData = await readUserDataTask;
+                var sessionData = await readSessionDataTask;
+                var mainPlayerData = await readMainPlayerDataTask;
+                if (userData?.User is null ||
+                    sessionData?.Session is null ||
+                    mainPlayerData?.PlayerInformation is null ||
+                    sessionData.Session.InstanceType is InstanceType.Loading or InstanceType.Undefined)
+                {
+                    this.MainPlayerDataValid = false;
+                    this.Browser.Visibility = Visibility.Collapsed;
+                    continue;
+                }
+
+                this.MainPlayerResourceContext = new MainPlayerResourceContext
+                {
+                    Player = mainPlayerData,
+                    User = userData,
+                    Session = sessionData
+                };
+
+                this.MainPlayerDataValid = true;
+                this.Browser.Visibility = this.minimapMaximized ? Visibility.Hidden : Visibility.Visible;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Encountered non-terminating exception. Silently continuing");
+            }
+        }
+    }
+
     private void FocusView_Loaded(object _, RoutedEventArgs e)
     {
         this.BrowserAddress = this.liveUpdateableOptions.Value.BrowserUrl;
@@ -254,7 +287,7 @@ public partial class FocusView : UserControl
         this.cancellationTokenSource?.Dispose();
         this.cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = this.cancellationTokenSource.Token;
-        this.PeriodicallyReadGameData(cancellationToken);
+        this.PeriodicallyReadMainPlayerContextData(cancellationToken);
         if (this.InventoryVisible)
         {
             this.PeriodicallyReadInventoryData(cancellationToken);
@@ -262,6 +295,7 @@ public partial class FocusView : UserControl
 
         if (this.MinimapVisible)
         {
+            this.PeriodicallyReadGameData(cancellationToken);
             this.PeriodicallyReadPathingData(cancellationToken);
         }
     }
