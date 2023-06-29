@@ -5,10 +5,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Controls.FocusViewComponents"
              xmlns:controls="clr-namespace:Daybreak.Controls"
+             xmlns:converters="clr-namespace:Daybreak.Converters"
              x:Name="_this"
              mc:Ignorable="d" 
-             Loaded="Control_Loaded"
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:BooleanToGridLengthConverter x:Key="ResourceBarGridLengthConverter" VisibleValue="*" />
+    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"></ColumnDefinition>
@@ -25,7 +28,6 @@
                 Text="{Binding ElementName=_this,Path=ExperienceBarText, Mode=OneWay}"
                 BarColor="{DynamicResource Daybreak.Brushes.Experience}"
                 Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                Height="113"
                 FontSize="14"
                 Cursor="Hand"
                 MouseLeftButtonDown="ExperienceBar_MouseLeftButtonDown">
@@ -63,13 +65,13 @@
                          StrokeThickness="0.08"
                          Stroke="{DynamicResource MahApps.Brushes.ThemeForeground}"></Polygon>
         </Viewbox>
-        <StackPanel
+        <Grid
                 VerticalAlignment="Center"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 Grid.Row="2"
                 Grid.RowSpan="2">
-            <StackPanel.OpacityMask>
+            <Grid.OpacityMask>
                 <DrawingBrush>
                     <DrawingBrush.Drawing>
                         <DrawingGroup>
@@ -92,12 +94,18 @@
                         </DrawingGroup>
                     </DrawingBrush.Drawing>
                 </DrawingBrush>
-            </StackPanel.OpacityMask>
+            </Grid.OpacityMask>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
             <controls:HorizontalResourceBar 
                     Margin="0, 2, 0, 2"
-                    Height="{Binding ElementName=_this, Path=LeftSideBarSize, Mode=OneWay}"
-                    CurrentResourceValue="{Binding Path=User.CurrentKurzickPoints, Mode=OneWay}"
-                    MaxResourceValue="{Binding Path=User.MaxKurzickPoints, Mode=OneWay}"
+                    Grid.Row="0"
+                    CurrentResourceValue="{Binding Path=User.User.CurrentKurzickPoints, Mode=OneWay}"
+                    MaxResourceValue="{Binding Path=User.User.MaxKurzickPoints, Mode=OneWay}"
                     VerticalAlignment="Bottom"
                     HorizontalAlignment="Left"
                     BarColor="{DynamicResource Daybreak.Brushes.Kurzick}"
@@ -110,9 +118,9 @@
                     MouseLeftButtonDown="KurzickBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
             <controls:HorizontalResourceBar 
                     Margin="0, 2, 0, 2"
-                    Height="{Binding ElementName=_this, Path=LeftSideBarSize, Mode=OneWay}"
-                    CurrentResourceValue="{Binding Path=User.CurrentLuxonPoints, Mode=OneWay}"
-                    MaxResourceValue="{Binding Path=User.MaxLuxonPoints, Mode=OneWay}"
+                    Grid.Row="1"
+                    CurrentResourceValue="{Binding Path=User.User.CurrentLuxonPoints, Mode=OneWay}"
+                    MaxResourceValue="{Binding Path=User.User.MaxLuxonPoints, Mode=OneWay}"
                     VerticalAlignment="Bottom"
                     HorizontalAlignment="Left"
                     BarColor="{DynamicResource Daybreak.Brushes.Luxon}"
@@ -125,9 +133,9 @@
                     MouseLeftButtonDown="LuxonBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
             <controls:HorizontalResourceBar 
                     Margin="0, 2, 0, 2"
-                    Height="{Binding ElementName=_this, Path=LeftSideBarSize, Mode=OneWay}"
-                    CurrentResourceValue="{Binding Path=User.CurrentImperialPoints, Mode=OneWay}"
-                    MaxResourceValue="{Binding Path=User.MaxImperialPoints, Mode=OneWay}"
+                    Grid.Row="2"
+                    CurrentResourceValue="{Binding Path=User.User.CurrentImperialPoints, Mode=OneWay}"
+                    MaxResourceValue="{Binding Path=User.User.MaxImperialPoints, Mode=OneWay}"
                     VerticalAlignment="Bottom"
                     HorizontalAlignment="Left"
                     BarColor="{DynamicResource Daybreak.Brushes.Imperial}"
@@ -140,9 +148,9 @@
                     MouseLeftButtonDown="ImperialBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
             <controls:HorizontalResourceBar
                     Margin="0, 2, 0, 2"
-                    Height="{Binding ElementName=_this, Path=LeftSideBarSize, Mode=OneWay}"
-                    CurrentResourceValue="{Binding Path=User.CurrentBalthazarPoints, Mode=OneWay}"
-                    MaxResourceValue="{Binding Path=User.MaxBalthazarPoints, Mode=OneWay}"
+                    Grid.Row="3"
+                    CurrentResourceValue="{Binding Path=User.User.CurrentBalthazarPoints, Mode=OneWay}"
+                    MaxResourceValue="{Binding Path=User.User.MaxBalthazarPoints, Mode=OneWay}"
                     VerticalAlignment="Bottom"
                     HorizontalAlignment="Left"
                     BarColor="{DynamicResource Daybreak.Brushes.Balthazar}"
@@ -153,7 +161,7 @@
                     BorderThickness="1"
                     Text="{Binding ElementName=_this, Path=BalthazarBarText, Mode=OneWay}"
                     MouseLeftButtonDown="BalthazarBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
-        </StackPanel>
+        </Grid>
         <Viewbox
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
@@ -166,14 +174,14 @@
                          Height="10.2"
                          Stroke="{DynamicResource MahApps.Brushes.ThemeForeground}"></Polygon>
         </Viewbox>
-        <StackPanel
+        <Grid
                 VerticalAlignment="Center"
                 HorizontalAlignment="Stretch"
                 Grid.Column="3"
                 Grid.ColumnSpan="2"
                 Grid.Row="2"
                 Grid.RowSpan="2">
-            <StackPanel.OpacityMask>
+            <Grid.OpacityMask>
                 <DrawingBrush>
                     <DrawingBrush.Drawing>
                         <DrawingGroup>
@@ -196,11 +204,17 @@
                         </DrawingGroup>
                     </DrawingBrush.Drawing>
                 </DrawingBrush>
-            </StackPanel.OpacityMask>
+            </Grid.OpacityMask>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="{Binding ElementName=_this, Path=Vanquishing, Mode=OneWay, Converter={StaticResource ResourceBarGridLengthConverter}}"></RowDefinition>
+                <RowDefinition Height="{Binding ElementName=_this, Path=TitleActive, Mode=OneWay, Converter={StaticResource ResourceBarGridLengthConverter}}"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
             <controls:HorizontalResourceBar 
                     Margin="0, 2, 0, 2"
-                    Height="{Binding ElementName=_this, Path=RightSideBarSize, Mode=OneWay}"
-                    CurrentResourceValue="{Binding Path=Session.FoesKilled, Mode=OneWay}"
+                    Grid.Row="0"
+                    CurrentResourceValue="{Binding Path=Session.Session.FoesKilled, Mode=OneWay}"
                     MaxResourceValue="{Binding ElementName=_this, Path=TotalFoes, Mode=OneWay}"
                     VerticalAlignment="Bottom"
                     HorizontalAlignment="Left"
@@ -216,7 +230,7 @@
                     MouseLeftButtonDown="VanquishingBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
             <controls:HorizontalResourceBar 
                     Margin="0, 2, 0, 2"
-                    Height="{Binding ElementName=_this, Path=RightSideBarSize, Mode=OneWay}"
+                    Grid.Row="1"
                     CurrentResourceValue="{Binding ElementName=_this, Path=PointsInCurrentRank, Mode=OneWay}"
                     MaxResourceValue="{Binding ElementName=_this, Path=PointsForNextRank, Mode=OneWay}"
                     VerticalAlignment="Bottom"
@@ -232,9 +246,9 @@
                     Visibility="{Binding ElementName=_this, Path=TitleActive, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
             <controls:HorizontalResourceBar 
                     Margin="0, 2, 0, 2"
-                    Height="{Binding ElementName=_this, Path=RightSideBarSize, Mode=OneWay}"
-                    CurrentResourceValue="{Binding Path=MainPlayer.CurrentHealth, Mode=OneWay}"
-                    MaxResourceValue="{Binding Path=MainPlayer.MaxHealth, Mode=OneWay}"
+                    Grid.Row="2"
+                    CurrentResourceValue="{Binding Path=Player.PlayerInformation.CurrentHealth, Mode=OneWay}"
+                    MaxResourceValue="{Binding Path=Player.PlayerInformation.MaxHealth, Mode=OneWay}"
                     VerticalAlignment="Bottom"
                     HorizontalAlignment="Left"
                     BarColor="{DynamicResource Daybreak.Brushes.Health}"
@@ -248,9 +262,9 @@
                     MouseLeftButtonDown="HealthBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
             <controls:HorizontalResourceBar 
                     Margin="0, 2, 0, 2"
-                    Height="{Binding ElementName=_this, Path=RightSideBarSize, Mode=OneWay}"
-                    CurrentResourceValue="{Binding Path=MainPlayer.CurrentEnergy, Mode=OneWay}"
-                    MaxResourceValue="{Binding Path=MainPlayer.MaxEnergy, Mode=OneWay}"
+                    Grid.Row="3"
+                    CurrentResourceValue="{Binding Path=Player.PlayerInformation.CurrentEnergy, Mode=OneWay}"
+                    MaxResourceValue="{Binding Path=Player.PlayerInformation.MaxEnergy, Mode=OneWay}"
                     VerticalAlignment="Bottom"
                     HorizontalAlignment="Left"
                     BarColor="{DynamicResource Daybreak.Brushes.Energy}"
@@ -262,7 +276,7 @@
                     BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
                     BorderThickness="1"
                     MouseLeftButtonDown="EnergyBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
-        </StackPanel>
+        </Grid>
         <Viewbox
                 Grid.Column="3"
                 Grid.ColumnSpan="2"

@@ -167,7 +167,7 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
-        this.TargetEntityId = this.GameData.Session?.CurrentTargetId ?? 0;
+        this.TargetEntityId = this.GameData.CurrentTargetId ?? 0;
         this.TargetEntityModelId = (int?)this.GameData.LivingEntities?.FirstOrDefault(e => e.Id == this.TargetEntityId)?.ModelType ?? 0;
         var screenVirtualWidth = this.ActualWidth / this.Zoom;
         var screenVirtualHeight = this.ActualHeight / this.Zoom;
