@@ -1,17 +1,19 @@
-﻿using Daybreak.Models.Metrics;
+﻿using Daybreak.Configuration.Options;
+using Daybreak.Models.Metrics;
 using Daybreak.Services.Images.Models;
 using Daybreak.Services.Metrics;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Extensions;
 using System.IO;
 using System.Logging;
-using System.Net.Cache;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
@@ -27,10 +29,10 @@ public sealed class ImageCache : IImageCache
     private const string CacheSizeMetricName = "Image cache size";
     private const string CacheSizeMetricDescription = "Size of the image cache in bytes";
     private const string CacheSizeMetricUnitName = "bytes";
-    private const double MaxCacheSize = 10e7; // 100mbs maximum image cache size
 
     private static readonly object CacheLock = new();
 
+    private readonly ILiveOptions<ImageCacheOptions> options;
     private readonly ILogger<ImageCache> logger;
     private readonly ConcurrentDictionary<string, ImageEntry> imageEntryCache = new();
     private readonly Histogram<double> imageRetrievalLatency;
@@ -39,8 +41,10 @@ public sealed class ImageCache : IImageCache
 
     public ImageCache(
         IMetricsService metricsService,
+        ILiveOptions<ImageCacheOptions> options,
         ILogger<ImageCache> logger)
     {
+        this.options = options.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
         this.imageRetrievalLatency = metricsService.ThrowIfNull()
             .CreateHistogram<double>(LatencyMetricName, LatencyMetricUnitName, LatencyMetricDescription, AggregationTypes.NoAggregate);
@@ -81,9 +85,9 @@ public sealed class ImageCache : IImageCache
 
         while (!Monitor.TryEnter(CacheLock)) { }
         var fileInfo = new FileInfo(uri);
-        if (this.currentCacheSize + fileInfo.Length > MaxCacheSize)
+        if (this.currentCacheSize + fileInfo.Length > this.options.Value.MemoryImageCacheLimit * 10e5)
         {
-            var spaceToFree = (this.currentCacheSize + fileInfo.Length) - MaxCacheSize;
+            var spaceToFree = (this.currentCacheSize + fileInfo.Length) - this.options.Value.MemoryImageCacheLimit * 10e5;
             scopedLogger.LogInformation($"Exceeding cache size. Freeing up {spaceToFree} bytes");
             this.FreeCache(spaceToFree);
             scopedLogger.LogInformation($"New cache size: {this.currentCacheSize} bytes");
@@ -123,7 +127,6 @@ public sealed class ImageCache : IImageCache
     private async Task<ImageEntry> AddToCache(string uri)
     {
         using var memoryStream = new MemoryStream(File.ReadAllBytes(uri));
-        this.currentCacheSize += memoryStream.Length;
         return await Task.Run(() =>
         {
             var bitmapImage = new BitmapImage();
@@ -133,14 +136,16 @@ public sealed class ImageCache : IImageCache
             bitmapImage.EndInit();
             bitmapImage.Freeze();
 
+            var size = bitmapImage.Format.BitsPerPixel * bitmapImage.PixelWidth * bitmapImage.PixelHeight;
             var imageEntry = new ImageEntry
             {
                 ImageSource = bitmapImage,
-                Size = memoryStream.Length,
+                Size = size,
                 Uri = uri
             };
 
             this.imageEntryCache[uri] = imageEntry;
+            this.currentCacheSize += size;
             return imageEntry;
         });
     }
