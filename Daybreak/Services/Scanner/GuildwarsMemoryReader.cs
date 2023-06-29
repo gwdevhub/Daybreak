@@ -562,7 +562,13 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         if (mapEntity.MaxHealth != entity.MaxHealth ||
             mapEntity.MaxEnergy != entity.MaxEnergy ||
             mapEntity.MaxHealth < 0 || mapEntity.MaxHealth > 10000 ||
-            mapEntity.MaxEnergy < 0 || mapEntity.MaxEnergy > 10000)
+            mapEntity.MaxEnergy < 0 || mapEntity.MaxEnergy > 10000 ||
+            gameContext.Professions.Size == 0 ||
+            gameContext.Players.Size == 0 ||
+            gameContext.Skillbars.Size == 0 ||
+            gameContext.PartyAttributes.Size == 0 ||
+            gameContext.Titles.Size == 0 ||
+            gameContext.TitlesTiers.Size == 0)
         {
             return default;
         }
