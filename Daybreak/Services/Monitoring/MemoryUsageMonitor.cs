@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Extensions.Services;
 using System.Core.Extensions;
+using System.Extensions;
 
 namespace Daybreak.Services.Monitoring;
 
@@ -15,6 +16,8 @@ public sealed class MemoryUsageMonitor : IApplicationLifetimeService
 
     private readonly Histogram<long> memoryUsageHistogram;
     private readonly Process currentProcess;
+
+    private PerformanceCounter? memoryPerformanceCounter;
 
     public MemoryUsageMonitor(
         IMetricsService metricsService)
@@ -29,14 +32,39 @@ public sealed class MemoryUsageMonitor : IApplicationLifetimeService
 
     public void OnStartup()
     {
-        _ = Task.Run(this.PeriodicallyCheckMemoryUsage);
+        _ = Task.Run(this.StartupAndPeriodicallyReadMemoryUsage);
     }
 
-    private async Task PeriodicallyCheckMemoryUsage()
+    private async Task StartupAndPeriodicallyReadMemoryUsage()
+    {
+        var processName = this.currentProcess.ProcessName;
+        try
+        {
+            this.memoryPerformanceCounter = new PerformanceCounter("Process", "Working Set - Private", processName);
+            await this.PeriodicallyCheckMemoryUsagePerfCounterBased();
+        }
+        catch
+        {
+            await this.PeriodicallyCheckMemoryUsageProcessBased();
+        }
+    }
+
+    private async Task PeriodicallyCheckMemoryUsagePerfCounterBased()
+    {
+        if (this.memoryPerformanceCounter is not null)
+        {
+            this.memoryUsageHistogram.Record(this.memoryPerformanceCounter.RawValue / 1024);
+        }
+
+        await Task.Delay(1000);
+        _ = Task.Run(this.PeriodicallyCheckMemoryUsagePerfCounterBased);
+    }
+
+    private async Task PeriodicallyCheckMemoryUsageProcessBased()
     {
         this.currentProcess.Refresh();
         this.memoryUsageHistogram.Record(this.currentProcess.PrivateMemorySize64 / 1000000);
         await Task.Delay(1000);
-        _ = Task.Run(this.PeriodicallyCheckMemoryUsage);
+        _ = Task.Run(this.PeriodicallyCheckMemoryUsageProcessBased);
     }
 }

@@ -324,16 +324,21 @@ public static class ProjectConfiguration
     {
         optionsProducer.ThrowIfNull();
 
+        optionsProducer.RegisterOptions<LauncherOptions>();
         optionsProducer.RegisterOptions<SoundOptions>();
         optionsProducer.RegisterOptions<ThemeOptions>();
+
         optionsProducer.RegisterOptions<BrowserOptions>();
         optionsProducer.RegisterOptions<BuildSynchronizationOptions>();
         optionsProducer.RegisterOptions<FocusViewOptions>();
+
         optionsProducer.RegisterOptions<MemoryReaderOptions>();
-        optionsProducer.RegisterOptions<LauncherOptions>();
+        optionsProducer.RegisterOptions<ImageCacheOptions>();
+
         optionsProducer.RegisterOptions<ToolboxOptions>();
         optionsProducer.RegisterOptions<UModOptions>();
         optionsProducer.RegisterOptions<DSOALOptions>();
+
         optionsProducer.RegisterOptions<ScreenManagerOptions>();
         optionsProducer.RegisterOptions<KamadanTradeChatOptions>();
         optionsProducer.RegisterOptions<AscalonTradeChatOptions>();
