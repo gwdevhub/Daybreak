@@ -1,6 +1,6 @@
 ﻿namespace Daybreak.Models.Guildwars;
 
-public readonly struct PathingMetadata
+public sealed class PathingMetadata
 {
     public int TrapezoidCount { get; init; }
 }

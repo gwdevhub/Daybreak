@@ -1,6 +1,6 @@
 ﻿namespace Daybreak.Models.Guildwars;
 
-public readonly struct SessionInformation
+public sealed class SessionInformation
 {
     public uint FoesKilled { get; init; }
     public uint FoesToKill { get; init; }

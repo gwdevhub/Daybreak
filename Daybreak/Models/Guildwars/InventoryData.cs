@@ -2,7 +2,7 @@
 
 namespace Daybreak.Models.Guildwars;
 
-public readonly struct InventoryData
+public sealed class InventoryData
 {
     public Bag? Backpack { get; init; }
     public Bag? BeltPouch { get; init; }

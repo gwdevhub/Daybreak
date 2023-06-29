@@ -2,7 +2,7 @@
 
 namespace Daybreak.Models.Guildwars;
 
-public readonly struct MainPlayerInformation : IEntity
+public sealed class MainPlayerInformation : IEntity
 {
     public string? Name { get; init; }
     public uint Timer { get; init; }

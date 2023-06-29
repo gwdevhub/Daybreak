@@ -18,6 +18,6 @@ public partial class PlayerContextMenu : UserControl
 
     private void TextBlock_MouseLeftButtonDown(object _, MouseButtonEventArgs e)
     {
-        this.PlayerContextMenuClicked?.Invoke(this, this.DataContext as PlayerInformation? ?? default);
+        this.PlayerContextMenuClicked?.Invoke(this, this.DataContext as PlayerInformation ?? default);
     }
 }

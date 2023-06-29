@@ -177,6 +177,7 @@ public static class ProjectConfiguration
         services.AddSingleton<INotificationStorage, NotificationStorage>();
         services.AddSingleton<ITradeAlertingService, TradeAlertingService>();
         services.AddSingleton<IModsManager, ModsManager>();
+        services.AddSingleton<IGuildwarsMemoryCache, GuildwarsMemoryCache>();
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
         services.AddScoped<IScreenshotProvider, ScreenshotProvider>();
@@ -208,7 +209,6 @@ public static class ProjectConfiguration
         services.AddScoped<ITradeHistoryDatabase, TradeHistoryDatabase>();
         services.AddScoped<IGuildwarsCopyService, GuildwarsCopyService>();
         services.AddScoped<IItemHashService, ItemHashService>();
-        services.AddScoped<IGuildwarsMemoryCache, GuildwarsMemoryCache>();
     }
 
     public static void RegisterViews(IViewProducer viewProducer)

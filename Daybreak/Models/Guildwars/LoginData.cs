@@ -1,6 +1,6 @@
 ﻿namespace Daybreak.Models.Guildwars;
 
-public readonly struct LoginData
+public sealed class LoginData
 {
     public string Email { get; init; }
     public string PlayerName { get; init; }

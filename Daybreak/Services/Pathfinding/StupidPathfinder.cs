@@ -73,6 +73,13 @@ public sealed class StupidPathfinder : IPathfinder
             return new PathfindingFailure.PathfindingDisabled();
         }
 
+        if (map is null ||
+            map.Trapezoids is null)
+        {
+            scopedLogger.LogError("Null pathfinding map");
+            return new PathfindingFailure.UnexpectedFailure();
+        }
+
         if (GetContainingTrapezoid(map, startPoint) is not Trapezoid startTrapezoid)
         {
             scopedLogger.LogInformation("Start point not in map. Getting closest start point in map");
@@ -163,7 +170,8 @@ public sealed class StupidPathfinder : IPathfinder
 
     private static Trapezoid? GetContainingTrapezoid(PathingData map, Point point)
     {
-        if (map.Trapezoids is null)
+        if (map is null ||
+            map.Trapezoids is null)
         {
             return default;
         }

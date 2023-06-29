@@ -1,6 +1,6 @@
 ﻿namespace Daybreak.Models.Guildwars;
 
-public readonly struct WorldData
+public sealed class WorldData
 {
     public Campaign? Campaign { get; init; }
     public Continent? Continent { get; init; }

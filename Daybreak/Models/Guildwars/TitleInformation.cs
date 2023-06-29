@@ -1,6 +1,6 @@
 ﻿namespace Daybreak.Models.Guildwars;
 
-public readonly struct TitleInformation
+public sealed class TitleInformation
 {
     public bool IsValid => this.CurrentPoints != 0 && this.PointsForCurrentRank != 0 && this.PointsForNextRank != 0 && this.TierNumber != 0 && this.MaxTierNumber != 0;
 
