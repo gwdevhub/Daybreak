@@ -199,7 +199,7 @@ public sealed class Npc
     public static readonly Npc AscalonSettler = new() { Ids = new int[] { 1986, 1987 }, Name = "Ascalon Settler", WikiUrl = "https://wiki.guildwars.com/wiki/Ascalon_Settler" };
     public static readonly Npc SettlementGuard = new() { Ids = new int[] { 1989 }, Name = "Settlement Guard", WikiUrl = "https://wiki.guildwars.com/wiki/Settlement_Guard" };
     public static readonly Npc CaptainGreywind = new() { Ids = new int[] { 1990 }, Name = "Captain Greywind", WikiUrl = "https://wiki.guildwars.com/wiki/Captain_Greywind" };
-    public static readonly Npc AscalonianGhost = new() { Ids = new int[] { 1998, 2141, 2353, 2354, 2355, 2534, 5617 }, Name = "Ascalonian Ghost", WikiUrl = "https://wiki.guildwars.com/wiki/Guild_Wars_Wiki:Projects/NPC_models/Ghosts" };
+    public static readonly Npc AscalonianGhost = new() { Ids = new int[] { 1998, 2141, 2353, 2354, 2355, 2534, 5617, 4975 }, Name = "Ascalonian Ghost", WikiUrl = "https://wiki.guildwars.com/wiki/Guild_Wars_Wiki:Projects/NPC_models/Ghosts" };
     public static readonly Npc KrytanSmith = new() { Ids = new int[] { 2000 }, Name = "Krytan Smith", WikiUrl = "https://wiki.guildwars.com/wiki/Guild_Wars_Wiki:Projects/NPC_models/Humans/Kryta" };
     public static readonly Npc WhiteMantleZealot = new() { Ids = new int[] { 2006, 2206, 2207 }, Name = "White Mantle Zealot", WikiUrl = "https://wiki.guildwars.com/wiki/White_Mantle_Zealot" };
     public static readonly Npc CaptainGrumby = new() { Ids = new int[] { 2016 }, Name = "Captain Grumby", WikiUrl = "https://wiki.guildwars.com/wiki/Captain_Grumby" };
@@ -1133,9 +1133,9 @@ public sealed class Npc
     public static readonly Npc ElderJonah = new() { Ids = new int[] { 5286 }, Name = "Elder Jonah", WikiUrl = "https://wiki.guildwars.com/wiki/Elder_Jonah" };
     public static readonly Npc Lormeh = new() { Ids = new int[] { 5387 }, Name = "Lormeh", WikiUrl = "https://wiki.guildwars.com/wiki/Lormeh" };
     public static readonly Npc MadnessTitan = new() { Ids = new int[] { 4970 }, Name = "Madness Titan", WikiUrl = "https://wiki.guildwars.com/wiki/Madness_Titan" };
-    public static readonly Npc ShadowRanger = new() { Ids = new int[] { 4966 }, Name = "Shadow Ranger", WikiUrl = "https://wiki.guildwars.com/wiki/Shadow_Ranger" };
-    public static readonly Npc ShadowMonk = new() { Ids = new int[] { 4964 }, Name = "Shadow Monk", WikiUrl = "https://wiki.guildwars.com/wiki/Shadow_Monk" };
-    public static readonly Npc ShadowMesmer = new() { Ids = new int[] { 4962 }, Name = "Shadow Mesmer", WikiUrl = "https://wiki.guildwars.com/wiki/Shadow_Mesmer" };
+    public static readonly Npc ShadowRanger = new() { Ids = new int[] { 4966, 2808 }, Name = "Shadow Ranger", WikiUrl = "https://wiki.guildwars.com/wiki/Shadow_Ranger" };
+    public static readonly Npc ShadowMonk = new() { Ids = new int[] { 4964, 2806 }, Name = "Shadow Monk", WikiUrl = "https://wiki.guildwars.com/wiki/Shadow_Monk" };
+    public static readonly Npc ShadowMesmer = new() { Ids = new int[] { 4962, 2804 }, Name = "Shadow Mesmer", WikiUrl = "https://wiki.guildwars.com/wiki/Shadow_Mesmer" };
     public static readonly Npc GravenMonolith = new() { Ids = new int[] { 4316, 4315, 4317 }, Name = "Graven Monolith", WikiUrl = "https://wiki.guildwars.com/wiki/Graven_Monolith" };
     public static readonly Npc Harbinger = new() { Ids = new int[] { 5404 }, Name = "Harbinger", WikiUrl = "https://wiki.guildwars.com/wiki/Harbinger" };
     public static readonly Npc SpiritOfSeborhin = new() { Ids = new int[] { 5584 }, Name = "Spirit of Seborhin", WikiUrl = "https://wiki.guildwars.com/wiki/Spirit_of_Seborhin" };
@@ -1210,7 +1210,7 @@ public sealed class Npc
     public static readonly Npc WordOfMadness = new() { Ids = new int[] { 5446 }, Name = "Word of Madness", WikiUrl = "https://wiki.guildwars.com/wiki/Word_of_Madness" };
     public static readonly Npc RainOfTerror = new() { Ids = new int[] { 5445 }, Name = "Rain of Terror", WikiUrl = "https://wiki.guildwars.com/wiki/Rain_of_Terror" };
     public static readonly Npc ShadowOfFear = new() { Ids = new int[] { 5444 }, Name = "Shadow of Fear", WikiUrl = "https://wiki.guildwars.com/wiki/Shadow_of_Fear" };
-    public static readonly Npc ScytheOfChaos = new() { Ids = new int[] { 5449, 4959 }, Name = "Scythe of Chaos", WikiUrl = "https://wiki.guildwars.com/wiki/Scythe_of_Chaos" };
+    public static readonly Npc ScytheOfChaos = new() { Ids = new int[] { 5449, 4959, 7316 }, Name = "Scythe of Chaos", WikiUrl = "https://wiki.guildwars.com/wiki/Scythe_of_Chaos" };
     public static readonly Npc SpearOfTorment = new() { Ids = new int[] { 5450 }, Name = "Spear of Torment", WikiUrl = "https://wiki.guildwars.com/wiki/Spear_of_Torment" };
     public static readonly Npc HeraldOfNightmares = new() { Ids = new int[] { 5443 }, Name = "Herald of Nightmares", WikiUrl = "https://wiki.guildwars.com/wiki/Herald_of_Nightmares" };
     public static readonly Npc ArmOfInsanity = new() { Ids = new int[] { 5448 }, Name = "Arm of Insanity", WikiUrl = "https://wiki.guildwars.com/wiki/Arm_of_Insanity" };
@@ -1227,7 +1227,7 @@ public sealed class Npc
     public static readonly Npc EmissaryOfDhuum = new() { Ids = new int[] { 5412, 5425 }, Name = "Emissary of Dhuum", WikiUrl = "https://wiki.guildwars.com/wiki/Emissary_of_Dhuum" };
     public static readonly Npc TerrorwebDryder = new() { Ids = new int[] { 2321 }, Name = "Terrorweb Dryder", WikiUrl = "https://wiki.guildwars.com/wiki/Terrorweb_Dryder" };
     public static readonly Npc Rukkassa = new() { Ids = new int[] { 4973 }, Name = "Rukkassa", WikiUrl = "https://wiki.guildwars.com/wiki/Rukkassa" };
-    public static readonly Npc TorturewebDryder = new() { Ids = new int[] { 5427 }, Name = "Tortureweb Dryder", WikiUrl = "https://wiki.guildwars.com/wiki/Tortureweb_Dryder" };
+    public static readonly Npc TorturewebDryder = new() { Ids = new int[] { 5427, 5215 }, Name = "Tortureweb Dryder", WikiUrl = "https://wiki.guildwars.com/wiki/Tortureweb_Dryder" };
     public static readonly Npc LostSoul = new() { Ids = new int[] { 2358 }, Name = "Lost Soul", WikiUrl = "https://wiki.guildwars.com/wiki/Lost_Soul" };
     public static readonly Npc Apostate = new() { Ids = new int[] { 5491 }, Name = "Apostate", WikiUrl = "https://wiki.guildwars.com/wiki/Apostate" };
     public static readonly Npc StormOfAnguish = new() { Ids = new int[] { 5436 }, Name = "Storm of Anguish", WikiUrl = "https://wiki.guildwars.com/wiki/Storm_of_Anguish" };
@@ -1239,12 +1239,12 @@ public sealed class Npc
     public static readonly Npc TitanAbomination = new() { Ids = new int[] { 4968 }, Name = "Titan Abomination", WikiUrl = "https://wiki.guildwars.com/wiki/Titan_Abomination" };
     public static readonly Npc BoundTiendi = new() { Ids = new int[] { 4087 }, Name = "Bound Tiendi", WikiUrl = "https://wiki.guildwars.com/wiki/Bound_Tiendi" };
     public static readonly Npc BoundKaichen = new() { Ids = new int[] { 4085 }, Name = "Bound Kaichen", WikiUrl = "https://wiki.guildwars.com/wiki/Bound_Kaichen" };
-    public static readonly Npc WrathfulStorm = new() { Ids = new int[] { 4961 }, Name = "Wrathful Storm", WikiUrl = "https://wiki.guildwars.com/wiki/Wrathful_Storm" };
-    public static readonly Npc GraspOfInsanity = new() { Ids = new int[] { 4960 }, Name = "Grasp of Insanity", WikiUrl = "https://wiki.guildwars.com/wiki/Grasp_of_Insanity" };
-    public static readonly Npc TormentClaw = new() { Ids = new int[] { 5461 }, Name = "Torment Claw", WikiUrl = "https://wiki.guildwars.com/wiki/Torment_Claw" };
+    public static readonly Npc WrathfulStorm = new() { Ids = new int[] { 4961, 7320 }, Name = "Wrathful Storm", WikiUrl = "https://wiki.guildwars.com/wiki/Wrathful_Storm" };
+    public static readonly Npc GraspOfInsanity = new() { Ids = new int[] { 4960, 7317 }, Name = "Grasp of Insanity", WikiUrl = "https://wiki.guildwars.com/wiki/Grasp_of_Insanity" };
+    public static readonly Npc TormentClaw = new() { Ids = new int[] { 5461, 7319 }, Name = "Torment Claw", WikiUrl = "https://wiki.guildwars.com/wiki/Torment_Claw" };
     public static readonly Npc BoundHaoLi = new() { Ids = new int[] { 4082 }, Name = "Bound Hao Li", WikiUrl = "https://wiki.guildwars.com/wiki/Bound_Hao_Li" };
     public static readonly Npc IgnisCruor = new() { Ids = new int[] { 4978 }, Name = "Ignis Cruor", WikiUrl = "https://wiki.guildwars.com/wiki/Ignis_Cruor" };
-    public static readonly Npc ShadowBeast = new() { Ids = new int[] { 4967 }, Name = "Shadow Beast", WikiUrl = "https://wiki.guildwars.com/wiki/Shadow_Beast" };
+    public static readonly Npc ShadowBeast = new() { Ids = new int[] { 4967, 2809 }, Name = "Shadow Beast", WikiUrl = "https://wiki.guildwars.com/wiki/Shadow_Beast" };
     public static readonly Npc CreoVulnero = new() { Ids = new int[] { 4957 }, Name = "Creo Vulnero", WikiUrl = "https://wiki.guildwars.com/wiki/Creo_Vulnero" };
     public static readonly Npc PortalWraith = new() { Ids = new int[] { 2764 }, Name = "Portal Wraith", WikiUrl = "https://wiki.guildwars.com/wiki/Portal_Wraith" };
     public static readonly Npc ArmageddonLord = new() { Ids = new int[] { 2674 }, Name = "Armageddon Lord", WikiUrl = "https://wiki.guildwars.com/wiki/Armageddon_Lord" };
@@ -1252,8 +1252,101 @@ public sealed class Npc
     public static readonly Npc MagridTheSly = new() { Ids = new int[] { 4451 }, Name = "Magrid the Sly", WikiUrl = "https://wiki.guildwars.com/wiki/Magrid_the_Sly" };
     public static readonly Npc Zenmai = new() { Ids = new int[] { 3552 }, Name = "Zenmai", WikiUrl = "https://wiki.guildwars.com/wiki/Zenmai" };
     public static readonly Npc Abaddon = new() { Ids = new int[] { 5142 }, Name = "Abaddon", WikiUrl = "https://wiki.guildwars.com/wiki/Abaddon" };
+    public static readonly Npc CorsairRunner = new() { Ids = new int[] { 5091 }, Name = "Corsair Runner", WikiUrl = "https://wiki.guildwars.com/wiki/Corsair_Runner" };
+    public static readonly Npc Abyssal = new() { Ids = new int[] { 2810, 5194 }, Name = "Abyssal", WikiUrl = "https://wiki.guildwars.com/wiki/Abyssal" };
+    public static readonly Npc GhostChampion = new() { Ids = new int[] { 2826 }, Name = "Ghost Champion", WikiUrl = "https://wiki.guildwars.com/wiki/Guild_Wars_Wiki:Projects/NPC_models/Ghosts" };
+    public static readonly Npc ShadowWarrior = new() { Ids = new int[] { 2807, 4965 }, Name = "Shadow Warrior", WikiUrl = "https://wiki.guildwars.com/wiki/Shadow_Warrior" };
+    public static readonly Npc ShadowElemental = new() { Ids = new int[] { 2805, 4963 }, Name = "Shadow Elemental", WikiUrl = "https://wiki.guildwars.com/wiki/Shadow_Elemental" };
+    public static readonly Npc SkeletalEtherBreaker = new() { Ids = new int[] { 2816 }, Name = "Skeletal Ether Breaker", WikiUrl = "https://wiki.guildwars.com/wiki/Skeletal_Ether_Breaker" };
+    public static readonly Npc SkeletalIcehand = new() { Ids = new int[] { 2817 }, Name = "Skeletal Icehand", WikiUrl = "https://wiki.guildwars.com/wiki/Skeletal_Icehand" };
+    public static readonly Npc SkeletalBond = new() { Ids = new int[] { 2818 }, Name = "Skeletal Bond", WikiUrl = "https://wiki.guildwars.com/wiki/Skeletal_Bond" };
+    public static readonly Npc SkeletalBerserker = new() { Ids = new int[] { 2819 }, Name = "Skeletal Berserker", WikiUrl = "https://wiki.guildwars.com/wiki/Skeletal_Berserker" };
+    public static readonly Npc SpiritShepherd = new() { Ids = new int[] { 2813 }, Name = "Spirit Shepherd", WikiUrl = "https://wiki.guildwars.com/wiki/Spirit_Shepherd" };
+    public static readonly Npc SpiritWood = new() { Ids = new int[] { 2812 }, Name = "Spirit Wood", WikiUrl = "https://wiki.guildwars.com/wiki/Spirit_Wood" };
+    public static readonly Npc SpiritofNaturesRenewal = new() { Ids = new int[] { 2887 }, Name = "Spirit of Nature's Renewal", WikiUrl = "https://wiki.guildwars.com/wiki/Spirit_of_Nature%27s_Renewal" };
+    public static readonly Npc RockBorerWorm = new() { Ids = new int[] { 2821 }, Name = "Rock Borer Worm", WikiUrl = "https://wiki.guildwars.com/wiki/Rock_Borer_Worm" };
+    public static readonly Npc SpiritofExtinction = new() { Ids = new int[] { 2876 }, Name = "Spirit of Extinction", WikiUrl = "https://wiki.guildwars.com/wiki/Spirit_of_Extinction" };
+    public static readonly Npc ArmoredCaveSpider = new() { Ids = new int[] { 2800 }, Name = "Armored Cave Spider", WikiUrl = "https://wiki.guildwars.com/wiki/Armored_Cave_Spider" };
+    public static readonly Npc Banshee = new() { Ids = new int[] { 2326 }, Name = "Banshee", WikiUrl = "https://wiki.guildwars.com/wiki/Banshee" };
+    public static readonly Npc ForestGriffon = new() { Ids = new int[] { 2827 }, Name = "Forest Griffon", WikiUrl = "https://wiki.guildwars.com/wiki/Forest_Griffon" };
+    public static readonly Npc SkeletalImpaler = new() { Ids = new int[] { 2820 }, Name = "Skeletal Impaler", WikiUrl = "https://wiki.guildwars.com/wiki/Skeletal_Impaler" };
+    public static readonly Npc FlamingScepterMage = new() { Ids = new int[] { 2832 }, Name = "Flaming Scepter Mage", WikiUrl = "https://wiki.guildwars.com/wiki/Guild_Wars_Wiki:Projects/NPC_models/Ghosts" };
+    public static readonly Npc EternalForgemaster = new() { Ids = new int[] { 2829 }, Name = "Eternal Forgemaster", WikiUrl = "https://wiki.guildwars.com/wiki/Eternal_Forgemaster" };
+    public static readonly Npc EternalRanger = new() { Ids = new int[] { 2834 }, Name = "Eternal Ranger", WikiUrl = "https://wiki.guildwars.com/wiki/Eternal_Ranger" };
+    public static readonly Npc SeedofCorruption = new() { Ids = new int[] { 2811 }, Name = "Seed of Corruption", WikiUrl = "https://wiki.guildwars.com/wiki/Seed_of_Corruption" };
+    public static readonly Npc DoubtersDryder = new() { Ids = new int[] { 2803 }, Name = "Doubter's Dryder", WikiUrl = "https://wiki.guildwars.com/wiki/Doubter%27s_Dryder" };
+    public static readonly Npc ObsidianFurnaceDrake = new() { Ids = new int[] { 2802 }, Name = "Obsidian Furnace Drake", WikiUrl = "https://wiki.guildwars.com/wiki/Obsidian_Furnace_Drake" };
+    public static readonly Npc SmokeWalker = new() { Ids = new int[] { 2801 }, Name = "Smoke Walker", WikiUrl = "https://wiki.guildwars.com/wiki/Smoke_Walker" };
+    public static readonly Npc InfernalWurm = new() { Ids = new int[] { 2822 }, Name = "Infernal Wurm", WikiUrl = "https://wiki.guildwars.com/wiki/Infernal_Wurm" };
+    public static readonly Npc AncientSkale = new() { Ids = new int[] { 2814 }, Name = "Ancient Skale", WikiUrl = "https://wiki.guildwars.com/wiki/Ancient_Skale" };
+    public static readonly Npc DragonLich = new() { Ids = new int[] { 2823 }, Name = "Dragon Lich", WikiUrl = "https://wiki.guildwars.com/wiki/Dragon_Lich" };
+    public static readonly Npc VisionOfDespair = new() { Ids = new int[] { 5440 }, Name = "Vision of Despair", WikiUrl = "https://wiki.guildwars.com/wiki/Vision_of_Despair" };
+    public static readonly Npc SaevioProelium = new() { Ids = new int[] { 4956 }, Name = "Saevio Proelium", WikiUrl = "https://wiki.guildwars.com/wiki/Saevio_Proelium" };
+    public static readonly Npc BringerOfDeceit = new() { Ids = new int[] { 5441 }, Name = "Bringer of Deceit", WikiUrl = "https://wiki.guildwars.com/wiki/Bringer_of_Deceit" };
+    public static readonly Npc SpiritOfQuickeningZephyr = new() { Ids = new int[] { 2886 }, Name = "Spirit of Quickening Zephyr", WikiUrl = "https://wiki.guildwars.com/wiki/Spirit_of_Quickening_Zephyr" };
+    public static readonly Npc FlameOfFervor = new() { Ids = new int[] { 5437 }, Name = "Flame of Fervor", WikiUrl = "https://wiki.guildwars.com/wiki/Flame_of_Fervor" };
+    public static readonly Npc WaterBornTitan = new() { Ids = new int[] { 2677 }, Name = "Water Born Titan", WikiUrl = "https://wiki.guildwars.com/wiki/Water_Born_Titan" };
+    public static readonly Npc WildGrowth = new() { Ids = new int[] { 2678 }, Name = "Wild Growth", WikiUrl = "https://wiki.guildwars.com/wiki/Wild_Growth" };
+    public static readonly Npc SeedOfSuffering = new() { Ids = new int[] { 5438 }, Name = "Seed of Suffering", WikiUrl = "https://wiki.guildwars.com/wiki/Seed_of_Suffering" };
+    public static readonly Npc FortuneTellerGhost = new() { Ids = new int[] { 4977 }, Name = "Fortune Teller Ghost", WikiUrl = "https://wiki.guildwars.com/wiki/Fortune_Teller" };
+    public static readonly Npc EarthBornTitan = new() { Ids = new int[] { 2676 }, Name = "Earth Born Titan", WikiUrl = "https://wiki.guildwars.com/wiki/Earth_Born_Titan" };
+    public static readonly Npc WindBornTitan = new() { Ids = new int[] { 2675 }, Name = "Wind Born Titan", WikiUrl = "https://wiki.guildwars.com/wiki/Wind_Born_Titan" };
+    public static readonly Npc RottingTitan = new() { Ids = new int[] { 2679 }, Name = "Rotting Titan", WikiUrl = "https://wiki.guildwars.com/wiki/Rotting_Titan" };
+    public static readonly Npc ForgottenIllusionist = new() { Ids = new int[] { 4974, 1861 }, Name = "Forgotten Illusionist", WikiUrl = "https://wiki.guildwars.com/wiki/Forgotten_Illusionist" };
+    public static readonly Npc WieshurTheInspiring = new() { Ids = new int[] { 5523 }, Name = "Wieshur the Inspiring", WikiUrl = "https://wiki.guildwars.com/wiki/Wieshur_the_Inspiring" };
+    public static readonly Npc HautohThePilferer = new() { Ids = new int[] { 5524 }, Name = "Hautoh the Pilferer", WikiUrl = "https://wiki.guildwars.com/wiki/Hautoh_the_Pilferer" };
+    public static readonly Npc LetumContineo = new() { Ids = new int[] { 4980 }, Name = "Letum Contineo", WikiUrl = "https://wiki.guildwars.com/wiki/Letum_Contineo" };
+    public static readonly Npc SecurisPhasmatis = new() { Ids = new int[] { 4979 }, Name = "Securis Phasmatis", WikiUrl = "https://wiki.guildwars.com/wiki/Securis_Phasmatis" };
+    public static readonly Npc Razakel = new() { Ids = new int[] { 5426 }, Name = "Razakel", WikiUrl = "https://wiki.guildwars.com/wiki/Razakel" };
+    public static readonly Npc BindingGuardian = new() { Ids = new int[] { 5222 }, Name = "Binding Guardian", WikiUrl = "https://wiki.guildwars.com/wiki/Binding_Guardian" };
+    public static readonly Npc Razah = new() { Ids = new int[] { 4502 }, Name = "Razah", WikiUrl = "https://wiki.guildwars.com/wiki/Razah" };
+    public static readonly Npc MargoniteAnurTuk = new() { Ids = new int[] { 5171 }, Name = "Margonite Anur Tuk", WikiUrl = "https://wiki.guildwars.com/wiki/Margonite_Anur_Tuk" };
+    public static readonly Npc MargoniteAnurSu = new() { Ids = new int[] { 5168 }, Name = "Margonite Anur Su", WikiUrl = "https://wiki.guildwars.com/wiki/Margonite_Anur_Su" };
+    public static readonly Npc MargoniteAnurDabi = new() { Ids = new int[] { 5167 }, Name = "Margonite Anur Dabi", WikiUrl = "https://wiki.guildwars.com/wiki/Margonite_Anur_Dabi" };
+    public static readonly Npc MargoniteAnurVu = new() { Ids = new int[] { 5170 }, Name = "Margonite Anur Vu", WikiUrl = "https://wiki.guildwars.com/wiki/Margonite_Anur_Vu" };
+    public static readonly Npc MargoniteAnurKi = new() { Ids = new int[] { 5169 }, Name = "Margonite Anur Ki", WikiUrl = "https://wiki.guildwars.com/wiki/Margonite_Anur_Ki" };
+    public static readonly Npc MargoniteAnurRund = new() { Ids = new int[] { 5173 }, Name = "Margonite Anur Rund", WikiUrl = "https://wiki.guildwars.com/wiki/Margonite_Anur_Rund" };
+    public static readonly Npc WindOfDarkness = new() { Ids = new int[] { 5192 }, Name = "Wind of Darkness", WikiUrl = "https://wiki.guildwars.com/wiki/Wind_of_Darkness" };
+    public static readonly Npc ChillOfDarkness = new() { Ids = new int[] { 5189 }, Name = "Chill of Darkness", WikiUrl = "https://wiki.guildwars.com/wiki/Chill_of_Darkness" };
+    public static readonly Npc ClawOfDarkness = new() { Ids = new int[] { 5191 }, Name = "Claw of Darkness", WikiUrl = "https://wiki.guildwars.com/wiki/Claw_of_Darkness" };
+    public static readonly Npc ThoughtOfDarkness = new() { Ids = new int[] { 5188 }, Name = "Thought of Darkness", WikiUrl = "https://wiki.guildwars.com/wiki/Thought_of_Darkness" };
+    public static readonly Npc CurseOfDarkness = new() { Ids = new int[] { 5193 }, Name = "Curse of Darkness", WikiUrl = "https://wiki.guildwars.com/wiki/Curse_of_Darkness" };
+    public static readonly Npc ScourgeOfDarkness = new() { Ids = new int[] { 5190 }, Name = "Scourge of Darkness", WikiUrl = "https://wiki.guildwars.com/wiki/Scourge_of_Darkness" };
+    public static readonly Npc MargoniteAnurRuk = new() { Ids = new int[] { 5172 }, Name = "Margonite Anur Ruk", WikiUrl = "https://wiki.guildwars.com/wiki/Margonite_Anur_Ruk" };
+    public static readonly Npc MargoniteAnurMank = new() { Ids = new int[] { 5174 }, Name = "Margonite Anur Mank", WikiUrl = "https://wiki.guildwars.com/wiki/Margonite_Anur_Mank" };
+    public static readonly Npc HeartTormentor = new() { Ids = new int[] { 5207 }, Name = "Heart Tormentor", WikiUrl = "https://wiki.guildwars.com/wiki/Heart_Tormentor" };
+    public static readonly Npc WaterTormentor = new() { Ids = new int[] { 5206 }, Name = "Water Tormentor", WikiUrl = "https://wiki.guildwars.com/wiki/Water_Tormentor" };
+    public static readonly Npc SpiritTormentor = new() { Ids = new int[] { 5209 }, Name = "Spirit Tormentor", WikiUrl = "https://wiki.guildwars.com/wiki/Spirit_Tormentor" };
+    public static readonly Npc SanityTormentor = new() { Ids = new int[] { 5212 }, Name = "Sanity Tormentor", WikiUrl = "https://wiki.guildwars.com/wiki/Sanity_Tormentor" };
+    public static readonly Npc MindTormentor = new() { Ids = new int[] { 5204 }, Name = "Mind Tormentor", WikiUrl = "https://wiki.guildwars.com/wiki/Mind_Tormentor" };
+    public static readonly Npc SoulTormentor = new() { Ids = new int[] { 5205 }, Name = "Soul Tormentor", WikiUrl = "https://wiki.guildwars.com/wiki/Soul_Tormentor" };
+    public static readonly Npc FleshTormentor = new() { Ids = new int[] { 5208 }, Name = "Flesh Tormentor", WikiUrl = "https://wiki.guildwars.com/wiki/Flesh_Tormentor" };
+    public static readonly Npc MargoniteAnurKaya = new() { Ids = new int[] { 5166 }, Name = "Margonite Anur Kaya", WikiUrl = "https://wiki.guildwars.com/wiki/Margonite_Anur_Kaya" };
+    public static readonly Npc StygianBrute = new() { Ids = new int[] { 5176 }, Name = "Stygian Brute", WikiUrl = "https://wiki.guildwars.com/wiki/Stygian_Brute" };
+    public static readonly Npc StygianGolem = new() { Ids = new int[] { 5177 }, Name = "Stygian Golem", WikiUrl = "https://wiki.guildwars.com/wiki/Stygian_Golem" };
+    public static readonly Npc ShaunurTheDivine = new() { Ids = new int[] { 5159 }, Name = "Shaunur the Divine", WikiUrl = "https://wiki.guildwars.com/wiki/Shaunur_the_Divine" };
+    public static readonly Npc LordJadoth = new() { Ids = new int[] { 5144 }, Name = "Lord Jadoth", WikiUrl = "https://wiki.guildwars.com/wiki/Lord_Jadoth" };
+    public static readonly Npc TurepMakerOfOrphans = new () { Ids = new int[] { 5160 }, Name = "Turep, Maker of Orphans", WikiUrl = "https://wiki.guildwars.com/wiki/Turep,_Maker_of_Orphans" };
+    public static readonly Npc StygianHunger = new() { Ids = new int[] { 5175 }, Name = "Stygian Hunger", WikiUrl = "https://wiki.guildwars.com/wiki/Stygian_Hunger" };
+    public static readonly Npc SpiritOfTruth = new() { Ids = new int[] { 4986 }, Name = "Spirit of Truth", WikiUrl = "https://wiki.guildwars.com/wiki/Spirit_of_Truth" };
+    public static readonly Npc TheDarkness = new() { Ids = new int[] { 5152 }, Name = "The Darkness", WikiUrl = "https://wiki.guildwars.com/wiki/The_Darkness" };
+    public static readonly Npc RageTitan = new() { Ids = new int[] { 5201 }, Name = "Rage Titan", WikiUrl = "https://wiki.guildwars.com/wiki/Rage_Titan" };
+    public static readonly Npc DespairTitan = new() { Ids = new int[] { 5203 }, Name = "Despair Titan", WikiUrl = "https://wiki.guildwars.com/wiki/Despair_Titan" };
+    public static readonly Npc GreaterDreamRider = new() { Ids = new int[] { 5216 }, Name = "Greater Dream Rider", WikiUrl = "https://wiki.guildwars.com/wiki/Greater_Dream_Rider" };
+    public static readonly Npc AnguishTitan = new() { Ids = new int[] { 5198 }, Name = "Anguish Titan", WikiUrl = "https://wiki.guildwars.com/wiki/Anguish_Titan" };
+    public static readonly Npc MiseryTitan = new() { Ids = new int[] { 5195 }, Name = "Misery Titan", WikiUrl = "https://wiki.guildwars.com/wiki/Misery_Titan" };
+    public static readonly Npc FuryTitan = new() { Ids = new int[] { 5200 }, Name = "Fury Titan", WikiUrl = "https://wiki.guildwars.com/wiki/Fury_Titan" };
+    public static readonly Npc DementiaTitan = new() { Ids = new int[] { 5197 }, Name = "Dementia Titan", WikiUrl = "https://wiki.guildwars.com/wiki/Dementia_Titan" };
+    public static readonly Npc BanishedDreamRider = new() { Ids = new int[] { 7321 }, Name = "Banished Dream Rider", WikiUrl = "https://wiki.guildwars.com/wiki/Banished_Dream_Rider" };
+    public static readonly Npc ChaosWurm = new() { Ids = new int[] { 7326 }, Name = "Chaos Wurm", WikiUrl = "https://wiki.guildwars.com/wiki/Chaos_Wurm" };
+    public static readonly Npc GuardianOfKomalie = new() { Ids = new int[] { 5162, 5161 }, Name = "Guardian of Komalie", WikiUrl = "https://wiki.guildwars.com/wiki/Guardian_of_Komalie" };
+    public static readonly Npc TheFury = new() { Ids = new int[] { 5149 }, Name = "The Fury", WikiUrl = "https://wiki.guildwars.com/wiki/The_Fury" };
+    public static readonly Npc StygianHorror = new() { Ids = new int[] { 5178 }, Name = "Stygian Horror", WikiUrl = "https://wiki.guildwars.com/wiki/Stygian_Horror" };
+    public static readonly Npc StygianFiend = new() { Ids = new int[] { 5179 }, Name = "Stygian Fiend", WikiUrl = "https://wiki.guildwars.com/wiki/Stygian_Fiend" };
+    public static readonly Npc StygianUnderlord = new() { Ids = new int[] { 5163, 5164 }, Name = "Stygian Underlord", WikiUrl = "https://wiki.guildwars.com/wiki/Stygian_Underlord" };
+    public static readonly Npc StygianLord = new() { Ids = new int[] { 5148, 5147, 5146, 5145 }, Name = "Stygian Lord", WikiUrl = "https://wiki.guildwars.com/wiki/Stygian_Lord" };
 
-    public static IEnumerable<Npc> Npcs { get; } = new List<Npc>()
+public static IEnumerable<Npc> Npcs { get; } = new List<Npc>()
     {
         Unknown,
         RitualPriest,
@@ -2499,7 +2592,100 @@ public sealed class Npc
         JoyousSoul,
         MagridTheSly,
         Zenmai,
-        Abaddon
+        Abaddon,
+        CorsairRunner,
+        Abyssal,
+        GhostChampion,
+        ShadowWarrior,
+        ShadowElemental,
+        SkeletalEtherBreaker,
+        SkeletalIcehand,
+        SkeletalBond,
+        SkeletalBerserker,
+        SpiritShepherd,
+        SpiritWood,
+        SpiritofNaturesRenewal,
+        RockBorerWorm,
+        SpiritofExtinction,
+        ArmoredCaveSpider,
+        Banshee,
+        ForestGriffon,
+        SkeletalImpaler,
+        FlamingScepterMage,
+        EternalForgemaster,
+        EternalRanger,
+        SeedofCorruption,
+        DoubtersDryder,
+        ObsidianFurnaceDrake,
+        SmokeWalker,
+        InfernalWurm,
+        AncientSkale,
+        DragonLich,
+        VisionOfDespair,
+        SaevioProelium,
+        BringerOfDeceit,
+        SpiritOfQuickeningZephyr,
+        FlameOfFervor,
+        WaterBornTitan,
+        WildGrowth,
+        SeedOfSuffering,
+        EarthBornTitan,
+        WindBornTitan,
+        RottingTitan,
+        ForgottenIllusionist,
+        WieshurTheInspiring,
+        HautohThePilferer,
+        LetumContineo,
+        SecurisPhasmatis,
+        Razakel,
+        BindingGuardian,
+        Razah,
+        MargoniteAnurTuk,
+        MargoniteAnurSu,
+        MargoniteAnurDabi,
+        MargoniteAnurVu,
+        MargoniteAnurKi,
+        MargoniteAnurRund,
+        WindOfDarkness,
+        ChillOfDarkness,
+        ClawOfDarkness,
+        ThoughtOfDarkness,
+        CurseOfDarkness,
+        ScourgeOfDarkness,
+        MargoniteAnurRuk,
+        MargoniteAnurMank,
+        HeartTormentor,
+        WaterTormentor,
+        SpiritTormentor,
+        SanityTormentor,
+        MindTormentor,
+        SoulTormentor,
+        FleshTormentor,
+        MargoniteAnurKaya,
+        StygianBrute,
+        StygianGolem,
+        ShaunurTheDivine,
+        LordJadoth,
+        TurepMakerOfOrphans,
+        StygianHunger,
+        SpiritOfTruth,
+        TheDarkness,
+        RageTitan,
+        DespairTitan,
+        GreaterDreamRider,
+        AnguishTitan,
+        MiseryTitan,
+        FuryTitan,
+        DementiaTitan,
+        BanishedDreamRider,
+        ChaosWurm,
+        GuardianOfKomalie,
+        TheFury,
+        StygianHorror,
+        StygianFiend,
+        StygianUnderlord,
+        StygianLord,
+        FortuneTellerGhost,
     };
 
 
