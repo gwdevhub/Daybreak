@@ -77,6 +77,7 @@ namespace Daybreak.Configuration;
 public static class ProjectConfiguration
 {
     private const string DaybreakUserAgent = "Daybreak";
+    private const string ChromeImpersonationUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.79";
 
     public static void RegisterResolvers(IServiceManager serviceManager)
     {
@@ -92,7 +93,7 @@ public static class ProjectConfiguration
                 .Build()
             .RegisterHttpClient<BloogumClient>()
                 .WithMessageHandler(SetupLoggingAndMetrics<BloogumClient>)
-                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
+                .WithDefaultRequestHeadersSetup(SetupChromeImpersonationUserAgent)
                 .Build()
             .RegisterHttpClient<GraphClient>()
                 .WithMessageHandler(SetupLoggingAndMetrics<GraphClient>)
@@ -389,6 +390,11 @@ public static class ProjectConfiguration
     private static void SetupDaybreakUserAgent(HttpRequestHeaders httpRequestHeaders)
     {
         httpRequestHeaders.ThrowIfNull().TryAddWithoutValidation("User-Agent", DaybreakUserAgent);
+    }
+
+    private static void SetupChromeImpersonationUserAgent(HttpRequestHeaders httpRequestHeaders)
+    {
+        httpRequestHeaders.ThrowIfNull().TryAddWithoutValidation("User-Agent", ChromeImpersonationUserAgent);
     }
 
     private static HttpMessageHandler SetupLoggingAndMetrics<T>(System.IServiceProvider serviceProvider)

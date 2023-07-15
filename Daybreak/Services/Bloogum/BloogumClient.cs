@@ -16,6 +16,8 @@ namespace Daybreak.Services.Bloogum;
 
 public sealed class BloogumClient : IBloogumClient
 {
+    private const string CloudFlareCookieValue = "fcfd523b2470336531e47baff3d2c2d6a0e2412a.1689426482.1";
+    private const string CloudFlareCookieKey = "wschkid";
     private const string CacheFolder = "Bloogum";
     private const string BaseAddress = "http://bloogum.net/guildwars";
     private readonly IImageCache imageCache;
@@ -33,6 +35,8 @@ public sealed class BloogumClient : IBloogumClient
         this.guildwarsMemoryCache = guildwarsMemoryCache.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
         this.httpClient = httpClient.ThrowIfNull();
+
+        this.httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Cookie", $"{CloudFlareCookieKey}={CloudFlareCookieValue}");
     }
 
     public async Task<ImageSource?> GetImage(bool localized)
