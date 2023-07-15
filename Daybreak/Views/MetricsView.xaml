@@ -5,16 +5,24 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Views"
              xmlns:chart="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
+             xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              xmlns:lvCore="clr-namespace:LiveChartsCore;assembly=LiveChartsCore"
              mc:Ignorable="d" 
              Loaded="UserControl_Loaded"
+             Unloaded="UserControl_Unloaded"
              x:Name="_this"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Background="{StaticResource Daybreak.Brushes.Background}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
         <Border BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                BorderThickness="0, 1, 0, 0"/>
+                BorderThickness="0, 1, 0, 1"/>
+        <TextBlock HorizontalAlignment="Center" Text="Metrics" FontSize="22" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" />
         <ItemsControl ItemsSource="{Binding ElementName=_this, Path=Metrics, Mode=OneWay}"
-                      Background="Transparent" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                      Background="Transparent" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                      Grid.Row="1">
             <ItemsControl.Template>
                 <ControlTemplate>
                     <Border

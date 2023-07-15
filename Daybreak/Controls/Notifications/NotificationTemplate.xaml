@@ -9,7 +9,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <converters:DateTimeConverter x:Key="DateTimeConverter" LongTime="True"></converters:DateTimeConverter>
+        <converters:DateTimeConverter x:Key="DateTimeConverter" Format="f"></converters:DateTimeConverter>
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></converters:BooleanToVisibilityConverter>
     </UserControl.Resources>
     <Grid>

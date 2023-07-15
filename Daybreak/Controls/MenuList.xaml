@@ -15,7 +15,8 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </UserControl.Resources>
-    <Grid>
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                  VerticalScrollBarVisibility="Auto">
         <StackPanel>
             <local:ExpandableMenuSection
                 SectionTitle="Guild Wars" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
@@ -174,5 +175,5 @@
                 </local:ExpandableMenuSection.Children>
             </local:ExpandableMenuSection>
         </StackPanel>
-    </Grid>
+    </ScrollViewer>
 </UserControl>

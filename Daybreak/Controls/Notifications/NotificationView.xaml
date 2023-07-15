@@ -29,22 +29,22 @@
                         <RowDefinition Height="*"></RowDefinition>
                     </Grid.RowDefinitions>
                     <Border 
-                    BorderThickness="1"
-                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    Grid.RowSpan="2"/>
+                        BorderThickness="1"
+                        BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                        Grid.RowSpan="2" />
                     <TextBlock Text="{Binding Title, Mode=OneWay}"
                            Grid.Row="0"
                            FontSize="18"
                            Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                            HorizontalAlignment="Center"
-                           Margin="5, 0, 5, 10"/>
+                           Margin="5, 0, 5, 10" />
                     <TextBlock Text="{Binding Description, Mode=OneWay}"
                            Margin="5, 0, 5, 0"
                            Grid.Row="1"
                            FontSize="14"
                            Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                            HorizontalAlignment="Left"
-                           TextWrapping="Wrap"/>
+                           TextWrapping="Wrap" />
                 </Grid>
             </buttons:HighlightButton.ButtonContent>
         </buttons:HighlightButton>
