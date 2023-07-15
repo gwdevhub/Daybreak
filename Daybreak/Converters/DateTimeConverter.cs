@@ -5,6 +5,7 @@ using System.Windows.Data;
 namespace Daybreak.Converters;
 public sealed class DateTimeConverter : IValueConverter
 {
+    public string? Format { get; set; }
     public bool LongTime { get; set; }
     public bool LongDate { get; set; }
 
@@ -13,6 +14,11 @@ public sealed class DateTimeConverter : IValueConverter
         if (value is not DateTime dateTime)
         {
             return string.Empty;
+        }
+
+        if (this.Format is not null)
+        {
+            return dateTime.ToString(this.Format);
         }
 
         if (this.LongTime)

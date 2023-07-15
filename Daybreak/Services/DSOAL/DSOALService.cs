@@ -1,6 +1,8 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Models.Progress;
 using Daybreak.Services.Downloads;
+using Daybreak.Services.Privilege;
+using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -28,6 +30,7 @@ public sealed class DSOALService : IDSOALService
     private const string AlsoftIni = "alsoft.ini";
     private const string OpenAlDirectory = "openal";
 
+    private readonly IPrivilegeManager privilegeManager;
     private readonly IDownloadService downloadService;
     private readonly ILiveUpdateableOptions<DSOALOptions> options;
     private readonly ILogger<DSOALService> logger;
@@ -42,16 +45,17 @@ public sealed class DSOALService : IDSOALService
         }
     }
     public bool IsInstalled => Directory.Exists(this.options.Value.Path) &&
-                                Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), OpenAlDirectory)) &&
-                                File.Exists(Path.Combine(DSOALDirectory, DsoundDll)) &&
-                                File.Exists(Path.Combine(DSOALDirectory, AlsoftIni)) &&
-                                File.Exists(Path.Combine(DSOALDirectory, AlsoftIni));
+           File.Exists(Path.Combine(DSOALDirectory, DsoundDll)) &&
+           File.Exists(Path.Combine(DSOALDirectory, AlsoftIni)) &&
+           File.Exists(Path.Combine(DSOALDirectory, AlsoftIni));
 
     public DSOALService(
+        IPrivilegeManager privilegeManager,
         IDownloadService downloadService,
         ILiveUpdateableOptions<DSOALOptions> options,
         ILogger<DSOALService> logger)
     {
+        this.privilegeManager = privilegeManager.ThrowIfNull();
         this.downloadService = downloadService.ThrowIfNull();
         this.options = options.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
@@ -62,6 +66,12 @@ public sealed class DSOALService : IDSOALService
         if (this.IsInstalled)
         {
             return true;
+        }
+
+        if (!this.privilegeManager.AdminPrivileges)
+        {
+            this.privilegeManager.RequestAdminPrivileges<LauncherView>("Administrator privileges are required to install DSOAL");
+            return false;
         }
 
         if ((await this.downloadService.DownloadFile(DownloadUrl, ArchiveName, dSOALInstallationStatus)) is false)
@@ -103,6 +113,7 @@ public sealed class DSOALService : IDSOALService
         var guildwarsDirectory = new FileInfo(process.StartInfo.FileName).Directory!.FullName;
         if (this.options.Value.Enabled)
         {
+            EnsureSymbolicLinkExists();
             EnsureFileExistsInGuildwarsDirectory(DsoundDll, guildwarsDirectory);
             EnsureFileExistsInGuildwarsDirectory(DSOALAldrvDll, guildwarsDirectory);
             EnsureFileExistsInGuildwarsDirectory(AlsoftIni, guildwarsDirectory);
@@ -140,6 +151,26 @@ public sealed class DSOALService : IDSOALService
         File.Delete(destinationPath);
     }
 
+    private static void EnsureSymbolicLinkExists()
+    {
+        var openalPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), OpenAlDirectory);
+        if (!Directory.Exists(openalPath))
+        {
+            Directory.CreateSymbolicLink(openalPath, Path.GetFullPath(DSOALDirectory));
+            return;
+        }
+
+        var fi = new FileInfo(openalPath);
+        var desiredPath = Path.GetFullPath(DSOALDirectory);
+        if (fi.LinkTarget == desiredPath)
+        {
+            return;
+        }
+
+        Directory.Delete(openalPath);
+        Directory.CreateSymbolicLink(openalPath, Path.GetFullPath(DSOALDirectory));
+    }
+
     private void ExtractFiles()
     {
         ZipFile.ExtractToDirectory(ArchiveName, Path.Combine(Directory.GetCurrentDirectory(), DSOALDirectory), true);
@@ -155,6 +186,12 @@ public sealed class DSOALService : IDSOALService
     {
         var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         var openalPath = Path.Combine(appDataPath, OpenAlDirectory);
+        if (Directory.Exists(openalPath))
+        {
+            this.logger.LogWarning($"Found existing openal symbolic link at [{openalPath}]. Deleting");
+            Directory.Delete(openalPath);
+        }
+
         Directory.CreateSymbolicLink(openalPath, Path.GetFullPath(DSOALDirectory));
     }
 }

@@ -20,6 +20,9 @@ public sealed class MetricsService : IMetricsService, IDisposable
     private readonly ConcurrentDictionary<string, LinkedList<Metric>> metricStore = new();
     private readonly ConcurrentDictionary<Instrument, AggregationTypes> aggregationTypeMapping = new();
 
+    public event EventHandler<RecordedMetric>? MetricRecorded;
+    public event EventHandler<MetricSet>? SetRecorded;
+
     public MetricsService()
     {
         this.daybreakMeter = new Meter($"{MetricsNamespace}.{MetricsStoreName}");
@@ -111,6 +114,8 @@ public sealed class MetricsService : IMetricsService, IDisposable
 
     private void MeasurementRecorded<T>(Instrument instrument, T measurement, ReadOnlySpan<KeyValuePair<string, object?>> tags, object? state)
     {
+        MetricSet? newMetricSet = default;
+        RecordedMetric? newRecordedMetric = default;
         while(Monitor.TryEnter(this.metricStoreLock) is false)
         {
         }
@@ -124,15 +129,29 @@ public sealed class MetricsService : IMetricsService, IDisposable
         {
             metrics = new LinkedList<Metric>();
             this.metricStore[instrument.Name] = metrics;
+            newMetricSet = new MetricSet { Metrics = metrics, AggregationType = this.aggregationTypeMapping[instrument], Instrument = instrument };
+            
         }
 
-        metrics.AddLast(new Metric { Timestamp = DateTime.UtcNow, Instrument = instrument, Measurement = measurement });
+        var metric = new Metric { Timestamp = DateTime.UtcNow, Instrument = instrument, Measurement = measurement };
+        metrics.AddLast(metric);
         if (metrics.Count > MetricsStoreLimit)
         {
             metrics.RemoveFirst();
         }
 
+        newRecordedMetric = new RecordedMetric { Instrument = instrument, Metric = metric };
         Monitor.Exit(this.metricStoreLock);
+
+        if (newMetricSet is not null)
+        {
+            this.SetRecorded?.Invoke(this, newMetricSet);
+        }
+
+        if (newRecordedMetric is not null)
+        {
+            this.MetricRecorded?.Invoke(this, newRecordedMetric);
+        }
     }
 
     public void Dispose()

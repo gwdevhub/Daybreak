@@ -4,10 +4,10 @@ using Daybreak.Models.Github;
 using Daybreak.Models.Progress;
 using Daybreak.Services.Downloads;
 using Daybreak.Services.Navigation;
+using Daybreak.Services.Registry;
 using Daybreak.Services.Updater.PostUpdate;
 using Daybreak.Views;
 using Microsoft.Extensions.Logging;
-using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -27,8 +27,7 @@ namespace Daybreak.Services.Updater;
 public sealed class ApplicationUpdater : IApplicationUpdater
 {
     private const string InstallerFileName = "Daybreak.Installer.exe";
-    private const string UpdatedKey = "Updating";
-    private const string RegistryKey = "Daybreak";
+    private const string UpdatedKey = "LauncherUpdating";
     private const string TempFile = "tempfile.zip";
     private const string VersionTag = "{VERSION}";
     private const string RefTagPrefix = "/refs/tags";
@@ -37,6 +36,7 @@ public sealed class ApplicationUpdater : IApplicationUpdater
     private const string DownloadUrl = $"https://github.com/AlexMacocian/Daybreak/releases/download/{VersionTag}/Daybreak{VersionTag}.zip";
 
     private readonly CancellationTokenSource updateCancellationTokenSource = new();
+    private readonly IRegistryService registryService;
     private readonly IViewManager viewManager;
     private readonly IDownloadService downloadService;
     private readonly IPostUpdateActionProvider postUpdateActionProvider;
@@ -47,6 +47,7 @@ public sealed class ApplicationUpdater : IApplicationUpdater
     public Version CurrentVersion { get; }
 
     public ApplicationUpdater(
+        IRegistryService registryService,
         IViewManager viewManager,
         IDownloadService downloadService,
         IPostUpdateActionProvider postUpdateActionProvider,
@@ -54,6 +55,7 @@ public sealed class ApplicationUpdater : IApplicationUpdater
         IHttpClient<ApplicationUpdater> httpClient,
         ILogger<ApplicationUpdater> logger)
     {
+        this.registryService = registryService.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
         this.downloadService = downloadService.ThrowIfNull();
         this.postUpdateActionProvider = postUpdateActionProvider.ThrowIfNull();
@@ -149,15 +151,15 @@ public sealed class ApplicationUpdater : IApplicationUpdater
 
     public void FinalizeUpdate()
     {
-        MarkUpdateInRegistry();
+        this.MarkUpdateInRegistry();
         this.LaunchExtractor();
     }
 
     public void OnStartup()
     {
-        if (UpdateMarkedInRegistry())
+        if (this.UpdateMarkedInRegistry())
         {
-            UnmarkUpdateInRegistry();
+            this.UnmarkUpdateInRegistry();
             this.ExecutePostUpdateActions();
         }
     }
@@ -211,45 +213,23 @@ public sealed class ApplicationUpdater : IApplicationUpdater
         }
     }
 
-    private static void MarkUpdateInRegistry()
+    private void MarkUpdateInRegistry()
     {
-        var homeRegistryKey = GetOrCreateHomeKey();
-        homeRegistryKey.SetValue(UpdatedKey, true);
-        homeRegistryKey.Close();
+        this.registryService.SaveValue(UpdatedKey, true);
     }
 
-    private static void UnmarkUpdateInRegistry()
+    private void UnmarkUpdateInRegistry()
     {
-        var homeRegistryKey = GetOrCreateHomeKey();
-        homeRegistryKey.SetValue(UpdatedKey, false);
-        homeRegistryKey.Close();
+        this.registryService.DeleteValue(UpdatedKey);
     }
 
-    private static bool UpdateMarkedInRegistry()
+    private bool UpdateMarkedInRegistry()
     {
-        var homeRegistryKey = GetOrCreateHomeKey();
-        var update = homeRegistryKey.GetValue(UpdatedKey);
-        homeRegistryKey.Close();
-        if (update is string updateString)
+        if (this.registryService.TryGetValue<bool>(UpdatedKey, out _))
         {
-            if (bool.TryParse(updateString, out var updateValue))
-            {
-                return updateValue;
-            }
-            else
-            {
-                throw new InvalidOperationException($"Found update value {updateString} in registry");
-            }
+            return true;
         }
 
         return false;
-    }
-
-    private static RegistryKey GetOrCreateHomeKey()
-    {
-        var homeRegistryKey = Registry.CurrentUser.OpenSubKey("Software", true)?.OpenSubKey(RegistryKey, true);
-        homeRegistryKey ??= Registry.CurrentUser.OpenSubKey("Software", true)!.CreateSubKey(RegistryKey, true);
-
-        return homeRegistryKey;
     }
 }

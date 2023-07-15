@@ -116,8 +116,23 @@ public sealed class BloogumClient : IBloogumClient
             if (response.IsSuccessStatusCode)
             {
                 this.logger.LogInformation("Received success status code");
-                var ms = new MemoryStream(await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false));
-                return ms;
+                if (response.Headers.TryGetValues("Content-Length", out var values) &&
+                    values.FirstOrDefault() is string responseLengthString &&
+                    int.TryParse(responseLengthString, out var responseLength) &&
+                    responseLength < 10e4)
+                {
+                    this.logger.LogError("Received invalid response. Request was probably blocked by Cloudflare");
+                    return default;
+                }
+
+                var responseStream = response.Content.ReadAsStream();
+                if (responseStream.Length < 10e4)
+                {
+                    this.logger.LogError("Received invalid response. Request was probably blocked by Cloudflare");
+                    return default;
+                }
+
+                return responseStream;
             }
             else
             {

@@ -8,6 +8,7 @@ using LiveChartsCore.SkiaSharpView.WPF;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Core.Extensions;
 using System.Data;
 using System.Extensions;
@@ -29,8 +30,7 @@ public partial class MetricsView : UserControl
     private readonly SolidColorPaint accentPaint;
     private readonly IMetricsService metricsService;
 
-    [GenerateDependencyProperty]
-    private IEnumerable<MetricSet> metrics = new List<MetricSet>();
+    public ObservableCollection<MetricSetViewModel> Metrics { get; } = new ObservableCollection<MetricSetViewModel>();
     
     public MetricsView(
         IMetricsService metricsService)
@@ -49,13 +49,42 @@ public partial class MetricsView : UserControl
 
     private void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
-        this.Metrics = this.metricsService.GetMetrics().Where(m => m.Metrics?.Count() > 1);
+        this.Metrics.AddRange(this.metricsService.GetMetrics().Select(s => new MetricSetViewModel { Instrument = s.Instrument, AggregationType = s.AggregationType, Metrics = new ObservableCollection<Metric>(s.Metrics ?? new List<Metric>()) }).ToList());
+        this.metricsService.SetRecorded += this.MetricsService_SetRecorded;
+        this.metricsService.MetricRecorded += this.MetricsService_MetricRecorded;
+    }
+
+    private void MetricsService_MetricRecorded(object? sender, RecordedMetric e)
+    {
+        this.Dispatcher.Invoke(() =>
+        {
+            if (this.Metrics.FirstOrDefault(m => m.Instrument == e.Instrument) is not MetricSetViewModel existingSet)
+            {
+                return;
+            }
+
+            existingSet.Metrics?.Add(e.Metric);
+        });
+    }
+
+    private void MetricsService_SetRecorded(object? sender, MetricSet e)
+    {
+        this.Dispatcher.Invoke(() =>
+        {
+            this.Metrics.Add(new MetricSetViewModel { AggregationType = e.AggregationType, Instrument = e.Instrument, Metrics = new ObservableCollection<Metric>(e.Metrics ?? new List<Metric>()) });
+        });
+    }
+
+    private void UserControl_Unloaded(object sender, RoutedEventArgs e)
+    {
+        this.metricsService.MetricRecorded -= this.MetricsService_MetricRecorded;
+        this.metricsService.SetRecorded -= this.MetricsService_SetRecorded;
     }
 
     private void CartesianChart_Loaded(object sender, RoutedEventArgs e)
     {
         var cartesianChart = sender.Cast<CartesianChart>();
-        if (cartesianChart.DataContext is not MetricSet metricSet)
+        if (cartesianChart.DataContext is not MetricSetViewModel metricSet)
         {
             return;
         }

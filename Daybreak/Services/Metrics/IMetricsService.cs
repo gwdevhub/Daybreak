@@ -7,15 +7,19 @@ namespace Daybreak.Services.Metrics;
 
 public interface IMetricsService
 {
-    public ObservableGauge<T> CreateObservableGauge<T>(string name, string unitName, string description, AggregationTypes aggregationType, Func<T> valueFactory) where T : struct;
+    event EventHandler<RecordedMetric>? MetricRecorded;
 
-    public ObservableCounter<T> CreateObservableCounter<T>(string name, string unitName, string description, AggregationTypes aggregationType, Func<T> valueFactory) where T : struct;
+    event EventHandler<MetricSet>? SetRecorded;
 
-    public Counter<T> CreateCounter<T>(string name, string unitName, string description, AggregationTypes aggregationType) where T : struct;
+    ObservableGauge<T> CreateObservableGauge<T>(string name, string unitName, string description, AggregationTypes aggregationType, Func<T> valueFactory) where T : struct;
+
+    ObservableCounter<T> CreateObservableCounter<T>(string name, string unitName, string description, AggregationTypes aggregationType, Func<T> valueFactory) where T : struct;
+
+    Counter<T> CreateCounter<T>(string name, string unitName, string description, AggregationTypes aggregationType) where T : struct;
     
-    public Histogram<T> CreateHistogram<T>(string name, string unitName, string description, AggregationTypes aggregationType) where T : struct;
+    Histogram<T> CreateHistogram<T>(string name, string unitName, string description, AggregationTypes aggregationType) where T : struct;
 
-    public MetricSet GetMetrics(string name);
+    MetricSet GetMetrics(string name);
 
-    public IEnumerable<MetricSet> GetMetrics();
+    IEnumerable<MetricSet> GetMetrics();
 }

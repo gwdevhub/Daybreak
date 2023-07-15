@@ -126,12 +126,12 @@ public sealed class ImageCache : IImageCache
 
     private async Task<ImageEntry> AddToCache(string uri)
     {
-        using var memoryStream = new MemoryStream(File.ReadAllBytes(uri));
+        using var fileStream = File.OpenRead(uri);
         return await Task.Run(() =>
         {
             var bitmapImage = new BitmapImage();
             bitmapImage.BeginInit();
-            bitmapImage.StreamSource = memoryStream;
+            bitmapImage.StreamSource = fileStream;
             bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
             bitmapImage.EndInit();
             bitmapImage.Freeze();

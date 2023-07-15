@@ -70,6 +70,7 @@ using Daybreak.Views.Copy;
 using Daybreak.Services.DSOAL;
 using Daybreak.Services.Mods;
 using Daybreak.Views.Onboarding.DSOAL;
+using Daybreak.Services.Registry;
 
 namespace Daybreak.Configuration;
 
@@ -209,6 +210,7 @@ public static class ProjectConfiguration
         services.AddScoped<ITradeHistoryDatabase, TradeHistoryDatabase>();
         services.AddScoped<IGuildwarsCopyService, GuildwarsCopyService>();
         services.AddScoped<IItemHashService, ItemHashService>();
+        services.AddScoped<IRegistryService, RegistryService>();
     }
 
     public static void RegisterViews(IViewProducer viewProducer)
@@ -393,6 +395,7 @@ public static class ProjectConfiguration
     {
         var logger = serviceProvider.GetRequiredService<ILogger<T>>();
         var metricsService = serviceProvider.GetRequiredService<IMetricsService>();
+        
 
         return new MetricsHttpMessageHandler<T>(
             metricsService,
