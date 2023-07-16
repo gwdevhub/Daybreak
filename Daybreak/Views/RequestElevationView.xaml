@@ -13,7 +13,8 @@
                 BorderThickness="1"/>
         <StackPanel VerticalAlignment="Center" Orientation="Vertical">
             <TextBlock Text="{Binding MessageToUser}" Margin="10, 0, 10, 0" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                       TextWrapping="Wrap" HorizontalAlignment="Center" FontSize="16"></TextBlock>
+                       TextWrapping="Wrap" HorizontalAlignment="Center" FontSize="16"
+                       TextAlignment="Center"></TextBlock>
             <TextBlock Text="Do you want to restart the application with administrator rights?" HorizontalAlignment="Center"
                        FontSize="16" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Margin="10, 0, 10, 10" TextWrapping="Wrap"></TextBlock>
             <Grid MaxWidth="600"

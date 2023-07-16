@@ -50,5 +50,9 @@ public sealed class FixSymbolicLinkStartupAction : StartupActionBase
 
         this.dSOALService.EnsureDSOALSymbolicLinkExists();
         this.registryService.DeleteValue(DSOALService.DSOALFixRegistryKey);
+        this.notificationService.NotifyInformation(
+            "DSOAL Fixed",
+            "DSOAL installation has been fixed",
+            expirationTime: DateTime.Now + TimeSpan.FromSeconds(5));
     }
 }
