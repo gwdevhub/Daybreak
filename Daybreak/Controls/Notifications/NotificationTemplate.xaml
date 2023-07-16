@@ -39,7 +39,8 @@
                     <TextBlock Text="{Binding Description, Mode=OneWay}"
                                FontSize="14"
                                Grid.Row="2"
-                               Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+                               Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                               TextWrapping="Wrap"/>
                     <Rectangle Grid.RowSpan="3"
                                Fill="{DynamicResource MahApps.Brushes.Accent}"
                                Visibility="{Binding Closed, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"

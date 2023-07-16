@@ -71,6 +71,7 @@ using Daybreak.Services.DSOAL;
 using Daybreak.Services.Mods;
 using Daybreak.Views.Onboarding.DSOAL;
 using Daybreak.Services.Registry;
+using Daybreak.Services.DSOAL.Actions;
 
 namespace Daybreak.Configuration;
 
@@ -268,6 +269,7 @@ public static class ProjectConfiguration
         startupActionProducer.ThrowIfNull();
 
         startupActionProducer.RegisterAction<RenameInstallerAction>();
+        startupActionProducer.RegisterAction<FixSymbolicLinkStartupAction>();
     }
 
     public static void RegisterPostUpdateActions(IPostUpdateActionProducer postUpdateActionProducer)
@@ -367,6 +369,7 @@ public static class ProjectConfiguration
         notificationHandlerProducer.RegisterNotificationHandler<NoActionHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<MessageBoxHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<TradeMessageNotificationHandler>();
+        notificationHandlerProducer.RegisterNotificationHandler<FixSymbolicLinkNotificationHandler>();
     }
 
     public static void RegisterMods(IModsManager modsManager)

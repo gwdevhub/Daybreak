@@ -97,6 +97,7 @@ public sealed class RegistryService : IRegistryService
                     return false;
                 }
 
+                destinationRegistryKey = maybeSubKey;
                 disposableKeys.Add(destinationRegistryKey);
             }
         }
