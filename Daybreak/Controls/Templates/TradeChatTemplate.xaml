@@ -24,7 +24,7 @@
         </Grid.RowDefinitions>
         <Grid
             Grid.Row="0"
-            Height="30">
+            Height="40">
             <WrapPanel
                 HorizontalAlignment="Right"
                 VerticalAlignment="Top">
@@ -45,7 +45,8 @@
                        Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"/>
             <Border 
                 BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
-                BorderThickness="0, 0, 0, 1"/>
+                BorderThickness="0, 0, 0, 1"
+                Height="40"/>
         </Grid>
         <Grid Grid.Row="1">
             <controls:SearchTextBox

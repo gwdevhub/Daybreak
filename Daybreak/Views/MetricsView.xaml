@@ -18,7 +18,8 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Border BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                BorderThickness="0, 1, 0, 1"/>
+                BorderThickness="0, 1, 0, 1"
+                Height="40"/>
         <TextBlock HorizontalAlignment="Center" Text="Metrics" FontSize="22" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" />
         <ItemsControl ItemsSource="{Binding ElementName=_this, Path=Metrics, Mode=OneWay}"
                       Background="Transparent" ScrollViewer.VerticalScrollBarVisibility="Auto"
