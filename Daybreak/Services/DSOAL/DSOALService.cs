@@ -2,6 +2,7 @@
 using Daybreak.Models.Progress;
 using Daybreak.Services.Downloads;
 using Daybreak.Services.Privilege;
+using Daybreak.Services.Registry;
 using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using System;
@@ -21,6 +22,8 @@ namespace Daybreak.Services.DSOAL;
 /// </summary>
 public sealed class DSOALService : IDSOALService
 {
+    public const string DSOALFixAdminMessage = "Daybreak has detected an issue with the DSOAL installation. In order to fix this issue, Daybreak will need to restart as administrator. DSOAL will not work until then.";
+    public const string DSOALFixRegistryKey = "DSOAL/FixSymbolicLink";
     private const string DownloadUrl = "https://github.com/ChthonVII/dsoal-GW1/releases/download/r420%2Bgw1_rev1/dsoal-GW1_r420+gw1_rev1.zip";
     private const string ArchiveName = "dsoal-GW1_r420+gw1_rev1.zip";
     private const string DSOALDirectory = "DSOAL";
@@ -30,6 +33,7 @@ public sealed class DSOALService : IDSOALService
     private const string AlsoftIni = "alsoft.ini";
     private const string OpenAlDirectory = "openal";
 
+    private readonly IRegistryService registryService;
     private readonly IPrivilegeManager privilegeManager;
     private readonly IDownloadService downloadService;
     private readonly ILiveUpdateableOptions<DSOALOptions> options;
@@ -50,15 +54,22 @@ public sealed class DSOALService : IDSOALService
            File.Exists(Path.Combine(DSOALDirectory, AlsoftIni));
 
     public DSOALService(
+        IRegistryService registryService,
         IPrivilegeManager privilegeManager,
         IDownloadService downloadService,
         ILiveUpdateableOptions<DSOALOptions> options,
         ILogger<DSOALService> logger)
     {
+        this.registryService = registryService.ThrowIfNull();
         this.privilegeManager = privilegeManager.ThrowIfNull();
         this.downloadService = downloadService.ThrowIfNull();
         this.options = options.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
+    }
+
+    public void EnsureDSOALSymbolicLinkExists()
+    {
+        this.EnsureSymbolicLinkExists();
     }
 
     public async Task<bool> SetupDSOAL(DSOALInstallationStatus dSOALInstallationStatus)
@@ -113,7 +124,7 @@ public sealed class DSOALService : IDSOALService
         var guildwarsDirectory = new FileInfo(process.StartInfo.FileName).Directory!.FullName;
         if (this.options.Value.Enabled)
         {
-            EnsureSymbolicLinkExists();
+            this.EnsureSymbolicLinkExists();
             EnsureFileExistsInGuildwarsDirectory(DsoundDll, guildwarsDirectory);
             EnsureFileExistsInGuildwarsDirectory(DSOALAldrvDll, guildwarsDirectory);
             EnsureFileExistsInGuildwarsDirectory(AlsoftIni, guildwarsDirectory);
@@ -151,11 +162,18 @@ public sealed class DSOALService : IDSOALService
         File.Delete(destinationPath);
     }
 
-    private static void EnsureSymbolicLinkExists()
+    private void EnsureSymbolicLinkExists()
     {
         var openalPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), OpenAlDirectory);
         if (!Directory.Exists(openalPath))
         {
+            if (!this.privilegeManager.AdminPrivileges)
+            {
+                this.registryService.SaveValue(DSOALFixRegistryKey, true);
+                this.privilegeManager.RequestAdminPrivileges<LauncherView>(DSOALFixAdminMessage);
+                return;
+            }
+
             Directory.CreateSymbolicLink(openalPath, Path.GetFullPath(DSOALDirectory));
             return;
         }
@@ -164,6 +182,13 @@ public sealed class DSOALService : IDSOALService
         var desiredPath = Path.GetFullPath(DSOALDirectory);
         if (fi.LinkTarget == desiredPath)
         {
+            return;
+        }
+
+        if (!this.privilegeManager.AdminPrivileges)
+        {
+            this.registryService.SaveValue(DSOALFixRegistryKey, true);
+            this.privilegeManager.RequestAdminPrivileges<LauncherView>(DSOALFixAdminMessage);
             return;
         }
 
