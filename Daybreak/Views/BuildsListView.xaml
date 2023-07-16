@@ -19,7 +19,7 @@
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <Border BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
-                BorderThickness="0, 1, 0, 0"/>
+                BorderThickness="0, 1, 0, 1"/>
         <TextBlock
             FontSize="22"
             Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
