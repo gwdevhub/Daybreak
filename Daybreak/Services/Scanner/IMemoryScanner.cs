@@ -1,6 +1,5 @@
 ﻿using Daybreak.Models.Interop;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 
 namespace Daybreak.Services.Scanner;
 
