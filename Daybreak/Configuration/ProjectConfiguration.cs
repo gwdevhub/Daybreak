@@ -377,6 +377,7 @@ public static class ProjectConfiguration
         modsManager.RegisterMod<IToolboxService, ToolboxService>();
         modsManager.RegisterMod<IUModService, UModService>();
         modsManager.RegisterMod<IDSOALService, DSOALService>();
+        modsManager.RegisterMod<IGuildwarsScreenPlacer, GuildwarsScreenPlacer>();
     }
 
     private static void RegisterLiteCollection<TCollectionType, TOptionsType>(IServiceCollection services)

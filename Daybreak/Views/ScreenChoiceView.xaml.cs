@@ -48,12 +48,26 @@ public partial class ScreenChoiceView : UserControl
 
     private void SetupView()
     {
+        var minX = double.MaxValue;
+        var minY = double.MaxValue;
+        foreach(var screen in this.screenManager.Screens)
+        {
+            if (screen.Size.Left < minX)
+            {
+                minX = screen.Size.Left;
+            }
+
+            if (screen.Size.Top < minY)
+            {
+                minY = screen.Size.Top;
+            }
+        }
         foreach(var screen in this.screenManager.Screens)
         {
             var screenTemplate = new ScreenTemplate
             {
                 DataContext = screen,
-                Margin = new System.Windows.Thickness(screen.Size.Left, screen.Size.Top, 0, 0),
+                Margin = new System.Windows.Thickness(screen.Size.Left - minX, screen.Size.Top - minY, 0, 0),
                 Width = screen.Size.Width,
                 Height = screen.Size.Height,
                 VerticalAlignment = System.Windows.VerticalAlignment.Top,

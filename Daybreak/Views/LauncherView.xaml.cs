@@ -142,17 +142,17 @@ public partial class LauncherView : UserControl
             return;
         }
 
-        if (this.launcherOptions.Value.SetGuildwarsWindowSizeOnLaunch)
-        {
-            var id = this.launcherOptions.Value.DesiredGuildwarsScreen;
-            var desiredScreen = this.screenManager.Screens.Skip(id).FirstOrDefault();
-            if (desiredScreen is null)
-            {
-                throw new InvalidOperationException($"Unable to set guildwars on desired screen. No screen with id {id}");
-            }
+        //if (this.launcherOptions.Value.SetGuildwarsWindowSizeOnLaunch)
+        //{
+        //    var id = this.launcherOptions.Value.DesiredGuildwarsScreen;
+        //    var desiredScreen = this.screenManager.Screens.Skip(id).FirstOrDefault();
+        //    if (desiredScreen is null)
+        //    {
+        //        throw new InvalidOperationException($"Unable to set guildwars on desired screen. No screen with id {id}");
+        //    }
 
-            await Task.Delay(1000);
-            this.screenManager.MoveGuildwarsToScreen(desiredScreen);
-        }
+        //    await Task.Delay(1000);
+        //    this.screenManager.MoveGuildwarsToScreen(desiredScreen);
+        //}
     }
 }
