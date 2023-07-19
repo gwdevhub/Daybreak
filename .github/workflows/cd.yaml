@@ -9,9 +9,9 @@ on:
   push:
     branches:
       - master
-#    paths:
-#      - "Daybreak/**"
-#      - "Daybreak.Installer/**"
+    paths:
+      - "Daybreak/**"
+      - "Daybreak.Installer/**"
       
 jobs:
 
