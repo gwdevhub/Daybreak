@@ -15,6 +15,7 @@ using System.Extensions;
 using System.Globalization;
 using System.Linq;
 using System.Logging;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -174,6 +175,16 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         }
 
         return Task.Run(() => this.SafeReadGameMemory(this.ReadMainPlayerDataInternal), cancellationToken);
+    }
+
+    public Task<ConnectionData?> ReadConnectionData(CancellationToken cancellationToken)
+    {
+        if (this.memoryScanner.Scanning is false)
+        {
+            return Task.FromResult<ConnectionData?>(default);
+        }
+
+        return Task.Run(() => this.SafeReadGameMemory(this.ReadConnectionData), cancellationToken);
     }
 
     private async Task InitializeSafe(Process process, ScopedLogger<GuildwarsMemoryReader> scopedLogger)
@@ -606,6 +617,23 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         {
             PlayerInformation = mainPlayerInfo
         };
+    }
+
+    private ConnectionData? ReadConnectionData()
+    {
+        /*
+         * IP Address in long format is at one of the following addresses:
+         * startAddress + 00629204 -> +0x18 -> +0x44 -> +0x1A4
+         */
+
+        var ipAddressContext = this.memoryScanner.ReadPtrChain<IPAddressContext>(this.memoryScanner.ModuleStartAddress, finalPointerOffset: 0x1A4, 0x00629204, 0x18, 0x44);
+
+        if (!IPAddress.TryParse($"{ipAddressContext.Byte1}.{ipAddressContext.Byte2}.{ipAddressContext.Byte3}.{ipAddressContext.Byte4}", out var ipAddress))
+        {
+            return default;
+        }
+
+        return new ConnectionData { IPAddress = ipAddress };
     }
 
     private uint GetPlayerIdPointer()
