@@ -6,7 +6,7 @@ namespace Daybreak.Models.Guildwars;
 
 public sealed class Region : IWikiEntity
 {
-    public static Region Kryta { get; } = new Region
+    public static readonly Region Kryta = new()
     { 
         Id = 0,
         Name = "Kryta",
@@ -44,7 +44,7 @@ public sealed class Region : IWikiEntity
             Map.WatchtowerCoast
         }
     };
-    public static Region MaguumaJungle { get; } = new Region
+    public static readonly Region MaguumaJungle = new()
     {
         Id = 1,
         Name = "Maguuma Jungle",
@@ -71,7 +71,7 @@ public sealed class Region : IWikiEntity
             Map.TheFalls
         }
     };
-    public static Region Ascalon { get; } = new Region
+    public static readonly Region Ascalon = new()
     { 
         Id = 2,
         Name = "Ascalon",
@@ -104,7 +104,7 @@ public sealed class Region : IWikiEntity
             Map.TheBreach
         }
     };
-    public static Region ShiverpeakMountains { get; } = new Region
+    public static readonly Region ShiverpeakMountains = new()
     { 
         Id = 3,
         Name = "Shiverpeak Mountains",
@@ -153,7 +153,7 @@ public sealed class Region : IWikiEntity
             Map.WitmansFolly
         }
     };
-    public static Region HeroesAscent { get; } = new Region
+    public static readonly Region HeroesAscent = new()
     { 
         Id = 4,
         Name = "Heroes' Ascent",
@@ -175,7 +175,7 @@ public sealed class Region : IWikiEntity
             Map.ScarredEarth2
         }
     };
-    public static Region CrystalDesert { get; } = new Region
+    public static readonly Region CrystalDesert = new()
     { 
         Id = 5, 
         Name = "Crystal Desert", 
@@ -203,7 +203,7 @@ public sealed class Region : IWikiEntity
             Map.VultureDrifts
         }
     };
-    public static Region RingOfFireIslands { get; } = new Region
+    public static readonly Region RingOfFireIslands = new()
     {
         Id = 6,
         Name = "Ring of Fire Islands",
@@ -218,7 +218,7 @@ public sealed class Region : IWikiEntity
             Map.TheFissureofWoe
         }
     };
-    public static Region PresearingAscalon { get; } = new Region
+    public static readonly Region PresearingAscalon = new()
     {
         Id = 7,
         Name = "Pre Searing Ascalon",
@@ -241,7 +241,7 @@ public sealed class Region : IWikiEntity
             Map.WizardsFolly
         }
     };
-    public static Region KainengCity { get; } = new Region
+    public static readonly Region KainengCity = new()
     { 
         Id = 8,
         Name = "Kaineng City",
@@ -290,7 +290,7 @@ public sealed class Region : IWikiEntity
             Map.XaquangSkyway
         }
     };
-    public static Region EchovaldForest { get; } = new Region
+    public static readonly Region EchovaldForest = new()
     {
         Id = 9,
         Name = "Echovald Forest",
@@ -325,7 +325,7 @@ public sealed class Region : IWikiEntity
             Map.MourningVeilFalls
         }
     };
-    public static Region TheJadeSea { get; } = new Region
+    public static readonly Region TheJadeSea = new()
     {
         Id = 10,
         Name = "The Jade Sea",
@@ -361,7 +361,7 @@ public sealed class Region : IWikiEntity
             Map.SilentSurf
         }
     };
-    public static Region ShingJeaIsland { get; } = new Region
+    public static readonly Region ShingJeaIsland = new()
     {
         Id = 11,
         Name = "Shing Jea Island",
@@ -402,7 +402,7 @@ public sealed class Region : IWikiEntity
             Map.SunquaVale
         }
     };
-    public static Region Kourna { get; } = new Region
+    public static readonly Region Kourna = new()
     {
         Id = 12,
         Name = "Kourna",
@@ -434,7 +434,7 @@ public sealed class Region : IWikiEntity
             Map.NightfallenCoast
         }
     };
-    public static Region Vabbi { get; } = new Region
+    public static readonly Region Vabbi = new()
     {
         Id = 13,
         Name = "Vabbi",
@@ -467,7 +467,7 @@ public sealed class Region : IWikiEntity
             Map.YatendiCanyons
         }
     };
-    public static Region TheDesolation { get; } = new Region
+    public static readonly Region TheDesolation = new()
     {
         Id = 14,
         Name = "TheDesolation",
@@ -489,7 +489,7 @@ public sealed class Region : IWikiEntity
             Map.TheSulfurousWastes
         }
     };
-    public static Region Istan { get; } = new Region
+    public static readonly Region Istan = new()
     {
         Id = 15,
         Name = "Istan",
@@ -528,7 +528,7 @@ public sealed class Region : IWikiEntity
             Map.ZehlonReach
         }
     };
-    public static Region RealmOfTorment { get; } = new Region
+    public static readonly Region RealmOfTorment = new()
     {
         Id = 16,
         Name = "Realm of Torment",
@@ -555,7 +555,7 @@ public sealed class Region : IWikiEntity
             Map.ThroneOfSecrets
         }
     };
-    public static Region TarnishedCoast { get; } = new Region
+    public static readonly Region TarnishedCoast = new()
     {
         Id = 17,
         Name = "Tarnished Coast",
@@ -586,7 +586,7 @@ public sealed class Region : IWikiEntity
             Map.VerdantCascades
         }
     };
-    public static Region DepthsOfTyria { get; } = new Region
+    public static readonly Region DepthsOfTyria = new()
     {
         Id = 18,
         Name = "Depths Of Tyria",
@@ -656,7 +656,7 @@ public sealed class Region : IWikiEntity
             Map.VloxenExcavationsLevel3
         }
     };
-    public static Region FarShiverpeaks { get; } = new Region
+    public static readonly Region FarShiverpeaks = new()
     {
         Id = 19,
         Name = "Far Shiverpeaks",
@@ -692,7 +692,7 @@ public sealed class Region : IWikiEntity
             Map.VarajarFells
         }
     };
-    public static Region CharrHomelands { get; } = new Region
+    public static readonly Region CharrHomelands = new()
     {
         Id = 20,
         Name = "Charr Homelands",
@@ -714,7 +714,7 @@ public sealed class Region : IWikiEntity
             Map.SacnothValley
         }
     };
-    public static Region TheBattleIsles { get; } = new Region
+    public static readonly Region TheBattleIsles = new()
     {
         Id = 21,
         Name = "The Battle Isles",
@@ -772,7 +772,7 @@ public sealed class Region : IWikiEntity
             Map.UnchartedIsleOutpost
         }
     };
-    public static Region TheBattleOfJahai { get; } = new Region
+    public static readonly Region TheBattleOfJahai = new()
     {
         Id = 22,
         Name = "The Battle Of Jahai",
@@ -782,7 +782,7 @@ public sealed class Region : IWikiEntity
             Map.TheBattleOfJahai
         }
     };
-    public static Region TheFlightNorth { get; } = new Region
+    public static readonly Region TheFlightNorth = new()
     {
         Id = 23,
         Name = "The Flight North",
@@ -792,7 +792,7 @@ public sealed class Region : IWikiEntity
             Map.TheFlightNorth
         }
     };
-    public static Region TheTenguAccords { get; } = new Region
+    public static readonly Region TheTenguAccords = new()
     {
         Id = 24,
         Name = "The Tengu Accords",
@@ -802,7 +802,7 @@ public sealed class Region : IWikiEntity
             Map.TheTenguAccords
         }
     };
-    public static Region TheRiseOfTheWhiteMantle { get; } = new Region
+    public static readonly Region TheRiseOfTheWhiteMantle = new()
     {
         Id = 25,
         Name = "The Rise Of The White Mantle",
@@ -812,8 +812,8 @@ public sealed class Region : IWikiEntity
             Map.TheRiseOfTheWhiteMantle
         }
     };
-    public static Region Swat { get; } = new Region { Id = 26 };
-    public static Region DevRegion { get; } = new Region { Id = 27 };
+    public static readonly Region Swat = new() { Id = 26 };
+    public static readonly Region DevRegion = new() { Id = 27 };
 
     public static IReadOnlyList<Region> Regions { get; } = new List<Region>()
     {

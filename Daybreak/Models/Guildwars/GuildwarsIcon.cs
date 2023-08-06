@@ -6,19 +6,19 @@ namespace Daybreak.Models.Guildwars;
 
 public sealed class GuildwarsIcon : IWikiEntity
 {
-    public static GuildwarsIcon ResurrectionShrine { get; } = new GuildwarsIcon { Id = 191474, Name = "Resurrection Shrine", WikiUrl = "https://wiki.guildwars.com/wiki/Resurrection_Shrine" };
-    public static GuildwarsIcon Collector { get; } = new GuildwarsIcon { Id = 191482, Name = "Collector", WikiUrl = "https://wiki.guildwars.com/wiki/Collector" };
-    public static GuildwarsIcon Person { get; } = new GuildwarsIcon { Id = 191466, Name = "Person" };
-    public static GuildwarsIcon Flag { get; } = new GuildwarsIcon { Id = 191462, Name = "Flag" };
-    public static GuildwarsIcon AreaMap { get; } = new GuildwarsIcon { Id = 302781, Name = "Area Map" };
-    public static GuildwarsIcon StairsUp { get; } = new GuildwarsIcon { Id = 302783, Name = "Stairs Up" };
-    public static GuildwarsIcon StairsDown { get; } = new GuildwarsIcon { Id = 302784, Name = "Stairs Down" };
-    public static GuildwarsIcon Gate { get; } = new GuildwarsIcon { Id = 191464, Name = "Gate", WikiUrl = "" };
-    public static GuildwarsIcon Star { get; } = new GuildwarsIcon { Id = 191472, Name = "Star", WikiUrl = "" };
-    public static GuildwarsIcon DungeonBoss { get; } = new GuildwarsIcon { Id = 302779, Name = "Dungeon Boss" };
-    public static GuildwarsIcon DungeonKey { get; } = new GuildwarsIcon { Id = 302777, Name = "Dungeon Key" };
+    public static readonly GuildwarsIcon ResurrectionShrine = new() { Id = 191474, Name = "Resurrection Shrine", WikiUrl = "https://wiki.guildwars.com/wiki/Resurrection_Shrine" };
+    public static readonly GuildwarsIcon Collector = new() { Id = 191482, Name = "Collector", WikiUrl = "https://wiki.guildwars.com/wiki/Collector" };
+    public static readonly GuildwarsIcon Person = new() { Id = 191466, Name = "Person" };
+    public static readonly GuildwarsIcon Flag = new() { Id = 191462, Name = "Flag" };
+    public static readonly GuildwarsIcon AreaMap = new() { Id = 302781, Name = "Area Map" };
+    public static readonly GuildwarsIcon StairsUp = new() { Id = 302783, Name = "Stairs Up" };
+    public static readonly GuildwarsIcon StairsDown = new() { Id = 302784, Name = "Stairs Down" };
+    public static readonly GuildwarsIcon Gate = new() { Id = 191464, Name = "Gate", WikiUrl = "" };
+    public static readonly GuildwarsIcon Star = new() { Id = 191472, Name = "Star", WikiUrl = "" };
+    public static readonly GuildwarsIcon DungeonBoss = new() { Id = 302779, Name = "Dungeon Boss" };
+    public static readonly GuildwarsIcon DungeonKey = new() { Id = 302777, Name = "Dungeon Key" };
 
-    public static List<GuildwarsIcon> Icons { get; } = new()
+    public static readonly List<GuildwarsIcon> Icons = new()
     {
         ResurrectionShrine,
         Collector,

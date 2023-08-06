@@ -72,6 +72,7 @@ using Daybreak.Services.Mods;
 using Daybreak.Views.Onboarding.DSOAL;
 using Daybreak.Services.Registry;
 using Daybreak.Services.DSOAL.Actions;
+using Daybreak.Services.Events;
 
 namespace Daybreak.Configuration;
 
@@ -213,6 +214,7 @@ public static class ProjectConfiguration
         services.AddScoped<IGuildwarsCopyService, GuildwarsCopyService>();
         services.AddScoped<IItemHashService, ItemHashService>();
         services.AddScoped<IRegistryService, RegistryService>();
+        services.AddScoped<IEventNotifierService, EventNotifierService>();
     }
 
     public static void RegisterViews(IViewProducer viewProducer)
@@ -354,6 +356,7 @@ public static class ProjectConfiguration
         optionsProducer.RegisterOptions<NotificationStorageOptions>();
         optionsProducer.RegisterOptions<TradeAlertingOptions>();
         optionsProducer.RegisterOptions<TraderMessagesOptions>();
+        optionsProducer.RegisterOptions<EventNotifierOptions>();
     }
 
     public static void RegisterLiteCollections(IServiceCollection services)
