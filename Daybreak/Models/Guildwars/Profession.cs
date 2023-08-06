@@ -6,8 +6,8 @@ namespace Daybreak.Models.Guildwars;
 
 public sealed class Profession : IWikiEntity
 {
-    public static Profession None { get; } = new() { Name = "None", Id = 0, Alias = "Any" };
-    public static Profession Warrior { get; } = new()
+    public static readonly Profession None = new() { Name = "None", Id = 0, Alias = "Any" };
+    public static readonly Profession Warrior = new()
     { 
         Name = "Warrior",
         Id = 1,
@@ -17,7 +17,7 @@ public sealed class Profession : IWikiEntity
         PrimaryAttribute = Attribute.Strength,
         Attributes = new List<Attribute> { Attribute.AxeMastery, Attribute.HammerMastery, Attribute.Swordsmanship, Attribute.Tactics }
     };
-    public static Profession Ranger { get; } = new()
+    public static readonly Profession Ranger = new()
     {
         Name = "Ranger",
         Id = 2,
@@ -27,7 +27,7 @@ public sealed class Profession : IWikiEntity
         PrimaryAttribute = Attribute.Expertise,
         Attributes = new List<Attribute> { Attribute.BeastMastery, Attribute.Marksmanship, Attribute.WildernessSurvival }
     };
-    public static Profession Monk { get; } = new()
+    public static readonly Profession Monk = new()
     {
         Name = "Monk",
         Id = 3,
@@ -37,7 +37,7 @@ public sealed class Profession : IWikiEntity
         PrimaryAttribute = Attribute.DivineFavor,
         Attributes = new List<Attribute> { Attribute.HealingPrayers, Attribute.SmitingPrayers, Attribute.ProtectionPrayers }
     };
-    public static Profession Necromancer { get; } = new()
+    public static readonly Profession Necromancer = new()
     { 
         Name = "Necromancer",
         Alias = "N",
@@ -47,7 +47,7 @@ public sealed class Profession : IWikiEntity
         PrimaryAttribute = Attribute.SoulReaping,
         Attributes = new List<Attribute> { Attribute.Curses, Attribute.BloodMagic, Attribute.DeathMagic }
     };
-    public static Profession Mesmer { get; } = new() 
+    public static readonly Profession Mesmer = new() 
     { 
         Name = "Mesmer",
         Id = 5,
@@ -57,7 +57,7 @@ public sealed class Profession : IWikiEntity
         PrimaryAttribute = Attribute.FastCasting, 
         Attributes = new List<Attribute> { Attribute.DominationMagic, Attribute.IllusionMagic, Attribute.InspirationMagic }
     };
-    public static Profession Elementalist { get; } = new()
+    public static readonly Profession Elementalist = new()
     { 
         Name = "Elementalist",
         Id = 6,
@@ -67,7 +67,7 @@ public sealed class Profession : IWikiEntity
         PrimaryAttribute = Attribute.EnergyStorage,
         Attributes = new List<Attribute> { Attribute.AirMagic, Attribute.EarthMagic, Attribute.FireMagic, Attribute.WaterMagic }
     };
-    public static Profession Assassin { get; } = new()
+    public static readonly Profession Assassin = new()
     { 
         Name = "Assassin",
         Id = 7,
@@ -77,7 +77,7 @@ public sealed class Profession : IWikiEntity
         PrimaryAttribute = Attribute.CriticalStrikes,
         Attributes = new List<Attribute> { Attribute.DaggerMastery, Attribute.DeadlyArts, Attribute.ShadowArts }
     };
-    public static Profession Ritualist { get; } = new()
+    public static readonly Profession Ritualist = new()
     { 
         Name = "Ritualist",
         Id = 8,
@@ -87,7 +87,7 @@ public sealed class Profession : IWikiEntity
         PrimaryAttribute = Attribute.SpawningPower,
         Attributes = new List<Attribute> { Attribute.ChannelingMagic, Attribute.Communing, Attribute.RestorationMagic }
     };
-    public static Profession Paragon { get; } = new()
+    public static readonly Profession Paragon = new()
     {
         Name = "Paragon",
         Id = 9,
@@ -97,7 +97,7 @@ public sealed class Profession : IWikiEntity
         PrimaryAttribute = Attribute.Leadership,
         Attributes = new List<Attribute> { Attribute.Command, Attribute.Motivation, Attribute.SpearMastery }
     };
-    public static Profession Dervish { get; } = new()
+    public static readonly Profession Dervish = new()
     { 
         Name = "Dervish",
         Id = 10,
@@ -107,7 +107,7 @@ public sealed class Profession : IWikiEntity
         PrimaryAttribute = Attribute.Mysticism,
         Attributes = new List<Attribute> { Attribute.EarthPrayers, Attribute.ScytheMastery, Attribute.WindPrayers }
     };
-    public static IEnumerable<Profession> Professions { get; } = new List<Profession>
+    public static IEnumerable<Profession> Professions = new List<Profession>
     {
         None,
         Warrior,
