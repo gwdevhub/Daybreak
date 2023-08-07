@@ -8,4 +8,9 @@ public readonly struct GuildwarsPointer<T>
     {
         return this.Address != 0x0;
     }
+
+    public override string ToString()
+    {
+        return this.Address.ToString("X");
+    }
 }

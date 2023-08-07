@@ -297,7 +297,7 @@ public sealed class MemoryScanner : IMemoryScanner
         }
 
         var assertionBytes = new byte[] { 0xBA, 0x0, 0x0, 0x0, 0x0, 0xB9, 0x0, 0x0, 0x0, 0x0 };
-        var assertionMask = "x????x????";
+        var assertionMask = new StringBuilder("x????x????");
         if (assertionMessage is not null)
         {
             var assertionMessageBytes = Encoding.ASCII.GetBytes(assertionMessage);
@@ -318,6 +318,7 @@ public sealed class MemoryScanner : IMemoryScanner
             assertionBytes[7] = (byte)(rdataPtr >> 8);
             assertionBytes[8] = (byte)(rdataPtr >> 16);
             assertionBytes[9] = (byte)(rdataPtr >> 24);
+            assertionMask[6] = assertionMask[7] = assertionMask[8] = assertionMask[9] = 'x';
         }
         
         if (assertionFile is not null)
@@ -336,9 +337,10 @@ public sealed class MemoryScanner : IMemoryScanner
             assertionBytes[2] = (byte)(rdataPtr >> 8);
             assertionBytes[3] = (byte)(rdataPtr >> 16);
             assertionBytes[4] = (byte)(rdataPtr >> 24);
+            assertionMask[1] = assertionMask[2] = assertionMask[3] = assertionMask[4] = 'x';
         }
 
-        return this.ScanForPtr(assertionBytes, assertionMask, false);
+        return this.ScanForPtr(assertionBytes, assertionMask.ToString(), false);
     }
 
     private byte[]? ReadBytesNonLocking(uint address, uint size)

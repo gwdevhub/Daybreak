@@ -17,5 +17,6 @@ public interface IGuildwarsMemoryReader
     Task<SessionData?> ReadSessionData(CancellationToken cancellationToken);
     Task<MainPlayerData?> ReadMainPlayerData(CancellationToken cancellationToken);
     Task<ConnectionData?> ReadConnectionData(CancellationToken cancellationToken);
+    Task<PreGameData?> ReadPreGameData(CancellationToken cancellationToken);
     void Stop();
 }
