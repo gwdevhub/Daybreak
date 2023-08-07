@@ -39,9 +39,9 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
 
     private uint playerIdPointer;
     private uint entityArrayPointer;
-    private uint titleDataPointer;
     private uint targetIdPointer;
     private uint instanceInfoPointer;
+    private uint preGameContextPointer;
 
     public GuildwarsMemoryReader(
         IApplicationLauncher applicationLauncher,
@@ -185,6 +185,16 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         }
 
         return Task.Run(() => this.SafeReadGameMemory(this.ReadConnectionData), cancellationToken);
+    }
+
+    public Task<PreGameData?> ReadPreGameData(CancellationToken cancellationToken)
+    {
+        if (this.memoryScanner.Scanning is false)
+        {
+            return Task.FromResult<PreGameData?>(default);
+        }
+
+        return Task.Run(() => this.SafeReadGameMemory(this.ReadPreGameData), cancellationToken);
     }
 
     private async Task InitializeSafe(Process process, ScopedLogger<GuildwarsMemoryReader> scopedLogger)
@@ -636,6 +646,38 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         return new ConnectionData { IPAddress = ipAddress };
     }
 
+    private PreGameData? ReadPreGameData()
+    {
+        var preGameContextPtr = this.GetPreGameContextPointer();
+        if (preGameContextPtr == 0)
+        {
+            return default;
+        }
+
+        var preGameContext = this.memoryScanner.ReadPtrChain<PreGameContext>(preGameContextPtr, 0x0, 0x0, 0x0);
+        if (preGameContext.LoginCharacters.Capacity > 20 ||
+            preGameContext.LoginCharacters.Size > 20 ||
+            !preGameContext.LoginCharacters.Buffer.IsValid())
+        {
+            return default;
+        }
+
+        // Detect corrupt memory by checking that player names are longer than 3 characters
+        var loginCharacters = this.memoryScanner.ReadArray(preGameContext.LoginCharacters);
+        if (loginCharacters.Any(c => c.CharacterName != "" && c.CharacterName.Length < 2))
+        {
+            return default;
+        }
+
+        return new PreGameData
+        {
+            ChosenCharacterIndex = preGameContext.LoginSelectionIndex > 0 && preGameContext.LoginSelectionIndex < loginCharacters.Length ?
+                (int)preGameContext.LoginSelectionIndex :
+                -1,
+            Characters = loginCharacters.Select(c => c.CharacterName).ToList()
+        };
+    }
+
     private uint GetPlayerIdPointer()
     {
         if (this.playerIdPointer == 0)
@@ -656,16 +698,6 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         return this.entityArrayPointer;
     }
 
-    private uint GetTitleDataPointer()
-    {
-        if (this.titleDataPointer == 0)
-        {
-            this.titleDataPointer = this.memoryScanner.ScanForAssertion("p:\\code\\gw\\const\\consttitle.cpp", "index < arrsize(s_titleClientData)") + 0x12;
-        }
-
-        return this.titleDataPointer;
-    }
-
     private uint GetTargetIdPointer()
     {
         if (this.targetIdPointer == 0)
@@ -684,6 +716,16 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         }
 
         return this.instanceInfoPointer;
+    }
+
+    private uint GetPreGameContextPointer()
+    {
+        if (this.preGameContextPointer == 0)
+        {
+            this.preGameContextPointer = this.memoryScanner.ScanForAssertion("p:\\code\\gw\\ui\\uipregame.cpp", "!s_scene") + 0x34;
+        }
+
+        return this.preGameContextPointer;
     }
 
     private Bag? GetBag(GuildwarsPointer<BagInfo> bagInfoPtr, uint expectedBagType, bool returnEmptyBag)

@@ -23,6 +23,7 @@ public sealed class GuildwarsMemoryCache : IGuildwarsMemoryCache
     private readonly CachedData<UserData?> userDataCache = new();
     private readonly CachedData<MainPlayerData?> mainPlayerDataCache = new();
     private readonly CachedData<ConnectionData?> connectionDataCache = new();
+    private readonly CachedData<PreGameData?> preGameDataCache = new();
 
     public GuildwarsMemoryCache(
         IGuildwarsMemoryReader guildwarsMemoryReader,
@@ -80,6 +81,11 @@ public sealed class GuildwarsMemoryCache : IGuildwarsMemoryCache
     public Task<ConnectionData?> ReadConnectionData(CancellationToken cancellationToken)
     {
         return this.ReadDataInternal(this.connectionDataCache, this.guildwarsMemoryReader.ReadConnectionData, cancellationToken);
+    }
+
+    public Task<PreGameData?> ReadPreGameData(CancellationToken cancellationToken)
+    {
+        return this.ReadDataInternal(this.preGameDataCache, this.guildwarsMemoryReader.ReadPreGameData, cancellationToken);
     }
 
     private async Task<T?> ReadDataInternal<T>(CachedData<T?> cachedData, Func<CancellationToken, Task<T?>> task, CancellationToken cancellationToken)

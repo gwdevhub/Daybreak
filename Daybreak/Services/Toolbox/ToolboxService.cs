@@ -2,6 +2,7 @@
 using Daybreak.Exceptions;
 using Daybreak.Models.Progress;
 using Daybreak.Services.Downloads;
+using Daybreak.Services.Scanner;
 using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
@@ -13,6 +14,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Daybreak.Services.Toolbox;
@@ -24,6 +26,7 @@ public sealed class ToolboxService : IToolboxService
     private const string ExecutableName = "GWToolboxpp.exe";
     private const string ToolboxDestinationDirectory = "GWToolbox";
 
+    private readonly IGuildwarsMemoryReader guildwarsMemoryReader;
     private readonly IDownloadService downloadService;
     private readonly ILiveOptions<LauncherOptions> launcherOptions;
     private readonly ILiveUpdateableOptions<ToolboxOptions> toolboxOptions;
@@ -41,11 +44,13 @@ public sealed class ToolboxService : IToolboxService
     public bool IsInstalled => File.Exists(this.toolboxOptions.Value.Path);
 
     public ToolboxService(
+        IGuildwarsMemoryReader guildwarsMemoryReader,
         IDownloadService downloadService,
         ILiveOptions<LauncherOptions> launcherOptions,
         ILiveUpdateableOptions<ToolboxOptions> toolboxOptions,
         ILogger<ToolboxService> logger)
     {
+        this.guildwarsMemoryReader = guildwarsMemoryReader.ThrowIfNull();
         this.downloadService = downloadService.ThrowIfNull();
         this.launcherOptions = launcherOptions.ThrowIfNull();
         this.toolboxOptions = toolboxOptions.ThrowIfNull();
@@ -138,7 +143,20 @@ public sealed class ToolboxService : IToolboxService
             return;
         }
 
-        await Task.Delay(5000);
+        // Try to detect when Guildwars has successfully launched and is on character selection screen
+        for (var i = 0; i < 10; i++)
+        {
+            await this.guildwarsMemoryReader.EnsureInitialized(CancellationToken.None);
+            var preGameData = await this.guildwarsMemoryReader.ReadPreGameData(CancellationToken.None);
+            if (preGameData is null)
+            {
+                await Task.Delay(1000);
+                continue;
+            }
+
+            break;
+        }
+
         this.logger.LogInformation($"Launching GWToolbox");
         var process = new Process()
         {
