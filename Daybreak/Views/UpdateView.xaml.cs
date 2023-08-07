@@ -30,6 +30,10 @@ public partial class UpdateView : UserControl
     private double progressValue;
     [GenerateDependencyProperty]
     private bool continueButtonEnabled;
+    [GenerateDependencyProperty]
+    private TimeSpan eta;
+    [GenerateDependencyProperty]
+    private bool etaVisible;
 
     public UpdateView(
         IApplicationUpdater applicationUpdater,
@@ -50,6 +54,8 @@ public partial class UpdateView : UserControl
             if (this.updateStatus.CurrentStep is DownloadStatus.DownloadProgressStep downloadUpdateStep)
             {
                 this.ProgressValue = downloadUpdateStep.Progress * 100;
+                this.Eta = downloadUpdateStep.ETA ?? TimeSpan.Zero;
+                this.EtaVisible = downloadUpdateStep.ETA is not null;
             }
 
             this.Description = this.updateStatus.CurrentStep.Description;

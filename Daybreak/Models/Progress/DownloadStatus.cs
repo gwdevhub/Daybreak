@@ -1,9 +1,11 @@
-﻿namespace Daybreak.Models.Progress;
+﻿using System;
+
+namespace Daybreak.Models.Progress;
 
 public abstract class DownloadStatus : ActionStatus
 {
     public static readonly LoadStatus InitializingDownload = new DownloadStep("Initializing download");
-    public static LoadStatus Downloading(double progress) => new DownloadProgressStep("Downloading", progress);
+    public static LoadStatus Downloading(double progress, TimeSpan? eta) => new DownloadProgressStep("Downloading", progress, eta);
     public static readonly LoadStatus DownloadCancelled = new DownloadStep("Download has been cancelled");
     public static readonly LoadStatus DownloadFinished = new DownloadStep("Download finished. Starting installer");
     public static readonly LoadStatus FailedDownload = new DownloadStep("Download failed. Please check logs for details");
@@ -22,9 +24,12 @@ public abstract class DownloadStatus : ActionStatus
 
     public sealed class DownloadProgressStep : DownloadStep
     {
-        internal DownloadProgressStep(string name, double progress) : base(name)
+        public TimeSpan? ETA { get; set; }
+
+        internal DownloadProgressStep(string name, double progress, TimeSpan? eta) : base(name)
         {
             this.Progress = progress;
+            this.ETA = eta;
         }
     }
 }

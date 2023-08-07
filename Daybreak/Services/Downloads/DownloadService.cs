@@ -53,6 +53,7 @@ public sealed class DownloadService : IDownloadService
         var downloaded = 0d;
         var downloadedPerTimeframe = 0d;
         var tickTime = DateTime.Now;
+        var startTime = DateTime.Now;
         while (downloadStream.CanRead && (length = await downloadStream.ReadAsync(buffer)) > 0)
         {
             downloaded += length;
@@ -63,12 +64,20 @@ public sealed class DownloadService : IDownloadService
                 tickTime = DateTime.Now;
                 var downloadedInSecond = downloadedPerTimeframe * 1000d / StatusUpdateInterval;
                 this.averageDownloadSpeed.Record(downloadedInSecond);
+
+                var avgSpeed = downloaded / (tickTime - startTime).TotalSeconds;
+                var remainingSize = downloadSize - downloaded;
+                var secondsRemaining = remainingSize / avgSpeed;
                 downloadedPerTimeframe = 0d;
-                downloadStatus.CurrentStep = DownloadStatus.Downloading(downloaded / downloadSize);
+                downloadStatus.CurrentStep = DownloadStatus.Downloading(
+                    downloaded / downloadSize,
+                    double.IsFinite(secondsRemaining) ?
+                        TimeSpan.FromSeconds(secondsRemaining) :
+                        TimeSpan.Zero);
             }
         }
 
-        downloadStatus.CurrentStep = DownloadStatus.Downloading(1);
+        downloadStatus.CurrentStep = DownloadStatus.Downloading(1, TimeSpan.Zero);
         downloadStatus.CurrentStep = DownloadStatus.DownloadFinished;
         fileStream.Close();
         this.logger.LogInformation("Downloaded file");
