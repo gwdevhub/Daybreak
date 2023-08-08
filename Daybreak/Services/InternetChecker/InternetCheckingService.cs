@@ -22,9 +22,6 @@ internal sealed class InternetCheckingService : IInternetCheckingService
     private const string GoogleUrl = "https://google.com";
     private const string BingUrl = "https://bing.com";
     private const string GuildwarsUrl = "https://guildwars.com";
-    private const string DNSUrl1 = "8.8.8.8";
-    private const string DNSUrl2 = "8.8.4.4";
-    private const string DNSUrl3 = "1.1.1.1";
 
     private readonly Histogram<double> connectionCheckingLatency;
     private readonly IHttpClient<InternetCheckingService> httpClient;
@@ -51,12 +48,6 @@ internal sealed class InternetCheckingService : IInternetCheckingService
             return InternetConnectionState.Unavailable;
         }
 
-        var dnsAvailable = await this.PingDNS();
-        if (!dnsAvailable)
-        {
-            this.logger.LogWarning("DNS servers are not available. Attempts to connect to the internet will probably fail");
-        }
-
         var queryTasks = new Task<bool>[]
         {
             this.UrlAvailable(GoogleUrl),
@@ -64,7 +55,6 @@ internal sealed class InternetCheckingService : IInternetCheckingService
             this.UrlAvailable(GuildwarsUrl),
         };
 
-        await Task.WhenAny(queryTasks);
         var googleQueryResult = await queryTasks[0];
         var bingQueryResult = await queryTasks[1];
         var guildwarsQueryResult = await queryTasks[2];
@@ -95,44 +85,6 @@ internal sealed class InternetCheckingService : IInternetCheckingService
         this.logger.LogError($"Outage detected. Internet is unavailable");
         this.connectionCheckingLatency.Record(sw.ElapsedMilliseconds);
         return InternetConnectionState.Unavailable;
-    }
-
-    private async Task<bool> PingDNS()
-    {
-        try
-        {
-            using var ping1 = new Ping();
-            using var ping2 = new Ping();
-            using var ping3 = new Ping();
-            var tasks = new[]
-            {
-                ping1.SendPingAsync(IPAddress.Parse(DNSUrl1)),
-                ping2.SendPingAsync(IPAddress.Parse(DNSUrl2)),
-                ping3.SendPingAsync(IPAddress.Parse(DNSUrl3)),
-            };
-
-            await Task.WhenAny(tasks);
-            var result1 = await tasks[0];
-            var result2 = await tasks[1];
-            var result3 = await tasks[2];
-            this.logger.LogInformation($"Ping to {result1.Address} resulted in {result1.Status}");
-            this.logger.LogInformation($"Ping to {result2.Address} resulted in {result2.Status}");
-            this.logger.LogInformation($"Ping to {result3.Address} resulted in {result3.Status}");
-
-            if (result1.Status is not IPStatus.Success &&
-                result2.Status is not IPStatus.Success &&
-                result3.Status is not IPStatus.Success)
-            {
-                return false;
-            }
-
-            return true;
-        }
-        catch(Exception e)
-        {
-            this.logger.LogError(e, $"Encountered exception during DNS pings. Marking connection as unavailable");
-            return false;
-        }
     }
 
     private async Task<bool> UrlAvailable(string url)

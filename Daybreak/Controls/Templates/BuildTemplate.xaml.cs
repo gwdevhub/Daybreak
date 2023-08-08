@@ -192,6 +192,7 @@ public partial class BuildTemplate : UserControl
         }
 
         this.AvailableSkills = this.skillListCache;
+        this.SkillListSearchTextBox.FocusOnTextBox();
     }
 
     private void HideSkillListView()

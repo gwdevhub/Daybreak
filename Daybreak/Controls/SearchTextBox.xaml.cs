@@ -37,6 +37,11 @@ public partial class SearchTextBox : UserControl
         this.dispatcherTimer.Tick += this.DispatcherTimer_Tick;
     }
 
+    public void FocusOnTextBox()
+    {
+        this.TextBox.Focus();
+    }
+
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);

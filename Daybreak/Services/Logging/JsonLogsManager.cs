@@ -12,6 +12,8 @@ public sealed class JsonLogsManager : ILogsManager
 {
     private readonly ILiteCollection<Models.Log> collection;
 
+    public event EventHandler<Models.Log>? ReceivedLog;
+
     public JsonLogsManager(ILiteCollection<Models.Log> collection)
     {
         this.collection = collection.ThrowIfNull();
@@ -38,6 +40,7 @@ public sealed class JsonLogsManager : ILogsManager
         };
 
         this.collection.Insert(dbLog);
+        this.ReceivedLog?.Invoke(this, dbLog);
     }
     public int DeleteLogs()
     {

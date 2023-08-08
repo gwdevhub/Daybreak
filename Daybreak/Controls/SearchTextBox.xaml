@@ -11,7 +11,8 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
     </UserControl.Resources>
     <Grid>
-        <TextBox Foreground="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=Foreground, Mode=OneWay}"
+        <TextBox x:Name="TextBox"
+                 Foreground="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=Foreground, Mode=OneWay}"
                  FontSize="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=FontSize, Mode=OneWay}"
                  FontFamily="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=FontFamily, Mode=OneWay}"
                  FontStretch="{Binding RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}, Path=FontStretch, Mode=OneWay}"

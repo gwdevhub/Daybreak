@@ -44,6 +44,7 @@ public partial class BuildsListView : UserControl
         this.buildEntries = await this.buildTemplateManager.GetBuilds().ToListAsync();
         this.BuildEntries.ClearAnd().AddRange(this.buildEntries.OrderBy(b => b.Name));
         this.Loading = false;
+        this.SearchTextBox.FocusOnTextBox();
     }
 
     private void AddButton_Clicked(object sender, EventArgs e)

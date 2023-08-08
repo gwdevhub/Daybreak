@@ -138,7 +138,7 @@ public class ApplicationLauncher : IApplicationLauncher
             args.Add($"\"{character}\"");
         }
 
-        foreach(var mod in this.modsManager.GetMods())
+        foreach(var mod in this.modsManager.GetMods().Where(m => m.IsEnabled))
         {
             args.AddRange(mod.GetCustomArguments());
         }
@@ -156,7 +156,7 @@ public class ApplicationLauncher : IApplicationLauncher
             }
         };
 
-        var preLaunchActions = this.modsManager.GetMods().Select(m => m.OnGuildwarsStarting(process));
+        var preLaunchActions = this.modsManager.GetMods().Where(m => m.IsEnabled).Select(m => m.OnGuildwarsStarting(process));
         await Task.WhenAll(preLaunchActions);
         if (process.Start() is false)
         {
@@ -199,7 +199,7 @@ public class ApplicationLauncher : IApplicationLauncher
                 continue;
             }
 
-            var postLaunchActions = this.modsManager.GetMods().Select(m => m.OnGuildwarsStarted(gwProcess!));
+            var postLaunchActions = this.modsManager.GetMods().Where(m => m.IsEnabled).Select(m => m.OnGuildwarsStarted(gwProcess!));
             await Task.WhenAll(postLaunchActions);
             return gwProcess;
         }

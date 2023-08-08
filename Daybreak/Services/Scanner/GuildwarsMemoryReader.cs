@@ -356,7 +356,8 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         var mapContext = this.memoryScanner.Read(globalContext.MapContext);
 
         var pathingMapContext = this.memoryScanner.ReadPtrChain<PathingMapContext>(mapContext.PathingMapContextPtr, 0x0, 0x0);
-        if (pathingMapContext.PathingMapArray.Size > 10000)
+        if (!pathingMapContext.PathingMapArray.IsValidArray(true) ||
+            pathingMapContext.PathingMapArray.Size > 10000)
         {
             return default;
         }
@@ -432,8 +433,13 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         var mapContext = this.memoryScanner.Read(globalContext.MapContext);
 
         var pathingMapContext = this.memoryScanner.ReadPtrChain<PathingMapContext>(mapContext.PathingMapContextPtr, 0x0, 0x0);
-        var pathingMaps = this.memoryScanner.ReadArray(pathingMapContext.PathingMapArray);
+        if (!pathingMapContext.PathingMapArray.IsValidArray(true) ||
+            pathingMapContext.PathingMapArray.Size > 10000)
+        {
+            return default;
+        }
 
+        var pathingMaps = this.memoryScanner.ReadArray(pathingMapContext.PathingMapArray);
         return new PathingMetadata { TrapezoidCount = (int)pathingMaps.Select(p => p.TrapezoidCount).Sum(count => count) };
     }
 

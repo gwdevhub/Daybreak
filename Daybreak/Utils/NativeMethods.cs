@@ -174,4 +174,6 @@ internal static class NativeMethods
     [return: MarshalAs(UnmanagedType.Bool)]
     [DllImport("user32.dll", SetLastError = true)]
     public static extern bool GetWindowInfo(IntPtr hwnd, ref WindowInfo pwi);
+    [DllImport("user32.dll")]
+    public static extern int SendMessage(IntPtr hWnd, int wMsg, bool wParam, int lParam);
 }
