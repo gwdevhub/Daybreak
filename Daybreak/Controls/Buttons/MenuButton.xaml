@@ -4,8 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Controls.Buttons"
-             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:behaviors="clr-namespace:Daybreak.Behaviors"
              xmlns:converters="clr-namespace:Daybreak.Converters"
              x:Name="_this"
              Cursor="Hand"

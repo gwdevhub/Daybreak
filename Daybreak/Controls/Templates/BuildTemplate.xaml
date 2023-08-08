@@ -158,7 +158,8 @@
                     <RowDefinition Height="auto"></RowDefinition>
                     <RowDefinition Height="*"></RowDefinition>
                 </Grid.RowDefinitions>
-                <local:SearchTextBox    FontSize="20"
+                <local:SearchTextBox    x:Name="SkillListSearchTextBox"
+                                        FontSize="20"
                                         Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                         Background="Transparent"
                                         SearchText="{Binding ElementName=_this, Path=SkillSearchText, Mode=TwoWay}"

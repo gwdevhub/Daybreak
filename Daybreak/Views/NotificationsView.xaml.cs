@@ -49,7 +49,7 @@ public partial class NotificationsView : UserControl
     {
         while (!cancellationToken.IsCancellationRequested)
         {
-            var notifications = this.notificationProducer.GetAllNotifications().OrderBy(n => n.CreationTime);
+            var notifications = this.notificationProducer.GetAllNotifications().OrderBy(n => n.CreationTime).Take(100).ToList();
             var notificationsToAdd = notifications.Where(n => this.Notifications.None(n2 => n2.Id == n.Id)).ToList();
             var notificationsToRemove = this.Notifications.Where(n => notifications.None(n2 => n2.Id == n.Id)).ToList();
             this.Notifications.AddRange(notificationsToAdd);

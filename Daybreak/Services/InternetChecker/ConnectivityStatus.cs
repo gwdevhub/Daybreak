@@ -1,7 +1,6 @@
 ﻿using Daybreak.Models;
 using Daybreak.Models.Notifications;
 using Daybreak.Services.Notifications;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Core.Extensions;
 using System.Threading;
@@ -12,7 +11,7 @@ namespace Daybreak.Services.InternetChecker;
 
 internal sealed class ConnectivityStatus : IConnectivityStatus, IApplicationLifetimeService
 {
-    private static readonly TimeSpan ConnectivityBackoff = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan ConnectivityBackoff = TimeSpan.FromSeconds(30);
 
     private readonly CancellationTokenSource cancellationTokenSource = new();
     private readonly IInternetCheckingService internetCheckingService;

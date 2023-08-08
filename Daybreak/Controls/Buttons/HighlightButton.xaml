@@ -25,7 +25,7 @@
                    HorizontalAlignment="{Binding ElementName=_this, Path=HorizontalContentAlignment, Mode=OneWay}"
                    TextWrapping="{Binding ElementName=_this, Path=TextWrapping, Mode=OneWay}"
                    TextAlignment="{Binding ElementName=_this, Path=TextAlignment, Mode=OneWay}"
-                   Padding="{Binding ElementName=_this, Path=TextPadding, Mode=OneWay}"/>
+                   Padding="{Binding ElementName=_this, Path=TextPadding, Mode=OneWay}" />
         <ContentPresenter 
             Content="{Binding ElementName=_this, Path=ButtonContent, Mode=OneWay}"/>
         <Rectangle Fill="Transparent"

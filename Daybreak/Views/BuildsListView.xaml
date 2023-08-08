@@ -29,7 +29,8 @@
                             VerticalAlignment="Top" Margin="5" Clicked="AddButton_Clicked"></buttons:AddButton>
         <buttons:SynchronizeButton Height="30" Width="30" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5, 5, 45, 5"
                                    Clicked="SynchronizeButton_Clicked"></buttons:SynchronizeButton>
-        <controls:SearchTextBox Grid.Row="1"
+        <controls:SearchTextBox x:Name="SearchTextBox"
+                                Grid.Row="1"
                                 FontSize="24"
                                 Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                 DebounceDelay="0:0:0.5"

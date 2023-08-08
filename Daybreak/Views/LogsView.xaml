@@ -6,6 +6,9 @@
              xmlns:local="clr-namespace:Daybreak.Views"
              xmlns:controls="clr-namespace:Daybreak.Controls"
              xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
+             xmlns:avalon="http://icsharpcode.net/sharpdevelop/avalonedit"
+             Loaded="LogsView_Loaded"
+             Unloaded="LogsView_Unloaded"
              mc:Ignorable="d" 
              x:Name="_this"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -19,60 +22,24 @@
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
-        <Border BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                BorderThickness="0, 1, 0, 1"
+        <TextBlock HorizontalAlignment="Center" Text="Application Logs" FontSize="22" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" />
+        <Border BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                BorderThickness="0, 0, 0, 1"
                 Height="40"/>
-        <TextBlock FontSize="16" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                   Margin="10, 0, 0, 0"
-                   VerticalAlignment="Center"
-                   HorizontalAlignment="Left"
-                   Text="Latest 100 log lines"></TextBlock>
         <buttons:BinButton  Height="30" Width="30" HorizontalAlignment="Right" Margin="5"
                             Clicked="BinButton_Clicked"></buttons:BinButton>
-        <buttons:RefreshButton Height="30" Width="30" HorizontalAlignment="Right" Margin="0, 5, 45, 5"
-                               Clicked="RefreshGlyph_Clicked"></buttons:RefreshButton>
-        <buttons:BackButton  Height="30" Width="30" HorizontalAlignment="Right" Margin="0, 5, 85, 5"
+        <buttons:BackButton  Height="30" Width="30" HorizontalAlignment="Right" Margin="0, 5, 45, 5"
                              Clicked="ExportButton_Clicked">
             <buttons:BackButton.RenderTransform>
                 <RotateTransform Angle="270" CenterX="15" CenterY="15"></RotateTransform>
             </buttons:BackButton.RenderTransform>
         </buttons:BackButton>
-        <DataGrid IsReadOnly="True" Background="Transparent" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Grid.Row="1"
-                  ItemsSource="{Binding ElementName=_this, Path=Logs, Mode=OneWay}" HorizontalScrollBarVisibility="Disabled"
-                  AutoGenerateColumns="False" HeadersVisibility="Column" EnableColumnVirtualization="True"
-                  EnableRowVirtualization="True">
-            <DataGrid.ColumnHeaderStyle>
-                <Style TargetType="{x:Type DataGridColumnHeader}">
-                    <Setter Property="Foreground" Value="{StaticResource MahApps.Brushes.ThemeForeground}"></Setter>
-                    <Setter Property="Background" Value="Transparent"></Setter>
-                    <Setter Property="BorderThickness" Value="1"></Setter>
-                </Style>
-            </DataGrid.ColumnHeaderStyle>
-            <DataGrid.CellStyle>
-                <Style TargetType="{x:Type DataGridCell}">
-                    <Setter Property="BorderThickness" Value="1"></Setter>
-                </Style>
-            </DataGrid.CellStyle>
-            <DataGrid.RowStyle>
-                <Style TargetType="{x:Type DataGridRow}">
-                    <Setter Property="Background" Value="Transparent"></Setter>
-                    <Setter Property="Foreground" Value="{StaticResource MahApps.Brushes.ThemeForeground}"></Setter>
-                </Style>
-            </DataGrid.RowStyle>
-            <DataGrid.Columns>
-                <DataGridTextColumn IsReadOnly="True" Header="DateTime" Binding="{Binding LogTime}" ElementStyle="{StaticResource WrapText}" Width="auto"/>
-                <DataGridTextColumn IsReadOnly="True" Header="CV" Binding="{Binding CorrelationVector}" ElementStyle="{StaticResource WrapText}" Width="auto"/>
-                <DataGridTextColumn IsReadOnly="True" Header="Category" Binding="{Binding Category}" ElementStyle="{StaticResource WrapText}" Width="auto"/>
-                <DataGridTextColumn IsReadOnly="True" Header="LogLevel" Binding="{Binding LogLevel}" ElementStyle="{StaticResource WrapText}" Width="auto"/>
-                <DataGridTextColumn IsReadOnly="True" Header="EventId" Binding="{Binding EventId}" ElementStyle="{StaticResource WrapText}" Width="auto"/>
-                <DataGridTemplateColumn IsReadOnly="True" Header="Message" Width="*">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <controls:LogMessageTemplate Message="{Binding Message}" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></controls:LogMessageTemplate>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
+        <avalon:TextEditor
+            x:Name="TextEditor"
+            Grid.Row="1"
+            IsReadOnly="True"
+            FontSize="16"
+            Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+            Background="{StaticResource MahApps.Brushes.ThemeBackground}"/>
     </Grid>
 </UserControl>

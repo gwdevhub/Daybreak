@@ -1,6 +1,7 @@
 ﻿using Daybreak.Models.Guildwars;
 using System;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace Daybreak.Controls.FocusViewComponents;
 /// <summary>
@@ -15,7 +16,7 @@ public partial class CurrentMapComponent : UserControl
         this.InitializeComponent();
     }
 
-    private void CurrentMap_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
+    private void CurrentMap_MouseLeftButtonDown(object _, MouseButtonEventArgs e)
     {
         if (this.DataContext is not Map currentMap)
         {

@@ -317,7 +317,7 @@ public partial class ChromiumBrowserWrapper : UserControl
         if (payload?.Key == BrowserPayload.PayloadKeys.ContextMenu)
         {
             var contextMenuPayload = args.WebMessageAsJson.Deserialize<BrowserPayload<OnContextMenuPayload>>();
-            var maybeTemplate = contextMenuPayload.Value!.Selection;
+            var maybeTemplate = contextMenuPayload?.Value?.Selection?.Trim();
             if (string.IsNullOrWhiteSpace(maybeTemplate))
             {
                 return;
