@@ -117,6 +117,34 @@ public class ApplicationLauncher : IApplicationLauncher
         Application.Current.Shutdown();
     }
 
+    public void RestartDaybreakAsNormalUser()
+    {
+        this.logger.LogInformation("Restarting daybreak with admin rights");
+        var processName = Process.GetCurrentProcess()?.MainModule?.FileName;
+        if (processName!.IsNullOrWhiteSpace() || File.Exists(processName) is false)
+        {
+            throw new InvalidOperationException("Unable to find executable. Aborting restart");
+        }
+
+        var process = new Process()
+        {
+            StartInfo = new()
+            {
+                WorkingDirectory = Environment.CurrentDirectory,
+                FileName = "cmd.exe",
+                UseShellExecute = true,
+                CreateNoWindow = true,
+                Arguments = $"/c runas /trustlevel:0x20000 {processName}"
+            }
+        };
+        if (process.Start() is false)
+        {
+            throw new InvalidOperationException($"Unable to start {processName} as normal user");
+        }
+
+        Application.Current.Shutdown();
+    }
+
     private async Task<Process?> LaunchGuildwarsProcess(string email, Models.SecureString password, string character)
     {
         var executable = this.launcherOptions.Value.GuildwarsPaths.Where(path => path.Default).FirstOrDefault() ?? throw new ExecutableNotFoundException($"No executable selected");

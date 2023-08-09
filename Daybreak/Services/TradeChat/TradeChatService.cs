@@ -41,12 +41,17 @@ public sealed class TradeChatService<TChannelOptions> : ITradeChatService<TChann
     private const string QueryPlaceholder = "[QUERY]";
     private const string IfNoneMatchHeader = "if-none-match";
 
+    private static readonly TimeSpan MinBackoffTime = TimeSpan.FromSeconds(1);
+    private static readonly TimeSpan MaxBackoffTime = TimeSpan.FromSeconds(16);
+
     private readonly byte[] webSocketBuffer = new byte[1024];
     private readonly IPriceHistoryDatabase priceHistoryDatabase;
     private readonly IOptions<TChannelOptions> options;
     private readonly IClientWebSocket<TradeChatService<TChannelOptions>> clientWebSocket;
     private readonly IHttpClient<TradeChatService<TChannelOptions>> httpClient;
     private readonly ILogger<TradeChatService<TChannelOptions>> logger;
+
+    private TimeSpan backoffTime = MinBackoffTime;
 
     public TradeChatService(
         IPriceHistoryDatabase priceHistoryDatabase,
@@ -201,7 +206,9 @@ public sealed class TradeChatService<TChannelOptions> : ITradeChatService<TChann
 
         try
         {
-            return await this.ReceiveWebsocketResponse(cancellationToken);
+            var response = await this.ReceiveWebsocketResponse(cancellationToken);
+            this.backoffTime = MinBackoffTime;
+            return response;
         }
         catch (OperationCanceledException ex)
         {
@@ -210,8 +217,9 @@ public sealed class TradeChatService<TChannelOptions> : ITradeChatService<TChann
         }
         catch (Exception ex)
         {
-            this.logger.LogError(ex, "Encountered exception while receiving response. Waiting 1s and retrying");
-            await Task.Delay(1000);
+            this.logger.LogError(ex, $"Encountered exception while receiving response. Waiting {this.backoffTime.TotalSeconds}s and retrying");
+            await Task.Delay(this.backoffTime, cancellationToken);
+            this.backoffTime = TimeSpan.FromSeconds(Math.Min(this.backoffTime.TotalSeconds * 2, MaxBackoffTime.TotalSeconds));
             return await this.ReceiveWebsocketResponseSafe(cancellationToken);
         }
     }

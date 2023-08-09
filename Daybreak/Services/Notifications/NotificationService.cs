@@ -37,9 +37,10 @@ public sealed class NotificationService : INotificationService, INotificationPro
         string description,
         string? metaData = default,
         DateTime? expirationTime = default,
-        bool dismissible = true)
+        bool dismissible = true,
+        bool persistent = true)
     {
-        return this.NotifyInternal<NoActionHandler>(title, description, metaData, expirationTime, dismissible, LogLevel.Information);
+        return this.NotifyInternal<NoActionHandler>(title, description, metaData, expirationTime, dismissible, LogLevel.Information, persistent);
     }
 
     public NotificationToken NotifyError(
@@ -47,9 +48,10 @@ public sealed class NotificationService : INotificationService, INotificationPro
         string description,
         string? metaData = default,
         DateTime? expirationTime = default,
-        bool dismissible = true)
+        bool dismissible = true,
+        bool persistent = true)
     {
-        return this.NotifyInternal<NoActionHandler>(title, description, metaData, expirationTime, dismissible, LogLevel.Error);
+        return this.NotifyInternal<NoActionHandler>(title, description, metaData, expirationTime, dismissible, LogLevel.Error, persistent);
     }
 
     public NotificationToken NotifyInformation<THandlingType>(
@@ -57,20 +59,22 @@ public sealed class NotificationService : INotificationService, INotificationPro
         string description,
         string? metaData = default,
         DateTime? expirationTime = default,
-        bool dismissible = true)
+        bool dismissible = true,
+        bool persistent = true)
         where THandlingType : class, INotificationHandler
     {
-        return this.NotifyInternal<THandlingType>(title, description, metaData, expirationTime, dismissible, LogLevel.Information);
+        return this.NotifyInternal<THandlingType>(title, description, metaData, expirationTime, dismissible, LogLevel.Information, persistent);
     }
 
     public NotificationToken NotifyError<THandlingType>(string title,
         string description,
         string? metaData = default,
         DateTime? expirationTime = default,
-        bool dismissible = true)
+        bool dismissible = true,
+        bool persistent = true)
         where THandlingType : class, INotificationHandler
     {
-        return this.NotifyInternal<THandlingType>(title, description, metaData, expirationTime, dismissible, LogLevel.Error);
+        return this.NotifyInternal<THandlingType>(title, description, metaData, expirationTime, dismissible, LogLevel.Error, persistent);
     }
 
     void INotificationProducer.OpenNotification(Notification notification, bool storeNotification)
@@ -143,7 +147,8 @@ public sealed class NotificationService : INotificationService, INotificationPro
         string? metaData,
         DateTime? expirationTime,
         bool dismissible,
-        LogLevel logLevel)
+        LogLevel logLevel,
+        bool persistent)
         where THandlingType : class, INotificationHandler
     {
         var notification = new Notification<THandlingType>
@@ -156,13 +161,17 @@ public sealed class NotificationService : INotificationService, INotificationPro
             Level = logLevel,
         };
 
-        this.EnqueueNotification(notification);
+        this.EnqueueNotification(notification, persistent);
         return new NotificationToken(notification);
     }
 
-    private void EnqueueNotification(Notification notification)
+    private void EnqueueNotification(Notification notification, bool persistent)
     {
-        this.storage.StoreNotification(ToDTO(notification));
+        if (persistent)
+        {
+            this.storage.StoreNotification(ToDTO(notification));
+        }
+
         this.pendingNotifications.Enqueue(notification);
     }
 

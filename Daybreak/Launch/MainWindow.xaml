@@ -98,15 +98,14 @@
             <buttons:MenuButton Grid.Row="1" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Opacity="0.6"
                      Title="{Binding ElementName=_this, Path=CurrentVersionText, Mode=OneWay}" FontSize="10"
                      Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
-                     Clicked="VersionText_Clicked"></buttons:MenuButton>
+                     Clicked="VersionText_Clicked" />
             <buttons:MenuButton Grid.Row="1" Background="Transparent" Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" 
                      Opacity="0.6" Title=" - " FontSize="10" BorderBrush="Transparent" BorderThickness="0"
-                     Visibility="{Binding ElementName=_this, Path=IsRunningAsAdmin, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                     Clicked="VersionText_Clicked"></buttons:MenuButton>
+                     Visibility="{Binding ElementName=_this, Path=IsRunningAsAdmin, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
             <buttons:MenuButton Grid.Row="1" Background="Transparent" Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" 
                      Opacity="0.6" Title="[Admin]" FontSize="10" BorderBrush="Transparent" BorderThickness="0"
                      Visibility="{Binding ElementName=_this, Path=IsRunningAsAdmin, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                     Clicked="VersionText_Clicked"></buttons:MenuButton>
+                     Clicked="AdminText_Clicked" />
         </WrapPanel>
         <Grid x:Name="Container"
                   Grid.Column="1"

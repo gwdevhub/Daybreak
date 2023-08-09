@@ -230,6 +230,7 @@ public static class ProjectConfiguration
         viewProducer.RegisterView<BuildTemplateView>();
         viewProducer.RegisterView<BuildsListView>();
         viewProducer.RegisterView<RequestElevationView>();
+        viewProducer.RegisterView<RequestDelevationView>();
         viewProducer.RegisterView<ScreenChoiceView>();
         viewProducer.RegisterView<VersionManagementView>();
         viewProducer.RegisterView<LogsView>();

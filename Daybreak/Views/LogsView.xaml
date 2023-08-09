@@ -39,6 +39,7 @@
             Grid.Row="1"
             IsReadOnly="True"
             FontSize="16"
+            FontFamily="Consolas"
             Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
             Background="{StaticResource MahApps.Brushes.ThemeBackground}"/>
     </Grid>
