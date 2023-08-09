@@ -11,7 +11,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 
 namespace Daybreak.Views;
 
@@ -20,12 +19,14 @@ namespace Daybreak.Views;
 /// </summary>
 public partial class LogsView : UserControl
 {
+    private const int MaximumLookbackPeriod = 1000;
+    private const string MaximumLookbackMessageTemplate = "COULD NOT LOAD OLDER MESSAGES. MAXIMUM AMOUNT OF LOADED MESSAGES IS {0}";
+
     private readonly StringBuilder cachedText = new();
     private readonly RichTextModel richTextModel = new();
     private readonly SimpleHighlightingBrush simpleRedHighlightingBrush;
     private readonly SimpleHighlightingBrush simpleGreenHighlightingBrush;
     private readonly SimpleHighlightingBrush simpleOrangeHighlightingBrush;
-    private readonly Color foregroundColor;
     private readonly ILogsManager logManager;
     private readonly ILogger<LogsView> logger;
 
@@ -54,7 +55,16 @@ public partial class LogsView : UserControl
     {
         var logs = this.logManager.GetLogs(l => l.LogLevel < LogLevel.Trace).ToArray();
         this.TextEditor.Clear();
-        await this.WriteLogs(true, logs);
+        if (logs.Length > MaximumLookbackPeriod)
+        {
+            var maximumLookbackPeriodMessage = string.Format(MaximumLookbackMessageTemplate, MaximumLookbackPeriod);
+            var adornedMessage = SetupAdornedMessage(maximumLookbackPeriodMessage);
+            this.TextEditor.Document.Insert(this.cachedText.Length, adornedMessage);
+            this.richTextModel.SetForeground(this.cachedText.Length, adornedMessage.Length, this.simpleRedHighlightingBrush);
+            this.cachedText.Append(adornedMessage);
+        }
+
+        await this.WriteLogs(true, logs.TakeLast(MaximumLookbackPeriod).ToArray());
     }
 
     private async Task WriteLogs(bool forceScrollToEnd, params Log[] logs)
@@ -140,5 +150,26 @@ public partial class LogsView : UserControl
     private void LogsView_Unloaded(object sender, RoutedEventArgs _)
     {
         this.logManager.ReceivedLog -= this.LogManager_ReceivedLog;
+    }
+
+    private static string SetupAdornedMessage(string message)
+    {
+        var sb = new StringBuilder();
+        for (var i = 0; i < message.Length + 4; i++)
+        {
+            sb.Append('*');
+        }
+
+        sb.AppendLine();
+        sb.Append("* ");
+        sb.Append(message);
+        sb.Append(" *");
+        sb.AppendLine();
+        for (var i = 0; i < message.Length + 4; i++)
+        {
+            sb.Append('*');
+        }
+
+        return sb.AppendLine().ToString();
     }
 }

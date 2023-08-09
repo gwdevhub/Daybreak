@@ -219,6 +219,11 @@ public partial class MainWindow : MetroWindow
         this.viewManager.ShowView<VersionManagementView>();
     }
 
+    private void AdminText_Clicked(object sender, EventArgs e)
+    {
+        this.privilegeManager.RequestNormalPrivileges<LauncherView>(string.Empty);
+    }
+
     private void SetImage(ImageSource imageSource)
     {
         this.ImageViewer.ShowImage(imageSource);

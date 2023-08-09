@@ -33,7 +33,8 @@ internal sealed class ConnectivityStatus : IConnectivityStatus, IApplicationLife
             "Checking connection",
             "Checking internet connection status",
             expirationTime: DateTime.MaxValue,
-            clickClosable: false);
+            clickClosable: false,
+            persistent: false);
         NotificationToken? internetUnavailableNotification = default;
         while (!this.cancellationTokenSource.IsCancellationRequested)
         {
@@ -64,7 +65,7 @@ internal sealed class ConnectivityStatus : IConnectivityStatus, IApplicationLife
             {
                 internetUnavailableNotification?.Cancel();
                 internetUnavailableNotification = default;
-                this.notificationService.NotifyInformation("Connection restored", "Internet connection has been restored", clickClosable: true);
+                this.notificationService.NotifyInformation("Connection restored", "Internet connection has been restored", clickClosable: true, persistent: false);
             }
 
             // Only show Connection Unavailable message when no other connection unavailable notification is being shown
@@ -75,7 +76,8 @@ internal sealed class ConnectivityStatus : IConnectivityStatus, IApplicationLife
                     "Connection unavailable",
                     "Internet connection is not available",
                     expirationTime: DateTime.MaxValue,
-                    clickClosable: false);
+                    clickClosable: false,
+                    persistent: false);
             }
 
             await Task.Delay(ConnectivityBackoff, this.cancellationTokenSource.Token);

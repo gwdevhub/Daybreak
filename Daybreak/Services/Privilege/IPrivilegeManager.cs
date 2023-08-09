@@ -8,4 +8,7 @@ public interface IPrivilegeManager
 
     void RequestAdminPrivileges<TCancelView>(string messageToUser, object? dataContextOfCancelView = null)
         where TCancelView : UserControl;
+
+    void RequestNormalPrivileges<TCancelView>(string messageToUser, object? dataContextOfCancelView = default)
+        where TCancelView : UserControl;
 }

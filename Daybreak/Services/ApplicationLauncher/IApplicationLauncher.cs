@@ -9,4 +9,5 @@ public interface IApplicationLauncher
     Process? RunningGuildwarsProcess { get; }
     Task<Process?> LaunchGuildwars();
     void RestartDaybreakAsAdmin();
+    void RestartDaybreakAsNormalUser();
 }
