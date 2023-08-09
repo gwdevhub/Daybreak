@@ -12,6 +12,7 @@ on:
     paths:
       - "Daybreak/**"
       - "Daybreak.Installer/**"
+  workflow_dispatch:
       
 jobs:
 
