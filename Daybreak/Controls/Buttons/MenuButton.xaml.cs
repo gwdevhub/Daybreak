@@ -15,6 +15,9 @@ public partial class MenuButton : UserControl
     public event EventHandler? Clicked;
 
     [GenerateDependencyProperty]
+    private ICommand click = default!;
+
+    [GenerateDependencyProperty]
     private bool highlighted;
     [GenerateDependencyProperty]
     private Brush highlightColor = default!;
@@ -45,5 +48,9 @@ public partial class MenuButton : UserControl
     private void Rectangle_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         this.Clicked?.Invoke(this, e);
+        if (this.Click?.CanExecute(e) is true)
+        {
+            this.Click?.Execute(e);
+        }
     }
 }
