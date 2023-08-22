@@ -1,6 +1,8 @@
 ﻿using Daybreak.Models;
 using Daybreak.Services.Logging;
+using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit.Highlighting;
+using ICSharpCode.AvalonEdit.Search;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System;
@@ -43,6 +45,7 @@ public partial class LogsView : UserControl
         this.simpleOrangeHighlightingBrush = new SimpleHighlightingBrush(ColorPalette.Orange);
         this.simpleGreenHighlightingBrush = new SimpleHighlightingBrush(ColorPalette.Green);
         this.TextEditor.TextArea.TextView.LineTransformers.Add(new RichTextColorizer(this.richTextModel));
+        SearchPanel.Install(this.TextEditor);
         this.UpdateLogs();
     }
 

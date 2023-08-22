@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace Daybreak.Controls.Buttons;
 
@@ -10,6 +11,8 @@ public partial class AddButton : UserControl
 {
     public event EventHandler? Clicked;
 
+    public ICommand? Click { get; set; }
+
     public AddButton()
     {
         this.InitializeComponent();
@@ -18,5 +21,9 @@ public partial class AddButton : UserControl
     private void HighlightButton_Clicked(object sender, EventArgs e)
     {
         this.Clicked?.Invoke(this, e);
+        if (this.Click?.CanExecute(e) is true)
+        {
+            this.Click?.Execute(e);
+        }
     }
 }
