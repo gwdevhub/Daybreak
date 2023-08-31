@@ -65,6 +65,7 @@ public partial class NotificationsView : UserControl
     private void NotificationTemplate_OpenClicked(object _, Notification e)
     {
         this.notificationProducer.OpenNotification(e, e.Dismissible);
+        e.Closed = true;
     }
 
     private void NotificationTemplate_RemoveClicked(object _, Notification e)
