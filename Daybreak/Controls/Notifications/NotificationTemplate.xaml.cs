@@ -24,6 +24,10 @@ public partial class NotificationTemplate : UserControl
         }
 
         this.OpenClicked?.Invoke(this, notification);
+
+        // Resetting the data context triggers the data bindings to update
+        this.DataContext = default;
+        this.DataContext = notification;
     }
 
     private void CancelButton_Clicked(object sender, EventArgs e)
