@@ -378,6 +378,7 @@ public sealed class Map : IWikiEntity
     public static readonly Map TheKodashBazaarOutpost = new() { Id = 414, Name = "The Kodash Bazaar", WikiUrl = "https://wiki.guildwars.com/wiki/The_Kodash_Bazaar" };
     public static readonly Map LionsGate = new() { Id = 415, Name = "Lion's Gate", WikiUrl = "https://wiki.guildwars.com/wiki/Lion's_Gate" };
     public static readonly Map TheMirrorOfLyss = new() { Id = 416, Name = "The Mirror of Lyss", WikiUrl = "https://wiki.guildwars.com/wiki/The_Mirror_of_Lyss" };
+    public static readonly Map TheMirrorOfLyss2 = new() { Id = 419, Name = "The Mirror of Lyss", WikiUrl = "https://wiki.guildwars.com/wiki/The_Mirror_of_Lyss" };
     public static readonly Map SecuretheRefuge = new() { Id = 420, Name = "Secure the Refuge", WikiUrl = "https://wiki.guildwars.com/wiki/Secure_the_Refuge" };
     public static readonly Map VentaCemetery = new() { Id = 421, Name = "Venta Cemetery", WikiUrl = "https://wiki.guildwars.com/wiki/Venta_Cemetery" };
     public static readonly Map KamadanJewelOfIstanExplorable = new() { Id = 422, Name = "Kamadan", WikiUrl = "https://wiki.guildwars.com/wiki/Kamadan" };
@@ -1079,6 +1080,7 @@ public sealed class Map : IWikiEntity
         TheKodashBazaarOutpost,
         LionsGate,
         TheMirrorOfLyss,
+        TheMirrorOfLyss2,
         SecuretheRefuge,
         VentaCemetery,
         KamadanJewelOfIstanExplorable,
