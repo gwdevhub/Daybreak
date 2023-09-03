@@ -1,10 +1,12 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Converters;
 using Daybreak.Models.Guildwars;
 using Daybreak.Services.Notifications;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Configuration;
 using System.Core.Extensions;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,6 +14,7 @@ namespace Daybreak.Services.Events;
 
 public sealed class EventNotifierService : IEventNotifierService
 {
+    private readonly TimespanToETAConverter timespanToETAConverter = new();
     private readonly INotificationService notificationService;
     private readonly ILiveOptions<EventNotifierOptions> liveOptions;
     private readonly ILogger<IEventNotifierService> logger;
@@ -41,8 +44,17 @@ public sealed class EventNotifierService : IEventNotifierService
         var maybeEvents = Event.Events.Where(EventIsActive);
         foreach(var e in maybeEvents)
         {
-            this.notificationService.NotifyInformation(e.Title!, e.Description!, expirationTime: DateTime.Now + TimeSpan.FromMinutes(1));
+            this.notificationService.NotifyInformation(e.Title!, $"{this.GetRemainingTime(e)}\n{e.Description!}", expirationTime: DateTime.Now + TimeSpan.FromMinutes(1));
         }
+    }
+
+    private string? GetRemainingTime(Event e)
+    {
+        var currentTime = DateTime.UtcNow;
+        var eventEndTime = new DateTime(currentTime.Year, e.To.Month, e.To.Day, 19, 0, 0);
+
+        var remainingTime = eventEndTime - currentTime;
+        return this.timespanToETAConverter.Convert(remainingTime, typeof(string), default!, CultureInfo.CurrentCulture) as string;
     }
 
     private static bool EventIsActive(Event e)
