@@ -10,4 +10,6 @@ public sealed class OnContextMenuPayload
     public double Y { get; set; }
     [JsonProperty(nameof(Selection))]
     public string? Selection { get; set; }
+    [JsonProperty(nameof(Url))]
+    public string? Url { get; set; }
 }

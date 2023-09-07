@@ -1,20 +1,17 @@
-﻿using Daybreak.Configuration.Options;
+﻿using Daybreak.Configuration;
+using Daybreak.Configuration.Options;
 using Daybreak.Models.Browser;
 using Daybreak.Models.Guildwars;
 using Daybreak.Services.BuildTemplates;
-using Daybreak.Services.Options;
 using Daybreak.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Web.WebView2.Core;
-using Microsoft.Web.WebView2.Wpf;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
-using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -250,7 +247,15 @@ public partial class ChromiumBrowserWrapper : UserControl
         };
         this.WebBrowser.NavigationCompleted += (browser, args) => this.Navigating = false;
         this.WebBrowser.WebMessageReceived += this.CoreWebView2_WebMessageReceived!;
-        this.WebBrowser.CoreWebView2.Settings.AreDevToolsEnabled = false;
+        this.WebBrowser.CoreWebView2.DOMContentLoaded += async (browser, args) =>
+        {
+            if (this.CanDownloadBuild)
+            {
+                await this.WebBrowser.CoreWebView2.ExecuteScriptAsync(Scripts.SendSelectionOnContextMenu);
+            }
+        };
+
+        this.WebBrowser.CoreWebView2.Settings.AreDevToolsEnabled = ProjectConfiguration.CurrentConfiguration == "Debug";
         this.WebBrowser.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
         if (this.CanDownloadBuild)
         {
@@ -284,7 +289,12 @@ public partial class ChromiumBrowserWrapper : UserControl
     {
         if (e.Key == System.Windows.Input.Key.Enter)
         {
-            var input = sender.As<TextBox>().Text;
+            var input = sender.As<TextBox>()?.Text;
+            if (input is null)
+            {
+                return;
+            }
+
             var maybeAddress = SanitizeAddress(input);
             // If input is address, navigate to address. Otherwise search for the text input in Google
             if (Uri.TryCreate(maybeAddress, UriKind.Absolute, out _))
@@ -304,7 +314,7 @@ public partial class ChromiumBrowserWrapper : UserControl
 
     private void CoreWebView2_WebMessageReceived(object sender, CoreWebView2WebMessageReceivedEventArgs args)
     {
-        BrowserPayload payload = default!;
+        BrowserPayload? payload = default!;
         try
         {
             payload = args.WebMessageAsJson.Deserialize<BrowserPayload>();
@@ -328,16 +338,16 @@ public partial class ChromiumBrowserWrapper : UserControl
                 return;
             }
 
-            if (this.buildTemplateManager.IsTemplate(maybeTemplate) is false)
+            if (this.buildTemplateManager.TryDecodeTemplate(maybeTemplate, out var build) is false)
             {
                 return;
             }
 
+            build.SourceUrl = contextMenuPayload?.Value?.Url;
             Task.Run(() =>
             {
                 try
                 {
-                    var build = this.buildTemplateManager.DecodeTemplate(maybeTemplate);
                     this.Dispatcher.Invoke(() =>
                     {
                         this.ContextMenu.DataContext = build;
@@ -374,6 +384,11 @@ public partial class ChromiumBrowserWrapper : UserControl
     {
         var build = this.ContextMenu.DataContext.As<Build>();
         this.ContextMenu.IsOpen = false;
+        if (build is null)
+        {
+            return;
+        }
+
         this.BuildDecoded?.Invoke(this, build);
     }
 

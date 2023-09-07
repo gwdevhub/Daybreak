@@ -73,6 +73,7 @@ using Daybreak.Views.Onboarding.DSOAL;
 using Daybreak.Services.Registry;
 using Daybreak.Services.DSOAL.Actions;
 using Daybreak.Services.Events;
+using System.Reflection;
 
 namespace Daybreak.Configuration;
 
@@ -80,6 +81,8 @@ public static class ProjectConfiguration
 {
     private const string DaybreakUserAgent = "Daybreak";
     private const string ChromeImpersonationUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.79";
+
+    public static string? CurrentConfiguration => typeof(ProjectConfiguration).Assembly.GetCustomAttribute<AssemblyConfigurationAttribute>()?.Configuration;
 
     public static void RegisterResolvers(IServiceManager serviceManager)
     {

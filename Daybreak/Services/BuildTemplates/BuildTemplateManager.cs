@@ -69,7 +69,7 @@ public sealed class BuildTemplateManager : IBuildTemplateManager
         }
 
         Directory.CreateDirectory(Path.GetDirectoryName(newPath)!);
-        File.WriteAllText(newPath, encodedBuild);
+        File.WriteAllText(newPath, $"{encodedBuild}\n{buildEntry.Build?.SourceUrl}");
     }
 
     public void RemoveBuild(BuildEntry buildEntry)
@@ -93,10 +93,21 @@ public sealed class BuildTemplateManager : IBuildTemplateManager
             return new InvalidOperationException("Unable to find build file");
         }
 
-        var content = await File.ReadAllTextAsync(path);
-        if (this.TryDecodeTemplate(content, out var build) is false)
+        var content = await File.ReadAllLinesAsync(path);
+        if (content.Length == 0)
+        {
+            return new InvalidOperationException("File does not contain a valid template code");
+        }
+
+        if (this.TryDecodeTemplate(content.First(), out var build) is false)
         {
             return new InvalidOperationException("Unable to parse build file");
+        }
+
+        if (content.Length > 1 &&
+            !content[1].IsNullOrWhiteSpace())
+        {
+            build.SourceUrl = content[1];
         }
 
         return new BuildEntry { Build = build, Name = name, PreviousName = name };
@@ -119,9 +130,19 @@ public sealed class BuildTemplateManager : IBuildTemplateManager
 
         foreach (var file in Directory.GetFiles(BuildsPath, "*.txt", SearchOption.AllDirectories))
         {
-            var maybeBuild = this.DecodeTemplateInner(await File.ReadAllTextAsync(file));
+            var content = await File.ReadAllLinesAsync(file);
+            var maybeBuild = this.DecodeTemplateInner(content.FirstOrDefault()!);
             var build = maybeBuild.Switch(
-                onSuccess: build => build,
+                onSuccess: build =>
+                {
+                    if (content.Length > 1 &&
+                        !content[1].IsNullOrWhiteSpace())
+                    {
+                        build.SourceUrl = content[1];
+                    }
+
+                    return build;
+                },
                 onFailure: exception =>
                 {
                     this.logger.LogError(exception, "Failed to parse build");

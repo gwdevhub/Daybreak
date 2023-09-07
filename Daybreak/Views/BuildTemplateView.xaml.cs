@@ -35,6 +35,8 @@ public partial class BuildTemplateView : UserControl
     private string currentBuildCode = string.Empty;
     [GenerateDependencyProperty]
     private int attributePoints;
+    [GenerateDependencyProperty]
+    private string currentBuildSource = string.Empty;
 
     public BuildTemplateView(
         IViewManager viewManager,
@@ -55,6 +57,7 @@ public partial class BuildTemplateView : UserControl
                 this.CurrentBuild = buildEntry;
                 this.CurrentBuildCode = this.buildTemplateManager.EncodeTemplate(this.CurrentBuild.Build!);
                 this.AttributePoints = this.attributePointCalculator.GetRemainingFreePoints(this.CurrentBuild.Build!);
+                this.CurrentBuildSource = buildEntry.Build?.SourceUrl;
             }
         };
     }
@@ -73,7 +76,7 @@ public partial class BuildTemplateView : UserControl
                     Name = this.CurrentBuild.Name,
                     PreviousName = this.CurrentBuild.PreviousName,
                     Build = this.buildTemplateManager.DecodeTemplate(this.CurrentBuildCode)
-                };
+            };
 
                 this.logger.LogInformation($"Template {this.CurrentBuildCode} decoded");
             }
@@ -111,6 +114,13 @@ public partial class BuildTemplateView : UserControl
     }
     private void SaveButton_Clicked(object sender, EventArgs e)
     {
+        if (this.CurrentBuild.Build is null)
+        {
+            this.viewManager.ShowView<BuildsListView>();
+            return;
+        }
+
+        this.CurrentBuild.Build.SourceUrl = this.CurrentBuildSource;
         this.buildTemplateManager.SaveBuild(this.CurrentBuild);
         this.viewManager.ShowView<BuildsListView>();
     }
@@ -124,7 +134,7 @@ public partial class BuildTemplateView : UserControl
     }
     private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
-        if (string.IsNullOrWhiteSpace(sender.As<TextBox>().Text))
+        if (string.IsNullOrWhiteSpace(sender.As<TextBox>()?.Text))
         {
             this.SaveButtonEnabled = false;
         }

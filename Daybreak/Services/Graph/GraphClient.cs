@@ -177,6 +177,7 @@ public sealed class GraphClient : IGraphClient
                 return null;
             }
 
+            build.SourceUrl = buildFile.SourceUrl;
             return new BuildEntry
             {
                 Build = build,
@@ -213,11 +214,12 @@ public sealed class GraphClient : IGraphClient
                 return null;
             }
 
+            build.SourceUrl = buildFile.SourceUrl;
             return new BuildEntry
             {
                 Build = build,
                 Name = buildFile.FileName,
-                PreviousName = buildFile.FileName
+                PreviousName = buildFile.FileName,
             };
         }).Where(entry => entry is not null).ToList();
         _ = compiledBuilds.Do(this.buildTemplateManager.SaveBuild!).ToList();
@@ -284,7 +286,8 @@ public sealed class GraphClient : IGraphClient
         var buildFile = new BuildFile
         {
             FileName = buildEntry.Name,
-            TemplateCode = this.buildTemplateManager.EncodeTemplate(buildEntry.Build!)
+            TemplateCode = this.buildTemplateManager.EncodeTemplate(buildEntry.Build!),
+            SourceUrl = buildEntry.Build?.SourceUrl
         };
 
         var buildList = this.buildsCache ?? new List<BuildFile>();
@@ -311,7 +314,8 @@ public sealed class GraphClient : IGraphClient
         var buildFiles = buildEntries.Select(buildEntry => new BuildFile
         {
             FileName = buildEntry.Name,
-            TemplateCode = this.buildTemplateManager.EncodeTemplate(buildEntry.Build!)
+            TemplateCode = this.buildTemplateManager.EncodeTemplate(buildEntry.Build!),
+            SourceUrl = buildEntry.Build?.SourceUrl
         });
 
         var buildList = new List<BuildFile>();
