@@ -3,8 +3,9 @@
 public static class Scripts
 {
     public const string SendSelectionOnContextMenu = @"
-            document.addEventListener('contextmenu', function (event)
+            window.addEventListener('contextmenu', function (event)
             {
+                console.log('Triggering build selection parser');
                 var text = '';
                 var activeEl = document.activeElement;
                 var activeElTagName = activeEl ? activeEl.tagName.toLowerCase() : null;
@@ -26,7 +27,8 @@ public static class Scripts
                     {
                         X: event.screenX,
                         Y: event.screenY,
-                        Selection: text
+                        Selection: text,
+                        Url: document.URL
                     }
                 };
                 window.chrome.webview.postMessage(jsonObject);
