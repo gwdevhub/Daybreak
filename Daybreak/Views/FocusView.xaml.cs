@@ -323,7 +323,7 @@ public partial class FocusView : UserControl
         }
     }
 
-    private void Browser_BuildDecoded(object _, Build e)
+    private void Browser_BuildDecoded(object _, DownloadedBuild e)
     {
         if (e is null)
         {
@@ -331,7 +331,8 @@ public partial class FocusView : UserControl
         }
 
         var buildEntry = this.buildTemplateManager.CreateBuild();
-        buildEntry.Build = e;
+        buildEntry.Build = e.Build;
+        buildEntry.Name = e.PreferredName ?? buildEntry.Name;
         this.viewManager.ShowView<BuildTemplateView>(buildEntry);
     }
 

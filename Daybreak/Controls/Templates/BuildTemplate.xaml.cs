@@ -5,7 +5,9 @@ using Daybreak.Models;
 using Daybreak.Models.Builds;
 using Daybreak.Models.Guildwars;
 using Daybreak.Services.BuildTemplates;
+using Daybreak.Services.Navigation;
 using Daybreak.Utils;
+using Daybreak.Views;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -19,6 +21,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
+using System.Windows.Input;
 
 namespace Daybreak.Controls.Templates;
 
@@ -32,13 +35,18 @@ public partial class BuildTemplate : UserControl
     private const string InfoNamePlaceholder = "[NAME]";
     private const string BaseAddress = $"https://wiki.guildwars.com/wiki/{InfoNamePlaceholder}";
 
+    private readonly IBuildTemplateManager buildTemplateManager;
+    private readonly IViewManager viewManager;
+    private readonly IAttributePointCalculator? attributePointCalculator;
+    private readonly CancellationTokenSource? cancellationTokenSource = new();
+
+    private bool browserMaximized = false;
     private bool showingSkillList = false;
     private bool replacingSecondaryProfession;
     private bool replacingPrimaryProfession;
-    private IAttributePointCalculator? attributePointCalculator;
+    
     private SkillTemplate? selectingSkillTemplate;
     private List<Skill>? skillListCache;
-    private CancellationTokenSource? cancellationTokenSource = new();
 
     [GenerateDependencyProperty]
     private string skillSearchText = string.Empty;
@@ -55,14 +63,20 @@ public partial class BuildTemplate : UserControl
     public ObservableCollection<Profession> SecondaryProfessions { get; } = new();
 
     public BuildTemplate()
-        : this(Launcher.Instance.ApplicationServiceProvider.GetService<IAttributePointCalculator>()!)
+        : this(Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IBuildTemplateManager>(),
+              Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>(),
+              Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IAttributePointCalculator>())
     {
         
     }
     
     public BuildTemplate(
+        IBuildTemplateManager buildTemplateManager,
+        IViewManager viewManager,
         IAttributePointCalculator attributePointCalculator)
     {
+        this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
+        this.viewManager = viewManager.ThrowIfNull();
         this.attributePointCalculator = attributePointCalculator.ThrowIfNull();
 
         this.InitializeComponent();
@@ -70,6 +84,12 @@ public partial class BuildTemplate : UserControl
         this.HideInfoBrowser();
         this.buildEntry = new BuildEntry();
         this.DataContextChanged += this.BuildTemplate_DataContextChanged;
+    }
+
+    public void BrowseToUrl(string url)
+    {
+        this.SkillBrowser.Address = url;
+        this.ShowInfoBrowser();
     }
 
     private void BuildTemplate_Unloaded(object sender, RoutedEventArgs e)
@@ -157,24 +177,28 @@ public partial class BuildTemplate : UserControl
     private void BrowseToInfo(string infoName)
     {
         var address = BaseAddress.Replace(InfoNamePlaceholder, infoName.Replace(" ", "_"));
-        this.SkillBrowser.Address = address;
-        this.ShowInfoBrowser();
+        this.BrowseToUrl(address);
     }
 
     private void ShowInfoBrowser()
     {
-        if (this.SkillBrowser.BrowserSupported is true)
+        if (!this.SkillBrowser.BrowserSupported ||
+            this.browserMaximized)
         {
-            this.HideSkillListView();
-            this.SkillBrowser.Width = 400;
+            return;
         }
+
+        this.HideSkillListView();
+        this.SkillBrowser.MaxWidth = 400;
+        this.SkillBrowser.Visibility = Visibility.Visible;
     }
 
     private void HideInfoBrowser()
     {
         if (this.SkillBrowser.BrowserSupported is true)
         {
-            this.SkillBrowser.Width = 0;
+            this.SkillBrowser.MaxWidth = 0;
+            this.SkillBrowser.Visibility = Visibility.Hidden;
         }
     }
 
@@ -403,5 +427,42 @@ public partial class BuildTemplate : UserControl
         }
 
         this.HideSkillListView();
+    }
+
+    private void SkillBrowser_MaximizeClicked(object sender, EventArgs e)
+    {
+        this.browserMaximized = !this.browserMaximized;
+        if (this.browserMaximized)
+        {
+            this.SideHolder.Children.Remove(this.SkillBrowser);
+            this.FullScreenHolder.Children.Add(this.SkillBrowser);
+            this.FullScreenHolder.Visibility = Visibility.Visible;
+            this.SkillBrowser.MaxWidth = double.MaxValue;
+        }
+        else
+        {
+            this.FullScreenHolder.Children.Remove(this.SkillBrowser);
+            this.SideHolder.Children.Add(this.SkillBrowser);
+            this.FullScreenHolder.Visibility = Visibility.Hidden;
+            this.SkillBrowser.MaxWidth = 400;
+        }
+
+        if (e is MouseButtonEventArgs mouseButtonEventArgs)
+        {
+            mouseButtonEventArgs.Handled = true;
+        }
+    }
+
+    private void SkillBrowser_BuildDecoded(object _, DownloadedBuild e)
+    {
+        if (e is null)
+        {
+            return;
+        }
+
+        var buildEntry = this.buildTemplateManager.CreateBuild();
+        buildEntry.Build = e.Build;
+        buildEntry.Name = e.PreferredName ?? buildEntry.Name;
+        this.viewManager.ShowView<BuildTemplateView>(buildEntry);
     }
 }

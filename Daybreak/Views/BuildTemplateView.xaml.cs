@@ -125,6 +125,16 @@ public partial class BuildTemplateView : UserControl
         this.viewManager.ShowView<BuildsListView>();
     }
 
+    private void BrowserButton_Clicked(object sender, EventArgs e)
+    {
+        if (this.CurrentBuildSource.IsNullOrWhiteSpace())
+        {
+            return;
+        }
+
+        this.BuildTemplate.BrowseToUrl(this.CurrentBuildSource);
+    }
+
     private void TextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
     {
         if (DisallowedChars.ToCharArray().Where(c => e.Text.Contains(c)).Any())
