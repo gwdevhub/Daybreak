@@ -38,6 +38,7 @@
                     Background="{DynamicResource Daybreak.Brushes.Background}"
                     Foreground="{DynamicResource MahApps.Brushes.Accent}"
                     HorizontalAlignment="Right"
+                    MaxHeight="300"
                     Expired="NotificationView_Expired"
                     Closed="NotificationView_Closed"/>
             </DataTemplate>
@@ -46,6 +47,7 @@
                     Background="{DynamicResource Daybreak.Brushes.Background}"
                     Foreground="{DynamicResource MahApps.Brushes.Accent}"
                     HorizontalAlignment="Right"
+                    MaxHeight="300"
                     Expired="NotificationView_Expired"
                     Closed="NotificationView_Closed"/>
             </DataTemplate>

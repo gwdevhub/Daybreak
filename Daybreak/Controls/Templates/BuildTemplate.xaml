@@ -149,8 +149,22 @@
             <TextBlock Grid.Column="7" Grid.Row="1" TextWrapping="Wrap" FontSize="16"
                        Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Text="{Binding ElementName=_this, Path=BuildEntry.EigthSkill.Name, Mode=OneWay}"></TextBlock>
         </Grid>
-        <Grid Grid.Column="1" Grid.RowSpan="6">
-            <local:ChromiumBrowserWrapper x:Name="SkillBrowser" ControlsEnabled="False" Width="0" AddressBarReadonly="True" CanNavigate="True"></local:ChromiumBrowserWrapper>
+        <Grid Grid.Column="1" Grid.RowSpan="6"
+              x:Name="SideHolder">
+            <local:ChromiumBrowserWrapper x:Name="SkillBrowser"
+                                          MaxWidth="0"
+                                          ControlsEnabled="True"
+                                          AddressBarReadonly="True"
+                                          CanNavigate="True"
+                                          VerticalAlignment="Stretch"
+                                          HorizontalAlignment="Stretch"
+                                          HorizontalContentAlignment="Stretch"
+                                          VerticalContentAlignment="Stretch"
+                                          CanDownloadBuild="True"
+                                          BuildDecoded="SkillBrowser_BuildDecoded"
+                                          Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                          PreventDispose="True"
+                                          MaximizeClicked="SkillBrowser_MaximizeClicked" />
         </Grid>
         <Grid Grid.Column="1" Grid.RowSpan="6">
             <Grid x:Name="SkillListContainer">
@@ -212,6 +226,11 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </Grid>
+        </Grid>
+        <Grid Grid.RowSpan="6"
+              Grid.ColumnSpan="2"
+              Visibility="Hidden"
+              x:Name="FullScreenHolder">
         </Grid>
     </Grid>
 </UserControl>

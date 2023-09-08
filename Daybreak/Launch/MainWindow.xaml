@@ -146,7 +146,7 @@
             HorizontalAlignment="Right"
             VerticalAlignment="Bottom"
             Width="300"
-            Grid.RowSpan="2"
+            Grid.Row="1"
             Grid.ColumnSpan="2"/>
     </Grid>
 </mah:MetroWindow>

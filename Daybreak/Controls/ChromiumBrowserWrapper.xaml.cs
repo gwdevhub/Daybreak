@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Configuration.Options;
+using Daybreak.Models;
 using Daybreak.Models.Browser;
 using Daybreak.Models.Guildwars;
 using Daybreak.Services.BuildTemplates;
@@ -13,6 +14,7 @@ using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.IO;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,6 +34,7 @@ public partial class ChromiumBrowserWrapper : UserControl
     public static readonly DependencyProperty AddressProperty =
         DependencyPropertyExtensions.Register<ChromiumBrowserWrapper, string>(nameof(Address));
 
+    private const long MaxBuildBytes = 200;
     private const string BrowserSearchPlaceholder = "[PLACEHOLDER]";
     private const string BrowserSearchLink = $"https://www.google.com/search?q={BrowserSearchPlaceholder}";
     private const string BrowserDownloadLink = "https://developer.microsoft.com/en-us/microsoft-edge/webview2/";
@@ -43,11 +46,12 @@ public partial class ChromiumBrowserWrapper : UserControl
 
     public event EventHandler<string>? FavoriteUriChanged;
     public event EventHandler? MaximizeClicked;
-    public event EventHandler<Build>? BuildDecoded;
+    public event EventHandler<DownloadedBuild>? BuildDecoded;
     public event EventHandler<DownloadPayload>? DownloadingFile;
     public event EventHandler<string>? DownloadedFile;
 
     private readonly Task initializationTask;
+    private readonly IHttpClient<ChromiumBrowserWrapper> httpClient;
     private readonly ILiveOptions<BrowserOptions> liveOptions;
     private readonly ILogger<ChromiumBrowserWrapper> logger;
     private readonly IBuildTemplateManager buildTemplateManager;
@@ -90,17 +94,20 @@ public partial class ChromiumBrowserWrapper : UserControl
     }
 
     public ChromiumBrowserWrapper()
-        : this(Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILiveOptions<BrowserOptions>>(),
+        : this(Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IHttpClient<ChromiumBrowserWrapper>>(),
+              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILiveOptions<BrowserOptions>>(),
               Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IBuildTemplateManager>(),
               Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILogger<ChromiumBrowserWrapper>>())
     {
     }
 
     public ChromiumBrowserWrapper(
+        IHttpClient<ChromiumBrowserWrapper> httpClient,
         ILiveOptions<BrowserOptions> liveOptions,
         IBuildTemplateManager buildTemplateManager,
         ILogger<ChromiumBrowserWrapper> logger)
     {
+        this.httpClient = httpClient.ThrowIfNull();
         this.liveOptions = liveOptions.ThrowIfNull();
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
@@ -218,10 +225,12 @@ public partial class ChromiumBrowserWrapper : UserControl
         };
         this.WebBrowser.CoreWebView2.DownloadStarting += (browser, args) =>
         {
-            if (this.CanDownloadFiles is false)
+            if (!this.CanDownloadFiles)
             {
                 this.logger?.LogInformation("Downloads are disallowed. Cancelling download");
                 args.Cancel = true;
+                this.CheckForBuildFile(args.DownloadOperation.Uri);
+                return;
             }
 
             if (this.DownloadsDirectory.IsNullOrWhiteSpace())
@@ -263,6 +272,42 @@ public partial class ChromiumBrowserWrapper : UserControl
         }
 
         this.browserInitialized = true;
+    }
+
+    private async void CheckForBuildFile(string source)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.CheckForBuildFile), source);
+        if (!this.CanDownloadBuild)
+        {
+            return;
+        }
+
+        if (source.IsNullOrWhiteSpace())
+        {
+            return;
+        }
+
+        var result = await this.httpClient.GetAsync(source);
+        if (result.Content.Headers.ContentLength > MaxBuildBytes)
+        {
+            this.logger.LogInformation($"Content size [{result.Content.Headers.ContentLength}] exceeds max size [{MaxBuildBytes}]");
+            result.Dispose();
+            return;
+        }
+
+        var content = await result.Content.ReadAsStringAsync();
+        if (!this.buildTemplateManager.TryDecodeTemplate(content, out var build))
+        {
+            this.logger.LogInformation("Could not decode downloaded file");
+            return;
+        }
+
+        build.SourceUrl = this.Address;
+        this.BuildDecoded?.Invoke(this, new DownloadedBuild
+        {
+            Build = build,
+            PreferredName = result.Content.Headers.ContentDisposition?.FileName
+        });
     }
 
     private async void RetryInitializeButton_Clicked(object sender, EventArgs e)
@@ -389,7 +434,7 @@ public partial class ChromiumBrowserWrapper : UserControl
             return;
         }
 
-        this.BuildDecoded?.Invoke(this, build);
+        this.BuildDecoded?.Invoke(this, new DownloadedBuild { Build = build, PreferredName = this.WebBrowser.CoreWebView2.DocumentTitle });
     }
 
     private async void UserControl_Loaded(object sender, RoutedEventArgs e)

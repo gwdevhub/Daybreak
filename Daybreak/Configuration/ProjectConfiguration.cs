@@ -74,6 +74,7 @@ using Daybreak.Services.Registry;
 using Daybreak.Services.DSOAL.Actions;
 using Daybreak.Services.Events;
 using System.Reflection;
+using Daybreak.Controls;
 
 namespace Daybreak.Configuration;
 
@@ -130,6 +131,10 @@ public static class ProjectConfiguration
                 .Build()
             .RegisterHttpClient<InternetCheckingService>()
                 .WithMessageHandler(SetupLoggingAndMetrics<InternetCheckingService>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
+                .Build()
+            .RegisterHttpClient<ChromiumBrowserWrapper>()
+                .WithMessageHandler(SetupLoggingAndMetrics<ChromiumBrowserWrapper>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build();
     }

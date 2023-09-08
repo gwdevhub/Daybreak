@@ -1,0 +1,59 @@
+﻿<UserControl x:Class="Daybreak.Controls.Buttons.BrowserButton"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Daybreak.Controls.Buttons"
+             xmlns:controls="clr-namespace:Daybreak.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <local:CircularButton Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                               Highlight="{StaticResource MahApps.Brushes.Accent}"
+                               Clicked="HighlightButton_Clicked">
+            <local:CircularButton.Content>
+                <Viewbox Stretch="Fill" Width="60" Height="60">
+                    <Grid Width="24" Height="24"
+                          Margin="5">
+                        <Path Data="m7.724,17a15.176,15.176 0 0 0 4.276,7a15.176,15.176 0 0 0 4.276,-7l-8.552,0z"
+                              Fill="{StaticResource MahApps.Brushes.ThemeForeground}" 
+                              VerticalAlignment="Stretch"
+                              HorizontalAlignment="Stretch"/>
+                        <Path Data="m7,12a17.764,17.764 0 0 0 0.271,3l9.458,0a17.764,17.764 0 0 0 0.271,-3a17.764,17.764 0 0 0 -0.271,-3l-9.458,0a17.764,17.764 0 0 0 -0.271,3z"
+                              Fill="{StaticResource MahApps.Brushes.ThemeForeground}" 
+                              VerticalAlignment="Stretch"
+                              HorizontalAlignment="Stretch"/>
+                        <Path Data="m23.606,9l-4.863,0a19.608,19.608 0 0 1 0.257,3a19.608,19.608 0 0 1 -0.257,3l4.863,0a11.618,11.618 0 0 0 0,-6z"
+                              Fill="{StaticResource MahApps.Brushes.ThemeForeground}" 
+                              VerticalAlignment="Stretch"
+                              HorizontalAlignment="Stretch"/>
+                        <Path Data="m22.9,7a12.025,12.025 0 0 0 -7.87,-6.6a17.922,17.922 0 0 1 3.294,6.6l4.576,0z"
+                              Fill="{StaticResource MahApps.Brushes.ThemeForeground}" 
+                              VerticalAlignment="Stretch"
+                              HorizontalAlignment="Stretch"/>
+                        <Path Data="m5,12a19.608,19.608 0 0 1 0.257,-3l-4.863,0a11.618,11.618 0 0 0 0,6l4.863,0a19.608,19.608 0 0 1 -0.257,-3z"
+                              Fill="{StaticResource MahApps.Brushes.ThemeForeground}" 
+                              VerticalAlignment="Stretch"
+                              HorizontalAlignment="Stretch"/>
+                        <Path Data="m1.1,17a12.025,12.025 0 0 0 7.87,6.6a17.922,17.922 0 0 1 -3.294,-6.6l-4.576,0z"
+                              Fill="{StaticResource MahApps.Brushes.ThemeForeground}" 
+                              VerticalAlignment="Stretch"
+                              HorizontalAlignment="Stretch"/>
+                        <Path Data="m15.03,23.6a12.025,12.025 0 0 0 7.87,-6.6l-4.576,0a17.922,17.922 0 0 1 -3.294,6.6z"
+                              Fill="{StaticResource MahApps.Brushes.ThemeForeground}" 
+                              VerticalAlignment="Stretch"
+                              HorizontalAlignment="Stretch"/>
+                        <Path Data="m16.276,7a15.176,15.176 0 0 0 -4.276,-7a15.176,15.176 0 0 0 -4.276,7l8.552,0z"
+                              Fill="{StaticResource MahApps.Brushes.ThemeForeground}" 
+                              VerticalAlignment="Stretch"
+                              HorizontalAlignment="Stretch"/>
+                        <Path Data="m8.97,0.4a12.025,12.025 0 0 0 -7.87,6.6l4.576,0a17.922,17.922 0 0 1 3.294,-6.6z"
+                              Fill="{StaticResource MahApps.Brushes.ThemeForeground}" 
+                              VerticalAlignment="Stretch"
+                              HorizontalAlignment="Stretch"/>
+                    </Grid>
+                </Viewbox>
+            </local:CircularButton.Content>
+        </local:CircularButton>
+    </Grid>
+</UserControl>
