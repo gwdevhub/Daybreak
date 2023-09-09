@@ -1,4 +1,5 @@
 ﻿using Daybreak.Configuration;
+using Daybreak.Services.BrowserExtensions;
 using Daybreak.Services.Drawing;
 using Daybreak.Services.ExceptionHandling;
 using Daybreak.Services.Mods;
@@ -54,13 +55,14 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
 
     protected override void ApplicationStarting()
     {
-        ProjectConfiguration.RegisterOptions(this.ServiceProvider.GetRequiredService<IOptionsProducer>()!);
-        ProjectConfiguration.RegisterViews(this.ServiceProvider.GetRequiredService<IViewManager>()!);
-        ProjectConfiguration.RegisterPostUpdateActions(this.ServiceProvider.GetRequiredService<IPostUpdateActionProducer>()!);
-        ProjectConfiguration.RegisterStartupActions(this.ServiceProvider.GetRequiredService<IStartupActionProducer>()!);
-        ProjectConfiguration.RegisterDrawingModules(this.ServiceProvider.GetRequiredService<IDrawingModuleProducer>()!);
-        ProjectConfiguration.RegisterNotificationHandlers(this.ServiceProvider.GetRequiredService<INotificationHandlerProducer>()!);
-        ProjectConfiguration.RegisterMods(this.ServiceProvider.GetRequiredService<IModsManager>()!);
+        ProjectConfiguration.RegisterOptions(this.ServiceProvider.GetRequiredService<IOptionsProducer>());
+        ProjectConfiguration.RegisterViews(this.ServiceProvider.GetRequiredService<IViewManager>());
+        ProjectConfiguration.RegisterPostUpdateActions(this.ServiceProvider.GetRequiredService<IPostUpdateActionProducer>());
+        ProjectConfiguration.RegisterStartupActions(this.ServiceProvider.GetRequiredService<IStartupActionProducer>());
+        ProjectConfiguration.RegisterDrawingModules(this.ServiceProvider.GetRequiredService<IDrawingModuleProducer>());
+        ProjectConfiguration.RegisterNotificationHandlers(this.ServiceProvider.GetRequiredService<INotificationHandlerProducer>());
+        ProjectConfiguration.RegisterMods(this.ServiceProvider.GetRequiredService<IModsManager>());
+        ProjectConfiguration.RegisterBrowserExtensions(this.ServiceProvider.GetRequiredService<IBrowserExtensionsProducer>());
 
         this.logger = this.ServiceProvider.GetRequiredService<ILogger<Launcher>>();
         this.exceptionHandler = this.ServiceProvider.GetRequiredService<IExceptionHandler>();

@@ -3,6 +3,7 @@ using Daybreak.Configuration.Options;
 using Daybreak.Models;
 using Daybreak.Models.Browser;
 using Daybreak.Models.Guildwars;
+using Daybreak.Services.BrowserExtensions;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Utils;
 using Microsoft.Extensions.DependencyInjection;
@@ -51,6 +52,7 @@ public partial class ChromiumBrowserWrapper : UserControl
     public event EventHandler<string>? DownloadedFile;
 
     private readonly Task initializationTask;
+    private readonly IBrowserExtensionsManager browserExtensionsManager;
     private readonly IHttpClient<ChromiumBrowserWrapper> httpClient;
     private readonly ILiveOptions<BrowserOptions> liveOptions;
     private readonly ILogger<ChromiumBrowserWrapper> logger;
@@ -94,7 +96,8 @@ public partial class ChromiumBrowserWrapper : UserControl
     }
 
     public ChromiumBrowserWrapper()
-        : this(Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IHttpClient<ChromiumBrowserWrapper>>(),
+        : this(Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IBrowserExtensionsManager>(),
+              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IHttpClient<ChromiumBrowserWrapper>>(),
               Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILiveOptions<BrowserOptions>>(),
               Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IBuildTemplateManager>(),
               Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILogger<ChromiumBrowserWrapper>>())
@@ -102,11 +105,13 @@ public partial class ChromiumBrowserWrapper : UserControl
     }
 
     public ChromiumBrowserWrapper(
+        IBrowserExtensionsManager browserExtensionsManager,
         IHttpClient<ChromiumBrowserWrapper> httpClient,
         ILiveOptions<BrowserOptions> liveOptions,
         IBuildTemplateManager buildTemplateManager,
         ILogger<ChromiumBrowserWrapper> logger)
     {
+        this.browserExtensionsManager = browserExtensionsManager.ThrowIfNull();
         this.httpClient = httpClient.ThrowIfNull();
         this.liveOptions = liveOptions.ThrowIfNull();
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
@@ -156,7 +161,8 @@ public partial class ChromiumBrowserWrapper : UserControl
             CoreWebView2Environment ??= System.Extensions.TaskExtensions.RunSync(() => CoreWebView2Environment.CreateAsync(null, "BrowserData", new CoreWebView2EnvironmentOptions
             {
                 EnableTrackingPrevention = true,
-                AllowSingleSignOnUsingOSPrimaryAccount = true
+                AllowSingleSignOnUsingOSPrimaryAccount = true,
+                AreBrowserExtensionsEnabled = true
             }));
 
             this.BrowserSupported = true;
@@ -196,74 +202,22 @@ public partial class ChromiumBrowserWrapper : UserControl
         if (!this.BrowserSupported ||
             !this.BrowserEnabled)
         {
-            
+
             return;
         }
 
         this.ShowBrowserDisabledMessage = false;
-        await this.WebBrowser.EnsureCoreWebView2Async(CoreWebView2Environment);
-        if (this.Address is not null &&
-            Uri.TryCreate(this.Address, UriKind.RelativeOrAbsolute, out var uri))
-        {
-            this.WebBrowser.Source = uri;
-        }
-
+        await this.WebBrowser.EnsureCoreWebView2Async(CoreWebView2Environment).ConfigureAwait(true);
+        await this.browserExtensionsManager.InitializeBrowserEnvironment(this.WebBrowser.CoreWebView2.Profile, CoreWebView2Environment!.BrowserVersionString).ConfigureAwait(true);
         this.WebBrowser.SourceChanged += (_, args) => this.Address = this.WebBrowser.Source.ToString();
         this.AddressBarReadonly = this.liveOptions!.Value.AddressBarReadonly;
         this.CanDownloadBuild = this.liveOptions.Value.DynamicBuildLoading;
         this.WebBrowser.CoreWebView2.NewWindowRequested += (browser, args) => args.Handled = true;
-        this.WebBrowser.NavigationStarting += (browser, args) =>
-        {
-            if (this.CanNavigate is false && args.Uri != this.Address)
-            {
-                args.Cancel = true;
-            }
-            else
-            {
-                this.Navigating = true;
-            }
-        };
-        this.WebBrowser.CoreWebView2.DownloadStarting += (browser, args) =>
-        {
-            if (!this.CanDownloadFiles)
-            {
-                this.logger?.LogInformation("Downloads are disallowed. Cancelling download");
-                args.Cancel = true;
-                this.CheckForBuildFile(args.DownloadOperation.Uri);
-                return;
-            }
-
-            if (this.DownloadsDirectory.IsNullOrWhiteSpace())
-            {
-                this.logger?.LogInformation("No downloads directory specified. Downloading to default directory");
-                return;
-            }
-
-            var fileName = Path.GetFileName(args.ResultFilePath);
-            var finalPath = Path.GetFullPath(Path.Combine(this.DownloadsDirectory, fileName));
-            var downloadPayload = new DownloadPayload { ResultingFilePath = finalPath, CanDownload = true };
-            this.DownloadingFile?.Invoke(this, downloadPayload);
-            if (!downloadPayload.CanDownload)
-            {
-                args.Cancel = true;
-                this.logger?.LogInformation("Download blocked by handler. Cancelling download");
-                return;
-            }
-
-            args.ResultFilePath = finalPath;
-
-            args.DownloadOperation.StateChanged += this.DownloadOperation_StateChanged;
-        };
+        this.WebBrowser.NavigationStarting += this.WebBrowser_NavigationStarting;
+        this.WebBrowser.CoreWebView2.DownloadStarting += this.CoreWebView2_DownloadStarting;
         this.WebBrowser.NavigationCompleted += (browser, args) => this.Navigating = false;
         this.WebBrowser.WebMessageReceived += this.CoreWebView2_WebMessageReceived!;
-        this.WebBrowser.CoreWebView2.DOMContentLoaded += async (browser, args) =>
-        {
-            if (this.CanDownloadBuild)
-            {
-                await this.WebBrowser.CoreWebView2.ExecuteScriptAsync(Scripts.SendSelectionOnContextMenu);
-            }
-        };
-
+        this.WebBrowser.CoreWebView2.DOMContentLoaded += this.CoreWebView2_DOMContentLoaded;
         this.WebBrowser.CoreWebView2.Settings.AreDevToolsEnabled = ProjectConfiguration.CurrentConfiguration == "Debug";
         this.WebBrowser.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
         if (this.CanDownloadBuild)
@@ -271,7 +225,65 @@ public partial class ChromiumBrowserWrapper : UserControl
             await this.WebBrowser.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(Scripts.SendSelectionOnContextMenu);
         }
 
+        if (this.Address is not null &&
+            Uri.TryCreate(this.Address, UriKind.RelativeOrAbsolute, out var uri))
+        {
+            this.WebBrowser.Source = uri;
+        }
         this.browserInitialized = true;
+    }
+
+    private async void CoreWebView2_DOMContentLoaded(object? sender, CoreWebView2DOMContentLoadedEventArgs e)
+    {
+        if (!this.CanDownloadBuild)
+        {
+            return;
+        }
+
+        await this.WebBrowser.CoreWebView2.ExecuteScriptAsync(Scripts.SendSelectionOnContextMenu);
+    }
+
+    private void CoreWebView2_DownloadStarting(object? _, CoreWebView2DownloadStartingEventArgs args)
+    {
+        if (!this.CanDownloadFiles)
+        {
+            this.logger?.LogInformation("Downloads are disallowed. Cancelling download");
+            args.Cancel = true;
+            this.CheckForBuildFile(args.DownloadOperation.Uri);
+            return;
+        }
+
+        if (this.DownloadsDirectory.IsNullOrWhiteSpace())
+        {
+            this.logger?.LogInformation("No downloads directory specified. Downloading to default directory");
+            return;
+        }
+
+        var fileName = Path.GetFileName(args.ResultFilePath);
+        var finalPath = Path.GetFullPath(Path.Combine(this.DownloadsDirectory, fileName));
+        var downloadPayload = new DownloadPayload { ResultingFilePath = finalPath, CanDownload = true };
+        this.DownloadingFile?.Invoke(this, downloadPayload);
+        if (!downloadPayload.CanDownload)
+        {
+            args.Cancel = true;
+            this.logger?.LogInformation("Download blocked by handler. Cancelling download");
+            return;
+        }
+
+        args.ResultFilePath = finalPath;
+        args.DownloadOperation.StateChanged += this.DownloadOperation_StateChanged;
+    }
+
+    private void WebBrowser_NavigationStarting(object? _, CoreWebView2NavigationStartingEventArgs args)
+    {
+        if (this.CanNavigate is false && args.Uri != this.Address)
+        {
+            args.Cancel = true;
+        }
+        else
+        {
+            this.Navigating = true;
+        }
     }
 
     private async void CheckForBuildFile(string source)

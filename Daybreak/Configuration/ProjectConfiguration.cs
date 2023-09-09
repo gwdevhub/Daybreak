@@ -75,6 +75,8 @@ using Daybreak.Services.DSOAL.Actions;
 using Daybreak.Services.Events;
 using System.Reflection;
 using Daybreak.Controls;
+using Daybreak.Services.BrowserExtensions;
+using Daybreak.Services.AdBlock;
 
 namespace Daybreak.Configuration;
 
@@ -168,19 +170,19 @@ public static class ProjectConfiguration
         services.AddSingleton<IPostUpdateActionProducer>(sp => sp.GetRequiredService<PostUpdateActionManager>());
         services.AddSingleton<IPostUpdateActionProvider>(sp => sp.GetRequiredService<PostUpdateActionManager>());
         services.AddSingleton<IMenuService, MenuService>();
-        services.AddSingleton<IMenuServiceInitializer, MenuService>(sp => sp.GetRequiredService<IMenuService>().As<MenuService>()!);
+        services.AddSingleton<IMenuServiceInitializer, MenuService>(sp => sp.GetRequiredService<IMenuService>().Cast<MenuService>());
         services.AddSingleton<ILiteDatabase, LiteDatabase>(sp => new LiteDatabase("Daybreak.db"));
         services.AddSingleton<IMutexHandler, MutexHandler>();
         services.AddSingleton<IShortcutManager, ShortcutManager>();
         services.AddSingleton<IMetricsService, MetricsService>();
         services.AddSingleton<IStartupActionProducer, StartupActionManager>();
-        services.AddSingleton<IOptionsProducer, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().As<OptionsManager>()!);
-        services.AddSingleton<IOptionsUpdateHook, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().As<OptionsManager>()!);
-        services.AddSingleton<IOptionsProvider, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().As<OptionsManager>()!);
+        services.AddSingleton<IOptionsProducer, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().Cast<OptionsManager>());
+        services.AddSingleton<IOptionsUpdateHook, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().Cast<OptionsManager>());
+        services.AddSingleton<IOptionsProvider, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().Cast<OptionsManager>());
         services.AddSingleton<IThemeManager, ThemeManager>();
         services.AddSingleton<INotificationService, NotificationService>();
-        services.AddSingleton<INotificationProducer, NotificationService>(sp => sp.GetRequiredService<INotificationService>().As<NotificationService>()!);
-        services.AddSingleton<INotificationHandlerProducer, NotificationService>(sp => sp.GetRequiredService<INotificationService>().As<NotificationService>()!);
+        services.AddSingleton<INotificationProducer, NotificationService>(sp => sp.GetRequiredService<INotificationService>().Cast<NotificationService>());
+        services.AddSingleton<INotificationHandlerProducer, NotificationService>(sp => sp.GetRequiredService<INotificationService>().Cast<NotificationService>());
         services.AddSingleton<ILiveChartInitializer, LiveChartInitializer>();
         services.AddSingleton<IImageCache, ImageCache>();
         services.AddSingleton<ISoundService, SoundService>();
@@ -190,6 +192,8 @@ public static class ProjectConfiguration
         services.AddSingleton<ITradeAlertingService, TradeAlertingService>();
         services.AddSingleton<IModsManager, ModsManager>();
         services.AddSingleton<IGuildwarsMemoryCache, GuildwarsMemoryCache>();
+        services.AddScoped<IBrowserExtensionsManager, BrowserExtensionsManager>();
+        services.AddScoped<IBrowserExtensionsProducer, BrowserExtensionsManager>(sp => sp.GetRequiredService<IBrowserExtensionsManager>().Cast<BrowserExtensionsManager>());
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
         services.AddScoped<IScreenshotProvider, ScreenshotProvider>();
@@ -390,6 +394,12 @@ public static class ProjectConfiguration
         modsManager.RegisterMod<IUModService, UModService>();
         modsManager.RegisterMod<IDSOALService, DSOALService>();
         modsManager.RegisterMod<IGuildwarsScreenPlacer, GuildwarsScreenPlacer>();
+    }
+
+    public static void RegisterBrowserExtensions(IBrowserExtensionsProducer browserExtensionsProducer)
+    {
+        browserExtensionsProducer.ThrowIfNull();
+        browserExtensionsProducer.RegisterExtension<AdBlockService>();
     }
 
     private static void RegisterLiteCollection<TCollectionType, TOptionsType>(IServiceCollection services)
