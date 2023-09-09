@@ -53,10 +53,10 @@ public sealed class ScreenManager : IScreenManager, IApplicationLifetimeService
 
         // Validate that the desired position will be at least partially on screen.
         var validPosition = false;
+        var desiredRect = new Rect(desiredX, desiredY, desiredWidth, desiredHeight);
         foreach(var screen in this.Screens)
         {
-            if (desiredX < screen.Size.Right - 10 &&
-                desiredY < screen.Size.Bottom - 10)
+            if (desiredRect.IntersectsWith(screen.Size))
             {
                 validPosition = true;
                 break;
