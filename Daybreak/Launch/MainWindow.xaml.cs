@@ -93,7 +93,7 @@ public partial class MainWindow : MetroWindow
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         this.SetupImageCycle();
-        this.CheckForUpdates();
+        this.viewManager.ShowView<LauncherView>();
     }
 
     private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -242,25 +242,6 @@ public partial class MainWindow : MetroWindow
 
             this.WindowButtonCommands.Foreground = this.Foreground;
         }
-    }
-
-    private async void CheckForUpdates()
-    {
-        var updateAvailable = this.launcherOptions.Value.AutoCheckUpdate is true && await this.applicationUpdater.UpdateAvailable().ConfigureAwait(true);
-        if (updateAvailable)
-        {
-            this.viewManager.ShowView<AskUpdateView>();
-        }
-        else
-        {
-            this.viewManager.ShowView<LauncherView>();
-            this.PeriodicallyCheckForUpdates();
-        }
-    }
-
-    private void PeriodicallyCheckForUpdates()
-    {
-        this.applicationUpdater.PeriodicallyCheckForUpdates();
     }
 
     private void SetupMenuService()

@@ -9,7 +9,7 @@ public sealed class Version : IEquatable<Version>, IComparable<Version>
 {
     private List<VersionToken> parts = new();
 
-    public bool HasPrefix { get; private set; }
+    public bool HasPrefix { get; set; }
     public IEnumerable<VersionToken> VersionTokens { get => this.parts; }
     public string VersionString { get => this.ToString(); }
 

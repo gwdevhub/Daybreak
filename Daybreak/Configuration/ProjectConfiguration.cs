@@ -231,7 +231,6 @@ public static class ProjectConfiguration
 
         viewProducer.RegisterPermanentView<Views.FocusView>();
         viewProducer.RegisterView<LauncherView>();
-        viewProducer.RegisterView<AskUpdateView>();
         viewProducer.RegisterView<UpdateView>();
         viewProducer.RegisterView<AccountsView>();
         viewProducer.RegisterView<ExecutablesView>();
@@ -382,6 +381,7 @@ public static class ProjectConfiguration
         notificationHandlerProducer.RegisterNotificationHandler<MessageBoxHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<TradeMessageNotificationHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<FixSymbolicLinkNotificationHandler>();
+        notificationHandlerProducer.RegisterNotificationHandler<UpdateNotificationHandler>();
     }
 
     public static void RegisterMods(IModsManager modsManager)
