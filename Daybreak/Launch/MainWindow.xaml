@@ -10,6 +10,7 @@
         xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
         xmlns:glyphs="clr-namespace:Daybreak.Controls.Glyphs"
         xmlns:notifications="clr-namespace:Daybreak.Controls.Notifications"
+        xmlns:converters="clr-namespace:Daybreak.Converters"
         WindowStyle="None"
         ResizeMode="CanResize"
         Loaded="Window_Loaded"
@@ -22,6 +23,8 @@
     <Window.Resources>
         <ResourceDictionary>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
+            <converters:DoubleMultiplierConverter x:Key="FifthValueConverter" Multiplier="0.5"></converters:DoubleMultiplierConverter>
+            <converters:DoubleMultiplierConverter x:Key="TenthValueConverter" Multiplier="0.1"></converters:DoubleMultiplierConverter>
             <Style x:Key="Window_SettingsButton" TargetType="ToggleButton">
                 <Setter Property="Template">
                     <Setter.Value>
@@ -65,11 +68,12 @@
         </Grid.ColumnDefinitions>
         <Border BorderBrush="Transparent" BorderThickness="0" Grid.RowSpan="2" Grid.ColumnSpan="2">
             <Border.Effect>
-                <BlurEffect Radius="5" KernelType="Gaussian" RenderingBias="Performance"></BlurEffect>
+                <effects:ContrastAdjust Brightness="0.01" Contrast="1.3"></effects:ContrastAdjust>
             </Border.Effect>
             <controls:ImageViewer x:Name="ImageViewer">
                 <controls:ImageViewer.Effect>
-                    <effects:LightStreak Attenuation="0.4" BrightThreshold="0.9"></effects:LightStreak>
+                    <effects:Kuwahara TexelWidth="200"
+                                      TexelHeight="50"></effects:Kuwahara>
                 </controls:ImageViewer.Effect>
             </controls:ImageViewer>
         </Border>

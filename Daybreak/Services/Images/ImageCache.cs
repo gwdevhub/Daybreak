@@ -55,7 +55,8 @@ public sealed class ImageCache : IImageCache
     public async Task<ImageSource?> GetImage(string? uri)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetImage), uri?.ToString() ?? string.Empty);
-        if (uri is null)
+        if (uri is null ||
+            !File.Exists(uri))
         {
             return default;
         }

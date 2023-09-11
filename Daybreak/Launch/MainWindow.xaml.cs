@@ -33,8 +33,7 @@ public partial class MainWindow : MetroWindow
 {
     private readonly IMenuServiceInitializer menuServiceInitializer;
     private readonly IViewManager viewManager;
-    private readonly IScreenshotProvider screenshotProvider;
-    private readonly IBloogumClient bloogumClient;
+    private readonly IBackgroundProvider backgroundProvider;
     private readonly IApplicationUpdater applicationUpdater;
     private readonly IPrivilegeManager privilegeManager;
     private readonly ILiveOptions<LauncherOptions> launcherOptions;
@@ -54,16 +53,14 @@ public partial class MainWindow : MetroWindow
     public MainWindow(
         IMenuServiceInitializer menuServiceInitializer,
         IViewManager viewManager,
-        IScreenshotProvider screenshotProvider,
-        IBloogumClient bloogumClient,
+        IBackgroundProvider backgroundProvider,
         IApplicationUpdater applicationUpdater,
         IPrivilegeManager privilegeManager,
         ILiveOptions<LauncherOptions> launcherOptions)
     {
         this.menuServiceInitializer = menuServiceInitializer.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
-        this.screenshotProvider = screenshotProvider.ThrowIfNull();
-        this.bloogumClient = bloogumClient.ThrowIfNull();
+        this.backgroundProvider = backgroundProvider.ThrowIfNull();
         this.applicationUpdater = applicationUpdater.ThrowIfNull();
         this.privilegeManager = privilegeManager.ThrowIfNull();
         this.launcherOptions = launcherOptions.ThrowIfNull();
@@ -112,26 +109,17 @@ public partial class MainWindow : MetroWindow
         TaskExtensions.RunPeriodicAsync(() => this.Dispatcher.Invoke(() => this.UpdateRandomImage()), TimeSpan.Zero, TimeSpan.FromSeconds(15), this.cancellationToken.Token);
     }
 
-    private void UpdateRandomImage()
+    private async void UpdateRandomImage()
     {
-        var maybeImage = this.screenshotProvider.GetRandomScreenShot();
-        maybeImage.Do(
-            onSome: (image) =>
-            {
-                this.SetImage(image);
-                this.CreditText = string.Empty;
-            },
-            onNone: async () =>
-            {
-                var maybeImageSource = await this.bloogumClient.GetImage(true).ConfigureAwait(true);
-                if (maybeImageSource is null)
-                {
-                    return;
-                }
+        var response = await this.backgroundProvider.GetBackground();
+        if (response.ImageSource is null)
+        {
+            this.CreditText = string.Empty;
+            return;
+        }
 
-                this.SetImage(maybeImageSource);
-                this.CreditText = "http://bloogum.net/guildwars";
-            });
+        this.CreditText = response.CreditText;
+        this.SetImage(response.ImageSource);
     }
 
     private void SettingsButton_Clicked(object sender, EventArgs e)
