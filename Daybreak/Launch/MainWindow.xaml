@@ -23,8 +23,6 @@
     <Window.Resources>
         <ResourceDictionary>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
-            <converters:DoubleMultiplierConverter x:Key="FifthValueConverter" Multiplier="0.5"></converters:DoubleMultiplierConverter>
-            <converters:DoubleMultiplierConverter x:Key="TenthValueConverter" Multiplier="0.1"></converters:DoubleMultiplierConverter>
             <Style x:Key="Window_SettingsButton" TargetType="ToggleButton">
                 <Setter Property="Template">
                     <Setter.Value>
