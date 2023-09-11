@@ -226,7 +226,7 @@ public sealed class DrawingService : IDrawingService, IDrawingModuleProducer
                         currentPosVector += increment;
                         if (!this.IsEntityOnScreen(new Position { X = (float)currentPosVector.X, Y = (float)currentPosVector.Y }, out var finalX, out var finalY))
                         {
-                            break;
+                            continue;
                         }
 
                         module.DrawPathFinding(finalX, finalY, this.finalEntitySize, bitmap, color, this.foregroundColor);
