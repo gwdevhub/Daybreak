@@ -11,6 +11,8 @@ using System.Core.Extensions;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Extensions;
+using System.Linq;
+using System.Logging;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,12 +25,16 @@ namespace Daybreak.Services.Pathfinding;
 /// </summary>
 public sealed class StupidPathfinder : IPathfinder
 {
-    private const string LatencyMetricName = "Pathfinding Latency";
-    private const string LatencyMetricUnit = "Milliseconds";
-    private const string LatencyMetricDescription = "Amount of milliseconds elapsed while running the pathfinding algorithm. P95 aggregation";
+    private const string PathfindingLatencyMetricName = "Pathfinding Latency";
+    private const string PathfindingLatencyMetricUnit = "Milliseconds";
+    private const string PathfindingLatencyMetricDescription = "Amount of milliseconds elapsed while running the pathfinding algorithm. P95 aggregation";
+    private const string OptimizationLatencyMetricName = "Pathfinding Optimization Latency";
+    private const string OptimizationLatencyMetricUnit = "Milliseconds";
+    private const string OptimizationLatencyMetricDescription = "Amount of milliseconds elapsed while running the pathfinding optimization algorithm. P95 aggregation";
     private const double PathStep = 1;
 
-    private readonly Histogram<long> latencyMetric;
+    private readonly Histogram<long> pathFindingLatencyMetric;
+    private readonly Histogram<long> optimizationLatencyMetric;
     private readonly ILiveOptions<PathfindingOptions> liveOptions;
     private readonly ILogger<StupidPathfinder> logger;
 
@@ -39,7 +45,8 @@ public sealed class StupidPathfinder : IPathfinder
     {
         this.liveOptions = liveOptions.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
-        this.latencyMetric = metricsService.ThrowIfNull().CreateHistogram<long>(LatencyMetricName, LatencyMetricUnit, LatencyMetricDescription, Daybreak.Models.Metrics.AggregationTypes.P95);
+        this.pathFindingLatencyMetric = metricsService.ThrowIfNull().CreateHistogram<long>(PathfindingLatencyMetricName, PathfindingLatencyMetricUnit, PathfindingLatencyMetricDescription, Daybreak.Models.Metrics.AggregationTypes.P95);
+        this.optimizationLatencyMetric = metricsService.ThrowIfNull().CreateHistogram<long>(OptimizationLatencyMetricName, OptimizationLatencyMetricUnit, OptimizationLatencyMetricDescription, Daybreak.Models.Metrics.AggregationTypes.P95);
     }
 
     public Task<Result<PathfindingResponse, PathfindingFailure>> CalculatePath(PathingData map, Point startPoint, Point endPoint, CancellationToken cancellationToken)
@@ -52,7 +59,7 @@ public sealed class StupidPathfinder : IPathfinder
                 var sw = Stopwatch.StartNew();
                 var result = this.CalculatePathInternal(map, startPoint, endPoint);
                 var ms = sw.ElapsedMilliseconds;
-                this.latencyMetric.Record(ms);
+                this.pathFindingLatencyMetric.Record(ms);
                 return result;
             }
             catch(Exception e)
@@ -110,12 +117,18 @@ public sealed class StupidPathfinder : IPathfinder
             endTrapezoid = newEndTrapezoid;
         }
 
+        /*
+         * First generate a list of trapezoids that should contain the final path
+         */
         if (this.GetTrapezoidPath(map, startTrapezoid, endTrapezoid, startPoint) is not List<int> pathList)
         {
             scopedLogger.LogInformation("Unable to find an initial path");
             return new PathfindingFailure.NoPathFound();
         }
 
+        /*
+         * Generate a list of points along the trapezoid path
+         */
         var pathfinding = new List<PathSegment>();
         var currentPoint = startPoint;
         var currentDirection = endPoint - currentPoint;
@@ -162,10 +175,93 @@ public sealed class StupidPathfinder : IPathfinder
         }
 
         pathfinding.Add(new PathSegment { StartPoint = currentPoint, EndPoint = endPoint });
+        pathfinding = this.OptimizePath(map, pathfinding, scopedLogger);
         return new PathfindingResponse
         {
             Pathing = pathfinding
         };
+    }
+
+    private List<PathSegment> OptimizePath(PathingData map, List<PathSegment> pathSegments, ScopedLogger<StupidPathfinder> scopedLogger)
+    {
+        if (!this.liveOptions.Value.OptimizePaths)
+        {
+            scopedLogger.LogInformation("Skipping path optimization due to performance issues");
+            return pathSegments;
+        }
+
+        var sw = Stopwatch.StartNew();
+        /*
+         * Optimize the final path by excluding redundant points.
+         * Remove points to generate new paths, then walk these new paths, checking discrete points
+         * that they are inside trapezoids.
+         */
+        var passes = 0;
+        var nodesRemoved = 0;
+        bool changed;
+        do
+        {
+            changed = false;
+            var increment = Math.Max(pathSegments.Count / 100, 1);
+            for (var i = 0; i < pathSegments.Count - 1; i += increment)
+            {
+                var firstSegment = pathSegments[i];
+                var secondSegment = pathSegments[i + 1];
+                var newSegmentStart = firstSegment.StartPoint;
+                var newSegmentEnd = secondSegment.EndPoint;
+                var direction = newSegmentEnd - newSegmentStart;
+                direction.Normalize();
+
+                var valid = true;
+                var newCurrentPoint = newSegmentStart;
+
+                /*
+                 * To improve performance, cache the current trapezoid. Very rarely the path crosses across multiple trapezoids. This way
+                 */
+                var maybeTrapezoid = GetContainingTrapezoid(map, newCurrentPoint);
+                while ((newSegmentEnd - newCurrentPoint).LengthSquared > 10000)
+                {
+                    newCurrentPoint += direction * 100;
+                    if (maybeTrapezoid is Trapezoid trapezoid &&
+                        !MathUtils.PointInsideTrapezoid(trapezoid, newCurrentPoint))
+                    {
+                        /*
+                         * If the current point is outside of the trapezoid we were traversing, try to find the new trapezoid it traverses.
+                         * First check the neighbors for the current trapezoid, then expand the search to all trapezoids
+                         */
+                        maybeTrapezoid = FindTrapezoidContainingPointFromNeighbors(map, trapezoid, newCurrentPoint);
+                        if (maybeTrapezoid is null)
+                        {
+                            maybeTrapezoid = GetContainingTrapezoid(map, newCurrentPoint);
+                        }
+                    }
+
+                    if (maybeTrapezoid is null)
+                    {
+                        valid = false;
+                        break;
+                    }
+                }
+
+                if (!valid)
+                {
+                    continue;
+                }
+
+                pathSegments.Remove(firstSegment);
+                pathSegments.Remove(secondSegment);
+                nodesRemoved++;
+                pathSegments.Insert(i, new PathSegment { StartPoint = newSegmentStart, EndPoint = newSegmentEnd });
+                i -= increment; // Stay on the same position to try and further optimize the current path segment
+                changed = true;
+            }
+
+            passes++;
+        } while (changed);
+
+        scopedLogger.LogInformation($"Optimized path after {passes} passes. Removed {nodesRemoved} nodes");
+        this.optimizationLatencyMetric.Record(sw.ElapsedMilliseconds);
+        return pathSegments;
     }
 
     private static Trapezoid? GetContainingTrapezoid(PathingData map, Point point)
@@ -353,6 +449,20 @@ public sealed class StupidPathfinder : IPathfinder
             if (MathUtils.LineSegmentsIntersect(p1, p2, p3, p4, out var intersectionPoint, epsilon: 0.1))
             {
                 return intersectionPoint;
+            }
+        }
+
+        return default;
+    }
+
+    private static Trapezoid? FindTrapezoidContainingPointFromNeighbors(PathingData map, Trapezoid currentTrapezoid, Point currentPoint)
+    {
+        var neighbors = map.ComputedAdjacencyList[currentTrapezoid.Id].Select(id => map.Trapezoids[id]);
+        foreach(var neighbor in neighbors)
+        {
+            if (MathUtils.PointInsideTrapezoid(neighbor, currentPoint))
+            {
+                return neighbor;
             }
         }
 
