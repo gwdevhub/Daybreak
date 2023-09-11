@@ -223,6 +223,7 @@ public static class ProjectConfiguration
         services.AddScoped<IItemHashService, ItemHashService>();
         services.AddScoped<IRegistryService, RegistryService>();
         services.AddScoped<IEventNotifierService, EventNotifierService>();
+        services.AddScoped<IBackgroundProvider, BackgroundProvider>();
     }
 
     public static void RegisterViews(IViewProducer viewProducer)
@@ -349,6 +350,8 @@ public static class ProjectConfiguration
 
         optionsProducer.RegisterOptions<MemoryReaderOptions>();
         optionsProducer.RegisterOptions<ImageCacheOptions>();
+
+        optionsProducer.RegisterOptions<BackgroundProviderOptions>();
 
         optionsProducer.RegisterOptions<ToolboxOptions>();
         optionsProducer.RegisterOptions<UModOptions>();

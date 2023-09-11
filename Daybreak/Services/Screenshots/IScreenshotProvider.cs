@@ -1,11 +1,9 @@
-﻿using System.Extensions;
-using System.Windows.Extensions.Services;
+﻿using System.Threading.Tasks;
 using System.Windows.Media;
 
 namespace Daybreak.Services.Screenshots;
 
-public interface IScreenshotProvider : IApplicationLifetimeService
+public interface IScreenshotProvider
 {
-    Optional<ImageSource> GetRandomScreenShot();
-    Optional<ImageSource> GetScreenshot(string name);
+    Task<ImageSource?> GetRandomScreenShot();
 }
