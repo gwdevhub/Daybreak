@@ -65,11 +65,11 @@ public partial class ChromiumBrowserWrapper : UserControl
     [GenerateDependencyProperty(InitialValue = true)]
     private bool controlsEnabled;
     [GenerateDependencyProperty(InitialValue = false)]
-    private bool browserSupported;
+    private bool browserSupported = false;
     [GenerateDependencyProperty]
     private bool addressBarReadonly;
     [GenerateDependencyProperty(InitialValue = false)]
-    private bool browserEnabled;
+    private bool browserEnabled = false;
     [GenerateDependencyProperty]
     private bool navigating;
     [GenerateDependencyProperty]
@@ -147,19 +147,22 @@ public partial class ChromiumBrowserWrapper : UserControl
     {
         try
         {
-            if (CoreWebView2Environment is not null)
+            lock (Lock)
             {
+                if (CoreWebView2Environment is not null)
+                {
+                    this.BrowserSupported = true;
+                    return;
+                }
+
+                CoreWebView2Environment ??= System.Extensions.TaskExtensions.RunSync(() => CoreWebView2Environment.CreateAsync(null, "BrowserData", new CoreWebView2EnvironmentOptions
+                {
+                    EnableTrackingPrevention = true,
+                    AllowSingleSignOnUsingOSPrimaryAccount = true
+                }));
+
                 this.BrowserSupported = true;
-                return;
             }
-
-            CoreWebView2Environment ??= System.Extensions.TaskExtensions.RunSync(() => CoreWebView2Environment.CreateAsync(null, "BrowserData", new CoreWebView2EnvironmentOptions
-            {
-                EnableTrackingPrevention = true,
-                AllowSingleSignOnUsingOSPrimaryAccount = true
-            }));
-
-            this.BrowserSupported = true;
         }
         catch(Exception e)
         {

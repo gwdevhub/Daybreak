@@ -114,7 +114,7 @@ public partial class MainWindow : MetroWindow
         var response = await this.backgroundProvider.GetBackground();
         if (response.ImageSource is null)
         {
-            this.CreditText = string.Empty;
+            // Since image will not change, do not change CreditText
             return;
         }
 
