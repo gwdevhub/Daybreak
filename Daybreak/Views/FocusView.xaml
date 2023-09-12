@@ -9,6 +9,8 @@
              xmlns:converters="clr-namespace:Daybreak.Converters"
              xmlns:templates="clr-namespace:Daybreak.Controls.Templates"
              xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
+             xmlns:interactivity="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:behaviors="clr-namespace:Daybreak.Behaviors"
              xmlns:components="clr-namespace:Daybreak.Controls.FocusViewComponents"
              mc:Ignorable="d" 
              Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
@@ -21,6 +23,8 @@
         <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" TriggerValue="True" />
         <converters:BooleanToGridLengthConverter x:Key="InventoryComponentVisibilityConverter" VisibleValue="1*" />
         <converters:BooleanToGridLengthConverter x:Key="MinimapComponentVisibilityConverter" VisibleValue="1*" />
+        <converters:BooleanToGridLengthConverter x:Key="BrowserComponentVisibilityConverter" VisibleValue="1.5*" />
+        <converters:BooleanToGridLengthConverter x:Key="MarginVisibilityConverter" VisibleValue="10" />
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -70,16 +74,18 @@
         </Grid>
         <Grid Grid.Column="1"
               Margin="5, 0, 5, 0">
+            <interactivity:Interaction.Behaviors>
+                <behaviors:RowAutoMargin Margin="10"></behaviors:RowAutoMargin>
+            </interactivity:Interaction.Behaviors>
             <Grid.RowDefinitions>
                 <RowDefinition Height="{Binding ElementName=_this, Path=InventoryVisible, Mode=OneWay, Converter={StaticResource InventoryComponentVisibilityConverter}}" />
                 <RowDefinition Height="{Binding ElementName=_this, Path=MinimapVisible, Mode=OneWay, Converter={StaticResource MinimapComponentVisibilityConverter}}" />
-                <RowDefinition Height="1.5*"/>
+                <RowDefinition Height="{Binding ElementName=Browser, Path=BrowserSupported, Mode=OneWay, Converter={StaticResource BrowserComponentVisibilityConverter}}" />
             </Grid.RowDefinitions>
             <Grid x:Name="InventoryHolder"
                   MaxHeight="250">
                 <Grid x:Name="InventoryComponent"
-                      Visibility="{Binding ElementName=_this, Path=InventoryVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                      Margin="0, 0, 0, 10">
+                      Visibility="{Binding ElementName=_this, Path=InventoryVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <components:InventoryComponent
                                                DataContext="{Binding ElementName=_this, Path=InventoryData, Mode=OneWay}"
                                                MaximizeClicked="InventoryComponent_MaximizeClicked"
@@ -90,8 +96,7 @@
                 </Grid>
             </Grid>
             <Grid x:Name="MinimapHolder"
-                  Grid.Row="1"
-                  Margin="0, 0, 0, 10">
+                  Grid.Row="1">
                 <Grid x:Name="MinimapComponent"
                       Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <minimap:GuildwarsMinimap x:Name="Minimap"

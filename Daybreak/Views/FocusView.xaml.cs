@@ -34,19 +34,19 @@ public partial class FocusView : UserControl
     private readonly ILogger<FocusView> logger;
 
     [GenerateDependencyProperty]
-    private InventoryData inventoryData;
+    private InventoryData inventoryData = new();
 
     [GenerateDependencyProperty]
-    private GameData gameData;
+    private GameData gameData = new();
 
     [GenerateDependencyProperty]
     private bool mainPlayerDataValid;
 
     [GenerateDependencyProperty]
-    private PathingData pathingData;
+    private PathingData pathingData = new();
 
     [GenerateDependencyProperty]
-    private MainPlayerResourceContext mainPlayerResourceContext;
+    private MainPlayerResourceContext mainPlayerResourceContext = new();
 
     [GenerateDependencyProperty]
     private bool loadingPathingData;
@@ -84,8 +84,6 @@ public partial class FocusView : UserControl
         this.viewManager = viewManager.ThrowIfNull();
         this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
-        this.gameData = new GameData();
-        this.pathingData = new PathingData();
 
         this.InitializeComponent();
     }
