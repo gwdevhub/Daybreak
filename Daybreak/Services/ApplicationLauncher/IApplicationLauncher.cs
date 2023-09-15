@@ -8,6 +8,7 @@ public interface IApplicationLauncher
     bool IsGuildwarsRunning { get; }
     Process? RunningGuildwarsProcess { get; }
     Task<Process?> LaunchGuildwars();
+    void RestartDaybreak();
     void RestartDaybreakAsAdmin();
     void RestartDaybreakAsNormalUser();
 }

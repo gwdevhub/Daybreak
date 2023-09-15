@@ -135,6 +135,11 @@ public partial class MenuList : UserControl
         this.viewManager.ShowView<NotificationsView>();
     }
 
+    private void PluginsButton_Clicked(object sender, EventArgs e)
+    {
+        this.viewManager.ShowView<PluginsView>();
+    }
+
     private void TradeAlertsButton_Clicked(object sender, EventArgs e)
     {
         this.viewManager.ShowView<TradeAlertsView>();

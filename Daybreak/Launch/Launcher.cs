@@ -5,6 +5,7 @@ using Daybreak.Services.Mods;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Notifications;
 using Daybreak.Services.Options;
+using Daybreak.Services.Plugins;
 using Daybreak.Services.Startup;
 using Daybreak.Services.Updater.PostUpdate;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +23,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
 {
     public readonly static Launcher Instance = new();
 
+    private readonly ProjectConfiguration projectConfiguration = new();
     private ILogger? logger;
     private IExceptionHandler? exceptionHandler;
 
@@ -37,14 +39,13 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
     protected override System.IServiceProvider SetupServiceProvider(IServiceCollection services)
     {
         var serviceManager = new ServiceManager();
-        ProjectConfiguration.RegisterResolvers(serviceManager);
-        ProjectConfiguration.RegisterLiteCollections(services);
+        this.projectConfiguration.RegisterResolvers(serviceManager);
         return services.BuildSlimServiceProvider(serviceManager);
     }
 
     protected override void RegisterServices(IServiceCollection services)
     {
-        ProjectConfiguration.RegisterServices(services);
+        this.projectConfiguration.RegisterServices(services);
     }
 
     protected override bool HandleException(Exception e)
@@ -54,16 +55,44 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
 
     protected override void ApplicationStarting()
     {
-        ProjectConfiguration.RegisterOptions(this.ServiceProvider.GetRequiredService<IOptionsProducer>()!);
-        ProjectConfiguration.RegisterViews(this.ServiceProvider.GetRequiredService<IViewManager>()!);
-        ProjectConfiguration.RegisterPostUpdateActions(this.ServiceProvider.GetRequiredService<IPostUpdateActionProducer>()!);
-        ProjectConfiguration.RegisterStartupActions(this.ServiceProvider.GetRequiredService<IStartupActionProducer>()!);
-        ProjectConfiguration.RegisterDrawingModules(this.ServiceProvider.GetRequiredService<IDrawingModuleProducer>()!);
-        ProjectConfiguration.RegisterNotificationHandlers(this.ServiceProvider.GetRequiredService<INotificationHandlerProducer>()!);
-        ProjectConfiguration.RegisterMods(this.ServiceProvider.GetRequiredService<IModsManager>()!);
+        var serviceManager = this.ServiceProvider.GetRequiredService<IServiceManager>();
+        var optionsProducer = this.ServiceProvider.GetRequiredService<IOptionsProducer>();
+        var viewProducer = this.ServiceProvider.GetRequiredService<IViewManager>();
+        var postUpdateActionProducer = this.ServiceProvider.GetRequiredService<IPostUpdateActionProducer>();
+        var startupActionProducer = this.ServiceProvider.GetRequiredService<IStartupActionProducer>();
+        var drawingModuleProducer = this.ServiceProvider.GetRequiredService<IDrawingModuleProducer>();
+        var notificationHandlerProducer = this.ServiceProvider.GetRequiredService<INotificationHandlerProducer>();
+        var modsManager = this.ServiceProvider.GetRequiredService<IModsManager>();
+        this.projectConfiguration.RegisterOptions(optionsProducer);
+        this.projectConfiguration.RegisterViews(viewProducer);
+        this.projectConfiguration.RegisterPostUpdateActions(postUpdateActionProducer);
+        this.projectConfiguration.RegisterStartupActions(startupActionProducer);
+        this.projectConfiguration.RegisterDrawingModules(drawingModuleProducer);
+        this.projectConfiguration.RegisterNotificationHandlers(notificationHandlerProducer);
+        this.projectConfiguration.RegisterMods(modsManager);
 
         this.logger = this.ServiceProvider.GetRequiredService<ILogger<Launcher>>();
         this.exceptionHandler = this.ServiceProvider.GetRequiredService<IExceptionHandler>();
+
+        try
+        {
+            this.ServiceProvider.GetRequiredService<IPluginsService>()
+                .LoadPlugins(
+                    serviceManager,
+                    optionsProducer,
+                    viewProducer,
+                    postUpdateActionProducer,
+                    startupActionProducer,
+                    drawingModuleProducer,
+                    notificationHandlerProducer,
+                    modsManager);
+        }
+        catch(Exception e)
+        {
+            this.logger.LogError(e, "Encountered exception while loading plugins. Aborting...");
+            this.exceptionHandler.HandleException(e);
+        }
+
         this.RegisterViewContainer();
     }
 

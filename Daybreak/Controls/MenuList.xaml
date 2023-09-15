@@ -99,6 +99,14 @@
                     </buttons:MenuButton>
                 </local:ExpandableMenuSection.Children>
             </local:ExpandableMenuSection>
+            <buttons:MenuButton FontSize="16"
+                Height="30"
+                Title="Plugins"
+                Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                BorderThickness="0, 0, 0, 1"
+                Clicked="PluginsButton_Clicked"/>
             <local:ExpandableMenuSection
             SectionTitle="Mods" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
             FontSize="16">
