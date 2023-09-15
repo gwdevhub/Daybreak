@@ -90,6 +90,18 @@ public class ApplicationLauncher : IApplicationLauncher
             .ExtractValue();
     }
 
+    public void RestartDaybreak()
+    {
+        if (this.privilegeManager.AdminPrivileges)
+        {
+            this.RestartDaybreakAsAdmin();
+        }
+        else
+        {
+            this.RestartDaybreakAsNormalUser();
+        }
+    }
+
     public void RestartDaybreakAsAdmin()
     {
         this.logger.LogInformation("Restarting daybreak with admin rights");

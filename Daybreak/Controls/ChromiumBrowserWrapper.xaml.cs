@@ -267,7 +267,6 @@ public partial class ChromiumBrowserWrapper : UserControl
             }
         };
 
-        this.WebBrowser.CoreWebView2.Settings.AreDevToolsEnabled = ProjectConfiguration.CurrentConfiguration == "Debug";
         this.WebBrowser.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
         if (this.CanDownloadBuild)
         {
