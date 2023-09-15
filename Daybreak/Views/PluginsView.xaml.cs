@@ -38,15 +38,13 @@ public partial class PluginsView : UserControl
 
     private void SaveButton_Clicked(object sender, EventArgs e)
     {
-        var availablePlugins = this.pluginsService.GetAvailablePlugins().ToList();
-        var modifiedPlugins = this.AvailablePlugins.ToList();
-        if (availablePlugins.Count != modifiedPlugins.Count ||
-            modifiedPlugins.Any(p => availablePlugins.None(p2 => p.Path == p2.Path)) || // The new list contains elements that the old list doesn't have
-            availablePlugins.Any(p => modifiedPlugins.None(p2 => p.Path == p2.Path)) || // The old list contains elements that the new list doesn't have
-            modifiedPlugins.Any(p => p.Enabled != availablePlugins.FirstOrDefault(p2 => p2.Path == p.Path)?.Enabled)) // The state of the plugins differs
+        var currentlyLoadedPlugins = this.pluginsService.GetCurrentlyLoadedPlugins().ToList();
+        var pluginsToBeLoaded = this.AvailablePlugins.Where(p => p.Enabled).ToList();
+        this.pluginsService.SaveEnabledPlugins(pluginsToBeLoaded);
+        if (pluginsToBeLoaded.Any(p => currentlyLoadedPlugins.None(p2 => p2.Path == p.Path)) || // If the first list contains elements not present in the second list
+            currentlyLoadedPlugins.Any(p => pluginsToBeLoaded.None(p2 => p2.Path == p.Path))) // If the second list contains elements not present in the first list
         {
-            this.pluginsService.SaveEnabledPlugins(modifiedPlugins);
-            this.viewManager.ShowView<PluginsConfirmationView>(modifiedPlugins);
+            this.viewManager.ShowView<PluginsConfirmationView>();
             return;
         }
 
