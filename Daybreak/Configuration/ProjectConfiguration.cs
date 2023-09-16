@@ -184,6 +184,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IModsManager, ModsManager>();
         services.AddSingleton<IGuildwarsMemoryCache, GuildwarsMemoryCache>();
         services.AddSingleton<IPluginsService, PluginsService>();
+        services.AddSingleton<ISplashScreenService, SplashScreenService>();
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
         services.AddScoped<IScreenshotProvider, ScreenshotProvider>();

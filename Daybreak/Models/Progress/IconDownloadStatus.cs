@@ -21,7 +21,7 @@ public sealed class IconDownloadStatus : INotifyPropertyChanged
         set
         {
             this.currentStep = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CurrentStep)));
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CurrentStep)));
         }
     }
 

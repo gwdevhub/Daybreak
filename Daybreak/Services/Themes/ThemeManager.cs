@@ -1,4 +1,5 @@
-﻿using Daybreak.Configuration.Options;
+﻿using ControlzEx.Theming;
+using Daybreak.Configuration.Options;
 using Daybreak.Launch;
 using Daybreak.Models;
 using Daybreak.Services.Options;
@@ -27,6 +28,7 @@ public sealed class ThemeManager : IThemeManager, IApplicationLifetimeService
     {
         this.themeOptions = themeOptions.ThrowIfNull();
         optionsUpdateHook.ThrowIfNull().RegisterHook<ThemeOptions>(this.UpdateTheme);
+        this.SetCurrentTheme();
     }
 
     public Color GetForegroundColor()
@@ -39,13 +41,20 @@ public sealed class ThemeManager : IThemeManager, IApplicationLifetimeService
         return (Color)mahAppsResources!["MahApps.Colors.ThemeForeground"];
     }
 
+    public Theme GetCurrentTheme()
+    {
+        var themeManager = ControlzEx.Theming.ThemeManager.Current;
+        var mode = this.themeOptions.Value.DarkMode ? DarkMode : LightMode;
+        var theme = this.themeOptions.Value.Theme.ToString();
+        return themeManager.GetTheme(mode, theme)!;
+    }
+
     public void OnClosing()
     {
     }
 
     public void OnStartup()
     {
-        this.SetCurrentTheme();
     }
 
     private void UpdateTheme()
