@@ -4,6 +4,7 @@ using Daybreak.Services.IconRetrieve;
 using Daybreak.Services.Menu;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Privilege;
+using Daybreak.Services.Screens;
 using Daybreak.Services.Screenshots;
 using Daybreak.Services.Updater;
 using Daybreak.Views;
@@ -31,6 +32,7 @@ namespace Daybreak.Launch;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
 public partial class MainWindow : MetroWindow
 {
+    private readonly ISplashScreenService splashScreenService;
     private readonly IMenuServiceInitializer menuServiceInitializer;
     private readonly IViewManager viewManager;
     private readonly IBackgroundProvider backgroundProvider;
@@ -51,6 +53,7 @@ public partial class MainWindow : MetroWindow
     public event EventHandler<MainWindow>? WindowParametersChanged;
 
     public MainWindow(
+        ISplashScreenService splashScreenService,
         IMenuServiceInitializer menuServiceInitializer,
         IViewManager viewManager,
         IBackgroundProvider backgroundProvider,
@@ -58,6 +61,7 @@ public partial class MainWindow : MetroWindow
         IPrivilegeManager privilegeManager,
         ILiveOptions<LauncherOptions> launcherOptions)
     {
+        this.splashScreenService = splashScreenService.ThrowIfNull();
         this.menuServiceInitializer = menuServiceInitializer.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
         this.backgroundProvider = backgroundProvider.ThrowIfNull();
@@ -89,6 +93,7 @@ public partial class MainWindow : MetroWindow
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
+        this.splashScreenService.HideSplashScreen();
         this.SetupImageCycle();
         this.viewManager.ShowView<LauncherView>();
     }

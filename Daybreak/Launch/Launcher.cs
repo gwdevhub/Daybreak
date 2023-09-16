@@ -1,4 +1,5 @@
 ﻿using Daybreak.Configuration;
+using Daybreak.Models.Progress;
 using Daybreak.Services.Drawing;
 using Daybreak.Services.ExceptionHandling;
 using Daybreak.Services.Mods;
@@ -6,6 +7,7 @@ using Daybreak.Services.Navigation;
 using Daybreak.Services.Notifications;
 using Daybreak.Services.Options;
 using Daybreak.Services.Plugins;
+using Daybreak.Services.Screens;
 using Daybreak.Services.Startup;
 using Daybreak.Services.Updater.PostUpdate;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +15,8 @@ using Microsoft.Extensions.Logging;
 using Slim;
 using Slim.Integration.ServiceCollection;
 using System;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Extensions;
 using System.Windows.Media;
@@ -40,6 +44,8 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
     {
         var serviceManager = new ServiceManager();
         this.projectConfiguration.RegisterResolvers(serviceManager);
+        serviceManager.RegisterSingleton<SplashWindow>();
+        serviceManager.RegisterSingleton<StartupStatus>();
         return services.BuildSlimServiceProvider(serviceManager);
     }
 
@@ -55,6 +61,13 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
 
     protected override void ApplicationStarting()
     {
+        /*
+         * Show splash screen before beginning to load the rest of the application.
+         * MainWindow will call HideSplashScreen() on Loaded event
+         */
+        var startupStatus = this.ServiceProvider.GetRequiredService<StartupStatus>();
+        this.ServiceProvider.GetRequiredService<ISplashScreenService>().ShowSplashScreen();
+
         var serviceManager = this.ServiceProvider.GetRequiredService<IServiceManager>();
         var optionsProducer = this.ServiceProvider.GetRequiredService<IOptionsProducer>();
         var viewProducer = this.ServiceProvider.GetRequiredService<IViewManager>();
@@ -63,12 +76,19 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
         var drawingModuleProducer = this.ServiceProvider.GetRequiredService<IDrawingModuleProducer>();
         var notificationHandlerProducer = this.ServiceProvider.GetRequiredService<INotificationHandlerProducer>();
         var modsManager = this.ServiceProvider.GetRequiredService<IModsManager>();
+        startupStatus.CurrentStep = StartupStatus.Custom("Loading options");
         this.projectConfiguration.RegisterOptions(optionsProducer);
+        startupStatus.CurrentStep = StartupStatus.Custom("Loading views");
         this.projectConfiguration.RegisterViews(viewProducer);
+        startupStatus.CurrentStep = StartupStatus.Custom("Loading post-update actions");
         this.projectConfiguration.RegisterPostUpdateActions(postUpdateActionProducer);
+        startupStatus.CurrentStep = StartupStatus.Custom("Loading startup actions");
         this.projectConfiguration.RegisterStartupActions(startupActionProducer);
+        startupStatus.CurrentStep = StartupStatus.Custom("Loading drawing modules");
         this.projectConfiguration.RegisterDrawingModules(drawingModuleProducer);
+        startupStatus.CurrentStep = StartupStatus.Custom("Loading notification handlers");
         this.projectConfiguration.RegisterNotificationHandlers(notificationHandlerProducer);
+        startupStatus.CurrentStep = StartupStatus.Custom("Loading mods");
         this.projectConfiguration.RegisterMods(modsManager);
 
         this.logger = this.ServiceProvider.GetRequiredService<ILogger<Launcher>>();
@@ -76,6 +96,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
 
         try
         {
+            startupStatus.CurrentStep = StartupStatus.Custom("Loading plugins");
             this.ServiceProvider.GetRequiredService<IPluginsService>()
                 .LoadPlugins(
                     serviceManager,
@@ -93,7 +114,9 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
             this.exceptionHandler.HandleException(e);
         }
 
+        startupStatus.CurrentStep = StartupStatus.Custom("Registering view container");
         this.RegisterViewContainer();
+        startupStatus.CurrentStep = StartupStatus.Finished;
     }
 
     protected override void ApplicationClosing()
@@ -106,7 +129,6 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
         var mainWindow = this.ServiceProvider.GetRequiredService<MainWindow>();
         viewManager.RegisterContainer(mainWindow.Container);
     }
-
 
     private static int LaunchMainWindow()
     {
