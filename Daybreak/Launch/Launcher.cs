@@ -15,8 +15,6 @@ using Microsoft.Extensions.Logging;
 using Slim;
 using Slim.Integration.ServiceCollection;
 using System;
-using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Windows;
 using System.Windows.Extensions;
 using System.Windows.Media;
