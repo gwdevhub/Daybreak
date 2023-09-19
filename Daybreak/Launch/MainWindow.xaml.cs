@@ -3,6 +3,7 @@ using Daybreak.Services.Bloogum;
 using Daybreak.Services.IconRetrieve;
 using Daybreak.Services.Menu;
 using Daybreak.Services.Navigation;
+using Daybreak.Services.Options;
 using Daybreak.Services.Privilege;
 using Daybreak.Services.Screens;
 using Daybreak.Services.Screenshots;
@@ -39,6 +40,7 @@ public partial class MainWindow : MetroWindow
     private readonly IApplicationUpdater applicationUpdater;
     private readonly IPrivilegeManager privilegeManager;
     private readonly ILiveOptions<LauncherOptions> launcherOptions;
+    private readonly ILiveOptions<ThemeOptions> themeOptions;
     private readonly CancellationTokenSource cancellationToken = new();
 
     [GenerateDependencyProperty]
@@ -49,6 +51,10 @@ public partial class MainWindow : MetroWindow
     private bool isRunningAsAdmin;
     [GenerateDependencyProperty]
     private bool isShowingDropdown;
+    [GenerateDependencyProperty]
+    private bool paintifyBackground;
+    [GenerateDependencyProperty]
+    private bool blurBackground;
 
     public event EventHandler<MainWindow>? WindowParametersChanged;
 
@@ -59,7 +65,9 @@ public partial class MainWindow : MetroWindow
         IBackgroundProvider backgroundProvider,
         IApplicationUpdater applicationUpdater,
         IPrivilegeManager privilegeManager,
-        ILiveOptions<LauncherOptions> launcherOptions)
+        IOptionsUpdateHook optionsUpdateHook,
+        ILiveOptions<LauncherOptions> launcherOptions,
+        ILiveOptions<ThemeOptions> themeOptions)
     {
         this.splashScreenService = splashScreenService.ThrowIfNull();
         this.menuServiceInitializer = menuServiceInitializer.ThrowIfNull();
@@ -68,10 +76,14 @@ public partial class MainWindow : MetroWindow
         this.applicationUpdater = applicationUpdater.ThrowIfNull();
         this.privilegeManager = privilegeManager.ThrowIfNull();
         this.launcherOptions = launcherOptions.ThrowIfNull();
+        this.themeOptions = themeOptions.ThrowIfNull();
+        optionsUpdateHook.ThrowIfNull().RegisterHook<ThemeOptions>(this.ThemeOptionsChanged);
         this.InitializeComponent();
         this.CurrentVersionText = this.applicationUpdater.CurrentVersion.ToString();
         this.IsRunningAsAdmin = this.privilegeManager.AdminPrivileges;
+        this.ThemeOptionsChanged();
         this.SetupMenuService();
+
     }
 
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -107,6 +119,12 @@ public partial class MainWindow : MetroWindow
         }
 
         this.DragMove();
+    }
+
+    private void ThemeOptionsChanged()
+    {
+        this.PaintifyBackground = this.themeOptions.Value.BackgroundPaintify;
+        this.BlurBackground = this.themeOptions.Value.BackgroundBlur;
     }
 
     private void SetupImageCycle()
