@@ -22,7 +22,10 @@
         d:DesignHeight="450" d:DesignWidth="800">
     <Window.Resources>
         <ResourceDictionary>
-            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <converters:BooleanToEffectConverter x:Key="BooleanToEffectConverter" />
+            <effects:Kuwahara x:Key="PaintifyEffect" TexelWidth="200" TexelHeight="50" />
+            <BlurEffect x:Key="BlurEffect" Radius="3" RenderingBias="Performance" KernelType="Box" />
             <Style x:Key="Window_SettingsButton" TargetType="ToggleButton">
                 <Setter Property="Template">
                     <Setter.Value>
@@ -66,14 +69,14 @@
         </Grid.ColumnDefinitions>
         <Border BorderBrush="Transparent" BorderThickness="0" Grid.RowSpan="2" Grid.ColumnSpan="2">
             <Border.Effect>
-                <effects:ContrastAdjust Brightness="0.01" Contrast="1.3"></effects:ContrastAdjust>
+                <effects:ContrastAdjust Brightness="0.01"
+                                        Contrast="1.3" />
             </Border.Effect>
-            <controls:ImageViewer x:Name="ImageViewer">
-                <controls:ImageViewer.Effect>
-                    <effects:Kuwahara TexelWidth="200"
-                                      TexelHeight="50"></effects:Kuwahara>
-                </controls:ImageViewer.Effect>
-            </controls:ImageViewer>
+            <Border Effect="{Binding ElementName=_this, Path=BlurBackground, Mode=OneWay, Converter={StaticResource BooleanToEffectConverter}, ConverterParameter={StaticResource BlurEffect}}">
+                <Border Effect="{Binding ElementName=_this, Path=PaintifyBackground, Mode=OneWay, Converter={StaticResource BooleanToEffectConverter}, ConverterParameter={StaticResource PaintifyEffect}}">
+                    <controls:ImageViewer x:Name="ImageViewer" />
+                </Border>
+            </Border>
         </Border>
         <Rectangle Fill="Transparent"
                    MouseDown="Window_MouseLeftButtonDown"
