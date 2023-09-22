@@ -7,5 +7,7 @@ public interface IToolboxService : IModService
 {
     bool LoadToolboxFromDisk();
 
+    bool LoadToolboxFromUsualLocation();
+
     Task<bool> SetupToolbox(ToolboxInstallationStatus toolboxInstallationStatus);
 }
