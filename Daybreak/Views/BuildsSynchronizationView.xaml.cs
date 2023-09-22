@@ -69,7 +69,7 @@ public partial class BuildsSynchronizationView : UserControl
             return;
         }
 
-        this.DisplayName = user.DisplayName;
+        this.DisplayName = user?.DisplayName;
         await this.PopulateBuilds();
         this.ButtonsEnabled = true;
         this.ShowLoading = false;
@@ -85,7 +85,7 @@ public partial class BuildsSynchronizationView : UserControl
 
         var localBuildFiles = await this.buildTemplateManager.GetBuilds().ToListAsync();
 
-        var remoteBuilds = remoteBuildFiles.Select(buildFile => new SynchronizationBuild { Name = buildFile.FileName!, TemplateCode = buildFile.TemplateCode! })
+        var remoteBuilds = remoteBuildFiles!.Select(buildFile => new SynchronizationBuild { Name = buildFile.FileName!, TemplateCode = buildFile.TemplateCode! })
             .ToList();
         var localBuilds = localBuildFiles.Select(build => new SynchronizationBuild { Name = build.Name!, TemplateCode = this.buildTemplateManager.EncodeTemplate(build.Build!) })
             .ToList();

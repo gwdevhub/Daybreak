@@ -57,6 +57,6 @@ public partial class ScreenTemplate : UserControl
 
     private void Rectangle_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-        this.Clicked?.Invoke(this, this.DataContext.As<Screen>());
+        this.Clicked?.Invoke(this, this.DataContext.As<Screen>()!);
     }
 }

@@ -404,7 +404,7 @@ public partial class FocusView : UserControl
 
     private void GuildwarsMinimap_MapIconClicked(object _, MapIcon e)
     {
-        if (e.Icon?.WikiUrl.IsNullOrWhiteSpace() is true)
+        if (e.Icon?.WikiUrl!.IsNullOrWhiteSpace() is true)
         {
             return;
         }

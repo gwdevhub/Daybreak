@@ -20,10 +20,10 @@ public sealed class GuildwarsEntityDebouncer : IGuildwarsEntityDebouncer
         this.DebounceEntitiesInternal(gameData);
         return new DebounceResponse
         {
-            MainPlayer = this.mainPlayer.Entity,
-            WorldPlayers = this.worldPlayers.Select(c => c.Entity),
-            Party = this.party.Select(c => c.Entity),
-            LivingEntities = this.livingEntities.Select(c => c.Entity)
+            MainPlayer = this.mainPlayer.Entity!,
+            WorldPlayers = this.worldPlayers.Select(c => c.Entity)!,
+            Party = this.party.Select(c => c.Entity)!,
+            LivingEntities = this.livingEntities.Select(c => c.Entity)!
         };
     }
 

@@ -40,7 +40,7 @@ public partial class GuildwarsPathTemplate : UserControl
 
     private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
-        this.DataContext.As<GuildwarsPath>().Path = this.Path;
+        this.DataContext.As<GuildwarsPath>()!.Path = this.Path;
     }
 
     private void StarGlyph_Clicked(object sender, EventArgs e)
@@ -65,7 +65,7 @@ public partial class GuildwarsPathTemplate : UserControl
         if (filePicker.ShowDialog() is true)
         {
             this.Path = filePicker.FileName;
-            this.DataContext.As<GuildwarsPath>().Path = filePicker.FileName;
+            this.DataContext.As<GuildwarsPath>()!.Path = filePicker.FileName;
         }
     }
 }

@@ -3032,7 +3032,7 @@ public sealed class Npc
         return npc;
     }
 
-    public int[] Ids { get; private set; }
+    public int[] Ids { get; private set; } = Array.Empty<int>();
     public string Name { get; private set; } = string.Empty;
     public string WikiUrl { get; private set; } = string.Empty;
 

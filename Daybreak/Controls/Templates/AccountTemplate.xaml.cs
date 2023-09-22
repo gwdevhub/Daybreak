@@ -50,18 +50,18 @@ public partial class AccountTemplate : UserControl
 
     private void UsernameTextbox_TextChanged(object sender, EventArgs e)
     {
-        this.DataContext.As<LoginCredentials>().Username = this.Username;
+        this.DataContext.As<LoginCredentials>()!.Username = this.Username;
     }
 
     private void CharacterNameTextbox_TextChanged(object sender, EventArgs e)
     {
-        this.DataContext.As<LoginCredentials>().CharacterName = this.CharacterName;
+        this.DataContext.As<LoginCredentials>()!.CharacterName = this.CharacterName;
     }
 
     private void Passwordbox_PasswordChanged(object sender, EventArgs e)
     {
         this.Password = sender.As<PasswordBox>()?.Password;
-        this.DataContext.As<LoginCredentials>().Password = this.Password;
+        this.DataContext.As<LoginCredentials>()!.Password = this.Password;
     }
 
     private void StarGlyph_Clicked(object sender, EventArgs e)

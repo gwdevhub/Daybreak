@@ -124,7 +124,7 @@ public sealed class ApplicationUpdater : IApplicationUpdater
         {
             var serializedList = await response.Content.ReadAsStringAsync();
             var versionList = serializedList.Deserialize<GithubRefTag[]>();
-            return versionList.Select(v => v.Ref!.Remove(0, RefTagPrefix.Length)).Select(v => new Version(v));
+            return versionList!.Select(v => v.Ref!.Remove(0, RefTagPrefix.Length)).Select(v => new Version(v));
         }
 
         return new List<Version>();

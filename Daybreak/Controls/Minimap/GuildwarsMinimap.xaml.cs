@@ -531,7 +531,7 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
-        if (this.CheckMouseOverEntity(Enumerable.Repeat(this.GameData.MainPlayer.As<IEntity>(), 1)) is MainPlayerInformation &&
+        if (this.CheckMouseOverEntity(Enumerable.Repeat(this.GameData.MainPlayer!.As<IEntity>()!, 1)) is MainPlayerInformation &&
             this.TryFindResource("MainPlayerContextMenu") is ContextMenu mainPlayerContextMenu)
         {
             this.ContextMenu = mainPlayerContextMenu;

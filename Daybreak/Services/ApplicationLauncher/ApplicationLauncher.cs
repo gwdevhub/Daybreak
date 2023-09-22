@@ -87,7 +87,7 @@ public class ApplicationLauncher : IApplicationLauncher
             {
                 throw new CredentialsNotFoundException($"No credentials available");
             })
-            .ExtractValue();
+            .ExtractValue()!;
     }
 
     public void RestartDaybreak()
@@ -106,7 +106,7 @@ public class ApplicationLauncher : IApplicationLauncher
     {
         this.logger.LogInformation("Restarting daybreak with admin rights");
         var processName = Process.GetCurrentProcess()?.MainModule?.FileName;
-        if (processName.IsNullOrWhiteSpace() || File.Exists(processName) is false)
+        if (processName!.IsNullOrWhiteSpace() || File.Exists(processName) is false)
         {
             throw new InvalidOperationException("Unable to find executable. Aborting restart");
         }
