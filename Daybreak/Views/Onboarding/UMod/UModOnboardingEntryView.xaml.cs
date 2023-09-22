@@ -30,7 +30,7 @@ public partial class UModOnboardingEntryView : UserControl
     {
         if (this.uModService.IsInstalled)
         {
-            this.viewManager.ShowView<UModSwitchView>();
+            this.viewManager.ShowView<UModMainView>();
         }
         else
         {

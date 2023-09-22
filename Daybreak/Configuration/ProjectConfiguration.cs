@@ -71,6 +71,7 @@ using Daybreak.Services.Events;
 using Daybreak.Controls;
 using Daybreak.Models.Plugins;
 using Daybreak.Services.Plugins;
+using Daybreak.Services.UMod.Utilities;
 
 namespace Daybreak.Configuration;
 
@@ -219,6 +220,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IRegistryService, RegistryService>();
         services.AddScoped<IEventNotifierService, EventNotifierService>();
         services.AddScoped<IBackgroundProvider, BackgroundProvider>();
+        services.AddScoped<IUModClient, UModClient>();
     }
 
     public override void RegisterViews(IViewProducer viewProducer)
@@ -245,7 +247,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<UModInstallingView>();
         viewProducer.RegisterView<UModInstallationChoiceView>();
         viewProducer.RegisterView<UModOnboardingEntryView>();
-        viewProducer.RegisterView<UModSwitchView>();
+        viewProducer.RegisterView<UModMainView>();
         viewProducer.RegisterView<UModBrowserView>();
         viewProducer.RegisterView<ToolboxInstallationView>();
         viewProducer.RegisterView<ToolboxInstallationChoiceView>();

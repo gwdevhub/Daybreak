@@ -65,6 +65,6 @@ public partial class UModInstallingView : UserControl
 
     private void OpaqueButton_Clicked(object sender, System.EventArgs e)
     {
-        this.viewManager.ShowView<UModSwitchView>();
+        this.viewManager.ShowView<UModMainView>();
     }
 }

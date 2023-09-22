@@ -84,6 +84,8 @@ public partial class ChromiumBrowserWrapper : UserControl
     private string downloadsDirectory = string.Empty;
     [GenerateDependencyProperty]
     private bool showBrowserDisabledMessage;
+    [GenerateDependencyProperty(InitialValue = true)]
+    private bool showDownloadsDialog = true;
 
     private bool browserInitialized = false;
 
@@ -259,6 +261,14 @@ public partial class ChromiumBrowserWrapper : UserControl
         };
         this.WebBrowser.NavigationCompleted += (browser, args) => this.Navigating = false;
         this.WebBrowser.WebMessageReceived += this.CoreWebView2_WebMessageReceived!;
+        this.WebBrowser.CoreWebView2.IsDefaultDownloadDialogOpenChanged += (browser, args) =>
+        {
+            if (this.WebBrowser.CoreWebView2.IsDefaultDownloadDialogOpen &&
+                !this.ShowDownloadsDialog)
+            {
+                this.WebBrowser.CoreWebView2.CloseDefaultDownloadDialog();
+            }
+        };
         this.WebBrowser.CoreWebView2.DOMContentLoaded += async (browser, args) =>
         {
             if (this.CanDownloadBuild)

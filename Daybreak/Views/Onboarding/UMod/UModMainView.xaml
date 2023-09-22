@@ -1,0 +1,128 @@
+﻿<UserControl x:Class="Daybreak.Views.Onboarding.UMod.UModMainView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Daybreak.Views.Onboarding.UMod"
+             xmlns:controls="clr-namespace:Daybreak.Controls"
+             xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
+             xmlns:converters="clr-namespace:Daybreak.Converters"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             Loaded="UserControl_Loaded"
+             x:Name="_this"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
+        <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" TriggerValue="True"></converters:BooleanToVisibilityConverter>
+    </UserControl.Resources>
+    <Grid Background="{StaticResource Daybreak.Brushes.Background}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <mah:ToggleSwitch IsOn="{Binding ElementName=_this, Path=UModEnabled, Mode=TwoWay}"
+                          ToolTip="Enable/Disable uMod"/>
+        <TextBlock HorizontalAlignment="Center" Text="uMod" FontSize="22" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" />
+        <Border BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                BorderThickness="0, 0, 0, 1"
+                Height="40"/>
+        <StackPanel Orientation="Horizontal"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Right">
+            <buttons:HelpButton
+                ToolTip="uMod Wiki"
+                Height="30" 
+                Width="30"  
+                Margin="0, 0, 5, 0"
+                Clicked="HelpButton_Clicked" />
+            <buttons:BrowserButton
+                ToolTip="Download mods"
+                Height="30" 
+                Width="30"
+                Margin="0, 0, 5, 0"
+                Clicked="BrowserButton_Clicked" />
+            <buttons:NavigateFileButton
+                ToolTip="Load mods from disk"
+                Height="30"
+                Width="30"
+                Margin="0, 0, 5, 0"
+                Clicked="NavigateFileButton_Clicked" />
+            <buttons:SaveButton
+                ToolTip="Save Changes"
+                Height="30" 
+                Width="30"
+                Margin="0, 0, 5, 0"
+                Clicked="SaveButton_Clicked" />
+        </StackPanel>
+        <ItemsControl
+            Grid.Row="1"
+            Background="Transparent"
+            ItemsSource="{Binding ElementName=_this, Path=Mods, Mode=OneWay}"
+            ScrollViewer.VerticalScrollBarVisibility="Auto"
+            VirtualizingPanel.IsVirtualizing="True"
+            VirtualizingPanel.IsContainerVirtualizable="True"
+            VirtualizingPanel.VirtualizationMode="Recycling"
+            ScrollViewer.CanContentScroll="True"
+            HorizontalContentAlignment="Stretch">
+            <ItemsControl.Template>
+                <ControlTemplate>
+                    <Border
+                        Padding="{TemplateBinding Control.Padding}"
+                        Background="{TemplateBinding Panel.Background}"
+                        BorderBrush="{TemplateBinding Border.BorderBrush}"
+                        BorderThickness="{TemplateBinding Border.BorderThickness}"
+                        SnapsToDevicePixels="True">
+                        <ScrollViewer Padding="{TemplateBinding Control.Padding}" Focusable="False">
+                            <ItemsPresenter SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
+                        </ScrollViewer>
+                    </Border>
+                </ControlTemplate>
+            </ItemsControl.Template>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBox Text="{Binding Name}"
+                                     TextWrapping="Wrap"
+                                     Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                     FontSize="16"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     IsReadOnly="True"
+                                     IsReadOnlyCaretVisible="False"/>
+                            <TextBox Text="{Binding PathToFile}"
+                                     TextWrapping="Wrap"
+                                     Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                     FontSize="12"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     IsReadOnly="True"
+                                     IsReadOnlyCaretVisible="False"/>
+                        </StackPanel>
+                        <mah:ToggleSwitch Grid.Column="1"
+                                          Margin="0, 0, -50, 0"
+                                          IsOn="{Binding Enabled, Mode=TwoWay}"
+                                          ToolTip="Enable/Disable mod"/>
+                        <buttons:BinButton Grid.Column="2"
+                                           Height="30"
+                                           Width="30"
+                                           Margin="0, 0, 10, 0"
+                                           Clicked="BinButton_Clicked"
+                                           ToolTip="Remove mod"/>
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Grid>
+</UserControl>

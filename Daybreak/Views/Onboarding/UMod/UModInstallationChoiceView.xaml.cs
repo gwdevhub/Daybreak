@@ -35,7 +35,7 @@ public partial class UModInstallationChoiceView : UserControl
     {
         if (this.uModService.LoadUModFromDisk())
         {
-            this.viewManager.ShowView<UModSwitchView>();
+            this.viewManager.ShowView<UModMainView>();
         }
     }
 }

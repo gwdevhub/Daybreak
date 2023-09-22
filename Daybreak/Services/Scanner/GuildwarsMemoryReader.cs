@@ -57,7 +57,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
     
     public async Task EnsureInitialized(CancellationToken cancellationToken)
     {
-        var scoppedLogger = this.logger.CreateScopedLogger(nameof(this.EnsureInitialized), default);
+        var scoppedLogger = this.logger.CreateScopedLogger(nameof(this.EnsureInitialized), default!);
         var currentGuildwarsProcess = this.applicationLauncher.RunningGuildwarsProcess;
         if (currentGuildwarsProcess is null)
         {
@@ -82,7 +82,7 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
     
     public void Stop()
     {
-        var scoppedLogger = this.logger.CreateScopedLogger(nameof(this.Stop), default);
+        var scoppedLogger = this.logger.CreateScopedLogger(nameof(this.Stop), default!);
         scoppedLogger.LogInformation($"Stopping {nameof(GuildwarsMemoryReader)}");
         this.memoryScanner?.EndScanner();
     }
