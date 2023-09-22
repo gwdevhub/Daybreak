@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Slim;
 using Slim.Integration.ServiceCollection;
 using System;
+using System.Text;
 using System.Windows;
 using System.Windows.Extensions;
 using System.Windows.Media;
@@ -34,6 +35,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
     [STAThread]
     public static int Main()
     {
+        RegisterExtraEncodingProviders();
         RegisterMahAppsStyle();
         return LaunchMainWindow();
     }
@@ -131,6 +133,14 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
     private static int LaunchMainWindow()
     {
         return Instance.Run();
+    }
+
+    private static void RegisterExtraEncodingProviders()
+    {
+        /*
+         * This is a fix for encoding issues with zip files
+         */
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
 
     private static void RegisterMahAppsStyle()

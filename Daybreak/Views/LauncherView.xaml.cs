@@ -1,18 +1,15 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Models.Notifications;
 using Daybreak.Models.Onboarding;
 using Daybreak.Services.ApplicationLauncher;
 using Daybreak.Services.InternetChecker;
 using Daybreak.Services.Menu;
 using Daybreak.Services.Navigation;
-using Daybreak.Services.Notifications;
 using Daybreak.Services.Onboarding;
 using Daybreak.Services.Screens;
 using System;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -137,7 +134,13 @@ public partial class LauncherView : UserControl
         }
 
         this.LaunchButtonEnabled = false;
-        _ = await this.applicationDetector.LaunchGuildwars();
+        try
+        {
+            _ = await this.applicationDetector.LaunchGuildwars();
+        }
+        catch(Exception ex)
+        {
+        }
         this.CheckGameState();
     }
 }

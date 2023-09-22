@@ -9,7 +9,8 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <controls:ChromiumBrowserWrapper AddressBarReadonly="True"
+        <controls:ChromiumBrowserWrapper x:Name="Browser"
+                                         AddressBarReadonly="True"
                                          ControlsEnabled="False"
                                          Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                          Address="{Binding ElementName=_this, Path=DataContext, Mode=OneWay}"
@@ -17,7 +18,8 @@
                                          CanNavigate="True"
                                          CanDownloadFiles="True"
                                          DownloadsDirectory="uMod/Mods"
+                                         ShowDownloadsDialog="False"
                                          DownloadingFile="ChromiumBrowserWrapper_DownloadingFile"
-                                         DownloadedFile="ChromiumBrowserWrapper_DownloadedFile"></controls:ChromiumBrowserWrapper>
+                                         DownloadedFile="ChromiumBrowserWrapper_DownloadedFile" />
     </Grid>
 </UserControl>

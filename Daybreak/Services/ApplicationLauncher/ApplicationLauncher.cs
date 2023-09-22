@@ -265,7 +265,7 @@ public class ApplicationLauncher : IApplicationLauncher
             }
         }
 
-        return Process.GetProcessesByName(ProcessName).FirstOrDefault();
+        return Process.GetProcessesByName(ProcessName).Where(p => !p.HasExited).FirstOrDefault();
     }
 
     private void ClearGwLocks()

@@ -2,6 +2,9 @@
 
 public static class Scripts
 {
+    public static string CreateAlert(string notificationMessage) => @$"
+        window.alert('{notificationMessage}');";
+
     public const string SendSelectionOnContextMenu = @"
             window.addEventListener('contextmenu', function (event)
             {
