@@ -3,6 +3,7 @@ using Daybreak.Exceptions;
 using Daybreak.Models.Progress;
 using Daybreak.Services.Injection;
 using Daybreak.Services.Notifications;
+using Daybreak.Services.Scanner;
 using Daybreak.Services.Toolbox.Models;
 using Daybreak.Services.Toolbox.Utilities;
 using Microsoft.Extensions.Logging;
@@ -27,6 +28,7 @@ internal sealed class ToolboxService : IToolboxService
     private static readonly string UsualToolboxLocation = Path.GetFullPath(
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "GWToolboxpp", "GWToolboxdll.dll"));
 
+    private readonly IGuildwarsMemoryCache guildwarsMemoryCache;
     private readonly INotificationService notificationService;
     private readonly IProcessInjector processInjector;
     private readonly IToolboxClient toolboxClient;
@@ -45,12 +47,14 @@ internal sealed class ToolboxService : IToolboxService
     public bool IsInstalled => File.Exists(this.toolboxOptions.Value.DllPath);
 
     public ToolboxService(
+        IGuildwarsMemoryCache guildwarsMemoryCache,
         INotificationService notificationService,
         IProcessInjector processInjector,
         IToolboxClient toolboxClient,
         ILiveUpdateableOptions<ToolboxOptions> toolboxOptions,
         ILogger<ToolboxService> logger)
     {
+        this.guildwarsMemoryCache = guildwarsMemoryCache.ThrowIfNull();
         this.notificationService = notificationService.ThrowIfNull();
         this.processInjector = processInjector.ThrowIfNull();
         this.toolboxClient = toolboxClient.ThrowIfNull();
@@ -146,32 +150,58 @@ internal sealed class ToolboxService : IToolboxService
         return true;
     }
 
-    private Task LaunchToolbox(Process process)
+    private async Task LaunchToolbox(Process process)
     {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.LaunchToolbox), string.Empty);
         if (this.toolboxOptions.Value.Enabled is false)
         {
-            return Task.CompletedTask;
+            scopedLogger.LogInformation("Toolbox disabled");
+            return;
         }
 
         var dll = this.toolboxOptions.Value.DllPath;
         if (File.Exists(dll) is false)
         {
+            scopedLogger.LogError("Dll file does not exist");
             throw new ExecutableNotFoundException($"GWToolbox dll doesn't exist at {dll}");
         }
 
+        while (true)
+        {
+            var loginData = await this.guildwarsMemoryCache.ReadLoginData(CancellationToken.None);
+            if (loginData is null)
+            {
+                scopedLogger.LogError("Login data is null. Waiting 500ms and retrying");
+                await Task.Delay(500);
+                continue;
+            }
+
+            if (loginData.Email.IsNullOrWhiteSpace())
+            {
+                scopedLogger.LogError("Email is null or empty. Waiting 500ms and retrying");
+                await Task.Delay(500);
+                continue;
+            }
+
+            break;
+        }
+
+        scopedLogger.LogInformation("Injecting toolbox dll");
         if (this.processInjector.Inject(process, dll))
         {
+            scopedLogger.LogInformation("Injected toolbox dll");
             this.notificationService.NotifyInformation(
                 title: "GWToolbox started",
                 description: "GWToolbox has been injected");
         }
         else
         {
+            scopedLogger.LogError("Failed to inject toolbox dll");
             this.notificationService.NotifyError(
                 title: "GWToolbox failed to start",
                 description: "Failed to inject GWToolbox");
         }
 
-        return Task.CompletedTask;
+        return;
     }
 }
