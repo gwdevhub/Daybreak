@@ -137,10 +137,10 @@ public sealed class CredentialManager : ICredentialManager
     }
     private ProtectedLoginCredentials ExtractProtectedCredentials(Optional<ProtectedLoginCredentials> optional)
     {
-        return optional.ExtractValue();
+        return optional.ExtractValue()!;
     }
     private LoginCredentials ExtractCredentials(Optional<LoginCredentials> optional)
     {
-        return optional.ExtractValue();
+        return optional.ExtractValue()!;
     }
 }

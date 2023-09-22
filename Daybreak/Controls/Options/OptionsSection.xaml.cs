@@ -66,7 +66,7 @@ public partial class OptionsSection : UserControl
             return type.Name;
         }
 
-        if (optionsNameAttribute.Name.IsNullOrWhiteSpace())
+        if (optionsNameAttribute.Name!.IsNullOrWhiteSpace())
         {
             return type.Name;
         }

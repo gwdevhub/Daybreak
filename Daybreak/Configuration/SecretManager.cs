@@ -31,7 +31,7 @@ public static class SecretManager
 
     private static void LoadSecrets()
     {
-        var serializedSecrets = Assembly.GetExecutingAssembly().GetManifestResourceStream("Daybreak.secrets.json").ReadAllBytes().GetString();
+        var serializedSecrets = Assembly.GetExecutingAssembly().GetManifestResourceStream("Daybreak.secrets.json")!.ReadAllBytes().GetString();
         serializedSecrets = TrimUnwantedCharacters(serializedSecrets);
         SecretsHolder = JObject.Parse(serializedSecrets);
     }

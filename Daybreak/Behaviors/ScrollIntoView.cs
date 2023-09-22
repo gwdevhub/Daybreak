@@ -26,7 +26,7 @@ public class ScrollIntoView : Behavior<ListView>
     {
         if (sender is ListView)
         {
-            var listView = sender.As<ListView>();
+            var listView = sender.As<ListView>()!;
             if (listView.SelectedItem != null)
             {
                 listView.Dispatcher.BeginInvoke(

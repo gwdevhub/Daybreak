@@ -5,7 +5,7 @@ namespace Daybreak.Services.Notifications.Models;
 
 public sealed class NotificationDTO
 {
-    public string Id { get; init; }
+    public string Id { get; init; } = string.Empty;
     public LogLevel Level { get; init; }
     public DateTime ExpirationTime { get; init; }
     public DateTime CreationTime { get; init; } = DateTime.Now;

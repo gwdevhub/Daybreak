@@ -125,7 +125,7 @@ public abstract class ItemBase
             throw new InvalidOperationException($"Could not find a item with name {name}");
         }
 
-        return item;
+        return item!;
     }
 
     private static ItemBase? FilterAndFirstOrDefault(Func<ItemBase, bool> filter) => AllItems

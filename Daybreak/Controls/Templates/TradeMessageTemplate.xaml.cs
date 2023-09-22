@@ -105,6 +105,6 @@ public partial class TradeMessageTemplate : UserControl
             return;
         }
 
-        this.TraderMessageClicked?.Invoke(this, traderMessageViewWrapper.TraderMessage);
+        this.TraderMessageClicked?.Invoke(this, traderMessageViewWrapper.TraderMessage!);
     }
 }

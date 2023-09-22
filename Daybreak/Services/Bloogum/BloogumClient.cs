@@ -173,7 +173,7 @@ public sealed class BloogumClient : IBloogumClient
     private static async Task CacheImage(string uri, Stream imageStream)
     {
         var directoryName = Path.GetDirectoryName(uri);
-        Directory.CreateDirectory(directoryName);
+        Directory.CreateDirectory(directoryName!);
         using var fs = File.Create(uri);
         await imageStream.CopyToAsync(fs);
     }

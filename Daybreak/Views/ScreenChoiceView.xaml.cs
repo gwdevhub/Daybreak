@@ -92,7 +92,7 @@ public partial class ScreenChoiceView : UserControl
         this.selectedId = screen.Id;
         foreach(var template in this.ScreenContainer.Children.OfType<ScreenTemplate>())
         {
-            template.Foreground = template.DataContext.As<Screen>().Id == this.selectedId ?
+            template.Foreground = template.DataContext.As<Screen>()?.Id == this.selectedId ?
                 this.FindResource("MahApps.Brushes.Accent") as Brush :
                 this.FindResource("MahApps.Brushes.ThemeForeground") as Brush;
         }

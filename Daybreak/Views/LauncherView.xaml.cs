@@ -138,7 +138,7 @@ public partial class LauncherView : UserControl
         {
             _ = await this.applicationDetector.LaunchGuildwars();
         }
-        catch(Exception ex)
+        catch(Exception)
         {
         }
         this.CheckGameState();

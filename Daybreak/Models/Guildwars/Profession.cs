@@ -173,6 +173,6 @@ public sealed class Profession : IWikiEntity
 
     public override string ToString()
     {
-        return this.Name;
+        return this.Name!;
     }
 }

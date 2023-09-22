@@ -158,7 +158,7 @@ public sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptions
             return type.Name;
         }
 
-        if (optionsNameAttribute.Name.IsNullOrWhiteSpace())
+        if (optionsNameAttribute.Name!.IsNullOrWhiteSpace())
         {
             return type.Name;
         }
