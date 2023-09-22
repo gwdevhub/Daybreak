@@ -72,6 +72,8 @@ using Daybreak.Controls;
 using Daybreak.Models.Plugins;
 using Daybreak.Services.Plugins;
 using Daybreak.Services.UMod.Utilities;
+using Daybreak.Services.Toolbox.Utilities;
+using Daybreak.Services.Injection;
 
 namespace Daybreak.Configuration;
 
@@ -127,6 +129,10 @@ public class ProjectConfiguration : PluginConfigurationBase
                 .Build()
             .RegisterHttpClient<ChromiumBrowserWrapper>()
                 .WithMessageHandler(this.SetupLoggingAndMetrics<ChromiumBrowserWrapper>)
+                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
+                .Build()
+            .RegisterHttpClient<ToolboxClient>()
+                .WithMessageHandler(this.SetupLoggingAndMetrics<ToolboxClient>)
                 .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
                 .Build();
     }
@@ -221,6 +227,8 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IEventNotifierService, EventNotifierService>();
         services.AddScoped<IBackgroundProvider, BackgroundProvider>();
         services.AddScoped<IUModClient, UModClient>();
+        services.AddScoped<IToolboxClient, ToolboxClient>();
+        services.AddScoped<IProcessInjector, ProcessInjector>();
     }
 
     public override void RegisterViews(IViewProducer viewProducer)

@@ -3,6 +3,7 @@ using Daybreak.Exceptions;
 using Daybreak.Models.Progress;
 using Daybreak.Models.UMod;
 using Daybreak.Services.Downloads;
+using Daybreak.Services.Notifications;
 using Daybreak.Services.UMod.Utilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
@@ -29,6 +30,7 @@ public sealed class UModService : IUModService
     private const string D3D9Dll = "d3d9.dll";
     private const string D3D9DllBackup = "d3d9.dll.backup";
 
+    private readonly INotificationService notificationService;
     private readonly IUModClient uModClient;
     private readonly IDownloadService downloadService;
     private readonly ILiveOptions<LauncherOptions> launcherOptions;
@@ -48,12 +50,14 @@ public sealed class UModService : IUModService
     public bool IsInstalled => File.Exists(this.uModOptions.Value.DllPath);
 
     public UModService(
+        INotificationService notificationService,
         IUModClient uModClient,
         IDownloadService downloadService,
         ILiveOptions<LauncherOptions> launcherOptions,
         ILiveUpdateableOptions<UModOptions> uModOptions,
         ILogger<UModService> logger)
     {
+        this.notificationService = notificationService.ThrowIfNull();
         this.uModClient = uModClient.ThrowIfNull();
         this.downloadService = downloadService.ThrowIfNull();
         this.launcherOptions = launcherOptions.ThrowIfNull();
@@ -81,6 +85,9 @@ public sealed class UModService : IUModService
 
         await this.uModClient.Send(CancellationToken.None);
         this.uModClient.CloseConnection();
+        this.notificationService.NotifyInformation(
+                title: "uMod started",
+                description: "uMod textures have been loaded");
     }
 
     public bool LoadUModFromDisk()

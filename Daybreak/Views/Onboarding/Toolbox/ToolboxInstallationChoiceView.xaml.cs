@@ -38,4 +38,12 @@ public partial class ToolboxInstallationChoiceView : UserControl
             this.viewManager.ShowView<ToolboxSwitchView>();
         }
     }
+
+    private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
+    {
+        if (this.toolboxService.LoadToolboxFromUsualLocation())
+        {
+            this.viewManager.ShowView<ToolboxOnboardingEntryView>();
+        }
+    }
 }

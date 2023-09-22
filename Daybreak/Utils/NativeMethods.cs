@@ -15,6 +15,33 @@ internal static class NativeMethods
 
     public delegate IntPtr HookProc(int nCode, IntPtr wParam, IntPtr lParam);
 
+    [Flags]
+    public enum MemoryProtection : uint
+    {
+        PAGE_EXECUTE = 0x10,
+        PAGE_EXECUTE_READ = 0x20,
+        PAGE_EXECUTE_READ_WRITE = 0x40,
+        PAGE_EXECUTE_WRITECOPY = 0x80,
+        PAGE_NOACCESS = 0x01,
+        PAGE_READONLY = 0x02,
+        PAGE_READWRITE = 0x04,
+        PAGE_WRITECOPY = 0x08,
+        PAGE_GUARD = 0x100,
+        PAGE_NOCACHE = 0x200,
+        PAGE_WRITECOMBINE = 0x400
+    }
+    [Flags]
+    public enum MemoryAllocationType : uint
+    {
+        MEM_COMMIT = 0x00001000,
+        MEM_RESERVE = 0x00002000,
+        MEM_RESET = 0x00080000,
+        MEM_RESET_UNDO = 0x1000000,
+        MEM_LARGE_PAGES = 0x20000000,
+        MEM_PHYSICAL = 0x00400000,
+        MEM_TOP_DOWN = 0x00100000,
+        MEM_WRITE_WATCH = 0x00200000
+    }
     [StructLayout(LayoutKind.Sequential)]
     public readonly struct RECT
     {
@@ -176,4 +203,20 @@ internal static class NativeMethods
     public static extern bool GetWindowInfo(IntPtr hwnd, ref WindowInfo pwi);
     [DllImport("user32.dll")]
     public static extern int SendMessage(IntPtr hWnd, int wMsg, bool wParam, int lParam);
+    [DllImport("kernel32.dll")]
+    public static extern IntPtr VirtualAllocEx(IntPtr hProcess, IntPtr lpAddress, uint dwSize, MemoryAllocationType flAllocationType, MemoryProtection flProtect);
+    [DllImport("kernel32.dll")]
+    public static extern void VirtualFreeEx(IntPtr hProcess, IntPtr lpAddress, int dwSize, MemoryAllocationType dwFreeType);
+    [DllImport("kernel32.dll")]
+    public static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] lpBuffer, uint nSize, out int lpNumberOfBytesWritten);
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+    public static extern IntPtr GetModuleHandle(string lpModuleName);
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern uint WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);
+    [DllImport("kernel32.dll")]
+    public static extern bool GetExitCodeThread(IntPtr hThread, out uint lpExitCode);
+    [DllImport("kernel32.dll")]
+    public static extern IntPtr CreateRemoteThread(IntPtr hProcess, IntPtr lpThreadAttributes, uint dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, uint dwCreationFlags, out IntPtr lpThreadId);
+    [DllImport("kernel32.dll", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true)]
+    public static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
 }
