@@ -12,6 +12,7 @@ internal static class NativeMethods
     public static IntPtr HWND_TOPMOST = new(-1);
     public static IntPtr HWND_TOP = IntPtr.Zero;
     public const int WH_KEYBOARD_LL = 13;
+    public const uint LIST_MODULES_32BIT = 0x01;
 
     public delegate IntPtr HookProc(int nCode, IntPtr wParam, IntPtr lParam);
 
@@ -201,22 +202,4 @@ internal static class NativeMethods
     [return: MarshalAs(UnmanagedType.Bool)]
     [DllImport("user32.dll", SetLastError = true)]
     public static extern bool GetWindowInfo(IntPtr hwnd, ref WindowInfo pwi);
-    [DllImport("user32.dll")]
-    public static extern int SendMessage(IntPtr hWnd, int wMsg, bool wParam, int lParam);
-    [DllImport("kernel32.dll")]
-    public static extern IntPtr VirtualAllocEx(IntPtr hProcess, IntPtr lpAddress, uint dwSize, MemoryAllocationType flAllocationType, MemoryProtection flProtect);
-    [DllImport("kernel32.dll")]
-    public static extern void VirtualFreeEx(IntPtr hProcess, IntPtr lpAddress, int dwSize, MemoryAllocationType dwFreeType);
-    [DllImport("kernel32.dll")]
-    public static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] lpBuffer, uint nSize, out int lpNumberOfBytesWritten);
-    [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
-    public static extern IntPtr GetModuleHandle(string lpModuleName);
-    [DllImport("kernel32.dll", SetLastError = true)]
-    public static extern uint WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);
-    [DllImport("kernel32.dll")]
-    public static extern bool GetExitCodeThread(IntPtr hThread, out uint lpExitCode);
-    [DllImport("kernel32.dll")]
-    public static extern IntPtr CreateRemoteThread(IntPtr hProcess, IntPtr lpThreadAttributes, uint dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, uint dwCreationFlags, out IntPtr lpThreadId);
-    [DllImport("kernel32.dll", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true)]
-    public static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
 }
