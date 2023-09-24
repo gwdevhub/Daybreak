@@ -39,8 +39,9 @@ public sealed class BackgroundProvider : IBackgroundProvider
             maybeImage = await this.screenshotProvider.GetRandomScreenShot().ConfigureAwait(true);
         }
 
-        if (this.liveOptions.Value.BloogumEnabled &&
-            Random.Shared.Next(this.liveOptions.Value.LocalScreenshotsEnabled ? 0 : 50, 101) >= 50)
+        if ((this.liveOptions.Value.BloogumEnabled &&
+            Random.Shared.Next(this.liveOptions.Value.LocalScreenshotsEnabled ? 0 : 50, 101) >= 50) ||
+            maybeImage is null)
         {
             maybeImage = await this.bloogumClient.GetImage(true).ConfigureAwait(true);
             creditText = maybeImage is not null ? "http://bloogum.net/guildwars" : string.Empty;
