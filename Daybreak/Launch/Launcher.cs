@@ -64,20 +64,31 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
         /*
          * Show splash screen before beginning to load the rest of the application.
          * MainWindow will call HideSplashScreen() on Loaded event
+         * 
+         * OptionsProducer needs to be created before everything else, otherwise all
+         * the other services will fail to get options for their needs.
          */
+        
+        var optionsProducer = this.ServiceProvider.GetRequiredService<IOptionsProducer>();
         var startupStatus = this.ServiceProvider.GetRequiredService<StartupStatus>();
+        startupStatus.CurrentStep = StartupStatus.Custom("Loading options");
+        this.projectConfiguration.RegisterOptions(optionsProducer);
+
+        /*
+         * SplashScreenService has a dependency on IOptionsProducer, due to needing to style the
+         * SplashScreen based on the theme in the options. Thus, it can only be called after
+         * initializing the options.
+         */
         this.ServiceProvider.GetRequiredService<ISplashScreenService>().ShowSplashScreen();
 
         var serviceManager = this.ServiceProvider.GetRequiredService<IServiceManager>();
-        var optionsProducer = this.ServiceProvider.GetRequiredService<IOptionsProducer>();
         var viewProducer = this.ServiceProvider.GetRequiredService<IViewManager>();
         var postUpdateActionProducer = this.ServiceProvider.GetRequiredService<IPostUpdateActionProducer>();
         var startupActionProducer = this.ServiceProvider.GetRequiredService<IStartupActionProducer>();
         var drawingModuleProducer = this.ServiceProvider.GetRequiredService<IDrawingModuleProducer>();
         var notificationHandlerProducer = this.ServiceProvider.GetRequiredService<INotificationHandlerProducer>();
         var modsManager = this.ServiceProvider.GetRequiredService<IModsManager>();
-        startupStatus.CurrentStep = StartupStatus.Custom("Loading options");
-        this.projectConfiguration.RegisterOptions(optionsProducer);
+        
         startupStatus.CurrentStep = StartupStatus.Custom("Loading views");
         this.projectConfiguration.RegisterViews(viewProducer);
         startupStatus.CurrentStep = StartupStatus.Custom("Loading post-update actions");
