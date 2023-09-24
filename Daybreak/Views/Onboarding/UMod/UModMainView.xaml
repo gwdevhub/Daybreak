@@ -92,23 +92,41 @@
                             <ColumnDefinition Width="auto" />
                             <ColumnDefinition Width="auto" />
                         </Grid.ColumnDefinitions>
-                        <StackPanel>
-                            <TextBox Text="{Binding Name}"
-                                     TextWrapping="Wrap"
-                                     Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                                     FontSize="16"
-                                     Background="Transparent"
-                                     BorderThickness="0"
-                                     IsReadOnly="True"
-                                     IsReadOnlyCaretVisible="False"/>
-                            <TextBox Text="{Binding PathToFile}"
-                                     TextWrapping="Wrap"
-                                     Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                                     FontSize="12"
-                                     Background="Transparent"
-                                     BorderThickness="0"
-                                     IsReadOnly="True"
-                                     IsReadOnlyCaretVisible="False"/>
+                        <StackPanel Orientation="Horizontal">
+                            <buttons:BackButton Height="30"
+                                                Width="30"
+                                                RenderTransformOrigin="0.5, 0.5"
+                                                Clicked="UpButton_Clicked">
+                                <buttons:BackButton.RenderTransform>
+                                    <RotateTransform Angle="90"/>
+                                </buttons:BackButton.RenderTransform>
+                            </buttons:BackButton>
+                            <buttons:BackButton Height="30"
+                                                Width="30"
+                                                RenderTransformOrigin="0.5, 0.5"
+                                                Clicked="DownButton_Clicked">
+                                <buttons:BackButton.RenderTransform>
+                                    <RotateTransform Angle="270"/>
+                                </buttons:BackButton.RenderTransform>
+                            </buttons:BackButton>
+                            <StackPanel>
+                                <TextBox Text="{Binding Name}"
+                                         TextWrapping="Wrap"
+                                         Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                         FontSize="16"
+                                         Background="Transparent"
+                                         BorderThickness="0"
+                                         IsReadOnly="True"
+                                         IsReadOnlyCaretVisible="False"/>
+                                <TextBox Text="{Binding PathToFile}"
+                                         TextWrapping="Wrap"
+                                         Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                         FontSize="12"
+                                         Background="Transparent"
+                                         BorderThickness="0"
+                                         IsReadOnly="True"
+                                         IsReadOnlyCaretVisible="False"/>
+                            </StackPanel>
                         </StackPanel>
                         <mah:ToggleSwitch Grid.Column="1"
                                           Margin="0, 0, -50, 0"

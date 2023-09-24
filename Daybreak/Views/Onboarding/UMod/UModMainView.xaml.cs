@@ -78,10 +78,10 @@ public partial class UModMainView : UserControl
     {
         var filePicker = new OpenFileDialog
         {
-            Filter = "Tpf Files (*.tpf)|*.tpf",
+            Filter = "Tpf or Zip Files (*.tpf;*.zip)|*.tpf;*.zip",
             Multiselect = true,
             RestoreDirectory = true,
-            Title = "Please load a tpf file"
+            Title = "Please load a tpf or zip file"
         };
         if (filePicker.ShowDialog() is false)
         {
@@ -129,5 +129,45 @@ public partial class UModMainView : UserControl
     private void RefreshMods()
     {
         this.Mods.ClearAnd().AddRange(this.uModService.GetMods());
+    }
+
+    private void UpButton_Clicked(object sender, EventArgs e)
+    {
+        if (sender is not UserControl control ||
+            control.DataContext is not UModEntry entry)
+        {
+            return;
+        }
+        
+        var indexOfEntry = this.Mods.IndexOf(entry);
+        // Ignore the mod that is first, since it cannot move up in the list
+        if (indexOfEntry < 1 ||
+            indexOfEntry > this.Mods.Count - 1)
+        {
+            return;
+        }
+
+        this.Mods.Remove(entry);
+        this.Mods.Insert(indexOfEntry - 1, entry);
+    }
+
+    private void DownButton_Clicked(object sender, EventArgs e)
+    {
+        if (sender is not UserControl control ||
+            control.DataContext is not UModEntry entry)
+        {
+            return;
+        }
+
+        var indexOfEntry = this.Mods.IndexOf(entry);
+        // Ignore the mod that is last, since it cannot move down in the list
+        if (indexOfEntry < 0 ||
+            indexOfEntry > this.Mods.Count - 2)
+        {
+            return;
+        }
+
+        this.Mods.Remove(entry);
+        this.Mods.Insert(indexOfEntry + 1, entry);
     }
 }

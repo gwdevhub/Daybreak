@@ -4,6 +4,7 @@ using Daybreak.Utils;
 using System;
 using System.Core.Extensions;
 using System.IO;
+using System.Linq;
 using System.Windows.Controls;
 
 namespace Daybreak.Views.Onboarding.UMod;
@@ -12,7 +13,7 @@ namespace Daybreak.Views.Onboarding.UMod;
 /// </summary>
 public partial class UModBrowserView : UserControl
 {
-    private const string WhitelistedExtension = ".tpf";
+    private static readonly string[] WhitelistedExtensions = new[] { ".tpf", ".zip" };
 
     private readonly INotificationService notificationService;
     private readonly IUModService uModService;
@@ -34,12 +35,12 @@ public partial class UModBrowserView : UserControl
     {
         /*
          * According to https://wiki.guildwars.com/wiki/Player-made_Modifications#Shared_player_content,
-         * download links must link directly to a .tpf file. Only allow downloads for .tpf files.
+         * download links must link directly to a .zip or .tpf file. Only allow downloads for .zip or .tpf files.
          */
 
         var path = e.ResultingFilePath;
         var extension = Path.GetExtension(path);
-        if (extension?.Equals(WhitelistedExtension, StringComparison.OrdinalIgnoreCase) is true)
+        if (WhitelistedExtensions.Any(e => e.Equals(extension, StringComparison.OrdinalIgnoreCase)))
         {
             // TODO: #378 Notification deduplication logic. This is due to a bug in WebView2 where DownloadStarting is triggered twice. Remove once event is fixed
             if ((DateTime.Now - this.lastDownloadingNotificationTime).TotalMilliseconds > 100)

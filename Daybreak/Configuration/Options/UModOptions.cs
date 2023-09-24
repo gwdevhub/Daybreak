@@ -17,7 +17,7 @@ public sealed class UModOptions
     public bool Enabled { get; set; }
 
     [JsonProperty(nameof(AutoEnableMods))]
-    [OptionName(Name = "Auto-Enable Mods", Description = "If true, mods downloaded through the launcher will be auto-placed in the managed mod list")]
+    [OptionName(Name = "Auto-Enable Mods", Description = "If true, mods loaded into Daybreak will be enabled by default")]
     public bool AutoEnableMods { get; set; } = true;
 
     [JsonProperty(nameof(Mods))]
