@@ -21,10 +21,10 @@
                     Grid.Row="0"
                     FontSize="18"
                     Padding="10"
-                    Text="Quest Log"></TextBlock>
+                    Text="Quest Log" />
         <Rectangle Height="1"
                    Fill="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                   VerticalAlignment="Bottom"></Rectangle>
+                   VerticalAlignment="Bottom" />
         <ScrollViewer
                     VerticalScrollBarVisibility="Auto"
                     HorizontalScrollBarVisibility="Disabled"

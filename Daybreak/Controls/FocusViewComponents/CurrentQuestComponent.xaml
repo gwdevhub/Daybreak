@@ -29,6 +29,7 @@
                     HorizontalContentAlignment="Left"
                     Cursor="Hand"
                     FontSize="20"
-                    MouseLeftButtonDown="CurrentQuest_MouseLeftButtonDown"></buttons:MenuButton>
+                    MouseLeftButtonDown="CurrentQuest_MouseLeftButtonDown"
+                    ToolTip="Open quest info"/>
     </StackPanel>
 </UserControl>

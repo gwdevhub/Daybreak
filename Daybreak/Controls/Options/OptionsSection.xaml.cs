@@ -54,9 +54,16 @@ public partial class OptionsSection : UserControl
             this.Options.Add(new OptionSection
             {
                 Name = GetOptionsName(registeredType),
+                Tooltip = GetOptionsToolTip(registeredType),
                 Type = registeredType
             });
         }
+    }
+
+    private static string GetOptionsToolTip(Type type)
+    {
+        var name = GetOptionsName(type);
+        return $"{name} settings";
     }
 
     private static string GetOptionsName(Type type)

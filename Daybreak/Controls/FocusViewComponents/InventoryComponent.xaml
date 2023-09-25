@@ -152,7 +152,8 @@
               HorizontalAlignment="Right">
             <buttons:MaximizeButton Height="30" Width="30" Margin="5"
                                     Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                                    Clicked="MaximizeButton_Clicked"></buttons:MaximizeButton>
+                                    Clicked="MaximizeButton_Clicked"
+                                    ToolTip="Maximize"/>
         </Grid>
         <Grid Background="{DynamicResource Daybreak.Brushes.Background}"
               VerticalAlignment="Stretch"

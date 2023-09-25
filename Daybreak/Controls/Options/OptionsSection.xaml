@@ -17,7 +17,8 @@
                                     HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
                                     Height="30"
                                     Cursor="Hand"
-                                    Clicked="MenuButton_Clicked"></buttons:MenuButton>
+                                    Clicked="MenuButton_Clicked"
+                                    ToolTip="{Binding Tooltip}"/>
             </DataTemplate>
         </ItemsControl.ItemTemplate>
     </ItemsControl>

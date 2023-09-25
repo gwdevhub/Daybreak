@@ -26,7 +26,8 @@
                 <ColumnDefinition Width="auto"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <buttons:BackButton Height="30" Width="30" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5"
-                                Clicked="BackButton_Clicked" Grid.Column="0"></buttons:BackButton>
+                                Clicked="BackButton_Clicked" Grid.Column="0"
+                                ToolTip="Go back to build templates"/>
             <Grid Grid.Column="1" VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"></ColumnDefinition>
@@ -35,10 +36,12 @@
                 <TextBlock Text="Name: " Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" FontSize="20" VerticalAlignment="Center"></TextBlock>
                 <TextBox Grid.Column="1" Background="Transparent" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" FontSize="20"
                          Text="{Binding ElementName=_this, Path=CurrentBuild.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         PreviewTextInput="TextBox_PreviewTextInput" TextChanged="TextBox_TextChanged"></TextBox>
+                         PreviewTextInput="TextBox_PreviewTextInput" TextChanged="TextBox_TextChanged"
+                         ToolTip="Build template name"/>
             </Grid>
             <buttons:SaveButton Height="30" Width="30" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5"
-                                Clicked="SaveButton_Clicked" Grid.Column="2" IsEnabled="{Binding ElementName=_this, Path=SaveButtonEnabled, Mode=OneWay}"></buttons:SaveButton>
+                                Clicked="SaveButton_Clicked" Grid.Column="2" IsEnabled="{Binding ElementName=_this, Path=SaveButtonEnabled, Mode=OneWay}"
+                                ToolTip="Save build template"/>
         </Grid>
         <Grid Grid.Row="1" Margin="5, 0, 5, 0">
             <Grid.ColumnDefinitions>
@@ -53,15 +56,19 @@
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="1" Text="Code: " Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" FontSize="16" VerticalAlignment="Center" />
             <TextBox Grid.Row="1" Grid.Column="1" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" FontSize="16"
-                     Text="{Binding ElementName=_this, Path=CurrentBuildCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                     Text="{Binding ElementName=_this, Path=CurrentBuildCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     ToolTip="Template code for the current build"/>
             <TextBlock Grid.Row="1" Grid.Column="2" Text="Points: " Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent"
                        FontSize="16" Margin="10, 0, 0, 0" VerticalAlignment="Center"></TextBlock>
             <TextBox Grid.Row="1" Grid.Column="3" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" FontSize="16"
-                     Text="{Binding ElementName=_this, Path=AttributePoints, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                     Text="{Binding ElementName=_this, Path=AttributePoints, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                     ToolTip="Attribute points available"/>
             <TextBlock Grid.Row="0" Text="Source: " Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" FontSize="16" VerticalAlignment="Center" />
             <TextBox Grid.Row="0" Grid.Column="1" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" FontSize="16"
-                     Text="{Binding ElementName=_this, Path=CurrentBuildSource, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-            <buttons:BrowserButton Grid.Row="0" Grid.Column="3" Height="30" Width="30" Clicked="BrowserButton_Clicked"></buttons:BrowserButton>
+                     Text="{Binding ElementName=_this, Path=CurrentBuildSource, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     ToolTip="Url from where this build was retrieved"/>
+            <buttons:BrowserButton Grid.Row="0" Grid.Column="3" Height="30" Width="30" Clicked="BrowserButton_Clicked"
+                                   ToolTip="Open source url"/>
         </Grid>
         <templates:BuildTemplate x:Name="BuildTemplate" Grid.Row="2" DataContext="{Binding ElementName=_this, Path=CurrentBuild, Mode=OneWay}"
                                 BuildChanged="BuildTemplate_BuildChanged">

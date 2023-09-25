@@ -31,6 +31,7 @@
                    VerticalAlignment="Stretch" HorizontalAlignment="Stretch" MouseLeftButtonDown="Rectangle_MouseLeftButtonDown"></Rectangle>
         <buttons:CancelButton x:Name="CancelButton" Width="30" Height="30" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="10"
                               Visibility="Hidden" Clicked="CancelButton_Clicked" MouseEnter="Border_MouseEnter"
-                              MouseLeave="Border_MouseLeave"></buttons:CancelButton>
+                              MouseLeave="Border_MouseLeave"
+                              ToolTip="Remove skill" />
     </Grid>
 </UserControl>

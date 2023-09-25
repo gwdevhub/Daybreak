@@ -22,9 +22,11 @@
                                  HighlightColor="{StaticResource MahApps.Brushes.Accent}"
                                  BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
                                  BorderThickness="1"
-                                 HorizontalContentAlignment="Center" VerticalContentAlignment="Center"></buttons:HighlightButton>
+                                 HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                                 ToolTip="Test changes"/>
         <buttons:SaveButton Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Height="30" Width="30" Grid.Column="1" HorizontalAlignment="Right" Margin="5"
-                                 Clicked="SaveButton_Clicked"></buttons:SaveButton>
+                            Clicked="SaveButton_Clicked"
+                            ToolTip="Save changes"></buttons:SaveButton>
         <Viewbox Grid.Row="1">
             <Grid x:Name="ScreenContainer"></Grid>
         </Viewbox>

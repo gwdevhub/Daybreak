@@ -20,32 +20,37 @@
         <StackPanel>
             <local:ExpandableMenuSection
                 SectionTitle="Guild Wars" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                FontSize="16">
+                FontSize="16"
+                ToolTip="Guild Wars section">
                 <local:ExpandableMenuSection.Children>
                     <buttons:MenuButton Title="Game companion" 
                                         Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                                         HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
                                         Height="30"
                                         Cursor="Hand"
-                                        Clicked="GameCompanionButton_Clicked" />
+                                        Clicked="GameCompanionButton_Clicked"
+                                        ToolTip="Open game companion"/>
                     <buttons:MenuButton Title="Manage builds" 
                                         Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                                         HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
                                         Height="30"
                                         Cursor="Hand"
-                                        Clicked="ManageBuildsButton_Clicked" />
+                                        Clicked="ManageBuildsButton_Clicked"
+                                        ToolTip="Open builds manager"/>
                     <buttons:MenuButton Title="Download Guild Wars" 
                                         Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                                         HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
                                         Height="30"
                                         Cursor="Hand"
-                                        Clicked="DownloadGuildwarsButton_Clicked" />
+                                        Clicked="DownloadGuildwarsButton_Clicked"
+                                        ToolTip="Download Guild Wars installer"/>
                     <buttons:MenuButton Title="Copy Guild Wars" 
                                         Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                                         HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
                                         Height="30"
                                         Cursor="Hand"
-                                        Clicked="CopyGuildwarsButton_Clicked" />
+                                        Clicked="CopyGuildwarsButton_Clicked"
+                                        ToolTip="Copy Guild Wars from an existing installation"/>
                 </local:ExpandableMenuSection.Children>
             </local:ExpandableMenuSection>
             <Grid>
@@ -63,7 +68,8 @@
                                     HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
                                     BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
                                     BorderThickness="0, 0, 0, 1"
-                                    Clicked="NotificationsButton_Clicked"/>
+                                    Clicked="NotificationsButton_Clicked"
+                                    ToolTip="Open notifications view"/>
             </Grid>
             <local:ExpandableMenuSection
                 SectionTitle="Trade" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
@@ -100,86 +106,90 @@
                 </local:ExpandableMenuSection.Children>
             </local:ExpandableMenuSection>
             <buttons:MenuButton FontSize="16"
-                Height="30"
-                Title="Plugins"
-                Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
-                BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                BorderThickness="0, 0, 0, 1"
-                Clicked="PluginsButton_Clicked"/>
+                                Height="30"
+                                Title="Plugins"
+                                Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                                BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                BorderThickness="0, 0, 0, 1"
+                                Clicked="PluginsButton_Clicked"
+                                ToolTip="Open plugin manager"/>
             <local:ExpandableMenuSection
-            SectionTitle="Mods" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-            FontSize="16">
+                    SectionTitle="Mods" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                    FontSize="16"
+                    ToolTip="Mods section">
             <local:ExpandableMenuSection.Children>
-                <buttons:MenuButton Title="uMod" 
-                            Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                            HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
-                            Height="30"
-                            Cursor="Hand"
-                            Clicked="UModButton_Clicked">
-                </buttons:MenuButton>
-                <buttons:MenuButton Title="GWToolboxpp" 
-                            Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                            HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
-                            Height="30"
-                            Cursor="Hand"
-                            Clicked="ToolboxButton_Clicked">
-                </buttons:MenuButton>
-                <buttons:MenuButton Title="DSOAL" 
-                            Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                            HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
-                            Height="30"
-                            Cursor="Hand"
-                            Clicked="DSOALButton_Clicked">
-                </buttons:MenuButton>
-            </local:ExpandableMenuSection.Children>
+                    <buttons:MenuButton Title="uMod" 
+                                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                        HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                                        Height="30"
+                                        Cursor="Hand"
+                                        Clicked="UModButton_Clicked"
+                                        ToolTip="Open uMod manager"/>
+                    <buttons:MenuButton Title="GWToolboxpp" 
+                                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                        HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                                        Height="30"
+                                        Cursor="Hand"
+                                        Clicked="ToolboxButton_Clicked"
+                                        ToolTip="Open GWToolboxdll manager"/>
+                    <buttons:MenuButton Title="DSOAL" 
+                                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                        HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                                        Height="30"
+                                        Cursor="Hand"
+                                        Clicked="DSOALButton_Clicked"
+                                        ToolTip="Open DSOAL manager"/>
+                </local:ExpandableMenuSection.Children>
             </local:ExpandableMenuSection>
             <local:ExpandableMenuSection
                 SectionTitle="Settings" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                FontSize="16">
+                FontSize="16"
+                ToolTip="Settings section">
                 <local:ExpandableMenuSection.Children>
                     <buttons:MenuButton Title="Accounts" 
-                                Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                                HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
-                                Height="30"
-                                Cursor="Hand"
-                                Clicked="AccountSettingsButton_Clicked">
-                    </buttons:MenuButton>
+                                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                        HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                                        Height="30"
+                                        Cursor="Hand"
+                                        Clicked="AccountSettingsButton_Clicked"
+                                        ToolTip="Account settings" />
                     <buttons:MenuButton Title="Executables" 
-                                Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                                HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
-                                Height="30"
-                                Cursor="Hand"
-                                Clicked="GuildwarsSettingsButton_Clicked">
-                    </buttons:MenuButton>
+                                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                        HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                                        Height="30"
+                                        Cursor="Hand"
+                                        Clicked="GuildwarsSettingsButton_Clicked" 
+                                        ToolTip="Executables settings"/>
                     <options:OptionsSection />
                 </local:ExpandableMenuSection.Children>
             </local:ExpandableMenuSection>
             <local:ExpandableMenuSection
                 SectionTitle="Diagnostics" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                FontSize="16">
+                FontSize="16"
+                ToolTip="Diagnostic section">
                 <local:ExpandableMenuSection.Children>
                     <buttons:MenuButton Title="Manage client version" 
-                                Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                                HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
-                                Height="30"
-                                Cursor="Hand"
-                                Clicked="VersionManagementButton_Clicked">
-                    </buttons:MenuButton>
+                                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                        HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                                        Height="30"
+                                        Cursor="Hand"
+                                        Clicked="VersionManagementButton_Clicked"
+                                        ToolTip="Open version manager"/>
                     <buttons:MenuButton Title="Logs" 
-                                Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                                HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
-                                Height="30"
-                                Cursor="Hand"
-                                Clicked="LogsButton_Clicked">
-                    </buttons:MenuButton>
+                                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                        HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                                        Height="30"
+                                        Cursor="Hand"
+                                        Clicked="LogsButton_Clicked" 
+                                        ToolTip="Open logs view"/>
                     <buttons:MenuButton Title="Metrics" 
-                                Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                                HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
-                                Height="30"
-                                Cursor="Hand"
-                                Clicked="MetricsButton_Clicked">
-                    </buttons:MenuButton>
+                                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                        HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                                        Height="30"
+                                        Cursor="Hand"
+                                        Clicked="MetricsButton_Clicked"
+                                        ToolTip="Open metrics view"/>
                 </local:ExpandableMenuSection.Children>
             </local:ExpandableMenuSection>
         </StackPanel>

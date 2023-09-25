@@ -22,7 +22,8 @@
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <mah:ToggleSwitch IsOn="{Binding ElementName=_this, Path=UModEnabled, Mode=TwoWay}"
-                          ToolTip="Enable/Disable uMod"/>
+                          ToolTip="Enable/Disable uMod"
+                          Cursor="Hand"/>
         <TextBlock HorizontalAlignment="Center" Text="uMod" FontSize="22" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" />
         <Border BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
                 BorderThickness="0, 0, 0, 1"
@@ -35,7 +36,7 @@
                 Height="30" 
                 Width="30"  
                 Margin="0, 0, 5, 0"
-                Clicked="HelpButton_Clicked" />
+                Clicked="HelpButton_Clicked"/>
             <buttons:BrowserButton
                 ToolTip="Download mods"
                 Height="30" 
@@ -96,7 +97,8 @@
                             <buttons:BackButton Height="30"
                                                 Width="30"
                                                 RenderTransformOrigin="0.5, 0.5"
-                                                Clicked="UpButton_Clicked">
+                                                Clicked="UpButton_Clicked"
+                                                ToolTip="Move mod higher">
                                 <buttons:BackButton.RenderTransform>
                                     <RotateTransform Angle="90"/>
                                 </buttons:BackButton.RenderTransform>
@@ -104,7 +106,8 @@
                             <buttons:BackButton Height="30"
                                                 Width="30"
                                                 RenderTransformOrigin="0.5, 0.5"
-                                                Clicked="DownButton_Clicked">
+                                                Clicked="DownButton_Clicked"
+                                                ToolTip="Move mod lower">
                                 <buttons:BackButton.RenderTransform>
                                     <RotateTransform Angle="270"/>
                                 </buttons:BackButton.RenderTransform>
@@ -117,7 +120,8 @@
                                          Background="Transparent"
                                          BorderThickness="0"
                                          IsReadOnly="True"
-                                         IsReadOnlyCaretVisible="False"/>
+                                         IsReadOnlyCaretVisible="False"
+                                         ToolTip="Mod name"/>
                                 <TextBox Text="{Binding PathToFile}"
                                          TextWrapping="Wrap"
                                          Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
@@ -125,13 +129,15 @@
                                          Background="Transparent"
                                          BorderThickness="0"
                                          IsReadOnly="True"
-                                         IsReadOnlyCaretVisible="False"/>
+                                         IsReadOnlyCaretVisible="False"
+                                         ToolTip="Mod path"/>
                             </StackPanel>
                         </StackPanel>
                         <mah:ToggleSwitch Grid.Column="1"
                                           Margin="0, 0, -50, 0"
                                           IsOn="{Binding Enabled, Mode=TwoWay}"
-                                          ToolTip="Enable/Disable mod"/>
+                                          ToolTip="Enable/Disable mod"
+                                          Cursor="Hand"/>
                         <buttons:BinButton Grid.Column="2"
                                            Height="30"
                                            Width="30"

@@ -35,7 +35,8 @@
                         VerticalContentAlignment="Center"
                         Cursor="Hand"
                         FontSize="18"
-                        MouseLeftButtonDown="Title_MouseLeftButtonDown"></buttons:HighlightButton>
+                        MouseLeftButtonDown="Title_MouseLeftButtonDown"
+                        ToolTip="Open title track info"/>
         </Grid>
         <Rectangle 
                     Height="1"
@@ -48,6 +49,7 @@
                     HorizontalContentAlignment="Left"
                     Cursor="Hand"
                     FontSize="20"
-                    MouseLeftButtonDown="Title_MouseLeftButtonDown"></buttons:MenuButton>
+                    MouseLeftButtonDown="Title_MouseLeftButtonDown"
+                    ToolTip="Open title track info"/>
     </StackPanel>
 </UserControl>

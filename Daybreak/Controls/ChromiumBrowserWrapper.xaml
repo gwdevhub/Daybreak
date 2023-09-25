@@ -50,20 +50,24 @@
             </Grid.ColumnDefinitions>
             <WrapPanel>
                 <buttons:BackButton Height="30" Width="30"
-                                  Clicked="BackButton_Clicked" Margin="5" Cursor="Hand"
-                                  IsEnabled="{Binding ElementName=WebBrowser, Path=CanGoBack, Mode=OneWay}"></buttons:BackButton>
+                                    Clicked="BackButton_Clicked" Margin="5" Cursor="Hand"
+                                    IsEnabled="{Binding ElementName=WebBrowser, Path=CanGoBack, Mode=OneWay}"
+                                    ToolTip="Go back"/>
                 <buttons:BackButton Height="30" Width="30"
-                                  Clicked="ForwardButton_Clicked" Margin="5" Cursor="Hand"
-                                  IsEnabled="{Binding ElementName=WebBrowser, Path=CanGoForward, Mode=OneWay}">
+                                    Clicked="ForwardButton_Clicked" Margin="5" Cursor="Hand"
+                                    IsEnabled="{Binding ElementName=WebBrowser, Path=CanGoForward, Mode=OneWay}"
+                                    ToolTip="Go forward">
                     <buttons:BackButton.RenderTransform>
                         <RotateTransform Angle="180" CenterX="15" CenterY="15"></RotateTransform>
                     </buttons:BackButton.RenderTransform>
                 </buttons:BackButton>
                 <Grid Height="30" Width="30" Margin="5">
                     <buttons:RefreshButton Height="30" Width="30" Clicked="RefreshGlyph_Clicked" Cursor="Hand"
-                                        Visibility="{Binding ElementName=_this, Path=Navigating, Mode=OneWay, Converter={StaticResource ReverseBooleanToVisibilityConverter}}"></buttons:RefreshButton>
+                                           Visibility="{Binding ElementName=_this, Path=Navigating, Mode=OneWay, Converter={StaticResource ReverseBooleanToVisibilityConverter}}"
+                                           ToolTip="Refresh"/>
                     <buttons:RefreshButton Height="30" Width="30" Clicked="CancelGlyph_Clicked" Cursor="Hand"
-                                        Visibility="{Binding ElementName=_this, Path=Navigating, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"></buttons:RefreshButton>
+                                           Visibility="{Binding ElementName=_this, Path=Navigating, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                           ToolTip="Cancel refresh"/>
                 </Grid>
             </WrapPanel>
             <TextBox Text="{Binding ElementName=_this, Path=Address, Mode=OneWay}" FontSize="16" 
@@ -72,22 +76,26 @@
                      BorderThickness="1" VerticalAlignment="Center" VerticalContentAlignment="Center"
                      BorderBrush="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
                      PreviewKeyDown="TextBox_PreviewKeyDown"
-                     IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"></TextBox>
+                     IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"
+                     ToolTip="Address bar"/>
             <StackPanel Grid.Column="2" Orientation="Horizontal">
                 <buttons:HomeButton Width="30" Height="30" Margin="5"
                                     Visibility="{Binding ElementName=_this, Path=HomeButtonVisible, Mode=OneWay, Converter={StaticResource ReverseBooleanToVisibilityConverter}}"
                                     Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
                                     IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"
-                                    Clicked="HomeButton_Clicked"></buttons:HomeButton>
+                                    Clicked="HomeButton_Clicked"
+                                    ToolTip="Navigate to home"/>
                 <buttons:StarButton Height="30" Width="30" Margin="5"
                                     Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
                                     Visibility="{Binding ElementName=_this, Path=HomeButtonVisible, Mode=OneWay, Converter={StaticResource ReverseBooleanToVisibilityConverter}}"
                                     IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"
-                                    Clicked="StarGlyph_Clicked" x:Name="FavoriteButton"></buttons:StarButton>
+                                    Clicked="StarGlyph_Clicked" x:Name="FavoriteButton"
+                                    ToolTip="Mark as favorite"/>
                 <buttons:MaximizeButton Height="30" Width="30" Margin="5"
-                                    Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
-                                    IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"
-                                    Clicked="MaximizeButton_Clicked"></buttons:MaximizeButton>
+                                        Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                                        IsEnabled="{Binding ElementName=_this, Path=BrowserSupported, Mode=OneWay}"
+                                        Clicked="MaximizeButton_Clicked"
+                                        ToolTip="Maximize"/>
             </StackPanel>
         </Grid>
         <Grid Grid.RowSpan="2" Background="{StaticResource Daybreak.Brushes.Background}"

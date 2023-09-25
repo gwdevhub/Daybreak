@@ -35,7 +35,8 @@
             Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
             FontSize="24"
             DebounceDelay="0:0:1"
-            TextChanged="SearchTextBox_TextChanged" />
+            TextChanged="SearchTextBox_TextChanged"
+            ToolTip="Search bar"/>
         <ItemsControl
                     Grid.Row="2"
                     ItemsSource="{Binding ElementName=_this, Path=TraderQuotes, Mode=OneWay}"
@@ -60,7 +61,8 @@
                     <buttons:HighlightButton
                         Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                         HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
-                        Clicked="HighlightButton_Clicked">
+                        Clicked="HighlightButton_Clicked"
+                        ToolTip="Open price history">
                         <buttons:HighlightButton.ButtonContent>
                             <templates:TradeQuoteTemplate 
                                 BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
