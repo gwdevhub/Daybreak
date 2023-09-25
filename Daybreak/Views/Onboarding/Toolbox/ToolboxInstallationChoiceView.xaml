@@ -14,7 +14,7 @@
             BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
             BorderThickness="1"/>
         <StackPanel VerticalAlignment="Center">
-            <TextBlock Text="Do you already have GWToolboxpp installed on your PC?" Margin="10, 0, 10, 0" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+            <TextBlock Text="Do you already have GWToolbox installed on your PC?" Margin="10, 0, 10, 0" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                        TextWrapping="Wrap" HorizontalAlignment="Center" FontSize="16"></TextBlock>
             <Grid MaxWidth="600"
                   Margin="10">
@@ -23,33 +23,35 @@
                     <ColumnDefinition Width="*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <buttons:HighlightButton Title="No"
-                                    Grid.Column="0"
-                                    HorizontalAlignment="Center"
-                                    Height="30"
-                                    Width="60"
-                                    HorizontalContentAlignment="Center"
-                                    VerticalContentAlignment="Center"
-                                    FontSize="16"
-                                    Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                                    Background="{StaticResource MahApps.Brushes.ThemeBackground}"
-                                    HighlightColor="{StaticResource MahApps.Brushes.Accent}"
-                                    BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
-                                    BorderThickness="1"
-                                    Clicked="OpaqueButtonNo_Clicked"></buttons:HighlightButton>
+                                         Grid.Column="0"
+                                         HorizontalAlignment="Center"
+                                         Height="30"
+                                         Width="60"
+                                         HorizontalContentAlignment="Center"
+                                         VerticalContentAlignment="Center"
+                                         FontSize="16"
+                                         Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                         Background="{StaticResource MahApps.Brushes.ThemeBackground}"
+                                         HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                         BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                         BorderThickness="1"
+                                         Clicked="OpaqueButtonNo_Clicked"
+                                         ToolTip="Install GWToolbox"/>
                 <buttons:HighlightButton Title="Yes"
-                                    Grid.Column="1"
-                                    HorizontalAlignment="Center"
-                                    Height="30"
-                                    Width="60"
-                                    HorizontalContentAlignment="Center"
-                                    VerticalContentAlignment="Center"
-                                    FontSize="16"
-                                    Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                                    Background="{StaticResource MahApps.Brushes.ThemeBackground}"
-                                    HighlightColor="{StaticResource MahApps.Brushes.Accent}"
-                                    BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
-                                    BorderThickness="1"
-                                    Clicked="OpaqueButtonYes_Clicked"></buttons:HighlightButton>
+                                         Grid.Column="1"
+                                         HorizontalAlignment="Center"
+                                         Height="30"
+                                         Width="60"
+                                         HorizontalContentAlignment="Center"
+                                         VerticalContentAlignment="Center"
+                                         FontSize="16"
+                                         Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                         Background="{StaticResource MahApps.Brushes.ThemeBackground}"
+                                         HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                         BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                         BorderThickness="1"
+                                         Clicked="OpaqueButtonYes_Clicked"
+                                         ToolTip="Open existing installation"/>
             </Grid>
         </StackPanel>
     </Grid>

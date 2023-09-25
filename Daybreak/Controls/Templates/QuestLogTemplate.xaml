@@ -17,9 +17,10 @@
                                         Title="{Binding Title}"
                                         HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
                                         FontSize="18"
-                                        Clicked="LocationButton_Clicked"></buttons:MenuButton>
+                                        Clicked="LocationButton_Clicked"
+                                        ToolTip="Open location info"/>
                     <Rectangle Fill="{DynamicResource MahApps.Brushes.ThemeForeground}" Height="1"
-                               VerticalAlignment="Bottom"></Rectangle>
+                               VerticalAlignment="Bottom" />
                 </Grid>
             </DataTemplate>
             <DataTemplate DataType="{x:Type models:QuestEntry}">
@@ -28,10 +29,11 @@
                                         HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
                                         FontSize="18"
                                         Margin="15, 0, 0, 0"
-                                        Clicked="QuestButton_Clicked"></buttons:MenuButton>
+                                        Clicked="QuestButton_Clicked"
+                                        ToolTip="Open quest info"/>
             </DataTemplate>
             <DataTemplate DataType="{x:Type models:QuestLogSeparator}">
-                <Rectangle Fill="Transparent" Height="15"></Rectangle>
+                <Rectangle Fill="Transparent" Height="15" />
             </DataTemplate>
         </ItemsControl.Resources>
     </ItemsControl>

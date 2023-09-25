@@ -12,12 +12,14 @@
     <Grid Background="{StaticResource Daybreak.Brushes.Background}">
         <Border BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
                 BorderThickness="0, 1, 0, 0"/>
-        <TextBlock HorizontalAlignment="Center" Text="Executables settings" FontSize="22" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
+        <TextBlock HorizontalAlignment="Center" Text="Executables settings" FontSize="22" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" />
         <buttons:AddButton   Height="30" Width="30" Grid.Column="0" 
-                             HorizontalAlignment="Right" Margin="5, 5, 45, 5" Clicked="AddButton_Clicked" VerticalAlignment="Top"></buttons:AddButton>
+                             HorizontalAlignment="Right" Margin="5, 5, 45, 5" Clicked="AddButton_Clicked" VerticalAlignment="Top"
+                             ToolTip="Add entry"/>
         <buttons:SaveButton  Height="30" Width="30" Grid.Column="0" HorizontalAlignment="Right" Margin="5"
-                             Clicked="SaveButton_Clicked" VerticalAlignment="Top"></buttons:SaveButton>
-        <Rectangle Fill="{StaticResource MahApps.Brushes.ThemeForeground}" VerticalAlignment="Top" Height="1" Margin="0, 39, 0, 0"></Rectangle>
+                             Clicked="SaveButton_Clicked" VerticalAlignment="Top"
+                             ToolTip="Save changes" />
+        <Rectangle Fill="{StaticResource MahApps.Brushes.ThemeForeground}" VerticalAlignment="Top" Height="1" Margin="0, 39, 0, 0" />
         <ItemsControl ItemsSource="{Binding ElementName=_this, Path=Paths, Mode=OneWay}" Background="Transparent" Margin="0, 40, 0, 0"
                   BorderThickness="0">
             <ItemsControl.ItemTemplate>

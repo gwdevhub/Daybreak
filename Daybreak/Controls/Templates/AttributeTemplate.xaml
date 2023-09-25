@@ -11,17 +11,21 @@
     <Grid Height="30">
         <WrapPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="10, 0, 10, 0">
             <buttons:HelpButton Width="20" Height="20" Margin="3, 5, 3, 0" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                                Clicked="HelpButton_Clicked" Cursor="Hand"></buttons:HelpButton>
+                                Clicked="HelpButton_Clicked" Cursor="Hand"
+                                ToolTip="Open attribute info"/>
             <TextBlock Text="{Binding Attribute.Name}" FontSize="16" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                       Margin="0, 3, 0, 0"></TextBlock>
+                       Margin="0, 3, 0, 0" />
         </WrapPanel>
         <WrapPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="10, 0, 10, 0">
             <buttons:MinusButton Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Height="20" Clicked="MinusButton_Clicked" Cursor="Hand"
-                                 IsEnabled="{Binding ElementName=_this, Path=CanSubtract, Mode=OneWay}" Margin="0, 0, 5, 0"></buttons:MinusButton>
+                                 IsEnabled="{Binding ElementName=_this, Path=CanSubtract, Mode=OneWay}" Margin="0, 0, 5, 0"
+                                 ToolTip="Decrease attribute points"/>
             <TextBox Background="Transparent" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" FontSize="16" IsReadOnly="True" Width="30"
-                     Text="{Binding Points}"></TextBox>
+                     Text="{Binding Points}"
+                     ToolTip="Current attribute points"/>
             <buttons:AddButton Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Height="20" Clicked="AddButton_Clicked" Cursor="Hand"
-                               IsEnabled="{Binding ElementName=_this, Path=CanAdd, Mode=OneWay}" Margin="5, 0, 0, 0"></buttons:AddButton>
+                               IsEnabled="{Binding ElementName=_this, Path=CanAdd, Mode=OneWay}" Margin="5, 0, 0, 0"
+                               ToolTip="Increase attribute points"/>
         </WrapPanel>
     </Grid>
 </UserControl>

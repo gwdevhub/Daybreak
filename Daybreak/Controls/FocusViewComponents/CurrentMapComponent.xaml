@@ -27,6 +27,7 @@
                     HorizontalContentAlignment="Left"
                     Cursor="Hand"
                     FontSize="20"
-                    MouseLeftButtonDown="CurrentMap_MouseLeftButtonDown"></buttons:MenuButton>
+                    MouseLeftButtonDown="CurrentMap_MouseLeftButtonDown"
+                    ToolTip="Open current map info"/>
     </StackPanel>
 </UserControl>

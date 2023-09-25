@@ -49,8 +49,9 @@
                    HorizontalAlignment="Left"
                    Margin="5"/>
         <buttons:HighlightButton 
-            HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
-            MouseRightButtonDown="HighlightButton_MouseRightButtonDown"
-            MouseLeftButtonDown="HighlightButton_MouseLeftButtonDown"/>
+                    HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                    MouseRightButtonDown="HighlightButton_MouseRightButtonDown"
+                    MouseLeftButtonDown="HighlightButton_MouseLeftButtonDown"
+                    ToolTip="Open item details"/>
     </Grid>
 </UserControl>

@@ -37,7 +37,8 @@
                     Text="{Binding ElementName=_this, Path=PoweredBy, Mode=OneWay}"
                     FontSize="12"
                     Cursor="Hand"
-                    MouseLeftButtonDown="TextBlock_MouseLeftButtonDown"/>
+                    MouseLeftButtonDown="TextBlock_MouseLeftButtonDown"
+                    ToolTip="Open in browser"/>
             </WrapPanel>
             <TextBlock Text="{Binding ElementName=_this, Path=Title, Mode=OneWay}"
                        FontSize="22"
@@ -53,7 +54,8 @@
                 Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                 FontSize="24"
                 DebounceDelay="0:0:1"
-                TextChanged="SearchTextBox_TextChanged"></controls:SearchTextBox>
+                TextChanged="SearchTextBox_TextChanged"
+                ToolTip="Search bar" />
         </Grid>
         <ItemsControl ItemsSource="{Binding ElementName=_this, Path=TraderMessages, Mode=OneWay}"
                       ScrollViewer.VerticalScrollBarVisibility="Visible"
@@ -84,7 +86,8 @@
                 <DataTemplate DataType="tradeModels:TraderMessage">
                     <local:TradeMessageTemplate
                         MinHeight="40"
-                        TraderMessageClicked="TradeMessageTemplate_TraderMessageClicked" />
+                        TraderMessageClicked="TradeMessageTemplate_TraderMessageClicked"
+                        ToolTip="Open details"/>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

@@ -21,12 +21,13 @@
         <Border BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
                 BorderThickness="0, 1, 0, 0"/>
         <TextBlock Text="Manage application version" FontSize="22" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" HorizontalAlignment="Center"></TextBlock>
-        <Rectangle Fill="{StaticResource MahApps.Brushes.ThemeForeground}" VerticalAlignment="Top" Height="1" Margin="0, 39, 0, 0"></Rectangle>
+        <Rectangle Fill="{StaticResource MahApps.Brushes.ThemeForeground}" VerticalAlignment="Top" Height="1" Margin="0, 39, 0, 0" />
         <WrapPanel Grid.Row="1" HorizontalAlignment="Center" Margin="10">
-            <TextBlock Text="Current version: " Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" FontSize="16"></TextBlock>
+            <TextBlock Text="Current version: " Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" FontSize="16" />
             <buttons:MenuButton Title="{Binding ElementName=_this, Path=CurrentVersion.VersionString, Mode=OneWay}"
                                 Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" FontSize="16"
-                                Cursor="Hand" BorderBrush="Transparent" BorderThickness="0" Clicked="CurrentVersion_Clicked"></buttons:MenuButton>
+                                Cursor="Hand" BorderBrush="Transparent" BorderThickness="0" Clicked="CurrentVersion_Clicked"
+                                ToolTip="Open in browser"/>
         </WrapPanel>
         <ItemsControl Grid.Row="2"
                       Background="Transparent" ItemsSource="{Binding ElementName=_this, Path=Versions, Mode=OneWay}"
@@ -68,12 +69,14 @@
                                             BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
                                             BorderThickness="0, 0, 0, 1"
                                             VerticalContentAlignment="Center"
-                                            HorizontalAlignment="Stretch"></buttons:HighlightButton>
+                                            HorizontalAlignment="Stretch"
+                                            ToolTip="Open in browser"/>
                         <buttons:BackButton Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Width="30" Height="30" HorizontalAlignment="Right"
                                             Margin="5"
-                                            Clicked="DesiredVersion_DownloadButton_Clicked">
+                                            Clicked="DesiredVersion_DownloadButton_Clicked"
+                                            ToolTip="Install this version">
                             <buttons:BackButton.RenderTransform>
-                                <RotateTransform Angle="270" CenterX="15" CenterY="15"></RotateTransform>
+                                <RotateTransform Angle="270" CenterX="15" CenterY="15" />
                             </buttons:BackButton.RenderTransform>
                         </buttons:BackButton>
                     </Grid>

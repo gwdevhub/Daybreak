@@ -28,7 +28,8 @@
                 BorderThickness="0, 1, 0, 0"/>
         <buttons:BackButton  Height="30" Width="30" Grid.Column="0" HorizontalAlignment="Left" Margin="5"
                              Clicked="BackButton_Clicked" VerticalAlignment="Top"
-                             IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"></buttons:BackButton>
+                             IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"
+                             ToolTip="Go back to build templates"/>
         <buttons:HighlightButton 
                                 Title="Log Out"
                                 Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
@@ -43,7 +44,8 @@
                                 Margin="5"
                                 Clicked="LogOutButton_Clicked"
                                 Height="30"
-                                IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"/>
+                                IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"
+                                ToolTip="Log out of the current account"/>
         <WrapPanel HorizontalAlignment="Center">
             <TextBlock
                    Text="Build templates synchronization"
@@ -92,19 +94,20 @@
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"/>
                 <buttons:HighlightButton Grid.Column="1"
-                                    Title="Upload all"
-                                    Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                                    Background="{StaticResource Daybreak.Brushes.Background}"
-                                    HighlightColor="{StaticResource MahApps.Brushes.Accent}"
-                                    HorizontalAlignment="Right"
-                                    VerticalContentAlignment="Center"
-                                    HorizontalContentAlignment="Center"
-                                    Width="150"
-                                    Height="30"
-                                    Clicked="UploadAllButton_Clicked"
-                                    BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
-                                    BorderThickness="1"
-                                    IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"/>
+                                         Title="Upload all"
+                                         Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                         Background="{StaticResource Daybreak.Brushes.Background}"
+                                         HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                         HorizontalAlignment="Right"
+                                         VerticalContentAlignment="Center"
+                                         HorizontalContentAlignment="Center"
+                                         Width="150"
+                                         Height="30"
+                                         Clicked="UploadAllButton_Clicked"
+                                         BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                         BorderThickness="1"
+                                         IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"
+                                         ToolTip="Upload all local builds to remote"/>
             </Grid>
             <ListView 
                     Grid.Column="0"
@@ -143,19 +146,20 @@
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"/>
                 <buttons:HighlightButton Grid.Column="0"
-                                    Title="Download all"
-                                    Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                                    Background="{StaticResource Daybreak.Brushes.Background}"
-                                    HighlightColor="{StaticResource MahApps.Brushes.Accent}"
-                                    HorizontalAlignment="Left"
-                                    HorizontalContentAlignment="Center"
-                                    VerticalContentAlignment="Center"
-                                    Height="30"
-                                    Width="150"
-                                    Clicked="DownloadAllButton_Clicked"
-                                    BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
-                                    BorderThickness="1"
-                                    IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"/>
+                                         Title="Download all"
+                                         Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                         Background="{StaticResource Daybreak.Brushes.Background}"
+                                         HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                         HorizontalAlignment="Left"
+                                         HorizontalContentAlignment="Center"
+                                         VerticalContentAlignment="Center"
+                                         Height="30"
+                                         Width="150"
+                                         Clicked="DownloadAllButton_Clicked"
+                                         BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                         BorderThickness="1"
+                                         IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"
+                                         ToolTip="Download all remote builds to local"/>
             </Grid>
             <ListView 
                     Grid.Column="2"
@@ -199,7 +203,8 @@
                                         Clicked="DownloadButton_Clicked"
                                         BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
                                         BorderThickness="1"
-                                        IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"></buttons:HighlightButton>
+                                        IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"
+                                        ToolTip="Download selected remote build"/>
                 <buttons:HighlightButton    
                                         Title="Upload Build"
                                         Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
@@ -213,7 +218,8 @@
                                         Clicked="UploadButton_Clicked"
                                         BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
                                         BorderThickness="1"
-                                        IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}"></buttons:HighlightButton>
+                                        IsEnabled="{Binding ElementName=_this, Path=ButtonsEnabled, Mode=OneWay}" 
+                                        ToolTip="Upload selected local build"/>
             </StackPanel>
         </Grid>
         <Grid Grid.RowSpan="3"

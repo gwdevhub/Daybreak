@@ -29,7 +29,8 @@
                                  HorizontalAlignment="Right"
                                  VerticalContentAlignment="Center"
                                  TextPadding="5"
-                                 Clicked="HighlightButton_Clicked"/>
+                                 Clicked="HighlightButton_Clicked"
+                                 ToolTip="Clear all notifications"/>
         <ItemsControl
             Grid.Row="1"
             Background="Transparent"

@@ -18,7 +18,7 @@
              Loaded="GuildwarsMinimap_Loaded"
              Unloaded="GuildwarsMinimap_Unloaded">
     <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <ContextMenu x:Key="WorldPlayerContextMenu">
             <ContextMenu.Template>
                 <ControlTemplate>
@@ -29,7 +29,7 @@
         <ContextMenu x:Key="MainPlayerContextMenu">
             <ContextMenu.Template>
                 <ControlTemplate>
-                    <controls:MainPlayerContextMenu DataContext="{Binding DataContext, RelativeSource={RelativeSource TemplatedParent}}"></controls:MainPlayerContextMenu>
+                    <controls:MainPlayerContextMenu DataContext="{Binding DataContext, RelativeSource={RelativeSource TemplatedParent}}" />
                 </ControlTemplate>
             </ContextMenu.Template>
         </ContextMenu>
@@ -38,7 +38,7 @@
                 <ControlTemplate>
                     <controls:LivingEntityContextMenu DataContext="{Binding DataContext, RelativeSource={RelativeSource TemplatedParent}}"
                                                       LivingEntityContextMenuClicked="LivingEntityContextMenu_LivingEntityContextMenuClicked"
-                                                      LivingEntityProfessionContextMenuClicked="LivingEntityContextMenu_LivingEntityProfessionContextMenuClicked"></controls:LivingEntityContextMenu>
+                                                      LivingEntityProfessionContextMenuClicked="LivingEntityContextMenu_LivingEntityProfessionContextMenuClicked" />
                 </ControlTemplate>
             </ContextMenu.Template>
         </ContextMenu>
@@ -46,7 +46,7 @@
             <ContextMenu.Template>
                 <ControlTemplate>
                     <controls:PlayerContextMenu DataContext="{Binding DataContext, RelativeSource={RelativeSource TemplatedParent}}"
-                                             PlayerContextMenuClicked="PlayerContextMenu_PlayerContextMenuClicked"></controls:PlayerContextMenu>
+                                             PlayerContextMenuClicked="PlayerContextMenu_PlayerContextMenuClicked" />
                 </ControlTemplate>
             </ContextMenu.Template>
         </ContextMenu>
@@ -54,7 +54,7 @@
             <ContextMenu.Template>
                 <ControlTemplate>
                     <controls:QuestContextMenu DataContext="{Binding DataContext, RelativeSource={RelativeSource TemplatedParent}}"
-                                            QuestContextMenuClicked="QuestContextMenu_QuestContextMenuClicked"></controls:QuestContextMenu>
+                                            QuestContextMenuClicked="QuestContextMenu_QuestContextMenuClicked" />
                 </ControlTemplate>
             </ContextMenu.Template>
         </ContextMenu>
@@ -62,7 +62,7 @@
             <ContextMenu.Template>
                 <ControlTemplate>
                     <controls:MapIconContextMenu DataContext="{Binding DataContext, RelativeSource={RelativeSource TemplatedParent}}"
-                                            MapIconContextMenuClicked="MapIconContextMenu_MapIconContextMenuClicked"></controls:MapIconContextMenu>
+                                            MapIconContextMenuClicked="MapIconContextMenu_MapIconContextMenuClicked" />
                 </ControlTemplate>
             </ContextMenu.Template>
         </ContextMenu>
@@ -76,17 +76,18 @@
               Visibility="{Binding ElementName=_this, Path=ControlsVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
             <buttons:MaximizeButton Height="30" Width="30" Margin="5"
                                     Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                                    Clicked="MaximizeButton_Clicked"></buttons:MaximizeButton>
+                                    Clicked="MaximizeButton_Clicked"
+                                    ToolTip="Maximize"/>
         </Grid>
         <WrapPanel Background="{DynamicResource Daybreak.Brushes.Background}"
                    VerticalAlignment="Top"
                    HorizontalAlignment="Right" >
             <TextBlock Text="{Binding ElementName=_this, Path=TargetEntityId, Mode=OneWay}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                       FontSize="16" Padding="5" ></TextBlock>
+                       FontSize="16" Padding="5" />
             <TextBlock Text=" - " Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                       FontSize="16" Padding="5" ></TextBlock>
+                       FontSize="16" Padding="5" />
             <TextBlock Text="{Binding ElementName=_this, Path=TargetEntityModelId, Mode=OneWay}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                       FontSize="16" Padding="5" ></TextBlock>
+                       FontSize="16" Padding="5" />
         </WrapPanel>
     </Grid>
 </UserControl>

@@ -37,9 +37,11 @@
                     TextWrapping="Wrap"
                     IsReadOnly="True"
                     IsReadOnlyCaretVisible="False"
-                    BorderThickness="0, 0, 0, 1"/>
+                    BorderThickness="0, 0, 0, 1"
+                    ToolTip="Player name"/>
             <buttons:CopyButton Height="20" Width="20"
-                                    Clicked="NameCopyButton_Clicked"/>
+                                Clicked="NameCopyButton_Clicked"
+                                ToolTip="Copy to clipboard"/>
         </WrapPanel>
         <WrapPanel
                 Margin="10, 0, 10, 0"
@@ -56,9 +58,11 @@
                     TextWrapping="Wrap"
                     IsReadOnly="True"
                     IsReadOnlyCaretVisible="False"
-                    BorderThickness="0, 0, 0, 1"/>
+                    BorderThickness="0, 0, 0, 1"
+                    ToolTip="Message"/>
             <buttons:CopyButton Height="20" Width="20"
-                                    Clicked="MessageCopyButton_Clicked"/>
+                                Clicked="MessageCopyButton_Clicked"
+                                ToolTip="Copy to clipboard"/>
         </WrapPanel>
         <WrapPanel
                 Margin="10, 0, 10, 0"
@@ -75,9 +79,11 @@
                     TextWrapping="Wrap"
                     IsReadOnly="True"
                     IsReadOnlyCaretVisible="False"
-                    BorderThickness="0, 0, 0, 1"/>
+                    BorderThickness="0, 0, 0, 1"
+                    ToolTip="Timestamp"/>
             <buttons:CopyButton Height="20" Width="20"
-                                    Clicked="TimestampCopyButton_Clicked"/>
+                                Clicked="TimestampCopyButton_Clicked"
+                                ToolTip="Copy to clipboard"/>
         </WrapPanel>
         <buttons:HighlightButton
                 Grid.Row="3"
@@ -92,6 +98,7 @@
                 BorderThickness="1"
                 TextPadding="5"
                 Margin="10"
-                Clicked="CloseButton_Clicked"></buttons:HighlightButton>
+                Clicked="CloseButton_Clicked"
+                ToolTip="Close"/>
     </Grid>
 </UserControl>

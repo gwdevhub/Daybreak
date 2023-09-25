@@ -26,6 +26,7 @@
                             BorderThickness="1"
                             IsEnabled="{Binding ElementName=_this, Path=LaunchButtonEnabled, Mode=OneWay}"
                             Clicked="LaunchButton_Clicked" Grid.Row="0" Grid.ColumnSpan="3"
-                            Cursor="Hand"></buttons:HighlightButton>
+                            ToolTip="Launch Guild Wars"
+                            Cursor="Hand"/>
     </Grid>
 </UserControl>
