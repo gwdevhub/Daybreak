@@ -9,6 +9,7 @@ using Daybreak.Services.Options;
 using Daybreak.Services.Plugins;
 using Daybreak.Services.Screens;
 using Daybreak.Services.Startup;
+using Daybreak.Services.Themes;
 using Daybreak.Services.Updater.PostUpdate;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -80,6 +81,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
          * initializing the options.
          */
         this.ServiceProvider.GetRequiredService<ISplashScreenService>().ShowSplashScreen();
+        _ = this.ServiceProvider.GetRequiredService<IThemeManager>().GetCurrentTheme();
 
         var serviceManager = this.ServiceProvider.GetRequiredService<IServiceManager>();
         var viewProducer = this.ServiceProvider.GetRequiredService<IViewManager>();
