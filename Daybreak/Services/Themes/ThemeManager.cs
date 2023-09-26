@@ -4,8 +4,10 @@ using Daybreak.Launch;
 using Daybreak.Models;
 using Daybreak.Services.Options;
 using Daybreak.Utils;
+using System;
 using System.Configuration;
 using System.Core.Extensions;
+using System.Diagnostics;
 using System.Extensions;
 using System.Linq;
 using System.Reflection;
@@ -15,8 +17,8 @@ using System.Windows.Media;
 namespace Daybreak.Services.Themes;
 public sealed class ThemeManager : IThemeManager, IApplicationLifetimeService
 {
-    private const string BackgroundKey = "Daybreak.Brushes.Background";
-    private const string MahAppsBackgroundKey = "MahApps.Brushes.ThemeBackground";
+    private const string LightThemeValue = "Light";
+    private const string RegistryKey = @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes";
     private const string DarkMode = "Dark";
     private const string LightMode = "Light";
 
@@ -28,14 +30,13 @@ public sealed class ThemeManager : IThemeManager, IApplicationLifetimeService
     {
         this.themeOptions = themeOptions.ThrowIfNull();
         optionsUpdateHook.ThrowIfNull().RegisterHook<ThemeOptions>(this.UpdateTheme);
-        this.SetCurrentTheme();
+        this.SetAndReturnCurrentTheme();
     }
 
     public Color GetForegroundColor()
     {
         var themeManager = ControlzEx.Theming.ThemeManager.Current;
-        var mode = this.themeOptions.Value.DarkMode ? DarkMode : LightMode;
-        var theme = this.themeOptions.Value.Theme.ToString();
+        (var mode, var theme) = this.GetCurrentModeAndTheme();
         var definedTheme = themeManager.GetTheme(mode, theme);
         var mahAppsResources = definedTheme?.Resources.MergedDictionaries.First().MergedDictionaries.First();
         return (Color)mahAppsResources!["MahApps.Colors.ThemeForeground"];
@@ -43,10 +44,7 @@ public sealed class ThemeManager : IThemeManager, IApplicationLifetimeService
 
     public Theme GetCurrentTheme()
     {
-        var themeManager = ControlzEx.Theming.ThemeManager.Current;
-        var mode = this.themeOptions.Value.DarkMode ? DarkMode : LightMode;
-        var theme = this.themeOptions.Value.Theme.ToString();
-        return themeManager.GetTheme(mode, theme)!;
+        return ControlzEx.Theming.ThemeManager.Current.DetectTheme(Launcher.Instance) ?? throw new InvalidOperationException("Unable to retrieve theme");
     }
 
     public void OnClosing()
@@ -59,20 +57,20 @@ public sealed class ThemeManager : IThemeManager, IApplicationLifetimeService
 
     private void UpdateTheme()
     {
-        this.SetCurrentTheme();
+        this.SetAndReturnCurrentTheme();
     }
 
-    private void SetCurrentTheme()
+    private Theme SetAndReturnCurrentTheme()
     {
         var themeManager = ControlzEx.Theming.ThemeManager.Current;
-        var mode = this.themeOptions.Value.DarkMode ? DarkMode : LightMode;
-        var theme = this.themeOptions.Value.Theme.ToString();
+        (var mode, var theme) = this.GetCurrentModeAndTheme();
         var definedTheme = themeManager.GetTheme(mode, theme);
         var mahAppsResources = definedTheme?.Resources.MergedDictionaries.First().MergedDictionaries.First()!;
         var definedBackgroundBrush = mahAppsResources["MahApps.Brushes.ThemeBackground"].Cast<SolidColorBrush>();
         var foregroundColor = mahAppsResources["MahApps.Colors.ThemeForeground"].Cast<Color>();
         var foregroundColorToBlend = Color.FromArgb(80, foregroundColor.R, foregroundColor.G, foregroundColor.B);
-        mahAppsResources["Daybreak.Brushes.Background"] = new SolidColorBrush(definedBackgroundBrush!.Color) { Opacity = 0.8 };
+        var backgroundColorToBlend = Color.FromArgb(200, definedBackgroundBrush.Color.R, definedBackgroundBrush.Color.G, definedBackgroundBrush.Color.B);
+        mahAppsResources["Daybreak.Brushes.Background"] = new SolidColorBrush(backgroundColorToBlend);
         mahAppsResources["Daybreak.Brushes.Kurzick"] = new SolidColorBrush(ColorPalette.Blue);
         mahAppsResources["Daybreak.Brushes.Luxon"] = new SolidColorBrush(ColorPalette.Orange);
         mahAppsResources["Daybreak.Brushes.Imperial"] = new SolidColorBrush(ColorPalette.Purple);
@@ -90,6 +88,40 @@ public sealed class ThemeManager : IThemeManager, IApplicationLifetimeService
             mahAppsResources[$"Daybreak.BlendedBrushes.{member.Name}"] = new SolidColorBrush(blendedColor);
         }
 
+        ChangeTheme(themeManager, mode, theme);
+        return definedTheme!;
+    }
+
+    private (string Mode, string Theme) GetCurrentModeAndTheme()
+    {
+        var mode = this.themeOptions.Value.DarkMode ? DarkMode : LightMode;
+        if (this.themeOptions.Value.SystemSynchronization)
+        {
+            mode = IsWindowsLight() ? LightMode : DarkMode;
+        }
+
+        var theme = this.themeOptions.Value.Theme.ToString();
+        return (mode, theme);
+    }
+
+    private static void ChangeTheme(ControlzEx.Theming.ThemeManager themeManager, string mode, string theme)
+    {
+        if (mode == LightMode)
+        {
+            themeManager.ChangeTheme(Launcher.Instance, DarkMode, theme);
+        }
+
         themeManager.ChangeTheme(Launcher.Instance, mode, theme);
+    }
+
+    /*
+     * By default, windows 10 comes with dark mode and windows 11 with light mode.
+     * When migrating from windows 7 to windows 10, the theme will be called roamed.
+     * As such, it is easier to check for the light theme and treat everything else as dark theme.
+     */
+    private static bool IsWindowsLight()
+    {
+        var theme = Microsoft.Win32.Registry.GetValue(RegistryKey, "CurrentTheme", string.Empty)?.As<string>();
+        return LightThemeValue.Equals(theme?.Split('\\').Last().Split('.').First().ToString(), System.StringComparison.OrdinalIgnoreCase);
     }
 }

@@ -61,7 +61,7 @@
                VerticalAlignment="Center"
                HorizontalAlignment="Center"
                Grid.Row="1"
-               FontSize="20"
+               FontSize="16"
                Foreground="{StaticResource FontColor}"/>
     </Grid>
 </Window>

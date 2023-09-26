@@ -1,5 +1,6 @@
 ﻿using Daybreak.Models.Progress;
 using System.Core.Extensions;
+using System.Extensions;
 using System.Windows;
 
 namespace Daybreak.Launch;
