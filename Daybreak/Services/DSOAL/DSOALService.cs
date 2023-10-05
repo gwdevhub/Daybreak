@@ -1,6 +1,7 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Models.Progress;
 using Daybreak.Services.Downloads;
+using Daybreak.Services.Notifications;
 using Daybreak.Services.Privilege;
 using Daybreak.Services.Registry;
 using Daybreak.Views;
@@ -33,6 +34,7 @@ public sealed class DSOALService : IDSOALService
     private const string AlsoftIni = "alsoft.ini";
     private const string OpenAlDirectory = "openal";
 
+    private readonly INotificationService notificationService;
     private readonly IRegistryService registryService;
     private readonly IPrivilegeManager privilegeManager;
     private readonly IDownloadService downloadService;
@@ -54,12 +56,14 @@ public sealed class DSOALService : IDSOALService
            File.Exists(Path.Combine(DSOALDirectory, AlsoftIni));
 
     public DSOALService(
+        INotificationService notificationService,
         IRegistryService registryService,
         IPrivilegeManager privilegeManager,
         IDownloadService downloadService,
         ILiveUpdateableOptions<DSOALOptions> options,
         ILogger<DSOALService> logger)
     {
+        this.notificationService = notificationService.ThrowIfNull();
         this.registryService = registryService.ThrowIfNull();
         this.privilegeManager = privilegeManager.ThrowIfNull();
         this.downloadService = downloadService.ThrowIfNull();
@@ -114,6 +118,11 @@ public sealed class DSOALService : IDSOALService
         }
     }
 
+    public Task OnGuildWarsCreated(Process process)
+    {
+        return Task.CompletedTask;
+    }
+
     public Task OnGuildwarsStarted(Process process)
     {
         return Task.CompletedTask;
@@ -128,6 +137,9 @@ public sealed class DSOALService : IDSOALService
             EnsureFileExistsInGuildwarsDirectory(DsoundDll, guildwarsDirectory);
             EnsureFileExistsInGuildwarsDirectory(DSOALAldrvDll, guildwarsDirectory);
             EnsureFileExistsInGuildwarsDirectory(AlsoftIni, guildwarsDirectory);
+            this.notificationService.NotifyInformation(
+                title: "DSOAL started",
+                description: "DSOAL files have been set up");
         }
         else
         {

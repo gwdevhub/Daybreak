@@ -1,7 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Models.Guildwars;
 using HtmlAgilityPack;
-using MahApps.Metro.Controls;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Configuration;

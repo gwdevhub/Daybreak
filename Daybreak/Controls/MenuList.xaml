@@ -140,6 +140,13 @@
                                         Cursor="Hand"
                                         Clicked="DSOALButton_Clicked"
                                         ToolTip="Open DSOAL manager"/>
+                    <buttons:MenuButton Title="ReShade" 
+                                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                        HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                                        Height="30"
+                                        Cursor="Hand"
+                                        Clicked="ReShadeButton_Clicked"
+                                        ToolTip="Open ReShade manager"/>
                 </local:ExpandableMenuSection.Children>
             </local:ExpandableMenuSection>
             <local:ExpandableMenuSection

@@ -3,6 +3,7 @@ using Daybreak.Exceptions;
 using Daybreak.Models.Progress;
 using Daybreak.Models.UMod;
 using Daybreak.Services.Downloads;
+using Daybreak.Services.Injection;
 using Daybreak.Services.Notifications;
 using Daybreak.Services.UMod.Utilities;
 using Microsoft.Extensions.Logging;
@@ -30,6 +31,7 @@ public sealed class UModService : IUModService
     private const string D3D9Dll = "d3d9.dll";
     private const string D3D9DllBackup = "d3d9.dll.backup";
 
+    private readonly IProcessInjector processInjector;
     private readonly INotificationService notificationService;
     private readonly IUModClient uModClient;
     private readonly IDownloadService downloadService;
@@ -50,6 +52,7 @@ public sealed class UModService : IUModService
     public bool IsInstalled => File.Exists(this.uModOptions.Value.DllPath);
 
     public UModService(
+        IProcessInjector processInjector,
         INotificationService notificationService,
         IUModClient uModClient,
         IDownloadService downloadService,
@@ -57,6 +60,7 @@ public sealed class UModService : IUModService
         ILiveUpdateableOptions<UModOptions> uModOptions,
         ILogger<UModService> logger)
     {
+        this.processInjector = processInjector.ThrowIfNull();
         this.notificationService = notificationService.ThrowIfNull();
         this.uModClient = uModClient.ThrowIfNull();
         this.downloadService = downloadService.ThrowIfNull();
@@ -73,7 +77,12 @@ public sealed class UModService : IUModService
     public async Task OnGuildwarsStarting(Process process)
     {
         this.uModClient.Initialize(CancellationToken.None);
-        await this.LaunchUmod(process);
+    }
+
+    public Task OnGuildWarsCreated(Process process)
+    {
+        this.processInjector.Inject(process, Path.Combine(Path.GetFullPath(UModDirectory), D3D9Dll));
+        return Task.CompletedTask;
     }
 
     public async Task OnGuildwarsStarted(Process process)
@@ -215,65 +224,5 @@ public sealed class UModService : IUModService
         archiveFileStream.Dispose();
         File.Delete(ArchiveName);
         return true;
-    }
-
-    private Task LaunchUmod(Process gwProcess)
-    {
-        if (this.uModOptions.Value.Enabled is false)
-        {
-            throw new InvalidOperationException("Cannot launch uMod. uMod is disabled");
-        }
-
-        var dll = this.uModOptions.Value.DllPath;
-        if (File.Exists(dll) is false)
-        {
-            throw new ExecutableNotFoundException($"uMod executable doesn't exist at {dll}");
-        }
-
-        this.logger.LogInformation("Setting up uMod d3d9 dll");
-        this.SetupD3D9Dll(gwProcess);
-        return Task.CompletedTask;
-    }
-
-    private void SetupD3D9Dll(Process gwProcess)
-    {
-        if (gwProcess.StartInfo.FileName?.IsNullOrWhiteSpace() is true)
-        {
-            throw new InvalidOperationException("Unable to start uMod. Invalid Guild Wars process");
-        }
-
-        var guildWarsDirectory = Path.GetDirectoryName(gwProcess.StartInfo.FileName);
-        var d3d9SourceFilePath = Path.Combine(UModDirectory, D3D9Dll);
-        var d3d9DestinationFilePath = Path.Combine(guildWarsDirectory!, D3D9Dll);
-        if (MustBackupD3D9Dll(d3d9SourceFilePath, d3d9DestinationFilePath))
-        {
-            this.logger.LogInformation($"Found an existing {D3D9Dll} file. Saving it as {D3D9DllBackup}");
-            var d3d9DestinationBackupFilePath = Path.Combine(guildWarsDirectory!, D3D9DllBackup);
-            if (File.Exists(d3d9DestinationBackupFilePath))
-            {
-                File.Delete(d3d9DestinationBackupFilePath);
-            }
-
-            File.Move(d3d9DestinationFilePath, d3d9DestinationBackupFilePath);
-            File.Delete(d3d9DestinationFilePath);
-        }
-
-        if (!File.Exists(d3d9DestinationFilePath))
-        {
-            this.logger.LogInformation($"Copying {d3d9SourceFilePath} to {d3d9DestinationFilePath}");
-            File.Copy(d3d9SourceFilePath, d3d9DestinationFilePath);
-        }
-    }
-
-    private static bool MustBackupD3D9Dll(string sourcePath, string destinationPath)
-    {
-        if (!File.Exists(destinationPath))
-        {
-            return false;
-        }
-
-        var sourceInfo = new FileInfo(sourcePath);
-        var destinationInfo = new FileInfo(destinationPath);
-        return sourceInfo.Length != destinationInfo.Length;
     }
 }

@@ -62,15 +62,14 @@ internal sealed class ToolboxService : IToolboxService
         this.logger = logger.ThrowIfNull();
     }
 
-    public Task OnGuildwarsStarting(Process process)
-    {
-        return Task.CompletedTask;
-    }
+    public Task OnGuildwarsStarting(Process process) => Task.CompletedTask;
 
-    public async Task OnGuildwarsStarted(Process process)
+    public async Task OnGuildWarsCreated(Process process)
     {
         await this.LaunchToolbox(process);
     }
+
+    public Task OnGuildwarsStarted(Process process) => Task.CompletedTask;
 
     public IEnumerable<string> GetCustomArguments()
     {
@@ -164,26 +163,6 @@ internal sealed class ToolboxService : IToolboxService
         {
             scopedLogger.LogError("Dll file does not exist");
             throw new ExecutableNotFoundException($"GWToolbox dll doesn't exist at {dll}");
-        }
-
-        while (true)
-        {
-            var loginData = await this.guildwarsMemoryCache.ReadLoginData(CancellationToken.None);
-            if (loginData is null)
-            {
-                scopedLogger.LogError("Login data is null. Waiting 500ms and retrying");
-                await Task.Delay(500);
-                continue;
-            }
-
-            if (loginData.Email.IsNullOrWhiteSpace())
-            {
-                scopedLogger.LogError("Email is null or empty. Waiting 500ms and retrying");
-                await Task.Delay(500);
-                continue;
-            }
-
-            break;
         }
 
         scopedLogger.LogInformation("Injecting toolbox dll");
