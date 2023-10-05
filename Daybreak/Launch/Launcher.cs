@@ -7,6 +7,7 @@ using Daybreak.Services.Navigation;
 using Daybreak.Services.Notifications;
 using Daybreak.Services.Options;
 using Daybreak.Services.Plugins;
+using Daybreak.Services.ReShade;
 using Daybreak.Services.Screens;
 using Daybreak.Services.Startup;
 using Daybreak.Services.Themes;
@@ -17,6 +18,7 @@ using Slim;
 using Slim.Integration.ServiceCollection;
 using System;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Extensions;
 using System.Windows.Media;
@@ -60,7 +62,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
         return this.exceptionHandler?.HandleException(e) is true;
     }
 
-    protected override void ApplicationStarting()
+    protected override async void ApplicationStarting()
     {
         /*
          * Show splash screen before beginning to load the rest of the application.
@@ -106,7 +108,6 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
 
         this.logger = this.ServiceProvider.GetRequiredService<ILogger<Launcher>>();
         this.exceptionHandler = this.ServiceProvider.GetRequiredService<IExceptionHandler>();
-
         try
         {
             startupStatus.CurrentStep = StartupStatus.Custom("Loading plugins");

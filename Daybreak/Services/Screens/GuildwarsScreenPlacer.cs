@@ -1,5 +1,4 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Models.Guildwars;
 using Daybreak.Services.Scanner;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -72,4 +71,6 @@ public sealed class GuildwarsScreenPlacer : IGuildwarsScreenPlacer
     public IEnumerable<string> GetCustomArguments() => Enumerable.Empty<string>();
 
     public Task OnGuildwarsStarting(Process process) => Task.CompletedTask;
+
+    public Task OnGuildWarsCreated(Process process) => Task.CompletedTask;
 }

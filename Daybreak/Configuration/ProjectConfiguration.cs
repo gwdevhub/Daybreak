@@ -74,6 +74,8 @@ using Daybreak.Services.Plugins;
 using Daybreak.Services.UMod.Utilities;
 using Daybreak.Services.Toolbox.Utilities;
 using Daybreak.Services.Injection;
+using Daybreak.Services.ReShade;
+using Daybreak.Views.Onboarding.ReShade;
 
 namespace Daybreak.Configuration;
 
@@ -133,6 +135,10 @@ public class ProjectConfiguration : PluginConfigurationBase
                 .Build()
             .RegisterHttpClient<ToolboxClient>()
                 .WithMessageHandler(this.SetupLoggingAndMetrics<ToolboxClient>)
+                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
+                .Build()
+            .RegisterHttpClient<ReShadeService>()
+                .WithMessageHandler(this.SetupLoggingAndMetrics<ReShadeService>)
                 .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
                 .Build();
     }
@@ -280,6 +286,14 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<DSOALBrowserView>();
         viewProducer.RegisterView<PluginsView>();
         viewProducer.RegisterView<PluginsConfirmationView>();
+        viewProducer.RegisterView<ReShadeInstallingView>();
+        viewProducer.RegisterView<ReShadeInstallationChoiceView>();
+        viewProducer.RegisterView<ReShadeOnboardingEntryView>();
+        viewProducer.RegisterView<ReShadeMainView>();
+        viewProducer.RegisterView<ReShadeBrowserView>();
+        viewProducer.RegisterView<ReShadeStockEffectsSelectorView>();
+        viewProducer.RegisterView<ReShadeConfigView>();
+        viewProducer.RegisterView<ReShadePresetView>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -363,6 +377,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         optionsProducer.RegisterOptions<ToolboxOptions>();
         optionsProducer.RegisterOptions<UModOptions>();
         optionsProducer.RegisterOptions<DSOALOptions>();
+        optionsProducer.RegisterOptions<ReShadeOptions>();
 
         optionsProducer.RegisterOptions<ScreenManagerOptions>();
         optionsProducer.RegisterOptions<KamadanTradeChatOptions>();
@@ -393,6 +408,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         modsManager.RegisterMod<IUModService, UModService>();
         modsManager.RegisterMod<IDSOALService, DSOALService>();
         modsManager.RegisterMod<IGuildwarsScreenPlacer, GuildwarsScreenPlacer>();
+        modsManager.RegisterMod<IReShadeService, ReShadeService>();
     }
 
     private void RegisterLiteCollections(IServiceCollection services)

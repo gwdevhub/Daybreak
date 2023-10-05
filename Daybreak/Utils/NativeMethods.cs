@@ -16,6 +16,13 @@ internal static class NativeMethods
 
     public delegate IntPtr HookProc(int nCode, IntPtr wParam, IntPtr lParam);
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct SecurityAttributes
+    {
+        public uint nLength;
+        public IntPtr lpSecurityDescriptor;
+        public bool bInheritHandle;
+    }
     [Flags]
     public enum MemoryProtection : uint
     {
@@ -158,6 +165,142 @@ internal static class NativeMethods
     {
         FileNameInformation = 9
     }
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    public struct StartupInfo
+    {
+        public int cb;
+        public string lpReserved;
+        public string lpDesktop;
+        public string lpTitle;
+        public int dwX;
+        public int dwY;
+        public int dwXSize;
+        public int dwYSize;
+        public int dwXCountChars;
+        public int dwYCountChars;
+        public int dwFillAttribute;
+        public int dwFlags;
+        public short wShowWindow;
+        public short cbReserved2;
+        public IntPtr lpReserved2;
+        public IntPtr hStdInput;
+        public IntPtr hStdOutput;
+        public IntPtr hStdError;
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct ProcessInformation
+    {
+        public IntPtr hProcess;
+        public IntPtr hThread;
+        public int dwProcessId;
+        public int dwThreadId;
+    }
+    public enum ProcessInfoClass : uint
+    {
+        ProcessBasicInformation = 0x00,
+        ProcessDebugPort = 0x07,
+        ProcessExceptionPort = 0x08,
+        ProcessAccessToken = 0x09,
+        ProcessWow64Information = 0x1A,
+        ProcessImageFileName = 0x1B,
+        ProcessDebugObjectHandle = 0x1E,
+        ProcessDebugFlags = 0x1F,
+        ProcessExecuteFlags = 0x22,
+        ProcessInstrumentationCallback = 0x28,
+        MaxProcessInfoClass = 0x64
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct ProcessBasicInformation
+    {
+        private readonly IntPtr Reserved1;
+        internal IntPtr PebBaseAddress;
+        private readonly IntPtr Reserved2;
+        private readonly IntPtr Reserved3;
+        private readonly UIntPtr UniqueProcessId;
+        private readonly IntPtr Reserved4;
+    }
+    public enum SaferLevel : uint
+    {
+        Disallowed = 0,
+        Untrusted = 0x1000,
+        Constrained = 0x10000,
+        NormalUser = 0x20000,
+        FullyTrusted = 0x40000
+    }
+    public enum SaferLevelScope : uint
+    {
+        Machine = 1,
+        User = 2
+    }
+    public enum SaferOpen : uint
+    {
+        Open = 1
+    }
+    public enum SaferTokenBehaviour : uint
+    {
+        Default = 0x0,
+        NullIfEqual = 0x1,
+        CompareOnly = 0x2,
+        MakeInert = 0x4,
+        WantFlags = 0x8
+    }
+    public enum TokenInformationClass : uint
+    {
+        TokenUser = 1,
+        TokenGroups,
+        TokenPrivileges,
+        TokenOwner,
+        TokenPrimaryGroup,
+        TokenDefaultDacl,
+        TokenSource,
+        TokenType,
+        TokenImpersonationLevel,
+        TokenStatistics,
+        TokenRestrictedSids,
+        TokenSessionId,
+        TokenGroupsAndPrivileges,
+        TokenSessionReference,
+        TokenSandBoxInert,
+        TokenAuditPolicy,
+        TokenOrigin,
+        TokenElevationType,
+        TokenLinkedToken,
+        TokenElevation,
+        TokenHasRestrictions,
+        TokenAccessInformation,
+        TokenVirtualizationAllowed,
+        TokenVirtualizationEnabled,
+        TokenIntegrityLevel,
+        TokenUiAccess,
+        TokenMandatoryPolicy,
+        TokenLogonSid,
+        MaxTokenInfoClass
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct TokenMandatoryLabel
+    {
+        public SidAndAttributes Label;
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct SidAndAttributes
+    {
+        public IntPtr Sid;
+        public int Attributes;
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Sid_Identifier_Authority
+    {
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)]
+        public byte[] Value;
+    }
+    [Flags]
+    public enum CreationFlags : uint
+    {
+        CreateSuspended = 0x00000004,
+        DetachedProcess = 0x00000008,
+        CreateNoWindow = 0x08000000,
+        ExtendedStartupInfoPresent = 0x00080000
+    }
 
     public const int WM_SYSCOMMAND = 0x112;
 
@@ -202,4 +345,92 @@ internal static class NativeMethods
     [return: MarshalAs(UnmanagedType.Bool)]
     [DllImport("user32.dll", SetLastError = true)]
     public static extern bool GetWindowInfo(IntPtr hwnd, ref WindowInfo pwi);
+    [DllImport("kernel32.dll", CallingConvention = CallingConvention.Winapi)]
+    public static extern bool CreateProcess(
+        string lpApplicationName, string lpCommandLine, ref SecurityAttributes lpProcessAttributes,
+        ref SecurityAttributes lpThreadAttributes, bool bInheritHandles, uint dwCreationFlags,
+        IntPtr lpEnvironment, string lpCurrentDirectory, [In] ref StartupInfo lpStartupInfo,
+        out ProcessInformation lpProcessInformation);
+    [DllImport("kernel32.dll", CallingConvention = CallingConvention.Winapi)]
+    public static extern uint ResumeThread(IntPtr hThread);
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern IntPtr LocalFree(IntPtr hMem);
+    [DllImport("kernel32.dll", CallingConvention = CallingConvention.Winapi)]
+    public static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] lpBuffer, int dwSize, out IntPtr lpNumberOfBytesWritten);
+    [DllImport("ntdll.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
+    public static extern int NtQueryInformationProcess(IntPtr hProcess, ProcessInfoClass pic, out ProcessBasicInformation pbi, int cb, out int pSize);
+    [DllImport("advapi32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
+    public static extern bool SaferCreateLevel(SaferLevelScope scopeId, SaferLevel levelId, SaferOpen openFlags, out IntPtr levelHandle, IntPtr reserved);
+    [DllImport("advapi32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
+    public static extern bool SaferComputeTokenFromLevel(IntPtr levelHandle, IntPtr inAccessToken, out IntPtr outAccessToken, SaferTokenBehaviour flags, IntPtr lpReserved);
+    [DllImport("advapi32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
+    public static extern bool SaferCloseLevel(IntPtr levelHandle);
+    [DllImport("advapi32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
+    public static extern bool SetTokenInformation(IntPtr tokenHandle, TokenInformationClass tokenInformationokenInformationClass, ref TokenMandatoryLabel tokenInformation, uint tokenInformationLength);
+    [DllImport("advapi32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
+    public static extern bool ConvertStringSidToSid(string stringSid, out IntPtr ptrSid);
+    [DllImport("advapi32.dll")]
+    public static extern uint GetLengthSid(IntPtr pSid);
+    [DllImport("advapi32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
+    public static extern bool CreateProcessAsUser(
+        IntPtr hToken,
+        string lpApplicationName,
+        string lpCommandLine,
+        ref SecurityAttributes lpProcessAttributes,
+        ref SecurityAttributes lpThreadAttributes,
+        bool bInheritHandles,
+        uint dwCreationFlags,
+        IntPtr lpEnvironment,
+        string lpCurrentDirectory,
+        ref StartupInfo lpStartupInfo,
+        out ProcessInformation lpProcessInformation);
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+    public static extern IntPtr GetModuleHandle(string lpModuleName);
+    [DllImport("kernel32.dll")]
+    public static extern IntPtr CreateRemoteThread(
+        IntPtr hProcess,
+        IntPtr lpThreadAttributes,
+        uint dwStackSize,
+        IntPtr lpStartAddress,
+        IntPtr lpParameter,
+        uint dwCreationFlags,
+        out IntPtr lpThreadId);
+
+    [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
+    public static extern IntPtr VirtualAllocEx(
+        IntPtr hProcess,
+        IntPtr lpAddress,
+        IntPtr dwSize,
+        uint dwAllocationType,
+        uint dwProtect);
+
+    [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
+    public static extern bool VirtualFreeEx(
+        IntPtr hProcess,
+        IntPtr lpAddress,
+        uint dwSize,
+        uint dwFreeType);
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true)]
+    public static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern uint WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern uint GetExitCodeThread(IntPtr hHandle, out IntPtr dwMilliseconds);
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern bool WriteProcessMemory(
+        IntPtr hProcess,
+        IntPtr lpBaseAddress,
+        IntPtr lpBuffer,
+        int nSize,
+        out IntPtr lpNumberOfBytesWritten);
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern bool ReadProcessMemory(
+        IntPtr hProcess,
+        IntPtr lpBaseAddress,
+        IntPtr lpBuffer,
+        int nSize,
+        out IntPtr lpNumberOfBytesRead);
 }

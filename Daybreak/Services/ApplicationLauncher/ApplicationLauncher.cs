@@ -16,10 +16,12 @@ using System.Diagnostics;
 using System.Extensions;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using static Daybreak.Utils.NativeMethods;
 
 namespace Daybreak.Services.ApplicationLauncher;
 
@@ -178,7 +180,8 @@ public class ApplicationLauncher : IApplicationLauncher
             args.Add($"\"{character}\"");
         }
 
-        foreach(var mod in this.modsManager.GetMods().Where(m => m.IsEnabled))
+        var mods = this.modsManager.GetMods().Where(m => m.IsEnabled).ToList();
+        foreach(var mod in mods)
         {
             args.AddRange(mod.GetCustomArguments());
         }
@@ -198,9 +201,26 @@ public class ApplicationLauncher : IApplicationLauncher
 
         var preLaunchActions = this.modsManager.GetMods().Where(m => m.IsEnabled).Select(m => m.OnGuildwarsStarting(process));
         await Task.WhenAll(preLaunchActions);
-        if (process.Start() is false)
+        var pId = LaunchClient(executable.Path, string.Join(" ", args), this.privilegeManager.AdminPrivileges, out var clientHandle);
+        process = Process.GetProcessById(pId);
+
+        foreach(var mod in mods)
         {
-            throw new InvalidOperationException($"Unable to launch {executable}");
+            await mod.OnGuildWarsCreated(process);
+        }
+
+        if (clientHandle != IntPtr.Zero)
+        {
+            ResumeThread(clientHandle);
+            CloseHandle(clientHandle);
+        }
+
+        /*
+         * Run the actions one by one, to avoid injection issues
+         */
+        foreach (var mod in mods)
+        {
+            await mod.OnGuildwarsStarted(process);
         }
 
         var retries = 0;
@@ -239,8 +259,6 @@ public class ApplicationLauncher : IApplicationLauncher
                 continue;
             }
 
-            var postLaunchActions = this.modsManager.GetMods().Where(m => m.IsEnabled).Select(m => m.OnGuildwarsStarted(gwProcess!));
-            await Task.WhenAll(postLaunchActions);
             return gwProcess;
         }
     }
@@ -321,5 +339,96 @@ public class ApplicationLauncher : IApplicationLauncher
         }
 
         throw new InvalidOperationException("Could not find registry key for guildwars.");
+    }
+
+    /// <summary>
+    /// Launches the Guild Wars in suspended state. This fixes a lot of the injection issues
+    /// Once everything is injected, the process is resumed.
+    /// Source: https://github.com/GregLando113/gwlauncher/blob/master/GW%20Launcher/MulticlientPatch.cs
+    /// </summary>
+    private static int LaunchClient(string path, string args, bool elevated, out IntPtr hThread)
+    {
+        var commandLine = $"\"{path}\" {args}";
+        hThread = IntPtr.Zero;
+
+        ProcessInformation procinfo;
+        StartupInfo startinfo = new()
+        {
+            cb = Marshal.SizeOf(typeof(StartupInfo))
+        };
+        var saProcess = new SecurityAttributes();
+        saProcess.nLength = (uint)Marshal.SizeOf(saProcess);
+        var saThread = new SecurityAttributes();
+        saThread.nLength = (uint)Marshal.SizeOf(saThread);
+
+        var lastDirectory = Directory.GetCurrentDirectory();
+        Directory.SetCurrentDirectory(Path.GetDirectoryName(path)!);
+
+        if (!elevated)
+        {
+            if (!SaferCreateLevel(SaferLevelScope.User, SaferLevel.NormalUser, SaferOpen.Open, out var hLevel,
+                    IntPtr.Zero))
+            {
+                Debug.WriteLine("SaferCreateLevel");
+                return 0;
+            }
+
+            if (!SaferComputeTokenFromLevel(hLevel, IntPtr.Zero, out var hRestrictedToken, 0, IntPtr.Zero))
+            {
+                Debug.WriteLine("SaferComputeTokenFromLevel");
+                return 0;
+            }
+
+            SaferCloseLevel(hLevel);
+
+            // Set the token to medium integrity.
+
+            TokenMandatoryLabel tml;
+            tml.Label.Attributes = 0x20; // SE_GROUP_INTEGRITY
+            if (!ConvertStringSidToSid("S-1-16-8192", out tml.Label.Sid))
+            {
+                CloseHandle(hRestrictedToken);
+                Debug.WriteLine("ConvertStringSidToSid");
+            }
+
+            if (!SetTokenInformation(hRestrictedToken, TokenInformationClass.TokenIntegrityLevel, ref tml,
+                    (uint)Marshal.SizeOf(tml) + GetLengthSid(tml.Label.Sid)))
+            {
+                LocalFree(tml.Label.Sid);
+                CloseHandle(hRestrictedToken);
+                return 0;
+            }
+
+            if (!CreateProcessAsUser(hRestrictedToken, null!, commandLine, ref saProcess,
+                    ref saProcess, false, (uint)CreationFlags.CreateSuspended, IntPtr.Zero,
+                    null!, ref startinfo, out procinfo))
+            {
+                var error = Marshal.GetLastWin32Error();
+                Debug.WriteLine($"CreateProcessAsUser {error}");
+                CloseHandle(procinfo.hThread);
+                return 0;
+            }
+
+            CloseHandle(hRestrictedToken);
+        }
+        else
+        {
+            if (!CreateProcess(null!, commandLine, ref saProcess,
+                    ref saThread, false, (uint)CreationFlags.CreateSuspended, IntPtr.Zero,
+                    null!, ref startinfo, out procinfo))
+            {
+                var error = Marshal.GetLastWin32Error();
+                Debug.WriteLine($"CreateProcess {error}");
+                ResumeThread(procinfo.hThread);
+                CloseHandle(procinfo.hThread);
+                return 0;
+            }
+        }
+
+        Directory.SetCurrentDirectory(lastDirectory);
+
+        CloseHandle(procinfo.hProcess);
+        hThread = procinfo.hThread;
+        return procinfo.dwProcessId;
     }
 }

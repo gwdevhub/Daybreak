@@ -46,7 +46,7 @@ public sealed class DownloadService : IDownloadService
         this.logger.LogInformation("Beginning download");
         var fileInfo = new FileInfo(destinationPath);
         fileInfo.Directory?.Create();
-        var fileStream = File.OpenWrite(destinationPath);
+        var fileStream = File.Open(destinationPath, FileMode.CreateNew, FileAccess.Write);
         var downloadSize = (double)response.Content!.Headers!.ContentLength!;
         var buffer = new byte[1024];
         var length = 0;
