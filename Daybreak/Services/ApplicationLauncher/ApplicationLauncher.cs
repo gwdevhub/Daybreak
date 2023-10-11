@@ -1,8 +1,9 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Exceptions;
-using Daybreak.Services.Credentials;
+using Daybreak.Models.LaunchConfigurations;
 using Daybreak.Services.Mods;
 using Daybreak.Services.Mutex;
+using Daybreak.Services.Notifications;
 using Daybreak.Services.Privilege;
 using Daybreak.Utils;
 using Daybreak.Views;
@@ -31,19 +32,16 @@ public class ApplicationLauncher : IApplicationLauncher
     private const string ProcessName = "gw";
     private const string ArenaNetMutex = "AN-Mute";
 
+    private readonly INotificationService notificationService;
     private readonly ILiveOptions<LauncherOptions> launcherOptions;
-    private readonly ICredentialManager credentialManager;
     private readonly IMutexHandler mutexHandler;
     private readonly IModsManager modsManager;
     private readonly ILogger<ApplicationLauncher> logger;
     private readonly IPrivilegeManager privilegeManager;
 
-    public bool IsGuildwarsRunning => this.GetGuildwarsProcess() is not null;
-    public Process? RunningGuildwarsProcess => this.GetGuildwarsProcess();
-
     public ApplicationLauncher(
+        INotificationService notificationService,
         ILiveOptions<LauncherOptions> launcherOptions,
-        ICredentialManager credentialManager,
         IMutexHandler mutexHandler,
         IModsManager modsManager,
         ILogger<ApplicationLauncher> logger,
@@ -51,45 +49,47 @@ public class ApplicationLauncher : IApplicationLauncher
     {
         this.logger = logger.ThrowIfNull();
         this.mutexHandler = mutexHandler.ThrowIfNull();
-        this.credentialManager = credentialManager.ThrowIfNull();
         this.launcherOptions = launcherOptions.ThrowIfNull();
         this.modsManager = modsManager.ThrowIfNull();
         this.privilegeManager = privilegeManager.ThrowIfNull();
+        this.notificationService = notificationService.ThrowIfNull();
     }
 
-    public async Task<Process?> LaunchGuildwars()
+    public async Task<GuildWarsApplicationLaunchContext?> LaunchGuildwars(LaunchConfigurationWithCredentials launchConfigurationWithCredentials)
     {
+        launchConfigurationWithCredentials.ThrowIfNull();
+        var credentials = launchConfigurationWithCredentials.Credentials!.ThrowIfNull();
         var configuration = this.launcherOptions.Value;
-        var auth = await this.credentialManager.GetDefaultCredentials().ConfigureAwait(false);
-        return await auth.Switch<Task<Process?>>(
-            onSome: async (credentials) =>
+        if (configuration.MultiLaunchSupport is true)
+        {
+            if (this.privilegeManager.AdminPrivileges is false)
             {
-                credentials.ThrowIfNull();
-                if (configuration.MultiLaunchSupport is true)
-                {
-                    if (this.privilegeManager.AdminPrivileges is false)
-                    {
-                        this.privilegeManager.RequestAdminPrivileges<LauncherView>("You need administrator rights in order to start using multi-launch");
-                        return null;
-                    }
+                this.privilegeManager.RequestAdminPrivileges<LauncherView>("You need administrator rights in order to start using multi-launch");
+                return null;
+            }
 
-                    this.ClearGwLocks();
-                }
+            this.ClearGwLocks(launchConfigurationWithCredentials.ExecutablePath!.ThrowIfNull());
+        }
+        else if (this.GetGuildwarsProcesses().Any())
+        {
+            this.notificationService.NotifyError(
+                title: "Can not launch Guild Wars",
+                description: "Multi-launch is disabled. Can not launch another instance of Guild Wars while the current one is running");
+            return null;
+        }
 
-                var gwProcess = await this.LaunchGuildwarsProcess(credentials.Username!, credentials.Password!, credentials.CharacterName!);
-                if (gwProcess is null)
-                {
-                    return default;
-                }
+        var gwProcess = await this.LaunchGuildwarsProcess(
+            credentials.Username!.ThrowIfNull(),
+            credentials.Password!.ThrowIfNull(),
+            credentials.CharacterName!.ThrowIfNull(),
+            launchConfigurationWithCredentials.ExecutablePath!.ThrowIfNull());
+        if (gwProcess is null)
+        {
+            return default;
+        }
 
-                
-                return gwProcess;
-            },
-            onNone: () =>
-            {
-                throw new CredentialsNotFoundException($"No credentials available");
-            })
-            .ExtractValue()!;
+
+        return new GuildWarsApplicationLaunchContext { LaunchConfiguration = launchConfigurationWithCredentials, GuildWarsProcess = gwProcess };
     }
 
     public void RestartDaybreak()
@@ -159,10 +159,9 @@ public class ApplicationLauncher : IApplicationLauncher
         Application.Current.Shutdown();
     }
 
-    private async Task<Process?> LaunchGuildwarsProcess(string email, Models.SecureString password, string character)
+    private async Task<Process?> LaunchGuildwarsProcess(string email, Models.SecureString password, string character, string executable)
     {
-        var executable = this.launcherOptions.Value.GuildwarsPaths.Where(path => path.Default).FirstOrDefault() ?? throw new ExecutableNotFoundException($"No executable selected");
-        if (File.Exists(executable.Path) is false)
+        if (File.Exists(executable) is false)
         {
             throw new ExecutableNotFoundException($"Guildwars executable doesn't exist at {executable}");
         }
@@ -172,7 +171,7 @@ public class ApplicationLauncher : IApplicationLauncher
             "-email",
             email,
             "-password",
-            password!
+            password!.ToString()
         };
         if (!string.IsNullOrWhiteSpace(character))
         {
@@ -195,13 +194,13 @@ public class ApplicationLauncher : IApplicationLauncher
             StartInfo = new ProcessStartInfo
             {
                 Arguments = string.Join(" ", args),
-                FileName = executable.Path,
+                FileName = executable,
             }
         };
 
         var preLaunchActions = this.modsManager.GetMods().Where(m => m.IsEnabled).Select(m => m.OnGuildwarsStarting(process));
         await Task.WhenAll(preLaunchActions);
-        var pId = LaunchClient(executable.Path, string.Join(" ", args), this.privilegeManager.AdminPrivileges, out var clientHandle);
+        var pId = LaunchClient(executable, string.Join(" ", args), this.privilegeManager.AdminPrivileges, out var clientHandle);
         process = Process.GetProcessById(pId);
 
         foreach(var mod in mods)
@@ -224,7 +223,7 @@ public class ApplicationLauncher : IApplicationLauncher
         }
 
         var retries = 0;
-        while (true)
+        while (retries < MaxRetries)
         {
             await Task.Delay(100);
             retries++;
@@ -261,44 +260,42 @@ public class ApplicationLauncher : IApplicationLauncher
 
             return gwProcess;
         }
+
+        throw new InvalidOperationException("Unable to launch Guild Wars process. Timed out waiting for the main window to launch");
     }
 
-    private Process? GetGuildwarsProcess()
+    public GuildWarsApplicationLaunchContext? GetGuildwarsProcess(LaunchConfigurationWithCredentials launchConfigurationWithCredentials)
     {
-        if (this.launcherOptions.Value.MultiLaunchSupport is true)
-        {
-            try
-            {
-                var path = this.launcherOptions.Value.GuildwarsPaths.Where(path => path.Default).FirstOrDefault();
-                if (path is null)
-                {
-                    return null;
-                }
+        launchConfigurationWithCredentials.ThrowIfNull();
 
-                return Process.GetProcessesByName(ProcessName).Where(process => string.Equals(path.Path, process.MainModule!.FileName, StringComparison.Ordinal)).FirstOrDefault();
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        return Process.GetProcessesByName(ProcessName).Where(p => !p.HasExited).FirstOrDefault();
+        return GetGuildwarsProcessesInternal(launchConfigurationWithCredentials)
+            .FirstOrDefault();
     }
 
-    private void ClearGwLocks()
+    public IEnumerable<GuildWarsApplicationLaunchContext?> GetGuildwarsProcesses(params LaunchConfigurationWithCredentials[] launchConfigurationWithCredentials)
     {
-        this.SetRegistryGuildwarsPath();
+        launchConfigurationWithCredentials.ThrowIfNull();
+
+        return GetGuildwarsProcessesInternal(launchConfigurationWithCredentials);
+    }
+
+    public IEnumerable<Process> GetGuildwarsProcesses()
+    {
+        return Process.GetProcessesByName(ProcessName);
+    }
+
+    private void ClearGwLocks(string path)
+    {
+        this.SetRegistryGuildwarsPath(path);
         foreach (var process in Process.GetProcessesByName(ProcessName))
         {
             this.mutexHandler.CloseMutex(process, ArenaNetMutex);
         }
     }
 
-    private void SetRegistryGuildwarsPath()
+    private void SetRegistryGuildwarsPath(string path)
     {
-        var path = this.launcherOptions.Value.GuildwarsPaths.Where(path => path.Default).FirstOrDefault() ?? throw new ExecutableNotFoundException("No executable currently selected");
-        var gamePath = path.Path;
+        var gamePath = path;
         try
         {
             var registryKey = GetGuildwarsRegistryKey(true);
@@ -310,6 +307,23 @@ public class ApplicationLauncher : IApplicationLauncher
         {
             this.logger.LogCritical($"Multi-launch requires administrator rights. Details: {ex}");
         }
+    }
+
+    private static IEnumerable<GuildWarsApplicationLaunchContext?> GetGuildwarsProcessesInternal(params LaunchConfigurationWithCredentials[] launchConfigurationWithCredentials)
+    {
+        //TODO: #419: Rework GetGuildwarsProcess to know which process it should be connected to
+        return Process.GetProcessesByName(ProcessName)
+            .Where(p =>
+            {
+                return launchConfigurationWithCredentials.FirstOrDefault(l => l.ExecutablePath == p.MainModule?.FileName) is not null;
+            })
+            .Select(p =>
+            {
+                var config = launchConfigurationWithCredentials.FirstOrDefault(l => l.ExecutablePath == p.MainModule?.FileName);
+                return config is not null ?
+                    new GuildWarsApplicationLaunchContext { GuildWarsProcess = p, LaunchConfiguration = config } :
+                    default;
+            });
     }
 
     private static RegistryKey GetGuildwarsRegistryKey(bool write)

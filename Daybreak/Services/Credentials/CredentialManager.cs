@@ -8,79 +8,73 @@ using System.Extensions;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Daybreak.Services.Credentials;
 
 public sealed class CredentialManager : ICredentialManager
 {
-    private static readonly byte[] Entropy = Convert.FromBase64String("R3VpbGR3YXJz");
+    private static readonly byte[] Entropy = Convert.FromBase64String("uXB8Vmz5MmuDar36v8SRGzpALi0Wv5Gx");
     private readonly ILogger<CredentialManager> logger;
-    private readonly ILiveUpdateableOptions<LauncherOptions> liveOptions;
+    private readonly ILiveUpdateableOptions<CredentialManagerOptions> liveOptions;
 
     public CredentialManager(
         ILogger<CredentialManager> logger,
-        ILiveUpdateableOptions<LauncherOptions> liveOptions)
+        ILiveUpdateableOptions<CredentialManagerOptions> liveOptions)
     {
         this.liveOptions = liveOptions.ThrowIfNull(nameof(liveOptions));
         this.logger = logger.ThrowIfNull(nameof(logger));
     }
 
-    public Task<Optional<LoginCredentials>> GetDefaultCredentials()
+    public bool TryGetCredentialsByIdentifier(string identifier, out LoginCredentials? loginCredentials)
     {
-        return Task.Run(async () =>
+        loginCredentials = default;
+        if (this.GetCredentialList().FirstOrDefault(l => l.Identifier == identifier) is LoginCredentials foundCredentials)
         {
-            this.logger.LogInformation("Retrieving default credentials");
-            var defaultCredentials = (await this.GetCredentialList())
-                .Where(creds => creds.Default)
-                .ToList();
-            if (defaultCredentials.Count == 0)
-            {
-                this.logger.LogWarning("No default credentials");
-                return Optional.None<LoginCredentials>();
-            }
+            loginCredentials = foundCredentials;
+            return true;
+        }
 
-            if (defaultCredentials.Count > 1)
-            {
-                this.logger.LogError("Multiple credentials set as default");
-                return Optional.None<LoginCredentials>();
-            }
-
-            return defaultCredentials.FirstOrDefault();
-        });
+        return false;
     }
-    public Task<List<LoginCredentials>> GetCredentialList()
-    {
-        return Task.Run(() =>
-        {
-            this.logger.LogInformation("Retrieving credentials");
-            var config = this.liveOptions.Value;
-            if (config.ProtectedLoginCredentials is null || config.ProtectedLoginCredentials.Count == 0)
-            {
-                this.logger.LogInformation("No credentials found");
-                return new List<LoginCredentials>();
-            }
 
-            return config
-                .ProtectedLoginCredentials
-                .Select(this.UnprotectCredentials)
-                .Where(this.CredentialsUnprotected)
-                .Select(this.ExtractCredentials)
-                .ToList();
-        });
-    }
-    public Task StoreCredentials(List<LoginCredentials> loginCredentials)
+    public List<LoginCredentials> GetCredentialList()
     {
-        return Task.Run(() =>
+        this.logger.LogInformation("Retrieving credentials");
+        var config = this.liveOptions.Value;
+        if (config.ProtectedLoginCredentials is null || config.ProtectedLoginCredentials.Count == 0)
         {
-            this.logger.LogInformation("Storing credentials");
-            this.liveOptions.Value.ProtectedLoginCredentials = loginCredentials
-                .Select(this.ProtectCredentials)
-                .Where(this.CredentialsProtected)
-                .Select(this.ExtractProtectedCredentials)
-                .ToList();
-            this.liveOptions.UpdateOption();
-        });   
+            this.logger.LogInformation("No credentials found");
+            return new List<LoginCredentials>();
+        }
+
+        return config
+            .ProtectedLoginCredentials
+            .Select(this.UnprotectCredentials)
+            .Where(this.CredentialsUnprotected)
+            .Select(this.ExtractCredentials)
+            .ToList();
+    }
+
+    public void StoreCredentials(List<LoginCredentials> loginCredentials)
+    {
+        this.logger.LogInformation("Storing credentials");
+        this.liveOptions.Value.ProtectedLoginCredentials = loginCredentials
+            .Select(this.ProtectCredentials)
+            .Where(this.CredentialsProtected)
+            .Select(this.ExtractProtectedCredentials)
+            .ToList();
+        this.liveOptions.UpdateOption();
+    }
+
+    public LoginCredentials CreateUniqueCredentials()
+    {
+        return new LoginCredentials
+        {
+            CharacterName = string.Empty,
+            Username = string.Empty,
+            Password = string.Empty,
+            Identifier = Guid.NewGuid().ToString()
+        };
     }
 
     private Optional<LoginCredentials> UnprotectCredentials(ProtectedLoginCredentials protectedLoginCredentials)
@@ -91,10 +85,10 @@ public sealed class CredentialManager : ICredentialManager
             var psdBytes = Convert.FromBase64String(protectedLoginCredentials.ProtectedPassword!);
             return new LoginCredentials
             {
+                Identifier = protectedLoginCredentials.Identifier,
                 Username = Encoding.UTF8.GetString(ProtectedData.Unprotect(usrbytes, Entropy, DataProtectionScope.LocalMachine)),
                 Password = Encoding.UTF8.GetString(ProtectedData.Unprotect(psdBytes, Entropy, DataProtectionScope.LocalMachine)),
                 CharacterName = protectedLoginCredentials.CharacterName,
-                Default = protectedLoginCredentials.Default
             };
         }
         catch (Exception e)
@@ -103,6 +97,7 @@ public sealed class CredentialManager : ICredentialManager
             return Optional.None<LoginCredentials>();
         }
     }
+
     private Optional<ProtectedLoginCredentials> ProtectCredentials(LoginCredentials loginCredentials)
     {
         try
@@ -111,10 +106,10 @@ public sealed class CredentialManager : ICredentialManager
             var psdBytes = Encoding.UTF8.GetBytes(loginCredentials.Password!);
             return new ProtectedLoginCredentials
             {
+                Identifier = loginCredentials.Identifier,
                 ProtectedUsername = Convert.ToBase64String(ProtectedData.Protect(usrBytes, Entropy, DataProtectionScope.LocalMachine)),
                 ProtectedPassword = Convert.ToBase64String(ProtectedData.Protect(psdBytes, Entropy, DataProtectionScope.LocalMachine)),
                 CharacterName = loginCredentials.CharacterName,
-                Default = loginCredentials.Default
             };
         }
         catch
@@ -129,16 +124,19 @@ public sealed class CredentialManager : ICredentialManager
             .Switch(onSome: _ => true, onNone: () => false)
             .ExtractValue();
     }
+
     private bool CredentialsProtected(Optional<ProtectedLoginCredentials> optional)
     {
         return optional
             .Switch(onSome: _ => true, onNone: () => false)
             .ExtractValue();
     }
+
     private ProtectedLoginCredentials ExtractProtectedCredentials(Optional<ProtectedLoginCredentials> optional)
     {
         return optional.ExtractValue()!;
     }
+
     private LoginCredentials ExtractCredentials(Optional<LoginCredentials> optional)
     {
         return optional.ExtractValue()!;

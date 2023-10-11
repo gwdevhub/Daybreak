@@ -1,6 +1,7 @@
 ﻿using Daybreak.Models.Builds;
 using Daybreak.Models.Guildwars;
 using Daybreak.Models.Interop;
+using Daybreak.Models.LaunchConfigurations;
 using Daybreak.Models.Metrics;
 using Daybreak.Services.ApplicationLauncher;
 using Daybreak.Services.Metrics;
@@ -32,7 +33,6 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
     private const string LatencyMeterUnitsName = "Milliseconds";
     private const string LatencyMeterDescription = "Amount of milliseconds elapsed while reading memory. P95 aggregation";
 
-    private readonly IApplicationLauncher applicationLauncher;
     private readonly IMemoryScanner memoryScanner;
     private readonly Histogram<double> latencyMeter;
     private readonly ILogger<GuildwarsMemoryReader> logger;
@@ -44,21 +44,19 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
     private uint preGameContextPointer;
 
     public GuildwarsMemoryReader(
-        IApplicationLauncher applicationLauncher,
         IMemoryScanner memoryScanner,
         IMetricsService metricsService,
         ILogger<GuildwarsMemoryReader> logger)
     {
-        this.applicationLauncher = applicationLauncher.ThrowIfNull();
         this.memoryScanner = memoryScanner.ThrowIfNull();
         this.latencyMeter = metricsService.ThrowIfNull().CreateHistogram<double>(LatencyMeterName, LatencyMeterUnitsName, LatencyMeterDescription, AggregationTypes.P95);
         this.logger = logger.ThrowIfNull();
     }
     
-    public async Task EnsureInitialized(CancellationToken cancellationToken)
+    public async Task EnsureInitialized(Process process, CancellationToken cancellationToken)
     {
         var scoppedLogger = this.logger.CreateScopedLogger(nameof(this.EnsureInitialized), default!);
-        var currentGuildwarsProcess = this.applicationLauncher.RunningGuildwarsProcess;
+        var currentGuildwarsProcess = process.ThrowIfNull();
         if (currentGuildwarsProcess is null)
         {
             scoppedLogger.LogWarning($"Process is null. {nameof(GuildwarsMemoryReader)} will not start");

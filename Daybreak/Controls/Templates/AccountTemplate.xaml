@@ -45,11 +45,8 @@
                                               FontSize="16" TextChanged="CharacterNameTextbox_TextChanged" Margin="5"
                                               ToolTip="Character name" />
         </Grid>
-        <buttons:BinButton Grid.Column="2" Height="30" Width="30" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" VerticalAlignment="Top" Margin="5, 15, 5, 5"
+        <buttons:BinButton Grid.Column="2" Height="30" Width="30" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" VerticalAlignment="Center" Margin="5, 5, 5, 5"
                            Clicked="BinButton_Clicked"
                            ToolTip="Delete entry" />
-        <buttons:StarButton Grid.Column="2" Height="30" Width="30" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" VerticalAlignment="Top" Margin="5, 55, 5, 5"
-                            Clicked="StarGlyph_Clicked" IsEnabled="{Binding ElementName=_this, Path=IsDefault, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
-                            ToolTip="Mark entry as active"/>
     </Grid>
 </UserControl>

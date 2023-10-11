@@ -8,9 +8,8 @@ using System.Core.Extensions;
 using System.Extensions;
 using System.Linq;
 using System.Windows.Controls;
-using System.Windows.Data;
 
-namespace Daybreak.Views;
+namespace Daybreak.Views.Launch;
 
 /// <summary>
 /// Interaction logic for AccountsView.xaml
@@ -32,25 +31,21 @@ public partial class AccountsView : UserControl
         this.GetCredentials();
     }
 
-    private async void GetCredentials()
+    private void GetCredentials()
     {
-        var creds = await this.credentialManager.GetCredentialList().ConfigureAwait(true);
+        var creds = this.credentialManager.GetCredentialList().ToList();
         this.Accounts.AddRange(creds);
     }
 
     private void AddButton_Clicked(object sender, EventArgs e)
     {
-        var newCredentials = new LoginCredentials();
+        var newCredentials = this.credentialManager.CreateUniqueCredentials();
         this.Accounts.Add(newCredentials);
-        if (this.Accounts.Count == 1)
-        {
-            this.SetAccountAsDefault(newCredentials);
-        }
     }
 
-    private async void SaveButton_Clicked(object sender, EventArgs e)
+    private void SaveButton_Clicked(object sender, EventArgs e)
     {
-        await this.credentialManager.StoreCredentials(this.Accounts.ToList()).ConfigureAwait(true);
+        this.credentialManager.StoreCredentials(this.Accounts.ToList());
         this.viewManager.ShowView<LauncherView>();
     }
 
@@ -63,31 +58,5 @@ public partial class AccountsView : UserControl
         }
 
         this.Accounts.Remove(creds);
-        if (this.Accounts.Count > 0 && creds.Default is true)
-        {
-            this.SetAccountAsDefault(this.Accounts.First());
-        }
-    }
-
-    private void AccountTemplate_DefaultClicked(object sender, EventArgs e)
-    {
-        var creds = sender.As<AccountTemplate>()?.DataContext?.As<LoginCredentials>();
-        if (creds is null)
-        {
-            return;
-        }
-
-        this.SetAccountAsDefault(creds);
-    }
-
-    private void SetAccountAsDefault(LoginCredentials loginCredentials)
-    {
-        foreach (var cred in this.Accounts)
-        {
-            cred.Default = false;
-        }
-        loginCredentials.Default = true;
-        var view = CollectionViewSource.GetDefaultView(this.Accounts);
-        view.Refresh();
     }
 }

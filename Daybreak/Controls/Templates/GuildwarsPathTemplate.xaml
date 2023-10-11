@@ -28,9 +28,9 @@
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <TextBlock FontSize="16" Text="Path:" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Margin="5" Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-            <TextBox Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" Text="{Binding ElementName=_this, Path=Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            <TextBox Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" Text="{Binding Path=Path, Mode=TwoWay }"
                      BorderThickness="1" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1"
-                     FontSize="16" TextChanged="TextBox_TextChanged" Margin="5"
+                     FontSize="16" Margin="5"
                      ToolTip="Path to Gw.exe"/>
         </Grid>
         <WrapPanel Grid.Column="1">
@@ -40,9 +40,6 @@
             <buttons:BinButton Grid.Column="2" Height="30" Width="30" VerticalAlignment="Top" Margin="5"
                                Clicked="BinButton_Clicked"
                                ToolTip="Remove entry"/>
-            <buttons:StarButton Grid.Column="2" Height="30" Width="30" VerticalAlignment="Top" Margin="5"
-                                Clicked="StarGlyph_Clicked" IsEnabled="{Binding ElementName=_this, Path=IsDefault, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
-                                ToolTip="Mark entry as active"/>
         </WrapPanel>
     </Grid>
 </UserControl>

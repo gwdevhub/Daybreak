@@ -1,6 +1,9 @@
-﻿using Daybreak.Models.Onboarding;
+﻿using Daybreak.Models.LaunchConfigurations;
+using Daybreak.Models.Onboarding;
+using Daybreak.Services.LaunchConfigurations;
 using Daybreak.Services.Menu;
 using Daybreak.Services.Navigation;
+using Daybreak.Views.Launch;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Core.Extensions;
@@ -14,6 +17,7 @@ namespace Daybreak.Views;
 /// </summary>
 public partial class LauncherOnboardingView : UserControl
 {
+    private readonly ILaunchConfigurationService launchConfigurationService;
     private readonly IMenuService menuService;
     private readonly IViewManager viewManager;
     private readonly ILogger<LauncherOnboardingView> logger;
@@ -24,10 +28,12 @@ public partial class LauncherOnboardingView : UserControl
     private LauncherOnboardingStage onboardingStage;
 
     public LauncherOnboardingView(
+        ILaunchConfigurationService launchConfigurationService,
         IMenuService menuService,
         IViewManager viewManager,
         ILogger<LauncherOnboardingView> logger)
     {
+        this.launchConfigurationService = launchConfigurationService.ThrowIfNull();
         this.menuService = menuService.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
@@ -35,7 +41,7 @@ public partial class LauncherOnboardingView : UserControl
         this.InitializeComponent();
     }
 
-    private void OpaqueButton_Clicked(object sender, System.EventArgs e)
+    private void OpaqueButton_Clicked(object sender, EventArgs e)
     {
         switch (this.onboardingStage)
         {
@@ -45,6 +51,10 @@ public partial class LauncherOnboardingView : UserControl
                 break;
             case LauncherOnboardingStage.NeedsExecutable:
                 this.viewManager.ShowView<ExecutablesView>();
+                this.menuService.OpenMenu();
+                break;
+            case LauncherOnboardingStage.NeedsConfiguration:
+                this.viewManager.ShowView<LaunchConfigurationView>(this.launchConfigurationService.CreateConfiguration()!);
                 this.menuService.OpenMenu();
                 break;
             default:
@@ -73,10 +83,13 @@ public partial class LauncherOnboardingView : UserControl
                 this.logger.LogError("Received default onboarding stage");
                 throw new InvalidOperationException("Onboarding stage cannot be default.");
             case LauncherOnboardingStage.NeedsCredentials:
-                this.Description = "No default credentials have been set. Please set up at least one credential set";
+                this.Description = "No credentials have been set. Please set up at least one credential set";
                 break;
             case LauncherOnboardingStage.NeedsExecutable:
-                this.Description = "No default Guildwars executable has been set. Please set up at least one Guildwars executable";
+                this.Description = "No Guildwars executable has been set. Please set up at least one Guildwars executable";
+                break;
+            case LauncherOnboardingStage.NeedsConfiguration:
+                this.Description = "No launch configuration has been set. Please set up at least one launch configuration";
                 break;
             case LauncherOnboardingStage.Complete:
                 this.logger.LogError("Received complete onboarding stage");

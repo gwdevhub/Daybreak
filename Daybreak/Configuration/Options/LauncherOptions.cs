@@ -23,14 +23,6 @@ public sealed class LauncherOptions
     [OptionName(Name = "Launch GuildWars As Current User", Description = "If true, will attempt to launch GuildWars as the current user. Otherwise will attempt to launch as system user")]
     public bool LaunchGuildwarsAsCurrentUser { get; set; } = true;
 
-    [JsonProperty(nameof(GuildwarsPaths))]
-    [OptionIgnore]
-    public List<GuildwarsPath> GuildwarsPaths { get; set; } = new();
-
-    [JsonProperty(nameof(ProtectedLoginCredentials))]
-    [OptionIgnore]
-    public List<ProtectedLoginCredentials> ProtectedLoginCredentials { get; set; } = new();
-
     [JsonProperty(nameof(ShortcutLocation))]
     [OptionName(Name = "Shortcut Location", Description = "Location where the shortcut will be placed")]
     public string? ShortcutLocation { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);

@@ -76,6 +76,9 @@ using Daybreak.Services.Toolbox.Utilities;
 using Daybreak.Services.Injection;
 using Daybreak.Services.ReShade;
 using Daybreak.Views.Onboarding.ReShade;
+using Daybreak.Services.LaunchConfigurations;
+using Daybreak.Services.ExecutableManagement;
+using Daybreak.Views.Launch;
 
 namespace Daybreak.Configuration;
 
@@ -198,6 +201,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IGuildwarsMemoryCache, GuildwarsMemoryCache>();
         services.AddSingleton<IPluginsService, PluginsService>();
         services.AddSingleton<ISplashScreenService, SplashScreenService>();
+        services.AddSingleton<IGuildWarsExecutableManager, GuildWarsExecutableManager>();
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
         services.AddScoped<IScreenshotProvider, ScreenshotProvider>();
@@ -235,6 +239,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IUModClient, UModClient>();
         services.AddScoped<IToolboxClient, ToolboxClient>();
         services.AddScoped<IProcessInjector, ProcessInjector>();
+        services.AddScoped<ILaunchConfigurationService, LaunchConfigurationService>();
     }
 
     public override void RegisterViews(IViewProducer viewProducer)
@@ -294,6 +299,8 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<ReShadeStockEffectsSelectorView>();
         viewProducer.RegisterView<ReShadeConfigView>();
         viewProducer.RegisterView<ReShadePresetView>();
+        viewProducer.RegisterView<LaunchConfigurationView>();
+        viewProducer.RegisterView<LaunchConfigurationsView>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -391,6 +398,9 @@ public class ProjectConfiguration : PluginConfigurationBase
         optionsProducer.RegisterOptions<TraderMessagesOptions>();
         optionsProducer.RegisterOptions<EventNotifierOptions>();
         optionsProducer.RegisterOptions<PluginsServiceOptions>();
+        optionsProducer.RegisterOptions<GuildwarsExecutableOptions>();
+        optionsProducer.RegisterOptions<CredentialManagerOptions>();
+        optionsProducer.RegisterOptions<LaunchConfigurationServiceOptions>();
     }
 
     public override void RegisterNotificationHandlers(INotificationHandlerProducer notificationHandlerProducer)

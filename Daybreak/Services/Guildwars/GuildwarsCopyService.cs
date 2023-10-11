@@ -1,12 +1,9 @@
-﻿using Daybreak.Configuration.Options;
-using Daybreak.Launch;
+﻿using Daybreak.Launch;
 using Daybreak.Models;
 using Daybreak.Models.Progress;
+using Daybreak.Services.ExecutableManagement;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.Core.Extensions;
 using System.IO;
 using System.Threading;
@@ -27,14 +24,14 @@ public sealed class GuildwarsCopyService : IGuildwarsCopyService
         "GwLoginClient.dll"
     };
 
-    private readonly IUpdateableOptions<LauncherOptions> updateableOptions;
+    private readonly IGuildWarsExecutableManager guildWarsExecutableManager;
     private readonly ILogger<GuildwarsCopyService> logger;
 
     public GuildwarsCopyService(
-        IUpdateableOptions<LauncherOptions> options,
+        IGuildWarsExecutableManager guildWarsExecutableManager,
         ILogger<GuildwarsCopyService> logger)
     {
-        this.updateableOptions = options.ThrowIfNull();
+        this.guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
     }
 
@@ -102,12 +99,8 @@ public sealed class GuildwarsCopyService : IGuildwarsCopyService
             } while (bytesRead > 0);
         }
 
-        this.updateableOptions.Value.GuildwarsPaths.Add(new GuildwarsPath
-        {
-            Default = false,
-            Path = Path.Combine(destinationFolder.FullName, ExecutableName)
-        });
-        this.updateableOptions.UpdateOption();
+        var finalPath = Path.Combine(destinationFolder.FullName, ExecutableName);
+        this.guildWarsExecutableManager.AddExecutable(finalPath);
 
         this.logger.LogInformation("Copy succeeded");
         copyStatus.CurrentStep = CopyStatus.CopyFinished;
