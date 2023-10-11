@@ -168,6 +168,13 @@
                                         Cursor="Hand"
                                         Clicked="GuildwarsSettingsButton_Clicked" 
                                         ToolTip="Executables settings"/>
+                    <buttons:MenuButton Title="Launch configurations" 
+                                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                        HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                                        Height="30"
+                                        Cursor="Hand"
+                                        Clicked="LaunchConfigurationsSettingsButton_Clicked"
+                                        ToolTip="Launch configurations settings" />
                     <options:OptionsSection />
                 </local:ExpandableMenuSection.Children>
             </local:ExpandableMenuSection>

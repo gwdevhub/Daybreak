@@ -23,8 +23,6 @@ public partial class AccountTemplate : UserControl
     private string password = string.Empty;
     [GenerateDependencyProperty]
     private string characterName = string.Empty;
-    [GenerateDependencyProperty]
-    private bool isDefault;
 
     public AccountTemplate()
     {
@@ -39,7 +37,6 @@ public partial class AccountTemplate : UserControl
             this.PasswordBox.Password = loginCredentials.Password;
             this.Username = loginCredentials.Username;
             this.CharacterName = loginCredentials.CharacterName;
-            this.IsDefault = loginCredentials.Default;
         }
     }
 
@@ -61,7 +58,7 @@ public partial class AccountTemplate : UserControl
     private void Passwordbox_PasswordChanged(object sender, EventArgs e)
     {
         this.Password = sender.As<PasswordBox>()?.Password;
-        this.DataContext.As<LoginCredentials>()!.Password = this.Password;
+        this.DataContext.As<LoginCredentials>()!.Password = this.Password!;
     }
 
     private void StarGlyph_Clicked(object sender, EventArgs e)

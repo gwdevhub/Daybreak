@@ -16,36 +16,13 @@ namespace Daybreak.Controls;
 public partial class GuildwarsPathTemplate : UserControl
 {
     public event EventHandler? RemoveClicked;
-    public event EventHandler? DefaultClicked;
 
     [GenerateDependencyProperty]
     private string path = string.Empty;
-    [GenerateDependencyProperty]
-    private bool isDefault;
 
     public GuildwarsPathTemplate()
     {
         this.InitializeComponent();
-        this.DataContextChanged += this.GuildwarsPathTemplate_DataContextChanged;
-    }
-
-    private void GuildwarsPathTemplate_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
-    {
-        if (e.NewValue is GuildwarsPath guildwarsPath)
-        {
-            this.IsDefault = guildwarsPath.Default;
-            this.Path = guildwarsPath.Path;
-        }
-    }
-
-    private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
-    {
-        this.DataContext.As<GuildwarsPath>()!.Path = this.Path;
-    }
-
-    private void StarGlyph_Clicked(object sender, EventArgs e)
-    {
-        this.DefaultClicked?.Invoke(this, e);
     }
 
     private void BinButton_Clicked(object sender, EventArgs e)
@@ -64,8 +41,7 @@ public partial class GuildwarsPathTemplate : UserControl
         };
         if (filePicker.ShowDialog() is true)
         {
-            this.Path = filePicker.FileName;
-            this.DataContext.As<GuildwarsPath>()!.Path = filePicker.FileName;
+            this.DataContext.As<ExecutablePath>()!.Path = filePicker.FileName;
         }
     }
 }

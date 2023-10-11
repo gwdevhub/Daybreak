@@ -1,6 +1,7 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Models;
 using Daybreak.Models.Guildwars;
+using Daybreak.Models.LaunchConfigurations;
 using Daybreak.Services.ApplicationLauncher;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Experience;
@@ -102,7 +103,13 @@ public partial class FocusView : UserControl
 
     private async Task UpdatePathingData()
     {
-        if (this.applicationLauncher.IsGuildwarsRunning is false)
+        if (this.DataContext is not GuildWarsApplicationLaunchContext context)
+        {
+            this.logger.LogInformation($"Data context is not set to {nameof(GuildWarsApplicationLaunchContext)}. Can not retrieve executable");
+            return;
+        }
+
+        if (context.GuildWarsProcess?.HasExited is not false)
         {
             this.logger.LogInformation($"Executable is not running. Returning to {nameof(LauncherView)}");
             this.viewManager.ShowView<LauncherView>();
@@ -145,6 +152,13 @@ public partial class FocusView : UserControl
                     return;
                 }
 
+                if (this.DataContext is not GuildWarsApplicationLaunchContext context)
+                {
+                    continue;
+                }
+
+                await this.guildwarsMemoryCache.EnsureInitialized(context, cancellationToken);
+
                 await Task.WhenAll(
                     this.UpdatePathingData(),
                     Task.Delay(1000, cancellationToken)).ConfigureAwait(true);
@@ -167,6 +181,13 @@ public partial class FocusView : UserControl
                 {
                     return;
                 }
+
+                if (this.DataContext is not GuildWarsApplicationLaunchContext context)
+                {
+                    continue;
+                }
+
+                await this.guildwarsMemoryCache.EnsureInitialized(context, cancellationToken);
 
                 var readGameDataTask = this.guildwarsMemoryCache.ReadGameData(cancellationToken);
                 await Task.WhenAll(
@@ -199,6 +220,12 @@ public partial class FocusView : UserControl
                     return;
                 }
 
+                if (this.DataContext is not GuildWarsApplicationLaunchContext context)
+                {
+                    continue;
+                }
+
+                await this.guildwarsMemoryCache.EnsureInitialized(context, cancellationToken);
                 var readInventoryTask = this.guildwarsMemoryCache.ReadInventoryData(cancellationToken);
                 await Task.WhenAll(
                     readInventoryTask,
@@ -230,7 +257,14 @@ public partial class FocusView : UserControl
                     return;
                 }
 
-                if (this.applicationLauncher.IsGuildwarsRunning is false)
+                if (this.DataContext is not GuildWarsApplicationLaunchContext context)
+                {
+                    continue;
+                }
+
+                await this.guildwarsMemoryCache.EnsureInitialized(context, cancellationToken);
+
+                if (context.GuildWarsProcess?.HasExited is not false)
                 {
                     this.logger.LogInformation($"Executable is not running. Returning to {nameof(LauncherView)}");
                     this.viewManager.ShowView<LauncherView>();

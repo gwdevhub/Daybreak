@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Daybreak.Views.AccountsView"
+﻿<UserControl x:Class="Daybreak.Views.Launch.AccountsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -27,9 +27,7 @@
                     <controls:AccountTemplate Username="{Binding Username, Mode=TwoWay}"
                                               Password="{Binding Password, Mode=TwoWay}"
                                               CharacterName="{Binding CharacterName, Mode=TwoWay}"
-                                              RemoveClicked="AccountTemplate_RemoveClicked"
-                                              IsDefault="{Binding Default, Mode=TwoWay}"
-                                              DefaultClicked="AccountTemplate_DefaultClicked"></controls:AccountTemplate>
+                                              RemoveClicked="AccountTemplate_RemoveClicked"/>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

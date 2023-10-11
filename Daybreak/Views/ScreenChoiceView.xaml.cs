@@ -42,7 +42,7 @@ public partial class ScreenChoiceView : UserControl
         this.applicationLauncher = applicationLauncher.ThrowIfNull(nameof(applicationLauncher));
         this.InitializeComponent();
         this.selectedId = this.liveOptions.Value.DesiredGuildwarsScreen;
-        this.CanTest = applicationLauncher.IsGuildwarsRunning;
+        this.CanTest = applicationLauncher.GetGuildwarsProcesses().FirstOrDefault() is not null;
         this.SetupView();
     }
 

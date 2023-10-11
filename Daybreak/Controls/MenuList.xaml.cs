@@ -4,6 +4,7 @@ using Daybreak.Services.Navigation;
 using Daybreak.Services.Notifications;
 using Daybreak.Views;
 using Daybreak.Views.Copy;
+using Daybreak.Views.Launch;
 using Daybreak.Views.Onboarding.DSOAL;
 using Daybreak.Views.Onboarding.ReShade;
 using Daybreak.Views.Onboarding.Toolbox;
@@ -64,6 +65,11 @@ public partial class MenuList : UserControl
     private void AccountSettingsButton_Clicked(object sender, EventArgs e)
     {
         this.viewManager.ShowView<AccountsView>();
+    }
+
+    private void LaunchConfigurationsSettingsButton_Clicked(object sender, EventArgs e)
+    {
+        this.viewManager.ShowView<LaunchConfigurationsView>();
     }
 
     private void GuildwarsSettingsButton_Clicked(object sender, EventArgs e)

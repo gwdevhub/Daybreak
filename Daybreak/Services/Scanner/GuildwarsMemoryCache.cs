@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Models.Guildwars;
+using Daybreak.Models.LaunchConfigurations;
 using Daybreak.Services.Scanner.Models;
 using System;
 using System.Configuration;
@@ -31,6 +32,11 @@ public sealed class GuildwarsMemoryCache : IGuildwarsMemoryCache
     {
         this.guildwarsMemoryReader = guildwarsMemoryReader.ThrowIfNull();
         this.liveOptions = liveOptions.ThrowIfNull();
+    }
+
+    public async Task EnsureInitialized(GuildWarsApplicationLaunchContext context, CancellationToken cancellationToken)
+    {
+        await this.guildwarsMemoryReader.EnsureInitialized(context.ThrowIfNull().GuildWarsProcess.ThrowIfNull(), cancellationToken);
     }
 
     public Task<GameData?> ReadGameData(CancellationToken cancellationToken)
@@ -95,7 +101,6 @@ public sealed class GuildwarsMemoryCache : IGuildwarsMemoryCache
             return cachedData.Data;
         }
 
-        await this.guildwarsMemoryReader.EnsureInitialized(cancellationToken);
         var data = await task(cancellationToken);
         if (data is null)
         {

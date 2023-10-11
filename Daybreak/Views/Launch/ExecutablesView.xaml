@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Daybreak.Views.ExecutablesView"
+﻿<UserControl x:Class="Daybreak.Views.Launch.ExecutablesView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -24,10 +24,7 @@
                   BorderThickness="0">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <controls:GuildwarsPathTemplate 
-                                                Path="{Binding Path, Mode=TwoWay}"
-                                                IsDefault="{Binding Default, Mode=TwoWay}"
-                                                DefaultClicked="GuildwarsPathTemplate_DefaultClicked"
+                    <controls:GuildwarsPathTemplate DataContext="{Binding}"
                                                 RemoveClicked="GuildwarsPathTemplate_RemoveClicked"></controls:GuildwarsPathTemplate>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

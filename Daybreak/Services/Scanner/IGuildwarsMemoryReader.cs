@@ -1,4 +1,5 @@
 ﻿using Daybreak.Models.Guildwars;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -6,7 +7,7 @@ namespace Daybreak.Services.Scanner;
 
 public interface IGuildwarsMemoryReader
 {
-    Task EnsureInitialized(CancellationToken cancellationToken);
+    Task EnsureInitialized(Process process, CancellationToken cancellationToken);
     Task<LoginData?> ReadLoginData(CancellationToken cancellationToken);
     Task<GameData?> ReadGameData(CancellationToken cancellationToken);
     Task<PathingData?> ReadPathingData(CancellationToken cancellationToken);
