@@ -20,6 +20,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using static Daybreak.Utils.NativeMethods;
@@ -198,14 +199,57 @@ public class ApplicationLauncher : IApplicationLauncher
             }
         };
 
-        var preLaunchActions = this.modsManager.GetMods().Where(m => m.IsEnabled).Select(m => m.OnGuildwarsStarting(process));
-        await Task.WhenAll(preLaunchActions);
+        foreach(var mod in mods)
+        {
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.Value.ModStartupTimeout));
+            try
+            {
+                await mod.OnGuildwarsStarting(process, cts.Token);
+            }
+            catch (TaskCanceledException)
+            {
+                this.logger.LogError($"{mod.Name} timeout");
+                this.notificationService.NotifyError(
+                    title: $"{mod.Name} timeout",
+                    description: $"Mod timed out while processing {nameof(mod.OnGuildwarsStarting)}");
+            }
+            catch (Exception e)
+            {
+                this.KillGuildWarsProcess(process);
+                this.logger.LogError(e, $"{mod.Name} unhandled exception");
+                this.notificationService.NotifyError(
+                    title: $"{mod.Name} exception",
+                    description: $"Mod encountered exception of type {e.GetType().Name} while processing {nameof(mod.OnGuildwarsStarting)}");
+                return default;
+            }
+        }
+
         var pId = LaunchClient(executable, string.Join(" ", args), this.privilegeManager.AdminPrivileges, out var clientHandle);
         process = Process.GetProcessById(pId);
 
-        foreach(var mod in mods)
+        foreach (var mod in mods)
         {
-            await mod.OnGuildWarsCreated(process);
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.Value.ModStartupTimeout));
+            try
+            {
+                await mod.OnGuildWarsCreated(process, cts.Token);
+            }
+            catch (TaskCanceledException)
+            {
+                this.logger.LogError($"{mod.Name} timeout");
+                this.notificationService.NotifyError(
+                    title: $"{mod.Name} timeout",
+                    description: $"Mod timed out while processing {nameof(mod.OnGuildWarsCreated)}");
+            }
+            catch (Exception e)
+            {
+                this.KillGuildWarsProcess(process);
+                this.logger.LogError(e, $"{mod.Name} unhandled exception");
+                this.notificationService.NotifyError(
+                    title: $"{mod.Name} exception",
+                    description: $"Mod encountered exception of type {e.GetType().Name} while processing {nameof(mod.OnGuildWarsCreated)}");
+                return default;
+            }
         }
 
         if (clientHandle != IntPtr.Zero)
@@ -219,7 +263,27 @@ public class ApplicationLauncher : IApplicationLauncher
          */
         foreach (var mod in mods)
         {
-            await mod.OnGuildwarsStarted(process);
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.Value.ModStartupTimeout));
+            try
+            {
+                await mod.OnGuildwarsStarted(process, cts.Token);
+            }
+            catch (TaskCanceledException)
+            {
+                this.logger.LogError($"{mod.Name} timeout");
+                this.notificationService.NotifyError(
+                    title: $"{mod.Name} timeout",
+                    description: $"Mod timed out while processing {nameof(mod.OnGuildwarsStarted)}");
+            }
+            catch (Exception e)
+            {
+                this.KillGuildWarsProcess(process);
+                this.logger.LogError(e, $"{mod.Name} unhandled exception");
+                this.notificationService.NotifyError(
+                    title: $"{mod.Name} exception",
+                    description: $"Mod encountered exception of type {e.GetType().Name} while processing {nameof(mod.OnGuildwarsStarted)}");
+                return default;
+            }
         }
 
         var retries = 0;
@@ -282,6 +346,34 @@ public class ApplicationLauncher : IApplicationLauncher
     public IEnumerable<Process> GetGuildwarsProcesses()
     {
         return Process.GetProcessesByName(ProcessName);
+    }
+
+    public void KillGuildWarsProcess(Process process)
+    {
+        process.ThrowIfNull();
+        try
+        {
+            if (process.StartInfo is not null &&
+                process.StartInfo.FileName.Contains("Gw.exe", StringComparison.OrdinalIgnoreCase))
+            {
+                process.Kill(true);
+                return;
+            }
+
+            if (process.MainModule?.FileName is not null &&
+                process.MainModule.FileName.Contains("Gw.exe", StringComparison.OrdinalIgnoreCase))
+            {
+                process.Kill(true);
+                return;
+            }
+        }
+        catch(Exception e)
+        {
+            this.logger.LogError(e, $"Failed to kill GuildWars process with id {process?.Id}");
+            this.notificationService.NotifyError(
+                title: "Failed to kill GuildWars process",
+                description: $"Encountered exception while trying to kill GuildWars process with id {process?.Id}. Check logs for details");
+        }
     }
 
     private void ClearGwLocks(string path)

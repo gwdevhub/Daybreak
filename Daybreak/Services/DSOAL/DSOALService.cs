@@ -14,6 +14,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Daybreak.Services.DSOAL;
@@ -41,6 +42,7 @@ public sealed class DSOALService : IDSOALService
     private readonly ILiveUpdateableOptions<DSOALOptions> options;
     private readonly ILogger<DSOALService> logger;
 
+    public string Name => "DSOAL";
     public bool IsEnabled
     {
         get => this.options.Value.Enabled;
@@ -118,17 +120,17 @@ public sealed class DSOALService : IDSOALService
         }
     }
 
-    public Task OnGuildWarsCreated(Process process)
+    public Task OnGuildWarsCreated(Process process, CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }
 
-    public Task OnGuildwarsStarted(Process process)
+    public Task OnGuildwarsStarted(Process process, CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }
 
-    public Task OnGuildwarsStarting(Process process)
+    public Task OnGuildwarsStarting(Process process, CancellationToken cancellationToken)
     {
         var guildwarsDirectory = new FileInfo(process.StartInfo.FileName).Directory!.FullName;
         if (this.options.Value.Enabled)

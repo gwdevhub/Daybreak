@@ -35,6 +35,7 @@ internal sealed class ToolboxService : IToolboxService
     private readonly ILiveUpdateableOptions<ToolboxOptions> toolboxOptions;
     private readonly ILogger<ToolboxService> logger;
 
+    public string Name => "GWToolbox";
     public bool IsEnabled
     {
         get => this.toolboxOptions.Value.Enabled;
@@ -62,14 +63,14 @@ internal sealed class ToolboxService : IToolboxService
         this.logger = logger.ThrowIfNull();
     }
 
-    public Task OnGuildwarsStarting(Process process) => Task.CompletedTask;
+    public Task OnGuildwarsStarting(Process process, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public async Task OnGuildWarsCreated(Process process)
+    public Task OnGuildWarsCreated(Process process, CancellationToken cancellationToken)
     {
-        await this.LaunchToolbox(process);
+        return Task.Run(() => this.LaunchToolbox(process), cancellationToken);
     }
 
-    public Task OnGuildwarsStarted(Process process) => Task.CompletedTask;
+    public Task OnGuildwarsStarted(Process process, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public IEnumerable<string> GetCustomArguments()
     {
@@ -149,7 +150,7 @@ internal sealed class ToolboxService : IToolboxService
         return true;
     }
 
-    private async Task LaunchToolbox(Process process)
+    private void LaunchToolbox(Process process)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.LaunchToolbox), string.Empty);
         if (this.toolboxOptions.Value.Enabled is false)

@@ -54,6 +54,7 @@ public sealed class ReShadeService : IReShadeService, IApplicationLifetimeServic
     private readonly IDownloadService downloadService;
     private readonly ILogger<ReShadeService> logger;
 
+    public string Name => "ReShade";
     public bool IsEnabled
     {
         get => this.liveUpdateableOptions.Value.Enabled;
@@ -118,30 +119,31 @@ public sealed class ReShadeService : IReShadeService, IApplicationLifetimeServic
 
     public IEnumerable<string> GetCustomArguments() => Enumerable.Empty<string>();
 
-    public Task OnGuildWarsCreated(Process process)
+    public Task OnGuildWarsCreated(Process process, CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.OnGuildWarsCreated), process?.MainModule?.FileName ?? string.Empty);
-        if (this.processInjector.Inject(process!, ReShadeDllPath))
+        return Task.Run(() =>
         {
-            scopedLogger.LogInformation("Injected ReShade dll");
-            this.notificationService.NotifyInformation(
-                title: "ReShade started",
-                description: "ReShade has been injected");
-        }
-        else
-        {
-            scopedLogger.LogError("Failed to inject ReShade dll");
-            this.notificationService.NotifyError(
-                title: "ReShade failed to start",
-                description: "Failed to inject ReShade");
-        }
-
-        return Task.CompletedTask;
+            var scopedLogger = this.logger.CreateScopedLogger(nameof(this.OnGuildWarsCreated), process?.MainModule?.FileName ?? string.Empty);
+            if (this.processInjector.Inject(process!, ReShadeDllPath))
+            {
+                scopedLogger.LogInformation("Injected ReShade dll");
+                this.notificationService.NotifyInformation(
+                    title: "ReShade started",
+                    description: "ReShade has been injected");
+            }
+            else
+            {
+                scopedLogger.LogError("Failed to inject ReShade dll");
+                this.notificationService.NotifyError(
+                    title: "ReShade failed to start",
+                    description: "Failed to inject ReShade");
+            }
+        }, cancellationToken);
     }
 
-    public Task OnGuildwarsStarted(Process process) => Task.CompletedTask;
+    public Task OnGuildwarsStarted(Process process, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public Task OnGuildwarsStarting(Process process)
+    public Task OnGuildwarsStarting(Process process, CancellationToken cancellationToken)
     {
         var destinationDirectory = Path.GetFullPath(new FileInfo(process.StartInfo.FileName).DirectoryName!);
         EnsureFileExistsInGuildwarsDirectory(ReShadeLog, destinationDirectory);

@@ -32,6 +32,7 @@ public sealed class GuildwarsScreenPlacer : IGuildwarsScreenPlacer
         this.logger = logger.ThrowIfNull();
     }
 
+    public string Name => "Screen placer";
     public bool IsEnabled
     {
         get => this.liveOptions.Value.SetGuildwarsWindowSizeOnLaunch;
@@ -44,7 +45,7 @@ public sealed class GuildwarsScreenPlacer : IGuildwarsScreenPlacer
 
     public bool IsInstalled => true;
 
-    public async Task OnGuildwarsStarted(Process process)
+    public async Task OnGuildwarsStarted(Process process, CancellationToken cancellationToken)
     {
         var screen = this.screenManager.Screens.Skip(this.liveOptions.Value.DesiredGuildwarsScreen).FirstOrDefault();
         if (screen is null)
@@ -55,7 +56,7 @@ public sealed class GuildwarsScreenPlacer : IGuildwarsScreenPlacer
         var tries = 0;
         while (await this.guildwarsMemoryCache.ReadLoginData(CancellationToken.None) is null)
         {
-            await Task.Delay(1000);
+            await Task.Delay(1000, cancellationToken);
             tries++;
             if (tries > MaxTries)
             {
@@ -70,7 +71,7 @@ public sealed class GuildwarsScreenPlacer : IGuildwarsScreenPlacer
 
     public IEnumerable<string> GetCustomArguments() => Enumerable.Empty<string>();
 
-    public Task OnGuildwarsStarting(Process process) => Task.CompletedTask;
+    public Task OnGuildwarsStarting(Process process, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public Task OnGuildWarsCreated(Process process) => Task.CompletedTask;
+    public Task OnGuildWarsCreated(Process process, CancellationToken cancellationToken) => Task.CompletedTask;
 }

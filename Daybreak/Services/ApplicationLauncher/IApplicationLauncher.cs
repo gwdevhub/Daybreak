@@ -10,6 +10,7 @@ public interface IApplicationLauncher
     GuildWarsApplicationLaunchContext? GetGuildwarsProcess(LaunchConfigurationWithCredentials launchConfigurationWithCredentials);
     IEnumerable<GuildWarsApplicationLaunchContext?> GetGuildwarsProcesses(params LaunchConfigurationWithCredentials[] launchConfigurationWithCredentials);
     IEnumerable<Process> GetGuildwarsProcesses();
+    void KillGuildWarsProcess(Process process);
     Task<GuildWarsApplicationLaunchContext?> LaunchGuildwars(LaunchConfigurationWithCredentials launchConfigurationWithCredentials);
     void RestartDaybreak();
     void RestartDaybreakAsAdmin();
