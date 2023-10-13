@@ -39,6 +39,8 @@ public sealed class UModService : IUModService
     private readonly ILiveUpdateableOptions<UModOptions> uModOptions;
     private readonly ILogger<UModService> logger;
 
+    public string Name => "uMod";
+
     public bool IsEnabled
     {
         get => this.uModOptions.Value.Enabled;
@@ -74,25 +76,48 @@ public sealed class UModService : IUModService
         return Enumerable.Empty<string>();
     }
 
-    public async Task OnGuildwarsStarting(Process process)
+    public Task OnGuildwarsStarting(Process process, CancellationToken cancellationToken)
     {
-        this.uModClient.Initialize(CancellationToken.None);
-    }
-
-    public Task OnGuildWarsCreated(Process process)
-    {
-        this.processInjector.Inject(process, Path.Combine(Path.GetFullPath(UModDirectory), D3D9Dll));
+        this.uModClient.Initialize(cancellationToken);
         return Task.CompletedTask;
     }
 
-    public async Task OnGuildwarsStarted(Process process)
+    public Task OnGuildWarsCreated(Process process, CancellationToken cancellationToken)
+    {
+        return Task.Run(() =>
+        {
+            this.processInjector.Inject(process, Path.Combine(Path.GetFullPath(UModDirectory), D3D9Dll));
+        }, cancellationToken);
+    }
+
+    public async Task OnGuildwarsStarted(Process process, CancellationToken cancellationToken)
     {
         foreach(var entry in this.uModOptions.Value.Mods.Where(e => e.Enabled && e.PathToFile is not null))
         {
-            await this.uModClient.AddFile(entry.PathToFile!, CancellationToken.None);
+            await this.uModClient.AddFile(entry.PathToFile!, cancellationToken);
         }
 
-        await this.uModClient.Send(CancellationToken.None);
+        try
+        {
+            await this.uModClient.Send(cancellationToken);
+        }
+        catch(IOException e)
+        {
+            if (!e.Message.Contains("Pipe is broken", StringComparison.OrdinalIgnoreCase))
+            {
+                throw;
+            }
+
+            /*
+             * Known issue where Guild Wars updater breaks the executable, which in turn breaks the integration with uMod.
+             * Prompt the user to manually reinstall Guild Wars.
+             */
+            this.notificationService.NotifyInformation(
+                title: "uMod failed to start",
+                description: "uMod failed to start due to a known issue with Guild Wars updating process. Please manually re-install Guild Wars in order to restore uMod functionality");
+            return;
+        }
+
         this.uModClient.CloseConnection();
         this.notificationService.NotifyInformation(
                 title: "uMod started",

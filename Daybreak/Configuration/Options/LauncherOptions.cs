@@ -1,9 +1,7 @@
 ﻿using Daybreak.Attributes;
-using Daybreak.Models;
 using Daybreak.Views;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 
 namespace Daybreak.Configuration.Options;
 
@@ -42,4 +40,8 @@ public sealed class LauncherOptions
     [JsonProperty(nameof(DownloadIcons))]
     [OptionName(Name = "Download Icons", Description = "If true, the launcher will download icons that are not found in the local cache")]
     public bool DownloadIcons { get; set; } = true;
+
+    [JsonProperty(nameof(ModStartupTimeout))]
+    [OptionName(Name = "Mod Startup Timeout", Description = "Amount of seconds that Daybreak will wait for each mod to start-up before cancelling the tasks")]
+    public int ModStartupTimeout { get; set; } = 30;
 }
