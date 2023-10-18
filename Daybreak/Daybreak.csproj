@@ -60,6 +60,9 @@
 
   <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
+    <None Include="..\build\Daybreak.GWCA\$(Configuration)\Daybreak.GWCA.dll" Link="GWCA\Daybreak.GWCA.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <Target Name="AddUserSecrets" BeforeTargets="PrepareForBuild" Condition=" '$(UserSecretsId)' != '' ">
@@ -108,6 +111,10 @@
     <PackageReference Include="WriteableBitmapEx" Version="1.6.8" />
   </ItemGroup>
 	
+  <ItemGroup>
+    <Folder Include="GWCA\" />
+  </ItemGroup>
+	
 	
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
     <Exec Command="echo.&gt;$(Version).version" />
@@ -120,5 +127,13 @@
       <Analyzer Remove="@(Analyzer)" />
       <Analyzer Include="@(FilteredAnalyzer)" />
     </ItemGroup>
+  </Target>
+
+  <Target Name="BuildCMakeProject" BeforeTargets="CoreCompile">
+    <!-- Configure CMake if needed -->
+    <Exec Command="cd $(SolutionDir) &amp;&amp; cmake -S . -B build -A Win32" />
+
+    <!-- Build the CMake project -->
+    <Exec Command="cd $(SolutionDir) &amp;&amp; cmake --build build --config $(Configuration)" />
   </Target>
 </Project>

@@ -57,6 +57,13 @@ jobs:
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v1.3.1
 
+    - name: Fetch submodules
+      run: |
+        git submodule update --init --recursive
+
+    - name: Build CMake Files
+      run: cmake -S . -B build -A Win32
+
     - name: Setup project secrets
       run: |
         dotnet user-secrets --project Daybreak\Daybreak.csproj set AadApplicationId "${{ secrets.AadApplicationId }}"

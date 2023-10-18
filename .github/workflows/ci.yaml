@@ -43,9 +43,16 @@ jobs:
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v1.3.1
 
+    - name: Fetch submodules
+      run: |
+        git submodule update --init --recursive
+
+    - name: Build CMake Files
+      run: cmake -S . -B build -A Win32
+
     - name: Execute Unit Tests
       run: dotnet test $env:Test_Project_Path
-
+    
     - name:  Restore the Wpf application to populate the obj folder
       run: msbuild $env:Solution_Path /t:Restore /p:Configuration=$env:Configuration /p:RuntimeIdentifier=$env:RuntimeIdentifier
       env:
