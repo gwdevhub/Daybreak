@@ -75,7 +75,7 @@ jobs:
         RuntimeIdentifier: win-${{ matrix.targetplatform }}
 
     - name: Build Daybreak project
-      run: dotnet build Daybreak -c $env:Configuration --property:SolutionDir=$GITHUB_WORKSPACE
+      run: dotnet build Daybreak -c $env:Configuration --property:SolutionDir=$env:GITHUB_WORKSPACE
 
     - name: Set version variable
       run: |
@@ -83,12 +83,12 @@ jobs:
         echo "::set-env name=Version::$version"
 
     - name: Create publish launcher files
-      run: dotnet publish .\Daybreak\Daybreak.csproj -c $env:Configuration -r $env:RuntimeIdentifier --property:SolutionDir=$GITHUB_WORKSPACE -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained true -o .\Publish
+      run: dotnet publish .\Daybreak\Daybreak.csproj -c $env:Configuration -r $env:RuntimeIdentifier --property:SolutionDir=$env:GITHUB_WORKSPACE -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained true -o .\Publish
       env:
         RuntimeIdentifier: win-${{ matrix.targetplatform }}
 
     - name: Create publish installer files
-      run: dotnet publish .\Daybreak.Installer\Daybreak.Installer.csproj -c $env:Configuration -r $env:RuntimeIdentifier --property:SolutionDir=$GITHUB_WORKSPACE -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained true -o .\Publish
+      run: dotnet publish .\Daybreak.Installer\Daybreak.Installer.csproj -c $env:Configuration -r $env:RuntimeIdentifier --property:SolutionDir=$env:GITHUB_WORKSPACE -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained true -o .\Publish
       env:
         RuntimeIdentifier: win-${{ matrix.targetplatform }}
 
