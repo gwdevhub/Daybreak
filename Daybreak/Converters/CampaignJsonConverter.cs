@@ -26,9 +26,9 @@ public sealed class CampaignJsonConverter : JsonConverter
 
                 return namedCampaign;
             case JsonToken.Integer:
-                var id = reader.ReadAsInt32();
-                if (id is not int ||
-                    !Campaign.TryParse(id.Value, out var parsedCampaign))
+                var id = reader.Value as long?;
+                if (id is not long ||
+                    !Campaign.TryParse((int)id.Value, out var parsedCampaign))
                 {
                     return default;
                 }

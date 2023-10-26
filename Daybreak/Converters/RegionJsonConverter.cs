@@ -26,9 +26,9 @@ public sealed class RegionJsonConverter : JsonConverter
 
                 return namedRegion;
             case JsonToken.Integer:
-                var id = reader.ReadAsInt32();
-                if (id is not int ||
-                    !Region.TryParse(id.Value, out var parsedRegion))
+                var id = reader.Value as long?;
+                if (id is not long ||
+                    !Region.TryParse((int)id.Value, out var parsedRegion))
                 {
                     return default;
                 }

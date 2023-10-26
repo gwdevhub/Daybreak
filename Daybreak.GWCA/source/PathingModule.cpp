@@ -31,6 +31,7 @@ namespace Daybreak::Modules::PathingModule {
                 auto gwTrapezoid = gwPathingMap.trapezoids[j];
                 PathingTrapezoid trapezoid;
                 trapezoid.Id = gwTrapezoid.id;
+                trapezoid.PathingMapId = i;
                 trapezoid.XTL = gwTrapezoid.XTL;
                 trapezoid.XBL = gwTrapezoid.XBL;
                 trapezoid.XTR = gwTrapezoid.XTR;

@@ -26,9 +26,9 @@ public sealed class QuestJsonConverter : JsonConverter
 
                 return namedQuest;
             case JsonToken.Integer:
-                var id = reader.ReadAsInt32();
-                if (id is not int ||
-                    !Quest.TryParse(id.Value, out var parsedQuest))
+                var id = reader.Value as long?;
+                if (id is not long ||
+                    !Quest.TryParse((int)id.Value, out var parsedQuest))
                 {
                     return default;
                 }

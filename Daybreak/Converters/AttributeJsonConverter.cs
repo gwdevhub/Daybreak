@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Daybreak.Models.Guildwars;
+using Newtonsoft.Json;
 using System;
 
 namespace Daybreak.Converters;
@@ -25,9 +26,9 @@ public sealed class AttributeJsonConverter : JsonConverter
 
                 return namedAttribute;
             case JsonToken.Integer:
-                var id = reader.ReadAsInt32();
-                if (id is not int ||
-                    !Models.Guildwars.Attribute.TryParse(id.Value, out var parsedAttribute))
+                var id = reader.Value as long?;
+                if (id is not long ||
+                    !Models.Guildwars.Attribute.TryParse((int)id.Value, out var parsedAttribute))
                 {
                     return default;
                 }

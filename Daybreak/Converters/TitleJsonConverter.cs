@@ -26,9 +26,9 @@ public sealed class TitleJsonConverter : JsonConverter
 
                 return namedTitle;
             case JsonToken.Integer:
-                var id = reader.ReadAsInt32();
-                if (id is not int ||
-                    !Title.TryParse(id.Value, out var parsedTitle))
+                var id = reader.Value as long?;
+                if (id is not long ||
+                    !Title.TryParse((int)id.Value, out var parsedTitle))
                 {
                     return default;
                 }

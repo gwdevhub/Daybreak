@@ -32,6 +32,10 @@ namespace Daybreak::Modules::MainPlayerModule {
     volatile bool initialized = false;
 
     std::string GetString(wchar_t* chars) {
+        if (!chars) {
+            return "";
+        }
+
         std::string str(64, '\0');
         auto length = std::wcstombs(&str[0], chars, 64);
         str.resize(length);
@@ -41,6 +45,10 @@ namespace Daybreak::Modules::MainPlayerModule {
     std::list<QuestMetadata> GetQuestLog() {
         std::list<QuestMetadata> questMetadatas;
         auto questLog = GW::QuestMgr::GetQuestLog();
+        if (!questLog) {
+            return questMetadatas;
+        }
+
         for (auto& quest : *questLog) {
             QuestMetadata metadata;
             metadata.FromId = (uint32_t)quest.map_from;
@@ -88,6 +96,10 @@ namespace Daybreak::Modules::MainPlayerModule {
         std::list<GW::AgentLiving> agentList;
         const GW::AgentArray* agents_ptr = GW::Agents::GetAgentArray();
         GW::AgentArray* agents = GW::Agents::GetAgentArray();
+        if (!agents) {
+            return agentList;
+        }
+
         for (auto* a : *agents) {
             const GW::AgentLiving* agent = a ? a->GetAsAgentLiving() : nullptr;
             if (agent) {
@@ -132,6 +144,10 @@ namespace Daybreak::Modules::MainPlayerModule {
         std::list<Temp::GWPlayer> players;
         auto worldContext = GW::GetWorldContext();
         Temp::GWPlayer *tempPlayerArray = (Temp::GWPlayer*)worldContext->players.m_buffer;
+        if (!tempPlayerArray) {
+            return players;
+        }
+
         for (auto i = 0; i < worldContext->players.m_size; i++) {
             if (tempPlayerArray->agent_id != 0) {
                 players.push_back(*tempPlayerArray);
@@ -145,6 +161,10 @@ namespace Daybreak::Modules::MainPlayerModule {
     std::map<uint32_t, std::list<uint32_t>> GetSkillbars() {
         std::map<uint32_t, std::list<uint32_t>> skillbarMap;
         auto skillbars = GW::SkillbarMgr::GetSkillbarArray();
+        if (!skillbars) {
+            return skillbarMap;
+        }
+
         for (auto& skillbar : *skillbars) {
             std::list<uint32_t> skillList;
             skillList.push_back((uint32_t)skillbar.skills[0].skill_id);

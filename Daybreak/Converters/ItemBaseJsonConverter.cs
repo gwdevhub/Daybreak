@@ -26,9 +26,9 @@ public sealed class ItemBaseJsonConverter : JsonConverter
 
                 return namedItem;
             case JsonToken.Integer:
-                var id = reader.ReadAsInt32();
-                if (id is not int ||
-                    !ItemBase.TryParse(id.Value, modifiers: default, out var parsedItem))
+                var id = reader.Value as long?;
+                if (id is not long ||
+                    !ItemBase.TryParse((int)id.Value, null, out var parsedItem))
                 {
                     return default;
                 }

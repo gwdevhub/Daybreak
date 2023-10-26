@@ -26,9 +26,9 @@ public sealed class ContinentJsonConverter : JsonConverter
 
                 return namedContinent;
             case JsonToken.Integer:
-                var id = reader.ReadAsInt32();
-                if (id is not int ||
-                    !Continent.TryParse(id.Value, out var parsedContinent))
+                var id = reader.Value as long?;
+                if (id is not long ||
+                    !Continent.TryParse((int)id.Value, out var parsedContinent))
                 {
                     return default;
                 }

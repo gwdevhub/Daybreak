@@ -26,9 +26,9 @@ public sealed class SkillJsonConverter : JsonConverter
 
                 return namedSkill;
             case JsonToken.Integer:
-                var id = reader.ReadAsInt32();
-                if (id is not int ||
-                    !Skill.TryParse(id.Value, out var parsedSkill))
+                var id = reader.Value as long?;
+                if (id is not long ||
+                    !Skill.TryParse((int)id.Value, out var parsedSkill))
                 {
                     return default;
                 }

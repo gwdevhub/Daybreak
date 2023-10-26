@@ -30,7 +30,7 @@ static DWORD WINAPI ThreadProc(LPVOID lpModule)
     HMODULE hModule = static_cast<HMODULE>(lpModule);
 #ifdef BUILD_TYPE_DEBUG
     AllocConsole();
-    SetConsoleTitleA("PacketLogger Console");
+    SetConsoleTitleA("Daybreak.GWCA Console");
     freopen_s(&stdout_proxy, "CONOUT$", "w", stdout);
     freopen_s(&stderr_proxy, "CONOUT$", "w", stderr);
 #endif

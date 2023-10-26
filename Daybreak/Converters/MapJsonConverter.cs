@@ -26,9 +26,9 @@ public sealed class MapJsonConverter : JsonConverter
 
                 return namedMap;
             case JsonToken.Integer:
-                var id = reader.ReadAsInt32();
-                if (id is not int ||
-                    !Map.TryParse(id.Value, out var parsedMap))
+                var id = reader.Value as long?;
+                if (id is not long ||
+                    !Map.TryParse((int)id.Value, out var parsedMap))
                 {
                     return default;
                 }

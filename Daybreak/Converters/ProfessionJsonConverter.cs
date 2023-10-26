@@ -26,9 +26,9 @@ public sealed class ProfessionJsonConverter : JsonConverter
 
                 return namedProfession;
             case JsonToken.Integer:
-                var id = reader.ReadAsInt32();
-                if (id is not int ||
-                    !Profession.TryParse(id.Value, out var parsedProfession))
+                var id = reader.Value as long?;
+                if (id is not long ||
+                    !Profession.TryParse((int)id.Value, out var parsedProfession))
                 {
                     return default;
                 }

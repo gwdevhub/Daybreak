@@ -10,6 +10,7 @@ namespace Daybreak {
         j = json
         {
             {"Id", p.Id},
+            {"PathingMapId", p.PathingMapId},
             {"XTL", p.XTL},
             {"XTR", p.XTR},
             {"XBL", p.XBL},

@@ -8,6 +8,7 @@ using json = nlohmann::json;
 namespace Daybreak {
     struct PathingTrapezoid {
         uint32_t Id;
+        uint32_t PathingMapId;
         float XTL;
         float XTR;
         float XBL;

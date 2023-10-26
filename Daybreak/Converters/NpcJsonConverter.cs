@@ -27,9 +27,9 @@ public sealed class NpcJsonConverter : JsonConverter
 
                 return namedNpc;
             case JsonToken.Integer:
-                var id = reader.ReadAsInt32();
-                if (id is not int ||
-                    !Npc.TryParse(id.Value, out var parsedNpc))
+                var id = reader.Value as long?;
+                if (id is not long ||
+                    !Npc.TryParse((int)id.Value, out var parsedNpc))
                 {
                     return default;
                 }

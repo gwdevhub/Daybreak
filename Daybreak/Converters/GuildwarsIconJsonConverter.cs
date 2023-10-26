@@ -26,9 +26,9 @@ public sealed class GuildwarsIconJsonConverter : JsonConverter
 
                 return namedGuildwarsIcon;
             case JsonToken.Integer:
-                var id = reader.ReadAsInt32();
-                if (id is not int ||
-                    !GuildwarsIcon.TryParse(id.Value, out var parsedGuildwarsIcon))
+                var id = reader.Value as long?;
+                if (id is not long ||
+                    !GuildwarsIcon.TryParse((int)id.Value, out var parsedGuildwarsIcon))
                 {
                     return default;
                 }
