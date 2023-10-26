@@ -32,9 +32,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'csharp' ]
+        language: [ 'csharp', 'cpp' ]
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby' ]
         # Learn more about CodeQL language support at https://aka.ms/codeql-docs/language-support
+
+    env:
+      Configuration: Release
+      Solution_Path: Daybreak.sln
+      Test_Project_Path: Daybreak.Tests\Daybreak.Tests.csproj
+      Wpf_Project_Path: Daybreak\Daybreak.csproj
+      Actions_Allow_Unsecure_Commands: true
 
     steps:
     - name: Checkout repository
