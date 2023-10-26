@@ -41,7 +41,7 @@ jobs:
       run: cmake -S . -B build -A Win32
 
     - name: Build Daybreak project
-      run: dotnet build Daybreak -c $env:Configuration
+      run: dotnet build Daybreak -c $env:Configuration --property:SolutionDir=$env:GITHUB_WORKSPACE
 
     - name: Set version variable
       run: |
