@@ -79,6 +79,7 @@ using Daybreak.Views.Onboarding.ReShade;
 using Daybreak.Services.LaunchConfigurations;
 using Daybreak.Services.ExecutableManagement;
 using Daybreak.Views.Launch;
+using Daybreak.Services.GWCA;
 
 namespace Daybreak.Configuration;
 
@@ -143,6 +144,11 @@ public class ProjectConfiguration : PluginConfigurationBase
             .RegisterHttpClient<ReShadeService>()
                 .WithMessageHandler(this.SetupLoggingAndMetrics<ReShadeService>)
                 .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
+                .Build()
+            .RegisterHttpClient<GWCAClient>()
+                .WithMessageHandler(this.SetupLoggingAndMetrics<GWCAClient>)
+                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
+                .WithTimeout(TimeSpan.FromSeconds(5))
                 .Build();
     }
 
@@ -213,7 +219,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IScreenManager, ScreenManager>();
         services.AddScoped<IGraphClient, GraphClient>();
         services.AddScoped<IOnboardingService, OnboardingService>();
-        services.AddScoped<IGuildwarsMemoryReader, GuildwarsMemoryReader>();
         services.AddScoped<IMemoryScanner, MemoryScanner>();
         services.AddScoped<IExperienceCalculator, ExperienceCalculator>();
         services.AddScoped<IAttributePointCalculator, AttributePointCalculator>();
@@ -240,6 +245,12 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IToolboxClient, ToolboxClient>();
         services.AddScoped<IProcessInjector, ProcessInjector>();
         services.AddScoped<ILaunchConfigurationService, LaunchConfigurationService>();
+        services.AddScoped<IGWCAClient, GWCAClient>();
+
+        //TODO: Composite will be the main reader. Composite will select between GuildwarsMemoryReader and GWCAMemoryReader depending on the options. Remove once GWCA is stable
+        services.AddScoped<IGuildwarsMemoryReader, CompositeMemoryReader>();
+        services.AddScoped<GuildwarsMemoryReader>();
+        services.AddScoped<GWCAMemoryReader>();
     }
 
     public override void RegisterViews(IViewProducer viewProducer)
@@ -419,6 +430,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         modsManager.RegisterMod<IDSOALService, DSOALService>();
         modsManager.RegisterMod<IGuildwarsScreenPlacer, GuildwarsScreenPlacer>();
         modsManager.RegisterMod<IReShadeService, ReShadeService>();
+        modsManager.RegisterMod<IGWCAInjector, GWCAInjector>();
     }
 
     private void RegisterLiteCollections(IServiceCollection services)

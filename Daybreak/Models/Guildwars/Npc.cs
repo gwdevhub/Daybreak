@@ -1,10 +1,13 @@
-﻿using System;
+﻿using Daybreak.Converters;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Daybreak.Models.Guildwars;
 
 // TODO: Add missing npcs
+[JsonConverter(typeof(NpcJsonConverter))]
 public sealed class Npc
 {
     public static readonly Npc Unknown = new() { Ids = new int[] { 0 }, Name = "Unknown" };

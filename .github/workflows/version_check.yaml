@@ -33,8 +33,15 @@ jobs:
       id: getLatestTag
       uses: WyriHaximus/github-action-get-previous-tag@v1
 
+    - name: Fetch submodules
+      run: |
+        git submodule update --init --recursive
+
+    - name: Build CMake Files
+      run: cmake -S . -B build -A Win32
+
     - name: Build Daybreak project
-      run: dotnet build Daybreak -c $env:Configuration
+      run: dotnet build Daybreak -c $env:Configuration --property:SolutionDir=$env:GITHUB_WORKSPACE
 
     - name: Set version variable
       run: |

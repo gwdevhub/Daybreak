@@ -1,9 +1,12 @@
-﻿using System;
+﻿using Daybreak.Converters;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Daybreak.Models.Guildwars;
 
+[JsonConverter(typeof(GuildwarsIconJsonConverter))]
 public sealed class GuildwarsIcon : IWikiEntity
 {
     public static readonly GuildwarsIcon ResurrectionShrine = new() { Id = 191474, Name = "Resurrection Shrine", WikiUrl = "https://wiki.guildwars.com/wiki/Resurrection_Shrine" };

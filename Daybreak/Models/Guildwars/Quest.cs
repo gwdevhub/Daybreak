@@ -1,9 +1,12 @@
-﻿using System;
+﻿using Daybreak.Converters;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Daybreak.Models.Guildwars;
 
+[JsonConverter(typeof(QuestJsonConverter))]
 public sealed class Quest : IWikiEntity
 {
     public int Id { get; init; }

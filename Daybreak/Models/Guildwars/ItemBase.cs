@@ -1,8 +1,12 @@
-﻿using System;
+﻿using Daybreak.Converters;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Daybreak.Models.Guildwars;
+
+[JsonConverter(typeof(ItemBaseJsonConverter))]
 public abstract class ItemBase
 {
     public static IReadOnlyCollection<ItemBase> AllItems { get; } = Enumerable.Empty<ItemBase>()

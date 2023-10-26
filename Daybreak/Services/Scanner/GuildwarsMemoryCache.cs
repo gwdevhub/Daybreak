@@ -84,11 +84,6 @@ public sealed class GuildwarsMemoryCache : IGuildwarsMemoryCache
         return this.ReadDataInternal(this.mainPlayerDataCache, this.guildwarsMemoryReader.ReadMainPlayerData, cancellationToken);
     }
 
-    public Task<ConnectionData?> ReadConnectionData(CancellationToken cancellationToken)
-    {
-        return this.ReadDataInternal(this.connectionDataCache, this.guildwarsMemoryReader.ReadConnectionData, cancellationToken);
-    }
-
     public Task<PreGameData?> ReadPreGameData(CancellationToken cancellationToken)
     {
         return this.ReadDataInternal(this.preGameDataCache, this.guildwarsMemoryReader.ReadPreGameData, cancellationToken);

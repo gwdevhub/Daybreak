@@ -13,7 +13,7 @@
     <LangVersion>preview</LangVersion>
     <ApplicationIcon>Daybreak.ico</ApplicationIcon>
     <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
-    <Version>0.9.8.126</Version>
+    <Version>0.9.8.127</Version>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <UserSecretsId>cfb2a489-db80-448d-a969-80270f314c46</UserSecretsId>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -60,6 +60,9 @@
 
   <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
+    <None Include="..\build\Daybreak.GWCA\$(Configuration)\Daybreak.GWCA.dll" Link="GWCA\Daybreak.GWCA.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <Target Name="AddUserSecrets" BeforeTargets="PrepareForBuild" Condition=" '$(UserSecretsId)' != '' ">
@@ -88,8 +91,8 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2045.28" />
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2088.41" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.75" />
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Plumsy" Version="1.1.0" />
@@ -108,6 +111,10 @@
     <PackageReference Include="WriteableBitmapEx" Version="1.6.8" />
   </ItemGroup>
 	
+  <ItemGroup>
+    <Folder Include="GWCA\" />
+  </ItemGroup>
+	
 	
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
     <Exec Command="echo.&gt;$(Version).version" />
@@ -120,5 +127,13 @@
       <Analyzer Remove="@(Analyzer)" />
       <Analyzer Include="@(FilteredAnalyzer)" />
     </ItemGroup>
+  </Target>
+
+  <Target Name="BuildCMakeProject" BeforeTargets="CoreCompile">
+    <!-- Configure CMake if needed -->
+    <Exec Command="cd $(SolutionDir) &amp;&amp; cmake -S . -B build -A Win32" />
+
+    <!-- Build the CMake project -->
+    <Exec Command="cd $(SolutionDir) &amp;&amp; cmake --build build --config $(Configuration)" />
   </Target>
 </Project>

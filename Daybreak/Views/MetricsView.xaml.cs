@@ -26,6 +26,7 @@ namespace Daybreak.Views;
 public partial class MetricsView : UserControl
 {
     private readonly SolidColorPaint backgroundPaint;
+    private readonly SolidColorPaint transparentPaint = new(new SKColor(0, 0, 0, 0));
     private readonly SolidColorPaint foregroundPaint;
     private readonly SolidColorPaint accentPaint;
     private readonly IMetricsService metricsService;
@@ -102,13 +103,25 @@ public partial class MetricsView : UserControl
             return;
         }
 
+        cartesianChart.DrawMargin = new LiveChartsCore.Measure.Margin(30);
         cartesianChart.XAxes = new Axis[]
         {
             new Axis
             {
                 Name = "Time",
+                Labeler = (ticks) =>
+                {
+                    return new DateTime((long)ticks).ToString("HH:mm:ss");
+                },
                 LabelsPaint = this.foregroundPaint,
-                Labeler = (ticks) => new DateTime((long)ticks).ToString("HH:mm:ss")
+                SeparatorsPaint = this.transparentPaint,
+                CrosshairLabelsPaint = this.transparentPaint,
+                CrosshairPaint = this.transparentPaint,
+                NamePaint = this.foregroundPaint,
+                SubseparatorsPaint = this.transparentPaint,
+                SubticksPaint = this.transparentPaint,
+                TicksPaint = this.transparentPaint,
+                ZeroPaint = this.transparentPaint,
             }
         };
 
@@ -118,6 +131,14 @@ public partial class MetricsView : UserControl
             {
                 Name = metricSet.Instrument.Unit,
                 LabelsPaint = this.foregroundPaint,
+                SeparatorsPaint = this.transparentPaint,
+                CrosshairLabelsPaint = this.transparentPaint,
+                CrosshairPaint = this.transparentPaint,
+                NamePaint = this.foregroundPaint,
+                SubseparatorsPaint = this.transparentPaint,
+                SubticksPaint = this.transparentPaint,
+                TicksPaint = this.transparentPaint,
+                ZeroPaint = this.transparentPaint,
             }
         };
 

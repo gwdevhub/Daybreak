@@ -164,6 +164,11 @@ public partial class FocusView : UserControl
                     Task.Delay(1000, cancellationToken)).ConfigureAwait(true);
 
             }
+            catch (InvalidOperationException ex)
+            {
+                this.logger.LogError(ex, "Encountered invalid operation exception. Cancelling periodic reading");
+                return;
+            }
             catch (Exception ex)
             {
                 this.logger.LogError(ex, "Encountered non-terminating exception. Silently continuing");
@@ -201,6 +206,11 @@ public partial class FocusView : UserControl
                 }
 
                 this.GameData = maybeGameData;
+            }
+            catch (InvalidOperationException ex)
+            {
+                this.logger.LogError(ex, "Encountered invalid operation exception. Cancelling periodic reading");
+                return;
             }
             catch (Exception ex)
             {
@@ -303,6 +313,11 @@ public partial class FocusView : UserControl
 
                 this.MainPlayerDataValid = true;
                 this.Browser.Visibility = this.minimapMaximized ? Visibility.Hidden : Visibility.Visible;
+            }
+            catch (InvalidOperationException ex)
+            {
+                this.logger.LogError(ex, "Encountered invalid operation exception. Cancelling periodic main player reading");
+                return;
             }
             catch (Exception ex)
             {

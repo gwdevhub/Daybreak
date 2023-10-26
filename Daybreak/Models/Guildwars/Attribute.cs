@@ -1,9 +1,12 @@
-﻿using System;
+﻿using Daybreak.Converters;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Daybreak.Models.Guildwars;
 
+[JsonConverter(typeof(AttributeJsonConverter))]
 public sealed class Attribute
 {
     public static readonly Attribute FastCasting = new() { Name = "Fast Casting", Id = 0, Profession = Profession.Mesmer };

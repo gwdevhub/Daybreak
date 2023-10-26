@@ -38,6 +38,11 @@
                     </Border>
                 </ControlTemplate>
             </ItemsControl.Template>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Grid
@@ -45,8 +50,7 @@
                         MouseWheel="InterceptScroll">
                         <Border BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
                                     BorderThickness="0, 0, 0, 1"/>
-                        <StackPanel HorizontalAlignment="Stretch"
-                                    Margin="0, 0, 0, 20">
+                        <StackPanel Margin="0, 0, 0, 20">
                             <TextBlock Text="{Binding Instrument.Name}"
                                        Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                        FontSize="14"
@@ -57,14 +61,11 @@
                                     VerticalAlignment="Center"></TextBlock>
                             <chart:CartesianChart 
                                     Loaded="CartesianChart_Loaded"
-                                    Title="{Binding ElementName=_this, Path=Title, Mode=OneWay}"
                                     Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                     ZoomMode="X"
                                     EasingFunction="{x:Static lvCore:EasingFunctions.BounceOut}"
                                     AnimationsSpeed="0:0:0.1"
                                     Background="{StaticResource MahApps.Brushes.ThemeBackground}"
-                                    XAxes="{Binding ElementName=_this, Path=XAxes, Mode=OneWay}"
-                                    YAxes="{Binding ElementName=_this, Path=YAxes, Mode=OneWay}"
                                     Height="300">
                             </chart:CartesianChart>
                         </StackPanel>

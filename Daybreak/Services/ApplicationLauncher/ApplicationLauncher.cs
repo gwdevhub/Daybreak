@@ -258,38 +258,10 @@ public class ApplicationLauncher : IApplicationLauncher
             CloseHandle(clientHandle);
         }
 
-        /*
-         * Run the actions one by one, to avoid injection issues
-         */
-        foreach (var mod in mods)
-        {
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.Value.ModStartupTimeout));
-            try
-            {
-                await mod.OnGuildwarsStarted(process, cts.Token);
-            }
-            catch (TaskCanceledException)
-            {
-                this.logger.LogError($"{mod.Name} timeout");
-                this.notificationService.NotifyError(
-                    title: $"{mod.Name} timeout",
-                    description: $"Mod timed out while processing {nameof(mod.OnGuildwarsStarted)}");
-            }
-            catch (Exception e)
-            {
-                this.KillGuildWarsProcess(process);
-                this.logger.LogError(e, $"{mod.Name} unhandled exception");
-                this.notificationService.NotifyError(
-                    title: $"{mod.Name} exception",
-                    description: $"Mod encountered exception of type {e.GetType().Name} while processing {nameof(mod.OnGuildwarsStarted)}");
-                return default;
-            }
-        }
-
         var retries = 0;
         while (retries < MaxRetries)
         {
-            await Task.Delay(100);
+            await Task.Delay(1000);
             retries++;
             var gwProcess = Process.GetProcessesByName("gw").FirstOrDefault();
             if (gwProcess is null && retries < MaxRetries)
@@ -320,6 +292,34 @@ public class ApplicationLauncher : IApplicationLauncher
             if (windowInfo.rcWindow.Width == 0 || windowInfo.rcWindow.Height == 0)
             {
                 continue;
+            }
+
+            /*
+             * Run the actions one by one, to avoid injection issues
+             */
+            foreach (var mod in mods)
+            {
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.Value.ModStartupTimeout));
+                try
+                {
+                    await mod.OnGuildwarsStarted(process, cts.Token);
+                }
+                catch (TaskCanceledException)
+                {
+                    this.logger.LogError($"{mod.Name} timeout");
+                    this.notificationService.NotifyError(
+                        title: $"{mod.Name} timeout",
+                        description: $"Mod timed out while processing {nameof(mod.OnGuildwarsStarted)}");
+                }
+                catch (Exception e)
+                {
+                    this.KillGuildWarsProcess(process);
+                    this.logger.LogError(e, $"{mod.Name} unhandled exception");
+                    this.notificationService.NotifyError(
+                        title: $"{mod.Name} exception",
+                        description: $"Mod encountered exception of type {e.GetType().Name} while processing {nameof(mod.OnGuildwarsStarted)}");
+                    return default;
+                }
             }
 
             return gwProcess;

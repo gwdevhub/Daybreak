@@ -2,6 +2,8 @@
 using Daybreak.Models.Progress;
 using Daybreak.Services.Drawing;
 using Daybreak.Services.ExceptionHandling;
+using Daybreak.Services.GWCA;
+using Daybreak.Services.Injection;
 using Daybreak.Services.Mods;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Notifications;
@@ -17,6 +19,8 @@ using Microsoft.Extensions.Logging;
 using Slim;
 using Slim.Integration.ServiceCollection;
 using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows;
