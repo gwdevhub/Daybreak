@@ -61,8 +61,8 @@ jobs:
       with:
         dotnet-version: '7.x'
 
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v2
+    #- name: Autobuild
+    #  uses: github/codeql-action/autobuild@v2
 
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
@@ -73,6 +73,9 @@ jobs:
     # - run: |
     #   echo "Run, Build Application using script"
     #   ./location_of_script_within_repo/buildscript.sh
+
+    - name: Build Daybreak project
+      run: dotnet build Daybreak -c $env:Configuration --property:SolutionDir=$env:GITHUB_WORKSPACE
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
