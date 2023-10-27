@@ -195,6 +195,11 @@ public sealed class GuildwarsMemoryReader : IGuildwarsMemoryReader
         return Task.Run(() => this.SafeReadGameMemory(this.ReadPreGameData), cancellationToken);
     }
 
+    public Task<string?> GetNamedEntity(IEntity entity, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
     private async Task InitializeSafe(Process process, ScopedLogger<GuildwarsMemoryReader> scopedLogger)
     {
         if (this.memoryScanner.Process is null ||

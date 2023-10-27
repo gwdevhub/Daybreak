@@ -41,7 +41,7 @@ namespace Daybreak::Modules::PathingMetadataModule {
                     PromiseQueue.pop();
                     try {
                         auto payload = GetPayload();
-                        promise->set_value(GetPayload());
+                        promise->set_value(payload);
                     }
                     catch (...) {
                         PathingMetadataPayload payload;

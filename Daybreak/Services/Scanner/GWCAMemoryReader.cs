@@ -517,6 +517,43 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
         return default;
     }
 
+    public async Task<string?> GetNamedEntity(IEntity entity, CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetNamedEntity), string.Empty);
+        if (this.connectionContextCache is null)
+        {
+            return default;
+        }
+
+        var response = await this.client.GetAsync(this.connectionContextCache.Value, $"name?id={entity.Id}", cancellationToken);
+        if (!response.IsSuccessStatusCode)
+        {
+            scopedLogger.LogError($"Received non-success response {response.StatusCode}");
+            return default;
+        }
+
+        try
+        {
+            var payload = await response.Content.ReadAsStringAsync(cancellationToken);
+            var namePayload = payload.Deserialize<NamePayload>();
+            if (namePayload is null ||
+                namePayload.Id != entity.Id ||
+                namePayload.Name!.IsNullOrWhiteSpace())
+            {
+                return default;
+            }
+
+            return namePayload.Name;
+            
+        }
+        catch (Exception ex)
+        {
+            scopedLogger.LogError(ex, "Encountered exception while parsing response");
+        }
+
+        return default;
+    }
+
     public void Stop()
     {
     }

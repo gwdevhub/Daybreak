@@ -403,7 +403,6 @@ public class ApplicationLauncher : IApplicationLauncher
 
     private static IEnumerable<GuildWarsApplicationLaunchContext?> GetGuildwarsProcessesInternal(params LaunchConfigurationWithCredentials[] launchConfigurationWithCredentials)
     {
-        //TODO: #419: Rework GetGuildwarsProcess to know which process it should be connected to
         return Process.GetProcessesByName(ProcessName)
             .Where(p =>
             {

@@ -277,21 +277,25 @@ namespace Daybreak::Modules::MainPlayerModule {
         std::vector<GW::TitleTier> titleTiers,
         WorldPlayer& player,
         int playerId,
-        Temp::GWPlayer gwPlayer,
+        Temp::GWPlayer* gwPlayer,
         GW::ProfessionState* professionState,
         std::list<uint32_t> skillbar,
         GW::PartyAttribute* partyAttribute,
         GW::AgentLiving* agent) {
 
         PopulatePlayer(player, playerId, professionState, skillbar, partyAttribute, agent);
+        if (!gwPlayer) {
+            return;
+        }
+
         GW::Title gwTitle;
         Title title;
         int titleId = 0;
-        auto name = GetString(gwPlayer.name);
+        auto name = GetString(gwPlayer->name);
         player.Name = name;
 
         for (const auto &t : titles) {
-            if (t.current_title_tier_index == gwPlayer.active_title_tier) {
+            if (t.current_title_tier_index == gwPlayer->active_title_tier) {
                 gwTitle = t;
                 break;
             }
@@ -322,7 +326,7 @@ namespace Daybreak::Modules::MainPlayerModule {
         std::list<GW::Title> titles,
         std::vector<GW::TitleTier> titleTiers,
         int playerId,
-        Temp::GWPlayer gwPlayer,
+        Temp::GWPlayer* gwPlayer,
         GW::ProfessionState* professionState,
         std::list<uint32_t> skillbar,
         GW::PartyAttribute* partyAttribute,
@@ -434,7 +438,15 @@ namespace Daybreak::Modules::MainPlayerModule {
             mainProfPtr = &*foundMainProfessionsState;
         }
 
-        PopulateMainPlayer(mainPlayer, (uint32_t)activeQuestId, questLog, titles, titleTiers, playerAgentId, *foundMainGwPlayer, mainProfPtr, skillbars[playerAgentId], mainAttrPtr, mainAgentPtr);
+        Temp::GWPlayer* mainGwPlayer;
+        if (foundMainGwPlayer == players.end()) {
+            mainGwPlayer = nullptr;
+        }
+        else {
+            mainGwPlayer = &*foundMainGwPlayer;
+        }
+
+        PopulateMainPlayer(mainPlayer, (uint32_t)activeQuestId, questLog, titles, titleTiers, playerAgentId, mainGwPlayer, mainProfPtr, skillbars[playerAgentId], mainAttrPtr, mainAgentPtr);
         return mainPlayer;
     }
 
@@ -447,7 +459,7 @@ namespace Daybreak::Modules::MainPlayerModule {
                     PromiseQueue.pop();
                     try {
                         auto payload = GetPayload();
-                        promise->set_value(GetPayload());
+                        promise->set_value(payload);
                     }
                     catch (...) {
                         MainPlayer payload;

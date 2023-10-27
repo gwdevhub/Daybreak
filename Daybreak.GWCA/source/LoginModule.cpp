@@ -39,7 +39,7 @@ namespace Daybreak::Modules::LoginModule {
                     PromiseQueue.pop();
                     try {
                         auto payload = GetPayload();
-                        promise->set_value(GetPayload());
+                        promise->set_value(payload);
                     }
                     catch (...) {
                         LoginPayload payload;

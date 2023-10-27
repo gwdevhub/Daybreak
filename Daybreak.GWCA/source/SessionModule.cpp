@@ -46,7 +46,7 @@ namespace Daybreak::Modules::SessionModule {
                     PromiseQueue.pop();
                     try {
                         auto payload = GetPayload();
-                        promise->set_value(GetPayload());
+                        promise->set_value(payload);
                     }
                     catch (...) {
                         SessionPayload payload;
