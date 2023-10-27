@@ -50,7 +50,7 @@ namespace Daybreak::Modules::UserModule {
                     PromiseQueue.pop();
                     try {
                         auto payload = GetPayload();
-                        promise->set_value(GetPayload());
+                        promise->set_value(payload);
                     }
                     catch (...) {
                         UserPayload payload;

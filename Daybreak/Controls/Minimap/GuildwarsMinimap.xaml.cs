@@ -23,6 +23,8 @@ using Daybreak.Services.Themes;
 using Daybreak.Services.Metrics;
 using System.Diagnostics.Metrics;
 using System.Diagnostics;
+using Daybreak.Models.FocusView;
+using Daybreak.Models.LaunchConfigurations;
 
 namespace Daybreak.Controls.Minimap;
 
@@ -80,6 +82,8 @@ public partial class GuildwarsMinimap : UserControl
     private int targetEntityId;
     [GenerateDependencyProperty]
     private int targetEntityModelId;
+    [GenerateDependencyProperty]
+    private GuildWarsApplicationLaunchContext launchContext = default!;
 
     public event EventHandler? MaximizeClicked;
     public event EventHandler<QuestMetadata>? QuestMetadataClicked;
@@ -552,20 +556,22 @@ public partial class GuildwarsMinimap : UserControl
 
         var maybePartyMember = this.CheckMouseOverEntity(this.GameData.Party?.OfType<IEntity>().Where(IsValidPositionalEntity).OrderByDescending(p => p.Id == this.TargetEntityId));
         if (maybePartyMember is PlayerInformation partyMember &&
-            this.TryFindResource("PlayerContextMenu") is ContextMenu playerContextMenu)
+            this.TryFindResource("PlayerContextMenu") is ContextMenu playerContextMenu &&
+            this.LaunchContext is not null)
         {
             this.ContextMenu = playerContextMenu;
-            this.ContextMenu.DataContext = partyMember;
+            this.ContextMenu.DataContext = new PlayerContextMenuContext { Player = partyMember, GuildWarsApplicationLaunchContext = this.LaunchContext };
             this.ContextMenu.IsOpen = true;
             return;
         }
 
         var maybeLivingEntity = this.CheckMouseOverEntity(this.GameData.LivingEntities?.OfType<IEntity>().Where(IsValidPositionalEntity).OrderByDescending(p => p.Id == this.TargetEntityId));
         if (maybeLivingEntity is LivingEntity livingEntity &&
-            this.TryFindResource("LivingEntityContextMenu") is ContextMenu livingEntityContextMenu)
+            this.TryFindResource("LivingEntityContextMenu") is ContextMenu livingEntityContextMenu &&
+            this.LaunchContext is not null)
         {
             this.ContextMenu = livingEntityContextMenu;
-            this.ContextMenu.DataContext = livingEntity;
+            this.ContextMenu.DataContext = new LivingEntityContextMenuContext { LivingEntity = livingEntity, GuildWarsApplicationLaunchContext = this.LaunchContext };
             this.ContextMenu.IsOpen = true;
             return;
         }

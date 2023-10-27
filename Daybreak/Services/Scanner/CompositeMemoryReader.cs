@@ -1,6 +1,8 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Models.Guildwars;
 using Microsoft.Extensions.Logging;
+using System;
+using System.CodeDom;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
@@ -38,6 +40,16 @@ public sealed class CompositeMemoryReader : IGuildwarsMemoryReader
         {
             return this.guildwarsMemoryReader.EnsureInitialized(process, cancellationToken);
         }
+    }
+
+    public async Task<string?> GetNamedEntity(IEntity entity, CancellationToken cancellationToken)
+    {
+        if (!this.liveOptions.Value.GWCAIntegration)
+        {
+            return default;
+        }
+
+        return await this.gWCAMemoryReader.GetNamedEntity(entity, cancellationToken);
     }
 
     public Task<GameData?> ReadGameData(CancellationToken cancellationToken)

@@ -86,7 +86,7 @@ namespace Daybreak::Modules::InventoryModule {
                     PromiseQueue.pop();
                     try {
                         auto payload = GetPayload();
-                        promise->set_value(GetPayload());
+                        promise->set_value(payload);
                     }
                     catch(...){
                         InventoryPayload payload;
