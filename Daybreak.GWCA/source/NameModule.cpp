@@ -16,6 +16,7 @@
 #include <limits>
 
 namespace Daybreak::Modules::NameModule {
+    std::vector<std::tuple<uint32_t, std::promise<NamePayload>*, std::wstring*>> WaitingList;
     std::queue<std::tuple<uint32_t, std::promise<NamePayload>>*> PromiseQueue;
     std::mutex GameThreadMutex;
     GW::HookEntry GameThreadHook;
@@ -32,28 +33,25 @@ namespace Daybreak::Modules::NameModule {
         return strTo;
     }
 
-    NamePayload GetAsyncName(uint32_t id) {
+    std::wstring* GetAsyncName(uint32_t id) {
         NamePayload namePayload;
-        auto name = new std::wstring();
         auto agent = GW::Agents::GetAgentByID(id);
         if (!agent) {
-            return namePayload;
+            return nullptr;
         }
 
         auto agentLiving = agent->GetAsAgentLiving();
         if (!agentLiving) {
-            return namePayload;
+            return nullptr;
         }
 
+        auto name = new std::wstring();
         if (!GW::Agents::AsyncGetAgentName(agentLiving, *name)) {
-            return namePayload;
+            delete(name);
+            return nullptr;
         }
 
-        const auto namestr =  WStringToString(*name);
-        namePayload.Id = id;
-        namePayload.Name = namestr;
-        delete(name);
-        return namePayload;
+        return name;
     }
 
     void EnsureInitialized() {
@@ -62,17 +60,39 @@ namespace Daybreak::Modules::NameModule {
             GW::GameThread::RegisterGameThreadCallback(&GameThreadHook, [&](GW::HookStatus*) {
                 while (!PromiseQueue.empty()) {
                     auto promiseRequest = PromiseQueue.front();
-                    std::promise<NamePayload>& promise = std::get<1>(*promiseRequest);
+                    std::promise<NamePayload> &promise = std::get<1>(*promiseRequest);
                     uint32_t id = std::get<0>(*promiseRequest);
                     PromiseQueue.pop();
                     try {
-                        auto payload = GetAsyncName(id);
-                        promise.set_value(payload);
+                        auto name = GetAsyncName(id);
+                        if (!name) {
+                            continue;
+                        }
+
+                        WaitingList.emplace_back(id, &promise, name);
                     }
                     catch (...) {
                         NamePayload payload;
                         promise.set_value(payload);
                     }
+                }
+
+                for (auto i = 0; i < WaitingList.size(); ) {
+                    auto item = &WaitingList[i];
+                    auto name = std::get<2>(*item);
+                    if (name->empty()) {
+                        i++;
+                        continue;
+                    }
+
+                    auto promise = std::get<1>(*item);
+                    auto id = std::get<0>(*item);
+                    WaitingList.erase(WaitingList.begin() + i);
+                    NamePayload payload;
+                    payload.Id = id;
+                    payload.Name = WStringToString(*name);
+                    delete(name);
+                    promise->set_value(payload);
                 }
                 });
 

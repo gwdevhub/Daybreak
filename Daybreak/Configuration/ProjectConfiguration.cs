@@ -224,7 +224,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IAttributePointCalculator, AttributePointCalculator>();
         services.AddScoped<IDownloadService, DownloadService>();
         services.AddScoped<IGuildwarsInstaller, GuildwarsInstaller>();
-        services.AddScoped<IGuildwarsEntityDebouncer, GuildwarsEntityDebouncer>();
         services.AddScoped<IExceptionHandler, ExceptionHandler>();
         services.AddScoped<IPathfinder, StupidPathfinder>();
         services.AddScoped<IDrawingService, DrawingService>();
