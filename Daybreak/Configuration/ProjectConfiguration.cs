@@ -208,6 +208,8 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IPluginsService, PluginsService>();
         services.AddSingleton<ISplashScreenService, SplashScreenService>();
         services.AddSingleton<IGuildWarsExecutableManager, GuildWarsExecutableManager>();
+        services.AddSingleton<IGWCAClient, GWCAClient>();
+        services.AddSingleton<IGuildwarsMemoryReader, GWCAMemoryReader>();
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
         services.AddScoped<IScreenshotProvider, ScreenshotProvider>();
@@ -219,7 +221,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IScreenManager, ScreenManager>();
         services.AddScoped<IGraphClient, GraphClient>();
         services.AddScoped<IOnboardingService, OnboardingService>();
-        services.AddScoped<IMemoryScanner, MemoryScanner>();
         services.AddScoped<IExperienceCalculator, ExperienceCalculator>();
         services.AddScoped<IAttributePointCalculator, AttributePointCalculator>();
         services.AddScoped<IDownloadService, DownloadService>();
@@ -244,12 +245,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IToolboxClient, ToolboxClient>();
         services.AddScoped<IProcessInjector, ProcessInjector>();
         services.AddScoped<ILaunchConfigurationService, LaunchConfigurationService>();
-        services.AddScoped<IGWCAClient, GWCAClient>();
-
-        //TODO: Composite will be the main reader. Composite will select between GuildwarsMemoryReader and GWCAMemoryReader depending on the options. Remove once GWCA is stable
-        services.AddScoped<IGuildwarsMemoryReader, CompositeMemoryReader>();
-        services.AddScoped<GuildwarsMemoryReader>();
-        services.AddScoped<GWCAMemoryReader>();
     }
 
     public override void RegisterViews(IViewProducer viewProducer)
