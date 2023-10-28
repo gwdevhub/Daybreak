@@ -631,8 +631,8 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
                     To = to,
                     Position = new Position
                     {
-                        X = metadata.PosX,
-                        Y = metadata.PosY
+                        X = metadata.PosX ?? 0,
+                        Y = metadata.PosY ?? 0
                     },
                     Quest = q
                 };

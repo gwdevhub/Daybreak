@@ -54,8 +54,8 @@ namespace Daybreak::Modules::GameModule {
             metadata.FromId = (uint32_t)quest.map_from;
             metadata.ToId = (uint32_t)quest.map_to;
             metadata.Id = (uint32_t)quest.quest_id;
-            metadata.PosX = (uint32_t)quest.marker.x;
-            metadata.PosY = (uint32_t)quest.marker.y;
+            metadata.PosX = quest.marker.x;
+            metadata.PosY = quest.marker.y;
             questMetadatas.push_back(metadata);
         }
 
