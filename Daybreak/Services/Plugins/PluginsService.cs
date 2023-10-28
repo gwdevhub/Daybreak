@@ -24,11 +24,13 @@ using System.Linq;
 using System.Logging;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Daybreak.Services.Plugins;
 
 public sealed class PluginsService : IPluginsService
 {
+    private const string DllExtension = ".dll";
     private const string PluginsDirectory = "Plugins";
 
     private static readonly object Lock = new();
@@ -178,6 +180,36 @@ public sealed class PluginsService : IPluginsService
         }
 
         Monitor.Exit(Lock);
+    }
+
+    public async Task<bool> AddPlugin(string pathToPlugin)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.AddPlugin), pathToPlugin ?? string.Empty);
+        if (pathToPlugin!.IsNullOrWhiteSpace())
+        {
+            scopedLogger.LogError("Plugin path is null or empty");
+            return false;
+        }
+
+        var fullPath = Path.GetFullPath(pathToPlugin!);
+        if (!File.Exists(fullPath) ||
+            !Path.GetExtension(fullPath).Equals(DllExtension, StringComparison.OrdinalIgnoreCase))
+        {
+            scopedLogger.LogError("Plugin path is invalid. File must exist and must have .dll extension");
+            return false;
+        }
+
+        var destinationPath = Path.GetFullPath(Path.Combine(PluginsDirectory, Path.GetFileName(fullPath)));
+        if (File.Exists(destinationPath))
+        {
+            scopedLogger.LogError("Plugin already exists");
+            return true;
+        }
+
+        using var sourceStream = new FileStream(fullPath, FileMode.Open);
+        using var destinationStream = new FileStream(destinationPath, FileMode.CreateNew);
+        await sourceStream.CopyToAsync(destinationStream);
+        return true;
     }
 
     private static void LogLoadOperation(PluginLoadOperation result, ScopedLogger<PluginsService> scopedLogger)

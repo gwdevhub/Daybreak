@@ -92,6 +92,16 @@ public sealed class UModService : IUModService
 
     public async Task OnGuildwarsStarted(Process process, CancellationToken cancellationToken)
     {
+        try
+        {
+            await this.uModClient.WaitForInitialize(cancellationToken);
+        }
+        catch(TimeoutException)
+        {
+            this.NotifyFaultyInstallation();
+            return;
+        }
+
         foreach(var entry in this.uModOptions.Value.Mods.Where(e => e.Enabled && e.PathToFile is not null))
         {
             await this.uModClient.AddFile(entry.PathToFile!, cancellationToken);
@@ -108,13 +118,7 @@ public sealed class UModService : IUModService
                 throw;
             }
 
-            /*
-             * Known issue where Guild Wars updater breaks the executable, which in turn breaks the integration with uMod.
-             * Prompt the user to manually reinstall Guild Wars.
-             */
-            this.notificationService.NotifyInformation(
-                title: "uMod failed to start",
-                description: "uMod failed to start due to a known issue with Guild Wars updating process. Please manually re-install Guild Wars in order to restore uMod functionality");
+            this.NotifyFaultyInstallation();
             return;
         }
 
@@ -213,6 +217,17 @@ public sealed class UModService : IUModService
     {
         this.uModOptions.Value.Mods = list;
         this.uModOptions.UpdateOption();
+    }
+
+    private void NotifyFaultyInstallation()
+    {
+        /*
+             * Known issue where Guild Wars updater breaks the executable, which in turn breaks the integration with uMod.
+             * Prompt the user to manually reinstall Guild Wars.
+             */
+        this.notificationService.NotifyInformation(
+            title: "uMod failed to start",
+            description: "uMod failed to start due to a known issue with Guild Wars updating process. Please manually re-install Guild Wars in order to restore uMod functionality");
     }
 
     private async Task<bool> SetupUModDll(UModInstallationStatus uModInstallationStatus)

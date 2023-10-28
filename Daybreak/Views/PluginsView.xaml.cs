@@ -1,6 +1,7 @@
 ﻿using Daybreak.Models.Plugins;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Plugins;
+using Microsoft.Win32;
 using System;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;
@@ -33,7 +34,7 @@ public partial class PluginsView : UserControl
 
     private void View_Loaded(object sender, RoutedEventArgs e)
     {
-        this.AvailablePlugins.ClearAnd().AddRange(this.pluginsService.GetAvailablePlugins());
+        this.UpdatePlugins();
     }
 
     private void SaveButton_Clicked(object sender, EventArgs e)
@@ -51,6 +52,28 @@ public partial class PluginsView : UserControl
         this.viewManager.ShowView<LauncherView>();
     }
 
+    private async void LoadPluginFromDisk_Clicked(object sender, EventArgs e)
+    {
+        var filePicker = new OpenFileDialog
+        {
+            Filter = "Dll Files (*.dll)|*.dll",
+            Multiselect = true,
+            RestoreDirectory = true,
+            Title = "Please select dll files"
+        };
+        if (filePicker.ShowDialog() is false)
+        {
+            return;
+        }
+
+        foreach (var name in filePicker.FileNames)
+        {
+            await this.pluginsService.AddPlugin(name);
+        }
+
+        this.UpdatePlugins();
+    }
+
     private void NavigateFileButton_Clicked(object sender, EventArgs e)
     {
         if (sender is not FrameworkElement element ||
@@ -60,5 +83,10 @@ public partial class PluginsView : UserControl
         }
 
         Process.Start("explorer.exe", plugin.Path);
+    }
+
+    private void UpdatePlugins()
+    {
+        this.AvailablePlugins.ClearAnd().AddRange(this.pluginsService.GetAvailablePlugins());
     }
 }

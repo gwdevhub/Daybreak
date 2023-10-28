@@ -27,6 +27,7 @@ internal sealed class UModClient : IUModClient
     private const string EntryLoadMetricUnit = "ms";
     private const int SMALL_PIPE_SIZE = 1 << 10;
     private const int BIG_PIPE_SIZE = 1 << 24;
+    private const int MaxRetryCount = 10; //Equivalent of 5 seconds
 
     private readonly Histogram<double> latencyMetric;
     private readonly INotificationService notificationService;
@@ -113,14 +114,27 @@ internal sealed class UModClient : IUModClient
         }
     }
 
-    public async Task<bool> Send(CancellationToken cancellationToken)
+    public async Task WaitForInitialize(CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.Send), string.Empty);
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.WaitForInitialize), string.Empty);
+        var retryCount = 0;
         while (!this.Ready)
         {
             scopedLogger.LogInformation("Pipes are not yet ready. Waiting 100ms");
-            await Task.Delay(100, cancellationToken);
+            await Task.Delay(500, cancellationToken);
+            retryCount++;
+            if (retryCount == MaxRetryCount)
+            {
+                scopedLogger.LogError($"Exceeded retry count. Throwing {nameof(TimeoutException)}");
+                throw new TimeoutException("Timed out waiting for uMod connection");
+            }
         }
+    }
+
+    public async Task<bool> Send(CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.Send), string.Empty);
+        await this.WaitForInitialize(cancellationToken);
 
         foreach(var loader in this.texturePackLoaders)
         {
