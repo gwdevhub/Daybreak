@@ -7,7 +7,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System;
 using System.Extensions;
-using Daybreak.Services.Scanner;
 using Microsoft.Extensions.DependencyInjection;
 using System.Core.Extensions;
 using System.Windows.Input;
@@ -46,7 +45,6 @@ public partial class GuildwarsMinimap : UserControl
     private readonly List<Position> mainPlayerPositionHistory = new();
     private readonly IPathfinder pathfinder;
     private readonly IDrawingService drawingService;
-    private readonly IGuildwarsEntityDebouncer guildwarsEntityDebouncer;
     private readonly IThemeManager themeManager;
     private readonly Color outlineColor = Colors.Chocolate;
     private readonly TimeSpan offsetRevertDelay = TimeSpan.FromSeconds(3);
@@ -65,7 +63,6 @@ public partial class GuildwarsMinimap : UserControl
     private Point initialClickPoint = new(0, 0);
     private Point lastPathfindingPoint = new(0, 0);
     private int pathfindingObjectiveCount = 0;
-    private DebounceResponse? cachedDebounceResponse;
     private PathfindingCache? pathfindingCache;
     
     [GenerateDependencyProperty]
@@ -91,12 +88,12 @@ public partial class GuildwarsMinimap : UserControl
     public event EventHandler<PlayerInformation>? PlayerInformationClicked;
     public event EventHandler<MapIcon>? MapIconClicked;
     public event EventHandler<Profession>? ProfessionClicked;
+    public event EventHandler<string?> NpcNameClicked;
 
     public GuildwarsMinimap()
         :this(
              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IPathfinder>(),
              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IDrawingService>(),
-             Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IGuildwarsEntityDebouncer>(),
              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IThemeManager>(),
              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IMetricsService>())
     {
@@ -105,13 +102,11 @@ public partial class GuildwarsMinimap : UserControl
     public GuildwarsMinimap(
         IPathfinder pathfinder,
         IDrawingService drawingService,
-        IGuildwarsEntityDebouncer guildwarsEntityDebouncer,
         IThemeManager themeManager,
         IMetricsService metricsService)
     {
         this.pathfinder = pathfinder.ThrowIfNull();
         this.drawingService = drawingService.ThrowIfNull();
-        this.guildwarsEntityDebouncer = guildwarsEntityDebouncer.ThrowIfNull();
         this.themeManager = themeManager.ThrowIfNull();
         this.drawingLatency = metricsService.CreateHistogram<double>(DrawingLatencyName, DrawingLatencyUnitName, DrawingLatencyDescription, Models.Metrics.AggregationTypes.P95);
 
@@ -135,7 +130,6 @@ public partial class GuildwarsMinimap : UserControl
         }
         else if (e.Property == PathingDataProperty)
         {
-            this.guildwarsEntityDebouncer.ClearCaches();
             this.mainPlayerPositionHistory.Clear();
             this.lastPathfindingPoint = new Point(0, 0);
             this.pathfindingObjectiveCount = 0;
@@ -161,12 +155,11 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
-        var debounceResponse = this.guildwarsEntityDebouncer.DebounceEntities(this.GameData);
         if (!double.IsFinite(this.mapWidth) ||
             !double.IsFinite(this.mapHeight) ||
             !double.IsFinite(this.mapVirtualMinWidth) ||
             !double.IsFinite(this.mapVirtualMinHeight) ||
-            debounceResponse.MainPlayer.Position is null)
+            this.GameData.MainPlayer?.Position is null)
         {
             return;
         }
@@ -175,7 +168,7 @@ public partial class GuildwarsMinimap : UserControl
         this.TargetEntityModelId = (int?)this.GameData.LivingEntities?.FirstOrDefault(e => e.Id == this.TargetEntityId)?.ModelType ?? 0;
         var screenVirtualWidth = this.ActualWidth / this.Zoom;
         var screenVirtualHeight = this.ActualHeight / this.Zoom;
-        var position = debounceResponse.MainPlayer.Position!.Value;
+        var position = this.GameData.MainPlayer.Position!.Value;
         this.originPoint = new Point(
             position.X - (screenVirtualWidth / 2) - (this.originOffset.X / this.Zoom),
             position.Y + (screenVirtualHeight / 2) + (this.originOffset.Y / this.Zoom));
@@ -189,19 +182,18 @@ public partial class GuildwarsMinimap : UserControl
             0);
         this.MapDrawingHost.Height = this.mapHeight * this.Zoom;
         this.MapDrawingHost.Width = this.mapWidth * this.Zoom;
-        this.cachedDebounceResponse = debounceResponse;
         this.ManageMainPlayerPositionHistory();
         this.DrawEntities();
     }
 
     private void ManageMainPlayerPositionHistory()
     {
-        if (this.cachedDebounceResponse is null)
+        if (this.GameData is null)
         {
             return;
         }
 
-        var currentPosition = this.cachedDebounceResponse.MainPlayer.Position ?? throw new InvalidOperationException("Unexpected main player null position");
+        var currentPosition = this.GameData.MainPlayer?.Position ?? throw new InvalidOperationException("Unexpected main player null position");
         if (this.mainPlayerPositionHistory.Any(oldPosition => PositionsCollide(oldPosition, currentPosition)))
         {
             return;
@@ -320,12 +312,12 @@ public partial class GuildwarsMinimap : UserControl
             PositionRadius,
             EntitySize,
             foregroundColor);
-        this.drawingService.DrawEngagementArea(bitmap, this.cachedDebounceResponse ?? new DebounceResponse());
+        this.drawingService.DrawEngagementArea(bitmap, this.GameData);
         this.drawingService.DrawMainPlayerPositionHistory(bitmap, this.mainPlayerPositionHistory);
         this.drawingService.DrawPaths(bitmap, this.pathfindingCache);
         this.drawingService.DrawQuestObjectives(bitmap, this.GameData.MainPlayer?.QuestLog ?? new List<QuestMetadata>());
         this.drawingService.DrawMapIcons(bitmap, this.GameData.MapIcons ?? new List<MapIcon>());
-        this.drawingService.DrawEntities(bitmap, this.cachedDebounceResponse ?? new DebounceResponse(), this.TargetEntityId);
+        this.drawingService.DrawEntities(bitmap, this.GameData, this.TargetEntityId);
         bitmap.Unlock();
         this.drawingLatency.Record(sw.ElapsedMilliseconds);
     }
@@ -387,8 +379,8 @@ public partial class GuildwarsMinimap : UserControl
 
         var playerPosition = new Point
         {
-            X = this.cachedDebounceResponse?.MainPlayer.Position?.X ?? 0,
-            Y = this.cachedDebounceResponse?.MainPlayer.Position?.Y ?? 0,
+            X = this.GameData?.MainPlayer?.Position?.X ?? 0,
+            Y = this.GameData?.MainPlayer?.Position?.Y ?? 0,
         };
 
         /*
@@ -689,24 +681,36 @@ public partial class GuildwarsMinimap : UserControl
         this.QuestMetadataClicked?.Invoke(this, quest);
     }
 
-    private void PlayerContextMenu_PlayerContextMenuClicked(object _, PlayerInformation? playerInformation)
+    private void PlayerContextMenu_PlayerContextMenuClicked(object _, (PlayerInformation? Player, string? Name) tuple)
     {
-        if (playerInformation is null)
+        if (tuple.Name?.IsNullOrWhiteSpace() is false)
+        {
+            this.NpcNameClicked?.Invoke(this, tuple.Name);
+            return;
+        }
+
+        if (tuple.Player is null)
         {
             return;
         }
 
-        this.PlayerInformationClicked?.Invoke(this, playerInformation);
+        this.PlayerInformationClicked?.Invoke(this, tuple.Player);
     }
 
-    private void LivingEntityContextMenu_LivingEntityContextMenuClicked(object _, LivingEntity? livingEntity)
+    private void LivingEntityContextMenu_LivingEntityContextMenuClicked(object _, (LivingEntity? LivingEntity, string? Name) tuple)
     {
-        if (livingEntity is null)
+        if (tuple.Name?.IsNullOrWhiteSpace() is false)
+        {
+            this.NpcNameClicked?.Invoke(this, tuple.Name);
+            return;
+        }
+
+        if (tuple.LivingEntity is null)
         {
             return;
         }
 
-        this.LivingEntityClicked?.Invoke(this, livingEntity);
+        this.LivingEntityClicked?.Invoke(this, tuple.LivingEntity);
     }
 
     private void LivingEntityContextMenu_LivingEntityProfessionContextMenuClicked(object _, Profession? e)

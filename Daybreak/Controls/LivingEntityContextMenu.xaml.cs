@@ -19,7 +19,7 @@ public partial class LivingEntityContextMenu : UserControl
 {
     private readonly IGuildwarsMemoryReader guildwarsMemoryReader;
 
-    public event EventHandler<LivingEntity?>? LivingEntityContextMenuClicked;
+    public event EventHandler<(LivingEntity? Entity, string? Name)>? LivingEntityContextMenuClicked;
     public event EventHandler<Profession?>? LivingEntityProfessionContextMenuClicked;
 
     [GenerateDependencyProperty]
@@ -64,7 +64,7 @@ public partial class LivingEntityContextMenu : UserControl
 
     private void NpcDefinitionTextBlock_MouseLeftButtonDown(object _, MouseButtonEventArgs e)
     {
-        this.LivingEntityContextMenuClicked?.Invoke(this, this.DataContext.As<LivingEntityContextMenuContext>()?.LivingEntity ?? default);
+        this.LivingEntityContextMenuClicked?.Invoke(this, (this.DataContext.As<LivingEntityContextMenuContext>()?.LivingEntity ?? default, this.EntityName));
     }
 
     private void PrimaryProfessionTextBlock_MouseLeftButtonDown(object _, MouseButtonEventArgs e)

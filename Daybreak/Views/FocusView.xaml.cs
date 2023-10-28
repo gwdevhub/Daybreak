@@ -27,6 +27,9 @@ namespace Daybreak.Views;
 /// </summary>
 public partial class FocusView : UserControl
 {
+    private const string NamePlaceholder = "[NamePlaceholder]";
+    private const string WikiUrl = "https://wiki.guildwars.com/wiki/[NamePlaceholder]";
+
     private static readonly TimeSpan UninitializedBackoff = TimeSpan.FromSeconds(15);
 
     private readonly IBuildTemplateManager buildTemplateManager;
@@ -356,7 +359,8 @@ public partial class FocusView : UserControl
                 if (userData?.User is null ||
                     sessionData?.Session is null ||
                     mainPlayerData?.PlayerInformation is null ||
-                    sessionData.Session.InstanceType is InstanceType.Loading or InstanceType.Undefined)
+                    sessionData.Session.InstanceType is InstanceType.Loading or InstanceType.Undefined ||
+                    sessionData.Session.InstanceTimer == 0)
                 {
                     this.MainPlayerDataValid = false;
                     this.Browser.Visibility = Visibility.Collapsed;
@@ -562,6 +566,20 @@ public partial class FocusView : UserControl
         }
 
         this.BrowserAddress = entity.WikiUrl;
+    }
+
+    private void GuildwarsMinimap_NpcNameClicked(object _, string e)
+    {
+        if (e.IsNullOrEmpty() is not false)
+        {
+            return;
+        }
+
+        var indexOfSeparator = e.IndexOf("[");
+        indexOfSeparator = indexOfSeparator >= 0 ? indexOfSeparator : e.Length;
+        var curedNpcName = e[..indexOfSeparator];
+        var npcUrl = WikiUrl.Replace(NamePlaceholder, curedNpcName);
+        this.BrowserAddress = npcUrl;
     }
 
     private void InventoryComponent_PriceHistoryClicked(object _, ItemBase e)

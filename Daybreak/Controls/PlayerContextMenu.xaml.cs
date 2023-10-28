@@ -18,7 +18,7 @@ public partial class PlayerContextMenu : UserControl
 {
     private readonly IGuildwarsMemoryReader guildwarsMemoryReader;
 
-    public event EventHandler<PlayerInformation?>? PlayerContextMenuClicked;
+    public event EventHandler<(PlayerInformation? Player, string? Name)>? PlayerContextMenuClicked;
 
     [GenerateDependencyProperty]
     private string playerName = string.Empty;
@@ -49,6 +49,6 @@ public partial class PlayerContextMenu : UserControl
 
     private void TextBlock_MouseLeftButtonDown(object _, MouseButtonEventArgs e)
     {
-        this.PlayerContextMenuClicked?.Invoke(this, this.DataContext.As<PlayerContextMenuContext>()?.Player ?? default);
+        this.PlayerContextMenuClicked?.Invoke(this, (this.DataContext.As<PlayerContextMenuContext>()?.Player ?? default, this.PlayerName));
     }
 }

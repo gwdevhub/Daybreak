@@ -111,6 +111,7 @@
                                           PlayerInformationClicked="GuildwarsMinimap_PlayerInformationClicked"
                                           MapIconClicked="GuildwarsMinimap_MapIconClicked"
                                           ProfessionClicked="GuildwarsMinimap_ProfessionClicked"
+                                          NpcNameClicked="GuildwarsMinimap_NpcNameClicked"
                                           ClipToBounds="True"
                                           Background="{DynamicResource Daybreak.Brushes.Background}"
                                           BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"

@@ -65,26 +65,26 @@ public sealed class DrawingService : IDrawingService, IDrawingModuleProducer
         return true;
     }
 
-    public void DrawEntities(WriteableBitmap bitmap, DebounceResponse debounceResponse, int targetEntityId)
+    public void DrawEntities(WriteableBitmap bitmap, GameData gameData, int targetEntityId)
     {
         if (bitmap is null)
         {
             return;
         }
 
-        if (debounceResponse is null ||
-            debounceResponse.MainPlayer.Position is null ||
-            debounceResponse.WorldPlayers is null |
-            debounceResponse.Party is null ||
-            debounceResponse.LivingEntities is null)
+        if (gameData is null ||
+            gameData.MainPlayer?.Position is null ||
+            gameData.WorldPlayers is null |
+            gameData.Party is null ||
+            gameData.LivingEntities is null)
         {
             return;
         }
 
-        var entities = debounceResponse.LivingEntities.OfType<IEntity>()
-            .Concat(debounceResponse.Party!.OfType<IEntity>())
-            .Concat(debounceResponse.WorldPlayers!.OfType<IEntity>())
-            .Append(debounceResponse.MainPlayer)
+        var entities = gameData.LivingEntities.OfType<IEntity>()
+            .Concat(gameData.Party!.OfType<IEntity>())
+            .Concat(gameData.WorldPlayers!.OfType<IEntity>())
+            .Append(gameData.MainPlayer)
             .Where(IsValidPositionalEntity);
 
         var nonTargetedEntities = entities.Where(e => e.Id != targetEntityId);
@@ -266,26 +266,26 @@ public sealed class DrawingService : IDrawingService, IDrawingModuleProducer
         }
     }
 
-    public void DrawEngagementArea(WriteableBitmap bitmap, DebounceResponse debounceResponse)
+    public void DrawEngagementArea(WriteableBitmap bitmap, GameData gameData)
     {
         if (bitmap is null)
         {
             return;
         }
 
-        if (debounceResponse is null ||
-            debounceResponse.MainPlayer.Position is null ||
-            debounceResponse.WorldPlayers is null |
-            debounceResponse.Party is null ||
-            debounceResponse.LivingEntities is null)
+        if (gameData is null ||
+            gameData.MainPlayer?.Position is null ||
+            gameData.WorldPlayers is null |
+            gameData.Party is null ||
+            gameData.LivingEntities is null)
         {
             return;
         }
 
-        var entities = debounceResponse.LivingEntities.OfType<IEntity>()
-            .Concat(debounceResponse.Party!.OfType<IEntity>())
-            .Concat(debounceResponse.WorldPlayers!.OfType<IEntity>())
-            .Append(debounceResponse.MainPlayer)
+        var entities = gameData.LivingEntities.OfType<IEntity>()
+            .Concat(gameData.Party!.OfType<IEntity>())
+            .Concat(gameData.WorldPlayers!.OfType<IEntity>())
+            .Append(gameData.MainPlayer)
             .Where(IsValidPositionalEntity);
 
         foreach (var entity in entities)
