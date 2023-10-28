@@ -1,4 +1,5 @@
-﻿using Daybreak.Services.Bloogum.Models;
+﻿using Daybreak.Models.Guildwars;
+using Daybreak.Services.Bloogum.Models;
 using Daybreak.Services.Images;
 using Daybreak.Services.Scanner;
 using Microsoft.Extensions.Logging;
@@ -65,14 +66,23 @@ public sealed class BloogumClient : IBloogumClient
             return GetRandomScreenShot();
         }
 
-        var worldInfo = await this.guildwarsMemoryCache.ReadWorldData(CancellationToken.None);
-        if (worldInfo is null)
+        WorldData? worldInfo = default;
+        try
         {
+            worldInfo = await this.guildwarsMemoryCache.ReadWorldData(CancellationToken.None);
+            if (worldInfo is null)
+            {
+                return GetRandomScreenShot();
+            }
+        }
+        catch (Exception ex) when (ex is TimeoutException or TaskCanceledException or HttpRequestException)
+        {
+            this.logger.LogInformation("Could not retrieve world data. Returning random screenshot");
             return GetRandomScreenShot();
         }
 
-        var validLocations = Location.Locations.Where(l => l.Region == worldInfo.Region).ToList();
-        var validCategories = validLocations.SelectMany(l => l.Categories).Where(c => c.Map == worldInfo.Map).ToList();
+        var validLocations = Location.Locations.Where(l => l.Region == worldInfo!.Region).ToList();
+        var validCategories = validLocations.SelectMany(l => l.Categories).Where(c => c.Map == worldInfo!.Map).ToList();
         if (validCategories.None())
         {
             if (validLocations.None())

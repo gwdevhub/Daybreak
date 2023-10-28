@@ -28,12 +28,12 @@ namespace Daybreak::Modules::InventoryModule {
                 continue;
             }
 
-            bagContent.Id = item->item_id;
+            bagContent.Id = item->model_id;
             bagContent.Slot = item->slot;
             bagContent.Count = item->quantity;
             auto modifier = item->mod_struct;
             for (auto i = 0; i < item->mod_struct_size; i++) {
-                bagContent.Modifiers.push_back((uint32_t)modifier);
+                bagContent.Modifiers.push_back((uint32_t)(modifier->mod));
                 modifier++;
             }
            
