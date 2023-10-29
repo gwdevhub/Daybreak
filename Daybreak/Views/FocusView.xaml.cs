@@ -10,9 +10,11 @@ using Daybreak.Services.Scanner;
 using Daybreak.Views.Trade;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
+using System.Linq;
 using System.Logging;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,6 +33,7 @@ public partial class FocusView : UserControl
     private const string WikiUrl = "https://wiki.guildwars.com/wiki/[NamePlaceholder]";
 
     private static readonly TimeSpan UninitializedBackoff = TimeSpan.FromSeconds(15);
+    private static readonly TimeSpan GameDataFrequency = TimeSpan.FromSeconds(1);
 
     private readonly IBuildTemplateManager buildTemplateManager;
     private readonly IApplicationLauncher applicationLauncher;
@@ -42,6 +45,9 @@ public partial class FocusView : UserControl
 
     [GenerateDependencyProperty]
     private InventoryData inventoryData = new();
+
+    [GenerateDependencyProperty]
+    private GameState gameState = new();
 
     [GenerateDependencyProperty]
     private GameData gameData = new();
@@ -204,6 +210,66 @@ public partial class FocusView : UserControl
         }
     }
 
+    private async void PeriodicallyReadGameState(CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.PeriodicallyReadGameState), string.Empty);
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            try
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                if (this.DataContext is not GuildWarsApplicationLaunchContext context)
+                {
+                    continue;
+                }
+
+                var readGameStateTask = this.guildwarsMemoryCache.ReadGameState(cancellationToken);
+                await Task.WhenAll(
+                    readGameStateTask,
+                    Task.Delay(16, cancellationToken)).ConfigureAwait(true);
+
+                var maybeGameState = await readGameStateTask;
+                if (maybeGameState is null)
+                {
+                    continue;
+                }
+
+                this.GameState = maybeGameState;
+            }
+            catch (InvalidOperationException ex)
+            {
+                scopedLogger.LogError(ex, "Encountered invalid operation exception. Cancelling periodic reading");
+                return;
+            }
+            catch (Exception ex) when (ex is TimeoutException or OperationCanceledException)
+            {
+                if (this.DataContext is not GuildWarsApplicationLaunchContext context)
+                {
+                    continue;
+                }
+
+                scopedLogger.LogError(ex, "Encountered timeout. Verifying connection");
+                try
+                {
+                    await this.guildwarsMemoryCache.EnsureInitialized(context, cancellationToken);
+                }
+                catch (InvalidOperationException innerEx)
+                {
+                    scopedLogger.LogError(innerEx, "Could not ensure connection is initialized. Backing off before retrying");
+                    await Task.Delay(UninitializedBackoff, cancellationToken);
+                }
+            }
+            catch (Exception ex)
+            {
+                scopedLogger.LogError(ex, "Encountered non-terminating exception. Silently continuing");
+            }
+        }
+    }
+
     private async void PeriodicallyReadGameData(CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.PeriodicallyReadGameData), string.Empty);
@@ -224,12 +290,34 @@ public partial class FocusView : UserControl
                 var readGameDataTask = this.guildwarsMemoryCache.ReadGameData(cancellationToken);
                 await Task.WhenAll(
                     readGameDataTask,
-                    Task.Delay(16, cancellationToken)).ConfigureAwait(true);
+                    Task.Delay(GameDataFrequency, cancellationToken)).ConfigureAwait(true);
 
                 var maybeGameData = await readGameDataTask;
                 if (maybeGameData is null)
                 {
                     continue;
+                }
+
+                if (maybeGameData.MainPlayer is not null)
+                {
+                    maybeGameData.MainPlayer.Position = this.GameData?.MainPlayer?.Position ?? new Position();
+                }
+                
+                foreach(var worldPlayer in maybeGameData.WorldPlayers ?? new List<WorldPlayerInformation>())
+                {
+                    worldPlayer.Position = this.GameData?.WorldPlayers?.FirstOrDefault(w => w.Id == worldPlayer.Id)?.Position ?? new Position();
+                }
+
+                foreach (var partyPlayer in maybeGameData.Party ?? new List<PlayerInformation>())
+                {
+                    partyPlayer.Position = this.GameData?.Party?.FirstOrDefault(w => w.Id == partyPlayer.Id)?.Position ?? new Position();
+                }
+
+                foreach (var entity in maybeGameData.LivingEntities ?? new List<LivingEntity>())
+                {
+                    var oldEntity = this.GameData?.LivingEntities?.FirstOrDefault(w => w.Id == entity.Id);
+                    entity.Position = oldEntity?.Position ?? new Position();
+                    entity.State = oldEntity?.State ?? LivingEntityState.Unknown;
                 }
 
                 this.GameData = maybeGameData;
@@ -429,6 +517,7 @@ public partial class FocusView : UserControl
 
         if (this.MinimapVisible)
         {
+            this.PeriodicallyReadGameState(cancellationToken);
             this.PeriodicallyReadGameData(cancellationToken);
             this.PeriodicallyReadPathingData(cancellationToken);
         }

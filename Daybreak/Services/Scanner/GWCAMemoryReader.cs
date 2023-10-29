@@ -14,11 +14,13 @@ using System.Collections.Generic;
 using Daybreak.Models.Builds;
 using System.Windows;
 using Daybreak.Utils;
+using System.Text.RegularExpressions;
 
 namespace Daybreak.Services.Scanner;
 
 public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
 {
+    private static readonly Regex ItemNameColorRegex = new(@"<c=.*?>|</c>", RegexOptions.Compiled);
     private readonly IGWCAClient client;
     private readonly ILogger<GWCAMemoryReader> logger;
 
@@ -517,15 +519,68 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
         return default;
     }
 
-    public async Task<string?> GetNamedEntity(IEntity entity, CancellationToken cancellationToken)
+    public async Task<GameState?> ReadGameState(CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetNamedEntity), string.Empty);
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetEntityName), string.Empty);
         if (this.connectionContextCache is null)
         {
             return default;
         }
 
-        var response = await this.client.GetAsync(this.connectionContextCache.Value, $"name?id={entity.Id}", cancellationToken);
+        var response = await this.client.GetAsync(this.connectionContextCache.Value, $"game/state", cancellationToken);
+        if (!response.IsSuccessStatusCode)
+        {
+            scopedLogger.LogError($"Received non-success response {response.StatusCode}");
+            return default;
+        }
+
+        try
+        {
+            var payload = await response.Content.ReadAsStringAsync(cancellationToken);
+            var gameStatePayload = payload.Deserialize<GameStatePayload>();
+            if (gameStatePayload is null ||
+                gameStatePayload.States is null)
+            {
+                return default;
+            }
+
+            var states = gameStatePayload.States.Select(state =>
+            {
+                return new EntityGameState
+                {
+                    Id = (int)state.Id,
+                    Position = new Position { X = state.PosX, Y = state.PosY },
+                    State = state.State switch
+                    {
+                        0x08 => LivingEntityState.Dead,
+                        0xC00 => LivingEntityState.Boss,
+                        0x40000 => LivingEntityState.Spirit,
+                        0x40008 => LivingEntityState.ToBeCleanedUp,
+                        0x400000 => LivingEntityState.Player,
+                        _ => LivingEntityState.Unknown
+                    }
+                };
+            }).ToList();
+
+            return new GameState { States = states };
+        }
+        catch (Exception ex)
+        {
+            scopedLogger.LogError(ex, "Encountered exception while parsing response");
+        }
+
+        return default;
+    }
+
+    public async Task<string?> GetEntityName(IEntity entity, CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetEntityName), string.Empty);
+        if (this.connectionContextCache is null)
+        {
+            return default;
+        }
+
+        var response = await this.client.GetAsync(this.connectionContextCache.Value, $"entities/name?id={entity.Id}", cancellationToken);
         if (!response.IsSuccessStatusCode)
         {
             scopedLogger.LogError($"Received non-success response {response.StatusCode}");
@@ -545,6 +600,44 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
 
             return namePayload.Name;
             
+        }
+        catch (Exception ex)
+        {
+            scopedLogger.LogError(ex, "Encountered exception while parsing response");
+        }
+
+        return default;
+    }
+
+    public async Task<string?> GetItemName(int id, List<uint> modifiers, CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetItemName), string.Empty);
+        if (this.connectionContextCache is null)
+        {
+            return default;
+        }
+
+        var response = await this.client.GetAsync(this.connectionContextCache.Value, $"items/name?id={id}&modifiers={string.Join(',', modifiers?.Select(m => m.ToString()) ?? Array.Empty<string>())}", cancellationToken);
+        if (!response.IsSuccessStatusCode)
+        {
+            scopedLogger.LogError($"Received non-success response {response.StatusCode}");
+            return default;
+        }
+
+        try
+        {
+            var payload = await response.Content.ReadAsStringAsync(cancellationToken);
+            var namePayload = payload.Deserialize<NamePayload>();
+            if (namePayload is null ||
+                namePayload.Id != id ||
+                namePayload.Name!.IsNullOrWhiteSpace())
+            {
+                return default;
+            }
+
+            var curedName = ItemNameColorRegex.Replace(namePayload.Name!, "");
+            return curedName;
+
         }
         catch (Exception ex)
         {

@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "NameModule.h"
+#include "EntityNameModule.h"
 #include "payloads/NamePayload.h"
 #include <GWCA/Managers/GameThreadMgr.h>
 #include <GWCA/Managers/MapMgr.h>
@@ -14,24 +14,14 @@
 #include <Windows.h>
 #include <cstdint>
 #include <limits>
+#include "Utils.h"
 
-namespace Daybreak::Modules::NameModule {
+namespace Daybreak::Modules::EntityNameModule {
     std::vector<std::tuple<uint32_t, std::promise<NamePayload>*, std::wstring*>> WaitingList;
     std::queue<std::tuple<uint32_t, std::promise<NamePayload>>*> PromiseQueue;
     std::mutex GameThreadMutex;
     GW::HookEntry GameThreadHook;
     volatile bool initialized = false;
-
-    std::string WStringToString(const std::wstring& wstr)
-    {
-        if (wstr.empty()) return std::string();
-
-        int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
-        std::string strTo(size_needed, 0);
-        WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
-
-        return strTo;
-    }
 
     std::wstring* GetAsyncName(uint32_t id) {
         NamePayload namePayload;
@@ -90,7 +80,7 @@ namespace Daybreak::Modules::NameModule {
                     WaitingList.erase(WaitingList.begin() + i);
                     NamePayload payload;
                     payload.Id = id;
-                    payload.Name = WStringToString(*name);
+                    payload.Name = Daybreak::Utils::WStringToString(*name);
                     delete(name);
                     promise->set_value(payload);
                 }

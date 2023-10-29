@@ -7,7 +7,7 @@ public sealed class PlayerInformation : IEntity
     public int Id { get; init; }
     public uint Timer { get; init; }
     public int Level { get; init; }
-    public Position? Position { get; init; }
+    public Position? Position { get; set; }
     public Profession? PrimaryProfession { get; init; }
     public Profession? SecondaryProfession { get; init; }
     public List<Profession>? UnlockedProfession { get; init; }

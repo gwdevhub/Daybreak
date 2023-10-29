@@ -59,7 +59,7 @@ public partial class LivingEntityContextMenu : UserControl
         }
 
         await this.guildwarsMemoryReader.EnsureInitialized(context.GuildWarsApplicationLaunchContext!.GuildWarsProcess, CancellationToken.None);
-        this.EntityName = await this.guildwarsMemoryReader.GetNamedEntity(context.LivingEntity!, CancellationToken.None);
+        this.EntityName = await this.guildwarsMemoryReader.GetEntityName(context.LivingEntity!, CancellationToken.None).ConfigureAwait(true);
     }
 
     private void NpcDefinitionTextBlock_MouseLeftButtonDown(object _, MouseButtonEventArgs e)

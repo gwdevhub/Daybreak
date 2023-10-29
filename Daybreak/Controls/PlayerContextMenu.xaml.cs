@@ -44,7 +44,7 @@ public partial class PlayerContextMenu : UserControl
         }
 
         await this.guildwarsMemoryReader.EnsureInitialized(context.GuildWarsApplicationLaunchContext!.GuildWarsProcess, CancellationToken.None);
-        this.PlayerName = await this.guildwarsMemoryReader.GetNamedEntity(context.Player!, CancellationToken.None);
+        this.PlayerName = await this.guildwarsMemoryReader.GetEntityName(context.Player!, CancellationToken.None).ConfigureAwait(true);
     }
 
     private void TextBlock_MouseLeftButtonDown(object _, MouseButtonEventArgs e)
