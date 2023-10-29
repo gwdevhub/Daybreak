@@ -14,9 +14,9 @@ public sealed class MainPlayerInformation : IEntity
     public Profession? SecondaryProfession { get; init; }
     public List<Profession>? UnlockedProfession { get; init; }
     public Build? CurrentBuild { get; init; }
-    public float CurrentHealth { get; init; }
+    public float CurrentHealth { get; set; }
     public float MaxHealth { get; init; }
-    public float CurrentEnergy { get; init; }
+    public float CurrentEnergy { get; set; }
     public float MaxEnergy { get; init; }
     public float HealthRegen { get; init; }
     public float EnergyRegen { get; init; }

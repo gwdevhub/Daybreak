@@ -21,4 +21,8 @@ public sealed class LivingEntity : IEntity
     public LivingEntityState State { get; set; }
     
     public LivingEntityAllegiance Allegiance { get; init; }
+
+    public float Health { get; set; }
+
+    public float Energy { get; set; }
 }

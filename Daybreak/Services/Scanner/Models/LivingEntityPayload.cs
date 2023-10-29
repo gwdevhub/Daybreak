@@ -12,4 +12,6 @@ internal class LivingEntityPayload
     public uint PrimaryProfessionId { get; set; }
     public uint SecondaryProfessionId { get; set; }
     public uint Timer { get; set; }
+    public float Health { get; set; }
+    public float Energy { get; set; }
 }

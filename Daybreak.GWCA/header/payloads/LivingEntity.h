@@ -17,6 +17,8 @@ namespace Daybreak {
         uint32_t Level = 0;
         uint32_t EntityState = 0;
         uint32_t EntityAllegiance = 0;
+        float Health;
+        float Energy;
     };
 
     void to_json(json& j, const LivingEntity& p);

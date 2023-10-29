@@ -558,7 +558,9 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
                         0x40008 => LivingEntityState.ToBeCleanedUp,
                         0x400000 => LivingEntityState.Player,
                         _ => LivingEntityState.Unknown
-                    }
+                    },
+                    Health = state.Health,
+                    Energy = state.Energy
                 };
             }).ToList();
 
@@ -835,7 +837,9 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
             {
                 X = livingEntityPayload.PosX,
                 Y = livingEntityPayload.PosY,
-            }
+            },
+            Health = livingEntityPayload.Health,
+            Energy = livingEntityPayload.Energy
         };
     }
 

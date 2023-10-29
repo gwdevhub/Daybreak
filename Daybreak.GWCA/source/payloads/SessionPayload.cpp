@@ -8,7 +8,7 @@ namespace Daybreak {
     void to_json(json& j, const SessionPayload& p) {
         j = json
         {
-            {"FoedKilled", p.FoesKilled},
+            {"FoesKilled", p.FoesKilled},
             {"FoesToKill", p.FoesToKill},
             {"MapId", p.MapId},
             {"InstanceTimer", p.InstanceTimer},

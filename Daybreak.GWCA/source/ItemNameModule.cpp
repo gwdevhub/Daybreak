@@ -16,58 +16,27 @@
 
 namespace Daybreak::Modules::ItemNameModule {
     std::vector<std::tuple<uint32_t, std::promise<NamePayload>*, std::wstring*>> WaitingList;
-    std::queue<std::tuple<uint32_t, std::list<uint32_t>, std::promise<NamePayload>>*> PromiseQueue;
+    std::queue<std::tuple<uint32_t, std::vector<uint32_t>, std::promise<NamePayload>>*> PromiseQueue;
     std::mutex GameThreadMutex;
     GW::HookEntry GameThreadHook;
     volatile bool initialized = false;
 
-
-    // TODO #442: Delete this once it is merged into GWCA
-    GW::Item* GetItemByModelIdAndModifiers(uint32_t modelid, const std::list<GW::ItemModifier> modifiers, int bagStart, int bagEnd) {
-        GW::Bag** bags = GW::Items::GetBagArray();
-        GW::Bag* bag = NULL;
-
-        for (int bagIndex = bagStart; bagIndex <= bagEnd; ++bagIndex) {
-            bag = bags[bagIndex];
-            if (!(bag && bag->items.valid())) continue;
-            for (GW::Item* item : bag->items) {
-                if (item && item->model_id == modelid && item->mod_struct_size == modifiers.size()) {
-                    auto match = true;
-                    auto listIt = modifiers.begin();
-                    for (uint32_t i = 0; i < item->mod_struct_size; i++) {
-                        // Compare each element from the array to the corresponding element in the list
-                        if (!(item->mod_struct[i] == *listIt)) {
-                            match = false;
-                            break;
-                        }
-                        ++listIt;
-                    }
-
-                    if (match) {
-                        return item;
-                    }
-                }
-            }
-        }
-
-        return NULL;
-    }
-
-    std::wstring* GetAsyncName(uint32_t id, std::list<uint32_t> modifiers) {
-        std::list<GW::ItemModifier> parsedModifiers;
-        for (auto mod : modifiers) {
+    std::wstring* GetAsyncName(uint32_t id, std::vector<uint32_t> modifiers) {
+        GW::ItemModifier parsedModifiers[64];
+        for (auto i = 0; i < modifiers.size(); i++) {
             GW::ItemModifier parsedModifier;
+            const auto mod = modifiers.at(i);
             parsedModifier.mod = mod;
-            parsedModifiers.push_back(parsedModifier);
+            parsedModifiers[i] = parsedModifier;
         }
 
-        auto item = GetItemByModelIdAndModifiers(id, parsedModifiers, 1, 23);
+        auto item = GW::Items::GetItemByModelIdAndModifiers(id, parsedModifiers, modifiers.size(), 1, 23);
         if (!item) {
             return nullptr;
         }
 
         auto name = new std::wstring();
-        GW::Items::AsyncGetItemByName(item, *name);
+        GW::Items::AsyncGetItemName(item, *name);
         return name;
     }
 
@@ -136,7 +105,7 @@ namespace Daybreak::Modules::ItemNameModule {
     void GetName(const httplib::Request& req, httplib::Response& res) {
         auto callbackEntry = new GW::HookEntry;
         uint32_t id = 0;
-        std::list<uint32_t> modifiers;
+        std::vector<uint32_t> modifiers;
         
         auto id_it = req.params.find("id");
         if (id_it == req.params.end()) {
@@ -177,7 +146,7 @@ namespace Daybreak::Modules::ItemNameModule {
             }
         }
 
-        auto response = new std::tuple<uint32_t, std::list<uint32_t>, std::promise<NamePayload>>();
+        auto response = new std::tuple<uint32_t, std::vector<uint32_t>, std::promise<NamePayload>>();
         std::get<0>(*response) = id;
         std::promise<NamePayload>& promise = std::get<2>(*response);
         std::get<1>(*response) = modifiers;

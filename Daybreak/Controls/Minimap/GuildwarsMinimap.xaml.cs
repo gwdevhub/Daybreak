@@ -159,15 +159,24 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
-        this.GameData.MainPlayer!.Position = this.GameState.States?.FirstOrDefault(state => state.Id == this.GameData.MainPlayer.Id)?.Position ?? new Position();
-        foreach(var worldPlayer in this.GameData.WorldPlayers!)
+        var mainPlayerState = this.GameState.States?.FirstOrDefault(state => state.Id == this.GameData.MainPlayer?.Id);
+        this.GameData.MainPlayer!.Position = mainPlayerState?.Position ?? new Position();
+        this.GameData.MainPlayer!.CurrentHealth = mainPlayerState?.Health ?? 0;
+        this.GameData.MainPlayer!.CurrentEnergy = mainPlayerState?.Energy ?? 0;
+        foreach (var worldPlayer in this.GameData.WorldPlayers!)
         {
-            worldPlayer.Position = this.GameState.States?.FirstOrDefault(state => state.Id == worldPlayer.Id)?.Position ?? new Position();
+            var worldPlayerState = this.GameState.States?.FirstOrDefault(state => state.Id == worldPlayer.Id);
+            worldPlayer.Position = worldPlayerState?.Position ?? new Position();
+            worldPlayer.CurrentHealth = worldPlayerState?.Health ?? 0;
+            worldPlayer.CurrentEnergy = worldPlayerState?.Energy ?? 0;
         }
 
         foreach (var partyPlayer in this.GameData.Party!)
         {
-            partyPlayer.Position = this.GameState.States?.FirstOrDefault(state => state.Id == partyPlayer.Id)?.Position ?? new Position();
+            var partyPlayerState = this.GameState.States?.FirstOrDefault(state => state.Id == partyPlayer.Id);
+            partyPlayer.Position = partyPlayerState?.Position ?? new Position();
+            partyPlayer.CurrentHealth = partyPlayerState?.Health ?? 0;
+            partyPlayer.CurrentEnergy = partyPlayerState?.Energy ?? 0;
         }
 
         foreach (var entity in this.GameData.LivingEntities!)
@@ -175,6 +184,8 @@ public partial class GuildwarsMinimap : UserControl
             var state = this.GameState.States?.FirstOrDefault(state => state.Id == entity.Id);
             entity.Position = state?.Position ?? new Position();
             entity.State = state?.State ?? LivingEntityState.Unknown;
+            entity.Health = state?.Health ?? 0;
+            entity.Energy = state?.Energy ?? 0;
         }
     }
 
