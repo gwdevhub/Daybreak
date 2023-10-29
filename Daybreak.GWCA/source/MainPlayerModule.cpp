@@ -24,23 +24,13 @@
 #include <json.hpp>
 #include <queue>
 #include <algorithm>
+#include "Utils.h"
 
 namespace Daybreak::Modules::MainPlayerModule {
     std::queue<std::promise<MainPlayer>*> PromiseQueue;
     std::mutex GameThreadMutex;
     GW::HookEntry GameThreadHook;
     volatile bool initialized = false;
-
-    std::string GetString(wchar_t* chars) {
-        if (!chars) {
-            return "";
-        }
-
-        std::string str(64, '\0');
-        auto length = std::wcstombs(&str[0], chars, 64);
-        str.resize(length);
-        return str;
-    }
 
     std::list<QuestMetadata> GetQuestLog() {
         std::list<QuestMetadata> questMetadatas;
@@ -291,7 +281,8 @@ namespace Daybreak::Modules::MainPlayerModule {
         GW::Title gwTitle;
         Title title;
         int titleId = 0;
-        auto name = GetString(gwPlayer->name);
+        std::wstring gwPlayerName(gwPlayer->name);
+        auto name = Daybreak::Utils::WStringToString(gwPlayerName);
         player.Name = name;
 
         for (const auto &t : titles) {

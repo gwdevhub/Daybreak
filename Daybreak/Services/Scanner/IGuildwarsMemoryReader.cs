@@ -1,4 +1,5 @@
 ﻿using Daybreak.Models.Guildwars;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,6 +19,8 @@ public interface IGuildwarsMemoryReader
     Task<SessionData?> ReadSessionData(CancellationToken cancellationToken);
     Task<MainPlayerData?> ReadMainPlayerData(CancellationToken cancellationToken);
     Task<PreGameData?> ReadPreGameData(CancellationToken cancellationToken);
-    Task<string?> GetNamedEntity(IEntity entity, CancellationToken cancellationToken);
+    Task<GameState?> ReadGameState(CancellationToken cancellationToken);
+    Task<string?> GetEntityName(IEntity entity, CancellationToken cancellationToken);
+    Task<string?> GetItemName(int id, List<uint> modifiers, CancellationToken cancellationToken);
     void Stop();
 }

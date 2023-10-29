@@ -70,6 +70,8 @@ public partial class GuildwarsMinimap : UserControl
     [GenerateDependencyProperty]
     private GameData gameData = new();
     [GenerateDependencyProperty]
+    private GameState gameState = new();
+    [GenerateDependencyProperty]
     private double zoom = 0.08;
     [GenerateDependencyProperty(InitialValue = true)]
     private bool drawPositionHistory = true;
@@ -88,7 +90,7 @@ public partial class GuildwarsMinimap : UserControl
     public event EventHandler<PlayerInformation>? PlayerInformationClicked;
     public event EventHandler<MapIcon>? MapIconClicked;
     public event EventHandler<Profession>? ProfessionClicked;
-    public event EventHandler<string?> NpcNameClicked;
+    public event EventHandler<string?>? NpcNameClicked;
 
     public GuildwarsMinimap()
         :this(
@@ -140,10 +142,39 @@ public partial class GuildwarsMinimap : UserControl
         {
             this.UpdateGameData();
         }
-        else if (e.Property == GameDataProperty &&
-                this.GameData.Valid)
+        else if (e.Property == GameStateProperty &&
+            this.GameState is not null)
         {
+            this.UpdateStates();
             this.UpdateGameData();
+        }
+    }
+
+    private void UpdateStates()
+    {
+        if (this.GameState is null ||
+            this.GameData is null ||
+            this.GameData.Valid is false)
+        {
+            return;
+        }
+
+        this.GameData.MainPlayer!.Position = this.GameState.States?.FirstOrDefault(state => state.Id == this.GameData.MainPlayer.Id)?.Position ?? new Position();
+        foreach(var worldPlayer in this.GameData.WorldPlayers!)
+        {
+            worldPlayer.Position = this.GameState.States?.FirstOrDefault(state => state.Id == worldPlayer.Id)?.Position ?? new Position();
+        }
+
+        foreach (var partyPlayer in this.GameData.Party!)
+        {
+            partyPlayer.Position = this.GameState.States?.FirstOrDefault(state => state.Id == partyPlayer.Id)?.Position ?? new Position();
+        }
+
+        foreach (var entity in this.GameData.LivingEntities!)
+        {
+            var state = this.GameState.States?.FirstOrDefault(state => state.Id == entity.Id);
+            entity.Position = state?.Position ?? new Position();
+            entity.State = state?.State ?? LivingEntityState.Unknown;
         }
     }
 
@@ -168,7 +199,7 @@ public partial class GuildwarsMinimap : UserControl
         this.TargetEntityModelId = (int?)this.GameData.LivingEntities?.FirstOrDefault(e => e.Id == this.TargetEntityId)?.ModelType ?? 0;
         var screenVirtualWidth = this.ActualWidth / this.Zoom;
         var screenVirtualHeight = this.ActualHeight / this.Zoom;
-        var position = this.GameData.MainPlayer.Position!.Value;
+        var position = this.GameData?.MainPlayer?.Position ?? new Position();
         this.originPoint = new Point(
             position.X - (screenVirtualWidth / 2) - (this.originOffset.X / this.Zoom),
             position.Y + (screenVirtualHeight / 2) + (this.originOffset.Y / this.Zoom));
@@ -193,7 +224,7 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
-        var currentPosition = this.GameData.MainPlayer?.Position ?? throw new InvalidOperationException("Unexpected main player null position");
+        var currentPosition = this.GameData?.MainPlayer?.Position ?? throw new InvalidOperationException("Unexpected main player null position");
         if (this.mainPlayerPositionHistory.Any(oldPosition => PositionsCollide(oldPosition, currentPosition)))
         {
             return;

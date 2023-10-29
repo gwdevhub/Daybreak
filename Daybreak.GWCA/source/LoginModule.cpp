@@ -7,6 +7,7 @@
 #include <payloads/LoginPayload.h>
 #include <json.hpp>
 #include <queue>
+#include "Utils.h"
 
 namespace Daybreak::Modules::LoginModule {
     std::queue<std::promise<LoginPayload>*> PromiseQueue;
@@ -17,15 +18,10 @@ namespace Daybreak::Modules::LoginModule {
     LoginPayload GetPayload() {
         auto context = GW::GetCharContext();
         LoginPayload loginPayload;
-        std::string emailstr(64, '\0');
-        auto length = std::wcstombs(&emailstr[0], context->player_email, 64);
-        emailstr.resize(length);
-        loginPayload.Email = emailstr;
-    
-        std::string playerstr(20, '\0');
-        length = std::wcstombs(&playerstr[0], context->player_name, 20);
-        playerstr.resize(length);
-        loginPayload.PlayerName = playerstr;
+        std::wstring playerEmail(context->player_email);
+        std::wstring playerName(context->player_name);
+        loginPayload.Email = Daybreak::Utils::WStringToString(playerEmail);
+        loginPayload.PlayerName = Daybreak::Utils::WStringToString(playerName);
 
         return loginPayload;
     }

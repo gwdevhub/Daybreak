@@ -16,7 +16,9 @@
 #include "GameModule.h"
 #include "MainPlayerModule.h"
 #include "SessionModule.h"
-#include "NameModule.h"
+#include "EntityNameModule.h"
+#include "GameStateModule.h"
+#include "ItemNameModule.h"
 
 static FILE* stdout_proxy;
 static FILE* stderr_proxy;
@@ -48,8 +50,10 @@ static DWORD WINAPI ThreadProc(LPVOID lpModule)
     http::server::Get("/game", Daybreak::Modules::GameModule::GetGameInfo);
     http::server::Get("/inventory", Daybreak::Modules::InventoryModule::GetInventoryInfo);
     http::server::Get("/game/mainplayer", Daybreak::Modules::MainPlayerModule::GetMainPlayer);
+    http::server::Get("/game/state", Daybreak::Modules::GameStateModule::GetGameStateInfo);
     http::server::Get("/session", Daybreak::Modules::SessionModule::GetSessionInfo);
-    http::server::Get("/name", Daybreak::Modules::NameModule::GetName);
+    http::server::Get("/entities/name", Daybreak::Modules::EntityNameModule::GetName);
+    http::server::Get("/items/name", Daybreak::Modules::ItemNameModule::GetName);
     http::server::StartServer();
 
 #ifdef BUILD_TYPE_DEBUG

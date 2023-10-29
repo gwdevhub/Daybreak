@@ -3,6 +3,7 @@ using Daybreak.Models.Guildwars;
 using Daybreak.Models.LaunchConfigurations;
 using Daybreak.Services.Scanner.Models;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Threading;
@@ -23,8 +24,8 @@ public sealed class GuildwarsMemoryCache : IGuildwarsMemoryCache
     private readonly CachedData<SessionData?> sessionDataCache = new();
     private readonly CachedData<UserData?> userDataCache = new();
     private readonly CachedData<MainPlayerData?> mainPlayerDataCache = new();
-    private readonly CachedData<ConnectionData?> connectionDataCache = new();
     private readonly CachedData<PreGameData?> preGameDataCache = new();
+    private readonly CachedData<GameState?> gameStateCache = new();
 
     public GuildwarsMemoryCache(
         IGuildwarsMemoryReader guildwarsMemoryReader,
@@ -87,6 +88,11 @@ public sealed class GuildwarsMemoryCache : IGuildwarsMemoryCache
     public Task<PreGameData?> ReadPreGameData(CancellationToken cancellationToken)
     {
         return this.ReadDataInternal(this.preGameDataCache, this.guildwarsMemoryReader.ReadPreGameData, cancellationToken);
+    }
+
+    public Task<GameState?> ReadGameState(CancellationToken cancellationToken)
+    {
+        return this.ReadDataInternal(this.gameStateCache, this.guildwarsMemoryReader.ReadGameState, cancellationToken);
     }
 
     private async Task<T?> ReadDataInternal<T>(CachedData<T?> cachedData, Func<CancellationToken, Task<T?>> task, CancellationToken cancellationToken)

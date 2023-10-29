@@ -102,6 +102,7 @@
                     <minimap:GuildwarsMinimap x:Name="Minimap"
                                           Visibility="{Binding ElementName=_this, Path=LoadingPathingData, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
                                           GameData="{Binding ElementName=_this, Path=GameData, Mode=OneWay}"
+                                          GameState="{Binding ElementName=_this, Path=GameState, Mode=OneWay}"
                                           PathingData="{Binding ElementName=_this, Path=PathingData, Mode=OneWay}"
                                           Zoom="0.04"
                                           ControlsVisible="True"
