@@ -19,6 +19,8 @@ namespace Daybreak {
             {"Level", p.Level},
             {"EntityState", p.EntityState},
             {"EntityAllegiance", p.EntityAllegiance},
+            {"Health", p.Health},
+            {"Energy", p.Energy}
         };
     }
 }

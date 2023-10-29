@@ -14,9 +14,9 @@ public sealed class PlayerInformation : IEntity
     public Build? CurrentBuild { get; init; }
     public Npc? NpcDefinition { get; init; }
     public uint ModelType { get; init; }
-    public float CurrentHealth { get; init; }
+    public float CurrentHealth { get; set; }
     public float MaxHealth { get; init; }
-    public float CurrentEnergy { get; init; }
+    public float CurrentEnergy { get; set; }
     public float MaxEnergy { get; init; }
     public float HealthRegen { get; init; }
     public float EnergyRegen { get; init; }

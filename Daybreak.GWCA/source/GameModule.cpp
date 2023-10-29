@@ -100,16 +100,6 @@ namespace Daybreak::Modules::GameModule {
         return agentList;
     }
 
-    std::list<GW::NPC> GetNpcs() {
-        std::list<GW::NPC> npcs;
-        auto worldContext = GW::GetWorldContext();
-        for (auto& npc : worldContext->npcs) {
-            npcs.push_back(npc);
-        }
-
-        return npcs;
-    }
-
     std::vector<GW::TitleTier> GetTitleTiers() {
         std::vector<GW::TitleTier> titles;
         auto worldContext = GW::GetWorldContext();
@@ -186,6 +176,16 @@ namespace Daybreak::Modules::GameModule {
             entity.Level = agent.level;
             entity.PosX = agent.pos.x;
             entity.PosY = agent.pos.y;
+            entity.Health = agent.hp;
+            entity.Energy = agent.energy;
+            if (agent.primary == 0) {
+                const auto npc = GW::Agents::GetNPCByID(agent.player_number);
+                if (npc) {
+                    entity.PrimaryProfessionId = npc->primary;
+                }
+            }
+            
+
             entities.push_back(entity);
         }
 
@@ -255,6 +255,8 @@ namespace Daybreak::Modules::GameModule {
             player.NpcDefinition = agent->player_number;
             player.PrimaryProfessionId = (uint32_t)agent->primary;
             player.SecondaryProfessionId = (uint32_t)agent->secondary;
+            player.Health = agent->hp * (agent->max_hp > 0 ? agent->max_hp : 1);
+            player.Energy = agent->energy * (agent->max_energy > 0 ? agent->max_energy : 1);
         }
         else if (professionState) {
             player.PrimaryProfessionId = (uint32_t)professionState->primary;
@@ -369,11 +371,6 @@ namespace Daybreak::Modules::GameModule {
 
         auto players = GetPlayers();
         if (players.empty()) {
-            return gamePayload;
-        }
-
-        auto npcs = GetNpcs();
-        if (npcs.empty()) {
             return gamePayload;
         }
 

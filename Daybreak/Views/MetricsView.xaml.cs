@@ -80,6 +80,17 @@ public partial class MetricsView : UserControl
     {
         this.metricsService.MetricRecorded -= this.MetricsService_MetricRecorded;
         this.metricsService.SetRecorded -= this.MetricsService_SetRecorded;
+
+        /*
+         * #444 - Due to a bug in LiveCharts2, metrics need to be cleared manually, otherwise they would
+         * cause a memory leak.
+         */
+        foreach (var metric in this.Metrics)
+        {
+            metric.Metrics?.Clear();
+        }
+
+        this.Metrics.Clear();
     }
 
     private void CartesianChart_Loaded(object sender, RoutedEventArgs e)

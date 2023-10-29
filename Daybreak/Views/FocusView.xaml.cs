@@ -527,6 +527,10 @@ public partial class FocusView : UserControl
     {
         this.cancellationTokenSource?.Cancel();
         this.cancellationTokenSource = null;
+        this.GameData = default;
+        this.GameState = default;
+        this.PathingData = default;
+        this.InventoryData = default;
     }
 
     private void Browser_MaximizeClicked(object _, EventArgs e)

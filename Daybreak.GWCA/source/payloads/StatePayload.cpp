@@ -11,7 +11,9 @@ namespace Daybreak {
             {"Id", p.Id},
             {"PosX", p.PosX},
             {"PosY", p.PosY},
-            {"State", p.State}
+            {"State", p.State},
+            {"Health", p.Health},
+            {"Energy", p.Energy}
         };
     }
 }

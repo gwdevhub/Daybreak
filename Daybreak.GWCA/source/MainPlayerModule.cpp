@@ -255,6 +255,8 @@ namespace Daybreak::Modules::MainPlayerModule {
             player.NpcDefinition = agent->player_number;
             player.PrimaryProfessionId = (uint32_t)agent->primary;
             player.SecondaryProfessionId = (uint32_t)agent->secondary;
+            player.Health = agent->hp * (agent->max_hp > 0 ? agent->max_hp : 1);
+            player.Energy = agent->energy * (agent->max_energy > 0 ? agent->max_energy : 1);
         }
         else if (professionState) {
             player.PrimaryProfessionId = (uint32_t)professionState->primary;
