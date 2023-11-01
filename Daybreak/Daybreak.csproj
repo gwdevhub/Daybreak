@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -98,7 +98,7 @@
     <PackageReference Include="Plumsy" Version="1.1.0" />
     <PackageReference Include="securifybv.ShellLink" Version="0.1.0" />
     <PackageReference Include="Slim" Version="1.9.2" />
-    <PackageReference Include="Svg" Version="3.4.4" />
+    <PackageReference Include="Svg" Version="3.4.5" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
     <PackageReference Include="System.Reflection.Metadata" Version="7.0.2" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0" />
