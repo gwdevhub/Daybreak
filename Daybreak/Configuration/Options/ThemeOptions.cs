@@ -20,4 +20,7 @@ public sealed class ThemeOptions
 
     [OptionName(Name = "Blur Background", Description = "If true, the background image will be blurred")]
     public bool BackgroundBlur { get; set; } = false;
+
+    [OptionName(Name = "Wintersday Mode", Description = "If true, Daybreak will apply a Wintersday theme")]
+    public bool WintersdayMode { get; set; } = false;
 }

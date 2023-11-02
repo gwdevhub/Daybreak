@@ -1,5 +1,4 @@
 ﻿using Daybreak.Services.ApplicationLauncher;
-using Daybreak.Services.Bloogum;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Credentials;
 using Daybreak.Services.IconRetrieve;
@@ -97,8 +96,8 @@ public class ProjectConfiguration : PluginConfigurationBase
                 .WithMessageHandler(this.SetupLoggingAndMetrics<ApplicationUpdater>)
                 .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
                 .Build()
-            .RegisterHttpClient<BloogumClient>()
-                .WithMessageHandler(this.SetupLoggingAndMetrics<BloogumClient>)
+            .RegisterHttpClient<OnlinePictureClient>()
+                .WithMessageHandler(this.SetupLoggingAndMetrics<OnlinePictureClient>)
                 .WithDefaultRequestHeadersSetup(this.SetupChromeImpersonationUserAgent)
                 .Build()
             .RegisterHttpClient<GraphClient>()
@@ -213,7 +212,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
         services.AddScoped<IScreenshotProvider, ScreenshotProvider>();
-        services.AddScoped<IBloogumClient, BloogumClient>();
+        services.AddScoped<IOnlinePictureClient, OnlinePictureClient>();
         services.AddScoped<IApplicationUpdater, ApplicationUpdater>();
         services.AddScoped<IBuildTemplateManager, BuildTemplateManager>();
         services.AddScoped<IIconCache, IconCache>();
