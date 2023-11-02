@@ -1,5 +1,4 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Services.Bloogum;
 using Daybreak.Services.Screenshots.Models;
 using Microsoft.Extensions.Logging;
 using System;
@@ -14,13 +13,13 @@ namespace Daybreak.Services.Screenshots;
 public sealed class BackgroundProvider : IBackgroundProvider
 {
     private readonly IScreenshotProvider screenshotProvider;
-    private readonly IBloogumClient bloogumClient;
+    private readonly IOnlinePictureClient bloogumClient;
     private readonly ILiveOptions<BackgroundProviderOptions> liveOptions;
     private readonly ILogger<BackgroundProvider> logger;
 
     public BackgroundProvider(
         IScreenshotProvider screenshotProvider,
-        IBloogumClient bloogumClient,
+        IOnlinePictureClient bloogumClient,
         ILiveOptions<BackgroundProviderOptions> liveOptions,
         ILogger<BackgroundProvider> logger)
     {
@@ -43,8 +42,9 @@ public sealed class BackgroundProvider : IBackgroundProvider
             Random.Shared.Next(this.liveOptions.Value.LocalScreenshotsEnabled ? 0 : 50, 101) >= 50) ||
             maybeImage is null)
         {
-            maybeImage = await this.bloogumClient.GetImage(true).ConfigureAwait(true);
-            creditText = maybeImage is not null ? "http://bloogum.net/guildwars" : string.Empty;
+            (var maybeRemoteImage, var credit) = await this.bloogumClient.GetImage(true).ConfigureAwait(true);
+            maybeImage = maybeRemoteImage;
+            creditText = credit;
         }
 
         return new BackgroundResponse

@@ -1,6 +1,4 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Services.Bloogum;
-using Daybreak.Services.IconRetrieve;
 using Daybreak.Services.Menu;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Options;
@@ -55,6 +53,8 @@ public partial class MainWindow : MetroWindow
     private bool paintifyBackground;
     [GenerateDependencyProperty]
     private bool blurBackground;
+    [GenerateDependencyProperty]
+    private bool wintersdayMode;
 
     public event EventHandler<MainWindow>? WindowParametersChanged;
 
@@ -125,6 +125,7 @@ public partial class MainWindow : MetroWindow
     {
         this.PaintifyBackground = this.themeOptions.Value.BackgroundPaintify;
         this.BlurBackground = this.themeOptions.Value.BackgroundBlur;
+        this.WintersdayMode = this.themeOptions.Value.WintersdayMode;
     }
 
     private void SetupImageCycle()

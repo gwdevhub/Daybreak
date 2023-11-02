@@ -58,7 +58,7 @@
             </Style>
         </ResourceDictionary>
     </Window.Resources>
-    <Grid Background="Transparent">
+    <Grid Background="Black">
         <Grid.RowDefinitions>
             <RowDefinition Height="30"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
@@ -72,11 +72,32 @@
                 <effects:ContrastAdjust Brightness="0.01"
                                         Contrast="1.3" />
             </Border.Effect>
-            <Border Effect="{Binding ElementName=_this, Path=BlurBackground, Mode=OneWay, Converter={StaticResource BooleanToEffectConverter}, ConverterParameter={StaticResource BlurEffect}}">
-                <Border Effect="{Binding ElementName=_this, Path=PaintifyBackground, Mode=OneWay, Converter={StaticResource BooleanToEffectConverter}, ConverterParameter={StaticResource PaintifyEffect}}">
-                    <controls:ImageViewer x:Name="ImageViewer" />
+            <Grid>
+                <Border Effect="{Binding ElementName=_this, Path=BlurBackground, Mode=OneWay, Converter={StaticResource BooleanToEffectConverter}, ConverterParameter={StaticResource BlurEffect}}">
+                    <Border Effect="{Binding ElementName=_this, Path=PaintifyBackground, Mode=OneWay, Converter={StaticResource BooleanToEffectConverter}, ConverterParameter={StaticResource PaintifyEffect}}">
+                        <controls:ImageViewer x:Name="ImageViewer" />
+                    </Border>
                 </Border>
-            </Border>
+                <controls:SnowfallOverlay
+                    Visibility="{Binding ElementName=_this, Path=WintersdayMode, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                    Opacity="0.4"
+                    BaseWind1="0.000074"
+                    BaseWind2="0.000087"
+                    BaseWind3="0.000073"
+                    BaseWind4="0.000065"
+                    BaseWind5="0.000062"
+                    WindStrength1="0.0005"
+                    WindStrength2="0.001"
+                    WindStrength3="0.0008"
+                    WindStrength4="0.0007"
+                    WindStrength5="0.0006"
+                    FlakeSize1="14"
+                    FlakeSize2="6"
+                    FlakeSize3="4.6"
+                    FlakeSize4="3.2"
+                    FlakeSize5="2.1">
+                </controls:SnowfallOverlay>
+            </Grid>
         </Border>
         <Rectangle Fill="Transparent"
                    MouseDown="Window_MouseLeftButtonDown"

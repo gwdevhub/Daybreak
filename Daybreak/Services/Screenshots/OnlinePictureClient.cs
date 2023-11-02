@@ -1,9 +1,11 @@
-﻿using Daybreak.Models.Guildwars;
-using Daybreak.Services.Bloogum.Models;
+﻿using Daybreak.Configuration.Options;
+using Daybreak.Models.Guildwars;
 using Daybreak.Services.Images;
 using Daybreak.Services.Scanner;
+using Daybreak.Services.Screenshots.Models;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 using System.IO;
@@ -13,37 +15,39 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace Daybreak.Services.Bloogum;
+namespace Daybreak.Services.Screenshots;
 
-public sealed class BloogumClient : IBloogumClient
+public sealed class OnlinePictureClient : IOnlinePictureClient
 {
     private const string CloudFlareCookieValue = "fcfd523b2470336531e47baff3d2c2d6a0e2412a.1689426482.1";
     private const string CloudFlareCookieKey = "wschkid";
     private const string CacheFolder = "Bloogum";
-    private const string BaseAddress = "http://bloogum.net/guildwars";
     private readonly IImageCache imageCache;
     private readonly IGuildwarsMemoryCache guildwarsMemoryCache;
-    private readonly IHttpClient<BloogumClient> httpClient;
+    private readonly IHttpClient<OnlinePictureClient> httpClient;
+    private readonly ILiveOptions<ThemeOptions> themeOptions;
     private readonly ILogger logger;
 
-    public BloogumClient(
+    public OnlinePictureClient(
         IImageCache imageCache,
         IGuildwarsMemoryCache guildwarsMemoryCache,
-        ILogger<BloogumClient> logger,
-        IHttpClient<BloogumClient> httpClient)
+        ILogger<OnlinePictureClient> logger,
+        ILiveOptions<ThemeOptions> themeOptions,
+        IHttpClient<OnlinePictureClient> httpClient)
     {
         this.imageCache = imageCache.ThrowIfNull();
         this.guildwarsMemoryCache = guildwarsMemoryCache.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
+        this.themeOptions = themeOptions.ThrowIfNull();
         this.httpClient = httpClient.ThrowIfNull();
 
         this.httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Cookie", $"{CloudFlareCookieKey}={CloudFlareCookieValue}");
     }
 
-    public async Task<ImageSource?> GetImage(bool localized)
+    public async Task<(ImageSource? Source, string Credit)> GetImage(bool localized)
     {
-        var uri = await this.GetImageUri(localized);
-        var localUri = Path.GetFullPath(Path.Combine(CacheFolder, uri));
+        (var uri, var credit) = await this.GetImageUri(localized);
+        var localUri = Path.GetFullPath(Path.Combine(CacheFolder, uri)).Replace("http:\\", "");
         if (!File.Exists(localUri))
         {
             var imageStream = await this.GetRemoteImage(uri);
@@ -56,10 +60,10 @@ public sealed class BloogumClient : IBloogumClient
             imageStream.Dispose();
         }
 
-        return await this.imageCache.GetImage(localUri);
+        return (await this.imageCache.GetImage(localUri), credit);
     }
 
-    private async Task<string> GetImageUri(bool localized)
+    private async Task<(string Uri, string CreditText)> GetImageUri(bool localized)
     {
         if (!localized)
         {
@@ -82,7 +86,7 @@ public sealed class BloogumClient : IBloogumClient
         }
 
         var validLocations = Location.Locations.Where(l => l.Region == worldInfo!.Region).ToList();
-        var validCategories = validLocations.SelectMany(l => l.Categories).Where(c => c.Map == worldInfo!.Map).ToList();
+        var validCategories = validLocations.SelectMany(l => l.Entries).Where(c => c.Map == worldInfo!.Map).ToList();
         if (validCategories.None())
         {
             if (validLocations.None())
@@ -95,7 +99,7 @@ public sealed class BloogumClient : IBloogumClient
         }
 
         var selectedCategory = validCategories[Random.Shared.Next(0, validCategories.Count)];
-        if (selectedCategory.ImageCount == 0)
+        if (selectedCategory.Count == 0)
         {
             if (validLocations.None())
             {
@@ -106,27 +110,15 @@ public sealed class BloogumClient : IBloogumClient
             return GetRandomScreenShot(location);
         }
 
-        var selectedLocation = Location.Locations.FirstOrDefault(l => l.Categories.Contains(selectedCategory));
-        if (selectedLocation is null)
-        {
-            if (validLocations.None())
-            {
-                return GetRandomScreenShot();
-            }
-
-            var location = validLocations[Random.Shared.Next(0, validLocations.Count)];
-            return GetRandomScreenShot(location);
-        }
-
-        return GetScreenshotName(selectedLocation, selectedCategory, Random.Shared.Next(0, selectedCategory.ImageCount));
+        return GetScreenshotName(selectedCategory, Random.Shared.Next(selectedCategory.StartIndex ?? 0, (selectedCategory.Count + selectedCategory.StartIndex) ?? 0));
     }
 
     private async Task<Stream?> GetRemoteImage(string url)
     {
-        this.logger.LogInformation($"Retrieving image from {BaseAddress}/{url}");
+        this.logger.LogInformation($"Retrieving image from {url}");
         try
         {
-            var response = await this.httpClient.GetAsync($"{BaseAddress}/{url}").ConfigureAwait(false);
+            var response = await this.httpClient.GetAsync($"{url}").ConfigureAwait(false);
             if (response.IsSuccessStatusCode)
             {
                 this.logger.LogInformation("Received success status code");
@@ -154,30 +146,30 @@ public sealed class BloogumClient : IBloogumClient
                 return default;
             }
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             this.logger.LogError(e.ToString());
             return default;
         }
     }
 
-    private static string GetRandomScreenShot()
+    private static (string Uri, string CreditText) GetRandomScreenShot()
     {
         var location = Location.Locations[Random.Shared.Next(0, Location.Locations.Count)];
         return GetRandomScreenShot(location);
     }
 
-    private static string GetRandomScreenShot(Location location)
+    private static (string Uri, string CreditText) GetRandomScreenShot(Location location)
     {
-        var category = location.Categories[Random.Shared.Next(0, location.Categories.Count)];
-        var picture = Random.Shared.Next(0, category.ImageCount) + 1;
+        var category = location.Entries[Random.Shared.Next(0, location.Entries.Count)];
+        var picture = Random.Shared.Next(0, category.Count ?? 0) + 1;
 
-        return GetScreenshotName(location, category, picture);
+        return GetScreenshotName(category, picture);
     }
 
-    private static string GetScreenshotName(Location location, Category category, int picture)
+    private static (string Uri, string CreditText) GetScreenshotName(Entry category, int picture)
     {
-        return $"{location.LocationName}/{category.CategoryName}/{picture:00}.jpg";
+        return (category.Url?.Replace("{ID}", picture.ToString(category.IdFormat)) ?? string.Empty, category.Credit ?? string.Empty);
     }
 
     private static async Task CacheImage(string uri, Stream imageStream)

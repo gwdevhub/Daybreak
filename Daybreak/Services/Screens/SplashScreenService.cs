@@ -46,7 +46,6 @@ public sealed class SplashScreenService : ISplashScreenService
         }
 
         this.splashWindow.Show();
-        this.splashWindow.Topmost = true;
     }
 
     private void SetupThemeResources()
