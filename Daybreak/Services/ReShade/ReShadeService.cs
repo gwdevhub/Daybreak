@@ -119,26 +119,23 @@ public sealed class ReShadeService : IReShadeService, IApplicationLifetimeServic
 
     public IEnumerable<string> GetCustomArguments() => Enumerable.Empty<string>();
 
-    public Task OnGuildWarsCreated(Process process, CancellationToken cancellationToken)
+    public async Task OnGuildWarsCreated(Process process, CancellationToken cancellationToken)
     {
-        return Task.Run(() =>
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.OnGuildWarsCreated), process?.MainModule?.FileName ?? string.Empty);
+        if (await this.processInjector.Inject(process!, ReShadeDllPath, cancellationToken))
         {
-            var scopedLogger = this.logger.CreateScopedLogger(nameof(this.OnGuildWarsCreated), process?.MainModule?.FileName ?? string.Empty);
-            if (this.processInjector.Inject(process!, ReShadeDllPath))
-            {
-                scopedLogger.LogInformation("Injected ReShade dll");
-                this.notificationService.NotifyInformation(
-                    title: "ReShade started",
-                    description: "ReShade has been injected");
-            }
-            else
-            {
-                scopedLogger.LogError("Failed to inject ReShade dll");
-                this.notificationService.NotifyError(
-                    title: "ReShade failed to start",
-                    description: "Failed to inject ReShade");
-            }
-        }, cancellationToken);
+            scopedLogger.LogInformation("Injected ReShade dll");
+            this.notificationService.NotifyInformation(
+                title: "ReShade started",
+                description: "ReShade has been injected");
+        }
+        else
+        {
+            scopedLogger.LogError("Failed to inject ReShade dll");
+            this.notificationService.NotifyError(
+                title: "ReShade failed to start",
+                description: "Failed to inject ReShade");
+        }
     }
 
     public Task OnGuildwarsStarted(Process process, CancellationToken cancellationToken) => Task.CompletedTask;

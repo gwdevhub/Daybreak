@@ -1,7 +1,9 @@
 ﻿using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Daybreak.Services.Injection;
 public interface IProcessInjector
 {
-    bool Inject(Process process, string pathToDll);
+    Task<bool> Inject(Process process, string pathToDll, CancellationToken cancellationToken);
 }

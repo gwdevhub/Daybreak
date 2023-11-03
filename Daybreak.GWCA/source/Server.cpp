@@ -68,5 +68,9 @@ namespace http {
 
             return false;
         }
+
+        void StopServer() {
+            server.stop();
+        }
     }
 }
