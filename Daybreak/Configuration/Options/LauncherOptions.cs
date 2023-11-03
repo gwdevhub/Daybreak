@@ -43,5 +43,6 @@ public sealed class LauncherOptions
 
     [JsonProperty(nameof(ModStartupTimeout))]
     [OptionName(Name = "Mod Startup Timeout", Description = "Amount of seconds that Daybreak will wait for each mod to start-up before cancelling the tasks")]
-    public int ModStartupTimeout { get; set; } = 30;
+    [OptionRange<double>(MinValue = 30, MaxValue = 300)]
+    public double ModStartupTimeout { get; set; } = 30;
 }

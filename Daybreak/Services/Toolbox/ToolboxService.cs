@@ -65,9 +65,15 @@ internal sealed class ToolboxService : IToolboxService
 
     public Task OnGuildwarsStarting(Process process, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public Task OnGuildWarsCreated(Process process, CancellationToken cancellationToken)
+    public async Task OnGuildWarsCreated(Process process, CancellationToken cancellationToken)
     {
-        return Task.Run(() => this.LaunchToolbox(process), cancellationToken);
+        await this.LaunchToolbox(process, cancellationToken);
+
+        /*
+         * Toolbox startup conflicts with Daybreak GWCA integration. Wait some time
+         * so that toolbox has the chance to set up its hooks.
+         */
+        await Task.Delay(TimeSpan.FromSeconds(this.toolboxOptions.Value.StartupDelay), cancellationToken);
     }
 
     public Task OnGuildwarsStarted(Process process, CancellationToken cancellationToken) => Task.CompletedTask;
@@ -150,7 +156,7 @@ internal sealed class ToolboxService : IToolboxService
         return true;
     }
 
-    private void LaunchToolbox(Process process)
+    private async Task LaunchToolbox(Process process, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.LaunchToolbox), string.Empty);
         if (this.toolboxOptions.Value.Enabled is false)
@@ -167,12 +173,12 @@ internal sealed class ToolboxService : IToolboxService
         }
 
         scopedLogger.LogInformation("Injecting toolbox dll");
-        if (this.processInjector.Inject(process, dll))
+        if (await this.processInjector.Inject(process, dll, cancellationToken))
         {
             scopedLogger.LogInformation("Injected toolbox dll");
             this.notificationService.NotifyInformation(
                 title: "GWToolbox started",
-                description: "GWToolbox has been injected");
+                description: "GWToolbox has been injected. Delaying startup so that GWToolbox has time to initialize");
         }
         else
         {

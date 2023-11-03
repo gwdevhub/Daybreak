@@ -40,10 +40,14 @@ internal sealed class GWCAInjector : IGWCAInjector
         return Task.CompletedTask;
     }
 
-    public Task OnGuildWarsCreated(Process process, CancellationToken cancellationToken)
+    public async Task OnGuildWarsCreated(Process process, CancellationToken cancellationToken)
     {
-        this.injector.Inject(process, ModulePath);
-        return Task.CompletedTask;
+        if (!await this.injector.Inject(process, ModulePath, cancellationToken))
+        {
+            this.notificationService.NotifyError(
+                    title: "Unable to inject GWCA into Guild Wars process",
+                    description: "Daybreak integration with the Guild Wars process will be affected. Some Daybreak functionality might not work");
+        }
     }
 
     public async Task OnGuildwarsStarted(Process process, CancellationToken cancellationToken)

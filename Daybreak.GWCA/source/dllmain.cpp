@@ -2,6 +2,11 @@
 #include "pch.h"
 #include "httplib.h"
 #include <GWCA/GWCA.h>
+#include <GWCA/Utilities/Scanner.h>
+#include <GWCA/Utilities/Hook.h>
+#include <GWCA/Utilities/Hooker.h>
+#include <GWCA/Managers/RenderMgr.h>
+#include <GWCA/Managers/MemoryMgr.h>
 #include "AliveModule.h"
 #include "ProcessIdModule.h"
 #include "HttpLogger.h"
@@ -19,25 +24,38 @@
 #include "EntityNameModule.h"
 #include "GameStateModule.h"
 #include "ItemNameModule.h"
+#include <mutex>
 
+volatile bool initialized;
+volatile WNDPROC oldWndProc;
+std::mutex startupMutex;
+HMODULE dllmodule;
+HANDLE serverThread;
 static FILE* stdout_proxy;
 static FILE* stderr_proxy;
 
+void Terminate()
+{
+    http::server::StopServer();
+    if (serverThread) {
+        CloseHandle(serverThread);
+    }
 
-static DWORD WINAPI ThreadProc(LPVOID lpModule)
+#ifdef BUILD_TYPE_DEBUG
+    if (stdout_proxy)
+        fclose(stdout_proxy);
+    if (stderr_proxy)
+        fclose(stderr_proxy);
+    FreeConsole();
+#endif
+}
+
+
+static DWORD WINAPI StartHttpServer(LPVOID)
 {
     // This is a new thread so you should only initialize GWCA and setup the hook on the game thread.
     // When the game thread hook is setup (i.e. SetRenderCallback), you should do the next operations
     // on the game from within the game thread.
-
-    HMODULE hModule = static_cast<HMODULE>(lpModule);
-#ifdef BUILD_TYPE_DEBUG
-    AllocConsole();
-    SetConsoleTitleA("Daybreak.GWCA Console");
-    freopen_s(&stdout_proxy, "CONOUT$", "w", stdout);
-    freopen_s(&stderr_proxy, "CONOUT$", "w", stderr);
-#endif
-    GW::Initialize();
     http::server::SetLogger(http::ConsoleLogger);
     http::server::Get("/alive", http::modules::HandleAlive);
     http::server::Get("/id", http::modules::HandleProcessId);
@@ -55,28 +73,87 @@ static DWORD WINAPI ThreadProc(LPVOID lpModule)
     http::server::Get("/entities/name", Daybreak::Modules::EntityNameModule::GetName);
     http::server::Get("/items/name", Daybreak::Modules::ItemNameModule::GetName);
     http::server::StartServer();
+    return 0;
+}
+
+LRESULT CALLBACK WndProc(const HWND hWnd, const UINT Message, const WPARAM wParam, const LPARAM lParam) {
+    if (Message == WM_CLOSE || (Message == WM_SYSCOMMAND && wParam == SC_CLOSE)) {
+        Terminate();
+    }
+
+    return CallWindowProc(oldWndProc, hWnd, Message, wParam, lParam);
+}
+
+LRESULT CALLBACK SafeWndProc(const HWND hWnd, const UINT Message, const WPARAM wParam, const LPARAM lParam) noexcept
+{
+    __try {
+        return WndProc(hWnd, Message, wParam, lParam);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) {
+        return CallWindowProc(oldWndProc, hWnd, Message, wParam, lParam);
+    }
+}
+
+void OnWindowCreated(IDirect3DDevice9*) {
+    startupMutex.lock();
+    if (initialized) {
+        startupMutex.unlock();
+        return;
+    }
 
 #ifdef BUILD_TYPE_DEBUG
-    if (stdout_proxy)
-        fclose(stdout_proxy);
-    if (stderr_proxy)
-        fclose(stderr_proxy);
-    FreeConsole();
+    AllocConsole();
+    SetConsoleTitleA("Daybreak.GWCA Console");
+    freopen_s(&stdout_proxy, "CONOUT$", "w", stdout);
+    freopen_s(&stderr_proxy, "CONOUT$", "w", stderr);
 #endif
-
-    FreeLibraryAndExitThread(hModule, EXIT_SUCCESS);
+    auto handle = GW::MemoryMgr::GetGWWindowHandle();
+    oldWndProc = reinterpret_cast<WNDPROC>(SetWindowLongPtrW(handle, GWL_WNDPROC, reinterpret_cast<LONG>(SafeWndProc)));
+    serverThread = CreateThread(
+        NULL,
+        0,
+        StartHttpServer,
+        NULL,
+        0,
+        NULL);
+    startupMutex.unlock();
+    initialized = true;
+    return;
 }
 
 
-BOOL APIENTRY DllMain( HMODULE hModule,
-                       DWORD  ul_reason_for_call,
-                       LPVOID lpReserved
-                     )
+static DWORD WINAPI Init(LPVOID)
+{
+    printf("Init: Setting up scanner\n");
+    GW::Scanner::Initialize();
+    printf("Init: Setting up hook base\n");
+    GW::HookBase::Initialize();
+    printf("Init: Setting up GWCA\n");
+    if (!GW::Initialize()) {
+        printf("Init: Failed to set up GWCA\n");
+        return 0;
+    }
+
+    printf("Init: Enabling hooks\n");
+    GW::HookBase::EnableHooks();
+    printf("Init: Set up render callback\n");
+    GW::Render::SetRenderCallback(OnWindowCreated);
+    printf("Init: Returning success\n");
+    FreeLibraryAndExitThread(dllmodule, EXIT_SUCCESS);
+    return 0;
+}
+
+
+// DLL entry point, dont do things in this thread unless you know what you are doing.
+BOOL APIENTRY DllMain(HMODULE hModule,
+    DWORD  ul_reason_for_call,
+    LPVOID lpReserved
+)
 {
     DisableThreadLibraryCalls(hModule);
 
     if (ul_reason_for_call == DLL_PROCESS_ATTACH) {
-        HANDLE handle = CreateThread(0, 0, ThreadProc, hModule, 0, 0);
+        HANDLE handle = CreateThread(0, 0, Init, hModule, 0, 0);
         CloseHandle(handle);
     }
 

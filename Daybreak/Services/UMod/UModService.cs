@@ -84,10 +84,7 @@ public sealed class UModService : IUModService
 
     public Task OnGuildWarsCreated(Process process, CancellationToken cancellationToken)
     {
-        return Task.Run(() =>
-        {
-            this.processInjector.Inject(process, Path.Combine(Path.GetFullPath(UModDirectory), D3D9Dll));
-        }, cancellationToken);
+        return this.processInjector.Inject(process, Path.Combine(Path.GetFullPath(UModDirectory), D3D9Dll), cancellationToken);
     }
 
     public async Task OnGuildwarsStarted(Process process, CancellationToken cancellationToken)
