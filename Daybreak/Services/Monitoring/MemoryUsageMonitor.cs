@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows.Extensions.Services;
 using System.Core.Extensions;
 using System.Extensions;
+using System.Threading;
 
 namespace Daybreak.Services.Monitoring;
 
@@ -12,10 +13,11 @@ public sealed class MemoryUsageMonitor : IApplicationLifetimeService
 {
     private const string MemoryUsage = "Memory Usage";
     private const string MemoryUsageUnit = "MBs";
-    private const string MemoryUsageDescription = "MBs used by the launcher";
+    private const string MemoryUsageDescription = "MBs used by Daybreak";
 
     private readonly Histogram<long> memoryUsageHistogram;
     private readonly Process currentProcess;
+    private readonly CancellationTokenSource cancellationTokenSource = new();
 
     private PerformanceCounter? memoryPerformanceCounter;
 
@@ -28,11 +30,12 @@ public sealed class MemoryUsageMonitor : IApplicationLifetimeService
 
     public void OnClosing()
     {
+        this.cancellationTokenSource.Cancel();
     }
 
     public void OnStartup()
     {
-        _ = Task.Run(this.StartupAndPeriodicallyReadMemoryUsage);
+        _ = Task.Run(this.StartupAndPeriodicallyReadMemoryUsage, this.cancellationTokenSource.Token);
     }
 
     private async Task StartupAndPeriodicallyReadMemoryUsage()
@@ -51,20 +54,24 @@ public sealed class MemoryUsageMonitor : IApplicationLifetimeService
 
     private async Task PeriodicallyCheckMemoryUsagePerfCounterBased()
     {
-        if (this.memoryPerformanceCounter is not null)
+        while (!this.cancellationTokenSource.IsCancellationRequested)
         {
-            this.memoryUsageHistogram.Record(this.memoryPerformanceCounter.RawValue / 1024);
-        }
+            if (this.memoryPerformanceCounter is not null)
+            {
+                this.memoryUsageHistogram.Record(this.memoryPerformanceCounter.RawValue / 1024);
+            }
 
-        await Task.Delay(1000);
-        _ = Task.Run(this.PeriodicallyCheckMemoryUsagePerfCounterBased);
+            await Task.Delay(1000);
+        }
     }
 
     private async Task PeriodicallyCheckMemoryUsageProcessBased()
     {
-        this.currentProcess.Refresh();
-        this.memoryUsageHistogram.Record(this.currentProcess.PrivateMemorySize64 / 1000000);
-        await Task.Delay(1000);
-        _ = Task.Run(this.PeriodicallyCheckMemoryUsageProcessBased);
+        while (!this.cancellationTokenSource.IsCancellationRequested)
+        {
+            this.currentProcess.Refresh();
+            this.memoryUsageHistogram.Record(this.currentProcess.PrivateMemorySize64 / 1000000);
+            await Task.Delay(1000);
+        }
     }
 }

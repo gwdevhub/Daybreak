@@ -111,12 +111,13 @@ public partial class LauncherView : UserControl
         if (this.applicationLauncher.GetGuildwarsProcess(this.LatestConfiguration) is GuildWarsApplicationLaunchContext context)
         {
             // Detected already running guildwars process
+            await this.Dispatcher.InvokeAsync(() => this.Loading = false);
             if (this.focusViewOptions.Value.Enabled)
             {
+                this.menuService.CloseMenu();
                 this.viewManager.ShowView<FocusView>(context);
             }
 
-            await this.Dispatcher.InvokeAsync(() => this.Loading = false);
             return;
         }
 

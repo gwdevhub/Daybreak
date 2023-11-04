@@ -175,6 +175,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<ViewManager>();
         services.AddSingleton<ProcessorUsageMonitor>();
         services.AddSingleton<MemoryUsageMonitor>();
+        services.AddSingleton<DiskUsageMonitor>();
         services.AddSingleton<IViewManager, ViewManager>(sp => sp.GetRequiredService<ViewManager>());
         services.AddSingleton<IViewProducer, ViewManager>(sp => sp.GetRequiredService<ViewManager>());
         services.AddSingleton<PostUpdateActionManager>();

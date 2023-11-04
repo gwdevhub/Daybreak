@@ -2,6 +2,7 @@
 using Daybreak.Views;
 using Newtonsoft.Json;
 using System;
+using System.ComponentModel;
 
 namespace Daybreak.Configuration.Options;
 
@@ -45,4 +46,8 @@ public sealed class LauncherOptions
     [OptionName(Name = "Mod Startup Timeout", Description = "Amount of seconds that Daybreak will wait for each mod to start-up before cancelling the tasks")]
     [OptionRange<double>(MinValue = 30, MaxValue = 300)]
     public double ModStartupTimeout { get; set; } = 30;
+
+    [JsonProperty(nameof(PersistentLogging))]
+    [OptionName(Name = "Persistent Logging", Description = "If true, the launcher will save logs in the local database. Otherwise, the launcher will only keep logs in a memory cache")]
+    public bool PersistentLogging { get; set; } = false;
 }

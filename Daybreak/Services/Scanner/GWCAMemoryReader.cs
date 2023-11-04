@@ -777,6 +777,11 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
                     return default;
                 }
 
+                if (a.ActualLevel == 64)
+                {
+                    return default;
+                }
+
                 return new AttributeEntry
                 {
                     Attribute = attribute,
