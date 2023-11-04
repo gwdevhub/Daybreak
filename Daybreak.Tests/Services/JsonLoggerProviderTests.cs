@@ -1,8 +1,12 @@
-﻿using Daybreak.Services.Logging;
+﻿using Daybreak.Configuration.Options;
+using Daybreak.Services.Logging;
 using FluentAssertions;
 using LiteDB;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NSubstitute;
+using NSubstitute.Extensions;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Logging;
@@ -21,7 +25,9 @@ public class JsonLoggerProviderTests
     {
         File.Delete("Daybreak.db");
         this.liteDatabase = new LiteDatabase("Daybreak.db");
-        this.logsManager = new JsonLogsManager(this.liteDatabase.GetCollection<Daybreak.Models.Log>());
+        var options = Substitute.For<ILiveOptions<LauncherOptions>>();
+        options.Value.Returns(new LauncherOptions { PersistentLogging = true });
+        this.logsManager = new JsonLogsManager(this.liteDatabase.GetCollection<Daybreak.Models.Log>(), options);
         this.loggerProvider = new CVLoggerProvider(this.logsManager);
     }
 
