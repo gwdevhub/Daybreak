@@ -123,11 +123,6 @@
     <Folder Include="GWCA\" />
   </ItemGroup>
 	
-  <ItemGroup>
-    <ProjectReference Include="..\Daybreak.7ZipExtractor\Daybreak.7ZipExtractor.csproj" />
-  </ItemGroup>
-	
-	
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
     <Exec Command="echo.&gt;$(Version).version" />
   </Target>
