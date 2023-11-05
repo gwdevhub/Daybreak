@@ -63,7 +63,9 @@ internal sealed class ToolboxService : IToolboxService
         this.logger = logger.ThrowIfNull();
     }
 
-    public Task OnGuildwarsStarting(Process process, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task OnGuildWarsStarting(Process process, CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public Task OnGuildWarsStartingDisabled(Process process, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public async Task OnGuildWarsCreated(Process process, CancellationToken cancellationToken)
     {
@@ -76,7 +78,7 @@ internal sealed class ToolboxService : IToolboxService
         await Task.Delay(TimeSpan.FromSeconds(this.toolboxOptions.Value.StartupDelay), cancellationToken);
     }
 
-    public Task OnGuildwarsStarted(Process process, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task OnGuildWarsStarted(Process process, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public IEnumerable<string> GetCustomArguments()
     {

@@ -79,6 +79,10 @@ using Daybreak.Services.LaunchConfigurations;
 using Daybreak.Services.ExecutableManagement;
 using Daybreak.Views.Launch;
 using Daybreak.Services.GWCA;
+using Daybreak.Services.DirectSong;
+using Daybreak.Views.Onboarding.DirectSong;
+using System.Xml.Linq;
+using Daybreak.Services.SevenZip;
 
 namespace Daybreak.Configuration;
 
@@ -210,6 +214,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IGuildWarsExecutableManager, GuildWarsExecutableManager>();
         services.AddSingleton<IGWCAClient, GWCAClient>();
         services.AddSingleton<IGuildwarsMemoryReader, GWCAMemoryReader>();
+        services.AddSingleton<ISevenZipExtractor, SevenZipExtractor>();
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
         services.AddScoped<IScreenshotProvider, ScreenshotProvider>();
@@ -306,6 +311,10 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<ReShadePresetView>();
         viewProducer.RegisterView<LaunchConfigurationView>();
         viewProducer.RegisterView<LaunchConfigurationsView>();
+        viewProducer.RegisterView<DirectSongInstallationView>();
+        viewProducer.RegisterView<DirectSongInstallationChoiceView>();
+        viewProducer.RegisterView<DirectSongOnboardingEntryView>();
+        viewProducer.RegisterView<DirectSongSwitchView>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -406,6 +415,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         optionsProducer.RegisterOptions<GuildwarsExecutableOptions>();
         optionsProducer.RegisterOptions<CredentialManagerOptions>();
         optionsProducer.RegisterOptions<LaunchConfigurationServiceOptions>();
+        optionsProducer.RegisterOptions<DirectSongOptions>();
     }
 
     public override void RegisterNotificationHandlers(INotificationHandlerProducer notificationHandlerProducer)
@@ -425,6 +435,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         modsManager.RegisterMod<IGuildwarsScreenPlacer, GuildwarsScreenPlacer>();
         modsManager.RegisterMod<IReShadeService, ReShadeService>();
         modsManager.RegisterMod<IGWCAInjector, GWCAInjector>();
+        modsManager.RegisterMod<IDirectSongService, DirectSongService>(singleton: true);
     }
 
     private void RegisterLiteCollections(IServiceCollection services)

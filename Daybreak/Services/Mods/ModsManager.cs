@@ -23,11 +23,19 @@ public sealed class ModsManager : IModsManager
         return this.serviceManager.GetServicesOfType<IModService>();
     }
 
-    public void RegisterMod<TInterface, TImplementation>()
+    public void RegisterMod<TInterface, TImplementation>(bool singleton = false)
         where TInterface : class, IModService
         where TImplementation : TInterface
     {
-        this.serviceManager.RegisterScoped<TInterface, TImplementation>();
+        if (singleton)
+        {
+            this.serviceManager.RegisterSingleton<TInterface, TImplementation>();
+        }
+        else
+        {
+            this.serviceManager.RegisterScoped<TInterface, TImplementation>();
+        }
+        
         this.logger.LogInformation($"Registered mod [{typeof(TImplementation).Name}]");
     }
 }

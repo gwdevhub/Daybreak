@@ -23,7 +23,7 @@
      Storyboard.TargetProperty="Time"
      From="0"
      To="200"
-     Duration="4:0:0"
+     Duration="0:30:0"
      RepeatBehavior="Forever"/>
                 </Storyboard>
             </BeginStoryboard>
@@ -38,8 +38,8 @@
                     Viewport="0, 0, 100, 100">
                     <ImageBrush.RelativeTransform>
                         <TransformGroup>
-                            <TranslateTransform x:Name="SnowfallTransform1" X="0" Y="{Binding ElementName=_this, Path=Time, Mode=OneWay}" />
                             <ScaleTransform ScaleX="{Binding ElementName=_this, Path=FlakeSize1, Mode=OneWay}" ScaleY="{Binding ElementName=_this, Path=FlakeSize1, Mode=OneWay}" />
+                            <TranslateTransform x:Name="SnowfallTransform1" X="0" Y="{Binding ElementName=_this, Path=Time, Mode=OneWay}" />
                         </TransformGroup>
                     </ImageBrush.RelativeTransform>
                 </ImageBrush>
@@ -53,8 +53,8 @@
             Viewport="0, 0, 100, 100">
                     <ImageBrush.RelativeTransform>
                         <TransformGroup>
-                            <TranslateTransform x:Name="SnowfallTransform2" X="0" Y="{Binding ElementName=_this, Path=Time, Mode=OneWay}" />
                             <ScaleTransform ScaleX="{Binding ElementName=_this, Path=FlakeSize2, Mode=OneWay}" ScaleY="{Binding ElementName=_this, Path=FlakeSize2, Mode=OneWay}" />
+                            <TranslateTransform x:Name="SnowfallTransform2" X="0" Y="{Binding ElementName=_this, Path=Time, Mode=OneWay}" />
                         </TransformGroup>
                     </ImageBrush.RelativeTransform>
                 </ImageBrush>
@@ -68,8 +68,8 @@
             Viewport="0, 0, 100, 100">
                     <ImageBrush.RelativeTransform>
                         <TransformGroup>
-                            <TranslateTransform x:Name="SnowfallTransform3" X="0" Y="{Binding ElementName=_this, Path=Time, Mode=OneWay}" />
                             <ScaleTransform ScaleX="{Binding ElementName=_this, Path=FlakeSize3, Mode=OneWay}" ScaleY="{Binding ElementName=_this, Path=FlakeSize3, Mode=OneWay}" />
+                            <TranslateTransform x:Name="SnowfallTransform3" X="0" Y="{Binding ElementName=_this, Path=Time, Mode=OneWay}" />
                         </TransformGroup>
                     </ImageBrush.RelativeTransform>
                 </ImageBrush>
@@ -83,8 +83,8 @@
             Viewport="0, 0, 100, 100">
                     <ImageBrush.RelativeTransform>
                         <TransformGroup>
-                            <TranslateTransform x:Name="SnowfallTransform4" X="0" Y="{Binding ElementName=_this, Path=Time, Mode=OneWay}" />
                             <ScaleTransform ScaleX="{Binding ElementName=_this, Path=FlakeSize4, Mode=OneWay}" ScaleY="{Binding ElementName=_this, Path=FlakeSize4, Mode=OneWay}" />
+                            <TranslateTransform x:Name="SnowfallTransform4" X="0" Y="{Binding ElementName=_this, Path=Time, Mode=OneWay}" />
                         </TransformGroup>
                     </ImageBrush.RelativeTransform>
                 </ImageBrush>
@@ -98,8 +98,8 @@
             Viewport="0, 0, 100, 100">
                     <ImageBrush.RelativeTransform>
                         <TransformGroup>
-                            <TranslateTransform x:Name="SnowfallTransform5" X="0" Y="{Binding ElementName=_this, Path=Time, Mode=OneWay}" />
                             <ScaleTransform ScaleX="{Binding ElementName=_this, Path=FlakeSize5, Mode=OneWay}" ScaleY="{Binding ElementName=_this, Path=FlakeSize5, Mode=OneWay}" />
+                            <TranslateTransform x:Name="SnowfallTransform5" X="0" Y="{Binding ElementName=_this, Path=Time, Mode=OneWay}" />
                         </TransformGroup>
                     </ImageBrush.RelativeTransform>
                 </ImageBrush>

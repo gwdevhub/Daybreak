@@ -1,6 +1,7 @@
 ﻿using Daybreak.Models.GWCA;
 using Daybreak.Services.Injection;
 using Daybreak.Services.Notifications;
+using System;
 using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Diagnostics;
@@ -35,7 +36,12 @@ internal sealed class GWCAInjector : IGWCAInjector
 
     public IEnumerable<string> GetCustomArguments() => Enumerable.Empty<string>();
 
-    public Task OnGuildwarsStarting(Process process, CancellationToken cancellationToken)
+    public Task OnGuildWarsStarting(Process process, CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task OnGuildWarsStartingDisabled(Process process, CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }
@@ -50,7 +56,7 @@ internal sealed class GWCAInjector : IGWCAInjector
         }
     }
 
-    public async Task OnGuildwarsStarted(Process process, CancellationToken cancellationToken)
+    public async Task OnGuildWarsStarted(Process process, CancellationToken cancellationToken)
     {
         if (await this.gwcaClient.Connect(process, cancellationToken) is not ConnectionContext connectionContext)
         {

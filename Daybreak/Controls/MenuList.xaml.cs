@@ -5,6 +5,7 @@ using Daybreak.Services.Notifications;
 using Daybreak.Views;
 using Daybreak.Views.Copy;
 using Daybreak.Views.Launch;
+using Daybreak.Views.Onboarding.DirectSong;
 using Daybreak.Views.Onboarding.DSOAL;
 using Daybreak.Views.Onboarding.ReShade;
 using Daybreak.Views.Onboarding.Toolbox;
@@ -125,6 +126,11 @@ public partial class MenuList : UserControl
     private void ReShadeButton_Clicked(object sender, EventArgs e)
     {
         this.viewManager.ShowView<ReShadeOnboardingEntryView>();
+    }
+
+    private void DirectSongButton_Clicked(object sender, EventArgs e)
+    {
+        this.viewManager.ShowView<DirectSongOnboardingEntryView>();
     }
 
     private void KamadanButton_Clicked(object sender, EventArgs e)

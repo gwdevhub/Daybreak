@@ -15,7 +15,7 @@ public interface IModService
     /// Called before starting the guild wars process.
     /// Do mod preparation here.
     /// </summary>
-    Task OnGuildwarsStarting(Process process, CancellationToken cancellationToken);
+    Task OnGuildWarsStarting(Process process, CancellationToken cancellationToken);
     /// <summary>
     /// Called when the process is created in suspended state.
     /// Do dll injection here.
@@ -25,5 +25,10 @@ public interface IModService
     /// Called after the process has been resumed.
     /// Do clean-up/integration with the guild wars process here.
     /// </summary>
-    Task OnGuildwarsStarted(Process process, CancellationToken cancellationToken);
+    Task OnGuildWarsStarted(Process process, CancellationToken cancellationToken);
+    /// <summary>
+    /// Called before starting the guild wars process, when the mod is disabled.
+    /// Use this method to clean up the GuildWars folder of any residual mod files.
+    /// </summary>
+    Task OnGuildWarsStartingDisabled(Process process, CancellationToken cancellationToken);
 }
