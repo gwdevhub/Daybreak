@@ -7,6 +7,7 @@ using System.Core.Extensions;
 using System.Diagnostics.Metrics;
 using System.IO;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Daybreak.Services.Downloads;
@@ -31,7 +32,7 @@ public sealed class DownloadService : IDownloadService
         this.logger = logger.ThrowIfNull();
     }
 
-    public async Task<bool> DownloadFile(string downloadUri, string destinationPath, DownloadStatus downloadStatus)
+    public async Task<bool> DownloadFile(string downloadUri, string destinationPath, DownloadStatus downloadStatus, CancellationToken cancellationToken = default)
     {
         downloadStatus.CurrentStep = DownloadStatus.InitializingDownload;
         using var response = await this.httpClient.GetAsync(downloadUri, HttpCompletionOption.ResponseHeadersRead);

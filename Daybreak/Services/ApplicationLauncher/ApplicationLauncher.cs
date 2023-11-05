@@ -181,6 +181,7 @@ public class ApplicationLauncher : IApplicationLauncher
         }
 
         var mods = this.modsManager.GetMods().Where(m => m.IsEnabled).ToList();
+        var disabledmods = this.modsManager.GetMods().Where(m => !m.IsEnabled).ToList();
         foreach(var mod in mods)
         {
             args.AddRange(mod.GetCustomArguments());
@@ -199,27 +200,50 @@ public class ApplicationLauncher : IApplicationLauncher
             }
         };
 
-        foreach(var mod in mods)
+        foreach(var mod in disabledmods)
         {
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.Value.ModStartupTimeout));
             try
             {
-                await mod.OnGuildwarsStarting(process, cts.Token);
+                await mod.OnGuildWarsStartingDisabled(process, cts.Token);
             }
             catch (TaskCanceledException)
             {
                 this.logger.LogError($"{mod.Name} timeout");
                 this.notificationService.NotifyError(
                     title: $"{mod.Name} timeout",
-                    description: $"Mod timed out while processing {nameof(mod.OnGuildwarsStarting)}");
+                    description: $"Mod timed out while processing {nameof(mod.OnGuildWarsStartingDisabled)}");
             }
             catch (Exception e)
             {
-                this.KillGuildWarsProcess(process);
                 this.logger.LogError(e, $"{mod.Name} unhandled exception");
                 this.notificationService.NotifyError(
                     title: $"{mod.Name} exception",
-                    description: $"Mod encountered exception of type {e.GetType().Name} while processing {nameof(mod.OnGuildwarsStarting)}");
+                    description: $"Mod encountered exception of type {e.GetType().Name} while processing {nameof(mod.OnGuildWarsStartingDisabled)}");
+                return default;
+            }
+        }
+
+        foreach(var mod in mods)
+        {
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.Value.ModStartupTimeout));
+            try
+            {
+                await mod.OnGuildWarsStarting(process, cts.Token);
+            }
+            catch (TaskCanceledException)
+            {
+                this.logger.LogError($"{mod.Name} timeout");
+                this.notificationService.NotifyError(
+                    title: $"{mod.Name} timeout",
+                    description: $"Mod timed out while processing {nameof(mod.OnGuildWarsStarting)}");
+            }
+            catch (Exception e)
+            {
+                this.logger.LogError(e, $"{mod.Name} unhandled exception");
+                this.notificationService.NotifyError(
+                    title: $"{mod.Name} exception",
+                    description: $"Mod encountered exception of type {e.GetType().Name} while processing {nameof(mod.OnGuildWarsStarting)}");
                 return default;
             }
         }
@@ -302,14 +326,14 @@ public class ApplicationLauncher : IApplicationLauncher
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.Value.ModStartupTimeout));
                 try
                 {
-                    await mod.OnGuildwarsStarted(process, cts.Token);
+                    await mod.OnGuildWarsStarted(process, cts.Token);
                 }
                 catch (TaskCanceledException)
                 {
                     this.logger.LogError($"{mod.Name} timeout");
                     this.notificationService.NotifyError(
                         title: $"{mod.Name} timeout",
-                        description: $"Mod timed out while processing {nameof(mod.OnGuildwarsStarted)}");
+                        description: $"Mod timed out while processing {nameof(mod.OnGuildWarsStarted)}");
                 }
                 catch (Exception e)
                 {
@@ -317,7 +341,7 @@ public class ApplicationLauncher : IApplicationLauncher
                     this.logger.LogError(e, $"{mod.Name} unhandled exception");
                     this.notificationService.NotifyError(
                         title: $"{mod.Name} exception",
-                        description: $"Mod encountered exception of type {e.GetType().Name} while processing {nameof(mod.OnGuildwarsStarted)}");
+                        description: $"Mod encountered exception of type {e.GetType().Name} while processing {nameof(mod.OnGuildWarsStarted)}");
                     return default;
                 }
             }

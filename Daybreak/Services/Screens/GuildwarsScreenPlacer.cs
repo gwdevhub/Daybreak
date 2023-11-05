@@ -1,6 +1,7 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Services.Scanner;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
@@ -45,7 +46,7 @@ public sealed class GuildwarsScreenPlacer : IGuildwarsScreenPlacer
 
     public bool IsInstalled => true;
 
-    public async Task OnGuildwarsStarted(Process process, CancellationToken cancellationToken)
+    public async Task OnGuildWarsStarted(Process process, CancellationToken cancellationToken)
     {
         var screen = this.screenManager.Screens.Skip(this.liveOptions.Value.DesiredGuildwarsScreen).FirstOrDefault();
         if (screen is null)
@@ -71,7 +72,9 @@ public sealed class GuildwarsScreenPlacer : IGuildwarsScreenPlacer
 
     public IEnumerable<string> GetCustomArguments() => Enumerable.Empty<string>();
 
-    public Task OnGuildwarsStarting(Process process, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task OnGuildWarsStarting(Process process, CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public Task OnGuildWarsStartingDisabled(Process process, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public Task OnGuildWarsCreated(Process process, CancellationToken cancellationToken) => Task.CompletedTask;
 }

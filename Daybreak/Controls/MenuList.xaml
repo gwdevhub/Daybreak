@@ -147,6 +147,13 @@
                                         Cursor="Hand"
                                         Clicked="ReShadeButton_Clicked"
                                         ToolTip="Open ReShade manager"/>
+                    <buttons:MenuButton Title="DirectSong" 
+                                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                        HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                                        Height="30"
+                                        Cursor="Hand"
+                                        Clicked="DirectSongButton_Clicked"
+                                        ToolTip="Open DirectSong manager"/>
                 </local:ExpandableMenuSection.Children>
             </local:ExpandableMenuSection>
             <local:ExpandableMenuSection

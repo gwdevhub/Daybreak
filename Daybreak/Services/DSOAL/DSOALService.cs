@@ -125,15 +125,15 @@ public sealed class DSOALService : IDSOALService
         return Task.CompletedTask;
     }
 
-    public Task OnGuildwarsStarted(Process process, CancellationToken cancellationToken)
+    public Task OnGuildWarsStarted(Process process, CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }
 
-    public Task OnGuildwarsStarting(Process process, CancellationToken cancellationToken)
+    public Task OnGuildWarsStarting(Process process, CancellationToken cancellationToken)
     {
         var guildwarsDirectory = new FileInfo(process.StartInfo.FileName).Directory!.FullName;
-        if (this.options.Value.Enabled)
+        if (this.IsInstalled)
         {
             this.EnsureSymbolicLinkExists();
             EnsureFileExistsInGuildwarsDirectory(DsoundDll, guildwarsDirectory);
@@ -143,16 +143,19 @@ public sealed class DSOALService : IDSOALService
                 title: "DSOAL started",
                 description: "DSOAL files have been set up");
         }
-        else
-        {
-            EnsureFileDoesNotExistInGuildwarsDirectory(DsoundDll, guildwarsDirectory);
-            EnsureFileDoesNotExistInGuildwarsDirectory(DSOALAldrvDll, guildwarsDirectory);
-            EnsureFileDoesNotExistInGuildwarsDirectory(AlsoftIni, guildwarsDirectory);
-        }
 
         return Task.CompletedTask;
     }
-    
+
+    public Task OnGuildWarsStartingDisabled(Process process, CancellationToken cancellationToken)
+    {
+        var guildwarsDirectory = new FileInfo(process.StartInfo.FileName).Directory!.FullName;
+        EnsureFileDoesNotExistInGuildwarsDirectory(DsoundDll, guildwarsDirectory);
+        EnsureFileDoesNotExistInGuildwarsDirectory(DSOALAldrvDll, guildwarsDirectory);
+        EnsureFileDoesNotExistInGuildwarsDirectory(AlsoftIni, guildwarsDirectory);
+        return Task.CompletedTask;
+    }
+
     private static void EnsureFileExistsInGuildwarsDirectory(string fileName, string destinationDirectoryName)
     {
         var sourcePath = Path.Combine(DSOALDirectory, fileName);

@@ -138,15 +138,28 @@ public sealed class ReShadeService : IReShadeService, IApplicationLifetimeServic
         }
     }
 
-    public Task OnGuildwarsStarted(Process process, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task OnGuildWarsStarted(Process process, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public Task OnGuildwarsStarting(Process process, CancellationToken cancellationToken)
+    public Task OnGuildWarsStarting(Process process, CancellationToken cancellationToken)
     {
         var destinationDirectory = Path.GetFullPath(new FileInfo(process.StartInfo.FileName).DirectoryName!);
         EnsureFileExistsInGuildwarsDirectory(ReShadeLog, destinationDirectory);
         EnsureFileExistsInGuildwarsDirectory(ReShadePreset, destinationDirectory);
         EnsureFileExistsInGuildwarsDirectory(ConfigIni, destinationDirectory);
+        Directory.CreateDirectory(SourcePresetsFolderPath);
         EnsureSymbolicLinkExists(destinationDirectory);
+        return Task.CompletedTask;
+    }
+
+    public Task OnGuildWarsStartingDisabled(Process process, CancellationToken cancellationToken)
+    {
+        var destinationDirectory = Path.GetFullPath(new FileInfo(process.StartInfo.FileName).DirectoryName!);
+        var destination = Path.Combine(Path.GetFullPath(destinationDirectory), PresetsFolder);
+        if (Directory.Exists(destination))
+        {
+            Directory.Delete(destination);
+        }
+
         return Task.CompletedTask;
     }
 

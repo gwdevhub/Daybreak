@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace Daybreak.Controls;
@@ -16,7 +13,7 @@ namespace Daybreak.Controls;
 /// </summary>
 public partial class SnowfallOverlay : UserControl
 {
-    private static readonly double[] Frequencies = new double[] { 0.5, 0.1, 5, 1 };
+    private static readonly double[] Frequencies = new double[] { 0.1, 0.025, 1, 0.25 };
     private static readonly double[] Amplitudes = new double[] { 1, 0.1, 0.1, 0.2 };
     private static readonly double Divisor = Amplitudes.Sum();
 
@@ -85,11 +82,11 @@ public partial class SnowfallOverlay : UserControl
         while (!cancellationToken.IsCancellationRequested)
         {
             var time = this.Time;
-            this.SnowfallTransform1.X += this.BaseWind1 + this.GetNoise(time) * this.WindStrength1;
-            this.SnowfallTransform2.X += this.BaseWind2 + this.GetNoise(time - 0.02) * this.WindStrength2;
-            this.SnowfallTransform3.X += this.BaseWind3 + this.GetNoise(time - 0.03) * this.WindStrength3;
-            this.SnowfallTransform4.X += this.BaseWind4 + this.GetNoise(time - 0.05) * this.WindStrength4;
-            this.SnowfallTransform5.X += this.BaseWind5 + this.GetNoise(time - 0.08) * this.WindStrength5;
+            this.SnowfallTransform1.X += (this.BaseWind1 + (this.GetNoise(time) * this.WindStrength1)) / this.FlakeSize1;
+            this.SnowfallTransform2.X += (this.BaseWind2 + (this.GetNoise(time - 0.02) * this.WindStrength2)) / this.FlakeSize2;
+            this.SnowfallTransform3.X += (this.BaseWind3 + (this.GetNoise(time - 0.03) * this.WindStrength3)) / this.FlakeSize3;
+            this.SnowfallTransform4.X += (this.BaseWind4 + (this.GetNoise(time - 0.05) * this.WindStrength4)) / this.FlakeSize4;
+            this.SnowfallTransform5.X += (this.BaseWind5 + (this.GetNoise(time - 0.08) * this.WindStrength5)) / this.FlakeSize5;
             await Task.Delay(16, cancellationToken).ConfigureAwait(true);
         }
     }

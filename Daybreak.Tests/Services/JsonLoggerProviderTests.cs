@@ -5,7 +5,6 @@ using LiteDB;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
-using NSubstitute.Extensions;
 using System.Configuration;
 using System.IO;
 using System.Linq;

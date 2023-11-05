@@ -76,18 +76,20 @@ public sealed class UModService : IUModService
         return Enumerable.Empty<string>();
     }
 
-    public Task OnGuildwarsStarting(Process process, CancellationToken cancellationToken)
+    public Task OnGuildWarsStarting(Process process, CancellationToken cancellationToken)
     {
         this.uModClient.Initialize(cancellationToken);
         return Task.CompletedTask;
     }
+
+    public Task OnGuildWarsStartingDisabled(Process process, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public Task OnGuildWarsCreated(Process process, CancellationToken cancellationToken)
     {
         return this.processInjector.Inject(process, Path.Combine(Path.GetFullPath(UModDirectory), D3D9Dll), cancellationToken);
     }
 
-    public async Task OnGuildwarsStarted(Process process, CancellationToken cancellationToken)
+    public async Task OnGuildWarsStarted(Process process, CancellationToken cancellationToken)
     {
         try
         {
