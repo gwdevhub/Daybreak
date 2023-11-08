@@ -13,6 +13,7 @@ using Daybreak.Services.ReShade;
 using Daybreak.Services.Screens;
 using Daybreak.Services.Startup;
 using Daybreak.Services.Themes;
+using Daybreak.Services.UMod.Utilities;
 using Daybreak.Services.Updater.PostUpdate;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -66,7 +67,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
         return this.exceptionHandler?.HandleException(e) is true;
     }
 
-    protected override async void ApplicationStarting()
+    protected override void ApplicationStarting()
     {
         /*
          * Show splash screen before beginning to load the rest of the application.

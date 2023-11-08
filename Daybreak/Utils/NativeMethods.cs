@@ -17,6 +17,16 @@ internal static class NativeMethods
     public delegate IntPtr HookProc(int nCode, IntPtr wParam, IntPtr lParam);
 
     [StructLayout(LayoutKind.Sequential)]
+    internal struct PEB
+    {
+        private readonly byte InheritedAddressSpace;
+        private readonly byte ReadImageFileExecOptions;
+        private readonly byte BeingDebugged;
+        private readonly byte BitField;
+        private readonly IntPtr Mutant;
+        internal IntPtr ImageBaseAddress;
+    }
+    [StructLayout(LayoutKind.Sequential)]
     public struct SecurityAttributes
     {
         public uint nLength;
@@ -342,6 +352,8 @@ internal static class NativeMethods
     public static extern IntPtr GetForegroundWindow();
     [DllImport("kernel32.dll", SetLastError = true)]
     public static extern bool ReadProcessMemory(IntPtr hProcess, uint lpBaseAddress, IntPtr lpBuffer, uint nSize, out uint lpNumberOfBytesRead);
+    [DllImport("kernel32.dll", CallingConvention = CallingConvention.Winapi)]
+    internal static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, [Out] byte[] lpBuffer, int dwSize, out IntPtr lpNumberOfBytesRead);
     [return: MarshalAs(UnmanagedType.Bool)]
     [DllImport("user32.dll", SetLastError = true)]
     public static extern bool GetWindowInfo(IntPtr hwnd, ref WindowInfo pwi);

@@ -1,14 +1,12 @@
-﻿using System;
+﻿using System.Threading.Tasks;
 using System.Threading;
-using System.Threading.Tasks;
+using System.Diagnostics;
+using Daybreak.Services.UMod.Models;
 
 namespace Daybreak.Services.UMod.Utilities;
-public interface IUModClient : IDisposable
+
+public interface IUModClient
 {
-    bool Ready { get; }
-    void Initialize(CancellationToken cancellationToken);
-    Task WaitForInitialize(CancellationToken cancellationToken);
-    void CloseConnection();
-    Task AddFile(string filePath, CancellationToken cancellationToken);
-    Task<bool> Send(CancellationToken cancellationToken);
+    Task<UModConnectionContext?> Initialize(Process process, CancellationToken cancellationToken);
+    Task AddFile(string filePath, UModConnectionContext uModConnectionContext, CancellationToken cancellationToken);
 }

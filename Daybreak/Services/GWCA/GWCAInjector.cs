@@ -1,11 +1,9 @@
 ﻿using Daybreak.Models.GWCA;
 using Daybreak.Services.Injection;
 using Daybreak.Services.Notifications;
-using System;
 using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +12,7 @@ namespace Daybreak.Services.GWCA;
 
 internal sealed class GWCAInjector : IGWCAInjector
 {
+    private const int MaxRetries = 10;
     private const string ModulePath = "GWCA/Daybreak.GWCA.dll";
 
     private readonly INotificationService notificationService;
@@ -58,21 +57,27 @@ internal sealed class GWCAInjector : IGWCAInjector
 
     public async Task OnGuildWarsStarted(Process process, CancellationToken cancellationToken)
     {
-        if (await this.gwcaClient.Connect(process, cancellationToken) is not ConnectionContext connectionContext)
+        ConnectionContext? connectionContext = default;
+        for(var i = 0; i < MaxRetries; i++)
         {
-            var maybeConnectionContext = await this.gwcaClient.Connect(process, cancellationToken);
-            if (maybeConnectionContext is not ConnectionContext newContext)
+            if (await this.gwcaClient.Connect(process, cancellationToken) is ConnectionContext newContext)
             {
-                this.notificationService.NotifyError(
-                    title: "Unable to inject GWCA into Guild Wars process",
-                    description: "Daybreak integration with the Guild Wars process will be affected. Some Daybreak functionality might not work");
-                return;
+                connectionContext = newContext;
+                break;
             }
 
-            connectionContext = newContext;
+            await Task.Delay(1000, cancellationToken);
         }
 
-        if (await this.gwcaClient.CheckAlive(connectionContext, cancellationToken) is false)
+        if (connectionContext is null)
+        {
+            this.notificationService.NotifyError(
+                        title: "Unable to inject GWCA into Guild Wars process",
+                        description: "Daybreak integration with the Guild Wars process will be affected. Some Daybreak functionality might not work");
+            return;
+        }
+
+        if (await this.gwcaClient.CheckAlive(connectionContext.Value, cancellationToken) is false)
         {
             this.notificationService.NotifyError(
                     title: "Unable to inject GWCA into Guild Wars process",
@@ -82,6 +87,6 @@ internal sealed class GWCAInjector : IGWCAInjector
 
         this.notificationService.NotifyInformation(
             title: "GWCA integration injected",
-            description: $"Daybreak GWCA integration has started successfully on http://localhost:{connectionContext.Port}");
+            description: $"Daybreak GWCA integration has started successfully on http://localhost:{connectionContext.Value.Port}");
     }
 }
