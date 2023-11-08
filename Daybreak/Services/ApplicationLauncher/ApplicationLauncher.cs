@@ -69,7 +69,11 @@ public class ApplicationLauncher : IApplicationLauncher
                 return null;
             }
 
-            this.ClearGwLocks(launchConfigurationWithCredentials.ExecutablePath!.ThrowIfNull());
+            if (!this.ClearGwLocks(launchConfigurationWithCredentials.ExecutablePath!.ThrowIfNull()))
+            {
+                this.logger.LogError("Failed to clear GW locks. Canceling GuildWars launch");
+                return null;
+            }
         }
         else if (this.GetGuildwarsProcesses().Any())
         {
@@ -278,7 +282,8 @@ public class ApplicationLauncher : IApplicationLauncher
 
         if (clientHandle != IntPtr.Zero)
         {
-            ResumeThread(clientHandle);
+            McPatch(process.Handle);
+            _ = ResumeThread(clientHandle);
             CloseHandle(clientHandle);
         }
 
@@ -400,28 +405,50 @@ public class ApplicationLauncher : IApplicationLauncher
         }
     }
 
-    private void ClearGwLocks(string path)
+    private bool ClearGwLocks(string path)
     {
-        this.SetRegistryGuildwarsPath(path);
+        if (!this.SetRegistryGuildwarsPath(path))
+        {
+            this.logger.LogError("Failed to set registry entries. Failing to start GuildWars");
+            return false;
+        }
+
         foreach (var process in Process.GetProcessesByName(ProcessName))
         {
             this.mutexHandler.CloseMutex(process, ArenaNetMutex);
         }
+
+        return true;
     }
 
-    private void SetRegistryGuildwarsPath(string path)
+    private bool SetRegistryGuildwarsPath(string path)
     {
-        var gamePath = path;
         try
         {
-            var registryKey = GetGuildwarsRegistryKey(true);
-            registryKey.SetValue("Path", gamePath!);
-            registryKey.SetValue("Src", gamePath!);
-            registryKey.Close();
+            var regSrc = Microsoft.Win32.Registry.GetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\ArenaNet\\Guild Wars", "Src", null);
+            if (regSrc != null && (string)regSrc != Path.GetFullPath(path))
+            {
+                Microsoft.Win32.Registry.SetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\ArenaNet\\Guild Wars", "Src", Path.GetFullPath(path));
+                Microsoft.Win32.Registry.SetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\ArenaNet\\Guild Wars", "Path", Path.GetFullPath(path));
+            }
+
+            regSrc = Microsoft.Win32.Registry.GetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\ArenaNet\\Guild Wars", "Src", null);
+            if (regSrc == null || (string)regSrc == Path.GetFullPath(path))
+            {
+                return true;
+            }
+
+            Microsoft.Win32.Registry.SetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\ArenaNet\\Guild Wars", "Src",
+                Path.GetFullPath(path));
+            Microsoft.Win32.Registry.SetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\ArenaNet\\Guild Wars", "Path",
+                Path.GetFullPath(path));
+
+            return true;
         }
-        catch (SecurityException ex)
+        catch (UnauthorizedAccessException e)
         {
-            this.logger.LogCritical($"Multi-launch requires administrator rights. Details: {ex}");
+            this.logger.LogError(e, "Failed to patch registry");
+            return false;
         }
     }
 
@@ -439,35 +466,6 @@ public class ApplicationLauncher : IApplicationLauncher
                     new GuildWarsApplicationLaunchContext { GuildWarsProcess = p, LaunchConfiguration = config } :
                     default;
             });
-    }
-
-    private static RegistryKey GetGuildwarsRegistryKey(bool write)
-    {
-        var gwKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("SOFTWARE")?.OpenSubKey("ArenaNet")?.OpenSubKey("Guild Wars", write);
-        if (gwKey is not null)
-        {
-            return gwKey;
-        }
-
-        gwKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("SOFTWARE")?.OpenSubKey("WOW6432Node")?.OpenSubKey("ArenaNet")?.OpenSubKey("Guild Wars", write);
-        if (gwKey is not null)
-        {
-            return gwKey;
-        }
-
-        gwKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SOFTWARE")?.OpenSubKey("ArenaNet")?.OpenSubKey("Guild Wars", write);
-        if (gwKey is not null)
-        {
-            return gwKey;
-        }
-
-        gwKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SOFTWARE")?.OpenSubKey("WOW6432Node")?.OpenSubKey("ArenaNet")?.OpenSubKey("Guild Wars", write);
-        if (gwKey is not null)
-        {
-            return gwKey;
-        }
-
-        throw new InvalidOperationException("Could not find registry key for guildwars.");
     }
 
     /// <summary>
@@ -559,5 +557,90 @@ public class ApplicationLauncher : IApplicationLauncher
         CloseHandle(procinfo.hProcess);
         hThread = procinfo.hThread;
         return procinfo.dwProcessId;
+    }
+
+    /// <summary>
+    /// https://github.com/GregLando113/gwlauncher/blob/master/GW%20Launcher/MulticlientPatch.cs
+    /// </summary>
+    private static bool McPatch(IntPtr processHandle)
+    {
+        byte[] sigPatch =
+        {
+            0x56, 0x57, 0x68, 0x00, 0x01, 0x00, 0x00, 0x89, 0x85, 0xF4, 0xFE, 0xFF, 0xFF, 0xC7, 0x00, 0x00, 0x00, 0x00,
+            0x00
+        };
+        var moduleBase = GetProcessModuleBase(processHandle);
+        var gwdata = new byte[0x48D000];
+
+        if (!NativeMethods.ReadProcessMemory(processHandle, moduleBase, gwdata, gwdata.Length, out _))
+        {
+            return false;
+        }
+
+        var idx = SearchBytes(gwdata, sigPatch);
+
+        if (idx == -1)
+        {
+            return false;
+        }
+
+        var mcpatch = moduleBase + idx - 0x1A;
+
+        byte[] payload = { 0x31, 0xC0, 0x90, 0xC3 };
+
+        return NativeMethods.WriteProcessMemory(processHandle, mcpatch, payload, payload.Length, out _);
+    }
+
+    /// <summary>
+    /// https://github.com/GregLando113/gwlauncher/blob/master/GW%20Launcher/MulticlientPatch.cs
+    /// </summary>
+    private static int SearchBytes(IReadOnlyList<byte> haystack, IReadOnlyList<byte> needle)
+    {
+        var len = needle.Count;
+        var limit = haystack.Count - len;
+        for (var i = 0; i <= limit; i++)
+        {
+            var k = 0;
+            for (; k < len; k++)
+            {
+                if (needle[k] != haystack[i + k])
+                {
+                    break;
+                }
+            }
+
+            if (k == len)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    /// <summary>
+    /// https://github.com/GregLando113/gwlauncher/blob/master/GW%20Launcher/MulticlientPatch.cs
+    /// </summary>
+    private static IntPtr GetProcessModuleBase(IntPtr process)
+    {
+        if (NativeMethods.NtQueryInformationProcess(process, NativeMethods.ProcessInfoClass.ProcessBasicInformation, out var pbi,
+                Marshal.SizeOf(typeof(NativeMethods.ProcessBasicInformation)), out _) != 0)
+        {
+            return IntPtr.Zero;
+        }
+
+        var buffer = new byte[Marshal.SizeOf(typeof(PEB))];
+
+        if (!NativeMethods.ReadProcessMemory(process, pbi.PebBaseAddress, buffer, Marshal.SizeOf(typeof(PEB)), out _))
+        {
+            return IntPtr.Zero;
+        }
+
+        PEB peb = new()
+        {
+            ImageBaseAddress = (IntPtr)BitConverter.ToInt32(buffer, 8)
+        };
+
+        return peb.ImageBaseAddress + 0x1000;
     }
 }

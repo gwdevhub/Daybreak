@@ -152,6 +152,15 @@ public class ProjectConfiguration : PluginConfigurationBase
                 .WithMessageHandler(this.SetupLoggingAndMetrics<GWCAClient>)
                 .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
                 .WithTimeout(TimeSpan.FromSeconds(5))
+                .Build()
+            .RegisterHttpClient<UModService>()
+                .WithMessageHandler(this.SetupLoggingAndMetrics<UModService>)
+                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
+                .Build()
+            .RegisterHttpClient<UModClient>()
+                .WithMessageHandler(this.SetupLoggingAndMetrics<UModClient>)
+                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
+                .WithTimeout(TimeSpan.FromSeconds(30))
                 .Build();
     }
 

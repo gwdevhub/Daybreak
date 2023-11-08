@@ -87,7 +87,14 @@ public sealed class ShortcutManager : IShortcutManager
             WorkingDir = Path.GetDirectoryName(currentExecutable),
             RelativePath = "Daybreak.exe"
         };
-        shortcut.WriteToFile(shortcutPath);
+
+        try
+        {
+            shortcut.WriteToFile(shortcutPath);
+        }
+        catch
+        {
+        }
     }
 
     private void RemoveShortcut()
