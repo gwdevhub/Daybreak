@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Exceptions;
+using Daybreak.Models;
 using Daybreak.Models.LaunchConfigurations;
 using Daybreak.Services.Mods;
 using Daybreak.Services.Mutex;
@@ -204,12 +205,13 @@ public class ApplicationLauncher : IApplicationLauncher
             }
         };
 
+        var applicationLauncherContext = new ApplicationLauncherContext { Process = process, ExecutablePath = executable };
         foreach(var mod in disabledmods)
         {
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.Value.ModStartupTimeout));
             try
             {
-                await mod.OnGuildWarsStartingDisabled(process, cts.Token);
+                await mod.OnGuildWarsStartingDisabled(applicationLauncherContext, cts.Token);
             }
             catch (TaskCanceledException)
             {
@@ -233,7 +235,7 @@ public class ApplicationLauncher : IApplicationLauncher
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.Value.ModStartupTimeout));
             try
             {
-                await mod.OnGuildWarsStarting(process, cts.Token);
+                await mod.OnGuildWarsStarting(applicationLauncherContext, cts.Token);
             }
             catch (TaskCanceledException)
             {
@@ -253,14 +255,39 @@ public class ApplicationLauncher : IApplicationLauncher
         }
 
         var pId = LaunchClient(executable, string.Join(" ", args), this.privilegeManager.AdminPrivileges, out var clientHandle);
-        process = Process.GetProcessById(pId);
+        do
+        {
+            process = Process.GetProcessById(pId);
+        } while (process is null);
 
+        while (true)
+        {
+            // We need to verify that the process is actually started. This needs to be in a try/catch block because process.Id throws when the process is invalid
+            try
+            {
+                if (process.Id != 0)
+                {
+                    break;
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        while (!process.Responding)
+        {
+            await Task.Delay(1000, CancellationToken.None);
+        }
+
+        // Reset launch context with the launched process
+        applicationLauncherContext = new ApplicationLauncherContext { ExecutablePath =  executable, Process = process };
         foreach (var mod in mods)
         {
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.Value.ModStartupTimeout));
             try
             {
-                await mod.OnGuildWarsCreated(process, cts.Token);
+                await mod.OnGuildWarsCreated(applicationLauncherContext, cts.Token);
             }
             catch (TaskCanceledException)
             {
@@ -331,7 +358,7 @@ public class ApplicationLauncher : IApplicationLauncher
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.Value.ModStartupTimeout));
                 try
                 {
-                    await mod.OnGuildWarsStarted(process, cts.Token);
+                    await mod.OnGuildWarsStarted(applicationLauncherContext, cts.Token);
                 }
                 catch (TaskCanceledException)
                 {
@@ -457,7 +484,14 @@ public class ApplicationLauncher : IApplicationLauncher
         return Process.GetProcessesByName(ProcessName)
             .Where(p =>
             {
-                return launchConfigurationWithCredentials.FirstOrDefault(l => l.ExecutablePath == p.MainModule?.FileName) is not null;
+                try
+                {
+                    return launchConfigurationWithCredentials.FirstOrDefault(l => l.ExecutablePath == p.MainModule?.FileName) is not null;
+                }
+                catch
+                {
+                    return false;
+                }
             })
             .Select(p =>
             {

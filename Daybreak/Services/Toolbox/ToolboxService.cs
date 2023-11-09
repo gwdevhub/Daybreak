@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Exceptions;
+using Daybreak.Models;
 using Daybreak.Models.Progress;
 using Daybreak.Services.Injection;
 using Daybreak.Services.Notifications;
@@ -63,13 +64,13 @@ internal sealed class ToolboxService : IToolboxService
         this.logger = logger.ThrowIfNull();
     }
 
-    public Task OnGuildWarsStarting(Process process, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task OnGuildWarsStarting(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public Task OnGuildWarsStartingDisabled(Process process, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task OnGuildWarsStartingDisabled(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public async Task OnGuildWarsCreated(Process process, CancellationToken cancellationToken)
+    public async Task OnGuildWarsCreated(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
     {
-        await this.LaunchToolbox(process, cancellationToken);
+        await this.LaunchToolbox(applicationLauncherContext.Process, cancellationToken);
 
         /*
          * Toolbox startup conflicts with Daybreak GWCA integration. Wait some time
@@ -78,7 +79,7 @@ internal sealed class ToolboxService : IToolboxService
         await Task.Delay(TimeSpan.FromSeconds(this.toolboxOptions.Value.StartupDelay), cancellationToken);
     }
 
-    public Task OnGuildWarsStarted(Process process, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task OnGuildWarsStarted(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public IEnumerable<string> GetCustomArguments()
     {

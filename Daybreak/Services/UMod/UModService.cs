@@ -1,4 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Models;
 using Daybreak.Models.Github;
 using Daybreak.Models.Progress;
 using Daybreak.Models.UMod;
@@ -85,24 +86,24 @@ public sealed class UModService : IUModService
         return Enumerable.Empty<string>();
     }
 
-    public Task OnGuildWarsStarting(Process process, CancellationToken cancellationToken)
+    public Task OnGuildWarsStarting(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }
 
-    public Task OnGuildWarsStartingDisabled(Process process, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task OnGuildWarsStartingDisabled(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public Task OnGuildWarsCreated(Process process, CancellationToken cancellationToken)
+    public Task OnGuildWarsCreated(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
     {
-        return this.processInjector.Inject(process, Path.Combine(Path.GetFullPath(UModDirectory), UModDll), cancellationToken);
+        return this.processInjector.Inject(applicationLauncherContext.Process, Path.Combine(Path.GetFullPath(UModDirectory), UModDll), cancellationToken);
     }
 
-    public async Task OnGuildWarsStarted(Process process, CancellationToken cancellationToken)
+    public async Task OnGuildWarsStarted(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
     {
         UModConnectionContext? context;
         try
         {
-            context = await this.uModClient2.Initialize(process, cancellationToken);
+            context = await this.uModClient2.Initialize(applicationLauncherContext.Process, cancellationToken);
         }
         catch(TimeoutException)
         {
@@ -206,6 +207,56 @@ public sealed class UModService : IUModService
     {
         this.uModOptions.Value.Mods = list;
         this.uModOptions.UpdateOption();
+    }
+
+    public async Task CheckAndUpdateUMod(CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.CheckAndUpdateUMod), string.Empty);
+        var existingUMod = Path.Combine(Path.GetFullPath(UModDirectory), UModDll);
+        if (!this.IsInstalled)
+        {
+            scopedLogger.LogInformation("UMod is not installed");
+            return;
+        }
+
+        scopedLogger.LogInformation("Retrieving version list");
+        var getListResponse = await this.httpClient.GetAsync(ReleasesUrl, cancellationToken);
+        if (!getListResponse.IsSuccessStatusCode)
+        {
+            scopedLogger.LogError($"Received non success status code [{getListResponse.StatusCode}]");
+            return;
+        }
+
+        var responseString = await getListResponse.Content.ReadAsStringAsync();
+        var releasesList = responseString.Deserialize<List<GithubRefTag>>();
+        var latestRelease = releasesList?
+            .Select(t => t.Ref?.Replace("refs/tags/", ""))
+            .OfType<string>()
+            .LastOrDefault();
+
+        if (!Daybreak.Models.Versioning.Version.TryParse(latestRelease ?? string.Empty, out var latestVersion))
+        {
+            scopedLogger.LogError($"Unable to parse latest version {latestRelease}");
+            return;
+        }
+
+        var currentRelease = FileVersionInfo.GetVersionInfo(existingUMod).FileVersion;
+        if (!Daybreak.Models.Versioning.Version.TryParse(currentRelease ?? string.Empty, out var currentVersion))
+        {
+            scopedLogger.LogError($"Unable to parse current version {currentRelease}");
+            return;
+        }
+
+        if (currentVersion.CompareTo(latestVersion) >= 0)
+        {
+            scopedLogger.LogError($"UMod is up to date");
+            return;
+        }
+
+        await this.DownloadLatestDll(new UModInstallationStatus(), cancellationToken);
+        this.notificationService.NotifyInformation(
+            title: "UMod updated",
+            description: $"UMod has been updated to version {latestRelease}");
     }
 
     private async void LoadModsAsync(UModConnectionContext context)

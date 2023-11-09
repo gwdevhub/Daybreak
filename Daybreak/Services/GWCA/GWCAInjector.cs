@@ -1,4 +1,5 @@
-﻿using Daybreak.Models.GWCA;
+﻿using Daybreak.Models;
+using Daybreak.Models.GWCA;
 using Daybreak.Services.Injection;
 using Daybreak.Services.Notifications;
 using System.Collections.Generic;
@@ -35,19 +36,19 @@ internal sealed class GWCAInjector : IGWCAInjector
 
     public IEnumerable<string> GetCustomArguments() => Enumerable.Empty<string>();
 
-    public Task OnGuildWarsStarting(Process process, CancellationToken cancellationToken)
+    public Task OnGuildWarsStarting(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }
 
-    public Task OnGuildWarsStartingDisabled(Process process, CancellationToken cancellationToken)
+    public Task OnGuildWarsStartingDisabled(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }
 
-    public async Task OnGuildWarsCreated(Process process, CancellationToken cancellationToken)
+    public async Task OnGuildWarsCreated(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
     {
-        if (!await this.injector.Inject(process, ModulePath, cancellationToken))
+        if (!await this.injector.Inject(applicationLauncherContext.Process, ModulePath, cancellationToken))
         {
             this.notificationService.NotifyError(
                     title: "Unable to inject GWCA into Guild Wars process",
@@ -55,12 +56,12 @@ internal sealed class GWCAInjector : IGWCAInjector
         }
     }
 
-    public async Task OnGuildWarsStarted(Process process, CancellationToken cancellationToken)
+    public async Task OnGuildWarsStarted(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
     {
         ConnectionContext? connectionContext = default;
         for(var i = 0; i < MaxRetries; i++)
         {
-            if (await this.gwcaClient.Connect(process, cancellationToken) is ConnectionContext newContext)
+            if (await this.gwcaClient.Connect(applicationLauncherContext.Process, cancellationToken) is ConnectionContext newContext)
             {
                 connectionContext = newContext;
                 break;
