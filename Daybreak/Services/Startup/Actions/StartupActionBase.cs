@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace Daybreak.Services.Startup.Actions;
 
@@ -9,7 +10,7 @@ public abstract class StartupActionBase
 
     }
 
-    public virtual Task ExecuteOnStartupAsync()
+    public virtual Task ExecuteOnStartupAsync(CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }

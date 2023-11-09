@@ -332,6 +332,7 @@ public class ProjectConfiguration : PluginConfigurationBase
 
         startupActionProducer.RegisterAction<RenameInstallerAction>();
         startupActionProducer.RegisterAction<FixSymbolicLinkStartupAction>();
+        startupActionProducer.RegisterAction<UpdateUModAction>();
     }
 
     public override void RegisterPostUpdateActions(IPostUpdateActionProducer postUpdateActionProducer)
@@ -438,11 +439,11 @@ public class ProjectConfiguration : PluginConfigurationBase
 
     public override void RegisterMods(IModsManager modsManager)
     {
+        modsManager.RegisterMod<IReShadeService, ReShadeService>();
         modsManager.RegisterMod<IUModService, UModService>();
         modsManager.RegisterMod<IToolboxService, ToolboxService>();
         modsManager.RegisterMod<IDSOALService, DSOALService>();
         modsManager.RegisterMod<IGuildwarsScreenPlacer, GuildwarsScreenPlacer>();
-        modsManager.RegisterMod<IReShadeService, ReShadeService>();
         modsManager.RegisterMod<IGWCAInjector, GWCAInjector>();
         modsManager.RegisterMod<IDirectSongService, DirectSongService>(singleton: true);
     }

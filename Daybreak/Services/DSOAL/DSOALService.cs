@@ -1,4 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Models;
 using Daybreak.Models.Progress;
 using Daybreak.Services.Downloads;
 using Daybreak.Services.Notifications;
@@ -120,19 +121,19 @@ public sealed class DSOALService : IDSOALService
         }
     }
 
-    public Task OnGuildWarsCreated(Process process, CancellationToken cancellationToken)
+    public Task OnGuildWarsCreated(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }
 
-    public Task OnGuildWarsStarted(Process process, CancellationToken cancellationToken)
+    public Task OnGuildWarsStarted(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }
 
-    public Task OnGuildWarsStarting(Process process, CancellationToken cancellationToken)
+    public Task OnGuildWarsStarting(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
     {
-        var guildwarsDirectory = new FileInfo(process.StartInfo.FileName).Directory!.FullName;
+        var guildwarsDirectory = new FileInfo(applicationLauncherContext.ExecutablePath).Directory!.FullName;
         if (this.IsInstalled)
         {
             this.EnsureSymbolicLinkExists();
@@ -147,9 +148,9 @@ public sealed class DSOALService : IDSOALService
         return Task.CompletedTask;
     }
 
-    public Task OnGuildWarsStartingDisabled(Process process, CancellationToken cancellationToken)
+    public Task OnGuildWarsStartingDisabled(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
     {
-        var guildwarsDirectory = new FileInfo(process.StartInfo.FileName).Directory!.FullName;
+        var guildwarsDirectory = new FileInfo(applicationLauncherContext.ExecutablePath).Directory!.FullName;
         EnsureFileDoesNotExistInGuildwarsDirectory(DsoundDll, guildwarsDirectory);
         EnsureFileDoesNotExistInGuildwarsDirectory(DSOALAldrvDll, guildwarsDirectory);
         EnsureFileDoesNotExistInGuildwarsDirectory(AlsoftIni, guildwarsDirectory);

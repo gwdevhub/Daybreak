@@ -1,4 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Models;
 using Daybreak.Models.Progress;
 using Daybreak.Models.ReShade;
 using Daybreak.Services.Downloads;
@@ -120,10 +121,10 @@ public sealed class ReShadeService : IReShadeService, IApplicationLifetimeServic
 
     public IEnumerable<string> GetCustomArguments() => Enumerable.Empty<string>();
 
-    public async Task OnGuildWarsCreated(Process process, CancellationToken cancellationToken)
+    public async Task OnGuildWarsCreated(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.OnGuildWarsCreated), process?.MainModule?.FileName ?? string.Empty);
-        if (await this.processInjector.Inject(process!, ReShadeDllPath, cancellationToken))
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.OnGuildWarsCreated), applicationLauncherContext.ExecutablePath ?? string.Empty);
+        if (await this.processInjector.Inject(applicationLauncherContext.Process, ReShadeDllPath, cancellationToken))
         {
             scopedLogger.LogInformation("Injected ReShade dll");
             this.notificationService.NotifyInformation(
@@ -139,11 +140,11 @@ public sealed class ReShadeService : IReShadeService, IApplicationLifetimeServic
         }
     }
 
-    public Task OnGuildWarsStarted(Process process, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task OnGuildWarsStarted(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public Task OnGuildWarsStarting(Process process, CancellationToken cancellationToken)
+    public Task OnGuildWarsStarting(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
     {
-        var destinationDirectory = Path.GetFullPath(new FileInfo(process.StartInfo.FileName).DirectoryName!);
+        var destinationDirectory = Path.GetFullPath(new FileInfo(applicationLauncherContext.ExecutablePath).DirectoryName!);
         EnsureFileExistsInGuildwarsDirectory(ReShadeLog, destinationDirectory);
         EnsureFileExistsInGuildwarsDirectory(ReShadePreset, destinationDirectory);
         EnsureFileExistsInGuildwarsDirectory(ConfigIni, destinationDirectory);
@@ -152,9 +153,9 @@ public sealed class ReShadeService : IReShadeService, IApplicationLifetimeServic
         return Task.CompletedTask;
     }
 
-    public Task OnGuildWarsStartingDisabled(Process process, CancellationToken cancellationToken)
+    public Task OnGuildWarsStartingDisabled(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
     {
-        var destinationDirectory = Path.GetFullPath(new FileInfo(process.StartInfo.FileName).DirectoryName!);
+        var destinationDirectory = Path.GetFullPath(new FileInfo(applicationLauncherContext.ExecutablePath).DirectoryName!);
         var destination = Path.Combine(Path.GetFullPath(destinationDirectory), PresetsFolder);
         if (Directory.Exists(destination))
         {

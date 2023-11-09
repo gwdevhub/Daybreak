@@ -1,4 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Models;
 using Daybreak.Models.Progress;
 using Daybreak.Services.Downloads;
 using Daybreak.Services.Notifications;
@@ -68,18 +69,18 @@ internal sealed class DirectSongService : IDirectSongService
 
     public IEnumerable<string> GetCustomArguments() => Array.Empty<string>();
 
-    public Task OnGuildWarsCreated(Process process, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task OnGuildWarsCreated(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public Task OnGuildWarsStarted(Process process, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task OnGuildWarsStarted(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public Task OnGuildWarsStarting(Process process, CancellationToken cancellationToken)
+    public Task OnGuildWarsStarting(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
     {
         if (!this.IsInstalled)
         {
             return Task.CompletedTask;
         }
 
-        var gwPath = Path.GetFullPath(process.StartInfo.FileName);
+        var gwPath = Path.GetFullPath(applicationLauncherContext.ExecutablePath);
         var gwDirectory = Path.GetDirectoryName(gwPath)!;
         var wmCorePath = Path.Combine(gwDirectory, WMVCOREDll);
         var dsGuildWarsDll = Path.Combine(gwDirectory, DsGuildwarsDll);
@@ -99,9 +100,9 @@ internal sealed class DirectSongService : IDirectSongService
         return Task.CompletedTask;
     }
 
-    public Task OnGuildWarsStartingDisabled(Process process, CancellationToken cancellationToken)
+    public Task OnGuildWarsStartingDisabled(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
     {
-        var gwPath = Path.GetFullPath(process.StartInfo.FileName);
+        var gwPath = Path.GetFullPath(applicationLauncherContext.ExecutablePath);
         var gwDirectory = Path.GetDirectoryName(gwPath)!;
         var wmCorePath = Path.Combine(gwDirectory, WMVCOREDll);
         var dsGuildWarsDll = Path.Combine(gwDirectory, DsGuildwarsDll);
