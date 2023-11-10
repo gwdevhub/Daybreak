@@ -70,7 +70,6 @@ using Daybreak.Services.Events;
 using Daybreak.Controls;
 using Daybreak.Models.Plugins;
 using Daybreak.Services.Plugins;
-using Daybreak.Services.UMod.Utilities;
 using Daybreak.Services.Toolbox.Utilities;
 using Daybreak.Services.Injection;
 using Daybreak.Services.ReShade;
@@ -81,7 +80,6 @@ using Daybreak.Views.Launch;
 using Daybreak.Services.GWCA;
 using Daybreak.Services.DirectSong;
 using Daybreak.Views.Onboarding.DirectSong;
-using System.Xml.Linq;
 using Daybreak.Services.SevenZip;
 
 namespace Daybreak.Configuration;
@@ -156,11 +154,6 @@ public class ProjectConfiguration : PluginConfigurationBase
             .RegisterHttpClient<UModService>()
                 .WithMessageHandler(this.SetupLoggingAndMetrics<UModService>)
                 .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
-                .Build()
-            .RegisterHttpClient<UModClient>()
-                .WithMessageHandler(this.SetupLoggingAndMetrics<UModClient>)
-                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
-                .WithTimeout(TimeSpan.FromSeconds(30))
                 .Build();
     }
 
@@ -255,7 +248,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IRegistryService, RegistryService>();
         services.AddScoped<IEventNotifierService, EventNotifierService>();
         services.AddScoped<IBackgroundProvider, BackgroundProvider>();
-        services.AddScoped<IUModClient, UModClient>();
         services.AddScoped<IToolboxClient, ToolboxClient>();
         services.AddScoped<IProcessInjector, ProcessInjector>();
         services.AddScoped<ILaunchConfigurationService, LaunchConfigurationService>();
