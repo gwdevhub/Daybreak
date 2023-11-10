@@ -7,8 +7,6 @@ using Daybreak.Services.Downloads;
 using Daybreak.Services.Injection;
 using Daybreak.Services.Notifications;
 using Daybreak.Services.Toolbox.Models;
-using Daybreak.Services.UMod.Models;
-using Daybreak.Services.UMod.Utilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System;
@@ -18,7 +16,6 @@ using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -33,11 +30,10 @@ public sealed class UModService : IUModService
     private const string ReleasesUrl = "https://api.github.com/repos/AlexMacocian/uMod/git/refs/tags";
     private const string UModDirectory = "uMod";
     private const string UModDll = "uMod.dll";
+    private const string UModModList = "modlist.txt";
 
     private readonly IProcessInjector processInjector;
     private readonly INotificationService notificationService;
-    private readonly IUModClient uModClient2;
-    private readonly IUModClient uModClient;
     private readonly IDownloadService downloadService;
     private readonly IHttpClient<UModService> httpClient;
     private readonly ILiveOptions<LauncherOptions> launcherOptions;
@@ -62,8 +58,6 @@ public sealed class UModService : IUModService
     public UModService(
         IProcessInjector processInjector,
         INotificationService notificationService,
-        IUModClient uModClient2,
-        IUModClient uModClient,
         IDownloadService downloadService,
         IHttpClient<UModService> httpClient,
         ILiveOptions<LauncherOptions> launcherOptions,
@@ -72,8 +66,6 @@ public sealed class UModService : IUModService
     {
         this.processInjector = processInjector.ThrowIfNull();
         this.notificationService = notificationService.ThrowIfNull();
-        this.uModClient2 = uModClient2.ThrowIfNull();
-        this.uModClient = uModClient.ThrowIfNull();
         this.downloadService = downloadService.ThrowIfNull();
         this.httpClient = httpClient.ThrowIfNull();
         this.launcherOptions = launcherOptions.ThrowIfNull();
@@ -93,30 +85,27 @@ public sealed class UModService : IUModService
 
     public Task OnGuildWarsStartingDisabled(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public Task OnGuildWarsCreated(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
+    public async Task OnGuildWarsCreated(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
     {
-        return this.processInjector.Inject(applicationLauncherContext.Process, Path.Combine(Path.GetFullPath(UModDirectory), UModDll), cancellationToken);
+        var modListFilePath = Path.Combine(Path.GetFullPath(UModDirectory), UModModList);
+        var lines = this.uModOptions.Value.Mods.Where(e => e.Enabled && e.PathToFile is not null).Select(e => e.PathToFile).ToList();
+        await File.WriteAllLinesAsync(modListFilePath, lines!, cancellationToken);
+        var result = await this.processInjector.Inject(applicationLauncherContext.Process, Path.Combine(Path.GetFullPath(UModDirectory), UModDll), cancellationToken);
+        if (result)
+        {
+            this.notificationService.NotifyInformation(
+                title: "uMod loaded",
+                description: "uMod.dll has been loaded. Textures will start loading asynchronously");
+        }
+        else
+        {
+            this.notificationService.NotifyError(
+                title: "uMod failed to load",
+                description: "uMod.dll has failed to load. Check logs for details");
+        }
     }
 
-    public async Task OnGuildWarsStarted(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
-    {
-        UModConnectionContext? context;
-        try
-        {
-            context = await this.uModClient2.Initialize(applicationLauncherContext.Process, cancellationToken);
-        }
-        catch(TimeoutException)
-        {
-            this.NotifyFaultyInstallation();
-            return;
-        }
-
-        _ = Task.Run(() => this.LoadModsAsync(context.Value));
-
-        this.notificationService.NotifyInformation(
-                title: "uMod started",
-                description: "uMod will begin loading textures");
-    }
+    public Task OnGuildWarsStarted(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public bool LoadUModFromDisk()
     {
@@ -257,14 +246,6 @@ public sealed class UModService : IUModService
         this.notificationService.NotifyInformation(
             title: "UMod updated",
             description: $"UMod has been updated to version {latestRelease}");
-    }
-
-    private async void LoadModsAsync(UModConnectionContext context)
-    {
-        foreach (var entry in this.uModOptions.Value.Mods.Where(e => e.Enabled && e.PathToFile is not null))
-        {
-            await this.uModClient2.AddFile(entry.PathToFile!, context, CancellationToken.None);
-        }
     }
 
     private void NotifyFaultyInstallation()
