@@ -8,16 +8,19 @@ using Daybreak.Services.Notifications;
 using Daybreak.Services.Privilege;
 using Daybreak.Utils;
 using Daybreak.Views;
+using HarfBuzzSharp;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
@@ -482,24 +485,63 @@ public class ApplicationLauncher : IApplicationLauncher
     private static IEnumerable<GuildWarsApplicationLaunchContext?> GetGuildwarsProcessesInternal(params LaunchConfigurationWithCredentials[] launchConfigurationWithCredentials)
     {
         return Process.GetProcessesByName(ProcessName)
-            .Where(p =>
+            .Select(Process =>
             {
-                try
-                {
-                    return launchConfigurationWithCredentials.FirstOrDefault(l => l.ExecutablePath == p.MainModule?.FileName) is not null;
-                }
-                catch
-                {
-                    return false;
-                }
+                var AssociatedConfiguration = launchConfigurationWithCredentials.FirstOrDefault(c => ConfigurationMatchesProcess(c, Process));
+                return (Process, AssociatedConfiguration);
             })
-            .Select(p =>
+            .Where(tuple => tuple.AssociatedConfiguration is not null)
+            .Select(tuple => new GuildWarsApplicationLaunchContext
             {
-                var config = launchConfigurationWithCredentials.FirstOrDefault(l => l.ExecutablePath == p.MainModule?.FileName);
-                return config is not null ?
-                    new GuildWarsApplicationLaunchContext { GuildWarsProcess = p, LaunchConfiguration = config } :
-                    default;
+                GuildWarsProcess = tuple.Process,
+                LaunchConfiguration = tuple.AssociatedConfiguration
             });
+    }
+
+    private static bool ConfigurationMatchesProcess(LaunchConfigurationWithCredentials launchConfigurationWithCredentials, Process process)
+    {
+        try
+        {
+            return launchConfigurationWithCredentials.ExecutablePath == process.MainModule?.FileName;
+        }
+        catch (Win32Exception ex) when (ex.Message.Contains("Access is denied"))
+        {
+            /*
+             * The process is running elevated. There is no way to use the standard C# libraries
+             * to figure out what is the path of the running process.
+             * We have to resort to low-leve Windows API to figure out the path of the elevated process.
+             * We create a process snapshot and compare the paths
+             */
+            var hSnapshot = CreateToolhelp32Snapshot(0x00000002, 0); // 0x00000002 is the TH32CS_SNAPPROCESS flag
+            var pe32 = new ProcessEntry32
+            {
+                dwSize = (uint)Marshal.SizeOf(typeof(ProcessEntry32))
+            };
+
+            var nameBuffer = new StringBuilder(1024);
+            if (Process32First(hSnapshot, ref pe32))
+            {
+                do
+                {
+                    var size = 1024U;
+                    if (pe32.szExeFile == "Gw.exe")
+                    {
+                        var maybeDesiredProcessHandle = OpenProcess(ProcessAccessFlags.QueryLimitedInformation, false, pe32.th32ProcessID);
+                        if (QueryFullProcessImageName(maybeDesiredProcessHandle, 0, nameBuffer, ref size) &&
+                            nameBuffer.ToString() == launchConfigurationWithCredentials.ExecutablePath)
+                        {
+                            CloseHandle(maybeDesiredProcessHandle);
+                            return true;
+                        }
+
+                        CloseHandle(maybeDesiredProcessHandle);
+                    }
+                } while (Process32Next(hSnapshot, ref pe32));
+            }
+
+            CloseHandle(hSnapshot);
+            return false;
+        }
     }
 
     /// <summary>

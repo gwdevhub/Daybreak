@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
+using static Daybreak.Utils.NativeMethods;
 
 namespace Daybreak.Utils;
 
@@ -16,6 +17,21 @@ internal static class NativeMethods
 
     public delegate IntPtr HookProc(int nCode, IntPtr wParam, IntPtr lParam);
 
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct ProcessEntry32
+    {
+        public uint dwSize;
+        public uint cntUsage;
+        public uint th32ProcessID;
+        public IntPtr th32DefaultHeapID;
+        public uint th32ModuleID;
+        public uint cntThreads;
+        public uint th32ParentProcessID;
+        public int pcPriClassBase;
+        public uint dwFlags;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
+        public string szExeFile;
+    };
     [StructLayout(LayoutKind.Sequential)]
     internal struct PEB
     {
@@ -148,6 +164,7 @@ internal static class NativeMethods
         DupHandle = 0x00000040,
         SetInformation = 0x00000200,
         QueryInformation = 0x00000400,
+        QueryLimitedInformation = 0x00001000,
         Synchronize = 0x00100000
     }
     [Flags]
@@ -314,6 +331,12 @@ internal static class NativeMethods
 
     public const int WM_SYSCOMMAND = 0x112;
 
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern IntPtr CreateToolhelp32Snapshot(uint dwFlags, uint th32ProcessID);
+    [DllImport("kernel32.dll")]
+    public static extern bool Process32First(IntPtr hSnapshot, ref ProcessEntry32 lppe);
+    [DllImport("kernel32.dll")]
+    public static extern bool Process32Next(IntPtr hSnapshot, ref ProcessEntry32 lppe);
     [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
     public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
     [DllImport("kernel32.dll")]
