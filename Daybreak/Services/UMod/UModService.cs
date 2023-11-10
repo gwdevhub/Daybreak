@@ -26,8 +26,8 @@ namespace Daybreak.Services.UMod;
 public sealed class UModService : IUModService
 {
     private const string TagPlaceholder = "[TAG_PLACEHOLDER]";
-    private const string ReleaseUrl = "https://github.com/AlexMacocian/uMod/releases/download/[TAG_PLACEHOLDER]/uMod.dll";
-    private const string ReleasesUrl = "https://api.github.com/repos/AlexMacocian/uMod/git/refs/tags";
+    private const string ReleaseUrl = "https://github.com/DubbleClick/gMod/releases/download/[TAG_PLACEHOLDER]/gMod.dll";
+    private const string ReleasesUrl = "https://api.github.com/repos/DubbleClick/gMod/git/refs/tags";
     private const string UModDirectory = "uMod";
     private const string UModDll = "uMod.dll";
     private const string UModModList = "modlist.txt";
