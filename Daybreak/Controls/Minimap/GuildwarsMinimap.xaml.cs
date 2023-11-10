@@ -629,7 +629,8 @@ public partial class GuildwarsMinimap : UserControl
 
     private void GuildwarsMinimap_MouseMove(object sender, MouseEventArgs e)
     {
-        if (this.GameData.Valid is false ||
+        if (this.GameData is null ||
+            this.GameData.Valid is false ||
             this.GameData.MainPlayer is null ||
             this.GameData.Party is null ||
             this.GameData.WorldPlayers is null)
@@ -653,24 +654,24 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
-        if (this.CheckMouseOverEntity(this.GameData.LivingEntities!.OfType<IEntity>()) is not null)
+        if (this.CheckMouseOverEntity(this.GameData.LivingEntities?.OfType<IEntity>()) is not null)
         {
             return;
         }
 
-        if (this.CheckMouseOverEntity(this.GameData.MapIcons!.OfType<IPositionalEntity>()) is not null)
+        if (this.CheckMouseOverEntity(this.GameData.MapIcons?.OfType<IPositionalEntity>()) is not null)
         {
             return;
         }
 
-        if (this.CheckMouseOverEntity(this.GameData.MainPlayer.QuestLog!
+        if (this.CheckMouseOverEntity(this.GameData.MainPlayer.QuestLog?
                 .Where(entity => this.drawingService.IsEntityOnScreen(entity.Position, out _, out _))
                 .OfType<IPositionalEntity>()) is not null)
         {
             return;
         }
 
-        if (this.CheckMouseOverEntity(this.GameData.MainPlayer.QuestLog!
+        if (this.CheckMouseOverEntity(this.GameData.MainPlayer.QuestLog?
                 .Where(entity => !this.drawingService.IsEntityOnScreen(entity.Position, out _, out _))
                 .Select(oldQuestMetadata =>
                 {
