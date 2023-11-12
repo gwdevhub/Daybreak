@@ -19,8 +19,8 @@ internal sealed class ToolboxClient : IToolboxClient
     private const string ToolboxDirectory = "GWToolbox";
     private const string DllName = "GWToolboxdll.dll";
     private const string TagPlaceholder = "[TAG_PLACEHOLDER]";
-    private const string ReleaseUrl = "https://github.com/HasKha/GWToolboxpp/releases/download/[TAG_PLACEHOLDER]/GWToolboxdll.dll";
-    private const string ReleasesUrl = "https://api.github.com/repos/HasKha/GWToolboxpp/git/refs/tags";
+    private const string ReleaseUrl = "https://github.com/gwdevhub/GWToolboxpp/releases/download/[TAG_PLACEHOLDER]/GWToolboxdll.dll";
+    private const string ReleasesUrl = "https://api.github.com/repos/gwdevhub/GWToolboxpp/git/refs/tags";
 
     private readonly IDownloadService downloadService;
     private readonly IHttpClient<ToolboxClient> httpClient;

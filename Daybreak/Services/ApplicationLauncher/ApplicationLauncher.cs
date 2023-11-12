@@ -504,7 +504,7 @@ public class ApplicationLauncher : IApplicationLauncher
         {
             return launchConfigurationWithCredentials.ExecutablePath == process.MainModule?.FileName;
         }
-        catch (Win32Exception ex) when (ex.Message.Contains("Access is denied"))
+        catch (Win32Exception ex) when (ex.Message.Contains("Access is denied") || ex.Message.Contains("Only part of a ReadProcessMemory or WriteProcessMemory request was completed."))
         {
             /*
              * The process is running elevated. There is no way to use the standard C# libraries
