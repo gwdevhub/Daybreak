@@ -5,6 +5,7 @@ using Daybreak.Services.Scanner;
 using Daybreak.Services.Screenshots.Models;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
@@ -13,6 +14,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using System.Windows.Media;
 
 namespace Daybreak.Services.Screenshots;
@@ -21,7 +23,7 @@ public sealed class OnlinePictureClient : IOnlinePictureClient
 {
     private const string CloudFlareCookieValue = "fcfd523b2470336531e47baff3d2c2d6a0e2412a.1689426482.1";
     private const string CloudFlareCookieKey = "wschkid";
-    private const string CacheFolder = "Bloogum";
+    private const string CacheFolder = "ImageCache";
     private readonly IImageCache imageCache;
     private readonly IGuildwarsMemoryCache guildwarsMemoryCache;
     private readonly IHttpClient<OnlinePictureClient> httpClient;
@@ -47,7 +49,7 @@ public sealed class OnlinePictureClient : IOnlinePictureClient
     public async Task<(ImageSource? Source, string Credit)> GetImage(bool localized)
     {
         (var uri, var credit) = await this.GetImageUri(localized);
-        var localUri = Path.GetFullPath(Path.Combine(CacheFolder, uri)).Replace("http:\\", "");
+        var localUri = Path.GetFullPath(Path.Combine(CacheFolder, uri)).Replace("https:\\", "").Replace("http:\\", "");
         if (!File.Exists(localUri))
         {
             var imageStream = await this.GetRemoteImage(uri);
@@ -65,11 +67,54 @@ public sealed class OnlinePictureClient : IOnlinePictureClient
 
     private async Task<(string Uri, string CreditText)> GetImageUri(bool localized)
     {
+        if (this.themeOptions.Value.WintersdayMode)
+        {
+            return await this.GetWintersdayUri(localized);
+        }
+
         if (!localized)
         {
             return GetRandomScreenShot();
         }
 
+        return await this.GetLocalizedImageUri();
+    }
+
+    private async Task<(string Uri, string CreditText)> GetWintersdayUri(bool localized)
+    {
+        var validEntries = Location.Locations
+                .SelectMany(l => l.Entries)
+                .Where(e => Models.Event.Wintersday.ValidLocations!.Any(map => e.Map == map));
+        if (localized)
+        {
+            WorldData? worldInfo = default;
+            try
+            {
+                worldInfo = await this.guildwarsMemoryCache.ReadWorldData(CancellationToken.None);
+            }
+            catch (Exception ex) when (ex is TimeoutException or TaskCanceledException or HttpRequestException)
+            {
+                this.logger.LogInformation("Could not retrieve world data. Returning random screenshot");
+            }
+
+            if (worldInfo?.Map is Map map)
+            {
+                var localizedEntries = validEntries.Where(e => e.Map == map).ToList();
+                if (localizedEntries.Count > 0)
+                {
+                    var selectedEntry = localizedEntries[Random.Shared.Next(0, localizedEntries.Count)];
+                    return GetScreenshotName(selectedEntry, selectedEntry.StartIndex ?? 0 + Random.Shared.Next(0, selectedEntry.Count ?? 0));
+                }
+            }
+        }
+
+        var finalEntries = validEntries.ToList();
+        var selectedFinalEntry = finalEntries[Random.Shared.Next(0, finalEntries.Count)];
+        return GetScreenshotName(selectedFinalEntry, selectedFinalEntry.StartIndex ?? 0 + Random.Shared.Next(0, selectedFinalEntry.Count ?? 0));
+    }
+
+    private async Task<(string Uri, string CreditText)> GetLocalizedImageUri()
+    {
         WorldData? worldInfo = default;
         try
         {
@@ -85,8 +130,13 @@ public sealed class OnlinePictureClient : IOnlinePictureClient
             return GetRandomScreenShot();
         }
 
-        var validLocations = Location.Locations.Where(l => l.Region == worldInfo!.Region).ToList();
-        var validCategories = validLocations.SelectMany(l => l.Entries).Where(c => c.Map == worldInfo!.Map).ToList();
+        var validLocations = Location.Locations
+            .Where(l => l.Region == worldInfo!.Region)
+            .ToList();
+        var validCategories = validLocations
+            .SelectMany(l => l.Entries)
+            .Where(c => c.Map == worldInfo!.Map)
+            .ToList();
         if (validCategories.None())
         {
             if (validLocations.None())
@@ -98,6 +148,11 @@ public sealed class OnlinePictureClient : IOnlinePictureClient
             return GetRandomScreenShot(location);
         }
 
+        return this.GetImageUri(validLocations, validCategories);
+    }
+
+    private (string Uri, string CreditText) GetImageUri(List<Location> validLocations, List<Entry> validCategories)
+    {
         var selectedCategory = validCategories[Random.Shared.Next(0, validCategories.Count)];
         if (selectedCategory.Count == 0)
         {

@@ -5,7 +5,6 @@ using System;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 using System.Windows.Media;
 
 namespace Daybreak.Services.Screenshots;

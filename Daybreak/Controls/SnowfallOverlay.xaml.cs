@@ -27,6 +27,7 @@ public partial class SnowfallOverlay : UserControl
     private double flakeSize4;
     [GenerateDependencyProperty]
     private double flakeSize5;
+
     [GenerateDependencyProperty]
     private double time;
 
@@ -111,7 +112,7 @@ public partial class SnowfallOverlay : UserControl
         {
             var f = Frequencies[i];
             var a = Amplitudes[i];
-            returnValue += a * Math.Sin(f * source * Math.PI * 2);
+            returnValue += a * Math.Sin(f * source * Math.PI);
         }
 
         return returnValue / Divisor;
