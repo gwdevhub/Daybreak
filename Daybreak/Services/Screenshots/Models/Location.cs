@@ -1,4 +1,5 @@
 ﻿using Daybreak.Models.Guildwars;
+using LiveChartsCore.Geo;
 using System.Collections.Generic;
 
 namespace Daybreak.Services.Screenshots.Models;
@@ -591,6 +592,15 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 21
             },
+            new Entry
+            {
+                Map = Map.SanctumCay,
+                Url = "https://i.imgur.com/9jrmIAM.jpeg",
+                Credit = "https://imgur.com/a/PzYch4c",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            }
         });
     public static readonly Location MaguumaJungle = new(
         Region.MaguumaJungle,
@@ -740,6 +750,15 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 12
             },
+            new Entry
+            {
+                Map = Map.MamnoonLagoon,
+                Url = "https://i.imgur.com/d78EuZt.jpeg",
+                Credit = "https://imgur.com/a/PzYch4c",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            }
         });
     public static readonly Location CrystalDesert = new(
         Region.CrystalDesert,
@@ -1129,6 +1148,15 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 57
             },
+            new Entry
+            {
+                Map = Map.MineralSprings,
+                Url = "https://i.imgur.com/CFP4AmT.jpeg",
+                Credit = "https://imgur.com/a/PzYch4c",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            }
         });
     public static readonly Location RingOfFireIslandChain = new(
         Region.RingOfFireIslands,
@@ -1179,6 +1207,24 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 38
             },
+            new Entry
+            {
+                Map = Map.RingOfFire,
+                Url = "https://i.imgur.com/srejpIP.jpeg",
+                Credit = "https://imgur.com/a/PzYch4c",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            },
+            new Entry
+            {
+                Map = Map.RingOfFire,
+                Url = "https://i.imgur.com/70Oc160.jpeg",
+                Credit = "https://imgur.com/a/PzYch4c",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            }
         });
     public static readonly Location FarShiverpeaks = new(
         Region.FarShiverpeaks,
@@ -1351,6 +1397,15 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 60
             },
+            new Entry
+            {
+                Map = Map.GrothmarWardowns,
+                Url = "https://i.imgur.com/aECgPky.jpeg",
+                Credit = "https://imgur.com/a/PzYch4c",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            }
         });
     public static readonly Location TarnishedCoast = new(
         Region.TarnishedCoast,
@@ -3586,6 +3641,15 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 35
             },
+            new Entry
+            {
+                Map = Map.SunwardMarches,
+                Url = "https://i.imgur.com/8pSyjun.jpeg",
+                Credit = "https://imgur.com/a/PzYch4c",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            }
         });
     public static readonly Location Vabbi = new(
         Region.Vabbi,
@@ -4096,6 +4160,15 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 4
             },
+            new Entry
+            {
+                Map = Map.NightfallenJahai,
+                Url = "https://i.imgur.com/2tKgyv4.jpeg",
+                Credit = "https://imgur.com/a/PzYch4c",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            }
         });
     public static readonly Location BattleIsles = new(
         Region.TheBattleIsles,
