@@ -22,8 +22,8 @@ namespace Daybreak::Modules::MapModule {
         auto region = GW::Map::GetRegion();
         auto mapId = GW::Map::GetMapID();
         MapPayload mapPayload;
-        mapPayload.Campaign = mapInfo->campaign;
-        mapPayload.Continent = mapInfo->continent;
+        mapPayload.Campaign = static_cast<uint32_t>(mapInfo->campaign);
+        mapPayload.Continent = static_cast<uint32_t>(mapInfo->continent);
         mapPayload.Region = mapInfo->region;
         mapPayload.InstanceType = (uint32_t)instanceType;
         mapPayload.IsLoaded = isLoaded;
