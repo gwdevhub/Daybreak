@@ -76,7 +76,7 @@ internal sealed class ProcessInjector : IProcessInjector
             return false;
         }
 
-        var threadResult = NativeMethods.WaitForSingleObject(hThread, 5000u);
+        var threadResult = NativeMethods.WaitForSingleObject(hThread, 30000u);
         if (threadResult is 0x102 or 0xFFFFFFFF /* WAIT_FAILED */)
         {
             scopedLogger.LogError($"Exception occurred while waiting for the remote thread. Result is {threadResult}");
