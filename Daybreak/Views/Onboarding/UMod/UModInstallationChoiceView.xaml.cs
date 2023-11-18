@@ -1,5 +1,4 @@
 ﻿using Daybreak.Services.Navigation;
-using Daybreak.Services.UMod;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Windows.Controls;
@@ -10,16 +9,13 @@ namespace Daybreak.Views.Onboarding.UMod;
 /// </summary>
 public partial class UModInstallationChoiceView : UserControl
 {
-    private readonly IUModService uModService;
     private readonly IViewManager viewManager;
     private readonly ILogger<UModInstallationChoiceView> logger;
 
     public UModInstallationChoiceView(
-        IUModService uModService,
         IViewManager viewManager,
         ILogger<UModInstallationChoiceView> logger)
     {
-        this.uModService = uModService.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
 
@@ -28,14 +24,11 @@ public partial class UModInstallationChoiceView : UserControl
 
     private void OpaqueButtonNo_Clicked(object sender, System.EventArgs e)
     {
-        this.viewManager.ShowView<UModInstallingView>();
+        this.viewManager.ShowView<LauncherView>();
     }
 
     private void OpaqueButtonYes_Clicked(object sender, System.EventArgs e)
     {
-        if (this.uModService.LoadUModFromDisk())
-        {
-            this.viewManager.ShowView<UModMainView>();
-        }
+        this.viewManager.ShowView<UModInstallingView>();
     }
 }

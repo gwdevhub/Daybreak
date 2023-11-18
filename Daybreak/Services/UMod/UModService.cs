@@ -8,7 +8,6 @@ using Daybreak.Services.Injection;
 using Daybreak.Services.Notifications;
 using Daybreak.Services.Toolbox.Models;
 using Microsoft.Extensions.Logging;
-using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -52,8 +51,7 @@ public sealed class UModService : IUModService
         }
     }
 
-    public bool IsInstalled => File.Exists(this.uModOptions.Value.DllPath) &&
-        Path.GetFileName(this.uModOptions.Value.DllPath) == UModDll;
+    public bool IsInstalled => File.Exists(Path.GetFullPath(Path.Combine(UModDirectory, UModDll)));
 
     public UModService(
         IProcessInjector processInjector,
@@ -106,26 +104,6 @@ public sealed class UModService : IUModService
     }
 
     public Task OnGuildWarsStarted(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken) => Task.CompletedTask;
-
-    public bool LoadUModFromDisk()
-    {
-        var filePicker = new OpenFileDialog
-        {
-            Filter = "Dll Files (uMod.dll)|uMod.dll",
-            Multiselect = false,
-            RestoreDirectory = true,
-            Title = "Please select the uMod.dll"
-        };
-        if (filePicker.ShowDialog() is false)
-        {
-            return false;
-        }
-
-        var fileName = filePicker.FileName;
-        this.uModOptions.Value.DllPath = Path.GetFullPath(fileName);
-        this.uModOptions.UpdateOption();
-        return true;
-    }
 
     public async Task<bool> SetupUMod(UModInstallationStatus uModInstallationStatus)
     {
@@ -272,12 +250,6 @@ public sealed class UModService : IUModService
             return false;
         }
 
-        Directory.CreateDirectory(Path.GetFullPath(UModDirectory));
-        var uModPath = Path.GetFullPath(Path.Combine(UModDirectory, UModDll));
-        
-        var uModOptions = this.uModOptions.Value;
-        uModOptions.DllPath = uModPath;
-        this.uModOptions.UpdateOption();
         return true;
     }
 

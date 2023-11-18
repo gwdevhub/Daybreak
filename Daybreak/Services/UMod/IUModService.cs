@@ -8,8 +8,6 @@ using System.Threading.Tasks;
 namespace Daybreak.Services.UMod;
 public interface IUModService : IModService
 {
-    bool LoadUModFromDisk();
-
     Task<bool> SetupUMod(UModInstallationStatus uModInstallationStatus);
 
     Task CheckAndUpdateUMod(CancellationToken cancellationToken);

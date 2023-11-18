@@ -8,10 +8,6 @@ namespace Daybreak.Configuration.Options;
 [OptionsName(Name = "uMod")]
 public sealed class UModOptions
 {
-    [JsonProperty(nameof(DllPath))]
-    [OptionName(Name = "Dll Path", Description = "The path to the uMod dll")]
-    public string? DllPath { get; set; }
-
     [JsonProperty(nameof(Enabled))]
     [OptionName(Name = "Enabled", Description = "If true, Daybreak will also launch uMod when launching GuildWars")]
     public bool Enabled { get; set; }
