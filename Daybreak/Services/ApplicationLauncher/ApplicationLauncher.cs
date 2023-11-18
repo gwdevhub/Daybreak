@@ -188,8 +188,8 @@ public class ApplicationLauncher : IApplicationLauncher
             args.Add($"\"{character}\"");
         }
 
-        var mods = this.modsManager.GetMods().Where(m => m.IsEnabled).ToList();
-        var disabledmods = this.modsManager.GetMods().Where(m => !m.IsEnabled).ToList();
+        var mods = this.modsManager.GetMods().Where(m => m.IsEnabled && m.IsInstalled).ToList();
+        var disabledmods = this.modsManager.GetMods().Where(m => !m.IsEnabled && m.IsInstalled).ToList();
         foreach(var mod in mods)
         {
             args.AddRange(mod.GetCustomArguments());

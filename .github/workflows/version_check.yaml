@@ -28,7 +28,12 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    
+
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.x'
+
     - name: Get Latest Tag
       id: getLatestTag
       uses: WyriHaximus/github-action-get-previous-tag@v1

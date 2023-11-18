@@ -81,6 +81,7 @@ using Daybreak.Services.GWCA;
 using Daybreak.Services.DirectSong;
 using Daybreak.Views.Onboarding.DirectSong;
 using Daybreak.Services.SevenZip;
+using Daybreak.Services.ReShade.Notifications;
 
 namespace Daybreak.Configuration;
 
@@ -427,6 +428,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         notificationHandlerProducer.RegisterNotificationHandler<TradeMessageNotificationHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<FixSymbolicLinkNotificationHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<UpdateNotificationHandler>();
+        notificationHandlerProducer.RegisterNotificationHandler<ReShadeConfigChangedHandler>();
     }
 
     public override void RegisterMods(IModsManager modsManager)

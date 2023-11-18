@@ -1,6 +1,7 @@
 ﻿using Daybreak.Models.Metrics;
 using Daybreak.Models.Trade;
 using LiveChartsCore;
+using LiveChartsCore.Kernel;
 using LiveChartsCore.SkiaSharpView;
 using System;
 using System.Windows.Extensions.Services;
@@ -20,15 +21,13 @@ public sealed class LiveChartInitializer : ILiveChartInitializer, IApplicationLi
                 .AddDefaultMappers()
                 .AddDarkTheme()
                 .AddLightTheme()
-                .HasMap<Metric>((metric, point) =>
+                .HasMap<Metric>((metric, index) =>
                 {
-                    point.SecondaryValue = metric.Timestamp.Ticks;
-                    point.PrimaryValue = Convert.ToDouble(metric.Measurement);
+                    return new Coordinate(Convert.ToDouble(metric.Measurement), metric.Timestamp.Ticks);
                 })
                 .HasMap<TraderQuote>((quote, point) =>
                 {
-                    point.SecondaryValue = quote.Timestamp?.Ticks ?? 0;
-                    point.PrimaryValue = ((double)quote.Price) / 20d;
+                    return new Coordinate(((double)quote.Price) / 20d, quote.Timestamp?.Ticks ?? 0);
                 }));
     }
 }

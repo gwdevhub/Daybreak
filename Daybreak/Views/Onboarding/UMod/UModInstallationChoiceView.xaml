@@ -12,7 +12,7 @@
         <Border BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
                 BorderThickness="1"/>
         <StackPanel VerticalAlignment="Center">
-            <TextBlock Text="Do you already have uMod installed on your PC?" Margin="10, 0, 10, 0" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+            <TextBlock Text="Do you want to install uMod?" Margin="10, 0, 10, 0" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                        TextWrapping="Wrap" HorizontalAlignment="Center" FontSize="16"></TextBlock>
             <Grid MaxWidth="600"
                   Margin="10">

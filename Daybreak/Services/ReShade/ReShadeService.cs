@@ -5,6 +5,7 @@ using Daybreak.Models.ReShade;
 using Daybreak.Services.Downloads;
 using Daybreak.Services.Injection;
 using Daybreak.Services.Notifications;
+using Daybreak.Services.ReShade.Notifications;
 using Daybreak.Services.ReShade.Utils;
 using Daybreak.Services.Scanner;
 using HtmlAgilityPack;
@@ -16,12 +17,10 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
-using System.Diagnostics;
 using System.Extensions;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Extensions.Services;
@@ -44,9 +43,9 @@ public sealed class ReShadeService : IReShadeService, IApplicationLifetimeServic
     private static readonly string ReShadePresetPath = Path.Combine(Path.GetFullPath(ReShadePath), ReShadePreset);
     private static readonly string ReShadeLogPath = Path.Combine(Path.GetFullPath(ReShadePath), ReShadeLog);
     private static readonly string SourcePresetsFolderPath = Path.Combine(Path.GetFullPath(ReShadePath), PresetsFolder);
-    private static readonly string[] TextureExtensions = new string[] { ".png", ".jpg", ".jpeg" };
-    private static readonly string[] FxExtensions = new string[] { ".fx", };
-    private static readonly string[] FxHeaderExtensions = new string[] { ".fxh" };
+    private static readonly string[] TextureExtensions = [".png", ".jpg", ".jpeg"];
+    private static readonly string[] FxExtensions = [".fx",];
+    private static readonly string[] FxHeaderExtensions = [".fxh"];
 
     private readonly IGuildwarsMemoryCache guildwarsMemoryCache;
     private readonly INotificationService notificationService;
@@ -140,7 +139,14 @@ public sealed class ReShadeService : IReShadeService, IApplicationLifetimeServic
         }
     }
 
-    public Task OnGuildWarsStarted(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task OnGuildWarsStarted(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
+    {
+        var destinationDirectory = Path.GetFullPath(new FileInfo(applicationLauncherContext.ExecutablePath).DirectoryName!);
+        var destinationPreset = Path.Combine(destinationDirectory, ReShadePreset);
+        var destinationIni = Path.Combine(destinationDirectory, ConfigIni);
+        this.PeriodicallyCheckPresetChanges(applicationLauncherContext, destinationPreset, destinationIni);
+        return Task.CompletedTask;
+    }
 
     public Task OnGuildWarsStarting(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
     {
@@ -323,6 +329,94 @@ public sealed class ReShadeService : IReShadeService, IApplicationLifetimeServic
             "ReShade preset saved",
             "Saved changes to ReShade preset");
         return true;
+    }
+
+    public async Task<bool> UpdateIniFromPath(string pathToIni, CancellationToken cancellationToken)
+    {
+        pathToIni = Path.GetFullPath(pathToIni);
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.UpdateIniFromPath), pathToIni);
+        if (!File.Exists(pathToIni))
+        {
+            scopedLogger.LogError("File doesn't exist");
+            return false;
+        }
+
+        var config = await File.ReadAllTextAsync(pathToIni, cancellationToken);
+        if (pathToIni.Contains(ConfigIni))
+        {
+            await this.SaveConfig(config, cancellationToken);
+        }
+
+        if (pathToIni.Contains(ReShadePreset))
+        {
+            await this.SavePreset(config, cancellationToken);
+        }
+
+        return true;
+    }
+
+    private async void PeriodicallyCheckPresetChanges(ApplicationLauncherContext applicationLauncherContext, string presetsFile, string configFile)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.PeriodicallyCheckPresetChanges), presetsFile);
+        if (!File.Exists(presetsFile))
+        {
+            scopedLogger.LogError("File does not exist");
+            return;
+        }
+
+        var presetsCache = File.ReadAllText(presetsFile);
+        var configCache = File.ReadAllText(configFile);
+        try
+        {
+            while (true)
+            {
+                if (applicationLauncherContext.Process.HasExited)
+                {
+                    scopedLogger.LogInformation("Process has exited");
+                    return;
+                }
+
+                await Task.Delay(1000);
+                if (!File.Exists(presetsFile))
+                {
+                    scopedLogger.LogError("Preset file has been deleted");
+                    return;
+                }
+
+                if (!File.Exists(configFile))
+                {
+                    scopedLogger.LogError("Config file has been deleted");
+                    return;
+                }
+
+                var currentPresets = File.ReadAllText(presetsFile);
+                if (currentPresets != presetsCache)
+                {
+                    presetsCache = currentPresets;
+                    this.notificationService.NotifyInformation<ReShadeConfigChangedHandler>(
+                        title: "ReShade presets changed",
+                        description: $"ReShade presets have been changed by {applicationLauncherContext.ExecutablePath}. Click on this notification to save the changes in Daybreak",
+                        metaData: presetsFile);
+                    continue;
+                }
+
+                var currentConfig = File.ReadAllText(configFile);
+                if (currentConfig != configCache)
+                {
+                    configCache = currentConfig;
+                    this.notificationService.NotifyInformation<ReShadeConfigChangedHandler>(
+                        title: "ReShade config changed",
+                        description: $"ReShade config has been changed by {applicationLauncherContext.ExecutablePath}. Click on this notification to save the changes in Daybreak",
+                        metaData: configFile);
+                    continue;
+                }
+            }
+        }
+        catch(Exception e)
+        {
+            scopedLogger.LogError(e, "Encountered exception. Cancelling preset monitoring");
+            return;
+        }
     }
 
     private async Task InstallPackageInternal(
