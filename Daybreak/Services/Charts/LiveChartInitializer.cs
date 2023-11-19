@@ -23,11 +23,11 @@ public sealed class LiveChartInitializer : ILiveChartInitializer, IApplicationLi
                 .AddLightTheme()
                 .HasMap<Metric>((metric, index) =>
                 {
-                    return new Coordinate(Convert.ToDouble(metric.Measurement), metric.Timestamp.Ticks);
+                    return new Coordinate(metric.Timestamp.Ticks, Convert.ToDouble(metric.Measurement));
                 })
                 .HasMap<TraderQuote>((quote, point) =>
                 {
-                    return new Coordinate(((double)quote.Price) / 20d, quote.Timestamp?.Ticks ?? 0);
+                    return new Coordinate(quote.Timestamp?.Ticks ?? 0, ((double)quote.Price) / 20d);
                 }));
     }
 }
