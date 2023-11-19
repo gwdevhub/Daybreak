@@ -18,7 +18,6 @@ public sealed class GuildwarsCopyService : IGuildwarsCopyService
 
     private static readonly string[] FilesToCopy =
     {
-        "d3d9.dll",
         "Gw.dat",
         "Gw.exe",
         "GwLoginClient.dll"
@@ -117,7 +116,7 @@ public sealed class GuildwarsCopyService : IGuildwarsCopyService
             UseDescriptionForTitle = true
         };
 
-        var result = folderPicker.ShowDialog(new Win32Window(Launcher.Instance.MainWindow));
+        var result = folderPicker.ShowDialog();
         if (result is DialogResult.Abort or DialogResult.Cancel or DialogResult.No)
         {
             return false;

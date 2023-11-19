@@ -26,6 +26,7 @@
                                      FontSize="16" Margin="10" Width="50" Height="25" Clicked="HighlightButton_Clicked" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                      HighlightColor="{StaticResource MahApps.Brushes.Accent}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                                      BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                     Visibility="{Binding ElementName=_this, Path=ContinueButtonEnabled, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
                                      BorderThickness="1"
                                      ToolTip="Continue"/>
         </StackPanel>
