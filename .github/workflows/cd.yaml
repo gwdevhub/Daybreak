@@ -107,16 +107,40 @@ jobs:
         .\Scripts\BuildRelease.ps1
       shell: pwsh
 
-    - name: Publish release
-      uses: Xotl/cool-github-releases@v1.1.8
-      with:
-        mode: update
-        tag_name: v${{ env.Version }}
-        release_name: Daybreak v${{ env.Version }}
-        assets: .\Publish\*
-        github_token: ${{ env.GITHUB_TOKEN }}
-        replace_assets: true
-        body_mrkdwn: ${{ env.Changelog }}
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ env.Version }}
+        release_name: Daybreak v${{ env.Version }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Assets
+      run: |
+        $rootPath = "Publish"
+        $files = Get-ChildItem $rootPath -File -Recurse
+        foreach ($file in $files) {
+            $relativePath = $file.FullName.Replace((Get-Location).Path + "\", "")
+            Write-Host "Uploading $relativePath"
+            gh release upload ${{ github.ref }} "$($file.FullName)" --clobber --name "$relativePath"
+        }
+      shell: powershell
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    # - name: Publish release
+    #   uses: Xotl/cool-github-releases@v1.1.8
+    #   with:
+    #     mode: update
+    #     tag_name: v${{ env.Version }}
+    #     release_name: Daybreak v${{ env.Version }}
+    #     assets: .\Publish\*
+    #     github_token: ${{ env.GITHUB_TOKEN }}
+    #     replace_assets: true
+    #     body_mrkdwn: ${{ env.Changelog }}
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
