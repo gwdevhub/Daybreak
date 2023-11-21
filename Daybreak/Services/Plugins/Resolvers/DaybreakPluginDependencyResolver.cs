@@ -2,7 +2,7 @@
 using System.Reflection;
 
 namespace Daybreak.Services.Plugins.Resolvers;
-public sealed class DaybreakPluginDependencyResolver : IDependencyResolver
+internal sealed class DaybreakPluginDependencyResolver : IDependencyResolver
 {
     public bool TryResolveDependency(Assembly? requestingAssembly, string dependencyName, out string? path)
     {

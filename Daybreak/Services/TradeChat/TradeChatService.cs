@@ -1,5 +1,4 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Models.Guildwars;
 using Daybreak.Models.Trade;
 using Daybreak.Services.TradeChat.Models;
 using Microsoft.Extensions.Logging;
@@ -25,7 +24,7 @@ namespace Daybreak.Services.TradeChat;
 /// Client implementation for https://github.com/3vcloud/kamadan-trade-chat
 /// </summary>
 /// <typeparam name="TChannelOptions"></typeparam>
-public sealed class TradeChatService<TChannelOptions> : ITradeChatService<TChannelOptions>, IDisposable
+internal sealed class TradeChatService<TChannelOptions> : ITradeChatService<TChannelOptions>, IDisposable
     where TChannelOptions : class, ITradeChatOptions, new()
 {
     private const long MinEpochTime = 1420070400;

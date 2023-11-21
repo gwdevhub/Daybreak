@@ -10,7 +10,7 @@ using System.IO;
 using System.Threading.Tasks;
 
 namespace Daybreak.Services.Guildwars;
-public sealed class GuildwarsInstaller : IGuildwarsInstaller
+internal sealed class GuildwarsInstaller : IGuildwarsInstaller
 {
     private const string GuildwarsDownloadUri = "https://cloudfront.guildwars2.com/client/GwSetup.exe";
     private const string InstallationFileName = "GwSetup.exe";

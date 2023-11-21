@@ -1,5 +1,4 @@
 ﻿using Daybreak.Configuration.Options;
-using Microsoft.Extensions.Options;
 using NAudio.Wave;
 using System.Configuration;
 using System.Core.Extensions;
@@ -8,7 +7,7 @@ using System.Reflection;
 
 namespace Daybreak.Services.Sounds;
 
-public sealed class SoundService : ISoundService
+internal sealed class SoundService : ISoundService
 {
     private const string CloseNotification = "NotifyClose";
     private const string ErrorNotification = "NotifyError";

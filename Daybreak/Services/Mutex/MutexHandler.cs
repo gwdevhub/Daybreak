@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace Daybreak.Services.Mutex;
 
-public sealed class MutexHandler : IMutexHandler
+internal sealed class MutexHandler : IMutexHandler
 {
     public void CloseMutex(Process process, string mutexName)
     {

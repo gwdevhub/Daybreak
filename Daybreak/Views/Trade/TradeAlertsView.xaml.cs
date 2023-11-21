@@ -20,7 +20,7 @@ public partial class TradeAlertsView : UserControl
     private readonly IViewManager viewManager;
     private readonly ITradeAlertingService tradeAlertingService;
 
-    public ObservableCollection<TradeAlert> TradeAlerts { get; set; } = new();
+    public ObservableCollection<TradeAlert> TradeAlerts { get; set; } = [];
 
     public TradeAlertsView(
         IViewManager viewManager,

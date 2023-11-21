@@ -21,7 +21,7 @@ using System.Windows.Media.Imaging;
 
 namespace Daybreak.Services.Images;
 
-public sealed class ImageCache : IImageCache
+internal sealed class ImageCache : IImageCache
 {
     private const string LatencyMetricName = "Image retrieval latency";
     private const string LatencyMetricDescription = "Number of milliseconds spent while retrieving images";

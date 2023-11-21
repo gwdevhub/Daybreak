@@ -19,7 +19,7 @@ public partial class ReShadeStockEffectsSelectorView : UserControl
     [GenerateDependencyProperty]
     private bool loading;
 
-    public ObservableCollection<ShaderPackage> Packages { get; set; } = new();
+    public ObservableCollection<ShaderPackage> Packages { get; set; } = [];
 
     public ReShadeStockEffectsSelectorView(
         IReShadeService reShadeService)

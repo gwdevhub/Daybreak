@@ -22,7 +22,7 @@ public partial class NotificationsView : UserControl
 
     private CancellationTokenSource? cancellationTokenSource;
 
-    public ObservableCollection<Notification> Notifications { get; } = new ObservableCollection<Notification>();
+    public ObservableCollection<Notification> Notifications { get; } = [];
 
     public NotificationsView(
         INotificationProducer notificationProducer,

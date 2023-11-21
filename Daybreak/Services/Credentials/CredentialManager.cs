@@ -11,7 +11,7 @@ using System.Text;
 
 namespace Daybreak.Services.Credentials;
 
-public sealed class CredentialManager : ICredentialManager
+internal sealed class CredentialManager : ICredentialManager
 {
     private static readonly byte[] Entropy = Convert.FromBase64String("uXB8Vmz5MmuDar36v8SRGzpALi0Wv5Gx");
     private readonly ILogger<CredentialManager> logger;
@@ -44,7 +44,7 @@ public sealed class CredentialManager : ICredentialManager
         if (config.ProtectedLoginCredentials is null || config.ProtectedLoginCredentials.Count == 0)
         {
             this.logger.LogInformation("No credentials found");
-            return new List<LoginCredentials>();
+            return [];
         }
 
         return config

@@ -26,7 +26,7 @@ using System.Threading.Tasks;
 using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.ReShade;
-public sealed class ReShadeService : IReShadeService, IApplicationLifetimeService
+internal sealed class ReShadeService : IReShadeService, IApplicationLifetimeService
 {
     private const string PackagesIniUrl = "https://raw.githubusercontent.com/crosire/reshade-shaders/list/EffectPackages.ini";
     private const string ReShadeHomepageUrl = "https://reshade.me";

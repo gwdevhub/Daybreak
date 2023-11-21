@@ -1,5 +1,6 @@
 ﻿using Daybreak.Models.Progress;
 using Daybreak.Models.UMod;
+using Daybreak.Models.Versioning;
 using Daybreak.Services.Mods;
 using System.Collections.Generic;
 using System.Threading;
@@ -8,6 +9,8 @@ using System.Threading.Tasks;
 namespace Daybreak.Services.UMod;
 public interface IUModService : IModService
 {
+    Version Version { get; }
+
     Task<bool> SetupUMod(UModInstallationStatus uModInstallationStatus);
 
     Task CheckAndUpdateUMod(CancellationToken cancellationToken);

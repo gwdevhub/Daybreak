@@ -3,7 +3,7 @@
 namespace Daybreak.Configuration.Options;
 
 [OptionsName(Name = "Memory Cache")]
-public sealed class ImageCacheOptions
+internal sealed class ImageCacheOptions
 {
     [OptionName(Name = "Image Cache Limit", Description = "The maximum number of MBs that will be used to cache images in memory")]
     [OptionRange<double>(MinValue = 0d, MaxValue = 1000d)]

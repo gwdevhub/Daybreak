@@ -5,7 +5,7 @@ namespace Daybreak.Configuration.Options;
 
 [OptionsName(Name = "Build Synchronization")]
 [OptionsIgnore]
-public sealed class BuildSynchronizationOptions
+internal sealed class BuildSynchronizationOptions
 {
     [JsonProperty(nameof(ProtectedGraphAccessToken))]
     public string? ProtectedGraphAccessToken { get; set; }

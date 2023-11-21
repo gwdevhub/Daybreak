@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Daybreak.Services.Screens;
 
-public sealed class GuildwarsScreenPlacer : IGuildwarsScreenPlacer
+internal sealed class GuildwarsScreenPlacer : IGuildwarsScreenPlacer
 {
     private const int MaxTries = 10;
 

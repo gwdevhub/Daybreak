@@ -19,7 +19,7 @@ public partial class AccountsView : UserControl
     private readonly IViewManager viewManager;
     private readonly ICredentialManager credentialManager;
 
-    public ObservableCollection<LoginCredentials> Accounts { get; } = new();
+    public ObservableCollection<LoginCredentials> Accounts { get; } = [];
 
     public AccountsView(
         IViewManager viewManager,

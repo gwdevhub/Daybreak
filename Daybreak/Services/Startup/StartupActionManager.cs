@@ -10,7 +10,7 @@ using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.Startup;
 
-public sealed class StartupActionManager : IStartupActionProducer, IApplicationLifetimeService
+internal sealed class StartupActionManager : IStartupActionProducer, IApplicationLifetimeService
 {
     private readonly IServiceManager serviceManager;
     private readonly ILogger<StartupActionManager> logger;

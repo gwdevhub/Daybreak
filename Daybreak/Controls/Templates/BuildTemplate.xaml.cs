@@ -56,11 +56,11 @@ public partial class BuildTemplate : UserControl
     private int attributePoints;
 
     [GenerateDependencyProperty]
-    private List<Skill> availableSkills = new();
+    private List<Skill> availableSkills = [];
 
     public event EventHandler? BuildChanged;
-    public ObservableCollection<Profession> PrimaryProfessions { get; } = new();
-    public ObservableCollection<Profession> SecondaryProfessions { get; } = new();
+    public ObservableCollection<Profession> PrimaryProfessions { get; } = [];
+    public ObservableCollection<Profession> SecondaryProfessions { get; } = [];
 
     public BuildTemplate()
         : this(Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IBuildTemplateManager>(),

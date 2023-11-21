@@ -7,31 +7,31 @@ using System.Windows.Media;
 
 namespace Daybreak.Services.TradeChat;
 
-public sealed class WordHighlightingService : IWordHighlightingService
+internal sealed class WordHighlightingService : IWordHighlightingService
 {
     private static readonly Regex WordsSplitRegex = new("[\\s+\\|+]", RegexOptions.Compiled);
-    private static readonly string[] BuyWords = new[]
-    {
+    private static readonly string[] BuyWords =
+    [
         "wtb",
         "buy",
         "buying",
         "buyin",
-    };
-    private static readonly string[] SellWords = new[]
-    {
+    ];
+    private static readonly string[] SellWords =
+    [
         "wts",
         "sell",
         "selling",
         "sellin"
-    };
-    private static readonly string[] TradeWords = new[]
-    {
+    ];
+    private static readonly string[] TradeWords =
+    [
         "wtt",
         "trade",
         "trading",
         "lf",
         "tradin"
-    };
+    ];
 
     public IEnumerable<ColoredTextElement> ParseString(string s, SolidColorBrush foreground, SolidColorBrush buy, SolidColorBrush sell, SolidColorBrush trade)
     {

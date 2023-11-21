@@ -24,8 +24,8 @@ public static class ColorPalette
     public readonly static Color BlueGrey = Color.FromArgb(255, 96, 125, 139);
     public readonly static Color Grey = Color.FromArgb(255, 158, 158, 158);
 
-    public readonly static List<Color> Colors = new()
-    {
+    public readonly static List<Color> Colors =
+    [
         Pink,
         Amber,
         Purple,
@@ -45,5 +45,5 @@ public static class ColorPalette
         Gold,
         BlueGrey,
         Grey
-    };
+    ];
 }

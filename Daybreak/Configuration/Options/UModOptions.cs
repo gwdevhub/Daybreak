@@ -18,5 +18,5 @@ public sealed class UModOptions
 
     [JsonProperty(nameof(Mods))]
     [OptionIgnore]
-    public List<UModEntry> Mods { get; set; } = new();
+    public List<UModEntry> Mods { get; set; } = [];
 }

@@ -11,11 +11,11 @@ using System.Logging;
 
 namespace Daybreak.Services.Logging;
 
-public sealed class JsonLogsManager : ILogsManager
+internal sealed class JsonLogsManager : ILogsManager
 {
     private const int MemoryCacheMaxSize = 5000;
 
-    private readonly List<Models.Log> memoryCache = new();
+    private readonly List<Models.Log> memoryCache = [];
     private readonly ILiteCollection<Models.Log> collection;
     private readonly ILiveOptions<LauncherOptions> liveOptions;
 

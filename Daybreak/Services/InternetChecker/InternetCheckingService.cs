@@ -1,12 +1,10 @@
 ﻿using Daybreak.Models;
 using Daybreak.Services.Metrics;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Extensions;
-using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Threading;

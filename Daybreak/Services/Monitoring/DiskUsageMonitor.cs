@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace Daybreak.Services.Monitoring;
 
-public sealed class DiskUsageMonitor : IApplicationLifetimeService
+internal sealed class DiskUsageMonitor : IApplicationLifetimeService
 {
     private const string WriteDiskUsage = "Write Disk Usage";
     private const string WriteDiskUsageUnit = "MBs/s";

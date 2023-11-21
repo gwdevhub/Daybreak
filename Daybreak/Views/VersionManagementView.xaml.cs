@@ -28,7 +28,7 @@ public partial class VersionManagementView : UserControl
     [GenerateDependencyProperty]
     private bool loading;
 
-    public ObservableCollection<Version> Versions { get; } = new();
+    public ObservableCollection<Version> Versions { get; } = [];
 
     public VersionManagementView(
         IApplicationUpdater applicationUpdater,

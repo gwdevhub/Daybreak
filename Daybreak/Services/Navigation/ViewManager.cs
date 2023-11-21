@@ -6,7 +6,7 @@ using System.Windows.Controls;
 
 namespace Daybreak.Services.Navigation;
 
-public sealed class ViewManager : IViewManager
+internal sealed class ViewManager : IViewManager
 {
     private readonly IServiceManager serviceManager;
     private Panel? container;

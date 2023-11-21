@@ -42,7 +42,7 @@ public partial class GuildwarsMinimap : UserControl
 
     private readonly Histogram<double> drawingLatency;
     private readonly DispatcherTimer dispatcherTimer = new(DispatcherPriority.Render);
-    private readonly List<Position> mainPlayerPositionHistory = new();
+    private readonly List<Position> mainPlayerPositionHistory = [];
     private readonly IPathfinder pathfinder;
     private readonly IDrawingService drawingService;
     private readonly IThemeManager themeManager;
@@ -357,8 +357,8 @@ public partial class GuildwarsMinimap : UserControl
         this.drawingService.DrawEngagementArea(bitmap, this.GameData);
         this.drawingService.DrawMainPlayerPositionHistory(bitmap, this.mainPlayerPositionHistory);
         this.drawingService.DrawPaths(bitmap, this.pathfindingCache);
-        this.drawingService.DrawQuestObjectives(bitmap, this.GameData.MainPlayer?.QuestLog ?? new List<QuestMetadata>());
-        this.drawingService.DrawMapIcons(bitmap, this.GameData.MapIcons ?? new List<MapIcon>());
+        this.drawingService.DrawQuestObjectives(bitmap, this.GameData.MainPlayer?.QuestLog ?? []);
+        this.drawingService.DrawMapIcons(bitmap, this.GameData.MapIcons ?? []);
         this.drawingService.DrawEntities(bitmap, this.GameData, this.TargetEntityId);
         bitmap.Unlock();
         this.drawingLatency.Record(sw.ElapsedMilliseconds);

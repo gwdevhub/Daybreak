@@ -31,7 +31,7 @@ public partial class ReShadeMainView : UserControl
     [GenerateDependencyProperty]
     private bool loading;
 
-    public ObservableCollection<UModEntry> Mods { get; } = new();
+    public ObservableCollection<UModEntry> Mods { get; } = [];
 
     public ReShadeMainView(
         IViewManager viewManager,

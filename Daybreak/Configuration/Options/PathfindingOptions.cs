@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace Daybreak.Configuration.Options;
 
 [OptionsName(Name = "Pathfinding")]
-public sealed class PathfindingOptions
+internal sealed class PathfindingOptions
 {
     [JsonProperty(nameof(EnablePathfinding))]
     [OptionName(Name = "Enable Pathfinding", Description = "If true, the pathfinder will attempt to produce paths from the player position to objectives")]

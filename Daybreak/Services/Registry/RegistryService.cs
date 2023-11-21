@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace Daybreak.Services.Registry;
 
-public sealed class RegistryService : IRegistryService
+internal sealed class RegistryService : IRegistryService
 {
     private const string RegistryKey = "Daybreak";
 

@@ -5,7 +5,6 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
-using System.Collections.Generic;
 
 namespace Daybreak.Tests.Services;
 
@@ -54,8 +53,8 @@ public class BuildTemplateManagerTests
         {
             Primary = Profession.Assassin,
             Secondary = Profession.None,
-            Attributes = new List<AttributeEntry>
-            {
+            Attributes =
+            [
                 new AttributeEntry
                 {
                     Attribute = Attribute.DaggerMastery,
@@ -76,9 +75,9 @@ public class BuildTemplateManagerTests
                     Attribute = Attribute.CriticalStrikes,
                     Points = 11
                 }
-            },
-            Skills = new List<Skill>
-            {
+            ],
+            Skills =
+            [
                 Skill.UnsuspectingStrike,
                 Skill.WildStrike,
                 Skill.CriticalStrike,
@@ -87,7 +86,7 @@ public class BuildTemplateManagerTests
                 Skill.CriticalEye,
                 Skill.CriticalAgility,
                 Skill.CriticalDefenses
-            }
+            ]
         };
 
         var encoded = this.buildTemplateManager.EncodeTemplate(build);

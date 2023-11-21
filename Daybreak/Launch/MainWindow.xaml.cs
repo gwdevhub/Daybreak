@@ -153,69 +153,78 @@ public partial class MainWindow : MetroWindow
 
     private void OpenDropdownMenu()
     {
-        if (this.IsShowingDropdown)
+        this.Dispatcher.Invoke(() =>
         {
-            return;
-        }
+            if (this.IsShowingDropdown)
+            {
+                return;
+            }
 
-        this.ToggleDropdownMenu();
+            this.ToggleDropdownMenu();
+        });
     }
 
     private void CloseDropdownMenu()
     {
-        if (!this.IsShowingDropdown)
+        this.Dispatcher.Invoke(() =>
         {
-            return;
-        }
+            if (!this.IsShowingDropdown)
+            {
+                return;
+            }
 
-        this.ToggleDropdownMenu();
+            this.ToggleDropdownMenu();
+        });
     }
 
     private void ToggleDropdownMenu()
     {
-        var button = this.IsShowingDropdown ?
+        this.Dispatcher.Invoke(() =>
+        {
+            var button = this.IsShowingDropdown ?
             this.ClosingSettingsButton :
             this.OpeningSettingsButton;
-        button.IsEnabled = false;
-        var widthAnimation = new DoubleAnimation
-        {
-            From = this.IsShowingDropdown ?
-                this.MenuContainer.ActualWidth :
-                0,
-            To = this.IsShowingDropdown ?
-                0 :
-                300,
-            Duration = new Duration(TimeSpan.FromMilliseconds(200)),
-            DecelerationRatio = 0.7
-        };
+            button.IsEnabled = false;
+            var widthAnimation = new DoubleAnimation
+            {
+                From = this.IsShowingDropdown ?
+                    this.MenuContainer.ActualWidth :
+                    0,
+                To = this.IsShowingDropdown ?
+                    0 :
+                    300,
+                Duration = new Duration(TimeSpan.FromMilliseconds(200)),
+                DecelerationRatio = 0.7
+            };
 
-        var opacityAnimation = new DoubleAnimation
-        {
-            From = this.IsShowingDropdown ?
-                this.MenuContainer.Opacity :
-                0,
-            To = this.IsShowingDropdown ?
-                0 :
-                1,
-            Duration = new Duration(TimeSpan.FromMilliseconds(100)),
-            DecelerationRatio = 0.7
-        };
+            var opacityAnimation = new DoubleAnimation
+            {
+                From = this.IsShowingDropdown ?
+                    this.MenuContainer.Opacity :
+                    0,
+                To = this.IsShowingDropdown ?
+                    0 :
+                    1,
+                Duration = new Duration(TimeSpan.FromMilliseconds(100)),
+                DecelerationRatio = 0.7
+            };
 
-        var storyBoard = new Storyboard();
-        storyBoard.Children.Add(widthAnimation);
-        Storyboard.SetTarget(widthAnimation, this.MenuContainer);
-        Storyboard.SetTargetProperty(widthAnimation, new PropertyPath(Grid.WidthProperty));
-        storyBoard.Children.Add(opacityAnimation);
-        Storyboard.SetTarget(opacityAnimation, this.MenuContainer);
-        Storyboard.SetTargetProperty(opacityAnimation, new PropertyPath(Grid.OpacityProperty));
+            var storyBoard = new Storyboard();
+            storyBoard.Children.Add(widthAnimation);
+            Storyboard.SetTarget(widthAnimation, this.MenuContainer);
+            Storyboard.SetTargetProperty(widthAnimation, new PropertyPath(Grid.WidthProperty));
+            storyBoard.Children.Add(opacityAnimation);
+            Storyboard.SetTarget(opacityAnimation, this.MenuContainer);
+            Storyboard.SetTargetProperty(opacityAnimation, new PropertyPath(Grid.OpacityProperty));
 
-        storyBoard.Completed += (_, _) =>
-        {
-            button.IsEnabled = true;
-            this.IsShowingDropdown = !this.IsShowingDropdown;
-        };
+            storyBoard.Completed += (_, _) =>
+            {
+                button.IsEnabled = true;
+                this.IsShowingDropdown = !this.IsShowingDropdown;
+            };
 
-        storyBoard.Begin();
+            storyBoard.Begin();
+        });
     }
 
     private void CreditTextBox_MouseLeftButtonDown(object sender, EventArgs e)

@@ -31,7 +31,7 @@ public partial class MetricsView : UserControl
     private readonly SolidColorPaint accentPaint;
     private readonly IMetricsService metricsService;
 
-    public ObservableCollection<MetricSetViewModel> Metrics { get; } = new ObservableCollection<MetricSetViewModel>();
+    public ObservableCollection<MetricSetViewModel> Metrics { get; } = [];
     
     public MetricsView(
         IMetricsService metricsService)

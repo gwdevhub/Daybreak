@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace Daybreak.Configuration.Options;
 
 [OptionsName(Name = "ReShade")]
-public sealed class ReShadeOptions
+internal sealed class ReShadeOptions
 {
     [JsonProperty(nameof(Enabled))]
     [OptionName(Name = "Enabled", Description = "If true, Daybreak will attempt to inject ReShade into the starting Guild Wars executable")]

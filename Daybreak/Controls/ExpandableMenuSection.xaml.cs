@@ -20,7 +20,7 @@ public partial class ExpandableMenuSection : UserControl
     [GenerateDependencyProperty(InitialValue = false)]
     private bool expanded = false;
 
-    public ObservableCollection<FrameworkElement> Children { get; } = new ObservableCollection<FrameworkElement>();
+    public ObservableCollection<FrameworkElement> Children { get; } = [];
 
     public ExpandableMenuSection()
     {

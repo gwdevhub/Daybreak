@@ -8,9 +8,7 @@ using Daybreak.Services.Notifications;
 using Daybreak.Services.Privilege;
 using Daybreak.Utils;
 using Daybreak.Views;
-using HarfBuzzSharp;
 using Microsoft.Extensions.Logging;
-using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,9 +18,7 @@ using System.Diagnostics;
 using System.Extensions;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Security;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,7 +27,7 @@ using static Daybreak.Utils.NativeMethods;
 
 namespace Daybreak.Services.ApplicationLauncher;
 
-public class ApplicationLauncher : IApplicationLauncher
+internal sealed class ApplicationLauncher : IApplicationLauncher
 {
     private const int MaxRetries = 10;
     private const string ProcessName = "gw";

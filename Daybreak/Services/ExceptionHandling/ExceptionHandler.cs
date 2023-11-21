@@ -13,7 +13,7 @@ using System.Windows;
 
 namespace Daybreak.Services.ExceptionHandling;
 
-public sealed class ExceptionHandler : IExceptionHandler
+internal sealed class ExceptionHandler : IExceptionHandler
 {
     private readonly INotificationService notificationService;
     private readonly ILogger<ExceptionHandler> logger;

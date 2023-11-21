@@ -14,7 +14,7 @@ public abstract class SvgDrawingModuleBase : DrawingModuleBase
 {
     private const int SvgCacheSize = 100;
 
-    private readonly Dictionary<ColorCombination, WriteableBitmap> bitmapCache = new();
+    private readonly Dictionary<ColorCombination, WriteableBitmap> bitmapCache = [];
 
     protected override bool HasMinimumSize => true;
 

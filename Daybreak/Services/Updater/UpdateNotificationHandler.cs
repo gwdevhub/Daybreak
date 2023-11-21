@@ -6,7 +6,7 @@ using Daybreak.Views;
 using System.Core.Extensions;
 
 namespace Daybreak.Services.Updater;
-public sealed class UpdateNotificationHandler : INotificationHandler
+internal sealed class UpdateNotificationHandler : INotificationHandler
 {
     private readonly IViewManager viewManager;
 

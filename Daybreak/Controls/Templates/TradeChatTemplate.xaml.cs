@@ -49,7 +49,7 @@ public partial class TradeChatTemplate : UserControl
     [GenerateDependencyProperty]
     private TraderMessage selectedTraderMessage = default!;
 
-    public ObservableCollection<TraderMessageViewWrapper> TraderMessages { get; } = new();
+    public ObservableCollection<TraderMessageViewWrapper> TraderMessages { get; } = [];
 
     public TradeChatTemplate()
         : this(Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IWordHighlightingService>())

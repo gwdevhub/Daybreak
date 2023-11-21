@@ -4,11 +4,8 @@ using Daybreak.Services.Notifications;
 using Daybreak.Services.TradeChat.Models;
 using Daybreak.Services.TradeChat.Notifications;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.VisualBasic;
 using Newtonsoft.Json;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
@@ -20,9 +17,9 @@ using System.Threading.Tasks;
 using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.TradeChat;
-public sealed class TradeAlertingService : ITradeAlertingService, IApplicationLifetimeService
+internal sealed class TradeAlertingService : ITradeAlertingService, IApplicationLifetimeService
 {
-    private readonly List<TradeAlert> tradeAlerts = new List<TradeAlert>();
+    private readonly List<TradeAlert> tradeAlerts = [];
     private readonly INotificationService notificationService;
     private readonly ITradeHistoryDatabase tradeHistoryDatabase;
     private readonly ITradeChatService<KamadanTradeChatOptions> kamadanTradeChatService;
@@ -47,7 +44,7 @@ public sealed class TradeAlertingService : ITradeAlertingService, IApplicationLi
         this.ascalonTradeChatService = ascalonTradeChatService.ThrowIfNull();
         this.options = options.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
-        this.tradeAlerts = this.options.Value.Alerts ?? new List<TradeAlert>();
+        this.tradeAlerts = this.options.Value.Alerts ?? [];
     }
 
     public void AddTradeAlert(TradeAlert tradeAlert)

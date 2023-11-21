@@ -24,7 +24,7 @@ public partial class NotificationStackpanel : UserControl
     private readonly DispatcherTimer dispatcherTimer = new();
     private CancellationTokenSource? cancellationToken;
 
-    public ObservableCollection<NotificationWrapper> Notifications { get; } = new();
+    public ObservableCollection<NotificationWrapper> Notifications { get; } = [];
 
     public NotificationStackpanel() :
         this(Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<INotificationProducer>(),

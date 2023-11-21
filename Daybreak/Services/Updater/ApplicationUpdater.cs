@@ -22,7 +22,7 @@ using Version = Daybreak.Models.Versioning.Version;
 
 namespace Daybreak.Services.Updater;
 
-public sealed class ApplicationUpdater : IApplicationUpdater
+internal sealed class ApplicationUpdater : IApplicationUpdater
 {
     private const string InstallerFileName = "Daybreak.Installer.exe";
     private const string UpdatedKey = "LauncherUpdating";

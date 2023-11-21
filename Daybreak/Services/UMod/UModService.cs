@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 
 namespace Daybreak.Services.UMod;
 
-public sealed class UModService : IUModService
+internal sealed class UModService : IUModService
 {
     private const string TagPlaceholder = "[TAG_PLACEHOLDER]";
     private const string ReleaseUrl = "https://github.com/gwdevhub/gMod/releases/download/[TAG_PLACEHOLDER]/gMod.dll";
@@ -52,6 +52,12 @@ public sealed class UModService : IUModService
     }
 
     public bool IsInstalled => File.Exists(Path.GetFullPath(Path.Combine(UModDirectory, UModDll)));
+
+    public Models.Versioning.Version Version => File.Exists(Path.Combine(Path.GetFullPath(UModDirectory), UModDll)) ?
+        Models.Versioning.Version.TryParse(FileVersionInfo.GetVersionInfo(Path.Combine(Path.GetFullPath(UModDirectory), UModDll)).FileVersion!, out var version) ?
+            version :
+            Models.Versioning.Version.Zero :
+        Models.Versioning.Version.Zero;
 
     public UModService(
         IProcessInjector processInjector,
@@ -207,14 +213,7 @@ public sealed class UModService : IUModService
             return;
         }
 
-        var currentRelease = FileVersionInfo.GetVersionInfo(existingUMod).FileVersion;
-        if (!Daybreak.Models.Versioning.Version.TryParse(currentRelease ?? string.Empty, out var currentVersion))
-        {
-            scopedLogger.LogError($"Unable to parse current version {currentRelease}");
-            return;
-        }
-
-        if (currentVersion.CompareTo(latestVersion) >= 0)
+        if (this.Version.CompareTo(latestVersion) >= 0)
         {
             scopedLogger.LogError($"UMod is up to date");
             return;

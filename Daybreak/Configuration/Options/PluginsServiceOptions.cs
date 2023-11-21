@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Daybreak.Configuration.Options;
 
 [OptionsIgnore]
-public sealed class PluginsServiceOptions
+internal sealed class PluginsServiceOptions
 {
-    public List<PluginEntry> EnabledPlugins { get; set; } = new();
+    public List<PluginEntry> EnabledPlugins { get; set; } = [];
 }

@@ -29,7 +29,7 @@ public partial class QuestLogTemplate : UserControl
 
     public QuestLogTemplate()
     {
-        this.quests = new List<QuestMetadata>();
+        this.quests = [];
         this.InitializeComponent();
     }
 

@@ -9,7 +9,7 @@ using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.Monitoring;
 
-public sealed class ProcessorUsageMonitor : IApplicationLifetimeService
+internal sealed class ProcessorUsageMonitor : IApplicationLifetimeService
 {
     private const string ProcessorTime = "Processor Usage";
     private const string ProcessorTimeUnit = "% CPU";

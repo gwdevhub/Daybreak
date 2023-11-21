@@ -3,7 +3,7 @@ using System.Logging;
 
 namespace Daybreak.Services.Logging;
 
-public sealed class CompositeLogsWriter : ILogsWriter
+internal sealed class CompositeLogsWriter : ILogsWriter
 {
     private readonly IEnumerable<ILogsWriter> logsWriters;
 

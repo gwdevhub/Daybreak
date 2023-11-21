@@ -45,7 +45,7 @@ public partial class LauncherView : UserControl
     [GenerateDependencyProperty]
     private bool loading;
 
-    public ObservableCollection<LaunchConfigurationWithCredentials> LaunchConfigurations { get; } = new();
+    public ObservableCollection<LaunchConfigurationWithCredentials> LaunchConfigurations { get; } = [];
 
     public LauncherView(
         IMenuService menuService,
@@ -108,40 +108,45 @@ public partial class LauncherView : UserControl
             return;
         }
 
-        if (this.applicationLauncher.GetGuildwarsProcess(this.LatestConfiguration) is GuildWarsApplicationLaunchContext context)
+        var launchingTask = await new TaskFactory().StartNew(async () =>
         {
-            // Detected already running guildwars process
-            await this.Dispatcher.InvokeAsync(() => this.Loading = false);
-            if (this.focusViewOptions.Value.Enabled)
+            var latestConfig = await this.Dispatcher.InvokeAsync(() => this.LatestConfiguration);
+            if (this.applicationLauncher.GetGuildwarsProcess(latestConfig) is GuildWarsApplicationLaunchContext context)
             {
-                this.menuService.CloseMenu();
-                this.viewManager.ShowView<FocusView>(context);
-            }
-
-            return;
-        }
-
-        try
-        {
-            var launchedContext = await this.applicationLauncher.LaunchGuildwars(this.LatestConfiguration);
-            if (launchedContext is null)
-            {
+                // Detected already running guildwars process
                 await this.Dispatcher.InvokeAsync(() => this.Loading = false);
+                if (this.focusViewOptions.Value.Enabled)
+                {
+                    this.menuService.CloseMenu();
+                    this.viewManager.ShowView<FocusView>(context);
+                }
+
                 return;
             }
 
-            this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(this.LatestConfiguration);
-            if (this.focusViewOptions.Value.Enabled)
+            try
             {
-                await this.Dispatcher.InvokeAsync(() => this.Loading = false);
-                this.menuService.CloseMenu();
-                this.viewManager.ShowView<FocusView>(launchedContext);
-            }
-        }
-        catch (Exception)
-        {
-        }
+                var launchedContext = await this.applicationLauncher.LaunchGuildwars(latestConfig);
+                if (launchedContext is null)
+                {
+                    await this.Dispatcher.InvokeAsync(() => this.Loading = false);
+                    return;
+                }
 
+                this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(latestConfig);
+                if (this.focusViewOptions.Value.Enabled)
+                {
+                    await this.Dispatcher.InvokeAsync(() => this.Loading = false);
+                    this.menuService.CloseMenu();
+                    this.viewManager.ShowView<FocusView>(launchedContext);
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }, TaskCreationOptions.LongRunning);
+
+        await launchingTask;
         await this.Dispatcher.InvokeAsync(() => this.Loading = false);
     }
 }

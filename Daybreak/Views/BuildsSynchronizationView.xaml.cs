@@ -27,8 +27,8 @@ public partial class BuildsSynchronizationView : UserControl
     private readonly IViewManager viewManager;
     private readonly ILogger<BuildsSynchronizationView> logger;
 
-    public ObservableCollection<SynchronizationBuild> RemoteBuildEntries { get; } = new();
-    public ObservableCollection<SynchronizationBuild> LocalBuildEntries { get; } = new();
+    public ObservableCollection<SynchronizationBuild> RemoteBuildEntries { get; } = [];
+    public ObservableCollection<SynchronizationBuild> LocalBuildEntries { get; } = [];
 
     [GenerateDependencyProperty(InitialValue = true)]
     private bool buttonsEnabled;

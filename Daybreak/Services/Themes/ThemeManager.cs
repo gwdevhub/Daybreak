@@ -7,7 +7,6 @@ using Daybreak.Utils;
 using System;
 using System.Configuration;
 using System.Core.Extensions;
-using System.Diagnostics;
 using System.Extensions;
 using System.Linq;
 using System.Reflection;
@@ -15,7 +14,7 @@ using System.Windows.Extensions.Services;
 using System.Windows.Media;
 
 namespace Daybreak.Services.Themes;
-public sealed class ThemeManager : IThemeManager, IApplicationLifetimeService
+internal sealed class ThemeManager : IThemeManager, IApplicationLifetimeService
 {
     private const string LightThemeValue = "Light";
     private const string RegistryKey = @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes";

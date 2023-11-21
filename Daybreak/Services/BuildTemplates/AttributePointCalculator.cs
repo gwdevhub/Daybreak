@@ -8,15 +8,15 @@ namespace Daybreak.Services.BuildTemplates;
 /// Attribute point calculator.
 /// Based on https://wiki.guildwars.com/wiki/Attribute_point.
 /// </summary>
-public sealed class AttributePointCalculator : IAttributePointCalculator
+internal sealed class AttributePointCalculator : IAttributePointCalculator
 {
     private const int MaxRank = 12;
     private const int MinRank = 0;
 
-    private static readonly List<int> PointsRequiredToIncreaseRankMapping = new()
-    {
+    private static readonly List<int> PointsRequiredToIncreaseRankMapping =
+    [
         1, 2, 3, 4, 5, 6, 7, 9, 11, 13, 16, 20, int.MaxValue
-    };
+    ];
 
     public int MaximumAttributePoints => 200;
 

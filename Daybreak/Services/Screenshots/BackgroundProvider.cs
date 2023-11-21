@@ -9,7 +9,7 @@ using System.Windows.Media;
 
 namespace Daybreak.Services.Screenshots;
 
-public sealed class BackgroundProvider : IBackgroundProvider
+internal sealed class BackgroundProvider : IBackgroundProvider
 {
     private readonly IScreenshotProvider screenshotProvider;
     private readonly IOnlinePictureClient bloogumClient;

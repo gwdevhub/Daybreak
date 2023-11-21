@@ -31,7 +31,7 @@ public partial class OptionSectionView : UserControl
     [GenerateDependencyProperty]
     private string title = string.Empty;
 
-    public ObservableCollection<OptionEntry> OptionEntries { get; } = new ObservableCollection<OptionEntry>();
+    public ObservableCollection<OptionEntry> OptionEntries { get; } = [];
 
     public OptionSectionView(
         IViewManager viewManager,

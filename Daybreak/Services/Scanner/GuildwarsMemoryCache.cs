@@ -3,7 +3,6 @@ using Daybreak.Models.Guildwars;
 using Daybreak.Models.LaunchConfigurations;
 using Daybreak.Services.Scanner.Models;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Threading;
@@ -11,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Daybreak.Services.Scanner;
 
-public sealed class GuildwarsMemoryCache : IGuildwarsMemoryCache
+internal sealed class GuildwarsMemoryCache : IGuildwarsMemoryCache
 {
     private readonly IGuildwarsMemoryReader guildwarsMemoryReader;
     private readonly ILiveOptions<MemoryReaderOptions> liveOptions;

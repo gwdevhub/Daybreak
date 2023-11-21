@@ -10,7 +10,7 @@ using System.Extensions;
 using System.Linq;
 
 namespace Daybreak.Services.LaunchConfigurations;
-public sealed class LaunchConfigurationService : ILaunchConfigurationService
+internal sealed class LaunchConfigurationService : ILaunchConfigurationService
 {
     private readonly ICredentialManager credentialManager;
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager;

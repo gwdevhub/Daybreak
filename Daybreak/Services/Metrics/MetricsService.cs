@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace Daybreak.Services.Metrics;
 
-public sealed class MetricsService : IMetricsService, IDisposable
+internal sealed class MetricsService : IMetricsService, IDisposable
 {
     private const int MetricsStoreLimit = 10000;
     private const string MetricsNamespace = "Daybreak";

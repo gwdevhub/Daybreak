@@ -77,8 +77,8 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
                 CurrentTargetId = (int)gameData.TargetId,
                 LivingEntities = gameData.LivingEntities?.Select(ParsePayload).ToList(),
                 MainPlayer = gameData.MainPlayer is not null ? ParsePayload(gameData.MainPlayer) : new MainPlayerInformation(),
-                Party = gameData.Party?.Select(ParsePayload).ToList() ?? new List<PlayerInformation>(),
-                WorldPlayers = gameData.WorldPlayers?.Select(ParsePayload).ToList() ?? new List<WorldPlayerInformation>(),
+                Party = gameData.Party?.Select(ParsePayload).ToList() ?? [],
+                WorldPlayers = gameData.WorldPlayers?.Select(ParsePayload).ToList() ?? [],
                 MapIcons = gameData.MapIcons?.Select(m =>
                 {
                     if (!GuildwarsIcon.TryParse((int)m.Id, out var icon))
@@ -96,7 +96,7 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
                             Y = m.PosY
                         }
                     };
-                }).OfType<MapIcon>().ToList() ?? new List<MapIcon>()
+                }).OfType<MapIcon>().ToList() ?? []
             };
         }
         catch(Exception ex)
@@ -261,15 +261,15 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
                 XBR = pathingTrapezoid.XBR,
                 XTL = pathingTrapezoid.XTL,
                 XTR = pathingTrapezoid.XTR
-            }).ToList() ?? new List<Trapezoid>();
-            var adjacencyList = pathingPayload.AdjacencyList ?? new List<List<int>>();
+            }).ToList() ?? [];
+            var adjacencyList = pathingPayload.AdjacencyList ?? [];
             var pathingMapsCount = pathingPayload.Trapezoids?.Max(p => p.PathingMapId) ?? 0;
             var originalPathingMaps = new List<List<int>>((int)pathingMapsCount);
             foreach(var trapezoid in trapezoidList)
             {
                 while (originalPathingMaps.Count <= trapezoid.PathingMapId)
                 {
-                    originalPathingMaps.Add(new List<int>());
+                    originalPathingMaps.Add([]);
                 }
 
                 originalPathingMaps[trapezoid.PathingMapId].Add(trapezoid.Id);
@@ -683,7 +683,7 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
         return new Bag
         {
             Capacity = bagPayload.Items?.Count ?? 0,
-            Items = bagPayload.Items?.Select(ParsePayload).ToList() ?? new List<IBagContent>()
+            Items = bagPayload.Items?.Select(ParsePayload).ToList() ?? []
         };
     }
 
@@ -787,7 +787,7 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
                     Attribute = attribute,
                     Points = (int)a.BaseLevel
                 };
-            }).OfType<AttributeEntry>().ToList() ?? new List<AttributeEntry>(),
+            }).OfType<AttributeEntry>().ToList() ?? [],
             Skills = partyPlayerPayload.Build?.Skills?.Select(s =>
             {
                 if(!Skill.TryParse((int)s, out var skill))
@@ -817,7 +817,7 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
                 }
 
                 return default;
-            }).OfType<Profession>().ToList() ?? new List<Profession>()
+            }).OfType<Profession>().ToList() ?? []
         };
     }
 

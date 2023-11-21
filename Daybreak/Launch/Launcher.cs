@@ -16,10 +16,15 @@ using Microsoft.Extensions.Logging;
 using Slim;
 using Slim.Integration.ServiceCollection;
 using System;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Extensions;
 using System.Windows.Media;
+
+//The following lines are needed to expose internal objects to the test project
+[assembly: InternalsVisibleTo("Daybreak.Tests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
 namespace Daybreak.Launch;
 

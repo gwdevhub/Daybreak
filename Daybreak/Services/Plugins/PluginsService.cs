@@ -28,14 +28,14 @@ using System.Threading.Tasks;
 
 namespace Daybreak.Services.Plugins;
 
-public sealed class PluginsService : IPluginsService
+internal sealed class PluginsService : IPluginsService
 {
     private const string DllExtension = ".dll";
     private const string PluginsDirectory = "Plugins";
 
     private static readonly object Lock = new();
 
-    private readonly List<AvailablePlugin> loadedPlugins = new();
+    private readonly List<AvailablePlugin> loadedPlugins = [];
     private readonly ILiveUpdateableOptions<PluginsServiceOptions> liveUpdateableOptions;
     private readonly ILogger<PluginsService> logger;
     private readonly DaybreakPluginValidator daybreakPluginValidator = new();
