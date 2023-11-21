@@ -104,7 +104,7 @@ jobs:
     - name: Pack publish files
       run: |
         Write-Host $env
-        .\Scripts\BuildRelease.ps1
+        .\Scripts\BuildRelease.ps1 -version $env:Version
       shell: pwsh
 
     - name: Create Release

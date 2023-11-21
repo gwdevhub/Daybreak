@@ -1,3 +1,8 @@
+Param(
+    [Parameter(Mandatory=$true)]
+    [string]$version
+) #end param
+
 function Get-FileMetadata {
     param (
         [string]$Path
@@ -17,7 +22,7 @@ function Get-FileMetadata {
     }
 }
 
-$zipPath = "Publish\daybreak.zip"
+$zipPath = "Publish\daybreakv$version.zip"
 Write-Output "Deleting pdb file"
 Remove-item .\Publish\Daybreak.pdb
 Remove-item .\Publish\Daybreak.Installer.pdb
