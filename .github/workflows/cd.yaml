@@ -125,7 +125,7 @@ jobs:
         foreach ($file in $files) {
             $relativePath = $file.FullName.Replace((Get-Location).Path + "\", "")
             Write-Host "Uploading $relativePath"
-            gh release upload ${{ github.ref }} "$($file.FullName)" --clobber
+            gh release upload v${{ env.Version }} "$($file.FullName)" --clobber
         }
       shell: powershell
       env:
