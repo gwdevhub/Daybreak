@@ -6,6 +6,10 @@
 name:  Daybreak CD Pipeline
 
 on:
+  # Delete after test
+  pull_request:
+    branches:
+      - master
   push:
     branches:
       - master
@@ -93,14 +97,14 @@ jobs:
         RuntimeIdentifier: win-${{ matrix.targetplatform }}
 
     - name: Create publish extractor files
-      run: dotnet publish .\Daybreak.7ZipExtractor\Daybreak.7ZipExtractor.csproj -c $env:Configuration -r $env:RuntimeIdentifier --property:SolutionDir=$env:GITHUB_WORKSPACE -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained true -o .\Publish
+      run: dotnet publish .\Daybreak.7ZipExtractor\Daybreak.7ZipExtractor.csproj -c $env:Configuration -r $env:RuntimeIdentifier --property:SolutionDir=$env:GITHUB_WORKSPACE -p:PublishReadyToRun=true -p:PublishSingleFile=false --self-contained true -o .\Publish
       env:
         RuntimeIdentifier: win-${{ matrix.targetplatform }}
 
     - name: Pack publish files
       run: |
         Write-Host $env
-        .\Scripts\BuildRelease.ps1 -version $env:Version
+        .\Scripts\BuildRelease.ps1
       shell: pwsh
 
     - name: Publish release
@@ -109,7 +113,7 @@ jobs:
         mode: update
         tag_name: v${{ env.Version }}
         release_name: Daybreak v${{ env.Version }}
-        assets: .\Publish\daybreakv${{ env.Version }}.zip
+        assets: .\Publish\*
         github_token: ${{ env.GITHUB_TOKEN }}
         replace_assets: true
         body_mrkdwn: ${{ env.Changelog }}
