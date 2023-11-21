@@ -16,7 +16,7 @@ using System.Windows.Media;
 
 namespace Daybreak.Services.Screens;
 
-public sealed class ScreenManager : IScreenManager, IApplicationLifetimeService
+internal sealed class ScreenManager : IScreenManager, IApplicationLifetimeService
 {
     private readonly MainWindow host;
     private readonly ILiveUpdateableOptions<ScreenManagerOptions> liveUpdateableOptions;

@@ -6,8 +6,8 @@ using System.Collections.Generic;
 namespace Daybreak.Configuration.Options;
 
 [OptionsIgnore]
-public sealed class LaunchConfigurationServiceOptions
+internal sealed class LaunchConfigurationServiceOptions
 {
     [JsonProperty(nameof(LaunchConfigurations))]
-    public List<LaunchConfiguration> LaunchConfigurations { get; set; } = new();
+    public List<LaunchConfiguration> LaunchConfigurations { get; set; } = [];
 }

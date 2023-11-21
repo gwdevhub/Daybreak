@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace Daybreak.Configuration.Options;
 
 [OptionsName(Name = "GWToolbox")]
-public sealed class ToolboxOptions
+internal sealed class ToolboxOptions
 {
     [JsonProperty(nameof(DllPath))]
     [OptionName(Name = "DllPath", Description = "The path to GWToolboxdll.dll")]

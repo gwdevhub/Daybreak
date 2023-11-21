@@ -11,7 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace Daybreak.Services.Drawing;
-public sealed class DrawingService : IDrawingService, IDrawingModuleProducer
+internal sealed class DrawingService : IDrawingService, IDrawingModuleProducer
 {
     private const int EngagementAreaMultiplier = 9;
 

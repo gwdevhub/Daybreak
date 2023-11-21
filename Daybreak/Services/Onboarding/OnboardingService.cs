@@ -10,7 +10,7 @@ using System.Extensions;
 
 namespace Daybreak.Services.Onboarding;
 
-public sealed class OnboardingService : IOnboardingService
+internal sealed class OnboardingService : IOnboardingService
 {
     private readonly ICredentialManager credentialManager;
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager;

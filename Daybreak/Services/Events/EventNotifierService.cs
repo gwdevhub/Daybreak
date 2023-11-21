@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Daybreak.Services.Events;
 
-public sealed class EventNotifierService : IEventNotifierService
+internal sealed class EventNotifierService : IEventNotifierService
 {
     private readonly TimespanToETAConverter timespanToETAConverter = new();
     private readonly INotificationService notificationService;

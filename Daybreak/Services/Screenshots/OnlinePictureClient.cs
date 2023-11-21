@@ -14,12 +14,11 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 using System.Windows.Media;
 
 namespace Daybreak.Services.Screenshots;
 
-public sealed class OnlinePictureClient : IOnlinePictureClient
+internal sealed class OnlinePictureClient : IOnlinePictureClient
 {
     private const string CloudFlareCookieValue = "fcfd523b2470336531e47baff3d2c2d6a0e2412a.1689426482.1";
     private const string CloudFlareCookieKey = "wschkid";

@@ -4,7 +4,7 @@ using System;
 namespace Daybreak.Configuration.Options;
 
 [OptionsName(Name = "Trader Quotes")]
-public sealed class TraderQuotesOptions
+internal sealed class TraderQuotesOptions
 {
     [OptionIgnore]
     public string HttpsUri { get; set; } = "https://kamadan.gwtoolbox.com/";

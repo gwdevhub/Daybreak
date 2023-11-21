@@ -18,7 +18,7 @@ public partial class LaunchConfigurationsView : UserControl
     private readonly IViewManager viewManager;
     private readonly ILaunchConfigurationService launchConfigurationService;
 
-    public ObservableCollection<LaunchConfigurationWithCredentials> LaunchConfigurations { get; set; } = new();
+    public ObservableCollection<LaunchConfigurationWithCredentials> LaunchConfigurations { get; set; } = [];
 
     public LaunchConfigurationsView(
         IViewManager viewManager,

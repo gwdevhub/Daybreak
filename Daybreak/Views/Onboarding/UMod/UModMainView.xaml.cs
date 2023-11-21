@@ -32,7 +32,10 @@ public partial class UModMainView : UserControl
     [GenerateDependencyProperty]
     public bool uModEnabled;
 
-    public ObservableCollection<UModEntry> Mods { get; } = new();
+    [GenerateDependencyProperty]
+    public string currentVersion;
+
+    public ObservableCollection<UModEntry> Mods { get; } = [];
 
     public UModMainView(
         IViewManager viewManager,
@@ -50,6 +53,7 @@ public partial class UModMainView : UserControl
     {
         this.RefreshMods();
         this.UModEnabled = this.uModService.IsEnabled;
+        this.CurrentVersion = this.uModService.Version.ToString();
     }
 
     private void SaveButton_Clicked(object _, EventArgs e)

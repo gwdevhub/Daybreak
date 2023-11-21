@@ -4,7 +4,7 @@ using System.Core.Extensions;
 
 namespace Daybreak.Services.Menu;
 
-public sealed class MenuService : IMenuService, IMenuServiceInitializer
+internal sealed class MenuService : IMenuService, IMenuServiceInitializer
 {
     private readonly ILogger<MenuService> logger;
 

@@ -3,7 +3,7 @@ using System.Logging;
 
 namespace Daybreak.Services.Logging;
 
-public sealed class DebugLogsWriter : IDebugLogsWriter
+internal sealed class DebugLogsWriter : IDebugLogsWriter
 {
     public void WriteLog(Log log)
     {

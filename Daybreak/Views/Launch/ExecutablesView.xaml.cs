@@ -18,7 +18,7 @@ public partial class ExecutablesView : UserControl
 {
     private readonly IViewManager viewManager;
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager;
-    public ObservableCollection<ExecutablePath> Paths { get; } = new();
+    public ObservableCollection<ExecutablePath> Paths { get; } = [];
 
     public ExecutablesView(
         IViewManager viewManager,

@@ -23,7 +23,7 @@ public partial class OptionsSection : UserControl
     private readonly IOptionsProvider optionsProvider;
     private readonly IViewManager viewManager;
 
-    public ObservableCollection<OptionSection> Options { get; } = new ObservableCollection<OptionSection>();
+    public ObservableCollection<OptionSection> Options { get; } = [];
 
     public OptionsSection(
         IOptionsProvider optionsProvider,

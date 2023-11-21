@@ -8,7 +8,7 @@ using System.Windows.Controls;
 
 namespace Daybreak.Services.Privilege;
 
-public sealed class PrivilegeManager : IPrivilegeManager
+internal sealed class PrivilegeManager : IPrivilegeManager
 {
     public bool AdminPrivileges => new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
 

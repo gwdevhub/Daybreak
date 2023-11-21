@@ -1,20 +1,16 @@
 ﻿using Daybreak.Services.Images;
 using Microsoft.Extensions.Logging;
-using NAudio.CoreAudioApi;
 using System;
 using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Extensions;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Xml.Linq;
 
 namespace Daybreak.Services.Screenshots;
 
-public sealed class ScreenshotProvider : IScreenshotProvider
+internal sealed class ScreenshotProvider : IScreenshotProvider
 {
     private readonly static string ScreenshotsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Guild Wars\\Screens";
 

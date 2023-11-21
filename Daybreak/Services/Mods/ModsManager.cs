@@ -5,7 +5,7 @@ using System.Core.Extensions;
 
 namespace Daybreak.Services.Mods;
 
-public sealed class ModsManager : IModsManager
+internal sealed class ModsManager : IModsManager
 {
     private readonly IServiceManager serviceManager;
     private readonly ILogger<IModsManager> logger;

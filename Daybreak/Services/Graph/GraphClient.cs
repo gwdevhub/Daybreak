@@ -17,7 +17,6 @@ using System.Extensions;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -27,7 +26,7 @@ using System.Windows.Controls;
 
 namespace Daybreak.Services.Graph;
 
-public sealed class GraphClient : IGraphClient
+internal sealed class GraphClient : IGraphClient
 {
     private const int MaxBrowserInitializationRetries = 5;
 
@@ -290,7 +289,7 @@ public sealed class GraphClient : IGraphClient
             SourceUrl = buildEntry.Build?.SourceUrl
         };
 
-        var buildList = this.buildsCache ?? new List<BuildFile>();
+        var buildList = this.buildsCache ?? [];
         // Remove the previous version of the build
         buildList = buildList.Where(b => b.FileName != buildEntry.Name).ToList();
         // Add new version of the build

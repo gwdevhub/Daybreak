@@ -8,8 +8,7 @@ internal sealed class Location
 {
     public static readonly Location AscalonPreSearing = new(
         Region.PresearingAscalon,
-        new List<Entry>
-        {
+        [
             new Entry
             {
                 Map = Map.AscalonCityPresearing,
@@ -118,11 +117,10 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 10
             },
-        });
+        ]);
     public static readonly Location Ascalon = new(
         Region.Ascalon,
-        new List<Entry>
-        {
+        [
             new Entry
             {
                 Map = Map.AscalonCityOutpost,
@@ -249,11 +247,10 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 18
             }
-        });
+        ]);
     public static readonly Location NorthernShiverpeaks = new(
         Region.ShiverpeakMountains,
-        new List<Entry>
-        {
+        [
             new Entry
             {
                 Map = Map.TravelersVale,
@@ -344,11 +341,10 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 7
             },
-        });
+        ]);
     public static readonly Location Kryta = new(
         Region.Kryta,
-        new List<Entry>
-        {
+        [
             new Entry
             {
                 Map = Map.ScoundrelsRise,
@@ -601,11 +597,10 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 1
             }
-        });
+        ]);
     public static readonly Location MaguumaJungle = new(
         Region.MaguumaJungle,
-        new List<Entry>
-        {
+        [
             new Entry
             {
                 Map = Map.DruidsOverlookOutpost,
@@ -759,11 +754,10 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 1
             }
-        });
+        ]);
     public static readonly Location CrystalDesert = new(
         Region.CrystalDesert,
-        new List<Entry>
-        {
+        [
             new Entry
             {
                 Map = Map.TheAmnoonOasisOutpost,
@@ -926,11 +920,10 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 60
             },
-        });
+        ]);
     public static readonly Location SouthernShiverpeaks = new(
         Region.ShiverpeakMountains,
-        new List<Entry>
-        {
+        [
             new Entry
             {
                 Map = Map.DroknarsForgeOutpost,
@@ -1157,11 +1150,10 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 1
             }
-        });
+        ]);
     public static readonly Location RingOfFireIslandChain = new(
         Region.RingOfFireIslands,
-        new List<Entry>
-        {
+        [
             new Entry
             {
                 Map = Map.EmberLightCampOutpost,
@@ -1225,11 +1217,10 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 1
             }
-        });
+        ]);
     public static readonly Location FarShiverpeaks = new(
         Region.FarShiverpeaks,
-        new List<Entry>
-        {
+        [
             new Entry
             {
                 Map = Map.EmberLightCampOutpost,
@@ -1356,11 +1347,10 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 4
             },
-        });
+        ]);
     public static readonly Location CharrHomelands = new(
         Region.CharrHomelands,
-        new List<Entry>
-        {
+        [
             new Entry
             {
                 Map = Map.GrothmarWardowns,
@@ -1406,11 +1396,10 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 1
             }
-        });
+        ]);
     public static readonly Location TarnishedCoast = new(
         Region.TarnishedCoast,
-        new List<Entry>
-        {
+        [
             new Entry
             {
                 Map = Map.VerdantCascades,
@@ -1519,11 +1508,10 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 4
             },
-        });
+        ]);
     public static readonly Location DepthsOfTyria = new(
         Region.DepthsOfTyria,
-        new List<Entry>
-        {
+        [
             new Entry
             {
                 Map = Map.TheFissureofWoe,
@@ -2000,11 +1988,10 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 40
             },
-        });
+        ]);
     public static readonly Location ShingJeaIsland = new(
         Region.ShingJeaIsland,
-        new List<Entry>
-        {
+        [
             new Entry
             {
                 Map = Map.MonasteryOverlook1,
@@ -2293,11 +2280,10 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 2
             },
-        });
+        ]);
     public static readonly Location KainengCity = new(
         Region.KainengCity,
-        new List<Entry>
-        {
+        [
             new Entry
             {
                 Map = Map.KainengCenterCanthanNewYearOutpost,
@@ -2676,11 +2662,10 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 5
             },
-        });
+        ]);
     public static readonly Location EchovaldForest = new(
         Region.EchovaldForest,
-        new List<Entry>
-        {
+        [
             new Entry
             {
                 Map = Map.TanglewoodCopseOutpost,
@@ -2915,11 +2900,10 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 13
             },
-        });
+        ]);
     public static readonly Location JadeSea = new(
         Region.TheJadeSea,
-        new List<Entry>
-        {
+        [
             new Entry
             {
                 Map = Map.BoreasSeabedExplorable,
@@ -3163,11 +3147,10 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 18
             },
-        });
+        ]);
     public static readonly Location Istan = new(
         Region.Istan,
-        new List<Entry>
-        {
+        [
             new Entry
             {
                 Map = Map.IslandOfShehkah,
@@ -3438,11 +3421,10 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 2
             },
-        });
+        ]);
     public static readonly Location Kourna = new(
         Region.Kourna,
-        new List<Entry>
-        {
+        [
             new Entry
             {
                 Map = Map.YohlonHavenOutpost,
@@ -3650,11 +3632,10 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 1
             }
-        });
+        ]);
     public static readonly Location Vabbi = new(
         Region.Vabbi,
-        new List<Entry>
-        {
+        [
             new Entry
             {
                 Map = Map.YatendiCanyons,
@@ -3880,11 +3861,10 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 2
             },
-        });
+        ]);
     public static readonly Location TheDesolation = new(
         Region.TheDesolation,
-        new List<Entry>
-        {
+        [
             new Entry
             {
                 Map = Map.GateOfDesolation,
@@ -4011,11 +3991,10 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 5
             },
-        });
+        ]);
     public static readonly Location GateOfTorment = new(
         Region.RealmOfTorment,
-        new List<Entry>
-        {
+        [
             new Entry
             {
                 Map = Map.GateOfTormentOutpost,
@@ -4169,11 +4148,10 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 1
             }
-        });
+        ]);
     public static readonly Location BattleIsles = new(
         Region.TheBattleIsles,
-        new List<Entry>
-        {
+        [
             new Entry
             {
                 Map = Map.GreatTempleOfBalthazarOutpost,
@@ -4273,11 +4251,10 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 12
             },
-        });
+        ]);
     public static readonly Location GuildHalls = new(
         Region.TheBattleIsles,
-        new List<Entry>
-        {
+        [
             new Entry
             {
                 Map = Map.WarriorsIsle,
@@ -4710,10 +4687,10 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 12
             }
-        });
+        ]);
 
-    public static List<Location> Locations { get; } = new List<Location>
-    {
+    public static List<Location> Locations { get; } =
+    [
         AscalonPreSearing,
         Ascalon,
         NorthernShiverpeaks,
@@ -4737,10 +4714,10 @@ internal sealed class Location
         GateOfTorment,
         BattleIsles,
         GuildHalls
-    };
+    ];
 
     public Region Region { get; }
-    public List<Entry> Entries { get; } = new();
+    public List<Entry> Entries { get; } = [];
     internal Location(Region region, List<Entry> entries)
     {
         this.Region = region;

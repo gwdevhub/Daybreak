@@ -14,8 +14,8 @@ internal sealed class Event
     public static readonly Event Wintersday = new()
     {
         Name = "Wintersday",
-        ValidLocations = new List<Map>
-        {
+        ValidLocations =
+        [
             Map.AscalonCityWintersdayOutpost,
             Map.DroknarsForgeWintersdayOutpost,
             Map.EyeOfTheNorthOutpostWintersdayOutpost,
@@ -60,6 +60,6 @@ internal sealed class Event
             Map.DrakkarLake,
             Map.JagaMoraine,
             Map.BjoraMarches
-        }
+        ]
     };
 }

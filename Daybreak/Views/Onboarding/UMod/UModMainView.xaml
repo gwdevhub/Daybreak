@@ -31,6 +31,22 @@
         <StackPanel Orientation="Horizontal"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Right">
+            <TextBlock 
+                ToolTip="Current uMod version"
+                FontSize="9"
+                Text="Version: "
+                Foreground="{Binding MahApps.Brushes.ThemeForeground}"
+                VerticalAlignment="Bottom"
+                TextAlignment="Center"
+                Margin="0, 0, 0, 0"/>
+            <TextBlock 
+                ToolTip="Current uMod version"
+                FontSize="9"
+                Text="{Binding ElementName=_this, Path=CurrentVersion, Mode=OneWay}"
+                Foreground="{Binding MahApps.Brushes.ThemeForeground}"
+                VerticalAlignment="Bottom"
+                TextAlignment="Center"
+                Margin="0, 0, 15, 0"/>
             <buttons:HelpButton
                 ToolTip="uMod Wiki"
                 Height="30" 

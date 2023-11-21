@@ -29,8 +29,8 @@ public partial class LaunchConfigurationView : UserControl
     [GenerateDependencyProperty]
     private string selectedPath = default!;
 
-    public ObservableCollection<LoginCredentials> Credentials { get; set; } = new();
-    public ObservableCollection<string> ExecutablePaths { get; set; } = new();
+    public ObservableCollection<LoginCredentials> Credentials { get; set; } = [];
+    public ObservableCollection<string> ExecutablePaths { get; set; } = [];
 
     public LaunchConfigurationView(
         INotificationService notificationService,

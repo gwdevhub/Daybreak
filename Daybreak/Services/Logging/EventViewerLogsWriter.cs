@@ -4,7 +4,7 @@ using System.Logging;
 
 namespace Daybreak.Services.Logging;
 
-public sealed class EventViewerLogsWriter : IEventViewerLogsWriter
+internal sealed class EventViewerLogsWriter : IEventViewerLogsWriter
 {
     private const string AppName = "Daybreak";
     private const string LogType = "Application";

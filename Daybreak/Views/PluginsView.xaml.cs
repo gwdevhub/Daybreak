@@ -20,7 +20,7 @@ public partial class PluginsView : UserControl
     private readonly IViewManager viewManager;
     private readonly IPluginsService pluginsService;
 
-    public ObservableCollection<AvailablePlugin> AvailablePlugins { get; private set; } = new();
+    public ObservableCollection<AvailablePlugin> AvailablePlugins { get; private set; } = [];
 
     public PluginsView(
         IViewManager viewManager,

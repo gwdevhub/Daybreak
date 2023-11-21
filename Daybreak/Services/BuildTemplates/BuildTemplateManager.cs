@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Daybreak.Services.BuildTemplates;
 
-public sealed class BuildTemplateManager : IBuildTemplateManager
+internal sealed class BuildTemplateManager : IBuildTemplateManager
 {
     private const string DecodingLookupTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
     private readonly static string BuildsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Guild Wars\\Templates\\Skills";
@@ -194,7 +194,7 @@ public sealed class BuildTemplateManager : IBuildTemplateManager
         var build = new Build()
         {
             BuildMetadata = buildMetadata,
-            Skills = new()
+            Skills = []
         };
 
         if (Profession.TryParse(buildMetadata.PrimaryProfessionId, out var primaryProfession) is false)

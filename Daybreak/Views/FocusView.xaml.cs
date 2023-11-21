@@ -303,17 +303,17 @@ public partial class FocusView : UserControl
                     maybeGameData.MainPlayer.Position = this.GameData?.MainPlayer?.Position ?? new Position();
                 }
                 
-                foreach(var worldPlayer in maybeGameData.WorldPlayers ?? new List<WorldPlayerInformation>())
+                foreach(var worldPlayer in maybeGameData.WorldPlayers ?? [])
                 {
                     worldPlayer.Position = this.GameData?.WorldPlayers?.FirstOrDefault(w => w.Id == worldPlayer.Id)?.Position ?? new Position();
                 }
 
-                foreach (var partyPlayer in maybeGameData.Party ?? new List<PlayerInformation>())
+                foreach (var partyPlayer in maybeGameData.Party ?? [])
                 {
                     partyPlayer.Position = this.GameData?.Party?.FirstOrDefault(w => w.Id == partyPlayer.Id)?.Position ?? new Position();
                 }
 
-                foreach (var entity in maybeGameData.LivingEntities ?? new List<LivingEntity>())
+                foreach (var entity in maybeGameData.LivingEntities ?? [])
                 {
                     var oldEntity = this.GameData?.LivingEntities?.FirstOrDefault(w => w.Id == entity.Id);
                     entity.Position = oldEntity?.Position ?? new Position();

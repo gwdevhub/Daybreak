@@ -16,7 +16,7 @@ public sealed class BuildMetadata
     public int SkillsLength { get; set; }
     public bool TailPresent { get; set; }
     public bool NewTemplate { get; set; }
-    public List<int> SkillIds { get; set; } = new();
-    public List<int> AttributesIds { get; set; } = new();
-    public List<int> AttributePoints { get; set; } = new();
+    public List<int> SkillIds { get; set; } = [];
+    public List<int> AttributesIds { get; set; } = [];
+    public List<int> AttributePoints { get; set; } = [];
 }

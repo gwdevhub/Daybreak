@@ -10,7 +10,7 @@ using System.Windows;
 
 namespace Daybreak.Services.Screens;
 
-public sealed class SplashScreenService : ISplashScreenService
+internal sealed class SplashScreenService : ISplashScreenService
 {
     private readonly IThemeManager themeManager;
     private readonly IOptions<ScreenManagerOptions> options;

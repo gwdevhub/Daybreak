@@ -1,6 +1,4 @@
-﻿using Daybreak.Launch;
-using Daybreak.Models;
-using Daybreak.Models.Progress;
+﻿using Daybreak.Models.Progress;
 using Daybreak.Services.ExecutableManagement;
 using Microsoft.Extensions.Logging;
 using System;
@@ -12,7 +10,7 @@ using System.Windows.Forms;
 
 namespace Daybreak.Services.Guildwars;
 
-public sealed class GuildwarsCopyService : IGuildwarsCopyService
+internal sealed class GuildwarsCopyService : IGuildwarsCopyService
 {
     private const string ExecutableName = "Gw.exe";
 

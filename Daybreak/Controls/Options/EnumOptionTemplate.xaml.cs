@@ -15,7 +15,7 @@ public partial class EnumOptionTemplate : UserControl
 {
     private OptionProperty optionProperty = default!;
 
-    public ObservableCollection<object> PossibleEnumValues { get; } = new ObservableCollection<object>();
+    public ObservableCollection<object> PossibleEnumValues { get; } = [];
 
     [GenerateDependencyProperty]
     private object value = default!;

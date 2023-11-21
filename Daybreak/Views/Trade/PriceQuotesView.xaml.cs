@@ -23,12 +23,12 @@ public partial class PriceQuotesView : UserControl
     private readonly IViewManager viewManager;
     private readonly ITraderQuoteService traderQuoteService;
 
-    private List<TraderQuote> traderQuotesCache = new();
+    private List<TraderQuote> traderQuotesCache = [];
 
     [GenerateDependencyProperty]
     private bool loading = false;
 
-    public ObservableCollection<TraderQuote> TraderQuotes { get; } = new ObservableCollection<TraderQuote>();
+    public ObservableCollection<TraderQuote> TraderQuotes { get; } = [];
 
     public PriceQuotesView(
         IViewManager viewManager,

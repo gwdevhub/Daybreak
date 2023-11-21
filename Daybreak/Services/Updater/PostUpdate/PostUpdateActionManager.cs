@@ -5,7 +5,7 @@ using System.Core.Extensions;
 
 namespace Daybreak.Services.Updater.PostUpdate;
 
-public sealed class PostUpdateActionManager : IPostUpdateActionManager
+internal sealed class PostUpdateActionManager : IPostUpdateActionManager
 {
     private readonly IServiceManager serviceManager;
     private readonly ILogger<PostUpdateActionManager> logger;

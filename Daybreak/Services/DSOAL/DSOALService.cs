@@ -11,7 +11,6 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
-using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -23,7 +22,7 @@ namespace Daybreak.Services.DSOAL;
 /// <summary>
 /// Service for managing DSOAL for GW1. Credits to: https://lemmy.wtf/post/27911
 /// </summary>
-public sealed class DSOALService : IDSOALService
+internal sealed class DSOALService : IDSOALService
 {
     public const string DSOALFixAdminMessage = "Daybreak has detected an issue with the DSOAL installation. In order to fix this issue, Daybreak will need to restart as administrator. DSOAL will not work until then.";
     public const string DSOALFixRegistryKey = "DSOAL/FixSymbolicLink";

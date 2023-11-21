@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace Daybreak.Services.Monitoring;
 
-public sealed class MemoryUsageMonitor : IApplicationLifetimeService
+internal sealed class MemoryUsageMonitor : IApplicationLifetimeService
 {
     private const string MemoryUsage = "Memory Usage";
     private const string MemoryUsageUnit = "MBs";

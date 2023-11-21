@@ -6,8 +6,8 @@ using System.Collections.Generic;
 namespace Daybreak.Configuration.Options;
 
 [OptionsIgnore]
-public sealed class CredentialManagerOptions
+internal sealed class CredentialManagerOptions
 {
     [JsonProperty(nameof(ProtectedLoginCredentials))]
-    public List<ProtectedLoginCredentials> ProtectedLoginCredentials { get; set; } = new();
+    public List<ProtectedLoginCredentials> ProtectedLoginCredentials { get; set; } = [];
 }

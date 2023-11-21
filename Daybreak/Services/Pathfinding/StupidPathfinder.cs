@@ -22,7 +22,7 @@ namespace Daybreak.Services.Pathfinding;
 /// <summary>
 /// Pathfinder based on Euclidean distance with discrete space.
 /// </summary>
-public sealed class StupidPathfinder : IPathfinder
+internal sealed class StupidPathfinder : IPathfinder
 {
     private const string PathfindingLatencyMetricName = "Pathfinding Latency";
     private const string PathfindingLatencyMetricUnit = "Milliseconds";

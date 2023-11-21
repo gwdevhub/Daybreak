@@ -8,7 +8,7 @@ using System.Core.Extensions;
 using System.Extensions;
 
 namespace Daybreak.Services.TradeChat;
-public sealed class PriceHistoryDatabase : IPriceHistoryDatabase
+internal sealed class PriceHistoryDatabase : IPriceHistoryDatabase
 {
     private readonly IItemHashService itemHashService;
     private readonly ILiteCollection<TraderQuoteDTO> collection;

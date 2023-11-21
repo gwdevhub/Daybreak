@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace Daybreak.Configuration.Options;
 
 [OptionsName(Name = "Background Provider")]
-public sealed class BackgroundProviderOptions
+internal sealed class BackgroundProviderOptions
 {
     [OptionName(Name = "Bloogum Client Enabled", Description = "When enabled, Background Provider will make use of Bloogum to get background images")]
     [JsonProperty(nameof(BloogumEnabled))]

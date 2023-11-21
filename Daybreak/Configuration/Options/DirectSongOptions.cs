@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace Daybreak.Configuration.Options;
 
 [OptionsName(Name = "DirectSong")]
-public sealed class DirectSongOptions
+internal sealed class DirectSongOptions
 {
     [JsonProperty(nameof(Path))]
     [OptionName(Name = "Path", Description = "Folder that contains the DirectSong files")]

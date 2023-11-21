@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Daybreak.Services.Downloads;
 
-public sealed class DownloadService : IDownloadService
+internal sealed class DownloadService : IDownloadService
 {
     private const double StatusUpdateInterval = 50;
     private const string MetricUnits = "bytes/sec";

@@ -8,7 +8,7 @@ using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.Charts;
 
-public sealed class LiveChartInitializer : ILiveChartInitializer, IApplicationLifetimeService
+internal sealed class LiveChartInitializer : ILiveChartInitializer, IApplicationLifetimeService
 {
     public void OnClosing()
     {

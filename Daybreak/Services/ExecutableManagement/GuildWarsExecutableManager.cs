@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.ExecutableManagement;
-public sealed class GuildWarsExecutableManager : IGuildWarsExecutableManager, IApplicationLifetimeService
+internal sealed class GuildWarsExecutableManager : IGuildWarsExecutableManager, IApplicationLifetimeService
 {
     private readonly static TimeSpan ExecutableVerificationLatency = TimeSpan.FromSeconds(5);
     private readonly static object Lock = new();

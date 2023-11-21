@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection.Metadata;
 
 namespace Daybreak.Services.Plugins.Validators;
-public sealed class DaybreakPluginValidator : IMetadataValidator, IEnvironmentVersionValidator, ITypeDefinitionsValidator
+internal sealed class DaybreakPluginValidator : IMetadataValidator, IEnvironmentVersionValidator, ITypeDefinitionsValidator
 {
     public bool Validate(IEnumerable<TypeDefinition> typeDefinitions, MetadataReader metadataReader)
     {

@@ -4,8 +4,8 @@ using System.Collections.Generic;
 
 namespace Daybreak.Configuration.Options;
 [OptionsIgnore]
-public sealed class GuildwarsExecutableOptions
+internal sealed class GuildwarsExecutableOptions
 {
     [JsonProperty(nameof(ExecutablePaths))]
-    public List<string> ExecutablePaths { get; set; } = new();
+    public List<string> ExecutablePaths { get; set; } = [];
 }
