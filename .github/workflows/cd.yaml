@@ -117,10 +117,14 @@ jobs:
 
         $response = Invoke-RestMethod -Uri $rateLimitUrl -Method Get -Headers $headers
         $response
-        $response.resources
-        $response.resources.core
-        $response.resources.search
-        $response.resources.graphql
+        foreach ($resource in $response.resources.PSObject.Properties) {
+            $resourceName = $resource.Name
+            $resourceDetails = $resource.Value
+            Write-Host "`n$resourceName API Limit:"
+            Write-Host "Limit: $($resourceDetails.limit)"
+            Write-Host "Remaining: $($resourceDetails.remaining)"
+            Write-Host "Reset Time: $(Get-Date -Date @($resourceDetails.reset))"
+        }
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
