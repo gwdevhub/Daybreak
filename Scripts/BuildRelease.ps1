@@ -42,7 +42,7 @@ foreach ($file in $files) {
 
     $relativePath = Resolve-Path -Path $file.FullName -Relative
     $relativePath = $relativePath.trim(".\\");
-    $newName = $relativePath -replace '\\', '#'
+    $newName = $relativePath -replace '\\', '_'
 
     Move-Item -Path $file.FullName -Destination $newName
 }

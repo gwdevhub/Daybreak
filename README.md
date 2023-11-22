@@ -5,4 +5,8 @@
 Custom launcher for Guildwars.
 Requires webview2 runtime https://go.microsoft.com/fwlink/p/?LinkId=2124703.
 
+Download:
+- Go to [Releases](https://github.com/AlexMacocian/Daybreak/releases/latest)
+- Download daybreakv[VERSION].zip, where [VERSION] is the version of the release
+
 Please check the [wiki](https://github.com/AlexMacocian/Daybreak/wiki) for project description and features
