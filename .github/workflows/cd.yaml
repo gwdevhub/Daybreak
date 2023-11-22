@@ -92,7 +92,7 @@ jobs:
         RuntimeIdentifier: win-${{ matrix.targetplatform }}
 
     - name: Create publish installer files
-      run: dotnet publish .\Daybreak.Installer\Daybreak.Installer.csproj -c $env:Configuration -r $env:RuntimeIdentifier --property:SolutionDir=$env:GITHUB_WORKSPACE -p:PublishReadyToRun=true -p:PublishSingleFile=false --self-contained true -o .\Publish
+      run: dotnet publish .\Daybreak.Installer\Daybreak.Installer.csproj -c $env:Configuration -r $env:RuntimeIdentifier --property:SolutionDir=$env:GITHUB_WORKSPACE -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained true -o .\Publish
       env:
         RuntimeIdentifier: win-${{ matrix.targetplatform }}
 
@@ -105,6 +105,12 @@ jobs:
       run: |
         Write-Host $env
         .\Scripts\BuildRelease.ps1 -version $env:Version
+      shell: pwsh
+
+    - name: Publish blob files
+      run: |
+        Write-Host $env
+        .\Scripts\PushFilesToBlobStorage.ps1 -version $env:Version -connectionString ${{ secrets.BLOBSTORAGE_CONNECTIONSTRING }} -sourcePath .\Publish\
       shell: pwsh
 
     - name: Create release draft
@@ -121,10 +127,10 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    # - name: Publish release
-    #   run: |
-    #     gh release edit v${{ env.Version }} --draft=false
-    #   shell: powershell
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Publish release
+      run: |
+        gh release edit v${{ env.Version }} --draft=false
+      shell: powershell
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
