@@ -107,77 +107,24 @@ jobs:
         .\Scripts\BuildRelease.ps1 -version $env:Version
       shell: pwsh
 
-    - name: Check rate limit
-      run: |
-        $rateLimitUrl = "https://api.github.com/rate_limit"
-        $token = $env:GITHUB_TOKEN
-        $headers = @{
-            Authorization = "token $token"
-        }
-
-        $response = Invoke-RestMethod -Uri $rateLimitUrl -Method Get -Headers $headers
-        $response
-        foreach ($resource in $response.resources.PSObject.Properties) {
-            $resourceName = $resource.Name
-            Write-Host "`n$resourceName API Limit: $($resource.Value)"
-        }
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Create release draft
+      uses: Xotl/cool-github-releases@v1.1.8
       with:
+        mode: update
         tag_name: v${{ env.Version }}
         release_name: Daybreak v${{ env.Version }}
-        draft: true
-        prerelease: false
-
-    - name: Upload Release Assets
-      run: |
-        $maxRetries = 5
-        $retryDelay = 60
-        $rootPath = "Publish"
-        $files = Get-ChildItem $rootPath -File -Recurse
-        foreach ($file in $files) {
-            $relativePath = $file.FullName.Replace((Get-Location).Path + "\", "")
-            Write-Host "Uploading $relativePath"
-            $retryCount = 0
-            do {
-                gh release upload v${{ env.Version }} "$($file.FullName)" --clobber
-                $retryCount++
-                if ($LASTEXITCODE -ne 0){
-                    Start-Sleep -Seconds $retryDelay
-                    if ($retryCount -ge $maxRetries){
-                        Write-Host "Failed to upload $($file.FullName). Exiting"
-                        exit $LASTEXITCODE
-                    }
-                }
-            } while ($LASTEXITCODE -ne 0 -and $retryCount -lt $maxRetries)
-        }
-      shell: powershell
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Publish Release
-      run: |
-        gh release edit v${{ env.Version }} --draft=false
-      shell: powershell
+        assets: .\Publish\daybreakv${{ env.Version }}.zip
+        github_token: ${{ env.GITHUB_TOKEN }}
+        replace_assets: true
+        body_mrkdwn: ${{ env.Changelog }}
+        isDraft: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     # - name: Publish release
-    #   uses: Xotl/cool-github-releases@v1.1.8
-    #   with:
-    #     mode: update
-    #     tag_name: v${{ env.Version }}
-    #     release_name: Daybreak v${{ env.Version }}
-    #     assets: .\Publish\*
-    #     github_token: ${{ env.GITHUB_TOKEN }}
-    #     replace_assets: true
-    #     body_mrkdwn: ${{ env.Changelog }}
+    #   run: |
+    #     gh release edit v${{ env.Version }} --draft=false
+    #   shell: powershell
     #   env:
     #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
