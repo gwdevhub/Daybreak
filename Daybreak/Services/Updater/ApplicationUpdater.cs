@@ -12,6 +12,7 @@ using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
@@ -32,6 +33,7 @@ namespace Daybreak.Services.Updater;
 
 internal sealed class ApplicationUpdater : IApplicationUpdater
 {
+    private const string TempInstallerFileName = "Daybreak.Installer.Temp.exe";
     private const string InstallerFileName = "Daybreak.Installer.exe";
     private const string UpdatedKey = "LauncherUpdating";
     private const string TempFile = "tempfile.zip";
@@ -44,7 +46,6 @@ internal sealed class ApplicationUpdater : IApplicationUpdater
     private const string BlobStorageUrl = $"https://daybreak.blob.core.windows.net/{VersionTag}/{FileTag}";
 
     private readonly CancellationTokenSource updateCancellationTokenSource = new();
-    private readonly IPrivilegeManager privilegeManager;
     private readonly INotificationService notificationService;
     private readonly IRegistryService registryService;
     private readonly IDownloadService downloadService;
@@ -56,7 +57,6 @@ internal sealed class ApplicationUpdater : IApplicationUpdater
     public Version CurrentVersion { get; }
 
     public ApplicationUpdater(
-        IPrivilegeManager privilegeManager,
         INotificationService notificationService,
         IRegistryService registryService,
         IDownloadService downloadService,
@@ -65,7 +65,6 @@ internal sealed class ApplicationUpdater : IApplicationUpdater
         IHttpClient<ApplicationUpdater> httpClient,
         ILogger<ApplicationUpdater> logger)
     {
-        this.privilegeManager = privilegeManager.ThrowIfNull();
         this.notificationService = notificationService.ThrowIfNull();
         this.registryService = registryService.ThrowIfNull();
         this.downloadService = downloadService.ThrowIfNull();
@@ -91,12 +90,6 @@ internal sealed class ApplicationUpdater : IApplicationUpdater
 
     public async Task<bool> DownloadUpdate(Version version, UpdateStatus updateStatus)
     {
-        if (!this.privilegeManager.AdminPrivileges)
-        {
-            this.privilegeManager.RequestAdminPrivileges<LauncherView>("Daybreak needs Administrator privileges in order to update");
-            return false;
-        }
-
         if (version.HasPrefix is false)
         {
             version.HasPrefix = true;
@@ -221,6 +214,17 @@ internal sealed class ApplicationUpdater : IApplicationUpdater
                 var fileInfo = new FileInfo(m.RelativePath!);
                 return !fileInfo.Exists || fileInfo.Length != m.Size;
             })
+            .Where(m =>
+            {
+                // Special case for Daybreak.Installer
+                if (m.Name != TempInstallerFileName)
+                {
+                    return true;
+                }
+
+                var existingInstaller = new FileInfo(InstallerFileName);
+                return !existingInstaller.Exists || existingInstaller.Length != m.Size;
+            })
             .ToList();
 
         updateStatus.CurrentStep = DownloadStatus.InitializingDownload;
@@ -230,7 +234,7 @@ internal sealed class ApplicationUpdater : IApplicationUpdater
         var sizeToDownload = (double)filesToDownload.Sum(m => m.Size);
         var sw = Stopwatch.StartNew();
         foreach (var file in filesToDownload)
-        {   
+        {
             var downloadUrl = BlobStorageUrl.Replace(VersionTag, version.ToString().Replace('.', '-')).Replace(FileTag, file.RelativePath);
             var response = await this.httpClient.GetAsync(downloadUrl);
             if (!response.IsSuccessStatusCode)
@@ -260,6 +264,8 @@ internal sealed class ApplicationUpdater : IApplicationUpdater
                 updateStatus.CurrentStep = DownloadStatus.Downloading(downloaded / sizeToDownload, TimeSpan.FromMilliseconds(etaMillis));
             }
         }
+
+        updateStatus.CurrentStep = DownloadStatus.Downloading(1, TimeSpan.Zero);
 
         scopedLogger.LogInformation($"Prepared update package at {Path.GetFullPath("update.pkg")}");
         updateStatus.CurrentStep = UpdateStatus.PendingRestart;
