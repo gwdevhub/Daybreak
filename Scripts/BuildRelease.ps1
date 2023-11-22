@@ -29,7 +29,7 @@ Remove-item .\Publish\Daybreak.Installer.pdb
 Remove-item .\Publish\Daybreak.7ZipExtractor.pdb
 Move-Item -Path .\Publish\Daybreak.Installer.exe -Destination .\Publish\Daybreak.Installer.Temp.exe
 
-#Compress-Archive .\Publish\* $zipPath -Force
+Compress-Archive .\Publish\* $zipPath -Force
 
 $files = Get-ChildItem -Path .\Publish -Recurse -File
 $metadata = $files | ForEach-Object { Get-FileMetadata $_.FullName }
