@@ -107,6 +107,23 @@ jobs:
         .\Scripts\BuildRelease.ps1 -version $env:Version
       shell: pwsh
 
+    - name: Check rate limit
+      run: |
+        $rateLimitUrl = "https://api.github.com/rate_limit"
+        $token = $env:GITHUB_TOKEN
+        $headers = @{
+            Authorization = "token $token"
+        }
+
+        $response = Invoke-RestMethod -Uri $rateLimitUrl -Method Get -Headers $headers
+        $response
+        $response.resources
+        $response.resources.core
+        $response.resources.search
+        $response.resources.graphql
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -133,7 +150,7 @@ jobs:
                 $retryCount++
                 if ($LASTEXITCODE -ne 0){
                     Start-Sleep -Seconds $retryDelay
-                    if ($retryCount == $maxRetries){
+                    if ($retryCount -ge $maxRetries){
                         Write-Host "Failed to upload $($file.FullName). Exiting"
                         exit $LASTEXITCODE
                     }
