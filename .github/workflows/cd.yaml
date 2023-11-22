@@ -6,10 +6,6 @@
 name:  Daybreak CD Pipeline
 
 on:
-  # Delete after test
-  pull_request:
-    branches:
-      - master
   push:
     branches:
       - master
