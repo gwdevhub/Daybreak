@@ -119,11 +119,7 @@ jobs:
         $response
         foreach ($resource in $response.resources.PSObject.Properties) {
             $resourceName = $resource.Name
-            $resourceDetails = $resource.Value
-            Write-Host "`n$resourceName API Limit:"
-            Write-Host "Limit: $($resourceDetails.limit)"
-            Write-Host "Remaining: $($resourceDetails.remaining)"
-            Write-Host "Reset Time: $(Get-Date -Date @($resourceDetails.reset))"
+            Write-Host "`n$resourceName API Limit: $($resource.Value)"
         }
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
