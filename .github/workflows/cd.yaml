@@ -83,7 +83,7 @@ jobs:
         echo "::set-env name=Version::$version"
 
     - name: Create publish launcher files
-      run: dotnet publish .\Daybreak\Daybreak.csproj -c $env:Configuration -r $env:RuntimeIdentifier --property:SolutionDir=$env:GITHUB_WORKSPACE -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed --self-contained true -o .\Publish
+      run: dotnet publish .\Daybreak\Daybreak.csproj -c $env:Configuration -r $env:RuntimeIdentifier --property:SolutionDir=$env:GITHUB_WORKSPACE -p:PublishReadyToRun=true -p:PublishSingleFile=false --self-contained true -o .\Publish
       env:
         RuntimeIdentifier: win-${{ matrix.targetplatform }}
 
@@ -93,7 +93,7 @@ jobs:
         RuntimeIdentifier: win-${{ matrix.targetplatform }}
 
     - name: Create publish extractor files
-      run: dotnet publish .\Daybreak.7ZipExtractor\Daybreak.7ZipExtractor.csproj -c $env:Configuration -r $env:RuntimeIdentifier --property:SolutionDir=$env:GITHUB_WORKSPACE -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained true -o .\Publish
+      run: dotnet publish .\Daybreak.7ZipExtractor\Daybreak.7ZipExtractor.csproj -c $env:Configuration -r $env:RuntimeIdentifier --property:SolutionDir=$env:GITHUB_WORKSPACE -p:PublishReadyToRun=true -p:PublishSingleFile=false --self-contained true -o .\Publish
       env:
         RuntimeIdentifier: win-${{ matrix.targetplatform }}
 
@@ -103,7 +103,13 @@ jobs:
         .\Scripts\BuildRelease.ps1 -version $env:Version
       shell: pwsh
 
-    - name: Publish release
+    - name: Publish blob files
+      run: |
+        Write-Host $env
+        .\Scripts\PushFilesToBlobStorage.ps1 -version $env:Version -sourcePath .\Publish\ -connectionString "${{ secrets.BLOBSTORAGE_CONNECTIONSTRING }}"
+      shell: pwsh
+
+    - name: Create release draft
       uses: Xotl/cool-github-releases@v1.1.8
       with:
         mode: update
@@ -113,6 +119,14 @@ jobs:
         github_token: ${{ env.GITHUB_TOKEN }}
         replace_assets: true
         body_mrkdwn: ${{ env.Changelog }}
+        isDraft: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Publish release
+      run: |
+        gh release edit v${{ env.Version }} --draft=false
+      shell: powershell
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     

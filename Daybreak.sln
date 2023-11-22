@@ -23,6 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{41AE
 		Scripts\BuildRelease.ps1 = Scripts\BuildRelease.ps1
 		Scripts\CompareVersions.ps1 = Scripts\CompareVersions.ps1
 		Scripts\GetBuildVersion.ps1 = Scripts\GetBuildVersion.ps1
+		Scripts\PushFilesToBlobStorage.ps1 = Scripts\PushFilesToBlobStorage.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0E30DDA0-2111-4E6C-851E-01DC34124FC2}"
@@ -31,7 +32,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.github\CODEOWNERS = .github\CODEOWNERS
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daybreak.7ZipExtractor", "Daybreak.7ZipExtractor\Daybreak.7ZipExtractor.csproj", "{CA60F9AC-A496-4DB6-970E-ECE73B051C05}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Daybreak.7ZipExtractor", "Daybreak.7ZipExtractor\Daybreak.7ZipExtractor.csproj", "{CA60F9AC-A496-4DB6-970E-ECE73B051C05}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
