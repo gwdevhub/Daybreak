@@ -110,7 +110,7 @@ jobs:
     - name: Publish blob files
       run: |
         Write-Host $env
-        .\Scripts\PushFilesToBlobStorage.ps1 -version $env:Version -connectionString ${{ secrets.BLOBSTORAGE_CONNECTIONSTRING }} -sourcePath .\Publish\
+        .\Scripts\PushFilesToBlobStorage.ps1 -version $env:Version -sourcePath .\Publish\ -connectionString "${{ secrets.BLOBSTORAGE_CONNECTIONSTRING }}"
       shell: pwsh
 
     - name: Create release draft
