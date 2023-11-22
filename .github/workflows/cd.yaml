@@ -115,18 +115,38 @@ jobs:
       with:
         tag_name: v${{ env.Version }}
         release_name: Daybreak v${{ env.Version }}
-        draft: false
+        draft: true
         prerelease: false
 
     - name: Upload Release Assets
       run: |
+        $maxRetries = 5
+        $retryDelay = 60
         $rootPath = "Publish"
         $files = Get-ChildItem $rootPath -File -Recurse
         foreach ($file in $files) {
             $relativePath = $file.FullName.Replace((Get-Location).Path + "\", "")
             Write-Host "Uploading $relativePath"
-            gh release upload v${{ env.Version }} "$($file.FullName)" --clobber
+            $retryCount = 0
+            do {
+                gh release upload v${{ env.Version }} "$($file.FullName)" --clobber
+                $retryCount++
+                if ($LASTEXITCODE -ne 0){
+                    Start-Sleep -Seconds $retryDelay
+                    if ($retryCount == $maxRetries){
+                        Write-Host "Failed to upload $($file.FullName). Exiting"
+                        exit $LASTEXITCODE
+                    }
+                }
+            } while ($LASTEXITCODE -ne 0 -and $retryCount -lt $maxRetries)
         }
+      shell: powershell
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Publish Release
+      run: |
+        gh release edit v${{ env.Version }} --draft=false
       shell: powershell
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
