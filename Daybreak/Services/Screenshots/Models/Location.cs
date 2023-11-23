@@ -117,6 +117,15 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 10
             },
+            new Entry
+            {
+                Map = Map.GreenHillsCounty,
+                Url = "https://media.discordapp.net/attachments/279231165045407744/1053453780580044940/image.png?ex=656a6c49&is=6557f749&hm=beab3433db2cac2d519fc8158978a949e06a57df50b587f41afe3718dc4dad20&=&format=webp&width=954&height=521",
+                Credit = "",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            }
         ]);
     public static readonly Location Ascalon = new(
         Region.Ascalon,
@@ -246,6 +255,24 @@ internal sealed class Location
                 IdFormat = "D2",
                 StartIndex = 1,
                 Count = 18
+            },
+            new Entry
+            {
+                Map = Map.AscalonCityWintersdayOutpost,
+                Url = "https://wiki.guildwars.com/images/0/0b/Ascalon_City_Wintersday_2009.png",
+                Credit = "https://wiki.guildwars.com/",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            },
+            new Entry
+            {
+                Map = Map.TheGreatNorthernWall,
+                Url = "https://media.discordapp.net/attachments/279231165045407744/853784390357876746/gw005.jpg?ex=656d152d&is=655aa02d&hm=03e8464e9fc60f8c832eebc246a4fff422ebb865d27dc189b727f22aacab6fb2&=&format=webp&width=954&height=380",
+                Credit = "https://discordapp.com/users/Chrono#6655",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
             }
         ]);
     public static readonly Location NorthernShiverpeaks = new(
@@ -341,6 +368,15 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 7
             },
+            new Entry
+            {
+                Map = Map.IronHorseMine,
+                Url = "https://media.discordapp.net/attachments/279231165045407744/927936695230414888/gw064.jpg?ex=656f3864&is=655cc364&hm=75456e75a3a77e0dcbc8b0f1d3dfa292e477b535e90c7a8f40566e0ffa52cb64&=&format=webp&width=903&height=564",
+                Credit = "https://discordapp.com/users/Pekka#4619",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            }
         ]);
     public static readonly Location Kryta = new(
         Region.Kryta,
@@ -593,6 +629,78 @@ internal sealed class Location
                 Map = Map.SanctumCay,
                 Url = "https://i.imgur.com/9jrmIAM.jpeg",
                 Credit = "https://imgur.com/a/PzYch4c",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            },
+            new Entry
+            {
+                Map = Map.LionsArchWintersdayOutpost,
+                Url = "https://wiki.guildwars.com/images/b/b6/Lions_Arch_Wintersday_2009.png",
+                Credit = "https://wiki.guildwars.com/",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            },
+            new Entry
+            {
+                Map = Map.BeneathLionsArch,
+                Url = "https://i.imgur.com/PVtkF7W.jpeg",
+                Credit = "https://imgur.com/gallery/VkhAw",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            },
+            new Entry
+            {
+                Map = Map.BeneathLionsArch,
+                Url = "https://i.imgur.com/Aeg5Qld.jpeg",
+                Credit = "https://imgur.com/gallery/VkhAw",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            },
+            new Entry
+            {
+                Map = Map.WarinKrytaTheMausoleum,
+                Url = "https://i.imgur.com/0PHeleU.jpeg",
+                Credit = "https://imgur.com/gallery/VkhAw",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            },
+            new Entry
+            {
+                Map = Map.WarinKrytaTheMausoleum,
+                Url = "https://i.imgur.com/4l6X5L3.jpeg",
+                Credit = "https://imgur.com/gallery/VkhAw",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            },
+            new Entry
+            {
+                Map = Map.WarinKrytaTheMausoleum,
+                Url = "https://i.imgur.com/zyf33kW.jpeg",
+                Credit = "https://imgur.com/gallery/VkhAw",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            },
+            new Entry
+            {
+                Map = Map.WarinKrytaTheMausoleum,
+                Url = "https://i.imgur.com/jYvlbej.jpeg",
+                Credit = "https://imgur.com/gallery/VkhAw",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            },
+            new Entry
+            {
+                Map = Map.WarinKrytaTheMausoleum,
+                Url = "https://i.imgur.com/ByyS5ya.jpeg",
+                Credit = "https://imgur.com/gallery/VkhAw",
                 IdFormat = "D2",
                 StartIndex = 1,
                 Count = 1
@@ -920,6 +1028,15 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 60
             },
+            new Entry
+            {
+                Map = Map.TombOfThePrimevalKings,
+                Url = "https://cdn.discordapp.com/attachments/279231165045407744/1137832214151843930/gw079.jpg?ex=656cd953&is=655a6453&hm=af57440037882d84e959b950945b738e611d976a2f0beb24d9b1a0fcd626086d&",
+                Credit = "https://discordapp.com/users/Soldrand#2252",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            }
         ]);
     public static readonly Location SouthernShiverpeaks = new(
         Region.ShiverpeakMountains,
@@ -1149,7 +1266,25 @@ internal sealed class Location
                 IdFormat = "D2",
                 StartIndex = 1,
                 Count = 1
-            }
+            },
+            new Entry
+            {
+                Map = Map.TalusChute,
+                Url = "https://cdn.discordapp.com/attachments/279231165045407744/1079051027753480232/gw500.jpg?ex=656b4294&is=6558cd94&hm=95afe18ecddc81d5cedc9865e5db76986dc4ee2fe34f4832ffcc35854298f371&",
+                Credit = "https://discordapp.com/users/miragee#4827",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            },
+            new Entry
+            {
+                Map = Map.TalusChute,
+                Url = "https://cdn.discordapp.com/attachments/279231165045407744/1079051028000948345/gw507.jpg?ex=656b4294&is=6558cd94&hm=9e85f4560d8184fbb3a575515a72bdfb1d5812a64b57e486acb9f2a1ce658b4a&",
+                Credit = "https://discordapp.com/users/miragee#4827",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            },
         ]);
     public static readonly Location RingOfFireIslandChain = new(
         Region.RingOfFireIslands,
@@ -1347,6 +1482,15 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 4
             },
+            new Entry
+            {
+                Map = Map.EyeOfTheNorthOutpostWintersdayOutpost,
+                Url = "https://wiki.guildwars.com/images/1/14/Eye_of_the_North_Wintersday_2009.png",
+                Credit = "https://wiki.guildwars.com/",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            }
         ]);
     public static readonly Location CharrHomelands = new(
         Region.CharrHomelands,
@@ -1988,6 +2132,69 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 40
             },
+            new Entry
+            {
+                Map = Map.RragarsMenagerieLevel1,
+                Url = "https://i.imgur.com/LK2d7p4.jpeg",
+                Credit = "https://imgur.com/gallery/VkhAw",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            },
+            new Entry
+            {
+                Map = Map.RragarsMenagerieLevel1,
+                Url = "https://i.imgur.com/KwjNmsq.jpeg",
+                Credit = "https://imgur.com/gallery/VkhAw",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            },
+            new Entry
+            {
+                Map = Map.RragarsMenagerieLevel3,
+                Url = "https://i.imgur.com/6NWaY0C.jpeg",
+                Credit = "https://imgur.com/gallery/VkhAw",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            },
+            new Entry
+            {
+                Map = Map.HeartOftheShiverpeaksLevel1,
+                Url = "https://i.imgur.com/a1XpYMc.jpeg",
+                Credit = "https://imgur.com/gallery/VkhAw",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            },
+            new Entry
+            {
+                Map = Map.BattledepthsLevel1,
+                Url = "https://i.imgur.com/Czaf9Tq.jpeg",
+                Credit = "https://imgur.com/gallery/VkhAw",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            },
+            new Entry
+            {
+                Map = Map.BattledepthsLevel1,
+                Url = "https://i.imgur.com/iuepDVG.jpeg",
+                Credit = "https://imgur.com/gallery/VkhAw",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            },
+            new Entry
+            {
+                Map = Map.BattledepthsLevel1,
+                Url = "https://i.imgur.com/8SjTjCX.jpeg",
+                Credit = "https://imgur.com/gallery/VkhAw",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            },
         ]);
     public static readonly Location ShingJeaIsland = new(
         Region.ShingJeaIsland,
@@ -2280,6 +2487,15 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 2
             },
+            new Entry
+            {
+                Map = Map.SunquaVale,
+                Url = "https://media.discordapp.net/attachments/279231165045407744/859817527739547678/gw010.jpg?ex=657092f9&is=655e1df9&hm=b77dd201214212cfc6dd68db2218f550136878f6a2dca37830cc0dcad4201363&=&format=webp&width=954&height=479",
+                Credit = "https://discordapp.com/users/Sara#2170",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 1
+            }
         ]);
     public static readonly Location KainengCity = new(
         Region.KainengCity,
@@ -3991,6 +4207,15 @@ internal sealed class Location
                 StartIndex = 1,
                 Count = 5
             },
+            new Entry
+            {
+                Map = Map.TheSulfurousWastes,
+                Url = "https://media.discordapp.net/attachments/279231165045407744/1037396920001372240/unknown.png?ex=65709bab&is=655e26ab&hm=8329f7f07e635c9493c12f53054d090908b8643d0932313d49f2b2ff79601a36&=&format=webp",
+                Credit = "https://discordapp.com/users/Planewalker#5903",
+                IdFormat = "D2",
+                StartIndex = 1,
+                Count = 5
+            }
         ]);
     public static readonly Location GateOfTorment = new(
         Region.RealmOfTorment,
