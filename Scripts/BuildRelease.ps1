@@ -15,10 +15,12 @@ function Get-FileMetadata {
     Set-Location -Path .\Publish
     $relativePath = Resolve-Path -Path $Path -Relative
     Set-Location -Path $currentLocation
+    $versionInfo = $fileInfo.VersionInfo.ProductVersion
     return @{
         Name         = $fileInfo.Name
         Size         = $fileInfo.Length
         RelativePath = $relativePath.trim(".\\")
+        VersionInfo  = $versionInfo
     }
 }
 
