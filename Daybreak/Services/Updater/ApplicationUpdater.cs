@@ -4,15 +4,12 @@ using Daybreak.Models.Github;
 using Daybreak.Models.Progress;
 using Daybreak.Services.Downloads;
 using Daybreak.Services.Notifications;
-using Daybreak.Services.Privilege;
 using Daybreak.Services.Registry;
 using Daybreak.Services.Updater.Models;
 using Daybreak.Services.Updater.PostUpdate;
-using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
@@ -22,11 +19,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using static Daybreak.Utils.NativeMethods;
 using Version = Daybreak.Models.Versioning.Version;
 
 namespace Daybreak.Services.Updater;
@@ -212,7 +207,41 @@ internal sealed class ApplicationUpdater : IApplicationUpdater
             .Where(m =>
             {
                 var fileInfo = new FileInfo(m.RelativePath!);
-                return !fileInfo.Exists || fileInfo.Length != m.Size;
+                if (!fileInfo.Exists)
+                {
+                    return true;
+                }
+
+                if (fileInfo.Length != m.Size)
+                {
+                    return true;
+                }
+
+                try
+                {
+                    var info = FileVersionInfo.GetVersionInfo(fileInfo.FullName);
+                    if (info is null && m.VersionInfo is null)
+                    {
+                        return false;
+                    }
+
+                    if (info is null && m.VersionInfo is not null)
+                    {
+                        return true;
+                    }
+
+                    if (info is not null && m.VersionInfo is null)
+                    {
+                        return false;
+                    }
+
+                    return m.VersionInfo!.CompareTo(info!.ProductVersion) > 0;
+                }
+                catch
+                {
+                    return false;
+                }
+
             })
             .Where(m =>
             {

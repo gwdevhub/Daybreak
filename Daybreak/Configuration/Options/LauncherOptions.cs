@@ -52,5 +52,5 @@ public sealed class LauncherOptions
 
     [JsonProperty(nameof(BetaUpdate))]
     [OptionName(Name = "Beta Update", Description = "If true, the launcher will use the new update procedure")]
-    public bool BetaUpdate { get; set; } = true;
+    public bool BetaUpdate { get; set; } = false;
 }

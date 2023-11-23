@@ -11,4 +11,7 @@ internal sealed class Metadata
 
     [JsonProperty(nameof(Size))]
     public int Size { get; set; }
+
+    [JsonProperty(nameof(VersionInfo))]
+    public string? VersionInfo { get; set; }
 }
