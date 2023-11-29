@@ -48,7 +48,11 @@ internal sealed class OnlinePictureClient : IOnlinePictureClient
     public async Task<(ImageSource? Source, string Credit)> GetImage(bool localized)
     {
         (var uri, var credit) = await this.GetImageUri(localized);
-        var localUri = Path.GetFullPath(Path.Combine(CacheFolder, uri)).Replace("https:\\", "").Replace("http:\\", "");
+        var localUri = Path.GetFullPath(Path.Combine(CacheFolder, uri))
+            .Replace("https:\\", "").Replace("http:\\", "")
+            .Replace("?", "")
+            .Replace("&", "")
+            .Replace("=", "");
         if (!File.Exists(localUri))
         {
             var imageStream = await this.GetRemoteImage(uri);

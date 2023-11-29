@@ -215,7 +215,7 @@ internal sealed class DrawingService : IDrawingService, IDrawingModuleProducer
                     direction.Normalize();
                     var increment = direction * (this.positionRadius + this.positionRadius);
 
-                    while (currentPosVector.X != endPosition.X && currentPosVector.Y != endPosition.Y)
+                    while (currentPosVector.X != endPosition.X || currentPosVector.Y != endPosition.Y)
                     {
                         var remaining = endVector - currentPosVector;
                         if (remaining.LengthSquared < increment.LengthSquared)
