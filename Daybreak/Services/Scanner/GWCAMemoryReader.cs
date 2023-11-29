@@ -15,21 +15,27 @@ using Daybreak.Models.Builds;
 using System.Windows;
 using Daybreak.Utils;
 using System.Text.RegularExpressions;
+using SharpNav;
+using SharpNav.Geometry;
+using Daybreak.Services.Pathfinding;
 
 namespace Daybreak.Services.Scanner;
 
 public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
 {
     private static readonly Regex ItemNameColorRegex = new(@"<c=.*?>|</c>", RegexOptions.Compiled);
+    private readonly IPathfinder pathfinder;
     private readonly IGWCAClient client;
     private readonly ILogger<GWCAMemoryReader> logger;
 
     private ConnectionContext? connectionContextCache;
 
     public GWCAMemoryReader(
+        IPathfinder pathfinder,
         IGWCAClient gWCAClient,
         ILogger<GWCAMemoryReader> logger)
     {
+        this.pathfinder = pathfinder.ThrowIfNull();
         this.client = gWCAClient.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
     }
@@ -275,15 +281,12 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
                 originalPathingMaps[trapezoid.PathingMapId].Add(trapezoid.Id);
             }
 
-            var computedPathingMaps = BuildPathingMaps(trapezoidList, adjacencyList);
-            var computedAdjacencyList = BuildFinalAdjacencyList(trapezoidList, computedPathingMaps, adjacencyList);
             return new PathingData
             {
                 Trapezoids = trapezoidList,
                 OriginalAdjacencyList = adjacencyList,
                 OriginalPathingMaps = originalPathingMaps,
-                ComputedAdjacencyList = computedAdjacencyList,
-                ComputedPathingMaps = computedPathingMaps
+                NavMesh = await this.pathfinder.GenerateNavMesh(trapezoidList, cancellationToken)
             };
         }
         catch (Exception ex)
@@ -500,7 +503,7 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
 
             _ = Campaign.TryParse((int)mapPayload.Campaign, out var campaign);
             _ = Continent.TryParse((int)mapPayload.Continent, out var continent);
-            _ = Region.TryParse((int)mapPayload.Region, out var region);
+            _ = Daybreak.Models.Guildwars.Region.TryParse((int)mapPayload.Region, out var region);
             _ = Map.TryParse((int)mapPayload.Id, out var map);
 
             return new WorldData
