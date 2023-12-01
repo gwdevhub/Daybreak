@@ -24,6 +24,8 @@ using System.Diagnostics.Metrics;
 using System.Diagnostics;
 using Daybreak.Models.FocusView;
 using Daybreak.Models.LaunchConfigurations;
+using System.Configuration;
+using Daybreak.Configuration.Options;
 
 namespace Daybreak.Controls.Minimap;
 
@@ -46,6 +48,7 @@ public partial class GuildwarsMinimap : UserControl
     private readonly IPathfinder pathfinder;
     private readonly IDrawingService drawingService;
     private readonly IThemeManager themeManager;
+    private readonly ILiveOptions<PathfindingOptions> liveOptions;
     private readonly Color outlineColor = Colors.Chocolate;
     private readonly TimeSpan offsetRevertDelay = TimeSpan.FromSeconds(3);
 
@@ -97,20 +100,23 @@ public partial class GuildwarsMinimap : UserControl
              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IPathfinder>(),
              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IDrawingService>(),
              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IThemeManager>(),
-             Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IMetricsService>())
+             Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IMetricsService>(),
+             Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILiveOptions<PathfindingOptions>>())
     {
     }
 
-    public GuildwarsMinimap(
+    internal GuildwarsMinimap(
         IPathfinder pathfinder,
         IDrawingService drawingService,
         IThemeManager themeManager,
-        IMetricsService metricsService)
+        IMetricsService metricsService,
+        ILiveOptions<PathfindingOptions> liveOptions)
     {
         this.pathfinder = pathfinder.ThrowIfNull();
         this.drawingService = drawingService.ThrowIfNull();
         this.themeManager = themeManager.ThrowIfNull();
         this.drawingLatency = metricsService.CreateHistogram<double>(DrawingLatencyName, DrawingLatencyUnitName, DrawingLatencyDescription, Models.Metrics.AggregationTypes.P95);
+        this.liveOptions = liveOptions.ThrowIfNull();
 
         this.dispatcherTimer.Tick += (_, _) => this.ApplyOffsetRevert();
         this.dispatcherTimer.Interval = TimeSpan.FromMilliseconds(16);
@@ -311,6 +317,23 @@ public partial class GuildwarsMinimap : UserControl
         using var bitmapContext = bitmap.GetBitmapContext();
         bitmap.Clear(Colors.Transparent);
         var color = this.themeManager.GetForegroundColor();
+
+        var debugMode = this.liveOptions.Value.DebugMode;
+        if (this.PathingData.NavMesh is SuperOvercomplicatedNavmesh navmesh && debugMode)
+        {
+            foreach(var triangle in navmesh.Triangles)
+            {
+                var a = new Point((int)((triangle.A.X - minWidth) / MapDownscaleFactor), (int)((height - triangle.A.Y + minHeight) / MapDownscaleFactor));
+                var b = new Point((int)((triangle.B.X - minWidth) / MapDownscaleFactor), (int)((height - triangle.B.Y + minHeight) / MapDownscaleFactor));
+                var c = new Point((int)((triangle.C.X - minWidth) / MapDownscaleFactor), (int)((height - triangle.C.Y + minHeight) / MapDownscaleFactor));
+
+                bitmap.FillPolygon([(int)a.X, (int)a.Y, (int)b.X, (int)b.Y, (int)c.X, (int)c.Y, (int)a.X, (int)a.Y], ColorPalette.Colors[triangle.Id % ColorPalette.Colors.Count]);
+                //bitmap.DrawPolyline([(int)a.X, (int)a.Y, (int)b.X, (int)b.Y, (int)c.X, (int)c.Y, (int)a.X, (int)a.Y], ColorPalette.Red);
+            }
+
+            return;
+        }
+
         foreach (var trapezoid in this.PathingData.Trapezoids)
         {
             var a = new Point((int)((trapezoid.XTL - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YT + minHeight) / MapDownscaleFactor));
@@ -318,7 +341,12 @@ public partial class GuildwarsMinimap : UserControl
             var c = new Point((int)((trapezoid.XBR - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YB + minHeight) / MapDownscaleFactor));
             var d = new Point((int)((trapezoid.XBL - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YB + minHeight) / MapDownscaleFactor));
 
-            bitmap.FillPolygon(new int[] { (int)a.X, (int)a.Y, (int)b.X, (int)b.Y, (int)c.X, (int)c.Y, (int)d.X, (int)d.Y, (int)a.X, (int)a.Y }, color);
+            var finalColor = debugMode ? ColorPalette.Colors[trapezoid.PathingMapId % ColorPalette.Colors.Count] : color;
+            bitmap.FillPolygon([(int)a.X, (int)a.Y, (int)b.X, (int)b.Y, (int)c.X, (int)c.Y, (int)d.X, (int)d.Y, (int)a.X, (int)a.Y], finalColor);
+            if (debugMode)
+            {
+                bitmap.DrawPolyline([(int)a.X, (int)a.Y, (int)b.X, (int)b.Y, (int)c.X, (int)c.Y, (int)d.X, (int)d.Y, (int)a.X, (int)a.Y], color);
+            }
         }
     }
 

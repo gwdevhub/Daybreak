@@ -51,7 +51,7 @@ internal sealed class SharpNavPathfinder : IPathfinder
         return await new TaskFactory().StartNew(() => this.CalculatePathInternal(map, startPoint, endPoint, cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
     }
 
-    public Task<NavMesh?> GenerateNavMesh(List<Trapezoid> trapezoids, CancellationToken cancellationToken)
+    public Task<object?> GenerateNavMesh(List<Trapezoid> trapezoids, List<List<int>> computedAdjacencyList, CancellationToken cancellationToken)
     {
         /*
          * High sensitivity loads meshes in 2 - 10s. Low sensitivity generates in ~100 ms. Low sensitivity ignores small objects on the mesh.
@@ -63,21 +63,21 @@ internal sealed class SharpNavPathfinder : IPathfinder
         settings.CellHeight = highSensitivity ? 60 : 200;
         settings.ContourFlags = ContourBuildFlags.None;
         settings.SampleDistance = highSensitivity ? 15 : 100;
-        return new TaskFactory().StartNew(() => this.GenerateNavMesh(ConvertTrapezoidsToTriangles(trapezoids), settings), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        return new TaskFactory().StartNew<object?>(() => this.GenerateNavMesh(ConvertTrapezoidsToTriangles(trapezoids), settings), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
     }
 
     private Result<PathfindingResponse, PathfindingFailure> CalculatePathInternal(PathingData pathingData, Point startPoint, Point endPoint, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.CalculatePath), string.Empty);
         if (pathingData is null ||
-            pathingData.NavMesh is null)
+            pathingData.NavMesh is not NavMesh navMesh)
         {
             scopedLogger.LogError("Null pathfinding map");
             return new PathfindingFailure.UnexpectedFailure();
         }
 
         var sw = Stopwatch.StartNew();
-        var query = new NavMeshQuery(pathingData.NavMesh, 2048);
+        var query = new NavMeshQuery(navMesh, 2048);
         var startVec = new Vector3((float)startPoint.X, 0, (float)startPoint.Y);
         var endVec = new Vector3((float)endPoint.X, 0, (float)endPoint.Y);
         var extents = Vector3.One;

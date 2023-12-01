@@ -281,12 +281,14 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
                 originalPathingMaps[trapezoid.PathingMapId].Add(trapezoid.Id);
             }
 
+            var computedAdjacencyList = BuildFinalAdjacencyList(trapezoidList, originalPathingMaps, adjacencyList);
             return new PathingData
             {
                 Trapezoids = trapezoidList,
                 OriginalAdjacencyList = adjacencyList,
                 OriginalPathingMaps = originalPathingMaps,
-                NavMesh = await this.pathfinder.GenerateNavMesh(trapezoidList, cancellationToken)
+                ComputedAdjacencyList = computedAdjacencyList,
+                NavMesh = await this.pathfinder.GenerateNavMesh(trapezoidList, computedAdjacencyList, cancellationToken)
             };
         }
         catch (Exception ex)

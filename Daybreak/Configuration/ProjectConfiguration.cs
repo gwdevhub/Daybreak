@@ -228,7 +228,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IPrivilegeManager, PrivilegeManager>();
         services.AddScoped<IScreenManager, ScreenManager>();
         services.AddScoped<IGraphClient, GraphClient>();
-        services.AddScoped<IPathfinder, SharpNavPathfinder>();
+        services.AddScoped<IPathfinder, StupidPathfinder2>();
         services.AddScoped<IOnboardingService, OnboardingService>();
         services.AddScoped<IExperienceCalculator, ExperienceCalculator>();
         services.AddScoped<IAttributePointCalculator, AttributePointCalculator>();

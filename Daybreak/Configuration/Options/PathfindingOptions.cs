@@ -13,4 +13,8 @@ internal sealed class PathfindingOptions
     [JsonProperty(nameof(HighSensitivity))]
     [OptionName(Name = "High Sensitivity", Description = "If true, the pathfinder generate much more accurate paths. This will greatly increase memory usage and map load times")]
     public bool HighSensitivity { get; set; } = false;
+
+    [JsonProperty(nameof(DebugMode))]
+    [OptionName(Name = "Debug Mode", Description = "If true, the minimap will draw extra debugging features")]
+    public bool DebugMode { get; set; } = false;
 }
