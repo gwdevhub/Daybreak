@@ -319,21 +319,6 @@ public partial class GuildwarsMinimap : UserControl
         var color = this.themeManager.GetForegroundColor();
 
         var debugMode = this.liveOptions.Value.DebugMode;
-        if (this.PathingData.NavMesh is SuperOvercomplicatedNavmesh navmesh && debugMode)
-        {
-            foreach(var triangle in navmesh.Triangles)
-            {
-                var a = new Point((int)((triangle.A.X - minWidth) / MapDownscaleFactor), (int)((height - triangle.A.Y + minHeight) / MapDownscaleFactor));
-                var b = new Point((int)((triangle.B.X - minWidth) / MapDownscaleFactor), (int)((height - triangle.B.Y + minHeight) / MapDownscaleFactor));
-                var c = new Point((int)((triangle.C.X - minWidth) / MapDownscaleFactor), (int)((height - triangle.C.Y + minHeight) / MapDownscaleFactor));
-
-                bitmap.FillPolygon([(int)a.X, (int)a.Y, (int)b.X, (int)b.Y, (int)c.X, (int)c.Y, (int)a.X, (int)a.Y], ColorPalette.Colors[triangle.Id % ColorPalette.Colors.Count]);
-                //bitmap.DrawPolyline([(int)a.X, (int)a.Y, (int)b.X, (int)b.Y, (int)c.X, (int)c.Y, (int)a.X, (int)a.Y], ColorPalette.Red);
-            }
-
-            return;
-        }
-
         foreach (var trapezoid in this.PathingData.Trapezoids)
         {
             var a = new Point((int)((trapezoid.XTL - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YT + minHeight) / MapDownscaleFactor));
@@ -343,10 +328,24 @@ public partial class GuildwarsMinimap : UserControl
 
             var finalColor = debugMode ? ColorPalette.Colors[trapezoid.PathingMapId % ColorPalette.Colors.Count] : color;
             bitmap.FillPolygon([(int)a.X, (int)a.Y, (int)b.X, (int)b.Y, (int)c.X, (int)c.Y, (int)d.X, (int)d.Y, (int)a.X, (int)a.Y], finalColor);
-            if (debugMode)
+        }
+
+        if (this.PathingData.NavMesh is SuperOvercomplicatedNavmesh navmesh && debugMode)
+        {
+            foreach (var node in navmesh.Trapezoids)
             {
+                var trapezoid = node.Trapezoid;
+                var a = new Point((int)((trapezoid.XTL - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YT + minHeight) / MapDownscaleFactor));
+                var b = new Point((int)((trapezoid.XTR - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YT + minHeight) / MapDownscaleFactor));
+                var c = new Point((int)((trapezoid.XBR - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YB + minHeight) / MapDownscaleFactor));
+                var d = new Point((int)((trapezoid.XBL - minWidth) / MapDownscaleFactor), (int)((height - trapezoid.YB + minHeight) / MapDownscaleFactor));
+
+                var finalColor = debugMode ? ColorPalette.Colors[trapezoid.Id % ColorPalette.Colors.Count] : color;
+                //bitmap.FillPolygon([(int)a.X, (int)a.Y, (int)b.X, (int)b.Y, (int)c.X, (int)c.Y, (int)d.X, (int)d.Y, (int)a.X, (int)a.Y], finalColor);
                 bitmap.DrawPolyline([(int)a.X, (int)a.Y, (int)b.X, (int)b.Y, (int)c.X, (int)c.Y, (int)d.X, (int)d.Y, (int)a.X, (int)a.Y], color);
             }
+
+            return;
         }
     }
 
