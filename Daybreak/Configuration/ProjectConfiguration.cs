@@ -294,6 +294,8 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<TradeAlertsView>();
         viewProducer.RegisterView<TradeAlertSetupView>();
         viewProducer.RegisterView<TradeNotificationView>();
+        viewProducer.RegisterView<TradeAlertsChoiceView>();
+        viewProducer.RegisterView<QuoteAlertSetupView>();
         viewProducer.RegisterView<GuildwarsCopySelectionView>();
         viewProducer.RegisterView<GuildwarsCopyView>();
         viewProducer.RegisterView<DSOALInstallingView>();

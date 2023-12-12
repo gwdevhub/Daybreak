@@ -1,0 +1,81 @@
+﻿<UserControl x:Class="Daybreak.Views.Trade.TradeAlertsChoiceView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Daybreak.Views.Trade"
+             xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Background="{DynamicResource Daybreak.Brushes.Background}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <TextBlock HorizontalAlignment="Center" Text="Create Alert"
+            FontSize="22"
+            Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"/>
+        <Border BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+            BorderThickness="0, 0, 0, 1"/>
+        <StackPanel
+            HorizontalAlignment="Left"
+            Margin="5, 0, 0, 0"
+            Orientation="Horizontal">
+            <buttons:BackButton 
+                Height="30"
+                Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                Clicked="BackButton_Clicked"
+                ToolTip="Go back to alerts"/>
+        </StackPanel>
+        <StackPanel
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Grid.Row="1">
+            <buttons:HighlightButton 
+                Title="Trade Alert"
+                Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                Background="{StaticResource MahApps.Brushes.ThemeBackground}"
+                HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                BorderThickness="1"
+                BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                FontSize="16"
+                Width="250"
+                Height="100"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                Margin="10"
+                ToolTip="Create an alert on Kamadan/Ascalon trade messages"
+                Clicked="AddTradeAlertButton_Clicked" />
+            <buttons:HighlightButton 
+                Title="Buy Quote Alert"
+                Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                Background="{StaticResource MahApps.Brushes.ThemeBackground}"
+                HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                BorderThickness="1"
+                BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                FontSize="16"
+                Width="250"
+                Height="100"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                Margin="10"
+                ToolTip="Create an alert based on the price of buy quotes of items"
+                Clicked="AddBuyQuoteAlertButton_Clicked" />
+            <buttons:HighlightButton 
+                Title="Sell Quote Alert"
+                Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                Background="{StaticResource MahApps.Brushes.ThemeBackground}"
+                HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                BorderThickness="1"
+                BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                FontSize="16"
+                Width="250"
+                Height="100"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                Margin="10"
+                ToolTip="Create an alert based on the price of sell quotes of items"
+                Clicked="AddSellQuoteAlertButton_Clicked" />
+        </StackPanel>
+    </Grid>
+</UserControl>

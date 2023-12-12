@@ -1,13 +1,10 @@
-﻿using Daybreak.Configuration.Options;
-using Daybreak.Models.Trade;
+﻿using Daybreak.Models.Trade;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.TradeChat;
 using System;
 using System.Collections.ObjectModel;
-using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -20,7 +17,7 @@ public partial class TradeAlertsView : UserControl
     private readonly IViewManager viewManager;
     private readonly ITradeAlertingService tradeAlertingService;
 
-    public ObservableCollection<TradeAlert> TradeAlerts { get; set; } = [];
+    public ObservableCollection<ITradeAlert> TradeAlerts { get; set; } = [];
 
     public TradeAlertsView(
         IViewManager viewManager,
@@ -39,7 +36,7 @@ public partial class TradeAlertsView : UserControl
     private void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
     {
         if (sender is not FrameworkElement frameworkElement ||
-            frameworkElement.DataContext is not TradeAlert tradeAlert)
+            frameworkElement.DataContext is not ITradeAlert tradeAlert)
         {
             return;
         }
@@ -49,32 +46,31 @@ public partial class TradeAlertsView : UserControl
 
     private void AddButton_Clicked(object _, EventArgs __)
     {
-        var tradeAlert = new TradeAlert
-        {
-            Enabled = false,
-            Name = "New trade alert"
-        };
-
-        this.tradeAlertingService.AddTradeAlert(tradeAlert);
-        this.TradeAlerts.Add(tradeAlert);
-        this.viewManager.ShowView<TradeAlertSetupView>(tradeAlert);
+        this.viewManager.ShowView<TradeAlertsChoiceView>();
     }
 
     private void HighlightButton_Clicked(object sender, EventArgs e)
     {
         if(sender is not FrameworkElement frameworkElement ||
-           frameworkElement.DataContext is not TradeAlert alert)
+           frameworkElement.DataContext is not ITradeAlert alert)
         {
             return;
         }
 
-        this.viewManager.ShowView<TradeAlertSetupView>(alert);
+        if (alert is TradeAlert)
+        {
+            this.viewManager.ShowView<TradeAlertSetupView>(alert);
+        }
+        else if (alert is QuoteAlert)
+        {
+            this.viewManager.ShowView<QuoteAlertSetupView>(alert);
+        }
     }
 
     private void BinButton_Clicked(object sender, EventArgs e)
     {
         if (sender is not FrameworkElement frameworkElement ||
-           frameworkElement.DataContext is not TradeAlert alert)
+           frameworkElement.DataContext is not ITradeAlert alert)
         {
             return;
         }

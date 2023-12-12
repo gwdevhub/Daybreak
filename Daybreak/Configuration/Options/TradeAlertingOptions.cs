@@ -10,5 +10,5 @@ internal sealed class TradeAlertingOptions
 {
     public TimeSpan MaxLookbackPeriod { get; set; } = TimeSpan.FromDays(31);
     public DateTime LastCheckTime { get; set; } = DateTime.MinValue;
-    public List<TradeAlert> Alerts { get; set; } = [];
+    public List<ITradeAlert> Alerts { get; set; } = [];
 }
