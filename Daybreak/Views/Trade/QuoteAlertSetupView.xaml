@@ -84,7 +84,8 @@
                               Cursor="Hand"/>
         </Grid>
         <Grid Grid.Row="2"
-              Height="35">
+              Height="35"
+              Visibility="Collapsed">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="*"/>
