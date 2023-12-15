@@ -6,11 +6,19 @@
              xmlns:local="clr-namespace:Daybreak.Views"
              xmlns:notifications="clr-namespace:Daybreak.Controls.Notifications"
              xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
+             xmlns:converters="clr-namespace:Daybreak.Converters"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              Loaded="UserControl_Loaded"
              Unloaded="UserControl_Unloaded"
              x:Name="_this"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" TriggerValue="True" IsHidden="False"></converters:BooleanToVisibilityConverter>
+            <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" TriggerValue="False" IsHidden="False"></converters:BooleanToVisibilityConverter>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <Grid Background="{DynamicResource Daybreak.Brushes.Background}">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -20,17 +28,61 @@
         <Border BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
                 BorderThickness="0, 0, 0, 1"
                 Height="40"/>
-        <buttons:HighlightButton Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                                 BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
-                                 BorderThickness="1"
-                                 HighlightColor="{StaticResource MahApps.Brushes.Accent}"
-                                 Title="Clear all"
-                                 FontSize="16"
-                                 HorizontalAlignment="Right"
-                                 VerticalContentAlignment="Center"
-                                 TextPadding="5"
-                                 Clicked="HighlightButton_Clicked"
-                                 ToolTip="Clear all notifications"/>
+        <WrapPanel
+            VerticalAlignment="Center"
+            HorizontalAlignment="Left">
+            <TextBlock 
+                Text="Show All: "
+                Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                FontSize="16"
+                Margin="5, 0, 0, 0"
+                VerticalAlignment="Center"/>
+            <mah:ToggleSwitch VerticalAlignment="Center"
+                              IsOn="{Binding ElementName=_this, Path=ShowAll, Mode=TwoWay}"
+                              Toggled="ToggleSwitch_Toggled"/>
+        </WrapPanel>
+        <WrapPanel
+            HorizontalAlignment="Right"
+            VerticalAlignment="Center">
+            <buttons:BackButton
+                    Grid.Row="0"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Right"
+                    Height="30"
+                    Width="30"
+                    Margin="5"
+                    Clicked="SortButton_Clicked"
+                    Visibility="{Binding ElementName=_this, Path=Descending, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                    RenderTransformOrigin="0.5 0.5">
+                <buttons:BackButton.RenderTransform>
+                    <RotateTransform Angle="270"/>
+                </buttons:BackButton.RenderTransform>
+            </buttons:BackButton>
+            <buttons:BackButton
+                    Grid.Row="0"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Right"
+                    Height="30"
+                    Width="30"
+                    Margin="5"
+                    Clicked="SortButton_Clicked"
+                    Visibility="{Binding ElementName=_this, Path=Descending, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                    RenderTransformOrigin="0.5 0.5">
+                <buttons:BackButton.RenderTransform>
+                    <RotateTransform Angle="90"/>
+                </buttons:BackButton.RenderTransform>
+            </buttons:BackButton>
+            <buttons:HighlightButton Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                         BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                         BorderThickness="1"
+                         HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                         Title="Clear all"
+                         FontSize="16"
+                         TextPadding="5"
+                         VerticalContentAlignment="Center"
+                         Clicked="HighlightButton_Clicked"
+                         ToolTip="Clear all notifications"/>
+        </WrapPanel>
         <ItemsControl
             Grid.Row="1"
             Background="Transparent"
