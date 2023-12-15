@@ -27,7 +27,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
     private readonly ITradeHistoryDatabase tradeHistoryDatabase;
     private readonly ITradeChatService<KamadanTradeChatOptions> kamadanTradeChatService;
     private readonly ITradeChatService<AscalonTradeChatOptions> ascalonTradeChatService;
-    private readonly IUpdateableOptions<TradeAlertingOptions> options;
+    private readonly ILiveUpdateableOptions<TradeAlertingOptions> options;
     private readonly ILogger<TradeAlertingService> logger;
     private readonly CancellationTokenSource cancellationTokenSource = new();
 
@@ -39,7 +39,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
         ITradeHistoryDatabase tradeHistoryDatabase,
         ITradeChatService<KamadanTradeChatOptions> kamadanTradeChatService,
         ITradeChatService<AscalonTradeChatOptions> ascalonTradeChatService,
-        IUpdateableOptions<TradeAlertingOptions> options,
+        ILiveUpdateableOptions<TradeAlertingOptions> options,
         ILogger<TradeAlertingService> logger)
     {
         this.traderQuoteService = traderQuoteService.ThrowIfNull();
@@ -187,7 +187,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
                 }
             }
 
-            await Task.Delay(QuoteCheckDelay, cancellationToken);
+            await Task.Delay(TimeSpan.FromSeconds(this.options.Value.QuoteAlertsInterval), cancellationToken);
         }
     }
 

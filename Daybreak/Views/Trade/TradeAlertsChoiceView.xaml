@@ -63,6 +63,7 @@
                 Clicked="AddBuyQuoteAlertButton_Clicked" />
             <buttons:HighlightButton 
                 Title="Sell Quote Alert"
+                Visibility="Collapsed"
                 Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                 Background="{StaticResource MahApps.Brushes.ThemeBackground}"
                 HighlightColor="{StaticResource MahApps.Brushes.Accent}"
