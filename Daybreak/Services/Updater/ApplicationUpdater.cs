@@ -104,7 +104,8 @@ internal sealed class ApplicationUpdater : IApplicationUpdater
             var metaData = await maybeMetadataResponse.Content.ReadFromJsonAsync<List<Metadata>>();
             if (metaData is not null)
             {
-                return await this.DownloadUpdateInternalBlob(metaData, version, updateStatus);
+                return await
+                    await new TaskFactory().StartNew(() => this.DownloadUpdateInternalBlob(metaData, version, updateStatus), CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current);
             }
         }
 
@@ -259,9 +260,10 @@ internal sealed class ApplicationUpdater : IApplicationUpdater
         updateStatus.CurrentStep = DownloadStatus.InitializingDownload;
         using var packageStream = new FileStream("update.pkg", FileMode.Create);
         var downloaded = 0d;
-        var downloadBuffer = new byte[1024];
+        var downloadBuffer = new byte[8192];
         var sizeToDownload = (double)filesToDownload.Sum(m => m.Size);
         var sw = Stopwatch.StartNew();
+        var lastUpdate = DateTime.Now;
         foreach (var file in filesToDownload)
         {
             var downloadUrl = BlobStorageUrl.Replace(VersionTag, version.ToString().Replace('.', '-')).Replace(FileTag, file.RelativePath);
@@ -283,14 +285,18 @@ internal sealed class ApplicationUpdater : IApplicationUpdater
             var fileSize = file.Size;
             while (fileSize > 0)
             {
-                var toGet = Math.Min(fileSize, 1024);
+                var toGet = Math.Min(fileSize, 8192);
                 await downloadStream.ReadAsync(downloadBuffer, 0, toGet);
                 fileSize -= toGet;
                 await packageStream.WriteAsync(downloadBuffer, 0, toGet);
 
                 downloaded += toGet;
-                var etaMillis = sw.ElapsedMilliseconds * (sizeToDownload - downloaded) / downloaded;
-                updateStatus.CurrentStep = DownloadStatus.Downloading(downloaded / sizeToDownload, TimeSpan.FromMilliseconds(etaMillis));
+                if (DateTime.Now - lastUpdate > TimeSpan.FromSeconds(1))
+                {
+                    lastUpdate = DateTime.Now;
+                    var etaMillis = sw.ElapsedMilliseconds * (sizeToDownload - downloaded) / downloaded;
+                    updateStatus.CurrentStep = DownloadStatus.Downloading(downloaded / sizeToDownload, TimeSpan.FromMilliseconds(etaMillis));
+                }
             }
         }
 
