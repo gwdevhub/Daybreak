@@ -7,6 +7,7 @@ namespace Daybreak.Configuration.Options;
 
 [OptionsName(Name = "Price History")]
 [OptionsIgnore]
+[OptionsSynchronizationIgnore]
 internal sealed class PriceHistoryOptions : ILiteCollectionOptions<TraderQuoteDTO>
 {
     public string HttpsUri { get; set; } = "https://kamadan.gwtoolbox.com/";

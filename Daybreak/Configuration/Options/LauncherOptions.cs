@@ -10,11 +10,13 @@ public sealed class LauncherOptions
 {
     [JsonProperty(nameof(SetGuildwarsWindowSizeOnLaunch))]
     [OptionName(Name = "Set GuildWars Window Size On Launch", Description = "Sets the GuildWars window size and position on launch")]
+    [OptionSynchronizationIgnore]
     public bool SetGuildwarsWindowSizeOnLaunch { get; set; }
 
     [JsonProperty(nameof(DesiredGuildwarsScreen))]
     [OptionName(Name = "Desired GuildWars Screen", Description = "Sets the screen on which the GuildWars window will be placed")]
     [OptionSetterView<ScreenChoiceView>(Action = "Screen Selector")]
+    [OptionSynchronizationIgnore]
     public int DesiredGuildwarsScreen { get; set; }
 
     [JsonProperty(nameof(LaunchGuildwarsAsCurrentUser))]
@@ -23,6 +25,7 @@ public sealed class LauncherOptions
 
     [JsonProperty(nameof(ShortcutLocation))]
     [OptionName(Name = "Shortcut Location", Description = "Location where the shortcut will be placed")]
+    [OptionSynchronizationIgnore]
     public string? ShortcutLocation { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
     [JsonProperty(nameof(PlaceShortcut))]

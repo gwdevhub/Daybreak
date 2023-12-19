@@ -8,6 +8,7 @@ internal sealed class DirectSongOptions
 {
     [JsonProperty(nameof(Path))]
     [OptionName(Name = "Path", Description = "Folder that contains the DirectSong files")]
+    [OptionSynchronizationIgnore]
     public string Path { get; set; } = string.Empty;
 
     [JsonProperty(nameof(Enabled))]

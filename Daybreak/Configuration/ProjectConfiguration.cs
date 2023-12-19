@@ -218,6 +218,8 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IGWCAClient, GWCAClient>();
         services.AddSingleton<IGuildwarsMemoryReader, GWCAMemoryReader>();
         services.AddSingleton<ISevenZipExtractor, SevenZipExtractor>();
+        services.AddSingleton<IGraphClient, GraphClient>();
+        services.AddSingleton<IOptionsSynchronizationService, OptionsSynchronizationService>();
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
         services.AddScoped<IScreenshotProvider, ScreenshotProvider>();
@@ -227,7 +229,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IIconCache, IconCache>();
         services.AddScoped<IPrivilegeManager, PrivilegeManager>();
         services.AddScoped<IScreenManager, ScreenManager>();
-        services.AddScoped<IGraphClient, GraphClient>();
         services.AddScoped<IPathfinder, SharpNavPathfinder>();
         services.AddScoped<IOnboardingService, OnboardingService>();
         services.AddScoped<IExperienceCalculator, ExperienceCalculator>();
@@ -319,6 +320,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<DirectSongInstallationChoiceView>();
         viewProducer.RegisterView<DirectSongOnboardingEntryView>();
         viewProducer.RegisterView<DirectSongSwitchView>();
+        viewProducer.RegisterView<SettingsSynchronizationView>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -392,7 +394,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         optionsProducer.RegisterOptions<ThemeOptions>();
 
         optionsProducer.RegisterOptions<BrowserOptions>();
-        optionsProducer.RegisterOptions<BuildSynchronizationOptions>();
+        optionsProducer.RegisterOptions<SynchronizationOptions>();
         optionsProducer.RegisterOptions<FocusViewOptions>();
 
         optionsProducer.RegisterOptions<MemoryReaderOptions>();

@@ -8,6 +8,7 @@ internal sealed class ToolboxOptions
 {
     [JsonProperty(nameof(DllPath))]
     [OptionName(Name = "DllPath", Description = "The path to GWToolboxdll.dll")]
+    [OptionSynchronizationIgnore]
     public string? DllPath { get; set; }
 
     [JsonProperty(nameof(Enabled))]
