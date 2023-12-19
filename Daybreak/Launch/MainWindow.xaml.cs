@@ -91,7 +91,6 @@ public partial class MainWindow : MetroWindow
         this.IsRunningAsAdmin = this.privilegeManager.AdminPrivileges;
         this.ThemeOptionsChanged();
         this.SetupMenuService();
-        this.PeriodicallyCheckSettingsSynchronization();
     }
 
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -144,17 +143,6 @@ public partial class MainWindow : MetroWindow
     private void SetupImageCycle()
     {
         System.Extensions.TaskExtensions.RunPeriodicAsync(() => this.Dispatcher.Invoke(() => this.UpdateRandomImage()), TimeSpan.Zero, TimeSpan.FromSeconds(15), this.cancellationToken.Token);
-    }
-
-    private async void PeriodicallyCheckSettingsSynchronization()
-    {
-        while (!this.cancellationToken.IsCancellationRequested)
-        {
-            var currentOptions = await this.optionsSynchronizationService.GetLocalOptions(this.cancellationToken.Token);
-            var remoteOptions = await this.optionsSynchronizationService.GetRemoteOptions(this.cancellationToken.Token);
-            this.SettingsSynchronized = JsonConvert.SerializeObject(currentOptions) == JsonConvert.SerializeObject(remoteOptions);
-            await Task.Delay(1000, this.cancellationToken.Token);
-        }
     }
 
     private async void UpdateRandomImage()
