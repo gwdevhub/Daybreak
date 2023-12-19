@@ -4,6 +4,7 @@ using System;
 namespace Daybreak.Configuration.Options;
 
 [OptionsName(Name = "Trader Quotes")]
+[OptionsSynchronizationIgnore]
 internal sealed class TraderQuotesOptions
 {
     [OptionIgnore]

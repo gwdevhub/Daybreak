@@ -9,9 +9,11 @@ namespace Daybreak.Configuration.Options;
 internal sealed class TradeAlertingOptions
 {
     [OptionIgnore]
+    [OptionSynchronizationIgnore]
     public TimeSpan MaxLookbackPeriod { get; set; } = TimeSpan.FromDays(31);
 
     [OptionIgnore]
+    [OptionSynchronizationIgnore]
     public DateTime LastCheckTime { get; set; } = DateTime.MinValue;
 
     [OptionIgnore]

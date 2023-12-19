@@ -19,6 +19,8 @@ public interface IGraphClient
     Task<Result<bool, Exception>> DownloadBuilds();
     Task<Result<bool, Exception>> UploadBuild(string buildName);
     Task<Result<bool, Exception>> DownloadBuild(string buildName);
+    Task<Result<bool, Exception>> UploadSettings(string settings, CancellationToken cancellationToken);
+    Task<Result<string, Exception>> DownloadSettings(CancellationToken cancellationToken);
     Task<Result<IEnumerable<BuildFile>, Exception>> RetrieveBuildsList();
     void ResetAuthorization();
 }

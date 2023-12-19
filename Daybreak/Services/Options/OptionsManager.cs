@@ -1,5 +1,6 @@
 ﻿using Daybreak.Attributes;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -7,6 +8,7 @@ using System.Core.Extensions;
 using System.Extensions;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace Daybreak.Services.Options;
 
@@ -114,6 +116,29 @@ internal sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptio
         options.ThrowIfNull();
 
         this.SaveOptions(options.GetType(), options);
+    }
+
+    public void SaveRegisteredOptions(string name, JObject options)
+    {
+        options.ThrowIfNull();
+
+        var registeredType = this.optionsTypes.FirstOrDefault(t =>
+        {
+            var typeName = t.Name;
+            if (t.GetCustomAttribute<OptionsNameAttribute>() is OptionsNameAttribute optionsName)
+            {
+                typeName = optionsName.Name;
+            }
+
+            return name == typeName;
+        });
+
+        if (registeredType is null)
+        {
+            return;
+        }
+
+        this.SaveOptions(registeredType, options);
     }
 
     private void SaveOptions(Type type, object value)

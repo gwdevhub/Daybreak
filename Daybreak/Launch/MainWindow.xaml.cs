@@ -8,12 +8,15 @@ using Daybreak.Services.Screenshots;
 using Daybreak.Services.Updater;
 using Daybreak.Views;
 using MahApps.Metro.Controls;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
@@ -31,6 +34,7 @@ namespace Daybreak.Launch;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
 public partial class MainWindow : MetroWindow
 {
+    private readonly IOptionsSynchronizationService optionsSynchronizationService;
     private readonly ISplashScreenService splashScreenService;
     private readonly IMenuServiceInitializer menuServiceInitializer;
     private readonly IViewManager viewManager;
@@ -55,10 +59,13 @@ public partial class MainWindow : MetroWindow
     private bool blurBackground;
     [GenerateDependencyProperty]
     private bool wintersdayMode;
+    [GenerateDependencyProperty]
+    private bool settingsSynchronized;
 
     public event EventHandler<MainWindow>? WindowParametersChanged;
 
     public MainWindow(
+        IOptionsSynchronizationService optionsSynchronizationService,
         ISplashScreenService splashScreenService,
         IMenuServiceInitializer menuServiceInitializer,
         IViewManager viewManager,
@@ -69,6 +76,7 @@ public partial class MainWindow : MetroWindow
         ILiveOptions<LauncherOptions> launcherOptions,
         ILiveOptions<ThemeOptions> themeOptions)
     {
+        this.optionsSynchronizationService = optionsSynchronizationService.ThrowIfNull();
         this.splashScreenService = splashScreenService.ThrowIfNull();
         this.menuServiceInitializer = menuServiceInitializer.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
@@ -83,7 +91,7 @@ public partial class MainWindow : MetroWindow
         this.IsRunningAsAdmin = this.privilegeManager.AdminPrivileges;
         this.ThemeOptionsChanged();
         this.SetupMenuService();
-
+        this.PeriodicallyCheckSettingsSynchronization();
     }
 
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -110,6 +118,11 @@ public partial class MainWindow : MetroWindow
         this.viewManager.ShowView<LauncherView>();
     }
 
+    private void SynchronizeButton_Click(object sender, EventArgs e)
+    {
+        this.viewManager.ShowView<SettingsSynchronizationView>();
+    }
+
     private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         if (e.ChangedButton is not MouseButton.Left &&
@@ -130,7 +143,18 @@ public partial class MainWindow : MetroWindow
 
     private void SetupImageCycle()
     {
-        TaskExtensions.RunPeriodicAsync(() => this.Dispatcher.Invoke(() => this.UpdateRandomImage()), TimeSpan.Zero, TimeSpan.FromSeconds(15), this.cancellationToken.Token);
+        System.Extensions.TaskExtensions.RunPeriodicAsync(() => this.Dispatcher.Invoke(() => this.UpdateRandomImage()), TimeSpan.Zero, TimeSpan.FromSeconds(15), this.cancellationToken.Token);
+    }
+
+    private async void PeriodicallyCheckSettingsSynchronization()
+    {
+        while (!this.cancellationToken.IsCancellationRequested)
+        {
+            var currentOptions = await this.optionsSynchronizationService.GetLocalOptions(this.cancellationToken.Token);
+            var remoteOptions = await this.optionsSynchronizationService.GetRemoteOptions(this.cancellationToken.Token);
+            this.SettingsSynchronized = JsonConvert.SerializeObject(currentOptions) == JsonConvert.SerializeObject(remoteOptions);
+            await Task.Delay(1000, this.cancellationToken.Token);
+        }
     }
 
     private async void UpdateRandomImage()
