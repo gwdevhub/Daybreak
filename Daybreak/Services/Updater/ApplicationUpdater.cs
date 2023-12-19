@@ -201,6 +201,8 @@ internal sealed class ApplicationUpdater : IApplicationUpdater
     private async Task<bool> DownloadUpdateInternalBlob(List<Metadata> metadata, Version version, UpdateStatus updateStatus)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.DownloadUpdateInternalBlob), version.ToString());
+        updateStatus.CurrentStep = DownloadStatus.InitializingDownload;
+
         // Exclude daybreak packed files
         var daybreakArchive = $"daybreak{version}.zip";
         var filesToDownload = metadata
@@ -257,7 +259,6 @@ internal sealed class ApplicationUpdater : IApplicationUpdater
             })
             .ToList();
 
-        updateStatus.CurrentStep = DownloadStatus.InitializingDownload;
         using var packageStream = new FileStream("update.pkg", FileMode.Create);
         var downloaded = 0d;
         var downloadBuffer = new byte[8192];
