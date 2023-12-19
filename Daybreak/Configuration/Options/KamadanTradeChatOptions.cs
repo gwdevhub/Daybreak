@@ -4,6 +4,7 @@ namespace Daybreak.Configuration.Options;
 
 [OptionsName(Name = "Kamadan Trade Chat")]
 [OptionsIgnore]
+[OptionsSynchronizationIgnore]
 public sealed class KamadanTradeChatOptions : ITradeChatOptions
 {
     public string HttpsUri { get; set; } = "https://kamadan.gwtoolbox.com/";

@@ -43,7 +43,8 @@ internal sealed class GraphClient : IGraphClient
     private const string GraphBaseUrl = "https://graph.microsoft.com/v1.0/";
     private const string TokenUrlPlaceholder = $"https://login.microsoftonline.com/consumers/oauth2/v2.0/token";
     private const string AuthorizationUrlPlaceholder = $"https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id={ClientIdPlaceholder}&response_type=code&redirect_uri={RedirectUriPlaceholder}&response_mode=query&scope={ScopesPlaceholder}&state={StatePlaceholder}";
-    private const string SyncFileUri = $"me/drive/root:/Daybreak/Builds/daybreak.json{ContentSuffix}";
+    private const string BuildsSyncFileUri = $"me/drive/root:/Daybreak/Builds/daybreak.json{ContentSuffix}";
+    private const string SettingsSyncFileUri = $"me/drive/root:/Daybreak/Settings/daybreak.json{ContentSuffix}";
     private const string ContentSuffix = ":/content";
 
     private static readonly byte[] Entropy = Convert.FromBase64String("R3VpbGR3YXJz");
@@ -51,7 +52,7 @@ internal sealed class GraphClient : IGraphClient
 
     private readonly IBuildTemplateManager buildTemplateManager;
     private readonly IViewManager viewManager;
-    private readonly ILiveUpdateableOptions<BuildSynchronizationOptions> liveUpdateableOptions;
+    private readonly ILiveUpdateableOptions<SynchronizationOptions> liveUpdateableOptions;
     private readonly IHttpClient<GraphClient> httpClient;
     private readonly ILogger<GraphClient> logger;
 
@@ -60,7 +61,7 @@ internal sealed class GraphClient : IGraphClient
     public GraphClient(
         IBuildTemplateManager buildTemplateManager,
         IViewManager viewManager,
-        ILiveUpdateableOptions<BuildSynchronizationOptions> liveUpdateableOptions,
+        ILiveUpdateableOptions<SynchronizationOptions> liveUpdateableOptions,
         IHttpClient<GraphClient> httpClient,
         ILogger<GraphClient> logger)
     {
@@ -252,6 +253,39 @@ internal sealed class GraphClient : IGraphClient
         this.ResetRefreshToken();
     }
 
+    public async Task<Result<bool, Exception>> UploadSettings(string settings, CancellationToken cancellationToken)
+    {
+        using var stringContent = new StringContent(settings);
+        try
+        {
+            var response = await this.httpClient.PutAsync(SettingsSyncFileUri, stringContent, cancellationToken);
+            return response.IsSuccessStatusCode;
+        }
+        catch(Exception e)
+        {
+            return e;
+        }
+    }
+
+    public async Task<Result<string, Exception>> DownloadSettings(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var fileItemResponse = await this.httpClient.GetAsync(SettingsSyncFileUri, cancellationToken);
+            if (fileItemResponse.IsSuccessStatusCode is false)
+            {
+                return string.Empty;
+            }
+
+            var driveItemContent = await fileItemResponse.Content.ReadAsStringAsync(cancellationToken);
+            return driveItemContent;
+        }
+        catch(Exception e)
+        {
+            return e;
+        }
+    }
+
     private async Task<Optional<TokenResponse>> RefreshAccessToken()
     {
         var maybeRefreshToken = this.LoadRefreshToken();
@@ -298,7 +332,7 @@ internal sealed class GraphClient : IGraphClient
         buildList = buildList.OrderBy(b => b.FileName).ToList();
 
         using var stringContent = new StringContent(JsonConvert.SerializeObject(buildList));
-        var response = await this.httpClient.PutAsync(SyncFileUri, stringContent);
+        var response = await this.httpClient.PutAsync(BuildsSyncFileUri, stringContent);
         if (response.IsSuccessStatusCode is false)
         {
             return false;
@@ -322,7 +356,7 @@ internal sealed class GraphClient : IGraphClient
         buildList = buildList.OrderBy(b => b.FileName).ToList();
 
         using var stringContent = new StringContent(JsonConvert.SerializeObject(buildList));
-        var response = await this.httpClient.PutAsync(SyncFileUri, stringContent);
+        var response = await this.httpClient.PutAsync(BuildsSyncFileUri, stringContent);
         if (response.IsSuccessStatusCode is false)
         {
             return false;
@@ -334,7 +368,7 @@ internal sealed class GraphClient : IGraphClient
 
     private async Task<Optional<List<BuildFile>>> GetBuildsBackup()
     {
-        var fileItemResponse = await this.httpClient.GetAsync(SyncFileUri);
+        var fileItemResponse = await this.httpClient.GetAsync(BuildsSyncFileUri);
         if (fileItemResponse.IsSuccessStatusCode is false)
         {
             return Optional.None<List<BuildFile>>();
