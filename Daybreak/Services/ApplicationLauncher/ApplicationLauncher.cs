@@ -174,9 +174,9 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
         var args = new List<string>()
         {
             "-email",
-            email,
+            $"\"{email}\"",
             "-password",
-            password!.ToString()
+            $"\"{password}\""
         };
         if (!string.IsNullOrWhiteSpace(character))
         {
