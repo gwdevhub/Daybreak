@@ -62,6 +62,9 @@ namespace http {
             int port = FindPort();
             if (port > 0) {
                 std::cout << "Initializing server on port " << port << std::endl;
+                server.set_read_timeout(1, 0);
+                server.set_write_timeout(1, 0);
+                server.set_idle_interval(0, 100000);
                 server.listen("0.0.0.0", port);
                 return true;
             }

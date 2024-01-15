@@ -287,6 +287,11 @@ namespace Daybreak::Modules::GameModule {
         auto name = Daybreak::Utils::WStringToString(nameString);
         player.Name = name;
 
+        if (titles.empty() ||
+            titleTiers.empty()) {
+            return;
+        }
+
         for (const auto &t : titles) {
             if (t.current_title_tier_index == gwPlayer->active_title_tier) {
                 gwTitle = t;
@@ -360,14 +365,8 @@ namespace Daybreak::Modules::GameModule {
         }
 
         auto titles = GetTitles();
-        if (titles.empty()) {
-            return gamePayload;
-        }
 
         auto titleTiers = GetTitleTiers();
-        if (titleTiers.empty()) {
-            return gamePayload;
-        }
 
         auto players = GetPlayers();
         if (players.empty()) {

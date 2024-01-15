@@ -28,6 +28,7 @@ target_compile_features(Daybreak.GWCA PUBLIC cxx_std_17)
 target_compile_definitions(Daybreak.GWCA PRIVATE
     $<$<CONFIG:Debug>:BUILD_TYPE_DEBUG>
     $<$<CONFIG:Release>:BUILD_TYPE_RELEASE>
+    NOMINMAX
 )
 
 target_precompile_headers(Daybreak.GWCA PRIVATE "header/pch.h")
