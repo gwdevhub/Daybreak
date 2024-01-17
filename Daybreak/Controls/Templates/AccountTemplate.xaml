@@ -23,7 +23,6 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"></RowDefinition>
                 <RowDefinition Height="auto"></RowDefinition>
-                <RowDefinition Height="auto"></RowDefinition>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"></ColumnDefinition>
@@ -31,7 +30,6 @@
             </Grid.ColumnDefinitions>
             <TextBlock FontSize="16" Text="Username:" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Margin="5" Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Center"></TextBlock>
             <TextBlock FontSize="16" Text="Password:" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Margin="5" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Center"></TextBlock>
-            <TextBlock FontSize="16" Text="Character name:" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Margin="5" Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center"></TextBlock>
             <TextBox Text="{Binding ElementName=_this, Path=Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent"
                                               BorderThickness="1" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1"
                                               FontSize="16" TextChanged="UsernameTextbox_TextChanged" Margin="5"
@@ -40,10 +38,6 @@
                          BorderThickness="1" HorizontalAlignment="Stretch" Grid.Row="1" Grid.Column="1"
                          FontSize="16" PasswordChanged="Passwordbox_PasswordChanged" Margin="5"
                          ToolTip="Password" />
-            <TextBox Text="{Binding ElementName=_this, Path=CharacterName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent"
-                                              BorderThickness="1" HorizontalAlignment="Stretch" Grid.Row="2" Grid.Column="1"
-                                              FontSize="16" TextChanged="CharacterNameTextbox_TextChanged" Margin="5"
-                                              ToolTip="Character name" />
         </Grid>
         <buttons:BinButton Grid.Column="2" Height="30" Width="30" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" VerticalAlignment="Center" Margin="5, 5, 5, 5"
                            Clicked="BinButton_Clicked"

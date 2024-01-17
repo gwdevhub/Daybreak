@@ -62,9 +62,6 @@
                                     <TextBlock Text="{Binding Credentials.Username}"
                                                FontSize="16"
                                                Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"/>
-                                    <TextBlock Text="{Binding Credentials.CharacterName}"
-                                               FontSize="12"
-                                               Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"/>
                                     <TextBlock Text="{Binding ExecutablePath}"
                                                FontSize="12"
                                                Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"/>
