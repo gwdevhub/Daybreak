@@ -21,8 +21,6 @@ public partial class AccountTemplate : UserControl
     private string username = string.Empty;
     [GenerateDependencyProperty]
     private string password = string.Empty;
-    [GenerateDependencyProperty]
-    private string characterName = string.Empty;
 
     public AccountTemplate()
     {
@@ -36,7 +34,6 @@ public partial class AccountTemplate : UserControl
         {
             this.PasswordBox.Password = loginCredentials.Password;
             this.Username = loginCredentials.Username;
-            this.CharacterName = loginCredentials.CharacterName;
         }
     }
 
@@ -48,11 +45,6 @@ public partial class AccountTemplate : UserControl
     private void UsernameTextbox_TextChanged(object sender, EventArgs e)
     {
         this.DataContext.As<LoginCredentials>()!.Username = this.Username;
-    }
-
-    private void CharacterNameTextbox_TextChanged(object sender, EventArgs e)
-    {
-        this.DataContext.As<LoginCredentials>()!.CharacterName = this.CharacterName;
     }
 
     private void Passwordbox_PasswordChanged(object sender, EventArgs e)

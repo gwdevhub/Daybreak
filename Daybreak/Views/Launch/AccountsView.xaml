@@ -26,7 +26,6 @@
                 <DataTemplate>
                     <controls:AccountTemplate Username="{Binding Username, Mode=TwoWay}"
                                               Password="{Binding Password, Mode=TwoWay}"
-                                              CharacterName="{Binding CharacterName, Mode=TwoWay}"
                                               RemoveClicked="AccountTemplate_RemoveClicked"/>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

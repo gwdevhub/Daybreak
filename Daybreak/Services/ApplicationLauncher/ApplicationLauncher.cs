@@ -86,7 +86,6 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
         var gwProcess = await this.LaunchGuildwarsProcess(
             credentials.Username!.ThrowIfNull(),
             credentials.Password!.ThrowIfNull(),
-            credentials.CharacterName!.ThrowIfNull(),
             launchConfigurationWithCredentials.ExecutablePath!.ThrowIfNull());
         if (gwProcess is null)
         {
@@ -164,7 +163,7 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
         Application.Current.Shutdown();
     }
 
-    private async Task<Process?> LaunchGuildwarsProcess(string email, Models.SecureString password, string character, string executable)
+    private async Task<Process?> LaunchGuildwarsProcess(string email, Models.SecureString password, string executable)
     {
         if (File.Exists(executable) is false)
         {
@@ -176,13 +175,10 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
             "-email",
             $"\"{email}\"",
             "-password",
-            $"\"{password}\""
+            $"\"{password}\"",
+            "-character",
+            "\"\""
         };
-        if (!string.IsNullOrWhiteSpace(character))
-        {
-            args.Add("-character");
-            args.Add($"\"{character}\"");
-        }
 
         var mods = this.modsManager.GetMods().Where(m => m.IsEnabled && m.IsInstalled).ToList();
         var disabledmods = this.modsManager.GetMods().Where(m => !m.IsEnabled && m.IsInstalled).ToList();

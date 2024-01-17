@@ -70,7 +70,6 @@ internal sealed class CredentialManager : ICredentialManager
     {
         return new LoginCredentials
         {
-            CharacterName = string.Empty,
             Username = string.Empty,
             Password = string.Empty,
             Identifier = Guid.NewGuid().ToString()
@@ -88,7 +87,6 @@ internal sealed class CredentialManager : ICredentialManager
                 Identifier = protectedLoginCredentials.Identifier,
                 Username = Encoding.UTF8.GetString(ProtectedData.Unprotect(usrbytes, Entropy, DataProtectionScope.LocalMachine)),
                 Password = Encoding.UTF8.GetString(ProtectedData.Unprotect(psdBytes, Entropy, DataProtectionScope.LocalMachine)),
-                CharacterName = protectedLoginCredentials.CharacterName,
             };
         }
         catch (Exception e)
@@ -109,7 +107,6 @@ internal sealed class CredentialManager : ICredentialManager
                 Identifier = loginCredentials.Identifier,
                 ProtectedUsername = Convert.ToBase64String(ProtectedData.Protect(usrBytes, Entropy, DataProtectionScope.LocalMachine)),
                 ProtectedPassword = Convert.ToBase64String(ProtectedData.Protect(psdBytes, Entropy, DataProtectionScope.LocalMachine)),
-                CharacterName = loginCredentials.CharacterName,
             };
         }
         catch

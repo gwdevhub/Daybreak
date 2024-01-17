@@ -33,9 +33,6 @@
                            Foreground="{StaticResource MahApps.Brushes.Accent}"
                            Visibility="{Binding ElementName=_this, Path=GameRunning, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
             </WrapPanel>
-            <TextBlock Text="{Binding Credentials.CharacterName}"
-                               FontSize="16"
-                               Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"/>
             <TextBlock Text="{Binding ExecutablePath}"
                        Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                        FontSize="12"
@@ -52,9 +49,6 @@
                            FontSize="22"
                            Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"/>
             </WrapPanel>
-            <TextBlock Text="{Binding Credentials.CharacterName}"
-                       FontSize="16"
-                       Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"/>
             <TextBlock Text="{Binding ExecutablePath}"
                Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                FontSize="12"
