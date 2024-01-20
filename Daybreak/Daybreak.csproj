@@ -11,7 +11,7 @@
     <LangVersion>preview</LangVersion>
     <ApplicationIcon>Daybreak.ico</ApplicationIcon>
     <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
-    <Version>0.9.9.5</Version>
+    <Version>0.9.9.6</Version>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <UserSecretsId>cfb2a489-db80-448d-a969-80270f314c46</UserSecretsId>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -66,7 +66,7 @@
 
   <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
-    <None Include="..\build\Daybreak.GWCA\$(Configuration)\Daybreak.GWCA.dll" Link="GWCA\Daybreak.GWCA.dll">
+    <None Include="..\Daybreak.GWCA\bin\$(Configuration)\Daybreak.GWCA.dll" Link="GWCA\Daybreak.GWCA.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

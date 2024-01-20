@@ -177,7 +177,7 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
             "-password",
             $"\"{password}\"",
             "-character",
-            "\"\""
+            "\"Daybreak\""
         };
 
         var mods = this.modsManager.GetMods().Where(m => m.IsEnabled && m.IsInstalled).ToList();
