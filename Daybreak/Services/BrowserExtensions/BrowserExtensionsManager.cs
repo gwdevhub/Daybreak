@@ -2,7 +2,9 @@
 using Slim;
 using System.Core.Extensions;
 using System.Extensions;
+using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Daybreak.Services.BrowserExtensions;
@@ -30,7 +32,18 @@ public sealed class BrowserExtensionsManager : IBrowserExtensionsManager, IBrows
             .Where(e => existingExtensions.None(ee => ee.Id == e.ExtensionId)))
         {
             await extension.CheckAndUpdate(browserVersion);
-            await coreWebView2Profile.AddBrowserExtensionAsync(await extension.GetExtensionPath());
+            var extensionPath = await extension.GetExtensionPath();
+            if (!Directory.Exists(extensionPath))
+            {
+                continue;
+            }
+
+            if (!File.Exists(Path.Combine(extensionPath, "manifest.json")))
+            {
+                continue;
+            }
+
+            await coreWebView2Profile.AddBrowserExtensionAsync(extensionPath);
         }
     }
 }

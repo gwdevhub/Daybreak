@@ -48,7 +48,7 @@ internal sealed class DownloadService : IDownloadService
         var fileInfo = new FileInfo(destinationPath);
         fileInfo.Directory?.Create();
         var fileStream = File.Open(destinationPath, FileMode.Create, FileAccess.Write);
-        var downloadSize = (double)response.Content!.Headers!.ContentLength!;
+        var downloadSize = response.Content?.Headers?.ContentLength ?? double.MaxValue;
         var buffer = new byte[1024];
         var length = 0;
         var downloaded = 0d;

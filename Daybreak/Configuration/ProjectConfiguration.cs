@@ -83,7 +83,7 @@ using Daybreak.Views.Onboarding.DirectSong;
 using Daybreak.Services.SevenZip;
 using Daybreak.Services.ReShade.Notifications;
 using Daybreak.Services.BrowserExtensions;
-using Daybreak.Services.AdBlock;
+using Daybreak.Services.UBlockOrigin;
 
 namespace Daybreak.Configuration;
 
@@ -156,6 +156,10 @@ public class ProjectConfiguration : PluginConfigurationBase
                 .Build()
             .RegisterHttpClient<UModService>()
                 .WithMessageHandler(this.SetupLoggingAndMetrics<UModService>)
+                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
+                .Build()
+            .RegisterHttpClient<UBlockOriginService>()
+                .WithMessageHandler(this.SetupLoggingAndMetrics<UBlockOriginService>)
                 .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
                 .Build();
     }
@@ -450,31 +454,10 @@ public class ProjectConfiguration : PluginConfigurationBase
         modsManager.RegisterMod<IDirectSongService, DirectSongService>(singleton: true);
     }
 
-    public static void RegisterBrowserExtensions(IBrowserExtensionsProducer browserExtensionsProducer)
+    public override void RegisterBrowserExtensions(IBrowserExtensionsProducer browserExtensionsProducer)
     {
         browserExtensionsProducer.ThrowIfNull();
-        browserExtensionsProducer.RegisterExtension<AdBlockService>();
-    }
-
-    private static void RegisterLiteCollection<TCollectionType, TOptionsType>(IServiceCollection services)
-        where TOptionsType : class, ILiteCollectionOptions<TCollectionType>
-    {
-        services.AddSingleton(sp =>
-        {
-            var options = sp.GetRequiredService<IOptions<TOptionsType>>();
-            var liteDatabase = sp.GetRequiredService<ILiteDatabase>();
-            return liteDatabase.GetCollection<TCollectionType>(options.Value.CollectionName, BsonAutoId.Int64);
-        });
-    }
-
-    private static void SetupDaybreakUserAgent(HttpRequestHeaders httpRequestHeaders)
-    {
-        httpRequestHeaders.ThrowIfNull().TryAddWithoutValidation("User-Agent", DaybreakUserAgent);
-    }
-
-    private static void SetupChromeImpersonationUserAgent(HttpRequestHeaders httpRequestHeaders)
-    {
-        httpRequestHeaders.ThrowIfNull().TryAddWithoutValidation("User-Agent", ChromeImpersonationUserAgent);
+        browserExtensionsProducer.RegisterExtension<UBlockOriginService>();
     }
 
     private void RegisterLiteCollections(IServiceCollection services)

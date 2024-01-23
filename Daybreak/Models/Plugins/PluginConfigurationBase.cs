@@ -1,4 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Services.BrowserExtensions;
 using Daybreak.Services.Drawing;
 using Daybreak.Services.Metrics;
 using Daybreak.Services.Mods;
@@ -34,6 +35,7 @@ public abstract class PluginConfigurationBase
     public virtual void RegisterOptions(IOptionsProducer optionsProducer) { }
     public virtual void RegisterNotificationHandlers(INotificationHandlerProducer notificationHandlerProducer) { }
     public virtual void RegisterMods(IModsManager modsManager) { }
+    public virtual void RegisterBrowserExtensions(IBrowserExtensionsProducer browserExtensionsProducer) { }
 
     public PluginConfigurationBase()
     {
