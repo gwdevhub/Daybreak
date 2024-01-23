@@ -3,12 +3,14 @@ using Daybreak.Configuration.Options;
 using Daybreak.Models;
 using Daybreak.Models.Browser;
 using Daybreak.Models.Guildwars;
+using Daybreak.Services.Browser;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Web.WebView2.Core;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
@@ -21,6 +23,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
+using System.Windows.Input;
 
 namespace Daybreak.Controls;
 
@@ -39,7 +42,7 @@ public partial class ChromiumBrowserWrapper : UserControl
     private const string BrowserSearchLink = $"https://www.google.com/search?q={BrowserSearchPlaceholder}";
     private const string BrowserDownloadLink = "https://developer.microsoft.com/en-us/microsoft-edge/webview2/";
 
-    private static readonly Regex WebAddressRegex = new("^((http|ftp|https)://)?([\\w_-]+(?:(?:\\.[\\w_-]+)+))([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?", RegexOptions.Compiled);
+    private static readonly Regex WebAddressRegex = BuildWebAddressRegex();
     private static readonly object Lock = new();
 
     private static CoreWebView2Environment? CoreWebView2Environment;    
@@ -50,11 +53,13 @@ public partial class ChromiumBrowserWrapper : UserControl
     public event EventHandler<DownloadPayload>? DownloadingFile;
     public event EventHandler<string>? DownloadedFile;
 
+    private readonly HashSet<ulong> domNavigationIds = [];
     private readonly Task initializationTask;
     private readonly IHttpClient<ChromiumBrowserWrapper> httpClient;
     private readonly ILiveOptions<BrowserOptions> liveOptions;
     private readonly ILogger<ChromiumBrowserWrapper> logger;
     private readonly IBuildTemplateManager buildTemplateManager;
+    private readonly IBrowserHistoryManager historyManager;
     
     [GenerateDependencyProperty(InitialValue = true)]
     private bool canDownloadBuild;
@@ -95,8 +100,12 @@ public partial class ChromiumBrowserWrapper : UserControl
         set => this.SetValue(AddressProperty, value);
     }
 
+    public IBrowserHistoryManager BrowserHistoryManager => this.historyManager;
+
     public ChromiumBrowserWrapper()
-        : this(Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IHttpClient<ChromiumBrowserWrapper>>(),
+        : this(
+              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IBrowserHistoryManager>(),
+              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IHttpClient<ChromiumBrowserWrapper>>(),
               Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILiveOptions<BrowserOptions>>(),
               Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IBuildTemplateManager>(),
               Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILogger<ChromiumBrowserWrapper>>())
@@ -104,11 +113,13 @@ public partial class ChromiumBrowserWrapper : UserControl
     }
 
     public ChromiumBrowserWrapper(
+        IBrowserHistoryManager historyManager,
         IHttpClient<ChromiumBrowserWrapper> httpClient,
         ILiveOptions<BrowserOptions> liveOptions,
         IBuildTemplateManager buildTemplateManager,
         ILogger<ChromiumBrowserWrapper> logger)
     {
+        this.historyManager = historyManager.ThrowIfNull();
         this.httpClient = httpClient.ThrowIfNull();
         this.liveOptions = liveOptions.ThrowIfNull();
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
@@ -116,6 +127,7 @@ public partial class ChromiumBrowserWrapper : UserControl
         this.InitializeEnvironment();
         this.InitializeComponent();
 
+        this.historyManager.InitializeHistoryManager(this);
         this.initializationTask = Task.Run(this.InitializeBrowserSafe);
     }
 
@@ -217,6 +229,21 @@ public partial class ChromiumBrowserWrapper : UserControl
         this.AddressBarReadonly = this.liveOptions!.Value.AddressBarReadonly;
         this.CanDownloadBuild = this.liveOptions.Value.DynamicBuildLoading;
         this.WebBrowser.CoreWebView2.NewWindowRequested += (browser, args) => args.Handled = true;
+        this.WebBrowser.KeyDown += (sender, e) =>
+        {
+            if ((e.Key == Key.Left && Keyboard.Modifiers == ModifierKeys.Alt) ||
+                (e.Key == Key.BrowserBack))
+            {
+                this.BrowserHistoryManager.GoBack();
+                e.Handled = true; // Prevent default behavior
+            }
+            else if ((e.Key == Key.Right && Keyboard.Modifiers == ModifierKeys.Alt) ||
+                     (e.Key == Key.BrowserForward))
+            {
+                this.BrowserHistoryManager.GoForward();
+                e.Handled = true; // Prevent default behavior
+            }
+        };
         this.WebBrowser.NavigationStarting += (browser, args) =>
         {
             if (this.CanNavigate is false && args.Uri != this.Address)
@@ -271,6 +298,13 @@ public partial class ChromiumBrowserWrapper : UserControl
         };
         this.WebBrowser.CoreWebView2.DOMContentLoaded += async (browser, args) =>
         {
+            if (this.domNavigationIds.Contains(args.NavigationId))
+            {
+                return;
+            }
+
+            this.domNavigationIds.Add(args.NavigationId);
+            await this.WebBrowser.CoreWebView2.ExecuteScriptAsync(Scripts.CaptureNavigationButtons);
             if (this.CanDownloadBuild)
             {
                 await this.WebBrowser.CoreWebView2.ExecuteScriptAsync(Scripts.SendSelectionOnContextMenu);
@@ -381,7 +415,7 @@ public partial class ChromiumBrowserWrapper : UserControl
             this.logger!.LogError(e, $"Exception encountered when deserializing {nameof(BrowserPayload)}");
         }
 
-        if (payload?.Key == BrowserPayload.PayloadKeys.ContextMenu)
+        if (payload?.Key is BrowserPayload.PayloadKeys.ContextMenu)
         {
             var contextMenuPayload = args.WebMessageAsJson.Deserialize<BrowserPayload<OnContextMenuPayload>>();
             var maybeTemplate = contextMenuPayload?.Value?.Selection?.Trim();
@@ -416,6 +450,14 @@ public partial class ChromiumBrowserWrapper : UserControl
                     this.logger!.LogWarning($"Exception when decoding template {maybeTemplate}. Details {e}");
                 }
             });
+        }
+        else if (payload?.Key is BrowserPayload.PayloadKeys.XButton1Pressed)
+        {
+            this.BrowserHistoryManager.GoBack();
+        }
+        else if (payload?.Key is BrowserPayload.PayloadKeys.XButton2Pressed)
+        {
+            this.BrowserHistoryManager.GoForward();
         }
     }
 
@@ -461,26 +503,24 @@ public partial class ChromiumBrowserWrapper : UserControl
             return;
         }
 
+        this.historyManager.UnInitializeHistoryManager();
         this.WebBrowser?.Dispose();
         this.browserInitialized = false;
     }
 
     private void BackButton_Clicked(object sender, EventArgs e)
     {
-        this.WebBrowser.GoBack();
-        this.Address = this.WebBrowser.Source.ToString();
+        this.historyManager.GoBack();
     }
 
     private void ForwardButton_Clicked(object sender, EventArgs e)
     {
-        this.WebBrowser.GoForward();
-        this.Address = this.WebBrowser.Source.ToString();
+        this.historyManager.GoForward();
     }
 
     private void RefreshGlyph_Clicked(object sender, EventArgs e)
     {
-        this.WebBrowser.Reload();
-        this.Address = this.WebBrowser.Source.ToString();
+        this.BrowserHistoryManager.Reload();
     }
 
     private void CancelGlyph_Clicked(object sender, EventArgs e)
@@ -502,6 +542,11 @@ public partial class ChromiumBrowserWrapper : UserControl
     private void MaximizeButton_Clicked(object sender, EventArgs e)
     {
         this.MaximizeClicked?.Invoke(this, e);
+    }
+
+    private void Browser_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        
     }
 
     private void CheckFavoriteAddress()
@@ -541,4 +586,7 @@ public partial class ChromiumBrowserWrapper : UserControl
         Uri.TryCreate(address, UriKind.Absolute, out var uri);
         return uri?.ToString() ?? string.Empty;
     }
+
+    [GeneratedRegex("^((http|ftp|https)://)?([\\w_-]+(?:(?:\\.[\\w_-]+)+))([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?", RegexOptions.Compiled)]
+    private static partial Regex BuildWebAddressRegex();
 }

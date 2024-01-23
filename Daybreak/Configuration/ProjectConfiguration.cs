@@ -82,6 +82,7 @@ using Daybreak.Services.DirectSong;
 using Daybreak.Views.Onboarding.DirectSong;
 using Daybreak.Services.SevenZip;
 using Daybreak.Services.ReShade.Notifications;
+using Daybreak.Services.Browser;
 
 namespace Daybreak.Configuration;
 
@@ -253,6 +254,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IToolboxClient, ToolboxClient>();
         services.AddScoped<IProcessInjector, ProcessInjector>();
         services.AddScoped<ILaunchConfigurationService, LaunchConfigurationService>();
+        services.AddScoped<IBrowserHistoryManager, BrowserHistoryManager>();
     }
 
     public override void RegisterViews(IViewProducer viewProducer)
