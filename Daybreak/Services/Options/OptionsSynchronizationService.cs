@@ -19,8 +19,6 @@ namespace Daybreak.Services.Options;
 
 public sealed class OptionsSynchronizationService : IOptionsSynchronizationService, IApplicationLifetimeService
 {
-    private static string? CurrentOptionsCache;
-
     private readonly IOptionsProvider optionsProvider;
     private readonly IGraphClient graphClient;
     private readonly ILiveOptions<LauncherOptions> liveOptions;
@@ -147,22 +145,23 @@ public sealed class OptionsSynchronizationService : IOptionsSynchronizationServi
     {
         while (true)
         {
-            if (CurrentOptionsCache is null)
-            {
-                CurrentOptionsCache = JsonConvert.SerializeObject(this.GetCurrentOptionsInternal());
-                continue;
-            }
+            await Task.Delay(15000);
 
+            var remoteOptions = await this.GetRemoteOptionsInternal(CancellationToken.None);
+            var remoteOptionsSerialized = JsonConvert.SerializeObject(remoteOptions);
             var currentOptions = JsonConvert.SerializeObject(this.GetCurrentOptionsInternal());
-            if (currentOptions != CurrentOptionsCache &&
+            if (remoteOptions is not null &&
+                currentOptions != remoteOptionsSerialized &&
                 this.liveOptions.Value.AutoBackupSettings)
             {
-                await this.BackupOptions(CancellationToken.None);
-                CurrentOptionsCache = currentOptions;
+                try
+                {
+                    await this.BackupOptions(CancellationToken.None);
+                }
+                catch
+                {
+                }
             }
-
-            
-            await Task.Delay(15000);
         }
     }
 
