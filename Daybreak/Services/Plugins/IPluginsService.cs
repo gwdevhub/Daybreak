@@ -1,4 +1,5 @@
 ﻿using Daybreak.Models.Plugins;
+using Daybreak.Services.BrowserExtensions;
 using Daybreak.Services.Drawing;
 using Daybreak.Services.Mods;
 using Daybreak.Services.Navigation;
@@ -26,7 +27,8 @@ public interface IPluginsService
         IStartupActionProducer startupActionProducer,
         IDrawingModuleProducer drawingModuleProducer,
         INotificationHandlerProducer notificationHandlerProducer,
-        IModsManager modsManager);
+        IModsManager modsManager,
+        IBrowserExtensionsProducer browserExtensionsProducer);
 
     IEnumerable<AvailablePlugin> GetAvailablePlugins();
 

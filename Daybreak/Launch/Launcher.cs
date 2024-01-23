@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Models.Progress;
+using Daybreak.Services.BrowserExtensions;
 using Daybreak.Services.Drawing;
 using Daybreak.Services.ExceptionHandling;
 using Daybreak.Services.Mods;
@@ -95,6 +96,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
         var drawingModuleProducer = this.ServiceProvider.GetRequiredService<IDrawingModuleProducer>();
         var notificationHandlerProducer = this.ServiceProvider.GetRequiredService<INotificationHandlerProducer>();
         var modsManager = this.ServiceProvider.GetRequiredService<IModsManager>();
+        var browserExtensionsProducer = this.ServiceProvider.GetRequiredService<IBrowserExtensionsProducer>();
         
         startupStatus.CurrentStep = StartupStatus.Custom("Loading views");
         this.projectConfiguration.RegisterViews(viewProducer);
@@ -108,6 +110,8 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
         this.projectConfiguration.RegisterNotificationHandlers(notificationHandlerProducer);
         startupStatus.CurrentStep = StartupStatus.Custom("Loading mods");
         this.projectConfiguration.RegisterMods(modsManager);
+        startupStatus.CurrentStep = StartupStatus.Custom("Loading browser extensions");
+        this.projectConfiguration.RegisterBrowserExtensions(browserExtensionsProducer);
 
         this.logger = this.ServiceProvider.GetRequiredService<ILogger<Launcher>>();
         this.exceptionHandler = this.ServiceProvider.GetRequiredService<IExceptionHandler>();
@@ -123,7 +127,8 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
                     startupActionProducer,
                     drawingModuleProducer,
                     notificationHandlerProducer,
-                    modsManager);
+                    modsManager,
+                    browserExtensionsProducer);
         }
         catch(Exception e)
         {

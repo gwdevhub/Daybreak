@@ -82,6 +82,8 @@ using Daybreak.Services.DirectSong;
 using Daybreak.Views.Onboarding.DirectSong;
 using Daybreak.Services.SevenZip;
 using Daybreak.Services.ReShade.Notifications;
+using Daybreak.Services.BrowserExtensions;
+using Daybreak.Services.UBlockOrigin;
 
 namespace Daybreak.Configuration;
 
@@ -155,6 +157,10 @@ public class ProjectConfiguration : PluginConfigurationBase
             .RegisterHttpClient<UModService>()
                 .WithMessageHandler(this.SetupLoggingAndMetrics<UModService>)
                 .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
+                .Build()
+            .RegisterHttpClient<UBlockOriginService>()
+                .WithMessageHandler(this.SetupLoggingAndMetrics<UBlockOriginService>)
+                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
                 .Build();
     }
 
@@ -190,19 +196,19 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IPostUpdateActionProducer>(sp => sp.GetRequiredService<PostUpdateActionManager>());
         services.AddSingleton<IPostUpdateActionProvider>(sp => sp.GetRequiredService<PostUpdateActionManager>());
         services.AddSingleton<IMenuService, MenuService>();
-        services.AddSingleton<IMenuServiceInitializer, MenuService>(sp => sp.GetRequiredService<IMenuService>().As<MenuService>()!);
+        services.AddSingleton<IMenuServiceInitializer, MenuService>(sp => sp.GetRequiredService<IMenuService>().Cast<MenuService>());
         services.AddSingleton<ILiteDatabase, LiteDatabase>(sp => new LiteDatabase("Daybreak.db"));
         services.AddSingleton<IMutexHandler, MutexHandler>();
         services.AddSingleton<IShortcutManager, ShortcutManager>();
         services.AddSingleton<IMetricsService, MetricsService>();
         services.AddSingleton<IStartupActionProducer, StartupActionManager>();
-        services.AddSingleton<IOptionsProducer, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().As<OptionsManager>()!);
-        services.AddSingleton<IOptionsUpdateHook, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().As<OptionsManager>()!);
-        services.AddSingleton<IOptionsProvider, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().As<OptionsManager>()!);
+        services.AddSingleton<IOptionsProducer, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().Cast<OptionsManager>());
+        services.AddSingleton<IOptionsUpdateHook, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().Cast<OptionsManager>());
+        services.AddSingleton<IOptionsProvider, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().Cast<OptionsManager>());
         services.AddSingleton<IThemeManager, ThemeManager>();
         services.AddSingleton<INotificationService, NotificationService>();
-        services.AddSingleton<INotificationProducer, NotificationService>(sp => sp.GetRequiredService<INotificationService>().As<NotificationService>()!);
-        services.AddSingleton<INotificationHandlerProducer, NotificationService>(sp => sp.GetRequiredService<INotificationService>().As<NotificationService>()!);
+        services.AddSingleton<INotificationProducer, NotificationService>(sp => sp.GetRequiredService<INotificationService>().Cast<NotificationService>());
+        services.AddSingleton<INotificationHandlerProducer, NotificationService>(sp => sp.GetRequiredService<INotificationService>().Cast<NotificationService>());
         services.AddSingleton<ILiveChartInitializer, LiveChartInitializer>();
         services.AddSingleton<IImageCache, ImageCache>();
         services.AddSingleton<ISoundService, SoundService>();
@@ -220,6 +226,8 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<ISevenZipExtractor, SevenZipExtractor>();
         services.AddSingleton<IGraphClient, GraphClient>();
         services.AddSingleton<IOptionsSynchronizationService, OptionsSynchronizationService>();
+        services.AddScoped<IBrowserExtensionsManager, BrowserExtensionsManager>();
+        services.AddScoped<IBrowserExtensionsProducer, BrowserExtensionsManager>(sp => sp.GetRequiredService<IBrowserExtensionsManager>().Cast<BrowserExtensionsManager>());
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
         services.AddScoped<IScreenshotProvider, ScreenshotProvider>();
@@ -444,6 +452,12 @@ public class ProjectConfiguration : PluginConfigurationBase
         modsManager.RegisterMod<IGuildwarsScreenPlacer, GuildwarsScreenPlacer>();
         modsManager.RegisterMod<IGWCAInjector, GWCAInjector>();
         modsManager.RegisterMod<IDirectSongService, DirectSongService>(singleton: true);
+    }
+
+    public override void RegisterBrowserExtensions(IBrowserExtensionsProducer browserExtensionsProducer)
+    {
+        browserExtensionsProducer.ThrowIfNull();
+        browserExtensionsProducer.RegisterExtension<UBlockOriginService>();
     }
 
     private void RegisterLiteCollections(IServiceCollection services)

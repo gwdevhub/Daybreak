@@ -1,32 +1,38 @@
 ﻿using Daybreak.Attributes;
+using Daybreak.Configuration.Options;
 using Daybreak.Services.Graph;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.Options;
 
-public sealed class OptionsSynchronizationService : IOptionsSynchronizationService
+public sealed class OptionsSynchronizationService : IOptionsSynchronizationService, IApplicationLifetimeService
 {
     private readonly IOptionsProvider optionsProvider;
     private readonly IGraphClient graphClient;
+    private readonly ILiveOptions<LauncherOptions> liveOptions;
     private readonly ILogger<OptionsSynchronizationService> logger;
 
     public OptionsSynchronizationService(
         IOptionsProvider optionsProvider,
         IGraphClient graphClient,
+        ILiveOptions<LauncherOptions> liveOptions,
         ILogger<OptionsSynchronizationService> logger)
     {
         this.optionsProvider = optionsProvider.ThrowIfNull();
         this.graphClient = graphClient.ThrowIfNull();
+        this.liveOptions = liveOptions.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
     }
 
@@ -133,5 +139,33 @@ public sealed class OptionsSynchronizationService : IOptionsSynchronizationServi
         }
 
         return optionsNameAttribute.Name!;
+    }
+
+    public async void OnStartup()
+    {
+        while (true)
+        {
+            await Task.Delay(15000);
+
+            var remoteOptions = await this.GetRemoteOptionsInternal(CancellationToken.None);
+            var remoteOptionsSerialized = JsonConvert.SerializeObject(remoteOptions);
+            var currentOptions = JsonConvert.SerializeObject(this.GetCurrentOptionsInternal());
+            if (remoteOptions is not null &&
+                currentOptions != remoteOptionsSerialized &&
+                this.liveOptions.Value.AutoBackupSettings)
+            {
+                try
+                {
+                    await this.BackupOptions(CancellationToken.None);
+                }
+                catch
+                {
+                }
+            }
+        }
+    }
+
+    public void OnClosing()
+    {
     }
 }

@@ -112,9 +112,9 @@ public partial class MainWindow : MetroWindow
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
-        this.splashScreenService.HideSplashScreen();
         this.SetupImageCycle();
         this.viewManager.ShowView<LauncherView>();
+        this.splashScreenService.HideSplashScreen();
     }
 
     private void SynchronizeButton_Click(object sender, EventArgs e)

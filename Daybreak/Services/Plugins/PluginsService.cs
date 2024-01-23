@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Models.Plugins;
+using Daybreak.Services.BrowserExtensions;
 using Daybreak.Services.Drawing;
 using Daybreak.Services.Mods;
 using Daybreak.Services.Navigation;
@@ -92,7 +93,8 @@ internal sealed class PluginsService : IPluginsService
         IStartupActionProducer startupActionProducer,
         IDrawingModuleProducer drawingModuleProducer,
         INotificationHandlerProducer notificationHandlerProducer,
-        IModsManager modsManager)
+        IModsManager modsManager,
+        IBrowserExtensionsProducer browserExtensionsProducer)
     {
         serviceManager.ThrowIfNull();
         optionsProducer.ThrowIfNull();
@@ -102,6 +104,7 @@ internal sealed class PluginsService : IPluginsService
         drawingModuleProducer.ThrowIfNull();
         notificationHandlerProducer.ThrowIfNull();
         modsManager.ThrowIfNull();
+        browserExtensionsProducer.ThrowIfNull();
 
         while (!Monitor.TryEnter(Lock)) { }
 
@@ -135,48 +138,57 @@ internal sealed class PluginsService : IPluginsService
         foreach (var result in results)
         {
             var pluginScopedLogger = this.logger.CreateScopedLogger(nameof(this.LoadPlugins), result.PluginEntry?.Name ?? string.Empty);
-            var assembly = ExtractAssembly(result);
-            LogLoadOperation(result, pluginScopedLogger);
-
-            if (assembly is null)
+            try
             {
-                continue;
-            }
+                var assembly = ExtractAssembly(result);
+                LogLoadOperation(result, pluginScopedLogger);
 
-            var entryPoint = assembly.GetTypes().FirstOrDefault(t => t.IsSubclassOf(typeof(PluginConfigurationBase)));
-            if (entryPoint is null)
+                if (assembly is null)
+                {
+                    continue;
+                }
+
+                var entryPoint = assembly.GetTypes().FirstOrDefault(t => t.IsSubclassOf(typeof(PluginConfigurationBase)));
+                if (entryPoint is null)
+                {
+                    pluginScopedLogger.LogError($"Assembly loaded but unable to find entry point. The plugin will not start");
+                    continue;
+                }
+
+                var pluginConfig = Activator.CreateInstance(entryPoint)?.As<PluginConfigurationBase>();
+                if (pluginConfig is null)
+                {
+                    pluginScopedLogger.LogError($"Assembly loaded but unable to create entry point. The plugin will not start");
+                    continue;
+                }
+
+                RegisterResolvers(pluginConfig, serviceManager);
+                pluginScopedLogger.LogInformation("Registered resolvers");
+                RegisterServices(pluginConfig, serviceManager);
+                pluginScopedLogger.LogInformation("Registered services");
+                RegisterOptions(pluginConfig, optionsProducer);
+                pluginScopedLogger.LogInformation("Registered options");
+                RegisterViews(pluginConfig, viewManager);
+                pluginScopedLogger.LogInformation("Registered views");
+                RegisterPostUpdateActions(pluginConfig, postUpdateActionProducer);
+                pluginScopedLogger.LogInformation("Registered post-update actions");
+                RegisterStartupActions(pluginConfig, startupActionProducer);
+                pluginScopedLogger.LogInformation("Registered startup actions");
+                RegisterDrawingModules(pluginConfig, drawingModuleProducer);
+                pluginScopedLogger.LogInformation("Registered drawing modules");
+                RegisterNotificationHandlers(pluginConfig, notificationHandlerProducer);
+                pluginScopedLogger.LogInformation("Registered notification handlers");
+                RegisterMods(pluginConfig, modsManager);
+                pluginScopedLogger.LogInformation("Registered mods");
+                RegisterBrowserExtensions(pluginConfig, browserExtensionsProducer);
+                pluginScopedLogger.LogInformation("Registered browser extensions");
+                this.loadedPlugins.Add(new AvailablePlugin { Name = result.PluginEntry?.Name ?? string.Empty, Path = result.PluginEntry?.Path ?? string.Empty, Enabled = true });
+                pluginScopedLogger.LogInformation("Loaded plugin");
+            }
+            catch(Exception e)
             {
-                pluginScopedLogger.LogError($"Assembly loaded but unable to find entry point. The plugin will not start");
-                continue;
+                pluginScopedLogger.LogError(e, $"Encountered exception while loading plugin");
             }
-
-            var pluginConfig = Activator.CreateInstance(entryPoint)?.As<PluginConfigurationBase>();
-            if (pluginConfig is null)
-            {
-                pluginScopedLogger.LogError($"Assembly loaded but unable to create entry point. The plugin will not start");
-                continue;
-            }
-
-            RegisterResolvers(pluginConfig, serviceManager);
-            pluginScopedLogger.LogInformation("Registered resolvers");
-            RegisterServices(pluginConfig, serviceManager);
-            pluginScopedLogger.LogInformation("Registered services");
-            RegisterOptions(pluginConfig, optionsProducer);
-            pluginScopedLogger.LogInformation("Registered options");
-            RegisterViews(pluginConfig, viewManager);
-            pluginScopedLogger.LogInformation("Registered views");
-            RegisterPostUpdateActions(pluginConfig, postUpdateActionProducer);
-            pluginScopedLogger.LogInformation("Registered post-update actions");
-            RegisterStartupActions(pluginConfig, startupActionProducer);
-            pluginScopedLogger.LogInformation("Registered startup actions");
-            RegisterDrawingModules(pluginConfig, drawingModuleProducer);
-            pluginScopedLogger.LogInformation("Registered drawing modules");
-            RegisterNotificationHandlers(pluginConfig, notificationHandlerProducer);
-            pluginScopedLogger.LogInformation("Registered notification handlers");
-            RegisterMods(pluginConfig, modsManager);
-            pluginScopedLogger.LogInformation("Registered mods");
-            this.loadedPlugins.Add(new AvailablePlugin { Name = result.PluginEntry?.Name ?? string.Empty, Path = result.PluginEntry?.Path ?? string.Empty, Enabled = true });
-            pluginScopedLogger.LogInformation("Loaded plugin");
         }
 
         Monitor.Exit(Lock);
@@ -309,4 +321,6 @@ internal sealed class PluginsService : IPluginsService
     private static void RegisterNotificationHandlers(PluginConfigurationBase pluginConfig, INotificationHandlerProducer notificationHandlerProducer) => pluginConfig.RegisterNotificationHandlers(notificationHandlerProducer);
 
     private static void RegisterMods(PluginConfigurationBase pluginConfig, IModsManager modsManager) => pluginConfig.RegisterMods(modsManager);
+
+    private static void RegisterBrowserExtensions(PluginConfigurationBase pluginConfig, IBrowserExtensionsProducer browserExtensionsProducer) => pluginConfig.RegisterBrowserExtensions(browserExtensionsProducer);
 }
