@@ -67,11 +67,11 @@ public partial class ChromiumBrowserWrapper : UserControl
     [GenerateDependencyProperty(InitialValue = true)]
     private bool controlsEnabled;
     [GenerateDependencyProperty(InitialValue = false)]
-    private bool browserSupported;
+    private bool browserSupported = false;
     [GenerateDependencyProperty]
     private bool addressBarReadonly;
     [GenerateDependencyProperty(InitialValue = false)]
-    private bool browserEnabled;
+    private bool browserEnabled = false;
     [GenerateDependencyProperty]
     private bool navigating;
     [GenerateDependencyProperty]
@@ -86,6 +86,8 @@ public partial class ChromiumBrowserWrapper : UserControl
     private string downloadsDirectory = string.Empty;
     [GenerateDependencyProperty]
     private bool showBrowserDisabledMessage;
+    [GenerateDependencyProperty(InitialValue = true)]
+    private bool showDownloadsDialog = true;
 
     private bool browserInitialized = false;
 
@@ -152,11 +154,13 @@ public partial class ChromiumBrowserWrapper : UserControl
     {
         try
         {
-            if (CoreWebView2Environment is not null)
+            lock (Lock)
             {
-                this.BrowserSupported = true;
-                return;
-            }
+                if (CoreWebView2Environment is not null)
+                {
+                    this.BrowserSupported = true;
+                    return;
+                }
 
             CoreWebView2Environment ??= System.Extensions.TaskExtensions.RunSync(() => CoreWebView2Environment.CreateAsync(null, "BrowserData", new CoreWebView2EnvironmentOptions
             {
@@ -165,7 +169,8 @@ public partial class ChromiumBrowserWrapper : UserControl
                 AreBrowserExtensionsEnabled = true
             }));
 
-            this.BrowserSupported = true;
+                this.BrowserSupported = true;
+            }
         }
         catch(Exception e)
         {
@@ -274,15 +279,30 @@ public partial class ChromiumBrowserWrapper : UserControl
         args.DownloadOperation.StateChanged += this.DownloadOperation_StateChanged;
     }
 
-    private void WebBrowser_NavigationStarting(object? _, CoreWebView2NavigationStartingEventArgs args)
-    {
-        if (this.CanNavigate is false && args.Uri != this.Address)
+            args.DownloadOperation.StateChanged += this.DownloadOperation_StateChanged;
+        };
+        this.WebBrowser.NavigationCompleted += (browser, args) => this.Navigating = false;
+        this.WebBrowser.WebMessageReceived += this.CoreWebView2_WebMessageReceived!;
+        this.WebBrowser.CoreWebView2.IsDefaultDownloadDialogOpenChanged += (browser, args) =>
         {
-            args.Cancel = true;
-        }
-        else
+            if (this.WebBrowser.CoreWebView2.IsDefaultDownloadDialogOpen &&
+                !this.ShowDownloadsDialog)
+            {
+                this.WebBrowser.CoreWebView2.CloseDefaultDownloadDialog();
+            }
+        };
+        this.WebBrowser.CoreWebView2.DOMContentLoaded += async (browser, args) =>
         {
-            this.Navigating = true;
+            if (this.CanDownloadBuild)
+            {
+                await this.WebBrowser.CoreWebView2.ExecuteScriptAsync(Scripts.SendSelectionOnContextMenu);
+            }
+        };
+
+        this.WebBrowser.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
+        if (this.CanDownloadBuild)
+        {
+            await this.WebBrowser.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(Scripts.SendSelectionOnContextMenu);
         }
     }
 

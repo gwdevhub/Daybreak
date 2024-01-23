@@ -7,7 +7,8 @@ namespace Daybreak.Configuration.Options;
 
 [OptionsName(Name = "Price History")]
 [OptionsIgnore]
-public sealed class PriceHistoryOptions : ILiteCollectionOptions<TraderQuoteDTO>
+[OptionsSynchronizationIgnore]
+internal sealed class PriceHistoryOptions : ILiteCollectionOptions<TraderQuoteDTO>
 {
     public string HttpsUri { get; set; } = "https://kamadan.gwtoolbox.com/";
 
@@ -15,5 +16,5 @@ public sealed class PriceHistoryOptions : ILiteCollectionOptions<TraderQuoteDTO>
 
     public TimeSpan UpdateInterval { get; set; } = TimeSpan.FromHours(1);
 
-    public Dictionary<string, DateTime> ItemHistoryMetadata { get; set; } = new();
+    public Dictionary<string, DateTime> ItemHistoryMetadata { get; set; } = [];
 }

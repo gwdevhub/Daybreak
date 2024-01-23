@@ -3,9 +3,10 @@ using Newtonsoft.Json;
 
 namespace Daybreak.Configuration.Options;
 
-[OptionsName(Name = "Build Synchronization")]
+[OptionsName(Name = "Synchronization")]
 [OptionsIgnore]
-public sealed class BuildSynchronizationOptions
+[OptionsSynchronizationIgnore]
+internal sealed class SynchronizationOptions
 {
     [JsonProperty(nameof(ProtectedGraphAccessToken))]
     public string? ProtectedGraphAccessToken { get; set; }

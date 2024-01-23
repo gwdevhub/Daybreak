@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Daybreak.Services.TradeChat;
 
-public sealed class ItemHashService : IItemHashService
+internal sealed class ItemHashService : IItemHashService
 {
     public string? ComputeHash(ItemBase itemBase)
     {

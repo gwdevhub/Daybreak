@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Daybreak.Services.Startup.Actions;
 
-public sealed class RenameInstallerAction : StartupActionBase
+internal sealed class RenameInstallerAction : StartupActionBase
 {
     private const string TemporaryInstallerFileName = "Daybreak.Installer.Temp.exe";
     private const string InstallerFileName = "Daybreak.Installer.exe";

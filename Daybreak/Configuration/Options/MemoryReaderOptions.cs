@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace Daybreak.Configuration.Options;
 
 [OptionsName(Name = "Memory Reader")]
-public sealed class MemoryReaderOptions
+internal sealed class MemoryReaderOptions
 {
     [JsonProperty(nameof(MemoryReaderFrequency))]
     [OptionRange<double>(MinValue = 0, MaxValue = 1000)]

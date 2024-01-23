@@ -27,18 +27,19 @@
                 <ColumnDefinition Width="auto"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <TextBlock FontSize="16" Text="Path:" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Margin="5" Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Center"></TextBlock>
-            <TextBox Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" Text="{Binding ElementName=_this, Path=Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            <TextBlock FontSize="16" Text="Path:" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Margin="5" Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+            <TextBox Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" Text="{Binding Path=Path, Mode=TwoWay }"
                      BorderThickness="1" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1"
-                     FontSize="16" TextChanged="TextBox_TextChanged" Margin="5"></TextBox>
+                     FontSize="16" Margin="5"
+                     ToolTip="Path to Gw.exe"/>
         </Grid>
         <WrapPanel Grid.Column="1">
             <buttons:FilePickerButton Width="30" Height="30" VerticalAlignment="Top" Margin="5"
-                                      Clicked="FilePickerGlyph_Clicked"></buttons:FilePickerButton>
+                                      Clicked="FilePickerGlyph_Clicked"
+                                      ToolTip="Open path dialog"/>
             <buttons:BinButton Grid.Column="2" Height="30" Width="30" VerticalAlignment="Top" Margin="5"
-                               Clicked="BinButton_Clicked"></buttons:BinButton>
-            <buttons:StarButton Grid.Column="2" Height="30" Width="30" VerticalAlignment="Top" Margin="5"
-                                Clicked="StarGlyph_Clicked" IsEnabled="{Binding ElementName=_this, Path=IsDefault, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"></buttons:StarButton>
+                               Clicked="BinButton_Clicked"
+                               ToolTip="Remove entry"/>
         </WrapPanel>
     </Grid>
 </UserControl>

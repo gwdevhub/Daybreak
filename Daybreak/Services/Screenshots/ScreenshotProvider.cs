@@ -1,81 +1,61 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Daybreak.Services.Images;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Core.Extensions;
 using System.Extensions;
 using System.IO;
-using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace Daybreak.Services.Screenshots;
 
-public sealed class ScreenshotProvider : IScreenshotProvider
+internal sealed class ScreenshotProvider : IScreenshotProvider
 {
-    private const string ScreenshotsFolder = "Screenshots";
+    private readonly static string ScreenshotsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Guild Wars\\Screens";
 
-    private readonly List<string> Screenshots = new();
+    private readonly IImageCache imageCache;
     private readonly ILogger<ScreenshotProvider> logger;
-    private int innerCount = 0;
 
-    public ScreenshotProvider(ILogger<ScreenshotProvider> logger)
+    public ScreenshotProvider(
+        IImageCache imageCache,
+        ILogger<ScreenshotProvider> logger)
     {
-        this.logger = logger.ThrowIfNull(nameof(logger));
-        if (Directory.Exists(ScreenshotsFolder) is false)
+        this.imageCache = imageCache.ThrowIfNull();
+        this.logger = logger.ThrowIfNull();
+        if (Directory.Exists(ScreenshotsPath) is false)
         {
-            Directory.CreateDirectory(ScreenshotsFolder);
+            Directory.CreateDirectory(ScreenshotsPath);
         }
     }
 
-    public Optional<ImageSource> GetRandomScreenShot()
+    public async Task<ImageSource?> GetRandomScreenShot()
     {
-        if (this.Screenshots.Count == 0)
-        {
-            this.logger.LogWarning("Attempted to retrieve a random screenshot. No screenshots present");
-            return Optional.None<ImageSource>();
-        }
-
-        var screenshot = this.Screenshots[this.innerCount++ % this.Screenshots.Count];
-        return Optional.FromValue<ImageSource>(new BitmapImage(new Uri(Path.GetFullPath(screenshot))));
-    }
-
-    public Optional<ImageSource> GetScreenshot(string name)
-    {
-        if (this.Screenshots.Count == 0)
+        var screenshots = GetScreenshots();
+        if (screenshots.Count == 0)
         {
             this.logger.LogWarning("Attempted to retrieve a random screenshot. No screenshots present");
-            return Optional.None<ImageSource>();
+            return default;
         }
 
-        var screenshot = this.Screenshots.FirstOrDefault(s => s == name);
-        if (screenshot == default)
+        var screenShot = screenshots[Random.Shared.Next(0, screenshots.Count)];
+        return await this.GetScreenshotInternal(screenShot);
+    }
+
+    private async Task<ImageSource?> GetScreenshotInternal(string name)
+    {
+        var screenshots = GetScreenshots();
+        if (screenshots.Count == 0)
         {
-            this.logger.LogWarning($"No screenshot found with name {name}");
-            return Optional.None<ImageSource>();
+            this.logger.LogWarning("Attempted to retrieve a random screenshot. No screenshots present");
+            return default;
         }
 
-        return Optional.FromValue<ImageSource>(new BitmapImage(new Uri(Path.GetFullPath(screenshot))));
+        return await this.imageCache.GetImage(name);
     }
 
-    public void OnClosing()
+    private static IList<string> GetScreenshots()
     {
-    }
-
-    public void OnStartup()
-    {
-        this.LoadScreenshots();
-    }
-
-    private void LoadScreenshots()
-    {
-        var rand = new Random();
-        var fileList = Directory.GetFiles(ScreenshotsFolder);
-        if (!fileList.Any())
-        {
-            this.logger.LogWarning($"No screenshots found in {ScreenshotsFolder}");
-            return;
-        }
-
-        this.logger.LogInformation($"Loaded {fileList.Length} screenshots");
-        this.Screenshots.AddRange(fileList.OrderBy(s => rand.Next()));
+        return Directory.GetFiles(ScreenshotsPath);
     }
 }

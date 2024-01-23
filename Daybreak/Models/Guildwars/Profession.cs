@@ -1,9 +1,12 @@
-﻿using System;
+﻿using Daybreak.Converters;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Daybreak.Models.Guildwars;
 
+[JsonConverter(typeof(ProfessionJsonConverter))]
 public sealed class Profession : IWikiEntity
 {
     public static readonly Profession None = new() { Name = "None", Id = 0, Alias = "Any" };
@@ -15,7 +18,7 @@ public sealed class Profession : IWikiEntity
         BuildsUrl = "https://gwpvx.fandom.com/wiki/Special:PrefixIndex/Build:W/",
         WikiUrl = "https://wiki.guildwars.com/wiki/Warrior",
         PrimaryAttribute = Attribute.Strength,
-        Attributes = new List<Attribute> { Attribute.AxeMastery, Attribute.HammerMastery, Attribute.Swordsmanship, Attribute.Tactics }
+        Attributes = [Attribute.AxeMastery, Attribute.HammerMastery, Attribute.Swordsmanship, Attribute.Tactics]
     };
     public static readonly Profession Ranger = new()
     {
@@ -25,7 +28,7 @@ public sealed class Profession : IWikiEntity
         BuildsUrl = "https://gwpvx.fandom.com/wiki/Special:PrefixIndex/Build:R/",
         WikiUrl = "https://wiki.guildwars.com/wiki/Ranger",
         PrimaryAttribute = Attribute.Expertise,
-        Attributes = new List<Attribute> { Attribute.BeastMastery, Attribute.Marksmanship, Attribute.WildernessSurvival }
+        Attributes = [Attribute.BeastMastery, Attribute.Marksmanship, Attribute.WildernessSurvival]
     };
     public static readonly Profession Monk = new()
     {
@@ -35,7 +38,7 @@ public sealed class Profession : IWikiEntity
         BuildsUrl = "https://gwpvx.fandom.com/wiki/Special:PrefixIndex/Build:Mo/",
         WikiUrl = "https://wiki.guildwars.com/wiki/Monk",
         PrimaryAttribute = Attribute.DivineFavor,
-        Attributes = new List<Attribute> { Attribute.HealingPrayers, Attribute.SmitingPrayers, Attribute.ProtectionPrayers }
+        Attributes = [Attribute.HealingPrayers, Attribute.SmitingPrayers, Attribute.ProtectionPrayers]
     };
     public static readonly Profession Necromancer = new()
     { 
@@ -45,7 +48,7 @@ public sealed class Profession : IWikiEntity
         BuildsUrl = "https://gwpvx.fandom.com/wiki/Special:PrefixIndex/Build:N/",
         WikiUrl = "https://wiki.guildwars.com/wiki/Necromancer",
         PrimaryAttribute = Attribute.SoulReaping,
-        Attributes = new List<Attribute> { Attribute.Curses, Attribute.BloodMagic, Attribute.DeathMagic }
+        Attributes = [Attribute.Curses, Attribute.BloodMagic, Attribute.DeathMagic]
     };
     public static readonly Profession Mesmer = new() 
     { 
@@ -55,7 +58,7 @@ public sealed class Profession : IWikiEntity
         BuildsUrl = "https://gwpvx.fandom.com/wiki/Special:PrefixIndex/Build:Me/",
         WikiUrl = "https://wiki.guildwars.com/wiki/Mesmer",
         PrimaryAttribute = Attribute.FastCasting, 
-        Attributes = new List<Attribute> { Attribute.DominationMagic, Attribute.IllusionMagic, Attribute.InspirationMagic }
+        Attributes = [Attribute.DominationMagic, Attribute.IllusionMagic, Attribute.InspirationMagic]
     };
     public static readonly Profession Elementalist = new()
     { 
@@ -65,7 +68,7 @@ public sealed class Profession : IWikiEntity
         BuildsUrl = "https://gwpvx.fandom.com/wiki/Special:PrefixIndex/Build:E/",
         WikiUrl = "https://wiki.guildwars.com/wiki/Elementalist",
         PrimaryAttribute = Attribute.EnergyStorage,
-        Attributes = new List<Attribute> { Attribute.AirMagic, Attribute.EarthMagic, Attribute.FireMagic, Attribute.WaterMagic }
+        Attributes = [Attribute.AirMagic, Attribute.EarthMagic, Attribute.FireMagic, Attribute.WaterMagic]
     };
     public static readonly Profession Assassin = new()
     { 
@@ -75,7 +78,7 @@ public sealed class Profession : IWikiEntity
         BuildsUrl = "https://gwpvx.fandom.com/wiki/Special:PrefixIndex/Build:A/",
         WikiUrl = "https://wiki.guildwars.com/wiki/Assassin",
         PrimaryAttribute = Attribute.CriticalStrikes,
-        Attributes = new List<Attribute> { Attribute.DaggerMastery, Attribute.DeadlyArts, Attribute.ShadowArts }
+        Attributes = [Attribute.DaggerMastery, Attribute.DeadlyArts, Attribute.ShadowArts]
     };
     public static readonly Profession Ritualist = new()
     { 
@@ -85,7 +88,7 @@ public sealed class Profession : IWikiEntity
         BuildsUrl = "https://gwpvx.fandom.com/wiki/Special:PrefixIndex/Build:Rt/",
         WikiUrl = "https://wiki.guildwars.com/wiki/Ritualist",
         PrimaryAttribute = Attribute.SpawningPower,
-        Attributes = new List<Attribute> { Attribute.ChannelingMagic, Attribute.Communing, Attribute.RestorationMagic }
+        Attributes = [Attribute.ChannelingMagic, Attribute.Communing, Attribute.RestorationMagic]
     };
     public static readonly Profession Paragon = new()
     {
@@ -95,7 +98,7 @@ public sealed class Profession : IWikiEntity
         BuildsUrl = "https://gwpvx.fandom.com/wiki/Special:PrefixIndex/Build:P/",
         WikiUrl = "https://wiki.guildwars.com/wiki/Paragon",
         PrimaryAttribute = Attribute.Leadership,
-        Attributes = new List<Attribute> { Attribute.Command, Attribute.Motivation, Attribute.SpearMastery }
+        Attributes = [Attribute.Command, Attribute.Motivation, Attribute.SpearMastery]
     };
     public static readonly Profession Dervish = new()
     { 
@@ -105,7 +108,7 @@ public sealed class Profession : IWikiEntity
         BuildsUrl = "https://gwpvx.fandom.com/wiki/Special:PrefixIndex/Build:D/",
         WikiUrl = "https://wiki.guildwars.com/wiki/Dervish",
         PrimaryAttribute = Attribute.Mysticism,
-        Attributes = new List<Attribute> { Attribute.EarthPrayers, Attribute.ScytheMastery, Attribute.WindPrayers }
+        Attributes = [Attribute.EarthPrayers, Attribute.ScytheMastery, Attribute.WindPrayers]
     };
     public static IEnumerable<Profession> Professions = new List<Profession>
     {
@@ -166,13 +169,13 @@ public sealed class Profession : IWikiEntity
     public string? Name { get; init; }
     public int Id { get; set; }
     public Attribute? PrimaryAttribute { get; private set; }
-    public List<Attribute> Attributes { get; private set; } = new List<Attribute>();
+    public List<Attribute> Attributes { get; private set; } = [];
     private Profession()
     {
     }
 
     public override string ToString()
     {
-        return this.Name;
+        return this.Name!;
     }
 }

@@ -3,7 +3,6 @@ using Daybreak.Models.Guildwars;
 using Daybreak.Models.Trade;
 using Daybreak.Services.TradeChat.Models;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -22,7 +21,7 @@ namespace Daybreak.Services.TradeChat;
 /// Based on https://github.com/3vcloud/kamadan-trade-chat
 /// </summary>
 /// <typeparam name="TChannelOptions"></typeparam>
-public sealed class TraderQuoteService : ITraderQuoteService
+internal sealed class TraderQuoteService : ITraderQuoteService
 {
     private const string TraderQuotesUri = "trader_quotes";
 

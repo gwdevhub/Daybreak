@@ -1,4 +1,6 @@
 ﻿using Daybreak.Models.Guildwars;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -6,7 +8,7 @@ namespace Daybreak.Services.Scanner;
 
 public interface IGuildwarsMemoryReader
 {
-    Task EnsureInitialized(CancellationToken cancellationToken);
+    Task EnsureInitialized(Process process, CancellationToken cancellationToken);
     Task<LoginData?> ReadLoginData(CancellationToken cancellationToken);
     Task<GameData?> ReadGameData(CancellationToken cancellationToken);
     Task<PathingData?> ReadPathingData(CancellationToken cancellationToken);
@@ -16,7 +18,9 @@ public interface IGuildwarsMemoryReader
     Task<UserData?> ReadUserData(CancellationToken cancellationToken);
     Task<SessionData?> ReadSessionData(CancellationToken cancellationToken);
     Task<MainPlayerData?> ReadMainPlayerData(CancellationToken cancellationToken);
-    Task<ConnectionData?> ReadConnectionData(CancellationToken cancellationToken);
     Task<PreGameData?> ReadPreGameData(CancellationToken cancellationToken);
+    Task<GameState?> ReadGameState(CancellationToken cancellationToken);
+    Task<string?> GetEntityName(IEntity entity, CancellationToken cancellationToken);
+    Task<string?> GetItemName(int id, List<uint> modifiers, CancellationToken cancellationToken);
     void Stop();
 }

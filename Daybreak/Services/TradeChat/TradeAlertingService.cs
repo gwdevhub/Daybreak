@@ -4,11 +4,8 @@ using Daybreak.Services.Notifications;
 using Daybreak.Services.TradeChat.Models;
 using Daybreak.Services.TradeChat.Notifications;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.VisualBasic;
 using Newtonsoft.Json;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
@@ -20,61 +17,62 @@ using System.Threading.Tasks;
 using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.TradeChat;
-public sealed class TradeAlertingService : ITradeAlertingService, IApplicationLifetimeService
+internal sealed class TradeAlertingService : ITradeAlertingService, IApplicationLifetimeService
 {
-    private readonly List<TradeAlert> tradeAlerts = new List<TradeAlert>();
+    private static readonly TimeSpan QuoteCheckDelay = TimeSpan.FromMinutes(15);
+
+    private readonly List<ITradeAlert> tradeAlerts = [];
+    private readonly ITraderQuoteService traderQuoteService;
     private readonly INotificationService notificationService;
     private readonly ITradeHistoryDatabase tradeHistoryDatabase;
     private readonly ITradeChatService<KamadanTradeChatOptions> kamadanTradeChatService;
     private readonly ITradeChatService<AscalonTradeChatOptions> ascalonTradeChatService;
-    private readonly IUpdateableOptions<TradeAlertingOptions> options;
+    private readonly ILiveUpdateableOptions<TradeAlertingOptions> options;
     private readonly ILogger<TradeAlertingService> logger;
     private readonly CancellationTokenSource cancellationTokenSource = new();
 
-    public IEnumerable<TradeAlert> TradeAlerts => this.tradeAlerts;
+    public IEnumerable<ITradeAlert> TradeAlerts => this.tradeAlerts;
 
     public TradeAlertingService(
+        ITraderQuoteService traderQuoteService,
         INotificationService notificationService,
         ITradeHistoryDatabase tradeHistoryDatabase,
         ITradeChatService<KamadanTradeChatOptions> kamadanTradeChatService,
         ITradeChatService<AscalonTradeChatOptions> ascalonTradeChatService,
-        IUpdateableOptions<TradeAlertingOptions> options,
+        ILiveUpdateableOptions<TradeAlertingOptions> options,
         ILogger<TradeAlertingService> logger)
     {
+        this.traderQuoteService = traderQuoteService.ThrowIfNull();
         this.notificationService = notificationService.ThrowIfNull();
         this.tradeHistoryDatabase = tradeHistoryDatabase.ThrowIfNull();
         this.kamadanTradeChatService = kamadanTradeChatService.ThrowIfNull();
         this.ascalonTradeChatService = ascalonTradeChatService.ThrowIfNull();
         this.options = options.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
-        this.tradeAlerts = this.options.Value.Alerts ?? new List<TradeAlert>();
+        this.tradeAlerts = this.options.Value.Alerts ?? [];
     }
 
-    public void AddTradeAlert(TradeAlert tradeAlert)
+    public void AddTradeAlert(ITradeAlert tradeAlert)
     {
         if (this.tradeAlerts.FirstOrDefault(t => t.Id == tradeAlert.Id) is not null)
         {
-            throw new InvalidOperationException($"Cannot add {nameof(TradeAlert)}. Another {nameof(TradeAlert)} exists with the same id");
+            throw new InvalidOperationException($"Cannot add {nameof(ITradeAlert)}. Another {nameof(ITradeAlert)} exists with the same id");
         }
 
         this.tradeAlerts.Add(tradeAlert);
         this.SaveTradeAlerts();
     }
 
-    public void ModifyTradeAlert(TradeAlert modifiedTradeAlert)
+    public void ModifyTradeAlert(ITradeAlert modifiedTradeAlert)
     {
-        var existingTradeAlert = this.tradeAlerts.FirstOrDefault(t => t.Id == modifiedTradeAlert.Id);
-        if (existingTradeAlert is null)
+        var existingTradeAlertId = this.tradeAlerts.IndexOfWhere(t => t.Id == modifiedTradeAlert.Id);
+        if (existingTradeAlertId is -1)
         {
             throw new InvalidOperationException($"No trade alert found to modify");
         }
 
-        existingTradeAlert.Name = modifiedTradeAlert.Name;
-        existingTradeAlert.Enabled = modifiedTradeAlert.Enabled;
-        existingTradeAlert.MessageCheck = modifiedTradeAlert.MessageCheck;
-        existingTradeAlert.MessageRegexCheck = modifiedTradeAlert.MessageRegexCheck;
-        existingTradeAlert.SenderCheck = modifiedTradeAlert.SenderCheck;
-        existingTradeAlert.SenderRegexCheck = modifiedTradeAlert.SenderRegexCheck;
+        this.tradeAlerts.RemoveAt(existingTradeAlertId);
+        this.tradeAlerts.Insert(existingTradeAlertId, modifiedTradeAlert);
         this.SaveTradeAlerts();
     }
 
@@ -115,8 +113,8 @@ public sealed class TradeAlertingService : ITradeAlertingService, IApplicationLi
         var savedTrades = this.tradeHistoryDatabase.GetTraderMessagesSinceTime(DateTime.UtcNow - timeSinceLastCheckTime).ToList();
         if (savedTrades.None())
         {
-            var kamadanHistoryTradesTask = this.GetTraderMessages(this.kamadanTradeChatService, TraderSource.Kamadan, DateTime.UtcNow - timeSinceLastCheckTime, cancellationToken);
-            var ascalonHistoryTradesTask = this.GetTraderMessages(this.ascalonTradeChatService, TraderSource.Kamadan, DateTime.UtcNow - timeSinceLastCheckTime, cancellationToken);
+            var kamadanHistoryTradesTask = GetTraderMessages(this.kamadanTradeChatService, TraderSource.Kamadan, DateTime.UtcNow - timeSinceLastCheckTime, cancellationToken);
+            var ascalonHistoryTradesTask = GetTraderMessages(this.ascalonTradeChatService, TraderSource.Kamadan, DateTime.UtcNow - timeSinceLastCheckTime, cancellationToken);
             await Task.WhenAll(kamadanHistoryTradesTask, ascalonHistoryTradesTask);
             var kamadanHistoryTrades = await kamadanHistoryTradesTask;
             var ascalonHistoryTrades = await ascalonHistoryTradesTask;
@@ -133,57 +131,9 @@ public sealed class TradeAlertingService : ITradeAlertingService, IApplicationLi
         }
 
         await Task.WhenAll(
+            this.CheckTraderQuotes(cancellationToken),
             this.CheckLiveTrades(this.kamadanTradeChatService, TraderSource.Kamadan, cancellationToken),
             this.CheckLiveTrades(this.ascalonTradeChatService, TraderSource.Ascalon, cancellationToken));
-    }
-
-    private async Task<IEnumerable<TraderMessageDTO>> GetTraderMessages<T>(ITradeChatService<T> tradeChatService, TraderSource traderSource, DateTime since, CancellationToken cancellationToken)
-        where T : class, ITradeChatOptions, new()
-    {
-        var trades = await tradeChatService.GetLatestTrades(cancellationToken);
-        var orderedTrades = trades.OrderBy(t => t.Timestamp).Select(t => new TraderMessageDTO
-        {
-            Timestamp = t.Timestamp,
-            Id = t.Timestamp.Ticks,
-            Message = t.Message,
-            Sender = t.Sender,
-            TraderSource = traderSource
-        }).ToList();
-
-        return orderedTrades.Where(t => t.Timestamp > since);
-    }
-
-    /// <summary>
-    /// Returns all trades since the time interval by querying paginated responses.
-    /// Currently is not supported by the API.
-    /// </summary>
-    private async Task<IEnumerable<TraderMessageDTO>> GetTraderMessagesSince<T>(ITradeChatService<T> tradeChatService, TraderSource traderSource, DateTime since, CancellationToken cancellationToken)
-        where T : class, ITradeChatOptions, new()
-    {
-        var retrievedTrades = new List<TraderMessageDTO>();
-        var retrievedCount = 0;
-        do
-        {
-            var trades = await tradeChatService.GetLatestTrades(cancellationToken, since);
-            var orderedTrades = trades.OrderBy(t => t.Timestamp).Select(t => new TraderMessageDTO
-            {
-                Timestamp = t.Timestamp,
-                Id = t.Timestamp.Ticks,
-                Message = t.Message,
-                Sender = t.Sender,
-                TraderSource = traderSource
-            }).ToList();
-
-            retrievedTrades.AddRange(orderedTrades);
-            retrievedCount = orderedTrades.Count;
-            var maybeMaxTime = orderedTrades.LastOrDefault()?.Timestamp;
-            if (maybeMaxTime is DateTime maxTime)
-            {
-                since = maxTime;
-            }
-        } while (retrievedCount > 0);
-
-        return retrievedTrades;
     }
 
     private async Task CheckLiveTrades<T>(ITradeChatService<T> tradeChatService, TraderSource traderSource, CancellationToken cancellationToken)
@@ -205,9 +155,45 @@ public sealed class TradeAlertingService : ITradeAlertingService, IApplicationLi
         }
     }
 
+    private async Task CheckTraderQuotes(CancellationToken cancellationToken)
+    {
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            var buyQuotes = await this.traderQuoteService.GetBuyQuotes(cancellationToken);
+            var sellQuotes = await this.traderQuoteService.GetSellQuotes(cancellationToken);
+            foreach (var alert in this.tradeAlerts.OfType<QuoteAlert>())
+            {
+                var maybeQuote = alert.TraderQuoteType is TraderQuoteType.Buy ?
+                    buyQuotes.FirstOrDefault(q => q.Item?.Id == alert.ItemId) :
+                    sellQuotes.FirstOrDefault(q => q.Item?.Id == alert.ItemId);
+                if (maybeQuote is null)
+                {
+                    continue;
+                }
+
+                if (maybeQuote.Price > alert.UpperPriceTarget &&
+                    alert.UpperPriceTargetEnabled)
+                {
+                    this.notificationService.NotifyInformation(
+                        "Quote Alert",
+                        $"The {(alert.TraderQuoteType is TraderQuoteType.Buy ? "buying" : "selling")} price of {maybeQuote.Item?.Name} has exceeded the upper price target of {alert.UpperPriceTarget}. Current {(alert.TraderQuoteType is TraderQuoteType.Buy ? "buying" : "selling")} price: {maybeQuote.Price}");
+                }
+                else if (maybeQuote.Price < alert.LowerPriceTarget &&
+                    alert.LowerPriceTargetEnabled)
+                {
+                    this.notificationService.NotifyInformation(
+                        "Quote Alert",
+                        $"The {(alert.TraderQuoteType is TraderQuoteType.Buy ? "buying" : "selling")} price of {maybeQuote.Item?.Name} has falled under the lower price target of {alert.LowerPriceTarget}. Current {(alert.TraderQuoteType is TraderQuoteType.Buy ? "buying" : "selling")} price: {maybeQuote.Price}");
+                }
+            }
+
+            await Task.Delay(TimeSpan.FromSeconds(this.options.Value.QuoteAlertsInterval), cancellationToken);
+        }
+    }
+
     private void CheckTrade(TraderMessageDTO traderMessageDTO)
     {
-        foreach(var alert in this.tradeAlerts)
+        foreach(var alert in this.tradeAlerts.OfType<TradeAlert>())
         {
             if (!alert.Enabled)
             {
@@ -238,7 +224,7 @@ public sealed class TradeAlertingService : ITradeAlertingService, IApplicationLi
         this.options.UpdateOption();
     }
 
-    private void NotifyAlertMatch(TraderMessageDTO traderMessageDTO, TradeAlert alert)
+    private void NotifyAlertMatch(TraderMessageDTO traderMessageDTO, ITradeAlert alert)
     {
         var traderMessage = new TraderMessage
         {
@@ -275,5 +261,54 @@ public sealed class TradeAlertingService : ITradeAlertingService, IApplicationLi
         {
             return toCheck.ToLower().Contains(toMatch.ToLower());
         }
+    }
+
+    private static async Task<IEnumerable<TraderMessageDTO>> GetTraderMessages<T>(ITradeChatService<T> tradeChatService, TraderSource traderSource, DateTime since, CancellationToken cancellationToken)
+        where T : class, ITradeChatOptions, new()
+    {
+        var trades = await tradeChatService.GetLatestTrades(cancellationToken);
+        var orderedTrades = trades.OrderBy(t => t.Timestamp).Select(t => new TraderMessageDTO
+        {
+            Timestamp = t.Timestamp,
+            Id = t.Timestamp.Ticks,
+            Message = t.Message,
+            Sender = t.Sender,
+            TraderSource = traderSource
+        }).ToList();
+
+        return orderedTrades.Where(t => t.Timestamp > since);
+    }
+
+    /// <summary>
+    /// Returns all trades since the time interval by querying paginated responses.
+    /// Currently is not supported by the API.
+    /// </summary>
+    private static async Task<IEnumerable<TraderMessageDTO>> GetTraderMessagesSince<T>(ITradeChatService<T> tradeChatService, TraderSource traderSource, DateTime since, CancellationToken cancellationToken)
+        where T : class, ITradeChatOptions, new()
+    {
+        var retrievedTrades = new List<TraderMessageDTO>();
+        var retrievedCount = 0;
+        do
+        {
+            var trades = await tradeChatService.GetLatestTrades(cancellationToken, since);
+            var orderedTrades = trades.OrderBy(t => t.Timestamp).Select(t => new TraderMessageDTO
+            {
+                Timestamp = t.Timestamp,
+                Id = t.Timestamp.Ticks,
+                Message = t.Message,
+                Sender = t.Sender,
+                TraderSource = traderSource
+            }).ToList();
+
+            retrievedTrades.AddRange(orderedTrades);
+            retrievedCount = orderedTrades.Count;
+            var maybeMaxTime = orderedTrades.LastOrDefault()?.Timestamp;
+            if (maybeMaxTime is DateTime maxTime)
+            {
+                since = maxTime;
+            }
+        } while (retrievedCount > 0);
+
+        return retrievedTrades;
     }
 }

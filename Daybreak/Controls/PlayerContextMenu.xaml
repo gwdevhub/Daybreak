@@ -3,30 +3,29 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:guildwars="clr-namespace:Daybreak.Models.Guildwars"
              mc:Ignorable="d" 
              Background="{StaticResource Daybreak.Brushes.Background}"
-             d:DataContext="{d:DesignInstance Type=guildwars:PlayerInformation, IsDesignTimeCreatable=True}"
              d:DesignHeight="300" d:DesignWidth="100"
              BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
              BorderThickness="1"
-             Margin="5, 0, 5, 0">
+             Margin="5, 0, 5, 0"
+             x:Name="_this">
     <StackPanel>
         <TextBlock Text="Party Member" FontSize="16" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
-        <TextBlock Text="{Binding NpcDefinition.Name}" Foreground="{StaticResource MahApps.Brushes.Accent}" Cursor="Hand"
+        <TextBlock Text="{Binding ElementName=_this, Path=PlayerName, Mode=OneWay}" Foreground="{StaticResource MahApps.Brushes.Accent}" Cursor="Hand"
                    MouseLeftButtonDown="TextBlock_MouseLeftButtonDown"></TextBlock>
         <WrapPanel>
             <TextBlock Text="Id: " Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
-            <TextBlock Text="{Binding ModelType, Mode=OneWay}" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
+            <TextBlock Text="{Binding Player.ModelType, Mode=OneWay}" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
         </WrapPanel>
         <WrapPanel>
             <TextBlock Text="Lvl: " Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
-            <TextBlock Text="{Binding Level, Mode=OneWay}" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
+            <TextBlock Text="{Binding Player.Level, Mode=OneWay}" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
         </WrapPanel>
         <WrapPanel>
-            <TextBlock Text="{Binding PrimaryProfession.Alias, Mode=OneWay}" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
+            <TextBlock Text="{Binding Player.PrimaryProfession.Alias, Mode=OneWay}" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
             <TextBlock Text="/" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
-            <TextBlock Text="{Binding SecondaryProfession.Alias, Mode=OneWay}" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
+            <TextBlock Text="{Binding Player.SecondaryProfession.Alias, Mode=OneWay}" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"></TextBlock>
         </WrapPanel>
     </StackPanel>
 </UserControl>

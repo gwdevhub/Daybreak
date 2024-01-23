@@ -1,9 +1,12 @@
-﻿using System;
+﻿using Daybreak.Converters;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Daybreak.Models.Guildwars;
 
+[JsonConverter(typeof(GuildwarsIconJsonConverter))]
 public sealed class GuildwarsIcon : IWikiEntity
 {
     public static readonly GuildwarsIcon ResurrectionShrine = new() { Id = 191474, Name = "Resurrection Shrine", WikiUrl = "https://wiki.guildwars.com/wiki/Resurrection_Shrine" };
@@ -18,8 +21,8 @@ public sealed class GuildwarsIcon : IWikiEntity
     public static readonly GuildwarsIcon DungeonBoss = new() { Id = 302779, Name = "Dungeon Boss" };
     public static readonly GuildwarsIcon DungeonKey = new() { Id = 302777, Name = "Dungeon Key" };
 
-    public static readonly List<GuildwarsIcon> Icons = new()
-    {
+    public static readonly List<GuildwarsIcon> Icons =
+    [
         ResurrectionShrine,
         Collector,
         AreaMap,
@@ -31,7 +34,7 @@ public sealed class GuildwarsIcon : IWikiEntity
         DungeonKey,
         Flag,
         Person
-    };
+    ];
 
     public static bool TryParse(int id, out GuildwarsIcon icon)
     {

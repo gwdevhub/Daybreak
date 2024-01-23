@@ -53,7 +53,7 @@ public partial class SearchTextBox : UserControl
 
     private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
-        var searchText = e.Source.As<TextBox>().Text;
+        var searchText = e.Source.As<TextBox>()!.Text;
         if (searchText.IsNullOrWhiteSpace())
         {
             this.PlaceholderVisibility = true;

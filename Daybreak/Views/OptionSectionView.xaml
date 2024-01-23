@@ -21,7 +21,8 @@
         <buttons:SaveButton Height="30" Width="30"
                             HorizontalAlignment="Right"
                             Margin="5"
-                            Clicked="SaveButton_Clicked"></buttons:SaveButton>
+                            Clicked="SaveButton_Clicked"
+                            ToolTip="Save changes"/>
         <TextBlock FontSize="22"
                    Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                    Text="{Binding ElementName=_this, Path=Title, Mode=OneWay}"

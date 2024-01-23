@@ -1,13 +1,12 @@
 ﻿using Daybreak.Models;
 using System.Collections.Generic;
-using System.Extensions;
-using System.Threading.Tasks;
 
 namespace Daybreak.Services.Credentials;
 
 public interface ICredentialManager
 {
-    Task StoreCredentials(List<LoginCredentials> loginCredentials);
-    Task<List<LoginCredentials>> GetCredentialList();
-    Task<Optional<LoginCredentials>> GetDefaultCredentials();
+    void StoreCredentials(List<LoginCredentials> loginCredentials);
+    List<LoginCredentials> GetCredentialList();
+    bool TryGetCredentialsByIdentifier(string identifier, out LoginCredentials? loginCredentials);
+    LoginCredentials CreateUniqueCredentials();
 }

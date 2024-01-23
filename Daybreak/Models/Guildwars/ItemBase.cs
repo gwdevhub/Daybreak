@@ -1,8 +1,12 @@
-﻿using System;
+﻿using Daybreak.Converters;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Daybreak.Models.Guildwars;
+
+[JsonConverter(typeof(ItemBaseJsonConverter))]
 public abstract class ItemBase
 {
     public static IReadOnlyCollection<ItemBase> AllItems { get; } = Enumerable.Empty<ItemBase>()
@@ -125,7 +129,7 @@ public abstract class ItemBase
             throw new InvalidOperationException($"Could not find a item with name {name}");
         }
 
-        return item;
+        return item!;
     }
 
     private static ItemBase? FilterAndFirstOrDefault(Func<ItemBase, bool> filter) => AllItems

@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Daybreak.Services.Notifications;
 
-public sealed class NotificationService : INotificationService, INotificationProducer, INotificationHandlerProducer
+internal sealed class NotificationService : INotificationService, INotificationProducer, INotificationHandlerProducer
 {
     private readonly ConcurrentQueue<Notification> pendingNotifications = new();
     private readonly IServiceManager serviceManager;

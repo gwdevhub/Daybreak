@@ -1,20 +1,23 @@
 ﻿using Daybreak.Attributes;
+using Daybreak.Models.UMod;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Daybreak.Configuration.Options;
 
 [OptionsName(Name = "uMod")]
 public sealed class UModOptions
 {
-    [JsonProperty(nameof(Path))]
-    [OptionName(Name = "Path", Description = "The path to the uMod executable")]
-    public string? Path { get; set; }
-
     [JsonProperty(nameof(Enabled))]
-    [OptionName(Name = "Enabled", Description = "If true, the launcher will also launch uMod when launching GuildWars")]
+    [OptionName(Name = "Enabled", Description = "If true, Daybreak will also launch uMod when launching GuildWars")]
     public bool Enabled { get; set; }
 
     [JsonProperty(nameof(AutoEnableMods))]
-    [OptionName(Name = "Auto-Enable Mods", Description = "If true, mods downloaded through the launcher will be auto-placed in the managed mod list")]
-    public bool AutoEnableMods { get; set; }
+    [OptionName(Name = "Auto-Enable Mods", Description = "If true, mods loaded into Daybreak will be enabled by default")]
+    public bool AutoEnableMods { get; set; } = true;
+
+    [JsonProperty(nameof(Mods))]
+    [OptionIgnore]
+    [OptionSynchronizationIgnore]
+    public List<UModEntry> Mods { get; set; } = [];
 }

@@ -6,12 +6,12 @@ namespace Daybreak.Services.Experience;
 /// Based on the explanation from here https://wiki.guildwars.com/wiki/Experience.
 /// After 182600, the experience threshold is capped.
 /// </summary>
-public sealed class ExperienceCalculator : IExperienceCalculator
+internal sealed class ExperienceCalculator : IExperienceCalculator
 {
     private const uint ExperienceCalculationThreshold = 182600;
     private const uint MaxExperienceRequirement = 15000;
-    private static readonly List<uint> ExperienceThreshold = new()
-    {
+    private static readonly List<uint> ExperienceThreshold =
+    [
         0,
         2000,
         4600,
@@ -35,7 +35,7 @@ public sealed class ExperienceCalculator : IExperienceCalculator
         154000,
         168000,
         182600
-    };
+    ];
 
     public uint GetExperienceForCurrentLevel(uint currentTotalExperience)
     {

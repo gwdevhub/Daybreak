@@ -7,7 +7,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System;
 using System.Extensions;
-using Daybreak.Services.Scanner;
 using Microsoft.Extensions.DependencyInjection;
 using System.Core.Extensions;
 using System.Windows.Input;
@@ -23,6 +22,8 @@ using Daybreak.Services.Themes;
 using Daybreak.Services.Metrics;
 using System.Diagnostics.Metrics;
 using System.Diagnostics;
+using Daybreak.Models.FocusView;
+using Daybreak.Models.LaunchConfigurations;
 
 namespace Daybreak.Controls.Minimap;
 
@@ -41,10 +42,9 @@ public partial class GuildwarsMinimap : UserControl
 
     private readonly Histogram<double> drawingLatency;
     private readonly DispatcherTimer dispatcherTimer = new(DispatcherPriority.Render);
-    private readonly List<Position> mainPlayerPositionHistory = new();
+    private readonly List<Position> mainPlayerPositionHistory = [];
     private readonly IPathfinder pathfinder;
     private readonly IDrawingService drawingService;
-    private readonly IGuildwarsEntityDebouncer guildwarsEntityDebouncer;
     private readonly IThemeManager themeManager;
     private readonly Color outlineColor = Colors.Chocolate;
     private readonly TimeSpan offsetRevertDelay = TimeSpan.FromSeconds(3);
@@ -63,13 +63,14 @@ public partial class GuildwarsMinimap : UserControl
     private Point initialClickPoint = new(0, 0);
     private Point lastPathfindingPoint = new(0, 0);
     private int pathfindingObjectiveCount = 0;
-    private DebounceResponse? cachedDebounceResponse;
     private PathfindingCache? pathfindingCache;
     
     [GenerateDependencyProperty]
     private PathingData pathingData = new();
     [GenerateDependencyProperty]
     private GameData gameData = new();
+    [GenerateDependencyProperty]
+    private GameState gameState = new();
     [GenerateDependencyProperty]
     private double zoom = 0.08;
     [GenerateDependencyProperty(InitialValue = true)]
@@ -80,6 +81,8 @@ public partial class GuildwarsMinimap : UserControl
     private int targetEntityId;
     [GenerateDependencyProperty]
     private int targetEntityModelId;
+    [GenerateDependencyProperty]
+    private GuildWarsApplicationLaunchContext launchContext = default!;
 
     public event EventHandler? MaximizeClicked;
     public event EventHandler<QuestMetadata>? QuestMetadataClicked;
@@ -87,12 +90,12 @@ public partial class GuildwarsMinimap : UserControl
     public event EventHandler<PlayerInformation>? PlayerInformationClicked;
     public event EventHandler<MapIcon>? MapIconClicked;
     public event EventHandler<Profession>? ProfessionClicked;
+    public event EventHandler<string?>? NpcNameClicked;
 
     public GuildwarsMinimap()
         :this(
              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IPathfinder>(),
              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IDrawingService>(),
-             Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IGuildwarsEntityDebouncer>(),
              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IThemeManager>(),
              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IMetricsService>())
     {
@@ -101,13 +104,11 @@ public partial class GuildwarsMinimap : UserControl
     public GuildwarsMinimap(
         IPathfinder pathfinder,
         IDrawingService drawingService,
-        IGuildwarsEntityDebouncer guildwarsEntityDebouncer,
         IThemeManager themeManager,
         IMetricsService metricsService)
     {
         this.pathfinder = pathfinder.ThrowIfNull();
         this.drawingService = drawingService.ThrowIfNull();
-        this.guildwarsEntityDebouncer = guildwarsEntityDebouncer.ThrowIfNull();
         this.themeManager = themeManager.ThrowIfNull();
         this.drawingLatency = metricsService.CreateHistogram<double>(DrawingLatencyName, DrawingLatencyUnitName, DrawingLatencyDescription, Models.Metrics.AggregationTypes.P95);
 
@@ -131,7 +132,6 @@ public partial class GuildwarsMinimap : UserControl
         }
         else if (e.Property == PathingDataProperty)
         {
-            this.guildwarsEntityDebouncer.ClearCaches();
             this.mainPlayerPositionHistory.Clear();
             this.lastPathfindingPoint = new Point(0, 0);
             this.pathfindingObjectiveCount = 0;
@@ -142,10 +142,50 @@ public partial class GuildwarsMinimap : UserControl
         {
             this.UpdateGameData();
         }
-        else if (e.Property == GameDataProperty &&
-                this.GameData.Valid)
+        else if (e.Property == GameStateProperty &&
+            this.GameState is not null)
         {
+            this.UpdateStates();
             this.UpdateGameData();
+        }
+    }
+
+    private void UpdateStates()
+    {
+        if (this.GameState is null ||
+            this.GameData is null ||
+            this.GameData.Valid is false)
+        {
+            return;
+        }
+
+        var mainPlayerState = this.GameState.States?.FirstOrDefault(state => state.Id == this.GameData.MainPlayer?.Id);
+        this.GameData.MainPlayer!.Position = mainPlayerState?.Position ?? new Position();
+        this.GameData.MainPlayer!.CurrentHealth = mainPlayerState?.Health ?? 0;
+        this.GameData.MainPlayer!.CurrentEnergy = mainPlayerState?.Energy ?? 0;
+        foreach (var worldPlayer in this.GameData.WorldPlayers!)
+        {
+            var worldPlayerState = this.GameState.States?.FirstOrDefault(state => state.Id == worldPlayer.Id);
+            worldPlayer.Position = worldPlayerState?.Position ?? new Position();
+            worldPlayer.CurrentHealth = worldPlayerState?.Health ?? 0;
+            worldPlayer.CurrentEnergy = worldPlayerState?.Energy ?? 0;
+        }
+
+        foreach (var partyPlayer in this.GameData.Party!)
+        {
+            var partyPlayerState = this.GameState.States?.FirstOrDefault(state => state.Id == partyPlayer.Id);
+            partyPlayer.Position = partyPlayerState?.Position ?? new Position();
+            partyPlayer.CurrentHealth = partyPlayerState?.Health ?? 0;
+            partyPlayer.CurrentEnergy = partyPlayerState?.Energy ?? 0;
+        }
+
+        foreach (var entity in this.GameData.LivingEntities!)
+        {
+            var state = this.GameState.States?.FirstOrDefault(state => state.Id == entity.Id);
+            entity.Position = state?.Position ?? new Position();
+            entity.State = state?.State ?? LivingEntityState.Unknown;
+            entity.Health = state?.Health ?? 0;
+            entity.Energy = state?.Energy ?? 0;
         }
     }
 
@@ -157,12 +197,11 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
-        var debounceResponse = this.guildwarsEntityDebouncer.DebounceEntities(this.GameData);
         if (!double.IsFinite(this.mapWidth) ||
             !double.IsFinite(this.mapHeight) ||
             !double.IsFinite(this.mapVirtualMinWidth) ||
             !double.IsFinite(this.mapVirtualMinHeight) ||
-            debounceResponse.MainPlayer.Position is null)
+            this.GameData.MainPlayer?.Position is null)
         {
             return;
         }
@@ -171,7 +210,7 @@ public partial class GuildwarsMinimap : UserControl
         this.TargetEntityModelId = (int?)this.GameData.LivingEntities?.FirstOrDefault(e => e.Id == this.TargetEntityId)?.ModelType ?? 0;
         var screenVirtualWidth = this.ActualWidth / this.Zoom;
         var screenVirtualHeight = this.ActualHeight / this.Zoom;
-        var position = debounceResponse.MainPlayer.Position!.Value;
+        var position = this.GameData?.MainPlayer?.Position ?? new Position();
         this.originPoint = new Point(
             position.X - (screenVirtualWidth / 2) - (this.originOffset.X / this.Zoom),
             position.Y + (screenVirtualHeight / 2) + (this.originOffset.Y / this.Zoom));
@@ -185,19 +224,18 @@ public partial class GuildwarsMinimap : UserControl
             0);
         this.MapDrawingHost.Height = this.mapHeight * this.Zoom;
         this.MapDrawingHost.Width = this.mapWidth * this.Zoom;
-        this.cachedDebounceResponse = debounceResponse;
         this.ManageMainPlayerPositionHistory();
         this.DrawEntities();
     }
 
     private void ManageMainPlayerPositionHistory()
     {
-        if (this.cachedDebounceResponse is null)
+        if (this.GameData is null)
         {
             return;
         }
 
-        var currentPosition = this.cachedDebounceResponse.MainPlayer.Position ?? throw new InvalidOperationException("Unexpected main player null position");
+        var currentPosition = this.GameData?.MainPlayer?.Position ?? throw new InvalidOperationException("Unexpected main player null position");
         if (this.mainPlayerPositionHistory.Any(oldPosition => PositionsCollide(oldPosition, currentPosition)))
         {
             return;
@@ -316,12 +354,12 @@ public partial class GuildwarsMinimap : UserControl
             PositionRadius,
             EntitySize,
             foregroundColor);
-        this.drawingService.DrawEngagementArea(bitmap, this.cachedDebounceResponse ?? new DebounceResponse());
+        this.drawingService.DrawEngagementArea(bitmap, this.GameData);
         this.drawingService.DrawMainPlayerPositionHistory(bitmap, this.mainPlayerPositionHistory);
         this.drawingService.DrawPaths(bitmap, this.pathfindingCache);
-        this.drawingService.DrawQuestObjectives(bitmap, this.GameData.MainPlayer?.QuestLog ?? new List<QuestMetadata>());
-        this.drawingService.DrawMapIcons(bitmap, this.GameData.MapIcons ?? new List<MapIcon>());
-        this.drawingService.DrawEntities(bitmap, this.cachedDebounceResponse ?? new DebounceResponse(), this.TargetEntityId);
+        this.drawingService.DrawQuestObjectives(bitmap, this.GameData.MainPlayer?.QuestLog ?? []);
+        this.drawingService.DrawMapIcons(bitmap, this.GameData.MapIcons ?? []);
+        this.drawingService.DrawEntities(bitmap, this.GameData, this.TargetEntityId);
         bitmap.Unlock();
         this.drawingLatency.Record(sw.ElapsedMilliseconds);
     }
@@ -383,8 +421,8 @@ public partial class GuildwarsMinimap : UserControl
 
         var playerPosition = new Point
         {
-            X = this.cachedDebounceResponse?.MainPlayer.Position?.X ?? 0,
-            Y = this.cachedDebounceResponse?.MainPlayer.Position?.Y ?? 0,
+            X = this.GameData?.MainPlayer?.Position?.X ?? 0,
+            Y = this.GameData?.MainPlayer?.Position?.Y ?? 0,
         };
 
         /*
@@ -531,7 +569,7 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
-        if (this.CheckMouseOverEntity(Enumerable.Repeat(this.GameData.MainPlayer.As<IEntity>(), 1)) is MainPlayerInformation &&
+        if (this.CheckMouseOverEntity(Enumerable.Repeat(this.GameData.MainPlayer!.As<IEntity>()!, 1)) is MainPlayerInformation &&
             this.TryFindResource("MainPlayerContextMenu") is ContextMenu mainPlayerContextMenu)
         {
             this.ContextMenu = mainPlayerContextMenu;
@@ -552,20 +590,22 @@ public partial class GuildwarsMinimap : UserControl
 
         var maybePartyMember = this.CheckMouseOverEntity(this.GameData.Party?.OfType<IEntity>().Where(IsValidPositionalEntity).OrderByDescending(p => p.Id == this.TargetEntityId));
         if (maybePartyMember is PlayerInformation partyMember &&
-            this.TryFindResource("PlayerContextMenu") is ContextMenu playerContextMenu)
+            this.TryFindResource("PlayerContextMenu") is ContextMenu playerContextMenu &&
+            this.LaunchContext is not null)
         {
             this.ContextMenu = playerContextMenu;
-            this.ContextMenu.DataContext = partyMember;
+            this.ContextMenu.DataContext = new PlayerContextMenuContext { Player = partyMember, GuildWarsApplicationLaunchContext = this.LaunchContext };
             this.ContextMenu.IsOpen = true;
             return;
         }
 
         var maybeLivingEntity = this.CheckMouseOverEntity(this.GameData.LivingEntities?.OfType<IEntity>().Where(IsValidPositionalEntity).OrderByDescending(p => p.Id == this.TargetEntityId));
         if (maybeLivingEntity is LivingEntity livingEntity &&
-            this.TryFindResource("LivingEntityContextMenu") is ContextMenu livingEntityContextMenu)
+            this.TryFindResource("LivingEntityContextMenu") is ContextMenu livingEntityContextMenu &&
+            this.LaunchContext is not null)
         {
             this.ContextMenu = livingEntityContextMenu;
-            this.ContextMenu.DataContext = livingEntity;
+            this.ContextMenu.DataContext = new LivingEntityContextMenuContext { LivingEntity = livingEntity, GuildWarsApplicationLaunchContext = this.LaunchContext };
             this.ContextMenu.IsOpen = true;
             return;
         }
@@ -589,7 +629,8 @@ public partial class GuildwarsMinimap : UserControl
 
     private void GuildwarsMinimap_MouseMove(object sender, MouseEventArgs e)
     {
-        if (this.GameData.Valid is false ||
+        if (this.GameData is null ||
+            this.GameData.Valid is false ||
             this.GameData.MainPlayer is null ||
             this.GameData.Party is null ||
             this.GameData.WorldPlayers is null)
@@ -613,24 +654,24 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
-        if (this.CheckMouseOverEntity(this.GameData.LivingEntities!.OfType<IEntity>()) is not null)
+        if (this.CheckMouseOverEntity(this.GameData.LivingEntities?.OfType<IEntity>()) is not null)
         {
             return;
         }
 
-        if (this.CheckMouseOverEntity(this.GameData.MapIcons!.OfType<IPositionalEntity>()) is not null)
+        if (this.CheckMouseOverEntity(this.GameData.MapIcons?.OfType<IPositionalEntity>()) is not null)
         {
             return;
         }
 
-        if (this.CheckMouseOverEntity(this.GameData.MainPlayer.QuestLog!
+        if (this.CheckMouseOverEntity(this.GameData.MainPlayer.QuestLog?
                 .Where(entity => this.drawingService.IsEntityOnScreen(entity.Position, out _, out _))
                 .OfType<IPositionalEntity>()) is not null)
         {
             return;
         }
 
-        if (this.CheckMouseOverEntity(this.GameData.MainPlayer.QuestLog!
+        if (this.CheckMouseOverEntity(this.GameData.MainPlayer.QuestLog?
                 .Where(entity => !this.drawingService.IsEntityOnScreen(entity.Position, out _, out _))
                 .Select(oldQuestMetadata =>
                 {
@@ -683,24 +724,36 @@ public partial class GuildwarsMinimap : UserControl
         this.QuestMetadataClicked?.Invoke(this, quest);
     }
 
-    private void PlayerContextMenu_PlayerContextMenuClicked(object _, PlayerInformation? playerInformation)
+    private void PlayerContextMenu_PlayerContextMenuClicked(object _, (PlayerInformation? Player, string? Name) tuple)
     {
-        if (playerInformation is null)
+        if (tuple.Name?.IsNullOrWhiteSpace() is false)
+        {
+            this.NpcNameClicked?.Invoke(this, tuple.Name);
+            return;
+        }
+
+        if (tuple.Player is null)
         {
             return;
         }
 
-        this.PlayerInformationClicked?.Invoke(this, playerInformation);
+        this.PlayerInformationClicked?.Invoke(this, tuple.Player);
     }
 
-    private void LivingEntityContextMenu_LivingEntityContextMenuClicked(object _, LivingEntity? livingEntity)
+    private void LivingEntityContextMenu_LivingEntityContextMenuClicked(object _, (LivingEntity? LivingEntity, string? Name) tuple)
     {
-        if (livingEntity is null)
+        if (tuple.Name?.IsNullOrWhiteSpace() is false)
+        {
+            this.NpcNameClicked?.Invoke(this, tuple.Name);
+            return;
+        }
+
+        if (tuple.LivingEntity is null)
         {
             return;
         }
 
-        this.LivingEntityClicked?.Invoke(this, livingEntity);
+        this.LivingEntityClicked?.Invoke(this, tuple.LivingEntity);
     }
 
     private void LivingEntityContextMenu_LivingEntityProfessionContextMenuClicked(object _, Profession? e)

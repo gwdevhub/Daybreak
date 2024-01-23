@@ -4,7 +4,8 @@ namespace Daybreak.Configuration.Options;
 
 [OptionsName(Name = "Screen Manager")]
 [OptionsIgnore]
-public sealed class ScreenManagerOptions
+[OptionsSynchronizationIgnore]
+internal sealed class ScreenManagerOptions
 {
     public double X { get; set; }
     public double Y { get; set; }

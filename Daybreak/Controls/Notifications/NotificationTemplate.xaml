@@ -18,7 +18,8 @@
             BorderThickness="0, 0, 0, 1"/>
         <buttons:HighlightButton
             HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
-            Clicked="HighlightButton_Clicked">
+            Clicked="HighlightButton_Clicked"
+            ToolTip="Open notification">
             <buttons:HighlightButton.ButtonContent>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -51,6 +52,7 @@
         <buttons:CancelButton Height="20"
                               VerticalAlignment="Center"
                               HorizontalAlignment="Right"
-                              Clicked="CancelButton_Clicked"></buttons:CancelButton>
+                              Clicked="CancelButton_Clicked"
+                              ToolTip="Remove notification"/>
     </Grid>
 </UserControl>

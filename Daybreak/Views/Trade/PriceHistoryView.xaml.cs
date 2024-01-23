@@ -26,7 +26,7 @@ public partial class PriceHistoryView : UserControl
 {
     private readonly IViewManager viewManager;
     private readonly IPriceHistoryService priceHistoryService;
-    private readonly List<TraderQuote> traderQuotes = new();
+    private readonly List<TraderQuote> traderQuotes = [];
     private readonly SolidColorPaint backgroundPaint;
     private readonly SolidColorPaint foregroundPaint;
     private readonly SolidColorPaint accentPaint;

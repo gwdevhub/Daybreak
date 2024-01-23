@@ -12,7 +12,7 @@ public interface IDrawingService
 
     void DrawPaths(WriteableBitmap writeableBitmap, PathfindingCache? pathfindingCache);
 
-    void DrawEntities(WriteableBitmap bitmap, DebounceResponse debounceResponse, int targetEntityId);
+    void DrawEntities(WriteableBitmap bitmap, GameData gameData, int targetEntityId);
 
     void DrawQuestObjectives(WriteableBitmap bitmap, IEnumerable<QuestMetadata> quests);
 
@@ -20,7 +20,7 @@ public interface IDrawingService
 
     void DrawMapIcons(WriteableBitmap bitmap, List<MapIcon> mapIcons);
 
-    void DrawEngagementArea(WriteableBitmap bitmap, DebounceResponse debounceResponse);
+    void DrawEngagementArea(WriteableBitmap bitmap, GameData gameData);
 
     bool IsEntityOnScreen(Position? position, out int x, out int y);
 }

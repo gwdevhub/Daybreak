@@ -1,19 +1,22 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Services.Bloogum;
-using Daybreak.Services.IconRetrieve;
 using Daybreak.Services.Menu;
 using Daybreak.Services.Navigation;
+using Daybreak.Services.Options;
 using Daybreak.Services.Privilege;
+using Daybreak.Services.Screens;
 using Daybreak.Services.Screenshots;
 using Daybreak.Services.Updater;
 using Daybreak.Views;
 using MahApps.Metro.Controls;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
@@ -31,13 +34,15 @@ namespace Daybreak.Launch;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
 public partial class MainWindow : MetroWindow
 {
+    private readonly IOptionsSynchronizationService optionsSynchronizationService;
+    private readonly ISplashScreenService splashScreenService;
     private readonly IMenuServiceInitializer menuServiceInitializer;
     private readonly IViewManager viewManager;
-    private readonly IScreenshotProvider screenshotProvider;
-    private readonly IBloogumClient bloogumClient;
+    private readonly IBackgroundProvider backgroundProvider;
     private readonly IApplicationUpdater applicationUpdater;
     private readonly IPrivilegeManager privilegeManager;
     private readonly ILiveOptions<LauncherOptions> launcherOptions;
+    private readonly ILiveOptions<ThemeOptions> themeOptions;
     private readonly CancellationTokenSource cancellationToken = new();
 
     [GenerateDependencyProperty]
@@ -48,28 +53,43 @@ public partial class MainWindow : MetroWindow
     private bool isRunningAsAdmin;
     [GenerateDependencyProperty]
     private bool isShowingDropdown;
+    [GenerateDependencyProperty]
+    private bool paintifyBackground;
+    [GenerateDependencyProperty]
+    private bool blurBackground;
+    [GenerateDependencyProperty]
+    private bool wintersdayMode;
+    [GenerateDependencyProperty]
+    private bool settingsSynchronized;
 
     public event EventHandler<MainWindow>? WindowParametersChanged;
 
     public MainWindow(
+        IOptionsSynchronizationService optionsSynchronizationService,
+        ISplashScreenService splashScreenService,
         IMenuServiceInitializer menuServiceInitializer,
         IViewManager viewManager,
-        IScreenshotProvider screenshotProvider,
-        IBloogumClient bloogumClient,
+        IBackgroundProvider backgroundProvider,
         IApplicationUpdater applicationUpdater,
         IPrivilegeManager privilegeManager,
-        ILiveOptions<LauncherOptions> launcherOptions)
+        IOptionsUpdateHook optionsUpdateHook,
+        ILiveOptions<LauncherOptions> launcherOptions,
+        ILiveOptions<ThemeOptions> themeOptions)
     {
+        this.optionsSynchronizationService = optionsSynchronizationService.ThrowIfNull();
+        this.splashScreenService = splashScreenService.ThrowIfNull();
         this.menuServiceInitializer = menuServiceInitializer.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
-        this.screenshotProvider = screenshotProvider.ThrowIfNull();
-        this.bloogumClient = bloogumClient.ThrowIfNull();
+        this.backgroundProvider = backgroundProvider.ThrowIfNull();
         this.applicationUpdater = applicationUpdater.ThrowIfNull();
         this.privilegeManager = privilegeManager.ThrowIfNull();
         this.launcherOptions = launcherOptions.ThrowIfNull();
+        this.themeOptions = themeOptions.ThrowIfNull();
+        optionsUpdateHook.ThrowIfNull().RegisterHook<ThemeOptions>(this.ThemeOptionsChanged);
         this.InitializeComponent();
         this.CurrentVersionText = this.applicationUpdater.CurrentVersion.ToString();
         this.IsRunningAsAdmin = this.privilegeManager.AdminPrivileges;
+        this.ThemeOptionsChanged();
         this.SetupMenuService();
     }
 
@@ -92,8 +112,14 @@ public partial class MainWindow : MetroWindow
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
+        this.splashScreenService.HideSplashScreen();
         this.SetupImageCycle();
-        this.CheckForUpdates();
+        this.viewManager.ShowView<LauncherView>();
+    }
+
+    private void SynchronizeButton_Click(object sender, EventArgs e)
+    {
+        this.viewManager.ShowView<SettingsSynchronizationView>();
     }
 
     private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -107,31 +133,29 @@ public partial class MainWindow : MetroWindow
         this.DragMove();
     }
 
-    private void SetupImageCycle()
+    private void ThemeOptionsChanged()
     {
-        TaskExtensions.RunPeriodicAsync(() => this.Dispatcher.Invoke(() => this.UpdateRandomImage()), TimeSpan.Zero, TimeSpan.FromSeconds(15), this.cancellationToken.Token);
+        this.PaintifyBackground = this.themeOptions.Value.BackgroundPaintify;
+        this.BlurBackground = this.themeOptions.Value.BackgroundBlur;
+        this.WintersdayMode = this.themeOptions.Value.WintersdayMode;
     }
 
-    private void UpdateRandomImage()
+    private void SetupImageCycle()
     {
-        var maybeImage = this.screenshotProvider.GetRandomScreenShot();
-        maybeImage.Do(
-            onSome: (image) =>
-            {
-                this.SetImage(image);
-                this.CreditText = string.Empty;
-            },
-            onNone: async () =>
-            {
-                var maybeImageSource = await this.bloogumClient.GetImage(true).ConfigureAwait(true);
-                if (maybeImageSource is null)
-                {
-                    return;
-                }
+        System.Extensions.TaskExtensions.RunPeriodicAsync(() => this.Dispatcher.Invoke(() => this.UpdateRandomImage()), TimeSpan.Zero, TimeSpan.FromSeconds(15), this.cancellationToken.Token);
+    }
 
-                this.SetImage(maybeImageSource);
-                this.CreditText = "http://bloogum.net/guildwars";
-            });
+    private async void UpdateRandomImage()
+    {
+        var response = await this.backgroundProvider.GetBackground();
+        if (response.ImageSource is null)
+        {
+            // Since image will not change, do not change CreditText
+            return;
+        }
+
+        this.CreditText = response.CreditText;
+        this.SetImage(response.ImageSource);
     }
 
     private void SettingsButton_Clicked(object sender, EventArgs e)
@@ -141,69 +165,78 @@ public partial class MainWindow : MetroWindow
 
     private void OpenDropdownMenu()
     {
-        if (this.IsShowingDropdown)
+        this.Dispatcher.Invoke(() =>
         {
-            return;
-        }
+            if (this.IsShowingDropdown)
+            {
+                return;
+            }
 
-        this.ToggleDropdownMenu();
+            this.ToggleDropdownMenu();
+        });
     }
 
     private void CloseDropdownMenu()
     {
-        if (!this.IsShowingDropdown)
+        this.Dispatcher.Invoke(() =>
         {
-            return;
-        }
+            if (!this.IsShowingDropdown)
+            {
+                return;
+            }
 
-        this.ToggleDropdownMenu();
+            this.ToggleDropdownMenu();
+        });
     }
 
     private void ToggleDropdownMenu()
     {
-        var button = this.IsShowingDropdown ?
+        this.Dispatcher.Invoke(() =>
+        {
+            var button = this.IsShowingDropdown ?
             this.ClosingSettingsButton :
             this.OpeningSettingsButton;
-        button.IsEnabled = false;
-        var widthAnimation = new DoubleAnimation
-        {
-            From = this.IsShowingDropdown ?
-                this.MenuContainer.ActualWidth :
-                0,
-            To = this.IsShowingDropdown ?
-                0 :
-                300,
-            Duration = new Duration(TimeSpan.FromMilliseconds(200)),
-            DecelerationRatio = 0.7
-        };
+            button.IsEnabled = false;
+            var widthAnimation = new DoubleAnimation
+            {
+                From = this.IsShowingDropdown ?
+                    this.MenuContainer.ActualWidth :
+                    0,
+                To = this.IsShowingDropdown ?
+                    0 :
+                    300,
+                Duration = new Duration(TimeSpan.FromMilliseconds(200)),
+                DecelerationRatio = 0.7
+            };
 
-        var opacityAnimation = new DoubleAnimation
-        {
-            From = this.IsShowingDropdown ?
-                this.MenuContainer.Opacity :
-                0,
-            To = this.IsShowingDropdown ?
-                0 :
-                1,
-            Duration = new Duration(TimeSpan.FromMilliseconds(100)),
-            DecelerationRatio = 0.7
-        };
+            var opacityAnimation = new DoubleAnimation
+            {
+                From = this.IsShowingDropdown ?
+                    this.MenuContainer.Opacity :
+                    0,
+                To = this.IsShowingDropdown ?
+                    0 :
+                    1,
+                Duration = new Duration(TimeSpan.FromMilliseconds(100)),
+                DecelerationRatio = 0.7
+            };
 
-        var storyBoard = new Storyboard();
-        storyBoard.Children.Add(widthAnimation);
-        Storyboard.SetTarget(widthAnimation, this.MenuContainer);
-        Storyboard.SetTargetProperty(widthAnimation, new PropertyPath(Grid.WidthProperty));
-        storyBoard.Children.Add(opacityAnimation);
-        Storyboard.SetTarget(opacityAnimation, this.MenuContainer);
-        Storyboard.SetTargetProperty(opacityAnimation, new PropertyPath(Grid.OpacityProperty));
+            var storyBoard = new Storyboard();
+            storyBoard.Children.Add(widthAnimation);
+            Storyboard.SetTarget(widthAnimation, this.MenuContainer);
+            Storyboard.SetTargetProperty(widthAnimation, new PropertyPath(Grid.WidthProperty));
+            storyBoard.Children.Add(opacityAnimation);
+            Storyboard.SetTarget(opacityAnimation, this.MenuContainer);
+            Storyboard.SetTargetProperty(opacityAnimation, new PropertyPath(Grid.OpacityProperty));
 
-        storyBoard.Completed += (_, _) =>
-        {
-            button.IsEnabled = true;
-            this.IsShowingDropdown = !this.IsShowingDropdown;
-        };
+            storyBoard.Completed += (_, _) =>
+            {
+                button.IsEnabled = true;
+                this.IsShowingDropdown = !this.IsShowingDropdown;
+            };
 
-        storyBoard.Begin();
+            storyBoard.Begin();
+        });
     }
 
     private void CreditTextBox_MouseLeftButtonDown(object sender, EventArgs e)
@@ -242,25 +275,6 @@ public partial class MainWindow : MetroWindow
 
             this.WindowButtonCommands.Foreground = this.Foreground;
         }
-    }
-
-    private async void CheckForUpdates()
-    {
-        var updateAvailable = this.launcherOptions.Value.AutoCheckUpdate is true && await this.applicationUpdater.UpdateAvailable().ConfigureAwait(true);
-        if (updateAvailable)
-        {
-            this.viewManager.ShowView<AskUpdateView>();
-        }
-        else
-        {
-            this.viewManager.ShowView<LauncherView>();
-            this.PeriodicallyCheckForUpdates();
-        }
-    }
-
-    private void PeriodicallyCheckForUpdates()
-    {
-        this.applicationUpdater.PeriodicallyCheckForUpdates();
     }
 
     private void SetupMenuService()

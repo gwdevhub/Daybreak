@@ -40,7 +40,8 @@
                     HorizontalAlignment="Right"
                     MaxHeight="300"
                     Expired="NotificationView_Expired"
-                    Closed="NotificationView_Closed"/>
+                    Closed="NotificationView_Closed"
+                    ToolTip="Open Information Notification"/>
             </DataTemplate>
             <DataTemplate x:Key="ErrorNotificationDataTemplate">
                 <local:NotificationView 
@@ -49,7 +50,8 @@
                     HorizontalAlignment="Right"
                     MaxHeight="300"
                     Expired="NotificationView_Expired"
-                    Closed="NotificationView_Closed"/>
+                    Closed="NotificationView_Closed"
+                    ToolTip="Open Error Notification"/>
             </DataTemplate>
         </ItemsControl.Resources>
     </ItemsControl>

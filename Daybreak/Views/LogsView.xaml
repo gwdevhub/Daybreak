@@ -71,9 +71,11 @@
                 BorderThickness="0, 0, 0, 1"
                 Height="40"/>
         <buttons:BinButton  Height="30" Width="30" HorizontalAlignment="Right" Margin="5"
-                            Clicked="BinButton_Clicked"></buttons:BinButton>
+                            Clicked="BinButton_Clicked"
+                            ToolTip="Delete all logs"/>
         <buttons:BackButton  Height="30" Width="30" HorizontalAlignment="Right" Margin="0, 5, 45, 5"
-                             Clicked="ExportButton_Clicked">
+                             Clicked="ExportButton_Clicked"
+                             ToolTip="Export">
             <buttons:BackButton.RenderTransform>
                 <RotateTransform Angle="270" CenterX="15" CenterY="15"></RotateTransform>
             </buttons:BackButton.RenderTransform>
@@ -85,7 +87,6 @@
             FontSize="16"
             FontFamily="Consolas"
             Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-            Background="{StaticResource MahApps.Brushes.ThemeBackground}">
-        </avalon:TextEditor>
+            Background="{StaticResource MahApps.Brushes.ThemeBackground}" />
     </Grid>
 </UserControl>

@@ -7,11 +7,12 @@ using System.Core.Extensions;
 using System.Diagnostics.Metrics;
 using System.IO;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Daybreak.Services.Downloads;
 
-public sealed class DownloadService : IDownloadService
+internal sealed class DownloadService : IDownloadService
 {
     private const double StatusUpdateInterval = 50;
     private const string MetricUnits = "bytes/sec";
@@ -31,7 +32,7 @@ public sealed class DownloadService : IDownloadService
         this.logger = logger.ThrowIfNull();
     }
 
-    public async Task<bool> DownloadFile(string downloadUri, string destinationPath, DownloadStatus downloadStatus)
+    public async Task<bool> DownloadFile(string downloadUri, string destinationPath, DownloadStatus downloadStatus, CancellationToken cancellationToken = default)
     {
         downloadStatus.CurrentStep = DownloadStatus.InitializingDownload;
         using var response = await this.httpClient.GetAsync(downloadUri, HttpCompletionOption.ResponseHeadersRead);
@@ -46,7 +47,7 @@ public sealed class DownloadService : IDownloadService
         this.logger.LogInformation("Beginning download");
         var fileInfo = new FileInfo(destinationPath);
         fileInfo.Directory?.Create();
-        var fileStream = File.OpenWrite(destinationPath);
+        var fileStream = File.Open(destinationPath, FileMode.Create, FileAccess.Write);
         var downloadSize = (double)response.Content!.Headers!.ContentLength!;
         var buffer = new byte[1024];
         var length = 0;

@@ -1,18 +1,17 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Models.Guildwars;
+using Daybreak.Models;
 using Daybreak.Services.Scanner;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Daybreak.Services.Screens;
 
-public sealed class GuildwarsScreenPlacer : IGuildwarsScreenPlacer
+internal sealed class GuildwarsScreenPlacer : IGuildwarsScreenPlacer
 {
     private const int MaxTries = 10;
 
@@ -33,6 +32,7 @@ public sealed class GuildwarsScreenPlacer : IGuildwarsScreenPlacer
         this.logger = logger.ThrowIfNull();
     }
 
+    public string Name => "Screen placer";
     public bool IsEnabled
     {
         get => this.liveOptions.Value.SetGuildwarsWindowSizeOnLaunch;
@@ -45,7 +45,7 @@ public sealed class GuildwarsScreenPlacer : IGuildwarsScreenPlacer
 
     public bool IsInstalled => true;
 
-    public async Task OnGuildwarsStarted(Process process)
+    public async Task OnGuildWarsStarted(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
     {
         var screen = this.screenManager.Screens.Skip(this.liveOptions.Value.DesiredGuildwarsScreen).FirstOrDefault();
         if (screen is null)
@@ -56,7 +56,7 @@ public sealed class GuildwarsScreenPlacer : IGuildwarsScreenPlacer
         var tries = 0;
         while (await this.guildwarsMemoryCache.ReadLoginData(CancellationToken.None) is null)
         {
-            await Task.Delay(1000);
+            await Task.Delay(1000, cancellationToken);
             tries++;
             if (tries > MaxTries)
             {
@@ -71,5 +71,9 @@ public sealed class GuildwarsScreenPlacer : IGuildwarsScreenPlacer
 
     public IEnumerable<string> GetCustomArguments() => Enumerable.Empty<string>();
 
-    public Task OnGuildwarsStarting(Process process) => Task.CompletedTask;
+    public Task OnGuildWarsStarting(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public Task OnGuildWarsStartingDisabled(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public Task OnGuildWarsCreated(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken) => Task.CompletedTask;
 }

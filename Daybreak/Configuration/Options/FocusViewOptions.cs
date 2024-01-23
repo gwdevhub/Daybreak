@@ -9,7 +9,7 @@ public sealed class FocusViewOptions
 {
     [JsonProperty(nameof(Enabled))]
     [OptionName(Name = "Enabled", Description = "If true, the focus view is enabled, showing live information from the game")]
-    public bool Enabled { get; set; }
+    public bool Enabled { get; set; } = true;
 
     [OptionName(Name = "Inventory Component Enabled", Description = "If true, the focus view will show a component with the inventory contents")]
     public bool InventoryComponentVisible { get; set; }

@@ -26,7 +26,8 @@
                                      HighlightColor="{StaticResource MahApps.Brushes.Accent}"
                                      VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
                                      BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
-                                     BorderThickness="1"></buttons:HighlightButton>
+                                     BorderThickness="1"
+                                     ToolTip="Continue"/>
         </StackPanel>
     </Grid>
 </UserControl>

@@ -1,4 +1,5 @@
 ﻿using Daybreak.Configuration;
+using Daybreak.Models.Progress;
 using Daybreak.Services.BrowserExtensions;
 using Daybreak.Services.Drawing;
 using Daybreak.Services.ExceptionHandling;
@@ -6,16 +7,25 @@ using Daybreak.Services.Mods;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Notifications;
 using Daybreak.Services.Options;
+using Daybreak.Services.Plugins;
+using Daybreak.Services.Screens;
 using Daybreak.Services.Startup;
+using Daybreak.Services.Themes;
 using Daybreak.Services.Updater.PostUpdate;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Slim;
 using Slim.Integration.ServiceCollection;
 using System;
+using System.Runtime.CompilerServices;
+using System.Text;
 using System.Windows;
 using System.Windows.Extensions;
 using System.Windows.Media;
+
+//The following lines are needed to expose internal objects to the test project
+[assembly: InternalsVisibleTo("Daybreak.Tests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
 namespace Daybreak.Launch;
 
@@ -23,6 +33,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
 {
     public readonly static Launcher Instance = new();
 
+    private readonly ProjectConfiguration projectConfiguration = new();
     private ILogger? logger;
     private IExceptionHandler? exceptionHandler;
 
@@ -31,6 +42,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
     [STAThread]
     public static int Main()
     {
+        RegisterExtraEncodingProviders();
         RegisterMahAppsStyle();
         return LaunchMainWindow();
     }
@@ -38,14 +50,15 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
     protected override System.IServiceProvider SetupServiceProvider(IServiceCollection services)
     {
         var serviceManager = new ServiceManager();
-        ProjectConfiguration.RegisterResolvers(serviceManager);
-        ProjectConfiguration.RegisterLiteCollections(services);
+        this.projectConfiguration.RegisterResolvers(serviceManager);
+        serviceManager.RegisterSingleton<SplashWindow>();
+        serviceManager.RegisterSingleton<StartupStatus>();
         return services.BuildSlimServiceProvider(serviceManager);
     }
 
     protected override void RegisterServices(IServiceCollection services)
     {
-        ProjectConfiguration.RegisterServices(services);
+        this.projectConfiguration.RegisterServices(services);
     }
 
     protected override bool HandleException(Exception e)
@@ -55,18 +68,73 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
 
     protected override void ApplicationStarting()
     {
-        ProjectConfiguration.RegisterOptions(this.ServiceProvider.GetRequiredService<IOptionsProducer>());
-        ProjectConfiguration.RegisterViews(this.ServiceProvider.GetRequiredService<IViewManager>());
-        ProjectConfiguration.RegisterPostUpdateActions(this.ServiceProvider.GetRequiredService<IPostUpdateActionProducer>());
-        ProjectConfiguration.RegisterStartupActions(this.ServiceProvider.GetRequiredService<IStartupActionProducer>());
-        ProjectConfiguration.RegisterDrawingModules(this.ServiceProvider.GetRequiredService<IDrawingModuleProducer>());
-        ProjectConfiguration.RegisterNotificationHandlers(this.ServiceProvider.GetRequiredService<INotificationHandlerProducer>());
-        ProjectConfiguration.RegisterMods(this.ServiceProvider.GetRequiredService<IModsManager>());
-        ProjectConfiguration.RegisterBrowserExtensions(this.ServiceProvider.GetRequiredService<IBrowserExtensionsProducer>());
+        /*
+         * Show splash screen before beginning to load the rest of the application.
+         * MainWindow will call HideSplashScreen() on Loaded event
+         * 
+         * OptionsProducer needs to be created before everything else, otherwise all
+         * the other services will fail to get options for their needs.
+         */
+        
+        var optionsProducer = this.ServiceProvider.GetRequiredService<IOptionsProducer>();
+        var startupStatus = this.ServiceProvider.GetRequiredService<StartupStatus>();
+        startupStatus.CurrentStep = StartupStatus.Custom("Loading options");
+        this.projectConfiguration.RegisterOptions(optionsProducer);
+
+        /*
+         * SplashScreenService has a dependency on IOptionsProducer, due to needing to style the
+         * SplashScreen based on the theme in the options. Thus, it can only be called after
+         * initializing the options.
+         */
+        this.ServiceProvider.GetRequiredService<ISplashScreenService>().ShowSplashScreen();
+        _ = this.ServiceProvider.GetRequiredService<IThemeManager>().GetCurrentTheme();
+
+        var serviceManager = this.ServiceProvider.GetRequiredService<IServiceManager>();
+        var viewProducer = this.ServiceProvider.GetRequiredService<IViewManager>();
+        var postUpdateActionProducer = this.ServiceProvider.GetRequiredService<IPostUpdateActionProducer>();
+        var startupActionProducer = this.ServiceProvider.GetRequiredService<IStartupActionProducer>();
+        var drawingModuleProducer = this.ServiceProvider.GetRequiredService<IDrawingModuleProducer>();
+        var notificationHandlerProducer = this.ServiceProvider.GetRequiredService<INotificationHandlerProducer>();
+        var modsManager = this.ServiceProvider.GetRequiredService<IModsManager>();
+        
+        startupStatus.CurrentStep = StartupStatus.Custom("Loading views");
+        this.projectConfiguration.RegisterViews(viewProducer);
+        startupStatus.CurrentStep = StartupStatus.Custom("Loading post-update actions");
+        this.projectConfiguration.RegisterPostUpdateActions(postUpdateActionProducer);
+        startupStatus.CurrentStep = StartupStatus.Custom("Loading startup actions");
+        this.projectConfiguration.RegisterStartupActions(startupActionProducer);
+        startupStatus.CurrentStep = StartupStatus.Custom("Loading drawing modules");
+        this.projectConfiguration.RegisterDrawingModules(drawingModuleProducer);
+        startupStatus.CurrentStep = StartupStatus.Custom("Loading notification handlers");
+        this.projectConfiguration.RegisterNotificationHandlers(notificationHandlerProducer);
+        startupStatus.CurrentStep = StartupStatus.Custom("Loading mods");
+        this.projectConfiguration.RegisterMods(modsManager);
 
         this.logger = this.ServiceProvider.GetRequiredService<ILogger<Launcher>>();
         this.exceptionHandler = this.ServiceProvider.GetRequiredService<IExceptionHandler>();
+        try
+        {
+            startupStatus.CurrentStep = StartupStatus.Custom("Loading plugins");
+            this.ServiceProvider.GetRequiredService<IPluginsService>()
+                .LoadPlugins(
+                    serviceManager,
+                    optionsProducer,
+                    viewProducer,
+                    postUpdateActionProducer,
+                    startupActionProducer,
+                    drawingModuleProducer,
+                    notificationHandlerProducer,
+                    modsManager);
+        }
+        catch(Exception e)
+        {
+            this.logger.LogError(e, "Encountered exception while loading plugins. Aborting...");
+            this.exceptionHandler.HandleException(e);
+        }
+
+        startupStatus.CurrentStep = StartupStatus.Custom("Registering view container");
         this.RegisterViewContainer();
+        startupStatus.CurrentStep = StartupStatus.Finished;
     }
 
     protected override void ApplicationClosing()
@@ -80,10 +148,17 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
         viewManager.RegisterContainer(mainWindow.Container);
     }
 
-
     private static int LaunchMainWindow()
     {
         return Instance.Run();
+    }
+
+    private static void RegisterExtraEncodingProviders()
+    {
+        /*
+         * This is a fix for encoding issues with zip files
+         */
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
 
     private static void RegisterMahAppsStyle()

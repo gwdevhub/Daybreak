@@ -1,11 +1,13 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Exceptions;
 using Daybreak.Models;
+using Daybreak.Models.Github;
 using Daybreak.Models.Progress;
+using Daybreak.Models.UMod;
 using Daybreak.Services.Downloads;
-using Daybreak.Utils;
+using Daybreak.Services.Injection;
+using Daybreak.Services.Notifications;
+using Daybreak.Services.Toolbox.Models;
 using Microsoft.Extensions.Logging;
-using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -13,29 +15,31 @@ using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Text;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Daybreak.Services.UMod;
 
-public sealed class UModService : IUModService
+internal sealed class UModService : IUModService
 {
-    private const int MaxRetries = 10;
-    private const string DownloadUrl = "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/texmod/uMod_v1_r44.zip";
-    private const string ArchiveName = "uMod_v1_r44.zip";
+    private const string TagPlaceholder = "[TAG_PLACEHOLDER]";
+    private const string ReleaseUrl = "https://github.com/gwdevhub/gMod/releases/download/[TAG_PLACEHOLDER]/gMod.dll";
+    private const string ReleasesUrl = "https://api.github.com/repos/gwdevhub/gMod/git/refs/tags";
     private const string UModDirectory = "uMod";
-    private const string D3D9Dll = "d3d9.dll";
-    private const string D3D9DllBackup = "d3d9.dll.backup";
-    private const string UModExecutable = "uMod.exe";
-    private const string UModDefaultTemplateFile = "uMod_SaveFiles.txt";
-    private const string UModModListFile = "ModList.txt";
+    private const string UModDll = "uMod.dll";
+    private const string UModModList = "modlist.txt";
 
+    private readonly IProcessInjector processInjector;
+    private readonly INotificationService notificationService;
     private readonly IDownloadService downloadService;
+    private readonly IHttpClient<UModService> httpClient;
     private readonly ILiveOptions<LauncherOptions> launcherOptions;
     private readonly ILiveUpdateableOptions<UModOptions> uModOptions;
     private readonly ILogger<UModService> logger;
+
+    public string Name => "uMod";
 
     public bool IsEnabled
     {
@@ -47,15 +51,27 @@ public sealed class UModService : IUModService
         }
     }
 
-    public bool IsInstalled => File.Exists(this.uModOptions.Value.Path);
+    public bool IsInstalled => File.Exists(Path.GetFullPath(Path.Combine(UModDirectory, UModDll)));
+
+    public Models.Versioning.Version Version => File.Exists(Path.Combine(Path.GetFullPath(UModDirectory), UModDll)) ?
+        Models.Versioning.Version.TryParse(FileVersionInfo.GetVersionInfo(Path.Combine(Path.GetFullPath(UModDirectory), UModDll)).FileVersion!, out var version) ?
+            version :
+            Models.Versioning.Version.Zero :
+        Models.Versioning.Version.Zero;
 
     public UModService(
+        IProcessInjector processInjector,
+        INotificationService notificationService,
         IDownloadService downloadService,
+        IHttpClient<UModService> httpClient,
         ILiveOptions<LauncherOptions> launcherOptions,
         ILiveUpdateableOptions<UModOptions> uModOptions,
         ILogger<UModService> logger)
     {
+        this.processInjector = processInjector.ThrowIfNull();
+        this.notificationService = notificationService.ThrowIfNull();
         this.downloadService = downloadService.ThrowIfNull();
+        this.httpClient = httpClient.ThrowIfNull();
         this.launcherOptions = launcherOptions.ThrowIfNull();
         this.uModOptions = uModOptions.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
@@ -66,39 +82,38 @@ public sealed class UModService : IUModService
         return Enumerable.Empty<string>();
     }
 
-    public async Task OnGuildwarsStarting(Process process)
-    {
-        await this.LaunchUmod(process);
-    }
-
-    public Task OnGuildwarsStarted(Process process)
+    public Task OnGuildWarsStarting(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }
 
-    public bool LoadUModFromDisk()
-    {
-        var filePicker = new OpenFileDialog
-        {
-            Filter = "Executable Files (*.exe)|*.exe",
-            Multiselect = false,
-            RestoreDirectory = true,
-            Title = "Please select the uMod executable"
-        };
-        if (filePicker.ShowDialog() is false)
-        {
-            return false;
-        }
+    public Task OnGuildWarsStartingDisabled(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
-        var fileName = filePicker.FileName;
-        this.uModOptions.Value.Path = Path.GetFullPath(fileName);
-        this.uModOptions.UpdateOption();
-        return true;
+    public async Task OnGuildWarsCreated(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
+    {
+        var modListFilePath = Path.Combine(Path.GetFullPath(UModDirectory), UModModList);
+        var lines = this.uModOptions.Value.Mods.Where(e => e.Enabled && e.PathToFile is not null).Select(e => e.PathToFile).ToList();
+        await File.WriteAllLinesAsync(modListFilePath, lines!, cancellationToken);
+        var result = await this.processInjector.Inject(applicationLauncherContext.Process, Path.Combine(Path.GetFullPath(UModDirectory), UModDll), cancellationToken);
+        if (result)
+        {
+            this.notificationService.NotifyInformation(
+                title: "uMod loaded",
+                description: "uMod.dll has been loaded. Textures will start loading asynchronously");
+        }
+        else
+        {
+            this.notificationService.NotifyError(
+                title: "uMod failed to load",
+                description: "uMod.dll has failed to load. Check logs for details");
+        }
     }
+
+    public Task OnGuildWarsStarted(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public async Task<bool> SetupUMod(UModInstallationStatus uModInstallationStatus)
     {
-        if ((await this.SetupUModExecutable(uModInstallationStatus)) is false)
+        if ((await this.SetupUModDll(uModInstallationStatus)) is false)
         {
             this.logger.LogError("Failed to setup the uMod executable");
             return false;
@@ -108,183 +123,181 @@ public sealed class UModService : IUModService
         return true;
     }
 
-    public async Task<bool> AddMod(string pathToTpf)
+    public bool AddMod(string pathToTpf, bool? imported = default)
     {
-        if (this.uModOptions.Value.AutoEnableMods is false)
+        var fullPath = Path.GetFullPath(pathToTpf);
+        if (!File.Exists(pathToTpf))
         {
             return false;
         }
 
-        var modListPath = Path.Combine(UModDirectory, UModModListFile);
-        var tpfPath = Path.GetFullPath(pathToTpf);
-        await File.AppendAllLinesAsync(modListPath, new string[] { $"Add_true:{tpfPath}" });
-        return true;
-    }
-
-    private async Task<bool> SetupUModExecutable(UModInstallationStatus uModInstallationStatus)
-    {
-        if (File.Exists(this.uModOptions.Value.Path))
+        if (this.uModOptions.Value.Mods.Any(m => m.PathToFile == fullPath))
         {
             return true;
         }
 
-        if ((await this.downloadService.DownloadFile(DownloadUrl, ArchiveName, uModInstallationStatus)) is false)
+        var entry = new UModEntry
         {
-            this.logger.LogError("Failed to install uMod");
-            return false;
-        }
+            Enabled = this.uModOptions.Value.AutoEnableMods,
+            PathToFile = fullPath,
+            Name = Path.GetFileNameWithoutExtension(fullPath),
+            Imported = imported is true
+        };
 
-        ZipFile.ExtractToDirectory(ArchiveName, Directory.GetCurrentDirectory(), true);
-        var uModOptions = this.uModOptions.Value;
-        uModOptions.Path = Path.GetFullPath(Path.Combine(UModDirectory, UModExecutable));
+        this.uModOptions.Value.Mods.Add(entry);
         this.uModOptions.UpdateOption();
-        await this.SetupDefaultTemplateFile();
-        await SetupModListFile();
-        File.Delete(ArchiveName);
         return true;
     }
 
-    private async Task SetupDefaultTemplateFile()
+    public bool RemoveMod(string pathToTpf)
     {
-        var maybeGuildwarsPath = this.launcherOptions.Value.GuildwarsPaths.Where(a => a.Default).FirstOrDefault();
-        if (maybeGuildwarsPath is not GuildwarsPath guildwarsPath)
+        var fullPath = Path.GetFullPath(pathToTpf);
+        var mods = this.uModOptions.Value.Mods;
+        var maybeMod = mods.FirstOrDefault(m => m.PathToFile == fullPath);
+        if (maybeMod is null)
         {
-            this.logger.LogError("Unable to create default template file. No guild wars executable found");
+            return true;
+        }
+
+        mods.Remove(maybeMod);
+        this.SaveMods(mods);
+
+        // If the mod was downloaded and managed entirely through Daybreak, we can safely delete it
+        if (!maybeMod.Imported)
+        {
+            File.Delete(fullPath);
+        }
+
+        return true;
+    }
+
+    public List<UModEntry> GetMods()
+    {
+        return this.uModOptions.Value.Mods;
+    }
+
+    public void SaveMods(List<UModEntry> list)
+    {
+        this.uModOptions.Value.Mods = list;
+        this.uModOptions.UpdateOption();
+    }
+
+    public async Task CheckAndUpdateUMod(CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.CheckAndUpdateUMod), string.Empty);
+        var existingUMod = Path.Combine(Path.GetFullPath(UModDirectory), UModDll);
+        if (!this.IsInstalled)
+        {
+            scopedLogger.LogInformation("UMod is not installed");
             return;
         }
 
+        scopedLogger.LogInformation("Retrieving version list");
+        var getListResponse = await this.httpClient.GetAsync(ReleasesUrl, cancellationToken);
+        if (!getListResponse.IsSuccessStatusCode)
+        {
+            scopedLogger.LogError($"Received non success status code [{getListResponse.StatusCode}]");
+            return;
+        }
+
+        var responseString = await getListResponse.Content.ReadAsStringAsync();
+        var releasesList = responseString.Deserialize<List<GithubRefTag>>();
+        var latestRelease = releasesList?
+            .Select(t => t.Ref?.Replace("refs/tags/", ""))
+            .OfType<string>()
+            .LastOrDefault();
+
+        if (!Daybreak.Models.Versioning.Version.TryParse(latestRelease ?? string.Empty, out var latestVersion))
+        {
+            scopedLogger.LogError($"Unable to parse latest version {latestRelease}");
+            return;
+        }
+
+        if (this.Version.CompareTo(latestVersion) >= 0)
+        {
+            scopedLogger.LogError($"UMod is up to date");
+            return;
+        }
+
+        await this.DownloadLatestDll(new UModInstallationStatus(), cancellationToken);
+        this.notificationService.NotifyInformation(
+            title: "UMod updated",
+            description: $"UMod has been updated to version {latestRelease}");
+    }
+
+    private void NotifyFaultyInstallation()
+    {
         /*
-         * uMod expects a modlist file with Add_true:Path_To_Tbf for each tbf.
-         * To make uMod auto-load the template, it needs to be saved in uMod_SaveFiles.txt.
-         * uMod_SaveFiles.txt has a weird format where each character is appended with \0.
-         */
-        var defaultTemplateFile = Path.Combine(UModDirectory, UModDefaultTemplateFile);
-        var modListPath = Path.GetFullPath(Path.Combine(UModDirectory, UModModListFile));
-        var gwPath = Path.GetFullPath(guildwarsPath.Path!);
-        var entry = $"{gwPath}|{modListPath}\r\n";
-        var finalSb = new StringBuilder();
-        foreach(var c in entry)
-        {
-            finalSb.Append(c).Append('\0');
-        }
-
-        await File.WriteAllLinesAsync(defaultTemplateFile, new string[] { finalSb.ToString() } );
+             * Known issue where Guild Wars updater breaks the executable, which in turn breaks the integration with uMod.
+             * Prompt the user to manually reinstall Guild Wars.
+             */
+        this.notificationService.NotifyInformation(
+            title: "uMod failed to start",
+            description: "uMod failed to start due to a known issue with Guild Wars updating process. Please manually re-install Guild Wars in order to restore uMod functionality");
     }
 
-    private async Task LaunchUmod(Process gwProcess)
+    private async Task<bool> SetupUModDll(UModInstallationStatus uModInstallationStatus)
     {
-        if (this.uModOptions.Value.Enabled is false)
+        if (this.IsInstalled)
         {
-            throw new InvalidOperationException("Cannot launch uMod. uMod is disabled");
+            return true;
         }
 
-        var executable = this.uModOptions.Value.Path;
-        if (File.Exists(executable) is false)
+        if (await this.DownloadLatestDll(uModInstallationStatus, CancellationToken.None) is not DownloadLatestOperation.Success)
         {
-            throw new ExecutableNotFoundException($"uMod executable doesn't exist at {executable}");
-        }
-
-        if (Process.GetProcessesByName("uMod").FirstOrDefault() is not null)
-        {
-            this.logger.LogInformation("uMod is already running");
-            return;
-        }
-
-        this.logger.LogInformation("Setting up uMod d3d9 dll");
-        this.SetupD3D9Dll(gwProcess);
-
-        this.logger.LogInformation($"Launching uMod");
-        var process = new Process()
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = executable,
-                WorkingDirectory = Path.GetDirectoryName(executable)
-            }
-        };
-        if (process.Start() is false)
-        {
-            throw new InvalidOperationException($"Unable to launch {executable}");
-        }
-
-        var retries = 0;
-        while (true)
-        {
-            await Task.Delay(100);
-            retries++;
-            var uModProcess = Process.GetProcessesByName("uMod").FirstOrDefault();
-            if (uModProcess is null && retries < MaxRetries)
-            {
-                continue;
-            }
-            else if (uModProcess is null && retries >= MaxRetries)
-            {
-                throw new InvalidOperationException("Newly launched uMod process not detected");
-            }
-
-            if (uModProcess!.MainWindowHandle == IntPtr.Zero)
-            {
-                continue;
-            }
-
-            var titleLength = NativeMethods.GetWindowTextLength(uModProcess.MainWindowHandle);
-            var titleBuffer = new StringBuilder(titleLength);
-            _ = NativeMethods.GetWindowText(uModProcess.MainWindowHandle, titleBuffer, titleLength + 1);
-            var title = titleBuffer.ToString();
-            if (title != "uMod V 1.0")
-            {
-                continue;
-            }
-
-            return;
-        }
-    }
-
-    private void SetupD3D9Dll(Process gwProcess)
-    {
-        if (gwProcess.StartInfo.FileName?.IsNullOrWhiteSpace() is true)
-        {
-            throw new InvalidOperationException("Unable to start uMod. Invalid Guild Wars process");
-        }
-
-        var guildWarsDirectory = Path.GetDirectoryName(gwProcess.StartInfo.FileName);
-        var d3d9SourceFilePath = Path.Combine(UModDirectory, D3D9Dll);
-        var d3d9DestinationFilePath = Path.Combine(guildWarsDirectory!, D3D9Dll);
-        if (MustBackupD3D9Dll(d3d9SourceFilePath, d3d9DestinationFilePath))
-        {
-            this.logger.LogInformation($"Found an existing {D3D9Dll} file. Saving it as {D3D9DllBackup}");
-            var d3d9DestinationBackupFilePath = Path.Combine(guildWarsDirectory!, D3D9DllBackup);
-            if (File.Exists(d3d9DestinationBackupFilePath))
-            {
-                File.Delete(d3d9DestinationBackupFilePath);
-            }
-
-            File.Move(d3d9DestinationFilePath, d3d9DestinationBackupFilePath);
-            File.Delete(d3d9DestinationFilePath);
-        }
-
-        if (!File.Exists(d3d9DestinationFilePath))
-        {
-            this.logger.LogInformation($"Copying {d3d9SourceFilePath} to {d3d9DestinationFilePath}");
-            File.Copy(d3d9SourceFilePath, d3d9DestinationFilePath);
-        }
-    }
-
-    private static async Task SetupModListFile()
-    {
-        var modListPath = Path.Combine(UModDirectory, UModModListFile);
-        await File.WriteAllTextAsync(modListPath, string.Empty);
-    }
-
-    private static bool MustBackupD3D9Dll(string sourcePath, string destinationPath)
-    {
-        if (!File.Exists(destinationPath))
-        {
+            this.logger.LogError("Failed to install uMod. Failed to download uMod");
             return false;
         }
 
-        var sourceInfo = new FileInfo(sourcePath);
-        var destinationInfo = new FileInfo(destinationPath);
-        return sourceInfo.Length != destinationInfo.Length;
+        return true;
+    }
+
+    private async Task<DownloadLatestOperation> DownloadLatestDll(UModInstallationStatus uModInstallationStatus, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await this.GetLatestVersion(uModInstallationStatus, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, "Encountered exception");
+            return new DownloadLatestOperation.ExceptionEncountered(ex);
+        }
+    }
+
+    private async Task<DownloadLatestOperation> GetLatestVersion(UModInstallationStatus uModInstallationStatus, CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetLatestVersion), string.Empty);
+        scopedLogger.LogInformation("Retrieving version list");
+        var getListResponse = await this.httpClient.GetAsync(ReleasesUrl, cancellationToken);
+        if (!getListResponse.IsSuccessStatusCode)
+        {
+            scopedLogger.LogError($"Received non success status code [{getListResponse.StatusCode}]");
+            return new DownloadLatestOperation.NonSuccessStatusCode((int)getListResponse.StatusCode);
+        }
+
+        var responseString = await getListResponse.Content.ReadAsStringAsync();
+        var releasesList = responseString.Deserialize<List<GithubRefTag>>();
+        var latestRelease = releasesList?
+            .Select(t => t.Ref?.Replace("refs/tags/", ""))
+            .OfType<string>()
+            .LastOrDefault();
+        if (latestRelease is not string tag)
+        {
+            scopedLogger.LogError("Could not parse version list. No latest version found");
+            return new DownloadLatestOperation.NoVersionFound();
+        }
+
+        scopedLogger.LogInformation($"Retrieving version {tag}");
+        var downloadUrl = ReleaseUrl.Replace(TagPlaceholder, tag);
+        var destinationFolder = Path.GetFullPath(UModDirectory);
+        var destinationPath = Path.Combine(destinationFolder, UModDll);
+        var success = await this.downloadService.DownloadFile(downloadUrl, destinationPath, uModInstallationStatus, cancellationToken);
+        if (!success)
+        {
+            throw new InvalidOperationException($"Failed to download uMod version {tag}");
+        }
+
+        return new DownloadLatestOperation.Success(destinationPath);
     }
 }

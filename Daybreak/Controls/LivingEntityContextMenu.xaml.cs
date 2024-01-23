@@ -1,6 +1,12 @@
-﻿using Daybreak.Models.Guildwars;
+﻿using Daybreak.Launch;
+using Daybreak.Models.FocusView;
+using Daybreak.Models.Guildwars;
+using Daybreak.Services.Scanner;
+using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Core.Extensions;
 using System.Extensions;
+using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 using System.Windows.Input;
@@ -11,27 +17,39 @@ namespace Daybreak.Controls;
 /// </summary>
 public partial class LivingEntityContextMenu : UserControl
 {
-    public event EventHandler<LivingEntity?>? LivingEntityContextMenuClicked;
+    private readonly IGuildwarsMemoryReader guildwarsMemoryReader;
+
+    public event EventHandler<(LivingEntity? Entity, string? Name)>? LivingEntityContextMenuClicked;
     public event EventHandler<Profession?>? LivingEntityProfessionContextMenuClicked;
+
+    [GenerateDependencyProperty]
+    private string entityName = string.Empty;
 
     [GenerateDependencyProperty]
     private bool primaryProfessionVisible;
 
     public LivingEntityContextMenu()
+        : this(Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IGuildwarsMemoryReader>())
     {
+    }
+
+    public LivingEntityContextMenu(
+        IGuildwarsMemoryReader guildwarsMemoryReader)
+    {
+        this.guildwarsMemoryReader = guildwarsMemoryReader.ThrowIfNull();
         this.InitializeComponent();
         this.DataContextChanged += this.LivingEntityContextMenu_DataContextChanged;
     }
 
-    private void LivingEntityContextMenu_DataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
+    private async void LivingEntityContextMenu_DataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
     {
-        if (this.DataContext is not LivingEntity entity)
+        if (this.DataContext is not LivingEntityContextMenuContext context)
         {
             return;
         }
 
-        if (entity.PrimaryProfession != Profession.None &&
-            entity.PrimaryProfession is not null)
+        if (context.LivingEntity?.PrimaryProfession != Profession.None &&
+            context.LivingEntity?.PrimaryProfession is not null)
         {
             this.PrimaryProfessionVisible = true;
         }
@@ -39,15 +57,18 @@ public partial class LivingEntityContextMenu : UserControl
         {
             this.PrimaryProfessionVisible = false;
         }
+
+        await this.guildwarsMemoryReader.EnsureInitialized(context.GuildWarsApplicationLaunchContext!.GuildWarsProcess, CancellationToken.None);
+        this.EntityName = await this.guildwarsMemoryReader.GetEntityName(context.LivingEntity!, CancellationToken.None).ConfigureAwait(true);
     }
 
     private void NpcDefinitionTextBlock_MouseLeftButtonDown(object _, MouseButtonEventArgs e)
     {
-        this.LivingEntityContextMenuClicked?.Invoke(this, this.DataContext as LivingEntity ?? default);
+        this.LivingEntityContextMenuClicked?.Invoke(this, (this.DataContext.As<LivingEntityContextMenuContext>()?.LivingEntity ?? default, this.EntityName));
     }
 
     private void PrimaryProfessionTextBlock_MouseLeftButtonDown(object _, MouseButtonEventArgs e)
     {
-        this.LivingEntityProfessionContextMenuClicked?.Invoke(this, this.DataContext.Cast<LivingEntity>().PrimaryProfession ?? default);
+        this.LivingEntityProfessionContextMenuClicked?.Invoke(this, this.DataContext.As<LivingEntityContextMenuContext>()?.LivingEntity?.PrimaryProfession ?? default);
     }
 }

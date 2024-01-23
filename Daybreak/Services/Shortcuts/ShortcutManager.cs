@@ -9,7 +9,7 @@ using System.IO;
 namespace Daybreak.Services.Shortcuts;
 
 //TODO: Fix dependency on IConfigurationManager
-public sealed class ShortcutManager : IShortcutManager
+internal sealed class ShortcutManager : IShortcutManager
 {
     private const string ShortcutName = "Daybreak.lnk";
 
@@ -87,7 +87,14 @@ public sealed class ShortcutManager : IShortcutManager
             WorkingDir = Path.GetDirectoryName(currentExecutable),
             RelativePath = "Daybreak.exe"
         };
-        shortcut.WriteToFile(shortcutPath);
+
+        try
+        {
+            shortcut.WriteToFile(shortcutPath);
+        }
+        catch
+        {
+        }
     }
 
     private void RemoveShortcut()

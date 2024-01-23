@@ -1,14 +1,16 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Models.Notifications;
+using Daybreak.Models.LaunchConfigurations;
 using Daybreak.Models.Onboarding;
 using Daybreak.Services.ApplicationLauncher;
 using Daybreak.Services.InternetChecker;
+using Daybreak.Services.LaunchConfigurations;
 using Daybreak.Services.Menu;
 using Daybreak.Services.Navigation;
-using Daybreak.Services.Notifications;
 using Daybreak.Services.Onboarding;
 using Daybreak.Services.Screens;
 using System;
+using System.CodeDom.Compiler;
+using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
@@ -29,130 +31,122 @@ namespace Daybreak.Views;
 public partial class LauncherView : UserControl
 {
     private readonly IMenuService menuService;
+    private readonly ILaunchConfigurationService launchConfigurationService;
     private readonly IConnectivityStatus connectivityStatus;
     private readonly IOnboardingService onboardingService;
-    private readonly IApplicationLauncher applicationDetector;
+    private readonly IApplicationLauncher applicationLauncher;
     private readonly IViewManager viewManager;
-    private readonly ILiveOptions<LauncherOptions> launcherOptions;
-    private readonly ILiveOptions<FocusViewOptions> focusViewOptions;
     private readonly IScreenManager screenManager;
-
-    private CancellationTokenSource cancellationTokenSource = new();
-    private bool gameRunning = false;
-    private bool internetAvailable = false;
+    private readonly ILiveOptions<FocusViewOptions> focusViewOptions;
 
     [GenerateDependencyProperty]
-    private bool launchButtonEnabled;
+    private LaunchConfigurationWithCredentials latestConfiguration = default!;
+
+    [GenerateDependencyProperty]
+    private bool loading;
+
+    public ObservableCollection<LaunchConfigurationWithCredentials> LaunchConfigurations { get; } = [];
 
     public LauncherView(
         IMenuService menuService,
+        ILaunchConfigurationService launchConfigurationService,
         IConnectivityStatus connectivityStatus,
         IOnboardingService onboardingService,
-        IApplicationLauncher applicationDetector,
+        IApplicationLauncher applicationLauncher,
         IViewManager viewManager,
-        ILiveOptions<FocusViewOptions> focusViewOptions,
-        ILiveOptions<LauncherOptions> launcherOptions,
-        IScreenManager screenManager)
+        IScreenManager screenManager,
+        ILiveOptions<FocusViewOptions> focusViewOptions)
     {
         this.menuService = menuService.ThrowIfNull();
+        this.launchConfigurationService = launchConfigurationService.ThrowIfNull();
         this.connectivityStatus = connectivityStatus.ThrowIfNull();
         this.onboardingService = onboardingService.ThrowIfNull();
         this.screenManager = screenManager.ThrowIfNull();
-        this.focusViewOptions = focusViewOptions.ThrowIfNull();
-        this.launcherOptions = launcherOptions.ThrowIfNull();
-        this.applicationDetector = applicationDetector.ThrowIfNull();
+        this.applicationLauncher = applicationLauncher.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
+        this.focusViewOptions = focusViewOptions.ThrowIfNull();
         this.InitializeComponent();
     }
 
-    private async void PeriodicallyCheckGameState(CancellationToken cancellationToken)
+    private void CheckOnboardingState()
     {
-        while (!cancellationToken.IsCancellationRequested)
-        {
-            await this.Dispatcher.InvokeAsync(this.CheckGameState);
-            await Task.Delay(1000, cancellationToken);
-        }
-    }
-
-    private void CheckGameState()
-    {
-        this.internetAvailable = this.connectivityStatus.IsInternetAvailable;
-        this.gameRunning = this.applicationDetector.IsGuildwarsRunning;
-        this.CheckLaunchButtonState();
-        this.CheckAndSwitchToFocusView();
-    }
-
-    private void CheckAndSwitchToFocusView()
-    {
-        if (!this.focusViewOptions.Value.Enabled)
-        {
-            return;
-        }
-
-        if (!this.applicationDetector.IsGuildwarsRunning)
-        {
-            return;
-        }
-
-        this.menuService.CloseMenu();
-        this.viewManager.ShowView<FocusView>();
-    }
-
-    private void CheckLaunchButtonState()
-    {
-        if (this.internetAvailable is false || this.gameRunning is true)
-        {
-            this.LaunchButtonEnabled = false;
-        }
-        else
-        {
-            this.LaunchButtonEnabled = true;
-        }
-    }
-
-    private void StartupView_Loaded(object sender, RoutedEventArgs e)
-    {
-        this.cancellationTokenSource?.Cancel();
-        this.cancellationTokenSource = new CancellationTokenSource();
-        this.PeriodicallyCheckGameState(this.cancellationTokenSource.Token);
-    }
-
-    private void StartupView_Unloaded(object sender, RoutedEventArgs e)
-    {
-        this.cancellationTokenSource?.Cancel();
-    }
-
-    private async void LaunchButton_Clicked(object sender, EventArgs e)
-    {
-        var onboardingStage = await this.onboardingService.CheckOnboardingStage();
+        var onboardingStage = this.onboardingService.CheckOnboardingStage();
         if (onboardingStage is LauncherOnboardingStage.Default)
         {
             throw new InvalidOperationException($"Unexpected onboarding stage {onboardingStage}");
         }
 
-        if (onboardingStage is LauncherOnboardingStage.NeedsCredentials or LauncherOnboardingStage.NeedsExecutable)
+        if (onboardingStage is LauncherOnboardingStage.NeedsCredentials or LauncherOnboardingStage.NeedsExecutable or LauncherOnboardingStage.NeedsConfiguration)
         {
             this.viewManager.ShowView<LauncherOnboardingView>(onboardingStage);
             return;
         }
+    }
 
-        var maybeProcess = await this.applicationDetector.LaunchGuildwars();
-        if (maybeProcess is null)
+    private void RetrieveLaunchConfigurations()
+    {
+        this.LaunchConfigurations.ClearAnd().AddRange(this.launchConfigurationService.GetLaunchConfigurations());
+        this.LatestConfiguration = this.launchConfigurationService.GetLastLaunchConfigurationWithCredentials();
+    }
+
+    private void StartupView_Loaded(object sender, RoutedEventArgs e)
+    {
+        this.CheckOnboardingState();
+        this.RetrieveLaunchConfigurations();
+    }
+
+    private void StartupView_Unloaded(object sender, RoutedEventArgs e)
+    {
+    }
+
+    private async void SplitButton_Click(object sender, RoutedEventArgs e)
+    {
+        await this.Dispatcher.InvokeAsync(() => this.Loading = true);
+        if (this.LatestConfiguration is null)
         {
+            await this.Dispatcher.InvokeAsync(() => this.Loading = false);
             return;
         }
 
-        //if (this.launcherOptions.Value.SetGuildwarsWindowSizeOnLaunch)
-        //{
-        //    var id = this.launcherOptions.Value.DesiredGuildwarsScreen;
-        //    var desiredScreen = this.screenManager.Screens.Skip(id).FirstOrDefault();
-        //    if (desiredScreen is null)
-        //    {
-        //        throw new InvalidOperationException($"Unable to set guildwars on desired screen. No screen with id {id}");
-        //    }
+        var launchingTask = await new TaskFactory().StartNew(async () =>
+        {
+            var latestConfig = await this.Dispatcher.InvokeAsync(() => this.LatestConfiguration);
+            if (this.applicationLauncher.GetGuildwarsProcess(latestConfig) is GuildWarsApplicationLaunchContext context)
+            {
+                // Detected already running guildwars process
+                await this.Dispatcher.InvokeAsync(() => this.Loading = false);
+                if (this.focusViewOptions.Value.Enabled)
+                {
+                    this.menuService.CloseMenu();
+                    this.viewManager.ShowView<FocusView>(context);
+                }
 
-        //    await Task.Delay(1000);
-        //    this.screenManager.MoveGuildwarsToScreen(desiredScreen);
-        //}
+                return;
+            }
+
+            try
+            {
+                var launchedContext = await this.applicationLauncher.LaunchGuildwars(latestConfig);
+                if (launchedContext is null)
+                {
+                    await this.Dispatcher.InvokeAsync(() => this.Loading = false);
+                    return;
+                }
+
+                this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(latestConfig);
+                if (this.focusViewOptions.Value.Enabled)
+                {
+                    await this.Dispatcher.InvokeAsync(() => this.Loading = false);
+                    this.menuService.CloseMenu();
+                    this.viewManager.ShowView<FocusView>(launchedContext);
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }, TaskCreationOptions.LongRunning);
+
+        await launchingTask;
+        await this.Dispatcher.InvokeAsync(() => this.Loading = false);
     }
 }

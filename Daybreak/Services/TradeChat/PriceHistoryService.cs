@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Daybreak.Services.TradeChat;
 
-public sealed class PriceHistoryService : IPriceHistoryService
+internal sealed class PriceHistoryService : IPriceHistoryService
 {
     private static readonly DateTime MinEpochTime = DateTimeOffset.FromUnixTimeSeconds(1420070400).UtcDateTime;
 

@@ -9,7 +9,7 @@ using System.Extensions;
 
 namespace Daybreak.Services.TradeChat.Notifications;
 
-public sealed class TradeMessageNotificationHandler : INotificationHandler
+internal sealed class TradeMessageNotificationHandler : INotificationHandler
 {
     private readonly IViewManager viewManager;
 

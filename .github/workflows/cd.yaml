@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        targetplatform: [x64]
+        targetplatform: [x86]
 
     runs-on: windows-latest
 
@@ -33,7 +33,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
@@ -50,12 +50,19 @@ jobs:
         LatestReleaseTag: ${{steps.getLatestTag.outputs.tag}}
 
     - name: Install .NET Core
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '7.x'
+        dotnet-version: '8.x'
 
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v1.3.1
+
+    - name: Fetch submodules
+      run: |
+        git submodule update --init --recursive
+
+    - name: Build CMake Files
+      run: cmake -S . -B build -A Win32
 
     - name: Setup project secrets
       run: |
@@ -63,12 +70,12 @@ jobs:
         dotnet user-secrets --project Daybreak\Daybreak.csproj set AadTenantId "${{ secrets.AadTenantId }}"
 
     - name:  Restore project
-      run: msbuild $env:Solution_Path /t:Restore /p:Configuration=$env:Configuration /p:RuntimeIdentifier=$env:RuntimeIdentifier
+      run: msbuild $env:Solution_Path /t:Restore /p:Configuration=$env:Configuration /p:RuntimeIdentifier=$env:RuntimeIdentifier --property:SolutionDir=$GITHUB_WORKSPACE
       env:
         RuntimeIdentifier: win-${{ matrix.targetplatform }}
 
     - name: Build Daybreak project
-      run: dotnet build Daybreak -c $env:Configuration
+      run: dotnet build Daybreak -c $env:Configuration --property:SolutionDir=$env:GITHUB_WORKSPACE
 
     - name: Set version variable
       run: |
@@ -76,12 +83,17 @@ jobs:
         echo "::set-env name=Version::$version"
 
     - name: Create publish launcher files
-      run: dotnet publish .\Daybreak\Daybreak.csproj -c $env:Configuration -r $env:RuntimeIdentifier -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained true -o .\Publish
+      run: dotnet publish .\Daybreak\Daybreak.csproj -c $env:Configuration -r $env:RuntimeIdentifier --property:SolutionDir=$env:GITHUB_WORKSPACE -p:PublishReadyToRun=true -p:PublishSingleFile=false --self-contained true -o .\Publish
       env:
         RuntimeIdentifier: win-${{ matrix.targetplatform }}
 
     - name: Create publish installer files
-      run: dotnet publish .\Daybreak.Installer\Daybreak.Installer.csproj -c $env:Configuration -r $env:RuntimeIdentifier -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained true -o .\Publish
+      run: dotnet publish .\Daybreak.Installer\Daybreak.Installer.csproj -c $env:Configuration -r $env:RuntimeIdentifier --property:SolutionDir=$env:GITHUB_WORKSPACE -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained true -o .\Publish
+      env:
+        RuntimeIdentifier: win-${{ matrix.targetplatform }}
+
+    - name: Create publish extractor files
+      run: dotnet publish .\Daybreak.7ZipExtractor\Daybreak.7ZipExtractor.csproj -c $env:Configuration -r $env:RuntimeIdentifier --property:SolutionDir=$env:GITHUB_WORKSPACE -p:PublishReadyToRun=true -p:PublishSingleFile=false --self-contained true -o .\Publish
       env:
         RuntimeIdentifier: win-${{ matrix.targetplatform }}
 
@@ -91,7 +103,13 @@ jobs:
         .\Scripts\BuildRelease.ps1 -version $env:Version
       shell: pwsh
 
-    - name: Publish release
+    - name: Publish blob files
+      run: |
+        Write-Host $env
+        .\Scripts\PushFilesToBlobStorage.ps1 -version $env:Version -sourcePath .\Publish\ -connectionString "${{ secrets.BLOBSTORAGE_CONNECTIONSTRING }}"
+      shell: pwsh
+
+    - name: Create release draft
       uses: Xotl/cool-github-releases@v1.1.8
       with:
         mode: update
@@ -101,6 +119,14 @@ jobs:
         github_token: ${{ env.GITHUB_TOKEN }}
         replace_assets: true
         body_mrkdwn: ${{ env.Changelog }}
+        isDraft: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Publish release
+      run: |
+        gh release edit v${{ env.Version }} --draft=false
+      shell: powershell
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     

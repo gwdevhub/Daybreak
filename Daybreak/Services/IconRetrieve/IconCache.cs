@@ -1,7 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Models.Guildwars;
 using HtmlAgilityPack;
-using MahApps.Metro.Controls;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Configuration;
@@ -13,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Daybreak.Services.IconRetrieve;
 
-public sealed class IconCache : IIconCache
+internal sealed class IconCache : IIconCache
 {
     private const string HighResolutionGalleryUrl = $"https://wiki.guildwars.com/wiki/File:{NamePlaceholder}_(large).jpg";
     private const string WikiUrl = "https://wiki.guildwars.com";

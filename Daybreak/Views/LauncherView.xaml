@@ -6,26 +6,29 @@
              xmlns:local="clr-namespace:Daybreak.Views"
              xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              xmlns:effects="clr-namespace:System.Windows.Media.Extensions.Effects;assembly=WpfExtended"
+             xmlns:converters="clr-namespace:Daybreak.Converters"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:templates="clr-namespace:Daybreak.Controls.Templates"
              mc:Ignorable="d"
              x:Name="_this"
              Loaded="StartupView_Loaded"
              Unloaded="StartupView_Unloaded"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibility"></BooleanToVisibilityConverter>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibility" />
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
     </UserControl.Resources>
-    <Grid x:Name="ViewContainer">
-        <buttons:HighlightButton 
-                            Title="Launch Guild Wars"
-                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                            Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                            HighlightColor="{StaticResource MahApps.Brushes.Accent}"
-                            Background="{StaticResource Daybreak.Brushes.Background}"
-                            FontSize="36" Width="400" Height="100"
-                            BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
-                            BorderThickness="1"
-                            IsEnabled="{Binding ElementName=_this, Path=LaunchButtonEnabled, Mode=OneWay}"
-                            Clicked="LaunchButton_Clicked" Grid.Row="0" Grid.ColumnSpan="3"
-                            Cursor="Hand"></buttons:HighlightButton>
-    </Grid>
+    <mah:SplitButton Height="100"
+                     Width="400"
+                     IsEnabled="{Binding ElementName=_this, Path=Loading, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
+                     ItemsSource="{Binding ElementName=_this, Path=LaunchConfigurations, Mode=OneWay}"
+                     SelectedItem="{Binding ElementName=_this, Path=LatestConfiguration, Mode=TwoWay}"
+                     Cursor="Hand"
+                     Click="SplitButton_Click">
+        <mah:SplitButton.ItemTemplate>
+            <DataTemplate>
+                <templates:LaunchButtonTemplate/>
+            </DataTemplate>
+        </mah:SplitButton.ItemTemplate>
+    </mah:SplitButton>
 </UserControl>

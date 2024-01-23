@@ -67,7 +67,7 @@ public partial class GuildwarsDownloadView : System.Windows.Controls.UserControl
             UseDescriptionForTitle = true
         };
 
-        var result = folderPicker.ShowDialog(new Win32Window(Launcher.Instance.MainWindow));
+        var result = folderPicker.ShowDialog();
         if (result is DialogResult.Abort or DialogResult.Cancel or DialogResult.No)
         {
             this.installationStatus.CurrentStep = DownloadStatus.DownloadCancelled;

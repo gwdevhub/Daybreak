@@ -25,11 +25,11 @@ public partial class LogMessageTemplate : UserControl
         this.expanded = !this.expanded;
         if (this.expanded)
         {
-            sender.As<TextBlock>().MaxHeight = double.MaxValue;
+            sender.As<TextBlock>()!.MaxHeight = double.MaxValue;
         }
         else
         {
-            sender.As<TextBlock>().MaxHeight = 18;
+            sender.As<TextBlock>()!.MaxHeight = 18;
         }
     }
 }

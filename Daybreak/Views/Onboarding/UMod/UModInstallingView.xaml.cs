@@ -40,17 +40,17 @@ public partial class UModInstallingView : UserControl
 
     private void DownloadStatus_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        var installationStatus = sender.As<UModInstallationStatus>();
+        var installationStatus = sender?.As<UModInstallationStatus>();
         this.Dispatcher.Invoke(() =>
         {
             this.ProgressVisible = false;
-            if (installationStatus.CurrentStep is DownloadStatus.DownloadProgressStep downloadUpdateStep)
+            if (installationStatus?.CurrentStep is DownloadStatus.DownloadProgressStep downloadUpdateStep)
             {
                 this.ProgressValue = downloadUpdateStep.Progress * 100;
                 this.ProgressVisible = true;
             }
 
-            this.Description = installationStatus.CurrentStep.Description;
+            this.Description = installationStatus?.CurrentStep.Description;
         });
     }
 
@@ -65,6 +65,6 @@ public partial class UModInstallingView : UserControl
 
     private void OpaqueButton_Clicked(object sender, System.EventArgs e)
     {
-        this.viewManager.ShowView<UModSwitchView>();
+        this.viewManager.ShowView<UModMainView>();
     }
 }

@@ -1,12 +1,7 @@
-﻿using Daybreak.Configuration.Options;
-using Daybreak.Launch;
-using Daybreak.Models;
-using Daybreak.Models.Progress;
+﻿using Daybreak.Models.Progress;
+using Daybreak.Services.ExecutableManagement;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.Core.Extensions;
 using System.IO;
 using System.Threading;
@@ -15,26 +10,25 @@ using System.Windows.Forms;
 
 namespace Daybreak.Services.Guildwars;
 
-public sealed class GuildwarsCopyService : IGuildwarsCopyService
+internal sealed class GuildwarsCopyService : IGuildwarsCopyService
 {
     private const string ExecutableName = "Gw.exe";
 
     private static readonly string[] FilesToCopy =
     {
-        "d3d9.dll",
         "Gw.dat",
         "Gw.exe",
         "GwLoginClient.dll"
     };
 
-    private readonly IUpdateableOptions<LauncherOptions> updateableOptions;
+    private readonly IGuildWarsExecutableManager guildWarsExecutableManager;
     private readonly ILogger<GuildwarsCopyService> logger;
 
     public GuildwarsCopyService(
-        IUpdateableOptions<LauncherOptions> options,
+        IGuildWarsExecutableManager guildWarsExecutableManager,
         ILogger<GuildwarsCopyService> logger)
     {
-        this.updateableOptions = options.ThrowIfNull();
+        this.guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
     }
 
@@ -102,12 +96,8 @@ public sealed class GuildwarsCopyService : IGuildwarsCopyService
             } while (bytesRead > 0);
         }
 
-        this.updateableOptions.Value.GuildwarsPaths.Add(new GuildwarsPath
-        {
-            Default = false,
-            Path = Path.Combine(destinationFolder.FullName, ExecutableName)
-        });
-        this.updateableOptions.UpdateOption();
+        var finalPath = Path.Combine(destinationFolder.FullName, ExecutableName);
+        this.guildWarsExecutableManager.AddExecutable(finalPath);
 
         this.logger.LogInformation("Copy succeeded");
         copyStatus.CurrentStep = CopyStatus.CopyFinished;
@@ -124,7 +114,7 @@ public sealed class GuildwarsCopyService : IGuildwarsCopyService
             UseDescriptionForTitle = true
         };
 
-        var result = folderPicker.ShowDialog(new Win32Window(Launcher.Instance.MainWindow));
+        var result = folderPicker.ShowDialog();
         if (result is DialogResult.Abort or DialogResult.Cancel or DialogResult.No)
         {
             return false;

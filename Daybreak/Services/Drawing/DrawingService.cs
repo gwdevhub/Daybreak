@@ -11,7 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace Daybreak.Services.Drawing;
-public sealed class DrawingService : IDrawingService, IDrawingModuleProducer
+internal sealed class DrawingService : IDrawingService, IDrawingModuleProducer
 {
     private const int EngagementAreaMultiplier = 9;
 
@@ -65,26 +65,26 @@ public sealed class DrawingService : IDrawingService, IDrawingModuleProducer
         return true;
     }
 
-    public void DrawEntities(WriteableBitmap bitmap, DebounceResponse debounceResponse, int targetEntityId)
+    public void DrawEntities(WriteableBitmap bitmap, GameData gameData, int targetEntityId)
     {
         if (bitmap is null)
         {
             return;
         }
 
-        if (debounceResponse is null ||
-            debounceResponse.MainPlayer.Position is null ||
-            debounceResponse.WorldPlayers is null |
-            debounceResponse.Party is null ||
-            debounceResponse.LivingEntities is null)
+        if (gameData is null ||
+            gameData.MainPlayer?.Position is null ||
+            gameData.WorldPlayers is null |
+            gameData.Party is null ||
+            gameData.LivingEntities is null)
         {
             return;
         }
 
-        var entities = debounceResponse.LivingEntities.OfType<IEntity>()
-            .Concat(debounceResponse.Party!.OfType<IEntity>())
-            .Concat(debounceResponse.WorldPlayers!.OfType<IEntity>())
-            .Append(debounceResponse.MainPlayer)
+        var entities = gameData.LivingEntities.OfType<IEntity>()
+            .Concat(gameData.Party!.OfType<IEntity>())
+            .Concat(gameData.WorldPlayers!.OfType<IEntity>())
+            .Append(gameData.MainPlayer)
             .Where(IsValidPositionalEntity);
 
         var nonTargetedEntities = entities.Where(e => e.Id != targetEntityId);
@@ -215,7 +215,7 @@ public sealed class DrawingService : IDrawingService, IDrawingModuleProducer
                     direction.Normalize();
                     var increment = direction * (this.positionRadius + this.positionRadius);
 
-                    while (currentPosVector.X != endPosition.X && currentPosVector.Y != endPosition.Y)
+                    while (currentPosVector.X != endPosition.X || currentPosVector.Y != endPosition.Y)
                     {
                         var remaining = endVector - currentPosVector;
                         if (remaining.LengthSquared < increment.LengthSquared)
@@ -226,7 +226,7 @@ public sealed class DrawingService : IDrawingService, IDrawingModuleProducer
                         currentPosVector += increment;
                         if (!this.IsEntityOnScreen(new Position { X = (float)currentPosVector.X, Y = (float)currentPosVector.Y }, out var finalX, out var finalY))
                         {
-                            break;
+                            continue;
                         }
 
                         module.DrawPathFinding(finalX, finalY, this.finalEntitySize, bitmap, color, this.foregroundColor);
@@ -266,26 +266,26 @@ public sealed class DrawingService : IDrawingService, IDrawingModuleProducer
         }
     }
 
-    public void DrawEngagementArea(WriteableBitmap bitmap, DebounceResponse debounceResponse)
+    public void DrawEngagementArea(WriteableBitmap bitmap, GameData gameData)
     {
         if (bitmap is null)
         {
             return;
         }
 
-        if (debounceResponse is null ||
-            debounceResponse.MainPlayer.Position is null ||
-            debounceResponse.WorldPlayers is null |
-            debounceResponse.Party is null ||
-            debounceResponse.LivingEntities is null)
+        if (gameData is null ||
+            gameData.MainPlayer?.Position is null ||
+            gameData.WorldPlayers is null |
+            gameData.Party is null ||
+            gameData.LivingEntities is null)
         {
             return;
         }
 
-        var entities = debounceResponse.LivingEntities.OfType<IEntity>()
-            .Concat(debounceResponse.Party!.OfType<IEntity>())
-            .Concat(debounceResponse.WorldPlayers!.OfType<IEntity>())
-            .Append(debounceResponse.MainPlayer)
+        var entities = gameData.LivingEntities.OfType<IEntity>()
+            .Concat(gameData.Party!.OfType<IEntity>())
+            .Concat(gameData.WorldPlayers!.OfType<IEntity>())
+            .Append(gameData.MainPlayer)
             .Where(IsValidPositionalEntity);
 
         foreach (var entity in entities)

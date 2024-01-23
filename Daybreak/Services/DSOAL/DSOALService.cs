@@ -1,6 +1,8 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Models;
 using Daybreak.Models.Progress;
 using Daybreak.Services.Downloads;
+using Daybreak.Services.Notifications;
 using Daybreak.Services.Privilege;
 using Daybreak.Services.Registry;
 using Daybreak.Views;
@@ -9,10 +11,10 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
-using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Daybreak.Services.DSOAL;
@@ -20,7 +22,7 @@ namespace Daybreak.Services.DSOAL;
 /// <summary>
 /// Service for managing DSOAL for GW1. Credits to: https://lemmy.wtf/post/27911
 /// </summary>
-public sealed class DSOALService : IDSOALService
+internal sealed class DSOALService : IDSOALService
 {
     public const string DSOALFixAdminMessage = "Daybreak has detected an issue with the DSOAL installation. In order to fix this issue, Daybreak will need to restart as administrator. DSOAL will not work until then.";
     public const string DSOALFixRegistryKey = "DSOAL/FixSymbolicLink";
@@ -33,12 +35,14 @@ public sealed class DSOALService : IDSOALService
     private const string AlsoftIni = "alsoft.ini";
     private const string OpenAlDirectory = "openal";
 
+    private readonly INotificationService notificationService;
     private readonly IRegistryService registryService;
     private readonly IPrivilegeManager privilegeManager;
     private readonly IDownloadService downloadService;
     private readonly ILiveUpdateableOptions<DSOALOptions> options;
     private readonly ILogger<DSOALService> logger;
 
+    public string Name => "DSOAL";
     public bool IsEnabled
     {
         get => this.options.Value.Enabled;
@@ -54,12 +58,14 @@ public sealed class DSOALService : IDSOALService
            File.Exists(Path.Combine(DSOALDirectory, AlsoftIni));
 
     public DSOALService(
+        INotificationService notificationService,
         IRegistryService registryService,
         IPrivilegeManager privilegeManager,
         IDownloadService downloadService,
         ILiveUpdateableOptions<DSOALOptions> options,
         ILogger<DSOALService> logger)
     {
+        this.notificationService = notificationService.ThrowIfNull();
         this.registryService = registryService.ThrowIfNull();
         this.privilegeManager = privilegeManager.ThrowIfNull();
         this.downloadService = downloadService.ThrowIfNull();
@@ -114,31 +120,42 @@ public sealed class DSOALService : IDSOALService
         }
     }
 
-    public Task OnGuildwarsStarted(Process process)
+    public Task OnGuildWarsCreated(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }
 
-    public Task OnGuildwarsStarting(Process process)
+    public Task OnGuildWarsStarted(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
     {
-        var guildwarsDirectory = new FileInfo(process.StartInfo.FileName).Directory!.FullName;
-        if (this.options.Value.Enabled)
+        return Task.CompletedTask;
+    }
+
+    public Task OnGuildWarsStarting(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
+    {
+        var guildwarsDirectory = new FileInfo(applicationLauncherContext.ExecutablePath).Directory!.FullName;
+        if (this.IsInstalled)
         {
             this.EnsureSymbolicLinkExists();
             EnsureFileExistsInGuildwarsDirectory(DsoundDll, guildwarsDirectory);
             EnsureFileExistsInGuildwarsDirectory(DSOALAldrvDll, guildwarsDirectory);
             EnsureFileExistsInGuildwarsDirectory(AlsoftIni, guildwarsDirectory);
-        }
-        else
-        {
-            EnsureFileDoesNotExistInGuildwarsDirectory(DsoundDll, guildwarsDirectory);
-            EnsureFileDoesNotExistInGuildwarsDirectory(DSOALAldrvDll, guildwarsDirectory);
-            EnsureFileDoesNotExistInGuildwarsDirectory(AlsoftIni, guildwarsDirectory);
+            this.notificationService.NotifyInformation(
+                title: "DSOAL started",
+                description: "DSOAL files have been set up");
         }
 
         return Task.CompletedTask;
     }
-    
+
+    public Task OnGuildWarsStartingDisabled(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
+    {
+        var guildwarsDirectory = new FileInfo(applicationLauncherContext.ExecutablePath).Directory!.FullName;
+        EnsureFileDoesNotExistInGuildwarsDirectory(DsoundDll, guildwarsDirectory);
+        EnsureFileDoesNotExistInGuildwarsDirectory(DSOALAldrvDll, guildwarsDirectory);
+        EnsureFileDoesNotExistInGuildwarsDirectory(AlsoftIni, guildwarsDirectory);
+        return Task.CompletedTask;
+    }
+
     private static void EnsureFileExistsInGuildwarsDirectory(string fileName, string destinationDirectoryName)
     {
         var sourcePath = Path.Combine(DSOALDirectory, fileName);

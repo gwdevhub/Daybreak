@@ -37,9 +37,11 @@
                 FontSize="16"
                 Background="Transparent"
                 Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                Grid.Column="2"></mah:SplitButton>
+                Grid.Column="2"
+                ToolTip="Primary profession drop-down"/>
             <buttons:HelpButton Grid.Column="0" Width="20" Height="20" Margin="3"
-                                Clicked="HelpButtonPrimary_Clicked" Cursor="Hand"></buttons:HelpButton>
+                                Clicked="HelpButtonPrimary_Clicked" Cursor="Hand"
+                                ToolTip="Open primary profession info"/>
         </Grid>
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
@@ -55,9 +57,11 @@
                 FontSize="16"
                 Background="Transparent"
                 Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                Grid.Column="2"></mah:SplitButton>
+                Grid.Column="2"
+                ToolTip="Secondary profession drop-down"/>
             <buttons:HelpButton Grid.Column="0" Width="20" Height="20" Margin="3"
-                                Clicked="HelpButtonSecondary_Clicked" Cursor="Hand"></buttons:HelpButton>
+                                Clicked="HelpButtonSecondary_Clicked" Cursor="Hand"
+                                ToolTip="Open secondary profession info"/>
         </Grid>
         <Grid Grid.Row="3">
             <ListView Background="Transparent" ItemsSource="{Binding ElementName=_this, Path=BuildEntry.Attributes, Mode=OneWay}"
@@ -72,7 +76,7 @@
                         <templates:AttributeTemplate HelpClicked="AttributeTemplate_HelpClicked"
                                                  AttributeChanged="AttributeTemplate_AttributeChanged"
                                                  Loaded="AttributeTemplate_Loaded"
-                                                 AttributePoints="{Binding Path=AttributePoints, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"></templates:AttributeTemplate>
+                                                 AttributePoints="{Binding Path=AttributePoints, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>

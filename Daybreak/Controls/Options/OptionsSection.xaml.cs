@@ -23,7 +23,7 @@ public partial class OptionsSection : UserControl
     private readonly IOptionsProvider optionsProvider;
     private readonly IViewManager viewManager;
 
-    public ObservableCollection<OptionSection> Options { get; } = new ObservableCollection<OptionSection>();
+    public ObservableCollection<OptionSection> Options { get; } = [];
 
     public OptionsSection(
         IOptionsProvider optionsProvider,
@@ -54,9 +54,16 @@ public partial class OptionsSection : UserControl
             this.Options.Add(new OptionSection
             {
                 Name = GetOptionsName(registeredType),
+                Tooltip = GetOptionsToolTip(registeredType),
                 Type = registeredType
             });
         }
+    }
+
+    private static string GetOptionsToolTip(Type type)
+    {
+        var name = GetOptionsName(type);
+        return $"{name} settings";
     }
 
     private static string GetOptionsName(Type type)
@@ -66,7 +73,7 @@ public partial class OptionsSection : UserControl
             return type.Name;
         }
 
-        if (optionsNameAttribute.Name.IsNullOrWhiteSpace())
+        if (optionsNameAttribute.Name!.IsNullOrWhiteSpace())
         {
             return type.Name;
         }

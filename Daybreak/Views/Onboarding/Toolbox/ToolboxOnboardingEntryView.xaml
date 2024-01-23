@@ -12,6 +12,6 @@
             BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
             BorderThickness="1"/>
         <TextBlock Text="Checking GWToolboxpp state" Margin="10, 0, 10, 0" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                       TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16"></TextBlock>
+                       TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" />
     </Grid>
 </UserControl>

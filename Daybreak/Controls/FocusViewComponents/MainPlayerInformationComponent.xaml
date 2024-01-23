@@ -24,7 +24,7 @@
                         Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                         Text="{Binding Path=Name, Mode=OneWay}"
                         VerticalAlignment="Center"
-                        HorizontalAlignment="Left"></TextBlock>
+                        HorizontalAlignment="Left" />
             <buttons:HighlightButton
                         Grid.Column="1"
                         Title="Edit Build"
@@ -36,7 +36,8 @@
                         VerticalContentAlignment="Center"
                         Cursor="Hand"
                         FontSize="18"
-                        MouseLeftButtonDown="EditBuild_MouseLeftButtonDown"></buttons:HighlightButton>
+                        MouseLeftButtonDown="EditBuild_MouseLeftButtonDown"
+                        ToolTip="Load current build"/>
             <buttons:HighlightButton
                         Grid.Column="2"
                         Title="Meta Builds"
@@ -48,7 +49,8 @@
                         VerticalContentAlignment="Center"
                         Cursor="Hand"
                         FontSize="18"
-                        MouseLeftButtonDown="MetaBuilds_MouseLeftButtonDown"></buttons:HighlightButton>
+                        MouseLeftButtonDown="MetaBuilds_MouseLeftButtonDown"
+                        ToolTip="Open meta builds"/>
         </Grid>
         <Rectangle 
                     Height="1"
@@ -61,7 +63,8 @@
                     Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                     Cursor="Hand"
                     FontSize="20"
-                    MouseLeftButtonDown="PrimaryProfession_MouseLeftButtonDown"></buttons:MenuButton>
+                    MouseLeftButtonDown="PrimaryProfession_MouseLeftButtonDown"
+                    ToolTip="Open primary profession info"/>
         <buttons:MenuButton
                     Title="{Binding Path=SecondaryProfession.Name, Mode=OneWay}"
                     HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
@@ -70,6 +73,7 @@
                     HorizontalContentAlignment="Left"
                     Cursor="Hand"
                     FontSize="20"
-                    MouseLeftButtonDown="SecondaryProfession_MouseLeftButtonDown"></buttons:MenuButton>
+                    MouseLeftButtonDown="SecondaryProfession_MouseLeftButtonDown"
+                    ToolTip="Open secondary profession info"/>
     </StackPanel>
 </UserControl>

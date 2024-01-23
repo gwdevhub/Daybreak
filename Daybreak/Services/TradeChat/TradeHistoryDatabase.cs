@@ -6,7 +6,7 @@ using System.Core.Extensions;
 
 namespace Daybreak.Services.TradeChat;
 
-public sealed class TradeHistoryDatabase : ITradeHistoryDatabase
+internal sealed class TradeHistoryDatabase : ITradeHistoryDatabase
 {
     private readonly ILiteCollection<TraderMessageDTO> liteCollection;
 

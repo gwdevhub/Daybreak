@@ -10,7 +10,7 @@ public sealed class LivingEntity : IEntity
 
     public Npc? NpcDefinition { get; init; }
 
-    public Position? Position { get; init; }
+    public Position? Position { get; set; }
 
     public Profession? PrimaryProfession { get; init; }
     
@@ -18,7 +18,11 @@ public sealed class LivingEntity : IEntity
 
     public int Level { get; init; }
 
-    public LivingEntityState State { get; init; }
+    public LivingEntityState State { get; set; }
     
     public LivingEntityAllegiance Allegiance { get; init; }
+
+    public float Health { get; set; }
+
+    public float Energy { get; set; }
 }

@@ -30,7 +30,8 @@
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             Margin="5"
-            Clicked="BackButton_Clicked"/>
+            Clicked="BackButton_Clicked"
+            ToolTip="Go back to price quotes"/>
         <buttons:HighlightButton 
             Height="30"
             Width="100"
@@ -46,7 +47,8 @@
             HorizontalContentAlignment="Center"
             BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
             BorderThickness="1"
-            Clicked="HighlightButton_Clicked"/>
+            Clicked="HighlightButton_Clicked"
+            ToolTip="Reset zoom"/>
         <Grid
             Visibility="{Binding ElementName=_this, Path=Loading, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
             Background="{StaticResource Daybreak.Brushes.Background}">

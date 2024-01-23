@@ -115,7 +115,8 @@
                     Text="{Binding ElementName=_this, Path=KurzickBarText, Mode=OneWay}"
                     BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
                     BorderThickness="1"
-                    MouseLeftButtonDown="KurzickBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
+                    MouseLeftButtonDown="KurzickBar_MouseLeftButtonDown"
+                    ToolTip="Switch display mode"/>
             <controls:HorizontalResourceBar 
                     Margin="0, 2, 0, 2"
                     Grid.Row="1"
@@ -130,7 +131,8 @@
                     Text="{Binding ElementName=_this, Path=LuxonBarText, Mode=OneWay}"
                     BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
                     BorderThickness="1"
-                    MouseLeftButtonDown="LuxonBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
+                    MouseLeftButtonDown="LuxonBar_MouseLeftButtonDown"
+                    ToolTip="Switch display mode"/>
             <controls:HorizontalResourceBar 
                     Margin="0, 2, 0, 2"
                     Grid.Row="2"
@@ -145,7 +147,8 @@
                     BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
                     BorderThickness="1"
                     Text="{Binding ElementName=_this, Path=ImperialBarText, Mode=OneWay}"
-                    MouseLeftButtonDown="ImperialBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
+                    MouseLeftButtonDown="ImperialBar_MouseLeftButtonDown"
+                    ToolTip="Switch display mode"/>
             <controls:HorizontalResourceBar
                     Margin="0, 2, 0, 2"
                     Grid.Row="3"
@@ -160,7 +163,8 @@
                     BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
                     BorderThickness="1"
                     Text="{Binding ElementName=_this, Path=BalthazarBarText, Mode=OneWay}"
-                    MouseLeftButtonDown="BalthazarBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
+                    MouseLeftButtonDown="BalthazarBar_MouseLeftButtonDown"
+                    ToolTip="Switch display mode"/>
         </Grid>
         <Viewbox
                 Grid.Column="0"
@@ -227,7 +231,8 @@
                     BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
                     BorderThickness="1"
                     Visibility="{Binding ElementName=_this, Path=Vanquishing, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                    MouseLeftButtonDown="VanquishingBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
+                    MouseLeftButtonDown="VanquishingBar_MouseLeftButtonDown"
+                    ToolTip="Switch display mode"/>
             <controls:HorizontalResourceBar 
                     Margin="0, 2, 0, 2"
                     Grid.Row="1"
@@ -243,7 +248,8 @@
                     FillAlignment="Right"
                     BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
                     BorderThickness="1"
-                    Visibility="{Binding ElementName=_this, Path=TitleActive, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    Visibility="{Binding ElementName=_this, Path=TitleActive, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                    ToolTip="Switch display mode"/>
             <controls:HorizontalResourceBar 
                     Margin="0, 2, 0, 2"
                     Grid.Row="2"
@@ -259,7 +265,8 @@
                     FillAlignment="Right"
                     BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
                     BorderThickness="1"
-                    MouseLeftButtonDown="HealthBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
+                    MouseLeftButtonDown="HealthBar_MouseLeftButtonDown" 
+                    ToolTip="Switch display mode"/>
             <controls:HorizontalResourceBar 
                     Margin="0, 2, 0, 2"
                     Grid.Row="3"
@@ -275,7 +282,8 @@
                     FillAlignment="Right"
                     BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
                     BorderThickness="1"
-                    MouseLeftButtonDown="EnergyBar_MouseLeftButtonDown"></controls:HorizontalResourceBar>
+                    MouseLeftButtonDown="EnergyBar_MouseLeftButtonDown"
+                    ToolTip="Switch display mode"/>
         </Grid>
         <Viewbox
                 Grid.Column="3"

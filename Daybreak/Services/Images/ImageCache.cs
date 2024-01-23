@@ -21,7 +21,7 @@ using System.Windows.Media.Imaging;
 
 namespace Daybreak.Services.Images;
 
-public sealed class ImageCache : IImageCache
+internal sealed class ImageCache : IImageCache
 {
     private const string LatencyMetricName = "Image retrieval latency";
     private const string LatencyMetricDescription = "Number of milliseconds spent while retrieving images";
@@ -55,7 +55,8 @@ public sealed class ImageCache : IImageCache
     public async Task<ImageSource?> GetImage(string? uri)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetImage), uri?.ToString() ?? string.Empty);
-        if (uri is null)
+        if (uri is null ||
+            !File.Exists(uri))
         {
             return default;
         }

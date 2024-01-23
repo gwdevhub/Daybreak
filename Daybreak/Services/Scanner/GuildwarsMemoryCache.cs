@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Models.Guildwars;
+using Daybreak.Models.LaunchConfigurations;
 using Daybreak.Services.Scanner.Models;
 using System;
 using System.Configuration;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Daybreak.Services.Scanner;
 
-public sealed class GuildwarsMemoryCache : IGuildwarsMemoryCache
+internal sealed class GuildwarsMemoryCache : IGuildwarsMemoryCache
 {
     private readonly IGuildwarsMemoryReader guildwarsMemoryReader;
     private readonly ILiveOptions<MemoryReaderOptions> liveOptions;
@@ -22,8 +23,8 @@ public sealed class GuildwarsMemoryCache : IGuildwarsMemoryCache
     private readonly CachedData<SessionData?> sessionDataCache = new();
     private readonly CachedData<UserData?> userDataCache = new();
     private readonly CachedData<MainPlayerData?> mainPlayerDataCache = new();
-    private readonly CachedData<ConnectionData?> connectionDataCache = new();
     private readonly CachedData<PreGameData?> preGameDataCache = new();
+    private readonly CachedData<GameState?> gameStateCache = new();
 
     public GuildwarsMemoryCache(
         IGuildwarsMemoryReader guildwarsMemoryReader,
@@ -31,6 +32,11 @@ public sealed class GuildwarsMemoryCache : IGuildwarsMemoryCache
     {
         this.guildwarsMemoryReader = guildwarsMemoryReader.ThrowIfNull();
         this.liveOptions = liveOptions.ThrowIfNull();
+    }
+
+    public async Task EnsureInitialized(GuildWarsApplicationLaunchContext context, CancellationToken cancellationToken)
+    {
+        await this.guildwarsMemoryReader.EnsureInitialized(context.ThrowIfNull().GuildWarsProcess.ThrowIfNull(), cancellationToken);
     }
 
     public Task<GameData?> ReadGameData(CancellationToken cancellationToken)
@@ -78,14 +84,14 @@ public sealed class GuildwarsMemoryCache : IGuildwarsMemoryCache
         return this.ReadDataInternal(this.mainPlayerDataCache, this.guildwarsMemoryReader.ReadMainPlayerData, cancellationToken);
     }
 
-    public Task<ConnectionData?> ReadConnectionData(CancellationToken cancellationToken)
-    {
-        return this.ReadDataInternal(this.connectionDataCache, this.guildwarsMemoryReader.ReadConnectionData, cancellationToken);
-    }
-
     public Task<PreGameData?> ReadPreGameData(CancellationToken cancellationToken)
     {
         return this.ReadDataInternal(this.preGameDataCache, this.guildwarsMemoryReader.ReadPreGameData, cancellationToken);
+    }
+
+    public Task<GameState?> ReadGameState(CancellationToken cancellationToken)
+    {
+        return this.ReadDataInternal(this.gameStateCache, this.guildwarsMemoryReader.ReadGameState, cancellationToken);
     }
 
     private async Task<T?> ReadDataInternal<T>(CachedData<T?> cachedData, Func<CancellationToken, Task<T?>> task, CancellationToken cancellationToken)
@@ -95,7 +101,6 @@ public sealed class GuildwarsMemoryCache : IGuildwarsMemoryCache
             return cachedData.Data;
         }
 
-        await this.guildwarsMemoryReader.EnsureInitialized(cancellationToken);
         var data = await task(cancellationToken);
         if (data is null)
         {

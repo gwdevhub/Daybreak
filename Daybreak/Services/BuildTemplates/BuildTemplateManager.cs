@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Daybreak.Services.BuildTemplates;
 
-public sealed class BuildTemplateManager : IBuildTemplateManager
+internal sealed class BuildTemplateManager : IBuildTemplateManager
 {
     private const string DecodingLookupTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
     private readonly static string BuildsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Guild Wars\\Templates\\Skills";
@@ -194,7 +194,7 @@ public sealed class BuildTemplateManager : IBuildTemplateManager
         var build = new Build()
         {
             BuildMetadata = buildMetadata,
-            Skills = new()
+            Skills = []
         };
 
         if (Profession.TryParse(buildMetadata.PrimaryProfessionId, out var primaryProfession) is false)
@@ -229,10 +229,17 @@ public sealed class BuildTemplateManager : IBuildTemplateManager
         for(int i = 0; i < buildMetadata.AttributeCount; i++)
         {
             var attributeId = buildMetadata.AttributesIds[i];
+            if (attributeId == 0)
+            {
+                continue;
+            }
+
             var maybeAttribute = build.Attributes.FirstOrDefault(a => a.Attribute!.Id == attributeId);
             if (maybeAttribute is null)
             {
-                this.logger.LogError($"Failed to parse attribute with id {attributeId} for professions {primaryProfession.Name}/{secondaryProfession.Name}");
+                var msg = $"Failed to parse attribute with id {attributeId} for professions {primaryProfession.Name}/{secondaryProfession.Name}";
+                this.logger.LogError(msg);
+                return new InvalidOperationException(msg);
             }
 
             maybeAttribute!.Points = buildMetadata.AttributePoints[i];

@@ -18,11 +18,13 @@
             VerticalAlignment="Stretch"
             VerticalContentAlignment="Center"
             Clicked="HighlightButton_Clicked"
-            Height="40"></buttons:HighlightButton>
-        <buttons:BinButton Width="30" Height="30" HorizontalAlignment="Right" Clicked="BinButton_Clicked"></buttons:BinButton>
+            Height="40"
+            ToolTip="Open build template"/>
+        <buttons:BinButton Width="30" Height="30" HorizontalAlignment="Right" Clicked="BinButton_Clicked"
+                           ToolTip="Delete build template"/>
         <Rectangle 
             Height="1"
             Fill="{StaticResource MahApps.Brushes.ThemeForeground}"
-            VerticalAlignment="Bottom"></Rectangle>
+            VerticalAlignment="Bottom" />
     </Grid>
 </UserControl>

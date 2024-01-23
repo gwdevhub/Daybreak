@@ -10,6 +10,7 @@
         xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
         xmlns:glyphs="clr-namespace:Daybreak.Controls.Glyphs"
         xmlns:notifications="clr-namespace:Daybreak.Controls.Notifications"
+        xmlns:converters="clr-namespace:Daybreak.Converters"
         WindowStyle="None"
         ResizeMode="CanResize"
         Loaded="Window_Loaded"
@@ -21,7 +22,10 @@
         d:DesignHeight="450" d:DesignWidth="800">
     <Window.Resources>
         <ResourceDictionary>
-            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
+            <BooleanToVisibilityConverter x:Key="BaseBooleanToVisibilityConverter" />
+            <converters:BooleanToEffectConverter x:Key="BooleanToEffectConverter" />
+            <effects:Kuwahara x:Key="PaintifyEffect" TexelWidth="200" TexelHeight="50" />
+            <BlurEffect x:Key="BlurEffect" Radius="3" RenderingBias="Performance" KernelType="Box" />
             <Style x:Key="Window_SettingsButton" TargetType="ToggleButton">
                 <Setter Property="Template">
                     <Setter.Value>
@@ -54,7 +58,7 @@
             </Style>
         </ResourceDictionary>
     </Window.Resources>
-    <Grid Background="Transparent">
+    <Grid Background="Black">
         <Grid.RowDefinitions>
             <RowDefinition Height="30"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
@@ -65,18 +69,40 @@
         </Grid.ColumnDefinitions>
         <Border BorderBrush="Transparent" BorderThickness="0" Grid.RowSpan="2" Grid.ColumnSpan="2">
             <Border.Effect>
-                <BlurEffect Radius="5" KernelType="Gaussian" RenderingBias="Performance"></BlurEffect>
+                <effects:ContrastAdjust Brightness="0.01"
+                                        Contrast="1.3" />
             </Border.Effect>
-            <controls:ImageViewer x:Name="ImageViewer">
-                <controls:ImageViewer.Effect>
-                    <effects:LightStreak Attenuation="0.4" BrightThreshold="0.9"></effects:LightStreak>
-                </controls:ImageViewer.Effect>
-            </controls:ImageViewer>
+            <Grid>
+                <Border Effect="{Binding ElementName=_this, Path=BlurBackground, Mode=OneWay, Converter={StaticResource BooleanToEffectConverter}, ConverterParameter={StaticResource BlurEffect}}">
+                    <Border Effect="{Binding ElementName=_this, Path=PaintifyBackground, Mode=OneWay, Converter={StaticResource BooleanToEffectConverter}, ConverterParameter={StaticResource PaintifyEffect}}">
+                        <controls:ImageViewer x:Name="ImageViewer" />
+                    </Border>
+                </Border>
+                <controls:SnowfallOverlay
+                    Visibility="{Binding ElementName=_this, Path=WintersdayMode, Mode=OneWay, Converter={StaticResource BaseBooleanToVisibilityConverter}}"
+                    Opacity="0.4"
+                    BaseWind1="0.0247"
+                    BaseWind2="0.00427"
+                    BaseWind3="0.00443"
+                    BaseWind4="0.00405"
+                    BaseWind5="0.00362"
+                    WindStrength1="0.006"
+                    WindStrength2="0.001"
+                    WindStrength3="0.00096"
+                    WindStrength4="0.00098"
+                    WindStrength5="0.0009"
+                    FlakeSize1="14"
+                    FlakeSize2="6"
+                    FlakeSize3="4.6"
+                    FlakeSize4="3.2"
+                    FlakeSize5="2.1">
+                </controls:SnowfallOverlay>
+            </Grid>
         </Border>
         <Rectangle Fill="Transparent"
                    MouseDown="Window_MouseLeftButtonDown"
                    Grid.RowSpan="2"
-                   Grid.ColumnSpan="2"></Rectangle>
+                   Grid.ColumnSpan="2" />
         <buttons:MenuButton    Grid.Row="1"
                                Grid.Column="1"
                                Background="Transparent"
@@ -89,23 +115,27 @@
                                Margin="0, 0, 20, 30" 
                                FontSize="22" 
                                Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
-                 Clicked="CreditTextBox_MouseLeftButtonDown" Cursor="Hand"></buttons:MenuButton>
+                               Clicked="CreditTextBox_MouseLeftButtonDown" Cursor="Hand"
+                               ToolTip="Source for background image"/>
         <WrapPanel Grid.Row="1"
                    Grid.Column="1"
                    Margin="0, 0, 20, 10"
                    VerticalAlignment="Bottom"
                    HorizontalAlignment="Right">
             <buttons:MenuButton Grid.Row="1" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Opacity="0.6"
-                     Title="{Binding ElementName=_this, Path=CurrentVersionText, Mode=OneWay}" FontSize="10"
-                     Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
-                     Clicked="VersionText_Clicked" />
+                                Title="{Binding ElementName=_this, Path=CurrentVersionText, Mode=OneWay}" FontSize="10"
+                                Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                                Clicked="VersionText_Clicked"
+                                ToolTip="Version Management"/>
             <buttons:MenuButton Grid.Row="1" Background="Transparent" Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" 
-                     Opacity="0.6" Title=" - " FontSize="10" BorderBrush="Transparent" BorderThickness="0"
-                     Visibility="{Binding ElementName=_this, Path=IsRunningAsAdmin, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                Opacity="0.6" Title=" - " FontSize="10" BorderBrush="Transparent" BorderThickness="0"
+                                Visibility="{Binding ElementName=_this, Path=IsRunningAsAdmin, Mode=OneWay, Converter={StaticResource BaseBooleanToVisibilityConverter}}" 
+                                ToolTip="Running with Administrator Rights"/>
             <buttons:MenuButton Grid.Row="1" Background="Transparent" Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}" 
-                     Opacity="0.6" Title="[Admin]" FontSize="10" BorderBrush="Transparent" BorderThickness="0"
-                     Visibility="{Binding ElementName=_this, Path=IsRunningAsAdmin, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                     Clicked="AdminText_Clicked" />
+                                Opacity="0.6" Title="[Admin]" FontSize="10" BorderBrush="Transparent" BorderThickness="0"
+                                Visibility="{Binding ElementName=_this, Path=IsRunningAsAdmin, Mode=OneWay, Converter={StaticResource BaseBooleanToVisibilityConverter}}"
+                                Clicked="AdminText_Clicked" 
+                                ToolTip="Running with Administrator Rights"/>
         </WrapPanel>
         <Grid x:Name="Container"
                   Grid.Column="1"
@@ -130,7 +160,8 @@
                       Margin="0, 0, 0, 0"
                       Grid.ColumnSpan="2"
                       Foreground="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
-                      Click="SettingsButton_Clicked"></ToggleButton>
+                      Click="SettingsButton_Clicked"
+                      ToolTip="Open Settings"/>
         <ToggleButton x:Name="ClosingSettingsButton"
                       Style="{StaticResource Window_SettingsButton}"
                       Width="50"
@@ -141,7 +172,27 @@
                       Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                       Background="{DynamicResource MahApps.Brushes.ThemeBackground}"
                       Visibility="{Binding ElementName=_this, Path=IsShowingDropdown, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                      Click="SettingsButton_Clicked"></ToggleButton>
+                      Click="SettingsButton_Clicked" 
+                      ToolTip="Close Settings"/>
+        <buttons:HighlightButton Height="30"
+                                 Width="47"
+                                 VerticalAlignment="Center"
+                                 HorizontalAlignment="Right"
+                                 Grid.Column="1"
+                                 Margin="0, 0, 140, 0"
+                                 Cursor="Arrow"
+                                 Opacity="0.8"
+                                 HighlightColor="White"
+                                 ToolTip="Synchronize Settings"
+                                 Clicked="SynchronizeButton_Click">
+            <buttons:HighlightButton.ButtonContent>
+                <Grid Height="30"
+                      Width="30">
+                    <glyphs:DownloadGlyph Height="20"
+                        Width="20" />
+                </Grid>
+            </buttons:HighlightButton.ButtonContent>
+        </buttons:HighlightButton>
         <notifications:NotificationStackpanel 
             HorizontalAlignment="Right"
             VerticalAlignment="Bottom"

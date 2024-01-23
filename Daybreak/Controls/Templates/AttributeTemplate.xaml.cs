@@ -46,7 +46,7 @@ public partial class AttributeTemplate : UserControl
             {
                 this.CanAdd = false;
             }
-            else if (this.DataContext.As<AttributeEntry>().Points < 12)
+            else if (attributeEntry.Points < 12)
             {
                 this.CanAdd = true;
             }
@@ -77,23 +77,23 @@ public partial class AttributeTemplate : UserControl
 
     private void MinusButton_Clicked(object sender, System.EventArgs e)
     {
-        if (this.DataContext.As<AttributeEntry>().Points > 0)
+        if (this.DataContext.As<AttributeEntry>()!.Points > 0)
         {
-            this.DataContext.As<AttributeEntry>().Points--;
-            this.CanSubtract = this.DataContext.As<AttributeEntry>().Points > 0;
+            this.DataContext.As<AttributeEntry>()!.Points--;
+            this.CanSubtract = this.DataContext.As<AttributeEntry>()!.Points > 0;
             this.CanAdd = true;
-            this.AttributeChanged?.Invoke(this, this.DataContext.As<AttributeEntry>());
+            this.AttributeChanged?.Invoke(this, this.DataContext.As<AttributeEntry>()!);
         }
     }
 
     private void AddButton_Clicked(object sender, System.EventArgs e)
     {
-        if (this.DataContext.As<AttributeEntry>().Points < 12)
+        if (this.DataContext.As<AttributeEntry>()!.Points < 12)
         {
-            this.DataContext.As<AttributeEntry>().Points++;
-            this.CanAdd = this.DataContext.As<AttributeEntry>().Points < 12;
+            this.DataContext.As<AttributeEntry>()!.Points++;
+            this.CanAdd = this.DataContext.As<AttributeEntry>()!.Points < 12;
             this.CanSubtract = true;
-            this.AttributeChanged?.Invoke(this, this.DataContext.As<AttributeEntry>());
+            this.AttributeChanged?.Invoke(this, this.DataContext.As<AttributeEntry>()!);
         }
     }
 

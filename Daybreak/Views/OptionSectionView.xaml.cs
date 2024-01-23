@@ -31,7 +31,7 @@ public partial class OptionSectionView : UserControl
     [GenerateDependencyProperty]
     private string title = string.Empty;
 
-    public ObservableCollection<OptionEntry> OptionEntries { get; } = new ObservableCollection<OptionEntry>();
+    public ObservableCollection<OptionEntry> OptionEntries { get; } = [];
 
     public OptionSectionView(
         IViewManager viewManager,
@@ -160,7 +160,7 @@ public partial class OptionSectionView : UserControl
         }
 
         var action = customSetterViewAttribute.GetType().GetProperty(nameof(OptionSetterView<UserControl>.Action))?
-            .GetValue(customSetterViewAttribute).As<string>();
+            .GetValue(customSetterViewAttribute)?.As<string>();
         var viewType = customSetterViewAttribute.GetType().GetGenericArguments().FirstOrDefault();
 
         return (viewType is not null,
@@ -347,7 +347,7 @@ public partial class OptionSectionView : UserControl
             return;
         }
 
-        this.viewManager.ShowView(optionSetter.CustomSetterViewType);
+        this.viewManager.ShowView(optionSetter.CustomSetterViewType!);
     }
 
     private void HelpButton_Clicked(object sender, EventArgs e)
@@ -357,8 +357,8 @@ public partial class OptionSectionView : UserControl
             return;
         }
 
-        helpButton.ToolTip.As<ToolTip>().IsOpen = true;
-        helpButton.ToolTip.As<ToolTip>().Content = helpButton.DataContext.As<OptionEntry>()?.Heading?.Description;
+        helpButton.ToolTip.As<ToolTip>()!.IsOpen = true;
+        helpButton.ToolTip.As<ToolTip>()!.Content = helpButton.DataContext.As<OptionEntry>()?.Heading?.Description;
     }
 
     private void HelpButton_MouseLeave(object sender, MouseEventArgs e)
@@ -368,9 +368,9 @@ public partial class OptionSectionView : UserControl
             return;
         }
 
-        if (helpButton.ToolTip.As<ToolTip>().IsOpen)
+        if (helpButton.ToolTip.As<ToolTip>()!.IsOpen)
         {
-            helpButton.ToolTip.As<ToolTip>().IsOpen = false;
+            helpButton.ToolTip.As<ToolTip>()!.IsOpen = false;
         }
     }
 }

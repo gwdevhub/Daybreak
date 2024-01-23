@@ -1,6 +1,7 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Models;
 using Daybreak.Models.Guildwars;
+using Daybreak.Models.LaunchConfigurations;
 using Daybreak.Services.ApplicationLauncher;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Experience;
@@ -9,9 +10,12 @@ using Daybreak.Services.Scanner;
 using Daybreak.Views.Trade;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
+using System.Linq;
+using System.Logging;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -25,6 +29,12 @@ namespace Daybreak.Views;
 /// </summary>
 public partial class FocusView : UserControl
 {
+    private const string NamePlaceholder = "[NamePlaceholder]";
+    private const string WikiUrl = "https://wiki.guildwars.com/wiki/[NamePlaceholder]";
+
+    private static readonly TimeSpan UninitializedBackoff = TimeSpan.FromSeconds(15);
+    private static readonly TimeSpan GameDataFrequency = TimeSpan.FromSeconds(1);
+
     private readonly IBuildTemplateManager buildTemplateManager;
     private readonly IApplicationLauncher applicationLauncher;
     private readonly IGuildwarsMemoryCache guildwarsMemoryCache;
@@ -34,19 +44,22 @@ public partial class FocusView : UserControl
     private readonly ILogger<FocusView> logger;
 
     [GenerateDependencyProperty]
-    private InventoryData inventoryData;
+    private InventoryData inventoryData = new();
 
     [GenerateDependencyProperty]
-    private GameData gameData;
+    private GameState gameState = new();
+
+    [GenerateDependencyProperty]
+    private GameData gameData = new();
 
     [GenerateDependencyProperty]
     private bool mainPlayerDataValid;
 
     [GenerateDependencyProperty]
-    private PathingData pathingData;
+    private PathingData pathingData = new();
 
     [GenerateDependencyProperty]
-    private MainPlayerResourceContext mainPlayerResourceContext;
+    private MainPlayerResourceContext mainPlayerResourceContext = new();
 
     [GenerateDependencyProperty]
     private bool loadingPathingData;
@@ -84,8 +97,6 @@ public partial class FocusView : UserControl
         this.viewManager = viewManager.ThrowIfNull();
         this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
-        this.gameData = new GameData();
-        this.pathingData = new PathingData();
 
         this.InitializeComponent();
     }
@@ -98,13 +109,24 @@ public partial class FocusView : UserControl
             this.liveUpdateableOptions.Value.BrowserUrl = this.BrowserAddress;
             this.liveUpdateableOptions.UpdateOption();
         }
+        else if (e.Property == DataContextProperty &&
+                this.DataContext is GuildWarsApplicationLaunchContext context)
+        {
+            this.Minimap.LaunchContext = context;
+        }
 
         base.OnPropertyChanged(e);
     }
 
     private async Task UpdatePathingData()
     {
-        if (this.applicationLauncher.IsGuildwarsRunning is false)
+        if (this.DataContext is not GuildWarsApplicationLaunchContext context)
+        {
+            this.logger.LogInformation($"Data context is not set to {nameof(GuildWarsApplicationLaunchContext)}. Can not retrieve executable");
+            return;
+        }
+
+        if (context.GuildWarsProcess?.HasExited is not false)
         {
             this.logger.LogInformation($"Executable is not running. Returning to {nameof(LauncherView)}");
             this.viewManager.ShowView<LauncherView>();
@@ -138,6 +160,7 @@ public partial class FocusView : UserControl
 
     private async void PeriodicallyReadPathingData(CancellationToken cancellationToken)
     {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.PeriodicallyReadPathingData), string.Empty);
         while (!cancellationToken.IsCancellationRequested)
         {
             try
@@ -145,6 +168,11 @@ public partial class FocusView : UserControl
                 if (cancellationToken.IsCancellationRequested)
                 {
                     return;
+                }
+
+                if (this.DataContext is not GuildWarsApplicationLaunchContext context)
+                {
+                    continue;
                 }
 
                 await Task.WhenAll(
@@ -152,15 +180,39 @@ public partial class FocusView : UserControl
                     Task.Delay(1000, cancellationToken)).ConfigureAwait(true);
 
             }
+            catch (InvalidOperationException ex)
+            {
+                scopedLogger.LogError(ex, "Encountered invalid operation exception. Cancelling periodic reading");
+                return;
+            }
+            catch (Exception ex) when (ex is TimeoutException or OperationCanceledException)
+            {
+                if (this.DataContext is not GuildWarsApplicationLaunchContext context)
+                {
+                    continue;
+                }
+
+                scopedLogger.LogError(ex, "Encountered timeout. Verifying connection");
+                try
+                {
+                    await this.guildwarsMemoryCache.EnsureInitialized(context, cancellationToken);
+                }
+                catch (InvalidOperationException innerEx)
+                {
+                    scopedLogger.LogError(innerEx, "Could not ensure connection is initialized. Backing off before retrying");
+                    await Task.Delay(UninitializedBackoff, cancellationToken);
+                }
+            }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "Encountered non-terminating exception. Silently continuing");
+                scopedLogger.LogError(ex, "Encountered non-terminating exception. Silently continuing");
             }
         }
     }
 
-    private async void PeriodicallyReadGameData(CancellationToken cancellationToken)
+    private async void PeriodicallyReadGameState(CancellationToken cancellationToken)
     {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.PeriodicallyReadGameState), string.Empty);
         while (!cancellationToken.IsCancellationRequested)
         {
             try
@@ -170,10 +222,75 @@ public partial class FocusView : UserControl
                     return;
                 }
 
+                if (this.DataContext is not GuildWarsApplicationLaunchContext context)
+                {
+                    continue;
+                }
+
+                var readGameStateTask = this.guildwarsMemoryCache.ReadGameState(cancellationToken);
+                await Task.WhenAll(
+                    readGameStateTask,
+                    Task.Delay(16, cancellationToken)).ConfigureAwait(true);
+
+                var maybeGameState = await readGameStateTask;
+                if (maybeGameState is null)
+                {
+                    continue;
+                }
+
+                this.GameState = maybeGameState;
+            }
+            catch (InvalidOperationException ex)
+            {
+                scopedLogger.LogError(ex, "Encountered invalid operation exception. Cancelling periodic reading");
+                return;
+            }
+            catch (Exception ex) when (ex is TimeoutException or OperationCanceledException)
+            {
+                if (this.DataContext is not GuildWarsApplicationLaunchContext context)
+                {
+                    continue;
+                }
+
+                scopedLogger.LogError(ex, "Encountered timeout. Verifying connection");
+                try
+                {
+                    await this.guildwarsMemoryCache.EnsureInitialized(context, cancellationToken);
+                }
+                catch (InvalidOperationException innerEx)
+                {
+                    scopedLogger.LogError(innerEx, "Could not ensure connection is initialized. Backing off before retrying");
+                    await Task.Delay(UninitializedBackoff, cancellationToken);
+                }
+            }
+            catch (Exception ex)
+            {
+                scopedLogger.LogError(ex, "Encountered non-terminating exception. Silently continuing");
+            }
+        }
+    }
+
+    private async void PeriodicallyReadGameData(CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.PeriodicallyReadGameData), string.Empty);
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            try
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                if (this.DataContext is not GuildWarsApplicationLaunchContext context)
+                {
+                    continue;
+                }
+
                 var readGameDataTask = this.guildwarsMemoryCache.ReadGameData(cancellationToken);
                 await Task.WhenAll(
                     readGameDataTask,
-                    Task.Delay(16, cancellationToken)).ConfigureAwait(true);
+                    Task.Delay(GameDataFrequency, cancellationToken)).ConfigureAwait(true);
 
                 var maybeGameData = await readGameDataTask;
                 if (maybeGameData is null)
@@ -181,17 +298,63 @@ public partial class FocusView : UserControl
                     continue;
                 }
 
+                if (maybeGameData.MainPlayer is not null)
+                {
+                    maybeGameData.MainPlayer.Position = this.GameData?.MainPlayer?.Position ?? new Position();
+                }
+                
+                foreach(var worldPlayer in maybeGameData.WorldPlayers ?? [])
+                {
+                    worldPlayer.Position = this.GameData?.WorldPlayers?.FirstOrDefault(w => w.Id == worldPlayer.Id)?.Position ?? new Position();
+                }
+
+                foreach (var partyPlayer in maybeGameData.Party ?? [])
+                {
+                    partyPlayer.Position = this.GameData?.Party?.FirstOrDefault(w => w.Id == partyPlayer.Id)?.Position ?? new Position();
+                }
+
+                foreach (var entity in maybeGameData.LivingEntities ?? [])
+                {
+                    var oldEntity = this.GameData?.LivingEntities?.FirstOrDefault(w => w.Id == entity.Id);
+                    entity.Position = oldEntity?.Position ?? new Position();
+                    entity.State = oldEntity?.State ?? LivingEntityState.Unknown;
+                }
+
                 this.GameData = maybeGameData;
+            }
+            catch (InvalidOperationException ex)
+            {
+                scopedLogger.LogError(ex, "Encountered invalid operation exception. Cancelling periodic reading");
+                return;
+            }
+            catch (Exception ex) when (ex is TimeoutException or OperationCanceledException)
+            {
+                if (this.DataContext is not GuildWarsApplicationLaunchContext context)
+                {
+                    continue;
+                }
+
+                scopedLogger.LogError(ex, "Encountered timeout. Verifying connection");
+                try
+                {
+                    await this.guildwarsMemoryCache.EnsureInitialized(context, cancellationToken);
+                }
+                catch (InvalidOperationException innerEx)
+                {
+                    scopedLogger.LogError(innerEx, "Could not ensure connection is initialized. Backing off before retrying");
+                    await Task.Delay(UninitializedBackoff, cancellationToken);
+                }
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "Encountered non-terminating exception. Silently continuing");
+                scopedLogger.LogError(ex, "Encountered non-terminating exception. Silently continuing");
             }
         }
     }
 
     private async void PeriodicallyReadInventoryData(CancellationToken cancellationToken)
     {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.PeriodicallyReadInventoryData), string.Empty);
         while (!cancellationToken.IsCancellationRequested)
         {
             try
@@ -199,6 +362,11 @@ public partial class FocusView : UserControl
                 if (cancellationToken.IsCancellationRequested)
                 {
                     return;
+                }
+
+                if (this.DataContext is not GuildWarsApplicationLaunchContext context)
+                {
+                    continue;
                 }
 
                 var readInventoryTask = this.guildwarsMemoryCache.ReadInventoryData(cancellationToken);
@@ -214,15 +382,34 @@ public partial class FocusView : UserControl
 
                 this.InventoryData = maybeInventoryData;
             }
+            catch (Exception ex) when (ex is TimeoutException or OperationCanceledException)
+            {
+                if (this.DataContext is not GuildWarsApplicationLaunchContext context)
+                {
+                    continue;
+                }
+
+                scopedLogger.LogError(ex, "Encountered timeout. Verifying connection");
+                try
+                {
+                    await this.guildwarsMemoryCache.EnsureInitialized(context, cancellationToken);
+                }
+                catch (InvalidOperationException innerEx)
+                {
+                    scopedLogger.LogError(innerEx, "Could not ensure connection is initialized. Backing off before retrying");
+                    await Task.Delay(UninitializedBackoff, cancellationToken);
+                }
+            }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "Encountered non-terminating exception. Silently continuing");
+                scopedLogger.LogError(ex, "Encountered non-terminating exception. Silently continuing");
             }
         }
     }
 
     private async void PeriodicallyReadMainPlayerContextData(CancellationToken cancellationToken)
     {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.PeriodicallyReadMainPlayerContextData), string.Empty);
         while (!cancellationToken.IsCancellationRequested)
         {
             try
@@ -232,7 +419,12 @@ public partial class FocusView : UserControl
                     return;
                 }
 
-                if (this.applicationLauncher.IsGuildwarsRunning is false)
+                if (this.DataContext is not GuildWarsApplicationLaunchContext context)
+                {
+                    continue;
+                }
+
+                if (context.GuildWarsProcess?.HasExited is not false)
                 {
                     this.logger.LogInformation($"Executable is not running. Returning to {nameof(LauncherView)}");
                     this.viewManager.ShowView<LauncherView>();
@@ -255,7 +447,8 @@ public partial class FocusView : UserControl
                 if (userData?.User is null ||
                     sessionData?.Session is null ||
                     mainPlayerData?.PlayerInformation is null ||
-                    sessionData.Session.InstanceType is InstanceType.Loading or InstanceType.Undefined)
+                    sessionData.Session.InstanceType is InstanceType.Loading or InstanceType.Undefined ||
+                    sessionData.Session.InstanceTimer == 0)
                 {
                     this.MainPlayerDataValid = false;
                     this.Browser.Visibility = Visibility.Collapsed;
@@ -272,21 +465,50 @@ public partial class FocusView : UserControl
                 this.MainPlayerDataValid = true;
                 this.Browser.Visibility = this.minimapMaximized ? Visibility.Hidden : Visibility.Visible;
             }
+            catch (InvalidOperationException ex)
+            {
+                scopedLogger.LogError(ex, "Encountered invalid operation exception. Cancelling periodic main player reading");
+                return;
+            }
+            catch (Exception ex) when (ex is TimeoutException or OperationCanceledException)
+            {
+                if (this.DataContext is not GuildWarsApplicationLaunchContext context)
+                {
+                    continue;
+                }
+
+                scopedLogger.LogError(ex, "Encountered timeout. Verifying connection");
+                try
+                {
+                    await this.guildwarsMemoryCache.EnsureInitialized(context, cancellationToken);
+                }
+                catch (InvalidOperationException innerEx)
+                {
+                    scopedLogger.LogError(innerEx, "Could not ensure connection is initialized. Backing off before retrying");
+                    await Task.Delay(UninitializedBackoff, cancellationToken);
+                }
+            }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "Encountered non-terminating exception. Silently continuing");
+                scopedLogger.LogError(ex, "Encountered non-terminating exception. Silently continuing");
             }
         }
     }
 
-    private void FocusView_Loaded(object _, RoutedEventArgs e)
+    private async void FocusView_Loaded(object _, RoutedEventArgs e)
     {
+        if (this.DataContext is not GuildWarsApplicationLaunchContext context)
+        {
+            return;
+        }
+
         this.BrowserAddress = this.liveUpdateableOptions.Value.BrowserUrl;
         this.InventoryVisible = this.liveUpdateableOptions.Value.InventoryComponentVisible;
         this.MinimapVisible = this.liveUpdateableOptions.Value.MinimapComponentVisible;
         this.cancellationTokenSource?.Dispose();
         this.cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = this.cancellationTokenSource.Token;
+        await this.guildwarsMemoryCache.EnsureInitialized(context, cancellationToken);
         this.PeriodicallyReadMainPlayerContextData(cancellationToken);
         if (this.InventoryVisible)
         {
@@ -295,6 +517,7 @@ public partial class FocusView : UserControl
 
         if (this.MinimapVisible)
         {
+            this.PeriodicallyReadGameState(cancellationToken);
             this.PeriodicallyReadGameData(cancellationToken);
             this.PeriodicallyReadPathingData(cancellationToken);
         }
@@ -304,6 +527,10 @@ public partial class FocusView : UserControl
     {
         this.cancellationTokenSource?.Cancel();
         this.cancellationTokenSource = null;
+        this.GameData = default;
+        this.GameState = default;
+        this.PathingData = default;
+        this.InventoryData = default;
     }
 
     private void Browser_MaximizeClicked(object _, EventArgs e)
@@ -386,7 +613,7 @@ public partial class FocusView : UserControl
 
     private void GuildwarsMinimap_LivingEntityClicked(object _, LivingEntity e)
     {
-        if (e.NpcDefinition?.WikiUrl.IsNullOrWhiteSpace() is true)
+        if (e.NpcDefinition?.WikiUrl.IsNullOrWhiteSpace() is not false)
         {
             return;
         }
@@ -396,7 +623,7 @@ public partial class FocusView : UserControl
 
     private void GuildwarsMinimap_PlayerInformationClicked(object _, PlayerInformation e)
     {
-        if (e.NpcDefinition?.WikiUrl.IsNullOrWhiteSpace() is true)
+        if (e.NpcDefinition?.WikiUrl.IsNullOrWhiteSpace() is not false)
         {
             return;
         }
@@ -406,7 +633,7 @@ public partial class FocusView : UserControl
 
     private void GuildwarsMinimap_MapIconClicked(object _, MapIcon e)
     {
-        if (e.Icon?.WikiUrl.IsNullOrWhiteSpace() is true)
+        if (e.Icon?.WikiUrl!.IsNullOrWhiteSpace() is true)
         {
             return;
         }
@@ -432,6 +659,20 @@ public partial class FocusView : UserControl
         }
 
         this.BrowserAddress = entity.WikiUrl;
+    }
+
+    private void GuildwarsMinimap_NpcNameClicked(object _, string e)
+    {
+        if (e.IsNullOrEmpty() is not false)
+        {
+            return;
+        }
+
+        var indexOfSeparator = e.IndexOf("[");
+        indexOfSeparator = indexOfSeparator >= 0 ? indexOfSeparator : e.Length;
+        var curedNpcName = e[..indexOfSeparator];
+        var npcUrl = WikiUrl.Replace(NamePlaceholder, curedNpcName);
+        this.BrowserAddress = npcUrl;
     }
 
     private void InventoryComponent_PriceHistoryClicked(object _, ItemBase e)

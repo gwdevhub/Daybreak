@@ -4,7 +4,10 @@ using Daybreak.Services.Navigation;
 using Daybreak.Services.Notifications;
 using Daybreak.Views;
 using Daybreak.Views.Copy;
+using Daybreak.Views.Launch;
+using Daybreak.Views.Onboarding.DirectSong;
 using Daybreak.Views.Onboarding.DSOAL;
+using Daybreak.Views.Onboarding.ReShade;
 using Daybreak.Views.Onboarding.Toolbox;
 using Daybreak.Views.Onboarding.UMod;
 using Daybreak.Views.Trade;
@@ -65,6 +68,11 @@ public partial class MenuList : UserControl
         this.viewManager.ShowView<AccountsView>();
     }
 
+    private void LaunchConfigurationsSettingsButton_Clicked(object sender, EventArgs e)
+    {
+        this.viewManager.ShowView<LaunchConfigurationsView>();
+    }
+
     private void GuildwarsSettingsButton_Clicked(object sender, EventArgs e)
     {
         this.viewManager.ShowView<ExecutablesView>();
@@ -115,6 +123,16 @@ public partial class MenuList : UserControl
         this.viewManager.ShowView<DSOALOnboardingEntryView>();
     }
 
+    private void ReShadeButton_Clicked(object sender, EventArgs e)
+    {
+        this.viewManager.ShowView<ReShadeOnboardingEntryView>();
+    }
+
+    private void DirectSongButton_Clicked(object sender, EventArgs e)
+    {
+        this.viewManager.ShowView<DirectSongOnboardingEntryView>();
+    }
+
     private void KamadanButton_Clicked(object sender, EventArgs e)
     {
         this.viewManager.ShowView<KamadanTradeChatView>();
@@ -133,6 +151,11 @@ public partial class MenuList : UserControl
     private void NotificationsButton_Clicked(object sender, EventArgs e)
     {
         this.viewManager.ShowView<NotificationsView>();
+    }
+
+    private void PluginsButton_Clicked(object sender, EventArgs e)
+    {
+        this.viewManager.ShowView<PluginsView>();
     }
 
     private void TradeAlertsButton_Clicked(object sender, EventArgs e)

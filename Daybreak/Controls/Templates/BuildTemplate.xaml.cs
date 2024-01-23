@@ -56,11 +56,11 @@ public partial class BuildTemplate : UserControl
     private int attributePoints;
 
     [GenerateDependencyProperty]
-    private List<Skill> availableSkills = new();
+    private List<Skill> availableSkills = [];
 
     public event EventHandler? BuildChanged;
-    public ObservableCollection<Profession> PrimaryProfessions { get; } = new();
-    public ObservableCollection<Profession> SecondaryProfessions { get; } = new();
+    public ObservableCollection<Profession> PrimaryProfessions { get; } = [];
+    public ObservableCollection<Profession> SecondaryProfessions { get; } = [];
 
     public BuildTemplate()
         : this(Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IBuildTemplateManager>(),
@@ -322,7 +322,7 @@ public partial class BuildTemplate : UserControl
 
     private void SkillTemplate_Clicked(object sender, RoutedEventArgs e)
     {
-        var skill = sender.As<SkillTemplate>().DataContext.As<Skill>();
+        var skill = sender.As<SkillTemplate>()?.DataContext.As<Skill>();
         if (skill == Skill.NoSkill)
         {
             this.SkillSearchText = string.Empty;
@@ -331,7 +331,7 @@ public partial class BuildTemplate : UserControl
         }
         else
         {
-            this.BrowseToInfo(skill.Name!);
+            this.BrowseToInfo(skill?.Name!);
         }
 
         e.Handled = true;
@@ -381,7 +381,7 @@ public partial class BuildTemplate : UserControl
 
     private void AttributeTemplate_Loaded(object sender, RoutedEventArgs e)
     {
-        sender.As<AttributeTemplate>().InitializeAttributeTemplate(this.attributePointCalculator!);
+        sender.As<AttributeTemplate>()?.InitializeAttributeTemplate(this.attributePointCalculator!);
     }
 
     private void HighlightButton_Clicked(object sender, EventArgs e)
@@ -392,7 +392,7 @@ public partial class BuildTemplate : UserControl
             return;
         }
 
-        var selectedSkilll = sender.As<HighlightButton>().DataContext.As<Skill>();
+        var selectedSkilll = sender.As<HighlightButton>()?.DataContext.As<Skill>() ?? throw new InvalidOperationException();
         if (this.selectingSkillTemplate == this.SkillTemplate0)
         {
             this.BuildEntry.FirstSkill = selectedSkilll;

@@ -5,11 +5,11 @@ namespace Daybreak.Services.TradeChat;
 
 public interface ITradeAlertingService
 {
-    IEnumerable<TradeAlert> TradeAlerts { get; }
+    IEnumerable<ITradeAlert> TradeAlerts { get; }
     
-    void AddTradeAlert(TradeAlert tradeAlert);
+    void AddTradeAlert(ITradeAlert tradeAlert);
     
-    void ModifyTradeAlert(TradeAlert modifiedTradeAlert);
+    void ModifyTradeAlert(ITradeAlert modifiedTradeAlert);
     
     void DeleteTradeAlert(string tradeAlertId);
 }

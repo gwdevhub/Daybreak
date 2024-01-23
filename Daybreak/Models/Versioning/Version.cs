@@ -7,9 +7,11 @@ namespace Daybreak.Models.Versioning;
 
 public sealed class Version : IEquatable<Version>, IComparable<Version>
 {
-    private List<VersionToken> parts = new();
+    public static readonly Version Zero = new("0");
 
-    public bool HasPrefix { get; private set; }
+    private List<VersionToken> parts = [];
+
+    public bool HasPrefix { get; set; }
     public IEnumerable<VersionToken> VersionTokens { get => this.parts; }
     public string VersionString { get => this.ToString(); }
 
@@ -190,7 +192,7 @@ public sealed class Version : IEquatable<Version>, IComparable<Version>
             tokens[0] = tokens[0][1..];
         }
 
-        parts = new List<VersionToken>();
+        parts = [];
         for(int i = 0; i < tokens.Length - 1; i++)
         {
             var token = tokens[i];

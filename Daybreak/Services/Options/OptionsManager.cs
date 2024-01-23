@@ -8,16 +8,17 @@ using System.Core.Extensions;
 using System.Extensions;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace Daybreak.Services.Options;
 
-public sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptionsUpdateHook, IOptionsProvider
+internal sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptionsUpdateHook, IOptionsProvider
 {
     private const string OptionsFile = "Daybreak.options";
 
-    private readonly Dictionary<string, string> optionsCache = new();
-    private readonly Dictionary<Type, List<Action>> optionsUpdateHooks = new();
-    private readonly HashSet<Type> optionsTypes = new();
+    private readonly Dictionary<string, string> optionsCache = [];
+    private readonly Dictionary<Type, List<Action>> optionsUpdateHooks = [];
+    private readonly HashSet<Type> optionsTypes = [];
 
     public OptionsManager()
     {
@@ -29,7 +30,7 @@ public sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptions
         var optionsFileContent = File.ReadAllText(OptionsFile);
         if (optionsFileContent.IsNullOrWhiteSpace())
         {
-            this.optionsCache = new Dictionary<string, string>();
+            this.optionsCache = [];
         }
         else
         {
@@ -69,7 +70,7 @@ public sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptions
         if (this.optionsUpdateHooks.TryGetValue(typeof(TOptionsType), out var hooks) is false ||
             hooks is null)
         {
-            hooks = new List<Action>();
+            hooks = [];
             this.optionsUpdateHooks[typeof(TOptionsType)] = hooks;
         }
 
@@ -117,6 +118,29 @@ public sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptions
         this.SaveOptions(options.GetType(), options);
     }
 
+    public void SaveRegisteredOptions(string name, JObject options)
+    {
+        options.ThrowIfNull();
+
+        var registeredType = this.optionsTypes.FirstOrDefault(t =>
+        {
+            var typeName = t.Name;
+            if (t.GetCustomAttribute<OptionsNameAttribute>() is OptionsNameAttribute optionsName)
+            {
+                typeName = optionsName.Name;
+            }
+
+            return name == typeName;
+        });
+
+        if (registeredType is null)
+        {
+            return;
+        }
+
+        this.SaveOptions(registeredType, options);
+    }
+
     private void SaveOptions(Type type, object value)
     {
         var optionsName = GetOptionsName(type);
@@ -158,7 +182,7 @@ public sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptions
             return type.Name;
         }
 
-        if (optionsNameAttribute.Name.IsNullOrWhiteSpace())
+        if (optionsNameAttribute.Name!.IsNullOrWhiteSpace())
         {
             return type.Name;
         }

@@ -17,7 +17,6 @@ using System.Extensions;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -27,7 +26,7 @@ using System.Windows.Controls;
 
 namespace Daybreak.Services.Graph;
 
-public sealed class GraphClient : IGraphClient
+internal sealed class GraphClient : IGraphClient
 {
     private const int MaxBrowserInitializationRetries = 5;
 
@@ -44,7 +43,8 @@ public sealed class GraphClient : IGraphClient
     private const string GraphBaseUrl = "https://graph.microsoft.com/v1.0/";
     private const string TokenUrlPlaceholder = $"https://login.microsoftonline.com/consumers/oauth2/v2.0/token";
     private const string AuthorizationUrlPlaceholder = $"https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id={ClientIdPlaceholder}&response_type=code&redirect_uri={RedirectUriPlaceholder}&response_mode=query&scope={ScopesPlaceholder}&state={StatePlaceholder}";
-    private const string SyncFileUri = $"me/drive/root:/Daybreak/Builds/daybreak.json{ContentSuffix}";
+    private const string BuildsSyncFileUri = $"me/drive/root:/Daybreak/Builds/daybreak.json{ContentSuffix}";
+    private const string SettingsSyncFileUri = $"me/drive/root:/Daybreak/Settings/daybreak.json{ContentSuffix}";
     private const string ContentSuffix = ":/content";
 
     private static readonly byte[] Entropy = Convert.FromBase64String("R3VpbGR3YXJz");
@@ -52,7 +52,7 @@ public sealed class GraphClient : IGraphClient
 
     private readonly IBuildTemplateManager buildTemplateManager;
     private readonly IViewManager viewManager;
-    private readonly ILiveUpdateableOptions<BuildSynchronizationOptions> liveUpdateableOptions;
+    private readonly ILiveUpdateableOptions<SynchronizationOptions> liveUpdateableOptions;
     private readonly IHttpClient<GraphClient> httpClient;
     private readonly ILogger<GraphClient> logger;
 
@@ -61,7 +61,7 @@ public sealed class GraphClient : IGraphClient
     public GraphClient(
         IBuildTemplateManager buildTemplateManager,
         IViewManager viewManager,
-        ILiveUpdateableOptions<BuildSynchronizationOptions> liveUpdateableOptions,
+        ILiveUpdateableOptions<SynchronizationOptions> liveUpdateableOptions,
         IHttpClient<GraphClient> httpClient,
         ILogger<GraphClient> logger)
     {
@@ -82,10 +82,10 @@ public sealed class GraphClient : IGraphClient
         var maybeAuthCode = await RetrieveAuthorizationCode(chromiumBrowserWrapper, cancellationToken);
         if (maybeAuthCode.TryExtractSuccess(out var authCode) is false)
         {
-            return maybeAuthCode.SwitchAny(onFailure: exception => exception);
+            return maybeAuthCode.SwitchAny(onFailure: exception => exception)!;
         }
 
-        var maybeAccessToken = await this.RetrieveAccessToken(authCode);
+        var maybeAccessToken = await this.RetrieveAccessToken(authCode!);
 
         return maybeAccessToken.Switch(
             onSuccess: token =>
@@ -185,7 +185,7 @@ public sealed class GraphClient : IGraphClient
                 PreviousName = buildFile.FileName
             };
         }).Where(entry => entry is not null).ToList();
-        _ = compiledBuilds.Do(this.buildTemplateManager.SaveBuild!).ToList();
+        _ = compiledBuilds?.Do(this.buildTemplateManager.SaveBuild!).ToList();
 
         return true;
     }
@@ -222,7 +222,7 @@ public sealed class GraphClient : IGraphClient
                 PreviousName = buildFile.FileName,
             };
         }).Where(entry => entry is not null).ToList();
-        _ = compiledBuilds.Do(this.buildTemplateManager.SaveBuild!).ToList();
+        _ = compiledBuilds?.Do(this.buildTemplateManager.SaveBuild!).ToList();
 
         return true;
     }
@@ -233,10 +233,10 @@ public sealed class GraphClient : IGraphClient
         if (getBuildResult.TryExtractSuccess(out var buildEntry) is false)
         {
             return getBuildResult.SwitchAny(
-                onFailure: exception => exception);
+                onFailure: exception => exception)!;
         }
 
-        return await this.PutBuild(buildEntry);
+        return await this.PutBuild(buildEntry!);
     }
 
     public async Task<Result<IEnumerable<BuildFile>, Exception>> RetrieveBuildsList()
@@ -244,13 +244,46 @@ public sealed class GraphClient : IGraphClient
         var maybeBuildsBackup = await this.GetBuildsBackup();
         var buildsBackup = maybeBuildsBackup.ExtractValue();
         this.buildsCache = buildsBackup;
-        return buildsBackup;
+        return buildsBackup!;
     }
 
     public void ResetAuthorization()
     {
         this.ResetAccessToken();
         this.ResetRefreshToken();
+    }
+
+    public async Task<Result<bool, Exception>> UploadSettings(string settings, CancellationToken cancellationToken)
+    {
+        using var stringContent = new StringContent(settings);
+        try
+        {
+            var response = await this.httpClient.PutAsync(SettingsSyncFileUri, stringContent, cancellationToken);
+            return response.IsSuccessStatusCode;
+        }
+        catch(Exception e)
+        {
+            return e;
+        }
+    }
+
+    public async Task<Result<string, Exception>> DownloadSettings(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var fileItemResponse = await this.httpClient.GetAsync(SettingsSyncFileUri, cancellationToken);
+            if (fileItemResponse.IsSuccessStatusCode is false)
+            {
+                return string.Empty;
+            }
+
+            var driveItemContent = await fileItemResponse.Content.ReadAsStringAsync(cancellationToken);
+            return driveItemContent;
+        }
+        catch(Exception e)
+        {
+            return e;
+        }
     }
 
     private async Task<Optional<TokenResponse>> RefreshAccessToken()
@@ -290,7 +323,7 @@ public sealed class GraphClient : IGraphClient
             SourceUrl = buildEntry.Build?.SourceUrl
         };
 
-        var buildList = this.buildsCache ?? new List<BuildFile>();
+        var buildList = this.buildsCache ?? [];
         // Remove the previous version of the build
         buildList = buildList.Where(b => b.FileName != buildEntry.Name).ToList();
         // Add new version of the build
@@ -299,7 +332,7 @@ public sealed class GraphClient : IGraphClient
         buildList = buildList.OrderBy(b => b.FileName).ToList();
 
         using var stringContent = new StringContent(JsonConvert.SerializeObject(buildList));
-        var response = await this.httpClient.PutAsync(SyncFileUri, stringContent);
+        var response = await this.httpClient.PutAsync(BuildsSyncFileUri, stringContent);
         if (response.IsSuccessStatusCode is false)
         {
             return false;
@@ -323,7 +356,7 @@ public sealed class GraphClient : IGraphClient
         buildList = buildList.OrderBy(b => b.FileName).ToList();
 
         using var stringContent = new StringContent(JsonConvert.SerializeObject(buildList));
-        var response = await this.httpClient.PutAsync(SyncFileUri, stringContent);
+        var response = await this.httpClient.PutAsync(BuildsSyncFileUri, stringContent);
         if (response.IsSuccessStatusCode is false)
         {
             return false;
@@ -335,7 +368,7 @@ public sealed class GraphClient : IGraphClient
 
     private async Task<Optional<List<BuildFile>>> GetBuildsBackup()
     {
-        var fileItemResponse = await this.httpClient.GetAsync(SyncFileUri);
+        var fileItemResponse = await this.httpClient.GetAsync(BuildsSyncFileUri);
         if (fileItemResponse.IsSuccessStatusCode is false)
         {
             return Optional.None<List<BuildFile>>();
@@ -500,7 +533,7 @@ public sealed class GraphClient : IGraphClient
     private Optional<AccessToken> LoadAccessToken()
     {
         var protectedCode = this.liveUpdateableOptions.Value.ProtectedGraphAccessToken;
-        if (protectedCode.IsNullOrWhiteSpace())
+        if (protectedCode!.IsNullOrWhiteSpace())
         {
             return Optional.None<AccessToken>();
         }
@@ -521,7 +554,7 @@ public sealed class GraphClient : IGraphClient
     private Optional<RefreshToken> LoadRefreshToken()
     {
         var protectedCode = this.liveUpdateableOptions.Value.ProtectedGraphRefreshToken;
-        if (protectedCode.IsNullOrWhiteSpace())
+        if (protectedCode!.IsNullOrWhiteSpace())
         {
             return Optional.None<RefreshToken>();
         }
