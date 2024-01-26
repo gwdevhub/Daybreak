@@ -56,4 +56,8 @@ public sealed class LauncherOptions
     [JsonProperty(nameof(BetaUpdate))]
     [OptionName(Name = "Beta Update", Description = "If true, the launcher will use the new update procedure")]
     public bool BetaUpdate { get; set; } = true;
+
+    [JsonProperty(nameof(AutoBackupSettings))]
+    [OptionName(Name = "Auto Backup Settings", Description = "If true, the launcher will attempt to backup settings periodically")]
+    public bool AutoBackupSettings { get; set; } = false;
 }

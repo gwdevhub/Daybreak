@@ -3,6 +3,7 @@ using Daybreak.Configuration.Options;
 using Daybreak.Models;
 using Daybreak.Models.Browser;
 using Daybreak.Models.Guildwars;
+using Daybreak.Services.BrowserExtensions;
 using Daybreak.Services.Browser;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Utils;
@@ -44,8 +45,10 @@ public partial class ChromiumBrowserWrapper : UserControl
 
     private static readonly Regex WebAddressRegex = BuildWebAddressRegex();
     private static readonly object Lock = new();
+    private static readonly Regex WebAddressRegex = new("^((http|ftp|https)://)?([\\w_-]+(?:(?:\\.[\\w_-]+)+))([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?", RegexOptions.Compiled);
+    private static readonly SemaphoreSlim SemaphoreSlim = new(1, 1);
 
-    private static CoreWebView2Environment? CoreWebView2Environment;    
+    private static CoreWebView2Environment? CoreWebView2Environment;
 
     public event EventHandler<string>? FavoriteUriChanged;
     public event EventHandler? MaximizeClicked;
@@ -61,6 +64,8 @@ public partial class ChromiumBrowserWrapper : UserControl
     private readonly IBuildTemplateManager buildTemplateManager;
     private readonly IBrowserHistoryManager historyManager;
     
+    private readonly IBrowserExtensionsManager browserExtensionsManager;
+
     [GenerateDependencyProperty(InitialValue = true)]
     private bool canDownloadBuild;
     [GenerateDependencyProperty(InitialValue = true)]
@@ -106,6 +111,9 @@ public partial class ChromiumBrowserWrapper : UserControl
         : this(
               Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IBrowserHistoryManager>(),
               Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IHttpClient<ChromiumBrowserWrapper>>(),
+        : this(
+              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IBrowserExtensionsManager>(),
+              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IHttpClient<ChromiumBrowserWrapper>>(),
               Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILiveOptions<BrowserOptions>>(),
               Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IBuildTemplateManager>(),
               Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILogger<ChromiumBrowserWrapper>>())
@@ -114,17 +122,18 @@ public partial class ChromiumBrowserWrapper : UserControl
 
     public ChromiumBrowserWrapper(
         IBrowserHistoryManager historyManager,
+        IBrowserExtensionsManager browserExtensionsManager,
         IHttpClient<ChromiumBrowserWrapper> httpClient,
         ILiveOptions<BrowserOptions> liveOptions,
         IBuildTemplateManager buildTemplateManager,
         ILogger<ChromiumBrowserWrapper> logger)
     {
         this.historyManager = historyManager.ThrowIfNull();
+        this.browserExtensionsManager = browserExtensionsManager.ThrowIfNull();
         this.httpClient = httpClient.ThrowIfNull();
         this.liveOptions = liveOptions.ThrowIfNull();
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
-        this.InitializeEnvironment();
         this.InitializeComponent();
 
         this.historyManager.InitializeHistoryManager(this);
@@ -161,24 +170,22 @@ public partial class ChromiumBrowserWrapper : UserControl
     {
         try
         {
-            lock (Lock)
+            if (CoreWebView2Environment is not null)
             {
-                if (CoreWebView2Environment is not null)
-                {
-                    this.BrowserSupported = true;
-                    return;
-                }
-
-                CoreWebView2Environment ??= System.Extensions.TaskExtensions.RunSync(() => CoreWebView2Environment.CreateAsync(null, "BrowserData", new CoreWebView2EnvironmentOptions
-                {
-                    EnableTrackingPrevention = true,
-                    AllowSingleSignOnUsingOSPrimaryAccount = true
-                }));
-
                 this.BrowserSupported = true;
+                return;
             }
+
+            CoreWebView2Environment ??= System.Extensions.TaskExtensions.RunSync(() => CoreWebView2Environment.CreateAsync(null, "BrowserData", new CoreWebView2EnvironmentOptions
+            {
+                EnableTrackingPrevention = true,
+                AllowSingleSignOnUsingOSPrimaryAccount = true,
+                AreBrowserExtensionsEnabled = true,
+            }));
+
+            this.BrowserSupported = true;
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             this.logger!.LogWarning($"Browser initialization failed. Details: {e}");
             this.BrowserSupported = false;
@@ -189,10 +196,7 @@ public partial class ChromiumBrowserWrapper : UserControl
     {
         await this.Dispatcher.InvokeAsync(async () =>
         {
-            while (!Monitor.TryEnter(Lock))
-            {
-                await Task.Delay(100);
-            }
+            await SemaphoreSlim.WaitAsync();
 
             try
             {
@@ -201,7 +205,7 @@ public partial class ChromiumBrowserWrapper : UserControl
             }
             finally
             {
-                Monitor.Exit(Lock);
+                SemaphoreSlim.Release();
             }
         });
     }
@@ -213,12 +217,18 @@ public partial class ChromiumBrowserWrapper : UserControl
         if (!this.BrowserSupported ||
             !this.BrowserEnabled)
         {
-            
+
+            return;
+        }
+        
+        if (this.WebBrowser.CoreWebView2 is not null)
+        {
             return;
         }
 
         this.ShowBrowserDisabledMessage = false;
-        await this.WebBrowser.EnsureCoreWebView2Async(CoreWebView2Environment);
+        await this.WebBrowser.EnsureCoreWebView2Async(CoreWebView2Environment).ConfigureAwait(true);
+        await this.browserExtensionsManager.InitializeBrowserEnvironment(this.WebBrowser.CoreWebView2!.Profile, CoreWebView2Environment!.BrowserVersionString).ConfigureAwait(true);
         if (this.Address is not null &&
             Uri.TryCreate(this.Address, UriKind.RelativeOrAbsolute, out var uri))
         {
@@ -410,7 +420,7 @@ public partial class ChromiumBrowserWrapper : UserControl
         {
             payload = args.WebMessageAsJson.Deserialize<BrowserPayload>();
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             this.logger!.LogError(e, $"Exception encountered when deserializing {nameof(BrowserPayload)}");
         }
@@ -445,7 +455,7 @@ public partial class ChromiumBrowserWrapper : UserControl
                         this.ContextMenu.IsOpen = true;
                     });
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     this.logger!.LogWarning($"Exception when decoding template {maybeTemplate}. Details {e}");
                 }
