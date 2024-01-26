@@ -1,6 +1,6 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Models.Progress;
-using Daybreak.Services.BrowserExtensions;
+using Daybreak.Services.Browser;
 using Daybreak.Services.Drawing;
 using Daybreak.Services.ExceptionHandling;
 using Daybreak.Services.Mods;

@@ -74,12 +74,14 @@ public static class Scripts
                         Key: 'XButton1Pressed'
                     };
                     window.chrome.webview.postMessage(jsonObject);
+                    event.preventDefault();
                 } else if (event.button === 4) {
                     let jsonObject = 
                     {
                         Key: 'XButton2Pressed'
                     };
                     window.chrome.webview.postMessage(jsonObject);
+                    event.preventDefault();
                 }
             });
             document._navigationButtonListenerAdded = true;

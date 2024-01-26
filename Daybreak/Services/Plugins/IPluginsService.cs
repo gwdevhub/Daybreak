@@ -1,5 +1,5 @@
 ﻿using Daybreak.Models.Plugins;
-using Daybreak.Services.BrowserExtensions;
+using Daybreak.Services.Browser;
 using Daybreak.Services.Drawing;
 using Daybreak.Services.Mods;
 using Daybreak.Services.Navigation;

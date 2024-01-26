@@ -1,5 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Services.BrowserExtensions;
+using Daybreak.Services.Browser;
 using Daybreak.Services.Drawing;
 using Daybreak.Services.Metrics;
 using Daybreak.Services.Mods;

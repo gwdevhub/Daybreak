@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Services.BrowserExtensions;
+﻿namespace Daybreak.Services.Browser;
 public interface IBrowserExtensionsProducer
 {
     void RegisterExtension<T>()

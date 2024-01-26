@@ -1,6 +1,5 @@
 ﻿using Daybreak.Models.Github;
 using Daybreak.Models.Progress;
-using Daybreak.Services.BrowserExtensions;
 using System.Collections.Generic;
 using System;
 using System.IO;
@@ -16,6 +15,7 @@ using Ionic.Zip;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Daybreak.Services.Notifications;
+using Daybreak.Services.Browser;
 
 namespace Daybreak.Services.UBlockOrigin;
 public sealed class UBlockOriginService : IBrowserExtension

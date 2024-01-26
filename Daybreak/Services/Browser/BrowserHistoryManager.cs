@@ -1,6 +1,7 @@
 ﻿using Daybreak.Controls;
 using Daybreak.Models.Browser;
 using Microsoft.Web.WebView2.Core;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Core.Extensions;
@@ -9,6 +10,10 @@ using System.Linq;
 namespace Daybreak.Services.Browser;
 public sealed class BrowserHistoryManager : IBrowserHistoryManager, INotifyPropertyChanged
 {
+    private static readonly TimeSpan DebounceWindow = TimeSpan.FromMilliseconds(100);
+
+    private DateTime lastOperation = DateTime.Now;
+    private string lastUrlCache = string.Empty;
     private HashSet<ulong> eventIds = [];
     private bool userInitiated;
     private bool canGoBack;
@@ -46,7 +51,7 @@ public sealed class BrowserHistoryManager : IBrowserHistoryManager, INotifyPrope
     public void InitializeHistoryManager(ChromiumBrowserWrapper chromiumBrowserWrapper)
     {
         this.browserWrapper = chromiumBrowserWrapper.ThrowIfNull();
-        this.browserWrapper.WebBrowser.NavigationStarting += this.WebView_NavigationStarting;
+        this.browserWrapper.WebBrowser.NavigationCompleted += this.WebView_NavigationCompleted;
     }
 
     public void UnInitializeHistoryManager()
@@ -56,7 +61,7 @@ public sealed class BrowserHistoryManager : IBrowserHistoryManager, INotifyPrope
             return;
         }
 
-        this.browserWrapper.WebBrowser.NavigationStarting -= this.WebView_NavigationStarting;
+        this.browserWrapper.WebBrowser.NavigationCompleted -= this.WebView_NavigationCompleted;
     }
 
     public void GoBack()
@@ -137,9 +142,21 @@ public sealed class BrowserHistoryManager : IBrowserHistoryManager, INotifyPrope
         return this.BrowserHistory.History.Skip(this.BrowserHistory.CurrentPosition).FirstOrDefault();
     }
 
-    private void WebView_NavigationStarting(object? sender, CoreWebView2NavigationStartingEventArgs e)
+    private void WebView_NavigationCompleted(object? sender, CoreWebView2NavigationCompletedEventArgs e)
     {
         if (this.eventIds.Contains(e.NavigationId))
+        {
+            return;
+        }
+
+        // WebView2 sometimes calls navigation twice for the same url. This condition is supposed to handle the duplicate case
+        if (this.browserWrapper?.Address == this.lastUrlCache)
+        {
+            return;
+        }
+
+        // WebView2 when going forward will sometimes call navigation to the old url and quickly call navigation to new url. This condition is supposed to handle the duplicate operation
+        if (DateTime.Now - this.lastOperation < DebounceWindow)
         {
             return;
         }
@@ -151,27 +168,22 @@ public sealed class BrowserHistoryManager : IBrowserHistoryManager, INotifyPrope
             this.userInitiated = false;
             this.CanGoBack = this.BrowserHistory.CurrentPosition > 0;
             this.CanGoForward = this.BrowserHistory.CurrentPosition < this.BrowserHistory.History.Count - 1;
+            this.lastUrlCache = this.browserWrapper?.Address ?? string.Empty;
+            this.lastOperation = DateTime.Now;
             return;
         }
 
-        if (e.NavigationKind is CoreWebView2NavigationKind.Reload)
+        if (this.BrowserHistory.CurrentPosition < this.BrowserHistory.History.Count - 1)
         {
-            return;
-        }
-        else if (e.NavigationKind is CoreWebView2NavigationKind.BackOrForward)
-        {
-            e.Cancel = true;
-            return;
-        }
-        else if (this.BrowserHistory.CurrentPosition < this.BrowserHistory.History.Count - 1)
-        {
-            this.BrowserHistory.History.RemoveRange(this.BrowserHistory.CurrentPosition, this.BrowserHistory.History.Count - this.BrowserHistory.CurrentPosition);
+            this.BrowserHistory.History.RemoveRange(this.BrowserHistory.CurrentPosition + 1, this.BrowserHistory.History.Count - this.BrowserHistory.CurrentPosition - 1);
         }
 
-        this.BrowserHistory.History.Add(e.Uri);
+        this.BrowserHistory.History.Add(this.browserWrapper?.Address ?? string.Empty);
         this.BrowserHistory.CurrentPosition = this.BrowserHistory.History.Count - 1;
 
         this.CanGoBack = this.BrowserHistory.CurrentPosition > 0;
         this.CanGoForward = this.BrowserHistory.CurrentPosition < this.BrowserHistory.History.Count - 1;
+        this.lastUrlCache = this.browserWrapper?.Address ?? string.Empty;
+        this.lastOperation = DateTime.Now;
     }
 }

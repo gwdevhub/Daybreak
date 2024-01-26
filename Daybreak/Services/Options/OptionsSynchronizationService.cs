@@ -19,6 +19,9 @@ namespace Daybreak.Services.Options;
 
 public sealed class OptionsSynchronizationService : IOptionsSynchronizationService, IApplicationLifetimeService
 {
+    private static readonly TimeSpan StartupDelay = TimeSpan.FromMinutes(1);
+    private static readonly TimeSpan BackupFrequency = TimeSpan.FromSeconds(15);
+
     private readonly IOptionsProvider optionsProvider;
     private readonly IGraphClient graphClient;
     private readonly ILiveOptions<LauncherOptions> liveOptions;
@@ -143,10 +146,10 @@ public sealed class OptionsSynchronizationService : IOptionsSynchronizationServi
 
     public async void OnStartup()
     {
+        await Task.Delay(StartupDelay);
         while (true)
         {
-            await Task.Delay(15000);
-
+            await Task.Delay(BackupFrequency);
             var remoteOptions = await this.GetRemoteOptionsInternal(CancellationToken.None);
             var remoteOptionsSerialized = JsonConvert.SerializeObject(remoteOptions);
             var currentOptions = JsonConvert.SerializeObject(this.GetCurrentOptionsInternal());

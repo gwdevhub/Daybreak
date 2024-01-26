@@ -3,7 +3,6 @@ using Daybreak.Configuration.Options;
 using Daybreak.Models;
 using Daybreak.Models.Browser;
 using Daybreak.Models.Guildwars;
-using Daybreak.Services.BrowserExtensions;
 using Daybreak.Services.Browser;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Utils;
@@ -44,8 +43,6 @@ public partial class ChromiumBrowserWrapper : UserControl
     private const string BrowserDownloadLink = "https://developer.microsoft.com/en-us/microsoft-edge/webview2/";
 
     private static readonly Regex WebAddressRegex = BuildWebAddressRegex();
-    private static readonly object Lock = new();
-    private static readonly Regex WebAddressRegex = new("^((http|ftp|https)://)?([\\w_-]+(?:(?:\\.[\\w_-]+)+))([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?", RegexOptions.Compiled);
     private static readonly SemaphoreSlim SemaphoreSlim = new(1, 1);
 
     private static CoreWebView2Environment? CoreWebView2Environment;
@@ -110,8 +107,6 @@ public partial class ChromiumBrowserWrapper : UserControl
     public ChromiumBrowserWrapper()
         : this(
               Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IBrowserHistoryManager>(),
-              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IHttpClient<ChromiumBrowserWrapper>>(),
-        : this(
               Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IBrowserExtensionsManager>(),
               Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IHttpClient<ChromiumBrowserWrapper>>(),
               Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILiveOptions<BrowserOptions>>(),
