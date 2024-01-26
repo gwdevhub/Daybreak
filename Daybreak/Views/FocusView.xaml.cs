@@ -62,13 +62,13 @@ public partial class FocusView : UserControl
     private MainPlayerResourceContext mainPlayerResourceContext = new();
 
     [GenerateDependencyProperty]
+    private string browserAddress = string.Empty;
+
+    [GenerateDependencyProperty]
     private bool loadingPathingData;
 
     [GenerateDependencyProperty]
     private bool faultyPathingData;
-
-    [GenerateDependencyProperty]
-    private string browserAddress = string.Empty;
 
     [GenerateDependencyProperty]
     private bool inventoryVisible;
@@ -106,7 +106,7 @@ public partial class FocusView : UserControl
         if (e.Property == BrowserAddressProperty &&
             this.Browser.BrowserEnabled)
         {
-            this.liveUpdateableOptions.Value.BrowserUrl = this.BrowserAddress;
+            this.liveUpdateableOptions.Value.BrowserHistory = this.Browser.BrowserHistoryManager.BrowserHistory;
             this.liveUpdateableOptions.UpdateOption();
         }
         else if (e.Property == DataContextProperty &&
@@ -502,7 +502,7 @@ public partial class FocusView : UserControl
             return;
         }
 
-        this.BrowserAddress = this.liveUpdateableOptions.Value.BrowserUrl;
+        this.Browser.BrowserHistoryManager.SetBrowserHistory(this.liveUpdateableOptions.Value.BrowserHistory);
         this.InventoryVisible = this.liveUpdateableOptions.Value.InventoryComponentVisible;
         this.MinimapVisible = this.liveUpdateableOptions.Value.MinimapComponentVisible;
         this.cancellationTokenSource?.Dispose();

@@ -4,10 +4,9 @@ using System.Core.Extensions;
 using System.Extensions;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
-namespace Daybreak.Services.BrowserExtensions;
+namespace Daybreak.Services.Browser;
 
 public sealed class BrowserExtensionsManager : IBrowserExtensionsManager, IBrowserExtensionsProducer
 {

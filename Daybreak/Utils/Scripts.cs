@@ -63,4 +63,29 @@ public static class Scripts
                 window.chrome.webview.postMessage(jsonObject);
                 return jsonObject;
             }";
+
+    public const string CaptureNavigationButtons = @"
+    (function() {
+        if (!document._navigationButtonListenerAdded) {
+            document.addEventListener('mouseup', function(event) {
+                if (event.button === 3) {
+                    let jsonObject = 
+                    {
+                        Key: 'XButton1Pressed'
+                    };
+                    window.chrome.webview.postMessage(jsonObject);
+                    event.preventDefault();
+                } else if (event.button === 4) {
+                    let jsonObject = 
+                    {
+                        Key: 'XButton2Pressed'
+                    };
+                    window.chrome.webview.postMessage(jsonObject);
+                    event.preventDefault();
+                }
+            });
+            document._navigationButtonListenerAdded = true;
+        }
+    })();
+";
 }

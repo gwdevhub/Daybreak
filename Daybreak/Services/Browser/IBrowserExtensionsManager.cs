@@ -1,7 +1,7 @@
 ﻿using Microsoft.Web.WebView2.Core;
 using System.Threading.Tasks;
 
-namespace Daybreak.Services.BrowserExtensions;
+namespace Daybreak.Services.Browser;
 
 public interface IBrowserExtensionsManager
 {

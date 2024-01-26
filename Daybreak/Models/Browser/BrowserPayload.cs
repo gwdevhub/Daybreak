@@ -9,7 +9,9 @@ public class BrowserPayload
     public enum PayloadKeys
     {
         None,
-        ContextMenu
+        ContextMenu,
+        XButton1Pressed,
+        XButton2Pressed
     }
 
     [JsonProperty(nameof(Key))]

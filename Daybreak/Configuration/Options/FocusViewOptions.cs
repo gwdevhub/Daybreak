@@ -1,5 +1,6 @@
 ﻿using Daybreak.Attributes;
 using Daybreak.Configuration.FocusView;
+using Daybreak.Models.Browser;
 using Newtonsoft.Json;
 
 namespace Daybreak.Configuration.Options;
@@ -49,7 +50,7 @@ public sealed class FocusViewOptions
     [OptionName(Name = "Energy Display Mode", Description = "Sets how should the energy display show the information")]
     public PointsDisplay EnergyDisplay { get; set; }
 
-    [JsonProperty(nameof(BrowserUrl))]
+    [JsonProperty(nameof(BrowserHistory))]
     [OptionIgnore]
-    public string? BrowserUrl { get; set; } = "https://wiki.guildwars.com/wiki/Main_Page";
+    public BrowserHistory BrowserHistory { get; set; } = new();
 }
