@@ -7,6 +7,7 @@ public sealed record GuildWarsApplicationLaunchContext : IEquatable<GuildWarsApp
 {
     public LaunchConfigurationWithCredentials LaunchConfiguration { get; init; } = default!;
     public Process GuildWarsProcess { get; init; } = default!;
+    public uint ProcessId { get; init; } = default!;
 
     internal GuildWarsApplicationLaunchContext()
     {

@@ -93,7 +93,7 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
         }
 
 
-        return new GuildWarsApplicationLaunchContext { LaunchConfiguration = launchConfigurationWithCredentials, GuildWarsProcess = gwProcess };
+        return new GuildWarsApplicationLaunchContext { LaunchConfiguration = launchConfigurationWithCredentials, GuildWarsProcess = gwProcess, ProcessId = (uint)gwProcess.Id };
     }
 
     public void RestartDaybreak()
@@ -200,7 +200,7 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
             }
         };
 
-        var applicationLauncherContext = new ApplicationLauncherContext { Process = process, ExecutablePath = executable };
+        var applicationLauncherContext = new ApplicationLauncherContext { Process = process, ExecutablePath = executable, ProcessId = 0 };
         foreach(var mod in disabledmods)
         {
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.Value.ModStartupTimeout));
@@ -276,7 +276,7 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
         }
 
         // Reset launch context with the launched process
-        applicationLauncherContext = new ApplicationLauncherContext { ExecutablePath =  executable, Process = process };
+        applicationLauncherContext = new ApplicationLauncherContext { ExecutablePath =  executable, Process = process, ProcessId = (uint)pId };
         foreach (var mod in mods)
         {
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.Value.ModStartupTimeout));
@@ -479,25 +479,30 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
         return Process.GetProcessesByName(ProcessName)
             .Select(Process =>
             {
-                var AssociatedConfiguration = launchConfigurationWithCredentials.FirstOrDefault(c => ConfigurationMatchesProcess(c, Process));
-                return (Process, AssociatedConfiguration);
+                (var AssociatedConfiguration, _, var ProcessId) = launchConfigurationWithCredentials
+                    .Select(c => (c, ConfigurationMatchesProcess(c, Process, out var processId), processId))
+                    .FirstOrDefault(c => c.Item2);
+                return (Process, AssociatedConfiguration, ProcessId);
             })
             .Where(tuple => tuple.AssociatedConfiguration is not null)
             .Select(tuple => new GuildWarsApplicationLaunchContext
             {
                 GuildWarsProcess = tuple.Process,
-                LaunchConfiguration = tuple.AssociatedConfiguration
+                LaunchConfiguration = tuple.AssociatedConfiguration!,
+                ProcessId = tuple.ProcessId
             });
     }
 
-    private static bool ConfigurationMatchesProcess(LaunchConfigurationWithCredentials launchConfigurationWithCredentials, Process process)
+    private static bool ConfigurationMatchesProcess(LaunchConfigurationWithCredentials launchConfigurationWithCredentials, Process process, out uint processId)
     {
         try
         {
+            processId = (uint)process.Id;
             return launchConfigurationWithCredentials.ExecutablePath == process.MainModule?.FileName;
         }
         catch (Win32Exception ex) when (ex.Message.Contains("Access is denied") || ex.Message.Contains("Only part of a ReadProcessMemory or WriteProcessMemory request was completed."))
         {
+            processId = 0;
             /*
              * The process is running elevated. There is no way to use the standard C# libraries
              * to figure out what is the path of the running process.
@@ -522,6 +527,7 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
                         if (QueryFullProcessImageName(maybeDesiredProcessHandle, 0, nameBuffer, ref size) &&
                             nameBuffer.ToString() == launchConfigurationWithCredentials.ExecutablePath)
                         {
+                            processId = pe32.th32ProcessID;
                             CloseHandle(maybeDesiredProcessHandle);
                             return true;
                         }

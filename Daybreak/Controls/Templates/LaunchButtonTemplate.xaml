@@ -8,6 +8,7 @@
              xmlns:configs="clr-namespace:Daybreak.Models.LaunchConfigurations"
              xmlns:converters="clr-namespace:Daybreak.Converters"
              mc:Ignorable="d" 
+             DataContextChanged="UserControl_DataContextChanged"
              Loaded="UserControl_Loaded"
              Unloaded="UserControl_Unloaded"
              x:Name="_this"
@@ -25,7 +26,7 @@
                            FontSize="22"
                            Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                            Visibility="{Binding ElementName=_this, Path=GameRunning, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
-                <TextBlock Text="{Binding Credentials.Username}"
+                <TextBlock Text="{Binding Configuration.Credentials.Username}"
                                    FontSize="22"
                                    Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"/>
                 <TextBlock Text=" running"
@@ -33,10 +34,11 @@
                            Foreground="{StaticResource MahApps.Brushes.Accent}"
                            Visibility="{Binding ElementName=_this, Path=GameRunning, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
             </WrapPanel>
-            <TextBlock Text="{Binding ExecutablePath}"
+            <TextBlock Text="{Binding Configuration.ExecutablePath}"
                        Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                        FontSize="12"
-                       TextWrapping="Wrap"/>
+                       TextWrapping="Wrap"
+                       HorizontalAlignment="Center"/>
         </StackPanel>
         <StackPanel
             Visibility="{Binding ElementName=_this, Path=CanShowFocusView, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -45,14 +47,15 @@
                 <TextBlock Text="Attach "
                    FontSize="22"
                    Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" />
-                <TextBlock Text="{Binding Credentials.Username}"
+                <TextBlock Text="{Binding Configuration.Credentials.Username}"
                            FontSize="22"
                            Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"/>
             </WrapPanel>
-            <TextBlock Text="{Binding ExecutablePath}"
-               Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-               FontSize="12"
-               TextWrapping="Wrap"/>
+            <TextBlock Text="{Binding Configuration.ExecutablePath}"
+                       Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                       FontSize="12"
+                       TextWrapping="Wrap"
+                       HorizontalAlignment="Center"/>
         </StackPanel>
     </Grid>
 </UserControl>

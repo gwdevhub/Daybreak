@@ -113,22 +113,6 @@ else
     return;
 }
 
-Console.WriteLine("Deleting browser caches");
-try
-{
-    Directory.Delete("BrowserData", true);
-}
-catch(Exception)
-{
-}
-try
-{
-    Directory.Delete("Daybreak.exe.WebView2", true);
-}
-catch(Exception)
-{
-}
-
 Console.WriteLine("Launching application");
 var process = new Process
 {

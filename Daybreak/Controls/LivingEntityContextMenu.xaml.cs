@@ -58,7 +58,7 @@ public partial class LivingEntityContextMenu : UserControl
             this.PrimaryProfessionVisible = false;
         }
 
-        await this.guildwarsMemoryReader.EnsureInitialized(context.GuildWarsApplicationLaunchContext!.GuildWarsProcess, CancellationToken.None);
+        await this.guildwarsMemoryReader.EnsureInitialized(context.GuildWarsApplicationLaunchContext!.ProcessId, CancellationToken.None);
         this.EntityName = await this.guildwarsMemoryReader.GetEntityName(context.LivingEntity!, CancellationToken.None).ConfigureAwait(true);
     }
 

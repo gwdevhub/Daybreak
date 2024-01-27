@@ -29,4 +29,14 @@ public sealed class LaunchConfigurationWithCredentials : IEquatable<LaunchConfig
     {
         return HashCode.Combine(this.ExecutablePath, this.Credentials?.GetHashCode());
     }
+
+    public static bool operator ==(LaunchConfigurationWithCredentials l1, LaunchConfigurationWithCredentials l2)
+    {
+        return l1?.Equals(l2) is true;
+    }
+
+    public static bool operator !=(LaunchConfigurationWithCredentials l1, LaunchConfigurationWithCredentials l2)
+    {
+        return l1?.Equals(l2) is not true;
+    }
 }

@@ -9,6 +9,7 @@
              xmlns:converters="clr-namespace:Daybreak.Converters"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:templates="clr-namespace:Daybreak.Controls.Templates"
+             xmlns:controls="clr-namespace:Daybreak.Controls"
              mc:Ignorable="d"
              x:Name="_this"
              Loaded="StartupView_Loaded"
@@ -18,17 +19,22 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibility" />
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
     </UserControl.Resources>
-    <mah:SplitButton Height="100"
-                     Width="400"
-                     IsEnabled="{Binding ElementName=_this, Path=Loading, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
-                     ItemsSource="{Binding ElementName=_this, Path=LaunchConfigurations, Mode=OneWay}"
-                     SelectedItem="{Binding ElementName=_this, Path=LatestConfiguration, Mode=TwoWay}"
-                     Cursor="Hand"
-                     Click="SplitButton_Click">
-        <mah:SplitButton.ItemTemplate>
-            <DataTemplate>
-                <templates:LaunchButtonTemplate/>
-            </DataTemplate>
-        </mah:SplitButton.ItemTemplate>
-    </mah:SplitButton>
+    <Grid>
+        <controls:DropDownButton Height="100"
+                                 Width="400"
+                                 Background="{StaticResource MahApps.Brushes.ThemeBackground}"
+                                 Items="{Binding ElementName=_this, Path=LaunchConfigurations, Mode=OneWay}"
+                                 SelectedItem="{Binding ElementName=_this, Path=LatestConfiguration, Mode=TwoWay}"
+                                 ClickEnabled="{Binding ElementName=_this, Path=CanLaunch, Mode=OneWay}"
+                                 SelectionChanged="DropDownButton_SelectionChanged"
+                                 Clicked="DropDownButton_Clicked">
+            <controls:DropDownButton.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <templates:LaunchButtonTemplate VerticalAlignment="Center"/>
+                    </Grid>
+                </DataTemplate>
+            </controls:DropDownButton.ItemTemplate>
+        </controls:DropDownButton>
+    </Grid>
 </UserControl>

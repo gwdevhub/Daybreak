@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Core.Extensions;
-using System.Diagnostics;
 using System.Extensions;
 using System.Linq;
 using System.Net;
@@ -53,9 +52,8 @@ internal sealed class GWCAClient : IGWCAClient
         }
     }
 
-    public async Task<ConnectionContext?> Connect(Process process, CancellationToken cancellationToken)
+    public async Task<ConnectionContext?> Connect(uint processId, CancellationToken cancellationToken)
     {
-        process.ThrowIfNull();
         var listeners = IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners()
             .Where(i => i.Port >= PortRange.MinRange && i.Port < PortRange.MaxRange && i.Address.ToString() == IPAddress.Any.ToString());
         foreach(var listener in listeners)
@@ -71,19 +69,19 @@ internal sealed class GWCAClient : IGWCAClient
                 }
 
                 var id = await response.Content.ReadAsStringAsync(cancellationToken);
-                if (!int.TryParse(id, out var processId))
+                if (!int.TryParse(id, out var targetId))
                 {
                     scopedLogger.LogInformation("Received response is not an integer. Continuing");
                     continue;
                 }
 
-                if (processId != process.Id)
+                if (targetId != processId)
                 {
                     scopedLogger.LogInformation("Received response does not match desired process id. Continuing");
                     continue;
                 }
 
-                return new ConnectionContext(listener.Port);
+                return new ConnectionContext(listener.Port, processId);
             }
             catch (Exception e) when (e is TaskCanceledException or TimeoutException)
             {
@@ -97,6 +95,6 @@ internal sealed class GWCAClient : IGWCAClient
     public async Task<HttpResponseMessage> GetAsync(ConnectionContext connectionContext, string subPath, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetAsync), subPath);
-        return await this.httpClient.GetAsync($"{UrlTemplate.Replace(PortPlaceholder, connectionContext.Port.ToString())}/{subPath}");
+        return await this.httpClient.GetAsync($"{UrlTemplate.Replace(PortPlaceholder, connectionContext.Port.ToString())}/{subPath}", cancellationToken);
     }
 }
