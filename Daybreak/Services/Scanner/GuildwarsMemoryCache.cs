@@ -36,7 +36,7 @@ internal sealed class GuildwarsMemoryCache : IGuildwarsMemoryCache
 
     public async Task EnsureInitialized(GuildWarsApplicationLaunchContext context, CancellationToken cancellationToken)
     {
-        await this.guildwarsMemoryReader.EnsureInitialized(context.ThrowIfNull().GuildWarsProcess.ThrowIfNull(), cancellationToken);
+        await this.guildwarsMemoryReader.EnsureInitialized(context.ThrowIfNull().ProcessId, cancellationToken);
     }
 
     public Task<GameData?> ReadGameData(CancellationToken cancellationToken)

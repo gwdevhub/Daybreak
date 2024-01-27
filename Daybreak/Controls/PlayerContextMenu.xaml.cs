@@ -43,7 +43,7 @@ public partial class PlayerContextMenu : UserControl
             return;
         }
 
-        await this.guildwarsMemoryReader.EnsureInitialized(context.GuildWarsApplicationLaunchContext!.GuildWarsProcess, CancellationToken.None);
+        await this.guildwarsMemoryReader.EnsureInitialized(context.GuildWarsApplicationLaunchContext!.ProcessId, CancellationToken.None);
         this.PlayerName = await this.guildwarsMemoryReader.GetEntityName(context.Player!, CancellationToken.None).ConfigureAwait(true);
     }
 

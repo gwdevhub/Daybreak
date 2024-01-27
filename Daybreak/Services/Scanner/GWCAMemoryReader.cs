@@ -4,7 +4,6 @@ using Daybreak.Services.GWCA;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Core.Extensions;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Extensions;
@@ -15,18 +14,18 @@ using Daybreak.Models.Builds;
 using System.Windows;
 using Daybreak.Utils;
 using System.Text.RegularExpressions;
-using SharpNav;
-using SharpNav.Geometry;
 using Daybreak.Services.Pathfinding;
 
 namespace Daybreak.Services.Scanner;
 
-public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
+public sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
 {
-    private static readonly Regex ItemNameColorRegex = new(@"<c=.*?>|</c>", RegexOptions.Compiled);
+    private static readonly Regex ItemNameColorRegex = GenerateItemNameColorRegex();
     private readonly IPathfinder pathfinder;
     private readonly IGWCAClient client;
     private readonly ILogger<GWCAMemoryReader> logger;
+
+    private bool faulty = false;
 
     private ConnectionContext? connectionContextCache;
 
@@ -40,14 +39,19 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
         this.logger = logger.ThrowIfNull();
     }
 
-    public async Task EnsureInitialized(Process process, CancellationToken cancellationToken)
+    public async Task EnsureInitialized(uint processId, CancellationToken cancellationToken)
     {
-        process.ThrowIfNull();
+        if (this.faulty is false &&
+            this.connectionContextCache.HasValue &&
+            this.connectionContextCache.Value.ProcessId == processId)
+        {
+            return;
+        }
 
-        var maybeConnectionContext = await this.client.Connect(process, cancellationToken);
+        var maybeConnectionContext = await this.client.Connect(processId, cancellationToken);
         if (maybeConnectionContext is not ConnectionContext)
         {
-            throw new InvalidOperationException($"Unable to connect to desired process {process.Id}");
+            throw new InvalidOperationException($"Unable to connect to desired process {processId}");
         }
 
         this.connectionContextCache = maybeConnectionContext;
@@ -108,6 +112,7 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
         catch(Exception ex)
         {
             scopedLogger.LogError(ex, "Encountered exception while parsing response");
+            this.faulty = true;
         }
 
         return default;
@@ -152,6 +157,7 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
         catch (Exception ex)
         {
             scopedLogger.LogError(ex, "Encountered exception while parsing response");
+            this.faulty = true;
         }
 
         return default;
@@ -190,6 +196,7 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
         catch (Exception ex)
         {
             scopedLogger.LogError(ex, "Encountered exception while parsing response");
+            this.faulty = true;
         }
 
         return default;
@@ -227,6 +234,7 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
         catch (Exception ex)
         {
             scopedLogger.LogError(ex, "Encountered exception while parsing response");
+            this.faulty = true;
         }
 
         return default;
@@ -292,6 +300,7 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
         catch (Exception ex)
         {
             scopedLogger.LogError(ex, "Encountered exception while parsing response");
+            this.faulty = true;
         }
 
         return default;
@@ -329,6 +338,7 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
         catch (Exception ex)
         {
             scopedLogger.LogError(ex, "Encountered exception while parsing response");
+            this.faulty = true;
         }
 
         return default;
@@ -367,6 +377,7 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
         catch (Exception ex)
         {
             scopedLogger.LogError(ex, "Encountered exception while parsing response");
+            this.faulty = true;
         }
 
         return default;
@@ -418,6 +429,7 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
         catch (Exception ex)
         {
             scopedLogger.LogError(ex, "Encountered exception while parsing response");
+            this.faulty = true;
         }
 
         return default;
@@ -472,6 +484,7 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
         catch (Exception ex)
         {
             scopedLogger.LogError(ex, "Encountered exception while parsing response");
+            this.faulty = true;
         }
 
         return default;
@@ -517,6 +530,7 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
         catch (Exception ex)
         {
             scopedLogger.LogError(ex, "Encountered exception while parsing response");
+            this.faulty = true;
         }
 
         return default;
@@ -572,6 +586,7 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
         catch (Exception ex)
         {
             scopedLogger.LogError(ex, "Encountered exception while parsing response");
+            this.faulty = true;
         }
 
         return default;
@@ -609,6 +624,7 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
         catch (Exception ex)
         {
             scopedLogger.LogError(ex, "Encountered exception while parsing response");
+            this.faulty = true;
         }
 
         return default;
@@ -647,6 +663,7 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
         catch (Exception ex)
         {
             scopedLogger.LogError(ex, "Encountered exception while parsing response");
+            this.faulty = true;
         }
 
         return default;
@@ -654,6 +671,7 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
 
     public void Stop()
     {
+        this.connectionContextCache = default;
     }
 
     private static IBagContent ParsePayload(BagContentPayload bagContentPayload)
@@ -888,7 +906,7 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
         var adjacencyList = new List<List<int>>();
         for (var i = 0; i < trapezoids.Count; i++)
         {
-            adjacencyList.Add(originalAdjacencyList[i].ToList());
+            adjacencyList.Add([.. originalAdjacencyList[i]]);
         }
 
         for (var i = 0; i < computedPathingMaps.Count; i++)
@@ -957,4 +975,7 @@ public sealed class GWCAMemoryReader : IGuildwarsMemoryReader
 
         return new Rect(minX, minY, maxX - minX, maxY - minY);
     }
+
+    [GeneratedRegex(@"<c=.*?>|</c>", RegexOptions.Compiled)]
+    private static partial Regex GenerateItemNameColorRegex();
 }

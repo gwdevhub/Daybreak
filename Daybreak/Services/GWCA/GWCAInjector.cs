@@ -4,7 +4,6 @@ using Daybreak.Services.Injection;
 using Daybreak.Services.Notifications;
 using System.Collections.Generic;
 using System.Core.Extensions;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -61,7 +60,7 @@ internal sealed class GWCAInjector : IGWCAInjector
         ConnectionContext? connectionContext = default;
         for(var i = 0; i < MaxRetries; i++)
         {
-            if (await this.gwcaClient.Connect(applicationLauncherContext.Process, cancellationToken) is ConnectionContext newContext)
+            if (await this.gwcaClient.Connect(applicationLauncherContext.ProcessId, cancellationToken) is ConnectionContext newContext)
             {
                 connectionContext = newContext;
                 break;

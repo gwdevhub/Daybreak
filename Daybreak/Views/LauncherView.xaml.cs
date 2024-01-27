@@ -1,4 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Models;
 using Daybreak.Models.LaunchConfigurations;
 using Daybreak.Models.Onboarding;
 using Daybreak.Services.ApplicationLauncher;
@@ -9,7 +10,6 @@ using Daybreak.Services.Navigation;
 using Daybreak.Services.Onboarding;
 using Daybreak.Services.Screens;
 using System;
-using System.CodeDom.Compiler;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Core.Extensions;
@@ -38,14 +38,15 @@ public partial class LauncherView : UserControl
     private readonly IViewManager viewManager;
     private readonly IScreenManager screenManager;
     private readonly ILiveOptions<FocusViewOptions> focusViewOptions;
+    private readonly CancellationTokenSource cancellationTokenSource = new();
 
     [GenerateDependencyProperty]
-    private LaunchConfigurationWithCredentials latestConfiguration = default!;
+    private LauncherViewContext latestConfiguration = default!;
 
     [GenerateDependencyProperty]
-    private bool loading;
+    private bool canLaunch;
 
-    public ObservableCollection<LaunchConfigurationWithCredentials> LaunchConfigurations { get; } = [];
+    public ObservableCollection<LauncherViewContext> LaunchConfigurations { get; } = [];
 
     public LauncherView(
         IMenuService menuService,
@@ -68,7 +69,7 @@ public partial class LauncherView : UserControl
         this.InitializeComponent();
     }
 
-    private void CheckOnboardingState()
+    private bool IsOnboarded()
     {
         var onboardingStage = this.onboardingService.CheckOnboardingStage();
         if (onboardingStage is LauncherOnboardingStage.Default)
@@ -79,64 +80,103 @@ public partial class LauncherView : UserControl
         if (onboardingStage is LauncherOnboardingStage.NeedsCredentials or LauncherOnboardingStage.NeedsExecutable or LauncherOnboardingStage.NeedsConfiguration)
         {
             this.viewManager.ShowView<LauncherOnboardingView>(onboardingStage);
-            return;
+            return false;
         }
+
+        return true;
     }
 
     private void RetrieveLaunchConfigurations()
     {
-        this.LaunchConfigurations.ClearAnd().AddRange(this.launchConfigurationService.GetLaunchConfigurations());
-        this.LatestConfiguration = this.launchConfigurationService.GetLastLaunchConfigurationWithCredentials();
+        var latestLaunchConfiguration = this.launchConfigurationService.GetLastLaunchConfigurationWithCredentials();
+        this.LaunchConfigurations.ClearAnd().AddRange(this.launchConfigurationService.GetLaunchConfigurations().Select(c => new LauncherViewContext { Configuration = c, CanLaunch = false }));
+        this.LatestConfiguration = this.LaunchConfigurations.FirstOrDefault(c => c.Configuration?.Equals(latestLaunchConfiguration) is true);
+    }
+
+    private async void PeriodicallyCheckSelectedConfigState()
+    {
+        while (!this.cancellationTokenSource.IsCancellationRequested)
+        {
+            await this.Dispatcher.InvokeAsync(() => this.CanLaunch = this.LatestConfiguration?.CanLaunch ?? false);
+            await Task.Delay(TimeSpan.FromSeconds(1), this.cancellationTokenSource.Token);
+        }
     }
 
     private void StartupView_Loaded(object sender, RoutedEventArgs e)
     {
-        this.CheckOnboardingState();
+        if (!this.IsOnboarded())
+        {
+            return;
+        }
+
         this.RetrieveLaunchConfigurations();
+        this.PeriodicallyCheckSelectedConfigState();
     }
 
     private void StartupView_Unloaded(object sender, RoutedEventArgs e)
     {
+        this.cancellationTokenSource?.Cancel();
+        this.cancellationTokenSource?.Dispose();
     }
 
-    private async void SplitButton_Click(object sender, RoutedEventArgs e)
+    private async void DropDownButton_SelectionChanged(object _, object e)
     {
-        await this.Dispatcher.InvokeAsync(() => this.Loading = true);
-        if (this.LatestConfiguration is null)
+        if (e is not LauncherViewContext context)
         {
-            await this.Dispatcher.InvokeAsync(() => this.Loading = false);
+            return;
+        }
+
+        if (this.LatestConfiguration is null ||
+            this.LatestConfiguration.CanLaunch is false)
+        {
+            await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);
+        }
+        else
+        {
+            await this.Dispatcher.InvokeAsync(() => this.CanLaunch = true);
+        }
+    }
+
+    private async void DropDownButton_Clicked(object _, object e)
+    {
+        await this.Dispatcher.InvokeAsync(() => this.CanLaunch = true);
+        if (this.LatestConfiguration is null ||
+            this.LatestConfiguration.CanLaunch is false)
+        {
+            await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);
             return;
         }
 
         var launchingTask = await new TaskFactory().StartNew(async () =>
         {
             var latestConfig = await this.Dispatcher.InvokeAsync(() => this.LatestConfiguration);
-            if (this.applicationLauncher.GetGuildwarsProcess(latestConfig) is GuildWarsApplicationLaunchContext context)
+            if (this.applicationLauncher.GetGuildwarsProcess(latestConfig.Configuration!) is GuildWarsApplicationLaunchContext context)
             {
                 // Detected already running guildwars process
-                await this.Dispatcher.InvokeAsync(() => this.Loading = false);
+                await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);
                 if (this.focusViewOptions.Value.Enabled)
                 {
                     this.menuService.CloseMenu();
                     this.viewManager.ShowView<FocusView>(context);
                 }
 
+                this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(latestConfig.Configuration!);
                 return;
             }
 
             try
             {
-                var launchedContext = await this.applicationLauncher.LaunchGuildwars(latestConfig);
+                var launchedContext = await this.applicationLauncher.LaunchGuildwars(latestConfig.Configuration!);
                 if (launchedContext is null)
                 {
-                    await this.Dispatcher.InvokeAsync(() => this.Loading = false);
+                    await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);
                     return;
                 }
 
-                this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(latestConfig);
+                this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(latestConfig.Configuration!);
                 if (this.focusViewOptions.Value.Enabled)
                 {
-                    await this.Dispatcher.InvokeAsync(() => this.Loading = false);
+                    await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);
                     this.menuService.CloseMenu();
                     this.viewManager.ShowView<FocusView>(launchedContext);
                 }
@@ -147,6 +187,6 @@ public partial class LauncherView : UserControl
         }, TaskCreationOptions.LongRunning);
 
         await launchingTask;
-        await this.Dispatcher.InvokeAsync(() => this.Loading = false);
+        await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);
     }
 }
