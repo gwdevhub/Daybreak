@@ -50,6 +50,10 @@ public sealed class FocusViewOptions
     [OptionName(Name = "Energy Display Mode", Description = "Sets how should the energy display show the information")]
     public PointsDisplay EnergyDisplay { get; set; }
 
+    [JsonProperty(nameof(MinimapRotationEnabled))]
+    [OptionName(Name = "Minimap Rotation", Description = "When enabled, the minimap will rotate according to the player camera")]
+    public bool MinimapRotationEnabled { get; set; } = true;
+
     [JsonProperty(nameof(BrowserHistory))]
     [OptionIgnore]
     public BrowserHistory BrowserHistory { get; set; } = new();

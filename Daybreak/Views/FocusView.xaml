@@ -104,6 +104,7 @@
                                           GameData="{Binding ElementName=_this, Path=GameData, Mode=OneWay}"
                                           GameState="{Binding ElementName=_this, Path=GameState, Mode=OneWay}"
                                           PathingData="{Binding ElementName=_this, Path=PathingData, Mode=OneWay}"
+                                          CanRotate="{Binding ElementName=_this, Path=CanRotateMinimap, Mode=OneWay}"
                                           Zoom="0.04"
                                           ControlsVisible="True"
                                           MaximizeClicked="GuildwarsMinimap_MaximizeClicked"

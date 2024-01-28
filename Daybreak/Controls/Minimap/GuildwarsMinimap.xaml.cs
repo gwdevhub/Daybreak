@@ -24,6 +24,7 @@ using System.Diagnostics.Metrics;
 using System.Diagnostics;
 using Daybreak.Models.FocusView;
 using Daybreak.Models.LaunchConfigurations;
+using System.Configuration;
 
 namespace Daybreak.Controls.Minimap;
 
@@ -77,6 +78,10 @@ public partial class GuildwarsMinimap : UserControl
     private bool drawPositionHistory = true;
     [GenerateDependencyProperty]
     private bool controlsVisible;
+    [GenerateDependencyProperty]
+    private bool canRotate;
+    [GenerateDependencyProperty]
+    private double angle;
     [GenerateDependencyProperty]
     private int targetEntityId;
     [GenerateDependencyProperty]
@@ -187,6 +192,8 @@ public partial class GuildwarsMinimap : UserControl
             entity.Health = state?.Health ?? 0;
             entity.Energy = state?.Energy ?? 0;
         }
+
+        this.Angle = this.CanRotate ? (this.GameState.Camera.Yaw - (Math.PI / 2)) * (180 / Math.PI) : 0;
     }
 
     private void UpdateGameData()
