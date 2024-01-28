@@ -15,7 +15,6 @@ using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Linq;
-using System.Logging;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -75,6 +74,9 @@ public partial class FocusView : UserControl
 
     [GenerateDependencyProperty]
     private bool minimapVisible;
+
+    [GenerateDependencyProperty]
+    private bool canRotateMinimap;
 
     private bool browserMaximized = false;
     private bool minimapMaximized = false;
@@ -239,6 +241,7 @@ public partial class FocusView : UserControl
                 }
 
                 this.GameState = maybeGameState;
+                this.CanRotateMinimap = this.liveUpdateableOptions.Value.MinimapRotationEnabled;
             }
             catch (InvalidOperationException ex)
             {

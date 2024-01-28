@@ -2,7 +2,9 @@
 #include "GameStateModule.h"
 #include <GWCA/Managers/GameThreadMgr.h>
 #include <GWCA/Managers/AgentMgr.h>
+#include <GWCA/Managers/CameraMgr.h>
 #include <GWCA/GameEntities/Agent.h>
+#include <GWCA/GameEntities/Camera.h>
 #include <GWCA/Managers/MapMgr.h>
 #include <future>
 #include <payloads/GameStatePayload.h>
@@ -64,6 +66,12 @@ namespace Daybreak::Modules::GameStateModule {
 
         auto states = GetStates(agents);
         gamePayload.States = states;
+
+        auto camera = GW::CameraMgr::GetCamera();
+        Daybreak::Camera cameraPayload{};
+        cameraPayload.Pitch = camera->pitch;
+        cameraPayload.Yaw = camera->yaw;
+        gamePayload.Camera = cameraPayload;
         return gamePayload;
     }
 

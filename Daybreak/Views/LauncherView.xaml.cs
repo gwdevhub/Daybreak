@@ -40,6 +40,8 @@ public partial class LauncherView : UserControl
     private readonly ILiveOptions<FocusViewOptions> focusViewOptions;
     private readonly CancellationTokenSource cancellationTokenSource = new();
 
+    private bool launching;
+
     [GenerateDependencyProperty]
     private LauncherViewContext latestConfiguration = default!;
 
@@ -97,7 +99,11 @@ public partial class LauncherView : UserControl
     {
         while (!this.cancellationTokenSource.IsCancellationRequested)
         {
-            await this.Dispatcher.InvokeAsync(() => this.CanLaunch = this.LatestConfiguration?.CanLaunch ?? false);
+            if (!this.launching)
+            {
+                await this.Dispatcher.InvokeAsync(() => this.CanLaunch = this.LatestConfiguration?.CanLaunch ?? false);
+            }
+
             await Task.Delay(TimeSpan.FromSeconds(1), this.cancellationTokenSource.Token);
         }
     }
@@ -139,14 +145,8 @@ public partial class LauncherView : UserControl
 
     private async void DropDownButton_Clicked(object _, object e)
     {
-        await this.Dispatcher.InvokeAsync(() => this.CanLaunch = true);
-        if (this.LatestConfiguration is null ||
-            this.LatestConfiguration.CanLaunch is false)
-        {
-            await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);
-            return;
-        }
-
+        this.launching = true;
+        await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);
         var launchingTask = await new TaskFactory().StartNew(async () =>
         {
             var latestConfig = await this.Dispatcher.InvokeAsync(() => this.LatestConfiguration);
@@ -186,7 +186,14 @@ public partial class LauncherView : UserControl
             }
         }, TaskCreationOptions.LongRunning);
 
-        await launchingTask;
-        await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);
+        try
+        {
+            await launchingTask;
+        }
+        catch
+        {
+        }
+
+        this.launching = false;
     }
 }

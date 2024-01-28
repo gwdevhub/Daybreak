@@ -68,8 +68,13 @@
         </ContextMenu>
     </UserControl.Resources>
     <Grid>
-        <Image x:Name="MapDrawingHost" VerticalAlignment="Top" HorizontalAlignment="Left" Stretch="Fill"/>
-        <Image x:Name="EntitiesDrawingHost" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+        <Grid RenderTransformOrigin="0.5 0.5">
+            <Grid.RenderTransform>
+                <RotateTransform Angle="{Binding ElementName=_this, Path=Angle, Mode=OneWay}"/>
+            </Grid.RenderTransform>
+            <Image x:Name="MapDrawingHost" VerticalAlignment="Top" HorizontalAlignment="Left" Stretch="Fill" />
+            <Image x:Name="EntitiesDrawingHost" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+        </Grid>
         <Grid Background="{DynamicResource Daybreak.Brushes.Background}"
               VerticalAlignment="Bottom"
               HorizontalAlignment="Right"
@@ -79,15 +84,5 @@
                                     Clicked="MaximizeButton_Clicked"
                                     ToolTip="Maximize"/>
         </Grid>
-        <WrapPanel Background="{DynamicResource Daybreak.Brushes.Background}"
-                   VerticalAlignment="Top"
-                   HorizontalAlignment="Right" >
-            <TextBlock Text="{Binding ElementName=_this, Path=TargetEntityId, Mode=OneWay}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                       FontSize="16" Padding="5" />
-            <TextBlock Text=" - " Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                       FontSize="16" Padding="5" />
-            <TextBlock Text="{Binding ElementName=_this, Path=TargetEntityModelId, Mode=OneWay}" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                       FontSize="16" Padding="5" />
-        </WrapPanel>
     </Grid>
 </UserControl>

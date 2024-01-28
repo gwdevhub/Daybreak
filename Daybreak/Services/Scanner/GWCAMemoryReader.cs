@@ -581,7 +581,7 @@ public sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
                 };
             }).ToList();
 
-            return new GameState { States = states };
+            return new GameState { States = states, Camera = new Camera { Pitch = gameStatePayload.Camera?.Pitch ?? 0, Yaw = gameStatePayload.Camera?.Yaw ?? 0 }, };
         }
         catch (Exception ex)
         {
