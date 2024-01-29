@@ -70,10 +70,18 @@
     <Grid>
         <Grid RenderTransformOrigin="0.5 0.5">
             <Grid.RenderTransform>
-                <RotateTransform Angle="{Binding ElementName=_this, Path=Angle, Mode=OneWay}"/>
+                <TransformGroup x:Name="TransformGroup">
+                    <TranslateTransform X=""/>
+                    <ScaleTransform ScaleX="{Binding ElementName=_this, Path=Zoom, Mode=OneWay}"
+                                    ScaleY="{Binding ElementName=_this, Path=Zoom, Mode=OneWay}" />
+                    <RotateTransform Angle="{Binding ElementName=_this, Path=Angle, Mode=OneWay}"/>
+                </TransformGroup>
             </Grid.RenderTransform>
             <Image x:Name="MapDrawingHost" VerticalAlignment="Top" HorizontalAlignment="Left" Stretch="Fill" />
             <Image x:Name="EntitiesDrawingHost" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+        </Grid>
+        <Grid>
+            <Image x:Name="TestDrawingHost" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
         </Grid>
         <Grid Background="{DynamicResource Daybreak.Brushes.Background}"
               VerticalAlignment="Bottom"

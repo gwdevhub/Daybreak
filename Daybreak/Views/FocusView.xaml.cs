@@ -10,7 +10,6 @@ using Daybreak.Services.Scanner;
 using Daybreak.Views.Trade;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
