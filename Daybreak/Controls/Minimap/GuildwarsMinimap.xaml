@@ -70,12 +70,7 @@
     <Grid>
         <Grid RenderTransformOrigin="0.5 0.5">
             <Grid.RenderTransform>
-                <TransformGroup x:Name="TransformGroup">
-                    <TranslateTransform X=""/>
-                    <ScaleTransform ScaleX="{Binding ElementName=_this, Path=Zoom, Mode=OneWay}"
-                                    ScaleY="{Binding ElementName=_this, Path=Zoom, Mode=OneWay}" />
-                    <RotateTransform Angle="{Binding ElementName=_this, Path=Angle, Mode=OneWay}"/>
-                </TransformGroup>
+                <RotateTransform x:Name="RotateTransform" Angle="{Binding ElementName=_this, Path=Angle, Mode=OneWay}"/>
             </Grid.RenderTransform>
             <Image x:Name="MapDrawingHost" VerticalAlignment="Top" HorizontalAlignment="Left" Stretch="Fill" />
             <Image x:Name="EntitiesDrawingHost" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />

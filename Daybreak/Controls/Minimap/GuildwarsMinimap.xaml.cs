@@ -384,6 +384,8 @@ public partial class GuildwarsMinimap : UserControl
         //TODO: Delete
         using var testContext = testBitmap.GetBitmapContext();
         testBitmap.Clear(Colors.Transparent);
+        var centerPoint = new Point(this.originPoint.X * this.Zoom, this.originPoint.Y * this.Zoom);
+        testBitmap.DrawEllipseCentered((int)centerPoint.X, (int)centerPoint.Y, 10, 10, Colors.AliceBlue);
         foreach (var entity in this.GameData.LivingEntities!)
         {
             var x = (int)((entity.Position!.Value.X - this.originPoint.X) * this.Zoom);
@@ -399,6 +401,7 @@ public partial class GuildwarsMinimap : UserControl
         var x = (int)((entity.Position!.Value.X - this.originPoint.X) * this.Zoom);
         var y = 0 - (int)((entity.Position!.Value.Y - this.originPoint.Y) * this.Zoom);
         var entityPoint = new Point(x, y);
+        var centerPoint = new Point(this.originPoint.X * this.Zoom, this.originPoint.Y * this.Zoom);
         var finalEntityPoint = this.RotateTransform.Transform(entityPoint);
         return Math.Pow(mousePosition.X - finalEntityPoint.X, 2) + Math.Pow(mousePosition.Y - finalEntityPoint.Y, 2) < Math.Pow(EntitySize * this.Zoom, 2);
     }
@@ -553,7 +556,7 @@ public partial class GuildwarsMinimap : UserControl
 
     private void GuildwarsMinimap_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        this.initialClickPoint = Mouse.GetPosition(this);
+        this.initialClickPoint = Mouse.GetPosition(this) - this.originOffset;
         this.offsetRevert = 0;
         this.offsetRevertTime = DateTime.Now + this.offsetRevertDelay;
         this.dragging = true;
