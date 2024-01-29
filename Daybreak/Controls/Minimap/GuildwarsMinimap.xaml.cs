@@ -25,6 +25,7 @@ using System.Diagnostics;
 using Daybreak.Models.FocusView;
 using Daybreak.Models.LaunchConfigurations;
 using System.Configuration;
+using System.Runtime.CompilerServices;
 
 namespace Daybreak.Controls.Minimap;
 
@@ -375,8 +376,10 @@ public partial class GuildwarsMinimap : UserControl
     {
         var x = (int)((entity.Position!.Value.X - this.originPoint.X) * this.Zoom);
         var y = 0 - (int)((entity.Position!.Value.Y - this.originPoint.Y) * this.Zoom);
-
-        return Math.Pow(mousePosition.X - x, 2) + Math.Pow(mousePosition.Y - y, 2) < Math.Pow(EntitySize * this.Zoom, 2);
+        var entityPoint = new Point(x, y);
+        var centerPoint = new Point(this.ActualWidth / 2, this.ActualHeight / 2);
+        var finalEntityPoint = RotatePointAroundPivot(entityPoint, centerPoint, this.Angle);
+        return Math.Pow(mousePosition.X - finalEntityPoint.X, 2) + Math.Pow(mousePosition.Y - finalEntityPoint.Y, 2) < Math.Pow(EntitySize * this.Zoom, 2);
     }
 
     private void DragMinimap()
@@ -386,9 +389,14 @@ public partial class GuildwarsMinimap : UserControl
             return;
         }
 
+        var rad = -this.Angle * Math.PI / 180;
         var mousePosition = Mouse.GetPosition(this);
+        var offset = mousePosition - this.initialClickPoint;
+        var transformedOffset = new Vector((offset.X * Math.Cos(rad)) - (offset.Y * Math.Sin(rad)),
+                                            (offset.X * Math.Sin(rad)) + (offset.Y * Math.Cos(rad)));
+        this.initialClickPoint = mousePosition;
         this.offsetRevert = 0;
-        this.originOffset = mousePosition - this.initialClickPoint;
+        this.originOffset += transformedOffset;
         this.offsetRevertTime = DateTime.Now + this.offsetRevertDelay;
         this.UpdateGameData();
     }
@@ -525,7 +533,7 @@ public partial class GuildwarsMinimap : UserControl
 
     private void GuildwarsMinimap_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        this.initialClickPoint = Mouse.GetPosition(this) - this.originOffset;
+        this.initialClickPoint = Mouse.GetPosition(this);
         this.offsetRevert = 0;
         this.offsetRevertTime = DateTime.Now + this.offsetRevertDelay;
         this.dragging = true;
@@ -701,7 +709,7 @@ public partial class GuildwarsMinimap : UserControl
     {
         var delta = e.Delta > 0 ? 0.1 : -0.1;
         var previousZoom = this.Zoom;
-        var newZoom = this.Zoom + this.Zoom * delta;
+        var newZoom = this.Zoom + (this.Zoom * delta);
         this.originOffset *= newZoom / previousZoom;
         this.initialClickPoint = new Point(
             this.initialClickPoint.X * newZoom / previousZoom,
@@ -791,6 +799,26 @@ public partial class GuildwarsMinimap : UserControl
             mouseButtonEventArgs.Handled = true;
         }
     }
+
+    private static Point RotatePointAroundPivot(Point point, Point pivot, double angle)
+    {
+        // Translate the point to the pivot point
+        point = new Point(point.X - pivot.X, point.Y - pivot.Y);
+
+        // Convert angle to radians for the rotation
+        double radians = Math.PI / 180 * angle;
+
+        // Rotate the point around the pivot
+        double rotatedX = (point.X * Math.Cos(radians)) - (point.Y * Math.Sin(radians));
+        double rotatedY = (point.X * Math.Sin(radians)) + (point.Y * Math.Cos(radians));
+
+        // Translate the point back
+        rotatedX += pivot.X;
+        rotatedY += pivot.Y;
+
+        return new Point(rotatedX, rotatedY);
+    }
+
 
     private static bool PositionsCollide(Position position1, Position position2)
     {
