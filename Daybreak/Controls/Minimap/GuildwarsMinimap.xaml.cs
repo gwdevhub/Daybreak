@@ -347,16 +347,6 @@ public partial class GuildwarsMinimap : UserControl
             this.resizeEntities = false;
         }
 
-        if (this.TestDrawingHost.Source is not WriteableBitmap testBitmap ||
-            this.resizeEntities ||
-            testBitmap.PixelHeight != (int)this.ActualHeight ||
-            testBitmap.PixelWidth != (int)this.ActualWidth)
-        {
-            testBitmap = BitmapFactory.New((int)this.ActualWidth, (int)this.ActualHeight);
-            this.TestDrawingHost.Source = testBitmap;
-            this.resizeEntities = false;
-        }
-
         this.CalculatePathsToObjectives();
 
         var foregroundColor = this.FindResource("MahApps.Colors.ThemeBackground").Cast<Color>();
@@ -380,20 +370,6 @@ public partial class GuildwarsMinimap : UserControl
         this.drawingService.DrawEntities(bitmap, this.GameData, this.TargetEntityId);
         bitmap.Unlock();
         this.drawingLatency.Record(sw.ElapsedMilliseconds);
-
-        //TODO: Delete
-        using var testContext = testBitmap.GetBitmapContext();
-        testBitmap.Clear(Colors.Transparent);
-        var centerPoint = new Point(this.originPoint.X * this.Zoom, this.originPoint.Y * this.Zoom);
-        testBitmap.DrawEllipseCentered((int)centerPoint.X, (int)centerPoint.Y, 10, 10, Colors.AliceBlue);
-        foreach (var entity in this.GameData.LivingEntities!)
-        {
-            var x = (int)((entity.Position!.Value.X - this.originPoint.X) * this.Zoom);
-            var y = 0 - (int)((entity.Position!.Value.Y - this.originPoint.Y) * this.Zoom);
-            var entityPoint = new Point(x, y);
-            var finalEntityPoint = this.RotateTransform.Transform(entityPoint);
-            testBitmap.DrawEllipseCentered((int)finalEntityPoint.X, (int)finalEntityPoint.Y, 10, 10, Colors.Red);
-        }
     }
 
     private bool MouseOverEntity(IPositionalEntity entity, Point mousePosition)
@@ -401,8 +377,8 @@ public partial class GuildwarsMinimap : UserControl
         var x = (int)((entity.Position!.Value.X - this.originPoint.X) * this.Zoom);
         var y = 0 - (int)((entity.Position!.Value.Y - this.originPoint.Y) * this.Zoom);
         var entityPoint = new Point(x, y);
-        var centerPoint = new Point(this.originPoint.X * this.Zoom, this.originPoint.Y * this.Zoom);
-        var finalEntityPoint = this.RotateTransform.Transform(entityPoint);
+        var centerPoint = new Point(this.ActualWidth / 2, this.ActualHeight / 2);
+        var finalEntityPoint = RotatePointAroundPivot(entityPoint, centerPoint, this.Angle);
         return Math.Pow(mousePosition.X - finalEntityPoint.X, 2) + Math.Pow(mousePosition.Y - finalEntityPoint.Y, 2) < Math.Pow(EntitySize * this.Zoom, 2);
     }
 
@@ -418,8 +394,9 @@ public partial class GuildwarsMinimap : UserControl
         var offset = mousePosition - this.initialClickPoint;
         var transformedOffset = new Vector((offset.X * Math.Cos(rad)) - (offset.Y * Math.Sin(rad)),
                                             (offset.X * Math.Sin(rad)) + (offset.Y * Math.Cos(rad)));
+        this.initialClickPoint = mousePosition;
         this.offsetRevert = 0;
-        this.originOffset = transformedOffset;
+        this.originOffset += transformedOffset;
         this.offsetRevertTime = DateTime.Now + this.offsetRevertDelay;
         this.UpdateGameData();
     }
@@ -556,7 +533,7 @@ public partial class GuildwarsMinimap : UserControl
 
     private void GuildwarsMinimap_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        this.initialClickPoint = Mouse.GetPosition(this) - this.originOffset;
+        this.initialClickPoint = Mouse.GetPosition(this);
         this.offsetRevert = 0;
         this.offsetRevertTime = DateTime.Now + this.offsetRevertDelay;
         this.dragging = true;

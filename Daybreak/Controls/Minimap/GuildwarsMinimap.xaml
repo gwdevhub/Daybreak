@@ -75,9 +75,6 @@
             <Image x:Name="MapDrawingHost" VerticalAlignment="Top" HorizontalAlignment="Left" Stretch="Fill" />
             <Image x:Name="EntitiesDrawingHost" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
         </Grid>
-        <Grid>
-            <Image x:Name="TestDrawingHost" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
-        </Grid>
         <Grid Background="{DynamicResource Daybreak.Brushes.Background}"
               VerticalAlignment="Bottom"
               HorizontalAlignment="Right"
