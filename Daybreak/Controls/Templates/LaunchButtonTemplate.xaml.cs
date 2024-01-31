@@ -31,8 +31,14 @@ public partial class LaunchButtonTemplate : UserControl
     private readonly IApplicationLauncher applicationLauncher;
     private readonly ILiveOptions<FocusViewOptions> liveOptions;
 
+    [GenerateDependencyProperty(InitialValue = true)]
+    private bool canLaunch;
+
     [GenerateDependencyProperty]
-    private bool canShowFocusView;
+    private bool canKill;
+
+    [GenerateDependencyProperty]
+    private bool canAttach;
 
     [GenerateDependencyProperty]
     private bool gameRunning;
@@ -101,14 +107,20 @@ public partial class LaunchButtonTemplate : UserControl
         if (this.DataContext is not LauncherViewContext launcherViewContext ||
                 launcherViewContext.Configuration is null)
         {
+            this.CanLaunch = false;
+            this.CanAttach = false;
+            this.CanKill = false;
             return;
         }
 
         if (this.applicationLauncher.GetGuildwarsProcess(launcherViewContext.Configuration) is not GuildWarsApplicationLaunchContext context)
         {
             this.GameRunning = false;
-            this.CanShowFocusView = this.liveOptions.Value.Enabled && this.GameRunning;
+            this.CanLaunch = true;
+            this.CanAttach = this.liveOptions.Value.Enabled && this.GameRunning;
+            this.CanKill = false;
             launcherViewContext.CanLaunch = true;
+            launcherViewContext.CanKill = false;
             return;
         }
 
@@ -119,8 +131,11 @@ public partial class LaunchButtonTemplate : UserControl
         catch
         {
             this.GameRunning = false;
-            this.CanShowFocusView = this.liveOptions.Value.Enabled && this.GameRunning;
+            this.CanLaunch = false;
+            this.CanAttach = this.liveOptions.Value.Enabled && this.GameRunning;
+            this.CanKill = this.CanAttach ? false : true;
             launcherViewContext.CanLaunch = false;
+            launcherViewContext.CanKill = true;
             return;
         }
 
@@ -128,13 +143,19 @@ public partial class LaunchButtonTemplate : UserControl
         if (loginInfo?.Email != context.LaunchConfiguration.Credentials?.Username)
         {
             this.GameRunning = false;
-            this.CanShowFocusView = this.liveOptions.Value.Enabled && this.GameRunning;
+            this.CanAttach = this.liveOptions.Value.Enabled && this.GameRunning;
+            this.CanLaunch = true;
+            this.CanKill = false;
             launcherViewContext.CanLaunch = false;
+            launcherViewContext.CanKill = false;
             return;
         }
 
         this.GameRunning = true;
+        this.CanKill = false;
+        this.CanLaunch = false;
         launcherViewContext.CanLaunch = true;
-        this.CanShowFocusView = this.liveOptions.Value.Enabled && this.GameRunning;
+        launcherViewContext.CanKill = false;
+        this.CanAttach = this.liveOptions.Value.Enabled && this.GameRunning;
     }
 }
