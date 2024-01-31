@@ -83,10 +83,7 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
             return null;
         }
 
-        var gwProcess = await this.LaunchGuildwarsProcess(
-            credentials.Username!.ThrowIfNull(),
-            credentials.Password!.ThrowIfNull(),
-            launchConfigurationWithCredentials.ExecutablePath!.ThrowIfNull());
+        var gwProcess = await this.LaunchGuildwarsProcess(launchConfigurationWithCredentials);
         if (gwProcess is null)
         {
             return default;
@@ -163,8 +160,11 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
         Application.Current.Shutdown();
     }
 
-    private async Task<Process?> LaunchGuildwarsProcess(string email, Models.SecureString password, string executable)
+    private async Task<Process?> LaunchGuildwarsProcess(LaunchConfigurationWithCredentials launchConfigurationWithCredentials)
     {
+        var email = launchConfigurationWithCredentials.Credentials!.Username;
+        var password = launchConfigurationWithCredentials.Credentials!.Password;
+        var executable = launchConfigurationWithCredentials.ExecutablePath!;
         if (File.Exists(executable) is false)
         {
             throw new ExecutableNotFoundException($"Guildwars executable doesn't exist at {executable}");
@@ -293,7 +293,7 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
             }
             catch (Exception e)
             {
-                this.KillGuildWarsProcess(process);
+                this.KillGuildWarsProcess(new GuildWarsApplicationLaunchContext { GuildWarsProcess = process, LaunchConfiguration = launchConfigurationWithCredentials, ProcessId = (uint)pId });
                 this.logger.LogError(e, $"{mod.Name} unhandled exception");
                 this.notificationService.NotifyError(
                     title: $"{mod.Name} exception",
@@ -364,7 +364,7 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
                 }
                 catch (Exception e)
                 {
-                    this.KillGuildWarsProcess(process);
+                    this.KillGuildWarsProcess(new GuildWarsApplicationLaunchContext { GuildWarsProcess = process, LaunchConfiguration = launchConfigurationWithCredentials, ProcessId = (uint)pId });
                     this.logger.LogError(e, $"{mod.Name} unhandled exception");
                     this.notificationService.NotifyError(
                         title: $"{mod.Name} exception",
@@ -399,18 +399,11 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
         return Process.GetProcessesByName(ProcessName);
     }
 
-    public void KillGuildWarsProcess(Process process)
+    public void KillGuildWarsProcess(GuildWarsApplicationLaunchContext guildWarsApplicationLaunchContext)
     {
-        process.ThrowIfNull();
         try
         {
-            if (process.StartInfo is not null &&
-                process.StartInfo.FileName.Contains("Gw.exe", StringComparison.OrdinalIgnoreCase))
-            {
-                process.Kill(true);
-                return;
-            }
-
+            var process = guildWarsApplicationLaunchContext.GuildWarsProcess;
             if (process.MainModule?.FileName is not null &&
                 process.MainModule.FileName.Contains("Gw.exe", StringComparison.OrdinalIgnoreCase))
             {
@@ -418,12 +411,17 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
                 return;
             }
         }
+        catch (Win32Exception e)
+        {
+            this.logger.LogError(e, $"Insuficient privileges to kill GuildWars process with id {guildWarsApplicationLaunchContext.ProcessId}");
+            this.privilegeManager.RequestAdminPrivileges<LauncherView>("Insufficient privileges to kill Guild Wars process. Please restart as administrator and try again.");
+        }
         catch(Exception e)
         {
-            this.logger.LogError(e, $"Failed to kill GuildWars process with id {process?.Id}");
+            this.logger.LogError(e, $"Failed to kill GuildWars process with id {guildWarsApplicationLaunchContext.ProcessId}");
             this.notificationService.NotifyError(
                 title: "Failed to kill GuildWars process",
-                description: $"Encountered exception while trying to kill GuildWars process with id {process?.Id}. Check logs for details");
+                description: $"Encountered exception while trying to kill GuildWars process with id {guildWarsApplicationLaunchContext.ProcessId}. Check logs for details");
         }
     }
 

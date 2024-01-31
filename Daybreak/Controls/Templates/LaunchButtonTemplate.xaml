@@ -19,7 +19,7 @@
     </UserControl.Resources>
     <Grid>
         <StackPanel
-            Visibility="{Binding ElementName=_this, Path=CanShowFocusView, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+            Visibility="{Binding ElementName=_this, Path=CanLaunch, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
             <WrapPanel VerticalAlignment="Center"
                                HorizontalAlignment="Center">
                 <TextBlock Text="Launch "
@@ -29,10 +29,6 @@
                 <TextBlock Text="{Binding Configuration.Credentials.Username}"
                                    FontSize="22"
                                    Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"/>
-                <TextBlock Text=" running"
-                           FontSize="22"
-                           Foreground="{StaticResource MahApps.Brushes.Accent}"
-                           Visibility="{Binding ElementName=_this, Path=GameRunning, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
             </WrapPanel>
             <TextBlock Text="{Binding Configuration.ExecutablePath}"
                        Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
@@ -41,7 +37,7 @@
                        HorizontalAlignment="Center"/>
         </StackPanel>
         <StackPanel
-            Visibility="{Binding ElementName=_this, Path=CanShowFocusView, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+            Visibility="{Binding ElementName=_this, Path=CanAttach, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
             <WrapPanel VerticalAlignment="Center"
                        HorizontalAlignment="Center">
                 <TextBlock Text="Attach "
@@ -56,6 +52,23 @@
                        FontSize="12"
                        TextWrapping="Wrap"
                        HorizontalAlignment="Center"/>
+        </StackPanel>
+        <StackPanel
+            Visibility="{Binding ElementName=_this, Path=CanKill, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <WrapPanel VerticalAlignment="Center"
+               HorizontalAlignment="Center">
+                <TextBlock Text="Kill "
+                    FontSize="22"
+                    Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" />
+                <TextBlock Text="{Binding Configuration.Credentials.Username}"
+                   FontSize="22"
+                   Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"/>
+            </WrapPanel>
+            <TextBlock Text="{Binding Configuration.ExecutablePath}"
+               Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+               FontSize="12"
+               TextWrapping="Wrap"
+               HorizontalAlignment="Center"/>
         </StackPanel>
     </Grid>
 </UserControl>

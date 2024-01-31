@@ -10,6 +10,7 @@ using System.Extensions;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -31,6 +32,7 @@ public partial class LogsView : UserControl
     private readonly SimpleHighlightingBrush simpleOrangeHighlightingBrush;
     private readonly ILogsManager logManager;
     private readonly ILogger<LogsView> logger;
+    private readonly SemaphoreSlim semaphoreSlim = new(1, 1);
 
     private ScrollViewer? textEditorScrollViewer;
 
@@ -56,8 +58,9 @@ public partial class LogsView : UserControl
 
     private async void UpdateLogs()
     {
-        var logs = this.logManager.GetLogs(l => l.LogLevel < LogLevel.Trace).ToArray();
+        var logs = this.logManager.GetLogs().ToArray();
         this.TextEditor.Clear();
+        this.cachedText.Clear();
         if (logs.Length > MaximumLookbackPeriod)
         {
             var maximumLookbackPeriodMessage = string.Format(MaximumLookbackMessageTemplate, MaximumLookbackPeriod);
@@ -72,8 +75,9 @@ public partial class LogsView : UserControl
 
     private async Task WriteLogs(bool forceScrollToEnd, params Log[] logs)
     {
-        await this.Dispatcher.InvokeAsync(() =>
+        await this.Dispatcher.InvokeAsync(async () =>
         {
+            await this.semaphoreSlim.WaitAsync();
             foreach (var log in logs)
             {
                 var logTimeComponent = $"[{log.LogTime}]\t";
@@ -110,6 +114,8 @@ public partial class LogsView : UserControl
             {
                 this.TextEditor.ScrollToEnd();
             }
+
+            this.semaphoreSlim.Release();
         });
     }
 
@@ -148,6 +154,7 @@ public partial class LogsView : UserControl
             .GetField("scrollViewer", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?
             .GetValue(this.TextEditor)?.Cast<ScrollViewer>();
         this.logManager.ReceivedLog += this.LogManager_ReceivedLog;
+        this.UpdateLogs();
     }
 
     private void LogsView_Unloaded(object sender, RoutedEventArgs _)

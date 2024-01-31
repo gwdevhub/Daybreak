@@ -83,7 +83,7 @@ internal sealed class GWCAClient : IGWCAClient
 
                 return new ConnectionContext(listener.Port, processId);
             }
-            catch (Exception e) when (e is TaskCanceledException or TimeoutException)
+            catch (Exception e) when (e is TaskCanceledException or TimeoutException or HttpRequestException)
             {
                 scopedLogger.LogInformation($"Timed out trying to reach port. Continuing");
             }
