@@ -101,7 +101,7 @@ public partial class LauncherView : UserControl
         {
             if (!this.launching)
             {
-                await this.Dispatcher.InvokeAsync(() => this.CanLaunch = this.LatestConfiguration?.CanLaunch ?? false);
+                await this.SetLaunchButtonState();
             }
 
             await Task.Delay(TimeSpan.FromSeconds(1), this.cancellationTokenSource.Token);
@@ -127,73 +127,110 @@ public partial class LauncherView : UserControl
 
     private async void DropDownButton_SelectionChanged(object _, object e)
     {
-        if (e is not LauncherViewContext context)
+        if (e is not LauncherViewContext)
         {
             return;
         }
 
-        if (this.LatestConfiguration is null ||
-            this.LatestConfiguration.CanLaunch is false)
-        {
-            await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);
-        }
-        else
-        {
-            await this.Dispatcher.InvokeAsync(() => this.CanLaunch = true);
-        }
+        await this.SetLaunchButtonState();
     }
 
     private async void DropDownButton_Clicked(object _, object e)
     {
         this.launching = true;
         await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);
-        var launchingTask = await new TaskFactory().StartNew(async () =>
+
+        if (this.LatestConfiguration.CanKill)
         {
-            var latestConfig = await this.Dispatcher.InvokeAsync(() => this.LatestConfiguration);
-            if (this.applicationLauncher.GetGuildwarsProcess(latestConfig.Configuration!) is GuildWarsApplicationLaunchContext context)
-            {
-                // Detected already running guildwars process
-                await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);
-                if (this.focusViewOptions.Value.Enabled)
-                {
-                    this.menuService.CloseMenu();
-                    this.viewManager.ShowView<FocusView>(context);
-                }
-
-                this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(latestConfig.Configuration!);
-                return;
-            }
-
+            var killingTask = await new TaskFactory().StartNew(this.KillGuildWars, TaskCreationOptions.LongRunning);
             try
             {
-                var launchedContext = await this.applicationLauncher.LaunchGuildwars(latestConfig.Configuration!);
-                if (launchedContext is null)
-                {
-                    await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);
-                    return;
-                }
-
-                this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(latestConfig.Configuration!);
-                if (this.focusViewOptions.Value.Enabled)
-                {
-                    await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);
-                    this.menuService.CloseMenu();
-                    this.viewManager.ShowView<FocusView>(launchedContext);
-                }
+                await killingTask;
             }
-            catch (Exception)
+            catch
             {
             }
-        }, TaskCreationOptions.LongRunning);
-
-        try
-        {
-            await launchingTask;
         }
-        catch
+        else
         {
+            var launchingTask = await new TaskFactory().StartNew(this.LaunchGuildWars, TaskCreationOptions.LongRunning);
+            try
+            {
+                await launchingTask;
+            }
+            catch
+            {
+            }
         }
 
         this.launching = false;
+    }
+
+    private async Task SetLaunchButtonState()
+    {
+        if (this.LatestConfiguration is null)
+        {
+            await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);
+            return;
+        }
+
+        if (this.LatestConfiguration.CanKill is true)
+        {
+            await this.Dispatcher.InvokeAsync(() => this.CanLaunch = true);
+            return;
+        }
+
+        await this.Dispatcher.InvokeAsync(() => this.CanLaunch = this.LatestConfiguration.CanLaunch);
+    }
+
+    private async Task KillGuildWars()
+    {
+        var latestConfig = await this.Dispatcher.InvokeAsync(() => this.LatestConfiguration);
+        var context = this.applicationLauncher.GetGuildwarsProcess(latestConfig.Configuration!);
+        if (context is null)
+        {
+            return;
+        }
+
+        this.applicationLauncher.KillGuildWarsProcess(context);
+    }
+
+    private async Task LaunchGuildWars()
+    {
+        var latestConfig = await this.Dispatcher.InvokeAsync(() => this.LatestConfiguration);
+        if (this.applicationLauncher.GetGuildwarsProcess(latestConfig.Configuration!) is GuildWarsApplicationLaunchContext context)
+        {
+            // Detected already running guildwars process
+            await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);
+            if (this.focusViewOptions.Value.Enabled)
+            {
+                this.menuService.CloseMenu();
+                this.viewManager.ShowView<FocusView>(context);
+            }
+
+            this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(latestConfig.Configuration!);
+            return;
+        }
+
+        try
+        {
+            var launchedContext = await this.applicationLauncher.LaunchGuildwars(latestConfig.Configuration!);
+            if (launchedContext is null)
+            {
+                await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);
+                return;
+            }
+
+            this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(latestConfig.Configuration!);
+            if (this.focusViewOptions.Value.Enabled)
+            {
+                await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);
+                this.menuService.CloseMenu();
+                this.viewManager.ShowView<FocusView>(launchedContext);
+            }
+        }
+        catch (Exception)
+        {
+        }
     }
 }

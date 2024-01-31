@@ -6,14 +6,17 @@ using Daybreak.Services.ApplicationLauncher;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Experience;
 using Daybreak.Services.Navigation;
+using Daybreak.Services.Notifications;
 using Daybreak.Services.Scanner;
 using Daybreak.Views.Trade;
+using LiveChartsCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -29,10 +32,12 @@ public partial class FocusView : UserControl
 {
     private const string NamePlaceholder = "[NamePlaceholder]";
     private const string WikiUrl = "https://wiki.guildwars.com/wiki/[NamePlaceholder]";
+    private const int MaxRetries = 5;
 
     private static readonly TimeSpan UninitializedBackoff = TimeSpan.FromSeconds(15);
     private static readonly TimeSpan GameDataFrequency = TimeSpan.FromSeconds(1);
 
+    private readonly INotificationService notificationService;
     private readonly IBuildTemplateManager buildTemplateManager;
     private readonly IApplicationLauncher applicationLauncher;
     private readonly IGuildwarsMemoryCache guildwarsMemoryCache;
@@ -83,6 +88,7 @@ public partial class FocusView : UserControl
     private CancellationTokenSource? cancellationTokenSource;
 
     public FocusView(
+        INotificationService notificationService,
         IBuildTemplateManager buildTemplateManager,
         IApplicationLauncher applicationLauncher,
         IGuildwarsMemoryCache guildwarsMemoryCache,
@@ -91,6 +97,7 @@ public partial class FocusView : UserControl
         ILiveUpdateableOptions<FocusViewOptions> liveUpdateableOptions,
         ILogger<FocusView> logger)
     {
+        this.notificationService = notificationService.ThrowIfNull();
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
         this.applicationLauncher = applicationLauncher.ThrowIfNull();
         this.guildwarsMemoryCache = guildwarsMemoryCache.ThrowIfNull();
@@ -135,7 +142,7 @@ public partial class FocusView : UserControl
             return;
         }
 
-        var pathingMeta = await this.guildwarsMemoryCache.ReadPathingMetaData(this.cancellationTokenSource?.Token ?? CancellationToken.None);
+        var pathingMeta = await this.guildwarsMemoryCache.ReadPathingMetaData(this.cancellationTokenSource?.Token ?? CancellationToken.None) ?? throw new HttpRequestException();
         if (pathingMeta?.TrapezoidCount == this.PathingData?.Trapezoids?.Count ||
             this.cancellationTokenSource?.IsCancellationRequested is not false)
         {
@@ -144,7 +151,7 @@ public partial class FocusView : UserControl
         }
 
         await this.Dispatcher.InvokeAsync(() => this.LoadingPathingData = true);
-        var maybePathingData = await this.guildwarsMemoryCache.ReadPathingData(this.cancellationTokenSource?.Token ?? CancellationToken.None);
+        var maybePathingData = await this.guildwarsMemoryCache.ReadPathingData(this.cancellationTokenSource?.Token ?? CancellationToken.None) ?? throw new HttpRequestException();
         if (maybePathingData is not PathingData pathingData ||
             pathingData.Trapezoids is null ||
             pathingData.Trapezoids.Count == 0)
@@ -162,6 +169,7 @@ public partial class FocusView : UserControl
     private async void PeriodicallyReadPathingData(CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.PeriodicallyReadPathingData), string.Empty);
+        var retries = 0;
         while (!cancellationToken.IsCancellationRequested)
         {
             try
@@ -179,6 +187,7 @@ public partial class FocusView : UserControl
                 await Task.WhenAll(
                     this.UpdatePathingData(),
                     Task.Delay(1000, cancellationToken)).ConfigureAwait(true);
+                retries = 0;
 
             }
             catch (InvalidOperationException ex)
@@ -186,7 +195,7 @@ public partial class FocusView : UserControl
                 scopedLogger.LogError(ex, "Encountered invalid operation exception. Cancelling periodic reading");
                 return;
             }
-            catch (Exception ex) when (ex is TimeoutException or OperationCanceledException)
+            catch (Exception ex) when (ex is TimeoutException or OperationCanceledException or HttpRequestException)
             {
                 if (this.DataContext is not GuildWarsApplicationLaunchContext context)
                 {
@@ -200,8 +209,20 @@ public partial class FocusView : UserControl
                 }
                 catch (InvalidOperationException innerEx)
                 {
-                    scopedLogger.LogError(innerEx, "Could not ensure connection is initialized. Backing off before retrying");
-                    await Task.Delay(UninitializedBackoff, cancellationToken);
+                    retries++;
+                    if (retries >= MaxRetries)
+                    {
+                        scopedLogger.LogError(innerEx, "Could not ensure connection is initialized. Returning to launcher view");
+                        this.notificationService.NotifyError(
+                            title: "GuildWars unresponsive",
+                            description: "Could not connect to Guild Wars instance. Returning to Launcher view");
+                        this.viewManager.ShowView<LauncherView>();
+                    }
+                    else
+                    {
+                        scopedLogger.LogError(innerEx, "Could not ensure connection is initialized. Backing off before retrying");
+                        await Task.Delay(UninitializedBackoff, cancellationToken);
+                    }
                 }
             }
             catch (Exception ex)
@@ -214,6 +235,7 @@ public partial class FocusView : UserControl
     private async void PeriodicallyReadGameState(CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.PeriodicallyReadGameState), string.Empty);
+        var retries = 0;
         while (!cancellationToken.IsCancellationRequested)
         {
             try
@@ -233,21 +255,17 @@ public partial class FocusView : UserControl
                     readGameStateTask,
                     Task.Delay(16, cancellationToken)).ConfigureAwait(true);
 
-                var maybeGameState = await readGameStateTask;
-                if (maybeGameState is null)
-                {
-                    continue;
-                }
-
+                var maybeGameState = await readGameStateTask ?? throw new HttpRequestException();
                 this.GameState = maybeGameState;
                 this.CanRotateMinimap = this.liveUpdateableOptions.Value.MinimapRotationEnabled;
+                retries = 0;
             }
             catch (InvalidOperationException ex)
             {
                 scopedLogger.LogError(ex, "Encountered invalid operation exception. Cancelling periodic reading");
                 return;
             }
-            catch (Exception ex) when (ex is TimeoutException or OperationCanceledException)
+            catch (Exception ex) when (ex is TimeoutException or OperationCanceledException or HttpRequestException)
             {
                 if (this.DataContext is not GuildWarsApplicationLaunchContext context)
                 {
@@ -261,8 +279,20 @@ public partial class FocusView : UserControl
                 }
                 catch (InvalidOperationException innerEx)
                 {
-                    scopedLogger.LogError(innerEx, "Could not ensure connection is initialized. Backing off before retrying");
-                    await Task.Delay(UninitializedBackoff, cancellationToken);
+                    retries++;
+                    if (retries >= MaxRetries)
+                    {
+                        scopedLogger.LogError(innerEx, "Could not ensure connection is initialized. Returning to launcher view");
+                        this.notificationService.NotifyError(
+                            title: "GuildWars unresponsive",
+                            description: "Could not connect to Guild Wars instance. Returning to Launcher view");
+                        this.viewManager.ShowView<LauncherView>();
+                    }
+                    else
+                    {
+                        scopedLogger.LogError(innerEx, "Could not ensure connection is initialized. Backing off before retrying");
+                        await Task.Delay(UninitializedBackoff, cancellationToken);
+                    }
                 }
             }
             catch (Exception ex)
@@ -275,6 +305,7 @@ public partial class FocusView : UserControl
     private async void PeriodicallyReadGameData(CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.PeriodicallyReadGameData), string.Empty);
+        var retries = 0;
         while (!cancellationToken.IsCancellationRequested)
         {
             try
@@ -294,7 +325,7 @@ public partial class FocusView : UserControl
                     readGameDataTask,
                     Task.Delay(GameDataFrequency, cancellationToken)).ConfigureAwait(true);
 
-                var maybeGameData = await readGameDataTask;
+                var maybeGameData = await readGameDataTask ?? throw new HttpRequestException();
                 if (maybeGameData is null)
                 {
                     continue;
@@ -323,13 +354,14 @@ public partial class FocusView : UserControl
                 }
 
                 this.GameData = maybeGameData;
+                retries = 0;
             }
             catch (InvalidOperationException ex)
             {
                 scopedLogger.LogError(ex, "Encountered invalid operation exception. Cancelling periodic reading");
                 return;
             }
-            catch (Exception ex) when (ex is TimeoutException or OperationCanceledException)
+            catch (Exception ex) when (ex is TimeoutException or OperationCanceledException or HttpRequestException)
             {
                 if (this.DataContext is not GuildWarsApplicationLaunchContext context)
                 {
@@ -343,8 +375,20 @@ public partial class FocusView : UserControl
                 }
                 catch (InvalidOperationException innerEx)
                 {
-                    scopedLogger.LogError(innerEx, "Could not ensure connection is initialized. Backing off before retrying");
-                    await Task.Delay(UninitializedBackoff, cancellationToken);
+                    retries++;
+                    if (retries >= MaxRetries)
+                    {
+                        scopedLogger.LogError(innerEx, "Could not ensure connection is initialized. Returning to launcher view");
+                        this.notificationService.NotifyError(
+                            title: "GuildWars unresponsive",
+                            description: "Could not connect to Guild Wars instance. Returning to Launcher view");
+                        this.viewManager.ShowView<LauncherView>();
+                    }
+                    else
+                    {
+                        scopedLogger.LogError(innerEx, "Could not ensure connection is initialized. Backing off before retrying");
+                        await Task.Delay(UninitializedBackoff, cancellationToken);
+                    }
                 }
             }
             catch (Exception ex)
@@ -357,6 +401,7 @@ public partial class FocusView : UserControl
     private async void PeriodicallyReadInventoryData(CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.PeriodicallyReadInventoryData), string.Empty);
+        var retries = 0;
         while (!cancellationToken.IsCancellationRequested)
         {
             try
@@ -376,15 +421,16 @@ public partial class FocusView : UserControl
                     readInventoryTask,
                     Task.Delay(1000, cancellationToken)).ConfigureAwait(true);
 
-                var maybeInventoryData = await readInventoryTask;
+                var maybeInventoryData = await readInventoryTask ?? throw new HttpRequestException();
                 if (maybeInventoryData is null)
                 {
                     continue;
                 }
 
                 this.InventoryData = maybeInventoryData;
+                retries = 0;
             }
-            catch (Exception ex) when (ex is TimeoutException or OperationCanceledException)
+            catch (Exception ex) when (ex is TimeoutException or OperationCanceledException or HttpRequestException)
             {
                 if (this.DataContext is not GuildWarsApplicationLaunchContext context)
                 {
@@ -398,8 +444,20 @@ public partial class FocusView : UserControl
                 }
                 catch (InvalidOperationException innerEx)
                 {
-                    scopedLogger.LogError(innerEx, "Could not ensure connection is initialized. Backing off before retrying");
-                    await Task.Delay(UninitializedBackoff, cancellationToken);
+                    retries++;
+                    if (retries >= MaxRetries)
+                    {
+                        scopedLogger.LogError(innerEx, "Could not ensure connection is initialized. Returning to launcher view");
+                        this.notificationService.NotifyError(
+                            title: "GuildWars unresponsive",
+                            description: "Could not connect to Guild Wars instance. Returning to Launcher view");
+                        this.viewManager.ShowView<LauncherView>();
+                    }
+                    else
+                    {
+                        scopedLogger.LogError(innerEx, "Could not ensure connection is initialized. Backing off before retrying");
+                        await Task.Delay(UninitializedBackoff, cancellationToken);
+                    }
                 }
             }
             catch (Exception ex)
@@ -412,6 +470,7 @@ public partial class FocusView : UserControl
     private async void PeriodicallyReadMainPlayerContextData(CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.PeriodicallyReadMainPlayerContextData), string.Empty);
+        var retries = 0;
         while (!cancellationToken.IsCancellationRequested)
         {
             try
@@ -443,9 +502,9 @@ public partial class FocusView : UserControl
                     readMainPlayerDataTask,
                     Task.Delay(16, cancellationToken)).ConfigureAwait(true);
 
-                var userData = await readUserDataTask;
-                var sessionData = await readSessionDataTask;
-                var mainPlayerData = await readMainPlayerDataTask;
+                var userData = await readUserDataTask ?? throw new HttpRequestException();
+                var sessionData = await readSessionDataTask ?? throw new HttpRequestException();
+                var mainPlayerData = await readMainPlayerDataTask ?? throw new HttpRequestException();
                 if (userData?.User is null ||
                     sessionData?.Session is null ||
                     mainPlayerData?.PlayerInformation is null ||
@@ -466,13 +525,14 @@ public partial class FocusView : UserControl
 
                 this.MainPlayerDataValid = true;
                 this.Browser.Visibility = this.minimapMaximized ? Visibility.Hidden : Visibility.Visible;
+                retries = 0;
             }
             catch (InvalidOperationException ex)
             {
                 scopedLogger.LogError(ex, "Encountered invalid operation exception. Cancelling periodic main player reading");
                 return;
             }
-            catch (Exception ex) when (ex is TimeoutException or OperationCanceledException)
+            catch (Exception ex) when (ex is TimeoutException or OperationCanceledException or HttpRequestException)
             {
                 if (this.DataContext is not GuildWarsApplicationLaunchContext context)
                 {
@@ -486,8 +546,20 @@ public partial class FocusView : UserControl
                 }
                 catch (InvalidOperationException innerEx)
                 {
-                    scopedLogger.LogError(innerEx, "Could not ensure connection is initialized. Backing off before retrying");
-                    await Task.Delay(UninitializedBackoff, cancellationToken);
+                    retries++;
+                    if (retries >= MaxRetries)
+                    {
+                        scopedLogger.LogError(innerEx, "Could not ensure connection is initialized. Returning to launcher view");
+                        this.notificationService.NotifyError(
+                            title: "GuildWars unresponsive",
+                            description: "Could not connect to Guild Wars instance. Returning to Launcher view");
+                        this.viewManager.ShowView<LauncherView>();
+                    }
+                    else
+                    {
+                        scopedLogger.LogError(innerEx, "Could not ensure connection is initialized. Backing off before retrying");
+                        await Task.Delay(UninitializedBackoff, cancellationToken);
+                    }
                 }
             }
             catch (Exception ex)
