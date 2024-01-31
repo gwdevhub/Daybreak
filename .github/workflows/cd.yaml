@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        targetplatform: [x86]
+        targetplatform: [x64]
 
     runs-on: windows-latest
 
@@ -96,6 +96,11 @@ jobs:
       run: dotnet publish .\Daybreak.7ZipExtractor\Daybreak.7ZipExtractor.csproj -c $env:Configuration -r $env:RuntimeIdentifier --property:SolutionDir=$env:GITHUB_WORKSPACE -p:PublishReadyToRun=true -p:PublishSingleFile=false --self-contained true -o .\Publish
       env:
         RuntimeIdentifier: win-${{ matrix.targetplatform }}
+
+    - name: Create publish injector files
+      run: dotnet publish .\Daybreak.Injector\Daybreak.Injector.csproj -c $env:Configuration -r $env:RuntimeIdentifier --property:SolutionDir=$env:GITHUB_WORKSPACE -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained true -o .\Publish
+      env:
+        RuntimeIdentifier: win-x86
 
     - name: Pack publish files
       run: |
