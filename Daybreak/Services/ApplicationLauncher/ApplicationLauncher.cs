@@ -411,7 +411,11 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
                 return;
             }
         }
-        catch (Win32Exception e)
+        catch (Win32Exception e) when (e.Message.Contains("Only part of a ReadProcessMemory or WriteProcessMemory request was completed"))
+        {
+            guildWarsApplicationLaunchContext.GuildWarsProcess.Kill();
+        }
+        catch (Win32Exception e) when (e.Message.Contains("Access is denied"))
         {
             this.logger.LogError(e, $"Insuficient privileges to kill GuildWars process with id {guildWarsApplicationLaunchContext.ProcessId}");
             this.privilegeManager.RequestAdminPrivileges<LauncherView>("Insufficient privileges to kill Guild Wars process. Please restart as administrator and try again.");
