@@ -178,12 +178,9 @@ internal sealed class GraphClient : IGraphClient
             }
 
             build.SourceUrl = buildFile.SourceUrl;
-            return new BuildEntry
-            {
-                Build = build,
-                Name = buildFile.FileName,
-                PreviousName = buildFile.FileName
-            };
+            build.Name = buildFile.FileName;
+            build.PreviousName = buildFile.FileName;
+            return build;
         }).Where(entry => entry is not null).ToList();
         _ = compiledBuilds?.Do(this.buildTemplateManager.SaveBuild!).ToList();
 
@@ -215,12 +212,9 @@ internal sealed class GraphClient : IGraphClient
             }
 
             build.SourceUrl = buildFile.SourceUrl;
-            return new BuildEntry
-            {
-                Build = build,
-                Name = buildFile.FileName,
-                PreviousName = buildFile.FileName,
-            };
+            build.Name = buildFile.FileName;
+            build.PreviousName = buildFile.FileName;
+            return build;
         }).Where(entry => entry is not null).ToList();
         _ = compiledBuilds?.Do(this.buildTemplateManager.SaveBuild!).ToList();
 
@@ -309,7 +303,7 @@ internal sealed class GraphClient : IGraphClient
         return JsonConvert.DeserializeObject<TokenResponse>(await response.Content.ReadAsStringAsync())!;
     }
 
-    private async Task<bool> PutBuild(BuildEntry buildEntry)
+    private async Task<bool> PutBuild(IBuildEntry buildEntry)
     {
         if (this.buildsCache is null)
         {
@@ -319,8 +313,8 @@ internal sealed class GraphClient : IGraphClient
         var buildFile = new BuildFile
         {
             FileName = buildEntry.Name,
-            TemplateCode = this.buildTemplateManager.EncodeTemplate(buildEntry.Build!),
-            SourceUrl = buildEntry.Build?.SourceUrl
+            TemplateCode = this.buildTemplateManager.EncodeTemplate(buildEntry),
+            SourceUrl = buildEntry.SourceUrl
         };
 
         var buildList = this.buildsCache ?? [];
@@ -329,7 +323,7 @@ internal sealed class GraphClient : IGraphClient
         // Add new version of the build
         buildList.Add(buildFile);
         // Order by name
-        buildList = buildList.OrderBy(b => b.FileName).ToList();
+        buildList = [.. buildList.OrderBy(b => b.FileName)];
 
         using var stringContent = new StringContent(JsonConvert.SerializeObject(buildList));
         var response = await this.httpClient.PutAsync(BuildsSyncFileUri, stringContent);
@@ -342,18 +336,18 @@ internal sealed class GraphClient : IGraphClient
         return true;
     }
 
-    private async Task<bool> PutBuilds(List<BuildEntry> buildEntries)
+    private async Task<bool> PutBuilds(List<IBuildEntry> buildEntries)
     {
         var buildFiles = buildEntries.Select(buildEntry => new BuildFile
         {
             FileName = buildEntry.Name,
-            TemplateCode = this.buildTemplateManager.EncodeTemplate(buildEntry.Build!),
-            SourceUrl = buildEntry.Build?.SourceUrl
+            TemplateCode = this.buildTemplateManager.EncodeTemplate(buildEntry),
+            SourceUrl = buildEntry.SourceUrl
         });
 
         var buildList = new List<BuildFile>();
         buildList.AddRange(buildFiles);
-        buildList = buildList.OrderBy(b => b.FileName).ToList();
+        buildList = [.. buildList.OrderBy(b => b.FileName)];
 
         using var stringContent = new StringContent(JsonConvert.SerializeObject(buildList));
         var response = await this.httpClient.PutAsync(BuildsSyncFileUri, stringContent);

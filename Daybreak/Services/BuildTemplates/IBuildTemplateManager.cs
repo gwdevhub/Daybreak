@@ -1,5 +1,4 @@
 ﻿using Daybreak.Models.Builds;
-using Daybreak.Models.Guildwars;
 using System;
 using System.Collections.Generic;
 using System.Extensions;
@@ -10,14 +9,16 @@ namespace Daybreak.Services.BuildTemplates;
 public interface IBuildTemplateManager
 {
     bool IsTemplate(string template);
-    BuildEntry CreateBuild();
-    BuildEntry CreateBuild(string name);
+    SingleBuildEntry CreateSingleBuild();
+    SingleBuildEntry CreateSingleBuild(string name);
+    TeamBuildEntry CreateTeamBuild();
+    TeamBuildEntry CreateTeamBuild(string name);
     void ClearBuilds();
-    void SaveBuild(BuildEntry buildEntry);
-    void RemoveBuild(BuildEntry buildEntry);
-    IAsyncEnumerable<BuildEntry> GetBuilds();
-    Task<Result<BuildEntry, Exception>> GetBuild(string name);
-    Build DecodeTemplate(string template);
-    bool TryDecodeTemplate(string template, out Build build);
-    string EncodeTemplate(Build build);
+    void SaveBuild(IBuildEntry buildEntry);
+    void RemoveBuild(IBuildEntry buildEntry);
+    IAsyncEnumerable<IBuildEntry> GetBuilds();
+    Task<Result<IBuildEntry, Exception>> GetBuild(string name);
+    IBuildEntry DecodeTemplate(string template);
+    bool TryDecodeTemplate(string template, out IBuildEntry build);
+    string EncodeTemplate(IBuildEntry buildEntry);
 }

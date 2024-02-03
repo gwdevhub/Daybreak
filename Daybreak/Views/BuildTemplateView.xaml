@@ -48,7 +48,6 @@
                 <ColumnDefinition Width="auto"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
                 <ColumnDefinition Width="auto"></ColumnDefinition>
-                <ColumnDefinition Width="auto"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -58,11 +57,6 @@
             <TextBox Grid.Row="1" Grid.Column="1" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" FontSize="16"
                      Text="{Binding ElementName=_this, Path=CurrentBuildCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      ToolTip="Template code for the current build"/>
-            <TextBlock Grid.Row="1" Grid.Column="2" Text="Points: " Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent"
-                       FontSize="16" Margin="10, 0, 0, 0" VerticalAlignment="Center"></TextBlock>
-            <TextBox Grid.Row="1" Grid.Column="3" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" FontSize="16"
-                     Text="{Binding ElementName=_this, Path=AttributePoints, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                     ToolTip="Attribute points available"/>
             <TextBlock Grid.Row="0" Text="Source: " Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" FontSize="16" VerticalAlignment="Center" />
             <TextBox Grid.Row="0" Grid.Column="1" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" FontSize="16"
                      Text="{Binding ElementName=_this, Path=CurrentBuildSource, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"

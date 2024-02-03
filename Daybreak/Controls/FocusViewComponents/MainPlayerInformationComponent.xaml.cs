@@ -89,8 +89,11 @@ public partial class MainPlayerInformationComponent : UserControl
 
         if (mainPlayer.CurrentBuild is Build build)
         {
-            var buildEntry = this.buildTemplateManager.CreateBuild();
-            buildEntry.Build = build;
+            var buildEntry = this.buildTemplateManager.CreateSingleBuild();
+            buildEntry.Primary = build.Primary;
+            buildEntry.Secondary = build.Secondary;
+            buildEntry.Attributes = build.Attributes;
+            buildEntry.Skills = build.Skills;
             this.viewManager.ShowView<BuildTemplateView>(buildEntry);
         }
     }

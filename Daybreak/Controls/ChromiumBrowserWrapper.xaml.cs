@@ -2,6 +2,7 @@
 using Daybreak.Configuration.Options;
 using Daybreak.Models;
 using Daybreak.Models.Browser;
+using Daybreak.Models.Builds;
 using Daybreak.Models.Guildwars;
 using Daybreak.Services.Browser;
 using Daybreak.Services.BuildTemplates;
@@ -486,7 +487,7 @@ public partial class ChromiumBrowserWrapper : UserControl
 
     private void LoadBuildTemplateButton_Click(object sender, EventArgs e)
     {
-        var build = this.ContextMenu.DataContext.As<Build>();
+        var build = this.ContextMenu.DataContext.As<IBuildEntry>();
         this.ContextMenu.IsOpen = false;
         if (build is null)
         {
