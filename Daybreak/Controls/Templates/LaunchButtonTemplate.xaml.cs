@@ -133,7 +133,7 @@ public partial class LaunchButtonTemplate : UserControl
             this.GameRunning = false;
             this.CanLaunch = false;
             this.CanAttach = this.liveOptions.Value.Enabled && this.GameRunning;
-            this.CanKill = this.CanAttach ? false : true;
+            this.CanKill = !this.CanAttach;
             launcherViewContext.CanLaunch = false;
             launcherViewContext.CanKill = true;
             return;
@@ -143,7 +143,7 @@ public partial class LaunchButtonTemplate : UserControl
         if (loginInfo?.Email != context.LaunchConfiguration.Credentials?.Username)
         {
             this.GameRunning = false;
-            this.CanAttach = this.liveOptions.Value.Enabled && this.GameRunning;
+            this.CanAttach = false;
             this.CanLaunch = true;
             this.CanKill = false;
             launcherViewContext.CanLaunch = false;
@@ -152,10 +152,10 @@ public partial class LaunchButtonTemplate : UserControl
         }
 
         this.GameRunning = true;
-        this.CanKill = false;
-        this.CanLaunch = false;
-        launcherViewContext.CanLaunch = true;
-        launcherViewContext.CanKill = false;
         this.CanAttach = this.liveOptions.Value.Enabled && this.GameRunning;
+        launcherViewContext.CanLaunch = this.CanAttach;
+        launcherViewContext.CanKill = false;
+        this.CanLaunch = !this.CanAttach;
+        this.CanKill = false;
     }
 }

@@ -121,6 +121,12 @@ internal sealed class ThemeManager : IThemeManager, IApplicationLifetimeService
     private static bool IsWindowsLight()
     {
         var theme = Microsoft.Win32.Registry.GetValue(RegistryKey, "CurrentTheme", string.Empty)?.As<string>();
+        // Windows 11 light theme is called aero.theme
+        if (theme?.EndsWith("aero.theme") is true)
+        {
+            return true;
+        }
+
         return LightThemeValue.Equals(theme?.Split('\\').Last().Split('.').First().ToString(), System.StringComparison.OrdinalIgnoreCase);
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Daybreak.Controls.Buttons;
-using Daybreak.Controls.Templates;
 using Daybreak.Launch;
 using Daybreak.Models;
 using Daybreak.Models.Builds;
@@ -8,6 +7,7 @@ using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Navigation;
 using Daybreak.Utils;
 using Daybreak.Views;
+using MahApps.Metro.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -34,10 +34,11 @@ public partial class BuildTemplate : UserControl
 {
     private const string InfoNamePlaceholder = "[NAME]";
     private const string BaseAddress = $"https://wiki.guildwars.com/wiki/{InfoNamePlaceholder}";
+    private const string AttributePointInfo = "Attribute_point";
 
     private readonly IBuildTemplateManager buildTemplateManager;
     private readonly IViewManager viewManager;
-    private readonly IAttributePointCalculator? attributePointCalculator;
+    private readonly IAttributePointCalculator attributePointCalculator;
     private readonly CancellationTokenSource? cancellationTokenSource = new();
 
     private bool browserMaximized = false;
@@ -51,7 +52,7 @@ public partial class BuildTemplate : UserControl
     [GenerateDependencyProperty]
     private string skillSearchText = string.Empty;
     [GenerateDependencyProperty]
-    private BuildEntry buildEntry;
+    private SingleBuildEntry buildEntry;
     [GenerateDependencyProperty]
     private int attributePoints;
 
@@ -82,7 +83,7 @@ public partial class BuildTemplate : UserControl
         this.InitializeComponent();
         this.HideSkillListView();
         this.HideInfoBrowser();
-        this.buildEntry = new BuildEntry();
+        this.buildEntry = new SingleBuildEntry();
         this.DataContextChanged += this.BuildTemplate_DataContextChanged;
     }
 
@@ -99,16 +100,11 @@ public partial class BuildTemplate : UserControl
 
     private void BuildTemplate_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
-        if(e.NewValue is BuildEntry buildEntry)
+        if(e.NewValue is SingleBuildEntry buildEntry)
         {
-            if (this.BuildEntry is not null)
-            {
-                this.BuildEntry.PropertyChanged -= this.BuildEntry_Changed;
-            }
-            
             this.BuildEntry = buildEntry;
             this.BuildEntry.PropertyChanged += this.BuildEntry_Changed;
-            this.AttributePoints = this.attributePointCalculator!.GetRemainingFreePoints(this.BuildEntry.Build!);
+            this.AttributePoints = this.attributePointCalculator!.GetRemainingFreePoints(this.BuildEntry);
             this.SetupProfessions();
             this.LoadSkills();
         }
@@ -118,12 +114,13 @@ public partial class BuildTemplate : UserControl
     {
         this.SetupProfessions();
         this.LoadSkills();
+        this.AttributePoints = this.attributePointCalculator.GetRemainingFreePoints(this.BuildEntry);
         this.BuildChanged?.Invoke(this, propertyChangedEventArgs);
     }
 
     private void SetupProfessions()
     {
-        if (this.BuildEntry is not BuildEntry buildEntry ||
+        if (this.BuildEntry is not SingleBuildEntry buildEntry ||
             buildEntry.Primary is null ||
             buildEntry.Secondary is null)
         {
@@ -308,6 +305,15 @@ public partial class BuildTemplate : UserControl
         }
     }
 
+    private void HelpButtonAttributePoints_Clicked(object sender, EventArgs e)
+    {
+        this.BrowseToInfo(AttributePointInfo);
+        if (e is RoutedEventArgs routedEventArgs)
+        {
+            routedEventArgs.Handled = true;
+        }
+    }
+
     private void AttributeTemplate_HelpClicked(object _, AttributeEntry e)
     {
         this.BrowseToInfo(e.Attribute?.Name!);
@@ -317,7 +323,7 @@ public partial class BuildTemplate : UserControl
     {
         e.ThrowIfNull();
         this.BuildChanged?.Invoke(this, new EventArgs());
-        this.AttributePoints = this.attributePointCalculator!.GetRemainingFreePoints(this.BuildEntry.Build!);
+        this.AttributePoints = this.attributePointCalculator!.GetRemainingFreePoints(this.BuildEntry);
     }
 
     private void SkillTemplate_Clicked(object sender, RoutedEventArgs e)
@@ -348,40 +354,43 @@ public partial class BuildTemplate : UserControl
         if (sender == this.SkillTemplate0)
         {
             this.BuildEntry.FirstSkill = Skill.NoSkill;
+            this.SkillTemplate0.DataContext = Skill.NoSkill;
         }
         else if (sender == this.SkillTemplate1)
         {
             this.BuildEntry.SecondSkill = Skill.NoSkill;
+            this.SkillTemplate1.DataContext = Skill.NoSkill;
         }
         else if (sender == this.SkillTemplate2)
         {
             this.BuildEntry.ThirdSkill = Skill.NoSkill;
+            this.SkillTemplate2.DataContext = Skill.NoSkill;
         }
         else if (sender == this.SkillTemplate3)
         {
             this.BuildEntry.FourthSkill = Skill.NoSkill;
+            this.SkillTemplate3.DataContext = Skill.NoSkill;
         }
         else if (sender == this.SkillTemplate4)
         {
             this.BuildEntry.FifthSkill = Skill.NoSkill;
+            this.SkillTemplate4.DataContext = Skill.NoSkill;
         }
         else if (sender == this.SkillTemplate5)
         {
             this.BuildEntry.SixthSkill = Skill.NoSkill;
+            this.SkillTemplate5.DataContext = Skill.NoSkill;
         }
         else if (sender == this.SkillTemplate6)
         {
             this.BuildEntry.SeventhSkill = Skill.NoSkill;
+            this.SkillTemplate6.DataContext = Skill.NoSkill;
         }
         else if (sender == this.SkillTemplate7)
         {
             this.BuildEntry.EigthSkill = Skill.NoSkill;
+            this.SkillTemplate7.DataContext = Skill.NoSkill;
         }
-    }
-
-    private void AttributeTemplate_Loaded(object sender, RoutedEventArgs e)
-    {
-        sender.As<AttributeTemplate>()?.InitializeAttributeTemplate(this.attributePointCalculator!);
     }
 
     private void HighlightButton_Clicked(object sender, EventArgs e)
@@ -396,34 +405,42 @@ public partial class BuildTemplate : UserControl
         if (this.selectingSkillTemplate == this.SkillTemplate0)
         {
             this.BuildEntry.FirstSkill = selectedSkilll;
+            this.SkillTemplate0.DataContext = selectedSkilll;
         }
         else if (this.selectingSkillTemplate == this.SkillTemplate1)
         {
             this.BuildEntry.SecondSkill = selectedSkilll;
+            this.SkillTemplate1.DataContext = selectedSkilll;
         }
         else if (this.selectingSkillTemplate == this.SkillTemplate2)
         {
             this.BuildEntry.ThirdSkill = selectedSkilll;
+            this.SkillTemplate2.DataContext = selectedSkilll;
         }
         else if (this.selectingSkillTemplate == this.SkillTemplate3)
         {
             this.BuildEntry.FourthSkill = selectedSkilll;
+            this.SkillTemplate3.DataContext = selectedSkilll;
         }
         else if (this.selectingSkillTemplate == this.SkillTemplate4)
         {
             this.BuildEntry.FifthSkill = selectedSkilll;
+            this.SkillTemplate4.DataContext = selectedSkilll;
         }
         else if (this.selectingSkillTemplate == this.SkillTemplate5)
         {
             this.BuildEntry.SixthSkill = selectedSkilll;
+            this.SkillTemplate5.DataContext = selectedSkilll;
         }
         else if (this.selectingSkillTemplate == this.SkillTemplate6)
         {
             this.BuildEntry.SeventhSkill = selectedSkilll;
+            this.SkillTemplate6.DataContext = selectedSkilll;
         }
         else if (this.selectingSkillTemplate == this.SkillTemplate7)
         {
             this.BuildEntry.EigthSkill = selectedSkilll;
+            this.SkillTemplate7.DataContext = selectedSkilll;
         }
 
         this.HideSkillListView();
@@ -460,9 +477,7 @@ public partial class BuildTemplate : UserControl
             return;
         }
 
-        var buildEntry = this.buildTemplateManager.CreateBuild();
-        buildEntry.Build = e.Build;
-        buildEntry.Name = e.PreferredName ?? buildEntry.Name;
-        this.viewManager.ShowView<BuildTemplateView>(buildEntry);
+        e.Build!.Name = e.PreferredName ?? Guid.NewGuid().ToString();
+        this.viewManager.ShowView<SingleBuildTemplateView>(e.Build);
     }
 }

@@ -1,0 +1,40 @@
+﻿<UserControl x:Class="Daybreak.Controls.Glyphs.TeamGlyph"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Daybreak.Controls.Glyphs"
+             x:Name="_this"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Viewbox>
+            <Grid>
+                <Ellipse Margin="97,25,0,0"
+                     Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                     VerticalAlignment="Top"
+                     HorizontalAlignment="Left"
+                     Width="13"
+                     Height="13"/>
+                <Ellipse Margin="20,25,0,0"
+                     VerticalAlignment="Top"
+                     HorizontalAlignment="Left"
+                     Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                     Width="13"
+                     Height="13"/>
+                <Ellipse Margin="0,18,0,0"
+                     VerticalAlignment="Top"
+                     HorizontalAlignment="Center"
+                     Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                     Width="18"
+                     Height="18"/>
+                <Path Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                  Data="m34.6,51.17l0,0q-0.43,0.61 -0.84,1.24l0,0a35.82,35.82 0 0 0 -5.76,19.53l72,0a35.82,35.82 0 0 0 -5.71,-19.44l0,0q-0.41,-0.63 -0.84,-1.24l0,0a36,36 0 0 0 -58.8,0l-0.05,-0.09z"/>
+                <Path Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                  Data="m0,63.94l20.74,0a44,44 0 0 1 13.72,-24.58a26,26 0 0 0 -34.46,24.58z"/>
+                <Path Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+                  Data="m102,37.94a26,26 0 0 0 -8.46,1.42a44,44 0 0 1 13.72,24.58l20.74,0a26,26 0 0 0 -26,-26z"/>
+            </Grid>
+        </Viewbox>
+    </Grid>
+</UserControl>

@@ -16,6 +16,7 @@
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
@@ -64,6 +65,34 @@
                                 ToolTip="Open secondary profession info"/>
         </Grid>
         <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+            <buttons:HelpButton Grid.Column="0"
+                                ToolTip="Open attribute points info"
+                                Clicked="HelpButtonAttributePoints_Clicked"
+                                Width="20"
+                                Height="20"
+                                Margin="3, 5, 3, 5"/>
+            <TextBlock Grid.Column="1"
+                       Text="Remaining Attribute Points:"
+                       Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                       FontSize="16"
+                       VerticalAlignment="Center"/>
+            <TextBox Grid.Column="2"
+                     Width="50"
+                     Margin="3, 0, 0, 5"
+                     Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                     BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                     BorderThickness="1"
+                     Text="{Binding ElementName=_this, Path=AttributePoints, Mode=OneWay}"
+                     FontSize="16"
+                     Background="Transparent"
+                     IsReadOnly="True"/>
+        </Grid>
+        <Grid Grid.Row="4">
             <ListView Background="Transparent" ItemsSource="{Binding ElementName=_this, Path=BuildEntry.Attributes, Mode=OneWay}"
                      HorizontalContentAlignment="Stretch" BorderThickness="0">
                 <ListView.ItemContainerStyle>
@@ -75,13 +104,12 @@
                     <DataTemplate>
                         <templates:AttributeTemplate HelpClicked="AttributeTemplate_HelpClicked"
                                                  AttributeChanged="AttributeTemplate_AttributeChanged"
-                                                 Loaded="AttributeTemplate_Loaded"
                                                  AttributePoints="{Binding Path=AttributePoints, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
         </Grid>
-        <Grid Grid.Row="4">
+        <Grid Grid.Row="5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
@@ -153,7 +181,7 @@
             <TextBlock Grid.Column="7" Grid.Row="1" TextWrapping="Wrap" FontSize="16"
                        Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Text="{Binding ElementName=_this, Path=BuildEntry.EigthSkill.Name, Mode=OneWay}"></TextBlock>
         </Grid>
-        <Grid Grid.Column="1" Grid.RowSpan="6"
+        <Grid Grid.Column="1" Grid.RowSpan="7"
               x:Name="SideHolder">
             <local:ChromiumBrowserWrapper x:Name="SkillBrowser"
                                           MaxWidth="0"
@@ -170,7 +198,7 @@
                                           PreventDispose="True"
                                           MaximizeClicked="SkillBrowser_MaximizeClicked" />
         </Grid>
-        <Grid Grid.Column="1" Grid.RowSpan="6">
+        <Grid Grid.Column="1" Grid.RowSpan="7">
             <Grid x:Name="SkillListContainer">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"></RowDefinition>
@@ -231,7 +259,7 @@
                 </ItemsControl>
             </Grid>
         </Grid>
-        <Grid Grid.RowSpan="6"
+        <Grid Grid.RowSpan="7"
               Grid.ColumnSpan="2"
               Visibility="Hidden"
               x:Name="FullScreenHolder">

@@ -9,8 +9,8 @@ namespace Daybreak.Controls;
 /// </summary>
 public partial class BuildEntryTemplate : UserControl
 {
-    public event EventHandler<BuildEntry>? RemoveClicked;
-    public event EventHandler<BuildEntry>? EntryClicked;
+    public event EventHandler<IBuildEntry>? RemoveClicked;
+    public event EventHandler<IBuildEntry>? EntryClicked;
 
     public BuildEntryTemplate()
     {
@@ -19,7 +19,7 @@ public partial class BuildEntryTemplate : UserControl
 
     private void BinButton_Clicked(object _, EventArgs __)
     {
-        if (this.DataContext is BuildEntry buildEntry)
+        if (this.DataContext is IBuildEntry buildEntry)
         {
             this.RemoveClicked?.Invoke(this, buildEntry);
         }
@@ -27,7 +27,7 @@ public partial class BuildEntryTemplate : UserControl
 
     private void HighlightButton_Clicked(object _, EventArgs __)
     {
-        if (this.DataContext is BuildEntry buildEntry)
+        if (this.DataContext is IBuildEntry buildEntry)
         {
             this.EntryClicked?.Invoke(this, buildEntry);
         }

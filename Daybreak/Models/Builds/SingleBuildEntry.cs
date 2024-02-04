@@ -1,15 +1,20 @@
 ﻿using Daybreak.Models.Guildwars;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using Attribute = Daybreak.Models.Guildwars.Attribute;
 
 namespace Daybreak.Models.Builds;
-
-public sealed class BuildEntry : INotifyPropertyChanged
+public sealed class SingleBuildEntry : IBuildEntry, INotifyPropertyChanged, IEquatable<SingleBuildEntry>
 {
     public event PropertyChangedEventHandler? PropertyChanged;
     private string? name;
-    private Build? build;
+    private string? sourceUrl;
+    private Profession primary = Profession.None;
+    private Profession secondary = Profession.None;
+    private List<AttributeEntry> attributes = [];
+    private List<Skill> skills = [Skill.NoSkill, Skill.NoSkill, Skill.NoSkill, Skill.NoSkill, Skill.NoSkill, Skill.NoSkill, Skill.NoSkill, Skill.NoSkill];
 
     public string? PreviousName { get; set; }
     public string? Name
@@ -21,114 +26,123 @@ public sealed class BuildEntry : INotifyPropertyChanged
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Name)));
         }
     }
-    public Build? Build
+    public string? SourceUrl
     {
-        get => this.build;
+        get => this.sourceUrl;
         set
         {
-            this.build = value;
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Build)));
+            this.sourceUrl = value;
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.SourceUrl)));
         }
     }
     public Profession Primary
     {
-        get => this.Build!.Primary;
+        get => this.primary;
         set
         {
-            this.Build!.Primary = value;
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Primary)));
+            this.primary = value;
             this.UpdateAttributes();
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Primary)));
         }
     }
     public Profession Secondary
     {
-        get => this.Build!.Secondary;
+        get => this.secondary;
         set
         {
-            this.Build!.Secondary = value;
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Secondary)));
+            this.secondary = value;
             this.UpdateAttributes();
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Secondary)));
         }
     }
     public List<AttributeEntry> Attributes
     {
-        get => this.Build!.Attributes;
+        get => this.attributes;
         set
         {
-            this.Build!.Attributes = value;
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Attributes)));
+            this.attributes = value;
             this.UpdateSkills();
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Attributes)));
+        }
+    }
+    public List<Skill> Skills
+    {
+        get => this.skills;
+        set
+        {
+            this.skills = value;
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Skills)));
         }
     }
     public Skill FirstSkill
     {
-        get => this.Build!.Skills[0];
+        get => this.Skills[0];
         set
         {
-            this.Build!.Skills[0] = value;
+            this.Skills[0] = value;
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.FirstSkill)));
         }
     }
     public Skill SecondSkill
     {
-        get => this.Build!.Skills[1];
+        get => this.Skills[1];
         set
         {
-            this.Build!.Skills[1] = value;
+            this.Skills[1] = value;
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.SecondSkill)));
         }
     }
     public Skill ThirdSkill
     {
-        get => this.Build!.Skills[2];
+        get => this.Skills[2];
         set
         {
-            this.Build!.Skills[2] = value;
+            this.Skills[2] = value;
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.ThirdSkill)));
         }
     }
     public Skill FourthSkill
     {
-        get => this.Build!.Skills[3];
+        get => this.Skills[3];
         set
         {
-            this.Build!.Skills[3] = value;
+            this.Skills[3] = value;
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.FourthSkill)));
         }
     }
     public Skill FifthSkill
     {
-        get => this.Build!.Skills[4];
+        get => this.Skills[4];
         set
         {
-            this.Build!.Skills[4] = value;
+            this.Skills[4] = value;
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.FifthSkill)));
         }
     }
     public Skill SixthSkill
     {
-        get => this.Build!.Skills[5];
+        get => this.Skills[5];
         set
         {
-            this.Build!.Skills[5] = value;
+            this.Skills[5] = value;
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.SixthSkill)));
         }
     }
     public Skill SeventhSkill
     {
-        get => this.Build!.Skills[6];
+        get => this.Skills[6];
         set
         {
-            this.Build!.Skills[6] = value;
+            this.Skills[6] = value;
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.SeventhSkill)));
         }
     }
     public Skill EigthSkill
     {
-        get => this.Build!.Skills[7];
+        get => this.Skills[7];
         set
         {
-            this.Build!.Skills[7] = value;
+            this.Skills[7] = value;
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.EigthSkill)));
         }
     }
@@ -211,5 +225,15 @@ public sealed class BuildEntry : INotifyPropertyChanged
         {
             this.EigthSkill = Skill.NoSkill;
         }
+    }
+
+    public bool Equals(SingleBuildEntry? other)
+    {
+        return this.Name == other?.Name &&
+            this.PreviousName == other?.PreviousName &&
+            this.SourceUrl == other?.SourceUrl &&
+            this.Primary == other?.Primary &&
+            this.Secondary == other?.Secondary &&
+            this.Skills.SequenceEqual(other.Skills);
     }
 }

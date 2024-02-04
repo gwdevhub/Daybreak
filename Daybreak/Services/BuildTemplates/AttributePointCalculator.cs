@@ -1,4 +1,5 @@
-﻿using Daybreak.Models.Guildwars;
+﻿using Daybreak.Models.Builds;
+using Daybreak.Models.Guildwars;
 using System;
 using System.Collections.Generic;
 
@@ -35,13 +36,32 @@ internal sealed class AttributePointCalculator : IAttributePointCalculator
     {
         return this.MaximumAttributePoints - this.GetUsedPoints(build);
     }
-    
+
+    public int GetRemainingFreePoints(SingleBuildEntry build)
+    {
+        return this.MaximumAttributePoints - this.GetUsedPoints(build);
+    }
+
     public int GetUsedPoints(Build build)
     {
         var totalPoints = 0;
         foreach(var attribute in build.Attributes)
         {
             for(var i = 0; i < attribute.Points; i++)
+            {
+                totalPoints += this.GetPointsRequiredToIncreaseRank(i);
+            }
+        }
+
+        return totalPoints;
+    }
+
+    public int GetUsedPoints(SingleBuildEntry build)
+    {
+        var totalPoints = 0;
+        foreach (var attribute in build.Attributes)
+        {
+            for (var i = 0; i < attribute.Points; i++)
             {
                 totalPoints += this.GetPointsRequiredToIncreaseRank(i);
             }

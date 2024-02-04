@@ -631,10 +631,9 @@ public partial class FocusView : UserControl
             return;
         }
 
-        var buildEntry = this.buildTemplateManager.CreateBuild();
-        buildEntry.Build = e.Build;
+        var buildEntry = this.buildTemplateManager.CreateSingleBuild();
         buildEntry.Name = e.PreferredName ?? buildEntry.Name;
-        this.viewManager.ShowView<BuildTemplateView>(buildEntry);
+        this.viewManager.ShowView<SingleBuildTemplateView>(buildEntry);
     }
 
     private void Component_NavigateToClicked(object _, string e)

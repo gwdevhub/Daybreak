@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Controls.Buttons"
+             xmlns:glyphs="clr-namespace:Daybreak.Controls.Glyphs"
              mc:Ignorable="d"
              x:Name="_this"
              Cursor="Hand"
@@ -13,13 +14,13 @@
                                Highlight="{StaticResource MahApps.Brushes.Accent}"
                                Clicked="HighlightButton_Clicked">
             <local:CircularButton.Content>
-                <Viewbox Stretch="Fill" Width="60" Height="60">
-                    <Grid Width="25" Height="25">
-                        <Path Data="m13,20a1,1 0 0 1 -1,-1l0,-12a1,1 0 0 1 2,0l0,12a1,1 0 0 1 -1,1z"
-                            Fill="{StaticResource MahApps.Brushes.ThemeForeground}"></Path>
-                        <Path Data="m19,14l-12,0a1,1 0 0 1 0,-2l12,0a1,1 0 0 1 0,2z"
-                            Fill="{StaticResource MahApps.Brushes.ThemeForeground}"></Path>
-                    </Grid>
+                <Viewbox>
+                    <glyphs:PlusGlyph Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                      Height="50"
+                                      Width="50"
+                                      VerticalAlignment="Top"
+                                      HorizontalAlignment="Left"
+                                      Margin="0, 0, 14, 14"/>
                 </Viewbox>
             </local:CircularButton.Content>
         </local:CircularButton>

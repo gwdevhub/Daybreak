@@ -140,6 +140,7 @@ public sealed class Attribute
     public int Id { get; private set; }
     public string? Name { get; private set; }
     public Profession? Profession { get; private set; }
+    public override string ToString() => this.Name ?? string.Empty;
     private Attribute()
     {
     }

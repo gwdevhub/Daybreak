@@ -1,5 +1,6 @@
 ﻿using Daybreak.Models.Builds;
 using Daybreak.Services.BuildTemplates;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Core.Extensions;
 using System.Extensions;
@@ -29,7 +30,14 @@ public partial class AttributeTemplate : UserControl
     private int attributePoints;
 
     public AttributeTemplate()
+        : this(Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IAttributePointCalculator>())
     {
+    }
+
+    public AttributeTemplate(
+        IAttributePointCalculator attributePointCalculator)
+    {
+        this.attributePointCalculator = attributePointCalculator.ThrowIfNull();
         this.InitializeComponent();
         this.DataContextChanged += this.AttributeTemplate_DataContextChanged;
     }
@@ -51,12 +59,6 @@ public partial class AttributeTemplate : UserControl
                 this.CanAdd = true;
             }
         }
-    }
-
-    public void InitializeAttributeTemplate(
-        IAttributePointCalculator attributePointCalculator)
-    {
-        this.attributePointCalculator = attributePointCalculator.ThrowIfNull();
     }
 
     private void AttributeTemplate_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)

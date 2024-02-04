@@ -8,6 +8,8 @@ public sealed class AttributeEntry : INotifyPropertyChanged
     private Attribute? attribute;
     private int points;
 
+    public event PropertyChangedEventHandler? PropertyChanged;
+
     public Attribute? Attribute
     {
         get => this.attribute;
@@ -26,6 +28,5 @@ public sealed class AttributeEntry : INotifyPropertyChanged
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Points)));
         }
     }
-
-    public event PropertyChangedEventHandler? PropertyChanged;
+    public override string ToString() => $"{this.Attribute?.Name} - {this.Points}";
 }

@@ -3026,6 +3026,7 @@ public sealed class Skill
     public string? Name { get; private set; }
     public int? Id { get; private set; }
     public string? AlternativeName { get; private set; }
+    public override string ToString() => this.Name ?? this.AlternativeName ?? nameof(Skill);
     private Skill()
     {
     }

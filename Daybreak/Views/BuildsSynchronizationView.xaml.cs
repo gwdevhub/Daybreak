@@ -87,7 +87,7 @@ public partial class BuildsSynchronizationView : UserControl
 
         var remoteBuilds = remoteBuildFiles!.Select(buildFile => new SynchronizationBuild { Name = buildFile.FileName!, TemplateCode = buildFile.TemplateCode! })
             .ToList();
-        var localBuilds = localBuildFiles.Select(build => new SynchronizationBuild { Name = build.Name!, TemplateCode = this.buildTemplateManager.EncodeTemplate(build.Build!) })
+        var localBuilds = localBuildFiles.Select(build => new SynchronizationBuild { Name = build.Name!, TemplateCode = this.buildTemplateManager.EncodeTemplate(build) })
             .ToList();
 
         var changedLocalBuilds = localBuilds.Where(

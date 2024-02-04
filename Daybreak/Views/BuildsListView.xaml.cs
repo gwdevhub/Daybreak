@@ -21,12 +21,12 @@ public partial class BuildsListView : UserControl
     private readonly IViewManager viewManager;
     private readonly IBuildTemplateManager buildTemplateManager;
 
-    private IEnumerable<BuildEntry>? buildEntries;
+    private IEnumerable<IBuildEntry>? buildEntries;
 
     [GenerateDependencyProperty]
     private bool loading;
 
-    public SortedObservableCollection<BuildEntry, string> BuildEntries { get; } = new SortedObservableCollection<BuildEntry, string>(entry => entry.Name!);
+    public SortedObservableCollection<IBuildEntry, string> BuildEntries { get; } = new SortedObservableCollection<IBuildEntry, string>(entry => entry.Name!);
 
     public BuildsListView(
         IViewManager viewManager,
@@ -47,13 +47,19 @@ public partial class BuildsListView : UserControl
         this.SearchTextBox.FocusOnTextBox();
     }
 
-    private void AddButton_Clicked(object sender, EventArgs e)
+    private void AddSingleButton_Clicked(object sender, EventArgs e)
     {
-        var build = this.buildTemplateManager.CreateBuild();
-        this.viewManager.ShowView<BuildTemplateView>(build);
+        var build = this.buildTemplateManager.CreateSingleBuild();
+        this.viewManager.ShowView<SingleBuildTemplateView>(build);
     }
 
-    private void BuildEntryTemplate_RemoveClicked(object _, BuildEntry e)
+    private void AddTeamButton_Clicked(object sender, EventArgs e)
+    {
+        var build = this.buildTemplateManager.CreateTeamBuild();
+        this.viewManager.ShowView<TeamBuildTemplateView>(build);
+    }
+
+    private void BuildEntryTemplate_RemoveClicked(object _, IBuildEntry e)
     {
         this.buildTemplateManager.RemoveBuild(e);
         this.LoadBuilds();
@@ -81,8 +87,15 @@ public partial class BuildsListView : UserControl
         this.viewManager.ShowView<BuildsSynchronizationView>();
     }
 
-    private void BuildEntryTemplate_EntryClicked(object _, BuildEntry e)
+    private void BuildEntryTemplate_EntryClicked(object _, IBuildEntry e)
     {
-        this.viewManager.ShowView<BuildTemplateView>(e);
+        if (e is SingleBuildEntry)
+        {
+            this.viewManager.ShowView<SingleBuildTemplateView>(e);
+        }
+        else if (e is TeamBuildEntry)
+        {
+            this.viewManager.ShowView<TeamBuildTemplateView>(e);
+        }
     }
 }
