@@ -180,7 +180,7 @@
                                  HorizontalAlignment="Right"
                                  Grid.Column="1"
                                  Margin="0, 0, 140, 0"
-                                 Cursor="Arrow"
+                                 Cursor="Hand"
                                  Opacity="0.8"
                                  HighlightColor="White"
                                  ToolTip="Synchronize Settings"
