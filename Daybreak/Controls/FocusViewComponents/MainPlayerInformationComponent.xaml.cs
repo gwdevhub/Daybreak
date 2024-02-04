@@ -2,10 +2,13 @@
 using Daybreak.Models.Guildwars;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Navigation;
+using Daybreak.Services.Scanner;
 using Daybreak.Views;
 using Microsoft.Extensions.DependencyInjection;
+using NAudio.CoreAudioApi;
 using System;
 using System.Core.Extensions;
+using System.Threading;
 using System.Windows.Controls;
 
 namespace Daybreak.Controls.FocusViewComponents;
@@ -14,6 +17,7 @@ namespace Daybreak.Controls.FocusViewComponents;
 /// </summary>
 public partial class MainPlayerInformationComponent : UserControl
 {
+    private readonly IGuildwarsMemoryCache guildwarsMemoryCache;
     private readonly IBuildTemplateManager buildTemplateManager;
     private readonly IViewManager viewManager;
 
@@ -21,15 +25,18 @@ public partial class MainPlayerInformationComponent : UserControl
 
     public MainPlayerInformationComponent()
         : this(
+              Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IGuildwarsMemoryCache>(),
               Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IBuildTemplateManager>(),
               Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>())
     {
     }
 
     public MainPlayerInformationComponent(
+        IGuildwarsMemoryCache guildwarsMemoryCache,
         IBuildTemplateManager buildTemplateManager,
         IViewManager viewManager)
     {
+        this.guildwarsMemoryCache = guildwarsMemoryCache.ThrowIfNull();
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
         this.InitializeComponent();
@@ -96,5 +103,39 @@ public partial class MainPlayerInformationComponent : UserControl
             buildEntry.Skills = build.Skills;
             this.viewManager.ShowView<SingleBuildTemplateView>(buildEntry);
         }
+    }
+
+    private async void EditTeamBuild_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        var gameData = await this.guildwarsMemoryCache.ReadGameData(CancellationToken.None);
+        if (gameData is null)
+        {
+            return;
+        }
+
+        var teamBuild = this.buildTemplateManager.CreateTeamBuild();
+        teamBuild.Builds.Clear();
+        var mainPlayerBuild = this.buildTemplateManager.CreateSingleBuild();
+        mainPlayerBuild.Primary = gameData.MainPlayer?.CurrentBuild?.Primary!;
+        mainPlayerBuild.Secondary = gameData.MainPlayer?.CurrentBuild?.Secondary!;
+        mainPlayerBuild.Attributes = gameData.MainPlayer?.CurrentBuild?.Attributes!;
+        mainPlayerBuild.Skills = gameData.MainPlayer?.CurrentBuild?.Skills!;
+        teamBuild.Builds.Add(mainPlayerBuild);
+        foreach (var player in gameData.Party!)
+        {
+            if (player.CurrentBuild is null)
+            {
+                continue;
+            }
+
+            var singleBuildEntry = this.buildTemplateManager.CreateSingleBuild();
+            singleBuildEntry.Primary = player.CurrentBuild.Primary;
+            singleBuildEntry.Secondary = player.CurrentBuild.Secondary;
+            singleBuildEntry.Attributes = player.CurrentBuild.Attributes;
+            singleBuildEntry.Skills = player.CurrentBuild.Skills;
+            teamBuild.Builds.Add(singleBuildEntry);
+        }
+
+        this.viewManager.ShowView<TeamBuildTemplateView>(teamBuild);
     }
 }
