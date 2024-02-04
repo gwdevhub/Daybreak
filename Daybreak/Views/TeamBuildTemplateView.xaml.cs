@@ -1,5 +1,6 @@
 ﻿using Daybreak.Controls.Buttons;
 using Daybreak.Models.Builds;
+using Daybreak.Models.Guildwars;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Navigation;
 using Microsoft.Extensions.Logging;
@@ -37,6 +38,8 @@ public partial class TeamBuildTemplateView : UserControl
     private string currentBuildCode = string.Empty;
     [GenerateDependencyProperty]
     private string currentBuildSource = string.Empty;
+    [GenerateDependencyProperty]
+    private string currentBuildSubCode = string.Empty;
 
     public TeamBuildTemplateView(
         IViewManager viewManager,
@@ -116,6 +119,54 @@ public partial class TeamBuildTemplateView : UserControl
 
             this.CurrentBuild.PropertyChanged += this.CurrentBuild_PropertyChanged;
         }
+        else if (e.Property == SelectedBuildProperty)
+        {
+            this.preventDecode = true;
+            this.CurrentBuildSubCode = this.SelectedBuild is not null ? this.buildTemplateManager.EncodeTemplate(this.SelectedBuild) : string.Empty;
+            this.preventDecode = false;
+        }
+        else if (e.Property == CurrentBuildSubCodeProperty)
+        {
+            if (this.preventDecode)
+            {
+                return;
+            }
+
+            if (this.CurrentBuild is null)
+            {
+                this.CurrentBuildSubCode = string.Empty;
+                return;
+            }
+
+            try
+            {
+                var newSelectedBuild = this.buildTemplateManager.DecodeTemplate(this.CurrentBuildSubCode);
+                if (newSelectedBuild is not SingleBuildEntry newSingleBuildEntry)
+                {
+                    return;
+                }
+
+                // Manually write all properties to trigger bindings
+                this.SelectedBuild.Primary = newSingleBuildEntry.Primary;
+                this.SelectedBuild.Secondary = newSingleBuildEntry.Secondary;
+                this.SelectedBuild.Attributes = newSingleBuildEntry.Attributes;
+                this.SelectedBuild.FirstSkill = newSingleBuildEntry.FirstSkill;
+                this.SelectedBuild.SecondSkill = newSingleBuildEntry.SecondSkill;
+                this.SelectedBuild.ThirdSkill = newSingleBuildEntry.ThirdSkill;
+                this.SelectedBuild.FourthSkill = newSingleBuildEntry.FourthSkill;
+                this.SelectedBuild.FifthSkill = newSingleBuildEntry.FifthSkill;
+                this.SelectedBuild.SixthSkill = newSingleBuildEntry.SixthSkill;
+                this.SelectedBuild.SeventhSkill = newSingleBuildEntry.SeventhSkill;
+                this.SelectedBuild.EigthSkill = newSingleBuildEntry.EigthSkill;
+            }
+            catch
+            {
+                this.SelectedBuild.Primary = Profession.None;
+                this.SelectedBuild.Secondary = Profession.None;
+                this.SelectedBuild.Attributes = [];
+                this.SelectedBuild.Skills = [ Skill.NoSkill, Skill.NoSkill, Skill.NoSkill, Skill.NoSkill, Skill.NoSkill, Skill.NoSkill, Skill.NoSkill, Skill.NoSkill ];
+            }
+        }
     }
 
     private void CurrentBuild_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -130,6 +181,7 @@ public partial class TeamBuildTemplateView : UserControl
             this.preventDecode = true;
             this.CurrentBuildCode = this.buildTemplateManager.EncodeTemplate(this.CurrentBuild);
             this.previousCode = this.CurrentBuildCode;
+            this.CurrentBuildSubCode = this.SelectedBuild is not null ? this.buildTemplateManager.EncodeTemplate(this.SelectedBuild) : string.Empty;
             this.preventDecode = false;
         }
         finally
@@ -214,3 +266,4 @@ public partial class TeamBuildTemplateView : UserControl
         this.CurrentBuild.Builds = [.. this.CurrentBuild.Builds, newBuild];
     }
 }
+
