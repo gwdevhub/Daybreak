@@ -47,10 +47,16 @@ public partial class BuildsListView : UserControl
         this.SearchTextBox.FocusOnTextBox();
     }
 
-    private void AddButton_Clicked(object sender, EventArgs e)
+    private void AddSingleButton_Clicked(object sender, EventArgs e)
     {
         var build = this.buildTemplateManager.CreateSingleBuild();
         this.viewManager.ShowView<SingleBuildTemplateView>(build);
+    }
+
+    private void AddTeamButton_Clicked(object sender, EventArgs e)
+    {
+        var build = this.buildTemplateManager.CreateTeamBuild();
+        this.viewManager.ShowView<TeamBuildTemplateView>(build);
     }
 
     private void BuildEntryTemplate_RemoveClicked(object _, IBuildEntry e)

@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:Daybreak.Views"
              xmlns:controls="clr-namespace:Daybreak.Controls"
              xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
+             xmlns:glyphs="clr-namespace:Daybreak.Controls.Glyphs"
              mc:Ignorable="d" 
              x:Name="_this"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -25,10 +26,56 @@
             Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
             HorizontalAlignment="Center"
             Text="Manage builds"></TextBlock>
-        <buttons:AddButton  Height="30" Width="30" Grid.Column="0" HorizontalAlignment="Right"
-                            VerticalAlignment="Top" Margin="5" Clicked="AddButton_Clicked"
-                            ToolTip="Add build template"/>
-        <buttons:SynchronizeButton Height="30" Width="30" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5, 5, 45, 5"
+        <buttons:CircularButton Height="30"
+                                Width="30"
+                                VerticalAlignment="Top"
+                                HorizontalAlignment="Right"
+                                Highlight="{StaticResource MahApps.Brushes.Accent}"
+                                Margin="5"
+                                Grid.Column="0"
+                                ToolTip="Add single build template"
+                                Clicked="AddSingleButton_Clicked">
+            <buttons:CircularButton.Content>
+                <Grid Height="60"
+                      Width="60">
+                    <glyphs:PersonGlyph Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                        Height="30"
+                                        Width="30"/>
+                    <glyphs:PlusGlyph Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                      Height="45"
+                                      Width="45"
+                                      VerticalAlignment="Bottom"
+                                      HorizontalAlignment="Right"
+                                      Margin="0, 0, -5, -3"/>
+                </Grid>
+            </buttons:CircularButton.Content>
+        </buttons:CircularButton>
+        <buttons:CircularButton Height="30"
+                        Width="30"
+                        VerticalAlignment="Top"
+                        HorizontalAlignment="Right"
+                        Highlight="{StaticResource MahApps.Brushes.Accent}"
+                        Margin="5, 5, 45, 5"
+                        Grid.Column="0"
+                        ToolTip="Add team build template"
+                        Clicked="AddTeamButton_Clicked">
+            <buttons:CircularButton.Content>
+                <Grid Height="60"
+                      Width="60">
+                    <glyphs:TeamGlyph Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                      Height="40"
+                                      Width="40"
+                                      Margin="5"/>
+                    <glyphs:PlusGlyph Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                              Height="40"
+                              Width="40"
+                              VerticalAlignment="Bottom"
+                              HorizontalAlignment="Right"
+                              Margin="0, 0, -5, -3"/>
+                </Grid>
+            </buttons:CircularButton.Content>
+        </buttons:CircularButton>
+        <buttons:SynchronizeButton Height="30" Width="30" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5, 5, 85, 5"
                                    Clicked="SynchronizeButton_Clicked"
                                    ToolTip="Open synchronization view"/>
         <controls:SearchTextBox x:Name="SearchTextBox"
