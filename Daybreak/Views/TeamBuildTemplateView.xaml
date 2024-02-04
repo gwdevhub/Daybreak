@@ -55,6 +55,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="1" Text="Code: " Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" FontSize="16" VerticalAlignment="Center" />
             <TextBox Grid.Row="1" Grid.Column="1" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" FontSize="16"
@@ -66,6 +67,10 @@
                      ToolTip="Url from where this build was retrieved"/>
             <buttons:BrowserButton Grid.Row="0" Grid.Column="3" Height="30" Width="30" Clicked="BrowserButton_Clicked"
                                    ToolTip="Open source url"/>
+            <TextBlock Grid.Row="2" Text="Sub-build code: " Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" FontSize="16" VerticalAlignment="Center" />
+            <TextBox Grid.Row="2" Grid.Column="1" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" FontSize="16"
+                     Text="{Binding ElementName=_this, Path=CurrentBuildSubCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     ToolTip="Template code for the current build"/>
         </Grid>
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>

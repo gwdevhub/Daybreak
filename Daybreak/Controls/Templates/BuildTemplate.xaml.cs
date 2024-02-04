@@ -38,7 +38,7 @@ public partial class BuildTemplate : UserControl
 
     private readonly IBuildTemplateManager buildTemplateManager;
     private readonly IViewManager viewManager;
-    private readonly IAttributePointCalculator? attributePointCalculator;
+    private readonly IAttributePointCalculator attributePointCalculator;
     private readonly CancellationTokenSource? cancellationTokenSource = new();
 
     private bool browserMaximized = false;
@@ -114,6 +114,7 @@ public partial class BuildTemplate : UserControl
     {
         this.SetupProfessions();
         this.LoadSkills();
+        this.AttributePoints = this.attributePointCalculator.GetRemainingFreePoints(this.BuildEntry);
         this.BuildChanged?.Invoke(this, propertyChangedEventArgs);
     }
 
@@ -303,7 +304,6 @@ public partial class BuildTemplate : UserControl
             routedEventArgs.Handled = true;
         }
     }
-
 
     private void HelpButtonAttributePoints_Clicked(object sender, EventArgs e)
     {

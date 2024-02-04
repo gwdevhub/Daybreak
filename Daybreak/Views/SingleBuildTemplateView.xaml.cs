@@ -28,7 +28,7 @@ public partial class SingleBuildTemplateView : UserControl
     [GenerateDependencyProperty(InitialValue = false)]
     private bool saveButtonEnabled;
     [GenerateDependencyProperty]
-    private IBuildEntry currentBuild = default!;
+    private SingleBuildEntry currentBuild = default!;
     [GenerateDependencyProperty]
     private string currentBuildCode = string.Empty;
     [GenerateDependencyProperty]
@@ -45,7 +45,7 @@ public partial class SingleBuildTemplateView : UserControl
         this.InitializeComponent();
         this.DataContextChanged += (sender, contextArgs) =>
         {
-            if (contextArgs.NewValue is IBuildEntry buildEntry)
+            if (contextArgs.NewValue is SingleBuildEntry buildEntry)
             {
                 this.logger.LogInformation("Received data context. Setting current build");
                 this.CurrentBuild = buildEntry;
@@ -65,9 +65,14 @@ public partial class SingleBuildTemplateView : UserControl
             try
             {
                 var newBuild = this.buildTemplateManager.DecodeTemplate(this.CurrentBuildCode);
+                if (newBuild is not SingleBuildEntry singleBuildEntry)
+                {
+                    throw new InvalidOperationException();
+                }
+
                 newBuild.Name = this.CurrentBuild.Name;
                 newBuild.PreviousName = this.CurrentBuild.PreviousName;
-                this.CurrentBuild = newBuild;
+                this.CurrentBuild = singleBuildEntry;
                 this.logger.LogInformation($"Template {this.CurrentBuildCode} decoded");
             }
             catch
@@ -137,5 +142,19 @@ public partial class SingleBuildTemplateView : UserControl
         {
             this.SaveButtonEnabled = true;
         }
+    }
+
+    private void CircularButton_Clicked(object sender, EventArgs e)
+    {
+        if (this.CurrentBuild is null)
+        {
+            return;
+        }
+
+        var newTeamBuild = this.buildTemplateManager.CreateTeamBuild();
+        newTeamBuild.Name = this.CurrentBuild.Name;
+        newTeamBuild.PreviousName = this.CurrentBuild.PreviousName;
+        newTeamBuild.Builds.ClearAnd().Add(this.CurrentBuild);
+        this.viewManager.ShowView<TeamBuildTemplateView>(newTeamBuild);
     }
 }
