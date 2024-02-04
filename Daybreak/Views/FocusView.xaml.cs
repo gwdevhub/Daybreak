@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Models;
+using Daybreak.Models.Builds;
 using Daybreak.Models.Guildwars;
 using Daybreak.Models.LaunchConfigurations;
 using Daybreak.Services.ApplicationLauncher;
@@ -626,14 +627,22 @@ public partial class FocusView : UserControl
 
     private void Browser_BuildDecoded(object _, DownloadedBuild e)
     {
-        if (e is null)
+        if (e is null ||
+            e.Build is null)
         {
             return;
         }
 
-        var buildEntry = this.buildTemplateManager.CreateSingleBuild();
-        buildEntry.Name = e.PreferredName ?? buildEntry.Name;
-        this.viewManager.ShowView<SingleBuildTemplateView>(buildEntry);
+        e.Build.Name = e.PreferredName ?? e.Build.Name;
+        if (e.Build is SingleBuildEntry)
+        {
+            this.viewManager.ShowView<SingleBuildTemplateView>(e.Build);
+        }
+        else if (e.Build is TeamBuildEntry)
+        {
+            this.viewManager.ShowView<TeamBuildTemplateView>(e.Build);
+        }
+        
     }
 
     private void Component_NavigateToClicked(object _, string e)
