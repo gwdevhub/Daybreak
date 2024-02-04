@@ -16,6 +16,7 @@
                 <ColumnDefinition Width="*"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <TextBlock 
                         Grid.Column="0"
@@ -27,7 +28,7 @@
                         HorizontalAlignment="Left" />
             <buttons:HighlightButton
                         Grid.Column="1"
-                        Title="Edit Build"
+                        Title="Export Build"
                         HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
                         Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                         Margin="10, 0, 10, 0"
@@ -40,6 +41,19 @@
                         ToolTip="Load current build"/>
             <buttons:HighlightButton
                         Grid.Column="2"
+                        Title="Export Team Build"
+                        HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                        Margin="10, 0, 10, 0"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        Cursor="Hand"
+                        FontSize="18"
+                        MouseLeftButtonDown="EditTeamBuild_MouseLeftButtonDown"
+                        ToolTip="Load current team build"/>
+            <buttons:HighlightButton
+                        Grid.Column="3"
                         Title="Meta Builds"
                         HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
                         Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
