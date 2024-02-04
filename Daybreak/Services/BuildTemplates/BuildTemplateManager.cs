@@ -9,8 +9,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media.Animation;
-using System.Xml.Linq;
 
 namespace Daybreak.Services.BuildTemplates;
 
@@ -98,6 +96,35 @@ internal sealed class BuildTemplateManager : IBuildTemplateManager
         return entry;
     }
 
+    public SingleBuildEntry ConvertToSingleBuildEntry(TeamBuildEntry teamBuildEntry)
+    {
+        if (teamBuildEntry.Builds.Count > 1 ||
+            teamBuildEntry.Builds.Count < 1)
+        {
+            throw new InvalidOperationException($"Cannot convert {nameof(TeamBuildEntry)} with {teamBuildEntry.Builds.Count} builds into a {nameof(SingleBuildEntry)}");
+        }
+
+        var singleBuildEntry = teamBuildEntry.Builds.First();
+        singleBuildEntry.Name = teamBuildEntry.Name;
+        singleBuildEntry.PreviousName = teamBuildEntry.PreviousName;
+        singleBuildEntry.SourceUrl = teamBuildEntry.SourceUrl;
+
+        return singleBuildEntry;
+    }
+
+    public TeamBuildEntry ConvertToTeamBuildEntry(SingleBuildEntry singleBuildEntry)
+    {
+        var teamBuildEntry = new TeamBuildEntry
+        {
+            Name = singleBuildEntry.Name,
+            PreviousName = singleBuildEntry.PreviousName,
+            SourceUrl = singleBuildEntry.SourceUrl,
+            Builds = [ singleBuildEntry ]
+        };
+
+        return teamBuildEntry;
+    }
+
     public void SaveBuild(IBuildEntry buildEntry)
     {
         var encodedBuild = new StringBuilder();
@@ -125,7 +152,7 @@ internal sealed class BuildTemplateManager : IBuildTemplateManager
                     Skills = singleBuildEntry.Skills
                 };
 
-                encodedBuild.Append(this.EncodeTemplateInner(build));
+                encodedBuild.Append(this.EncodeTemplateInner(build)).Append(' ');
             }
         }
 
@@ -140,7 +167,7 @@ internal sealed class BuildTemplateManager : IBuildTemplateManager
         }
 
         Directory.CreateDirectory(Path.GetDirectoryName(newPath)!);
-        File.WriteAllText(newPath, $"{encodedBuild}\n{buildEntry.SourceUrl}");
+        File.WriteAllText(newPath, $"{encodedBuild.ToString().Trim()}\n{buildEntry.SourceUrl}");
     }
 
     public void RemoveBuild(IBuildEntry buildEntry)

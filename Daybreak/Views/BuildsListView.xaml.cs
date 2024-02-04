@@ -50,7 +50,7 @@ public partial class BuildsListView : UserControl
     private void AddButton_Clicked(object sender, EventArgs e)
     {
         var build = this.buildTemplateManager.CreateSingleBuild();
-        this.viewManager.ShowView<BuildTemplateView>(build);
+        this.viewManager.ShowView<SingleBuildTemplateView>(build);
     }
 
     private void BuildEntryTemplate_RemoveClicked(object _, IBuildEntry e)
@@ -83,6 +83,13 @@ public partial class BuildsListView : UserControl
 
     private void BuildEntryTemplate_EntryClicked(object _, IBuildEntry e)
     {
-        this.viewManager.ShowView<BuildTemplateView>(e);
+        if (e is SingleBuildEntry)
+        {
+            this.viewManager.ShowView<SingleBuildTemplateView>(e);
+        }
+        else if (e is TeamBuildEntry)
+        {
+            this.viewManager.ShowView<TeamBuildTemplateView>(e);
+        }
     }
 }

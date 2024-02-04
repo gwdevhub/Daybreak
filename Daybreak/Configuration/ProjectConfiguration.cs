@@ -273,7 +273,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<UpdateView>();
         viewProducer.RegisterView<AccountsView>();
         viewProducer.RegisterView<ExecutablesView>();
-        viewProducer.RegisterView<BuildTemplateView>();
+        viewProducer.RegisterView<SingleBuildTemplateView>();
         viewProducer.RegisterView<BuildsListView>();
         viewProducer.RegisterView<RequestElevationView>();
         viewProducer.RegisterView<RequestDelevationView>();
@@ -330,6 +330,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<DirectSongOnboardingEntryView>();
         viewProducer.RegisterView<DirectSongSwitchView>();
         viewProducer.RegisterView<SettingsSynchronizationView>();
+        viewProducer.RegisterView<TeamBuildTemplateView>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)

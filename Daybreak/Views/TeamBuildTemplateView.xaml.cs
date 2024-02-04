@@ -1,5 +1,5 @@
-﻿using Daybreak.Models.Builds;
-using Daybreak.Models.Guildwars;
+﻿using Daybreak.Controls.Buttons;
+using Daybreak.Models.Builds;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Navigation;
 using Microsoft.Extensions.Logging;
@@ -16,29 +16,32 @@ namespace Daybreak.Views;
 /// <summary>
 /// Interaction logic for BuildTemplatesView.xaml
 /// </summary>
-public partial class BuildTemplateView : UserControl
+public partial class TeamBuildTemplateView : UserControl
 {
     private const string DisallowedChars = "\r\n/.";
 
     private readonly IViewManager viewManager;
     private readonly IBuildTemplateManager buildTemplateManager;
-    private readonly ILogger<BuildTemplateView> logger;
+    private readonly ILogger<TeamBuildTemplateView> logger;
 
     private bool preventDecode = false;
+    private string previousCode = string.Empty;
 
     [GenerateDependencyProperty(InitialValue = false)]
     private bool saveButtonEnabled;
     [GenerateDependencyProperty]
-    private IBuildEntry currentBuild = default!;
+    private SingleBuildEntry selectedBuild = default!;
+    [GenerateDependencyProperty]
+    private TeamBuildEntry currentBuild = default!;
     [GenerateDependencyProperty]
     private string currentBuildCode = string.Empty;
     [GenerateDependencyProperty]
     private string currentBuildSource = string.Empty;
 
-    public BuildTemplateView(
+    public TeamBuildTemplateView(
         IViewManager viewManager,
         IBuildTemplateManager buildTemplateManager,
-        ILogger<BuildTemplateView> logger)
+        ILogger<TeamBuildTemplateView> logger)
     {
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
@@ -46,12 +49,14 @@ public partial class BuildTemplateView : UserControl
         this.InitializeComponent();
         this.DataContextChanged += (sender, contextArgs) =>
         {
-            if (contextArgs.NewValue is IBuildEntry buildEntry)
+            if (contextArgs.NewValue is TeamBuildEntry buildEntry)
             {
                 this.logger.LogInformation("Received data context. Setting current build");
                 this.CurrentBuild = buildEntry;
                 this.CurrentBuildCode = this.buildTemplateManager.EncodeTemplate(this.CurrentBuild);
                 this.CurrentBuildSource = buildEntry.SourceUrl;
+                this.SelectedBuild = this.CurrentBuild.Builds.FirstOrDefault();
+                this.CurrentBuild.PropertyChanged += this.CurrentBuild_PropertyChanged;
             }
         };
     }
@@ -59,27 +64,63 @@ public partial class BuildTemplateView : UserControl
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);
-        if (e.Property == CurrentBuildCodeProperty &&
-            this.preventDecode is false)
+        if (e.Property == CurrentBuildCodeProperty)
         {
+            if (this.preventDecode)
+            {
+                return;
+            }
+
+            // Ignore whitespace changes
+            if (this.previousCode.Trim() == this.CurrentBuildCode.Trim())
+            {
+                return;
+            }
+
             this.logger.LogInformation($"Attempting to decode provided template {this.CurrentBuildCode}");
             try
             {
                 var newBuild = this.buildTemplateManager.DecodeTemplate(this.CurrentBuildCode);
-                newBuild.Name = this.CurrentBuild.Name;
-                newBuild.PreviousName = this.CurrentBuild.PreviousName;
-                this.CurrentBuild = newBuild;
-                this.logger.LogInformation($"Template {this.CurrentBuildCode} decoded");
+                if (newBuild is TeamBuildEntry teamBuildEntry)
+                {
+                    teamBuildEntry.Name = this.CurrentBuild.Name;
+                    teamBuildEntry.PreviousName = this.CurrentBuild.PreviousName;
+                    var indexOfSelectedBuild = 0;
+                    if (this.CurrentBuild is not null &&
+                        this.SelectedBuild is not null)
+                    {
+                        indexOfSelectedBuild = this.CurrentBuild.Builds.IndexOf(this.SelectedBuild);
+                    }
+
+                    this.CurrentBuild = teamBuildEntry;
+                    this.SelectedBuild = this.CurrentBuild.Builds.Skip(indexOfSelectedBuild).FirstOrDefault();
+                    this.previousCode = this.CurrentBuildCode;
+                    this.logger.LogInformation($"Template {this.CurrentBuildCode} decoded");
+                }
+                else if (newBuild is SingleBuildEntry singleBuildEntry)
+                {
+                    this.CurrentBuild.Builds = [singleBuildEntry];
+                    this.SelectedBuild = singleBuildEntry;
+                    this.logger.LogInformation($"Template {this.CurrentBuildCode} decoded into {nameof(SingleBuildEntry)}");
+                }
             }
             catch
             {
                 this.logger.LogWarning($"Failed to decode {this.CurrentBuildCode}. Reverting to default build");
-                var newBuild = this.buildTemplateManager.CreateSingleBuild();
+                var newBuild = this.buildTemplateManager.CreateTeamBuild();
                 newBuild.Name = this.CurrentBuild.Name;
                 newBuild.PreviousName = this.CurrentBuild.PreviousName;
                 this.CurrentBuild = newBuild;
+                this.previousCode = this.CurrentBuildCode;
             }
+
+            this.CurrentBuild.PropertyChanged += this.CurrentBuild_PropertyChanged;
         }
+    }
+
+    private void CurrentBuild_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        this.BuildTemplate_BuildChanged(sender!, e);
     }
 
     private void BuildTemplate_BuildChanged(object sender, EventArgs e)
@@ -88,6 +129,7 @@ public partial class BuildTemplateView : UserControl
         {
             this.preventDecode = true;
             this.CurrentBuildCode = this.buildTemplateManager.EncodeTemplate(this.CurrentBuild);
+            this.previousCode = this.CurrentBuildCode;
             this.preventDecode = false;
         }
         finally
@@ -138,5 +180,37 @@ public partial class BuildTemplateView : UserControl
         {
             this.SaveButtonEnabled = true;
         }
+    }
+
+    private void BinButton_Clicked(object sender, EventArgs e)
+    {
+        if (sender is not BinButton binButton)
+        {
+            return;
+        }
+
+        if (binButton.DataContext is not SingleBuildEntry singleBuildEntry)
+        {
+            return;
+        }
+
+        // We need to reset the list to trigger the binding. Simply removing the item from the list will not trigger the binding
+        if (this.SelectedBuild == singleBuildEntry)
+        {
+            // We need to perform the check before we change the build collection, otherwise SelectedBuild will be null
+            this.CurrentBuild.Builds = this.CurrentBuild.Builds.Where(b => b != singleBuildEntry).ToList();
+            this.SelectedBuild = this.CurrentBuild.Builds.FirstOrDefault();
+        }
+        else
+        {
+            this.CurrentBuild.Builds = this.CurrentBuild.Builds.Where(b => b != singleBuildEntry).ToList();
+        }
+    }
+
+    private void AddButton_Clicked(object sender, EventArgs e)
+    {
+        var newBuild = this.buildTemplateManager.CreateSingleBuild();
+        // We need to reset the list to trigger the binding. Simply adding the item from the list will not trigger the binding
+        this.CurrentBuild.Builds = [.. this.CurrentBuild.Builds, newBuild];
     }
 }

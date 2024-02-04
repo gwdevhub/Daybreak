@@ -1,10 +1,12 @@
 ﻿using Daybreak.Models.Guildwars;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using Attribute = Daybreak.Models.Guildwars.Attribute;
 
 namespace Daybreak.Models.Builds;
-public sealed class SingleBuildEntry : IBuildEntry
+public sealed class SingleBuildEntry : IBuildEntry, INotifyPropertyChanged, IEquatable<SingleBuildEntry>
 {
     public event PropertyChangedEventHandler? PropertyChanged;
     private string? name;
@@ -223,5 +225,15 @@ public sealed class SingleBuildEntry : IBuildEntry
         {
             this.EigthSkill = Skill.NoSkill;
         }
+    }
+
+    public bool Equals(SingleBuildEntry? other)
+    {
+        return this.Name == other?.Name &&
+            this.PreviousName == other?.PreviousName &&
+            this.SourceUrl == other?.SourceUrl &&
+            this.Primary == other?.Primary &&
+            this.Secondary == other?.Secondary &&
+            this.Skills.SequenceEqual(other.Skills);
     }
 }

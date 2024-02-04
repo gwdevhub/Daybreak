@@ -1,0 +1,183 @@
+﻿<UserControl x:Class="Daybreak.Views.TeamBuildTemplateView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Daybreak.Views"
+             xmlns:controls="clr-namespace:Daybreak.Controls"
+             xmlns:converters="clr-namespace:Daybreak.Converters"
+             xmlns:templates="clr-namespace:Daybreak.Controls.Templates"
+             xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
+             mc:Ignorable="d"
+             x:Name="_this"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:EqualityToVisibilityConverter x:Key="EqualityToVisibilityConverter" />
+    </UserControl.Resources>
+    <Grid Background="{StaticResource Daybreak.Brushes.Background}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Border BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                BorderThickness="0, 1, 0, 0"/>
+        <Grid HorizontalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="auto"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <buttons:BackButton Height="30" Width="30" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5"
+                                Clicked="BackButton_Clicked" Grid.Column="0"
+                                ToolTip="Go back to build templates"/>
+            <Grid Grid.Column="1" VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Name: " Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" FontSize="20" VerticalAlignment="Center"></TextBlock>
+                <TextBox Grid.Column="1" Background="Transparent" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" FontSize="20"
+                         Text="{Binding ElementName=_this, Path=CurrentBuild.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         PreviewTextInput="TextBox_PreviewTextInput" TextChanged="TextBox_TextChanged"
+                         ToolTip="Build template name"/>
+            </Grid>
+            <buttons:SaveButton Height="30" Width="30" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5"
+                                Clicked="SaveButton_Clicked" Grid.Column="2" IsEnabled="{Binding ElementName=_this, Path=SaveButtonEnabled, Mode=OneWay}"
+                                ToolTip="Save build template"/>
+        </Grid>
+        <Grid Grid.Row="1" Margin="5, 0, 5, 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="auto"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="1" Text="Code: " Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" FontSize="16" VerticalAlignment="Center" />
+            <TextBox Grid.Row="1" Grid.Column="1" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" FontSize="16"
+                     Text="{Binding ElementName=_this, Path=CurrentBuildCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     ToolTip="Template code for the current build"/>
+            <TextBlock Grid.Row="0" Text="Source: " Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" FontSize="16" VerticalAlignment="Center" />
+            <TextBox Grid.Row="0" Grid.Column="1" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" FontSize="16"
+                     Text="{Binding ElementName=_this, Path=CurrentBuildSource, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     ToolTip="Url from where this build was retrieved"/>
+            <buttons:BrowserButton Grid.Row="0" Grid.Column="3" Height="30" Width="30" Clicked="BrowserButton_Clicked"
+                                   ToolTip="Open source url"/>
+        </Grid>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" MinWidth="200" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Border BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                    BorderThickness="0, 1, 1, 0"></Border>
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Team builds: "
+                           Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                           FontSize="20"
+                           VerticalAlignment="Center"/>
+                <buttons:AddButton Height="30"
+                                   Width="30"
+                                   HorizontalAlignment="Right"
+                                   Margin="2"
+                                   ToolTip="Add new build"
+                                   Clicked="AddButton_Clicked"/>
+                <ListView Grid.Row="1"
+                          ItemsSource="{Binding ElementName=_this, Path=CurrentBuild.Builds, Mode=OneWay}"
+                          SelectedItem="{Binding ElementName=_this, Path=SelectedBuild, Mode=TwoWay}"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          Background="Transparent">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="BorderBrush" Value="{StaticResource MahApps.Brushes.ThemeForeground}" />
+                            <Setter Property="BorderThickness" Value="0, 1, 0, 0" />
+                            <!-- Optional: Set the selection background to be transparent or a specific color -->
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListViewItem">
+                                        <Border Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}">
+                                            <ContentPresenter />
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.Template>
+                        <ControlTemplate>
+                            <Border
+                                    Padding="{TemplateBinding Control.Padding}"
+                                    Background="{TemplateBinding Panel.Background}"
+                                    BorderBrush="{TemplateBinding Border.BorderBrush}"
+                                    BorderThickness="{TemplateBinding Border.BorderThickness}"
+                                    SnapsToDevicePixels="True">
+                                <ScrollViewer Padding="{TemplateBinding Control.Padding}" Focusable="False">
+                                    <ItemsPresenter SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
+                                </ScrollViewer>
+                            </Border>
+                        </ControlTemplate>
+                    </ListView.Template>
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel />
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Rectangle Fill="{StaticResource MahApps.Brushes.Accent}" >
+                                    <Rectangle.Visibility>
+                                        <MultiBinding Converter="{StaticResource EqualityToVisibilityConverter}">
+                                            <Binding />
+                                            <Binding Path="SelectedItem" RelativeSource="{RelativeSource AncestorType={x:Type ListView}}" />
+                                        </MultiBinding>
+                                    </Rectangle.Visibility>
+                                </Rectangle>
+                                <buttons:HighlightButton HighlightColor="{StaticResource MahApps.Brushes.Accent}">
+                                    <buttons:HighlightButton.ButtonContent>
+                                        <Grid>
+                                            <WrapPanel Cursor="Hand"
+                                                    VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Primary.Alias}"
+                                                           FontSize="16"
+                                                           Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"/>
+                                                <TextBlock Text="/"
+                                                           FontSize="16"
+                                                           Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"/>
+                                                <TextBlock Text="{Binding Secondary.Alias}"
+                                                           FontSize="16"
+                                                           Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"/>
+                                            </WrapPanel>
+                                        </Grid>
+                                    </buttons:HighlightButton.ButtonContent>
+                                </buttons:HighlightButton>
+                                <buttons:BinButton Height="30"
+                                                   Width="30"
+                                                   HorizontalAlignment="Right"
+                                                   VerticalAlignment="Center"
+                                                   ToolTip="Delete build"
+                                                   Clicked="BinButton_Clicked"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+            <templates:BuildTemplate x:Name="BuildTemplate"
+                                     Grid.Column="1"
+                                     Grid.Row="2"
+                                     DataContext="{Binding ElementName=_this, Path=SelectedBuild, Mode=OneWay}"
+                                     BuildChanged="BuildTemplate_BuildChanged">
+            </templates:BuildTemplate>
+        </Grid>
+    </Grid>
+</UserControl>

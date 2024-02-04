@@ -72,6 +72,7 @@
             </Grid.ColumnDefinitions>
             <buttons:HelpButton Grid.Column="0"
                                 ToolTip="Open attribute points info"
+                                Clicked="HelpButtonAttributePoints_Clicked"
                                 Width="20"
                                 Height="20"
                                 Margin="3, 5, 3, 5"/>
@@ -87,6 +88,8 @@
                      BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
                      BorderThickness="1"
                      Text="{Binding ElementName=_this, Path=AttributePoints, Mode=OneWay}"
+                     FontSize="16"
+                     Background="Transparent"
                      IsReadOnly="True"/>
         </Grid>
         <Grid Grid.Row="4">
@@ -101,7 +104,6 @@
                     <DataTemplate>
                         <templates:AttributeTemplate HelpClicked="AttributeTemplate_HelpClicked"
                                                  AttributeChanged="AttributeTemplate_AttributeChanged"
-                                                 Loaded="AttributeTemplate_Loaded"
                                                  AttributePoints="{Binding Path=AttributePoints, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
                     </DataTemplate>
                 </ListView.ItemTemplate>

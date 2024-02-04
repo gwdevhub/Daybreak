@@ -8,6 +8,8 @@ namespace Daybreak.Services.BuildTemplates;
 
 public interface IBuildTemplateManager
 {
+    SingleBuildEntry ConvertToSingleBuildEntry(TeamBuildEntry teamBuildEntry);
+    TeamBuildEntry ConvertToTeamBuildEntry(SingleBuildEntry singleBuildEntry);
     bool IsTemplate(string template);
     SingleBuildEntry CreateSingleBuild();
     SingleBuildEntry CreateSingleBuild(string name);

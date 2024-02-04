@@ -94,7 +94,7 @@ public partial class MainPlayerInformationComponent : UserControl
             buildEntry.Secondary = build.Secondary;
             buildEntry.Attributes = build.Attributes;
             buildEntry.Skills = build.Skills;
-            this.viewManager.ShowView<BuildTemplateView>(buildEntry);
+            this.viewManager.ShowView<SingleBuildTemplateView>(buildEntry);
         }
     }
 }

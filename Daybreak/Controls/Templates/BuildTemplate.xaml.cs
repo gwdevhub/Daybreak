@@ -7,6 +7,7 @@ using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Navigation;
 using Daybreak.Utils;
 using Daybreak.Views;
+using MahApps.Metro.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -33,6 +34,7 @@ public partial class BuildTemplate : UserControl
 {
     private const string InfoNamePlaceholder = "[NAME]";
     private const string BaseAddress = $"https://wiki.guildwars.com/wiki/{InfoNamePlaceholder}";
+    private const string AttributePointInfo = "Attribute_point";
 
     private readonly IBuildTemplateManager buildTemplateManager;
     private readonly IViewManager viewManager;
@@ -100,11 +102,6 @@ public partial class BuildTemplate : UserControl
     {
         if(e.NewValue is SingleBuildEntry buildEntry)
         {
-            if (this.BuildEntry is not null)
-            {
-                this.BuildEntry.PropertyChanged -= this.BuildEntry_Changed;
-            }
-            
             this.BuildEntry = buildEntry;
             this.BuildEntry.PropertyChanged += this.BuildEntry_Changed;
             this.AttributePoints = this.attributePointCalculator!.GetRemainingFreePoints(this.BuildEntry);
@@ -307,6 +304,16 @@ public partial class BuildTemplate : UserControl
         }
     }
 
+
+    private void HelpButtonAttributePoints_Clicked(object sender, EventArgs e)
+    {
+        this.BrowseToInfo(AttributePointInfo);
+        if (e is RoutedEventArgs routedEventArgs)
+        {
+            routedEventArgs.Handled = true;
+        }
+    }
+
     private void AttributeTemplate_HelpClicked(object _, AttributeEntry e)
     {
         this.BrowseToInfo(e.Attribute?.Name!);
@@ -384,11 +391,6 @@ public partial class BuildTemplate : UserControl
             this.BuildEntry.EigthSkill = Skill.NoSkill;
             this.SkillTemplate7.DataContext = Skill.NoSkill;
         }
-    }
-
-    private void AttributeTemplate_Loaded(object sender, RoutedEventArgs e)
-    {
-        sender.As<AttributeTemplate>()?.InitializeAttributeTemplate(this.attributePointCalculator!);
     }
 
     private void HighlightButton_Clicked(object sender, EventArgs e)
@@ -476,6 +478,6 @@ public partial class BuildTemplate : UserControl
         }
 
         e.Build!.Name = e.PreferredName ?? Guid.NewGuid().ToString();
-        this.viewManager.ShowView<BuildTemplateView>(e.Build);
+        this.viewManager.ShowView<SingleBuildTemplateView>(e.Build);
     }
 }
