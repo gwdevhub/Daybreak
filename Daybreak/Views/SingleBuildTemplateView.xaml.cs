@@ -1,5 +1,4 @@
 ﻿using Daybreak.Models.Builds;
-using Daybreak.Models.Guildwars;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Navigation;
 using Microsoft.Extensions.Logging;
@@ -16,48 +15,42 @@ namespace Daybreak.Views;
 /// <summary>
 /// Interaction logic for BuildTemplatesView.xaml
 /// </summary>
-public partial class BuildTemplateView : UserControl
+public partial class SingleBuildTemplateView : UserControl
 {
     private const string DisallowedChars = "\r\n/.";
 
     private readonly IViewManager viewManager;
     private readonly IBuildTemplateManager buildTemplateManager;
-    private readonly IAttributePointCalculator attributePointCalculator;
-    private readonly ILogger<BuildTemplateView> logger;
+    private readonly ILogger<SingleBuildTemplateView> logger;
 
     private bool preventDecode = false;
 
     [GenerateDependencyProperty(InitialValue = false)]
     private bool saveButtonEnabled;
     [GenerateDependencyProperty]
-    private BuildEntry currentBuild = default!;
+    private IBuildEntry currentBuild = default!;
     [GenerateDependencyProperty]
     private string currentBuildCode = string.Empty;
     [GenerateDependencyProperty]
-    private int attributePoints;
-    [GenerateDependencyProperty]
     private string currentBuildSource = string.Empty;
 
-    public BuildTemplateView(
+    public SingleBuildTemplateView(
         IViewManager viewManager,
         IBuildTemplateManager buildTemplateManager,
-        IAttributePointCalculator attributePointCalculator,
-        ILogger<BuildTemplateView> logger)
+        ILogger<SingleBuildTemplateView> logger)
     {
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
-        this.attributePointCalculator = attributePointCalculator.ThrowIfNull();
         this.InitializeComponent();
         this.DataContextChanged += (sender, contextArgs) =>
         {
-            if (contextArgs.NewValue is BuildEntry buildEntry)
+            if (contextArgs.NewValue is IBuildEntry buildEntry)
             {
                 this.logger.LogInformation("Received data context. Setting current build");
                 this.CurrentBuild = buildEntry;
-                this.CurrentBuildCode = this.buildTemplateManager.EncodeTemplate(this.CurrentBuild.Build!);
-                this.AttributePoints = this.attributePointCalculator.GetRemainingFreePoints(this.CurrentBuild.Build!);
-                this.CurrentBuildSource = buildEntry.Build?.SourceUrl;
+                this.CurrentBuildCode = this.buildTemplateManager.EncodeTemplate(this.CurrentBuild);
+                this.CurrentBuildSource = buildEntry.SourceUrl;
             }
         };
     }
@@ -71,27 +64,20 @@ public partial class BuildTemplateView : UserControl
             this.logger.LogInformation($"Attempting to decode provided template {this.CurrentBuildCode}");
             try
             {
-                this.CurrentBuild = new BuildEntry
-                {
-                    Name = this.CurrentBuild.Name,
-                    PreviousName = this.CurrentBuild.PreviousName,
-                    Build = this.buildTemplateManager.DecodeTemplate(this.CurrentBuildCode)
-            };
-
+                var newBuild = this.buildTemplateManager.DecodeTemplate(this.CurrentBuildCode);
+                newBuild.Name = this.CurrentBuild.Name;
+                newBuild.PreviousName = this.CurrentBuild.PreviousName;
+                this.CurrentBuild = newBuild;
                 this.logger.LogInformation($"Template {this.CurrentBuildCode} decoded");
             }
             catch
             {
                 this.logger.LogWarning($"Failed to decode {this.CurrentBuildCode}. Reverting to default build");
-                this.CurrentBuild = new BuildEntry
-                {
-                    Name = this.CurrentBuild.Name,
-                    PreviousName = this.CurrentBuild.PreviousName,
-                    Build = new Build()
-                };
+                var newBuild = this.buildTemplateManager.CreateSingleBuild();
+                newBuild.Name = this.CurrentBuild.Name;
+                newBuild.PreviousName = this.CurrentBuild.PreviousName;
+                this.CurrentBuild = newBuild;
             }
-
-            this.AttributePoints = this.attributePointCalculator.GetRemainingFreePoints(this.CurrentBuild.Build!);
         }
     }
 
@@ -100,9 +86,8 @@ public partial class BuildTemplateView : UserControl
         try
         {
             this.preventDecode = true;
-            this.CurrentBuildCode = this.buildTemplateManager.EncodeTemplate(this.CurrentBuild.Build!);
+            this.CurrentBuildCode = this.buildTemplateManager.EncodeTemplate(this.CurrentBuild);
             this.preventDecode = false;
-            this.AttributePoints = this.attributePointCalculator.GetRemainingFreePoints(this.CurrentBuild.Build!);
         }
         finally
         {
@@ -114,13 +99,13 @@ public partial class BuildTemplateView : UserControl
     }
     private void SaveButton_Clicked(object sender, EventArgs e)
     {
-        if (this.CurrentBuild.Build is null)
+        if (this.CurrentBuild is null)
         {
             this.viewManager.ShowView<BuildsListView>();
             return;
         }
 
-        this.CurrentBuild.Build.SourceUrl = this.CurrentBuildSource;
+        this.CurrentBuild.SourceUrl = this.CurrentBuildSource;
         this.buildTemplateManager.SaveBuild(this.CurrentBuild);
         this.viewManager.ShowView<BuildsListView>();
     }
@@ -137,7 +122,7 @@ public partial class BuildTemplateView : UserControl
 
     private void TextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
     {
-        if (DisallowedChars.ToCharArray().Where(c => e.Text.Contains(c)).Any())
+        if (DisallowedChars.ToCharArray().Where(e.Text.Contains).Any())
         {
             e.Handled = true;
         }
