@@ -20,12 +20,12 @@ public sealed class RowAutoMargin : Behavior<Grid>
     }
 
     // TODO #367: Super hacky code below. To be reworked
-    private void AssociatedObject_Loaded(object sender, RoutedEventArgs e)
+    public void RecalculateRows()
     {
         /*
          * Tag each child with the desired row. Skip children already tagged
          */
-        foreach(var child in this.AssociatedObject.Children.OfType<FrameworkElement>())
+        foreach (var child in this.AssociatedObject.Children.OfType<FrameworkElement>())
         {
             if (child.Tag is int desiredRow)
             {
@@ -72,9 +72,12 @@ public sealed class RowAutoMargin : Behavior<Grid>
         var addedRows = 0;
         for (var i = 0; i < this.AssociatedObject.RowDefinitions.Count - 1; i++)
         {
-            if (this.AssociatedObject.RowDefinitions[i + addedRows].Height.Value > 0)
+            var rowDefinition = this.AssociatedObject.RowDefinitions[i];
+            if (rowDefinition.Height.Value > 0 &&
+                (rowDefinition.Tag is not string tagString ||
+                 tagString is not GeneratedRowsTag))
             {
-                this.AssociatedObject.RowDefinitions.Insert(i + 1, 
+                this.AssociatedObject.RowDefinitions.Insert(i + 1,
                     new RowDefinition
                     {
                         Height = new GridLength(this.Margin, GridUnitType.Pixel),
@@ -89,9 +92,13 @@ public sealed class RowAutoMargin : Behavior<Grid>
                     }
                 }
 
-                i++;
                 addedRows++;
             }
         }
+    }
+
+    private void AssociatedObject_Loaded(object sender, RoutedEventArgs e)
+    {
+        this.RecalculateRows();
     }
 }

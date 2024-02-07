@@ -12,6 +12,7 @@
              xmlns:interactivity="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:behaviors="clr-namespace:Daybreak.Behaviors"
              xmlns:components="clr-namespace:Daybreak.Controls.FocusViewComponents"
+             xmlns:glyphs="clr-namespace:Daybreak.Controls.Glyphs"
              mc:Ignorable="d" 
              Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
              Loaded="FocusView_Loaded"
@@ -25,6 +26,7 @@
         <converters:BooleanToGridLengthConverter x:Key="MinimapComponentVisibilityConverter" VisibleValue="1*" />
         <converters:BooleanToGridLengthConverter x:Key="BrowserComponentVisibilityConverter" VisibleValue="1.5*" />
         <converters:BooleanToGridLengthConverter x:Key="MarginVisibilityConverter" VisibleValue="10" />
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -35,13 +37,25 @@
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="118"></RowDefinition>
         </Grid.RowDefinitions>
-        <components:PlayerResourcesComponent Margin="5, 5, 5, 0"
-                                             Grid.ColumnSpan="2"
-                                             Grid.Row="1"
-                                             DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext, Mode=OneWay}"
-                                             Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-        <Grid Margin="5, 0, 5, 0"
-              Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+        <Grid Grid.Row="1"
+              Margin="5, 5, 5, 0"
+              Grid.ColumnSpan="2">
+            <components:PlayerResourcesComponent Margin="5, 5, 5, 0"
+                                     Grid.ColumnSpan="2"
+                                     Grid.Row="1"
+                                     DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext, Mode=OneWay}"
+                                     Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <Grid Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                  VerticalAlignment="Stretch"
+                  HorizontalAlignment="Stretch"
+                  Background="{StaticResource Daybreak.Brushes.Background}">
+                <controls:CircularLoadingWidget VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Height="100"
+                    Width="100"/>
+            </Grid>
+        </Grid>
+        <Grid Margin="5, 0, 5, 0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"></RowDefinition>
                 <RowDefinition Height="auto"></RowDefinition>
@@ -50,40 +64,57 @@
                 <RowDefinition Height="auto"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
-            <components:MainPlayerInformationComponent Grid.Row="0"
-                                                       DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext.Player.PlayerInformation, Mode=OneWay}"
-                                                       Margin="0, 0, 0, 10"
-                                                       NavigateToClicked="Component_NavigateToClicked"/>
-            <components:TitleInformationComponent Grid.Row="1"
-                                                  DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext.Player.PlayerInformation.TitleInformation, Mode=OneWay}"
-                                                  Visibility="{Binding ElementName=_this, Path=MainPlayerResourceContext.Player.PlayerInformation.TitleInformation.IsValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                  Margin="0, 0, 0, 10"
-                                                  NavigateToClicked="Component_NavigateToClicked"/>
+            <components:MainPlayerInformationComponent
+                                           DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext.Player.PlayerInformation, Mode=OneWay}"
+                                           Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                           Margin="0, 0, 0, 10"
+                                           NavigateToClicked="Component_NavigateToClicked"/>
+            <Grid Grid.Row="1"
+                  Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <components:TitleInformationComponent Grid.Row="1"
+                                      DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext.Player.PlayerInformation.TitleInformation, Mode=OneWay}"
+                                      Visibility="{Binding ElementName=_this, Path=MainPlayerResourceContext.Player.PlayerInformation.TitleInformation.IsValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                      Margin="0, 0, 0, 10"
+                                      NavigateToClicked="Component_NavigateToClicked"/>
+            </Grid>
             <components:CurrentMapComponent Grid.Row="2"
                                             DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext.Session.Session.CurrentMap, Mode=OneWay}"
+                                            Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
                                             Margin="0, 0, 0, 10"
                                             NavigateToClicked="Component_NavigateToClicked"/>
             <components:CurrentQuestComponent Grid.Row="3"
                                               Margin="0, 0, 0, 10"
                                               DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext.Player.PlayerInformation.Quest, Mode=OneWay}"
+                                              Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
                                               NavigateToClicked="Component_NavigateToClicked"/>
             <components:QuestLogComponent Grid.Row="4"
                                           Grid.RowSpan="2"
                                           NavigateToClicked="Component_NavigateToClicked"
-                                          DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext.Player.PlayerInformation.QuestLog, Mode=OneWay}"></components:QuestLogComponent>
+                                          DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext.Player.PlayerInformation.QuestLog, Mode=OneWay}"
+                                          Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <Grid Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                  Grid.RowSpan="6"
+                  Grid.ColumnSpan="6"
+                  VerticalAlignment="Stretch"
+                  HorizontalAlignment="Stretch"
+                  Background="{StaticResource Daybreak.Brushes.Background}">
+                <controls:CircularLoadingWidget VerticalAlignment="Center"
+                                                HorizontalAlignment="Center"
+                                                Height="100"
+                                                Width="100"/>
+            </Grid>
         </Grid>
         <Grid Grid.Column="1"
               Margin="5, 0, 5, 0">
             <interactivity:Interaction.Behaviors>
-                <behaviors:RowAutoMargin Margin="10"></behaviors:RowAutoMargin>
+                <behaviors:RowAutoMargin x:Name="RowAutoMargin" Margin="10"></behaviors:RowAutoMargin>
             </interactivity:Interaction.Behaviors>
             <Grid.RowDefinitions>
                 <RowDefinition Height="{Binding ElementName=_this, Path=InventoryVisible, Mode=OneWay, Converter={StaticResource InventoryComponentVisibilityConverter}}" />
                 <RowDefinition Height="{Binding ElementName=_this, Path=MinimapVisible, Mode=OneWay, Converter={StaticResource MinimapComponentVisibilityConverter}}" />
                 <RowDefinition Height="{Binding ElementName=Browser, Path=BrowserSupported, Mode=OneWay, Converter={StaticResource BrowserComponentVisibilityConverter}}" />
             </Grid.RowDefinitions>
-            <Grid x:Name="InventoryHolder"
-                  MaxHeight="250">
+            <Grid x:Name="InventoryHolder">
                 <Grid x:Name="InventoryComponent"
                       Visibility="{Binding ElementName=_this, Path=InventoryVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <components:InventoryComponent
@@ -96,7 +127,9 @@
                 </Grid>
             </Grid>
             <Grid x:Name="MinimapHolder"
-                  Grid.Row="1">
+                  Grid.Row="1"
+                  Background="{StaticResource Daybreak.Brushes.Background}"
+                  Visibility="{Binding ElementName=_this, Path=MinimapExtracted, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
                 <Grid x:Name="MinimapComponent"
                       Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <minimap:GuildwarsMinimap x:Name="Minimap"
@@ -106,7 +139,7 @@
                                           PathingData="{Binding ElementName=_this, Path=PathingData, Mode=OneWay}"
                                           CanRotate="{Binding ElementName=_this, Path=CanRotateMinimap, Mode=OneWay}"
                                           Zoom="0.04"
-                                          ControlsVisible="True"
+                                          ControlsVisible="{Binding ElementName=_this, Path=MinimapExtracted, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
                                           MaximizeClicked="GuildwarsMinimap_MaximizeClicked"
                                           QuestMetadataClicked="GuildwarsMinimap_QuestMetadataClicked"
                                           LivingEntityClicked="GuildwarsMinimap_LivingEntityClicked"
@@ -117,12 +150,40 @@
                                           ClipToBounds="True"
                                           Background="{DynamicResource Daybreak.Brushes.Background}"
                                           BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                                          BorderThickness="1"
-                                          IsEnabled="{Binding ElementName=_this, Path=MinimapVisible, Mode=OneWay}"/>
+                                          BorderThickness="1"/>
+                    <Grid
+                        VerticalAlignment="Top"
+                        HorizontalAlignment="Right"
+                        Margin="1"
+                        Background="{StaticResource Daybreak.Brushes.Background}">
+                        <buttons:CircularButton
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Highlight="{StaticResource MahApps.Brushes.Accent}"
+                            Visibility="{Binding ElementName=_this, Path=MinimapExtracted, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                            ToolTip="Move minimap to new window"
+                            Height="30"
+                            Width="30"
+                            Margin="5"
+                            Clicked="MinimapExtractButton_Clicked">
+                            <buttons:CircularButton.Content>
+                                <glyphs:ArrowGlyph RenderTransformOrigin="0.5 0.5"
+                                    Height="50"
+                                    Width="50">
+                                    <glyphs:ArrowGlyph.RenderTransform>
+                                        <RotateTransform Angle="90" />
+                                    </glyphs:ArrowGlyph.RenderTransform>
+                                </glyphs:ArrowGlyph>
+                            </buttons:CircularButton.Content>
+                        </buttons:CircularButton>
+                    </Grid>
                     <controls:CircularLoadingWidget Height="100"
                                                 Width="100"
                                                 Visibility="{Binding ElementName=_this,Path=LoadingPathingData,Mode=OneWay,Converter={StaticResource BooleanToVisibilityConverter}}" />
                 </Grid>
+                <controls:CircularLoadingWidget Height="100"
+                            Width="100"
+                            Visibility="{Binding ElementName=_this,Path=MainPlayerDataValid,Mode=OneWay,Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
             </Grid>
             <Grid x:Name="BrowserHolder"
                   Grid.Row="2">
@@ -134,7 +195,7 @@
                     CanDownloadBuild="True"
                     Address="{Binding ElementName=_this, Path=BrowserAddress, Mode=TwoWay}"
                     MaximizeClicked="Browser_MaximizeClicked"
-                    Visibility="Hidden"
+                    Visibility="Visible"
                     BuildDecoded="Browser_BuildDecoded"
                     BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
                     BorderThickness="1"
@@ -147,10 +208,5 @@
               Margin="5, 0, 5, 0"
               Background="{DynamicResource MahApps.Brushes.ThemeBackground}"
               Visibility="Hidden"/>
-        <controls:CircularLoadingWidget Grid.ColumnSpan="2"
-                                        Grid.RowSpan="2"
-                                        Width="100"
-                                        Height="100"
-                                        Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"></controls:CircularLoadingWidget>
     </Grid>
 </UserControl>
