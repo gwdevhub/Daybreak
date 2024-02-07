@@ -104,19 +104,17 @@
                                                 Width="100"/>
             </Grid>
         </Grid>
-        <Grid x:Name="RightSideGrid"
-              Grid.Column="1"
+        <Grid Grid.Column="1"
               Margin="5, 0, 5, 0">
             <interactivity:Interaction.Behaviors>
-                <behaviors:RowAutoMargin Margin="10"></behaviors:RowAutoMargin>
+                <behaviors:RowAutoMargin x:Name="RowAutoMargin" Margin="10"></behaviors:RowAutoMargin>
             </interactivity:Interaction.Behaviors>
             <Grid.RowDefinitions>
                 <RowDefinition Height="{Binding ElementName=_this, Path=InventoryVisible, Mode=OneWay, Converter={StaticResource InventoryComponentVisibilityConverter}}" />
                 <RowDefinition Height="{Binding ElementName=_this, Path=MinimapVisible, Mode=OneWay, Converter={StaticResource MinimapComponentVisibilityConverter}}" />
                 <RowDefinition Height="{Binding ElementName=Browser, Path=BrowserSupported, Mode=OneWay, Converter={StaticResource BrowserComponentVisibilityConverter}}" />
             </Grid.RowDefinitions>
-            <Grid x:Name="InventoryHolder"
-                  MaxHeight="250">
+            <Grid x:Name="InventoryHolder">
                 <Grid x:Name="InventoryComponent"
                       Visibility="{Binding ElementName=_this, Path=InventoryVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <components:InventoryComponent
@@ -163,6 +161,7 @@
                             HorizontalAlignment="Center"
                             Highlight="{StaticResource MahApps.Brushes.Accent}"
                             Visibility="{Binding ElementName=_this, Path=MinimapExtracted, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                            ToolTip="Move minimap to new window"
                             Height="30"
                             Width="30"
                             Margin="5"

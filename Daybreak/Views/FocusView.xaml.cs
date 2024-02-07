@@ -793,6 +793,7 @@ public partial class FocusView : UserControl
         this.MinimapHolder.Children.Remove(this.MinimapComponent);
         this.minimapWindow.Content = this.MinimapComponent;
         this.minimapWindow.Show();
+        this.RowAutoMargin.RecalculateRows();
     }
 
     private void MinimapWindow_Closed(object? sender, EventArgs e)
@@ -814,8 +815,6 @@ public partial class FocusView : UserControl
         this.minimapWindow.Content = default!;
         this.minimapWindow = default;
         this.MinimapHolder.Children.Insert(0, this.MinimapComponent);
-        this.RightSideGrid.InvalidateArrange();
-        this.RightSideGrid.InvalidateMeasure();
-        this.RightSideGrid.InvalidateVisual();
+        this.RowAutoMargin.RecalculateRows();
     }
 }

@@ -17,27 +17,10 @@ public sealed class RowAutoMargin : Behavior<Grid>
          * We need to trigger the behavior only after the object is fully loaded and rows are generated
          */
         this.AssociatedObject.Loaded += this.AssociatedObject_Loaded;
-        this.AssociatedObject.SizeChanged += this.AssociatedObject_SizeChanged;
-        this.AssociatedObject.LayoutUpdated += this.AssociatedObject_LayoutUpdated;
-    }
-
-    private void AssociatedObject_LayoutUpdated(object? sender, System.EventArgs e)
-    {
-        this.RecalculateRows();
-    }
-
-    private void AssociatedObject_SizeChanged(object sender, SizeChangedEventArgs e)
-    {
-        this.RecalculateRows();
     }
 
     // TODO #367: Super hacky code below. To be reworked
-    private void AssociatedObject_Loaded(object sender, RoutedEventArgs e)
-    {
-        this.RecalculateRows();
-    }
-
-    private void RecalculateRows()
+    public void RecalculateRows()
     {
         /*
          * Tag each child with the desired row. Skip children already tagged
@@ -89,7 +72,10 @@ public sealed class RowAutoMargin : Behavior<Grid>
         var addedRows = 0;
         for (var i = 0; i < this.AssociatedObject.RowDefinitions.Count - 1; i++)
         {
-            if (this.AssociatedObject.RowDefinitions[i + addedRows].Height.Value > 0)
+            var rowDefinition = this.AssociatedObject.RowDefinitions[i];
+            if (rowDefinition.Height.Value > 0 &&
+                (rowDefinition.Tag is not string tagString ||
+                 tagString is not GeneratedRowsTag))
             {
                 this.AssociatedObject.RowDefinitions.Insert(i + 1,
                     new RowDefinition
@@ -106,9 +92,13 @@ public sealed class RowAutoMargin : Behavior<Grid>
                     }
                 }
 
-                i++;
                 addedRows++;
             }
         }
+    }
+
+    private void AssociatedObject_Loaded(object sender, RoutedEventArgs e)
+    {
+        this.RecalculateRows();
     }
 }
