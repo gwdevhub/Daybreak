@@ -10,7 +10,7 @@ using Daybreak.Services.Navigation;
 using Daybreak.Services.Notifications;
 using Daybreak.Services.Scanner;
 using Daybreak.Views.Trade;
-using LiveChartsCore;
+using MahApps.Metro.Controls;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Configuration;
@@ -23,6 +23,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
+using System.Windows.Media.Animation;
+using Position = Daybreak.Models.Guildwars.Position;
 
 namespace Daybreak.Views;
 
@@ -83,6 +85,10 @@ public partial class FocusView : UserControl
     [GenerateDependencyProperty]
     private bool canRotateMinimap;
 
+    [GenerateDependencyProperty]
+    private bool minimapExtracted;
+
+    private MetroWindow? minimapWindow;
     private bool browserMaximized = false;
     private bool minimapMaximized = false;
     private bool inventoryMaximized = false;
@@ -513,7 +519,6 @@ public partial class FocusView : UserControl
                     sessionData.Session.InstanceTimer == 0)
                 {
                     this.MainPlayerDataValid = false;
-                    this.Browser.Visibility = Visibility.Collapsed;
                     continue;
                 }
 
@@ -606,6 +611,7 @@ public partial class FocusView : UserControl
         this.GameState = default;
         this.PathingData = default;
         this.InventoryData = default;
+        this.MinimapWindow_Closed(this, e);
     }
 
     private void Browser_MaximizeClicked(object _, EventArgs e)
@@ -760,5 +766,56 @@ public partial class FocusView : UserControl
     private void InventoryComponent_PriceHistoryClicked(object _, ItemBase e)
     {
         this.viewManager.ShowView<PriceHistoryView>(e);
+    }
+
+    private void MinimapExtractButton_Clicked(object sender, EventArgs e)
+    {
+        if (this.minimapWindow is not null)
+        {
+            return;
+        }
+
+        this.minimapWindow = new()
+        {
+            ShowTitleBar = true,
+            ShowMaxRestoreButton = true,
+            ShowIconOnTitleBar = false,
+            ShowMinButton = true,
+            ShowSystemMenu = false,
+            ShowSystemMenuOnRightClick = false,
+            ShowInTaskbar = true,
+            ShowCloseButton = true
+        };
+
+        this.minimapWindow.Closed += this.MinimapWindow_Closed;
+        this.MinimapExtracted = true;
+        this.MinimapVisible = false;
+        this.MinimapHolder.Children.Remove(this.MinimapComponent);
+        this.minimapWindow.Content = this.MinimapComponent;
+        this.minimapWindow.Show();
+    }
+
+    private void MinimapWindow_Closed(object? sender, EventArgs e)
+    {
+        if (!this.MinimapExtracted)
+        {
+            return;
+        }
+
+        if (this.minimapWindow is null)
+        {
+            return;
+        }
+
+        this.MinimapExtracted = false;
+        this.MinimapVisible = this.liveUpdateableOptions.Value.MinimapComponentVisible;
+        this.minimapWindow.Close();
+        this.minimapWindow.Closed -= this.MinimapWindow_Closed;
+        this.minimapWindow.Content = default!;
+        this.minimapWindow = default;
+        this.MinimapHolder.Children.Insert(0, this.MinimapComponent);
+        this.RightSideGrid.InvalidateArrange();
+        this.RightSideGrid.InvalidateMeasure();
+        this.RightSideGrid.InvalidateVisual();
     }
 }

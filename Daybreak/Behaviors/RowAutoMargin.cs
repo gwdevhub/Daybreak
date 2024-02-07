@@ -17,15 +17,32 @@ public sealed class RowAutoMargin : Behavior<Grid>
          * We need to trigger the behavior only after the object is fully loaded and rows are generated
          */
         this.AssociatedObject.Loaded += this.AssociatedObject_Loaded;
+        this.AssociatedObject.SizeChanged += this.AssociatedObject_SizeChanged;
+        this.AssociatedObject.LayoutUpdated += this.AssociatedObject_LayoutUpdated;
+    }
+
+    private void AssociatedObject_LayoutUpdated(object? sender, System.EventArgs e)
+    {
+        this.RecalculateRows();
+    }
+
+    private void AssociatedObject_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        this.RecalculateRows();
     }
 
     // TODO #367: Super hacky code below. To be reworked
     private void AssociatedObject_Loaded(object sender, RoutedEventArgs e)
     {
+        this.RecalculateRows();
+    }
+
+    private void RecalculateRows()
+    {
         /*
          * Tag each child with the desired row. Skip children already tagged
          */
-        foreach(var child in this.AssociatedObject.Children.OfType<FrameworkElement>())
+        foreach (var child in this.AssociatedObject.Children.OfType<FrameworkElement>())
         {
             if (child.Tag is int desiredRow)
             {
@@ -74,7 +91,7 @@ public sealed class RowAutoMargin : Behavior<Grid>
         {
             if (this.AssociatedObject.RowDefinitions[i + addedRows].Height.Value > 0)
             {
-                this.AssociatedObject.RowDefinitions.Insert(i + 1, 
+                this.AssociatedObject.RowDefinitions.Insert(i + 1,
                     new RowDefinition
                     {
                         Height = new GridLength(this.Margin, GridUnitType.Pixel),
