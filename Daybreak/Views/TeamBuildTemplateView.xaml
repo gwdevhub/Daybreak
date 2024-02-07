@@ -61,6 +61,11 @@
             <TextBox Grid.Row="1" Grid.Column="1" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" FontSize="16"
                      Text="{Binding ElementName=_this, Path=CurrentBuildCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      ToolTip="Template code for the current build"/>
+            <buttons:CopyButton Grid.Row="1"
+                    Grid.Column="2"
+                    Height="30"
+                    Width="30"
+                    Clicked="CopyButton_CodeClicked"/>
             <TextBlock Grid.Row="0" Text="Source: " Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" FontSize="16" VerticalAlignment="Center" />
             <TextBox Grid.Row="0" Grid.Column="1" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" FontSize="16"
                      Text="{Binding ElementName=_this, Path=CurrentBuildSource, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -71,6 +76,11 @@
             <TextBox Grid.Row="2" Grid.Column="1" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" FontSize="16"
                      Text="{Binding ElementName=_this, Path=CurrentBuildSubCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      ToolTip="Template code for the current build"/>
+            <buttons:CopyButton Grid.Row="2"
+                                Grid.Column="2"
+                                Height="30"
+                                Width="30"
+                                Clicked="CopyButton_SubCodeClicked"/>
         </Grid>
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>

@@ -75,6 +75,11 @@
                      ToolTip="Url from where this build was retrieved"/>
             <buttons:BrowserButton Grid.Row="0" Grid.Column="3" Height="30" Width="30" Clicked="BrowserButton_Clicked"
                                    ToolTip="Open source url"/>
+            <buttons:CopyButton Grid.Column="2"
+                                Grid.Row="1"
+                                Height="30"
+                                Width="30"
+                                Clicked="CopyButton_Clicked"/>
         </Grid>
         <templates:BuildTemplate x:Name="BuildTemplate" Grid.Row="2" DataContext="{Binding ElementName=_this, Path=CurrentBuild, Mode=OneWay}"
                                 BuildChanged="BuildTemplate_BuildChanged">

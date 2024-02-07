@@ -3,6 +3,7 @@ using Daybreak.Models.Builds;
 using Daybreak.Models.Guildwars;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Navigation;
+using Daybreak.Services.Notifications;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Core.Extensions;
@@ -21,6 +22,7 @@ public partial class TeamBuildTemplateView : UserControl
 {
     private const string DisallowedChars = "\r\n/.";
 
+    private readonly INotificationService notificationService;
     private readonly IViewManager viewManager;
     private readonly IBuildTemplateManager buildTemplateManager;
     private readonly ILogger<TeamBuildTemplateView> logger;
@@ -42,10 +44,12 @@ public partial class TeamBuildTemplateView : UserControl
     private string currentBuildSubCode = string.Empty;
 
     public TeamBuildTemplateView(
+        INotificationService notificationService,
         IViewManager viewManager,
         IBuildTemplateManager buildTemplateManager,
         ILogger<TeamBuildTemplateView> logger)
     {
+        this.notificationService = notificationService.ThrowIfNull();
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
@@ -264,6 +268,32 @@ public partial class TeamBuildTemplateView : UserControl
         var newBuild = this.buildTemplateManager.CreateSingleBuild();
         // We need to reset the list to trigger the binding. Simply adding the item from the list will not trigger the binding
         this.CurrentBuild.Builds = [.. this.CurrentBuild.Builds, newBuild];
+    }
+
+    private void CopyButton_SubCodeClicked(object sender, EventArgs e)
+    {
+        if (this.CurrentBuildSubCode.IsNullOrWhiteSpace())
+        {
+            return;
+        }
+
+        Clipboard.SetText(this.CurrentBuildSubCode);
+        this.notificationService.NotifyInformation(
+            "Copied sub-build code",
+            $"Copied {this.CurrentBuildSubCode} code to clipboard");
+    }
+
+    private void CopyButton_CodeClicked(object sender, EventArgs e)
+    {
+        if (this.CurrentBuildCode.IsNullOrWhiteSpace())
+        {
+            return;
+        }
+
+        Clipboard.SetText(this.CurrentBuildCode);
+        this.notificationService.NotifyInformation(
+            "Copied team build code",
+            $"Copied {this.CurrentBuildCode} code to clipboard");
     }
 }
 
