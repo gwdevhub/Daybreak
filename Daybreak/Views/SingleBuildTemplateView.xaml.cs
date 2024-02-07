@@ -1,6 +1,7 @@
 ﻿using Daybreak.Models.Builds;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Navigation;
+using Daybreak.Services.Notifications;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Core.Extensions;
@@ -19,6 +20,7 @@ public partial class SingleBuildTemplateView : UserControl
 {
     private const string DisallowedChars = "\r\n/.";
 
+    private readonly INotificationService notificationService;
     private readonly IViewManager viewManager;
     private readonly IBuildTemplateManager buildTemplateManager;
     private readonly ILogger<SingleBuildTemplateView> logger;
@@ -35,10 +37,12 @@ public partial class SingleBuildTemplateView : UserControl
     private string currentBuildSource = string.Empty;
 
     public SingleBuildTemplateView(
+        INotificationService notificationService,
         IViewManager viewManager,
         IBuildTemplateManager buildTemplateManager,
         ILogger<SingleBuildTemplateView> logger)
     {
+        this.notificationService = notificationService.ThrowIfNull();
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
@@ -156,5 +160,18 @@ public partial class SingleBuildTemplateView : UserControl
         newTeamBuild.PreviousName = this.CurrentBuild.PreviousName;
         newTeamBuild.Builds.ClearAnd().Add(this.CurrentBuild);
         this.viewManager.ShowView<TeamBuildTemplateView>(newTeamBuild);
+    }
+
+    private void CopyButton_Clicked(object sender, EventArgs e)
+    {
+        if (this.CurrentBuildCode.IsNullOrWhiteSpace())
+        {
+            return;
+        }
+
+        Clipboard.SetText(this.CurrentBuildCode);
+        this.notificationService.NotifyInformation(
+            "Copied build code",
+            $"Copied {this.CurrentBuildCode} code to clipboard");
     }
 }
