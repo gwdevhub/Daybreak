@@ -1,4 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Launch;
 using Daybreak.Models;
 using Daybreak.Models.Builds;
 using Daybreak.Models.Guildwars;
@@ -91,7 +92,7 @@ public partial class FocusView : UserControl
     [GenerateDependencyProperty]
     private bool minimapExtracted;
 
-    private MetroWindow? minimapWindow;
+    private MinimapWindow? minimapWindow;
     private bool browserMaximized = false;
     private bool minimapMaximized = false;
     private bool inventoryMaximized = false;
@@ -784,14 +785,7 @@ public partial class FocusView : UserControl
 
         this.minimapWindow = new()
         {
-            ShowTitleBar = true,
-            ShowMaxRestoreButton = true,
-            ShowIconOnTitleBar = false,
-            ShowMinButton = true,
-            ShowSystemMenu = false,
-            ShowSystemMenuOnRightClick = false,
-            ShowInTaskbar = true,
-            ShowCloseButton = true
+            Resources = this.Resources
         };
 
         var minimapWindowOptions = this.minimapWindowOptions.Value.ThrowIfNull();
@@ -813,8 +807,6 @@ public partial class FocusView : UserControl
             this.minimapWindow.Height = minimapSize.Height;
         }
 
-        this.minimapWindow.LocationChanged += this.MinimapWindow_LocationChanged;
-        this.minimapWindow.SizeChanged += this.MinimapWindow_SizeChanged;
         this.minimapWindow.Closed += this.MinimapWindow_Closed;
         this.MinimapExtracted = true;
         this.MinimapVisible = false;
@@ -822,44 +814,6 @@ public partial class FocusView : UserControl
         this.minimapWindow.Content = this.MinimapComponent;
         this.minimapWindow.Show();
         this.RowAutoMargin.RecalculateRows();
-    }
-
-    private void MinimapWindow_SizeChanged(object sender, SizeChangedEventArgs e)
-    {
-        if (this.minimapWindow is null)
-        {
-            return;
-        }
-
-        var options = this.minimapWindowOptions.Value.ThrowIfNull();
-        var dpiScale = VisualTreeHelper.GetDpi(this.minimapWindow);
-        options.X = this.minimapWindow.Left;
-        options.Y = this.minimapWindow.Top;
-        options.Width = this.minimapWindow.Width;
-        options.Height = this.minimapWindow.Height;
-        options.DpiX = dpiScale.DpiScaleX;
-        options.DpiY = dpiScale.DpiScaleY;
-
-        this.minimapWindowOptions.UpdateOption();
-    }
-
-    private void MinimapWindow_LocationChanged(object? sender, EventArgs e)
-    {
-        if (this.minimapWindow is null)
-        {
-            return;
-        }
-
-        var options = this.minimapWindowOptions.Value.ThrowIfNull();
-        var dpiScale = VisualTreeHelper.GetDpi(this.minimapWindow);
-        options.X = this.minimapWindow.Left;
-        options.Y = this.minimapWindow.Top;
-        options.Width = this.minimapWindow.Width;
-        options.Height = this.minimapWindow.Height;
-        options.DpiX = dpiScale.DpiScaleX;
-        options.DpiY = dpiScale.DpiScaleY;
-
-        this.minimapWindowOptions.UpdateOption();
     }
 
     private void MinimapWindow_Closed(object? sender, EventArgs e)
@@ -873,6 +827,17 @@ public partial class FocusView : UserControl
         {
             return;
         }
+
+        var options = this.minimapWindowOptions.Value.ThrowIfNull();
+        var dpiScale = VisualTreeHelper.GetDpi(this.minimapWindow);
+        options.X = this.minimapWindow.Left;
+        options.Y = this.minimapWindow.Top;
+        options.Width = this.minimapWindow.Width;
+        options.Height = this.minimapWindow.Height;
+        options.DpiX = dpiScale.DpiScaleX;
+        options.DpiY = dpiScale.DpiScaleY;
+
+        this.minimapWindowOptions.UpdateOption();
 
         this.MinimapExtracted = false;
         this.MinimapVisible = this.liveUpdateableOptions.Value.MinimapComponentVisible;
