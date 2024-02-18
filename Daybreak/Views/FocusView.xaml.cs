@@ -785,7 +785,8 @@ public partial class FocusView : UserControl
 
         this.minimapWindow = new()
         {
-            Resources = this.Resources
+            Resources = this.Resources,
+            Opaque = !this.liveUpdateableOptions.Value.MinimapTransparency
         };
 
         var minimapWindowOptions = this.minimapWindowOptions.Value.ThrowIfNull();

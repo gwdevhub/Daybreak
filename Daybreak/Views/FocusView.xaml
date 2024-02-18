@@ -128,7 +128,7 @@
             </Grid>
             <Grid x:Name="MinimapHolder"
                   Grid.Row="1"
-                  Background="{StaticResource Daybreak.Brushes.Background}"
+                  Background="{DynamicResource Daybreak.Brushes.Background}"
                   Visibility="{Binding ElementName=_this, Path=MinimapExtracted, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
                 <Grid x:Name="MinimapComponent"
                       Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -148,18 +148,18 @@
                                           ProfessionClicked="GuildwarsMinimap_ProfessionClicked"
                                           NpcNameClicked="GuildwarsMinimap_NpcNameClicked"
                                           ClipToBounds="True"
-                                          Background="{DynamicResource Daybreak.Brushes.Background}"
+                                          Background="Transparent"
                                           BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
                                           BorderThickness="1"/>
                     <Grid
                         VerticalAlignment="Top"
                         HorizontalAlignment="Right"
                         Margin="1"
-                        Background="{StaticResource Daybreak.Brushes.Background}">
+                        Background="{DynamicResource Daybreak.Brushes.Background}">
                         <buttons:CircularButton
                             VerticalAlignment="Center"
                             HorizontalAlignment="Center"
-                            Highlight="{StaticResource MahApps.Brushes.Accent}"
+                            Highlight="{DynamicResource MahApps.Brushes.Accent}"
                             Visibility="{Binding ElementName=_this, Path=MinimapExtracted, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
                             ToolTip="Move minimap to new window"
                             Height="30"

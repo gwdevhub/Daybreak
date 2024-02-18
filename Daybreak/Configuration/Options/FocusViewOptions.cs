@@ -54,6 +54,10 @@ public sealed class FocusViewOptions
     [OptionName(Name = "Minimap Rotation", Description = "When enabled, the minimap will rotate according to the player camera")]
     public bool MinimapRotationEnabled { get; set; } = true;
 
+    [JsonProperty(nameof(MinimapTransparency))]
+    [OptionName(Name = "Minimap Transparency", Description = "When enabled, the minimap window will be transparent")]
+    public bool MinimapTransparency { get; set; } = true;
+
     [JsonProperty(nameof(BrowserHistory))]
     [OptionIgnore]
     public BrowserHistory BrowserHistory { get; set; } = new();
