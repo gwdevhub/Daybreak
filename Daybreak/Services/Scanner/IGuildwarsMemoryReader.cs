@@ -21,5 +21,6 @@ public interface IGuildwarsMemoryReader
     Task<GameState?> ReadGameState(CancellationToken cancellationToken);
     Task<string?> GetEntityName(IEntity entity, CancellationToken cancellationToken);
     Task<string?> GetItemName(int id, List<uint> modifiers, CancellationToken cancellationToken);
+    Task<TitleInformationExtended?> GetTitleInformation(int id, CancellationToken cancellationToken);
     void Stop();
 }

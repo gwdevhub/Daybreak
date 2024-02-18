@@ -151,6 +151,27 @@
                                           Background="Transparent"
                                           BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
                                           BorderThickness="1"/>
+                    <Border BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                            BorderThickness="1"
+                            Background="{DynamicResource Daybreak.Brushes.Background}"
+                            VerticalAlignment="Top"
+                            HorizontalAlignment="Left"
+                            Visibility="{Binding ElementName=_this, Path=ShowCartoProgress, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <WrapPanel>
+                            <TextBlock Text="{Binding ElementName=_this, Path=CartoTitle.TitleName, Mode=OneWay}"
+                                       FontSize="16"
+                                       Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+                            <TextBlock Text=" "
+                                       FontSize="16"
+                                       Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+                            <TextBlock Text="{Binding ElementName=_this, Path=CartoTitle.Percentage, Mode=OneWay}"
+                                       FontSize="16"
+                                       Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+                            <TextBlock Text="%"
+                                       FontSize="16"
+                                       Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"/>
+                        </WrapPanel>
+                    </Border>
                     <Grid
                         VerticalAlignment="Top"
                         HorizontalAlignment="Right"
