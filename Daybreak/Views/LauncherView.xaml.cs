@@ -95,13 +95,13 @@ public partial class LauncherView : UserControl
         this.LatestConfiguration = this.LaunchConfigurations.FirstOrDefault(c => c.Configuration?.Equals(latestLaunchConfiguration) is true);
     }
 
-    private async void PeriodicallyCheckSelectedConfigState()
+    private async Task PeriodicallyCheckSelectedConfigState()
     {
         while (!this.cancellationTokenSource.IsCancellationRequested)
         {
             if (!this.launching)
             {
-                await this.SetLaunchButtonState();
+                await this.Dispatcher.InvokeAsync(this.SetLaunchButtonState);
             }
 
             await Task.Delay(TimeSpan.FromSeconds(1), this.cancellationTokenSource.Token);
@@ -116,7 +116,7 @@ public partial class LauncherView : UserControl
         }
 
         this.RetrieveLaunchConfigurations();
-        this.PeriodicallyCheckSelectedConfigState();
+        new TaskFactory().StartNew(this.PeriodicallyCheckSelectedConfigState, this.cancellationTokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
     }
 
     private void StartupView_Unloaded(object sender, RoutedEventArgs e)

@@ -1,4 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Launch;
 using Daybreak.Models;
 using Daybreak.Models.Builds;
 using Daybreak.Models.Guildwars;
@@ -9,6 +10,7 @@ using Daybreak.Services.Experience;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Notifications;
 using Daybreak.Services.Scanner;
+using Daybreak.Services.Screens;
 using Daybreak.Views.Trade;
 using MahApps.Metro.Controls;
 using Microsoft.Extensions.Logging;
@@ -23,7 +25,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
-using System.Windows.Media.Animation;
+using System.Windows.Media;
 using Position = Daybreak.Models.Guildwars.Position;
 
 namespace Daybreak.Views;
@@ -46,7 +48,9 @@ public partial class FocusView : UserControl
     private readonly IGuildwarsMemoryCache guildwarsMemoryCache;
     private readonly IExperienceCalculator experienceCalculator;
     private readonly IViewManager viewManager;
+    private readonly IScreenManager screenManager;
     private readonly ILiveUpdateableOptions<FocusViewOptions> liveUpdateableOptions;
+    private readonly ILiveUpdateableOptions<MinimapWindowOptions> minimapWindowOptions;
     private readonly ILogger<FocusView> logger;
 
     [GenerateDependencyProperty]
@@ -88,7 +92,7 @@ public partial class FocusView : UserControl
     [GenerateDependencyProperty]
     private bool minimapExtracted;
 
-    private MetroWindow? minimapWindow;
+    private MinimapWindow? minimapWindow;
     private bool browserMaximized = false;
     private bool minimapMaximized = false;
     private bool inventoryMaximized = false;
@@ -101,7 +105,9 @@ public partial class FocusView : UserControl
         IGuildwarsMemoryCache guildwarsMemoryCache,
         IExperienceCalculator experienceCalculator,
         IViewManager viewManager,
+        IScreenManager screenManager,
         ILiveUpdateableOptions<FocusViewOptions> liveUpdateableOptions,
+        ILiveUpdateableOptions<MinimapWindowOptions> minimapWindowOptions,
         ILogger<FocusView> logger)
     {
         this.notificationService = notificationService.ThrowIfNull();
@@ -110,7 +116,9 @@ public partial class FocusView : UserControl
         this.guildwarsMemoryCache = guildwarsMemoryCache.ThrowIfNull();
         this.experienceCalculator = experienceCalculator.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
+        this.screenManager = screenManager.ThrowIfNull();
         this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
+        this.minimapWindowOptions = minimapWindowOptions.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
 
         this.InitializeComponent();
@@ -777,15 +785,27 @@ public partial class FocusView : UserControl
 
         this.minimapWindow = new()
         {
-            ShowTitleBar = true,
-            ShowMaxRestoreButton = true,
-            ShowIconOnTitleBar = false,
-            ShowMinButton = true,
-            ShowSystemMenu = false,
-            ShowSystemMenuOnRightClick = false,
-            ShowInTaskbar = true,
-            ShowCloseButton = true
+            Resources = this.Resources
         };
+
+        var minimapWindowOptions = this.minimapWindowOptions.Value.ThrowIfNull();
+        var dpiScale = VisualTreeHelper.GetDpi(this.minimapWindow);
+        var minimapSize = new Rect
+        {
+            X = minimapWindowOptions.X * dpiScale.DpiScaleX / minimapWindowOptions.DpiX,
+            Y = minimapWindowOptions.Y * dpiScale.DpiScaleY / minimapWindowOptions.DpiY,
+            Width = minimapWindowOptions.Width * dpiScale.DpiScaleX / minimapWindowOptions.DpiX,
+            Height = minimapWindowOptions.Height * dpiScale.DpiScaleY / minimapWindowOptions.DpiY
+        };
+
+        if (minimapSize.Width > 0 && minimapSize.Height > 0 &&
+            this.screenManager.Screens.Any(s => s.Size.Contains(minimapSize) || s.Size.IntersectsWith(minimapSize)))
+        {
+            this.minimapWindow.Left = minimapSize.Left;
+            this.minimapWindow.Top = minimapSize.Top;
+            this.minimapWindow.Width = minimapSize.Width;
+            this.minimapWindow.Height = minimapSize.Height;
+        }
 
         this.minimapWindow.Closed += this.MinimapWindow_Closed;
         this.MinimapExtracted = true;
@@ -807,6 +827,17 @@ public partial class FocusView : UserControl
         {
             return;
         }
+
+        var options = this.minimapWindowOptions.Value.ThrowIfNull();
+        var dpiScale = VisualTreeHelper.GetDpi(this.minimapWindow);
+        options.X = this.minimapWindow.Left;
+        options.Y = this.minimapWindow.Top;
+        options.Width = this.minimapWindow.Width;
+        options.Height = this.minimapWindow.Height;
+        options.DpiX = dpiScale.DpiScaleX;
+        options.DpiY = dpiScale.DpiScaleY;
+
+        this.minimapWindowOptions.UpdateOption();
 
         this.MinimapExtracted = false;
         this.MinimapVisible = this.liveUpdateableOptions.Value.MinimapComponentVisible;
