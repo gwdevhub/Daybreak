@@ -433,6 +433,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         optionsProducer.RegisterOptions<CredentialManagerOptions>();
         optionsProducer.RegisterOptions<LaunchConfigurationServiceOptions>();
         optionsProducer.RegisterOptions<DirectSongOptions>();
+        optionsProducer.RegisterOptions<MinimapWindowOptions>();
     }
 
     public override void RegisterNotificationHandlers(INotificationHandlerProducer notificationHandlerProducer)
