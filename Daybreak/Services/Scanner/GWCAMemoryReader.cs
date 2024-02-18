@@ -669,6 +669,53 @@ public sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
         return default;
     }
 
+    public async Task<TitleInformationExtended?> GetTitleInformation(int id, CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetTitleInformation), string.Empty);
+        if (this.connectionContextCache is null)
+        {
+            return default;
+        }
+
+        try
+        {
+            var response = await this.client.GetAsync(this.connectionContextCache.Value, $"titles/info?id={id}", cancellationToken);
+            if (!response.IsSuccessStatusCode)
+            {
+                scopedLogger.LogError($"Received non-success response {response.StatusCode}");
+                return default;
+            }
+
+            var payload = await response.Content.ReadAsStringAsync(cancellationToken);
+            var titleInfoPayload = payload.Deserialize<TitleInfoPayload>();
+            if (titleInfoPayload is null ||
+                titleInfoPayload.TitleId != id ||
+                (titleInfoPayload.CurrentPoints == 0 && titleInfoPayload.PointsNeededNextRank == 0))
+            {
+                return default;
+            }
+
+            return new TitleInformationExtended
+            {
+                CurrentPoints = titleInfoPayload.CurrentPoints,
+                TitleId = titleInfoPayload.TitleId,
+                TitleName = titleInfoPayload.TitleName,
+                TitleTierId = titleInfoPayload.TitleTierId,
+                IsPercentageBased = titleInfoPayload.IsPercentageBased,
+                PointsNeededNextRank = titleInfoPayload.PointsNeededNextRank,
+                CurrentTier = titleInfoPayload.CurrentTier
+            };
+
+        }
+        catch (Exception ex)
+        {
+            scopedLogger.LogError(ex, "Encountered exception while parsing response");
+            this.faulty = true;
+        }
+
+        return default;
+    }
+
     public void Stop()
     {
         this.connectionContextCache = default;

@@ -2,6 +2,7 @@
 using Daybreak.Launch;
 using Daybreak.Models;
 using Daybreak.Models.Builds;
+using Daybreak.Models.FocusView;
 using Daybreak.Models.Guildwars;
 using Daybreak.Models.LaunchConfigurations;
 using Daybreak.Services.ApplicationLauncher;
@@ -12,7 +13,6 @@ using Daybreak.Services.Notifications;
 using Daybreak.Services.Scanner;
 using Daybreak.Services.Screens;
 using Daybreak.Views.Trade;
-using MahApps.Metro.Controls;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Configuration;
@@ -46,6 +46,7 @@ public partial class FocusView : UserControl
     private readonly IBuildTemplateManager buildTemplateManager;
     private readonly IApplicationLauncher applicationLauncher;
     private readonly IGuildwarsMemoryCache guildwarsMemoryCache;
+    private readonly IGuildwarsMemoryReader guildwarsMemoryReader;
     private readonly IExperienceCalculator experienceCalculator;
     private readonly IViewManager viewManager;
     private readonly IScreenManager screenManager;
@@ -92,6 +93,12 @@ public partial class FocusView : UserControl
     [GenerateDependencyProperty]
     private bool minimapExtracted;
 
+    [GenerateDependencyProperty]
+    private bool showCartoProgress;
+
+    [GenerateDependencyProperty]
+    private CartoProgressContext cartoTitle = default!;
+
     private MinimapWindow? minimapWindow;
     private bool browserMaximized = false;
     private bool minimapMaximized = false;
@@ -103,6 +110,7 @@ public partial class FocusView : UserControl
         IBuildTemplateManager buildTemplateManager,
         IApplicationLauncher applicationLauncher,
         IGuildwarsMemoryCache guildwarsMemoryCache,
+        IGuildwarsMemoryReader guildwarsMemoryReader,
         IExperienceCalculator experienceCalculator,
         IViewManager viewManager,
         IScreenManager screenManager,
@@ -114,6 +122,7 @@ public partial class FocusView : UserControl
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
         this.applicationLauncher = applicationLauncher.ThrowIfNull();
         this.guildwarsMemoryCache = guildwarsMemoryCache.ThrowIfNull();
+        this.guildwarsMemoryReader = guildwarsMemoryReader.ThrowIfNull();
         this.experienceCalculator = experienceCalculator.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
         this.screenManager = screenManager.ThrowIfNull();
@@ -273,6 +282,124 @@ public partial class FocusView : UserControl
                 var maybeGameState = await readGameStateTask ?? throw new HttpRequestException();
                 this.GameState = maybeGameState;
                 this.CanRotateMinimap = this.liveUpdateableOptions.Value.MinimapRotationEnabled;
+                retries = 0;
+            }
+            catch (InvalidOperationException ex)
+            {
+                scopedLogger.LogError(ex, "Encountered invalid operation exception. Cancelling periodic reading");
+                return;
+            }
+            catch (Exception ex) when (ex is TimeoutException or OperationCanceledException or HttpRequestException)
+            {
+                if (this.DataContext is not GuildWarsApplicationLaunchContext context)
+                {
+                    continue;
+                }
+
+                scopedLogger.LogError(ex, "Encountered timeout. Verifying connection");
+                try
+                {
+                    await this.guildwarsMemoryCache.EnsureInitialized(context, cancellationToken);
+                }
+                catch (InvalidOperationException innerEx)
+                {
+                    retries++;
+                    if (retries >= MaxRetries)
+                    {
+                        scopedLogger.LogError(innerEx, "Could not ensure connection is initialized. Returning to launcher view");
+                        this.notificationService.NotifyError(
+                            title: "GuildWars unresponsive",
+                            description: "Could not connect to Guild Wars instance. Returning to Launcher view");
+                        this.viewManager.ShowView<LauncherView>();
+                    }
+                    else
+                    {
+                        scopedLogger.LogError(innerEx, "Could not ensure connection is initialized. Backing off before retrying");
+                        await Task.Delay(UninitializedBackoff, cancellationToken);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                scopedLogger.LogError(ex, "Encountered non-terminating exception. Silently continuing");
+            }
+        }
+    }
+
+    private async void PeriodicallyReadCartoData(CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.PeriodicallyReadCartoData), string.Empty);
+        var retries = 0;
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            await Task.Delay(GameDataFrequency, cancellationToken);
+            try
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                if (this.DataContext is not GuildWarsApplicationLaunchContext context)
+                {
+                    continue;
+                }
+
+                var maybeMap = this.MainPlayerResourceContext?.Session?.Session?.CurrentMap;
+                if (this.liveUpdateableOptions.Value.ShowCartoProgress &&
+                    maybeMap is not null)
+                {
+                    var maybeCurrentContinent = Continent.Continents.FirstOrDefault(c => c.Regions?.Any(r => r.Maps?.Contains(maybeMap) is true) is true);
+                    if (maybeCurrentContinent == Continent.Tyria)
+                    {
+                        var titleInfo = (await this.guildwarsMemoryReader.GetTitleInformation(Title.TyrianCartographer.Id, cancellationToken))!;
+                        this.CartoTitle = titleInfo is null ?
+                            default :
+                            new CartoProgressContext
+                            {
+                                Continent = Continent.Tyria,
+                                ResolvedName = titleInfo.TitleName,
+                                Percentage = titleInfo.CurrentPoints / 10d,
+                                TitleInformationExtended = titleInfo,
+                                TitleName = Title.TyrianCartographer.Name
+                            };
+                    }
+                    else if (maybeCurrentContinent == Continent.Cantha)
+                    {
+                        var titleInfo = (await this.guildwarsMemoryReader.GetTitleInformation(Title.CanthanCartographer.Id, cancellationToken))!;
+                        this.CartoTitle = titleInfo is null ?
+                            default :
+                            new CartoProgressContext
+                            {
+                                Continent = Continent.Cantha,
+                                ResolvedName = titleInfo.TitleName,
+                                Percentage = titleInfo.CurrentPoints / 10d,
+                                TitleInformationExtended = titleInfo,
+                                TitleName = Title.CanthanCartographer.Name
+                            };
+                    }
+                    else if (maybeCurrentContinent == Continent.Elona)
+                    {
+                        var titleInfo = (await this.guildwarsMemoryReader.GetTitleInformation(Title.ElonianCartographer.Id, cancellationToken))!;
+                        this.CartoTitle = titleInfo is null ?
+                            default :
+                            new CartoProgressContext
+                            {
+                                Continent = Continent.Elona,
+                                ResolvedName = titleInfo.TitleName,
+                                Percentage = titleInfo.CurrentPoints / 10d,
+                                TitleInformationExtended = titleInfo,
+                                TitleName = Title.ElonianCartographer.Name
+                            };
+                    }
+
+                    this.ShowCartoProgress = this.CartoTitle is not null;
+                }
+                else
+                {
+                    this.ShowCartoProgress = false;
+                }
+
                 retries = 0;
             }
             catch (InvalidOperationException ex)
@@ -608,6 +735,7 @@ public partial class FocusView : UserControl
             this.PeriodicallyReadGameState(cancellationToken);
             this.PeriodicallyReadGameData(cancellationToken);
             this.PeriodicallyReadPathingData(cancellationToken);
+            this.PeriodicallyReadCartoData(cancellationToken);
         }
     }
 
@@ -785,7 +913,8 @@ public partial class FocusView : UserControl
 
         this.minimapWindow = new()
         {
-            Resources = this.Resources
+            Resources = this.Resources,
+            Opaque = !this.liveUpdateableOptions.Value.MinimapTransparency
         };
 
         var minimapWindowOptions = this.minimapWindowOptions.Value.ThrowIfNull();

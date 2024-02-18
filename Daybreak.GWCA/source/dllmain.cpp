@@ -24,6 +24,7 @@
 #include "EntityNameModule.h"
 #include "GameStateModule.h"
 #include "ItemNameModule.h"
+#include "TitleInfoModule.h"
 #include <mutex>
 
 volatile bool initialized;
@@ -72,6 +73,7 @@ static DWORD WINAPI StartHttpServer(LPVOID)
     http::server::Get("/session", Daybreak::Modules::SessionModule::GetSessionInfo);
     http::server::Get("/entities/name", Daybreak::Modules::EntityNameModule::GetName);
     http::server::Get("/items/name", Daybreak::Modules::ItemNameModule::GetName);
+    http::server::Get("/titles/info", Daybreak::Modules::TitleInfoModule::GetTitleInfo);
     http::server::StartServer();
     return 0;
 }

@@ -9,6 +9,8 @@ namespace Daybreak.Launch;
 public partial class MinimapWindow : MetroWindow
 {
     [GenerateDependencyProperty]
+    private bool opaque = false;
+    [GenerateDependencyProperty]
     private bool pinned = false;
     [GenerateDependencyProperty]
     private FrameworkElement content = default!;

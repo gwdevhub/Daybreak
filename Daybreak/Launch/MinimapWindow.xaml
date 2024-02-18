@@ -19,19 +19,29 @@
                  ShowSystemMenuOnRightClick="False"
                  ShowInTaskbar="True"
                  ShowCloseButton="True"
+                 Background="Transparent"
+                 AllowsTransparency="True"
                  Title="Daybreak Minimap"
                  Topmost="{Binding ElementName=_this, Path=Pinned, Mode=OneWay}"
                  x:Name="_this"
                  Height="450" Width="800">
-    <Grid>
+    <Grid Background="{StaticResource Daybreak.Brushes.Background}">
         <Grid.RowDefinitions>
             <RowDefinition Height="30" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+        <Rectangle Fill="{StaticResource MahApps.Brushes.ThemeBackground}"
+                   VerticalAlignment="Stretch"
+                   HorizontalAlignment="Stretch"
+                   Grid.RowSpan="2"
+                   Visibility="{Binding ElementName=_this, Path=Opaque, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        <ContentPresenter Grid.RowSpan="2"
+                  Content="{Binding ElementName=_this, Path=Content, Mode=OneWay}"/>
         <Rectangle Height="30"
                    VerticalAlignment="Stretch"
                    HorizontalAlignment="Stretch"
                    Grid.Row="0"
+                   Fill="Transparent"
                    MouseLeftButtonDown="Grid_MouseLeftButtonDown" />
         <buttons:HighlightButton Height="30"
                                  Width="50"
@@ -53,10 +63,8 @@
                           Stroke="{StaticResource MahApps.Brushes.ThemeForeground}"
                           Visibility="{Binding Path=Pinned, RelativeSource={RelativeSource AncestorType={x:Type launch:MinimapWindow}}, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                 </Grid>
-                
+
             </buttons:HighlightButton.ButtonContent>
         </buttons:HighlightButton>
-        <ContentPresenter Grid.Row="1"
-                          Content="{Binding ElementName=_this, Path=Content, Mode=OneWay}"/>
     </Grid>
 </mah:MetroWindow>
