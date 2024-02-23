@@ -15,7 +15,7 @@ using System.Extensions;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
+using Point = System.Windows.Point;
 
 namespace Daybreak.Services.Pathfinding;
 internal sealed class SharpNavPathfinder : IPathfinder

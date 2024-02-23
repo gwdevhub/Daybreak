@@ -11,5 +11,5 @@ namespace Daybreak.Services.Pathfinding;
 public interface IPathfinder
 {
     Task<object?> GenerateNavMesh(List<Trapezoid> trapezoids, List<List<int>> adjacencyList, CancellationToken cancellationToken);
-    Task<Result<PathfindingResponse, PathfindingFailure>> CalculatePath(PathingData map, Point startPoint, Point endPoint, CancellationToken cancellationToken);
+    Task<Result<PathfindingResponse, PathfindingFailure>> CalculatePath(PathingData map, System.Windows.Point startPoint, System.Windows.Point endPoint, CancellationToken cancellationToken);
 }
