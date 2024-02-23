@@ -1,5 +1,6 @@
 ﻿namespace Daybreak.Services.Scanner.Models;
-public sealed class TitleInfoPayload
+
+internal sealed class TitleInfoPayload
 {
     public uint CurrentPoints { get; set; }
     public uint PointsNeededNextRank { get; set; }

@@ -24,8 +24,6 @@ using System.Diagnostics.Metrics;
 using System.Diagnostics;
 using Daybreak.Models.FocusView;
 using Daybreak.Models.LaunchConfigurations;
-using System.Configuration;
-using System.Runtime.CompilerServices;
 
 namespace Daybreak.Controls.Minimap;
 
@@ -39,6 +37,7 @@ public partial class GuildwarsMinimap : UserControl
     private const string DrawingLatencyUnitName = "ms";
     private const string DrawingLatencyDescription = "The amount of time spent drawing the minimap entities. Measured in ms";
     private const int MapDownscaleFactor = 10;
+    private const int FogUpscaleFactor = 10;
     private const int EntitySize = 100;
     private const float PositionRadius = 150;
 
@@ -66,7 +65,9 @@ public partial class GuildwarsMinimap : UserControl
     private Point lastPathfindingPoint = new(0, 0);
     private int pathfindingObjectiveCount = 0;
     private PathfindingCache? pathfindingCache;
-    
+
+    [GenerateDependencyProperty]
+    private CartographerData cartographerData = new();
     [GenerateDependencyProperty]
     private PathingData pathingData = new();
     [GenerateDependencyProperty]
@@ -223,15 +224,17 @@ public partial class GuildwarsMinimap : UserControl
             position.X - (screenVirtualWidth / 2) - (this.originOffset.X / this.Zoom),
             position.Y + (screenVirtualHeight / 2) + (this.originOffset.Y / this.Zoom));
 
-        var adjustedPosition = new Point((int)((position.X - this.mapVirtualMinWidth) * this.Zoom), (int)(this.mapHeight - position.Y + this.mapVirtualMinHeight) * this.Zoom);
-        
+        var adjustedPathingMapPosition = new Point((int)((position.X - this.mapVirtualMinWidth) * this.Zoom), (int)(this.mapHeight - position.Y + this.mapVirtualMinHeight) * this.Zoom);
+
         this.MapDrawingHost.Margin = new Thickness(
-            -adjustedPosition.X + (this.ActualWidth / 2) + this.originOffset.X,
-            -adjustedPosition.Y + (this.ActualHeight / 2) + this.originOffset.Y,
+            -adjustedPathingMapPosition.X + (this.ActualWidth / 2) + this.originOffset.X,
+            -adjustedPathingMapPosition.Y + (this.ActualHeight / 2) + this.originOffset.Y,
             0,
             0);
         this.MapDrawingHost.Height = this.mapHeight * this.Zoom;
         this.MapDrawingHost.Width = this.mapWidth * this.Zoom;
+        this.FogDrawingHost.Width = this.CartographerData?.Width * 102.4 * this.Zoom ?? 0;
+        this.FogDrawingHost.Height = this.CartographerData?.Height * 102.4 * this.Zoom ?? 0;
         this.ManageMainPlayerPositionHistory();
         this.DrawEntities();
     }
@@ -250,6 +253,46 @@ public partial class GuildwarsMinimap : UserControl
         }
 
         this.mainPlayerPositionHistory.Add(currentPosition);
+    }
+
+    private void DrawFog()
+    {
+        if (this.CartographerData is null ||
+            this.CartographerData.Height == 0 ||
+            this.CartographerData.Width == 0 ||
+            this.CartographerData.Areas is null)
+        {
+            return;
+        }
+
+        var bitmap = BitmapFactory.New((int)this.CartographerData.Width * FogUpscaleFactor, (int)this.CartographerData.Height * FogUpscaleFactor);
+        this.FogDrawingHost.Source = bitmap;
+        this.FogDrawingHost.Width = this.CartographerData.Width;
+        this.FogDrawingHost.Height = this.CartographerData.Height;
+
+        using var bitmapContext = bitmap.GetBitmapContext();
+        bitmap.Clear(Colors.Transparent);
+        var color = this.themeManager.GetForegroundColor();
+        var transparentForeground = Color.FromArgb(100, Colors.CornflowerBlue.R, Colors.CornflowerBlue.G, Colors.CornflowerBlue.B);
+        for (var idx = 0; idx < this.CartographerData.Areas.Count; idx++)
+        {
+            var area = this.CartographerData.Areas[idx];
+            for (var bit = 0; bit < 32; ++bit)
+            {
+                var bitIdx = idx * 32 + bit;
+                // Corrected calculation for x and y, including scaling
+                var realX = (bitIdx % this.CartographerData.Width) * FogUpscaleFactor;
+                var realY = (bitIdx / this.CartographerData.Width) * FogUpscaleFactor; // Use Width here for correct y calculation
+                if ((area & (1 << bit)) != 0)
+                {
+                }
+                else
+                {
+                    // Unexplored areas
+                    bitmap.FillEllipseCentered((int)realX, (int)realY, FogUpscaleFactor, FogUpscaleFactor, transparentForeground);
+                }
+            }
+        }
     }
 
     private void DrawMap()
@@ -328,6 +371,8 @@ public partial class GuildwarsMinimap : UserControl
 
             bitmap.FillPolygon(new int[] { (int)a.X, (int)a.Y, (int)b.X, (int)b.Y, (int)c.X, (int)c.Y, (int)d.X, (int)d.Y, (int)a.X, (int)a.Y }, color);
         }
+
+        this.DrawFog();
     }
 
     private void DrawEntities()

@@ -25,6 +25,7 @@ internal sealed class GuildwarsMemoryCache : IGuildwarsMemoryCache
     private readonly CachedData<MainPlayerData?> mainPlayerDataCache = new();
     private readonly CachedData<PreGameData?> preGameDataCache = new();
     private readonly CachedData<GameState?> gameStateCache = new();
+    private readonly CachedData<CartographerData?> cartographerDataCache = new();
 
     public GuildwarsMemoryCache(
         IGuildwarsMemoryReader guildwarsMemoryReader,
@@ -92,6 +93,11 @@ internal sealed class GuildwarsMemoryCache : IGuildwarsMemoryCache
     public Task<GameState?> ReadGameState(CancellationToken cancellationToken)
     {
         return this.ReadDataInternal(this.gameStateCache, this.guildwarsMemoryReader.ReadGameState, cancellationToken);
+    }
+
+    public Task<CartographerData?> ReadCartographerData(CancellationToken cancellationToken)
+    {
+        return this.ReadDataInternal(this.cartographerDataCache, this.guildwarsMemoryReader.ReadCartographerData, cancellationToken);
     }
 
     private async Task<T?> ReadDataInternal<T>(CachedData<T?> cachedData, Func<CancellationToken, Task<T?>> task, CancellationToken cancellationToken)

@@ -592,6 +592,50 @@ public sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
         return default;
     }
 
+    public async Task<CartographerData?> ReadCartographerData(CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.ReadCartographerData), string.Empty);
+        if (this.connectionContextCache is null)
+        {
+            return default;
+        }
+
+        try
+        {
+            var response = await this.client.GetAsync(this.connectionContextCache.Value, $"cartographer", cancellationToken);
+            if (!response.IsSuccessStatusCode)
+            {
+                scopedLogger.LogError($"Received non-success response {response.StatusCode}");
+                return default;
+            }
+
+            var payload = await response.Content.ReadAsStringAsync(cancellationToken);
+            var cartoInfoPayload = payload.Deserialize<CartographerPayload>();
+            if (cartoInfoPayload is null ||
+                cartoInfoPayload.CartographedAreas?.Count == 0 ||
+                cartoInfoPayload.MapSize is null ||
+                (cartoInfoPayload.MapSize.X == 0 && cartoInfoPayload.MapSize.Y == 0))
+            {
+                return default;
+            }
+
+            return new CartographerData
+            {
+                Width = cartoInfoPayload.MapSize.X,
+                Height = cartoInfoPayload.MapSize.Y,
+                Areas = cartoInfoPayload.CartographedAreas
+            };
+
+        }
+        catch (Exception ex)
+        {
+            scopedLogger.LogError(ex, "Encountered exception while parsing response");
+            this.faulty = true;
+        }
+
+        return default;
+    }
+
     public async Task<string?> GetEntityName(IEntity entity, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetEntityName), string.Empty);

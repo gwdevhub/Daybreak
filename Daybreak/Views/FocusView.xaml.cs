@@ -70,6 +70,9 @@ public partial class FocusView : UserControl
     private PathingData pathingData = new();
 
     [GenerateDependencyProperty]
+    private CartographerData cartographerData = new();
+
+    [GenerateDependencyProperty]
     private MainPlayerResourceContext mainPlayerResourceContext = new();
 
     [GenerateDependencyProperty]
@@ -183,8 +186,15 @@ public partial class FocusView : UserControl
             return;
         }
 
+        var maybeCartoData = await this.guildwarsMemoryCache.ReadCartographerData(this.cancellationTokenSource?.Token ?? CancellationToken.None) ?? throw new HttpRequestException();
+        if (maybeCartoData is null)
+        {
+            return;
+        }
+
         await this.Dispatcher.InvokeAsync(() =>
         {
+            this.CartographerData = maybeCartoData;
             this.PathingData = pathingData;
             this.LoadingPathingData = false;
         });

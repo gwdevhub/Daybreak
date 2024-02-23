@@ -19,4 +19,5 @@ public interface IGuildwarsMemoryCache
     Task<MainPlayerData?> ReadMainPlayerData(CancellationToken cancellationToken);
     Task<PreGameData?> ReadPreGameData(CancellationToken cancellationToken);
     Task<GameState?> ReadGameState(CancellationToken cancellationToken);
+    Task<CartographerData?> ReadCartographerData(CancellationToken cancellationToken);
 }
