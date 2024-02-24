@@ -1,8 +1,10 @@
-﻿using Daybreak.Models;
+﻿using Daybreak.Configuration.Options;
+using Daybreak.Models;
 using Daybreak.Models.GWCA;
 using Daybreak.Services.Injection;
 using Daybreak.Services.Notifications;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Core.Extensions;
 using System.Linq;
 using System.Threading;
@@ -18,19 +20,30 @@ internal sealed class GWCAInjector : IGWCAInjector
     private readonly INotificationService notificationService;
     private readonly IGWCAClient gwcaClient;
     private readonly IProcessInjector injector;
+    private readonly ILiveUpdateableOptions<FocusViewOptions> liveOptions;
 
-    public bool IsEnabled { get; set; } = true;
+    public bool IsEnabled
+    {
+        get => this.liveOptions.Value.Enabled;
+        set
+        {
+            this.liveOptions.Value.Enabled = value;
+            this.liveOptions.UpdateOption();
+        }
+    }
     public bool IsInstalled { get; } = true;
     public string Name { get; } = "GWCA";
 
     public GWCAInjector(
         INotificationService notificationService,
         IGWCAClient client,
-        IProcessInjector processInjector)
+        IProcessInjector processInjector,
+        ILiveUpdateableOptions<FocusViewOptions> liveOptions)
     {
         this.notificationService = notificationService.ThrowIfNull();
         this.gwcaClient = client.ThrowIfNull();
         this.injector = processInjector.ThrowIfNull();
+        this.liveOptions = liveOptions.ThrowIfNull();
     }
 
     public IEnumerable<string> GetCustomArguments() => Enumerable.Empty<string>();
