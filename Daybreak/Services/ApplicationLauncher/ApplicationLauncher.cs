@@ -19,6 +19,7 @@ using System.Extensions;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Principal;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -188,8 +189,8 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
         }
 
         var identity = this.launcherOptions.Value.LaunchGuildwarsAsCurrentUser ?
-            System.Security.Principal.WindowsIdentity.GetCurrent().Name :
-            System.Security.Principal.WindowsIdentity.GetAnonymous().Name;
+            WindowsIdentity.GetCurrent().Name :
+            WindowsIdentity.GetAnonymous().Name;
         this.logger.LogInformation($"Launching guildwars as [{identity}] identity");
         var process = new Process()
         {
@@ -197,7 +198,7 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
             {
                 Arguments = string.Join(" ", args),
                 FileName = executable,
-            }
+            },
         };
 
         var applicationLauncherContext = new ApplicationLauncherContext { Process = process, ExecutablePath = executable, ProcessId = 0 };
