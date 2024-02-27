@@ -79,6 +79,7 @@ internal sealed class JsonLogsManager : ILogsManager
     }
     public int DeleteLogs()
     {
+        this.memoryCache.Clear();
         return this.collection.DeleteAll();
     }
 }

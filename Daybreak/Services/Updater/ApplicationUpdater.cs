@@ -1,5 +1,7 @@
-﻿using Daybreak.Configuration.Options;
+﻿using ControlzEx.Standard;
+using Daybreak.Configuration.Options;
 using Daybreak.Exceptions;
+using Daybreak.Models;
 using Daybreak.Models.Github;
 using Daybreak.Models.Progress;
 using Daybreak.Services.Downloads;
@@ -12,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
+using System.Data;
 using System.Diagnostics;
 using System.Extensions;
 using System.IO;
@@ -22,6 +25,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using UpdateStatus = Daybreak.Models.Progress.UpdateStatus;
 using Version = Daybreak.Models.Versioning.Version;
 
 namespace Daybreak.Services.Updater;
@@ -39,6 +43,9 @@ internal sealed class ApplicationUpdater : IApplicationUpdater
     private const string Url = "https://github.com/AlexMacocian/Daybreak/releases/latest";
     private const string DownloadUrl = $"https://github.com/AlexMacocian/Daybreak/releases/download/{VersionTag}/Daybreak{VersionTag}.zip";
     private const string BlobStorageUrl = $"https://daybreak.blob.core.windows.net/{VersionTag}/{FileTag}";
+    private const int DownloadParallelTasks = 10;
+
+    private readonly static TimeSpan DownloadInfoUpdateInterval = TimeSpan.FromMilliseconds(16);
 
     private readonly CancellationTokenSource updateCancellationTokenSource = new();
     private readonly INotificationService notificationService;
@@ -261,42 +268,76 @@ internal sealed class ApplicationUpdater : IApplicationUpdater
 
         using var packageStream = new FileStream("update.pkg", FileMode.Create);
         var downloaded = 0d;
-        var downloadBuffer = new byte[8192];
+        var downloadBuffer = new Memory<byte>(new byte[8192]);
         var sizeToDownload = (double)filesToDownload.Sum(m => m.Size);
         var sw = Stopwatch.StartNew();
         var lastUpdate = DateTime.Now;
-        foreach (var file in filesToDownload)
+        var speedMeasurements = new List<double>();
+        var fileQueue = filesToDownload;
+        var pendingDownloads = fileQueue.AsEnumerable();
+        while(pendingDownloads.Any())
         {
-            var downloadUrl = BlobStorageUrl.Replace(VersionTag, version.ToString().Replace('.', '-')).Replace(FileTag, file.RelativePath);
-            var response = await this.httpClient.GetAsync(downloadUrl);
-            if (!response.IsSuccessStatusCode)
+            var parallelDownloads = pendingDownloads.Take(DownloadParallelTasks);
+            pendingDownloads = pendingDownloads.Skip(DownloadParallelTasks);
+            // Setup the download streams for all the parallel downloads
+            var parallelResponses = parallelDownloads.Select(file =>
             {
-                scopedLogger.LogError($"Error {response.StatusCode} when downloading {file.RelativePath}");
-                return false;
-            }
-
-            var fileNameBytes = Encoding.UTF8.GetBytes(file.Name!);
-            var relativePathBytes = Encoding.UTF8.GetBytes(file.RelativePath!);
-            await packageStream.WriteAsync(BitConverter.GetBytes(fileNameBytes.Length));
-            await packageStream.WriteAsync(fileNameBytes);
-            await packageStream.WriteAsync(BitConverter.GetBytes(relativePathBytes.Length));
-            await packageStream.WriteAsync(relativePathBytes);
-            await packageStream.WriteAsync(BitConverter.GetBytes(file.Size));
-            var downloadStream = await response.Content.ReadAsStreamAsync();
-            var fileSize = file.Size;
-            while (fileSize > 0)
-            {
-                var toGet = Math.Min(fileSize, 8192);
-                await downloadStream.ReadAsync(downloadBuffer, 0, toGet);
-                fileSize -= toGet;
-                await packageStream.WriteAsync(downloadBuffer, 0, toGet);
-
-                downloaded += toGet;
-                if (DateTime.Now - lastUpdate > TimeSpan.FromSeconds(1))
+                return Task.Run(async () =>
                 {
-                    lastUpdate = DateTime.Now;
-                    var etaMillis = sw.ElapsedMilliseconds * (sizeToDownload - downloaded) / downloaded;
-                    updateStatus.CurrentStep = DownloadStatus.Downloading(downloaded / sizeToDownload, TimeSpan.FromMilliseconds(etaMillis));
+                    var downloadUrl = BlobStorageUrl.Replace(VersionTag, version.ToString().Replace('.', '-')).Replace(FileTag, file.RelativePath);
+                    var response = await this.httpClient.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        scopedLogger.LogError($"Error {response.StatusCode} when downloading {file.RelativePath}");
+                        return (file, false, response);
+                    }
+
+                    return (file, true, response);
+                });
+            });
+
+            foreach(var result in parallelResponses)
+            {
+                (var file, var fileDownloadResult, var response) = await result;
+                if (fileDownloadResult is false)
+                {
+                    scopedLogger.LogError($"{file.RelativePath} failed to download. Cancelling update");
+                    return false;
+                }
+
+                var fileNameBytes = Encoding.UTF8.GetBytes(file.Name!);
+                var relativePathBytes = Encoding.UTF8.GetBytes(file.RelativePath!);
+                await packageStream.WriteAsync(BitConverter.GetBytes(fileNameBytes.Length));
+                await packageStream.WriteAsync(fileNameBytes);
+                await packageStream.WriteAsync(BitConverter.GetBytes(relativePathBytes.Length));
+                await packageStream.WriteAsync(relativePathBytes);
+                await packageStream.WriteAsync(BitConverter.GetBytes(file.Size));
+
+                var downloadStream = await response.Content.ReadAsStreamAsync();
+                var maxMeasurements = 100;
+                var fileSize = file.Size;
+                while (fileSize > 0)
+                {
+                    var readBytes = await downloadStream.ReadAsync(downloadBuffer);
+                    await packageStream.WriteAsync(downloadBuffer);
+
+                    fileSize -= readBytes;
+                    downloaded += readBytes;
+                    if (DateTime.Now - lastUpdate > DownloadInfoUpdateInterval)
+                    {
+                        lastUpdate = DateTime.Now;
+                        var currentSpeed = downloaded / sw.ElapsedMilliseconds;
+                        if (speedMeasurements.Count > maxMeasurements)
+                        {
+                            speedMeasurements.Remove(0);
+                        }
+
+                        speedMeasurements.Add(currentSpeed);
+                        var averageSpeed = speedMeasurements.Average();
+                        var remainingBytes = sizeToDownload - downloaded;
+                        var etaMillis = averageSpeed > 0 ? remainingBytes / averageSpeed : 0;
+                        updateStatus.CurrentStep = DownloadStatus.Downloading(downloaded / sizeToDownload, TimeSpan.FromMilliseconds(etaMillis));
+                    }
                 }
             }
         }
