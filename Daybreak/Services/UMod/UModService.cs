@@ -215,7 +215,7 @@ internal sealed class UModService : IUModService
 
         if (this.Version.CompareTo(latestVersion) >= 0)
         {
-            scopedLogger.LogError($"UMod is up to date");
+            scopedLogger.LogInformation($"UMod is up to date");
             return;
         }
 
