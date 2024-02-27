@@ -268,7 +268,7 @@ internal sealed class ApplicationUpdater : IApplicationUpdater
 
         using var packageStream = new FileStream("update.pkg", FileMode.Create);
         var downloaded = 0d;
-        var downloadBuffer = new Memory<byte>(new byte[8192]);
+        var downloadBuffer = new byte[8192];
         var sizeToDownload = (double)filesToDownload.Sum(m => m.Size);
         var sw = Stopwatch.StartNew();
         var lastUpdate = DateTime.Now;
@@ -318,8 +318,8 @@ internal sealed class ApplicationUpdater : IApplicationUpdater
                 var fileSize = file.Size;
                 while (fileSize > 0)
                 {
-                    var readBytes = await downloadStream.ReadAsync(downloadBuffer);
-                    await packageStream.WriteAsync(downloadBuffer);
+                    var readBytes = await downloadStream.ReadAsync(downloadBuffer, 0, downloadBuffer.Length);
+                    await packageStream.WriteAsync(downloadBuffer, 0, readBytes);
 
                     fileSize -= readBytes;
                     downloaded += readBytes;
