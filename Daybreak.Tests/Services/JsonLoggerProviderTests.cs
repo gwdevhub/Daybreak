@@ -57,6 +57,7 @@ public class JsonLoggerProviderTests
     [TestMethod]
     public void LoggerLogsAndReaderReads()
     {
+        this.logsManager.DeleteLogs();
         var logger = this.loggerProvider.CreateLogger("SomeCategory");
         logger.LogInformation("Logging some stuff");
         logger.LogError("Logging some error");
