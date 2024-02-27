@@ -110,7 +110,7 @@ jobs:
       shell: pwsh
 
     - name: Create release draft
-      uses: Xotl/cool-github-releases@v1.1.8
+      uses: Xotl/cool-github-releases@v1.1.10
       with:
         mode: update
         tag_name: v${{ env.Version }}
