@@ -3,7 +3,6 @@ using Daybreak.Controls.Buttons;
 using Daybreak.Models;
 using Daybreak.Models.LaunchConfigurations;
 using Daybreak.Services.ApplicationLauncher;
-using Daybreak.Services.GWCA;
 using Daybreak.Services.LaunchConfigurations;
 using Daybreak.Services.Scanner;
 using Daybreak.Utils;
@@ -124,11 +123,7 @@ public partial class LaunchButtonTemplate : UserControl
             return;
         }
 
-        try
-        {
-            await this.guildwarsMemoryReader.EnsureInitialized(context.ProcessId, cancellationToken);
-        }
-        catch
+        if (!await this.guildwarsMemoryReader.IsInitialized(context.ProcessId, cancellationToken))
         {
             this.GameRunning = false;
             this.CanLaunch = false;

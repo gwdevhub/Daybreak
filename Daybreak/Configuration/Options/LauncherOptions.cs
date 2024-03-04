@@ -8,6 +8,11 @@ namespace Daybreak.Configuration.Options;
 [OptionsName(Name = "Launcher")]
 public sealed class LauncherOptions
 {
+    [JsonProperty(nameof(DynamicBackgrounds))]
+    [OptionName(Name = "Dyamic Backgrounds", Description = "If enabled, Daybreak will periodically change the background image. Otherwise, Daybreak will show a plain background")]
+    [OptionSynchronizationIgnore]
+    public bool DynamicBackgrounds { get; set; } = true;
+
     [JsonProperty(nameof(SetGuildwarsWindowSizeOnLaunch))]
     [OptionName(Name = "Set GuildWars Window Size On Launch", Description = "Sets the GuildWars window size and position on launch")]
     [OptionSynchronizationIgnore]
