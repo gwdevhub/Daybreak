@@ -147,6 +147,12 @@ public partial class MainWindow : MetroWindow
 
     private async void UpdateRandomImage()
     {
+        if (!this.launcherOptions.Value.DynamicBackgrounds)
+        {
+            // Dynamic backgrounds are disabled
+            return;
+        }
+
         var response = await this.backgroundProvider.GetBackground();
         if (response.ImageSource is null)
         {
