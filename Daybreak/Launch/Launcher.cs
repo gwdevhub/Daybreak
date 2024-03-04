@@ -114,6 +114,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
         this.projectConfiguration.RegisterBrowserExtensions(browserExtensionsProducer);
 
         this.logger = this.ServiceProvider.GetRequiredService<ILogger<Launcher>>();
+        this.logger.LogInformation($"Running in {Environment.CurrentDirectory}");
         this.exceptionHandler = this.ServiceProvider.GetRequiredService<IExceptionHandler>();
         try
         {

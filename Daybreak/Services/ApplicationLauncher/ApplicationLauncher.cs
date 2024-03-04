@@ -60,7 +60,7 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
     public async Task<GuildWarsApplicationLaunchContext?> LaunchGuildwars(LaunchConfigurationWithCredentials launchConfigurationWithCredentials)
     {
         launchConfigurationWithCredentials.ThrowIfNull();
-        var credentials = launchConfigurationWithCredentials.Credentials!.ThrowIfNull();
+        launchConfigurationWithCredentials.Credentials!.ThrowIfNull();
         var configuration = this.launcherOptions.Value;
         if (configuration.MultiLaunchSupport is true)
         {
@@ -122,7 +122,9 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
                 Verb = "runas",
                 WorkingDirectory = Environment.CurrentDirectory,
                 UseShellExecute = true,
-                FileName = processName
+                CreateNoWindow = true,
+                FileName = "cmd.exe",
+                Arguments = $"/c cd /d \"{Environment.CurrentDirectory}\" && timeout /t 1 /nobreak && start \"\" \"{processName}\" && exit"
             }
         };
         if (process.Start() is false)
@@ -135,7 +137,7 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
 
     public void RestartDaybreakAsNormalUser()
     {
-        this.logger.LogInformation("Restarting daybreak with admin rights");
+        this.logger.LogInformation("Restarting daybreak as normal user");
         var processName = Process.GetCurrentProcess()?.MainModule?.FileName;
         if (processName!.IsNullOrWhiteSpace() || File.Exists(processName) is false)
         {
@@ -150,7 +152,7 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
                 FileName = "cmd.exe",
                 UseShellExecute = true,
                 CreateNoWindow = true,
-                Arguments = $"/c runas /trustlevel:0x20000 {processName}"
+                Arguments = $"/c cd /d \"{Environment.CurrentDirectory}\" && timeout /t 1 /nobreak && runas /machine:x86 /trustlevel:0x20000 \"{processName}\" && exit"
             }
         };
         if (process.Start() is false)
