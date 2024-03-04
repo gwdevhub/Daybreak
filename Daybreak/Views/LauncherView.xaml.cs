@@ -135,7 +135,7 @@ public partial class LauncherView : UserControl
         await this.SetLaunchButtonState();
     }
 
-    private async void DropDownButton_Clicked(object _, object e)
+    private async void DropDownButton_Clicked(object _, object __)
     {
         this.launching = true;
         await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);

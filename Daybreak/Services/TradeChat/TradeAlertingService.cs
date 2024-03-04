@@ -159,6 +159,12 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
     {
         while (!cancellationToken.IsCancellationRequested)
         {
+            if (this.tradeAlerts.OfType<QuoteAlert>().None(q => q.Enabled))
+            {
+                await Task.Delay(TimeSpan.FromSeconds(this.options.Value.QuoteAlertsInterval), cancellationToken);
+                continue;
+            }
+
             var buyQuotes = await this.traderQuoteService.GetBuyQuotes(cancellationToken);
             var sellQuotes = await this.traderQuoteService.GetSellQuotes(cancellationToken);
             foreach (var alert in this.tradeAlerts.OfType<QuoteAlert>())

@@ -39,22 +39,31 @@ public sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
         this.logger = logger.ThrowIfNull();
     }
 
-    public async Task EnsureInitialized(uint processId, CancellationToken cancellationToken)
+    public async Task<bool> IsInitialized(uint processId, CancellationToken cancellationToken)
     {
         if (this.faulty is false &&
             this.connectionContextCache.HasValue &&
             this.connectionContextCache.Value.ProcessId == processId)
         {
-            return;
+            return true;
         }
 
         var maybeConnectionContext = await this.client.Connect(processId, cancellationToken);
         if (maybeConnectionContext is not ConnectionContext)
         {
-            throw new InvalidOperationException($"Unable to connect to desired process {processId}");
+            return false;
         }
 
         this.connectionContextCache = maybeConnectionContext;
+        return true;
+    }
+
+    public async Task EnsureInitialized(uint processId, CancellationToken cancellationToken)
+    {
+        if (!await this.IsInitialized(processId, cancellationToken))
+        {
+            throw new InvalidOperationException($"Unable to connect to desired process {processId}");
+        }
     }
 
     public async Task<GameData?> ReadGameData(CancellationToken cancellationToken)

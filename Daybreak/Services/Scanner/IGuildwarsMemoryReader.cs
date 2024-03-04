@@ -7,6 +7,7 @@ namespace Daybreak.Services.Scanner;
 
 public interface IGuildwarsMemoryReader
 {
+    Task<bool> IsInitialized(uint processId, CancellationToken cancellationToken);
     Task EnsureInitialized(uint processId, CancellationToken cancellationToken);
     Task<LoginData?> ReadLoginData(CancellationToken cancellationToken);
     Task<GameData?> ReadGameData(CancellationToken cancellationToken);
