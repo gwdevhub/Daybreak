@@ -42,7 +42,7 @@ public partial class PriceQuotesView : UserControl
     private async void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
         this.Loading = true;
-        this.traderQuotesCache = (await this.traderQuoteService.GetBuyQuotes(CancellationToken.None)).ToList();
+        this.traderQuotesCache = [.. (await this.traderQuoteService.GetBuyQuotes(CancellationToken.None)).OrderBy(q => q.Item!.Name).OrderBy(q => q.Item is Rune)];
         await this.Dispatcher.InvokeAsync(() =>
         {
             this.TraderQuotes.ClearAnd().AddRange(this.traderQuotesCache);
@@ -52,19 +52,9 @@ public partial class PriceQuotesView : UserControl
 
     private void SearchTextBox_TextChanged(object _, string e)
     {
-        var filteredItems = this.traderQuotesCache.Where(t => StringUtils.MatchesSearchString(t.Item!.Name!, e)).ToList();
-        var itemsToAdd = filteredItems.Except(this.TraderQuotes).ToList();
-        var itemsToRemove = this.TraderQuotes.Except(filteredItems).ToList();
-
-        foreach(var item in itemsToAdd)
-        {
-            this.TraderQuotes.Add(item);
-        }
-
-        foreach(var item in itemsToRemove)
-        {
-            this.TraderQuotes.Remove(item);
-        }
+        var filteredItems = this.traderQuotesCache.Where(t => 
+            e.IsNullOrWhiteSpace() || StringUtils.MatchesSearchString(t.Item!.Name!, e)).ToList().OrderBy(q => q.Item!.Name).OrderBy(q => q.Item is Rune);
+        this.TraderQuotes.ClearAnd().AddRange(filteredItems);
     }
 
     private void HighlightButton_Clicked(object sender, EventArgs _)

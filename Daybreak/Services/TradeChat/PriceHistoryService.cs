@@ -55,7 +55,7 @@ internal sealed class PriceHistoryService : IPriceHistoryService
     private async Task<IEnumerable<TraderQuote>> UpdateCacheAndGetPriceHistory(ItemBase itemBase, CancellationToken cancellationToken, DateTime? from = default, DateTime? to = default)
     {
         var itemId = itemBase.Modifiers is not null ? $"{itemBase.Id}-{this.itemHashService.ComputeHash(itemBase)}" : itemBase.Id.ToString();
-        if (!this.options.Value.ItemHistoryMetadata.TryGetValue(itemId, out var lastQueryTime))
+        if (!this.options.Value.PriceHistoryMetadata.TryGetValue(itemId, out var lastQueryTime))
         {
             lastQueryTime = MinEpochTime;
         }
@@ -63,7 +63,7 @@ internal sealed class PriceHistoryService : IPriceHistoryService
         if (lastQueryTime + this.options.Value.UpdateInterval < DateTime.UtcNow)
         {
             await this.FetchAndUpdatePricingHistoryCache(itemBase, cancellationToken, lastQueryTime, DateTime.UtcNow);
-            this.options.Value.ItemHistoryMetadata[itemId] = DateTime.UtcNow;
+            this.options.Value.PriceHistoryMetadata[itemId] = DateTime.UtcNow;
             this.options.UpdateOption();
         }
 
@@ -133,9 +133,9 @@ internal sealed class PriceHistoryService : IPriceHistoryService
         {
             return itemBase.Modifiers is null ?
                         itemBase.Id.ToString() :
-                        $"{itemBase.Id}-{this.itemHashService.ComputeHash(itemBase)}";
+                        $"{itemBase.Id}-{this.itemHashService.ComputeHash(itemBase).Replace("C0000000","")}";
         }
 
-        return $"{itemBase.Id}-{itemModHash.ModHash}";
+        return $"{itemBase.Id}-{itemModHash.ModHash.Replace("C0000000", "")}";
     }
 }

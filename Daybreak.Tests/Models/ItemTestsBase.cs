@@ -14,7 +14,7 @@ public abstract class ItemTestsBase<T>
     protected abstract IEnumerable<T> AllItems { get; }
 
     [TestMethod]
-    public void InscriptionList_Should_ContainOnlyUniqueItems()
+    public void List_Should_ContainOnlyUniqueItems()
     {
         var itemMap = new Dictionary<T, int>();
 
@@ -45,7 +45,7 @@ public abstract class ItemTestsBase<T>
     }
 
     [TestMethod]
-    public void InscriptionList_Should_ContainAllNpcs()
+    public void List_Should_ContainAllItems()
     {
         var itemMap = new Dictionary<T, bool>();
         var definedItemFields = typeof(T).GetFields(BindingFlags.Static | BindingFlags.Public).Where(f => f.FieldType == typeof(T));
