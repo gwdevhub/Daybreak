@@ -98,10 +98,23 @@ public partial class PriceHistoryView : UserControl
         }
 
         this.Loading = true;
-        var priceHistory = await this.priceHistoryService.GetPriceHistory(itemBase, CancellationToken.None);
-        this.traderQuotes.ClearAnd().AddRange(priceHistory);
-        this.PopulateChart();
-        this.Loading = false;
+        var priceHistory = await this.priceHistoryService.GetPriceHistory(itemBase, CancellationToken.None).ConfigureAwait(false);
+        this.Dispatcher.Invoke(() => {
+            this.traderQuotes.ClearAnd().AddRange(priceHistory);
+            if (this.traderQuotes.Count >= 1)
+            {
+                var lastQuote = this.traderQuotes.LastOrDefault() ?? throw new InvalidOperationException();
+                this.traderQuotes.Add(new TraderQuote
+                {
+                    Item = lastQuote.Item,
+                    Price = lastQuote.Price,
+                    Timestamp = DateTime.Now,
+                });
+            }
+
+            this.PopulateChart();
+            this.Loading = false;
+        });
     }
 
     private void PopulateChart()
@@ -109,8 +122,8 @@ public partial class PriceHistoryView : UserControl
         this.EndDateTime = this.traderQuotes.OrderByDescending(t => t.Timestamp).FirstOrDefault()?.Timestamp ?? DateTime.Now;
         this.StartDateTime = this.EndDateTime - TimeSpan.FromDays(1);
 
-        this.XAxes = new Axis[]
-        {
+        this.XAxes =
+        [
             new Axis
             {
                 Name = "Date",
@@ -120,20 +133,20 @@ public partial class PriceHistoryView : UserControl
                 MaxLimit = this.EndDateTime.Ticks,
                 MinStep = TimeSpan.FromHours(1).Ticks,
             }
-        };
+        ];
 
-        this.YAxes = new Axis[]
-        {
+        this.YAxes =
+        [
             new Axis
             {
                 Name = "Price",
                 LabelsPaint = this.foregroundPaint,
                 Labeler = (price) => $"{price*20d:0}g",
             }
-        };
+        ];
 
-        this.Series = new ISeries[]
-        {
+        this.Series =
+        [
             new LineSeries<TraderQuote>
             {
                 Values = this.traderQuotes,
@@ -146,7 +159,7 @@ public partial class PriceHistoryView : UserControl
                 GeometrySize = default,
                 Name = string.Empty,
             }
-        };
+        ];
 
         this.Title = new LabelVisual
         {

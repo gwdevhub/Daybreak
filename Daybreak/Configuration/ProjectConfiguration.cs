@@ -340,6 +340,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         startupActionProducer.RegisterAction<RenameInstallerAction>();
         startupActionProducer.RegisterAction<FixSymbolicLinkStartupAction>();
         startupActionProducer.RegisterAction<UpdateUModAction>();
+        startupActionProducer.RegisterAction<FixPriceHistoryEntries>();
     }
 
     public override void RegisterPostUpdateActions(IPostUpdateActionProducer postUpdateActionProducer)

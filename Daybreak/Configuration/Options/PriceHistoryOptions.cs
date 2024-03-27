@@ -16,5 +16,5 @@ internal sealed class PriceHistoryOptions : ILiteCollectionOptions<TraderQuoteDT
 
     public TimeSpan UpdateInterval { get; set; } = TimeSpan.FromHours(1);
 
-    public Dictionary<string, DateTime> ItemHistoryMetadata { get; set; } = [];
+    public Dictionary<string, DateTime> PriceHistoryMetadata { get; set; } = [];
 }

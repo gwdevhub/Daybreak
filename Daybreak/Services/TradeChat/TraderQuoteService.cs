@@ -195,7 +195,7 @@ internal sealed class TraderQuoteService : ITraderQuoteService
         catch (Exception ex)
         {
             scopedLogger.LogError(ex, "Encountered exception");
-            return Enumerable.Empty<TraderQuote>();
+            return [];
         }
     }
 
@@ -241,7 +241,7 @@ internal sealed class TraderQuoteService : ITraderQuoteService
         catch (Exception ex)
         {
             scopedLogger.LogError(ex, "Encountered exception");
-            return Enumerable.Empty<TraderQuote>();
+            return [];
         }
     }
 

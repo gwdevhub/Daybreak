@@ -16,25 +16,27 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"></ColumnDefinition>
-            <ColumnDefinition Width="80"></ColumnDefinition>
+            <ColumnDefinition Width="auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Image Source="{Binding ElementName=_this, Path=ImageSource, Mode=OneWay}"
                Height="40"
                Width="40"
-               HorizontalAlignment="Right"
-               Grid.Column="1"
+               HorizontalAlignment="Left"
+               Grid.Column="0"
                Visibility="{Binding ElementName=_this, Path=ImageVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
         </Image>
         <TextBlock 
             Text="{Binding ElementName=_this, Path=DataContext.Item.Name, Mode=OneWay}"
             Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
             VerticalAlignment="Center"
-            HorizontalAlignment="Right"
+            HorizontalAlignment="Left"
+            Margin="50, 0, 0, 0"
             FontSize="16"
-            Grid.Column="1"
-            Visibility="{Binding ElementName=_this, Path=ImageVisible, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+            Grid.Column="0"
             TextWrapping="Wrap"/>
-        <WrapPanel VerticalAlignment="Center">
+        <WrapPanel VerticalAlignment="Center"
+                   Grid.Column="1"
+                   Margin="0, 0, 5, 0">
             <TextBlock 
                 Text="{Binding ElementName=_this, Path=DataContext.Price, Mode=OneWay}"
                 Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
