@@ -51,15 +51,12 @@ namespace Daybreak::Modules::LoginModule {
     }
 
     void GetLoginInfo(const httplib::Request&, httplib::Response& res) {
-        auto callbackEntry = new GW::HookEntry;
-        auto response = new std::promise<LoginPayload>;
+        auto response = std::promise<LoginPayload>();
 
         EnsureInitialized();
-        PromiseQueue.emplace(response);
-        json responsePayload = response->get_future().get();
+        PromiseQueue.emplace(&response);
+        json responsePayload = response.get_future().get();
 
-        delete callbackEntry;
-        delete response;
         res.set_content(responsePayload.dump(), "text/json");
     }
 }

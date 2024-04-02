@@ -60,15 +60,12 @@ namespace Daybreak::Modules::PreGameModule {
     }
 
     void GetPreGameInfo(const httplib::Request&, httplib::Response& res) {
-        auto callbackEntry = new GW::HookEntry;
-        auto response = new std::promise<PreGamePayload>;
+        auto response = std::promise<PreGamePayload>();
 
         EnsureInitialized();
-        PromiseQueue.emplace(response);
-        json responsePayload = response->get_future().get();
+        PromiseQueue.emplace(&response);
+        json responsePayload = response.get_future().get();
 
-        delete callbackEntry;
-        delete response;
         res.set_content(responsePayload.dump(), "text/json");
     }
 }

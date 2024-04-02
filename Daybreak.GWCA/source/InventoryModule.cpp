@@ -102,15 +102,12 @@ namespace Daybreak::Modules::InventoryModule {
     }
 
     void GetInventoryInfo(const httplib::Request&, httplib::Response& res) {
-        auto callbackEntry = new GW::HookEntry;
-        auto response = new std::promise<InventoryPayload>;
+        auto response = std::promise<InventoryPayload>();
 
         EnsureInitialized();
-        PromiseQueue.emplace(response);
-        json responsePayload = response->get_future().get();
+        PromiseQueue.emplace(&response);
+        json responsePayload = response.get_future().get();
 
-        delete callbackEntry;
-        delete response;
         res.set_content(responsePayload.dump(), "text/json");
     }
 }

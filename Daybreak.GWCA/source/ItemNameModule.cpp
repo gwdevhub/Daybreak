@@ -103,7 +103,6 @@ namespace Daybreak::Modules::ItemNameModule {
     }
 
     void GetName(const httplib::Request& req, httplib::Response& res) {
-        auto callbackEntry = new GW::HookEntry;
         uint32_t id = 0;
         std::vector<uint32_t> modifiers;
         
@@ -146,17 +145,15 @@ namespace Daybreak::Modules::ItemNameModule {
             }
         }
 
-        auto response = new std::tuple<uint32_t, std::vector<uint32_t>, std::promise<NamePayload>>();
-        std::get<0>(*response) = id;
-        std::promise<NamePayload>& promise = std::get<2>(*response);
-        std::get<1>(*response) = modifiers;
+        auto response = std::tuple<uint32_t, std::vector<uint32_t>, std::promise<NamePayload>>();
+        std::get<0>(response) = id;
+        std::promise<NamePayload>& promise = std::get<2>(response);
+        std::get<1>(response) = modifiers;
 
         EnsureInitialized();
-        PromiseQueue.emplace(response);
+        PromiseQueue.emplace(&response);
 
         json responsePayload = promise.get_future().get();
-        delete callbackEntry;
-        delete response;
         res.set_content(responsePayload.dump(), "text/json");
     }
 }
