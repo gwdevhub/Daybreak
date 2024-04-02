@@ -467,15 +467,12 @@ namespace Daybreak::Modules::MainPlayerModule {
     }
 
     void GetMainPlayer(const httplib::Request&, httplib::Response& res) {
-        auto callbackEntry = new GW::HookEntry;
-        auto response = new std::promise<MainPlayer>;
+        auto response = std::promise<MainPlayer>();
 
         EnsureInitialized();
-        PromiseQueue.emplace(response);
-        json responsePayload = response->get_future().get();
+        PromiseQueue.emplace(&response);
+        json responsePayload = response.get_future().get();
 
-        delete callbackEntry;
-        delete response;
         res.set_content(responsePayload.dump(), "text/json");
     }
 }

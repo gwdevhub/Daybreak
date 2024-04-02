@@ -62,15 +62,12 @@ namespace Daybreak::Modules::SessionModule {
     }
 
     void GetSessionInfo(const httplib::Request&, httplib::Response& res) {
-        auto callbackEntry = new GW::HookEntry;
-        auto response = new std::promise<SessionPayload>;
+        auto response = std::promise<SessionPayload>();
 
         EnsureInitialized();
-        PromiseQueue.emplace(response);
-        json responsePayload = response->get_future().get();
+        PromiseQueue.emplace(&response);
+        json responsePayload = response.get_future().get();
 
-        delete callbackEntry;
-        delete response;
         res.set_content(responsePayload.dump(), "text/json");
     }
 }
