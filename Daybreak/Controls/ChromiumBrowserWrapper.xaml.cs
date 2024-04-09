@@ -60,8 +60,6 @@ public partial class ChromiumBrowserWrapper : UserControl
     private readonly ILiveOptions<BrowserOptions> liveOptions;
     private readonly ILogger<ChromiumBrowserWrapper> logger;
     private readonly IBuildTemplateManager buildTemplateManager;
-    private readonly IBrowserHistoryManager historyManager;
-    
     private readonly IBrowserExtensionsManager browserExtensionsManager;
 
     [GenerateDependencyProperty(InitialValue = true)]
@@ -94,6 +92,8 @@ public partial class ChromiumBrowserWrapper : UserControl
     private bool showBrowserDisabledMessage;
     [GenerateDependencyProperty(InitialValue = true)]
     private bool showDownloadsDialog = true;
+    [GenerateDependencyProperty(InitialValue = true)]
+    private bool maximizeButtonVisible = true;
 
     private bool browserInitialized = false;
 
@@ -103,7 +103,7 @@ public partial class ChromiumBrowserWrapper : UserControl
         set => this.SetValue(AddressProperty, value);
     }
 
-    public IBrowserHistoryManager BrowserHistoryManager => this.historyManager;
+    public IBrowserHistoryManager BrowserHistoryManager { get; }
 
     public ChromiumBrowserWrapper()
         : this(
@@ -124,7 +124,7 @@ public partial class ChromiumBrowserWrapper : UserControl
         IBuildTemplateManager buildTemplateManager,
         ILogger<ChromiumBrowserWrapper> logger)
     {
-        this.historyManager = historyManager.ThrowIfNull();
+        this.BrowserHistoryManager = historyManager.ThrowIfNull();
         this.browserExtensionsManager = browserExtensionsManager.ThrowIfNull();
         this.httpClient = httpClient.ThrowIfNull();
         this.liveOptions = liveOptions.ThrowIfNull();
@@ -132,7 +132,7 @@ public partial class ChromiumBrowserWrapper : UserControl
         this.logger = logger.ThrowIfNull();
         this.InitializeComponent();
 
-        this.historyManager.InitializeHistoryManager(this);
+        this.BrowserHistoryManager.InitializeHistoryManager(this);
         this.initializationTask = Task.Run(this.InitializeBrowserSafe);
     }
 
@@ -509,19 +509,19 @@ public partial class ChromiumBrowserWrapper : UserControl
             return;
         }
 
-        this.historyManager.UnInitializeHistoryManager();
+        this.BrowserHistoryManager.UnInitializeHistoryManager();
         this.WebBrowser?.Dispose();
         this.browserInitialized = false;
     }
 
     private void BackButton_Clicked(object sender, EventArgs e)
     {
-        this.historyManager.GoBack();
+        this.BrowserHistoryManager.GoBack();
     }
 
     private void ForwardButton_Clicked(object sender, EventArgs e)
     {
-        this.historyManager.GoForward();
+        this.BrowserHistoryManager.GoForward();
     }
 
     private void RefreshGlyph_Clicked(object sender, EventArgs e)

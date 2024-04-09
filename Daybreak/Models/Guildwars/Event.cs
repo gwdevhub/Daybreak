@@ -32,8 +32,8 @@ public sealed class Event
         Title = "Sweet Treats Week",
         Description = "Sweet Treats Week is upon us, which means it’s time to load up on springtime goodies. Chocolate Bunnies and Golden Eggs will be randomly mixed in with regular drops all across Tyria. Get hopping!",
         WikiUrl = "https://wiki.guildwars.com/wiki/Sweet_Treats_Week",
-        From = new DateOnly(1, 4, 22),
-        To = new DateOnly(1, 5, 6)
+        From = new DateOnly(1, 4, 10),
+        To = new DateOnly(1, 4, 17)
     };
 
     public static readonly Event AnniversaryCelebration = new()
@@ -41,8 +41,8 @@ public sealed class Event
         Title = "Guild Wars Anniversary Celebration",
         Description = "Guild Wars is another year older and the party just won't stop! Strap on your party hats, unpack your fireworks, and get ready to celebrate!",
         WikiUrl = "https://wiki.guildwars.com/wiki/Anniversary_Celebration",
-        From = new DateOnly(1, 4, 10),
-        To = new DateOnly(1, 4, 17)
+        From = new DateOnly(1, 4, 22),
+        To = new DateOnly(1, 5, 6)
     };
 
     public static readonly Event DragonFestival = new()
@@ -115,6 +115,15 @@ public sealed class Event
         WikiUrl = "https://wiki.guildwars.com/wiki/Wintersday",
         From = new DateOnly(1, 12, 19),
         To = new DateOnly(1, 1, 2)
+    };
+
+    public static readonly Event AprilFoolsDay = new()
+    {
+        Title = "April Fools' Day",
+        Description = "*CLASSIFIED INFORMATION*\r\nTGlzdGVuLC Bhbm Qgd W5kZXJz dG FuZC4g VG hhd CBBbm5 paG lsYXRv c iBnb 2xlbSBp cyBvdXQ gd Ghlcm UuIEl0 IGN hb id0IG JlIGJ h cmdh aW5lZ CB3 aX RoL iBJdCBj YW4n d CBiZ SByZWF zb25lZ C B3aX RoLi BJd C Bkb2 Vzbid0I GZlZWwgcGl 0eS wgb3 I gcmVtb3Jz ZSwg b3I gZmV hci4g QW5 kIGl 0IGFi c2 9s dXRl bHk gd2lsbC Bub 3Qgc 3RvcC wgZX Zlc iwg dW50aW w gU2Fy YWggY W5kIE d3Z W4 gYXJ lIGRl YWQu",
+        WikiUrl = "https://wiki.guildwars.com/wiki/April_Fools%27_Day",
+        From = new DateOnly(1, 4, 1),
+        To = new DateOnly(1, 4, 2)
     };
 
     public static readonly IEnumerable<Event> Events = new List<Event>
