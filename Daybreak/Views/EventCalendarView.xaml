@@ -12,41 +12,83 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <converters:EventToBrushConverter x:Key="EventToBrushConverter" />
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <converters:EventCalendarDayToBrushConverter x:Key="EventCalendarDayToBrushConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid>
+    <Grid
+        Background="{StaticResource Daybreak.Brushes.Background}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="300"/>
+            <RowDefinition Height="0.5*" MaxHeight="300"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <ListView ItemsSource="{Binding ElementName=_this, Path=Events, Mode=OneWay}"
                   SelectedItem="{Binding ElementName=_this, Path=SelectedListEvent, Mode=TwoWay}"
+                  Background="Transparent"
                   ScrollViewer.CanContentScroll="False"
                   ScrollViewer.VerticalScrollBarVisibility="Auto"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                   Grid.RowSpan="2">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem" BasedOn="{StaticResource MahApps.Styles.ListViewItem}">
+                    <Setter Property="Background" Value="Transparent"/>
+                    <!-- Set the background for various item states -->
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="Transparent"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="Transparent"/>
+                        </Trigger>
+                        <!-- Add more triggers for other states as needed -->
+                    </Style.Triggers>
+                </Style>
+            </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Cursor="Hand"
                                 Background="Transparent"
                                 MouseLeftButtonUp="EventListItem_MouseLeftButtonUp">
                         <WrapPanel>
-                            <Rectangle Fill="{Binding Converter={StaticResource EventToBrushConverter}}"
+                            <Rectangle Fill="{Binding SeasonalEvent, Converter={StaticResource EventToBrushConverter}}"
                                        Height="20"
                                        Width="20"
                                        Margin="10, 0, 10, 0"/>
-                            <TextBlock Text="{Binding Title}"
+                            <TextBlock Text="{Binding SeasonalEvent.Title}"
+                                       Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                        TextWrapping="Wrap"
                                        Grid.Column="1"
                                        FontSize="20"/>
+                            <WrapPanel Visibility="{Binding Upcoming, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <TextBlock Text="Upcoming "
+                                           TextWrapping="Wrap"
+                                           Margin="10, 0, 0, 0"
+                                           Foreground="{StaticResource MahApps.Brushes.Accent}"/>
+                                <TextBlock Text="{Binding SeasonalEvent.From, StringFormat=MMM dd}"
+                                           TextWrapping="Wrap"
+                                           Foreground="{StaticResource MahApps.Brushes.Accent}"/>
+                                <TextBlock Text=", "
+                                           TextWrapping="Wrap"
+                                           Foreground="{StaticResource MahApps.Brushes.Accent}"/>
+                                <TextBlock Text="{Binding ElementName=_this, Path=UpcomingEventStartTime, Mode=OneWay}"
+                                           TextWrapping="Wrap"
+                                           Foreground="{StaticResource MahApps.Brushes.Accent}"/>
+                            </WrapPanel>
+                            <WrapPanel Visibility="{Binding Active, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <TextBlock Text="Active"
+                                           TextWrapping="Wrap"
+                                           Margin="10, 0, 0, 0"
+                                           Foreground="{StaticResource MahApps.Brushes.Accent}"/>
+                            </WrapPanel>
                         </WrapPanel>
                         <TextBlock Grid.Row="1"
                                    Grid.ColumnSpan="2"
-                                   Text="{Binding Description}"
+                                   Text="{Binding SeasonalEvent.Description}"
+                                   Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                    TextWrapping="Wrap"/>
                         <Rectangle Fill="{StaticResource MahApps.Brushes.ThemeForeground}"
                                    Grid.ColumnSpan="2"
@@ -64,7 +106,18 @@
             Grid.Column="1">
             <Calendar VerticalAlignment="Stretch"
                       HorizontalAlignment="Center"
-                      FirstDayOfWeek="Monday"/>
+                      FirstDayOfWeek="Monday"
+                      SelectionMode="SingleDate"
+                      SelectedDatesChanged="Calendar_SelectedDatesChanged"
+                      DisplayDate="{Binding ElementName=_this, Path=SelectedDate, Mode=TwoWay}">
+                <Calendar.CalendarDayButtonStyle>
+                    <Style TargetType="CalendarDayButton" BasedOn="{StaticResource MahApps.Styles.Button.Flat}">
+                        <Setter Property="Background" Value="{Binding Date, Converter={StaticResource EventCalendarDayToBrushConverter}}" />
+                        <Setter Property="Cursor" Value="Hand" />
+                        <Setter Property="Foreground" Value="{StaticResource MahApps.Brushes.ThemeForeground}" />
+                    </Style>
+                </Calendar.CalendarDayButtonStyle>
+            </Calendar>
         </Viewbox>
         <controls:ChromiumBrowserWrapper 
             Grid.Column="2"

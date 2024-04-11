@@ -6,9 +6,16 @@ using System.Linq;
 namespace Daybreak.Services.Events;
 internal sealed class EventService : IEventService
 {
-    public ICollection<Event> GetCurrentEvents()
+    private static readonly TimeOnly EventStartTime = new(19, 0);
+
+    public ICollection<Event> GetCurrentActiveEvents()
     {
-        return GetCurrentEventsInternal().ToList();
+        return GetActiveEventsInternal(DateTime.UtcNow).ToList();
+    }
+
+    public ICollection<Event> GetActiveEvents(DateTime dateTime)
+    {
+        return GetActiveEventsInternal(dateTime).ToList();
     }
 
     public Event GetUpcomingEvent()
@@ -17,9 +24,24 @@ internal sealed class EventService : IEventService
         return Event.Events.OrderBy(TimeToStart).First();
     }
 
-    private static IEnumerable<Event> GetCurrentEventsInternal()
+    public TimeOnly GetLocalizedEventStartTime()
     {
-        var maybeEvents = Event.Events.Where(EventIsActive);
+        var today = DateTime.UtcNow.Date;
+        var utcDateTime = new DateTime(today.Year, today.Month, today.Day, EventStartTime.Hour, EventStartTime.Minute, EventStartTime.Second, DateTimeKind.Utc);
+        var localizedDateTime = utcDateTime.ToLocalTime();
+        var localTime = TimeOnly.FromDateTime(localizedDateTime);
+        return localTime;
+    }
+
+    public DateTime GetEventStartTime(Event e)
+    {
+        var timeToEvent = TimeToStart(e);
+        return DateTime.UtcNow + timeToEvent;
+    }
+
+    private static IEnumerable<Event> GetActiveEventsInternal(DateTime dateTime)
+    {
+        var maybeEvents = Event.Events.Where(e => EventIsActive(e, dateTime));
         foreach (var e in maybeEvents)
         {
             yield return e;
@@ -29,25 +51,21 @@ internal sealed class EventService : IEventService
     private static TimeSpan TimeToStart(Event e)
     {
         var currentTime = DateTime.UtcNow;
-        return EventDateFilter(e, (_, eventStartTime, _) =>
+        var startEventTime = new DateTime(currentTime.Year, e.From.Month, e.From.Day, EventStartTime.Hour, EventStartTime.Minute, EventStartTime.Second, DateTimeKind.Utc);
+        if (startEventTime < currentTime)
         {
-            if (eventStartTime < currentTime)
-            {
-                return TimeSpan.MaxValue;
-            }
+            startEventTime = startEventTime.AddYears(1);
+        }
 
-            return eventStartTime - currentTime;
-        });
+        return startEventTime - currentTime;
     }
 
-    private static bool EventIsActive(Event e)
+    private static bool EventIsActive(Event e, DateTime dateTime)
     {
-        var currentTime = DateTime.UtcNow;
-
-        return EventDateFilter(e, (_, eventStartTime, eventEndTime) =>
+        return EventDateFilter(e, dateTime.Year, (_, eventStartTime, eventEndTime) =>
         {
-            if (currentTime > eventStartTime &&
-                currentTime < eventEndTime)
+            if (dateTime >= eventStartTime &&
+                dateTime <= eventEndTime)
             {
                 return true;
             }
@@ -56,19 +74,11 @@ internal sealed class EventService : IEventService
         });
     }
 
-    private static TFilterReturn EventDateFilter<TFilterReturn>(Event e, Func<Event, DateTime, DateTime, TFilterReturn> filter)
+    private static TFilterReturn EventDateFilter<TFilterReturn>(Event e, int year, Func<Event, DateTime, DateTime, TFilterReturn> filter)
     {
-        var currentTime = DateTime.UtcNow;
-
         // 12pm pst is the equivalent of 19.00 utc
-        var eventStartTime = new DateTime(currentTime.Year, e.From.Month, e.From.Day, 19, 0, 0);
-        var eventEndTime = new DateTime(currentTime.Year, e.To.Month, e.To.Day, 19, 0, 0);
-        if (eventEndTime < eventStartTime)
-        {
-            // Edge case when the event spans a new year. In this case, we need to move the start time in the previous year
-            eventStartTime = new DateTime(eventStartTime.Year - 1, eventStartTime.Month, eventStartTime.Day, eventStartTime.Hour, eventStartTime.Minute, eventStartTime.Second);
-        }
-
+        var eventStartTime = new DateTime(year, e.From.Month, e.From.Day, EventStartTime.Hour, EventStartTime.Minute, EventStartTime.Second, DateTimeKind.Utc);
+        var eventEndTime = new DateTime(year, e.To.Month, e.To.Day, EventStartTime.Hour, EventStartTime.Minute, EventStartTime.Second, DateTimeKind.Utc);
         return filter(e, eventStartTime, eventEndTime);
     }
 }

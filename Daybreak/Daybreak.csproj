@@ -116,7 +116,7 @@
     <PackageReference Include="SystemExtensions.NetStandard" Version="1.6.2" />
     <PackageReference Include="SystemExtensions.NetStandard.DependencyInjection" Version="1.3.1" />
     <PackageReference Include="WpfExtended" Version="0.7.7" />
-    <PackageReference Include="WpfExtended.SourceGeneration" Version="0.1.2" />
+    <PackageReference Include="WpfExtended.SourceGeneration" Version="0.2.5" />
     <PackageReference Include="WpfScreenHelper" Version="2.1.0" />
     <PackageReference Include="WriteableBitmapEx" Version="1.6.8" />
   </ItemGroup>

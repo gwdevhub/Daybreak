@@ -9,6 +9,15 @@ namespace Daybreak.Models.Guildwars;
 /// </summary>
 public sealed class Event
 {
+    public static readonly Event WintersdayJanuary = new()
+    {
+        Title = "Wintersday",
+        Description = "See towns glimmering with festive décor, deliver presents to needy little urchins, defeat the scheming Grentches, and spread Wintersday cheer to your fellow Tyrians! The fun culminates with a grand finale that runs every three hours on January 1!",
+        WikiUrl = "https://wiki.guildwars.com/wiki/Wintersday",
+        From = new DateOnly(1, 1, 1),
+        To = new DateOnly(1, 1, 2)
+    };
+
     public static readonly Event CanthanNewYear = new()
     {
         Title = "Canthan New Year",
@@ -108,13 +117,13 @@ public sealed class Event
         To = new DateOnly(1, 11, 28)
     };
 
-    public static readonly Event Wintersday = new()
+    public static readonly Event WintersdayDecember = new()
     {
         Title = "Wintersday",
         Description = "See towns glimmering with festive décor, deliver presents to needy little urchins, defeat the scheming Grentches, and spread Wintersday cheer to your fellow Tyrians! The fun culminates with a grand finale that runs every three hours on January 1!",
         WikiUrl = "https://wiki.guildwars.com/wiki/Wintersday",
         From = new DateOnly(1, 12, 19),
-        To = new DateOnly(1, 1, 2)
+        To = new DateOnly(1, 12, 31)
     };
 
     public static readonly Event AprilFoolsDay = new()
@@ -126,10 +135,12 @@ public sealed class Event
         To = new DateOnly(1, 4, 2)
     };
 
-    public static readonly IEnumerable<Event> Events = new List<Event>
-    {
+    public static readonly IEnumerable<Event> Events =
+    [
+        WintersdayJanuary,
         CanthanNewYear,
         LuckyTreatsWeek,
+        AprilFoolsDay,
         SweetTreatsWeek,
         AnniversaryCelebration,
         DragonFestival,
@@ -139,8 +150,8 @@ public sealed class Event
         BreastCancerAwarenessMonth,
         Halloween,
         SpecialTreatsWeek,
-        Wintersday
-    };
+        WintersdayDecember
+    ];
 
     public string? Title { get; set; }
 

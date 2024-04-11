@@ -23,7 +23,8 @@ internal sealed class EventToBrushConverter : IValueConverter
         { Event.BreastCancerAwarenessMonth, new SolidColorBrush(ColorPalette.Pink) },
         { Event.Halloween, new SolidColorBrush(ColorPalette.Orange) },
         { Event.SpecialTreatsWeek, new SolidColorBrush(ColorPalette.Lime) },
-        { Event.Wintersday, new SolidColorBrush(ColorPalette.BlueGrey) }
+        { Event.WintersdayJanuary, new SolidColorBrush(ColorPalette.BlueGrey) },
+        { Event.WintersdayDecember, new SolidColorBrush(ColorPalette.BlueGrey) }
     };
 
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

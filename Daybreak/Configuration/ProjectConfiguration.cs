@@ -447,6 +447,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         notificationHandlerProducer.RegisterNotificationHandler<FixSymbolicLinkNotificationHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<UpdateNotificationHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<ReShadeConfigChangedHandler>();
+        notificationHandlerProducer.RegisterNotificationHandler<NavigateToCalendarViewHandler>();
     }
 
     public override void RegisterMods(IModsManager modsManager)
