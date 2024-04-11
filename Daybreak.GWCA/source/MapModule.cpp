@@ -14,14 +14,18 @@ namespace Daybreak::Modules::MapModule {
     volatile bool initialized = false;
 
     MapPayload GetPayload() {
+        MapPayload mapPayload;
         auto isLoaded = GW::Map::GetIsMapLoaded();
+        if (!isLoaded) {
+            return mapPayload;
+        }
+
         auto instanceType = GW::Map::GetInstanceType();
         auto instanceTime = GW::Map::GetInstanceTime();
         auto mapInfo = GW::Map::GetCurrentMapInfo();
         auto isInCinematic = GW::Map::GetIsInCinematic();
         auto region = GW::Map::GetRegion();
         auto mapId = GW::Map::GetMapID();
-        MapPayload mapPayload;
         mapPayload.Campaign = static_cast<uint32_t>(mapInfo->campaign);
         mapPayload.Continent = static_cast<uint32_t>(mapInfo->continent);
         mapPayload.Region = mapInfo->region;
