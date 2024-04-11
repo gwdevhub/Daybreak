@@ -163,6 +163,11 @@ public partial class MenuList : UserControl
         this.viewManager.ShowView<TradeAlertsView>();
     }
 
+    private void CalendarButton_Clicked(object sender, EventArgs e)
+    {
+        this.viewManager.ShowView<EventCalendarView>();
+    }
+
     private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
     {
         this.cancellationTokenSource = new CancellationTokenSource();

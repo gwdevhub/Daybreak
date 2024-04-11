@@ -51,6 +51,13 @@
                                         Cursor="Hand"
                                         Clicked="CopyGuildwarsButton_Clicked"
                                         ToolTip="Copy Guild Wars from an existing installation"/>
+                    <buttons:MenuButton Title="Event Calendar" 
+                                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                        HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                                        Height="30"
+                                        Cursor="Hand"
+                                        Clicked="CalendarButton_Clicked"
+                                        ToolTip="Show current and upcoming events"/>
                 </local:ExpandableMenuSection.Children>
             </local:ExpandableMenuSection>
             <Grid>
