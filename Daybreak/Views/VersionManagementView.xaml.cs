@@ -81,6 +81,6 @@ public partial class VersionManagementView : UserControl
             return;
         }
 
-        this.viewManager.ShowView<UpdateView>(desiredVersion);
+        this.viewManager.ShowView<UpdateConfirmationView>(desiredVersion);
     }
 }

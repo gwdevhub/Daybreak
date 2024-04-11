@@ -333,6 +333,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<SettingsSynchronizationView>();
         viewProducer.RegisterView<TeamBuildTemplateView>();
         viewProducer.RegisterView<EventCalendarView>();
+        viewProducer.RegisterView<UpdateConfirmationView>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)

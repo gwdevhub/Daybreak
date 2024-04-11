@@ -15,4 +15,5 @@ public interface IApplicationUpdater : IApplicationLifetimeService
     Task<bool> UpdateAvailable();
     Task<bool> DownloadUpdate(Version version, UpdateStatus updateStatus);
     Task<bool> DownloadLatestUpdate(UpdateStatus updateStatus);
+    Task<string?> GetChangelog(Version version);
 }
