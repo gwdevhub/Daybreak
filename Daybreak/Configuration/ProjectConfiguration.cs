@@ -262,6 +262,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IProcessInjector, ProcessInjector>();
         services.AddScoped<ILaunchConfigurationService, LaunchConfigurationService>();
         services.AddScoped<IBrowserHistoryManager, BrowserHistoryManager>();
+        services.AddScoped<IEventService, EventService>();
     }
 
     public override void RegisterViews(IViewProducer viewProducer)
@@ -331,6 +332,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<DirectSongSwitchView>();
         viewProducer.RegisterView<SettingsSynchronizationView>();
         viewProducer.RegisterView<TeamBuildTemplateView>();
+        viewProducer.RegisterView<EventCalendarView>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -445,6 +447,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         notificationHandlerProducer.RegisterNotificationHandler<FixSymbolicLinkNotificationHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<UpdateNotificationHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<ReShadeConfigChangedHandler>();
+        notificationHandlerProducer.RegisterNotificationHandler<NavigateToCalendarViewHandler>();
     }
 
     public override void RegisterMods(IModsManager modsManager)
