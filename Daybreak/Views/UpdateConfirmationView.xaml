@@ -1,0 +1,81 @@
+﻿<UserControl x:Class="Daybreak.Views.UpdateConfirmationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
+             xmlns:local="clr-namespace:Daybreak.Views"
+             Loaded="UserControl_Loaded"
+             x:Name="_this"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Background="{StaticResource Daybreak.Brushes.Background}"
+                MaxWidth="600">
+        <WrapPanel HorizontalAlignment="Center"
+                   Margin="10">
+            <TextBlock HorizontalAlignment="Center"
+                       Text="Daybreak "
+                       Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                       FontSize="20"/>
+            <TextBlock HorizontalAlignment="Center"
+                       Text="{Binding ElementName=_this, Path=Version, Mode=OneWay}"
+                       Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                       FontSize="20"/>
+            <TextBlock HorizontalAlignment="Center"
+                       Text=" changelog"
+                       Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                       FontSize="20"/>
+        </WrapPanel>
+        <ScrollViewer MaxHeight="300"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalAlignment="Center">
+            <TextBox Text="{Binding ElementName=_this, Path=ChangeLog, Mode=OneWay}"
+                     IsReadOnly="True"
+                     FontSize="14"/>
+        </ScrollViewer>
+        <TextBlock HorizontalAlignment="Center"
+                   Text="Do you want to download this update?"
+                   Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                   FontSize="20"
+                   Margin="10"/>
+        <Grid MaxWidth="600"
+              Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <buttons:HighlightButton Title="No"
+                 Grid.Column="0"
+                 HorizontalAlignment="Center"
+                 Height="30"
+                 Width="60"
+                 HorizontalContentAlignment="Center"
+                 VerticalContentAlignment="Center"
+                 FontSize="16"
+                 Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                 Background="{StaticResource MahApps.Brushes.ThemeBackground}"
+                 HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                 BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                 BorderThickness="1"
+                 Clicked="NoButton_Clicked"
+                 ToolTip="Cancel"/>
+            <buttons:HighlightButton Title="Yes"
+                 Grid.Column="1"
+                 HorizontalAlignment="Center"
+                 Height="30"
+                 Width="60"
+                 HorizontalContentAlignment="Center"
+                 VerticalContentAlignment="Center"
+                 FontSize="16"
+                 Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                 Background="{StaticResource MahApps.Brushes.ThemeBackground}"
+                 BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                 BorderThickness="1"
+                 HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                 Clicked="YesButton_Clicked"
+                 ToolTip="Restart"/>
+        </Grid>
+    </StackPanel>
+</UserControl>

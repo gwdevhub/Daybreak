@@ -24,6 +24,6 @@ internal sealed class UpdateNotificationHandler : INotificationHandler
         }
 
         version.HasPrefix = true;
-        this.viewManager.ShowView<UpdateView>(version);
+        this.viewManager.ShowView<UpdateConfirmationView>(version);
     }
 }

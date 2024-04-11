@@ -158,6 +158,21 @@ internal sealed class ApplicationUpdater : IApplicationUpdater
         return new List<Version>();
     }
 
+    public async Task<string?> GetChangelog(Version version)
+    {
+        var changeLogResponse = await this.httpClient.GetAsync(
+            BlobStorageUrl
+                .Replace(VersionTag, version.ToString().Replace(".", "-"))
+                .Replace(FileTag, "changelog.txt"));
+
+        if (!changeLogResponse.IsSuccessStatusCode)
+        {
+            return default;
+        }
+
+        return await changeLogResponse.Content.ReadAsStringAsync();
+    }
+
     public void PeriodicallyCheckForUpdates()
     {
         System.Extensions.TaskExtensions.RunPeriodicAsync(async () =>
