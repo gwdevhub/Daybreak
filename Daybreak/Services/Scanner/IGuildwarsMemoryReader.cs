@@ -23,5 +23,6 @@ public interface IGuildwarsMemoryReader
     Task<string?> GetEntityName(IEntity entity, CancellationToken cancellationToken);
     Task<string?> GetItemName(int id, List<uint> modifiers, CancellationToken cancellationToken);
     Task<TitleInformationExtended?> GetTitleInformation(int id, CancellationToken cancellationToken);
+    Task<bool> SendWhisper(string message, CancellationToken cancellationToken);
     void Stop();
 }

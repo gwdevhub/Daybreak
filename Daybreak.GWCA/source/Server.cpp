@@ -54,6 +54,10 @@ namespace http {
             server.Get(pattern, handler);
         }
 
+        void Post(const std::string& pattern, httplib::Server::Handler handler) {
+            server.Post(pattern, handler);
+        }
+
         void SetLogger(httplib::Logger logger) {
             server.set_logger(logger);
         }
