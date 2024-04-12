@@ -8,5 +8,6 @@ namespace http {
         void StopServer();
         void SetLogger(httplib::Logger logger);
         void Get(const std::string& pattern, httplib::Server::Handler handler);
+        void Post(const std::string& pattern, httplib::Server::Handler handler);
     }
 }

@@ -97,4 +97,10 @@ internal sealed class GWCAClient : IGWCAClient
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetAsync), subPath);
         return await this.httpClient.GetAsync($"{UrlTemplate.Replace(PortPlaceholder, connectionContext.Port.ToString())}/{subPath}", cancellationToken);
     }
+
+    public async Task<HttpResponseMessage> PostAsync(ConnectionContext connectionContext, string subPath, HttpContent httpContent, CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetAsync), subPath);
+        return await this.httpClient.PostAsync($"{UrlTemplate.Replace(PortPlaceholder, connectionContext.Port.ToString())}/{subPath}", httpContent, cancellationToken);
+    }
 }

@@ -86,7 +86,7 @@ internal sealed class PriceCheckerService : IPriceCheckerService
                     inventoryData.Backpack!.Items.Concat(
                     inventoryData.Bags.SelectMany(b => b!.Items).Concat(
                     inventoryData.BeltPouch!.Items.Concat(
-                    inventoryData.EquippedItems!.Items.Concat(
+                    inventoryData.EquipmentPack!.Items.Concat(
                     inventoryData.UnclaimedItems!.Items))))
                     .Select(i =>
                     {
@@ -132,9 +132,10 @@ internal sealed class PriceCheckerService : IPriceCheckerService
                     var name = await this.guildwarsMemoryReader.GetItemName((int)modelId, item.Modifiers.Select(m => (uint)m).ToList(), cancellationToken);
                     this.notificationService.NotifyInformation(
                         title: $"Expensive item detected",
-                        description: $"The following components have been identified in the item{(name is null ? string.Empty : $" {name}")}:\n{string.Join('\n', itemsWithPrice.Select(t => $"{t.item.Name}: {t.Item2}g"))}",
+                        description: $"{(name is null ? string.Empty : $"{name}\n")}{string.Join('\n', itemsWithPrice.Select(t => $"{t.item.Name}: {t.Item2}g"))}",
                         expirationTime: DateTime.MaxValue,
-                        persistent: false);
+                        persistent: true);
+                    await this.guildwarsMemoryReader.SendWhisper($"<c=#f96677>Expensive item detected:\n<c=#ffffff>{(name is null ? string.Empty : $"{name}\n")}{string.Join('\n', itemsWithPrice.Select(t => $"<c=#8fce00>{t.item.Name}: {t.Item2}g<c=#ffffff>"))}", CancellationToken.None);
                 }
 
             }
@@ -150,7 +151,7 @@ internal sealed class PriceCheckerService : IPriceCheckerService
     private bool TryGetPrice(string id, out double price)
     {
         price = 0;
-        var priceCheckDTO = this.priceCache.FindOne(b => b.Id == id);
+        var priceCheckDTO = this.priceCache.Find(b => b.Id == id).FirstOrDefault();
         if (priceCheckDTO is null)
         {
             return false;
