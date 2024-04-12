@@ -15,14 +15,18 @@ using System.Windows;
 using Daybreak.Utils;
 using System.Text.RegularExpressions;
 using Daybreak.Services.Pathfinding;
+using System.Net.Http;
+using System.Configuration;
+using Daybreak.Configuration.Options;
 
 namespace Daybreak.Services.Scanner;
 
-public sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
+internal sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
 {
     private static readonly Regex ItemNameColorRegex = GenerateItemNameColorRegex();
     private readonly IPathfinder pathfinder;
     private readonly IGWCAClient client;
+    private readonly ILiveOptions<MemoryReaderOptions> liveOptions;
     private readonly ILogger<GWCAMemoryReader> logger;
 
     private bool faulty = false;
@@ -32,10 +36,12 @@ public sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
     public GWCAMemoryReader(
         IPathfinder pathfinder,
         IGWCAClient gWCAClient,
+        ILiveOptions<MemoryReaderOptions> liveOptions,
         ILogger<GWCAMemoryReader> logger)
     {
         this.pathfinder = pathfinder.ThrowIfNull();
         this.client = gWCAClient.ThrowIfNull();
+        this.liveOptions = liveOptions.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
     }
 
@@ -76,7 +82,7 @@ public sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
 
         try
         {
-            var response = await this.client.GetAsync(this.connectionContextCache.Value, "game", cancellationToken);
+            using var response = await this.client.GetAsync(this.connectionContextCache.Value, "game", cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
                 scopedLogger.LogError($"Received non-success response {response.StatusCode}");
@@ -137,7 +143,7 @@ public sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
 
         try
         {
-            var response = await this.client.GetAsync(this.connectionContextCache.Value, "inventory", cancellationToken);
+            using var response = await this.client.GetAsync(this.connectionContextCache.Value, "inventory", cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
                 scopedLogger.LogError($"Received non-success response {response.StatusCode}");
@@ -182,7 +188,7 @@ public sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
 
         try
         {
-            var response = await this.client.GetAsync(this.connectionContextCache.Value, "login", cancellationToken);
+            using var response = await this.client.GetAsync(this.connectionContextCache.Value, "login", cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
                 scopedLogger.LogError($"Received non-success response {response.StatusCode}");
@@ -221,7 +227,7 @@ public sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
 
         try
         {
-            var response = await this.client.GetAsync(this.connectionContextCache.Value, "game/mainplayer", cancellationToken);
+            using var response = await this.client.GetAsync(this.connectionContextCache.Value, "game/mainplayer", cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
                 scopedLogger.LogError($"Received non-success response {response.StatusCode}");
@@ -259,7 +265,7 @@ public sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
 
         try
         {
-            var response = await this.client.GetAsync(this.connectionContextCache.Value, "pathing", cancellationToken);
+            using var response = await this.client.GetAsync(this.connectionContextCache.Value, "pathing", cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
                 scopedLogger.LogError($"Received non-success response {response.StatusCode}");
@@ -325,7 +331,7 @@ public sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
 
         try
         {
-            var response = await this.client.GetAsync(this.connectionContextCache.Value, "pathing/metadata", cancellationToken);
+            using var response = await this.client.GetAsync(this.connectionContextCache.Value, "pathing/metadata", cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
                 scopedLogger.LogError($"Received non-success response {response.StatusCode}");
@@ -363,7 +369,7 @@ public sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
 
         try
         {
-            var response = await this.client.GetAsync(this.connectionContextCache.Value, "pregame", cancellationToken);
+            using var response = await this.client.GetAsync(this.connectionContextCache.Value, "pregame", cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
                 scopedLogger.LogError($"Received non-success response {response.StatusCode}");
@@ -402,7 +408,7 @@ public sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
 
         try
         {
-            var response = await this.client.GetAsync(this.connectionContextCache.Value, "session", cancellationToken);
+            using var response = await this.client.GetAsync(this.connectionContextCache.Value, "session", cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
                 scopedLogger.LogError($"Received non-success response {response.StatusCode}");
@@ -454,7 +460,7 @@ public sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
 
         try
         {
-            var response = await this.client.GetAsync(this.connectionContextCache.Value, "user", cancellationToken);
+            using var response = await this.client.GetAsync(this.connectionContextCache.Value, "user", cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
                 scopedLogger.LogError($"Received non-success response {response.StatusCode}");
@@ -509,7 +515,7 @@ public sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
 
         try
         {
-            var response = await this.client.GetAsync(this.connectionContextCache.Value, "map", cancellationToken);
+            using var response = await this.client.GetAsync(this.connectionContextCache.Value, "map", cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
                 scopedLogger.LogError($"Received non-success response {response.StatusCode}");
@@ -555,7 +561,7 @@ public sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
 
         try
         {
-            var response = await this.client.GetAsync(this.connectionContextCache.Value, $"game/state", cancellationToken);
+            using var response = await this.client.GetAsync(this.connectionContextCache.Value, $"game/state", cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
                 scopedLogger.LogError($"Received non-success response {response.StatusCode}");
@@ -611,7 +617,7 @@ public sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
 
         try
         {
-            var response = await this.client.GetAsync(this.connectionContextCache.Value, $"entities/name?id={entity.Id}", cancellationToken);
+            using var response = await this.client.GetAsync(this.connectionContextCache.Value, $"entities/name?id={entity.Id}", cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
                 scopedLogger.LogError($"Received non-success response {response.StatusCode}");
@@ -649,7 +655,7 @@ public sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
 
         try
         {
-            var response = await this.client.GetAsync(this.connectionContextCache.Value, $"items/name?id={id}&modifiers={string.Join(',', modifiers?.Select(m => m.ToString()) ?? Array.Empty<string>())}", cancellationToken);
+            using var response = await this.client.GetAsync(this.connectionContextCache.Value, $"items/name?id={id}&modifiers={string.Join(',', modifiers?.Select(m => m.ToString()) ?? Array.Empty<string>())}", cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
                 scopedLogger.LogError($"Received non-success response {response.StatusCode}");
@@ -688,7 +694,7 @@ public sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
 
         try
         {
-            var response = await this.client.GetAsync(this.connectionContextCache.Value, $"titles/info?id={id}", cancellationToken);
+            using var response = await this.client.GetAsync(this.connectionContextCache.Value, $"titles/info?id={id}", cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
                 scopedLogger.LogError($"Received non-success response {response.StatusCode}");
@@ -723,6 +729,38 @@ public sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
         }
 
         return default;
+    }
+
+    public async Task<bool> SendWhisper(string message, CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetTitleInformation), string.Empty);
+        if (this.connectionContextCache is null)
+        {
+            return false;
+        }
+
+        if (!this.liveOptions.Value.AllowWhispers)
+        {
+            return false;
+        }
+
+        try
+        {
+            using var textContent = new StringContent(message);
+            using var response = await this.client.PostAsync(this.connectionContextCache.Value, $"whisper", textContent, cancellationToken);
+            if (!response.IsSuccessStatusCode)
+            {
+                scopedLogger.LogError($"Received non-success response {response.StatusCode}");
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            scopedLogger.LogError(ex, "Encountered exception while parsing response");
+            this.faulty = true;
+        }
+
+        return false;
     }
 
     public void Stop()

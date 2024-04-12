@@ -11,4 +11,6 @@ public interface IGWCAClient
     Task<bool> CheckAlive(ConnectionContext connectionContext, CancellationToken cancellationToken);
 
     Task<HttpResponseMessage> GetAsync(ConnectionContext connectionContext, string subPath, CancellationToken cancellationToken);
+
+    Task<HttpResponseMessage> PostAsync(ConnectionContext connectionContext, string subPath, HttpContent httpContent, CancellationToken cancellationToken);
 }

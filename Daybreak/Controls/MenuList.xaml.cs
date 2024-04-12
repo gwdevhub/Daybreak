@@ -185,13 +185,13 @@ public partial class MenuList : UserControl
     {
         while (!cancellationToken.IsCancellationRequested)
         {
-            var unopenedNotifications = this.notificationStorage.GetPendingNotifications().ToList();
+            var unopenedNotifications = this.notificationStorage.GetPendingNotifications();
             if (unopenedNotifications.Any())
             {
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.ShowingNotificationCount = true;
-                    this.NotificationCount = unopenedNotifications.Count;
+                    this.NotificationCount = unopenedNotifications.Count();
                 });
             }
             else
