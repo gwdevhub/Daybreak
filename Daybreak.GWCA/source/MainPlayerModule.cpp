@@ -138,7 +138,7 @@ namespace Daybreak::Modules::MainPlayerModule {
             return players;
         }
 
-        for (auto i = 0; i < worldContext->players.m_size; i++) {
+        for (auto i = 0U; i < worldContext->players.m_size; i++) {
             if (tempPlayerArray->agent_id != 0) {
                 players.push_back(*tempPlayerArray);
             }

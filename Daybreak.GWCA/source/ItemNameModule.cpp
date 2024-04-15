@@ -23,7 +23,7 @@ namespace Daybreak::Modules::ItemNameModule {
 
     std::wstring* GetAsyncName(uint32_t id, std::vector<uint32_t> modifiers) {
         GW::ItemModifier parsedModifiers[64];
-        for (auto i = 0; i < modifiers.size(); i++) {
+        for (auto i = 0U; i < modifiers.size(); i++) {
             GW::ItemModifier parsedModifier;
             const auto mod = modifiers.at(i);
             parsedModifier.mod = mod;
