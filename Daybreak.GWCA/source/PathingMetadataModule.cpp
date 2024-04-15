@@ -23,7 +23,7 @@ namespace Daybreak::Modules::PathingMetadataModule {
 
         auto pathingMap = GW::Map::GetPathingMap();
         int count = 0;
-        for (int i = 0; i < pathingMap->size(); i++) {
+        for (auto i = 0U; i < pathingMap->size(); i++) {
             auto gwPathingMap = pathingMap->at(i);
             count += gwPathingMap.trapezoid_count;
         }

@@ -25,9 +25,9 @@ namespace Daybreak::Modules::PathingModule {
         auto pathingMap = GW::Map::GetPathingMap();
         std::list<PathingTrapezoid> trapezoids;
         std::map<int, std::list<int>> adjacencyMap;
-        for (int i = 0; i < pathingMap->size(); i++) {
+        for (auto i = 0U; i < pathingMap->size(); i++) {
             auto gwPathingMap = pathingMap->at(i);
-            for (int j = 0; j < gwPathingMap.trapezoid_count; j++) {
+            for (auto j = 0U; j < gwPathingMap.trapezoid_count; j++) {
                 auto gwTrapezoid = gwPathingMap.trapezoids[j];
                 PathingTrapezoid trapezoid;
                 trapezoid.Id = gwTrapezoid.id;
