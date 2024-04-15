@@ -101,7 +101,7 @@ namespace Daybreak::Modules::TitleInfoModule {
                     }
                 }
 
-                for (auto i = 0; i < WaitingList.size(); ) {
+                for (auto i = 0U; i < WaitingList.size(); ) {
                     auto item = &WaitingList[i];
                     auto name = std::get<2>(*item);
                     auto& tries = std::get<3>(*item);
