@@ -34,7 +34,7 @@ namespace Daybreak::Modules::MainPlayerModule {
 
     std::list<QuestMetadata> GetQuestLog() {
         std::list<QuestMetadata> questMetadatas;
-        auto questLog = GW::QuestMgr::GetQuestLog();
+        const auto questLog = GW::QuestMgr::GetQuestLog();
         if (!questLog) {
             return questMetadatas;
         }
@@ -54,7 +54,11 @@ namespace Daybreak::Modules::MainPlayerModule {
 
     std::vector<GW::MapAgent> GetMapEntities() {
         std::vector<GW::MapAgent> entities;
-        auto worldContext = GW::GetWorldContext();
+        const auto worldContext = GW::GetWorldContext();
+        if (!worldContext) {
+            return entities;
+        }
+
         for (auto& agent : worldContext->map_agents) {
             entities.push_back(agent);
         }
@@ -64,7 +68,11 @@ namespace Daybreak::Modules::MainPlayerModule {
 
     std::list<GW::PartyAttribute> GetPartyAttributes() {
         std::list<GW::PartyAttribute> attributes;
-        auto worldContext = GW::GetWorldContext();
+        const auto worldContext = GW::GetWorldContext();
+        if (!worldContext) {
+            return attributes;
+        }
+
         for (auto& attribute : worldContext->attributes) {
             attributes.push_back(attribute);
         }
@@ -74,7 +82,11 @@ namespace Daybreak::Modules::MainPlayerModule {
 
     std::list<GW::ProfessionState> GetProfessions() {
         std::list<GW::ProfessionState> professions;
-        auto worldContext = GW::GetWorldContext();
+        const auto worldContext = GW::GetWorldContext();
+        if (!worldContext) {
+            return professions;
+        }
+
         for (auto& profession : worldContext->party_profession_states) {
             professions.push_back(profession);
         }
@@ -84,8 +96,7 @@ namespace Daybreak::Modules::MainPlayerModule {
 
     std::list<GW::AgentLiving> GetLivingAgents() {
         std::list<GW::AgentLiving> agentList;
-        const GW::AgentArray* agents_ptr = GW::Agents::GetAgentArray();
-        GW::AgentArray* agents = GW::Agents::GetAgentArray();
+        const GW::AgentArray* agents = GW::Agents::GetAgentArray();
         if (!agents) {
             return agentList;
         }
@@ -102,7 +113,11 @@ namespace Daybreak::Modules::MainPlayerModule {
 
     std::list<GW::NPC> GetNpcs() {
         std::list<GW::NPC> npcs;
-        auto worldContext = GW::GetWorldContext();
+        const auto worldContext = GW::GetWorldContext();
+        if (!worldContext) {
+            return npcs;
+        }
+
         for (auto& npc : worldContext->npcs) {
             npcs.push_back(npc);
         }
@@ -112,7 +127,11 @@ namespace Daybreak::Modules::MainPlayerModule {
 
     std::vector<GW::TitleTier> GetTitleTiers() {
         std::vector<GW::TitleTier> titles;
-        auto worldContext = GW::GetWorldContext();
+        const auto worldContext = GW::GetWorldContext();
+        if (!worldContext) {
+            return titles;
+        }
+
         for (auto& title : worldContext->title_tiers) {
             titles.push_back(title);
         }
@@ -122,7 +141,11 @@ namespace Daybreak::Modules::MainPlayerModule {
 
     std::list<GW::Title> GetTitles() {
         std::list<GW::Title> titles;
-        auto worldContext = GW::GetWorldContext();
+        const auto worldContext = GW::GetWorldContext();
+        if (!worldContext) {
+            return titles;
+        }
+
         for (auto& title : worldContext->titles) {
             titles.push_back(title);
         }
@@ -132,7 +155,11 @@ namespace Daybreak::Modules::MainPlayerModule {
 
     std::list<Temp::GWPlayer> GetPlayers() {
         std::list<Temp::GWPlayer> players;
-        auto worldContext = GW::GetWorldContext();
+        const auto worldContext = GW::GetWorldContext();
+        if (!worldContext) {
+            return players;
+        }
+
         Temp::GWPlayer *tempPlayerArray = (Temp::GWPlayer*)worldContext->players.m_buffer;
         if (!tempPlayerArray) {
             return players;
@@ -350,6 +377,10 @@ namespace Daybreak::Modules::MainPlayerModule {
         }
         
         auto worldContext = GW::GetWorldContext();
+        if (!worldContext) {
+            return gamePayload;
+        }
+
         auto activeQuestId = GW::QuestMgr::GetActiveQuestId();
         auto questLog = GetQuestLog();
         auto skillbars = GetSkillbars();

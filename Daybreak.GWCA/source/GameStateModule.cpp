@@ -26,7 +26,7 @@ namespace Daybreak::Modules::GameStateModule {
             return agentList;
         }
 
-        for (auto* a : *agents) {
+        for (const auto* a : *agents) {
             const GW::AgentLiving* agent = a ? a->GetAsAgentLiving() : nullptr;
             if (agent) {
                 agentList.push_back(*agent);
