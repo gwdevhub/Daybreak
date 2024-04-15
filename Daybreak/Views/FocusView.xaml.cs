@@ -728,7 +728,7 @@ public partial class FocusView : UserControl
         this.cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = this.cancellationTokenSource.Token;
         await this.guildwarsMemoryCache.EnsureInitialized(context, cancellationToken);
-        _ = new TaskFactory().StartNew(() => this.priceCheckerService.CheckForPrices(cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        _ = Task.Run(() => this.priceCheckerService.CheckForPrices(cancellationToken), cancellationToken);
         this.PeriodicallyReadMainPlayerContextData(cancellationToken);
         if (this.InventoryVisible)
         {
