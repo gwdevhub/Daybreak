@@ -16,8 +16,12 @@ namespace Daybreak::Modules::LoginModule {
     volatile bool initialized = false;
 
     LoginPayload GetPayload() {
-        auto context = GW::GetCharContext();
+        const auto context = GW::GetCharContext();
         LoginPayload loginPayload;
+        if (!context) {
+            return loginPayload;
+        }
+
         std::wstring playerEmail(context->player_email);
         std::wstring playerName(context->player_name);
         loginPayload.Email = Daybreak::Utils::WStringToString(playerEmail);

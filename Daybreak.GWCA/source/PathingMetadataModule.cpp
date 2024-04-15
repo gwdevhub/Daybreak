@@ -22,6 +22,10 @@ namespace Daybreak::Modules::PathingMetadataModule {
         }
 
         auto pathingMap = GW::Map::GetPathingMap();
+        if (!pathingMap) {
+            return pathingPayload;
+        }
+
         int count = 0;
         for (auto i = 0U; i < pathingMap->size(); i++) {
             auto gwPathingMap = pathingMap->at(i);

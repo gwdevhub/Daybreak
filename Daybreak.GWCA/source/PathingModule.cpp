@@ -23,6 +23,10 @@ namespace Daybreak::Modules::PathingModule {
         }
 
         auto pathingMap = GW::Map::GetPathingMap();
+        if (!pathingMap) {
+            return pathingPayload;
+        }
+
         std::list<PathingTrapezoid> trapezoids;
         std::map<int, std::list<int>> adjacencyMap;
         for (auto i = 0U; i < pathingMap->size(); i++) {

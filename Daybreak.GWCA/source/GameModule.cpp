@@ -34,12 +34,12 @@ namespace Daybreak::Modules::GameModule {
 
     std::list<QuestMetadata> GetQuestLog() {
         std::list<QuestMetadata> questMetadatas;
-        auto questLog = GW::QuestMgr::GetQuestLog();
+        const auto questLog = GW::QuestMgr::GetQuestLog();
         if (!questLog) {
             return questMetadatas;
         }
 
-        for (auto& quest : *questLog) {
+        for (const auto& quest : *questLog) {
             QuestMetadata metadata;
             metadata.FromId = (uint32_t)quest.map_from;
             metadata.ToId = (uint32_t)quest.map_to;
@@ -54,8 +54,8 @@ namespace Daybreak::Modules::GameModule {
 
     std::vector<GW::MapAgent> GetMapEntities() {
         std::vector<GW::MapAgent> entities;
-        auto worldContext = GW::GetWorldContext();
-        for (auto& agent : worldContext->map_agents) {
+        const auto worldContext = GW::GetWorldContext();
+        for (const auto& agent : worldContext->map_agents) {
             entities.push_back(agent);
         }
 
@@ -64,8 +64,8 @@ namespace Daybreak::Modules::GameModule {
 
     std::list<GW::PartyAttribute> GetPartyAttributes() {
         std::list<GW::PartyAttribute> attributes;
-        auto worldContext = GW::GetWorldContext();
-        for (auto& attribute : worldContext->attributes) {
+        const auto worldContext = GW::GetWorldContext();
+        for (const auto& attribute : worldContext->attributes) {
             attributes.push_back(attribute);
         }
 
@@ -74,8 +74,8 @@ namespace Daybreak::Modules::GameModule {
 
     std::list<GW::ProfessionState> GetProfessions() {
         std::list<GW::ProfessionState> professions;
-        auto worldContext = GW::GetWorldContext();
-        for (auto& profession : worldContext->party_profession_states) {
+        const auto worldContext = GW::GetWorldContext();
+        for (const auto& profession : worldContext->party_profession_states) {
             professions.push_back(profession);
         }
 
@@ -90,7 +90,7 @@ namespace Daybreak::Modules::GameModule {
             return agentList;
         }
 
-        for (auto* a : *agents) {
+        for (const auto* a : *agents) {
             const GW::AgentLiving* agent = a ? a->GetAsAgentLiving() : nullptr;
             if (agent) {
                 agentList.push_back(*agent);
@@ -102,8 +102,8 @@ namespace Daybreak::Modules::GameModule {
 
     std::vector<GW::TitleTier> GetTitleTiers() {
         std::vector<GW::TitleTier> titles;
-        auto worldContext = GW::GetWorldContext();
-        for (auto& title : worldContext->title_tiers) {
+        const auto worldContext = GW::GetWorldContext();
+        for (const auto& title : worldContext->title_tiers) {
             titles.push_back(title);
         }
 
@@ -112,8 +112,8 @@ namespace Daybreak::Modules::GameModule {
 
     std::list<GW::Title> GetTitles() {
         std::list<GW::Title> titles;
-        auto worldContext = GW::GetWorldContext();
-        for (auto& title : worldContext->titles) {
+        const auto worldContext = GW::GetWorldContext();
+        for (const auto& title : worldContext->titles) {
             titles.push_back(title);
         }
 
@@ -122,7 +122,7 @@ namespace Daybreak::Modules::GameModule {
 
     std::list<Temp::GWPlayer> GetPlayers() {
         std::list<Temp::GWPlayer> players;
-        auto worldContext = GW::GetWorldContext();
+        const auto worldContext = GW::GetWorldContext();
         Temp::GWPlayer *tempPlayerArray = (Temp::GWPlayer*)worldContext->players.m_buffer;
         if (!tempPlayerArray) {
             return players;
@@ -140,12 +140,12 @@ namespace Daybreak::Modules::GameModule {
 
     std::map<uint32_t, std::list<uint32_t>> GetSkillbars() {
         std::map<uint32_t, std::list<uint32_t>> skillbarMap;
-        auto skillbars = GW::SkillbarMgr::GetSkillbarArray();
+        const auto skillbars = GW::SkillbarMgr::GetSkillbarArray();
         if (!skillbars) {
             return skillbarMap;
         }
 
-        for (auto& skillbar : *skillbars) {
+        for (const auto& skillbar : *skillbars) {
             std::list<uint32_t> skillList;
             skillList.push_back((uint32_t)skillbar.skills[0].skill_id);
             skillList.push_back((uint32_t)skillbar.skills[1].skill_id);
@@ -164,7 +164,7 @@ namespace Daybreak::Modules::GameModule {
     std::list<LivingEntity> GetLivingEntities(
         std::list<GW::AgentLiving> agents) {
         std::list<LivingEntity> entities;
-        for (auto& agent : agents) {
+        for (const auto& agent : agents) {
             LivingEntity entity;
             entity.PrimaryProfessionId = agent.primary;
             entity.SecondaryProfessionId = agent.secondary;
@@ -203,7 +203,7 @@ namespace Daybreak::Modules::GameModule {
         std::list<uint32_t> unlockedProfessions;
         if (professionState) {
             for (auto i = 0; i < 11; i++) {
-                auto prof = (GW::Constants::Profession)i;
+                const auto prof = (GW::Constants::Profession)i;
                 if (professionState->IsProfessionUnlocked(prof)) {
                     unlockedProfessions.push_back(i);
                 }
@@ -284,7 +284,7 @@ namespace Daybreak::Modules::GameModule {
         Title title;
         int titleId = 0;
         std::wstring nameString(gwPlayer->name);
-        auto name = Daybreak::Utils::WStringToString(nameString);
+        const auto name = Daybreak::Utils::WStringToString(nameString);
         player.Name = name;
 
         if (titles.empty() ||
@@ -305,7 +305,7 @@ namespace Daybreak::Modules::GameModule {
             return;
         }
 
-        auto titleTier = titleTiers[gwTitle.current_title_tier_index];
+        const auto titleTier = titleTiers[gwTitle.current_title_tier_index];
         title.CurrentPoints = gwTitle.current_points;
         title.IsPercentage = gwTitle.is_percentage_based();
         title.PointsForCurrentRank = gwTitle.points_needed_current_rank;
