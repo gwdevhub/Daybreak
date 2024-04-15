@@ -49,9 +49,13 @@ namespace Daybreak::Modules::InventoryModule {
             return inventoryPayload;
         }
 
-        inventoryPayload.GoldInStorage = GW::Items::GetGoldAmountInStorage();
-        inventoryPayload.GoldOnCharacter = GW::Items::GetGoldAmountOnCharacter();
         auto inventory = GW::GetItemContext()->inventory;
+        if (!inventory) {
+            return inventoryPayload;
+        }
+
+        inventoryPayload.GoldInStorage = GW::Items::GetGoldAmountInStorage();
+        inventoryPayload.GoldOnCharacter = GW::Items::GetGoldAmountOnCharacter();        
         inventoryPayload.Backpack = GetBag(inventory->backpack);
         inventoryPayload.BeltPouch = (GetBag(inventory->belt_pouch));
         inventoryPayload.Bags.push_back(GetBag(inventory->bag1));

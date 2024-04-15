@@ -23,7 +23,11 @@ namespace Daybreak::Modules::PreGameModule {
             return preGamePayload;
         }
 
-        auto context = GW::GetPreGameContext();
+        const auto context = GW::GetPreGameContext();
+        if (!context) {
+            return preGamePayload;
+        }
+
         for (const auto& loginChar : context->chars) {
             std::string charName(20, '\0');
             auto length = std::wcstombs(&charName[0], loginChar.character_name, 20);

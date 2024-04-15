@@ -19,6 +19,14 @@ namespace Daybreak::Modules::UserModule {
         UserPayload userPayload;
         auto charContext = GW::GetCharContext();
         auto worldContext = GW::GetWorldContext();
+        if (!charContext) {
+            return userPayload;
+        }
+
+        if (!worldContext) {
+            return userPayload;
+        }
+
         std::string emailstr(64, '\0');
         auto length = std::wcstombs(&emailstr[0], charContext->player_email, 64);
         emailstr.resize(length);
