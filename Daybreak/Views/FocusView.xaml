@@ -124,6 +124,15 @@
                                                ItemWikiClicked="InventoryComponent_ItemWikiClicked"
                                                PriceHistoryClicked="InventoryComponent_PriceHistoryClicked"
                                                IsEnabled="{Binding ElementName=_this, Path=InventoryVisible, Mode=OneWay}"/>
+                    <Grid Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                          VerticalAlignment="Stretch"
+                          HorizontalAlignment="Stretch"
+                          Background="{StaticResource Daybreak.Brushes.Background}">
+                        <controls:CircularLoadingWidget VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    Height="100"
+                                    Width="100"/>
+                    </Grid>
                 </Grid>
             </Grid>
             <Grid x:Name="MinimapHolder"
