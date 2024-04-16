@@ -41,7 +41,12 @@ namespace Daybreak::Modules::LoginModule {
                         auto payload = GetPayload();
                         promise->set_value(payload);
                     }
-                    catch (...) {
+                    catch (const std::future_error& e) {
+                        printf("[Login Module] Encountered exception: {%s}", e.what());
+                        continue;
+                    }
+                    catch (const std::exception& e) {
+                        printf("[Login Module] Encountered exception: {%s}", e.what());
                         LoginPayload payload;
                         promise->set_value(payload);
                     }

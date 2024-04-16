@@ -47,7 +47,12 @@ namespace Daybreak::Modules::PathingMetadataModule {
                         auto payload = GetPayload();
                         promise->set_value(payload);
                     }
-                    catch (...) {
+                    catch (const std::future_error& e) {
+                        printf("[Pathing Metadata Module] Encountered exception: {%s}", e.what());
+                        continue;
+                    }
+                    catch (const std::exception& e) {
+                        printf("[Pathing Metadata Module] Encountered exception: {%s}", e.what());
                         PathingMetadataPayload payload;
                         promise->set_value(payload);
                     }
