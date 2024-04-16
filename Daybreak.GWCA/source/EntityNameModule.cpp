@@ -61,7 +61,8 @@ namespace Daybreak::Modules::EntityNameModule {
 
                         WaitingList.emplace_back(id, &promise, name);
                     }
-                    catch (...) {
+                    catch (const std::exception& e) {
+                        printf("[Entity Name Module] Encountered exception: {%s}", e.what());
                         NamePayload payload;
                         promise.set_value(payload);
                     }
