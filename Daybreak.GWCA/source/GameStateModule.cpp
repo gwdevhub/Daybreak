@@ -86,7 +86,12 @@ namespace Daybreak::Modules::GameStateModule {
                         auto payload = GetPayload();
                         promise->set_value(payload);
                     }
-                    catch (...) {
+                    catch (const std::future_error& e) {
+                        printf("[Game State Module] Encountered exception: {%s}", e.what());
+                        continue;
+                    }
+                    catch (const std::exception& e) {
+                        printf("[Game State Module] Encountered exception: {%s}", e.what());
                         GameStatePayload payload;
                         promise->set_value(payload);
                     }

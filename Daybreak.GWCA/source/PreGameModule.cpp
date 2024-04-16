@@ -50,7 +50,12 @@ namespace Daybreak::Modules::PreGameModule {
                         auto payload = GetPayload();
                         promise->set_value(payload);
                     }
-                    catch (...) {
+                    catch (const std::future_error& e) {
+                        printf("[Pre Game Module] Encountered exception: {%s}", e.what());
+                        continue;
+                    }
+                    catch (const std::exception& e) {
+                        printf("[Pre Game Module] Encountered exception: {%s}", e.what());
                         PreGamePayload payload;
                         promise->set_value(payload);
                     }

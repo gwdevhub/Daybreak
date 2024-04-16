@@ -31,7 +31,8 @@ namespace Daybreak::Modules::WhisperModule {
                     try {
                         PostMessage(message);
                     }
-                    catch (...) {
+                    catch (const std::exception& e) {
+                        printf("[Whisper Module] Encountered exception: {%s}", e.what());
                     }
                 }
                 });

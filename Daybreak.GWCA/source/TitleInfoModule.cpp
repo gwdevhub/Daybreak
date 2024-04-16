@@ -95,7 +95,12 @@ namespace Daybreak::Modules::TitleInfoModule {
 
                         WaitingList.emplace_back(payload, &promise, name, 0);
                     }
-                    catch (...) {
+                    catch (const std::future_error& e) {
+                        printf("[Title Info Module] Encountered exception: {%s}", e.what());
+                        continue;
+                    }
+                    catch (const std::exception& e) {
+                        printf("[Title Info Module] Encountered exception: {%s}", e.what());
                         TitleInfoPayload payload;
                         promise.set_value(payload);
                     }
