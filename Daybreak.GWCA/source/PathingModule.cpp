@@ -74,7 +74,8 @@ namespace Daybreak::Modules::PathingModule {
                         auto payload = GetPayload();
                         promise->set_value(payload);
                     }
-                    catch (...) {
+                    catch (const std::exception& e) {
+                        printf("[Pathing Module] Encountered exception: {%s}", e.what());
                         PathingPayload payload;
                         promise->set_value(payload);
                     }

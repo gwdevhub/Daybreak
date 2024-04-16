@@ -579,7 +579,8 @@ namespace Daybreak::Modules::GameModule {
                         auto payload = GetPayload();
                         promise->set_value(payload);
                     }
-                    catch (...) {
+                    catch (const std::exception& e) {
+                        printf("[Game Module] Encountered exception: {%s}", e.what());
                         GamePayload payload;
                         promise->set_value(payload);
                     }

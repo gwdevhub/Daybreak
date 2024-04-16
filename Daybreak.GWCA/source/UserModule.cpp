@@ -60,7 +60,8 @@ namespace Daybreak::Modules::UserModule {
                         auto payload = GetPayload();
                         promise->set_value(payload);
                     }
-                    catch (...) {
+                    catch (const std::exception& e) {
+                        printf("[User Module] Encountered exception: {%s}", e.what());
                         UserPayload payload;
                         promise->set_value(payload);
                     }

@@ -92,7 +92,8 @@ namespace Daybreak::Modules::InventoryModule {
                         auto payload = GetPayload();
                         promise->set_value(payload);
                     }
-                    catch(...){
+                    catch (const std::exception& e) {
+                        printf("[Inventory Module] Encountered exception: {%s}", e.what());
                         InventoryPayload payload;
                         promise->set_value(payload);
                     }

@@ -48,7 +48,8 @@ namespace Daybreak::Modules::SessionModule {
                         auto payload = GetPayload();
                         promise->set_value(payload);
                     }
-                    catch (...) {
+                    catch (const std::exception& e) {
+                        printf("[Session Module] Encountered exception: {%s}", e.what());
                         SessionPayload payload;
                         promise->set_value(payload);
                     }

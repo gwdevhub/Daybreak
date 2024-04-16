@@ -52,7 +52,8 @@ namespace Daybreak::Modules::MapModule {
                         auto payload = GetPayload();
                         promise->set_value(payload);
                     }
-                    catch (...) {
+                    catch (const std::exception& e) {
+                        printf("[Map Module] Encountered exception: {%s}", e.what());
                         MapPayload payload;
                         promise->set_value(payload);
                     }
