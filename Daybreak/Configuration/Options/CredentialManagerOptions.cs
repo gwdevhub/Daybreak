@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace Daybreak.Configuration.Options;
 
 [OptionsIgnore]
-[OptionsSynchronizationIgnore]
+[OptionsName(Name = "Credentials")]
 internal sealed class CredentialManagerOptions
 {
     [JsonProperty(nameof(ProtectedLoginCredentials))]

@@ -6,6 +6,7 @@ namespace Daybreak.Services.Options;
 
 public interface IOptionsProvider
 {
+    JObject? TryGetKeyedOptions(string key);
     IEnumerable<object> GetRegisteredOptions();
     IEnumerable<Type> GetRegisteredOptionsTypes();
     void SaveRegisteredOptions(object options);

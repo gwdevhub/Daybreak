@@ -10,6 +10,4 @@ public sealed class ProtectedLoginCredentials
     public string? ProtectedUsername { get; set; }
     [JsonProperty(nameof(ProtectedPassword))]
     public string? ProtectedPassword { get; set; }
-    [JsonProperty(nameof(CharacterName))]
-    public string? CharacterName { get; set; }
 }
