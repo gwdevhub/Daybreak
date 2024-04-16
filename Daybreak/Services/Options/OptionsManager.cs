@@ -141,6 +141,16 @@ internal sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptio
         this.SaveOptions(registeredType, options);
     }
 
+    public JObject? TryGetKeyedOptions(string key)
+    {
+        if (!this.optionsCache.TryGetValue(key, out var value))
+        {
+            return default;
+        }
+
+        return JsonConvert.DeserializeObject<JObject>(value);
+    }
+
     private void SaveOptions(Type type, object value)
     {
         var optionsName = GetOptionsName(type);

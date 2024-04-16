@@ -347,6 +347,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         startupActionProducer.RegisterAction<FixSymbolicLinkStartupAction>();
         startupActionProducer.RegisterAction<UpdateUModAction>();
         startupActionProducer.RegisterAction<FixPriceHistoryEntries>();
+        startupActionProducer.RegisterAction<CredentialsOptionsMigrator>();
     }
 
     public override void RegisterPostUpdateActions(IPostUpdateActionProducer postUpdateActionProducer)
