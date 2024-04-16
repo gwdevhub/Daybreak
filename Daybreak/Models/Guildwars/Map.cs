@@ -495,6 +495,7 @@ public sealed class Map : IWikiEntity
     public static readonly Map DajkahInlet = new() { Id = 554, Name = "Dajkah Inlet", WikiUrl = "https://wiki.guildwars.com/wiki/Dajkah_Inlet" };
     public static readonly Map TheShadowNexus = new() { Id = 555, Name = "The Shadow Nexus", WikiUrl = "https://wiki.guildwars.com/wiki/The_Shadow_Nexus" };
     public static readonly Map SparkflySwamp = new() { Id = 556, Name = "Sparkfly Swamp", WikiUrl = "https://wiki.guildwars.com/wiki/Sparkfly_Swamp" };
+    public static readonly Map SparkflySwamp2 = new() { Id = 558, Name = "Sparkfly Swamp", WikiUrl = "https://wiki.guildwars.com/wiki/Sparkfly_Swamp" };
     public static readonly Map GateOftheNightfallenLandsOutpost = new() { Id = 559, Name = "Gate of the Nightfallen Lands", WikiUrl = "https://wiki.guildwars.com/wiki/Gate_of_the_Nightfallen_Lands" };
     public static readonly Map CathedralofFlamesLevel1 = new() { Id = 560, Name = "Cathedral of Flames", WikiUrl = "https://wiki.guildwars.com/wiki/Cathedral_of_Flames" };
     public static readonly Map TheTroubledKeeper = new() { Id = 561, Name = "Gate of Torment", WikiUrl = "https://wiki.guildwars.com/wiki/Gate_of_Torment" };
@@ -1197,6 +1198,7 @@ public sealed class Map : IWikiEntity
         DajkahInlet,
         TheShadowNexus,
         SparkflySwamp,
+        SparkflySwamp2,
         GateOftheNightfallenLandsOutpost,
         CathedralofFlamesLevel1,
         TheTroubledKeeper,
