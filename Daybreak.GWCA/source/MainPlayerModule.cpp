@@ -484,6 +484,10 @@ namespace Daybreak::Modules::MainPlayerModule {
                         auto payload = GetPayload();
                         promise->set_value(payload);
                     }
+                    catch (const std::future_error& e) {
+                        printf("[Main Player Module] Encountered exception: {%s}", e.what());
+                        continue;
+                    }
                     catch (const std::exception& e) {
                         printf("[Main Player Module] Encountered exception: {%s}", e.what());
                         MainPlayer payload;

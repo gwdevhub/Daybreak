@@ -58,6 +58,10 @@ namespace Daybreak::Modules::ItemNameModule {
 
                         WaitingList.emplace_back(id, &promise, name);
                     }
+                    catch (const std::future_error& e) {
+                        printf("[Item Name Module] Encountered exception: {%s}", e.what());
+                        continue;
+                    }
                     catch (const std::exception& e) {
                         printf("[Item Name Module] Encountered exception: {%s}", e.what());
                         NamePayload payload;
