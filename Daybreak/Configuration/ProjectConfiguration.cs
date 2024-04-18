@@ -348,6 +348,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         startupActionProducer.RegisterAction<UpdateUModAction>();
         startupActionProducer.RegisterAction<FixPriceHistoryEntries>();
         startupActionProducer.RegisterAction<CredentialsOptionsMigrator>();
+        startupActionProducer.RegisterAction<BrowserHistorySizeEnforcer>();
     }
 
     public override void RegisterPostUpdateActions(IPostUpdateActionProducer postUpdateActionProducer)

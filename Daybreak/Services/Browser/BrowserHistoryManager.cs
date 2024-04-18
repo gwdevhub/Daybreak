@@ -10,11 +10,13 @@ using System.Linq;
 namespace Daybreak.Services.Browser;
 public sealed class BrowserHistoryManager : IBrowserHistoryManager, INotifyPropertyChanged
 {
+    private const int MaxBrowserHistory = 20;
     private static readonly TimeSpan DebounceWindow = TimeSpan.FromMilliseconds(100);
 
     private DateTime lastOperation = DateTime.Now;
     private string lastUrlCache = string.Empty;
     private HashSet<ulong> eventIds = [];
+    private DateTime userInitiatedTime = DateTime.MinValue;
     private bool userInitiated;
     private bool canGoBack;
     private bool canGoForward;
@@ -76,13 +78,14 @@ public sealed class BrowserHistoryManager : IBrowserHistoryManager, INotifyPrope
             return;
         }
 
-        // Skip duplicate commands
-        if (this.userInitiated)
+        // Skip duplicate commands only if they fall inside the Debounce window
+        if (this.userInitiated && DateTime.Now - this.userInitiatedTime < DebounceWindow)
         {
             return;
         }
 
         this.userInitiated = true;
+        this.userInitiatedTime = DateTime.Now;
         this.BrowserHistory.CurrentPosition--;
         var url = this.BrowserHistory.History[this.BrowserHistory.CurrentPosition];
         this.browserWrapper.WebBrowser.CoreWebView2.Navigate(url);
@@ -102,13 +105,14 @@ public sealed class BrowserHistoryManager : IBrowserHistoryManager, INotifyPrope
             return;
         }
 
-        // Skip duplicate commands
-        if (this.userInitiated)
+        // Skip duplicate commands only if they fall inside the Debounce window
+        if (this.userInitiated && DateTime.Now - this.userInitiatedTime < DebounceWindow)
         {
             return;
         }
 
         this.userInitiated = true;
+        this.userInitiatedTime = DateTime.Now;
         this.BrowserHistory.CurrentPosition++;
         var url = this.BrowserHistory.History[this.BrowserHistory.CurrentPosition];
         this.browserWrapper.WebBrowser.CoreWebView2.Navigate(url);
@@ -173,9 +177,14 @@ public sealed class BrowserHistoryManager : IBrowserHistoryManager, INotifyPrope
             return;
         }
 
-        if (this.BrowserHistory.CurrentPosition < this.BrowserHistory.History.Count - 1)
+        while (this.BrowserHistory.CurrentPosition < this.BrowserHistory.History.Count - 1)
         {
-            this.BrowserHistory.History.RemoveRange(this.BrowserHistory.CurrentPosition + 1, this.BrowserHistory.History.Count - this.BrowserHistory.CurrentPosition - 1);
+            this.BrowserHistory.History.RemoveAt(this.BrowserHistory.History.Count - 1);
+        }
+
+        if (this.BrowserHistory.History.Count >= MaxBrowserHistory)
+        {
+            this.BrowserHistory.History.RemoveAt(0);
         }
 
         this.BrowserHistory.History.Add(this.browserWrapper?.Address ?? string.Empty);
