@@ -7,50 +7,31 @@ using System.Windows.Media;
 
 namespace Daybreak.Services.TradeChat;
 
-internal sealed class WordHighlightingService : IWordHighlightingService
+internal sealed partial class WordHighlightingService : IWordHighlightingService
 {
-    private static readonly Regex WordsSplitRegex = new("[\\s+\\|+]", RegexOptions.Compiled);
-    private static readonly string[] BuyWords =
-    [
-        "wtb",
-        "buy",
-        "buying",
-        "buyin",
-    ];
-    private static readonly string[] SellWords =
-    [
-        "wts",
-        "sell",
-        "selling",
-        "sellin"
-    ];
-    private static readonly string[] TradeWords =
-    [
-        "wtt",
-        "trade",
-        "trading",
-        "lf",
-        "tradin"
-    ];
+    private static readonly Regex WordsSplitRegex = SplitByWordsRegex();
+    private static readonly Regex BuyWordsRegex = BuyWordsGroupRegex();
+    private static readonly Regex SellWordsRegex = SellWordsGroupRegex();
+    private static readonly Regex TradeWordsRegex = TradeWordsGroupRegex();
 
     public IEnumerable<ColoredTextElement> ParseString(string s, SolidColorBrush foreground, SolidColorBrush buy, SolidColorBrush sell, SolidColorBrush trade)
     {
         var words = WordsSplitRegex.Split(s);
         foreach (var word in words)
         {
-            if (BuyWords.Any(w => word.Contains(w, StringComparison.InvariantCultureIgnoreCase)))
+            if (BuyWordsRegex.IsMatch(word))
             {
                 yield return new ColoredTextElement { Color = buy, Text = word };
                 continue;
             }
 
-            if (SellWords.Any(w => word.Contains(w, StringComparison.InvariantCultureIgnoreCase)))
+            if (SellWordsRegex.IsMatch(word))
             {
                 yield return new ColoredTextElement { Color = sell, Text = word };
                 continue;
             }
 
-            if (TradeWords.Any(w => word.Contains(w, StringComparison.InvariantCultureIgnoreCase)))
+            if (TradeWordsRegex.IsMatch(word))
             {
                 yield return new ColoredTextElement { Color = trade, Text = word };
                 continue;
@@ -59,4 +40,16 @@ internal sealed class WordHighlightingService : IWordHighlightingService
             yield return new ColoredTextElement { Color = foreground, Text = word };
         }
     }
+
+    [GeneratedRegex("[\\s+\\|+]", RegexOptions.Compiled)]
+    private static partial Regex SplitByWordsRegex();
+
+    [GeneratedRegex("((wtb)|(buy)|(buying)|(buyin))", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
+    private static partial Regex BuyWordsGroupRegex();
+
+    [GeneratedRegex("((wts)|(sell)|(selling)|(sellin))", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
+    private static partial Regex SellWordsGroupRegex();
+
+    [GeneratedRegex("((wtt)|(trade)|(trading)|(lf)|(tradin))", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
+    private static partial Regex TradeWordsGroupRegex();
 }
