@@ -923,6 +923,7 @@ public partial class FocusView : UserControl
         };
 
         var minimapWindowOptions = this.minimapWindowOptions.Value.ThrowIfNull();
+        this.minimapWindow.Pinned = minimapWindowOptions.Pinned;
         var dpiScale = VisualTreeHelper.GetDpi(this.minimapWindow);
         var minimapSize = new Rect
         {
@@ -970,6 +971,7 @@ public partial class FocusView : UserControl
         options.Height = this.minimapWindow.Height;
         options.DpiX = dpiScale.DpiScaleX;
         options.DpiY = dpiScale.DpiScaleY;
+        options.Pinned = this.minimapWindow.Pinned;
 
         this.minimapWindowOptions.UpdateOption();
 
