@@ -7,6 +7,7 @@ namespace Daybreak.Configuration.Options;
 [OptionsSynchronizationIgnore]
 public sealed class MinimapWindowOptions
 {
+    public bool Pinned { get; set; }
     public double X { get; set; }
     public double Y { get; set; }
     public double Width { get; set; }
