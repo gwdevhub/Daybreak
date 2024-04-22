@@ -186,7 +186,7 @@ internal sealed class RuneIdentifierModule : IIdentifierModule
         { 0x24080214, Rune.RuneOfRestoration },
         { 0x24080215, Rune.RuneOfClarity },
         { 0x24080216, Rune.RuneOfPurity },
-        { 0x240800FF, Rune.RuneOfMinorVigor },
+        { 0x240800C2, Rune.RuneOfMinorVigor },
         { 0x24080101, Rune.RuneOfSuperiorVigor },
         { 0x24080100, Rune.RuneOfMajorVigor },
         { 0x24080212, Rune.RuneOfVitae },
