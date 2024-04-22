@@ -15,7 +15,7 @@ public sealed class AreaMapDrawingModule : EmbeddedSvgDrawingModuleBase<AreaMapD
         return mapIcon.Icon == GuildwarsIcon.AreaMap;
     }
 
-    public override void DrawMapIcon(int finalX, int finalY, int size, WriteableBitmap bitmap, Affiliation affiliation, Color shade)
+    public override void DrawMapIcon(int finalX, int finalY, int size, double angle, WriteableBitmap bitmap, Affiliation affiliation, Color shade)
     {
         this.DrawSvg(bitmap, finalX, finalY, size, Colors.Transparent, Colors.Transparent, shade);
     }

@@ -13,7 +13,7 @@ public sealed class CollectorDrawingModule : EmbeddedSvgDrawingModuleBase<Collec
         return mapIcon.Icon == GuildwarsIcon.Collector;
     }
 
-    public override void DrawMapIcon(int finalX, int finalY, int size, WriteableBitmap bitmap, Affiliation _, Color shade)
+    public override void DrawMapIcon(int finalX, int finalY, int size, double angle, WriteableBitmap bitmap, Affiliation _, Color shade)
     {
         this.DrawSvg(bitmap, finalX, finalY, size, Colors.Transparent, Colors.Transparent, shade);
     }

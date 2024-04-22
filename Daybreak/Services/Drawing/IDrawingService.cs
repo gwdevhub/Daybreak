@@ -12,13 +12,13 @@ public interface IDrawingService
 
     void DrawPaths(WriteableBitmap writeableBitmap, PathfindingCache? pathfindingCache);
 
-    void DrawEntities(WriteableBitmap bitmap, GameData gameData, int targetEntityId);
+    void DrawEntities(WriteableBitmap bitmap, GameData gameData, int targetEntityId, double angle);
 
-    void DrawQuestObjectives(WriteableBitmap bitmap, IEnumerable<QuestMetadata> quests);
+    void DrawQuestObjectives(WriteableBitmap bitmap, IEnumerable<QuestMetadata> quests, double angle);
 
     void DrawMainPlayerPositionHistory(WriteableBitmap bitmap, List<Position> mainPlayerPositionHistory);
 
-    void DrawMapIcons(WriteableBitmap bitmap, List<MapIcon> mapIcons);
+    void DrawMapIcons(WriteableBitmap bitmap, List<MapIcon> mapIcons, double angle);
 
     void DrawEngagementArea(WriteableBitmap bitmap, GameData gameData);
 

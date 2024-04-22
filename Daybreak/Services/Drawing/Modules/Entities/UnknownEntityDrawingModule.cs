@@ -17,7 +17,7 @@ public sealed class UnknownEntityDrawingModule : ColoredEmbeddedSvgDrawingModule
             livingEntity.NpcDefinition == Npc.Unknown);
     }
 
-    public override void DrawEntity(int finalX, int finalY, int size, WriteableBitmap bitmap, bool targeted, Color shade)
+    public override void DrawEntity(int finalX, int finalY, int size, double angle, WriteableBitmap bitmap, bool targeted, Color shade)
     {
         this.DrawSvg(bitmap, finalX, finalY, (int)(size / 1.3), this.StrokeColor, Colors.Transparent, shade);
     }

@@ -65,7 +65,7 @@ internal sealed class DrawingService : IDrawingService, IDrawingModuleProducer
         return true;
     }
 
-    public void DrawEntities(WriteableBitmap bitmap, GameData gameData, int targetEntityId)
+    public void DrawEntities(WriteableBitmap bitmap, GameData gameData, int targetEntityId, double angle)
     {
         if (bitmap is null)
         {
@@ -100,7 +100,7 @@ internal sealed class DrawingService : IDrawingService, IDrawingModuleProducer
             {
                 if (module.CanDrawEntity(entity))
                 {
-                    module.DrawEntity(finalX, finalY, this.finalEntitySize, bitmap, false, this.foregroundColor);
+                    module.DrawEntity(finalX, finalY, this.finalEntitySize, angle, bitmap, false, this.foregroundColor);
                 }
             }
         }
@@ -113,7 +113,7 @@ internal sealed class DrawingService : IDrawingService, IDrawingModuleProducer
             {
                 if (module.CanDrawEntity(targetedEntity))
                 {
-                    module.DrawEntity(finalTargetedX, finalTargetedY, this.finalEntitySize, bitmap, true, this.foregroundColor);
+                    module.DrawEntity(finalTargetedX, finalTargetedY, this.finalEntitySize, angle, bitmap, true, this.foregroundColor);
                 }
             }
         }
@@ -148,7 +148,7 @@ internal sealed class DrawingService : IDrawingService, IDrawingModuleProducer
         }
     }
 
-    public void DrawMapIcons(WriteableBitmap bitmap, List<MapIcon> mapIcons)
+    public void DrawMapIcons(WriteableBitmap bitmap, List<MapIcon> mapIcons, double angle)
     {
         if (bitmap is null)
         {
@@ -171,7 +171,7 @@ internal sealed class DrawingService : IDrawingService, IDrawingModuleProducer
                         break;
                     }
 
-                    module.DrawMapIcon(finalX, finalY, this.finalEntitySize, bitmap, mapIcon.Affiliation!.Value, this.foregroundColor);
+                    module.DrawMapIcon(finalX, finalY, this.finalEntitySize, angle, bitmap, mapIcon.Affiliation!.Value, this.foregroundColor);
                 }
             }
         }
@@ -236,7 +236,7 @@ internal sealed class DrawingService : IDrawingService, IDrawingModuleProducer
         }
     }
 
-    public void DrawQuestObjectives(WriteableBitmap bitmap, IEnumerable<QuestMetadata> quests)
+    public void DrawQuestObjectives(WriteableBitmap bitmap, IEnumerable<QuestMetadata> quests, double angle)
     {
         if (bitmap is null)
         {
@@ -255,12 +255,12 @@ internal sealed class DrawingService : IDrawingService, IDrawingModuleProducer
                 var position = this.ForceOnScreenPosition(questMetadata.Position!.Value);
                 if (this.IsEntityOnScreen(questMetadata.Position!.Value, out var finalX, out var finalY))
                 {
-                    module.DrawQuestObjective(finalX, finalY, this.finalEntitySize, bitmap, GetQuestColor(questMetadata), this.foregroundColor);
+                    module.DrawQuestObjective(finalX, finalY, this.finalEntitySize, angle, bitmap, GetQuestColor(questMetadata), this.foregroundColor);
                 }
                 else
                 {
                     this.IsEntityOnScreen(position, out var finalOnscreenX, out var finalOnscreenY);
-                    module.DrawQuestObjective(finalX, finalY, this.finalEntitySize, bitmap, GetQuestColor(questMetadata), this.foregroundColor);
+                    module.DrawQuestObjective(finalX, finalY, this.finalEntitySize, angle, bitmap, GetQuestColor(questMetadata), this.foregroundColor);
                 }
             }
         }

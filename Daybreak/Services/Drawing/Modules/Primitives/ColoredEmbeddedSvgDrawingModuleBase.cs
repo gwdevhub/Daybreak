@@ -8,7 +8,7 @@ public abstract class ColoredEmbeddedSvgDrawingModuleBase<TDerivingType> : Embed
 {
     protected abstract Color StrokeColor { get; }
 
-    public override void DrawMapIcon(int finalX, int finalY, int size, WriteableBitmap bitmap, Affiliation affiliation, Color shade)
+    public override void DrawMapIcon(int finalX, int finalY, int size, double angle, WriteableBitmap bitmap, Affiliation affiliation, Color shade)
     {
         switch (affiliation)
         {
