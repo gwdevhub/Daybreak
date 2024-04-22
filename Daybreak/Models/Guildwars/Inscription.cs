@@ -10,12 +10,12 @@ public sealed class Inscription : ItemBase, IWikiEntity, IIconUrlEntity
 
     public static readonly Inscription FocusOrShieldInscription = new() { Id = 15541, Name = "Focus Items or Shields Inscription", WikiUrl = "https://wiki.guildwars.com/wiki/Inscription", IconUrl = "https://wiki.guildwars.com/images/6/61/Inscription_focus_items_or_shields.png" };
 
-    public static IReadOnlyList<Inscription> Inscriptions { get; } = new List<Inscription>
-    {
+    public static IReadOnlyList<Inscription> Inscriptions { get; } =
+    [
         WeaponInscription,
         FocusInscription,
         FocusOrShieldInscription
-    };
+    ];
 
     public string? WikiUrl { get; init; }
 
