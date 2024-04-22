@@ -10,8 +10,8 @@ public sealed class QuestObjectiveDrawingModule : StarDrawingModuleBase
 
     public override bool CanDrawQuestObjectives => true;
 
-    public override void DrawQuestObjective(int finalX, int finalY, int size, WriteableBitmap bitmap, Color color, Color shade)
+    public override void DrawQuestObjective(int finalX, int finalY, int size, double angle, WriteableBitmap bitmap, Color color, Color shade)
     {
-        this.DrawFilledStar(bitmap, finalX, finalY, size, color, shade);
+        this.DrawFilledStar(bitmap, finalX, finalY, size, angle, color, shade);
     }
 }

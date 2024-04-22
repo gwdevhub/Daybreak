@@ -7,9 +7,9 @@ public abstract class TriangleTargetedEntityDrawingModuleBase : TriangleEntityDr
 {
     protected virtual Color OutlineColor { get; } = Colors.Chocolate;
 
-    public override sealed void DrawEntity(int finalX, int finalY, int size, WriteableBitmap bitmap, bool targeted, Color shade)
+    public override sealed void DrawEntity(int finalX, int finalY, int size, double angle, WriteableBitmap bitmap, bool targeted, Color shade)
     {
-        base.DrawEntity(finalX, finalY, size, bitmap, targeted, shade);
+        base.DrawEntity(finalX, finalY, size, angle, bitmap, targeted, shade);
         if (targeted)
         {
             var thickness = size / 5;
