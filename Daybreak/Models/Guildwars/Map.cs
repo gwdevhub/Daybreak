@@ -355,6 +355,7 @@ public sealed class Map : IWikiEntity
     public static readonly Map YohlonHavenOutpost = new() { Id = 381, Name = "Yohlon Haven", WikiUrl = "https://wiki.guildwars.com/wiki/Yohlon_Haven" };
     public static readonly Map GandaraTheMoonFortress = new() { Id = 382, Name = "Gandara", WikiUrl = "https://wiki.guildwars.com/wiki/Gandara" };
     public static readonly Map TheFloodplainOfMahnkelon = new() { Id = 383, Name = "The Floodplain of Mahnkelon", WikiUrl = "https://wiki.guildwars.com/wiki/The_Floodplain_of_Mahnkelon" };
+    public static readonly Map TheFloodplainOfMahnkelon2 = new() { Id = 384, Name = "The Floodplain of Mahnkelon", WikiUrl = "https://wiki.guildwars.com/wiki/The_Floodplain_of_Mahnkelon" };
     public static readonly Map LionsArchSunspearsinKryta = new() { Id = 385, Name = "Lion's Arch", WikiUrl = "https://wiki.guildwars.com/wiki/Lion's_Arch" };
     public static readonly Map TuraisProcession = new() { Id = 386, Name = "Turai's Procession", WikiUrl = "https://wiki.guildwars.com/wiki/Turai's_Procession" };
     public static readonly Map SunspearSanctuaryOutpost = new() { Id = 387, Name = "Sunspear Sanctuary", WikiUrl = "https://wiki.guildwars.com/wiki/Sunspear_Sanctuary" };
@@ -1058,6 +1059,7 @@ public sealed class Map : IWikiEntity
         YohlonHavenOutpost,
         GandaraTheMoonFortress,
         TheFloodplainOfMahnkelon,
+        TheFloodplainOfMahnkelon2,
         LionsArchSunspearsinKryta,
         TuraisProcession,
         SunspearSanctuaryOutpost,
