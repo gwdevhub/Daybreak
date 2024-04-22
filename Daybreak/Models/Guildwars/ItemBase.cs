@@ -86,7 +86,7 @@ public abstract class ItemBase
                 i.Modifiers is not null)
             {
                 return i.Modifiers.Count() == modifiers.Count() &&
-                       i.Modifiers.All(modifiers.Contains);
+                       i.Modifiers.All(i1 => modifiers.Any(i2 => i1.Modifier == i2.Modifier));
             }
             else if (i.Modifiers is not null)
             {
