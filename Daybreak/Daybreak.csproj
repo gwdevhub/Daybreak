@@ -26,6 +26,7 @@
     <None Remove="Resources\Snow3.png" />
     <None Remove="Resources\Snow4.png" />
     <None Remove="Services\Drawing\Resources\Bag.svg" />
+    <None Remove="Services\Drawing\Resources\CircledArrow.svg" />
     <None Remove="Services\Drawing\Resources\CircledStar.svg" />
     <None Remove="Services\Drawing\Resources\Dungeon.svg" />
     <None Remove="Services\Drawing\Resources\DungeonBoss.svg" />
@@ -48,6 +49,7 @@
     <EmbeddedResource Include="Resources\Snow3.png" />
     <EmbeddedResource Include="Resources\Snow4.png" />
     <EmbeddedResource Include="Services\Drawing\Resources\Bag.svg" />
+    <EmbeddedResource Include="Services\Drawing\Resources\CircledArrow.svg" />
     <EmbeddedResource Include="Services\Drawing\Resources\CircledStar.svg" />
     <EmbeddedResource Include="Services\Drawing\Resources\Dungeon.svg" />
     <EmbeddedResource Include="Services\Drawing\Resources\DungeonBoss.svg" />
