@@ -916,6 +916,11 @@ public partial class FocusView : UserControl
             return;
         }
 
+        if (this.minimapMaximized)
+        {
+            this.GuildwarsMinimap_MaximizeClicked(sender, e);
+        }
+
         this.minimapWindow = new()
         {
             Resources = this.Resources,
