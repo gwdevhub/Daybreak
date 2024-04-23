@@ -24,8 +24,6 @@ using System.Diagnostics.Metrics;
 using System.Diagnostics;
 using Daybreak.Models.FocusView;
 using Daybreak.Models.LaunchConfigurations;
-using System.Configuration;
-using System.Runtime.CompilerServices;
 
 namespace Daybreak.Controls.Minimap;
 
@@ -349,7 +347,7 @@ public partial class GuildwarsMinimap : UserControl
 
         this.CalculatePathsToObjectives();
 
-        var angleRads = Math.PI / 180 * this.Angle;
+        var angleRads = -(Math.PI / 180 * this.Angle);
         var foregroundColor = this.FindResource("MahApps.Colors.ThemeBackground").Cast<Color>();
         bitmap.Clear(Colors.Transparent);
         using var context = bitmap.GetBitmapContext();

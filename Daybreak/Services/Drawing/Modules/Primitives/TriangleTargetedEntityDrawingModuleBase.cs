@@ -13,7 +13,7 @@ public abstract class TriangleTargetedEntityDrawingModuleBase : TriangleEntityDr
         if (targeted)
         {
             var thickness = size / 5;
-            this.DrawOutlinedTriangle(bitmap, finalX, finalY, size, thickness, this.OutlineColor, shade);
+            this.DrawOutlinedTriangle(bitmap, finalX, finalY, size, angle, thickness, this.OutlineColor, shade);
         }
     }
 }

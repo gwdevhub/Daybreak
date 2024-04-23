@@ -9,6 +9,6 @@ public abstract class TriangleEntityDrawingModuleBase : TriangleDrawingModuleBas
 
     public override void DrawEntity(int finalX, int finalY, int size, double angle, WriteableBitmap bitmap, bool targeted, Color shade)
     {
-        this.DrawFilledTriangle(bitmap, finalX, finalY, size, this.FillColor, shade);
+        this.DrawFilledTriangle(bitmap, finalX, finalY, size, angle, this.FillColor, shade);
     }
 }

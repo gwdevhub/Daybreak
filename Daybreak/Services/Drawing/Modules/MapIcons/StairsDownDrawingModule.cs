@@ -16,6 +16,6 @@ public sealed class StairsDownDrawingModule : EmbeddedSvgDrawingModuleBase<Stair
 
     public override void DrawMapIcon(int finalX, int finalY, int size, double angle, WriteableBitmap bitmap, Affiliation _, Color shade)
     {
-        this.DrawSvg(bitmap, finalX, finalY, size, Colors.White, Colors.Red, shade);
+        this.DrawSvg(bitmap, finalX, finalY, size, angle, Colors.White, Colors.Red, shade);
     }
 }
