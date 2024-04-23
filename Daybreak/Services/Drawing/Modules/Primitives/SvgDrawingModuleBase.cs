@@ -20,7 +20,7 @@ public abstract class SvgDrawingModuleBase : DrawingModuleBase
 
     protected abstract SvgDocument GetSvgDocument(Color fillColor, Color strokeColor);
 
-    protected void DrawSvg(WriteableBitmap bitmap, int x, int y, int entitySize, Color stroke, Color fill, Color shade)
+    protected void DrawSvg(WriteableBitmap bitmap, int x, int y, int entitySize, double angle, Color stroke, Color fill, Color shade)
     {
         if (this.HasMinimumSize &&
             entitySize < MinimumSize)
@@ -35,6 +35,10 @@ public abstract class SvgDrawingModuleBase : DrawingModuleBase
             this.bitmapCache.Add(combination, cachedSvg);
         }
 
+        //Convert to degrees
+        angle *= 180 / Math.PI;
+
+        cachedSvg = cachedSvg.RotateFree((int)angle);
         bitmap.Blit(new Rect(x - entitySize, y - entitySize, entitySize + entitySize, entitySize + entitySize), cachedSvg, new Rect(0, 0, cachedSvg.Width, cachedSvg.Height), WriteableBitmapExtensions.BlendMode.Alpha);
     }
 

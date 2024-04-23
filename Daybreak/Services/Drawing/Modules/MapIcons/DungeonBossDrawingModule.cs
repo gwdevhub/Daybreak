@@ -16,8 +16,8 @@ public sealed class DungeonBossDrawingModule : EmbeddedSvgDrawingModuleBase<Dung
         return mapIcon.Icon == GuildwarsIcon.DungeonBoss;
     }
 
-    public override void DrawMapIcon(int finalX, int finalY, int size, WriteableBitmap bitmap, Affiliation affiliation, Color shade)
+    public override void DrawMapIcon(int finalX, int finalY, int size, double angle, WriteableBitmap bitmap, Affiliation affiliation, Color shade)
     {
-        this.DrawSvg(bitmap, finalX, finalY, size, Colors.Transparent, ColorPalette.Red, shade);
+        this.DrawSvg(bitmap, finalX, finalY, size, angle, Colors.Transparent, ColorPalette.Red, shade);
     }
 }

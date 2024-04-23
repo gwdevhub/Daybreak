@@ -24,8 +24,6 @@ using System.Diagnostics.Metrics;
 using System.Diagnostics;
 using Daybreak.Models.FocusView;
 using Daybreak.Models.LaunchConfigurations;
-using System.Configuration;
-using System.Runtime.CompilerServices;
 
 namespace Daybreak.Controls.Minimap;
 
@@ -349,6 +347,7 @@ public partial class GuildwarsMinimap : UserControl
 
         this.CalculatePathsToObjectives();
 
+        var angleRads = -(Math.PI / 180 * this.Angle);
         var foregroundColor = this.FindResource("MahApps.Colors.ThemeBackground").Cast<Color>();
         bitmap.Clear(Colors.Transparent);
         using var context = bitmap.GetBitmapContext();
@@ -365,9 +364,9 @@ public partial class GuildwarsMinimap : UserControl
         this.drawingService.DrawEngagementArea(bitmap, this.GameData);
         this.drawingService.DrawMainPlayerPositionHistory(bitmap, this.mainPlayerPositionHistory);
         this.drawingService.DrawPaths(bitmap, this.pathfindingCache);
-        this.drawingService.DrawQuestObjectives(bitmap, this.GameData.MainPlayer?.QuestLog ?? []);
-        this.drawingService.DrawMapIcons(bitmap, this.GameData.MapIcons ?? []);
-        this.drawingService.DrawEntities(bitmap, this.GameData, this.TargetEntityId);
+        this.drawingService.DrawQuestObjectives(bitmap, this.GameData.MainPlayer?.QuestLog ?? [], angleRads);
+        this.drawingService.DrawMapIcons(bitmap, this.GameData.MapIcons ?? [], angleRads);
+        this.drawingService.DrawEntities(bitmap, this.GameData, this.TargetEntityId, angleRads);
         bitmap.Unlock();
         this.drawingLatency.Record(sw.ElapsedMilliseconds);
     }
@@ -818,7 +817,6 @@ public partial class GuildwarsMinimap : UserControl
 
         return new Point(rotatedX, rotatedY);
     }
-
 
     private static bool PositionsCollide(Position position1, Position position2)
     {

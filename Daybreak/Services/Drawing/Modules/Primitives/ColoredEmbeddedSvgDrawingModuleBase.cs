@@ -8,36 +8,36 @@ public abstract class ColoredEmbeddedSvgDrawingModuleBase<TDerivingType> : Embed
 {
     protected abstract Color StrokeColor { get; }
 
-    public override void DrawMapIcon(int finalX, int finalY, int size, WriteableBitmap bitmap, Affiliation affiliation, Color shade)
+    public override void DrawMapIcon(int finalX, int finalY, int size, double angle, WriteableBitmap bitmap, Affiliation affiliation, Color shade)
     {
         switch (affiliation)
         {
             case Affiliation.Gray:
-                this.DrawSvg(bitmap, finalX, finalY, size, this.StrokeColor, Colors.Red, shade);
+                this.DrawSvg(bitmap, finalX, finalY, size, angle, this.StrokeColor, Colors.Red, shade);
                 break;
             case Affiliation.Red:
-                this.DrawSvg(bitmap, finalX, finalY, size, this.StrokeColor, ColorPalette.Red, shade);
+                this.DrawSvg(bitmap, finalX, finalY, size, angle, this.StrokeColor, ColorPalette.Red, shade);
                 break;
             case Affiliation.Blue:
-                this.DrawSvg(bitmap, finalX, finalY, size, this.StrokeColor, ColorPalette.Blue, shade);
+                this.DrawSvg(bitmap, finalX, finalY, size, angle, this.StrokeColor, ColorPalette.Blue, shade);
                 break;
             case Affiliation.Yellow:
-                this.DrawSvg(bitmap, finalX, finalY, size, this.StrokeColor, ColorPalette.Yellow, shade);
+                this.DrawSvg(bitmap, finalX, finalY, size, angle, this.StrokeColor, ColorPalette.Yellow, shade);
                 break;
             case Affiliation.Green:
-                this.DrawSvg(bitmap, finalX, finalY, size, this.StrokeColor, ColorPalette.Green, shade);
+                this.DrawSvg(bitmap, finalX, finalY, size, angle, this.StrokeColor, ColorPalette.Green, shade);
                 break;
             case Affiliation.GrayNeutral:
-                this.DrawSvg(bitmap, finalX, finalY, size, this.StrokeColor, Colors.Gray, shade);
+                this.DrawSvg(bitmap, finalX, finalY, size, angle, this.StrokeColor, Colors.Gray, shade);
                 break;
             case Affiliation.Teal:
-                this.DrawSvg(bitmap, finalX, finalY, size, this.StrokeColor, ColorPalette.Teal, shade);
+                this.DrawSvg(bitmap, finalX, finalY, size, angle, this.StrokeColor, ColorPalette.Teal, shade);
                 break;
             case Affiliation.Purple:
-                this.DrawSvg(bitmap, finalX, finalY, size, this.StrokeColor, ColorPalette.Purple, shade);
+                this.DrawSvg(bitmap, finalX, finalY, size, angle, this.StrokeColor, ColorPalette.Purple, shade);
                 break;
             case Affiliation.Any:
-                this.DrawSvg(bitmap, finalX, finalY, size, this.StrokeColor, Colors.Gray, shade);
+                this.DrawSvg(bitmap, finalX, finalY, size, angle, this.StrokeColor, Colors.Gray, shade);
                 break;
 
         }
