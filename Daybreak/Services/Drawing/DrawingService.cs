@@ -1,6 +1,7 @@
 ﻿using Daybreak.Models;
 using Daybreak.Models.Guildwars;
 using Daybreak.Services.Drawing.Modules;
+using Daybreak.Services.Screenshots.Models;
 using Slim;
 using System;
 using System.Collections.Generic;
@@ -100,7 +101,8 @@ internal sealed class DrawingService : IDrawingService, IDrawingModuleProducer
             {
                 if (module.CanDrawEntity(entity))
                 {
-                    module.DrawEntity(finalX, finalY, this.finalEntitySize, angle, bitmap, false, this.foregroundColor);
+                    var entityAngle = -(entity.RotationAngle - (Math.PI / 2));
+                    module.DrawEntity(finalX, finalY, this.finalEntitySize, angle, entityAngle, bitmap, false, this.foregroundColor);
                 }
             }
         }
@@ -113,7 +115,8 @@ internal sealed class DrawingService : IDrawingService, IDrawingModuleProducer
             {
                 if (module.CanDrawEntity(targetedEntity))
                 {
-                    module.DrawEntity(finalTargetedX, finalTargetedY, this.finalEntitySize, angle, bitmap, true, this.foregroundColor);
+                    var entityAngle = -(targetedEntity.RotationAngle - (Math.PI / 2));
+                    module.DrawEntity(finalTargetedX, finalTargetedY, this.finalEntitySize, angle, entityAngle, bitmap, true, this.foregroundColor);
                 }
             }
         }

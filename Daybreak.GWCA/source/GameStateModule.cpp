@@ -47,6 +47,7 @@ namespace Daybreak::Modules::GameStateModule {
             state.State = agent.type_map;
             state.Health = agent.hp * (agent.max_hp > 0 ? agent.max_hp : 1);
             state.Energy = agent.energy * (agent.max_energy > 0 ? agent.max_energy : 1);
+            state.RotationAngle = agent.rotation_angle;
             states.push_back(state);
         }
 

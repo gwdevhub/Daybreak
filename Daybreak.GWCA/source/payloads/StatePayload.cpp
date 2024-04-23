@@ -13,7 +13,8 @@ namespace Daybreak {
             {"PosY", p.PosY},
             {"State", p.State},
             {"Health", p.Health},
-            {"Energy", p.Energy}
+            {"Energy", p.Energy},
+            {"RotationAngle", p.RotationAngle}
         };
     }
 }

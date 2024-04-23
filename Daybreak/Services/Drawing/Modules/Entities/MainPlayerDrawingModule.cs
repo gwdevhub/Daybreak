@@ -15,8 +15,9 @@ public sealed class MainPlayerDrawingModule : EmbeddedSvgDrawingModuleBase<MainP
         return entity is MainPlayerInformation;
     }
 
-    public override void DrawEntity(int finalX, int finalY, int size, WriteableBitmap bitmap, bool targeted, Color shade)
+    public override void DrawEntity(int finalX, int finalY, int size, double cameraAngle, double entityAngle, WriteableBitmap bitmap, bool targeted, Color shade)
     {
-        this.DrawSvg(bitmap, finalX, finalY, size, targeted ? this.OutlineColor : this.FillColor, this.FillColor, shade);
+        var angle = entityAngle != 0 ? entityAngle : cameraAngle;
+        this.DrawSvg(bitmap, finalX, finalY, size, angle, targeted ? this.OutlineColor : this.FillColor, this.FillColor, shade);
     }
 }

@@ -25,4 +25,6 @@ public sealed class LivingEntity : IEntity
     public float Health { get; set; }
 
     public float Energy { get; set; }
+
+    public float RotationAngle { get; set; }
 }
