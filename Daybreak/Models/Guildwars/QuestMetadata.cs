@@ -6,4 +6,5 @@ public sealed class QuestMetadata : IPositionalEntity
     public Position? Position { get; init; }
     public Map? From { get; init; }
     public Map? To { get; init; }
+    public float RotationAngle { get; } = 0f;
 }

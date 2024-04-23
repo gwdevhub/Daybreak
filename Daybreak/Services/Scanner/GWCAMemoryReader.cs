@@ -592,7 +592,8 @@ internal sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
                         _ => LivingEntityState.Unknown
                     },
                     Health = state.Health,
-                    Energy = state.Energy
+                    Energy = state.Energy,
+                    RotationAngle = state.RotationAngle
                 };
             }).ToList();
 
@@ -826,6 +827,7 @@ internal sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
             Timer = worldPlayer.Timer,
             TitleInformation = worldPlayer.TitleInformation,
             UnlockedProfession = worldPlayer.UnlockedProfession,
+            RotationAngle = worldPlayer.RotationAngle,
             QuestLog = mainPlayerPayload.QuestLog?.Select(metadata =>
             {
                 if (!Quest.TryParse((int)metadata.Id, out var q))
@@ -865,6 +867,7 @@ internal sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
             Name = worldPlayerPayload.Name,
             Timer = partyPlayer.Timer,
             UnlockedProfession = partyPlayer.UnlockedProfession,
+            RotationAngle = partyPlayer.RotationAngle,
             TitleInformation = new TitleInformation
             {
                 CurrentPoints = worldPlayerPayload.Title?.CurrentPoints,
@@ -924,6 +927,7 @@ internal sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
             NpcDefinition = livingEntity.NpcDefinition,
             ModelType = livingEntity.ModelType ?? 0,
             Timer = livingEntity.Timer,
+            RotationAngle = livingEntity.RotationAngle,
             UnlockedProfession = partyPlayerPayload.UnlockedProfession?.Select(id =>
             {
                 if (Profession.TryParse((int)id, out var profession))
@@ -959,7 +963,8 @@ internal sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
                 Y = livingEntityPayload.PosY,
             },
             Health = livingEntityPayload.Health,
-            Energy = livingEntityPayload.Energy
+            Energy = livingEntityPayload.Energy,
+            RotationAngle = livingEntityPayload.RotationAngle
         };
     }
 

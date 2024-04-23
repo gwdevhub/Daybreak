@@ -167,12 +167,14 @@ public partial class GuildwarsMinimap : UserControl
         this.GameData.MainPlayer!.Position = mainPlayerState?.Position ?? new Position();
         this.GameData.MainPlayer!.CurrentHealth = mainPlayerState?.Health ?? 0;
         this.GameData.MainPlayer!.CurrentEnergy = mainPlayerState?.Energy ?? 0;
+        this.GameData.MainPlayer!.RotationAngle = mainPlayerState?.RotationAngle ?? 0;
         foreach (var worldPlayer in this.GameData.WorldPlayers!)
         {
             var worldPlayerState = this.GameState.States?.FirstOrDefault(state => state.Id == worldPlayer.Id);
             worldPlayer.Position = worldPlayerState?.Position ?? new Position();
             worldPlayer.CurrentHealth = worldPlayerState?.Health ?? 0;
             worldPlayer.CurrentEnergy = worldPlayerState?.Energy ?? 0;
+            worldPlayer.RotationAngle = worldPlayerState?.RotationAngle ?? 0;
         }
 
         foreach (var partyPlayer in this.GameData.Party!)
@@ -181,6 +183,7 @@ public partial class GuildwarsMinimap : UserControl
             partyPlayer.Position = partyPlayerState?.Position ?? new Position();
             partyPlayer.CurrentHealth = partyPlayerState?.Health ?? 0;
             partyPlayer.CurrentEnergy = partyPlayerState?.Energy ?? 0;
+            partyPlayer.RotationAngle = partyPlayerState?.RotationAngle ?? 0;
         }
 
         foreach (var entity in this.GameData.LivingEntities!)
@@ -190,6 +193,7 @@ public partial class GuildwarsMinimap : UserControl
             entity.State = state?.State ?? LivingEntityState.Unknown;
             entity.Health = state?.Health ?? 0;
             entity.Energy = state?.Energy ?? 0;
+            entity.RotationAngle = state?.RotationAngle ?? 0;
         }
 
         this.Angle = this.CanRotate ? (this.GameState.Camera.Yaw - (Math.PI / 2)) * (180 / Math.PI) : 0;

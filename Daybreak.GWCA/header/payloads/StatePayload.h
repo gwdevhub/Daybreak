@@ -12,6 +12,7 @@ namespace Daybreak {
         uint32_t State = 0;
         float Health = 0;
         float Energy = 0;
+        float RotationAngle = 0;
     };
 
     void to_json(json& j, const StatePayload& p);

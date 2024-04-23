@@ -20,6 +20,7 @@ public sealed class MainPlayerInformation : IEntity
     public float MaxEnergy { get; init; }
     public float HealthRegen { get; init; }
     public float EnergyRegen { get; init; }
+    public float RotationAngle { get; set; }
     public bool HardModeUnlocked { get; init; }
     public uint Experience { get; init; }
     public uint Morale { get; init; }

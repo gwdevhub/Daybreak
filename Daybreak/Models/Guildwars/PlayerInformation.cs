@@ -20,4 +20,5 @@ public sealed class PlayerInformation : IEntity
     public float MaxEnergy { get; init; }
     public float HealthRegen { get; init; }
     public float EnergyRegen { get; init; }
+    public float RotationAngle { get; set; }
 }

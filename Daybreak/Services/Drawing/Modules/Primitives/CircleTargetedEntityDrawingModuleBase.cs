@@ -7,7 +7,7 @@ public abstract class CircleTargetedEntityDrawingModuleBase : CircleEntityDrawin
 {
     protected virtual Color OutlineColor { get; } = Colors.Chocolate;
 
-    public override sealed void DrawEntity(int finalX, int finalY, int size, double angle, WriteableBitmap bitmap, bool targeted, Color shade)
+    public override sealed void DrawEntity(int finalX, int finalY, int size, double angle, double entityAngle, WriteableBitmap bitmap, bool targeted, Color shade)
     {
         if (targeted)
         {
@@ -15,6 +15,6 @@ public abstract class CircleTargetedEntityDrawingModuleBase : CircleEntityDrawin
             this.DrawFilledCircle(bitmap, finalX, finalY, outlineSize, this.OutlineColor, shade);
         }
 
-        base.DrawEntity(finalX, finalY, size, angle, bitmap, targeted, shade);
+        base.DrawEntity(finalX, finalY, size, angle, entityAngle, bitmap, targeted, shade);
     }
 }
