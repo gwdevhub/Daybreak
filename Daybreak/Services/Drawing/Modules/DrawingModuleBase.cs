@@ -21,15 +21,15 @@ public abstract class DrawingModuleBase
 
     public virtual bool CanDrawEngagementArea(IEntity entity) => false;
 
-    public virtual void DrawEntity(int finalX, int finalY, int size, double angle, WriteableBitmap bitmap, bool targeted, Color shade) { }
+    public virtual void DrawEntity(int finalX, int finalY, int size, double cameraAngle, double entityAngle, WriteableBitmap bitmap, bool targeted, Color shade) { }
 
-    public virtual void DrawMapIcon(int finalX, int finalY, int size, double angle, WriteableBitmap bitmap, Affiliation affiliation, Color shade) { }
+    public virtual void DrawMapIcon(int finalX, int finalY, int size, double cameraAngle, WriteableBitmap bitmap, Affiliation affiliation, Color shade) { }
 
     public virtual void DrawPlayerPositionHistory(int finalX, int finalY, int size, WriteableBitmap bitmap, Color shade) { }
 
     public virtual void DrawPathFinding(int finalX, int finalY, int size, WriteableBitmap bitmap, Color color, Color shade) { }
 
-    public virtual void DrawQuestObjective(int finalX, int finalY, int size, double angle, WriteableBitmap bitmap, Color color, Color shade) { }
+    public virtual void DrawQuestObjective(int finalX, int finalY, int size, double cameraAngle, WriteableBitmap bitmap, Color color, Color shade) { }
 
     public virtual void DrawEngagementArea(int finalX, int finalY, int size, WriteableBitmap bitmap, Color shade) { }
 }

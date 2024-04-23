@@ -20,7 +20,8 @@ namespace Daybreak {
             {"EntityState", p.EntityState},
             {"EntityAllegiance", p.EntityAllegiance},
             {"Health", p.Health},
-            {"Energy", p.Energy}
+            {"Energy", p.Energy},
+            {"RotationAngle", p.RotationAngle}
         };
     }
 }

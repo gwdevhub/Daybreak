@@ -6,4 +6,5 @@ public sealed class EntityGameState
     public LivingEntityState State { get; set; }
     public float Health { get; set; }
     public float Energy { get; set; }
+    public float RotationAngle { get; set; }
 }
