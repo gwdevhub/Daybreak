@@ -69,6 +69,7 @@ public partial class LaunchButtonTemplate : UserControl
 
     private void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
+        this.tokenSource?.Cancel();
         this.tokenSource?.Dispose();
         this.tokenSource = new CancellationTokenSource();
         this.PeriodicallyCheckGameState(this.tokenSource.Token);
@@ -76,13 +77,19 @@ public partial class LaunchButtonTemplate : UserControl
 
     private void UserControl_Unloaded(object sender, RoutedEventArgs e)
     {
+        this.tokenSource?.Cancel();
         this.tokenSource?.Dispose();
         this.tokenSource = default;
     }
 
     private async void UserControl_DataContextChanged(object _, DependencyPropertyChangedEventArgs e)
     {
-        await this.CheckGameState(this.tokenSource?.Token ?? CancellationToken.None);
+        if (this.tokenSource?.Token is null)
+        {
+            return;
+        }
+
+        await this.CheckGameState(this.tokenSource.Token);
     }
 
     private async void PeriodicallyCheckGameState(CancellationToken cancellationToken)
