@@ -42,6 +42,11 @@ public partial class FocusView : UserControl
 
     private static readonly TimeSpan UninitializedBackoff = TimeSpan.FromSeconds(15);
     private static readonly TimeSpan GameDataFrequency = TimeSpan.FromSeconds(1);
+    private static readonly TimeSpan PathingDataFrequency = TimeSpan.FromSeconds(1);
+    private static readonly TimeSpan MainPlayerDataFrequency = TimeSpan.FromMilliseconds(16);
+    private static readonly TimeSpan GameStateFrequency = TimeSpan.FromMilliseconds(16);
+    private static readonly TimeSpan InventoryDataFrequency = TimeSpan.FromSeconds(1);
+    private static readonly TimeSpan CartoDataFrequency = TimeSpan.FromSeconds(1);
 
     private readonly IPriceCheckerService priceCheckerService;
     private readonly INotificationService notificationService;
@@ -209,12 +214,19 @@ public partial class FocusView : UserControl
 
                 if (this.DataContext is not GuildWarsApplicationLaunchContext context)
                 {
+                    await Task.Delay(PathingDataFrequency, cancellationToken);
+                    continue;
+                }
+
+                if (!this.MinimapVisible)
+                {
+                    await Task.Delay(PathingDataFrequency, cancellationToken);
                     continue;
                 }
 
                 await Task.WhenAll(
                     this.UpdatePathingData(),
-                    Task.Delay(1000, cancellationToken)).ConfigureAwait(true);
+                    Task.Delay(PathingDataFrequency, cancellationToken)).ConfigureAwait(true);
                 retries = 0;
 
             }
@@ -275,13 +287,20 @@ public partial class FocusView : UserControl
 
                 if (this.DataContext is not GuildWarsApplicationLaunchContext context)
                 {
+                    await Task.Delay(GameStateFrequency, cancellationToken);
+                    continue;
+                }
+
+                if (!this.MinimapVisible)
+                {
+                    await Task.Delay(GameStateFrequency, cancellationToken);
                     continue;
                 }
 
                 var readGameStateTask = this.guildwarsMemoryCache.ReadGameState(cancellationToken);
                 await Task.WhenAll(
                     readGameStateTask,
-                    Task.Delay(16, cancellationToken)).ConfigureAwait(true);
+                    Task.Delay(GameStateFrequency, cancellationToken)).ConfigureAwait(true);
 
                 var maybeGameState = await readGameStateTask ?? throw new HttpRequestException();
                 this.GameState = maybeGameState;
@@ -336,7 +355,7 @@ public partial class FocusView : UserControl
         var retries = 0;
         while (!cancellationToken.IsCancellationRequested)
         {
-            await Task.Delay(GameDataFrequency, cancellationToken);
+            await Task.Delay(CartoDataFrequency, cancellationToken);
             try
             {
                 if (cancellationToken.IsCancellationRequested)
@@ -346,6 +365,13 @@ public partial class FocusView : UserControl
 
                 if (this.DataContext is not GuildWarsApplicationLaunchContext context)
                 {
+                    await Task.Delay(CartoDataFrequency, cancellationToken);
+                    continue;
+                }
+
+                if (!this.MinimapVisible)
+                {
+                    await Task.Delay(CartoDataFrequency, cancellationToken);
                     continue;
                 }
 
@@ -463,6 +489,13 @@ public partial class FocusView : UserControl
 
                 if (this.DataContext is not GuildWarsApplicationLaunchContext context)
                 {
+                    await Task.Delay(GameDataFrequency, cancellationToken);
+                    continue;
+                }
+
+                if (!this.MinimapVisible)
+                {
+                    await Task.Delay(GameDataFrequency, cancellationToken);
                     continue;
                 }
 
@@ -559,13 +592,20 @@ public partial class FocusView : UserControl
 
                 if (this.DataContext is not GuildWarsApplicationLaunchContext context)
                 {
+                    await Task.Delay(InventoryDataFrequency, cancellationToken);
+                    continue;
+                }
+
+                if (!this.InventoryVisible)
+                {
+                    await Task.Delay(InventoryDataFrequency, cancellationToken);
                     continue;
                 }
 
                 var readInventoryTask = this.guildwarsMemoryCache.ReadInventoryData(cancellationToken);
                 await Task.WhenAll(
                     readInventoryTask,
-                    Task.Delay(1000, cancellationToken)).ConfigureAwait(true);
+                    Task.Delay(InventoryDataFrequency, cancellationToken)).ConfigureAwait(true);
 
                 var maybeInventoryData = await readInventoryTask ?? throw new HttpRequestException();
                 if (maybeInventoryData is null)
@@ -628,6 +668,7 @@ public partial class FocusView : UserControl
 
                 if (this.DataContext is not GuildWarsApplicationLaunchContext context)
                 {
+                    await Task.Delay(MainPlayerDataFrequency, cancellationToken);
                     continue;
                 }
 
@@ -646,7 +687,7 @@ public partial class FocusView : UserControl
                     readUserDataTask,
                     readSessionDataTask,
                     readMainPlayerDataTask,
-                    Task.Delay(16, cancellationToken)).ConfigureAwait(true);
+                    Task.Delay(MainPlayerDataFrequency, cancellationToken)).ConfigureAwait(true);
 
                 var userData = await readUserDataTask ?? throw new HttpRequestException();
                 var sessionData = await readSessionDataTask ?? throw new HttpRequestException();
