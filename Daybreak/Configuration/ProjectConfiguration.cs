@@ -87,6 +87,7 @@ using Daybreak.Services.Browser;
 using Daybreak.Services.PriceChecker;
 using Daybreak.Services.PriceChecker.Models;
 using Daybreak.Services.ApplicationArguments;
+using Daybreak.Services.ApplicationArguments.ArgumentHandling;
 
 namespace Daybreak.Configuration;
 
@@ -480,6 +481,7 @@ public class ProjectConfiguration : PluginConfigurationBase
     public override void RegisterLaunchArgumentHandlers(IArgumentHandlerProducer argumentHandlerProducer)
     {
         argumentHandlerProducer.ThrowIfNull();
+        argumentHandlerProducer.RegisterArgumentHandler<AutoLaunchArgumentHandler>();
     }
 
     private void RegisterLiteCollections(IServiceCollection services)
