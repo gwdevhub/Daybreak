@@ -41,6 +41,19 @@
                             Text="{Binding Identifier}"/>
             </Grid>
             <Grid>
+                <TextBlock  FontSize="16"
+                            Text="Arguments: "
+                            Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                            VerticalAlignment="Center"/>
+                <TextBox    FontSize="16"
+                            Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                            Margin="200, 0, 0, 0"
+                            Height="40"
+                            VerticalContentAlignment="Center"
+                            HorizontalContentAlignment="Center"
+                            Text="{Binding ElementName=_this, Path=LaunchArguments, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </Grid>
+            <Grid>
                 <TextBlock Text="Selected credentials: " FontSize="16"
                            VerticalAlignment="Center"
                            Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"/>

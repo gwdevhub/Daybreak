@@ -183,6 +183,11 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
             "\"Daybreak\""
         };
 
+        foreach(var arg in launchConfigurationWithCredentials.Arguments?.Split(" ") ?? [])
+        {
+            args.Add(arg);
+        }
+
         var mods = this.modsManager.GetMods().Where(m => m.IsEnabled && m.IsInstalled).ToList();
         var disabledmods = this.modsManager.GetMods().Where(m => !m.IsEnabled && m.IsInstalled).ToList();
         foreach(var mod in mods)
