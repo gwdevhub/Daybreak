@@ -28,6 +28,8 @@ public partial class LaunchConfigurationView : UserControl
     private LoginCredentials selectedCredentials = default!;
     [GenerateDependencyProperty]
     private string selectedPath = default!;
+    [GenerateDependencyProperty]
+    private string launchArguments = default!;
 
     public ObservableCollection<LoginCredentials> Credentials { get; set; } = [];
     public ObservableCollection<string> ExecutablePaths { get; set; } = [];
@@ -66,6 +68,11 @@ public partial class LaunchConfigurationView : UserControl
         {
             this.SelectedPath = config.ExecutablePath;
         }
+
+        if (config.Arguments?.IsNullOrWhiteSpace() is false)
+        {
+            this.LaunchArguments = config.Arguments;
+        }
     }
 
     private void BackButton_Clicked(object sender, EventArgs e)
@@ -82,6 +89,7 @@ public partial class LaunchConfigurationView : UserControl
 
         config.Credentials = this.SelectedCredentials;
         config.ExecutablePath = this.SelectedPath;
+        config.Arguments = this.LaunchArguments;
         if (!this.launchConfigurationService.SaveConfiguration(config))
         {
             this.notificationService.NotifyInformation(

@@ -117,6 +117,7 @@ internal sealed class LaunchConfigurationService : ILaunchConfigurationService
             config.Identifier = launchConfigurationWithCredentials.Identifier;
             config.CredentialsIdentifier = launchConfigurationWithCredentials.Credentials!.Identifier;
             config.Executable = launchConfigurationWithCredentials.ExecutablePath;
+            config.Arguments = launchConfigurationWithCredentials.Arguments;
             this.liveUpdateableOptions.Value.LaunchConfigurations = configs;
             this.liveUpdateableOptions.UpdateOption();
             return true;
@@ -126,7 +127,8 @@ internal sealed class LaunchConfigurationService : ILaunchConfigurationService
         {
             CredentialsIdentifier = launchConfigurationWithCredentials.Credentials!.Identifier,
             Executable = launchConfigurationWithCredentials.ExecutablePath,
-            Identifier = launchConfigurationWithCredentials.Identifier
+            Identifier = launchConfigurationWithCredentials.Identifier,
+            Arguments = launchConfigurationWithCredentials.Arguments,
         });
         this.liveUpdateableOptions.Value.LaunchConfigurations = configs;
         this.liveUpdateableOptions.UpdateOption();
@@ -149,7 +151,8 @@ internal sealed class LaunchConfigurationService : ILaunchConfigurationService
         {
             Identifier = launchConfiguration.Identifier,
             Credentials = credentials,
-            ExecutablePath = launchConfiguration.Executable
+            ExecutablePath = launchConfiguration.Executable,
+            Arguments = launchConfiguration.Arguments
         };
     }
 }
