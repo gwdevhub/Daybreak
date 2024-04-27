@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Models.Plugins;
+using Daybreak.Services.ApplicationArguments;
 using Daybreak.Services.Browser;
 using Daybreak.Services.Drawing;
 using Daybreak.Services.Mods;
@@ -94,7 +95,8 @@ internal sealed class PluginsService : IPluginsService
         IDrawingModuleProducer drawingModuleProducer,
         INotificationHandlerProducer notificationHandlerProducer,
         IModsManager modsManager,
-        IBrowserExtensionsProducer browserExtensionsProducer)
+        IBrowserExtensionsProducer browserExtensionsProducer,
+        IArgumentHandlerProducer argumentHandlerProducer)
     {
         serviceManager.ThrowIfNull();
         optionsProducer.ThrowIfNull();
@@ -105,6 +107,7 @@ internal sealed class PluginsService : IPluginsService
         notificationHandlerProducer.ThrowIfNull();
         modsManager.ThrowIfNull();
         browserExtensionsProducer.ThrowIfNull();
+        argumentHandlerProducer.ThrowIfNull();
 
         while (!Monitor.TryEnter(Lock)) { }
 
@@ -182,6 +185,8 @@ internal sealed class PluginsService : IPluginsService
                 pluginScopedLogger.LogInformation("Registered mods");
                 RegisterBrowserExtensions(pluginConfig, browserExtensionsProducer);
                 pluginScopedLogger.LogInformation("Registered browser extensions");
+                RegisterArgumentHandlers(pluginConfig, argumentHandlerProducer);
+                pluginScopedLogger.LogInformation("Registered argument handlers");
                 this.loadedPlugins.Add(new AvailablePlugin { Name = result.PluginEntry?.Name ?? string.Empty, Path = result.PluginEntry?.Path ?? string.Empty, Enabled = true });
                 pluginScopedLogger.LogInformation("Loaded plugin");
             }
@@ -323,4 +328,6 @@ internal sealed class PluginsService : IPluginsService
     private static void RegisterMods(PluginConfigurationBase pluginConfig, IModsManager modsManager) => pluginConfig.RegisterMods(modsManager);
 
     private static void RegisterBrowserExtensions(PluginConfigurationBase pluginConfig, IBrowserExtensionsProducer browserExtensionsProducer) => pluginConfig.RegisterBrowserExtensions(browserExtensionsProducer);
+
+    private static void RegisterArgumentHandlers(PluginConfigurationBase pluginConfig, IArgumentHandlerProducer argumentHandlerProducer) => pluginConfig.RegisterLaunchArgumentHandlers(argumentHandlerProducer);
 }
