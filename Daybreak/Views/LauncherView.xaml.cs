@@ -90,9 +90,16 @@ public partial class LauncherView : UserControl
 
     private void RetrieveLaunchConfigurations()
     {
-        var latestLaunchConfiguration = this.launchConfigurationService.GetLastLaunchConfigurationWithCredentials();
+        var latestLaunchConfiguration = this.DataContext is LaunchConfigurationWithCredentials desiredConfig ?
+            desiredConfig :
+            this.launchConfigurationService.GetLastLaunchConfigurationWithCredentials();
         this.LaunchConfigurations.ClearAnd().AddRange(this.launchConfigurationService.GetLaunchConfigurations().Select(c => new LauncherViewContext { Configuration = c, CanLaunch = false }));
         this.LatestConfiguration = this.LaunchConfigurations.FirstOrDefault(c => c.Configuration?.Equals(latestLaunchConfiguration) is true);
+
+        if (this.DataContext is LaunchConfigurationWithCredentials)
+        {
+            this.DropDownButton_Clicked(this, default!);
+        }
     }
 
     private async Task PeriodicallyCheckSelectedConfigState()
