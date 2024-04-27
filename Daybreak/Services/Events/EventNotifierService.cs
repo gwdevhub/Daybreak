@@ -46,7 +46,7 @@ internal sealed class EventNotifierService : IEventNotifierService
         await Task.Delay(5000);
         foreach(var e in this.eventService.GetCurrentActiveEvents())
         {
-            this.notificationService.NotifyInformation<NavigateToCalendarViewHandler>(e.Title!, $"{this.GetRemainingTime(e)}\n{e.Description!}", expirationTime: DateTime.Now + TimeSpan.FromMinutes(1), metaData: e.Title);
+            this.notificationService.NotifyInformation<NavigateToCalendarViewHandler>(e.Title!, $"{this.GetRemainingTime(e)}\n{e.Description!}", expirationTime: DateTime.Now + TimeSpan.FromSeconds(15), metaData: e.Title);
         }
     }
 
