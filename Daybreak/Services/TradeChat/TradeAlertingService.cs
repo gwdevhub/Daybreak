@@ -1,4 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Converters;
 using Daybreak.Models.Trade;
 using Daybreak.Services.Notifications;
 using Daybreak.Services.TradeChat.Models;
@@ -10,6 +11,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -20,6 +22,7 @@ namespace Daybreak.Services.TradeChat;
 internal sealed class TradeAlertingService : ITradeAlertingService, IApplicationLifetimeService
 {
     private static readonly TimeSpan QuoteCheckDelay = TimeSpan.FromMinutes(15);
+    private static readonly PriceToStringConverter PriceToStringConverter = new();
 
     private readonly List<ITradeAlert> tradeAlerts = [];
     private readonly ITraderQuoteService traderQuoteService;
@@ -167,6 +170,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
 
             var buyQuotes = await this.traderQuoteService.GetBuyQuotes(cancellationToken);
             var sellQuotes = await this.traderQuoteService.GetSellQuotes(cancellationToken);
+            var matches = new List<(TraderQuote Quote, QuoteAlert Alert, int TargetPrice)>();
             foreach (var alert in this.tradeAlerts.OfType<QuoteAlert>())
             {
                 var maybeQuote = alert.TraderQuoteType is TraderQuoteType.Buy ?
@@ -177,20 +181,25 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
                     continue;
                 }
 
-                if (maybeQuote.Price > alert.UpperPriceTarget &&
+                if (maybeQuote.Price >= alert.UpperPriceTarget &&
                     alert.UpperPriceTargetEnabled)
                 {
-                    this.notificationService.NotifyInformation(
-                        "Quote Alert",
-                        $"The {(alert.TraderQuoteType is TraderQuoteType.Buy ? "buying" : "selling")} price of {maybeQuote.Item?.Name} has exceeded the upper price target of {alert.UpperPriceTarget}. Current {(alert.TraderQuoteType is TraderQuoteType.Buy ? "buying" : "selling")} price: {maybeQuote.Price}");
+                    matches.Add((maybeQuote, alert, alert.UpperPriceTarget));
                 }
-                else if (maybeQuote.Price < alert.LowerPriceTarget &&
+                else if (maybeQuote.Price <= alert.LowerPriceTarget &&
                     alert.LowerPriceTargetEnabled)
                 {
-                    this.notificationService.NotifyInformation(
-                        "Quote Alert",
-                        $"The {(alert.TraderQuoteType is TraderQuoteType.Buy ? "buying" : "selling")} price of {maybeQuote.Item?.Name} has falled under the lower price target of {alert.LowerPriceTarget}. Current {(alert.TraderQuoteType is TraderQuoteType.Buy ? "buying" : "selling")} price: {maybeQuote.Price}");
+                    matches.Add((maybeQuote, alert, alert.LowerPriceTarget));
                 }
+            }
+
+            if (matches.Count > 0)
+            {
+                var description = string.Join('\n', matches.Select(m => $"[{m.Quote.Item?.Name}] Target: {ConvertPriceToString(m.TargetPrice)}, Current: {ConvertPriceToString(m.Quote.Price)}"));
+                this.notificationService.NotifyInformation(
+                    title: "Quote alert!",
+                    description: description,
+                    expirationTime: DateTime.Now + TimeSpan.FromSeconds(15));
             }
 
             await Task.Delay(TimeSpan.FromSeconds(this.options.Value.QuoteAlertsInterval), cancellationToken);
@@ -316,5 +325,10 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
         } while (retrievedCount > 0);
 
         return retrievedTrades;
+    }
+
+    private static string ConvertPriceToString(int price)
+    {
+        return PriceToStringConverter.Convert(price, typeof(string), default!, CultureInfo.CurrentCulture).Cast<string>();
     }
 }
