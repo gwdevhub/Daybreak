@@ -101,6 +101,6 @@ public sealed class TimeSinceDateTimeConverter : IValueConverter
             currentYear--;
         }
 
-        return $"{yearCount} years{(yearCount > 1 ? PluralAppend : string.Empty)} ago";
+        return $"{yearCount} year{(yearCount > 1 ? PluralAppend : string.Empty)} ago";
     }
 }
