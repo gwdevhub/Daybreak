@@ -10,6 +10,9 @@ public sealed class LaunchConfiguration
     [JsonProperty(nameof(Executable))]
     public string? Executable { get; set; }
 
+    [JsonProperty(nameof(Arguments))]
+    public string? Arguments { get; set; }
+
     [JsonProperty(nameof(CredentialsIdentifier))]
     public string? CredentialsIdentifier { get; set; }
 }

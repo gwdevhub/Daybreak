@@ -6,6 +6,7 @@ public sealed class LaunchConfigurationWithCredentials : IEquatable<LaunchConfig
 {
     public string? Identifier { get; init; }
     public string? ExecutablePath { get; set; }
+    public string? Arguments { get; set; }
     public LoginCredentials? Credentials { get; set; }
 
     public bool Equals(LaunchConfigurationWithCredentials? other)
