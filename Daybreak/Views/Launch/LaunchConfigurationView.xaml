@@ -26,12 +26,28 @@
                             ToolTip="Save changes" />
         <StackPanel Grid.Row="1">
             <Grid>
+                <TextBlock  FontSize="16"
+                            Text="Id: "
+                            Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                            VerticalAlignment="Center"/>
+                <TextBox    FontSize="16"
+                            Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                            IsReadOnly="True"
+                            IsReadOnlyCaretVisible="False"
+                            Margin="200, 0, 0, 0"
+                            Height="40"
+                            VerticalContentAlignment="Center"
+                            HorizontalContentAlignment="Center"
+                            Text="{Binding Identifier}"/>
+            </Grid>
+            <Grid>
                 <TextBlock Text="Selected credentials: " FontSize="16"
                            VerticalAlignment="Center"
                            Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"/>
                 <mah:SplitButton
                     ItemsSource="{Binding ElementName=_this, Path=Credentials, Mode=TwoWay}"
                     SelectedItem="{Binding ElementName=_this, Path=SelectedCredentials, Mode=TwoWay}"
+                    Height="40"
                     Margin="200, 0, 0, 0">
                     <mah:SplitButton.ItemTemplate>
                         <DataTemplate>
@@ -52,6 +68,7 @@
                 <mah:SplitButton
                     ItemsSource="{Binding ElementName=_this, Path=ExecutablePaths, Mode=TwoWay}"
                     SelectedItem="{Binding ElementName=_this, Path=SelectedPath, Mode=TwoWay}"
+                    Height="40"
                     Margin="200, 0, 0, 0">
                     <mah:SplitButton.ItemTemplate>
                         <DataTemplate>
