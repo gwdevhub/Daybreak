@@ -86,6 +86,7 @@ using Daybreak.Services.UBlockOrigin;
 using Daybreak.Services.Browser;
 using Daybreak.Services.PriceChecker;
 using Daybreak.Services.PriceChecker.Models;
+using Daybreak.Services.ApplicationArguments;
 
 namespace Daybreak.Configuration;
 
@@ -266,6 +267,8 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IBrowserHistoryManager, BrowserHistoryManager>();
         services.AddScoped<IEventService, EventService>();
         services.AddScoped<IPriceCheckerService, PriceCheckerService>();
+        services.AddScoped<IApplicationArgumentService, ApplicationArgumentService>();
+        services.AddScoped<IArgumentHandlerProducer, IApplicationArgumentService>(sp => sp.GetRequiredService<IApplicationArgumentService>());
     }
 
     public override void RegisterViews(IViewProducer viewProducer)
@@ -472,6 +475,11 @@ public class ProjectConfiguration : PluginConfigurationBase
     {
         browserExtensionsProducer.ThrowIfNull();
         browserExtensionsProducer.RegisterExtension<UBlockOriginService>();
+    }
+
+    public override void RegisterLaunchArgumentHandlers(IArgumentHandlerProducer argumentHandlerProducer)
+    {
+        argumentHandlerProducer.ThrowIfNull();
     }
 
     private void RegisterLiteCollections(IServiceCollection services)

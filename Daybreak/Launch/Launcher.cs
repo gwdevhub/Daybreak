@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Models.Progress;
+using Daybreak.Services.ApplicationArguments;
 using Daybreak.Services.Browser;
 using Daybreak.Services.Drawing;
 using Daybreak.Services.ExceptionHandling;
@@ -12,11 +13,13 @@ using Daybreak.Services.Screens;
 using Daybreak.Services.Startup;
 using Daybreak.Services.Themes;
 using Daybreak.Services.Updater.PostUpdate;
+using Daybreak.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Slim;
 using Slim.Integration.ServiceCollection;
 using System;
+using System.Core.Extensions;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
@@ -31,17 +34,24 @@ namespace Daybreak.Launch;
 
 public sealed class Launcher : ExtendedApplication<MainWindow>
 {
-    public readonly static Launcher Instance = new();
+    public static Launcher Instance { get; private set; } = default!;
 
     private readonly ProjectConfiguration projectConfiguration = new();
+    private readonly string[] launchArguments;
     private ILogger? logger;
     private IExceptionHandler? exceptionHandler;
 
     public System.IServiceProvider ApplicationServiceProvider => this.ServiceProvider;
 
-    [STAThread]
-    public static int Main()
+    internal Launcher(string[] args)
     {
+        this.launchArguments = args.ThrowIfNull();
+    }
+
+    [STAThread]
+    public static int Main(string[] args)
+    {
+        Instance = new Launcher(args);
         RegisterExtraEncodingProviders();
         RegisterMahAppsStyle();
         return LaunchMainWindow();
@@ -97,6 +107,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
         var notificationHandlerProducer = this.ServiceProvider.GetRequiredService<INotificationHandlerProducer>();
         var modsManager = this.ServiceProvider.GetRequiredService<IModsManager>();
         var browserExtensionsProducer = this.ServiceProvider.GetRequiredService<IBrowserExtensionsProducer>();
+        var argumentHandlerProducer = this.ServiceProvider.GetRequiredService<IArgumentHandlerProducer>();
         
         startupStatus.CurrentStep = StartupStatus.Custom("Loading views");
         this.projectConfiguration.RegisterViews(viewProducer);
@@ -112,6 +123,8 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
         this.projectConfiguration.RegisterMods(modsManager);
         startupStatus.CurrentStep = StartupStatus.Custom("Loading browser extensions");
         this.projectConfiguration.RegisterBrowserExtensions(browserExtensionsProducer);
+        startupStatus.CurrentStep = StartupStatus.Custom("Loading argument handlers");
+        this.projectConfiguration.RegisterLaunchArgumentHandlers(argumentHandlerProducer);
 
         this.logger = this.ServiceProvider.GetRequiredService<ILogger<Launcher>>();
         this.logger.LogInformation($"Running in {Environment.CurrentDirectory}");
@@ -129,7 +142,8 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
                     drawingModuleProducer,
                     notificationHandlerProducer,
                     modsManager,
-                    browserExtensionsProducer);
+                    browserExtensionsProducer,
+                    argumentHandlerProducer);
         }
         catch(Exception e)
         {
@@ -139,7 +153,10 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
 
         startupStatus.CurrentStep = StartupStatus.Custom("Registering view container");
         this.RegisterViewContainer();
+        startupStatus.CurrentStep = StartupStatus.Custom("Executing argument handlers");
+        this.ServiceProvider.GetRequiredService<IApplicationArgumentService>().HandleArguments(this.launchArguments);
         startupStatus.CurrentStep = StartupStatus.Finished;
+        this.ServiceProvider.GetRequiredService<IViewManager>().ShowView<LauncherView>();
     }
 
     protected override void ApplicationClosing()
