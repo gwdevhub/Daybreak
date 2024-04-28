@@ -5,15 +5,9 @@
 #include <future>
 #include <payloads/PreGamePayload.h>
 #include <json.hpp>
-#include <queue>
-#include <GWCA/GWCA.h>
 #include <GWCA/Context/PreGameContext.h>
 
 namespace Daybreak::Modules::PreGameModule {
-    std::queue<std::promise<PreGamePayload>*> PromiseQueue;
-    std::mutex GameThreadMutex;
-    GW::HookEntry GameThreadHook;
-    volatile bool initialized = false;
 
     PreGamePayload GetPayload() {
         PreGamePayload preGamePayload;
@@ -29,52 +23,23 @@ namespace Daybreak::Modules::PreGameModule {
         }
 
         for (const auto& loginChar : context->chars) {
-            std::string charName(20, '\0');
-            auto length = std::wcstombs(&charName[0], loginChar.character_name, 20);
-            charName.resize(length);
-            preGamePayload.Characters.push_back(charName);
+            char charName[20];
+            int result = WideCharToMultiByte(CP_UTF8, 0, loginChar.character_name, -1, charName, sizeof(charName), NULL, NULL);
+            if (result == 0) {
+                // handle error, use GetLastError() to get more info
+            }
+            preGamePayload.Characters.emplace_back(charName);
         }
 
         preGamePayload.ChosenCharacterIndex = context->index_1;
         return preGamePayload;
     }
 
-    void EnsureInitialized() {
-        GameThreadMutex.lock();
-        if (!initialized) {
-            GW::GameThread::RegisterGameThreadCallback(&GameThreadHook, [&](GW::HookStatus*) {
-                while (!PromiseQueue.empty()) {
-                    auto promise = PromiseQueue.front();
-                    PromiseQueue.pop();
-                    try {
-                        auto payload = GetPayload();
-                        promise->set_value(payload);
-                    }
-                    catch (const std::future_error& e) {
-                        printf("[Pre Game Module] Encountered exception: {%s}", e.what());
-                        continue;
-                    }
-                    catch (const std::exception& e) {
-                        printf("[Pre Game Module] Encountered exception: {%s}", e.what());
-                        PreGamePayload payload;
-                        promise->set_value(payload);
-                    }
-                }
-                });
-
-            initialized = true;
-        }
-
-        GameThreadMutex.unlock();
-    }
-
     void GetPreGameInfo(const httplib::Request&, httplib::Response& res) {
-        auto response = std::promise<PreGamePayload>();
-
-        EnsureInitialized();
-        PromiseQueue.emplace(&response);
-        json responsePayload = response.get_future().get();
-
-        res.set_content(responsePayload.dump(), "text/json");
+        GW::GameThread::Enqueue([&res] {
+            const auto payload = GetPayload();
+            const auto ret_json = static_cast<json>(payload);
+            res.set_content(ret_json, "text/json");
+        });
     }
 }
