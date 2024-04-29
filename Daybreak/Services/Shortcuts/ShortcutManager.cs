@@ -60,7 +60,7 @@ internal sealed class ShortcutManager : IShortcutManager
         {
             var shortcut = Shortcut.ReadFromFile(shortcutPath);
             var currentExecutable = Process.GetCurrentProcess()?.MainModule?.FileName;
-            if (shortcut.ExtraData?.EnvironmentVariableDataBlock?.TargetAnsi?.Equals(currentExecutable) is true)
+            if (shortcut.LinkTargetIDList?.Path?.Equals(currentExecutable) is true)
             {
                 return true;
             }
