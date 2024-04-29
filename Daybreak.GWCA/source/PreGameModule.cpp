@@ -8,12 +8,12 @@
 
 namespace Daybreak::Modules::PreGameModule {
 
-    PreGamePayload* GetPayload() {
-        auto preGamePayload = new PreGamePayload();
+    PreGamePayload GetPayload() {
+        PreGamePayload preGamePayload;
         if (GW::Map::GetIsMapLoaded())
         {
-            preGamePayload->Characters.clear();
-            preGamePayload->ChosenCharacterIndex = 0;
+            preGamePayload.Characters.clear();
+            preGamePayload.ChosenCharacterIndex = 0;
             return preGamePayload;
         }
 
@@ -32,25 +32,27 @@ namespace Daybreak::Modules::PreGameModule {
                 // handle error, use GetLastError() to get more info
             }
 
-            preGamePayload->Characters.emplace_back(charName);
+            preGamePayload.Characters.emplace_back(charName);
         }
 
-        preGamePayload->ChosenCharacterIndex = context->index_1;
+        preGamePayload.ChosenCharacterIndex = context->index_1;
         return preGamePayload;
     }
 
     void GetPreGameInfo(const httplib::Request&, httplib::Response& res) {
-        PreGamePayload* payload = NULL;
-        std::exception* ex = NULL;
+        PreGamePayload payload;
+        std::exception ex;
         volatile bool executing = true;
-        GW::GameThread::Enqueue([&res, &executing, &ex, &payload]
+        volatile bool exception = false;
+        GW::GameThread::Enqueue([&res, &executing, &ex, &payload, &exception]
             {
                 try {
                     payload = GetPayload();
 
                 }
                 catch (std::exception e) {
-                    ex = &e;
+                    ex = e;
+                    exception = true;
                 }
 
                 executing = false;
@@ -60,15 +62,14 @@ namespace Daybreak::Modules::PreGameModule {
             Sleep(4);
         }
 
-        if (payload) {
-            const auto json = static_cast<nlohmann::json>(*payload);
+        if (!exception) {
+            const auto json = static_cast<nlohmann::json>(payload);
             const auto dump = json.dump();
             res.set_content(dump, "text/json");
-            delete(payload);
         }
-        else if (ex) {
-            printf("[Pre Game Module] Encountered exception: {%s}", ex->what());
-            res.set_content(std::format("Encountered exception: {}", ex->what()), "text/plain");
+        else {
+            printf("[Pre Game Module] Encountered exception: {%s}", ex.what());
+            res.set_content(std::format("Encountered exception: {}", ex.what()), "text/plain");
             res.status = 500;
         }
     }

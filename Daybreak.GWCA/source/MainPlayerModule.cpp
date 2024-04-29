@@ -366,8 +366,8 @@ namespace Daybreak::Modules::MainPlayerModule {
         }
     }
 
-    MainPlayer* GetPayload() {
-        auto mainPlayer = new MainPlayer();
+    MainPlayer GetPayload() {
+        MainPlayer mainPlayer;
         if (!GW::Map::GetIsMapLoaded()) {
             return mainPlayer;
         }
@@ -463,22 +463,24 @@ namespace Daybreak::Modules::MainPlayerModule {
             mainGwPlayer = &*foundMainGwPlayer;
         }
 
-        PopulateMainPlayer(*mainPlayer, (uint32_t)activeQuestId, questLog, titles, titleTiers, playerAgentId, mainGwPlayer, mainProfPtr, skillbars[playerAgentId], mainAttrPtr, mainAgentPtr);
+        PopulateMainPlayer(mainPlayer, (uint32_t)activeQuestId, questLog, titles, titleTiers, playerAgentId, mainGwPlayer, mainProfPtr, skillbars[playerAgentId], mainAttrPtr, mainAgentPtr);
         return mainPlayer;
     }
 
     void GetMainPlayer(const httplib::Request&, httplib::Response& res) {
-        MainPlayer* payload = NULL;
-        std::exception* ex = NULL;
+        MainPlayer payload;
+        std::exception ex;
         volatile bool executing = true;
-        GW::GameThread::Enqueue([&res, &executing, &ex, &payload]
+        volatile bool exception = false;
+        GW::GameThread::Enqueue([&res, &executing, &ex, &payload, &exception]
             {
                 try {
                     payload = GetPayload();
 
                 }
                 catch (std::exception e) {
-                    ex = &e;
+                    ex = e;
+                    exception = true;
                 }
 
                 executing = false;
@@ -488,15 +490,14 @@ namespace Daybreak::Modules::MainPlayerModule {
             Sleep(4);
         }
 
-        if (payload) {
-            const auto json = static_cast<nlohmann::json>(*payload);
+        if (!exception) {
+            const auto json = static_cast<nlohmann::json>(payload);
             const auto dump = json.dump();
             res.set_content(dump, "text/json");
-            delete(payload);
         }
-        else if (ex) {
-            printf("[Main Player Module] Encountered exception: {%s}", ex->what());
-            res.set_content(std::format("Encountered exception: {}", ex->what()), "text/plain");
+        else {
+            printf("[Main Player Module] Encountered exception: {%s}", ex.what());
+            res.set_content(std::format("Encountered exception: {}", ex.what()), "text/plain");
             res.status = 500;
         }
     }

@@ -9,9 +9,9 @@
 #include <GWCA/GameEntities/Pathing.h>
 
 namespace Daybreak::Modules::PathingMetadataModule {
-    PathingMetadataPayload* GetPayload() {
-        auto pathingPayload = new PathingMetadataPayload();
-        pathingPayload->TrapezoidCount = 0;
+    PathingMetadataPayload GetPayload() {
+        PathingMetadataPayload pathingPayload;
+        pathingPayload.TrapezoidCount = 0;
         if (!GW::Map::GetIsMapLoaded()) {
             return pathingPayload;
         }
@@ -27,22 +27,24 @@ namespace Daybreak::Modules::PathingMetadataModule {
             count += gwPathingMap.trapezoid_count;
         }
 
-        pathingPayload->TrapezoidCount = count;
+        pathingPayload.TrapezoidCount = count;
         return pathingPayload;
     }
 
     void GetPathingMetadata(const httplib::Request&, httplib::Response& res) {
-        PathingMetadataPayload* payload = NULL;
-        std::exception* ex = NULL;
+        PathingMetadataPayload payload;
+        std::exception ex;
         volatile bool executing = true;
-        GW::GameThread::Enqueue([&res, &executing, &ex, &payload]
+        volatile bool exception = false;
+        GW::GameThread::Enqueue([&res, &executing, &ex, &payload, &exception]
             {
                 try {
                     payload = GetPayload();
 
                 }
                 catch (std::exception e) {
-                    ex = &e;
+                    ex = e;
+                    exception = true;
                 }
 
                 executing = false;
@@ -52,15 +54,14 @@ namespace Daybreak::Modules::PathingMetadataModule {
             Sleep(4);
         }
 
-        if (payload) {
-            const auto json = static_cast<nlohmann::json>(*payload);
+        if (!exception) {
+            const auto json = static_cast<nlohmann::json>(payload);
             const auto dump = json.dump();
             res.set_content(dump, "text/json");
-            delete(payload);
         }
-        else if (ex) {
-            printf("[Pathing Metadata Module] Encountered exception: {%s}", ex->what());
-            res.set_content(std::format("Encountered exception: {}", ex->what()), "text/plain");
+        else {
+            printf("[Pathing Metadata Module] Encountered exception: {%s}", ex.what());
+            res.set_content(std::format("Encountered exception: {}", ex.what()), "text/plain");
             res.status = 500;
         }
     }

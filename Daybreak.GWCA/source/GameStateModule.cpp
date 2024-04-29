@@ -49,8 +49,8 @@ namespace Daybreak::Modules::GameStateModule {
         return states;
     }
 
-    GameStatePayload* GetPayload() {
-        auto gamePayload = new GameStatePayload();
+    GameStatePayload GetPayload() {
+        GameStatePayload gamePayload;
         if (!GW::Map::GetIsMapLoaded()) {
             return gamePayload;
         }
@@ -61,28 +61,30 @@ namespace Daybreak::Modules::GameStateModule {
         }
 
         auto states = GetStates(agents);
-        gamePayload->States = states;
+        gamePayload.States = states;
 
         auto camera = GW::CameraMgr::GetCamera();
         Daybreak::Camera cameraPayload{};
         cameraPayload.Pitch = camera->pitch;
         cameraPayload.Yaw = camera->yaw;
-        gamePayload->Camera = cameraPayload;
+        gamePayload.Camera = cameraPayload;
         return gamePayload;
     }
 
     void GetGameStateInfo(const httplib::Request&, httplib::Response& res) {
-        GameStatePayload* payload = NULL;
-        std::exception* ex = NULL;
+        GameStatePayload payload;
+        std::exception ex;
         volatile bool executing = true;
-        GW::GameThread::Enqueue([&res, &executing, &ex, &payload]
+        volatile bool exception = false;
+        GW::GameThread::Enqueue([&res, &executing, &ex, &payload, &exception]
             {
                 try {
                     payload = GetPayload();
 
                 }
                 catch (std::exception e) {
-                    ex = &e;
+                    ex = e;
+                    exception = true;
                 }
 
                 executing = false;
@@ -92,15 +94,14 @@ namespace Daybreak::Modules::GameStateModule {
             Sleep(4);
         }
 
-        if (payload) {
-            const auto json = static_cast<nlohmann::json>(*payload);
+        if (!exception) {
+            const auto json = static_cast<nlohmann::json>(payload);
             const auto dump = json.dump();
             res.set_content(dump, "text/json");
-            delete(payload);
         }
-        else if (ex) {
-            printf("[Game State Module] Encountered exception: {%s}", ex->what());
-            res.set_content(std::format("Encountered exception: {}", ex->what()), "text/plain");
+        else {
+            printf("[Game State Module] Encountered exception: {%s}", ex.what());
+            res.set_content(std::format("Encountered exception: {}", ex.what()), "text/plain");
             res.status = 500;
         }
     }

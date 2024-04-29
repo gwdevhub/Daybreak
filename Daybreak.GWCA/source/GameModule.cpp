@@ -340,14 +340,14 @@ namespace Daybreak::Modules::GameModule {
         }
     }
 
-    GamePayload* GetPayload() {
-        auto* gamePayload = new GamePayload();
-        gamePayload->TargetId = 0;
+    GamePayload GetPayload() {
+        GamePayload gamePayload;
+        gamePayload.TargetId = 0;
         if (!GW::Map::GetIsMapLoaded()) {
             return gamePayload;
         }
         
-        gamePayload->TargetId = GW::Agents::GetTargetId();
+        gamePayload.TargetId = GW::Agents::GetTargetId();
         auto worldContext = GW::GetWorldContext();
         auto activeQuestId = GW::QuestMgr::GetActiveQuestId();
         auto questLog = GetQuestLog();
@@ -397,7 +397,7 @@ namespace Daybreak::Modules::GameModule {
             mapIcons.push_back(mapIcon);
         }
         
-        gamePayload->MapIcons = mapIcons;
+        gamePayload.MapIcons = mapIcons;
 
         std::list<Player> partyMembers;
         for (auto &prof : professions) {
@@ -433,7 +433,7 @@ namespace Daybreak::Modules::GameModule {
             PopulatePlayer(player, prof.agent_id, &prof, skillbars[prof.agent_id], attrPtr, agentPtr);
             partyMembers.push_back(player);
         }
-        gamePayload->Party = partyMembers;
+        gamePayload.Party = partyMembers;
 
         MainPlayer mainPlayer;
         auto foundMainAttr = std::find_if(attributes.begin(), attributes.end(), [&](GW::PartyAttribute attribute) {
@@ -481,7 +481,7 @@ namespace Daybreak::Modules::GameModule {
         }
 
         PopulateMainPlayer(mainPlayer, (uint32_t)activeQuestId, questLog, titles, titleTiers, playerAgentId, mainGwPlayer, mainProfPtr, skillbars[playerAgentId], mainAttrPtr, mainAgentPtr);
-        gamePayload->MainPlayer = mainPlayer;
+        gamePayload.MainPlayer = mainPlayer;
 
         std::list<WorldPlayer> worldPlayers;
         for (auto& gwPlayer : players) {
@@ -536,7 +536,7 @@ namespace Daybreak::Modules::GameModule {
             worldPlayers.push_back(worldPlayer);
         }
 
-        gamePayload->WorldPlayers = worldPlayers;
+        gamePayload.WorldPlayers = worldPlayers;
         std::list<GW::AgentLiving> livingEntities;
         for (const auto& agentLiving : agents) {
             /*
@@ -561,22 +561,24 @@ namespace Daybreak::Modules::GameModule {
         }
 
         auto livingEntityList = GetLivingEntities(livingEntities);
-        gamePayload->LivingEntities = livingEntityList;
+        gamePayload.LivingEntities = livingEntityList;
         return gamePayload;
     }
 
     void GetGameInfo(const httplib::Request&, httplib::Response& res) {
-        GamePayload* payload = NULL;
-        std::exception* ex = NULL;
+        GamePayload payload;
+        std::exception ex;
         volatile bool executing = true;
-        GW::GameThread::Enqueue([&res, &executing, &ex, &payload]
+        volatile bool exception = false;
+        GW::GameThread::Enqueue([&res, &executing, &ex, &payload, &exception]
             {
                 try {
                     payload = GetPayload();
                     
                 }
                 catch (std::exception e) {
-                    ex = &e;
+                    ex = e;
+                    exception = true;
                 }
 
                 executing = false;
@@ -586,15 +588,14 @@ namespace Daybreak::Modules::GameModule {
             Sleep(4);
         }
 
-        if (payload) {
-            const auto json = static_cast<nlohmann::json>(*payload);
+        if (!exception) {
+            const auto json = static_cast<nlohmann::json>(payload);
             const auto dump = json.dump();
             res.set_content(dump, "text/json");
-            delete(payload);
         }
-        else if (ex) {
-            printf("[Game Module] Encountered exception: {%s}", ex->what());
-            res.set_content(std::format("Encountered exception: {}", ex->what()), "text/plain");
+        else {
+            printf("[Game Module] Encountered exception: {%s}", ex.what());
+            res.set_content(std::format("Encountered exception: {}", ex.what()), "text/plain");
             res.status = 500;
         }
     }
