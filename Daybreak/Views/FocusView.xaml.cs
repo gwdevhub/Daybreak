@@ -218,7 +218,8 @@ public partial class FocusView : UserControl
                     continue;
                 }
 
-                if (!this.MinimapVisible)
+                if (!this.MinimapVisible &&
+                    this.minimapWindow is null)
                 {
                     await Task.Delay(PathingDataFrequency, cancellationToken);
                     continue;
@@ -291,7 +292,8 @@ public partial class FocusView : UserControl
                     continue;
                 }
 
-                if (!this.MinimapVisible)
+                if (!this.MinimapVisible &&
+                    this.minimapWindow is null)
                 {
                     await Task.Delay(GameStateFrequency, cancellationToken);
                     continue;
@@ -369,7 +371,8 @@ public partial class FocusView : UserControl
                     continue;
                 }
 
-                if (!this.MinimapVisible)
+                if (!this.MinimapVisible &&
+                    this.minimapWindow is null)
                 {
                     await Task.Delay(CartoDataFrequency, cancellationToken);
                     continue;
@@ -493,7 +496,8 @@ public partial class FocusView : UserControl
                     continue;
                 }
 
-                if (!this.MinimapVisible)
+                if (!this.MinimapVisible &&
+                    this.minimapWindow is null)
                 {
                     await Task.Delay(GameDataFrequency, cancellationToken);
                     continue;
