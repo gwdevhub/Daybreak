@@ -27,11 +27,6 @@
 #include "Utils.h"
 
 namespace Daybreak::Modules::GameModule {
-    std::queue<std::promise<GamePayload>*> PromiseQueue;
-    std::mutex GameThreadMutex;
-    GW::HookEntry GameThreadHook;
-    volatile bool initialized = false;
-
     std::list<QuestMetadata> GetQuestLog() {
         std::list<QuestMetadata> questMetadatas;
         const auto questLog = GW::QuestMgr::GetQuestLog();
@@ -345,14 +340,14 @@ namespace Daybreak::Modules::GameModule {
         }
     }
 
-    GamePayload GetPayload() {
-        GamePayload gamePayload;
-        gamePayload.TargetId = 0;
+    GamePayload* GetPayload() {
+        auto* gamePayload = new GamePayload();
+        gamePayload->TargetId = 0;
         if (!GW::Map::GetIsMapLoaded()) {
             return gamePayload;
         }
         
-        gamePayload.TargetId = GW::Agents::GetTargetId();
+        gamePayload->TargetId = GW::Agents::GetTargetId();
         auto worldContext = GW::GetWorldContext();
         auto activeQuestId = GW::QuestMgr::GetActiveQuestId();
         auto questLog = GetQuestLog();
@@ -402,7 +397,7 @@ namespace Daybreak::Modules::GameModule {
             mapIcons.push_back(mapIcon);
         }
         
-        gamePayload.MapIcons = mapIcons;
+        gamePayload->MapIcons = mapIcons;
 
         std::list<Player> partyMembers;
         for (auto &prof : professions) {
@@ -438,7 +433,7 @@ namespace Daybreak::Modules::GameModule {
             PopulatePlayer(player, prof.agent_id, &prof, skillbars[prof.agent_id], attrPtr, agentPtr);
             partyMembers.push_back(player);
         }
-        gamePayload.Party = partyMembers;
+        gamePayload->Party = partyMembers;
 
         MainPlayer mainPlayer;
         auto foundMainAttr = std::find_if(attributes.begin(), attributes.end(), [&](GW::PartyAttribute attribute) {
@@ -486,7 +481,7 @@ namespace Daybreak::Modules::GameModule {
         }
 
         PopulateMainPlayer(mainPlayer, (uint32_t)activeQuestId, questLog, titles, titleTiers, playerAgentId, mainGwPlayer, mainProfPtr, skillbars[playerAgentId], mainAttrPtr, mainAgentPtr);
-        gamePayload.MainPlayer = mainPlayer;
+        gamePayload->MainPlayer = mainPlayer;
 
         std::list<WorldPlayer> worldPlayers;
         for (auto& gwPlayer : players) {
@@ -541,7 +536,7 @@ namespace Daybreak::Modules::GameModule {
             worldPlayers.push_back(worldPlayer);
         }
 
-        gamePayload.WorldPlayers = worldPlayers;
+        gamePayload->WorldPlayers = worldPlayers;
         std::list<GW::AgentLiving> livingEntities;
         for (const auto& agentLiving : agents) {
             /*
@@ -566,46 +561,41 @@ namespace Daybreak::Modules::GameModule {
         }
 
         auto livingEntityList = GetLivingEntities(livingEntities);
-        gamePayload.LivingEntities = livingEntityList;
+        gamePayload->LivingEntities = livingEntityList;
         return gamePayload;
     }
 
-    void EnsureInitialized() {
-        GameThreadMutex.lock();
-        if (!initialized) {
-            GW::GameThread::RegisterGameThreadCallback(&GameThreadHook, [&](GW::HookStatus*) {
-                while (!PromiseQueue.empty()) {
-                    auto promise = PromiseQueue.front();
-                    PromiseQueue.pop();
-                    try {
-                        auto payload = GetPayload();
-                        promise->set_value(payload);
-                    }
-                    catch (const std::future_error& e) {
-                        printf("[Game Module] Encountered exception: {%s}", e.what());
-                        continue;
-                    }
-                    catch (const std::exception& e) {
-                        printf("[Game Module] Encountered exception: {%s}", e.what());
-                        GamePayload payload;
-                        promise->set_value(payload);
-                    }
+    void GetGameInfo(const httplib::Request&, httplib::Response& res) {
+        GamePayload* payload = NULL;
+        std::exception* ex = NULL;
+        volatile bool executing = true;
+        GW::GameThread::Enqueue([&res, &executing, &ex, &payload]
+            {
+                try {
+                    payload = GetPayload();
+                    
                 }
-                });
+                catch (std::exception e) {
+                    ex = &e;
+                }
 
-            initialized = true;
+                executing = false;
+            });
+
+        while (executing) {
+            Sleep(4);
         }
 
-        GameThreadMutex.unlock();
-    }
-
-    void GetGameInfo(const httplib::Request&, httplib::Response& res) {
-        auto response = std::promise<GamePayload>();
-
-        EnsureInitialized();
-        PromiseQueue.emplace(&response);
-        json responsePayload = response.get_future().get();
-
-        res.set_content(responsePayload.dump(), "text/json");
+        if (payload) {
+            const auto json = static_cast<nlohmann::json>(*payload);
+            const auto dump = json.dump();
+            res.set_content(dump, "text/json");
+            delete(payload);
+        }
+        else if (ex) {
+            printf("[Game Module] Encountered exception: {%s}", ex->what());
+            res.set_content(std::format("Encountered exception: {}", ex->what()), "text/plain");
+            res.status = 500;
+        }
     }
 }

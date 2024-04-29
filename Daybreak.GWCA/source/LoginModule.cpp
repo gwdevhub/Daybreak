@@ -10,62 +10,52 @@
 #include "Utils.h"
 
 namespace Daybreak::Modules::LoginModule {
-    std::queue<std::promise<LoginPayload>*> PromiseQueue;
-    std::mutex GameThreadMutex;
-    GW::HookEntry GameThreadHook;
-    volatile bool initialized = false;
-
-    LoginPayload GetPayload() {
+    LoginPayload* GetPayload() {
         const auto context = GW::GetCharContext();
-        LoginPayload loginPayload;
+        auto loginPayload = new LoginPayload();
         if (!context) {
             return loginPayload;
         }
 
         std::wstring playerEmail(context->player_email);
         std::wstring playerName(context->player_name);
-        loginPayload.Email = Daybreak::Utils::WStringToString(playerEmail);
-        loginPayload.PlayerName = Daybreak::Utils::WStringToString(playerName);
+        loginPayload->Email = Daybreak::Utils::WStringToString(playerEmail);
+        loginPayload->PlayerName = Daybreak::Utils::WStringToString(playerName);
 
         return loginPayload;
     }
 
-    void EnsureInitialized() {
-        GameThreadMutex.lock();
-        if (!initialized) {
-            GW::GameThread::RegisterGameThreadCallback(&GameThreadHook, [&](GW::HookStatus*) {
-                while (!PromiseQueue.empty()) {
-                    auto promise = PromiseQueue.front();
-                    PromiseQueue.pop();
-                    try {
-                        auto payload = GetPayload();
-                        promise->set_value(payload);
-                    }
-                    catch (const std::future_error& e) {
-                        printf("[Login Module] Encountered exception: {%s}", e.what());
-                        continue;
-                    }
-                    catch (const std::exception& e) {
-                        printf("[Login Module] Encountered exception: {%s}", e.what());
-                        LoginPayload payload;
-                        promise->set_value(payload);
-                    }
+    void GetLoginInfo(const httplib::Request&, httplib::Response& res) {
+        LoginPayload* payload = NULL;
+        std::exception* ex = NULL;
+        volatile bool executing = true;
+        GW::GameThread::Enqueue([&res, &executing, &ex, &payload]
+            {
+                try {
+                    payload = GetPayload();
+
                 }
+                catch (std::exception e) {
+                    ex = &e;
+                }
+
+                executing = false;
             });
 
-            initialized = true;
+        while (executing) {
+            Sleep(4);
         }
 
-        GameThreadMutex.unlock();
-    }
-
-    void GetLoginInfo(const httplib::Request&, httplib::Response& res) {
-        auto response = std::promise<LoginPayload>();
-
-        EnsureInitialized();
-        PromiseQueue.emplace(&response);
-        json responsePayload = response.get_future().get();
-
-        res.set_content(responsePayload.dump(), "text/json");
+        if (payload) {
+            const auto json = static_cast<nlohmann::json>(*payload);
+            const auto dump = json.dump();
+            res.set_content(dump, "text/json");
+            delete(payload);
+        }
+        else if (ex) {
+            printf("[Login Module] Encountered exception: {%s}", ex->what());
+            res.set_content(std::format("Encountered exception: {}", ex->what()), "text/plain");
+            res.status = 500;
+        }
     }
 }

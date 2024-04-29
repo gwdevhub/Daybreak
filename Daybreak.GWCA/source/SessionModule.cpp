@@ -10,69 +10,59 @@
 #include <GWCA/Context/WorldContext.h>
 
 namespace Daybreak::Modules::SessionModule {
-    std::queue<std::promise<SessionPayload>*> PromiseQueue;
-    std::mutex GameThreadMutex;
-    GW::HookEntry GameThreadHook;
-    volatile bool initialized = false;
-
-    SessionPayload GetPayload() {
-        SessionPayload sessionPayload;
-        sessionPayload.MapId = (uint32_t)GW::Map::GetMapID();
-        sessionPayload.InstanceType = (uint32_t)GW::Map::GetInstanceType();
+    SessionPayload* GetPayload() {
+        auto sessionPayload = new SessionPayload();
+        sessionPayload->MapId = (uint32_t)GW::Map::GetMapID();
+        sessionPayload->InstanceType = (uint32_t)GW::Map::GetInstanceType();
 
         const auto worldContext = GW::GetWorldContext();
         if (!worldContext) {
             return sessionPayload;
         }
 
-        sessionPayload.FoesKilled = worldContext->foes_killed;
-        sessionPayload.FoesToKill = worldContext->foes_to_kill;
+        sessionPayload->FoesKilled = worldContext->foes_killed;
+        sessionPayload->FoesToKill = worldContext->foes_to_kill;
         
         const auto agentContext = GW::GetAgentContext();
         if (!agentContext) {
             return sessionPayload;
         }
 
-        sessionPayload.InstanceTimer = agentContext->instance_timer;
+        sessionPayload->InstanceTimer = agentContext->instance_timer;
         return sessionPayload;
     }
 
-    void EnsureInitialized() {
-        GameThreadMutex.lock();
-        if (!initialized) {
-            GW::GameThread::RegisterGameThreadCallback(&GameThreadHook, [&](GW::HookStatus*) {
-                while (!PromiseQueue.empty()) {
-                    auto promise = PromiseQueue.front();
-                    PromiseQueue.pop();
-                    try {
-                        auto payload = GetPayload();
-                        promise->set_value(payload);
-                    }
-                    catch (const std::future_error& e) {
-                        printf("[Session Module] Encountered exception: {%s}", e.what());
-                        continue;
-                    }
-                    catch (const std::exception& e) {
-                        printf("[Session Module] Encountered exception: {%s}", e.what());
-                        SessionPayload payload;
-                        promise->set_value(payload);
-                    }
-                }
-                });
+    void GetSessionInfo(const httplib::Request&, httplib::Response& res) {
+        SessionPayload* payload = NULL;
+        std::exception* ex = NULL;
+        volatile bool executing = true;
+        GW::GameThread::Enqueue([&res, &executing, &ex, &payload]
+            {
+                try {
+                    payload = GetPayload();
 
-            initialized = true;
+                }
+                catch (std::exception e) {
+                    ex = &e;
+                }
+
+                executing = false;
+            });
+
+        while (executing) {
+            Sleep(4);
         }
 
-        GameThreadMutex.unlock();
-    }
-
-    void GetSessionInfo(const httplib::Request&, httplib::Response& res) {
-        auto response = std::promise<SessionPayload>();
-
-        EnsureInitialized();
-        PromiseQueue.emplace(&response);
-        json responsePayload = response.get_future().get();
-
-        res.set_content(responsePayload.dump(), "text/json");
+        if (payload) {
+            const auto json = static_cast<nlohmann::json>(*payload);
+            const auto dump = json.dump();
+            res.set_content(dump, "text/json");
+            delete(payload);
+        }
+        else if (ex) {
+            printf("[Session Module] Encountered exception: {%s}", ex->what());
+            res.set_content(std::format("Encountered exception: {}", ex->what()), "text/plain");
+            res.status = 500;
+        }
     }
 }

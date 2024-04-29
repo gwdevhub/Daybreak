@@ -10,13 +10,8 @@
 #include <GWCA/Context/WorldContext.h>
 
 namespace Daybreak::Modules::UserModule {
-    std::queue<std::promise<UserPayload>*> PromiseQueue;
-    std::mutex GameThreadMutex;
-    GW::HookEntry GameThreadHook;
-    volatile bool initialized = false;
-
-    UserPayload GetPayload() {
-        UserPayload userPayload;
+    UserPayload* GetPayload() {
+        auto userPayload = new UserPayload();
         auto charContext = GW::GetCharContext();
         auto worldContext = GW::GetWorldContext();
         if (!charContext) {
@@ -30,61 +25,56 @@ namespace Daybreak::Modules::UserModule {
         std::string emailstr(64, '\0');
         auto length = std::wcstombs(&emailstr[0], charContext->player_email, 64);
         emailstr.resize(length);
-        userPayload.Email = emailstr;
-        userPayload.CurrentKurzickPoints = worldContext->current_kurzick;
-        userPayload.CurrentLuxonPoints = worldContext->current_luxon;
-        userPayload.CurrentImperialPoints = worldContext->current_imperial;
-        userPayload.CurrentBalthazarPoints = worldContext->current_balth;
-        userPayload.CurrentSkillPoints = worldContext->current_skill_points;
-        userPayload.TotalKurzickPoints = worldContext->total_earned_kurzick;
-        userPayload.TotalLuxonPoints = worldContext->total_earned_luxon;
-        userPayload.TotalImperialPoints = worldContext->total_earned_imperial;
-        userPayload.TotalBalthazarPoints = worldContext->total_earned_balth;
-        userPayload.TotalSkillPoints = worldContext->total_earned_skill_points;
-        userPayload.MaxKurzickPoints = worldContext->max_kurzick;
-        userPayload.MaxLuxonPoints = worldContext->max_luxon;
-        userPayload.MaxImperialPoints = worldContext->max_imperial;
-        userPayload.MaxBalthazarPoints = worldContext->max_balth;
+        userPayload->Email = emailstr;
+        userPayload->CurrentKurzickPoints = worldContext->current_kurzick;
+        userPayload->CurrentLuxonPoints = worldContext->current_luxon;
+        userPayload->CurrentImperialPoints = worldContext->current_imperial;
+        userPayload->CurrentBalthazarPoints = worldContext->current_balth;
+        userPayload->CurrentSkillPoints = worldContext->current_skill_points;
+        userPayload->TotalKurzickPoints = worldContext->total_earned_kurzick;
+        userPayload->TotalLuxonPoints = worldContext->total_earned_luxon;
+        userPayload->TotalImperialPoints = worldContext->total_earned_imperial;
+        userPayload->TotalBalthazarPoints = worldContext->total_earned_balth;
+        userPayload->TotalSkillPoints = worldContext->total_earned_skill_points;
+        userPayload->MaxKurzickPoints = worldContext->max_kurzick;
+        userPayload->MaxLuxonPoints = worldContext->max_luxon;
+        userPayload->MaxImperialPoints = worldContext->max_imperial;
+        userPayload->MaxBalthazarPoints = worldContext->max_balth;
 
         return userPayload;
     }
 
-    void EnsureInitialized() {
-        GameThreadMutex.lock();
-        if (!initialized) {
-            GW::GameThread::RegisterGameThreadCallback(&GameThreadHook, [&](GW::HookStatus*) {
-                while (!PromiseQueue.empty()) {
-                    auto promise = PromiseQueue.front();
-                    PromiseQueue.pop();
-                    try {
-                        auto payload = GetPayload();
-                        promise->set_value(payload);
-                    }
-                    catch (const std::future_error& e) {
-                        printf("[User Module] Encountered exception: {%s}", e.what());
-                        continue;
-                    }
-                    catch (const std::exception& e) {
-                        printf("[User Module] Encountered exception: {%s}", e.what());
-                        UserPayload payload;
-                        promise->set_value(payload);
-                    }
-                }
-                });
+    void GetUserInfo(const httplib::Request&, httplib::Response& res) {
+        UserPayload* payload = NULL;
+        std::exception* ex = NULL;
+        volatile bool executing = true;
+        GW::GameThread::Enqueue([&res, &executing, &ex, &payload]
+            {
+                try {
+                    payload = GetPayload();
 
-            initialized = true;
+                }
+                catch (std::exception e) {
+                    ex = &e;
+                }
+
+                executing = false;
+            });
+
+        while (executing) {
+            Sleep(4);
         }
 
-        GameThreadMutex.unlock();
-    }
-
-    void GetUserInfo(const httplib::Request&, httplib::Response& res) {
-        auto response = std::promise<UserPayload>();
-
-        EnsureInitialized();
-        PromiseQueue.emplace(&response);
-        json responsePayload = response.get_future().get();
-
-        res.set_content(responsePayload.dump(), "text/json");
+        if (payload) {
+            const auto json = static_cast<nlohmann::json>(*payload);
+            const auto dump = json.dump();
+            res.set_content(dump, "text/json");
+            delete(payload);
+        }
+        else if (ex) {
+            printf("[Game Module] Encountered exception: {%s}", ex->what());
+            res.set_content(std::format("Encountered exception: {}", ex->what()), "text/plain");
+            res.status = 500;
+        }
     }
 }

@@ -15,12 +15,6 @@
 #include <Utils.h>
 
 namespace Daybreak::Modules::ItemNameModule {
-    std::vector<std::tuple<uint32_t, std::promise<NamePayload>*, std::wstring*>> WaitingList;
-    std::queue<std::tuple<uint32_t, std::vector<uint32_t>, std::promise<NamePayload>>*> PromiseQueue;
-    std::mutex GameThreadMutex;
-    GW::HookEntry GameThreadHook;
-    volatile bool initialized = false;
-
     std::wstring* GetAsyncName(uint32_t id, std::vector<uint32_t> modifiers) {
         GW::ItemModifier parsedModifiers[64];
         for (auto i = 0U; i < modifiers.size(); i++) {
@@ -38,60 +32,6 @@ namespace Daybreak::Modules::ItemNameModule {
         auto name = new std::wstring();
         GW::Items::AsyncGetItemName(item, *name);
         return name;
-    }
-
-    void EnsureInitialized() {
-        GameThreadMutex.lock();
-        if (!initialized) {
-            GW::GameThread::RegisterGameThreadCallback(&GameThreadHook, [&](GW::HookStatus*) {
-                while (!PromiseQueue.empty()) {
-                    auto promiseRequest = PromiseQueue.front();
-                    std::promise<NamePayload> &promise = std::get<2>(*promiseRequest);
-                    uint32_t id = std::get<0>(*promiseRequest);
-                    auto modifiers = std::get<1>(*promiseRequest);
-                    PromiseQueue.pop();
-                    try {
-                        auto name = GetAsyncName(id, modifiers);
-                        if (!name) {
-                            continue;
-                        }
-
-                        WaitingList.emplace_back(id, &promise, name);
-                    }
-                    catch (const std::future_error& e) {
-                        printf("[Item Name Module] Encountered exception: {%s}", e.what());
-                        continue;
-                    }
-                    catch (const std::exception& e) {
-                        printf("[Item Name Module] Encountered exception: {%s}", e.what());
-                        NamePayload payload;
-                        promise.set_value(payload);
-                    }
-                }
-
-                for (size_t i = 0; i < WaitingList.size(); ) {
-                    auto item = &WaitingList[i];
-                    auto name = std::get<2>(*item);
-                    if (name->empty()) {
-                        i++;
-                        continue;
-                    }
-
-                    auto promise = std::get<1>(*item);
-                    auto id = std::get<0>(*item);
-                    WaitingList.erase(WaitingList.begin() + i);
-                    NamePayload payload;
-                    payload.Id = id;
-                    payload.Name = Daybreak::Utils::WStringToString(*name);
-                    delete(name);
-                    promise->set_value(payload);
-                }
-                });
-
-            initialized = true;
-        }
-
-        GameThreadMutex.unlock();
     }
 
     std::vector<std::string> SplitAndRemoveSpaces(const std::string& s) {
@@ -150,15 +90,40 @@ namespace Daybreak::Modules::ItemNameModule {
             }
         }
 
-        auto response = std::tuple<uint32_t, std::vector<uint32_t>, std::promise<NamePayload>>();
-        std::get<0>(response) = id;
-        std::promise<NamePayload>& promise = std::get<2>(response);
-        std::get<1>(response) = modifiers;
+        std::wstring* name = NULL;
+        std::exception* ex = NULL;
+        volatile bool executing = true;
+        GW::GameThread::Enqueue([&res, &executing, &ex, &name, &id, &modifiers]
+            {
+                try {
+                    name = GetAsyncName(id, modifiers);
+                }
+                catch (std::exception e) {
+                    ex = &e;
+                }
 
-        EnsureInitialized();
-        PromiseQueue.emplace(&response);
+                executing = false;
+            });
 
-        json responsePayload = promise.get_future().get();
-        res.set_content(responsePayload.dump(), "text/json");
+        // Wait while executing the name request or while the name has been requested but has not yet been populated
+        while (executing ||
+            (name && name->empty())) {
+            Sleep(4);
+        }
+
+        if (name) {
+            NamePayload namePayload;
+            namePayload.Name = Daybreak::Utils::WStringToString(*name);
+            namePayload.Id = id;
+            const auto json = static_cast<nlohmann::json>(namePayload);
+            const auto dump = json.dump();
+            res.set_content(dump, "text/json");
+            delete(name);
+        }
+        else if (ex) {
+            printf("[Item Name Module] Encountered exception: {%s}", ex->what());
+            res.set_content(std::format("Encountered exception: {}", ex->what()), "text/plain");
+            res.status = 500;
+        }
     }
 }

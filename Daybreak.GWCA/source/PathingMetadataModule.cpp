@@ -9,14 +9,9 @@
 #include <GWCA/GameEntities/Pathing.h>
 
 namespace Daybreak::Modules::PathingMetadataModule {
-    std::queue<std::promise<PathingMetadataPayload>*> PromiseQueue;
-    std::mutex GameThreadMutex;
-    GW::HookEntry GameThreadHook;
-    volatile bool initialized = false;
-
-    PathingMetadataPayload GetPayload() {
-        PathingMetadataPayload pathingPayload;
-        pathingPayload.TrapezoidCount = 0;
+    PathingMetadataPayload* GetPayload() {
+        auto pathingPayload = new PathingMetadataPayload();
+        pathingPayload->TrapezoidCount = 0;
         if (!GW::Map::GetIsMapLoaded()) {
             return pathingPayload;
         }
@@ -32,46 +27,41 @@ namespace Daybreak::Modules::PathingMetadataModule {
             count += gwPathingMap.trapezoid_count;
         }
 
-        pathingPayload.TrapezoidCount = count;
+        pathingPayload->TrapezoidCount = count;
         return pathingPayload;
     }
 
-    void EnsureInitialized() {
-        GameThreadMutex.lock();
-        if (!initialized) {
-            GW::GameThread::RegisterGameThreadCallback(&GameThreadHook, [&](GW::HookStatus*) {
-                while (!PromiseQueue.empty()) {
-                    auto promise = PromiseQueue.front();
-                    PromiseQueue.pop();
-                    try {
-                        auto payload = GetPayload();
-                        promise->set_value(payload);
-                    }
-                    catch (const std::future_error& e) {
-                        printf("[Pathing Metadata Module] Encountered exception: {%s}", e.what());
-                        continue;
-                    }
-                    catch (const std::exception& e) {
-                        printf("[Pathing Metadata Module] Encountered exception: {%s}", e.what());
-                        PathingMetadataPayload payload;
-                        promise->set_value(payload);
-                    }
-                }
-                });
+    void GetPathingMetadata(const httplib::Request&, httplib::Response& res) {
+        PathingMetadataPayload* payload = NULL;
+        std::exception* ex = NULL;
+        volatile bool executing = true;
+        GW::GameThread::Enqueue([&res, &executing, &ex, &payload]
+            {
+                try {
+                    payload = GetPayload();
 
-            initialized = true;
+                }
+                catch (std::exception e) {
+                    ex = &e;
+                }
+
+                executing = false;
+            });
+
+        while (executing) {
+            Sleep(4);
         }
 
-        GameThreadMutex.unlock();
-    }
-
-    void GetPathingMetadata(const httplib::Request&, httplib::Response& res) {
-        auto response = std::promise<PathingMetadataPayload>();
-
-        EnsureInitialized();
-        PromiseQueue.emplace(&response);
-        json responsePayload = response.get_future().get();
-
-        res.set_content(responsePayload.dump(), "text/json");
+        if (payload) {
+            const auto json = static_cast<nlohmann::json>(*payload);
+            const auto dump = json.dump();
+            res.set_content(dump, "text/json");
+            delete(payload);
+        }
+        else if (ex) {
+            printf("[Pathing Metadata Module] Encountered exception: {%s}", ex->what());
+            res.set_content(std::format("Encountered exception: {}", ex->what()), "text/plain");
+            res.status = 500;
+        }
     }
 }

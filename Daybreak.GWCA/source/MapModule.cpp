@@ -8,13 +8,8 @@
 #include <queue>
 
 namespace Daybreak::Modules::MapModule {
-    std::queue<std::promise<MapPayload>*> PromiseQueue;
-    std::mutex GameThreadMutex;
-    GW::HookEntry GameThreadHook;
-    volatile bool initialized = false;
-
-    MapPayload GetPayload() {
-        MapPayload mapPayload{};
+    MapPayload* GetPayload() {
+        auto mapPayload = new MapPayload();
         auto isLoaded = GW::Map::GetIsMapLoaded();
         if (!isLoaded) {
             return mapPayload;
@@ -30,53 +25,48 @@ namespace Daybreak::Modules::MapModule {
             return mapPayload;
         }
 
-        mapPayload.Campaign = static_cast<uint32_t>(mapInfo->campaign);
-        mapPayload.Continent = static_cast<uint32_t>(mapInfo->continent);
-        mapPayload.Region = mapInfo->region;
-        mapPayload.InstanceType = (uint32_t)instanceType;
-        mapPayload.IsLoaded = isLoaded;
-        mapPayload.Timer = instanceTime;
-        mapPayload.Id = (uint32_t)mapId;
+        mapPayload->Campaign = static_cast<uint32_t>(mapInfo->campaign);
+        mapPayload->Continent = static_cast<uint32_t>(mapInfo->continent);
+        mapPayload->Region = mapInfo->region;
+        mapPayload->InstanceType = (uint32_t)instanceType;
+        mapPayload->IsLoaded = isLoaded;
+        mapPayload->Timer = instanceTime;
+        mapPayload->Id = (uint32_t)mapId;
 
         return mapPayload;
     }
 
-    void EnsureInitialized() {
-        GameThreadMutex.lock();
-        if (!initialized) {
-            GW::GameThread::RegisterGameThreadCallback(&GameThreadHook, [&](GW::HookStatus*) {
-                while (!PromiseQueue.empty()) {
-                    auto promise = PromiseQueue.front();
-                    PromiseQueue.pop();
-                    try {
-                        auto payload = GetPayload();
-                        promise->set_value(payload);
-                    }
-                    catch (const std::future_error& e) {
-                        printf("[Map Module] Encountered exception: {%s}", e.what());
-                        continue;
-                    }
-                    catch (const std::exception& e) {
-                        printf("[Map Module] Encountered exception: {%s}", e.what());
-                        MapPayload payload;
-                        promise->set_value(payload);
-                    }
-                }
-                });
+    void GetMapInfo(const httplib::Request&, httplib::Response& res) {
+        MapPayload* payload = NULL;
+        std::exception* ex = NULL;
+        volatile bool executing = true;
+        GW::GameThread::Enqueue([&res, &executing, &ex, &payload]
+            {
+                try {
+                    payload = GetPayload();
 
-            initialized = true;
+                }
+                catch (std::exception e) {
+                    ex = &e;
+                }
+
+                executing = false;
+            });
+
+        while (executing) {
+            Sleep(4);
         }
 
-        GameThreadMutex.unlock();
-    }
-
-    void GetMapInfo(const httplib::Request&, httplib::Response& res) {
-        auto response = std::promise<MapPayload>();
-
-        EnsureInitialized();
-        PromiseQueue.emplace(&response);
-        json responsePayload = response.get_future().get();
-
-        res.set_content(responsePayload.dump(), "text/json");
+        if (payload) {
+            const auto json = static_cast<nlohmann::json>(*payload);
+            const auto dump = json.dump();
+            res.set_content(dump, "text/json");
+            delete(payload);
+        }
+        else if (ex) {
+            printf("[Map Module] Encountered exception: {%s}", ex->what());
+            res.set_content(std::format("Encountered exception: {}", ex->what()), "text/plain");
+            res.status = 500;
+        }
     }
 }

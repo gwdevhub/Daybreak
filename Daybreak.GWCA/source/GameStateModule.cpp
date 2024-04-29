@@ -13,11 +13,6 @@
 #include <algorithm>
 
 namespace Daybreak::Modules::GameStateModule {
-    std::queue<std::promise<GameStatePayload>*> PromiseQueue;
-    std::mutex GameThreadMutex;
-    GW::HookEntry GameThreadHook;
-    volatile bool initialized = false;
-
     std::list<GW::AgentLiving> GetLivingAgents() {
         std::list<GW::AgentLiving> agentList;
         const GW::AgentArray* agents_ptr = GW::Agents::GetAgentArray();
@@ -54,8 +49,8 @@ namespace Daybreak::Modules::GameStateModule {
         return states;
     }
 
-    GameStatePayload GetPayload() {
-        GameStatePayload gamePayload;
+    GameStatePayload* GetPayload() {
+        auto gamePayload = new GameStatePayload();
         if (!GW::Map::GetIsMapLoaded()) {
             return gamePayload;
         }
@@ -66,52 +61,47 @@ namespace Daybreak::Modules::GameStateModule {
         }
 
         auto states = GetStates(agents);
-        gamePayload.States = states;
+        gamePayload->States = states;
 
         auto camera = GW::CameraMgr::GetCamera();
         Daybreak::Camera cameraPayload{};
         cameraPayload.Pitch = camera->pitch;
         cameraPayload.Yaw = camera->yaw;
-        gamePayload.Camera = cameraPayload;
+        gamePayload->Camera = cameraPayload;
         return gamePayload;
     }
 
-    void EnsureInitialized() {
-        GameThreadMutex.lock();
-        if (!initialized) {
-            GW::GameThread::RegisterGameThreadCallback(&GameThreadHook, [&](GW::HookStatus*) {
-                while (!PromiseQueue.empty()) {
-                    auto promise = PromiseQueue.front();
-                    PromiseQueue.pop();
-                    try {
-                        auto payload = GetPayload();
-                        promise->set_value(payload);
-                    }
-                    catch (const std::future_error& e) {
-                        printf("[Game State Module] Encountered exception: {%s}", e.what());
-                        continue;
-                    }
-                    catch (const std::exception& e) {
-                        printf("[Game State Module] Encountered exception: {%s}", e.what());
-                        GameStatePayload payload;
-                        promise->set_value(payload);
-                    }
-                }
-                });
+    void GetGameStateInfo(const httplib::Request&, httplib::Response& res) {
+        GameStatePayload* payload = NULL;
+        std::exception* ex = NULL;
+        volatile bool executing = true;
+        GW::GameThread::Enqueue([&res, &executing, &ex, &payload]
+            {
+                try {
+                    payload = GetPayload();
 
-            initialized = true;
+                }
+                catch (std::exception e) {
+                    ex = &e;
+                }
+
+                executing = false;
+            });
+
+        while (executing) {
+            Sleep(4);
         }
 
-        GameThreadMutex.unlock();
-    }
-
-    void GetGameStateInfo(const httplib::Request&, httplib::Response& res) {
-        auto response = std::promise<GameStatePayload>();
-
-        EnsureInitialized();
-        PromiseQueue.emplace(&response);
-        json responsePayload = response.get_future().get();
-
-        res.set_content(responsePayload.dump(), "text/json");
+        if (payload) {
+            const auto json = static_cast<nlohmann::json>(*payload);
+            const auto dump = json.dump();
+            res.set_content(dump, "text/json");
+            delete(payload);
+        }
+        else if (ex) {
+            printf("[Game State Module] Encountered exception: {%s}", ex->what());
+            res.set_content(std::format("Encountered exception: {}", ex->what()), "text/plain");
+            res.status = 500;
+        }
     }
 }
