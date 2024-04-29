@@ -8,11 +8,6 @@
 #include <Utils.h>
 
 namespace Daybreak::Modules::WhisperModule {
-    std::queue<std::wstring> PromiseQueue;
-    std::mutex GameThreadMutex;
-    GW::HookEntry GameThreadHook;
-    volatile bool initialized = false;
-
     void PostMessage(std::wstring message) {
         if (!GW::Map::GetIsMapLoaded()) {
             return;
@@ -21,32 +16,11 @@ namespace Daybreak::Modules::WhisperModule {
         GW::Chat::WriteChat(GW::Chat::CHANNEL_WHISPER, message.c_str(), L"Daybreak", false);
     }
 
-    void EnsureInitialized() {
-        GameThreadMutex.lock();
-        if (!initialized) {
-            GW::GameThread::RegisterGameThreadCallback(&GameThreadHook, [&](GW::HookStatus*) {
-                while (!PromiseQueue.empty()) {
-                    auto message = PromiseQueue.front();
-                    PromiseQueue.pop();
-                    try {
-                        PostMessage(message);
-                    }
-                    catch (const std::exception& e) {
-                        printf("[Whisper Module] Encountered exception: {%s}", e.what());
-                    }
-                }
-                });
-
-            initialized = true;
-        }
-
-        GameThreadMutex.unlock();
-    }
-
     void PostWhisper(const httplib::Request& req, httplib::Response& res) {
-        EnsureInitialized();
         auto wMessage = Utils::StringToWString(req.body);
-        PromiseQueue.emplace(wMessage);
-        res.set_content("Okay", "text/plain");
+        GW::GameThread::Enqueue([&res, wMessage]
+            {
+                PostMessage(wMessage);
+            });
     }
 }

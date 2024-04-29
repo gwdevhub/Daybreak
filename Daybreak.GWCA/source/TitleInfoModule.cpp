@@ -20,13 +20,6 @@
 #include "Utils.h"
 
 namespace Daybreak::Modules::TitleInfoModule {
-    const int MaxTries = 20;
-    std::vector<std::tuple<TitleInfoPayload, std::promise<TitleInfoPayload>*, std::wstring*, int>> WaitingList;
-    std::queue<std::tuple<uint32_t, std::promise<TitleInfoPayload>>*> PromiseQueue;
-    std::mutex GameThreadMutex;
-    GW::HookEntry GameThreadHook;
-    volatile bool initialized = false;
-
     std::wstring* GetAsyncName(uint32_t titleTierIndex) {
         const auto worldContext = GW::GetWorldContext();
         const auto tiers = &worldContext->title_tiers;
@@ -36,8 +29,8 @@ namespace Daybreak::Modules::TitleInfoModule {
         return description;
     }
 
-    TitleInfoPayload GetPayload(uint32_t id) {
-        TitleInfoPayload payload;
+    TitleInfoPayload* GetPayload(uint32_t id) {
+        auto payload = new TitleInfoPayload();
         if (!GW::Map::GetIsMapLoaded()) {
             return payload;
         }
@@ -59,77 +52,13 @@ namespace Daybreak::Modules::TitleInfoModule {
         const auto tiers = &worldContext->title_tiers;
         const auto tier = &tiers->at(tierIndex);
 
-        payload.TitleId = id;
-        payload.TitleTierId = tierIndex;
-        payload.CurrentPoints = title->current_points;
-        payload.PointsNeededNextRank = title->points_needed_next_rank;
-        payload.IsPercentageBased = title->is_percentage_based();
-        payload.CurrentTier = tier->tier_number;
+        payload->TitleId = id;
+        payload->TitleTierId = tierIndex;
+        payload->CurrentPoints = title->current_points;
+        payload->PointsNeededNextRank = title->points_needed_next_rank;
+        payload->IsPercentageBased = title->is_percentage_based();
+        payload->CurrentTier = tier->tier_number;
         return payload;
-    }
-
-    void EnsureInitialized() {
-        GameThreadMutex.lock();
-        if (!initialized) {
-            GW::GameThread::RegisterGameThreadCallback(&GameThreadHook, [&](GW::HookStatus*) {
-                while (!PromiseQueue.empty()) {
-                    auto promiseRequest = PromiseQueue.front();
-                    std::promise<TitleInfoPayload> &promise = std::get<1>(*promiseRequest);
-                    uint32_t id = std::get<0>(*promiseRequest);
-                    PromiseQueue.pop();
-                    try {
-                        const auto payload = GetPayload(id);
-                        if (payload.TitleId == 0 &&
-                            payload.CurrentPoints == 0 &&
-                            payload.PointsNeededNextRank == 0 &&
-                            payload.TitleTierId == 0) {
-                            TitleInfoPayload payload;
-                            promise.set_value(payload);
-                            continue;
-                        }
-
-                        auto name = GetAsyncName(payload.TitleTierId);
-                        if (!name) {
-                            continue;
-                        }
-
-                        WaitingList.emplace_back(payload, &promise, name, 0);
-                    }
-                    catch (const std::future_error& e) {
-                        printf("[Title Info Module] Encountered exception: {%s}", e.what());
-                        continue;
-                    }
-                    catch (const std::exception& e) {
-                        printf("[Title Info Module] Encountered exception: {%s}", e.what());
-                        TitleInfoPayload payload;
-                        promise.set_value(payload);
-                    }
-                }
-
-                for (auto i = 0U; i < WaitingList.size(); ) {
-                    auto item = &WaitingList[i];
-                    auto name = std::get<2>(*item);
-                    auto& tries = std::get<3>(*item);
-                    if (name->empty() &&
-                        tries < MaxTries) {
-                        tries += 1;
-                        i++;
-                        continue;
-                    }
-
-                    auto promise = std::get<1>(*item);
-                    auto payload = std::get<0>(*item);
-                    payload.TitleName = Utils::WStringToString(*name);
-                    WaitingList.erase(WaitingList.begin() + i);
-                    delete(name);
-                    promise->set_value(payload);
-                }
-                });
-
-            initialized = true;
-        }
-
-        GameThreadMutex.unlock();
     }
 
     void GetTitleInfo(const httplib::Request& req, httplib::Response& res) {
@@ -153,14 +82,41 @@ namespace Daybreak::Modules::TitleInfoModule {
             id = static_cast<uint32_t>(result);
         }
 
-        auto response = std::tuple<uint32_t, std::promise<TitleInfoPayload>>();
-        std::get<0>(response) = id;
-        std::promise<TitleInfoPayload>& promise = std::get<1>(response);
+        TitleInfoPayload* payload = NULL;
+        std::wstring* name = NULL;
+        std::exception* ex = NULL;
+        volatile bool executing = true;
+        GW::GameThread::Enqueue([&res, &executing, &ex, &payload, &name, &id]
+            {
+                try {
+                    payload = GetPayload(id);
+                    name = GetAsyncName(id);
+                }
+                catch (std::exception e) {
+                    ex = &e;
+                }
 
-        EnsureInitialized();
-        PromiseQueue.emplace(&response);
+                executing = false;
+            });
 
-        json responsePayload = promise.get_future().get();
-        res.set_content(responsePayload.dump(), "text/json");
+        // Wait while executing the name request or while the name has been requested but has not yet been populated
+        while (executing ||
+            (name && name->empty())) {
+            Sleep(4);
+        }
+
+        if (name && payload) {
+            payload->TitleName = Daybreak::Utils::WStringToString(*name);
+            const auto json = static_cast<nlohmann::json>(*payload);
+            const auto dump = json.dump();
+            res.set_content(dump, "text/json");
+            delete(name);
+            delete(payload);
+        }
+        else if (ex) {
+            printf("[Item Name Module] Encountered exception: {%s}", ex->what());
+            res.set_content(std::format("Encountered exception: {}", ex->what()), "text/plain");
+            res.status = 500;
+        }
     }
 }

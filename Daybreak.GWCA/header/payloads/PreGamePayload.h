@@ -6,7 +6,7 @@ using json = nlohmann::json;
 
 namespace Daybreak {
     struct PreGamePayload {
-        int ChosenCharacterIndex;
+        int ChosenCharacterIndex = -1;
         std::list<std::string> Characters;
     };
 

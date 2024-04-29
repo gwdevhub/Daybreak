@@ -6,16 +6,11 @@
 #include <GWCA/Managers/ItemMgr.h>
 #include <GWCA/GameEntities/Item.h>
 #include <future>
-#include <payloads/InventoryPayload.h>
+#include <payloads/inventoryPayload.h>
 #include <json.hpp>
 #include <queue>
 
 namespace Daybreak::Modules::InventoryModule {
-    std::queue<std::promise<InventoryPayload>*> PromiseQueue;
-    std::mutex GameThreadMutex;
-    GW::HookEntry GameThreadHook;
-    volatile bool initialized = false;
-
     Daybreak::Bag GetBag(GW::Bag* bag) {
         Bag retBag;
         if (!bag) {
@@ -43,8 +38,8 @@ namespace Daybreak::Modules::InventoryModule {
         return retBag;
     }
 
-    InventoryPayload GetPayload() {
-        InventoryPayload inventoryPayload;
+    InventoryPayload* GetPayload() {
+        auto inventoryPayload = new InventoryPayload();
         if (!GW::Map::GetIsMapLoaded()) {
             return inventoryPayload;
         }
@@ -54,69 +49,64 @@ namespace Daybreak::Modules::InventoryModule {
             return inventoryPayload;
         }
 
-        inventoryPayload.GoldInStorage = GW::Items::GetGoldAmountInStorage();
-        inventoryPayload.GoldOnCharacter = GW::Items::GetGoldAmountOnCharacter();        
-        inventoryPayload.Backpack = GetBag(inventory->backpack);
-        inventoryPayload.BeltPouch = (GetBag(inventory->belt_pouch));
-        inventoryPayload.Bags.push_back(GetBag(inventory->bag1));
-        inventoryPayload.Bags.push_back(GetBag(inventory->bag2));
-        inventoryPayload.EquipmentPack = (GetBag(inventory->equipment_pack));
-        inventoryPayload.MaterialStorage = (GetBag(inventory->material_storage));
-        inventoryPayload.UnclaimedItems = (GetBag(inventory->unclaimed_items));
-        inventoryPayload.EquippedItems = (GetBag(inventory->equipped_items));
-        inventoryPayload.StoragePanes.push_back(GetBag(inventory->storage1));
-        inventoryPayload.StoragePanes.push_back(GetBag(inventory->storage2));
-        inventoryPayload.StoragePanes.push_back(GetBag(inventory->storage3));
-        inventoryPayload.StoragePanes.push_back(GetBag(inventory->storage4));
-        inventoryPayload.StoragePanes.push_back(GetBag(inventory->storage5));
-        inventoryPayload.StoragePanes.push_back(GetBag(inventory->storage6));
-        inventoryPayload.StoragePanes.push_back(GetBag(inventory->storage7));
-        inventoryPayload.StoragePanes.push_back(GetBag(inventory->storage8));
-        inventoryPayload.StoragePanes.push_back(GetBag(inventory->storage9));
-        inventoryPayload.StoragePanes.push_back(GetBag(inventory->storage10));
-        inventoryPayload.StoragePanes.push_back(GetBag(inventory->storage11));
-        inventoryPayload.StoragePanes.push_back(GetBag(inventory->storage12));
-        inventoryPayload.StoragePanes.push_back(GetBag(inventory->storage13));
-        inventoryPayload.StoragePanes.push_back(GetBag(inventory->storage14));
+        inventoryPayload->GoldInStorage = GW::Items::GetGoldAmountInStorage();
+        inventoryPayload->GoldOnCharacter = GW::Items::GetGoldAmountOnCharacter();        
+        inventoryPayload->Backpack = GetBag(inventory->backpack);
+        inventoryPayload->BeltPouch = (GetBag(inventory->belt_pouch));
+        inventoryPayload->Bags.push_back(GetBag(inventory->bag1));
+        inventoryPayload->Bags.push_back(GetBag(inventory->bag2));
+        inventoryPayload->EquipmentPack = (GetBag(inventory->equipment_pack));
+        inventoryPayload->MaterialStorage = (GetBag(inventory->material_storage));
+        inventoryPayload->UnclaimedItems = (GetBag(inventory->unclaimed_items));
+        inventoryPayload->EquippedItems = (GetBag(inventory->equipped_items));
+        inventoryPayload->StoragePanes.push_back(GetBag(inventory->storage1));
+        inventoryPayload->StoragePanes.push_back(GetBag(inventory->storage2));
+        inventoryPayload->StoragePanes.push_back(GetBag(inventory->storage3));
+        inventoryPayload->StoragePanes.push_back(GetBag(inventory->storage4));
+        inventoryPayload->StoragePanes.push_back(GetBag(inventory->storage5));
+        inventoryPayload->StoragePanes.push_back(GetBag(inventory->storage6));
+        inventoryPayload->StoragePanes.push_back(GetBag(inventory->storage7));
+        inventoryPayload->StoragePanes.push_back(GetBag(inventory->storage8));
+        inventoryPayload->StoragePanes.push_back(GetBag(inventory->storage9));
+        inventoryPayload->StoragePanes.push_back(GetBag(inventory->storage10));
+        inventoryPayload->StoragePanes.push_back(GetBag(inventory->storage11));
+        inventoryPayload->StoragePanes.push_back(GetBag(inventory->storage12));
+        inventoryPayload->StoragePanes.push_back(GetBag(inventory->storage13));
+        inventoryPayload->StoragePanes.push_back(GetBag(inventory->storage14));
         return inventoryPayload;
     }
 
-    void EnsureInitialized() {
-        GameThreadMutex.lock();
-        if (!initialized) {
-            GW::GameThread::RegisterGameThreadCallback(&GameThreadHook, [&](GW::HookStatus*) {
-                while (!PromiseQueue.empty()) {
-                    auto promise = PromiseQueue.front();
-                    PromiseQueue.pop();
-                    try {
-                        auto payload = GetPayload();
-                        promise->set_value(payload);
-                    }
-                    catch (const std::future_error& e) {
-                        printf("[Inventory Module] Encountered exception: {%s}", e.what());
-                        continue;
-                    }
-                    catch (const std::exception& e) {
-                        printf("[Inventory Module] Encountered exception: {%s}", e.what());
-                        InventoryPayload payload;
-                        promise->set_value(payload);
-                    }
-                }
-                });
+    void GetInventoryInfo(const httplib::Request&, httplib::Response& res) {
+        InventoryPayload* payload = NULL;
+        std::exception* ex = NULL;
+        volatile bool executing = true;
+        GW::GameThread::Enqueue([&res, &executing, &ex, &payload]
+            {
+                try {
+                    payload = GetPayload();
 
-            initialized = true;
+                }
+                catch (std::exception e) {
+                    ex = &e;
+                }
+
+                executing = false;
+            });
+
+        while (executing) {
+            Sleep(4);
         }
 
-        GameThreadMutex.unlock();
-    }
-
-    void GetInventoryInfo(const httplib::Request&, httplib::Response& res) {
-        auto response = std::promise<InventoryPayload>();
-
-        EnsureInitialized();
-        PromiseQueue.emplace(&response);
-        json responsePayload = response.get_future().get();
-
-        res.set_content(responsePayload.dump(), "text/json");
+        if (payload) {
+            const auto json = static_cast<nlohmann::json>(*payload);
+            const auto dump = json.dump();
+            res.set_content(dump, "text/json");
+            delete(payload);
+        }
+        else if (ex) {
+            printf("[Inventory Module] Encountered exception: {%s}", ex->what());
+            res.set_content(std::format("Encountered exception: {}", ex->what()), "text/plain");
+            res.status = 500;
+        }
     }
 }

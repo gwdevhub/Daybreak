@@ -27,11 +27,6 @@
 #include "Utils.h"
 
 namespace Daybreak::Modules::MainPlayerModule {
-    std::queue<std::promise<MainPlayer>*> PromiseQueue;
-    std::mutex GameThreadMutex;
-    GW::HookEntry GameThreadHook;
-    volatile bool initialized = false;
-
     std::list<QuestMetadata> GetQuestLog() {
         std::list<QuestMetadata> questMetadatas;
         const auto questLog = GW::QuestMgr::GetQuestLog();
@@ -371,27 +366,27 @@ namespace Daybreak::Modules::MainPlayerModule {
         }
     }
 
-    MainPlayer GetPayload() {
-        MainPlayer gamePayload;
+    MainPlayer* GetPayload() {
+        auto mainPlayer = new MainPlayer();
         if (!GW::Map::GetIsMapLoaded()) {
-            return gamePayload;
+            return mainPlayer;
         }
         
         auto worldContext = GW::GetWorldContext();
         if (!worldContext) {
-            return gamePayload;
+            return mainPlayer;
         }
 
         auto activeQuestId = GW::QuestMgr::GetActiveQuestId();
         auto questLog = GetQuestLog();
         auto skillbars = GetSkillbars();
         if (skillbars.empty()) {
-            return gamePayload;
+            return mainPlayer;
         }
 
         auto agents = GetLivingAgents();
         if (agents.empty()) {
-            return gamePayload;
+            return mainPlayer;
         }
 
         auto titles = GetTitles();
@@ -400,32 +395,30 @@ namespace Daybreak::Modules::MainPlayerModule {
 
         auto players = GetPlayers();
         if (players.empty()) {
-            return gamePayload;
+            return mainPlayer;
         }
 
         auto npcs = GetNpcs();
         if (npcs.empty()) {
-            return gamePayload;
+            return mainPlayer;
         }
 
         auto attributes = GetPartyAttributes();
         if (attributes.empty()) {
-            return gamePayload;
+            return mainPlayer;
         }
 
         auto professions = GetProfessions();
         if (professions.empty()) {
-            return gamePayload;
+            return mainPlayer;
         }
 
         auto mapAgents = GetMapEntities();
         if (mapAgents.empty()) {
-            return gamePayload;
+            return mainPlayer;
         }
         auto playerAgentId = GW::Agents::GetPlayerId();
 
-
-        MainPlayer mainPlayer;
         auto foundMainAttr = std::find_if(attributes.begin(), attributes.end(), [&](GW::PartyAttribute attribute) {
             return playerAgentId == attribute.agent_id;
             });
@@ -470,46 +463,41 @@ namespace Daybreak::Modules::MainPlayerModule {
             mainGwPlayer = &*foundMainGwPlayer;
         }
 
-        PopulateMainPlayer(mainPlayer, (uint32_t)activeQuestId, questLog, titles, titleTiers, playerAgentId, mainGwPlayer, mainProfPtr, skillbars[playerAgentId], mainAttrPtr, mainAgentPtr);
+        PopulateMainPlayer(*mainPlayer, (uint32_t)activeQuestId, questLog, titles, titleTiers, playerAgentId, mainGwPlayer, mainProfPtr, skillbars[playerAgentId], mainAttrPtr, mainAgentPtr);
         return mainPlayer;
     }
 
-    void EnsureInitialized() {
-        GameThreadMutex.lock();
-        if (!initialized) {
-            GW::GameThread::RegisterGameThreadCallback(&GameThreadHook, [&](GW::HookStatus*) {
-                while (!PromiseQueue.empty()) {
-                    auto promise = PromiseQueue.front();
-                    PromiseQueue.pop();
-                    try {
-                        auto payload = GetPayload();
-                        promise->set_value(payload);
-                    }
-                    catch (const std::future_error& e) {
-                        printf("[Main Player Module] Encountered exception: {%s}", e.what());
-                        continue;
-                    }
-                    catch (const std::exception& e) {
-                        printf("[Main Player Module] Encountered exception: {%s}", e.what());
-                        MainPlayer payload;
-                        promise->set_value(payload);
-                    }
-                }
-                });
+    void GetMainPlayer(const httplib::Request&, httplib::Response& res) {
+        MainPlayer* payload = NULL;
+        std::exception* ex = NULL;
+        volatile bool executing = true;
+        GW::GameThread::Enqueue([&res, &executing, &ex, &payload]
+            {
+                try {
+                    payload = GetPayload();
 
-            initialized = true;
+                }
+                catch (std::exception e) {
+                    ex = &e;
+                }
+
+                executing = false;
+            });
+
+        while (executing) {
+            Sleep(4);
         }
 
-        GameThreadMutex.unlock();
-    }
-
-    void GetMainPlayer(const httplib::Request&, httplib::Response& res) {
-        auto response = std::promise<MainPlayer>();
-
-        EnsureInitialized();
-        PromiseQueue.emplace(&response);
-        json responsePayload = response.get_future().get();
-
-        res.set_content(responsePayload.dump(), "text/json");
+        if (payload) {
+            const auto json = static_cast<nlohmann::json>(*payload);
+            const auto dump = json.dump();
+            res.set_content(dump, "text/json");
+            delete(payload);
+        }
+        else if (ex) {
+            printf("[Main Player Module] Encountered exception: {%s}", ex->what());
+            res.set_content(std::format("Encountered exception: {}", ex->what()), "text/plain");
+            res.status = 500;
+        }
     }
 }
