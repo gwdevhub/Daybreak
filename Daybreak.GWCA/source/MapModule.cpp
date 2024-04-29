@@ -8,8 +8,8 @@
 #include <queue>
 
 namespace Daybreak::Modules::MapModule {
-    MapPayload* GetPayload() {
-        auto mapPayload = new MapPayload();
+    MapPayload GetPayload() {
+        MapPayload mapPayload;
         auto isLoaded = GW::Map::GetIsMapLoaded();
         if (!isLoaded) {
             return mapPayload;
@@ -25,29 +25,31 @@ namespace Daybreak::Modules::MapModule {
             return mapPayload;
         }
 
-        mapPayload->Campaign = static_cast<uint32_t>(mapInfo->campaign);
-        mapPayload->Continent = static_cast<uint32_t>(mapInfo->continent);
-        mapPayload->Region = mapInfo->region;
-        mapPayload->InstanceType = (uint32_t)instanceType;
-        mapPayload->IsLoaded = isLoaded;
-        mapPayload->Timer = instanceTime;
-        mapPayload->Id = (uint32_t)mapId;
+        mapPayload.Campaign = static_cast<uint32_t>(mapInfo->campaign);
+        mapPayload.Continent = static_cast<uint32_t>(mapInfo->continent);
+        mapPayload.Region = mapInfo->region;
+        mapPayload.InstanceType = (uint32_t)instanceType;
+        mapPayload.IsLoaded = isLoaded;
+        mapPayload.Timer = instanceTime;
+        mapPayload.Id = (uint32_t)mapId;
 
         return mapPayload;
     }
 
     void GetMapInfo(const httplib::Request&, httplib::Response& res) {
-        MapPayload* payload = NULL;
-        std::exception* ex = NULL;
+        MapPayload payload;
+        std::exception ex;
         volatile bool executing = true;
-        GW::GameThread::Enqueue([&res, &executing, &ex, &payload]
+        volatile bool exception = false;
+        GW::GameThread::Enqueue([&res, &executing, &ex, &payload, &exception]
             {
                 try {
                     payload = GetPayload();
 
                 }
                 catch (std::exception e) {
-                    ex = &e;
+                    ex = e;
+                    exception = true;
                 }
 
                 executing = false;
@@ -57,15 +59,14 @@ namespace Daybreak::Modules::MapModule {
             Sleep(4);
         }
 
-        if (payload) {
-            const auto json = static_cast<nlohmann::json>(*payload);
+        if (!exception) {
+            const auto json = static_cast<nlohmann::json>(payload);
             const auto dump = json.dump();
             res.set_content(dump, "text/json");
-            delete(payload);
         }
-        else if (ex) {
-            printf("[Map Module] Encountered exception: {%s}", ex->what());
-            res.set_content(std::format("Encountered exception: {}", ex->what()), "text/plain");
+        else {
+            printf("[Map Module] Encountered exception: {%s}", ex.what());
+            res.set_content(std::format("Encountered exception: {}", ex.what()), "text/plain");
             res.status = 500;
         }
     }

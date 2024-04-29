@@ -29,8 +29,8 @@ namespace Daybreak::Modules::TitleInfoModule {
         return description;
     }
 
-    TitleInfoPayload* GetPayload(uint32_t id) {
-        auto payload = new TitleInfoPayload();
+    TitleInfoPayload GetPayload(uint32_t id) {
+        TitleInfoPayload payload;
         if (!GW::Map::GetIsMapLoaded()) {
             return payload;
         }
@@ -52,12 +52,12 @@ namespace Daybreak::Modules::TitleInfoModule {
         const auto tiers = &worldContext->title_tiers;
         const auto tier = &tiers->at(tierIndex);
 
-        payload->TitleId = id;
-        payload->TitleTierId = tierIndex;
-        payload->CurrentPoints = title->current_points;
-        payload->PointsNeededNextRank = title->points_needed_next_rank;
-        payload->IsPercentageBased = title->is_percentage_based();
-        payload->CurrentTier = tier->tier_number;
+        payload.TitleId = id;
+        payload.TitleTierId = tierIndex;
+        payload.CurrentPoints = title->current_points;
+        payload.PointsNeededNextRank = title->points_needed_next_rank;
+        payload.IsPercentageBased = title->is_percentage_based();
+        payload.CurrentTier = tier->tier_number;
         return payload;
     }
 
@@ -82,18 +82,20 @@ namespace Daybreak::Modules::TitleInfoModule {
             id = static_cast<uint32_t>(result);
         }
 
-        TitleInfoPayload* payload = NULL;
-        std::wstring* name = NULL;
-        std::exception* ex = NULL;
+        TitleInfoPayload payload;
+        std::wstring* name;
+        std::exception ex;
         volatile bool executing = true;
-        GW::GameThread::Enqueue([&res, &executing, &ex, &payload, &name, &id]
+        volatile bool exception = false;
+        GW::GameThread::Enqueue([&res, &executing, &ex, &payload, &name, &id, &exception]
             {
                 try {
                     payload = GetPayload(id);
                     name = GetAsyncName(id);
                 }
                 catch (std::exception e) {
-                    ex = &e;
+                    ex = e;
+                    exception = true;
                 }
 
                 executing = false;
@@ -105,17 +107,16 @@ namespace Daybreak::Modules::TitleInfoModule {
             Sleep(4);
         }
 
-        if (name && payload) {
-            payload->TitleName = Daybreak::Utils::WStringToString(*name);
-            const auto json = static_cast<nlohmann::json>(*payload);
+        if (name && !exception) {
+            payload.TitleName = Daybreak::Utils::WStringToString(*name);
+            const auto json = static_cast<nlohmann::json>(payload);
             const auto dump = json.dump();
             res.set_content(dump, "text/json");
             delete(name);
-            delete(payload);
         }
-        else if (ex) {
-            printf("[Item Name Module] Encountered exception: {%s}", ex->what());
-            res.set_content(std::format("Encountered exception: {}", ex->what()), "text/plain");
+        else {
+            printf("[Item Name Module] Encountered exception: {%s}", ex.what());
+            res.set_content(std::format("Encountered exception: {}", ex.what()), "text/plain");
             res.status = 500;
         }
     }

@@ -9,10 +9,10 @@
 #include <GWCA/GameEntities/Pathing.h>
 
 namespace Daybreak::Modules::PathingModule {
-    PathingPayload* GetPayload() {
-        auto pathingPayload = new PathingPayload();
-        pathingPayload->Trapezoids.clear();
-        pathingPayload->AdjacencyList.clear();
+    PathingPayload GetPayload() {
+        PathingPayload pathingPayload;
+        pathingPayload.Trapezoids.clear();
+        pathingPayload.AdjacencyList.clear();
         if (!GW::Map::GetIsMapLoaded()) {
             return pathingPayload;
         }
@@ -53,23 +53,25 @@ namespace Daybreak::Modules::PathingModule {
             adjacencyList.push_back(pair.second);
         }
 
-        pathingPayload->Trapezoids = trapezoids;
-        pathingPayload->AdjacencyList = adjacencyList;
+        pathingPayload.Trapezoids = trapezoids;
+        pathingPayload.AdjacencyList = adjacencyList;
         return pathingPayload;
     }
 
     void GetPathingData(const httplib::Request&, httplib::Response& res) {
-        PathingPayload* payload = NULL;
-        std::exception* ex = NULL;
+        PathingPayload payload;
+        std::exception ex;
         volatile bool executing = true;
-        GW::GameThread::Enqueue([&res, &executing, &ex, &payload]
+        volatile bool exception = false;
+        GW::GameThread::Enqueue([&res, &executing, &ex, &payload, &exception]
             {
                 try {
                     payload = GetPayload();
 
                 }
                 catch (std::exception e) {
-                    ex = &e;
+                    ex = e;
+                    exception = true;
                 }
 
                 executing = false;
@@ -79,15 +81,14 @@ namespace Daybreak::Modules::PathingModule {
             Sleep(4);
         }
 
-        if (payload) {
-            const auto json = static_cast<nlohmann::json>(*payload);
+        if (!exception) {
+            const auto json = static_cast<nlohmann::json>(payload);
             const auto dump = json.dump();
             res.set_content(dump, "text/json");
-            delete(payload);
         }
-        else if (ex) {
-            printf("[Pathing Module] Encountered exception: {%s}", ex->what());
-            res.set_content(std::format("Encountered exception: {}", ex->what()), "text/plain");
+        else {
+            printf("[Pathing Module] Encountered exception: {%s}", ex.what());
+            res.set_content(std::format("Encountered exception: {}", ex.what()), "text/plain");
             res.status = 500;
         }
     }

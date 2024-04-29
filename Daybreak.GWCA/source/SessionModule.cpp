@@ -10,40 +10,42 @@
 #include <GWCA/Context/WorldContext.h>
 
 namespace Daybreak::Modules::SessionModule {
-    SessionPayload* GetPayload() {
-        auto sessionPayload = new SessionPayload();
-        sessionPayload->MapId = (uint32_t)GW::Map::GetMapID();
-        sessionPayload->InstanceType = (uint32_t)GW::Map::GetInstanceType();
+    SessionPayload GetPayload() {
+        SessionPayload sessionPayload;
+        sessionPayload.MapId = (uint32_t)GW::Map::GetMapID();
+        sessionPayload.InstanceType = (uint32_t)GW::Map::GetInstanceType();
 
         const auto worldContext = GW::GetWorldContext();
         if (!worldContext) {
             return sessionPayload;
         }
 
-        sessionPayload->FoesKilled = worldContext->foes_killed;
-        sessionPayload->FoesToKill = worldContext->foes_to_kill;
+        sessionPayload.FoesKilled = worldContext->foes_killed;
+        sessionPayload.FoesToKill = worldContext->foes_to_kill;
         
         const auto agentContext = GW::GetAgentContext();
         if (!agentContext) {
             return sessionPayload;
         }
 
-        sessionPayload->InstanceTimer = agentContext->instance_timer;
+        sessionPayload.InstanceTimer = agentContext->instance_timer;
         return sessionPayload;
     }
 
     void GetSessionInfo(const httplib::Request&, httplib::Response& res) {
-        SessionPayload* payload = NULL;
-        std::exception* ex = NULL;
+        SessionPayload payload;
+        std::exception ex;
         volatile bool executing = true;
-        GW::GameThread::Enqueue([&res, &executing, &ex, &payload]
+        volatile bool exception = false;
+        GW::GameThread::Enqueue([&res, &executing, &ex, &payload, &exception]
             {
                 try {
                     payload = GetPayload();
 
                 }
                 catch (std::exception e) {
-                    ex = &e;
+                    ex = e;
+                    exception = true;
                 }
 
                 executing = false;
@@ -53,15 +55,14 @@ namespace Daybreak::Modules::SessionModule {
             Sleep(4);
         }
 
-        if (payload) {
-            const auto json = static_cast<nlohmann::json>(*payload);
+        if (!exception) {
+            const auto json = static_cast<nlohmann::json>(payload);
             const auto dump = json.dump();
             res.set_content(dump, "text/json");
-            delete(payload);
         }
-        else if (ex) {
-            printf("[Session Module] Encountered exception: {%s}", ex->what());
-            res.set_content(std::format("Encountered exception: {}", ex->what()), "text/plain");
+        else {
+            printf("[Session Module] Encountered exception: {%s}", ex.what());
+            res.set_content(std::format("Encountered exception: {}", ex.what()), "text/plain");
             res.status = 500;
         }
     }

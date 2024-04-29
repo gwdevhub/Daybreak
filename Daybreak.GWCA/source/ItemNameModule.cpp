@@ -90,16 +90,18 @@ namespace Daybreak::Modules::ItemNameModule {
             }
         }
 
-        std::wstring* name = NULL;
-        std::exception* ex = NULL;
+        std::wstring* name;
+        std::exception ex;
         volatile bool executing = true;
-        GW::GameThread::Enqueue([&res, &executing, &ex, &name, &id, &modifiers]
+        volatile bool exception = false;
+        GW::GameThread::Enqueue([&res, &executing, &ex, &name, &id, &modifiers, &exception]
             {
                 try {
                     name = GetAsyncName(id, modifiers);
                 }
                 catch (std::exception e) {
-                    ex = &e;
+                    ex = e;
+                    exception = true;
                 }
 
                 executing = false;
@@ -111,7 +113,7 @@ namespace Daybreak::Modules::ItemNameModule {
             Sleep(4);
         }
 
-        if (name) {
+        if (!exception && name) {
             NamePayload namePayload;
             namePayload.Name = Daybreak::Utils::WStringToString(*name);
             namePayload.Id = id;
@@ -120,9 +122,9 @@ namespace Daybreak::Modules::ItemNameModule {
             res.set_content(dump, "text/json");
             delete(name);
         }
-        else if (ex) {
-            printf("[Item Name Module] Encountered exception: {%s}", ex->what());
-            res.set_content(std::format("Encountered exception: {}", ex->what()), "text/plain");
+        else {
+            printf("[Item Name Module] Encountered exception: {%s}", ex.what());
+            res.set_content(std::format("Encountered exception: {}", ex.what()), "text/plain");
             res.status = 500;
         }
     }

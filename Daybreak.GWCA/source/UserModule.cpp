@@ -10,8 +10,8 @@
 #include <GWCA/Context/WorldContext.h>
 
 namespace Daybreak::Modules::UserModule {
-    UserPayload* GetPayload() {
-        auto userPayload = new UserPayload();
+    UserPayload GetPayload() {
+        UserPayload userPayload;
         auto charContext = GW::GetCharContext();
         auto worldContext = GW::GetWorldContext();
         if (!charContext) {
@@ -22,40 +22,44 @@ namespace Daybreak::Modules::UserModule {
             return userPayload;
         }
 
-        std::string emailstr(64, '\0');
-        auto length = std::wcstombs(&emailstr[0], charContext->player_email, 64);
-        emailstr.resize(length);
-        userPayload->Email = emailstr;
-        userPayload->CurrentKurzickPoints = worldContext->current_kurzick;
-        userPayload->CurrentLuxonPoints = worldContext->current_luxon;
-        userPayload->CurrentImperialPoints = worldContext->current_imperial;
-        userPayload->CurrentBalthazarPoints = worldContext->current_balth;
-        userPayload->CurrentSkillPoints = worldContext->current_skill_points;
-        userPayload->TotalKurzickPoints = worldContext->total_earned_kurzick;
-        userPayload->TotalLuxonPoints = worldContext->total_earned_luxon;
-        userPayload->TotalImperialPoints = worldContext->total_earned_imperial;
-        userPayload->TotalBalthazarPoints = worldContext->total_earned_balth;
-        userPayload->TotalSkillPoints = worldContext->total_earned_skill_points;
-        userPayload->MaxKurzickPoints = worldContext->max_kurzick;
-        userPayload->MaxLuxonPoints = worldContext->max_luxon;
-        userPayload->MaxImperialPoints = worldContext->max_imperial;
-        userPayload->MaxBalthazarPoints = worldContext->max_balth;
+        char emailStr[64];
+        int result = WideCharToMultiByte(CP_UTF8, 0, charContext->player_email, -1, emailStr, sizeof(emailStr), NULL, NULL);
+        if (result == 0) {
+            // handle error, use GetLastError() to get more info
+        }
+        userPayload.Email = emailStr;
+        userPayload.CurrentKurzickPoints = worldContext->current_kurzick;
+        userPayload.CurrentLuxonPoints = worldContext->current_luxon;
+        userPayload.CurrentImperialPoints = worldContext->current_imperial;
+        userPayload.CurrentBalthazarPoints = worldContext->current_balth;
+        userPayload.CurrentSkillPoints = worldContext->current_skill_points;
+        userPayload.TotalKurzickPoints = worldContext->total_earned_kurzick;
+        userPayload.TotalLuxonPoints = worldContext->total_earned_luxon;
+        userPayload.TotalImperialPoints = worldContext->total_earned_imperial;
+        userPayload.TotalBalthazarPoints = worldContext->total_earned_balth;
+        userPayload.TotalSkillPoints = worldContext->total_earned_skill_points;
+        userPayload.MaxKurzickPoints = worldContext->max_kurzick;
+        userPayload.MaxLuxonPoints = worldContext->max_luxon;
+        userPayload.MaxImperialPoints = worldContext->max_imperial;
+        userPayload.MaxBalthazarPoints = worldContext->max_balth;
 
         return userPayload;
     }
 
     void GetUserInfo(const httplib::Request&, httplib::Response& res) {
-        UserPayload* payload = NULL;
-        std::exception* ex = NULL;
+        UserPayload payload;
+        std::exception ex;
         volatile bool executing = true;
-        GW::GameThread::Enqueue([&res, &executing, &ex, &payload]
+        volatile bool exception = false;
+        GW::GameThread::Enqueue([&res, &executing, &ex, &payload, &exception]
             {
                 try {
                     payload = GetPayload();
 
                 }
                 catch (std::exception e) {
-                    ex = &e;
+                    ex = e;
+                    exception = true;
                 }
 
                 executing = false;
@@ -65,15 +69,14 @@ namespace Daybreak::Modules::UserModule {
             Sleep(4);
         }
 
-        if (payload) {
-            const auto json = static_cast<nlohmann::json>(*payload);
+        if (!exception) {
+            const auto json = static_cast<nlohmann::json>(payload);
             const auto dump = json.dump();
             res.set_content(dump, "text/json");
-            delete(payload);
         }
-        else if (ex) {
-            printf("[Game Module] Encountered exception: {%s}", ex->what());
-            res.set_content(std::format("Encountered exception: {}", ex->what()), "text/plain");
+        else {
+            printf("[User Module] Encountered exception: {%s}", ex.what());
+            res.set_content(std::format("Encountered exception: {}", ex.what()), "text/plain");
             res.status = 500;
         }
     }
