@@ -9,8 +9,8 @@
 #include <GWCA/Context/AgentContext.h>
 #include <GWCA/Context/WorldContext.h>
 
-namespace Daybreak::Modules::SessionModule {
-    SessionPayload GetPayload() {
+namespace Daybreak::Modules {
+    std::optional<SessionPayload> SessionModule::GetPayload(const uint32_t) {
         SessionPayload sessionPayload;
         sessionPayload.MapId = (uint32_t)GW::Map::GetMapID();
         sessionPayload.InstanceType = (uint32_t)GW::Map::GetInstanceType();
@@ -32,38 +32,13 @@ namespace Daybreak::Modules::SessionModule {
         return sessionPayload;
     }
 
-    void GetSessionInfo(const httplib::Request&, httplib::Response& res) {
-        SessionPayload payload;
-        std::exception ex;
-        volatile bool executing = true;
-        volatile bool exception = false;
-        GW::GameThread::Enqueue([&res, &executing, &ex, &payload, &exception]
-            {
-                try {
-                    payload = GetPayload();
+    std::string SessionModule::ApiUri()
+    {
+        return "/session";
+    }
 
-                }
-                catch (std::exception e) {
-                    ex = e;
-                    exception = true;
-                }
-
-                executing = false;
-            });
-
-        while (executing) {
-            Sleep(4);
-        }
-
-        if (!exception) {
-            const auto json = static_cast<nlohmann::json>(payload);
-            const auto dump = json.dump();
-            res.set_content(dump, "text/json");
-        }
-        else {
-            printf("[Session Module] Encountered exception: {%s}", ex.what());
-            res.set_content(std::format("Encountered exception: {}", ex.what()), "text/plain");
-            res.status = 500;
-        }
+    std::optional<uint32_t> SessionModule::GetContext(const httplib::Request& req, httplib::Response& res)
+    {
+        return NULL;
     }
 }

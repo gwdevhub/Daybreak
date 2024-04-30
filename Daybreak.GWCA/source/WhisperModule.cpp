@@ -7,20 +7,28 @@
 #include <string>
 #include <Utils.h>
 
-namespace Daybreak::Modules::WhisperModule {
-    void PostMessage(std::wstring message) {
+namespace Daybreak::Modules {
+    std::optional<bool> WhisperModule::GetPayload(std::wstring message) {
         if (!GW::Map::GetIsMapLoaded()) {
-            return;
+            return std::optional<bool>();
         }
 
         GW::Chat::WriteChat(GW::Chat::CHANNEL_WHISPER, message.c_str(), L"Daybreak", false);
+        return true;
     }
 
-    void PostWhisper(const httplib::Request& req, httplib::Response& res) {
+    std::string WhisperModule::ApiUri()
+    {
+        return "/whisper";
+    }
+
+    std::optional<std::wstring> WhisperModule::GetContext(const httplib::Request& req, httplib::Response& res)
+    {
         auto wMessage = Utils::StringToWString(req.body);
-        GW::GameThread::Enqueue([&res, wMessage]
-            {
-                PostMessage(wMessage);
-            });
+        return wMessage;
+    }
+
+    std::tuple<std::string, std::string> WhisperModule::ReturnPayload(bool) {
+        return std::make_tuple("", "text/plain");
     }
 }

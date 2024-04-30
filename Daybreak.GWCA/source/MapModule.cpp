@@ -7,8 +7,8 @@
 #include <json.hpp>
 #include <queue>
 
-namespace Daybreak::Modules::MapModule {
-    MapPayload GetPayload() {
+namespace Daybreak::Modules {
+    std::optional<MapPayload> MapModule::GetPayload(const uint32_t) {
         MapPayload mapPayload;
         auto isLoaded = GW::Map::GetIsMapLoaded();
         if (!isLoaded) {
@@ -36,38 +36,13 @@ namespace Daybreak::Modules::MapModule {
         return mapPayload;
     }
 
-    void GetMapInfo(const httplib::Request&, httplib::Response& res) {
-        MapPayload payload;
-        std::exception ex;
-        volatile bool executing = true;
-        volatile bool exception = false;
-        GW::GameThread::Enqueue([&res, &executing, &ex, &payload, &exception]
-            {
-                try {
-                    payload = GetPayload();
+    std::string MapModule::ApiUri()
+    {
+        return "/map";
+    }
 
-                }
-                catch (std::exception e) {
-                    ex = e;
-                    exception = true;
-                }
-
-                executing = false;
-            });
-
-        while (executing) {
-            Sleep(4);
-        }
-
-        if (!exception) {
-            const auto json = static_cast<nlohmann::json>(payload);
-            const auto dump = json.dump();
-            res.set_content(dump, "text/json");
-        }
-        else {
-            printf("[Map Module] Encountered exception: {%s}", ex.what());
-            res.set_content(std::format("Encountered exception: {}", ex.what()), "text/plain");
-            res.status = 500;
-        }
+    std::optional<uint32_t> MapModule::GetContext(const httplib::Request& req, httplib::Response& res)
+    {
+        return NULL;
     }
 }

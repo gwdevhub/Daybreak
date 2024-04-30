@@ -2,14 +2,14 @@
 #include "PathingMetadataModule.h"
 #include <GWCA/Managers/GameThreadMgr.h>
 #include <GWCA/Managers/MapMgr.h>
+#include <GWCA/GameEntities/Pathing.h>
 #include <future>
 #include <payloads/PathingMetadataPayload.h>
 #include <json.hpp>
 #include <queue>
-#include <GWCA/GameEntities/Pathing.h>
 
-namespace Daybreak::Modules::PathingMetadataModule {
-    PathingMetadataPayload GetPayload() {
+namespace Daybreak::Modules {
+    std::optional<PathingMetadataPayload> PathingMetadataModule::GetPayload(const uint32_t) {
         PathingMetadataPayload pathingPayload;
         pathingPayload.TrapezoidCount = 0;
         if (!GW::Map::GetIsMapLoaded()) {
@@ -31,38 +31,13 @@ namespace Daybreak::Modules::PathingMetadataModule {
         return pathingPayload;
     }
 
-    void GetPathingMetadata(const httplib::Request&, httplib::Response& res) {
-        PathingMetadataPayload payload;
-        std::exception ex;
-        volatile bool executing = true;
-        volatile bool exception = false;
-        GW::GameThread::Enqueue([&res, &executing, &ex, &payload, &exception]
-            {
-                try {
-                    payload = GetPayload();
+    std::string PathingMetadataModule::ApiUri()
+    {
+        return "/pathing/metadata";
+    }
 
-                }
-                catch (std::exception e) {
-                    ex = e;
-                    exception = true;
-                }
-
-                executing = false;
-            });
-
-        while (executing) {
-            Sleep(4);
-        }
-
-        if (!exception) {
-            const auto json = static_cast<nlohmann::json>(payload);
-            const auto dump = json.dump();
-            res.set_content(dump, "text/json");
-        }
-        else {
-            printf("[Pathing Metadata Module] Encountered exception: {%s}", ex.what());
-            res.set_content(std::format("Encountered exception: {}", ex.what()), "text/plain");
-            res.status = 500;
-        }
+    std::optional<uint32_t> PathingMetadataModule::GetContext(const httplib::Request& req, httplib::Response& res)
+    {
+        return NULL;
     }
 }

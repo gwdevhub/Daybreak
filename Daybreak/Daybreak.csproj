@@ -71,6 +71,9 @@
     <None Include="..\Daybreak.GWCA\bin\$(Configuration)\Daybreak.GWCA.dll" Link="GWCA\Daybreak.GWCA.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\Daybreak.GWCA\bin\$(Configuration)\Daybreak.GWCA.pdb" Link="GWCA\Daybreak.GWCA.pdb" Condition="$(Configuration)==Debug">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <Target Name="AddUserSecrets" BeforeTargets="PrepareForBuild" Condition=" '$(UserSecretsId)' != '' ">

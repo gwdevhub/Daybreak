@@ -8,8 +8,8 @@
 #include <queue>
 #include <GWCA/GameEntities/Pathing.h>
 
-namespace Daybreak::Modules::PathingModule {
-    PathingPayload GetPayload() {
+namespace Daybreak::Modules {
+    std::optional<PathingPayload> PathingModule::GetPayload(const uint32_t) {
         PathingPayload pathingPayload;
         pathingPayload.Trapezoids.clear();
         pathingPayload.AdjacencyList.clear();
@@ -58,38 +58,13 @@ namespace Daybreak::Modules::PathingModule {
         return pathingPayload;
     }
 
-    void GetPathingData(const httplib::Request&, httplib::Response& res) {
-        PathingPayload payload;
-        std::exception ex;
-        volatile bool executing = true;
-        volatile bool exception = false;
-        GW::GameThread::Enqueue([&res, &executing, &ex, &payload, &exception]
-            {
-                try {
-                    payload = GetPayload();
+    std::string PathingModule::ApiUri()
+    {
+        return "/pathing";
+    }
 
-                }
-                catch (std::exception e) {
-                    ex = e;
-                    exception = true;
-                }
-
-                executing = false;
-            });
-
-        while (executing) {
-            Sleep(4);
-        }
-
-        if (!exception) {
-            const auto json = static_cast<nlohmann::json>(payload);
-            const auto dump = json.dump();
-            res.set_content(dump, "text/json");
-        }
-        else {
-            printf("[Pathing Module] Encountered exception: {%s}", ex.what());
-            res.set_content(std::format("Encountered exception: {}", ex.what()), "text/plain");
-            res.status = 500;
-        }
+    std::optional<uint32_t> PathingModule::GetContext(const httplib::Request& req, httplib::Response& res)
+    {
+        return NULL;
     }
 }

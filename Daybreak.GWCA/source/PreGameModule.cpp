@@ -1,14 +1,13 @@
 #include "pch.h"
-#include "MapModule.h"
+#include <PreGameModule.h>
 #include <GWCA/Managers/GameThreadMgr.h>
 #include <GWCA/Managers/MapMgr.h>
 #include <GWCA/Context/PreGameContext.h>
 #include <payloads/PreGamePayload.h>
 #include <json.hpp>
 
-namespace Daybreak::Modules::PreGameModule {
-
-    PreGamePayload GetPayload() {
+namespace Daybreak::Modules {
+    std::optional<PreGamePayload> PreGameModule::GetPayload(const uint32_t) {
         PreGamePayload preGamePayload;
         if (GW::Map::GetIsMapLoaded())
         {
@@ -39,38 +38,13 @@ namespace Daybreak::Modules::PreGameModule {
         return preGamePayload;
     }
 
-    void GetPreGameInfo(const httplib::Request&, httplib::Response& res) {
-        PreGamePayload payload;
-        std::exception ex;
-        volatile bool executing = true;
-        volatile bool exception = false;
-        GW::GameThread::Enqueue([&res, &executing, &ex, &payload, &exception]
-            {
-                try {
-                    payload = GetPayload();
+    std::string PreGameModule::ApiUri()
+    {
+        return "/pregame";
+    }
 
-                }
-                catch (std::exception e) {
-                    ex = e;
-                    exception = true;
-                }
-
-                executing = false;
-            });
-
-        while (executing) {
-            Sleep(4);
-        }
-
-        if (!exception) {
-            const auto json = static_cast<nlohmann::json>(payload);
-            const auto dump = json.dump();
-            res.set_content(dump, "text/json");
-        }
-        else {
-            printf("[Pre Game Module] Encountered exception: {%s}", ex.what());
-            res.set_content(std::format("Encountered exception: {}", ex.what()), "text/plain");
-            res.status = 500;
-        }
+    std::optional<uint32_t> PreGameModule::GetContext(const httplib::Request& req, httplib::Response& res)
+    {
+        return NULL;
     }
 }

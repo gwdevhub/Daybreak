@@ -9,8 +9,8 @@
 #include <GWCA/Context/CharContext.h>
 #include <GWCA/Context/WorldContext.h>
 
-namespace Daybreak::Modules::UserModule {
-    UserPayload GetPayload() {
+namespace Daybreak::Modules {
+    std::optional<UserPayload> UserModule::GetPayload(const uint32_t) {
         UserPayload userPayload;
         auto charContext = GW::GetCharContext();
         auto worldContext = GW::GetWorldContext();
@@ -27,6 +27,7 @@ namespace Daybreak::Modules::UserModule {
         if (result == 0) {
             // handle error, use GetLastError() to get more info
         }
+
         userPayload.Email = emailStr;
         userPayload.CurrentKurzickPoints = worldContext->current_kurzick;
         userPayload.CurrentLuxonPoints = worldContext->current_luxon;
@@ -46,38 +47,13 @@ namespace Daybreak::Modules::UserModule {
         return userPayload;
     }
 
-    void GetUserInfo(const httplib::Request&, httplib::Response& res) {
-        UserPayload payload;
-        std::exception ex;
-        volatile bool executing = true;
-        volatile bool exception = false;
-        GW::GameThread::Enqueue([&res, &executing, &ex, &payload, &exception]
-            {
-                try {
-                    payload = GetPayload();
+    std::string UserModule::ApiUri()
+    {
+        return "/user";
+    }
 
-                }
-                catch (std::exception e) {
-                    ex = e;
-                    exception = true;
-                }
-
-                executing = false;
-            });
-
-        while (executing) {
-            Sleep(4);
-        }
-
-        if (!exception) {
-            const auto json = static_cast<nlohmann::json>(payload);
-            const auto dump = json.dump();
-            res.set_content(dump, "text/json");
-        }
-        else {
-            printf("[User Module] Encountered exception: {%s}", ex.what());
-            res.set_content(std::format("Encountered exception: {}", ex.what()), "text/plain");
-            res.status = 500;
-        }
+    std::optional<uint32_t> UserModule::GetContext(const httplib::Request& req, httplib::Response& res)
+    {
+        return NULL;
     }
 }
