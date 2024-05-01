@@ -2,19 +2,14 @@
 #include "PathingMetadataModule.h"
 #include <GWCA/Managers/GameThreadMgr.h>
 #include <GWCA/Managers/MapMgr.h>
+#include <GWCA/GameEntities/Pathing.h>
 #include <future>
 #include <payloads/PathingMetadataPayload.h>
 #include <json.hpp>
 #include <queue>
-#include <GWCA/GameEntities/Pathing.h>
 
-namespace Daybreak::Modules::PathingMetadataModule {
-    std::queue<std::promise<PathingMetadataPayload>*> PromiseQueue;
-    std::mutex GameThreadMutex;
-    GW::HookEntry GameThreadHook;
-    volatile bool initialized = false;
-
-    PathingMetadataPayload GetPayload() {
+namespace Daybreak::Modules {
+    std::optional<PathingMetadataPayload> PathingMetadataModule::GetPayload(const uint32_t) {
         PathingMetadataPayload pathingPayload;
         pathingPayload.TrapezoidCount = 0;
         if (!GW::Map::GetIsMapLoaded()) {
@@ -36,42 +31,13 @@ namespace Daybreak::Modules::PathingMetadataModule {
         return pathingPayload;
     }
 
-    void EnsureInitialized() {
-        GameThreadMutex.lock();
-        if (!initialized) {
-            GW::GameThread::RegisterGameThreadCallback(&GameThreadHook, [&](GW::HookStatus*) {
-                while (!PromiseQueue.empty()) {
-                    auto promise = PromiseQueue.front();
-                    PromiseQueue.pop();
-                    try {
-                        auto payload = GetPayload();
-                        promise->set_value(payload);
-                    }
-                    catch (const std::future_error& e) {
-                        printf("[Pathing Metadata Module] Encountered exception: {%s}", e.what());
-                        continue;
-                    }
-                    catch (const std::exception& e) {
-                        printf("[Pathing Metadata Module] Encountered exception: {%s}", e.what());
-                        PathingMetadataPayload payload;
-                        promise->set_value(payload);
-                    }
-                }
-                });
-
-            initialized = true;
-        }
-
-        GameThreadMutex.unlock();
+    std::string PathingMetadataModule::ApiUri()
+    {
+        return "/pathing/metadata";
     }
 
-    void GetPathingMetadata(const httplib::Request&, httplib::Response& res) {
-        auto response = std::promise<PathingMetadataPayload>();
-
-        EnsureInitialized();
-        PromiseQueue.emplace(&response);
-        json responsePayload = response.get_future().get();
-
-        res.set_content(responsePayload.dump(), "text/json");
+    std::optional<uint32_t> PathingMetadataModule::GetContext(const httplib::Request& req, httplib::Response& res)
+    {
+        return NULL;
     }
 }

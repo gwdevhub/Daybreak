@@ -7,46 +7,28 @@
 #include <string>
 #include <Utils.h>
 
-namespace Daybreak::Modules::WhisperModule {
-    std::queue<std::wstring> PromiseQueue;
-    std::mutex GameThreadMutex;
-    GW::HookEntry GameThreadHook;
-    volatile bool initialized = false;
-
-    void PostMessage(std::wstring message) {
+namespace Daybreak::Modules {
+    std::optional<bool> WhisperModule::GetPayload(std::wstring message) {
         if (!GW::Map::GetIsMapLoaded()) {
-            return;
+            return std::optional<bool>();
         }
 
         GW::Chat::WriteChat(GW::Chat::CHANNEL_WHISPER, message.c_str(), L"Daybreak", false);
+        return true;
     }
 
-    void EnsureInitialized() {
-        GameThreadMutex.lock();
-        if (!initialized) {
-            GW::GameThread::RegisterGameThreadCallback(&GameThreadHook, [&](GW::HookStatus*) {
-                while (!PromiseQueue.empty()) {
-                    auto message = PromiseQueue.front();
-                    PromiseQueue.pop();
-                    try {
-                        PostMessage(message);
-                    }
-                    catch (const std::exception& e) {
-                        printf("[Whisper Module] Encountered exception: {%s}", e.what());
-                    }
-                }
-                });
-
-            initialized = true;
-        }
-
-        GameThreadMutex.unlock();
+    std::string WhisperModule::ApiUri()
+    {
+        return "/whisper";
     }
 
-    void PostWhisper(const httplib::Request& req, httplib::Response& res) {
-        EnsureInitialized();
+    std::optional<std::wstring> WhisperModule::GetContext(const httplib::Request& req, httplib::Response& res)
+    {
         auto wMessage = Utils::StringToWString(req.body);
-        PromiseQueue.emplace(wMessage);
-        res.set_content("Okay", "text/plain");
+        return wMessage;
+    }
+
+    std::tuple<std::string, std::string> WhisperModule::ReturnPayload(bool) {
+        return std::make_tuple("", "text/plain");
     }
 }

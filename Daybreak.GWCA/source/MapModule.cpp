@@ -7,14 +7,9 @@
 #include <json.hpp>
 #include <queue>
 
-namespace Daybreak::Modules::MapModule {
-    std::queue<std::promise<MapPayload>*> PromiseQueue;
-    std::mutex GameThreadMutex;
-    GW::HookEntry GameThreadHook;
-    volatile bool initialized = false;
-
-    MapPayload GetPayload() {
-        MapPayload mapPayload{};
+namespace Daybreak::Modules {
+    std::optional<MapPayload> MapModule::GetPayload(const uint32_t) {
+        MapPayload mapPayload;
         auto isLoaded = GW::Map::GetIsMapLoaded();
         if (!isLoaded) {
             return mapPayload;
@@ -41,42 +36,13 @@ namespace Daybreak::Modules::MapModule {
         return mapPayload;
     }
 
-    void EnsureInitialized() {
-        GameThreadMutex.lock();
-        if (!initialized) {
-            GW::GameThread::RegisterGameThreadCallback(&GameThreadHook, [&](GW::HookStatus*) {
-                while (!PromiseQueue.empty()) {
-                    auto promise = PromiseQueue.front();
-                    PromiseQueue.pop();
-                    try {
-                        auto payload = GetPayload();
-                        promise->set_value(payload);
-                    }
-                    catch (const std::future_error& e) {
-                        printf("[Map Module] Encountered exception: {%s}", e.what());
-                        continue;
-                    }
-                    catch (const std::exception& e) {
-                        printf("[Map Module] Encountered exception: {%s}", e.what());
-                        MapPayload payload;
-                        promise->set_value(payload);
-                    }
-                }
-                });
-
-            initialized = true;
-        }
-
-        GameThreadMutex.unlock();
+    std::string MapModule::ApiUri()
+    {
+        return "/map";
     }
 
-    void GetMapInfo(const httplib::Request&, httplib::Response& res) {
-        auto response = std::promise<MapPayload>();
-
-        EnsureInitialized();
-        PromiseQueue.emplace(&response);
-        json responsePayload = response.get_future().get();
-
-        res.set_content(responsePayload.dump(), "text/json");
+    std::optional<uint32_t> MapModule::GetContext(const httplib::Request& req, httplib::Response& res)
+    {
+        return NULL;
     }
 }

@@ -1,33 +1,36 @@
 #include "pch.h"
-#include "MapModule.h"
+#include <PreGameModule.h>
 #include <GWCA/Managers/GameThreadMgr.h>
 #include <GWCA/Managers/MapMgr.h>
-#include <future>
+#include <GWCA/Context/PreGameContext.h>
 #include <payloads/PreGamePayload.h>
 #include <json.hpp>
-#include <GWCA/Context/PreGameContext.h>
 
-namespace Daybreak::Modules::PreGameModule {
-
-    PreGamePayload GetPayload() {
+namespace Daybreak::Modules {
+    std::optional<PreGamePayload> PreGameModule::GetPayload(const uint32_t) {
         PreGamePayload preGamePayload;
-        if (GW::Map::GetIsMapLoaded()) {
+        if (GW::Map::GetIsMapLoaded())
+        {
             preGamePayload.Characters.clear();
             preGamePayload.ChosenCharacterIndex = 0;
             return preGamePayload;
         }
 
         const auto context = GW::GetPreGameContext();
-        if (!context) {
+        if (!context) 
+        {
             return preGamePayload;
         }
 
-        for (const auto& loginChar : context->chars) {
+        for (const auto& loginChar : context->chars)
+        {
             char charName[20];
             int result = WideCharToMultiByte(CP_UTF8, 0, loginChar.character_name, -1, charName, sizeof(charName), NULL, NULL);
-            if (result == 0) {
+            if (result == 0)
+            {
                 // handle error, use GetLastError() to get more info
             }
+
             preGamePayload.Characters.emplace_back(charName);
         }
 
@@ -35,11 +38,13 @@ namespace Daybreak::Modules::PreGameModule {
         return preGamePayload;
     }
 
-    void GetPreGameInfo(const httplib::Request&, httplib::Response& res) {
-        GW::GameThread::Enqueue([&res] {
-            const auto payload = GetPayload();
-            const auto ret_json = static_cast<json>(payload);
-            res.set_content(ret_json, "text/json");
-        });
+    std::string PreGameModule::ApiUri()
+    {
+        return "/pregame";
+    }
+
+    std::optional<uint32_t> PreGameModule::GetContext(const httplib::Request& req, httplib::Response& res)
+    {
+        return NULL;
     }
 }

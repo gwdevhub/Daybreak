@@ -9,13 +9,8 @@
 #include <queue>
 #include "Utils.h"
 
-namespace Daybreak::Modules::LoginModule {
-    std::queue<std::promise<LoginPayload>*> PromiseQueue;
-    std::mutex GameThreadMutex;
-    GW::HookEntry GameThreadHook;
-    volatile bool initialized = false;
-
-    LoginPayload GetPayload() {
+namespace Daybreak::Modules {
+    std::optional<LoginPayload> LoginModule::GetPayload(const uint32_t) {
         const auto context = GW::GetCharContext();
         LoginPayload loginPayload;
         if (!context) {
@@ -30,42 +25,12 @@ namespace Daybreak::Modules::LoginModule {
         return loginPayload;
     }
 
-    void EnsureInitialized() {
-        GameThreadMutex.lock();
-        if (!initialized) {
-            GW::GameThread::RegisterGameThreadCallback(&GameThreadHook, [&](GW::HookStatus*) {
-                while (!PromiseQueue.empty()) {
-                    auto promise = PromiseQueue.front();
-                    PromiseQueue.pop();
-                    try {
-                        auto payload = GetPayload();
-                        promise->set_value(payload);
-                    }
-                    catch (const std::future_error& e) {
-                        printf("[Login Module] Encountered exception: {%s}", e.what());
-                        continue;
-                    }
-                    catch (const std::exception& e) {
-                        printf("[Login Module] Encountered exception: {%s}", e.what());
-                        LoginPayload payload;
-                        promise->set_value(payload);
-                    }
-                }
-            });
-
-            initialized = true;
-        }
-
-        GameThreadMutex.unlock();
+    std::optional<uint32_t> LoginModule::GetContext(const httplib::Request& req, httplib::Response& res) {
+        return 0;
     }
 
-    void GetLoginInfo(const httplib::Request&, httplib::Response& res) {
-        auto response = std::promise<LoginPayload>();
-
-        EnsureInitialized();
-        PromiseQueue.emplace(&response);
-        json responsePayload = response.get_future().get();
-
-        res.set_content(responsePayload.dump(), "text/json");
+    std::string LoginModule::ApiUri()
+    {
+        return "/login";
     }
 }
