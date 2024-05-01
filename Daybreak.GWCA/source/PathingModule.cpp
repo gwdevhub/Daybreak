@@ -8,13 +8,8 @@
 #include <queue>
 #include <GWCA/GameEntities/Pathing.h>
 
-namespace Daybreak::Modules::PathingModule {
-    std::queue<std::promise<PathingPayload>*> PromiseQueue;
-    std::mutex GameThreadMutex;
-    GW::HookEntry GameThreadHook;
-    volatile bool initialized = false;
-
-    PathingPayload GetPayload() {
+namespace Daybreak::Modules {
+    std::optional<PathingPayload> PathingModule::GetPayload(const uint32_t) {
         PathingPayload pathingPayload;
         pathingPayload.Trapezoids.clear();
         pathingPayload.AdjacencyList.clear();
@@ -63,42 +58,13 @@ namespace Daybreak::Modules::PathingModule {
         return pathingPayload;
     }
 
-    void EnsureInitialized() {
-        GameThreadMutex.lock();
-        if (!initialized) {
-            GW::GameThread::RegisterGameThreadCallback(&GameThreadHook, [&](GW::HookStatus*) {
-                while (!PromiseQueue.empty()) {
-                    auto promise = PromiseQueue.front();
-                    PromiseQueue.pop();
-                    try {
-                        auto payload = GetPayload();
-                        promise->set_value(payload);
-                    }
-                    catch (const std::future_error& e) {
-                        printf("[Pathing Module] Encountered exception: {%s}", e.what());
-                        continue;
-                    }
-                    catch (const std::exception& e) {
-                        printf("[Pathing Module] Encountered exception: {%s}", e.what());
-                        PathingPayload payload;
-                        promise->set_value(payload);
-                    }
-                }
-                });
-
-            initialized = true;
-        }
-
-        GameThreadMutex.unlock();
+    std::string PathingModule::ApiUri()
+    {
+        return "/pathing";
     }
 
-    void GetPathingData(const httplib::Request&, httplib::Response& res) {
-        auto response = std::promise<PathingPayload>();
-
-        EnsureInitialized();
-        PromiseQueue.emplace(&response);
-        json responsePayload = response.get_future().get();
-
-        res.set_content(responsePayload.dump(), "text/json");
+    std::optional<uint32_t> PathingModule::GetContext(const httplib::Request& req, httplib::Response& res)
+    {
+        return NULL;
     }
 }

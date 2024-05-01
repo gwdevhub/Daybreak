@@ -9,13 +9,8 @@
 #include <GWCA/Context/AgentContext.h>
 #include <GWCA/Context/WorldContext.h>
 
-namespace Daybreak::Modules::SessionModule {
-    std::queue<std::promise<SessionPayload>*> PromiseQueue;
-    std::mutex GameThreadMutex;
-    GW::HookEntry GameThreadHook;
-    volatile bool initialized = false;
-
-    SessionPayload GetPayload() {
+namespace Daybreak::Modules {
+    std::optional<SessionPayload> SessionModule::GetPayload(const uint32_t) {
         SessionPayload sessionPayload;
         sessionPayload.MapId = (uint32_t)GW::Map::GetMapID();
         sessionPayload.InstanceType = (uint32_t)GW::Map::GetInstanceType();
@@ -37,42 +32,13 @@ namespace Daybreak::Modules::SessionModule {
         return sessionPayload;
     }
 
-    void EnsureInitialized() {
-        GameThreadMutex.lock();
-        if (!initialized) {
-            GW::GameThread::RegisterGameThreadCallback(&GameThreadHook, [&](GW::HookStatus*) {
-                while (!PromiseQueue.empty()) {
-                    auto promise = PromiseQueue.front();
-                    PromiseQueue.pop();
-                    try {
-                        auto payload = GetPayload();
-                        promise->set_value(payload);
-                    }
-                    catch (const std::future_error& e) {
-                        printf("[Session Module] Encountered exception: {%s}", e.what());
-                        continue;
-                    }
-                    catch (const std::exception& e) {
-                        printf("[Session Module] Encountered exception: {%s}", e.what());
-                        SessionPayload payload;
-                        promise->set_value(payload);
-                    }
-                }
-                });
-
-            initialized = true;
-        }
-
-        GameThreadMutex.unlock();
+    std::string SessionModule::ApiUri()
+    {
+        return "/session";
     }
 
-    void GetSessionInfo(const httplib::Request&, httplib::Response& res) {
-        auto response = std::promise<SessionPayload>();
-
-        EnsureInitialized();
-        PromiseQueue.emplace(&response);
-        json responsePayload = response.get_future().get();
-
-        res.set_content(responsePayload.dump(), "text/json");
+    std::optional<uint32_t> SessionModule::GetContext(const httplib::Request& req, httplib::Response& res)
+    {
+        return NULL;
     }
 }

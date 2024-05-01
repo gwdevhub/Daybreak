@@ -9,13 +9,8 @@
 #include <GWCA/Context/CharContext.h>
 #include <GWCA/Context/WorldContext.h>
 
-namespace Daybreak::Modules::UserModule {
-    std::queue<std::promise<UserPayload>*> PromiseQueue;
-    std::mutex GameThreadMutex;
-    GW::HookEntry GameThreadHook;
-    volatile bool initialized = false;
-
-    UserPayload GetPayload() {
+namespace Daybreak::Modules {
+    std::optional<UserPayload> UserModule::GetPayload(const uint32_t) {
         UserPayload userPayload;
         auto charContext = GW::GetCharContext();
         auto worldContext = GW::GetWorldContext();
@@ -27,10 +22,13 @@ namespace Daybreak::Modules::UserModule {
             return userPayload;
         }
 
-        std::string emailstr(64, '\0');
-        auto length = std::wcstombs(&emailstr[0], charContext->player_email, 64);
-        emailstr.resize(length);
-        userPayload.Email = emailstr;
+        char emailStr[64];
+        int result = WideCharToMultiByte(CP_UTF8, 0, charContext->player_email, -1, emailStr, sizeof(emailStr), NULL, NULL);
+        if (result == 0) {
+            // handle error, use GetLastError() to get more info
+        }
+
+        userPayload.Email = emailStr;
         userPayload.CurrentKurzickPoints = worldContext->current_kurzick;
         userPayload.CurrentLuxonPoints = worldContext->current_luxon;
         userPayload.CurrentImperialPoints = worldContext->current_imperial;
@@ -49,42 +47,13 @@ namespace Daybreak::Modules::UserModule {
         return userPayload;
     }
 
-    void EnsureInitialized() {
-        GameThreadMutex.lock();
-        if (!initialized) {
-            GW::GameThread::RegisterGameThreadCallback(&GameThreadHook, [&](GW::HookStatus*) {
-                while (!PromiseQueue.empty()) {
-                    auto promise = PromiseQueue.front();
-                    PromiseQueue.pop();
-                    try {
-                        auto payload = GetPayload();
-                        promise->set_value(payload);
-                    }
-                    catch (const std::future_error& e) {
-                        printf("[User Module] Encountered exception: {%s}", e.what());
-                        continue;
-                    }
-                    catch (const std::exception& e) {
-                        printf("[User Module] Encountered exception: {%s}", e.what());
-                        UserPayload payload;
-                        promise->set_value(payload);
-                    }
-                }
-                });
-
-            initialized = true;
-        }
-
-        GameThreadMutex.unlock();
+    std::string UserModule::ApiUri()
+    {
+        return "/user";
     }
 
-    void GetUserInfo(const httplib::Request&, httplib::Response& res) {
-        auto response = std::promise<UserPayload>();
-
-        EnsureInitialized();
-        PromiseQueue.emplace(&response);
-        json responsePayload = response.get_future().get();
-
-        res.set_content(responsePayload.dump(), "text/json");
+    std::optional<uint32_t> UserModule::GetContext(const httplib::Request& req, httplib::Response& res)
+    {
+        return NULL;
     }
 }

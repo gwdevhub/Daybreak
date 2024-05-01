@@ -16,94 +16,20 @@
 #include <limits>
 #include "Utils.h"
 
-namespace Daybreak::Modules::EntityNameModule {
-    std::vector<std::tuple<uint32_t, std::promise<NamePayload>*, std::wstring*>> WaitingList;
-    std::queue<std::tuple<uint32_t, std::promise<NamePayload>>*> PromiseQueue;
-    std::mutex GameThreadMutex;
-    GW::HookEntry GameThreadHook;
-    volatile bool initialized = false;
-
-    std::wstring* GetAsyncName(uint32_t id) {
-        NamePayload namePayload;
-        auto agent = GW::Agents::GetAgentByID(id);
-        if (!agent) {
-            return nullptr;
-        }
-
-        auto agentLiving = agent->GetAsAgentLiving();
-        if (!agentLiving) {
-            return nullptr;
-        }
-
-        auto name = new std::wstring();
-        if (!GW::Agents::AsyncGetAgentName(agentLiving, *name)) {
-            delete(name);
-            return nullptr;
-        }
-
-        return name;
+namespace Daybreak::Modules {
+    std::string EntityNameModule::ApiUri()
+    {
+        return "/entities/name";
     }
 
-    void EnsureInitialized() {
-        GameThreadMutex.lock();
-        if (!initialized) {
-            GW::GameThread::RegisterGameThreadCallback(&GameThreadHook, [&](GW::HookStatus*) {
-                while (!PromiseQueue.empty()) {
-                    auto promiseRequest = PromiseQueue.front();
-                    std::promise<NamePayload> &promise = std::get<1>(*promiseRequest);
-                    uint32_t id = std::get<0>(*promiseRequest);
-                    PromiseQueue.pop();
-                    try {
-                        auto name = GetAsyncName(id);
-                        if (!name) {
-                            continue;
-                        }
-
-                        WaitingList.emplace_back(id, &promise, name);
-                    }
-                    catch (const std::future_error& e) {
-                        printf("[Entity Name Module] Encountered exception: {%s}", e.what());
-                        continue;
-                    }
-                    catch (const std::exception& e) {
-                        printf("[Entity Name Module] Encountered exception: {%s}", e.what());
-                        NamePayload payload;
-                        promise.set_value(payload);
-                    }
-                }
-
-                for (auto i = 0U; i < WaitingList.size(); ) {
-                    auto item = &WaitingList[i];
-                    auto name = std::get<2>(*item);
-                    if (name->empty()) {
-                        i++;
-                        continue;
-                    }
-
-                    auto promise = std::get<1>(*item);
-                    auto id = std::get<0>(*item);
-                    WaitingList.erase(WaitingList.begin() + i);
-                    NamePayload payload;
-                    payload.Id = id;
-                    payload.Name = Daybreak::Utils::WStringToString(*name);
-                    delete(name);
-                    promise->set_value(payload);
-                }
-                });
-
-            initialized = true;
-        }
-
-        GameThreadMutex.unlock();
-    }
-
-    void GetName(const httplib::Request& req, httplib::Response& res) {
+    std::optional<uint32_t> EntityNameModule::GetContext(const httplib::Request& req, httplib::Response& res)
+    {
         uint32_t id = 0;
         auto it = req.params.find("id");
         if (it == req.params.end()) {
             res.status = 400;
             res.set_content("Missing id parameter", "text/plain");
-            return;
+            return std::optional<uint32_t>();
         }
         else {
             auto idStr = it->second;
@@ -112,20 +38,42 @@ namespace Daybreak::Modules::EntityNameModule {
             if (pos != idStr.size()) {
                 res.status = 400;
                 res.set_content("Invalid id parameter", "text/plain");
-                return;
+                return std::optional<uint32_t>();
             }
 
             id = static_cast<uint32_t>(result);
         }
 
-        auto response = std::tuple<uint32_t, std::promise<NamePayload>>();
-        std::get<0>(response) = id;
-        std::promise<NamePayload>& promise = std::get<1>(response);
+        return id;
+    }
 
-        EnsureInitialized();
-        PromiseQueue.emplace(&response);
+    std::optional<NamePayload> EntityNameModule::GetPayload(const uint32_t context)
+    {
+        NamePayload namePayload;
+        auto agent = GW::Agents::GetAgentByID(context);
+        if (!agent) {
+            return std::optional<NamePayload>();
+        }
 
-        json responsePayload = promise.get_future().get();
-        res.set_content(responsePayload.dump(), "text/json");
+        auto agentLiving = agent->GetAsAgentLiving();
+        if (!agentLiving) {
+            return std::optional<NamePayload>();
+        }
+
+        if (!GW::Agents::AsyncGetAgentName(agentLiving, this->name)) {
+            return std::optional<NamePayload>();
+        }
+
+        namePayload.Id = context;
+        return namePayload;
+    }
+
+    bool EntityNameModule::CanReturn(const httplib::Request& req, httplib::Response& res, const NamePayload& payload) {
+        return !name.empty();
+    }
+
+    std::tuple<std::string, std::string> EntityNameModule::ReturnPayload(NamePayload payload) {
+        payload.Name = Daybreak::Utils::WStringToString(this->name);
+        return std::make_tuple(static_cast<json>(payload).dump(), "application/json");
     }
 }

@@ -58,24 +58,40 @@ static DWORD WINAPI StartHttpServer(LPVOID)
     // This is a new thread so you should only initialize GWCA and setup the hook on the game thread.
     // When the game thread hook is setup (i.e. SetRenderCallback), you should do the next operations
     // on the game from within the game thread.
+    const auto titleInfoModule = new Daybreak::Modules::TitleInfoModule();
+    const auto entityNameModule = new Daybreak::Modules::EntityNameModule();
+    const auto gameModule = new Daybreak::Modules::GameModule();
+    const auto gameStateModule = new Daybreak::Modules::GameStateModule();
+    const auto inventoryModule = new Daybreak::Modules::InventoryModule();
+    const auto itemNameModule = new Daybreak::Modules::ItemNameModule();
+    const auto loginModule = new Daybreak::Modules::LoginModule();
+    const auto mainPlayerModule = new Daybreak::Modules::MainPlayerModule();
+    const auto mapModule = new Daybreak::Modules::MapModule();
+    const auto pathingMetadataModule = new Daybreak::Modules::PathingMetadataModule();
+    const auto pathingModule = new Daybreak::Modules::PathingModule();
+    const auto preGameModule = new Daybreak::Modules::PreGameModule();
+    const auto sessionModule = new Daybreak::Modules::SessionModule();
+    const auto userModule = new Daybreak::Modules::UserModule();
+    const auto whisperModule = new Daybreak::Modules::WhisperModule();
+
     http::server::SetLogger(http::ConsoleLogger);
     http::server::Get("/alive", http::modules::HandleAlive);
     http::server::Get("/id", http::modules::HandleProcessId);
-    http::server::Get("/map", Daybreak::Modules::MapModule::GetMapInfo);
-    http::server::Get("/login", Daybreak::Modules::LoginModule::GetLoginInfo);
-    http::server::Get("/pathing/metadata", Daybreak::Modules::PathingMetadataModule::GetPathingMetadata);
-    http::server::Get("/pathing", Daybreak::Modules::PathingModule::GetPathingData);
-    http::server::Get("/pregame", Daybreak::Modules::PreGameModule::GetPreGameInfo);
-    http::server::Get("/user", Daybreak::Modules::UserModule::GetUserInfo);
-    http::server::Get("/game", Daybreak::Modules::GameModule::GetGameInfo);
-    http::server::Get("/inventory", Daybreak::Modules::InventoryModule::GetInventoryInfo);
-    http::server::Get("/game/mainplayer", Daybreak::Modules::MainPlayerModule::GetMainPlayer);
-    http::server::Get("/game/state", Daybreak::Modules::GameStateModule::GetGameStateInfo);
-    http::server::Get("/session", Daybreak::Modules::SessionModule::GetSessionInfo);
-    http::server::Get("/entities/name", Daybreak::Modules::EntityNameModule::GetName);
-    http::server::Get("/items/name", Daybreak::Modules::ItemNameModule::GetName);
-    http::server::Get("/titles/info", Daybreak::Modules::TitleInfoModule::GetTitleInfo);
-    http::server::Post("/whisper", Daybreak::Modules::WhisperModule::PostWhisper);
+    http::server::Get(mapModule->ApiUri(), [&mapModule](const httplib::Request& req, httplib::Response& res) { mapModule->HandleApiCall(req, res); });
+    http::server::Get(loginModule->ApiUri(), [&loginModule](const httplib::Request& req, httplib::Response& res) { loginModule->HandleApiCall(req, res); });
+    http::server::Get(pathingMetadataModule->ApiUri(), [&pathingMetadataModule](const httplib::Request& req, httplib::Response& res) { pathingMetadataModule->HandleApiCall(req, res); });
+    http::server::Get(pathingModule->ApiUri(), [&pathingModule](const httplib::Request& req, httplib::Response& res) { pathingModule->HandleApiCall(req, res); });
+    http::server::Get(preGameModule->ApiUri(), [&preGameModule](const httplib::Request& req, httplib::Response& res) { preGameModule->HandleApiCall(req, res); });
+    http::server::Get(userModule->ApiUri(), [&userModule](const httplib::Request& req, httplib::Response& res) { userModule->HandleApiCall(req, res); });
+    http::server::Get(gameModule->ApiUri(), [&gameModule](const httplib::Request& req, httplib::Response& res) { gameModule->HandleApiCall(req, res); });
+    http::server::Get(inventoryModule->ApiUri(), [&inventoryModule](const httplib::Request& req, httplib::Response& res) { inventoryModule->HandleApiCall(req, res); });
+    http::server::Get(mainPlayerModule->ApiUri(), [&mainPlayerModule](const httplib::Request& req, httplib::Response& res) { mainPlayerModule->HandleApiCall(req, res); });
+    http::server::Get(gameStateModule->ApiUri(), [&gameStateModule](const httplib::Request& req, httplib::Response& res) { gameStateModule->HandleApiCall(req, res); });
+    http::server::Get(sessionModule->ApiUri(), [&sessionModule](const httplib::Request& req, httplib::Response& res) { sessionModule->HandleApiCall(req, res); });
+    http::server::Get(entityNameModule->ApiUri(), [&entityNameModule](const httplib::Request& req, httplib::Response& res) { entityNameModule->HandleApiCall(req, res); });
+    http::server::Get(itemNameModule->ApiUri(), [&itemNameModule](const httplib::Request& req, httplib::Response& res) { itemNameModule->HandleApiCall(req, res); });
+    http::server::Get(titleInfoModule->ApiUri(), [&titleInfoModule](const httplib::Request& req, httplib::Response& res) { titleInfoModule->HandleApiCall(req, res); });
+    http::server::Post(whisperModule->ApiUri(), [&whisperModule](const httplib::Request& req, httplib::Response& res) { whisperModule->HandleApiCall(req, res); });
     http::server::StartServer();
     return 0;
 }
