@@ -328,6 +328,8 @@ internal static class NativeMethods
         ExtendedStartupInfoPresent = 0x00080000
     }
 
+    public delegate bool Win32Callback(IntPtr hwnd, IntPtr lParam);
+
     public const int WM_SYSCOMMAND = 0x112;
 
     [DllImport("kernel32.dll", SetLastError = true)]
@@ -467,4 +469,10 @@ internal static class NativeMethods
         IntPtr lpBuffer,
         int nSize,
         out IntPtr lpNumberOfBytesRead);
+    [DllImport("user32.dll")]
+    public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
+    [DllImport("user32.Dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool EnumChildWindows(IntPtr parentHandle, Win32Callback callback, IntPtr lParam);
 }
