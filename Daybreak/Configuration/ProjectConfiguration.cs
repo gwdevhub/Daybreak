@@ -84,8 +84,6 @@ using Daybreak.Services.SevenZip;
 using Daybreak.Services.ReShade.Notifications;
 using Daybreak.Services.UBlockOrigin;
 using Daybreak.Services.Browser;
-using Daybreak.Services.PriceChecker;
-using Daybreak.Services.PriceChecker.Models;
 using Daybreak.Services.ApplicationArguments;
 using Daybreak.Services.ApplicationArguments.ArgumentHandling;
 
@@ -267,7 +265,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<ILaunchConfigurationService, LaunchConfigurationService>();
         services.AddScoped<IBrowserHistoryManager, BrowserHistoryManager>();
         services.AddScoped<IEventService, EventService>();
-        services.AddScoped<IPriceCheckerService, PriceCheckerService>();
         services.AddScoped<IApplicationArgumentService, ApplicationArgumentService>();
         services.AddScoped<IArgumentHandlerProducer, IApplicationArgumentService>(sp => sp.GetRequiredService<IApplicationArgumentService>());
     }
@@ -433,7 +430,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         optionsProducer.RegisterOptions<ScreenManagerOptions>();
         optionsProducer.RegisterOptions<KamadanTradeChatOptions>();
         optionsProducer.RegisterOptions<AscalonTradeChatOptions>();
-        optionsProducer.RegisterOptions<PriceCheckerOptions>();
         optionsProducer.RegisterOptions<LoggingOptions>();
         optionsProducer.RegisterOptions<PriceHistoryOptions>();
         optionsProducer.RegisterOptions<TraderQuotesOptions>();
@@ -490,6 +486,5 @@ public class ProjectConfiguration : PluginConfigurationBase
         this.RegisterLiteCollection<TraderQuoteDTO, PriceHistoryOptions>(services);
         this.RegisterLiteCollection<NotificationDTO, NotificationStorageOptions>(services);
         this.RegisterLiteCollection<TraderMessageDTO, TraderMessagesOptions>(services);
-        this.RegisterLiteCollection<PriceCheckDTO, PriceCheckerOptions>(services);
     }
 }
