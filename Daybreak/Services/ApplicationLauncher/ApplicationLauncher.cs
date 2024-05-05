@@ -30,9 +30,11 @@ namespace Daybreak.Services.ApplicationLauncher;
 
 internal sealed class ApplicationLauncher : IApplicationLauncher
 {
-    private const int MaxRetries = 10;
     private const string ProcessName = "gw";
     private const string ArenaNetMutex = "AN-Mute";
+    private const double LaunchMemoryThreshold = 200000000;
+
+    private static readonly TimeSpan LaunchTimeout = TimeSpan.FromMinutes(1);
 
     private readonly INotificationService notificationService;
     private readonly ILiveOptions<LauncherOptions> launcherOptions;
@@ -317,19 +319,14 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
             CloseHandle(clientHandle);
         }
 
-        var retries = 0;
-        while (retries < MaxRetries)
+        var sw = Stopwatch.StartNew();
+        while (sw.Elapsed.TotalSeconds < LaunchTimeout.TotalSeconds)
         {
-            await Task.Delay(1000);
-            retries++;
+            await Task.Delay(16);
             var gwProcess = Process.GetProcessesByName("gw").FirstOrDefault();
-            if (gwProcess is null && retries < MaxRetries)
+            if (gwProcess is null)
             {
                 continue;
-            }
-            else if (gwProcess is null && retries >= MaxRetries)
-            {
-                throw new InvalidOperationException("Newly launched gw process not detected");
             }
 
             if (gwProcess!.MainWindowHandle == IntPtr.Zero)
@@ -337,11 +334,27 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
                 continue;
             }
 
-            int titleLength = NativeMethods.GetWindowTextLength(gwProcess.MainWindowHandle);
-            var titleBuffer = new StringBuilder(titleLength);
-            var readCount = NativeMethods.GetWindowText(gwProcess.MainWindowHandle, titleBuffer, titleLength + 1);
-            var title = titleBuffer.ToString();
-            if (title != "Guild Wars")
+            var windows = GetRootWindowsOfProcess(gwProcess.Id)
+                .Select(root => (root, GetChildWindows(root)))
+                .SelectMany(tuple =>
+                {
+                    tuple.Item2.Add(tuple.root);
+                    return tuple.Item2;
+                })
+                .Select(GetWindowTitle).ToList();
+
+            /*
+             * Detect when the game window has shown. Because both the updater and the game window are called Guild Wars,
+             * we need to look at the other windows created by the process. Especially, we need to detect the input windows
+             * to check when the game is ready to accept input
+             */
+            if (!windows.Contains("Guild Wars"))
+            {
+                continue;
+            }
+
+            var virtualMemory = gwProcess.VirtualMemorySize64;
+            if (virtualMemory < LaunchMemoryThreshold)
             {
                 continue;
             }
@@ -349,6 +362,15 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
             var windowInfo = new NativeMethods.WindowInfo(true);
             NativeMethods.GetWindowInfo(gwProcess.MainWindowHandle, ref windowInfo);
             if (windowInfo.rcWindow.Width == 0 || windowInfo.rcWindow.Height == 0)
+            {
+                continue;
+            }
+
+            /*
+             * GW loads more than 110 modules when it starts properly. If there are less than
+             * 110 modules, GW probably has failed to start or has not started yet
+             */
+            if (gwProcess.Modules.Count < 110)
             {
                 continue;
             }
@@ -726,5 +748,59 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
         };
 
         return peb.ImageBaseAddress + 0x1000;
+    }
+
+    private static List<IntPtr> GetRootWindowsOfProcess(int pid)
+    {
+        var rootWindows = GetChildWindows(IntPtr.Zero);
+        var dsProcRootWindows = new List<IntPtr>();
+        foreach (IntPtr hWnd in rootWindows)
+        {
+            _ = GetWindowThreadProcessId(hWnd, out var lpdwProcessId);
+            if (lpdwProcessId == pid)
+                dsProcRootWindows.Add(hWnd);
+        }
+
+        return dsProcRootWindows;
+    }
+
+    private static List<IntPtr> GetChildWindows(IntPtr parent)
+    {
+        var result = new List<IntPtr>();
+        var listHandle = GCHandle.Alloc(result);
+        try
+        {
+            Win32Callback childProc = new Win32Callback(EnumWindow);
+            EnumChildWindows(parent, childProc, GCHandle.ToIntPtr(listHandle));
+        }
+        finally
+        {
+            if (listHandle.IsAllocated)
+                listHandle.Free();
+        }
+
+        return result;
+    }
+
+    private static string GetWindowTitle(IntPtr hwnd)
+    {
+        var titleLength = NativeMethods.GetWindowTextLength(hwnd);
+        var titleBuffer = new StringBuilder(titleLength);
+        _ = NativeMethods.GetWindowText(hwnd, titleBuffer, titleLength + 1);
+        var title = titleBuffer.ToString();
+
+        return title;
+    }
+
+    private static bool EnumWindow(IntPtr handle, IntPtr pointer)
+    {
+        var gch = GCHandle.FromIntPtr(pointer);
+        if (gch.Target is not List<IntPtr> list)
+        {
+            return false;
+        }
+
+        list.Add(handle);
+        return true;
     }
 }
