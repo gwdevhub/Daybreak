@@ -322,7 +322,7 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
         var sw = Stopwatch.StartNew();
         while (sw.Elapsed.TotalSeconds < LaunchTimeout.TotalSeconds)
         {
-            await Task.Delay(16);
+            await Task.Delay(500);
             var gwProcess = Process.GetProcessesByName("gw").FirstOrDefault();
             if (gwProcess is null)
             {
