@@ -10,7 +10,6 @@ using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Experience;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Notifications;
-using Daybreak.Services.PriceChecker;
 using Daybreak.Services.Scanner;
 using Daybreak.Services.Screens;
 using Daybreak.Views.Trade;
@@ -48,7 +47,6 @@ public partial class FocusView : UserControl
     private static readonly TimeSpan InventoryDataFrequency = TimeSpan.FromSeconds(1);
     private static readonly TimeSpan CartoDataFrequency = TimeSpan.FromSeconds(1);
 
-    private readonly IPriceCheckerService priceCheckerService;
     private readonly INotificationService notificationService;
     private readonly IBuildTemplateManager buildTemplateManager;
     private readonly IApplicationLauncher applicationLauncher;
@@ -113,7 +111,6 @@ public partial class FocusView : UserControl
     private CancellationTokenSource? cancellationTokenSource;
 
     public FocusView(
-        IPriceCheckerService priceCheckerService,
         INotificationService notificationService,
         IBuildTemplateManager buildTemplateManager,
         IApplicationLauncher applicationLauncher,
@@ -126,7 +123,6 @@ public partial class FocusView : UserControl
         ILiveUpdateableOptions<MinimapWindowOptions> minimapWindowOptions,
         ILogger<FocusView> logger)
     {
-        this.priceCheckerService = priceCheckerService.ThrowIfNull();
         this.notificationService = notificationService.ThrowIfNull();
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
         this.applicationLauncher = applicationLauncher.ThrowIfNull();
@@ -773,7 +769,6 @@ public partial class FocusView : UserControl
         this.cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = this.cancellationTokenSource.Token;
         await this.guildwarsMemoryCache.EnsureInitialized(context, cancellationToken);
-        _ = Task.Run(() => this.priceCheckerService.CheckForPrices(cancellationToken), cancellationToken);
         this.PeriodicallyReadMainPlayerContextData(cancellationToken);
         if (this.InventoryVisible)
         {
