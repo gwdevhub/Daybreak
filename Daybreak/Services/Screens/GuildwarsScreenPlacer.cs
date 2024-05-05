@@ -2,6 +2,7 @@
 using Daybreak.Models;
 using Daybreak.Services.Scanner;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
@@ -13,7 +14,7 @@ namespace Daybreak.Services.Screens;
 
 internal sealed class GuildwarsScreenPlacer : IGuildwarsScreenPlacer
 {
-    private const int MaxTries = 10;
+    private static readonly TimeSpan Delay = TimeSpan.FromSeconds(5);
 
     private readonly IGuildwarsMemoryCache guildwarsMemoryCache;
     private readonly ILiveUpdateableOptions<LauncherOptions> liveOptions;
@@ -53,18 +54,7 @@ internal sealed class GuildwarsScreenPlacer : IGuildwarsScreenPlacer
             return;
         }
 
-        var tries = 0;
-        while (await this.guildwarsMemoryCache.ReadLoginData(CancellationToken.None) is null)
-        {
-            await Task.Delay(1000, cancellationToken);
-            tries++;
-            if (tries > MaxTries)
-            {
-                this.logger.LogInformation("Failed to detect startup of Guildwars. Cancelling screen placement operation");
-                return;
-            }
-        }
-
+        await Task.Delay(Delay, cancellationToken);
         this.screenManager.MoveGuildwarsToScreen(screen);
         return;
     }
