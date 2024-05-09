@@ -3,9 +3,11 @@ using Daybreak.Models;
 using Daybreak.Models.GWCA;
 using Daybreak.Services.Injection;
 using Daybreak.Services.Notifications;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
+using System.Extensions;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,6 +23,7 @@ internal sealed class GWCAInjector : IGWCAInjector
     private readonly IGWCAClient gwcaClient;
     private readonly IProcessInjector injector;
     private readonly ILiveUpdateableOptions<FocusViewOptions> liveOptions;
+    private readonly ILogger<GWCAInjector> logger;
 
     public bool IsEnabled
     {
@@ -38,12 +41,14 @@ internal sealed class GWCAInjector : IGWCAInjector
         INotificationService notificationService,
         IGWCAClient client,
         IProcessInjector processInjector,
-        ILiveUpdateableOptions<FocusViewOptions> liveOptions)
+        ILiveUpdateableOptions<FocusViewOptions> liveOptions,
+        ILogger<GWCAInjector> logger)
     {
         this.notificationService = notificationService.ThrowIfNull();
         this.gwcaClient = client.ThrowIfNull();
         this.injector = processInjector.ThrowIfNull();
         this.liveOptions = liveOptions.ThrowIfNull();
+        this.logger = logger.ThrowIfNull();
     }
 
     public IEnumerable<string> GetCustomArguments() => Enumerable.Empty<string>();
@@ -60,8 +65,10 @@ internal sealed class GWCAInjector : IGWCAInjector
 
     public async Task OnGuildWarsCreated(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
     {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.OnGuildWarsCreated), applicationLauncherContext.ExecutablePath);
         if (!await this.injector.Inject(applicationLauncherContext.Process, ModulePath, cancellationToken))
         {
+            scopedLogger.LogError("Unable to inject GWCA plugin into Guild Wars. Check above error messages for details");
             this.notificationService.NotifyError(
                     title: "Unable to inject GWCA into Guild Wars process",
                     description: "Daybreak integration with the Guild Wars process will be affected. Some Daybreak functionality might not work");
@@ -70,6 +77,7 @@ internal sealed class GWCAInjector : IGWCAInjector
 
     public async Task OnGuildWarsStarted(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
     {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.OnGuildWarsStarted), applicationLauncherContext.ExecutablePath);
         ConnectionContext? connectionContext = default;
         for(var i = 0; i < MaxRetries; i++)
         {
@@ -84,6 +92,7 @@ internal sealed class GWCAInjector : IGWCAInjector
 
         if (connectionContext is null)
         {
+            scopedLogger.LogError("Unable to create connection context. Unable to connect to created process");
             this.notificationService.NotifyError(
                         title: "Unable to inject GWCA into Guild Wars process",
                         description: "Daybreak integration with the Guild Wars process will be affected. Some Daybreak functionality might not work");
@@ -92,6 +101,7 @@ internal sealed class GWCAInjector : IGWCAInjector
 
         if (await this.gwcaClient.CheckAlive(connectionContext.Value, cancellationToken) is false)
         {
+            scopedLogger.LogError("No response from GWCA plugin when calling CheckAlive");
             this.notificationService.NotifyError(
                     title: "Unable to inject GWCA into Guild Wars process",
                     description: "Daybreak integration with the Guild Wars process will be affected. Some Daybreak functionality might not work");
