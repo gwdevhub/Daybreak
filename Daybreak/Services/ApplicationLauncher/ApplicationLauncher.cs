@@ -2,6 +2,7 @@
 using Daybreak.Exceptions;
 using Daybreak.Models;
 using Daybreak.Models.LaunchConfigurations;
+using Daybreak.Models.Mods;
 using Daybreak.Services.Mods;
 using Daybreak.Services.Mutex;
 using Daybreak.Services.Notifications;
@@ -211,12 +212,13 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
         };
 
         var applicationLauncherContext = new ApplicationLauncherContext { Process = process, ExecutablePath = executable, ProcessId = 0 };
+        var guildWarsStartingDisabledContext = new GuildWarsStartingDisabledContext { ApplicationLauncherContext = applicationLauncherContext };
         foreach(var mod in disabledmods)
         {
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.Value.ModStartupTimeout));
             try
             {
-                await mod.OnGuildWarsStartingDisabled(applicationLauncherContext, cts.Token);
+                await mod.OnGuildWarsStartingDisabled(guildWarsStartingDisabledContext, cts.Token);
             }
             catch (TaskCanceledException)
             {
@@ -235,12 +237,21 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
             }
         }
 
-        foreach(var mod in mods)
+        var guildWarsStartingContext = new GuildWarsStartingContext { ApplicationLauncherContext = applicationLauncherContext, CancelStartup = false };
+        foreach (var mod in mods)
         {
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.Value.ModStartupTimeout));
             try
             {
-                await mod.OnGuildWarsStarting(applicationLauncherContext, cts.Token);
+                await mod.OnGuildWarsStarting(guildWarsStartingContext, cts.Token);
+                if (guildWarsStartingContext.CancelStartup)
+                {
+                    this.logger.LogError($"{mod.Name} canceled startup");
+                    this.notificationService.NotifyError(
+                        title: $"{mod.Name} canceled startup",
+                        description: $"Mod canceled the startup during {nameof(mod.OnGuildWarsStarting)}");
+                    return default;
+                }
             }
             catch (TaskCanceledException)
             {
@@ -287,12 +298,22 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
 
         // Reset launch context with the launched process
         applicationLauncherContext = new ApplicationLauncherContext { ExecutablePath =  executable, Process = process, ProcessId = (uint)pId };
+        var guildWarsCreatedContext = new GuildWarsCreatedContext { ApplicationLauncherContext = applicationLauncherContext, CancelStartup = false };
         foreach (var mod in mods)
         {
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.Value.ModStartupTimeout));
             try
             {
-                await mod.OnGuildWarsCreated(applicationLauncherContext, cts.Token);
+                await mod.OnGuildWarsCreated(guildWarsCreatedContext, cts.Token);
+                if (guildWarsCreatedContext.CancelStartup)
+                {
+                    this.logger.LogError($"{mod.Name} canceled startup");
+                    this.notificationService.NotifyError(
+                        title: $"{mod.Name} canceled startup",
+                        description: $"Mod canceled the startup during {nameof(mod.OnGuildWarsStarting)}");
+                    this.KillGuildWarsProcess(new GuildWarsApplicationLaunchContext { GuildWarsProcess = process, LaunchConfiguration = launchConfigurationWithCredentials, ProcessId = (uint)pId });
+                    return default;
+                }
             }
             catch (TaskCanceledException)
             {
@@ -378,12 +399,13 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
             /*
              * Run the actions one by one, to avoid injection issues
              */
+            var guildWarsStartedContext = new GuildWarsStartedContext { ApplicationLauncherContext = applicationLauncherContext };
             foreach (var mod in mods)
             {
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.Value.ModStartupTimeout));
                 try
                 {
-                    await mod.OnGuildWarsStarted(applicationLauncherContext, cts.Token);
+                    await mod.OnGuildWarsStarted(guildWarsStartedContext, cts.Token);
                 }
                 catch (TaskCanceledException)
                 {

@@ -1,6 +1,7 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Exceptions;
 using Daybreak.Models;
+using Daybreak.Models.Mods;
 using Daybreak.Models.Progress;
 using Daybreak.Services.Injection;
 using Daybreak.Services.Notifications;
@@ -16,7 +17,6 @@ using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -64,13 +64,13 @@ internal sealed class ToolboxService : IToolboxService
         this.logger = logger.ThrowIfNull();
     }
 
-    public Task OnGuildWarsStarting(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task OnGuildWarsStarting(GuildWarsStartingContext guildWarsStartingContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public Task OnGuildWarsStartingDisabled(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task OnGuildWarsStartingDisabled(GuildWarsStartingDisabledContext guildWarsStartingDisabledContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public async Task OnGuildWarsCreated(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
+    public async Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken)
     {
-        await this.LaunchToolbox(applicationLauncherContext.Process, cancellationToken);
+        await this.LaunchToolbox(guildWarsCreatedContext.ApplicationLauncherContext.Process, cancellationToken);
 
         /*
          * Toolbox startup conflicts with Daybreak GWCA integration. Wait some time
@@ -79,12 +79,9 @@ internal sealed class ToolboxService : IToolboxService
         await Task.Delay(TimeSpan.FromSeconds(this.toolboxOptions.Value.StartupDelay), cancellationToken);
     }
 
-    public Task OnGuildWarsStarted(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public IEnumerable<string> GetCustomArguments()
-    {
-        return Enumerable.Empty<string>();
-    }
+    public IEnumerable<string> GetCustomArguments() => [];
 
     public bool LoadToolboxFromUsualLocation()
     {

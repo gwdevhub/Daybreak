@@ -1,4 +1,5 @@
 ﻿using Daybreak.Models;
+using Daybreak.Models.Mods;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,20 +16,20 @@ public interface IModService
     /// Called before starting the guild wars process.
     /// Do mod preparation here.
     /// </summary>
-    Task OnGuildWarsStarting(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken);
+    Task OnGuildWarsStarting(GuildWarsStartingContext guildWarsStartingContext, CancellationToken cancellationToken);
     /// <summary>
     /// Called when the process is created in suspended state.
     /// Do dll injection here.
     /// </summary>
-    Task OnGuildWarsCreated(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken);
+    Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken);
     /// <summary>
     /// Called after the process has been resumed.
     /// Do clean-up/integration with the guild wars process here.
     /// </summary>
-    Task OnGuildWarsStarted(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken);
+    Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken);
     /// <summary>
     /// Called before starting the guild wars process, when the mod is disabled.
     /// Use this method to clean up the GuildWars folder of any residual mod files.
     /// </summary>
-    Task OnGuildWarsStartingDisabled(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken);
+    Task OnGuildWarsStartingDisabled(GuildWarsStartingDisabledContext guildWarsStartingDisabledContext, CancellationToken cancellationToken);
 }

@@ -1,6 +1,7 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Models;
 using Daybreak.Models.Github;
+using Daybreak.Models.Mods;
 using Daybreak.Models.Progress;
 using Daybreak.Models.UMod;
 using Daybreak.Services.Downloads;
@@ -77,24 +78,18 @@ internal sealed class UModService : IUModService
         this.logger = logger.ThrowIfNull();
     }
 
-    public IEnumerable<string> GetCustomArguments()
-    {
-        return Enumerable.Empty<string>();
-    }
+    public IEnumerable<string> GetCustomArguments() => [];
 
-    public Task OnGuildWarsStarting(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
-    }
+    public Task OnGuildWarsStarting(GuildWarsStartingContext guildWarsStartingContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public Task OnGuildWarsStartingDisabled(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task OnGuildWarsStartingDisabled(GuildWarsStartingDisabledContext guildWarsStartingDisabledContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public async Task OnGuildWarsCreated(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
+    public async Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken)
     {
         var modListFilePath = Path.Combine(Path.GetFullPath(UModDirectory), UModModList);
         var lines = this.uModOptions.Value.Mods.Where(e => e.Enabled && e.PathToFile is not null).Select(e => e.PathToFile).ToList();
         await File.WriteAllLinesAsync(modListFilePath, lines!, cancellationToken);
-        var result = await this.processInjector.Inject(applicationLauncherContext.Process, Path.Combine(Path.GetFullPath(UModDirectory), UModDll), cancellationToken);
+        var result = await this.processInjector.Inject(guildWarsCreatedContext.ApplicationLauncherContext.Process, Path.Combine(Path.GetFullPath(UModDirectory), UModDll), cancellationToken);
         if (result)
         {
             this.notificationService.NotifyInformation(
@@ -109,7 +104,7 @@ internal sealed class UModService : IUModService
         }
     }
 
-    public Task OnGuildWarsStarted(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public async Task<bool> SetupUMod(UModInstallationStatus uModInstallationStatus)
     {
@@ -200,7 +195,7 @@ internal sealed class UModService : IUModService
             return;
         }
 
-        var responseString = await getListResponse.Content.ReadAsStringAsync();
+        var responseString = await getListResponse.Content.ReadAsStringAsync(cancellationToken);
         var releasesList = responseString.Deserialize<List<GithubRefTag>>();
         var latestRelease = releasesList?
             .Select(t => t.Ref?.Replace("refs/tags/", ""))
@@ -276,7 +271,7 @@ internal sealed class UModService : IUModService
             return new DownloadLatestOperation.NonSuccessStatusCode((int)getListResponse.StatusCode);
         }
 
-        var responseString = await getListResponse.Content.ReadAsStringAsync();
+        var responseString = await getListResponse.Content.ReadAsStringAsync(cancellationToken);
         var releasesList = responseString.Deserialize<List<GithubRefTag>>();
         var latestRelease = releasesList?
             .Select(t => t.Ref?.Replace("refs/tags/", ""))
