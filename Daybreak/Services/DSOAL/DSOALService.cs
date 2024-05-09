@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Models;
+using Daybreak.Models.Mods;
 using Daybreak.Models.Progress;
 using Daybreak.Services.Downloads;
 using Daybreak.Services.Notifications;
@@ -112,30 +113,34 @@ internal sealed class DSOALService : IDSOALService
     {
         if (this.options.Value.Enabled)
         {
-            return new List<string> { "-dsound" };
+            return [ "-dsound" ];
         }
         else
         {
-            return Enumerable.Empty<string>();
+            return [];
         }
     }
 
-    public Task OnGuildWarsCreated(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
+    public Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }
 
-    public Task OnGuildWarsStarted(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
+    public Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }
 
-    public Task OnGuildWarsStarting(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
+    public Task OnGuildWarsStarting(GuildWarsStartingContext guildWarsStartingContext, CancellationToken cancellationToken)
     {
-        var guildwarsDirectory = new FileInfo(applicationLauncherContext.ExecutablePath).Directory!.FullName;
+        var guildwarsDirectory = new FileInfo(guildWarsStartingContext.ApplicationLauncherContext.ExecutablePath).Directory!.FullName;
         if (this.IsInstalled)
         {
-            this.EnsureSymbolicLinkExists();
+            if (!this.EnsureSymbolicLinkExists())
+            {
+                guildWarsStartingContext.CancelStartup = true;
+            }
+
             EnsureFileExistsInGuildwarsDirectory(DsoundDll, guildwarsDirectory);
             EnsureFileExistsInGuildwarsDirectory(DSOALAldrvDll, guildwarsDirectory);
             EnsureFileExistsInGuildwarsDirectory(AlsoftIni, guildwarsDirectory);
@@ -147,9 +152,9 @@ internal sealed class DSOALService : IDSOALService
         return Task.CompletedTask;
     }
 
-    public Task OnGuildWarsStartingDisabled(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
+    public Task OnGuildWarsStartingDisabled(GuildWarsStartingDisabledContext guildWarsStartingDisabledContext, CancellationToken cancellationToken)
     {
-        var guildwarsDirectory = new FileInfo(applicationLauncherContext.ExecutablePath).Directory!.FullName;
+        var guildwarsDirectory = new FileInfo(guildWarsStartingDisabledContext.ApplicationLauncherContext.ExecutablePath).Directory!.FullName;
         EnsureFileDoesNotExistInGuildwarsDirectory(DsoundDll, guildwarsDirectory);
         EnsureFileDoesNotExistInGuildwarsDirectory(DSOALAldrvDll, guildwarsDirectory);
         EnsureFileDoesNotExistInGuildwarsDirectory(AlsoftIni, guildwarsDirectory);
@@ -179,7 +184,7 @@ internal sealed class DSOALService : IDSOALService
         File.Delete(destinationPath);
     }
 
-    private void EnsureSymbolicLinkExists()
+    private bool EnsureSymbolicLinkExists()
     {
         var openalPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), OpenAlDirectory);
         if (!Directory.Exists(openalPath))
@@ -188,29 +193,30 @@ internal sealed class DSOALService : IDSOALService
             {
                 this.registryService.SaveValue(DSOALFixRegistryKey, true);
                 this.privilegeManager.RequestAdminPrivileges<LauncherView>(DSOALFixAdminMessage);
-                return;
+                return false;
             }
 
             Directory.CreateSymbolicLink(openalPath, Path.GetFullPath(DSOALDirectory));
-            return;
+            return true;
         }
 
         var fi = new FileInfo(openalPath);
         var desiredPath = Path.GetFullPath(DSOALDirectory);
         if (fi.LinkTarget == desiredPath)
         {
-            return;
+            return true;
         }
 
         if (!this.privilegeManager.AdminPrivileges)
         {
             this.registryService.SaveValue(DSOALFixRegistryKey, true);
             this.privilegeManager.RequestAdminPrivileges<LauncherView>(DSOALFixAdminMessage);
-            return;
+            return false;
         }
 
         Directory.Delete(openalPath);
         Directory.CreateSymbolicLink(openalPath, Path.GetFullPath(DSOALDirectory));
+        return true;
     }
 
     private void ExtractFiles()

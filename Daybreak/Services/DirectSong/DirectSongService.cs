@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Models;
+using Daybreak.Models.Mods;
 using Daybreak.Models.Progress;
 using Daybreak.Services.Downloads;
 using Daybreak.Services.Notifications;
@@ -67,20 +68,20 @@ internal sealed class DirectSongService : IDirectSongService
         this.logger = logger.ThrowIfNull();
     }
 
-    public IEnumerable<string> GetCustomArguments() => Array.Empty<string>();
+    public IEnumerable<string> GetCustomArguments() => [];
 
-    public Task OnGuildWarsCreated(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public Task OnGuildWarsStarted(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public Task OnGuildWarsStarting(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
+    public Task OnGuildWarsStarting(GuildWarsStartingContext guildWarsStartingContext, CancellationToken cancellationToken)
     {
         if (!this.IsInstalled)
         {
             return Task.CompletedTask;
         }
 
-        var gwPath = Path.GetFullPath(applicationLauncherContext.ExecutablePath);
+        var gwPath = Path.GetFullPath(guildWarsStartingContext.ApplicationLauncherContext.ExecutablePath);
         var gwDirectory = Path.GetDirectoryName(gwPath)!;
         var wmCorePath = Path.Combine(gwDirectory, WMVCOREDll);
         var dsGuildWarsDll = Path.Combine(gwDirectory, DsGuildwarsDll);
@@ -100,9 +101,9 @@ internal sealed class DirectSongService : IDirectSongService
         return Task.CompletedTask;
     }
 
-    public Task OnGuildWarsStartingDisabled(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
+    public Task OnGuildWarsStartingDisabled(GuildWarsStartingDisabledContext guildWarsStartingDisabledContext, CancellationToken cancellationToken)
     {
-        var gwPath = Path.GetFullPath(applicationLauncherContext.ExecutablePath);
+        var gwPath = Path.GetFullPath(guildWarsStartingDisabledContext.ApplicationLauncherContext.ExecutablePath);
         var gwDirectory = Path.GetDirectoryName(gwPath)!;
         var wmCorePath = Path.Combine(gwDirectory, WMVCOREDll);
         var dsGuildWarsDll = Path.Combine(gwDirectory, DsGuildwarsDll);

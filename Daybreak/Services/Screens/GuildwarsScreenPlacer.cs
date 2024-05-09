@@ -1,5 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Models;
+using Daybreak.Models.Mods;
 using Daybreak.Services.Scanner;
 using Microsoft.Extensions.Logging;
 using System;
@@ -46,7 +46,7 @@ internal sealed class GuildwarsScreenPlacer : IGuildwarsScreenPlacer
 
     public bool IsInstalled => true;
 
-    public async Task OnGuildWarsStarted(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
+    public async Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken)
     {
         var screen = this.screenManager.Screens.Skip(this.liveOptions.Value.DesiredGuildwarsScreen).FirstOrDefault();
         if (screen is null)
@@ -59,11 +59,11 @@ internal sealed class GuildwarsScreenPlacer : IGuildwarsScreenPlacer
         return;
     }
 
-    public IEnumerable<string> GetCustomArguments() => Enumerable.Empty<string>();
+    public IEnumerable<string> GetCustomArguments() => [];
 
-    public Task OnGuildWarsStarting(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task OnGuildWarsStarting(GuildWarsStartingContext guildWarsStartingContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public Task OnGuildWarsStartingDisabled(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task OnGuildWarsStartingDisabled(GuildWarsStartingDisabledContext guildWarsStartingDisabledContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public Task OnGuildWarsCreated(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken) => Task.CompletedTask;
 }

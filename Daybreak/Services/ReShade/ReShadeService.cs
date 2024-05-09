@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Models;
+using Daybreak.Models.Mods;
 using Daybreak.Models.Progress;
 using Daybreak.Models.ReShade;
 using Daybreak.Services.Downloads;
@@ -118,12 +119,12 @@ internal sealed class ReShadeService : IReShadeService, IApplicationLifetimeServ
     {
     }
 
-    public IEnumerable<string> GetCustomArguments() => Enumerable.Empty<string>();
+    public IEnumerable<string> GetCustomArguments() => [];
 
-    public async Task OnGuildWarsCreated(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
+    public async Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.OnGuildWarsCreated), applicationLauncherContext.ExecutablePath ?? string.Empty);
-        if (await this.processInjector.Inject(applicationLauncherContext.Process, ReShadeDllPath, cancellationToken))
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.OnGuildWarsCreated), guildWarsCreatedContext.ApplicationLauncherContext.ExecutablePath ?? string.Empty);
+        if (await this.processInjector.Inject(guildWarsCreatedContext.ApplicationLauncherContext.Process, ReShadeDllPath, cancellationToken))
         {
             scopedLogger.LogInformation("Injected ReShade dll");
             this.notificationService.NotifyInformation(
@@ -139,18 +140,18 @@ internal sealed class ReShadeService : IReShadeService, IApplicationLifetimeServ
         }
     }
 
-    public Task OnGuildWarsStarted(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
+    public Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken)
     {
-        var destinationDirectory = Path.GetFullPath(new FileInfo(applicationLauncherContext.ExecutablePath).DirectoryName!);
+        var destinationDirectory = Path.GetFullPath(new FileInfo(guildWarsStartedContext.ApplicationLauncherContext.ExecutablePath).DirectoryName!);
         var destinationPreset = Path.Combine(destinationDirectory, ReShadePreset);
         var destinationIni = Path.Combine(destinationDirectory, ConfigIni);
-        this.PeriodicallyCheckPresetChanges(applicationLauncherContext, destinationPreset, destinationIni);
+        this.PeriodicallyCheckPresetChanges(guildWarsStartedContext.ApplicationLauncherContext, destinationPreset, destinationIni);
         return Task.CompletedTask;
     }
 
-    public Task OnGuildWarsStarting(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
+    public Task OnGuildWarsStarting(GuildWarsStartingContext guildWarsStartingContext, CancellationToken cancellationToken)
     {
-        var destinationDirectory = Path.GetFullPath(new FileInfo(applicationLauncherContext.ExecutablePath).DirectoryName!);
+        var destinationDirectory = Path.GetFullPath(new FileInfo(guildWarsStartingContext.ApplicationLauncherContext.ExecutablePath).DirectoryName!);
         EnsureFileExistsInGuildwarsDirectory(ReShadeLog, destinationDirectory);
         EnsureFileExistsInGuildwarsDirectory(ReShadePreset, destinationDirectory);
         EnsureFileExistsInGuildwarsDirectory(ConfigIni, destinationDirectory);
@@ -159,9 +160,9 @@ internal sealed class ReShadeService : IReShadeService, IApplicationLifetimeServ
         return Task.CompletedTask;
     }
 
-    public Task OnGuildWarsStartingDisabled(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
+    public Task OnGuildWarsStartingDisabled(GuildWarsStartingDisabledContext guildWarsStartingDisabledContext, CancellationToken cancellationToken)
     {
-        var destinationDirectory = Path.GetFullPath(new FileInfo(applicationLauncherContext.ExecutablePath).DirectoryName!);
+        var destinationDirectory = Path.GetFullPath(new FileInfo(guildWarsStartingDisabledContext.ApplicationLauncherContext.ExecutablePath).DirectoryName!);
         var destination = Path.Combine(Path.GetFullPath(destinationDirectory), PresetsFolder);
         if (Directory.Exists(destination))
         {
@@ -230,7 +231,7 @@ internal sealed class ReShadeService : IReShadeService, IApplicationLifetimeServ
 
         scopedLogger.LogInformation($"Downloading installer from {downloadUrl}");
         var destinationPath = Path.Combine(Path.GetFullPath(ReShadePath), ReShadeInstallerName);
-        var downloadResult = await this.downloadService.DownloadFile(downloadUrl, destinationPath, reShadeInstallationStatus);
+        var downloadResult = await this.downloadService.DownloadFile(downloadUrl, destinationPath, reShadeInstallationStatus, cancellationToken);
         if (!downloadResult)
         {
             scopedLogger.LogError($"Failed to download {downloadUrl}. Check {nameof(DownloadService)} logs for errors");
@@ -507,14 +508,14 @@ internal sealed class ReShadeService : IReShadeService, IApplicationLifetimeServ
         }
 
         scopedLogger.LogInformation("Scrapping latest download url");
-        var html = await homePageResult.Content.ReadAsStringAsync();
+        var html = await homePageResult.Content.ReadAsStringAsync(cancellationToken);
         var doc = new HtmlDocument();
         doc.LoadHtml(html);
         if (doc.DocumentNode.Descendants("a")
             .Select(node =>
             {
                 if (node.GetAttributeValue<string>("href", string.Empty) is string href &&
-                    href.ToLower().Contains("/downloads/"))
+                    href.Contains("/downloads/", StringComparison.OrdinalIgnoreCase))
                 {
                     return href;
                 }
@@ -657,8 +658,8 @@ internal sealed class ReShadeService : IReShadeService, IApplicationLifetimeServ
     /// </summary>
     private static async Task SeekZipStart(FileStream fs, CancellationToken cancellationToken)
     {
-        byte[] buffer = new byte[512];
-        byte[] zipSignature = new byte[] { 0x50, 0x4B, 0x03, 0x04 }; // This is the ZIP Local File Header signature
+        var buffer = new byte[512];
+        var zipSignature = new byte[] { 0x50, 0x4B, 0x03, 0x04 }; // This is the ZIP Local File Header signature
 
         while(await fs.ReadAsync(buffer.AsMemory(0, 512), cancellationToken) >= zipSignature.Length)
         {
