@@ -1,6 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Models;
 using Daybreak.Models.GWCA;
+using Daybreak.Models.Mods;
 using Daybreak.Services.Injection;
 using Daybreak.Services.Notifications;
 using Microsoft.Extensions.Logging;
@@ -51,22 +51,22 @@ internal sealed class GWCAInjector : IGWCAInjector
         this.logger = logger.ThrowIfNull();
     }
 
-    public IEnumerable<string> GetCustomArguments() => Enumerable.Empty<string>();
+    public IEnumerable<string> GetCustomArguments() => [];
 
-    public Task OnGuildWarsStarting(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
+    public Task OnGuildWarsStarting(GuildWarsStartingContext guildWarsStartingContext, CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }
 
-    public Task OnGuildWarsStartingDisabled(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
+    public Task OnGuildWarsStartingDisabled(GuildWarsStartingDisabledContext guildWarsStartingDisabledContext, CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }
 
-    public async Task OnGuildWarsCreated(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
+    public async Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.OnGuildWarsCreated), applicationLauncherContext.ExecutablePath);
-        if (!await this.injector.Inject(applicationLauncherContext.Process, ModulePath, cancellationToken))
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.OnGuildWarsCreated), guildWarsCreatedContext.ApplicationLauncherContext.ExecutablePath);
+        if (!await this.injector.Inject(guildWarsCreatedContext.ApplicationLauncherContext.Process, ModulePath, cancellationToken))
         {
             scopedLogger.LogError("Unable to inject GWCA plugin into Guild Wars. Check above error messages for details");
             this.notificationService.NotifyError(
@@ -75,13 +75,13 @@ internal sealed class GWCAInjector : IGWCAInjector
         }
     }
 
-    public async Task OnGuildWarsStarted(ApplicationLauncherContext applicationLauncherContext, CancellationToken cancellationToken)
+    public async Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.OnGuildWarsStarted), applicationLauncherContext.ExecutablePath);
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.OnGuildWarsStarted), guildWarsStartedContext.ApplicationLauncherContext.ExecutablePath);
         ConnectionContext? connectionContext = default;
         for(var i = 0; i < MaxRetries; i++)
         {
-            if (await this.gwcaClient.Connect(applicationLauncherContext.ProcessId, cancellationToken) is ConnectionContext newContext)
+            if (await this.gwcaClient.Connect(guildWarsStartedContext.ApplicationLauncherContext.ProcessId, cancellationToken) is ConnectionContext newContext)
             {
                 connectionContext = newContext;
                 break;
