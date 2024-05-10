@@ -16,6 +16,9 @@ namespace Daybreak {
     template <typename TPayload, typename TContext>
     class DaybreakModule {
         protected:
+            virtual std::chrono::milliseconds GetTimeout() {
+                return std::chrono::milliseconds(200);
+            }
             std::future<std::optional<TPayload>> EnqueueWithReturn(const TContext context) {
                 std::shared_ptr<std::promise<std::optional<TPayload>>> promise = std::make_shared<std::promise<std::optional<TPayload>>>();
                 std::future<std::optional<TPayload>> ret = promise->get_future();
@@ -46,6 +49,7 @@ namespace Daybreak {
         public:
             virtual std::string ApiUri() = 0;
             void HandleApiCall(const httplib::Request& req, httplib::Response& res) {
+                const auto startTime = std::chrono::steady_clock::now();
                 const std::optional<TContext> context = this->GetContext(req, res);
                 if (!context.has_value()) {
                     return;
@@ -58,7 +62,13 @@ namespace Daybreak {
                     return;
                 }
 
-                while (!this->CanReturn(req, res, payload.value())) {
+                /*
+                * Wait until timeout. Normally timeout should be handled differently, but since the modules
+                * wait only for strings to populate, we can return the rest of the payload just fine and let
+                * Daybreak handle the missing string
+                */
+                while (!this->CanReturn(req, res, payload.value()) &&
+                    std::chrono::steady_clock::now() - startTime < this->GetTimeout()) {
                     std::this_thread::sleep_for(std::chrono::milliseconds(1));
                 }
 
