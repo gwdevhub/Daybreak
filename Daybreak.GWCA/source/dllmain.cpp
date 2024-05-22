@@ -27,6 +27,7 @@
 #include "TitleInfoModule.h"
 #include "WhisperModule.h"
 #include "DebugModule.h"
+#include "CartographerModule.h"
 #include <mutex>
 
 volatile bool initialized;
@@ -75,6 +76,7 @@ static DWORD WINAPI StartHttpServer(LPVOID)
     const auto userModule = new Daybreak::Modules::UserModule();
     const auto whisperModule = new Daybreak::Modules::WhisperModule();
     const auto debugModule = new Daybreak::Modules::DebugModule();
+    const auto cartographerModule = new Daybreak::Modules::CartographerModule();
 
     http::server::SetLogger(http::ConsoleLogger);
     http::server::Get("/alive", http::modules::HandleAlive);
@@ -95,6 +97,7 @@ static DWORD WINAPI StartHttpServer(LPVOID)
     http::server::Get(titleInfoModule->ApiUri(), [&titleInfoModule](const httplib::Request& req, httplib::Response& res) { titleInfoModule->HandleApiCall(req, res); });
     http::server::Post(whisperModule->ApiUri(), [&whisperModule](const httplib::Request& req, httplib::Response& res) { whisperModule->HandleApiCall(req, res); });
     http::server::Get(debugModule->ApiUri(), [&debugModule](const httplib::Request& req, httplib::Response& res) { debugModule->HandleApiCall(req, res); });
+    http::server::Get(cartographerModule->ApiUri(), [&cartographerModule](const httplib::Request& req, httplib::Response& res) { cartographerModule->HandleApiCall(req, res); });
     http::server::StartServer();
     return 0;
 }
