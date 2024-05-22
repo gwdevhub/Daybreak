@@ -12,6 +12,7 @@ using Daybreak.Services.Navigation;
 using Daybreak.Services.Notifications;
 using Daybreak.Services.Scanner;
 using Daybreak.Services.Screens;
+using Daybreak.Services.Window;
 using Daybreak.Views.Trade;
 using Microsoft.Extensions.Logging;
 using System;
@@ -47,6 +48,7 @@ public partial class FocusView : UserControl
     private static readonly TimeSpan InventoryDataFrequency = TimeSpan.FromSeconds(1);
     private static readonly TimeSpan CartoDataFrequency = TimeSpan.FromSeconds(1);
 
+    private readonly IWindowEventsHook<MainWindow> mainWindowEventsHook;
     private readonly INotificationService notificationService;
     private readonly IBuildTemplateManager buildTemplateManager;
     private readonly IApplicationLauncher applicationLauncher;
@@ -104,6 +106,10 @@ public partial class FocusView : UserControl
     [GenerateDependencyProperty]
     private CartoProgressContext cartoTitle = default!;
 
+    [GenerateDependencyProperty]
+    private bool pauseDataFetching;
+
+    private IWindowEventsHook<MinimapWindow>? minimapWindowEventsHook;
     private MinimapWindow? minimapWindow;
     private bool browserMaximized = false;
     private bool minimapMaximized = false;
@@ -111,6 +117,7 @@ public partial class FocusView : UserControl
     private CancellationTokenSource? cancellationTokenSource;
 
     public FocusView(
+        IWindowEventsHook<MainWindow> mainWindowEventsHook,
         INotificationService notificationService,
         IBuildTemplateManager buildTemplateManager,
         IApplicationLauncher applicationLauncher,
@@ -123,6 +130,7 @@ public partial class FocusView : UserControl
         ILiveUpdateableOptions<MinimapWindowOptions> minimapWindowOptions,
         ILogger<FocusView> logger)
     {
+        this.mainWindowEventsHook = mainWindowEventsHook.ThrowIfNull();
         this.notificationService = notificationService.ThrowIfNull();
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
         this.applicationLauncher = applicationLauncher.ThrowIfNull();
@@ -208,6 +216,12 @@ public partial class FocusView : UserControl
                     return;
                 }
 
+                if (this.PauseDataFetching)
+                {
+                    await Task.Delay(PathingDataFrequency, cancellationToken);
+                    continue;
+                }
+
                 if (this.DataContext is not GuildWarsApplicationLaunchContext context)
                 {
                     await Task.Delay(PathingDataFrequency, cancellationToken);
@@ -280,6 +294,12 @@ public partial class FocusView : UserControl
                 if (cancellationToken.IsCancellationRequested)
                 {
                     return;
+                }
+
+                if (this.PauseDataFetching)
+                {
+                    await Task.Delay(GameStateFrequency, cancellationToken);
+                    continue;
                 }
 
                 if (this.DataContext is not GuildWarsApplicationLaunchContext context)
@@ -359,6 +379,12 @@ public partial class FocusView : UserControl
                 if (cancellationToken.IsCancellationRequested)
                 {
                     return;
+                }
+
+                if (this.PauseDataFetching)
+                {
+                    await Task.Delay(CartoDataFrequency, cancellationToken);
+                    continue;
                 }
 
                 if (this.DataContext is not GuildWarsApplicationLaunchContext context)
@@ -486,6 +512,12 @@ public partial class FocusView : UserControl
                     return;
                 }
 
+                if (this.PauseDataFetching)
+                {
+                    await Task.Delay(GameDataFrequency, cancellationToken);
+                    continue;
+                }
+
                 if (this.DataContext is not GuildWarsApplicationLaunchContext context)
                 {
                     await Task.Delay(GameDataFrequency, cancellationToken);
@@ -590,6 +622,12 @@ public partial class FocusView : UserControl
                     return;
                 }
 
+                if (this.PauseDataFetching)
+                {
+                    await Task.Delay(InventoryDataFrequency, cancellationToken);
+                    continue;
+                }
+
                 if (this.DataContext is not GuildWarsApplicationLaunchContext context)
                 {
                     await Task.Delay(InventoryDataFrequency, cancellationToken);
@@ -664,6 +702,12 @@ public partial class FocusView : UserControl
                 if (cancellationToken.IsCancellationRequested)
                 {
                     return;
+                }
+
+                if (this.PauseDataFetching)
+                {
+                    await Task.Delay(MainPlayerDataFrequency, cancellationToken);
+                    continue;
                 }
 
                 if (this.DataContext is not GuildWarsApplicationLaunchContext context)
@@ -762,6 +806,8 @@ public partial class FocusView : UserControl
             return;
         }
 
+        this.mainWindowEventsHook.RegisterHookOnSizeOrMoveBegin(this.OnMainWindowSizeOrMoveStart);
+        this.mainWindowEventsHook.RegisterHookOnSizeOrMoveEnd(this.OnMainWindowSizeOrMoveEnd);
         this.Browser.BrowserHistoryManager.SetBrowserHistory(this.liveUpdateableOptions.Value.BrowserHistory);
         this.InventoryVisible = this.liveUpdateableOptions.Value.InventoryComponentVisible;
         this.MinimapVisible = this.liveUpdateableOptions.Value.MinimapComponentVisible;
@@ -786,6 +832,8 @@ public partial class FocusView : UserControl
 
     private void FocusView_Unloaded(object _, RoutedEventArgs e)
     {
+        this.mainWindowEventsHook.UnregisterHookOnSizeOrMoveBegin(this.OnMainWindowSizeOrMoveStart);
+        this.mainWindowEventsHook.UnregisterHookOnSizeOrMoveEnd(this.OnMainWindowSizeOrMoveEnd);
         this.cancellationTokenSource?.Cancel();
         this.cancellationTokenSource = null;
         this.GameData = default;
@@ -993,6 +1041,9 @@ public partial class FocusView : UserControl
         this.MinimapHolder.Children.Remove(this.MinimapComponent);
         this.minimapWindow.Content = this.MinimapComponent;
         this.minimapWindow.Show();
+        this.minimapWindowEventsHook = new WindowEventsHook<MinimapWindow>(this.minimapWindow);
+        this.minimapWindowEventsHook.RegisterHookOnSizeOrMoveBegin(this.OnMinimapWindowSizeOrMoveStart);
+        this.minimapWindowEventsHook.RegisterHookOnSizeOrMoveEnd(this.OnMinimapWindowSizeOrMoveEnd);
         this.RowAutoMargin.RecalculateRows();
     }
 
@@ -1026,7 +1077,31 @@ public partial class FocusView : UserControl
         this.minimapWindow.Closed -= this.MinimapWindow_Closed;
         this.minimapWindow.Content = default!;
         this.minimapWindow = default;
+        this.minimapWindowEventsHook?.Dispose();
+        this.minimapWindowEventsHook = default;
         this.MinimapHolder.Children.Insert(0, this.MinimapComponent);
         this.RowAutoMargin.RecalculateRows();
+    }
+
+    private void OnMainWindowSizeOrMoveStart()
+    {
+        this.IsEnabled = false;
+        this.PauseDataFetching = true;
+    }
+
+    private void OnMainWindowSizeOrMoveEnd()
+    {
+        this.IsEnabled = true;
+        this.PauseDataFetching = false;
+    }
+
+    private void OnMinimapWindowSizeOrMoveStart()
+    {
+        this.PauseDataFetching = true;
+    }
+
+    private void OnMinimapWindowSizeOrMoveEnd()
+    {
+        this.PauseDataFetching = false;
     }
 }

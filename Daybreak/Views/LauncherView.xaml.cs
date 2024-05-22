@@ -38,8 +38,8 @@ public partial class LauncherView : UserControl
     private readonly IViewManager viewManager;
     private readonly IScreenManager screenManager;
     private readonly ILiveOptions<FocusViewOptions> focusViewOptions;
-    private readonly CancellationTokenSource cancellationTokenSource = new();
 
+    private CancellationTokenSource? cancellationTokenSource;
     private bool launching;
 
     [GenerateDependencyProperty]
@@ -104,7 +104,7 @@ public partial class LauncherView : UserControl
 
     private async Task PeriodicallyCheckSelectedConfigState()
     {
-        while (!this.cancellationTokenSource.IsCancellationRequested)
+        while (this.cancellationTokenSource is not null && !this.cancellationTokenSource.IsCancellationRequested)
         {
             if (!this.launching)
             {
@@ -122,6 +122,7 @@ public partial class LauncherView : UserControl
             return;
         }
 
+        this.cancellationTokenSource = new CancellationTokenSource();
         this.RetrieveLaunchConfigurations();
         new TaskFactory().StartNew(this.PeriodicallyCheckSelectedConfigState, this.cancellationTokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
     }

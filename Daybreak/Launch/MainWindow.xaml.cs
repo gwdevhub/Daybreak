@@ -152,6 +152,11 @@ public partial class MainWindow : MetroWindow
             return;
         }
 
+        if (!this.IsEnabled)
+        {
+            return;
+        }
+
         var response = await this.backgroundProvider.GetBackground();
         if (response.ImageSource is null)
         {
