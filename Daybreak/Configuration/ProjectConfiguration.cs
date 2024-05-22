@@ -86,6 +86,8 @@ using Daybreak.Services.UBlockOrigin;
 using Daybreak.Services.Browser;
 using Daybreak.Services.ApplicationArguments;
 using Daybreak.Services.ApplicationArguments.ArgumentHandling;
+using Daybreak.Services.Window;
+using Daybreak.Launch;
 
 namespace Daybreak.Configuration;
 
@@ -228,6 +230,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<ISevenZipExtractor, SevenZipExtractor>();
         services.AddSingleton<IGraphClient, GraphClient>();
         services.AddSingleton<IOptionsSynchronizationService, OptionsSynchronizationService>();
+        services.AddSingleton<IWindowEventsHook<MainWindow>, WindowEventsHook<MainWindow>>();
         services.AddScoped<IBrowserExtensionsManager, BrowserExtensionsManager>();
         services.AddScoped<IBrowserExtensionsProducer, BrowserExtensionsManager>(sp => sp.GetRequiredService<IBrowserExtensionsManager>().Cast<BrowserExtensionsManager>());
         services.AddScoped<ICredentialManager, CredentialManager>();
