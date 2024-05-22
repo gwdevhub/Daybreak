@@ -13,6 +13,7 @@ using Daybreak.Services.Screens;
 using Daybreak.Services.Startup;
 using Daybreak.Services.Themes;
 using Daybreak.Services.Updater.PostUpdate;
+using Daybreak.Services.Window;
 using Daybreak.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -150,6 +151,9 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
             this.logger.LogError(e, "Encountered exception while loading plugins. Aborting...");
             this.exceptionHandler.HandleException(e);
         }
+        
+        // Trigger hooks into MainWindow
+        this.ServiceProvider.GetRequiredService<IWindowEventsHook<MainWindow>>();
 
         startupStatus.CurrentStep = StartupStatus.Custom("Registering view container");
         this.RegisterViewContainer();
