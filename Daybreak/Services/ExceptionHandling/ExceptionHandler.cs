@@ -1,9 +1,11 @@
 ﻿using Daybreak.Exceptions;
 using Daybreak.Models.Notifications.Handling;
 using Daybreak.Services.Notifications;
+using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Core.Extensions;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -30,11 +32,13 @@ internal sealed class ExceptionHandler : IExceptionHandler
     {
         if (e is null)
         {
+            WriteCrashDump();
             return false;
         }
 
         if (this.logger is null)
         {
+            WriteCrashDump();
             return false;
         }
 
@@ -43,6 +47,7 @@ internal sealed class ExceptionHandler : IExceptionHandler
             this.logger.LogCritical(e, $"{nameof(FatalException)} encountered. Closing application");
             MessageBox.Show(fatalException.ToString());
             File.WriteAllText("crash.log", e.ToString());
+            WriteCrashDump();
             return false;
         }
         else if (e is TaskCanceledException)
@@ -55,6 +60,7 @@ internal sealed class ExceptionHandler : IExceptionHandler
             this.logger.LogCritical(e, $"{nameof(FatalException)} encountered. Closing application");
             MessageBox.Show(innerFatalException.ToString());
             File.WriteAllText("crash.log", e.ToString());
+            WriteCrashDump();
             return false;
         }
         else if (e is AggregateException aggregateException)
@@ -83,5 +89,13 @@ internal sealed class ExceptionHandler : IExceptionHandler
         this.logger.LogError(e, $"Unhandled exception caught {e.GetType()}");
         this.notificationService.NotifyError<MessageBoxHandler>("Encountered exception", e.ToString());
         return true;
+    }
+
+    private static void WriteCrashDump()
+    {
+        string dumpFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"crash-{DateTime.Now.ToOADate()}.dmp");
+        using var fs = new FileStream(dumpFilePath, FileMode.Create, FileAccess.Write);
+        var process = Process.GetCurrentProcess();
+        NativeMethods.MiniDumpWriteDump(process.Handle, process.Id, fs.SafeFileHandle, NativeMethods.MinidumpType.MiniDumpWithFullMemory, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
     }
 }
