@@ -9,6 +9,7 @@
              xmlns:controls="clr-namespace:Daybreak.Controls"
              xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              Loaded="DownloadView_Loaded"
+             Unloaded="DownloadView_Unloaded"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
@@ -27,7 +28,8 @@
                                      HighlightColor="{StaticResource MahApps.Brushes.Accent}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                                      BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
                                      BorderThickness="1"
-                                     ToolTip="Continue"/>
+                                     ToolTip="Continue"
+                                     Visibility="{Binding ElementName=_this, Path=ContinueButtonEnabled, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         </StackPanel>
     </Grid>
 </UserControl>

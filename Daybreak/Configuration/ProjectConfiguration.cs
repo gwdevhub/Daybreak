@@ -181,7 +181,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IExperienceCalculator, ExperienceCalculator>();
         services.AddScoped<IAttributePointCalculator, AttributePointCalculator>();
         services.AddScoped<IDownloadService, DownloadService>();
-        services.AddScoped<IGuildwarsInstaller, GuildwarsInstaller>();
+        services.AddScoped<IGuildwarsInstaller, IntegratedGuildwarsInstaller>();
         services.AddScoped<IExceptionHandler, ExceptionHandler>();
         services.AddScoped<IDrawingService, DrawingService>();
         services.AddScoped<IDrawingModuleProducer, DrawingService>(sp => sp.GetRequiredService<IDrawingService>().As<DrawingService>()!);

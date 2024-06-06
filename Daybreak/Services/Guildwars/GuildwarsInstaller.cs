@@ -7,6 +7,7 @@ using System;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Daybreak.Services.Guildwars;
@@ -29,7 +30,7 @@ internal sealed class GuildwarsInstaller : IGuildwarsInstaller
         this.logger = logger.ThrowIfNull();
     }
 
-    public async Task<bool> InstallGuildwars(string destinationPath, GuildwarsInstallationStatus installationStatus)
+    public async Task<bool> InstallGuildwars(string destinationPath, GuildwarsInstallationStatus installationStatus, CancellationToken cancellationToken)
     {
         if (this.privilegeManager.AdminPrivileges is false)
         {
