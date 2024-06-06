@@ -20,15 +20,15 @@ namespace Daybreak::Modules {
         char buffer[20];
         DebugPayload debugPayload;
         const auto gameContext = GW::GetGameContext();
-        std::sprintf(buffer, "%p", static_cast<void*>(gameContext));
+        std::snprintf(buffer, 20, "%p", static_cast<void*>(gameContext));
         debugPayload.GameContextAddress = std::string(buffer);
-        std::sprintf(buffer, "%p", static_cast<void*>(gameContext->agent));
+        std::snprintf(buffer, 20, "%p", static_cast<void*>(gameContext->agent));
         debugPayload.AgentContextAddress = std::string(buffer);
-        std::sprintf(buffer, "%p", static_cast<void*>(gameContext->character));
+        std::snprintf(buffer, 20, "%p", static_cast<void*>(gameContext->character));
         debugPayload.CharContextAddress = std::string(buffer);
-        std::sprintf(buffer, "%p", static_cast<void*>(gameContext->world));
+        std::snprintf(buffer, 20, "%p", static_cast<void*>(gameContext->world));
         debugPayload.WorldContextAddress = std::string(buffer);
-        std::sprintf(buffer, "%p", static_cast<void*>(gameContext->map));
+        std::snprintf(buffer, 20, "%p", static_cast<void*>(gameContext->map));
         debugPayload.MapContextAddress = std::string(buffer);
 
         return debugPayload;
