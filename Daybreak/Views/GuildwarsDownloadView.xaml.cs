@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using Daybreak.Launch;
 using Daybreak.Models;
 using Daybreak.Services.Guildwars;
+using System.Threading;
 
 namespace Daybreak.Views;
 
@@ -20,6 +21,7 @@ public partial class GuildwarsDownloadView : System.Windows.Controls.UserControl
     private readonly IViewManager viewManager;
     private readonly IGuildwarsInstaller guildwarsInstaller;
     private readonly GuildwarsInstallationStatus installationStatus = new();
+    private readonly CancellationTokenSource cancellationTokenSource = new();
 
     [GenerateDependencyProperty(InitialValue = "")]
     private string description = string.Empty;
@@ -77,7 +79,7 @@ public partial class GuildwarsDownloadView : System.Windows.Controls.UserControl
 
         var folderPath = folderPicker.SelectedPath;
         this.logger.LogInformation("Starting download procedure");
-        var success = await this.guildwarsInstaller.InstallGuildwars(folderPath, this.installationStatus).ConfigureAwait(true);
+        var success = await this.guildwarsInstaller.InstallGuildwars(folderPath, this.installationStatus, this.cancellationTokenSource.Token).ConfigureAwait(true);
         if (success is false)
         {
             this.logger.LogError("Download procedure failed");
@@ -93,5 +95,11 @@ public partial class GuildwarsDownloadView : System.Windows.Controls.UserControl
     private void OpaqueButton_Clicked(object sender, System.EventArgs e)
     {
         this.viewManager.ShowView<LauncherView>();
+    }
+
+    private void DownloadView_Unloaded(object sender, RoutedEventArgs e)
+    {
+        this.cancellationTokenSource?.Cancel();
+        this.cancellationTokenSource?.Dispose();
     }
 }
