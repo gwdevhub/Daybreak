@@ -27,15 +27,10 @@ public partial class ImageViewer : UserControl
         this.Image2.Opacity = 0;
     }
 
-    public async void ShowImage(ImageSource imageSource)
+    public void ShowImage(ImageSource imageSource)
     {
         var currentVisible = this.CurrentVisible();
         var nextVisible = this.NextVisible();
-
-        if (nextVisible.Source is BitmapImage bitmapImage)
-        {
-            await bitmapImage.StreamSource.DisposeAsync().ConfigureAwait(true);
-        }
 
         nextVisible.Source = imageSource;
         Transition(currentVisible, nextVisible);

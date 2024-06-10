@@ -1,4 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Controls.Options;
 using Daybreak.Models.Metrics;
 using Daybreak.Services.Images.Models;
 using Daybreak.Services.Metrics;
@@ -11,6 +12,8 @@ using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Extensions;
 using System.IO;
 using System.Logging;
@@ -30,8 +33,7 @@ internal sealed class ImageCache : IImageCache
     private const string CacheSizeMetricDescription = "Size of the image cache in bytes";
     private const string CacheSizeMetricUnitName = "bytes";
 
-    private static readonly object CacheLock = new();
-
+    private readonly SemaphoreSlim cacheSemaphore = new(1, 1);
     private readonly ILiveOptions<ImageCacheOptions> options;
     private readonly ILogger<ImageCache> logger;
     private readonly ConcurrentDictionary<string, ImageEntry> imageEntryCache = new();
@@ -76,7 +78,7 @@ internal sealed class ImageCache : IImageCache
     private async Task<ImageSource> GetImageInternal(string uri, ScopedLogger<ImageCache> scopedLogger)
     {
         var stopwatch = Stopwatch.StartNew();
-        if (this.imageEntryCache.TryGetValue(uri, out var entry))
+        if (this.imageEntryCache.TryGetValue($"{uri}", out var entry))
         {
             this.imageRetrievalLatency.Record(stopwatch.ElapsedMilliseconds);
             this.imageCacheSize.Record(this.currentCacheSize);
@@ -84,7 +86,7 @@ internal sealed class ImageCache : IImageCache
             return entry.ImageSource;
         }
 
-        while (!Monitor.TryEnter(CacheLock)) { }
+        await this.cacheSemaphore.WaitAsync();
         var fileInfo = new FileInfo(uri);
         if (this.currentCacheSize + fileInfo.Length > this.options.Value.MemoryImageCacheLimit * 10e5)
         {
@@ -95,7 +97,7 @@ internal sealed class ImageCache : IImageCache
         }
 
         var imageEntry = await this.AddToCache(uri);
-        Monitor.Exit(CacheLock);
+        this.cacheSemaphore.Release();
         this.imageRetrievalLatency.Record(stopwatch.ElapsedMilliseconds);
         this.imageCacheSize.Record(this.currentCacheSize);
         scopedLogger.LogInformation("Added image to cache");
@@ -149,5 +151,22 @@ internal sealed class ImageCache : IImageCache
             this.currentCacheSize += size;
             return imageEntry;
         });
+    }
+
+    private static BitmapSource BitmapToBitmapSource(Bitmap bmp)
+    {
+        var bitmapData = bmp.LockBits(
+               new Rectangle(0, 0, bmp.Width, bmp.Height),
+               ImageLockMode.ReadOnly, bmp.PixelFormat);
+
+        var bitmapSource = BitmapSource.Create(
+            bitmapData.Width, bitmapData.Height,
+            bmp.HorizontalResolution, bmp.VerticalResolution,
+            PixelFormats.Bgr24, null,
+            bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
+
+        bmp.UnlockBits(bitmapData);
+
+        return bitmapSource;
     }
 }
