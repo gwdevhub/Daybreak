@@ -27,10 +27,6 @@ public partial class AsyncImage : UserControl
     private string imageUri = string.Empty;
     [GenerateDependencyProperty]
     private Stretch stretch;
-    [GenerateDependencyProperty]
-    private int desiredImageWidth;
-    [GenerateDependencyProperty]
-    private int desiredImageHeight;
     [GenerateDependencyProperty(InitialValue = BitmapScalingMode.HighQuality)]
     private BitmapScalingMode scalingMode = BitmapScalingMode.HighQuality;
 
@@ -76,9 +72,7 @@ public partial class AsyncImage : UserControl
         this.cancellationTokenSource?.Dispose();
         this.cancellationTokenSource = new();
         var token = this.cancellationTokenSource.Token;
-        var desiredWidth = this.DesiredImageWidth;
-        var desiredHeight = this.DesiredImageHeight;
-        new TaskFactory().StartNew(() => this.imageCache.GetImage(maybeUri, desiredWidth, desiredHeight), token, TaskCreationOptions.LongRunning, TaskScheduler.Current)
+        new TaskFactory().StartNew(() => this.imageCache.GetImage(maybeUri), token, TaskCreationOptions.LongRunning, TaskScheduler.Current)
             .ContinueWith(async t =>
             {
                 var result = await await t;

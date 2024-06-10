@@ -54,7 +54,7 @@ internal sealed class ImageCache : IImageCache
             .CreateHistogram<double>(CacheSizeMetricName, CacheSizeMetricUnitName, CacheSizeMetricDescription, AggregationTypes.NoAggregate);
     }
 
-    public async Task<ImageSource?> GetImage(string? uri, int? width = default, int? height = default)
+    public async Task<ImageSource?> GetImage(string? uri)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetImage), uri?.ToString() ?? string.Empty);
         if (uri is null ||
@@ -65,7 +65,7 @@ internal sealed class ImageCache : IImageCache
 
         try
         {
-            var imageSource = await this.GetImageInternal(uri, width ?? 0, height ?? 0, scopedLogger);
+            var imageSource = await this.GetImageInternal(uri, scopedLogger);
             return imageSource;
         }
         catch(Exception ex)
@@ -75,10 +75,10 @@ internal sealed class ImageCache : IImageCache
         }
     }
 
-    private async Task<ImageSource> GetImageInternal(string uri, int width, int height, ScopedLogger<ImageCache> scopedLogger)
+    private async Task<ImageSource> GetImageInternal(string uri, ScopedLogger<ImageCache> scopedLogger)
     {
         var stopwatch = Stopwatch.StartNew();
-        if (this.imageEntryCache.TryGetValue($"{uri}-{width}-{height}", out var entry))
+        if (this.imageEntryCache.TryGetValue($"{uri}", out var entry))
         {
             this.imageRetrievalLatency.Record(stopwatch.ElapsedMilliseconds);
             this.imageCacheSize.Record(this.currentCacheSize);
