@@ -22,4 +22,16 @@ public static class DependencyObjectExtensions
             return FindParent<T>(parentObject);
         }
     }
+
+    public static bool IsElementVisible(this FrameworkElement element, FrameworkElement container)
+    {
+        if (!element.IsVisible)
+            return false;
+
+        var bounds = element.TransformToAncestor(container)
+                             .TransformBounds(new Rect(0.0, 0.0, element.RenderSize.Width, element.RenderSize.Height));
+        var viewport = new Rect(0.0, 0.0, container.ActualWidth, container.ActualHeight);
+
+        return viewport.IntersectsWith(bounds);
+    }
 }

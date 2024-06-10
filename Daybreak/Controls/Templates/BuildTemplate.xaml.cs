@@ -202,7 +202,6 @@ public partial class BuildTemplate : UserControl
     private void ShowSkillListView()
     {
         this.HideInfoBrowser();
-        this.SkillListContainer.Width = 400;
         this.SkillListContainer.Visibility = Visibility.Visible;
         this.showingSkillList = true;
         if (this.AvailableSkills is not null &&
@@ -218,8 +217,7 @@ public partial class BuildTemplate : UserControl
 
     private void HideSkillListView()
     {
-        this.SkillListContainer.Visibility = Visibility.Hidden;
-        this.SkillListContainer.Width = 0;
+        this.SkillListContainer.Visibility = Visibility.Collapsed;
         this.showingSkillList = false;
     }
 

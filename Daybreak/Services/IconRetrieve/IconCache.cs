@@ -8,6 +8,7 @@ using System.Core.Extensions;
 using System.Extensions;
 using System.IO;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Daybreak.Services.IconRetrieve;
@@ -20,6 +21,7 @@ internal sealed class IconCache : IIconCache
     private const string IconsDirectoryName = "Icons";
     private const string IconsLocation = $"{IconsDirectoryName}/{NamePlaceholder}.jpg";
 
+    private readonly SemaphoreSlim diskSemaphore = new(1, 1);
     private readonly IHttpClient<IconCache> httpClient;
     private readonly ILiveOptions<LauncherOptions> options;
     private readonly ILogger<IconCache> logger;
@@ -39,7 +41,7 @@ internal sealed class IconCache : IIconCache
         }
     }
 
-    public async Task<string?> GetIconUri(Skill skill)
+    public async Task<string?> GetIconUri(Skill skill, bool prefHighQuality = true)
     {
         if (skill is null ||
             skill.Name!.IsNullOrWhiteSpace())
@@ -48,22 +50,28 @@ internal sealed class IconCache : IIconCache
         }
 
         var curedSkillName = CureSkillName(skill);
-        var fileName = SkillFileSafeName(skill);
+        var highQFileName = SkillFileSafeName(skill, false);
+        var lowQFileName = SkillFileSafeName(skill, false);
         if (curedSkillName!.IsNullOrWhiteSpace() ||
-            fileName!.IsNullOrWhiteSpace())
+            lowQFileName!.IsNullOrWhiteSpace() ||
+            highQFileName!.IsNullOrWhiteSpace())
         {
             return default;
         }
 
-        var highResWikiUri = $"{WikiUrl}/wiki/File:{curedSkillName}_(large).jpg";
-        var highResResult = await this.GetIconUriInternal(curedSkillName!, fileName!, highResWikiUri, false);
-        if (highResResult is string)
+        if (prefHighQuality)
         {
-            return highResResult;
+            var highResWikiUri = $"{WikiUrl}/wiki/File:{curedSkillName}_(large).jpg";
+            var highResResult = await this.GetIconUriInternal(curedSkillName!, highQFileName!, highResWikiUri, false);
+            if (highResResult is not null)
+            {
+                return highResResult;
+            }
         }
 
+
         var wikiUri = $"{WikiUrl}/wiki/{curedSkillName}";
-        return await this.GetIconUriInternal(curedSkillName!, fileName!, wikiUri, false);
+        return await this.GetIconUriInternal(curedSkillName!, lowQFileName!, wikiUri, false);
     }
 
     public async Task<string?> GetIconUri(ItemBase itemBase)
@@ -75,7 +83,7 @@ internal sealed class IconCache : IIconCache
         }
 
         var curedName = CureName(itemBase.Name);
-        var fileName = FileSafeName(itemBase.Name);
+        var fileName = FileSafeName(itemBase.Name, false);
         if (curedName!.IsNullOrWhiteSpace() ||
             fileName!.IsNullOrWhiteSpace())
         {
@@ -95,20 +103,30 @@ internal sealed class IconCache : IIconCache
 
     private async Task<string?> GetIconUriInternal(string curedName, string fileName, string wikiUri, bool directLink)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetIconUriInternal), string.Empty);
-        var maybeIconUri = this.GetLocalIcon(fileName);
-        if (maybeIconUri is string uri)
+        await this.diskSemaphore.WaitAsync();
+        try
         {
-            return uri;
-        }
+            var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetIconUriInternal), string.Empty);
+            var maybeIconUri = this.GetLocalIcon(fileName);
+            if (maybeIconUri is string uri)
+            {
+                return uri;
+            }
 
-        if (!this.options.Value.DownloadIcons)
+            if (!this.options.Value.DownloadIcons)
+            {
+                scopedLogger.LogWarning("Icon not found and download disabled. Returning empty icon uri");
+
+                return default;
+            }
+
+            var localUri = await this.DownloadAndRetrieveIcon(curedName, fileName, wikiUri, directLink);
+            return localUri;
+        }
+        finally
         {
-            scopedLogger.LogWarning("Icon not found and download disabled. Returning empty icon uri");
-            return default;
+            this.diskSemaphore.Release();
         }
-
-        return await this.DownloadAndRetrieveIcon(curedName, fileName, wikiUri, directLink);
     }
 
     private async Task<string?> DownloadAndRetrieveIcon(string curedName, string fileName, string wikiUri, bool directLink)
@@ -207,14 +225,14 @@ internal sealed class IconCache : IIconCache
         return CureName(skill.AlternativeName!.IsNullOrWhiteSpace() ? skill.Name : skill.AlternativeName);
     }
 
-    private static string? SkillFileSafeName(Skill? skill)
+    private static string? SkillFileSafeName(Skill? skill, bool highQuality)
     {
         if (skill is null)
         {
             return default;
         }
 
-        return FileSafeName(skill.AlternativeName!.IsNullOrWhiteSpace() ? skill.Name : skill.AlternativeName);
+        return FileSafeName(skill.AlternativeName!.IsNullOrWhiteSpace() ? skill.Name : skill.AlternativeName, highQuality);
     }
 
     private static string? CureName(string? name)
@@ -226,9 +244,8 @@ internal sealed class IconCache : IIconCache
             .Replace("\"", "%22");
     }
 
-    private static string? FileSafeName(string? name)
+    private static string? FileSafeName(string? name, bool highQuality)
     {
-        return name?
-            .Replace("\"", string.Empty);
+        return $"{name?.Replace("\"", string.Empty)}{(highQuality ? "-HQ" : string.Empty)}";
     }
 }
