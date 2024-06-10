@@ -20,7 +20,7 @@ internal sealed class GuildwarsFileStream : Stream
     public int SizeDecompressed { get; init; }
     public int Crc { get; init; }
 
-    public override bool CanRead { get; }
+    public override bool CanRead => true;
     public override bool CanSeek => false;
     public override bool CanWrite => false;
     public override long Length => this.SizeCompressed;
@@ -97,7 +97,7 @@ internal sealed class GuildwarsFileStream : Stream
 
     public override int Read(byte[] buffer, int offset, int count)
     {
-        throw new System.NotImplementedException();
+        return System.Extensions.TaskExtensions.RunSync(() => this.ReadAsync(buffer, offset, count));
     }
 
     public override long Seek(long offset, SeekOrigin origin)

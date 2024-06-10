@@ -36,7 +36,7 @@ internal sealed class HuffmanTable
             var largeEncIndex = lastIndex - (int)groupIndex;
             if (largeEncIndex < 0 || largeEncIndex >= this.largeSymbolValues.Count)
             {
-                throw new InvalidOperationException("largeEncIndex >= this.largeSymbolValues.Count");
+                throw new InvalidOperationException("Failed to get next Huffman Table code. largeEncIndex >= this.largeSymbolValues.Count");
             }
 
             encVal = this.largeSymbolValues[largeEncIndex];
@@ -73,7 +73,7 @@ internal sealed class HuffmanTable
 
             if (idx == Huffman.Table1.Length)
             {
-                throw new InvalidOperationException("Index out of table1 bounds");
+                throw new InvalidOperationException("Failed to build Huffman Table. Index out of table1 bounds");
             }
 
             var bitCount = idx + 3;
@@ -118,12 +118,12 @@ internal sealed class HuffmanTable
             {
                 if (currentSymbol >= symbolCount)
                 {
-                    throw new InvalidOperationException("currentSymbol >= symbolCount");
+                    throw new InvalidOperationException("Failed to build Huffman Table. currentSymbol >= symbolCount");
                 }
 
                 if (nextBitsEncoding >= (1 << encLen))
                 {
-                    throw new InvalidOperationException("nextBitsEncoding >= (1 << encLen)");
+                    throw new InvalidOperationException("Failed to build Huffman Table. nextBitsEncoding >= (1 << encLen)");
                 }
 
                 var firstSymbol = nextBitsEncoding << (8 - encLen);
@@ -156,11 +156,11 @@ internal sealed class HuffmanTable
             {
                 if (currentSymbol >= symbolCount)
                 {
-                    throw new InvalidOperationException("currentSymbol >= symbolCount");
+                    throw new InvalidOperationException("Failed to build Huffman Table. currentSymbol >= symbolCount");
                 }
                 if (nextBitsEncoding >= (1 << encLen))
                 {
-                    throw new InvalidOperationException("nextBitsEncoding >= (1 << encLen)");
+                    throw new InvalidOperationException("Failed to build Huffman Table. nextBitsEncoding >= (1 << encLen)");
                 }
 
                 int partialEncoding = nextBitsEncoding >> (encLen - 8);
