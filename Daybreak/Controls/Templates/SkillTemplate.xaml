@@ -19,11 +19,11 @@
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <Image VerticalAlignment="Top" HorizontalAlignment="Left"
+        <local:AsyncImage VerticalAlignment="Top" HorizontalAlignment="Left"
                Width="{Binding ElementName=_this, Path=ActualWidth, Mode=OneWay}"
                Height="{Binding ElementName=_this, Path=ActualWidth, Mode=OneWay}"
-               Source="{Binding ElementName=_this, Path=ImageSource, Mode=OneWay}"
-               Stretch="UniformToFill"></Image>
+               ImageUri="{Binding ElementName=_this, Path=ImageUri, Mode=OneWay}"
+               Stretch="UniformToFill"/>
         <Border BorderThickness="5" BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"></Border>
         <Border BorderThickness="3" Margin="2" BorderBrush="{StaticResource MahApps.Brushes.Accent}"
                 Opacity="{Binding ElementName=_this, Path=BorderOpacity, Mode=OneWay}"></Border>

@@ -199,7 +199,8 @@
                                           MaximizeClicked="SkillBrowser_MaximizeClicked" />
         </Grid>
         <Grid Grid.Column="1" Grid.RowSpan="7">
-            <Grid x:Name="SkillListContainer">
+            <Grid x:Name="SkillListContainer"
+                  Width="400">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"></RowDefinition>
                     <RowDefinition Height="*"></RowDefinition>
@@ -219,7 +220,7 @@
                           ScrollViewer.CanContentScroll="True"
                           ItemsSource="{Binding ElementName=_this, Path=AvailableSkills, Mode=OneWay}"
                           VirtualizingPanel.IsVirtualizing="True"
-                          VirtualizingPanel.VirtualizationMode="Recycling"
+                          VirtualizingPanel.VirtualizationMode="Standard"
                           VirtualizingPanel.IsVirtualizingWhenGrouping="True">
                     <ItemsControl.Template>
                         <ControlTemplate>
@@ -251,9 +252,12 @@
                                 BorderThickness="0, 0, 0, 1"
                                 TextWrapping="Wrap" 
                                 Height="30"
-                                Title="{Binding Name}"
                                 Clicked="HighlightButton_Clicked"
-                                Cursor="Hand"></buttons:HighlightButton>
+                                Cursor="Hand">
+                                <buttons:HighlightButton.ButtonContent>
+                                    <templates:SkillListEntryTemplate DataContext="{Binding}"/>
+                                </buttons:HighlightButton.ButtonContent>
+                            </buttons:HighlightButton>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
