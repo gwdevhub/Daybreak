@@ -8,6 +8,7 @@ using Daybreak.Services.Notifications;
 using Daybreak.Services.Scanner;
 using Daybreak.Services.Toolbox.Models;
 using Daybreak.Services.Toolbox.Utilities;
+using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System;
@@ -24,8 +25,9 @@ namespace Daybreak.Services.Toolbox;
 
 internal sealed class ToolboxService : IToolboxService
 {
-    private const string ToolboxDestinationDirectory = "GWToolbox";
+    private const string ToolboxDestinationDirectorySubPath = "GWToolbox";
 
+    private static readonly string ToolboxDestinationDirectoryPath = PathUtils.GetAbsolutePathFromRoot(ToolboxDestinationDirectorySubPath);
     private static readonly string UsualToolboxLocation = Path.GetFullPath(
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "GWToolboxpp", "GWToolboxdll.dll"));
 

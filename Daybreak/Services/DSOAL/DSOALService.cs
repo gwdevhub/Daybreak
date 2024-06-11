@@ -6,6 +6,7 @@ using Daybreak.Services.Downloads;
 using Daybreak.Services.Notifications;
 using Daybreak.Services.Privilege;
 using Daybreak.Services.Registry;
+using Daybreak.Utils;
 using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using System;
@@ -29,12 +30,14 @@ internal sealed class DSOALService : IDSOALService
     public const string DSOALFixRegistryKey = "DSOAL/FixSymbolicLink";
     private const string DownloadUrl = "https://github.com/ChthonVII/dsoal-GW1/releases/download/r420%2Bgw1_rev1/dsoal-GW1_r420+gw1_rev1.zip";
     private const string ArchiveName = "dsoal-GW1_r420+gw1_rev1.zip";
-    private const string DSOALDirectory = "DSOAL";
+    private const string DSOALDirectorySubPath = "DSOAL";
     private const string HRTFArchiveName = "HRTF_OAL_1.19.0.zip";
     private const string DsoundDll = "dsound.dll";
     private const string DSOALAldrvDll = "dsoal-aldrv.dll";
     private const string AlsoftIni = "alsoft.ini";
     private const string OpenAlDirectory = "openal";
+
+    private static readonly string DSOALDirectory = PathUtils.GetAbsolutePathFromRoot(DSOALDirectorySubPath);
 
     private readonly INotificationService notificationService;
     private readonly IRegistryService registryService;
@@ -196,12 +199,12 @@ internal sealed class DSOALService : IDSOALService
                 return false;
             }
 
-            Directory.CreateSymbolicLink(openalPath, Path.GetFullPath(DSOALDirectory));
+            Directory.CreateSymbolicLink(openalPath, DSOALDirectory);
             return true;
         }
 
         var fi = new FileInfo(openalPath);
-        var desiredPath = Path.GetFullPath(DSOALDirectory);
+        var desiredPath = DSOALDirectory;
         if (fi.LinkTarget == desiredPath)
         {
             return true;
@@ -215,16 +218,16 @@ internal sealed class DSOALService : IDSOALService
         }
 
         Directory.Delete(openalPath);
-        Directory.CreateSymbolicLink(openalPath, Path.GetFullPath(DSOALDirectory));
+        Directory.CreateSymbolicLink(openalPath, DSOALDirectory);
         return true;
     }
 
     private void ExtractFiles()
     {
-        ZipFile.ExtractToDirectory(ArchiveName, Path.Combine(Directory.GetCurrentDirectory(), DSOALDirectory), true);
-        ZipFile.ExtractToDirectory(Path.Combine(DSOALDirectory, HRTFArchiveName), Path.Combine(Directory.GetCurrentDirectory(), DSOALDirectory), true);
+        ZipFile.ExtractToDirectory(ArchiveName, DSOALDirectory, true);
+        ZipFile.ExtractToDirectory(Path.Combine(DSOALDirectory, HRTFArchiveName), DSOALDirectory, true);
         var options = this.options.Value;
-        options.Path = Path.GetFullPath(DSOALDirectory);
+        options.Path = DSOALDirectory;
         this.options.UpdateOption();
         File.Delete(ArchiveName);
         File.Delete(Path.Combine(DSOALDirectory, HRTFArchiveName));
@@ -240,6 +243,6 @@ internal sealed class DSOALService : IDSOALService
             Directory.Delete(openalPath);
         }
 
-        Directory.CreateSymbolicLink(openalPath, Path.GetFullPath(DSOALDirectory));
+        Directory.CreateSymbolicLink(openalPath, DSOALDirectory);
     }
 }

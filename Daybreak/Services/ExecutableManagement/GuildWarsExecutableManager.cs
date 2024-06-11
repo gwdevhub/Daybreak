@@ -15,7 +15,7 @@ namespace Daybreak.Services.ExecutableManagement;
 internal sealed class GuildWarsExecutableManager : IGuildWarsExecutableManager, IApplicationLifetimeService
 {
     private readonly static TimeSpan ExecutableVerificationLatency = TimeSpan.FromSeconds(5);
-    private readonly static object Lock = new();
+    private readonly static SemaphoreSlim ExecutablesSemaphore = new(1, 1);
 
     private readonly CancellationTokenSource cancellationTokenSource = new();
     private readonly ILiveUpdateableOptions<GuildwarsExecutableOptions> liveUpdateableOptions;
@@ -31,10 +31,10 @@ internal sealed class GuildWarsExecutableManager : IGuildWarsExecutableManager, 
 
     public IEnumerable<string> GetExecutableList()
     {
-        while (!Monitor.TryEnter(Lock)) { }
+        ExecutablesSemaphore.Wait();
 
         var list = this.liveUpdateableOptions.Value.ExecutablePaths.Where(this.IsValidExecutable).ToList();
-        Monitor.Exit(Lock);
+        ExecutablesSemaphore.Release();
 
         return list;
     }
@@ -42,7 +42,7 @@ internal sealed class GuildWarsExecutableManager : IGuildWarsExecutableManager, 
     public void AddExecutable(string executablePath)
     {
         var fullPath = Path.GetFullPath(executablePath);
-        while (!Monitor.TryEnter(Lock)) { }
+        ExecutablesSemaphore.Wait();
 
         var list = this.liveUpdateableOptions.Value.ExecutablePaths;
         if (list.None(e => e == executablePath))
@@ -52,13 +52,13 @@ internal sealed class GuildWarsExecutableManager : IGuildWarsExecutableManager, 
 
         this.liveUpdateableOptions.Value.ExecutablePaths = list;
         this.liveUpdateableOptions.UpdateOption();
-        Monitor.Exit(Lock);
+        ExecutablesSemaphore.Release();
     }
 
     public void RemoveExecutable(string executablePath)
     {
         var fullPath = Path.GetFullPath(executablePath);
-        while (!Monitor.TryEnter(Lock)) { }
+        ExecutablesSemaphore.Wait();
 
         var list = this.liveUpdateableOptions.Value.ExecutablePaths;
         if (list.Any(e => e == executablePath))
@@ -68,7 +68,7 @@ internal sealed class GuildWarsExecutableManager : IGuildWarsExecutableManager, 
 
         this.liveUpdateableOptions.Value.ExecutablePaths = list;
         this.liveUpdateableOptions.UpdateOption();
-        Monitor.Exit(Lock);
+        ExecutablesSemaphore.Release();
     }
 
     public bool IsValidExecutable(string executablePath)
@@ -90,7 +90,7 @@ internal sealed class GuildWarsExecutableManager : IGuildWarsExecutableManager, 
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.VerifyExecutables), string.Empty);
         while (!cancellationToken.IsCancellationRequested)
         {
-            while (!Monitor.TryEnter(Lock)) { }
+            await ExecutablesSemaphore.WaitAsync(cancellationToken);
 
             var executables = this.liveUpdateableOptions.Value.ExecutablePaths;
             var deletedExecutable = false;
@@ -114,7 +114,7 @@ internal sealed class GuildWarsExecutableManager : IGuildWarsExecutableManager, 
                 this.liveUpdateableOptions.UpdateOption();
             }
 
-            Monitor.Exit(Lock);
+            ExecutablesSemaphore.Release();
             await Task.Delay(ExecutableVerificationLatency, cancellationToken);
         }
     }
