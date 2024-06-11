@@ -9,9 +9,11 @@ using Daybreak.Services.Notifications;
 using Daybreak.Services.Registry;
 using Daybreak.Services.Updater.Models;
 using Daybreak.Services.Updater.PostUpdate;
+using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Data;
@@ -32,10 +34,11 @@ namespace Daybreak.Services.Updater;
 
 internal sealed class ApplicationUpdater : IApplicationUpdater
 {
-    private const string TempInstallerFileName = "Daybreak.Installer.Temp.exe";
-    private const string InstallerFileName = "Daybreak.Installer.exe";
+    private const string UpdatePkgSubPath = "update.pkg";
+    private const string TempInstallerFileNameSubPath = "Daybreak.Installer.Temp.exe";
+    private const string InstallerFileNameSubPath = "Daybreak.Installer.exe";
     private const string UpdatedKey = "LauncherUpdating";
-    private const string TempFile = "tempfile.zip";
+    private const string TempFileSubPath = "tempfile.zip";
     private const string VersionTag = "{VERSION}";
     private const string FileTag = "{FILE}";
     private const string RefTagPrefix = "/refs/tags";
@@ -44,6 +47,11 @@ internal sealed class ApplicationUpdater : IApplicationUpdater
     private const string DownloadUrl = $"https://github.com/AlexMacocian/Daybreak/releases/download/{VersionTag}/Daybreak{VersionTag}.zip";
     private const string BlobStorageUrl = $"https://daybreak.blob.core.windows.net/{VersionTag}/{FileTag}";
     private const int DownloadParallelTasks = 10;
+
+    private readonly static string TempInstallerFileName = PathUtils.GetAbsolutePathFromRoot(TempInstallerFileNameSubPath);
+    private readonly static string InstallerFileName = PathUtils.GetAbsolutePathFromRoot(InstallerFileNameSubPath);
+    private readonly static string TempFile = PathUtils.GetAbsolutePathFromRoot(TempFileSubPath);
+    private readonly static string UpdatePkg = PathUtils.GetAbsolutePathFromRoot(UpdatePkgSubPath);
 
     private readonly static TimeSpan DownloadInfoUpdateInterval = TimeSpan.FromMilliseconds(16);
 
@@ -281,7 +289,7 @@ internal sealed class ApplicationUpdater : IApplicationUpdater
             })
             .ToList();
 
-        using var packageStream = new FileStream("update.pkg", FileMode.Create);
+        using var packageStream = new FileStream(UpdatePkg, FileMode.Create);
         var downloaded = 0d;
         var downloadBuffer = new byte[8192];
         var sizeToDownload = (double)filesToDownload.Sum(m => m.Size);
@@ -359,7 +367,7 @@ internal sealed class ApplicationUpdater : IApplicationUpdater
 
         updateStatus.CurrentStep = DownloadStatus.Downloading(1, TimeSpan.Zero);
 
-        scopedLogger.LogInformation($"Prepared update package at {Path.GetFullPath("update.pkg")}");
+        scopedLogger.LogInformation($"Prepared update package at {UpdatePkg}");
         updateStatus.CurrentStep = UpdateStatus.PendingRestart;
         return true;
     }
