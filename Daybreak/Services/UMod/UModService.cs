@@ -8,6 +8,7 @@ using Daybreak.Services.Downloads;
 using Daybreak.Services.Injection;
 using Daybreak.Services.Notifications;
 using Daybreak.Services.Toolbox.Models;
+using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -28,9 +29,11 @@ internal sealed class UModService : IUModService
     private const string TagPlaceholder = "[TAG_PLACEHOLDER]";
     private const string ReleaseUrl = "https://github.com/gwdevhub/gMod/releases/download/[TAG_PLACEHOLDER]/gMod.dll";
     private const string ReleasesUrl = "https://api.github.com/repos/gwdevhub/gMod/git/refs/tags";
-    private const string UModDirectory = "uMod";
+    private const string UModDirectorySubPath = "uMod";
     private const string UModDll = "uMod.dll";
     private const string UModModList = "modlist.txt";
+
+    private static readonly string UModDirectory = PathUtils.GetAbsolutePathFromRoot(UModDirectorySubPath);
 
     private readonly IProcessInjector processInjector;
     private readonly INotificationService notificationService;
@@ -86,10 +89,10 @@ internal sealed class UModService : IUModService
 
     public async Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken)
     {
-        var modListFilePath = Path.Combine(Path.GetFullPath(UModDirectory), UModModList);
+        var modListFilePath = Path.Combine(UModDirectory, UModModList);
         var lines = this.uModOptions.Value.Mods.Where(e => e.Enabled && e.PathToFile is not null).Select(e => e.PathToFile).ToList();
         await File.WriteAllLinesAsync(modListFilePath, lines!, cancellationToken);
-        var result = await this.processInjector.Inject(guildWarsCreatedContext.ApplicationLauncherContext.Process, Path.Combine(Path.GetFullPath(UModDirectory), UModDll), cancellationToken);
+        var result = await this.processInjector.Inject(guildWarsCreatedContext.ApplicationLauncherContext.Process, Path.Combine(UModDirectory, UModDll), cancellationToken);
         if (result)
         {
             this.notificationService.NotifyInformation(
@@ -180,7 +183,7 @@ internal sealed class UModService : IUModService
     public async Task CheckAndUpdateUMod(CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.CheckAndUpdateUMod), string.Empty);
-        var existingUMod = Path.Combine(Path.GetFullPath(UModDirectory), UModDll);
+        var existingUMod = Path.Combine(UModDirectory, UModDll);
         if (!this.IsInstalled)
         {
             scopedLogger.LogInformation("UMod is not installed");
@@ -285,7 +288,7 @@ internal sealed class UModService : IUModService
 
         scopedLogger.LogInformation($"Retrieving version {tag}");
         var downloadUrl = ReleaseUrl.Replace(TagPlaceholder, tag);
-        var destinationFolder = Path.GetFullPath(UModDirectory);
+        var destinationFolder = UModDirectory;
         var destinationPath = Path.Combine(destinationFolder, UModDll);
         var success = await this.downloadService.DownloadFile(downloadUrl, destinationPath, uModInstallationStatus, cancellationToken);
         if (!success)

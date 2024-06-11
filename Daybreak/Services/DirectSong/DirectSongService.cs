@@ -1,14 +1,13 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Models;
 using Daybreak.Models.Mods;
 using Daybreak.Models.Progress;
 using Daybreak.Services.Downloads;
 using Daybreak.Services.Notifications;
 using Daybreak.Services.Privilege;
 using Daybreak.Services.SevenZip;
+using Daybreak.Utils;
 using Daybreak.Views;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
@@ -23,10 +22,12 @@ internal sealed class DirectSongService : IDirectSongService
 {
     private const string DownloadUrl = "https://guildwarslegacy.com/DirectSong.7z";
     private const string RegistryEditorName = "RegisterDirectSongDirectory.exe";
-    private const string InstallationDirectory = "DirectSong";
+    private const string InstallationDirectorySubPath = "DirectSong";
     private const string DestinationZipFile = "DirectSong.7z";
     private const string WMVCOREDll = "WMVCORE.DLL";
     private const string DsGuildwarsDll = "ds_GuildWars.dll";
+
+    private readonly static string InstallationDirectory = PathUtils.GetAbsolutePathFromRoot(InstallationDirectorySubPath);
 
     private readonly INotificationService notificationService;
     private readonly IPrivilegeManager privilegeManager;
@@ -123,7 +124,8 @@ internal sealed class DirectSongService : IDirectSongService
 
     public Task<bool> SetupDirectSong(DirectSongInstallationStatus directSongInstallationStatus, CancellationToken cancellationToken)
     {
-        if (this.InstallationTask is not null)
+        if (this.InstallationTask is not null &&
+            !this.InstallationTask.IsCompleted)
         {
             return this.InstallationTask;
         }
@@ -144,12 +146,16 @@ internal sealed class DirectSongService : IDirectSongService
         if (this.IsInstalled)
         {
             scopedLogger.LogInformation("Already installed");
+            this.InstallationTask = default;
+            this.CachedInstallationStatus = default;
             return true;
         }
 
         if (!this.privilegeManager.AdminPrivileges)
         {
             this.privilegeManager.RequestAdminPrivileges<LauncherView>("DirectSong installation requires Administrator privileges in order to set up the registry entries");
+            this.InstallationTask = default;
+            this.CachedInstallationStatus = default;
             return false;
         }
 
@@ -164,6 +170,8 @@ internal sealed class DirectSongService : IDirectSongService
             if (!await this.downloadService.DownloadFile(DownloadUrl, destinationPath, directSongInstallationStatus, cancellationToken))
             {
                 scopedLogger.LogError("Download failed. Check logs");
+                this.InstallationTask = default;
+                this.CachedInstallationStatus = default;
                 return false;
             }
         }
@@ -176,6 +184,8 @@ internal sealed class DirectSongService : IDirectSongService
         }, cancellationToken))
         {
             scopedLogger.LogError("Extraction failed");
+            this.InstallationTask = default;
+            this.CachedInstallationStatus = default;
             return false;
         }
 
@@ -184,6 +194,8 @@ internal sealed class DirectSongService : IDirectSongService
         if (!await RunRegisterDirectSongDirectory(cancellationToken))
         {
             scopedLogger.LogError("Failed to set up registry entries");
+            this.InstallationTask = default;
+            this.CachedInstallationStatus = default;
             return false;
         }
 

@@ -11,6 +11,7 @@ using Daybreak.Services.Plugins.Resolvers;
 using Daybreak.Services.Plugins.Validators;
 using Daybreak.Services.Startup;
 using Daybreak.Services.Updater.PostUpdate;
+using Daybreak.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Plumsy;
@@ -33,10 +34,10 @@ namespace Daybreak.Services.Plugins;
 internal sealed class PluginsService : IPluginsService
 {
     private const string DllExtension = ".dll";
-    private const string PluginsDirectory = "Plugins";
+    private const string PluginsDirectorySubPath = "Plugins";
+    private static readonly string PluginsDirectory = PathUtils.GetAbsolutePathFromRoot(PluginsDirectorySubPath);
 
-    private static readonly object Lock = new();
-
+    private readonly SemaphoreSlim pluginsSemaphore = new(1, 1);
     private readonly List<AvailablePlugin> loadedPlugins = [];
     private readonly ILiveUpdateableOptions<PluginsServiceOptions> liveUpdateableOptions;
     private readonly ILogger<PluginsService> logger;
@@ -109,10 +110,9 @@ internal sealed class PluginsService : IPluginsService
         browserExtensionsProducer.ThrowIfNull();
         argumentHandlerProducer.ThrowIfNull();
 
-        while (!Monitor.TryEnter(Lock)) { }
-
+        this.pluginsSemaphore.Wait();
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.LoadPlugins), string.Empty);
-        var pluginsPath = Path.GetFullPath(PluginsDirectory);
+        var pluginsPath = PluginsDirectory;
         if (!Directory.Exists(pluginsPath))
         {
             scopedLogger.LogInformation("Creating plugins folder");
@@ -196,7 +196,7 @@ internal sealed class PluginsService : IPluginsService
             }
         }
 
-        Monitor.Exit(Lock);
+        this.pluginsSemaphore.Release();
     }
 
     public async Task<bool> AddPlugin(string pathToPlugin)

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Daybreak.Utils;
+using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.IO;
 
@@ -6,8 +7,11 @@ namespace Daybreak.Services.Startup.Actions;
 
 internal sealed class RenameInstallerAction : StartupActionBase
 {
-    private const string TemporaryInstallerFileName = "Daybreak.Installer.Temp.exe";
-    private const string InstallerFileName = "Daybreak.Installer.exe";
+    private const string TemporaryInstallerFileNameSubPath = "Daybreak.Installer.Temp.exe";
+    private const string InstallerFileNameSubPath = "Daybreak.Installer.exe";
+
+    private static readonly string TemporaryInstallerFileName = PathUtils.GetAbsolutePathFromRoot(TemporaryInstallerFileNameSubPath);
+    private static readonly string InstallerFileName = PathUtils.GetAbsolutePathFromRoot(InstallerFileNameSubPath);
 
     private readonly ILogger<RenameInstallerAction> logger;
 

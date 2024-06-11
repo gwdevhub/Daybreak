@@ -1,4 +1,5 @@
 ﻿using Daybreak.Attributes;
+using Daybreak.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -14,7 +15,9 @@ namespace Daybreak.Services.Options;
 
 internal sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptionsUpdateHook, IOptionsProvider
 {
-    private const string OptionsFile = "Daybreak.options";
+    private const string OptionsFileSubPath = "Daybreak.options";
+
+    private static readonly string OptionsFile = PathUtils.GetAbsolutePathFromRoot(OptionsFileSubPath);
 
     private readonly Dictionary<string, string> optionsCache = [];
     private readonly Dictionary<Type, List<Action>> optionsUpdateHooks = [];

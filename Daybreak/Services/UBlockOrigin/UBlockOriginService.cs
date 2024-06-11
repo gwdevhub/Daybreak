@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Daybreak.Services.Notifications;
 using Daybreak.Services.Browser;
+using Daybreak.Utils;
 
 namespace Daybreak.Services.UBlockOrigin;
 public sealed class UBlockOriginService : IBrowserExtension
@@ -23,10 +24,11 @@ public sealed class UBlockOriginService : IBrowserExtension
     private const string TagPlaceholder = "[TAG_PLACEHOLDER]";
     private const string ReleaseUrl = "https://github.com/gorhill/uBlock/releases/download/[TAG_PLACEHOLDER]/uBlock0_[TAG_PLACEHOLDER].chromium.zip";
     private const string ReleasesUrl = "https://api.github.com/repos/gorhill/uBlock/git/refs/tags";
-    private const string InstallationPath = "BrowserExtensions";
+    private const string InstallationSubPath = "BrowserExtensions";
     private const string ZipName = "ublock.chromium.zip";
     private const string InstallationFolderName = "uBlock0.chromium";
 
+    private static readonly string InstallationPath = PathUtils.GetAbsolutePathFromRoot(InstallationSubPath);
     private static readonly SemaphoreSlim SemaphoreSlim = new(1);
 
     private static volatile bool VersionUpToDate;
@@ -111,7 +113,7 @@ public sealed class UBlockOriginService : IBrowserExtension
         }
 
         using var zipFile = ZipFile.Read(zipFilePath);
-        zipFile.ExtractAll(Path.GetFullPath(InstallationPath), ExtractExistingFileAction.OverwriteSilently);
+        zipFile.ExtractAll(InstallationPath, ExtractExistingFileAction.OverwriteSilently);
         zipFile.Dispose();
         File.Delete(zipFilePath);
         VersionUpToDate = true;
@@ -125,7 +127,7 @@ public sealed class UBlockOriginService : IBrowserExtension
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetLatestVersion), version);
         scopedLogger.LogInformation($"Retrieving version {version}");
         var downloadUrl = ReleaseUrl.Replace(TagPlaceholder, version);
-        var destinationFolder = Path.GetFullPath(InstallationPath);
+        var destinationFolder = InstallationPath;
         var destinationPath = Path.Combine(destinationFolder, ZipName);
         var success = await this.downloadService.DownloadFile(downloadUrl, destinationPath, new UpdateStatus(), cancellationToken);
         if (!success)
@@ -138,7 +140,7 @@ public sealed class UBlockOriginService : IBrowserExtension
 
     private async Task<string?> GetCurrentVersion(CancellationToken cancellationToken)
     {
-        var manifestFilePath = Path.GetFullPath(Path.Combine(InstallationPath, Path.Combine(InstallationFolderName, "manifest.json")));
+        var manifestFilePath = Path.GetFullPath(InstallationPath, Path.Combine(InstallationFolderName, "manifest.json"));
         var fileInfo = new FileInfo(manifestFilePath);
         if (!fileInfo.Exists)
         {
