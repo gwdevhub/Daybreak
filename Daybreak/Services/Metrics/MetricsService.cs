@@ -14,7 +14,8 @@ internal sealed class MetricsService : IMetricsService, IDisposable
     private const string MetricsNamespace = "Daybreak";
     private const string MetricsStoreName = "MetricsStore";
 
-    private readonly object metricStoreLock = new object();
+    private static readonly SemaphoreSlim MetricsSemaphore = new(1, 1);
+
     private readonly MeterListener meterListener;
     private readonly Meter daybreakMeter;
     private readonly ConcurrentDictionary<string, LinkedList<Metric>> metricStore = new();
@@ -116,9 +117,7 @@ internal sealed class MetricsService : IMetricsService, IDisposable
     {
         MetricSet? newMetricSet = default;
         RecordedMetric? newRecordedMetric = default;
-        while(Monitor.TryEnter(this.metricStoreLock) is false)
-        {
-        }
+        MetricsSemaphore.Wait();
 
         if (measurement is null)
         {
@@ -141,7 +140,7 @@ internal sealed class MetricsService : IMetricsService, IDisposable
         }
 
         newRecordedMetric = new RecordedMetric { Instrument = instrument, Metric = metric };
-        Monitor.Exit(this.metricStoreLock);
+        MetricsSemaphore.Release();
 
         if (newMetricSet is not null)
         {

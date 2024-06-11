@@ -88,6 +88,7 @@ using Daybreak.Services.ApplicationArguments;
 using Daybreak.Services.ApplicationArguments.ArgumentHandling;
 using Daybreak.Services.Window;
 using Daybreak.Launch;
+using Daybreak.Utils;
 
 namespace Daybreak.Configuration;
 
@@ -135,7 +136,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IPostUpdateActionProvider>(sp => sp.GetRequiredService<PostUpdateActionManager>());
         services.AddSingleton<IMenuService, MenuService>();
         services.AddSingleton<IMenuServiceInitializer, MenuService>(sp => sp.GetRequiredService<IMenuService>().Cast<MenuService>());
-        services.AddSingleton<ILiteDatabase, LiteDatabase>(sp => new LiteDatabase("Daybreak.db"));
+        services.AddSingleton<ILiteDatabase, LiteDatabase>(sp => new LiteDatabase(PathUtils.GetAbsolutePathFromRoot("Daybreak.db")));
         services.AddSingleton<IMutexHandler, MutexHandler>();
         services.AddSingleton<IShortcutManager, ShortcutManager>();
         services.AddSingleton<IMetricsService, MetricsService>();

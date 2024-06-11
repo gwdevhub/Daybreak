@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Models.Guildwars;
+using Daybreak.Utils;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 using System;
@@ -8,6 +9,7 @@ using System.Core.Extensions;
 using System.Extensions;
 using System.IO;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,8 +20,9 @@ internal sealed class IconCache : IIconCache
     private const string HighResolutionGalleryUrl = $"https://wiki.guildwars.com/wiki/File:{NamePlaceholder}_(large).jpg";
     private const string WikiUrl = "https://wiki.guildwars.com";
     private const string NamePlaceholder = "[NAME]";
-    private const string IconsDirectoryName = "Icons";
-    private const string IconsLocation = $"{IconsDirectoryName}/{NamePlaceholder}.jpg";
+    private const string IconsDirectoryNameSubpath = "Icons";
+    private readonly static string IconsDirectory = PathUtils.GetAbsolutePathFromRoot(IconsDirectoryNameSubpath);
+    private readonly static string IconsLocation = PathUtils.GetAbsolutePathFromRoot(IconsDirectoryNameSubpath, $"{NamePlaceholder}.jpg");
 
     private readonly SemaphoreSlim diskSemaphore = new(1, 1);
     private readonly IHttpClient<IconCache> httpClient;
@@ -35,9 +38,9 @@ internal sealed class IconCache : IIconCache
         this.options = options.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
 
-        if (Directory.Exists(IconsDirectoryName) is false)
+        if (Directory.Exists(IconsDirectory) is false)
         {
-            Directory.CreateDirectory(IconsDirectoryName);
+            Directory.CreateDirectory(IconsDirectory);
         }
     }
 

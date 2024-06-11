@@ -3,12 +3,14 @@ using Daybreak.Models.GWCA;
 using Daybreak.Models.Mods;
 using Daybreak.Services.Injection;
 using Daybreak.Services.Notifications;
+using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Linq;
+using System.IO;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,7 +19,7 @@ namespace Daybreak.Services.GWCA;
 internal sealed class GWCAInjector : IGWCAInjector
 {
     private const int MaxRetries = 10;
-    private const string ModulePath = "GWCA/Daybreak.GWCA.dll";
+    private const string ModuleSubPath = "GWCA/Daybreak.GWCA.dll";
 
     private readonly INotificationService notificationService;
     private readonly IGWCAClient gwcaClient;
@@ -65,8 +67,9 @@ internal sealed class GWCAInjector : IGWCAInjector
 
     public async Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken)
     {
+        var modulePath = PathUtils.GetAbsolutePathFromRoot(ModuleSubPath);
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.OnGuildWarsCreated), guildWarsCreatedContext.ApplicationLauncherContext.ExecutablePath);
-        if (!await this.injector.Inject(guildWarsCreatedContext.ApplicationLauncherContext.Process, ModulePath, cancellationToken))
+        if (!await this.injector.Inject(guildWarsCreatedContext.ApplicationLauncherContext.Process, modulePath, cancellationToken))
         {
             scopedLogger.LogError("Unable to inject GWCA plugin into Guild Wars. Check above error messages for details");
             this.notificationService.NotifyError(

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Daybreak.Utils;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Core.Extensions;
 using System.Diagnostics;
@@ -28,7 +29,7 @@ internal sealed class SevenZipExtractor : ISevenZipExtractor
         {
             StartInfo = new ProcessStartInfo
             {
-                FileName = ExtractorExeName,
+                FileName = PathUtils.GetAbsolutePathFromRoot(ExtractorExeName),
                 Arguments = $"\"{sourceFile}\" \"{destinationDirectory}\"",
                 RedirectStandardOutput = true,
                 CreateNoWindow = true,

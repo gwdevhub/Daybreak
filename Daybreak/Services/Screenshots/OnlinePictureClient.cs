@@ -3,6 +3,7 @@ using Daybreak.Models.Guildwars;
 using Daybreak.Services.Images;
 using Daybreak.Services.Scanner;
 using Daybreak.Services.Screenshots.Models;
+using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ using System.Extensions;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
@@ -22,7 +24,10 @@ internal sealed class OnlinePictureClient : IOnlinePictureClient
 {
     private const string CloudFlareCookieValue = "fcfd523b2470336531e47baff3d2c2d6a0e2412a.1689426482.1";
     private const string CloudFlareCookieKey = "wschkid";
-    private const string CacheFolder = "ImageCache";
+    private const string CacheFolderSubPath = "ImageCache";
+
+    private static readonly string CacheFolder = PathUtils.GetAbsolutePathFromRoot(CacheFolderSubPath);
+
     private readonly IImageCache imageCache;
     private readonly IGuildwarsMemoryCache guildwarsMemoryCache;
     private readonly IHttpClient<OnlinePictureClient> httpClient;

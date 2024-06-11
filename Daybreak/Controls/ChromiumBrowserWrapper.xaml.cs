@@ -172,7 +172,7 @@ public partial class ChromiumBrowserWrapper : UserControl
                 return;
             }
 
-            CoreWebView2Environment ??= System.Extensions.TaskExtensions.RunSync(() => CoreWebView2Environment.CreateAsync(null, "BrowserData", new CoreWebView2EnvironmentOptions
+            CoreWebView2Environment ??= System.Extensions.TaskExtensions.RunSync(() => CoreWebView2Environment.CreateAsync(null, PathUtils.GetAbsolutePathFromRoot("BrowserData"), new CoreWebView2EnvironmentOptions
             {
                 EnableTrackingPrevention = true,
                 AllowSingleSignOnUsingOSPrimaryAccount = true,
