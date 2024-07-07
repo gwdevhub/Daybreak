@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Daybreak.Services.Guildwars.Models;
+namespace Daybreak.Services.GuildWars.Models;
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 internal readonly struct HandshakeRequest
 {

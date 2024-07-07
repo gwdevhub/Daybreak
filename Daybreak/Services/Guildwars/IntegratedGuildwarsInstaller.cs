@@ -1,22 +1,28 @@
 ﻿using Daybreak.Models.Progress;
 using Daybreak.Services.ExecutableManagement;
-using Daybreak.Services.Guildwars.Models;
-using Daybreak.Services.Guildwars.Utils;
+using Daybreak.Services.GuildWars.Models;
+using Daybreak.Services.GuildWars.Utils;
 using Daybreak.Services.Notifications;
+using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Daybreak.Services.Guildwars;
-internal sealed class IntegratedGuildwarsInstaller : IGuildwarsInstaller
+namespace Daybreak.Services.GuildWars;
+internal sealed class IntegratedGuildwarsInstaller : IGuildWarsInstaller
 {
     private const string ExeName = "Gw.exe";
-    private const string TempExeName = "Gw.exe.temp";
+    private const string CompressedTempExeName = $"Gw.{VersionPlaceholder}.temp";
+    private const string UncompressedTempExeName = $"Gw.{VersionPlaceholder}.exe";
+    private const string VersionPlaceholder = "[VERSION]";
+    private static readonly string StagingFolder = PathUtils.GetAbsolutePathFromRoot("GuildWarsCache");
 
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager;
     private readonly INotificationService notificationService;
@@ -32,6 +38,65 @@ internal sealed class IntegratedGuildwarsInstaller : IGuildwarsInstaller
         this.logger = logger.ThrowIfNull();
     }
 
+    public async IAsyncEnumerable<GuildWarsUpdateResponse> CheckAndUpdateGuildWarsExecutables(List<GuildWarsUpdateRequest> requests, [EnumeratorCancellation]CancellationToken cancellationToken)
+    {
+        requests.ThrowIfNull();
+        var mainScopedLogger = this.logger.CreateScopedLogger(nameof(this.CheckAndUpdateGuildWarsExecutables), string.Empty);
+        if (await this.GetLatestVersionId(CancellationToken.None) is not int latestVersion)
+        {
+            mainScopedLogger.LogError("Failed to fetch latest GuildWars version");
+            throw new InvalidOperationException("Failed to fetch latest GuildWars version");
+        }
+
+        foreach(var request in requests)
+        {
+            if (request.ExecutablePath!.IsNullOrWhiteSpace() ||
+                request.Status is null)
+            {
+                mainScopedLogger.LogError($"Invalid request for [{request.ExecutablePath}]");
+                yield return new GuildWarsUpdateResponse { ExecutablePath = request.ExecutablePath, Result = false };
+                continue;
+            }
+
+            var scopedLogger = this.logger.CreateScopedLogger(nameof(this.CheckAndUpdateGuildWarsExecutables), request.ExecutablePath!);
+            if (!File.Exists(request.ExecutablePath))
+            {
+                scopedLogger.LogError($"File not found at [{request.ExecutablePath}]");
+                yield return new GuildWarsUpdateResponse { ExecutablePath = request.ExecutablePath, Result = false };
+                continue;
+            }
+
+            if (await this.GetVersionId(request.ExecutablePath, request.CancellationToken) is int version &&
+                    version == latestVersion)
+            {
+                scopedLogger.LogInformation("Executable is already latest");
+                yield return new GuildWarsUpdateResponse { ExecutablePath = request.ExecutablePath, Result = true };
+                continue;
+            }
+
+            var success = false;
+            try
+            {
+                success = await this.UpdateGuildwars(request.ExecutablePath, request.Status, request.CancellationToken);
+            }
+            catch(Exception e)
+            {
+                scopedLogger.LogError(e, "Encountered exception while processing");
+                success = false;
+            }
+
+            yield return new GuildWarsUpdateResponse { ExecutablePath = request.ExecutablePath, Result = success };
+        }
+    }
+
+    public async Task<bool> UpdateGuildwars(string exePath, GuildwarsInstallationStatus installationStatus, CancellationToken cancellationToken)
+    {
+        return await new TaskFactory().StartNew(_ =>
+        {
+            return this.UpdateGuildwarsInternal(exePath, installationStatus, cancellationToken);
+        }, TaskCreationOptions.LongRunning, cancellationToken).Unwrap();
+    }
+
     public async Task<bool> InstallGuildwars(string destinationPath, GuildwarsInstallationStatus installationStatus, CancellationToken cancellationToken)
     {
         return await new TaskFactory().StartNew(_ => {
@@ -39,65 +104,101 @@ internal sealed class IntegratedGuildwarsInstaller : IGuildwarsInstaller
         }, TaskCreationOptions.LongRunning, cancellationToken).Unwrap();
     }
 
-    private async Task<bool> InstallGuildwarsInternal(string destinationPath, GuildwarsInstallationStatus installationStatus, CancellationToken cancellationToken)
+    public async Task<int?> GetLatestVersionId(CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.InstallGuildwarsInternal), destinationPath);
-        GuildwarsClientContext? maybeContext = default;
+        var guildWarsClient = new GuildWarsClient();
+        var response = await guildWarsClient.Connect(cancellationToken);
+        return response?.Item2.LatestExe;
+    }
+
+    public async Task<int?> GetVersionId(string executablePath, CancellationToken cancellationToken)
+    {
+        var parser = GuildWarsExecutableParser.TryParse(executablePath);
+        if (parser is null)
+        {
+            return default;
+        }
+
         try
         {
-            var tempName = Path.Combine(destinationPath, TempExeName);
-            var exeName = Path.Combine(destinationPath, ExeName);
+            return await parser.GetVersion(cancellationToken);
+        }
+        catch
+        {
+            return default;
+        }
+    }
 
+    private async Task<bool> UpdateGuildwarsInternal(string exePath, GuildwarsInstallationStatus installationStatus, CancellationToken cancellationToken)
+    {
+        var downloadedPath = await this.FetchLatestGuildwarsInternal(installationStatus, cancellationToken);
+        if (downloadedPath is null)
+        {
+            installationStatus.CurrentStep = GuildwarsInstallationStatus.Failed;
+            return false;
+        }
+
+        File.Copy(downloadedPath, exePath, true);
+        installationStatus.CurrentStep = GuildwarsInstallationStatus.UpdateFinished;
+        return true;
+    }
+
+    private async Task<string?> FetchLatestGuildwarsInternal(GuildwarsInstallationStatus installationStatus, CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.FetchLatestGuildwarsInternal), string.Empty);
+        GuildWarsClientContext? maybeContext = default;
+        try
+        {
             // Initialize the download client
-            var guildWarsClient = new GuildwarsClient();
+            var guildWarsClient = new GuildWarsClient();
             var result = await guildWarsClient.Connect(cancellationToken);
             if (!result.HasValue)
             {
                 scopedLogger.LogError("Failed to connect to ArenaNet servers");
-                installationStatus.CurrentStep = GuildwarsInstallationStatus.FailedDownload;
-                return false;
+                installationStatus.CurrentStep = GuildwarsInstallationStatus.Failed;
+                return default;
             }
 
             (var context, var manifest) = result.Value;
             maybeContext = context;
+            var tempName = Path.Combine(StagingFolder, CompressedTempExeName.Replace(VersionPlaceholder, manifest.LatestExe.ToString()));
+            var cacheName = Path.Combine(StagingFolder, UncompressedTempExeName.Replace(VersionPlaceholder, manifest.LatestExe.ToString()));
+            if (File.Exists(cacheName))
+            {
+                var fileInfo = new FileInfo(cacheName);
+                var fileResponse = await guildWarsClient.GetFileResponse(context, manifest.LatestExe, 0, cancellationToken);
+                if (fileInfo.Length == fileResponse.SizeDecompressed)
+                {
+                    return cacheName;
+                }
+            }
+
             (var downloadResult, var expectedFinalSize) = await this.DownloadCompressedExecutable(tempName, guildWarsClient, context, manifest, installationStatus, cancellationToken);
             if (!downloadResult)
             {
                 scopedLogger.LogError("Failed to download compressed executable");
-                installationStatus.CurrentStep = GuildwarsInstallationStatus.FailedDownload;
-                return false;
+                installationStatus.CurrentStep = GuildwarsInstallationStatus.Failed;
+                return default;
             }
 
-            if (!this.DecompressExecutable(tempName, exeName, expectedFinalSize, installationStatus))
+            if (!this.DecompressExecutable(tempName, cacheName, expectedFinalSize, installationStatus))
             {
                 scopedLogger.LogError("Failed to decompress executable");
-                installationStatus.CurrentStep = GuildwarsInstallationStatus.FailedDownload;
-                return false;
+                installationStatus.CurrentStep = GuildwarsInstallationStatus.Failed;
+                return default;
             }
 
-            var filePath = Path.GetFullPath(exeName);
-            installationStatus.CurrentStep = GuildwarsInstallationStatus.StartingExecutable;
-            await Task.Delay(100, cancellationToken);
-            using var process = Process.Start(filePath);
-            scopedLogger.LogInformation("Starting executable. Waiting for the process to end before finishing installation");
-            while (!process.HasExited)
-            {
-                await Task.Delay(1000, cancellationToken);
-            }
-
-            this.guildWarsExecutableManager.AddExecutable(filePath);
             File.Delete(tempName);
-            installationStatus.CurrentStep = GuildwarsInstallationStatus.Finished;
-            return true;
+            return cacheName;
         }
         catch (Exception e)
         {
             this.notificationService.NotifyError(
                 title: "Download exception",
                 description: $"Encountered exception while downloading: {e}");
-            installationStatus.CurrentStep = GuildwarsInstallationStatus.FailedDownload;
+            installationStatus.CurrentStep = GuildwarsInstallationStatus.Failed;
             this.logger.LogError(e, "Download failed. Encountered exception");
-            return false;
+            return default;
         }
         finally
         {
@@ -108,10 +209,37 @@ internal sealed class IntegratedGuildwarsInstaller : IGuildwarsInstaller
         }
     }
 
+    private async Task<bool> InstallGuildwarsInternal(string destinationPath, GuildwarsInstallationStatus installationStatus, CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.InstallGuildwarsInternal), destinationPath);
+        var exePath = Path.Combine(destinationPath, ExeName);
+        var latestGwPath = await this.FetchLatestGuildwarsInternal(installationStatus, cancellationToken);
+        if (latestGwPath is null)
+        {
+            installationStatus.CurrentStep = GuildwarsInstallationStatus.Failed;
+            return false;
+        }
+
+        var filePath = Path.GetFullPath(exePath);
+        File.Copy(latestGwPath, filePath, true);
+        installationStatus.CurrentStep = GuildwarsInstallationStatus.StartingExecutable;
+        await Task.Delay(100, cancellationToken);
+        using var process = Process.Start(filePath);
+        scopedLogger.LogInformation("Starting executable. Waiting for the process to end before finishing installation");
+        while (!process.HasExited)
+        {
+            await Task.Delay(1000, cancellationToken);
+        }
+
+        this.guildWarsExecutableManager.AddExecutable(filePath);
+        installationStatus.CurrentStep = GuildwarsInstallationStatus.InstallFinished;
+        return true;
+    }
+
     private async Task<(bool Success, int ExpectedSize)> DownloadCompressedExecutable(
         string fileName,
-        GuildwarsClient guildWarsClient,
-        GuildwarsClientContext context,
+        GuildWarsClient guildWarsClient,
+        GuildWarsClientContext context,
         ManifestResponse manifest,
         GuildwarsInstallationStatus installationStatus,
         CancellationToken cancellationToken)
@@ -125,6 +253,18 @@ internal sealed class IntegratedGuildwarsInstaller : IGuildwarsInstaller
         }
 
         using var downloadStream = maybeStream;
+        var directoryName = Path.GetDirectoryName(fileName);
+        if (directoryName is null)
+        {
+            scopedLogger.LogError("Failed to create destination folder");
+            return (false, -1);
+        }
+
+        if (!Directory.Exists(directoryName))
+        {
+            Directory.CreateDirectory(directoryName);
+        }
+
         using var writeFileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write);
         var expectedFinalSize = downloadStream.SizeDecompressed;
         var buffer = new Memory<byte>(new byte[2048]);

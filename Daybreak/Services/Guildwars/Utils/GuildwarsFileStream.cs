@@ -1,15 +1,15 @@
-﻿using Daybreak.Services.Guildwars.Models;
+﻿using Daybreak.Services.GuildWars.Models;
 using System;
 using System.Core.Extensions;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Daybreak.Services.Guildwars.Utils;
+namespace Daybreak.Services.GuildWars.Utils;
 internal sealed class GuildwarsFileStream : Stream
 {
-    private readonly GuildwarsClient guildwarsClient;
-    private readonly GuildwarsClientContext guildwarsClientContext;
+    private readonly GuildWarsClient guildwarsClient;
+    private readonly GuildWarsClientContext guildwarsClientContext;
 
     private byte[]? chunkBuffer;
     private int positionInBuffer = 0;
@@ -26,7 +26,7 @@ internal sealed class GuildwarsFileStream : Stream
     public override long Length => this.SizeCompressed;
     public override long Position { get; set; }
 
-    public GuildwarsFileStream(GuildwarsClientContext guildwarsClientContext, GuildwarsClient guildwarsClient, int fileId, int sizeCompressed, int sizeDecompressed, int crc)
+    public GuildwarsFileStream(GuildWarsClientContext guildwarsClientContext, GuildWarsClient guildwarsClient, int fileId, int sizeCompressed, int sizeDecompressed, int crc)
     {
         this.guildwarsClient = guildwarsClient.ThrowIfNull();
         this.guildwarsClientContext = guildwarsClientContext;

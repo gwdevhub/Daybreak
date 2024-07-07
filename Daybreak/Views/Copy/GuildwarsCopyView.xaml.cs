@@ -1,5 +1,5 @@
 ﻿using Daybreak.Models.Progress;
-using Daybreak.Services.Guildwars;
+using Daybreak.Services.GuildWars;
 using Daybreak.Services.Navigation;
 using Daybreak.Views.Launch;
 using Microsoft.Extensions.Logging;
@@ -20,7 +20,7 @@ public partial class GuildwarsCopyView : UserControl
     private readonly CancellationTokenSource cancellationTokenSource = new();
     private readonly ILogger<GuildwarsCopyView> logger;
     private readonly IViewManager viewManager;
-    private readonly IGuildwarsCopyService guildwarsCopyService;
+    private readonly IGuildWarsCopyService guildwarsCopyService;
     private readonly CopyStatus copyStatus = new();
 
     [GenerateDependencyProperty(InitialValue = "")]
@@ -33,7 +33,7 @@ public partial class GuildwarsCopyView : UserControl
     private bool progressVisible;
 
     public GuildwarsCopyView(
-        IGuildwarsCopyService guildwarsCopyService,
+        IGuildWarsCopyService guildwarsCopyService,
         ILogger<GuildwarsCopyView> logger,
         IViewManager viewManager)
     {
