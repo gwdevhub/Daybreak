@@ -22,7 +22,7 @@ public abstract class DownloadStatus : ActionStatus
         }
     }
 
-    public sealed class DownloadProgressStep : DownloadStep
+    public class DownloadProgressStep : DownloadStep
     {
         public TimeSpan? ETA { get; set; }
 
