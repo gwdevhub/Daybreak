@@ -372,7 +372,6 @@
             <BeginStoryboard x:Name="ProgressAnimation_BeginStoryboard" Storyboard="{StaticResource ProgressAnimation}"/>
         </EventTrigger>
     </UserControl.Triggers>
-
     <Viewbox>
         <Canvas x:Name="LayoutRoot" VerticalAlignment="Top" Height="88" Width="88">
             <Grid Width="10.734" Height="10.004" Canvas.Left="38.614" Canvas.Top="0.331">

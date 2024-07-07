@@ -163,14 +163,11 @@ internal sealed class IntegratedGuildwarsInstaller : IGuildWarsInstaller
             maybeContext = context;
             var tempName = Path.Combine(StagingFolder, CompressedTempExeName.Replace(VersionPlaceholder, manifest.LatestExe.ToString()));
             var cacheName = Path.Combine(StagingFolder, UncompressedTempExeName.Replace(VersionPlaceholder, manifest.LatestExe.ToString()));
-            if (File.Exists(cacheName))
+            if (File.Exists(cacheName) &&
+                await this.GetVersionId(cacheName, cancellationToken) is int cacheVersion &&
+                cacheVersion == manifest.LatestExe)
             {
-                var fileInfo = new FileInfo(cacheName);
-                var fileResponse = await guildWarsClient.GetFileResponse(context, manifest.LatestExe, 0, cancellationToken);
-                if (fileInfo.Length == fileResponse.SizeDecompressed)
-                {
-                    return cacheName;
-                }
+                return cacheName;
             }
 
             (var downloadResult, var expectedFinalSize) = await this.DownloadCompressedExecutable(tempName, guildWarsClient, context, manifest, installationStatus, cancellationToken);

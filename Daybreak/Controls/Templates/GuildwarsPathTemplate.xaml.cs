@@ -1,7 +1,17 @@
-﻿using Daybreak.Models;
+﻿using Daybreak.Controls.Buttons;
+using Daybreak.Models;
+using Daybreak.Models.Progress;
+using Daybreak.Models.Versioning;
+using Daybreak.Services.GuildWars;
+using Daybreak.Services.Navigation;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using System;
+using System.Core.Extensions;
+using System.Data;
 using System.Extensions;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
@@ -15,14 +25,55 @@ namespace Daybreak.Controls;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
 public partial class GuildwarsPathTemplate : UserControl
 {
+    private readonly IGuildWarsInstaller guildWarsInstaller;
+
+    private CancellationTokenSource? tokenSource;
+
     public event EventHandler? RemoveClicked;
 
     [GenerateDependencyProperty]
-    private string path = string.Empty;
+    private bool noUpdateResult;
+    [GenerateDependencyProperty]
+    private bool checkingVersion;
+    [GenerateDependencyProperty]
+    private bool upToDate;
+    [GenerateDependencyProperty]
+    private string updateProgress = string.Empty;
 
-    public GuildwarsPathTemplate()
+    public GuildwarsPathTemplate() :
+        this(Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IGuildWarsInstaller>())
     {
+    }
+
+    public GuildwarsPathTemplate(
+        IGuildWarsInstaller guildWarsInstaller)
+    {
+        this.guildWarsInstaller = guildWarsInstaller.ThrowIfNull();
         this.InitializeComponent();
+    }
+
+    protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+        if (e.Property == DataContextProperty)
+        {
+            if (e.OldValue is ExecutablePath oldPath)
+            {
+                oldPath.PropertyChanged -= this.ExecutablePath_PropertyChanged;
+            }
+
+            if (e.NewValue is ExecutablePath newPath)
+            {
+                newPath.PropertyChanged += this.ExecutablePath_PropertyChanged;
+            }
+
+            this.CheckExecutable();
+        }
+    }
+
+    private void ExecutablePath_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        throw new NotImplementedException();
     }
 
     private void BinButton_Clicked(object sender, EventArgs e)
@@ -42,6 +93,99 @@ public partial class GuildwarsPathTemplate : UserControl
         if (filePicker.ShowDialog() is true)
         {
             this.DataContext.As<ExecutablePath>()!.Path = filePicker.FileName;
+            this.CheckExecutable();
+        }
+    }
+
+    private void UserControl_Unloaded(object sender, RoutedEventArgs e)
+    {
+        this.tokenSource?.Dispose();
+    }
+
+    private void CheckExecutable()
+    {
+        if (this.DataContext is not ExecutablePath executablePath)
+        {
+            return;
+        }
+
+        this.tokenSource?.Dispose();
+        this.tokenSource = new CancellationTokenSource();
+        new TaskFactory().StartNew(async () =>
+        {
+            await this.Dispatcher.InvokeAsync(() => this.CheckingVersion = true);
+            await this.Dispatcher.InvokeAsync(() => this.NoUpdateResult = false);
+            if (await this.guildWarsInstaller.GetLatestVersionId(this.tokenSource.Token) is not int latestVersion)
+            {
+                await this.Dispatcher.InvokeAsync(() => this.CheckingVersion = false);
+                await this.Dispatcher.InvokeAsync(() => this.NoUpdateResult = true);
+                return;
+            }
+
+            if (await this.guildWarsInstaller.GetVersionId(executablePath.Path, this.tokenSource.Token) is not int version)
+            {
+                await this.Dispatcher.InvokeAsync(() => this.CheckingVersion = false);
+                await this.Dispatcher.InvokeAsync(() => this.NoUpdateResult = false);
+                await this.Dispatcher.InvokeAsync(() => this.UpToDate = false);
+                return;
+            }
+
+            await this.Dispatcher.InvokeAsync(() => this.CheckingVersion = false);
+            await this.Dispatcher.InvokeAsync(() => this.NoUpdateResult = false);
+            await this.Dispatcher.InvokeAsync(() => this.UpToDate = version == latestVersion);
+        }, this.tokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+    }
+
+    private async void UpdateButton_Clicked(object sender, EventArgs e)
+    {
+        if (this.DataContext is not ExecutablePath path)
+        {
+            return;
+        }
+
+        if (sender is not BackButton updateButton)
+        {
+            return;
+        }
+
+        await this.Dispatcher.InvokeAsync(() => updateButton.IsEnabled = false);
+        await this.Dispatcher.InvokeAsync(() => this.CheckingVersion = true);
+        await this.Dispatcher.InvokeAsync(() => this.NoUpdateResult = false);
+        this.tokenSource?.Dispose();
+        this.tokenSource = new CancellationTokenSource();
+        var status = new GuildwarsInstallationStatus();
+        status.PropertyChanged += this.UpdateStatus_PropertyChanged;
+        try
+        {
+            var result = await this.guildWarsInstaller.UpdateGuildwars(path.Path, status, this.tokenSource.Token);
+            await this.Dispatcher.InvokeAsync(() => this.CheckingVersion = false);
+            await this.Dispatcher.InvokeAsync(() => this.NoUpdateResult = false);
+            await this.Dispatcher.InvokeAsync(() => this.UpToDate = result);
+        }
+        finally
+        {
+            status.PropertyChanged -= this.UpdateStatus_PropertyChanged;
+        }
+    }
+
+    private void UpdateStatus_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (sender is not GuildwarsInstallationStatus status)
+        {
+            return;
+        }
+
+        if (status.CurrentStep is DownloadStatus.DownloadProgressStep progressStep)
+        {
+            // TODO: Kinda hacky way to display a continuous progress widget
+            if (progressStep is GuildwarsInstallationStatus.UnpackingProgressStep)
+            {
+                this.Dispatcher.Invoke(() => this.UpdateProgress = $"{(int)(50 + (progressStep.Progress * 50))}%");
+            }
+            else
+            {
+                this.Dispatcher.Invoke(() => this.UpdateProgress = $"{(int)(progressStep.Progress * 50)}%");
+            }
         }
     }
 }
