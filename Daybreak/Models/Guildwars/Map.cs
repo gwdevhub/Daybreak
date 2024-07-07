@@ -256,6 +256,7 @@ public sealed class Map : IWikiEntity
     public static readonly Map DwaynaVsGrenth = new() { Id = 253, Name = "Dwayna Vs Grenth", WikiUrl = "https://wiki.guildwars.com/wiki/Dwayna_Vs_Grenth" };
     public static readonly Map SunjiangDistrictExplorable = new() { Id = 254, Name = "Sunjiang District", WikiUrl = "https://wiki.guildwars.com/wiki/Sunjiang_District" };
     public static readonly Map NahpuiQuarterExplorable = new() { Id = 257, Name = "Nahpui Quarter", WikiUrl = "https://wiki.guildwars.com/wiki/Nahpui_Quarter" };
+    public static readonly Map NahpuiQuarterExplorable2 = new() { Id = 265, Name = "Nahpui Quarter", WikiUrl = "https://wiki.guildwars.com/wiki/Nahpui_Quarter" };
     public static readonly Map UrgozsWarren = new() { Id = 266, Name = "Urgozs Warren", WikiUrl = "https://wiki.guildwars.com/wiki/Urgozs_Warren" };
     public static readonly Map TahnnakaiTempleExplorable = new() { Id = 267, Name = "Tahnnakai Temple", WikiUrl = "https://wiki.guildwars.com/wiki/Tahnnakai_Temple" };
     public static readonly Map AltrummRuins = new() { Id = 270, Name = "Altrumm Ruins", WikiUrl = "https://wiki.guildwars.com/wiki/Altrumm_Ruins" };
