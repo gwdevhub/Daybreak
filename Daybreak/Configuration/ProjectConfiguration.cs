@@ -38,7 +38,7 @@ using Daybreak.Services.Drawing;
 using Daybreak.Services.Drawing.Modules.Entities;
 using Daybreak.Services.Drawing.Modules.MapIcons;
 using Daybreak.Services.Drawing.Modules;
-using Daybreak.Services.Guildwars;
+using Daybreak.Services.GuildWars;
 using Daybreak.Configuration.Options;
 using System.Configuration;
 using Daybreak.Services.UMod;
@@ -89,6 +89,7 @@ using Daybreak.Services.ApplicationArguments.ArgumentHandling;
 using Daybreak.Services.Window;
 using Daybreak.Launch;
 using Daybreak.Utils;
+using Daybreak.Views.Installation;
 
 namespace Daybreak.Configuration;
 
@@ -182,7 +183,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IExperienceCalculator, ExperienceCalculator>();
         services.AddScoped<IAttributePointCalculator, AttributePointCalculator>();
         services.AddScoped<IDownloadService, DownloadService>();
-        services.AddScoped<IGuildwarsInstaller, IntegratedGuildwarsInstaller>();
+        services.AddScoped<IGuildWarsInstaller, IntegratedGuildwarsInstaller>();
         services.AddScoped<IExceptionHandler, ExceptionHandler>();
         services.AddScoped<IDrawingService, DrawingService>();
         services.AddScoped<IDrawingModuleProducer, DrawingService>(sp => sp.GetRequiredService<IDrawingService>().As<DrawingService>()!);
@@ -193,7 +194,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IPriceHistoryService, PriceHistoryService>();
         services.AddScoped<IWordHighlightingService, WordHighlightingService>();
         services.AddScoped<ITradeHistoryDatabase, TradeHistoryDatabase>();
-        services.AddScoped<IGuildwarsCopyService, GuildwarsCopyService>();
+        services.AddScoped<IGuildWarsCopyService, GuildWarsCopyService>();
         services.AddScoped<IItemHashService, ItemHashService>();
         services.AddScoped<IRegistryService, RegistryService>();
         services.AddScoped<IEventNotifierService, EventNotifierService>();
@@ -227,7 +228,8 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<BuildsSynchronizationView>();
         viewProducer.RegisterView<LauncherOnboardingView>();
         viewProducer.RegisterView<MetricsView>();
-        viewProducer.RegisterView<GuildwarsDownloadView>();
+        viewProducer.RegisterView<GuildWarsDownloadView>();
+        viewProducer.RegisterView<GuildWarsDownloadSelectionView>();
         viewProducer.RegisterView<UModInstallingView>();
         viewProducer.RegisterView<UModInstallationChoiceView>();
         viewProducer.RegisterView<UModOnboardingEntryView>();
@@ -393,6 +395,8 @@ public class ProjectConfiguration : PluginConfigurationBase
         notificationHandlerProducer.RegisterNotificationHandler<UpdateNotificationHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<ReShadeConfigChangedHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<NavigateToCalendarViewHandler>();
+        notificationHandlerProducer.RegisterNotificationHandler<GuildWarsUpdateNotificationHandler>();
+        notificationHandlerProducer.RegisterNotificationHandler<GuildWarsBatchUpdateNotificationHandler>();
     }
 
     public override void RegisterMods(IModsManager modsManager)
@@ -404,6 +408,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         modsManager.RegisterMod<IGuildwarsScreenPlacer, GuildwarsScreenPlacer>();
         modsManager.RegisterMod<IGWCAInjector, GWCAInjector>();
         modsManager.RegisterMod<IDirectSongService, DirectSongService>(singleton: true);
+        modsManager.RegisterMod<IGuildWarsVersionChecker, GuildWarsVersionChecker>();
     }
 
     public override void RegisterBrowserExtensions(IBrowserExtensionsProducer browserExtensionsProducer)

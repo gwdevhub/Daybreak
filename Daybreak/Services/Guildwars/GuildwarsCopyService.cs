@@ -8,9 +8,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Daybreak.Services.Guildwars;
+namespace Daybreak.Services.GuildWars;
 
-internal sealed class GuildwarsCopyService : IGuildwarsCopyService
+internal sealed class GuildWarsCopyService : IGuildWarsCopyService
 {
     private const string ExecutableName = "Gw.exe";
 
@@ -22,11 +22,11 @@ internal sealed class GuildwarsCopyService : IGuildwarsCopyService
     };
 
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager;
-    private readonly ILogger<GuildwarsCopyService> logger;
+    private readonly ILogger<GuildWarsCopyService> logger;
 
-    public GuildwarsCopyService(
+    public GuildWarsCopyService(
         IGuildWarsExecutableManager guildWarsExecutableManager,
-        ILogger<GuildwarsCopyService> logger)
+        ILogger<GuildWarsCopyService> logger)
     {
         this.guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
