@@ -8,7 +8,7 @@ public sealed class GuildwarsInstallationStatus : DownloadStatus
     public static readonly LoadStatus StartingExecutable = new GuildwarsInstallationStep("Starting Guildwars. Finish the installation process and close the installer");
     public static readonly LoadStatus UpdateFinished = new GuildwarsInstallationStep("Update has finished", true);
     public static readonly LoadStatus Failed = new GuildwarsInstallationStep("Operation failed. Please check logs for details", true);
-    public static DownloadProgressStep Unpacking(double progress, TimeSpan? eta) => new("Unpacking", progress, eta);
+    public static UnpackingProgressStep Unpacking(double progress, TimeSpan? eta) => new(progress, eta);
 
     public GuildwarsInstallationStatus()
     {
@@ -22,6 +22,14 @@ public sealed class GuildwarsInstallationStatus : DownloadStatus
         internal GuildwarsInstallationStep(string name, bool final = false) : base(name)
         {
             this.Final = final;
+        }
+    }
+
+    public sealed class UnpackingProgressStep : DownloadProgressStep
+    {
+        public UnpackingProgressStep(double progress, TimeSpan? eta)
+            : base("Unpacking", progress, eta)
+        {
         }
     }
 }
