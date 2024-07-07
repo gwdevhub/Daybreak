@@ -1,14 +1,14 @@
-﻿using Daybreak.Services.Guildwars.Models;
+﻿using Daybreak.Services.GuildWars.Models;
 using System;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Daybreak.Services.Guildwars.Utils;
-internal sealed class GuildwarsClient
+namespace Daybreak.Services.GuildWars.Utils;
+internal sealed class GuildWarsClient
 {
-    public async Task<(GuildwarsClientContext, ManifestResponse)?> Connect(CancellationToken cancellationToken)
+    public async Task<(GuildWarsClientContext, ManifestResponse)?> Connect(CancellationToken cancellationToken)
     {
         for(var i = 1; i < 13; i++)
         {
@@ -21,7 +21,7 @@ internal sealed class GuildwarsClient
             try
             {
                 await socket.ConnectAsync(url, 6112, cancellationToken);
-                var context = new GuildwarsClientContext { Socket = socket };
+                var context = new GuildWarsClientContext { Socket = socket };
                 var handshakeRequest = new HandshakeRequest
                 {
                     Field1 = 1,
@@ -46,7 +46,7 @@ internal sealed class GuildwarsClient
         return default;
     }
 
-    public async Task<GuildwarsFileStream?> GetFileStream(GuildwarsClientContext guildwarsClientContext, int fileId, int version = 0, CancellationToken cancellationToken = default)
+    public async Task<FileResponse> GetFileResponse(GuildWarsClientContext guildwarsClientContext, int fileId, int version = 0, CancellationToken cancellationToken = default)
     {
         await this.Send(new FileRequest { Field1 = 0x3F2, Field2 = 0xC, FileId = fileId, Version = version }, guildwarsClientContext, cancellationToken);
         var metadata = await this.ReceiveWait<FileMetadataResponse>(guildwarsClientContext, cancellationToken);
@@ -62,10 +62,16 @@ internal sealed class GuildwarsClient
         }
 
         var response = await this.ReceiveWait<FileResponse>(guildwarsClientContext, cancellationToken);
+        return response;
+    }
+
+    public async Task<GuildwarsFileStream?> GetFileStream(GuildWarsClientContext guildwarsClientContext, int fileId, int version = 0, CancellationToken cancellationToken = default)
+    {
+        var response = await this.GetFileResponse(guildwarsClientContext, fileId, version, cancellationToken);
         return new GuildwarsFileStream(guildwarsClientContext, this, response.FileId, response.SizeCompressed, response.SizeDecompressed, response.Crc);
     }
 
-    public async Task<T> ReceiveWait<T>(GuildwarsClientContext context, CancellationToken cancellationToken)
+    public async Task<T> ReceiveWait<T>(GuildWarsClientContext context, CancellationToken cancellationToken)
         where T : struct
     {
         var size = Marshal.SizeOf<T>();
@@ -89,7 +95,7 @@ internal sealed class GuildwarsClient
         return str;
     }
 
-    public async Task Send<T>(T str, GuildwarsClientContext context, CancellationToken cancellationToken)
+    public async Task Send<T>(T str, GuildWarsClientContext context, CancellationToken cancellationToken)
         where T : struct
     {
         var size = Marshal.SizeOf<T>();

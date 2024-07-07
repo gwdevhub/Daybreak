@@ -4,6 +4,7 @@ using Daybreak.Services.Navigation;
 using Daybreak.Services.Notifications;
 using Daybreak.Views;
 using Daybreak.Views.Copy;
+using Daybreak.Views.Installation;
 using Daybreak.Views.Launch;
 using Daybreak.Views.Onboarding.DirectSong;
 using Daybreak.Views.Onboarding.DSOAL;
@@ -100,7 +101,7 @@ public partial class MenuList : UserControl
 
     private void DownloadGuildwarsButton_Clicked(object sender, EventArgs e)
     {
-        this.viewManager.ShowView<GuildwarsDownloadView>();
+        this.viewManager.ShowView<GuildWarsDownloadSelectionView>();
     }
 
     private void CopyGuildwarsButton_Clicked(object sender, EventArgs e)
