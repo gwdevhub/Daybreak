@@ -398,7 +398,7 @@ namespace Daybreak::Modules {
             return gamePayload;
         }
 
-        auto playerAgentId = GW::Agents::GetPlayerId();
+        auto playerAgentId = GW::Agents::GetControlledCharacterId();
 
         std::list<MapIcon> mapIcons;
         for (const auto& icon : worldContext->mission_map_icons) {
