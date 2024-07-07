@@ -419,7 +419,7 @@ namespace Daybreak::Modules {
         if (mapAgents.empty()) {
             return mainPlayer;
         }
-        auto playerAgentId = GW::Agents::GetPlayerId();
+        auto playerAgentId = GW::Agents::GetControlledCharacterId();
 
         auto foundMainAttr = std::find_if(attributes.begin(), attributes.end(), [&](GW::PartyAttribute attribute) {
             return playerAgentId == attribute.agent_id;
