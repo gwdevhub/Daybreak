@@ -104,14 +104,14 @@ public partial class LauncherView : UserControl
 
     private async Task PeriodicallyCheckSelectedConfigState()
     {
-        while (this.cancellationTokenSource is not null && !this.cancellationTokenSource.IsCancellationRequested)
+        while (this.cancellationTokenSource?.Token is CancellationToken token && this.cancellationTokenSource?.IsCancellationRequested is false)
         {
             if (!this.launching)
             {
                 await this.Dispatcher.InvokeAsync(this.SetLaunchButtonState);
             }
 
-            await Task.Delay(TimeSpan.FromSeconds(1), this.cancellationTokenSource.Token);
+            await Task.Delay(TimeSpan.FromSeconds(1), token);
         }
     }
 
@@ -122,6 +122,7 @@ public partial class LauncherView : UserControl
             return;
         }
 
+        this.cancellationTokenSource?.Dispose();
         this.cancellationTokenSource = new CancellationTokenSource();
         this.RetrieveLaunchConfigurations();
         new TaskFactory().StartNew(this.PeriodicallyCheckSelectedConfigState, this.cancellationTokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
