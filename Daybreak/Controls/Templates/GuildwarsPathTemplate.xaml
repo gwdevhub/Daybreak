@@ -32,7 +32,7 @@
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <TextBlock FontSize="16" Text="Path:" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Margin="5" Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-            <TextBox Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" Text="{Binding Path=Path, Mode=TwoWay }"
+            <TextBox Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" Text="{Binding Path=Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      BorderThickness="1" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1"
                      FontSize="16" Margin="5"
                      ToolTip="Path to Gw.exe"/>
