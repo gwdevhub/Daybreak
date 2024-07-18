@@ -10,6 +10,7 @@ using System;
 using System.Core.Extensions;
 using System.Data;
 using System.Extensions;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -71,9 +72,18 @@ public partial class GuildwarsPathTemplate : UserControl
         }
     }
 
-    private void ExecutablePath_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private async void ExecutablePath_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        throw new NotImplementedException();
+        if (this.DataContext is not ExecutablePath executablePath)
+        {
+            return;
+        }
+
+        this.tokenSource?.Cancel();
+        this.tokenSource?.Dispose();
+        this.tokenSource = new CancellationTokenSource();
+        await Task.Delay(1000, this.tokenSource.Token);
+        this.CheckExecutable();
     }
 
     private void BinButton_Clicked(object sender, EventArgs e)
@@ -106,6 +116,13 @@ public partial class GuildwarsPathTemplate : UserControl
     {
         if (this.DataContext is not ExecutablePath executablePath)
         {
+            this.Dispatcher.Invoke(() => this.NoUpdateResult = true);
+            return;
+        }
+
+        if (!File.Exists(executablePath.Path))
+        {
+            this.Dispatcher.Invoke(() => this.NoUpdateResult = true);
             return;
         }
 

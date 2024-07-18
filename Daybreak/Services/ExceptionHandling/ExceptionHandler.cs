@@ -75,6 +75,11 @@ internal sealed class ExceptionHandler : IExceptionHandler
                 this.logger.LogError(e, "Failed to initialize browser");
                 return true;
             }
+            else if (aggregateException.InnerExceptions.FirstOrDefault() is OperationCanceledException)
+            {
+                this.logger.LogError(e, "Encountered operation canceled exception");
+                return true;
+            }
         }
         else if (e.Message.Contains("Invalid window handle.") && e.StackTrace?.Contains("CoreWebView2Environment.CreateCoreWebView2ControllerAsync") is true)
         {
