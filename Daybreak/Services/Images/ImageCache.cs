@@ -65,7 +65,7 @@ internal sealed class ImageCache : IImageCache
 
         try
         {
-            var imageSource = await this.GetImageInternal(uri, scopedLogger);
+            var imageSource = await new TaskFactory().StartNew(() => this.GetImageInternal(uri, scopedLogger), TaskCreationOptions.LongRunning).Unwrap();
             return imageSource;
         }
         catch(Exception ex)

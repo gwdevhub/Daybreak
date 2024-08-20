@@ -116,7 +116,6 @@ internal sealed class MetricsService : IMetricsService, IDisposable
     private void MeasurementRecorded<T>(Instrument instrument, T measurement, ReadOnlySpan<KeyValuePair<string, object?>> tags, object? state)
     {
         MetricSet? newMetricSet = default;
-        RecordedMetric? newRecordedMetric = default;
         MetricsSemaphore.Wait();
 
         if (measurement is null)
@@ -139,7 +138,7 @@ internal sealed class MetricsService : IMetricsService, IDisposable
             metrics.RemoveFirst();
         }
 
-        newRecordedMetric = new RecordedMetric { Instrument = instrument, Metric = metric };
+        var newRecordedMetric = new RecordedMetric { Instrument = instrument, Metric = metric };
         MetricsSemaphore.Release();
 
         if (newMetricSet is not null)
