@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Core.Extensions;
+using System.Extensions;
 using System.Reflection;
 
 namespace Daybreak.Services.Startup.Actions;
@@ -25,12 +26,20 @@ internal sealed class CredentialsOptionsMigrator : StartupActionBase
 
     public override void ExecuteOnStartup()
     {
-        if (this.optionsProvider.TryGetKeyedOptions(OldOptionsKey) is not JObject options)
+        var newOptionsKey = GetNewOptionsKey();
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.ExecuteOnStartup), string.Empty);
+        if (this.optionsProvider.TryGetKeyedOptions(newOptionsKey) is JObject)
         {
+            scopedLogger.LogDebug($"Found [{newOptionsKey}]. No migration needed");
             return;
         }
 
-        var newOptionsKey = GetNewOptionsKey();
+        if (this.optionsProvider.TryGetKeyedOptions(OldOptionsKey) is not JObject options)
+        {
+            scopedLogger.LogDebug($"Could not find [{OldOptionsKey}]. No migration possible");
+            return;
+        }
+
         this.logger.LogInformation($"Found [{OldOptionsKey}]. Migrating options to [{newOptionsKey}]");
         this.optionsProvider.SaveRegisteredOptions(newOptionsKey, options);
     }
