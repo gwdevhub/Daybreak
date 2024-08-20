@@ -134,9 +134,9 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
         }
 
         await Task.WhenAll(
-            this.CheckTraderQuotes(cancellationToken),
-            this.CheckLiveTrades(this.kamadanTradeChatService, TraderSource.Kamadan, cancellationToken),
-            this.CheckLiveTrades(this.ascalonTradeChatService, TraderSource.Ascalon, cancellationToken));
+            new TaskFactory().StartNew(() => this.CheckTraderQuotes(cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap(),
+            new TaskFactory().StartNew(() => this.CheckLiveTrades(this.kamadanTradeChatService, TraderSource.Kamadan, cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap(),
+            new TaskFactory().StartNew(() => this.CheckLiveTrades(this.ascalonTradeChatService, TraderSource.Ascalon, cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap());
     }
 
     private async Task CheckLiveTrades<T>(ITradeChatService<T> tradeChatService, TraderSource traderSource, CancellationToken cancellationToken)
