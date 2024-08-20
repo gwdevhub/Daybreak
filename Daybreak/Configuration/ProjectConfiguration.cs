@@ -290,6 +290,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         startupActionProducer.RegisterAction<FixPriceHistoryEntries>();
         startupActionProducer.RegisterAction<CredentialsOptionsMigrator>();
         startupActionProducer.RegisterAction<BrowserHistorySizeEnforcer>();
+        startupActionProducer.RegisterAction<CleanupDatabases>();
     }
 
     public override void RegisterPostUpdateActions(IPostUpdateActionProducer postUpdateActionProducer)
