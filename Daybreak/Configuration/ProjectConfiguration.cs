@@ -402,6 +402,7 @@ public class ProjectConfiguration : PluginConfigurationBase
 
     public override void RegisterMods(IModsManager modsManager)
     {
+        modsManager.RegisterMod<IGuildWarsVersionChecker, GuildWarsVersionChecker>();
         modsManager.RegisterMod<IReShadeService, ReShadeService>();
         modsManager.RegisterMod<IUModService, UModService>();
         modsManager.RegisterMod<IToolboxService, ToolboxService>();
@@ -409,7 +410,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         modsManager.RegisterMod<IGuildwarsScreenPlacer, GuildwarsScreenPlacer>();
         modsManager.RegisterMod<IGWCAInjector, GWCAInjector>();
         modsManager.RegisterMod<IDirectSongService, DirectSongService>(singleton: true);
-        modsManager.RegisterMod<IGuildWarsVersionChecker, GuildWarsVersionChecker>();
     }
 
     public override void RegisterBrowserExtensions(IBrowserExtensionsProducer browserExtensionsProducer)
