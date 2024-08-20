@@ -71,7 +71,6 @@ internal sealed class BuildTemplateManager : IBuildTemplateManager
 
     public TeamBuildEntry CreateTeamBuild()
     {
-        var emptyBuild = new Build();
         var name = Guid.NewGuid().ToString();
         var entry = new TeamBuildEntry
         {
@@ -85,7 +84,6 @@ internal sealed class BuildTemplateManager : IBuildTemplateManager
 
     public TeamBuildEntry CreateTeamBuild(string name)
     {
-        var emptyBuild = new Build();
         var entry = new TeamBuildEntry
         {
             Name = name,

@@ -41,7 +41,7 @@ internal sealed class BackgroundProvider : IBackgroundProvider
             Random.Shared.Next(this.liveOptions.Value.LocalScreenshotsEnabled ? 0 : 50, 101) >= 50) ||
             maybeImage is null)
         {
-            (var maybeRemoteImage, var credit) = await this.bloogumClient.GetImage(true).ConfigureAwait(true);
+            (var maybeRemoteImage, var credit) = await new TaskFactory().StartNew(() => this.bloogumClient.GetImage(true), TaskCreationOptions.LongRunning).Unwrap().ConfigureAwait(true);
             maybeImage = maybeRemoteImage;
             creditText = credit;
         }

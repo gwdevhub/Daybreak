@@ -48,7 +48,7 @@ internal sealed class SharpNavPathfinder : IPathfinder
 
     public async Task<Result<PathfindingResponse, PathfindingFailure>> CalculatePath(PathingData map, Point startPoint, Point endPoint, CancellationToken cancellationToken)
     {
-        return await new TaskFactory().StartNew(() => this.CalculatePathInternal(map, startPoint, endPoint, cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        return await new TaskFactory().StartNew(() => this.CalculatePathInternal(map, startPoint, endPoint), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
     }
 
     public Task<NavMesh?> GenerateNavMesh(List<Trapezoid> trapezoids, CancellationToken cancellationToken)
@@ -66,7 +66,7 @@ internal sealed class SharpNavPathfinder : IPathfinder
         return new TaskFactory().StartNew(() => this.GenerateNavMesh(ConvertTrapezoidsToTriangles(trapezoids), settings), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
     }
 
-    private Result<PathfindingResponse, PathfindingFailure> CalculatePathInternal(PathingData pathingData, Point startPoint, Point endPoint, CancellationToken cancellationToken)
+    private Result<PathfindingResponse, PathfindingFailure> CalculatePathInternal(PathingData pathingData, Point startPoint, Point endPoint)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.CalculatePath), string.Empty);
         if (pathingData is null ||
