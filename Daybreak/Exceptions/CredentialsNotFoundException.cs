@@ -13,9 +13,6 @@ public sealed class CredentialsNotFoundException : Exception
     {
     }
 
-    public CredentialsNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context)
-    {
-    }
 
     public CredentialsNotFoundException(string message, Exception innerException) : base(message, innerException)
     {

@@ -13,10 +13,6 @@ public sealed class FatalException : Exception
     {
     }
 
-    public FatalException(SerializationInfo info, StreamingContext context) : base(info, context)
-    {
-    }
-
     public FatalException(string message, Exception innerException) : base(message, innerException)
     {
     }
