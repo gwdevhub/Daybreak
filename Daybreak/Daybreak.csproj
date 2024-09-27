@@ -94,7 +94,7 @@
     <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
     <PackageReference Include="DiffPlex" Version="1.7.2" />
     <PackageReference Include="DotNetZip" Version="1.16.0" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.64" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.66" />
     <PackageReference Include="ini-parser-netstandard" Version="2.5.2" />
     <PackageReference Include="LiteDB" Version="5.0.20" />
     <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.0-rc2" />
@@ -103,11 +103,11 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2651.64" />
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.122" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2792.45" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="PeNet" Version="4.0.5" />
+    <PackageReference Include="PeNet" Version="4.1.0" />
     <PackageReference Include="Plumsy" Version="1.1.0" />
     <PackageReference Include="securifybv.ShellLink" Version="0.1.0" />
     <PackageReference Include="SharpNav" Version="0.9.2" />
@@ -119,12 +119,12 @@
     <PackageReference Include="System.Reflection.Metadata" Version="8.0.0" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
-    <PackageReference Include="SystemExtensions.NetCore" Version="1.0.1" />
-    <PackageReference Include="SystemExtensions.NetStandard" Version="1.6.4" />
-    <PackageReference Include="SystemExtensions.NetStandard.DependencyInjection" Version="1.4.0" />
+    <PackageReference Include="SystemExtensions.NetCore" Version="1.6.9" />
+    <PackageReference Include="SystemExtensions.NetStandard" Version="1.6.9" />
+    <PackageReference Include="SystemExtensions.NetStandard.DependencyInjection" Version="1.4.1" />
     <PackageReference Include="WpfExtended" Version="0.7.7" />
     <PackageReference Include="WpfExtended.SourceGeneration" Version="0.3.0" />
-    <PackageReference Include="WpfScreenHelper" Version="2.1.0" />
+    <PackageReference Include="WpfScreenHelper" Version="2.1.1" />
     <PackageReference Include="WriteableBitmapEx" Version="1.6.8" />
   </ItemGroup>
 	
