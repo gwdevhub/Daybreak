@@ -13,9 +13,6 @@ public sealed class ExecutableNotFoundException : Exception
     {
     }
 
-    public ExecutableNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context)
-    {
-    }
 
     public ExecutableNotFoundException(string message, Exception innerException) : base(message, innerException)
     {

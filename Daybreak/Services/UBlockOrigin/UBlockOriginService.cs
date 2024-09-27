@@ -73,7 +73,7 @@ public sealed class UBlockOriginService : IBrowserExtension
         return Task.FromResult(Path.GetFullPath(Path.Combine(InstallationPath, InstallationFolderName)));
     }
 
-    private async Task CheckAndUpdateInternal(string browserVersion)
+    private async Task CheckAndUpdateInternal(string _)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.CheckAndUpdateInternal), string.Empty);
         if (VersionUpToDate)

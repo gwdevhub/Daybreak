@@ -23,6 +23,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Windows.Controls;
+using Convert = System.Convert;
 
 namespace Daybreak.Services.Graph;
 

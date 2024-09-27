@@ -8,6 +8,7 @@ using System.Extensions;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using Convert = System.Convert;
 
 namespace Daybreak.Services.Credentials;
 

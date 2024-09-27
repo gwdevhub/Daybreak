@@ -74,7 +74,7 @@ public partial class GuildwarsPathTemplate : UserControl
 
     private async void ExecutablePath_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        if (this.DataContext is not ExecutablePath executablePath)
+        if (this.DataContext is not ExecutablePath)
         {
             return;
         }
