@@ -25,12 +25,9 @@ namespace Daybreak.Controls.Templates;
 public partial class TradeChatTemplate : UserControl
 {
     private readonly TimeSpan timeUpdateInterval = TimeSpan.FromSeconds(1);
-    private readonly object collectionLock = new();
     private readonly DispatcherTimer dispatcherTimer = new();
     private readonly IWordHighlightingService wordHighlightingService;
     private CancellationTokenSource? cancellationTokenSource;
-    private DateTime? lastQueryTime;
-    private DateTime nextQueryTime = DateTime.Now;
 
     public event EventHandler<TraderMessage>? NameCopyClicked, MessageCopyClicked, TimestampCopyClicked;
 
