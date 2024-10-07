@@ -1,5 +1,4 @@
-﻿using Daybreak.Models.Trade;
-using Daybreak.Services.IconRetrieve;
+﻿using Daybreak.Services.IconRetrieve;
 using Daybreak.Services.Images;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -40,7 +39,7 @@ public partial class TradeQuoteTemplate : UserControl
 
     private async void UserControl_DataContextChanged(object _, DependencyPropertyChangedEventArgs __)
     {
-        if (this.DataContext is not TraderQuote traderQuote)
+        if (this.DataContext is not TraderQuoteModel traderQuote)
         {
             return;
         }

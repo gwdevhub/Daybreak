@@ -85,7 +85,7 @@
         </Grid>
         <Grid Grid.Row="2"
               Height="35"
-              Visibility="Collapsed">
+              Visibility="Visible">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="*"/>
