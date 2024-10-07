@@ -11,12 +11,12 @@ using Microsoft.Extensions.Logging;
 using System.Extensions;
 using System.Linq;
 using Daybreak.Services.Downloads;
-using Ionic.Zip;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Daybreak.Services.Notifications;
 using Daybreak.Services.Browser;
 using Daybreak.Utils;
+using System.IO.Compression;
 
 namespace Daybreak.Services.UBlockOrigin;
 public sealed class UBlockOriginService : IBrowserExtension
@@ -112,8 +112,8 @@ public sealed class UBlockOriginService : IBrowserExtension
             return;
         }
 
-        using var zipFile = ZipFile.Read(zipFilePath);
-        zipFile.ExtractAll(InstallationPath, ExtractExistingFileAction.OverwriteSilently);
+        using var zipFile = ZipFile.OpenRead(zipFilePath);
+        zipFile.ExtractToDirectory(InstallationPath, true);
         zipFile.Dispose();
         File.Delete(zipFilePath);
         VersionUpToDate = true;
