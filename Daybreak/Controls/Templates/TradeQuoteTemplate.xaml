@@ -38,7 +38,39 @@
                    Grid.Column="1"
                    Margin="0, 0, 5, 0">
             <TextBlock 
-                Text="{Binding ElementName=_this, Path=DataContext.Price, Mode=OneWay}"
+                Text="B: "
+                Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Right"
+                FontSize="16"
+                Grid.Column="0"
+                TextWrapping="Wrap"/>
+            <TextBlock 
+                Text="{Binding ElementName=_this, Path=DataContext.BuyPrice, Mode=OneWay}"
+                Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Right"
+                FontSize="16"
+                Grid.Column="0"
+                TextWrapping="Wrap"/>
+            <TextBlock 
+                Text="g"
+                Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Right"
+                FontSize="16"
+                Grid.Column="0"
+                TextWrapping="Wrap"/>
+            <TextBlock 
+                Text=" | S: "
+                Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Right"
+                FontSize="16"
+                Grid.Column="0"
+                TextWrapping="Wrap"/>
+            <TextBlock 
+                Text="{Binding ElementName=_this, Path=DataContext.SellPrice, Mode=OneWay}"
                 Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Right"

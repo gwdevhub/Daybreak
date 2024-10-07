@@ -111,18 +111,18 @@ internal sealed class PriceHistoryService : IPriceHistoryService
 
             if (!response.IsSuccessStatusCode)
             {
-                return Enumerable.Empty<TraderQuote>();
+                return [];
             }
 
             var responseString = await response.Content.ReadAsStringAsync();
             var responseList = JsonConvert.DeserializeObject<List<TraderQuotePayload>>(responseString);
             return responseList?.Select(p => new TraderQuote { Item = itemBase, Price = p.Price, Timestamp = p.TimeStamp }) ??
-                Enumerable.Empty<TraderQuote>();
+                [];
         }
         catch (Exception ex)
         {
             scopedLogger.LogError(ex, "Encountered exception");
-            return Enumerable.Empty<TraderQuote>();
+            return [];
         }
     }
 
@@ -133,9 +133,9 @@ internal sealed class PriceHistoryService : IPriceHistoryService
         {
             return itemBase.Modifiers is null ?
                         itemBase.Id.ToString() :
-                        $"{itemBase.Id}-{this.itemHashService.ComputeHash(itemBase).Replace("C0000000","")}";
+                        $"{itemBase.Id}-{this.itemHashService.ComputeHash(itemBase)?.Replace("C0000000","")}";
         }
 
-        return $"{itemBase.Id}-{itemModHash.ModHash.Replace("C0000000", "")}";
+        return $"{itemBase.Id}-{itemModHash.ModHash?.Replace("C0000000", "")}";
     }
 }
