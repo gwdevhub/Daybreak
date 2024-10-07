@@ -12,7 +12,6 @@ using Daybreak.Services.Scanner;
 using Daybreak.Utils;
 using HtmlAgilityPack;
 using IniParser.Parser;
-using Ionic.Zip;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System;
@@ -22,6 +21,7 @@ using System.Core.Extensions;
 using System.Data;
 using System.Extensions;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -276,7 +276,13 @@ internal sealed class ReShadeService : IReShadeService, IApplicationLifetimeServ
             return false;
         }
 
-        using var archive = ZipFile.Read(result.Content.ReadAsStream(cancellationToken));
+        using var archive = new ZipArchive(result.Content.ReadAsStream(cancellationToken));
+        if (archive is null)
+        {
+            scopedLogger.LogError("Unable to open archive");
+            return false;
+        }
+
         await this.InstallPackageInternal(archive, cancellationToken, package.InstallPath, package.TextureInstallPath, package.EffectFiles);
         this.notificationService.NotifyInformation(
             "ReShade package installed",
@@ -300,8 +306,13 @@ internal sealed class ReShadeService : IReShadeService, IApplicationLifetimeServ
             return false;
         }
 
-        using var fs = new FileStream(fullPath, FileMode.Open);
-        using var archive = ZipFile.Read(fs);
+        using var archive = ZipFile.OpenRead(fullPath);
+        if (archive is null)
+        {
+            scopedLogger.LogError($"Unable to open archive");
+            return false;
+        }
+
         await this.InstallPackageInternal(archive, cancellationToken);
         this.notificationService.NotifyInformation(
             "ReShade package installed",
@@ -426,26 +437,26 @@ internal sealed class ReShadeService : IReShadeService, IApplicationLifetimeServ
     }
 
     private async Task InstallPackageInternal(
-        ZipFile archive,
+        ZipArchive archive,
         CancellationToken cancellationToken,
         string? desiredInstallationPath = default,
         string? desiredTextureInstallationPath = default,
         List<string>? fxFilter = default)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.InstallPackageInternal), archive.Name ?? string.Empty);
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.InstallPackageInternal), string.Empty);
         var basePath = Path.GetFullPath(ReShadePath);
         desiredInstallationPath = desiredInstallationPath?.Replace(".\\", basePath + "\\");
         desiredTextureInstallationPath = desiredTextureInstallationPath?.Replace(".\\", basePath + "\\");
         foreach (var entry in archive.Entries)
         {
-            if (FxExtensions.Any(entry.FileName.EndsWith))
+            if (FxExtensions.Any(entry.FullName.EndsWith))
             {
-                scopedLogger.LogInformation($"[{entry.FileName}] Processing fx file");
-                var fileName = StripAfterToken(entry.FileName, "shaders/");
+                scopedLogger.LogInformation($"[{entry.FullName}] Processing fx file");
+                var fileName = StripAfterToken(entry.FullName, "shaders/");
                 if (fxFilter is not null &&
                     !fxFilter.Contains(fileName))
                 {
-                    scopedLogger.LogInformation($"[{entry.FileName}] File not found in effects list. Skipping");
+                    scopedLogger.LogInformation($"[{entry.FullName}] File not found in effects list. Skipping");
                     continue;
                 }
 
@@ -455,49 +466,49 @@ internal sealed class ReShadeService : IReShadeService, IApplicationLifetimeServ
                     destination = Path.Combine(desiredInstallationPath, fileName);
                 }
 
-                scopedLogger.LogInformation($"[{entry.FileName}] Installing fx at {destination}");
+                scopedLogger.LogInformation($"[{entry.FullName}] Installing fx at {destination}");
                 new FileInfo(destination).Directory?.Create();
                 using var fs = new FileStream(destination, FileMode.Create);
-                using var reader = entry.OpenReader();
+                using var reader = entry.Open();
                 await reader.CopyToAsync(fs, cancellationToken);
 
-                scopedLogger.LogInformation($"[{entry.FileName}] Installed fx at {destination}");
+                scopedLogger.LogInformation($"[{entry.FullName}] Installed fx at {destination}");
             }
-            else if (FxHeaderExtensions.Any(entry.FileName.EndsWith))
+            else if (FxHeaderExtensions.Any(entry.FullName.EndsWith))
             {
-                scopedLogger.LogInformation($"[{entry.FileName}] Processing fxh file");
-                var fileName = StripAfterToken(entry.FileName, "shaders/");
+                scopedLogger.LogInformation($"[{entry.FullName}] Processing fxh file");
+                var fileName = StripAfterToken(entry.FullName, "shaders/");
                 var destination = Path.Combine(basePath, PresetsFolder, "Shaders", fileName);
                 if (desiredInstallationPath?.IsNullOrWhiteSpace() is false)
                 {
                     destination = Path.Combine(desiredInstallationPath, fileName);
                 }
 
-                scopedLogger.LogInformation($"[{entry.FileName}] Installing fxh at {destination}");
+                scopedLogger.LogInformation($"[{entry.FullName}] Installing fxh at {destination}");
                 new FileInfo(destination).Directory?.Create();
                 using var fs = new FileStream(destination, FileMode.Create);
-                using var reader = entry.OpenReader();
+                using var reader = entry.Open();
                 await reader.CopyToAsync(fs, cancellationToken);
 
-                scopedLogger.LogInformation($"[{entry.FileName}] Installed fxh at {destination}");
+                scopedLogger.LogInformation($"[{entry.FullName}] Installed fxh at {destination}");
             }
-            else if (TextureExtensions.Any(entry.FileName.EndsWith))
+            else if (TextureExtensions.Any(entry.FullName.EndsWith))
             {
-                scopedLogger.LogInformation($"Processing texture file {entry.FileName}");
-                var fileName = StripAfterToken(entry.FileName, "Textures/");
+                scopedLogger.LogInformation($"Processing texture file {entry.FullName}");
+                var fileName = StripAfterToken(entry.FullName, "Textures/");
                 var destination = Path.Combine(basePath, PresetsFolder, "Textures", fileName);
                 if (desiredTextureInstallationPath?.IsNullOrWhiteSpace() is false)
                 {
                     destination = Path.Combine(desiredTextureInstallationPath, fileName);
                 }
 
-                scopedLogger.LogInformation($"[{entry.FileName}] Installing texture at {destination}");
+                scopedLogger.LogInformation($"[{entry.FullName}] Installing texture at {destination}");
                 new FileInfo(destination).Directory?.Create();
                 using var fs = new FileStream(destination, FileMode.Create);
-                using var reader = entry.OpenReader();
+                using var reader = entry.Open();
                 await reader.CopyToAsync(fs, cancellationToken);
 
-                scopedLogger.LogInformation($"[{entry.FileName}] Installed texture at {destination}");
+                scopedLogger.LogInformation($"[{entry.FullName}] Installed texture at {destination}");
             }
         }
     }
@@ -544,10 +555,10 @@ internal sealed class ReShadeService : IReShadeService, IApplicationLifetimeServ
             using var fs = File.OpenRead(pathToInstaller);
             await SeekZipStart(fs, cancellationToken);
             using var zipStream = new OffsetStream(fs);
-            using var zip = ZipFile.Read(zipStream);
+            using var zip = new ZipArchive(zipStream);
 
             // Validate archive contains the ReShade DLLs
-            if (zip.Entries.FirstOrDefault(e => e.FileName == DllName) is not ZipEntry entry)
+            if (zip.Entries.FirstOrDefault(e => e.FullName == DllName) is not ZipArchiveEntry entry)
             {
                 throw new InvalidOperationException("File does not contain desired ReShade dll");
             }
@@ -559,7 +570,7 @@ internal sealed class ReShadeService : IReShadeService, IApplicationLifetimeServ
             }
 
             var dllDestination = Path.Combine(reshadePath, DllName);
-            using var reader = entry.OpenReader();
+            using var reader = entry.Open();
             using var output = File.OpenWrite(dllDestination);
             await reader.CopyToAsync(output, cancellationToken);
             SetupAdditionalFiles();
