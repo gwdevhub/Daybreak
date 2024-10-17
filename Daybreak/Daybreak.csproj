@@ -120,8 +120,8 @@
     <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
-    <PackageReference Include="SystemExtensions.NetCore" Version="1.6.9" />
-    <PackageReference Include="SystemExtensions.NetStandard" Version="1.6.9" />
+    <PackageReference Include="SystemExtensions.NetCore" Version="1.6.11" />
+    <PackageReference Include="SystemExtensions.NetStandard" Version="1.6.11" />
     <PackageReference Include="SystemExtensions.NetStandard.DependencyInjection" Version="1.6.9" />
     <PackageReference Include="WpfExtended" Version="0.7.7" />
     <PackageReference Include="WpfExtended.SourceGeneration" Version="0.3.0" />
