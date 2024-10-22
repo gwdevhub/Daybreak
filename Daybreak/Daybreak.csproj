@@ -102,12 +102,13 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2792.45" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2849.39" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="PeNet" Version="4.1.0" />
     <PackageReference Include="Plumsy" Version="1.1.0" />
+    <PackageReference Include="Realm" Version="20.0.0" />
     <PackageReference Include="securifybv.ShellLink" Version="0.1.0" />
     <PackageReference Include="SharpNav" Version="0.9.2" />
     <PackageReference Include="Slim" Version="1.9.2" />
@@ -120,8 +121,8 @@
     <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
-    <PackageReference Include="SystemExtensions.NetCore" Version="1.6.9" />
-    <PackageReference Include="SystemExtensions.NetStandard" Version="1.6.9" />
+    <PackageReference Include="SystemExtensions.NetCore" Version="1.6.11" />
+    <PackageReference Include="SystemExtensions.NetStandard" Version="1.6.11" />
     <PackageReference Include="SystemExtensions.NetStandard.DependencyInjection" Version="1.6.9" />
     <PackageReference Include="WpfExtended" Version="0.7.7" />
     <PackageReference Include="WpfExtended.SourceGeneration" Version="0.3.0" />
