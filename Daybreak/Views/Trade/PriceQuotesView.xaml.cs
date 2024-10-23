@@ -88,7 +88,7 @@ public partial class PriceQuotesView : UserControl
     private void HighlightButton_Clicked(object sender, EventArgs _)
     {
         if (sender is not FrameworkElement element ||
-            element.DataContext is not TraderQuote traderQuote ||
+            element.DataContext is not TraderQuoteModel traderQuote ||
             traderQuote.Item is not ItemBase item)
         {
             return;

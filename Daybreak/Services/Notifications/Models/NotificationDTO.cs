@@ -1,14 +1,16 @@
 ﻿using Microsoft.Extensions.Logging;
+using Realms;
 using System;
 
 namespace Daybreak.Services.Notifications.Models;
 
-public sealed class NotificationDTO
+public sealed class NotificationDTO : RealmObject
 {
+    [PrimaryKey]
     public string Id { get; init; } = string.Empty;
-    public LogLevel Level { get; init; }
-    public DateTime ExpirationTime { get; init; }
-    public DateTime CreationTime { get; init; } = DateTime.Now;
+    public int Level { get; init; }
+    public DateTimeOffset ExpirationTime { get; init; }
+    public DateTimeOffset CreationTime { get; init; } = DateTimeOffset.Now;
     public string? Title { get; init; }
     public string? Description { get; init; }
     public string? MetaData { get; init; }

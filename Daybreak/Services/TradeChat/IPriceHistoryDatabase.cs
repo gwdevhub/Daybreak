@@ -11,7 +11,7 @@ public interface IPriceHistoryDatabase
 
     IEnumerable<TraderQuoteDTO> GetQuoteHistory(ItemBase item, DateTime? fromTimestamp, DateTime? toTimestamp);
 
-    void AddTraderQuotes(IEnumerable<TraderQuoteDTO> traderQuotes);
+    bool AddTraderQuotes(IEnumerable<TraderQuoteDTO> traderQuotes);
 
     IEnumerable<TraderQuoteDTO> GetQuotesByTimestamp(TraderQuoteType type, DateTime? from = default, DateTime? to = default);
 
