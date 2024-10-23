@@ -80,7 +80,7 @@ internal sealed class TraderQuoteService : ITraderQuoteService
             {
                 Item = item,
                 Price = quoteDTO.Price,
-                Timestamp = quoteDTO.TimeStamp,
+                Timestamp = quoteDTO.TimeStamp.LocalDateTime,
             });
         }
 
@@ -110,7 +110,7 @@ internal sealed class TraderQuoteService : ITraderQuoteService
             {
                 Item = item,
                 Price = quoteDTO.Price,
-                Timestamp = quoteDTO.TimeStamp,
+                Timestamp = quoteDTO.TimeStamp.LocalDateTime,
             });
         }
 
@@ -131,8 +131,7 @@ internal sealed class TraderQuoteService : ITraderQuoteService
                     ModifiersHash = quote.Item?.Modifiers is null ? string.Empty : this.itemHashService.ComputeHash(quote.Item),
                     InsertionTime = insertionTime,
                     TimeStamp = quote.Timestamp ?? insertionTime,
-                    TraderQuoteType = TraderQuoteType.Buy,
-                    IsLatest = true,
+                    TraderQuoteType = (int)TraderQuoteType.Buy
                 }));
 
         this.priceHistoryDatabase.AddTraderQuotes(sellQuotes
@@ -144,8 +143,7 @@ internal sealed class TraderQuoteService : ITraderQuoteService
                     ModifiersHash = quote.Item?.Modifiers is null ? string.Empty : this.itemHashService.ComputeHash(quote.Item),
                     InsertionTime = insertionTime,
                     TimeStamp = quote.Timestamp ?? insertionTime,
-                    TraderQuoteType = TraderQuoteType.Sell,
-                    IsLatest = true
+                    TraderQuoteType = (int)TraderQuoteType.Sell
                 }));
 
         this.options.Value.LastCheckTime = insertionTime;

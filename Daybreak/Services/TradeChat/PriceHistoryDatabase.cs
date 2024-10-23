@@ -1,22 +1,23 @@
 ﻿using Daybreak.Models.Guildwars;
+using Daybreak.Services.Database;
 using Daybreak.Services.TradeChat.Models;
-using LiteDB;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Extensions;
+using System.Linq;
 
 namespace Daybreak.Services.TradeChat;
 internal sealed class PriceHistoryDatabase : IPriceHistoryDatabase
 {
     private readonly IItemHashService itemHashService;
-    private readonly ILiteCollection<TraderQuoteDTO> collection;
+    private readonly IDatabaseCollection<TraderQuoteDTO> collection;
     private readonly ILogger<PriceHistoryDatabase> logger;
 
     public PriceHistoryDatabase(
         IItemHashService itemHashService,
-        ILiteCollection<TraderQuoteDTO> collection,
+        IDatabaseCollection<TraderQuoteDTO> collection,
         ILogger<PriceHistoryDatabase> logger)
     {
         this.itemHashService = itemHashService.ThrowIfNull();
@@ -24,39 +25,42 @@ internal sealed class PriceHistoryDatabase : IPriceHistoryDatabase
         this.logger = logger.ThrowIfNull();
     }
 
-    public void AddTraderQuotes(IEnumerable<TraderQuoteDTO> traderQuotes)
+    public bool AddTraderQuotes(IEnumerable<TraderQuoteDTO> traderQuotes)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.AddTraderQuotes), string.Empty);
         scopedLogger.LogDebug("Inserting quotes");
-        foreach(var quote in traderQuotes)
-        {
-            this.collection.Upsert(quote.Id, quote);
-        }
-
+        this.collection.AddBulk(traderQuotes);
         scopedLogger.LogDebug("Inserted quotes");
+        return true;
     }
 
     public IEnumerable<TraderQuoteDTO> GetLatestQuotes(TraderQuoteType traderQuoteType)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetLatestQuotes), string.Empty);
         scopedLogger.LogDebug($"Retrieving latest quotes");
-        var items = this.collection.Find(t => t.IsLatest == true && t.TraderQuoteType == traderQuoteType);
+        var items = this.collection.FindAll(t => t.TraderQuoteType == (int)traderQuoteType).OrderByDescending(q => q.InsertionTime).ToList();
+        var latestItems = items.GroupBy(q => q.ItemId).Select(g => g.First()).ToList();
         scopedLogger.LogDebug($"Retrieved latest quotes");
-        return items;
+        return latestItems;
     }
 
     public IEnumerable<TraderQuoteDTO> GetQuoteHistory(ItemBase item, DateTime? fromTimestamp, DateTime? toTimestamp)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetQuoteHistory), item.Id.ToString());
-        fromTimestamp ??= DateTime.MinValue;
-        toTimestamp ??= DateTime.MaxValue;
-        scopedLogger.LogDebug($"Retrieving quotes for item {item.Id} with timestamp between [{fromTimestamp}] and [{toTimestamp}]");
+        var fromO = fromTimestamp.HasValue ?
+            new DateTimeOffset(fromTimestamp.Value) :
+            DateTimeOffset.MinValue;
+        var toO = toTimestamp.HasValue ?
+            new DateTimeOffset(toTimestamp.Value) :
+            DateTimeOffset.MaxValue;
+        scopedLogger.LogDebug($"Retrieving quotes for item {item.Id} with timestamp between [{fromO}] and [{toO}]");
         var modifiersHash = item.Modifiers is not null ? this.itemHashService.ComputeHash(item) : default;
-        var items = this.collection.Find(t =>
+        var items = this.collection.FindAll(t =>
             t.ItemId == item.Id &&
             t.ModifiersHash == modifiersHash &&
-            t.TimeStamp >= fromTimestamp &&
-            t.TimeStamp <= toTimestamp);
+            t.TimeStamp >= fromO &&
+            t.TimeStamp <= toO &&
+            t.TraderQuoteType == (int)TraderQuoteType.Sell);
         scopedLogger.LogDebug($"Retrieved quotes for item {item.Id}");
         return items;
     }
@@ -64,11 +68,14 @@ internal sealed class PriceHistoryDatabase : IPriceHistoryDatabase
     public IEnumerable<TraderQuoteDTO> GetQuotesByTimestamp(TraderQuoteType type, DateTime? from = default, DateTime? to = default)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetQuotesByTimestamp), string.Empty);
-        from ??= DateTime.MinValue;
-        to ??= DateTime.Now;
-
-        scopedLogger.LogDebug($"Retrieving all quotes by timestamp between [{from}] and [{to}]");
-        var items = this.collection.Find(t => t.TimeStamp >= from && t.TimeStamp <= to && t.TraderQuoteType == type);
+        var fromO = from.HasValue ?
+            new DateTimeOffset(from.Value) :
+            DateTimeOffset.MinValue;
+        var toO = to.HasValue ?
+            new DateTimeOffset(to.Value) :
+            DateTimeOffset.Now;
+        scopedLogger.LogDebug($"Retrieving all quotes by timestamp between [{fromO}] and [{toO}]");
+        var items = this.collection.FindAll(t => t.TimeStamp >= fromO && t.TimeStamp <= toO && t.TraderQuoteType == (int)type);
         scopedLogger.LogDebug("Retrieved quotes by timestamp");
         return items;
     }
@@ -76,11 +83,14 @@ internal sealed class PriceHistoryDatabase : IPriceHistoryDatabase
     public IEnumerable<TraderQuoteDTO> GetQuotesByInsertionTime(TraderQuoteType type, DateTime? from = default, DateTime? to = default)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetQuotesByInsertionTime), string.Empty);
-        from ??= DateTime.MinValue;
-        to ??= DateTime.Now;
-
-        scopedLogger.LogDebug($"Retrieving all quotes by insertion time between [{from}] and [{to}]");
-        var items = this.collection.Find(t => t.InsertionTime >= from && t.InsertionTime <= to && t.TraderQuoteType == type);
+        var fromO = from.HasValue ?
+            new DateTimeOffset(from.Value) :
+            DateTimeOffset.MinValue;
+        var toO = to.HasValue ?
+            new DateTimeOffset(to.Value) :
+            DateTimeOffset.Now;
+        scopedLogger.LogDebug($"Retrieving all quotes by insertion time between [{fromO}] and [{toO}]");
+        var items = this.collection.FindAll(t => t.InsertionTime >= fromO && t.InsertionTime <= toO && t.TraderQuoteType == (int)type);
         scopedLogger.LogDebug("Retrieved quotes by insertion time");
         return items;
     }

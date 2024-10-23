@@ -6,6 +6,6 @@ namespace Daybreak.Services.TradeChat;
 
 public interface ITradeHistoryDatabase
 {
-    IEnumerable<TraderMessageDTO> GetTraderMessagesSinceTime(DateTime since);
-    void StoreTraderMessage(TraderMessageDTO message);
+    IEnumerable<TraderMessageDTO> GetTraderMessagesSinceTime(DateTimeOffset since);
+    bool StoreTraderMessage(TraderMessageDTO message);
 }

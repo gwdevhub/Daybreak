@@ -5,7 +5,7 @@ namespace Daybreak.Services.Notifications;
 
 public interface INotificationStorage
 {
-    IEnumerable<NotificationDTO> GetPendingNotifications(int maxCount = int.MaxValue);
+    IEnumerable<NotificationDTO> GetPendingNotifications();
 
     IEnumerable<NotificationDTO> GetNotifications();
 

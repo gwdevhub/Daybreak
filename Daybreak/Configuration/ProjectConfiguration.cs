@@ -13,7 +13,6 @@ using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using Slim;
 using System.Extensions;
-using LiteDB;
 using Daybreak.Services.Options;
 using Daybreak.Models;
 using Microsoft.CorrelationVector;
@@ -90,6 +89,8 @@ using Daybreak.Services.Window;
 using Daybreak.Launch;
 using Daybreak.Utils;
 using Daybreak.Views.Installation;
+using Realms;
+using Daybreak.Services.Logging.Models;
 
 namespace Daybreak.Configuration;
 
@@ -137,7 +138,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IPostUpdateActionProvider>(sp => sp.GetRequiredService<PostUpdateActionManager>());
         services.AddSingleton<IMenuService, MenuService>();
         services.AddSingleton<IMenuServiceInitializer, MenuService>(sp => sp.GetRequiredService<IMenuService>().Cast<MenuService>());
-        services.AddSingleton<ILiteDatabase, LiteDatabase>(sp => new LiteDatabase(PathUtils.GetAbsolutePathFromRoot("Daybreak.db")));
         services.AddSingleton<IMutexHandler, MutexHandler>();
         services.AddSingleton<IShortcutManager, ShortcutManager>();
         services.AddSingleton<IMetricsService, MetricsService>();
@@ -287,10 +287,10 @@ public class ProjectConfiguration : PluginConfigurationBase
         startupActionProducer.RegisterAction<RenameInstallerAction>();
         startupActionProducer.RegisterAction<FixSymbolicLinkStartupAction>();
         startupActionProducer.RegisterAction<UpdateUModAction>();
-        startupActionProducer.RegisterAction<FixPriceHistoryEntries>();
         startupActionProducer.RegisterAction<CredentialsOptionsMigrator>();
         startupActionProducer.RegisterAction<BrowserHistorySizeEnforcer>();
         startupActionProducer.RegisterAction<CleanupDatabases>();
+        startupActionProducer.RegisterAction<DeleteOldDatabase>();
     }
 
     public override void RegisterPostUpdateActions(IPostUpdateActionProducer postUpdateActionProducer)
@@ -371,13 +371,10 @@ public class ProjectConfiguration : PluginConfigurationBase
         optionsProducer.RegisterOptions<ScreenManagerOptions>();
         optionsProducer.RegisterOptions<KamadanTradeChatOptions>();
         optionsProducer.RegisterOptions<AscalonTradeChatOptions>();
-        optionsProducer.RegisterOptions<LoggingOptions>();
         optionsProducer.RegisterOptions<PriceHistoryOptions>();
         optionsProducer.RegisterOptions<TraderQuotesOptions>();
         optionsProducer.RegisterOptions<PathfindingOptions>();
-        optionsProducer.RegisterOptions<NotificationStorageOptions>();
         optionsProducer.RegisterOptions<TradeAlertingOptions>();
-        optionsProducer.RegisterOptions<TraderMessagesOptions>();
         optionsProducer.RegisterOptions<EventNotifierOptions>();
         optionsProducer.RegisterOptions<PluginsServiceOptions>();
         optionsProducer.RegisterOptions<GuildwarsExecutableOptions>();
@@ -426,10 +423,10 @@ public class ProjectConfiguration : PluginConfigurationBase
 
     private void RegisterLiteCollections(IServiceCollection services)
     {
-        this.RegisterLiteCollection<Models.Log, LoggingOptions>(services);
-        this.RegisterLiteCollection<TraderQuoteDTO, PriceHistoryOptions>(services);
-        this.RegisterLiteCollection<NotificationDTO, NotificationStorageOptions>(services);
-        this.RegisterLiteCollection<TraderMessageDTO, TraderMessagesOptions>(services);
+        this.RegisterCollection<LogDTO>(services);
+        this.RegisterCollection<TraderQuoteDTO>(services);
+        this.RegisterCollection<NotificationDTO>(services);
+        this.RegisterCollection<TraderMessageDTO>(services);
     }
 
     private IServiceCollection RegisterHttpClients(IServiceCollection services)

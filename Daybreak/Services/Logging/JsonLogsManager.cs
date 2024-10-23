@@ -1,5 +1,7 @@
 ﻿using Daybreak.Configuration.Options;
-using LiteDB;
+using Daybreak.Services.Database;
+using Daybreak.Services.Logging.Models;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -8,6 +10,7 @@ using System.Extensions;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Logging;
+using System.Threading;
 
 namespace Daybreak.Services.Logging;
 
@@ -15,33 +18,50 @@ internal sealed class JsonLogsManager : ILogsManager
 {
     private const int MemoryCacheMaxSize = 5000;
 
-    private readonly List<Models.Log> memoryCache = [];
-    private readonly ILiteCollection<Models.Log> collection;
+    private readonly List<Daybreak.Models.Log> memoryCache = [];
+    private readonly SemaphoreSlim semaphoreSlim = new(1);
+    private readonly IDatabaseCollection<LogDTO> collection;
     private readonly ILiveOptions<LauncherOptions> liveOptions;
 
-    public event EventHandler<Models.Log>? ReceivedLog;
+    public event EventHandler<Daybreak.Models.Log>? ReceivedLog;
 
     public JsonLogsManager(
-        ILiteCollection<Models.Log> collection,
+        IDatabaseCollection<LogDTO> collection,
         ILiveOptions<LauncherOptions> liveOptions)
     {
         this.collection = collection.ThrowIfNull();
         this.liveOptions = liveOptions.ThrowIfNull();
     }
 
-    public IEnumerable<Models.Log> GetLogs(Expression<Func<Models.Log, bool>> filter)
+    public IEnumerable<Daybreak.Models.Log> GetLogs(Expression<Func<Daybreak.Models.Log, bool>> filter)
     {
-        return this.collection.Find(filter).Concat(this.memoryCache.Where(filter.Compile()));
-    }
-    public IEnumerable<Models.Log> GetLogs()
-    {
-        return this.collection.FindAll().Concat(this.memoryCache);
-    }
-    public void WriteLog(Log log)
-    {
-        var dbLog = new Models.Log
+        return this.collection.FindAll().Select(log => new Daybreak.Models.Log
         {
+            Category = log.Category,
+            CorrelationVector = log.CorrelationVector,
             EventId = log.EventId,
+            Message = log.Message,
+            LogLevel = (LogLevel)log.LogLevel,
+            LogTime = log.LogTime
+        }).Where(filter.Compile());
+    }
+    public IEnumerable<Daybreak.Models.Log> GetLogs()
+    {
+        return this.collection.FindAll().Select(log => new Daybreak.Models.Log
+        {
+            Category = log.Category,
+            CorrelationVector = log.CorrelationVector,
+            EventId = log.EventId,
+            Message = log.Message,
+            LogLevel = (LogLevel)log.LogLevel,
+            LogTime = log.LogTime
+        });
+    }
+    public async void WriteLog(Log log)
+    {
+        var logModel = new Daybreak.Models.Log
+        {
+            EventId = log.EventId ?? string.Empty,
             Message = log.Exception is null ? log.Message : $"{log.Message}{Environment.NewLine}{log.Exception}",
             Category = log.Category,
             LogLevel = log.LogLevel,
@@ -51,35 +71,40 @@ internal sealed class JsonLogsManager : ILogsManager
 
         if (this.liveOptions.Value.PersistentLogging)
         {
-            lock (this.memoryCache)
+            using var context = await this.semaphoreSlim.Acquire();
+            if (this.memoryCache.Count > 100)
             {
-                if (this.memoryCache.Count > 0)
+                this.collection.AddBulk(this.memoryCache.Select(l => new LogDTO
                 {
-                    this.collection.InsertBulk(this.memoryCache, this.memoryCache.Count);
-                    this.memoryCache.Clear();
-                }
+                    EventId = l.EventId,
+                    Message = l.Message,
+                    Category = l.Category,
+                    LogLevel = (int)l.LogLevel,
+                    LogTime = l.LogTime,
+                    CorrelationVector = l.CorrelationVector
+                }));
+
+                this.memoryCache.Clear();
             }
 
-            this.collection.Insert(dbLog);
+            this.memoryCache.Add(logModel);
         }
         else
         {
-            lock(this.memoryCache)
+            using var context = await this.semaphoreSlim.Acquire();
+            if (this.memoryCache.Count >= MemoryCacheMaxSize)
             {
-                if (this.memoryCache.Count >= MemoryCacheMaxSize)
-                {
-                    this.memoryCache.RemoveAt(this.memoryCache.Count - 1);
-                }
-
-                this.memoryCache.Add(dbLog);
+                this.memoryCache.RemoveAt(this.memoryCache.Count - 1);
             }
+
+            this.memoryCache.Add(logModel);
         }
 
-        this.ReceivedLog?.Invoke(this, dbLog);
+        this.ReceivedLog?.Invoke(this, logModel);
     }
-    public int DeleteLogs()
+    public void DeleteLogs()
     {
         this.memoryCache.Clear();
-        return this.collection.DeleteAll();
+        this.collection.DeleteAll();
     }
 }

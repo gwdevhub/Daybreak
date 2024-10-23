@@ -58,10 +58,10 @@ public partial class LogsView : UserControl
 
     private async void UpdateLogs()
     {
-        var logs = this.logManager.GetLogs().ToArray();
+        var logs = this.logManager.GetLogs().ToList();
         this.TextEditor.Clear();
         this.cachedText.Clear();
-        if (logs.Length > MaximumLookbackPeriod)
+        if (logs.Count > MaximumLookbackPeriod)
         {
             var maximumLookbackPeriodMessage = string.Format(MaximumLookbackMessageTemplate, MaximumLookbackPeriod);
             var adornedMessage = SetupAdornedMessage(maximumLookbackPeriodMessage);

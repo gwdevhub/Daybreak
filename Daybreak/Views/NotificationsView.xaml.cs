@@ -21,6 +21,7 @@ public partial class NotificationsView : UserControl
     private readonly INotificationProducer notificationProducer;
     private readonly ILogger<NotificationsView> logger;
 
+    private readonly SemaphoreSlim semaphoreSlim = new(1);
     private CancellationTokenSource? cancellationTokenSource;
 
     [GenerateDependencyProperty(InitialValue = true)]
@@ -57,36 +58,34 @@ public partial class NotificationsView : UserControl
         while (!cancellationToken.IsCancellationRequested)
         {
             var unsortedNotifications = this.ShowAll ?
-                this.notificationProducer.GetAllNotifications() :
-                this.notificationProducer.GetPendingNotifications();
+                this.notificationProducer.GetAllNotifications().ToList() :
+                this.notificationProducer.GetPendingNotifications().ToList();
             var notifications = this.Descending ?
                 unsortedNotifications.OrderByDescending(n => n.CreationTime).Take(100).ToList() :
                 unsortedNotifications.OrderBy(n => n.CreationTime).Take(100).ToList();
-            lock (this.Notifications)
+            using var context = await this.semaphoreSlim.Acquire();
+            var notificationsToAdd = notifications.Where(n => this.Notifications.None(n2 => n2.Id == n.Id)).ToList();
+            var notificationsToRemove = this.Notifications.Where(n => notifications.None(n2 => n2.Id == n.Id)).ToList();
+            foreach (var notification in notificationsToRemove)
             {
-                var notificationsToAdd = notifications.Where(n => this.Notifications.None(n2 => n2.Id == n.Id)).ToList();
-                var notificationsToRemove = this.Notifications.Where(n => notifications.None(n2 => n2.Id == n.Id)).ToList();
-                foreach (var notification in notificationsToRemove)
-                {
-                    this.Notifications.Remove(notification);
-                }
+                this.Notifications.Remove(notification);
+            }
 
-                foreach(var notification in notificationsToAdd)
+            foreach (var notification in notificationsToAdd)
+            {
+                var index = this.Descending ?
+                    this.Notifications.IndexOfWhere(n2 => n2.CreationTime <= notification.CreationTime) :
+                    this.Notifications.IndexOfWhere(n2 => n2.CreationTime >= notification.CreationTime);
+                if (index == -1)
                 {
-                    var index = this.Descending ?
-                        this.Notifications.IndexOfWhere(n2 => n2.CreationTime <= notification.CreationTime) :
-                        this.Notifications.IndexOfWhere(n2 => n2.CreationTime >= notification.CreationTime);
-                    if (index == -1)
-                    {
-                        this.Notifications.Add(notification);
-                    }
-                    else
-                    {
-                        this.Notifications.Insert(index, notification);
-                    }
+                    this.Notifications.Add(notification);
+                }
+                else
+                {
+                    this.Notifications.Insert(index, notification);
                 }
             }
-            
+
             await Task.Delay(1000, cancellationToken);
         }
     }
@@ -121,17 +120,15 @@ public partial class NotificationsView : UserControl
         }
     }
 
-    private void ToggleSwitch_Toggled(object sender, System.Windows.RoutedEventArgs e)
+    private async void ToggleSwitch_Toggled(object sender, System.Windows.RoutedEventArgs e)
     {
-        lock (this.Notifications)
-        {
-            var unsortedNotifications = this.ShowAll ?
+        using var context = await this.semaphoreSlim.Acquire();
+        var unsortedNotifications = this.ShowAll ?
                     this.notificationProducer.GetAllNotifications() :
                     this.notificationProducer.GetPendingNotifications();
-            var sortedNotification = this.Descending ?
-                    unsortedNotifications.OrderByDescending(n => n.CreationTime).ToList() :
-                    unsortedNotifications.OrderBy(n => n.CreationTime).ToList();
-            this.Notifications.ClearAnd().AddRange(sortedNotification);
-        }
+        var sortedNotification = this.Descending ?
+                unsortedNotifications.OrderByDescending(n => n.CreationTime).ToList() :
+                unsortedNotifications.OrderBy(n => n.CreationTime).ToList();
+        this.Notifications.ClearAnd().AddRange(sortedNotification);
     }
 }
