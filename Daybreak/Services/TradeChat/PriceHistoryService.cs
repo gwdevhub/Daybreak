@@ -55,7 +55,7 @@ internal sealed class PriceHistoryService : IPriceHistoryService
     private async Task<IEnumerable<TraderQuote>> UpdateCacheAndGetPriceHistory(ItemBase itemBase, CancellationToken cancellationToken, DateTime? from = default, DateTime? to = default)
     {
         var itemId = itemBase.Modifiers is not null ? $"{itemBase.Id}-{this.itemHashService.ComputeHash(itemBase)}" : itemBase.Id.ToString();
-        if (!this.options.Value.PriceHistoryMetadata.TryGetValue(itemId, out var lastQueryTime))
+        if (!this.options.Value.PricingHistoryMetadata.TryGetValue(itemId, out var lastQueryTime))
         {
             lastQueryTime = MinEpochTime;
         }
@@ -63,19 +63,18 @@ internal sealed class PriceHistoryService : IPriceHistoryService
         if (lastQueryTime + this.options.Value.UpdateInterval < DateTime.UtcNow)
         {
             await this.FetchAndUpdatePricingHistoryCache(itemBase, cancellationToken, lastQueryTime, DateTime.UtcNow);
-            this.options.Value.PriceHistoryMetadata[itemId] = DateTime.UtcNow;
+            this.options.Value.PricingHistoryMetadata[itemId] = DateTime.UtcNow;
             this.options.UpdateOption();
         }
 
-        var quotes = this.priceHistoryDatabase.GetQuoteHistory(itemBase, from, to);
         var retList = new List<TraderQuote>();
-        foreach(var quote in quotes)
+        foreach (var quote in this.priceHistoryDatabase.GetQuoteHistory(itemBase, from, to))
         {
             retList.Add(new TraderQuote
             {
                 Item = itemBase,
                 Price = quote.Price,
-                Timestamp = quote.TimeStamp
+                Timestamp = quote.TimeStamp.LocalDateTime
             });
         }
 
@@ -92,7 +91,7 @@ internal sealed class PriceHistoryService : IPriceHistoryService
             ItemId = quote.Item?.Id ?? 0,
             Price = quote.Price,
             ModifiersHash = quote.Item?.Modifiers is not null ? this.itemHashService.ComputeHash(quote.Item) : default,
-            TraderQuoteType = TraderQuoteType.Buy,
+            TraderQuoteType = (int)TraderQuoteType.Sell,
             InsertionTime = quote.Timestamp ?? insertionTime //Use timestamp as this method basically recreates the kamadan tradechat database
         }));
     }
@@ -116,7 +115,8 @@ internal sealed class PriceHistoryService : IPriceHistoryService
 
             var responseString = await response.Content.ReadAsStringAsync();
             var responseList = JsonConvert.DeserializeObject<List<TraderQuotePayload>>(responseString);
-            return responseList?.Select(p => new TraderQuote { Item = itemBase, Price = p.Price, Timestamp = p.TimeStamp }) ??
+            return responseList?.Where(p => p.Type == 1)
+                .Select(p => new TraderQuote { Item = itemBase, Price = p.Price, Timestamp = p.TimeStamp }) ??
                 [];
         }
         catch (Exception ex)

@@ -105,7 +105,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
     private async void StartAlertingService(CancellationToken cancellationToken)
     {
         var lastCheckTime = this.options.Value.LastCheckTime;
-        var timeSinceLastCheckTime = DateTime.UtcNow - lastCheckTime;
+        var timeSinceLastCheckTime = DateTimeOffset.UtcNow - lastCheckTime;
         if (timeSinceLastCheckTime > this.options.Value.MaxLookbackPeriod)
         {
             timeSinceLastCheckTime = this.options.Value.MaxLookbackPeriod;
@@ -113,7 +113,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
 
         this.options.Value.LastCheckTime = DateTime.UtcNow;
         this.options.UpdateOption();
-        var savedTrades = this.tradeHistoryDatabase.GetTraderMessagesSinceTime(DateTime.UtcNow - timeSinceLastCheckTime).ToList();
+        var savedTrades = this.tradeHistoryDatabase.GetTraderMessagesSinceTime(DateTimeOffset.UtcNow - timeSinceLastCheckTime);
         if (savedTrades.None())
         {
             var kamadanHistoryTradesTask = GetTraderMessages(this.kamadanTradeChatService, TraderSource.Kamadan, DateTime.UtcNow - timeSinceLastCheckTime, cancellationToken);
@@ -150,7 +150,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
                 Id = message.Timestamp.Ticks,
                 Message = message.Message,
                 Sender = message.Sender,
-                TraderSource = traderSource
+                TraderSource = (int)traderSource
             };
 
             this.tradeHistoryDatabase.StoreTraderMessage(traderMessageDTO);
@@ -245,7 +245,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
         {
             Message = traderMessageDTO.Message,
             Sender = traderMessageDTO.Sender,
-            Timestamp = traderMessageDTO.Timestamp
+            Timestamp = traderMessageDTO.Timestamp.LocalDateTime
         };
 
         this.notificationService.NotifyInformation<TradeMessageNotificationHandler>(
@@ -288,7 +288,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
             Id = t.Timestamp.Ticks,
             Message = t.Message,
             Sender = t.Sender,
-            TraderSource = traderSource
+            TraderSource = (int)traderSource
         }).ToList();
 
         return orderedTrades.Where(t => t.Timestamp > since);
@@ -312,15 +312,15 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
                 Id = t.Timestamp.Ticks,
                 Message = t.Message,
                 Sender = t.Sender,
-                TraderSource = traderSource
+                TraderSource = (int)traderSource
             }).ToList();
 
             retrievedTrades.AddRange(orderedTrades);
             retrievedCount = orderedTrades.Count;
             var maybeMaxTime = orderedTrades.LastOrDefault()?.Timestamp;
-            if (maybeMaxTime is DateTime maxTime)
+            if (maybeMaxTime is DateTimeOffset maxTime)
             {
-                since = maxTime;
+                since = maxTime.LocalDateTime;
             }
         } while (retrievedCount > 0);
 

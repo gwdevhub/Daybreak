@@ -86,7 +86,7 @@ internal sealed class NotificationService : INotificationService, INotificationP
                 Title = notification.Title,
                 Description = notification.Description,
                 Id = notification.Id,
-                Level = notification.Level,
+                Level = (int)notification.Level,
                 MetaData = notification.Metadata,
                 HandlerType = notification.HandlingType?.AssemblyQualifiedName,
                 ExpirationTime = notification.ExpirationTime,
@@ -184,11 +184,11 @@ internal sealed class NotificationService : INotificationService, INotificationP
         return new Notification
         {
             Id = dto.Id,
-            Level = dto.Level,
+            Level = (LogLevel)dto.Level,
             Title = dto.Title ?? string.Empty,
             Description = dto.Description ?? string.Empty,
-            ExpirationTime = dto.ExpirationTime,
-            CreationTime = dto.CreationTime,
+            ExpirationTime = dto.ExpirationTime.LocalDateTime,
+            CreationTime = dto.CreationTime.LocalDateTime,
             Metadata = dto.MetaData ?? string.Empty,
             Dismissible = dto.Dismissible,
             Closed = dto.Closed,
@@ -201,7 +201,7 @@ internal sealed class NotificationService : INotificationService, INotificationP
         return new NotificationDTO
         {
             Id = notification.Id,
-            Level = notification.Level,
+            Level = (int)notification.Level,
             Title = notification.Title,
             Description = notification.Description,
             ExpirationTime = notification.ExpirationTime,

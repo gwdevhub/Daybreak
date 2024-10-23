@@ -1,5 +1,5 @@
-﻿using Daybreak.Services.Notifications.Models;
-using LiteDB;
+﻿using Daybreak.Services.Database;
+using Daybreak.Services.Notifications.Models;
 using System;
 using System.Collections.Generic;
 using System.Core.Extensions;
@@ -8,17 +8,17 @@ namespace Daybreak.Services.Notifications;
 
 internal sealed class NotificationStorage : INotificationStorage
 {
-    private readonly ILiteCollection<NotificationDTO> liteCollection;
+    private readonly IDatabaseCollection<NotificationDTO> liteCollection;
 
     public NotificationStorage(
-        ILiteCollection<NotificationDTO> liteCollection)
+        IDatabaseCollection<NotificationDTO> liteCollection)
     {
         this.liteCollection = liteCollection.ThrowIfNull();
     }
 
-    public IEnumerable<NotificationDTO> GetPendingNotifications(int maxCount = int.MaxValue)
+    public IEnumerable<NotificationDTO> GetPendingNotifications()
     {
-        return this.liteCollection.Find(dto => dto.Closed == false && dto.ExpirationTime > DateTime.Now, limit: maxCount);
+        return this.liteCollection.FindAll(dto => dto.Closed == false && dto.ExpirationTime > DateTimeOffset.Now);
     }
 
     public IEnumerable<NotificationDTO> GetNotifications()
@@ -29,7 +29,7 @@ internal sealed class NotificationStorage : INotificationStorage
     public void StoreNotification(NotificationDTO notification)
     {
         notification.ThrowIfNull();
-        this.liteCollection.Upsert(notification.Id, notification);
+        this.liteCollection.Add(notification);
     }
 
     public void OpenNotification(NotificationDTO notificationDTO)
@@ -41,7 +41,7 @@ internal sealed class NotificationStorage : INotificationStorage
 
     public void RemoveNotification(NotificationDTO notificationDTO)
     {
-        this.liteCollection.Delete(notificationDTO.Id);
+        this.liteCollection.Delete(notificationDTO);
     }
 
     public void RemoveAllNotifications()

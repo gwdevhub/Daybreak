@@ -1,6 +1,6 @@
-﻿using Daybreak.Configuration.Options;
-using Daybreak.Services.ApplicationArguments;
+﻿using Daybreak.Services.ApplicationArguments;
 using Daybreak.Services.Browser;
+using Daybreak.Services.Database;
 using Daybreak.Services.Drawing;
 using Daybreak.Services.Metrics;
 using Daybreak.Services.Mods;
@@ -10,11 +10,10 @@ using Daybreak.Services.Options;
 using Daybreak.Services.Startup;
 using Daybreak.Services.Updater.PostUpdate;
 using Daybreak.Utils;
-using LiteDB;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http.Logging;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Realms;
 using Slim;
 using System.Core.Extensions;
 using System.Net.Http;
@@ -43,14 +42,12 @@ public abstract class PluginConfigurationBase
     {
     }
 
-    public void RegisterLiteCollection<TCollectionType, TOptionsType>(IServiceCollection services)
-        where TOptionsType : class, ILiteCollectionOptions<TCollectionType>
+    public void RegisterCollection<TCollectionType>(IServiceCollection services)
+        where TCollectionType : RealmObject, new()
     {
-        services.AddSingleton(sp =>
+        services.AddScoped<IDatabaseCollection<TCollectionType>>(sp =>
         {
-            var options = sp.GetRequiredService<IOptions<TOptionsType>>();
-            var liteDatabase = sp.GetRequiredService<ILiteDatabase>();
-            return liteDatabase.GetCollection<TCollectionType>(options.Value.CollectionName, BsonAutoId.Int64);
+            return new RealmDatabaseCollection<TCollectionType>();
         });
     }
     

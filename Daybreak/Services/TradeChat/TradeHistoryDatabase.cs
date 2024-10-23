@@ -1,5 +1,5 @@
-﻿using Daybreak.Services.TradeChat.Models;
-using LiteDB;
+﻿using Daybreak.Services.Database;
+using Daybreak.Services.TradeChat.Models;
 using System;
 using System.Collections.Generic;
 using System.Core.Extensions;
@@ -8,21 +8,21 @@ namespace Daybreak.Services.TradeChat;
 
 internal sealed class TradeHistoryDatabase : ITradeHistoryDatabase
 {
-    private readonly ILiteCollection<TraderMessageDTO> liteCollection;
+    private readonly IDatabaseCollection<TraderMessageDTO> liteCollection;
 
     public TradeHistoryDatabase(
-        ILiteCollection<TraderMessageDTO> liteCollection)
+        IDatabaseCollection<TraderMessageDTO> liteCollection)
     {
         this.liteCollection = liteCollection.ThrowIfNull();
     }
 
-    public IEnumerable<TraderMessageDTO> GetTraderMessagesSinceTime(DateTime since)
+    public IEnumerable<TraderMessageDTO> GetTraderMessagesSinceTime(DateTimeOffset since)
     {
-        return this.liteCollection.Find(t => t.Timestamp > since);
+        return this.liteCollection.FindAll(t => t.Timestamp > since);
     }
 
-    public void StoreTraderMessage(TraderMessageDTO message)
+    public bool StoreTraderMessage(TraderMessageDTO message)
     {
-        this.liteCollection.Upsert(message.Id, message);
+        return this.liteCollection.Update(message);
     }
 }

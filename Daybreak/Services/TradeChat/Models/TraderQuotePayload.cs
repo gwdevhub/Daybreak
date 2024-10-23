@@ -11,4 +11,7 @@ internal sealed class TraderQuotePayload
     [JsonProperty("t")]
     [JsonConverter(typeof(UnixDateTimeConverter))]
     public DateTime TimeStamp { get; set; }
+
+    [JsonProperty("s")]
+    public int Type { get; set; }
 }
