@@ -18,6 +18,8 @@ internal sealed class ThemeManager : IThemeManager, IApplicationLifetimeService
 {
     private const string LightThemeValue = "Light";
     private const string RegistryKey = @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes";
+    private const string PersonalizeKey = @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize";
+    private const string AppsUseLightThemeValue = "AppsUseLightTheme";
     private const string DarkMode = "Dark";
     private const string LightMode = "Light";
 
@@ -123,6 +125,13 @@ internal sealed class ThemeManager : IThemeManager, IApplicationLifetimeService
         var theme = Microsoft.Win32.Registry.GetValue(RegistryKey, "CurrentTheme", string.Empty)?.As<string>();
         // Windows 11 light theme is called aero.theme
         if (theme?.EndsWith("aero.theme") is true)
+        {
+            return true;
+        }
+
+        
+        var themeMode = Microsoft.Win32.Registry.GetValue(PersonalizeKey, AppsUseLightThemeValue, null);
+        if (themeMode is int themeModeValue && themeModeValue is 1)
         {
             return true;
         }
