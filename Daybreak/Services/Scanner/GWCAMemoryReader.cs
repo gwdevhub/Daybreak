@@ -14,7 +14,6 @@ using Daybreak.Models.Builds;
 using System.Windows;
 using Daybreak.Utils;
 using System.Text.RegularExpressions;
-using Daybreak.Services.Pathfinding;
 using System.Net.Http;
 using System.Configuration;
 using Daybreak.Configuration.Options;
@@ -24,7 +23,6 @@ namespace Daybreak.Services.Scanner;
 internal sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
 {
     private static readonly Regex ItemNameColorRegex = GenerateItemNameColorRegex();
-    private readonly IPathfinder pathfinder;
     private readonly IGWCAClient client;
     private readonly ILiveOptions<MemoryReaderOptions> liveOptions;
     private readonly ILogger<GWCAMemoryReader> logger;
@@ -34,12 +32,10 @@ internal sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
     private ConnectionContext? connectionContextCache;
 
     public GWCAMemoryReader(
-        IPathfinder pathfinder,
         IGWCAClient gWCAClient,
         ILiveOptions<MemoryReaderOptions> liveOptions,
         ILogger<GWCAMemoryReader> logger)
     {
-        this.pathfinder = pathfinder.ThrowIfNull();
         this.client = gWCAClient.ThrowIfNull();
         this.liveOptions = liveOptions.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
@@ -308,8 +304,7 @@ internal sealed partial class GWCAMemoryReader : IGuildwarsMemoryReader
             {
                 Trapezoids = trapezoidList,
                 OriginalAdjacencyList = adjacencyList,
-                OriginalPathingMaps = originalPathingMaps,
-                NavMesh = await this.pathfinder.GenerateNavMesh(trapezoidList, cancellationToken)
+                OriginalPathingMaps = originalPathingMaps
             };
         }
         catch (Exception ex)
