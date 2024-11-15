@@ -30,13 +30,8 @@ using Daybreak.Services.Metrics;
 using Daybreak.Services.Monitoring;
 using Daybreak.Services.Downloads;
 using Daybreak.Services.ExceptionHandling;
-using Daybreak.Services.Pathfinding;
 using Daybreak.Services.Startup;
 using Daybreak.Services.Startup.Actions;
-using Daybreak.Services.Drawing;
-using Daybreak.Services.Drawing.Modules.Entities;
-using Daybreak.Services.Drawing.Modules.MapIcons;
-using Daybreak.Services.Drawing.Modules;
 using Daybreak.Services.GuildWars;
 using Daybreak.Configuration.Options;
 using System.Configuration;
@@ -52,7 +47,6 @@ using Daybreak.Services.Notifications;
 using Daybreak.Services.TradeChat.Models;
 using Daybreak.Services.Charts;
 using Daybreak.Services.Images;
-using Daybreak.Services.Drawing.Modules.Bosses;
 using Daybreak.Services.InternetChecker;
 using System;
 using Daybreak.Services.Sounds;
@@ -87,9 +81,7 @@ using Daybreak.Services.ApplicationArguments;
 using Daybreak.Services.ApplicationArguments.ArgumentHandling;
 using Daybreak.Services.Window;
 using Daybreak.Launch;
-using Daybreak.Utils;
 using Daybreak.Views.Installation;
-using Realms;
 using Daybreak.Services.Logging.Models;
 
 namespace Daybreak.Configuration;
@@ -178,15 +170,12 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IIconCache, IconCache>();
         services.AddScoped<IPrivilegeManager, PrivilegeManager>();
         services.AddScoped<IScreenManager, ScreenManager>();
-        services.AddScoped<IPathfinder, SharpNavPathfinder>();
         services.AddScoped<IOnboardingService, OnboardingService>();
         services.AddScoped<IExperienceCalculator, ExperienceCalculator>();
         services.AddScoped<IAttributePointCalculator, AttributePointCalculator>();
         services.AddScoped<IDownloadService, DownloadService>();
         services.AddScoped<IGuildWarsInstaller, IntegratedGuildwarsInstaller>();
         services.AddScoped<IExceptionHandler, ExceptionHandler>();
-        services.AddScoped<IDrawingService, DrawingService>();
-        services.AddScoped<IDrawingModuleProducer, DrawingService>(sp => sp.GetRequiredService<IDrawingService>().As<DrawingService>()!);
         services.AddScoped<ITradeChatService<KamadanTradeChatOptions>, TradeChatService<KamadanTradeChatOptions>>();
         services.AddScoped<ITradeChatService<AscalonTradeChatOptions>, TradeChatService<AscalonTradeChatOptions>>();
         services.AddScoped<ITraderQuoteService, TraderQuoteService>();
@@ -298,54 +287,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         postUpdateActionProducer.ThrowIfNull();
     }
 
-    public override void RegisterDrawingModules(IDrawingModuleProducer drawingModuleProducer)
-    {
-        drawingModuleProducer.ThrowIfNull();
-
-        drawingModuleProducer.RegisterDrawingModule<DeadEntityDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<NeutralEntityDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<AlliedCreatureEntityDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<AllyEntityDrawingModule>();
-
-        drawingModuleProducer.RegisterDrawingModule<NeutralBossEntityDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<WarriorBossEntityDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<RangerBossEntityDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<MesmerBossEntityDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<NecromancerBossEntityDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<MonkBossEntityDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<ElementalistBossEntityDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<AssassinBossEntityDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<RitualistBossEntityDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<DervishBossEntityDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<ParagonBossEntityDrawingModule>();
-
-        drawingModuleProducer.RegisterDrawingModule<EnemyEntityDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<NpcEntityDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<UnknownEntityDrawingModule>();
-
-        drawingModuleProducer.RegisterDrawingModule<ResurrectionShrineDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<CollectorDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<GateDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<StairsDownDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<StairsUpDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<CircledStarDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<AreaMapDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<DungeonBossDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<DungeonKeyDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<FlagDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<PersonDrawingModule>();
-
-        drawingModuleProducer.RegisterDrawingModule<PathfindingDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<PlayerPositionHistoryDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<QuestObjectiveDrawingModule>();
-
-        drawingModuleProducer.RegisterDrawingModule<MainPlayerDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<PartyMemberDrawingModule>();
-        drawingModuleProducer.RegisterDrawingModule<WorldPlayerDrawingModule>();
-
-        drawingModuleProducer.RegisterDrawingModule<EngagementAreaDrawingModule>();
-    }
-
     public override void RegisterOptions(IOptionsProducer optionsProducer)
     {
         optionsProducer.ThrowIfNull();
@@ -373,7 +314,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         optionsProducer.RegisterOptions<AscalonTradeChatOptions>();
         optionsProducer.RegisterOptions<PriceHistoryOptions>();
         optionsProducer.RegisterOptions<TraderQuotesOptions>();
-        optionsProducer.RegisterOptions<PathfindingOptions>();
         optionsProducer.RegisterOptions<TradeAlertingOptions>();
         optionsProducer.RegisterOptions<EventNotifierOptions>();
         optionsProducer.RegisterOptions<PluginsServiceOptions>();

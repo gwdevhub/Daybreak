@@ -2,7 +2,6 @@
 using Daybreak.Models.Progress;
 using Daybreak.Services.ApplicationArguments;
 using Daybreak.Services.Browser;
-using Daybreak.Services.Drawing;
 using Daybreak.Services.ExceptionHandling;
 using Daybreak.Services.Mods;
 using Daybreak.Services.Navigation;
@@ -104,7 +103,6 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
         var viewProducer = this.ServiceProvider.GetRequiredService<IViewManager>();
         var postUpdateActionProducer = this.ServiceProvider.GetRequiredService<IPostUpdateActionProducer>();
         var startupActionProducer = this.ServiceProvider.GetRequiredService<IStartupActionProducer>();
-        var drawingModuleProducer = this.ServiceProvider.GetRequiredService<IDrawingModuleProducer>();
         var notificationHandlerProducer = this.ServiceProvider.GetRequiredService<INotificationHandlerProducer>();
         var modsManager = this.ServiceProvider.GetRequiredService<IModsManager>();
         var browserExtensionsProducer = this.ServiceProvider.GetRequiredService<IBrowserExtensionsProducer>();
@@ -116,8 +114,6 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
         this.projectConfiguration.RegisterPostUpdateActions(postUpdateActionProducer);
         startupStatus.CurrentStep = StartupStatus.Custom("Loading startup actions");
         this.projectConfiguration.RegisterStartupActions(startupActionProducer);
-        startupStatus.CurrentStep = StartupStatus.Custom("Loading drawing modules");
-        this.projectConfiguration.RegisterDrawingModules(drawingModuleProducer);
         startupStatus.CurrentStep = StartupStatus.Custom("Loading notification handlers");
         this.projectConfiguration.RegisterNotificationHandlers(notificationHandlerProducer);
         startupStatus.CurrentStep = StartupStatus.Custom("Loading mods");
@@ -140,7 +136,6 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
                     viewProducer,
                     postUpdateActionProducer,
                     startupActionProducer,
-                    drawingModuleProducer,
                     notificationHandlerProducer,
                     modsManager,
                     browserExtensionsProducer,

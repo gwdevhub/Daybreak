@@ -12,12 +12,6 @@ public sealed class FocusViewOptions
     [OptionName(Name = "Enabled", Description = "If true, the focus view is enabled, showing live information from the game")]
     public bool Enabled { get; set; } = true;
 
-    [OptionName(Name = "Inventory Component Enabled", Description = "If true, the focus view will show a component with the inventory contents")]
-    public bool InventoryComponentVisible { get; set; }
-
-    [OptionName(Name = "Minimap Component Enabled", Description = "If true, the focus view will show a minimap component")]
-    public bool MinimapComponentVisible { get; set; }
-
     [JsonProperty(nameof(ExperienceDisplay))]
     [OptionName(Name = "Experience Display Mode", Description = "Sets how should the experience display show the information")]
     public ExperienceDisplay ExperienceDisplay { get; set; }
@@ -49,18 +43,6 @@ public sealed class FocusViewOptions
     [JsonProperty(nameof(EnergyDisplay))]
     [OptionName(Name = "Energy Display Mode", Description = "Sets how should the energy display show the information")]
     public PointsDisplay EnergyDisplay { get; set; }
-
-    [JsonProperty(nameof(MinimapRotationEnabled))]
-    [OptionName(Name = "Minimap Rotation", Description = "When enabled, the minimap will rotate according to the player camera")]
-    public bool MinimapRotationEnabled { get; set; } = true;
-
-    [JsonProperty(nameof(MinimapTransparency))]
-    [OptionName(Name = "Minimap Transparency", Description = "When enabled, the minimap window will be transparent")]
-    public bool MinimapTransparency { get; set; } = true;
-
-    [JsonProperty(nameof(ShowCartoProgress))]
-    [OptionName(Name = "Show Cartographer Progress", Description = "When enabled, the minimap will show live cartographer progress")]
-    public bool ShowCartoProgress { get; set; } = false;
 
     [JsonProperty(nameof(BrowserHistory))]
     [OptionIgnore]
