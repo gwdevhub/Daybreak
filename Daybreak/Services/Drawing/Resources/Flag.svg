@@ -1,7 +1,0 @@
-<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg" version="1.1" xml:space="preserve">
- <g>
-    <polygon fill="{FILL}" points="250,45 250,0 40,0 40,210 205,210 250,210 " id="svg_2"/>
-    <path fill="{FILL}" d="m260,50l0,165c0,2.761 -2.238,5 -5,5l-45,0l0,40l210,0l0,-210l-160,0z" id="svg_3"/>
-    <polygon points="0,460 30,460 30,215 30,0 0,0 " fill="{STROKE}" id="svg_4"/>
- </g>
-</svg>

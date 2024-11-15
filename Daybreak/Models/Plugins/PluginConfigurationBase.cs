@@ -1,7 +1,6 @@
 ﻿using Daybreak.Services.ApplicationArguments;
 using Daybreak.Services.Browser;
 using Daybreak.Services.Database;
-using Daybreak.Services.Drawing;
 using Daybreak.Services.Metrics;
 using Daybreak.Services.Mods;
 using Daybreak.Services.Navigation;
@@ -31,7 +30,6 @@ public abstract class PluginConfigurationBase
     public virtual void RegisterViews(IViewProducer viewProducer) { }
     public virtual void RegisterStartupActions(IStartupActionProducer startupActionProducer) { }
     public virtual void RegisterPostUpdateActions(IPostUpdateActionProducer postUpdateActionProducer) { }
-    public virtual void RegisterDrawingModules(IDrawingModuleProducer drawingModuleProducer) { }
     public virtual void RegisterOptions(IOptionsProducer optionsProducer) { }
     public virtual void RegisterNotificationHandlers(INotificationHandlerProducer notificationHandlerProducer) { }
     public virtual void RegisterMods(IModsManager modsManager) { }

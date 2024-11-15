@@ -2,7 +2,6 @@
 using Daybreak.Models.Plugins;
 using Daybreak.Services.ApplicationArguments;
 using Daybreak.Services.Browser;
-using Daybreak.Services.Drawing;
 using Daybreak.Services.Mods;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Notifications;
@@ -93,7 +92,6 @@ internal sealed class PluginsService : IPluginsService
         IViewManager viewManager,
         IPostUpdateActionProducer postUpdateActionProducer,
         IStartupActionProducer startupActionProducer,
-        IDrawingModuleProducer drawingModuleProducer,
         INotificationHandlerProducer notificationHandlerProducer,
         IModsManager modsManager,
         IBrowserExtensionsProducer browserExtensionsProducer,
@@ -104,7 +102,6 @@ internal sealed class PluginsService : IPluginsService
         viewManager.ThrowIfNull();
         postUpdateActionProducer.ThrowIfNull();
         startupActionProducer.ThrowIfNull();
-        drawingModuleProducer.ThrowIfNull();
         notificationHandlerProducer.ThrowIfNull();
         modsManager.ThrowIfNull();
         browserExtensionsProducer.ThrowIfNull();
@@ -177,8 +174,6 @@ internal sealed class PluginsService : IPluginsService
                 pluginScopedLogger.LogInformation("Registered post-update actions");
                 RegisterStartupActions(pluginConfig, startupActionProducer);
                 pluginScopedLogger.LogInformation("Registered startup actions");
-                RegisterDrawingModules(pluginConfig, drawingModuleProducer);
-                pluginScopedLogger.LogInformation("Registered drawing modules");
                 RegisterNotificationHandlers(pluginConfig, notificationHandlerProducer);
                 pluginScopedLogger.LogInformation("Registered notification handlers");
                 RegisterMods(pluginConfig, modsManager);
@@ -320,8 +315,6 @@ internal sealed class PluginsService : IPluginsService
     private static void RegisterPostUpdateActions(PluginConfigurationBase pluginConfig, IPostUpdateActionProducer postUpdateActionProducer) => pluginConfig.RegisterPostUpdateActions(postUpdateActionProducer);
 
     private static void RegisterStartupActions(PluginConfigurationBase pluginConfig, IStartupActionProducer startupActionProducer) => pluginConfig.RegisterStartupActions(startupActionProducer);
-
-    private static void RegisterDrawingModules(PluginConfigurationBase pluginConfig, IDrawingModuleProducer drawingModuleProducer) => pluginConfig.RegisterDrawingModules(drawingModuleProducer);
 
     private static void RegisterNotificationHandlers(PluginConfigurationBase pluginConfig, INotificationHandlerProducer notificationHandlerProducer) => pluginConfig.RegisterNotificationHandlers(notificationHandlerProducer);
 

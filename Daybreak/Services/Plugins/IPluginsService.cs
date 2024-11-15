@@ -1,7 +1,6 @@
 ﻿using Daybreak.Models.Plugins;
 using Daybreak.Services.ApplicationArguments;
 using Daybreak.Services.Browser;
-using Daybreak.Services.Drawing;
 using Daybreak.Services.Mods;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Notifications;
@@ -26,7 +25,6 @@ public interface IPluginsService
         IViewManager viewManager,
         IPostUpdateActionProducer postUpdateActionProducer,
         IStartupActionProducer startupActionProducer,
-        IDrawingModuleProducer drawingModuleProducer,
         INotificationHandlerProducer notificationHandlerProducer,
         IModsManager modsManager,
         IBrowserExtensionsProducer browserExtensionsProducer,
