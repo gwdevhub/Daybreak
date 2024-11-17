@@ -1,4 +1,5 @@
 ﻿using Daybreak.Exceptions;
+using Daybreak.Launch;
 using Daybreak.Models.Notifications.Handling;
 using Daybreak.Services.Notifications;
 using Daybreak.Utils;
@@ -11,7 +12,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using System.Windows;
 
 namespace Daybreak.Services.ExceptionHandling;
 
@@ -45,7 +45,7 @@ internal sealed class ExceptionHandler : IExceptionHandler
         if (e is FatalException fatalException)
         {
             this.logger.LogCritical(e, $"{nameof(FatalException)} encountered. Closing application");
-            MessageBox.Show(fatalException.ToString());
+            ExceptionDialog.ShowException(fatalException);
             File.WriteAllText("crash.log", e.ToString());
             WriteCrashDump();
             return false;
@@ -58,7 +58,7 @@ internal sealed class ExceptionHandler : IExceptionHandler
         else if (e is TargetInvocationException targetInvocationException && e.InnerException is FatalException innerFatalException)
         {
             this.logger.LogCritical(e, $"{nameof(FatalException)} encountered. Closing application");
-            MessageBox.Show(innerFatalException.ToString());
+            ExceptionDialog.ShowException(e);
             File.WriteAllText("crash.log", e.ToString());
             WriteCrashDump();
             return false;
@@ -92,7 +92,7 @@ internal sealed class ExceptionHandler : IExceptionHandler
         }
 
         this.logger.LogError(e, $"Unhandled exception caught {e.GetType()}");
-        this.notificationService.NotifyError<MessageBoxHandler>("Encountered exception", e.ToString());
+        this.notificationService.NotifyError<MessageBoxHandler>(e.GetType().Name, e.ToString());
         return true;
     }
 
