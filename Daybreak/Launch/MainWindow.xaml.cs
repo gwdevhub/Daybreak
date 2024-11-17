@@ -141,8 +141,6 @@ public partial class MainWindow : MetroWindow
         {
             this.logger.LogError(ex, "Encountered exception while opening issues page");
         }
-
-        throw new InvalidOperationException();
     }
 
     private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
