@@ -1,6 +1,7 @@
 ﻿using Daybreak.Models.Guildwars;
 using Daybreak.Services.Database;
 using Daybreak.Services.TradeChat.Models;
+using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -48,10 +49,10 @@ internal sealed class PriceHistoryDatabase : IPriceHistoryDatabase
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetQuoteHistory), item.Id.ToString());
         var fromO = fromTimestamp.HasValue ?
-            new DateTimeOffset(fromTimestamp.Value) :
+            fromTimestamp.Value.ToSafeDateTimeOffset() :
             DateTimeOffset.MinValue;
         var toO = toTimestamp.HasValue ?
-            new DateTimeOffset(toTimestamp.Value) :
+            toTimestamp.Value.ToSafeDateTimeOffset() :
             DateTimeOffset.MaxValue;
         scopedLogger.LogDebug($"Retrieving quotes for item {item.Id} with timestamp between [{fromO}] and [{toO}]");
         var modifiersHash = item.Modifiers is not null ? this.itemHashService.ComputeHash(item) : default;
@@ -69,10 +70,10 @@ internal sealed class PriceHistoryDatabase : IPriceHistoryDatabase
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetQuotesByTimestamp), string.Empty);
         var fromO = from.HasValue ?
-            new DateTimeOffset(from.Value) :
+            from.Value.ToSafeDateTimeOffset() :
             DateTimeOffset.MinValue;
         var toO = to.HasValue ?
-            new DateTimeOffset(to.Value) :
+            to.Value.ToSafeDateTimeOffset() :
             DateTimeOffset.Now;
         scopedLogger.LogDebug($"Retrieving all quotes by timestamp between [{fromO}] and [{toO}]");
         var items = this.collection.FindAll(t => t.TimeStamp >= fromO && t.TimeStamp <= toO && t.TraderQuoteType == (int)type);
@@ -84,10 +85,10 @@ internal sealed class PriceHistoryDatabase : IPriceHistoryDatabase
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetQuotesByInsertionTime), string.Empty);
         var fromO = from.HasValue ?
-            new DateTimeOffset(from.Value) :
+            from.Value.ToSafeDateTimeOffset() :
             DateTimeOffset.MinValue;
         var toO = to.HasValue ?
-            new DateTimeOffset(to.Value) :
+            to.Value.ToSafeDateTimeOffset() :
             DateTimeOffset.Now;
         scopedLogger.LogDebug($"Retrieving all quotes by insertion time between [{fromO}] and [{toO}]");
         var items = this.collection.FindAll(t => t.InsertionTime >= fromO && t.InsertionTime <= toO && t.TraderQuoteType == (int)type);
