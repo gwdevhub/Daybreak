@@ -193,6 +193,25 @@
                 </Grid>
             </buttons:HighlightButton.ButtonContent>
         </buttons:HighlightButton>
+        <buttons:HighlightButton Height="30"
+                         Width="47"
+                         VerticalAlignment="Center"
+                         HorizontalAlignment="Right"
+                         Grid.Column="1"
+                         Margin="0, 0, 190, 0"
+                         Cursor="Hand"
+                         Opacity="0.8"
+                         HighlightColor="White"
+                         ToolTip="Report an issue"
+                         Clicked="BugButton_Click">
+            <buttons:HighlightButton.ButtonContent>
+                <Grid Height="30"
+                      Width="30">
+                    <glyphs:BugGlyph Height="20"
+                                    Width="20" />
+                </Grid>
+            </buttons:HighlightButton.ButtonContent>
+        </buttons:HighlightButton>
         <notifications:NotificationStackpanel 
             HorizontalAlignment="Right"
             VerticalAlignment="Bottom"
