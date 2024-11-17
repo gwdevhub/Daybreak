@@ -9,6 +9,7 @@ using Daybreak.Services.Updater;
 using Daybreak.Views;
 using MahApps.Metro.Controls;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Configuration;
@@ -34,6 +35,8 @@ namespace Daybreak.Launch;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
 public partial class MainWindow : MetroWindow
 {
+    private const string IssueUrl = "https://github.com/gwdevhub/Daybreak/issues/new";
+
     private readonly IOptionsSynchronizationService optionsSynchronizationService;
     private readonly ISplashScreenService splashScreenService;
     private readonly IMenuServiceInitializer menuServiceInitializer;
@@ -43,6 +46,7 @@ public partial class MainWindow : MetroWindow
     private readonly IPrivilegeManager privilegeManager;
     private readonly ILiveOptions<LauncherOptions> launcherOptions;
     private readonly ILiveOptions<ThemeOptions> themeOptions;
+    private readonly ILogger<MainWindow> logger;
     private readonly CancellationTokenSource cancellationToken = new();
 
     [GenerateDependencyProperty]
@@ -74,7 +78,8 @@ public partial class MainWindow : MetroWindow
         IPrivilegeManager privilegeManager,
         IOptionsUpdateHook optionsUpdateHook,
         ILiveOptions<LauncherOptions> launcherOptions,
-        ILiveOptions<ThemeOptions> themeOptions)
+        ILiveOptions<ThemeOptions> themeOptions,
+        ILogger<MainWindow> logger)
     {
         this.optionsSynchronizationService = optionsSynchronizationService.ThrowIfNull();
         this.splashScreenService = splashScreenService.ThrowIfNull();
@@ -85,6 +90,7 @@ public partial class MainWindow : MetroWindow
         this.privilegeManager = privilegeManager.ThrowIfNull();
         this.launcherOptions = launcherOptions.ThrowIfNull();
         this.themeOptions = themeOptions.ThrowIfNull();
+        this.logger = logger.ThrowIfNull();
         optionsUpdateHook.ThrowIfNull().RegisterHook<ThemeOptions>(this.ThemeOptionsChanged);
         this.InitializeComponent();
         this.CurrentVersionText = this.applicationUpdater.CurrentVersion.ToString();
@@ -119,6 +125,24 @@ public partial class MainWindow : MetroWindow
     private void SynchronizeButton_Click(object sender, EventArgs e)
     {
         this.viewManager.ShowView<SettingsSynchronizationView>();
+    }
+
+    private void BugButton_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = IssueUrl,
+                UseShellExecute = true
+            });
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, "Encountered exception while opening issues page");
+        }
+
+        throw new InvalidOperationException();
     }
 
     private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

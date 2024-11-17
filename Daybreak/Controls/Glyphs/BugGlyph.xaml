@@ -1,0 +1,14 @@
+﻿<UserControl x:Class="Daybreak.Controls.Glyphs.BugGlyph"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Daybreak.Controls.Glyphs"
+             x:Name="_this"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Viewbox>
+        <Path Fill="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+            Data="m1.188,47.173a2,2 0 0 0 -1.188,1.827l0,8l4,0l0,-6.7l6.992,-3.108a17.968,17.968 0 0 0 32.016,0l6.992,3.108l0,6.7l4,0l0,-8a2,2 0 0 0 -1.188,-1.827l-8.39,-3.729a17.858,17.858 0 0 0 0.511,-3.115l7.879,-3.5a2,2 0 0 0 1.188,-1.829l0,-8l-4,0l0,6.7l-5,2.223l0,-10.623l7.812,-3.472a2,2 0 0 0 1.188,-1.828l0,-8l-4,0l0,6.7l-5.325,2.367a6.006,6.006 0 0 0 -5.675,-4.067l-2,0l0,-4a7.941,7.941 0 0 0 -0.99,-3.847l3.239,-2.591a2,2 0 0 0 0.751,-1.562l0,-5l-4,0l0,4.039l-2.747,2.2a7.939,7.939 0 0 0 -4.253,-1.239l-4,0a7.939,7.939 0 0 0 -4.253,1.237l-2.747,-2.198l0,-4.039l-4,0l0,5a2,2 0 0 0 0.751,1.562l3.239,2.591a7.941,7.941 0 0 0 -0.99,3.847l0,4l-2,0a6.006,6.006 0 0 0 -5.675,4.067l-5.325,-2.367l0,-6.7l-4,0l0,8a2,2 0 0 0 1.188,1.827l7.812,3.473l0,10.623l-5,-2.223l0,-6.7l-4,0l0,8a2,2 0 0 0 1.188,1.827l7.879,3.5a17.858,17.858 0 0 0 0.511,3.115l-8.39,3.731zm11.812,-8.173l0,-10l12,0l0,23.84a14.009,14.009 0 0 1 -12,-13.84zm16,13.84l0,-23.84l12,0l0,10a14.009,14.009 0 0 1 -12,13.84zm-8,-39.84a4,4 0 0 1 4,-4l4,0a4,4 0 0 1 4,4l0,4l-12,0l0,-4zm-6,8l24,0a2,2 0 0 1 2,2l0,2l-28,0l0,-2a2,2 0 0 1 2,-2z"/>
+    </Viewbox>
+</UserControl>
