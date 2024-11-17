@@ -4,6 +4,7 @@ using Daybreak.Models.Trade;
 using Daybreak.Services.Notifications;
 using Daybreak.Services.TradeChat.Models;
 using Daybreak.Services.TradeChat.Notifications;
+using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -105,7 +106,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
     private async void StartAlertingService(CancellationToken cancellationToken)
     {
         var lastCheckTime = this.options.Value.LastCheckTime;
-        var timeSinceLastCheckTime = DateTimeOffset.UtcNow - lastCheckTime;
+        var timeSinceLastCheckTime = DateTimeOffset.UtcNow - lastCheckTime.ToSafeDateTimeOffset();
         if (timeSinceLastCheckTime > this.options.Value.MaxLookbackPeriod)
         {
             timeSinceLastCheckTime = this.options.Value.MaxLookbackPeriod;
@@ -146,7 +147,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
         {
             var traderMessageDTO = new TraderMessageDTO
             {
-                Timestamp = message.Timestamp,
+                Timestamp = message.Timestamp.ToSafeDateTimeOffset(),
                 Id = message.Timestamp.Ticks,
                 Message = message.Message,
                 Sender = message.Sender,
@@ -274,7 +275,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
         }
         else
         {
-            return toCheck.ToLower().Contains(toMatch.ToLower());
+            return toCheck.Contains(toMatch, StringComparison.CurrentCultureIgnoreCase);
         }
     }
 
@@ -284,7 +285,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
         var trades = await tradeChatService.GetLatestTrades(cancellationToken);
         var orderedTrades = trades.OrderBy(t => t.Timestamp).Select(t => new TraderMessageDTO
         {
-            Timestamp = t.Timestamp,
+            Timestamp = t.Timestamp.ToSafeDateTimeOffset(),
             Id = t.Timestamp.Ticks,
             Message = t.Message,
             Sender = t.Sender,
@@ -308,7 +309,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
             var trades = await tradeChatService.GetLatestTrades(cancellationToken, since);
             var orderedTrades = trades.OrderBy(t => t.Timestamp).Select(t => new TraderMessageDTO
             {
-                Timestamp = t.Timestamp,
+                Timestamp = t.Timestamp.ToSafeDateTimeOffset(),
                 Id = t.Timestamp.Ticks,
                 Message = t.Message,
                 Sender = t.Sender,

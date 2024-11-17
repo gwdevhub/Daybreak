@@ -1,6 +1,7 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Services.Database;
 using Daybreak.Services.Logging.Models;
+using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -65,7 +66,7 @@ internal sealed class JsonLogsManager : ILogsManager
             Message = log.Exception is null ? log.Message : $"{log.Message}{Environment.NewLine}{log.Exception}",
             Category = log.Category,
             LogLevel = log.LogLevel,
-            LogTime = log.LogTime,
+            LogTime = log.LogTime.ToSafeDateTimeOffset(),
             CorrelationVector = log.CorrelationVector
         };
 

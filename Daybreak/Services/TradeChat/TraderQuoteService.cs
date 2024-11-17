@@ -2,6 +2,7 @@
 using Daybreak.Models.Guildwars;
 using Daybreak.Models.Trade;
 using Daybreak.Services.TradeChat.Models;
+using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -121,7 +122,7 @@ internal sealed class TraderQuoteService : ITraderQuoteService
     {
         var buyQuotes = await this.FetchBuyQuotesInternal(cancellationToken);
         var sellQuotes = await this.FetchSellQuotesInternal(cancellationToken);
-        var insertionTime = DateTime.UtcNow;
+        var insertionTime = DateTimeOffset.UtcNow;
         this.priceHistoryDatabase.AddTraderQuotes(buyQuotes
             .Select(
                 quote => new TraderQuoteDTO
@@ -130,7 +131,7 @@ internal sealed class TraderQuoteService : ITraderQuoteService
                     ItemId = quote.Item?.Id ?? 0,
                     ModifiersHash = quote.Item?.Modifiers is null ? string.Empty : this.itemHashService.ComputeHash(quote.Item),
                     InsertionTime = insertionTime,
-                    TimeStamp = quote.Timestamp ?? insertionTime,
+                    TimeStamp = quote.Timestamp.ToSafeDateTimeOffset() ?? insertionTime,
                     TraderQuoteType = (int)TraderQuoteType.Buy
                 }));
 
@@ -142,11 +143,11 @@ internal sealed class TraderQuoteService : ITraderQuoteService
                     ItemId = quote.Item?.Id ?? 0,
                     ModifiersHash = quote.Item?.Modifiers is null ? string.Empty : this.itemHashService.ComputeHash(quote.Item),
                     InsertionTime = insertionTime,
-                    TimeStamp = quote.Timestamp ?? insertionTime,
+                    TimeStamp = quote.Timestamp.ToSafeDateTimeOffset() ?? insertionTime,
                     TraderQuoteType = (int)TraderQuoteType.Sell
                 }));
 
-        this.options.Value.LastCheckTime = insertionTime;
+        this.options.Value.LastCheckTime = insertionTime.UtcDateTime;
         this.options.UpdateOption();
         return (buyQuotes, sellQuotes);
     }

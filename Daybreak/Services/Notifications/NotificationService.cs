@@ -1,6 +1,7 @@
 ﻿using Daybreak.Models.Notifications;
 using Daybreak.Models.Notifications.Handling;
 using Daybreak.Services.Notifications.Models;
+using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using Slim;
 using System;
@@ -8,7 +9,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Extensions.Core;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -80,27 +80,19 @@ internal sealed class NotificationService : INotificationService, INotificationP
 
     void INotificationProducer.OpenNotification(Notification notification, bool storeNotification)
     {
-        var scopedLogger = this.logger.CreateScopedLogger();
         if (storeNotification)
         {
-            try
+            this.storage.OpenNotification(new NotificationDTO
             {
-                this.storage.OpenNotification(new NotificationDTO
-                {
-                    Title = notification.Title,
-                    Description = notification.Description,
-                    Id = notification.Id,
-                    Level = (int)notification.Level,
-                    MetaData = notification.Metadata,
-                    HandlerType = notification.HandlingType?.AssemblyQualifiedName,
-                    ExpirationTime = notification.ExpirationTime,
-                    Closed = true
-                });
-            }
-            catch(ArgumentOutOfRangeException exception) when (exception.Message.Contains("The UTC time represented when the offset is applied must be between year 0 and 10000"))
-            {
-                scopedLogger.LogError(exception, "Encountered DateTime to DateTimeOffset exception. Failed to store notification and will discard it. DateTime: {dateTime}", notification.ExpirationTime);
-            }
+                Title = notification.Title,
+                Description = notification.Description,
+                Id = notification.Id,
+                Level = (int)notification.Level,
+                MetaData = notification.Metadata,
+                HandlerType = notification.HandlingType?.AssemblyQualifiedName,
+                ExpirationTime = notification.ExpirationTime.ToSafeDateTimeOffset(),
+                Closed = true
+            });
         }
 
         if (notification.HandlingType is null)
@@ -213,8 +205,8 @@ internal sealed class NotificationService : INotificationService, INotificationP
             Level = (int)notification.Level,
             Title = notification.Title,
             Description = notification.Description,
-            ExpirationTime = notification.ExpirationTime,
-            CreationTime = notification.CreationTime,
+            ExpirationTime = notification.ExpirationTime.ToSafeDateTimeOffset(),
+            CreationTime = notification.CreationTime.ToSafeDateTimeOffset(),
             MetaData = notification.Metadata,
             Dismissible = notification.Dismissible,
             Closed = notification.Closed,
