@@ -1,9 +1,7 @@
-﻿using Daybreak.Configuration;
-using Daybreak.Configuration.Options;
+﻿using Daybreak.Configuration.Options;
 using Daybreak.Models;
 using Daybreak.Models.Browser;
 using Daybreak.Models.Builds;
-using Daybreak.Models.Guildwars;
 using Daybreak.Services.Browser;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Utils;

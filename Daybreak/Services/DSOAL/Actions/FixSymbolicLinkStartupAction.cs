@@ -2,7 +2,6 @@
 using Daybreak.Services.Privilege;
 using Daybreak.Services.Registry;
 using Daybreak.Services.Startup.Actions;
-using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Core.Extensions;

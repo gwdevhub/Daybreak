@@ -1,5 +1,4 @@
-﻿using Daybreak.Services.ApplicationLauncher;
-using Daybreak.Services.LaunchConfigurations;
+﻿using Daybreak.Services.LaunchConfigurations;
 using Daybreak.Services.Navigation;
 using Daybreak.Views;
 using Microsoft.Extensions.Logging;

@@ -1,6 +1,4 @@
-﻿using Daybreak.Models.Guildwars;
-using Daybreak.Models.Trade;
-using System;
+﻿using Daybreak.Models.Trade;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;

@@ -2,7 +2,6 @@
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
-using static Daybreak.Utils.NativeMethods;
 
 namespace Daybreak.Utils;
 

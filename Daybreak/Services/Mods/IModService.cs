@@ -1,5 +1,4 @@
-﻿using Daybreak.Models;
-using Daybreak.Models.Mods;
+﻿using Daybreak.Models.Mods;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
