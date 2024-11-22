@@ -15,7 +15,6 @@ using System.Extensions;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Extensions;
 using System.Windows.Media;
 
 namespace Daybreak.Views;

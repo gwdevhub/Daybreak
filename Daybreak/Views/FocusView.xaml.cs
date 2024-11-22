@@ -2,7 +2,6 @@
 using Daybreak.Launch;
 using Daybreak.Models;
 using Daybreak.Models.Builds;
-using Daybreak.Models.FocusView;
 using Daybreak.Models.Guildwars;
 using Daybreak.Models.LaunchConfigurations;
 using Daybreak.Services.ApplicationLauncher;
@@ -19,15 +18,12 @@ using System;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
-using System.Windows.Media;
-using Position = Daybreak.Models.Guildwars.Position;
 
 namespace Daybreak.Views;
 

@@ -1,6 +1,4 @@
-﻿using System.Media;
-
-namespace Daybreak.Services.Sounds;
+﻿namespace Daybreak.Services.Sounds;
 
 public interface ISoundService
 {

@@ -1,5 +1,4 @@
 ﻿using Daybreak.Models.Guildwars;
-using LiveChartsCore.Geo;
 using System.Collections.Generic;
 
 namespace Daybreak.Services.Screenshots.Models;

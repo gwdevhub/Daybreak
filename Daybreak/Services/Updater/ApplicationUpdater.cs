@@ -1,7 +1,5 @@
-﻿using ControlzEx.Standard;
-using Daybreak.Configuration.Options;
+﻿using Daybreak.Configuration.Options;
 using Daybreak.Exceptions;
-using Daybreak.Models;
 using Daybreak.Models.Github;
 using Daybreak.Models.Progress;
 using Daybreak.Services.Downloads;
@@ -13,7 +11,6 @@ using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design.Serialization;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Data;

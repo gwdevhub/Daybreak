@@ -1,10 +1,8 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Controls.Options;
 using Daybreak.Models.Metrics;
 using Daybreak.Services.Images.Models;
 using Daybreak.Services.Metrics;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

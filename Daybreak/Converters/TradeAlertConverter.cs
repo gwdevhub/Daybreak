@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Reflection.Emit;
 
 namespace Daybreak.Converters;
 public sealed class TradeAlertConverter : JsonConverter<ITradeAlert>

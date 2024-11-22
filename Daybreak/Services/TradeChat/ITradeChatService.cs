@@ -1,5 +1,4 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Models.Guildwars;
 using Daybreak.Models.Trade;
 using System;
 using System.Collections.Generic;
