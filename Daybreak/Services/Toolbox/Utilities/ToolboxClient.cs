@@ -7,16 +7,17 @@ using System;
 using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Extensions;
+using System.Extensions.Core;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Version = Daybreak.Models.Versioning.Version;
 
 namespace Daybreak.Services.Toolbox.Utilities;
 internal sealed class ToolboxClient : IToolboxClient
 {
-    private const string ToolboxDirectory = "GWToolbox";
     private const string DllName = "GWToolboxdll.dll";
     private const string TagPlaceholder = "[TAG_PLACEHOLDER]";
     private const string ReleaseUrl = "https://github.com/gwdevhub/GWToolboxpp/releases/download/[TAG_PLACEHOLDER]/GWToolboxdll.dll";
@@ -36,28 +37,72 @@ internal sealed class ToolboxClient : IToolboxClient
         this.logger = logger.ThrowIfNull();
     }
 
-    public async Task<DownloadLatestOperation> DownloadLatestDll(ToolboxInstallationStatus toolboxInstallationStatus, CancellationToken cancellationToken)
+    public async Task<DownloadLatestOperation> DownloadLatestDll(ToolboxInstallationStatus toolboxInstallationStatus, string destinationFolder, CancellationToken cancellationToken)
     {
+        var scopedLogger = this.logger.CreateScopedLogger();
         try
         {
-            return await this.GetLatestVersion(toolboxInstallationStatus, cancellationToken);
+            return await this.DownloadLatestVersion(toolboxInstallationStatus, destinationFolder, cancellationToken);
         }
         catch (Exception ex)
         {
-            this.logger.LogError(ex, "Encountered exception");
+            scopedLogger.LogError(ex, "Encountered exception");
             return new DownloadLatestOperation.ExceptionEncountered(ex);
         }
     }
 
-    private async Task<DownloadLatestOperation> GetLatestVersion(ToolboxInstallationStatus toolboxInstallationStatus, CancellationToken cancellationToken)
+    public async Task<Version?> GetLatestVersion(CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetLatestVersion), string.Empty);
+        var scopedLogger = this.logger.CreateScopedLogger();
+        try
+        {
+            (var latest, _) = await this.GetLatestVersionTag(cancellationToken);
+            if (latest is null)
+            {
+                scopedLogger.LogError("Failed to fetch latest version");
+                return default;
+            }
+
+            return latest;
+        }
+        catch (Exception ex)
+        {
+            scopedLogger.LogError(ex, "Encountered exception");
+            return default;
+        }
+    }
+
+    private async Task<DownloadLatestOperation> DownloadLatestVersion(ToolboxInstallationStatus toolboxInstallationStatus, string destinationFolderPath, CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        (_, var tag) = await this.GetLatestVersionTag(cancellationToken);
+        if (tag is null)
+        {
+            return new DownloadLatestOperation.NoVersionFound();
+        }
+
+        scopedLogger.LogInformation($"Retrieving version {tag}");
+        var downloadUrl = ReleaseUrl.Replace(TagPlaceholder, tag.ToString());
+        var destinationFolder = Path.GetFullPath(destinationFolderPath);
+        var destinationPath = Path.Combine(destinationFolder, DllName);
+        var success = await this.downloadService.DownloadFile(downloadUrl, destinationPath, toolboxInstallationStatus, cancellationToken);
+        if (!success)
+        {
+            throw new InvalidOperationException($"Failed to download GWToolboxdll version {tag}");
+        }
+        
+        return new DownloadLatestOperation.Success(destinationPath);
+    }
+
+    private async Task<(Version? Version, string Literal)> GetLatestVersionTag(CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
         scopedLogger.LogInformation("Retrieving version list");
         var getListResponse = await this.httpClient.GetAsync(ReleasesUrl, cancellationToken);
         if (!getListResponse.IsSuccessStatusCode)
         {
             scopedLogger.LogError($"Received non success status code [{getListResponse.StatusCode}]");
-            return new DownloadLatestOperation.NonSuccessStatusCode((int)getListResponse.StatusCode);
+            return default;
         }
 
         var responseString = await getListResponse.Content.ReadAsStringAsync();
@@ -65,23 +110,18 @@ internal sealed class ToolboxClient : IToolboxClient
         var latestRelease = releasesList?.Where(t => t.Ref?.Contains("Release") is true)
             .Select(t => t.Ref?.Replace("refs/tags/", ""))
             .OfType<string>()
-            .LastOrDefault();
-        if (latestRelease is not string tag)
+            .LastOrDefault(); // Replace _Release with -Release for the Version parser
+        if (latestRelease?.Replace('_', '-').ToLowerInvariant() is not string tag)
         {
             scopedLogger.LogError("Could not parse version list. No latest version found");
-            return new DownloadLatestOperation.NoVersionFound();
+            return default;
         }
 
-        scopedLogger.LogInformation($"Retrieving version {tag}");
-        var downloadUrl = ReleaseUrl.Replace(TagPlaceholder, tag);
-        var destinationFolder = Path.GetFullPath(ToolboxDirectory);
-        var destinationPath = Path.Combine(destinationFolder, DllName);
-        var success = await this.downloadService.DownloadFile(downloadUrl, destinationPath, toolboxInstallationStatus);
-        if (!success)
+        if (!Version.TryParse(tag, out var toolboxVersion))
         {
-            throw new InvalidOperationException($"Failed to download GWToolboxdll version {tag}");
+            scopedLogger.LogError("Could not parse version. No latest version found");
         }
-        
-        return new DownloadLatestOperation.Success(destinationPath);
+
+        return (toolboxVersion, latestRelease);
     }
 }

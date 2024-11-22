@@ -83,6 +83,7 @@ using Daybreak.Services.Window;
 using Daybreak.Launch;
 using Daybreak.Views.Installation;
 using Daybreak.Services.Logging.Models;
+using Daybreak.Services.Toolbox.Notifications;
 
 namespace Daybreak.Configuration;
 
@@ -280,6 +281,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         startupActionProducer.RegisterAction<BrowserHistorySizeEnforcer>();
         startupActionProducer.RegisterAction<CleanupDatabases>();
         startupActionProducer.RegisterAction<DeleteOldDatabase>();
+        startupActionProducer.RegisterAction<UpdateToolboxAction>();
     }
 
     public override void RegisterPostUpdateActions(IPostUpdateActionProducer postUpdateActionProducer)
@@ -335,6 +337,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         notificationHandlerProducer.RegisterNotificationHandler<NavigateToCalendarViewHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<GuildWarsUpdateNotificationHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<GuildWarsBatchUpdateNotificationHandler>();
+        notificationHandlerProducer.RegisterNotificationHandler<ToolboxUpdateHandler>();
     }
 
     public override void RegisterMods(IModsManager modsManager)

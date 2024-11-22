@@ -2,6 +2,7 @@
 using Daybreak.Services.Toolbox;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
+using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 
@@ -45,5 +46,10 @@ public partial class ToolboxSwitchView : UserControl
     private void Wiki_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
         this.viewManager.ShowView<ToolboxHomepageView>();
+    }
+
+    private async void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
+    {
+        await this.toolboxService.NotifyUserIfUpdateAvailable(CancellationToken.None);
     }
 }

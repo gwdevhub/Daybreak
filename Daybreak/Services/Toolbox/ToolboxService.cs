@@ -7,6 +7,7 @@ using Daybreak.Services.Injection;
 using Daybreak.Services.Notifications;
 using Daybreak.Services.Scanner;
 using Daybreak.Services.Toolbox.Models;
+using Daybreak.Services.Toolbox.Notifications;
 using Daybreak.Services.Toolbox.Utilities;
 using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
@@ -17,6 +18,7 @@ using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
+using System.Extensions.Core;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,8 +30,10 @@ internal sealed class ToolboxService : IToolboxService
     private const string ToolboxDestinationDirectorySubPath = "GWToolbox";
 
     private static readonly string ToolboxDestinationDirectoryPath = PathUtils.GetAbsolutePathFromRoot(ToolboxDestinationDirectorySubPath);
+    private static readonly string UsualToolboxFolderLocation = Path.GetFullPath(
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "GWToolboxpp"));
     private static readonly string UsualToolboxLocation = Path.GetFullPath(
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "GWToolboxpp", "GWToolboxdll.dll"));
+        Path.Combine(UsualToolboxFolderLocation, "GWToolboxdll.dll"));
 
     private readonly IGuildwarsMemoryCache guildwarsMemoryCache;
     private readonly INotificationService notificationService;
@@ -117,6 +121,14 @@ internal sealed class ToolboxService : IToolboxService
         return true;
     }
 
+    public async Task NotifyUserIfUpdateAvailable(CancellationToken cancellationToken)
+    {
+        if (await this.IsUpdateAvailable(cancellationToken))
+        {
+            this.notificationService.NotifyInformation<ToolboxUpdateHandler>("GWToolboxpp update available", "Click on this notification to update GWToolboxpp");
+        }
+    }
+
     public async Task<bool> SetupToolbox(ToolboxInstallationStatus toolboxInstallationStatus)
     {
         if ((await this.SetupToolboxDll(toolboxInstallationStatus)) is false)
@@ -131,13 +143,13 @@ internal sealed class ToolboxService : IToolboxService
 
     private async Task<bool> SetupToolboxDll(ToolboxInstallationStatus toolboxInstallationStatus)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.SetupToolboxDll), string.Empty);
-        if (File.Exists(this.toolboxOptions.Value.DllPath))
+        var scopedLogger = this.logger.CreateScopedLogger();
+        if (File.Exists(this.toolboxOptions.Value.DllPath) && !(await this.IsUpdateAvailable(CancellationToken.None)))
         {
             return true;
         }
 
-        var result = await this.toolboxClient.DownloadLatestDll(toolboxInstallationStatus, CancellationToken.None);
+        var result = await this.toolboxClient.DownloadLatestDll(toolboxInstallationStatus, UsualToolboxFolderLocation, CancellationToken.None);
         _ = result switch
         {
             DownloadLatestOperation.Success => scopedLogger.LogInformation(result.Message),
@@ -160,7 +172,7 @@ internal sealed class ToolboxService : IToolboxService
 
     private async Task LaunchToolbox(Process process, CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.LaunchToolbox), string.Empty);
+        var scopedLogger = this.logger.CreateScopedLogger();
         if (this.toolboxOptions.Value.Enabled is false)
         {
             scopedLogger.LogInformation("Toolbox disabled");
@@ -191,5 +203,39 @@ internal sealed class ToolboxService : IToolboxService
         }
 
         return;
+    }
+
+    private async Task<bool> IsUpdateAvailable(CancellationToken cancellationToken)
+    {
+        if (!File.Exists(this.toolboxOptions.Value.DllPath))
+        {
+            return true;
+        }
+
+        var latestVersion = await this.toolboxClient.GetLatestVersion(cancellationToken);
+        if (latestVersion is null)
+        {
+            return false;
+        }
+
+        var fileInfo = FileVersionInfo.GetVersionInfo(this.toolboxOptions.Value.DllPath);
+        var current = fileInfo.ProductVersion?.Replace('_', '-');
+        if (latestVersion.ToString().EndsWith("-release") &&
+            current?.EndsWith("-release") is not true)
+        {
+            current += "-release";
+        }
+
+        if (!Daybreak.Models.Versioning.Version.TryParse(current, out var currentVersion))
+        {
+            return true;
+        }
+
+        if (latestVersion.CompareTo(currentVersion) > 0)
+        {   
+            return true;
+        }
+
+        return false;
     }
 }
