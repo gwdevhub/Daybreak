@@ -7,6 +7,7 @@
 #include <GWCA/Utilities/Hooker.h>
 #include <GWCA/Managers/RenderMgr.h>
 #include <GWCA/Managers/MemoryMgr.h>
+#include <GWCA/Utilities/Debug.h>
 #include "AliveModule.h"
 #include "ProcessIdModule.h"
 #include "HttpLogger.h"
@@ -53,6 +54,30 @@ void Terminate()
 #endif
 }
 
+void ConsoleLogHandler(void* context, GW::LogLevel level, const char* msg, const char* file, unsigned int line, const char* function) {
+    const char* levelStr = "";
+    switch (level) {
+        case GW::LEVEL_TRACE: levelStr = "TRACE"; break;
+        case GW::LEVEL_DEBUG: levelStr = "DEBUG"; break;
+        case GW::LEVEL_INFO: levelStr = "INFO"; break;
+        case GW::LEVEL_WARN: levelStr = "WARN"; break;
+        case GW::LEVEL_ERR: levelStr = "ERROR"; break;
+        case GW::LEVEL_CRITICAL: levelStr = "CRITICAL"; break;
+    }
+
+    printf("[%s] %s:%u in %s: %s\n", levelStr, file, line, function, msg);
+}
+
+void ConsolePanicHandler(
+    void* context,
+    const char* expr,
+    const char* file,
+    unsigned int line,
+    const char* function)
+{
+    printf("PANIC: Expression '%s' failed in file %s at line %u in function %s\n",
+        expr, file, line, function);
+}
 
 static DWORD WINAPI StartHttpServer(LPVOID)
 {
@@ -117,19 +142,13 @@ LRESULT CALLBACK SafeWndProc(const HWND hWnd, const UINT Message, const WPARAM w
     }
 }
 
-void OnWindowCreated(IDirect3DDevice9*) {
+void LaunchServer() {
     startupMutex.lock();
     if (initialized) {
         startupMutex.unlock();
         return;
     }
 
-#ifdef BUILD_TYPE_DEBUG
-    AllocConsole();
-    SetConsoleTitleA("Daybreak.GWCA Console");
-    freopen_s(&stdout_proxy, "CONOUT$", "w", stdout);
-    freopen_s(&stderr_proxy, "CONOUT$", "w", stderr);
-#endif
     auto handle = GW::MemoryMgr::GetGWWindowHandle();
     oldWndProc = reinterpret_cast<WNDPROC>(SetWindowLongPtrW(handle, GWL_WNDPROC, reinterpret_cast<LONG>(SafeWndProc)));
     serverThread = CreateThread(
@@ -144,24 +163,39 @@ void OnWindowCreated(IDirect3DDevice9*) {
     return;
 }
 
+void OnWindowCreated(IDirect3DDevice9*) {
+    LaunchServer();
+}
+
 
 static DWORD WINAPI Init(LPVOID)
 {
-    printf("Init: Setting up scanner\n");
+#ifdef BUILD_TYPE_DEBUG
+    AllocConsole();
+    SetConsoleTitleA("Daybreak.GWCA Console");
+    freopen_s(&stdout_proxy, "CONOUT$", "w", stdout);
+    freopen_s(&stderr_proxy, "CONOUT$", "w", stderr);
+    GWCA_INFO("Setting up logging");
+    GW::RegisterLogHandler(ConsoleLogHandler, nullptr);
+    GW::RegisterPanicHandler(ConsolePanicHandler, nullptr);
+#endif
+    GWCA_INFO("Setting up scanner");
     GW::Scanner::Initialize();
-    printf("Init: Setting up hook base\n");
-    GW::HookBase::Initialize();
-    printf("Init: Setting up GWCA\n");
+    GWCA_INFO("Setting up GWCA");
     if (!GW::Initialize()) {
-        printf("Init: Failed to set up GWCA\n");
+        GWCA_CRITICAL("Failed to set up GWCA");
         return 0;
     }
 
-    printf("Init: Enabling hooks\n");
+    GWCA_INFO("Enabling hooks");
     GW::HookBase::EnableHooks();
-    printf("Init: Set up render callback\n");
-    GW::Render::SetRenderCallback(OnWindowCreated);
-    printf("Init: Returning success\n");
+
+    //TODO: https://github.com/gwdevhub/Daybreak/issues/871 Re-enable window hook for clean tear-downs based on GW exit
+    /*printf("Init: Set up render callback\n");
+    GW::Render::SetRenderCallback(OnWindowCreated);*/
+    GWCA_INFO("Launching http server");
+    StartHttpServer((LPVOID)nullptr);
+    GWCA_INFO("Returning success");
     FreeLibraryAndExitThread(dllmodule, EXIT_SUCCESS);
     return 0;
 }
