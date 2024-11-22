@@ -1,5 +1,4 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Models;
 using Daybreak.Models.Mods;
 using Daybreak.Models.Progress;
 using Daybreak.Services.Downloads;
@@ -15,7 +14,6 @@ using System.Configuration;
 using System.Core.Extensions;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 

@@ -1,5 +1,4 @@
 ﻿using Daybreak.Launch;
-using System.Windows;
 
 namespace Daybreak.Models.Notifications.Handling;
 

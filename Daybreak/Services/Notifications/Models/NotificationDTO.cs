@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Realms;
+﻿using Realms;
 using System;
 
 namespace Daybreak.Services.Notifications.Models;

@@ -1,6 +1,5 @@
 ﻿using Daybreak.Models.Guildwars;
 using Daybreak.Services.IconRetrieve;
-using Daybreak.Services.TradeChat;
 using Daybreak.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using System.Core.Extensions;

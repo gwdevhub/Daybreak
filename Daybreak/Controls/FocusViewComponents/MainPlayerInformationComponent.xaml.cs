@@ -5,7 +5,6 @@ using Daybreak.Services.Navigation;
 using Daybreak.Services.Scanner;
 using Daybreak.Views;
 using Microsoft.Extensions.DependencyInjection;
-using NAudio.CoreAudioApi;
 using System;
 using System.Core.Extensions;
 using System.Threading;

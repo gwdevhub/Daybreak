@@ -1,5 +1,4 @@
-﻿using Daybreak.Models.Guildwars;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 
 namespace Daybreak.Converters;

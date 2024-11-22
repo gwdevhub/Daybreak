@@ -7,7 +7,6 @@ using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Navigation;
 using Daybreak.Utils;
 using Daybreak.Views;
-using MahApps.Metro.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Daybreak.Validators;
+﻿namespace Daybreak.Validators;
 
 public sealed class AllGoesValidator : IValidator
 {

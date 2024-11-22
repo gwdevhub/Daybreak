@@ -5,7 +5,6 @@ using Daybreak.Services.Navigation;
 using Daybreak.Utils;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Extensions;
 using System.Linq;
 using System.Windows.Controls;
