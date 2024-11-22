@@ -268,6 +268,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<TeamBuildTemplateView>();
         viewProducer.RegisterView<EventCalendarView>();
         viewProducer.RegisterView<UpdateConfirmationView>();
+        viewProducer.RegisterView<GuildWarsPartySearchView>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)

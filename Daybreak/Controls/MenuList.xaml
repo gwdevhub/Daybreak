@@ -58,6 +58,13 @@
                                         Cursor="Hand"
                                         Clicked="CalendarButton_Clicked"
                                         ToolTip="Show current and upcoming events"/>
+                    <buttons:MenuButton Title="Guild Wars Party Search" 
+                                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                                        HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                                        Height="30"
+                                        Cursor="Hand"
+                                        Clicked="GuildWarsPartySearchButton_Clicked"
+                                        ToolTip="Show party search broadcasts"/>
                 </local:ExpandableMenuSection.Children>
             </local:ExpandableMenuSection>
             <Grid>
