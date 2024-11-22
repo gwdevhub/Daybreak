@@ -21,6 +21,6 @@ public partial class UModGlyph : UserControl
 {
     public UModGlyph()
     {
-        InitializeComponent();
+        this.InitializeComponent();
     }
 }

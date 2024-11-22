@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Core.Extensions;
 using System.Diagnostics.Metrics;
+using System.Extensions.Core;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
@@ -34,12 +35,13 @@ internal sealed class DownloadService : IDownloadService
 
     public async Task<bool> DownloadFile(string downloadUri, string destinationPath, DownloadStatus downloadStatus, CancellationToken cancellationToken = default)
     {
+        var scopedLogger = this.logger.CreateScopedLogger();
         downloadStatus.CurrentStep = DownloadStatus.InitializingDownload;
         using var response = await this.httpClient.GetAsync(downloadUri, HttpCompletionOption.ResponseHeadersRead);
         if (response.IsSuccessStatusCode is false)
         {
             downloadStatus.CurrentStep = DownloadStatus.FailedDownload;
-            this.logger.LogError($"Failed to download installer. Details: {await response.Content.ReadAsStringAsync()}");
+            scopedLogger.LogError($"Failed to download installer. Status: {response.StatusCode}. Details: {await response.Content.ReadAsStringAsync()}");
             return false;
         }
 
@@ -55,11 +57,11 @@ internal sealed class DownloadService : IDownloadService
         var downloadedPerTimeframe = 0d;
         var tickTime = DateTime.Now;
         var startTime = DateTime.Now;
-        while (downloadStream.CanRead && (length = await downloadStream.ReadAsync(buffer)) > 0)
+        while (downloadStream.CanRead && (length = await downloadStream.ReadAsync(buffer, cancellationToken)) > 0)
         {
             downloaded += length;
             downloadedPerTimeframe += length;
-            await fileStream.WriteAsync(buffer, 0, length);
+            await fileStream.WriteAsync(buffer, 0, length, cancellationToken);
             if ((DateTime.Now - tickTime).TotalMilliseconds > StatusUpdateInterval)
             {
                 tickTime = DateTime.Now;
@@ -81,7 +83,7 @@ internal sealed class DownloadService : IDownloadService
         downloadStatus.CurrentStep = DownloadStatus.Downloading(1, TimeSpan.Zero);
         downloadStatus.CurrentStep = DownloadStatus.DownloadFinished;
         fileStream.Close();
-        this.logger.LogInformation("Downloaded file");
+        scopedLogger.LogInformation("Downloaded file");
         return true;
     }
 }
