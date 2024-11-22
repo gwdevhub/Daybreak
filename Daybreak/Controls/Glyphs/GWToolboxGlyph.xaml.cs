@@ -21,6 +21,6 @@ public partial class GWToolboxGlyph : UserControl
 {
     public GWToolboxGlyph()
     {
-        InitializeComponent();
+        this.InitializeComponent();
     }
 }

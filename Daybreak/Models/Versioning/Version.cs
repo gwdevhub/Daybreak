@@ -138,7 +138,7 @@ public sealed class Version : IEquatable<Version>, IComparable<Version>
         return parsedVersion;
     }
 
-    public static bool TryParse(string version, out Version parsedVersion)
+    public static bool TryParse(string? version, out Version parsedVersion)
     {
         if (TryParseParts(version, out var parts, out var hasPrefix) is false)
         {
@@ -166,11 +166,11 @@ public sealed class Version : IEquatable<Version>, IComparable<Version>
         return true;
     }
     
-    private static bool TryParseParts(string version, out List<VersionToken> parts, out bool hasPrefix)
+    private static bool TryParseParts(string? version, out List<VersionToken> parts, out bool hasPrefix)
     {
         hasPrefix = false;
         parts = default!;
-        if (version.IsNullOrWhiteSpace())
+        if (version is null || version.IsNullOrWhiteSpace())
         {
             return false;
         }
