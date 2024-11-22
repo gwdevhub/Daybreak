@@ -169,6 +169,11 @@ public partial class MenuList : UserControl
         this.viewManager.ShowView<EventCalendarView>();
     }
 
+    private void GuildWarsPartySearchButton_Clicked(object sender, EventArgs e)
+    {
+        this.viewManager.ShowView<GuildWarsPartySearchView>();
+    }
+
     private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
     {
         this.cancellationTokenSource = new CancellationTokenSource();
