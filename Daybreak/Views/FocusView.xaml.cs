@@ -18,6 +18,7 @@ using System;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
+using System.Extensions.Core;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -116,7 +117,7 @@ public partial class FocusView : UserControl
 
     private async void PeriodicallyReadMainPlayerContextData(CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.PeriodicallyReadMainPlayerContextData), string.Empty);
+        var scopedLogger = this.logger.CreateScopedLogger();
         var retries = 0;
         while (!cancellationToken.IsCancellationRequested)
         {

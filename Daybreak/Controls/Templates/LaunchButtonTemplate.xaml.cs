@@ -132,6 +132,9 @@ public partial class LaunchButtonTemplate : UserControl
 
         if (!await this.guildwarsMemoryReader.IsInitialized(context.ProcessId, cancellationToken))
         {
+            // Attempt to initialize the memory reader here and check status in the next proc
+            await this.guildwarsMemoryReader.EnsureInitialized(context.ProcessId, cancellationToken);
+
             this.GameRunning = false;
             this.CanLaunch = false;
             this.CanAttach = this.liveOptions.Value.Enabled && this.GameRunning;
