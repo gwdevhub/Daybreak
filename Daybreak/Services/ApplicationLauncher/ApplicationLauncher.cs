@@ -391,7 +391,7 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
              * GW loads more than 110 modules when it starts properly. If there are less than
              * 110 modules, GW probably has failed to start or has not started yet
              */
-            if (gwProcess.Modules.Count < 110)
+            if (gwProcess.Modules.Count < 100)
             {
                 continue;
             }

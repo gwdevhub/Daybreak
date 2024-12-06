@@ -106,35 +106,27 @@ public partial class MainPlayerInformationComponent : UserControl
 
     private async void EditTeamBuild_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
-        //TODO #889: Add gamedata reading
-
-        //var gameData = await this.guildwarsMemoryCache.ReadGameData(CancellationToken.None);
-        //if (gameData is null)
-        //{
-        //    return;
-        //}
-
-        var gameData = new GameData();
+        var teamBuildData = await this.guildwarsMemoryCache.ReadTeamBuildData(CancellationToken.None);
         var teamBuild = this.buildTemplateManager.CreateTeamBuild();
         teamBuild.Builds.Clear();
         var mainPlayerBuild = this.buildTemplateManager.CreateSingleBuild();
-        mainPlayerBuild.Primary = gameData.MainPlayer?.CurrentBuild?.Primary!;
-        mainPlayerBuild.Secondary = gameData.MainPlayer?.CurrentBuild?.Secondary!;
-        mainPlayerBuild.Attributes = gameData.MainPlayer?.CurrentBuild?.Attributes!;
-        mainPlayerBuild.Skills = gameData.MainPlayer?.CurrentBuild?.Skills!;
+        mainPlayerBuild.Primary = teamBuildData?.PlayerBuild?.Primary!;
+        mainPlayerBuild.Secondary = teamBuildData?.PlayerBuild?.Secondary!;
+        mainPlayerBuild.Attributes = teamBuildData?.PlayerBuild?.Attributes!;
+        mainPlayerBuild.Skills = teamBuildData?.PlayerBuild?.Skills!;
         teamBuild.Builds.Add(mainPlayerBuild);
-        foreach (var player in gameData.Party!)
+        foreach (var build in teamBuildData?.TeamMemberBuilds!)
         {
-            if (player.CurrentBuild is null)
+            if (build is null)
             {
                 continue;
             }
 
             var singleBuildEntry = this.buildTemplateManager.CreateSingleBuild();
-            singleBuildEntry.Primary = player.CurrentBuild.Primary;
-            singleBuildEntry.Secondary = player.CurrentBuild.Secondary;
-            singleBuildEntry.Attributes = player.CurrentBuild.Attributes;
-            singleBuildEntry.Skills = player.CurrentBuild.Skills;
+            singleBuildEntry.Primary = build.Primary;
+            singleBuildEntry.Secondary = build.Secondary;
+            singleBuildEntry.Attributes = build.Attributes;
+            singleBuildEntry.Skills = build.Skills;
             teamBuild.Builds.Add(singleBuildEntry);
         }
 

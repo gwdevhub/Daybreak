@@ -19,6 +19,9 @@ public readonly struct GameContext
     [FieldOffset(0x04B0)]
     public readonly GuildwarsArray<QuestContext> QuestLog;
 
+    [FieldOffset(0x0604)]
+    public readonly GuildwarsPointer<PlayerControlledCharContext> PlayerControlledChar;
+
     [FieldOffset(0x0608)]
     public readonly uint HardModeUnlocked;
 
