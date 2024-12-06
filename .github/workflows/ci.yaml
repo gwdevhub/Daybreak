@@ -43,9 +43,6 @@ jobs:
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v2.0.0
 
-    - name: Build CMake Files
-      run: cmake -S . -B build -A Win32
-
     - name: Execute Unit Tests
       run: dotnet test $env:Test_Project_Path --property:SolutionDir=$env:GITHUB_WORKSPACE -p:ParallelizeTestCollections=false
     
