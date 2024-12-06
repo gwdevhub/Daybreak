@@ -49,10 +49,6 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Fetch submodules
-      run: |
-        git submodule update --init --recursive
-
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
