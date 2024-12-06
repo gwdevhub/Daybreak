@@ -157,9 +157,9 @@ public partial class FocusView : UserControl
                     readMainPlayerDataTask,
                     Task.Delay(MainPlayerDataFrequency, cancellationToken)).ConfigureAwait(true);
 
-                var userData = await readUserDataTask ?? throw new HttpRequestException();
-                var sessionData = await readSessionDataTask ?? throw new HttpRequestException();
-                var mainPlayerData = await readMainPlayerDataTask ?? throw new HttpRequestException();
+                var userData = await readUserDataTask;
+                var sessionData = await readSessionDataTask;
+                var mainPlayerData = await readMainPlayerDataTask;
                 if (userData?.User is null ||
                     sessionData?.Session is null ||
                     mainPlayerData?.PlayerInformation is null ||
@@ -186,7 +186,7 @@ public partial class FocusView : UserControl
                 scopedLogger.LogError(ex, "Encountered invalid operation exception. Cancelling periodic main player reading");
                 return;
             }
-            catch (Exception ex) when (ex is TimeoutException or OperationCanceledException or HttpRequestException)
+            catch (Exception ex) when (ex is TimeoutException or OperationCanceledException)
             {
                 if (this.DataContext is not GuildWarsApplicationLaunchContext context)
                 {
