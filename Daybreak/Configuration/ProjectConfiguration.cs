@@ -70,7 +70,6 @@ using Daybreak.Views.Onboarding.ReShade;
 using Daybreak.Services.LaunchConfigurations;
 using Daybreak.Services.ExecutableManagement;
 using Daybreak.Views.Launch;
-using Daybreak.Services.GWCA;
 using Daybreak.Services.DirectSong;
 using Daybreak.Views.Onboarding.DirectSong;
 using Daybreak.Services.SevenZip;
@@ -154,8 +153,8 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IPluginsService, PluginsService>();
         services.AddSingleton<ISplashScreenService, SplashScreenService>();
         services.AddSingleton<IGuildWarsExecutableManager, GuildWarsExecutableManager>();
-        services.AddSingleton<IGWCAClient, GWCAClient>();
-        services.AddSingleton<IGuildwarsMemoryReader, GWCAMemoryReader>();
+        services.AddSingleton<IMemoryScanner, MemoryScanner>();
+        services.AddSingleton<IGuildwarsMemoryReader, GuildwarsMemoryReader>();
         services.AddSingleton<ISevenZipExtractor, SevenZipExtractor>();
         services.AddSingleton<IGraphClient, GraphClient>();
         services.AddSingleton<IOptionsSynchronizationService, OptionsSynchronizationService>();
@@ -349,7 +348,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         modsManager.RegisterMod<IToolboxService, ToolboxService>();
         modsManager.RegisterMod<IDSOALService, DSOALService>();
         modsManager.RegisterMod<IGuildwarsScreenPlacer, GuildwarsScreenPlacer>();
-        modsManager.RegisterMod<IGWCAInjector, GWCAInjector>();
         modsManager.RegisterMod<IDirectSongService, DirectSongService>(singleton: true);
     }
 
@@ -428,11 +426,6 @@ public class ProjectConfiguration : PluginConfigurationBase
             .RegisterHttpClient<ReShadeService>()
                 .WithMessageHandler(this.SetupLoggingAndMetrics<ReShadeService>)
                 .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
-                .Build()
-            .RegisterHttpClient<GWCAClient>()
-                .WithMessageHandler(this.SetupLoggingAndMetrics<GWCAClient>)
-                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
-                .WithTimeout(TimeSpan.FromSeconds(5))
                 .Build()
             .RegisterHttpClient<UModService>()
                 .WithMessageHandler(this.SetupLoggingAndMetrics<UModService>)
