@@ -106,12 +106,15 @@ public partial class MainPlayerInformationComponent : UserControl
 
     private async void EditTeamBuild_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
-        var gameData = await this.guildwarsMemoryCache.ReadGameData(CancellationToken.None);
-        if (gameData is null)
-        {
-            return;
-        }
+        //TODO #889: Add gamedata reading
 
+        //var gameData = await this.guildwarsMemoryCache.ReadGameData(CancellationToken.None);
+        //if (gameData is null)
+        //{
+        //    return;
+        //}
+
+        var gameData = new GameData();
         var teamBuild = this.buildTemplateManager.CreateTeamBuild();
         teamBuild.Builds.Clear();
         var mainPlayerBuild = this.buildTemplateManager.CreateSingleBuild();
