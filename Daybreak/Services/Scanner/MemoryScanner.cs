@@ -15,6 +15,8 @@ namespace Daybreak.Services.Scanner;
 internal sealed class MemoryScanner(
     ILogger<MemoryScanner> logger) : IMemoryScanner
 {
+    private const int LockTimeout = 1000;
+
     private const double MaximumReadSize = 10e8;
     private const double MaximumArraySize = 10e5;
 
@@ -28,14 +30,22 @@ internal sealed class MemoryScanner(
     {
         get
         {
-            this.semaphoreSlim.Wait();
+            if (!this.semaphoreSlim.Wait(LockTimeout))
+            {
+                return field;
+            }
+
             var value = field;
             this.semaphoreSlim.Release();
             return value;
         }
         set
         {
-            this.semaphoreSlim.Wait();
+            if (!this.semaphoreSlim.Wait(LockTimeout))
+            {
+                return;
+            }
+
             field = value;
             this.semaphoreSlim.Release();
         }
@@ -47,12 +57,16 @@ internal sealed class MemoryScanner(
         _ = process.ThrowIfNull();
 
 
-        if (this.Scanning)
+        if (this.Scanning && process.Id == this.Process?.Id)
         {
             throw new InvalidOperationException("Scanner is already running");
         }
 
-        this.semaphoreSlim.Wait();
+        if (!this.semaphoreSlim.Wait(LockTimeout))
+        {
+            throw new InvalidOperationException("Unable to start scanner. Scanner is locked");
+        }
+
         this.Process = process;
         (var startAddress, var size) = this.GetModuleInfo(process);
         if (startAddress == 0 &&
@@ -77,7 +91,11 @@ internal sealed class MemoryScanner(
             return;
         }
 
-        this.semaphoreSlim.Wait();
+        if (!this.semaphoreSlim.Wait(LockTimeout))
+        {
+            throw new InvalidOperationException("Unable to stop scanner. Scanner is locked");
+        }
+
         this.Memory = default;
         this.Size = default;
         this.ModuleStartAddress = default;

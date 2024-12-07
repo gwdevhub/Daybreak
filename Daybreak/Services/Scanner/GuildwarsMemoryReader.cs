@@ -166,6 +166,11 @@ public sealed class GuildwarsMemoryReader(
     {
         for (var i = 0; i < RetryInitializationCount; i++)
         {
+            if (this.memoryScanner.Scanning)
+            {
+                this.memoryScanner.EndScanner();
+            }
+
             try
             {
                 scopedLogger.LogInformation("Initializing scanner");
