@@ -166,6 +166,12 @@ public sealed class GuildwarsMemoryReader(
     {
         for (var i = 0; i < RetryInitializationCount; i++)
         {
+            if (this.memoryScanner.Scanning && process.Id == this.memoryScanner.Process?.Id)
+            {
+                scopedLogger.LogInformation("Scanner already initialized");
+                return;
+            }
+
             if (this.memoryScanner.Scanning)
             {
                 this.memoryScanner.EndScanner();
