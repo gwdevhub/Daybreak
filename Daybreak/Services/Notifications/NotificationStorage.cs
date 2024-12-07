@@ -18,7 +18,7 @@ internal sealed class NotificationStorage : INotificationStorage
 
     public IEnumerable<NotificationDTO> GetPendingNotifications()
     {
-        return this.liteCollection.FindAll(dto => dto.Closed == false && dto.ExpirationTime > DateTimeOffset.Now);
+        return this.liteCollection.FindAll(dto => dto.Closed == false && dto.ExpirationTime < DateTimeOffset.Now);
     }
 
     public IEnumerable<NotificationDTO> GetNotifications()
