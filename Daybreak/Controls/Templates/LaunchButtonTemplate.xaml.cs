@@ -130,6 +130,18 @@ public partial class LaunchButtonTemplate : UserControl
             return;
         }
 
+        // If FocusView is disabled, don't initialize memory scanner, instead just allow the user to kill the game
+        if (!this.liveOptions.Value.Enabled)
+        {
+            this.GameRunning = false;
+            this.CanLaunch = false;
+            this.CanAttach = false;
+            this.CanKill = true;
+            launcherViewContext.CanLaunch = false;
+            launcherViewContext.CanKill = true;
+            return;
+        }
+
         if (!await this.guildwarsMemoryReader.IsInitialized(context.ProcessId, cancellationToken))
         {
             // Attempt to initialize the memory reader here and check status in the next proc
