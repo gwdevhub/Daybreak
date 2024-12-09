@@ -2,7 +2,7 @@
 
 namespace Daybreak.Services.BuildTemplates.Models;
 
-public sealed class EncodeCharStream
+internal sealed class EncodeCharStream
 {
     private readonly StringBuilder innerStringBuilder = new StringBuilder();
 

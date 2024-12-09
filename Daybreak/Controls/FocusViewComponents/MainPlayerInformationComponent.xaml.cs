@@ -107,29 +107,12 @@ public partial class MainPlayerInformationComponent : UserControl
     private async void EditTeamBuild_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
         var teamBuildData = await this.guildwarsMemoryCache.ReadTeamBuildData(CancellationToken.None);
-        var teamBuild = this.buildTemplateManager.CreateTeamBuild();
-        teamBuild.Builds.Clear();
-        var mainPlayerBuild = this.buildTemplateManager.CreateSingleBuild();
-        mainPlayerBuild.Primary = teamBuildData?.PlayerBuild?.Primary!;
-        mainPlayerBuild.Secondary = teamBuildData?.PlayerBuild?.Secondary!;
-        mainPlayerBuild.Attributes = teamBuildData?.PlayerBuild?.Attributes!;
-        mainPlayerBuild.Skills = teamBuildData?.PlayerBuild?.Skills!;
-        teamBuild.Builds.Add(mainPlayerBuild);
-        foreach (var build in teamBuildData?.TeamMemberBuilds!)
+        if (teamBuildData is null)
         {
-            if (build is null)
-            {
-                continue;
-            }
-
-            var singleBuildEntry = this.buildTemplateManager.CreateSingleBuild();
-            singleBuildEntry.Primary = build.Primary;
-            singleBuildEntry.Secondary = build.Secondary;
-            singleBuildEntry.Attributes = build.Attributes;
-            singleBuildEntry.Skills = build.Skills;
-            teamBuild.Builds.Add(singleBuildEntry);
+            return;
         }
 
+        var teamBuild = this.buildTemplateManager.CreateTeamBuild(teamBuildData);
         this.viewManager.ShowView<TeamBuildTemplateView>(teamBuild);
     }
 }
