@@ -1,8 +1,10 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Exceptions;
 using Daybreak.Models;
+using Daybreak.Models.Builds;
 using Daybreak.Models.Mods;
 using Daybreak.Models.Progress;
+using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Injection;
 using Daybreak.Services.Notifications;
 using Daybreak.Services.Scanner;
@@ -12,6 +14,7 @@ using Daybreak.Services.Toolbox.Utilities;
 using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
+using PeNet.Header.Resource;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -20,6 +23,8 @@ using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
 using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,6 +33,7 @@ namespace Daybreak.Services.Toolbox;
 internal sealed class ToolboxService : IToolboxService
 {
     private const string ToolboxDestinationDirectorySubPath = "GWToolbox";
+    private const string ToolboxBuildsFileName = "builds.ini";
 
     private static readonly string ToolboxDestinationDirectoryPath = PathUtils.GetAbsolutePathFromRoot(ToolboxDestinationDirectorySubPath);
     private static readonly string UsualToolboxFolderLocation = Path.GetFullPath(
@@ -35,6 +41,7 @@ internal sealed class ToolboxService : IToolboxService
     private static readonly string UsualToolboxLocation = Path.GetFullPath(
         Path.Combine(UsualToolboxFolderLocation, "GWToolboxdll.dll"));
 
+    private readonly IBuildTemplateManager buildTemplateManager;
     private readonly IGuildwarsMemoryCache guildwarsMemoryCache;
     private readonly INotificationService notificationService;
     private readonly IProcessInjector processInjector;
@@ -55,6 +62,7 @@ internal sealed class ToolboxService : IToolboxService
     public bool IsInstalled => File.Exists(this.toolboxOptions.Value.DllPath);
 
     public ToolboxService(
+        IBuildTemplateManager buildTemplateManager,
         IGuildwarsMemoryCache guildwarsMemoryCache,
         INotificationService notificationService,
         IProcessInjector processInjector,
@@ -62,6 +70,7 @@ internal sealed class ToolboxService : IToolboxService
         ILiveUpdateableOptions<ToolboxOptions> toolboxOptions,
         ILogger<ToolboxService> logger)
     {
+        this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
         this.guildwarsMemoryCache = guildwarsMemoryCache.ThrowIfNull();
         this.notificationService = notificationService.ThrowIfNull();
         this.processInjector = processInjector.ThrowIfNull();
@@ -119,6 +128,113 @@ internal sealed class ToolboxService : IToolboxService
         this.toolboxOptions.Value.DllPath = Path.GetFullPath(fileName);
         this.toolboxOptions.UpdateOption();
         return true;
+    }
+
+    public async IAsyncEnumerable<TeamBuildEntry> GetToolboxBuilds([EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        var toolboxBuildsFile = Path.Combine(UsualToolboxFolderLocation, Environment.MachineName, ToolboxBuildsFileName);
+        if (!File.Exists(toolboxBuildsFile))
+        {
+            yield break;
+        }
+
+        using var textReader = new StreamReader(toolboxBuildsFile);
+        TeamBuildEntry? teamBuild = default;
+        while (await textReader.ReadLineAsync(cancellationToken) is string headerLine)
+        {
+            if (!headerLine.StartsWith('[') ||
+                !headerLine.EndsWith(']') ||
+                !headerLine.Contains("builds"))
+            {
+                continue;
+            }
+
+            var loadedBuild = false;
+            while (await textReader.ReadLineAsync(cancellationToken) is string teamBuildLine)
+            {
+                if (string.IsNullOrWhiteSpace(teamBuildLine))
+                {
+                    break;
+                }
+
+                var equalSignIndex = teamBuildLine.IndexOf('=');
+                var propertyName = teamBuildLine.Substring(0, equalSignIndex).Trim(' ');
+                var propertyValue = teamBuildLine.Substring(equalSignIndex + 1, teamBuildLine.Length - equalSignIndex - 1).Trim(' ');
+                if (propertyName is "buildname")
+                {
+                    teamBuild = this.buildTemplateManager.CreateTeamBuild(propertyValue);
+                    teamBuild.Builds.Clear();
+                }
+
+                if (teamBuild is null)
+                {
+                    continue;
+                }
+
+                if (propertyName is "count" &&
+                    int.TryParse(propertyValue, out var buildsCount) &&
+                    buildsCount > 0)
+                {
+                    var buildsBuffer = new (string Template, string Name)[buildsCount];
+                    for (var i = 0; i < buildsCount; i++)
+                    {
+                        buildsBuffer[i] = (string.Empty, string.Empty);
+                    }
+
+                    while (await textReader.ReadLineAsync(cancellationToken) is string singleBuildLine)
+                    {
+                        if (string.IsNullOrWhiteSpace(singleBuildLine))
+                        {
+                            break;
+                        }
+
+                        equalSignIndex = singleBuildLine.IndexOf('=');
+                        propertyName = singleBuildLine.Substring(0, equalSignIndex).Trim(' ');
+                        propertyValue = singleBuildLine.Substring(equalSignIndex + 1, singleBuildLine.Length - equalSignIndex - 1);
+                        if (propertyName.StartsWith("name") &&
+                            int.TryParse(propertyName.Replace("name", ""), out var singleBuildNameIndex))
+                        {
+                            buildsBuffer[singleBuildNameIndex].Name = propertyValue;
+                        }
+                        else if (propertyName.StartsWith("template") &&
+                            int.TryParse(propertyName.Replace("template", ""), out var singleBuildTemplateIndex))
+                        {
+                            buildsBuffer[singleBuildTemplateIndex].Template = propertyValue;
+                        }
+                    }
+
+                    if (buildsBuffer.Length == 0)
+                    {
+                        continue;
+                    }
+
+                    foreach ((var buildTemplate, var buildName) in buildsBuffer)
+                    {
+                        if (!this.buildTemplateManager.TryDecodeTemplate(buildTemplate, out var build) ||
+                            build is not SingleBuildEntry singleBuild)
+                        {
+                            continue;
+                        }
+
+                        loadedBuild = true;
+                        singleBuild.Name = buildName;
+                        teamBuild?.Builds.Add(singleBuild);
+                    }
+                }
+
+                if (loadedBuild)
+                {
+                    break;
+                }
+            }
+
+            if (teamBuild is not null)
+            {
+                yield return teamBuild;
+                teamBuild = default;
+                loadedBuild = false;
+            }
+        }
     }
 
     public async Task NotifyUserIfUpdateAvailable(CancellationToken cancellationToken)
