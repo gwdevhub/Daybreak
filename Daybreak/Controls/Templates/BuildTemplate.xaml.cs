@@ -54,13 +54,14 @@ public partial class BuildTemplate : UserControl
     private SingleBuildEntry buildEntry;
     [GenerateDependencyProperty]
     private int attributePoints;
-
+    [GenerateDependencyProperty]
+    private List<Profession> primaryProfessions = [];
+    [GenerateDependencyProperty]
+    private List<Profession> secondaryProfessions = [];
     [GenerateDependencyProperty]
     private List<Skill> availableSkills = [];
 
     public event EventHandler? BuildChanged;
-    public ObservableCollection<Profession> PrimaryProfessions { get; } = [];
-    public ObservableCollection<Profession> SecondaryProfessions { get; } = [];
 
     public BuildTemplate()
         : this(Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IBuildTemplateManager>(),
@@ -102,10 +103,10 @@ public partial class BuildTemplate : UserControl
         if(e.NewValue is SingleBuildEntry buildEntry)
         {
             this.BuildEntry = buildEntry;
-            this.BuildEntry.PropertyChanged += this.BuildEntry_Changed;
-            this.AttributePoints = this.attributePointCalculator!.GetRemainingFreePoints(this.BuildEntry);
             this.SetupProfessions();
             this.LoadSkills();
+            this.AttributePoints = this.attributePointCalculator!.GetRemainingFreePoints(this.BuildEntry);
+            this.BuildEntry.PropertyChanged += this.BuildEntry_Changed;
         }
     }
 
@@ -126,41 +127,20 @@ public partial class BuildTemplate : UserControl
             return;
         }
 
-        var primaryProfessionsToAdd = Profession.Professions.Except(this.PrimaryProfessions).Where(p => p == Profession.None || p != buildEntry.Secondary).ToList();
-        var primaryProfessionsToRemove = this.PrimaryProfessions.Where(p => p != Profession.None && p == buildEntry.Secondary).ToList();
-        var secondaryProfessionsToAdd = Profession.Professions.Except(this.SecondaryProfessions).Where(p => p == Profession.None || p != buildEntry.Primary).ToList();
-        var secondaryProfessionsToRemove = this.SecondaryProfessions.Where(p => p != Profession.None && p == buildEntry.Primary).ToList();
-
-        if (primaryProfessionsToRemove.Count > 0)
+        var newPrimaryProfessions = Profession.Professions.Where(p => p == Profession.None || p != buildEntry.Secondary).ToList();
+        var newSecondaryProfessions = Profession.Professions.Where(p => p == Profession.None || p != buildEntry.Primary).ToList();
+        if (this.PrimaryProfessions is null ||
+            this.PrimaryProfessions.Any(p => !newPrimaryProfessions.Contains(p)) ||
+            newPrimaryProfessions.Any(p => !this.PrimaryProfessions.Contains(p)))
         {
-            foreach(var profession in primaryProfessionsToRemove)
-            {
-                this.PrimaryProfessions.Remove(profession);
-            }
+            this.PrimaryProfessions = newPrimaryProfessions;
         }
 
-        if (primaryProfessionsToAdd.Count > 0)
+        if (this.SecondaryProfessions is null ||
+            this.SecondaryProfessions.Any(p => !newSecondaryProfessions.Contains(p)) ||
+            newSecondaryProfessions.Any(p => !this.SecondaryProfessions.Contains(p)))
         {
-            foreach (var profession in primaryProfessionsToAdd)
-            {
-                this.PrimaryProfessions.Add(profession);
-            }
-        }
-
-        if (secondaryProfessionsToRemove.Count > 0)
-        {
-            foreach (var profession in secondaryProfessionsToRemove)
-            {
-                this.SecondaryProfessions.Remove(profession);
-            }
-        }
-
-        if (secondaryProfessionsToAdd.Count > 0)
-        {
-            foreach (var profession in secondaryProfessionsToAdd)
-            {
-                this.SecondaryProfessions.Add(profession);
-            }
+            this.SecondaryProfessions = newSecondaryProfessions;
         }
     }
 

@@ -14,7 +14,6 @@ using System.Extensions;
 using System.Extensions.Core;
 using System.Linq;
 using System.Logging;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -402,6 +401,12 @@ public sealed class GuildwarsMemoryReader(
         var instanceContext = this.memoryScanner.Read(globalContext.InstanceContext, InstanceContext.BaseOffset);
         var userContext = this.memoryScanner.Read(globalContext.UserContext, UserContext.BaseOffset);
         var playerControlledCharContext = this.memoryScanner.Read(gameContext.PlayerControlledChar, PlayerControlledCharContext.BaseOffset);
+        var partyContext = this.memoryScanner.Read(globalContext.PartyContext);
+        var playerPartyContext = this.memoryScanner.Read(partyContext.PlayerParty);
+        var partyPlayers = this.memoryScanner.ReadArray(playerPartyContext.Players);
+        var partyHeroes = this.memoryScanner.ReadArray(playerPartyContext.Heroes);
+        var partyHench = this.memoryScanner.ReadArray(playerPartyContext.Henchmen);
+
         var playerContexts = this.memoryScanner.ReadArray(gameContext.Players);
         var mapEntityContexts = this.memoryScanner.ReadArray(gameContext.MapEntities);
         var professionContexts = this.memoryScanner.ReadArray(gameContext.Professions);
@@ -415,11 +420,38 @@ public sealed class GuildwarsMemoryReader(
 
         var entityAggregateWithBuilds = professionContexts
             .Select(p => (p.AgentId, p, partyAttributesContexts.FirstOrDefault(pa => pa.AgentId == p.AgentId), skillBarContexts.FirstOrDefault(s => s.AgentId == p.AgentId)))
-            .Select(t => (t.AgentId, GetEntityBuild(t.p, t.Item3, t.Item4)));
+            .Select(t => (t.AgentId, GetEntityBuild(t.p, t.Item3, t.Item4)))
+            .Where(t => t.Item2 is not null)
+            .OfType<(uint AgentId, Build Build)>();
+
+
         return new TeamBuildData
         {
-            PlayerBuild = entityAggregateWithBuilds.FirstOrDefault(t => t.AgentId == playerControlledCharContext.AgentId).Item2,
-            TeamMemberBuilds = entityAggregateWithBuilds.Where(t => t.AgentId != playerControlledCharContext.AgentId).Select(t => t.Item2).ToList()!
+            TeamBuildPlayers = [.. entityAggregateWithBuilds.Select<(uint AgentId, Build Build), TeamBuildPlayerData>(t =>
+            {
+                var agentId = t.AgentId;
+                var build = t.Build;
+                if (agentId == playerControlledCharContext.AgentId)
+                {
+                    return new TeamBuildMainPlayerData { Build = build };
+                }
+
+                if (partyHeroes.FirstOrDefault(h => h.AgentId == agentId) is HeroPartyMember heroPartyMember &&
+                    heroPartyMember.HeroId != 0 &&
+                    Hero.TryParse((int)heroPartyMember.HeroId, out var hero))
+                {
+
+                    return new TeamBuildHeroData { Build = build, Hero = hero };
+                }
+
+                if (partyHench.FirstOrDefault(h => h.AgentId == agentId) is HenchmanPartyMember henchmanPartyMember &&
+                    henchmanPartyMember.AgentId != 0)
+                {
+                    return new TeamBuildHenchmanData { Build = build };
+                }
+
+                return new TeamBuildPartyMemberData { Build = build };
+            }).OrderBy(t => t is TeamBuildMainPlayerData ? 0 : 1)]
         };
     }
 
@@ -685,20 +717,15 @@ public sealed class GuildwarsMemoryReader(
                 .Concat(secondaryProfession.Attributes)
                 .Select(a => new AttributeEntry { Attribute = a })
                 .ToList();
-            foreach (var attribute in partyAttributesContext.Attributes ?? [])
+            foreach(var entry in attributes)
             {
-                if (attribute.Id < 0 || attribute.Id > 44)
+                var attributesContext = partyAttributesContext.Attributes.FirstOrDefault(p => p.Id == entry.Attribute?.Id);
+                if (attributesContext.IncrementPoints == 0 && attributesContext.DecrementPoints == 0)
                 {
                     continue;
                 }
 
-                var maybeAttributeEntry = attributes.FirstOrDefault(a => a.Attribute!.Id == attribute.Id);
-                if (maybeAttributeEntry is not AttributeEntry attributeEntry)
-                {
-                    continue;
-                }
-
-                attributeEntry.Points = (int)attribute.BaseLevel;
+                entry.Points = (int)attributesContext.BaseLevel;
             }
 
             var skillContexts = new SkillContext[]

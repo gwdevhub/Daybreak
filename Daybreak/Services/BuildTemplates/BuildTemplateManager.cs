@@ -1,29 +1,29 @@
 ﻿using Daybreak.Models.Builds;
 using Daybreak.Models.Guildwars;
 using Daybreak.Services.BuildTemplates.Models;
+using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
+using NAudio.MediaFoundation;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Extensions;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using Convert = System.Convert;
 
 namespace Daybreak.Services.BuildTemplates;
 
-internal sealed class BuildTemplateManager : IBuildTemplateManager
+internal sealed class BuildTemplateManager(
+    ILogger<BuildTemplateManager> logger) : IBuildTemplateManager
 {
     private const string DecodingLookupTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
     private readonly static string BuildsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Guild Wars\\Templates\\Skills";
 
-    private readonly ILogger<BuildTemplateManager> logger;
-
-    public BuildTemplateManager(
-        ILogger<BuildTemplateManager> logger)
-    {
-        this.logger = logger.ThrowIfNull(nameof(logger));
-    }
+    private readonly ILogger<BuildTemplateManager> logger = logger.ThrowIfNull(nameof(logger));
 
     public bool IsTemplate(string template)
     {
@@ -52,6 +52,7 @@ internal sealed class BuildTemplateManager : IBuildTemplateManager
             Skills = emptyBuild.Skills,
         };
 
+        entry.CreationTime = DateTimeOffset.UtcNow;
         return entry;
     }
 
@@ -63,9 +64,10 @@ internal sealed class BuildTemplateManager : IBuildTemplateManager
             Name = name,
             PreviousName = string.Empty,
             Attributes = emptyBuild.Attributes,
-            Skills = emptyBuild.Skills,
+            Skills = emptyBuild.Skills
         };
 
+        entry.CreationTime = DateTimeOffset.UtcNow;
         return entry;
     }
 
@@ -79,6 +81,7 @@ internal sealed class BuildTemplateManager : IBuildTemplateManager
             Builds = [this.CreateSingleBuild()]
         };
 
+        entry.CreationTime = DateTimeOffset.UtcNow;
         return entry;
     }
 
@@ -91,7 +94,20 @@ internal sealed class BuildTemplateManager : IBuildTemplateManager
             Builds = [this.CreateSingleBuild(name)]
         };
 
+        entry.CreationTime = DateTimeOffset.UtcNow;
         return entry;
+    }
+
+    public TeamBuildEntry CreateTeamBuild(TeamBuildData teamBuildData)
+    {
+        var entry = this.CreateTeamBuild();
+        return this.PopulateTeamBuild(entry, teamBuildData);
+    }
+
+    public TeamBuildEntry CreateTeamBuild(TeamBuildData teamBuildData, string name)
+    {
+        var entry = this.CreateTeamBuild();
+        return this.PopulateTeamBuild(entry, teamBuildData);
     }
 
     public SingleBuildEntry ConvertToSingleBuildEntry(TeamBuildEntry teamBuildEntry)
@@ -106,6 +122,7 @@ internal sealed class BuildTemplateManager : IBuildTemplateManager
         singleBuildEntry.Name = teamBuildEntry.Name;
         singleBuildEntry.PreviousName = teamBuildEntry.PreviousName;
         singleBuildEntry.SourceUrl = teamBuildEntry.SourceUrl;
+        singleBuildEntry.Metadata = teamBuildEntry.Metadata;
 
         return singleBuildEntry;
     }
@@ -117,7 +134,8 @@ internal sealed class BuildTemplateManager : IBuildTemplateManager
             Name = singleBuildEntry.Name,
             PreviousName = singleBuildEntry.PreviousName,
             SourceUrl = singleBuildEntry.SourceUrl,
-            Builds = [ singleBuildEntry ]
+            Builds = [ singleBuildEntry ],
+            Metadata = singleBuildEntry.Metadata
         };
 
         return teamBuildEntry;
@@ -165,7 +183,12 @@ internal sealed class BuildTemplateManager : IBuildTemplateManager
         }
 
         Directory.CreateDirectory(Path.GetDirectoryName(newPath)!);
-        File.WriteAllText(newPath, $"{encodedBuild.ToString().Trim()}\n{buildEntry.SourceUrl}");
+        var metadata = buildEntry.Metadata is not null
+            ? Convert.ToBase64String(
+                Encoding.UTF8.GetBytes(
+                    JsonConvert.SerializeObject(buildEntry.Metadata, Formatting.None)))
+            : string.Empty;
+        File.WriteAllText(newPath, $"{encodedBuild.ToString().Trim()}\n{metadata}");
     }
 
     public void RemoveBuild(IBuildEntry buildEntry)
@@ -181,29 +204,10 @@ internal sealed class BuildTemplateManager : IBuildTemplateManager
         }
     }
 
-    public async Task<Result<IBuildEntry, Exception>> GetBuild(string name)
+    public Task<Result<IBuildEntry, Exception>> GetBuild(string name)
     {
         var path = Path.Combine(BuildsPath, $"{name}.txt");
-        if (File.Exists(path) is false)
-        {
-            return new InvalidOperationException("Unable to find build file");
-        }
-
-        var content = await File.ReadAllLinesAsync(path);
-        if (content.Length == 0)
-        {
-            return new InvalidOperationException("File does not contain a valid template code");
-        }
-
-        if (this.TryDecodeTemplate(content.First(), out var build) is false)
-        {
-            return new InvalidOperationException("Unable to parse build file");
-        }
-
-        build.Name = name;
-        build.PreviousName = name;
-        build.SourceUrl = content.Length > 1 ? content[1] : string.Empty;
-        return Result<IBuildEntry, Exception>.Success(build);
+        return this.LoadBuildFromFile(path, name);
     }
 
     public void ClearBuilds()
@@ -223,16 +227,12 @@ internal sealed class BuildTemplateManager : IBuildTemplateManager
 
         foreach (var file in Directory.GetFiles(BuildsPath, "*.txt", SearchOption.AllDirectories))
         {
-            var content = await File.ReadAllLinesAsync(file);
-            if (!this.TryDecodeTemplate(content.FirstOrDefault()!, out var build))
+            var name = Path.GetRelativePath(BuildsPath, file).Replace(".txt", string.Empty);
+            var result = await this.LoadBuildFromFile(file, name);
+            if (result.TryExtractSuccess(out var buildEntry) && buildEntry is not null)
             {
-                yield break;
+                yield return buildEntry;
             }
-
-            build.Name = Path.GetRelativePath(BuildsPath, file).Replace(".txt", string.Empty);
-            build.PreviousName = Path.GetRelativePath(BuildsPath, file).Replace(".txt", string.Empty);
-            build.SourceUrl = content.Skip(1).FirstOrDefault() ?? string.Empty;
-            yield return build;
         }
     }
 
@@ -344,6 +344,93 @@ internal sealed class BuildTemplateManager : IBuildTemplateManager
         }
 
         throw new InvalidOperationException($"Unknown build entry of type {build.GetType().Name}");
+    }
+
+    private TeamBuildEntry PopulateTeamBuild(TeamBuildEntry teamBuildEntry, TeamBuildData teamBuildData)
+    {
+        teamBuildEntry.Builds.Clear();
+        var partyCompositionMetadata = new List<PartyCompositionMetadataEntry>();
+        var index = 0;
+        foreach (var teamBuildPlayer in teamBuildData?.TeamBuildPlayers ?? [])
+        {
+            if (teamBuildPlayer is null)
+            {
+                continue;
+            }
+
+            var build = teamBuildPlayer.Build;
+            var buildEntry = this.CreateSingleBuild();
+            buildEntry.Primary = build.Primary;
+            buildEntry.Secondary = build.Secondary;
+            buildEntry.Attributes = build.Attributes;
+            buildEntry.Skills = build.Skills;
+            teamBuildEntry.Builds.Add(buildEntry);
+            if (teamBuildPlayer is TeamBuildHeroData heroBuildData)
+            {
+                partyCompositionMetadata.Add(new PartyCompositionMetadataEntry { Type = PartyCompositionMemberType.Hero, HeroId = heroBuildData.Hero.Id, Index = index });
+            }
+            else if (teamBuildPlayer is TeamBuildMainPlayerData)
+            {
+                partyCompositionMetadata.Add(new PartyCompositionMetadataEntry { Type = PartyCompositionMemberType.MainPlayer, Index = index });
+            }
+            else if (teamBuildPlayer is TeamBuildPartyMemberData)
+            {
+                partyCompositionMetadata.Add(new PartyCompositionMetadataEntry { Type = PartyCompositionMemberType.Player, Index = index });
+            }
+            else if (teamBuildPlayer is TeamBuildHenchmanData)
+            {
+                partyCompositionMetadata.Add(new PartyCompositionMetadataEntry { Type = PartyCompositionMemberType.Henchman, Index = index });
+            }
+
+            index++;
+        }
+
+        teamBuildEntry.PartyComposition = partyCompositionMetadata;
+        return teamBuildEntry;
+    }
+
+    private async Task<Result<IBuildEntry, Exception>> LoadBuildFromFile(string path, string buildName)
+    {
+        if (File.Exists(path) is false)
+        {
+            return new InvalidOperationException("Unable to find build file");
+        }
+
+        var content = await File.ReadAllLinesAsync(path);
+        if (content.Length == 0)
+        {
+            return new InvalidOperationException("File does not contain a valid template code");
+        }
+
+        if (this.TryDecodeTemplate(content.First(), out var build) is false)
+        {
+            return new InvalidOperationException("Unable to parse build file");
+        }
+
+        build.Name = buildName;
+        build.PreviousName = buildName;
+        if (content.Length > 1)
+        {
+            // This check has to stay in place for backwards compatibility. If the second line in a build is url, it is the source Url of the build. Otherwise, it is a base64 encoded metadata of the build
+            if (Uri.TryCreate(content[1], UriKind.Absolute, out var sourceUrl))
+            {
+                build.SourceUrl = sourceUrl.ToString();
+            }
+            else
+            {
+                build.Metadata =
+                    JsonConvert.DeserializeObject<Dictionary<string, string>>(
+                        Encoding.UTF8.GetString(
+                            Convert.FromBase64String(content[1])));   
+            }
+        }
+
+        if (build.CreationTime == DateTimeOffset.MinValue)
+        {
+            build.CreationTime = new FileInfo(path).CreationTimeUtc.ToSafeDateTimeOffset();
+        }
+
+        return Result<IBuildEntry, Exception>.Success(build);
     }
 
     private Result<Build[], Exception> DecodeTemplatesInner(string template)

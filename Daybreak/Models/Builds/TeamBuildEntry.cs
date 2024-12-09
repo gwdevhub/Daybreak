@@ -1,44 +1,20 @@
-﻿using System;
+﻿using Daybreak.Models.Guildwars;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 
 namespace Daybreak.Models.Builds;
-public sealed class TeamBuildEntry : IBuildEntry, INotifyPropertyChanged, IEquatable<TeamBuildEntry>
+public sealed class TeamBuildEntry : BuildEntryBase, IEquatable<TeamBuildEntry>
 {
-    public event PropertyChangedEventHandler? PropertyChanged;
-    private string? name;
-    private string? sourceUrl;
-    private List<SingleBuildEntry> builds = [];
-
-    public string? PreviousName { get; set; }
-    public string? Name
-    {
-        get => this.name;
-        set
-        {
-            this.name = value;
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Name)));
-        }
-    }
-    public string? SourceUrl
-    {
-        get => this.sourceUrl;
-        set
-        {
-            this.sourceUrl = value;
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.SourceUrl)));
-        }
-    }
     public List<SingleBuildEntry> Builds
     {
-        get => this.builds;
+        get;
         set
         {
-            this.builds = value;
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Builds)));
+            field = value;
+            this.OnPropertyChanged(nameof(this.Builds));
         }
-    }
+    } = [];
 
     public bool Equals(TeamBuildEntry? other)
     {
@@ -52,5 +28,15 @@ public sealed class TeamBuildEntry : IBuildEntry, INotifyPropertyChanged, IEquat
                     thisBuild.Secondary == otherBuild?.Secondary &&
                     thisBuild.Skills.SequenceEqual(otherBuild.Skills);
             }).All(result => result);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return this.Equals(obj as TeamBuildEntry);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(this.Name, this.PreviousName, this.SourceUrl, this.Builds.Select(c => c.GetHashCode()));
     }
 }

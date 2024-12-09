@@ -6,81 +6,79 @@ using System.Linq;
 using Attribute = Daybreak.Models.Guildwars.Attribute;
 
 namespace Daybreak.Models.Builds;
-public sealed class SingleBuildEntry : IBuildEntry, INotifyPropertyChanged, IEquatable<SingleBuildEntry>
+public sealed class SingleBuildEntry : BuildEntryBase, IBuildEntry, INotifyPropertyChanged, IEquatable<SingleBuildEntry>
 {
-    public event PropertyChangedEventHandler? PropertyChanged;
-    private string? name;
-    private string? sourceUrl;
-    private Profession primary = Profession.None;
-    private Profession secondary = Profession.None;
-    private List<AttributeEntry> attributes = [];
-    private List<Skill> skills = [Skill.NoSkill, Skill.NoSkill, Skill.NoSkill, Skill.NoSkill, Skill.NoSkill, Skill.NoSkill, Skill.NoSkill, Skill.NoSkill];
-
-    public string? PreviousName { get; set; }
-    public string? Name
-    {
-        get => this.name;
-        set
-        {
-            this.name = value;
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Name)));
-        }
-    }
-    public string? SourceUrl
-    {
-        get => this.sourceUrl;
-        set
-        {
-            this.sourceUrl = value;
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.SourceUrl)));
-        }
-    }
     public Profession Primary
     {
-        get => this.primary;
+        get;
         set
         {
-            this.primary = value;
+            if (value is null)
+            {
+                return;
+            }
+
+            field = value;
             this.UpdateAttributes();
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Primary)));
+            this.OnPropertyChanged(nameof(this.Primary));
         }
-    }
+    } = Profession.None;
     public Profession Secondary
     {
-        get => this.secondary;
+        get;
         set
         {
-            this.secondary = value;
+            if (value is null)
+            {
+                return;
+            }
+
+            field = value;
             this.UpdateAttributes();
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Secondary)));
+            this.OnPropertyChanged(nameof(this.Secondary));
         }
-    }
+    } = Profession.None;
     public List<AttributeEntry> Attributes
     {
-        get => this.attributes;
+        get;
         set
         {
-            this.attributes = value;
+            if (value is null)
+            {
+                return;
+            }
+
+            field = value;
             this.UpdateSkills();
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Attributes)));
+            this.OnPropertyChanged(nameof(this.Attributes));
         }
-    }
+    } = [];
     public List<Skill> Skills
     {
-        get => this.skills;
+        get;
         set
         {
-            this.skills = value;
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Skills)));
+            if (value is null)
+            {
+                return;
+            }
+
+            field = value;
+            this.OnPropertyChanged(nameof(this.Skills));
         }
-    }
+    } = [Skill.NoSkill, Skill.NoSkill, Skill.NoSkill, Skill.NoSkill, Skill.NoSkill, Skill.NoSkill, Skill.NoSkill, Skill.NoSkill];
     public Skill FirstSkill
     {
         get => this.Skills[0];
         set
         {
+            if (value is null)
+            {
+                return;
+            }
+
             this.Skills[0] = value;
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.FirstSkill)));
+            this.OnPropertyChanged(nameof(this.FirstSkill));
         }
     }
     public Skill SecondSkill
@@ -88,8 +86,13 @@ public sealed class SingleBuildEntry : IBuildEntry, INotifyPropertyChanged, IEqu
         get => this.Skills[1];
         set
         {
+            if (value is null)
+            {
+                return;
+            }
+
             this.Skills[1] = value;
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.SecondSkill)));
+            this.OnPropertyChanged(nameof(this.SecondSkill));
         }
     }
     public Skill ThirdSkill
@@ -97,8 +100,13 @@ public sealed class SingleBuildEntry : IBuildEntry, INotifyPropertyChanged, IEqu
         get => this.Skills[2];
         set
         {
+            if (value is null)
+            {
+                return;
+            }
+
             this.Skills[2] = value;
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.ThirdSkill)));
+            this.OnPropertyChanged(nameof(this.ThirdSkill));
         }
     }
     public Skill FourthSkill
@@ -106,8 +114,13 @@ public sealed class SingleBuildEntry : IBuildEntry, INotifyPropertyChanged, IEqu
         get => this.Skills[3];
         set
         {
+            if (value is null)
+            {
+                return;
+            }
+
             this.Skills[3] = value;
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.FourthSkill)));
+            this.OnPropertyChanged(nameof(this.FourthSkill));
         }
     }
     public Skill FifthSkill
@@ -115,8 +128,13 @@ public sealed class SingleBuildEntry : IBuildEntry, INotifyPropertyChanged, IEqu
         get => this.Skills[4];
         set
         {
+            if (value is null)
+            {
+                return;
+            }
+
             this.Skills[4] = value;
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.FifthSkill)));
+            this.OnPropertyChanged(nameof(this.FifthSkill));
         }
     }
     public Skill SixthSkill
@@ -124,8 +142,13 @@ public sealed class SingleBuildEntry : IBuildEntry, INotifyPropertyChanged, IEqu
         get => this.Skills[5];
         set
         {
+            if (value is null)
+            {
+                return;
+            }
+
             this.Skills[5] = value;
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.SixthSkill)));
+            this.OnPropertyChanged(nameof(this.SixthSkill));
         }
     }
     public Skill SeventhSkill
@@ -133,8 +156,13 @@ public sealed class SingleBuildEntry : IBuildEntry, INotifyPropertyChanged, IEqu
         get => this.Skills[6];
         set
         {
+            if (value is null)
+            {
+                return;
+            }
+
             this.Skills[6] = value;
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.SeventhSkill)));
+            this.OnPropertyChanged(nameof(this.SeventhSkill));
         }
     }
     public Skill EigthSkill
@@ -142,8 +170,13 @@ public sealed class SingleBuildEntry : IBuildEntry, INotifyPropertyChanged, IEqu
         get => this.Skills[7];
         set
         {
+            if (value is null)
+            {
+                return;
+            }
+
             this.Skills[7] = value;
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.EigthSkill)));
+            this.OnPropertyChanged(nameof(this.EigthSkill));
         }
     }
 
@@ -235,5 +268,15 @@ public sealed class SingleBuildEntry : IBuildEntry, INotifyPropertyChanged, IEqu
             this.Primary == other?.Primary &&
             this.Secondary == other?.Secondary &&
             this.Skills.SequenceEqual(other.Skills);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return this.Equals(obj as SingleBuildEntry);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(this.Name, this.PreviousName, this.SourceUrl, this.Primary.Name, this.Secondary.Name, string.Join(';', this.Skills.Select(s => s.Id)));
     }
 }

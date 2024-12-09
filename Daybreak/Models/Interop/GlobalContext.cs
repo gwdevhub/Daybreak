@@ -19,4 +19,7 @@ public readonly struct GlobalContext
 
     [FieldOffset(0x0044)]
     public readonly GuildwarsPointer<UserContext> UserContext;
+
+    [FieldOffset(0x004C)]
+    public readonly GuildwarsPointer<PartyContext> PartyContext;
 }

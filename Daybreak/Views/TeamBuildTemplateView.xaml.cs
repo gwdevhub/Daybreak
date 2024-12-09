@@ -60,9 +60,11 @@ public partial class TeamBuildTemplateView : UserControl
             {
                 this.logger.LogInformation("Received data context. Setting current build");
                 this.CurrentBuild = buildEntry;
+                this.preventDecode = true;
                 this.CurrentBuildCode = this.buildTemplateManager.EncodeTemplate(this.CurrentBuild);
                 this.CurrentBuildSource = buildEntry.SourceUrl;
                 this.SelectedBuild = this.CurrentBuild.Builds.FirstOrDefault();
+                this.preventDecode = false;
                 this.CurrentBuild.PropertyChanged += this.CurrentBuild_PropertyChanged;
             }
         };
@@ -92,6 +94,11 @@ public partial class TeamBuildTemplateView : UserControl
                 {
                     teamBuildEntry.Name = this.CurrentBuild.Name;
                     teamBuildEntry.PreviousName = this.CurrentBuild.PreviousName;
+                    if (string.IsNullOrEmpty(this.CurrentBuild.PreviousName))
+                    {
+                        newBuild.Metadata = this.CurrentBuild.Metadata;
+                    }
+
                     var indexOfSelectedBuild = 0;
                     if (this.CurrentBuild is not null &&
                         this.SelectedBuild is not null)
