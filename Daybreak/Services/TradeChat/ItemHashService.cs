@@ -12,11 +12,6 @@ internal sealed class ItemHashService : IItemHashService
         return ComputeHashInternal(itemBase.Modifiers);
     }
 
-    public string? ComputeHash(IBagContent bagContent)
-    {
-        return ComputeHashInternal(bagContent.Modifiers);
-    }
-
     private static string? ComputeHashInternal(IEnumerable<ItemModifier>? itemModifiers)
     {
         if (itemModifiers is null ||

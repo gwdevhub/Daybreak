@@ -53,8 +53,10 @@ public partial class SingleBuildTemplateView : UserControl
             {
                 this.logger.LogInformation("Received data context. Setting current build");
                 this.CurrentBuild = buildEntry;
+                this.preventDecode = true;
                 this.CurrentBuildCode = this.buildTemplateManager.EncodeTemplate(this.CurrentBuild);
                 this.CurrentBuildSource = buildEntry.SourceUrl;
+                this.preventDecode = false;
             }
         };
     }
@@ -76,6 +78,11 @@ public partial class SingleBuildTemplateView : UserControl
 
                 newBuild.Name = this.CurrentBuild.Name;
                 newBuild.PreviousName = this.CurrentBuild.PreviousName;
+                if (string.IsNullOrEmpty(this.CurrentBuild.PreviousName))
+                {
+                    newBuild.Metadata = this.CurrentBuild.Metadata;
+                }
+
                 this.CurrentBuild = singleBuildEntry;
                 this.logger.LogInformation($"Template {this.CurrentBuildCode} decoded");
             }

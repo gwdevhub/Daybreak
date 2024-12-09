@@ -2,18 +2,13 @@
 
 namespace Daybreak.Services.BuildTemplates.Models;
 
-public sealed class DecodeCharStream
+internal sealed class DecodeCharStream(string[] encodedValues)
 {
-    private readonly string innerCharArray;
+    private readonly string innerCharArray = string.Join("", encodedValues);
 
     public int Length => this.innerCharArray.Length;
 
     public int Position { get; set; }
-
-    public DecodeCharStream(string[] encodedValues)
-    {
-        this.innerCharArray = string.Join("", encodedValues);
-    }
 
     public int Read(int count)
     {
