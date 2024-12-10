@@ -1,12 +1,16 @@
 ﻿using Daybreak.Models;
 using Daybreak.Models.Builds;
+using Daybreak.Models.Guildwars;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Navigation;
+using Daybreak.Services.Toolbox;
 using Daybreak.Utils;
 using System;
 using System.Collections.Generic;
+using System.Core.Extensions;
 using System.Extensions;
 using System.Linq;
+using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 
@@ -17,6 +21,7 @@ namespace Daybreak.Views;
 /// </summary>
 public partial class BuildsListView : UserControl
 {
+    private readonly IToolboxService toolboxService;
     private readonly IViewManager viewManager;
     private readonly IBuildTemplateManager buildTemplateManager;
 
@@ -29,10 +34,12 @@ public partial class BuildsListView : UserControl
 
     public BuildsListView(
         IViewManager viewManager,
+        IToolboxService toolboxService,
         IBuildTemplateManager buildTemplateManager)
     {
-        this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
-        this.buildTemplateManager = buildTemplateManager.ThrowIfNull(nameof(buildTemplateManager));
+        this.viewManager = viewManager.ThrowIfNull();
+        this.toolboxService = toolboxService.ThrowIfNull();
+        this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
         this.InitializeComponent();
         this.LoadBuilds();
     }
@@ -41,7 +48,8 @@ public partial class BuildsListView : UserControl
     {
         this.Loading = true;
         this.buildEntries = await this.buildTemplateManager.GetBuilds().ToListAsync();
-        this.BuildEntries.ClearAnd().AddRange(this.buildEntries.OrderBy(b => b.Name));
+        var toolboxBuildEntries = await this.toolboxService.GetToolboxBuilds(CancellationToken.None).ToListAsync();
+        this.BuildEntries.ClearAnd().AddRange(this.buildEntries.OrderBy(b => b.Name)).AddRange(toolboxBuildEntries.OrderBy(b => b.Name));
         this.Loading = false;
         this.SearchTextBox.FocusOnTextBox();
     }
@@ -60,7 +68,16 @@ public partial class BuildsListView : UserControl
 
     private void BuildEntryTemplate_RemoveClicked(object _, IBuildEntry e)
     {
-        this.buildTemplateManager.RemoveBuild(e);
+        if (e is TeamBuildEntry teamBuild &&
+            teamBuild.IsToolboxBuild)
+        {
+            this.toolboxService.DeleteToolboxBuild(teamBuild, CancellationToken.None);
+        }
+        else
+        {
+            this.buildTemplateManager.RemoveBuild(e);
+        }
+
         this.LoadBuilds();
     }
 
