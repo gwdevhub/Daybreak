@@ -1,5 +1,6 @@
 ﻿using Daybreak.Models;
 using Daybreak.Models.Builds;
+using Daybreak.Models.Guildwars;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Toolbox;
@@ -48,7 +49,7 @@ public partial class BuildsListView : UserControl
         this.Loading = true;
         this.buildEntries = await this.buildTemplateManager.GetBuilds().ToListAsync();
         var toolboxBuildEntries = await this.toolboxService.GetToolboxBuilds(CancellationToken.None).ToListAsync();
-        this.BuildEntries.ClearAnd().AddRange(this.buildEntries.OrderBy(b => b.Name));
+        this.BuildEntries.ClearAnd().AddRange(this.buildEntries.OrderBy(b => b.Name)).AddRange(toolboxBuildEntries.OrderBy(b => b.Name));
         this.Loading = false;
         this.SearchTextBox.FocusOnTextBox();
     }
@@ -67,7 +68,16 @@ public partial class BuildsListView : UserControl
 
     private void BuildEntryTemplate_RemoveClicked(object _, IBuildEntry e)
     {
-        this.buildTemplateManager.RemoveBuild(e);
+        if (e is TeamBuildEntry teamBuild &&
+            teamBuild.IsToolboxBuild)
+        {
+            this.toolboxService.DeleteToolboxBuild(teamBuild, CancellationToken.None);
+        }
+        else
+        {
+            this.buildTemplateManager.RemoveBuild(e);
+        }
+
         this.LoadBuilds();
     }
 
