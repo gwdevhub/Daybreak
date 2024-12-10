@@ -124,9 +124,14 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
+        <Rectangle Fill="{StaticResource Daybreak.Brushes.Background}"
+                   VerticalAlignment="Stretch"
+                   HorizontalAlignment="Stretch"
+                   Grid.RowSpan="3"
+                   Visibility="{Binding ElementName=_this, Path=Loading, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         <controls:CircularLoadingWidget Grid.RowSpan="3"
                                         Width="100"
                                         Height="100"
-                                        Visibility="{Binding ElementName=_this, Path=Loading, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"></controls:CircularLoadingWidget>
+                                        Visibility="{Binding ElementName=_this, Path=Loading, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
     </Grid>
 </UserControl>

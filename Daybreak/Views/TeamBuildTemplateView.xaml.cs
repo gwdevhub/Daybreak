@@ -4,11 +4,13 @@ using Daybreak.Models.Guildwars;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Notifications;
+using Daybreak.Services.Toolbox;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
@@ -22,6 +24,7 @@ public partial class TeamBuildTemplateView : UserControl
 {
     private const string DisallowedChars = "\r\n/.";
 
+    private readonly IToolboxService toolboxService;
     private readonly INotificationService notificationService;
     private readonly IViewManager viewManager;
     private readonly IBuildTemplateManager buildTemplateManager;
@@ -44,11 +47,13 @@ public partial class TeamBuildTemplateView : UserControl
     private string currentBuildSubCode = string.Empty;
 
     public TeamBuildTemplateView(
+        IToolboxService toolboxService,
         INotificationService notificationService,
         IViewManager viewManager,
         IBuildTemplateManager buildTemplateManager,
         ILogger<TeamBuildTemplateView> logger)
     {
+        this.toolboxService = toolboxService.ThrowIfNull();
         this.notificationService = notificationService.ThrowIfNull();
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
@@ -199,11 +204,13 @@ public partial class TeamBuildTemplateView : UserControl
         {
         }
     }
+
     private void BackButton_Clicked(object sender, EventArgs e)
     {
         this.viewManager.ShowView<BuildsListView>();
     }
-    private void SaveButton_Clicked(object sender, EventArgs e)
+
+    private async void SaveButton_Clicked(object sender, EventArgs e)
     {
         if (this.CurrentBuild is null)
         {
@@ -212,7 +219,28 @@ public partial class TeamBuildTemplateView : UserControl
         }
 
         this.CurrentBuild.SourceUrl = this.CurrentBuildSource;
-        this.buildTemplateManager.SaveBuild(this.CurrentBuild);
+        if (this.CurrentBuild.IsToolboxBuild)
+        {
+            await this.toolboxService.SaveToolboxBuild(this.CurrentBuild, CancellationToken.None);
+        }
+        else
+        {
+            this.buildTemplateManager.SaveBuild(this.CurrentBuild);
+        }
+
+        this.viewManager.ShowView<BuildsListView>();
+    }
+
+    private async void ExportButton_Clicked(object sender, EventArgs e)
+    {
+        if (this.CurrentBuild is null)
+        {
+            this.viewManager.ShowView<BuildsListView>();
+            return;
+        }
+
+        this.CurrentBuild.SourceUrl = this.CurrentBuildSource;
+        await this.toolboxService.ExportBuildToToolbox(this.CurrentBuild, CancellationToken.None);
         this.viewManager.ShowView<BuildsListView>();
     }
 

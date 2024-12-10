@@ -12,6 +12,44 @@ public abstract class BuildEntryBase : INotifyPropertyChanged, IBuildEntry
 
     public Dictionary<string, string>? Metadata { get; set; }
     public string? PreviousName { get; set; }
+    public int? ToolboxBuildId
+    {
+        get
+        {
+            if (this.Metadata?.TryGetValue(nameof(this.ToolboxBuildId), out var toolBoxBuildString) is true &&
+                int.TryParse(toolBoxBuildString, out var toolboxBuild))
+            {
+                return toolboxBuild;
+            }
+
+            return default;
+        }
+        set
+        {
+            this.Metadata ??= [];
+            this.Metadata[nameof(this.ToolboxBuildId)] = value.HasValue ? value.Value.ToString() : string.Empty;
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.ToolboxBuildId)));
+        }
+    }
+    public bool IsToolboxBuild
+    {
+        get
+        {
+            if (this.Metadata?.TryGetValue(nameof(this.IsToolboxBuild), out var toolBoxBuildString) is true &&
+                bool.TryParse(toolBoxBuildString, out var toolboxBuild))
+            {
+                return toolboxBuild;
+            }
+
+            return false;
+        }
+        set
+        {
+            this.Metadata ??= [];
+            this.Metadata[nameof(this.IsToolboxBuild)] = value.ToString();
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.IsToolboxBuild)));
+        }
+    }
     public DateTimeOffset CreationTime
     {
         get
