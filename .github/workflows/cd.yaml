@@ -103,6 +103,7 @@ jobs:
       run: |
         $apiKey = "${{ secrets.VIRUSTOTAL_APIKEY }}"
         cd Publish
+        ls
         $uploadUrlResponse = curl https://www.virustotal.com/api/v3/files/upload_url -H x-apikey:"$apiKey"
         $uploadUrlResponse
         $uploadUrlJson = $uploadUrlResponse | ConvertFrom-Json
