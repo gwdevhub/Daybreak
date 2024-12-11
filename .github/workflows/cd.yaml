@@ -101,12 +101,14 @@ jobs:
     - name: Submit virustotal scan
       shell: pwsh
       run: |
+        cd Publish
         $apiKey = "${{ secrets.VIRUSTOTAL_APIKEY }}"
+        $archiveName = "daybreakv${{ env.Version }}.zip"
         $uploadUrlResponse = curl https://www.virustotal.com/api/v3/files/upload_url -H x-apikey:"$apiKey"
         $uploadUrlResponse
         $uploadUrlJson = $uploadUrlResponse | ConvertFrom-Json
         $uploadUrl = $uploadUrlJson.data
-        $uploadResponse = curl --request POST --header x-apikey:"$apiKey" --header 'content-type: multipart/form-data' --form file='@.\Publish\daybreakv${{ env.Version }}' --url $uploadUrl
+        $uploadResponse = curl --request POST --header x-apikey:"$apiKey" --header 'content-type: multipart/form-data' --form file="@$archiveName" --url $uploadUrl
         $uploadResponse
         $uploadResponseJson = $uploadResponse | ConvertFrom-Json
         $resultsUrl = "https://www.virustotal.com/api/v3/analyses/$($uploadResponseJson.data.id)"
@@ -116,13 +118,14 @@ jobs:
         while ($status -ne "completed") {
             Start-Sleep -Seconds 10 # Wait for 10 seconds between checks
             $results = curl --header x-apikey:"$apiKey" --url $resultsUrl
+            $results
             $resultsJson = $results | ConvertFrom-Json
             $status = $resultsJson.data.attributes.status
             Write-Host "Current status: $status"
         }
 
-        $resultsJson.data.attributes.results | ConvertTo-Json | Out-File -FilePath ".\Publish\VirusTotal.Results.json" -Encoding UTF8
-        $resultsJson.data.attributes.stats | ConvertTo-Json | Out-File -FilePath ".\Publish\VirusTotal.Stats.json" -Encoding UTF8
+        $resultsJson.data.attributes.results | ConvertTo-Json | Out-File -FilePath "VirusTotal.Results.json" -Encoding UTF8
+        $resultsJson.data.attributes.stats | ConvertTo-Json | Out-File -FilePath "VirusTotal.Stats.json" -Encoding UTF8
         $stats = $resultsJson.data.attributes.stats
         echo "::set-env name=VirusTotalStats::$stats"
 
@@ -138,10 +141,7 @@ jobs:
         mode: update
         tag_name: v${{ env.Version }}
         release_name: Daybreak v${{ env.Version }}
-        assets: |
-            .\Publish\daybreakv${{ env.Version }}.zip
-            .\Publish\VirusTotal.Results.json
-            .\Publish\VirusTotal.Stats.json
+        assets: .\Publish\daybreakv${{ env.Version }}.zip;.\Publish\VirusTotal.Results.json;.\Publish\VirusTotal.Stats.json
         github_token: ${{ env.GITHUB_TOKEN }}
         replace_assets: true
         body_mrkdwn: |
