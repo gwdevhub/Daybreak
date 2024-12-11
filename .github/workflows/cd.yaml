@@ -103,11 +103,14 @@ jobs:
       run: |
         $apiKey = "${{ secrets.VIRUSTOTAL_APIKEY }}"
         $uploadUrlResponse = curl https://www.virustotal.com/api/v3/files/upload_url -H x-apikey:"$apiKey"
+        $uploadUrlResponse
         $uploadUrlJson = $uploadUrlResponse | ConvertFrom-Json
         $uploadUrl = $uploadUrlJson.data
         $uploadResponse = curl --request POST --header x-apikey:"$apiKey" --header 'content-type: multipart/form-data' --form file='@.\Publish\daybreakv${{ env.Version }}' --url $uploadUrl
+        $uploadResponse
         $uploadResponseJson = $uploadResponse | ConvertFrom-Json
         $resultsUrl = "https://www.virustotal.com/api/v3/analyses/$($uploadResponseJson.data.id)"
+        $resultsUrl
         # Poll the results until the status is "completed"
         $status = ""
         while ($status -ne "completed") {
