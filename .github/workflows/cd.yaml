@@ -102,13 +102,15 @@ jobs:
       shell: pwsh
       run: |
         $apiKey = "${{ secrets.VIRUSTOTAL_APIKEY }}"
+        $archiveName = "daybreakv${{ env.Version }}"
+        $archiveName
         cd Publish
         ls
         $uploadUrlResponse = curl https://www.virustotal.com/api/v3/files/upload_url -H x-apikey:"$apiKey"
         $uploadUrlResponse
         $uploadUrlJson = $uploadUrlResponse | ConvertFrom-Json
         $uploadUrl = $uploadUrlJson.data
-        $uploadResponse = curl --request POST --header x-apikey:"$apiKey" --header 'content-type: multipart/form-data' --form file='@daybreakv${{ env.Version }}' --url $uploadUrl
+        $uploadResponse = curl --request POST --header x-apikey:"$apiKey" --header 'content-type: multipart/form-data' --form file="@$archiveName" --url $uploadUrl
         $uploadResponse
         $uploadResponseJson = $uploadResponse | ConvertFrom-Json
         $resultsUrl = "https://www.virustotal.com/api/v3/analyses/$($uploadResponseJson.data.id)"
