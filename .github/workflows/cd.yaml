@@ -140,10 +140,7 @@ jobs:
         mode: update
         tag_name: v${{ env.Version }}
         release_name: Daybreak v${{ env.Version }}
-        assets: |
-            .\Publish\daybreakv${{ env.Version }}.zip
-            .\Publish\VirusTotal.Results.json
-            .\Publish\VirusTotal.Stats.json
+        assets: .\Publish\daybreakv${{ env.Version }}.zip;.\Publish\VirusTotal.Results.json;.\Publish\VirusTotal.Stats.json
         github_token: ${{ env.GITHUB_TOKEN }}
         replace_assets: true
         body_mrkdwn: |
