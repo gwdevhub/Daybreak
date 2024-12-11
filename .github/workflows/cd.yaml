@@ -103,9 +103,6 @@ jobs:
       run: |
         $apiKey = "${{ secrets.VIRUSTOTAL_APIKEY }}"
         $archiveName = "daybreakv${{ env.Version }}.zip"
-        $archiveName
-        cd Publish
-        ls
         $uploadUrlResponse = curl https://www.virustotal.com/api/v3/files/upload_url -H x-apikey:"$apiKey"
         $uploadUrlResponse
         $uploadUrlJson = $uploadUrlResponse | ConvertFrom-Json
