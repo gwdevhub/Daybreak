@@ -101,6 +101,7 @@ jobs:
     - name: Submit virustotal scan
       shell: pwsh
       run: |
+        cd Publish
         $apiKey = "${{ secrets.VIRUSTOTAL_APIKEY }}"
         $archiveName = "daybreakv${{ env.Version }}.zip"
         $uploadUrlResponse = curl https://www.virustotal.com/api/v3/files/upload_url -H x-apikey:"$apiKey"
