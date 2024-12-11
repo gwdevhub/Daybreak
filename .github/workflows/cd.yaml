@@ -102,7 +102,7 @@ jobs:
       shell: pwsh
       run: |
         $apiKey = "${{ secrets.VIRUSTOTAL_APIKEY }}"
-        $archiveName = "daybreakv${{ env.Version }}"
+        $archiveName = "daybreakv${{ env.Version }}.zip"
         $archiveName
         cd Publish
         ls
