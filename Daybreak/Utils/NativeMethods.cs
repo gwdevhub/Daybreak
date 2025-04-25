@@ -103,21 +103,13 @@ internal static class NativeMethods
         MEM_WRITE_WATCH = 0x00200000
     }
     [StructLayout(LayoutKind.Sequential)]
-    public readonly struct RECT
+    public readonly struct RECT(int left, int top, int right, int bottom)
     {
-        public readonly int Left, Top, Right, Bottom;
+        public readonly int Left = left, Top = top, Right = right, Bottom = bottom;
 
         public int Height => this.Bottom - this.Top;
 
         public int Width => this.Right - this.Left;
-
-        public RECT(int left, int top, int right, int bottom)
-        {
-            this.Left = left;
-            this.Top = top;
-            this.Right = right;
-            this.Bottom = bottom;
-        }
     }
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct SystemHandleInformation
@@ -168,10 +160,10 @@ internal static class NativeMethods
 
         public WindowInfo(bool? _) : this()   // Allows automatic initialization of "cbSize" with "new WINDOWINFO(null/true/false)".
         {
-            this.cbSize = (uint)(Marshal.SizeOf(typeof(WindowInfo)));
+            this.cbSize = (uint)Marshal.SizeOf<WindowInfo>();
         }
-
     }
+
     [Flags]
     public enum DuplicateOptions : uint
     {
