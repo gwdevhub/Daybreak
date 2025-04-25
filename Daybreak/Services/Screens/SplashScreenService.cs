@@ -41,8 +41,8 @@ internal sealed class SplashScreenService : ISplashScreenService
         var targetScreen = GetScreens().MaxBy(s => CalculateAreaOfRectIntersection(s.Size, launcherCoords));
         if (targetScreen is not null)
         {
-            this.splashWindow.Left = targetScreen.Size.Left + targetScreen.Size.Width / 2 - this.splashWindow.Width / 2;
-            this.splashWindow.Top = targetScreen.Size.Top + targetScreen.Size.Height / 2 - this.splashWindow.Height / 2;
+            this.splashWindow.Left = targetScreen.Size.Left + (targetScreen.Size.Width / 2) - (this.splashWindow.Width / 2);
+            this.splashWindow.Top = targetScreen.Size.Top + (targetScreen.Size.Height / 2) - (this.splashWindow.Height / 2);
         }
 
         this.splashWindow.Show();

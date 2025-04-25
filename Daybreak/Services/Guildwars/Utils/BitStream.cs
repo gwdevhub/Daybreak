@@ -63,10 +63,10 @@ internal sealed class BitStream
             else
             {
                 var bytes = new byte[4];
-                this.input.Read(bytes, 0, 4);
+                this.input.ReadExactly(bytes, 0, 4);
                 this.buf2 = BitConverter.ToUInt32(bytes);
                 this.idx += 4;
-                var newAvail = (this.avail + 32) - count;
+                var newAvail = this.avail + 32 - count;
                 this.buf1 += this.buf2 >> newAvail;
                 this.buf2 = U32(this.buf2 << (count - this.avail));
                 this.avail = newAvail;

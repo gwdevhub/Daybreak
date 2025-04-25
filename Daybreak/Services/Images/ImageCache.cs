@@ -22,7 +22,10 @@ using System.Windows.Media.Imaging;
 
 namespace Daybreak.Services.Images;
 
-internal sealed class ImageCache : IImageCache
+internal sealed class ImageCache(
+    IMetricsService metricsService,
+    ILiveOptions<ImageCacheOptions> options,
+    ILogger<ImageCache> logger) : IImageCache
 {
     private const string LatencyMetricName = "Image retrieval latency";
     private const string LatencyMetricDescription = "Number of milliseconds spent while retrieving images";
@@ -32,25 +35,14 @@ internal sealed class ImageCache : IImageCache
     private const string CacheSizeMetricUnitName = "bytes";
 
     private readonly SemaphoreSlim cacheSemaphore = new(1, 1);
-    private readonly ILiveOptions<ImageCacheOptions> options;
-    private readonly ILogger<ImageCache> logger;
+    private readonly ILiveOptions<ImageCacheOptions> options = options.ThrowIfNull();
+    private readonly ILogger<ImageCache> logger = logger.ThrowIfNull();
     private readonly ConcurrentDictionary<string, ImageEntry> imageEntryCache = new();
-    private readonly Histogram<double> imageRetrievalLatency;
-    private readonly Histogram<double> imageCacheSize;
-    private double currentCacheSize = 0;
-
-    public ImageCache(
-        IMetricsService metricsService,
-        ILiveOptions<ImageCacheOptions> options,
-        ILogger<ImageCache> logger)
-    {
-        this.options = options.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-        this.imageRetrievalLatency = metricsService.ThrowIfNull()
+    private readonly Histogram<double> imageRetrievalLatency = metricsService.ThrowIfNull()
             .CreateHistogram<double>(LatencyMetricName, LatencyMetricUnitName, LatencyMetricDescription, AggregationTypes.NoAggregate);
-        this.imageCacheSize = metricsService.ThrowIfNull()
+    private readonly Histogram<double> imageCacheSize = metricsService.ThrowIfNull()
             .CreateHistogram<double>(CacheSizeMetricName, CacheSizeMetricUnitName, CacheSizeMetricDescription, AggregationTypes.NoAggregate);
-    }
+    private double currentCacheSize = 0;
 
     public async Task<ImageSource?> GetImage(string? uri)
     {
@@ -88,7 +80,7 @@ internal sealed class ImageCache : IImageCache
         var fileInfo = new FileInfo(uri);
         if (this.currentCacheSize + fileInfo.Length > this.options.Value.MemoryImageCacheLimit * 10e5)
         {
-            var spaceToFree = (this.currentCacheSize + fileInfo.Length) - this.options.Value.MemoryImageCacheLimit * 10e5;
+            var spaceToFree = this.currentCacheSize + fileInfo.Length - (this.options.Value.MemoryImageCacheLimit * 10e5);
             scopedLogger.LogInformation($"Exceeding cache size. Freeing up {spaceToFree} bytes");
             this.FreeCache(spaceToFree);
             scopedLogger.LogInformation($"New cache size: {this.currentCacheSize} bytes");
@@ -137,7 +129,7 @@ internal sealed class ImageCache : IImageCache
             bitmapImage.EndInit();
             bitmapImage.Freeze();
 
-            var size = (bitmapImage.Format.BitsPerPixel / 8) * bitmapImage.PixelWidth * bitmapImage.PixelHeight;
+            var size = bitmapImage.Format.BitsPerPixel / 8 * bitmapImage.PixelWidth * bitmapImage.PixelHeight;
             var imageEntry = new ImageEntry
             {
                 ImageSource = bitmapImage,

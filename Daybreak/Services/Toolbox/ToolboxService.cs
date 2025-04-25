@@ -1,20 +1,17 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Exceptions;
-using Daybreak.Models;
 using Daybreak.Models.Builds;
 using Daybreak.Models.Mods;
 using Daybreak.Models.Progress;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Injection;
 using Daybreak.Services.Notifications;
-using Daybreak.Services.Scanner;
 using Daybreak.Services.Toolbox.Models;
 using Daybreak.Services.Toolbox.Notifications;
 using Daybreak.Services.Toolbox.Utilities;
 using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
-using PeNet.Header.Resource;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -23,7 +20,6 @@ using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
 using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
@@ -31,7 +27,13 @@ using System.Threading.Tasks;
 
 namespace Daybreak.Services.Toolbox;
 
-internal sealed class ToolboxService : IToolboxService
+internal sealed class ToolboxService(
+    IBuildTemplateManager buildTemplateManager,
+    INotificationService notificationService,
+    IProcessInjector processInjector,
+    IToolboxClient toolboxClient,
+    ILiveUpdateableOptions<ToolboxOptions> toolboxOptions,
+    ILogger<ToolboxService> logger) : IToolboxService
 {
     private const string ToolboxDestinationDirectorySubPath = "GWToolbox";
     private const string ToolboxBuildsFileName = "builds.ini";
@@ -42,12 +44,12 @@ internal sealed class ToolboxService : IToolboxService
     private static readonly string UsualToolboxLocation = Path.GetFullPath(
         Path.Combine(UsualToolboxFolderLocation, "GWToolboxdll.dll"));
 
-    private readonly IBuildTemplateManager buildTemplateManager;
-    private readonly INotificationService notificationService;
-    private readonly IProcessInjector processInjector;
-    private readonly IToolboxClient toolboxClient;
-    private readonly ILiveUpdateableOptions<ToolboxOptions> toolboxOptions;
-    private readonly ILogger<ToolboxService> logger;
+    private readonly IBuildTemplateManager buildTemplateManager = buildTemplateManager.ThrowIfNull();
+    private readonly INotificationService notificationService = notificationService.ThrowIfNull();
+    private readonly IProcessInjector processInjector = processInjector.ThrowIfNull();
+    private readonly IToolboxClient toolboxClient = toolboxClient.ThrowIfNull();
+    private readonly ILiveUpdateableOptions<ToolboxOptions> toolboxOptions = toolboxOptions.ThrowIfNull();
+    private readonly ILogger<ToolboxService> logger = logger.ThrowIfNull();
 
     public string Name => "GWToolbox";
     public bool IsEnabled
@@ -61,38 +63,13 @@ internal sealed class ToolboxService : IToolboxService
     }
     public bool IsInstalled => File.Exists(this.toolboxOptions.Value.DllPath);
 
-    public ToolboxService(
-        IBuildTemplateManager buildTemplateManager,
-        INotificationService notificationService,
-        IProcessInjector processInjector,
-        IToolboxClient toolboxClient,
-        ILiveUpdateableOptions<ToolboxOptions> toolboxOptions,
-        ILogger<ToolboxService> logger)
-    {
-        this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
-        this.notificationService = notificationService.ThrowIfNull();
-        this.processInjector = processInjector.ThrowIfNull();
-        this.toolboxClient = toolboxClient.ThrowIfNull();
-        this.toolboxOptions = toolboxOptions.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
-
     public Task OnGuildWarsStarting(GuildWarsStartingContext guildWarsStartingContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public Task OnGuildWarsStartingDisabled(GuildWarsStartingDisabledContext guildWarsStartingDisabledContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public async Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken)
-    {
-        await this.LaunchToolbox(guildWarsCreatedContext.ApplicationLauncherContext.Process, cancellationToken);
+    public Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
-        /*
-         * Toolbox startup conflicts with Daybreak GWCA integration. Wait some time
-         * so that toolbox has the chance to set up its hooks.
-         */
-        await Task.Delay(TimeSpan.FromSeconds(this.toolboxOptions.Value.StartupDelay), cancellationToken);
-    }
-
-    public Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken) => this.LaunchToolbox(guildWarsStartedContext.ApplicationLauncherContext.Process, cancellationToken);
 
     public IEnumerable<string> GetCustomArguments() => [];
 
@@ -157,7 +134,7 @@ internal sealed class ToolboxService : IToolboxService
         }
 
         using var textReader = new StreamReader(toolboxBuildsFile);
-        await foreach (var build in this.ParseToolboxBuilds(cancellationToken, textReader))
+        await foreach (var build in this.ParseToolboxBuilds(textReader, cancellationToken))
         {
             yield return build;
         }
@@ -183,7 +160,7 @@ internal sealed class ToolboxService : IToolboxService
 
         var buildsToSave = new List<TeamBuildEntry>();
         using var textReader = new StreamReader(new FileStream(toolboxBuildsFile, FileMode.Open, FileAccess.Read));
-        await foreach(var build in this.ParseToolboxBuilds(cancellationToken, textReader))
+        await foreach(var build in this.ParseToolboxBuilds(textReader, cancellationToken))
         {
             if (!build.ToolboxBuildId.HasValue)
             {
@@ -226,7 +203,7 @@ internal sealed class ToolboxService : IToolboxService
 
         var buildsToSave = new List<TeamBuildEntry>();
         using var textReader = new StreamReader(new FileStream(toolboxBuildsFile, FileMode.Open, FileAccess.Read));
-        await foreach (var build in this.ParseToolboxBuilds(cancellationToken, textReader))
+        await foreach (var build in this.ParseToolboxBuilds(textReader, cancellationToken))
         {
             if (!build.ToolboxBuildId.HasValue)
             {
@@ -262,7 +239,7 @@ internal sealed class ToolboxService : IToolboxService
 
         var buildsToSave = new List<TeamBuildEntry>();
         using var textReader = new StreamReader(new FileStream(toolboxBuildsFile, FileMode.Open, FileAccess.Read));
-        await foreach (var build in this.ParseToolboxBuilds(cancellationToken, textReader))
+        await foreach (var build in this.ParseToolboxBuilds(textReader, cancellationToken))
         {
             if (!build.ToolboxBuildId.HasValue)
             {
@@ -282,7 +259,7 @@ internal sealed class ToolboxService : IToolboxService
     private async Task<bool> SetupToolboxDll(ToolboxInstallationStatus toolboxInstallationStatus)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        if (File.Exists(this.toolboxOptions.Value.DllPath) && !(await this.IsUpdateAvailable(CancellationToken.None)))
+        if (File.Exists(this.toolboxOptions.Value.DllPath) && !await this.IsUpdateAvailable(CancellationToken.None))
         {
             return true;
         }
@@ -330,7 +307,7 @@ internal sealed class ToolboxService : IToolboxService
             scopedLogger.LogInformation("Injected toolbox dll");
             this.notificationService.NotifyInformation(
                 title: "GWToolbox started",
-                description: "GWToolbox has been injected. Delaying startup so that GWToolbox has time to initialize");
+                description: "GWToolbox has been injected");
         }
         else
         {
@@ -377,7 +354,7 @@ internal sealed class ToolboxService : IToolboxService
         return false;
     }
 
-    private async IAsyncEnumerable<TeamBuildEntry> ParseToolboxBuilds([EnumeratorCancellation] CancellationToken cancellationToken, TextReader textReader)
+    private async IAsyncEnumerable<TeamBuildEntry> ParseToolboxBuilds(TextReader textReader, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         TeamBuildEntry? teamBuild = default;
         while (await textReader.ReadLineAsync(cancellationToken) is string headerLine)
@@ -403,8 +380,8 @@ internal sealed class ToolboxService : IToolboxService
                 }
 
                 var equalSignIndex = teamBuildLine.IndexOf('=');
-                var propertyName = teamBuildLine.Substring(0, equalSignIndex).Trim(' ');
-                var propertyValue = teamBuildLine.Substring(equalSignIndex + 1, teamBuildLine.Length - equalSignIndex - 1).Trim(' ');
+                var propertyName = teamBuildLine[..equalSignIndex].Trim(' ');
+                var propertyValue = teamBuildLine[(equalSignIndex + 1)..].Trim(' ');
                 if (propertyName is "buildname")
                 {
                     teamBuild = this.buildTemplateManager.CreateTeamBuild(propertyValue);
@@ -436,8 +413,8 @@ internal sealed class ToolboxService : IToolboxService
                         }
 
                         equalSignIndex = singleBuildLine.IndexOf('=');
-                        propertyName = singleBuildLine.Substring(0, equalSignIndex).Trim(' ');
-                        propertyValue = singleBuildLine.Substring(equalSignIndex + 1, singleBuildLine.Length - equalSignIndex - 1);
+                        propertyName = singleBuildLine[..equalSignIndex].Trim(' ');
+                        propertyValue = singleBuildLine[(equalSignIndex + 1)..];
                         if (propertyName.StartsWith("name") &&
                             int.TryParse(propertyName.Replace("name", ""), out var singleBuildNameIndex))
                         {
