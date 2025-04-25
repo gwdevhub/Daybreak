@@ -343,9 +343,9 @@ public class ProjectConfiguration : PluginConfigurationBase
     public override void RegisterMods(IModsManager modsManager)
     {
         modsManager.RegisterMod<IGuildWarsVersionChecker, GuildWarsVersionChecker>();
+        modsManager.RegisterMod<IToolboxService, ToolboxService>();
         modsManager.RegisterMod<IReShadeService, ReShadeService>();
         modsManager.RegisterMod<IUModService, UModService>();
-        modsManager.RegisterMod<IToolboxService, ToolboxService>();
         modsManager.RegisterMod<IDSOALService, DSOALService>();
         modsManager.RegisterMod<IGuildwarsScreenPlacer, GuildwarsScreenPlacer>();
         modsManager.RegisterMod<IDirectSongService, DirectSongService>(singleton: true);
