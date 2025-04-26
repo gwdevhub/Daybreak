@@ -10,6 +10,7 @@ using Daybreak.Services.Privilege;
 using Daybreak.Utils;
 using Daybreak.Views;
 using Microsoft.Extensions.Logging;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -29,7 +30,13 @@ using static Daybreak.Utils.NativeMethods;
 
 namespace Daybreak.Services.ApplicationLauncher;
 
-internal sealed class ApplicationLauncher : IApplicationLauncher
+internal sealed class ApplicationLauncher(
+    INotificationService notificationService,
+    ILiveOptions<LauncherOptions> launcherOptions,
+    IMutexHandler mutexHandler,
+    IModsManager modsManager,
+    ILogger<ApplicationLauncher> logger,
+    IPrivilegeManager privilegeManager) : IApplicationLauncher
 {
     private const string ProcessName = "gw";
     private const string ArenaNetMutex = "AN-Mute";
@@ -37,28 +44,12 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
 
     private static readonly TimeSpan LaunchTimeout = TimeSpan.FromMinutes(1);
 
-    private readonly INotificationService notificationService;
-    private readonly ILiveOptions<LauncherOptions> launcherOptions;
-    private readonly IMutexHandler mutexHandler;
-    private readonly IModsManager modsManager;
-    private readonly ILogger<ApplicationLauncher> logger;
-    private readonly IPrivilegeManager privilegeManager;
-
-    public ApplicationLauncher(
-        INotificationService notificationService,
-        ILiveOptions<LauncherOptions> launcherOptions,
-        IMutexHandler mutexHandler,
-        IModsManager modsManager,
-        ILogger<ApplicationLauncher> logger,
-        IPrivilegeManager privilegeManager)
-    {
-        this.logger = logger.ThrowIfNull();
-        this.mutexHandler = mutexHandler.ThrowIfNull();
-        this.launcherOptions = launcherOptions.ThrowIfNull();
-        this.modsManager = modsManager.ThrowIfNull();
-        this.privilegeManager = privilegeManager.ThrowIfNull();
-        this.notificationService = notificationService.ThrowIfNull();
-    }
+    private readonly INotificationService notificationService = notificationService.ThrowIfNull();
+    private readonly ILiveOptions<LauncherOptions> launcherOptions = launcherOptions.ThrowIfNull();
+    private readonly IMutexHandler mutexHandler = mutexHandler.ThrowIfNull();
+    private readonly IModsManager modsManager = modsManager.ThrowIfNull();
+    private readonly ILogger<ApplicationLauncher> logger = logger.ThrowIfNull();
+    private readonly IPrivilegeManager privilegeManager = privilegeManager.ThrowIfNull();
 
     public async Task<GuildWarsApplicationLaunchContext?> LaunchGuildwars(LaunchConfigurationWithCredentials launchConfigurationWithCredentials)
     {
@@ -87,7 +78,8 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
             return null;
         }
 
-        var gwProcess = await this.LaunchGuildwarsProcess(launchConfigurationWithCredentials);
+        using var timeout = new CancellationTokenSource(LaunchTimeout);
+        var gwProcess = await this.LaunchGuildwarsProcess(launchConfigurationWithCredentials, timeout.Token);
         if (gwProcess is null)
         {
             return default;
@@ -166,7 +158,7 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
         Application.Current.Shutdown();
     }
 
-    private async Task<Process?> LaunchGuildwarsProcess(LaunchConfigurationWithCredentials launchConfigurationWithCredentials)
+    private async Task<Process?> LaunchGuildwarsProcess(LaunchConfigurationWithCredentials launchConfigurationWithCredentials, CancellationToken cancellationToken)
     {
         var email = launchConfigurationWithCredentials.Credentials!.Username;
         var password = launchConfigurationWithCredentials.Credentials!.Password;
@@ -274,26 +266,14 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
         do
         {
             process = Process.GetProcessById(pId);
+            await Task.Delay(100, cancellationToken);
         } while (process is null);
 
-        while (true)
+        if (!McPatch(process.Handle))
         {
-            // We need to verify that the process is actually started. This needs to be in a try/catch block because process.Id throws when the process is invalid
-            try
-            {
-                if (process.Id != 0)
-                {
-                    break;
-                }
-            }
-            catch
-            {
-            }
-        }
-
-        while (!process.Responding)
-        {
-            await Task.Delay(1000, CancellationToken.None);
+            var lastErr = Marshal.GetLastWin32Error();
+            this.logger.LogError($"Failed to patch GuildWars process. Error code: {lastErr}");
+            return default;
         }
 
         // Reset launch context with the launched process
@@ -335,7 +315,6 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
 
         if (clientHandle != IntPtr.Zero)
         {
-            McPatch(process.Handle);
             _ = ResumeThread(clientHandle);
             CloseHandle(clientHandle);
         }
@@ -343,7 +322,7 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
         var sw = Stopwatch.StartNew();
         while (sw.Elapsed.TotalSeconds < LaunchTimeout.TotalSeconds)
         {
-            await Task.Delay(500);
+            await Task.Delay(500, cancellationToken);
             var gwProcess = Process.GetProcessesByName("gw").FirstOrDefault();
             if (gwProcess is null)
             {
@@ -566,7 +545,7 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
             var hSnapshot = CreateToolhelp32Snapshot(0x00000002, 0); // 0x00000002 is the TH32CS_SNAPPROCESS flag
             var pe32 = new ProcessEntry32
             {
-                dwSize = (uint)Marshal.SizeOf(typeof(ProcessEntry32))
+                dwSize = (uint)Marshal.SizeOf<ProcessEntry32>()
             };
 
             var nameBuffer = new StringBuilder(1024);
@@ -607,9 +586,9 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
         hThread = IntPtr.Zero;
 
         ProcessInformation procinfo;
-        StartupInfo startinfo = new()
+        var startinfo = new StartupInfo
         {
-            cb = Marshal.SizeOf(typeof(StartupInfo))
+            cb = Marshal.SizeOf<StartupInfo>()
         };
         var saProcess = new SecurityAttributes();
         saProcess.nLength = (uint)Marshal.SizeOf(saProcess);
@@ -618,6 +597,9 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
 
         var lastDirectory = Directory.GetCurrentDirectory();
         Directory.SetCurrentDirectory(Path.GetDirectoryName(path)!);
+
+        SetRegistryValue(@"Software\ArenaNet\Guild Wars", "Path", path);
+        SetRegistryValue(@"Software\ArenaNet\Guild Wars", "Src", path);
 
         if (!elevated)
         {
@@ -654,6 +636,7 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
                 return 0;
             }
 
+            LocalFree(tml.Label.Sid);
             if (!CreateProcessAsUser(hRestrictedToken, null!, commandLine, ref saProcess,
                     ref saProcess, false, (uint)CreationFlags.CreateSuspended, IntPtr.Zero,
                     null!, ref startinfo, out procinfo))
@@ -674,7 +657,7 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
             {
                 var error = Marshal.GetLastWin32Error();
                 Debug.WriteLine($"CreateProcess {error}");
-                ResumeThread(procinfo.hThread);
+                _ = ResumeThread(procinfo.hThread);
                 CloseHandle(procinfo.hThread);
                 return 0;
             }
@@ -693,10 +676,10 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
     private static bool McPatch(IntPtr processHandle)
     {
         byte[] sigPatch =
-        {
+        [
             0x56, 0x57, 0x68, 0x00, 0x01, 0x00, 0x00, 0x89, 0x85, 0xF4, 0xFE, 0xFF, 0xFF, 0xC7, 0x00, 0x00, 0x00, 0x00,
             0x00
-        };
+        ];
         var moduleBase = GetProcessModuleBase(processHandle);
         var gwdata = new byte[0x48D000];
 
@@ -714,7 +697,7 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
 
         var mcpatch = moduleBase + idx - 0x1A;
 
-        byte[] payload = { 0x31, 0xC0, 0x90, 0xC3 };
+        byte[] payload = [0x31, 0xC0, 0x90, 0xC3];
 
         return NativeMethods.WriteProcessMemory(processHandle, mcpatch, payload, payload.Length, out _);
     }
@@ -722,16 +705,16 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
     /// <summary>
     /// https://github.com/GregLando113/gwlauncher/blob/master/GW%20Launcher/MulticlientPatch.cs
     /// </summary>
-    private static int SearchBytes(IReadOnlyList<byte> haystack, IReadOnlyList<byte> needle)
+    private static int SearchBytes(Memory<byte> haystack, Memory<byte> needle)
     {
-        var len = needle.Count;
-        var limit = haystack.Count - len;
+        var len = needle.Length;
+        var limit = haystack.Length - len;
         for (var i = 0; i <= limit; i++)
         {
             var k = 0;
             for (; k < len; k++)
             {
-                if (needle[k] != haystack[i + k])
+                if (needle.Span[k] != haystack.Span[i + k])
                 {
                     break;
                 }
@@ -752,14 +735,14 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
     private static IntPtr GetProcessModuleBase(IntPtr process)
     {
         if (NativeMethods.NtQueryInformationProcess(process, NativeMethods.ProcessInfoClass.ProcessBasicInformation, out var pbi,
-                Marshal.SizeOf(typeof(NativeMethods.ProcessBasicInformation)), out _) != 0)
+                Marshal.SizeOf<ProcessBasicInformation>(), out _) != 0)
         {
             return IntPtr.Zero;
         }
 
-        var buffer = new byte[Marshal.SizeOf(typeof(PEB))];
+        var buffer = new byte[Marshal.SizeOf<PEB>()];
 
-        if (!NativeMethods.ReadProcessMemory(process, pbi.PebBaseAddress, buffer, Marshal.SizeOf(typeof(PEB)), out _))
+        if (!NativeMethods.ReadProcessMemory(process, pbi.PebBaseAddress, buffer, Marshal.SizeOf<PEB>(), out _))
         {
             return IntPtr.Zero;
         }
@@ -792,7 +775,7 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
         var listHandle = GCHandle.Alloc(result);
         try
         {
-            Win32Callback childProc = new Win32Callback(EnumWindow);
+            var childProc = new Win32Callback(EnumWindow);
             EnumChildWindows(parent, childProc, GCHandle.ToIntPtr(listHandle));
         }
         finally
@@ -824,5 +807,11 @@ internal sealed class ApplicationLauncher : IApplicationLauncher
 
         list.Add(handle);
         return true;
+    }
+
+    private static void SetRegistryValue(string registryPath, string valueName, object newValue)
+    {
+        using var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(registryPath);
+        key.SetValue(valueName, newValue, RegistryValueKind.String);
     }
 }
