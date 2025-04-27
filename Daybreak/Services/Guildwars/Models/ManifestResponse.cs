@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Daybreak.Services.GuildWars.Models;
+namespace Daybreak.Services.Guildwars.Models;
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 internal readonly struct ManifestResponse
 {

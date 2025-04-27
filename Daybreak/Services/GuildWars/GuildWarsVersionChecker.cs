@@ -1,5 +1,6 @@
 ﻿using Daybreak.Models.Mods;
 using Daybreak.Services.ExecutableManagement;
+using Daybreak.Services.Guildwars;
 using Daybreak.Services.Notifications;
 using Microsoft.Extensions.Logging;
 using System;

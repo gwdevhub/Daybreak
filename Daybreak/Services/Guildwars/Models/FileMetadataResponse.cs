@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Services.GuildWars.Models;
+﻿namespace Daybreak.Services.Guildwars.Models;
 internal readonly struct FileMetadataResponse
 {
     public readonly short Field1 { get; init; }
