@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Daybreak.Services.GuildWars;
+namespace Daybreak.Services.Guildwars;
 
 internal sealed class GuildWarsCopyService : IGuildWarsCopyService
 {

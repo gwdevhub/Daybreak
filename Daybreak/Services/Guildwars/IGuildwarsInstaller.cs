@@ -1,10 +1,10 @@
 ﻿using Daybreak.Models.Progress;
-using Daybreak.Services.GuildWars.Models;
+using Daybreak.Services.Guildwars.Models;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Daybreak.Services.GuildWars;
+namespace Daybreak.Services.Guildwars;
 public interface IGuildWarsInstaller
 {
     Task<bool> UpdateGuildwars(string exePath, GuildwarsInstallationStatus installationStatus, CancellationToken cancellationToken);

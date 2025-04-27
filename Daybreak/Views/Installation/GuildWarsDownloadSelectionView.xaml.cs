@@ -1,6 +1,6 @@
 ﻿using Daybreak.Models.Progress;
-using Daybreak.Services.GuildWars;
-using Daybreak.Services.GuildWars.Models;
+using Daybreak.Services.Guildwars;
+using Daybreak.Services.Guildwars.Models;
 using Daybreak.Services.Navigation;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;

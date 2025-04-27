@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Daybreak.Services.GuildWars.Utils;
+namespace Daybreak.Services.Guildwars.Utils;
 /// <summary>
 /// https://github.com/gwdevhub/gwlauncher/blob/master/GW%20Launcher/Guildwars/FileIdFinder.cs
 /// </summary>

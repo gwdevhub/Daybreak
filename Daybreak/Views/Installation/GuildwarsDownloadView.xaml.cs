@@ -4,11 +4,11 @@ using System.Windows;
 using Daybreak.Models.Progress;
 using System.Core.Extensions;
 using System.Windows.Extensions;
-using Daybreak.Services.GuildWars;
 using System.Threading;
 using System.Windows.Controls;
 using Daybreak.Services.Menu;
-using Daybreak.Services.GuildWars.Models;
+using Daybreak.Services.Guildwars;
+using Daybreak.Services.Guildwars.Models;
 
 namespace Daybreak.Views.Installation;
 

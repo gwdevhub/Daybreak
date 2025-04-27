@@ -2,6 +2,7 @@
 using System.Core.Extensions;
 using System.IO;
 
+namespace Daybreak.Services.Guildwars.Utils;
 /// <summary>
 /// https://github.com/reduf/Headquarter/blob/decomp/tools/inflate.py
 /// </summary>

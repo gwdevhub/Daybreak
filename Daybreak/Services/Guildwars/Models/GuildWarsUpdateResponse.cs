@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Services.GuildWars.Models;
+﻿namespace Daybreak.Services.Guildwars.Models;
 public sealed class GuildWarsUpdateResponse
 {
     public bool Result { get; init; }

@@ -1,5 +1,5 @@
 ﻿using Daybreak.Models.Progress;
-using Daybreak.Services.GuildWars;
+using Daybreak.Services.Guildwars;
 using Daybreak.Services.Navigation;
 using Daybreak.Views.Launch;
 using Microsoft.Extensions.Logging;
