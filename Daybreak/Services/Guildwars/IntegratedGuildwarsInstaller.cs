@@ -1,6 +1,8 @@
 ﻿using Daybreak.Models.Progress;
 using Daybreak.Services.ExecutableManagement;
-using Daybreak.Services.GuildWars.Models;
+using Daybreak.Services.Guildwars;
+using Daybreak.Services.Guildwars.Models;
+using Daybreak.Services.Guildwars.Utils;
 using Daybreak.Services.GuildWars.Utils;
 using Daybreak.Services.Notifications;
 using Daybreak.Utils;

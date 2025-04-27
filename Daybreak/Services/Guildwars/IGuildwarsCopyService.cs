@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Daybreak.Services.GuildWars;
+namespace Daybreak.Services.Guildwars;
 
 public interface IGuildWarsCopyService
 {

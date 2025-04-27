@@ -1,7 +1,7 @@
 ﻿using Daybreak.Models.Notifications;
 using Daybreak.Models.Notifications.Handling;
 using Daybreak.Models.Progress;
-using Daybreak.Services.GuildWars.Models;
+using Daybreak.Services.Guildwars.Models;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Notifications;
 using Daybreak.Views.Installation;
@@ -11,7 +11,7 @@ using System.Extensions;
 using System.IO;
 using System.Threading;
 
-namespace Daybreak.Services.GuildWars;
+namespace Daybreak.Services.Guildwars;
 internal sealed class GuildWarsUpdateNotificationHandler : INotificationHandler
 {
     private readonly IViewManager viewManager;

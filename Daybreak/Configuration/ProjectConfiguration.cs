@@ -83,6 +83,7 @@ using Daybreak.Launch;
 using Daybreak.Views.Installation;
 using Daybreak.Services.Logging.Models;
 using Daybreak.Services.Toolbox.Notifications;
+using Daybreak.Services.Guildwars;
 
 namespace Daybreak.Configuration;
 

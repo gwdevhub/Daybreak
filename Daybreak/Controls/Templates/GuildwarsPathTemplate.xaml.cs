@@ -1,7 +1,7 @@
 ﻿using Daybreak.Controls.Buttons;
 using Daybreak.Models;
 using Daybreak.Models.Progress;
-using Daybreak.Services.GuildWars;
+using Daybreak.Services.Guildwars;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using System;

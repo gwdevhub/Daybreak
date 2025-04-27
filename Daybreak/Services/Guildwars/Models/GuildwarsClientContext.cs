@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net.Sockets;
 
-namespace Daybreak.Services.GuildWars.Models;
+namespace Daybreak.Services.Guildwars.Models;
 internal readonly struct GuildWarsClientContext : IDisposable
 {
     public Socket Socket { get; init; }
