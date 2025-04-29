@@ -131,7 +131,8 @@ public partial class LaunchButtonTemplate : UserControl
         }
 
         // If FocusView is disabled, don't initialize memory scanner, instead just allow the user to kill the game
-        if (!this.liveOptions.Value.Enabled)
+        if (!this.liveOptions.Value.Enabled ||
+            !launcherViewContext.IsSelected)
         {
             this.GameRunning = false;
             this.CanLaunch = false;
