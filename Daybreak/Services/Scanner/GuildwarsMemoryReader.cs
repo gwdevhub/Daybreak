@@ -20,18 +20,15 @@ using System.Threading.Tasks;
 namespace Daybreak.Services.Scanner;
 
 public sealed class GuildwarsMemoryReader(
-    IApplicationLauncher applicationLauncher,
     IMemoryScanner memoryScanner,
     IMetricsService metricsService,
     ILogger<GuildwarsMemoryReader> logger) : IGuildwarsMemoryReader
 {
-    private const int MaxTrapezoidCount = 1000000;
     private const int RetryInitializationCount = 5;
     private const string LatencyMeterName = "Memory Reader Latency";
     private const string LatencyMeterUnitsName = "Milliseconds";
     private const string LatencyMeterDescription = "Amount of milliseconds elapsed while reading memory. P95 aggregation";
 
-    private readonly IApplicationLauncher applicationLauncher = applicationLauncher.ThrowIfNull();
     private readonly IMemoryScanner memoryScanner = memoryScanner.ThrowIfNull();
     private readonly Histogram<double> latencyMeter = metricsService.ThrowIfNull().CreateHistogram<double>(LatencyMeterName, LatencyMeterUnitsName, LatencyMeterDescription, AggregationTypes.P95);
     private readonly ILogger<GuildwarsMemoryReader> logger = logger.ThrowIfNull();
@@ -745,10 +742,10 @@ public sealed class GuildwarsMemoryReader(
                 Primary = primaryProfession,
                 Secondary = secondaryProfession,
                 Attributes = attributes,
-                Skills = skillContexts.Select(s =>
+                Skills = [.. skillContexts.Select(s =>
                         Skill.TryParse((int)s.Id, out var parsedSkill) ?
                         parsedSkill :
-                        Skill.NoSkill).ToList()
+                        Skill.NoSkill)]
             };
         }
 

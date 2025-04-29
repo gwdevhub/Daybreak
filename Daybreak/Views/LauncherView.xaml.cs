@@ -189,7 +189,16 @@ public partial class LauncherView : UserControl
             return;
         }
 
-        await this.Dispatcher.InvokeAsync(() => this.CanLaunch = this.LatestConfiguration.CanLaunch);
+        await this.Dispatcher.InvokeAsync(() =>
+        {
+            foreach (var config in this.LaunchConfigurations)
+            {
+                config.IsSelected = false;
+            }
+
+            this.LatestConfiguration.IsSelected = true;
+            this.CanLaunch = this.LatestConfiguration.CanLaunch;
+        });
     }
 
     private async Task KillGuildWars()
