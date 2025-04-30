@@ -269,7 +269,7 @@ public partial class LauncherView : UserControl
         if (this.applicationLauncher.GetGuildwarsProcess(launcherViewContext.Configuration) is not GuildWarsApplicationLaunchContext context)
         {
             launcherViewContext.GameRunning = false;
-            launcherViewContext.CanLaunch = false;
+            launcherViewContext.CanLaunch = true;
             launcherViewContext.CanAttach = false;
             launcherViewContext.CanKill = false;
             return;
