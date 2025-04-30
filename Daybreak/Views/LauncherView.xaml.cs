@@ -8,6 +8,7 @@ using Daybreak.Services.LaunchConfigurations;
 using Daybreak.Services.Menu;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Onboarding;
+using Daybreak.Services.Scanner;
 using Daybreak.Services.Screens;
 using System;
 using System.Collections.ObjectModel;
@@ -20,6 +21,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
+using System.Windows.Threading;
 
 namespace Daybreak.Views;
 
@@ -30,6 +32,7 @@ namespace Daybreak.Views;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
 public partial class LauncherView : UserControl
 {
+    private readonly IGuildwarsMemoryReader guildwarsMemoryReader;
     private readonly IMenuService menuService;
     private readonly ILaunchConfigurationService launchConfigurationService;
     private readonly IConnectivityStatus connectivityStatus;
@@ -51,6 +54,7 @@ public partial class LauncherView : UserControl
     public ObservableCollection<LauncherViewContext> LaunchConfigurations { get; } = [];
 
     public LauncherView(
+        IGuildwarsMemoryReader guildwarsMemoryReader,
         IMenuService menuService,
         ILaunchConfigurationService launchConfigurationService,
         IConnectivityStatus connectivityStatus,
@@ -60,6 +64,7 @@ public partial class LauncherView : UserControl
         IScreenManager screenManager,
         ILiveOptions<FocusViewOptions> focusViewOptions)
     {
+        this.guildwarsMemoryReader = guildwarsMemoryReader.ThrowIfNull();
         this.menuService = menuService.ThrowIfNull();
         this.launchConfigurationService = launchConfigurationService.ThrowIfNull();
         this.connectivityStatus = connectivityStatus.ThrowIfNull();
@@ -102,16 +107,16 @@ public partial class LauncherView : UserControl
         }
     }
 
-    private async Task PeriodicallyCheckSelectedConfigState()
+    private async Task PeriodicallyCheckSelectedConfigState(CancellationToken cancellationToken)
     {
-        while (this.cancellationTokenSource?.Token is CancellationToken token && this.cancellationTokenSource?.IsCancellationRequested is false)
+        while (!cancellationToken.IsCancellationRequested)
         {
             if (!this.launching)
             {
-                await this.Dispatcher.InvokeAsync(this.SetLaunchButtonState);
+                await this.Dispatcher.InvokeAsync(() => this.SetLaunchButtonState(cancellationToken));
             }
 
-            await Task.Delay(TimeSpan.FromSeconds(1), token);
+            await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
         }
     }
 
@@ -124,8 +129,9 @@ public partial class LauncherView : UserControl
 
         this.cancellationTokenSource?.Dispose();
         this.cancellationTokenSource = new CancellationTokenSource();
+        var cancellationToken = this.cancellationTokenSource.Token;
         this.RetrieveLaunchConfigurations();
-        new TaskFactory().StartNew(this.PeriodicallyCheckSelectedConfigState, this.cancellationTokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        Task.Factory.StartNew(() => this.PeriodicallyCheckSelectedConfigState(cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
     }
 
     private void StartupView_Unloaded(object sender, RoutedEventArgs e)
@@ -134,14 +140,14 @@ public partial class LauncherView : UserControl
         this.cancellationTokenSource?.Dispose();
     }
 
-    private async void DropDownButton_SelectionChanged(object _, object e)
+    private void DropDownButton_SelectionChanged(object _, object e)
     {
         if (e is not LauncherViewContext)
         {
             return;
         }
 
-        await this.SetLaunchButtonState();
+        this.CanLaunch = false;
     }
 
     private async void DropDownButton_Clicked(object _, object __)
@@ -175,30 +181,27 @@ public partial class LauncherView : UserControl
         this.launching = false;
     }
 
-    private async Task SetLaunchButtonState()
+    private void SetLaunchButtonState(CancellationToken cancellationToken)
     {
         if (this.LatestConfiguration is null)
         {
-            await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);
+            this.CanLaunch = false;
             return;
         }
 
-        if (this.LatestConfiguration.CanKill is true)
+        if (this.LatestConfiguration.CanKill ||
+            this.LatestConfiguration.CanLaunch ||
+            this.LatestConfiguration.CanAttach)
         {
-            await this.Dispatcher.InvokeAsync(() => this.CanLaunch = true);
-            return;
+            this.CanLaunch = true;
+
         }
 
-        await this.Dispatcher.InvokeAsync(() =>
+        foreach(var config in this.LaunchConfigurations)
         {
-            foreach (var config in this.LaunchConfigurations)
-            {
-                config.IsSelected = false;
-            }
-
-            this.LatestConfiguration.IsSelected = true;
-            this.CanLaunch = this.LatestConfiguration.CanLaunch;
-        });
+            var isSelected = config == this.LatestConfiguration;
+            Task.Factory.StartNew(() => this.CheckGameState(config, isSelected, cancellationToken), cancellationToken);
+        }
     }
 
     private async Task KillGuildWars()
@@ -250,5 +253,66 @@ public partial class LauncherView : UserControl
         catch (Exception)
         {
         }
+    }
+
+    private async Task CheckGameState(LauncherViewContext launcherViewContext, bool isSelected, CancellationToken cancellationToken)
+    {
+        if (launcherViewContext.Configuration is null)
+        {
+            launcherViewContext.GameRunning = false;
+            launcherViewContext.CanLaunch = false;
+            launcherViewContext.CanAttach = false;
+            launcherViewContext.CanKill = false;
+            return;
+        }
+
+        if (this.applicationLauncher.GetGuildwarsProcess(launcherViewContext.Configuration) is not GuildWarsApplicationLaunchContext context)
+        {
+            launcherViewContext.GameRunning = false;
+            launcherViewContext.CanLaunch = false;
+            launcherViewContext.CanAttach = false;
+            launcherViewContext.CanKill = false;
+            return;
+        }
+        else
+        {
+            launcherViewContext.GameRunning = true;
+        }
+
+        launcherViewContext.GameRunning = true;
+        launcherViewContext.CanLaunch = false;
+        launcherViewContext.CanAttach = false;
+        launcherViewContext.CanKill = false;
+        // If FocusView is disabled, don't initialize memory scanner, instead just allow the user to kill the game
+        if (!this.focusViewOptions.Value.Enabled ||
+            !isSelected)
+        {
+            return;
+        }
+
+        await this.guildwarsMemoryReader.EnsureInitialized(context.ProcessId, cancellationToken);
+        if (!await this.guildwarsMemoryReader.IsInitialized(context.ProcessId, cancellationToken))
+        {
+            launcherViewContext.CanKill = true;
+            launcherViewContext.GameRunning = true;
+            launcherViewContext.CanLaunch = false;
+            launcherViewContext.CanAttach = false;
+            return;
+        }
+
+        var loginInfo = await this.guildwarsMemoryReader.ReadLoginData(cancellationToken);
+        if (loginInfo?.Email != context.LaunchConfiguration.Credentials?.Username)
+        {
+            launcherViewContext.GameRunning = false;
+            launcherViewContext.CanAttach = false;
+            launcherViewContext.CanLaunch = false;
+            launcherViewContext.CanKill = true;
+            return;
+        }
+
+        launcherViewContext.GameRunning = true;
+        launcherViewContext.CanAttach = this.focusViewOptions.Value.Enabled;
+        launcherViewContext.CanLaunch = false;
+        launcherViewContext.CanKill = false;
     }
 }

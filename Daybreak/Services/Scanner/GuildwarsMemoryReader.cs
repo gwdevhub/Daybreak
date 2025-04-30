@@ -143,6 +143,9 @@ public sealed class GuildwarsMemoryReader(
             if (this.memoryScanner.Scanning)
             {
                 scopedLogger.LogInformation("Scanner is already scanning a different process. Restart scanner and target the new process");
+                this.globalContextPointer = 0x0;
+                this.instanceInfoPointer = 0x0;
+                this.entityArrayPointer = 0x0;
                 this.memoryScanner.EndScanner();
             }
 
@@ -171,6 +174,9 @@ public sealed class GuildwarsMemoryReader(
             if (this.memoryScanner.Scanning)
             {
                 this.memoryScanner.EndScanner();
+                this.globalContextPointer = 0x0;
+                this.instanceInfoPointer = 0x0;
+                this.entityArrayPointer = 0x0;
             }
 
             try
@@ -458,13 +464,6 @@ public sealed class GuildwarsMemoryReader(
         var baseContextAddress = this.memoryScanner.Read<uint>(basePtr);
         var gameContextPtr = this.memoryScanner.Read<uint>(baseContextAddress + (6 * 4));
         var globalContext = this.memoryScanner.Read<GlobalContext>(gameContextPtr);
-        if (!globalContext.GameContext.IsValid() ||
-            !globalContext.UserContext.IsValid() ||
-            !globalContext.InstanceContext.IsValid())
-        {
-            return default;
-        }
-
         return globalContext;
     }
 
