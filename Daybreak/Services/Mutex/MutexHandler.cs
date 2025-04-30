@@ -65,15 +65,22 @@ internal sealed class MutexHandler : IMutexHandler
             return string.Empty;
         }
 
-        var thisProcess = Process.GetCurrentProcess().Handle;
-        NativeMethods.DuplicateHandle(processHandle, new IntPtr(targetHandleInfo.HandleValue), thisProcess, out var handle, 0, false, NativeMethods.DuplicateOptions.DUPLICATE_SAME_ACCESS);
-        var bufferSize = GetHandleNameLength(handle);
-        var stringBuffer = Marshal.AllocHGlobal(bufferSize);
-        NativeMethods.NtQueryObject(handle, NativeMethods.ObjectInformationClass.ObjectNameInformation, stringBuffer, bufferSize, out _);
-        NativeMethods.CloseHandle(handle);
-        var handleName = ConvertToString(stringBuffer);
-        Marshal.FreeHGlobal(stringBuffer);
-        return handleName;
+        try
+        {
+            var thisProcess = Process.GetCurrentProcess().Handle;
+            NativeMethods.DuplicateHandle(processHandle, new IntPtr(targetHandleInfo.HandleValue), thisProcess, out var handle, 0, false, NativeMethods.DuplicateOptions.DUPLICATE_SAME_ACCESS);
+            var bufferSize = GetHandleNameLength(handle);
+            var stringBuffer = Marshal.AllocHGlobal(bufferSize);
+            NativeMethods.NtQueryObject(handle, NativeMethods.ObjectInformationClass.ObjectNameInformation, stringBuffer, bufferSize, out _);
+            NativeMethods.CloseHandle(handle);
+            var handleName = ConvertToString(stringBuffer);
+            Marshal.FreeHGlobal(stringBuffer);
+            return handleName;
+        }
+        catch(Exception e)
+        {
+            return string.Empty;
+        }
     }
 
     private static IntPtr GetAllHandles()

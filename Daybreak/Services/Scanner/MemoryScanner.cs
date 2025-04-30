@@ -28,18 +28,8 @@ internal sealed class MemoryScanner(
     public uint Size { get; private set; }
     public bool Scanning
     {
-        get
-        {
-            if (!this.semaphoreSlim.Wait(LockTimeout))
-            {
-                return field;
-            }
-
-            var value = field;
-            this.semaphoreSlim.Release();
-            return value;
-        }
-        set
+        get;
+        private set
         {
             if (!this.semaphoreSlim.Wait(LockTimeout))
             {
@@ -99,8 +89,8 @@ internal sealed class MemoryScanner(
         this.Memory = default;
         this.Size = default;
         this.ModuleStartAddress = default;
-        this.Scanning = false;
         this.semaphoreSlim.Release();
+        this.Scanning = false;
     }
 
     public T Read<T>(GuildwarsPointer<T> pointer, uint offset = 0)
@@ -350,6 +340,11 @@ internal sealed class MemoryScanner(
         if (!this.Scanning)
         {
             throw new InvalidOperationException("Scanner is not running");
+        }
+
+        if (this.Memory is null)
+        {
+            throw new InvalidOperationException("Scanner is running but memory is not initialized");
         }
 
         if (this.Process is null ||

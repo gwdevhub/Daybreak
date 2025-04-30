@@ -8,16 +8,6 @@ public sealed class LauncherViewContext : INotifyPropertyChanged
 
     public LaunchConfigurationWithCredentials? Configuration { get; init; }
 
-    public bool IsSelected
-    {
-        get;
-        set
-        {
-            field = value;
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.IsSelected)));
-        }
-    } = false;
-
     public bool CanLaunch
     {
         get;
@@ -35,6 +25,36 @@ public sealed class LauncherViewContext : INotifyPropertyChanged
         {
             field = value;
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CanKill)));
+        }
+    } = false;
+
+    public bool CanAttach
+    {
+        get;
+        set
+        {
+            field = value;
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CanAttach)));
+        }
+    } = false;
+
+    public bool GameRunning
+    {
+        get;
+        set
+        {
+            field = value;
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.GameRunning)));
+        }
+    } = false;
+
+    public bool ShowJustName
+    {
+        get;
+        set
+        {
+            field = value;
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.ShowJustName)));
         }
     } = false;
 }
