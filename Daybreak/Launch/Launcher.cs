@@ -3,6 +3,7 @@ using Daybreak.Models.Progress;
 using Daybreak.Services.ApplicationArguments;
 using Daybreak.Services.Browser;
 using Daybreak.Services.ExceptionHandling;
+using Daybreak.Services.Menu;
 using Daybreak.Services.Mods;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Notifications;
@@ -107,7 +108,8 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
         var modsManager = this.ServiceProvider.GetRequiredService<IModsManager>();
         var browserExtensionsProducer = this.ServiceProvider.GetRequiredService<IBrowserExtensionsProducer>();
         var argumentHandlerProducer = this.ServiceProvider.GetRequiredService<IArgumentHandlerProducer>();
-        
+        var menuServiceProducer = this.ServiceProvider.GetRequiredService<IMenuServiceProducer>();
+
         startupStatus.CurrentStep = StartupStatus.Custom("Loading views");
         this.projectConfiguration.RegisterViews(viewProducer);
         startupStatus.CurrentStep = StartupStatus.Custom("Loading post-update actions");
@@ -122,6 +124,8 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
         this.projectConfiguration.RegisterBrowserExtensions(browserExtensionsProducer);
         startupStatus.CurrentStep = StartupStatus.Custom("Loading argument handlers");
         this.projectConfiguration.RegisterLaunchArgumentHandlers(argumentHandlerProducer);
+        startupStatus.CurrentStep = StartupStatus.Custom("Loading menu buttons");
+        this.projectConfiguration.RegisterMenuButtons(menuServiceProducer);
 
         this.logger = this.ServiceProvider.GetRequiredService<ILogger<Launcher>>();
         this.logger.LogInformation($"Running in {Environment.CurrentDirectory}");
@@ -139,7 +143,8 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
                     notificationHandlerProducer,
                     modsManager,
                     browserExtensionsProducer,
-                    argumentHandlerProducer);
+                    argumentHandlerProducer,
+                    menuServiceProducer);
         }
         catch(Exception e)
         {

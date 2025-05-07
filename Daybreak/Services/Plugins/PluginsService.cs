@@ -2,6 +2,7 @@
 using Daybreak.Models.Plugins;
 using Daybreak.Services.ApplicationArguments;
 using Daybreak.Services.Browser;
+using Daybreak.Services.Menu;
 using Daybreak.Services.Mods;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Notifications;
@@ -75,14 +76,13 @@ internal sealed class PluginsService : IPluginsService
 
     public void SaveEnabledPlugins(IEnumerable<AvailablePlugin> availablePlugins)
     {
-        this.liveUpdateableOptions.Value.EnabledPlugins = availablePlugins
+        this.liveUpdateableOptions.Value.EnabledPlugins = [.. availablePlugins
             .Where(p => p.Enabled)
             .Select(p => new Models.PluginEntry
             {
                 Name = p.Name,
                 Path = p.Path
-            })
-            .ToList();
+            })];
         this.liveUpdateableOptions.UpdateOption();
     }
 
@@ -95,7 +95,8 @@ internal sealed class PluginsService : IPluginsService
         INotificationHandlerProducer notificationHandlerProducer,
         IModsManager modsManager,
         IBrowserExtensionsProducer browserExtensionsProducer,
-        IArgumentHandlerProducer argumentHandlerProducer)
+        IArgumentHandlerProducer argumentHandlerProducer,
+        IMenuServiceProducer menuServiceProducer)
     {
         serviceManager.ThrowIfNull();
         optionsProducer.ThrowIfNull();
@@ -106,6 +107,7 @@ internal sealed class PluginsService : IPluginsService
         modsManager.ThrowIfNull();
         browserExtensionsProducer.ThrowIfNull();
         argumentHandlerProducer.ThrowIfNull();
+        menuServiceProducer.ThrowIfNull();
 
         this.pluginsSemaphore.Wait();
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.LoadPlugins), string.Empty);
@@ -182,6 +184,8 @@ internal sealed class PluginsService : IPluginsService
                 pluginScopedLogger.LogInformation("Registered browser extensions");
                 RegisterArgumentHandlers(pluginConfig, argumentHandlerProducer);
                 pluginScopedLogger.LogInformation("Registered argument handlers");
+                RegisterMenuButtons(pluginConfig, menuServiceProducer);
+                pluginScopedLogger.LogInformation("Registered menu buttons");
                 this.loadedPlugins.Add(new AvailablePlugin { Name = result.PluginEntry?.Name ?? string.Empty, Path = result.PluginEntry?.Path ?? string.Empty, Enabled = true });
                 pluginScopedLogger.LogInformation("Loaded plugin");
             }
@@ -323,4 +327,6 @@ internal sealed class PluginsService : IPluginsService
     private static void RegisterBrowserExtensions(PluginConfigurationBase pluginConfig, IBrowserExtensionsProducer browserExtensionsProducer) => pluginConfig.RegisterBrowserExtensions(browserExtensionsProducer);
 
     private static void RegisterArgumentHandlers(PluginConfigurationBase pluginConfig, IArgumentHandlerProducer argumentHandlerProducer) => pluginConfig.RegisterLaunchArgumentHandlers(argumentHandlerProducer);
+
+    private static void RegisterMenuButtons(PluginConfigurationBase pluginConfig, IMenuServiceProducer menuServiceProducer) => pluginConfig.RegisterMenuButtons(menuServiceProducer);
 }
