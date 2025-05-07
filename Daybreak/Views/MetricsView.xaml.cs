@@ -49,7 +49,7 @@ public partial class MetricsView : UserControl
 
     private void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
-        this.Metrics.AddRange(this.metricsService.GetMetrics().Select(s => new MetricSetViewModel { Instrument = s.Instrument, AggregationType = s.AggregationType, Metrics = new ObservableCollection<Metric>(s.Metrics ?? new List<Metric>()) }).ToList());
+        this.Metrics.AddRange([.. this.metricsService.GetMetrics().Select(s => new MetricSetViewModel { Instrument = s.Instrument, AggregationType = s.AggregationType, Metrics = [.. s.Metrics ?? []] })]);
         this.metricsService.SetRecorded += this.MetricsService_SetRecorded;
         this.metricsService.MetricRecorded += this.MetricsService_MetricRecorded;
     }
@@ -71,7 +71,7 @@ public partial class MetricsView : UserControl
     {
         this.Dispatcher.Invoke(() =>
         {
-            this.Metrics.Add(new MetricSetViewModel { AggregationType = e.AggregationType, Instrument = e.Instrument, Metrics = new ObservableCollection<Metric>(e.Metrics ?? new List<Metric>()) });
+            this.Metrics.Add(new MetricSetViewModel { AggregationType = e.AggregationType, Instrument = e.Instrument, Metrics = [.. e.Metrics ?? []] });
         });
     }
 
@@ -114,8 +114,8 @@ public partial class MetricsView : UserControl
         }
 
         cartesianChart.DrawMargin = new LiveChartsCore.Measure.Margin(30);
-        cartesianChart.XAxes = new Axis[]
-        {
+        cartesianChart.XAxes =
+        [
             new Axis
             {
                 Name = "Time",
@@ -133,10 +133,10 @@ public partial class MetricsView : UserControl
                 TicksPaint = this.transparentPaint,
                 ZeroPaint = this.transparentPaint,
             }
-        };
+        ];
 
-        cartesianChart.YAxes = new Axis[]
-        {
+        cartesianChart.YAxes =
+        [
             new Axis
             {
                 Name = metricSet.Instrument.Unit,
@@ -150,18 +150,18 @@ public partial class MetricsView : UserControl
                 TicksPaint = this.transparentPaint,
                 ZeroPaint = this.transparentPaint,
             }
-        };
+        ];
 
-        cartesianChart.Series = new ISeries[]
-        {
+        cartesianChart.Series =
+        [
             new LineSeries<Metric>
             {
                 Values = metricSet.AggregationType switch
                 {
-                    AggregationTypes.NoAggregate => this.PlotNoAggregation(metricSet.Metrics),
-                    AggregationTypes.P95 => this.PlotPercentageAggregation(metricSet.Metrics, 0.95),
-                    AggregationTypes.P98 => this.PlotPercentageAggregation(metricSet.Metrics, 0.98),
-                    AggregationTypes.P99 => this.PlotPercentageAggregation(metricSet.Metrics, 0.99),
+                    AggregationTypes.NoAggregate => PlotNoAggregation(metricSet.Metrics),
+                    AggregationTypes.P95 => PlotPercentageAggregation(metricSet.Metrics, 0.95),
+                    AggregationTypes.P98 => PlotPercentageAggregation(metricSet.Metrics, 0.98),
+                    AggregationTypes.P99 => PlotPercentageAggregation(metricSet.Metrics, 0.99),
                     _ => throw new InvalidOperationException("Unable to plot metrics. Unknown aggregation")
                 },
                 Fill = default,
@@ -173,7 +173,7 @@ public partial class MetricsView : UserControl
                 GeometrySize = default,
                 Name = string.Empty
             }
-        };
+        ];
 
         cartesianChart.Title = new LabelVisual
         {
@@ -183,23 +183,23 @@ public partial class MetricsView : UserControl
         };
     }
 
-    private IEnumerable<Metric> PlotNoAggregation(IEnumerable<Metric> dataSet)
+    private void InterceptScroll(object sender, System.Windows.Input.MouseWheelEventArgs e)
+    {
+        e.Handled = true;
+    }
+
+    private static ObservableCollection<Metric> PlotNoAggregation(ObservableCollection<Metric> dataSet)
     {
         return dataSet;
     }
 
-    private IEnumerable<Metric> PlotPercentageAggregation(IEnumerable<Metric> dataSet, double percentage)
+    private static IReadOnlyCollection<Metric> PlotPercentageAggregation(ObservableCollection<Metric> dataSet, double percentage)
     {
         var dataSetArray = dataSet.ToArray();
         var valuesToTake = Math.Round(dataSetArray.Length * percentage).ToInt();
         var orderedByValueDataSet = dataSetArray.OrderBy(s => s.Measurement);
         var finalDataSet = orderedByValueDataSet.Take(valuesToTake).OrderBy(s => s.Timestamp);
 
-        return finalDataSet;
-    }
-
-    private void InterceptScroll(object sender, System.Windows.Input.MouseWheelEventArgs e)
-    {
-        e.Handled = true;
+        return [.. finalDataSet];
     }
 }
