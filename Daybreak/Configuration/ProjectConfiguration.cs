@@ -131,6 +131,8 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IPostUpdateActionProvider>(sp => sp.GetRequiredService<PostUpdateActionManager>());
         services.AddSingleton<IMenuService, MenuService>();
         services.AddSingleton<IMenuServiceInitializer, MenuService>(sp => sp.GetRequiredService<IMenuService>().Cast<MenuService>());
+        services.AddSingleton<IMenuServiceProducer, MenuService>(sp => sp.GetRequiredService<IMenuService>().Cast<MenuService>());
+        services.AddSingleton<IMenuServiceButtonHandler, MenuService>(sp => sp.GetRequiredService<IMenuService>().Cast<MenuService>());
         services.AddSingleton<IMutexHandler, MutexHandler>();
         services.AddSingleton<IShortcutManager, ShortcutManager>();
         services.AddSingleton<IMetricsService, MetricsService>();
@@ -362,6 +364,40 @@ public class ProjectConfiguration : PluginConfigurationBase
     {
         argumentHandlerProducer.ThrowIfNull();
         argumentHandlerProducer.RegisterArgumentHandler<AutoLaunchArgumentHandler>();
+    }
+
+    public override void RegisterMenuButtons(IMenuServiceProducer menuServiceProducer)
+    {
+        menuServiceProducer.ThrowIfNull();
+        menuServiceProducer.CreateIfNotExistCategory("Launcher")
+            .RegisterButton("Notifications", "Open notifications view", sp => sp.GetRequiredService<ViewManager>().ShowView<NotificationsView>())
+            .RegisterButton("Plugins", "Open plugins view", sp => sp.GetRequiredService<ViewManager>().ShowView<PluginsView>())
+            .RegisterButton("Manage client version", "Open version manager", sp => sp.GetRequiredService<ViewManager>().ShowView<VersionManagementView>());
+        menuServiceProducer.CreateIfNotExistCategory("Guild Wars")
+            .RegisterButton("Game companion", "Open game companion", sp => sp.GetRequiredService<ViewManager>().ShowView<LauncherView>())
+            .RegisterButton("Manage builds", "Open builds manager", sp => sp.GetRequiredService<ViewManager>().ShowView<BuildsListView>())
+            .RegisterButton("Download Guild Wars", "Download Guild Wars installer", sp => sp.GetRequiredService<ViewManager>().ShowView<GuildWarsDownloadSelectionView>())
+            .RegisterButton("Copy Guild Wars", "Copy Guild Wars from an existing installation", sp => sp.GetRequiredService<ViewManager>().ShowView<GuildwarsCopySelectionView>())
+            .RegisterButton("Event Calendar", "Show current and upcoming events", sp => sp.GetRequiredService<ViewManager>().ShowView<EventCalendarView>())
+            .RegisterButton("Guild Wars Party Search", "Show party search broadcasts", sp => sp.GetRequiredService<ViewManager>().ShowView<GuildWarsPartySearchView>());
+        menuServiceProducer.CreateIfNotExistCategory("Trade")
+            .RegisterButton("Alerts", "Open trade alerts manager", sp => sp.GetRequiredService<ViewManager>().ShowView<TradeAlertsView>())
+            .RegisterButton("Kamadan", "Open kamadan trade chat", sp => sp.GetRequiredService<ViewManager>().ShowView<KamadanTradeChatView>())
+            .RegisterButton("Ascalon", "Open ascalon trade chat", sp => sp.GetRequiredService<ViewManager>().ShowView<AscalonTradeChatView>())
+            .RegisterButton("Trader Quotes", "Open trader quotes view", sp => sp.GetRequiredService<ViewManager>().ShowView<PriceQuotesView>());
+        menuServiceProducer.CreateIfNotExistCategory("Mods")
+            .RegisterButton("uMod", "Open uMod manager", sp => sp.GetRequiredService<ViewManager>().ShowView<UModOnboardingEntryView>())
+            .RegisterButton("GWToolboxpp", "Open GWToolbox manager", sp => sp.GetRequiredService<ViewManager>().ShowView<ToolboxOnboardingEntryView>())
+            .RegisterButton("DSOAL", "Open DSOAL manager", sp => sp.GetRequiredService<ViewManager>().ShowView<DSOALOnboardingEntryView>())
+            .RegisterButton("ReShade", "Open ReShade manager", sp => sp.GetRequiredService<ViewManager>().ShowView<ReShadeOnboardingEntryView>())
+            .RegisterButton("DirectSong", "Open DirectSong manager", sp => sp.GetRequiredService<ViewManager>().ShowView<DirectSongOnboardingEntryView>());
+        menuServiceProducer.CreateIfNotExistCategory("Settings")
+            .RegisterButton("Accounts", "Accounts Settings", sp => sp.GetRequiredService<ViewManager>().ShowView<AccountsView>())
+            .RegisterButton("Executables", "Executables Settings", sp => sp.GetRequiredService<ViewManager>().ShowView<ExecutablesView>())
+            .RegisterButton("Launch configurations", "Launch configurations settings", sp => sp.GetRequiredService<ViewManager>().ShowView<LaunchConfigurationsView>());
+        menuServiceProducer.CreateIfNotExistCategory("Diagnostics")
+            .RegisterButton("Logs", "Open logs view", sp => sp.GetRequiredService<ViewManager>().ShowView<LogsView>())
+            .RegisterButton("Metrics", "Open metrics view", sp => sp.GetRequiredService<ViewManager>().ShowView<MetricsView>());
     }
 
     private void RegisterLiteCollections(IServiceCollection services)

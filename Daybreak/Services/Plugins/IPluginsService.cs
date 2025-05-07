@@ -1,6 +1,7 @@
 ﻿using Daybreak.Models.Plugins;
 using Daybreak.Services.ApplicationArguments;
 using Daybreak.Services.Browser;
+using Daybreak.Services.Menu;
 using Daybreak.Services.Mods;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Notifications;
@@ -28,7 +29,8 @@ public interface IPluginsService
         INotificationHandlerProducer notificationHandlerProducer,
         IModsManager modsManager,
         IBrowserExtensionsProducer browserExtensionsProducer,
-        IArgumentHandlerProducer argumentHandlerProducer);
+        IArgumentHandlerProducer argumentHandlerProducer,
+        IMenuServiceProducer menuServiceProducer);
 
     IEnumerable<AvailablePlugin> GetAvailablePlugins();
 
