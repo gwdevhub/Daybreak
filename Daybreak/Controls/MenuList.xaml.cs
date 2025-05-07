@@ -1,5 +1,8 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Controls.Buttons;
+using Daybreak.Controls.Options;
 using Daybreak.Launch;
+using Daybreak.Services.Menu;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Notifications;
 using Daybreak.Views;
@@ -20,7 +23,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Extensions;
+using System.Windows.Input;
 
 namespace Daybreak.Controls;
 
@@ -29,6 +34,8 @@ namespace Daybreak.Controls;
 /// </summary>
 public partial class MenuList : UserControl
 {
+    private readonly IMenuServiceButtonHandler menuServiceButtonHandler;
+    private readonly IMenuServiceProducer menuServiceProducer;
     private readonly IViewManager viewManager;
     private readonly INotificationStorage notificationStorage;
     private readonly ILiveOptions<LauncherOptions> liveOptions;
@@ -42,141 +49,34 @@ public partial class MenuList : UserControl
 
     public MenuList()
         : this(
+              Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IMenuServiceButtonHandler>(),
+              Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IMenuServiceProducer>(),
               Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>(),
               Launcher.Instance.ApplicationServiceProvider.GetRequiredService<INotificationStorage>(),
               Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILiveOptions<LauncherOptions>>())
     {
-        this.InitializeComponent();
     }
 
     private MenuList(
+        IMenuServiceButtonHandler menuServiceButtonHandler,
+        IMenuServiceProducer menuServiceProducer,
         IViewManager viewManager,
         INotificationStorage notificationStorage,
         ILiveOptions<LauncherOptions> liveOptions)
     {
+        this.menuServiceButtonHandler = menuServiceButtonHandler.ThrowIfNull();
+        this.menuServiceProducer = menuServiceProducer.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
         this.notificationStorage = notificationStorage.ThrowIfNull();
         this.liveOptions = liveOptions.ThrowIfNull();
-    }
 
-    private void GameCompanionButton_Clicked(object sender, EventArgs e)
-    {
-        this.viewManager.ShowView<LauncherView>();
-    }
-
-    private void AccountSettingsButton_Clicked(object sender, EventArgs e)
-    {
-        this.viewManager.ShowView<AccountsView>();
-    }
-
-    private void LaunchConfigurationsSettingsButton_Clicked(object sender, EventArgs e)
-    {
-        this.viewManager.ShowView<LaunchConfigurationsView>();
-    }
-
-    private void GuildwarsSettingsButton_Clicked(object sender, EventArgs e)
-    {
-        this.viewManager.ShowView<ExecutablesView>();
-    }
-
-    private void ManageBuildsButton_Clicked(object sender, EventArgs e)
-    {
-        this.viewManager.ShowView<BuildsListView>();
-    }
-
-    private void VersionManagementButton_Clicked(object sender, EventArgs e)
-    {
-        this.viewManager.ShowView<VersionManagementView>();
-    }
-    
-    private void LogsButton_Clicked(object sender, EventArgs e)
-    {
-        this.viewManager.ShowView<LogsView>();
-    }
-
-    private void MetricsButton_Clicked(object sender, EventArgs e)
-    {
-        this.viewManager.ShowView<MetricsView>();
-    }
-
-    private void DownloadGuildwarsButton_Clicked(object sender, EventArgs e)
-    {
-        this.viewManager.ShowView<GuildWarsDownloadSelectionView>();
-    }
-
-    private void CopyGuildwarsButton_Clicked(object sender, EventArgs e)
-    {
-        this.viewManager.ShowView<GuildwarsCopySelectionView>();
-    }
-
-    private void UModButton_Clicked(object sender, EventArgs e)
-    {
-        this.viewManager.ShowView<UModOnboardingEntryView>();
-    }
-
-    private void ToolboxButton_Clicked(object sender, EventArgs e)
-    {
-        this.viewManager.ShowView<ToolboxOnboardingEntryView>();
-    }
-
-    private void DSOALButton_Clicked(object sender, EventArgs e)
-    {
-        this.viewManager.ShowView<DSOALOnboardingEntryView>();
-    }
-
-    private void ReShadeButton_Clicked(object sender, EventArgs e)
-    {
-        this.viewManager.ShowView<ReShadeOnboardingEntryView>();
-    }
-
-    private void DirectSongButton_Clicked(object sender, EventArgs e)
-    {
-        this.viewManager.ShowView<DirectSongOnboardingEntryView>();
-    }
-
-    private void KamadanButton_Clicked(object sender, EventArgs e)
-    {
-        this.viewManager.ShowView<KamadanTradeChatView>();
-    }
-
-    private void AscalonButton_Clicked(object sender, EventArgs e)
-    {
-        this.viewManager.ShowView<AscalonTradeChatView>();
-    }
-
-    private void TraderQuotesButton_Clicked(object sender, EventArgs e)
-    {
-        this.viewManager.ShowView<PriceQuotesView>();
-    }
-
-    private void NotificationsButton_Clicked(object sender, EventArgs e)
-    {
-        this.viewManager.ShowView<NotificationsView>();
-    }
-
-    private void PluginsButton_Clicked(object sender, EventArgs e)
-    {
-        this.viewManager.ShowView<PluginsView>();
-    }
-
-    private void TradeAlertsButton_Clicked(object sender, EventArgs e)
-    {
-        this.viewManager.ShowView<TradeAlertsView>();
-    }
-
-    private void CalendarButton_Clicked(object sender, EventArgs e)
-    {
-        this.viewManager.ShowView<EventCalendarView>();
-    }
-
-    private void GuildWarsPartySearchButton_Clicked(object sender, EventArgs e)
-    {
-        this.viewManager.ShowView<GuildWarsPartySearchView>();
+        this.InitializeComponent();
     }
 
     private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
     {
         this.cancellationTokenSource = new CancellationTokenSource();
+        this.PopulateMenuList();
         this.PeriodicallyCheckUnopenedNotifications(this.cancellationTokenSource.Token);
     }
 
@@ -185,6 +85,65 @@ public partial class MenuList : UserControl
         this.cancellationTokenSource?.Cancel();
         this.cancellationTokenSource?.Dispose();
         this.cancellationTokenSource = default;
+    }
+
+    private void PopulateMenuList()
+    {
+        this.MenuStackPanel.Children.Clear();
+        foreach (var category in this.menuServiceProducer.GetCategories())
+        {
+            var expandableMenuSection = new ExpandableMenuSection
+            {
+                SectionTitle = category.Name,
+                FontSize = 16
+            };
+
+            expandableMenuSection.SetResourceReference(ForegroundProperty, "MahApps.Brushes.ThemeForeground");
+            if (category.Name is "Settings")
+            {
+                expandableMenuSection.Children.Add(new OptionsSection());
+            }
+
+            foreach(var button in category.Buttons)
+            {
+                var menuButton = new MenuButton
+                {
+                    Title = button.Name,
+                    Height = 30,
+                    Cursor = Cursors.Hand,
+                    ToolTip = button.Hint
+                };
+
+                menuButton.SetResourceReference(ForegroundProperty, "MahApps.Brushes.ThemeForeground");
+                menuButton.SetResourceReference(MenuButton.HighlightColorProperty, "MahApps.Brushes.Accent");
+                menuButton.Clicked += (_, _) => this.menuServiceButtonHandler.HandleButton(button);
+                if (button.Name is "Notifications" &&
+                    category.Name is "Launcher")
+                {
+                    var grid = new Grid();
+                    var textBlock = new TextBlock
+                    {
+                        FontSize = 16,
+                        HorizontalAlignment = System.Windows.HorizontalAlignment.Right,
+                        VerticalAlignment = System.Windows.VerticalAlignment.Center,
+                        Margin = new System.Windows.Thickness(0, 0, 10, 0)
+                    };
+
+                    textBlock.SetResourceReference(ForegroundProperty, "MahApps.Brushes.ThemeForeground");
+                    textBlock.SetBinding(TextBlock.TextProperty, new Binding("NotificationCount") { Source = this, Mode = BindingMode.OneWay });
+                    textBlock.SetBinding(VisibilityProperty, new Binding("ShowingNotificationCount") { Source = this, Mode = BindingMode.OneWay, Converter = (IValueConverter)this.Resources["BooleanToVisibilityConverter"] });
+                    grid.Children.Add(textBlock);
+                    grid.Children.Add(menuButton);
+                    expandableMenuSection.Children.Add(grid);
+                }
+                else
+                {
+                    expandableMenuSection.Children.Add(menuButton);
+                }
+            }
+
+            this.MenuStackPanel.Children.Add(expandableMenuSection);
+        }
     }
 
     private async void PeriodicallyCheckUnopenedNotifications(CancellationToken cancellationToken)

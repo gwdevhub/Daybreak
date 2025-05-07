@@ -1,6 +1,7 @@
 ﻿using Daybreak.Services.ApplicationArguments;
 using Daybreak.Services.Browser;
 using Daybreak.Services.Database;
+using Daybreak.Services.Menu;
 using Daybreak.Services.Metrics;
 using Daybreak.Services.Mods;
 using Daybreak.Services.Navigation;
@@ -35,6 +36,7 @@ public abstract class PluginConfigurationBase
     public virtual void RegisterMods(IModsManager modsManager) { }
     public virtual void RegisterBrowserExtensions(IBrowserExtensionsProducer browserExtensionsProducer) { }
     public virtual void RegisterLaunchArgumentHandlers(IArgumentHandlerProducer argumentHandlerProducer) { }
+    public virtual void RegisterMenuButtons(IMenuServiceProducer menuServiceProducer) { }
 
     public PluginConfigurationBase()
     {

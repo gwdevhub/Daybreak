@@ -1,21 +1,21 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Daybreak.Models.Menu;
+using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Core.Extensions;
 
 namespace Daybreak.Services.Menu;
 
-internal sealed class MenuService : IMenuService, IMenuServiceInitializer
+internal sealed class MenuService(
+    IServiceProvider serviceProvider,
+    ILogger<MenuService> logger) : IMenuService, IMenuServiceInitializer, IMenuServiceProducer, IMenuServiceButtonHandler
 {
-    private readonly ILogger<MenuService> logger;
+    private readonly IServiceProvider serviceProvider = serviceProvider.ThrowIfNull();
+    private readonly ILogger<MenuService> logger = logger.ThrowIfNull();
+    private readonly Dictionary<string, MenuCategory> categories = [];
 
     private Action? openMenuAction, closeMenuAction, toggleMenuAction;
     private bool initialized;
-
-    public MenuService(
-        ILogger<MenuService> logger)
-    {
-        this.logger = logger.ThrowIfNull();
-    }
 
     public void InitializeMenuService(Action openMenuAction, Action closeMenuAction, Action toggleMenuAction)
     {
@@ -53,5 +53,26 @@ internal sealed class MenuService : IMenuService, IMenuServiceInitializer
         }
 
         this.toggleMenuAction?.Invoke();
+    }
+
+    public MenuCategory CreateIfNotExistCategory(string name)
+    {
+        if (!this.categories.TryGetValue(name, out var category))
+        {
+            category = new MenuCategory(name);
+            this.categories.Add(name, category);
+        }
+
+        return category;
+    }
+
+    public IEnumerable<MenuCategory> GetCategories()
+    {
+        return this.categories.Values;
+    }
+
+    public void HandleButton(MenuButton button)
+    {
+        button.Action(this.serviceProvider);
     }
 }
