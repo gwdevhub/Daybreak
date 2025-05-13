@@ -66,7 +66,7 @@ internal sealed class TraderQuoteService : ITraderQuoteService
             return buyQuotes;
         }
 
-        var quotes = this.priceHistoryDatabase.GetLatestQuotes(TraderQuoteType.Buy);
+        var quotes = await this.priceHistoryDatabase.GetLatestQuotes(TraderQuoteType.Buy, cancellationToken);
         var retList = new List<TraderQuote>();
         foreach(var quoteDTO in quotes)
         {
@@ -96,7 +96,7 @@ internal sealed class TraderQuoteService : ITraderQuoteService
             return sellQuotes;
         }
 
-        var quotes = this.priceHistoryDatabase.GetLatestQuotes(TraderQuoteType.Sell);
+        var quotes = await this.priceHistoryDatabase.GetLatestQuotes(TraderQuoteType.Sell, cancellationToken);
         var retList = new List<TraderQuote>();
         foreach (var quoteDTO in quotes)
         {
@@ -123,29 +123,31 @@ internal sealed class TraderQuoteService : ITraderQuoteService
         var buyQuotes = await this.FetchBuyQuotesInternal(cancellationToken);
         var sellQuotes = await this.FetchSellQuotesInternal(cancellationToken);
         var insertionTime = DateTimeOffset.UtcNow;
-        this.priceHistoryDatabase.AddTraderQuotes(buyQuotes
+        await this.priceHistoryDatabase.AddTraderQuotes(buyQuotes
             .Select(
                 quote => new TraderQuoteDTO
                 {
+                    Id = Guid.NewGuid().ToString(),
                     Price = quote.Price,
                     ItemId = quote.Item?.Id ?? 0,
                     ModifiersHash = quote.Item?.Modifiers is null ? string.Empty : this.itemHashService.ComputeHash(quote.Item),
                     InsertionTime = insertionTime,
                     TimeStamp = quote.Timestamp.ToSafeDateTimeOffset() ?? insertionTime,
                     TraderQuoteType = (int)TraderQuoteType.Buy
-                }));
+                }), cancellationToken);
 
-        this.priceHistoryDatabase.AddTraderQuotes(sellQuotes
+        await this.priceHistoryDatabase.AddTraderQuotes(sellQuotes
             .Select(
                 quote => new TraderQuoteDTO
                 {
+                    Id = Guid.NewGuid().ToString(),
                     Price = quote.Price,
                     ItemId = quote.Item?.Id ?? 0,
                     ModifiersHash = quote.Item?.Modifiers is null ? string.Empty : this.itemHashService.ComputeHash(quote.Item),
                     InsertionTime = insertionTime,
                     TimeStamp = quote.Timestamp.ToSafeDateTimeOffset() ?? insertionTime,
                     TraderQuoteType = (int)TraderQuoteType.Sell
-                }));
+                }), cancellationToken);
 
         this.options.Value.LastCheckTime = insertionTime.UtcDateTime;
         this.options.UpdateOption();

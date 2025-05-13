@@ -1,5 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Services.Screenshots.Models;
+using Daybreak.Models;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Configuration;

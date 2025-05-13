@@ -114,7 +114,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
 
         this.options.Value.LastCheckTime = DateTime.UtcNow;
         this.options.UpdateOption();
-        var savedTrades = this.tradeHistoryDatabase.GetTraderMessagesSinceTime(DateTimeOffset.UtcNow - timeSinceLastCheckTime);
+        var savedTrades = await this.tradeHistoryDatabase.GetTraderMessagesSinceTime(DateTimeOffset.UtcNow - timeSinceLastCheckTime, cancellationToken);
         if (savedTrades.None())
         {
             var kamadanHistoryTradesTask = GetTraderMessages(this.kamadanTradeChatService, TraderSource.Kamadan, DateTime.UtcNow - timeSinceLastCheckTime, cancellationToken);
@@ -122,10 +122,10 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
             await Task.WhenAll(kamadanHistoryTradesTask, ascalonHistoryTradesTask);
             var kamadanHistoryTrades = await kamadanHistoryTradesTask;
             var ascalonHistoryTrades = await ascalonHistoryTradesTask;
-            savedTrades = kamadanHistoryTrades.Concat(ascalonHistoryTrades).ToList();
+            savedTrades = [.. kamadanHistoryTrades, .. ascalonHistoryTrades];
             foreach(var trade in savedTrades)
             {
-                this.tradeHistoryDatabase.StoreTraderMessage(trade);
+                await this.tradeHistoryDatabase.StoreTraderMessage(trade, cancellationToken);
             }
         }
 
@@ -154,7 +154,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
                 TraderSource = (int)traderSource
             };
 
-            this.tradeHistoryDatabase.StoreTraderMessage(traderMessageDTO);
+            await this.tradeHistoryDatabase.StoreTraderMessage(traderMessageDTO, cancellationToken);
             this.CheckTrade(traderMessageDTO);
         }
     }

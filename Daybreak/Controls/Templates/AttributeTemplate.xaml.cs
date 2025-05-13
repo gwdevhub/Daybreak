@@ -1,5 +1,6 @@
 ﻿using Daybreak.Models.Builds;
 using Daybreak.Services.BuildTemplates;
+using Daybreak.Shared;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Core.Extensions;
@@ -30,7 +31,7 @@ public partial class AttributeTemplate : UserControl
     private int attributePoints;
 
     public AttributeTemplate()
-        : this(Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IAttributePointCalculator>())
+        : this(Global.GlobalServiceProvider.GetRequiredService<IAttributePointCalculator>())
     {
     }
 

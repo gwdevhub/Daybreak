@@ -1,7 +1,7 @@
-﻿using Daybreak.Services.Notifications;
+﻿using Daybreak.Models;
+using Daybreak.Services.Notifications;
 using Daybreak.Services.Privilege;
 using Daybreak.Services.Registry;
-using Daybreak.Services.Startup.Actions;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Core.Extensions;

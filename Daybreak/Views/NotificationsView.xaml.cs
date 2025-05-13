@@ -58,8 +58,8 @@ public partial class NotificationsView : UserControl
         while (!cancellationToken.IsCancellationRequested)
         {
             var unsortedNotifications = this.ShowAll ?
-                this.notificationProducer.GetAllNotifications().ToList() :
-                this.notificationProducer.GetPendingNotifications().ToList();
+                (await this.notificationProducer.GetAllNotifications(cancellationToken)).ToList() :
+                (await this.notificationProducer.GetPendingNotifications(cancellationToken)).ToList();
             var notifications = this.Descending ?
                 unsortedNotifications.OrderByDescending(n => n.CreationTime).Take(100).ToList() :
                 unsortedNotifications.OrderBy(n => n.CreationTime).Take(100).ToList();
@@ -96,15 +96,15 @@ public partial class NotificationsView : UserControl
         e.Closed = true;
     }
 
-    private void NotificationTemplate_RemoveClicked(object _, Notification e)
+    private async void NotificationTemplate_RemoveClicked(object _, Notification e)
     {
-        this.notificationProducer.RemoveNotification(e);
+        await this.notificationProducer.RemoveNotification(e, CancellationToken.None);
         this.Notifications.Remove(e);
     }
 
-    private void HighlightButton_Clicked(object sender, EventArgs e)
+    private async void HighlightButton_Clicked(object sender, EventArgs e)
     {
-        this.notificationProducer.RemoveAllNotifications();
+        await this.notificationProducer.RemoveAllNotifications(CancellationToken.None);
         this.Notifications.Clear();
     }
 
@@ -124,8 +124,8 @@ public partial class NotificationsView : UserControl
     {
         using var context = await this.semaphoreSlim.Acquire();
         var unsortedNotifications = this.ShowAll ?
-                    this.notificationProducer.GetAllNotifications() :
-                    this.notificationProducer.GetPendingNotifications();
+                    (await this.notificationProducer.GetAllNotifications(CancellationToken.None)) :
+                    (await this.notificationProducer.GetPendingNotifications(CancellationToken.None));
         var sortedNotification = this.Descending ?
                 unsortedNotifications.OrderByDescending(n => n.CreationTime).ToList() :
                 unsortedNotifications.OrderBy(n => n.CreationTime).ToList();

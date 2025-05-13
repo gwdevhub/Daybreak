@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Daybreak.Launch"
         xmlns:glyphs="clr-namespace:Daybreak.Controls.Glyphs"
+        xmlns:converters="clr-namespace:Daybreak.Converters;assembly=Daybreak.Shared"
         xmlns:controls="clr-namespace:Daybreak.Controls"
         WindowStyle="None"
         ResizeMode="NoResize"

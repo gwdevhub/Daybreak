@@ -1,51 +1,63 @@
-﻿using Daybreak.Services.Database;
-using Daybreak.Services.Notifications.Models;
+﻿using Daybreak.Services.Notifications.Models;
 using System;
 using System.Collections.Generic;
 using System.Core.Extensions;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Daybreak.Services.Notifications;
 
 internal sealed class NotificationStorage : INotificationStorage
 {
-    private readonly IDatabaseCollection<NotificationDTO> liteCollection;
+    private List<NotificationDTO>? notificationsCache;
+    private readonly NotificationsDbContext liteCollection;
 
     public NotificationStorage(
-        IDatabaseCollection<NotificationDTO> liteCollection)
+        NotificationsDbContext liteCollection)
     {
         this.liteCollection = liteCollection.ThrowIfNull();
     }
 
-    public IEnumerable<NotificationDTO> GetPendingNotifications()
+    public async ValueTask<IEnumerable<NotificationDTO>> GetPendingNotifications(CancellationToken cancellationToken)
     {
-        return this.liteCollection.FindAll(dto => dto.Closed == false && dto.ExpirationTime < DateTimeOffset.Now);
+        this.notificationsCache ??= await this.liteCollection.FindAll(cancellationToken).ToListAsync(cancellationToken);
+        return this.notificationsCache
+            .Where(dto => dto.Closed == false && dto.ExpirationTime < DateTimeOffset.Now.ToUnixTimeMilliseconds());
     }
 
-    public IEnumerable<NotificationDTO> GetNotifications()
+    public async ValueTask<IEnumerable<NotificationDTO>> GetNotifications(CancellationToken cancellationToken)
     {
-        return this.liteCollection.FindAll();
+        this.notificationsCache ??= await this.liteCollection.FindAll(cancellationToken).ToListAsync(cancellationToken);
+        return this.notificationsCache;
     }
 
-    public void StoreNotification(NotificationDTO notification)
+    public async ValueTask StoreNotification(NotificationDTO notification, CancellationToken cancellationToken)
     {
         notification.ThrowIfNull();
-        this.liteCollection.Add(notification);
+        await this.liteCollection.Insert(notification, cancellationToken);
+        this.notificationsCache ??= await this.liteCollection.FindAll(cancellationToken).ToListAsync(cancellationToken);
+        this.notificationsCache.Add(notification);
     }
 
-    public void OpenNotification(NotificationDTO notificationDTO)
+    public async ValueTask OpenNotification(NotificationDTO notificationDTO, CancellationToken cancellationToken)
     {
         notificationDTO.ThrowIfNull();
         notificationDTO.Closed = true;
-        this.liteCollection.Update(notificationDTO);
+        await this.liteCollection.Update(notificationDTO, cancellationToken);
+        this.notificationsCache = await this.liteCollection.FindAll(cancellationToken).ToListAsync(cancellationToken);
     }
 
-    public void RemoveNotification(NotificationDTO notificationDTO)
+    public async ValueTask RemoveNotification(NotificationDTO notificationDTO, CancellationToken cancellationToken)
     {
-        this.liteCollection.Delete(notificationDTO);
+        await this.liteCollection.Delete(notificationDTO.Id, cancellationToken);
+        this.notificationsCache ??= await this.liteCollection.FindAll(cancellationToken).ToListAsync(cancellationToken);
+        this.notificationsCache.Remove(notificationDTO);
     }
 
-    public void RemoveAllNotifications()
+    public async ValueTask RemoveAllNotifications(CancellationToken cancellationToken)
     {
-        this.liteCollection.DeleteAll();
+        await this.liteCollection.DeleteAll(cancellationToken);
+        this.notificationsCache = default;
     }
 }

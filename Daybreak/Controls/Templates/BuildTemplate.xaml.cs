@@ -5,6 +5,7 @@ using Daybreak.Models.Builds;
 using Daybreak.Models.Guildwars;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Navigation;
+using Daybreak.Shared;
 using Daybreak.Utils;
 using Daybreak.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -64,9 +65,9 @@ public partial class BuildTemplate : UserControl
     public event EventHandler? BuildChanged;
 
     public BuildTemplate()
-        : this(Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IBuildTemplateManager>(),
-              Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>(),
-              Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IAttributePointCalculator>())
+        : this(Global.GlobalServiceProvider.GetRequiredService<IBuildTemplateManager>(),
+              Global.GlobalServiceProvider.GetRequiredService<IViewManager>(),
+              Global.GlobalServiceProvider.GetRequiredService<IAttributePointCalculator>())
     {
         
     }

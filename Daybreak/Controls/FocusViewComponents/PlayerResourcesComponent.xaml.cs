@@ -3,6 +3,7 @@ using Daybreak.Launch;
 using Daybreak.Models;
 using Daybreak.Models.Guildwars;
 using Daybreak.Services.Experience;
+using Daybreak.Shared;
 using Microsoft.Extensions.DependencyInjection;
 using System.Configuration;
 using System.Core.Extensions;
@@ -58,8 +59,8 @@ public partial class PlayerResourcesComponent : UserControl
 
     public PlayerResourcesComponent()
         : this(
-              Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IExperienceCalculator>(),
-              Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILiveUpdateableOptions<FocusViewOptions>>())
+              Global.GlobalServiceProvider.GetRequiredService<IExperienceCalculator>(),
+              Global.GlobalServiceProvider.GetRequiredService<ILiveUpdateableOptions<FocusViewOptions>>())
     {
     }
 

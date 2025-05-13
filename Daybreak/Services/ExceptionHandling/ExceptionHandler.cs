@@ -1,7 +1,7 @@
 ﻿using Daybreak.Exceptions;
 using Daybreak.Launch;
-using Daybreak.Models.Notifications.Handling;
 using Daybreak.Services.Notifications;
+using Daybreak.Services.Notifications.Handlers;
 using Daybreak.Utils;
 using Microsoft.Extensions.Logging;
 using System;

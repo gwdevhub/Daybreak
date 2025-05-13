@@ -3,6 +3,7 @@ using Daybreak.Models.Guildwars;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Scanner;
+using Daybreak.Shared;
 using Daybreak.Views;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -24,9 +25,9 @@ public partial class MainPlayerInformationComponent : UserControl
 
     public MainPlayerInformationComponent()
         : this(
-              Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IGuildwarsMemoryCache>(),
-              Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IBuildTemplateManager>(),
-              Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>())
+              Global.GlobalServiceProvider.GetRequiredService<IGuildwarsMemoryCache>(),
+              Global.GlobalServiceProvider.GetRequiredService<IBuildTemplateManager>(),
+              Global.GlobalServiceProvider.GetRequiredService<IViewManager>())
     {
     }
 

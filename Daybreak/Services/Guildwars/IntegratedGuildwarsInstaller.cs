@@ -1,4 +1,5 @@
-﻿using Daybreak.Models.Progress;
+﻿using Daybreak.Models;
+using Daybreak.Models.Progress;
 using Daybreak.Services.ExecutableManagement;
 using Daybreak.Services.Guildwars;
 using Daybreak.Services.Guildwars.Models;

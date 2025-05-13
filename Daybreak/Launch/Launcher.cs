@@ -14,6 +14,7 @@ using Daybreak.Services.Startup;
 using Daybreak.Services.Themes;
 using Daybreak.Services.Updater.PostUpdate;
 using Daybreak.Services.Window;
+using Daybreak.Shared;
 using Daybreak.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -41,8 +42,6 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
     private readonly string[] launchArguments;
     private ILogger? logger;
     private IExceptionHandler? exceptionHandler;
-
-    public System.IServiceProvider ApplicationServiceProvider => this.ServiceProvider;
 
     internal Launcher(string[] args)
     {
@@ -79,6 +78,8 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
 
     protected override void ApplicationStarting()
     {
+        Global.GlobalServiceProvider = Instance.ServiceProvider;
+
         /*
          * Show splash screen before beginning to load the rest of the application.
          * MainWindow will call HideSplashScreen() on Loaded event
@@ -86,7 +87,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
          * OptionsProducer needs to be created before everything else, otherwise all
          * the other services will fail to get options for their needs.
          */
-        
+
         var optionsProducer = this.ServiceProvider.GetRequiredService<IOptionsProducer>();
         var startupStatus = this.ServiceProvider.GetRequiredService<StartupStatus>();
         startupStatus.CurrentStep = StartupStatus.Custom("Loading options");

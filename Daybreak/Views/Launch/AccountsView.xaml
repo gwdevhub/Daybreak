@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Views"
              mc:Ignorable="d"
+             xmlns:converters="clr-namespace:Daybreak.Converters;assembly=Daybreak.Shared"
              xmlns:controls="clr-namespace:Daybreak.Controls"
              xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              x:Name="_this"

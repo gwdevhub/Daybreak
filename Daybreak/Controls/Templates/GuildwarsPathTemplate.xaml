@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:converters="clr-namespace:Daybreak.Converters"
+             xmlns:converters="clr-namespace:Daybreak.Converters;assembly=Daybreak.Shared"
              xmlns:local="clr-namespace:Daybreak.Controls"
              xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              xmlns:glyphs="clr-namespace:Daybreak.Controls.Glyphs"

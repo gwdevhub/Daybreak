@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <OutputType>Library</OutputType>
+    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+    <StripSymbols>true</StripSymbols>
+    <InteropExports>true</InteropExports>
+    <PublishAot>true</PublishAot>
+    <SelfContained>true</SelfContained>
+
+    <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
+    <UseAppHost>false</UseAppHost>
+    <EnableIISSupport>false</EnableIISSupport>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Net.Sdk.Web.Extensions.SourceGenerators" Version="0.9.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Daybreak\Daybreak.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <DaybreakHostOutputDir>$(MSBuildProjectDirectory)\..\Daybreak\bin\x86\$(Configuration)\$(TargetFramework)\</DaybreakHostOutputDir>
+    <ShouldPublishAot>true</ShouldPublishAot>
+  </PropertyGroup>
+
+  <Target
+    Name="PublishIntoDaybreak"
+    AfterTargets="PostBuild"
+    Condition="'$(ShouldPublishAot)'=='true'">
+    <Message
+      Text="📦 dotnet-publish Daybreak.API → $(DaybreakHostOutputDir)"
+      Importance="High" />
+
+    <Exec
+      Command="dotnet publish &quot;$(MSBuildProjectFullPath)&quot; -c $(Configuration) -r win-x86 --self-contained true -o &quot;$(DaybreakHostOutputDir)&quot;"
+      WorkingDirectory="$(ProjectDir)" />
+  </Target>
+</Project>

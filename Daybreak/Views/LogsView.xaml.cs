@@ -47,7 +47,6 @@ public partial class LogsView : UserControl
         this.simpleGreenHighlightingBrush = new SimpleHighlightingBrush(ColorPalette.Green);
         this.TextEditor.TextArea.TextView.LineTransformers.Add(new RichTextColorizer(this.richTextModel));
         SearchPanel.Install(this.TextEditor);
-        this.UpdateLogs();
     }
 
     private async void LogManager_ReceivedLog(object? _, Log e)
@@ -57,9 +56,9 @@ public partial class LogsView : UserControl
 
     private async void UpdateLogs()
     {
-        var logs = this.logManager.GetLogs().ToList();
         this.TextEditor.Clear();
         this.cachedText.Clear();
+        var logs = this.logManager.GetLogs().ToList();
         if (logs.Count > MaximumLookbackPeriod)
         {
             var maximumLookbackPeriodMessage = string.Format(MaximumLookbackMessageTemplate, MaximumLookbackPeriod);
@@ -79,6 +78,11 @@ public partial class LogsView : UserControl
             await this.semaphoreSlim.WaitAsync();
             foreach (var log in logs)
             {
+                if (log is null)
+                {
+                    continue;
+                }
+
                 var logTimeComponent = $"[{log.LogTime}]\t";
                 this.TextEditor.Document.Insert(this.cachedText.Length, logTimeComponent);
                 this.cachedText.Append(logTimeComponent);

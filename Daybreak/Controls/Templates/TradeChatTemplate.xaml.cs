@@ -1,6 +1,7 @@
 ﻿using Daybreak.Launch;
 using Daybreak.Models.Trade;
 using Daybreak.Services.TradeChat;
+using Daybreak.Shared;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -49,7 +50,7 @@ public partial class TradeChatTemplate : UserControl
     public ObservableCollection<TraderMessageViewWrapper> TraderMessages { get; } = [];
 
     public TradeChatTemplate()
-        : this(Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IWordHighlightingService>())
+        : this(Global.GlobalServiceProvider.GetRequiredService<IWordHighlightingService>())
     {
     }
 

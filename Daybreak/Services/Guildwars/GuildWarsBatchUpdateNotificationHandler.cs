@@ -1,4 +1,5 @@
-﻿using Daybreak.Models.Notifications;
+﻿using Daybreak.Models;
+using Daybreak.Models.Notifications;
 using Daybreak.Models.Notifications.Handling;
 using Daybreak.Models.Progress;
 using Daybreak.Services.ExecutableManagement;

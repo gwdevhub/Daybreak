@@ -78,11 +78,11 @@ internal sealed class NotificationService : INotificationService, INotificationP
         return this.NotifyInternal<THandlingType>(title, description, metaData, expirationTime, dismissible, LogLevel.Error, persistent);
     }
 
-    void INotificationProducer.OpenNotification(Notification notification, bool storeNotification)
+   async ValueTask INotificationProducer.OpenNotification(Notification notification, bool storeNotification, CancellationToken cancellationToken)
     {
         if (storeNotification)
         {
-            this.storage.OpenNotification(new NotificationDTO
+            await this.storage.OpenNotification(new NotificationDTO
             {
                 Title = notification.Title,
                 Description = notification.Description,
@@ -90,9 +90,10 @@ internal sealed class NotificationService : INotificationService, INotificationP
                 Level = (int)notification.Level,
                 MetaData = notification.Metadata,
                 HandlerType = notification.HandlingType?.AssemblyQualifiedName,
-                ExpirationTime = notification.ExpirationTime.ToSafeDateTimeOffset(),
+                ExpirationTime = notification.ExpirationTime.ToSafeDateTimeOffset().ToUnixTimeMilliseconds(),
+                CreationTime = notification.CreationTime.ToSafeDateTimeOffset().ToUnixTimeMilliseconds(),
                 Closed = true
-            });
+            }, cancellationToken);
         }
 
         if (notification.HandlingType is null)
@@ -104,14 +105,14 @@ internal sealed class NotificationService : INotificationService, INotificationP
         handler?.OpenNotification(notification);
     }
 
-    void INotificationProducer.RemoveNotification(Notification notification)
+    async ValueTask INotificationProducer.RemoveNotification(Notification notification, CancellationToken cancellationToken)
     {
-        this.storage.RemoveNotification(ToDTO(notification));
+        await this.storage.RemoveNotification(ToDTO(notification), cancellationToken);
     }
 
-    void INotificationProducer.RemoveAllNotifications()
+    async ValueTask INotificationProducer.RemoveAllNotifications(CancellationToken cancellationToken)
     {
-        this.storage.RemoveAllNotifications();
+        await this.storage.RemoveAllNotifications(cancellationToken);
     }
 
     async IAsyncEnumerable<Notification> INotificationProducer.Consume([EnumeratorCancellation] CancellationToken cancellationToken)
@@ -127,14 +128,14 @@ internal sealed class NotificationService : INotificationService, INotificationP
         }
     }
 
-    IEnumerable<Notification> INotificationProducer.GetAllNotifications()
+    async ValueTask<IEnumerable<Notification>> INotificationProducer.GetAllNotifications(CancellationToken cancellationToken)
     {
-        return this.storage.GetNotifications().Select(FromDTO);
+        return (await this.storage.GetNotifications(cancellationToken)).Select(FromDTO);
     }
 
-    IEnumerable<Notification> INotificationProducer.GetPendingNotifications()
+    async ValueTask<IEnumerable<Notification>> INotificationProducer.GetPendingNotifications(CancellationToken cancellationToken)
     {
-        return this.storage.GetPendingNotifications().Select(FromDTO);
+        return (await this.storage.GetPendingNotifications(cancellationToken)).Select(FromDTO);
     }
 
     void INotificationHandlerProducer.RegisterNotificationHandler<T>()
@@ -166,11 +167,11 @@ internal sealed class NotificationService : INotificationService, INotificationP
         return new NotificationToken(notification);
     }
 
-    private void EnqueueNotification(Notification notification, bool persistent)
+    private async void EnqueueNotification(Notification notification, bool persistent)
     {
         if (persistent)
         {
-            this.storage.StoreNotification(ToDTO(notification));
+            await this.storage.StoreNotification(ToDTO(notification), CancellationToken.None);
         }
 
         this.pendingNotifications.Enqueue(notification);
@@ -188,8 +189,8 @@ internal sealed class NotificationService : INotificationService, INotificationP
             Level = (LogLevel)dto.Level,
             Title = dto.Title ?? string.Empty,
             Description = dto.Description ?? string.Empty,
-            ExpirationTime = dto.ExpirationTime.LocalDateTime,
-            CreationTime = dto.CreationTime.LocalDateTime,
+            ExpirationTime = DateTimeOffset.FromUnixTimeMilliseconds(dto.ExpirationTime).LocalDateTime,
+            CreationTime = DateTimeOffset.FromUnixTimeMilliseconds(dto.CreationTime).LocalDateTime,
             Metadata = dto.MetaData ?? string.Empty,
             Dismissible = dto.Dismissible,
             Closed = dto.Closed,
@@ -205,8 +206,8 @@ internal sealed class NotificationService : INotificationService, INotificationP
             Level = (int)notification.Level,
             Title = notification.Title,
             Description = notification.Description,
-            ExpirationTime = notification.ExpirationTime.ToSafeDateTimeOffset(),
-            CreationTime = notification.CreationTime.ToSafeDateTimeOffset(),
+            ExpirationTime = notification.ExpirationTime.ToSafeDateTimeOffset().ToUnixTimeMilliseconds(),
+            CreationTime = notification.CreationTime.ToSafeDateTimeOffset().ToUnixTimeMilliseconds(),
             MetaData = notification.Metadata,
             Dismissible = notification.Dismissible,
             Closed = notification.Closed,

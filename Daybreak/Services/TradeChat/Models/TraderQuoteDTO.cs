@@ -1,10 +1,14 @@
-﻿using Realms;
-using System;
+﻿using System;
+using Squealify;
 
 namespace Daybreak.Services.TradeChat.Models;
 
-public sealed class TraderQuoteDTO : RealmObject
+[Table("quotes")]
+public sealed class TraderQuoteDTO
 {
+    [PrimaryKey]
+    public required string Id { get; init; } = Guid.NewGuid().ToString();
+
     public int ItemId { get; set; }
 
     public int Price { get; set; }

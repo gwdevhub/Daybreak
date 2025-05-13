@@ -1,5 +1,6 @@
 ﻿using Daybreak.Attributes;
 using Daybreak.Configuration.Options;
+using Daybreak.Models;
 using Daybreak.Services.Options;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;

@@ -1,4 +1,5 @@
 ﻿using Daybreak.Services.Images;
+using Daybreak.Shared;
 using Microsoft.Extensions.DependencyInjection;
 using System.Core.Extensions;
 using System.Threading;
@@ -39,7 +40,7 @@ public partial class AsyncImage : UserControl
     }
 
     public AsyncImage()
-        : this(Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IImageCache>())
+        : this(Global.GlobalServiceProvider.GetRequiredService<IImageCache>())
     {
     }
 

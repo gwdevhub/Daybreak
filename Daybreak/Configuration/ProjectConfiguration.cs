@@ -44,13 +44,11 @@ using Daybreak.Services.TradeChat;
 using Daybreak.Views.Trade;
 using System.Net.WebSockets;
 using Daybreak.Services.Notifications;
-using Daybreak.Services.TradeChat.Models;
 using Daybreak.Services.Charts;
 using Daybreak.Services.Images;
 using Daybreak.Services.InternetChecker;
 using System;
 using Daybreak.Services.Sounds;
-using Daybreak.Services.Notifications.Models;
 using Daybreak.Models.Notifications.Handling;
 using Daybreak.Services.TradeChat.Notifications;
 using Daybreak.Views.Copy;
@@ -81,14 +79,18 @@ using Daybreak.Services.ApplicationArguments.ArgumentHandling;
 using Daybreak.Services.Window;
 using Daybreak.Launch;
 using Daybreak.Views.Installation;
-using Daybreak.Services.Logging.Models;
 using Daybreak.Services.Toolbox.Notifications;
 using Daybreak.Services.Guildwars;
+using Daybreak.Services.Api;
+using Daybreak.Services.Notifications.Handlers;
+using Microsoft.Data.Sqlite;
 
 namespace Daybreak.Configuration;
 
 public class ProjectConfiguration : PluginConfigurationBase
 {
+    private const string DbConnectionString = "Data Source=Daybreak.sqlite.db";
+
     public override void RegisterResolvers(IServiceManager serviceManager)
     {
         serviceManager.ThrowIfNull();
@@ -102,8 +104,16 @@ public class ProjectConfiguration : PluginConfigurationBase
     {
         services.ThrowIfNull();
 
-        this.RegisterLiteCollections(services);
         this.RegisterHttpClients(services);
+        services.AddScoped(sp =>
+        {
+            var connection = new SqliteConnection(DbConnectionString);
+            connection.Open();
+            return connection;
+        });
+        services.AddScoped(sp => new TradeQuoteDbContext(sp.GetRequiredService<SqliteConnection>()));
+        services.AddScoped(sp => new NotificationsDbContext(sp.GetRequiredService<SqliteConnection>()));
+        services.AddScoped(sp => new TradeMessagesDbContext(sp.GetRequiredService<SqliteConnection>()));
         services.AddSingleton<ILogsManager, JsonLogsManager>();
         services.AddSingleton<IDebugLogsWriter, Services.Logging.DebugLogsWriter>();
         services.AddSingleton<IEventViewerLogsWriter, EventViewerLogsWriter>();
@@ -193,6 +203,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IBackgroundProvider, BackgroundProvider>();
         services.AddScoped<IToolboxClient, ToolboxClient>();
         services.AddScoped<IProcessInjector, ProcessInjector>();
+        services.AddScoped<IStubInjector, StubInjector>();
         services.AddScoped<ILaunchConfigurationService, LaunchConfigurationService>();
         services.AddScoped<IBrowserHistoryManager, BrowserHistoryManager>();
         services.AddScoped<IEventService, EventService>();
@@ -277,6 +288,7 @@ public class ProjectConfiguration : PluginConfigurationBase
     {
         startupActionProducer.ThrowIfNull();
 
+        startupActionProducer.RegisterAction<EnsureDatabaseTablesExist>();
         startupActionProducer.RegisterAction<RenameInstallerAction>();
         startupActionProducer.RegisterAction<FixSymbolicLinkStartupAction>();
         startupActionProducer.RegisterAction<UpdateUModAction>();
@@ -352,6 +364,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         modsManager.RegisterMod<IDSOALService, DSOALService>();
         modsManager.RegisterMod<IGuildwarsScreenPlacer, GuildwarsScreenPlacer>();
         modsManager.RegisterMod<IDirectSongService, DirectSongService>(singleton: true);
+        modsManager.RegisterMod<IDaybreakApiService, DaybreakApiService>();
     }
 
     public override void RegisterBrowserExtensions(IBrowserExtensionsProducer browserExtensionsProducer)
@@ -398,14 +411,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         menuServiceProducer.CreateIfNotExistCategory("Diagnostics")
             .RegisterButton("Logs", "Open logs view", sp => sp.GetRequiredService<ViewManager>().ShowView<LogsView>())
             .RegisterButton("Metrics", "Open metrics view", sp => sp.GetRequiredService<ViewManager>().ShowView<MetricsView>());
-    }
-
-    private void RegisterLiteCollections(IServiceCollection services)
-    {
-        this.RegisterCollection<LogDTO>(services);
-        this.RegisterCollection<TraderQuoteDTO>(services);
-        this.RegisterCollection<NotificationDTO>(services);
-        this.RegisterCollection<TraderMessageDTO>(services);
     }
 
     private IServiceCollection RegisterHttpClients(IServiceCollection services)

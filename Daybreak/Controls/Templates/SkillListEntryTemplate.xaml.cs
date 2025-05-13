@@ -1,5 +1,6 @@
 ﻿using Daybreak.Models.Guildwars;
 using Daybreak.Services.IconRetrieve;
+using Daybreak.Shared;
 using Daybreak.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using System.Core.Extensions;
@@ -32,7 +33,7 @@ public partial class SkillListEntryTemplate : UserControl
     }
 
     public SkillListEntryTemplate()
-        : this(Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IIconCache>())
+        : this(Global.GlobalServiceProvider.GetRequiredService<IIconCache>())
     {
     }
 

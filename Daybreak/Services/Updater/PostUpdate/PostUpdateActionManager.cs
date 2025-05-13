@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Daybreak.Models;
+using Microsoft.Extensions.Logging;
 using Slim;
 using System.Collections.Generic;
 using System.Core.Extensions;
