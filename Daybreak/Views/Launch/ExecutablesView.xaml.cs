@@ -8,6 +8,7 @@ using System.Extensions;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Extensions;
 
 namespace Daybreak.Views.Launch;
 
@@ -18,6 +19,10 @@ public partial class ExecutablesView : UserControl
 {
     private readonly IViewManager viewManager;
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager;
+
+    [GenerateDependencyProperty]
+    private bool locked;
+
     public ObservableCollection<ExecutablePath> Paths { get; } = [];
 
     public ExecutablesView(
@@ -67,5 +72,15 @@ public partial class ExecutablesView : UserControl
         }
 
         this.Paths.Remove(path);
+    }
+
+    private void GuildwarsPathTemplate_UpdateStarted(object sender, EventArgs e)
+    {
+        this.Dispatcher.InvokeAsync(() => this.Locked = true);
+    }
+
+    private void GuildwarsPathTemplate_UpdateFinished(object sender, EventArgs e)
+    {
+        this.Dispatcher.InvokeAsync(() => this.Locked = false);
     }
 }
