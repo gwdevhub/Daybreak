@@ -1,5 +1,6 @@
-﻿using Daybreak.Models.Interop;
-using Daybreak.Utils;
+﻿using Daybreak.Shared.Models.Interop;
+using Daybreak.Shared.Services.Scanner;
+using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;

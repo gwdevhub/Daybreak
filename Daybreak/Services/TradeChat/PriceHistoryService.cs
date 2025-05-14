@@ -1,7 +1,8 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Models.Guildwars;
-using Daybreak.Models.Trade;
 using Daybreak.Services.TradeChat.Models;
+using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Models.Trade;
+using Daybreak.Shared.Services.TradeChat;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -68,7 +69,7 @@ internal sealed class PriceHistoryService : IPriceHistoryService
         }
 
         var retList = new List<TraderQuote>();
-        foreach (var quote in this.priceHistoryDatabase.GetQuoteHistory(itemBase, from, to))
+        foreach (var quote in await this.priceHistoryDatabase.GetQuoteHistory(itemBase, from, to, cancellationToken))
         {
             retList.Add(new TraderQuote
             {
@@ -85,15 +86,16 @@ internal sealed class PriceHistoryService : IPriceHistoryService
     {
         var insertionTime = DateTime.UtcNow;
         var quotes = await this.FetchPricingHistoryInternal(itemBase, cancellationToken, from, to);
-        this.priceHistoryDatabase.AddTraderQuotes(quotes.Select(quote => new TraderQuoteDTO
+        await this.priceHistoryDatabase.AddTraderQuotes(quotes.Select(quote => new TraderQuoteDTO
         {
+            Id = Guid.NewGuid().ToString(),
             TimeStamp = quote.Timestamp ?? insertionTime,
             ItemId = quote.Item?.Id ?? 0,
             Price = quote.Price,
             ModifiersHash = quote.Item?.Modifiers is not null ? this.itemHashService.ComputeHash(quote.Item) : default,
             TraderQuoteType = (int)TraderQuoteType.Sell,
             InsertionTime = quote.Timestamp ?? insertionTime //Use timestamp as this method basically recreates the kamadan tradechat database
-        }));
+        }), cancellationToken);
     }
 
     private async Task<IEnumerable<TraderQuote>> FetchPricingHistoryInternal(ItemBase itemBase, CancellationToken cancellationToken, DateTime? from = default, DateTime? to = default)

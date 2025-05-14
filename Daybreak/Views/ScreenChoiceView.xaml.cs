@@ -1,9 +1,9 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Controls.Templates;
-using Daybreak.Models;
-using Daybreak.Services.ApplicationLauncher;
-using Daybreak.Services.Navigation;
-using Daybreak.Services.Screens;
+using Daybreak.Shared.Models;
+using Daybreak.Shared.Services.ApplicationLauncher;
+using Daybreak.Shared.Services.Navigation;
+using Daybreak.Shared.Services.Screens;
 using System;
 using System.Configuration;
 using System.Extensions;

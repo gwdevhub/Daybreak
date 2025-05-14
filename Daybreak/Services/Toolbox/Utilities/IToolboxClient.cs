@@ -1,6 +1,6 @@
-﻿using Daybreak.Models.Progress;
-using Daybreak.Models.Versioning;
-using Daybreak.Services.Toolbox.Models;
+﻿using Daybreak.Services.Toolbox.Models;
+using Daybreak.Shared.Models.Progress;
+using Daybreak.Shared.Models.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 

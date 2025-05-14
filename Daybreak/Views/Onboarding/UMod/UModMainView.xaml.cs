@@ -1,7 +1,7 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Models.UMod;
-using Daybreak.Services.Navigation;
-using Daybreak.Services.UMod;
+using Daybreak.Shared.Models.UMod;
+using Daybreak.Shared.Services.Navigation;
+using Daybreak.Shared.Services.UMod;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;

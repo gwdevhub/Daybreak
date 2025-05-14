@@ -1,5 +1,6 @@
-﻿using Daybreak.Services.Notifications;
-using Daybreak.Services.UMod;
+﻿using Daybreak.Shared.Models.Browser;
+using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.UMod;
 using Daybreak.Utils;
 using System;
 using System.Core.Extensions;
@@ -31,7 +32,7 @@ public partial class ReShadeBrowserView : UserControl
         this.InitializeComponent();
     }
 
-    private async void ChromiumBrowserWrapper_DownloadingFile(object? _, Models.Browser.DownloadPayload e)
+    private async void ChromiumBrowserWrapper_DownloadingFile(object? _, DownloadPayload e)
     {
         /*
          * According to https://wiki.guildwars.com/wiki/Player-made_Modifications#Shared_player_content,

@@ -1,4 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Shared.Services.Sounds;
 using NAudio.Wave;
 using System.Configuration;
 using System.Core.Extensions;

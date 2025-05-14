@@ -1,4 +1,5 @@
-﻿using Daybreak.Services.Startup.Actions;
+﻿using Daybreak.Shared.Models;
+using Daybreak.Shared.Services.Startup;
 using Microsoft.Extensions.Logging;
 using Slim;
 using System;

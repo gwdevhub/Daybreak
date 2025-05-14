@@ -1,6 +1,6 @@
 ﻿using Daybreak.Controls.Buttons;
-using Daybreak.Models;
-using Daybreak.Utils;
+using Daybreak.Shared.Models;
+using Daybreak.Shared.Utils;
 using System;
 using System.Threading;
 using System.Threading.Tasks;

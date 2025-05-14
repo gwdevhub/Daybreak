@@ -1,4 +1,4 @@
-﻿using Daybreak.Services.ApplicationArguments.ArgumentHandling;
+﻿using Daybreak.Shared.Services.ApplicationArguments.ArgumentHandling;
 using FluentAssertions;
 
 namespace Daybreak.Tests.Services.Models;

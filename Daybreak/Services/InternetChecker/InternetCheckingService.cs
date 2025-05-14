@@ -1,5 +1,7 @@
-﻿using Daybreak.Models;
-using Daybreak.Services.Metrics;
+﻿using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.Metrics;
+using Daybreak.Shared.Services.InternetChecker;
+using Daybreak.Shared.Services.Metrics;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Diagnostics;
@@ -30,7 +32,7 @@ internal sealed class InternetCheckingService : IInternetCheckingService
         IHttpClient<InternetCheckingService> httpClient,
         ILogger<InternetCheckingService> logger)
     {
-        this.connectionCheckingLatency = metricsService.ThrowIfNull().CreateHistogram<double>(ConnectionVerificationLatency, ConnectionVerificationUnit, ConnectionVerificationDescription, Models.Metrics.AggregationTypes.NoAggregate);
+        this.connectionCheckingLatency = metricsService.ThrowIfNull().CreateHistogram<double>(ConnectionVerificationLatency, ConnectionVerificationUnit, ConnectionVerificationDescription, AggregationTypes.NoAggregate);
         this.httpClient = httpClient.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
     }

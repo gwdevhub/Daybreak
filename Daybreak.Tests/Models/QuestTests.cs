@@ -1,5 +1,4 @@
-﻿using Daybreak.Models.Guildwars;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Reflection;
@@ -7,6 +6,7 @@ using System.Text;
 using System;
 using System.Linq;
 using System.Extensions;
+using Daybreak.Shared.Models.Guildwars;
 
 namespace Daybreak.Tests.Models;
 

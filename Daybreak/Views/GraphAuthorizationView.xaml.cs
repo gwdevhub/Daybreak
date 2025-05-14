@@ -1,6 +1,6 @@
 ﻿using Daybreak.Services.Graph;
 using Daybreak.Services.Graph.Models;
-using Daybreak.Services.Navigation;
+using Daybreak.Shared.Services.Navigation;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Threading;

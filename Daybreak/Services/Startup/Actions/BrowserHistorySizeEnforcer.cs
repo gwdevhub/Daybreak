@@ -1,4 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Shared.Models;
 using System.Configuration;
 using System.Core.Extensions;
 

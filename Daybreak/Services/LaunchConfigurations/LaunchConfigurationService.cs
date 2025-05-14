@@ -1,7 +1,8 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Models.LaunchConfigurations;
-using Daybreak.Services.Credentials;
-using Daybreak.Services.ExecutableManagement;
+using Daybreak.Shared.Models.LaunchConfigurations;
+using Daybreak.Shared.Services.Credentials;
+using Daybreak.Shared.Services.ExecutableManagement;
+using Daybreak.Shared.Services.LaunchConfigurations;
 using System;
 using System.Collections.Generic;
 using System.Configuration;

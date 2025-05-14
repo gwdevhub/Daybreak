@@ -1,4 +1,4 @@
-﻿using Daybreak.Models.Options;
+﻿using Daybreak.Shared.Models.Options;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;

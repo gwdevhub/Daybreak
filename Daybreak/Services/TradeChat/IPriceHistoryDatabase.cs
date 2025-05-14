@@ -1,19 +1,22 @@
-﻿using Daybreak.Models.Guildwars;
-using Daybreak.Services.TradeChat.Models;
+﻿using Daybreak.Services.TradeChat.Models;
+using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Models.Trade;
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Daybreak.Services.TradeChat;
 
 public interface IPriceHistoryDatabase
 {
-    IEnumerable<TraderQuoteDTO> GetLatestQuotes(TraderQuoteType traderQuoteType);
+    ValueTask<IEnumerable<TraderQuoteDTO>> GetLatestQuotes(TraderQuoteType traderQuoteType, CancellationToken cancellationToken);
 
-    IEnumerable<TraderQuoteDTO> GetQuoteHistory(ItemBase item, DateTime? fromTimestamp, DateTime? toTimestamp);
+    ValueTask<IEnumerable<TraderQuoteDTO>> GetQuoteHistory(ItemBase item, DateTime? fromTimestamp, DateTime? toTimestamp, CancellationToken cancellationToken);
 
-    bool AddTraderQuotes(IEnumerable<TraderQuoteDTO> traderQuotes);
+    ValueTask<bool> AddTraderQuotes(IEnumerable<TraderQuoteDTO> traderQuotes, CancellationToken cancellationToken);
 
-    IEnumerable<TraderQuoteDTO> GetQuotesByTimestamp(TraderQuoteType type, DateTime? from = default, DateTime? to = default);
+    ValueTask<IEnumerable<TraderQuoteDTO>> GetQuotesByTimestamp(TraderQuoteType type, DateTime? from = default, DateTime? to = default, CancellationToken cancellationToken = default);
 
-    IEnumerable<TraderQuoteDTO> GetQuotesByInsertionTime(TraderQuoteType type, DateTime? from = default, DateTime? to = default);
+    ValueTask<IEnumerable<TraderQuoteDTO>> GetQuotesByInsertionTime(TraderQuoteType type, DateTime? from = default, DateTime? to = default, CancellationToken cancellationToken = default);
 }

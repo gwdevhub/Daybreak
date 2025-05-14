@@ -1,4 +1,5 @@
-﻿using Daybreak.Services.Metrics;
+﻿using Daybreak.Shared.Models.Metrics;
+using Daybreak.Shared.Services.Metrics;
 using System;
 using System.Core.Extensions;
 using System.Diagnostics;
@@ -23,7 +24,7 @@ internal sealed class ProcessorUsageMonitor : IApplicationLifetimeService
     public ProcessorUsageMonitor(
         IMetricsService metricsService)
     {
-        this.processorTimeHistogram = metricsService.ThrowIfNull().CreateHistogram<double>(ProcessorTime, ProcessorTimeUnit, ProcessorTimeDescription, Models.Metrics.AggregationTypes.NoAggregate);
+        this.processorTimeHistogram = metricsService.ThrowIfNull().CreateHistogram<double>(ProcessorTime, ProcessorTimeUnit, ProcessorTimeDescription, AggregationTypes.NoAggregate);
         this.currentProcess = Process.GetCurrentProcess();
         this.processorCount = Environment.ProcessorCount;
     }

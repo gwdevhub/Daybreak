@@ -1,6 +1,6 @@
-﻿using Daybreak.Models.Trade;
-using Daybreak.Services.Navigation;
-using Daybreak.Services.TradeChat;
+﻿using Daybreak.Shared.Models.Trade;
+using Daybreak.Shared.Services.Navigation;
+using Daybreak.Shared.Services.TradeChat;
 using System;
 using System.Core.Extensions;
 using System.Windows.Controls;
@@ -41,7 +41,7 @@ public partial class TradeAlertsChoiceView : UserControl
         {
             Enabled = false,
             Name = "New buy quote alert",
-            TraderQuoteType = Services.TradeChat.Models.TraderQuoteType.Buy
+            TraderQuoteType = TraderQuoteType.Buy
         };
 
         this.tradeAlertingService.AddTradeAlert(tradeAlert);
@@ -54,7 +54,7 @@ public partial class TradeAlertsChoiceView : UserControl
         {
             Enabled = false,
             Name = "New sell quote alert",
-            TraderQuoteType = Services.TradeChat.Models.TraderQuoteType.Sell
+            TraderQuoteType = TraderQuoteType.Sell
         };
 
         this.tradeAlertingService.AddTradeAlert(tradeAlert);

@@ -1,7 +1,7 @@
-﻿using Daybreak.Models;
-using Daybreak.Services.Graph;
-using Daybreak.Services.Navigation;
-using Daybreak.Services.Options;
+﻿using Daybreak.Services.Graph;
+using Daybreak.Shared.Models;
+using Daybreak.Shared.Services.Navigation;
+using Daybreak.Shared.Services.Options;
 using DiffPlex;
 using DiffPlex.DiffBuilder;
 using ICSharpCode.AvalonEdit.Highlighting;

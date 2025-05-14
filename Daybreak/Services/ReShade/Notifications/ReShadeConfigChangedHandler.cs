@@ -1,5 +1,6 @@
-﻿using Daybreak.Models.Notifications;
-using Daybreak.Models.Notifications.Handling;
+﻿using Daybreak.Shared.Models.Notifications;
+using Daybreak.Shared.Models.Notifications.Handling;
+using Daybreak.Shared.Services.ReShade;
 using System.Core.Extensions;
 using System.IO;
 using System.Threading;

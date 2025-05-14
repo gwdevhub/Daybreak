@@ -1,15 +1,15 @@
-﻿using Realms;
-using System;
+﻿using Squealify;
 
 namespace Daybreak.Services.Notifications.Models;
 
-public sealed class NotificationDTO : RealmObject
+[Table("notifications")]
+public partial class NotificationDTO
 {
     [PrimaryKey]
-    public string Id { get; init; } = string.Empty;
+    public required string Id { get; init; } = string.Empty;
     public int Level { get; init; }
-    public DateTimeOffset ExpirationTime { get; init; }
-    public DateTimeOffset CreationTime { get; init; } = DateTimeOffset.Now;
+    public long ExpirationTime { get; set; }
+    public required long CreationTime { get; init; }
     public string? Title { get; init; }
     public string? Description { get; init; }
     public string? MetaData { get; init; }

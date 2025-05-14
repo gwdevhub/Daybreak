@@ -1,4 +1,4 @@
-﻿using Daybreak.Services.Menu;
+﻿using Daybreak.Shared.Services.Menu;
 using System.Core.Extensions;
 using System.Windows.Controls;
 

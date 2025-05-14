@@ -1,4 +1,5 @@
-﻿using Daybreak.Models.Guildwars;
+﻿using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Services.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;

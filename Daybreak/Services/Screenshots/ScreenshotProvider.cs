@@ -1,4 +1,5 @@
-﻿using Daybreak.Services.Images;
+﻿using Daybreak.Shared.Services.Images;
+using Daybreak.Shared.Services.Screenshots;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;

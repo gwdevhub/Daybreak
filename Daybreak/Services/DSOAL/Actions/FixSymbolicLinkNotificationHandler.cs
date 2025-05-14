@@ -1,6 +1,6 @@
-﻿using Daybreak.Models.Notifications;
-using Daybreak.Models.Notifications.Handling;
-using Daybreak.Services.Privilege;
+﻿using Daybreak.Shared.Models.Notifications;
+using Daybreak.Shared.Models.Notifications.Handling;
+using Daybreak.Shared.Services.Privilege;
 using Daybreak.Views;
 using System.Core.Extensions;
 

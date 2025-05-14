@@ -1,6 +1,6 @@
-﻿using Daybreak.Models.LaunchConfigurations;
-using Daybreak.Services.LaunchConfigurations;
-using Daybreak.Services.Navigation;
+﻿using Daybreak.Shared.Models.LaunchConfigurations;
+using Daybreak.Shared.Services.LaunchConfigurations;
+using Daybreak.Shared.Services.Navigation;
 using System;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;

@@ -1,6 +1,7 @@
-﻿using Daybreak.Models.Builds;
-using Daybreak.Models.Guildwars;
-using Daybreak.Services.BuildTemplates;
+﻿using Daybreak.Services.BuildTemplates;
+using Daybreak.Shared.Models.Builds;
+using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Services.BuildTemplates;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

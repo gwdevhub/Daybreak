@@ -1,5 +1,5 @@
 ﻿using Daybreak.Attributes;
-using Daybreak.Models.UMod;
+using Daybreak.Shared.Models.UMod;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 

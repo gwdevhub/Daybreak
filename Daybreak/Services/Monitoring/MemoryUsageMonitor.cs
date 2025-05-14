@@ -1,11 +1,12 @@
-﻿using Daybreak.Services.Metrics;
-using System.Diagnostics.Metrics;
+﻿using System.Diagnostics.Metrics;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Extensions.Services;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Threading;
+using Daybreak.Shared.Services.Metrics;
+using Daybreak.Shared.Models.Metrics;
 
 namespace Daybreak.Services.Monitoring;
 
@@ -24,7 +25,7 @@ internal sealed class MemoryUsageMonitor : IApplicationLifetimeService
     public MemoryUsageMonitor(
         IMetricsService metricsService)
     {
-        this.memoryUsageHistogram = metricsService.ThrowIfNull().CreateHistogram<long>(MemoryUsage, MemoryUsageUnit, MemoryUsageDescription, Models.Metrics.AggregationTypes.NoAggregate);
+        this.memoryUsageHistogram = metricsService.ThrowIfNull().CreateHistogram<long>(MemoryUsage, MemoryUsageUnit, MemoryUsageDescription, AggregationTypes.NoAggregate);
         this.currentProcess = Process.GetCurrentProcess();
     }
 

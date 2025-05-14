@@ -9,11 +9,11 @@ using Daybreak.Services.Graph.Models;
 using System.Extensions;
 using System.Threading.Tasks;
 using System;
-using Daybreak.Services.BuildTemplates;
 using System.Linq;
-using Daybreak.Models;
 using System.Collections.Generic;
-using Daybreak.Services.Navigation;
+using Daybreak.Shared.Services.BuildTemplates;
+using Daybreak.Shared.Models;
+using Daybreak.Shared.Services.Navigation;
 
 namespace Daybreak.Views;
 

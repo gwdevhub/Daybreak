@@ -1,13 +1,14 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Models.Github;
-using Daybreak.Models.Mods;
-using Daybreak.Models.Progress;
-using Daybreak.Models.UMod;
-using Daybreak.Services.Downloads;
-using Daybreak.Services.Injection;
-using Daybreak.Services.Notifications;
 using Daybreak.Services.Toolbox.Models;
-using Daybreak.Utils;
+using Daybreak.Shared.Models.Github;
+using Daybreak.Shared.Models.Mods;
+using Daybreak.Shared.Models.Progress;
+using Daybreak.Shared.Models.UMod;
+using Daybreak.Shared.Services.Downloads;
+using Daybreak.Shared.Services.Injection;
+using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.UMod;
+using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -56,11 +57,11 @@ internal sealed class UModService : IUModService
 
     public bool IsInstalled => File.Exists(Path.GetFullPath(Path.Combine(UModDirectory, UModDll)));
 
-    public Models.Versioning.Version Version => File.Exists(Path.Combine(Path.GetFullPath(UModDirectory), UModDll)) ?
-        Models.Versioning.Version.TryParse(FileVersionInfo.GetVersionInfo(Path.Combine(Path.GetFullPath(UModDirectory), UModDll)).FileVersion!, out var version) ?
+    public Shared.Models.Versioning.Version Version => File.Exists(Path.Combine(Path.GetFullPath(UModDirectory), UModDll)) ?
+        Shared.Models.Versioning.Version.TryParse(FileVersionInfo.GetVersionInfo(Path.Combine(Path.GetFullPath(UModDirectory), UModDll)).FileVersion!, out var version) ?
             version :
-            Models.Versioning.Version.Zero :
-        Models.Versioning.Version.Zero;
+            Shared.Models.Versioning.Version.Zero :
+        Shared.Models.Versioning.Version.Zero;
 
     public UModService(
         IProcessInjector processInjector,
@@ -204,7 +205,7 @@ internal sealed class UModService : IUModService
             .OfType<string>()
             .LastOrDefault();
 
-        if (!Daybreak.Models.Versioning.Version.TryParse(latestRelease ?? string.Empty, out var latestVersion))
+        if (!Shared.Models.Versioning.Version.TryParse(latestRelease ?? string.Empty, out var latestVersion))
         {
             scopedLogger.LogError($"Unable to parse latest version {latestRelease}");
             return;

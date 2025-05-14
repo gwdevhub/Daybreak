@@ -1,6 +1,7 @@
-﻿using Daybreak.Models.Notifications;
-using Daybreak.Services.Notifications;
-using Daybreak.Services.Sounds;
+﻿using Daybreak.Shared;
+using Daybreak.Shared.Models.Notifications;
+using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.Sounds;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -27,8 +28,8 @@ public partial class NotificationStackpanel : UserControl
     public ObservableCollection<NotificationWrapper> Notifications { get; } = [];
 
     public NotificationStackpanel() :
-        this(Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<INotificationProducer>(),
-             Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ISoundService>())
+        this(Global.GlobalServiceProvider.GetRequiredService<INotificationProducer>(),
+             Global.GlobalServiceProvider.GetRequiredService<ISoundService>())
     {
     }
 

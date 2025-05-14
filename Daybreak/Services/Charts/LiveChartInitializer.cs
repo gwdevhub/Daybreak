@@ -1,5 +1,5 @@
-﻿using Daybreak.Models.Metrics;
-using Daybreak.Models.Trade;
+﻿using Daybreak.Shared.Models.Metrics;
+using Daybreak.Shared.Models.Trade;
 using LiveChartsCore;
 using LiveChartsCore.Kernel;
 using LiveChartsCore.SkiaSharpView;

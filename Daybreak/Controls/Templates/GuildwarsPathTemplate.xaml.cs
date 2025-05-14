@@ -1,7 +1,8 @@
 ﻿using Daybreak.Controls.Buttons;
-using Daybreak.Models;
-using Daybreak.Models.Progress;
-using Daybreak.Services.Guildwars;
+using Daybreak.Shared;
+using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.Progress;
+using Daybreak.Shared.Services.Guildwars;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using System;
@@ -39,7 +40,7 @@ public partial class GuildwarsPathTemplate : UserControl
     private string updateProgress = string.Empty;
 
     public GuildwarsPathTemplate() :
-        this(Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IGuildWarsInstaller>())
+        this(Global.GlobalServiceProvider.GetRequiredService<IGuildWarsInstaller>())
     {
     }
 

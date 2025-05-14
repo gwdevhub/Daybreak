@@ -1,6 +1,7 @@
 ﻿using Daybreak.Launch;
-using Daybreak.Models.Guildwars;
-using Daybreak.Services.IconRetrieve;
+using Daybreak.Shared;
+using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Services.IconRetrieve;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Core.Extensions;
@@ -29,7 +30,7 @@ public partial class SkillTemplate : UserControl
     private double borderOpacity;
 
     public SkillTemplate()
-        : this(Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IIconCache>())
+        : this(Global.GlobalServiceProvider.GetRequiredService<IIconCache>())
     {
     }
 

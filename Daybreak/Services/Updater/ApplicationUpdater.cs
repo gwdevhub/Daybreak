@@ -1,13 +1,14 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Exceptions;
-using Daybreak.Models.Github;
-using Daybreak.Models.Progress;
-using Daybreak.Services.Downloads;
-using Daybreak.Services.Notifications;
-using Daybreak.Services.Registry;
 using Daybreak.Services.Updater.Models;
-using Daybreak.Services.Updater.PostUpdate;
-using Daybreak.Utils;
+using Daybreak.Shared.Exceptions;
+using Daybreak.Shared.Models.Github;
+using Daybreak.Shared.Models.Progress;
+using Daybreak.Shared.Services.Downloads;
+using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.Registry;
+using Daybreak.Shared.Services.Updater;
+using Daybreak.Shared.Services.Updater.PostUpdate;
+using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -24,8 +25,8 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using UpdateStatus = Daybreak.Models.Progress.UpdateStatus;
-using Version = Daybreak.Models.Versioning.Version;
+using UpdateStatus = Daybreak.Shared.Models.Progress.UpdateStatus;
+using Version = Daybreak.Shared.Models.Versioning.Version;
 
 namespace Daybreak.Services.Updater;
 

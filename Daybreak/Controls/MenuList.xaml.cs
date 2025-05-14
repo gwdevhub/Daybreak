@@ -2,9 +2,10 @@
 using Daybreak.Controls.Buttons;
 using Daybreak.Controls.Options;
 using Daybreak.Launch;
-using Daybreak.Services.Menu;
-using Daybreak.Services.Navigation;
 using Daybreak.Services.Notifications;
+using Daybreak.Shared;
+using Daybreak.Shared.Services.Menu;
+using Daybreak.Shared.Services.Navigation;
 using Daybreak.Views;
 using Daybreak.Views.Copy;
 using Daybreak.Views.Installation;
@@ -49,11 +50,11 @@ public partial class MenuList : UserControl
 
     public MenuList()
         : this(
-              Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IMenuServiceButtonHandler>(),
-              Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IMenuServiceProducer>(),
-              Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>(),
-              Launcher.Instance.ApplicationServiceProvider.GetRequiredService<INotificationStorage>(),
-              Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILiveOptions<LauncherOptions>>())
+              Global.GlobalServiceProvider.GetRequiredService<IMenuServiceButtonHandler>(),
+              Global.GlobalServiceProvider.GetRequiredService<IMenuServiceProducer>(),
+              Global.GlobalServiceProvider.GetRequiredService<IViewManager>(),
+              Global.GlobalServiceProvider.GetRequiredService<INotificationStorage>(),
+              Global.GlobalServiceProvider.GetRequiredService<ILiveOptions<LauncherOptions>>())
     {
     }
 
@@ -150,7 +151,7 @@ public partial class MenuList : UserControl
     {
         while (!cancellationToken.IsCancellationRequested)
         {
-            var unopenedNotifications = this.notificationStorage.GetPendingNotifications();
+            var unopenedNotifications = await this.notificationStorage.GetPendingNotifications(cancellationToken);
             if (unopenedNotifications.Any())
             {
                 await this.Dispatcher.InvokeAsync(() =>

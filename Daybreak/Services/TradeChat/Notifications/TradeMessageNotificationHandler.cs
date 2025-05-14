@@ -1,7 +1,7 @@
-﻿using Daybreak.Models.Notifications;
-using Daybreak.Models.Notifications.Handling;
-using Daybreak.Models.Trade;
-using Daybreak.Services.Navigation;
+﻿using Daybreak.Shared.Models.Notifications;
+using Daybreak.Shared.Models.Notifications.Handling;
+using Daybreak.Shared.Models.Trade;
+using Daybreak.Shared.Services.Navigation;
 using Daybreak.Views.Trade;
 using Newtonsoft.Json;
 using System.Core.Extensions;

@@ -1,4 +1,4 @@
-﻿using Daybreak.Models.Notifications;
+﻿using Daybreak.Shared.Models.Notifications;
 using Microsoft.Extensions.Logging;
 using System.Extensions;
 using System.Windows;

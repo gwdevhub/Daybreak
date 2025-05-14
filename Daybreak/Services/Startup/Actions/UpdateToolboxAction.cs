@@ -1,4 +1,5 @@
-﻿using Daybreak.Services.Toolbox;
+﻿using Daybreak.Shared.Models;
+using Daybreak.Shared.Services.Toolbox;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Extensions.Core;
