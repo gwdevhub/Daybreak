@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.ComponentModel;
 using System.Core.Extensions;
+using System.Extensions;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -67,12 +68,20 @@ public partial class GuildwarsCopyView : UserControl
 
     private void CopyStatus_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
+        var newProgress = (int)(this.copyStatus.CurrentStep.As<CopyStatus.CopyProgressStep>()?.Progress * 100 ?? 0);
+
+        // Skip dispatcher invokation for no visible changes
+        if (this.progressValue == newProgress)
+        {
+            return;
+        }
+
         this.Dispatcher.Invoke(() =>
         {
             this.ProgressVisible = false;
             if (this.copyStatus.CurrentStep is CopyStatus.CopyProgressStep copyProgressStep)
             {
-                this.ProgressValue = copyProgressStep.Progress * 100;
+                this.ProgressValue = newProgress;
                 this.ProgressVisible = true;
             }
 

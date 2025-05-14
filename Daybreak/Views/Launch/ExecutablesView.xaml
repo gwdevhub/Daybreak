@@ -10,16 +10,23 @@
              xmlns:controls="clr-namespace:Daybreak.Controls"
              x:Name="_this"
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        </ResourceDictionary>
+    </UserControl.Resources>
     <Grid Background="{StaticResource Daybreak.Brushes.Background}">
         <Border BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
                 BorderThickness="0, 1, 0, 0"/>
         <TextBlock HorizontalAlignment="Center" Text="Executables settings" FontSize="22" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" />
         <buttons:AddButton   Height="30" Width="30" Grid.Column="0" 
                              HorizontalAlignment="Right" Margin="5, 5, 45, 5" Clicked="AddButton_Clicked" VerticalAlignment="Top"
-                             ToolTip="Add entry"/>
+                             ToolTip="Add entry"
+                             IsEnabled="{Binding ElementName=_this, Path=Locked, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"/>
         <buttons:SaveButton  Height="30" Width="30" Grid.Column="0" HorizontalAlignment="Right" Margin="5"
                              Clicked="SaveButton_Clicked" VerticalAlignment="Top"
-                             ToolTip="Save changes" />
+                             ToolTip="Save changes"
+                             IsEnabled="{Binding ElementName=_this, Path=Locked, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"/>
         <Rectangle Fill="{StaticResource MahApps.Brushes.ThemeForeground}" VerticalAlignment="Top" Height="1" Margin="0, 39, 0, 0" />
         <ItemsControl ItemsSource="{Binding ElementName=_this, Path=Paths, Mode=OneWay}" Background="Transparent" Margin="0, 40, 0, 0"
                       BorderThickness="0">
@@ -40,7 +47,10 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <controls:GuildwarsPathTemplate DataContext="{Binding}"
-                                                RemoveClicked="GuildwarsPathTemplate_RemoveClicked"></controls:GuildwarsPathTemplate>
+                                                    Locked="{Binding Locked, Mode=OneWay, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    RemoveClicked="GuildwarsPathTemplate_RemoveClicked"
+                                                    UpdateStarted="GuildwarsPathTemplate_UpdateStarted"
+                                                    UpdateFinished="GuildwarsPathTemplate_UpdateFinished"/>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

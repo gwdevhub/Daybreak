@@ -45,17 +45,27 @@ public partial class DirectSongInstallationView : UserControl
     private void DownloadStatus_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         var installationStatus = sender?.As<DirectSongInstallationStatus>();
+        var newProgress = (int)(installationStatus?.CurrentStep.As<DownloadStatus.DownloadProgressStep>()?.Progress * 100 ??
+            installationStatus?.CurrentStep.As<DirectSongInstallationStatus.DirectSongInstallationProgressStep>()?.Progress * 100 ??
+            0);
+
+        // Skip Dispatcher invokation if no visible change
+        if (this.progressValue == newProgress)
+        {
+            return;
+        }
+
         this.Dispatcher.Invoke(() =>
         {
             this.ProgressVisible = false;
             if (installationStatus?.CurrentStep is DownloadStatus.DownloadProgressStep downloadUpdateStep)
             {
-                this.ProgressValue = downloadUpdateStep.Progress * 100;
+                this.ProgressValue = newProgress;
                 this.ProgressVisible = true;
             }
             else if (installationStatus?.CurrentStep is DirectSongInstallationStatus.DirectSongInstallationProgressStep progressStep)
             {
-                this.ProgressValue = progressStep.Progress * 100;
+                this.ProgressValue = newProgress;
                 this.ProgressVisible = true;
             }
 
