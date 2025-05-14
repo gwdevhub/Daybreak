@@ -333,6 +333,7 @@ public class ProjectConfiguration : PluginConfigurationBase
     {
         startupActionProducer.ThrowIfNull();
 
+        startupActionProducer.RegisterAction<RestoreWindowPositionStartupAction>();
         startupActionProducer.RegisterAction<EnsureDatabaseTablesExist>();
         startupActionProducer.RegisterAction<RenameInstallerAction>();
         startupActionProducer.RegisterAction<FixSymbolicLinkStartupAction>();
