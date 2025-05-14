@@ -22,8 +22,11 @@ using Slim;
 using Slim.Integration.ServiceCollection;
 using System;
 using System.Core.Extensions;
+using System.Drawing.Printing;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Extensions;
 using System.Windows.Media;
@@ -46,6 +49,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
     internal Launcher(string[] args)
     {
         this.launchArguments = args.ThrowIfNull();
+        this.ShowWindowOnStartup = false;
     }
 
     [STAThread]
@@ -76,7 +80,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
         return this.exceptionHandler?.HandleException(e) is true;
     }
 
-    protected override void ApplicationStarting()
+    protected override async ValueTask ApplicationStarting()
     {
         Global.GlobalServiceProvider = Instance.ServiceProvider;
 
@@ -101,6 +105,15 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
         this.ServiceProvider.GetRequiredService<ISplashScreenService>().ShowSplashScreen();
         _ = this.ServiceProvider.GetRequiredService<IThemeManager>().GetCurrentTheme();
 
+        await this.InitializeApplicationServices(startupStatus, optionsProducer);
+    }
+
+    protected override void ApplicationClosing()
+    {
+    }
+
+    private async ValueTask InitializeApplicationServices(StartupStatus startupStatus, IOptionsProducer optionsProducer)
+    {
         var serviceManager = this.ServiceProvider.GetRequiredService<IServiceManager>();
         var viewProducer = this.ServiceProvider.GetRequiredService<IViewManager>();
         var postUpdateActionProducer = this.ServiceProvider.GetRequiredService<IPostUpdateActionProducer>();
@@ -111,22 +124,44 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
         var argumentHandlerProducer = this.ServiceProvider.GetRequiredService<IArgumentHandlerProducer>();
         var menuServiceProducer = this.ServiceProvider.GetRequiredService<IMenuServiceProducer>();
 
+        await this.Dispatcher.InvokeAsync(() => 
+        {
+            var mainWindow = this.ServiceProvider.GetRequiredService<MainWindow>();
+            mainWindow.Hide();
+        });
+        await Task.Delay(10);
+
         startupStatus.CurrentStep = StartupStatus.Custom("Loading views");
         this.projectConfiguration.RegisterViews(viewProducer);
+        await Task.Delay(10);
+
         startupStatus.CurrentStep = StartupStatus.Custom("Loading post-update actions");
         this.projectConfiguration.RegisterPostUpdateActions(postUpdateActionProducer);
+        await Task.Delay(10);
+
         startupStatus.CurrentStep = StartupStatus.Custom("Loading startup actions");
         this.projectConfiguration.RegisterStartupActions(startupActionProducer);
+        await Task.Delay(10);
+
         startupStatus.CurrentStep = StartupStatus.Custom("Loading notification handlers");
         this.projectConfiguration.RegisterNotificationHandlers(notificationHandlerProducer);
+        await Task.Delay(10);
+
         startupStatus.CurrentStep = StartupStatus.Custom("Loading mods");
         this.projectConfiguration.RegisterMods(modsManager);
+        await Task.Delay(10);
+
         startupStatus.CurrentStep = StartupStatus.Custom("Loading browser extensions");
         this.projectConfiguration.RegisterBrowserExtensions(browserExtensionsProducer);
+        await Task.Delay(10);
+
         startupStatus.CurrentStep = StartupStatus.Custom("Loading argument handlers");
         this.projectConfiguration.RegisterLaunchArgumentHandlers(argumentHandlerProducer);
+        await Task.Delay(10);
+
         startupStatus.CurrentStep = StartupStatus.Custom("Loading menu buttons");
         this.projectConfiguration.RegisterMenuButtons(menuServiceProducer);
+        await Task.Delay(10);
 
         this.logger = this.ServiceProvider.GetRequiredService<ILogger<Launcher>>();
         this.logger.LogInformation($"Running in {Environment.CurrentDirectory}");
@@ -146,26 +181,39 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
                     browserExtensionsProducer,
                     argumentHandlerProducer,
                     menuServiceProducer);
+            await Task.Delay(10);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             this.logger.LogError(e, "Encountered exception while loading plugins. Aborting...");
             this.exceptionHandler.HandleException(e);
         }
-        
-        // Trigger hooks into MainWindow
-        this.ServiceProvider.GetRequiredService<IWindowEventsHook<MainWindow>>();
+
+        await this.Dispatcher.InvokeAsync(() =>
+        {
+            var mainWindow = this.ServiceProvider.GetRequiredService<MainWindow>();
+            mainWindow.Show();
+            
+            // Trigger hooks into MainWindow
+            this.ServiceProvider.GetRequiredService<IWindowEventsHook<MainWindow>>();
+        });
 
         startupStatus.CurrentStep = StartupStatus.Custom("Registering view container");
         this.RegisterViewContainer();
+        await Task.Delay(10);
+
         startupStatus.CurrentStep = StartupStatus.Custom("Executing argument handlers");
         this.ServiceProvider.GetRequiredService<IApplicationArgumentService>().HandleArguments(this.launchArguments);
+        await Task.Delay(10);
+
         startupStatus.CurrentStep = StartupStatus.Finished;
         this.ServiceProvider.GetRequiredService<IViewManager>().ShowView<LauncherView>();
-    }
+        await Task.Delay(10);
 
-    protected override void ApplicationClosing()
-    {
+        await this.Dispatcher.InvokeAsync(() =>
+        {
+            this.ServiceProvider.GetRequiredService<ISplashScreenService>().HideSplashScreen();
+        });
     }
 
     private void RegisterViewContainer()
@@ -173,6 +221,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
         var viewManager = this.ServiceProvider.GetRequiredService<IViewManager>();
         var mainWindow = this.ServiceProvider.GetRequiredService<MainWindow>();
         viewManager.RegisterContainer(mainWindow.Container);
+        mainWindow.Container.InvalidateArrange();
     }
 
     private static int LaunchMainWindow()

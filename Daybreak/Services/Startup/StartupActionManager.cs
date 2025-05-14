@@ -30,22 +30,25 @@ internal sealed class StartupActionManager : IStartupActionProducer, IApplicatio
 
     public void OnStartup()
     {
-        var asyncTasks = new List<Task>();
-        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-        foreach(var action in this.serviceManager.GetServicesOfType<StartupActionBase>())
+        Task.Factory.StartNew(() =>
         {
-            action.ExecuteOnStartup();
-            asyncTasks.Add(Task.Run(() => action.ExecuteOnStartupAsync(cts.Token)));
-        }
+            var asyncTasks = new List<Task>();
+            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            foreach (var action in this.serviceManager.GetServicesOfType<StartupActionBase>())
+            {
+                action.ExecuteOnStartup();
+                asyncTasks.Add(Task.Run(() => action.ExecuteOnStartupAsync(cts.Token)));
+            }
 
-        try
-        {
-            Task.WaitAll(asyncTasks.ToArray());
-        }
-        catch(Exception e)
-        {
-            this.logger.LogError(e, "Encountered an exception while processing startup actions");
-        }
+            try
+            {
+                Task.WaitAll(asyncTasks.ToArray());
+            }
+            catch (Exception e)
+            {
+                this.logger.LogError(e, "Encountered an exception while processing startup actions");
+            }
+        }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current);
     }
 
     public void RegisterAction<T>() where T : StartupActionBase
