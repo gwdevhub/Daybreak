@@ -41,12 +41,21 @@ public partial class UModInstallingView : UserControl
     private void DownloadStatus_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         var installationStatus = sender?.As<UModInstallationStatus>();
+        var newProgress = (int)(installationStatus?.CurrentStep.As<DownloadStatus.DownloadProgressStep>()?.Progress * 100 ??
+            0);
+
+        // Skip Dispatcher invokation if no visible change
+        if (this.progressValue == newProgress)
+        {
+            return;
+        }
+
         this.Dispatcher.Invoke(() =>
         {
             this.ProgressVisible = false;
             if (installationStatus?.CurrentStep is DownloadStatus.DownloadProgressStep downloadUpdateStep)
             {
-                this.ProgressValue = downloadUpdateStep.Progress * 100;
+                this.ProgressValue = newProgress;
                 this.ProgressVisible = true;
             }
 

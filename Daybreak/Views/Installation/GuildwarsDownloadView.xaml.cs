@@ -9,6 +9,7 @@ using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Services.Guildwars;
 using Daybreak.Shared.Services.Navigation;
+using System.Extensions;
 
 namespace Daybreak.Views.Installation;
 
@@ -49,12 +50,21 @@ public partial class GuildWarsDownloadView : UserControl
 
     private void DownloadStatus_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
+        var newDescription = this.installationStatus?.CurrentStep.Description ?? string.Empty;
+        var newProgressValue = (int)(this.installationStatus?.CurrentStep.As<DownloadStatus.DownloadProgressStep>()?.Progress * 100 ?? 0);
+        // Skip dispatcher invokation for no visible changes
+        if (this.description == newDescription &&
+            this.progressValue == newProgressValue)
+        {
+            return;
+        }
+
         this.Dispatcher.Invoke(() =>
         {
             this.ProgressVisible = false;
             if (this.installationStatus?.CurrentStep is DownloadStatus.DownloadProgressStep downloadUpdateStep)
             {
-                this.ProgressValue = downloadUpdateStep.Progress * 100;
+                this.ProgressValue = newProgressValue;
                 this.ProgressVisible = true;
             }
 
@@ -68,7 +78,7 @@ public partial class GuildWarsDownloadView : UserControl
                 this.ContinueButtonEnabled = false;
             }
 
-            this.Description = this.installationStatus?.CurrentStep.Description ?? string.Empty;
+            this.Description = newDescription;
         });
     }
 

@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
+using System.Windows.Threading;
 
 namespace Daybreak.Controls;
 
@@ -29,7 +30,11 @@ public partial class GuildwarsPathTemplate : UserControl
     private CancellationTokenSource? tokenSource;
 
     public event EventHandler? RemoveClicked;
+    public event EventHandler? UpdateStarted;
+    public event EventHandler? UpdateFinished;
 
+    [GenerateDependencyProperty]
+    private bool locked;
     [GenerateDependencyProperty]
     private bool noUpdateResult;
     [GenerateDependencyProperty]
@@ -163,9 +168,9 @@ public partial class GuildwarsPathTemplate : UserControl
             return;
         }
 
-        await this.Dispatcher.InvokeAsync(() => updateButton.IsEnabled = false);
         await this.Dispatcher.InvokeAsync(() => this.CheckingVersion = true);
         await this.Dispatcher.InvokeAsync(() => this.NoUpdateResult = false);
+        await this.Dispatcher.InvokeAsync(() => this.UpdateStarted?.Invoke(this, new EventArgs()));
         this.tokenSource?.Dispose();
         this.tokenSource = new CancellationTokenSource();
         var status = new GuildwarsInstallationStatus();
@@ -180,6 +185,7 @@ public partial class GuildwarsPathTemplate : UserControl
         finally
         {
             status.PropertyChanged -= this.UpdateStatus_PropertyChanged;
+            await this.Dispatcher.InvokeAsync(() => this.UpdateFinished?.Invoke(this, new EventArgs()));
         }
     }
 
@@ -193,13 +199,14 @@ public partial class GuildwarsPathTemplate : UserControl
         if (status.CurrentStep is DownloadStatus.DownloadProgressStep progressStep)
         {
             // TODO: Kinda hacky way to display a continuous progress widget
-            if (progressStep is GuildwarsInstallationStatus.UnpackingProgressStep)
+            var statusProgress = progressStep is GuildwarsInstallationStatus.UnpackingProgressStep
+                ? $"{(int)(50 + (progressStep.Progress * 50))}%"
+                : $"{(int)(progressStep.Progress * 50)}%";
+
+            // Use the underlying field to check the value, so as to avoid invoking the dipatcher and redrawing for no visible change
+            if (this.updateProgress != statusProgress)
             {
-                this.Dispatcher.Invoke(() => this.UpdateProgress = $"{(int)(50 + (progressStep.Progress * 50))}%");
-            }
-            else
-            {
-                this.Dispatcher.Invoke(() => this.UpdateProgress = $"{(int)(progressStep.Progress * 50)}%");
+                Task.Run(() => this.Dispatcher.InvokeAsync(() => this.UpdateProgress = statusProgress, DispatcherPriority.Background));
             }
         }
     }
