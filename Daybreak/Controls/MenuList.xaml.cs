@@ -1,21 +1,10 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Controls.Buttons;
 using Daybreak.Controls.Options;
-using Daybreak.Launch;
 using Daybreak.Services.Notifications;
 using Daybreak.Shared;
 using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Navigation;
-using Daybreak.Views;
-using Daybreak.Views.Copy;
-using Daybreak.Views.Installation;
-using Daybreak.Views.Launch;
-using Daybreak.Views.Onboarding.DirectSong;
-using Daybreak.Views.Onboarding.DSOAL;
-using Daybreak.Views.Onboarding.ReShade;
-using Daybreak.Views.Onboarding.Toolbox;
-using Daybreak.Views.Onboarding.UMod;
-using Daybreak.Views.Trade;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Configuration;
@@ -100,11 +89,6 @@ public partial class MenuList : UserControl
             };
 
             expandableMenuSection.SetResourceReference(ForegroundProperty, "MahApps.Brushes.ThemeForeground");
-            if (category.Name is "Settings")
-            {
-                expandableMenuSection.Children.Add(new OptionsSection());
-            }
-
             foreach(var button in category.Buttons)
             {
                 var menuButton = new MenuButton
@@ -141,6 +125,11 @@ public partial class MenuList : UserControl
                 {
                     expandableMenuSection.Children.Add(menuButton);
                 }
+            }
+
+            if (category.Name is "Settings")
+            {
+                expandableMenuSection.Children.Add(new OptionsSection());
             }
 
             this.MenuStackPanel.Children.Add(expandableMenuSection);
