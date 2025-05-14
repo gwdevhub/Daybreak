@@ -126,6 +126,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
 
         await this.Dispatcher.InvokeAsync(() => 
         {
+            // Hide the main window until the application is fully loaded. Main window will be shown by the RestoreWindowPositionStartupAction
             var mainWindow = this.ServiceProvider.GetRequiredService<MainWindow>();
             mainWindow.Hide();
         });
@@ -189,14 +190,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
             this.exceptionHandler.HandleException(e);
         }
 
-        await this.Dispatcher.InvokeAsync(() =>
-        {
-            var mainWindow = this.ServiceProvider.GetRequiredService<MainWindow>();
-            mainWindow.Show();
-            
-            // Trigger hooks into MainWindow
-            this.ServiceProvider.GetRequiredService<IWindowEventsHook<MainWindow>>();
-        });
+        await this.Dispatcher.InvokeAsync(this.ServiceProvider.GetRequiredService<IWindowEventsHook<MainWindow>>);
 
         startupStatus.CurrentStep = StartupStatus.Custom("Registering view container");
         this.RegisterViewContainer();
@@ -207,13 +201,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
         await Task.Delay(10);
 
         startupStatus.CurrentStep = StartupStatus.Finished;
-        this.ServiceProvider.GetRequiredService<IViewManager>().ShowView<LauncherView>();
         await Task.Delay(10);
-
-        await this.Dispatcher.InvokeAsync(() =>
-        {
-            this.ServiceProvider.GetRequiredService<ISplashScreenService>().HideSplashScreen();
-        });
     }
 
     private void RegisterViewContainer()

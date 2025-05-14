@@ -1,8 +1,10 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Launch;
 using Daybreak.Shared.Models;
+using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Screens;
 using Daybreak.Shared.Utils;
+using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -17,24 +19,19 @@ using System.Windows.Media;
 
 namespace Daybreak.Services.Screens;
 
-internal sealed class ScreenManager : IScreenManager, IApplicationLifetimeService
+internal sealed class ScreenManager(
+    MainWindow host,
+    IViewManager viewManager,
+    ILiveUpdateableOptions<ScreenManagerOptions> liveUpdateableOptions,
+    ILogger<ScreenManager> logger) : IScreenManager, IApplicationLifetimeService
 {
-    private readonly MainWindow host;
-    private readonly ILiveUpdateableOptions<ScreenManagerOptions> liveUpdateableOptions;
-    private readonly ILogger<ScreenManager> logger;
+    private readonly MainWindow host = host.ThrowIfNull();
+    private readonly IViewManager viewManager = viewManager.ThrowIfNull();
+    private readonly ILiveUpdateableOptions<ScreenManagerOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
+    private readonly ILogger<ScreenManager> logger = logger.ThrowIfNull();
 
     public IEnumerable<Screen> Screens { get; } = WpfScreenHelper.Screen.AllScreens
         .Select((screen, index) => new Screen { Id = index, Size = screen.Bounds });
-
-    public ScreenManager(
-        MainWindow host,
-        ILiveUpdateableOptions<ScreenManagerOptions> liveUpdateableOptions,
-        ILogger<ScreenManager> logger)
-    {
-        this.host = host.ThrowIfNull();
-        this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
 
     public void MoveWindowToSavedPosition()
     {
@@ -114,7 +111,6 @@ internal sealed class ScreenManager : IScreenManager, IApplicationLifetimeServic
     public void OnStartup()
     {
         this.host.WindowParametersChanged += (_, _) => this.SaveWindowPositionAndSize();
-        this.MoveWindowToSavedPosition();
     }
 
     public void OnClosing()
