@@ -22,7 +22,21 @@
                             ToolTip="Save changes" />
         <Rectangle Fill="{StaticResource MahApps.Brushes.ThemeForeground}" VerticalAlignment="Top" Height="1" Margin="0, 39, 0, 0"></Rectangle>
         <ItemsControl ItemsSource="{Binding ElementName=_this, Path=Accounts, Mode=OneWay}" Background="Transparent" Margin="0, 40, 0, 0"
-                  BorderThickness="0">
+                      BorderThickness="0">
+            <ItemsControl.Template>
+                <ControlTemplate>
+                    <Border
+                        Padding="{TemplateBinding Control.Padding}"
+                        Background="{TemplateBinding Panel.Background}"
+                        BorderBrush="{TemplateBinding Border.BorderBrush}"
+                        BorderThickness="{TemplateBinding Border.BorderThickness}"
+                        SnapsToDevicePixels="True">
+                        <ScrollViewer Padding="{TemplateBinding Control.Padding}" Focusable="False">
+                            <ItemsPresenter SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
+                        </ScrollViewer>
+                    </Border>
+                </ControlTemplate>
+            </ItemsControl.Template>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <controls:AccountTemplate Username="{Binding Username, Mode=TwoWay}"
