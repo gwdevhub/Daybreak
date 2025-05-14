@@ -1,4 +1,4 @@
-﻿using Daybreak.Services.Notifications;
+﻿using Daybreak.Shared.Services.Notifications;
 using System.Core.Extensions;
 using System.Windows.Extensions.Services;
 
