@@ -1,11 +1,11 @@
-﻿using Daybreak.Models.Builds;
-using Daybreak.Models.Guildwars;
+﻿using Daybreak.Shared.Models.Builds;
+using Daybreak.Shared.Models.Guildwars;
 using System;
 using System.Collections.Generic;
 using System.Extensions;
 using System.Threading.Tasks;
 
-namespace Daybreak.Services.BuildTemplates;
+namespace Daybreak.Shared.Services.BuildTemplates;
 
 public interface IBuildTemplateManager
 {

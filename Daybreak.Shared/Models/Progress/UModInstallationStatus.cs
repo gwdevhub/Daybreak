@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Models.Progress;
+﻿namespace Daybreak.Shared.Models.Progress;
 public sealed class UModInstallationStatus : DownloadStatus
 {
     public static readonly LoadStatus StartingStep = new UModInstallationStep("Starting");

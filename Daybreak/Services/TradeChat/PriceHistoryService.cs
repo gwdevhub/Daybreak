@@ -1,7 +1,8 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Models.Guildwars;
-using Daybreak.Models.Trade;
 using Daybreak.Services.TradeChat.Models;
+using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Models.Trade;
+using Daybreak.Shared.Services.TradeChat;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;

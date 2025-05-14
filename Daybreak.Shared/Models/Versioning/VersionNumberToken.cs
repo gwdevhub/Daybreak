@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Models.Versioning;
+﻿namespace Daybreak.Shared.Models.Versioning;
 
 public sealed class VersionNumberToken : VersionToken
 {

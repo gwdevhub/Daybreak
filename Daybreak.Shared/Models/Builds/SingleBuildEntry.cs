@@ -1,11 +1,11 @@
-﻿using Daybreak.Models.Guildwars;
+﻿using Daybreak.Shared.Models.Guildwars;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using Attribute = Daybreak.Models.Guildwars.Attribute;
+using Attribute = Daybreak.Shared.Models.Guildwars.Attribute;
 
-namespace Daybreak.Models.Builds;
+namespace Daybreak.Shared.Models.Builds;
 public sealed class SingleBuildEntry : BuildEntryBase, IBuildEntry, INotifyPropertyChanged, IEquatable<SingleBuildEntry>
 {
     public Profession Primary

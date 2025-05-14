@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Daybreak.Services.Mods;
+namespace Daybreak.Shared.Services.Mods;
 
 public interface IModsManager
 {

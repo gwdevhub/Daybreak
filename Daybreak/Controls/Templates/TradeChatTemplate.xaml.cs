@@ -1,7 +1,7 @@
 ﻿using Daybreak.Launch;
-using Daybreak.Models.Trade;
-using Daybreak.Services.TradeChat;
 using Daybreak.Shared;
+using Daybreak.Shared.Models.Trade;
+using Daybreak.Shared.Services.TradeChat;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;

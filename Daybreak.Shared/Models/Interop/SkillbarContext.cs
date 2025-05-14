@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Daybreak.Models.Interop;
+namespace Daybreak.Shared.Models.Interop;
 
 [StructLayout(LayoutKind.Sequential, Pack = 0, Size = 0xBC)]
 public readonly unsafe struct SkillbarContext

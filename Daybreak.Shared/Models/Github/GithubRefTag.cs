@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Daybreak.Models.Github;
+namespace Daybreak.Shared.Models.Github;
 
 public sealed class GithubRefTag
 {

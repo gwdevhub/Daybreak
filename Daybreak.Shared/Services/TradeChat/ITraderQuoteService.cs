@@ -1,9 +1,9 @@
-﻿using Daybreak.Models.Trade;
+﻿using Daybreak.Shared.Models.Trade;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Daybreak.Services.TradeChat;
+namespace Daybreak.Shared.Services.TradeChat;
 
 public interface ITraderQuoteService
 {

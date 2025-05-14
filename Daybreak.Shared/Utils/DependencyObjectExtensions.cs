@@ -1,7 +1,7 @@
 ﻿using System.Windows.Media;
 using System.Windows;
 
-namespace Daybreak.Utils;
+namespace Daybreak.Shared.Utils;
 public static class DependencyObjectExtensions
 {
     public static T? FindParent<T>(this DependencyObject child) where T : DependencyObject

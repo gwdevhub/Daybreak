@@ -1,7 +1,7 @@
-﻿using Daybreak.Utils;
+﻿using Daybreak.Shared.Utils;
 using System.Runtime.InteropServices;
 
-namespace Daybreak.Models.Interop;
+namespace Daybreak.Shared.Models.Interop;
 
 [StructLayout(LayoutKind.Sequential)]
 public readonly struct GuildwarsArray<T>

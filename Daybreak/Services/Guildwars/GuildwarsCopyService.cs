@@ -1,5 +1,6 @@
-﻿using Daybreak.Models.Progress;
-using Daybreak.Services.ExecutableManagement;
+﻿using Daybreak.Shared.Models.Progress;
+using Daybreak.Shared.Services.ExecutableManagement;
+using Daybreak.Shared.Services.Guildwars;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Core.Extensions;

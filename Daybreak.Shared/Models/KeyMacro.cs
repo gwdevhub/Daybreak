@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace Daybreak.Models;
+namespace Daybreak.Shared.Models;
 
 public sealed class KeyMacro
 {

@@ -1,9 +1,9 @@
 ﻿using Daybreak.Controls.Templates;
-using Daybreak.Models.Guildwars;
-using Daybreak.Models.Trade;
-using Daybreak.Services.Navigation;
-using Daybreak.Services.TradeChat;
-using Daybreak.Utils;
+using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Models.Trade;
+using Daybreak.Shared.Services.Navigation;
+using Daybreak.Shared.Services.TradeChat;
+using Daybreak.Shared.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Models.Guildwars;
+﻿namespace Daybreak.Shared.Models.Guildwars;
 
 public sealed class MainPlayerData
 {

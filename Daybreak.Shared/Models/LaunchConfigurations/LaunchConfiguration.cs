@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Daybreak.Models.LaunchConfigurations;
+namespace Daybreak.Shared.Models.LaunchConfigurations;
 
 public sealed class LaunchConfiguration
 {

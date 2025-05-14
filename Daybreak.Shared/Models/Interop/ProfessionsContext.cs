@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Daybreak.Models.Interop;
+namespace Daybreak.Shared.Models.Interop;
 
 [StructLayout(LayoutKind.Sequential)]
 public readonly struct ProfessionsContext
@@ -18,6 +18,6 @@ public readonly struct ProfessionsContext
 
     public bool ProfessionUnlocked(int professionId)
     {
-        return (this.UnlockedProfessionsFlags & (1U << professionId)) != 0;
+        return (this.UnlockedProfessionsFlags & 1U << professionId) != 0;
     }
 }

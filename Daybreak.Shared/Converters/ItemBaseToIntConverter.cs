@@ -1,9 +1,9 @@
-﻿using Daybreak.Models.Guildwars;
+﻿using Daybreak.Shared.Models.Guildwars;
 using System;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace Daybreak.Converters;
+namespace Daybreak.Shared.Converters;
 public sealed class ItemBaseToIntConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

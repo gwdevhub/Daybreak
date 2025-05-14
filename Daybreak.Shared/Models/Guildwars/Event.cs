@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Daybreak.Models.Guildwars;
+namespace Daybreak.Shared.Models.Guildwars;
 
 /// <summary>
 /// Seasonal holidays and in-game events, as retrieved from https://www.guildwars.com/en/events.

@@ -1,7 +1,7 @@
-﻿using Daybreak.Models.Guildwars;
-using Daybreak.Models.LaunchConfigurations;
+﻿using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Models.LaunchConfigurations;
 
-namespace Daybreak.Models.FocusView;
+namespace Daybreak.Shared.Models.FocusView;
 /// <summary>
 /// XD Name
 /// </summary>

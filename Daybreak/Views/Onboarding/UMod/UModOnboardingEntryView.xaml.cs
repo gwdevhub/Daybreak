@@ -1,5 +1,5 @@
-﻿using Daybreak.Services.Navigation;
-using Daybreak.Services.UMod;
+﻿using Daybreak.Shared.Services.Navigation;
+using Daybreak.Shared.Services.UMod;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Windows.Controls;

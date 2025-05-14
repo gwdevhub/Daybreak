@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics.Metrics;
 
-namespace Daybreak.Models.Metrics;
+namespace Daybreak.Shared.Models.Metrics;
 
 public sealed class MetricSetViewModel
 {

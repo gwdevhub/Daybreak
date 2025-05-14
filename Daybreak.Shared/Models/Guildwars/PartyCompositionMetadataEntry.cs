@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Daybreak.Models.Guildwars;
+namespace Daybreak.Shared.Models.Guildwars;
 
 public sealed class PartyCompositionMetadataEntry
 {

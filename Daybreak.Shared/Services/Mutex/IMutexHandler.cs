@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Daybreak.Services.Mutex;
+namespace Daybreak.Shared.Services.Mutex;
 
 public interface IMutexHandler
 {

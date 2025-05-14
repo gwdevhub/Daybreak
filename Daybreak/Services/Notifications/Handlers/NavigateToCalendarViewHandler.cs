@@ -1,7 +1,7 @@
-﻿using Daybreak.Models.Guildwars;
-using Daybreak.Models.Notifications;
-using Daybreak.Models.Notifications.Handling;
-using Daybreak.Services.Navigation;
+﻿using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Models.Notifications;
+using Daybreak.Shared.Models.Notifications.Handling;
+using Daybreak.Shared.Services.Navigation;
 using Daybreak.Views;
 using System.Core.Extensions;
 using System.Linq;

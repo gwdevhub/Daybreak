@@ -1,4 +1,4 @@
-﻿using Daybreak.Models.Guildwars;
+﻿using Daybreak.Shared.Models.Guildwars;
 using System.ComponentModel;
 using System.Windows.Extensions;
 

@@ -1,7 +1,7 @@
-﻿using Daybreak.Models;
-using Daybreak.Services.Logging;
+﻿using Daybreak.Services.Logging;
 using Daybreak.Services.Notifications;
 using Daybreak.Services.TradeChat;
+using Daybreak.Shared.Models;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Extensions;

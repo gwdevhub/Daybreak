@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace Daybreak.Services.Screenshots;
+namespace Daybreak.Shared.Services.Screenshots;
 
 public interface IOnlinePictureClient
 {

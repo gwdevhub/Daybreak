@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media.Effects;
 
-namespace Daybreak.Converters;
+namespace Daybreak.Shared.Converters;
 public sealed class BooleanToEffectConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

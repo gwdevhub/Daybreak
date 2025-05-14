@@ -1,6 +1,7 @@
-﻿using Daybreak.Models.Metrics;
-using Daybreak.Models.Progress;
-using Daybreak.Services.Metrics;
+﻿using Daybreak.Shared.Models.Metrics;
+using Daybreak.Shared.Models.Progress;
+using Daybreak.Shared.Services.Downloads;
+using Daybreak.Shared.Services.Metrics;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Core.Extensions;

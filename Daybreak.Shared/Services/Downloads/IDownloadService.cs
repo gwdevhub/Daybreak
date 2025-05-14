@@ -1,8 +1,8 @@
-﻿using Daybreak.Models.Progress;
+﻿using Daybreak.Shared.Models.Progress;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Daybreak.Services.Downloads;
+namespace Daybreak.Shared.Services.Downloads;
 
 public interface IDownloadService
 {

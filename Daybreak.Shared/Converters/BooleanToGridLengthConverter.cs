@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace Daybreak.Converters;
+namespace Daybreak.Shared.Converters;
 
 public sealed class BooleanToGridLengthConverter : IValueConverter
 {

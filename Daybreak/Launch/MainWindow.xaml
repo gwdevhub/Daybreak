@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         mc:Ignorable="d"
-        xmlns:converters="clr-namespace:Daybreak.Converters;assembly=Daybreak.Shared"
+        xmlns:converters="clr-namespace:Daybreak.Shared.Converters;assembly=Daybreak.Shared"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:effects="clr-namespace:System.Windows.Media.Extensions.Effects;assembly=WpfExtended"
         xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"

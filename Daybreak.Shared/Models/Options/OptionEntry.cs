@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace Daybreak.Models.Options;
+namespace Daybreak.Shared.Models.Options;
 public sealed class OptionEntry
 {
     public OptionHeading Heading { get; init; } = default!;

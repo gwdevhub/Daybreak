@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Daybreak.Models;
+namespace Daybreak.Shared.Models;
 
 public abstract class PostUpdateActionBase
 {

@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Models.Guildwars;
+﻿namespace Daybreak.Shared.Models.Guildwars;
 public abstract class TeamBuildPlayerData
 {
     public required Build Build { get; init; }

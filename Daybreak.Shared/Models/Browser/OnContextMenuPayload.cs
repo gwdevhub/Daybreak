@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Daybreak.Models.Browser;
+namespace Daybreak.Shared.Models.Browser;
 
 public sealed class OnContextMenuPayload
 {

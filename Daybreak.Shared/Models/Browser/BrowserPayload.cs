@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Daybreak.Models.Browser;
+namespace Daybreak.Shared.Models.Browser;
 
 public class BrowserPayload
 {

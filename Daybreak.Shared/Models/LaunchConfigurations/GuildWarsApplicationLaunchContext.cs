@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace Daybreak.Models.LaunchConfigurations;
+namespace Daybreak.Shared.Models.LaunchConfigurations;
 
 public sealed record GuildWarsApplicationLaunchContext : IEquatable<GuildWarsApplicationLaunchContext>
 {

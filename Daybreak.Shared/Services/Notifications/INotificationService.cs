@@ -1,8 +1,8 @@
-﻿using Daybreak.Models.Notifications;
-using Daybreak.Models.Notifications.Handling;
+﻿using Daybreak.Shared.Models.Notifications;
+using Daybreak.Shared.Models.Notifications.Handling;
 using System;
 
-namespace Daybreak.Services.Notifications;
+namespace Daybreak.Shared.Services.Notifications;
 
 public interface INotificationService
 {

@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Services.Options;
+using Daybreak.Shared.Services.Options;
+using Daybreak.Shared.Services.Shortcuts;
 using ShellLink;
 using System.Configuration;
 using System.Diagnostics;

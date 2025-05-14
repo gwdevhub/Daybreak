@@ -1,6 +1,6 @@
-﻿using Daybreak.Models;
-using Daybreak.Services.Notifications;
+﻿using Daybreak.Services.Notifications;
 using Daybreak.Services.TradeChat;
+using Daybreak.Shared.Models;
 using System.Threading;
 using System.Threading.Tasks;
 

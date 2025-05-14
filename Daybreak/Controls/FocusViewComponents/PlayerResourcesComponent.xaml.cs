@@ -1,9 +1,9 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Launch;
-using Daybreak.Models;
-using Daybreak.Models.Guildwars;
-using Daybreak.Services.Experience;
 using Daybreak.Shared;
+using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Services.Experience;
 using Microsoft.Extensions.DependencyInjection;
 using System.Configuration;
 using System.Core.Extensions;

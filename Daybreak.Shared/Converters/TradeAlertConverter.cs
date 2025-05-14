@@ -1,9 +1,9 @@
-﻿using Daybreak.Models.Trade;
+﻿using Daybreak.Shared.Models.Trade;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 
-namespace Daybreak.Converters;
+namespace Daybreak.Shared.Converters;
 public sealed class TradeAlertConverter : JsonConverter<ITradeAlert>
 {
     public override ITradeAlert? ReadJson(JsonReader reader, Type objectType, ITradeAlert? existingValue, bool hasExistingValue, JsonSerializer serializer)

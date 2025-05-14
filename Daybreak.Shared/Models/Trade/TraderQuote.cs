@@ -1,7 +1,7 @@
-﻿using Daybreak.Models.Guildwars;
+﻿using Daybreak.Shared.Models.Guildwars;
 using System;
 
-namespace Daybreak.Models.Trade;
+namespace Daybreak.Shared.Models.Trade;
 
 public sealed class TraderQuote
 {

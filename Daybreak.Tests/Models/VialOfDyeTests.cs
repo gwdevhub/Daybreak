@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Daybreak.Tests.Models;
 
 [TestClass]
-public sealed class MaterialTests : ItemTestsBase<Material>
+public sealed class VialOfDyeTests : ItemTestsBase<VialOfDye>
 {
-    protected override IEnumerable<Material> AllItems { get; } = Material.All;
+    protected override IEnumerable<VialOfDye> AllItems { get; } = VialOfDye.Vials;
 }

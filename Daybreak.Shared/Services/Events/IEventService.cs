@@ -1,8 +1,8 @@
-﻿using Daybreak.Models.Guildwars;
+﻿using Daybreak.Shared.Models.Guildwars;
 using System;
 using System.Collections.Generic;
 
-namespace Daybreak.Services.Events;
+namespace Daybreak.Shared.Services.Events;
 public interface IEventService
 {
     TimeOnly GetLocalizedEventStartTime();

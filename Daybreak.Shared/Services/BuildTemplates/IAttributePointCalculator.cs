@@ -1,7 +1,7 @@
-﻿using Daybreak.Models.Builds;
-using Daybreak.Models.Guildwars;
+﻿using Daybreak.Shared.Models.Builds;
+using Daybreak.Shared.Models.Guildwars;
 
-namespace Daybreak.Services.BuildTemplates;
+namespace Daybreak.Shared.Services.BuildTemplates;
 
 public interface IAttributePointCalculator
 {

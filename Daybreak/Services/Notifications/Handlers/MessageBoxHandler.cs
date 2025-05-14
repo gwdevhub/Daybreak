@@ -1,6 +1,6 @@
 ﻿using Daybreak.Launch;
-using Daybreak.Models.Notifications;
-using Daybreak.Models.Notifications.Handling;
+using Daybreak.Shared.Models.Notifications;
+using Daybreak.Shared.Models.Notifications.Handling;
 
 namespace Daybreak.Services.Notifications.Handlers;
 

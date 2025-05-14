@@ -1,5 +1,5 @@
 ﻿using Daybreak.Controls;
-using Daybreak.Models.Browser;
+using Daybreak.Shared.Models.Browser;
 using Microsoft.Web.WebView2.Core;
 using System;
 using System.Collections.Generic;

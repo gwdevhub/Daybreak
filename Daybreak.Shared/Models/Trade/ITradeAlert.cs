@@ -1,7 +1,7 @@
-﻿using Daybreak.Converters;
+﻿using Daybreak.Shared.Converters;
 using Newtonsoft.Json;
 
-namespace Daybreak.Models.Trade;
+namespace Daybreak.Shared.Models.Trade;
 
 [JsonConverter(typeof(TradeAlertConverter))]
 public interface ITradeAlert

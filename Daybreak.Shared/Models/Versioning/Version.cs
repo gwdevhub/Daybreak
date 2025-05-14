@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Extensions;
 using System.Linq;
 
-namespace Daybreak.Models.Versioning;
+namespace Daybreak.Shared.Models.Versioning;
 
 public sealed class Version : IEquatable<Version>, IComparable<Version>
 {

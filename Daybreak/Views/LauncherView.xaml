@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:Daybreak.Views"
              xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              xmlns:effects="clr-namespace:System.Windows.Media.Extensions.Effects;assembly=WpfExtended"
-             xmlns:converters="clr-namespace:Daybreak.Converters;assembly=Daybreak.Shared"
+             xmlns:converters="clr-namespace:Daybreak.Shared.Converters;assembly=Daybreak.Shared"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:templates="clr-namespace:Daybreak.Controls.Templates"
              xmlns:controls="clr-namespace:Daybreak.Controls"

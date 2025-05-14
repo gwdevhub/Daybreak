@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Models.Progress;
+﻿namespace Daybreak.Shared.Models.Progress;
 public sealed class ToolboxInstallationStatus : DownloadStatus
 {
     public static readonly LoadStatus StartingStep = new ToolboxInstallationStep("Starting");

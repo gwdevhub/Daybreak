@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Daybreak.Models.Trade;
+namespace Daybreak.Shared.Models.Trade;
 public sealed class TradeAlert : ITradeAlert
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();

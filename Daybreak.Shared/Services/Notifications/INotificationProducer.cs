@@ -1,9 +1,9 @@
-﻿using Daybreak.Models.Notifications;
+﻿using Daybreak.Shared.Models.Notifications;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Daybreak.Services.Notifications;
+namespace Daybreak.Shared.Services.Notifications;
 
 public interface INotificationProducer
 {

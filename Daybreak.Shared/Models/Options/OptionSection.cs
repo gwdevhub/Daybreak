@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Daybreak.Models.Options;
+namespace Daybreak.Shared.Models.Options;
 public sealed class OptionSection
 {
     public string? Name { get; init; }

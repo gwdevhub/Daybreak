@@ -1,6 +1,6 @@
-﻿using Daybreak.Models.Guildwars;
+﻿using Daybreak.Shared.Models.Guildwars;
 
-namespace Daybreak.Models;
+namespace Daybreak.Shared.Models;
 
 public sealed class IconRequest
 {

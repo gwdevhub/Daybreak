@@ -2,7 +2,7 @@
 using System.Core.Extensions;
 using System.Extensions;
 
-namespace Daybreak.Models.Notifications;
+namespace Daybreak.Shared.Models.Notifications;
 
 public readonly struct NotificationToken
 {

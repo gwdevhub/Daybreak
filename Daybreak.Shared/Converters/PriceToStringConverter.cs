@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace Daybreak.Converters;
+namespace Daybreak.Shared.Converters;
 public sealed class PriceToStringConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -14,13 +14,13 @@ public sealed class PriceToStringConverter : IValueConverter
 
         var price = value switch
         {
-            byte byteVal => (double)byteVal,
-            short shortVal => (double)shortVal,
-            ushort ushortVal => (double)ushortVal,
-            int intVal => (double)intVal,
-            uint uintVal => (double)uintVal,
-            long longVal => (double)longVal,
-            ulong ulongVal => (double)ulongVal,
+            byte byteVal => byteVal,
+            short shortVal => shortVal,
+            ushort ushortVal => ushortVal,
+            int intVal => intVal,
+            uint uintVal => uintVal,
+            long longVal => longVal,
+            ulong ulongVal => ulongVal,
             decimal decimalVal => (double)decimalVal,
             float floatVal => (double)floatVal,
             double doubleVal => (double)doubleVal,

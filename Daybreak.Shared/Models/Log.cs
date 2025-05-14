@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 
-namespace Daybreak.Models;
+namespace Daybreak.Shared.Models;
 
 public sealed class Log
 {

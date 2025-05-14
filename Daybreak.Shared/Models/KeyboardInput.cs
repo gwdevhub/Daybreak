@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace Daybreak.Models;
+namespace Daybreak.Shared.Models;
 
 [StructLayout(LayoutKind.Sequential)]
 public struct KeyboardInput
@@ -36,5 +36,5 @@ public struct KeyboardInput
     /// <summary>
     /// Additional information associated with the message. 
     /// </summary>
-    public IntPtr AdditionalInformation;
+    public nint AdditionalInformation;
 }

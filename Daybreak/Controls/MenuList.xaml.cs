@@ -2,10 +2,10 @@
 using Daybreak.Controls.Buttons;
 using Daybreak.Controls.Options;
 using Daybreak.Launch;
-using Daybreak.Services.Menu;
-using Daybreak.Services.Navigation;
 using Daybreak.Services.Notifications;
 using Daybreak.Shared;
+using Daybreak.Shared.Services.Menu;
+using Daybreak.Shared.Services.Navigation;
 using Daybreak.Views;
 using Daybreak.Views.Copy;
 using Daybreak.Views.Installation;

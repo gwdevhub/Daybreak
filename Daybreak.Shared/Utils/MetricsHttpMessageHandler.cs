@@ -1,11 +1,11 @@
-﻿using Daybreak.Services.Metrics;
+﻿using Daybreak.Shared.Services.Metrics;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Daybreak.Utils;
+namespace Daybreak.Shared.Utils;
 
 public sealed class MetricsHttpMessageHandler<T> : DelegatingHandler
 {

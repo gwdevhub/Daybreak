@@ -1,6 +1,6 @@
 ﻿using System.Windows.Media;
 
-namespace Daybreak.Models;
+namespace Daybreak.Shared.Models;
 
 public sealed class ColoredTextElement
 {

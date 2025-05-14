@@ -1,4 +1,4 @@
-﻿using Daybreak.Models.Guildwars;
+﻿using Daybreak.Shared.Models.Guildwars;
 
 namespace Daybreak.Services.Screenshots.Models;
 internal sealed class Entry

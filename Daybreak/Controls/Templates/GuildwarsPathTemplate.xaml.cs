@@ -1,8 +1,8 @@
 ﻿using Daybreak.Controls.Buttons;
-using Daybreak.Models;
-using Daybreak.Models.Progress;
-using Daybreak.Services.Guildwars;
 using Daybreak.Shared;
+using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.Progress;
+using Daybreak.Shared.Services.Guildwars;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using System;

@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Models.Notifications.Handling;
+﻿namespace Daybreak.Shared.Models.Notifications.Handling;
 
 public interface INotificationHandler
 {

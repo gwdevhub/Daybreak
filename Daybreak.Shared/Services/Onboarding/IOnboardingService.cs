@@ -1,6 +1,6 @@
-﻿using Daybreak.Models.Onboarding;
+﻿using Daybreak.Shared.Models.Onboarding;
 
-namespace Daybreak.Services.Onboarding;
+namespace Daybreak.Shared.Services.Onboarding;
 
 public interface IOnboardingService
 {

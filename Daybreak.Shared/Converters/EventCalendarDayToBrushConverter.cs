@@ -1,6 +1,6 @@
-﻿using Daybreak.Models.Guildwars;
-using Daybreak.Services.Events;
-using Daybreak.Shared;
+﻿using Daybreak.Shared;
+using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Services.Events;
 using ExCSS;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -12,7 +12,7 @@ using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace Daybreak.Converters;
+namespace Daybreak.Shared.Converters;
 public sealed class EventCalendarDayToBrushConverter : IValueConverter
 {
     private readonly EventToBrushConverter eventToBrushConverter = new();

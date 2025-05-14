@@ -1,5 +1,5 @@
-﻿using Daybreak.Models;
-using Daybreak.Models.Guildwars;
+﻿using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.Guildwars;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -7,7 +7,7 @@ using System.Windows.Data;
 using System.Windows.Media;
 using Brush = System.Windows.Media.Brush;
 
-namespace Daybreak.Converters;
+namespace Daybreak.Shared.Converters;
 public sealed class EventToBrushConverter : IValueConverter
 {
     private static readonly Dictionary<Event, Brush> EventMapping = new()

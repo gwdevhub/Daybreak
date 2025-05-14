@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Daybreak.Utils;
+namespace Daybreak.Shared.Utils;
 public static class PathUtils
 {
     private static readonly Lazy<string> RootPath = new(() => Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? throw new InvalidOperationException("Unable to obtain application root path"));

@@ -1,7 +1,7 @@
-﻿using Daybreak.Models.LaunchConfigurations;
+﻿using Daybreak.Shared.Models.LaunchConfigurations;
 using System.ComponentModel;
 
-namespace Daybreak.Models;
+namespace Daybreak.Shared.Models;
 public sealed class LauncherViewContext : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;

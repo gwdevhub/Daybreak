@@ -1,7 +1,7 @@
-﻿using Daybreak.Models.Menu;
+﻿using Daybreak.Shared.Models.Menu;
 using System.Collections.Generic;
 
-namespace Daybreak.Services.Menu;
+namespace Daybreak.Shared.Services.Menu;
 
 public interface IMenuServiceProducer
 {

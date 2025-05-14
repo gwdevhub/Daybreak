@@ -1,10 +1,10 @@
-﻿using Daybreak.Models.Progress;
+﻿using Daybreak.Shared.Models.Progress;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Extensions.Services;
-using Version = Daybreak.Models.Versioning.Version;
+using Version = Daybreak.Shared.Models.Versioning.Version;
 
-namespace Daybreak.Services.Updater;
+namespace Daybreak.Shared.Services.Updater;
 
 public interface IApplicationUpdater : IApplicationLifetimeService
 {

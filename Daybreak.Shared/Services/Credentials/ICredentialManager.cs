@@ -1,7 +1,7 @@
-﻿using Daybreak.Models;
+﻿using Daybreak.Shared.Models;
 using System.Collections.Generic;
 
-namespace Daybreak.Services.Credentials;
+namespace Daybreak.Shared.Services.Credentials;
 
 public interface ICredentialManager
 {

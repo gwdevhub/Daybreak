@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Security.Cryptography;
 
-namespace Daybreak.Utils;
+namespace Daybreak.Shared.Utils;
 
 internal static class EncryptionHelper
 {
@@ -36,7 +36,7 @@ internal static class EncryptionHelper
     {
         var saltBytes = new byte[Aes.BlockSize / 8];
         var ivBytes = new byte[Aes.BlockSize / 8];
-        var cipherBytes = new byte[bytes.Length - (Aes.BlockSize / 4)];
+        var cipherBytes = new byte[bytes.Length - Aes.BlockSize / 4];
 
         using var encryptedStream = new MemoryStream(bytes);
         encryptedStream.Read(saltBytes, 0, saltBytes.Length);

@@ -1,6 +1,6 @@
-﻿using Daybreak.Services.ApplicationArguments.ArgumentHandling;
+﻿using Daybreak.Shared.Services.ApplicationArguments.ArgumentHandling;
 
-namespace Daybreak.Services.ApplicationArguments;
+namespace Daybreak.Shared.Services.ApplicationArguments;
 
 public interface IArgumentHandlerProducer
 {

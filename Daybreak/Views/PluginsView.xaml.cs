@@ -1,6 +1,6 @@
-﻿using Daybreak.Models.Plugins;
-using Daybreak.Services.Navigation;
-using Daybreak.Services.Plugins;
+﻿using Daybreak.Shared.Models.Plugins;
+using Daybreak.Shared.Services.Navigation;
+using Daybreak.Shared.Services.Plugins;
 using Microsoft.Win32;
 using System;
 using System.Collections.ObjectModel;

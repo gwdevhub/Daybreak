@@ -1,6 +1,6 @@
-﻿using Daybreak.Services.IconRetrieve;
-using Daybreak.Services.Images;
-using Daybreak.Shared;
+﻿using Daybreak.Shared;
+using Daybreak.Shared.Services.IconRetrieve;
+using Daybreak.Shared.Services.Images;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Core.Extensions;

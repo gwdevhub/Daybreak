@@ -1,9 +1,10 @@
 ﻿using ControlzEx.Theming;
 using Daybreak.Configuration.Options;
 using Daybreak.Launch;
-using Daybreak.Models;
-using Daybreak.Services.Options;
-using Daybreak.Utils;
+using Daybreak.Shared.Models;
+using Daybreak.Shared.Services.Options;
+using Daybreak.Shared.Services.Themes;
+using Daybreak.Shared.Utils;
 using System;
 using System.Configuration;
 using System.Core.Extensions;

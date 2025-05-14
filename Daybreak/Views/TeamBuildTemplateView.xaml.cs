@@ -1,10 +1,10 @@
 ﻿using Daybreak.Controls.Buttons;
-using Daybreak.Models.Builds;
-using Daybreak.Models.Guildwars;
-using Daybreak.Services.BuildTemplates;
-using Daybreak.Services.Navigation;
-using Daybreak.Services.Notifications;
-using Daybreak.Services.Toolbox;
+using Daybreak.Shared.Models.Builds;
+using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Services.BuildTemplates;
+using Daybreak.Shared.Services.Navigation;
+using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.Toolbox;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Core.Extensions;

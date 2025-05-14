@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Daybreak.Shared.Services.Logging;
+using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Logging;
 

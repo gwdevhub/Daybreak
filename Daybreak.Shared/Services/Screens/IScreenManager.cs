@@ -1,7 +1,7 @@
-﻿using Daybreak.Models;
+﻿using Daybreak.Shared.Models;
 using System.Collections.Generic;
 
-namespace Daybreak.Services.Screens;
+namespace Daybreak.Shared.Services.Screens;
 
 public interface IScreenManager
 {

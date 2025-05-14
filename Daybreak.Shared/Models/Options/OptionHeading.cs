@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Models.Options;
+﻿namespace Daybreak.Shared.Models.Options;
 
 public sealed class OptionHeading
 {

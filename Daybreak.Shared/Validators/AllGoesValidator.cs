@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Validators;
+﻿namespace Daybreak.Shared.Validators;
 
 public sealed class AllGoesValidator : IValidator
 {

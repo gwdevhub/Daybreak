@@ -1,9 +1,9 @@
-﻿using Daybreak.Models.Mods;
+﻿using Daybreak.Shared.Models.Mods;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Daybreak.Services.Mods;
+namespace Daybreak.Shared.Services.Mods;
 
 public interface IModService
 {

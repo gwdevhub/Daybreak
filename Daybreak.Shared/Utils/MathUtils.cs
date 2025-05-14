@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Utils;
+﻿namespace Daybreak.Shared.Utils;
 
 public static class MathUtils
 {

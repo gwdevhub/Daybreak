@@ -1,6 +1,6 @@
 ﻿using System.Windows.Threading;
 
-namespace Daybreak.Models.Notifications;
+namespace Daybreak.Shared.Models.Notifications;
 public sealed class NotificationWrapper
 {
     public string? Title { get => this.Notification?.Title; }

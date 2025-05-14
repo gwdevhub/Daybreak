@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Models.Notifications;
+﻿namespace Daybreak.Shared.Models.Notifications;
 
 internal interface ICancellableNotification : INotification
 {

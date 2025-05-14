@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Services.ApplicationArguments.ArgumentHandling;
+﻿namespace Daybreak.Shared.Services.ApplicationArguments.ArgumentHandling;
 public interface IArgumentHandler
 {
     string Identifier { get; }

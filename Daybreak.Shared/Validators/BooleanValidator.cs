@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Validators;
+﻿namespace Daybreak.Shared.Validators;
 public sealed class BooleanValidator : IValidator
 {
     public bool IsValid(object value)

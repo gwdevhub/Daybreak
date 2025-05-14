@@ -1,7 +1,7 @@
-﻿using Daybreak.Models.Notifications;
-using Daybreak.Services.Notifications;
-using Daybreak.Services.Sounds;
-using Daybreak.Shared;
+﻿using Daybreak.Shared;
+using Daybreak.Shared.Models.Notifications;
+using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.Sounds;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;

@@ -1,8 +1,8 @@
-﻿using Daybreak.Models.Guildwars;
+﻿using Daybreak.Shared.Models.Guildwars;
 using Newtonsoft.Json;
 using System;
 
-namespace Daybreak.Converters;
+namespace Daybreak.Shared.Converters;
 public sealed class ContinentJsonConverter : JsonConverter
 {
     public override bool CanConvert(Type objectType) => true;

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Daybreak.Models.Progress;
+namespace Daybreak.Shared.Models.Progress;
 
 public abstract class DownloadStatus : ActionStatus
 {

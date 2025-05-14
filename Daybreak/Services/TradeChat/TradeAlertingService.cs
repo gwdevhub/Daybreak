@@ -1,10 +1,12 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Converters;
-using Daybreak.Models.Trade;
-using Daybreak.Services.Notifications;
 using Daybreak.Services.TradeChat.Models;
 using Daybreak.Services.TradeChat.Notifications;
-using Daybreak.Utils;
+using Daybreak.Shared.Configuration.Options;
+using Daybreak.Shared.Converters;
+using Daybreak.Shared.Models.Trade;
+using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.TradeChat;
+using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;

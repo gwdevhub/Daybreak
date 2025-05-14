@@ -1,10 +1,10 @@
-﻿using Daybreak.Converters;
+﻿using Daybreak.Shared.Converters;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Daybreak.Models.Guildwars;
+namespace Daybreak.Shared.Models.Guildwars;
 
 [JsonConverter(typeof(MapJsonConverter))]
 public sealed class Map : IWikiEntity

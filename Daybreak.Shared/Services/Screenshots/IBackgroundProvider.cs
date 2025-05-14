@@ -1,7 +1,7 @@
-﻿using Daybreak.Models;
+﻿using Daybreak.Shared.Models;
 using System.Threading.Tasks;
 
-namespace Daybreak.Services.Screenshots;
+namespace Daybreak.Shared.Services.Screenshots;
 
 public interface IBackgroundProvider
 {

@@ -1,6 +1,6 @@
-﻿using Daybreak.Services.Mods;
+﻿using Daybreak.Shared.Services.Mods;
 
-namespace Daybreak.Services.Api;
+namespace Daybreak.Shared.Services.Api;
 public interface IDaybreakApiService : IModService
 {
 }

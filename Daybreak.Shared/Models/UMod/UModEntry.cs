@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Models.UMod;
+﻿namespace Daybreak.Shared.Models.UMod;
 
 public sealed class UModEntry
 {

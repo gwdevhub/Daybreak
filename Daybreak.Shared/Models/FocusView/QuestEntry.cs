@@ -1,6 +1,6 @@
-﻿using Daybreak.Models.Guildwars;
+﻿using Daybreak.Shared.Models.Guildwars;
 
-namespace Daybreak.Models.FocusView;
+namespace Daybreak.Shared.Models.FocusView;
 
 public sealed class QuestEntry : QuestLogEntry
 {

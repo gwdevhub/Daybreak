@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Media;
 
-namespace Daybreak.Models;
+namespace Daybreak.Shared.Models;
 public static class ColorPalette
 {
     public readonly static Color Red = Color.FromArgb(255, 213, 0, 0);

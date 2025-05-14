@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics.Metrics;
 
-namespace Daybreak.Models.Metrics;
+namespace Daybreak.Shared.Models.Metrics;
 
 public readonly struct Metric
 {

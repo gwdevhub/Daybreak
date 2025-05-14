@@ -1,7 +1,7 @@
-﻿using Daybreak.Models.Notifications;
-using Daybreak.Models.Notifications.Handling;
-using Daybreak.Models.Versioning;
-using Daybreak.Services.Navigation;
+﻿using Daybreak.Shared.Models.Notifications;
+using Daybreak.Shared.Models.Notifications.Handling;
+using Daybreak.Shared.Models.Versioning;
+using Daybreak.Shared.Services.Navigation;
 using Daybreak.Views;
 using System.Core.Extensions;
 

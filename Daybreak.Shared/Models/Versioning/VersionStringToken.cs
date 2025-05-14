@@ -1,6 +1,6 @@
 ﻿using System.Core.Extensions;
 
-namespace Daybreak.Models.Versioning;
+namespace Daybreak.Shared.Models.Versioning;
 
 public sealed class VersionStringToken : VersionToken
 {

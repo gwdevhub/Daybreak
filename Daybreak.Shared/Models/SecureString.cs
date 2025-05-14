@@ -1,10 +1,10 @@
-﻿using Daybreak.Utils;
+﻿using Daybreak.Shared.Utils;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Security.Cryptography;
 
-namespace Daybreak.Models;
+namespace Daybreak.Shared.Models;
 
 [Serializable]
 public sealed class SecureString

@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace Daybreak.Models;
+namespace Daybreak.Shared.Models;
 
 public sealed class Screen
 {

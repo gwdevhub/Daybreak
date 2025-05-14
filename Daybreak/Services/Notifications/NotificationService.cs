@@ -1,7 +1,9 @@
-﻿using Daybreak.Models.Notifications;
-using Daybreak.Models.Notifications.Handling;
+﻿using Daybreak.Models.Notifications.Handling;
 using Daybreak.Services.Notifications.Models;
-using Daybreak.Utils;
+using Daybreak.Shared.Models.Notifications;
+using Daybreak.Shared.Models.Notifications.Handling;
+using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using Slim;
 using System;

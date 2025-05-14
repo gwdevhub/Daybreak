@@ -1,7 +1,7 @@
-﻿using Daybreak.Models.Guildwars;
+﻿using Daybreak.Shared.Models.Guildwars;
 using System.Threading.Tasks;
 
-namespace Daybreak.Services.IconRetrieve;
+namespace Daybreak.Shared.Services.IconRetrieve;
 
 public interface IIconCache
 {

@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Models.Onboarding;
+﻿namespace Daybreak.Shared.Models.Onboarding;
 
 public enum LauncherOnboardingStage
 {

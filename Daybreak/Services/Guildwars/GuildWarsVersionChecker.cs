@@ -1,7 +1,8 @@
-﻿using Daybreak.Models.Mods;
-using Daybreak.Services.ExecutableManagement;
-using Daybreak.Services.Guildwars;
-using Daybreak.Services.Notifications;
+﻿using Daybreak.Services.Guildwars;
+using Daybreak.Shared.Models.Mods;
+using Daybreak.Shared.Services.ExecutableManagement;
+using Daybreak.Shared.Services.Guildwars;
+using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;

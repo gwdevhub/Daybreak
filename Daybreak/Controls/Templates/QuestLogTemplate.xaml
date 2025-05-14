@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Controls.Templates"
              xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
-             xmlns:models="clr-namespace:Daybreak.Models.FocusView;assembly=Daybreak.Shared"
+             xmlns:models="clr-namespace:Daybreak.Shared.Models.FocusView;assembly=Daybreak.Shared"
              x:Name="_this"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">

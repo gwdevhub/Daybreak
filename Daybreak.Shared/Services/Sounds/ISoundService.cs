@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Services.Sounds;
+﻿namespace Daybreak.Shared.Services.Sounds;
 
 public interface ISoundService
 {

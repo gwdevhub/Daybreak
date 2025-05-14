@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Daybreak.Models.Builds;
+using Daybreak.Shared.Models.Builds;
 
-namespace Daybreak.Models.Guildwars;
+namespace Daybreak.Shared.Models.Guildwars;
 
 public sealed class Build
 {

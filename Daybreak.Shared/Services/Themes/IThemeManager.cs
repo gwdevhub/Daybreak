@@ -1,7 +1,7 @@
 ﻿using ControlzEx.Theming;
 using System.Windows.Media;
 
-namespace Daybreak.Services.Themes;
+namespace Daybreak.Shared.Services.Themes;
 public interface IThemeManager
 {
     Theme GetCurrentTheme();

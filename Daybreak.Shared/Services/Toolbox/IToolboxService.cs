@@ -1,11 +1,11 @@
-﻿using Daybreak.Models.Builds;
-using Daybreak.Models.Progress;
-using Daybreak.Services.Mods;
+﻿using Daybreak.Shared.Models.Builds;
+using Daybreak.Shared.Models.Progress;
+using Daybreak.Shared.Services.Mods;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Daybreak.Services.Toolbox;
+namespace Daybreak.Shared.Services.Toolbox;
 public interface IToolboxService : IModService
 {
     bool LoadToolboxFromDisk();

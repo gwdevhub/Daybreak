@@ -1,13 +1,14 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Exceptions;
-using Daybreak.Models;
-using Daybreak.Models.LaunchConfigurations;
-using Daybreak.Models.Mods;
-using Daybreak.Services.Mods;
-using Daybreak.Services.Mutex;
-using Daybreak.Services.Notifications;
-using Daybreak.Services.Privilege;
-using Daybreak.Utils;
+using Daybreak.Shared.Exceptions;
+using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.LaunchConfigurations;
+using Daybreak.Shared.Models.Mods;
+using Daybreak.Shared.Services.ApplicationLauncher;
+using Daybreak.Shared.Services.Mods;
+using Daybreak.Shared.Services.Mutex;
+using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.Privilege;
+using Daybreak.Shared.Utils;
 using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
@@ -26,7 +27,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using static Daybreak.Utils.NativeMethods;
+using static Daybreak.Shared.Utils.NativeMethods;
 
 namespace Daybreak.Services.ApplicationLauncher;
 

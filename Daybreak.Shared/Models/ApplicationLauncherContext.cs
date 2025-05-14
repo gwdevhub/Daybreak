@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Daybreak.Models;
+namespace Daybreak.Shared.Models;
 public readonly struct ApplicationLauncherContext
 {
     public string ExecutablePath { get; init; }

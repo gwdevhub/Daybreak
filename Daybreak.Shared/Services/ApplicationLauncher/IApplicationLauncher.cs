@@ -1,9 +1,9 @@
-﻿using Daybreak.Models.LaunchConfigurations;
+﻿using Daybreak.Shared.Models.LaunchConfigurations;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace Daybreak.Services.ApplicationLauncher;
+namespace Daybreak.Shared.Services.ApplicationLauncher;
 
 public interface IApplicationLauncher
 {

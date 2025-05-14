@@ -1,6 +1,6 @@
-﻿using Daybreak.Models.Builds;
+﻿using Daybreak.Shared.Models.Builds;
 
-namespace Daybreak.Models;
+namespace Daybreak.Shared.Models;
 
 public sealed class BuildWithTemplateCode
 {

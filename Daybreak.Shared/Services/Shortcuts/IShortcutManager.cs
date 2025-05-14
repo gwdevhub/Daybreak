@@ -1,6 +1,6 @@
 ﻿using System.Windows.Extensions.Services;
 
-namespace Daybreak.Services.Shortcuts;
+namespace Daybreak.Shared.Services.Shortcuts;
 
 public interface IShortcutManager : IApplicationLifetimeService
 {

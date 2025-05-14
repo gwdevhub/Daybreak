@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace Daybreak.Converters;
+namespace Daybreak.Shared.Converters;
 public sealed class AttributeJsonConverter : JsonConverter
 {
     public override bool CanConvert(Type objectType) => true;

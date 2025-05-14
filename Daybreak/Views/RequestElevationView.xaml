@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:Daybreak.Views"
              xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              mc:Ignorable="d" 
-             xmlns:converters="clr-namespace:Daybreak.Converters;assembly=Daybreak.Shared"
+             xmlns:converters="clr-namespace:Daybreak.Shared.Converters;assembly=Daybreak.Shared"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Background="{StaticResource Daybreak.Brushes.Background}" MinHeight="200" MinWidth="400">
         <Border BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"

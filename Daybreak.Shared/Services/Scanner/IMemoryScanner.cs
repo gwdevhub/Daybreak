@@ -1,7 +1,7 @@
-﻿using Daybreak.Models.Interop;
+﻿using Daybreak.Shared.Models.Interop;
 using System.Diagnostics;
 
-namespace Daybreak.Services.Scanner;
+namespace Daybreak.Shared.Services.Scanner;
 
 public interface IMemoryScanner
 {

@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Models.Plugins;
+﻿namespace Daybreak.Shared.Models.Plugins;
 
 public sealed class AvailablePlugin
 {

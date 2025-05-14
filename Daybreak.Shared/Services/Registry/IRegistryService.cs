@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Services.Registry;
+﻿namespace Daybreak.Shared.Services.Registry;
 
 public interface IRegistryService
 {

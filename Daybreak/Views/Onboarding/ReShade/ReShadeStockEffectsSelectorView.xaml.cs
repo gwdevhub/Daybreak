@@ -1,5 +1,5 @@
-﻿using Daybreak.Models.ReShade;
-using Daybreak.Services.ReShade;
+﻿using Daybreak.Shared.Models.ReShade;
+using Daybreak.Shared.Services.ReShade;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;
 using System.Extensions;

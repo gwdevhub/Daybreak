@@ -1,4 +1,5 @@
-﻿using Microsoft.Web.WebView2.Core;
+﻿using Daybreak.Shared.Services.Browser;
+using Microsoft.Web.WebView2.Core;
 using Slim;
 using System.Core.Extensions;
 using System.Extensions;

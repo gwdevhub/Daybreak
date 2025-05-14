@@ -1,8 +1,8 @@
-﻿using Daybreak.Models;
+﻿using Daybreak.Shared.Models;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Daybreak.Services.InternetChecker;
+namespace Daybreak.Shared.Services.InternetChecker;
 
 public interface IInternetCheckingService
 {

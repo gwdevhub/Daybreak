@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 
-namespace Daybreak.Models.Notifications;
+namespace Daybreak.Shared.Models.Notifications;
 
 internal interface INotification
 {

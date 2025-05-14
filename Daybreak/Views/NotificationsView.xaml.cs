@@ -1,5 +1,5 @@
-﻿using Daybreak.Models.Notifications;
-using Daybreak.Services.Notifications;
+﻿using Daybreak.Shared.Models.Notifications;
+using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.ObjectModel;

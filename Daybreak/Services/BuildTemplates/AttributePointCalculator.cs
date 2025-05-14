@@ -1,5 +1,6 @@
-﻿using Daybreak.Models.Builds;
-using Daybreak.Models.Guildwars;
+﻿using Daybreak.Shared.Models.Builds;
+using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Services.BuildTemplates;
 using System;
 using System.Collections.Generic;
 

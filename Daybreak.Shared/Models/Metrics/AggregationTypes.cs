@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Models.Metrics;
+﻿namespace Daybreak.Shared.Models.Metrics;
 
 public enum AggregationTypes
 {

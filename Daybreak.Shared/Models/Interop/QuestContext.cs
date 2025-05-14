@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using System.Runtime.InteropServices;
 
-namespace Daybreak.Models.Interop;
+namespace Daybreak.Shared.Models.Interop;
 
 [StructLayout(LayoutKind.Explicit)]
 public readonly struct QuestContext

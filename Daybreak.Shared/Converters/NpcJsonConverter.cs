@@ -1,9 +1,9 @@
-﻿using Daybreak.Models.Guildwars;
+﻿using Daybreak.Shared.Models.Guildwars;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
 
-namespace Daybreak.Converters;
+namespace Daybreak.Shared.Converters;
 public sealed class NpcJsonConverter : JsonConverter
 {
     public override bool CanConvert(Type objectType) => true;

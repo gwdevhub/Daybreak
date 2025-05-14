@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
-using Attribute = Daybreak.Models.Guildwars.Attribute;
+using Attribute = Daybreak.Shared.Models.Guildwars.Attribute;
 
-namespace Daybreak.Models.Builds;
+namespace Daybreak.Shared.Models.Builds;
 
 public sealed class AttributeEntry : INotifyPropertyChanged
 {

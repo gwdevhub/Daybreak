@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:Daybreak.Controls"
              xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              xmlns:glyphs="clr-namespace:Daybreak.Controls.Glyphs"
-             xmlns:converters="clr-namespace:Daybreak.Converters;assembly=Daybreak.Shared"
+             xmlns:converters="clr-namespace:Daybreak.Shared.Converters;assembly=Daybreak.Shared"
              mc:Ignorable="d" 
              x:Name="_this"
              Tag="{Binding RelativeSource={RelativeSource Self}}"

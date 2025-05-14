@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Views"
-             xmlns:converters="clr-namespace:Daybreak.Converters;assembly=Daybreak.Shared"
+             xmlns:converters="clr-namespace:Daybreak.Shared.Converters;assembly=Daybreak.Shared"
              xmlns:controls="clr-namespace:Daybreak.Controls"
              xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              xmlns:glyphs="clr-namespace:Daybreak.Controls.Glyphs"

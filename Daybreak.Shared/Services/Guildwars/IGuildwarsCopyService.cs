@@ -1,8 +1,8 @@
-﻿using Daybreak.Models.Progress;
+﻿using Daybreak.Shared.Models.Progress;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Daybreak.Services.Guildwars;
+namespace Daybreak.Shared.Services.Guildwars;
 
 public interface IGuildWarsCopyService
 {

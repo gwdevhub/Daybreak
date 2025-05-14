@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Daybreak.Models;
+namespace Daybreak.Shared.Models;
 
 public sealed class ExecutablePath : INotifyPropertyChanged
 {

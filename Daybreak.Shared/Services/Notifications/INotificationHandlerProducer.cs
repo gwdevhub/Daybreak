@@ -1,6 +1,6 @@
-﻿using Daybreak.Models.Notifications.Handling;
+﻿using Daybreak.Shared.Models.Notifications.Handling;
 
-namespace Daybreak.Services.Notifications;
+namespace Daybreak.Shared.Services.Notifications;
 
 public interface INotificationHandlerProducer
 {

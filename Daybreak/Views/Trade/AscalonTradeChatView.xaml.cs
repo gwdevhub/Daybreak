@@ -1,7 +1,7 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Models.Trade;
-using Daybreak.Services.Notifications;
-using Daybreak.Services.TradeChat;
+using Daybreak.Shared.Models.Trade;
+using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.TradeChat;
 using Microsoft.Extensions.Options;
 using System.Core.Extensions;
 using System.Windows;

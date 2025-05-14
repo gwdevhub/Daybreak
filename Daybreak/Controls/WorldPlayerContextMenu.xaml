@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Controls"
-             xmlns:guildwars="clr-namespace:Daybreak.Models.Guildwars"
+             xmlns:guildwars="clr-namespace:Daybreak.Shared.Models.Guildwars;assembly=Daybreak.Shared"
              mc:Ignorable="d" 
              Background="{StaticResource Daybreak.Brushes.Background}"
              d:DataContext="{d:DesignInstance Type=guildwars:WorldPlayerInformation, IsDesignTimeCreatable=True}"

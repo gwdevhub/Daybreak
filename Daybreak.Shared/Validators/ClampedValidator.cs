@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace Daybreak.Validators;
+namespace Daybreak.Shared.Validators;
 
 public sealed class ClampedValidator<T> : IValidator
     where T : IComparable<T>

@@ -1,15 +1,16 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Exceptions;
-using Daybreak.Models.Builds;
-using Daybreak.Models.Mods;
-using Daybreak.Models.Progress;
-using Daybreak.Services.BuildTemplates;
-using Daybreak.Services.Injection;
-using Daybreak.Services.Notifications;
 using Daybreak.Services.Toolbox.Models;
 using Daybreak.Services.Toolbox.Notifications;
 using Daybreak.Services.Toolbox.Utilities;
-using Daybreak.Utils;
+using Daybreak.Shared.Exceptions;
+using Daybreak.Shared.Models.Builds;
+using Daybreak.Shared.Models.Mods;
+using Daybreak.Shared.Models.Progress;
+using Daybreak.Shared.Services.BuildTemplates;
+using Daybreak.Shared.Services.Injection;
+using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.Toolbox;
+using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System;
@@ -341,7 +342,7 @@ internal sealed class ToolboxService(
             current += "-release";
         }
 
-        if (!Daybreak.Models.Versioning.Version.TryParse(current, out var currentVersion))
+        if (!Shared.Models.Versioning.Version.TryParse(current, out var currentVersion))
         {
             return true;
         }

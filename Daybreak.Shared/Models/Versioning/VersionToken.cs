@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace Daybreak.Models.Versioning;
+namespace Daybreak.Shared.Models.Versioning;
 
 public abstract class VersionToken
 {

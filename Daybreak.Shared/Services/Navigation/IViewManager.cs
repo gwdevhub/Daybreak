@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Controls;
 
-namespace Daybreak.Services.Navigation;
+namespace Daybreak.Shared.Services.Navigation;
 
 public interface IViewManager : IViewProducer
 {

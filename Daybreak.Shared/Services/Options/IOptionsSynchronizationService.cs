@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Daybreak.Services.Options;
+namespace Daybreak.Shared.Services.Options;
 
 public interface IOptionsSynchronizationService
 {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Daybreak.Models.Progress;
+namespace Daybreak.Shared.Models.Progress;
 
 public sealed class IconDownloadStatus : INotifyPropertyChanged
 {

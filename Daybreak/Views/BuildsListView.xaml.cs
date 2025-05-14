@@ -1,10 +1,9 @@
-﻿using Daybreak.Models;
-using Daybreak.Models.Builds;
-using Daybreak.Models.Guildwars;
-using Daybreak.Services.BuildTemplates;
-using Daybreak.Services.Navigation;
-using Daybreak.Services.Toolbox;
-using Daybreak.Utils;
+﻿using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.Builds;
+using Daybreak.Shared.Services.BuildTemplates;
+using Daybreak.Shared.Services.Navigation;
+using Daybreak.Shared.Services.Toolbox;
+using Daybreak.Shared.Utils;
 using System;
 using System.Collections.Generic;
 using System.Core.Extensions;

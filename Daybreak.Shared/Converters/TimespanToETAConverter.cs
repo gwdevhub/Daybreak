@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace Daybreak.Converters;
+namespace Daybreak.Shared.Converters;
 
 public sealed class TimespanToETAConverter : IValueConverter
 {
@@ -30,6 +30,6 @@ public sealed class TimespanToETAConverter : IValueConverter
             return $"{(int)timeSpan.TotalDays} day{((int)timeSpan.TotalDays > 1 ? PluralAppend : string.Empty)} remaining";
         }
 
-        return $"{(int)timeSpan.Hours:D2}:{(int)timeSpan.Minutes:D2}:{(int)timeSpan.Seconds:D2} remaining";
+        return $"{timeSpan.Hours:D2}:{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2} remaining";
     }
 }

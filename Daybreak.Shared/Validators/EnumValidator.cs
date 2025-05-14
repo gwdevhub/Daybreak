@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Daybreak.Validators;
+namespace Daybreak.Shared.Validators;
 
 public sealed class EnumValidator<T> : IValidator
     where T : struct, Enum

@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics.Metrics;
 using System;
-using Daybreak.Models.Metrics;
 using System.Collections.Generic;
+using Daybreak.Shared.Models.Metrics;
 
-namespace Daybreak.Services.Metrics;
+namespace Daybreak.Shared.Services.Metrics;
 
 public interface IMetricsService
 {

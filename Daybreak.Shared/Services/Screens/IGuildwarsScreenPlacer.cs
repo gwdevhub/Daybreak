@@ -1,6 +1,6 @@
-﻿using Daybreak.Services.Mods;
+﻿using Daybreak.Shared.Services.Mods;
 
-namespace Daybreak.Services.Screens;
+namespace Daybreak.Shared.Services.Screens;
 
 public interface IGuildwarsScreenPlacer : IModService
 {

@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Models.Interop;
+﻿namespace Daybreak.Shared.Models.Interop;
 
 public readonly struct PlayerPartyMember
 {

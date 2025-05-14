@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Services.ApplicationArguments;
+﻿namespace Daybreak.Shared.Services.ApplicationArguments;
 
 public interface IApplicationArgumentService : IArgumentHandlerProducer
 {

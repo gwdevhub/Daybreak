@@ -1,14 +1,14 @@
-﻿using Daybreak.Services.ApplicationArguments;
-using Daybreak.Services.Browser;
-using Daybreak.Services.Menu;
-using Daybreak.Services.Metrics;
-using Daybreak.Services.Mods;
-using Daybreak.Services.Navigation;
-using Daybreak.Services.Notifications;
-using Daybreak.Services.Options;
-using Daybreak.Services.Startup;
-using Daybreak.Services.Updater.PostUpdate;
-using Daybreak.Utils;
+﻿using Daybreak.Shared.Services.ApplicationArguments;
+using Daybreak.Shared.Services.Browser;
+using Daybreak.Shared.Services.Menu;
+using Daybreak.Shared.Services.Metrics;
+using Daybreak.Shared.Services.Mods;
+using Daybreak.Shared.Services.Navigation;
+using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.Options;
+using Daybreak.Shared.Services.Startup;
+using Daybreak.Shared.Services.Updater.PostUpdate;
+using Daybreak.Shared.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http.Logging;
 using Microsoft.Extensions.Logging;
@@ -17,7 +17,7 @@ using System.Core.Extensions;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
-namespace Daybreak.Models.Plugins;
+namespace Daybreak.Shared.Shared.Models.Plugins;
 
 public abstract class PluginConfigurationBase
 {

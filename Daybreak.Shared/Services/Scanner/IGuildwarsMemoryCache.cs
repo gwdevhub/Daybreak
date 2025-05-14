@@ -1,9 +1,9 @@
-﻿using Daybreak.Models.Guildwars;
-using Daybreak.Models.LaunchConfigurations;
+﻿using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Models.LaunchConfigurations;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Daybreak.Services.Scanner;
+namespace Daybreak.Shared.Services.Scanner;
 
 public interface IGuildwarsMemoryCache
 {

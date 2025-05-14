@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Services.Experience;
+﻿namespace Daybreak.Shared.Services.Experience;
 
 public interface IExperienceCalculator
 {

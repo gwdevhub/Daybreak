@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
-namespace Daybreak.Models;
+namespace Daybreak.Shared.Models;
 
 public class BatchedObservableCollection<T> : ObservableCollection<T>
 {

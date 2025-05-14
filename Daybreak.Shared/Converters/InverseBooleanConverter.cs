@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Data;
 
-namespace Daybreak.Converters;
+namespace Daybreak.Shared.Converters;
 
 public class InverseBooleanConverter : IValueConverter
 {

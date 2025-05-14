@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Daybreak.Models.Guildwars;
+namespace Daybreak.Shared.Models.Guildwars;
 public sealed class TeamBuildData
 {
     public required List<TeamBuildPlayerData> TeamBuildPlayers { get; init; }

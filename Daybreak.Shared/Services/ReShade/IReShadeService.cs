@@ -1,11 +1,11 @@
-﻿using Daybreak.Models.Progress;
-using Daybreak.Models.ReShade;
-using Daybreak.Services.Mods;
+﻿using Daybreak.Shared.Models.Progress;
+using Daybreak.Shared.Models.ReShade;
+using Daybreak.Shared.Services.Mods;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Daybreak.Services.ReShade;
+namespace Daybreak.Shared.Services.ReShade;
 public interface IReShadeService : IModService
 {
     bool AutoUpdate { get; set; }

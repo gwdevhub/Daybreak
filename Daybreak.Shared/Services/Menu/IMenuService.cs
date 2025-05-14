@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Services.Menu;
+﻿namespace Daybreak.Shared.Services.Menu;
 
 public interface IMenuService
 {

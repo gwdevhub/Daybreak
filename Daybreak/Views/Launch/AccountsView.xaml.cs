@@ -1,7 +1,7 @@
 ﻿using Daybreak.Controls;
-using Daybreak.Models;
-using Daybreak.Services.Credentials;
-using Daybreak.Services.Navigation;
+using Daybreak.Shared.Models;
+using Daybreak.Shared.Services.Credentials;
+using Daybreak.Shared.Services.Navigation;
 using System;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;

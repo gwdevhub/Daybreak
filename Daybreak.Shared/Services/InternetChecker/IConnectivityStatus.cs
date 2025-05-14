@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Services.InternetChecker;
+﻿namespace Daybreak.Shared.Services.InternetChecker;
 
 public interface IConnectivityStatus
 {

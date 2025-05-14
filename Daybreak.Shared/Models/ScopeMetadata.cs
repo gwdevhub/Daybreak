@@ -1,6 +1,6 @@
 ﻿using Microsoft.CorrelationVector;
 
-namespace Daybreak.Models;
+namespace Daybreak.Shared.Models;
 
 public class ScopeMetadata
 {

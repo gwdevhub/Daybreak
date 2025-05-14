@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Models.FocusView;
+﻿namespace Daybreak.Shared.Models.FocusView;
 
 public abstract class QuestLogEntry
 {

@@ -1,7 +1,7 @@
-﻿using Daybreak.Models.LaunchConfigurations;
+﻿using Daybreak.Shared.Models.LaunchConfigurations;
 using System.Collections.Generic;
 
-namespace Daybreak.Services.LaunchConfigurations;
+namespace Daybreak.Shared.Services.LaunchConfigurations;
 public interface ILaunchConfigurationService
 {
     IEnumerable<LaunchConfigurationWithCredentials> GetLaunchConfigurations();

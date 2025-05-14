@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Windows.Threading;
 
-namespace Daybreak.Models.Trade;
+namespace Daybreak.Shared.Models.Trade;
 
 public sealed class TraderMessageViewWrapper : INotifyPropertyChanged
 {

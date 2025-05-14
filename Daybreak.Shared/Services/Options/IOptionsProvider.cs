@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Daybreak.Services.Options;
+namespace Daybreak.Shared.Services.Options;
 
 public interface IOptionsProvider
 {

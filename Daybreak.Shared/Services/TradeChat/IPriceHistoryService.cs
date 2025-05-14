@@ -1,11 +1,11 @@
-﻿using Daybreak.Models.Guildwars;
-using Daybreak.Models.Trade;
+﻿using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Models.Trade;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Daybreak.Services.TradeChat;
+namespace Daybreak.Shared.Services.TradeChat;
 
 public interface IPriceHistoryService
 {

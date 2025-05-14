@@ -1,5 +1,5 @@
-﻿using Daybreak.Models;
-using Daybreak.Services.Logging;
+﻿using Daybreak.Shared.Models;
+using Daybreak.Shared.Services.Logging;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Search;
 using Microsoft.Extensions.Logging;

@@ -1,6 +1,6 @@
-﻿using Daybreak.Models.Guildwars;
+﻿using Daybreak.Shared.Models.Guildwars;
 
-namespace Daybreak.Services.TradeChat;
+namespace Daybreak.Shared.Services.TradeChat;
 
 public interface IItemHashService
 {

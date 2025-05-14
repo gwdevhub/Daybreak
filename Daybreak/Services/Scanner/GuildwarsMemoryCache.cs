@@ -1,7 +1,8 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Models.Guildwars;
-using Daybreak.Models.LaunchConfigurations;
 using Daybreak.Services.Scanner.Models;
+using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Models.LaunchConfigurations;
+using Daybreak.Shared.Services.Scanner;
 using System;
 using System.Configuration;
 using System.Core.Extensions;

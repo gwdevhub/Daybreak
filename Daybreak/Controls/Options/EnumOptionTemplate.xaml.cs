@@ -1,4 +1,4 @@
-﻿using Daybreak.Models.Options;
+﻿using Daybreak.Shared.Models.Options;
 using System;
 using System.Collections.ObjectModel;
 using System.Extensions;

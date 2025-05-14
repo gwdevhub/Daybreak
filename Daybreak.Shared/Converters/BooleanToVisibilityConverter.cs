@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace Daybreak.Converters;
+namespace Daybreak.Shared.Converters;
 
 public class BooleanToVisibilityConverter : IValueConverter
 {
@@ -38,12 +38,12 @@ public class BooleanToVisibilityConverter : IValueConverter
         }
 
         var objValue = value.Cast<bool>();
-        if ((objValue && this.TriggerValue && this.IsHidden) || (!objValue && !this.TriggerValue && this.IsHidden))
+        if (objValue && this.TriggerValue && this.IsHidden || !objValue && !this.TriggerValue && this.IsHidden)
         {
             return Visibility.Hidden;
         }
 
-        if ((objValue && this.TriggerValue && !this.IsHidden) || (!objValue && !this.TriggerValue && !this.IsHidden))
+        if (objValue && this.TriggerValue && !this.IsHidden || !objValue && !this.TriggerValue && !this.IsHidden)
         {
             return Visibility.Collapsed;
         }

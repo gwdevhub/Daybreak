@@ -1,6 +1,7 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Models.Mods;
-using Daybreak.Services.Scanner;
+using Daybreak.Shared.Models.Mods;
+using Daybreak.Shared.Services.Scanner;
+using Daybreak.Shared.Services.Screens;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;

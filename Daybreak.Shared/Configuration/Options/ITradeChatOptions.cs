@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Configuration.Options;
+﻿namespace Daybreak.Shared.Configuration.Options;
 
 public interface ITradeChatOptions
 {

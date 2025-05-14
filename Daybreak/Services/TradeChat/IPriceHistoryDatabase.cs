@@ -1,6 +1,6 @@
-﻿using Daybreak.Models.Guildwars;
-using Daybreak.Models.Trade;
-using Daybreak.Services.TradeChat.Models;
+﻿using Daybreak.Services.TradeChat.Models;
+using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Models.Trade;
 using System;
 using System.Collections.Generic;
 using System.Threading;

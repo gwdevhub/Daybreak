@@ -1,12 +1,12 @@
-﻿using Daybreak.Models.Progress;
-using Daybreak.Models.UMod;
-using Daybreak.Services.Mods;
+﻿using Daybreak.Shared.Models.Progress;
+using Daybreak.Shared.Models.UMod;
+using Daybreak.Shared.Services.Mods;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Version = Daybreak.Models.Versioning.Version;
+using Version = Daybreak.Shared.Models.Versioning.Version;
 
-namespace Daybreak.Services.UMod;
+namespace Daybreak.Shared.Services.UMod;
 public interface IUModService : IModService
 {
     Version Version { get; }

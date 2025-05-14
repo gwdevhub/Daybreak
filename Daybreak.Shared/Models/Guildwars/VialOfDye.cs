@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Daybreak.Models.Guildwars;
+namespace Daybreak.Shared.Models.Guildwars;
 
 public sealed class VialOfDye : ItemBase, IItemModHash, IWikiEntity, IIconUrlEntity
 {
@@ -17,7 +17,7 @@ public sealed class VialOfDye : ItemBase, IItemModHash, IWikiEntity, IIconUrlEnt
     public static readonly VialOfDye White = new() { Id = 146, Name = "Vial of Dye [White]", Modifiers = [0x24D00C01, 0x24E8000C], ModHash = "24D00C0124E8000C", WikiUrl = "https://wiki.guildwars.com/wiki/Dye", IconUrl = "https://wiki.guildwars.com/images/9/91/White_Dye.png" };
     public static readonly VialOfDye Yellow = new() { Id = 146, Name = "Vial of Dye [Yellow]", Modifiers = [0x24D00601, 0x24E80006], ModHash = "24D0060124E80006", WikiUrl = "https://wiki.guildwars.com/wiki/Dye", IconUrl = "https://wiki.guildwars.com/images/4/46/Yellow_Dye.png" };
 
-    public static IReadOnlyList<ItemBase> Vials { get; } =
+    public static IReadOnlyList<VialOfDye> Vials { get; } =
     [
         Black,
         Blue,

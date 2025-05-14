@@ -1,7 +1,8 @@
-﻿using Daybreak.Models.Guildwars;
-using Daybreak.Models.Trade;
-using Daybreak.Services.TradeChat.Models;
-using Daybreak.Utils;
+﻿using Daybreak.Services.TradeChat.Models;
+using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Models.Trade;
+using Daybreak.Shared.Services.TradeChat;
+using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;

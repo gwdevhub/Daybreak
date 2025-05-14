@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Daybreak.Models.Interop;
+namespace Daybreak.Shared.Models.Interop;
 
 [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
 public readonly struct LoginCharacterContext

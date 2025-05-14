@@ -1,8 +1,8 @@
-﻿using Daybreak.Models.Notifications.Handling;
+﻿using Daybreak.Shared.Models.Notifications.Handling;
 using Microsoft.Extensions.Logging;
 using System;
 
-namespace Daybreak.Models.Notifications;
+namespace Daybreak.Shared.Models.Notifications;
 
 public class Notification : ICancellableNotification
 {

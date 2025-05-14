@@ -1,4 +1,4 @@
-﻿using Daybreak.Models.Progress;
+﻿using Daybreak.Shared.Models.Progress;
 using System.Threading;
 
 namespace Daybreak.Services.Guildwars.Models;

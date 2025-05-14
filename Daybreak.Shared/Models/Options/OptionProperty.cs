@@ -1,9 +1,9 @@
-﻿using Daybreak.Validators;
+﻿using Daybreak.Shared.Validators;
 using System;
 using System.ComponentModel;
 using System.Core.Extensions;
 
-namespace Daybreak.Models.Options;
+namespace Daybreak.Shared.Models.Options;
 public sealed class OptionProperty
 {
     public string Name { get; }

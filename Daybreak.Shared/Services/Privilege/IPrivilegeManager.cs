@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace Daybreak.Services.Privilege;
+namespace Daybreak.Shared.Services.Privilege;
 
 public interface IPrivilegeManager
 {

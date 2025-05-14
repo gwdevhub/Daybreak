@@ -1,4 +1,5 @@
-﻿using Daybreak.Models.Plugins;
+﻿using Daybreak.Shared.Models.Plugins;
+using Daybreak.Shared.Shared.Models.Plugins;
 using Plumsy.Validators;
 using System;
 using System.Collections.Generic;

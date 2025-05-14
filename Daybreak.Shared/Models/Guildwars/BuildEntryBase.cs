@@ -1,10 +1,10 @@
-﻿using Daybreak.Models.Builds;
+﻿using Daybreak.Shared.Models.Builds;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace Daybreak.Models.Guildwars;
+namespace Daybreak.Shared.Models.Guildwars;
 
 public abstract class BuildEntryBase : INotifyPropertyChanged, IBuildEntry
 {

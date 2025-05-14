@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Daybreak.Models.Trade;
+namespace Daybreak.Shared.Models.Trade;
 
 public sealed class TraderMessage : IEquatable<TraderMessage>
 {

@@ -1,7 +1,7 @@
-﻿using Daybreak.Models.Progress;
+﻿using Daybreak.Shared.Models.Progress;
 using System.Threading;
 
-namespace Daybreak.Models;
+namespace Daybreak.Shared.Models;
 public sealed class GuildWarsUpdateRequest
 {
     public string? ExecutablePath { get; init; }

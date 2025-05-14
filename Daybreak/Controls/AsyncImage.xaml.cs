@@ -1,5 +1,5 @@
-﻿using Daybreak.Services.Images;
-using Daybreak.Shared;
+﻿using Daybreak.Shared;
+using Daybreak.Shared.Services.Images;
 using Microsoft.Extensions.DependencyInjection;
 using System.Core.Extensions;
 using System.Threading;

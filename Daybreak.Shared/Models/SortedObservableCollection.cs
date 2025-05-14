@@ -2,7 +2,7 @@
 using System;
 using System.Linq;
 
-namespace Daybreak.Models;
+namespace Daybreak.Shared.Models;
 
 public class SortedObservableCollection<T, TKey> : BatchedObservableCollection<T>
 {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Daybreak.Models.ReShade;
+namespace Daybreak.Shared.Models.ReShade;
 
 public sealed class ShaderPackage
 {

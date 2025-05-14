@@ -3,7 +3,7 @@ using System.Extensions;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Daybreak.Utils;
+namespace Daybreak.Shared.Utils;
 
 public static class StringUtils
 {

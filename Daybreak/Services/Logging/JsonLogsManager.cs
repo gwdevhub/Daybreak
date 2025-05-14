@@ -1,31 +1,31 @@
-﻿using Daybreak.Utils;
+﻿using Daybreak.Shared.Services.Logging;
+using Daybreak.Shared.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Logging;
 
 namespace Daybreak.Services.Logging;
 
 internal sealed class JsonLogsManager : ILogsManager
 {
-    private readonly LinkedList<Models.Log> memoryCache = [];
+    private readonly LinkedList<Shared.Models.Log> memoryCache = [];
 
-    public event EventHandler<Models.Log>? ReceivedLog;
+    public event EventHandler<Shared.Models.Log>? ReceivedLog;
 
-    public IEnumerable<Models.Log> GetLogs(Expression<Func<Models.Log, bool>> filter)
+    public IEnumerable<Shared.Models.Log> GetLogs(Expression<Func<Shared.Models.Log, bool>> filter)
     {
         return this.memoryCache
             .Where(filter.Compile());
     }
 
-    public IEnumerable<Models.Log> GetLogs()
+    public IEnumerable<Shared.Models.Log> GetLogs()
     {
         return [.. this.memoryCache];
     }
-    public void WriteLog(Log log)
+    public void WriteLog(System.Logging.Log log)
     {
-        var logModel = new Models.Log
+        var logModel = new Shared.Models.Log
         {
             EventId = log.EventId ?? string.Empty,
             Message = log.Exception is null ? log.Message : $"{log.Message}{Environment.NewLine}{log.Exception}",

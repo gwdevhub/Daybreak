@@ -1,8 +1,8 @@
-﻿using Daybreak.Models.Progress;
-using Daybreak.Services.Mods;
+﻿using Daybreak.Shared.Models.Progress;
+using Daybreak.Shared.Services.Mods;
 using System.Threading.Tasks;
 
-namespace Daybreak.Services.DSOAL;
+namespace Daybreak.Shared.Services.DSOAL;
 
 public interface IDSOALService : IModService
 {

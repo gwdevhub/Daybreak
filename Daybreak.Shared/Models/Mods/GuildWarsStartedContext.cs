@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Models.Mods;
+﻿namespace Daybreak.Shared.Models.Mods;
 public sealed class GuildWarsStartedContext
 {
     public ApplicationLauncherContext ApplicationLauncherContext { get; init; }

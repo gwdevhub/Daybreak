@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Daybreak.Exceptions;
+namespace Daybreak.Shared.Exceptions;
 
 public sealed class ExecutableNotFoundException : Exception
 {

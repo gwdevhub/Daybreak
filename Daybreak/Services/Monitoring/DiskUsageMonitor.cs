@@ -1,11 +1,12 @@
-﻿using Daybreak.Services.Metrics;
-using System.Diagnostics.Metrics;
+﻿using System.Diagnostics.Metrics;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Extensions.Services;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Threading;
+using Daybreak.Shared.Services.Metrics;
+using Daybreak.Shared.Models.Metrics;
 
 namespace Daybreak.Services.Monitoring;
 
@@ -28,8 +29,8 @@ internal sealed class DiskUsageMonitor : IApplicationLifetimeService
     public DiskUsageMonitor(
         IMetricsService metricsService)
     {
-        this.writeDiskUsageHistogram = metricsService.ThrowIfNull().CreateHistogram<double>(WriteDiskUsage, WriteDiskUsageUnit, WriteDiskUsageDescription, Models.Metrics.AggregationTypes.NoAggregate);
-        this.readDiskUsageHistogram = metricsService.ThrowIfNull().CreateHistogram<double>(ReadDiskUsage, ReadDiskUsageUnit, ReadDiskUsageDescription, Models.Metrics.AggregationTypes.NoAggregate);
+        this.writeDiskUsageHistogram = metricsService.ThrowIfNull().CreateHistogram<double>(WriteDiskUsage, WriteDiskUsageUnit, WriteDiskUsageDescription, AggregationTypes.NoAggregate);
+        this.readDiskUsageHistogram = metricsService.ThrowIfNull().CreateHistogram<double>(ReadDiskUsage, ReadDiskUsageUnit, ReadDiskUsageDescription, AggregationTypes.NoAggregate);
     }
 
     public void OnClosing()

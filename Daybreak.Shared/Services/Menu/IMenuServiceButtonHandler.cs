@@ -1,6 +1,6 @@
-﻿using Daybreak.Models.Menu;
+﻿using Daybreak.Shared.Models.Menu;
 
-namespace Daybreak.Services.Menu;
+namespace Daybreak.Shared.Services.Menu;
 
 public interface IMenuServiceButtonHandler
 {

@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Models.Trade;
+﻿namespace Daybreak.Shared.Models.Trade;
 public enum TraderQuoteType
 {
     Buy,

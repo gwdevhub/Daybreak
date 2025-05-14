@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Daybreak.Models;
+namespace Daybreak.Shared.Models;
 
 public sealed class ProtectedLoginCredentials
 {

@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Services.Screens;
+﻿namespace Daybreak.Shared.Services.Screens;
 
 public interface ISplashScreenService
 {

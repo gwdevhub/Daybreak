@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Models;
+﻿namespace Daybreak.Shared.Models;
 
 public enum ColorScheme
 {
