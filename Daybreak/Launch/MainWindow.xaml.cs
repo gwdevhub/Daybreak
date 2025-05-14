@@ -3,7 +3,6 @@ using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Privilege;
-using Daybreak.Shared.Services.Screens;
 using Daybreak.Shared.Services.Screenshots;
 using Daybreak.Shared.Services.Updater;
 using Daybreak.Views;
@@ -35,7 +34,6 @@ public partial class MainWindow : MetroWindow
     private const string IssueUrl = "https://github.com/gwdevhub/Daybreak/issues/new";
 
     private readonly IOptionsSynchronizationService optionsSynchronizationService;
-    private readonly ISplashScreenService splashScreenService;
     private readonly IMenuServiceInitializer menuServiceInitializer;
     private readonly IViewManager viewManager;
     private readonly IBackgroundProvider backgroundProvider;
@@ -67,7 +65,6 @@ public partial class MainWindow : MetroWindow
 
     public MainWindow(
         IOptionsSynchronizationService optionsSynchronizationService,
-        ISplashScreenService splashScreenService,
         IMenuServiceInitializer menuServiceInitializer,
         IViewManager viewManager,
         IBackgroundProvider backgroundProvider,
@@ -79,7 +76,6 @@ public partial class MainWindow : MetroWindow
         ILogger<MainWindow> logger)
     {
         this.optionsSynchronizationService = optionsSynchronizationService.ThrowIfNull();
-        this.splashScreenService = splashScreenService.ThrowIfNull();
         this.menuServiceInitializer = menuServiceInitializer.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
         this.backgroundProvider = backgroundProvider.ThrowIfNull();
@@ -116,7 +112,6 @@ public partial class MainWindow : MetroWindow
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         this.SetupImageCycle();
-        this.splashScreenService.HideSplashScreen();
     }
 
     private void SynchronizeButton_Click(object sender, EventArgs e)

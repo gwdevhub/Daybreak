@@ -58,7 +58,7 @@
                    Foreground="{StaticResource FontColor}"
                    VerticalAlignment="Center" />
         </StackPanel>
-        <Label Content="{Binding ElementName=_this, Path=StartupStatus.CurrentStep.Description, Mode=OneWay}"
+        <Label Content="{Binding ElementName=_this, Path=SplashText, Mode=OneWay}"
                VerticalAlignment="Center"
                HorizontalAlignment="Center"
                Grid.Row="1"
