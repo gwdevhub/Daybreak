@@ -216,7 +216,7 @@ internal sealed class ApplicationUpdater : IApplicationUpdater
         if (this.UpdateMarkedInRegistry())
         {
             this.UnmarkUpdateInRegistry();
-            this.ExecutePostUpdateActions();
+            Task.Factory.StartNew(this.ExecutePostUpdateActions, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current);
         }
 
         this.PeriodicallyCheckForUpdates();
