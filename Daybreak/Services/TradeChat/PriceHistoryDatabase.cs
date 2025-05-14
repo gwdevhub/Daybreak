@@ -51,7 +51,7 @@ internal sealed class PriceHistoryDatabase : IPriceHistoryDatabase
         var items = await this.collection
             .FindAll(cancellationToken)
             .Where(t => t.TraderQuoteType == (int)traderQuoteType).OrderByDescending(q => q.InsertionTime)
-            .GroupBy(q => q.ItemId)
+            .GroupBy(q => (q.ItemId, q.ModifiersHash))
             .SelectAwait(async g => await g.FirstAsync(cancellationToken))
             .ToListAsync(cancellationToken);
         scopedLogger.LogDebug($"Retrieved latest quotes");

@@ -48,7 +48,7 @@ public partial class PriceQuotesView : UserControl
         {
             var sellQuotes = await this.traderQuoteService.GetSellQuotes(CancellationToken.None);
             var buyQuotes = await this.traderQuoteService.GetBuyQuotes(CancellationToken.None);
-            var concatQuotes = new Dictionary<ItemBase, TraderQuoteModel>();
+            var concatQuotes = new Dictionary<string, TraderQuoteModel>();
             InsertQuotes(concatQuotes, buyQuotes, false);
             InsertQuotes(concatQuotes, sellQuotes, true);
             var orderedQuotes = concatQuotes.Values.OrderBy(q => q.Item!.Name).OrderBy(q => q.Item is not Material).ToList();
@@ -80,7 +80,7 @@ public partial class PriceQuotesView : UserControl
         this.viewManager.ShowView<PriceHistoryView>(item);
     }
 
-    private static void InsertQuotes(Dictionary<ItemBase, TraderQuoteModel> concat, IEnumerable<TraderQuote> items, bool isSellPrice)
+    private static void InsertQuotes(Dictionary<string, TraderQuoteModel> concat, IEnumerable<TraderQuote> items, bool isSellPrice)
     {
         foreach(var quote in items)
         {
@@ -89,10 +89,11 @@ public partial class PriceQuotesView : UserControl
                 continue;
             }
 
-            if (!concat.TryGetValue(quote.Item, out var quoteModel))
+            var index = $"{quote.Item.Id}-{quote.Item.As<IItemModHash>()?.ModHash}";
+            if (!concat.TryGetValue(index, out var quoteModel))
             {
                 quoteModel = new TraderQuoteModel { Item = quote.Item, TimeStamp = quote.Timestamp ?? DateTime.UtcNow, SellPrice = quote.Price, BuyPrice = quote.Price };
-                concat[quote.Item] = quoteModel;
+                concat[index] = quoteModel;
                 
             }
 
