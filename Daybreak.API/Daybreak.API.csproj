@@ -8,9 +8,12 @@
     <RuntimeIdentifier>win-x86</RuntimeIdentifier>
     <StripSymbols>true</StripSymbols>
     <InteropExports>true</InteropExports>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    
     <PublishAot>true</PublishAot>
     <SelfContained>true</SelfContained>
-
+  
+    
     <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
     <UseAppHost>false</UseAppHost>
     <EnableIISSupport>false</EnableIISSupport>
@@ -22,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Daybreak\Daybreak.csproj" />
+    <ProjectReference Include="..\Daybreak.Shared\Daybreak.Shared.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -30,16 +33,9 @@
     <ShouldPublishAot>true</ShouldPublishAot>
   </PropertyGroup>
 
-  <Target
-    Name="PublishIntoDaybreak"
-    AfterTargets="PostBuild"
-    Condition="'$(ShouldPublishAot)'=='true'">
-    <Message
-      Text="📦 dotnet-publish Daybreak.API → $(DaybreakHostOutputDir)"
-      Importance="High" />
+  <Target Name="PublishIntoDaybreak" AfterTargets="PostBuild" Condition="'$(ShouldPublishAot)'=='true'">
+    <Message Text="📦 dotnet-publish Daybreak.API → $(DaybreakHostOutputDir)" Importance="High" />
 
-    <Exec
-      Command="dotnet publish &quot;$(MSBuildProjectFullPath)&quot; -c $(Configuration) -r win-x86 --self-contained true -o &quot;$(DaybreakHostOutputDir)&quot;"
-      WorkingDirectory="$(ProjectDir)" />
+    <Exec Command="dotnet publish &quot;$(MSBuildProjectFullPath)&quot; -c $(Configuration) -r win-x86 --self-contained true -o &quot;$(DaybreakHostOutputDir)&quot;" WorkingDirectory="$(ProjectDir)" />
   </Target>
 </Project>

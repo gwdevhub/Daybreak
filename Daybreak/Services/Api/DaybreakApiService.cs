@@ -25,7 +25,7 @@ public sealed class DaybreakApiService(
     private readonly ILogger<DaybreakApiService> logger = logger.ThrowIfNull();
 
     public string Name { get; } = "Daybreak API";
-    public bool IsEnabled { get; set; } = true;
+    public bool IsEnabled { get; set; } = false;
     public bool IsInstalled { get; } = true;
 
     public IEnumerable<string> GetCustomArguments() => [];
@@ -50,15 +50,34 @@ public sealed class DaybreakApiService(
 
         if (!File.Exists(dllName))
         {
+            this.notificationService.NotifyError(
+                "Daybreak API Failure",
+                "Failed to inject with stub. Daybreak API dll not found");
             scopedLogger.LogError("Failed to inject with stub. Daybreak API DLL not found at {dllPath}", dllName);
             return;
         }
 
         scopedLogger.LogInformation("Injecting {dllName} into {processId}", dllName, context.ApplicationLauncherContext.Process.Id);
-        if (!this.stubInjector.Inject(context.ApplicationLauncherContext.Process, dllName))
+        if (!this.stubInjector.Inject(context.ApplicationLauncherContext.Process, dllName, out var port))
         {
+            this.notificationService.NotifyError(
+                "Daybreak API Failure",
+                "Failed to inject with stub. Injection failed");
             scopedLogger.LogError("Failed to inject with stub. Injection failed");
             return;
         }
+
+        if (port < 0)
+        {
+            this.notificationService.NotifyError(
+                "Daybreak API Failure",
+                "Failed to start API. Non-success exit code");
+            scopedLogger.LogError($"Failed to start API. Exit code {port}");
+            return;
+        }
+
+        this.notificationService.NotifyInformation(
+            "Injected Daybreak API",
+            $"Daybreak API started on port {port}");
     }
 }

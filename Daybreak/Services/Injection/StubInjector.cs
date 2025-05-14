@@ -16,7 +16,8 @@ public sealed class StubInjector(
 
     /// <summary>
     /// ebp+8 is the dll path pointer
-    /// 0xDEADBEEF is a placeholder to be patched later
+    /// 0xDEADBEEF is a placeholder to be patched later for LoadLibraryA
+    /// 0xFEEDF00D is a placeholder to be patched later for GetProcAddress
     /// </summary>
     const string Asm = @"
 use32
@@ -37,21 +38,23 @@ mov  eax, 0xFEEDF00D           ; patched → GetProcAddress
 call eax                       ; EAX = exported EntryPoint
 
 ; -------- call EntryPoint() ----------------------------------
-call eax                       ; runs your NativeAOT export
-xor  eax, eax                  ; thread exit-code 0
+call eax                       ; calls EntryPoint
+; xor  eax, eax                  ; thread exit-code 0
 
+; -------- return EntryPoint() response -----------------------
 leave                        ; = mov esp, ebp / pop ebp
 ret  4                      ; stdcall: pop lpParameter
 ";
 
     private readonly ILogger<StubInjector> logger = logger.ThrowIfNull();
 
-    public bool Inject(Process target, string dllPath)
+    public bool Inject(Process target, string dllPath, out int exitCode)
     {
         var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: dllPath);
         var hProcess = NativeMethods.OpenProcess(
             NativeMethods.ProcessAccessFlags.All, false, (uint)target.Id);
 
+        exitCode = 0;
         if (hProcess is 0)
         {
             scopedLogger.LogError("Failed to inject with stub. Could not open process by id {processId}", target.Id);
@@ -129,6 +132,25 @@ ret  4                      ; stdcall: pop lpParameter
         {
             scopedLogger.LogError("Failed to inject with stub. Could not create remote thread");
             return false;
+        }
+
+        var waitResult = NativeMethods.WaitForSingleObject(hThread, 10000); // Wait up to 10 seconds
+        if (waitResult is 0) // WAIT_OBJECT_0 - thread completed
+        {
+            // Get the thread exit code, which will be our port number
+            if (NativeMethods.GetExitCodeThread(hThread, out var moduleExitCode) > 0)
+            {
+                scopedLogger.LogInformation("Thread completed with result: {result}", moduleExitCode);
+                exitCode = (int)moduleExitCode;
+            }
+            else
+            {
+                scopedLogger.LogWarning("Failed to get thread exit code");
+            }
+        }
+        else
+        {
+            scopedLogger.LogWarning("Thread did not complete within timeout period");
         }
 
         return true;
