@@ -1,4 +1,4 @@
-﻿using Daybreak.Models.Plugins;
+﻿using Daybreak.Shared.Shared.Models.Plugins;
 using Microsoft.Extensions.DependencyInjection;
 using SimplePlugin.Services;
 using System.Core.Extensions;
