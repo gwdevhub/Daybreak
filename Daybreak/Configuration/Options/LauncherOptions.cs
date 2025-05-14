@@ -54,10 +54,6 @@ public sealed class LauncherOptions
     [OptionRange<double>(MinValue = 30, MaxValue = 300)]
     public double ModStartupTimeout { get; set; } = 30;
 
-    [JsonProperty(nameof(PersistentLogging))]
-    [OptionName(Name = "Persistent Logging", Description = "If true, the launcher will save logs in the local database. Otherwise, the launcher will only keep logs in a memory cache")]
-    public bool PersistentLogging { get; set; } = false;
-
     [JsonProperty(nameof(BetaUpdate))]
     [OptionName(Name = "Beta Update", Description = "If true, the launcher will use the new update procedure")]
     public bool BetaUpdate { get; set; } = true;

@@ -1,10 +1,10 @@
 ﻿using Daybreak.Attributes;
 using Daybreak.Controls.Buttons;
 using Daybreak.Controls.Options;
-using Daybreak.Models.Options;
-using Daybreak.Services.Navigation;
-using Daybreak.Services.Options;
-using Daybreak.Validators;
+using Daybreak.Shared.Models.Options;
+using Daybreak.Shared.Services.Navigation;
+using Daybreak.Shared.Services.Options;
+using Daybreak.Shared.Validators;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;

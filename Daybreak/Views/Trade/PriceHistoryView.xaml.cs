@@ -1,7 +1,7 @@
-﻿using Daybreak.Models.Guildwars;
-using Daybreak.Models.Trade;
-using Daybreak.Services.Navigation;
-using Daybreak.Services.TradeChat;
+﻿using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Models.Trade;
+using Daybreak.Shared.Services.Navigation;
+using Daybreak.Shared.Services.TradeChat;
 using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;

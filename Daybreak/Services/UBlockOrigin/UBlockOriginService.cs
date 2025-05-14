@@ -1,6 +1,4 @@
-﻿using Daybreak.Models.Github;
-using Daybreak.Models.Progress;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System;
 using System.IO;
 using System.Threading;
@@ -10,13 +8,15 @@ using System.Net.Http;
 using Microsoft.Extensions.Logging;
 using System.Extensions;
 using System.Linq;
-using Daybreak.Services.Downloads;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Daybreak.Services.Notifications;
-using Daybreak.Services.Browser;
-using Daybreak.Utils;
 using System.IO.Compression;
+using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.Browser;
+using Daybreak.Shared.Models.Github;
+using Daybreak.Shared.Utils;
+using Daybreak.Shared.Services.Downloads;
+using Daybreak.Shared.Models.Progress;
 
 namespace Daybreak.Services.UBlockOrigin;
 public sealed class UBlockOriginService : IBrowserExtension
@@ -91,8 +91,8 @@ public sealed class UBlockOriginService : IBrowserExtension
         }
 
         if (currentVersionString is not null &&
-            Models.Versioning.Version.TryParse(currentVersionString, out var currentVersion) &&
-            Models.Versioning.Version.TryParse(latestVersionString, out var latestVersion) &&
+            Shared.Models.Versioning.Version.TryParse(currentVersionString, out var currentVersion) &&
+            Shared.Models.Versioning.Version.TryParse(latestVersionString, out var latestVersion) &&
             currentVersion.CompareTo(latestVersion) >= 0)
         {
             scopedLogger.LogInformation("uBlock-Origin is up to date");

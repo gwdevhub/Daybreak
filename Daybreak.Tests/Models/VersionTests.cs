@@ -1,9 +1,9 @@
-﻿using Daybreak.Models.Versioning;
+﻿using Daybreak.Shared.Models.Versioning;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
-using Version = Daybreak.Models.Versioning.Version;
+using Version = Daybreak.Shared.Models.Versioning.Version;
 
 namespace Daybreak.Tests.Models;
 

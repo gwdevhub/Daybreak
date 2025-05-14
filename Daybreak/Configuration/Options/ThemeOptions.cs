@@ -1,5 +1,5 @@
 ﻿using Daybreak.Attributes;
-using Daybreak.Models;
+using Daybreak.Shared.Models;
 
 namespace Daybreak.Configuration.Options;
 

@@ -8,7 +8,7 @@
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              xmlns:tradeModels="clr-namespace:Daybreak.Services.TradeChat.Models"
-             xmlns:converters="clr-namespace:Daybreak.Converters"
+             xmlns:converters="clr-namespace:Daybreak.Shared.Converters;assembly=Daybreak.Shared"
              x:Name="_this"
              mc:Ignorable="d" 
              Unloaded="UserControl_Unloaded"

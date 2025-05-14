@@ -1,19 +1,21 @@
 ﻿using Daybreak.Services.Notifications.Models;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Daybreak.Services.Notifications;
 
 public interface INotificationStorage
 {
-    IEnumerable<NotificationDTO> GetPendingNotifications();
+    ValueTask<IEnumerable<NotificationDTO>> GetPendingNotifications(CancellationToken cancellationToken);
 
-    IEnumerable<NotificationDTO> GetNotifications();
+    ValueTask<IEnumerable<NotificationDTO>> GetNotifications(CancellationToken cancellationToken);
 
-    void StoreNotification(NotificationDTO notification);
+    ValueTask StoreNotification(NotificationDTO notification, CancellationToken cancellationToken);
 
-    void OpenNotification(NotificationDTO notificationDTO);
+    ValueTask OpenNotification(NotificationDTO notificationDTO, CancellationToken cancellationToken);
 
-    void RemoveNotification(NotificationDTO notificationDTO);
+    ValueTask RemoveNotification(NotificationDTO notificationDTO, CancellationToken cancellationToken);
 
-    void RemoveAllNotifications();
+    ValueTask RemoveAllNotifications(CancellationToken cancellationToken);
 }

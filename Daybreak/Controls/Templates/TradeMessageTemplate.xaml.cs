@@ -1,4 +1,4 @@
-﻿using Daybreak.Models.Trade;
+﻿using Daybreak.Shared.Models.Trade;
 using System;
 using System.Extensions;
 using System.Windows;

@@ -1,6 +1,6 @@
-﻿using Daybreak.Models.Progress;
-using Daybreak.Services.DirectSong;
-using Daybreak.Services.Navigation;
+﻿using Daybreak.Shared.Models.Progress;
+using Daybreak.Shared.Services.DirectSong;
+using Daybreak.Shared.Services.Navigation;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Core.Extensions;

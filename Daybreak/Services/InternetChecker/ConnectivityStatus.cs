@@ -1,6 +1,7 @@
-﻿using Daybreak.Models;
-using Daybreak.Models.Notifications;
-using Daybreak.Services.Notifications;
+﻿using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.Notifications;
+using Daybreak.Shared.Services.InternetChecker;
+using Daybreak.Shared.Services.Notifications;
 using System;
 using System.Core.Extensions;
 using System.Threading;

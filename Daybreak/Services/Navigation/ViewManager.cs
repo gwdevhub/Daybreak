@@ -1,4 +1,5 @@
-﻿using Slim;
+﻿using Daybreak.Shared.Services.Navigation;
+using Slim;
 using System;
 using System.Extensions;
 using System.Windows;

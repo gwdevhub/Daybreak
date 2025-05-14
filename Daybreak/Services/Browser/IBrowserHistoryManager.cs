@@ -1,5 +1,5 @@
 ﻿using Daybreak.Controls;
-using Daybreak.Models.Browser;
+using Daybreak.Shared.Models.Browser;
 
 namespace Daybreak.Services.Browser;
 public interface IBrowserHistoryManager

@@ -1,6 +1,6 @@
-﻿using Daybreak.Models;
-using Daybreak.Services.ApplicationLauncher;
-using Daybreak.Services.Navigation;
+﻿using Daybreak.Shared.Models;
+using Daybreak.Shared.Services.ApplicationLauncher;
+using Daybreak.Shared.Services.Navigation;
 using Microsoft.Extensions.Logging;
 using System.Extensions;
 using System.Windows.Controls;

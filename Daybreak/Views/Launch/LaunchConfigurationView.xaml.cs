@@ -1,10 +1,10 @@
-﻿using Daybreak.Models;
-using Daybreak.Models.LaunchConfigurations;
-using Daybreak.Services.Credentials;
-using Daybreak.Services.ExecutableManagement;
-using Daybreak.Services.LaunchConfigurations;
-using Daybreak.Services.Navigation;
-using Daybreak.Services.Notifications;
+﻿using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.LaunchConfigurations;
+using Daybreak.Shared.Services.Credentials;
+using Daybreak.Shared.Services.ExecutableManagement;
+using Daybreak.Shared.Services.LaunchConfigurations;
+using Daybreak.Shared.Services.Navigation;
+using Daybreak.Shared.Services.Notifications;
 using System;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;

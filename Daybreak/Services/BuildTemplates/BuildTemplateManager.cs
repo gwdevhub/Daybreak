@@ -1,7 +1,8 @@
-﻿using Daybreak.Models.Builds;
-using Daybreak.Models.Guildwars;
-using Daybreak.Services.BuildTemplates.Models;
-using Daybreak.Utils;
+﻿using Daybreak.Services.BuildTemplates.Models;
+using Daybreak.Shared.Models.Builds;
+using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Services.BuildTemplates;
+using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using NAudio.MediaFoundation;
 using Newtonsoft.Json;

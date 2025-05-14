@@ -1,13 +1,13 @@
-﻿using Daybreak.Models.Progress;
-using Daybreak.Services.Navigation;
-using Daybreak.Services.Updater;
+﻿using Daybreak.Shared.Models.Progress;
+using Daybreak.Shared.Services.Navigation;
+using Daybreak.Shared.Services.Updater;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Core.Extensions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
-using Version = Daybreak.Models.Versioning.Version;
+using Version = Daybreak.Shared.Models.Versioning.Version;
 
 namespace Daybreak.Views;
 

@@ -1,5 +1,6 @@
-﻿using Daybreak.Services.IconRetrieve;
-using Daybreak.Services.Images;
+﻿using Daybreak.Shared;
+using Daybreak.Shared.Services.IconRetrieve;
+using Daybreak.Shared.Services.Images;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Core.Extensions;
@@ -23,8 +24,8 @@ public partial class TradeQuoteTemplate : UserControl
     private bool imageVisible;
 
     public TradeQuoteTemplate() :
-        this(Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IImageCache>(),
-            Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IIconCache>())
+        this(Global.GlobalServiceProvider.GetRequiredService<IImageCache>(),
+            Global.GlobalServiceProvider.GetRequiredService<IIconCache>())
     {
     }
 

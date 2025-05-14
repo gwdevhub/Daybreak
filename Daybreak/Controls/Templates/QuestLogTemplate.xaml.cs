@@ -1,6 +1,6 @@
 ﻿using Daybreak.Controls.Buttons;
-using Daybreak.Models.FocusView;
-using Daybreak.Models.Guildwars;
+using Daybreak.Shared.Models.FocusView;
+using Daybreak.Shared.Models.Guildwars;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,9 +1,12 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Models;
-using Daybreak.Models.Browser;
-using Daybreak.Models.Builds;
 using Daybreak.Services.Browser;
-using Daybreak.Services.BuildTemplates;
+using Daybreak.Shared;
+using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.Browser;
+using Daybreak.Shared.Models.Builds;
+using Daybreak.Shared.Services.Browser;
+using Daybreak.Shared.Services.BuildTemplates;
+using Daybreak.Shared.Utils;
 using Daybreak.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -105,12 +108,12 @@ public partial class ChromiumBrowserWrapper : UserControl
 
     public ChromiumBrowserWrapper()
         : this(
-              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IBrowserHistoryManager>(),
-              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IBrowserExtensionsManager>(),
-              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IHttpClient<ChromiumBrowserWrapper>>(),
-              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILiveOptions<BrowserOptions>>(),
-              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IBuildTemplateManager>(),
-              Launch.Launcher.Instance.ApplicationServiceProvider.GetRequiredService<ILogger<ChromiumBrowserWrapper>>())
+              Global.GlobalServiceProvider.GetRequiredService<IBrowserHistoryManager>(),
+              Global.GlobalServiceProvider.GetRequiredService<IBrowserExtensionsManager>(),
+              Global.GlobalServiceProvider.GetRequiredService<IHttpClient<ChromiumBrowserWrapper>>(),
+              Global.GlobalServiceProvider.GetRequiredService<ILiveOptions<BrowserOptions>>(),
+              Global.GlobalServiceProvider.GetRequiredService<IBuildTemplateManager>(),
+              Global.GlobalServiceProvider.GetRequiredService<ILogger<ChromiumBrowserWrapper>>())
     {
     }
 

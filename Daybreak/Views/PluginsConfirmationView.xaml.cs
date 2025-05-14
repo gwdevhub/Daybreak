@@ -1,5 +1,5 @@
-﻿using Daybreak.Services.ApplicationLauncher;
-using Daybreak.Services.Navigation;
+﻿using Daybreak.Shared.Services.ApplicationLauncher;
+using Daybreak.Shared.Services.Navigation;
 using System.Core.Extensions;
 using System.Windows.Controls;
 

@@ -1,5 +1,5 @@
-﻿using Daybreak.Services.DSOAL;
-using Daybreak.Services.Navigation;
+﻿using Daybreak.Shared.Services.DSOAL;
+using Daybreak.Shared.Services.Navigation;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Windows;

@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Models;
+using Daybreak.Shared.Models;
+using Daybreak.Shared.Services.Credentials;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;

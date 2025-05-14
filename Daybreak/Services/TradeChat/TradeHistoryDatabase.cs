@@ -1,28 +1,34 @@
-﻿using Daybreak.Services.Database;
-using Daybreak.Services.TradeChat.Models;
+﻿using Daybreak.Services.TradeChat.Models;
 using System;
 using System.Collections.Generic;
 using System.Core.Extensions;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Daybreak.Services.TradeChat;
 
 internal sealed class TradeHistoryDatabase : ITradeHistoryDatabase
 {
-    private readonly IDatabaseCollection<TraderMessageDTO> liteCollection;
+    private readonly TradeMessagesDbContext liteCollection;
 
     public TradeHistoryDatabase(
-        IDatabaseCollection<TraderMessageDTO> liteCollection)
+        TradeMessagesDbContext liteCollection)
     {
         this.liteCollection = liteCollection.ThrowIfNull();
     }
 
-    public IEnumerable<TraderMessageDTO> GetTraderMessagesSinceTime(DateTimeOffset since)
+    public async ValueTask<IEnumerable<TraderMessageDTO>> GetTraderMessagesSinceTime(DateTimeOffset since, CancellationToken cancellationToken)
     {
-        return this.liteCollection.FindAll(t => t.Timestamp > since);
+        return await this.liteCollection
+            .FindAll(cancellationToken)
+            .Where(t => t.Timestamp > since)
+            .ToListAsync(cancellationToken);
     }
 
-    public bool StoreTraderMessage(TraderMessageDTO message)
+    public async ValueTask<bool> StoreTraderMessage(TraderMessageDTO message, CancellationToken cancellationToken)
     {
-        return this.liteCollection.Update(message);
+        await this.liteCollection.Update(message, cancellationToken);
+        return true;
     }
 }

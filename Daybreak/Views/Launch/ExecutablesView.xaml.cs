@@ -1,6 +1,6 @@
-﻿using Daybreak.Models;
-using Daybreak.Services.ExecutableManagement;
-using Daybreak.Services.Navigation;
+﻿using Daybreak.Shared.Models;
+using Daybreak.Shared.Services.ExecutableManagement;
+using Daybreak.Shared.Services.Navigation;
 using System;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;

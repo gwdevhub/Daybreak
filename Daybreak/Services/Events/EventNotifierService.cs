@@ -1,8 +1,9 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Converters;
-using Daybreak.Models.Guildwars;
-using Daybreak.Models.Notifications.Handling;
-using Daybreak.Services.Notifications;
+using Daybreak.Services.Notifications.Handlers;
+using Daybreak.Shared.Converters;
+using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Services.Events;
+using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Configuration;

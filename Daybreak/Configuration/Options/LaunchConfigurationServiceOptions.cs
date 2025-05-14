@@ -1,5 +1,5 @@
 ﻿using Daybreak.Attributes;
-using Daybreak.Models.LaunchConfigurations;
+using Daybreak.Shared.Models.LaunchConfigurations;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 

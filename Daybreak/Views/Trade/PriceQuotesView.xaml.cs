@@ -1,9 +1,9 @@
 ﻿using Daybreak.Controls.Templates;
-using Daybreak.Models.Guildwars;
-using Daybreak.Models.Trade;
-using Daybreak.Services.Navigation;
-using Daybreak.Services.TradeChat;
-using Daybreak.Utils;
+using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Models.Trade;
+using Daybreak.Shared.Services.Navigation;
+using Daybreak.Shared.Services.TradeChat;
+using Daybreak.Shared.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -46,36 +46,19 @@ public partial class PriceQuotesView : UserControl
         this.Loading = true;
         await new TaskFactory().StartNew(async () =>
         {
-            var sellQuotes = (await this.traderQuoteService.GetSellQuotes(CancellationToken.None)).OrderBy(q => q.Item!.Name).OrderBy(q => q.Item is Rune);
-            var buyQuotes = (await this.traderQuoteService.GetBuyQuotes(CancellationToken.None)).OrderBy(q => q.Item!.Name).OrderBy(q => q.Item is Rune);
-            var quotes = sellQuotes.Select(q =>
+            var sellQuotes = await this.traderQuoteService.GetSellQuotes(CancellationToken.None);
+            var buyQuotes = await this.traderQuoteService.GetBuyQuotes(CancellationToken.None);
+            var concatQuotes = new Dictionary<ItemBase, TraderQuoteModel>();
+            InsertQuotes(concatQuotes, buyQuotes, false);
+            InsertQuotes(concatQuotes, sellQuotes, true);
+            var orderedQuotes = concatQuotes.Values.OrderBy(q => q.Item!.Name).OrderBy(q => q.Item is not Material).ToList();
+            this.traderQuotesCache = [.. orderedQuotes];
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                if (buyQuotes.FirstOrDefault(b => b.Item?.Id == q.Item?.Id) is TraderQuote buyQuote)
-                {
-                    return new TraderQuoteModel
-                    {
-                        Item = q.Item,
-                        BuyPrice = buyQuote.Price,
-                        SellPrice = q.Price,
-                        TimeStamp = q.Timestamp ?? buyQuote.Timestamp ?? DateTime.UtcNow
-                    };
-                }
-
-                return new TraderQuoteModel
-                {
-                    Item = q.Item,
-                    BuyPrice = q.Price,
-                    SellPrice = q.Price,
-                    TimeStamp = q.Timestamp ?? DateTime.UtcNow
-                };
+                this.TraderQuotes.ClearAnd().AddRange(this.traderQuotesCache);
+                this.Loading = false;
             });
-            this.traderQuotesCache = [.. quotes];
         }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current);
-        await this.Dispatcher.InvokeAsync(() =>
-        {
-            this.TraderQuotes.ClearAnd().AddRange(this.traderQuotesCache);
-            this.Loading = false;
-        });
     }
 
     private void SearchTextBox_TextChanged(object _, string e)
@@ -95,5 +78,32 @@ public partial class PriceQuotesView : UserControl
         }
 
         this.viewManager.ShowView<PriceHistoryView>(item);
+    }
+
+    private static void InsertQuotes(Dictionary<ItemBase, TraderQuoteModel> concat, IEnumerable<TraderQuote> items, bool isSellPrice)
+    {
+        foreach(var quote in items)
+        {
+            if(quote.Item is null)
+            {
+                continue;
+            }
+
+            if (!concat.TryGetValue(quote.Item, out var quoteModel))
+            {
+                quoteModel = new TraderQuoteModel { Item = quote.Item, TimeStamp = quote.Timestamp ?? DateTime.UtcNow, SellPrice = quote.Price, BuyPrice = quote.Price };
+                concat[quote.Item] = quoteModel;
+                
+            }
+
+            if (isSellPrice)
+            {
+                quoteModel.SellPrice = quote.Price;
+            }
+            else
+            {
+                quoteModel.BuyPrice = quote.Price;
+            }
+        }
     }
 }

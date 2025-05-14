@@ -1,9 +1,10 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Models.Guildwars;
-using Daybreak.Services.Images;
-using Daybreak.Services.Scanner;
 using Daybreak.Services.Screenshots.Models;
-using Daybreak.Utils;
+using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Services.Images;
+using Daybreak.Shared.Services.Scanner;
+using Daybreak.Shared.Services.Screenshots;
+using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;

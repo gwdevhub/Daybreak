@@ -1,6 +1,6 @@
 ﻿using Daybreak.Models;
-using Daybreak.Models.Guildwars;
-using Daybreak.Services.Events;
+using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Services.Events;
 using System;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;

@@ -1,7 +1,7 @@
-﻿using Daybreak.Models.Onboarding;
-using Daybreak.Services.LaunchConfigurations;
-using Daybreak.Services.Menu;
-using Daybreak.Services.Navigation;
+﻿using Daybreak.Shared.Models.Onboarding;
+using Daybreak.Shared.Services.LaunchConfigurations;
+using Daybreak.Shared.Services.Menu;
+using Daybreak.Shared.Services.Navigation;
 using Daybreak.Views.Launch;
 using Microsoft.Extensions.Logging;
 using System;

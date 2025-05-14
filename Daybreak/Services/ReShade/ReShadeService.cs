@@ -1,15 +1,17 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Models;
-using Daybreak.Models.Mods;
-using Daybreak.Models.Progress;
-using Daybreak.Models.ReShade;
 using Daybreak.Services.Downloads;
-using Daybreak.Services.Injection;
-using Daybreak.Services.Notifications;
 using Daybreak.Services.ReShade.Notifications;
 using Daybreak.Services.ReShade.Utils;
-using Daybreak.Services.Scanner;
-using Daybreak.Utils;
+using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.Mods;
+using Daybreak.Shared.Models.Progress;
+using Daybreak.Shared.Models.ReShade;
+using Daybreak.Shared.Services.Downloads;
+using Daybreak.Shared.Services.Injection;
+using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.ReShade;
+using Daybreak.Shared.Services.Scanner;
+using Daybreak.Shared.Utils;
 using HtmlAgilityPack;
 using IniParser.Parser;
 using Microsoft.Extensions.Logging;
@@ -640,19 +642,19 @@ internal sealed class ReShadeService : IReShadeService, IApplicationLifetimeServ
         }
 
         var versionString = downloadUrl.Replace(ReShadeHomepageUrl + "/downloads/ReShade_Setup_", "").Replace(".exe", "");
-        if (!Models.Versioning.Version.TryParse(versionString, out var version))
+        if (!Shared.Models.Versioning.Version.TryParse(versionString, out var version))
         {
             scopedLogger.LogError("Unable to parse latest version");
             return;
         }
 
-        if (!Models.Versioning.Version.TryParse(this.liveUpdateableOptions.Value.InstalledVersion, out var installedVersion))
+        if (!Shared.Models.Versioning.Version.TryParse(this.liveUpdateableOptions.Value.InstalledVersion, out var installedVersion))
         {
             scopedLogger.LogError("Unable to parse installed version");
             return;
         }
 
-        if (!Models.Versioning.Version.TryParse(DesiredVersion, out var desiredVersion))
+        if (!Shared.Models.Versioning.Version.TryParse(DesiredVersion, out var desiredVersion))
         {
             scopedLogger.LogError("Unable to parse desired version");
             return;

@@ -1,5 +1,6 @@
-﻿using Daybreak.Services.Navigation;
-using Daybreak.Services.Notifications;
+﻿using Daybreak.Shared.Models.Trade;
+using Daybreak.Shared.Services.Navigation;
+using Daybreak.Shared.Services.Notifications;
 using System;
 using System.Core.Extensions;
 using System.Windows;
@@ -24,19 +25,19 @@ public partial class TradeNotificationView : UserControl
         this.InitializeComponent();
     }
 
-    private void TradeChatMessageTemplate_NameCopyClicked(object _, Models.Trade.TraderMessage e)
+    private void TradeChatMessageTemplate_NameCopyClicked(object _, TraderMessage e)
     {
         this.notificationService.NotifyInformation("Copied", "Name copied to clipboard");
         Clipboard.SetText(e.Sender);
     }
 
-    private void TradeChatMessageTemplate_MessageCopyClicked(object _, Models.Trade.TraderMessage e)
+    private void TradeChatMessageTemplate_MessageCopyClicked(object _, TraderMessage e)
     {
         this.notificationService.NotifyInformation("Copied", "Message copied to clipboard");
         Clipboard.SetText(e.Message);
     }
 
-    private void TradeChatMessageTemplate_TimestampCopyClicked(object _, Models.Trade.TraderMessage e)
+    private void TradeChatMessageTemplate_TimestampCopyClicked(object _, TraderMessage e)
     {
         this.notificationService.NotifyInformation("Copied", "Timestamp copied to clipboard");
         Clipboard.SetText(e.Timestamp.ToString());

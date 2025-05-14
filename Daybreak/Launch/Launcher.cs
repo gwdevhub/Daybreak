@@ -1,19 +1,20 @@
 ﻿using Daybreak.Configuration;
-using Daybreak.Models.Progress;
-using Daybreak.Services.ApplicationArguments;
-using Daybreak.Services.Browser;
 using Daybreak.Services.ExceptionHandling;
-using Daybreak.Services.Menu;
-using Daybreak.Services.Mods;
-using Daybreak.Services.Navigation;
-using Daybreak.Services.Notifications;
-using Daybreak.Services.Options;
-using Daybreak.Services.Plugins;
-using Daybreak.Services.Screens;
-using Daybreak.Services.Startup;
-using Daybreak.Services.Themes;
-using Daybreak.Services.Updater.PostUpdate;
-using Daybreak.Services.Window;
+using Daybreak.Shared;
+using Daybreak.Shared.Models.Progress;
+using Daybreak.Shared.Services.ApplicationArguments;
+using Daybreak.Shared.Services.Browser;
+using Daybreak.Shared.Services.Menu;
+using Daybreak.Shared.Services.Mods;
+using Daybreak.Shared.Services.Navigation;
+using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.Options;
+using Daybreak.Shared.Services.Plugins;
+using Daybreak.Shared.Services.Screens;
+using Daybreak.Shared.Services.Startup;
+using Daybreak.Shared.Services.Themes;
+using Daybreak.Shared.Services.Updater.PostUpdate;
+using Daybreak.Shared.Services.Window;
 using Daybreak.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -41,8 +42,6 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
     private readonly string[] launchArguments;
     private ILogger? logger;
     private IExceptionHandler? exceptionHandler;
-
-    public System.IServiceProvider ApplicationServiceProvider => this.ServiceProvider;
 
     internal Launcher(string[] args)
     {
@@ -79,6 +78,8 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
 
     protected override void ApplicationStarting()
     {
+        Global.GlobalServiceProvider = Instance.ServiceProvider;
+
         /*
          * Show splash screen before beginning to load the rest of the application.
          * MainWindow will call HideSplashScreen() on Loaded event
@@ -86,7 +87,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
          * OptionsProducer needs to be created before everything else, otherwise all
          * the other services will fail to get options for their needs.
          */
-        
+
         var optionsProducer = this.ServiceProvider.GetRequiredService<IOptionsProducer>();
         var startupStatus = this.ServiceProvider.GetRequiredService<StartupStatus>();
         startupStatus.CurrentStep = StartupStatus.Custom("Loading options");

@@ -1,6 +1,6 @@
-﻿using Daybreak.Models.Trade;
-using Daybreak.Services.Navigation;
-using Daybreak.Services.TradeChat;
+﻿using Daybreak.Shared.Models.Trade;
+using Daybreak.Shared.Services.Navigation;
+using Daybreak.Shared.Services.TradeChat;
 using System;
 using System.Core.Extensions;
 using System.Windows;

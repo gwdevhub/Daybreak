@@ -1,4 +1,5 @@
-﻿using Daybreak.Models.Metrics;
+﻿using Daybreak.Shared.Models.Metrics;
+using Daybreak.Shared.Services.Metrics;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

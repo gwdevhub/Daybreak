@@ -7,6 +7,7 @@
              xmlns:chart="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
              xmlns:lvCore="clr-namespace:LiveChartsCore;assembly=LiveChartsCore"
              xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
+             xmlns:converters="clr-namespace:Daybreak.Shared.Converters;assembly=Daybreak.Shared"
              xmlns:controls="clr-namespace:Daybreak.Controls"
              DataContextChanged="UserControl_DataContextChanged"
              x:Name="_this"

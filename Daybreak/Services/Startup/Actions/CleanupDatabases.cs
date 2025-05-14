@@ -1,66 +1,63 @@
-﻿using Daybreak.Services.Database;
-using Daybreak.Services.Logging.Models;
-using Daybreak.Services.Notifications.Models;
-using Daybreak.Services.TradeChat.Models;
+﻿using Daybreak.Services.Logging;
+using Daybreak.Services.Notifications;
+using Daybreak.Services.TradeChat;
+using Daybreak.Shared.Models;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Extensions;
+using System.Extensions.Core;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Daybreak.Services.Startup.Actions;
 internal sealed class CleanupDatabases : StartupActionBase
 {
-    private readonly IDatabaseCollection<LogDTO> loggingCollection;
-    private readonly IDatabaseCollection<TraderQuoteDTO> quotesCollection;
-    private readonly IDatabaseCollection<NotificationDTO> notificationsCollection;
-    private readonly IDatabaseCollection<TraderMessageDTO> traderMessagesCollection;
+    private readonly TradeQuoteDbContext quotesCollection;
+    private readonly NotificationsDbContext notificationsCollection;
+    private readonly TradeMessagesDbContext traderMessagesCollection;
     private readonly ILogger<CleanupDatabases> logger;
 
     public CleanupDatabases(
-        IDatabaseCollection<LogDTO> loggingCollection,
-        IDatabaseCollection<TraderQuoteDTO> quotesCollection,
-        IDatabaseCollection<NotificationDTO> notificationsCollection,
-        IDatabaseCollection<TraderMessageDTO> traderMessagesCollection,
+        TradeQuoteDbContext quotesCollection,
+        NotificationsDbContext notificationsCollection,
+        TradeMessagesDbContext traderMessagesCollection,
         ILogger<CleanupDatabases> logger)
     {
-        this.loggingCollection = loggingCollection.ThrowIfNull();
         this.quotesCollection = quotesCollection.ThrowIfNull();
         this.notificationsCollection = notificationsCollection.ThrowIfNull();
         this.traderMessagesCollection = traderMessagesCollection.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
     }
 
-    public override void ExecuteOnStartup()
+    public override async Task ExecuteOnStartupAsync(CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.ExecuteOnStartup), string.Empty);
-        if (this.loggingCollection.Count() > 50000)
+        var scopedLogger = this.logger.CreateScopedLogger();
+        var notifications = await this.notificationsCollection.FindAll(cancellationToken).ToListAsync(cancellationToken);
+        if (notifications.Count > 1000)
         {
-            this.loggingCollection.DeleteAll();
-            scopedLogger.LogInformation("Cleared logging database");
-        }
-
-        if (this.notificationsCollection.Count() > 1000)
-        {
-            this.notificationsCollection.DeleteAll();
+            await this.notificationsCollection.DeleteAll(cancellationToken);
             scopedLogger.LogInformation("Cleared notifications database");
         }
 
-        if (this.quotesCollection.Count() > 20000)
+        var allQuotes = await this.quotesCollection.FindAll(cancellationToken).ToListAsync(cancellationToken);
+        if (allQuotes.Count > 20000)
         {
             // Delete the oldest 2000 entries in the db. We probably won't need them anymore
-            var quotes = this.quotesCollection.FindAll().OrderBy(q => q.TimeStamp).Take(2000).ToList();
-            foreach(var quote in quotes)
+            var quotes = await this.quotesCollection.FindAll(cancellationToken).OrderBy(q => q.TimeStamp).Take(2000).ToListAsync();
+            foreach (var quote in quotes)
             {
-                this.quotesCollection.Delete(quote);
+                await this.quotesCollection.Delete(quote.Id, cancellationToken);
             }
 
-            this.quotesCollection.DeleteAll();
+            await this.quotesCollection.DeleteAll(cancellationToken);
             scopedLogger.LogInformation("Cleared quotes database");
         }
 
-        if (this.traderMessagesCollection.Count() > 1000)
+        var traderMessages = await this.traderMessagesCollection.FindAll(cancellationToken).ToListAsync(cancellationToken);
+        if (traderMessages.Count > 1000)
         {
-            this.traderMessagesCollection.DeleteAll();
+            await this.traderMessagesCollection.DeleteAll(cancellationToken);
             scopedLogger.LogInformation("Cleared trader messages database");
         }
     }

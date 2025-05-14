@@ -1,6 +1,7 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Models.Guildwars;
-using Daybreak.Utils;
+using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Services.IconRetrieve;
+using Daybreak.Shared.Utils;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 using System;

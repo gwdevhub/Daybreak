@@ -1,10 +1,14 @@
-﻿using Realms;
+﻿using Squealify;
 using System;
 
 namespace Daybreak.Services.TradeChat.Models;
 
-public sealed class TraderMessageDTO : RealmObject
+[Table("traderMessages")]
+public partial class TraderMessageDTO
 {
+    [PrimaryKey]
+    public required long Id { get; init; }
+
     public int TraderSource { get; init; }
 
     public string Message { get; init; } = string.Empty;
@@ -12,6 +16,4 @@ public sealed class TraderMessageDTO : RealmObject
     public string Sender { get; init; } = string.Empty;
 
     public DateTimeOffset Timestamp { get; init; }
-    [PrimaryKey]
-    public long Id { get; init; }
 }

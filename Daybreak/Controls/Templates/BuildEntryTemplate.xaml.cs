@@ -1,4 +1,4 @@
-﻿using Daybreak.Models.Builds;
+﻿using Daybreak.Shared.Models.Builds;
 using System;
 using System.Windows.Controls;
 

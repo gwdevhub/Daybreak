@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Daybreak.Shared.Services.Logging;
+using System.Diagnostics;
 using System.Logging;
 
 namespace Daybreak.Services.Logging;

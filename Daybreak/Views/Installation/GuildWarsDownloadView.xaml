@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:Daybreak.Views.Installation"
              mc:Ignorable="d" 
              x:Name="_this"
-             xmlns:controls="clr-namespace:Daybreak.Controls"
+             xmlns:converters="clr-namespace:Daybreak.Shared.Converters;assembly=Daybreak.Shared"
              xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
              DataContextChanged="GuildWarsDownloadView_DataContextChanged"
              Unloaded="DownloadView_Unloaded"

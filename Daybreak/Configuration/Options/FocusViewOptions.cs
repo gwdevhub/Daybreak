@@ -1,6 +1,6 @@
 ﻿using Daybreak.Attributes;
 using Daybreak.Configuration.FocusView;
-using Daybreak.Models.Browser;
+using Daybreak.Shared.Models.Browser;
 using Newtonsoft.Json;
 
 namespace Daybreak.Configuration.Options;

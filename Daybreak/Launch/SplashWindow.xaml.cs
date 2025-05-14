@@ -1,4 +1,4 @@
-﻿using Daybreak.Models.Progress;
+﻿using Daybreak.Shared.Models.Progress;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Windows;

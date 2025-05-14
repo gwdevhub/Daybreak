@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:Daybreak.Views"
              xmlns:notifications="clr-namespace:Daybreak.Controls.Notifications"
              xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
-             xmlns:converters="clr-namespace:Daybreak.Converters"
+             xmlns:converters="clr-namespace:Daybreak.Shared.Converters;assembly=Daybreak.Shared"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              Loaded="UserControl_Loaded"
              Unloaded="UserControl_Unloaded"

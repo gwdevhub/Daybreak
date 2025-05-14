@@ -1,9 +1,10 @@
-﻿using Daybreak.Models.Notifications;
-using Daybreak.Models.Notifications.Handling;
-using Daybreak.Models.Progress;
-using Daybreak.Services.Guildwars.Models;
-using Daybreak.Services.Navigation;
-using Daybreak.Services.Notifications;
+﻿using Daybreak.Services.Guildwars.Models;
+using Daybreak.Shared.Models.Notifications;
+using Daybreak.Shared.Models.Notifications.Handling;
+using Daybreak.Shared.Models.Progress;
+using Daybreak.Shared.Services.Guildwars;
+using Daybreak.Shared.Services.Navigation;
+using Daybreak.Shared.Services.Notifications;
 using Daybreak.Views.Installation;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;

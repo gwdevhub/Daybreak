@@ -92,6 +92,11 @@ jobs:
       env:
         RuntimeIdentifier: win-${{ matrix.targetplatform }}
 
+    - name: Create publish API files
+      run: dotnet publish .\Daybreak.API\Daybreak.API.csproj -c $env:Configuration -r $env:RuntimeIdentifier --property:SolutionDir=$env:GITHUB_WORKSPACE -p:PublishSingleFile=false --self-contained true -o .\Publish
+      env:
+        RuntimeIdentifier: win-${{ matrix.targetplatform }}
+
     - name: Pack publish files
       run: |
         Write-Host $env

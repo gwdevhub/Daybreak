@@ -1,5 +1,5 @@
-﻿using Daybreak.Services.Navigation;
-using Daybreak.Services.ReShade;
+﻿using Daybreak.Shared.Services.Navigation;
+using Daybreak.Shared.Services.ReShade;
 using System.Core.Extensions;
 using System.Threading;
 using System.Windows.Controls;

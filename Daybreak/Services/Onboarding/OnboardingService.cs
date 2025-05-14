@@ -1,8 +1,9 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Models.Onboarding;
-using Daybreak.Services.Credentials;
-using Daybreak.Services.ExecutableManagement;
-using Daybreak.Services.LaunchConfigurations;
+using Daybreak.Shared.Models.Onboarding;
+using Daybreak.Shared.Services.Credentials;
+using Daybreak.Shared.Services.ExecutableManagement;
+using Daybreak.Shared.Services.LaunchConfigurations;
+using Daybreak.Shared.Services.Onboarding;
 using Microsoft.Extensions.Logging;
 using System.Configuration;
 using System.Core.Extensions;

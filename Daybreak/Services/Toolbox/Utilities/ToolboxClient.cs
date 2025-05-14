@@ -1,7 +1,7 @@
-﻿using Daybreak.Models.Github;
-using Daybreak.Models.Progress;
-using Daybreak.Services.Downloads;
-using Daybreak.Services.Toolbox.Models;
+﻿using Daybreak.Services.Toolbox.Models;
+using Daybreak.Shared.Models.Github;
+using Daybreak.Shared.Models.Progress;
+using Daybreak.Shared.Services.Downloads;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -13,7 +13,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Version = Daybreak.Models.Versioning.Version;
+using Version = Daybreak.Shared.Models.Versioning.Version;
 
 namespace Daybreak.Services.Toolbox.Utilities;
 internal sealed class ToolboxClient : IToolboxClient

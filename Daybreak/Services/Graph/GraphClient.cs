@@ -1,10 +1,10 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Configuration.Options;
 using Daybreak.Controls;
-using Daybreak.Models.Builds;
-using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Graph.Models;
-using Daybreak.Services.Navigation;
+using Daybreak.Shared.Models.Builds;
+using Daybreak.Shared.Services.BuildTemplates;
+using Daybreak.Shared.Services.Navigation;
 using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;

@@ -1,9 +1,10 @@
 ﻿using Daybreak.Attributes;
 using Daybreak.Controls.Buttons;
 using Daybreak.Launch;
-using Daybreak.Models.Options;
-using Daybreak.Services.Navigation;
-using Daybreak.Services.Options;
+using Daybreak.Shared;
+using Daybreak.Shared.Models.Options;
+using Daybreak.Shared.Services.Navigation;
+using Daybreak.Shared.Services.Options;
 using Daybreak.Views;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -34,8 +35,8 @@ public partial class OptionsSection : UserControl
     }
 
     public OptionsSection()
-        : this(Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IOptionsProvider>(),
-               Launcher.Instance.ApplicationServiceProvider.GetRequiredService<IViewManager>())
+        : this(Global.GlobalServiceProvider.GetRequiredService<IOptionsProvider>(),
+               Global.GlobalServiceProvider.GetRequiredService<IViewManager>())
     {
         this.InitializeComponent();
         this.InitializeOptions();

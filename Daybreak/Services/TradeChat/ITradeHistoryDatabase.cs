@@ -1,11 +1,13 @@
 ﻿using Daybreak.Services.TradeChat.Models;
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Daybreak.Services.TradeChat;
 
 public interface ITradeHistoryDatabase
 {
-    IEnumerable<TraderMessageDTO> GetTraderMessagesSinceTime(DateTimeOffset since);
-    bool StoreTraderMessage(TraderMessageDTO message);
+    ValueTask<IEnumerable<TraderMessageDTO>> GetTraderMessagesSinceTime(DateTimeOffset since, CancellationToken cancellationToken);
+    ValueTask<bool> StoreTraderMessage(TraderMessageDTO message, CancellationToken cancellationToken);
 }

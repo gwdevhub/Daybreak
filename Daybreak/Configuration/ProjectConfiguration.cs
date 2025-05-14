@@ -14,7 +14,6 @@ using Microsoft.Extensions.Logging;
 using Slim;
 using System.Extensions;
 using Daybreak.Services.Options;
-using Daybreak.Models;
 using Microsoft.CorrelationVector;
 using System.Logging;
 using Daybreak.Services.Updater.PostUpdate;
@@ -44,13 +43,11 @@ using Daybreak.Services.TradeChat;
 using Daybreak.Views.Trade;
 using System.Net.WebSockets;
 using Daybreak.Services.Notifications;
-using Daybreak.Services.TradeChat.Models;
 using Daybreak.Services.Charts;
 using Daybreak.Services.Images;
 using Daybreak.Services.InternetChecker;
 using System;
 using Daybreak.Services.Sounds;
-using Daybreak.Services.Notifications.Models;
 using Daybreak.Models.Notifications.Handling;
 using Daybreak.Services.TradeChat.Notifications;
 using Daybreak.Views.Copy;
@@ -61,7 +58,6 @@ using Daybreak.Services.Registry;
 using Daybreak.Services.DSOAL.Actions;
 using Daybreak.Services.Events;
 using Daybreak.Controls;
-using Daybreak.Models.Plugins;
 using Daybreak.Services.Plugins;
 using Daybreak.Services.Toolbox.Utilities;
 using Daybreak.Services.Injection;
@@ -81,14 +77,65 @@ using Daybreak.Services.ApplicationArguments.ArgumentHandling;
 using Daybreak.Services.Window;
 using Daybreak.Launch;
 using Daybreak.Views.Installation;
-using Daybreak.Services.Logging.Models;
 using Daybreak.Services.Toolbox.Notifications;
 using Daybreak.Services.Guildwars;
+using Daybreak.Services.Api;
+using Daybreak.Services.Notifications.Handlers;
+using Microsoft.Data.Sqlite;
+using Daybreak.Shared.Services.Options;
+using Daybreak.Shared.Services.Menu;
+using Daybreak.Shared.Services.Screens;
+using Daybreak.Shared.Services.Logging;
+using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.TradeChat;
+using Daybreak.Shared.Services.Scanner;
+using Daybreak.Shared.Services.Themes;
+using Daybreak.Shared.Services.Shortcuts;
+using Daybreak.Shared.Services.Guildwars;
+using Daybreak.Shared.Services.Registry;
+using Daybreak.Shared.Services.Images;
+using Daybreak.Shared.Services.Credentials;
+using Daybreak.Shared.Services.Onboarding;
+using Daybreak.Shared.Services.Sounds;
+using Daybreak.Shared.Services.BuildTemplates;
+using Daybreak.Shared.Services.Browser;
+using Daybreak.Shared.Services.DSOAL;
+using Daybreak.Shared.Services.ExecutableManagement;
+using Daybreak.Shared.Services.SevenZip;
+using Daybreak.Shared.Services.DirectSong;
+using Daybreak.Shared.Services.ApplicationArguments;
+using Daybreak.Shared.Services.LaunchConfigurations;
+using Daybreak.Shared.Services.UMod;
+using Daybreak.Shared.Services.Updater;
+using Daybreak.Shared.Services.Injection;
+using Daybreak.Shared.Services.Metrics;
+using Daybreak.Shared.Services.Mutex;
+using Daybreak.Shared.Services.IconRetrieve;
+using Daybreak.Shared.Services.Updater.PostUpdate;
+using Daybreak.Shared.Services.Mods;
+using Daybreak.Shared.Services.Screenshots;
+using Daybreak.Shared.Services.Plugins;
+using Daybreak.Shared.Services.Experience;
+using Daybreak.Shared.Services.Window;
+using Daybreak.Shared.Services.ApplicationLauncher;
+using Daybreak.Shared.Services.Navigation;
+using Daybreak.Shared.Services.Toolbox;
+using Daybreak.Shared.Services.Events;
+using Daybreak.Shared.Services.Startup;
+using Daybreak.Shared.Services.InternetChecker;
+using Daybreak.Shared.Services.ReShade;
+using Daybreak.Shared.Services.Api;
+using Daybreak.Shared.Services.Privilege;
+using Daybreak.Shared.Services.Downloads;
+using Daybreak.Shared.Shared.Models.Plugins;
+using Daybreak.Shared.Models;
 
 namespace Daybreak.Configuration;
 
 public class ProjectConfiguration : PluginConfigurationBase
 {
+    private const string DbConnectionString = "Data Source=Daybreak.sqlite.db";
+
     public override void RegisterResolvers(IServiceManager serviceManager)
     {
         serviceManager.ThrowIfNull();
@@ -102,8 +149,16 @@ public class ProjectConfiguration : PluginConfigurationBase
     {
         services.ThrowIfNull();
 
-        this.RegisterLiteCollections(services);
         this.RegisterHttpClients(services);
+        services.AddScoped(sp =>
+        {
+            var connection = new SqliteConnection(DbConnectionString);
+            connection.Open();
+            return connection;
+        });
+        services.AddScoped(sp => new TradeQuoteDbContext(sp.GetRequiredService<SqliteConnection>()));
+        services.AddScoped(sp => new NotificationsDbContext(sp.GetRequiredService<SqliteConnection>()));
+        services.AddScoped(sp => new TradeMessagesDbContext(sp.GetRequiredService<SqliteConnection>()));
         services.AddSingleton<ILogsManager, JsonLogsManager>();
         services.AddSingleton<IDebugLogsWriter, Services.Logging.DebugLogsWriter>();
         services.AddSingleton<IEventViewerLogsWriter, EventViewerLogsWriter>();
@@ -193,6 +248,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IBackgroundProvider, BackgroundProvider>();
         services.AddScoped<IToolboxClient, ToolboxClient>();
         services.AddScoped<IProcessInjector, ProcessInjector>();
+        services.AddScoped<IStubInjector, StubInjector>();
         services.AddScoped<ILaunchConfigurationService, LaunchConfigurationService>();
         services.AddScoped<IBrowserHistoryManager, BrowserHistoryManager>();
         services.AddScoped<IEventService, EventService>();
@@ -277,6 +333,7 @@ public class ProjectConfiguration : PluginConfigurationBase
     {
         startupActionProducer.ThrowIfNull();
 
+        startupActionProducer.RegisterAction<EnsureDatabaseTablesExist>();
         startupActionProducer.RegisterAction<RenameInstallerAction>();
         startupActionProducer.RegisterAction<FixSymbolicLinkStartupAction>();
         startupActionProducer.RegisterAction<UpdateUModAction>();
@@ -352,6 +409,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         modsManager.RegisterMod<IDSOALService, DSOALService>();
         modsManager.RegisterMod<IGuildwarsScreenPlacer, GuildwarsScreenPlacer>();
         modsManager.RegisterMod<IDirectSongService, DirectSongService>(singleton: true);
+        modsManager.RegisterMod<IDaybreakApiService, DaybreakApiService>();
     }
 
     public override void RegisterBrowserExtensions(IBrowserExtensionsProducer browserExtensionsProducer)
@@ -398,14 +456,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         menuServiceProducer.CreateIfNotExistCategory("Diagnostics")
             .RegisterButton("Logs", "Open logs view", sp => sp.GetRequiredService<ViewManager>().ShowView<LogsView>())
             .RegisterButton("Metrics", "Open metrics view", sp => sp.GetRequiredService<ViewManager>().ShowView<MetricsView>());
-    }
-
-    private void RegisterLiteCollections(IServiceCollection services)
-    {
-        this.RegisterCollection<LogDTO>(services);
-        this.RegisterCollection<TraderQuoteDTO>(services);
-        this.RegisterCollection<NotificationDTO>(services);
-        this.RegisterCollection<TraderMessageDTO>(services);
     }
 
     private IServiceCollection RegisterHttpClients(IServiceCollection services)

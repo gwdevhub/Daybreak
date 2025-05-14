@@ -1,9 +1,9 @@
-﻿using Daybreak.Models.Builds;
-using Daybreak.Models.Guildwars;
-using Daybreak.Models.Interop;
-using Daybreak.Models.Metrics;
-using Daybreak.Services.ApplicationLauncher;
-using Daybreak.Services.Metrics;
+﻿using Daybreak.Shared.Models.Builds;
+using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Models.Interop;
+using Daybreak.Shared.Models.Metrics;
+using Daybreak.Shared.Services.Metrics;
+using Daybreak.Shared.Services.Scanner;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -319,10 +319,10 @@ public sealed class GuildwarsMemoryReader(
                 InstanceTimer = instanceContext.Timer,
                 InstanceType = instanceInfoContext.InstanceType switch
                 {
-                    Daybreak.Models.Interop.InstanceType.Explorable => Daybreak.Models.Guildwars.InstanceType.Explorable,
-                    Daybreak.Models.Interop.InstanceType.Loading => Daybreak.Models.Guildwars.InstanceType.Loading,
-                    Daybreak.Models.Interop.InstanceType.Outpost => Daybreak.Models.Guildwars.InstanceType.Outpost,
-                    _ => Daybreak.Models.Guildwars.InstanceType.Undefined
+                    Shared.Models.Interop.InstanceType.Explorable => Shared.Models.Guildwars.InstanceType.Explorable,
+                    Shared.Models.Interop.InstanceType.Loading => Shared.Models.Guildwars.InstanceType.Loading,
+                    Shared.Models.Interop.InstanceType.Outpost => Shared.Models.Guildwars.InstanceType.Outpost,
+                    _ => Shared.Models.Guildwars.InstanceType.Undefined
                 }
             }
         };
@@ -708,7 +708,7 @@ public sealed class GuildwarsMemoryReader(
         {
             var attributes = (primaryProfession.PrimaryAttribute is null ?
                 [] :
-                new List<Daybreak.Models.Guildwars.Attribute> { primaryProfession.PrimaryAttribute! })
+                new List<Shared.Models.Guildwars.Attribute> { primaryProfession.PrimaryAttribute! })
                 .Concat(primaryProfession.Attributes)
                 .Concat(secondaryProfession.Attributes)
                 .Select(a => new AttributeEntry { Attribute = a })
