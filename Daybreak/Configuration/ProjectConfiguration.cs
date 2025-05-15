@@ -532,6 +532,10 @@ public class ProjectConfiguration : PluginConfigurationBase
             .RegisterHttpClient<UBlockOriginService>()
                 .WithMessageHandler(this.SetupLoggingAndMetrics<UBlockOriginService>)
                 .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
+                .Build()
+            .RegisterHttpClient<DXVKService>()
+                .WithMessageHandler(this.SetupLoggingAndMetrics<DXVKService>)
+                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
                 .Build();
     }
 }

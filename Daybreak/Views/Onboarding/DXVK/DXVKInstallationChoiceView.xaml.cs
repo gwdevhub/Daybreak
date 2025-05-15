@@ -23,28 +23,13 @@ public partial class DXVKInstallationChoiceView : UserControl
         this.InitializeComponent();
     }
 
-    private void NvidiaCappedButton_Clicked(object sender, System.EventArgs e)
+    private void YesButton_Clicked(object sender, System.EventArgs e)
     {
-        this.ProceedWithInstallation(DXVKInstallationChoice.NvidiaCapped);
+        this.viewManager.ShowView<DXVKInstallingView>();
     }
 
-    private void NvidiaButton_Clicked(object sender, System.EventArgs e)
+    private void NoButton_Clicked(object sender, System.EventArgs e)
     {
-        this.ProceedWithInstallation(DXVKInstallationChoice.Nvidia);
-    }
-
-    private void AMDCappedButton_Clicked(object sender, System.EventArgs e)
-    {
-        this.ProceedWithInstallation(DXVKInstallationChoice.AMDCapped);
-    }
-
-    private void AMDButton_Clicked(object sender, System.EventArgs e)
-    {
-        this.ProceedWithInstallation(DXVKInstallationChoice.AMD);
-    }
-
-    private void ProceedWithInstallation(DXVKInstallationChoice dXVKInstallationChoice)
-    {
-        this.viewManager.ShowView<DXVKInstallingView>(dXVKInstallationChoice);
+        this.viewManager.ShowView<LauncherView>();
     }
 }
