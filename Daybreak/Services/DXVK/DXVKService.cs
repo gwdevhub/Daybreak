@@ -169,6 +169,11 @@ internal sealed class DXVKService(
 
     private async ValueTask ExtractFiles(Version version, CancellationToken cancellationToken)
     {
+        if (!Directory.Exists(DXVKDirectory))
+        {
+            Directory.CreateDirectory(DXVKDirectory);
+        }
+
         using var fileStream = File.OpenRead(ArchiveName);
         using var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress);
         await TarFile.ExtractToDirectoryAsync(gzipStream, DXVKDirectory, overwriteFiles: true, cancellationToken);
