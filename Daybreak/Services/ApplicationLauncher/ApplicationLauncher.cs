@@ -4,6 +4,7 @@ using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.LaunchConfigurations;
 using Daybreak.Shared.Models.Mods;
 using Daybreak.Shared.Services.ApplicationLauncher;
+using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.Mods;
 using Daybreak.Shared.Services.Mutex;
 using Daybreak.Shared.Services.Notifications;
@@ -32,12 +33,13 @@ using static Daybreak.Shared.Utils.NativeMethods;
 namespace Daybreak.Services.ApplicationLauncher;
 
 internal sealed class ApplicationLauncher(
+    IGuildWarsExecutableManager guildWarsExecutableManager,
     INotificationService notificationService,
     ILiveOptions<LauncherOptions> launcherOptions,
     IMutexHandler mutexHandler,
     IModsManager modsManager,
-    ILogger<ApplicationLauncher> logger,
-    IPrivilegeManager privilegeManager) : IApplicationLauncher
+    IPrivilegeManager privilegeManager,
+    ILogger<ApplicationLauncher> logger) : IApplicationLauncher
 {
     private const string ProcessName = "gw";
     private const string ArenaNetMutex = "AN-Mute";
@@ -45,6 +47,7 @@ internal sealed class ApplicationLauncher(
 
     private static readonly TimeSpan LaunchTimeout = TimeSpan.FromMinutes(1);
 
+    private readonly IGuildWarsExecutableManager guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly ILiveOptions<LauncherOptions> launcherOptions = launcherOptions.ThrowIfNull();
     private readonly IMutexHandler mutexHandler = mutexHandler.ThrowIfNull();
@@ -65,7 +68,8 @@ internal sealed class ApplicationLauncher(
                 return null;
             }
 
-            if (!this.ClearGwLocks(launchConfigurationWithCredentials.ExecutablePath!.ThrowIfNull()))
+            if (launchConfigurationWithCredentials.ExecutablePath is not null &&
+                !this.ClearGwLocks(launchConfigurationWithCredentials.ExecutablePath))
             {
                 this.logger.LogError("Failed to clear GW locks. Canceling GuildWars launch");
                 return null;
@@ -163,10 +167,31 @@ internal sealed class ApplicationLauncher(
     {
         var email = launchConfigurationWithCredentials.Credentials!.Username;
         var password = launchConfigurationWithCredentials.Credentials!.Password;
-        var executable = launchConfigurationWithCredentials.ExecutablePath!;
-        if (File.Exists(executable) is false)
+        var executable = launchConfigurationWithCredentials.ExecutablePath;
+        if (executable is not null &&
+            File.Exists(executable) is false)
         {
             throw new ExecutableNotFoundException($"Guildwars executable doesn't exist at {executable}");
+        }
+        else if (executable is null)
+        {
+            var availableExecutables = this.guildWarsExecutableManager.GetExecutableList();
+            var runningInstances = this.GetGuildwarsProcesses();
+            var firstAvailableExecutable = availableExecutables.FirstOrDefault(e => !runningInstances.Any(p => Path.GetFullPath(p.MainModule?.FileName ?? string.Empty) == Path.GetFullPath(e)));
+            if (firstAvailableExecutable is null)
+            {
+                this.notificationService.NotifyError(
+                    title: "Can not launch Guild Wars",
+                    description: "No available executables found. All executables are currently in use");
+                return default;
+            }
+            else
+            {
+                executable = firstAvailableExecutable;
+                this.notificationService.NotifyError(
+                    title: "Launching Guild Wars",
+                    description: $"Found available executable at {firstAvailableExecutable}");
+            }
         }
 
         var args = new List<string>()
