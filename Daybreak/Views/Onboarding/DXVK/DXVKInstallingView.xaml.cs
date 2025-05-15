@@ -1,6 +1,7 @@
-﻿using Daybreak.Shared.Models.Progress;
+﻿using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.Progress;
+using Daybreak.Shared.Services.DXVK;
 using Daybreak.Shared.Services.Navigation;
-using Daybreak.Shared.Services.ReShade;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Extensions;
@@ -9,16 +10,17 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 
-namespace Daybreak.Views.Onboarding.ReShade;
+namespace Daybreak.Views.Onboarding.DXVK;
 /// <summary>
-/// Interaction logic for UModInstallerView.xaml
+/// Interaction logic for DXVKInstallerView.xaml
 /// </summary>
-public partial class ReShadeInstallingView : UserControl
+public partial class DXVKInstallingView : UserControl
 {
-    private readonly CancellationTokenSource cancellationTokenSource = new();
-    private readonly ILogger<ReShadeInstallingView> logger;
+    private readonly ILogger<DXVKInstallingView> logger;
     private readonly IViewManager viewManager;
-    private readonly IReShadeService reShadeService;
+    private readonly IDXVKService dXVKService;
+
+    private CancellationTokenSource? cancellationTokenSource;
 
     [GenerateDependencyProperty(InitialValue = "")]
     private string description = string.Empty;
@@ -29,12 +31,12 @@ public partial class ReShadeInstallingView : UserControl
     [GenerateDependencyProperty(InitialValue = false)]
     private bool progressVisible;
 
-    public ReShadeInstallingView(
-        IReShadeService reShadeService,
-        ILogger<ReShadeInstallingView> logger,
+    public DXVKInstallingView(
+        IDXVKService dXVKService,
+        ILogger<DXVKInstallingView> logger,
         IViewManager viewManager)
     {
-        this.reShadeService = reShadeService.ThrowIfNull();
+        this.dXVKService = dXVKService.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
         this.InitializeComponent();
@@ -42,7 +44,7 @@ public partial class ReShadeInstallingView : UserControl
 
     private void DownloadStatus_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        var installationStatus = sender?.As<ReShadeInstallationStatus>();
+        var installationStatus = sender?.As<DXVKInstallationStatus>();
         var newProgress = (int)(installationStatus?.CurrentStep.As<DownloadStatus.DownloadProgressStep>()?.Progress * 100 ??
             0);
 
@@ -55,33 +57,44 @@ public partial class ReShadeInstallingView : UserControl
         this.Dispatcher.Invoke(() =>
         {
             this.ProgressVisible = false;
-            if (installationStatus?.CurrentStep is DownloadStatus.DownloadProgressStep downloadUpdateStep)
+            if (installationStatus!.CurrentStep is DownloadStatus.DownloadProgressStep downloadUpdateStep)
             {
                 this.ProgressValue = newProgress;
                 this.ProgressVisible = true;
             }
 
-            this.Description = installationStatus?.CurrentStep.Description;
+            this.Description = installationStatus.CurrentStep.Description;
         });
     }
 
     private async void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
-        var installationStatus = new ReShadeInstallationStatus();
+        if (this.DataContext is not DXVKInstallationChoice installationChoice)
+        {
+            this.logger.LogError("DataContext is not DXVKInstallationChoice");
+            this.viewManager.ShowView<LauncherView>();
+            return;
+        }
+
+        this.cancellationTokenSource?.Cancel();
+        this.cancellationTokenSource?.Dispose();
+        this.cancellationTokenSource = new CancellationTokenSource();
+        var installationStatus = new DXVKInstallationStatus();
         installationStatus.PropertyChanged += this.DownloadStatus_PropertyChanged;
         this.Description = installationStatus.CurrentStep.Description;
-        await this.reShadeService.SetupReShade(installationStatus, this.cancellationTokenSource.Token);
+        await this.dXVKService.SetupDXVK(installationStatus, installationChoice, this.cancellationTokenSource.Token);
         installationStatus.PropertyChanged -= this.DownloadStatus_PropertyChanged;
         this.ContinueButtonEnabled = true;
-    }
-
-    private void OpaqueButton_Clicked(object sender, System.EventArgs e)
-    {
-        this.viewManager.ShowView<ReShadeMainView>();
     }
 
     private void UserControl_Unloaded(object sender, RoutedEventArgs e)
     {
         this.cancellationTokenSource?.Cancel();
+        this.cancellationTokenSource?.Dispose();
+    }
+
+    private void OpaqueButton_Clicked(object sender, System.EventArgs e)
+    {
+        this.viewManager.ShowView<DXVKSwitchView>();
     }
 }
