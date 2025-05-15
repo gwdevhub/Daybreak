@@ -11,41 +11,47 @@ using System.IO.Compression;
 using System.IO;
 using System.Threading.Tasks;
 using System.Threading;
-using System;
 using Daybreak.Shared.Services.DXVK;
 using System.Core.Extensions;
-using Daybreak.Shared.Models;
 using System.Extensions.Core;
+using Daybreak.Shared.Models.Github;
+using System.Net.Http;
+using System.Extensions;
+using Version = Daybreak.Shared.Models.Versioning.Version;
+using System.Linq;
+using Daybreak.Shared.Services.SevenZip;
+using System.Formats.Tar;
 
 namespace Daybreak.Services.DXVK;
 /// <summary>
-/// Service for managing DXVK for GW1. https://github.com/Deadsimon/dxvk-for-guildwars
+/// Service for managing DXVK for GW1. https://github.com/doitsujin/dxvk
 /// </summary>
 internal sealed class DXVKService(
+    ISevenZipExtractor sevenZipExtractor,
     INotificationService notificationService,
     IDownloadService downloadService,
+    IHttpClient<DXVKService> httpClient,
     ILiveUpdateableOptions<DXVKOptions> options,
     ILogger<DXVKService> logger) : IDXVKService
 {
-    private const string DownloadUrlAMDCapped = "https://github.com/Deadsimon/dxvk-for-guildwars/releases/download/V1.21/dxvk_for_GW_V1.21_amd-FPS_Capped.zip";
-    private const string DownloadUrlAMD = "https://github.com/Deadsimon/dxvk-for-guildwars/releases/download/V1.21/dxvk_for_GW_V1.21_amd.zip";
-    private const string DownloadUrlNvidiaCapped = "https://github.com/Deadsimon/dxvk-for-guildwars/releases/download/V1.21/dxvk_for_GW_V1.21_nvidia-FPS_capped.zip";
-    private const string DownloadUrlNvidia = "https://github.com/Deadsimon/dxvk-for-guildwars/releases/download/V1.21/dxvk_for_GW_V1.21_nvidia.zip";
-    private const string ArchiveName = "dxvk.zip";
+    private const string TagPlaceholder = "[TAG_PLACEHOLDER]";
+    private const string ReleaseUrl = $"https://github.com/doitsujin/dxvk/releases/download/v{TagPlaceholder}/dxvk-{TagPlaceholder}.tar.gz";
+    private const string ReleasesUrl = "https://api.github.com/repos/doitsujin/dxvk/git/refs/tags";
+    private const string ArchiveName = "dxvk.tar.gz";
+    private const string DxvkArchivedFile = $"dxvk-{TagPlaceholder}\\x32\\d3d9.dll";
     private const string DXVKDirectorySubpath = "DXVK";
     private const string D3D9Dll = "d3d9.dll";
-    private const string DXGIDll = "dxgi.dll";
-    private const string DXVKConf = "DXVK.conf";
-    private const string DXVKCache = "Gw.dxvk-cache";
 
     private static readonly string DXVKDirectory = PathUtils.GetAbsolutePathFromRoot(DXVKDirectorySubpath);
 
+    private readonly ISevenZipExtractor sevenZipExtractor = sevenZipExtractor.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
     private readonly ILiveUpdateableOptions<DXVKOptions> options = options.ThrowIfNull();
+    private readonly IHttpClient<DXVKService> httpClient = httpClient.ThrowIfNull();
     private readonly ILogger<DXVKService> logger = logger.ThrowIfNull();
 
-    public string Name => "DSOAL";
+    public string Name => "DXVK";
     public bool IsEnabled
     {
         get => this.options.Value.Enabled;
@@ -56,12 +62,9 @@ internal sealed class DXVKService(
         }
     }
     public bool IsInstalled => Directory.Exists(this.options.Value.Path) &&
-           File.Exists(Path.Combine(DXVKDirectory, D3D9Dll)) &&
-           File.Exists(Path.Combine(DXVKDirectory, DXGIDll)) &&
-           File.Exists(Path.Combine(DXVKDirectory, DXVKConf)) &&
-           File.Exists(Path.Combine(DXVKDirectory, DXVKCache));
+           File.Exists(Path.Combine(DXVKDirectory, D3D9Dll));
 
-    public async Task<bool> SetupDXVK(DXVKInstallationStatus dXVKInstallationStatus, DXVKInstallationChoice dXVKInstallationChoice, CancellationToken cancellationToken)
+    public async Task<bool> SetupDXVK(DXVKInstallationStatus dXVKInstallationStatus, CancellationToken cancellationToken)
     {
         if (this.IsInstalled)
         {
@@ -69,24 +72,27 @@ internal sealed class DXVKService(
         }
 
         var scopedLogger = this.logger.CreateScopedLogger();
-        var downloadUrl = dXVKInstallationChoice switch
+        
+        var latestVersion = await this.GetLatestVersion(cancellationToken);
+        if (latestVersion is null)
         {
-            DXVKInstallationChoice.AMD => DownloadUrlAMD,
-            DXVKInstallationChoice.AMDCapped => DownloadUrlAMDCapped,
-            DXVKInstallationChoice.Nvidia => DownloadUrlNvidia,
-            DXVKInstallationChoice.NvidiaCapped => DownloadUrlNvidiaCapped,
-            _ => throw new ArgumentOutOfRangeException(nameof(dXVKInstallationChoice))
-        };
+            scopedLogger.LogError("Failed to get latest version");
+            dXVKInstallationStatus.CurrentStep = DXVKInstallationStatus.FailedToGetLatestVersion;
+            return false;
+        }
 
+        latestVersion.HasPrefix = false;
+        var downloadUrl = ReleaseUrl.Replace(TagPlaceholder, latestVersion.ToString());
         if ((await this.downloadService.DownloadFile(downloadUrl, ArchiveName, dXVKInstallationStatus, cancellationToken)) is false)
         {
             scopedLogger.LogError("Failed to install DXVK");
+            dXVKInstallationStatus.CurrentStep = DXVKInstallationStatus.FailedDownload;
             return false;
         }
 
         scopedLogger.LogInformation("Extracting DXVK files");
         dXVKInstallationStatus.CurrentStep = DXVKInstallationStatus.ExtractingFiles;
-        this.ExtractFiles();
+        await this.ExtractFiles(latestVersion, cancellationToken);
 
         dXVKInstallationStatus.CurrentStep = DXVKInstallationStatus.Finished;
         return true;
@@ -118,9 +124,6 @@ internal sealed class DXVKService(
         if (this.IsInstalled)
         {
             EnsureFileExistsInGuildwarsDirectory(D3D9Dll, guildwarsDirectory);
-            EnsureFileExistsInGuildwarsDirectory(DXGIDll, guildwarsDirectory);
-            EnsureFileExistsInGuildwarsDirectory(DXVKCache, guildwarsDirectory);
-            EnsureFileExistsInGuildwarsDirectory(DXVKConf, guildwarsDirectory);
             this.notificationService.NotifyInformation(
                 title: "DXVK started",
                 description: "DXVK files have been set up");
@@ -138,9 +141,6 @@ internal sealed class DXVKService(
         }
 
         EnsureFileDoesNotExistInGuildwarsDirectory(D3D9Dll, guildwarsDirectory);
-        EnsureFileDoesNotExistInGuildwarsDirectory(DXGIDll, guildwarsDirectory);
-        EnsureFileDoesNotExistInGuildwarsDirectory(DXVKCache, guildwarsDirectory);
-        EnsureFileDoesNotExistInGuildwarsDirectory(DXVKConf, guildwarsDirectory);
         return Task.CompletedTask;
     }
 
@@ -167,23 +167,58 @@ internal sealed class DXVKService(
         File.Delete(destinationPath);
     }
 
-    private void ExtractFiles()
+    private async ValueTask ExtractFiles(Version version, CancellationToken cancellationToken)
     {
-        ZipFile.ExtractToDirectory(ArchiveName, DXVKDirectory, true);
+        using var fileStream = File.OpenRead(ArchiveName);
+        using var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress);
+        await TarFile.ExtractToDirectoryAsync(gzipStream, DXVKDirectory, overwriteFiles: true, cancellationToken);
+        gzipStream.Close();
+        fileStream.Close();
+
+        var destFile = Path.Combine(DXVKDirectory, Path.GetFileName(D3D9Dll));
+        var sourceFile = Path.Combine(DXVKDirectory, $"{DxvkArchivedFile.Replace(TagPlaceholder, version.ToString())}");
+        File.Move(sourceFile, destFile, true);
         foreach (var subDir in Directory.GetDirectories(DXVKDirectory))
         {
-            foreach (var file in Directory.GetFiles(subDir))
-            {
-                var destFile = Path.Combine(DXVKDirectory, Path.GetFileName(file));
-                File.Move(file, destFile, true);
-            }
-
             Directory.Delete(subDir, true);
         }
 
         var options = this.options.Value;
         options.Path = DXVKDirectory;
+        options.Version = version.ToString();
         this.options.UpdateOption();
         File.Delete(ArchiveName);
+    }
+
+    private async Task<Version?> GetLatestVersion(CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        scopedLogger.LogInformation("Retrieving version list");
+        var getListResponse = await this.httpClient.GetAsync(ReleasesUrl, cancellationToken);
+        if (!getListResponse.IsSuccessStatusCode)
+        {
+            scopedLogger.LogError("Received non success status code [{statusCode}]", getListResponse.StatusCode);
+            return default;
+        }
+
+        var responseString = await getListResponse.Content.ReadAsStringAsync(cancellationToken);
+        var releasesList = responseString.Deserialize<List<GithubRefTag>>();
+        var latestRelease = releasesList?
+            .Select(t => t.Ref?.Replace("refs/tags/", ""))
+            .OfType<string>()
+            .LastOrDefault();
+        if (latestRelease is not string tag)
+        {
+            scopedLogger.LogError("Could not parse version list. No latest version found");
+            return default;
+        }
+
+        if (!Version.TryParse(tag, out var version))
+        {
+            scopedLogger.LogError("Could not parse version from tag {tag}", tag);
+            return default;
+        }
+
+        return version;
     }
 }
