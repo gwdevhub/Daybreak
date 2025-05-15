@@ -18,7 +18,7 @@ public sealed class LaunchConfigurationWithCredentials : IEquatable<LaunchConfig
         }
 
         return this?.Identifier?.Equals(other?.Identifier) is true &&
-            this?.ExecutablePath?.Equals(other?.ExecutablePath) is true &&
+            this?.ExecutablePath?.Equals(other?.ExecutablePath) is not false && //ExecutablePath can be null, so in that case the comparison returns null
             this?.Credentials?.Equals(other?.Credentials) is true;
     }
 

@@ -138,7 +138,8 @@ internal sealed class LaunchConfigurationService : ILaunchConfigurationService
 
     private bool IsValidInternal(LaunchConfigurationWithCredentials launchConfiguration)
     {
-        return launchConfiguration.ExecutablePath?.IsNullOrWhiteSpace() is false && this.guildWarsExecutableManager.IsValidExecutable(launchConfiguration.ExecutablePath!);
+        return launchConfiguration.ExecutablePath is null ||
+                this.guildWarsExecutableManager.IsValidExecutable(launchConfiguration.ExecutablePath);
     }
 
     private LaunchConfigurationWithCredentials? ConvertToConfigurationWithCredentials(LaunchConfiguration launchConfiguration)

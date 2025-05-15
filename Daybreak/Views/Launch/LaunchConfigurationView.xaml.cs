@@ -9,6 +9,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;
 using System.Extensions;
+using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 
@@ -18,6 +19,7 @@ namespace Daybreak.Views.Launch;
 /// </summary>
 public partial class LaunchConfigurationView : UserControl
 {
+    private const string AnyAvailableExecutable = "Any available executable";
     private readonly INotificationService notificationService;
     private readonly ILaunchConfigurationService launchConfigurationService;
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager;
@@ -58,7 +60,7 @@ public partial class LaunchConfigurationView : UserControl
         }
 
         this.Credentials.ClearAnd().AddRange(this.credentialManager.GetCredentialList());
-        this.ExecutablePaths.ClearAnd().AddRange(this.guildWarsExecutableManager.GetExecutableList());
+        this.ExecutablePaths.ClearAnd().AddRange(this.guildWarsExecutableManager.GetExecutableList().Prepend(AnyAvailableExecutable));
         if (config.Credentials is not null)
         {
             this.SelectedCredentials = config.Credentials;
@@ -88,7 +90,7 @@ public partial class LaunchConfigurationView : UserControl
         }
 
         config.Credentials = this.SelectedCredentials;
-        config.ExecutablePath = this.SelectedPath;
+        config.ExecutablePath = this.SelectedPath == AnyAvailableExecutable ? default : this.SelectedPath; // if the user selected "Any available executable", we don't want to save that as the executable path
         config.Arguments = this.LaunchArguments;
         if (!this.launchConfigurationService.SaveConfiguration(config))
         {
