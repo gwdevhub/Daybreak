@@ -38,7 +38,8 @@
                                      BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
                                      BorderThickness="1"
                                      Clicked="OpaqueButton_Clicked"
-                                     ToolTip="Continue"/>
+                                     ToolTip="Continue"
+                                     Visibility="{Binding ElementName=_this,Path=ContinueButtonEnabled, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
         </StackPanel>
     </Grid>
 </UserControl>
