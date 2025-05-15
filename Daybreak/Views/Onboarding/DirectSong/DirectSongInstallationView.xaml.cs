@@ -80,6 +80,7 @@ public partial class DirectSongInstallationView : UserControl
         {
             this.installationStatus = new DirectSongInstallationStatus();
             this.installationStatus.PropertyChanged += this.DownloadStatus_PropertyChanged;
+            this.Description = this.installationStatus.CurrentStep.Description;
             await this.directSongService.SetupDirectSong(this.installationStatus, CancellationToken.None);
             this.installationStatus.PropertyChanged -= this.DownloadStatus_PropertyChanged;
             this.ContinueButtonEnabled = true;
@@ -88,6 +89,7 @@ public partial class DirectSongInstallationView : UserControl
         else
         {
             this.installationStatus.PropertyChanged += this.DownloadStatus_PropertyChanged;
+            this.Description = this.installationStatus.CurrentStep.Description;
             await (this.directSongService.InstallationTask ?? throw new InvalidOperationException("Installation task is null but the installation status cache exists"));
             this.installationStatus.PropertyChanged -= this.DownloadStatus_PropertyChanged;
             this.ContinueButtonEnabled = true;

@@ -129,6 +129,9 @@ using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Services.Downloads;
 using Daybreak.Shared.Shared.Models.Plugins;
 using Daybreak.Shared.Models;
+using Daybreak.Shared.Services.DXVK;
+using Daybreak.Services.DXVK;
+using Daybreak.Views.Onboarding.DXVK;
 
 namespace Daybreak.Configuration;
 
@@ -327,6 +330,10 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<EventCalendarView>();
         viewProducer.RegisterView<UpdateConfirmationView>();
         viewProducer.RegisterView<GuildWarsPartySearchView>();
+        viewProducer.RegisterView<DXVKInstallationChoiceView>();
+        viewProducer.RegisterView<DXVKInstallingView>();
+        viewProducer.RegisterView<DXVKOnboardingEntryView>();
+        viewProducer.RegisterView<DXVKSwitchView>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -371,6 +378,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         optionsProducer.RegisterOptions<UModOptions>();
         optionsProducer.RegisterOptions<DSOALOptions>();
         optionsProducer.RegisterOptions<ReShadeOptions>();
+        optionsProducer.RegisterOptions<DXVKOptions>();
 
         optionsProducer.RegisterOptions<ScreenManagerOptions>();
         optionsProducer.RegisterOptions<KamadanTradeChatOptions>();
@@ -408,6 +416,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         modsManager.RegisterMod<IReShadeService, ReShadeService>();
         modsManager.RegisterMod<IUModService, UModService>();
         modsManager.RegisterMod<IDSOALService, DSOALService>();
+        modsManager.RegisterMod<IDXVKService, DXVKService>();
         modsManager.RegisterMod<IGuildwarsScreenPlacer, GuildwarsScreenPlacer>();
         modsManager.RegisterMod<IDirectSongService, DirectSongService>(singleton: true);
         modsManager.RegisterMod<IDaybreakApiService, DaybreakApiService>();
@@ -449,7 +458,8 @@ public class ProjectConfiguration : PluginConfigurationBase
             .RegisterButton("GWToolboxpp", "Open GWToolbox manager", sp => sp.GetRequiredService<ViewManager>().ShowView<ToolboxOnboardingEntryView>())
             .RegisterButton("DSOAL", "Open DSOAL manager", sp => sp.GetRequiredService<ViewManager>().ShowView<DSOALOnboardingEntryView>())
             .RegisterButton("ReShade", "Open ReShade manager", sp => sp.GetRequiredService<ViewManager>().ShowView<ReShadeOnboardingEntryView>())
-            .RegisterButton("DirectSong", "Open DirectSong manager", sp => sp.GetRequiredService<ViewManager>().ShowView<DirectSongOnboardingEntryView>());
+            .RegisterButton("DirectSong", "Open DirectSong manager", sp => sp.GetRequiredService<ViewManager>().ShowView<DirectSongOnboardingEntryView>())
+            .RegisterButton("DXVK", "Open DXVK manager", sp => sp.GetRequiredService<ViewManager>().ShowView<DXVKOnboardingEntryView>());
         menuServiceProducer.CreateIfNotExistCategory("Settings")
             .RegisterButton("Accounts", "Accounts Settings", sp => sp.GetRequiredService<ViewManager>().ShowView<AccountsView>())
             .RegisterButton("Executables", "Executables Settings", sp => sp.GetRequiredService<ViewManager>().ShowView<ExecutablesView>())

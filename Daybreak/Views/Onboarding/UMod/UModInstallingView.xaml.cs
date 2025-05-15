@@ -67,6 +67,7 @@ public partial class UModInstallingView : UserControl
     {
         var installationStatus = new UModInstallationStatus();
         installationStatus.PropertyChanged += this.DownloadStatus_PropertyChanged;
+        this.Description = installationStatus.CurrentStep.Description;
         await this.uModService.SetupUMod(installationStatus);
         installationStatus.PropertyChanged -= this.DownloadStatus_PropertyChanged;
         this.ContinueButtonEnabled = true;

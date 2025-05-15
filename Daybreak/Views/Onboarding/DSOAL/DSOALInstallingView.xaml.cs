@@ -67,6 +67,7 @@ public partial class DSOALInstallingView : UserControl
     {
         var installationStatus = new DSOALInstallationStatus();
         installationStatus.PropertyChanged += this.DownloadStatus_PropertyChanged;
+        this.Description = installationStatus.CurrentStep.Description;
         await this.dSOALService.SetupDSOAL(installationStatus);
         installationStatus.PropertyChanged -= this.DownloadStatus_PropertyChanged;
         this.ContinueButtonEnabled = true;
