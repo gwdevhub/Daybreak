@@ -1,5 +1,4 @@
-﻿using Daybreak.Shared.Models;
-using Daybreak.Shared.Models.Progress;
+﻿using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Services.DXVK;
 using Daybreak.Shared.Services.Navigation;
 using Microsoft.Extensions.Logging;
@@ -69,20 +68,13 @@ public partial class DXVKInstallingView : UserControl
 
     private async void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
-        if (this.DataContext is not DXVKInstallationChoice installationChoice)
-        {
-            this.logger.LogError("DataContext is not DXVKInstallationChoice");
-            this.viewManager.ShowView<LauncherView>();
-            return;
-        }
-
         this.cancellationTokenSource?.Cancel();
         this.cancellationTokenSource?.Dispose();
         this.cancellationTokenSource = new CancellationTokenSource();
         var installationStatus = new DXVKInstallationStatus();
         installationStatus.PropertyChanged += this.DownloadStatus_PropertyChanged;
         this.Description = installationStatus.CurrentStep.Description;
-        await this.dXVKService.SetupDXVK(installationStatus, installationChoice, this.cancellationTokenSource.Token);
+        await this.dXVKService.SetupDXVK(installationStatus, this.cancellationTokenSource.Token);
         installationStatus.PropertyChanged -= this.DownloadStatus_PropertyChanged;
         this.ContinueButtonEnabled = true;
     }

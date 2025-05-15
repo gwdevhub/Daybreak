@@ -14,75 +14,48 @@
     </UserControl.Resources>
     <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Background="{StaticResource Daybreak.Brushes.Background}" MinHeight="200" MinWidth="400">
         <Border
-            BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
-            BorderThickness="1" />
+        BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+        BorderThickness="1"></Border>
         <StackPanel VerticalAlignment="Center">
-            <TextBlock Text="Which version would you like to install?"
-                       Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                       TextWrapping="Wrap"
-                       FontSize="16"
-                       HorizontalAlignment="Center"
-                       Margin="0, 0, 0, 10"/>
-            <buttons:HighlightButton Title="Nvidia"
-                         Margin="5"
-                         HorizontalAlignment="Center"
-                         Height="30"
-                         Width="200"
-                         HorizontalContentAlignment="Center"
-                         VerticalContentAlignment="Center"
-                         FontSize="16"
-                         Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                         Background="{StaticResource MahApps.Brushes.ThemeBackground}"
-                         HighlightColor="{StaticResource MahApps.Brushes.Accent}"
-                         BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
-                         BorderThickness="1"
-                         ToolTip="Install Nvidia version"
-                         Clicked="NvidiaButton_Clicked" />
-            <buttons:HighlightButton Title="AMD"
-                         Margin="5"
-                         HorizontalAlignment="Center"
-                         Height="30"
-                         Width="200"
-                         HorizontalContentAlignment="Center"
-                         VerticalContentAlignment="Center"
-                         FontSize="16"
-                         Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                         Background="{StaticResource MahApps.Brushes.ThemeBackground}"
-                         HighlightColor="{StaticResource MahApps.Brushes.Accent}"
-                         BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
-                         BorderThickness="1"
-                         ToolTip="Install AMD version"
-                         Clicked="AMDButton_Clicked" />
-            <buttons:HighlightButton Title="Nvidia Capped (144 FPS)"
-                         Margin="5"
-                         HorizontalAlignment="Center"
-                         Height="30"
-                         Width="200"
-                         HorizontalContentAlignment="Center"
-                         VerticalContentAlignment="Center"
-                         FontSize="16"
-                         Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                         Background="{StaticResource MahApps.Brushes.ThemeBackground}"
-                         HighlightColor="{StaticResource MahApps.Brushes.Accent}"
-                         BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
-                         BorderThickness="1"
-                         ToolTip="Install Nvidia Capped version"
-                         Clicked="NvidiaCappedButton_Clicked" />
-            <buttons:HighlightButton Title="AMD Capped (144 FPS)"
-                         Margin="5"
-                         HorizontalAlignment="Center"
-                         Height="30"
-                         Width="200"
-                         HorizontalContentAlignment="Center"
-                         VerticalContentAlignment="Center"
-                         FontSize="16"
-                         Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                         Background="{StaticResource MahApps.Brushes.ThemeBackground}"
-                         HighlightColor="{StaticResource MahApps.Brushes.Accent}"
-                         BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
-                         BorderThickness="1"
-                         ToolTip="Install AMD capped version"
-                         Clicked="AMDCappedButton_Clicked" />
+            <TextBlock Margin="10"
+                       Text="Do you want to install DXVK?" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                       TextWrapping="Wrap" FontSize="16" HorizontalAlignment="Center"></TextBlock>
+            <Grid MaxWidth="600" Margin="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <buttons:HighlightButton Title="No"
+                                     Grid.Column="0"
+                                     HorizontalAlignment="Center"
+                                     Height="30"
+                                     Width="60"
+                                     HorizontalContentAlignment="Center"
+                                     VerticalContentAlignment="Center"
+                                     FontSize="16"
+                                     Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                     Background="{StaticResource MahApps.Brushes.ThemeBackground}"
+                                     HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                     BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                     BorderThickness="1"
+                                     ToolTip="Do not install DXVK"
+                                     Clicked="NoButton_Clicked" />
+                <buttons:HighlightButton Title="Yes"
+                                     Grid.Column="1"
+                                     HorizontalAlignment="Center"
+                                     Height="30"
+                                     Width="60"
+                                     HorizontalContentAlignment="Center"
+                                     VerticalContentAlignment="Center"
+                                     FontSize="16"
+                                     Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                     Background="{StaticResource MahApps.Brushes.ThemeBackground}"
+                                     HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                     BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                     BorderThickness="1"
+                                     ToolTip="Proceed to installation"
+                                     Clicked="YesButton_Clicked" />
+            </Grid>
         </StackPanel>
     </Grid>
 </UserControl>
