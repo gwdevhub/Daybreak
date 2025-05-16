@@ -14,6 +14,8 @@ using System.Collections.Generic;
 using Daybreak.Shared.Services.BuildTemplates;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Navigation;
+using System.Threading;
+using System.Windows.Forms.VisualStyles;
 
 namespace Daybreak.Views;
 
@@ -26,9 +28,6 @@ public partial class BuildsSynchronizationView : UserControl
     private readonly IGraphClient graphClient;
     private readonly IViewManager viewManager;
     private readonly ILogger<BuildsSynchronizationView> logger;
-
-    public ObservableCollection<SynchronizationBuild> RemoteBuildEntries { get; } = [];
-    public ObservableCollection<SynchronizationBuild> LocalBuildEntries { get; } = [];
 
     [GenerateDependencyProperty(InitialValue = true)]
     private bool buttonsEnabled;
@@ -44,6 +43,11 @@ public partial class BuildsSynchronizationView : UserControl
     private bool showLoading;
     [GenerateDependencyProperty]
     private bool synchronized;
+
+    [GenerateDependencyProperty]
+    private List<SynchronizationBuild> remoteBuildEntries = default!;
+    [GenerateDependencyProperty]
+    private List<SynchronizationBuild> localBuildEntries = default!;
 
     public BuildsSynchronizationView(
         IBuildTemplateManager buildTemplateManager,
@@ -62,30 +66,38 @@ public partial class BuildsSynchronizationView : UserControl
     {
         this.ButtonsEnabled = false;
         this.ShowLoading = true;
-        var profile = await this.graphClient.GetUserProfile<BuildsSynchronizationView>();
-        if (profile.TryExtractSuccess(out var user) is false)
+        await Task.Factory.StartNew(async () =>
         {
-            this.logger.LogError("Failed to get user info");
-            return;
-        }
+            var profile = await this.graphClient.GetUserProfile<BuildsSynchronizationView>();
+            if (profile.TryExtractSuccess(out var user) is false)
+            {
+                this.logger.LogError("Failed to get user info");
+                return;
+            }
 
-        this.DisplayName = user?.DisplayName;
-        await this.PopulateBuilds();
-        this.ButtonsEnabled = true;
-        this.ShowLoading = false;
+            await this.Dispatcher.InvokeAsync(() => this.DisplayName = user?.DisplayName, System.Windows.Threading.DispatcherPriority.Background, CancellationToken.None);
+            await this.PopulateBuilds();
+        }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap();
+        await this.Dispatcher.InvokeAsync(() =>
+        {
+
+            this.ButtonsEnabled = true;
+            this.ShowLoading = false;
+        }, System.Windows.Threading.DispatcherPriority.Background, CancellationToken.None);
     }
 
     private async Task PopulateBuilds()
     {
         var getBuildsResponse = await this.graphClient.RetrieveBuildsList();
-        if (getBuildsResponse.TryExtractSuccess(out var remoteBuildFiles) is false)
+        if (getBuildsResponse.TryExtractSuccess(out var remoteBuildFiles) is false ||
+            remoteBuildFiles is null)
         {
-            remoteBuildFiles = new List<BuildFile>();
+            remoteBuildFiles = [];
         }
 
         var localBuildFiles = await this.buildTemplateManager.GetBuilds().ToListAsync();
 
-        var remoteBuilds = remoteBuildFiles!.Select(buildFile => new SynchronizationBuild { Name = buildFile.FileName!, TemplateCode = buildFile.TemplateCode! })
+        var remoteBuilds = remoteBuildFiles.Select(buildFile => new SynchronizationBuild { Name = buildFile.FileName, TemplateCode = buildFile.TemplateCode })
             .ToList();
         var localBuilds = localBuildFiles.Select(build => new SynchronizationBuild { Name = build.Name!, TemplateCode = this.buildTemplateManager.EncodeTemplate(build) })
             .ToList();
@@ -97,15 +109,14 @@ public partial class BuildsSynchronizationView : UserControl
             remoteBuild => localBuilds.None(localBuild => localBuild.Name + localBuild.TemplateCode == remoteBuild.Name + remoteBuild.TemplateCode))
             .ToList();
 
-        if (localBuilds.Any() &&
-            changedLocalBuilds.None() &&
-            changedRemoteBuilds.None())
+        if (changedLocalBuilds.Count is 0 &&
+            changedRemoteBuilds.Count is 0)
         {
-            this.Synchronized = true;
+            await this.Dispatcher.InvokeAsync(() => this.Synchronized = true, System.Windows.Threading.DispatcherPriority.Background, CancellationToken.None);
         }
         else
         {
-            this.Synchronized = false;
+            await this.Dispatcher.InvokeAsync(() => this.Synchronized = false, System.Windows.Threading.DispatcherPriority.Background, CancellationToken.None);
         }
 
         foreach(var build in changedLocalBuilds.Concat(changedRemoteBuilds))
@@ -113,8 +124,11 @@ public partial class BuildsSynchronizationView : UserControl
             build.Changed = true;
         }
 
-        this.RemoteBuildEntries.ClearAnd().AddRange(remoteBuilds);
-        this.LocalBuildEntries.ClearAnd().AddRange(localBuilds);
+        await this.Dispatcher.InvokeAsync(() =>
+        {
+            this.RemoteBuildEntries = remoteBuilds;
+            this.LocalBuildEntries = localBuilds;
+        }, System.Windows.Threading.DispatcherPriority.Background, CancellationToken.None);
     }
 
     private void BackButton_Clicked(object sender, EventArgs e)
@@ -132,10 +146,16 @@ public partial class BuildsSynchronizationView : UserControl
 
         this.ButtonsEnabled = false;
         this.ShowLoading = true;
-        await this.graphClient.UploadBuild(build.Name!);
-        await this.PopulateBuilds();
-        this.ButtonsEnabled = true;
-        this.ShowLoading = false;
+        await Task.Factory.StartNew(async () =>
+        {
+            await this.graphClient.UploadBuild(build.Name!);
+            await this.PopulateBuilds();
+        }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap();
+        await this.Dispatcher.InvokeAsync(() =>
+        {
+            this.ButtonsEnabled = true;
+            this.ShowLoading = false;
+        }, System.Windows.Threading.DispatcherPriority.Background, CancellationToken.None);
     }
 
     private async void DownloadButton_Clicked(object sender, EventArgs e)
@@ -147,42 +167,58 @@ public partial class BuildsSynchronizationView : UserControl
 
         this.ButtonsEnabled = false;
         this.ShowLoading = true;
-        await this.graphClient.DownloadBuild(build.Name!);
-        await this.PopulateBuilds();
-        this.ButtonsEnabled = true;
-        this.ShowLoading = false;
+        await Task.Factory.StartNew(async () =>
+        {
+            await this.graphClient.DownloadBuild(build.Name!);
+            await this.PopulateBuilds();
+        }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap();
+        await this.Dispatcher.InvokeAsync(() =>
+        {
+            this.ButtonsEnabled = true;
+            this.ShowLoading = false;
+        }, System.Windows.Threading.DispatcherPriority.Background, CancellationToken.None);
     }
 
     private async void DownloadAllButton_Clicked(object sender, EventArgs e)
     {
         this.ButtonsEnabled = false;
         this.ShowLoading = true;
-        var result = await this.graphClient.DownloadBuilds().ConfigureAwait(true);
-        result.DoAny(
-            onFailure: (failure) =>
-            {
-                this.logger.LogError(failure, $"Failed to download builds");
-            });
-
-        await this.PopulateBuilds();
-        this.ButtonsEnabled = true;
-        this.ShowLoading = false;
+        await Task.Factory.StartNew(async () =>
+        {
+            var result = await this.graphClient.DownloadBuilds();
+            result.DoAny(
+                onFailure: (failure) =>
+                {
+                    this.logger.LogError(failure, $"Failed to download builds");
+                });
+            await this.PopulateBuilds();
+        }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap();
+        await this.Dispatcher.InvokeAsync(() =>
+        {
+            this.ButtonsEnabled = true;
+            this.ShowLoading = false;
+        }, System.Windows.Threading.DispatcherPriority.Background, CancellationToken.None);
     }
 
     private async void UploadAllButton_Clicked(object sender, EventArgs e)
     {
         this.ButtonsEnabled = false;
         this.ShowLoading = true;
-        var result = await this.graphClient.UploadBuilds().ConfigureAwait(true);
-        result.DoAny(
-            onFailure: (failure) =>
-            {
-                this.logger.LogError(failure, $"Failed to upload builds");
-            });
-
-        await this.PopulateBuilds();
-        this.ButtonsEnabled = true;
-        this.ShowLoading = false;
+        await Task.Factory.StartNew(async () =>
+        {
+            var result = await this.graphClient.UploadBuilds();
+            result.DoAny(
+                onFailure: (failure) =>
+                {
+                    this.logger.LogError(failure, $"Failed to upload builds");
+                });
+            await this.PopulateBuilds();
+        }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap();
+        await this.Dispatcher.InvokeAsync(() =>
+        {
+            this.ButtonsEnabled = true;
+            this.ShowLoading = false;
+        }, System.Windows.Threading.DispatcherPriority.Background, CancellationToken.None);
     }
 
     private async void LogOutButton_Clicked(object sender, EventArgs e)
@@ -202,7 +238,10 @@ public partial class BuildsSynchronizationView : UserControl
             {
                 this.logger.LogError(failure, "Failed to log out");
             });
-        this.ButtonsEnabled = true;
-        this.ShowLoading = false;
+        await this.Dispatcher.InvokeAsync(() =>
+        {
+            this.ButtonsEnabled = true;
+            this.ShowLoading = false;
+        }, System.Windows.Threading.DispatcherPriority.Background, CancellationToken.None);
     }
 }

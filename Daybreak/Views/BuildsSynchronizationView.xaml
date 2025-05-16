@@ -119,17 +119,31 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
                             <Rectangle Fill="{StaticResource MahApps.Brushes.Accent}"
+                                       Grid.RowSpan="2"
                                        Opacity="0.2"
-                                       Visibility="{Binding Changed, Converter={StaticResource BooleanToVisibilityConverter}}"></Rectangle>
+                                       VerticalAlignment="Stretch"
+                                       HorizontalAlignment="Stretch"
+                                       Visibility="{Binding Changed, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            <Rectangle Fill="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                       Height="1"
+                                       Grid.Row="1"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Bottom" />
                             <TextBlock FontSize="14"
-                                   Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                                   Text="{Binding Name}"
-                                   HorizontalAlignment="Left"></TextBlock>
+                                       Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                       Text="{Binding Name}"
+                                       Grid.Row="0"
+                                       HorizontalAlignment="Left" />
                             <TextBlock FontSize="14"
-                                   Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                                   Text="{Binding TemplateCode}"
-                                   HorizontalAlignment="Right"></TextBlock>
+                                       Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                       Text="{Binding TemplateCode}"
+                                       Grid.Row="1"
+                                       HorizontalAlignment="Left" />
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
@@ -171,17 +185,31 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
                             <Rectangle Fill="{StaticResource MahApps.Brushes.SystemControlErrorTextForeground}"
                                        Visibility="{Binding Changed, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                       Opacity="0.2"></Rectangle>
+                                       Grid.RowSpan="2"
+                                       VerticalAlignment="Stretch"
+                                       HorizontalAlignment="Stretch"
+                                       Opacity="0.2" />
+                            <Rectangle Fill="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                       Height="1"
+                                       Grid.Row="1"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Bottom" />
                             <TextBlock FontSize="14"
-                                   Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                                   Text="{Binding TemplateCode}"
-                                   HorizontalAlignment="Left"></TextBlock>
+                                       Grid.Row="0"
+                                       Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                       Text="{Binding Name}"
+                                       HorizontalAlignment="Left" />
                             <TextBlock FontSize="14"
-                                   Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                                   Text="{Binding Name}"
-                                   HorizontalAlignment="Right"></TextBlock>
+                                       Grid.Row="1"
+                                       Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                       Text="{Binding TemplateCode}"
+                                       HorizontalAlignment="Left" />
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
