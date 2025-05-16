@@ -30,6 +30,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.github\CODEOWNERS = .github\CODEOWNERS
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Daybreak.7ZipExtractor", "Daybreak.7ZipExtractor\Daybreak.7ZipExtractor.csproj", "{CA60F9AC-A496-4DB6-970E-ECE73B051C05}"
