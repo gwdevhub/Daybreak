@@ -147,8 +147,21 @@ public partial class BuildTemplate : UserControl
 
     private async void LoadSkills()
     {
-        var filteredSkills = await this.FilterSkills(this.SkillSearchText).ToListAsync().ConfigureAwait(true);
-        this.PrepareSkillListCache(filteredSkills);
+        var searchTerm = this.SkillSearchText;
+        var buildEntry = this.BuildEntry;
+        if (buildEntry is null)
+        {
+            return;
+        }
+
+        await Task.Factory.StartNew(() =>
+        {
+            var filteredSkills = this.FilterSkills(searchTerm, buildEntry).ToList();
+            this.Dispatcher.InvokeAsync(() =>
+            {
+                this.PrepareSkillListCache(filteredSkills);
+            }, System.Windows.Threading.DispatcherPriority.Background, CancellationToken.None);
+        }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current);
     }
 
     private void BrowseToInfo(string infoName)
@@ -215,7 +228,7 @@ public partial class BuildTemplate : UserControl
         }
     }
 
-    private async IAsyncEnumerable<Skill> FilterSkills(string searchTerm)
+    private IEnumerable<Skill> FilterSkills(string searchTerm, SingleBuildEntry buildEntry)
     {
         // Replace symbols to ease search
         searchTerm = searchTerm?.Replace("\"", "").Replace("!", "")!;
@@ -227,9 +240,14 @@ public partial class BuildTemplate : UserControl
                 continue;
             }
 
-            if (skill.Profession != this.BuildEntry!.Primary &&
-                skill.Profession != this.BuildEntry!.Secondary &&
+            if (skill.Profession != buildEntry.Primary &&
+                skill.Profession != buildEntry.Secondary &&
                 skill.Profession != Profession.None)
+            {
+                continue;
+            }
+
+            if (skill.Name?.Contains("(PvP)") is true)
             {
                 continue;
             }
@@ -240,8 +258,7 @@ public partial class BuildTemplate : UserControl
                 continue;
             }
 
-            var matchesName = await Task.Run(() => StringUtils.MatchesSearchString(skill.Name!.Replace("\"", "").Replace("!", ""), searchTerm!));
-            if (matchesName)
+            if (StringUtils.MatchesSearchString(skill.Name!.Replace("\"", "").Replace("!", ""), searchTerm!))
             {
                 yield return skill;
                 continue;
