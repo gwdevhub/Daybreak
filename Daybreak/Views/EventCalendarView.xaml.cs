@@ -70,6 +70,8 @@ public partial class EventCalendarView : UserControl
             ev.Active = activeEvents.Contains(ev.SeasonalEvent!);
             ev.Upcoming = ev.SeasonalEvent == upcomingEvent;
         }
+
+        this.EventsListView.ScrollIntoView(this.UpcomingEvent);
     }
 
     private void NavigateToEvent(Event e)
