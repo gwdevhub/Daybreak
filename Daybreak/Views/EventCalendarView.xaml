@@ -26,7 +26,8 @@
             <RowDefinition Height="0.5*" MaxHeight="300"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <ListView ItemsSource="{Binding ElementName=_this, Path=Events, Mode=OneWay}"
+        <ListView x:Name="EventsListView"
+                  ItemsSource="{Binding ElementName=_this, Path=Events, Mode=OneWay}"
                   SelectedItem="{Binding ElementName=_this, Path=SelectedListEvent, Mode=TwoWay}"
                   Background="Transparent"
                   ScrollViewer.CanContentScroll="False"
