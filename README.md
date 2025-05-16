@@ -5,15 +5,14 @@
 Custom launcher for Guildwars.
 Requires webview2 runtime https://go.microsoft.com/fwlink/p/?LinkId=2124703.
 
-# Build requirements:
-- .Net 8 SDK
-- WPF
-- Winforms
-- MSVC (C++ Visual Studio packages)
-- Cmake
-
 # Download:
 - Go to [Releases](https://github.com/AlexMacocian/Daybreak/releases/latest)
 - Download daybreakv[VERSION].zip, where [VERSION] is the version of the release
 
+# Features
 Please check the [wiki](https://github.com/AlexMacocian/Daybreak/wiki) for project description and features
+
+# Build requirements:
+- .Net 9 SDK
+- WPF
+- Winforms
