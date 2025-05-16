@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Data;
+using System.Diagnostics;
 using System.Extensions;
 using System.IO;
 using System.IO.Compression;
@@ -33,7 +34,6 @@ using System.Windows.Extensions.Services;
 namespace Daybreak.Services.ReShade;
 internal sealed class ReShadeService : IReShadeService, IApplicationLifetimeService
 {
-    private const string DesiredVersion = "4.9.1";
     private const string PackagesIniUrl = "https://raw.githubusercontent.com/crosire/reshade-shaders/list/EffectPackages.ini";
     private const string ReShadeHomepageUrl = "https://reshade.me";
     private const string ReShadeSubPath = "ReShade";
@@ -105,21 +105,21 @@ internal sealed class ReShadeService : IReShadeService, IApplicationLifetimeServ
         this.logger = logger.ThrowIfNull();
     }
 
-    public async void OnStartup()
+    public void OnStartup()
     {
-        while (true)
+        Task.Factory.StartNew(async () =>
         {
             try
             {
                 await this.CheckUpdates();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.logger.LogError(e, "Encountered exception while checking for updates");
             }
 
             await Task.Delay(TimeSpan.FromMinutes(60));
-        }
+        }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current);
     }
 
     public void OnClosing()
@@ -227,12 +227,15 @@ internal sealed class ReShadeService : IReShadeService, IApplicationLifetimeServ
     public async Task<bool> SetupReShade(ReShadeInstallationStatus reShadeInstallationStatus, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.SetupReShade), string.Empty);
-        scopedLogger.LogInformation("Retrieving ReShade homepage");
+        scopedLogger.LogInformation("Retrieving ReShade latest version");
+
         reShadeInstallationStatus.CurrentStep = ReShadeInstallationStatus.RetrievingLatestVersionUrl;
-        var downloadUrl = $"{ReShadeHomepageUrl}/downloads/ReShade_Setup_4.9.1.exe";
-        if (downloadUrl?.IsNullOrWhiteSpace() is not false)
+        var downloadUrl = await this.GetLatestDownloadUrl(cancellationToken);
+
+        if (downloadUrl is null)
         {
-            scopedLogger.LogError("Unable to retrieve latest download url");
+            reShadeInstallationStatus.CurrentStep = ReShadeInstallationStatus.FailedDownload;
+            scopedLogger.LogError("Unable to retrieve latest version url");
             return false;
         }
 
@@ -254,9 +257,6 @@ internal sealed class ReShadeService : IReShadeService, IApplicationLifetimeServ
         }
 
         var versionString = downloadUrl.Replace(ReShadeHomepageUrl + "/downloads/ReShade_Setup_", "").Replace(".exe", "");
-        this.liveUpdateableOptions.Value.InstalledVersion = versionString;
-        this.liveUpdateableOptions.UpdateOption();
-
         File.Delete(destinationPath);
         reShadeInstallationStatus.CurrentStep = ReShadeInstallationStatus.Finished;
         return true;
@@ -648,35 +648,34 @@ internal sealed class ReShadeService : IReShadeService, IApplicationLifetimeServ
             return;
         }
 
-        if (!Shared.Models.Versioning.Version.TryParse(this.liveUpdateableOptions.Value.InstalledVersion, out var installedVersion))
+        if (File.Exists(ReShadeDllPath) &&
+            Shared.Models.Versioning.Version.TryParse(FileVersionInfo.GetVersionInfo(ReShadeDllPath).ProductVersion, out var currentVersion) &&
+            currentVersion.CompareTo(version) >= 0)
         {
-            scopedLogger.LogError("Unable to parse installed version");
+            scopedLogger.LogInformation("No update available. Current version is up to date");
             return;
         }
 
-        if (!Shared.Models.Versioning.Version.TryParse(DesiredVersion, out var desiredVersion))
+        scopedLogger.LogInformation($"Found an update for ReShade. Latest version: {version}");
+        var notificationToken = this.notificationService.NotifyInformation(
+                "Updating ReShade",
+                $"Updating ReShade to version {version}");
+
+        if (await this.SetupReShade(new ReShadeInstallationStatus(), CancellationToken.None))
         {
-            scopedLogger.LogError("Unable to parse desired version");
+            notificationToken.Cancel();
+            scopedLogger.LogInformation($"ReShade updated to version {version}");
+            this.notificationService.NotifyInformation(
+                "ReShade updated",
+                $"ReShade has been updated to version {version}");
             return;
         }
 
-        if (installedVersion.CompareTo(desiredVersion) != 0)
-        {
-            scopedLogger.LogInformation($"Current ReShade version does not match desired version {desiredVersion}. Fetching desired version");
-            if (await this.SetupReShade(new ReShadeInstallationStatus(), CancellationToken.None) is not true)
-            {
-                scopedLogger.LogError("Failed to update ReShade");
-            }
-        }
-
-        //if (version.CompareTo(installedVersion) > 0)
-        //{
-        //    scopedLogger.LogInformation($"Found an update for ReShade. Current version: {installedVersion}. Latest version: {version}");
-        //    if (await this.SetupReShade(new ReShadeInstallationStatus(), CancellationToken.None) is not true)
-        //    {
-        //        scopedLogger.LogError("Failed to update ReShade");
-        //    }
-        //}
+        notificationToken.Cancel();
+        scopedLogger.LogError("Failed to update ReShade");
+        this.notificationService.NotifyInformation(
+                "Failed to update ReShade",
+                $"Could not update ReShade to version {version}. Check logs for details");
     }
 
     /// <summary>
