@@ -1,12 +1,11 @@
 ﻿using Daybreak.Shared.Models.Progress;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Windows.Extensions.Services;
 using Version = Daybreak.Shared.Models.Versioning.Version;
 
 namespace Daybreak.Shared.Services.Updater;
 
-public interface IApplicationUpdater : IApplicationLifetimeService
+public interface IApplicationUpdater
 {
     Version CurrentVersion { get; }
     void FinalizeUpdate();

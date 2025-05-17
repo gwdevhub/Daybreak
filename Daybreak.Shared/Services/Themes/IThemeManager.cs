@@ -1,9 +1,9 @@
-﻿using ControlzEx.Theming;
-using System.Windows.Media;
+﻿using System.Windows.Media;
 
 namespace Daybreak.Shared.Services.Themes;
 public interface IThemeManager
 {
-    Theme GetCurrentTheme();
+    // Hacky way to pass the theme without having to take a dependency on the theme manager
+    object? GetCurrentTheme();
     Color GetForegroundColor();
 }
