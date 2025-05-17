@@ -10,9 +10,10 @@ using System.Core.Extensions;
 using System.Extensions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.GuildWars;
-internal sealed class GuildWarsVersionChecker : IGuildWarsVersionChecker
+internal sealed class GuildWarsVersionChecker : IGuildWarsVersionChecker, IApplicationLifetimeService
 {
     public string Name => "GuildWars Version Checker";
     public bool IsEnabled { get; set; } = true;

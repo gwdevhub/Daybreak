@@ -1,6 +1,6 @@
 ﻿using Daybreak.Shared.Models.Guildwars;
 using System.ComponentModel;
-using System.Windows.Extensions;
+using System.Extensions;
 
 namespace Daybreak.Models;
 public partial class EventViewModel : INotifyPropertyChanged

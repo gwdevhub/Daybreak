@@ -25,12 +25,13 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Extensions.Services;
 using UpdateStatus = Daybreak.Shared.Models.Progress.UpdateStatus;
 using Version = Daybreak.Shared.Models.Versioning.Version;
 
 namespace Daybreak.Services.Updater;
 
-internal sealed class ApplicationUpdater : IApplicationUpdater
+internal sealed class ApplicationUpdater : IApplicationUpdater, IApplicationLifetimeService
 {
     private const string UpdatePkgSubPath = "update.pkg";
     private const string TempInstallerFileNameSubPath = "Daybreak.Installer.Temp.exe";

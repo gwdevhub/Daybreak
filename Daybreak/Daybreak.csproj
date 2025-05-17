@@ -53,6 +53,30 @@
 	
   <ItemGroup>
     <PackageReference Include="Reloaded.Assembler" Version="1.0.16" />
+    <PackageReference Include="WpfExtended" Version="0.7.9" />
+    <PackageReference Include="WpfExtended.SourceGeneration" Version="0.3.0" />
+    <PackageReference Include="WpfScreenHelper" Version="2.1.1" />
+    <PackageReference Include="WriteableBitmapEx" Version="1.6.8" />
+    <PackageReference Include="Squealify" Version="0.8.2.2" />
+    <PackageReference Include="System.Formats.Asn1" Version="9.0.5" />
+    <PackageReference Include="System.IO.Compression" Version="4.3.0" />
+    <PackageReference Include="System.Linq.Async" Version="6.0.1" />
+    <PackageReference Include="PeNet" Version="5.1.0" />
+    <PackageReference Include="Plumsy" Version="1.1.0" />
+    <PackageReference Include="securifybv.ShellLink" Version="0.1.0" />
+    <PackageReference Include="AvalonEdit" Version="6.3.1.120" />
+    <PackageReference Include="DiffPlex" Version="1.7.2" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.12.1" />
+    <PackageReference Include="ini-parser-netstandard" Version="2.5.3" />
+    <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.0-rc2" />
+    <PackageReference Include="MahApps.Metro" Version="2.4.10" />
+    <PackageReference Include="Microsoft.CorrelationVector" Version="1.0.42" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.5" />
+    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="9.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.5" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
+    <PackageReference Include="NAudio" Version="2.2.1" />
   </ItemGroup>
 	
   <ItemGroup>
