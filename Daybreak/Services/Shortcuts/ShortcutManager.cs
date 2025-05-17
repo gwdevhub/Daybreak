@@ -6,11 +6,12 @@ using System.Configuration;
 using System.Diagnostics;
 using System.Extensions;
 using System.IO;
+using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.Shortcuts;
 
 //TODO: Fix dependency on IConfigurationManager
-internal sealed class ShortcutManager : IShortcutManager
+internal sealed class ShortcutManager : IShortcutManager, IApplicationLifetimeService
 {
     private const string ShortcutName = "Daybreak.lnk";
 

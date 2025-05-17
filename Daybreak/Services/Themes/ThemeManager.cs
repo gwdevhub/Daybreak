@@ -44,7 +44,7 @@ internal sealed class ThemeManager : IThemeManager, IApplicationLifetimeService
         return (Color)mahAppsResources!["MahApps.Colors.ThemeForeground"];
     }
 
-    public Theme GetCurrentTheme()
+    public object? GetCurrentTheme()
     {
         return ControlzEx.Theming.ThemeManager.Current.DetectTheme(Launcher.Instance) ?? throw new InvalidOperationException("Unable to retrieve theme");
     }

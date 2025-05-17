@@ -1,7 +1,5 @@
-﻿using Daybreak.Shared;
-using Daybreak.Shared.Models.Guildwars;
+﻿using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.Events;
-using ExCSS;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Globalization;

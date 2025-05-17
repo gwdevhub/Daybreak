@@ -1,4 +1,5 @@
-﻿using Daybreak.Configuration.Options;
+﻿using ControlzEx.Theming;
+using Daybreak.Configuration.Options;
 using Daybreak.Launch;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Screens;
@@ -6,6 +7,7 @@ using Daybreak.Shared.Services.Themes;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Core.Extensions;
+using System.Extensions;
 using System.Linq;
 using System.Windows;
 
@@ -51,7 +53,12 @@ internal sealed class SplashScreenService : ISplashScreenService
 
     private void SetupThemeResources()
     {
-        var theme = this.themeManager.GetCurrentTheme();
+        var theme = this.themeManager.GetCurrentTheme()?.As<Theme>();
+        if (theme is null)
+        {
+            return;
+        }
+
         foreach(var key in theme.Resources.Keys)
         {
             this.splashWindow.Resources.Add(key, theme.Resources[key]);
