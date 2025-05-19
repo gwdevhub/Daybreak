@@ -25,21 +25,21 @@ public sealed class DaybreakApiService(
     private readonly ILogger<DaybreakApiService> logger = logger.ThrowIfNull();
 
     public string Name { get; } = "Daybreak API";
-    public bool IsEnabled { get; set; } = false;
+    public bool IsEnabled { get; set; } = true;
     public bool IsInstalled { get; } = true;
 
     public IEnumerable<string> GetCustomArguments() => [];
 
-    public Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken) =>
+        Task.Factory.StartNew(() => this.InjectWithStub(guildWarsCreatedContext), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
-    public Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken) =>
-        Task.Factory.StartNew(() => this.InjectWithStub(guildWarsStartedContext), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+    public Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public Task OnGuildWarsStarting(GuildWarsStartingContext guildWarsStartingContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public Task OnGuildWarsStartingDisabled(GuildWarsStartingDisabledContext guildWarsStartingDisabledContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    private void InjectWithStub(GuildWarsStartedContext context)
+    private void InjectWithStub(GuildWarsCreatedContext context)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         var dllName = 

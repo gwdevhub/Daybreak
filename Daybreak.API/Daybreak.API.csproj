@@ -12,8 +12,7 @@
     
     <PublishAot>true</PublishAot>
     <SelfContained>true</SelfContained>
-  
-    
+
     <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
     <UseAppHost>false</UseAppHost>
     <EnableIISSupport>false</EnableIISSupport>
@@ -21,7 +20,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Configuration\appsettings.Debug.json" />
+    <EmbeddedResource Include="Configuration\appsettings.json" />
+    <EmbeddedResource Include="Configuration\appsettings.Release.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MinHook.NET" Version="1.1.1" />
+    <PackageReference Include="Net.Sdk.Web.Extensions" Version="0.8.4" />
     <PackageReference Include="Net.Sdk.Web.Extensions.SourceGenerators" Version="0.9.0" />
+    <PackageReference Include="PeNet" Version="5.1.0" />
+    <PackageReference Include="Serilog" Version="4.2.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.1" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="System.Private.Uri" Version="4.3.2" />
+    <PackageReference Include="SystemExtensions.NetStandard.Generators" Version="0.1.3" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,13 +44,13 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <DaybreakHostOutputDir>$(MSBuildProjectDirectory)\..\Daybreak\bin\x86\$(Configuration)\$(TargetFramework)\</DaybreakHostOutputDir>
+    <DaybreakHostOutputDir>$(MSBuildProjectDirectory)\..\Daybreak\bin\x86\$(Configuration)\$(TargetFramework)\$(RuntimeIdentifier)\</DaybreakHostOutputDir>
     <ShouldPublishAot>true</ShouldPublishAot>
   </PropertyGroup>
 
-  <Target Name="PublishIntoDaybreak" AfterTargets="PostBuild" Condition="'$(ShouldPublishAot)'=='true'">
-    <Message Text="📦 dotnet-publish Daybreak.API → $(DaybreakHostOutputDir)" Importance="High" />
+  <Target Name="PublishIntoDaybreak" AfterTargets="Build">
+    <Message Text="📦 $(MSBuildProjectDirectory)\$(OutputPath)Daybreak.API.dll → $(DaybreakHostOutputDir)" Importance="High" />
 
-    <Exec Command="dotnet publish &quot;$(MSBuildProjectFullPath)&quot; -c $(Configuration) -r win-x86 --self-contained true -o &quot;$(DaybreakHostOutputDir)&quot;" WorkingDirectory="$(ProjectDir)" />
+    <Copy SourceFiles="$(OutputPath)Daybreak.API.dll" DestinationFiles="$(DaybreakHostOutputDir)Daybreak.API.dll"></Copy>
   </Target>
 </Project>

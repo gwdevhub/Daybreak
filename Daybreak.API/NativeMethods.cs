@@ -2,7 +2,7 @@
 
 namespace Daybreak.API;
 
-internal static partial class NativeMethods
+internal unsafe static partial class NativeMethods
 {
     public const int STD_OUTPUT_HANDLE = -11;
     public const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004;

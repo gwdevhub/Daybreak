@@ -220,7 +220,7 @@ public sealed class GuildwarsMemoryReader(
         }
 
         var globalContext = maybeGlobalContext.Value;
-        var gameContext = this.memoryScanner.Read(globalContext.GameContext, GameContext.BaseOffset);
+        var gameContext = this.memoryScanner.Read(globalContext.GameContext);
         var userContext = this.memoryScanner.Read(globalContext.UserContext, UserContext.BaseOffset);
         return new UserData
         {
@@ -305,7 +305,7 @@ public sealed class GuildwarsMemoryReader(
 
         var globalContext = maybeGlobalContext.Value;
         var instanceInfoContext = maybeInstanceInfoContext.Value;
-        var gameContext = this.memoryScanner.Read(globalContext.GameContext, GameContext.BaseOffset);
+        var gameContext = this.memoryScanner.Read(globalContext.GameContext);
         var userContext = this.memoryScanner.Read(globalContext.UserContext, UserContext.BaseOffset);
         var instanceContext = this.memoryScanner.Read(globalContext.InstanceContext, InstanceContext.BaseOffset);
         _ = Map.TryParse((int)userContext.MapId, out var currentMap);
@@ -344,7 +344,7 @@ public sealed class GuildwarsMemoryReader(
 
         var globalContext = maybeGlobalContext.Value;
         var entityArray = maybeEntityArray.Value;
-        var gameContext = this.memoryScanner.Read(globalContext.GameContext, GameContext.BaseOffset);
+        var gameContext = this.memoryScanner.Read(globalContext.GameContext);
         var instanceContext = this.memoryScanner.Read(globalContext.InstanceContext, InstanceContext.BaseOffset);
         var userContext = this.memoryScanner.Read(globalContext.UserContext, UserContext.BaseOffset);
         var playerControlledCharContext = this.memoryScanner.Read(gameContext.PlayerControlledChar, PlayerControlledCharContext.BaseOffset);
@@ -400,7 +400,7 @@ public sealed class GuildwarsMemoryReader(
 
         var globalContext = maybeGlobalContext.Value;
         var entityArray = maybeEntityArray.Value;
-        var gameContext = this.memoryScanner.Read(globalContext.GameContext, GameContext.BaseOffset);
+        var gameContext = this.memoryScanner.Read(globalContext.GameContext);
         var instanceContext = this.memoryScanner.Read(globalContext.InstanceContext, InstanceContext.BaseOffset);
         var userContext = this.memoryScanner.Read(globalContext.UserContext, UserContext.BaseOffset);
         var playerControlledCharContext = this.memoryScanner.Read(gameContext.PlayerControlledChar, PlayerControlledCharContext.BaseOffset);

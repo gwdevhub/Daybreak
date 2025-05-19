@@ -13,7 +13,7 @@ using System.Threading;
 
 namespace Daybreak.Services.Scanner;
 
-internal sealed class MemoryScanner(
+public sealed class MemoryScanner(
     ILogger<MemoryScanner> logger) : IMemoryScanner
 {
     private const int LockTimeout = 1000;
@@ -107,7 +107,7 @@ internal sealed class MemoryScanner(
     public T Read<T>(uint address)
     {
         this.ValidateReadScanner();
-        var size = Marshal.SizeOf(typeof(T));
+        var size = Marshal.SizeOf<T>();
         var buffer = Marshal.AllocHGlobal(size);
 
         NativeMethods.ReadProcessMemory(this.Process!.Handle,
@@ -117,7 +117,7 @@ internal sealed class MemoryScanner(
             out _
         );
 
-        var ret = (T)Marshal.PtrToStructure(buffer, typeof(T))!;
+        var ret = Marshal.PtrToStructure<T>(buffer)!;
         Marshal.FreeHGlobal(buffer);
 
         return ret;
@@ -131,14 +131,14 @@ internal sealed class MemoryScanner(
             throw new InvalidOperationException($"Expected size to read is too large. Array size {size}");
         }
 
-        var itemSize = Marshal.SizeOf(typeof(T));
+        var itemSize = Marshal.SizeOf<T>();
         var readSize = (int)size * itemSize;
         if (readSize > MaximumReadSize)
         {
             throw new InvalidOperationException($"Expected size to read is too large. Size {readSize}");
         }
 
-        var buffer = Marshal.AllocHGlobal((int)readSize);
+        var buffer = Marshal.AllocHGlobal(readSize);
 
         NativeMethods.ReadProcessMemory(this.Process!.Handle,
             address,
@@ -151,7 +151,7 @@ internal sealed class MemoryScanner(
         var arrayPointer = buffer;
         for (var i = 0; i < size; i++)
         {
-            retArray[i] = (T)Marshal.PtrToStructure(arrayPointer, typeof(T))!;
+            retArray[i] = Marshal.PtrToStructure<T>(arrayPointer)!;
             arrayPointer += itemSize;
         }
 

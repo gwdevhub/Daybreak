@@ -1,14 +1,24 @@
-﻿using System.Net.NetworkInformation;
+﻿using System.Extensions.Core;
+using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
+using Daybreak.API.Configuration;
+using Daybreak.API.Controllers;
 using Daybreak.API.Extensions;
+using Daybreak.API.Health;
+using Daybreak.API.Hosting;
+using Daybreak.API.Logging;
 using Daybreak.API.Serialization;
+using Daybreak.API.Services;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Net.Sdk.Web;
+using Net.Sdk.Web.Websockets.Extensions;
 
 namespace Daybreak.API;
 
 public static class EntryPoint
 {
     private const int StartPort = 5080;
+    private const int InitializationAttempts = 10;
 
     [UnmanagedCallersOnly(EntryPoint = "ThreadInit"), STAThread]
     public static int ThreadInit(IntPtr _, int __)
@@ -22,26 +32,52 @@ public static class EntryPoint
         }
 
         Console.WriteLine($"Starting Daybreak API on port {port}");
-        Task.Run(() => StartServer(port));
+        var app = CreateApplication(port);
+        var runTask = Task.Run(() => StartServer(app));
+        var healthCheck = app.Services.GetRequiredService<HealthCheckService>();
+        for(var i = 0; i < InitializationAttempts; i++)
+        {
+            var status = Task.Run(() => healthCheck.CheckHealthAsync()).Result;
+            Console.WriteLine($"Health check status: {status.Status} in {status.TotalDuration.TotalMilliseconds}ms. Report:\n{string.Join("\n", status.Entries.Select(e => $"{e.Key}: {e.Value.Status}"))}");
+            if (status.Status is not HealthStatus.Healthy)
+            {
+                Thread.Sleep(100);
+            }
+            else
+            {
+                Console.WriteLine("Daybreak API is healthy. Initialization succeeded");
+                break;
+            }
+        }
+
         return port;
     }
 
-    private static async Task StartServer(int port)
+    private static WebApplication CreateApplication(int port)
+    {
+        var app = WebApplication.CreateBuilder()
+                .WithConfiguration()
+                .WithHosting(port)
+                .WithSerializationContext()
+                .WithLogging()
+                .WithDaybreakServices()
+                .WithRoutes()
+                .WithHealthChecks()
+                .Build();
+
+        app.UseWebSockets(new WebSocketOptions { KeepAliveInterval = TimeSpan.FromSeconds(30) });
+
+        return app
+            .UseHealthChecks()
+            .UseLogging()
+            .UseRoutes()
+            .MapWebSocket<GameContextRoute>("game-context");
+    }
+
+    private static async Task StartServer(WebApplication app)
     {
         try
         {
-            var builder = WebApplication.CreateBuilder();
-            builder.WebHost.UseUrls($"http://127.0.0.1:{port}");
-            builder.Services.ConfigureHttpJsonOptions(options =>
-            {
-                options.SerializerOptions.TypeInfoResolverChain.Insert(0, new ApiJsonSerializerContext());
-            });
-            builder.Logging.AddConsole();
-            builder.WithRoutes();
-
-            var app = builder.Build();
-            app.UseRoutes();
-
             await app.RunAsync();
         }
         catch (Exception ex)
