@@ -1,12 +1,73 @@
-﻿namespace Daybreak.API.Services;
+﻿using Daybreak.API.Services.Interop;
+using System.Diagnostics.CodeAnalysis;
+
+namespace Daybreak.API.Services;
 
 public static class WebApplicationBuilderExtensions
 {
     public static WebApplicationBuilder WithDaybreakServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddSingleton<MemoryScanningService>();
-        builder.Services.AddSingleton<GameThreadService>();
-        builder.Services.AddHostedService(sp => sp.GetRequiredService<GameThreadService>());
+        builder.Services.AddSingleton<ChatService>();
+        builder.Services.AddSingleton<GameStateService>();
+        builder.WithHookHostedService<GameThreadService>();
+        builder.WithHookHostedService<UIHandlingService>();
+        builder.WithHookHostedService<ChatHandlingService>();
+        builder.WithAddressService<GameContextService>();
+        builder.WithAddressService<InstanceContextService>();
+        return builder;
+    }
+
+    private static WebApplicationBuilder WithHookService<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this WebApplicationBuilder builder)
+        where T : class, IHookHealthService
+    {
+        builder.Services.AddSingleton<T>();
+        builder.Services.AddSingleton<IHookHealthService>(sp => sp.GetRequiredService<T>());
+        return builder;
+    }
+
+    private static WebApplicationBuilder WithAddressService<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this WebApplicationBuilder builder)
+        where T : class, IAddressHealthService
+    {
+        builder.Services.AddSingleton<T>();
+        builder.Services.AddSingleton<IAddressHealthService>(sp => sp.GetRequiredService<T>());
+        return builder;
+    }
+
+    private static WebApplicationBuilder WithHookHostedService<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this WebApplicationBuilder builder)
+        where T : class, IHookHealthService, IHostedService
+    {
+        builder.Services.AddSingleton<T>();
+        builder.Services.AddSingleton<IHostedService>(sp => sp.GetRequiredService<T>());
+        builder.Services.AddSingleton<IHookHealthService>(sp => sp.GetRequiredService<T>());
+        return builder;
+    }
+
+    private static WebApplicationBuilder WithAddressHostedService<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this WebApplicationBuilder builder)
+        where T : class, IAddressHealthService, IHostedService
+    {
+        builder.Services.AddSingleton<T>();
+        builder.Services.AddSingleton<IHostedService>(sp => sp.GetRequiredService<T>());
+        builder.Services.AddSingleton<IAddressHealthService>(sp => sp.GetRequiredService<T>());
+        return builder;
+    }
+
+    private static WebApplicationBuilder WithHookAddressService<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this WebApplicationBuilder builder)
+        where T : class, IHookHealthService, IAddressHealthService
+    {
+        builder.Services.AddSingleton<T>();
+        builder.Services.AddSingleton<IAddressHealthService>(sp => sp.GetRequiredService<T>());
+        builder.Services.AddSingleton<IHookHealthService>(sp => sp.GetRequiredService<T>());
+        return builder;
+    }
+
+    private static WebApplicationBuilder WithHookAddressHostedService<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this WebApplicationBuilder builder)
+        where T : class, IHookHealthService, IAddressHealthService, IHostedService
+    {
+        builder.Services.AddSingleton<T>();
+        builder.Services.AddSingleton<IAddressHealthService>(sp => sp.GetRequiredService<T>());
+        builder.Services.AddSingleton<IHookHealthService>(sp => sp.GetRequiredService<T>());
+        builder.Services.AddSingleton<IHostedService>(sp => sp.GetRequiredService<T>());
         return builder;
     }
 }

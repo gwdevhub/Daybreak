@@ -10,65 +10,18 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Daybreak.API.Services;
+namespace Daybreak.API.Services.Interop;
 
 public sealed unsafe class MemoryScanningService
 {
-    private const string BaseAddressMask = "xxxxxxx";
-    private const int BaseAddressOffset = +7;
-    private static readonly byte[] BaseAddressPattern = [0x50, 0x6A, 0x0F, 0x6A, 0x00, 0xFF, 0x35];
-
     private readonly ILogger<MemoryScanningService> logger;
     private readonly (nuint BaseAddress, ImageSectionHeader Section) textSection = GetSectionHeader(".text");
     private readonly (nuint BaseAddress, ImageSectionHeader Section) dataSection = GetSectionHeader(".rdata");
-
-    private readonly GWAddressCache baseAddress;
 
     public MemoryScanningService(
         ILogger<MemoryScanningService> logger)
     {
         this.logger = logger.ThrowIfNull();
-        this.baseAddress = new GWAddressCache(() => this.FindAndResolveAddress(BaseAddressPattern, BaseAddressMask, BaseAddressOffset));
-    }
-
-    public nuint GetBaseAddress()
-    {
-        var scopedLogger = this.logger.CreateScopedLogger();
-        if (this.baseAddress.GetAddress() is not nuint address)
-        {
-            scopedLogger.LogError("Failed to find base address");
-            return 0U;
-        }
-
-        scopedLogger.LogInformation("Base address: 0x{address:X8}", address);
-        return address;
-    }
-
-    public unsafe GlobalContext? GetGlobalContext()
-    {
-        var scopedLogger = this.logger.CreateScopedLogger();
-        var basePtr = this.GetBaseAddress();
-        if (basePtr is 0x0)
-        {
-            scopedLogger.LogError("Failed to get base address");
-            return default;
-        }
-
-        nuint** baseContext = *(nuint***)basePtr;
-        if (baseContext is null)
-        {
-            scopedLogger.LogError("Failed to get base context address");
-            return default;
-        }
-
-        var globalContextPtr = baseContext[0x6];
-        if (globalContextPtr is null)
-        {
-            scopedLogger.LogError("Failed to get global context address");
-            return default;
-        }
-
-        return Marshal.PtrToStructure<GlobalContext>((IntPtr)globalContextPtr);
     }
 
     public T? ReadPointer<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)] T>(GuildwarsPointer<T> ptr)
@@ -151,7 +104,7 @@ public sealed unsafe class MemoryScanningService
                 fileSearchPos = filePtr + 1;
 
                 // If what we found is “…/file.hpp” (no drive letter) fix it
-                if (Marshal.ReadByte((IntPtr)(filePtr + 1)) != (byte)':')
+                if (Marshal.ReadByte((nint)(filePtr + 1)) != (byte)':')
                 {
                     // look ≤128 bytes backward for ':' and back-up one char
                     nuint colon = FindInRange([(byte)':'], "x", -1, filePtr, filePtr - 128);
@@ -172,7 +125,7 @@ public sealed unsafe class MemoryScanningService
                     // PUSH imm8 variant  –  start matching at pattern[3]
                     pattern[3] = 0x6A;           // opcode
                     pattern[4] = (byte)lineNumber;
-                    hit = FindAddress(
+                    hit = FindAddressInternal(
                         this.textSection,
                         pattern[3..].ToArray(),
                         maskAll[3..],
@@ -184,7 +137,7 @@ public sealed unsafe class MemoryScanningService
                     // PUSH imm32 variant  –  whole pattern
                     pattern[0] = 0x68;
                     BitConverter.TryWriteBytes(pattern.Slice(1, 4), lineNumber);
-                    hit = FindAddress(
+                    hit = FindAddressInternal(
                         this.textSection,
                         pattern.ToArray(),
                         maskAll,
@@ -194,7 +147,7 @@ public sealed unsafe class MemoryScanningService
                 if (hit == 0 && lineNumber == 0)
                 {
                     // No line number  –  match only from MOV EDX onward
-                    hit = FindAddress(
+                    hit = FindAddressInternal(
                         this.textSection,
                         pattern[5..].ToArray(),
                         maskAll[5..],
@@ -214,15 +167,21 @@ public sealed unsafe class MemoryScanningService
     public nuint FindAndResolveAddress(byte[] pattern, string mask, uint offset = 0)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        var address = FindAddress(this.textSection, pattern, mask, offset);
+        var address = FindAddressInternal(this.textSection, pattern, mask, offset);
         if (address is 0)
         {
             scopedLogger.LogError("Failed to find address");
             return 0;
         }
 
-        var ptr = (nuint)Marshal.ReadIntPtr((IntPtr)address);
+        var ptr = (nuint)Marshal.ReadIntPtr((nint)address);
         return ptr;
+    }
+
+    public nuint FindAddress(byte[] pattern, string mask, uint offset = 0)
+    {
+        var address = FindAddressInternal(this.textSection, pattern, mask, offset);
+        return address;
     }
 
     public nuint ToFunctionStart(nuint callInstructionAddress, uint scanRange = 0x500)
@@ -260,13 +219,13 @@ public sealed unsafe class MemoryScanningService
         var cur = start;
         while (forward ? cur <= end : cur >= end)
         {
-            if (Marshal.ReadByte((IntPtr)cur) == pattern[0])
+            if (Marshal.ReadByte((nint)cur) == pattern[0])
             {
                 var matched = true;
                 for (int i = 1; i < patLength && matched; ++i)
                 {
                     if (mask[i] == 'x' &&
-                        Marshal.ReadByte((IntPtr)(cur + (uint)i)) != pattern[i])
+                        Marshal.ReadByte((nint)(cur + (uint)i)) != pattern[i])
                     {
                         matched = false;
                     }
@@ -291,14 +250,14 @@ public sealed unsafe class MemoryScanningService
     private static string ToCamelCase(string text)
         => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(text.ToLowerInvariant());
 
-    private static nuint FindAddress((nuint BaseAddress, ImageSectionHeader Section) section, byte[] pattern, string mask, uint offset = 0)
+    private static nuint FindAddressInternal((nuint BaseAddress, ImageSectionHeader Section) section, byte[] pattern, string mask, uint offset = 0)
     {
         var textStart = section.BaseAddress + section.Section.VirtualAddress;
         var textEnd = textStart + section.Section.VirtualSize - (uint)pattern.Length;
 
         for (var cur = textStart; cur <= textEnd; ++cur)
         {
-            if (Marshal.ReadByte((IntPtr)cur) != pattern[0])
+            if (Marshal.ReadByte((nint)cur) != pattern[0])
             {
                 continue;
             }
@@ -306,7 +265,7 @@ public sealed unsafe class MemoryScanningService
             var match = true;
             for (var i = 1; i < pattern.Length && match; ++i)
             {
-                if (mask[i] is 'x' && Marshal.ReadByte((IntPtr)(cur + (uint)i)) != pattern[i])
+                if (mask[i] is 'x' && Marshal.ReadByte((nint)(cur + (uint)i)) != pattern[i])
                 {
                     match = false;
                 }

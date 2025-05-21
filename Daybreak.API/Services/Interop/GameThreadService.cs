@@ -6,22 +6,22 @@ using System.Extensions.Core;
 using System.Runtime.InteropServices;
 using System.Security;
 
-namespace Daybreak.API.Services;
+namespace Daybreak.API.Services.Interop;
 
 public sealed class GameThreadService
-    : IHostedService
+    : IHostedService, IHookHealthService
 {
     private const string LeaveGameThreadFile = "FrApi.cpp";
     private const string LeaveGameThreadAssertion = "renderElapsed >= 0";
 
     [SuppressUnmanagedCodeSecurity]
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void LeaveGameThread(IntPtr ctx);
+    private delegate void LeaveGameThread(nint ctx);
 
     private readonly MemoryScanningService memoryScanningService;
     private readonly GWHook<LeaveGameThread> leaveGameThreadHook;
     private readonly ILogger<GameThreadService> logger;
-    private readonly ConcurrentQueue<(TaskCompletionSource, Action)> queuedActions = [];
+    private readonly ConcurrentQueue<(TaskCompletionSource, CancellationToken, Action)> queuedActions = [];
     private readonly ConcurrentDictionary<Guid, Action> registeredCallbacks = [];
 
     private CancellationTokenSource? cts = default;
@@ -42,7 +42,7 @@ public sealed class GameThreadService
     {
         this.cts?.Dispose();
         this.cts = new CancellationTokenSource();
-        return Task.Factory.StartNew(() => this.InitializeGameThreadHook(this.cts.Token), this.cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        return Task.Factory.StartNew(() => this.InitializeHooks(this.cts.Token), this.cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -53,10 +53,10 @@ public sealed class GameThreadService
         return Task.CompletedTask;
     }
 
-    public Task QueueActionOnGameThread(Action action)
+    public Task QueueActionOnGameThread(Action action, CancellationToken cancellationToken)
     {
         var taskCompletionSource = new TaskCompletionSource();
-        this.queuedActions.Enqueue((taskCompletionSource, action));
+        this.queuedActions.Enqueue((taskCompletionSource, cancellationToken, action));
         return taskCompletionSource.Task;
     }
 
@@ -68,38 +68,48 @@ public sealed class GameThreadService
         return registration;
     }
 
-    public HookState GetHookState()
+    public List<HookState> GetHookStates()
     {
-        return new HookState
-        {
-            Hooked = this.leaveGameThreadHook.Hooked,
-            TargetAddress = new PointerValue(this.leaveGameThreadHook.TargetAddress),
-            ContinueAddress = new PointerValue(this.leaveGameThreadHook.ContinueAddress),
-            DetourAddress = new PointerValue(this.leaveGameThreadHook.DetourAddress)
-        };
+        return
+            [
+                new HookState
+                {
+                    Hooked = this.leaveGameThreadHook.Hooked,
+                    Name = nameof(this.leaveGameThreadHook),
+                    TargetAddress = new PointerValue(this.leaveGameThreadHook.TargetAddress),
+                    ContinueAddress = new PointerValue(this.leaveGameThreadHook.ContinueAddress),
+                    DetourAddress = new PointerValue(this.leaveGameThreadHook.DetourAddress)
+                }
+            ];
     }
 
-    private async ValueTask InitializeGameThreadHook(CancellationToken cancellationToken)
+    private async ValueTask InitializeHooks(CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        scopedLogger.LogInformation("Initializing game thread hook");
+        scopedLogger.LogInformation("Initializing hooks");
         while (!this.leaveGameThreadHook.EnsureInitialized())
         {
-            scopedLogger.LogInformation("Waiting for game thread hook to be initialized");
+            scopedLogger.LogDebug("Waiting for hook to initialize: {hook}", nameof(this.leaveGameThreadHook));
             await Task.Delay(1000, cancellationToken);
         }
 
-        scopedLogger.LogInformation("Game thread hook initialized");
+        scopedLogger.LogInformation("Hooks initialized");
     }
 
-    private void OnLeaveGameThread(IntPtr ctx)
+    private void OnLeaveGameThread(nint ctx)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         while(this.queuedActions.TryDequeue(out var tuple))
         {
             try
             {
-                tuple.Item2();
+                if (tuple.Item2.IsCancellationRequested)
+                {
+                    tuple.Item1.TrySetCanceled();
+                    continue;
+                }
+
+                tuple.Item3();
                 tuple.Item1.TrySetResult();
             }
             catch(Exception ex)

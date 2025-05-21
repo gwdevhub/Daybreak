@@ -21,9 +21,9 @@ public static class WebApplicationExtensions
                     Entries = report.Entries.Select(e => (e, new HealthCheckEntryResponse
                     {
                         Status = e.Value.Status,
-                        Data = e.Value.Data.ToDictionary(kvp => kvp.Key, kvp => kvp.Value?.ToString() ?? string.Empty),
+                        Data = e.Value.Data.Where(kvp => kvp.Value is JsonElement).ToDictionary(kvp => kvp.Key, kvp => (JsonElement)kvp.Value),
                         Description = e.Value.Description ?? string.Empty,
-                        Tags = e.Value.Tags.ToList()
+                        Tags = [.. e.Value.Tags]
                     })).ToDictionary(e => e.e.Key, e => e.Item2)
                 };
 
