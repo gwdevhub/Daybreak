@@ -5,6 +5,12 @@ namespace Daybreak.API.Interop.GuildWars;
 [StructLayout(LayoutKind.Explicit, Pack = 1)]
 public readonly unsafe struct GameContext
 {
+    [FieldOffset(0x0008)]
+    public readonly AgentGameContext* AgentGameContext;
+
+    [FieldOffset(0x0014)]
+    public readonly MapContext* MapContext;
+
     [FieldOffset(0x002C)]
     public readonly WorldContext* WorldContext;
 

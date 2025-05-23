@@ -20,6 +20,7 @@ namespace Daybreak.API.Serialization;
 [JsonSerializable(typeof(List<AddressState>))]
 [JsonSerializable(typeof(GameState))]
 [JsonSerializable(typeof(JsonElement))]
+[JsonSerializable(typeof(Task<IResult>))]
 public partial class ApiJsonSerializerContext : JsonSerializerContext
 {
 }

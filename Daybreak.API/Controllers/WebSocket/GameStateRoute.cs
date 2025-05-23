@@ -1,20 +1,21 @@
 ﻿using Daybreak.API.Services;
 using Net.Sdk.Web.Websockets;
+using System.Buffers;
 using System.Core.Extensions;
 using System.Extensions.Core;
 using System.Net.WebSockets;
 
-namespace Daybreak.API.Controllers;
+namespace Daybreak.API.Controllers.WebSocket;
 
-public sealed class GameContextRoute(
+public sealed class GameStateRoute(
     ChatService chatService,
-    ILogger<GameContextRoute> logger)
+    ILogger<GameStateRoute> logger)
     : WebSocketRouteBase
 {
     private readonly ChatService chatService = chatService.ThrowIfNull();
-    private readonly ILogger<GameContextRoute> logger = logger.ThrowIfNull();
+    private readonly ILogger<GameStateRoute> logger = logger.ThrowIfNull();
 
-    public override Task ExecuteAsync(WebSocketMessageType type, byte[] data, CancellationToken cancellationToken)
+    public override Task ExecuteAsync(WebSocketMessageType type, ReadOnlySequence<byte> data, CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }

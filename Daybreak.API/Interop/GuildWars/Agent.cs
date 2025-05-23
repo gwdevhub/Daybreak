@@ -97,7 +97,7 @@ public readonly struct AgentEffects
 }
 
 [StructLayout(LayoutKind.Explicit, Pack = 1)]
-public readonly struct AgentWorldContext
+public readonly struct AgentGameContext
 {
     [FieldOffset(0x01AC)]
     public readonly uint InstanceTimer;

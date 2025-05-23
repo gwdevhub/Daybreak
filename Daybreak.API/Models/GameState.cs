@@ -2,7 +2,7 @@
 
 public sealed class GameState
 {
-    public required uint CurrentMap { get; init; }
+    public required uint? CurrentMap { get; init; }
     public required string Email { get; init; }
     public required string CharacterName { get; init; }
     public required uint CurrentExperience { get; init; }

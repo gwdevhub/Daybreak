@@ -1,5 +1,4 @@
-﻿using System.Extensions.Core;
-using System.Net.NetworkInformation;
+﻿using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using Daybreak.API.Configuration;
 using Daybreak.API.Controllers;
@@ -9,6 +8,8 @@ using Daybreak.API.Hosting;
 using Daybreak.API.Logging;
 using Daybreak.API.Serialization;
 using Daybreak.API.Services;
+using Daybreak.API.Swagger;
+using Daybreak.API.WebSockets;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Net.Sdk.Web;
 using Net.Sdk.Web.Websockets.Extensions;
@@ -18,7 +19,7 @@ namespace Daybreak.API;
 public static class EntryPoint
 {
     private const int StartPort = 5080;
-    private const int InitializationAttempts = 10;
+    private const int InitializationAttempts = 300;
 
     [UnmanagedCallersOnly(EntryPoint = "ThreadInit"), STAThread]
     public static int ThreadInit(IntPtr _, int __)
@@ -45,7 +46,7 @@ public static class EntryPoint
             }
             else
             {
-                Console.WriteLine("Daybreak API is healthy. Initialization succeeded");
+                Console.WriteLine($"Daybreak API is healthy. Initialization succeeded");
                 break;
             }
         }
@@ -58,9 +59,11 @@ public static class EntryPoint
         var app = WebApplication.CreateBuilder()
                 .WithConfiguration()
                 .WithHosting(port)
+                .WithSwagger()
                 .WithSerializationContext()
                 .WithLogging()
                 .WithDaybreakServices()
+                .WithWebSocketRoutes()
                 .WithRoutes()
                 .WithHealthChecks()
                 .Build();
@@ -71,7 +74,9 @@ public static class EntryPoint
             .UseHealthChecks()
             .UseLogging()
             .UseRoutes()
-            .MapWebSocket<GameContextRoute>("game-context");
+            .UseWebSocketRoutes()
+            .UseSwaggerWithUI();
+
     }
 
     private static async Task StartServer(WebApplication app)

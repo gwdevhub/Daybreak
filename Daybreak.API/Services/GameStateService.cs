@@ -66,7 +66,9 @@ public sealed class GameStateService : IDisposable
             TotalKurzick = gameContext->WorldContext->TotalKurzick,
             TotalBalthazar = gameContext->WorldContext->TotalBalthazar,
             TotalImperial = gameContext->WorldContext->TotalImperial,
-            CurrentMap = gameContext->CharContext is not null ? gameContext->CharContext->CurrentMapId : 0
+            CurrentMap = gameContext->MapContext is not null
+                ? gameContext->CharContext is not null ? gameContext->CharContext->CurrentMapId : default
+                : default
         };
     }
 }

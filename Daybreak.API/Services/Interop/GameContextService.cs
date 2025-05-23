@@ -12,8 +12,13 @@ public unsafe sealed class GameContextService : IAddressHealthService
     private const int BaseAddressOffset = +7;
     private static readonly byte[] BaseAddressPattern = [0x50, 0x6A, 0x0F, 0x6A, 0x00, 0xFF, 0x35];
 
+    private const string PreGameContextFile = "UiPregame.cpp";
+    private const string PreGameContextAssertion = "!s_scene";
+    private const int PreGameContextOffset = 0x34;
+
     private readonly MemoryScanningService memoryScanningService;
     private readonly GWAddressCache baseAddress;
+    private readonly GWAddressCache preGameContextAddress;
     private readonly ILogger<GameContextService> logger;
 
     public GameContextService(
@@ -23,6 +28,7 @@ public unsafe sealed class GameContextService : IAddressHealthService
         this.logger = logger.ThrowIfNull();
         this.memoryScanningService = memoryScanningService.ThrowIfNull();
         this.baseAddress = new GWAddressCache(this.GetBaseAddress);
+        this.preGameContextAddress = new GWAddressCache(this.GetPreGameContextAddress);
     }
 
     public List<AddressState> GetAddressStates()
@@ -33,7 +39,12 @@ public unsafe sealed class GameContextService : IAddressHealthService
                 Address = this.baseAddress.GetAddress() ?? 0,
                 Name = nameof(this.baseAddress),
             },
-            ];
+            new AddressState
+            {
+                Address = this.preGameContextAddress.GetAddress() ?? 0,
+                Name = nameof(this.preGameContextAddress),
+            },
+        ];
     }
 
     public GameContext* GetGameContext()
@@ -46,6 +57,18 @@ public unsafe sealed class GameContextService : IAddressHealthService
         }
 
         return (GameContext*)gameContextAddress;
+    }
+
+    public PreGameContext* GetPreGameContext()
+    {
+        var preGameContextAddress = this.preGameContextAddress.GetAddress();
+        if (preGameContextAddress is null or 0x0)
+        {
+            this.logger.LogError("Failed to get pre-game context address");
+            return null;
+        }
+
+        return *(PreGameContext**)preGameContextAddress;
     }
 
     private nuint GetGameContextAddress()
@@ -86,5 +109,19 @@ public unsafe sealed class GameContextService : IAddressHealthService
 
         scopedLogger.LogInformation("Base address: 0x{address:X8}", baseAddress);
         return baseAddress;
+    }
+
+    private nuint GetPreGameContextAddress()
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        var preGameContextAddress = this.memoryScanningService.FindAssertion(PreGameContextFile, PreGameContextAssertion, 0, PreGameContextOffset);
+        if (preGameContextAddress is 0)
+        {
+            scopedLogger.LogError("Failed to find pre-game context address");
+            return 0U;
+        }
+
+        scopedLogger.LogInformation("Pre-game context address: 0x{address:X8}", preGameContextAddress);
+        return preGameContextAddress;
     }
 }
