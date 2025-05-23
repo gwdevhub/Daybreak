@@ -132,6 +132,7 @@ using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.DXVK;
 using Daybreak.Services.DXVK;
 using Daybreak.Views.Onboarding.DXVK;
+using Daybreak.Shared.Services.MDns;
 
 namespace Daybreak.Configuration;
 
@@ -220,6 +221,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IGraphClient, GraphClient>();
         services.AddSingleton<IOptionsSynchronizationService, OptionsSynchronizationService>();
         services.AddSingleton<IWindowEventsHook<MainWindow>, WindowEventsHook<MainWindow>>();
+        services.AddSingleton<IMDnsService, MDnsService>();
         services.AddScoped<IBrowserExtensionsManager, BrowserExtensionsManager>();
         services.AddScoped<IBrowserExtensionsProducer, BrowserExtensionsManager>(sp => sp.GetRequiredService<IBrowserExtensionsManager>().Cast<BrowserExtensionsManager>());
         services.AddScoped<ICredentialManager, CredentialManager>();

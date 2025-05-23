@@ -36,13 +36,11 @@ internal sealed class ApplicationLauncher(
     IGuildWarsExecutableManager guildWarsExecutableManager,
     INotificationService notificationService,
     ILiveOptions<LauncherOptions> launcherOptions,
-    IMutexHandler mutexHandler,
     IModsManager modsManager,
     IPrivilegeManager privilegeManager,
     ILogger<ApplicationLauncher> logger) : IApplicationLauncher
 {
     private const string ProcessName = "gw";
-    private const string ArenaNetMutex = "AN-Mute";
     private const double LaunchMemoryThreshold = 200000000;
 
     private static readonly TimeSpan LaunchTimeout = TimeSpan.FromMinutes(1);
@@ -50,7 +48,6 @@ internal sealed class ApplicationLauncher(
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly ILiveOptions<LauncherOptions> launcherOptions = launcherOptions.ThrowIfNull();
-    private readonly IMutexHandler mutexHandler = mutexHandler.ThrowIfNull();
     private readonly IModsManager modsManager = modsManager.ThrowIfNull();
     private readonly ILogger<ApplicationLauncher> logger = logger.ThrowIfNull();
     private readonly IPrivilegeManager privilegeManager = privilegeManager.ThrowIfNull();
@@ -59,30 +56,6 @@ internal sealed class ApplicationLauncher(
     {
         launchConfigurationWithCredentials.ThrowIfNull();
         launchConfigurationWithCredentials.Credentials!.ThrowIfNull();
-        var configuration = this.launcherOptions.Value;
-        if (configuration.MultiLaunchSupport is true)
-        {
-            if (this.privilegeManager.AdminPrivileges is false)
-            {
-                this.privilegeManager.RequestAdminPrivileges<LauncherView>("You need administrator rights in order to start using multi-launch");
-                return null;
-            }
-
-            if (launchConfigurationWithCredentials.ExecutablePath is not null &&
-                !this.ClearGwLocks(launchConfigurationWithCredentials.ExecutablePath))
-            {
-                this.logger.LogError("Failed to clear GW locks. Canceling GuildWars launch");
-                return null;
-            }
-        }
-        else if (this.GetGuildwarsProcesses().Any())
-        {
-            this.notificationService.NotifyError(
-                title: "Can not launch Guild Wars",
-                description: "Multi-launch is disabled. Can not launch another instance of Guild Wars while the current one is running");
-            return null;
-        }
-
         using var timeout = new CancellationTokenSource(LaunchTimeout);
         var gwProcess = await this.LaunchGuildwarsProcess(launchConfigurationWithCredentials, timeout.Token);
         if (gwProcess is null)
@@ -483,53 +456,6 @@ internal sealed class ApplicationLauncher(
             this.notificationService.NotifyError(
                 title: "Failed to kill GuildWars process",
                 description: $"Encountered exception while trying to kill GuildWars process with id {guildWarsApplicationLaunchContext.ProcessId}. Check logs for details");
-        }
-    }
-
-    private bool ClearGwLocks(string path)
-    {
-        if (!this.SetRegistryGuildwarsPath(path))
-        {
-            this.logger.LogError("Failed to set registry entries. Failing to start GuildWars");
-            return false;
-        }
-
-        foreach (var process in Process.GetProcessesByName(ProcessName))
-        {
-            this.mutexHandler.CloseMutex(process, ArenaNetMutex);
-        }
-
-        return true;
-    }
-
-    private bool SetRegistryGuildwarsPath(string path)
-    {
-        try
-        {
-            var regSrc = Microsoft.Win32.Registry.GetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\ArenaNet\\Guild Wars", "Src", null);
-            if (regSrc != null && (string)regSrc != Path.GetFullPath(path))
-            {
-                Microsoft.Win32.Registry.SetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\ArenaNet\\Guild Wars", "Src", Path.GetFullPath(path));
-                Microsoft.Win32.Registry.SetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\ArenaNet\\Guild Wars", "Path", Path.GetFullPath(path));
-            }
-
-            regSrc = Microsoft.Win32.Registry.GetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\ArenaNet\\Guild Wars", "Src", null);
-            if (regSrc == null || (string)regSrc == Path.GetFullPath(path))
-            {
-                return true;
-            }
-
-            Microsoft.Win32.Registry.SetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\ArenaNet\\Guild Wars", "Src",
-                Path.GetFullPath(path));
-            Microsoft.Win32.Registry.SetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\ArenaNet\\Guild Wars", "Path",
-                Path.GetFullPath(path));
-
-            return true;
-        }
-        catch (UnauthorizedAccessException e)
-        {
-            this.logger.LogError(e, "Failed to patch registry");
-            return false;
         }
     }
 

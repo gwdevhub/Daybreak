@@ -2,6 +2,7 @@
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.LaunchConfigurations;
 using Daybreak.Shared.Models.Onboarding;
+using Daybreak.Shared.Services.Api;
 using Daybreak.Shared.Services.ApplicationLauncher;
 using Daybreak.Shared.Services.InternetChecker;
 using Daybreak.Shared.Services.LaunchConfigurations;
@@ -21,7 +22,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
-using System.Windows.Threading;
 
 namespace Daybreak.Views;
 
@@ -32,6 +32,7 @@ namespace Daybreak.Views;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
 public partial class LauncherView : UserControl
 {
+    private readonly IDaybreakApiService daybreakApiService;
     private readonly IGuildwarsMemoryReader guildwarsMemoryReader;
     private readonly IMenuService menuService;
     private readonly ILaunchConfigurationService launchConfigurationService;
@@ -54,6 +55,7 @@ public partial class LauncherView : UserControl
     public ObservableCollection<LauncherViewContext> LaunchConfigurations { get; } = [];
 
     public LauncherView(
+        IDaybreakApiService daybreakApiService,
         IGuildwarsMemoryReader guildwarsMemoryReader,
         IMenuService menuService,
         ILaunchConfigurationService launchConfigurationService,
@@ -64,6 +66,7 @@ public partial class LauncherView : UserControl
         IScreenManager screenManager,
         ILiveOptions<FocusViewOptions> focusViewOptions)
     {
+        this.daybreakApiService = daybreakApiService.ThrowIfNull();
         this.guildwarsMemoryReader = guildwarsMemoryReader.ThrowIfNull();
         this.menuService = menuService.ThrowIfNull();
         this.launchConfigurationService = launchConfigurationService.ThrowIfNull();
@@ -219,39 +222,47 @@ public partial class LauncherView : UserControl
     private async Task LaunchGuildWars()
     {
         var latestConfig = await this.Dispatcher.InvokeAsync(() => this.LatestConfiguration);
-        if (this.applicationLauncher.GetGuildwarsProcess(latestConfig.Configuration!) is GuildWarsApplicationLaunchContext context)
+        if (latestConfig.Configuration is null)
+        {
+            return;
+        }
+
+        if (this.applicationLauncher.GetGuildwarsProcess(latestConfig.Configuration) is GuildWarsApplicationLaunchContext context)
         {
             // Detected already running guildwars process
             await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);
             if (this.focusViewOptions.Value.Enabled)
             {
+                var apiContext = await this.daybreakApiService.GetDaybreakApiContext(context, CancellationToken.None);
                 this.menuService.CloseMenu();
                 this.viewManager.ShowView<FocusView>(context);
             }
 
-            this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(latestConfig.Configuration!);
+            this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(latestConfig.Configuration);
             return;
         }
-
-        try
+        else
         {
-            var launchedContext = await this.applicationLauncher.LaunchGuildwars(latestConfig.Configuration!);
-            if (launchedContext is null)
+            try
             {
+                var launchedContext = await this.applicationLauncher.LaunchGuildwars(latestConfig.Configuration);
                 await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);
-                return;
-            }
+                if (launchedContext is null)
+                {
+                    return;
+                }
 
-            this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(latestConfig.Configuration!);
-            if (this.focusViewOptions.Value.Enabled)
-            {
-                await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);
-                this.menuService.CloseMenu();
-                this.viewManager.ShowView<FocusView>(launchedContext);
+                this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(latestConfig.Configuration);
+                if (this.focusViewOptions.Value.Enabled)
+                {
+                    var apiContext = await this.daybreakApiService.GetDaybreakApiContext(launchedContext, CancellationToken.None);
+                    this.menuService.CloseMenu();
+                    this.viewManager.ShowView<FocusView>(launchedContext);
+                }
             }
-        }
-        catch (Exception)
-        {
+            catch (Exception)
+            {
+            }
         }
     }
 
