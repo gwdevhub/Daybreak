@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.FocusView;
 using Daybreak.Shared.Models.LaunchConfigurations;
 using Daybreak.Shared.Models.Onboarding;
 using Daybreak.Shared.Services.Api;
@@ -8,6 +9,7 @@ using Daybreak.Shared.Services.InternetChecker;
 using Daybreak.Shared.Services.LaunchConfigurations;
 using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Navigation;
+using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Onboarding;
 using Daybreak.Shared.Services.Scanner;
 using Daybreak.Shared.Services.Screens;
@@ -32,6 +34,7 @@ namespace Daybreak.Views;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
 public partial class LauncherView : UserControl
 {
+    private readonly INotificationService notificationService;
     private readonly IDaybreakApiService daybreakApiService;
     private readonly IGuildwarsMemoryReader guildwarsMemoryReader;
     private readonly IMenuService menuService;
@@ -55,6 +58,7 @@ public partial class LauncherView : UserControl
     public ObservableCollection<LauncherViewContext> LaunchConfigurations { get; } = [];
 
     public LauncherView(
+        INotificationService notificationService,
         IDaybreakApiService daybreakApiService,
         IGuildwarsMemoryReader guildwarsMemoryReader,
         IMenuService menuService,
@@ -66,6 +70,7 @@ public partial class LauncherView : UserControl
         IScreenManager screenManager,
         ILiveOptions<FocusViewOptions> focusViewOptions)
     {
+        this.notificationService = notificationService.ThrowIfNull();
         this.daybreakApiService = daybreakApiService.ThrowIfNull();
         this.guildwarsMemoryReader = guildwarsMemoryReader.ThrowIfNull();
         this.menuService = menuService.ThrowIfNull();
@@ -171,7 +176,7 @@ public partial class LauncherView : UserControl
         }
         else
         {
-            var launchingTask = await new TaskFactory().StartNew(this.LaunchGuildWars, TaskCreationOptions.LongRunning);
+            var launchingTask = await new TaskFactory().StartNew(() => this.LaunchGuildWars(this.cancellationTokenSource?.Token ?? CancellationToken.None), TaskCreationOptions.LongRunning);
             try
             {
                 await launchingTask;
@@ -219,7 +224,7 @@ public partial class LauncherView : UserControl
         this.applicationLauncher.KillGuildWarsProcess(context);
     }
 
-    private async Task LaunchGuildWars()
+    private async Task LaunchGuildWars(CancellationToken cancellationToken)
     {
         var latestConfig = await this.Dispatcher.InvokeAsync(() => this.LatestConfiguration);
         if (latestConfig.Configuration is null)
@@ -233,9 +238,24 @@ public partial class LauncherView : UserControl
             await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);
             if (this.focusViewOptions.Value.Enabled)
             {
-                var apiContext = await this.daybreakApiService.GetDaybreakApiContext(context, CancellationToken.None);
-                this.menuService.CloseMenu();
-                this.viewManager.ShowView<FocusView>(context);
+                var notificationToken = this.notificationService.NotifyInformation(
+                        title: "Attaching to Guild Wars process...",
+                        description: "Attempting to attach to Guild Wars process");
+                var apiContext = await this.daybreakApiService.GetDaybreakApiContext(context, cancellationToken);
+                notificationToken.Cancel();
+
+                if (apiContext is null)
+                {
+                    this.notificationService.NotifyError(
+                        title: "Could not attach to Guild Wars",
+                        description: "Could not find the Api context to attach to Guild Wars. Check the logs for more details");
+                    await this.Dispatcher.InvokeAsync(() => this.CanLaunch = true);
+                }
+                else
+                {
+                    this.menuService.CloseMenu();
+                    this.viewManager.ShowView<FocusView>(new FocusViewContext { ApiContext = apiContext.Value, LaunchContext = context });
+                }
             }
 
             this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(latestConfig.Configuration);
@@ -245,7 +265,7 @@ public partial class LauncherView : UserControl
         {
             try
             {
-                var launchedContext = await this.applicationLauncher.LaunchGuildwars(latestConfig.Configuration);
+                var launchedContext = await this.applicationLauncher.LaunchGuildwars(latestConfig.Configuration, cancellationToken);
                 await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);
                 if (launchedContext is null)
                 {
@@ -255,13 +275,29 @@ public partial class LauncherView : UserControl
                 this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(latestConfig.Configuration);
                 if (this.focusViewOptions.Value.Enabled)
                 {
-                    var apiContext = await this.daybreakApiService.GetDaybreakApiContext(launchedContext, CancellationToken.None);
-                    this.menuService.CloseMenu();
-                    this.viewManager.ShowView<FocusView>(launchedContext);
+                    var notificationToken = this.notificationService.NotifyInformation(
+                        title: "Attaching to Guild Wars process...",
+                        description: "Attempting to attach to Guild Wars process");
+                    var apiContext = await this.daybreakApiService.GetDaybreakApiContext(launchedContext, cancellationToken);
+                    notificationToken.Cancel();
+
+                    if (apiContext is null)
+                    {
+                        this.notificationService.NotifyError(
+                            title: "Could not attach to Guild Wars",
+                            description: "Could not find the Api context to attach to Guild Wars. Check the logs for more details");
+                        await this.Dispatcher.InvokeAsync(() => this.CanLaunch = true);
+                    }
+                    else
+                    {
+                        this.menuService.CloseMenu();
+                        this.viewManager.ShowView<FocusView>(new FocusViewContext { ApiContext = apiContext.Value, LaunchContext = launchedContext });
+                    }
                 }
             }
             catch (Exception)
             {
+                await this.Dispatcher.InvokeAsync(() => this.CanLaunch = true);
             }
         }
     }

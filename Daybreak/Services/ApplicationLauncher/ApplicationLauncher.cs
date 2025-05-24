@@ -52,12 +52,13 @@ internal sealed class ApplicationLauncher(
     private readonly ILogger<ApplicationLauncher> logger = logger.ThrowIfNull();
     private readonly IPrivilegeManager privilegeManager = privilegeManager.ThrowIfNull();
 
-    public async Task<GuildWarsApplicationLaunchContext?> LaunchGuildwars(LaunchConfigurationWithCredentials launchConfigurationWithCredentials)
+    public async Task<GuildWarsApplicationLaunchContext?> LaunchGuildwars(LaunchConfigurationWithCredentials launchConfigurationWithCredentials, CancellationToken cancellationToken)
     {
         launchConfigurationWithCredentials.ThrowIfNull();
         launchConfigurationWithCredentials.Credentials!.ThrowIfNull();
         using var timeout = new CancellationTokenSource(LaunchTimeout);
-        var gwProcess = await this.LaunchGuildwarsProcess(launchConfigurationWithCredentials, timeout.Token);
+        using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeout.Token);
+        var gwProcess = await this.LaunchGuildwarsProcess(launchConfigurationWithCredentials, cancellation.Token);
         if (gwProcess is null)
         {
             return default;
@@ -322,18 +323,21 @@ internal sealed class ApplicationLauncher(
         while (sw.Elapsed.TotalSeconds < LaunchTimeout.TotalSeconds)
         {
             await Task.Delay(500, cancellationToken);
-            var gwProcess = Process.GetProcessesByName("gw").FirstOrDefault();
-            if (gwProcess is null)
+            if (process.HasExited)
+            {
+                this.logger.LogError($"Guild Wars process exited before the main window was shown. Process ID: {process.Id}");
+                this.notificationService.NotifyError(
+                    title: "Guild Wars process exited",
+                    description: "Guild Wars process exited before the main window was shown. Please check logs for details");
+                return default;
+            }
+
+            if (process.MainWindowHandle == IntPtr.Zero)
             {
                 continue;
             }
 
-            if (gwProcess!.MainWindowHandle == IntPtr.Zero)
-            {
-                continue;
-            }
-
-            var windows = GetRootWindowsOfProcess(gwProcess.Id)
+            var windows = GetRootWindowsOfProcess(process.Id)
                 .Select(root => (root, GetChildWindows(root)))
                 .SelectMany(tuple =>
                 {
@@ -352,24 +356,8 @@ internal sealed class ApplicationLauncher(
                 continue;
             }
 
-            var virtualMemory = gwProcess.VirtualMemorySize64;
+            var virtualMemory = process.VirtualMemorySize64;
             if (virtualMemory < LaunchMemoryThreshold)
-            {
-                continue;
-            }
-
-            var windowInfo = new NativeMethods.WindowInfo(true);
-            NativeMethods.GetWindowInfo(gwProcess.MainWindowHandle, ref windowInfo);
-            if (windowInfo.rcWindow.Width == 0 || windowInfo.rcWindow.Height == 0)
-            {
-                continue;
-            }
-
-            /*
-             * GW loads more than 90 modules when it starts properly. If there are less than
-             * 90 modules, GW probably has failed to start or has not started yet
-             */
-            if (gwProcess.Modules.Count < 90)
             {
                 continue;
             }
@@ -403,7 +391,7 @@ internal sealed class ApplicationLauncher(
                 }
             }
 
-            return gwProcess;
+            return process;
         }
 
         throw new InvalidOperationException("Unable to launch Guild Wars process. Timed out waiting for the main window to launch");

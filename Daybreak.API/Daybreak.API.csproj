@@ -18,6 +18,7 @@
     <UseAppHost>false</UseAppHost>
     <EnableIISSupport>false</EnableIISSupport>
     <InvariantGlobalization>true</InvariantGlobalization>
+    <Platforms>x86</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -53,15 +54,4 @@
   <ItemGroup>
     <ProjectReference Include="..\Daybreak.Shared\Daybreak.Shared.csproj" />
   </ItemGroup>
-
-  <PropertyGroup>
-    <DaybreakHostOutputDir>$(MSBuildProjectDirectory)\..\Daybreak\bin\x86\$(Configuration)\$(TargetFramework)\$(RuntimeIdentifier)\</DaybreakHostOutputDir>
-    <ShouldPublishAot>true</ShouldPublishAot>
-  </PropertyGroup>
-
-  <Target Name="PublishIntoDaybreak" AfterTargets="Build">
-    <Message Text="📦 $(MSBuildProjectDirectory)\$(OutputPath)Daybreak.API.dll → $(DaybreakHostOutputDir)" Importance="High" />
-
-    <Copy SourceFiles="$(OutputPath)Daybreak.API.dll" DestinationFiles="$(DaybreakHostOutputDir)Daybreak.API.dll"></Copy>
-  </Target>
 </Project>

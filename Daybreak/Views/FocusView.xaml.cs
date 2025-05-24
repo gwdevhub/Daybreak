@@ -2,6 +2,7 @@
 using Daybreak.Launch;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Builds;
+using Daybreak.Shared.Models.FocusView;
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Models.LaunchConfigurations;
 using Daybreak.Shared.Services.ApplicationLauncher;
@@ -19,7 +20,6 @@ using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -134,13 +134,13 @@ public partial class FocusView : UserControl
                     continue;
                 }
 
-                if (this.DataContext is not GuildWarsApplicationLaunchContext context)
+                if (this.DataContext is not FocusViewContext context)
                 {
                     await Task.Delay(MainPlayerDataFrequency, cancellationToken);
                     continue;
                 }
 
-                if (context.GuildWarsProcess?.HasExited is not false)
+                if (context.LaunchContext.GuildWarsProcess?.HasExited is not false)
                 {
                     this.logger.LogInformation($"Executable is not running. Returning to {nameof(LauncherView)}");
                     this.viewManager.ShowView<LauncherView>();
@@ -225,7 +225,7 @@ public partial class FocusView : UserControl
 
     private async void FocusView_Loaded(object _, RoutedEventArgs e)
     {
-        if (this.DataContext is not GuildWarsApplicationLaunchContext context)
+        if (this.DataContext is not FocusViewContext context)
         {
             return;
         }
@@ -236,7 +236,7 @@ public partial class FocusView : UserControl
         this.cancellationTokenSource?.Dispose();
         this.cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = this.cancellationTokenSource.Token;
-        await this.guildwarsMemoryCache.EnsureInitialized(context, cancellationToken);
+        await this.guildwarsMemoryCache.EnsureInitialized(context.LaunchContext, cancellationToken);
         this.PeriodicallyReadMainPlayerContextData(cancellationToken);
     }
 
