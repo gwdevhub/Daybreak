@@ -102,19 +102,18 @@
     <RuntimeIdentifier>win-x86</RuntimeIdentifier>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Daybreak.API\Daybreak.API.csproj" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\Daybreak.7ZipExtractor\Daybreak.7ZipExtractor.csproj" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\Daybreak.Installer\Daybreak.Installer.csproj" ReferenceOutputAssembly="false" />
-  </ItemGroup>
+  <PropertyGroup>
+    <DependencyOutput Condition="'$(PublishDir)' != ''">$(PublishDir)</DependencyOutput>
+    <DependencyOutput Condition="'$(PublishDir)' == ''">$(OutDir)</DependencyOutput>
+  </PropertyGroup>
 
   <Target Name="PublishDaybreak7ZipExtractor"
         AfterTargets="Build"
         Inputs="..\Daybreak.7ZipExtractor\Daybreak.7ZipExtractor.csproj;
                 @(Compile);$(MSBuildProjectFile)"
         Outputs="$(OutDir)Daybreak.7ZipExtractor.exe">
-    <Message Importance="high" Text="📦Building Daybreak.7ZipExtractor"></Message>
-    <Exec Command="dotnet publish ..\Daybreak.7ZipExtractor\Daybreak.7ZipExtractor.csproj -c $(Configuration) -o $(OutDir)" />
+    <Message Importance="high" Text="📦 Daybreak.7ZipExtractor -> $(DependencyOutput)"></Message>
+    <Exec Command="dotnet publish ..\Daybreak.7ZipExtractor\Daybreak.7ZipExtractor.csproj -c $(Configuration) -o $(DependencyOutput)" />
   </Target>
 
   <Target Name="PublishDaybreakInstaller"
@@ -122,8 +121,8 @@
         Inputs="..\Daybreak.Installer\Daybreak.Installer.csproj;
                 @(Compile);$(MSBuildProjectFile)"
         Outputs="$(OutDir)Daybreak.Installer.exe">
-    <Message Importance="high" Text="📦Building Daybreak.Installer"></Message>
-    <Exec Command="dotnet publish ..\Daybreak.Installer\Daybreak.Installer.csproj -c $(Configuration) -o $(OutDir)" />
+    <Message Importance="high" Text="📦 Daybreak.Installer -> $(DependencyOutput)"></Message>
+    <Exec Command="dotnet publish ..\Daybreak.Installer\Daybreak.Installer.csproj -c $(Configuration) -o $(DependencyOutput)" />
   </Target>
 
   <Target Name="PublishDaybreakAPI"
@@ -131,7 +130,7 @@
         Inputs="..\Daybreak.API\Daybreak.API.csproj;
                 @(Compile);$(MSBuildProjectFile)"
         Outputs="$(OutDir)Daybreak.API.dll">
-    <Message Importance="high" Text="📦Building Daybreak.API"></Message>
-    <Exec Command="dotnet publish ..\Daybreak.API\Daybreak.API.csproj -c $(Configuration) -o $(OutDir)" />
+    <Message Importance="high" Text="📦 Daybreak.API -> $(DependencyOutput)"></Message>
+    <Exec Command="dotnet publish ..\Daybreak.API\Daybreak.API.csproj -c $(Configuration) -o $(DependencyOutput)" />
   </Target>
 </Project>
