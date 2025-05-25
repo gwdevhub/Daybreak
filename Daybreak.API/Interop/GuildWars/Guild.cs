@@ -1,6 +1,5 @@
 ﻿using System.Extensions;
 using System.Runtime.InteropServices;
-using System.Windows.Documents;
 
 namespace Daybreak.API.Interop.GuildWars;
 

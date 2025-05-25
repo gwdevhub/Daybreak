@@ -1,4 +1,5 @@
 ﻿using Daybreak.API.Models;
+using Daybreak.Shared.Models.Api;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 

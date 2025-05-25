@@ -1,27 +1,29 @@
 ﻿using Daybreak.API.Models;
 using Daybreak.API.Services;
-using Net.Sdk.Web.Websockets;
+using Daybreak.API.WebSockets;
+using Daybreak.Shared.Models.Api;
 using System.Buffers;
 using System.Core.Extensions;
 using System.Extensions.Core;
 using System.Net.WebSockets;
 
-namespace Daybreak.API.Controllers.WebSocket.GameState;
+namespace Daybreak.API.Controllers.WebSocket.MainPlayer;
 
 public sealed class MainPlayerStateRoute(
-    MainPlayerStateService mainPlayerStateService,
+    MainPlayerService mainPlayerStateService,
     ChatService chatService,
     ILogger<MainPlayerStateRoute> logger)
-    : WebSocketRouteBase
+        : UpdateWebSocketRoute
 {
     private const int DefaultFrequency = 1000;
 
-    private readonly byte[] buffer = ArrayPool<byte>.Shared.Rent(4096);
-    private readonly MainPlayerStateService mainPlayerStateService = mainPlayerStateService.ThrowIfNull();
+    private readonly MainPlayerService mainPlayerStateService = mainPlayerStateService.ThrowIfNull();
     private readonly ChatService chatService = chatService.ThrowIfNull();
     private readonly ILogger<MainPlayerStateRoute> logger = logger.ThrowIfNull();
 
     private CallbackRegistration? mainPlayerStateRegistration;
+
+    protected override int BufferSize => 256;
 
     public override Task ExecuteAsync(WebSocketMessageType type, ReadOnlySequence<byte> data, CancellationToken cancellationToken)
     {
@@ -39,7 +41,7 @@ public sealed class MainPlayerStateRoute(
         var freqTimeSpan = TimeSpan.FromMilliseconds(freq);
         scopedLogger.LogInformation("WebSocket accepted {id} with frequency {frequency}", this.Context?.Connection.Id ?? string.Empty, freqTimeSpan);
 
-        this.mainPlayerStateRegistration = this.mainPlayerStateService.RegisterConsumer(freqTimeSpan, this.SendState);
+        this.mainPlayerStateRegistration = this.mainPlayerStateService.RegisterMainStateConsumer(freqTimeSpan, this.SendUpdate);
 
         await this.chatService.AddMessageAsync(
             message: $"{nameof(MainPlayerState)} subscriber added: {this.Context?.Connection.RemoteIpAddress?.ToString()}:{this.Context?.Connection.RemotePort} with frequency {freq}ms",
@@ -54,7 +56,6 @@ public sealed class MainPlayerStateRoute(
 
         this.mainPlayerStateRegistration?.Dispose();
         this.mainPlayerStateRegistration = default;
-        ArrayPool<byte>.Shared.Return(this.buffer);
 
         scopedLogger.LogInformation("WebSocket closed {id}", this.Context?.Connection.Id ?? string.Empty);
         await this.chatService.AddMessageAsync(
@@ -62,20 +63,5 @@ public sealed class MainPlayerStateRoute(
             sender: "Daybreak.API",
             channel: Channel.Whisper,
             cancellationToken: CancellationToken.None);
-    }
-
-    private void SendState(ReadOnlySpan<byte> state)
-    {
-        // state lives on the stack, so we need to copy it to a buffer
-        state.CopyTo(this.buffer);
-        Task.Run(async () =>
-        {
-            if (this.WebSocket is null)
-            {
-                return;
-            }
-
-            await this.WebSocket.SendAsync(this.buffer, WebSocketMessageType.Binary, true, this.Context?.RequestAborted ?? CancellationToken.None);
-        });
     }
 }

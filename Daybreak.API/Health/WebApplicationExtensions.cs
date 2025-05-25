@@ -1,6 +1,6 @@
 ﻿using Daybreak.API.Models;
-using Daybreak.API.Serialization;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using ZLinq;
 
@@ -8,32 +8,40 @@ namespace Daybreak.API.Health;
 
 public static class WebApplicationExtensions
 {
+    [RequiresUnreferencedCode("The handler uses a static method that gets referenced, so there's no unreferenced code to worry about")]
+    [RequiresDynamicCode("The handler uses a static method, so there's no dynamic code to worry about")]
     public static WebApplication UseHealthChecks(this WebApplication app)
     {
-        app.MapHealthChecks("/health", new HealthCheckOptions
+        app.MapGet("/api/v1/rest/health", static async (HealthCheckService healthCheckService, CancellationToken cancellationToken) =>
         {
-            ResponseWriter = async (ctx, report) =>
+            var report = await healthCheckService.CheckHealthAsync(cancellationToken);
+
+            var response = new HealthCheckResponse
             {
-                ctx.Response.ContentType = "application/json";
-                var response = new HealthCheckResponse
-                {
-                    Status = report.Status,
-                    TotalDuration = report.TotalDuration,
-                    Entries = report.Entries.AsValueEnumerable().Select(e => (e, new HealthCheckEntryResponse
+                Status = report.Status,
+                TotalDuration = report.TotalDuration,
+                Entries = report.Entries.ToDictionary(
+                    e => e.Key,
+                    e => new HealthCheckEntryResponse
                     {
                         Status = e.Value.Status,
-                        Data = e.Value.Data.AsValueEnumerable().Where(kvp => kvp.Value is JsonElement).ToDictionary(kvp => kvp.Key, kvp => (JsonElement)kvp.Value),
                         Description = e.Value.Description ?? string.Empty,
-                        Tags = [.. e.Value.Tags]
-                    })).ToDictionary(e => e.e.Key, e => e.Item2)
-                };
+                        Tags = [.. e.Value.Tags],
+                        Data = e.Value.Data
+                            .Where(kvp => kvp.Value is JsonElement je)
+                            .ToDictionary(kvp => kvp.Key,
+                                kvp => (JsonElement)kvp.Value)
+                    })
+            };
 
-                var serialized = JsonSerializer.Serialize(
-                    response,
-                    ApiJsonSerializerContext.Default.HealthCheckResponse);
-                await ctx.Response.WriteAsync(serialized);
-            }
-        });
+            return Results.Json(response);
+        })
+        .WithName("Health")
+        .WithSummary("Service health")
+        .WithDescription($"Current health status of the service. Returns a serialized object of type {nameof(HealthCheckResponse)}")
+        .WithTags("Service")
+        .Produces<HealthCheckResponse>(StatusCodes.Status200OK)
+        .WithOpenApi();
         return app;
     }
 }

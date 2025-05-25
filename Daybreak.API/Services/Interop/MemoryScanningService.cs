@@ -1,5 +1,4 @@
-﻿using Daybreak.API.Interop;
-using Daybreak.Shared.Models.Interop;
+﻿using Daybreak.Shared.Models.Interop;
 using PeNet;
 using PeNet.Header.Pe;
 using System.Core.Extensions;
@@ -129,7 +128,7 @@ public sealed unsafe class MemoryScanningService
                         this.textSection,
                         pattern[3..].ToArray(),
                         maskAll[3..],
-                        (uint)offset);
+                        offset);
                 }
 
                 if (hit == 0 && lineNumber != 0)
@@ -141,7 +140,7 @@ public sealed unsafe class MemoryScanningService
                         this.textSection,
                         pattern.ToArray(),
                         maskAll,
-                        (uint)offset);
+                        offset);
                 }
 
                 if (hit == 0 && lineNumber == 0)
@@ -151,7 +150,7 @@ public sealed unsafe class MemoryScanningService
                         this.textSection,
                         pattern[5..].ToArray(),
                         maskAll[5..],
-                        (uint)offset);
+                        offset);
                 }
 
                 if (hit != 0)
@@ -164,7 +163,7 @@ public sealed unsafe class MemoryScanningService
         return 0;                         // nothing matched
     }
 
-    public nuint FindAndResolveAddress(byte[] pattern, string mask, uint offset = 0)
+    public nuint FindAndResolveAddress(byte[] pattern, string mask, int offset = 0)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         var address = FindAddressInternal(this.textSection, pattern, mask, offset);
@@ -178,7 +177,7 @@ public sealed unsafe class MemoryScanningService
         return ptr;
     }
 
-    public nuint FindAddress(byte[] pattern, string mask, uint offset = 0)
+    public nuint FindAddress(byte[] pattern, string mask, int offset = 0)
     {
         var address = FindAddressInternal(this.textSection, pattern, mask, offset);
         return address;
@@ -250,7 +249,7 @@ public sealed unsafe class MemoryScanningService
     private static string ToCamelCase(string text)
         => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(text.ToLowerInvariant());
 
-    private static nuint FindAddressInternal((nuint BaseAddress, ImageSectionHeader Section) section, byte[] pattern, string mask, uint offset = 0)
+    private static nuint FindAddressInternal((nuint BaseAddress, ImageSectionHeader Section) section, byte[] pattern, string mask, int offset = 0)
     {
         var textStart = section.BaseAddress + section.Section.VirtualAddress;
         var textEnd = textStart + section.Section.VirtualSize - (uint)pattern.Length;
@@ -273,7 +272,7 @@ public sealed unsafe class MemoryScanningService
 
             if (match)
             {
-                return cur + offset;
+                return (nuint)((nint)cur + offset);
             }
         }
 

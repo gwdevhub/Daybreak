@@ -12,12 +12,13 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddHostedService<ApiAdvertisingService>();
         builder.Services.AddSingleton<MemoryScanningService>();
         builder.Services.AddSingleton<ChatService>();
-        builder.Services.AddSingleton<MainPlayerStateService>();
+        builder.Services.AddSingleton<MainPlayerService>();
         builder.WithHookHostedService<GameThreadService>();
         builder.WithHookHostedService<UIHandlingService>();
         builder.WithHookHostedService<ChatHandlingService>();
         builder.WithAddressService<GameContextService>();
         builder.WithAddressService<InstanceContextService>();
+        builder.WithAddressService<AgentContextService>();
         return builder;
     }
 

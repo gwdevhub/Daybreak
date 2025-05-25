@@ -28,11 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MemoryPack" Version="1.21.4" />
-    <PackageReference Include="MemoryPack.Generator" Version="1.21.4">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.5" />
     <PackageReference Include="MinHook.NET" Version="1.1.1" />
     <PackageReference Include="Net.Sdk.Web.Extensions" Version="0.8.10" />

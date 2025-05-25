@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Runtime.InteropServices;
 
 namespace Daybreak.API.Interop.GuildWars;

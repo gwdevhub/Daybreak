@@ -1,5 +1,5 @@
-﻿using Daybreak.API.Controllers.WebSocket.GameState;
-using Daybreak.API.Models;
+﻿using Daybreak.API.Controllers.WebSocket.MainPlayer;
+using Daybreak.Shared.Models.Api;
 using Net.Sdk.Web.Websockets;
 using Net.Sdk.Web.Websockets.Extensions;
 using System.Diagnostics.CodeAnalysis;
@@ -14,11 +14,11 @@ public static class WebApplicationExtensions
     public static WebApplication UseWebSocketRoutes(this WebApplication app)
     {
         app.RegisterWebSocketRoute<MainPlayerStateRoute>(
-            path: "/api/v1/ws/game-state/main-player",
+            path: "/api/v1/ws/main-player/state",
             name: nameof(MainPlayerStateRoute),
             summary: $"{nameof(MainPlayerState)} WebSocket",
             description: $"Subscribe to {nameof(MainPlayerState)} websocket. On each game thread proc, the server will send a serialized {nameof(MainPlayerState)} payload",
-            tag: "GameState");
+            tag: "MainPlayer");
 
         return app;
     }
