@@ -1,10 +1,16 @@
-﻿namespace Daybreak.API.Models;
+﻿using MemoryPack;
 
-public sealed class GameState
+namespace Daybreak.API.Models;
+
+/// <summary>
+/// State of the main player data in the game.
+/// This will be serialized to a <see cref="ReadOnlySpan{Byte}"/> when being sent over the WebSocket.
+/// </summary>
+[MemoryPackable]
+public partial class MainPlayerState
 {
-    public required uint? CurrentMap { get; init; }
-    public required string Email { get; init; }
-    public required string CharacterName { get; init; }
+    public const int Size = 0x38;
+
     public required uint CurrentExperience { get; init; }
     public required uint Level { get; init; }
     public required uint CurrentLuxon { get; init; }

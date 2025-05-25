@@ -2,6 +2,7 @@
 using Daybreak.API.Services.Interop;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Text.Json;
+using ZLinq;
 
 namespace Daybreak.API.Health;
 
@@ -12,14 +13,14 @@ public sealed class HooksHealthCheck(IEnumerable<IHookHealthService> hookHealthS
 
     public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
-        var states = this.hookHealthServices.SelectMany(hookService => hookService.GetHookStates())
-            .ToList();
+        var states = this.hookHealthServices.AsValueEnumerable().SelectMany(hookService => hookService.GetHookStates());
         var healthy = !states.Any(s => !s.Hooked);
-        var serialized = JsonSerializer.SerializeToElement(states, ApiJsonSerializerContext.Default.ListHookState);
+        var statesArray = states.ToArrayPool();
+        var serialized = JsonSerializer.SerializeToElement(statesArray.ArraySegment, ApiJsonSerializerContext.Default.ArraySegmentHookState);
         var meta = new Dictionary<string, object>
         {
-            ["Count"] = states.Count.ToString(),
-            ["Unhooked"] = states.Count(s => !s.Hooked).ToString(),
+            ["Count"] = statesArray.Size,
+            ["Unhooked"] = states.Count(s => !s.Hooked),
             ["States"] = serialized,
         };
 

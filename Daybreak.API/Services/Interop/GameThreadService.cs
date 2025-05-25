@@ -21,7 +21,7 @@ public sealed class GameThreadService
     private readonly MemoryScanningService memoryScanningService;
     private readonly GWHook<LeaveGameThread> leaveGameThreadHook;
     private readonly ILogger<GameThreadService> logger;
-    private readonly ConcurrentQueue<(TaskCompletionSource, CancellationToken, Action)> queuedActions = [];
+    private readonly ConcurrentQueue<IWorkItem> queuedItems = [];
     private readonly ConcurrentDictionary<Guid, Action> registeredCallbacks = [];
 
     private CancellationTokenSource? cts = default;
@@ -53,10 +53,17 @@ public sealed class GameThreadService
         return Task.CompletedTask;
     }
 
-    public Task QueueActionOnGameThread(Action action, CancellationToken cancellationToken)
+    public Task QueueOnGameThread(Action action, CancellationToken cancellationToken)
     {
         var taskCompletionSource = new TaskCompletionSource();
-        this.queuedActions.Enqueue((taskCompletionSource, cancellationToken, action));
+        this.queuedItems.Enqueue(new WorkItem(action, taskCompletionSource, cancellationToken));
+        return taskCompletionSource.Task;
+    }
+
+    public Task<T> QueueOnGameThread<T>(Func<T> action, CancellationToken cancellationToken)
+    {
+        var taskCompletionSource = new TaskCompletionSource<T>();
+        this.queuedItems.Enqueue(new WorkItem<T>(action, taskCompletionSource, cancellationToken));
         return taskCompletionSource.Task;
     }
 
@@ -99,23 +106,22 @@ public sealed class GameThreadService
     private void OnLeaveGameThread(nint ctx)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        while(this.queuedActions.TryDequeue(out var tuple))
+        while(this.queuedItems.TryDequeue(out var item))
         {
             try
             {
-                if (tuple.Item2.IsCancellationRequested)
+                if (item.CancellationToken.IsCancellationRequested)
                 {
-                    tuple.Item1.TrySetCanceled();
+                    item.Cancel();
                     continue;
                 }
 
-                tuple.Item3();
-                tuple.Item1.TrySetResult();
+                item.Execute();
             }
             catch(Exception ex)
             {
                 scopedLogger.LogError(ex, "Error executing action on game thread");
-                tuple.Item1.TrySetException(ex);
+                item.Exception(ex);
             }
         }
 

@@ -9,6 +9,7 @@ using System.Extensions;
 [assembly: GenerateFixedArray<char>(Size = 32)]
 [assembly: GenerateFixedArray<char>(Size = 5)]
 [assembly: GenerateFixedArray<char>(Size = 8)]
+[assembly: GenerateFixedArray<byte>(Size = 56)]
 #pragma warning restore CS0436 // Type conflicts with imported type
 
 namespace Daybreak.API.Interop;

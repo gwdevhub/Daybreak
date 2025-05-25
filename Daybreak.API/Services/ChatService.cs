@@ -20,7 +20,7 @@ public sealed class ChatService(
     public async ValueTask AddMessageAsync(string message, string? sender, Channel channel, CancellationToken cancellationToken)
     {
         using var ctx = await this.semaphoreSlim.Acquire(cancellationToken);
-        await this.gameThreadService.QueueActionOnGameThread(() =>
+        await this.gameThreadService.QueueOnGameThread(() =>
         {
             var encodedMessage = string.Create(
                 3 + message.Length,

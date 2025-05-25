@@ -1,4 +1,5 @@
-﻿using Daybreak.API.Controllers.WebSocket;
+﻿using Daybreak.API.Controllers.WebSocket.GameState;
+using Daybreak.API.Models;
 using Net.Sdk.Web.Websockets;
 using Net.Sdk.Web.Websockets.Extensions;
 using System.Diagnostics.CodeAnalysis;
@@ -12,19 +13,20 @@ public static class WebApplicationExtensions
     [UnconditionalSuppressMessage("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.")]
     public static WebApplication UseWebSocketRoutes(this WebApplication app)
     {
-        app.RegisterWebSocketRoute<GameStateRoute>(
-            path: "/api/v1/ws/gamestate",
-            name: "GameState",
-            summary: "GameState WebSocket",
-            description: "Subscribe to GameState websocket. On each game thread proc, the server will send a serialized GameState payload");
+        app.RegisterWebSocketRoute<MainPlayerStateRoute>(
+            path: "/api/v1/ws/game-state/main-player",
+            name: nameof(MainPlayerStateRoute),
+            summary: $"{nameof(MainPlayerState)} WebSocket",
+            description: $"Subscribe to {nameof(MainPlayerState)} websocket. On each game thread proc, the server will send a serialized {nameof(MainPlayerState)} payload",
+            tag: "GameState");
 
         return app;
     }
 
-    private static WebApplication RegisterWebSocketRoute<T>(this WebApplication app, string path, string name, string summary, string description)
+    private static WebApplication RegisterWebSocketRoute<T>(this WebApplication app, string path, string name, string summary, string description, string tag)
         where T : WebSocketRouteBase
     {
-        app.UseWebSocketRoute<GameStateRoute>(path)
+        app.UseWebSocketRoute<MainPlayerStateRoute>(path)
             .Cast<RouteHandlerBuilder>()
             .WithName(name)
             .WithSummary(summary)
@@ -33,7 +35,7 @@ public static class WebApplicationExtensions
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithTags("GameState");
+            .WithTags(tag);
         return app;
     }
 }

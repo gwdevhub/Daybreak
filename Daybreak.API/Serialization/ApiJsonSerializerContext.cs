@@ -15,12 +15,13 @@ namespace Daybreak.API.Serialization;
 [JsonSerializable(typeof(Dictionary<string, string>))]
 [JsonSerializable(typeof(List<string>))]
 [JsonSerializable(typeof(HookState))]
-[JsonSerializable(typeof(List<HookState>))]
+[JsonSerializable(typeof(ArraySegment<HookState>))]
 [JsonSerializable(typeof(AddressState))]
-[JsonSerializable(typeof(List<AddressState>))]
-[JsonSerializable(typeof(GameState))]
+[JsonSerializable(typeof(ArraySegment<AddressState>))]
+[JsonSerializable(typeof(MainPlayerState))]
 [JsonSerializable(typeof(JsonElement))]
 [JsonSerializable(typeof(Task<IResult>))]
+[JsonSerializable(typeof(Task))]
 public partial class ApiJsonSerializerContext : JsonSerializerContext
 {
 }

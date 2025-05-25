@@ -2,6 +2,7 @@
 using Daybreak.API.Serialization;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using System.Text.Json;
+using ZLinq;
 
 namespace Daybreak.API.Health;
 
@@ -18,10 +19,10 @@ public static class WebApplicationExtensions
                 {
                     Status = report.Status,
                     TotalDuration = report.TotalDuration,
-                    Entries = report.Entries.Select(e => (e, new HealthCheckEntryResponse
+                    Entries = report.Entries.AsValueEnumerable().Select(e => (e, new HealthCheckEntryResponse
                     {
                         Status = e.Value.Status,
-                        Data = e.Value.Data.Where(kvp => kvp.Value is JsonElement).ToDictionary(kvp => kvp.Key, kvp => (JsonElement)kvp.Value),
+                        Data = e.Value.Data.AsValueEnumerable().Where(kvp => kvp.Value is JsonElement).ToDictionary(kvp => kvp.Key, kvp => (JsonElement)kvp.Value),
                         Description = e.Value.Description ?? string.Empty,
                         Tags = [.. e.Value.Tags]
                     })).ToDictionary(e => e.e.Key, e => e.Item2)

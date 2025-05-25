@@ -1,6 +1,6 @@
 ﻿using System.Core.Extensions;
 
-namespace Daybreak.API.Interop;
+namespace Daybreak.API.Models;
 
 public sealed class CallbackRegistration(Guid uid, Action onDispose) : IDisposable
 {
