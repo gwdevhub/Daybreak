@@ -1,7 +1,6 @@
 ﻿using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using Daybreak.API.Configuration;
-using Daybreak.API.Controllers;
 using Daybreak.API.Extensions;
 using Daybreak.API.Health;
 using Daybreak.API.Hosting;
@@ -12,7 +11,6 @@ using Daybreak.API.Swagger;
 using Daybreak.API.WebSockets;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Net.Sdk.Web;
-using Net.Sdk.Web.Websockets.Extensions;
 
 namespace Daybreak.API;
 

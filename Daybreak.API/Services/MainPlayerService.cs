@@ -48,6 +48,33 @@ public sealed class MainPlayerService : IDisposable
         this.callbackRegistration?.Dispose();
     }
 
+    public async Task<QuestLogInformation?> GetQuestLog(CancellationToken cancellationToken)
+    {
+        return await this.gameThreadService.QueueOnGameThread(() =>
+        {
+            unsafe
+            {
+                var gameContext = this.gameContextService.GetGameContext();
+                if (gameContext is null || gameContext->WorldContext is null)
+                {
+                    this.logger.LogError("Game context or world context is not initialized");
+                    return default;
+                }
+
+                return new QuestLogInformation
+                {
+                    Quests = gameContext->WorldContext->QuestLog.AsValueEnumerable().Select(q => new QuestInformation
+                    {
+                        QuestId = q.QuestId,
+                        MapFrom = q.MapFrom,
+                        MapTo = q.MapTo,
+                    }).ToList(),
+                    CurrentQuestId = gameContext->WorldContext->ActiveQuestId
+                };
+            }
+        }, cancellationToken);
+    }
+
     public Task<MainPlayerState> GetMainPlayerState(CancellationToken cancellationToken)
     {
         var tcs = new TaskCompletionSource<MainPlayerState>();

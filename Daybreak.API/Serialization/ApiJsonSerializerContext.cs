@@ -21,6 +21,8 @@ namespace Daybreak.API.Serialization;
 [JsonSerializable(typeof(ArraySegment<AddressState>))]
 [JsonSerializable(typeof(MainPlayerState))]
 [JsonSerializable(typeof(JsonElement))]
+[JsonSerializable(typeof(QuestLogInformation))]
+[JsonSerializable(typeof(QuestInformation))]
 [JsonSerializable(typeof(Task<IResult>))]
 [JsonSerializable(typeof(Task))]
 public partial class ApiJsonSerializerContext : JsonSerializerContext
