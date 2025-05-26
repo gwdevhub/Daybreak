@@ -7,32 +7,28 @@ namespace Daybreak.Shared.Models.Api;
 /// This will be serialized to a <see cref="System.ReadOnlySpan{System.Byte}"/> when being sent over the WebSocket.
 /// </summary>
 [MemoryPackable]
-public partial class MainPlayerState
+public partial record MainPlayerState(
+    uint CurrentExperience,
+    uint Level,
+    uint CurrentLuxon,
+    uint CurrentKurzick,
+    uint CurrentImperial,
+    uint CurrentBalthazar,
+    uint MaxLuxon,
+    uint MaxKurzick,
+    uint MaxImperial,
+    uint MaxBalthazar,
+    uint TotalLuxon,
+    uint TotalKurzick,
+    uint TotalImperial,
+    uint TotalBalthazar,
+    float CurrentHp,
+    uint MaxHp,
+    float CurrentEnergy,
+    uint MaxEnergy,
+    uint PrimaryProfession,
+    uint SecondaryProfession,
+    float PosX,
+    float PosY)
 {
-    public required uint CurrentExperience { get; init; }
-    public required uint Level { get; init; }
-
-    public required uint CurrentLuxon { get; init; }
-    public required uint CurrentKurzick { get; init; }
-    public required uint CurrentImperial { get; init; }
-    public required uint CurrentBalthazar { get; init; }
-    public required uint MaxLuxon { get; init; }
-    public required uint MaxKurzick { get; init; }
-    public required uint MaxImperial { get; init; }
-    public required uint MaxBalthazar { get; init; }
-    public required uint TotalLuxon { get; init; }
-    public required uint TotalKurzick { get; init; }
-    public required uint TotalImperial { get; init; }
-    public required uint TotalBalthazar { get; init; }
-
-    public required float CurrentHp { get; init; }
-    public required uint MaxHp { get; init; }
-    public required float CurrentEnergy { get; init; }
-    public required uint MaxEnergy { get; init; }
-
-    public required uint PrimaryProfession { get; init; }
-    public required uint SecondaryProfession { get; init; }
-
-    public required float PosX { get; init; }
-    public required float PosY { get; init; }
 }

@@ -16,9 +16,14 @@ public unsafe sealed class GameContextService : IAddressHealthService
     private const string PreGameContextAssertion = "!s_scene";
     private const int PreGameContextOffset = 0x34;
 
+    private const string AvailableCharsMask = "xx????xxxxxxx";
+    private const int AvailableCharsOffset = 0x2;
+    private static readonly byte[] AvailableCharsPattern = [0x8B, 0x35, 0x00, 0x00, 0x00, 0x00, 0x57, 0x69, 0xF8, 0x84, 0x00, 0x00, 0x00];
+
     private readonly MemoryScanningService memoryScanningService;
     private readonly GWAddressCache baseAddress;
     private readonly GWAddressCache preGameContextAddress;
+    private readonly GWAddressCache availableCharsAddress;
     private readonly ILogger<GameContextService> logger;
 
     public GameContextService(
@@ -29,6 +34,7 @@ public unsafe sealed class GameContextService : IAddressHealthService
         this.memoryScanningService = memoryScanningService.ThrowIfNull();
         this.baseAddress = new GWAddressCache(this.GetBaseAddress);
         this.preGameContextAddress = new GWAddressCache(this.GetPreGameContextAddress);
+        this.availableCharsAddress = new GWAddressCache(this.GetAvailableCharactersAddress);
     }
 
     public List<AddressState> GetAddressStates()
@@ -44,6 +50,11 @@ public unsafe sealed class GameContextService : IAddressHealthService
                 Address = this.preGameContextAddress.GetAddress() ?? 0,
                 Name = nameof(this.preGameContextAddress),
             },
+            new AddressState
+            {
+                Address = this.availableCharsAddress.GetAddress() ?? 0,
+                Name = nameof(this.availableCharsAddress),
+            }
         ];
     }
 
@@ -69,6 +80,18 @@ public unsafe sealed class GameContextService : IAddressHealthService
         }
 
         return *(PreGameContext**)preGameContextAddress;
+    }
+
+    public GuildWarsArray<CharInfoContext>* GetAvailableChars()
+    {
+        var availableCharsAddress = this.availableCharsAddress.GetAddress();
+        if (availableCharsAddress is null or 0x0)
+        {
+            this.logger.LogError("Failed to get available chars address");
+            return null;
+        }
+
+        return *(GuildWarsArray<CharInfoContext>**)availableCharsAddress;
     }
 
     private nuint GetGameContextAddress()
@@ -111,7 +134,7 @@ public unsafe sealed class GameContextService : IAddressHealthService
         return baseAddress;
     }
 
-    private nuint GetPreGameContextAddress()
+    private unsafe nuint GetPreGameContextAddress()
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         var preGameContextAddress = this.memoryScanningService.FindAssertion(PreGameContextFile, PreGameContextAssertion, 0, PreGameContextOffset);
@@ -121,7 +144,22 @@ public unsafe sealed class GameContextService : IAddressHealthService
             return 0U;
         }
 
+        preGameContextAddress = *(nuint*)preGameContextAddress;
         scopedLogger.LogInformation("Pre-game context address: 0x{address:X8}", preGameContextAddress);
         return preGameContextAddress;
+    }
+
+    private unsafe nuint GetAvailableCharactersAddress()
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        var availableCharsAddress = this.memoryScanningService.FindAddress(AvailableCharsPattern, AvailableCharsMask, AvailableCharsOffset);
+        if (availableCharsAddress is 0)
+        {
+            scopedLogger.LogError("Failed to find available chars address");
+            return 0U;
+        }
+
+        scopedLogger.LogInformation("Available chars address: 0x{address:X8}", availableCharsAddress);
+        return availableCharsAddress;
     }
 }

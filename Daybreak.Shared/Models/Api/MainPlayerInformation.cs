@@ -1,7 +1,15 @@
 ﻿namespace Daybreak.Shared.Models.Api;
 
-public sealed class MainPlayerInformation
+public sealed record MainPlayerInformation(
+    string Uuid,
+    string Email,
+    string CharacterName,
+    string AccountName,
+    uint Wins,
+    uint Losses,
+    uint Rating, 
+    uint QualifierPoints,
+    uint Rank,
+    uint TournamentRewardPoints)
 {
-    public string Email { get; set; } = string.Empty;
-    public string CharacterName { get; set; } = string.Empty;
 }

@@ -50,6 +50,7 @@ public sealed class MainPlayerService : IDisposable
 
     public async Task<QuestLogInformation?> GetQuestLog(CancellationToken cancellationToken)
     {
+        var scopedLogger = this.logger.CreateScopedLogger();
         return await this.gameThreadService.QueueOnGameThread(() =>
         {
             unsafe
@@ -57,20 +58,48 @@ public sealed class MainPlayerService : IDisposable
                 var gameContext = this.gameContextService.GetGameContext();
                 if (gameContext is null || gameContext->WorldContext is null)
                 {
-                    this.logger.LogError("Game context or world context is not initialized");
+                    scopedLogger.LogError("Game context is not initialized");
                     return default;
                 }
 
-                return new QuestLogInformation
+                return new QuestLogInformation(
+                    gameContext->WorldContext->ActiveQuestId,
+                    gameContext->WorldContext->QuestLog.AsValueEnumerable().Select(q => new QuestInformation(q.QuestId, q.MapFrom, q.MapTo)).ToList());
+            }
+        }, cancellationToken);
+    }
+
+    public async Task<MainPlayerInformation?> GetMainPlayerInformation(CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        return await this.gameThreadService.QueueOnGameThread(() =>
+        {
+            unsafe
+            {
+                var gameContext = this.gameContextService.GetGameContext();
+                if (gameContext is null || gameContext->CharContext is null ||
+                    gameContext->WorldContext is null)
                 {
-                    Quests = gameContext->WorldContext->QuestLog.AsValueEnumerable().Select(q => new QuestInformation
-                    {
-                        QuestId = q.QuestId,
-                        MapFrom = q.MapFrom,
-                        MapTo = q.MapTo,
-                    }).ToList(),
-                    CurrentQuestId = gameContext->WorldContext->ActiveQuestId
-                };
+                    scopedLogger.LogError("Game context is not initialized");
+                    return default;
+                }
+
+                var playerNameSpan = gameContext->CharContext->PlayerName.AsSpan();
+                var playerName = new string(playerNameSpan[..playerNameSpan.IndexOf('\0')]);
+                var emailSpan = gameContext->CharContext->PlayerEmail.AsSpan();
+                var email = new string(emailSpan[..emailSpan.IndexOf('\0')]);
+                var accountName = new string(gameContext->WorldContext->AccountInfo->AccountName);
+                return new MainPlayerInformation(
+                    gameContext->CharContext->PlayerUuid.ToString(),
+                    email,
+                    playerName,
+                    accountName,
+                    gameContext->WorldContext->AccountInfo->Wins,
+                    gameContext->WorldContext->AccountInfo->Losses,
+                    gameContext->WorldContext->AccountInfo->Rating,
+                    gameContext->WorldContext->AccountInfo->QualifierPoints,
+                    gameContext->WorldContext->AccountInfo->Rank,
+                    gameContext->WorldContext->AccountInfo->TournamentRewardPoints);
             }
         }, cancellationToken);
     }
@@ -166,37 +195,35 @@ public sealed class MainPlayerService : IDisposable
             return;
         }
 
-        this.mainPlayerState = new MainPlayerState
-        {
-            Level = gameContext->WorldContext->Level,
-            CurrentExperience = gameContext->WorldContext->Experience,
+        this.mainPlayerState = new MainPlayerState(
+            gameContext->WorldContext->Level,
+            gameContext->WorldContext->Experience,
 
-            CurrentLuxon = gameContext->WorldContext->CurrentLuxon,
-            CurrentKurzick = gameContext->WorldContext->CurrentKurzick,
-            CurrentBalthazar = gameContext->WorldContext->CurrentBalthazar,
-            CurrentImperial = gameContext->WorldContext->CurrentImperial,
-            MaxBalthazar = gameContext->WorldContext->MaxBalthazar,
-            MaxImperial = gameContext->WorldContext->MaxImperial,
-            MaxKurzick = gameContext->WorldContext->MaxKurzick,
-            MaxLuxon = gameContext->WorldContext->MaxLuxon,
-            TotalLuxon = gameContext->WorldContext->TotalLuxon,
-            TotalKurzick = gameContext->WorldContext->TotalKurzick,
-            TotalBalthazar = gameContext->WorldContext->TotalBalthazar,
-            TotalImperial = gameContext->WorldContext->TotalImperial,
-
-            PosX = playerAgent->Pos.X,
-            PosY = playerAgent->Pos.Y,
-
-            PrimaryProfession = livingAgent->Primary,
-            SecondaryProfession = livingAgent->Secondary,
-
-            MaxEnergy = livingAgent->MaxEnergy,
-            MaxHp = livingAgent->MaxHealth,
+            gameContext->WorldContext->CurrentLuxon,
+            gameContext->WorldContext->CurrentKurzick,
+            gameContext->WorldContext->CurrentImperial,
+            gameContext->WorldContext->CurrentBalthazar,
+            gameContext->WorldContext->MaxLuxon,
+            gameContext->WorldContext->MaxKurzick,
+            gameContext->WorldContext->MaxImperial,
+            gameContext->WorldContext->MaxBalthazar,
+            gameContext->WorldContext->TotalLuxon,
+            gameContext->WorldContext->TotalKurzick,
+            gameContext->WorldContext->TotalImperial,
+            gameContext->WorldContext->TotalBalthazar,
 
             // Energy and health are percentages of Max
-            CurrentEnergy = livingAgent->Energy * livingAgent->MaxEnergy, 
-            CurrentHp = livingAgent->Health * livingAgent->MaxHealth,
-        };
+            livingAgent->Health * livingAgent->MaxHealth,
+            livingAgent->MaxHealth,
+            livingAgent->Energy * livingAgent->MaxEnergy,
+            livingAgent->MaxEnergy,
+
+            livingAgent->Primary,
+            livingAgent->Secondary,
+
+            playerAgent->Pos.X,
+            playerAgent->Pos.Y
+        );
 
         this.bufferWriter.ResetWrittenCount();
         MemoryPackSerializer.Serialize(this.bufferWriter, this.mainPlayerState);

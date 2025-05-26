@@ -7,7 +7,7 @@ namespace Daybreak.API.Interop.GuildWars;
 public readonly struct CharContext
 {
     [FieldOffset(0x0064)]
-    public readonly Array4Uint PlayerUuid;
+    public readonly Uuid PlayerUuid;
 
     [FieldOffset(0x0074)]
     public readonly Array20Char PlayerName;

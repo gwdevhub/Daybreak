@@ -38,4 +38,16 @@ public sealed class MainPlayerController(
         var questLog = await this.mainPlayerService.GetQuestLog(cancellationToken);
         return questLog is not null ? Results.Ok(questLog) : Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
     }
+
+    [GenerateGet("info")]
+    [EndpointName("GetMainPlayerInformation")]
+    [EndpointSummary("Get the current MainPlayerInformation")]
+    [EndpointDescription("Get the current MainPlayerInformation. Returns a json serialized MainPlayerInformation object")]
+    [ProducesResponseType<MainPlayerInformation>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+    public async Task<IResult> GetMainPlayerInformation(CancellationToken cancellationToken)
+    {
+        var mainPlayerInformation = await this.mainPlayerService.GetMainPlayerInformation(cancellationToken);
+        return mainPlayerInformation is not null ? Results.Ok(mainPlayerInformation) : Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
+    }
 }

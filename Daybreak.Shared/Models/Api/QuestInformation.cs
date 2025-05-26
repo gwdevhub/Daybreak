@@ -1,8 +1,5 @@
 ﻿namespace Daybreak.Shared.Models.Api;
 
-public sealed class QuestInformation
+public sealed record QuestInformation(uint QuestId, uint MapFrom, uint MapTo)
 {
-    public uint QuestId { get; init; }
-    public uint MapFrom { get; init; }
-    public uint MapTo { get; init; }
 }
