@@ -48,6 +48,49 @@ public sealed class MainPlayerService : IDisposable
         this.callbackRegistration?.Dispose();
     }
 
+    public Task<BuildEntry?> GetCurrentBuild(CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        return this.gameThreadService.QueueOnGameThread(() =>
+        {
+            unsafe
+            {
+                var gameContext = this.gameContextService.GetGameContext();
+                if (gameContext is null)
+                {
+                    scopedLogger.LogError("Failed to get game context");
+                    return default;
+                }
+
+                var playerAgentId = this.agentContextService.GetPlayerAgentId();
+                if (playerAgentId is 0x0)
+                {
+                    scopedLogger.LogError("Failed to get player agent id");
+                    return default;
+                }
+
+                var skillbarContext = gameContext->WorldContext->Skillbars.AsValueEnumerable().FirstOrDefault(s => s.AgentId == playerAgentId);
+                if (skillbarContext.AgentId != playerAgentId)
+                {
+                    scopedLogger.LogError("Failed to find skillbar context for player agent id {agentId}", playerAgentId);
+                    return default;
+                }
+
+                var agentAttributes = gameContext->WorldContext->Attributes.AsValueEnumerable().FirstOrDefault(a => a.AgentId == playerAgentId);
+                if (agentAttributes.AgentId != playerAgentId)
+                {
+                    scopedLogger.LogError("Failed to find agent attributes for player agent id {agentId}", playerAgentId);
+                    return default;
+                }
+
+                return new BuildEntry(
+                    agentAttributes.Attributes.AsValueEnumerable().Select(a => new AttributeEntry(a.Id, a.LevelBase, a.Level)).ToList(),
+                    [skillbarContext.Skill0.Id, skillbarContext.Skill1.Id, skillbarContext.Skill2.Id, skillbarContext.Skill3.Id,
+                    skillbarContext.Skill4.Id, skillbarContext.Skill5.Id, skillbarContext.Skill6.Id, skillbarContext.Skill7.Id]);
+            }
+        }, cancellationToken);
+    }
+
     public async Task<QuestLogInformation?> GetQuestLog(CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();

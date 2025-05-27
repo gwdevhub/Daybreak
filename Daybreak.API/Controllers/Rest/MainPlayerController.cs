@@ -50,4 +50,16 @@ public sealed class MainPlayerController(
         var mainPlayerInformation = await this.mainPlayerService.GetMainPlayerInformation(cancellationToken);
         return mainPlayerInformation is not null ? Results.Ok(mainPlayerInformation) : Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
     }
+
+    [GenerateGet("build")]
+    [EndpointName("GetMainPlayerBuild")]
+    [EndpointSummary("Get the current build")]
+    [EndpointDescription("Get the current build. Returns a json serialized BuildEntry object")]
+    [ProducesResponseType<BuildEntry>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+    public async Task<IResult> GetMainPlayerBuild(CancellationToken cancellationToken)
+    {
+        var build = await this.mainPlayerService.GetCurrentBuild(cancellationToken);
+        return build is not null ? Results.Ok(build) : Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
+    }
 }
