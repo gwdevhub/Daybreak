@@ -11,6 +11,8 @@ using System.Extensions;
 [assembly: GenerateFixedArray<char>(Size = 8)]
 [assembly: GenerateFixedArray<byte>(Size = 56)]
 [assembly: GenerateFixedArray<uint>(Size = 17)]
+[assembly: GenerateFixedArray<uint>(Size = 12)]
+[assembly: GenerateFixedArray<uint>(Size = 8)]
 #pragma warning restore CS0436 // Type conflicts with imported type
 
 namespace Daybreak.API.Interop;

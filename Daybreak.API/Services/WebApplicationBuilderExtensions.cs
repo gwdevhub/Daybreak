@@ -14,9 +14,11 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddSingleton<ChatService>();
         builder.Services.AddSingleton<MainPlayerService>();
         builder.Services.AddSingleton<CharacterSelectService>();
+        builder.Services.AddSingleton<PartyService>();
         builder.WithHookHostedService<GameThreadService>();
         builder.WithHookHostedService<UIHandlingService>();
         builder.WithHookHostedService<ChatHandlingService>();
+        builder.WithHookHostedService<SkillbarContextService>();
         builder.WithAddressService<GameContextService>();
         builder.WithAddressService<InstanceContextService>();
         builder.WithAddressService<AgentContextService>();
