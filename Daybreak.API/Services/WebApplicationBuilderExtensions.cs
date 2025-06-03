@@ -1,4 +1,5 @@
 ﻿using Daybreak.API.Services.Interop;
+using Daybreak.Shared.Services.BuildTemplates;
 using Daybreak.Shared.Services.MDns;
 using System.Diagnostics.CodeAnalysis;
 
@@ -8,6 +9,7 @@ public static class WebApplicationBuilderExtensions
 {
     public static WebApplicationBuilder WithDaybreakServices(this WebApplicationBuilder builder)
     {
+        builder.Services.AddSingleton<IBuildTemplateManager, BuildTemplateManager>();
         builder.Services.AddSingleton<IMDnsService, MDnsService>();
         builder.Services.AddHostedService<ApiAdvertisingService>();
         builder.Services.AddSingleton<MemoryScanningService>();

@@ -1,4 +1,5 @@
-﻿using Daybreak.Shared.Models.Builds;
+﻿using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Models.Guildwars;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ public interface IBuildTemplateManager
     SingleBuildEntry ConvertToSingleBuildEntry(TeamBuildEntry teamBuildEntry);
     TeamBuildEntry ConvertToTeamBuildEntry(SingleBuildEntry singleBuildEntry);
     bool IsTemplate(string template);
+    bool CanTemplateApply(BuildTemplateValidationRequest request);
     SingleBuildEntry CreateSingleBuild();
     SingleBuildEntry CreateSingleBuild(string name);
     TeamBuildEntry CreateTeamBuild();

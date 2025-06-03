@@ -1,10 +1,10 @@
 ﻿using System.Text;
 
-namespace Daybreak.Services.BuildTemplates.Models;
+namespace Daybreak.Shared.Services.BuildTemplates.Models;
 
 internal sealed class EncodeCharStream
 {
-    private readonly StringBuilder innerStringBuilder = new StringBuilder();
+    private readonly StringBuilder innerStringBuilder = new();
 
     public void Write(int value, int count)
     {

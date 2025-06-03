@@ -1,7 +1,11 @@
 ﻿using Daybreak.API.Interop.GuildWars;
 using Daybreak.API.Models;
 using Daybreak.API.Services.Interop;
+using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Api;
+using Daybreak.Shared.Models.Builds;
+using Daybreak.Shared.Models.Interop;
+using Daybreak.Shared.Services.BuildTemplates;
 using MemoryPack;
 using System.Buffers;
 using System.Collections.Concurrent;
@@ -10,11 +14,14 @@ using System.Extensions;
 using System.Extensions.Core;
 using System.Runtime.CompilerServices;
 using ZLinq;
+using AttributeEntry = Daybreak.Shared.Models.Api.AttributeEntry;
 
 namespace Daybreak.API.Services;
 
 public sealed class MainPlayerService : IDisposable
 {
+    private readonly IBuildTemplateManager buildTemplateManager;
+    private readonly SkillbarContextService skillbarContextService;
     private readonly AgentContextService agentContextService;
     private readonly CallbackRegistration callbackRegistration;
     private readonly GameContextService gameContextService;
@@ -31,11 +38,15 @@ public sealed class MainPlayerService : IDisposable
     private DateTimeOffset lastFrequencyUpdate = DateTimeOffset.MinValue;
 
     public MainPlayerService(
+        IBuildTemplateManager buildTemplateManager,
+        SkillbarContextService skillbarContextService,
         GameContextService gameContextService,
         AgentContextService agentContextService,
         GameThreadService gameThreadService,
         ILogger<MainPlayerService> logger)
     {
+        this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
+        this.skillbarContextService = skillbarContextService.ThrowIfNull();
         this.gameThreadService = gameThreadService.ThrowIfNull();
         this.agentContextService = agentContextService.ThrowIfNull();
         this.gameContextService = gameContextService.ThrowIfNull();
@@ -46,6 +57,103 @@ public sealed class MainPlayerService : IDisposable
     public void Dispose()
     {
         this.callbackRegistration?.Dispose();
+    }
+
+    public Task<bool> SetCurrentBuild(string buildCode, CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        if (!this.buildTemplateManager.TryDecodeTemplate(buildCode, out var build) ||
+            build is not SingleBuildEntry singleBuild)
+        {
+            scopedLogger.LogError("Failed to decode build template from code {buildCode}", buildCode);
+            return Task.FromResult(false);
+        }
+
+        return this.gameThreadService.QueueOnGameThread(() =>
+        {
+            unsafe
+            {
+                var gameContext = this.gameContextService.GetGameContext();
+                if (gameContext is null ||
+                    gameContext->WorldContext is null)
+                {
+                    scopedLogger.LogError("Failed to get game context");
+                    return false;
+                }
+
+                var playerAgentId = this.agentContextService.GetPlayerAgentId();
+                if (playerAgentId is 0x0)
+                {
+                    scopedLogger.LogError("Failed to get player agent id");
+                    return false;
+                }
+
+                var playerAgent = this.GetAgentContext(playerAgentId);
+                if (playerAgent is null ||
+                    playerAgent->Type is not AgentType.Living ||
+                    playerAgent->AgentId != playerAgentId)
+                {
+                    scopedLogger.LogError("Player agent {playerAgentId} not found in agent array", playerAgentId);
+                    return false;
+                }
+
+                var livingAgent = (AgentLivingContext*)playerAgent;
+                if (livingAgent->Level != gameContext->WorldContext->Level)
+                {
+                    scopedLogger.LogError("Player agent not found. Player level mismatch: {level} != {gameLevel}", livingAgent->Level, gameContext->WorldContext->Level);
+                    return false;
+                }
+
+                var agentProfession = gameContext->WorldContext->Professions.AsValueEnumerable().FirstOrDefault(p => p.AgentId == playerAgentId);
+                if (agentProfession.AgentId != playerAgentId)
+                {
+                    scopedLogger.LogError("Failed to find agent profession for player agent id {agentId}", playerAgentId);
+                    return false;
+                }
+
+                var validationRequest = new BuildTemplateValidationRequest(
+                    singleBuild,
+                    livingAgent->Primary,
+                    agentProfession.UnlockedProfessionsFlags,
+                    [.. gameContext->WorldContext->UnlockedCharacterSkills]);
+
+                if (!this.buildTemplateManager.CanTemplateApply(validationRequest))
+                {
+                    scopedLogger.LogError("Build template validation failed for player agent id {agentId}", playerAgentId);
+                    return false;
+                }
+
+                var attributeIds = new Array12Uint();
+                var attributeValues = new Array12Uint();
+                var skills = new Array8Uint();
+                for(var i = 0; i < singleBuild.Attributes.Count && i < 12; i++)
+                {
+                    if (singleBuild.Attributes[i].Attribute is null)
+                    {
+                        continue;
+                    }
+
+                    attributeIds[i] = (uint)singleBuild.Attributes[i].Attribute!.Id;
+                    attributeValues[i] = (uint)singleBuild.Attributes[i].Points;
+                }
+
+                for(var i =0; i < singleBuild.Skills.Count && i < 8; i++)
+                {
+                    skills[i] = (uint)singleBuild.Skills[i].Id;
+                }
+
+                var skillTemplate = new SkillTemplate(
+                    (uint)singleBuild.Primary.Id,
+                    (uint)singleBuild.Secondary.Id,
+                    (uint)Math.Min(singleBuild.Attributes.Count, 12),
+                    attributeIds,
+                    attributeValues,
+                    skills);
+
+                this.skillbarContextService.LoadBuild(playerAgentId, &skillTemplate);
+                return true;
+            }
+        }, cancellationToken);
     }
 
     public Task<BuildEntry?> GetCurrentBuild(CancellationToken cancellationToken)
@@ -91,10 +199,10 @@ public sealed class MainPlayerService : IDisposable
         }, cancellationToken);
     }
 
-    public async Task<QuestLogInformation?> GetQuestLog(CancellationToken cancellationToken)
+    public Task<QuestLogInformation?> GetQuestLog(CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        return await this.gameThreadService.QueueOnGameThread(() =>
+        return this.gameThreadService.QueueOnGameThread(() =>
         {
             unsafe
             {
@@ -112,10 +220,10 @@ public sealed class MainPlayerService : IDisposable
         }, cancellationToken);
     }
 
-    public async Task<MainPlayerInformation?> GetMainPlayerInformation(CancellationToken cancellationToken)
+    public Task<MainPlayerInformation?> GetMainPlayerInformation(CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        return await this.gameThreadService.QueueOnGameThread(() =>
+        return this.gameThreadService.QueueOnGameThread(() =>
         {
             unsafe
             {

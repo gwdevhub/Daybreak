@@ -1,24 +1,23 @@
-﻿using Daybreak.Services.BuildTemplates.Models;
+﻿using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Models.Guildwars;
-using Daybreak.Shared.Services.BuildTemplates;
+using Daybreak.Shared.Services.BuildTemplates.Models;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
-using NAudio.MediaFoundation;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Extensions;
+using System.Extensions.Core;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Convert = System.Convert;
 
-namespace Daybreak.Services.BuildTemplates;
+namespace Daybreak.Shared.Services.BuildTemplates;
 
-internal sealed class BuildTemplateManager(
+public sealed class BuildTemplateManager(
     ILogger<BuildTemplateManager> logger) : IBuildTemplateManager
 {
     private const string DecodingLookupTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
@@ -51,9 +50,8 @@ internal sealed class BuildTemplateManager(
             PreviousName = string.Empty,
             Attributes = emptyBuild.Attributes,
             Skills = emptyBuild.Skills,
+            CreationTime = DateTimeOffset.UtcNow
         };
-
-        entry.CreationTime = DateTimeOffset.UtcNow;
         return entry;
     }
 
@@ -65,10 +63,9 @@ internal sealed class BuildTemplateManager(
             Name = name,
             PreviousName = string.Empty,
             Attributes = emptyBuild.Attributes,
-            Skills = emptyBuild.Skills
+            Skills = emptyBuild.Skills,
+            CreationTime = DateTimeOffset.UtcNow
         };
-
-        entry.CreationTime = DateTimeOffset.UtcNow;
         return entry;
     }
 
@@ -79,10 +76,9 @@ internal sealed class BuildTemplateManager(
         {
             Name = name,
             PreviousName = string.Empty,
-            Builds = [this.CreateSingleBuild()]
+            Builds = [this.CreateSingleBuild()],
+            CreationTime = DateTimeOffset.UtcNow
         };
-
-        entry.CreationTime = DateTimeOffset.UtcNow;
         return entry;
     }
 
@@ -92,10 +88,9 @@ internal sealed class BuildTemplateManager(
         {
             Name = name,
             PreviousName = string.Empty,
-            Builds = [this.CreateSingleBuild(name)]
+            Builds = [this.CreateSingleBuild(name)],
+            CreationTime = DateTimeOffset.UtcNow
         };
-
-        entry.CreationTime = DateTimeOffset.UtcNow;
         return entry;
     }
 
@@ -140,6 +135,49 @@ internal sealed class BuildTemplateManager(
         };
 
         return teamBuildEntry;
+    }
+
+    public bool CanTemplateApply(BuildTemplateValidationRequest request)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        bool IsProfessionUnlocked(Profession profession) => (request.UnlockedCharacterProfessions & (1 << profession.Id)) != 0;
+        bool IsSkillUnlocked(int skillId, uint[] unlockedSkills)
+        {
+            var realIndex = skillId / 32;
+            if (realIndex >= unlockedSkills.Length)
+            {
+                return false;
+            }
+
+            var shift = skillId % 32;
+            var flag = 1U << shift;
+            return (unlockedSkills[realIndex] & flag) != 0;
+        }
+
+        if (request.BuildEntry.Primary.Id != request.CurrentPrimary)
+        {
+            scopedLogger.LogError("Primary profession does not match current primary profession");
+            return false;
+        }
+
+        if (request.BuildEntry.Secondary != Profession.None &&
+            !IsProfessionUnlocked(request.BuildEntry.Secondary))
+        {
+            scopedLogger.LogError("Secondary profession is not unlocked");
+            return false;
+        }
+
+        foreach(var skill in request.BuildEntry.Skills)
+        {
+            if (skill != Skill.NoSkill &&
+                !IsSkillUnlocked(skill.Id, request.UnlockedSkills))
+            {
+                scopedLogger.LogError("Skill {skill.Name} is not unlocked", skill.Name);
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public void SaveBuild(IBuildEntry buildEntry)
@@ -256,7 +294,7 @@ internal sealed class BuildTemplateManager(
                 {
                     Name = randomName,
                     PreviousName = randomName,
-                    Builds = builds.Select(b => new SingleBuildEntry
+                    Builds = [.. builds.Select(b => new SingleBuildEntry
                     {
                         Name = randomName,
                         PreviousName = randomName,
@@ -264,7 +302,7 @@ internal sealed class BuildTemplateManager(
                         Secondary = b.Secondary,
                         Attributes = b.Attributes,
                         Skills = b.Skills
-                    }).ToList()
+                    })]
                 }),
             onFailure: exception => throw exception);
     }
@@ -529,6 +567,7 @@ internal sealed class BuildTemplateManager(
             build.Skills.Add(skill);
         }
 
+        this.logger.LogInformation("Successfully parsed build template");
         return build;
     }
 
@@ -543,9 +582,9 @@ internal sealed class BuildTemplateManager(
             PrimaryProfessionId = build.Primary.Id,
             SecondaryProfessionId = build.Secondary.Id,
             AttributeCount = build.Attributes.Where(attrEntry => attrEntry.Points > 0).Count(),
-            AttributesIds = build.Attributes.Where(attrEntry => attrEntry.Points > 0).OrderBy(attrEntry => attrEntry.Attribute!.Id).Select(attrEntry => attrEntry.Attribute!.Id).ToList(),
-            AttributePoints = build.Attributes.Where(attrEntry => attrEntry.Points > 0).OrderBy(attrEntry => attrEntry.Attribute!.Id).Select(attrEntry => attrEntry.Points).ToList(),
-            SkillIds = build.Skills.Select(skill => skill.Id!.Value).ToList(),
+            AttributesIds = [.. build.Attributes.Where(attrEntry => attrEntry.Points > 0).OrderBy(attrEntry => attrEntry.Attribute!.Id).Select(attrEntry => attrEntry.Attribute!.Id)],
+            AttributePoints = [.. build.Attributes.Where(attrEntry => attrEntry.Points > 0).OrderBy(attrEntry => attrEntry.Attribute!.Id).Select(attrEntry => attrEntry.Points)],
+            SkillIds = [.. build.Skills.Select(skill => skill.Id)],
             TailPresent = true
         };
 
@@ -555,12 +594,12 @@ internal sealed class BuildTemplateManager(
         var encodedBase64 = new List<int>();
         while (index < encodedBinary.Length)
         {
-            var subset = new string(encodedBinary.Skip(index).Take(6).ToArray());
+            var subset = new string([.. encodedBinary.Skip(index).Take(6)]);
             encodedBase64.Add(FromBitString(subset));
             index += 6;
         }
 
-        var template = new string(encodedBase64.Select(b => DecodingLookupTable[b]).ToArray());
+        var template = new string([.. encodedBase64.Select(b => DecodingLookupTable[b])]);
         return template;
     }
 
@@ -587,9 +626,9 @@ internal sealed class BuildTemplateManager(
 
         var buildMetadata = new BuildMetadata
         {
-            Base64Decoded = template.Select(c => DecodingLookupTable.IndexOf(c)).ToList(),
+            Base64Decoded = [.. template.Select(c => DecodingLookupTable.IndexOf(c))],
         };
-        buildMetadata.BinaryDecoded = buildMetadata.Base64Decoded.Select(ToBitString).ToList();
+        buildMetadata.BinaryDecoded = [.. buildMetadata.Base64Decoded.Select(ToBitString)];
 
         var stream = new DecodeCharStream([.. buildMetadata.BinaryDecoded]);
         buildMetadata.Header = stream.Read(4);

@@ -1,6 +1,7 @@
 ﻿using Daybreak.API.Services;
 using Daybreak.Shared.Models.Api;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using Net.Sdk.Web;
 using System.Core.Extensions;
 
@@ -61,5 +62,18 @@ public sealed class MainPlayerController(
     {
         var build = await this.mainPlayerService.GetCurrentBuild(cancellationToken);
         return build is not null ? Results.Ok(build) : Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
+    }
+
+    [GeneratePost("build")]
+    [EndpointName("SetMainPlayerBuild")]
+    [EndpointSummary("Set the current build")]
+    [EndpointDescription("Set the current build. Returns 200 is the operation has succeeded")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+    public async Task<IResult> SetMainPlayerBuild([FromQuery(Name = "code")] string? code, CancellationToken cancellationToken)
+    {
+        var result = await this.mainPlayerService.SetCurrentBuild(code ?? string.Empty, cancellationToken);
+        return result ? Results.Ok() : Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
     }
 }

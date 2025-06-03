@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Daybreak.Services.BuildTemplates.Models;
+namespace Daybreak.Shared.Services.BuildTemplates.Models;
 
 internal sealed class DecodeCharStream(string[] encodedValues)
 {

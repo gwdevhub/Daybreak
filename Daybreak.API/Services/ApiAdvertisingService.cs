@@ -24,26 +24,7 @@ public sealed class ApiAdvertisingService(
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        this.lifetime.ApplicationStarted.Register(() =>
-        {
-            var scopedLogger = this.logger.CreateScopedLogger();
-            var addresses = this.serverAddressesFeature?.Addresses.ToArray() ?? [];
-            var port = addresses
-                .Select(a => new Uri(a).Port)
-                .Distinct()
-                .FirstOrDefault();
-
-            scopedLogger.LogInformation("Found port {port}", port);
-            if (port is 0)
-            {
-                throw new InvalidOperationException("Unable to start advertising service. No port found");
-            }
-
-            var dnsEntry = ServiceName.Replace(ProcessIdPlaceholder, Environment.ProcessId.ToString());
-            scopedLogger.LogInformation("Advertising service {service}:{port}", dnsEntry, port);
-            this.dnsToken = this.mDnsService.RegisterDomain(dnsEntry, (ushort)port, ServiceSubType);
-        });
-
+        this.lifetime.ApplicationStarted.Register(this.RegisterDomain);
         return Task.CompletedTask;
     }
 
@@ -51,5 +32,25 @@ public sealed class ApiAdvertisingService(
     {
         this.dnsToken?.Dispose();
         return Task.CompletedTask;
+    }
+
+    private void RegisterDomain()
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        var addresses = this.serverAddressesFeature?.Addresses.ToArray() ?? [];
+        var port = addresses
+            .Select(a => new Uri(a).Port)
+            .Distinct()
+            .FirstOrDefault();
+
+        scopedLogger.LogInformation("Found port {port}", port);
+        if (port is 0)
+        {
+            throw new InvalidOperationException("Unable to start advertising service. No port found");
+        }
+
+        var dnsEntry = ServiceName.Replace(ProcessIdPlaceholder, Environment.ProcessId.ToString());
+        scopedLogger.LogInformation("Advertising service {service}:{port}", dnsEntry, port);
+        this.dnsToken = this.mDnsService.RegisterDomain(dnsEntry, (ushort)port, ServiceSubType);
     }
 }
