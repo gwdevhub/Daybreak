@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.IO.Compression;
 using System.Text;
 
+var cts = new CancellationTokenSource();
+
 static void RenderProgressBar(int currentStep, int totalSteps, int barSize)
 {
     Console.CursorLeft = 0; // Reset cursor position to the start of the line
@@ -34,8 +36,7 @@ if (File.Exists(updatePkg))
     Console.WriteLine("Unpacking files...");
 
     using var fileStream = new FileStream(updatePkg, FileMode.Open);
-    var sizeBuffer = new byte[4];
-    var copyBuffer = new byte[1024];
+    var copyBuffer = new Memory<byte>(new byte[4096]);
     while (fileStream.Position < fileStream.Length - 1)
     {
         /*
@@ -48,32 +49,34 @@ if (File.Exists(updatePkg))
          * Binary data
          */
 
-        await fileStream.ReadAsync(sizeBuffer, 0, 4);
-        var fileNameSize = BitConverter.ToInt32(sizeBuffer, 0);
-        var fileNameBuffer = new byte[fileNameSize];
-        await fileStream.ReadAsync(fileNameBuffer, 0, fileNameSize);
-        var fileName = Encoding.UTF8.GetString(fileNameBuffer);
+        var sizeBuffer = copyBuffer[..4];
+        await fileStream.ReadExactlyAsync(sizeBuffer);
+        var fileNameSize = BitConverter.ToInt32(sizeBuffer.Span);
+        var fileNameBuffer = copyBuffer[..fileNameSize];
+        await fileStream.ReadExactlyAsync(fileNameBuffer);
+        var fileName = Encoding.UTF8.GetString(fileNameBuffer.Span);
 
         RenderProgressBar((int)fileStream.Position, (int)fileStream.Length, 40);
 
-        await fileStream.ReadAsync(sizeBuffer, 0, 4);
-        var relativePathSize = BitConverter.ToInt32(sizeBuffer, 0);
-        var relativePathBuffer = new byte[relativePathSize];
-        await fileStream.ReadAsync(relativePathBuffer, 0, relativePathSize);
-        var relativePath = Encoding.UTF8.GetString(relativePathBuffer);
+        await fileStream.ReadExactlyAsync(sizeBuffer);
+        var relativePathSize = BitConverter.ToInt32(sizeBuffer.Span);
+        var relativePathBuffer = copyBuffer[..relativePathSize];
+        await fileStream.ReadExactlyAsync(relativePathBuffer);
+        var relativePath = Encoding.UTF8.GetString(relativePathBuffer.Span);
 
         RenderProgressBar((int)fileStream.Position, (int)fileStream.Length, 40);
 
-        await fileStream.ReadAsync(sizeBuffer, 0, 4);
-        var binarySize = BitConverter.ToInt32(sizeBuffer, 0);
+        await fileStream.ReadExactlyAsync(sizeBuffer);
+        var binarySize = BitConverter.ToInt32(sizeBuffer.Span);
         var fileInfo = new FileInfo(relativePath);
         fileInfo.Directory!.Create();
         using var destinationStream = new FileStream(relativePath, FileMode.Create);
         while(binarySize > 0)
         {
             var toRead = Math.Min(binarySize, copyBuffer.Length);
-            await fileStream.ReadAsync(copyBuffer, 0, toRead);
-            await destinationStream.WriteAsync(copyBuffer, 0, toRead);
+            var readBuffer = copyBuffer[..toRead];
+            await fileStream.ReadExactlyAsync(readBuffer);
+            await destinationStream.WriteAsync(readBuffer);
             binarySize -= toRead;
 
             RenderProgressBar((int)fileStream.Position, (int)fileStream.Length, 40);
