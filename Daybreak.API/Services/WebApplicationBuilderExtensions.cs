@@ -21,10 +21,12 @@ public static class WebApplicationBuilderExtensions
         builder.WithHookHostedService<UIHandlingService>();
         builder.WithHookHostedService<ChatHandlingService>();
         builder.WithHookHostedService<SkillbarContextService>();
+        builder.WithAddressService<UIContextService>();
         builder.WithAddressService<GameContextService>();
         builder.WithAddressService<InstanceContextService>();
         builder.WithAddressService<AgentContextService>();
         builder.WithAddressService<PlatformContextService>();
+        builder.WithAddressHostedService<PartyContextService>();
         return builder;
     }
 

@@ -1,5 +1,4 @@
-﻿using Daybreak.Shared.Models.Interop;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Runtime.InteropServices;
 
 namespace Daybreak.API.Interop.GuildWars;
@@ -41,10 +40,10 @@ public readonly unsafe struct WorldContext
     public readonly GuildWarsArray<uint> HenchmenAgentIds;
 
     [FieldOffset(0x0584)]
-    public readonly GuildwarsArray<HeroFlag> HeroFlags;
+    public readonly GuildWarsArray<HeroFlag> HeroFlags;
 
     [FieldOffset(0x0594)]
-    public readonly GuildwarsArray<HeroInfo> HeroInfos;
+    public readonly GuildWarsArray<HeroInfo> HeroInfos;
 
     [FieldOffset(0x05A4)]
     public readonly GuildWarsArray<nuint> CartographedAreas;

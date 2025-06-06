@@ -48,6 +48,17 @@ public sealed unsafe class InstanceContextService : IAddressHealthService
         return (InstanceInfoContext*)instanceInfoAddress;
     }
 
+    public InstanceType GetInstanceType()
+    {
+        var instanceInfo = this.GetInstanceInfoContext();
+        if (instanceInfo is null)
+        {
+            return InstanceType.Loading;
+        }
+
+        return instanceInfo->InstanceType;
+    }
+
     private nuint GetInstanceInfoAddress()
     {
         var scopedLogger = this.logger.CreateScopedLogger();

@@ -94,6 +94,22 @@ public unsafe sealed class GameContextService : IAddressHealthService
         return *(GuildWarsArray<CharInfoContext>**)availableCharsAddress;
     }
 
+    public bool IsMapLoaded()
+    {
+        var gameContext = this.GetGameContext();
+        if (gameContext is null)
+        {
+            return false;
+        }
+
+        if (gameContext->MapContext is null)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     private nuint GetGameContextAddress()
     {
         var scopedLogger = this.logger.CreateScopedLogger();

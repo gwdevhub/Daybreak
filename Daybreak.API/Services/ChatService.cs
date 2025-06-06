@@ -1,4 +1,5 @@
 ﻿using Daybreak.API.Interop;
+using Daybreak.API.Interop.GuildWars;
 using Daybreak.API.Models;
 using Daybreak.API.Services.Interop;
 using System.Core.Extensions;
@@ -7,10 +8,12 @@ using System.Extensions;
 namespace Daybreak.API.Services;
 
 public sealed class ChatService(
+    InstanceContextService instanceContextService,
     GameThreadService gameThreadService,
     UIHandlingService uIHandlingService)
 {
     private readonly SemaphoreSlim semaphoreSlim = new(1);
+    private readonly InstanceContextService instanceContextService = instanceContextService.ThrowIfNull();
     private readonly GameThreadService gameThreadService = gameThreadService.ThrowIfNull();
     private readonly UIHandlingService uIHandlingService = uIHandlingService.ThrowIfNull();
 
@@ -22,6 +25,11 @@ public sealed class ChatService(
         using var ctx = await this.semaphoreSlim.Acquire(cancellationToken);
         await this.gameThreadService.QueueOnGameThread(() =>
         {
+            if (this.instanceContextService.GetInstanceType() is InstanceType.Loading)
+            {
+                return;
+            }
+
             var encodedMessage = string.Create(
                 3 + message.Length,
                 message,

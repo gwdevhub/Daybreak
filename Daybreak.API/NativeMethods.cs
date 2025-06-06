@@ -13,6 +13,10 @@ internal unsafe static partial class NativeMethods
     public const int WM_CHAR = 0x0102;
     public const int VK_RIGHT = 0x27;
 
+    public const uint MEM_COMMIT = 0x1000;
+    public const uint MEM_RESERVE = 0x2000;
+    public const uint PAGE_EXECUTE_READWRITE = 0x40;
+
     [LibraryImport("kernel32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static partial bool AllocConsole();
@@ -33,4 +37,15 @@ internal unsafe static partial class NativeMethods
 
     [LibraryImport("user32.dll")]
     public static partial nint SendMessageW(nint hWnd, int Msg, nint wParam, nint lParam);
+
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    public static partial nint VirtualAlloc(
+        nint lpAddress, nuint dwSize,
+        uint flAllocationType, uint flProtect);
+
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool VirtualProtect(
+        void* lpAddress, nuint dwSize,
+        uint flNewProtect, out uint lpflOldProtect);
 }

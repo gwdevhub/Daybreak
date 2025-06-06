@@ -1,10 +1,10 @@
-﻿using Daybreak.API.Interop.GuildWars;
+﻿using Daybreak.API.Extensions;
+using Daybreak.API.Interop.GuildWars;
 using Daybreak.API.Models;
 using Daybreak.API.Services.Interop;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Api;
 using Daybreak.Shared.Models.Builds;
-using Daybreak.Shared.Models.Interop;
 using Daybreak.Shared.Services.BuildTemplates;
 using MemoryPack;
 using System.Buffers;
@@ -14,12 +14,13 @@ using System.Extensions;
 using System.Extensions.Core;
 using System.Runtime.CompilerServices;
 using ZLinq;
-using AttributeEntry = Daybreak.Shared.Models.Api.AttributeEntry;
+using InstanceType = Daybreak.API.Interop.GuildWars.InstanceType;
 
 namespace Daybreak.API.Services;
 
 public sealed class MainPlayerService : IDisposable
 {
+    private readonly InstanceContextService instanceContextService;
     private readonly IBuildTemplateManager buildTemplateManager;
     private readonly SkillbarContextService skillbarContextService;
     private readonly AgentContextService agentContextService;
@@ -38,6 +39,7 @@ public sealed class MainPlayerService : IDisposable
     private DateTimeOffset lastFrequencyUpdate = DateTimeOffset.MinValue;
 
     public MainPlayerService(
+        InstanceContextService instanceContextService,
         IBuildTemplateManager buildTemplateManager,
         SkillbarContextService skillbarContextService,
         GameContextService gameContextService,
@@ -45,6 +47,7 @@ public sealed class MainPlayerService : IDisposable
         GameThreadService gameThreadService,
         ILogger<MainPlayerService> logger)
     {
+        this.instanceContextService = instanceContextService.ThrowIfNull();
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
         this.skillbarContextService = skillbarContextService.ThrowIfNull();
         this.gameThreadService = gameThreadService.ThrowIfNull();
@@ -73,6 +76,12 @@ public sealed class MainPlayerService : IDisposable
         {
             unsafe
             {
+                if (this.instanceContextService.GetInstanceType() is InstanceType.Loading or InstanceType.Explorable)
+                {
+                    scopedLogger.LogError("Not in outpost");
+                    return default;
+                }
+
                 var gameContext = this.gameContextService.GetGameContext();
                 if (gameContext is null ||
                     gameContext->WorldContext is null)
@@ -163,6 +172,12 @@ public sealed class MainPlayerService : IDisposable
         {
             unsafe
             {
+                if (this.instanceContextService.GetInstanceType() is InstanceType.Loading)
+                {
+                    scopedLogger.LogError("Not loaded");
+                    return default;
+                }
+
                 var gameContext = this.gameContextService.GetGameContext();
                 if (gameContext is null)
                 {
@@ -192,7 +207,7 @@ public sealed class MainPlayerService : IDisposable
                 }
 
                 return new BuildEntry(
-                    agentAttributes.Attributes.AsValueEnumerable().Select(a => new AttributeEntry(a.Id, a.LevelBase, a.Level)).ToList(),
+                    agentAttributes.Attributes.GetAttributeEntryList(),
                     [skillbarContext.Skill0.Id, skillbarContext.Skill1.Id, skillbarContext.Skill2.Id, skillbarContext.Skill3.Id,
                     skillbarContext.Skill4.Id, skillbarContext.Skill5.Id, skillbarContext.Skill6.Id, skillbarContext.Skill7.Id]);
             }
@@ -206,6 +221,12 @@ public sealed class MainPlayerService : IDisposable
         {
             unsafe
             {
+                if (this.instanceContextService.GetInstanceType() is InstanceType.Loading)
+                {
+                    scopedLogger.LogError("Not loaded");
+                    return default;
+                }
+
                 var gameContext = this.gameContextService.GetGameContext();
                 if (gameContext is null || gameContext->WorldContext is null)
                 {
@@ -227,6 +248,12 @@ public sealed class MainPlayerService : IDisposable
         {
             unsafe
             {
+                if (this.instanceContextService.GetInstanceType() is InstanceType.Loading)
+                {
+                    scopedLogger.LogError("Not loaded");
+                    return default;
+                }
+
                 var gameContext = this.gameContextService.GetGameContext();
                 if (gameContext is null || gameContext->CharContext is null ||
                     gameContext->WorldContext is null)
@@ -311,6 +338,12 @@ public sealed class MainPlayerService : IDisposable
             now - this.lastUpdateTime < minFreq &&
             this.pendingRequests.IsEmpty)
         {
+            return;
+        }
+
+        if (this.instanceContextService.GetInstanceType() is InstanceType.Loading)
+        {
+            scopedLogger.LogError("Not loaded");
             return;
         }
 

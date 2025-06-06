@@ -22,4 +22,16 @@ public sealed class PartyController(PartyService partyService)
         var partyLoadout = await this.partyService.GetPartyLoadout(cancellationToken);
         return partyLoadout is not null ? Results.Ok(partyLoadout) : Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
     }
+
+    [GeneratePost]
+    [EndpointName("SetPartyLoadout")]
+    [EndpointSummary("Set the current party loadout")]
+    [EndpointDescription("Set the current party loadout")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+    public async Task<IResult> SetPartyLoadout([FromBody] PartyLoadout partyLoadout, CancellationToken cancellationToken)
+    {
+        var result = await this.partyService.SetPartyLoadout(partyLoadout, cancellationToken);
+        return result ? Results.Ok() : Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
+    }
 }

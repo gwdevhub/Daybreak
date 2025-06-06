@@ -12,6 +12,7 @@ using System.Extensions;
 [assembly: GenerateFixedArray<byte>(Size = 56)]
 [assembly: GenerateFixedArray<uint>(Size = 17)]
 [assembly: GenerateFixedArray<uint>(Size = 12)]
+[assembly: GenerateFixedArray<uint>(Size = 13)]
 [assembly: GenerateFixedArray<uint>(Size = 8)]
 #pragma warning restore CS0436 // Type conflicts with imported type
 

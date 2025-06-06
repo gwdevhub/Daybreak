@@ -8,6 +8,7 @@ using ZLinq;
 namespace Daybreak.API.Services;
 
 public sealed class CharacterSelectService(
+    InstanceContextService instanceContextService,
     PlatformContextService platformContextService,
     UIHandlingService uIHandlingService,
     GameThreadService gameThreadService,
@@ -21,6 +22,7 @@ public sealed class CharacterSelectService(
         public readonly uint CharacterSelect = characterSelect;
     }
 
+    private readonly InstanceContextService instanceContextService = instanceContextService.ThrowIfNull();
     private readonly PlatformContextService platformContextService = platformContextService.ThrowIfNull();
     private readonly UIHandlingService uIHandlingService = uIHandlingService.ThrowIfNull();
     private readonly GameThreadService gameThreadService = gameThreadService.ThrowIfNull();
@@ -75,6 +77,12 @@ public sealed class CharacterSelectService(
     public async Task<bool> ChangeCharacterByName(string characterName, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
+        if (await this.ValidateState(cancellationToken) is false)
+        {
+            scopedLogger.LogError("Cannot change character while in loading state");
+            return false;
+        }
+
         await this.TriggerLogOut(cancellationToken);
 
         var indexResult = await this.WaitForLoginScreenAndGetCurrentAndDesiredIndex(characterName, cancellationToken);
@@ -100,6 +108,12 @@ public sealed class CharacterSelectService(
     public async Task<bool> ChangeCharacterByUuid(string uuid, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
+        if (await this.ValidateState(cancellationToken) is false)
+        {
+            scopedLogger.LogError("Cannot change character while in loading state");
+            return false;
+        }
+
         var desiredCharName = await this.GetCharNameByUuid(uuid, cancellationToken);
         if (desiredCharName is null)
         {
@@ -127,6 +141,14 @@ public sealed class CharacterSelectService(
         }
 
         return true;
+    }
+
+    private async Task<bool> ValidateState(CancellationToken cancellationToken)
+    {
+        return await this.gameThreadService.QueueOnGameThread(() =>
+        {
+            return this.instanceContextService.GetInstanceType() is not API.Interop.GuildWars.InstanceType.Loading;
+        }, cancellationToken);
     }
 
     private async Task<bool> NavigateToCharAndPlay(uint currentIndex, uint desiredIndex, CancellationToken cancellationToken)
