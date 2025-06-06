@@ -17,6 +17,11 @@ public sealed class PartyService(
     private readonly GameContextService gameContextService = gameContextService;
     private readonly ILogger<PartyService> logger = logger;
 
+    public Task SetPartyLoadout(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
     public Task<PartyLoadout?> GetPartyLoadout(CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();

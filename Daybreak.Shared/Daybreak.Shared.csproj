@@ -16,7 +16,6 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.5" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3240.44" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Slim" Version="1.9.2" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Reflection.Metadata" Version="9.0.5" />
