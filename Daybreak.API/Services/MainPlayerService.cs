@@ -83,8 +83,8 @@ public sealed class MainPlayerService : IDisposable
                 }
 
                 var gameContext = this.gameContextService.GetGameContext();
-                if (gameContext is null ||
-                    gameContext->WorldContext is null)
+                if (gameContext.IsNull ||
+                    gameContext.Pointer->WorldContext is null)
                 {
                     scopedLogger.LogError("Failed to get game context");
                     return false;
@@ -107,13 +107,13 @@ public sealed class MainPlayerService : IDisposable
                 }
 
                 var livingAgent = (AgentLivingContext*)playerAgent;
-                if (livingAgent->Level != gameContext->WorldContext->Level)
+                if (livingAgent->Level != gameContext.Pointer->WorldContext->Level)
                 {
-                    scopedLogger.LogError("Player agent not found. Player level mismatch: {level} != {gameLevel}", livingAgent->Level, gameContext->WorldContext->Level);
+                    scopedLogger.LogError("Player agent not found. Player level mismatch: {level} != {gameLevel}", livingAgent->Level, gameContext.Pointer->WorldContext->Level);
                     return false;
                 }
 
-                var agentProfession = gameContext->WorldContext->Professions.AsValueEnumerable().FirstOrDefault(p => p.AgentId == playerAgentId);
+                var agentProfession = gameContext.Pointer->WorldContext->Professions.AsValueEnumerable().FirstOrDefault(p => p.AgentId == playerAgentId);
                 if (agentProfession.AgentId != playerAgentId)
                 {
                     scopedLogger.LogError("Failed to find agent profession for player agent id {agentId}", playerAgentId);
@@ -121,10 +121,12 @@ public sealed class MainPlayerService : IDisposable
                 }
 
                 var validationRequest = new BuildTemplateValidationRequest(
-                    singleBuild,
+                    (uint)singleBuild.Primary.Id,
+                    (uint)singleBuild.Secondary.Id,
+                    singleBuild.Skills.AsValueEnumerable().Select(s => (uint)s.Id).ToArray(),
                     livingAgent->Primary,
                     agentProfession.UnlockedProfessionsFlags,
-                    [.. gameContext->WorldContext->UnlockedCharacterSkills]);
+                    [.. gameContext.Pointer->WorldContext->UnlockedCharacterSkills]);
 
                 if (!this.buildTemplateManager.CanTemplateApply(validationRequest))
                 {
@@ -179,7 +181,7 @@ public sealed class MainPlayerService : IDisposable
                 }
 
                 var gameContext = this.gameContextService.GetGameContext();
-                if (gameContext is null)
+                if (gameContext.IsNull)
                 {
                     scopedLogger.LogError("Failed to get game context");
                     return default;
@@ -192,14 +194,14 @@ public sealed class MainPlayerService : IDisposable
                     return default;
                 }
 
-                var skillbarContext = gameContext->WorldContext->Skillbars.AsValueEnumerable().FirstOrDefault(s => s.AgentId == playerAgentId);
+                var skillbarContext = gameContext.Pointer->WorldContext->Skillbars.AsValueEnumerable().FirstOrDefault(s => s.AgentId == playerAgentId);
                 if (skillbarContext.AgentId != playerAgentId)
                 {
                     scopedLogger.LogError("Failed to find skillbar context for player agent id {agentId}", playerAgentId);
                     return default;
                 }
 
-                var agentAttributes = gameContext->WorldContext->Attributes.AsValueEnumerable().FirstOrDefault(a => a.AgentId == playerAgentId);
+                var agentAttributes = gameContext.Pointer->WorldContext->Attributes.AsValueEnumerable().FirstOrDefault(a => a.AgentId == playerAgentId);
                 if (agentAttributes.AgentId != playerAgentId)
                 {
                     scopedLogger.LogError("Failed to find agent attributes for player agent id {agentId}", playerAgentId);
@@ -228,15 +230,15 @@ public sealed class MainPlayerService : IDisposable
                 }
 
                 var gameContext = this.gameContextService.GetGameContext();
-                if (gameContext is null || gameContext->WorldContext is null)
+                if (gameContext.IsNull || gameContext.Pointer->WorldContext is null)
                 {
                     scopedLogger.LogError("Game context is not initialized");
                     return default;
                 }
 
                 return new QuestLogInformation(
-                    gameContext->WorldContext->ActiveQuestId,
-                    gameContext->WorldContext->QuestLog.AsValueEnumerable().Select(q => new QuestInformation(q.QuestId, q.MapFrom, q.MapTo)).ToList());
+                    gameContext.Pointer->WorldContext->ActiveQuestId,
+                    gameContext.Pointer->WorldContext->QuestLog.AsValueEnumerable().Select(q => new QuestInformation(q.QuestId, q.MapFrom, q.MapTo)).ToList());
             }
         }, cancellationToken);
     }
@@ -255,29 +257,29 @@ public sealed class MainPlayerService : IDisposable
                 }
 
                 var gameContext = this.gameContextService.GetGameContext();
-                if (gameContext is null || gameContext->CharContext is null ||
-                    gameContext->WorldContext is null)
+                if (gameContext.IsNull || gameContext.Pointer->CharContext is null ||
+                    gameContext.Pointer->WorldContext is null)
                 {
                     scopedLogger.LogError("Game context is not initialized");
                     return default;
                 }
 
-                var playerNameSpan = gameContext->CharContext->PlayerName.AsSpan();
+                var playerNameSpan = gameContext.Pointer->CharContext->PlayerName.AsSpan();
                 var playerName = new string(playerNameSpan[..playerNameSpan.IndexOf('\0')]);
-                var emailSpan = gameContext->CharContext->PlayerEmail.AsSpan();
+                var emailSpan = gameContext.Pointer->CharContext->PlayerEmail.AsSpan();
                 var email = new string(emailSpan[..emailSpan.IndexOf('\0')]);
-                var accountName = new string(gameContext->WorldContext->AccountInfo->AccountName);
+                var accountName = new string(gameContext.Pointer->WorldContext->AccountInfo->AccountName);
                 return new MainPlayerInformation(
-                    gameContext->CharContext->PlayerUuid.ToString(),
+                    gameContext.Pointer->CharContext->PlayerUuid.ToString(),
                     email,
                     playerName,
                     accountName,
-                    gameContext->WorldContext->AccountInfo->Wins,
-                    gameContext->WorldContext->AccountInfo->Losses,
-                    gameContext->WorldContext->AccountInfo->Rating,
-                    gameContext->WorldContext->AccountInfo->QualifierPoints,
-                    gameContext->WorldContext->AccountInfo->Rank,
-                    gameContext->WorldContext->AccountInfo->TournamentRewardPoints);
+                    gameContext.Pointer->WorldContext->AccountInfo->Wins,
+                    gameContext.Pointer->WorldContext->AccountInfo->Losses,
+                    gameContext.Pointer->WorldContext->AccountInfo->Rating,
+                    gameContext.Pointer->WorldContext->AccountInfo->QualifierPoints,
+                    gameContext.Pointer->WorldContext->AccountInfo->Rank,
+                    gameContext.Pointer->WorldContext->AccountInfo->TournamentRewardPoints);
             }
         }, cancellationToken);
     }
@@ -350,19 +352,19 @@ public sealed class MainPlayerService : IDisposable
         var gameContext = this.gameContextService.GetGameContext();
         var agentArray = this.agentContextService.GetAgentArray();
         var playerAgentId = this.agentContextService.GetPlayerAgentId();
-        if (gameContext is null ||
-            gameContext->WorldContext is null ||
-            gameContext->CharContext is null ||
-            gameContext->WorldContext->MapAgents.Buffer is null ||
-            agentArray is null ||
-            agentArray->Buffer is null ||
+        if (gameContext.IsNull ||
+            gameContext.Pointer->WorldContext is null ||
+            gameContext.Pointer->CharContext is null ||
+            gameContext.Pointer->WorldContext->MapAgents.Buffer is null ||
+            agentArray.IsNull ||
+            agentArray.Pointer->Buffer is null ||
             playerAgentId is 0x0)
         {
             scopedLogger.LogDebug("Game data is not yet initialized");
             return;
         }
 
-        var playerMapAgent = gameContext->WorldContext->MapAgents.AsValueEnumerable().Skip((int)playerAgentId).FirstOrDefault();
+        var playerMapAgent = gameContext.Pointer->WorldContext->MapAgents.AsValueEnumerable().Skip((int)playerAgentId).FirstOrDefault();
         var playerAgent = this.GetAgentContext(playerAgentId);
         if (playerAgent is null ||
             playerAgent->Type is not AgentType.Living ||
@@ -373,28 +375,28 @@ public sealed class MainPlayerService : IDisposable
         }
 
         var livingAgent = (AgentLivingContext*)playerAgent;
-        if (livingAgent->Level != gameContext->WorldContext->Level)
+        if (livingAgent->Level != gameContext.Pointer->WorldContext->Level)
         {
-            scopedLogger.LogError("Player agent not found. Player level mismatch: {level} != {gameLevel}", livingAgent->Level, gameContext->WorldContext->Level);
+            scopedLogger.LogError("Player agent not found. Player level mismatch: {level} != {gameLevel}", livingAgent->Level, gameContext.Pointer->WorldContext->Level);
             return;
         }
 
         this.mainPlayerState = new MainPlayerState(
-            gameContext->WorldContext->Level,
-            gameContext->WorldContext->Experience,
+            gameContext.Pointer->WorldContext->Level,
+            gameContext.Pointer->WorldContext->Experience,
 
-            gameContext->WorldContext->CurrentLuxon,
-            gameContext->WorldContext->CurrentKurzick,
-            gameContext->WorldContext->CurrentImperial,
-            gameContext->WorldContext->CurrentBalthazar,
-            gameContext->WorldContext->MaxLuxon,
-            gameContext->WorldContext->MaxKurzick,
-            gameContext->WorldContext->MaxImperial,
-            gameContext->WorldContext->MaxBalthazar,
-            gameContext->WorldContext->TotalLuxon,
-            gameContext->WorldContext->TotalKurzick,
-            gameContext->WorldContext->TotalImperial,
-            gameContext->WorldContext->TotalBalthazar,
+            gameContext.Pointer->WorldContext->CurrentLuxon,
+            gameContext.Pointer->WorldContext->CurrentKurzick,
+            gameContext.Pointer->WorldContext->CurrentImperial,
+            gameContext.Pointer->WorldContext->CurrentBalthazar,
+            gameContext.Pointer->WorldContext->MaxLuxon,
+            gameContext.Pointer->WorldContext->MaxKurzick,
+            gameContext.Pointer->WorldContext->MaxImperial,
+            gameContext.Pointer->WorldContext->MaxBalthazar,
+            gameContext.Pointer->WorldContext->TotalLuxon,
+            gameContext.Pointer->WorldContext->TotalKurzick,
+            gameContext.Pointer->WorldContext->TotalImperial,
+            gameContext.Pointer->WorldContext->TotalBalthazar,
 
             // Energy and health are percentages of Max
             livingAgent->Health * livingAgent->MaxHealth,
@@ -446,12 +448,12 @@ public sealed class MainPlayerService : IDisposable
     private unsafe AgentContext* GetAgentContext(uint agentId)
     {
         var agentArray = this.agentContextService.GetAgentArray();
-        if (agentArray is null || agentArray->Buffer is null ||
-            agentArray->Size <= agentId)
+        if (agentArray.IsNull || agentArray.Pointer->Buffer is null ||
+            agentArray.Pointer->Size <= agentId)
         {
             return null;
         }
 
-        return agentArray->Buffer[agentId].Pointer;
+        return agentArray.Pointer->Buffer[agentId].Pointer;
     }
 }

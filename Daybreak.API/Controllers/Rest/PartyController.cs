@@ -6,6 +6,7 @@ using Net.Sdk.Web;
 namespace Daybreak.API.Controllers.Rest;
 
 [GenerateController("api/v1/rest/party")]
+[Tags("Party")]
 public sealed class PartyController(PartyService partyService)
 {
     private readonly PartyService partyService = partyService;

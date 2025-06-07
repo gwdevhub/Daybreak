@@ -24,6 +24,9 @@ public readonly struct Frame
     [FieldOffset(0x00b4)]
     public readonly uint FrameId;
 
+    [FieldOffset(0x0120)]
+    public readonly FrameRelation Relation;
+
     [FieldOffset(0x0184)]
     public readonly uint Field91;
 
@@ -31,4 +34,14 @@ public readonly struct Frame
     public bool IsHidden => (this.Field91 & 0x200) != 0;
     public bool IsVisible => !this.IsHidden;
     public bool IsDIsabled => (this.Field91 & 0x10) != 0;
+}
+
+[StructLayout(LayoutKind.Explicit, Pack = 1, Size = 0x1C)]
+public readonly unsafe struct FrameRelation
+{
+    [FieldOffset(0x0000)]
+    public readonly FrameRelation* Parent;
+
+    [FieldOffset(0x0010)]
+    public readonly uint FrameHashId;
 }

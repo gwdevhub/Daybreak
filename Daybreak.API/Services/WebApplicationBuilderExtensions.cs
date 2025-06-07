@@ -18,15 +18,14 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddSingleton<CharacterSelectService>();
         builder.Services.AddSingleton<PartyService>();
         builder.WithHookHostedService<GameThreadService>();
-        builder.WithHookHostedService<UIHandlingService>();
         builder.WithHookHostedService<ChatHandlingService>();
         builder.WithHookHostedService<SkillbarContextService>();
-        builder.WithAddressService<UIContextService>();
         builder.WithAddressService<GameContextService>();
         builder.WithAddressService<InstanceContextService>();
         builder.WithAddressService<AgentContextService>();
         builder.WithAddressService<PlatformContextService>();
         builder.WithAddressHostedService<PartyContextService>();
+        builder.WithHookAddressHostedService<UIContextService>();
         return builder;
     }
 

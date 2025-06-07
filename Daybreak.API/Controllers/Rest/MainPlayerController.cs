@@ -1,14 +1,13 @@
 ﻿using Daybreak.API.Services;
 using Daybreak.Shared.Models.Api;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
 using Net.Sdk.Web;
 using System.Core.Extensions;
 
 namespace Daybreak.API.Controllers.Rest;
 
 [GenerateController("api/v1/rest/main-player")]
-[Tags("MainPlayer")]
+[Tags("Main Player")]
 public sealed class MainPlayerController(
     MainPlayerService mainPlayerService,
     ILogger<MainPlayerController> logger)

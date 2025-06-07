@@ -140,7 +140,7 @@ public sealed class BuildTemplateManager(
     public bool CanTemplateApply(BuildTemplateValidationRequest request)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        bool IsProfessionUnlocked(Profession profession) => (request.UnlockedCharacterProfessions & (1 << profession.Id)) != 0;
+        bool IsProfessionUnlocked(int professionId) => (request.UnlockedCharacterProfessions & (1 << professionId)) != 0;
         bool IsSkillUnlocked(int skillId, uint[] unlockedSkills)
         {
             var realIndex = skillId / 32;
@@ -154,25 +154,25 @@ public sealed class BuildTemplateManager(
             return (unlockedSkills[realIndex] & flag) != 0;
         }
 
-        if (request.BuildEntry.Primary.Id != request.CurrentPrimary)
+        if (request.BuildPrimary != request.CurrentPrimary)
         {
             scopedLogger.LogError("Primary profession does not match current primary profession");
             return false;
         }
 
-        if (request.BuildEntry.Secondary != Profession.None &&
-            !IsProfessionUnlocked(request.BuildEntry.Secondary))
+        if (request.BuildSecondary is not 0 &&
+            !IsProfessionUnlocked((int)request.BuildSecondary))
         {
             scopedLogger.LogError("Secondary profession is not unlocked");
             return false;
         }
 
-        foreach(var skill in request.BuildEntry.Skills)
+        foreach(var skill in request.BuildSkills)
         {
-            if (skill != Skill.NoSkill &&
-                !IsSkillUnlocked(skill.Id, request.UnlockedSkills))
+            if (skill is not 0 &&
+                !IsSkillUnlocked((int)skill, request.UnlockedSkills))
             {
-                scopedLogger.LogError("Skill {skill.Name} is not unlocked", skill.Name);
+                scopedLogger.LogError("Skill {skillId} is not unlocked", skill);
                 return false;
             }
         }

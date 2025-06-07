@@ -18,7 +18,7 @@ public static class WebApplicationExtensions
             name: nameof(MainPlayerStateRoute),
             summary: $"{nameof(MainPlayerState)} WebSocket",
             description: $"Subscribe to {nameof(MainPlayerState)} websocket. On each game thread proc, the server will send a serialized {nameof(MainPlayerState)} payload",
-            tag: "MainPlayer");
+            tag: "Main Player");
 
         return app;
     }

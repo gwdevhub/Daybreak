@@ -1,4 +1,5 @@
 ﻿using Daybreak.API.Models;
+using PeNet.Header.Net.MetaDataTables;
 using System.ComponentModel;
 using System.Core.Extensions;
 using System.Extensions;
@@ -88,51 +89,35 @@ public sealed class PartyContextService(
 
     public unsafe bool AddHero(uint heroId)
     {
-        Span<uint> wparamSpan = stackalloc uint[4];
-        wparamSpan.Clear();
-        wparamSpan[2] = 0x6;
-        wparamSpan[1] = 0x1;
+        var wparam = stackalloc uint[4];
+        wparam[2] = 0x6;
+        wparam[1] = 0x1;
 
-        Span<uint> ctxSpan = stackalloc uint[13];
-        ctxSpan.Clear();
-        ctxSpan[0xb] = 1;
-        ctxSpan[9] = heroId;
-        fixed (uint* ctx = ctxSpan)
-        fixed (uint* wparam = wparamSpan)
-        {
-            return this.CallSearchButtonCallback(ctx, 2, wparam);
-        }
+        var ctx = stackalloc uint[13];
+        ctx[0xb] = 1;
+        ctx[9] = heroId;
+        return this.CallSearchButtonCallback(ctx, 2, wparam);
     }
 
     public unsafe bool KickHero(uint heroId)
     {
-        Span<uint> wparamSpan = stackalloc uint[4];
-        wparamSpan.Clear();
-        wparamSpan[2] = 0x6;
-        wparamSpan[1] = 0x6;
+        var wparam = stackalloc uint[4];
+        wparam[2] = 0x6;
+        wparam[1] = 0x6;
 
-        Span<uint> ctxSpan = stackalloc uint[13];
-        ctxSpan.Clear();
-        ctxSpan[0xb] = 1;
-        ctxSpan[9] = heroId;
-        fixed (uint* ctx = ctxSpan)
-        fixed (uint* wparam = wparamSpan)
-        {
-            return this.CallSearchButtonCallback(ctx, 0, wparam);
-        }
+        var ctx = stackalloc uint[13];
+        ctx[0xb] = 1;
+        ctx[9] = heroId;
+        return this.CallSearchButtonCallback(ctx, 0, wparam);
     }
 
     public bool KickAllHeroes() => this.KickHero(0x26);
 
     public unsafe bool LeaveParty()
     {
-        Span<uint> ctxSpan = stackalloc uint[14];
-        ctxSpan.Clear(); // Ensure all values are zeroed
-        ctxSpan[0xd] = 1;
-        fixed (uint* ctx = ctxSpan)
-        {
-            return this.CallWindowButtonCallback(ctx, 0, (uint*)0);
-        }
+        var ctx = stackalloc uint[14];
+        ctx[0xd] = 1;
+        return this.CallWindowButtonCallback(ctx, 0, (uint*)0);
     }
 
     private async ValueTask InitializeCallbacks(CancellationToken cancellationToken)
@@ -193,8 +178,8 @@ public sealed class PartyContextService(
             return null;
         }
 
-        Span<byte> code =
-        [
+        var code = stackalloc byte[13]
+        {
             0x58,                      // pop eax               (ret)
             0x59,                      // pop ecx               (ctx)
             0x5A,                      // pop edx               (edxVal)
@@ -203,21 +188,18 @@ public sealed class PartyContextService(
             0x50,                      // push eax              (ret)
             0xB8,0,0,0,0,              // mov  eax, TARGET
             0xFF,0xE0                  // jmp  eax
-        ];                             // 13 bytes total
+        };                             // 13 bytes total
 
         const int TARGET_OFFSET = 7;
         Unsafe.WriteUnaligned(ref code[TARGET_OFFSET], (uint)target);
 
-        nint mem = NativeMethods.VirtualAlloc(0, (nuint)code.Length, NativeMethods.MEM_COMMIT | NativeMethods.MEM_RESERVE, NativeMethods.PAGE_EXECUTE_READWRITE);
-        if (mem == 0)
+        var mem = NativeMethods.VirtualAlloc(0, 13, NativeMethods.MEM_COMMIT | NativeMethods.MEM_RESERVE, NativeMethods.PAGE_EXECUTE_READWRITE);
+        if (mem is 0)
         {
             throw new Win32Exception(Marshal.GetLastWin32Error(), "VirtualAlloc");
         }
 
-        fixed (byte* src = code)
-        {
-            Buffer.MemoryCopy(src, (void*)mem, code.Length, code.Length);
-        }
+        Buffer.MemoryCopy(code, (void*)mem, 13, 13);
 
         return (delegate* unmanaged[Stdcall]<void*, uint, uint*, void>)mem;
     }

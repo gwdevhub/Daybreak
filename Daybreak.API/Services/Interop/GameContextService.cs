@@ -58,7 +58,7 @@ public unsafe sealed class GameContextService : IAddressHealthService
         ];
     }
 
-    public GameContext* GetGameContext()
+    public WrappedPointer<GameContext> GetGameContext()
     {
         var gameContextAddress = this.GetGameContextAddress();
         if (gameContextAddress is 0x0)
@@ -70,7 +70,7 @@ public unsafe sealed class GameContextService : IAddressHealthService
         return (GameContext*)gameContextAddress;
     }
 
-    public PreGameContext* GetPreGameContext()
+    public WrappedPointer<PreGameContext> GetPreGameContext()
     {
         var preGameContextAddress = this.preGameContextAddress.GetAddress();
         if (preGameContextAddress is null or 0x0)
@@ -82,7 +82,7 @@ public unsafe sealed class GameContextService : IAddressHealthService
         return *(PreGameContext**)preGameContextAddress;
     }
 
-    public GuildWarsArray<CharInfoContext>* GetAvailableChars()
+    public WrappedPointer<GuildWarsArray<CharInfoContext>> GetAvailableChars()
     {
         var availableCharsAddress = this.availableCharsAddress.GetAddress();
         if (availableCharsAddress is null or 0x0)
@@ -97,12 +97,12 @@ public unsafe sealed class GameContextService : IAddressHealthService
     public bool IsMapLoaded()
     {
         var gameContext = this.GetGameContext();
-        if (gameContext is null)
+        if (gameContext.IsNull)
         {
             return false;
         }
 
-        if (gameContext->MapContext is null)
+        if (gameContext.Pointer->MapContext is null)
         {
             return false;
         }

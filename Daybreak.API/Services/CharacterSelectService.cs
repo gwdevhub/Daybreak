@@ -10,7 +10,7 @@ namespace Daybreak.API.Services;
 public sealed class CharacterSelectService(
     InstanceContextService instanceContextService,
     PlatformContextService platformContextService,
-    UIHandlingService uIHandlingService,
+    UIContextService uiContextService,
     GameThreadService gameThreadService,
     GameContextService gameContextService,
     ILogger<CharacterSelectService> logger)
@@ -24,7 +24,7 @@ public sealed class CharacterSelectService(
 
     private readonly InstanceContextService instanceContextService = instanceContextService.ThrowIfNull();
     private readonly PlatformContextService platformContextService = platformContextService.ThrowIfNull();
-    private readonly UIHandlingService uIHandlingService = uIHandlingService.ThrowIfNull();
+    private readonly UIContextService uiContextService = uiContextService.ThrowIfNull();
     private readonly GameThreadService gameThreadService = gameThreadService.ThrowIfNull();
     private readonly GameContextService gameContextService = gameContextService.ThrowIfNull();
     private readonly ILogger<CharacterSelectService> logger = logger.ThrowIfNull();
@@ -37,23 +37,23 @@ public sealed class CharacterSelectService(
             unsafe
             {
                 var gameContext = this.gameContextService.GetGameContext();
-                if (gameContext is null ||
-                    gameContext->WorldContext is null)
+                if (gameContext.IsNull ||
+                    gameContext.Pointer->WorldContext is null)
                 {
                     scopedLogger.LogError("Game context is not initialized");
                     return default;
                 }
 
                 var availableCharsContext = this.gameContextService.GetAvailableChars();
-                if (availableCharsContext is null)
+                if (availableCharsContext.IsNull)
                 {
                     scopedLogger.LogError("Available characters context is not initialized");
                     return default;
                 }
 
-                var currentUuid = gameContext->CharContext->PlayerUuid.ToString();
-                var availableChars = new List<CharacterSelectEntry>((int)availableCharsContext->Size);
-                foreach(var charContext in *availableCharsContext)
+                var currentUuid = gameContext.Pointer->CharContext->PlayerUuid.ToString();
+                var availableChars = new List<CharacterSelectEntry>((int)availableCharsContext.Pointer->Size);
+                foreach(var charContext in *availableCharsContext.Pointer)
                 {
                     var nameSpan = charContext.Name.AsSpan();
                     var name = new string(nameSpan[..nameSpan.IndexOf('\0')]);
@@ -162,7 +162,7 @@ public sealed class CharacterSelectService(
                 unsafe
                 {
                     var preGameContext = this.gameContextService.GetPreGameContext();
-                    if (preGameContext is null)
+                    if (preGameContext.IsNull)
                     {
                         scopedLogger.LogError("Pre-game context is not initialized");
                         return false;
@@ -175,12 +175,12 @@ public sealed class CharacterSelectService(
                         return false;
                     }
 
-                    if (preGameContext->Index1 == currentIndex)
+                    if (preGameContext.Pointer->Index1 == currentIndex)
                     {
                         return false; //Not moved yet
                     }
 
-                    if (preGameContext->Index1 == desiredIndex)
+                    if (preGameContext.Pointer->Index1 == desiredIndex)
                     {
                         // We're on the desired character. Trigger play
                         NativeMethods.SendMessageW((nint)hwnd.Value, NativeMethods.WM_KEYDOWN, 0x50, 0x00190001);
@@ -189,7 +189,7 @@ public sealed class CharacterSelectService(
                         return true;
                     }
 
-                    currentIndex = preGameContext->Index1;
+                    currentIndex = preGameContext.Pointer->Index1;
                     NativeMethods.SendMessageW((nint)hwnd.Value, NativeMethods.WM_KEYDOWN, NativeMethods.VK_RIGHT, 0x014D0001);
                     NativeMethods.SendMessageW((nint)hwnd.Value, NativeMethods.WM_KEYUP, NativeMethods.VK_RIGHT, 0x014D0001);
                     return false;
@@ -213,20 +213,20 @@ public sealed class CharacterSelectService(
             unsafe
             {
                 var gameContext = this.gameContextService.GetGameContext();
-                if (gameContext is null)
+                if (gameContext.IsNull)
                 {
                     scopedLogger.LogError("Game context is not initialized");
                     return default;
                 }
 
                 var availableCharsContext = this.gameContextService.GetAvailableChars();
-                if (availableCharsContext is null)
+                if (availableCharsContext.IsNull)
                 {
                     scopedLogger.LogError("Available characters context is not initialized");
                     return default;
                 }
 
-                foreach (var charContext in *availableCharsContext)
+                foreach (var charContext in *availableCharsContext.Pointer)
                 {
                     if (charContext.Uuid.ToString() != uuid)
                     {
@@ -250,7 +250,7 @@ public sealed class CharacterSelectService(
             var logoutMessage = new LogOutMessage(0, 0);
             unsafe
             {
-                this.uIHandlingService.SendMessage(Models.UIMessage.Logout, (uint)&logoutMessage, 0);
+                this.uiContextService.SendMessage(Models.UIMessage.Logout, (uint)&logoutMessage, 0);
             }
         }, cancellationToken);
     }
@@ -267,22 +267,22 @@ public sealed class CharacterSelectService(
                 unsafe
                 {
                     var preGameContext = this.gameContextService.GetPreGameContext();
-                    if (preGameContext is null)
+                    if (preGameContext.IsNull)
                     {
                         return false;
                     }
 
                     var uiState = 10U;
-                    this.uIHandlingService.SendMessage(Models.UIMessage.CheckUIState, 0, (uint)&uiState);
+                    this.uiContextService.SendMessage(Models.UIMessage.CheckUIState, 0, (uint)&uiState);
                     var loginScreen = uiState == 2;
                     if (!loginScreen)
                     {
                         return false;
                     }
 
-                    for (var i = 0U; i < preGameContext->LoginCharacters.Size; i++)
+                    for (var i = 0U; i < preGameContext.Pointer->LoginCharacters.Size; i++)
                     {
-                        var loginCharacter = preGameContext->LoginCharacters.Buffer[i];
+                        var loginCharacter = preGameContext.Pointer->LoginCharacters.Buffer[i];
                         var charNameSpan = loginCharacter.CharacterName.AsSpan();
                         var charName = new string(charNameSpan[..charNameSpan.IndexOf('\0')]);
                         if (charName == desiredCharName)

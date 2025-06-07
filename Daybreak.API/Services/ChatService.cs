@@ -10,12 +10,12 @@ namespace Daybreak.API.Services;
 public sealed class ChatService(
     InstanceContextService instanceContextService,
     GameThreadService gameThreadService,
-    UIHandlingService uIHandlingService)
+    UIContextService uiContextService)
 {
     private readonly SemaphoreSlim semaphoreSlim = new(1);
     private readonly InstanceContextService instanceContextService = instanceContextService.ThrowIfNull();
     private readonly GameThreadService gameThreadService = gameThreadService.ThrowIfNull();
-    private readonly UIHandlingService uIHandlingService = uIHandlingService.ThrowIfNull();
+    private readonly UIContextService uiContextService = uiContextService.ThrowIfNull();
 
     /// <summary>
     /// Adds a message to the chat. It does not send the message, it only shows it to the player.
@@ -71,7 +71,7 @@ public sealed class ChatService(
                 });
 
             using var packet = new UnmanagedStruct<UIPackets.UIChatMessage>(new UIPackets.UIChatMessage(channel, encoded, channel));
-            this.uIHandlingService.SendMessage(UIMessage.WriteToChatLog, (nuint)packet.Address, 0x0);
+            this.uiContextService.SendMessage(UIMessage.WriteToChatLog, (nuint)packet.Address, 0x0);
         }, cancellationToken);
     }
 }

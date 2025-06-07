@@ -47,7 +47,7 @@ public unsafe sealed class AgentContextService : IAddressHealthService
         ];
     }
 
-    public GuildWarsArray<WrappedPointer<AgentContext>>* GetAgentArray()
+    public WrappedPointer<GuildWarsArray<WrappedPointer<AgentContext>>> GetAgentArray()
     {
         var agentArrayAddress = this.agentArrayAddress.GetAddress();
         if (agentArrayAddress is null or 0x0)

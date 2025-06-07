@@ -36,7 +36,7 @@ public sealed unsafe class InstanceContextService : IAddressHealthService
             ];
     }
 
-    public InstanceInfoContext* GetInstanceInfoContext()
+    public WrappedPointer<InstanceInfoContext> GetInstanceInfoContext()
     {
         var instanceInfoAddress = this.instanceInfoAddress.GetAddress();
         if (instanceInfoAddress is null)
@@ -51,12 +51,12 @@ public sealed unsafe class InstanceContextService : IAddressHealthService
     public InstanceType GetInstanceType()
     {
         var instanceInfo = this.GetInstanceInfoContext();
-        if (instanceInfo is null)
+        if (instanceInfo.IsNull)
         {
             return InstanceType.Loading;
         }
 
-        return instanceInfo->InstanceType;
+        return instanceInfo.Pointer->InstanceType;
     }
 
     private nuint GetInstanceInfoAddress()
