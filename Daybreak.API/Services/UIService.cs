@@ -17,12 +17,6 @@ public sealed class UIService(
     public async Task<bool> Keypress(UIAction action, WrappedPointer<Frame> frame, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        if (frame.IsNull)
-        {
-            scopedLogger.LogError("Frame pointer is null");
-            return false;
-        }
-
         var keyDownResult = await this.gameThreadService.QueueOnGameThread(() =>
         {
             if (!this.uIContextService.KeyDown(action, frame))
@@ -56,6 +50,40 @@ public sealed class UIService(
         }
 
         return true;
+    }
+
+    public async Task<ManagedFrame?> GetManagedFrame(string label, CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        if (string.IsNullOrEmpty(label))
+        {
+            scopedLogger.LogError("Frame label is null or empty");
+            return null;
+        }
+
+        var frame = await this.gameThreadService.QueueOnGameThread(() => this.uIContextService.GetFrameByLabel(label), cancellationToken);
+        if (!frame.IsNull)
+        {
+            // Frame was already open, we do not want to auto-close it
+            scopedLogger.LogInformation("Frame with label {label} is already open", label);
+            return new ManagedFrame(frame, () => { });
+        }
+
+        var uiAction = GetUIActionFromFrameLabel(label);
+        await this.Keypress(uiAction, null, cancellationToken);
+        frame = await this.gameThreadService.QueueOnGameThread(() => this.uIContextService.GetFrameByLabel(label), cancellationToken);
+        await this.gameThreadService.QueueOnGameThread(() => this.uIContextService.SetFrameVisible(frame, false), cancellationToken);
+        return new ManagedFrame(frame, async () =>
+        {
+            await this.gameThreadService.QueueOnGameThread(async () =>
+            {
+                if (!this.uIContextService.GetFrameByLabel(label).IsNull)
+                {
+                    await this.Keypress(uiAction, null, CancellationToken.None);
+                }
+
+            }, CancellationToken.None);
+        });
     }
 
     private static UIAction GetUIActionFromFrameLabel(string frameLabel)

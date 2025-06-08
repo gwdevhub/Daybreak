@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using Daybreak.API.Models;
+using System.Runtime.InteropServices;
 
 namespace Daybreak.API.Interop.GuildWars;
 
@@ -17,6 +18,9 @@ public readonly struct Frame
 
     [FieldOffset(0x0024)]
     public readonly uint TemplateType;
+
+    [FieldOffset(0x00A0)]
+    public readonly GuildWarsArray<FrameInteractionCallback> FrameCallbacks;
 
     [FieldOffset(0x00b0)]
     public readonly uint ChildOffsetId;
@@ -42,6 +46,23 @@ public readonly unsafe struct FrameRelation
     [FieldOffset(0x0000)]
     public readonly FrameRelation* Parent;
 
-    [FieldOffset(0x0010)]
+    [FieldOffset(0x000C)]
     public readonly uint FrameHashId;
+}
+
+[StructLayout(LayoutKind.Sequential, Pack =1)]
+public readonly unsafe struct InteractionMessage
+{
+    public readonly uint FrameId;
+    public readonly UIMessage MessageId;
+    public readonly void** WParam;
+}
+
+public unsafe delegate void UIInteractionCallback(InteractionMessage* message, void* wParam, void* lParam);
+
+[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0xC)]
+public unsafe readonly struct FrameInteractionCallback
+{
+    public readonly void* Callback; // UIInteractionCallback
+    public readonly void* UiCtl_Context;
 }

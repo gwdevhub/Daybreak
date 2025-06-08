@@ -1,5 +1,6 @@
 ﻿using Daybreak.API.Extensions;
 using Daybreak.API.Interop.GuildWars;
+using Daybreak.API.Models;
 using Daybreak.API.Services.Interop;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Api;
@@ -14,6 +15,8 @@ namespace Daybreak.API.Services;
 
 public sealed class PartyService(
     IBuildTemplateManager buildTemplateManager,
+    UIService uiService,
+    UIContextService uIContextService,
     SkillbarContextService skillbarContextService,
     InstanceContextService instanceContextService,
     PartyContextService partyContextService,
@@ -22,6 +25,8 @@ public sealed class PartyService(
     ILogger<PartyService> logger)
 {
     private readonly IBuildTemplateManager buildTemplateManager = buildTemplateManager.ThrowIfNull();
+    private readonly UIService uiService = uiService.ThrowIfNull();
+    private readonly UIContextService uIContextService = uIContextService.ThrowIfNull();
     private readonly SkillbarContextService skillbarContextService = skillbarContextService.ThrowIfNull();
     private readonly InstanceContextService instanceContextService = instanceContextService.ThrowIfNull();
     private readonly PartyContextService partyContextService = partyContextService.ThrowIfNull();
@@ -55,6 +60,15 @@ public sealed class PartyService(
         {
             scopedLogger.LogError("Could not set party loadout. Could not apply builds");
             return false;
+        }
+
+        var heroBehaviorSetup = await this.gameThreadService.QueueOnGameThread(() => this.GetHeroBehaviorSetup(partyLoadout), cancellationToken);
+        foreach(var heroBehaviorEntry in heroBehaviorSetup ?? [])
+        {
+            if (!await this.SetHeroBehavior(heroBehaviorEntry.AgentId, heroBehaviorEntry.Behavior, cancellationToken))
+            {
+                scopedLogger.LogWarning("Could not set hero behavior for agent {agentId} to {behavior}", heroBehaviorEntry.AgentId, heroBehaviorEntry.Behavior);
+            }
         }
 
         return true;
@@ -152,6 +166,49 @@ public sealed class PartyService(
         }, cancellationToken);
     }
 
+    public async Task<bool> SetHeroBehavior(uint heroAgentId, HeroBehavior behavior, CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        if (!await this.IsInValidOutpost(cancellationToken))
+        {
+            scopedLogger.LogError("Could not set hero behavior. Not in a valid outpost");
+            return false;
+        }
+
+        var heroCommanderFrameLabel = await this.HeroCommanderFrameLabel(heroAgentId, cancellationToken);
+        if (heroCommanderFrameLabel is null)
+        {
+            scopedLogger.LogError("Could not set hero behavior. Could not find hero commander frame label for agent {heroAgentId}", heroAgentId);
+            return false;
+        }
+
+        var maybeFrame = await this.uiService.GetManagedFrame(heroCommanderFrameLabel, cancellationToken);
+        if (!maybeFrame.HasValue)
+        {
+            scopedLogger.LogError("Could not set hero behavior. Could not get managed frame for label {heroCommanderFrameLabel}", heroCommanderFrameLabel);
+            return false;
+        }
+
+        using var frame = maybeFrame.Value;
+        var result = await this.gameThreadService.QueueOnGameThread(() =>
+        {
+            unsafe
+            {
+                var btn = this.uIContextService.GetChildFrame(frame.Frame, (uint)behavior);
+                var packet = new UIPackets.MouseClick(UIPackets.MouseButtons.Left, 0, 0);
+                return this.uIContextService.SendFrameUIMessage(frame.Frame, UIMessage.MouseClick, &packet);
+            }
+        }, cancellationToken);
+
+        if (!result)
+        {
+            scopedLogger.LogError("Failed to send UI message to set hero behavior {behavior} for agent {heroAgentId}", behavior, heroAgentId);
+        }
+
+        scopedLogger.LogInformation("Set hero behavior {behavior} for agent {agentId}", behavior, heroAgentId);
+        return result;
+    }
+
     private async Task<bool> IsInValidOutpost(CancellationToken cancellationToken)
     {
         return await this.gameThreadService.QueueOnGameThread(() =>
@@ -186,7 +243,6 @@ public sealed class PartyService(
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         scopedLogger.LogDebug("Applying builds");
-        
 
         if (!this.gameContextService.GetGameContext().TryGetPlayerParty(out _, out var players, out var heroes, out var henchmen))
         {
@@ -255,6 +311,106 @@ public sealed class PartyService(
             .OfType<(PartyLoadoutEntry Entry, uint AgentId, ProfessionsContext ProfessionContext, bool IsValid)>();
 
         return true;
+    }
+
+    private unsafe List<(uint AgentId, HeroBehavior Behavior)>? GetHeroBehaviorSetup(PartyLoadout partyLoadout)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        scopedLogger.LogDebug("Getting hero behavior setup");
+        
+        if (!this.gameContextService.GetGameContext().TryGetPlayerParty(out _, out _, out var heroes, out _) ||
+            !heroes.HasValue)
+        {
+            scopedLogger.LogError("Failed to get player party");
+            return default;
+        }
+
+        return heroes.Value.AsValueEnumerable()
+            .Select(h =>
+            {
+                var entry = partyLoadout.Entries.AsValueEnumerable().FirstOrDefault(e => (uint)e.HeroId == h.HeroId);
+                if (entry is null)
+                {
+                    scopedLogger.LogWarning("No entry found for hero {heroId}", h.HeroId);
+                    return default;
+                }
+
+                return (h.AgentId, entry.HeroBehavior);
+            })
+            .Where(t => t.AgentId is not 0)
+            .ToList();
+    }
+
+    private async Task<string?> HeroCommanderFrameLabel(uint heroAgentId, CancellationToken cancellationToken)
+    {
+        var heroOffset = await this.GetHeroNumber(heroAgentId, cancellationToken);
+        if (heroOffset > 6)
+        {
+            return default;
+        }
+
+        return heroOffset switch
+        {
+            0 => "AgentCommander0",
+            1 => "AgentCommander1",
+            2 => "AgentCommander2",
+            3 => "AgentCommander3",
+            4 => "AgentCommander4",
+            5 => "AgentCommander5",
+            6 => "AgentCommander6",
+            _ => default
+        };
+    }
+
+    private async Task<uint?> GetHeroNumber(uint agentId, CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        var heroNumber = await this.gameThreadService.QueueOnGameThread(() =>
+        {
+            unsafe
+            {
+                var gameContext = this.gameContextService.GetGameContext();
+                if (gameContext.IsNull)
+                {
+                    scopedLogger.LogError("Game context is null");
+                    return -1;
+                }
+
+                var partyContext = gameContext.Pointer->PartyContext;
+                if (partyContext is null)
+                {
+                    scopedLogger.LogError("Party context is null");
+                    return -1;
+                }
+
+                var charContext = gameContext.Pointer->CharContext;
+                if (charContext is null)
+                {
+                    scopedLogger.LogError("Char context is null");
+                    return -1;
+                }
+
+                var playerParty = partyContext->PlayerParty;
+                var playerId = charContext->PlayerNumber;
+                var offset = 0;
+                foreach(var hero in playerParty->Heroes)
+                {
+                    if (hero.OwnerPlayerId == playerId)
+                    {
+                        if (hero.AgentId == agentId)
+                        {
+                            return offset;
+                        }
+
+                        offset++;
+                    }
+                }
+
+                return -1;
+            }
+        }, cancellationToken);
+
+        return heroNumber is -1 ? default : (uint)heroNumber;
     }
 
     private static BuildEntry? GetBuildEntryById(ProfessionsContext professionContext, SkillbarContext skillbar, PartyAttribute attributes)

@@ -1,18 +1,12 @@
-﻿using Daybreak.API.Models;
-using PeNet.Header.Net.MetaDataTables;
-using System.ComponentModel;
+﻿using Daybreak.API.Interop;
+using Daybreak.API.Models;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Extensions.Core;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 namespace Daybreak.API.Services.Interop;
 
-public sealed class PartyContextService(
-    MemoryScanningService memoryScanningService,
-    ILogger<PartyContextService> logger)
-        : IAddressHealthService, IHostedService
+public sealed class PartyContextService
+        : IAddressHealthService
 {
     private const string SearchButtonFile = "\\Code\\Gw\\Ui\\Game\\Party\\PtSearch.cpp";
     private const string SearchButtonAssertion = "m_activeList == LIST_HEROES";
@@ -20,25 +14,22 @@ public sealed class PartyContextService(
     private const string WindowButtonAssertion = "m_selection.agentId";
 
     // Fastcall funcs do not work in .NET for x86 right now. https://github.com/dotnet/runtime/issues/113851
-    private unsafe delegate* unmanaged[Stdcall]<void*, uint, uint*, void> searchButtonCallback;
-    private unsafe delegate* unmanaged[Stdcall]<void*, uint, uint*, void> windowButtonCallback;
+    // This fastcall equivalent is <void*, uint, uint*, void>
+    private readonly GWFastCall<nint, uint, nint, GWFastCall.Void> searchButtonCallback;
+    // This fastcall equivalent is <void*, uint, uint*, void>
+    private readonly GWFastCall<nint, uint, nint, GWFastCall.Void> windowButtonCallback;
 
-    private readonly MemoryScanningService memoryScanningService = memoryScanningService.ThrowIfNull();
-    private readonly ILogger<PartyContextService> logger = logger.ThrowIfNull();
+    private readonly MemoryScanningService memoryScanningService;
+    private readonly ILogger<PartyContextService> logger;
 
-    private CancellationTokenSource? cts;
-
-    public Task StartAsync(CancellationToken cancellationToken)
+    public PartyContextService(
+        MemoryScanningService memoryScanningService,
+        ILogger<PartyContextService> logger)
     {
-        this.cts?.Dispose();
-        this.cts = new CancellationTokenSource();
-        return Task.Factory.StartNew(() => this.InitializeCallbacks(this.cts.Token), this.cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        this.cts?.Dispose();
-        return Task.CompletedTask;
+        this.memoryScanningService = memoryScanningService.ThrowIfNull();
+        this.logger = logger.ThrowIfNull();
+        this.searchButtonCallback = new(new GWAddressCache(() => this.memoryScanningService.ToFunctionStart(this.memoryScanningService.FindAssertion(SearchButtonFile, SearchButtonAssertion, 0, 0))));
+        this.windowButtonCallback = new(new GWAddressCache(() => this.memoryScanningService.ToFunctionStart(this.memoryScanningService.FindAssertion(WindowButtonFile, WindowButtonAssertion, 0, 0))));
     }
 
     public List<AddressState> GetAddressStates()
@@ -49,12 +40,12 @@ public sealed class PartyContextService(
             [
                 new AddressState
                 {
-                    Address = (nuint)this.searchButtonCallback,
+                    Address = this.searchButtonCallback.Cache.GetAddress() ?? 0,
                     Name = nameof(this.searchButtonCallback)
                 },
                 new AddressState
                 {
-                    Address = (nuint)this.windowButtonCallback,
+                    Address = this.windowButtonCallback.Cache.GetAddress() ?? 0,
                     Name = nameof(this.windowButtonCallback)
                 }
             ];
@@ -63,27 +54,13 @@ public sealed class PartyContextService(
 
     public unsafe bool CallSearchButtonCallback(void* ctx, uint edx, uint* wparam)
     {
-        var scopedLogger = this.logger.CreateScopedLogger();
-        if (this.searchButtonCallback is null)
-        {
-            scopedLogger.LogError("SearchButtonCallbackFunc address not found");
-            return false;
-        }
-
-        Invoke(this.searchButtonCallback, ctx, edx, wparam);
+        this.searchButtonCallback.Invoke((nint)ctx, edx, (nint)wparam);
         return true;
     }
 
     public unsafe bool CallWindowButtonCallback(void* ctx, uint edx, uint* wparam)
     {
-        var scopedLogger = this.logger.CreateScopedLogger();
-        if (this.windowButtonCallback is null)
-        {
-            scopedLogger.LogError("WindowButtonCallbackFunc address not found");
-            return false;
-        }
-
-        Invoke(this.windowButtonCallback, ctx, edx, wparam);
+        this.windowButtonCallback.Invoke((nint)ctx, edx, (nint)wparam);
         return true;
     }
 
@@ -118,89 +95,5 @@ public sealed class PartyContextService(
         var ctx = stackalloc uint[14];
         ctx[0xd] = 1;
         return this.CallWindowButtonCallback(ctx, 0, (uint*)0);
-    }
-
-    private async ValueTask InitializeCallbacks(CancellationToken cancellationToken)
-    {
-        var scopedLogger = this.logger.CreateScopedLogger();
-        scopedLogger.LogInformation("Initializing callbacks");
-        while(!cancellationToken.IsCancellationRequested)
-        {
-            unsafe
-            {
-                if (this.searchButtonCallback is null)
-                {
-                    var addr = this.memoryScanningService.ToFunctionStart(this.memoryScanningService.FindAssertion(SearchButtonFile, SearchButtonAssertion, 0, 0));
-                    if (addr is not 0)
-                    {
-                        this.searchButtonCallback = BuildFastcallThunk(addr);
-                    }
-                }
-
-                if (this.windowButtonCallback is null)
-                {
-                    var addr = this.memoryScanningService.ToFunctionStart(this.memoryScanningService.FindAssertion(WindowButtonFile, WindowButtonAssertion, 0, 0));
-                    if (addr is not 0)
-                    {
-                        this.windowButtonCallback = BuildFastcallThunk(addr);
-                    }
-                }
-
-                if (this.searchButtonCallback is not null && this.windowButtonCallback is not null)
-                {
-                    break;
-                }
-            }
-
-            await Task.Delay(1000, cancellationToken);
-        }
-
-        scopedLogger.LogInformation("Callbacks initialized");
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static unsafe void Invoke(delegate* unmanaged[Stdcall]<void*, uint, uint*, void> f,
-                               void* ctx, uint edx, uint* wparam)
-    {
-        if (f is null)
-        {
-            return;
-        }
-
-        f(ctx, edx, wparam);  // stdcall on our side -> fastcall inside thunk
-    }
-
-    private static unsafe delegate* unmanaged[Stdcall]
-        <void*, uint, uint*, void> BuildFastcallThunk(nuint target)
-    {
-        if (target is 0)
-        {
-            return null;
-        }
-
-        var code = stackalloc byte[13]
-        {
-            0x58,                      // pop eax               (ret)
-            0x59,                      // pop ecx               (ctx)
-            0x5A,                      // pop edx               (edxVal)
-            0x5B,                      // pop ebx               (wparam)
-            0x53,                      // push ebx              (wparam)
-            0x50,                      // push eax              (ret)
-            0xB8,0,0,0,0,              // mov  eax, TARGET
-            0xFF,0xE0                  // jmp  eax
-        };                             // 13 bytes total
-
-        const int TARGET_OFFSET = 7;
-        Unsafe.WriteUnaligned(ref code[TARGET_OFFSET], (uint)target);
-
-        var mem = NativeMethods.VirtualAlloc(0, 13, NativeMethods.MEM_COMMIT | NativeMethods.MEM_RESERVE, NativeMethods.PAGE_EXECUTE_READWRITE);
-        if (mem is 0)
-        {
-            throw new Win32Exception(Marshal.GetLastWin32Error(), "VirtualAlloc");
-        }
-
-        Buffer.MemoryCopy(code, (void*)mem, 13, 13);
-
-        return (delegate* unmanaged[Stdcall]<void*, uint, uint*, void>)mem;
     }
 }

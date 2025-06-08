@@ -39,15 +39,11 @@ public sealed class UIContextService
 
     [SuppressUnmanagedCodeSecurity]
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private unsafe delegate void SendFrameUIMessageByIdFunc(uint frameId, UIMessage messageId, nint arg1Address, nint arg2Adress = 0);
-
-    [SuppressUnmanagedCodeSecurity]
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate void SetFrameFlagFunc(uint frameId, uint flag);
 
     [SuppressUnmanagedCodeSecurity]
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void GetChildFrameIdFunc(uint parentFrameId, uint childOffset);
+    private delegate uint GetChildFrameIdFunc(uint parentFrameId, uint childOffset);
 
     private readonly SemaphoreSlim semaphoreSlim = new(1);
     private readonly MemoryScanningService memoryScanningService;
@@ -57,7 +53,8 @@ public sealed class UIContextService
     private readonly GWDelegateCache<GetChildFrameIdFunc> getChildFrameId;
     private readonly GWAddressCache frameArrayAddressCache;
     private readonly GWHook<SendUIMessageFunc> sendUiMessageHook;
-    private readonly GWHook<SendFrameUIMessageByIdFunc> sendUiMessageByIdHook;
+    // This fastcall equivalent is <GuildWarsArray<FrameInteractionCallback>*, void*, UIMessage, void*, void*>
+    private readonly GWFastCall<nint, nint, UIMessage, nint, nint, GWFastCall.Void> sendFrameUIMessage;
     private readonly ILogger<UIContextService> logger;
 
     private CancellationTokenSource? cts = default;
@@ -68,16 +65,16 @@ public sealed class UIContextService
     {
         this.logger = logger.ThrowIfNull();
         this.memoryScanningService = memoryScanningService.ThrowIfNull();
-        this.createHashFromString = new GWDelegateCache<CreateHashFromStringFunc>(new GWAddressCache(() => this.memoryScanningService.ToFunctionStart(
+        this.createHashFromString = new GWDelegateCache<CreateHashFromStringFunc>(new GWAddressCache(() => this.memoryScanningService.FunctionFromNearCall(
                 this.memoryScanningService.FindAddress(CreateHashFromStringSeq, CreateHashFromStringMask, CreateHashFromStringOffset))));
         this.frameArrayAddressCache = new GWAddressCache(() => this.memoryScanningService.FindAssertion(FrameArrayFile, FrameArrayAssertion, 0, -0x14));
         this.sendUiMessageHook = new GWHook<SendUIMessageFunc>(
             new GWAddressCache(() => this.memoryScanningService.ToFunctionStart(
                 this.memoryScanningService.FindAssertion(SendUIMessageFile, SendUIMessageAssertion, 0xcf8, 0))),
             this.OnSendUIMessage);
-        this.sendUiMessageByIdHook = new GWHook<SendFrameUIMessageByIdFunc>(
-            new GWAddressCache(() => this.memoryScanningService.FindAddress(SendFrameUiMessageByIdSeq, SendFrameUiMessageByIdMask, SendFrameUiMessageByIdOffset)),
-            this.OnSendFrameUIMessageById);
+        this.sendFrameUIMessage = new(
+            new GWAddressCache(() => this.memoryScanningService.FunctionFromNearCall(
+                this.memoryScanningService.FindAddress(SendFrameUiMessageByIdSeq, SendFrameUiMessageByIdMask, SendFrameUiMessageByIdOffset) + 0x67)));
         this.setFrameVisible = new GWDelegateCache<SetFrameFlagFunc>(
             new GWAddressCache(() => this.memoryScanningService.ToFunctionStart(
                 this.memoryScanningService.FindAssertion(SetFrameFlagFile, SetFrameFlagAssertion, SetFrameVisibleOffset, 0))));
@@ -117,6 +114,11 @@ public sealed class UIContextService
             {
                 Name = nameof(this.getChildFrameId),
                 Address = this.getChildFrameId.Cache.GetAddress() ?? 0U
+            },
+            new()
+            {
+                Name = nameof(this.sendFrameUIMessage),
+                Address = this.sendFrameUIMessage.Cache.GetAddress() ?? 0U
             }
         ];
     }
@@ -132,14 +134,6 @@ public sealed class UIContextService
                     TargetAddress = this.sendUiMessageHook.TargetAddress,
                     ContinueAddress = this.sendUiMessageHook.ContinueAddress,
                     DetourAddress = this.sendUiMessageHook.DetourAddress
-                },
-                new HookState
-                {
-                    Hooked = this.sendUiMessageByIdHook.Hooked,
-                    Name = nameof(this.sendUiMessageByIdHook),
-                    TargetAddress = this.sendUiMessageByIdHook.TargetAddress,
-                    ContinueAddress = this.sendUiMessageByIdHook.ContinueAddress,
-                    DetourAddress = this.sendUiMessageByIdHook.DetourAddress
                 }
             ];
     }
@@ -159,16 +153,100 @@ public sealed class UIContextService
         return Task.CompletedTask;
     }
 
+    public unsafe WrappedPointer<Frame> GetChildFrame(WrappedPointer<Frame> parent, uint childOffset)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        if (parent.IsNull)
+        {
+            scopedLogger.LogError("Parent frame is null");
+            return null;
+        }
+
+        var getChildFrameId = this.getChildFrameId.GetDelegate();
+        if (getChildFrameId is null)
+        {
+            scopedLogger.LogError("Failed to get GetChildFrameId delegate");
+            return null;
+        }
+
+        var childFrameId = getChildFrameId(parent.Pointer->FrameId, childOffset);
+        if (childFrameId == 0)
+        {
+            scopedLogger.LogError("No child frame found for parent frame {parent}", parent.Pointer->FrameId);
+            return null;
+        }
+
+        return this.GetFrameById(childFrameId);
+    }
+
+    public WrappedPointer<Frame> GetButtonActionFrame()
+    {
+        return this.GetChildFrame(this.GetFrameByLabel("Game"), 6);
+    }
+
+    public unsafe bool SendFrameUIMessage(WrappedPointer<Frame> frame, UIMessage messageId, void* arg1, void* arg2 = null)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        if (frame.IsNull)
+        {
+            scopedLogger.LogError("Frame is null");
+            return false;
+        }
+
+        this.sendFrameUIMessage.Invoke((nint)(&frame.Pointer->FrameCallbacks), 0, messageId, (nint)arg1, (nint)arg2);
+        return true;
+    }
+
+    public unsafe bool SetFrameDisabled(WrappedPointer<Frame> frame, bool disabled)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        if (frame.IsNull)
+        {
+            scopedLogger.LogError("Frame is null");
+            return false;
+        }
+
+        var setFrameDisabled = this.setFrameDisabled.GetDelegate();
+        if (setFrameDisabled is null)
+        {
+            scopedLogger.LogError("Failed to get SetFrameDisabled delegate");
+            return false;
+        }
+
+        setFrameDisabled(frame.Pointer->FrameId, disabled ? 0U : 10U);
+        return true;
+    }
+
+    public unsafe bool SetFrameVisible(WrappedPointer<Frame> frame, bool visible)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        if (frame.IsNull)
+        {
+            scopedLogger.LogError("Frame is null");
+            return false;
+        }
+
+        var setFrameVisible = this.setFrameVisible.GetDelegate();
+        if (setFrameVisible is null)
+        {
+            scopedLogger.LogError("Failed to get SetFrameVisible delegate");
+            return false;
+        }
+
+        setFrameVisible(frame.Pointer->FrameId, visible ? 1U : 0U);
+        return true;
+    }
+
     public unsafe bool KeyDown(UIAction action, WrappedPointer<Frame> frame)
     {
         if (frame.IsNull)
         {
-            return false;
+            frame = this.GetButtonActionFrame();
         }
 
         this.semaphoreSlim.Wait();
         var packet = new UIPackets.KeyAction((uint)action);
-        this.sendUiMessageByIdHook.Continue(frame.Pointer->FrameId, UIMessage.KeyDown, (nint)(&packet));
+        this.SendFrameUIMessage(frame, UIMessage.KeyDown, &packet);
         this.semaphoreSlim.Release();
         return true;
     }
@@ -177,12 +255,12 @@ public sealed class UIContextService
     {
         if (frame.IsNull)
         {
-            return false;
+            frame = this.GetButtonActionFrame();
         }
 
         this.semaphoreSlim.Wait();
         var packet = new UIPackets.KeyAction((uint)action);
-        this.sendUiMessageByIdHook.Continue(frame.Pointer->FrameId, UIMessage.KeyUp, (nint)(&packet));
+        this.SendFrameUIMessage(frame, UIMessage.KeyUp, &packet);
         this.semaphoreSlim.Release();
         return true;
     }
@@ -214,8 +292,9 @@ public sealed class UIContextService
             return null;
         }
 
-        foreach(var frame in *frameArray.Pointer)
+        for(var i = 0; i < frameArray.Pointer->Size; i++)
         {
+            var frame = frameArray.Pointer->Buffer[i];
             if (frame.Pointer is null ||
                 (int)frame.Pointer == -1)
             {
@@ -230,6 +309,27 @@ public sealed class UIContextService
 
         scopedLogger.LogWarning("Frame with label {label} not found", label);
         return null;
+    }
+
+    public unsafe WrappedPointer<Frame> GetFrameById(uint frameId)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        var frameArray = this.GetFrameArray();
+        if (frameArray.IsNull ||
+            frameArray.Pointer->Size <= frameId)
+        {
+            scopedLogger.LogError("Frame array is null or frameId {frameId} is out of bounds", frameId);
+            return null;
+        }
+
+        var frame = frameArray.Pointer->Skip((int)frameId).FirstOrDefault();
+        if (frame.IsNull)
+        {
+            scopedLogger.LogWarning("Frame with id {frameId} not found", frameId);
+            return null;
+        }
+
+        return frame;
     }
 
     public unsafe uint CreateHashFromString(string value, int seed)
@@ -264,22 +364,11 @@ public sealed class UIContextService
             await Task.Delay(1000, cancellationToken);
         }
 
-        while (!this.sendUiMessageByIdHook.EnsureInitialized())
-        {
-            scopedLogger.LogDebug("Waiting for hook to initialize: {hook}", nameof(this.sendUiMessageByIdHook));
-            await Task.Delay(1000, cancellationToken);
-        }
-
         scopedLogger.LogInformation("Hooks initialized");
     }
 
     private void OnSendUIMessage(UIMessage uiMessage, nuint wParam, nuint lParam)
     {
         this.sendUiMessageHook.Continue(uiMessage, wParam, lParam);
-    }
-
-    private void OnSendFrameUIMessageById(uint frameId, UIMessage messageId, nint arg1Address, nint arg2Address = 0)
-    {
-        this.sendUiMessageByIdHook.Continue(frameId, messageId, arg1Address, arg2Address);
     }
 }
