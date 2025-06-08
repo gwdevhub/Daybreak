@@ -36,6 +36,42 @@ public sealed unsafe class MemoryScanningService
         return Marshal.PtrToStructure<T>((nint)ptr.Address);
     }
 
+    public nuint FunctionFromNearCall(nuint callInstructionAddress, bool checkValidPtr = true)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        if (!IsValidPtr(callInstructionAddress, this.textSection))
+        {
+            scopedLogger.LogError("Invalid call instruction address: 0x{address:X8}", callInstructionAddress);
+            return 0;
+        }
+
+        var opcode = Marshal.ReadByte((nint)callInstructionAddress);
+        var functionAddress = opcode switch
+        {
+            0xE8 => (nuint)((nint)callInstructionAddress + 5 + Marshal.ReadInt32((nint)(callInstructionAddress + 1))),
+            0xE9 => (nuint)((nint)callInstructionAddress + 5 + Marshal.ReadInt32((nint)(callInstructionAddress + 1))),
+            0xEB => (nuint)((nint)callInstructionAddress + 2 + (sbyte)Marshal.ReadByte((nint)(callInstructionAddress + 1))),
+            _ => (nuint)0
+        };
+
+        if (checkValidPtr && !IsValidPtr(functionAddress, this.textSection))
+        {
+            scopedLogger.LogError("Invalid function address: 0x{address:X8}", functionAddress);
+            return 0;
+        }
+
+        // Recursively resolve nested JMPs
+        var nestedCall = this.FunctionFromNearCall(functionAddress, checkValidPtr);
+        if (nestedCall != 0)
+        {
+            scopedLogger.LogInformation("Resolved nested call to: 0x{address:X8}", nestedCall);
+            return nestedCall;
+        }
+
+        scopedLogger.LogInformation("Resolved function address: 0x{address:X8}", functionAddress);
+        return functionAddress;
+    }
+
     public nuint FindAssertion(
         string assertionFile,
         string assertionMessage,
@@ -198,6 +234,13 @@ public sealed unsafe class MemoryScanningService
         var end = callInstructionAddress - scanRange;    // scan backwards
 
         return FindInRange(prologue, mask, 0, start, end);
+    }
+
+    private static bool IsValidPtr(nuint address, (nuint BaseAddress, ImageSectionHeader Section) section)
+    {
+        return address > 0 && 
+            (ulong)address > section.Section.ImageBaseAddress &&
+            (ulong)address < (section.Section.ImageBaseAddress + section.Section.VirtualSize);
     }
 
     private static unsafe nuint FindInRange(

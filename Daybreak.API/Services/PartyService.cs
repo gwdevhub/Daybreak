@@ -3,7 +3,6 @@ using Daybreak.API.Interop.GuildWars;
 using Daybreak.API.Services.Interop;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Api;
-using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.BuildTemplates;
 using System.Core.Extensions;
@@ -100,7 +99,7 @@ public sealed class PartyService(
 
                 var buildTuples = professions.Value.AsValueEnumerable()
                     .Select(p => (p.AgentId, p, attributes.Value.FirstOrDefault(a => a.AgentId == p.AgentId), skillbars.Value.FirstOrDefault(s => s.AgentId == p.AgentId), heroFlags.Value.FirstOrDefault(f => f.AgentId == p.AgentId)))
-                    .Select(t => (t.AgentId, GetBuildEntryById(t.Item4, t.Item3), t.Item5.Behavior))
+                    .Select(t => (t.AgentId, GetBuildEntryById(t.p, t.Item4, t.Item3), t.Item5.Behavior))
                     .Where(t => t.Item2 is not null)
                     .OfType<(uint AgentId, BuildEntry BuildEntry, Behavior Behavior)>()
                     .ToList();

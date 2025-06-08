@@ -20,4 +20,12 @@ public static class UIPackets
         public readonly string Message = message;
         public readonly Channel Channel2 = channel2;
     }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public readonly struct KeyAction(uint key)
+    {
+        public readonly uint Key = key;
+        public readonly uint WParam = 0x4000;
+        public readonly uint LParam = 0x0006;
+    }
 }

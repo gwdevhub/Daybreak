@@ -208,7 +208,16 @@ public sealed class MainPlayerService : IDisposable
                     return default;
                 }
 
+                var professionContext = gameContext.Pointer->WorldContext->Professions.AsValueEnumerable().FirstOrDefault(p => p.AgentId == playerAgentId);
+                if (professionContext.AgentId != playerAgentId)
+                {
+                    scopedLogger.LogError("Failed to find agent profession for player agent id {agentId}", playerAgentId);
+                    return default;
+                }
+
                 return new BuildEntry(
+                    (int)professionContext.CurrentPrimary,
+                    (int)professionContext.CurrentSecondary,
                     agentAttributes.Attributes.GetAttributeEntryList(),
                     [skillbarContext.Skill0.Id, skillbarContext.Skill1.Id, skillbarContext.Skill2.Id, skillbarContext.Skill3.Id,
                     skillbarContext.Skill4.Id, skillbarContext.Skill5.Id, skillbarContext.Skill6.Id, skillbarContext.Skill7.Id]);
