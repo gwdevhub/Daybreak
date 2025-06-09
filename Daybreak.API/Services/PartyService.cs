@@ -7,7 +7,9 @@ using Daybreak.Shared.Models.Api;
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.BuildTemplates;
 using System.Core.Extensions;
+using System.Extensions;
 using System.Extensions.Core;
+using System.Windows.Navigation;
 using ZLinq;
 using InstanceType = Daybreak.API.Interop.GuildWars.InstanceType;
 
@@ -169,6 +171,7 @@ public sealed class PartyService(
     public async Task<bool> SetHeroBehavior(uint heroAgentId, HeroBehavior behavior, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
+
         if (!await this.IsInValidOutpost(cancellationToken))
         {
             scopedLogger.LogError("Could not set hero behavior. Not in a valid outpost");
@@ -196,6 +199,12 @@ public sealed class PartyService(
             {
                 var btn = this.uIContextService.GetChildFrame(frame.Frame, (uint)behavior);
                 var packet = new UIPackets.MouseClick(UIPackets.MouseButtons.Left, 0, 0);
+                if (btn.IsNull)
+                {
+                    scopedLogger.LogError("Could not set hero behavior. Could not find button for behavior {behavior} in frame {frameLabel}", behavior, heroCommanderFrameLabel);
+                    return false;
+                }
+
                 return this.uIContextService.SendFrameUIMessage(frame.Frame, UIMessage.MouseClick, &packet);
             }
         }, cancellationToken);
@@ -262,6 +271,20 @@ public sealed class PartyService(
             return false;
         }
 
+        if (!this.gameContextService.GetGameContext().TryGetAccountContext(out var accountContext) ||
+            accountContext.IsNull)
+        {
+            scopedLogger.LogError("Failed to get account context");
+            return false;
+        }
+
+        var playerProfessionContext = professions.Value.AsValueEnumerable().FirstOrDefault(p => p.AgentId == playerId);
+        if (playerProfessionContext.AgentId != playerId)
+        {
+            scopedLogger.LogError("Failed to get player profession context for player id {playerId}", playerId);
+            return false;
+        }
+
         var parsedEntries = partyLoadout.Entries.AsValueEnumerable()
             .Select(entry =>
             {
@@ -278,14 +301,22 @@ public sealed class PartyService(
             .Select(t => (t.entry, t.playerId, professions.Value.AsValueEnumerable().FirstOrDefault(p => p.AgentId == t.playerId)))
             .Select(t =>
             {
+                var validSkills = t.playerId == playerId
+                    ? unlockedSkills
+                    : accountContext.Pointer->UnlockedAccountSkills;
+
+                var unlockedProfessionsFlags = t.playerId == playerId
+                    ? playerProfessionContext.UnlockedProfessionsFlags
+                    : uint.MaxValue;
+
                 if (!this.buildTemplateManager.CanTemplateApply(
                     new BuildTemplateValidationRequest(
                         (uint)t.entry.Build.Primary,
                         (uint)t.entry.Build.Secondary,
                         [.. t.entry.Build.Skills],
                         (uint)t.Item3.CurrentPrimary,
-                        t.Item3.UnlockedProfessionsFlags,
-                        [.. unlockedSkills.Value])))
+                        unlockedProfessionsFlags,
+                        [.. validSkills])))
                 {
                     return (t.entry, t.playerId, t.Item3, false);
                 }
@@ -307,8 +338,40 @@ public sealed class PartyService(
                 }
 
                 return t.Item4;
-            })
-            .OfType<(PartyLoadoutEntry Entry, uint AgentId, ProfessionsContext ProfessionContext, bool IsValid)>();
+            });
+
+        foreach (var (entry, maybeAgentId, _, _) in parsedEntries)
+        {
+            if (maybeAgentId is not uint agentId)
+            {
+                continue;
+            }
+
+            var attributeIds = new Array12Uint();
+            var attributeValues = new Array12Uint();
+            for (var i = 0; i < entry.Build.Attributes.Count && i < 12; i++)
+            {
+                attributeIds[i] = (uint)entry.Build.Attributes[i].Id;
+                attributeValues[i] = (uint)entry.Build.Attributes[i].BasePoints;
+            }
+
+            var skills = new Array8Uint();
+            for (var i = 0; i < entry.Build.Skills.Count && i < 8; i++)
+            {
+                skills[i] = entry.Build.Skills[i];
+            }
+
+            var skillTemplate = new SkillTemplate(
+                (uint)entry.Build.Primary,
+                (uint)entry.Build.Secondary,
+                (uint)entry.Build.Attributes.Count,
+                attributeIds,
+                attributeValues,
+                skills);
+
+            scopedLogger.LogInformation("Applying build for agent {agentId} with primary {primary} and secondary {secondary}", agentId, entry.Build.Primary, entry.Build.Secondary);
+            this.skillbarContextService.LoadBuild(agentId, &skillTemplate);
+        }
 
         return true;
     }
@@ -328,6 +391,11 @@ public sealed class PartyService(
         return heroes.Value.AsValueEnumerable()
             .Select(h =>
             {
+                if (h.HeroId is 0)
+                {
+                    return default;
+                }
+
                 var entry = partyLoadout.Entries.AsValueEnumerable().FirstOrDefault(e => (uint)e.HeroId == h.HeroId);
                 if (entry is null)
                 {

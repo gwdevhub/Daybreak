@@ -39,7 +39,7 @@ public sealed unsafe class MemoryScanningService
     public nuint FunctionFromNearCall(nuint callInstructionAddress, bool checkValidPtr = true)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        if (!IsValidPtr(callInstructionAddress, this.textSection))
+        if (callInstructionAddress is 0)
         {
             scopedLogger.LogError("Invalid call instruction address: 0x{address:X8}", callInstructionAddress);
             return 0;
@@ -54,7 +54,7 @@ public sealed unsafe class MemoryScanningService
             _ => (nuint)0
         };
 
-        if (checkValidPtr && !IsValidPtr(functionAddress, this.textSection))
+        if (checkValidPtr && functionAddress is 0)
         {
             scopedLogger.LogError("Invalid function address: 0x{address:X8}", functionAddress);
             return 0;

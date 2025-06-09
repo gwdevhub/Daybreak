@@ -72,7 +72,7 @@ public sealed class UIService(
         var uiAction = GetUIActionFromFrameLabel(label);
         await this.Keypress(uiAction, null, cancellationToken);
         frame = await this.gameThreadService.QueueOnGameThread(() => this.uIContextService.GetFrameByLabel(label), cancellationToken);
-        await this.gameThreadService.QueueOnGameThread(() => this.uIContextService.SetFrameVisible(frame, false), cancellationToken);
+        await this.gameThreadService.QueueOnGameThread(() => this.uIContextService.SetFrameVisible(frame, true), cancellationToken);
         return new ManagedFrame(frame, async () =>
         {
             await this.gameThreadService.QueueOnGameThread(async () =>

@@ -83,4 +83,19 @@ public static unsafe class GameContextExtensions
         heroFlags = gameContext.Pointer->WorldContext->HeroFlags;
         return true;
     }
+
+    public static bool TryGetAccountContext(
+        this WrappedPointer<GameContext> gameContext,
+        out WrappedPointer<AccountGameContext> accountContext)
+    {
+        accountContext = default;
+        if (gameContext.IsNull ||
+            gameContext.Pointer->AccountContext is null)
+        {
+            return false;
+        }
+
+        accountContext = gameContext.Pointer->AccountContext;
+        return true;
+    }
 }

@@ -11,6 +11,9 @@ public readonly unsafe struct GameContext
     [FieldOffset(0x0014)]
     public readonly MapContext* MapContext;
 
+    [FieldOffset(0x0028)]
+    public readonly AccountGameContext* AccountContext;
+
     [FieldOffset(0x002C)]
     public readonly WorldContext* WorldContext;
 
