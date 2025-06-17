@@ -8,6 +8,8 @@ public readonly struct ManagedFrame(
 {
     private readonly Action closeFrame = closeFrame;
 
+    public static ManagedFrame Null => new(null, () => { });
+
     public readonly WrappedPointer<Frame> Frame = frame;
 
     public void Dispose()

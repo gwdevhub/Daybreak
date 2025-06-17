@@ -80,6 +80,13 @@ internal sealed class ExceptionHandler : IExceptionHandler
                 this.logger.LogError(e, "Encountered operation canceled exception");
                 return true;
             }
+            else if (aggregateException.InnerExceptions.FirstOrDefault() is ArgumentException argumentException &&
+                aggregateException.Message.Contains("A Task's exception(s) were not observed") &&
+                argumentException.Message?.Contains("Process with an Id of") is true)
+            {
+                this.logger.LogError(e, "Encountered argument exception. Guild Wars process terminated unexpectedly");
+                return true;
+            }
         }
         else if (e.Message.Contains("Invalid window handle.") && e.StackTrace?.Contains("CoreWebView2Environment.CreateCoreWebView2ControllerAsync") is true)
         {
@@ -90,8 +97,14 @@ internal sealed class ExceptionHandler : IExceptionHandler
             this.logger.LogError(e, "Failed to initialize browser");
             return true;
         }
+        else if (e is ArgumentException argumentException &&
+            argumentException.Message.Contains("Process with an Id of"))
+        {
+            this.logger.LogError(e, "Encountered argument exception. Guild Wars process terminated unexpectedly");
+            return true;
+        }
 
-        this.logger.LogError(e, $"Unhandled exception caught {e.GetType()}");
+            this.logger.LogError(e, $"Unhandled exception caught {e.GetType()}");
         this.notificationService.NotifyError<MessageBoxHandler>(e.GetType().Name, e.ToString());
         return true;
     }

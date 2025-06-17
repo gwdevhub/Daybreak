@@ -26,6 +26,8 @@ public sealed class PartyService(
     GameContextService gameContextService,
     ILogger<PartyService> logger)
 {
+    private static readonly TimeSpan HeroSpawnDelay = TimeSpan.FromSeconds(1);
+
     private readonly IBuildTemplateManager buildTemplateManager = buildTemplateManager.ThrowIfNull();
     private readonly UIService uiService = uiService.ThrowIfNull();
     private readonly UIContextService uIContextService = uIContextService.ThrowIfNull();
@@ -57,6 +59,8 @@ public sealed class PartyService(
             scopedLogger.LogError("Could not set party loadout. Could not spawn heroes");
             return false;
         }
+
+        await Task.Delay(HeroSpawnDelay, cancellationToken);
 
         if (!await this.gameThreadService.QueueOnGameThread(() => this.ApplyBuilds(partyLoadout), cancellationToken))
         {
@@ -205,7 +209,7 @@ public sealed class PartyService(
                     return false;
                 }
 
-                return this.uIContextService.SendFrameUIMessage(frame.Frame, UIMessage.MouseClick, &packet);
+                return this.uIContextService.SendFrameUIMessage(btn, UIMessage.MouseClick, &packet);
             }
         }, cancellationToken);
 
