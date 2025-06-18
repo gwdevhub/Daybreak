@@ -19,11 +19,11 @@ public sealed class UIContextService
     private const string SetFrameFlagAssertion = "frameId";
     private const int SetFrameVisibleOffset = 0x4f9;
     private const int SetFrameDisabledOffset = 0x4e3;
-    private static readonly byte[] SendFrameUiMessageByIdSeq = [0x83, 0xFB, 0x47, 0x1B, 0xC0];
+    private static readonly byte[] SendFrameUiMessageByIdSeq = [0x83, 0xFB, 0x47, 0x73, 0x14];
     private const string SendFrameUiMessageByIdMask = "xxxxx";
-    private const int SendFrameUiMessageByIdOffset = -0x38;
-    private const string SendUIMessageFile = "FrApi.cpp";
-    private const string SendUIMessageAssertion = "msgId >= FRAME_MSG_EX";
+    private const int SendFrameUiMessageByIdOffset = -0x34;
+    private static readonly byte[] SendUIMessageSeq = [0xB9, 0x00, 0x00, 0x00, 0x00, 0xE8, 0x00, 0x00, 0x00, 0x00, 0x5D, 0xC3, 0x89, 0x45, 0x08];
+    private const string SendUIMessageMask = "x????x????xxxxx";
     private const string CreateHashFromStringMask = "xxxxxxx";
     private const int CreateHashFromStringOffset = 0x7;
     private static readonly byte[] CreateHashFromStringSeq = [0x85, 0xC0, 0x74, 0x0D, 0x6A, 0xFF, 0x50];
@@ -39,7 +39,7 @@ public sealed class UIContextService
 
     [SuppressUnmanagedCodeSecurity]
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void SendUIMessageFunc(nuint contextPtr, UIMessage uiMessage, nuint wParam, nuint lParam);
+    private delegate void SendUIMessageFunc(UIMessage uiMessage, nuint wParam, nuint lParam);
 
     [SuppressUnmanagedCodeSecurity]
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -77,7 +77,7 @@ public sealed class UIContextService
         this.frameArrayAddressCache = new GWAddressCache(() => this.memoryScanningService.FindAssertion(FrameArrayFile, FrameArrayAssertion, 0, -0x14));
         this.sendUiMessageHook = new GWHook<SendUIMessageFunc>(
             new GWAddressCache(() => this.memoryScanningService.ToFunctionStart(
-                this.memoryScanningService.FindAssertion(SendUIMessageFile, SendUIMessageAssertion, 0, 0))),
+                this.memoryScanningService.FindAddress(SendUIMessageSeq, SendUIMessageMask))),
             this.OnSendUIMessage);
         this.sendFrameUIMessage = new(
             new GWAddressCache(() => this.memoryScanningService.FunctionFromNearCall(
@@ -333,15 +333,8 @@ public sealed class UIContextService
 
     public unsafe void SendMessage(UIMessage message, nuint wParam, nuint lParam)
     {
-        if (this.getRootFrame.GetDelegate() is not GetRootFrameFunc getRootFrameFunc)
-        {
-            this.logger.LogError("Failed to get GetRootFrame delegate");
-            return;
-        }
-
-        var rootFrame = getRootFrameFunc();
         this.semaphoreSlim.Wait();
-        this.sendUiMessageHook.Continue(rootFrame->FrameId, message, wParam, lParam);
+        this.sendUiMessageHook.Continue(message, wParam, lParam);
         this.semaphoreSlim.Release();
     }
 
@@ -358,9 +351,9 @@ public sealed class UIContextService
         scopedLogger.LogInformation("Hooks initialized");
     }
 
-    private void OnSendUIMessage(nuint ctx, UIMessage uiMessage, nuint wParam, nuint lParam)
+    private void OnSendUIMessage(UIMessage uiMessage, nuint wParam, nuint lParam)
     {
-        this.sendUiMessageHook.Continue(ctx, uiMessage, wParam, lParam);
+        this.sendUiMessageHook.Continue(uiMessage, wParam, lParam);
     }
 
     private static unsafe void SetFrameVisibleInternal(WrappedPointer<Frame> frame, bool visible)

@@ -100,7 +100,7 @@ public sealed class DaybreakApiService(
             return;
         }
 
-        if (port < 0)
+        if (port <= 0)
         {
             this.notificationService.NotifyError(
                 "Daybreak API Failure",

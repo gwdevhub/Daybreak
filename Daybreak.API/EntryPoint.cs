@@ -1,4 +1,6 @@
-﻿using System.Net.NetworkInformation;
+﻿using System.Diagnostics;
+using System.Extensions.Core;
+using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using Daybreak.API.Configuration;
 using Daybreak.API.Extensions;
@@ -14,42 +16,53 @@ using Net.Sdk.Web;
 
 namespace Daybreak.API;
 
-public static class EntryPoint
+public class EntryPoint
 {
     private const int StartPort = 5080;
-    private const int InitializationAttempts = 300;
+    private static readonly TimeSpan InitializationTimeout = TimeSpan.FromSeconds(5);
+    private static readonly CancellationTokenSource CancellationTokenSource = new();
 
     [UnmanagedCallersOnly(EntryPoint = "ThreadInit"), STAThread]
     public static int ThreadInit(IntPtr _, int __)
     {
+        Environment.SetEnvironmentVariable("ASPNETCORE_HOSTINGSTARTUPASSEMBLIES", null, EnvironmentVariableTarget.Process);
+        Environment.SetEnvironmentVariable("ASPNETCORE_PREVENTHOSTINGSTARTUP", "true", EnvironmentVariableTarget.Process);
+#if DEBUG
         ConsoleExtensions.AllocateAnsiConsole();
+#endif
         var port = FindAvailablePort(StartPort);
-        if (port <= 0)
-        {
-            Console.WriteLine($"No available port found starting from {StartPort}");
-            return -1;
-        }
-
-        Console.WriteLine($"Starting Daybreak API on port {port}");
         var app = CreateApplication(port);
-        var runTask = Task.Run(() => StartServer(app));
+        var runTask = Task.Run(() => StartServer(app), CancellationTokenSource.Token);
+        var scopedLogger = app.Services.GetRequiredService<ILogger<EntryPoint>>().CreateScopedLogger();
         var healthCheck = app.Services.GetRequiredService<HealthCheckService>();
-        for(var i = 0; i < InitializationAttempts; i++)
+        var sw = Stopwatch.StartNew();
+        var healthy = false;
+        while(sw.Elapsed < InitializationTimeout)
         {
             var status = Task.Run(() => healthCheck.CheckHealthAsync()).Result;
-            Console.WriteLine($"Health check status: {status.Status} in {status.TotalDuration.TotalMilliseconds}ms. Report:\n{string.Join("\n", status.Entries.Select(e => $"{e.Key}: {e.Value.Status}"))}");
-            if (status.Status is not HealthStatus.Healthy)
+            scopedLogger.LogWarning("HealthCheck status: {status} in {duration}. Report: {report}", status.Status, status.TotalDuration, string.Join("\n", status.Entries.Select(e => $"{e.Key}: {e.Value.Status}")));
+            if (status.Status is HealthStatus.Healthy)
             {
-                Thread.Sleep(100);
+                healthy = true;
+                break;
             }
             else
             {
-                Console.WriteLine($"Daybreak API is healthy. Initialization succeeded");
-                break;
+                Thread.Sleep(100);
             }
         }
 
-        return port;
+        if (healthy)
+        {
+            scopedLogger.LogInformation("Daybreak API is healthy on port {port}. Initialization succeeded in {duration}", port, sw.Elapsed);
+            return port;
+        }
+        else
+        {
+            scopedLogger.LogError("Daybreak API failed to initialize in {duration}", sw.Elapsed);
+            CancellationTokenSource.Cancel();
+            return -1;
+        }
     }
 
     private static WebApplication CreateApplication(int port)
