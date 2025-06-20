@@ -3,7 +3,6 @@ using Daybreak.API.Interop.GuildWars;
 using Daybreak.API.Models;
 using System.Core.Extensions;
 using System.Extensions.Core;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security;
 

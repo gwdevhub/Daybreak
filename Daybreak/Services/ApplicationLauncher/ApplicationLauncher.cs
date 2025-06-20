@@ -6,7 +6,6 @@ using Daybreak.Shared.Models.Mods;
 using Daybreak.Shared.Services.ApplicationLauncher;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.Mods;
-using Daybreak.Shared.Services.Mutex;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Utils;

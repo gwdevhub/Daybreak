@@ -1,4 +1,5 @@
-﻿using Daybreak.Shared.Models;
+﻿using Daybreak.Configuration.Options;
+using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.LaunchConfigurations;
 using Daybreak.Shared.Models.Mods;
 using Daybreak.Shared.Services.Api;
@@ -8,6 +9,7 @@ using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions.Core;
@@ -20,6 +22,7 @@ public sealed class DaybreakApiService(
     IMDnsService mdnsService,
     IStubInjector stubInjector,
     INotificationService notificationService,
+    ILiveUpdateableOptions<FocusViewOptions> liveUpdateableOptions,
     ILogger<DaybreakApiService> logger)
     : IDaybreakApiService
 {
@@ -29,10 +32,19 @@ public sealed class DaybreakApiService(
     private readonly IMDnsService mdnsService = mdnsService.ThrowIfNull();
     private readonly IStubInjector stubInjector = stubInjector.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
+    private readonly ILiveUpdateableOptions<FocusViewOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
     private readonly ILogger<DaybreakApiService> logger = logger.ThrowIfNull();
 
     public string Name { get; } = "Daybreak API";
-    public bool IsEnabled { get; set; } = true;
+    public bool IsEnabled
+    {
+        get => this.liveUpdateableOptions.Value.Enabled;
+        set
+        {
+            this.liveUpdateableOptions.Value.Enabled = value;
+            this.liveUpdateableOptions.UpdateOption();
+        }
+    }
     public bool IsInstalled { get; } = true;
 
     public IEnumerable<string> GetCustomArguments() => [];
