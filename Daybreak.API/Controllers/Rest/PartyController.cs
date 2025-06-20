@@ -11,7 +11,7 @@ public sealed class PartyController(PartyService partyService)
 {
     private readonly PartyService partyService = partyService;
 
-    [GenerateGet]
+    [GenerateGet("loadout")]
     [EndpointName("GetPartyLoadout")]
     [EndpointSummary("Get the current party loadout")]
     [EndpointDescription("Get the current party loadout. Returns a json serialized PartyLoadout object")]
@@ -24,7 +24,7 @@ public sealed class PartyController(PartyService partyService)
         return partyLoadout is not null ? Results.Ok(partyLoadout) : Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
     }
 
-    [GeneratePost]
+    [GeneratePost("loadout")]
     [EndpointName("SetPartyLoadout")]
     [EndpointSummary("Set the current party loadout")]
     [EndpointDescription("Set the current party loadout")]

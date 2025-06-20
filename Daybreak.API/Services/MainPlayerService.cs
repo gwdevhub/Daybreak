@@ -305,6 +305,58 @@ public sealed class MainPlayerService : IDisposable
         return tcs.Task;
     }
 
+    public Task<InstanceInfo> GetMainPlayerInstance(CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        return this.gameThreadService.QueueOnGameThread(() =>
+        {
+            unsafe
+            {
+                var instanceType = this.instanceContextService.GetInstanceType();
+                if (instanceType is InstanceType.Loading)
+                {
+                    return new InstanceInfo(0, 0, 0, 0, Shared.Models.Api.InstanceType.Loading, DistrictRegionInfo.Unknown, LanguageInfo.Unknown, CampaignInfo.Unknown, ContinentInfo.Unknown, RegionInfo.Unknown, DifficultyInfo.Unknown);
+                }
+
+                var gameContext = this.gameContextService.GetGameContext();
+                var instanceInfoContext = this.instanceContextService.GetInstanceInfoContext();
+                var serverRegion = this.instanceContextService.GetServerRegion();
+                if (gameContext.IsNull ||
+                    gameContext.Pointer->CharContext is null ||
+                    gameContext.Pointer->WorldContext is null ||
+                    gameContext.Pointer->PartyContext is null ||
+                    instanceInfoContext.IsNull)
+                {
+                    scopedLogger.LogError("Game context is not initialized");
+                    return new InstanceInfo(0, 0, 0, 0, Shared.Models.Api.InstanceType.Loading, DistrictRegionInfo.Unknown, LanguageInfo.Unknown, CampaignInfo.Unknown, ContinentInfo.Unknown, RegionInfo.Unknown, DifficultyInfo.Unknown);
+                }
+
+                var charContext = *gameContext.Pointer->CharContext;
+                var worldContext = *gameContext.Pointer->WorldContext;
+                var partyContext = *gameContext.Pointer->PartyContext;
+                var instanceInfo = *instanceInfoContext.Pointer;
+                var mapId = charContext.MapId;
+                var language = charContext.Language;
+                var districtNumber = charContext.DistrictNumber;
+                var foesKilled = worldContext.FoesKilled;
+                var foesToKill = worldContext.FoesToKill;
+
+                return new InstanceInfo(
+                    MapId: charContext.MapId,
+                    DistrictNumber: charContext.DistrictNumber,
+                    FoesKilled: worldContext.FoesKilled,
+                    FoesToKill: worldContext.FoesToKill,
+                    Type: (Shared.Models.Api.InstanceType)instanceType,
+                    DistrictRegion: (DistrictRegionInfo)serverRegion,
+                    Language: (LanguageInfo)charContext.Language,
+                    Campaign: (CampaignInfo)instanceInfo.CurrentMapInfo->Campaign,
+                    Continent: (ContinentInfo)instanceInfo.CurrentMapInfo->Continent,
+                    Region: (RegionInfo)instanceInfo.CurrentMapInfo->Region,
+                    Difficulty: partyContext.Flags.HasFlag(PartyFlags.HardMode) ? DifficultyInfo.Hard : DifficultyInfo.Normal);
+            }
+        }, cancellationToken);
+    }
+
     public CallbackRegistration RegisterMainStateConsumer(TimeSpan frequency, Action<ReadOnlySpan<byte>> onUpdate)
     {
         ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(frequency, TimeSpan.Zero);

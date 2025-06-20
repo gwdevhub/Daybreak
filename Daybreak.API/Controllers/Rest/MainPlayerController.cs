@@ -75,4 +75,16 @@ public sealed class MainPlayerController(
         var result = await this.mainPlayerService.SetCurrentBuild(code ?? string.Empty, cancellationToken);
         return result ? Results.Ok() : Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
     }
+
+    [GenerateGet("instance-info")]
+    [EndpointName("GetMainPlayerInstanceInfo")]
+    [EndpointSummary("Get the current instance info")]
+    [EndpointDescription("Get the current instance info. Returns a json serialized MainPlayerInstanceInfo object")]
+    [ProducesResponseType<InstanceInfo>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+    public async Task<IResult> GetMainPlayerInstanceInfo(CancellationToken cancellationToken)
+    {
+        var instanceInfo = await this.mainPlayerService.GetMainPlayerInstance(cancellationToken);
+        return instanceInfo is not null ? Results.Ok(instanceInfo) : Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
+    }
 }

@@ -1,9 +1,12 @@
-﻿namespace Daybreak.Shared.Models.Api;
+﻿using System.Text.Json.Serialization;
 
+namespace Daybreak.Shared.Models.Api;
+
+[JsonConverter(typeof(JsonStringEnumConverter<InstanceType>))]
 public enum InstanceType
 {
-    Undefined,
     Outpost,
     Explorable,
-    Loading
+    Loading,
+    Undefined
 }
