@@ -513,8 +513,8 @@ public sealed class MainPlayerService : IDisposable
         }
 
         this.mainPlayerState = new MainPlayerState(
-            gameContext.Pointer->WorldContext->Level,
             gameContext.Pointer->WorldContext->Experience,
+            gameContext.Pointer->WorldContext->Level,
 
             gameContext.Pointer->WorldContext->CurrentLuxon,
             gameContext.Pointer->WorldContext->CurrentKurzick,

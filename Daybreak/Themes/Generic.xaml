@@ -82,7 +82,7 @@
                         </buttons:HighlightButton>
 
                         <Rectangle Opacity="0.2"
-                                   Fill="Black"
+                                   Fill="{Binding DisableBrush, RelativeSource={RelativeSource TemplatedParent}}"
                                    VerticalAlignment="Stretch"
                                    HorizontalAlignment="Stretch"
                                    Visibility="{Binding ClickEnabled, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>

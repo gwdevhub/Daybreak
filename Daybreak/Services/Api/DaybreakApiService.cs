@@ -8,6 +8,7 @@ using Daybreak.Shared.Services.MDns;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
@@ -33,6 +34,10 @@ public sealed class DaybreakApiService(
     private const string DaybreakApiName = "Daybreak.API.dll";
     private const string ProcessIdPlaceholder = "{PID}";
     private const string DaybreakApiServiceName = $"daybreak-api-{ProcessIdPlaceholder}";
+    private const int MDNSRetryCount = 3;
+
+    private static readonly TimeSpan MDNSTimeout = TimeSpan.FromSeconds(5);
+
     private readonly IAttachedApiAccessor attachedApiAccessor = attachedApiAccessor.ThrowIfNull();
     private readonly IMDnsService mdnsService = mdnsService.ThrowIfNull();
     private readonly IStubInjector stubInjector = stubInjector.ThrowIfNull();
@@ -43,6 +48,7 @@ public sealed class DaybreakApiService(
     private readonly ILogger<ScopedApiContext> scopedApiLogger = scopedApiLogger.ThrowIfNull();
 
     public string Name { get; } = "Daybreak API";
+
     public bool IsEnabled
     {
         get => this.liveUpdateableOptions.Value.Enabled;
@@ -52,6 +58,7 @@ public sealed class DaybreakApiService(
             this.liveUpdateableOptions.UpdateOption();
         }
     }
+
     public bool IsInstalled { get; } = true;
 
     public IEnumerable<string> GetCustomArguments() => [];
@@ -78,7 +85,23 @@ public sealed class DaybreakApiService(
         }
 
         var serviceName = DaybreakApiServiceName.Replace(ProcessIdPlaceholder, guildWarsProcess.Id.ToString());
-        var serviceUris = await this.mdnsService.FindLocalService(serviceName, cancellationToken: cancellationToken);
+        IReadOnlyList<Uri>? serviceUris = default;
+        for (var i = 0; i < MDNSRetryCount; i++)
+        {
+            using var cts = new CancellationTokenSource(MDNSTimeout);
+            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cts.Token);
+            scopedLogger.LogInformation("{attempt}/{maxAttempts} Searching for Daybreak API service with name {serviceName}", i, MDNSRetryCount, serviceName);
+            try
+            {
+                serviceUris = await this.mdnsService.FindLocalService(serviceName, cancellationToken: linkedCts.Token);
+                break;
+            }
+            catch(Exception e)
+            {
+                scopedLogger.LogError(e, "{attempt}/{maxAttempts} Failed to find Daybreak API service with name {serviceName}", i, MDNSRetryCount, serviceName);
+            }
+        }
+
         var serviceUri = serviceUris?.Count > 0 ? serviceUris[0] : default;
         if (serviceUri is null)
         {

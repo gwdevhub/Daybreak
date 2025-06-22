@@ -230,32 +230,39 @@ public partial class LauncherView : UserControl
 
         if (this.applicationLauncher.GetGuildwarsProcess(latestConfig.Configuration) is GuildWarsApplicationLaunchContext context)
         {
-            // Detected already running guildwars process
-            await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);
-            if (this.focusViewOptions.Value.Enabled)
+            try
             {
-                var notificationToken = this.notificationService.NotifyInformation(
-                        title: "Attaching to Guild Wars process...",
-                        description: "Attempting to attach to Guild Wars process");
-                var apiContext = await this.daybreakApiService.AttachDaybreakApiContext(context, cancellationToken);
-                notificationToken.Cancel();
+                // Detected already running guildwars process
+                await this.Dispatcher.InvokeAsync(() => this.CanLaunch = false);
+                if (this.focusViewOptions.Value.Enabled)
+                {
+                    var notificationToken = this.notificationService.NotifyInformation(
+                            title: "Attaching to Guild Wars process...",
+                            description: "Attempting to attach to Guild Wars process");
+                    var apiContext = await this.daybreakApiService.AttachDaybreakApiContext(context, cancellationToken);
+                    notificationToken.Cancel();
 
-                if (apiContext is null)
-                {
-                    this.notificationService.NotifyError(
-                        title: "Could not attach to Guild Wars",
-                        description: "Could not find the Api context to attach to Guild Wars. Check the logs for more details");
-                    await this.Dispatcher.InvokeAsync(() => this.CanLaunch = true);
+                    if (apiContext is null)
+                    {
+                        this.notificationService.NotifyError(
+                            title: "Could not attach to Guild Wars",
+                            description: "Could not find the Api context to attach to Guild Wars. Check the logs for more details");
+                        await this.Dispatcher.InvokeAsync(() => this.CanLaunch = true);
+                    }
+                    else
+                    {
+                        this.viewManager.ShowView<FocusView>(new FocusViewContext { ApiContext = apiContext, LaunchContext = context });
+                        this.menuService.CloseMenu();
+                    }
                 }
-                else
-                {
-                    this.viewManager.ShowView<FocusView>(new FocusViewContext { ApiContext = apiContext, LaunchContext = context });
-                    this.menuService.CloseMenu();
-                }
+
+                this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(latestConfig.Configuration);
+                return;
             }
-
-            this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(latestConfig.Configuration);
-            return;
+            catch(Exception)
+            {
+                await this.Dispatcher.InvokeAsync(() => this.CanLaunch = true);
+            }
         }
         else
         {

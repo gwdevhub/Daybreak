@@ -15,7 +15,13 @@ public partial class TitleInformationComponent : UserControl
     public event EventHandler<string>? NavigateToClicked;
 
     [GenerateDependencyProperty]
-    private string titleRankName = string.Empty;
+    private int pointsInCurrentRank;
+    [GenerateDependencyProperty]
+    private int pointsForNextRank;
+    [GenerateDependencyProperty]
+    private bool titleActive;
+    [GenerateDependencyProperty]
+    private string titleText = string.Empty;
 
     public TitleInformationComponent()
     {
@@ -41,20 +47,46 @@ public partial class TitleInformationComponent : UserControl
             return;
         }
 
-        if (context.Title is not null &&
-                context.Title.Tiers!.Count > context.TierNumber - 1)
+        this.TitleActive = context.Title is not null;
+
+        if (context.Title is not null)
         {
-            var rankIndex = (int)context.TierNumber! - 1;
-            this.TitleRankName = $"{context.Title.Tiers![rankIndex]} ({context.TierNumber}/{Math.Min(context.Title.Tiers.Count, context.MaxTierNumber)})";
+            if (context.MaxTierNumber == context.TierNumber ||
+                context.PointsForCurrentRank == context.PointsForNextRank)
+            {
+                this.PointsInCurrentRank = (int)context.CurrentPoints;
+                this.PointsForNextRank = (int)context.CurrentPoints;
+            }
+            else if (context.IsPercentage is false)
+            {
+                this.PointsInCurrentRank = (int)((uint)context.CurrentPoints - (uint)context.PointsForCurrentRank);
+                this.PointsForNextRank = (int)((uint)context.PointsForNextRank - (uint)context.PointsForCurrentRank);
+            }
+            else
+            {
+
+                this.PointsInCurrentRank = (int)(uint)context.CurrentPoints;
+                this.PointsForNextRank = (int)(uint)context.PointsForNextRank;
+            }
         }
-        else if (context.IsPercentage &&
-            context.Title is not null)
+
+        this.UpdateTitleText();
+    }
+
+    private void UpdateTitleText()
+    {
+        if (this.DataContext is not TitleInformationComponentContext context)
         {
-            this.TitleRankName = $"{context.Title.Name} ({context.CurrentPoints / 10d}%)";
+            return;
+        }
+
+        if (context.IsPercentage is true)
+        {
+            this.TitleText = $"{(double?)context.CurrentPoints / 10d}% Rank Progress";
         }
         else
         {
-            this.TitleRankName = string.Empty;
+            this.TitleText = $"{context.CurrentPoints}/{context.PointsForNextRank} Rank Progress";
         }
     }
 }

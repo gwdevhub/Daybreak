@@ -19,6 +19,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Controls\FocusViewComponents\PlayerResourcesComponent.xaml~RF3770aaff.TMP" />
     <None Remove="Resources\NotifyClose.wav" />
     <None Remove="Resources\NotifyError.wav" />
     <None Remove="Resources\NotifyInformation.wav" />
@@ -107,6 +108,24 @@
     <UpToDateCheckInput Include="..\Daybreak.Installer\**\*.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <DaybreakApiSources Include="..\Daybreak.API\**\*.cs" />
+    <DaybreakApiSources Include="..\Daybreak.API\Daybreak.API.csproj" />
+    <DaybreakApiSources Include="..\Daybreak.Shared\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <DaybreakInstallerSources Include="..\Daybreak.Installer\**\*.cs" />
+    <DaybreakInstallerSources Include="..\Daybreak.Installer\Daybreak.Installer.csproj" />
+    <DaybreakInstallerSources Include="..\Daybreak.Shared\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <DaybreakExtractorSources Include="..\Daybreak.7ZipExtractor\**\*.cs" />
+    <DaybreakExtractorSources Include="..\Daybreak.7ZipExtractor\Daybreak.7ZipExtractor.csproj" />
+    <DaybreakExtractorSources Include="..\Daybreak.Shared\**\*.cs" />
+  </ItemGroup>
+
   <!--
   This is a workaround to determine where to place the dependency projects
   It will first check if PublishDir is set.
@@ -124,21 +143,21 @@
   and places the resulting binaries in the same folder as Daybreak.exe.
   These work with the normal build, as well as with the dotnet publish
   -->
-  <Target Name="PublishDaybreak7ZipExtractor" AfterTargets="Build" Inputs="..\Daybreak.7ZipExtractor\Daybreak.7ZipExtractor.csproj;&#xD;&#xA;                @(Compile);$(MSBuildProjectFile)" Outputs="$(OutDir)Daybreak.7ZipExtractor.exe">
+  <Target Name="PublishDaybreak7ZipExtractor" AfterTargets="Build" Inputs="@(DaybreakExtractorSources)" Outputs="$(OutDir)Daybreak.7ZipExtractor.exe">
     
     <Message Importance="high" Text="📦 Daybreak.7ZipExtractor -&gt; $(DependencyOutput)"></Message>
     
     <Exec Command="dotnet publish ..\Daybreak.7ZipExtractor\Daybreak.7ZipExtractor.csproj -c $(Configuration) -o $(DependencyOutput)" />
   </Target>
 
-  <Target Name="PublishDaybreakInstaller" AfterTargets="Build" Inputs="..\Daybreak.Installer\Daybreak.Installer.csproj;&#xD;&#xA;                @(Compile);$(MSBuildProjectFile)" Outputs="$(OutDir)Daybreak.Installer.exe">
+  <Target Name="PublishDaybreakInstaller" AfterTargets="Build" Inputs="@(DaybreakInstallerSources)" Outputs="$(OutDir)Daybreak.Installer.exe">
 
     <Message Importance="high" Text="📦 Daybreak.Installer -&gt; $(DependencyOutput)"></Message>
     
     <Exec Command="dotnet publish ..\Daybreak.Installer\Daybreak.Installer.csproj -c $(Configuration) -o $(DependencyOutput)" />
   </Target>
 
-  <Target Name="PublishDaybreakAPI" AfterTargets="Build" Inputs="..\Daybreak.API\Daybreak.API.csproj;&#xD;&#xA;                @(Compile);$(MSBuildProjectFile)" Outputs="$(OutDir)Daybreak.API.dll">
+  <Target Name="PublishDaybreakAPI" AfterTargets="Build" Inputs="@(DaybreakApiSources)" Outputs="$(OutDir)Daybreak.API.dll">
     
     <Message Importance="high" Text="📦 Daybreak.API -&gt; $(DependencyOutput)"></Message>
     

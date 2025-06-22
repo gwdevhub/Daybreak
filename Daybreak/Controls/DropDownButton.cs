@@ -17,7 +17,7 @@ public partial class DropDownButton : Control
 {
     private const string PartMainButton = "PART_MainButton";
     private const string PartArrowButton = "PART_ArrowButton";
-    private const string PartDropDown = "PART_DropDown"; // name inside the ContextMenu template
+    private const string PartDropDown = "PART_DropDown";
 
     [GenerateDependencyProperty]
     private DataTemplate itemTemplate = default!;
@@ -32,12 +32,13 @@ public partial class DropDownButton : Control
     private bool clickEnabled = true;
 
     [GenerateDependencyProperty]
-    private Brush dropDownBackground = null;
+    private Brush dropDownBackground = default!;
 
-    /// <summary>Raised when the main area is clicked.</summary>
+    [GenerateDependencyProperty]
+    private Brush disableBrush = default!;
+
     public event EventHandler<object>? Clicked;
 
-    /// <summary>Raised when the selection changes through the menu.</summary>
     public event EventHandler<object>? SelectionChanged;
 
     private HighlightButton? mainButton;
@@ -58,29 +59,41 @@ public partial class DropDownButton : Control
         this.PreviewMouseRightButtonUp += (_, e) => e.Handled = true;
     }
 
-    /// <inheritdoc />
     public override void OnApplyTemplate()
     {
         base.OnApplyTemplate();
-
-        // detach previous event hooks (handles template re‑application)
         if (this.mainButton is not null)
+        {
             this.mainButton.Clicked -= this.MainButton_Clicked;
+        }
+
         if (this.arrowButton is not null)
+        {
             this.arrowButton.Clicked -= this.ArrowButton_Clicked;
+        }
+
         if (this.ContextMenu is not null)
+        {
             this.ContextMenu.Opened -= this.ContextMenu_Opened;
+        }
 
         this.mainButton = this.GetTemplateChild(PartMainButton) as HighlightButton;
         this.arrowButton = this.GetTemplateChild(PartArrowButton) as HighlightButton;
 
         if (this.mainButton is not null)
+        {
             this.mainButton.Clicked += this.MainButton_Clicked;
+        }
+
         if (this.arrowButton is not null)
+        {
             this.arrowButton.Clicked += this.ArrowButton_Clicked;
+        }
 
         if (this.ContextMenu is not null)
+        {
             this.ContextMenu.Opened += this.ContextMenu_Opened;
+        }
     }
 
     private void MainButton_Clicked(object? sender, object e)
@@ -114,7 +127,10 @@ public partial class DropDownButton : Control
     {
         this.SelectedItem = e;
         if (this.ContextMenu is not null)
+        {
             this.ContextMenu.IsOpen = false;
+        }
+
         this.SelectionChanged?.Invoke(this, e);
     }
 }

@@ -26,6 +26,7 @@
                                  Items="{Binding ElementName=_this, Path=LaunchConfigurations, Mode=OneWay}"
                                  SelectedItem="{Binding ElementName=_this, Path=LatestConfiguration, Mode=TwoWay}"
                                  ClickEnabled="{Binding ElementName=_this, Path=CanLaunch, Mode=OneWay}"
+                                 DisableBrush="Black"
                                  SelectionChanged="DropDownButton_SelectionChanged"
                                  Clicked="DropDownButton_Clicked">
             <controls:DropDownButton.ItemTemplate>

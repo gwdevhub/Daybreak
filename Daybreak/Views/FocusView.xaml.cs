@@ -39,12 +39,7 @@ public partial class FocusView : UserControl
     private const int MaxRetries = 5;
 
     private static readonly TimeSpan UninitializedBackoff = TimeSpan.FromSeconds(15);
-    private static readonly TimeSpan GameDataFrequency = TimeSpan.FromSeconds(1);
-    private static readonly TimeSpan PathingDataFrequency = TimeSpan.FromSeconds(1);
     private static readonly TimeSpan MainPlayerDataFrequency = TimeSpan.FromSeconds(1);
-    private static readonly TimeSpan GameStateFrequency = TimeSpan.FromMilliseconds(16);
-    private static readonly TimeSpan InventoryDataFrequency = TimeSpan.FromSeconds(1);
-    private static readonly TimeSpan CartoDataFrequency = TimeSpan.FromSeconds(1);
 
     private readonly IWindowEventsHook<MainWindow> mainWindowEventsHook;
     private readonly INotificationService notificationService;
@@ -67,7 +62,7 @@ public partial class FocusView : UserControl
     private bool pauseDataFetching;
 
     [GenerateDependencyProperty]
-    private CharacterSelectComponentContext characterSelectComponentContext = default!;
+    private CharacterComponentContext characterSelectComponentContext = default!;
 
     [GenerateDependencyProperty]
     private CurrentMapComponentContext currentMapComponentContext = default!;
@@ -79,7 +74,10 @@ public partial class FocusView : UserControl
     private QuestLogComponentContext questLogComponentContext = default!;
 
     [GenerateDependencyProperty]
-    private CurrentQuestComponentContext currentQuestComponentContext = default!;
+    private PlayerResourcesComponentContext playerResourcesComponentContext = default!;
+
+    [GenerateDependencyProperty]
+    private VanquishComponentContext vanquishComponentContext = default!;
 
     private bool browserMaximized = false;
     private CancellationTokenSource? cancellationTokenSource;
@@ -210,9 +208,10 @@ public partial class FocusView : UserControl
 
                 this.SetCurrentMapComponentContext(instanceInfo);
                 this.SetTitleInformationComponentContext(titleInfo);
-                this.SetCharacterSelectComponentContext(characters);
+                this.SetCharacterSelectComponentContext(mainPlayerState, characters);
                 this.SetQuestLogComponentContext(questLog);
-                this.SetCurrentQuestContext(questLog);
+                this.SetPlayerResourcesComponentContext(mainPlayerState);
+                this.SetVanquishComponentContext(instanceInfo);
 
                 this.MainPlayerDataValid = !this.PauseDataFetching;
                 this.Browser.Visibility = Visibility.Visible;
@@ -369,10 +368,85 @@ public partial class FocusView : UserControl
         this.PauseDataFetching = false;
     }
 
+    private void SetVanquishComponentContext(InstanceInfo instanceInfo)
+    {
+        this.VanquishComponentContext = new VanquishComponentContext
+        {
+            FoesKilled = instanceInfo.FoesKilled,
+            FoesToKill = instanceInfo.FoesToKill,
+            HardMode = instanceInfo.Difficulty is DifficultyInfo.Hard,
+            Vanquishing = (instanceInfo.FoesToKill + instanceInfo.FoesKilled > 0U) && instanceInfo.Difficulty is DifficultyInfo.Hard
+        };
+    }
+
     private void SetCurrentMapComponentContext(InstanceInfo instanceInfo)
     {
         _ = Map.TryParse((int)instanceInfo.MapId, out var map);
         this.CurrentMapComponentContext = new CurrentMapComponentContext { CurrentMap = map };
+    }
+
+    private void SetCharacterSelectComponentContext(MainPlayerState state, CharacterSelectInformation characters)
+    {
+        var characterNames = characters.CharacterNames
+                    .Select(c =>
+                    {
+                        _ = Profession.TryParse((int)c.Primary, out var primary);
+                        _ = Profession.TryParse((int)c.Secondary, out var secondary);
+                        var professionText = secondary == Profession.None ?
+                            primary.Alias is null ? string.Empty : $"{primary.Alias} "
+                            : $"{primary.Alias}/{secondary.Alias} ";
+                        var name = $"{professionText}{c.Name}";
+                        return (c, name);
+                    })
+                    .ToList();
+
+
+
+        var mainCharacter = characterNames.FirstOrDefault(c => c.c.Name == characters.CurrentCharacter?.Name);
+        var restCharacters = characterNames.Where(c => c.c.Name != mainCharacter.c.Name);
+        this.CharacterSelectComponentContext = new CharacterComponentContext
+        {
+            CurrentExperience = state.CurrentExperience,
+            Characters = [.. restCharacters.Select(c => new CharacterSelectComponentEntry { CharacterName = c.c.Name, DisplayName = c.name })],
+            CurrentCharacter = new CharacterSelectComponentEntry { CharacterName = mainCharacter.c.Name, DisplayName = mainCharacter.name }
+        };
+    }
+
+    private void SetQuestLogComponentContext(QuestLogInformation questLog)
+    {
+        var currentQuestEntry = questLog.Quests.FirstOrDefault(q => q.QuestId == questLog.CurrentQuestId);
+        QuestMetadata? currentQuestMeta = default;
+        if (currentQuestEntry is not null)
+        {
+            _ = Quest.TryParse((int)questLog.CurrentQuestId, out var currentQuest);
+            _ = Map.TryParse((int)currentQuestEntry.MapFrom, out var mapFrom);
+            _ = Map.TryParse((int)currentQuestEntry.MapTo, out var mapTo);
+            currentQuestMeta = new QuestMetadata
+            {
+                From = mapFrom,
+                To = mapTo,
+                Quest = currentQuest
+            };
+        }
+
+        this.QuestLogComponentContext = new QuestLogComponentContext
+        {
+            CurrentQuest = currentQuestMeta,
+            Quests = [.. questLog.Quests
+                .Where(q => q.QuestId != questLog.CurrentQuestId)
+                .Select(quest =>
+                {
+                    if (!Quest.TryParse((int)quest.QuestId, out var parsedQuest) ||
+                        !Map.TryParse((int)quest.MapFrom, out var mapFrom) ||
+                        !Map.TryParse((int)quest.MapTo, out var mapTo))
+                    {
+                        return default;
+                    }
+
+                    return new QuestMetadata { From = mapFrom, To = mapTo, Quest = parsedQuest };
+                })
+                .OfType<QuestMetadata>()]
+        };
     }
 
     private void SetTitleInformationComponentContext(TitleInfo? titleInfo)
@@ -406,62 +480,24 @@ public partial class FocusView : UserControl
         }
     }
 
-    private void SetCharacterSelectComponentContext(CharacterSelectInformation characters)
+    private void SetPlayerResourcesComponentContext(MainPlayerState state)
     {
-        var characterNames = characters.CharacterNames
-                    .Select(c =>
-                    {
-                        _ = Profession.TryParse((int)c.Primary, out var primary);
-                        _ = Profession.TryParse((int)c.Secondary, out var secondary);
-                        var professionText = secondary == Profession.None ?
-                            primary.Alias is null ? string.Empty : $"{primary.Alias} "
-                            : $"{primary.Alias}/{secondary.Alias} ";
-                        var name = $"{professionText}{c.Name}";
-                        return (c, name);
-                    })
-                    .ToList();
-
-
-
-        var mainCharacter = characterNames.FirstOrDefault(c => c.c.Name == characters.CurrentCharacter?.Name);
-        var restCharacters = characterNames.Where(c => c.c.Name != mainCharacter.c.Name);
-        this.CharacterSelectComponentContext = new CharacterSelectComponentContext
+        this.PlayerResourcesComponentContext = new PlayerResourcesComponentContext
         {
-            Characters = [.. restCharacters.Select(c => new CharacterSelectComponentEntry { CharacterName = c.c.Name, DisplayName = c.name })],
-            CurrentCharacter = new CharacterSelectComponentEntry { CharacterName = mainCharacter.c.Name, DisplayName = mainCharacter.name }
+            CurrentBalthazar = state.CurrentBalthazar,
+            CurrentImperial = state.CurrentImperial,
+            CurrentLuxon = state.CurrentLuxon,
+            CurrentKurzick = state.CurrentKurzick,
+
+            MaxBalthazar = state.MaxBalthazar,
+            MaxImperial = state.MaxImperial,
+            MaxLuxon = state.MaxLuxon,
+            MaxKurzick = state.MaxKurzick,
+
+            TotalBalthazar = state.TotalBalthazar,
+            TotalImperial = state.TotalImperial,
+            TotalLuxon = state.TotalLuxon,
+            TotalKurzick = state.TotalKurzick,
         };
-    }
-
-    private void SetQuestLogComponentContext(QuestLogInformation questLog)
-    {
-        this.QuestLogComponentContext = new QuestLogComponentContext
-        {
-            Quests = [.. questLog.Quests
-                .Where(q => q.QuestId != questLog.CurrentQuestId)
-                .Select(quest =>
-                {
-                    if (!Quest.TryParse((int)quest.QuestId, out var parsedQuest) ||
-                        !Map.TryParse((int)quest.MapFrom, out var mapFrom) ||
-                        !Map.TryParse((int)quest.MapTo, out var mapTo))
-                    {
-                        return default;
-                    }
-
-                    return new QuestMetadata { From = mapFrom, To = mapTo, Quest = parsedQuest };
-                })
-                .OfType<QuestMetadata>()]
-        };
-    }
-    
-    private void SetCurrentQuestContext(QuestLogInformation questLog)
-    {
-        if (Quest.TryParse((int)questLog.CurrentQuestId, out var quest))
-        {
-            this.CurrentQuestComponentContext = new CurrentQuestComponentContext { Quest = quest };
-        }
-        else
-        {
-            this.CurrentQuestComponentContext = default!;
-        }
     }
 }
