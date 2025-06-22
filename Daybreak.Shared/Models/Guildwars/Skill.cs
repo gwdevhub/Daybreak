@@ -913,7 +913,7 @@ public sealed class Skill
     public static readonly Skill ScorpionWire = new() { Id = 815, Name = "Scorpion Wire", Profession = Profession.Assassin };
     public static readonly Skill SiphonStrength = new() { Id = 827, Name = "Siphon Strength", Profession = Profession.Assassin };
     public static readonly Skill DancingDaggers = new() { Id = 858, Name = "Dancing Daggers", Profession = Profession.Assassin };
-    public static readonly Skill SignetofShadows = new() { Id = 876, Name = "Signet of Shadows" };
+    public static readonly Skill SignetofShadows = new() { Id = 876, Name = "Signet of Shadows", Profession = Profession.Assassin };
     public static readonly Skill ShamefulFear = new() { Id = 927, Name = "Shameful Fear", Profession = Profession.Assassin };
     public static readonly Skill SiphonSpeed = new() { Id = 951, Name = "Siphon Speed", Profession = Profession.Assassin };
     public static readonly Skill MantisTouch = new() { Id = 974, Name = "Mantis Touch", Profession = Profession.Assassin };
@@ -3022,9 +3022,9 @@ public sealed class Skill
         return skill;
     }
 
-    public Profession? Profession { get; private set; }
-    public string? Name { get; private set; }
-    public int? Id { get; private set; }
+    public required Profession Profession { get; init; }
+    public required string Name { get; init; }
+    public required int Id { get; init; }
     public string? AlternativeName { get; private set; }
     public override string ToString() => this.Name ?? this.AlternativeName ?? nameof(Skill);
     private Skill()

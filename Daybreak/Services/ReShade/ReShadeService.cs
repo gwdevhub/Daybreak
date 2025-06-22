@@ -10,7 +10,6 @@ using Daybreak.Shared.Services.Downloads;
 using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.ReShade;
-using Daybreak.Shared.Services.Scanner;
 using Daybreak.Shared.Utils;
 using HtmlAgilityPack;
 using IniParser.Parser;
@@ -55,7 +54,6 @@ internal sealed class ReShadeService : IReShadeService, IApplicationLifetimeServ
     private static readonly string[] FxExtensions = [".fx",];
     private static readonly string[] FxHeaderExtensions = [".fxh"];
 
-    private readonly IGuildwarsMemoryCache guildwarsMemoryCache;
     private readonly INotificationService notificationService;
     private readonly IProcessInjector processInjector;
     private readonly ILiveUpdateableOptions<ReShadeOptions> liveUpdateableOptions;
@@ -88,7 +86,6 @@ internal sealed class ReShadeService : IReShadeService, IApplicationLifetimeServ
                                File.Exists(ConfigIniPath);
 
     public ReShadeService(
-        IGuildwarsMemoryCache guildwarsMemoryCache,
         INotificationService notificationService,
         IProcessInjector processInjector,
         ILiveUpdateableOptions<ReShadeOptions> liveUpdateableOptions,
@@ -96,7 +93,6 @@ internal sealed class ReShadeService : IReShadeService, IApplicationLifetimeServ
         IDownloadService downloadService,
         ILogger<ReShadeService> logger)
     {
-        this.guildwarsMemoryCache = guildwarsMemoryCache.ThrowIfNull();
         this.notificationService = notificationService.ThrowIfNull();
         this.processInjector = processInjector.ThrowIfNull();
         this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();

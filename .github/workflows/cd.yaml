@@ -82,21 +82,6 @@ jobs:
       env:
         RuntimeIdentifier: win-${{ matrix.targetplatform }}
 
-    - name: Create publish installer files
-      run: dotnet publish .\Daybreak.Installer\Daybreak.Installer.csproj -c $env:Configuration -r $env:RuntimeIdentifier --property:SolutionDir=$env:GITHUB_WORKSPACE -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained true -o .\Publish
-      env:
-        RuntimeIdentifier: win-${{ matrix.targetplatform }}
-
-    - name: Create publish extractor files
-      run: dotnet publish .\Daybreak.7ZipExtractor\Daybreak.7ZipExtractor.csproj -c $env:Configuration -r $env:RuntimeIdentifier --property:SolutionDir=$env:GITHUB_WORKSPACE -p:PublishReadyToRun=true -p:PublishSingleFile=false --self-contained true -o .\Publish
-      env:
-        RuntimeIdentifier: win-${{ matrix.targetplatform }}
-
-    - name: Create publish API files
-      run: dotnet publish .\Daybreak.API\Daybreak.API.csproj -c $env:Configuration -r $env:RuntimeIdentifier --property:SolutionDir=$env:GITHUB_WORKSPACE -p:PublishSingleFile=false --self-contained true -o .\Publish
-      env:
-        RuntimeIdentifier: win-${{ matrix.targetplatform }}
-
     - name: Pack publish files
       run: |
         Write-Host $env

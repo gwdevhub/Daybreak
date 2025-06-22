@@ -30,68 +30,40 @@
             <ColumnDefinition Width="*"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"></RowDefinition>
-            <RowDefinition Height="118"></RowDefinition>
-        </Grid.RowDefinitions>
-        <Grid Grid.Row="1"
-              Margin="5, 5, 5, 0"
-              Grid.ColumnSpan="2">
-            <components:PlayerResourcesComponent Margin="5, 5, 5, 0"
-                                     Grid.ColumnSpan="2"
-                                     Grid.Row="1"
-                                     DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext, Mode=OneWay}"
-                                     Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-            <Grid Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
-                  VerticalAlignment="Stretch"
-                  HorizontalAlignment="Stretch"
-                  Background="{StaticResource Daybreak.Brushes.Background}">
-                <controls:CircularLoadingWidget VerticalAlignment="Center"
-                    HorizontalAlignment="Center"
-                    Height="100"
-                    Width="100"/>
-            </Grid>
-        </Grid>
         <Grid Margin="5, 0, 5, 0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"></RowDefinition>
-                <RowDefinition Height="auto"></RowDefinition>
-                <RowDefinition Height="auto"></RowDefinition>
-                <RowDefinition Height="auto"></RowDefinition>
-                <RowDefinition Height="auto"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
-            <components:MainPlayerInformationComponent
-                                           DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext.Player.PlayerInformation, Mode=OneWay}"
-                                           Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                           Margin="0, 0, 0, 10"
-                                           NavigateToClicked="Component_NavigateToClicked"/>
-            <Grid Grid.Row="1"
-                  Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <components:TitleInformationComponent Grid.Row="1"
-                                      DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext.Player.PlayerInformation.TitleInformation, Mode=OneWay}"
-                                      Visibility="{Binding ElementName=_this, Path=MainPlayerResourceContext.Player.PlayerInformation.TitleInformation.IsValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                      Margin="0, 0, 0, 10"
-                                      NavigateToClicked="Component_NavigateToClicked"/>
-            </Grid>
-            <components:CurrentMapComponent Grid.Row="2"
-                                            DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext.Session.Session.CurrentMap, Mode=OneWay}"
-                                            Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                            Margin="0, 0, 0, 10"
-                                            NavigateToClicked="Component_NavigateToClicked"/>
-            <components:CurrentQuestComponent Grid.Row="3"
-                                              Margin="0, 0, 0, 10"
-                                              DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext.Player.PlayerInformation.Quest, Mode=OneWay}"
-                                              Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                              NavigateToClicked="Component_NavigateToClicked"/>
-            <components:QuestLogComponent Grid.Row="4"
-                                          Grid.RowSpan="2"
-                                          NavigateToClicked="Component_NavigateToClicked"
-                                          DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext.Player.PlayerInformation.QuestLog, Mode=OneWay}"
-                                          Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <StackPanel Grid.Row="0">
+                <components:CharacterComponent  Margin="0, 0, 0, 10"
+                                                DataContext="{Binding ElementName=_this, Path=CharacterSelectComponentContext, Mode=OneWay}"
+                                                Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                NavigateToClicked="Component_NavigateToClicked"
+                                                SwitchCharacterClicked="CharacterSelectComponent_SwitchCharacterClicked"/>
+                <Grid Visibility="{Binding ElementName=_this, Path=VanquishComponentContext.Vanquishing, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                      Margin="0, 0, 0, 10">
+                    <components:VanquishComponent   DataContext="{Binding ElementName=_this, Path=VanquishComponentContext, Mode=OneWay}"
+                                                    Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                </Grid>
+                <components:TitleInformationComponent   Margin="0, 0, 0, 10"
+                                                        DataContext="{Binding ElementName=_this, Path=TitleInformationComponentContext, Mode=OneWay}"
+                                                        Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                        NavigateToClicked="Component_NavigateToClicked"/>
+                <components:PlayerResourcesComponent    Margin="0, 0, 0, 10"
+                                                        DataContext="{Binding ElementName=_this, Path=PlayerResourcesComponentContext, Mode=OneWay}"
+                                                        Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                <components:CurrentMapComponent Margin="0, 0, 0, 10"
+                                                DataContext="{Binding ElementName=_this, Path=CurrentMapComponentContext.CurrentMap, Mode=OneWay}"
+                                                Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                NavigateToClicked="Component_NavigateToClicked"/>
+            </StackPanel>
+            <components:QuestLogComponent   Grid.Row="1"
+                                            NavigateToClicked="Component_NavigateToClicked"
+                                            DataContext="{Binding ElementName=_this, Path=QuestLogComponentContext, Mode=OneWay}"
+                                            Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
             <Grid Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
-                  Grid.RowSpan="6"
-                  Grid.ColumnSpan="6"
+                  Grid.RowSpan="100"
                   VerticalAlignment="Stretch"
                   HorizontalAlignment="Stretch"
                   Background="{StaticResource Daybreak.Brushes.Background}">
@@ -103,14 +75,11 @@
         </Grid>
         <Grid Grid.Column="1"
               Margin="5, 0, 5, 0">
-            <interactivity:Interaction.Behaviors>
-                <behaviors:RowAutoMargin x:Name="RowAutoMargin" Margin="10"></behaviors:RowAutoMargin>
-            </interactivity:Interaction.Behaviors>
             <Grid.RowDefinitions>
                 <RowDefinition Height="{Binding ElementName=Browser, Path=BrowserSupported, Mode=OneWay, Converter={StaticResource BrowserComponentVisibilityConverter}}" />
             </Grid.RowDefinitions>
             <Grid x:Name="BrowserHolder"
-                  Grid.Row="2">
+                  Grid.Row="0">
                 <controls:ChromiumBrowserWrapper
                     x:Name="Browser"
                     ControlsEnabled="True"

@@ -18,8 +18,8 @@
                                              Tag="{Binding Mode=OneWay}"
                                              Clicked="HighlightButton_Clicked">
                         <buttons:HighlightButton.ButtonContent>
-                            <ContentControl DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType={x:Type buttons:HighlightButton}}}"
-                                            ContentTemplate="{Binding ItemTemplate, RelativeSource={RelativeSource AncestorType={x:Type local:DropDownButtonContextMenu}}}"/>
+                            <ContentControl Content="{Binding}"
+                                            ContentTemplate="{Binding ItemTemplate, RelativeSource={RelativeSource AncestorType=local:DropDownButtonContextMenu}}" />
                         </buttons:HighlightButton.ButtonContent>
                     </buttons:HighlightButton>
                 </DataTemplate>

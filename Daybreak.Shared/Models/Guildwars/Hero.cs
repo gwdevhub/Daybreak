@@ -5,7 +5,7 @@ using System.Linq;
 namespace Daybreak.Shared.Models.Guildwars;
 public sealed class Hero : IWikiEntity
 {
-    public static readonly Hero None = new() { Id = 0, Profession = Profession.None };
+    public static readonly Hero None = new() { Id = 0, Profession = Profession.None, Name = string.Empty, WikiUrl = string.Empty };
     public static readonly Hero Norgu = new() { Id = 1, Name = "Norgu", WikiUrl = "https://wiki.guildwars.com/wiki/Norgu", Profession = Profession.Mesmer };
     public static readonly Hero Goren = new() { Id = 2, Name = "Goren", WikiUrl = "https://wiki.guildwars.com/wiki/Goren", Profession = Profession.Warrior };
     public static readonly Hero Tahlkora = new() { Id = 3, Name = "Tahlkora", WikiUrl = "https://wiki.guildwars.com/wiki/Tahlkora", Profession = Profession.Monk };
@@ -33,14 +33,14 @@ public sealed class Hero : IWikiEntity
     public static readonly Hero Xandra = new() { Id = 25, Name = "Xandra", WikiUrl = "https://wiki.guildwars.com/wiki/Xandra", Profession = Profession.Ritualist };
     public static readonly Hero Vekk = new() { Id = 26, Name = "Vekk", WikiUrl = "https://wiki.guildwars.com/wiki/Vekk", Profession = Profession.Elementalist };
     public static readonly Hero OgdenStonehealer = new() { Id = 27, Name = "Ogden Stonehealer", WikiUrl = "https://wiki.guildwars.com/wiki/Ogden_Stonehealer", Profession = Profession.Monk };
-    public static readonly Hero Merc1 = new() { Id = 28, Name = "Mercenary Hero 1", Profession = Profession.None };
-    public static readonly Hero Merc2 = new() { Id = 29, Name = "Mercenary Hero 2", Profession = Profession.None };
-    public static readonly Hero Merc3 = new() { Id = 30, Name = "Mercenary Hero 3", Profession = Profession.None };
-    public static readonly Hero Merc4 = new() { Id = 31, Name = "Mercenary Hero 4", Profession = Profession.None };
-    public static readonly Hero Merc5 = new() { Id = 32, Name = "Mercenary Hero 5", Profession = Profession.None };
-    public static readonly Hero Merc6 = new() { Id = 33, Name = "Mercenary Hero 6", Profession = Profession.None };
-    public static readonly Hero Merc7 = new() { Id = 34, Name = "Mercenary Hero 7", Profession = Profession.None };
-    public static readonly Hero Merc8 = new() { Id = 35, Name = "Mercenary Hero 8", Profession = Profession.None };
+    public static readonly Hero Merc1 = new() { Id = 28, Name = "Mercenary Hero 1", WikiUrl = string.Empty, Profession = Profession.None };
+    public static readonly Hero Merc2 = new() { Id = 29, Name = "Mercenary Hero 2", WikiUrl = string.Empty, Profession = Profession.None };
+    public static readonly Hero Merc3 = new() { Id = 30, Name = "Mercenary Hero 3", WikiUrl = string.Empty, Profession = Profession.None };
+    public static readonly Hero Merc4 = new() { Id = 31, Name = "Mercenary Hero 4", WikiUrl = string.Empty, Profession = Profession.None };
+    public static readonly Hero Merc5 = new() { Id = 32, Name = "Mercenary Hero 5", WikiUrl = string.Empty, Profession = Profession.None };
+    public static readonly Hero Merc6 = new() { Id = 33, Name = "Mercenary Hero 6", WikiUrl = string.Empty, Profession = Profession.None };
+    public static readonly Hero Merc7 = new() { Id = 34, Name = "Mercenary Hero 7", WikiUrl = string.Empty, Profession = Profession.None };
+    public static readonly Hero Merc8 = new() { Id = 35, Name = "Mercenary Hero 8", WikiUrl = string.Empty, Profession = Profession.None };
     public static readonly Hero Miku = new() { Id = 36, Name = "Miku", WikiUrl = "https://wiki.guildwars.com/wiki/Miku", Profession = Profession.Assassin };
     public static readonly Hero ZeiRi = new() { Id = 37, Name = "Zei Ri", WikiUrl = "https://wiki.guildwars.com/wiki/Zei_Ri", Profession = Profession.Ritualist };
 
@@ -128,8 +128,8 @@ public sealed class Hero : IWikiEntity
     {
     }
 
-    public int Id { get; init; }
-    public string? Name { get; init; }
-    public string? WikiUrl { get; init; }
+    public required int Id { get; init; }
+    public required string Name { get; init; }
+    public required string WikiUrl { get; init; }
     public required Profession Profession { get; init; }
 }

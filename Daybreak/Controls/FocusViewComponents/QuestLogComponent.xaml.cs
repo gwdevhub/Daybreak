@@ -1,4 +1,5 @@
-﻿using Daybreak.Shared.Models.Guildwars;
+﻿using Daybreak.Shared.Models.FocusView;
+using Daybreak.Shared.Models.Guildwars;
 using System;
 using System.Windows.Controls;
 
@@ -22,7 +23,7 @@ public partial class QuestLogComponent : UserControl
             return;
         }
 
-        this.NavigateToClicked?.Invoke(this, e.WikiUrl!);
+        this.NavigateToClicked?.Invoke(this, e.WikiUrl ?? string.Empty);
     }
 
     private void QuestLogTemplate_QuestClicked(object _, Quest e)
@@ -32,6 +33,17 @@ public partial class QuestLogComponent : UserControl
             return;
         }
 
-        this.NavigateToClicked?.Invoke(this, e.WikiUrl!);
+        this.NavigateToClicked?.Invoke(this, e.WikiUrl ?? string.Empty);
+    }
+
+    private void ActiveQuest_Clicked(object sender, EventArgs e)
+    {
+        if (this.DataContext is not QuestLogComponentContext context ||
+            context.CurrentQuest?.Quest is null)
+        {
+            return;
+        }
+
+        this.NavigateToClicked?.Invoke(this, context.CurrentQuest.Quest.WikiUrl ?? string.Empty);
     }
 }

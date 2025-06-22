@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Daybreak.Controls.FocusViewComponents"
              xmlns:buttons="clr-namespace:Daybreak.Controls.Buttons"
+             xmlns:controls="clr-namespace:Daybreak.Controls"
              DataContextChanged="UserControl_DataContextChanged"
              x:Name="_this"
              Background="{DynamicResource Daybreak.Brushes.Background}"
@@ -21,7 +22,7 @@
             <TextBlock 
                         Grid.Column="0"
                         FontSize="18"
-                        Margin="10"
+                        Margin="10, 0, 10, 0"
                         Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                         Text="Title Track"
                         HorizontalAlignment="Left"></TextBlock>
@@ -41,15 +42,16 @@
         <Rectangle 
                     Height="1"
                     Fill="{DynamicResource MahApps.Brushes.ThemeForeground}"></Rectangle>
-        <buttons:MenuButton
-                    Title="{Binding ElementName=_this, Path=TitleRankName, Mode=OneWay}"
-                    HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
-                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    HorizontalAlignment="Stretch"
-                    HorizontalContentAlignment="Left"
-                    Cursor="Hand"
-                    FontSize="20"
-                    MouseLeftButtonDown="Title_MouseLeftButtonDown"
-                    ToolTip="Open title track info"/>
+        <controls:HorizontalResourceBar 
+                CurrentResourceValue="{Binding ElementName=_this, Path=PointsInCurrentRank, Mode=OneWay}"
+                MaxResourceValue="{Binding ElementName=_this, Path=PointsForNextRank, Mode=OneWay}"
+                BarColor="{DynamicResource Daybreak.Brushes.Rank}"
+                Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                FontSize="14"
+                Text="{Binding ElementName=_this, Path=TitleText, Mode=OneWay}"
+                BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                BorderThickness="1"
+                MaxHeight="20"
+                ToolTip="Switch display mode"/>
     </StackPanel>
 </UserControl>

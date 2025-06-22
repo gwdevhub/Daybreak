@@ -9,33 +9,49 @@
     <StripSymbols>true</StripSymbols>
     <InteropExports>true</InteropExports>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <EnableRequestDelegateGenerator>true</EnableRequestDelegateGenerator>
     
     <PublishAot>true</PublishAot>
     <SelfContained>true</SelfContained>
-  
-    
+
     <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
     <UseAppHost>false</UseAppHost>
     <EnableIISSupport>false</EnableIISSupport>
     <InvariantGlobalization>true</InvariantGlobalization>
+    <Platforms>x86</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Net.Sdk.Web.Extensions.SourceGenerators" Version="0.9.0" />
+    <EmbeddedResource Include="Configuration\appsettings.Debug.json" />
+    <EmbeddedResource Include="Configuration\appsettings.json" />
+    <EmbeddedResource Include="Configuration\appsettings.Release.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <RdXmlFile Include="rd.xml" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.5" />
+    <PackageReference Include="MinHook.NET" Version="1.1.1" />
+    <PackageReference Include="Net.Sdk.Web.Extensions" Version="0.8.10" />
+    <PackageReference Include="Net.Sdk.Web.Extensions.SourceGenerators" Version="0.9.3" />
+    <PackageReference Include="PeNet" Version="5.1.0" />
+    <PackageReference Include="Serilog" Version="4.3.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.1" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="8.1.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="8.1.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="8.1.2" />
+    <PackageReference Include="System.Private.Uri" Version="4.3.2" />
+    <PackageReference Include="SystemExtensions.NetStandard.Generators" Version="0.1.5" PrivateAssets="all" />
+    <PackageReference Include="ZLinq" Version="1.4.7" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Daybreak.Shared\Daybreak.Shared.csproj" />
   </ItemGroup>
-
-  <PropertyGroup>
-    <DaybreakHostOutputDir>$(MSBuildProjectDirectory)\..\Daybreak\bin\x86\$(Configuration)\$(TargetFramework)\</DaybreakHostOutputDir>
-    <ShouldPublishAot>true</ShouldPublishAot>
-  </PropertyGroup>
-
-  <Target Name="PublishIntoDaybreak" AfterTargets="PostBuild" Condition="'$(ShouldPublishAot)'=='true'">
-    <Message Text="📦 dotnet-publish Daybreak.API → $(DaybreakHostOutputDir)" Importance="High" />
-
-    <Exec Command="dotnet publish &quot;$(MSBuildProjectFullPath)&quot; -c $(Configuration) -r win-x86 --self-contained true -o &quot;$(DaybreakHostOutputDir)&quot;" WorkingDirectory="$(ProjectDir)" />
-  </Target>
 </Project>
