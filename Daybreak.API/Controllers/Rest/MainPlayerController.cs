@@ -87,4 +87,16 @@ public sealed class MainPlayerController(
         var instanceInfo = await this.mainPlayerService.GetMainPlayerInstance(cancellationToken);
         return instanceInfo is not null ? Results.Ok(instanceInfo) : Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
     }
+
+    [GenerateGet("title")]
+    [EndpointName("GetMainPlayerTitleInfo")]
+    [EndpointSummary("Get the current title info")]
+    [EndpointDescription("Get the current title info. Returns a json serialized TitleInfo object")]
+    [ProducesResponseType<TitleInfo>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+    public async Task<IResult> GetMainPlayerTitleInfo(CancellationToken cancellationToken)
+    {
+        var titleInfo = await this.mainPlayerService.GetTitleInfo(cancellationToken);
+        return titleInfo is not null ? Results.Ok(titleInfo) : Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
+    }
 }

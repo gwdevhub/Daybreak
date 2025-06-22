@@ -1,4 +1,5 @@
-﻿using Daybreak.Shared.Models.Guildwars;
+﻿using Daybreak.Shared.Models.FocusView;
+using Daybreak.Shared.Models.Guildwars;
 using System;
 using System.Windows.Controls;
 
@@ -17,12 +18,12 @@ public partial class CurrentQuestComponent : UserControl
 
     private void CurrentQuest_MouseLeftButtonDown(object _, System.Windows.Input.MouseButtonEventArgs e)
     {
-        if (this.DataContext is not Quest quest)
+        if (this.DataContext is not CurrentQuestComponentContext context)
         {
             return;
         }
 
-        if (quest.WikiUrl is not string url)
+        if (context.Quest.WikiUrl is not string url)
         {
             return;
         }

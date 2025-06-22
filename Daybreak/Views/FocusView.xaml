@@ -61,33 +61,34 @@
                 <RowDefinition Height="auto"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
-            <components:MainPlayerInformationComponent
-                                           DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext.Player.PlayerInformation, Mode=OneWay}"
+            <components:CharacterSelectComponent
+                                           DataContext="{Binding ElementName=_this, Path=CharacterSelectComponentContext, Mode=OneWay}"
                                            Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
                                            Margin="0, 0, 0, 10"
-                                           NavigateToClicked="Component_NavigateToClicked"/>
+                                           NavigateToClicked="Component_NavigateToClicked"
+                                           SwitchCharacterClicked="CharacterSelectComponent_SwitchCharacterClicked"/>
             <Grid Grid.Row="1"
                   Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <components:TitleInformationComponent Grid.Row="1"
-                                      DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext.Player.PlayerInformation.TitleInformation, Mode=OneWay}"
-                                      Visibility="{Binding ElementName=_this, Path=MainPlayerResourceContext.Player.PlayerInformation.TitleInformation.IsValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                      DataContext="{Binding ElementName=_this, Path=TitleInformationComponentContext, Mode=OneWay}"
+                                      Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
                                       Margin="0, 0, 0, 10"
                                       NavigateToClicked="Component_NavigateToClicked"/>
             </Grid>
             <components:CurrentMapComponent Grid.Row="2"
-                                            DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext.Session.Session.CurrentMap, Mode=OneWay}"
+                                            DataContext="{Binding ElementName=_this, Path=CurrentMapComponentContext.CurrentMap, Mode=OneWay}"
                                             Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
                                             Margin="0, 0, 0, 10"
                                             NavigateToClicked="Component_NavigateToClicked"/>
             <components:CurrentQuestComponent Grid.Row="3"
                                               Margin="0, 0, 0, 10"
-                                              DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext.Player.PlayerInformation.Quest, Mode=OneWay}"
+                                              DataContext="{Binding ElementName=_this, Path=CurrentQuestComponentContext, Mode=OneWay}"
                                               Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
                                               NavigateToClicked="Component_NavigateToClicked"/>
             <components:QuestLogComponent Grid.Row="4"
                                           Grid.RowSpan="2"
                                           NavigateToClicked="Component_NavigateToClicked"
-                                          DataContext="{Binding ElementName=_this, Path=MainPlayerResourceContext.Player.PlayerInformation.QuestLog, Mode=OneWay}"
+                                          DataContext="{Binding ElementName=_this, Path=QuestLogComponentContext, Mode=OneWay}"
                                           Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
             <Grid Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
                   Grid.RowSpan="6"

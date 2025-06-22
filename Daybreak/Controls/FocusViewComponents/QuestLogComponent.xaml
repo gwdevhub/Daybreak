@@ -31,7 +31,7 @@
                     Grid.Row="1">
             <templates:QuestLogTemplate
                         Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                        Quests="{Binding Mode=OneWay}"
+                        Quests="{Binding Quests, Mode=OneWay}"
                         MapClicked="QuestLogTemplate_MapClicked"
                         QuestClicked="QuestLogTemplate_QuestClicked">
             </templates:QuestLogTemplate>

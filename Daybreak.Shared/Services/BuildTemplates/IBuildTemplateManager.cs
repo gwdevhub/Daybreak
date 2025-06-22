@@ -1,6 +1,6 @@
 ﻿using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.Api;
 using Daybreak.Shared.Models.Builds;
-using Daybreak.Shared.Models.Guildwars;
 using System;
 using System.Collections.Generic;
 using System.Extensions;
@@ -18,8 +18,8 @@ public interface IBuildTemplateManager
     SingleBuildEntry CreateSingleBuild(string name);
     TeamBuildEntry CreateTeamBuild();
     TeamBuildEntry CreateTeamBuild(string name);
-    TeamBuildEntry CreateTeamBuild(TeamBuildData teamBuildData);
-    TeamBuildEntry CreateTeamBuild(TeamBuildData teamBuildData, string name);
+    TeamBuildEntry CreateTeamBuild(PartyLoadout partyLoadout);
+    TeamBuildEntry CreateTeamBuild(PartyLoadout partyLoadout, string name);
     void ClearBuilds();
     void SaveBuild(IBuildEntry buildEntry);
     void RemoveBuild(IBuildEntry buildEntry);

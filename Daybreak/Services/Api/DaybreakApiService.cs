@@ -14,26 +14,33 @@ using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions.Core;
 using System.IO;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Daybreak.Services.Api;
 public sealed class DaybreakApiService(
+    IAttachedApiAccessor attachedApiAccessor,
     IMDnsService mdnsService,
     IStubInjector stubInjector,
     INotificationService notificationService,
+    IHttpClient<ScopedApiContext> scopedApiClient,
     ILiveUpdateableOptions<FocusViewOptions> liveUpdateableOptions,
-    ILogger<DaybreakApiService> logger)
+    ILogger<DaybreakApiService> logger,
+    ILogger<ScopedApiContext> scopedApiLogger)
     : IDaybreakApiService
 {
     private const string DaybreakApiName = "Daybreak.API.dll";
     private const string ProcessIdPlaceholder = "{PID}";
     private const string DaybreakApiServiceName = $"daybreak-api-{ProcessIdPlaceholder}";
+    private readonly IAttachedApiAccessor attachedApiAccessor = attachedApiAccessor.ThrowIfNull();
     private readonly IMDnsService mdnsService = mdnsService.ThrowIfNull();
     private readonly IStubInjector stubInjector = stubInjector.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
+    private readonly IHttpClient<ScopedApiContext> scopedApiClient = scopedApiClient.ThrowIfNull();
     private readonly ILiveUpdateableOptions<FocusViewOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
     private readonly ILogger<DaybreakApiService> logger = logger.ThrowIfNull();
+    private readonly ILogger<ScopedApiContext> scopedApiLogger = scopedApiLogger.ThrowIfNull();
 
     public string Name { get; } = "Daybreak API";
     public bool IsEnabled
@@ -49,12 +56,19 @@ public sealed class DaybreakApiService(
 
     public IEnumerable<string> GetCustomArguments() => [];
 
-    public Task<DaybreakAPIContext?> GetDaybreakApiContext(GuildWarsApplicationLaunchContext launchContext, CancellationToken cancellationToken)
+    public async Task<ScopedApiContext?> AttachDaybreakApiContext(GuildWarsApplicationLaunchContext launchContext, CancellationToken cancellationToken)
     {
-        return this.GetDaybreakApiContext(launchContext.GuildWarsProcess, cancellationToken);
+        var apiContext = await this.GetDaybreakApiContext(launchContext.GuildWarsProcess, cancellationToken);
+        if (this.attachedApiAccessor is AttachedApiAccessor accessor)
+        {
+            accessor.LaunchContext = launchContext;
+            accessor.ApiContext = apiContext;
+        }
+
+        return apiContext;
     }
 
-    public async Task<DaybreakAPIContext?> GetDaybreakApiContext(Process guildWarsProcess, CancellationToken cancellationToken)
+    public async Task<ScopedApiContext?> GetDaybreakApiContext(Process guildWarsProcess, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         if (guildWarsProcess.HasExited)
@@ -72,7 +86,8 @@ public sealed class DaybreakApiService(
             return default;
         }
 
-        return new DaybreakAPIContext(serviceUri, guildWarsProcess);
+        var apiContext = new DaybreakAPIContext(serviceUri, guildWarsProcess);
+        return new ScopedApiContext(this.scopedApiLogger, this.scopedApiClient, apiContext);
     }
 
     public Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken) =>

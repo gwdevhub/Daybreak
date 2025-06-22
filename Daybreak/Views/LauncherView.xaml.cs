@@ -11,7 +11,6 @@ using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Onboarding;
-using Daybreak.Shared.Services.Scanner;
 using Daybreak.Shared.Services.Screens;
 using System;
 using System.Collections.ObjectModel;
@@ -36,7 +35,6 @@ public partial class LauncherView : UserControl
 {
     private readonly INotificationService notificationService;
     private readonly IDaybreakApiService daybreakApiService;
-    private readonly IGuildwarsMemoryReader guildwarsMemoryReader;
     private readonly IMenuService menuService;
     private readonly ILaunchConfigurationService launchConfigurationService;
     private readonly IConnectivityStatus connectivityStatus;
@@ -60,7 +58,6 @@ public partial class LauncherView : UserControl
     public LauncherView(
         INotificationService notificationService,
         IDaybreakApiService daybreakApiService,
-        IGuildwarsMemoryReader guildwarsMemoryReader,
         IMenuService menuService,
         ILaunchConfigurationService launchConfigurationService,
         IConnectivityStatus connectivityStatus,
@@ -72,7 +69,6 @@ public partial class LauncherView : UserControl
     {
         this.notificationService = notificationService.ThrowIfNull();
         this.daybreakApiService = daybreakApiService.ThrowIfNull();
-        this.guildwarsMemoryReader = guildwarsMemoryReader.ThrowIfNull();
         this.menuService = menuService.ThrowIfNull();
         this.launchConfigurationService = launchConfigurationService.ThrowIfNull();
         this.connectivityStatus = connectivityStatus.ThrowIfNull();
@@ -241,7 +237,7 @@ public partial class LauncherView : UserControl
                 var notificationToken = this.notificationService.NotifyInformation(
                         title: "Attaching to Guild Wars process...",
                         description: "Attempting to attach to Guild Wars process");
-                var apiContext = await this.daybreakApiService.GetDaybreakApiContext(context, cancellationToken);
+                var apiContext = await this.daybreakApiService.AttachDaybreakApiContext(context, cancellationToken);
                 notificationToken.Cancel();
 
                 if (apiContext is null)
@@ -253,8 +249,8 @@ public partial class LauncherView : UserControl
                 }
                 else
                 {
+                    this.viewManager.ShowView<FocusView>(new FocusViewContext { ApiContext = apiContext, LaunchContext = context });
                     this.menuService.CloseMenu();
-                    this.viewManager.ShowView<FocusView>(new FocusViewContext { ApiContext = apiContext.Value, LaunchContext = context });
                 }
             }
 
@@ -278,7 +274,7 @@ public partial class LauncherView : UserControl
                     var notificationToken = this.notificationService.NotifyInformation(
                         title: "Attaching to Guild Wars process...",
                         description: "Attempting to attach to Guild Wars process");
-                    var apiContext = await this.daybreakApiService.GetDaybreakApiContext(launchedContext, cancellationToken);
+                    var apiContext = await this.daybreakApiService.AttachDaybreakApiContext(launchedContext, cancellationToken);
                     notificationToken.Cancel();
 
                     if (apiContext is null)
@@ -290,8 +286,8 @@ public partial class LauncherView : UserControl
                     }
                     else
                     {
+                        this.viewManager.ShowView<FocusView>(new FocusViewContext { ApiContext = apiContext, LaunchContext = launchedContext });
                         this.menuService.CloseMenu();
-                        this.viewManager.ShowView<FocusView>(new FocusViewContext { ApiContext = apiContext.Value, LaunchContext = launchedContext });
                     }
                 }
             }
@@ -326,19 +322,27 @@ public partial class LauncherView : UserControl
             launcherViewContext.GameRunning = true;
         }
 
-        launcherViewContext.GameRunning = true;
-        launcherViewContext.CanLaunch = false;
-        launcherViewContext.CanAttach = false;
-        launcherViewContext.CanKill = false;
         // If FocusView is disabled, don't initialize memory scanner, instead just allow the user to kill the game
         if (!this.focusViewOptions.Value.Enabled ||
             !isSelected)
         {
+            launcherViewContext.GameRunning = true;
+            launcherViewContext.CanLaunch = false;
+            launcherViewContext.CanAttach = false;
+            launcherViewContext.CanKill = false;
             return;
         }
 
-        await this.guildwarsMemoryReader.EnsureInitialized(context.ProcessId, cancellationToken);
-        if (!await this.guildwarsMemoryReader.IsInitialized(context.ProcessId, cancellationToken))
+        if (await this.daybreakApiService.GetDaybreakApiContext(context.GuildWarsProcess, cancellationToken) is not ScopedApiContext apiContext)
+        {
+            launcherViewContext.GameRunning = false;
+            launcherViewContext.CanLaunch = false;
+            launcherViewContext.CanAttach = false;
+            launcherViewContext.CanKill = true;
+            return;
+        }
+
+        if (!await apiContext.IsAvailable(cancellationToken))
         {
             launcherViewContext.CanKill = true;
             launcherViewContext.GameRunning = true;
@@ -347,8 +351,8 @@ public partial class LauncherView : UserControl
             return;
         }
 
-        var loginInfo = await this.guildwarsMemoryReader.ReadLoginData(cancellationToken);
-        if (loginInfo?.Email != context.LaunchConfiguration.Credentials?.Username)
+        var mainPlayerInfo = await apiContext.GetMainPlayerInfo(cancellationToken);
+        if (mainPlayerInfo?.Email != context.LaunchConfiguration.Credentials?.Username)
         {
             launcherViewContext.GameRunning = false;
             launcherViewContext.CanAttach = false;

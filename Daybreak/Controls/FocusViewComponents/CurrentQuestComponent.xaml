@@ -22,7 +22,7 @@
                     Height="1"
                     Fill="{DynamicResource MahApps.Brushes.ThemeForeground}"></Rectangle>
         <buttons:MenuButton
-                    Title="{Binding Path=Name, Mode=OneWay}"
+                    Title="{Binding Path=Quest.Name, Mode=OneWay}"
                     Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                     HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
                     HorizontalAlignment="Stretch"

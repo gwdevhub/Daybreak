@@ -1,7 +1,7 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Launch;
 using Daybreak.Shared;
-using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.FocusView;
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.Experience;
 using Microsoft.Extensions.DependencyInjection;
@@ -239,251 +239,251 @@ public partial class PlayerResourcesComponent : UserControl
 
     private void UpdateGameData()
     {
-        if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
-            mainPlayerResourceContext.User?.User is null ||
-            mainPlayerResourceContext.Session?.Session is null ||
-            mainPlayerResourceContext.Player?.PlayerInformation is null)
-        {
-            return;
-        }
+        //if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
+        //    mainPlayerResourceContext.User?.User is null ||
+        //    mainPlayerResourceContext.Session?.Session is null ||
+        //    mainPlayerResourceContext.Player?.PlayerInformation is null)
+        //{
+        //    return;
+        //}
 
-        this.CurrentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(mainPlayerResourceContext.Player.PlayerInformation.Experience);
-        this.NextLevelExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(mainPlayerResourceContext.Player.PlayerInformation.Experience);
-        this.TotalFoes = (int)(mainPlayerResourceContext.Session.Session.FoesKilled + mainPlayerResourceContext.Session.Session.FoesToKill);
-        this.Vanquishing = mainPlayerResourceContext.Session.Session.FoesToKill + mainPlayerResourceContext.Session.Session.FoesKilled > 0U;
-        this.TitleActive = mainPlayerResourceContext.Player.PlayerInformation.TitleInformation is not null && mainPlayerResourceContext.Player.PlayerInformation.TitleInformation.IsValid;
+        //this.CurrentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(mainPlayerResourceContext.Player.PlayerInformation.Experience);
+        //this.NextLevelExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(mainPlayerResourceContext.Player.PlayerInformation.Experience);
+        //this.TotalFoes = (int)(mainPlayerResourceContext.Session.Session.FoesKilled + mainPlayerResourceContext.Session.Session.FoesToKill);
+        //this.Vanquishing = mainPlayerResourceContext.Session.Session.FoesToKill + mainPlayerResourceContext.Session.Session.FoesKilled > 0U;
+        //this.TitleActive = mainPlayerResourceContext.Player.PlayerInformation.TitleInformation is not null && mainPlayerResourceContext.Player.PlayerInformation.TitleInformation.IsValid;
 
-        if (mainPlayerResourceContext.Player.PlayerInformation.TitleInformation is TitleInformation titleInformation && titleInformation.IsValid)
-        {
-            if (titleInformation.MaxTierNumber == titleInformation.TierNumber)
-            {
-                this.PointsInCurrentRank = (int)titleInformation.CurrentPoints!;
-                this.PointsForNextRank = (int)titleInformation.CurrentPoints!;
-            }
-            else if (titleInformation.IsPercentage is false)
-            {
-                this.PointsInCurrentRank = (int)((uint)titleInformation.CurrentPoints! - (uint)titleInformation.PointsForCurrentRank!);
-                this.PointsForNextRank = (int)((uint)titleInformation.PointsForNextRank! - (uint)titleInformation.PointsForCurrentRank!);
-            }
-            else
-            {
-                this.PointsInCurrentRank = (int)(uint)titleInformation.CurrentPoints!;
-                this.PointsForNextRank = (int)(uint)titleInformation.PointsForNextRank!;
-            }
-        }
+        //if (mainPlayerResourceContext.Player.PlayerInformation.TitleInformation is TitleInformation titleInformation && titleInformation.IsValid)
+        //{
+        //    if (titleInformation.MaxTierNumber == titleInformation.TierNumber)
+        //    {
+        //        this.PointsInCurrentRank = (int)titleInformation.CurrentPoints!;
+        //        this.PointsForNextRank = (int)titleInformation.CurrentPoints!;
+        //    }
+        //    else if (titleInformation.IsPercentage is false)
+        //    {
+        //        this.PointsInCurrentRank = (int)((uint)titleInformation.CurrentPoints! - (uint)titleInformation.PointsForCurrentRank!);
+        //        this.PointsForNextRank = (int)((uint)titleInformation.PointsForNextRank! - (uint)titleInformation.PointsForCurrentRank!);
+        //    }
+        //    else
+        //    {
+        //        this.PointsInCurrentRank = (int)(uint)titleInformation.CurrentPoints!;
+        //        this.PointsForNextRank = (int)(uint)titleInformation.PointsForNextRank!;
+        //    }
+        //}
 
-        this.UpdateExperienceText();
-        this.UpdateLuxonText();
-        this.UpdateKurzickText();
-        this.UpdateImperialText();
-        this.UpdateBalthazarText();
-        this.UpdateVanquishingText();
-        this.UpdateHealthText();
-        this.UpdateEnergyText();
-        this.UpdateTitleText();
+        //this.UpdateExperienceText();
+        //this.UpdateLuxonText();
+        //this.UpdateKurzickText();
+        //this.UpdateImperialText();
+        //this.UpdateBalthazarText();
+        //this.UpdateVanquishingText();
+        //this.UpdateHealthText();
+        //this.UpdateEnergyText();
+        //this.UpdateTitleText();
     }
 
     private void UpdateExperienceText()
     {
-        if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
-            mainPlayerResourceContext.Player?.PlayerInformation is null)
-        {
-            return;
-        }
+        //if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
+        //    mainPlayerResourceContext.Player?.PlayerInformation is null)
+        //{
+        //    return;
+        //}
 
-        switch (this.liveOptions.Value.ExperienceDisplay)
-        {
-            case Configuration.FocusView.ExperienceDisplay.CurrentLevelCurrentAndCurrentLevelMax:
-                var currentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(mainPlayerResourceContext.Player.PlayerInformation.Experience);
-                var nextLevelExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(mainPlayerResourceContext.Player.PlayerInformation.Experience);
-                this.ExperienceBarText = $"{(int)currentExperienceInLevel} / {(int)nextLevelExperienceThreshold} XP";
-                break;
-            case Configuration.FocusView.ExperienceDisplay.TotalCurretAndTotalMax:
-                var currentTotalExperience = mainPlayerResourceContext.Player.PlayerInformation.Experience;
-                var requiredTotalExperience = this.experienceCalculator.GetTotalExperienceForNextLevel(currentTotalExperience);
-                this.ExperienceBarText = $"{(int)currentTotalExperience} / {(int)requiredTotalExperience} XP";
-                break;
-            case Configuration.FocusView.ExperienceDisplay.RemainingUntilNextLevel:
-                var remainingExperience = this.experienceCalculator.GetRemainingExperienceForNextLevel(mainPlayerResourceContext.Player.PlayerInformation.Experience);
-                this.ExperienceBarText = $"Remaining {(int)remainingExperience} XP";
-                break;
-            case Configuration.FocusView.ExperienceDisplay.Percentage:
-                var currentExperienceInLevel2 = this.experienceCalculator.GetExperienceForCurrentLevel(mainPlayerResourceContext.Player.PlayerInformation.Experience);
-                var nextLevelExperienceThreshold2 = this.experienceCalculator.GetNextExperienceThreshold(mainPlayerResourceContext.Player.PlayerInformation.Experience);
-                this.ExperienceBarText = $"{(int)((double)currentExperienceInLevel2 / (double)nextLevelExperienceThreshold2 * 100)}% XP";
-                break;
-        }
+        //switch (this.liveOptions.Value.ExperienceDisplay)
+        //{
+        //    case Configuration.FocusView.ExperienceDisplay.CurrentLevelCurrentAndCurrentLevelMax:
+        //        var currentExperienceInLevel = this.experienceCalculator.GetExperienceForCurrentLevel(mainPlayerResourceContext.Player.PlayerInformation.Experience);
+        //        var nextLevelExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(mainPlayerResourceContext.Player.PlayerInformation.Experience);
+        //        this.ExperienceBarText = $"{(int)currentExperienceInLevel} / {(int)nextLevelExperienceThreshold} XP";
+        //        break;
+        //    case Configuration.FocusView.ExperienceDisplay.TotalCurretAndTotalMax:
+        //        var currentTotalExperience = mainPlayerResourceContext.Player.PlayerInformation.Experience;
+        //        var requiredTotalExperience = this.experienceCalculator.GetTotalExperienceForNextLevel(currentTotalExperience);
+        //        this.ExperienceBarText = $"{(int)currentTotalExperience} / {(int)requiredTotalExperience} XP";
+        //        break;
+        //    case Configuration.FocusView.ExperienceDisplay.RemainingUntilNextLevel:
+        //        var remainingExperience = this.experienceCalculator.GetRemainingExperienceForNextLevel(mainPlayerResourceContext.Player.PlayerInformation.Experience);
+        //        this.ExperienceBarText = $"Remaining {(int)remainingExperience} XP";
+        //        break;
+        //    case Configuration.FocusView.ExperienceDisplay.Percentage:
+        //        var currentExperienceInLevel2 = this.experienceCalculator.GetExperienceForCurrentLevel(mainPlayerResourceContext.Player.PlayerInformation.Experience);
+        //        var nextLevelExperienceThreshold2 = this.experienceCalculator.GetNextExperienceThreshold(mainPlayerResourceContext.Player.PlayerInformation.Experience);
+        //        this.ExperienceBarText = $"{(int)((double)currentExperienceInLevel2 / (double)nextLevelExperienceThreshold2 * 100)}% XP";
+        //        break;
+        //}
     }
 
     private void UpdateLuxonText()
     {
-        if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
-            mainPlayerResourceContext.User?.User is null)
-        {
-            return;
-        }
+        //if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
+        //    mainPlayerResourceContext.User?.User is null)
+        //{
+        //    return;
+        //}
 
-        switch (this.liveOptions.Value.LuxonPointsDisplay)
-        {
-            case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.LuxonBarText = $"{mainPlayerResourceContext.User.User.CurrentLuxonPoints} / {mainPlayerResourceContext.User.User.MaxLuxonPoints} Luxon Points";
-                break;
-            case Configuration.FocusView.PointsDisplay.Remaining:
-                this.LuxonBarText = $"Remaining {mainPlayerResourceContext.User.User.MaxLuxonPoints - mainPlayerResourceContext.User.User.CurrentLuxonPoints} Luxon Points";
-                break;
-            case Configuration.FocusView.PointsDisplay.Percentage:
-                this.LuxonBarText = $"{(int)((double)mainPlayerResourceContext.User.User.CurrentLuxonPoints / (double)mainPlayerResourceContext.User.User.MaxLuxonPoints * 100)}% Luxon Points";
-                break;
-        }
+        //switch (this.liveOptions.Value.LuxonPointsDisplay)
+        //{
+        //    case Configuration.FocusView.PointsDisplay.CurrentAndMax:
+        //        this.LuxonBarText = $"{mainPlayerResourceContext.User.User.CurrentLuxonPoints} / {mainPlayerResourceContext.User.User.MaxLuxonPoints} Luxon Points";
+        //        break;
+        //    case Configuration.FocusView.PointsDisplay.Remaining:
+        //        this.LuxonBarText = $"Remaining {mainPlayerResourceContext.User.User.MaxLuxonPoints - mainPlayerResourceContext.User.User.CurrentLuxonPoints} Luxon Points";
+        //        break;
+        //    case Configuration.FocusView.PointsDisplay.Percentage:
+        //        this.LuxonBarText = $"{(int)((double)mainPlayerResourceContext.User.User.CurrentLuxonPoints / (double)mainPlayerResourceContext.User.User.MaxLuxonPoints * 100)}% Luxon Points";
+        //        break;
+        //}
     }
 
     private void UpdateKurzickText()
     {
-        if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
-            mainPlayerResourceContext.User?.User is null)
-        {
-            return;
-        }
+        //if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
+        //    mainPlayerResourceContext.User?.User is null)
+        //{
+        //    return;
+        //}
 
-        switch (this.liveOptions.Value.KurzickPointsDisplay)
-        {
-            case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.KurzickBarText = $"{mainPlayerResourceContext.User.User.CurrentKurzickPoints} / {mainPlayerResourceContext.User.User.MaxKurzickPoints} Kurzick Points";
-                break;
-            case Configuration.FocusView.PointsDisplay.Remaining:
-                this.KurzickBarText = $"Remaining {mainPlayerResourceContext.User.User!.MaxKurzickPoints - mainPlayerResourceContext.User.User.CurrentKurzickPoints} Kurzick Points";
-                break;
-            case Configuration.FocusView.PointsDisplay.Percentage:
-                this.KurzickBarText = $"{(int)((double)mainPlayerResourceContext.User.User.CurrentKurzickPoints / (double)mainPlayerResourceContext.User.User.MaxKurzickPoints * 100)}% Kurzick Points";
-                break;
-        }
+        //switch (this.liveOptions.Value.KurzickPointsDisplay)
+        //{
+        //    case Configuration.FocusView.PointsDisplay.CurrentAndMax:
+        //        this.KurzickBarText = $"{mainPlayerResourceContext.User.User.CurrentKurzickPoints} / {mainPlayerResourceContext.User.User.MaxKurzickPoints} Kurzick Points";
+        //        break;
+        //    case Configuration.FocusView.PointsDisplay.Remaining:
+        //        this.KurzickBarText = $"Remaining {mainPlayerResourceContext.User.User!.MaxKurzickPoints - mainPlayerResourceContext.User.User.CurrentKurzickPoints} Kurzick Points";
+        //        break;
+        //    case Configuration.FocusView.PointsDisplay.Percentage:
+        //        this.KurzickBarText = $"{(int)((double)mainPlayerResourceContext.User.User.CurrentKurzickPoints / (double)mainPlayerResourceContext.User.User.MaxKurzickPoints * 100)}% Kurzick Points";
+        //        break;
+        //}
     }
 
     private void UpdateImperialText()
     {
-        if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
-            mainPlayerResourceContext.User?.User is null)
-        {
-            return;
-        }
+        //if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
+        //    mainPlayerResourceContext.User?.User is null)
+        //{
+        //    return;
+        //}
 
-        switch (this.liveOptions.Value.ImperialPointsDisplay)
-        {
-            case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.ImperialBarText = $"{mainPlayerResourceContext.User.User!.CurrentImperialPoints} / {mainPlayerResourceContext.User.User.MaxImperialPoints} Imperial Points";
-                break;
-            case Configuration.FocusView.PointsDisplay.Remaining:
-                this.ImperialBarText = $"Remaining {mainPlayerResourceContext.User.User!.MaxImperialPoints - mainPlayerResourceContext.User.User.CurrentImperialPoints} Imperial Points";
-                break;
-            case Configuration.FocusView.PointsDisplay.Percentage:
-                this.ImperialBarText = $"{(int)((double)mainPlayerResourceContext.User.User!.CurrentImperialPoints / (double)mainPlayerResourceContext.User.User.MaxImperialPoints * 100)}% Imperial Points";
-                break;
-        }
+        //switch (this.liveOptions.Value.ImperialPointsDisplay)
+        //{
+        //    case Configuration.FocusView.PointsDisplay.CurrentAndMax:
+        //        this.ImperialBarText = $"{mainPlayerResourceContext.User.User!.CurrentImperialPoints} / {mainPlayerResourceContext.User.User.MaxImperialPoints} Imperial Points";
+        //        break;
+        //    case Configuration.FocusView.PointsDisplay.Remaining:
+        //        this.ImperialBarText = $"Remaining {mainPlayerResourceContext.User.User!.MaxImperialPoints - mainPlayerResourceContext.User.User.CurrentImperialPoints} Imperial Points";
+        //        break;
+        //    case Configuration.FocusView.PointsDisplay.Percentage:
+        //        this.ImperialBarText = $"{(int)((double)mainPlayerResourceContext.User.User!.CurrentImperialPoints / (double)mainPlayerResourceContext.User.User.MaxImperialPoints * 100)}% Imperial Points";
+        //        break;
+        //}
     }
 
     private void UpdateBalthazarText()
     {
-        if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
-            mainPlayerResourceContext.User?.User is null)
-        {
-            return;
-        }
+        //if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
+        //    mainPlayerResourceContext.User?.User is null)
+        //{
+        //    return;
+        //}
 
-        switch (this.liveOptions.Value.BalthazarPointsDisplay)
-        {
-            case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.BalthazarBarText = $"{mainPlayerResourceContext.User.User.CurrentBalthazarPoints} / {mainPlayerResourceContext.User.User.MaxBalthazarPoints} Balthazar Points";
-                break;
-            case Configuration.FocusView.PointsDisplay.Remaining:
-                this.BalthazarBarText = $"Remaining {mainPlayerResourceContext.User.User.MaxBalthazarPoints - mainPlayerResourceContext.User.User.CurrentBalthazarPoints} Balthazar Points";
-                break;
-            case Configuration.FocusView.PointsDisplay.Percentage:
-                this.BalthazarBarText = $"{(int)((double)mainPlayerResourceContext.User.User.CurrentBalthazarPoints / (double)mainPlayerResourceContext.User.User.MaxBalthazarPoints * 100)}% Balthazar Points";
-                break;
-        }
+        //switch (this.liveOptions.Value.BalthazarPointsDisplay)
+        //{
+        //    case Configuration.FocusView.PointsDisplay.CurrentAndMax:
+        //        this.BalthazarBarText = $"{mainPlayerResourceContext.User.User.CurrentBalthazarPoints} / {mainPlayerResourceContext.User.User.MaxBalthazarPoints} Balthazar Points";
+        //        break;
+        //    case Configuration.FocusView.PointsDisplay.Remaining:
+        //        this.BalthazarBarText = $"Remaining {mainPlayerResourceContext.User.User.MaxBalthazarPoints - mainPlayerResourceContext.User.User.CurrentBalthazarPoints} Balthazar Points";
+        //        break;
+        //    case Configuration.FocusView.PointsDisplay.Percentage:
+        //        this.BalthazarBarText = $"{(int)((double)mainPlayerResourceContext.User.User.CurrentBalthazarPoints / (double)mainPlayerResourceContext.User.User.MaxBalthazarPoints * 100)}% Balthazar Points";
+        //        break;
+        //}
     }
 
     private void UpdateVanquishingText()
     {
-        if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
-            mainPlayerResourceContext.Session?.Session is null)
-        {
-            return;
-        }
+        //if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
+        //    mainPlayerResourceContext.Session?.Session is null)
+        //{
+        //    return;
+        //}
 
-        switch (this.liveOptions.Value.VanquishingDisplay)
-        {
-            case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.VanquishingText = $"{mainPlayerResourceContext.Session.Session.FoesKilled} / {(int)this.TotalFoes} Foes Killed";
-                break;
-            case Configuration.FocusView.PointsDisplay.Remaining:
-                this.VanquishingText = $"Remaining {mainPlayerResourceContext.Session.Session.FoesToKill} Foes";
-                break;
-            case Configuration.FocusView.PointsDisplay.Percentage:
-                this.VanquishingText = $"{(int)((double)mainPlayerResourceContext.Session.Session.FoesKilled / (double)this.TotalFoes * 100)}% Foes Killed";
-                break;
-        }
+        //switch (this.liveOptions.Value.VanquishingDisplay)
+        //{
+        //    case Configuration.FocusView.PointsDisplay.CurrentAndMax:
+        //        this.VanquishingText = $"{mainPlayerResourceContext.Session.Session.FoesKilled} / {(int)this.TotalFoes} Foes Killed";
+        //        break;
+        //    case Configuration.FocusView.PointsDisplay.Remaining:
+        //        this.VanquishingText = $"Remaining {mainPlayerResourceContext.Session.Session.FoesToKill} Foes";
+        //        break;
+        //    case Configuration.FocusView.PointsDisplay.Percentage:
+        //        this.VanquishingText = $"{(int)((double)mainPlayerResourceContext.Session.Session.FoesKilled / (double)this.TotalFoes * 100)}% Foes Killed";
+        //        break;
+        //}
     }
 
     private void UpdateHealthText()
     {
-        if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
-            mainPlayerResourceContext.Player?.PlayerInformation is null)
-        {
-            return;
-        }
+        //if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
+        //    mainPlayerResourceContext.Player?.PlayerInformation is null)
+        //{
+        //    return;
+        //}
 
-        switch (this.liveOptions.Value.HealthDisplay)
-        {
-            case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.HealthBarText = $"{(int)mainPlayerResourceContext.Player.PlayerInformation.CurrentHealth} / {(int)mainPlayerResourceContext.Player.PlayerInformation.MaxHealth} Health";
-                break;
-            case Configuration.FocusView.PointsDisplay.Remaining:
-                this.HealthBarText = $"Remaining {(int)mainPlayerResourceContext.Player.PlayerInformation.CurrentHealth} Health";
-                break;
-            case Configuration.FocusView.PointsDisplay.Percentage:
-                this.HealthBarText = $"{(int)(mainPlayerResourceContext.Player.PlayerInformation.CurrentHealth / mainPlayerResourceContext.Player.PlayerInformation.MaxHealth * 100)}% Health";
-                break;
-        }
+        //switch (this.liveOptions.Value.HealthDisplay)
+        //{
+        //    case Configuration.FocusView.PointsDisplay.CurrentAndMax:
+        //        this.HealthBarText = $"{(int)mainPlayerResourceContext.Player.PlayerInformation.CurrentHealth} / {(int)mainPlayerResourceContext.Player.PlayerInformation.MaxHealth} Health";
+        //        break;
+        //    case Configuration.FocusView.PointsDisplay.Remaining:
+        //        this.HealthBarText = $"Remaining {(int)mainPlayerResourceContext.Player.PlayerInformation.CurrentHealth} Health";
+        //        break;
+        //    case Configuration.FocusView.PointsDisplay.Percentage:
+        //        this.HealthBarText = $"{(int)(mainPlayerResourceContext.Player.PlayerInformation.CurrentHealth / mainPlayerResourceContext.Player.PlayerInformation.MaxHealth * 100)}% Health";
+        //        break;
+        //}
     }
 
     private void UpdateEnergyText()
     {
-        if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
-            mainPlayerResourceContext.Player?.PlayerInformation is null)
-        {
-            return;
-        }
+        //if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
+        //    mainPlayerResourceContext.Player?.PlayerInformation is null)
+        //{
+        //    return;
+        //}
 
-        switch (this.liveOptions.Value.EnergyDisplay)
-        {
-            case Configuration.FocusView.PointsDisplay.CurrentAndMax:
-                this.EnergyBarText = $"{(int)mainPlayerResourceContext.Player.PlayerInformation.CurrentEnergy} / {(int)mainPlayerResourceContext.Player.PlayerInformation.MaxEnergy} Energy";
-                break;
-            case Configuration.FocusView.PointsDisplay.Remaining:
-                this.EnergyBarText = $"Remaining {(int)mainPlayerResourceContext.Player.PlayerInformation.CurrentEnergy} Energy";
-                break;
-            case Configuration.FocusView.PointsDisplay.Percentage:
-                this.EnergyBarText = $"{(int)(mainPlayerResourceContext.Player.PlayerInformation.CurrentEnergy / mainPlayerResourceContext.Player.PlayerInformation.MaxEnergy * 100)}% Energy";
-                break;
-        }
+        //switch (this.liveOptions.Value.EnergyDisplay)
+        //{
+        //    case Configuration.FocusView.PointsDisplay.CurrentAndMax:
+        //        this.EnergyBarText = $"{(int)mainPlayerResourceContext.Player.PlayerInformation.CurrentEnergy} / {(int)mainPlayerResourceContext.Player.PlayerInformation.MaxEnergy} Energy";
+        //        break;
+        //    case Configuration.FocusView.PointsDisplay.Remaining:
+        //        this.EnergyBarText = $"Remaining {(int)mainPlayerResourceContext.Player.PlayerInformation.CurrentEnergy} Energy";
+        //        break;
+        //    case Configuration.FocusView.PointsDisplay.Percentage:
+        //        this.EnergyBarText = $"{(int)(mainPlayerResourceContext.Player.PlayerInformation.CurrentEnergy / mainPlayerResourceContext.Player.PlayerInformation.MaxEnergy * 100)}% Energy";
+        //        break;
+        //}
     }
 
     private void UpdateTitleText()
     {
-        if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
-            mainPlayerResourceContext.Player?.PlayerInformation is null)
-        {
-            return;
-        }
+        //if (this.DataContext is not MainPlayerResourceContext mainPlayerResourceContext ||
+        //    mainPlayerResourceContext.Player?.PlayerInformation is null)
+        //{
+        //    return;
+        //}
 
-        if (mainPlayerResourceContext.Player.PlayerInformation.TitleInformation?.IsPercentage is true)
-        {
-            this.TitleText = $"{(double?)mainPlayerResourceContext.Player.PlayerInformation.TitleInformation?.CurrentPoints / 10d}% Rank Progress";
-        }
-        else
-        {
-            this.TitleText = $"{mainPlayerResourceContext.Player.PlayerInformation.TitleInformation?.CurrentPoints}/{mainPlayerResourceContext.Player.PlayerInformation.TitleInformation?.PointsForNextRank} Rank Progress";
-        }
+        //if (mainPlayerResourceContext.Player.PlayerInformation.TitleInformation?.IsPercentage is true)
+        //{
+        //    this.TitleText = $"{(double?)mainPlayerResourceContext.Player.PlayerInformation.TitleInformation?.CurrentPoints / 10d}% Rank Progress";
+        //}
+        //else
+        //{
+        //    this.TitleText = $"{mainPlayerResourceContext.Player.PlayerInformation.TitleInformation?.CurrentPoints}/{mainPlayerResourceContext.Player.PlayerInformation.TitleInformation?.PointsForNextRank} Rank Progress";
+        //}
     }
 }

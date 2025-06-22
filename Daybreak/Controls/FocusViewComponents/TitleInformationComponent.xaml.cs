@@ -1,4 +1,5 @@
-﻿using Daybreak.Shared.Models.Guildwars;
+﻿using Daybreak.Shared.Models.FocusView;
+using Daybreak.Shared.Models.Guildwars;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -23,8 +24,8 @@ public partial class TitleInformationComponent : UserControl
 
     private void Title_MouseLeftButtonDown(object _, MouseButtonEventArgs __)
     {
-        if (this.DataContext is not TitleInformation titleInformation ||
-            titleInformation.Title is not Title title ||
+        if (this.DataContext is not TitleInformationComponentContext context ||
+            context.Title is not Title title ||
             title.WikiUrl is not string url)
         {
             return;
@@ -35,16 +36,21 @@ public partial class TitleInformationComponent : UserControl
 
     private void UserControl_DataContextChanged(object _, DependencyPropertyChangedEventArgs __)
     {
-        if (this.DataContext is not TitleInformation titleInformation)
+        if (this.DataContext is not TitleInformationComponentContext context)
         {
             return;
         }
 
-        if (titleInformation.Title is not null &&
-                titleInformation.Title.Tiers!.Count > titleInformation.TierNumber - 1)
+        if (context.Title is not null &&
+                context.Title.Tiers!.Count > context.TierNumber - 1)
         {
-            var rankIndex = (int)titleInformation.TierNumber! - 1;
-            this.TitleRankName = $"{titleInformation.Title.Tiers![rankIndex]} ({titleInformation.TierNumber}/{titleInformation.MaxTierNumber})";
+            var rankIndex = (int)context.TierNumber! - 1;
+            this.TitleRankName = $"{context.Title.Tiers![rankIndex]} ({context.TierNumber}/{Math.Min(context.Title.Tiers.Count, context.MaxTierNumber)})";
+        }
+        else if (context.IsPercentage &&
+            context.Title is not null)
+        {
+            this.TitleRankName = $"{context.Title.Name} ({context.CurrentPoints / 10d}%)";
         }
         else
         {

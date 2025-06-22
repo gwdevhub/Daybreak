@@ -23,7 +23,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Onboarding;
 using Daybreak.Services.Menu;
-using Daybreak.Services.Scanner;
 using Daybreak.Services.Experience;
 using Daybreak.Services.Metrics;
 using Daybreak.Services.Monitoring;
@@ -88,7 +87,6 @@ using Daybreak.Shared.Services.Screens;
 using Daybreak.Shared.Services.Logging;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.TradeChat;
-using Daybreak.Shared.Services.Scanner;
 using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.Shortcuts;
 using Daybreak.Shared.Services.Guildwars;
@@ -164,7 +162,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped(sp => new NotificationsDbContext(sp.GetRequiredService<SqliteConnection>()));
         services.AddScoped(sp => new TradeMessagesDbContext(sp.GetRequiredService<SqliteConnection>()));
         services.AddSingleton<ILogsManager, JsonLogsManager>();
-        services.AddSingleton<IDebugLogsWriter, Services.Logging.DebugLogsWriter>();
+        services.AddSingleton<IConsoleLogsWriter, ConsoleLogsWriter>();
         services.AddSingleton<IEventViewerLogsWriter, EventViewerLogsWriter>();
         services.AddSingleton<ILoggerFactory, LoggerFactory>(sp =>
         {
@@ -174,7 +172,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         });
         services.AddSingleton<ILogsWriter, CompositeLogsWriter>(sp => new CompositeLogsWriter(
             sp.GetService<ILogsManager>()!,
-            sp.GetService<IDebugLogsWriter>()!,
+            sp.GetService<IConsoleLogsWriter>()!,
             sp.GetService<IEventViewerLogsWriter>()!));
 
         services.AddScoped((sp) => new ScopeMetadata(new CorrelationVector()));
@@ -211,17 +209,15 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<INotificationStorage, NotificationStorage>();
         services.AddSingleton<ITradeAlertingService, TradeAlertingService>();
         services.AddSingleton<IModsManager, ModsManager>();
-        services.AddSingleton<IGuildwarsMemoryCache, GuildwarsMemoryCache>();
         services.AddSingleton<IPluginsService, PluginsService>();
         services.AddSingleton<ISplashScreenService, SplashScreenService>();
         services.AddSingleton<IGuildWarsExecutableManager, GuildWarsExecutableManager>();
-        services.AddSingleton<IMemoryScanner, MemoryScanner>();
-        services.AddSingleton<IGuildwarsMemoryReader, GuildwarsMemoryReader>();
         services.AddSingleton<ISevenZipExtractor, SevenZipExtractor>();
         services.AddSingleton<IGraphClient, GraphClient>();
         services.AddSingleton<IOptionsSynchronizationService, OptionsSynchronizationService>();
         services.AddSingleton<IWindowEventsHook<MainWindow>, WindowEventsHook<MainWindow>>();
         services.AddSingleton<IMDnsService, MDnsService>();
+        services.AddSingleton<IAttachedApiAccessor, AttachedApiAccessor>();
         services.AddScoped<IBrowserExtensionsManager, BrowserExtensionsManager>();
         services.AddScoped<IBrowserExtensionsProducer, BrowserExtensionsManager>(sp => sp.GetRequiredService<IBrowserExtensionsManager>().Cast<BrowserExtensionsManager>());
         services.AddScoped<ICredentialManager, CredentialManager>();
@@ -371,7 +367,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         optionsProducer.RegisterOptions<SynchronizationOptions>();
         optionsProducer.RegisterOptions<FocusViewOptions>();
 
-        optionsProducer.RegisterOptions<MemoryReaderOptions>();
         optionsProducer.RegisterOptions<ImageCacheOptions>();
 
         optionsProducer.RegisterOptions<BackgroundProviderOptions>();
@@ -537,6 +532,10 @@ public class ProjectConfiguration : PluginConfigurationBase
                 .Build()
             .RegisterHttpClient<DXVKService>()
                 .WithMessageHandler(this.SetupLoggingAndMetrics<DXVKService>)
+                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
+                .Build()
+            .RegisterHttpClient<ScopedApiContext>()
+                .WithMessageHandler(this.SetupLoggingAndMetrics<ScopedApiContext>)
                 .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
                 .Build();
     }

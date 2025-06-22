@@ -357,6 +357,76 @@ public sealed class MainPlayerService : IDisposable
         }, cancellationToken);
     }
 
+    public Task<TitleInfo?> GetTitleInfo(CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        return this.gameThreadService.QueueOnGameThread(() =>
+        {
+            unsafe
+            {
+                if (this.instanceContextService.GetInstanceType() is InstanceType.Loading)
+                {
+                    scopedLogger.LogError("Not loaded");
+                    return default;
+                }
+
+                var gameContext = this.gameContextService.GetGameContext();
+                if (gameContext.IsNull || gameContext.Pointer->WorldContext is null)
+                {
+                    scopedLogger.LogError("Game context is not initialized");
+                    return default;
+                }
+
+                if (!gameContext.TryGetPlayerId(out var playerId))
+                {
+                    scopedLogger.LogError("Failed to get player id");
+                    return default;
+                }
+
+                var player = gameContext.Pointer->WorldContext->Players.AsValueEnumerable().FirstOrDefault(p => p.AgentId == playerId);
+                if (player.AgentId != playerId)
+                {
+                    scopedLogger.LogError("Failed to find player with id {playerId}", playerId);
+                    return default;
+                }
+
+                var currentTier = player.ActiveTitleTier;
+                TitleContext? currentTitle = default;
+                int? id = -1;
+                for(var i = 0; i < gameContext.Pointer->WorldContext->Titles.Size; i++)
+                {
+                    var title = gameContext.Pointer->WorldContext->Titles.Skip(i).FirstOrDefault();
+                    if (title.CurrentTitleTierIndex == currentTier)
+                    {
+                        currentTitle = title;
+                        id = i;
+                        break;
+                    }
+                }
+
+                if (!currentTitle.HasValue)
+                {
+                    scopedLogger.LogError("Failed to find current title with tier {currentTier}", currentTier);
+                    return default;
+                }
+
+                var titleTier = gameContext.Pointer->WorldContext->TitleTiers.Skip((int)currentTitle.Value.CurrentTitleTierIndex).FirstOrDefault();
+                return new TitleInfo
+                (
+                    Id: (uint)id,
+                    IsPercentage: currentTitle.Value.Props.HasFlag(TitleProps.PercentageBased),
+                    PointsForCurrentRank: currentTitle.Value.PointsNeededForCurrentRank,
+                    PointsForNextRank: titleTier.TierNumber == currentTitle.Value.MaxTitleRank ?
+                                        currentTitle.Value.CurrentPoints :
+                                        currentTitle.Value.PointsNeededForNextRank,
+                    CurrentPoints: currentTitle.Value.CurrentPoints,
+                    TierNumber: titleTier.TierNumber,
+                    MaxTierNumber: currentTitle.Value.MaxTitleTierIndex
+                );
+            }
+        }, cancellationToken);
+    }
+
     public CallbackRegistration RegisterMainStateConsumer(TimeSpan frequency, Action<ReadOnlySpan<byte>> onUpdate)
     {
         ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(frequency, TimeSpan.Zero);

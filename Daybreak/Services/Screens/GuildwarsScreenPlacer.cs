@@ -1,6 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models.Mods;
-using Daybreak.Shared.Services.Scanner;
 using Daybreak.Shared.Services.Screens;
 using Microsoft.Extensions.Logging;
 using System;
@@ -17,18 +16,15 @@ internal sealed class GuildwarsScreenPlacer : IGuildwarsScreenPlacer
 {
     private static readonly TimeSpan Delay = TimeSpan.FromSeconds(5);
 
-    private readonly IGuildwarsMemoryCache guildwarsMemoryCache;
     private readonly ILiveUpdateableOptions<LauncherOptions> liveOptions;
     private readonly IScreenManager screenManager;
     private readonly ILogger<GuildwarsScreenPlacer> logger;
 
     public GuildwarsScreenPlacer(
-        IGuildwarsMemoryCache guildwarsMemoryCache,
         ILiveUpdateableOptions<LauncherOptions> liveOptions,
         IScreenManager screenManager,
         ILogger<GuildwarsScreenPlacer> logger)
     {
-        this.guildwarsMemoryCache = guildwarsMemoryCache.ThrowIfNull();
         this.liveOptions = liveOptions.ThrowIfNull();
         this.screenManager = screenManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
