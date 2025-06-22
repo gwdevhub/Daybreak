@@ -1,47 +1,99 @@
-﻿using System.Net.NetworkInformation;
+﻿using System.Diagnostics;
+using System.Extensions.Core;
+using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
+using Daybreak.API.Configuration;
 using Daybreak.API.Extensions;
+using Daybreak.API.Health;
+using Daybreak.API.Hosting;
+using Daybreak.API.Logging;
 using Daybreak.API.Serialization;
+using Daybreak.API.Services;
+using Daybreak.API.Swagger;
+using Daybreak.API.WebSockets;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Net.Sdk.Web;
 
 namespace Daybreak.API;
 
-public static class EntryPoint
+public class EntryPoint
 {
     private const int StartPort = 5080;
+    private static readonly TimeSpan InitializationTimeout = TimeSpan.FromSeconds(5);
+    private static readonly CancellationTokenSource CancellationTokenSource = new();
 
     [UnmanagedCallersOnly(EntryPoint = "ThreadInit"), STAThread]
     public static int ThreadInit(IntPtr _, int __)
     {
+        Environment.SetEnvironmentVariable("ASPNETCORE_HOSTINGSTARTUPASSEMBLIES", null, EnvironmentVariableTarget.Process);
+        Environment.SetEnvironmentVariable("ASPNETCORE_PREVENTHOSTINGSTARTUP", "true", EnvironmentVariableTarget.Process);
+#if DEBUG
         ConsoleExtensions.AllocateAnsiConsole();
+#endif
         var port = FindAvailablePort(StartPort);
-        if (port <= 0)
+        var app = CreateApplication(port);
+        var runTask = Task.Run(() => StartServer(app), CancellationTokenSource.Token);
+        var scopedLogger = app.Services.GetRequiredService<ILogger<EntryPoint>>().CreateScopedLogger();
+        var healthCheck = app.Services.GetRequiredService<HealthCheckService>();
+        var sw = Stopwatch.StartNew();
+        var healthy = false;
+        while(sw.Elapsed < InitializationTimeout)
         {
-            Console.WriteLine($"No available port found starting from {StartPort}");
-            return -1;
+            var status = Task.Run(() => healthCheck.CheckHealthAsync()).Result;
+            scopedLogger.LogWarning("HealthCheck status: {status} in {duration}. Report: {report}", status.Status, status.TotalDuration, string.Join("\n", status.Entries.Select(e => $"{e.Key}: {e.Value.Status}")));
+            if (status.Status is HealthStatus.Healthy)
+            {
+                healthy = true;
+                break;
+            }
+            else
+            {
+                Thread.Sleep(100);
+            }
         }
 
-        Console.WriteLine($"Starting Daybreak API on port {port}");
-        Task.Run(() => StartServer(port));
-        return port;
+        if (healthy)
+        {
+            scopedLogger.LogInformation("Daybreak API is healthy on port {port}. Initialization succeeded in {duration}", port, sw.Elapsed);
+            return port;
+        }
+        else
+        {
+            scopedLogger.LogError("Daybreak API failed to initialize in {duration}", sw.Elapsed);
+            CancellationTokenSource.Cancel();
+            return -1;
+        }
     }
 
-    private static async Task StartServer(int port)
+    private static WebApplication CreateApplication(int port)
+    {
+        var app = WebApplication.CreateBuilder()
+                .WithConfiguration()
+                .WithHosting(port)
+                .WithSwagger()
+                .WithSerializationContext()
+                .WithLogging()
+                .WithDaybreakServices()
+                .WithWebSocketRoutes()
+                .WithRoutes()
+                .WithHealthChecks()
+                .Build();
+
+        app.UseWebSockets(new WebSocketOptions { KeepAliveInterval = TimeSpan.FromSeconds(30) });
+
+        return app
+            .UseHealthChecks()
+            .UseLogging()
+            .UseRoutes()
+            .UseWebSocketRoutes()
+            .UseSwaggerWithUI();
+
+    }
+
+    private static async Task StartServer(WebApplication app)
     {
         try
         {
-            var builder = WebApplication.CreateBuilder();
-            builder.WebHost.UseUrls($"http://127.0.0.1:{port}");
-            builder.Services.ConfigureHttpJsonOptions(options =>
-            {
-                options.SerializerOptions.TypeInfoResolverChain.Insert(0, new ApiJsonSerializerContext());
-            });
-            builder.Logging.AddConsole();
-            builder.WithRoutes();
-
-            var app = builder.Build();
-            app.UseRoutes();
-
             await app.RunAsync();
         }
         catch (Exception ex)

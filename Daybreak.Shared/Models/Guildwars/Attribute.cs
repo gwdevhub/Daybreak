@@ -51,8 +51,8 @@ public sealed class Attribute
     public static readonly Attribute WindPrayers = new() { Name = "Wind Prayers", Id = 42, Profession = Profession.Dervish };
     public static readonly Attribute EarthPrayers = new() { Name = "Earth Prayers", Id = 43, Profession = Profession.Dervish };
     public static readonly Attribute Mysticism = new() { Name = "Mysticism", Id = 44, Profession = Profession.Dervish };
-    public static readonly IEnumerable<Attribute> Attributes = new List<Attribute>
-    {
+    public static readonly IEnumerable<Attribute> Attributes =
+    [
         FastCasting,
         IllusionMagic,
         DominationMagic,
@@ -96,7 +96,7 @@ public sealed class Attribute
         WindPrayers,
         EarthMagic,
         Mysticism
-    };
+    ];
 
     public static bool TryParse(int id, out Attribute attribute)
     {

@@ -1,0 +1,7 @@
+﻿<Directives>
+  <Application>
+    <Assembly Name="Microsoft.Extensions.Primitives">
+      <Type Name="Microsoft.Extensions.Primitives.StringValues" Dynamic="Required All" />
+    </Assembly>
+  </Application>
+</Directives>

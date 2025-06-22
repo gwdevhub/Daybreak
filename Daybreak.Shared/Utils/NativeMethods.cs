@@ -7,6 +7,10 @@ namespace Daybreak.Shared.Utils;
 
 public static class NativeMethods
 {
+    public const int STD_OUTPUT_HANDLE = -11;
+    public const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004;
+    public const uint ENABLE_PROCESSED_OUTPUT = 0x0001;
+
     public static uint WM_KEYDOWN = 0x0100;
     public static uint SWP_SHOWWINDOW = 0x0040;
     public static nint HWND_TOPMOST = new(-1);
@@ -363,6 +367,20 @@ public static class NativeMethods
     public delegate bool Win32Callback(nint hwnd, nint lParam);
 
     public const int WM_SYSCOMMAND = 0x112;
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool AllocConsole();
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern nint GetConsoleWindow();
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern nint GetStdHandle(int nStdHandle);
+    [DllImport("kernel32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool GetConsoleMode(nint hConsoleHandle, out uint lpMode);
+    [DllImport("kernel32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool SetConsoleMode(nint hConsoleHandle, uint dwMode);
 
     [DllImport("Dbghelp.dll", SetLastError = true)]
     public static extern bool MiniDumpWriteDump(nint hProcess, int processId, SafeHandle hFile, MinidumpType dumpType, nint expParam, nint userStreamParam, nint callbackParam);

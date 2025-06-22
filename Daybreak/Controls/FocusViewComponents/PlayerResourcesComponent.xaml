@@ -6,297 +6,86 @@
              xmlns:local="clr-namespace:Daybreak.Controls.FocusViewComponents"
              xmlns:converters="clr-namespace:Daybreak.Shared.Converters;assembly=Daybreak.Shared"
              xmlns:controls="clr-namespace:Daybreak.Controls"
+             Background="{DynamicResource Daybreak.Brushes.Background}"
+             BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+             BorderThickness="1"
              x:Name="_this"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.Resources>
-        <converters:BooleanToGridLengthConverter x:Key="ResourceBarGridLengthConverter" VisibleValue="*" />
-    </UserControl.Resources>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"></ColumnDefinition>
-            <ColumnDefinition Width="0.1*"></ColumnDefinition>
-            <ColumnDefinition Width="0.3*"></ColumnDefinition>
-            <ColumnDefinition Width="0.1*"></ColumnDefinition>
-            <ColumnDefinition Width="*"></ColumnDefinition>
-        </Grid.ColumnDefinitions>
-        <controls:VerticalResourceBar
-                Grid.Column="1"
-                Grid.ColumnSpan="3"
-                CurrentResourceValue="{Binding ElementName=_this, Path=CurrentExperienceInLevel, Mode=OneWay}"
-                MaxResourceValue="{Binding ElementName=_this, Path=NextLevelExperienceThreshold, Mode=OneWay}"
-                Text="{Binding ElementName=_this,Path=ExperienceBarText, Mode=OneWay}"
-                BarColor="{DynamicResource Daybreak.Brushes.Experience}"
-                Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                FontSize="14"
-                Cursor="Hand"
-                MouseLeftButtonDown="ExperienceBar_MouseLeftButtonDown">
-            <controls:VerticalResourceBar.OpacityMask>
-                <DrawingBrush>
-                    <DrawingBrush.Drawing>
-                        <DrawingGroup>
-                            <GeometryDrawing Brush="#FFFFFFFF">
-                                <GeometryDrawing.Geometry>
-                                    <PathGeometry>
-                                        <PathGeometry.Figures>
-                                            <PathFigure IsClosed="True" StartPoint="5, 1">
-                                                <PathSegmentCollection>
-                                                    <LineSegment Point="1, 5"></LineSegment>
-                                                    <LineSegment Point="5, 9"></LineSegment>
-                                                    <LineSegment Point="15, 9"></LineSegment>
-                                                    <LineSegment Point="19, 5"></LineSegment>
-                                                    <LineSegment Point="15, 1"></LineSegment>
-                                                </PathSegmentCollection>
-                                            </PathFigure>
-                                        </PathGeometry.Figures>
-                                    </PathGeometry>
-                                </GeometryDrawing.Geometry>
-                            </GeometryDrawing>
-                        </DrawingGroup>
-                    </DrawingBrush.Drawing>
-                </DrawingBrush>
-            </controls:VerticalResourceBar.OpacityMask>
-        </controls:VerticalResourceBar>
-        <Viewbox
-                Grid.Column="1"
-                Grid.ColumnSpan="3"
-                Stretch="Fill">
-            <Polygon Points="0, 3.94, 3.2, 8, 10.9, 8, 13.9, 3.94, 10.9, 0, 3.1, 0"
-                         StrokeThickness="0.08"
-                         Stroke="{DynamicResource MahApps.Brushes.ThemeForeground}"></Polygon>
-        </Viewbox>
-        <Grid
-                VerticalAlignment="Center"
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
-                Grid.Row="2"
-                Grid.RowSpan="2">
-            <Grid.OpacityMask>
-                <DrawingBrush>
-                    <DrawingBrush.Drawing>
-                        <DrawingGroup>
-                            <GeometryDrawing Brush="#FFFFFFFF">
-                                <GeometryDrawing.Geometry>
-                                    <PathGeometry>
-                                        <PathGeometry.Figures>
-                                            <PathFigure IsClosed="True" StartPoint="1, 1">
-                                                <PathSegmentCollection>
-                                                    <LineSegment Point="1, 9"></LineSegment>
-                                                    <LineSegment Point="21, 9"></LineSegment>
-                                                    <LineSegment Point="19, 5"></LineSegment>
-                                                    <LineSegment Point="21, 1"></LineSegment>
-                                                </PathSegmentCollection>
-                                            </PathFigure>
-                                        </PathGeometry.Figures>
-                                    </PathGeometry>
-                                </GeometryDrawing.Geometry>
-                            </GeometryDrawing>
-                        </DrawingGroup>
-                    </DrawingBrush.Drawing>
-                </DrawingBrush>
-            </Grid.OpacityMask>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"></RowDefinition>
-                <RowDefinition Height="*"></RowDefinition>
-                <RowDefinition Height="*"></RowDefinition>
-                <RowDefinition Height="*"></RowDefinition>
-            </Grid.RowDefinitions>
-            <controls:HorizontalResourceBar 
-                    Margin="0, 2, 0, 2"
-                    Grid.Row="0"
-                    CurrentResourceValue="{Binding Path=User.User.CurrentKurzickPoints, Mode=OneWay}"
-                    MaxResourceValue="{Binding Path=User.User.MaxKurzickPoints, Mode=OneWay}"
-                    VerticalAlignment="Bottom"
-                    HorizontalAlignment="Left"
-                    BarColor="{DynamicResource Daybreak.Brushes.Kurzick}"
-                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    FontSize="14"
-                    Cursor="Hand"
-                    Text="{Binding ElementName=_this, Path=KurzickBarText, Mode=OneWay}"
-                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    BorderThickness="1"
-                    MouseLeftButtonDown="KurzickBar_MouseLeftButtonDown"
-                    ToolTip="Switch display mode"/>
-            <controls:HorizontalResourceBar 
-                    Margin="0, 2, 0, 2"
-                    Grid.Row="1"
-                    CurrentResourceValue="{Binding Path=User.User.CurrentLuxonPoints, Mode=OneWay}"
-                    MaxResourceValue="{Binding Path=User.User.MaxLuxonPoints, Mode=OneWay}"
-                    VerticalAlignment="Bottom"
-                    HorizontalAlignment="Left"
-                    BarColor="{DynamicResource Daybreak.Brushes.Luxon}"
-                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    FontSize="14"
-                    Cursor="Hand"
-                    Text="{Binding ElementName=_this, Path=LuxonBarText, Mode=OneWay}"
-                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    BorderThickness="1"
-                    MouseLeftButtonDown="LuxonBar_MouseLeftButtonDown"
-                    ToolTip="Switch display mode"/>
-            <controls:HorizontalResourceBar 
-                    Margin="0, 2, 0, 2"
-                    Grid.Row="2"
-                    CurrentResourceValue="{Binding Path=User.User.CurrentImperialPoints, Mode=OneWay}"
-                    MaxResourceValue="{Binding Path=User.User.MaxImperialPoints, Mode=OneWay}"
-                    VerticalAlignment="Bottom"
-                    HorizontalAlignment="Left"
-                    BarColor="{DynamicResource Daybreak.Brushes.Imperial}"
-                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    FontSize="14"
-                    Cursor="Hand"
-                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    BorderThickness="1"
-                    Text="{Binding ElementName=_this, Path=ImperialBarText, Mode=OneWay}"
-                    MouseLeftButtonDown="ImperialBar_MouseLeftButtonDown"
-                    ToolTip="Switch display mode"/>
-            <controls:HorizontalResourceBar
-                    Margin="0, 2, 0, 2"
-                    Grid.Row="3"
-                    CurrentResourceValue="{Binding Path=User.User.CurrentBalthazarPoints, Mode=OneWay}"
-                    MaxResourceValue="{Binding Path=User.User.MaxBalthazarPoints, Mode=OneWay}"
-                    VerticalAlignment="Bottom"
-                    HorizontalAlignment="Left"
-                    BarColor="{DynamicResource Daybreak.Brushes.Balthazar}"
-                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    FontSize="14"
-                    Cursor="Hand"
-                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    BorderThickness="1"
-                    Text="{Binding ElementName=_this, Path=BalthazarBarText, Mode=OneWay}"
-                    MouseLeftButtonDown="BalthazarBar_MouseLeftButtonDown"
-                    ToolTip="Switch display mode"/>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <TextBlock 
+            Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+            Grid.Row="0"
+            FontSize="18"
+            Padding="10, 0, 0, 0"
+            Text="Faction" />
+        <Rectangle Height="1"
+           Fill="{DynamicResource MahApps.Brushes.ThemeForeground}"
+           VerticalAlignment="Bottom" />
+        <Grid Grid.Row="1">
+            <StackPanel Orientation="Vertical">
+                <controls:HorizontalResourceBar 
+                        CurrentResourceValue="{Binding Path=CurrentBalthazar, Mode=OneWay}"
+                        MaxResourceValue="{Binding Path=MaxBalthazar, Mode=OneWay}"
+                        VerticalAlignment="Bottom"
+                        HorizontalAlignment="Left"
+                        BarColor="{DynamicResource Daybreak.Brushes.Balthazar}"
+                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                        FontSize="14"
+                        Cursor="Hand"
+                        Text="{Binding ElementName=_this, Path=BalthazarBarText, Mode=OneWay}"
+                        BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                        BorderThickness="1"
+                        MouseLeftButtonDown="BalthazarBar_MouseLeftButtonDown"
+                        ToolTip="Switch display mode"/>
+                <controls:HorizontalResourceBar 
+                        CurrentResourceValue="{Binding Path=CurrentKurzick, Mode=OneWay}"
+                        MaxResourceValue="{Binding Path=MaxKurzick, Mode=OneWay}"
+                        VerticalAlignment="Bottom"
+                        HorizontalAlignment="Left"
+                        BarColor="{DynamicResource Daybreak.Brushes.Kurzick}"
+                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                        FontSize="14"
+                        Cursor="Hand"
+                        Text="{Binding ElementName=_this, Path=KurzickBarText, Mode=OneWay}"
+                        BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                        BorderThickness="1"
+                        MouseLeftButtonDown="KurzickBar_MouseLeftButtonDown"
+                        ToolTip="Switch display mode"/>
+                <controls:HorizontalResourceBar 
+                        CurrentResourceValue="{Binding Path=CurrentLuxon, Mode=OneWay}"
+                        MaxResourceValue="{Binding Path=MaxLuxon, Mode=OneWay}"
+                        VerticalAlignment="Bottom"
+                        HorizontalAlignment="Left"
+                        BarColor="{DynamicResource Daybreak.Brushes.Luxon}"
+                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                        FontSize="14"
+                        Cursor="Hand"
+                        Text="{Binding ElementName=_this, Path=LuxonBarText, Mode=OneWay}"
+                        BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                        BorderThickness="1"
+                        MouseLeftButtonDown="LuxonBar_MouseLeftButtonDown"
+                        ToolTip="Switch display mode"/>
+                <controls:HorizontalResourceBar 
+                        CurrentResourceValue="{Binding Path=CurrentImperial, Mode=OneWay}"
+                        MaxResourceValue="{Binding Path=MaxImperial, Mode=OneWay}"
+                        VerticalAlignment="Bottom"
+                        HorizontalAlignment="Left"
+                        BarColor="{DynamicResource Daybreak.Brushes.Imperial}"
+                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                        FontSize="14"
+                        Cursor="Hand"
+                        Text="{Binding ElementName=_this, Path=ImperialBarText, Mode=OneWay}"
+                        BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                        BorderThickness="1"
+                        MouseLeftButtonDown="ImperialBar_MouseLeftButtonDown"
+                        ToolTip="Switch display mode"/>
+            </StackPanel>
         </Grid>
-        <Viewbox
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
-                Grid.Row="2"
-                Grid.RowSpan="2"
-                Stretch="Fill">
-            <Polygon Points="0, 10.1, 21.5, 10.1, 19.4, 5, 21.5, 0.1, 0, 0.1"
-                         StrokeThickness="0.08"
-                         Width="21.5"
-                         Height="10.2"
-                         Stroke="{DynamicResource MahApps.Brushes.ThemeForeground}"></Polygon>
-        </Viewbox>
-        <Grid
-                VerticalAlignment="Center"
-                HorizontalAlignment="Stretch"
-                Grid.Column="3"
-                Grid.ColumnSpan="2"
-                Grid.Row="2"
-                Grid.RowSpan="2">
-            <Grid.OpacityMask>
-                <DrawingBrush>
-                    <DrawingBrush.Drawing>
-                        <DrawingGroup>
-                            <GeometryDrawing Brush="#FFFFFFFF">
-                                <GeometryDrawing.Geometry>
-                                    <PathGeometry>
-                                        <PathGeometry.Figures>
-                                            <PathFigure IsClosed="True" StartPoint="1, 1">
-                                                <PathSegmentCollection>
-                                                    <LineSegment Point="3, 5"></LineSegment>
-                                                    <LineSegment Point="1, 9"></LineSegment>
-                                                    <LineSegment Point="21, 9"></LineSegment>
-                                                    <LineSegment Point="21, 1"></LineSegment>
-                                                </PathSegmentCollection>
-                                            </PathFigure>
-                                        </PathGeometry.Figures>
-                                    </PathGeometry>
-                                </GeometryDrawing.Geometry>
-                            </GeometryDrawing>
-                        </DrawingGroup>
-                    </DrawingBrush.Drawing>
-                </DrawingBrush>
-            </Grid.OpacityMask>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="{Binding ElementName=_this, Path=Vanquishing, Mode=OneWay, Converter={StaticResource ResourceBarGridLengthConverter}}"></RowDefinition>
-                <RowDefinition Height="{Binding ElementName=_this, Path=TitleActive, Mode=OneWay, Converter={StaticResource ResourceBarGridLengthConverter}}"></RowDefinition>
-                <RowDefinition Height="*"></RowDefinition>
-                <RowDefinition Height="*"></RowDefinition>
-            </Grid.RowDefinitions>
-            <controls:HorizontalResourceBar 
-                    Margin="0, 2, 0, 2"
-                    Grid.Row="0"
-                    CurrentResourceValue="{Binding Path=Session.Session.FoesKilled, Mode=OneWay}"
-                    MaxResourceValue="{Binding ElementName=_this, Path=TotalFoes, Mode=OneWay}"
-                    VerticalAlignment="Bottom"
-                    HorizontalAlignment="Left"
-                    BarColor="{DynamicResource Daybreak.Brushes.Vanquish}"
-                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    FontSize="14"
-                    Cursor="Hand"
-                    Text="{Binding ElementName=_this, Path=VanquishingText, Mode=OneWay}"
-                    FillAlignment="Right"
-                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    BorderThickness="1"
-                    Visibility="{Binding ElementName=_this, Path=Vanquishing, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                    MouseLeftButtonDown="VanquishingBar_MouseLeftButtonDown"
-                    ToolTip="Switch display mode"/>
-            <controls:HorizontalResourceBar 
-                    Margin="0, 2, 0, 2"
-                    Grid.Row="1"
-                    CurrentResourceValue="{Binding ElementName=_this, Path=PointsInCurrentRank, Mode=OneWay}"
-                    MaxResourceValue="{Binding ElementName=_this, Path=PointsForNextRank, Mode=OneWay}"
-                    VerticalAlignment="Bottom"
-                    HorizontalAlignment="Left"
-                    BarColor="{DynamicResource Daybreak.Brushes.Rank}"
-                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    FontSize="14"
-                    Cursor="Hand"
-                    Text="{Binding ElementName=_this, Path=TitleText, Mode=OneWay}"
-                    FillAlignment="Right"
-                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    BorderThickness="1"
-                    Visibility="{Binding ElementName=_this, Path=TitleActive, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                    ToolTip="Switch display mode"/>
-            <controls:HorizontalResourceBar 
-                    Margin="0, 2, 0, 2"
-                    Grid.Row="2"
-                    CurrentResourceValue="{Binding Path=Player.PlayerInformation.CurrentHealth, Mode=OneWay}"
-                    MaxResourceValue="{Binding Path=Player.PlayerInformation.MaxHealth, Mode=OneWay}"
-                    VerticalAlignment="Bottom"
-                    HorizontalAlignment="Left"
-                    BarColor="{DynamicResource Daybreak.Brushes.Health}"
-                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    FontSize="14"
-                    Cursor="Hand"
-                    Text="{Binding ElementName=_this, Path=HealthBarText, Mode=OneWay}"
-                    FillAlignment="Right"
-                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    BorderThickness="1"
-                    MouseLeftButtonDown="HealthBar_MouseLeftButtonDown" 
-                    ToolTip="Switch display mode"/>
-            <controls:HorizontalResourceBar 
-                    Margin="0, 2, 0, 2"
-                    Grid.Row="3"
-                    CurrentResourceValue="{Binding Path=Player.PlayerInformation.CurrentEnergy, Mode=OneWay}"
-                    MaxResourceValue="{Binding Path=Player.PlayerInformation.MaxEnergy, Mode=OneWay}"
-                    VerticalAlignment="Bottom"
-                    HorizontalAlignment="Left"
-                    BarColor="{DynamicResource Daybreak.Brushes.Energy}"
-                    Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    FontSize="14"
-                    Cursor="Hand"
-                    Text="{Binding ElementName=_this, Path=EnergyBarText, Mode=OneWay}"
-                    FillAlignment="Right"
-                    BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    BorderThickness="1"
-                    MouseLeftButtonDown="EnergyBar_MouseLeftButtonDown"
-                    ToolTip="Switch display mode"/>
-        </Grid>
-        <Viewbox
-                Grid.Column="3"
-                Grid.ColumnSpan="2"
-                Grid.Row="2"
-                Grid.RowSpan="2"
-                Stretch="Fill">
-            <Polygon Points="0, 10.1, 21.5, 10.1, 21.5, 0.1, 0, 0.1, 2.1, 5"
-                         StrokeThickness="0.08"
-                         HorizontalAlignment="Right"
-                         Height="10.2"
-                         Width="21.49"
-                         Stroke="{DynamicResource MahApps.Brushes.ThemeForeground}"></Polygon>
-        </Viewbox>
     </Grid>
 </UserControl>

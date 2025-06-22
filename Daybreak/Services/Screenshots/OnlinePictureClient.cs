@@ -1,8 +1,8 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Services.Screenshots.Models;
 using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Services.Api;
 using Daybreak.Shared.Services.Images;
-using Daybreak.Shared.Services.Scanner;
 using Daybreak.Shared.Services.Screenshots;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
@@ -29,20 +29,20 @@ internal sealed class OnlinePictureClient : IOnlinePictureClient
     private static readonly string CacheFolder = PathUtils.GetAbsolutePathFromRoot(CacheFolderSubPath);
 
     private readonly IImageCache imageCache;
-    private readonly IGuildwarsMemoryCache guildwarsMemoryCache;
+    private readonly IAttachedApiAccessor attachedApiAccessor;
     private readonly IHttpClient<OnlinePictureClient> httpClient;
     private readonly ILiveOptions<ThemeOptions> themeOptions;
     private readonly ILogger logger;
 
     public OnlinePictureClient(
         IImageCache imageCache,
-        IGuildwarsMemoryCache guildwarsMemoryCache,
+        IAttachedApiAccessor attachedApiAccessor,
         ILogger<OnlinePictureClient> logger,
         ILiveOptions<ThemeOptions> themeOptions,
         IHttpClient<OnlinePictureClient> httpClient)
     {
         this.imageCache = imageCache.ThrowIfNull();
-        this.guildwarsMemoryCache = guildwarsMemoryCache.ThrowIfNull();
+        this.attachedApiAccessor = attachedApiAccessor.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
         this.themeOptions = themeOptions.ThrowIfNull();
         this.httpClient = httpClient.ThrowIfNull();
@@ -93,25 +93,23 @@ internal sealed class OnlinePictureClient : IOnlinePictureClient
         var validEntries = Location.Locations
                 .SelectMany(l => l.Entries)
                 .Where(e => Models.Event.Wintersday.ValidLocations!.Any(map => e.Map == map));
-        if (localized)
+        if (localized && this.attachedApiAccessor.ApiContext is ScopedApiContext apiContext)
         {
-            WorldData? worldInfo = default;
-            try
+            var instanceInfo = await apiContext.GetMainPlayerInstanceInfo(CancellationToken.None);
+            if (instanceInfo is not null)
             {
-                worldInfo = await this.guildwarsMemoryCache.ReadWorldData(CancellationToken.None);
-            }
-            catch (Exception ex) when (ex is TimeoutException or TaskCanceledException or HttpRequestException)
-            {
-                this.logger.LogInformation("Could not retrieve world data. Returning random screenshot");
-            }
-
-            if (worldInfo?.Map is Map map)
-            {
-                var localizedEntries = validEntries.Where(e => e.Map == map).ToList();
-                if (localizedEntries.Count > 0)
+                if (Map.TryParse((int)instanceInfo.MapId, out var map))
                 {
-                    var selectedEntry = localizedEntries[Random.Shared.Next(0, localizedEntries.Count)];
-                    return GetScreenshotName(selectedEntry, selectedEntry.StartIndex ?? 0 + Random.Shared.Next(0, selectedEntry.Count ?? 0));
+                    var localizedEntries = validEntries.Where(e => e.Map == map).ToList();
+                    if (localizedEntries.Count > 0)
+                    {
+                        var selectedEntry = localizedEntries[Random.Shared.Next(0, localizedEntries.Count)];
+                        return GetScreenshotName(selectedEntry, selectedEntry.StartIndex ?? 0 + Random.Shared.Next(0, selectedEntry.Count ?? 0));
+                    }
+                }
+                else
+                {
+                    this.logger.LogError("Could not parse map ID {mapId}", instanceInfo.MapId);
                 }
             }
         }
@@ -123,27 +121,30 @@ internal sealed class OnlinePictureClient : IOnlinePictureClient
 
     private async Task<(string Uri, string CreditText)> GetLocalizedImageUri()
     {
-        WorldData? worldInfo = default;
-        try
+        if (this.attachedApiAccessor.ApiContext is not ScopedApiContext apiContext)
         {
-            worldInfo = await this.guildwarsMemoryCache.ReadWorldData(CancellationToken.None);
-            if (worldInfo is null)
-            {
-                return GetRandomScreenShot();
-            }
+            return GetRandomScreenShot();
         }
-        catch (Exception ex) when (ex is TimeoutException or TaskCanceledException or HttpRequestException)
+
+        var instanceInfo = await apiContext.GetMainPlayerInstanceInfo(CancellationToken.None);
+        if (instanceInfo is null)
         {
-            this.logger.LogInformation("Could not retrieve world data. Returning random screenshot");
+            return GetRandomScreenShot();
+        }
+
+        if (!Region.TryParse((int)instanceInfo.Region, out var region) ||
+            !Map.TryParse((int)instanceInfo.MapId, out var map))
+        {
+            this.logger.LogError("Could not parse region {regionId} or map ID {mapId}", instanceInfo.Region, instanceInfo.MapId);
             return GetRandomScreenShot();
         }
 
         var validLocations = Location.Locations
-            .Where(l => l.Region == worldInfo!.Region)
+            .Where(l => l.Region == region)
             .ToList();
         var validCategories = validLocations
             .SelectMany(l => l.Entries)
-            .Where(c => c.Map == worldInfo!.Map)
+            .Where(c => c.Map == map)
             .ToList();
         if (validCategories.None())
         {

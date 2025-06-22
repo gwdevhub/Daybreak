@@ -15,17 +15,16 @@ using Daybreak.Shared.Services.Startup;
 using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.Updater.PostUpdate;
 using Daybreak.Shared.Services.Window;
-using Daybreak.Views;
+using Daybreak.Shared.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Slim;
 using Slim.Integration.ServiceCollection;
 using System;
 using System.Core.Extensions;
-using System.Drawing.Printing;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Extensions;
@@ -34,7 +33,10 @@ using System.Windows.Media;
 //The following lines are needed to expose internal objects to the test project
 [assembly: InternalsVisibleTo("Daybreak.Tests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
-
+[assembly: ThemeInfo(
+    ResourceDictionaryLocation.None,
+    ResourceDictionaryLocation.SourceAssembly)
+]
 namespace Daybreak.Launch;
 
 public sealed class Launcher : ExtendedApplication<MainWindow>
@@ -55,6 +57,10 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
     [STAThread]
     public static int Main(string[] args)
     {
+#if DEBUG
+        AllocateAnsiConsole();
+#endif
+
         Instance = new Launcher(args);
         RegisterExtraEncodingProviders();
         RegisterMahAppsStyle();
@@ -104,6 +110,13 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
          */
         this.ServiceProvider.GetRequiredService<ISplashScreenService>().ShowSplashScreen();
         _ = this.ServiceProvider.GetRequiredService<IThemeManager>().GetCurrentTheme();
+
+        /*
+         * Hook into WPF traces and output them to logs
+         */
+
+        PresentationTraceSources.DataBindingSource.Switch.Level = SourceLevels.Warning | SourceLevels.Error;
+        PresentationTraceSources.DataBindingSource.Listeners.Add(new BindingErrorTraceListener(this.ServiceProvider.GetRequiredService<ILogger<Launcher>>()));
 
         await this.InitializeApplicationServices(startupStatus, optionsProducer);
     }
@@ -246,5 +259,35 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
     private static void RegisterDaybreakComponent()
     {
         Instance.Resources.MergedDictionaries[2].Add("Daybreak.Brushes.Background", new SolidColorBrush(Colors.Transparent));
+    }
+
+    private static void AllocateAnsiConsole()
+    {
+        NativeMethods.AllocConsole();
+        var handle = NativeMethods.GetStdHandle(NativeMethods.STD_OUTPUT_HANDLE);
+        if (!NativeMethods.GetConsoleMode(handle, out var mode))
+        {
+            Console.WriteLine("Failed to get console mode");
+        }
+
+        if (!NativeMethods.SetConsoleMode(handle, mode | NativeMethods.ENABLE_VIRTUAL_TERMINAL_PROCESSING | NativeMethods.ENABLE_PROCESSED_OUTPUT))
+        {
+            Console.WriteLine("Failed to enable virtual terminal processing");
+        }
+    }
+
+    internal sealed class BindingErrorTraceListener(ILogger logger) : TraceListener
+    {
+        private readonly ILogger logger = logger;
+
+        public override void Write(string? message)
+        {
+            this.logger.LogWarning("WPF Binding error: {bindingMessage}", message);
+        }
+
+        public override void WriteLine(string? message)
+        {
+            this.logger.LogWarning("WPF Binding error: {bindingMessage}", message);
+        }
     }
 }

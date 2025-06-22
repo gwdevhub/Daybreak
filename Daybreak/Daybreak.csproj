@@ -15,9 +15,11 @@
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <UserSecretsId>cfb2a489-db80-448d-a969-80270f314c46</UserSecretsId>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Controls\FocusViewComponents\PlayerResourcesComponent.xaml~RF3770aaff.TMP" />
     <None Remove="Resources\NotifyClose.wav" />
     <None Remove="Resources\NotifyError.wav" />
     <None Remove="Resources\NotifyInformation.wav" />
@@ -96,9 +98,69 @@
     </ItemGroup>
   </Target>
 
+  <!--
+  This ItemGroup takes into account changes in the dependency projects. Any changes in any of them will trigger a rebuild
+  which will also build those dependencies
+  -->
+  <ItemGroup>
+    <UpToDateCheckInput Include="..\Daybreak.API\**\*.cs" />
+    <UpToDateCheckInput Include="..\Daybreak.7ZipExtractor\**\*.cs" />
+    <UpToDateCheckInput Include="..\Daybreak.Installer\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <DaybreakApiSources Include="..\Daybreak.API\**\*.cs" />
+    <DaybreakApiSources Include="..\Daybreak.API\Daybreak.API.csproj" />
+    <DaybreakApiSources Include="..\Daybreak.Shared\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <DaybreakInstallerSources Include="..\Daybreak.Installer\**\*.cs" />
+    <DaybreakInstallerSources Include="..\Daybreak.Installer\Daybreak.Installer.csproj" />
+    <DaybreakInstallerSources Include="..\Daybreak.Shared\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <DaybreakExtractorSources Include="..\Daybreak.7ZipExtractor\**\*.cs" />
+    <DaybreakExtractorSources Include="..\Daybreak.7ZipExtractor\Daybreak.7ZipExtractor.csproj" />
+    <DaybreakExtractorSources Include="..\Daybreak.Shared\**\*.cs" />
+  </ItemGroup>
+
+  <!--
+  This is a workaround to determine where to place the dependency projects
+  It will first check if PublishDir is set.
+  If PublishDir is not set, it will place the dependencies in the output directory of the build.
+  The reason we cannot use OutDir is because OutDir does not get set at this stage and is not stable enough to be set individually on each target
+  -->
   <PropertyGroup>
-    <!-- produce the “ref” assemblies under obj\<rid>\ref\<tfm>\Daybreak.dll -->
-    <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
-    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+    <BaseBuildDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\$(TargetFramework)\$(RuntimeIdentifier)\</BaseBuildDir>
+    <DependencyOutput Condition="'$(PublishDir)' != ''">$(PublishDir)</DependencyOutput>
+    <DependencyOutput Condition="'$(PublishDir)' == ''">$(BaseBuildDir)</DependencyOutput>
   </PropertyGroup>
+  
+  <!--
+  The targets below build Daybreak.7ZipExtractor.csproj, Daybreak.Installer.csproj and Daybreak.API.csproj
+  and places the resulting binaries in the same folder as Daybreak.exe.
+  These work with the normal build, as well as with the dotnet publish
+  -->
+  <Target Name="PublishDaybreak7ZipExtractor" AfterTargets="Build" Inputs="@(DaybreakExtractorSources)" Outputs="$(OutDir)Daybreak.7ZipExtractor.exe">
+    
+    <Message Importance="high" Text="📦 Daybreak.7ZipExtractor -&gt; $(DependencyOutput)"></Message>
+    
+    <Exec Command="dotnet publish ..\Daybreak.7ZipExtractor\Daybreak.7ZipExtractor.csproj -c $(Configuration) -o $(DependencyOutput)" />
+  </Target>
+
+  <Target Name="PublishDaybreakInstaller" AfterTargets="Build" Inputs="@(DaybreakInstallerSources)" Outputs="$(OutDir)Daybreak.Installer.exe">
+
+    <Message Importance="high" Text="📦 Daybreak.Installer -&gt; $(DependencyOutput)"></Message>
+    
+    <Exec Command="dotnet publish ..\Daybreak.Installer\Daybreak.Installer.csproj -c $(Configuration) -o $(DependencyOutput)" />
+  </Target>
+
+  <Target Name="PublishDaybreakAPI" AfterTargets="Build" Inputs="@(DaybreakApiSources)" Outputs="$(OutDir)Daybreak.API.dll">
+    
+    <Message Importance="high" Text="📦 Daybreak.API -&gt; $(DependencyOutput)"></Message>
+    
+    <Exec Command="dotnet publish ..\Daybreak.API\Daybreak.API.csproj -c $(Configuration) -o $(DependencyOutput)" />
+  </Target>
 </Project>

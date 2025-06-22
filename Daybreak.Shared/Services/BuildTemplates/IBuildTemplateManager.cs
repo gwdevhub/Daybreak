@@ -1,5 +1,6 @@
-﻿using Daybreak.Shared.Models.Builds;
-using Daybreak.Shared.Models.Guildwars;
+﻿using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.Api;
+using Daybreak.Shared.Models.Builds;
 using System;
 using System.Collections.Generic;
 using System.Extensions;
@@ -12,12 +13,13 @@ public interface IBuildTemplateManager
     SingleBuildEntry ConvertToSingleBuildEntry(TeamBuildEntry teamBuildEntry);
     TeamBuildEntry ConvertToTeamBuildEntry(SingleBuildEntry singleBuildEntry);
     bool IsTemplate(string template);
+    bool CanTemplateApply(BuildTemplateValidationRequest request);
     SingleBuildEntry CreateSingleBuild();
     SingleBuildEntry CreateSingleBuild(string name);
     TeamBuildEntry CreateTeamBuild();
     TeamBuildEntry CreateTeamBuild(string name);
-    TeamBuildEntry CreateTeamBuild(TeamBuildData teamBuildData);
-    TeamBuildEntry CreateTeamBuild(TeamBuildData teamBuildData, string name);
+    TeamBuildEntry CreateTeamBuild(PartyLoadout partyLoadout);
+    TeamBuildEntry CreateTeamBuild(PartyLoadout partyLoadout, string name);
     void ClearBuilds();
     void SaveBuild(IBuildEntry buildEntry);
     void RemoveBuild(IBuildEntry buildEntry);

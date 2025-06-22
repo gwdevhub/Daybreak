@@ -10,24 +10,29 @@
              BorderThickness="1"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <StackPanel>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
         <TextBlock 
                     FontSize="18"
                     Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                    Margin="10"
-                    Text="Current Map"></TextBlock>
-        <Rectangle 
-                    Height="1"
-                    Fill="{DynamicResource MahApps.Brushes.ThemeForeground}"></Rectangle>
+                    Margin="10, 0, 10, 0"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Left"
+                    Text="Current Map" />
         <buttons:MenuButton
                     Title="{Binding Path=Name, Mode=OneWay}"
                     HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
                     Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                    Grid.Column="1"
                     HorizontalAlignment="Stretch"
                     HorizontalContentAlignment="Left"
+                    VerticalContentAlignment="Center"
                     Cursor="Hand"
-                    FontSize="20"
+                    FontSize="18"
                     MouseLeftButtonDown="CurrentMap_MouseLeftButtonDown"
                     ToolTip="Open current map info"/>
-    </StackPanel>
+    </Grid>
 </UserControl>
