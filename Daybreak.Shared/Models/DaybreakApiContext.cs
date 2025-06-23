@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
 
 namespace Daybreak.Shared.Models;
-public readonly struct DaybreakAPIContext(Uri apiUri, Process process)
+public readonly struct DaybreakAPIContext(Uri apiUri)
 {
     public readonly Uri ApiUri = apiUri;
-    public readonly Process Process = process;
 }

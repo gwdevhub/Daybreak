@@ -62,7 +62,7 @@
     <PackageReference Include="Squealify" Version="0.8.2.2" />
     <PackageReference Include="System.Formats.Asn1" Version="9.0.5" />
     <PackageReference Include="System.IO.Compression" Version="4.3.0" />
-    <PackageReference Include="System.Linq.Async" Version="6.0.1" />
+    <PackageReference Include="System.Linq.Async" Version="6.0.3" />
     <PackageReference Include="PeNet" Version="5.1.0" />
     <PackageReference Include="Plumsy" Version="1.1.0" />
     <PackageReference Include="securifybv.ShellLink" Version="0.1.0" />

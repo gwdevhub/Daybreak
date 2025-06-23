@@ -411,7 +411,7 @@ internal sealed class ApplicationLauncher(
         return GetGuildwarsProcessesInternal(launchConfigurationWithCredentials);
     }
 
-    public IEnumerable<Process> GetGuildwarsProcesses()
+    public IReadOnlyList<Process> GetGuildwarsProcesses()
     {
         return Process.GetProcessesByName(ProcessName);
     }

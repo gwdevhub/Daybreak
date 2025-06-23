@@ -4,7 +4,7 @@ using System.Extensions;
 
 namespace Daybreak.Shared.Models.Notifications;
 
-public readonly struct NotificationToken
+public readonly struct NotificationToken : IDisposable
 {
     private readonly Notification notification;
 
@@ -20,5 +20,10 @@ public readonly struct NotificationToken
     public void Cancel()
     {
         this.notification.CancellationRequested = true;
+    }
+
+    public void Dispose()
+    {
+        this.Cancel();
     }
 }
