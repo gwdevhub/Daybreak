@@ -10,6 +10,7 @@
     <InteropExports>true</InteropExports>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <EnableRequestDelegateGenerator>true</EnableRequestDelegateGenerator>
+    <Version>0.9.9.72</Version>
     
     <PublishAot>true</PublishAot>
     <SelfContained>true</SelfContained>
