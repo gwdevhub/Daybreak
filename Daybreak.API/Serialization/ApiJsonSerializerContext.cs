@@ -34,6 +34,7 @@ namespace Daybreak.API.Serialization;
 [JsonSerializable(typeof(List<PartyLoadout>))]
 [JsonSerializable(typeof(InstanceInfo))]
 [JsonSerializable(typeof(TitleInfo))]
+[JsonSerializable(typeof(LoginInfo))]
 public partial class ApiJsonSerializerContext : JsonSerializerContext
 {
 }
