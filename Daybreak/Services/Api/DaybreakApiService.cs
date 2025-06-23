@@ -34,6 +34,7 @@ public sealed class DaybreakApiService(
     private const string DaybreakApiName = "Daybreak.API.dll";
     private const string ProcessIdPlaceholder = "{PID}";
     private const string DaybreakApiServiceName = $"daybreak-api-{ProcessIdPlaceholder}";
+    private const string ServiceSubType = "daybreak-api";
     private const int MDNSRetryCount = 3;
 
     private static readonly TimeSpan MDNSTimeout = TimeSpan.FromSeconds(5);
@@ -63,16 +64,28 @@ public sealed class DaybreakApiService(
 
     public IEnumerable<string> GetCustomArguments() => [];
 
-    public async Task<ScopedApiContext?> AttachDaybreakApiContext(GuildWarsApplicationLaunchContext launchContext, CancellationToken cancellationToken)
+    public Task<ScopedApiContext?> AttachDaybreakApiContext(GuildWarsApplicationLaunchContext launchContext, ScopedApiContext apiContext, CancellationToken _)
     {
-        var apiContext = await this.GetDaybreakApiContext(launchContext.GuildWarsProcess, cancellationToken);
         if (this.attachedApiAccessor is AttachedApiAccessor accessor)
         {
             accessor.LaunchContext = launchContext;
             accessor.ApiContext = apiContext;
         }
 
-        return apiContext;
+        return Task.FromResult<ScopedApiContext?>(apiContext);
+    }
+
+    public async Task<ScopedApiContext?> AttachDaybreakApiContext(GuildWarsApplicationLaunchContext launchContext, CancellationToken cancellationToken)
+    {
+        var apiContext = await this.GetDaybreakApiContext(launchContext.GuildWarsProcess, cancellationToken);
+        if (apiContext is not null)
+        {
+            return await this.AttachDaybreakApiContext(launchContext, apiContext, cancellationToken);
+        }
+        else
+        {
+            return apiContext;
+        }
     }
 
     public async Task<ScopedApiContext?> GetDaybreakApiContext(Process guildWarsProcess, CancellationToken cancellationToken)
@@ -109,8 +122,44 @@ public sealed class DaybreakApiService(
             return default;
         }
 
-        var apiContext = new DaybreakAPIContext(serviceUri, guildWarsProcess);
+        var apiContext = new DaybreakAPIContext(serviceUri);
         return new ScopedApiContext(this.scopedApiLogger, this.scopedApiClient, apiContext);
+    }
+
+    public async Task<ScopedApiContext?> FindDaybreakApiContextByCredentials(LoginCredentials loginCredentials, CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        IReadOnlyList<Uri>? serviceUris = default;
+        for (var i = 0; i < MDNSRetryCount; i++)
+        {
+            using var cts = new CancellationTokenSource(MDNSTimeout);
+            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cts.Token);
+            scopedLogger.LogInformation("[{attempt}/{maxAttempts}] Searching for Daybreak API services with subtype {serviceSubType}", i, MDNSRetryCount, ServiceSubType);
+            try
+            {
+                serviceUris = await this.mdnsService.FindLocalServices(ServiceSubType, cancellationToken: linkedCts.Token);
+                break;
+            }
+            catch (Exception e)
+            {
+                scopedLogger.LogError(e, "[{attempt}/{maxAttempts}] Failed to find Daybreak API service with subtype {serviceSubType}", i, MDNSRetryCount, ServiceSubType);
+            }
+        }
+
+        foreach(var uri in serviceUris ?? [])
+        {
+            var apiContext = new DaybreakAPIContext(uri);
+            var scopedApiContext = new ScopedApiContext(this.scopedApiLogger, this.scopedApiClient, apiContext);
+
+            var response = await scopedApiContext.GetLoginInfo(cancellationToken);
+            if (loginCredentials.Username == response?.Email)
+            {
+                return scopedApiContext;
+            }
+        }
+
+        scopedLogger.LogWarning("Failed to find Daybreak API service by credentials for user {username}", loginCredentials?.Username ?? string.Empty);
+        return default;
     }
 
     public Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken) =>

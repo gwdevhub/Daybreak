@@ -1,4 +1,5 @@
 ﻿using Daybreak.Shared.Models.LaunchConfigurations;
+using Daybreak.Shared.Services.Api;
 using System.ComponentModel;
 
 namespace Daybreak.Shared.Models;
@@ -57,4 +58,24 @@ public sealed class LauncherViewContext : INotifyPropertyChanged
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.ShowJustName)));
         }
     } = false;
+
+    public GuildWarsApplicationLaunchContext? AppContext
+    {
+        get;
+        set
+        {
+            field = value;
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.AppContext)));
+        }
+    }
+
+    public ScopedApiContext? ApiContext
+    {
+        get;
+        set
+        {
+            field = value;
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.ApiContext)));
+        }
+    }
 }

@@ -18,6 +18,7 @@ public static class WebApplicationExtensions
 
             var response = new HealthCheckResponse
             {
+                ProcessId = Environment.ProcessId,
                 Status = report.Status,
                 TotalDuration = report.TotalDuration,
                 Entries = report.Entries.ToDictionary(
