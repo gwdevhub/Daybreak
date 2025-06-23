@@ -274,6 +274,8 @@ public partial class LauncherView : UserControl
             return;
         }
 
+        launcherViewContext.AppContext = default;
+        launcherViewContext.ApiContext = default;
         (var appContext, var apiContext) = await this.GetAppAndApiContext(launcherViewContext, cancellationToken);
         launcherViewContext.AppContext = appContext;
         launcherViewContext.ApiContext = apiContext;
