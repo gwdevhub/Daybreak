@@ -274,8 +274,6 @@ public partial class LauncherView : UserControl
             return;
         }
 
-        launcherViewContext.AppContext = default;
-        launcherViewContext.ApiContext = default;
         (var appContext, var apiContext) = await this.GetAppAndApiContext(launcherViewContext, cancellationToken);
         launcherViewContext.AppContext = appContext;
         launcherViewContext.ApiContext = apiContext;
@@ -456,6 +454,9 @@ public partial class LauncherView : UserControl
         var attachNotificationToken = this.notificationService.NotifyInformation(
                 title: "Attaching to Guild Wars process...",
                 description: "Attempting to attach to Guild Wars process");
+
+        //Wait 2 seconds to allow the launched Guild Wars process to advertise itself
+        await Task.Delay(2000, cancellationToken);
         var apiContext = await this.daybreakApiService.AttachDaybreakApiContext(launchedContext, cancellationToken);
         attachNotificationToken.Cancel();
 

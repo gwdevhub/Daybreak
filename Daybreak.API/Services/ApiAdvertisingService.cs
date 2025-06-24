@@ -8,7 +8,7 @@ namespace Daybreak.API.Services;
 
 public sealed class ApiAdvertisingService(
     IServer server,
-    IMDnsService mDnsService,
+    IMDomainNameService mDnsService,
     IHostApplicationLifetime lifetime,
     ILogger<ApiAdvertisingService> logger) : IHostedService
 {
@@ -16,7 +16,7 @@ public sealed class ApiAdvertisingService(
     private const string ServiceName = $"daybreak-api-{ProcessIdPlaceholder}";
     private const string ServiceSubType = "daybreak-api";
     private readonly IServerAddressesFeature serverAddressesFeature = server.Features.Get<IServerAddressesFeature>() ?? throw new InvalidOperationException("Server does not support addresses feature.");
-    private readonly IMDnsService mDnsService = mDnsService;
+    private readonly IMDomainNameService mDnsService = mDnsService;
     private readonly IHostApplicationLifetime lifetime = lifetime;
     private readonly ILogger<ApiAdvertisingService> logger = logger;
 
