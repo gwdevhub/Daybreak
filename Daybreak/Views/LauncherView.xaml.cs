@@ -9,11 +9,13 @@ using Daybreak.Shared.Services.ApplicationLauncher;
 using Daybreak.Shared.Services.InternetChecker;
 using Daybreak.Shared.Services.LaunchConfigurations;
 using Daybreak.Shared.Services.Menu;
+using Daybreak.Shared.Services.Mods;
 using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Onboarding;
 using Daybreak.Shared.Services.Screens;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Core.Extensions;
@@ -54,6 +56,12 @@ public partial class LauncherView : UserControl
 
     [GenerateDependencyProperty]
     private bool canLaunch;
+
+    [GenerateDependencyProperty(InitialValue = true)]
+    private bool reApplyButtonEnabled = true;
+
+    [GenerateDependencyProperty]
+    private bool canReapply;
 
     public ObservableCollection<LauncherViewContext> LaunchConfigurations { get; } = [];
 
@@ -174,7 +182,7 @@ public partial class LauncherView : UserControl
         }
         else
         {
-            var launchingTask = await new TaskFactory().StartNew(() => this.LaunchGuildWars(this.cancellationTokenSource?.Token ?? CancellationToken.None), TaskCreationOptions.LongRunning);
+            var launchingTask = Task.Factory.StartNew(() => this.LaunchGuildWars(this.cancellationTokenSource?.Token ?? CancellationToken.None), TaskCreationOptions.LongRunning);
             try
             {
                 await launchingTask;
@@ -185,6 +193,15 @@ public partial class LauncherView : UserControl
         }
 
         this.launching = false;
+    }
+
+    private async void ReapplyButton_Clicked(object _, EventArgs __)
+    {
+        if (this.LatestConfiguration is LauncherViewContext context &&
+            context.ModsToReapply?.Any() is true)
+        {
+            await Task.Factory.StartNew(() => this.ReApplyMods(context, this.cancellationTokenSource?.Token ?? CancellationToken.None), TaskCreationOptions.LongRunning);
+        }
     }
 
     private async ValueTask SetLaunchButtonState(CancellationToken cancellationToken)
@@ -279,12 +296,13 @@ public partial class LauncherView : UserControl
         }
 
         (var appContext, var apiContext) = await this.GetAppAndApiContext(launcherViewContext, cancellationToken);
-        launcherViewContext.AppContext = appContext;
-        launcherViewContext.ApiContext = apiContext;
         if (appContext is not null)
         {
+            launcherViewContext.ModsToReapply = await this.CheckModsToReapply(launcherViewContext, appContext, cancellationToken).ConfigureAwait(true);
             if (apiContext is null)
             {
+                launcherViewContext.AppContext = appContext;
+                launcherViewContext.ApiContext = apiContext;
                 launcherViewContext.GameRunning = false;
                 launcherViewContext.CanLaunch = false;
                 launcherViewContext.CanAttach = false;
@@ -292,6 +310,8 @@ public partial class LauncherView : UserControl
             }
             else
             {
+                launcherViewContext.AppContext = appContext;
+                launcherViewContext.ApiContext = apiContext;
                 launcherViewContext.GameRunning = true;
                 launcherViewContext.CanLaunch = false;
                 launcherViewContext.CanAttach = this.focusViewOptions.Value.Enabled;
@@ -302,6 +322,8 @@ public partial class LauncherView : UserControl
         {
             if (apiContext is null)
             {
+                launcherViewContext.AppContext = appContext;
+                launcherViewContext.ApiContext = apiContext;
                 launcherViewContext.GameRunning = false;
                 launcherViewContext.CanLaunch = true;
                 launcherViewContext.CanAttach = false;
@@ -319,6 +341,7 @@ public partial class LauncherView : UserControl
                         LaunchConfiguration = launcherViewContext.Configuration
                     };
 
+                    launcherViewContext.ModsToReapply = await this.CheckModsToReapply(launcherViewContext, launcherViewContext.AppContext, cancellationToken).ConfigureAwait(true);
                     launcherViewContext.CanKill = !this.focusViewOptions.Value.Enabled;
                 }
                 else
@@ -326,6 +349,7 @@ public partial class LauncherView : UserControl
                     launcherViewContext.CanKill = false;
                 }
 
+                launcherViewContext.ApiContext = apiContext;
                 launcherViewContext.GameRunning = true;
                 launcherViewContext.CanLaunch = false;
                 launcherViewContext.CanAttach = this.focusViewOptions.Value.Enabled;
@@ -478,5 +502,57 @@ public partial class LauncherView : UserControl
             this.viewManager.ShowView<FocusView>(new FocusViewContext { ApiContext = apiContext, LaunchContext = launchedContext });
             this.menuService.CloseMenu();
         }
+    }
+
+    private async Task<IEnumerable<IModService>> CheckModsToReapply(LauncherViewContext launcherViewContext, GuildWarsApplicationLaunchContext appContext, CancellationToken cancellationToken)
+    {
+        var currentMods = launcherViewContext.ModsToReapply?.ToList() ?? [];
+        var mods = (await this.applicationLauncher.CheckMods(appContext, cancellationToken)).ToList();
+        if (mods.Any(m => !currentMods.Contains(m)))
+        {
+            this.notificationService.NotifyInformation(
+                title: "Mods changed",
+                description: "The mods have changed since Guild Wars was launched. Please click 'Reapply mods' to reapply the mod configuration");
+        }
+
+        if (mods.Any())
+        {
+            await this.Dispatcher.InvokeAsync(() => this.CanReapply = true);
+        }
+        else
+        {
+            await this.Dispatcher.InvokeAsync(() => this.CanReapply = false);
+        }
+
+        return mods;
+    }
+
+    private async Task ReApplyMods(LauncherViewContext launcherViewContext, CancellationToken cancellationToken)
+    {
+        var modsToApply = launcherViewContext.ModsToReapply?.ToList() ?? [];
+        if (modsToApply.Count == 0 ||
+            launcherViewContext.AppContext is null)
+        {
+            return;
+        }
+
+        await this.Dispatcher.InvokeAsync(() => this.ReApplyButtonEnabled = false);
+        using var token = this.notificationService.NotifyInformation(
+            title: "Reapplying mods",
+            description: "Reapplying mods to the running Guild Wars process. This may take a few seconds");
+        if (!await this.applicationLauncher.ReapplyMods(launcherViewContext.AppContext, modsToApply, cancellationToken))
+        {
+            this.notificationService.NotifyError(
+                title: "Could not reapply mods",
+                description: "Could not reapply the mods to the running Guild Wars process. Check the logs for more details");
+        }
+        else
+        {
+            this.notificationService.NotifyInformation(
+                title: "Mods have been reapplied",
+                description: "Mods have been reapplied to the running Guild Wars process");
+        }
+
+        await this.Dispatcher.InvokeAsync(() => this.ReApplyButtonEnabled = true);
     }
 }

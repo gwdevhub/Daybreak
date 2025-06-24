@@ -21,6 +21,7 @@ using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
@@ -36,6 +37,7 @@ internal sealed class ToolboxService(
     ILiveUpdateableOptions<ToolboxOptions> toolboxOptions,
     ILogger<ToolboxService> logger) : IToolboxService
 {
+    private const string ToolboxDllName = "GWToolboxdll.dll";
     private const string ToolboxDestinationDirectorySubPath = "GWToolbox";
     private const string ToolboxBuildsFileName = "builds.ini";
 
@@ -43,7 +45,7 @@ internal sealed class ToolboxService(
     private static readonly string UsualToolboxFolderLocation = Path.GetFullPath(
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "GWToolboxpp"));
     private static readonly string UsualToolboxLocation = Path.GetFullPath(
-        Path.Combine(UsualToolboxFolderLocation, "GWToolboxdll.dll"));
+        Path.Combine(UsualToolboxFolderLocation, ToolboxDllName));
 
     private readonly IBuildTemplateManager buildTemplateManager = buildTemplateManager.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
@@ -63,6 +65,22 @@ internal sealed class ToolboxService(
         }
     }
     public bool IsInstalled => File.Exists(this.toolboxOptions.Value.DllPath);
+
+    public Task<bool> ShouldRunAgain(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken)
+    {
+        if (!guildWarsRunningContext.LoadedModules.Contains(ToolboxDllName) &&
+            this.IsEnabled)
+        {
+            return Task.FromResult(true);
+        }
+
+        return Task.FromResult(false);
+    }
+
+    public Task OnGuildWarsRunning(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken)
+    {
+        return this.LaunchToolbox(guildWarsRunningContext.ApplicationLauncherContext.Process, cancellationToken);
+    }
 
     public Task OnGuildWarsStarting(GuildWarsStartingContext guildWarsStartingContext, CancellationToken cancellationToken) => Task.CompletedTask;
 

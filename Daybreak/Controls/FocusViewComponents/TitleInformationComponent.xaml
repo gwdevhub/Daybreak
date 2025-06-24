@@ -29,7 +29,7 @@
             <buttons:HighlightButton
                         Grid.Column="1"
                         Title="{Binding Path=Title.Name, Mode=OneWay}"
-                        HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                        HighlightBrush="{DynamicResource MahApps.Brushes.Accent}"
                         Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Center"

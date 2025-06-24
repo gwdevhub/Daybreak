@@ -18,7 +18,7 @@
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Rectangle
-            Fill="{Binding ElementName=_this, Path=HighlightColor, Mode=OneWay}"
+            Fill="{Binding ElementName=_this, Path=HighlightBrush, Mode=OneWay}"
             Opacity="{Binding ElementName=_this, Path=Highlighted, Converter={StaticResource HighlightConverter}}"
             Grid.ColumnSpan="2">
         </Rectangle>

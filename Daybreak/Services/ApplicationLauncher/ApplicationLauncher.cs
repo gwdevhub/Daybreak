@@ -19,6 +19,7 @@ using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
+using System.Extensions.Core;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -444,6 +445,89 @@ internal sealed class ApplicationLauncher(
                 title: "Failed to kill GuildWars process",
                 description: $"Encountered exception while trying to kill GuildWars process with id {guildWarsApplicationLaunchContext.ProcessId}. Check logs for details");
         }
+    }
+
+    public IEnumerable<string> GetLoadedModules(GuildWarsApplicationLaunchContext guildWarsApplicationLaunchContext)
+    {
+        if (guildWarsApplicationLaunchContext.GuildWarsProcess?.HasExited is false)
+        {
+            foreach (ProcessModule module in guildWarsApplicationLaunchContext.GuildWarsProcess.Modules)
+            {
+                yield return module.ModuleName;
+            }
+        }
+    }
+
+    public async Task<IEnumerable<IModService>> CheckMods(GuildWarsApplicationLaunchContext guildWarsApplicationLaunchContext, CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        if (guildWarsApplicationLaunchContext.LaunchConfiguration.ExecutablePath is null)
+        {
+            return [];
+        }
+
+        var guildWarsRunningContext = new GuildWarsRunningContext
+        {
+            ApplicationLauncherContext = new ApplicationLauncherContext
+            {
+                ExecutablePath = guildWarsApplicationLaunchContext.LaunchConfiguration.ExecutablePath,
+                Process = guildWarsApplicationLaunchContext.GuildWarsProcess,
+                ProcessId = guildWarsApplicationLaunchContext.ProcessId
+            },
+            LoadedModules = [.. this.GetLoadedModules(guildWarsApplicationLaunchContext)]
+        };
+
+        var modsNeedReapply = await this.modsManager.GetMods().ToAsyncEnumerable()
+            .WhereAwait(async m =>
+            {
+                try
+                {
+                    return await m.ShouldRunAgain(guildWarsRunningContext, cancellationToken);
+                }
+                catch(Exception e)
+                {
+                    scopedLogger.LogError(e, "Mod {modName} encountered an error while checking if it should run again", m.Name);
+                    return false;
+                }
+            }).ToListAsync(cancellationToken);
+        return modsNeedReapply;
+    }
+
+    public async Task<bool> ReapplyMods(GuildWarsApplicationLaunchContext guildWarsApplicationLaunchContext, IEnumerable<IModService> mods, CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        if (guildWarsApplicationLaunchContext.LaunchConfiguration.ExecutablePath is null)
+        {
+            return false;
+        }
+
+        var guildWarsRunningContext = new GuildWarsRunningContext
+        {
+            ApplicationLauncherContext = new ApplicationLauncherContext
+            {
+                ExecutablePath = guildWarsApplicationLaunchContext.LaunchConfiguration.ExecutablePath,
+                Process = guildWarsApplicationLaunchContext.GuildWarsProcess,
+                ProcessId = guildWarsApplicationLaunchContext.ProcessId
+            },
+            LoadedModules = [.. this.GetLoadedModules(guildWarsApplicationLaunchContext)]
+        };
+
+        foreach (var mod in mods)
+        {
+            try
+            {
+                await mod.OnGuildWarsRunning(guildWarsRunningContext, cancellationToken);
+            }
+            catch(Exception e)
+            {
+                scopedLogger.LogError(e, "Mod {modName} encountered an error while reapplying", mod.Name);
+                this.notificationService.NotifyError(
+                    title: $"{mod.Name} encountered an error",
+                    description: $"Mod {mod.Name} encountered an error while reapplying. Check logs for details");
+            }
+        }
+
+        return true;
     }
 
     private static IEnumerable<GuildWarsApplicationLaunchContext?> GetGuildwarsProcessesInternal(params LaunchConfigurationWithCredentials[] launchConfigurationWithCredentials)

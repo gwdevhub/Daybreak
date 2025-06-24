@@ -15,7 +15,7 @@
                 <Grid>
                     <buttons:MenuButton Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                                         Title="{Binding Title}"
-                                        HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                                        HighlightBrush="{DynamicResource MahApps.Brushes.Accent}"
                                         FontSize="18"
                                         Clicked="LocationButton_Clicked"
                                         ToolTip="Open location info"/>
@@ -26,7 +26,7 @@
             <DataTemplate DataType="{x:Type models:QuestEntry}">
                 <buttons:MenuButton     Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                                         Title="{Binding Title}"
-                                        HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                                        HighlightBrush="{DynamicResource MahApps.Brushes.Accent}"
                                         FontSize="18"
                                         Margin="15, 0, 0, 0"
                                         Clicked="QuestButton_Clicked"

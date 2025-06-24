@@ -31,4 +31,17 @@ public interface IModService
     /// Use this method to clean up the GuildWars folder of any residual mod files.
     /// </summary>
     Task OnGuildWarsStartingDisabled(GuildWarsStartingDisabledContext guildWarsStartingDisabledContext, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Called periodically while the guild wars process is running.
+    /// Use this method to detect if the mod should be re-run. (eg. if the running Guild Wars instance is missing modules)
+    /// </summary>
+    /// <returns>True if this mod should run again on the guild wars process</returns>
+    Task<bool> ShouldRunAgain(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Called if <see cref="ShouldRunAgain(GuildWarsRunningContext, CancellationToken)"/> returned true.
+    /// Use this method to re-inject or re-apply the mod to the running Guild Wars process.
+    /// </summary>
+    Task OnGuildWarsRunning(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken);
 }

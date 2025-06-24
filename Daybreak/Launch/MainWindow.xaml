@@ -182,7 +182,7 @@
                                  Margin="0, 0, 138, 0"
                                  Cursor="Hand"
                                  Opacity="0.8"
-                                 HighlightColor="White"
+                                 HighlightBrush="White"
                                  ToolTip="Synchronize Settings"
                                  Clicked="SynchronizeButton_Click">
             <buttons:HighlightButton.ButtonContent>
@@ -201,7 +201,7 @@
                          Margin="0, 0, 186, 0"
                          Cursor="Hand"
                          Opacity="0.8"
-                         HighlightColor="White"
+                         HighlightBrush="White"
                          ToolTip="Report an issue"
                          Clicked="BugButton_Click">
             <buttons:HighlightButton.ButtonContent>

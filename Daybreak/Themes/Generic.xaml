@@ -51,7 +51,7 @@
                         <buttons:HighlightButton x:Name="PART_MainButton"
                                                  Grid.Column="0"
                                                  Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                                                 HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                                                 HighlightBrush="{DynamicResource MahApps.Brushes.Accent}"
                                                  VerticalAlignment="Stretch"
                                                  HorizontalAlignment="Stretch"
                                                  VerticalContentAlignment="Center"
@@ -65,7 +65,7 @@
                         <buttons:HighlightButton x:Name="PART_ArrowButton"
                                                  Grid.Column="1"
                                                  Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                                                 HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                                                 HighlightBrush="{DynamicResource MahApps.Brushes.Accent}"
                                                  VerticalAlignment="Stretch"
                                                  HorizontalAlignment="Stretch">
                             <buttons:HighlightButton.ButtonContent>

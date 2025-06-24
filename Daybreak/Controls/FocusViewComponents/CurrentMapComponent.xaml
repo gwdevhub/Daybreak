@@ -24,7 +24,7 @@
                     Text="Current Map" />
         <buttons:MenuButton
                     Title="{Binding Path=Name, Mode=OneWay}"
-                    HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                    HighlightBrush="{DynamicResource MahApps.Brushes.Accent}"
                     Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                     Grid.Column="1"
                     HorizontalAlignment="Stretch"

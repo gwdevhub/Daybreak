@@ -12,7 +12,7 @@
         <ItemsControl ItemsSource="{Binding ElementName=_this, Path=Items, Mode=OneWay}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <buttons:HighlightButton HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                    <buttons:HighlightButton HighlightBrush="{DynamicResource MahApps.Brushes.Accent}"
                                              VerticalAlignment="Stretch"
                                              HorizontalAlignment="Stretch"
                                              Tag="{Binding Mode=OneWay}"

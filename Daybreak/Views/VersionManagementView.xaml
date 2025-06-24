@@ -65,7 +65,7 @@
                         <buttons:HighlightButton 
                                             Title="{Binding VersionString}" Clicked="DesiredVersion_Clicked"
                                             Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                                            HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                            HighlightBrush="{StaticResource MahApps.Brushes.Accent}"
                                             FontSize="16"
                                             BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
                                             BorderThickness="0, 0, 0, 1"

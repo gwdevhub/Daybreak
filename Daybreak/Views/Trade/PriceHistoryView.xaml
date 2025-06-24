@@ -43,7 +43,7 @@
             HorizontalAlignment="Right"
             Margin="5"
             FontSize="16"
-            HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+            HighlightBrush="{StaticResource MahApps.Brushes.Accent}"
             VerticalContentAlignment="Center"
             HorizontalContentAlignment="Center"
             BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"

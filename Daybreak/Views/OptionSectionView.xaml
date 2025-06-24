@@ -73,7 +73,7 @@
                                 TextPadding="5, 0, 5, 0"
                                 FontSize="16"
                                 Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                                HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                HighlightBrush="{StaticResource MahApps.Brushes.Accent}"
                                 BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
                                 BorderThickness="1, 0, 1, 0"
                                 Grid.Column="3"
