@@ -14,7 +14,7 @@
             <DataTemplate DataType="{x:Type models:OptionSection}">
                 <buttons:MenuButton Title="{Binding Name}"
                                     Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                                    HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                                    HighlightBrush="{DynamicResource MahApps.Brushes.Accent}"
                                     Height="30"
                                     Cursor="Hand"
                                     Clicked="MenuButton_Clicked"

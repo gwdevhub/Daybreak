@@ -34,7 +34,7 @@
                                          FontSize="16"
                                          Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                          Background="{StaticResource MahApps.Brushes.ThemeBackground}"
-                                         HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                         HighlightBrush="{StaticResource MahApps.Brushes.Accent}"
                                          BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
                                          BorderThickness="1"
                                          Clicked="NoButton_Clicked"
@@ -51,7 +51,7 @@
                                          Background="{StaticResource MahApps.Brushes.ThemeBackground}"
                                          BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
                                          BorderThickness="1"
-                                         HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                         HighlightBrush="{StaticResource MahApps.Brushes.Accent}"
                                          Clicked="YesButton_Clicked"
                                          ToolTip="Restart Daybreak"/>
             </Grid>

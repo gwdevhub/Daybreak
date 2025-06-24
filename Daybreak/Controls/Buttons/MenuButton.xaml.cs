@@ -20,7 +20,7 @@ public partial class MenuButton : UserControl
     [GenerateDependencyProperty]
     private bool highlighted;
     [GenerateDependencyProperty]
-    private Brush highlightColor = default!;
+    private Brush highlightBrush = default!;
     [GenerateDependencyProperty]
     private FrameworkElement innerContent = default!;
     [GenerateDependencyProperty(InitialValue = "")]

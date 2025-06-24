@@ -39,7 +39,7 @@
             <buttons:HighlightButton Grid.Row="1"
                                      Title="Ok" Background="{StaticResource MahApps.Brushes.ThemeBackground}" HorizontalAlignment="Center"
                                      FontSize="16" Margin="10" Width="50" Height="25" Clicked="OpaqueButton_Clicked" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                                     HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                     HighlightBrush="{StaticResource MahApps.Brushes.Accent}"
                                      HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                                      BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
                                      BorderThickness="1"

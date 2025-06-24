@@ -59,7 +59,7 @@
                     <buttons:HighlightButton 
                                 Title="{Binding Mode=OneWay}"
                                 FontSize="16"
-                                HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                HighlightBrush="{StaticResource MahApps.Brushes.Accent}"
                                 Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                                 Height="30"
                                 VerticalContentAlignment="Center"

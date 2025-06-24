@@ -20,7 +20,7 @@
         <buttons:HighlightButton 
             FontSize="16" 
             Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" 
-            HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+            HighlightBrush="{StaticResource MahApps.Brushes.Accent}"
             Title="{Binding Name}" 
             HorizontalAlignment="Stretch" 
             VerticalAlignment="Stretch"

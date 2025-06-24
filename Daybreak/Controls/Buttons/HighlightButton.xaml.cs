@@ -19,7 +19,9 @@ public partial class HighlightButton : UserControl
     [GenerateDependencyProperty]
     private bool highlighted;
     [GenerateDependencyProperty]
-    private Brush highlightColor = default!;
+    private Brush highlightBrush = default!;
+    [GenerateDependencyProperty]
+    private Brush disabledBrush = default!;
     [GenerateDependencyProperty(InitialValue = "")]
     private string title = string.Empty;
     [GenerateDependencyProperty(InitialValue = HorizontalAlignment.Left)]

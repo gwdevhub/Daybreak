@@ -19,7 +19,8 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibility" />
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
     </UserControl.Resources>
-    <Grid>
+    <StackPanel VerticalAlignment="Center"
+                HorizontalAlignment="Center">
         <controls:DropDownButton Height="100"
                                  Width="400"
                                  Background="{StaticResource MahApps.Brushes.ThemeBackground}"
@@ -37,5 +38,20 @@
                 </DataTemplate>
             </controls:DropDownButton.ItemTemplate>
         </controls:DropDownButton>
-    </Grid>
+        <buttons:HighlightButton    Background="{StaticResource MahApps.Brushes.ThemeBackground}"
+                                    Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
+                                    HighlightBrush="{StaticResource MahApps.Brushes.Accent}"
+                                    DisabledBrush="Black"
+                                    Title="Reapply mods"
+                                    FontSize="16"
+                                    Margin="0, 50, 0, 0"
+                                    Width="400"
+                                    Height="30"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    Visibility="{Binding ElementName=_this, Path=CanReapply, Mode=OneWay, Converter={StaticResource BooleanToVisibility}}"
+                                    IsEnabled="{Binding ElementName=_this, Path=ReApplyButtonEnabled, Mode=OneWay}"
+                                    Clicked="ReapplyButton_Clicked"
+            />
+    </StackPanel>
 </UserControl>

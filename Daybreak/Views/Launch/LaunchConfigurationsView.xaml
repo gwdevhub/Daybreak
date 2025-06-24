@@ -56,7 +56,7 @@
                     <Grid>
                         <buttons:HighlightButton 
                             Clicked="HighlightButton_Clicked"
-                            HighlightColor="{StaticResource MahApps.Brushes.Accent}">
+                            HighlightBrush="{StaticResource MahApps.Brushes.Accent}">
                             <buttons:HighlightButton.ButtonContent>
                                 <StackPanel>
                                     <TextBlock Text="{Binding Credentials.Username}"

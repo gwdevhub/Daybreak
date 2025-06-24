@@ -43,6 +43,10 @@ internal sealed class GuildwarsScreenPlacer : IGuildwarsScreenPlacer
 
     public bool IsInstalled => true;
 
+    public Task<bool> ShouldRunAgain(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken) => Task.FromResult(false);
+
+    public Task OnGuildWarsRunning(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken) => Task.CompletedTask;
+
     public async Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken)
     {
         var screen = this.screenManager.Screens.Skip(this.liveOptions.Value.DesiredGuildwarsScreen).FirstOrDefault();

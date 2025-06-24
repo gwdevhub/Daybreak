@@ -1,5 +1,7 @@
 ﻿using Daybreak.Shared.Models.LaunchConfigurations;
 using Daybreak.Shared.Services.Api;
+using Daybreak.Shared.Services.Mods;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace Daybreak.Shared.Models;
@@ -76,6 +78,16 @@ public sealed class LauncherViewContext : INotifyPropertyChanged
         {
             field = value;
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.ApiContext)));
+        }
+    }
+
+    public IEnumerable<IModService>? ModsToReapply
+    {
+        get;
+        set
+        {
+            field = value;
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.ModsToReapply)));
         }
     }
 }

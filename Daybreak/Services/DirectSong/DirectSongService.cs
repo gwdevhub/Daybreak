@@ -19,7 +19,13 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace Daybreak.Services.DirectSong;
-internal sealed class DirectSongService : IDirectSongService
+internal sealed class DirectSongService(
+    INotificationService notificationService,
+    IPrivilegeManager privilegeManager,
+    ISevenZipExtractor sevenZipExtractor,
+    IDownloadService downloadService,
+    ILiveUpdateableOptions<DirectSongOptions> options,
+    ILogger<DirectSongService> logger) : IDirectSongService
 {
     private const string DownloadUrl = "https://guildwarslegacy.com/DirectSong.7z";
     private const string RegistryEditorName = "RegisterDirectSongDirectory.exe";
@@ -30,12 +36,12 @@ internal sealed class DirectSongService : IDirectSongService
 
     private readonly static string InstallationDirectory = PathUtils.GetAbsolutePathFromRoot(InstallationDirectorySubPath);
 
-    private readonly INotificationService notificationService;
-    private readonly IPrivilegeManager privilegeManager;
-    private readonly ISevenZipExtractor sevenZipExtractor;
-    private readonly IDownloadService downloadService;
-    private readonly ILiveUpdateableOptions<DirectSongOptions> options;
-    private readonly ILogger<DirectSongService> logger;
+    private readonly INotificationService notificationService = notificationService.ThrowIfNull();
+    private readonly IPrivilegeManager privilegeManager = privilegeManager.ThrowIfNull();
+    private readonly ISevenZipExtractor sevenZipExtractor = sevenZipExtractor.ThrowIfNull();
+    private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
+    private readonly ILiveUpdateableOptions<DirectSongOptions> options = options.ThrowIfNull();
+    private readonly ILogger<DirectSongService> logger = logger.ThrowIfNull();
 
     public string Name => "DirectSong";
     public bool IsEnabled
@@ -54,23 +60,11 @@ internal sealed class DirectSongService : IDirectSongService
     public DirectSongInstallationStatus? CachedInstallationStatus { get; private set; }
     public Task<bool>? InstallationTask { get; private set; }
 
-    public DirectSongService(
-        INotificationService notificationService,
-        IPrivilegeManager privilegeManager,
-        ISevenZipExtractor sevenZipExtractor,
-        IDownloadService downloadService,
-        ILiveUpdateableOptions<DirectSongOptions> options,
-        ILogger<DirectSongService> logger)
-    {
-        this.notificationService = notificationService.ThrowIfNull();
-        this.privilegeManager = privilegeManager.ThrowIfNull();
-        this.sevenZipExtractor = sevenZipExtractor.ThrowIfNull();
-        this.downloadService = downloadService.ThrowIfNull();
-        this.options = options.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
-
     public IEnumerable<string> GetCustomArguments() => [];
+
+    public Task<bool> ShouldRunAgain(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken) => Task.FromResult(false);
+
+    public Task OnGuildWarsRunning(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken) => Task.CompletedTask;
 

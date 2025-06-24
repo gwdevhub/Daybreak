@@ -165,7 +165,7 @@
                                         </MultiBinding>
                                     </Rectangle.Visibility>
                                 </Rectangle>
-                                <buttons:HighlightButton HighlightColor="{StaticResource MahApps.Brushes.Accent}">
+                                <buttons:HighlightButton HighlightBrush="{StaticResource MahApps.Brushes.Accent}">
                                     <buttons:HighlightButton.ButtonContent>
                                         <Grid>
                                             <WrapPanel Cursor="Hand"

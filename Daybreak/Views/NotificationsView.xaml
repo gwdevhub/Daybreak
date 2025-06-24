@@ -75,7 +75,7 @@
             <buttons:HighlightButton Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                          BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
                          BorderThickness="1"
-                         HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                         HighlightBrush="{StaticResource MahApps.Brushes.Accent}"
                          Title="Clear all"
                          FontSize="16"
                          TextPadding="5"

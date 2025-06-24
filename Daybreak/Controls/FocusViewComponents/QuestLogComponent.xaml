@@ -31,7 +31,7 @@
                    VerticalAlignment="Bottom" />
         <buttons:MenuButton     Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                                 Title="{Binding CurrentQuest.Quest.Name}"
-                                HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                                HighlightBrush="{DynamicResource MahApps.Brushes.Accent}"
                                 FontSize="18"
                                 Grid.Row="1"
                                 Margin="15, 0, 0, 0"

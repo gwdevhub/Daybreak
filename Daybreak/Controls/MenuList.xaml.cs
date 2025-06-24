@@ -100,7 +100,7 @@ public partial class MenuList : UserControl
                 };
 
                 menuButton.SetResourceReference(ForegroundProperty, "MahApps.Brushes.ThemeForeground");
-                menuButton.SetResourceReference(MenuButton.HighlightColorProperty, "MahApps.Brushes.Accent");
+                menuButton.SetResourceReference(MenuButton.HighlightBrushProperty, "MahApps.Brushes.Accent");
                 menuButton.Clicked += (_, _) => this.menuServiceButtonHandler.HandleButton(button);
                 if (button.Name is "Notifications" &&
                     category.Name is "Launcher")

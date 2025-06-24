@@ -24,7 +24,7 @@
                     <StackPanel Margin="10">
                         <buttons:MenuButton Title="Load build template" Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
                                             Background="{DynamicResource MahApps.Brushes.ThemeBackground}"
-                                            HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                                            HighlightBrush="{DynamicResource MahApps.Brushes.Accent}"
                                             Clicked="LoadBuildTemplateButton_Click" FontSize="16" Height="40" Width="200"
                                             BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
                                             BorderThickness="1"></buttons:MenuButton>

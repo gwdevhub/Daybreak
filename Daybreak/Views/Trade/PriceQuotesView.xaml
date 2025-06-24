@@ -61,7 +61,7 @@
                 <DataTemplate DataType="traderModels:TraderQuote">
                     <buttons:HighlightButton
                         Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                        HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                        HighlightBrush="{DynamicResource MahApps.Brushes.Accent}"
                         Clicked="HighlightButton_Clicked"
                         ToolTip="Open price history">
                         <buttons:HighlightButton.ButtonContent>

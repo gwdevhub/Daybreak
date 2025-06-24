@@ -24,7 +24,14 @@ using System.Threading.Tasks;
 
 namespace Daybreak.Services.UMod;
 
-internal sealed class UModService : IUModService
+internal sealed class UModService(
+    IProcessInjector processInjector,
+    INotificationService notificationService,
+    IDownloadService downloadService,
+    IHttpClient<UModService> httpClient,
+    ILiveOptions<LauncherOptions> launcherOptions,
+    ILiveUpdateableOptions<UModOptions> uModOptions,
+    ILogger<UModService> logger) : IUModService
 {
     private const string TagPlaceholder = "[TAG_PLACEHOLDER]";
     private const string ReleaseUrl = "https://github.com/gwdevhub/gMod/releases/download/[TAG_PLACEHOLDER]/gMod.dll";
@@ -35,13 +42,13 @@ internal sealed class UModService : IUModService
 
     private static readonly string UModDirectory = PathUtils.GetAbsolutePathFromRoot(UModDirectorySubPath);
 
-    private readonly IProcessInjector processInjector;
-    private readonly INotificationService notificationService;
-    private readonly IDownloadService downloadService;
-    private readonly IHttpClient<UModService> httpClient;
-    private readonly ILiveOptions<LauncherOptions> launcherOptions;
-    private readonly ILiveUpdateableOptions<UModOptions> uModOptions;
-    private readonly ILogger<UModService> logger;
+    private readonly IProcessInjector processInjector = processInjector.ThrowIfNull();
+    private readonly INotificationService notificationService = notificationService.ThrowIfNull();
+    private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
+    private readonly IHttpClient<UModService> httpClient = httpClient.ThrowIfNull();
+    private readonly ILiveOptions<LauncherOptions> launcherOptions = launcherOptions.ThrowIfNull();
+    private readonly ILiveUpdateableOptions<UModOptions> uModOptions = uModOptions.ThrowIfNull();
+    private readonly ILogger<UModService> logger = logger.ThrowIfNull();
 
     public string Name => "uMod";
 
@@ -63,25 +70,11 @@ internal sealed class UModService : IUModService
             Shared.Models.Versioning.Version.Zero :
         Shared.Models.Versioning.Version.Zero;
 
-    public UModService(
-        IProcessInjector processInjector,
-        INotificationService notificationService,
-        IDownloadService downloadService,
-        IHttpClient<UModService> httpClient,
-        ILiveOptions<LauncherOptions> launcherOptions,
-        ILiveUpdateableOptions<UModOptions> uModOptions,
-        ILogger<UModService> logger)
-    {
-        this.processInjector = processInjector.ThrowIfNull();
-        this.notificationService = notificationService.ThrowIfNull();
-        this.downloadService = downloadService.ThrowIfNull();
-        this.httpClient = httpClient.ThrowIfNull();
-        this.launcherOptions = launcherOptions.ThrowIfNull();
-        this.uModOptions = uModOptions.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
-
     public IEnumerable<string> GetCustomArguments() => [];
+
+    public Task<bool> ShouldRunAgain(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken) => Task.FromResult(false);
+
+    public Task OnGuildWarsRunning(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public Task OnGuildWarsStarting(GuildWarsStartingContext guildWarsStartingContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
