@@ -8,12 +8,14 @@ using Daybreak.Shared.Services.MDns;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions.Core;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -138,7 +140,7 @@ public sealed class DaybreakApiService(
     }
 
     public Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken) =>
-        Task.Factory.StartNew(() => this.InjectWithStub(guildWarsCreatedContext), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        Task.Factory.StartNew(() => this.InjectWithStub(guildWarsCreatedContext.ApplicationLauncherContext), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
     public Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
@@ -146,7 +148,21 @@ public sealed class DaybreakApiService(
 
     public Task OnGuildWarsStartingDisabled(GuildWarsStartingDisabledContext guildWarsStartingDisabledContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    private void InjectWithStub(GuildWarsCreatedContext context)
+    public Task<bool> ShouldRunAgain(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken)
+    {
+        if (!guildWarsRunningContext.LoadedModules.Contains(DaybreakApiName) &&
+            this.IsEnabled)
+        {
+            return Task.FromResult(true);
+        }
+
+        return Task.FromResult(false);
+    }
+
+    public Task OnGuildWarsRunning(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken)
+        => Task.Factory.StartNew(() => this.InjectWithStub(guildWarsRunningContext.ApplicationLauncherContext), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+
+    private void InjectWithStub(ApplicationLauncherContext context)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         var dllName = 
@@ -159,13 +175,14 @@ public sealed class DaybreakApiService(
         {
             this.notificationService.NotifyError(
                 "Daybreak API Failure",
-                "Failed to inject with stub. Daybreak API dll not found");
+                "Failed to inject with stub. Daybreak API dll not found",
+                expirationTime: DateTime.UtcNow + TimeSpan.FromSeconds(10));
             scopedLogger.LogError("Failed to inject with stub. Daybreak API DLL not found at {dllPath}", dllName);
             return;
         }
 
-        scopedLogger.LogInformation("Injecting {dllName} into {processId}", dllName, context.ApplicationLauncherContext.Process.Id);
-        if (!this.stubInjector.Inject(context.ApplicationLauncherContext.Process, dllName, out var port))
+        scopedLogger.LogInformation("Injecting {dllName} into {processId}", dllName, context.Process.Id);
+        if (!this.stubInjector.Inject(context.Process, dllName, out var port))
         {
             this.notificationService.NotifyError(
                 "Daybreak API Failure",

@@ -91,7 +91,7 @@
                 Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                 Background="{StaticResource Daybreak.Brushes.Background}"
                 FontSize="16"
-                HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                HighlightBrush="{StaticResource MahApps.Brushes.Accent}"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
                 BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"

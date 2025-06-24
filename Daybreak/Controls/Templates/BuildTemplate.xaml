@@ -247,7 +247,7 @@
                             <buttons:HighlightButton 
                                 FontSize="16" 
                                 Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                                HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                HighlightBrush="{StaticResource MahApps.Brushes.Accent}"
                                 BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
                                 BorderThickness="0, 0, 0, 1"
                                 TextWrapping="Wrap" 

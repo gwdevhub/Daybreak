@@ -100,6 +100,10 @@ internal sealed class DXVKService(
 
     public IEnumerable<string> GetCustomArguments() => [];
 
+    public Task<bool> ShouldRunAgain(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken) => Task.FromResult(false);
+
+    public Task OnGuildWarsRunning(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken) => Task.CompletedTask;
+
     public Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken)
     {
         return Task.CompletedTask;

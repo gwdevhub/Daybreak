@@ -10,11 +10,12 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <converters:MenuButtonHighlightConverter x:Key="HighlightConverter"></converters:MenuButtonHighlightConverter>
+        <converters:MenuButtonHighlightConverter x:Key="HighlightConverter" />
+        <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" TriggerValue="True" />
     </UserControl.Resources>
     <Grid>
         <Rectangle
-            Fill="{Binding ElementName=_this, Path=HighlightColor, Mode=OneWay}"
+            Fill="{Binding ElementName=_this, Path=HighlightBrush, Mode=OneWay}"
             Opacity="{Binding ElementName=_this, Path=Highlighted, Converter={StaticResource HighlightConverter}}">
         </Rectangle>
         <TextBlock Text="{Binding ElementName=_this, Path=Title, Mode=OneWay}" 
@@ -28,6 +29,11 @@
                    Padding="{Binding ElementName=_this, Path=TextPadding, Mode=OneWay}" />
         <ContentPresenter 
             Content="{Binding ElementName=_this, Path=ButtonContent, Mode=OneWay}"/>
+        <Rectangle Fill="{Binding ElementName=_this, Path=DisabledBrush, Mode=OneWay}"
+                   Visibility="{Binding ElementName=_this, Path=IsEnabled, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                   VerticalAlignment="Stretch"
+                   HorizontalAlignment="Stretch"
+                   Opacity="0.2" />
         <Rectangle Fill="Transparent"
                    MouseEnter="Grid_MouseEnter" 
                    MouseLeave="Grid_MouseLeave"

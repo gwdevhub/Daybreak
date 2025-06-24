@@ -28,7 +28,7 @@
     <Grid>
         <buttons:HighlightButton 
             Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-            HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+            HighlightBrush="{StaticResource MahApps.Brushes.Accent}"
             Clicked="HighlightButton_Clicked">
             <buttons:HighlightButton.ButtonContent>
                 <Grid>

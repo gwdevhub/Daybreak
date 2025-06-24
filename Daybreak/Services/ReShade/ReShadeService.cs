@@ -31,7 +31,13 @@ using System.Threading.Tasks;
 using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.ReShade;
-internal sealed class ReShadeService : IReShadeService, IApplicationLifetimeService
+internal sealed class ReShadeService(
+    INotificationService notificationService,
+    IProcessInjector processInjector,
+    ILiveUpdateableOptions<ReShadeOptions> liveUpdateableOptions,
+    IHttpClient<ReShadeService> httpClient,
+    IDownloadService downloadService,
+    ILogger<ReShadeService> logger) : IReShadeService, IApplicationLifetimeService
 {
     private const string PackagesIniUrl = "https://raw.githubusercontent.com/crosire/reshade-shaders/list/EffectPackages.ini";
     private const string ReShadeHomepageUrl = "https://reshade.me";
@@ -54,12 +60,12 @@ internal sealed class ReShadeService : IReShadeService, IApplicationLifetimeServ
     private static readonly string[] FxExtensions = [".fx",];
     private static readonly string[] FxHeaderExtensions = [".fxh"];
 
-    private readonly INotificationService notificationService;
-    private readonly IProcessInjector processInjector;
-    private readonly ILiveUpdateableOptions<ReShadeOptions> liveUpdateableOptions;
-    private readonly IHttpClient<ReShadeService> httpClient;
-    private readonly IDownloadService downloadService;
-    private readonly ILogger<ReShadeService> logger;
+    private readonly INotificationService notificationService = notificationService.ThrowIfNull();
+    private readonly IProcessInjector processInjector = processInjector.ThrowIfNull();
+    private readonly ILiveUpdateableOptions<ReShadeOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
+    private readonly IHttpClient<ReShadeService> httpClient = httpClient.ThrowIfNull();
+    private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
+    private readonly ILogger<ReShadeService> logger = logger.ThrowIfNull();
 
     public string Name => "ReShade";
     public bool IsEnabled
@@ -85,22 +91,6 @@ internal sealed class ReShadeService : IReShadeService, IApplicationLifetimeServ
                                File.Exists(ReShadeLogPath) &&
                                File.Exists(ConfigIniPath);
 
-    public ReShadeService(
-        INotificationService notificationService,
-        IProcessInjector processInjector,
-        ILiveUpdateableOptions<ReShadeOptions> liveUpdateableOptions,
-        IHttpClient<ReShadeService> httpClient,
-        IDownloadService downloadService,
-        ILogger<ReShadeService> logger)
-    {
-        this.notificationService = notificationService.ThrowIfNull();
-        this.processInjector = processInjector.ThrowIfNull();
-        this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
-        this.httpClient = httpClient.ThrowIfNull();
-        this.downloadService = downloadService.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
-
     public void OnStartup()
     {
         Task.Factory.StartNew(async () =>
@@ -123,6 +113,10 @@ internal sealed class ReShadeService : IReShadeService, IApplicationLifetimeServ
     }
 
     public IEnumerable<string> GetCustomArguments() => [];
+
+    public Task<bool> ShouldRunAgain(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken) => Task.FromResult(false);
+
+    public Task OnGuildWarsRunning(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public async Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken)
     {

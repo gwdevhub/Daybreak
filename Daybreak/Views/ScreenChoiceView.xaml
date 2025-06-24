@@ -19,7 +19,7 @@
                 BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"/>
         <buttons:HighlightButton Title="Test" Background="{StaticResource MahApps.Brushes.ThemeBackground}" HorizontalAlignment="Right" Margin="0, 0, 50, 0"
                                  FontSize="16" Width="50" Height="30" Clicked="OpaqueButton_Clicked" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
-                                 HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                                 HighlightBrush="{StaticResource MahApps.Brushes.Accent}"
                                  BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
                                  BorderThickness="1"
                                  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"

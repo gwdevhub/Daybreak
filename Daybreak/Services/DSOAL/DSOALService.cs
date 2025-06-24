@@ -23,7 +23,13 @@ namespace Daybreak.Services.DSOAL;
 /// <summary>
 /// Service for managing DSOAL for GW1. Credits to: https://lemmy.wtf/post/27911
 /// </summary>
-internal sealed class DSOALService : IDSOALService
+internal sealed class DSOALService(
+    INotificationService notificationService,
+    IRegistryService registryService,
+    IPrivilegeManager privilegeManager,
+    IDownloadService downloadService,
+    ILiveUpdateableOptions<DSOALOptions> options,
+    ILogger<DSOALService> logger) : IDSOALService
 {
     public const string DSOALFixAdminMessage = "Daybreak has detected an issue with the DSOAL installation. In order to fix this issue, Daybreak will need to restart as administrator. DSOAL will not work until then.";
     public const string DSOALFixRegistryKey = "DSOAL/FixSymbolicLink";
@@ -38,12 +44,12 @@ internal sealed class DSOALService : IDSOALService
 
     private static readonly string DSOALDirectory = PathUtils.GetAbsolutePathFromRoot(DSOALDirectorySubPath);
 
-    private readonly INotificationService notificationService;
-    private readonly IRegistryService registryService;
-    private readonly IPrivilegeManager privilegeManager;
-    private readonly IDownloadService downloadService;
-    private readonly ILiveUpdateableOptions<DSOALOptions> options;
-    private readonly ILogger<DSOALService> logger;
+    private readonly INotificationService notificationService = notificationService.ThrowIfNull();
+    private readonly IRegistryService registryService = registryService.ThrowIfNull();
+    private readonly IPrivilegeManager privilegeManager = privilegeManager.ThrowIfNull();
+    private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
+    private readonly ILiveUpdateableOptions<DSOALOptions> options = options.ThrowIfNull();
+    private readonly ILogger<DSOALService> logger = logger.ThrowIfNull();
 
     public string Name => "DSOAL";
     public bool IsEnabled
@@ -59,22 +65,6 @@ internal sealed class DSOALService : IDSOALService
            File.Exists(Path.Combine(DSOALDirectory, DsoundDll)) &&
            File.Exists(Path.Combine(DSOALDirectory, AlsoftIni)) &&
            File.Exists(Path.Combine(DSOALDirectory, AlsoftIni));
-
-    public DSOALService(
-        INotificationService notificationService,
-        IRegistryService registryService,
-        IPrivilegeManager privilegeManager,
-        IDownloadService downloadService,
-        ILiveUpdateableOptions<DSOALOptions> options,
-        ILogger<DSOALService> logger)
-    {
-        this.notificationService = notificationService.ThrowIfNull();
-        this.registryService = registryService.ThrowIfNull();
-        this.privilegeManager = privilegeManager.ThrowIfNull();
-        this.downloadService = downloadService.ThrowIfNull();
-        this.options = options.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
 
     public void EnsureDSOALSymbolicLinkExists()
     {
@@ -122,6 +112,10 @@ internal sealed class DSOALService : IDSOALService
             return [];
         }
     }
+
+    public Task<bool> ShouldRunAgain(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken) => Task.FromResult(false);
+
+    public Task OnGuildWarsRunning(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken)
     {

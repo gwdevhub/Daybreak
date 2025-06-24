@@ -65,7 +65,7 @@
                             Height="30"
                             BorderBrush="{StaticResource MahApps.Brushes.ThemeForeground}"
                             BorderThickness="0, 0, 0, 1"
-                            HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                            HighlightBrush="{StaticResource MahApps.Brushes.Accent}"
                             Clicked="HighlightButton_Clicked"
                             VerticalAlignment="Center"
                             VerticalContentAlignment="Center"

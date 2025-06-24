@@ -41,6 +41,10 @@ internal sealed class GuildWarsVersionChecker : IGuildWarsVersionChecker, IAppli
         return [];
     }
 
+    public Task<bool> ShouldRunAgain(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken) => Task.FromResult(false);
+
+    public Task OnGuildWarsRunning(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken) => Task.CompletedTask;
+
     public async Task OnGuildWarsStarting(GuildWarsStartingContext guildWarsStartingContext, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.OnGuildWarsStarting), guildWarsStartingContext.ApplicationLauncherContext.ExecutablePath);

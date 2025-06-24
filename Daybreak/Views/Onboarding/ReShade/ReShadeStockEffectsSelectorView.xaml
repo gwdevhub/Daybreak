@@ -55,7 +55,7 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <buttons:HighlightButton
-                        HighlightColor="{StaticResource MahApps.Brushes.Accent}"
+                        HighlightBrush="{StaticResource MahApps.Brushes.Accent}"
                         Clicked="HighlightButton_Clicked">
                         <buttons:HighlightButton.ButtonContent>
                             <StackPanel>

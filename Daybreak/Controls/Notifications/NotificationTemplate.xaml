@@ -17,7 +17,7 @@
             BorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
             BorderThickness="0, 0, 0, 1"/>
         <buttons:HighlightButton
-            HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+            HighlightBrush="{DynamicResource MahApps.Brushes.Accent}"
             Clicked="HighlightButton_Clicked"
             ToolTip="Open notification">
             <buttons:HighlightButton.ButtonContent>

@@ -18,7 +18,7 @@
     </UserControl.Resources>
     <Grid>
         <buttons:HighlightButton
-        HighlightColor="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
+        HighlightBrush="{Binding ElementName=_this, Path=Foreground, Mode=OneWay}"
         Background="{Binding ElementName=_this, Path=Background, Mode=OneWay}"
         Width="{Binding ElementName=_this, Path=Width, Mode=OneTime}"
         Clicked="HighlightButton_Clicked">

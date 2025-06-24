@@ -18,7 +18,7 @@
             <buttons:MenuButton 
                        Cursor="Hand"
                        Foreground="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                       HighlightColor="{DynamicResource MahApps.Brushes.Accent}"
+                       HighlightBrush="{DynamicResource MahApps.Brushes.Accent}"
                        Title="{Binding ElementName=_this, Path=SectionTitle, Mode=OneWay}"
                        FontSize="{Binding ElementName=_this, Path=FontSize, Mode=OneWay}"
                        Clicked="MenuButton_Clicked"
