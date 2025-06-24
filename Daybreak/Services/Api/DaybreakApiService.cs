@@ -132,6 +132,11 @@ public sealed class DaybreakApiService(
         return default;
     }
 
+    public void RequestInstancesAnnouncement()
+    {
+        this.mDomainRegistrar.QueryAllServices();
+    }
+
     public Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken) =>
         Task.Factory.StartNew(() => this.InjectWithStub(guildWarsCreatedContext), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 

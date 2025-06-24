@@ -262,6 +262,8 @@ public partial class LauncherView : UserControl
             launcherViewContext.CanLaunch = false;
             launcherViewContext.CanAttach = false;
             launcherViewContext.CanKill = false;
+            launcherViewContext.AppContext = default;
+            launcherViewContext.ApiContext = default;
             return;
         }
 
@@ -271,6 +273,8 @@ public partial class LauncherView : UserControl
             launcherViewContext.CanLaunch = true;
             launcherViewContext.CanAttach = false;
             launcherViewContext.CanKill = false;
+            launcherViewContext.AppContext = default;
+            launcherViewContext.ApiContext = default;
             return;
         }
 
@@ -433,7 +437,8 @@ public partial class LauncherView : UserControl
 
         var launchNotificationToken = this.notificationService.NotifyInformation(
                     title: "Launching Guild Wars...",
-                    description: $"Attempting to launch Guild Wars process at {launcherViewContext.Configuration.ExecutablePath}");
+                    description: $"Attempting to launch Guild Wars process at {launcherViewContext.Configuration.ExecutablePath}",
+                    expirationTime: DateTime.MaxValue);
         var launchedContext = await this.applicationLauncher.LaunchGuildwars(launcherViewContext.Configuration, cancellationToken);
         if (launchedContext is null)
         {
@@ -445,6 +450,7 @@ public partial class LauncherView : UserControl
         }
 
         launchNotificationToken.Cancel();
+        this.daybreakApiService.RequestInstancesAnnouncement();
         this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(launcherViewContext.Configuration);
         if (!this.focusViewOptions.Value.Enabled)
         {
@@ -455,8 +461,8 @@ public partial class LauncherView : UserControl
                 title: "Attaching to Guild Wars process...",
                 description: "Attempting to attach to Guild Wars process");
 
-        //Wait 2 seconds to allow the launched Guild Wars process to advertise itself
-        await Task.Delay(2000, cancellationToken);
+        //Wait 1 second to allow the launched Guild Wars process to advertise itself
+        await Task.Delay(1000, cancellationToken);
         var apiContext = await this.daybreakApiService.AttachDaybreakApiContext(launchedContext, cancellationToken);
         attachNotificationToken.Cancel();
 
