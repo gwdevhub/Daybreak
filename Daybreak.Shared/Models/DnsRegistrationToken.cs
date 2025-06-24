@@ -10,6 +10,7 @@ public readonly struct DnsRegistrationToken : IDisposable
         ServiceProfile serviceProfile)
     {
         this.serviceDiscovery.Advertise(serviceProfile);
+        this.serviceDiscovery.Announce(serviceProfile);
     }
 
     public void Dispose()
