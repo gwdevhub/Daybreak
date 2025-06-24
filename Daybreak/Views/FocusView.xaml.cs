@@ -133,50 +133,30 @@ public partial class FocusView : UserControl
                     return;
                 }
 
-                if (this.PauseDataFetching)
-                {
-                    await Task.Delay(MainPlayerDataFrequency, cancellationToken);
-                    continue;
-                }
-
                 if (this.DataContext is not FocusViewContext context)
                 {
                     await Task.Delay(MainPlayerDataFrequency, cancellationToken);
                     continue;
                 }
 
-                if (context.LaunchContext.GuildWarsProcess?.HasExited is not false)
+                if (context.LaunchContext.GuildWarsProcess.HasExited)
                 {
                     this.logger.LogInformation($"Executable is not running. Returning to {nameof(LauncherView)}");
                     this.viewManager.ShowView<LauncherView>();
-                    this.cancellationTokenSource?.Cancel();
                     return;
                 }
 
+                if (this.PauseDataFetching)
+                {
+                    await Task.Delay(MainPlayerDataFrequency, cancellationToken);
+                    continue;
+                }
+
                 var isAvailableTask = context.ApiContext.IsAvailable(cancellationToken);
-                var mainPlayerInfoTask = context.ApiContext.GetMainPlayerInfo(cancellationToken);
-                var mainPlayerStateTask = context.ApiContext.GetMainPlayerState(cancellationToken);
                 var instanceInfoTask = context.ApiContext.GetMainPlayerInstanceInfo(cancellationToken);
-                var characterSelectTask = context.ApiContext.GetCharacters(cancellationToken);
-                var titleInfoTask = context.ApiContext.GetTitleInfo(cancellationToken);
-                var questLogTask = context.ApiContext.GetMainPlayerQuestLog(cancellationToken);
-                await Task.WhenAll(
-                    isAvailableTask,
-                    mainPlayerInfoTask,
-                    mainPlayerStateTask,
-                    instanceInfoTask,
-                    characterSelectTask,
-                    titleInfoTask,
-                    questLogTask,
-                    Task.Delay(MainPlayerDataFrequency, cancellationToken)).ConfigureAwait(true);
+                await Task.WhenAny(isAvailableTask, instanceInfoTask);
 
                 var isAvailable = await isAvailableTask;
-                var mainPlayerInfo = await mainPlayerInfoTask;
-                var mainPlayerState = await mainPlayerStateTask;
-                var instanceInfo = await instanceInfoTask;
-                var characters = await characterSelectTask;
-                var titleInfo = await titleInfoTask;
-                var questLog = await questLogTask;
                 if (isAvailable is not true)
                 {
                     retries++;
@@ -184,20 +164,50 @@ public partial class FocusView : UserControl
                     {
                         scopedLogger.LogError("Could not ensure connection is initialized. Returning to launcher view");
                         this.notificationService.NotifyError(
-                            title: "GuildWars unresponsive",
+                            title: "Guild Wars unresponsive",
                             description: "Could not connect to Guild Wars instance. Returning to Launcher view");
                         this.viewManager.ShowView<LauncherView>();
+                        break;
                     }
                     else
                     {
                         scopedLogger.LogError("Could not ensure connection is initialized. Backing off before retrying");
                         await Task.Delay(UninitializedBackoff, cancellationToken);
                     }
+
+                    continue;
                 }
 
+                var instanceInfo = await instanceInfoTask;
                 if (instanceInfo is null ||
-                    instanceInfo.Type is Shared.Models.Api.InstanceType.Loading or Shared.Models.Api.InstanceType.Undefined ||
-                    mainPlayerInfo is null ||
+                    instanceInfo.Type is Shared.Models.Api.InstanceType.Loading or Shared.Models.Api.InstanceType.Undefined)
+                {
+                    this.MainPlayerDataValid = false;
+                    await Task.Delay(MainPlayerDataFrequency, cancellationToken);
+                    continue;
+                }
+
+                var mainPlayerInfoTask = context.ApiContext.GetMainPlayerInfo(cancellationToken);
+                var mainPlayerStateTask = context.ApiContext.GetMainPlayerState(cancellationToken);
+                
+                var characterSelectTask = context.ApiContext.GetCharacters(cancellationToken);
+                var titleInfoTask = context.ApiContext.GetTitleInfo(cancellationToken);
+                var questLogTask = context.ApiContext.GetMainPlayerQuestLog(cancellationToken);
+                await Task.WhenAll(
+                    mainPlayerInfoTask,
+                    mainPlayerStateTask,
+                    characterSelectTask,
+                    titleInfoTask,
+                    questLogTask,
+                    Task.Delay(MainPlayerDataFrequency, cancellationToken)).ConfigureAwait(true);
+
+                var mainPlayerInfo = await mainPlayerInfoTask;
+                var mainPlayerState = await mainPlayerStateTask;
+                var characters = await characterSelectTask;
+                var titleInfo = await titleInfoTask;
+                var questLog = await questLogTask;
+
+                if (mainPlayerInfo is null ||
                     mainPlayerState is null ||
                     characters is null ||
                     questLog is null)

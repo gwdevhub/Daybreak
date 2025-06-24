@@ -67,6 +67,11 @@ public sealed class MDomainRegistrar(
         return default;
     }
 
+    public void QueryAllServices()
+    {
+        this.serviceDiscovery.QueryAllServices();
+    }
+
     private void ServiceDiscovery_ServiceDiscovered(object? _, DomainName e)
     {
         var labels = e.Labels;

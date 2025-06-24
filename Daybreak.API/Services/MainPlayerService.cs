@@ -325,7 +325,8 @@ public sealed class MainPlayerService : IDisposable
                     gameContext.Pointer->CharContext is null ||
                     gameContext.Pointer->WorldContext is null ||
                     gameContext.Pointer->PartyContext is null ||
-                    instanceInfoContext.IsNull)
+                    instanceInfoContext.IsNull ||
+                    instanceInfoContext.Pointer->CurrentMapInfo is null)
                 {
                     scopedLogger.LogError("Game context is not initialized");
                     return new InstanceInfo(0, 0, 0, 0, Shared.Models.Api.InstanceType.Loading, DistrictRegionInfo.Unknown, LanguageInfo.Unknown, CampaignInfo.Unknown, ContinentInfo.Unknown, RegionInfo.Unknown, DifficultyInfo.Unknown);
