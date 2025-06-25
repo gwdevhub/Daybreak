@@ -140,7 +140,7 @@ ret  4                      ; stdcall: pop lpParameter
             // Get the thread exit code, which will be our port number
             if (NativeMethods.GetExitCodeThread(hThread, out var moduleExitCode) > 0)
             {
-                scopedLogger.LogInformation("Thread completed with result: {result}", moduleExitCode);
+                scopedLogger.LogDebug("Thread completed with result: {result}", moduleExitCode);
                 exitCode = (int)moduleExitCode;
             }
             else

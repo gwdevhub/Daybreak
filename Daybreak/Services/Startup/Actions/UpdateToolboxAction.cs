@@ -25,7 +25,7 @@ public sealed class UpdateToolboxAction : StartupActionBase
         var scopedLogger = this.logger.CreateScopedLogger();
         if (this.toolboxService.IsInstalled)
         {
-            scopedLogger.LogInformation("Checking toolbox for updates");
+            scopedLogger.LogDebug("Checking toolbox for updates");
             await this.toolboxService.NotifyUserIfUpdateAvailable(cancellationToken);
         }
     }

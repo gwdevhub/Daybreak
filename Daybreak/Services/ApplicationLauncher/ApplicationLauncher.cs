@@ -193,7 +193,7 @@ internal sealed class ApplicationLauncher(
         var identity = this.launcherOptions.Value.LaunchGuildwarsAsCurrentUser ?
             WindowsIdentity.GetCurrent().Name :
             WindowsIdentity.GetAnonymous().Name;
-        this.logger.LogInformation($"Launching guildwars as [{identity}] identity");
+        this.logger.LogDebug($"Launching guildwars as [{identity}] identity");
         var process = new Process()
         {
             StartInfo = new ProcessStartInfo

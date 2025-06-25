@@ -35,7 +35,7 @@ internal sealed class ScreenshotProvider : IScreenshotProvider
         var screenshots = GetScreenshots();
         if (screenshots.Count == 0)
         {
-            this.logger.LogWarning("Attempted to retrieve a random screenshot. No screenshots present");
+            this.logger.LogDebug("Attempted to retrieve a random screenshot. No screenshots present");
             return default;
         }
 
@@ -48,7 +48,7 @@ internal sealed class ScreenshotProvider : IScreenshotProvider
         var screenshots = GetScreenshots();
         if (screenshots.Count == 0)
         {
-            this.logger.LogWarning("Attempted to retrieve a random screenshot. No screenshots present");
+            this.logger.LogDebug("Attempted to retrieve a random screenshot. No screenshots present");
             return default;
         }
 

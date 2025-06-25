@@ -14,7 +14,10 @@ using System.Threading.Tasks;
 
 namespace Daybreak.Services.InternetChecker;
 
-internal sealed class InternetCheckingService : IInternetCheckingService
+internal sealed class InternetCheckingService(
+    IMetricsService metricsService,
+    IHttpClient<InternetCheckingService> httpClient,
+    ILogger<InternetCheckingService> logger) : IInternetCheckingService
 {
     private const string ConnectionVerificationLatency = "Connection verification latency";
     private const string ConnectionVerificationUnit = "ms";
@@ -23,24 +26,14 @@ internal sealed class InternetCheckingService : IInternetCheckingService
     private const string BingUrl = "https://bing.com";
     private const string GuildwarsUrl = "https://guildwars.com";
 
-    private readonly Histogram<double> connectionCheckingLatency;
-    private readonly IHttpClient<InternetCheckingService> httpClient;
-    private readonly ILogger<InternetCheckingService> logger;
-
-    public InternetCheckingService(
-        IMetricsService metricsService,
-        IHttpClient<InternetCheckingService> httpClient,
-        ILogger<InternetCheckingService> logger)
-    {
-        this.connectionCheckingLatency = metricsService.ThrowIfNull().CreateHistogram<double>(ConnectionVerificationLatency, ConnectionVerificationUnit, ConnectionVerificationDescription, AggregationTypes.NoAggregate);
-        this.httpClient = httpClient.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly Histogram<double> connectionCheckingLatency = metricsService.ThrowIfNull().CreateHistogram<double>(ConnectionVerificationLatency, ConnectionVerificationUnit, ConnectionVerificationDescription, AggregationTypes.NoAggregate);
+    private readonly IHttpClient<InternetCheckingService> httpClient = httpClient.ThrowIfNull();
+    private readonly ILogger<InternetCheckingService> logger = logger.ThrowIfNull();
 
     public async Task<InternetConnectionState> CheckConnectionAvailable(CancellationToken cancellationToken)
     {
         var sw = Stopwatch.StartNew();
-        this.logger.LogInformation("Verifying connection state");
+        this.logger.LogDebug("Verifying connection state");
         var networkAvailable = NetworkInterface.GetIsNetworkAvailable();
         if (!networkAvailable)
         {
@@ -61,7 +54,7 @@ internal sealed class InternetCheckingService : IInternetCheckingService
 
         if (googleQueryResult && bingQueryResult && guildwarsQueryResult)
         {
-            this.logger.LogInformation("Connection is available");
+            this.logger.LogDebug("Connection is available");
             this.connectionCheckingLatency.Record(sw.ElapsedMilliseconds);
             return InternetConnectionState.Available;
         }
@@ -89,7 +82,7 @@ internal sealed class InternetCheckingService : IInternetCheckingService
 
     private async Task<bool> UrlAvailable(string url)
     {
-        this.logger.LogInformation($"Verifying connection to {url}");
+        this.logger.LogDebug($"Verifying connection to {url}");
         try
         {
             _ = await this.httpClient.GetAsync(GoogleUrl);

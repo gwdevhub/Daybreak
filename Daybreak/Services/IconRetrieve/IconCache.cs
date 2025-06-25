@@ -193,14 +193,14 @@ internal sealed class IconCache : IIconCache
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetLocalIcon), name);
         var filePath = IconsLocation.Replace(NamePlaceholder, name);
-        scopedLogger.LogInformation("Checking local icon cache");
+        scopedLogger.LogDebug("Checking local icon cache");
         if (!File.Exists(filePath))
         {
-            scopedLogger.LogWarning("No local icon cache found");
+            scopedLogger.LogInformation("No local icon cache found");
             return default;
         }
 
-        scopedLogger.LogInformation("Local icon cache found. Retrieving icon");
+        scopedLogger.LogDebug("Local icon cache found. Retrieving icon");
         return Path.GetFullPath(IconsLocation.Replace(NamePlaceholder, name));
     }
 
@@ -208,10 +208,10 @@ internal sealed class IconCache : IIconCache
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.SaveLocalIcon), name!);
         var filePath = IconsLocation.Replace(NamePlaceholder, name);
-        scopedLogger.LogInformation("Checking local icon cache");
+        scopedLogger.LogDebug("Checking local icon cache");
         if (File.Exists(filePath))
         {
-            scopedLogger.LogWarning("Local icon found, replacing");
+            scopedLogger.LogInformation("Local icon found, replacing");
         }
 
         await File.WriteAllBytesAsync(filePath, bytes);

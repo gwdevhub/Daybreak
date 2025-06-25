@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Services.ExceptionHandling;
+using Daybreak.Services.Telemetry;
 using Daybreak.Shared;
 using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Services.ApplicationArguments;
@@ -127,6 +128,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
 
     private async ValueTask InitializeApplicationServices(StartupStatus startupStatus, IOptionsProducer optionsProducer)
     {
+        var telemetryHost = this.ServiceProvider.GetRequiredService<TelemetryHost>();
         var serviceManager = this.ServiceProvider.GetRequiredService<IServiceManager>();
         var viewProducer = this.ServiceProvider.GetRequiredService<IViewManager>();
         var postUpdateActionProducer = this.ServiceProvider.GetRequiredService<IPostUpdateActionProducer>();
@@ -222,7 +224,6 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
         var viewManager = this.ServiceProvider.GetRequiredService<IViewManager>();
         var mainWindow = this.ServiceProvider.GetRequiredService<MainWindow>();
         viewManager.RegisterContainer(mainWindow.Container);
-        mainWindow.Container.InvalidateArrange();
     }
 
     private static int LaunchMainWindow()

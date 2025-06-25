@@ -160,14 +160,14 @@ internal sealed class TradeChatService<TChannelOptions> : ITradeChatService<TCha
         catch(Exception ex)
         {
             scopedLogger.LogError(ex, "Encountered exception");
-            return Enumerable.Empty<TraderMessage>();
+            return [];
         }
     }
 
     private async Task<string> GetAsync(string? uri, HttpRequestMessage? httpRequestMessage, ScopedLogger<TradeChatService<TChannelOptions>> scopedLogger, CancellationToken cancellationToken)
     {
         var response = httpRequestMessage is not null ?
-            await this.httpClient.SendAsync(httpRequestMessage) :
+            await this.httpClient.SendAsync(httpRequestMessage, cancellationToken) :
             await this.httpClient.GetAsync(uri!, cancellationToken);
         if (!response.IsSuccessStatusCode)
         {
@@ -195,7 +195,7 @@ internal sealed class TradeChatService<TChannelOptions> : ITradeChatService<TCha
         catch (Exception ex)
         {
             scopedLogger.LogError(ex, "Encountered exception. Waiting 1s and retrying");
-            await Task.Delay(1000);
+            await Task.Delay(1000, cancellationToken);
             return await this.ReceiveTraderMessageResponseSafe(cancellationToken);
         }
     }
@@ -237,7 +237,7 @@ internal sealed class TradeChatService<TChannelOptions> : ITradeChatService<TCha
             var response = await this.clientWebSocket.ReceiveAsync(buffer, cancellationToken);
             if (response.MessageType is WebSocketMessageType.Close)
             {
-                scopedLogger.LogInformation("Received close. Attempting to reconnect");
+                scopedLogger.LogDebug("Received close. Attempting to reconnect");
                 await this.EnsureConnectionAsync(cancellationToken);
                 continue;
             }
@@ -253,7 +253,7 @@ internal sealed class TradeChatService<TChannelOptions> : ITradeChatService<TCha
 
         finalResponseBuffer.Position = 0;
         using var streamReader = new StreamReader(finalResponseBuffer, textMessage ? Encoding.ASCII : Encoding.UTF8);
-        var parsedStringMessage = await streamReader.ReadToEndAsync();
+        var parsedStringMessage = await streamReader.ReadToEndAsync(cancellationToken);
         return parsedStringMessage;
     }
 

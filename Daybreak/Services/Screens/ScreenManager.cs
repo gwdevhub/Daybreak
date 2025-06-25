@@ -97,7 +97,7 @@ internal sealed class ScreenManager(
 
     public void MoveGuildwarsToScreen(Screen screen)
     {
-        this.logger.LogInformation($"Attempting to move guildwars to screen {screen.Id}");
+        this.logger.LogDebug($"Attempting to move guildwars to screen screenId", screen.Id);
         var hwnd = GetMainWindowHandle();
         NativeMethods.SetWindowPos(hwnd, NativeMethods.HWND_TOP, screen.Size.Left.ToInt(), screen.Size.Top.ToInt(), screen.Size.Width.ToInt(), screen.Size.Height.ToInt(), NativeMethods.SWP_SHOWWINDOW);
     }

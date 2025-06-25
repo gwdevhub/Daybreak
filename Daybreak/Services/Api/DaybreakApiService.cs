@@ -32,6 +32,7 @@ public sealed class DaybreakApiService(
     ILogger<ScopedApiContext> scopedApiLogger)
     : IDaybreakApiService
 {
+    private const string LocalHost = "localhost";
     private const string DaybreakApiName = "Daybreak.API.dll";
     private const string ProcessIdPlaceholder = "{PID}";
     private const string DaybreakApiServiceName = $"daybreak-api-{ProcessIdPlaceholder}";
@@ -104,7 +105,11 @@ public sealed class DaybreakApiService(
             return default;
         }
 
-        var apiContext = new DaybreakAPIContext(serviceUri);
+        var uriBuilder = new UriBuilder(serviceUri)
+        {
+            Host = LocalHost
+        };
+        var apiContext = new DaybreakAPIContext(uriBuilder.Uri);
         var scopedApiContext = new ScopedApiContext(this.scopedApiLogger, this.scopedApiClient, apiContext);
         if (await scopedApiContext.IsAvailable(cancellationToken))
         {
@@ -120,7 +125,11 @@ public sealed class DaybreakApiService(
         var serviceUris = this.mDomainRegistrar.QueryByServiceName(n => n.StartsWith(ServiceSubType));
         foreach(var uri in serviceUris ?? [])
         {
-            var apiContext = new DaybreakAPIContext(uri);
+            var uriBuilder = new UriBuilder(uri)
+            {
+                Host = LocalHost
+            };
+            var apiContext = new DaybreakAPIContext(uriBuilder.Uri);
             var scopedApiContext = new ScopedApiContext(this.scopedApiLogger, this.scopedApiClient, apiContext);
 
             var response = await scopedApiContext.GetLoginInfo(cancellationToken);

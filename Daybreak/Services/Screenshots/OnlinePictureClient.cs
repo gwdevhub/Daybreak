@@ -179,13 +179,13 @@ internal sealed class OnlinePictureClient : IOnlinePictureClient
 
     private async Task<Stream?> GetRemoteImage(string url)
     {
-        this.logger.LogInformation($"Retrieving image from {url}");
+        this.logger.LogDebug("Retrieving image from {url}", url);
         try
         {
             var response = await this.httpClient.GetAsync($"{url}").ConfigureAwait(false);
             if (response.IsSuccessStatusCode)
             {
-                this.logger.LogInformation("Received success status code");
+                this.logger.LogDebug("Received success status code");
                 if (response.Headers.TryGetValues("Content-Length", out var values) &&
                     values.FirstOrDefault() is string responseLengthString &&
                     int.TryParse(responseLengthString, out var responseLength) &&

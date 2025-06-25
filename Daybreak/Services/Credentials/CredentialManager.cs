@@ -41,25 +41,24 @@ internal sealed class CredentialManager : ICredentialManager
 
     public List<LoginCredentials> GetCredentialList()
     {
-        this.logger.LogInformation("Retrieving credentials");
+        this.logger.LogDebug("Retrieving credentials");
         var config = this.liveOptions.Value;
         if (config.ProtectedLoginCredentials is null || config.ProtectedLoginCredentials.Count == 0)
         {
-            this.logger.LogInformation("No credentials found");
+            this.logger.LogDebug("No credentials found");
             return [];
         }
 
-        return config
+        return [.. config
             .ProtectedLoginCredentials
             .Select(this.UnprotectCredentials)
             .Where(this.CredentialsUnprotected)
-            .Select(this.ExtractCredentials)
-            .ToList();
+            .Select(this.ExtractCredentials)];
     }
 
     public void StoreCredentials(List<LoginCredentials> loginCredentials)
     {
-        this.logger.LogInformation("Storing credentials");
+        this.logger.LogDebug("Storing credentials");
         this.liveOptions.Value.ProtectedLoginCredentials = loginCredentials
             .Select(this.ProtectCredentials)
             .Where(this.CredentialsProtected)

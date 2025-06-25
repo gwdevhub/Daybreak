@@ -286,7 +286,7 @@ internal sealed class ToolboxService(
         var result = await this.toolboxClient.DownloadLatestDll(toolboxInstallationStatus, UsualToolboxFolderLocation, CancellationToken.None);
         _ = result switch
         {
-            DownloadLatestOperation.Success => scopedLogger.LogInformation(result.Message),
+            DownloadLatestOperation.Success => scopedLogger.LogDebug(result.Message),
             DownloadLatestOperation.NonSuccessStatusCode => scopedLogger.LogError(result.Message),
             DownloadLatestOperation.NoVersionFound => scopedLogger.LogError(result.Message),
             DownloadLatestOperation.ExceptionEncountered exceptionResult => scopedLogger.LogError(exceptionResult.Exception, exceptionResult.Message),
@@ -309,7 +309,7 @@ internal sealed class ToolboxService(
         var scopedLogger = this.logger.CreateScopedLogger();
         if (this.toolboxOptions.Value.Enabled is false)
         {
-            scopedLogger.LogInformation("Toolbox disabled");
+            scopedLogger.LogDebug("Toolbox disabled");
             return;
         }
 
@@ -320,10 +320,10 @@ internal sealed class ToolboxService(
             throw new ExecutableNotFoundException($"GWToolbox dll doesn't exist at {dll}");
         }
 
-        scopedLogger.LogInformation("Injecting toolbox dll");
+        scopedLogger.LogDebug("Injecting toolbox dll");
         if (await this.processInjector.Inject(process, dll, cancellationToken))
         {
-            scopedLogger.LogInformation("Injected toolbox dll");
+            scopedLogger.LogDebug("Injected toolbox dll");
             this.notificationService.NotifyInformation(
                 title: "GWToolbox started",
                 description: "GWToolbox has been injected");

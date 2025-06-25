@@ -73,7 +73,7 @@ internal sealed class GuildWarsVersionChecker : IGuildWarsVersionChecker, IAppli
 
         if (version == latestVersion)
         {
-            scopedLogger.LogInformation("Executable is up to date");
+            scopedLogger.LogDebug("Executable is up to date");
             notificationToken.Cancel();
             return;
         }

@@ -12,7 +12,6 @@ using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Plugins;
 using Daybreak.Shared.Services.Startup;
 using Daybreak.Shared.Services.Updater.PostUpdate;
-using Daybreak.Shared.Shared.Models.Plugins;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -116,18 +115,18 @@ internal sealed class PluginsService : IPluginsService
         var pluginsPath = PluginsDirectory;
         if (!Directory.Exists(pluginsPath))
         {
-            scopedLogger.LogInformation("Creating plugins folder");
+            scopedLogger.LogDebug("Creating plugins folder");
             Directory.CreateDirectory(pluginsPath);
         }
 
-        scopedLogger.LogInformation("Enumerating available plugins");
+        scopedLogger.LogDebug("Enumerating available plugins");
         var availablePlugins = this.pluginManager.GetAvailablePlugins().ToList();
         foreach (var availablePlugin in availablePlugins)
         {
-            scopedLogger.LogInformation($"[{availablePlugin.Name}] - [{(this.liveUpdateableOptions.Value.EnabledPlugins.Any(p => p.Name == availablePlugin.Name) ? "Enabled" : "Disabled")}] - {availablePlugin.Path}");
+            scopedLogger.LogDebug($"[{availablePlugin.Name}] - [{(this.liveUpdateableOptions.Value.EnabledPlugins.Any(p => p.Name == availablePlugin.Name) ? "Enabled" : "Disabled")}] - {availablePlugin.Path}");
         }
 
-        scopedLogger.LogInformation("Loading plugins");
+        scopedLogger.LogDebug("Loading plugins");
         IEnumerable<PluginLoadOperation> results;
         try
         {
@@ -167,29 +166,29 @@ internal sealed class PluginsService : IPluginsService
                 }
 
                 RegisterResolvers(pluginConfig, serviceManager);
-                pluginScopedLogger.LogInformation("Registered resolvers");
+                pluginScopedLogger.LogDebug("Registered resolvers");
                 RegisterServices(pluginConfig, serviceManager);
-                pluginScopedLogger.LogInformation("Registered services");
+                pluginScopedLogger.LogDebug("Registered services");
                 RegisterOptions(pluginConfig, optionsProducer);
-                pluginScopedLogger.LogInformation("Registered options");
+                pluginScopedLogger.LogDebug("Registered options");
                 RegisterViews(pluginConfig, viewManager);
-                pluginScopedLogger.LogInformation("Registered views");
+                pluginScopedLogger.LogDebug("Registered views");
                 RegisterPostUpdateActions(pluginConfig, postUpdateActionProducer);
-                pluginScopedLogger.LogInformation("Registered post-update actions");
+                pluginScopedLogger.LogDebug("Registered post-update actions");
                 RegisterStartupActions(pluginConfig, startupActionProducer);
-                pluginScopedLogger.LogInformation("Registered startup actions");
+                pluginScopedLogger.LogDebug("Registered startup actions");
                 RegisterNotificationHandlers(pluginConfig, notificationHandlerProducer);
-                pluginScopedLogger.LogInformation("Registered notification handlers");
+                pluginScopedLogger.LogDebug("Registered notification handlers");
                 RegisterMods(pluginConfig, modsManager);
-                pluginScopedLogger.LogInformation("Registered mods");
+                pluginScopedLogger.LogDebug("Registered mods");
                 RegisterBrowserExtensions(pluginConfig, browserExtensionsProducer);
-                pluginScopedLogger.LogInformation("Registered browser extensions");
+                pluginScopedLogger.LogDebug("Registered browser extensions");
                 RegisterArgumentHandlers(pluginConfig, argumentHandlerProducer);
-                pluginScopedLogger.LogInformation("Registered argument handlers");
+                pluginScopedLogger.LogDebug("Registered argument handlers");
                 RegisterMenuButtons(pluginConfig, menuServiceProducer);
-                pluginScopedLogger.LogInformation("Registered menu buttons");
+                pluginScopedLogger.LogDebug("Registered menu buttons");
                 this.loadedPlugins.Add(new AvailablePlugin { Name = result.PluginEntry?.Name ?? string.Empty, Path = result.PluginEntry?.Path ?? string.Empty, Enabled = true });
-                pluginScopedLogger.LogInformation("Loaded plugin");
+                pluginScopedLogger.LogDebug("Loaded plugin");
             }
             catch(Exception e)
             {
@@ -234,9 +233,9 @@ internal sealed class PluginsService : IPluginsService
     {
         _ = result switch
         {
-            PluginLoadOperation.Success success => scopedLogger.LogInformation($"[{success.PluginEntry.Name}] - SUCCESS"),
-            PluginLoadOperation.NullEntry entry => scopedLogger.LogInformation($"[{entry.PluginEntry.Name}] - NULL"),
-            PluginLoadOperation.FileNotFound entry => scopedLogger.LogInformation($"[{entry.PluginEntry.Name}] - FILE NOT FOUND"),
+            PluginLoadOperation.Success success => scopedLogger.LogDebug($"[{success.PluginEntry.Name}] - SUCCESS"),
+            PluginLoadOperation.NullEntry entry => scopedLogger.LogError($"[{entry.PluginEntry.Name}] - NULL"),
+            PluginLoadOperation.FileNotFound entry => scopedLogger.LogDebug($"[{entry.PluginEntry.Name}] - FILE NOT FOUND"),
             PluginLoadOperation.ExceptionEncountered entry => scopedLogger.LogError(entry.Exception, $"[{entry.PluginEntry.Name}] - EXCEPTION"),
             PluginLoadOperation.UnexpectedErrorOccurred entry => scopedLogger.LogError($"[{entry.PluginEntry.Name}] - UNEXPECTED ERROR"),
             _ => default
