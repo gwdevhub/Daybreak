@@ -72,7 +72,7 @@ internal sealed class IntegratedGuildwarsInstaller : IGuildWarsInstaller
             if (await this.GetVersionId(request.ExecutablePath, request.CancellationToken) is int version &&
                     version == latestVersion)
             {
-                scopedLogger.LogInformation("Executable is already latest");
+                scopedLogger.LogDebug("Executable is already latest");
                 yield return new GuildWarsUpdateResponse { ExecutablePath = request.ExecutablePath, Result = true };
                 continue;
             }
@@ -225,7 +225,7 @@ internal sealed class IntegratedGuildwarsInstaller : IGuildWarsInstaller
         installationStatus.CurrentStep = GuildwarsInstallationStatus.StartingExecutable;
         await Task.Delay(100, cancellationToken);
         using var process = Process.Start(filePath);
-        scopedLogger.LogInformation("Starting executable. Waiting for the process to end before finishing installation");
+        scopedLogger.LogDebug("Starting executable. Waiting for the process to end before finishing installation");
         while (!process.HasExited)
         {
             await Task.Delay(1000, cancellationToken);

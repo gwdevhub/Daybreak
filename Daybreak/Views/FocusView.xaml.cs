@@ -141,7 +141,7 @@ public partial class FocusView : UserControl
 
                 if (context.LaunchContext.GuildWarsProcess.HasExited)
                 {
-                    this.logger.LogInformation($"Executable is not running. Returning to {nameof(LauncherView)}");
+                    this.logger.LogDebug("Executable is not running. Returning to {view}", nameof(LauncherView));
                     this.viewManager.ShowView<LauncherView>();
                     return;
                 }

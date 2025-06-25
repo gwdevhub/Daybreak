@@ -90,7 +90,7 @@ internal sealed class DXVKService(
             return false;
         }
 
-        scopedLogger.LogInformation("Extracting DXVK files");
+        scopedLogger.LogDebug("Extracting DXVK files");
         dXVKInstallationStatus.CurrentStep = DXVKInstallationStatus.ExtractingFiles;
         await this.ExtractFiles(latestVersion, cancellationToken);
 
@@ -202,7 +202,7 @@ internal sealed class DXVKService(
     private async Task<Version?> GetLatestVersion(CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        scopedLogger.LogInformation("Retrieving version list");
+        scopedLogger.LogDebug("Retrieving version list");
         var getListResponse = await this.httpClient.GetAsync(ReleasesUrl, cancellationToken);
         if (!getListResponse.IsSuccessStatusCode)
         {

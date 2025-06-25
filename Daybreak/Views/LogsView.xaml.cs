@@ -124,7 +124,7 @@ public partial class LogsView : UserControl
 
     private async void ExportButton_Clicked(object sender, EventArgs e)
     {
-        this.logger.LogInformation("Exporting logs");
+        this.logger.LogDebug("Exporting logs");
         var saveFileDialog = new SaveFileDialog
         {
             DefaultExt = "json",
@@ -136,12 +136,12 @@ public partial class LogsView : UserControl
         if (saveFileDialog.ShowDialog() is true)
         {
             var fileName = saveFileDialog.FileName;
-            this.logger.LogInformation($"Exporting to {fileName}");
+            this.logger.LogDebug("Exporting to {fileName}", fileName);
             await File.WriteAllTextAsync(fileName, this.logManager.GetLogs().ToList().Serialize());
         }
         else
         {
-            this.logger.LogInformation("Exporting canceled");
+            this.logger.LogDebug("Exporting canceled");
         }
     }
     

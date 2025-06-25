@@ -35,7 +35,7 @@ internal sealed class OnboardingService : IOnboardingService
 
     public LauncherOnboardingStage CheckOnboardingStage()
     {
-        this.logger.LogInformation("Verifying if user is completely onboarded");
+        this.logger.LogDebug("Verifying if user is completely onboarded");
         if (this.credentialManager.GetCredentialList().None())
         {
             this.logger.LogError("No credentials found. User needs to create at least one set of credentials");
@@ -54,7 +54,7 @@ internal sealed class OnboardingService : IOnboardingService
             return LauncherOnboardingStage.NeedsConfiguration;
         }
 
-        this.logger.LogInformation("User is onboarded");
+        this.logger.LogDebug("User is onboarded");
         return LauncherOnboardingStage.Complete;
     }
 }

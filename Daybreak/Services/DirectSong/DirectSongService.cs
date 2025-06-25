@@ -140,7 +140,7 @@ internal sealed class DirectSongService(
 
         if (this.IsInstalled)
         {
-            scopedLogger.LogInformation("Already installed");
+            scopedLogger.LogDebug("Already installed");
             this.InstallationTask = default;
             this.CachedInstallationStatus = default;
             return true;
@@ -160,7 +160,7 @@ internal sealed class DirectSongService(
         if (!File.Exists(destinationPath))
         {
             Directory.CreateDirectory(Path.GetFullPath(InstallationDirectory));
-            scopedLogger.LogInformation($"Downloading {DestinationZipFile}");
+            scopedLogger.LogDebug($"Downloading {DestinationZipFile}");
             directSongInstallationStatus.CurrentStep = DirectSongInstallationStatus.InitializingDownload;
             if (!await this.downloadService.DownloadFile(DownloadUrl, destinationPath, directSongInstallationStatus, cancellationToken))
             {
@@ -171,10 +171,10 @@ internal sealed class DirectSongService(
             }
         }
 
-        scopedLogger.LogInformation("Extracting DirectSong files");
+        scopedLogger.LogDebug("Extracting DirectSong files");
         if (!await this.sevenZipExtractor.ExtractToDirectory(destinationPath, InstallationDirectory, (progress, fileName) =>
         {
-            scopedLogger.LogInformation($"Extracted {fileName}");
+            scopedLogger.LogDebug($"Extracted {fileName}");
             directSongInstallationStatus.CurrentStep = DirectSongInstallationStatus.Extracting(progress);
         }, cancellationToken))
         {
@@ -184,7 +184,7 @@ internal sealed class DirectSongService(
             return false;
         }
 
-        scopedLogger.LogInformation("Extracted files. Setting up registry entries");
+        scopedLogger.LogDebug("Extracted files. Setting up registry entries");
         directSongInstallationStatus.CurrentStep = DirectSongInstallationStatus.SetupRegistry;
         if (!await RunRegisterDirectSongDirectory(cancellationToken))
         {
@@ -194,7 +194,7 @@ internal sealed class DirectSongService(
             return false;
         }
 
-        scopedLogger.LogInformation($"Deleting archive {destinationPath}");
+        scopedLogger.LogDebug($"Deleting archive {destinationPath}");
         File.Delete(destinationPath);
         directSongInstallationStatus.CurrentStep = DirectSongInstallationStatus.Finished;
         this.InstallationTask = default;

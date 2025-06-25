@@ -52,7 +52,7 @@ internal sealed class ExceptionHandler : IExceptionHandler
         }
         else if (e is TaskCanceledException)
         {
-            this.logger.LogInformation(e, $"Encountered {nameof(TaskCanceledException)}. Ignoring");
+            this.logger.LogDebug(e, $"Encountered {nameof(TaskCanceledException)}. Ignoring");
             return true;
         }
         else if (e is TargetInvocationException targetInvocationException && e.InnerException is FatalException innerFatalException)

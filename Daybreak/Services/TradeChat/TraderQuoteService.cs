@@ -174,7 +174,7 @@ internal sealed class TraderQuoteService : ITraderQuoteService
                 var idTokens = itemIdString.Split('-');
                 if (!int.TryParse(idTokens[0], out var id))
                 {
-                    scopedLogger.LogInformation($"Unable to parse item id {idTokens[0]}. Skipping quote");
+                    scopedLogger.LogWarning("Unable to parse item id {idToken}. Skipping quote", idTokens[0]);
                     continue;
                 }
 
@@ -184,7 +184,7 @@ internal sealed class TraderQuoteService : ITraderQuoteService
                         i.Id == id &&
                         (idTokens.Length <= 1 || this.itemHashService.ComputeHash(i)?.StartsWith(idTokens[1]) is true)) is not ItemBase item)
                 {
-                    scopedLogger.LogInformation($"Unable to parse item {itemIdString}. Skipping quote");
+                    scopedLogger.LogWarning("Unable to parse item {itemId}. Skipping quote", itemIdString);
                     continue;
                 }
 
@@ -220,7 +220,7 @@ internal sealed class TraderQuoteService : ITraderQuoteService
                 var idTokens = itemIdString.Split('-');
                 if (!int.TryParse(idTokens[0], out var id))
                 {
-                    scopedLogger.LogInformation($"Unable to parse item id {idTokens[0]}. Skipping quote");
+                    scopedLogger.LogWarning("Unable to parse item id {idToken}. Skipping quote", idTokens[0]);
                     continue;
                 }
 
@@ -230,7 +230,7 @@ internal sealed class TraderQuoteService : ITraderQuoteService
                         i.Id == id &&
                         (idTokens.Length <= 1 || this.itemHashService.ComputeHash(i)?.StartsWith(idTokens[1]) is true)) is not ItemBase item)
                 {
-                    scopedLogger.LogInformation($"Unable to parse item {itemIdString}. Skipping quote");
+                    scopedLogger.LogWarning("Unable to parse item {itemId}. Skipping quote", itemIdString);
                     continue;
                 }
 

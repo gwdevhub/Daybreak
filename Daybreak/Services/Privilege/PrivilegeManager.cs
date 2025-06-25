@@ -28,14 +28,14 @@ internal sealed class PrivilegeManager : IPrivilegeManager
     public void RequestAdminPrivileges<TCancelView>(string messageToUser, object? dataContextOfCancelView = default)
         where TCancelView : UserControl
     {
-        this.logger.LogInformation("Requesting admin privileges");
+        this.logger.LogDebug("Requesting admin privileges");
         this.viewManager.ShowView<RequestElevationView>(new ElevationRequest { View = typeof(TCancelView), DataContext = dataContextOfCancelView!, MessageToUser = messageToUser });
     }
 
     public void RequestNormalPrivileges<TCancelView>(string messageToUser, object? dataContextOfCancelView = default)
         where TCancelView : UserControl
     {
-        this.logger.LogInformation("Requesting normal privileges");
+        this.logger.LogDebug("Requesting normal privileges");
         this.viewManager.ShowView<RequestDelevationView>(new ElevationRequest { View = typeof(TCancelView), DataContext = dataContextOfCancelView!, MessageToUser = messageToUser });
     }
 }

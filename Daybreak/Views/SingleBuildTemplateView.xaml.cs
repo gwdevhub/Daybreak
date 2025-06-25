@@ -51,7 +51,7 @@ public partial class SingleBuildTemplateView : UserControl
         {
             if (contextArgs.NewValue is SingleBuildEntry buildEntry)
             {
-                this.logger.LogInformation("Received data context. Setting current build");
+                this.logger.LogDebug("Received data context. Setting current build");
                 this.CurrentBuild = buildEntry;
                 this.preventDecode = true;
                 this.CurrentBuildCode = this.buildTemplateManager.EncodeTemplate(this.CurrentBuild);
@@ -67,7 +67,7 @@ public partial class SingleBuildTemplateView : UserControl
         if (e.Property == CurrentBuildCodeProperty &&
             this.preventDecode is false)
         {
-            this.logger.LogInformation($"Attempting to decode provided template {this.CurrentBuildCode}");
+            this.logger.LogDebug("Attempting to decode provided template {buildCode}", this.CurrentBuildCode);
             try
             {
                 var newBuild = this.buildTemplateManager.DecodeTemplate(this.CurrentBuildCode);
@@ -84,11 +84,11 @@ public partial class SingleBuildTemplateView : UserControl
                 }
 
                 this.CurrentBuild = singleBuildEntry;
-                this.logger.LogInformation($"Template {this.CurrentBuildCode} decoded");
+                this.logger.LogDebug("Template {buildCode} decoded", this.CurrentBuildCode);
             }
             catch
             {
-                this.logger.LogWarning($"Failed to decode {this.CurrentBuildCode}. Reverting to default build");
+                this.logger.LogError("Failed to decode {buildCode}. Reverting to default build", this.CurrentBuildCode);
                 var newBuild = this.buildTemplateManager.CreateSingleBuild();
                 newBuild.Name = this.CurrentBuild.Name;
                 newBuild.PreviousName = this.CurrentBuild.PreviousName;

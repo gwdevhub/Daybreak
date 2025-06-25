@@ -55,6 +55,6 @@ internal sealed class GuildWarsUpdateNotificationHandler : INotificationHandler
         var context = new GuildWarsDownloadContext { CancellationTokenSource = cancellationTokenSource, GuildwarsInstallationStatus = status };
         this.viewManager.ShowView<GuildWarsDownloadView>(context);
         var response = await this.guildWarsInstaller.UpdateGuildwars(path, status, cancellationTokenSource.Token);
-        scopedLogger.LogInformation($"Update result {response}");
+        scopedLogger.LogDebug($"Update result {response}");
     }
 }

@@ -23,7 +23,7 @@ internal sealed class ToolboxUpdateHandler : INotificationHandler
     public void OpenNotification(Notification notification)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        scopedLogger.LogInformation("Updating toolbox");
+        scopedLogger.LogDebug("Updating toolbox");
         this.viewManager.ShowView<ToolboxInstallationView>();
     }
 }

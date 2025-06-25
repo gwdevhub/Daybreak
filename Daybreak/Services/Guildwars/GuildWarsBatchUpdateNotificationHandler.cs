@@ -71,7 +71,7 @@ internal sealed class GuildWarsBatchUpdateNotificationHandler : INotificationHan
 
         if (updateList.None())
         {
-            scopedLogger.LogInformation("All executables are up to date");
+            scopedLogger.LogDebug("All executables are up to date");
             return;
         }
 
@@ -80,14 +80,14 @@ internal sealed class GuildWarsBatchUpdateNotificationHandler : INotificationHan
         {
             if (result.Result)
             {
-                scopedLogger.LogInformation($"Updated {result.ExecutablePath}");
+                scopedLogger.LogDebug($"Updated {result.ExecutablePath}");
                 this.notificationService.NotifyInformation(
                     title: "Updated executable",
                     description: $"Updated executable at {result.ExecutablePath}");
             }
             else
             {
-                scopedLogger.LogInformation($"Failed to update {result.ExecutablePath}");
+                scopedLogger.LogDebug($"Failed to update {result.ExecutablePath}");
                 this.notificationService.NotifyInformation(
                     title: "Failed to update executable",
                     description: $"Failed to update executable at {result.ExecutablePath}");

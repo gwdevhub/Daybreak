@@ -41,7 +41,7 @@ internal sealed class CredentialsOptionsMigrator : StartupActionBase
             return;
         }
 
-        this.logger.LogInformation($"Found [{OldOptionsKey}]. Migrating options to [{newOptionsKey}]");
+        this.logger.LogDebug($"Found [{OldOptionsKey}]. Migrating options to [{newOptionsKey}]");
         this.optionsProvider.SaveRegisteredOptions(newOptionsKey, options);
     }
 

@@ -123,7 +123,7 @@ internal sealed class ReShadeService(
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.OnGuildWarsCreated), guildWarsCreatedContext.ApplicationLauncherContext.ExecutablePath ?? string.Empty);
         if (await this.processInjector.Inject(guildWarsCreatedContext.ApplicationLauncherContext.Process, ReShadeDllPath, cancellationToken))
         {
-            scopedLogger.LogInformation("Injected ReShade dll");
+            scopedLogger.LogDebug("Injected ReShade dll");
             this.notificationService.NotifyInformation(
                 title: "ReShade started",
                 description: "ReShade has been injected");
@@ -217,7 +217,7 @@ internal sealed class ReShadeService(
     public async Task<bool> SetupReShade(ReShadeInstallationStatus reShadeInstallationStatus, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.SetupReShade), string.Empty);
-        scopedLogger.LogInformation("Retrieving ReShade latest version");
+        scopedLogger.LogDebug("Retrieving ReShade latest version");
 
         reShadeInstallationStatus.CurrentStep = ReShadeInstallationStatus.RetrievingLatestVersionUrl;
         var downloadUrl = await this.GetLatestDownloadUrl(cancellationToken);
@@ -229,7 +229,7 @@ internal sealed class ReShadeService(
             return false;
         }
 
-        scopedLogger.LogInformation($"Downloading installer from {downloadUrl}");
+        scopedLogger.LogDebug($"Downloading installer from {downloadUrl}");
         var destinationPath = Path.Combine(Path.GetFullPath(ReShadePath), ReShadeInstallerName);
         var downloadResult = await this.downloadService.DownloadFile(downloadUrl, destinationPath, reShadeInstallationStatus, cancellationToken);
         if (!downloadResult)
@@ -381,7 +381,7 @@ internal sealed class ReShadeService(
             {
                 if (applicationLauncherContext.Process.HasExited)
                 {
-                    scopedLogger.LogInformation("Process has exited");
+                    scopedLogger.LogDebug("Process has exited");
                     return;
                 }
 
@@ -443,12 +443,12 @@ internal sealed class ReShadeService(
         {
             if (FxExtensions.Any(entry.FullName.EndsWith))
             {
-                scopedLogger.LogInformation($"[{entry.FullName}] Processing fx file");
+                scopedLogger.LogDebug($"[{entry.FullName}] Processing fx file");
                 var fileName = StripAfterToken(entry.FullName, "shaders/");
                 if (fxFilter is not null &&
                     !fxFilter.Contains(fileName))
                 {
-                    scopedLogger.LogInformation($"[{entry.FullName}] File not found in effects list. Skipping");
+                    scopedLogger.LogDebug($"[{entry.FullName}] File not found in effects list. Skipping");
                     continue;
                 }
 
@@ -458,17 +458,17 @@ internal sealed class ReShadeService(
                     destination = Path.Combine(desiredInstallationPath, fileName);
                 }
 
-                scopedLogger.LogInformation($"[{entry.FullName}] Installing fx at {destination}");
+                scopedLogger.LogDebug($"[{entry.FullName}] Installing fx at {destination}");
                 new FileInfo(destination).Directory?.Create();
                 using var fs = new FileStream(destination, FileMode.Create);
                 using var reader = entry.Open();
                 await reader.CopyToAsync(fs, cancellationToken);
 
-                scopedLogger.LogInformation($"[{entry.FullName}] Installed fx at {destination}");
+                scopedLogger.LogDebug($"[{entry.FullName}] Installed fx at {destination}");
             }
             else if (FxHeaderExtensions.Any(entry.FullName.EndsWith))
             {
-                scopedLogger.LogInformation($"[{entry.FullName}] Processing fxh file");
+                scopedLogger.LogDebug($"[{entry.FullName}] Processing fxh file");
                 var fileName = StripAfterToken(entry.FullName, "shaders/");
                 var destination = Path.Combine(basePath, PresetsFolder, "Shaders", fileName);
                 if (desiredInstallationPath?.IsNullOrWhiteSpace() is false)
@@ -476,17 +476,17 @@ internal sealed class ReShadeService(
                     destination = Path.Combine(desiredInstallationPath, fileName);
                 }
 
-                scopedLogger.LogInformation($"[{entry.FullName}] Installing fxh at {destination}");
+                scopedLogger.LogDebug($"[{entry.FullName}] Installing fxh at {destination}");
                 new FileInfo(destination).Directory?.Create();
                 using var fs = new FileStream(destination, FileMode.Create);
                 using var reader = entry.Open();
                 await reader.CopyToAsync(fs, cancellationToken);
 
-                scopedLogger.LogInformation($"[{entry.FullName}] Installed fxh at {destination}");
+                scopedLogger.LogDebug($"[{entry.FullName}] Installed fxh at {destination}");
             }
             else if (TextureExtensions.Any(entry.FullName.EndsWith))
             {
-                scopedLogger.LogInformation($"Processing texture file {entry.FullName}");
+                scopedLogger.LogDebug($"Processing texture file {entry.FullName}");
                 var fileName = StripAfterToken(entry.FullName, "Textures/");
                 var destination = Path.Combine(basePath, PresetsFolder, "Textures", fileName);
                 if (desiredTextureInstallationPath?.IsNullOrWhiteSpace() is false)
@@ -494,13 +494,13 @@ internal sealed class ReShadeService(
                     destination = Path.Combine(desiredTextureInstallationPath, fileName);
                 }
 
-                scopedLogger.LogInformation($"[{entry.FullName}] Installing texture at {destination}");
+                scopedLogger.LogDebug($"[{entry.FullName}] Installing texture at {destination}");
                 new FileInfo(destination).Directory?.Create();
                 using var fs = new FileStream(destination, FileMode.Create);
                 using var reader = entry.Open();
                 await reader.CopyToAsync(fs, cancellationToken);
 
-                scopedLogger.LogInformation($"[{entry.FullName}] Installed texture at {destination}");
+                scopedLogger.LogDebug($"[{entry.FullName}] Installed texture at {destination}");
             }
         }
     }
@@ -515,7 +515,7 @@ internal sealed class ReShadeService(
             return default;
         }
 
-        scopedLogger.LogInformation("Scrapping latest download url");
+        scopedLogger.LogDebug("Scrapping latest download url");
         var html = await homePageResult.Content.ReadAsStringAsync(cancellationToken);
         var doc = new HtmlDocument();
         doc.LoadHtml(html);
@@ -531,7 +531,7 @@ internal sealed class ReShadeService(
                 return null;
             }).FirstOrDefault(href => href?.IsNullOrWhiteSpace() is false) is not string href)
         {
-            scopedLogger.LogInformation("Unable to find the download url on the ReShade homepage");
+            scopedLogger.LogWarning("Unable to find the download url on the ReShade homepage");
             return default;
         }
 
@@ -642,11 +642,11 @@ internal sealed class ReShadeService(
             Shared.Models.Versioning.Version.TryParse(FileVersionInfo.GetVersionInfo(ReShadeDllPath).ProductVersion, out var currentVersion) &&
             currentVersion.CompareTo(version) >= 0)
         {
-            scopedLogger.LogInformation("No update available. Current version is up to date");
+            scopedLogger.LogDebug("No update available. Current version is up to date");
             return;
         }
 
-        scopedLogger.LogInformation($"Found an update for ReShade. Latest version: {version}");
+        scopedLogger.LogDebug($"Found an update for ReShade. Latest version: {version}");
         var notificationToken = this.notificationService.NotifyInformation(
                 "Updating ReShade",
                 $"Updating ReShade to version {version}");
@@ -654,7 +654,7 @@ internal sealed class ReShadeService(
         if (await this.SetupReShade(new ReShadeInstallationStatus(), CancellationToken.None))
         {
             notificationToken.Cancel();
-            scopedLogger.LogInformation($"ReShade updated to version {version}");
+            scopedLogger.LogDebug($"ReShade updated to version {version}");
             this.notificationService.NotifyInformation(
                 "ReShade updated",
                 $"ReShade has been updated to version {version}");
