@@ -180,7 +180,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
         await Task.Delay(10);
 
         this.logger = this.ServiceProvider.GetRequiredService<ILogger<Launcher>>();
-        this.logger.LogInformation($"Running in {Environment.CurrentDirectory}");
+        this.logger.LogDebug($"Running in {Environment.CurrentDirectory}");
         this.exceptionHandler = this.ServiceProvider.GetRequiredService<IExceptionHandler>();
         try
         {

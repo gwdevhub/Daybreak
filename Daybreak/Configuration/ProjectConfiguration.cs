@@ -131,12 +131,12 @@ using Daybreak.Services.DXVK;
 using Daybreak.Views.Onboarding.DXVK;
 using Daybreak.Shared.Services.MDns;
 using Daybreak.Services.MDns;
-using OpenTelemetry.Logs;
 using OpenTelemetry.Resources;
 using Daybreak.Services.Telemetry;
 using System.Reflection;
 using Version = Daybreak.Shared.Models.Versioning.Version;
 using Daybreak.Shared.Models.Plugins;
+using System.Collections.Generic;
 
 namespace Daybreak.Configuration;
 
@@ -176,14 +176,16 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<ILoggerFactory, ILoggerFactory>(sp =>
         {
             var swappableLoggerProvider = sp.GetRequiredService<SwappableLoggerProvider>();
-            return LoggerFactory.Create(logging =>
+            var factory = LoggerFactory.Create(logging =>
             {
                 logging.ClearProviders();
-
+                logging.SetMinimumLevel(LogLevel.Trace);
                 logging.AddProvider(new CVLoggerProvider(sp.GetRequiredService<ILogsWriter>()));
                 logging.AddProvider(swappableLoggerProvider);
                 logging.AddFilter<SwappableLoggerProvider>(static (_, level) => level >= LogLevel.Warning);
             });
+
+            return factory;
         });
         services.AddSingleton<ILogsWriter, CompositeLogsWriter>(sp => new CompositeLogsWriter(
             sp.GetRequiredService<ILogsManager>(),
@@ -193,8 +195,15 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped((sp) => new ScopeMetadata(new CorrelationVector()));
         services.AddSingleton(sp =>
         {
-            return ResourceBuilder.CreateDefault().AddService("Daybreak", serviceVersion: CurrentVersion.ToString());
-
+            var resourceBuilder = ResourceBuilder.CreateDefault().AddService("Daybreak", serviceVersion: CurrentVersion.ToString());
+            var attributes = new List<KeyValuePair<string, object>>();
+#if DEBUG
+            attributes.Add(new KeyValuePair<string, object>("deployment.environment", "debug"));
+#else
+            attributes.Add(new KeyValuePair<string, object>("deployment.environment", "production"));
+#endif
+            resourceBuilder.AddAttributes(attributes);
+            return resourceBuilder;
         });
         services.AddSingleton<ViewManager>();
         services.AddSingleton<ProcessorUsageMonitor>();

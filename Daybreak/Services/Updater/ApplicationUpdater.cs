@@ -10,7 +10,6 @@ using Daybreak.Shared.Services.Updater;
 using Daybreak.Shared.Services.Updater.PostUpdate;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -48,9 +47,9 @@ internal sealed class ApplicationUpdater(
     private const string VersionTag = "{VERSION}";
     private const string FileTag = "{FILE}";
     private const string RefTagPrefix = "/refs/tags";
-    private const string VersionListUrl = "https://api.github.com/repos/AlexMacocian/Daybreak/git/refs/tags";
-    private const string Url = "https://github.com/AlexMacocian/Daybreak/releases/latest";
-    private const string DownloadUrl = $"https://github.com/AlexMacocian/Daybreak/releases/download/{VersionTag}/Daybreak{VersionTag}.zip";
+    private const string VersionListUrl = "https://api.github.com/repos/gwdevhub/Daybreak/git/refs/tags";
+    private const string Url = "https://github.com/gwdevhub/Daybreak/releases/latest";
+    private const string DownloadUrl = $"https://github.com/gwdevhub/Daybreak/releases/download/{VersionTag}/Daybreak{VersionTag}.zip";
     private const string BlobStorageUrl = $"https://daybreak.blob.core.windows.net/{VersionTag}/{FileTag}";
     private const int DownloadParallelTasks = 10;
 
