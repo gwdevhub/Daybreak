@@ -66,7 +66,7 @@ public partial class LauncherOnboardingView : UserControl
     {
         if (e.NewValue is not LauncherOnboardingStage onboardingStage)
         {
-            this.logger.LogInformation($"{nameof(this.DataContext)} not set to {nameof(LauncherOnboardingStage)}");
+            this.logger.LogDebug("{dataContext} not set to {onboardingStage}", nameof(this.DataContext), nameof(LauncherOnboardingStage));
             return;
         }
 

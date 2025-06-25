@@ -179,11 +179,11 @@ internal sealed class UModService(
         var existingUMod = Path.Combine(UModDirectory, UModDll);
         if (!this.IsInstalled)
         {
-            scopedLogger.LogInformation("UMod is not installed");
+            scopedLogger.LogDebug("UMod is not installed");
             return;
         }
 
-        scopedLogger.LogInformation("Retrieving version list");
+        scopedLogger.LogDebug("Retrieving version list");
         var getListResponse = await this.httpClient.GetAsync(ReleasesUrl, cancellationToken);
         if (!getListResponse.IsSuccessStatusCode)
         {
@@ -206,7 +206,7 @@ internal sealed class UModService(
 
         if (this.Version.CompareTo(latestVersion) >= 0)
         {
-            scopedLogger.LogInformation($"UMod is up to date");
+            scopedLogger.LogDebug($"UMod is up to date");
             return;
         }
 
@@ -259,7 +259,7 @@ internal sealed class UModService(
     private async Task<DownloadLatestOperation> GetLatestVersion(UModInstallationStatus uModInstallationStatus, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetLatestVersion), string.Empty);
-        scopedLogger.LogInformation("Retrieving version list");
+        scopedLogger.LogDebug("Retrieving version list");
         var getListResponse = await this.httpClient.GetAsync(ReleasesUrl, cancellationToken);
         if (!getListResponse.IsSuccessStatusCode)
         {
@@ -279,7 +279,7 @@ internal sealed class UModService(
             return new DownloadLatestOperation.NoVersionFound();
         }
 
-        scopedLogger.LogInformation($"Retrieving version {tag}");
+        scopedLogger.LogDebug($"Retrieving version {tag}");
         var downloadUrl = ReleaseUrl.Replace(TagPlaceholder, tag);
         var destinationFolder = UModDirectory;
         var destinationPath = Path.Combine(destinationFolder, UModDll);

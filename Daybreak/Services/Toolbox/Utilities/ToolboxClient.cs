@@ -81,7 +81,7 @@ internal sealed class ToolboxClient : IToolboxClient
             return new DownloadLatestOperation.NoVersionFound();
         }
 
-        scopedLogger.LogInformation($"Retrieving version {tag}");
+        scopedLogger.LogDebug("Retrieving version {tag}", tag);
         var downloadUrl = ReleaseUrl.Replace(TagPlaceholder, tag.ToString());
         var destinationFolder = Path.GetFullPath(destinationFolderPath);
         var destinationPath = Path.Combine(destinationFolder, DllName);
@@ -97,7 +97,7 @@ internal sealed class ToolboxClient : IToolboxClient
     private async Task<(Version? Version, string Literal)> GetLatestVersionTag(CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        scopedLogger.LogInformation("Retrieving version list");
+        scopedLogger.LogDebug("Retrieving version list");
         var getListResponse = await this.httpClient.GetAsync(ReleasesUrl, cancellationToken);
         if (!getListResponse.IsSuccessStatusCode)
         {

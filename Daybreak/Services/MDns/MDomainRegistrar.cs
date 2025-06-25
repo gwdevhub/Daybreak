@@ -91,7 +91,7 @@ public sealed class MDomainRegistrar(
             return;
         }
 
-        scopedLogger.LogInformation("Service {serviceName} has been shut down", name);
+        scopedLogger.LogDebug("Service {serviceName} has been shut down", name);
         this.serviceLookup.TryRemove(name, out var __);
     }
 
@@ -110,7 +110,7 @@ public sealed class MDomainRegistrar(
             return;
         }
 
-        scopedLogger.LogInformation("Discovered service {serviceName}", name);
+        scopedLogger.LogDebug("Discovered service {serviceName}", name);
         var ttl = ptrRecord.TTL > MaxTTL
             ? MaxTTL
             : ptrRecord.TTL;

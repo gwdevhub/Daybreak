@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Extensions;
 using System.Linq;
 using System.Reflection;
@@ -11,39 +12,30 @@ public static class SecretManager
 
     public static string GetSecret(SecretKeys secretKey)
     {
-        if (SecretsHolder is null)
-        {
-            LoadSecrets();
-        }
-
-        return SecretsHolder!.Value<string>(secretKey.Key)!;
+        SecretsHolder ??= LoadSecrets();
+        return SecretsHolder.Value<string>(secretKey.Key) ?? throw new InvalidOperationException($"Could not find secret by key {secretKey.Key}");
     }
 
     public static T GetSecret<T>(SecretKeys secretKey)
     {
-        if (SecretsHolder is null)
-        {
-            LoadSecrets();
-        }
-
-        return SecretsHolder!.Value<T>(secretKey.Key)!;
+        SecretsHolder ??= LoadSecrets();
+        return SecretsHolder.Value<T>(secretKey.Key) ?? throw new InvalidOperationException($"Could not find secret by key {secretKey.Key}");
     }
 
-    private static void LoadSecrets()
+    private static JObject LoadSecrets()
     {
-        var serializedSecrets = Assembly.GetExecutingAssembly().GetManifestResourceStream("Daybreak.secrets.json")!.ReadAllBytes().GetString();
+        var serializedSecrets = Assembly.GetExecutingAssembly().GetManifestResourceStream("Daybreak.secrets.json")?.ReadAllBytes().GetString() ?? throw new InvalidOperationException("Could not load Daybreak.secrets.json from assembly");
         serializedSecrets = TrimUnwantedCharacters(serializedSecrets);
-        SecretsHolder = JObject.Parse(serializedSecrets);
+        return JObject.Parse(serializedSecrets);
     }
 
     private static string TrimUnwantedCharacters(string s)
     {
-        return new string(s.Where(c =>
+        return new string([.. s.Where(c =>
             char.IsWhiteSpace(c) ||
             char.IsLetterOrDigit(c) ||
             char.IsSymbol(c) ||
             char.IsSeparator(c) ||
-            char.IsPunctuation(c))
-            .ToArray());
+            char.IsPunctuation(c))]);
     }
 }

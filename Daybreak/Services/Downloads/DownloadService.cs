@@ -47,7 +47,7 @@ internal sealed class DownloadService : IDownloadService
         }
 
         using var downloadStream = await this.httpClient.GetStreamAsync(downloadUri);
-        this.logger.LogInformation("Beginning download");
+        this.logger.LogDebug("Beginning download");
         var fileInfo = new FileInfo(destinationPath);
         fileInfo.Directory?.Create();
         var fileStream = File.Open(destinationPath, FileMode.Create, FileAccess.Write);
@@ -84,7 +84,7 @@ internal sealed class DownloadService : IDownloadService
         downloadStatus.CurrentStep = DownloadStatus.Downloading(1, TimeSpan.Zero);
         downloadStatus.CurrentStep = DownloadStatus.DownloadFinished;
         fileStream.Close();
-        scopedLogger.LogInformation("Downloaded file");
+        scopedLogger.LogDebug("Downloaded file");
         return true;
     }
 }

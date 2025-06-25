@@ -17,7 +17,7 @@ using System.Core.Extensions;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
-namespace Daybreak.Shared.Shared.Models.Plugins;
+namespace Daybreak.Shared.Models.Plugins;
 
 public abstract class PluginConfigurationBase
 {

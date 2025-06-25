@@ -90,7 +90,7 @@ internal sealed class DSOALService(
             return false;
         }
 
-        this.logger.LogInformation("Extracting DSOAL files");
+        this.logger.LogDebug("Extracting DSOAL files");
         dSOALInstallationStatus.CurrentStep = DSOALInstallationStatus.ExtractingFiles;
 
         this.ExtractFiles();

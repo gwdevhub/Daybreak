@@ -522,9 +522,9 @@ public sealed class BuildTemplateManager(
 
     private Result<Build, Exception> DecodeTemplateInner(string template)
     {
-        this.logger.LogInformation("Attempting to decode template");
+        this.logger.LogDebug("Attempting to decode template");
         var buildMetadata = ParseEncodedTemplate(template);
-        this.logger.LogInformation("Decoded template. Beginning parsing");
+        this.logger.LogDebug("Decoded template. Beginning parsing");
         if (buildMetadata.VersionNumber != 0)
         {
             this.logger.LogError($"Expected version number to be 0 but found {buildMetadata.VersionNumber}");
@@ -591,13 +591,13 @@ public sealed class BuildTemplateManager(
             build.Skills.Add(skill);
         }
 
-        this.logger.LogInformation("Successfully parsed build template");
+        this.logger.LogDebug("Successfully parsed build template");
         return build;
     }
 
     private string EncodeTemplateInner(Build build)
     {
-        this.logger.LogInformation("Building build metadata");
+        this.logger.LogDebug("Building build metadata");
         var buildMetadata = new BuildMetadata
         {
             VersionNumber = 0,
@@ -612,7 +612,7 @@ public sealed class BuildTemplateManager(
             TailPresent = true
         };
 
-        this.logger.LogInformation("Encoding metadata into binary");
+        this.logger.LogDebug("Encoding metadata into binary");
         var encodedBinary = BuildEncodedString(buildMetadata);
         int index = 0;
         var encodedBase64 = new List<int>();

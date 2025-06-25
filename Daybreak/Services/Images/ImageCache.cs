@@ -73,7 +73,7 @@ internal sealed class ImageCache(
         {
             this.imageRetrievalLatency.Record(stopwatch.ElapsedMilliseconds);
             this.imageCacheSize.Record(this.currentCacheSize);
-            scopedLogger.LogInformation("Found image in cache. Returning");
+            scopedLogger.LogDebug("Found image in cache. Returning");
             return entry.ImageSource;
         }
 
@@ -82,16 +82,16 @@ internal sealed class ImageCache(
         if (this.currentCacheSize + fileInfo.Length > this.options.Value.MemoryImageCacheLimit * 10e5)
         {
             var spaceToFree = this.currentCacheSize + fileInfo.Length - (this.options.Value.MemoryImageCacheLimit * 10e5);
-            scopedLogger.LogInformation($"Exceeding cache size. Freeing up {spaceToFree} bytes");
+            scopedLogger.LogDebug($"Exceeding cache size. Freeing up {spaceToFree} bytes");
             this.FreeCache(spaceToFree);
-            scopedLogger.LogInformation($"New cache size: {this.currentCacheSize} bytes");
+            scopedLogger.LogDebug($"New cache size: {this.currentCacheSize} bytes");
         }
 
         var imageEntry = await this.AddToCache(uri);
         this.cacheSemaphore.Release();
         this.imageRetrievalLatency.Record(stopwatch.ElapsedMilliseconds);
         this.imageCacheSize.Record(this.currentCacheSize);
-        scopedLogger.LogInformation("Added image to cache");
+        scopedLogger.LogDebug("Added image to cache");
         return imageEntry.ImageSource;
     }
 

@@ -37,6 +37,6 @@ internal sealed class ModsManager : IModsManager
             this.serviceManager.RegisterScoped<TInterface, TImplementation>();
         }
         
-        this.logger.LogInformation($"Registered mod [{typeof(TImplementation).Name}]");
+        this.logger.LogDebug($"Registered mod [{typeof(TImplementation).Name}]");
     }
 }

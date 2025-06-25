@@ -26,10 +26,10 @@ internal sealed class RenameInstallerAction : StartupActionBase
     {
         if (File.Exists(TemporaryInstallerFileName))
         {
-            this.logger.LogInformation("Detected new installer version. Overwriting old installer with new one");
+            this.logger.LogDebug("Detected new installer version. Overwriting old installer with new one");
             File.Copy(TemporaryInstallerFileName, InstallerFileName, true);
 
-            this.logger.LogInformation("Deleting new installer temporary file");
+            this.logger.LogDebug("Deleting new installer temporary file");
             File.Delete(TemporaryInstallerFileName);
         }
     }

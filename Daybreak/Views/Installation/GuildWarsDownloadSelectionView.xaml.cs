@@ -52,7 +52,7 @@ public partial class GuildWarsDownloadSelectionView : System.Windows.Controls.Us
             GuildwarsInstallationStatus = new GuildwarsInstallationStatus()
         };
         var folderPath = folderPicker.SelectedPath;
-        this.logger.LogInformation("Starting download procedure");
+        this.logger.LogDebug("Starting download procedure");
         this.viewManager.ShowView<GuildWarsDownloadView>(context);
         var success = await this.guildwarsInstaller.InstallGuildwars(folderPath, context.GuildwarsInstallationStatus, context.CancellationTokenSource.Token);
         if (success is false)
@@ -61,7 +61,7 @@ public partial class GuildWarsDownloadSelectionView : System.Windows.Controls.Us
         }
         else
         {
-            this.logger.LogInformation("Installed guildwars");
+            this.logger.LogDebug("Installed guildwars");
         }
     }
 }

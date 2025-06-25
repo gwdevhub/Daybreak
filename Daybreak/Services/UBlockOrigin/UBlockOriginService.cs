@@ -95,7 +95,7 @@ public sealed class UBlockOriginService : IBrowserExtension
             Shared.Models.Versioning.Version.TryParse(latestVersionString, out var latestVersion) &&
             currentVersion.CompareTo(latestVersion) >= 0)
         {
-            scopedLogger.LogInformation("uBlock-Origin is up to date");
+            scopedLogger.LogDebug("uBlock-Origin is up to date");
             return;
         }
 
@@ -125,7 +125,7 @@ public sealed class UBlockOriginService : IBrowserExtension
     private async Task<string?> DownloadVersion(string version, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetLatestVersion), version);
-        scopedLogger.LogInformation($"Retrieving version {version}");
+        scopedLogger.LogDebug($"Retrieving version {version}");
         var downloadUrl = ReleaseUrl.Replace(TagPlaceholder, version);
         var destinationFolder = InstallationPath;
         var destinationPath = Path.Combine(destinationFolder, ZipName);
@@ -161,7 +161,7 @@ public sealed class UBlockOriginService : IBrowserExtension
     private async Task<string?> GetLatestVersion(CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetLatestVersion), string.Empty);
-        scopedLogger.LogInformation("Retrieving version list");
+        scopedLogger.LogDebug("Retrieving version list");
         var getListResponse = await this.httpClient.GetAsync(ReleasesUrl, cancellationToken);
         if (!getListResponse.IsSuccessStatusCode)
         {

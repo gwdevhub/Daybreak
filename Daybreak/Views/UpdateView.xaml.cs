@@ -70,7 +70,7 @@ public partial class UpdateView : UserControl
             throw new InvalidOperationException("No version specified for download");
         }
 
-        this.logger.LogInformation("Starting update procedure");
+        this.logger.LogDebug("Starting update procedure");
         var success = await this.applicationUpdater.DownloadUpdate(version, this.updateStatus).ConfigureAwait(true);
         if (success is false)
         {
@@ -79,7 +79,7 @@ public partial class UpdateView : UserControl
         else
         {
             this.success= true;
-            this.logger.LogInformation("Downloaded update");
+            this.logger.LogDebug("Downloaded update");
         }
 
         this.ContinueButtonEnabled = true;

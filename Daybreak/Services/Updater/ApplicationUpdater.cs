@@ -1,6 +1,6 @@
-﻿using Daybreak.Configuration.Options;
+﻿using Daybreak.Configuration;
+using Daybreak.Configuration.Options;
 using Daybreak.Services.Updater.Models;
-using Daybreak.Shared.Exceptions;
 using Daybreak.Shared.Models.Github;
 using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Services.Downloads;
@@ -21,7 +21,6 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,7 +30,14 @@ using Version = Daybreak.Shared.Models.Versioning.Version;
 
 namespace Daybreak.Services.Updater;
 
-internal sealed class ApplicationUpdater : IApplicationUpdater, IApplicationLifetimeService
+internal sealed class ApplicationUpdater(
+    INotificationService notificationService,
+    IRegistryService registryService,
+    IDownloadService downloadService,
+    IPostUpdateActionProvider postUpdateActionProvider,
+    ILiveOptions<LauncherOptions> liveOptions,
+    IHttpClient<ApplicationUpdater> httpClient,
+    ILogger<ApplicationUpdater> logger) : IApplicationUpdater, IApplicationLifetimeService
 {
     private const string UpdatePkgSubPath = "update.pkg";
     private const string TempInstallerFileNameSubPath = "Daybreak.Installer.Temp.exe";
@@ -41,9 +47,9 @@ internal sealed class ApplicationUpdater : IApplicationUpdater, IApplicationLife
     private const string VersionTag = "{VERSION}";
     private const string FileTag = "{FILE}";
     private const string RefTagPrefix = "/refs/tags";
-    private const string VersionListUrl = "https://api.github.com/repos/AlexMacocian/Daybreak/git/refs/tags";
-    private const string Url = "https://github.com/AlexMacocian/Daybreak/releases/latest";
-    private const string DownloadUrl = $"https://github.com/AlexMacocian/Daybreak/releases/download/{VersionTag}/Daybreak{VersionTag}.zip";
+    private const string VersionListUrl = "https://api.github.com/repos/gwdevhub/Daybreak/git/refs/tags";
+    private const string Url = "https://github.com/gwdevhub/Daybreak/releases/latest";
+    private const string DownloadUrl = $"https://github.com/gwdevhub/Daybreak/releases/download/{VersionTag}/Daybreak{VersionTag}.zip";
     private const string BlobStorageUrl = $"https://daybreak.blob.core.windows.net/{VersionTag}/{FileTag}";
     private const int DownloadParallelTasks = 10;
 
@@ -55,47 +61,15 @@ internal sealed class ApplicationUpdater : IApplicationUpdater, IApplicationLife
     private readonly static TimeSpan DownloadInfoUpdateInterval = TimeSpan.FromMilliseconds(16);
 
     private readonly CancellationTokenSource updateCancellationTokenSource = new();
-    private readonly INotificationService notificationService;
-    private readonly IRegistryService registryService;
-    private readonly IDownloadService downloadService;
-    private readonly IPostUpdateActionProvider postUpdateActionProvider;
-    private readonly ILiveOptions<LauncherOptions> liveOptions;
-    private readonly IHttpClient<ApplicationUpdater> httpClient;
-    private readonly ILogger<ApplicationUpdater> logger;
+    private readonly INotificationService notificationService = notificationService.ThrowIfNull();
+    private readonly IRegistryService registryService = registryService.ThrowIfNull();
+    private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
+    private readonly IPostUpdateActionProvider postUpdateActionProvider = postUpdateActionProvider.ThrowIfNull();
+    private readonly ILiveOptions<LauncherOptions> liveOptions = liveOptions.ThrowIfNull();
+    private readonly IHttpClient<ApplicationUpdater> httpClient = httpClient.ThrowIfNull();
+    private readonly ILogger<ApplicationUpdater> logger = logger.ThrowIfNull();
 
-    public Version CurrentVersion { get; }
-
-    public ApplicationUpdater(
-        INotificationService notificationService,
-        IRegistryService registryService,
-        IDownloadService downloadService,
-        IPostUpdateActionProvider postUpdateActionProvider,
-        ILiveOptions<LauncherOptions> liveOptions,
-        IHttpClient<ApplicationUpdater> httpClient,
-        ILogger<ApplicationUpdater> logger)
-    {
-        this.notificationService = notificationService.ThrowIfNull();
-        this.registryService = registryService.ThrowIfNull();
-        this.downloadService = downloadService.ThrowIfNull();
-        this.postUpdateActionProvider = postUpdateActionProvider.ThrowIfNull();
-        this.liveOptions = liveOptions.ThrowIfNull();
-        this.httpClient = httpClient.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-
-        if (Version.TryParse(Assembly.GetExecutingAssembly()!.GetName()!.Version!.ToString(), out var currentVersion))
-        {
-            if (currentVersion.HasPrefix is false)
-            {
-                currentVersion = Version.Parse("v" + currentVersion);
-            }
-
-            this.CurrentVersion = currentVersion;
-        }
-        else
-        {
-            throw new FatalException($"Application version is invalid: {Assembly.GetExecutingAssembly().GetName().Version}");
-        }
-    }
+    public Version CurrentVersion { get; } = ProjectConfiguration.CurrentVersion;
 
     public async Task<bool> DownloadUpdate(Version version, UpdateStatus updateStatus)
     {
@@ -153,7 +127,7 @@ internal sealed class ApplicationUpdater : IApplicationUpdater, IApplicationLife
 
     public async Task<IEnumerable<Version>> GetVersions()
     {
-        this.logger.LogInformation($"Retrieving version list from {VersionListUrl}");
+        this.logger.LogDebug($"Retrieving version list from {VersionListUrl}");
         var response = await this.httpClient.GetAsync(VersionListUrl);
         if (response.IsSuccessStatusCode)
         {
@@ -366,7 +340,7 @@ internal sealed class ApplicationUpdater : IApplicationUpdater, IApplicationLife
 
         updateStatus.CurrentStep = DownloadStatus.Downloading(1, TimeSpan.Zero);
 
-        scopedLogger.LogInformation($"Prepared update package at {UpdatePkg}");
+        scopedLogger.LogDebug($"Prepared update package at {UpdatePkg}");
         updateStatus.CurrentStep = UpdateStatus.PendingRestart;
         return true;
     }
@@ -382,7 +356,7 @@ internal sealed class ApplicationUpdater : IApplicationUpdater, IApplicationLife
         }
 
         updateStatus.CurrentStep = UpdateStatus.PendingRestart;
-        this.logger.LogInformation("Downloaded update file");
+        this.logger.LogDebug("Downloaded update file");
         return true;
     }
 
@@ -412,7 +386,7 @@ internal sealed class ApplicationUpdater : IApplicationUpdater, IApplicationLife
                 FileName = InstallerFileName
             }
         };
-        this.logger.LogInformation("Launching installer");
+        this.logger.LogDebug("Launching installer");
         if (process.Start() is false)
         {
             throw new InvalidOperationException("Failed to launch installer");
@@ -421,13 +395,13 @@ internal sealed class ApplicationUpdater : IApplicationUpdater, IApplicationLife
 
     private async void ExecutePostUpdateActions()
     {
-        this.logger.LogInformation("Executing post-update actions");
+        this.logger.LogDebug("Executing post-update actions");
         foreach(var action in this.postUpdateActionProvider.GetPostUpdateActions())
         {
-            this.logger.LogInformation($"Starting [{action.GetType().Name}]");
+            this.logger.LogDebug("Starting [{actionName}]", action.GetType().Name);
             action.DoPostUpdateAction();
             await action.DoPostUpdateActionAsync();
-            this.logger.LogInformation($"Finished [{action.GetType().Name}]");
+            this.logger.LogDebug("Finished [{actionName}]", action.GetType().Name);
         }
     }
 

@@ -1,21 +1,20 @@
-﻿using Daybreak.Shared.Services.Navigation;
+﻿using Daybreak.Services.Telemetry;
+using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Services.Navigation;
 using Slim;
 using System;
+using System.Diagnostics;
 using System.Extensions;
 using System.Windows;
 using System.Windows.Controls;
 
 namespace Daybreak.Services.Navigation;
 
-internal sealed class ViewManager : IViewManager
+internal sealed class ViewManager(IServiceManager serviceManager) : IViewManager
 {
-    private readonly IServiceManager serviceManager;
+    private readonly IServiceManager serviceManager = serviceManager.ThrowIfNull(nameof(serviceManager));
     private Panel? container;
-
-    public ViewManager(IServiceManager serviceManager)
-    {
-        this.serviceManager = serviceManager.ThrowIfNull(nameof(serviceManager));
-    }
+    private Activity? currentActivity;
 
     public void RegisterContainer(Panel panel)
     {
@@ -69,11 +68,12 @@ internal sealed class ViewManager : IViewManager
                 throw new InvalidOperationException("Cannot show a view without a registered container");
             }
 
-            var view = scopedManager.GetService(viewType)?.As<UserControl>();
-            if (view is null)
-            {
-                throw new InvalidOperationException($"Unexpected error occured when attempting to show view {viewType.Name}");
-            }
+            var view = scopedManager.GetService(viewType)?.As<UserControl>() ?? throw new InvalidOperationException($"Unexpected error occured when attempting to show view {viewType.Name}");
+            this.currentActivity?.Stop();
+            this.currentActivity = TelemetryHost.Source.StartActivity(viewType.Name, ActivityKind.Internal);
+            this.currentActivity?.Start();
+            this.currentActivity?.SetTag("daybreak.view", viewType.FullName);
+            this.currentActivity?.SetTag("component", nameof(ViewManager));
 
             this.container.Children.Clear();
             this.container.Children.Add(view);

@@ -125,19 +125,26 @@ using Daybreak.Shared.Services.ReShade;
 using Daybreak.Shared.Services.Api;
 using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Services.Downloads;
-using Daybreak.Shared.Shared.Models.Plugins;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.DXVK;
 using Daybreak.Services.DXVK;
 using Daybreak.Views.Onboarding.DXVK;
 using Daybreak.Shared.Services.MDns;
 using Daybreak.Services.MDns;
+using OpenTelemetry.Resources;
+using Daybreak.Services.Telemetry;
+using System.Reflection;
+using Version = Daybreak.Shared.Models.Versioning.Version;
+using Daybreak.Shared.Models.Plugins;
+using System.Collections.Generic;
 
 namespace Daybreak.Configuration;
 
 public class ProjectConfiguration : PluginConfigurationBase
 {
     private const string DbConnectionString = "Data Source=Daybreak.sqlite.db";
+
+    public static readonly Version CurrentVersion = Version.Parse(Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? throw new InvalidOperationException("Unable to get current version"));
 
     public override void RegisterResolvers(IServiceManager serviceManager)
     {
@@ -162,21 +169,42 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped(sp => new TradeQuoteDbContext(sp.GetRequiredService<SqliteConnection>()));
         services.AddScoped(sp => new NotificationsDbContext(sp.GetRequiredService<SqliteConnection>()));
         services.AddScoped(sp => new TradeMessagesDbContext(sp.GetRequiredService<SqliteConnection>()));
+        services.AddSingleton<SwappableLoggerProvider>();
         services.AddSingleton<ILogsManager, JsonLogsManager>();
         services.AddSingleton<IConsoleLogsWriter, ConsoleLogsWriter>();
         services.AddSingleton<IEventViewerLogsWriter, EventViewerLogsWriter>();
-        services.AddSingleton<ILoggerFactory, LoggerFactory>(sp =>
+        services.AddSingleton<ILoggerFactory, ILoggerFactory>(sp =>
         {
-            var factory = new LoggerFactory();
-            factory.AddProvider(new CVLoggerProvider(sp.GetService<ILogsWriter>()));
+            var swappableLoggerProvider = sp.GetRequiredService<SwappableLoggerProvider>();
+            var factory = LoggerFactory.Create(logging =>
+            {
+                logging.ClearProviders();
+                logging.SetMinimumLevel(LogLevel.Trace);
+                logging.AddProvider(new CVLoggerProvider(sp.GetRequiredService<ILogsWriter>()));
+                logging.AddProvider(swappableLoggerProvider);
+                logging.AddFilter<SwappableLoggerProvider>(static (_, level) => level >= LogLevel.Warning);
+            });
+
             return factory;
         });
         services.AddSingleton<ILogsWriter, CompositeLogsWriter>(sp => new CompositeLogsWriter(
-            sp.GetService<ILogsManager>()!,
-            sp.GetService<IConsoleLogsWriter>()!,
-            sp.GetService<IEventViewerLogsWriter>()!));
+            sp.GetRequiredService<ILogsManager>(),
+            sp.GetRequiredService<IConsoleLogsWriter>(),
+            sp.GetRequiredService<IEventViewerLogsWriter>()));
 
         services.AddScoped((sp) => new ScopeMetadata(new CorrelationVector()));
+        services.AddSingleton(sp =>
+        {
+            var resourceBuilder = ResourceBuilder.CreateDefault().AddService("Daybreak", serviceVersion: CurrentVersion.ToString());
+            var attributes = new List<KeyValuePair<string, object>>();
+#if DEBUG
+            attributes.Add(new KeyValuePair<string, object>("deployment.environment", "debug"));
+#else
+            attributes.Add(new KeyValuePair<string, object>("deployment.environment", "production"));
+#endif
+            resourceBuilder.AddAttributes(attributes);
+            return resourceBuilder;
+        });
         services.AddSingleton<ViewManager>();
         services.AddSingleton<ProcessorUsageMonitor>();
         services.AddSingleton<MemoryUsageMonitor>();
@@ -220,6 +248,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IMDomainNameService, MDomainNameService>();
         services.AddSingleton<IMDomainRegistrar, MDomainRegistrar>();
         services.AddSingleton<IAttachedApiAccessor, AttachedApiAccessor>();
+        services.AddSingleton<TelemetryHost>();
         services.AddScoped<IBrowserExtensionsManager, BrowserExtensionsManager>();
         services.AddScoped<IBrowserExtensionsProducer, BrowserExtensionsManager>(sp => sp.GetRequiredService<IBrowserExtensionsManager>().Cast<BrowserExtensionsManager>());
         services.AddScoped<ICredentialManager, CredentialManager>();
@@ -275,6 +304,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<ScreenChoiceView>();
         viewProducer.RegisterView<VersionManagementView>();
         viewProducer.RegisterView<LogsView>();
+        viewProducer.RegisterView<TelemetryView>();
         viewProducer.RegisterView<GraphAuthorizationView>();
         viewProducer.RegisterView<BuildsSynchronizationView>();
         viewProducer.RegisterView<LauncherOnboardingView>();
@@ -361,6 +391,7 @@ public class ProjectConfiguration : PluginConfigurationBase
     {
         optionsProducer.ThrowIfNull();
 
+        optionsProducer.RegisterOptions<TelemetryOptions>();
         optionsProducer.RegisterOptions<LauncherOptions>();
         optionsProducer.RegisterOptions<SoundOptions>();
         optionsProducer.RegisterOptions<ThemeOptions>();
@@ -464,6 +495,7 @@ public class ProjectConfiguration : PluginConfigurationBase
             .RegisterButton("Executables", "Executables Settings", sp => sp.GetRequiredService<ViewManager>().ShowView<ExecutablesView>())
             .RegisterButton("Launch configurations", "Launch configurations settings", sp => sp.GetRequiredService<ViewManager>().ShowView<LaunchConfigurationsView>());
         menuServiceProducer.CreateIfNotExistCategory("Diagnostics")
+            .RegisterButton("Telemetry", "Open telemetry view", sp => sp.GetRequiredService<ViewManager>().ShowView<TelemetryView>())
             .RegisterButton("Logs", "Open logs view", sp => sp.GetRequiredService<ViewManager>().ShowView<LogsView>())
             .RegisterButton("Metrics", "Open metrics view", sp => sp.GetRequiredService<ViewManager>().ShowView<MetricsView>());
     }

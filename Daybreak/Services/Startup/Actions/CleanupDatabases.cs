@@ -37,7 +37,7 @@ internal sealed class CleanupDatabases : StartupActionBase
         if (notifications.Count > 1000)
         {
             await this.notificationsCollection.DeleteAll(cancellationToken);
-            scopedLogger.LogInformation("Cleared notifications database");
+            scopedLogger.LogDebug("Cleared notifications database");
         }
 
         var allQuotes = await this.quotesCollection.FindAll(cancellationToken).ToListAsync(cancellationToken);
@@ -51,14 +51,14 @@ internal sealed class CleanupDatabases : StartupActionBase
             }
 
             await this.quotesCollection.DeleteAll(cancellationToken);
-            scopedLogger.LogInformation("Cleared quotes database");
+            scopedLogger.LogDebug("Cleared quotes database");
         }
 
         var traderMessages = await this.traderMessagesCollection.FindAll(cancellationToken).ToListAsync(cancellationToken);
         if (traderMessages.Count > 1000)
         {
             await this.traderMessagesCollection.DeleteAll(cancellationToken);
-            scopedLogger.LogInformation("Cleared trader messages database");
+            scopedLogger.LogDebug("Cleared trader messages database");
         }
     }
 }

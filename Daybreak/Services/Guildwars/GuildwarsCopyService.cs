@@ -61,7 +61,7 @@ internal sealed class GuildWarsCopyService : IGuildWarsCopyService
 
         if (!TryGetDestinationPath(out var destinationPath))
         {
-            this.logger.LogInformation("Copy cancelled. Destination path selection cancelled");
+            this.logger.LogDebug("Copy cancelled. Destination path selection cancelled");
             copyStatus.CurrentStep = CopyStatus.CopyFailed;
             return;
         }
@@ -100,7 +100,7 @@ internal sealed class GuildWarsCopyService : IGuildWarsCopyService
         var finalPath = Path.Combine(destinationFolder.FullName, ExecutableName);
         this.guildWarsExecutableManager.AddExecutable(finalPath);
 
-        this.logger.LogInformation("Copy succeeded");
+        this.logger.LogDebug("Copy succeeded");
         copyStatus.CurrentStep = CopyStatus.CopyFinished;
     }
 
