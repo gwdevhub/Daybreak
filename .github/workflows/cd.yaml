@@ -63,6 +63,8 @@ jobs:
       run: |
         dotnet user-secrets --project Daybreak\Daybreak.csproj set AadApplicationId "${{ secrets.AadApplicationId }}"
         dotnet user-secrets --project Daybreak\Daybreak.csproj set AadTenantId "${{ secrets.AadTenantId }}"
+        dotnet user-secrets --project Daybreak\Daybreak.csproj set ApmApiKey "${{ secrets.ApmApiKey }}"
+        dotnet user-secrets --project Daybreak\Daybreak.csproj set ApmUri "${{ secrets.ApmUri }}"
 
     - name:  Restore project
       run: msbuild $env:Solution_Path /t:Restore /p:Configuration=$env:Configuration /p:RuntimeIdentifier=$env:RuntimeIdentifier --property:SolutionDir=$GITHUB_WORKSPACE
