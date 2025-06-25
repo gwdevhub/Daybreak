@@ -128,10 +128,24 @@ public partial class PriceHistoryView : UserControl
             {
                 Name = "Date",
                 LabelsPaint = this.foregroundPaint,
-                Labeler = (ticks) => new DateTime((long)ticks).ToString("d"),
+                Labeler = ticks =>
+                {
+                    if (double.IsNaN(ticks))
+                    {
+                        return string.Empty;
+                    }
+
+                    var t = (long)Math.Round(ticks);
+                    if (t < DateTime.MinValue.Ticks || t > DateTime.MaxValue.Ticks)
+                    {
+                        return string.Empty;
+                    }
+
+                    return new DateTime(t, DateTimeKind.Utc).ToString("d");
+                },
                 MinLimit = this.StartDateTime.Ticks,
                 MaxLimit = this.EndDateTime.Ticks,
-                MinStep = TimeSpan.FromHours(1).Ticks,
+                MinStep  = TimeSpan.FromHours(1).Ticks,
             }
         ];
 
