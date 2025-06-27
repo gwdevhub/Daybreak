@@ -60,14 +60,16 @@
                 <ColumnDefinition Width="auto"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="1" Text="Code: " Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" FontSize="16" VerticalAlignment="Center" />
             <TextBox Grid.Row="1" Grid.Column="1" Foreground="{StaticResource MahApps.Brushes.ThemeForeground}" Background="Transparent" FontSize="16"
                      Text="{Binding ElementName=_this, Path=CurrentBuildCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                     ToolTip="Template code for the current build"/>
+                     ToolTip="Template code for the current build"
+                     IsReadOnly="True"/>
             <buttons:CopyButton Grid.Row="1"
                     Grid.Column="2"
                     Height="30"
@@ -105,101 +107,26 @@
                            Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
                            FontSize="20"
                            VerticalAlignment="Center"/>
-                <buttons:AddButton Height="30"
-                                   Width="30"
-                                   HorizontalAlignment="Right"
-                                   Margin="2"
-                                   ToolTip="Add new build"
-                                   Clicked="AddButton_Clicked"/>
-                <ListView Grid.Row="1"
-                          ItemsSource="{Binding ElementName=_this, Path=CurrentBuild.Builds, Mode=OneWay}"
-                          SelectedItem="{Binding ElementName=_this, Path=SelectedBuild, Mode=TwoWay}"
-                          ScrollViewer.VerticalScrollBarVisibility="Auto"
-                          Background="Transparent">
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="ListViewItem">
-                            <Setter Property="Background" Value="Transparent"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource MahApps.Brushes.ThemeForeground}" />
-                            <Setter Property="BorderThickness" Value="0, 1, 0, 0" />
-                            <!-- Optional: Set the selection background to be transparent or a specific color -->
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="ListViewItem">
-                                        <Border Background="{TemplateBinding Background}"
-                                                BorderBrush="{TemplateBinding BorderBrush}"
-                                                BorderThickness="{TemplateBinding BorderThickness}">
-                                            <ContentPresenter />
-                                        </Border>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </ListView.ItemContainerStyle>
-                    <ListView.Template>
-                        <ControlTemplate>
-                            <Border
-                                    Padding="{TemplateBinding Control.Padding}"
-                                    Background="{TemplateBinding Panel.Background}"
-                                    BorderBrush="{TemplateBinding Border.BorderBrush}"
-                                    BorderThickness="{TemplateBinding Border.BorderThickness}"
-                                    SnapsToDevicePixels="True">
-                                <ScrollViewer Padding="{TemplateBinding Control.Padding}" Focusable="False">
-                                    <ItemsPresenter SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
-                                </ScrollViewer>
-                            </Border>
-                        </ControlTemplate>
-                    </ListView.Template>
-                    <ListView.ItemsPanel>
+                <ItemsControl Grid.Row="1"
+                              ItemsSource="{Binding ElementName=_this, Path=PartyMembers, Mode=OneWay}">
+                    <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <VirtualizingStackPanel />
                         </ItemsPanelTemplate>
-                    </ListView.ItemsPanel>
-                    <ListView.ItemTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Grid>
-                                <Rectangle Fill="{StaticResource MahApps.Brushes.Accent}" >
-                                    <Rectangle.Visibility>
-                                        <MultiBinding Converter="{StaticResource EqualityToVisibilityConverter}">
-                                            <Binding />
-                                            <Binding Path="SelectedItem" RelativeSource="{RelativeSource AncestorType={x:Type ListView}}" />
-                                        </MultiBinding>
-                                    </Rectangle.Visibility>
-                                </Rectangle>
-                                <buttons:HighlightButton HighlightBrush="{StaticResource MahApps.Brushes.Accent}">
-                                    <buttons:HighlightButton.ButtonContent>
-                                        <Grid>
-                                            <WrapPanel Cursor="Hand"
-                                                    VerticalAlignment="Center">
-                                                <TextBlock Text="{Binding Primary.Alias}"
-                                                           FontSize="16"
-                                                           Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"/>
-                                                <TextBlock Text="/"
-                                                           FontSize="16"
-                                                           Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"/>
-                                                <TextBlock Text="{Binding Secondary.Alias}"
-                                                           FontSize="16"
-                                                           Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"/>
-                                            </WrapPanel>
-                                        </Grid>
-                                    </buttons:HighlightButton.ButtonContent>
-                                </buttons:HighlightButton>
-                                <buttons:BinButton Height="30"
-                                                   Width="30"
-                                                   HorizontalAlignment="Right"
-                                                   VerticalAlignment="Center"
-                                                   ToolTip="Delete build"
-                                                   Clicked="BinButton_Clicked"/>
-                            </Grid>
+                            <templates:PartyMemberTemplate BehaviorChanged="PartyMemberTemplate_BehaviorChanged"
+                                                           BuildSelected="PartyMemberTemplate_BuildSelected"/>
                         </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
             </Grid>
             <templates:BuildTemplate x:Name="BuildTemplate"
-                                     Grid.Column="1"
-                                     Grid.Row="2"
-                                     DataContext="{Binding ElementName=_this, Path=SelectedBuild, Mode=OneWay}"
-                                     BuildChanged="BuildTemplate_BuildChanged">
-            </templates:BuildTemplate>
+                         Grid.Column="1"
+                         Grid.Row="3"
+                         DataContext="{Binding ElementName=_this, Path=SelectedBuild, Mode=OneWay}"
+                         BuildChanged="BuildTemplate_BuildChanged" />
         </Grid>
     </Grid>
 </UserControl>
