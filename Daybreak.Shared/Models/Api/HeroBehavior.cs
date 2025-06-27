@@ -7,6 +7,6 @@ public enum HeroBehavior
 {
     Fight,
     Guard,
-    AvoidCombat,
+    Avoid,
     Undefined
 }

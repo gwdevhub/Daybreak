@@ -16,10 +16,16 @@ public interface IBuildTemplateManager
     bool CanTemplateApply(BuildTemplateValidationRequest request);
     SingleBuildEntry CreateSingleBuild();
     SingleBuildEntry CreateSingleBuild(string name);
+    SingleBuildEntry CreateSingleBuild(BuildEntry buildEntry);
+    SingleBuildEntry CreateSingleBuild(string name, BuildEntry buildEntry);
     TeamBuildEntry CreateTeamBuild();
     TeamBuildEntry CreateTeamBuild(string name);
     TeamBuildEntry CreateTeamBuild(PartyLoadout partyLoadout);
     TeamBuildEntry CreateTeamBuild(PartyLoadout partyLoadout, string name);
+    PartyLoadout ConvertToPartyLoadout(TeamBuildEntry teamBuildEntry);
+    BuildEntry ConvertToBuildEntry(SingleBuildEntry singleBuildEntry);
+    bool CanApply(MainPlayerBuildContext mainPlayerBuildContext, TeamBuildEntry teamBuildEntry);
+    bool CanApply(MainPlayerBuildContext mainPlayerBuildContext, SingleBuildEntry singleBuildEntry);
     void ClearBuilds();
     void SaveBuild(IBuildEntry buildEntry);
     void RemoveBuild(IBuildEntry buildEntry);

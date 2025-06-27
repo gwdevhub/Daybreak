@@ -25,6 +25,7 @@ public sealed class ScopedApiContext(
     private const string GetMainPlayerInfoPath = "/api/v1/rest/main-player/info";
     private const string GetMainPlayerInstanceInfoPath = "/api/v1/rest/main-player/instance-info";
     private const string GetMainPlayerBuildPath = "/api/v1/rest/main-player/build";
+    private const string GetMainPlayerBuildContextPath = "/api/v1/rest/main-player/build-context";
     private const string PostMainPlayerBuildPath = $"/api/v1/rest/main-player/build?code={CodePlaceholder}";
     private const string PartyLoadoutPath = "/api/v1/rest/party/loadout";
     private const string GetTitleInfoPath = "/api/v1/rest/main-player/title";
@@ -88,6 +89,8 @@ public sealed class ScopedApiContext(
     public Task<LoginInfo?> GetLoginInfo(CancellationToken cancellationToken) => this.GetPayload<LoginInfo>(GetLoginInfoPath, cancellationToken);
 
     public Task<ProcessIdResponse?> GetProcessId(CancellationToken cancellationToken) => this.GetPayload<ProcessIdResponse>(GetHealthPath, cancellationToken);
+
+    public Task<MainPlayerBuildContext?> GetMainPlayerBuildContext(CancellationToken cancellationToken) => this.GetPayload<MainPlayerBuildContext>(GetMainPlayerBuildContextPath, cancellationToken);
 
     public async Task<bool> PostPartyLoadout(PartyLoadout partyLoadout, CancellationToken cancellationToken) => await this.PostPayload(PartyLoadoutPath, partyLoadout, cancellationToken);
 

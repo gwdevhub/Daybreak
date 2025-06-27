@@ -12,6 +12,8 @@ using System.Extensions;
 using System.Extensions.Core;
 using System.IO;
 using System.Linq;
+using System.Logging;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using AttributeEntry = Daybreak.Shared.Models.Builds.AttributeEntry;
@@ -69,6 +71,18 @@ public sealed class BuildTemplateManager(
             CreationTime = DateTimeOffset.UtcNow
         };
         return entry;
+    }
+
+    public SingleBuildEntry CreateSingleBuild(BuildEntry buildEntry)
+    {
+        var singleBuildEntry = this.CreateSingleBuild();
+        return this.PopulateSingleBuild(singleBuildEntry, buildEntry);
+    }
+
+    public SingleBuildEntry CreateSingleBuild(string name, BuildEntry buildEntry)
+    {
+        var singleBuildEntry = this.CreateSingleBuild(name);
+        return this.PopulateSingleBuild(singleBuildEntry, buildEntry);
     }
 
     public TeamBuildEntry CreateTeamBuild()
@@ -139,23 +153,103 @@ public sealed class BuildTemplateManager(
         return teamBuildEntry;
     }
 
+    public PartyLoadout ConvertToPartyLoadout(TeamBuildEntry teamBuildEntry)
+    {
+        if (teamBuildEntry.PartyComposition is not List<PartyCompositionMetadataEntry> partyComposition ||
+            partyComposition.Count != teamBuildEntry.Builds.Count)
+        {
+            throw new InvalidOperationException("Invalid team build entry. Team build entry contains invalid party composition metadata");
+        }
+
+        if (partyComposition.Any(c => c.Type is PartyCompositionMemberType.Hero && (c.HeroId is null || c.Behavior is null)))
+        {
+            throw new InvalidOperationException("Invalid team build entry. Hero entries without specified heroes and behaviors are not currently supported");
+        }
+
+        var loadoutEntryComposition = teamBuildEntry.Builds.Select((build, index) =>
+        {
+            var compositionEntry = partyComposition.First(c => c.Index == index);
+            return (build, compositionEntry, index);
+        });
+
+        return new PartyLoadout(
+            Entries: [.. loadoutEntryComposition.Select(entry => new PartyLoadoutEntry(
+                HeroId: entry.compositionEntry.Type is PartyCompositionMemberType.MainPlayer ? 0 : entry.compositionEntry.HeroId ?? throw new InvalidOperationException(),
+                HeroBehavior: entry.compositionEntry.Behavior ?? HeroBehavior.Guard,
+                Build: this.ConvertToBuildEntry(entry.build)))]);
+    }
+
+    public BuildEntry ConvertToBuildEntry(SingleBuildEntry singleBuildEntry)
+    {
+        return new BuildEntry(
+            Primary: singleBuildEntry.Primary.Id,
+            Secondary: singleBuildEntry.Secondary.Id,
+            Attributes: [.. singleBuildEntry.Attributes.Select(a => new Shared.Models.Api.AttributeEntry((uint)(a.Attribute?.Id ?? -1), (uint)a.Points, (uint)a.Points))],
+            Skills: [.. singleBuildEntry.Skills.Select(s => (uint)s.Id)]);
+    }
+
+    public bool CanApply(MainPlayerBuildContext mainPlayerBuildContext, TeamBuildEntry teamBuildEntry)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        if (teamBuildEntry.PartyComposition is not List<PartyCompositionMetadataEntry> partyComposition ||
+            partyComposition.Count != teamBuildEntry.Builds.Count)
+        {
+            scopedLogger.LogDebug("Invalid team build entry {buildName}. Team build entry contains invalid party composition metadata", teamBuildEntry.Name ?? string.Empty);
+            return false;
+        }
+
+        if (partyComposition.Any(c => c.Type is PartyCompositionMemberType.Hero && (c.HeroId is null || c.Behavior is null)))
+        {
+            scopedLogger.LogDebug("Invalid team build entry {buildName}. Hero entries without specified heroes and behaviors are not currently supported", teamBuildEntry.Name ?? string.Empty);
+            return false;
+        }
+
+        var loadoutEntryComposition = teamBuildEntry.Builds.Select((build, index) =>
+        {
+            var compositionEntry = partyComposition.First(c => c.Index == index);
+            return (build, compositionEntry, index);
+        });
+
+        var lockedSkill = loadoutEntryComposition
+            .Select(entry => entry.build.Skills.FirstOrDefault(s => s != Skill.NoSkill && !IsSkillUnlocked(s.Id, mainPlayerBuildContext.UnlockedAccountSkills)))
+            .OfType<Skill>()
+            .FirstOrDefault();
+        if (lockedSkill is not null)
+        {
+            scopedLogger.LogDebug("Invalid team build entry {buildName}. Skill {skillName} is not unlocked by the current account", teamBuildEntry.Name ?? string.Empty, lockedSkill.Name);
+        }
+
+        return loadoutEntryComposition.Any(entry => entry.compositionEntry.Type is PartyCompositionMemberType.MainPlayer && this.CanApply(mainPlayerBuildContext, entry.build));
+    }
+
+    public bool CanApply(MainPlayerBuildContext mainPlayerBuildContext, SingleBuildEntry singleBuildEntry)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        if (singleBuildEntry.Primary.Id != mainPlayerBuildContext.PrimaryProfessionId)
+        {
+            scopedLogger.LogDebug("Invalid build entry {buildName}. Build primary {buildPrimaryId} does not match player primary {playerPrimaryId}", singleBuildEntry.Name ?? string.Empty, singleBuildEntry.Primary.Id, mainPlayerBuildContext.PrimaryProfessionId);
+            return false;
+        }
+
+        if (singleBuildEntry.Secondary != Profession.None &&
+            !IsProfessionUnlocked(singleBuildEntry.Secondary.Id, mainPlayerBuildContext.UnlockedProfessions))
+        {
+            scopedLogger.LogDebug("Invalid build entry {buildName}. Build secondary {buildSecondaryId} is not unlocked by the player", singleBuildEntry.Name ?? string.Empty, singleBuildEntry.Secondary.Id);
+            return false;
+        }
+
+        if (singleBuildEntry.Skills.FirstOrDefault(s => s != Skill.NoSkill && !IsSkillUnlocked(s.Id, mainPlayerBuildContext.UnlockedCharacterSkills)) is Skill lockedSkill)
+        {
+            scopedLogger.LogDebug("Invalid build entry {buildName}. Skill {skillName} is not unlocked by the current character", singleBuildEntry.Name ?? string.Empty, lockedSkill.Name);
+            return false;
+        }
+
+        return true;
+    }
+
     public bool CanTemplateApply(BuildTemplateValidationRequest request)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        bool IsProfessionUnlocked(int professionId) => (request.UnlockedCharacterProfessions & (1 << professionId)) != 0;
-        bool IsSkillUnlocked(int skillId, uint[] unlockedSkills)
-        {
-            var realIndex = skillId / 32;
-            if (realIndex >= unlockedSkills.Length)
-            {
-                return false;
-            }
-
-            var shift = skillId % 32;
-            var flag = 1U << shift;
-            return (unlockedSkills[realIndex] & flag) != 0;
-        }
-
         if (request.BuildPrimary != request.CurrentPrimary)
         {
             scopedLogger.LogError("Primary profession does not match current primary profession");
@@ -163,7 +257,7 @@ public sealed class BuildTemplateManager(
         }
 
         if (request.BuildSecondary is not 0 &&
-            !IsProfessionUnlocked((int)request.BuildSecondary))
+            !IsProfessionUnlocked((int)request.BuildSecondary, request.UnlockedCharacterProfessions))
         {
             scopedLogger.LogError("Secondary profession is not unlocked");
             return false;
@@ -389,67 +483,81 @@ public sealed class BuildTemplateManager(
 
     private TeamBuildEntry PopulateTeamBuild(TeamBuildEntry teamBuildEntry, PartyLoadout partyLoadout)
     {
-        var scopedLogger = this.logger.CreateScopedLogger();
         teamBuildEntry.Builds.Clear();
         var partyCompositionMetadata = new List<PartyCompositionMetadataEntry>();
-        var index = 0;
-        foreach (var entry in partyLoadout.Entries)
+        foreach (var entry in partyLoadout.Entries.OrderBy(e => e.HeroId))
         {
             var build = entry.Build;
             var buildEntry = this.CreateSingleBuild();
-            if (!Profession.TryParse(build.Primary, out var primary))
-            {
-                scopedLogger.LogError("Failed to parse primary profession with id {professionId}", build.Primary);
-                throw new InvalidOperationException($"Failed to parse primary profession with id {build.Primary}");
-            }
+            this.PopulateSingleBuild(buildEntry, build);
 
-            if (!Profession.TryParse(build.Secondary, out var secondary))
-            {
-                scopedLogger.LogError("Failed to parse secondary profession with id {professionId}", build.Secondary);
-                throw new InvalidOperationException($"Failed to parse secondary profession with id {build.Secondary}");
-            }
-
-            buildEntry.Primary = primary;
-            buildEntry.Secondary = secondary;
-            buildEntry.Attributes = [.. build.Attributes.Select(a =>
-            {
-                if (!Daybreak.Shared.Models.Guildwars.Attribute.TryParse((int)a.Id, out var attr))
-                {
-                    scopedLogger.LogError("Failed to parse attribute with id {attributeId}", a.Id);
-                    throw new InvalidOperationException($"Failed to parse attribute with id {a.Id}");
-                }
-
-                return new Daybreak.Shared.Models.Builds.AttributeEntry
-                {
-                    Attribute = attr,
-                    Points = (int)a.BasePoints
-                };
-            })];
-            buildEntry.Skills = [.. build.Skills.Select(s =>
-            {
-                if (!Skill.TryParse((int)s, out var skill))
-                {
-                    scopedLogger.LogError("Failed to parse skill with id {skillId}", s);
-                    throw new InvalidOperationException($"Failed to parse skill with id {s}");
-                }
-
-                return skill;
-            })];
-
-            teamBuildEntry.Builds.Add(buildEntry);
-            partyCompositionMetadata.Add(new PartyCompositionMetadataEntry
+            var partyCompositionEntry = new PartyCompositionMetadataEntry
             {
                 Type = entry.HeroId is 0 ? PartyCompositionMemberType.MainPlayer : PartyCompositionMemberType.Hero,
-                Index = index,
+                Index = entry.HeroId is 0 ? 0 : teamBuildEntry.Builds.Count,
                 Behavior = entry.HeroId is 0 ? default : (HeroBehavior)entry.HeroBehavior,
                 HeroId = entry.HeroId is 0 ? default : entry.HeroId
-            });
+            };
 
-            index++;
+            if (partyCompositionEntry.Type is PartyCompositionMemberType.MainPlayer)
+            {
+                teamBuildEntry.Builds.Insert(0, buildEntry);
+                partyCompositionMetadata.Insert(0, partyCompositionEntry);
+            }
+            else
+            {
+                teamBuildEntry.Builds.Add(buildEntry);
+                partyCompositionMetadata.Add(partyCompositionEntry);
+            }
         }
 
         teamBuildEntry.PartyComposition = partyCompositionMetadata;
         return teamBuildEntry;
+    }
+
+    private SingleBuildEntry PopulateSingleBuild(SingleBuildEntry singleBuildEntry, BuildEntry buildEntry)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        if (!Profession.TryParse(buildEntry.Primary, out var primary))
+        {
+            scopedLogger.LogError("Failed to parse primary profession with id {professionId}", buildEntry.Primary);
+            throw new InvalidOperationException($"Failed to parse primary profession with id {buildEntry.Primary}");
+        }
+
+        if (!Profession.TryParse(buildEntry.Secondary, out var secondary))
+        {
+            scopedLogger.LogError("Failed to parse secondary profession with id {professionId}", buildEntry.Secondary);
+            throw new InvalidOperationException($"Failed to parse secondary profession with id {buildEntry.Secondary}");
+        }
+
+        singleBuildEntry.Primary = primary;
+        singleBuildEntry.Secondary = secondary;
+        singleBuildEntry.Attributes = [.. buildEntry.Attributes.Select(a =>
+        {
+            if (!Daybreak.Shared.Models.Guildwars.Attribute.TryParse((int)a.Id, out var attr))
+            {
+                scopedLogger.LogError("Failed to parse attribute with id {attributeId}", a.Id);
+                throw new InvalidOperationException($"Failed to parse attribute with id {a.Id}");
+            }
+
+            return new Daybreak.Shared.Models.Builds.AttributeEntry
+            {
+                Attribute = attr,
+                Points = (int)a.BasePoints
+            };
+        })];
+        singleBuildEntry.Skills = [.. buildEntry.Skills.Select(s =>
+        {
+            if (!Skill.TryParse((int)s, out var skill))
+            {
+                scopedLogger.LogError("Failed to parse skill with id {skillId}", s);
+                throw new InvalidOperationException($"Failed to parse skill with id {s}");
+            }
+
+            return skill;
+        })];
+
+        return singleBuildEntry;
     }
 
     private async Task<Result<IBuildEntry, Exception>> LoadBuildFromFile(string path, string buildName)
@@ -766,5 +874,20 @@ public sealed class BuildTemplateManager(
         }
 
         return (int)value;
+    }
+
+    private static bool IsProfessionUnlocked(int professionId, uint unlockedProfessions) => (unlockedProfessions & (1 << professionId)) != 0;
+
+    private static bool IsSkillUnlocked(int skillId, uint[] unlockedSkills)
+    {
+        var realIndex = skillId / 32;
+        if (realIndex >= unlockedSkills.Length)
+        {
+            return false;
+        }
+
+        var shift = skillId % 32;
+        var flag = 1U << shift;
+        return (unlockedSkills[realIndex] & flag) != 0;
     }
 }

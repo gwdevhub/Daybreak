@@ -9,36 +9,31 @@
     <conv:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"
                                        TriggerValue="True"/>
     <conv:NullToUnsetValueConverter x:Key="NullToUnset" />
-
+    <ContextMenu x:Key="DropDownButtonContextMenu"
+                 x:Shared="False"
+                 Placement="Bottom">
+        <ContextMenu.Template>
+            <ControlTemplate>
+                <Border  BorderBrush="{Binding PlacementTarget.BorderBrush, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                         BorderThickness="{Binding PlacementTarget.BorderThickness, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                    <Border.Background>
+                        <PriorityBinding>
+                            <!-- override brush (only if not null) -->
+                            <Binding Path="PlacementTarget.DropDownBackground" RelativeSource="{RelativeSource AncestorType=ContextMenu}" Converter="{StaticResource NullToUnset}" />
+                            <!-- fall back to the button background -->
+                            <Binding Path="PlacementTarget.Background" RelativeSource="{RelativeSource AncestorType=ContextMenu}" />
+                        </PriorityBinding>
+                    </Border.Background>
+                    <local:DropDownButtonContextMenu x:Name="PART_DropDown"
+                                                     Items="{Binding PlacementTarget.Items, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                     ItemTemplate="{Binding PlacementTarget.ItemTemplate, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                     Width="{Binding PlacementTarget.ActualWidth, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                </Border>
+            </ControlTemplate>
+        </ContextMenu.Template>
+    </ContextMenu>
     <Style TargetType="{x:Type local:DropDownButton}">
-        <Setter Property="ContextMenu">
-            <Setter.Value>
-                <ContextMenu Placement="Bottom">
-                    <ContextMenu.Template>
-                        <ControlTemplate>
-                            <Border  BorderBrush="{Binding PlacementTarget.BorderBrush, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                                     BorderThickness="{Binding PlacementTarget.BorderThickness, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
-                                <Border.Background>
-                                    <PriorityBinding>
-                                        <!-- override brush (only if not null) -->
-                                        <Binding Path="PlacementTarget.DropDownBackground" RelativeSource="{RelativeSource AncestorType=ContextMenu}" Converter="{StaticResource NullToUnset}" />
-
-                                        <!-- fall back to the button background -->
-                                        <Binding Path="PlacementTarget.Background" RelativeSource="{RelativeSource AncestorType=ContextMenu}" />
-                                    </PriorityBinding>
-                                </Border.Background>
-                                <local:DropDownButtonContextMenu
-                                    x:Name="PART_DropDown"
-                                     Items="{Binding PlacementTarget.Items, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                                     ItemTemplate="{Binding PlacementTarget.ItemTemplate, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                                     Width="{Binding PlacementTarget.ActualWidth, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                            </Border>
-                        </ControlTemplate>
-                    </ContextMenu.Template>
-                </ContextMenu>
-            </Setter.Value>
-        </Setter>
-
+        <Setter Property="ContextMenu" Value="{StaticResource DropDownButtonContextMenu}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:DropDownButton}">

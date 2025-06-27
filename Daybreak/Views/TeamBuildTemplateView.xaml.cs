@@ -1,4 +1,6 @@
 ﻿using Daybreak.Controls.Buttons;
+using Daybreak.Controls.Templates;
+using Daybreak.Shared.Models.Api;
 using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.BuildTemplates;
@@ -7,6 +9,7 @@ using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Toolbox;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Linq;
@@ -40,11 +43,17 @@ public partial class TeamBuildTemplateView : UserControl
     [GenerateDependencyProperty]
     private TeamBuildEntry currentBuild = default!;
     [GenerateDependencyProperty]
+    private List<PartyMemberEntry> partyMembers = default!;
+    [GenerateDependencyProperty]
+    private PartyMemberEntry selectedPartyMember = default!;
+    [GenerateDependencyProperty]
     private string currentBuildCode = string.Empty;
     [GenerateDependencyProperty]
     private string currentBuildSource = string.Empty;
     [GenerateDependencyProperty]
     private string currentBuildSubCode = string.Empty;
+    [GenerateDependencyProperty]
+    private bool isPartyLocked = false;
 
     public TeamBuildTemplateView(
         IToolboxService toolboxService,
@@ -69,6 +78,13 @@ public partial class TeamBuildTemplateView : UserControl
                 this.CurrentBuildCode = this.buildTemplateManager.EncodeTemplate(this.CurrentBuild);
                 this.CurrentBuildSource = buildEntry.SourceUrl;
                 this.SelectedBuild = this.CurrentBuild.Builds.FirstOrDefault();
+                this.PartyMembers = this.CurrentBuild.PartyComposition?.Select(p => new PartyMemberEntry
+                {
+                    Behavior = p.Behavior ?? HeroBehavior.Undefined,
+                    Build = this.CurrentBuild.Builds[p.Index],
+                    Hero = Hero.TryParse((int)(p.HeroId ?? -1), out _) ? Hero.Parse((int)p.HeroId!) : default,
+                }).ToList()!;
+                this.IsPartyLocked = this.PartyMembers is not null;
                 this.preventDecode = false;
                 this.CurrentBuild.PropertyChanged += this.CurrentBuild_PropertyChanged;
             }
@@ -329,6 +345,46 @@ public partial class TeamBuildTemplateView : UserControl
         this.notificationService.NotifyInformation(
             "Copied team build code",
             $"Copied {this.CurrentBuildCode} code to clipboard");
+    }
+
+    private void PartyMemberTemplate_BehaviorChanged(object sender, HeroBehavior e)
+    {
+        if (sender is not PartyMemberTemplate template ||
+            template.DataContext is not PartyMemberEntry entry)
+        {
+            return;
+        }
+
+        var currentComposition = this.CurrentBuild.PartyComposition ?? [];
+        var oldComposition = currentComposition.Select((entry, index) => (entry, index)).FirstOrDefault(p => p.entry.HeroId == entry.Hero?.Id);
+        if (oldComposition.entry.HeroId is null ||
+            oldComposition.entry.HeroId != entry.Hero?.Id)
+        {
+            return;
+        }
+
+        var newComposition = new PartyCompositionMetadataEntry
+        {
+            Index = oldComposition.entry.Index,
+            Type = oldComposition.entry.Type,
+            HeroId = oldComposition.entry.HeroId,
+            Behavior = e
+        };
+        currentComposition[oldComposition.index] = newComposition;
+        this.CurrentBuild.PartyComposition = currentComposition;
+    }
+
+    private void PartyMemberListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        this.SelectedBuild = this.SelectedPartyMember?.Build;
+    }
+
+    private void PartyMemberTemplate_BuildSelected(object _, IBuildEntry e)
+    {
+        if (e is SingleBuildEntry build)
+        {
+            this.SelectedBuild = build;
+        }
     }
 }
 

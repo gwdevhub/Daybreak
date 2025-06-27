@@ -111,7 +111,7 @@ public abstract class BuildEntryBase : INotifyPropertyChanged, IBuildEntry
         set
         {
             this.Metadata ??= [];
-            this.Metadata[nameof(PartyCompositionMetadataEntry)] = value is null 
+            this.Metadata[nameof(this.PartyComposition)] = value is null 
                 ? string.Empty
                 : JsonConvert.SerializeObject(value, Formatting.None);
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.PartyComposition)));
