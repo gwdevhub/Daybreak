@@ -76,10 +76,16 @@
         <Grid Grid.Column="1"
               Margin="5, 0, 5, 0">
             <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
                 <RowDefinition Height="{Binding ElementName=Browser, Path=BrowserSupported, Mode=OneWay, Converter={StaticResource BrowserComponentVisibilityConverter}}" />
             </Grid.RowDefinitions>
+            <components:BuildComponent Margin="0, 0, 0, 10"
+                                       DataContext="{Binding ElementName=_this, Path=BuildComponentContext, Mode=OneWay}"
+                                       ValidData="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay}"
+                                       Visibility="{Binding ElementName=_this, Path=BuildComponentContext.IsInOutpost, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                       NavigateToClicked="Component_NavigateToClicked"/>
             <Grid x:Name="BrowserHolder"
-                  Grid.Row="0">
+                  Grid.Row="1">
                 <controls:ChromiumBrowserWrapper
                     x:Name="Browser"
                     ControlsEnabled="True"

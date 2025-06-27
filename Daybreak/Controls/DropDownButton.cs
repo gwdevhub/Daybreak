@@ -18,6 +18,7 @@ public partial class DropDownButton : Control
     private const string PartMainButton = "PART_MainButton";
     private const string PartArrowButton = "PART_ArrowButton";
     private const string PartDropDown = "PART_DropDown";
+    private const string DropDownContextMenu = "DropDownContextMenu";
 
     [GenerateDependencyProperty]
     private DataTemplate itemTemplate = default!;
@@ -72,28 +73,12 @@ public partial class DropDownButton : Control
             this.arrowButton.Clicked -= this.ArrowButton_Clicked;
         }
 
-        if (this.ContextMenu is not null)
-        {
-            this.ContextMenu.Opened -= this.ContextMenu_Opened;
-        }
-
-        this.mainButton = this.GetTemplateChild(PartMainButton) as HighlightButton;
-        this.arrowButton = this.GetTemplateChild(PartArrowButton) as HighlightButton;
-
-        if (this.mainButton is not null)
-        {
-            this.mainButton.Clicked += this.MainButton_Clicked;
-        }
-
-        if (this.arrowButton is not null)
-        {
-            this.arrowButton.Clicked += this.ArrowButton_Clicked;
-        }
-
-        if (this.ContextMenu is not null)
-        {
-            this.ContextMenu.Opened += this.ContextMenu_Opened;
-        }
+        this.ContextMenu ??= (ContextMenu)this.TryFindResource(DropDownContextMenu);
+        this.mainButton = (HighlightButton)this.GetTemplateChild(PartMainButton);
+        this.arrowButton = (HighlightButton)this.GetTemplateChild(PartArrowButton);
+        this.AttachItemClickedHandler(this.ContextMenu);
+        this.mainButton.Clicked += this.MainButton_Clicked;
+        this.arrowButton.Clicked += this.ArrowButton_Clicked;
     }
 
     private void MainButton_Clicked(object? sender, object e)
@@ -110,19 +95,6 @@ public partial class DropDownButton : Control
         }
     }
 
-    // When the context‑menu opens, locate the DropDownButtonContextMenu inside it and hook its CLR event.
-    private void ContextMenu_Opened(object? sender, RoutedEventArgs e)
-    {
-        if (sender is not ContextMenu menu)
-            return;
-
-        if (menu.Template.FindName(PartDropDown, menu) is DropDownButtonContextMenu dropDown)
-        {
-            dropDown.ItemClicked -= this.DropDownButtonContextMenu_ItemClicked; // avoid duplicates
-            dropDown.ItemClicked += this.DropDownButtonContextMenu_ItemClicked;
-        }
-    }
-
     private void DropDownButtonContextMenu_ItemClicked(object? _, object e)
     {
         this.SelectedItem = e;
@@ -132,5 +104,16 @@ public partial class DropDownButton : Control
         }
 
         this.SelectionChanged?.Invoke(this, e);
+    }
+
+    private void AttachItemClickedHandler(ContextMenu menu)
+    {
+        // Ensure the visual tree is built
+        menu.ApplyTemplate();
+        if (menu.Template.FindName(PartDropDown, menu) is DropDownButtonContextMenu dropDown)
+        {
+            dropDown.ItemClicked -= this.DropDownButtonContextMenu_ItemClicked;
+            dropDown.ItemClicked += this.DropDownButtonContextMenu_ItemClicked;
+        }
     }
 }

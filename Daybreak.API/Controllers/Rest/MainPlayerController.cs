@@ -99,4 +99,16 @@ public sealed class MainPlayerController(
         var titleInfo = await this.mainPlayerService.GetTitleInfo(cancellationToken);
         return titleInfo is not null ? Results.Ok(titleInfo) : Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
     }
+
+    [GenerateGet("build-context")]
+    [EndpointName("GetMainPlayerBuildContext")]
+    [EndpointSummary("Get the current build context")]
+    [EndpointDescription("Get the current build context. Returns a json serialized MainPlayerBuildContext object")]
+    [ProducesResponseType<BuildEntry>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+    public async Task<IResult> GetMainPlayerBuildContext(CancellationToken cancellationToken)
+    {
+        var context = await this.mainPlayerService.GetMainPlayerBuildContext(cancellationToken);
+        return context is not null ? Results.Ok(context) : Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
+    }
 }

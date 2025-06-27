@@ -12,6 +12,7 @@ using System.Collections.Concurrent;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
+using System.Logging;
 using System.Runtime.CompilerServices;
 using ZLinq;
 using InstanceType = Daybreak.API.Interop.GuildWars.InstanceType;
@@ -424,6 +425,52 @@ public sealed class MainPlayerService : IDisposable
                     TierNumber: titleTier.TierNumber,
                     MaxTierNumber: currentTitle.Value.MaxTitleTierIndex
                 );
+            }
+        }, cancellationToken);
+    }
+
+    public Task<MainPlayerBuildContext?> GetMainPlayerBuildContext(CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        return this.gameThreadService.QueueOnGameThread(() =>
+        {
+            unsafe
+            {
+                if (this.instanceContextService.GetInstanceType() is InstanceType.Loading)
+                {
+                    scopedLogger.LogError("Not loaded");
+                    return default;
+                }
+
+                var gameContext = this.gameContextService.GetGameContext();
+                if (gameContext.IsNull ||
+                    gameContext.Pointer->AccountContext is null ||
+                    gameContext.Pointer->WorldContext is null)
+                {
+                    this.logger.LogError("Game context is not initialized");
+                    return default;
+                }
+
+                var playerAgentId = this.agentContextService.GetPlayerAgentId();
+                if (playerAgentId is 0x0)
+                {
+                    scopedLogger.LogError("Failed to get player agent id");
+                    return default;
+                }
+
+                var agentProfession = gameContext.Pointer->WorldContext->Professions.AsValueEnumerable().FirstOrDefault(p => p.AgentId == playerAgentId);
+                if (agentProfession.AgentId != playerAgentId)
+                {
+                    scopedLogger.LogError("Failed to find agent profession for player agent id {agentId}", playerAgentId);
+                    return default;
+                }
+
+                return new MainPlayerBuildContext(
+                    PrimaryProfessionId: (uint)agentProfession.CurrentPrimary,
+                    UnlockedProfessions: agentProfession.UnlockedProfessionsFlags,
+                    UnlockedAccountSkills: gameContext.Pointer->AccountContext->UnlockedAccountSkills.AsValueEnumerable().ToArray(),
+                    UnlockedCharacterSkills: gameContext.Pointer->WorldContext->UnlockedCharacterSkills.AsValueEnumerable().ToArray());
+
             }
         }, cancellationToken);
     }

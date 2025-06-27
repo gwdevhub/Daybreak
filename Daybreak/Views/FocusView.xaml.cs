@@ -79,6 +79,9 @@ public partial class FocusView : UserControl
     [GenerateDependencyProperty]
     private VanquishComponentContext vanquishComponentContext = default!;
 
+    [GenerateDependencyProperty]
+    private BuildComponentContext buildComponentContext = default!;
+
     private bool browserMaximized = false;
     private CancellationTokenSource? cancellationTokenSource;
 
@@ -189,13 +192,14 @@ public partial class FocusView : UserControl
 
                 var mainPlayerInfoTask = context.ApiContext.GetMainPlayerInfo(cancellationToken);
                 var mainPlayerStateTask = context.ApiContext.GetMainPlayerState(cancellationToken);
-                
+                var mainPlayerBuildContextTask = context.ApiContext.GetMainPlayerBuildContext(cancellationToken);
                 var characterSelectTask = context.ApiContext.GetCharacters(cancellationToken);
                 var titleInfoTask = context.ApiContext.GetTitleInfo(cancellationToken);
                 var questLogTask = context.ApiContext.GetMainPlayerQuestLog(cancellationToken);
                 await Task.WhenAll(
                     mainPlayerInfoTask,
                     mainPlayerStateTask,
+                    mainPlayerBuildContextTask,
                     characterSelectTask,
                     titleInfoTask,
                     questLogTask,
@@ -203,6 +207,7 @@ public partial class FocusView : UserControl
 
                 var mainPlayerInfo = await mainPlayerInfoTask;
                 var mainPlayerState = await mainPlayerStateTask;
+                var mainPlayerBuildContext = await mainPlayerBuildContextTask;
                 var characters = await characterSelectTask;
                 var titleInfo = await titleInfoTask;
                 var questLog = await questLogTask;
@@ -210,7 +215,8 @@ public partial class FocusView : UserControl
                 if (mainPlayerInfo is null ||
                     mainPlayerState is null ||
                     characters is null ||
-                    questLog is null)
+                    questLog is null ||
+                    mainPlayerBuildContext is null)
                 {
                     this.MainPlayerDataValid = false;
                     continue;
@@ -222,6 +228,7 @@ public partial class FocusView : UserControl
                 this.SetQuestLogComponentContext(questLog);
                 this.SetPlayerResourcesComponentContext(mainPlayerState);
                 this.SetVanquishComponentContext(instanceInfo);
+                this.SetBuildComponentContext(instanceInfo, mainPlayerBuildContext);
 
                 this.MainPlayerDataValid = !this.PauseDataFetching;
                 this.Browser.Visibility = Visibility.Visible;
@@ -508,6 +515,18 @@ public partial class FocusView : UserControl
             TotalImperial = state.TotalImperial,
             TotalLuxon = state.TotalLuxon,
             TotalKurzick = state.TotalKurzick,
+        };
+    }
+
+    private void SetBuildComponentContext(InstanceInfo instanceInfo, MainPlayerBuildContext mainPlayerBuildContext)
+    {
+        this.BuildComponentContext = new BuildComponentContext
+        {
+            IsInOutpost = instanceInfo.Type is Shared.Models.Api.InstanceType.Outpost,
+            PrimaryProfessionId = mainPlayerBuildContext.PrimaryProfessionId,
+            AccountUnlockedSkills = mainPlayerBuildContext.UnlockedAccountSkills,
+            CharacterUnlockedSkills = mainPlayerBuildContext.UnlockedCharacterSkills,
+            UnlockedProfessions = mainPlayerBuildContext.UnlockedProfessions,
         };
     }
 }
