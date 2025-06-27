@@ -182,7 +182,7 @@ public partial class LauncherView : UserControl
         }
         else
         {
-            var launchingTask = Task.Factory.StartNew(() => this.LaunchGuildWars(this.cancellationTokenSource?.Token ?? CancellationToken.None), TaskCreationOptions.LongRunning);
+            var launchingTask = Task.Factory.StartNew(() => this.LaunchGuildWars(this.cancellationTokenSource?.Token ?? CancellationToken.None), TaskCreationOptions.LongRunning).Unwrap();
             try
             {
                 await launchingTask;
@@ -216,7 +216,7 @@ public partial class LauncherView : UserControl
             this.LatestConfiguration.CanLaunch ||
             this.LatestConfiguration.CanAttach)
         {
-            this.CanLaunch = true;
+            this.CanLaunch = !this.launching;
 
         }
 
