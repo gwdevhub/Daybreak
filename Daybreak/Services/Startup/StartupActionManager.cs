@@ -7,18 +7,12 @@ using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.Startup;
 
-internal sealed class StartupActionManager : IStartupActionProducer, IApplicationLifetimeService
+internal sealed class StartupActionManager(
+    IServiceManager serviceManager,
+    ILogger<StartupActionManager> logger) : IStartupActionProducer, IApplicationLifetimeService
 {
-    private readonly IServiceManager serviceManager;
-    private readonly ILogger<StartupActionManager> logger;
-
-    public StartupActionManager(
-        IServiceManager serviceManager,
-        ILogger<StartupActionManager> logger)
-    {
-        this.serviceManager = serviceManager.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly IServiceManager serviceManager = serviceManager.ThrowIfNull();
+    private readonly ILogger<StartupActionManager> logger = logger.ThrowIfNull();
 
     public void OnClosing()
     {
@@ -38,7 +32,7 @@ internal sealed class StartupActionManager : IStartupActionProducer, IApplicatio
 
             try
             {
-                Task.WaitAll(asyncTasks.ToArray());
+                Task.WaitAll([.. asyncTasks]);
             }
             catch (Exception e)
             {

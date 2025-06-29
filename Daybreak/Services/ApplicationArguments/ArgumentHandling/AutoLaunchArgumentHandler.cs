@@ -7,26 +7,19 @@ using System.Core.Extensions;
 using System.Extensions;
 
 namespace Daybreak.Services.ApplicationArguments.ArgumentHandling;
-internal sealed class AutoLaunchArgumentHandler : IArgumentHandler
+internal sealed class AutoLaunchArgumentHandler(
+    IViewManager viewManager,
+    ILaunchConfigurationService launchConfigurationService,
+    ILogger<AutoLaunchArgumentHandler> logger) : IArgumentHandler
 {
     private static readonly TimeSpan StartupDelay = TimeSpan.FromSeconds(1);
 
-    private readonly IViewManager viewManager;
-    private readonly ILaunchConfigurationService launchConfigurationService;
-    private readonly ILogger<AutoLaunchArgumentHandler> logger;
+    private readonly IViewManager viewManager = viewManager.ThrowIfNull();
+    private readonly ILaunchConfigurationService launchConfigurationService = launchConfigurationService.ThrowIfNull();
+    private readonly ILogger<AutoLaunchArgumentHandler> logger = logger.ThrowIfNull();
 
     public string Identifier => "-auto-launch";
     public int ExpectedArgumentCount => 1;
-
-    public AutoLaunchArgumentHandler(
-        IViewManager viewManager,
-        ILaunchConfigurationService launchConfigurationService,
-        ILogger<AutoLaunchArgumentHandler> logger)
-    {
-        this.viewManager = viewManager.ThrowIfNull();
-        this.launchConfigurationService = launchConfigurationService.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
 
     public async void HandleArguments(string[] args)
     {

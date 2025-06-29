@@ -131,7 +131,7 @@ internal sealed class ApplicationUpdater(
             return versionList!.Select(v => v.Ref!.Remove(0, RefTagPrefix.Length)).Select(v => new Version(v));
         }
 
-        return new List<Version>();
+        return [];
     }
 
     public async Task<string?> GetChangelog(Version version)

@@ -20,10 +20,7 @@ public sealed class StartupStatus : INotifyPropertyChanged
         }
     } = Starting;
 
-    public class StartupStep : LoadStatus
+    public class StartupStep(string description) : LoadStatus(description)
     {
-        public StartupStep(string description) : base(description)
-        {
-        }
     }
 }

@@ -2,12 +2,7 @@
 
 namespace Daybreak.Shared.Models;
 
-public class ScopeMetadata
+public class ScopeMetadata(CorrelationVector correlationVector)
 {
-    public CorrelationVector CorrelationVector { get; set; }
-
-    public ScopeMetadata(CorrelationVector correlationVector)
-    {
-        this.CorrelationVector = correlationVector;
-    }
+    public CorrelationVector CorrelationVector { get; set; } = correlationVector;
 }

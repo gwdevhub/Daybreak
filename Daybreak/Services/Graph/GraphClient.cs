@@ -315,7 +315,7 @@ internal sealed class GraphClient : IGraphClient
 
         var buildList = this.buildsCache ?? [];
         // Remove the previous version of the build
-        buildList = buildList.Where(b => b.FileName != buildEntry.Name).ToList();
+        buildList = [.. buildList.Where(b => b.FileName != buildEntry.Name)];
         // Add new version of the build
         buildList.Add(buildFile);
         // Order by name

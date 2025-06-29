@@ -16,20 +16,14 @@ namespace Daybreak.Controls.Options;
 /// <summary>
 /// Interaction logic for OptionsSection.xaml
 /// </summary>
-public partial class OptionsSection : UserControl
+public partial class OptionsSection(
+    IOptionsProvider optionsProvider,
+    IViewManager viewManager) : UserControl
 {
-    private readonly IOptionsProvider optionsProvider;
-    private readonly IViewManager viewManager;
+    private readonly IOptionsProvider optionsProvider = optionsProvider.ThrowIfNull();
+    private readonly IViewManager viewManager = viewManager.ThrowIfNull();
 
     public ObservableCollection<OptionSection> Options { get; } = [];
-
-    public OptionsSection(
-        IOptionsProvider optionsProvider,
-        IViewManager viewManager)
-    {
-        this.optionsProvider = optionsProvider.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
-    }
 
     public OptionsSection()
         : this(Global.GlobalServiceProvider.GetRequiredService<IOptionsProvider>(),

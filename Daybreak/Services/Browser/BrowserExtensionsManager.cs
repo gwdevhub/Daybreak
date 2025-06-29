@@ -7,15 +7,10 @@ using System.IO;
 
 namespace Daybreak.Services.Browser;
 
-public sealed class BrowserExtensionsManager : IBrowserExtensionsManager, IBrowserExtensionsProducer
+public sealed class BrowserExtensionsManager(
+    IServiceManager serviceManager) : IBrowserExtensionsManager, IBrowserExtensionsProducer
 {
-    private readonly IServiceManager serviceManager;
-
-    public BrowserExtensionsManager(
-        IServiceManager serviceManager)
-    {
-        this.serviceManager = serviceManager.ThrowIfNull();
-    }
+    private readonly IServiceManager serviceManager = serviceManager.ThrowIfNull();
 
     public void RegisterExtension<T>()
         where T : class, IBrowserExtension

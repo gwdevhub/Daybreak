@@ -15,7 +15,10 @@ using System.IO;
 using System.Runtime.CompilerServices;
 
 namespace Daybreak.Services.GuildWars;
-internal sealed class IntegratedGuildwarsInstaller : IGuildWarsInstaller
+internal sealed class IntegratedGuildwarsInstaller(
+    IGuildWarsExecutableManager guildWarsExecutableManager,
+    INotificationService notificationService,
+    ILogger<IntegratedGuildwarsInstaller> logger) : IGuildWarsInstaller
 {
     private const string ExeName = "Gw.exe";
     private const string CompressedTempExeName = $"Gw.{VersionPlaceholder}.temp";
@@ -23,19 +26,9 @@ internal sealed class IntegratedGuildwarsInstaller : IGuildWarsInstaller
     private const string VersionPlaceholder = "[VERSION]";
     private static readonly string StagingFolder = PathUtils.GetAbsolutePathFromRoot("GuildWarsCache");
 
-    private readonly IGuildWarsExecutableManager guildWarsExecutableManager;
-    private readonly INotificationService notificationService;
-    private readonly ILogger<IntegratedGuildwarsInstaller> logger;
-
-    public IntegratedGuildwarsInstaller(
-        IGuildWarsExecutableManager guildWarsExecutableManager,
-        INotificationService notificationService,
-        ILogger<IntegratedGuildwarsInstaller> logger)
-    {
-        this.guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
-        this.notificationService = notificationService.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly IGuildWarsExecutableManager guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
+    private readonly INotificationService notificationService = notificationService.ThrowIfNull();
+    private readonly ILogger<IntegratedGuildwarsInstaller> logger = logger.ThrowIfNull();
 
     public async IAsyncEnumerable<GuildWarsUpdateResponse> CheckAndUpdateGuildWarsExecutables(List<GuildWarsUpdateRequest> requests, [EnumeratorCancellation]CancellationToken cancellationToken)
     {

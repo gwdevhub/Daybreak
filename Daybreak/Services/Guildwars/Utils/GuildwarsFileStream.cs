@@ -4,35 +4,25 @@ using System.Core.Extensions;
 using System.IO;
 
 namespace Daybreak.Services.GuildWars.Utils;
-internal sealed class GuildwarsFileStream : Stream
+internal sealed class GuildwarsFileStream(GuildWarsClientContext guildwarsClientContext, GuildWarsClient guildwarsClient, int fileId, int sizeCompressed, int sizeDecompressed, int crc) : Stream
 {
-    private readonly GuildWarsClient guildwarsClient;
-    private readonly GuildWarsClientContext guildwarsClientContext;
+    private readonly GuildWarsClient guildwarsClient = guildwarsClient.ThrowIfNull();
+    private readonly GuildWarsClientContext guildwarsClientContext = guildwarsClientContext;
 
     private byte[]? chunkBuffer;
     private int positionInBuffer = 0;
     private int chunkSize = 0;
 
-    public int FileId { get; init; }
-    public int SizeCompressed { get; init; }
-    public int SizeDecompressed { get; init; }
-    public int Crc { get; init; }
+    public int FileId { get; init; } = fileId;
+    public int SizeCompressed { get; init; } = sizeCompressed;
+    public int SizeDecompressed { get; init; } = sizeDecompressed;
+    public int Crc { get; init; } = crc;
 
     public override bool CanRead => true;
     public override bool CanSeek => false;
     public override bool CanWrite => false;
     public override long Length => this.SizeCompressed;
     public override long Position { get; set; }
-
-    public GuildwarsFileStream(GuildWarsClientContext guildwarsClientContext, GuildWarsClient guildwarsClient, int fileId, int sizeCompressed, int sizeDecompressed, int crc)
-    {
-        this.guildwarsClient = guildwarsClient.ThrowIfNull();
-        this.guildwarsClientContext = guildwarsClientContext;
-        this.FileId = fileId;
-        this.SizeCompressed = sizeCompressed;
-        this.SizeDecompressed = sizeDecompressed;
-        this.Crc = crc;
-    }
 
     public override void Flush()
     {

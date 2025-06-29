@@ -55,7 +55,7 @@ public partial class UModMainView : UserControl
 
     private void SaveButton_Clicked(object _, EventArgs e)
     {
-        this.uModService.SaveMods(this.Mods.ToList());
+        this.uModService.SaveMods([.. this.Mods]);
         this.uModService.IsEnabled = this.UModEnabled;
         while(this.queuedSaveActions.TryDequeue(out var action))
         {

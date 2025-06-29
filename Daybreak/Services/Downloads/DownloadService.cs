@@ -11,25 +11,18 @@ using System.Net.Http;
 
 namespace Daybreak.Services.Downloads;
 
-internal sealed class DownloadService : IDownloadService
+internal sealed class DownloadService(
+    IMetricsService metricsService,
+    IHttpClient<DownloadService> httpClient,
+    ILogger<DownloadService> logger) : IDownloadService
 {
     private const double StatusUpdateInterval = 50;
     private const string MetricUnits = "bytes/sec";
     private const string MetricDescription = "Average download speed. Specified in bytes per second";
 
-    private readonly Histogram<double> averageDownloadSpeed;
-    private readonly IHttpClient<DownloadService> httpClient;
-    private readonly ILogger<DownloadService> logger;
-
-    public DownloadService(
-        IMetricsService metricsService,
-        IHttpClient<DownloadService> httpClient,
-        ILogger<DownloadService> logger)
-    {
-        this.averageDownloadSpeed = metricsService.ThrowIfNull().CreateHistogram<double>(nameof(DownloadService), MetricUnits, MetricDescription, AggregationTypes.NoAggregate);
-        this.httpClient = httpClient.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly Histogram<double> averageDownloadSpeed = metricsService.ThrowIfNull().CreateHistogram<double>(nameof(DownloadService), MetricUnits, MetricDescription, AggregationTypes.NoAggregate);
+    private readonly IHttpClient<DownloadService> httpClient = httpClient.ThrowIfNull();
+    private readonly ILogger<DownloadService> logger = logger.ThrowIfNull();
 
     public async Task<bool> DownloadFile(string downloadUri, string destinationPath, DownloadStatus downloadStatus, CancellationToken cancellationToken = default)
     {

@@ -193,7 +193,7 @@ public sealed class Version : IEquatable<Version>, IComparable<Version>
         for(int i = 0; i < tokens.Length - 1; i++)
         {
             var token = tokens[i];
-            if (token.IsNullOrWhiteSpace() || token.All(c => char.IsDigit(c)) is false)
+            if (token.IsNullOrWhiteSpace() || token.All(char.IsDigit) is false)
             {
                 return false;
             }
@@ -210,13 +210,13 @@ public sealed class Version : IEquatable<Version>, IComparable<Version>
                 return false;
             }
 
-            if (lastTokenParts[0].IsNullOrWhiteSpace() || lastTokenParts[0].All(c => char.IsDigit(c)) is false)
+            if (lastTokenParts[0].IsNullOrWhiteSpace() || lastTokenParts[0].All(char.IsDigit) is false)
             {
                 return false;
             }
 
             parts.Add(VersionToken.Parse(lastTokenParts[0]));
-            if (lastTokenParts[1].IsNullOrWhiteSpace() || lastTokenParts[1].All(c => char.IsLetter(c)) is false)
+            if (lastTokenParts[1].IsNullOrWhiteSpace() || lastTokenParts[1].All(char.IsLetter) is false)
             {
                 return false;
             }

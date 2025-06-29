@@ -107,8 +107,8 @@ public sealed class Profession : IWikiEntity
         PrimaryAttribute = Attribute.Mysticism,
         Attributes = [Attribute.EarthPrayers, Attribute.ScytheMastery, Attribute.WindPrayers]
     };
-    public static IEnumerable<Profession> Professions = new List<Profession>
-    {
+    public static IEnumerable<Profession> Professions =
+    [
         None,
         Warrior,
         Ranger,
@@ -120,7 +120,7 @@ public sealed class Profession : IWikiEntity
         Ritualist,
         Paragon,
         Dervish
-    };
+    ];
     public static bool TryParse(int id, out Profession profession)
     {
         profession = Professions.Where(prof => prof.Id == id).FirstOrDefault()!;

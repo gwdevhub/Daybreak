@@ -35,7 +35,7 @@ internal static class EncryptionHelper
     {
         var saltBytes = new byte[Aes.BlockSize / 8];
         var ivBytes = new byte[Aes.BlockSize / 8];
-        var cipherBytes = new byte[bytes.Length - Aes.BlockSize / 4];
+        var cipherBytes = new byte[bytes.Length - (Aes.BlockSize / 4)];
 
         using var encryptedStream = new MemoryStream(bytes);
         encryptedStream.Read(saltBytes, 0, saltBytes.Length);
@@ -49,7 +49,7 @@ internal static class EncryptionHelper
         using var cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Read);
         var plainTextBytes = new byte[memoryStream.Length];
         var decryptedByteCount = cryptoStream.Read(plainTextBytes, 0, plainTextBytes.Length);
-        return plainTextBytes.Take(decryptedByteCount).ToArray();
+        return [.. plainTextBytes.Take(decryptedByteCount)];
     }
 
     private static byte[] Generate128BitsOfRandomEntropy()

@@ -50,10 +50,12 @@ public sealed class TradeAlertConverter : JsonConverter<ITradeAlert>
             return;
         }
 
-        var jObject = new JObject();
-        jObject[nameof(ITradeAlert.Name)] = value.Name;
-        jObject[nameof(ITradeAlert.Enabled)] = value.Enabled;
-        jObject[nameof(ITradeAlert.Id)] = value.Id;
+        var jObject = new JObject
+        {
+            [nameof(ITradeAlert.Name)] = value.Name,
+            [nameof(ITradeAlert.Enabled)] = value.Enabled,
+            [nameof(ITradeAlert.Id)] = value.Id
+        };
         if (value is TradeAlert tradeAlert)
         {
             jObject[nameof(TradeAlert.MessageCheck)] = tradeAlert.MessageCheck;

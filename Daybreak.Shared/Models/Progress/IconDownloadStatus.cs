@@ -31,25 +31,16 @@ public sealed class IconDownloadStatus : INotifyPropertyChanged
         }
     }
 
-    public class StoppedIconDownloadStep : IconDownloadStep
+    public class StoppedIconDownloadStep(double progress) : IconDownloadStep("Download stopped", progress)
     {
-        public StoppedIconDownloadStep(double progress) : base("Download stopped", progress)
-        {
-        }
     }
 
-    public class DownloadingIconDownloadStep : IconDownloadStep
+    public class DownloadingIconDownloadStep(string skillName, double progress) : IconDownloadStep($"Downloading [{skillName}] icon", progress)
     {
-        public DownloadingIconDownloadStep(string skillName, double progress) : base($"Downloading [{skillName}] icon", progress)
-        {
-        }
     }
 
-    public class CheckingIconDownloadStep : IconDownloadStep
+    public class CheckingIconDownloadStep(string skillName, double progress) : IconDownloadStep($"Checking [{skillName}] icon", progress)
     {
-        public CheckingIconDownloadStep(string skillName, double progress) : base($"Checking [{skillName}] icon", progress)
-        {
-        }
     }
 
     public class NotSupportedIconDownloadStep : IconDownloadStep

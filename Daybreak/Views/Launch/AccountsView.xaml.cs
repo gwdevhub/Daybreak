@@ -43,7 +43,7 @@ public partial class AccountsView : UserControl
 
     private void SaveButton_Clicked(object sender, EventArgs e)
     {
-        this.credentialManager.StoreCredentials(this.Accounts.ToList());
+        this.credentialManager.StoreCredentials([.. this.Accounts]);
         this.viewManager.ShowView<LauncherView>();
     }
 

@@ -8,27 +8,21 @@ using System.Windows.Forms;
 
 namespace Daybreak.Services.Guildwars;
 
-internal sealed class GuildWarsCopyService : IGuildWarsCopyService
+internal sealed class GuildWarsCopyService(
+    IGuildWarsExecutableManager guildWarsExecutableManager,
+    ILogger<GuildWarsCopyService> logger) : IGuildWarsCopyService
 {
     private const string ExecutableName = "Gw.exe";
 
     private static readonly string[] FilesToCopy =
-    {
+    [
         "Gw.dat",
         "Gw.exe",
         "GwLoginClient.dll"
-    };
+    ];
 
-    private readonly IGuildWarsExecutableManager guildWarsExecutableManager;
-    private readonly ILogger<GuildWarsCopyService> logger;
-
-    public GuildWarsCopyService(
-        IGuildWarsExecutableManager guildWarsExecutableManager,
-        ILogger<GuildWarsCopyService> logger)
-    {
-        this.guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly IGuildWarsExecutableManager guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
+    private readonly ILogger<GuildWarsCopyService> logger = logger.ThrowIfNull();
 
     public async Task CopyGuildwars(string existingExecutable, CopyStatus copyStatus, CancellationToken cancellationToken)
     {

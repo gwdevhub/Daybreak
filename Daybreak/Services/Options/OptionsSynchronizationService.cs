@@ -13,27 +13,19 @@ using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.Options;
 
-public sealed class OptionsSynchronizationService : IOptionsSynchronizationService, IApplicationLifetimeService
+public sealed class OptionsSynchronizationService(
+    IOptionsProvider optionsProvider,
+    IGraphClient graphClient,
+    ILiveOptions<LauncherOptions> liveOptions,
+    ILogger<OptionsSynchronizationService> logger) : IOptionsSynchronizationService, IApplicationLifetimeService
 {
     private static readonly TimeSpan StartupDelay = TimeSpan.FromMinutes(1);
     private static readonly TimeSpan BackupFrequency = TimeSpan.FromSeconds(15);
 
-    private readonly IOptionsProvider optionsProvider;
-    private readonly IGraphClient graphClient;
-    private readonly ILiveOptions<LauncherOptions> liveOptions;
-    private readonly ILogger<OptionsSynchronizationService> logger;
-
-    public OptionsSynchronizationService(
-        IOptionsProvider optionsProvider,
-        IGraphClient graphClient,
-        ILiveOptions<LauncherOptions> liveOptions,
-        ILogger<OptionsSynchronizationService> logger)
-    {
-        this.optionsProvider = optionsProvider.ThrowIfNull();
-        this.graphClient = graphClient.ThrowIfNull();
-        this.liveOptions = liveOptions.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly IOptionsProvider optionsProvider = optionsProvider.ThrowIfNull();
+    private readonly IGraphClient graphClient = graphClient.ThrowIfNull();
+    private readonly ILiveOptions<LauncherOptions> liveOptions = liveOptions.ThrowIfNull();
+    private readonly ILogger<OptionsSynchronizationService> logger = logger.ThrowIfNull();
 
     public Task<Dictionary<string, JObject>> GetLocalOptions(CancellationToken cancellationToken)
     {

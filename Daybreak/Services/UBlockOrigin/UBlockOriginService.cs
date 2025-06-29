@@ -14,7 +14,11 @@ using Daybreak.Shared.Services.Downloads;
 using Daybreak.Shared.Models.Progress;
 
 namespace Daybreak.Services.UBlockOrigin;
-public sealed class UBlockOriginService : IBrowserExtension
+public sealed class UBlockOriginService(
+    INotificationService notificationService,
+    IDownloadService downloadService,
+    IHttpClient<UBlockOriginService> httpClient,
+    ILogger<UBlockOriginService> logger) : IBrowserExtension
 {
     private const string TagPlaceholder = "[TAG_PLACEHOLDER]";
     private const string ReleaseUrl = "https://github.com/gorhill/uBlock/releases/download/[TAG_PLACEHOLDER]/uBlock0_[TAG_PLACEHOLDER].chromium.zip";
@@ -28,22 +32,10 @@ public sealed class UBlockOriginService : IBrowserExtension
 
     private static volatile bool VersionUpToDate;
 
-    private readonly INotificationService notificationService;
-    private readonly IDownloadService downloadService;
-    private readonly IHttpClient<UBlockOriginService> httpClient;
-    private readonly ILogger<UBlockOriginService> logger;
-
-    public UBlockOriginService(
-        INotificationService notificationService,
-        IDownloadService downloadService,
-        IHttpClient<UBlockOriginService> httpClient,
-        ILogger<UBlockOriginService> logger)
-    {
-        this.notificationService = notificationService.ThrowIfNull();
-        this.downloadService = downloadService.ThrowIfNull();
-        this.httpClient = httpClient.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly INotificationService notificationService = notificationService.ThrowIfNull();
+    private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
+    private readonly IHttpClient<UBlockOriginService> httpClient = httpClient.ThrowIfNull();
+    private readonly ILogger<UBlockOriginService> logger = logger.ThrowIfNull();
 
     public string ExtensionId { get; } = "uBlock-Origin";
 

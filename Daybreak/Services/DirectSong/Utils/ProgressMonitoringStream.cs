@@ -2,9 +2,9 @@
 using System.IO;
 
 namespace Daybreak.Services.DirectSong.Utils;
-internal sealed class ProgressMonitoringStream : Stream
+internal sealed class ProgressMonitoringStream(Stream stream) : Stream
 {
-    private readonly Stream stream;
+    private readonly Stream stream = stream.ThrowIfNull();
 
     public long ReadBytes { get; private set; }
     public override bool CanRead => this.stream.CanRead;
@@ -15,11 +15,6 @@ internal sealed class ProgressMonitoringStream : Stream
     {
         get => this.stream.Position;
         set => this.stream.Position = value;
-    }
-
-    public ProgressMonitoringStream(Stream stream)
-    {
-        this.stream = stream.ThrowIfNull();
     }
 
     public override void Flush()

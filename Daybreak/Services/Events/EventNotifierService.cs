@@ -11,25 +11,17 @@ using System.Globalization;
 
 namespace Daybreak.Services.Events;
 
-internal sealed class EventNotifierService : IEventNotifierService
+internal sealed class EventNotifierService(
+    IEventService eventService,
+    INotificationService notificationService,
+    ILiveOptions<EventNotifierOptions> liveOptions,
+    ILogger<IEventNotifierService> logger) : IEventNotifierService
 {
     private readonly TimespanToETAConverter timespanToETAConverter = new();
-    private readonly IEventService eventService;
-    private readonly INotificationService notificationService;
-    private readonly ILiveOptions<EventNotifierOptions> liveOptions;
-    private readonly ILogger<IEventNotifierService> logger;
-
-    public EventNotifierService(
-        IEventService eventService,
-        INotificationService notificationService,
-        ILiveOptions<EventNotifierOptions> liveOptions,
-        ILogger<IEventNotifierService> logger)
-    {
-        this.eventService = eventService.ThrowIfNull();
-        this.notificationService = notificationService.ThrowIfNull();
-        this.liveOptions = liveOptions.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly IEventService eventService = eventService.ThrowIfNull();
+    private readonly INotificationService notificationService = notificationService.ThrowIfNull();
+    private readonly ILiveOptions<EventNotifierOptions> liveOptions = liveOptions.ThrowIfNull();
+    private readonly ILogger<IEventNotifierService> logger = logger.ThrowIfNull();
 
     public void OnClosing()
     {

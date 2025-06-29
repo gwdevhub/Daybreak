@@ -7,23 +7,16 @@ using System.Core.Extensions;
 
 namespace Daybreak.Services.Screens;
 
-internal sealed class GuildwarsScreenPlacer : IGuildwarsScreenPlacer
+internal sealed class GuildwarsScreenPlacer(
+    ILiveUpdateableOptions<LauncherOptions> liveOptions,
+    IScreenManager screenManager,
+    ILogger<GuildwarsScreenPlacer> logger) : IGuildwarsScreenPlacer
 {
     private static readonly TimeSpan Delay = TimeSpan.FromSeconds(5);
 
-    private readonly ILiveUpdateableOptions<LauncherOptions> liveOptions;
-    private readonly IScreenManager screenManager;
-    private readonly ILogger<GuildwarsScreenPlacer> logger;
-
-    public GuildwarsScreenPlacer(
-        ILiveUpdateableOptions<LauncherOptions> liveOptions,
-        IScreenManager screenManager,
-        ILogger<GuildwarsScreenPlacer> logger)
-    {
-        this.liveOptions = liveOptions.ThrowIfNull();
-        this.screenManager = screenManager.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly ILiveUpdateableOptions<LauncherOptions> liveOptions = liveOptions.ThrowIfNull();
+    private readonly IScreenManager screenManager = screenManager.ThrowIfNull();
+    private readonly ILogger<GuildwarsScreenPlacer> logger = logger.ThrowIfNull();
 
     public string Name => "Screen placer";
     public bool IsEnabled

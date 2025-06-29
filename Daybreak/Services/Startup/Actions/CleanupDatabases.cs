@@ -7,24 +7,16 @@ using System.Extensions;
 using System.Extensions.Core;
 
 namespace Daybreak.Services.Startup.Actions;
-internal sealed class CleanupDatabases : StartupActionBase
+internal sealed class CleanupDatabases(
+    TradeQuoteDbContext quotesCollection,
+    NotificationsDbContext notificationsCollection,
+    TradeMessagesDbContext traderMessagesCollection,
+    ILogger<CleanupDatabases> logger) : StartupActionBase
 {
-    private readonly TradeQuoteDbContext quotesCollection;
-    private readonly NotificationsDbContext notificationsCollection;
-    private readonly TradeMessagesDbContext traderMessagesCollection;
-    private readonly ILogger<CleanupDatabases> logger;
-
-    public CleanupDatabases(
-        TradeQuoteDbContext quotesCollection,
-        NotificationsDbContext notificationsCollection,
-        TradeMessagesDbContext traderMessagesCollection,
-        ILogger<CleanupDatabases> logger)
-    {
-        this.quotesCollection = quotesCollection.ThrowIfNull();
-        this.notificationsCollection = notificationsCollection.ThrowIfNull();
-        this.traderMessagesCollection = traderMessagesCollection.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly TradeQuoteDbContext quotesCollection = quotesCollection.ThrowIfNull();
+    private readonly NotificationsDbContext notificationsCollection = notificationsCollection.ThrowIfNull();
+    private readonly TradeMessagesDbContext traderMessagesCollection = traderMessagesCollection.ThrowIfNull();
+    private readonly ILogger<CleanupDatabases> logger = logger.ThrowIfNull();
 
     public override async Task ExecuteOnStartupAsync(CancellationToken cancellationToken)
     {

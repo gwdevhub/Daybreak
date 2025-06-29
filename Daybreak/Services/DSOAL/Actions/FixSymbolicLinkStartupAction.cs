@@ -8,27 +8,18 @@ using System.Core.Extensions;
 
 namespace Daybreak.Services.DSOAL.Actions;
 
-public sealed class FixSymbolicLinkStartupAction : StartupActionBase
+public sealed class FixSymbolicLinkStartupAction(
+    INotificationService notificationService,
+    IPrivilegeManager privilegeManager,
+    IDSOALService dSOALService,
+    IRegistryService registryService,
+    ILogger<FixSymbolicLinkStartupAction> logger) : StartupActionBase
 {
-    private readonly INotificationService notificationService;
-    private readonly IPrivilegeManager privilegeManager;
-    private readonly IDSOALService dSOALService;
-    private readonly IRegistryService registryService;
-    private readonly ILogger<FixSymbolicLinkStartupAction> logger;
-
-    public FixSymbolicLinkStartupAction(
-        INotificationService notificationService,
-        IPrivilegeManager privilegeManager,
-        IDSOALService dSOALService,
-        IRegistryService registryService,
-        ILogger<FixSymbolicLinkStartupAction> logger)
-    {
-        this.notificationService = notificationService.ThrowIfNull();
-        this.privilegeManager = privilegeManager.ThrowIfNull();
-        this.dSOALService = dSOALService.ThrowIfNull();
-        this.registryService = registryService.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly INotificationService notificationService = notificationService.ThrowIfNull();
+    private readonly IPrivilegeManager privilegeManager = privilegeManager.ThrowIfNull();
+    private readonly IDSOALService dSOALService = dSOALService.ThrowIfNull();
+    private readonly IRegistryService registryService = registryService.ThrowIfNull();
+    private readonly ILogger<FixSymbolicLinkStartupAction> logger = logger.ThrowIfNull();
 
     public override void ExecuteOnStartup()
     {

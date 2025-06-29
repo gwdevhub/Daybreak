@@ -8,24 +8,18 @@ using Daybreak.Shared.Models.Metrics;
 
 namespace Daybreak.Services.Monitoring;
 
-internal sealed class MemoryUsageMonitor : IApplicationLifetimeService
+internal sealed class MemoryUsageMonitor(
+    IMetricsService metricsService) : IApplicationLifetimeService
 {
     private const string MemoryUsage = "Memory Usage";
     private const string MemoryUsageUnit = "MBs";
     private const string MemoryUsageDescription = "MBs used by Daybreak";
 
-    private readonly Histogram<long> memoryUsageHistogram;
-    private readonly Process currentProcess;
+    private readonly Histogram<long> memoryUsageHistogram = metricsService.ThrowIfNull().CreateHistogram<long>(MemoryUsage, MemoryUsageUnit, MemoryUsageDescription, AggregationTypes.NoAggregate);
+    private readonly Process currentProcess = Process.GetCurrentProcess();
     private readonly CancellationTokenSource cancellationTokenSource = new();
 
     private PerformanceCounter? memoryPerformanceCounter;
-
-    public MemoryUsageMonitor(
-        IMetricsService metricsService)
-    {
-        this.memoryUsageHistogram = metricsService.ThrowIfNull().CreateHistogram<long>(MemoryUsage, MemoryUsageUnit, MemoryUsageDescription, AggregationTypes.NoAggregate);
-        this.currentProcess = Process.GetCurrentProcess();
-    }
 
     public void OnClosing()
     {

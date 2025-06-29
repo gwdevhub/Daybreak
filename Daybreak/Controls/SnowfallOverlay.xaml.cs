@@ -9,8 +9,8 @@ namespace Daybreak.Controls;
 /// </summary>
 public partial class SnowfallOverlay : UserControl
 {
-    private static readonly double[] Frequencies = new double[] { 0.1, 0.025, 1, 0.25 };
-    private static readonly double[] Amplitudes = new double[] { 1, 0.1, 0.1, 0.2 };
+    private static readonly double[] Frequencies = [0.1, 0.025, 1, 0.25];
+    private static readonly double[] Amplitudes = [1, 0.1, 0.1, 0.2];
     private static readonly double Divisor = Amplitudes.Sum();
 
     [GenerateDependencyProperty]

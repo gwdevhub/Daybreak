@@ -15,7 +15,7 @@ public partial class QuoteAlertSetupView : UserControl
     private readonly IViewManager viewManager;
     private readonly ITradeAlertingService tradeAlertingService;
 
-    public List<ItemBase> AvailableItems { get; } = ItemBase.AllItems.Where(i => i.Modifiers is null).ToList();
+    public List<ItemBase> AvailableItems { get; } = [.. ItemBase.AllItems.Where(i => i.Modifiers is null)];
 
     public QuoteAlertSetupView(
         IViewManager viewManager,

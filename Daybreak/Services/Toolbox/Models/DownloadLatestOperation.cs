@@ -5,15 +5,10 @@ internal abstract class DownloadLatestOperation
 {
     public abstract string Message { get; }
 
-    public sealed class Success : DownloadLatestOperation
+    public sealed class Success(string pathToDll) : DownloadLatestOperation
     {
         public override string Message => "Retrieved latest version";
-        public string PathToDll { get; }
-        
-        public Success(string pathToDll)
-        {
-            this.PathToDll = pathToDll.ThrowIfNull();
-        }
+        public string PathToDll { get; } = pathToDll.ThrowIfNull();
     }
 
     public sealed class NoVersionFound : DownloadLatestOperation
@@ -25,25 +20,15 @@ internal abstract class DownloadLatestOperation
         }
     }
 
-    public sealed class NonSuccessStatusCode : DownloadLatestOperation
+    public sealed class NonSuccessStatusCode(int statusCode) : DownloadLatestOperation
     {
         public override string Message => "Received unsuccessful status code";
-        public int StatusCode { get; }
-
-        public NonSuccessStatusCode(int statusCode)
-        {
-            this.StatusCode = statusCode;
-        }
+        public int StatusCode { get; } = statusCode;
     }
 
-    public sealed class ExceptionEncountered : DownloadLatestOperation
+    public sealed class ExceptionEncountered(Exception exception) : DownloadLatestOperation
     {
         public override string Message => "Encountered exception";
-        public Exception Exception { get; }
-
-        public ExceptionEncountered(Exception exception)
-        {
-            this.Exception = exception.ThrowIfNull();
-        }
+        public Exception Exception { get; } = exception.ThrowIfNull();
     }
 }

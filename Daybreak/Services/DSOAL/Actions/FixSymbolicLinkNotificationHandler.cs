@@ -6,15 +6,10 @@ using System.Core.Extensions;
 
 namespace Daybreak.Services.DSOAL.Actions;
 
-public sealed class FixSymbolicLinkNotificationHandler : INotificationHandler
+public sealed class FixSymbolicLinkNotificationHandler(
+    IPrivilegeManager privilegeManager) : INotificationHandler
 {
-    private readonly IPrivilegeManager privilegeManager;
-
-    public FixSymbolicLinkNotificationHandler(
-        IPrivilegeManager privilegeManager)
-    {
-        this.privilegeManager = privilegeManager.ThrowIfNull();
-    }
+    private readonly IPrivilegeManager privilegeManager = privilegeManager.ThrowIfNull();
 
     public void OpenNotification(Notification notification)
     {

@@ -11,26 +11,19 @@ using System.Net.Http;
 using Version = Daybreak.Shared.Models.Versioning.Version;
 
 namespace Daybreak.Services.Toolbox.Utilities;
-internal sealed class ToolboxClient : IToolboxClient
+internal sealed class ToolboxClient(
+    IDownloadService downloadService,
+    IHttpClient<ToolboxClient> httpClient,
+    ILogger<ToolboxClient> logger) : IToolboxClient
 {
     private const string DllName = "GWToolboxdll.dll";
     private const string TagPlaceholder = "[TAG_PLACEHOLDER]";
     private const string ReleaseUrl = "https://github.com/gwdevhub/GWToolboxpp/releases/download/[TAG_PLACEHOLDER]/GWToolboxdll.dll";
     private const string ReleasesUrl = "https://api.github.com/repos/gwdevhub/GWToolboxpp/git/refs/tags";
 
-    private readonly IDownloadService downloadService;
-    private readonly IHttpClient<ToolboxClient> httpClient;
-    private readonly ILogger<ToolboxClient> logger;
-
-    public ToolboxClient(
-        IDownloadService downloadService,
-        IHttpClient<ToolboxClient> httpClient,
-        ILogger<ToolboxClient> logger)
-    {
-        this.downloadService = downloadService.ThrowIfNull();
-        this.httpClient = httpClient.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
+    private readonly IHttpClient<ToolboxClient> httpClient = httpClient.ThrowIfNull();
+    private readonly ILogger<ToolboxClient> logger = logger.ThrowIfNull();
 
     public async Task<DownloadLatestOperation> DownloadLatestDll(ToolboxInstallationStatus toolboxInstallationStatus, string destinationFolder, CancellationToken cancellationToken)
     {

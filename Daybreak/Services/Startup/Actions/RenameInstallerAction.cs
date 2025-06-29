@@ -6,7 +6,8 @@ using System.IO;
 
 namespace Daybreak.Services.Startup.Actions;
 
-internal sealed class RenameInstallerAction : StartupActionBase
+internal sealed class RenameInstallerAction(
+    ILogger<RenameInstallerAction> logger) : StartupActionBase
 {
     private const string TemporaryInstallerFileNameSubPath = "Daybreak.Installer.Temp.exe";
     private const string InstallerFileNameSubPath = "Daybreak.Installer.exe";
@@ -14,13 +15,7 @@ internal sealed class RenameInstallerAction : StartupActionBase
     private static readonly string TemporaryInstallerFileName = PathUtils.GetAbsolutePathFromRoot(TemporaryInstallerFileNameSubPath);
     private static readonly string InstallerFileName = PathUtils.GetAbsolutePathFromRoot(InstallerFileNameSubPath);
 
-    private readonly ILogger<RenameInstallerAction> logger;
-
-    public RenameInstallerAction(
-        ILogger<RenameInstallerAction> logger)
-    {
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly ILogger<RenameInstallerAction> logger = logger.ThrowIfNull();
 
     public override void ExecuteOnStartup()
     {

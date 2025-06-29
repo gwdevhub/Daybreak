@@ -8,24 +8,16 @@ using System.Windows.Media;
 
 namespace Daybreak.Services.Screenshots;
 
-internal sealed class BackgroundProvider : IBackgroundProvider
+internal sealed class BackgroundProvider(
+    IScreenshotProvider screenshotProvider,
+    IOnlinePictureClient bloogumClient,
+    ILiveOptions<BackgroundProviderOptions> liveOptions,
+    ILogger<BackgroundProvider> logger) : IBackgroundProvider
 {
-    private readonly IScreenshotProvider screenshotProvider;
-    private readonly IOnlinePictureClient bloogumClient;
-    private readonly ILiveOptions<BackgroundProviderOptions> liveOptions;
-    private readonly ILogger<BackgroundProvider> logger;
-
-    public BackgroundProvider(
-        IScreenshotProvider screenshotProvider,
-        IOnlinePictureClient bloogumClient,
-        ILiveOptions<BackgroundProviderOptions> liveOptions,
-        ILogger<BackgroundProvider> logger)
-    {
-        this.screenshotProvider = screenshotProvider.ThrowIfNull();
-        this.bloogumClient = bloogumClient.ThrowIfNull();
-        this.liveOptions = liveOptions.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly IScreenshotProvider screenshotProvider = screenshotProvider.ThrowIfNull();
+    private readonly IOnlinePictureClient bloogumClient = bloogumClient.ThrowIfNull();
+    private readonly ILiveOptions<BackgroundProviderOptions> liveOptions = liveOptions.ThrowIfNull();
+    private readonly ILogger<BackgroundProvider> logger = logger.ThrowIfNull();
 
     public async Task<BackgroundResponse> GetBackground()
     {

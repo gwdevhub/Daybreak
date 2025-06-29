@@ -51,19 +51,19 @@ public sealed class SecureString
         if (ss1 is null) throw new ArgumentNullException(nameof(ss1));
         if (ss2 is null) throw new ArgumentNullException(nameof(ss2));
 
-        return new SecureString(ss1.DecryptedValue!.Concat(ss2.DecryptedValue!).ToArray());
+        return new SecureString([.. ss1.DecryptedValue!, .. ss2.DecryptedValue!]);
     }
     public static SecureString operator +(SecureString? ss1, string s2)
     {
         if (ss1 is null) throw new ArgumentNullException(nameof(ss1));
 
-        return new SecureString(ss1.DecryptedValue!.Concat(s2.AsBytes()).ToArray());
+        return new SecureString([.. ss1.DecryptedValue!, .. s2.AsBytes()]);
     }
     public static SecureString operator +(SecureString? ss1, char c)
     {
         if (ss1 is null) throw new ArgumentNullException(nameof(ss1));
         
-        return new SecureString(ss1.DecryptedValue!.Append(Convert.ToByte(c)).ToArray());
+        return new SecureString([.. ss1.DecryptedValue!, Convert.ToByte(c)]);
     }
     public static bool operator ==(SecureString? ss1, SecureString? ss2)
     {

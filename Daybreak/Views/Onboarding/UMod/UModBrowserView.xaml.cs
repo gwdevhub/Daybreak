@@ -12,7 +12,7 @@ namespace Daybreak.Views.Onboarding.UMod;
 /// </summary>
 public partial class UModBrowserView : UserControl
 {
-    private static readonly string[] WhitelistedExtensions = new[] { ".tpf", ".zip" };
+    private static readonly string[] WhitelistedExtensions = [".tpf", ".zip"];
 
     private readonly INotificationService notificationService;
     private readonly IUModService uModService;

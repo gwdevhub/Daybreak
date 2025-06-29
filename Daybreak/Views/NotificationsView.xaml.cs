@@ -55,10 +55,10 @@ public partial class NotificationsView : UserControl
         {
             var unsortedNotifications = this.ShowAll ?
                 (await this.notificationProducer.GetAllNotifications(cancellationToken)).ToList() :
-                (await this.notificationProducer.GetPendingNotifications(cancellationToken)).ToList();
+                [.. (await this.notificationProducer.GetPendingNotifications(cancellationToken))];
             var notifications = this.Descending ?
                 unsortedNotifications.OrderByDescending(n => n.CreationTime).Take(100).ToList() :
-                unsortedNotifications.OrderBy(n => n.CreationTime).Take(100).ToList();
+                [.. unsortedNotifications.OrderBy(n => n.CreationTime).Take(100)];
             using var context = await this.semaphoreSlim.Acquire();
             var notificationsToAdd = notifications.Where(n => this.Notifications.None(n2 => n2.Id == n.Id)).ToList();
             var notificationsToRemove = this.Notifications.Where(n => notifications.None(n2 => n2.Id == n.Id)).ToList();
@@ -111,7 +111,7 @@ public partial class NotificationsView : UserControl
             this.Descending = !this.Descending;
             var sortedNotification = this.Descending ?
                 this.Notifications.OrderByDescending(n => n.CreationTime).ToList() :
-                this.Notifications.OrderBy(n => n.CreationTime).ToList();
+                [.. this.Notifications.OrderBy(n => n.CreationTime)];
             this.Notifications.ClearAnd().AddRange(sortedNotification);
         }
     }
@@ -124,7 +124,7 @@ public partial class NotificationsView : UserControl
                     (await this.notificationProducer.GetPendingNotifications(CancellationToken.None));
         var sortedNotification = this.Descending ?
                 unsortedNotifications.OrderByDescending(n => n.CreationTime).ToList() :
-                unsortedNotifications.OrderBy(n => n.CreationTime).ToList();
+                [.. unsortedNotifications.OrderBy(n => n.CreationTime)];
         this.Notifications.ClearAnd().AddRange(sortedNotification);
     }
 }

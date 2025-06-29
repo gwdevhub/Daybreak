@@ -23,11 +23,7 @@ public sealed class GuildwarsInstallationStatus : DownloadStatus
         }
     }
 
-    public sealed class UnpackingProgressStep : DownloadProgressStep
+    public sealed class UnpackingProgressStep(double progress, TimeSpan? eta) : DownloadProgressStep("Unpacking", progress, eta)
     {
-        public UnpackingProgressStep(double progress, TimeSpan? eta)
-            : base("Unpacking", progress, eta)
-        {
-        }
     }
 }

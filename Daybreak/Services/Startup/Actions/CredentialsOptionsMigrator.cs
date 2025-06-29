@@ -9,20 +9,14 @@ using System.Extensions;
 using System.Reflection;
 
 namespace Daybreak.Services.Startup.Actions;
-internal sealed class CredentialsOptionsMigrator : StartupActionBase
+internal sealed class CredentialsOptionsMigrator(
+    IOptionsProvider optionsProvider,
+    ILogger<CredentialsOptionsMigrator> logger) : StartupActionBase
 {
     private const string OldOptionsKey = "CredentialManagerOptions";
 
-    private readonly IOptionsProvider optionsProvider;
-    private readonly ILogger<CredentialsOptionsMigrator> logger;
-
-    public CredentialsOptionsMigrator(
-        IOptionsProvider optionsProvider,
-        ILogger<CredentialsOptionsMigrator> logger)
-    {
-        this.optionsProvider = optionsProvider.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly IOptionsProvider optionsProvider = optionsProvider.ThrowIfNull();
+    private readonly ILogger<CredentialsOptionsMigrator> logger = logger.ThrowIfNull();
 
     public override void ExecuteOnStartup()
     {

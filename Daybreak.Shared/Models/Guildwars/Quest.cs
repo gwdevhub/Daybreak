@@ -1410,8 +1410,8 @@ public sealed class Quest : IWikiEntity
     public static readonly Quest PilgrimagetotheHallofHeroes = new() { Id = 1439, Name = "Pilgrimage to the Hall of Heroes", WikiUrl = "https://wiki.guildwars.com/wiki/Pilgrimage_to_the_Hall_of_Heroes" };
     public static readonly Quest CrossingTheDesolation = new() { Id = 686, Name = "Crossing The Desolation", WikiUrl = "https://wiki.guildwars.com/wiki/Crossing_the_Desolation" };
 
-    public static IEnumerable<Quest> Quests { get; } = new List<Quest>
-    {
+    public static IEnumerable<Quest> Quests { get; } =
+    [
         TheAscalonSettlement,
         TheVillainyofGalrath,
         BanditTrouble,
@@ -2811,7 +2811,7 @@ public sealed class Quest : IWikiEntity
         TakeMySisterPlease,
         PilgrimagetotheHallofHeroes,
         CrossingTheDesolation
-    };
+    ];
 
     public static bool TryParse(int id, out Quest quest)
     {

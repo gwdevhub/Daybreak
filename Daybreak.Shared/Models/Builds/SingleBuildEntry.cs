@@ -187,7 +187,7 @@ public sealed class SingleBuildEntry : BuildEntryBase, IBuildEntry, INotifyPrope
 
         attributesToAdd.AddRange(this.Primary.Attributes);
         attributesToAdd.AddRange(this.Secondary.Attributes);
-        this.Attributes = attributesToAdd.Distinct().Select(attribute =>
+        this.Attributes = [.. attributesToAdd.Distinct().Select(attribute =>
         {
             if (this.Attributes.FirstOrDefault(attributeEntry => attributeEntry.Attribute == attribute) is AttributeEntry attributeEntry)
             {
@@ -195,7 +195,7 @@ public sealed class SingleBuildEntry : BuildEntryBase, IBuildEntry, INotifyPrope
             }
 
             return new AttributeEntry { Attribute = attribute };
-        }).ToList();
+        })];
     }
 
     private void UpdateSkills()

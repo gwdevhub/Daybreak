@@ -8,21 +8,14 @@ using System.Core.Extensions;
 using System.Extensions;
 
 namespace Daybreak.Services.LaunchConfigurations;
-internal sealed class LaunchConfigurationService : ILaunchConfigurationService
+internal sealed class LaunchConfigurationService(
+    ICredentialManager credentialManager,
+    IGuildWarsExecutableManager guildWarsExecutableManager,
+    ILiveUpdateableOptions<LaunchConfigurationServiceOptions> liveUpdateableOptions) : ILaunchConfigurationService
 {
-    private readonly ICredentialManager credentialManager;
-    private readonly IGuildWarsExecutableManager guildWarsExecutableManager;
-    private readonly ILiveUpdateableOptions<LaunchConfigurationServiceOptions> liveUpdateableOptions;
-
-    public LaunchConfigurationService(
-        ICredentialManager credentialManager,
-        IGuildWarsExecutableManager guildWarsExecutableManager,
-        ILiveUpdateableOptions<LaunchConfigurationServiceOptions> liveUpdateableOptions)
-    {
-        this.credentialManager = credentialManager.ThrowIfNull();
-        this.guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
-        this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
-    }
+    private readonly ICredentialManager credentialManager = credentialManager.ThrowIfNull();
+    private readonly IGuildWarsExecutableManager guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
+    private readonly ILiveUpdateableOptions<LaunchConfigurationServiceOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
 
     public IEnumerable<LaunchConfigurationWithCredentials> GetLaunchConfigurations()
     {

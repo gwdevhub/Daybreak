@@ -8,7 +8,8 @@ using Daybreak.Shared.Models.Metrics;
 
 namespace Daybreak.Services.Monitoring;
 
-internal sealed class DiskUsageMonitor : IApplicationLifetimeService
+internal sealed class DiskUsageMonitor(
+    IMetricsService metricsService) : IApplicationLifetimeService
 {
     private const string WriteDiskUsage = "Write Disk Usage";
     private const string WriteDiskUsageUnit = "MBs/s";
@@ -17,19 +18,12 @@ internal sealed class DiskUsageMonitor : IApplicationLifetimeService
     private const string ReadDiskUsageUnit = "MBs/s";
     private const string ReadDiskUsageDescription = "MBs/s read by Daybreak";
 
-    private readonly Histogram<double> writeDiskUsageHistogram;
-    private readonly Histogram<double> readDiskUsageHistogram;
+    private readonly Histogram<double> writeDiskUsageHistogram = metricsService.ThrowIfNull().CreateHistogram<double>(WriteDiskUsage, WriteDiskUsageUnit, WriteDiskUsageDescription, AggregationTypes.NoAggregate);
+    private readonly Histogram<double> readDiskUsageHistogram = metricsService.ThrowIfNull().CreateHistogram<double>(ReadDiskUsage, ReadDiskUsageUnit, ReadDiskUsageDescription, AggregationTypes.NoAggregate);
     private readonly CancellationTokenSource cancellationTokenSource = new();
 
     private PerformanceCounter? readPerformanceCounter;
     private PerformanceCounter? writePerformanceCounter;
-
-    public DiskUsageMonitor(
-        IMetricsService metricsService)
-    {
-        this.writeDiskUsageHistogram = metricsService.ThrowIfNull().CreateHistogram<double>(WriteDiskUsage, WriteDiskUsageUnit, WriteDiskUsageDescription, AggregationTypes.NoAggregate);
-        this.readDiskUsageHistogram = metricsService.ThrowIfNull().CreateHistogram<double>(ReadDiskUsage, ReadDiskUsageUnit, ReadDiskUsageDescription, AggregationTypes.NoAggregate);
-    }
 
     public void OnClosing()
     {

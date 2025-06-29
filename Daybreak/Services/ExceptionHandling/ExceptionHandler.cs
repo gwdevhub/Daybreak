@@ -12,18 +12,12 @@ using System.Runtime.InteropServices;
 
 namespace Daybreak.Services.ExceptionHandling;
 
-internal sealed class ExceptionHandler : IExceptionHandler
+internal sealed class ExceptionHandler(
+    INotificationService notificationService,
+    ILogger<ExceptionHandler> logger) : IExceptionHandler
 {
-    private readonly INotificationService notificationService;
-    private readonly ILogger<ExceptionHandler> logger;
-
-    public ExceptionHandler(
-        INotificationService notificationService,
-        ILogger<ExceptionHandler> logger)
-    {
-        this.notificationService = notificationService.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly INotificationService notificationService = notificationService.ThrowIfNull();
+    private readonly ILogger<ExceptionHandler> logger = logger.ThrowIfNull();
 
     public bool HandleException(Exception e)
     {

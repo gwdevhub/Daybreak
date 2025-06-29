@@ -13,22 +13,15 @@ using System.Runtime.CompilerServices;
 
 namespace Daybreak.Services.Notifications;
 
-internal sealed class NotificationService : INotificationService, INotificationProducer, INotificationHandlerProducer
+internal sealed class NotificationService(
+    IServiceManager serviceManager,
+    INotificationStorage notificationStorage,
+    ILogger<NotificationService> logger) : INotificationService, INotificationProducer, INotificationHandlerProducer
 {
     private readonly ConcurrentQueue<Notification> pendingNotifications = new();
-    private readonly IServiceManager serviceManager;
-    private readonly INotificationStorage storage;
-    private readonly ILogger<NotificationService> logger;
-
-    public NotificationService(
-        IServiceManager serviceManager,
-        INotificationStorage notificationStorage,
-        ILogger<NotificationService> logger)
-    {
-        this.serviceManager = serviceManager.ThrowIfNull();
-        this.storage = notificationStorage.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly IServiceManager serviceManager = serviceManager.ThrowIfNull();
+    private readonly INotificationStorage storage = notificationStorage.ThrowIfNull();
+    private readonly ILogger<NotificationService> logger = logger.ThrowIfNull();
 
     public NotificationToken NotifyInformation(
         string title,

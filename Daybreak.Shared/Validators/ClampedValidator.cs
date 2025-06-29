@@ -2,16 +2,10 @@
 
 namespace Daybreak.Shared.Validators;
 
-public sealed class ClampedValidator<T> : IValidator
+public sealed class ClampedValidator<T>(T minValue, T maxValue) : IValidator
     where T : IComparable<T>
 {
-    private readonly T minValue, maxValue;
-
-    public ClampedValidator(T minValue, T maxValue)
-    {
-        this.minValue = minValue;
-        this.maxValue = maxValue;
-    }
+    private readonly T minValue = minValue, maxValue = maxValue;
 
     public bool IsValid(object value)
     {

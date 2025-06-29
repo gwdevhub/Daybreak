@@ -64,7 +64,7 @@ public partial class LogsView : UserControl
             this.cachedText.Append(adornedMessage);
         }
 
-        await this.WriteLogs(true, logs.TakeLast(MaximumLookbackPeriod).ToArray());
+        await this.WriteLogs(true, [.. logs.TakeLast(MaximumLookbackPeriod)]);
     }
 
     private async Task WriteLogs(bool forceScrollToEnd, params Log[] logs)

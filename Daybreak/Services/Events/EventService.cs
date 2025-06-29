@@ -8,12 +8,12 @@ internal sealed class EventService : IEventService
 
     public ICollection<Event> GetCurrentActiveEvents()
     {
-        return GetActiveEventsInternal(DateTime.UtcNow).ToList();
+        return [.. GetActiveEventsInternal(DateTime.UtcNow)];
     }
 
     public ICollection<Event> GetActiveEvents(DateTime dateTime)
     {
-        return GetActiveEventsInternal(dateTime).ToList();
+        return [.. GetActiveEventsInternal(dateTime)];
     }
 
     public Event GetUpcomingEvent()

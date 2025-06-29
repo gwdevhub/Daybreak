@@ -11,8 +11,8 @@ public sealed class Region : IWikiEntity
         Id = 0,
         Name = "Kryta",
         WikiUrl = "https://wiki.guildwars.com/wiki/Kryta",
-        Maps = new List<Map>
-        {
+        Maps =
+        [
             Map.LionsArchCanthanNewYearOutpost,
             Map.LionsArchHalloweenOutpost,
             Map.LionsArchOutpost,
@@ -42,15 +42,15 @@ public sealed class Region : IWikiEntity
             Map.TheBlackCurtain,
             Map.TwinSerpentLakes,
             Map.WatchtowerCoast
-        }
+        ]
     };
     public static readonly Region MaguumaJungle = new()
     {
         Id = 1,
         Name = "Maguuma Jungle",
         WikiUrl = "https://wiki.guildwars.com/wiki/Maguuma_Jungle",
-        Maps = new List<Map>
-        {
+        Maps =
+        [
             Map.HengeOfDenraviOutpost,
             Map.DruidsOverlookOutpost,
             Map.MaguumaStadeOutpost,
@@ -69,15 +69,15 @@ public sealed class Region : IWikiEntity
             Map.Silverwood,
             Map.TangleRoot,
             Map.TheFalls
-        }
+        ]
     };
     public static readonly Region Ascalon = new()
     { 
         Id = 2,
         Name = "Ascalon",
         WikiUrl = "https://wiki.guildwars.com/wiki/Ascalon",
-        Maps = new List<Map>
-        {
+        Maps =
+        [
             Map.AscalonCityOutpost,
             Map.AscalonCityWintersdayOutpost,
             Map.FrontierGateOutpost,
@@ -102,15 +102,15 @@ public sealed class Region : IWikiEntity
             Map.PockmarkFlats,
             Map.RegentValley,
             Map.TheBreach
-        }
+        ]
     };
     public static readonly Region ShiverpeakMountains = new()
     { 
         Id = 3,
         Name = "Shiverpeak Mountains",
         WikiUrl = "https://wiki.guildwars.com/wiki/Shiverpeak_Mountains",
-        Maps = new List<Map>
-        {
+        Maps =
+        [
             Map.BeaconsPerchOutpost,
             Map.IceToothCaveOutpost,
             Map.YaksBendOutpost,
@@ -151,15 +151,15 @@ public sealed class Region : IWikiEntity
             Map.TalusChute,
             Map.TascasDemise,
             Map.WitmansFolly
-        }
+        ]
     };
     public static readonly Region HeroesAscent = new()
     { 
         Id = 4,
         Name = "Heroes' Ascent",
         WikiUrl = "https://wiki.guildwars.com/wiki/Heroes%27_Ascent",
-        Maps = new List<Map>
-        {
+        Maps =
+        [
             Map.BurialMoundsMission,
             Map.FetidRiverMission,
             Map.TheUnderworldArenaMission,
@@ -173,15 +173,15 @@ public sealed class Region : IWikiEntity
             Map.SacredTemplesMission,
             Map.ScarredEarth,
             Map.ScarredEarth2
-        }
+        ]
     };
     public static readonly Region CrystalDesert = new()
     { 
         Id = 5, 
         Name = "Crystal Desert", 
         WikiUrl = "https://wiki.guildwars.com/wiki/Crystal_Desert",
-        Maps = new List<Map>
-        {
+        Maps =
+        [
             Map.TheAmnoonOasisOutpost,
             Map.DestinysGorgeOutpost,
             Map.HeroesAudienceOutpost,
@@ -201,30 +201,30 @@ public sealed class Region : IWikiEntity
             Map.TheAridSea,
             Map.TheScar,
             Map.VultureDrifts
-        }
+        ]
     };
     public static readonly Region RingOfFireIslands = new()
     {
         Id = 6,
         Name = "Ring of Fire Islands",
         WikiUrl = "https://wiki.guildwars.com/wiki/Ring_of_Fire_Islands",
-        Maps = new List<Map>
-        {
+        Maps =
+        [
             Map.EmberLightCampOutpost,
             Map.AbaddonsMouth,
             Map.HellsPrecipice,
             Map.RingOfFire,
             Map.PerditionRock,
             Map.TheFissureofWoe
-        }
+        ]
     };
     public static readonly Region PresearingAscalon = new()
     {
         Id = 7,
         Name = "Pre Searing Ascalon",
         WikiUrl = "https://wiki.guildwars.com/wiki/Ascalon_(pre-Searing)",
-        Maps = new List<Map>
-        {
+        Maps =
+        [
             Map.AscalonCityPresearing,
             Map.AshfordAbbeyOutpost,
             Map.AshfordCatacombs1070AE,
@@ -239,15 +239,15 @@ public sealed class Region : IWikiEntity
             Map.TheCatacombs,
             Map.TheNorthlands,
             Map.WizardsFolly
-        }
+        ]
     };
     public static readonly Region KainengCity = new()
     { 
         Id = 8,
         Name = "Kaineng City",
         WikiUrl = "https://wiki.guildwars.com/wiki/Kaineng_City",
-        Maps = new List<Map>
-        {
+        Maps =
+        [
             Map.KainengCenterOutpost,
             Map.KainengCenterCanthanNewYearOutpost,
             Map.KainengCenterSunspearsInCantha,
@@ -288,15 +288,15 @@ public sealed class Region : IWikiEntity
             Map.WajjunBazaarWindsOfChangeMinistryOfOppression,
             Map.WajjunBazaarWindsOfChangeViolenceInTheStreets,
             Map.XaquangSkyway
-        }
+        ]
     };
     public static readonly Region EchovaldForest = new()
     {
         Id = 9,
         Name = "Echovald Forest",
         WikiUrl = "https://wiki.guildwars.com/wiki/Echovald_Forest",
-        Maps = new List<Map>
-        {
+        Maps =
+        [
             Map.HouseZuHeltzerOutpost,
             Map.AspenwoodGateKurzickOutpost,
             Map.BrauerAcademyOutpost,
@@ -323,15 +323,15 @@ public sealed class Region : IWikiEntity
             Map.MelandrusHope,
             Map.MorostavTrail,
             Map.MourningVeilFalls
-        }
+        ]
     };
     public static readonly Region TheJadeSea = new()
     {
         Id = 10,
         Name = "The Jade Sea",
         WikiUrl = "https://wiki.guildwars.com/wiki/The_Jade_Sea",
-        Maps = new List<Map>
-        {
+        Maps =
+        [
             Map.CavalonOutpost,
             Map.AspenwoodGateLuxonOutpost,
             Map.BaiPaasuReachOutpost,
@@ -359,15 +359,15 @@ public sealed class Region : IWikiEntity
             Map.MountQinkai,
             Map.RheasCrater,
             Map.SilentSurf
-        }
+        ]
     };
     public static readonly Region ShingJeaIsland = new()
     {
         Id = 11,
         Name = "Shing Jea Island",
         WikiUrl = "https://wiki.guildwars.com/wiki/Shing_Jea_Island",
-        Maps = new List<Map>
-        {
+        Maps =
+        [
             Map.ShingJeaArena,
             Map.ShingJeaArenaMission,
             Map.ShingJeaMonasteryCanthanNewYearOutpost,
@@ -400,15 +400,15 @@ public sealed class Region : IWikiEntity
             Map.PanjiangPeninsula,
             Map.SaoshangTrail,
             Map.SunquaVale
-        }
+        ]
     };
     public static readonly Region Kourna = new()
     {
         Id = 12,
         Name = "Kourna",
         WikiUrl = "https://wiki.guildwars.com/wiki/Kourna",
-        Maps = new List<Map>
-        {
+        Maps =
+        [
             Map.SunspearSanctuaryOutpost,
             Map.CampHojanuOutpost,
             Map.WehhanTerracesOutpost,
@@ -432,15 +432,15 @@ public sealed class Region : IWikiEntity
             Map.TheFloodplainOfMahnkelon,
             Map.TuraisProcession,
             Map.NightfallenCoast
-        }
+        ]
     };
     public static readonly Region Vabbi = new()
     {
         Id = 13,
         Name = "Vabbi",
         WikiUrl = "https://wiki.guildwars.com/wiki/Vabbi",
-        Maps = new List<Map>
-        {
+        Maps =
+        [
             Map.TheKodashBazaarOutpost,
             Map.BasaltGrottoOutpost,
             Map.ChantryOfSecretsOutpost,
@@ -465,15 +465,15 @@ public sealed class Region : IWikiEntity
             Map.VehtendiValley,
             Map.WildernessOfBahdza,
             Map.YatendiCanyons
-        }
+        ]
     };
     public static readonly Region TheDesolation = new()
     {
         Id = 14,
         Name = "TheDesolation",
         WikiUrl = "https://wiki.guildwars.com/wiki/The_Desolation",
-        Maps = new List<Map>
-        {
+        Maps =
+        [
             Map.BonePalaceOutpost,
             Map.LairOfTheForgottenOutpost,
             Map.TheMouthOfTormentOutpost,
@@ -487,15 +487,15 @@ public sealed class Region : IWikiEntity
             Map.TheRupturedHeart,
             Map.TheShatteredRavines,
             Map.TheSulfurousWastes
-        }
+        ]
     };
     public static readonly Region Istan = new()
     {
         Id = 15,
         Name = "Istan",
         WikiUrl = "https://wiki.guildwars.com/wiki/Istan",
-        Maps = new List<Map>
-        {
+        Maps =
+        [
             Map.KamadanJewelOfIstanCanthanNewYearOutpost,
             Map.KamadanJewelOfIstanExplorable,
             Map.KamadanJewelOfIstanHalloweenOutpost,
@@ -526,15 +526,15 @@ public sealed class Region : IWikiEntity
             Map.PlainsOfJarin,
             Map.SunDocks,
             Map.ZehlonReach
-        }
+        ]
     };
     public static readonly Region RealmOfTorment = new()
     {
         Id = 16,
         Name = "Realm of Torment",
         WikiUrl = "https://wiki.guildwars.com/wiki/Realm_of_Torment",
-        Maps = new List<Map>
-        {
+        Maps =
+        [
             Map.DomainOfAnguish,
             Map.GateOfTormentOutpost,
             Map.GateOfFearOutpost,
@@ -553,15 +553,15 @@ public sealed class Region : IWikiEntity
             Map.NightfallenGarden,
             Map.NightfallenJahai,
             Map.ThroneOfSecrets
-        }
+        ]
     };
     public static readonly Region TarnishedCoast = new()
     {
         Id = 17,
         Name = "Tarnished Coast",
         WikiUrl = "https://wiki.guildwars.com/wiki/Tarnished_Coast",
-        Maps = new List<Map>
-        {
+        Maps =
+        [
             Map.RataSumOutpost,
             Map.GaddsEncampmentOutpost,
             Map.TarnishedHavenOutpost,
@@ -584,15 +584,15 @@ public sealed class Region : IWikiEntity
             Map.RivenEarth,
             Map.SparkflySwamp,
             Map.VerdantCascades
-        }
+        ]
     };
     public static readonly Region DepthsOfTyria = new()
     {
         Id = 18,
         Name = "Depths Of Tyria",
         WikiUrl = "https://wiki.guildwars.com/wiki/Depths_of_Tyria",
-        Maps = new List<Map>
-        {
+        Maps =
+        [
             Map.CentralTransferChamberOutpost,
             Map.DestructionsDepthsMission,
             Map.DestructionsDepthsLevel1,
@@ -654,15 +654,15 @@ public sealed class Region : IWikiEntity
             Map.VloxenExcavationsLevel1,
             Map.VloxenExcavationsLevel2,
             Map.VloxenExcavationsLevel3
-        }
+        ]
     };
     public static readonly Region FarShiverpeaks = new()
     {
         Id = 19,
         Name = "Far Shiverpeaks",
         WikiUrl = "https://wiki.guildwars.com/wiki/Far_Shiverpeaks",
-        Maps = new List<Map>
-        {
+        Maps =
+        [
             Map.GunnarsHoldOutpost,
             Map.BorealStationOutpost,
             Map.EyeOfTheNorthOutpost,
@@ -690,15 +690,15 @@ public sealed class Region : IWikiEntity
             Map.NorrhartDomains,
             Map.PolymockGlacier,
             Map.VarajarFells
-        }
+        ]
     };
     public static readonly Region CharrHomelands = new()
     {
         Id = 20,
         Name = "Charr Homelands",
         WikiUrl = "https://wiki.guildwars.com/wiki/Charr_Homelands",
-        Maps = new List<Map>
-        {
+        Maps =
+        [
             Map.DoomloreShrineOutpost,
             Map.AgainstTheCharr,
             Map.AgainstTheCharrMission,
@@ -712,15 +712,15 @@ public sealed class Region : IWikiEntity
             Map.GrothmarWardowns,
             Map.PolymockCrossing,
             Map.SacnothValley
-        }
+        ]
     };
     public static readonly Region TheBattleIsles = new()
     {
         Id = 21,
         Name = "The Battle Isles",
         WikiUrl = "https://wiki.guildwars.com/wiki/The_Battle_Isles",
-        Maps = new List<Map>
-        {
+        Maps =
+        [
             Map.GreatTempleOfBalthazarOutpost,
             Map.IsleOfTheDeadGuildHall,
             Map.IsleOfTheDeadGuildHallMission,
@@ -770,53 +770,53 @@ public sealed class Region : IWikiEntity
             Map.UnchartedIsle,
             Map.UnchartedIsleMission,
             Map.UnchartedIsleOutpost
-        }
+        ]
     };
     public static readonly Region TheBattleOfJahai = new()
     {
         Id = 22,
         Name = "The Battle Of Jahai",
         WikiUrl = "https://wiki.guildwars.com/wiki/The_Battle_of_Jahai",
-        Maps = new List<Map>
-        {
+        Maps =
+        [
             Map.TheBattleOfJahai
-        }
+        ]
     };
     public static readonly Region TheFlightNorth = new()
     {
         Id = 23,
         Name = "The Flight North",
         WikiUrl = "https://wiki.guildwars.com/wiki/The_Flight_North",
-        Maps = new List<Map>
-        {
+        Maps =
+        [
             Map.TheFlightNorth
-        }
+        ]
     };
     public static readonly Region TheTenguAccords = new()
     {
         Id = 24,
         Name = "The Tengu Accords",
         WikiUrl = "https://wiki.guildwars.com/wiki/The_Tengu_Accords",
-        Maps = new List<Map>
-        {
+        Maps =
+        [
             Map.TheTenguAccords
-        }
+        ]
     };
     public static readonly Region TheRiseOfTheWhiteMantle = new()
     {
         Id = 25,
         Name = "The Rise Of The White Mantle",
         WikiUrl = "https://wiki.guildwars.com/wiki/The_Rise_of_the_White_Mantle",
-        Maps = new List<Map>
-        {
+        Maps =
+        [
             Map.TheRiseOfTheWhiteMantle
-        }
+        ]
     };
     public static readonly Region Swat = new() { Id = 26 };
     public static readonly Region DevRegion = new() { Id = 27 };
 
-    public static IReadOnlyList<Region> Regions { get; } = new List<Region>()
-    {
+    public static IReadOnlyList<Region> Regions { get; } =
+    [
         Kryta,
         MaguumaJungle,
         Ascalon,
@@ -844,7 +844,7 @@ public sealed class Region : IWikiEntity
         TheRiseOfTheWhiteMantle,
         Swat,
         DevRegion
-    };
+    ];
 
     public static bool TryParse(int id, out Region region)
     {
