@@ -2,10 +2,7 @@
 using Daybreak.Shared.Models.Trade;
 using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.TradeChat;
-using System;
-using System.Collections.Generic;
 using System.Core.Extensions;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 

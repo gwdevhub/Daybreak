@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Models.Guildwars;
-using System.Threading.Tasks;
 
 namespace Daybreak.Shared.Services.IconRetrieve;
 

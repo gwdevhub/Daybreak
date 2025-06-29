@@ -1,5 +1,4 @@
-﻿using Daybreak.Models;
-using Daybreak.Shared.Models;
+﻿using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Privilege;
 using Daybreak.Views;

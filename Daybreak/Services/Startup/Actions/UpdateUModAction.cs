@@ -1,8 +1,6 @@
 ﻿using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.UMod;
 using System.Core.Extensions;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daybreak.Services.Startup.Actions;
 internal sealed class UpdateUModAction : StartupActionBase

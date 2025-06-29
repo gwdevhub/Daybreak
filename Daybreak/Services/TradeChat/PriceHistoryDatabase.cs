@@ -4,13 +4,8 @@ using Daybreak.Shared.Models.Trade;
 using Daybreak.Shared.Services.TradeChat;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daybreak.Services.TradeChat;
 internal sealed class PriceHistoryDatabase : IPriceHistoryDatabase

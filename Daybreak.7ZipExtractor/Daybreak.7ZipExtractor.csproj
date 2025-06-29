@@ -5,13 +5,11 @@
     <TargetFramework>net9.0</TargetFramework>
     <RootNamespace>Daybreak._7ZipExtractor</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
     <Platforms>x64</Platforms>
-    <Version>0.9.9.76</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SharpCompress" Version="0.40.0" />
+    <PackageReference Include="SharpCompress" />
   </ItemGroup>
 
 </Project>

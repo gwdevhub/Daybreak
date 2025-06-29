@@ -2,10 +2,8 @@
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.UMod;
 using Daybreak.Utils;
-using System;
 using System.Core.Extensions;
 using System.IO;
-using System.Linq;
 using System.Windows.Controls;
 
 namespace Daybreak.Views.Onboarding.ReShade;

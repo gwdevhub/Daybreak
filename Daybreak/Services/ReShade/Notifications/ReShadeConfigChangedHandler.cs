@@ -3,7 +3,6 @@ using Daybreak.Shared.Models.Notifications.Handling;
 using Daybreak.Shared.Services.ReShade;
 using System.Core.Extensions;
 using System.IO;
-using System.Threading;
 
 namespace Daybreak.Services.ReShade.Notifications;
 internal sealed class ReShadeConfigChangedHandler : INotificationHandler

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Core.Extensions;
+﻿using System.Core.Extensions;
 
 namespace Daybreak.Services.Toolbox.Models;
 internal abstract class DownloadLatestOperation

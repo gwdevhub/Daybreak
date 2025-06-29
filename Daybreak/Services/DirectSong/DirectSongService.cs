@@ -9,14 +9,11 @@ using Daybreak.Shared.Services.SevenZip;
 using Daybreak.Shared.Utils;
 using Daybreak.Views;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daybreak.Services.DirectSong;
 internal sealed class DirectSongService(

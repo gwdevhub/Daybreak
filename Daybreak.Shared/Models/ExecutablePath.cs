@@ -4,17 +4,15 @@ namespace Daybreak.Shared.Models;
 
 public sealed class ExecutablePath : INotifyPropertyChanged
 {
-    private string path = string.Empty;
-
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public string Path
     {
-        get => this.path;
+        get;
         set
         {
-            this.path = value;
+            field = value;
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Path)));
         }
-    }
+    } = string.Empty;
 }

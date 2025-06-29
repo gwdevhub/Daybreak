@@ -6,16 +6,11 @@ using Daybreak.Shared.Services.Images;
 using Daybreak.Shared.Services.Screenshots;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Media;
 
 namespace Daybreak.Services.Screenshots;

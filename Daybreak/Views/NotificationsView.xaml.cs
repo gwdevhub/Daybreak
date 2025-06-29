@@ -1,13 +1,9 @@
 ﻿using Daybreak.Shared.Models.Notifications;
 using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 

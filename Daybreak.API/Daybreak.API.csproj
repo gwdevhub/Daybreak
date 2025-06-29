@@ -8,9 +8,7 @@
     <RuntimeIdentifier>win-x86</RuntimeIdentifier>
     <StripSymbols>true</StripSymbols>
     <InteropExports>true</InteropExports>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <EnableRequestDelegateGenerator>true</EnableRequestDelegateGenerator>
-    <Version>0.9.9.76</Version>
     
     <PublishAot>true</PublishAot>
     <SelfContained>true</SelfContained>
@@ -21,6 +19,20 @@
     <InvariantGlobalization>true</InvariantGlobalization>
     <Platforms>x86</Platforms>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <!--Ignore trim warnings. NativeAOT support is still experimental so it should be tested with a Publish build generated from Daybreak build-->
+    <NoWarn>IL2104</NoWarn>
+    <NoWarn>IL3053</NoWarn>
+    <!--MinHook.NET does not contain sources for .NET, only .Net Framework. This has no impact on the functionality of the project-->
+    <NoWarn>NU1701</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!--Event Source support is experimental in NativeAOT-->
+    <_SuppressNativeLibEventSourceError>true</_SuppressNativeLibEventSourceError>
+  </PropertyGroup>
+
 
   <ItemGroup>
     <EmbeddedResource Include="Configuration\appsettings.Debug.json" />
@@ -33,23 +45,23 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.6" />
-    <PackageReference Include="MinHook.NET" Version="1.1.1" />
-    <PackageReference Include="Net.Sdk.Web.Extensions" Version="0.8.10" />
-    <PackageReference Include="Net.Sdk.Web.Extensions.SourceGenerators" Version="0.9.3" />
-    <PackageReference Include="PeNet" Version="5.1.0" />
-    <PackageReference Include="Serilog" Version="4.3.0" />
-    <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.2" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="9.0.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="9.0.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="9.0.1" />
-    <PackageReference Include="System.Private.Uri" Version="4.3.2" />
-    <PackageReference Include="SystemExtensions.NetStandard.Generators" Version="0.1.5" PrivateAssets="all" />
-    <PackageReference Include="ZLinq" Version="1.4.12" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="MinHook.NET" />
+    <PackageReference Include="Net.Sdk.Web.Extensions" />
+    <PackageReference Include="Net.Sdk.Web.Extensions.SourceGenerators" />
+    <PackageReference Include="PeNet" />
+    <PackageReference Include="Serilog" />
+    <PackageReference Include="Serilog.Extensions.Logging" />
+    <PackageReference Include="Serilog.Settings.Configuration" />
+    <PackageReference Include="Serilog.Sinks.Console" />
+    <PackageReference Include="Serilog.Sinks.File" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" />
+    <PackageReference Include="System.Private.Uri" />
+    <PackageReference Include="SystemExtensions.NetStandard.Generators" PrivateAssets="all" />
+    <PackageReference Include="ZLinq" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,8 +3,6 @@ using Daybreak.Shared.Models.Onboarding;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.Navigation;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Windows;

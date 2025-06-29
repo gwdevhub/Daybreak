@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace Daybreak.Shared.Models.Versioning;
+﻿namespace Daybreak.Shared.Models.Versioning;
 
 public abstract class VersionToken
 {

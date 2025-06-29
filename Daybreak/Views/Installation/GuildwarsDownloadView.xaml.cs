@@ -2,7 +2,6 @@
 using System.Windows;
 using System.Core.Extensions;
 using System.Windows.Extensions;
-using System.Threading;
 using System.Windows.Controls;
 using Daybreak.Services.Guildwars.Models;
 using Daybreak.Shared.Services.Menu;

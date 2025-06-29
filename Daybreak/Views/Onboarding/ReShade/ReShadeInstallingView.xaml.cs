@@ -4,7 +4,6 @@ using Daybreak.Shared.Services.ReShade;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;

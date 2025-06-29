@@ -2,11 +2,9 @@
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Credentials;
 using Daybreak.Shared.Services.Navigation;
-using System;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Linq;
 using System.Windows.Controls;
 
 namespace Daybreak.Views.Launch;

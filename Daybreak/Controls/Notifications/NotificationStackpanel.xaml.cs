@@ -4,11 +4,9 @@ using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Sounds;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Threading;
 

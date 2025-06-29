@@ -2,11 +2,7 @@
 using Daybreak.Shared.Services.Startup;
 using Microsoft.Extensions.Logging;
 using Slim;
-using System;
-using System.Collections.Generic;
 using System.Core.Extensions;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.Startup;

@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Models.Guildwars;
-using System;
 using System.Windows.Controls;
 using System.Windows.Input;
 

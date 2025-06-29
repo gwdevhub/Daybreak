@@ -4,7 +4,6 @@ using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Options;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Reflection;
@@ -29,7 +28,7 @@ internal sealed class CredentialsOptionsMigrator : StartupActionBase
     {
         var newOptionsKey = GetNewOptionsKey();
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.ExecuteOnStartup), string.Empty);
-        if (this.optionsProvider.TryGetKeyedOptions(newOptionsKey) is JObject)
+        if (this.optionsProvider.TryGetKeyedOptions(newOptionsKey) is not null)
         {
             scopedLogger.LogDebug($"Found [{newOptionsKey}]. No migration needed");
             return;

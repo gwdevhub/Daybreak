@@ -2,11 +2,8 @@
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.Guildwars;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Core.Extensions;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Daybreak.Services.Guildwars;

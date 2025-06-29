@@ -2,10 +2,8 @@
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Screenshots;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Configuration;
 using System.Core.Extensions;
-using System.Threading.Tasks;
 using System.Windows.Media;
 
 namespace Daybreak.Services.Screenshots;

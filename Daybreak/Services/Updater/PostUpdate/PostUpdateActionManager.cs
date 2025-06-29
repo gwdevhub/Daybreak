@@ -2,7 +2,6 @@
 using Daybreak.Shared.Services.Updater.PostUpdate;
 using Microsoft.Extensions.Logging;
 using Slim;
-using System.Collections.Generic;
 using System.Core.Extensions;
 
 namespace Daybreak.Services.Updater.PostUpdate;

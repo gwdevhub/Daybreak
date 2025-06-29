@@ -9,10 +9,8 @@ using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Views.Installation;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Threading;
 
 namespace Daybreak.Services.Guildwars;
 internal sealed class GuildWarsBatchUpdateNotificationHandler : INotificationHandler

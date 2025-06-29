@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Daybreak.Shared.Models.Progress;
+﻿namespace Daybreak.Shared.Models.Progress;
 public sealed class GuildwarsInstallationStatus : DownloadStatus
 {
     public static readonly LoadStatus StartingStep = new GuildwarsInstallationStep("Starting");

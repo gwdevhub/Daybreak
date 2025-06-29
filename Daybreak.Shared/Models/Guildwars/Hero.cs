@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Daybreak.Shared.Models.Guildwars;
+﻿namespace Daybreak.Shared.Models.Guildwars;
 public sealed class Hero : IWikiEntity
 {
     public static readonly Hero None = new() { Id = 0, Profession = Profession.None, Name = string.Empty, WikiUrl = string.Empty };

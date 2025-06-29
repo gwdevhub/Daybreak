@@ -1,11 +1,8 @@
 ﻿using Daybreak.Shared.Models.Metrics;
 using Daybreak.Shared.Services.Metrics;
-using System;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.Monitoring;

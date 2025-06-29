@@ -1,5 +1,4 @@
-﻿using System;
-using Squealify;
+﻿using Squealify;
 
 namespace Daybreak.Services.TradeChat.Models;
 

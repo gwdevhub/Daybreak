@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Logging;
+﻿using System.Logging;
 
 namespace Daybreak.Services.Logging;
 

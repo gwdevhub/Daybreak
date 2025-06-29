@@ -4,8 +4,6 @@ using Slim;
 using System.Core.Extensions;
 using System.Extensions;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Daybreak.Services.Browser;
 

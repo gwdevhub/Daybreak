@@ -2,10 +2,8 @@
 using Daybreak.Shared.Services.DirectSong;
 using Daybreak.Shared.Services.Navigation;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;

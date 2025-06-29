@@ -1,6 +1,4 @@
 ﻿using Daybreak.Shared.Models.Progress;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Version = Daybreak.Shared.Models.Versioning.Version;
 
 namespace Daybreak.Shared.Services.Updater;

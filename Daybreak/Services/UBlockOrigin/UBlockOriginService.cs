@@ -1,13 +1,8 @@
-﻿using System.Collections.Generic;
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.IO;
 using System.Core.Extensions;
 using System.Net.Http;
 using Microsoft.Extensions.Logging;
 using System.Extensions;
-using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO.Compression;

@@ -2,10 +2,7 @@
 using Daybreak.Shared.Models.Notifications;
 using Daybreak.Shared.Services.InternetChecker;
 using Daybreak.Shared.Services.Notifications;
-using System;
 using System.Core.Extensions;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.InternetChecker;

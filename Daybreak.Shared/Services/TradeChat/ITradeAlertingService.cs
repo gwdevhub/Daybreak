@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Models.Trade;
-using System.Collections.Generic;
 
 namespace Daybreak.Shared.Services.TradeChat;
 

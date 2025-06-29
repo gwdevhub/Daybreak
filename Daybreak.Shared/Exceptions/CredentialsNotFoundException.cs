@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Daybreak.Shared.Exceptions;
+﻿namespace Daybreak.Shared.Exceptions;
 
 public sealed class CredentialsNotFoundException : Exception
 {

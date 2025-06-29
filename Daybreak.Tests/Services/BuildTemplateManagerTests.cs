@@ -1,11 +1,11 @@
-﻿using Daybreak.Services.BuildTemplates;
-using Daybreak.Shared.Models.Builds;
+﻿using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.BuildTemplates;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
+using Attribute = Daybreak.Shared.Models.Guildwars.Attribute;
 
 namespace Daybreak.Tests.Services;
 
@@ -14,7 +14,7 @@ public class BuildTemplateManagerTests
 {
     private const string EncodedSingleTemplate = "OwBk0texXNu0Dj/z+TDzBj+TN4AE";
     private const string EncodedTeamTemplate = "OQJUAMxOEMLnw0nDXQGY6aw2B OQNCA8wDP9B8DyzmOUi1veC OggjYxXTIPWbp5krZfxEAAAoD OwUTM4HDn5gc9TJSh6xddmETA";
-    private IBuildTemplateManager buildTemplateManager;
+    private IBuildTemplateManager buildTemplateManager = default!;
 
     [TestInitialize]
     public void Initialize()

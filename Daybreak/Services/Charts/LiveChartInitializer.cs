@@ -3,7 +3,6 @@ using Daybreak.Shared.Models.Trade;
 using LiveChartsCore;
 using LiveChartsCore.Kernel;
 using LiveChartsCore.SkiaSharpView;
-using System;
 using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.Charts;

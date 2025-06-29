@@ -1,17 +1,14 @@
 ﻿using Daybreak.Attributes;
 using Daybreak.Controls.Buttons;
-using Daybreak.Launch;
 using Daybreak.Shared;
 using Daybreak.Shared.Models.Options;
 using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Views;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Linq;
 using System.Reflection;
 using System.Windows.Controls;
 

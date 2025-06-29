@@ -10,7 +10,6 @@ using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Extensions;
 using System.IO;
-using System.Threading;
 
 namespace Daybreak.Services.Guildwars;
 internal sealed class GuildWarsUpdateNotificationHandler : INotificationHandler

@@ -5,11 +5,9 @@ using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.Events;
 using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Globalization;
-using System.Threading.Tasks;
 
 namespace Daybreak.Services.Events;
 

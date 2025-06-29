@@ -1,6 +1,4 @@
 ﻿using Daybreak.Shared.Models.Guildwars;
-using System;
-using System.Collections.Generic;
 
 namespace Daybreak.Shared.Services.Events;
 public interface IEventService

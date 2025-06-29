@@ -1,6 +1,5 @@
 ﻿using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.TradeChat;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Windows.Media;
 

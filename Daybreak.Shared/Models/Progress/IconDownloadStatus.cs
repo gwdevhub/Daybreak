@@ -11,19 +11,17 @@ public sealed class IconDownloadStatus : INotifyPropertyChanged
     public static IconDownloadStep Downloading(string iconName, double progress) => new DownloadingIconDownloadStep(iconName, progress);
     public static IconDownloadStep Stopped(double progress) => new StoppedIconDownloadStep(progress);
 
-    private IconDownloadStep currentStep = StartingStep;
-
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public IconDownloadStep CurrentStep
     {
-        get => this.currentStep;
+        get;
         set
         {
-            this.currentStep = value;
+            field = value;
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CurrentStep)));
         }
-    }
+    } = StartingStep;
 
     public abstract class IconDownloadStep : LoadStatus
     {

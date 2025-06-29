@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Daybreak.Shared.Models.Builds;
+﻿namespace Daybreak.Shared.Models.Builds;
 public interface IBuildEntry
 {
     public DateTimeOffset CreationTime { get; set; }

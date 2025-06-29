@@ -4,9 +4,7 @@ using Daybreak.Shared.Models.Metrics;
 using Daybreak.Shared.Services.Images;
 using Daybreak.Shared.Services.Metrics;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
@@ -16,8 +14,6 @@ using System.Drawing.Imaging;
 using System.Extensions;
 using System.IO;
 using System.Logging;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 

@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Models.Trade;
-using System;
 using System.Windows.Controls;
 
 namespace Daybreak.Controls.Templates;

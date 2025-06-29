@@ -4,7 +4,6 @@ using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Navigation;
 using Daybreak.Views.Launch;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Core.Extensions;
 using System.Windows.Controls;
 using System.Windows.Extensions;

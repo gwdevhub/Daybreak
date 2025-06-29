@@ -3,11 +3,8 @@ using Daybreak.Shared.Services.LaunchConfigurations;
 using Daybreak.Shared.Services.Navigation;
 using Daybreak.Views;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Daybreak.Services.ApplicationArguments.ArgumentHandling;
 internal sealed class AutoLaunchArgumentHandler : IArgumentHandler

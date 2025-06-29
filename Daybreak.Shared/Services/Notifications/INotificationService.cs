@@ -1,6 +1,5 @@
 ﻿using Daybreak.Shared.Models.Notifications;
 using Daybreak.Shared.Models.Notifications.Handling;
-using System;
 
 namespace Daybreak.Shared.Services.Notifications;
 

@@ -9,8 +9,6 @@ using Newtonsoft.Json;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 using System.Windows.Media;

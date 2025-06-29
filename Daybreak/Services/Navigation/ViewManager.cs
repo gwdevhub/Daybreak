@@ -1,8 +1,6 @@
 ﻿using Daybreak.Services.Telemetry;
-using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.Navigation;
 using Slim;
-using System;
 using System.Diagnostics;
 using System.Extensions;
 using System.Windows;

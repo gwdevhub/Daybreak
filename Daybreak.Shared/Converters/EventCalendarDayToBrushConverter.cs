@@ -1,9 +1,7 @@
 ﻿using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.Events;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Globalization;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;

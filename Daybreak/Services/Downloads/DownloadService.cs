@@ -3,14 +3,11 @@ using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Services.Downloads;
 using Daybreak.Shared.Services.Metrics;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Core.Extensions;
 using System.Diagnostics.Metrics;
 using System.Extensions.Core;
 using System.IO;
 using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daybreak.Services.Downloads;
 

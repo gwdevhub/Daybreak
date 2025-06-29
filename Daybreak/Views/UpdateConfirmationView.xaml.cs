@@ -1,10 +1,10 @@
-﻿using Daybreak.Shared.Models.Versioning;
-using Daybreak.Shared.Services.Navigation;
+﻿using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Updater;
 using System.Core.Extensions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
+using Version = Daybreak.Shared.Models.Versioning.Version;
 
 namespace Daybreak.Views;
 /// <summary>

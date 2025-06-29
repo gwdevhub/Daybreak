@@ -5,8 +5,6 @@ using Daybreak.Shared.Services.Screens;
 using Daybreak.Views;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Threading;
 
 namespace Daybreak.Services.Startup.Actions;

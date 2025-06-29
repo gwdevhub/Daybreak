@@ -1,10 +1,8 @@
 ﻿using System.Diagnostics.Metrics;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using System.Windows.Extensions.Services;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Threading;
 using Daybreak.Shared.Services.Metrics;
 using Daybreak.Shared.Models.Metrics;
 

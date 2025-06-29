@@ -2,11 +2,8 @@
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Credentials;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Extensions;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using Convert = System.Convert;

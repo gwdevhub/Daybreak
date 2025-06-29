@@ -3,16 +3,11 @@ using Daybreak.Shared.Models.Github;
 using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Services.Downloads;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using Version = Daybreak.Shared.Models.Versioning.Version;
 
 namespace Daybreak.Services.Toolbox.Utilities;

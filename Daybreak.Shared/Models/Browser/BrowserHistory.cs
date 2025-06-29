@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Daybreak.Shared.Models.Browser;
+﻿namespace Daybreak.Shared.Models.Browser;
 public sealed class BrowserHistory
 {
     public List<string> History { get; set; } = [];

@@ -1,8 +1,5 @@
 ﻿using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.Events;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Daybreak.Services.Events;
 internal sealed class EventService : IEventService

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Extensions;
+﻿using System.Extensions;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;

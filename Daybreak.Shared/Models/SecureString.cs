@@ -1,7 +1,5 @@
 ﻿using Daybreak.Shared.Utils;
 using Newtonsoft.Json;
-using System;
-using System.Linq;
 using System.Security.Cryptography;
 
 namespace Daybreak.Shared.Models;

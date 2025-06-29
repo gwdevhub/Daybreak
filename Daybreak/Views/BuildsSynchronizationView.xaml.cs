@@ -4,18 +4,10 @@ using System.Core.Extensions;
 using System.Windows;
 using System.Windows.Extensions;
 using System.Windows.Controls;
-using System.Collections.ObjectModel;
-using Daybreak.Services.Graph.Models;
 using System.Extensions;
-using System.Threading.Tasks;
-using System;
-using System.Linq;
-using System.Collections.Generic;
 using Daybreak.Shared.Services.BuildTemplates;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Navigation;
-using System.Threading;
-using System.Windows.Forms.VisualStyles;
 
 namespace Daybreak.Views;
 

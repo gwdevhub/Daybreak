@@ -1,6 +1,5 @@
 ﻿using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.TradeChat;
-using System.Collections.Generic;
 using System.Extensions;
 using System.Text;
 

@@ -4,14 +4,11 @@ using Daybreak.Shared.Services.IconRetrieve;
 using Daybreak.Shared.Utils;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 using System.IO;
 using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daybreak.Services.IconRetrieve;
 

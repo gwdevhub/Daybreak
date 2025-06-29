@@ -1,14 +1,10 @@
-﻿using Daybreak.Services.Logging;
-using Daybreak.Services.Notifications;
+﻿using Daybreak.Services.Notifications;
 using Daybreak.Services.TradeChat;
 using Daybreak.Shared.Models;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daybreak.Services.Startup.Actions;
 internal sealed class CleanupDatabases : StartupActionBase

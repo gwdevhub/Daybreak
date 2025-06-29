@@ -10,17 +10,15 @@ public sealed class StartupStatus : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    private StartupStep currentStep = Starting;
-
     public StartupStep CurrentStep
     {
-        get => this.currentStep;
+        get;
         set
         {
-            this.currentStep = value;
+            field = value;
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CurrentStep)));
         }
-    }
+    } = Starting;
 
     public class StartupStep : LoadStatus
     {

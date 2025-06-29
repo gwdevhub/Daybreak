@@ -9,7 +9,6 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using System;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;

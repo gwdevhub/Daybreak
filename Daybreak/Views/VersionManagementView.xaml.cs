@@ -1,10 +1,8 @@
 ﻿using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Updater;
-using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Extensions;
-using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 using Version = Daybreak.Shared.Models.Versioning.Version;

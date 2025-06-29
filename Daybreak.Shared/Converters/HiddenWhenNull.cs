@@ -1,5 +1,4 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
@@ -9,7 +8,7 @@ public class HiddenWhenNull : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        return this.GetVerticalAlignment(value);
+        return GetVerticalAlignment(value);
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -17,7 +16,7 @@ public class HiddenWhenNull : IValueConverter
         throw new NotImplementedException();
     }
 
-    private object GetVerticalAlignment(object value)
+    private static object GetVerticalAlignment(object value)
     {
         if (value is null)
         {

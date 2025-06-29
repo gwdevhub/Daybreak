@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace Daybreak.Shared.Services.Browser;
+﻿namespace Daybreak.Shared.Services.Browser;
 
 public interface IBrowserExtension
 {

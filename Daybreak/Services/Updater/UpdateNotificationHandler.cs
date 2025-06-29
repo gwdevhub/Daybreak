@@ -1,9 +1,9 @@
 ﻿using Daybreak.Shared.Models.Notifications;
 using Daybreak.Shared.Models.Notifications.Handling;
-using Daybreak.Shared.Models.Versioning;
 using Daybreak.Shared.Services.Navigation;
 using Daybreak.Views;
 using System.Core.Extensions;
+using Version = Daybreak.Shared.Models.Versioning.Version;
 
 namespace Daybreak.Services.Updater;
 internal sealed class UpdateNotificationHandler : INotificationHandler

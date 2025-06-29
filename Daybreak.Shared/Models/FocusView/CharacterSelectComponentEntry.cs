@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Daybreak.Shared.Models.FocusView;
+﻿namespace Daybreak.Shared.Models.FocusView;
 public sealed class CharacterSelectComponentEntry : IEquatable<CharacterSelectComponentEntry>
 {
     public required string DisplayName { get; init; }
