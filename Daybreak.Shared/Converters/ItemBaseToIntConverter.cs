@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Models.Guildwars;
-using System;
 using System.Globalization;
 using System.Windows.Data;
 

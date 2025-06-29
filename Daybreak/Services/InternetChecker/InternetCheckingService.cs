@@ -9,8 +9,6 @@ using System.Diagnostics.Metrics;
 using System.Extensions;
 using System.Net.Http;
 using System.Net.NetworkInformation;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daybreak.Services.InternetChecker;
 

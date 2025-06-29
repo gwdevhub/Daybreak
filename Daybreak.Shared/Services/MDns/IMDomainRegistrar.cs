@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Daybreak.Shared.Services.MDns;
+﻿namespace Daybreak.Shared.Services.MDns;
 public interface IMDomainRegistrar
 {
     IReadOnlyList<Uri>? Resolve(string service);

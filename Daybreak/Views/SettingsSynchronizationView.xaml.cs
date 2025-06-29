@@ -9,8 +9,6 @@ using Newtonsoft.Json;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 using System.Windows.Media;
@@ -32,16 +30,16 @@ public partial class SettingsSynchronizationView : UserControl
     private bool loading;
 
     [GenerateDependencyProperty]
-    private string displayName;
+    private string displayName = default!;
 
     [GenerateDependencyProperty]
-    private string email;
+    private string email = default!;
 
     [GenerateDependencyProperty]
-    private string currentOptions;
+    private string currentOptions = default!;
 
     [GenerateDependencyProperty]
-    private string remoteOptions;
+    private string remoteOptions = default!;
 
     [GenerateDependencyProperty]
     private bool synchronized;

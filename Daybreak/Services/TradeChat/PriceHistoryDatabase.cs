@@ -4,30 +4,18 @@ using Daybreak.Shared.Models.Trade;
 using Daybreak.Shared.Services.TradeChat;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daybreak.Services.TradeChat;
-internal sealed class PriceHistoryDatabase : IPriceHistoryDatabase
+internal sealed class PriceHistoryDatabase(
+    IItemHashService itemHashService,
+    TradeQuoteDbContext collection,
+    ILogger<PriceHistoryDatabase> logger) : IPriceHistoryDatabase
 {
-    private readonly IItemHashService itemHashService;
-    private readonly TradeQuoteDbContext collection;
-    private readonly ILogger<PriceHistoryDatabase> logger;
-
-    public PriceHistoryDatabase(
-        IItemHashService itemHashService,
-        TradeQuoteDbContext collection,
-        ILogger<PriceHistoryDatabase> logger)
-    {
-        this.itemHashService = itemHashService.ThrowIfNull();
-        this.collection = collection.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly IItemHashService itemHashService = itemHashService.ThrowIfNull();
+    private readonly TradeQuoteDbContext collection = collection.ThrowIfNull();
+    private readonly ILogger<PriceHistoryDatabase> logger = logger.ThrowIfNull();
 
     public async ValueTask<bool> AddTraderQuotes(IEnumerable<TraderQuoteDTO> traderQuotes, CancellationToken cancellationToken)
     {

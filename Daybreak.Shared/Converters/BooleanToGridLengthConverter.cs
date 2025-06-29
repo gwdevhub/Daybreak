@@ -1,5 +1,4 @@
-﻿using System;
-using System.Extensions;
+﻿using System.Extensions;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
@@ -22,7 +21,7 @@ public sealed class BooleanToGridLengthConverter : IValueConverter
         throw new NotImplementedException();
     }
 
-    private object GetVisibility(object value)
+    private GridLength GetVisibility(object value)
     {
         if (value is not bool)
         {

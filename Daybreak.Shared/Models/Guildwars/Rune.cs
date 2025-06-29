@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Daybreak.Shared.Models.Guildwars;
+﻿namespace Daybreak.Shared.Models.Guildwars;
 public sealed class Rune : ItemBase, IWikiEntity, IIconUrlEntity, IItemModHash
 {
     public static readonly Rune KnightsInsignia = new() { Id = 19152, Name = "Knight's Insignia", Modifiers = [0x25B80000, 0x240801F9, 0xA53003F2, 0xA7F80300, 0xC0000000], ModHash = "25B80000240801F9A53003F2A7F80300C0000000", WikiUrl = "https://wiki.guildwars.com/wiki/Knight's_Insignia", IconUrl = "https://wiki.guildwars.com/images/7/79/Knight%27s_Insignia.png" };

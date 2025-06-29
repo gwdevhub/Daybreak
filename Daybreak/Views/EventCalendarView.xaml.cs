@@ -1,11 +1,9 @@
 ﻿using Daybreak.Models;
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.Events;
-using System;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 using System.Windows.Input;

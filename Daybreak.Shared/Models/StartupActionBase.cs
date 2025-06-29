@@ -1,7 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-
-namespace Daybreak.Shared.Models;
+﻿namespace Daybreak.Shared.Models;
 
 public abstract class StartupActionBase
 {

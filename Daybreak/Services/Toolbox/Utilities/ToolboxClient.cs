@@ -3,39 +3,27 @@ using Daybreak.Shared.Models.Github;
 using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Services.Downloads;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using Version = Daybreak.Shared.Models.Versioning.Version;
 
 namespace Daybreak.Services.Toolbox.Utilities;
-internal sealed class ToolboxClient : IToolboxClient
+internal sealed class ToolboxClient(
+    IDownloadService downloadService,
+    IHttpClient<ToolboxClient> httpClient,
+    ILogger<ToolboxClient> logger) : IToolboxClient
 {
     private const string DllName = "GWToolboxdll.dll";
     private const string TagPlaceholder = "[TAG_PLACEHOLDER]";
     private const string ReleaseUrl = "https://github.com/gwdevhub/GWToolboxpp/releases/download/[TAG_PLACEHOLDER]/GWToolboxdll.dll";
     private const string ReleasesUrl = "https://api.github.com/repos/gwdevhub/GWToolboxpp/git/refs/tags";
 
-    private readonly IDownloadService downloadService;
-    private readonly IHttpClient<ToolboxClient> httpClient;
-    private readonly ILogger<ToolboxClient> logger;
-
-    public ToolboxClient(
-        IDownloadService downloadService,
-        IHttpClient<ToolboxClient> httpClient,
-        ILogger<ToolboxClient> logger)
-    {
-        this.downloadService = downloadService.ThrowIfNull();
-        this.httpClient = httpClient.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
+    private readonly IHttpClient<ToolboxClient> httpClient = httpClient.ThrowIfNull();
+    private readonly ILogger<ToolboxClient> logger = logger.ThrowIfNull();
 
     public async Task<DownloadLatestOperation> DownloadLatestDll(ToolboxInstallationStatus toolboxInstallationStatus, string destinationFolder, CancellationToken cancellationToken)
     {
@@ -105,7 +93,7 @@ internal sealed class ToolboxClient : IToolboxClient
             return default;
         }
 
-        var responseString = await getListResponse.Content.ReadAsStringAsync();
+        var responseString = await getListResponse.Content.ReadAsStringAsync(cancellationToken);
         var releasesList = responseString.Deserialize<List<GithubRefTag>>();
         var latestRelease = releasesList?.Where(t => t.Ref?.Contains("Release") is true)
             .Select(t => t.Ref?.Replace("refs/tags/", ""))

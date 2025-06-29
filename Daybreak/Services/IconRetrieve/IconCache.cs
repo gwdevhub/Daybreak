@@ -4,14 +4,11 @@ using Daybreak.Shared.Services.IconRetrieve;
 using Daybreak.Shared.Utils;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 using System.IO;
 using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daybreak.Services.IconRetrieve;
 
@@ -178,7 +175,7 @@ internal sealed class IconCache : IIconCache
         foreach (var imgElement in imgElements)
         {
             if (imgElement.GetAttributeValue<string>("src", string.Empty) is string src &&
-                src.ToLower().Contains(curedName.ToLower()) &&
+                src.Contains(curedName, StringComparison.CurrentCultureIgnoreCase) &&
                 (Uri.TryCreate(src, UriKind.Absolute, out var iconUri) ||
                  Uri.TryCreate(new Uri(WikiUrl), src, out iconUri)))
             {

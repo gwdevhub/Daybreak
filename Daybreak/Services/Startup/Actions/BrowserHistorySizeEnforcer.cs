@@ -4,15 +4,10 @@ using System.Configuration;
 using System.Core.Extensions;
 
 namespace Daybreak.Services.Startup.Actions;
-public sealed class BrowserHistorySizeEnforcer : StartupActionBase
+public sealed class BrowserHistorySizeEnforcer(
+    IUpdateableOptions<FocusViewOptions> liveOptions) : StartupActionBase
 {
-    private readonly IUpdateableOptions<FocusViewOptions> liveOptions;
-
-    public BrowserHistorySizeEnforcer(
-        IUpdateableOptions<FocusViewOptions> liveOptions)
-    {
-        this.liveOptions = liveOptions.ThrowIfNull();
-    }
+    private readonly IUpdateableOptions<FocusViewOptions> liveOptions = liveOptions.ThrowIfNull();
 
     public override void ExecuteOnStartup()
     {

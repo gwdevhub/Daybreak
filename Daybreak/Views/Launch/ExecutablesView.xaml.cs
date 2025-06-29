@@ -1,11 +1,9 @@
 ﻿using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.Navigation;
-using System;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;

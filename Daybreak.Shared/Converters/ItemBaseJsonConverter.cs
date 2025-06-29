@@ -1,6 +1,5 @@
 ﻿using Daybreak.Shared.Models.Guildwars;
 using Newtonsoft.Json;
-using System;
 
 namespace Daybreak.Shared.Converters;
 public sealed class ItemBaseJsonConverter : JsonConverter
@@ -18,7 +17,7 @@ public sealed class ItemBaseJsonConverter : JsonConverter
         {
             case JsonToken.String:
                 var name = reader.ReadAsString();
-                if (name is not string ||
+                if (name is null ||
                     !ItemBase.TryParse(name, out var namedItem))
                 {
                     return default;

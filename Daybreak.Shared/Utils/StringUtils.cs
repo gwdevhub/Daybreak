@@ -1,14 +1,12 @@
-﻿using System;
-using System.Extensions;
-using System.Linq;
+﻿using System.Extensions;
 using System.Text.RegularExpressions;
 
 namespace Daybreak.Shared.Utils;
 
-public static class StringUtils
+public static partial class StringUtils
 {
     private const int SearchSensitivity = 2;
-    private static readonly Regex SplitIntoWordsRegex = new Regex(@"\W+", RegexOptions.Compiled);
+    private static readonly Regex SplitIntoWordsRegex = WordRegex();
 
     public static int DamerauLevenshteinDistance(string s, string t)
     {
@@ -79,4 +77,7 @@ public static class StringUtils
             SplitIntoWordsRegex.Split(stringToSearch.ToLower())
                 .Select(word => DamerauLevenshteinDistance(word.ToLower()[..Math.Min(word.Length, searchString.Length)], searchString.ToLower())).Min());
     }
+
+    [GeneratedRegex(@"\W+", RegexOptions.Compiled)]
+    private static partial Regex WordRegex();
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Windows.Data;
 
 namespace Daybreak.Shared.Converters;
@@ -10,7 +9,7 @@ public sealed class TimeSinceDateTimeConverter : IValueConverter
 
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        return this.GetTimeString(value);
+        return GetTimeString(value) ?? string.Empty;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -18,11 +17,11 @@ public sealed class TimeSinceDateTimeConverter : IValueConverter
         throw new NotImplementedException();
     }
 
-    private object GetTimeString(object value)
+    private static string? GetTimeString(object value)
     {
         if (value is not DateTime dateTime)
         {
-            return default!;
+            return default;
         }
 
         var difference = DateTime.Now - dateTime;

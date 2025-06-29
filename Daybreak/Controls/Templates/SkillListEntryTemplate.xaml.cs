@@ -5,8 +5,6 @@ using Daybreak.Shared.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 

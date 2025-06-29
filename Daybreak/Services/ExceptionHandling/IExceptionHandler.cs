@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Daybreak.Services.ExceptionHandling;
+﻿namespace Daybreak.Services.ExceptionHandling;
 
 public interface IExceptionHandler
 {

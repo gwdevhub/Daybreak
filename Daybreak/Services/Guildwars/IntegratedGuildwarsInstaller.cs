@@ -8,18 +8,17 @@ using Daybreak.Shared.Services.Guildwars;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.IO;
 using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daybreak.Services.GuildWars;
-internal sealed class IntegratedGuildwarsInstaller : IGuildWarsInstaller
+internal sealed class IntegratedGuildwarsInstaller(
+    IGuildWarsExecutableManager guildWarsExecutableManager,
+    INotificationService notificationService,
+    ILogger<IntegratedGuildwarsInstaller> logger) : IGuildWarsInstaller
 {
     private const string ExeName = "Gw.exe";
     private const string CompressedTempExeName = $"Gw.{VersionPlaceholder}.temp";
@@ -27,19 +26,9 @@ internal sealed class IntegratedGuildwarsInstaller : IGuildWarsInstaller
     private const string VersionPlaceholder = "[VERSION]";
     private static readonly string StagingFolder = PathUtils.GetAbsolutePathFromRoot("GuildWarsCache");
 
-    private readonly IGuildWarsExecutableManager guildWarsExecutableManager;
-    private readonly INotificationService notificationService;
-    private readonly ILogger<IntegratedGuildwarsInstaller> logger;
-
-    public IntegratedGuildwarsInstaller(
-        IGuildWarsExecutableManager guildWarsExecutableManager,
-        INotificationService notificationService,
-        ILogger<IntegratedGuildwarsInstaller> logger)
-    {
-        this.guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
-        this.notificationService = notificationService.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly IGuildWarsExecutableManager guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
+    private readonly INotificationService notificationService = notificationService.ThrowIfNull();
+    private readonly ILogger<IntegratedGuildwarsInstaller> logger = logger.ThrowIfNull();
 
     public async IAsyncEnumerable<GuildWarsUpdateResponse> CheckAndUpdateGuildWarsExecutables(List<GuildWarsUpdateRequest> requests, [EnumeratorCancellation]CancellationToken cancellationToken)
     {
@@ -109,8 +98,7 @@ internal sealed class IntegratedGuildwarsInstaller : IGuildWarsInstaller
 
     public async Task<int?> GetLatestVersionId(CancellationToken cancellationToken)
     {
-        var guildWarsClient = new GuildWarsClient();
-        var response = await guildWarsClient.Connect(cancellationToken);
+        var response = await GuildWarsClient.Connect(cancellationToken);
         return response?.Item2.LatestExe;
     }
 
@@ -154,7 +142,7 @@ internal sealed class IntegratedGuildwarsInstaller : IGuildWarsInstaller
         {
             // Initialize the download client
             var guildWarsClient = new GuildWarsClient();
-            var result = await guildWarsClient.Connect(cancellationToken);
+            var result = await GuildWarsClient.Connect(cancellationToken);
             if (!result.HasValue)
             {
                 scopedLogger.LogError("Failed to connect to ArenaNet servers");

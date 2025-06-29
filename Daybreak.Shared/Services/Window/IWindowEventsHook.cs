@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Daybreak.Shared.Services.Window;
+﻿namespace Daybreak.Shared.Services.Window;
 
 public interface IWindowEventsHook<T> : IDisposable
     where T : System.Windows.Window

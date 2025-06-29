@@ -1,6 +1,5 @@
 ﻿using Daybreak.Shared.Models.FocusView;
 using Daybreak.Shared.Models.Guildwars;
-using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;

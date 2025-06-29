@@ -1,4 +1,4 @@
-﻿using Daybreak.Models.Notifications.Handling;
+﻿using Daybreak.Services.Notifications.Handlers;
 using Daybreak.Services.Notifications.Models;
 using Daybreak.Shared.Models.Notifications;
 using Daybreak.Shared.Models.Notifications.Handling;
@@ -6,34 +6,22 @@ using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using Slim;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daybreak.Services.Notifications;
 
-internal sealed class NotificationService : INotificationService, INotificationProducer, INotificationHandlerProducer
+internal sealed class NotificationService(
+    IServiceManager serviceManager,
+    INotificationStorage notificationStorage,
+    ILogger<NotificationService> logger) : INotificationService, INotificationProducer, INotificationHandlerProducer
 {
     private readonly ConcurrentQueue<Notification> pendingNotifications = new();
-    private readonly IServiceManager serviceManager;
-    private readonly INotificationStorage storage;
-    private readonly ILogger<NotificationService> logger;
-
-    public NotificationService(
-        IServiceManager serviceManager,
-        INotificationStorage notificationStorage,
-        ILogger<NotificationService> logger)
-    {
-        this.serviceManager = serviceManager.ThrowIfNull();
-        this.storage = notificationStorage.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly IServiceManager serviceManager = serviceManager.ThrowIfNull();
+    private readonly INotificationStorage storage = notificationStorage.ThrowIfNull();
+    private readonly ILogger<NotificationService> logger = logger.ThrowIfNull();
 
     public NotificationToken NotifyInformation(
         string title,
@@ -80,7 +68,7 @@ internal sealed class NotificationService : INotificationService, INotificationP
         return this.NotifyInternal<THandlingType>(title, description, metaData, expirationTime, dismissible, LogLevel.Error, persistent);
     }
 
-   async ValueTask INotificationProducer.OpenNotification(Notification notification, bool storeNotification, CancellationToken cancellationToken)
+   async Task INotificationProducer.OpenNotification(Notification notification, bool storeNotification, CancellationToken cancellationToken)
     {
         if (storeNotification)
         {
@@ -107,12 +95,12 @@ internal sealed class NotificationService : INotificationService, INotificationP
         handler?.OpenNotification(notification);
     }
 
-    async ValueTask INotificationProducer.RemoveNotification(Notification notification, CancellationToken cancellationToken)
+    async Task INotificationProducer.RemoveNotification(Notification notification, CancellationToken cancellationToken)
     {
         await this.storage.RemoveNotification(ToDTO(notification), cancellationToken);
     }
 
-    async ValueTask INotificationProducer.RemoveAllNotifications(CancellationToken cancellationToken)
+    async Task INotificationProducer.RemoveAllNotifications(CancellationToken cancellationToken)
     {
         await this.storage.RemoveAllNotifications(cancellationToken);
     }

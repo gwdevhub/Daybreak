@@ -1,23 +1,13 @@
 ﻿using Daybreak.Services.Notifications.Models;
-using System;
-using System.Collections.Generic;
 using System.Core.Extensions;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daybreak.Services.Notifications;
 
-internal sealed class NotificationStorage : INotificationStorage
+internal sealed class NotificationStorage(
+    NotificationsDbContext liteCollection) : INotificationStorage
 {
     private List<NotificationDTO>? notificationsCache;
-    private readonly NotificationsDbContext liteCollection;
-
-    public NotificationStorage(
-        NotificationsDbContext liteCollection)
-    {
-        this.liteCollection = liteCollection.ThrowIfNull();
-    }
+    private readonly NotificationsDbContext liteCollection = liteCollection.ThrowIfNull();
 
     public async ValueTask<IEnumerable<NotificationDTO>> GetPendingNotifications(CancellationToken cancellationToken)
     {

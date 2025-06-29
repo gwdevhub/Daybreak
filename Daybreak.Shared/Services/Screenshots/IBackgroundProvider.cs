@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Models;
-using System.Threading.Tasks;
 
 namespace Daybreak.Shared.Services.Screenshots;
 

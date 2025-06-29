@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Daybreak.Shared.Models;
+﻿namespace Daybreak.Shared.Models;
 
 public sealed class ElevationRequest
 {

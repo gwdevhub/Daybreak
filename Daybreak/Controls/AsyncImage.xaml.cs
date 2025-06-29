@@ -2,8 +2,6 @@
 using Daybreak.Shared.Services.Images;
 using Microsoft.Extensions.DependencyInjection;
 using System.Core.Extensions;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;

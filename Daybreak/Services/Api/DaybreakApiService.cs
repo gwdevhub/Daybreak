@@ -8,17 +8,12 @@ using Daybreak.Shared.Services.MDns;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions.Core;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daybreak.Services.Api;
 public sealed class DaybreakApiService(

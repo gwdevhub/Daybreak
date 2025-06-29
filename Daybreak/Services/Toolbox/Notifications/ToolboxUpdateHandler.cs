@@ -7,18 +7,12 @@ using System.Core.Extensions;
 using System.Extensions.Core;
 
 namespace Daybreak.Services.Toolbox.Notifications;
-internal sealed class ToolboxUpdateHandler : INotificationHandler
+internal sealed class ToolboxUpdateHandler(
+    IViewManager viewManager,
+    ILogger<ToolboxUpdateHandler> logger) : INotificationHandler
 {
-    private readonly IViewManager viewManager;
-    private readonly ILogger<ToolboxUpdateHandler> logger;
-
-    public ToolboxUpdateHandler(
-        IViewManager viewManager,
-        ILogger<ToolboxUpdateHandler> logger)
-    {
-        this.viewManager = viewManager.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly IViewManager viewManager = viewManager.ThrowIfNull();
+    private readonly ILogger<ToolboxUpdateHandler> logger = logger.ThrowIfNull();
 
     public void OpenNotification(Notification notification)
     {

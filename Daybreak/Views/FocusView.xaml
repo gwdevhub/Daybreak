@@ -39,7 +39,6 @@
                 <components:CharacterComponent  Margin="0, 0, 0, 10"
                                                 DataContext="{Binding ElementName=_this, Path=CharacterSelectComponentContext, Mode=OneWay}"
                                                 Visibility="{Binding ElementName=_this, Path=MainPlayerDataValid, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                NavigateToClicked="Component_NavigateToClicked"
                                                 SwitchCharacterClicked="CharacterSelectComponent_SwitchCharacterClicked"/>
                 <Grid Visibility="{Binding ElementName=_this, Path=VanquishComponentContext.Vanquishing, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
                       Margin="0, 0, 0, 10">

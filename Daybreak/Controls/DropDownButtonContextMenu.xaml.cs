@@ -1,5 +1,4 @@
 ﻿using Daybreak.Controls.Buttons;
-using System;
 using System.Collections;
 using System.Extensions;
 using System.Windows;

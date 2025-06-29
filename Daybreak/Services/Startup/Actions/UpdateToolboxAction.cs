@@ -3,22 +3,14 @@ using Daybreak.Shared.Services.Toolbox;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Extensions.Core;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daybreak.Services.Startup.Actions;
-public sealed class UpdateToolboxAction : StartupActionBase
+public sealed class UpdateToolboxAction(
+    IToolboxService toolboxService,
+    ILogger<UpdateToolboxAction> logger) : StartupActionBase
 {
-    private readonly IToolboxService toolboxService;
-    private readonly ILogger<UpdateToolboxAction> logger;
-
-    public UpdateToolboxAction(
-        IToolboxService toolboxService,
-        ILogger<UpdateToolboxAction> logger)
-    {
-        this.toolboxService = toolboxService.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly IToolboxService toolboxService = toolboxService.ThrowIfNull();
+    private readonly ILogger<UpdateToolboxAction> logger = logger.ThrowIfNull();
 
     public override async Task ExecuteOnStartupAsync(CancellationToken cancellationToken)
     {

@@ -3,29 +3,19 @@ using Daybreak.Shared.Models.LaunchConfigurations;
 using Daybreak.Shared.Services.Credentials;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.LaunchConfigurations;
-using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Linq;
 
 namespace Daybreak.Services.LaunchConfigurations;
-internal sealed class LaunchConfigurationService : ILaunchConfigurationService
+internal sealed class LaunchConfigurationService(
+    ICredentialManager credentialManager,
+    IGuildWarsExecutableManager guildWarsExecutableManager,
+    ILiveUpdateableOptions<LaunchConfigurationServiceOptions> liveUpdateableOptions) : ILaunchConfigurationService
 {
-    private readonly ICredentialManager credentialManager;
-    private readonly IGuildWarsExecutableManager guildWarsExecutableManager;
-    private readonly ILiveUpdateableOptions<LaunchConfigurationServiceOptions> liveUpdateableOptions;
-
-    public LaunchConfigurationService(
-        ICredentialManager credentialManager,
-        IGuildWarsExecutableManager guildWarsExecutableManager,
-        ILiveUpdateableOptions<LaunchConfigurationServiceOptions> liveUpdateableOptions)
-    {
-        this.credentialManager = credentialManager.ThrowIfNull();
-        this.guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
-        this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
-    }
+    private readonly ICredentialManager credentialManager = credentialManager.ThrowIfNull();
+    private readonly IGuildWarsExecutableManager guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
+    private readonly ILiveUpdateableOptions<LaunchConfigurationServiceOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
 
     public IEnumerable<LaunchConfigurationWithCredentials> GetLaunchConfigurations()
     {
@@ -96,13 +86,7 @@ internal sealed class LaunchConfigurationService : ILaunchConfigurationService
         var configs = this.liveUpdateableOptions.Value.LaunchConfigurations;
         var maybeConfig = configs
             .FirstOrDefault(l => l.CredentialsIdentifier == launchConfigurationWithCredentials.Credentials?.Identifier &&
-                                 l.Executable == launchConfigurationWithCredentials.ExecutablePath);
-
-        if (maybeConfig is null)
-        {
-            throw new InvalidOperationException("Provided launch configuration is not part of the known list of launch configurations");
-        }
-
+                                 l.Executable == launchConfigurationWithCredentials.ExecutablePath) ?? throw new InvalidOperationException("Provided launch configuration is not part of the known list of launch configurations");
         configs.Remove(maybeConfig);
         configs.Add(maybeConfig);
         this.liveUpdateableOptions.Value.LaunchConfigurations = configs;

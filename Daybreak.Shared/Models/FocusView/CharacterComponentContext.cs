@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Daybreak.Shared.Models.FocusView;
+﻿namespace Daybreak.Shared.Models.FocusView;
 public sealed class CharacterComponentContext
 {
     public required uint CurrentExperience { get; init; }

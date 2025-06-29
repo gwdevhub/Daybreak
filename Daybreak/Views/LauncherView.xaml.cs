@@ -14,16 +14,11 @@ using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Onboarding;
 using Daybreak.Shared.Services.Screens;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
@@ -515,7 +510,7 @@ public partial class LauncherView : UserControl
                 description: "The mods have changed since Guild Wars was launched. Please click 'Reapply mods' to reapply the mod configuration");
         }
 
-        if (mods.Any())
+        if (mods.Count > 0)
         {
             await this.Dispatcher.InvokeAsync(() => this.CanReapply = true);
         }

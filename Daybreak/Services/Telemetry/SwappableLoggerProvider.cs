@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Concurrent;
-using System.Threading;
 
 namespace Daybreak.Services.Telemetry;
 

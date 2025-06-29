@@ -1,7 +1,4 @@
-﻿using Daybreak.Shared.Models;
-using System;
-
-namespace Daybreak.Shared.Models.LaunchConfigurations;
+﻿namespace Daybreak.Shared.Models.LaunchConfigurations;
 
 public sealed class LaunchConfigurationWithCredentials : IEquatable<LaunchConfigurationWithCredentials>
 {

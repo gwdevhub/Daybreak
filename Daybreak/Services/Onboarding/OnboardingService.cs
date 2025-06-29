@@ -11,27 +11,18 @@ using System.Extensions;
 
 namespace Daybreak.Services.Onboarding;
 
-internal sealed class OnboardingService : IOnboardingService
+internal sealed class OnboardingService(
+    ICredentialManager credentialManager,
+    IGuildWarsExecutableManager guildWarsExecutableManager,
+    ILaunchConfigurationService launchConfigurationService,
+    ILiveOptions<LauncherOptions> liveOptions,
+    ILogger<OnboardingService> logger) : IOnboardingService
 {
-    private readonly ICredentialManager credentialManager;
-    private readonly IGuildWarsExecutableManager guildWarsExecutableManager;
-    private readonly ILaunchConfigurationService launchConfigurationService;
-    private readonly ILiveOptions<LauncherOptions> options;
-    private readonly ILogger<OnboardingService> logger;
-
-    public OnboardingService(
-        ICredentialManager credentialManager,
-        IGuildWarsExecutableManager guildWarsExecutableManager,
-        ILaunchConfigurationService launchConfigurationService,
-        ILiveOptions<LauncherOptions> liveOptions,
-        ILogger<OnboardingService> logger)
-    {
-        this.credentialManager = credentialManager.ThrowIfNull();
-        this.guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
-        this.launchConfigurationService = launchConfigurationService.ThrowIfNull();
-        this.options = liveOptions.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly ICredentialManager credentialManager = credentialManager.ThrowIfNull();
+    private readonly IGuildWarsExecutableManager guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
+    private readonly ILaunchConfigurationService launchConfigurationService = launchConfigurationService.ThrowIfNull();
+    private readonly ILiveOptions<LauncherOptions> options = liveOptions.ThrowIfNull();
+    private readonly ILogger<OnboardingService> logger = logger.ThrowIfNull();
 
     public LauncherOnboardingStage CheckOnboardingStage()
     {

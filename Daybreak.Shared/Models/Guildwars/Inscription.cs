@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Daybreak.Shared.Models.Guildwars;
+﻿namespace Daybreak.Shared.Models.Guildwars;
 
 public sealed class Inscription : ItemBase, IWikiEntity, IIconUrlEntity
 {

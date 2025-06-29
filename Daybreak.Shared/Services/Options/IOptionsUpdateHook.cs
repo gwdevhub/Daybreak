@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Daybreak.Shared.Services.Options;
+﻿namespace Daybreak.Shared.Services.Options;
 
 public interface IOptionsUpdateHook
 {

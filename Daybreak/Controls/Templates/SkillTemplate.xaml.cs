@@ -1,9 +1,7 @@
-﻿using Daybreak.Launch;
-using Daybreak.Shared;
+﻿using Daybreak.Shared;
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.IconRetrieve;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Windows;

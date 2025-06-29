@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 
@@ -11,10 +10,10 @@ public static class NativeMethods
     public const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004;
     public const uint ENABLE_PROCESSED_OUTPUT = 0x0001;
 
-    public static uint WM_KEYDOWN = 0x0100;
-    public static uint SWP_SHOWWINDOW = 0x0040;
-    public static nint HWND_TOPMOST = new(-1);
-    public static nint HWND_TOP = nint.Zero;
+    public const uint WM_KEYDOWN = 0x0100;
+    public const uint SWP_SHOWWINDOW = 0x0040;
+    public const nint HWND_TOPMOST = -1;
+    public const nint HWND_TOP = 0;
     public const int WH_KEYBOARD_LL = 13;
     public const uint LIST_MODULES_32BIT = 0x01;
 

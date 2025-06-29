@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Models.Progress;
-using System.Threading;
 
 namespace Daybreak.Shared.Models;
 public sealed class GuildWarsUpdateRequest

@@ -4,15 +4,11 @@ using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Screens;
 using Daybreak.Shared.Utils;
-using Daybreak.Views;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
-using System.Linq;
 using System.Windows;
 using System.Windows.Extensions.Services;
 using System.Windows.Media;
@@ -97,7 +93,7 @@ internal sealed class ScreenManager(
 
     public void MoveGuildwarsToScreen(Screen screen)
     {
-        this.logger.LogDebug($"Attempting to move guildwars to screen screenId", screen.Id);
+        this.logger.LogDebug("Attempting to move guildwars to screen {screenId}", screen.Id);
         var hwnd = GetMainWindowHandle();
         NativeMethods.SetWindowPos(hwnd, NativeMethods.HWND_TOP, screen.Size.Left.ToInt(), screen.Size.Top.ToInt(), screen.Size.Width.ToInt(), screen.Size.Height.ToInt(), NativeMethods.SWP_SHOWWINDOW);
     }

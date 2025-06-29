@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
 
 namespace Daybreak.Shared.Converters;
 public sealed class AttributeJsonConverter : JsonConverter

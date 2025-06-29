@@ -3,46 +3,36 @@ using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Services.Downloads;
 using Daybreak.Shared.Services.Metrics;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Core.Extensions;
 using System.Diagnostics.Metrics;
 using System.Extensions.Core;
 using System.IO;
 using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daybreak.Services.Downloads;
 
-internal sealed class DownloadService : IDownloadService
+internal sealed class DownloadService(
+    IMetricsService metricsService,
+    IHttpClient<DownloadService> httpClient,
+    ILogger<DownloadService> logger) : IDownloadService
 {
     private const double StatusUpdateInterval = 50;
     private const string MetricUnits = "bytes/sec";
     private const string MetricDescription = "Average download speed. Specified in bytes per second";
 
-    private readonly Histogram<double> averageDownloadSpeed;
-    private readonly IHttpClient<DownloadService> httpClient;
-    private readonly ILogger<DownloadService> logger;
-
-    public DownloadService(
-        IMetricsService metricsService,
-        IHttpClient<DownloadService> httpClient,
-        ILogger<DownloadService> logger)
-    {
-        this.averageDownloadSpeed = metricsService.ThrowIfNull().CreateHistogram<double>(nameof(DownloadService), MetricUnits, MetricDescription, AggregationTypes.NoAggregate);
-        this.httpClient = httpClient.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly Histogram<double> averageDownloadSpeed = metricsService.ThrowIfNull().CreateHistogram<double>(nameof(DownloadService), MetricUnits, MetricDescription, AggregationTypes.NoAggregate);
+    private readonly IHttpClient<DownloadService> httpClient = httpClient.ThrowIfNull();
+    private readonly ILogger<DownloadService> logger = logger.ThrowIfNull();
 
     public async Task<bool> DownloadFile(string downloadUri, string destinationPath, DownloadStatus downloadStatus, CancellationToken cancellationToken = default)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         downloadStatus.CurrentStep = DownloadStatus.InitializingDownload;
-        using var response = await this.httpClient.GetAsync(downloadUri, HttpCompletionOption.ResponseHeadersRead);
+        using var response = await this.httpClient.GetAsync(downloadUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         if (response.IsSuccessStatusCode is false)
         {
             downloadStatus.CurrentStep = DownloadStatus.FailedDownload;
-            scopedLogger.LogError($"Failed to download installer. Status: {response.StatusCode}. Details: {await response.Content.ReadAsStringAsync()}");
+            scopedLogger.LogError($"Failed to download installer. Status: {response.StatusCode}. Details: {await response.Content.ReadAsStringAsync(cancellationToken)}");
             return false;
         }
 
@@ -62,7 +52,7 @@ internal sealed class DownloadService : IDownloadService
         {
             downloaded += length;
             downloadedPerTimeframe += length;
-            await fileStream.WriteAsync(buffer, 0, length, cancellationToken);
+            await fileStream.WriteAsync(buffer.AsMemory(0, length), cancellationToken);
             if ((DateTime.Now - tickTime).TotalMilliseconds > StatusUpdateInterval)
             {
                 tickTime = DateTime.Now;

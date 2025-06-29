@@ -2,23 +2,16 @@
 using Daybreak.Shared.Services.Updater.PostUpdate;
 using Microsoft.Extensions.Logging;
 using Slim;
-using System.Collections.Generic;
 using System.Core.Extensions;
 
 namespace Daybreak.Services.Updater.PostUpdate;
 
-internal sealed class PostUpdateActionManager : IPostUpdateActionManager
+internal sealed class PostUpdateActionManager(
+    IServiceManager serviceManager,
+    ILogger<PostUpdateActionManager> logger) : IPostUpdateActionManager
 {
-    private readonly IServiceManager serviceManager;
-    private readonly ILogger<PostUpdateActionManager> logger;
-
-    public PostUpdateActionManager(
-        IServiceManager serviceManager,
-        ILogger<PostUpdateActionManager> logger)
-    {
-        this.serviceManager = serviceManager.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly IServiceManager serviceManager = serviceManager.ThrowIfNull();
+    private readonly ILogger<PostUpdateActionManager> logger = logger.ThrowIfNull();
 
     public void AddPostUpdateAction<T>()
         where T : PostUpdateActionBase

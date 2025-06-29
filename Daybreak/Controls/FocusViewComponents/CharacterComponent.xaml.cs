@@ -3,11 +3,9 @@ using Daybreak.Shared;
 using Daybreak.Shared.Models.FocusView;
 using Daybreak.Shared.Services.Experience;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Core.Extensions;
-using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 using System.Windows.Input;
@@ -19,7 +17,6 @@ public partial class CharacterComponent : UserControl
     private readonly IExperienceCalculator experienceCalculator;
     private readonly ILiveUpdateableOptions<FocusViewOptions> liveOptions;
 
-    public event EventHandler<string>? NavigateToClicked;
     public event EventHandler<CharacterSelectComponentEntry>? SwitchCharacterClicked;
 
     public ObservableCollection<CharacterSelectComponentEntry> Characters { get; } = [];

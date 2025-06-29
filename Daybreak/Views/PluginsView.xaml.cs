@@ -2,12 +2,10 @@
 using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Plugins;
 using Microsoft.Win32;
-using System;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 

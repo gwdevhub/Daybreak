@@ -1,7 +1,4 @@
 ﻿using Daybreak.Shared.Models.Guildwars;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Daybreak.Shared.Models.Builds;
 public sealed class TeamBuildEntry : BuildEntryBase, IEquatable<TeamBuildEntry>

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Daybreak.Shared.Models.Menu;
+﻿namespace Daybreak.Shared.Models.Menu;
 
 public sealed class MenuButton(string name, string hint, Action<IServiceProvider> action)
 {

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Daybreak.Services.MDns;
+﻿namespace Daybreak.Services.MDns;
 internal sealed class ServiceRegistration
 {
     public required string Name { get; init; }

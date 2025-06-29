@@ -8,19 +8,14 @@ using Daybreak.Shared.Services.Navigation;
 using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Web;
 using System.Windows.Controls;
 using Convert = System.Convert;
@@ -320,7 +315,7 @@ internal sealed class GraphClient : IGraphClient
 
         var buildList = this.buildsCache ?? [];
         // Remove the previous version of the build
-        buildList = buildList.Where(b => b.FileName != buildEntry.Name).ToList();
+        buildList = [.. buildList.Where(b => b.FileName != buildEntry.Name)];
         // Add new version of the build
         buildList.Add(buildFile);
         // Order by name

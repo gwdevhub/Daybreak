@@ -29,6 +29,4 @@ public partial class HorizontalResourceBar : UserControl
         this.barColor = Brushes.Transparent;
         this.text = string.Empty;
     }
-
-    
 }

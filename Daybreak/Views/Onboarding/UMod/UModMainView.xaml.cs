@@ -3,14 +3,11 @@ using Daybreak.Shared.Models.UMod;
 using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.UMod;
 using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 using System.IO;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
@@ -33,7 +30,7 @@ public partial class UModMainView : UserControl
     public bool uModEnabled;
 
     [GenerateDependencyProperty]
-    public string currentVersion;
+    public string currentVersion = default!;
 
     public ObservableCollection<UModEntry> Mods { get; } = [];
 
@@ -58,7 +55,7 @@ public partial class UModMainView : UserControl
 
     private void SaveButton_Clicked(object _, EventArgs e)
     {
-        this.uModService.SaveMods(this.Mods.ToList());
+        this.uModService.SaveMods([.. this.Mods]);
         this.uModService.IsEnabled = this.UModEnabled;
         while(this.queuedSaveActions.TryDequeue(out var action))
         {

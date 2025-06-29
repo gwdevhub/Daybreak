@@ -21,6 +21,11 @@ var reader = archive.ExtractAllEntries();
 while (reader.MoveToNextEntry())
 {
     var entry = reader.Entry;
+    if (entry.Key is null)
+    {
+        continue;
+    }
+
     if (entry.IsDirectory)
     {
         var directoryName = Path.Combine(Path.GetFullPath(destinationDirectory), entry.Key);

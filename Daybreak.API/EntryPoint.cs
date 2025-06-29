@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Extensions.Core;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
@@ -23,6 +24,8 @@ public class EntryPoint
     private static readonly CancellationTokenSource CancellationTokenSource = new();
 
     [UnmanagedCallersOnly(EntryPoint = "ThreadInit"), STAThread]
+    [RequiresUnreferencedCode("The handler uses a static method that gets referenced, so there's no unreferenced code to worry about")]
+    [RequiresDynamicCode("The handler uses a static method, so there's no dynamic code to worry about")]
     public static int ThreadInit(IntPtr _, int __)
     {
         Environment.SetEnvironmentVariable("ASPNETCORE_HOSTINGSTARTUPASSEMBLIES", null, EnvironmentVariableTarget.Process);
@@ -37,7 +40,7 @@ public class EntryPoint
         var healthCheck = app.Services.GetRequiredService<HealthCheckService>();
         var sw = Stopwatch.StartNew();
         var healthy = false;
-        while(sw.Elapsed < InitializationTimeout)
+        while (sw.Elapsed < InitializationTimeout)
         {
             var status = Task.Run(() => healthCheck.CheckHealthAsync()).Result;
             scopedLogger.LogWarning("HealthCheck status: {status} in {duration}. Report: {report}", status.Status, status.TotalDuration, string.Join("\n", status.Entries.Select(e => $"{e.Key}: {e.Value.Status}")));
@@ -65,9 +68,11 @@ public class EntryPoint
         }
     }
 
+    [RequiresUnreferencedCode("The handler uses a static method that gets referenced, so there's no unreferenced code to worry about")]
+    [RequiresDynamicCode("The handler uses a static method, so there's no dynamic code to worry about")]
     private static WebApplication CreateApplication(int port)
     {
-        var app = WebApplication.CreateBuilder()
+        var builder = WebApplication.CreateBuilder()
                 .WithConfiguration()
                 .WithHosting(port)
                 .WithSwagger()
@@ -76,8 +81,11 @@ public class EntryPoint
                 .WithDaybreakServices()
                 .WithWebSocketRoutes()
                 .WithRoutes()
-                .WithHealthChecks()
-                .Build();
+                .WithHealthChecks();
+
+        builder.Services.AddOpenApi();
+
+        var app = builder.Build();
 
         app.UseWebSockets(new WebSocketOptions { KeepAliveInterval = TimeSpan.FromSeconds(30) });
 

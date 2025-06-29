@@ -9,33 +9,22 @@ using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Views.Installation;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Threading;
 
 namespace Daybreak.Services.Guildwars;
-internal sealed class GuildWarsBatchUpdateNotificationHandler : INotificationHandler
+internal sealed class GuildWarsBatchUpdateNotificationHandler(
+    IViewManager viewManager,
+    IGuildWarsInstaller guildWarsInstaller,
+    IGuildWarsExecutableManager guildWarsExecutableManager,
+    INotificationService notificationService,
+    ILogger<GuildWarsBatchUpdateNotificationHandler> logger) : INotificationHandler
 {
-    private readonly IViewManager viewManager;
-    private readonly IGuildWarsInstaller guildWarsInstaller;
-    private readonly IGuildWarsExecutableManager guildWarsExecutableManager;
-    private readonly INotificationService notificationService;
-    private readonly ILogger<GuildWarsBatchUpdateNotificationHandler> logger;
-
-    public GuildWarsBatchUpdateNotificationHandler(
-        IViewManager viewManager,
-        IGuildWarsInstaller guildWarsInstaller,
-        IGuildWarsExecutableManager guildWarsExecutableManager,
-        INotificationService notificationService,
-        ILogger<GuildWarsBatchUpdateNotificationHandler> logger)
-    {
-        this.viewManager = viewManager.ThrowIfNull();
-        this.guildWarsInstaller = guildWarsInstaller.ThrowIfNull();
-        this.guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
-        this.notificationService = notificationService.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly IViewManager viewManager = viewManager.ThrowIfNull();
+    private readonly IGuildWarsInstaller guildWarsInstaller = guildWarsInstaller.ThrowIfNull();
+    private readonly IGuildWarsExecutableManager guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
+    private readonly INotificationService notificationService = notificationService.ThrowIfNull();
+    private readonly ILogger<GuildWarsBatchUpdateNotificationHandler> logger = logger.ThrowIfNull();
 
     public async void OpenNotification(Notification notification)
     {

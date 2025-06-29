@@ -1,8 +1,6 @@
 ﻿using Daybreak.Shared.Models.Versioning;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Linq;
 using Version = Daybreak.Shared.Models.Versioning.Version;
 
 namespace Daybreak.Tests.Models;
@@ -122,7 +120,7 @@ public class VersionTests
     [TestMethod]
     public void VersionConstructorTest(string version, bool shouldNotThrow)
     {
-        var action = new Action(() => new Version(version));
+        var action = new Action(() => _ = new Version(version));
         if (shouldNotThrow is false)
         {
             action.Should().Throw<ArgumentException>();

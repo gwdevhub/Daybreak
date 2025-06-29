@@ -1,7 +1,6 @@
 ﻿using Daybreak.Shared.Models.Api;
 using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Models.Guildwars;
-using System;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;

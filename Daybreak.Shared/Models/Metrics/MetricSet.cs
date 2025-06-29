@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.Metrics;
+﻿using System.Diagnostics.Metrics;
 
 namespace Daybreak.Shared.Models.Metrics;
 

@@ -3,18 +3,12 @@ using Daybreak.Shared.Models.Notifications.Handling;
 using Daybreak.Shared.Services.ReShade;
 using System.Core.Extensions;
 using System.IO;
-using System.Threading;
 
 namespace Daybreak.Services.ReShade.Notifications;
-internal sealed class ReShadeConfigChangedHandler : INotificationHandler
+internal sealed class ReShadeConfigChangedHandler(
+    IReShadeService reShadeService) : INotificationHandler
 {
-    private readonly IReShadeService reShadeService;
-
-    public ReShadeConfigChangedHandler(
-        IReShadeService reShadeService)
-    {
-        this.reShadeService = reShadeService.ThrowIfNull();
-    }
+    private readonly IReShadeService reShadeService = reShadeService.ThrowIfNull();
 
     public async void OpenNotification(Notification notification)
     {

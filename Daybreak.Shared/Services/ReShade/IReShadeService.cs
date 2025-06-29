@@ -1,9 +1,6 @@
 ﻿using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Models.ReShade;
 using Daybreak.Shared.Services.Mods;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daybreak.Shared.Services.ReShade;
 public interface IReShadeService : IModService

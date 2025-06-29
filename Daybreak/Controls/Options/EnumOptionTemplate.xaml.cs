@@ -1,8 +1,6 @@
 ﻿using Daybreak.Shared.Models.Options;
-using System;
 using System.Collections.ObjectModel;
 using System.Extensions;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;

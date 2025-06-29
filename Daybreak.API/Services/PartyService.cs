@@ -9,7 +9,6 @@ using Daybreak.Shared.Services.BuildTemplates;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
-using System.Windows.Navigation;
 using ZLinq;
 using InstanceType = Daybreak.API.Interop.GuildWars.InstanceType;
 

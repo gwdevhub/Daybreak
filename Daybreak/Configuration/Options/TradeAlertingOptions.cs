@@ -1,7 +1,5 @@
 ﻿using Daybreak.Attributes;
 using Daybreak.Shared.Models.Trade;
-using System;
-using System.Collections.Generic;
 
 namespace Daybreak.Configuration.Options;
 

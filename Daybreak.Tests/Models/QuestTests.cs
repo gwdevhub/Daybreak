@@ -1,12 +1,10 @@
 ﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-using System;
-using System.Linq;
 using System.Extensions;
 using Daybreak.Shared.Models.Guildwars;
+using System.Core.Extensions;
 
 namespace Daybreak.Tests.Models;
 
@@ -81,7 +79,7 @@ public sealed class QuestTests
         var definedNpcsFields = typeof(Quest).GetFields(BindingFlags.Static | BindingFlags.Public).Where(f => f.FieldType == typeof(Quest));
         foreach (var field in definedNpcsFields)
         {
-            var quest = field.GetValue(default).Cast<Quest>();
+            var quest = field.GetValue(default).ThrowIfNull().Cast<Quest>();
             questMap[quest] = false;
         }
 

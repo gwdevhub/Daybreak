@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Daybreak.Shared.Utils;
+﻿namespace Daybreak.Shared.Utils;
 
 public static class DateTimeExtensions
 {

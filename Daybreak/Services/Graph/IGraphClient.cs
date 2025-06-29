@@ -1,10 +1,6 @@
 ﻿using Daybreak.Controls;
 using Daybreak.Services.Graph.Models;
-using System;
-using System.Collections.Generic;
 using System.Extensions;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 
 namespace Daybreak.Services.Graph;

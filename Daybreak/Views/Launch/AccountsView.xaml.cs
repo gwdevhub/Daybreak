@@ -2,11 +2,9 @@
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Credentials;
 using Daybreak.Shared.Services.Navigation;
-using System;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Linq;
 using System.Windows.Controls;
 
 namespace Daybreak.Views.Launch;
@@ -45,7 +43,7 @@ public partial class AccountsView : UserControl
 
     private void SaveButton_Clicked(object sender, EventArgs e)
     {
-        this.credentialManager.StoreCredentials(this.Accounts.ToList());
+        this.credentialManager.StoreCredentials([.. this.Accounts]);
         this.viewManager.ShowView<LauncherView>();
     }
 

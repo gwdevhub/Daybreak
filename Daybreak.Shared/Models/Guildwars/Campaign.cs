@@ -1,8 +1,5 @@
 ﻿using Daybreak.Shared.Converters;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Daybreak.Shared.Models.Guildwars;
 
@@ -14,11 +11,11 @@ public sealed class Campaign
         Id = 0,
         Name = "Core",
         WikiUrl = "https://wiki.guildwars.com/wiki/Guild_Wars_Core",
-        Continents = new List<Continent>
-        {
+        Continents =
+        [
             Continent.TheBattleIsles,
             Continent.TheMists
-        }
+        ]
     };
 
     public static Campaign Prophecies { get; } = new()
@@ -26,10 +23,10 @@ public sealed class Campaign
         Id = 1,
         Name = "Prophecies",
         WikiUrl = "https://wiki.guildwars.com/wiki/Guild_Wars_Prophecies",
-        Continents = new List<Continent>
-        {
+        Continents =
+        [
             Continent.Tyria
-        }
+        ]
     };
 
     public static Campaign Factions { get; } = new()
@@ -37,10 +34,10 @@ public sealed class Campaign
         Id = 2,
         Name = "Factions",
         WikiUrl = "https://wiki.guildwars.com/wiki/Guild_Wars_Factions",
-        Continents = new List<Continent>
-        {
+        Continents =
+        [
             Continent.Cantha
-        }
+        ]
     };
 
     public static Campaign Nightfall { get; } = new()
@@ -48,11 +45,11 @@ public sealed class Campaign
         Id = 3,
         Name = "Nightfall",
         WikiUrl = "https://wiki.guildwars.com/wiki/Guild_Wars_Nightfall",
-        Continents = new List<Continent>
-        {
+        Continents =
+        [
             Continent.Elona,
             Continent.RealmOfTorment
-        }
+        ]
     };
 
     public static Campaign EyeOfTheNorth { get; } = new()
@@ -60,10 +57,10 @@ public sealed class Campaign
         Id = 4,
         Name = "Eye of the North",
         WikiUrl = "https://wiki.guildwars.com/wiki/Guild_Wars_Eye_of_the_North",
-        Continents = new List<Continent>
-        {
+        Continents =
+        [
             Continent.Tyria
-        }
+        ]
     };
 
     public static Campaign BonusMissionPack { get; } = new()
@@ -71,23 +68,23 @@ public sealed class Campaign
         Id = 5,
         Name = "Bonus Mission Pack",
         WikiUrl = "https://wiki.guildwars.com/wiki/Guild_Wars_Bonus_Mission_Pack",
-        Continents = new List<Continent>
-        {
+        Continents =
+        [
             Continent.Tyria,
             Continent.Elona,
             Continent.Cantha
-        }
+        ]
     };
 
-    public static IReadOnlyList<Campaign> Campaigns { get; } = new List<Campaign>
-    {
+    public static IReadOnlyList<Campaign> Campaigns { get; } =
+    [
         Core,
         Prophecies,
         Factions,
         Nightfall,
         EyeOfTheNorth,
         BonusMissionPack
-    };
+    ];
 
     public static bool TryParse(int id, out Campaign campaign)
     {

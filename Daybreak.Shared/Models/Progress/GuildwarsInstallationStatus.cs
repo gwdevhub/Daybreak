@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Daybreak.Shared.Models.Progress;
+﻿namespace Daybreak.Shared.Models.Progress;
 public sealed class GuildwarsInstallationStatus : DownloadStatus
 {
     public static readonly LoadStatus StartingStep = new GuildwarsInstallationStep("Starting");
@@ -25,11 +23,7 @@ public sealed class GuildwarsInstallationStatus : DownloadStatus
         }
     }
 
-    public sealed class UnpackingProgressStep : DownloadProgressStep
+    public sealed class UnpackingProgressStep(double progress, TimeSpan? eta) : DownloadProgressStep("Unpacking", progress, eta)
     {
-        public UnpackingProgressStep(double progress, TimeSpan? eta)
-            : base("Unpacking", progress, eta)
-        {
-        }
     }
 }

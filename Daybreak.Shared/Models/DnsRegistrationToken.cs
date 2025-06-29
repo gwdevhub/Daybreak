@@ -1,5 +1,4 @@
 ﻿using MeaMod.DNS.Multicast;
-using System;
 
 namespace Daybreak.Shared.Models;
 public readonly struct DnsRegistrationToken : IDisposable

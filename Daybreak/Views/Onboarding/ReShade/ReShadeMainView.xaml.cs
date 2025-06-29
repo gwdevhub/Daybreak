@@ -7,7 +7,6 @@ using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 

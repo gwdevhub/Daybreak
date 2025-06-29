@@ -1,5 +1,4 @@
-﻿using Daybreak.Models;
-using Daybreak.Shared.Models;
+﻿using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Privilege;
 using Daybreak.Views;
@@ -10,20 +9,14 @@ using System.Windows.Controls;
 
 namespace Daybreak.Services.Privilege;
 
-internal sealed class PrivilegeManager : IPrivilegeManager
+internal sealed class PrivilegeManager(
+    IViewManager viewManager,
+    ILogger<PrivilegeManager> logger) : IPrivilegeManager
 {
     public bool AdminPrivileges => new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
 
-    private readonly IViewManager viewManager;
-    private readonly ILogger<PrivilegeManager> logger;
-
-    public PrivilegeManager(
-        IViewManager viewManager,
-        ILogger<PrivilegeManager> logger)
-    {
-        this.logger = logger.ThrowIfNull(nameof(logger));
-        this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
-    }
+    private readonly IViewManager viewManager = viewManager.ThrowIfNull(nameof(viewManager));
+    private readonly ILogger<PrivilegeManager> logger = logger.ThrowIfNull(nameof(logger));
 
     public void RequestAdminPrivileges<TCancelView>(string messageToUser, object? dataContextOfCancelView = default)
         where TCancelView : UserControl

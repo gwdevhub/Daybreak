@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Models.Guildwars;
-using System;
 
 namespace Daybreak.Controls.Templates;
 public sealed class TraderQuoteModel

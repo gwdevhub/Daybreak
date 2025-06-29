@@ -9,16 +9,11 @@ using Daybreak.Shared.Services.TradeChat;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Globalization;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.TradeChat;
@@ -242,7 +237,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
         this.options.UpdateOption();
     }
 
-    private void NotifyAlertMatch(TraderMessageDTO traderMessageDTO, ITradeAlert alert)
+    private void NotifyAlertMatch(TraderMessageDTO traderMessageDTO, TradeAlert alert)
     {
         var traderMessage = new TraderMessage
         {

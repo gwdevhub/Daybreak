@@ -2,31 +2,22 @@
 using Daybreak.Shared.Models.Notifications;
 using Daybreak.Shared.Services.InternetChecker;
 using Daybreak.Shared.Services.Notifications;
-using System;
 using System.Core.Extensions;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.InternetChecker;
 
-internal sealed class ConnectivityStatus : IConnectivityStatus, IApplicationLifetimeService
+internal sealed class ConnectivityStatus(
+    IInternetCheckingService internetCheckingService,
+    INotificationService notificationService) : IConnectivityStatus, IApplicationLifetimeService
 {
     private static readonly TimeSpan ConnectivityBackoff = TimeSpan.FromSeconds(30);
 
     private readonly CancellationTokenSource cancellationTokenSource = new();
-    private readonly IInternetCheckingService internetCheckingService;
-    private readonly INotificationService notificationService;
+    private readonly IInternetCheckingService internetCheckingService = internetCheckingService.ThrowIfNull();
+    private readonly INotificationService notificationService = notificationService.ThrowIfNull();
 
     public bool IsInternetAvailable { get; private set; } = false;
-
-    public ConnectivityStatus(
-        IInternetCheckingService internetCheckingService,
-        INotificationService notificationService)
-    {
-        this.internetCheckingService = internetCheckingService.ThrowIfNull();
-        this.notificationService = notificationService.ThrowIfNull();
-    }
 
     public async void OnStartup()
     {
@@ -45,20 +36,12 @@ internal sealed class ConnectivityStatus : IConnectivityStatus, IApplicationLife
                 checkingConnectionNotification.Cancel();
             }
 
-            switch (connectionStatus)
+            this.IsInternetAvailable = connectionStatus switch
             {
-                case InternetConnectionState.Available:
-                case InternetConnectionState.PartialOutage:
-                    this.IsInternetAvailable = true;
-                    break;
-                case InternetConnectionState.GuildwarsOutage:
-                case InternetConnectionState.Unavailable:
-                    this.IsInternetAvailable = false;
-                    break;
-                case InternetConnectionState.Undefined:
-                default:
-                    throw new InvalidOperationException($"Unexpected connection status {connectionStatus}");
-            }
+                InternetConnectionState.Available or InternetConnectionState.PartialOutage => true,
+                InternetConnectionState.GuildwarsOutage or InternetConnectionState.Unavailable => false,
+                _ => throw new InvalidOperationException($"Unexpected connection status {connectionStatus}"),
+            };
 
             // Only show Connection Restored message when a previous internet unavailable notification has been shown
             if (connectionStatus is InternetConnectionState.PartialOutage or InternetConnectionState.Available &&

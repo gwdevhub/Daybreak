@@ -1,13 +1,8 @@
-﻿using System.Collections.Generic;
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.IO;
 using System.Core.Extensions;
 using System.Net.Http;
 using Microsoft.Extensions.Logging;
 using System.Extensions;
-using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO.Compression;
@@ -19,7 +14,11 @@ using Daybreak.Shared.Services.Downloads;
 using Daybreak.Shared.Models.Progress;
 
 namespace Daybreak.Services.UBlockOrigin;
-public sealed class UBlockOriginService : IBrowserExtension
+public sealed class UBlockOriginService(
+    INotificationService notificationService,
+    IDownloadService downloadService,
+    IHttpClient<UBlockOriginService> httpClient,
+    ILogger<UBlockOriginService> logger) : IBrowserExtension
 {
     private const string TagPlaceholder = "[TAG_PLACEHOLDER]";
     private const string ReleaseUrl = "https://github.com/gorhill/uBlock/releases/download/[TAG_PLACEHOLDER]/uBlock0_[TAG_PLACEHOLDER].chromium.zip";
@@ -33,22 +32,10 @@ public sealed class UBlockOriginService : IBrowserExtension
 
     private static volatile bool VersionUpToDate;
 
-    private readonly INotificationService notificationService;
-    private readonly IDownloadService downloadService;
-    private readonly IHttpClient<UBlockOriginService> httpClient;
-    private readonly ILogger<UBlockOriginService> logger;
-
-    public UBlockOriginService(
-        INotificationService notificationService,
-        IDownloadService downloadService,
-        IHttpClient<UBlockOriginService> httpClient,
-        ILogger<UBlockOriginService> logger)
-    {
-        this.notificationService = notificationService.ThrowIfNull();
-        this.downloadService = downloadService.ThrowIfNull();
-        this.httpClient = httpClient.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly INotificationService notificationService = notificationService.ThrowIfNull();
+    private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
+    private readonly IHttpClient<UBlockOriginService> httpClient = httpClient.ThrowIfNull();
+    private readonly ILogger<UBlockOriginService> logger = logger.ThrowIfNull();
 
     public string ExtensionId { get; } = "uBlock-Origin";
 
@@ -82,7 +69,7 @@ public sealed class UBlockOriginService : IBrowserExtension
         }
 
         using var cancellationTokenSource = new CancellationTokenSource(5000);
-        var currentVersionString = await this.GetCurrentVersion(cancellationTokenSource.Token);
+        var currentVersionString = await GetCurrentVersion(cancellationTokenSource.Token);
         var latestVersionString = await this.GetLatestVersion(cancellationTokenSource.Token);
         if (latestVersionString is null)
         {
@@ -138,7 +125,34 @@ public sealed class UBlockOriginService : IBrowserExtension
         return destinationPath;
     }
 
-    private async Task<string?> GetCurrentVersion(CancellationToken cancellationToken)
+    private async Task<string?> GetLatestVersion(CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetLatestVersion), string.Empty);
+        scopedLogger.LogDebug("Retrieving version list");
+        var getListResponse = await this.httpClient.GetAsync(ReleasesUrl, cancellationToken);
+        if (!getListResponse.IsSuccessStatusCode)
+        {
+            scopedLogger.LogError($"Received non success status code [{getListResponse.StatusCode}]");
+            return default;
+        }
+
+        var responseString = await getListResponse.Content.ReadAsStringAsync(cancellationToken);
+        var releasesList = responseString.Deserialize<List<GithubRefTag>>();
+        var latestRelease = releasesList?
+            .Select(t => t.Ref?.Replace("refs/tags/", ""))
+            .OfType<string>()
+            .Where(v => !v.Contains('b') && !v.Contains("rc"))
+            .LastOrDefault();
+        if (latestRelease is not string tag)
+        {
+            scopedLogger.LogError("Could not parse version list. No latest version found");
+            return default;
+        }
+
+        return latestRelease;
+    }
+
+    private static async Task<string?> GetCurrentVersion(CancellationToken cancellationToken)
     {
         var manifestFilePath = Path.GetFullPath(InstallationPath, Path.Combine(InstallationFolderName, "manifest.json"));
         var fileInfo = new FileInfo(manifestFilePath);
@@ -156,32 +170,5 @@ public sealed class UBlockOriginService : IBrowserExtension
         }
 
         return value;
-    }
-
-    private async Task<string?> GetLatestVersion(CancellationToken cancellationToken)
-    {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetLatestVersion), string.Empty);
-        scopedLogger.LogDebug("Retrieving version list");
-        var getListResponse = await this.httpClient.GetAsync(ReleasesUrl, cancellationToken);
-        if (!getListResponse.IsSuccessStatusCode)
-        {
-            scopedLogger.LogError($"Received non success status code [{getListResponse.StatusCode}]");
-            return default;
-        }
-
-        var responseString = await getListResponse.Content.ReadAsStringAsync();
-        var releasesList = responseString.Deserialize<List<GithubRefTag>>();
-        var latestRelease = releasesList?
-            .Select(t => t.Ref?.Replace("refs/tags/", ""))
-            .OfType<string>()
-            .Where(v => !v.Contains("b") && !v.Contains("rc"))
-            .LastOrDefault();
-        if (latestRelease is not string tag)
-        {
-            scopedLogger.LogError("Could not parse version list. No latest version found");
-            return default;
-        }
-
-        return latestRelease;
     }
 }

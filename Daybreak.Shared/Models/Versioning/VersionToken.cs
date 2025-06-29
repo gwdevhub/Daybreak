@@ -1,19 +1,16 @@
-﻿using System;
-using System.Linq;
-
-namespace Daybreak.Shared.Models.Versioning;
+﻿namespace Daybreak.Shared.Models.Versioning;
 
 public abstract class VersionToken
 {
     public static VersionToken Parse(string token)
     {
-        if (token.All(c => char.IsDigit(c)))
+        if (token.All(char.IsDigit))
         {
             var number = int.Parse(token);
             return new VersionNumberToken(number);
         }
 
-        if (token.All(c => char.IsLetter(c)))
+        if (token.All(char.IsLetter))
         {
             return new VersionStringToken(token);
         }
