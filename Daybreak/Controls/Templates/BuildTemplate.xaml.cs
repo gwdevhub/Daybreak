@@ -147,7 +147,7 @@ public partial class BuildTemplate : UserControl
 
         await Task.Factory.StartNew(() =>
         {
-            var filteredSkills = this.FilterSkills(searchTerm, buildEntry).ToList();
+            var filteredSkills = FilterSkills(searchTerm, buildEntry).ToList();
             this.Dispatcher.InvokeAsync(() =>
             {
                 this.PrepareSkillListCache(filteredSkills);
@@ -219,7 +219,7 @@ public partial class BuildTemplate : UserControl
         }
     }
 
-    private IEnumerable<Skill> FilterSkills(string searchTerm, SingleBuildEntry buildEntry)
+    private static IEnumerable<Skill> FilterSkills(string searchTerm, SingleBuildEntry buildEntry)
     {
         // Replace symbols to ease search
         searchTerm = searchTerm?.Replace("\"", "").Replace("!", "")!;

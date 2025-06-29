@@ -128,7 +128,7 @@ internal sealed class ApplicationUpdater(
         {
             var serializedList = await response.Content.ReadAsStringAsync();
             var versionList = serializedList.Deserialize<GithubRefTag[]>();
-            return versionList!.Select(v => v.Ref!.Remove(0, RefTagPrefix.Length)).Select(v => new Version(v));
+            return versionList!.Select(v => v.Ref![RefTagPrefix.Length..]).Select(v => new Version(v));
         }
 
         return [];
@@ -242,7 +242,6 @@ internal sealed class ApplicationUpdater(
                 {
                     return false;
                 }
-
             })
             .Where(m =>
             {
@@ -309,8 +308,8 @@ internal sealed class ApplicationUpdater(
                 var fileSize = file.Size;
                 while (fileSize > 0)
                 {
-                    var readBytes = await downloadStream.ReadAsync(downloadBuffer, 0, downloadBuffer.Length);
-                    await packageStream.WriteAsync(downloadBuffer, 0, readBytes);
+                    var readBytes = await downloadStream.ReadAsync(downloadBuffer);
+                    await packageStream.WriteAsync(downloadBuffer.AsMemory(0, readBytes));
 
                     fileSize -= readBytes;
                     downloaded += readBytes;

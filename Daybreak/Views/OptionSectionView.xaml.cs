@@ -157,7 +157,7 @@ public partial class OptionSectionView : UserControl
             return (false, default, default);
         }
 
-        var action = customSetterViewAttribute.GetType().GetProperty(nameof(OptionSetterView<UserControl>.Action))?
+        var action = customSetterViewAttribute.GetType().GetProperty(nameof(OptionSetterView<>.Action))?
             .GetValue(customSetterViewAttribute)?.As<string>();
         var viewType = customSetterViewAttribute.GetType().GetGenericArguments().FirstOrDefault();
 
@@ -186,7 +186,7 @@ public partial class OptionSectionView : UserControl
                     return a.GetType().GetGenericTypeDefinition() == typeof(OptionCustomValidatorAttribute<>);
                 }) is object customValidatorAttribute)
         {
-            var validatorPropertyInfo = customValidatorAttribute.GetType().GetProperty(nameof(OptionCustomValidatorAttribute<AllGoesValidator>.Validator));
+            var validatorPropertyInfo = customValidatorAttribute.GetType().GetProperty(nameof(OptionCustomValidatorAttribute<>.Validator));
             return (validatorPropertyInfo?.GetValue(customValidatorAttribute) as IValidator, new StringOptionTemplate());
         }
 
@@ -308,7 +308,7 @@ public partial class OptionSectionView : UserControl
         return default;
     }
 
-    private static IValidator? GetClampedValidator<T>(PropertyInfo propertyInfo, T defaultMinValue, T defaultMaxValue, out (bool IsRange, T Min, T Max) clampDetails)
+    private static ClampedValidator<T>? GetClampedValidator<T>(PropertyInfo propertyInfo, T defaultMinValue, T defaultMaxValue, out (bool IsRange, T Min, T Max) clampDetails)
         where T : IComparable<T>
     {
         var maybeOptionRangeAttribute = propertyInfo.GetCustomAttribute<OptionRangeAttribute<T>>();

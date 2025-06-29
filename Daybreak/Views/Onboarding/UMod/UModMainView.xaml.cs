@@ -30,7 +30,7 @@ public partial class UModMainView : UserControl
     public bool uModEnabled;
 
     [GenerateDependencyProperty]
-    public string currentVersion;
+    public string currentVersion = default!;
 
     public ObservableCollection<UModEntry> Mods { get; } = [];
 

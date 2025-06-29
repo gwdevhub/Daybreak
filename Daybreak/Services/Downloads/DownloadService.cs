@@ -28,11 +28,11 @@ internal sealed class DownloadService(
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         downloadStatus.CurrentStep = DownloadStatus.InitializingDownload;
-        using var response = await this.httpClient.GetAsync(downloadUri, HttpCompletionOption.ResponseHeadersRead);
+        using var response = await this.httpClient.GetAsync(downloadUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         if (response.IsSuccessStatusCode is false)
         {
             downloadStatus.CurrentStep = DownloadStatus.FailedDownload;
-            scopedLogger.LogError($"Failed to download installer. Status: {response.StatusCode}. Details: {await response.Content.ReadAsStringAsync()}");
+            scopedLogger.LogError($"Failed to download installer. Status: {response.StatusCode}. Details: {await response.Content.ReadAsStringAsync(cancellationToken)}");
             return false;
         }
 
@@ -52,7 +52,7 @@ internal sealed class DownloadService(
         {
             downloaded += length;
             downloadedPerTimeframe += length;
-            await fileStream.WriteAsync(buffer, 0, length, cancellationToken);
+            await fileStream.WriteAsync(buffer.AsMemory(0, length), cancellationToken);
             if ((DateTime.Now - tickTime).TotalMilliseconds > StatusUpdateInterval)
             {
                 tickTime = DateTime.Now;

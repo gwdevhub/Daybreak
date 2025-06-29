@@ -156,6 +156,7 @@ internal sealed class HuffmanTable
                 {
                     throw new InvalidOperationException("Failed to build Huffman Table. currentSymbol >= symbolCount");
                 }
+
                 if (nextBitsEncoding >= (1 << encLen))
                 {
                     throw new InvalidOperationException("Failed to build Huffman Table. nextBitsEncoding >= (1 << encLen)");

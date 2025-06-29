@@ -86,13 +86,7 @@ internal sealed class LaunchConfigurationService(
         var configs = this.liveUpdateableOptions.Value.LaunchConfigurations;
         var maybeConfig = configs
             .FirstOrDefault(l => l.CredentialsIdentifier == launchConfigurationWithCredentials.Credentials?.Identifier &&
-                                 l.Executable == launchConfigurationWithCredentials.ExecutablePath);
-
-        if (maybeConfig is null)
-        {
-            throw new InvalidOperationException("Provided launch configuration is not part of the known list of launch configurations");
-        }
-
+                                 l.Executable == launchConfigurationWithCredentials.ExecutablePath) ?? throw new InvalidOperationException("Provided launch configuration is not part of the known list of launch configurations");
         configs.Remove(maybeConfig);
         configs.Add(maybeConfig);
         this.liveUpdateableOptions.Value.LaunchConfigurations = configs;

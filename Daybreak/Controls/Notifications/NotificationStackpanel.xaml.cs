@@ -75,7 +75,7 @@ public partial class NotificationStackpanel : UserControl
         }
 
         this.Notifications.Remove(notificationWrapper);
-        this.notificationProducer.OpenNotification(notificationWrapper.Notification!);
+        _ = this.notificationProducer.OpenNotification(notificationWrapper.Notification!);
         notificationWrapper.Notification!.Closed = true;
         this.soundService.PlayNotifyClose();
     }

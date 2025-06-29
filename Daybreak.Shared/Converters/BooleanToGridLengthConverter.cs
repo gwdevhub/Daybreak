@@ -21,7 +21,7 @@ public sealed class BooleanToGridLengthConverter : IValueConverter
         throw new NotImplementedException();
     }
 
-    private object GetVisibility(object value)
+    private GridLength GetVisibility(object value)
     {
         if (value is not bool)
         {

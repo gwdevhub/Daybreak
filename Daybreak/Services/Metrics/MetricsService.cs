@@ -82,15 +82,10 @@ internal sealed class MetricsService : IMetricsService, IDisposable
             throw new InvalidOperationException($"Could not find any metrics with name {name}");
         }
 
-        var instrument = metrics.First?.Value.Instrument;
-        if (instrument is null)
-        {
-            throw new InvalidOperationException($"Could not identify the instrument producing the desired metrics with name {name}");
-        }
-
+        var instrument = (metrics.First?.Value.Instrument) ?? throw new InvalidOperationException($"Could not identify the instrument producing the desired metrics with name {name}");
         this.aggregationTypeMapping.TryGetValue(instrument!, out var aggregationType);
 
-        return new MetricSet { Instrument = instrument, Metrics = metrics.ToImmutableList(), AggregationType = aggregationType };
+        return new MetricSet { Instrument = instrument, Metrics = [.. metrics], AggregationType = aggregationType };
     }
 
     public IEnumerable<MetricSet> GetMetrics()
@@ -105,7 +100,7 @@ internal sealed class MetricsService : IMetricsService, IDisposable
 
             var instrument = value.First.Value.Instrument;
             this.aggregationTypeMapping.TryGetValue(instrument, out var aggregationType);
-            retList.Add(new MetricSet { Instrument = instrument, Metrics = value.ToImmutableList(), AggregationType = aggregationType });
+            retList.Add(new MetricSet { Instrument = instrument, Metrics = [.. value], AggregationType = aggregationType });
         }
 
         return retList;

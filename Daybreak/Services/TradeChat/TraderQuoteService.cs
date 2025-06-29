@@ -245,7 +245,7 @@ internal sealed class TraderQuoteService : ITraderQuoteService
     private async Task<string> GetAsync(string? uri, HttpRequestMessage? httpRequestMessage, ScopedLogger<TraderQuoteService> scopedLogger, CancellationToken cancellationToken)
     {
         var response = httpRequestMessage is not null ?
-            await this.httpClient.SendAsync(httpRequestMessage) :
+            await this.httpClient.SendAsync(httpRequestMessage, cancellationToken) :
             await this.httpClient.GetAsync(uri!, cancellationToken);
         if (!response.IsSuccessStatusCode)
         {

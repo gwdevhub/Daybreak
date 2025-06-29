@@ -30,16 +30,16 @@ public partial class SettingsSynchronizationView : UserControl
     private bool loading;
 
     [GenerateDependencyProperty]
-    private string displayName;
+    private string displayName = default!;
 
     [GenerateDependencyProperty]
-    private string email;
+    private string email = default!;
 
     [GenerateDependencyProperty]
-    private string currentOptions;
+    private string currentOptions = default!;
 
     [GenerateDependencyProperty]
-    private string remoteOptions;
+    private string remoteOptions = default!;
 
     [GenerateDependencyProperty]
     private bool synchronized;

@@ -1,6 +1,5 @@
 ﻿<Project>  
   <PropertyGroup>
-    <!-- Suppress warnings we have already reviewed and accepted -->
     <NoWarn>$(NoWarn);IL2104;IL3053;IL3000;IL3002;NU1701;CS0108</NoWarn>
 
     <Version>0.9.9.76</Version>
@@ -8,5 +7,10 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!--Event Source support is experimental in NativeAOT-->
+    <_SuppressNativeLibEventSourceWarning>true</_SuppressNativeLibEventSourceWarning>
   </PropertyGroup>
 </Project>

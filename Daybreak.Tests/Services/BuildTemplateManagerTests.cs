@@ -14,7 +14,7 @@ public class BuildTemplateManagerTests
 {
     private const string EncodedSingleTemplate = "OwBk0texXNu0Dj/z+TDzBj+TN4AE";
     private const string EncodedTeamTemplate = "OQJUAMxOEMLnw0nDXQGY6aw2B OQNCA8wDP9B8DyzmOUi1veC OggjYxXTIPWbp5krZfxEAAAoD OwUTM4HDn5gc9TJSh6xddmETA";
-    private IBuildTemplateManager buildTemplateManager = default!;
+    private BuildTemplateManager buildTemplateManager = default!;
 
     [TestInitialize]
     public void Initialize()

@@ -1491,7 +1491,7 @@ public sealed class Skill
     public static readonly Skill WeaponsofThreeForges = new() { Id = 3429, Name = "Weapons of Three Forges", Profession = Profession.Ritualist };
     public static readonly Skill VowofRevolution = new() { Id = 3430, Name = "Vow of Revolution", Profession = Profession.Dervish };
     public static readonly Skill HeroicRefrain = new() { Id = 3431, Name = "Heroic Refrain", Profession = Profession.Paragon };
-    public static readonly IReadOnlyCollection<Skill> Skills = new List<Skill>
+    public static readonly IReadOnlyCollection<Skill> Skills = [.. new List<Skill>
     {
         NoSkill,
         ResurrectionSignet,
@@ -2978,7 +2978,7 @@ public sealed class Skill
         WeaponsofThreeForges,
         VowofRevolution,
         HeroicRefrain,
-    }.OrderBy(s => s.Name).ToList();
+    }.OrderBy(s => s.Name)];
 
     public static bool TryParse(int id, out Skill skill)
     {

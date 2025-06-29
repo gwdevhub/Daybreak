@@ -287,6 +287,7 @@ public partial class FocusView : UserControl
     {
         if (this.DataContext is not FocusViewContext context ||
             context.ApiContext is not ScopedApiContext apiContext ||
+            e is null ||
             e.CharacterName.IsNullOrWhiteSpace())
         {
             return;
@@ -322,7 +323,6 @@ public partial class FocusView : UserControl
         {
             this.viewManager.ShowView<TeamBuildTemplateView>(e.Build);
         }
-        
     }
 
     private void Component_NavigateToClicked(object _, string e)
@@ -347,7 +347,7 @@ public partial class FocusView : UserControl
             return;
         }
 
-        var indexOfSeparator = e.IndexOf("[");
+        var indexOfSeparator = e.IndexOf('[');
         indexOfSeparator = indexOfSeparator >= 0 ? indexOfSeparator : e.Length;
         var curedNpcName = e[..indexOfSeparator];
         var npcUrl = WikiUrl.Replace(NamePlaceholder, curedNpcName);

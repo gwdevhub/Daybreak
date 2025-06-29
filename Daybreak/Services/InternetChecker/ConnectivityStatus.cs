@@ -36,20 +36,12 @@ internal sealed class ConnectivityStatus(
                 checkingConnectionNotification.Cancel();
             }
 
-            switch (connectionStatus)
+            this.IsInternetAvailable = connectionStatus switch
             {
-                case InternetConnectionState.Available:
-                case InternetConnectionState.PartialOutage:
-                    this.IsInternetAvailable = true;
-                    break;
-                case InternetConnectionState.GuildwarsOutage:
-                case InternetConnectionState.Unavailable:
-                    this.IsInternetAvailable = false;
-                    break;
-                case InternetConnectionState.Undefined:
-                default:
-                    throw new InvalidOperationException($"Unexpected connection status {connectionStatus}");
-            }
+                InternetConnectionState.Available or InternetConnectionState.PartialOutage => true,
+                InternetConnectionState.GuildwarsOutage or InternetConnectionState.Unavailable => false,
+                _ => throw new InvalidOperationException($"Unexpected connection status {connectionStatus}"),
+            };
 
             // Only show Connection Restored message when a previous internet unavailable notification has been shown
             if (connectionStatus is InternetConnectionState.PartialOutage or InternetConnectionState.Available &&

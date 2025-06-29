@@ -47,6 +47,6 @@ public readonly unsafe struct GuildWarsArray<T> : IEnumerable<T>
         object IEnumerator.Current => this.Current;
 
         public void Reset() => this.index = -1;
-        public void Dispose() { }
+        public readonly void Dispose() { }
     }
 }

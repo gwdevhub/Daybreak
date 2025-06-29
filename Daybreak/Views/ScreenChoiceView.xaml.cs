@@ -40,7 +40,7 @@ public partial class ScreenChoiceView : UserControl
         this.applicationLauncher = applicationLauncher.ThrowIfNull(nameof(applicationLauncher));
         this.InitializeComponent();
         this.selectedId = this.liveOptions.Value.DesiredGuildwarsScreen;
-        this.CanTest = applicationLauncher.GetGuildwarsProcesses().FirstOrDefault() is not null;
+        this.CanTest = applicationLauncher.GetGuildwarsProcesses().Count > 0;
         this.SetupView();
     }
 
@@ -60,6 +60,7 @@ public partial class ScreenChoiceView : UserControl
                 minY = screen.Size.Top;
             }
         }
+
         foreach(var screen in this.screenManager.Screens)
         {
             var screenTemplate = new ScreenTemplate

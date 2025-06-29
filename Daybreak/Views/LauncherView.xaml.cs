@@ -510,7 +510,7 @@ public partial class LauncherView : UserControl
                 description: "The mods have changed since Guild Wars was launched. Please click 'Reapply mods' to reapply the mod configuration");
         }
 
-        if (mods.Any())
+        if (mods.Count > 0)
         {
             await this.Dispatcher.InvokeAsync(() => this.CanReapply = true);
         }

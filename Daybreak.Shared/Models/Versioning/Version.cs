@@ -122,7 +122,7 @@ public sealed class Version : IEquatable<Version>, IComparable<Version>
             return -1;
         }
 
-        throw new InvalidOperationException($"Failed to compare {this.ToString()} with {other.ToString()}");
+        throw new InvalidOperationException($"Failed to compare {this} with {other}");
     }
 
     public static Version Parse(string version)

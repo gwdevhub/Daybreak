@@ -7,12 +7,7 @@ public sealed class TradeAlertConverter : JsonConverter<ITradeAlert>
 {
     public override ITradeAlert? ReadJson(JsonReader reader, Type objectType, ITradeAlert? existingValue, bool hasExistingValue, JsonSerializer serializer)
     {
-        var jObject = JObject.Load(reader).ToObject<dynamic>();
-        if (jObject is null)
-        {
-            throw new InvalidOperationException($"Unable to deserialize {nameof(ITradeAlert)}");
-        }
-
+        var jObject = JObject.Load(reader).ToObject<dynamic>() ?? throw new InvalidOperationException($"Unable to deserialize {nameof(ITradeAlert)}");
         if (jObject[nameof(TradeAlert.MessageCheck)] is null)
         {
             return new QuoteAlert

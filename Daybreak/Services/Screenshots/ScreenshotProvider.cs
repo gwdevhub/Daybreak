@@ -30,20 +30,20 @@ internal sealed class ScreenshotProvider : IScreenshotProvider
     public async Task<ImageSource?> GetRandomScreenShot()
     {
         var screenshots = GetScreenshots();
-        if (screenshots.Count == 0)
+        if (screenshots.Length == 0)
         {
             this.logger.LogDebug("Attempted to retrieve a random screenshot. No screenshots present");
             return default;
         }
 
-        var screenShot = screenshots[Random.Shared.Next(0, screenshots.Count)];
+        var screenShot = screenshots[Random.Shared.Next(0, screenshots.Length)];
         return await this.GetScreenshotInternal(screenShot);
     }
 
     private async Task<ImageSource?> GetScreenshotInternal(string name)
     {
         var screenshots = GetScreenshots();
-        if (screenshots.Count == 0)
+        if (screenshots.Length == 0)
         {
             this.logger.LogDebug("Attempted to retrieve a random screenshot. No screenshots present");
             return default;
@@ -52,8 +52,5 @@ internal sealed class ScreenshotProvider : IScreenshotProvider
         return await this.imageCache.GetImage(name);
     }
 
-    private static IList<string> GetScreenshots()
-    {
-        return Directory.GetFiles(ScreenshotsPath);
-    }
+    private static string[] GetScreenshots() => Directory.GetFiles(ScreenshotsPath);
 }

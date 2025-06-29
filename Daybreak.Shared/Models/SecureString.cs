@@ -1,5 +1,6 @@
 ﻿using Daybreak.Shared.Utils;
 using Newtonsoft.Json;
+using System.Core.Extensions;
 using System.Security.Cryptography;
 
 namespace Daybreak.Shared.Models;
@@ -48,22 +49,15 @@ public sealed class SecureString
     public static implicit operator SecureString(string s) => new(s);
     public static SecureString operator +(SecureString? ss1, SecureString? ss2)
     {
-        if (ss1 is null) throw new ArgumentNullException(nameof(ss1));
-        if (ss2 is null) throw new ArgumentNullException(nameof(ss2));
-
-        return new SecureString([.. ss1.DecryptedValue!, .. ss2.DecryptedValue!]);
+        return new SecureString([.. ss1.ThrowIfNull().DecryptedValue!, .. ss2.ThrowIfNull().DecryptedValue!]);
     }
     public static SecureString operator +(SecureString? ss1, string s2)
     {
-        if (ss1 is null) throw new ArgumentNullException(nameof(ss1));
-
-        return new SecureString([.. ss1.DecryptedValue!, .. s2.AsBytes()]);
+        return new SecureString([.. ss1.ThrowIfNull().DecryptedValue!, .. s2.AsBytes()]);
     }
     public static SecureString operator +(SecureString? ss1, char c)
     {
-        if (ss1 is null) throw new ArgumentNullException(nameof(ss1));
-        
-        return new SecureString([.. ss1.DecryptedValue!, Convert.ToByte(c)]);
+        return new SecureString([.. ss1.ThrowIfNull().DecryptedValue!, Convert.ToByte(c)]);
     }
     public static bool operator ==(SecureString? ss1, SecureString? ss2)
     {

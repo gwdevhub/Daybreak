@@ -13,7 +13,7 @@ public partial class ExceptionDialog : Window
     private const string BodyPlaceholder = "[BODY]";
     private const string IssueUrl = $"https://github.com/gwdevhub/Daybreak/issues/new?title={TitlePlaceholder}&body={BodyPlaceholder}&labels=bug";
 
-    private string exceptionName;
+    private readonly string exceptionName;
 
     [GenerateDependencyProperty]
     private string exceptionMessage = string.Empty;

@@ -175,7 +175,7 @@ internal sealed class IconCache : IIconCache
         foreach (var imgElement in imgElements)
         {
             if (imgElement.GetAttributeValue<string>("src", string.Empty) is string src &&
-                src.ToLower().Contains(curedName.ToLower()) &&
+                src.Contains(curedName, StringComparison.CurrentCultureIgnoreCase) &&
                 (Uri.TryCreate(src, UriKind.Absolute, out var iconUri) ||
                  Uri.TryCreate(new Uri(WikiUrl), src, out iconUri)))
             {

@@ -45,7 +45,6 @@ using Daybreak.Services.Charts;
 using Daybreak.Services.Images;
 using Daybreak.Services.InternetChecker;
 using Daybreak.Services.Sounds;
-using Daybreak.Models.Notifications.Handling;
 using Daybreak.Services.TradeChat.Notifications;
 using Daybreak.Views.Copy;
 using Daybreak.Services.DSOAL;

@@ -12,7 +12,7 @@ public sealed class BrowserHistoryManager : IBrowserHistoryManager, INotifyPrope
 
     private DateTime lastOperation = DateTime.Now;
     private string lastUrlCache = string.Empty;
-    private HashSet<ulong> eventIds = [];
+    private readonly HashSet<ulong> eventIds = [];
     private DateTime userInitiatedTime = DateTime.MinValue;
     private bool userInitiated;
     private ChromiumBrowserWrapper? browserWrapper;

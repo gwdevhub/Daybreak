@@ -120,7 +120,7 @@ public class VersionTests
     [TestMethod]
     public void VersionConstructorTest(string version, bool shouldNotThrow)
     {
-        var action = new Action(() => new Version(version));
+        var action = new Action(() => _ = new Version(version));
         if (shouldNotThrow is false)
         {
             action.Should().Throw<ArgumentException>();

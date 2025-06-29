@@ -50,6 +50,7 @@ public partial class ReShadeBrowserView : UserControl
                     description: $"Downloading uMod mod to {e.ResultingFilePath}");
                 await this.Browser.WebBrowser.ExecuteScriptAsync(Scripts.CreateAlert($"Downloading {Path.GetFileName(e.ResultingFilePath)}"));
             }
+
             return;
         }
 

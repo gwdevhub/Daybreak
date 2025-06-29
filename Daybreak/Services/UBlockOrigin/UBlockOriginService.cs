@@ -69,7 +69,7 @@ public sealed class UBlockOriginService(
         }
 
         using var cancellationTokenSource = new CancellationTokenSource(5000);
-        var currentVersionString = await this.GetCurrentVersion(cancellationTokenSource.Token);
+        var currentVersionString = await GetCurrentVersion(cancellationTokenSource.Token);
         var latestVersionString = await this.GetLatestVersion(cancellationTokenSource.Token);
         if (latestVersionString is null)
         {
@@ -125,7 +125,34 @@ public sealed class UBlockOriginService(
         return destinationPath;
     }
 
-    private async Task<string?> GetCurrentVersion(CancellationToken cancellationToken)
+    private async Task<string?> GetLatestVersion(CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetLatestVersion), string.Empty);
+        scopedLogger.LogDebug("Retrieving version list");
+        var getListResponse = await this.httpClient.GetAsync(ReleasesUrl, cancellationToken);
+        if (!getListResponse.IsSuccessStatusCode)
+        {
+            scopedLogger.LogError($"Received non success status code [{getListResponse.StatusCode}]");
+            return default;
+        }
+
+        var responseString = await getListResponse.Content.ReadAsStringAsync(cancellationToken);
+        var releasesList = responseString.Deserialize<List<GithubRefTag>>();
+        var latestRelease = releasesList?
+            .Select(t => t.Ref?.Replace("refs/tags/", ""))
+            .OfType<string>()
+            .Where(v => !v.Contains('b') && !v.Contains("rc"))
+            .LastOrDefault();
+        if (latestRelease is not string tag)
+        {
+            scopedLogger.LogError("Could not parse version list. No latest version found");
+            return default;
+        }
+
+        return latestRelease;
+    }
+
+    private static async Task<string?> GetCurrentVersion(CancellationToken cancellationToken)
     {
         var manifestFilePath = Path.GetFullPath(InstallationPath, Path.Combine(InstallationFolderName, "manifest.json"));
         var fileInfo = new FileInfo(manifestFilePath);
@@ -143,32 +170,5 @@ public sealed class UBlockOriginService(
         }
 
         return value;
-    }
-
-    private async Task<string?> GetLatestVersion(CancellationToken cancellationToken)
-    {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetLatestVersion), string.Empty);
-        scopedLogger.LogDebug("Retrieving version list");
-        var getListResponse = await this.httpClient.GetAsync(ReleasesUrl, cancellationToken);
-        if (!getListResponse.IsSuccessStatusCode)
-        {
-            scopedLogger.LogError($"Received non success status code [{getListResponse.StatusCode}]");
-            return default;
-        }
-
-        var responseString = await getListResponse.Content.ReadAsStringAsync();
-        var releasesList = responseString.Deserialize<List<GithubRefTag>>();
-        var latestRelease = releasesList?
-            .Select(t => t.Ref?.Replace("refs/tags/", ""))
-            .OfType<string>()
-            .Where(v => !v.Contains("b") && !v.Contains("rc"))
-            .LastOrDefault();
-        if (latestRelease is not string tag)
-        {
-            scopedLogger.LogError("Could not parse version list. No latest version found");
-            return default;
-        }
-
-        return latestRelease;
     }
 }

@@ -152,24 +152,7 @@ internal sealed class OnlinePictureClient : IOnlinePictureClient
             return GetRandomScreenShot(location);
         }
 
-        return this.GetImageUri(validLocations, validCategories);
-    }
-
-    private (string Uri, string CreditText) GetImageUri(List<Location> validLocations, List<Entry> validCategories)
-    {
-        var selectedCategory = validCategories[Random.Shared.Next(0, validCategories.Count)];
-        if (selectedCategory.Count == 0)
-        {
-            if (validLocations.None())
-            {
-                return GetRandomScreenShot();
-            }
-
-            var location = validLocations[Random.Shared.Next(0, validLocations.Count)];
-            return GetRandomScreenShot(location);
-        }
-
-        return GetScreenshotName(selectedCategory, Random.Shared.Next(selectedCategory.StartIndex ?? 0, (selectedCategory.Count + selectedCategory.StartIndex) ?? 0));
+        return GetImageUri(validLocations, validCategories);
     }
 
     private async Task<Stream?> GetRemoteImage(string url)
@@ -210,6 +193,23 @@ internal sealed class OnlinePictureClient : IOnlinePictureClient
             this.logger.LogError(e.ToString());
             return default;
         }
+    }
+
+    private static (string Uri, string CreditText) GetImageUri(List<Location> validLocations, List<Entry> validCategories)
+    {
+        var selectedCategory = validCategories[Random.Shared.Next(0, validCategories.Count)];
+        if (selectedCategory.Count == 0)
+        {
+            if (validLocations.None())
+            {
+                return GetRandomScreenShot();
+            }
+
+            var location = validLocations[Random.Shared.Next(0, validLocations.Count)];
+            return GetRandomScreenShot(location);
+        }
+
+        return GetScreenshotName(selectedCategory, Random.Shared.Next(selectedCategory.StartIndex ?? 0, (selectedCategory.Count + selectedCategory.StartIndex) ?? 0));
     }
 
     private static (string Uri, string CreditText) GetRandomScreenShot()

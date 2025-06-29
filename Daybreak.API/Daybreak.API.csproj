@@ -28,12 +28,6 @@
     <NoWarn>NU1701</NoWarn>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <!--Event Source support is experimental in NativeAOT-->
-    <_SuppressNativeLibEventSourceError>true</_SuppressNativeLibEventSourceError>
-  </PropertyGroup>
-
-
   <ItemGroup>
     <EmbeddedResource Include="Configuration\appsettings.Debug.json" />
     <EmbeddedResource Include="Configuration\appsettings.json" />

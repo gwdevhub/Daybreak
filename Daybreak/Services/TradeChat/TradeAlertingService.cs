@@ -237,7 +237,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
         this.options.UpdateOption();
     }
 
-    private void NotifyAlertMatch(TraderMessageDTO traderMessageDTO, ITradeAlert alert)
+    private void NotifyAlertMatch(TraderMessageDTO traderMessageDTO, TradeAlert alert)
     {
         var traderMessage = new TraderMessage
         {

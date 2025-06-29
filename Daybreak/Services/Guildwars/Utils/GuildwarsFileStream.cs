@@ -9,7 +9,9 @@ internal sealed class GuildwarsFileStream(GuildWarsClientContext guildwarsClient
     private readonly GuildWarsClient guildwarsClient = guildwarsClient.ThrowIfNull();
     private readonly GuildWarsClientContext guildwarsClientContext = guildwarsClientContext;
 
-    private byte[]? chunkBuffer;
+    private readonly Memory<byte> downloadBuffer = new(new byte[4096]);
+
+    private Memory<byte>? chunkBuffer;
     private int positionInBuffer = 0;
     private int chunkSize = 0;
 
@@ -29,7 +31,7 @@ internal sealed class GuildwarsFileStream(GuildWarsClientContext guildwarsClient
         throw new System.NotImplementedException();
     }
 
-    public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+    public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
     {
         if (this.Position >= this.Length)
         {
@@ -38,7 +40,7 @@ internal sealed class GuildwarsFileStream(GuildWarsClientContext guildwarsClient
 
         if (this.positionInBuffer < this.chunkSize)
         {
-            var read = this.ReadCurrentChunkBytes(buffer, offset, count);
+            var read = this.ReadCurrentChunkBytes(buffer);
             this.Position += read;
             return read;
         }
@@ -46,10 +48,10 @@ internal sealed class GuildwarsFileStream(GuildWarsClientContext guildwarsClient
         // If we have already requested a previous chunk, we need to request more data
         if (this.chunkSize > 0)
         {
-            await this.guildwarsClient.Send(new FileRequestNextChunk { Field1 = 0x7F3, Field2 = 0x8, Field3 = (uint)this.chunkSize }, this.guildwarsClientContext, cancellationToken);
+            await GuildWarsClient.Send(new FileRequestNextChunk { Field1 = 0x7F3, Field2 = 0x8, Field3 = (uint)this.chunkSize }, this.guildwarsClientContext, cancellationToken);
         }
 
-        var meta = await this.guildwarsClient.ReceiveWait<FileMetadataResponse>(this.guildwarsClientContext, cancellationToken);
+        var meta = await GuildWarsClient.ReceiveWait<FileMetadataResponse>(this.guildwarsClientContext, cancellationToken);
         if (meta.Field1 != 0x6F2 && meta.Field1 != 0x6F3)
         {
             throw new InvalidOperationException($"Unknown header in response {meta.Field1:X4}");
@@ -57,28 +59,27 @@ internal sealed class GuildwarsFileStream(GuildWarsClientContext guildwarsClient
 
         this.chunkSize = meta.Field2 - 4;
         if (this.chunkBuffer is null ||
-            this.chunkBuffer.Length != this.chunkSize)
+            this.chunkBuffer.Value.Length != this.chunkSize)
         {
-            this.chunkBuffer = new byte[this.chunkSize];
+            this.chunkBuffer = new Memory<byte>(new byte[this.chunkSize]);
         }
 
         var downloadedChunkSize = 0;
         do
         {
-            var buf = new byte[Math.Min(4096, this.chunkSize - downloadedChunkSize)];
-            var readTask = this.guildwarsClientContext.Socket.ReceiveAsync(buf, cancellationToken).AsTask();
+            var readTask = this.guildwarsClientContext.Socket.ReceiveAsync(this.downloadBuffer, cancellationToken).AsTask();
             if (await Task.WhenAny(readTask, Task.Delay(5000, cancellationToken)) != readTask)
             {
                 throw new TaskCanceledException("Timed out waiting for download");
             }
 
             var read = await readTask;
-            Array.Copy(buf, 0, this.chunkBuffer, downloadedChunkSize, read);
+            this.downloadBuffer[..read].CopyTo(this.chunkBuffer.Value[downloadedChunkSize..]);
             downloadedChunkSize += read;
         } while (downloadedChunkSize < this.chunkSize);
 
         this.positionInBuffer = 0;
-        var chunkRead = this.ReadCurrentChunkBytes(buffer, offset, count);
+        var chunkRead = this.ReadCurrentChunkBytes(buffer);
         this.Position += chunkRead;
         return chunkRead;
     }
@@ -103,15 +104,15 @@ internal sealed class GuildwarsFileStream(GuildWarsClientContext guildwarsClient
         throw new System.NotImplementedException();
     }
 
-    private int ReadCurrentChunkBytes(byte[] buffer, int offset, int count)
+    private int ReadCurrentChunkBytes(Memory<byte> buffer)
     {
         if (this.chunkBuffer is null)
         {
             throw new InvalidOperationException("No chunk buffer ready");
         }
 
-        var bytesToRead = Math.Min(count, this.chunkSize - this.positionInBuffer);
-        Array.Copy(this.chunkBuffer, this.positionInBuffer, buffer, offset, bytesToRead);
+        var bytesToRead = Math.Min(buffer.Length, this.chunkSize - this.positionInBuffer);
+        this.chunkBuffer.Value.Slice(this.positionInBuffer, bytesToRead).CopyTo(buffer);
         this.positionInBuffer += bytesToRead;
         return bytesToRead;
     }

@@ -107,7 +107,7 @@ public sealed class Profession : IWikiEntity
         PrimaryAttribute = Attribute.Mysticism,
         Attributes = [Attribute.EarthPrayers, Attribute.ScytheMastery, Attribute.WindPrayers]
     };
-    public static IEnumerable<Profession> Professions =
+    public static readonly IEnumerable<Profession> Professions =
     [
         None,
         Warrior,

@@ -47,7 +47,7 @@ public partial class GuildWarsDownloadView : UserControl
         this.InitializeComponent();
     }
 
-    private void DownloadStatus_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void DownloadStatus_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         var newDescription = this.installationStatus?.CurrentStep.Description ?? string.Empty;
         var newProgressValue = (int)(this.installationStatus?.CurrentStep.As<DownloadStatus.DownloadProgressStep>()?.Progress * 100 ?? 0);
@@ -108,7 +108,6 @@ public partial class GuildWarsDownloadView : UserControl
             this.cancellationTokenSource = null;
         }
 
-#pragma warning disable CS8622 // Nullability of reference types in type of parameter doesn't match the target delegate (possibly because of nullability attributes).
         if (this.installationStatus is not null)
         {
             this.installationStatus.PropertyChanged -= this.DownloadStatus_PropertyChanged;
@@ -119,6 +118,5 @@ public partial class GuildWarsDownloadView : UserControl
         this.installationStatus = context.GuildwarsInstallationStatus;
         this.cancellationTokenSource = context.CancellationTokenSource;
         this.installationStatus.PropertyChanged += this.DownloadStatus_PropertyChanged;
-#pragma warning restore CS8622 // Nullability of reference types in type of parameter doesn't match the target delegate (possibly because of nullability attributes).
     }
 }

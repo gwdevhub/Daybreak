@@ -97,11 +97,7 @@ public partial class DropDownButton : Control
     private void DropDownButtonContextMenu_ItemClicked(object? _, object e)
     {
         this.SelectedItem = e;
-        if (this.ContextMenu is not null)
-        {
-            this.ContextMenu.IsOpen = false;
-        }
-
+        this.ContextMenu?.IsOpen = false;
         this.SelectionChanged?.Invoke(this, e);
     }
 

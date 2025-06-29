@@ -32,7 +32,7 @@ internal sealed class CleanupDatabases(
         if (allQuotes.Count > 20000)
         {
             // Delete the oldest 2000 entries in the db. We probably won't need them anymore
-            var quotes = await this.quotesCollection.FindAll(cancellationToken).OrderBy(q => q.TimeStamp).Take(2000).ToListAsync();
+            var quotes = await this.quotesCollection.FindAll(cancellationToken).OrderBy(q => q.TimeStamp).Take(2000).ToListAsync(cancellationToken);
             foreach (var quote in quotes)
             {
                 await this.quotesCollection.Delete(quote.Id, cancellationToken);

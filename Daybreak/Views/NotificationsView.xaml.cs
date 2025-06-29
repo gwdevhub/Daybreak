@@ -55,11 +55,11 @@ public partial class NotificationsView : UserControl
         {
             var unsortedNotifications = this.ShowAll ?
                 (await this.notificationProducer.GetAllNotifications(cancellationToken)).ToList() :
-                [.. (await this.notificationProducer.GetPendingNotifications(cancellationToken))];
+                [.. await this.notificationProducer.GetPendingNotifications(cancellationToken)];
             var notifications = this.Descending ?
                 unsortedNotifications.OrderByDescending(n => n.CreationTime).Take(100).ToList() :
                 [.. unsortedNotifications.OrderBy(n => n.CreationTime).Take(100)];
-            using var context = await this.semaphoreSlim.Acquire();
+            using var context = await this.semaphoreSlim.Acquire(cancellationToken);
             var notificationsToAdd = notifications.Where(n => this.Notifications.None(n2 => n2.Id == n.Id)).ToList();
             var notificationsToRemove = this.Notifications.Where(n => notifications.None(n2 => n2.Id == n.Id)).ToList();
             foreach (var notification in notificationsToRemove)

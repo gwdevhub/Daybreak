@@ -1,4 +1,4 @@
-﻿using Daybreak.Models.Notifications.Handling;
+﻿using Daybreak.Services.Notifications.Handlers;
 using Daybreak.Services.Notifications.Models;
 using Daybreak.Shared.Models.Notifications;
 using Daybreak.Shared.Models.Notifications.Handling;
@@ -68,7 +68,7 @@ internal sealed class NotificationService(
         return this.NotifyInternal<THandlingType>(title, description, metaData, expirationTime, dismissible, LogLevel.Error, persistent);
     }
 
-   async ValueTask INotificationProducer.OpenNotification(Notification notification, bool storeNotification, CancellationToken cancellationToken)
+   async Task INotificationProducer.OpenNotification(Notification notification, bool storeNotification, CancellationToken cancellationToken)
     {
         if (storeNotification)
         {
@@ -95,12 +95,12 @@ internal sealed class NotificationService(
         handler?.OpenNotification(notification);
     }
 
-    async ValueTask INotificationProducer.RemoveNotification(Notification notification, CancellationToken cancellationToken)
+    async Task INotificationProducer.RemoveNotification(Notification notification, CancellationToken cancellationToken)
     {
         await this.storage.RemoveNotification(ToDTO(notification), cancellationToken);
     }
 
-    async ValueTask INotificationProducer.RemoveAllNotifications(CancellationToken cancellationToken)
+    async Task INotificationProducer.RemoveAllNotifications(CancellationToken cancellationToken)
     {
         await this.storage.RemoveAllNotifications(cancellationToken);
     }

@@ -93,7 +93,7 @@ internal sealed class ToolboxClient(
             return default;
         }
 
-        var responseString = await getListResponse.Content.ReadAsStringAsync();
+        var responseString = await getListResponse.Content.ReadAsStringAsync(cancellationToken);
         var releasesList = responseString.Deserialize<List<GithubRefTag>>();
         var latestRelease = releasesList?.Where(t => t.Ref?.Contains("Release") is true)
             .Select(t => t.Ref?.Replace("refs/tags/", ""))
