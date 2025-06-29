@@ -139,6 +139,7 @@ internal sealed class TelemetryHost : IDisposable, IApplicationLifetimeService
         this.meter = Sdk.CreateMeterProviderBuilder()
             .SetResourceBuilder(this.resourceBuilder)
             .AddProcessInstrumentation()
+            .AddMeter("Daybreak.MetricsStore")
             .AddRuntimeInstrumentation()
             .AddOtlpExporter(o =>
             {

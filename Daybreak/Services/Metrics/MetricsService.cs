@@ -1,7 +1,6 @@
 ﻿using Daybreak.Shared.Models.Metrics;
 using Daybreak.Shared.Services.Metrics;
 using System.Collections.Concurrent;
-using System.Collections.Immutable;
 using System.Diagnostics.Metrics;
 
 namespace Daybreak.Services.Metrics;
