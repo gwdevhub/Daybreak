@@ -1,5 +1,6 @@
 ﻿using Daybreak.Services.Guildwars.Models;
 using Daybreak.Services.Guildwars.Utils;
+using System.ComponentModel.DataAnnotations;
 using System.Core.Extensions;
 using System.IO;
 
@@ -67,14 +68,17 @@ internal sealed class GuildwarsFileStream(GuildWarsClientContext guildwarsClient
         var downloadedChunkSize = 0;
         do
         {
-            var readTask = this.guildwarsClientContext.Socket.ReceiveAsync(this.downloadBuffer, cancellationToken).AsTask();
+            var remainingBytes = this.chunkSize - downloadedChunkSize;
+            var receiveBuffer = this.downloadBuffer[..Math.Min(this.downloadBuffer.Length, remainingBytes)];
+
+            var readTask = this.guildwarsClientContext.Socket.ReceiveAsync(receiveBuffer, cancellationToken).AsTask();
             if (await Task.WhenAny(readTask, Task.Delay(5000, cancellationToken)) != readTask)
             {
                 throw new TaskCanceledException("Timed out waiting for download");
             }
 
             var read = await readTask;
-            this.downloadBuffer[..read].CopyTo(this.chunkBuffer.Value[downloadedChunkSize..]);
+            receiveBuffer[..read].CopyTo(this.chunkBuffer.Value[downloadedChunkSize..]);
             downloadedChunkSize += read;
         } while (downloadedChunkSize < this.chunkSize);
 

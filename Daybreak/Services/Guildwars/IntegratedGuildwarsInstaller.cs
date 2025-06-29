@@ -98,8 +98,7 @@ internal sealed class IntegratedGuildwarsInstaller(
 
     public async Task<int?> GetLatestVersionId(CancellationToken cancellationToken)
     {
-        var guildWarsClient = new GuildWarsClient();
-        var response = await guildWarsClient.Connect(cancellationToken);
+        var response = await GuildWarsClient.Connect(cancellationToken);
         return response?.Item2.LatestExe;
     }
 
@@ -143,7 +142,7 @@ internal sealed class IntegratedGuildwarsInstaller(
         {
             // Initialize the download client
             var guildWarsClient = new GuildWarsClient();
-            var result = await guildWarsClient.Connect(cancellationToken);
+            var result = await GuildWarsClient.Connect(cancellationToken);
             if (!result.HasValue)
             {
                 scopedLogger.LogError("Failed to connect to ArenaNet servers");
