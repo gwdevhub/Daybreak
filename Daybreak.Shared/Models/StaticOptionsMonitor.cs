@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Options;
-using System;
 
 namespace Daybreak.Shared.Models;
 public sealed class StaticOptionsMonitor<T>(T currentValue)

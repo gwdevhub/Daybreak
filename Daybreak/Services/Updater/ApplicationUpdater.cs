@@ -10,20 +10,15 @@ using Daybreak.Shared.Services.Updater;
 using Daybreak.Shared.Services.Updater.PostUpdate;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Data;
 using System.Diagnostics;
 using System.Extensions;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Extensions.Services;
 using UpdateStatus = Daybreak.Shared.Models.Progress.UpdateStatus;
 using Version = Daybreak.Shared.Models.Versioning.Version;
@@ -133,10 +128,10 @@ internal sealed class ApplicationUpdater(
         {
             var serializedList = await response.Content.ReadAsStringAsync();
             var versionList = serializedList.Deserialize<GithubRefTag[]>();
-            return versionList!.Select(v => v.Ref!.Remove(0, RefTagPrefix.Length)).Select(v => new Version(v));
+            return versionList!.Select(v => v.Ref![RefTagPrefix.Length..]).Select(v => new Version(v));
         }
 
-        return new List<Version>();
+        return [];
     }
 
     public async Task<string?> GetChangelog(Version version)
@@ -247,7 +242,6 @@ internal sealed class ApplicationUpdater(
                 {
                     return false;
                 }
-
             })
             .Where(m =>
             {
@@ -314,8 +308,8 @@ internal sealed class ApplicationUpdater(
                 var fileSize = file.Size;
                 while (fileSize > 0)
                 {
-                    var readBytes = await downloadStream.ReadAsync(downloadBuffer, 0, downloadBuffer.Length);
-                    await packageStream.WriteAsync(downloadBuffer, 0, readBytes);
+                    var readBytes = await downloadStream.ReadAsync(downloadBuffer);
+                    await packageStream.WriteAsync(downloadBuffer.AsMemory(0, readBytes));
 
                     fileSize -= readBytes;
                     downloaded += readBytes;

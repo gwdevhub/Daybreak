@@ -1,5 +1,4 @@
 ﻿using Daybreak.Controls.Buttons;
-using Daybreak.Launch;
 using Daybreak.Shared;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Builds;
@@ -9,15 +8,9 @@ using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Utils;
 using Daybreak.Views;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
@@ -43,8 +36,6 @@ public partial class BuildTemplate : UserControl
 
     private bool browserMaximized = false;
     private bool showingSkillList = false;
-    private bool replacingSecondaryProfession;
-    private bool replacingPrimaryProfession;
     
     private SkillTemplate? selectingSkillTemplate;
     private List<Skill>? skillListCache;
@@ -156,7 +147,7 @@ public partial class BuildTemplate : UserControl
 
         await Task.Factory.StartNew(() =>
         {
-            var filteredSkills = this.FilterSkills(searchTerm, buildEntry).ToList();
+            var filteredSkills = FilterSkills(searchTerm, buildEntry).ToList();
             this.Dispatcher.InvokeAsync(() =>
             {
                 this.PrepareSkillListCache(filteredSkills);
@@ -228,7 +219,7 @@ public partial class BuildTemplate : UserControl
         }
     }
 
-    private IEnumerable<Skill> FilterSkills(string searchTerm, SingleBuildEntry buildEntry)
+    private static IEnumerable<Skill> FilterSkills(string searchTerm, SingleBuildEntry buildEntry)
     {
         // Replace symbols to ease search
         searchTerm = searchTerm?.Replace("\"", "").Replace("!", "")!;

@@ -2,8 +2,6 @@
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daybreak.Shared.Utils;
 

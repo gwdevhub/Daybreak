@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Daybreak.Shared.Models.Builds;
+﻿using Daybreak.Shared.Models.Builds;
 
 namespace Daybreak.Shared.Models.Guildwars;
 

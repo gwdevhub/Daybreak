@@ -16,14 +16,14 @@ public static class ColorExtensions
         var bg = (float)backColor.G / byte.MaxValue;
         var bb = (float)backColor.B / byte.MaxValue;
 
-        var a = fa + ba - fa * ba;
+        var a = fa + ba - (fa * ba);
 
         if (a <= 0)
             return Colors.Transparent;
 
-        var r = (fa * (1 - ba) * fr + fa * ba * fa + (1 - fa) * ba * br) / a;
-        var g = (fa * (1 - ba) * fg + fa * ba * fa + (1 - fa) * ba * bg) / a;
-        var b = (fa * (1 - ba) * fb + fa * ba * fa + (1 - fa) * ba * bb) / a;
+        var r = ((fa * (1 - ba) * fr) + (fa * ba * fa) + ((1 - fa) * ba * br)) / a;
+        var g = ((fa * (1 - ba) * fg) + (fa * ba * fa) + ((1 - fa) * ba * bg)) / a;
+        var b = ((fa * (1 - ba) * fb) + (fa * ba * fa) + ((1 - fa) * ba * bb)) / a;
 
         return Color.FromArgb(
             (byte)(a * byte.MaxValue),

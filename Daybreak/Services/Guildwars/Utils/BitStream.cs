@@ -1,5 +1,4 @@
-﻿using System;
-using System.Core.Extensions;
+﻿using System.Core.Extensions;
 using System.IO;
 
 namespace Daybreak.Services.Guildwars.Utils;

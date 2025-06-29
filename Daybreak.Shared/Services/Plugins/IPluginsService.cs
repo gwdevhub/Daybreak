@@ -9,8 +9,6 @@ using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Startup;
 using Daybreak.Shared.Services.Updater.PostUpdate;
 using Slim;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Daybreak.Shared.Services.Plugins;
 

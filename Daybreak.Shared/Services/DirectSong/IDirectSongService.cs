@@ -1,7 +1,5 @@
 ﻿using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Services.Mods;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daybreak.Shared.Services.DirectSong;
 public interface IDirectSongService : IModService

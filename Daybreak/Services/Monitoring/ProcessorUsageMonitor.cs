@@ -1,33 +1,23 @@
 ﻿using Daybreak.Shared.Models.Metrics;
 using Daybreak.Shared.Services.Metrics;
-using System;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.Monitoring;
 
-internal sealed class ProcessorUsageMonitor : IApplicationLifetimeService
+internal sealed class ProcessorUsageMonitor(
+    IMetricsService metricsService) : IApplicationLifetimeService
 {
     private const string ProcessorTime = "Processor Usage";
     private const string ProcessorTimeUnit = "% CPU";
     private const string ProcessorTimeDescription = "Percentage of CPU used by Daybreak";
     
-    private readonly Histogram<double> processorTimeHistogram;
-    private readonly Process currentProcess;
-    private readonly int processorCount;
+    private readonly Histogram<double> processorTimeHistogram = metricsService.ThrowIfNull().CreateHistogram<double>(ProcessorTime, ProcessorTimeUnit, ProcessorTimeDescription, AggregationTypes.NoAggregate);
+    private readonly Process currentProcess = Process.GetCurrentProcess();
+    private readonly int processorCount = Environment.ProcessorCount;
     private readonly CancellationTokenSource cancellationTokenSource = new();
-
-    public ProcessorUsageMonitor(
-        IMetricsService metricsService)
-    {
-        this.processorTimeHistogram = metricsService.ThrowIfNull().CreateHistogram<double>(ProcessorTime, ProcessorTimeUnit, ProcessorTimeDescription, AggregationTypes.NoAggregate);
-        this.currentProcess = Process.GetCurrentProcess();
-        this.processorCount = Environment.ProcessorCount;
-    }
 
     public void OnClosing()
     {

@@ -6,16 +6,11 @@ using Daybreak.Shared.Services.TradeChat;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Linq;
 using System.Logging;
 using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daybreak.Services.TradeChat;
 
@@ -250,7 +245,7 @@ internal sealed class TraderQuoteService : ITraderQuoteService
     private async Task<string> GetAsync(string? uri, HttpRequestMessage? httpRequestMessage, ScopedLogger<TraderQuoteService> scopedLogger, CancellationToken cancellationToken)
     {
         var response = httpRequestMessage is not null ?
-            await this.httpClient.SendAsync(httpRequestMessage) :
+            await this.httpClient.SendAsync(httpRequestMessage, cancellationToken) :
             await this.httpClient.GetAsync(uri!, cancellationToken);
         if (!response.IsSuccessStatusCode)
         {

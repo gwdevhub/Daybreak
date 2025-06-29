@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 using System.Windows.Input;
@@ -33,7 +32,7 @@ public partial class HighlightButton : UserControl
     [GenerateDependencyProperty(InitialValue = TextWrapping.Wrap)]
     private TextWrapping textWrapping = TextWrapping.Wrap;
     [GenerateDependencyProperty]
-    private Thickness textPadding = new Thickness(0);
+    private Thickness textPadding = new(0);
     [GenerateDependencyProperty]
     private UIElement buttonContent = default!;
 

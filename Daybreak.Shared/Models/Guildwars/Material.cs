@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Daybreak.Shared.Models.Guildwars;
+﻿namespace Daybreak.Shared.Models.Guildwars;
 
 public sealed class Material : ItemBase, IWikiEntity
 {
@@ -42,8 +40,8 @@ public sealed class Material : ItemBase, IWikiEntity
     public static readonly Material TemperedGlassVial = new() { Id = 939, Name = "Tempered Glass Vial", Multiple = "Tempered Glass Vials", WikiUrl = "https://wiki.guildwars.com/wiki/Tempered_Glass_Vial" };
     public static readonly Material VialOfInk = new() { Id = 944, Name = "Vial of Ink", Multiple = "Vials of Ink", WikiUrl = "https://wiki.guildwars.com/wiki/Vial_of_Ink" };
 
-    public static IReadOnlyList<Material> Common { get; } = new List<Material>
-    {
+    public static IReadOnlyList<Material> Common { get; } =
+    [
         Bone,
         BoltOfCloth,
         PileOfGlitteringDust,
@@ -55,9 +53,9 @@ public sealed class Material : ItemBase, IWikiEntity
         Scale,
         ChitinFragment,
         GraniteSlab
-    };
-    public static IReadOnlyList<Material> Rare { get; } = new List<Material>
-    {
+    ];
+    public static IReadOnlyList<Material> Rare { get; } =
+    [
         AmberChunk,
         BoltOfDamask,
         BoltOfLinen,
@@ -83,9 +81,9 @@ public sealed class Material : ItemBase, IWikiEntity
         SteelIngot,
         TemperedGlassVial,
         VialOfInk
-    };
-    public static IReadOnlyList<Material> All { get; } = new List<Material>
-    {
+    ];
+    public static IReadOnlyList<Material> All { get; } =
+    [
         Bone,
         BoltOfCloth,
         PileOfGlitteringDust,
@@ -122,7 +120,7 @@ public sealed class Material : ItemBase, IWikiEntity
         SteelIngot,
         TemperedGlassVial,
         VialOfInk
-    };
+    ];
 
     public string? Multiple { get; init; }
     public string? WikiUrl { get; init; }

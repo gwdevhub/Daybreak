@@ -1,8 +1,7 @@
 ﻿using Daybreak.Shared.Models.Guildwars;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
+using System.Core.Extensions;
 using System.Extensions;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -51,7 +50,7 @@ public abstract class ItemTestsBase<T>
         var definedItemFields = typeof(T).GetFields(BindingFlags.Static | BindingFlags.Public).Where(f => f.FieldType == typeof(T));
         foreach (var field in definedItemFields)
         {
-            var item = field.GetValue(default).Cast<T>();
+            var item = field.GetValue(default).ThrowIfNull().Cast<T>();
             itemMap[item] = false;
         }
 

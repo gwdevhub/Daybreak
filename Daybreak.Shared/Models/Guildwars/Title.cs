@@ -1,8 +1,5 @@
 ﻿using Daybreak.Shared.Converters;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Daybreak.Shared.Models.Guildwars;
 
@@ -56,8 +53,8 @@ public sealed class Title : IWikiEntity
     public static readonly Title Wisdom = new() { Id = 46, Name = "Wisdom", WikiUrl = "https://wiki.guildwars.com/wiki/Wisdom", Tiers = ["Seeker of Wisdom", "Collector of Wisdom", "Devotee of Wisdom", "Devourer of Wisdom", "Font of Wisdom", "Oracle of Wisdom", "Source of Wisdom"] };
     public static readonly Title Codex = new() { Id = 47, Name = "Codex", WikiUrl = "https://wiki.guildwars.com/wiki/Codex_Title", Tiers = ["Codex Initiate", "Codex Acolyte", "Codex Disciple", "Codex Zealot", "Codex Stalwart", "Codex Adept", "Codex Exemplar", "Codex Prodigy", "Codex Champion", "Codex Paragon", "Codex Master", "Codex Grandmaster"] };
 
-    public static readonly IEnumerable<Title> Titles = new List<Title>
-    {
+    public static readonly IEnumerable<Title> Titles =
+    [
         None,
         Hero,
         TyrianCartographer,
@@ -104,7 +101,7 @@ public sealed class Title : IWikiEntity
         TreasureHunter,
         Wisdom,
         Codex
-    };
+    ];
 
     public static bool TryParse(int id, out Title title)
     {

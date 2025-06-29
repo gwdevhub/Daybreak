@@ -1,9 +1,7 @@
-﻿using Daybreak.Shared.Models.Interop;
-using PeNet;
+﻿using PeNet;
 using PeNet.Header.Pe;
 using System.Core.Extensions;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Extensions.Core;
 using System.Globalization;
 using System.Runtime.InteropServices;
@@ -11,30 +9,12 @@ using System.Text;
 
 namespace Daybreak.API.Services.Interop;
 
-public sealed unsafe class MemoryScanningService
+public sealed unsafe class MemoryScanningService(
+    ILogger<MemoryScanningService> logger)
 {
-    private readonly ILogger<MemoryScanningService> logger;
+    private readonly ILogger<MemoryScanningService> logger = logger.ThrowIfNull();
     private readonly (nuint BaseAddress, ImageSectionHeader Section) textSection = GetSectionHeader(".text");
     private readonly (nuint BaseAddress, ImageSectionHeader Section) dataSection = GetSectionHeader(".rdata");
-
-    public MemoryScanningService(
-        ILogger<MemoryScanningService> logger)
-    {
-        this.logger = logger.ThrowIfNull();
-    }
-
-    public T? ReadPointer<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors)] T>(GuildwarsPointer<T> ptr)
-        where T : struct
-    {
-        var scopedLogger = this.logger.CreateScopedLogger();
-        scopedLogger.LogInformation("Reading pointer: 0x{ptr:X8}", ptr.Address);
-        if (ptr.Address is 0)
-        {
-            return default;
-        }
-
-        return Marshal.PtrToStructure<T>((nint)ptr.Address);
-    }
 
     public nuint FunctionFromNearCall(nuint callInstructionAddress, bool checkValidPtr = true)
     {

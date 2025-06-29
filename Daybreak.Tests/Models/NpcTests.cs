@@ -1,10 +1,8 @@
 ﻿using Daybreak.Shared.Models.Guildwars;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
+using System.Core.Extensions;
 using System.Extensions;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -81,7 +79,7 @@ public sealed class NpcTests
         var definedNpcsFields = typeof(Npc).GetFields(BindingFlags.Static | BindingFlags.Public).Where(f => f.FieldType == typeof(Npc));
         foreach(var field in definedNpcsFields)
         {
-            var npc = field.GetValue(default).Cast<Npc>();
+            var npc = field.GetValue(default).ThrowIfNull().Cast<Npc>();
             npcMap[npc] = false;
         }
 

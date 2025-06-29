@@ -2,30 +2,21 @@
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Credentials;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Extensions;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using Convert = System.Convert;
 
 namespace Daybreak.Services.Credentials;
 
-internal sealed class CredentialManager : ICredentialManager
+internal sealed class CredentialManager(
+    ILogger<CredentialManager> logger,
+    ILiveUpdateableOptions<CredentialManagerOptions> liveOptions) : ICredentialManager
 {
     private static readonly byte[] Entropy = Convert.FromBase64String("uXB8Vmz5MmuDar36v8SRGzpALi0Wv5Gx");
-    private readonly ILogger<CredentialManager> logger;
-    private readonly ILiveUpdateableOptions<CredentialManagerOptions> liveOptions;
-
-    public CredentialManager(
-        ILogger<CredentialManager> logger,
-        ILiveUpdateableOptions<CredentialManagerOptions> liveOptions)
-    {
-        this.liveOptions = liveOptions.ThrowIfNull(nameof(liveOptions));
-        this.logger = logger.ThrowIfNull(nameof(logger));
-    }
+    private readonly ILogger<CredentialManager> logger = logger.ThrowIfNull(nameof(logger));
+    private readonly ILiveUpdateableOptions<CredentialManagerOptions> liveOptions = liveOptions.ThrowIfNull(nameof(liveOptions));
 
     public bool TryGetCredentialsByIdentifier(string identifier, out LoginCredentials? loginCredentials)
     {
@@ -59,11 +50,10 @@ internal sealed class CredentialManager : ICredentialManager
     public void StoreCredentials(List<LoginCredentials> loginCredentials)
     {
         this.logger.LogDebug("Storing credentials");
-        this.liveOptions.Value.ProtectedLoginCredentials = loginCredentials
+        this.liveOptions.Value.ProtectedLoginCredentials = [.. loginCredentials
             .Select(this.ProtectCredentials)
             .Where(this.CredentialsProtected)
-            .Select(this.ExtractProtectedCredentials)
-            .ToList();
+            .Select(this.ExtractProtectedCredentials)];
         this.liveOptions.UpdateOption();
     }
 

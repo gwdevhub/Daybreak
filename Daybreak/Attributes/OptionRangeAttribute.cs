@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Daybreak.Attributes;
+﻿namespace Daybreak.Attributes;
 
 [AttributeUsage(AttributeTargets.Property)]
 public sealed class OptionRangeAttribute<T> : Attribute

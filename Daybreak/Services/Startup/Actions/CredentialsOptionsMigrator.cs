@@ -4,32 +4,25 @@ using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Options;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Reflection;
 
 namespace Daybreak.Services.Startup.Actions;
-internal sealed class CredentialsOptionsMigrator : StartupActionBase
+internal sealed class CredentialsOptionsMigrator(
+    IOptionsProvider optionsProvider,
+    ILogger<CredentialsOptionsMigrator> logger) : StartupActionBase
 {
     private const string OldOptionsKey = "CredentialManagerOptions";
 
-    private readonly IOptionsProvider optionsProvider;
-    private readonly ILogger<CredentialsOptionsMigrator> logger;
-
-    public CredentialsOptionsMigrator(
-        IOptionsProvider optionsProvider,
-        ILogger<CredentialsOptionsMigrator> logger)
-    {
-        this.optionsProvider = optionsProvider.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly IOptionsProvider optionsProvider = optionsProvider.ThrowIfNull();
+    private readonly ILogger<CredentialsOptionsMigrator> logger = logger.ThrowIfNull();
 
     public override void ExecuteOnStartup()
     {
         var newOptionsKey = GetNewOptionsKey();
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.ExecuteOnStartup), string.Empty);
-        if (this.optionsProvider.TryGetKeyedOptions(newOptionsKey) is JObject)
+        if (this.optionsProvider.TryGetKeyedOptions(newOptionsKey) is not null)
         {
             scopedLogger.LogDebug($"Found [{newOptionsKey}]. No migration needed");
             return;

@@ -40,7 +40,7 @@ public abstract class PluginConfigurationBase
     {
     }
     
-    public HttpMessageHandler SetupLoggingAndMetrics<T>(System.IServiceProvider serviceProvider)
+    public static HttpMessageHandler SetupLoggingAndMetrics<T>(System.IServiceProvider serviceProvider)
     {
         var logger = serviceProvider.GetRequiredService<ILogger<T>>();
         var metricsService = serviceProvider.GetRequiredService<IMetricsService>();
@@ -51,12 +51,12 @@ public abstract class PluginConfigurationBase
             new LoggingHttpMessageHandler(logger!) { InnerHandler = new HttpClientHandler() });
     }
 
-    public void SetupDaybreakUserAgent(HttpRequestHeaders httpRequestHeaders)
+    public static void SetupDaybreakUserAgent(HttpRequestHeaders httpRequestHeaders)
     {
         httpRequestHeaders.ThrowIfNull().TryAddWithoutValidation("User-Agent", DaybreakUserAgent);
     }
 
-    public void SetupChromeImpersonationUserAgent(HttpRequestHeaders httpRequestHeaders)
+    public static void SetupChromeImpersonationUserAgent(HttpRequestHeaders httpRequestHeaders)
     {
         httpRequestHeaders.ThrowIfNull().TryAddWithoutValidation("User-Agent", ChromeImpersonationUserAgent);
     }

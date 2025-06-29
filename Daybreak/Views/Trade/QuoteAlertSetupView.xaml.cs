@@ -2,10 +2,7 @@
 using Daybreak.Shared.Models.Trade;
 using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.TradeChat;
-using System;
-using System.Collections.Generic;
 using System.Core.Extensions;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -18,7 +15,7 @@ public partial class QuoteAlertSetupView : UserControl
     private readonly IViewManager viewManager;
     private readonly ITradeAlertingService tradeAlertingService;
 
-    public List<ItemBase> AvailableItems { get; } = ItemBase.AllItems.Where(i => i.Modifiers is null).ToList();
+    public List<ItemBase> AvailableItems { get; } = [.. ItemBase.AllItems.Where(i => i.Modifiers is null)];
 
     public QuoteAlertSetupView(
         IViewManager viewManager,

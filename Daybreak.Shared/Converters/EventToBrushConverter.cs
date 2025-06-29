@@ -1,7 +1,5 @@
 ﻿using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Guildwars;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media;

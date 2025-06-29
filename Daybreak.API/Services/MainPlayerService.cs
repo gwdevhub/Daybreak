@@ -12,7 +12,6 @@ using System.Collections.Concurrent;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
-using System.Logging;
 using System.Runtime.CompilerServices;
 using ZLinq;
 using InstanceType = Daybreak.API.Interop.GuildWars.InstanceType;

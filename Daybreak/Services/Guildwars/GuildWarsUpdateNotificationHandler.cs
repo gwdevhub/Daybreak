@@ -10,27 +10,18 @@ using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Extensions;
 using System.IO;
-using System.Threading;
 
 namespace Daybreak.Services.Guildwars;
-internal sealed class GuildWarsUpdateNotificationHandler : INotificationHandler
+internal sealed class GuildWarsUpdateNotificationHandler(
+    IViewManager viewManager,
+    IGuildWarsInstaller guildWarsInstaller,
+    INotificationService notificationService,
+    ILogger<GuildWarsUpdateNotificationHandler> logger) : INotificationHandler
 {
-    private readonly IViewManager viewManager;
-    private readonly IGuildWarsInstaller guildWarsInstaller;
-    private readonly INotificationService notificationService;
-    private readonly ILogger<GuildWarsUpdateNotificationHandler> logger;
-
-    public GuildWarsUpdateNotificationHandler(
-        IViewManager viewManager,
-        IGuildWarsInstaller guildWarsInstaller,
-        INotificationService notificationService,
-        ILogger<GuildWarsUpdateNotificationHandler> logger)
-    {
-        this.viewManager = viewManager.ThrowIfNull();
-        this.guildWarsInstaller = guildWarsInstaller.ThrowIfNull();
-        this.notificationService = notificationService.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly IViewManager viewManager = viewManager.ThrowIfNull();
+    private readonly IGuildWarsInstaller guildWarsInstaller = guildWarsInstaller.ThrowIfNull();
+    private readonly INotificationService notificationService = notificationService.ThrowIfNull();
+    private readonly ILogger<GuildWarsUpdateNotificationHandler> logger = logger.ThrowIfNull();
 
     public async void OpenNotification(Notification notification)
     {

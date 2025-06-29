@@ -11,19 +11,17 @@ public sealed class IconDownloadStatus : INotifyPropertyChanged
     public static IconDownloadStep Downloading(string iconName, double progress) => new DownloadingIconDownloadStep(iconName, progress);
     public static IconDownloadStep Stopped(double progress) => new StoppedIconDownloadStep(progress);
 
-    private IconDownloadStep currentStep = StartingStep;
-
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public IconDownloadStep CurrentStep
     {
-        get => this.currentStep;
+        get;
         set
         {
-            this.currentStep = value;
+            field = value;
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CurrentStep)));
         }
-    }
+    } = StartingStep;
 
     public abstract class IconDownloadStep : LoadStatus
     {
@@ -33,25 +31,16 @@ public sealed class IconDownloadStatus : INotifyPropertyChanged
         }
     }
 
-    public class StoppedIconDownloadStep : IconDownloadStep
+    public class StoppedIconDownloadStep(double progress) : IconDownloadStep("Download stopped", progress)
     {
-        public StoppedIconDownloadStep(double progress) : base("Download stopped", progress)
-        {
-        }
     }
 
-    public class DownloadingIconDownloadStep : IconDownloadStep
+    public class DownloadingIconDownloadStep(string skillName, double progress) : IconDownloadStep($"Downloading [{skillName}] icon", progress)
     {
-        public DownloadingIconDownloadStep(string skillName, double progress) : base($"Downloading [{skillName}] icon", progress)
-        {
-        }
     }
 
-    public class CheckingIconDownloadStep : IconDownloadStep
+    public class CheckingIconDownloadStep(string skillName, double progress) : IconDownloadStep($"Checking [{skillName}] icon", progress)
     {
-        public CheckingIconDownloadStep(string skillName, double progress) : base($"Checking [{skillName}] icon", progress)
-        {
-        }
     }
 
     public class NotSupportedIconDownloadStep : IconDownloadStep

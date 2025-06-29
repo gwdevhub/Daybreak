@@ -1,7 +1,5 @@
 ﻿using Daybreak.Behaviors;
 using Daybreak.Shared.Services.Window;
-using System;
-using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Windows;

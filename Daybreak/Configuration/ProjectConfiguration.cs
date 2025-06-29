@@ -3,7 +3,6 @@ using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Credentials;
 using Daybreak.Services.IconRetrieve;
 using Daybreak.Services.Logging;
-using Daybreak.Services.Mutex;
 using Daybreak.Services.Privilege;
 using Daybreak.Services.Screens;
 using Daybreak.Services.Screenshots;
@@ -45,9 +44,7 @@ using Daybreak.Services.Notifications;
 using Daybreak.Services.Charts;
 using Daybreak.Services.Images;
 using Daybreak.Services.InternetChecker;
-using System;
 using Daybreak.Services.Sounds;
-using Daybreak.Models.Notifications.Handling;
 using Daybreak.Services.TradeChat.Notifications;
 using Daybreak.Views.Copy;
 using Daybreak.Services.DSOAL;
@@ -107,7 +104,6 @@ using Daybreak.Shared.Services.UMod;
 using Daybreak.Shared.Services.Updater;
 using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.Metrics;
-using Daybreak.Shared.Services.Mutex;
 using Daybreak.Shared.Services.IconRetrieve;
 using Daybreak.Shared.Services.Updater.PostUpdate;
 using Daybreak.Shared.Services.Mods;
@@ -136,7 +132,6 @@ using Daybreak.Services.Telemetry;
 using System.Reflection;
 using Version = Daybreak.Shared.Models.Versioning.Version;
 using Daybreak.Shared.Models.Plugins;
-using System.Collections.Generic;
 
 namespace Daybreak.Configuration;
 
@@ -219,7 +214,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IMenuServiceInitializer, MenuService>(sp => sp.GetRequiredService<IMenuService>().Cast<MenuService>());
         services.AddSingleton<IMenuServiceProducer, MenuService>(sp => sp.GetRequiredService<IMenuService>().Cast<MenuService>());
         services.AddSingleton<IMenuServiceButtonHandler, MenuService>(sp => sp.GetRequiredService<IMenuService>().Cast<MenuService>());
-        services.AddSingleton<IMutexHandler, MutexHandler>();
         services.AddSingleton<IShortcutManager, ShortcutManager>();
         services.AddSingleton<IMetricsService, MetricsService>();
         services.AddSingleton<IStartupActionProducer, StartupActionManager>();
@@ -505,72 +499,72 @@ public class ProjectConfiguration : PluginConfigurationBase
         return services
             .ThrowIfNull()
             .RegisterHttpClient<ApplicationUpdater>()
-                .WithMessageHandler(this.SetupLoggingAndMetrics<ApplicationUpdater>)
-                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
+                .WithMessageHandler(SetupLoggingAndMetrics<ApplicationUpdater>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<OnlinePictureClient>()
-                .WithMessageHandler(this.SetupLoggingAndMetrics<OnlinePictureClient>)
-                .WithDefaultRequestHeadersSetup(this.SetupChromeImpersonationUserAgent)
+                .WithMessageHandler(SetupLoggingAndMetrics<OnlinePictureClient>)
+                .WithDefaultRequestHeadersSetup(SetupChromeImpersonationUserAgent)
                 .Build()
             .RegisterHttpClient<GraphClient>()
-                .WithMessageHandler(this.SetupLoggingAndMetrics<GraphClient>)
-                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
+                .WithMessageHandler(SetupLoggingAndMetrics<GraphClient>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<DownloadService>()
-                .WithMessageHandler(this.SetupLoggingAndMetrics<DownloadService>)
-                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
+                .WithMessageHandler(SetupLoggingAndMetrics<DownloadService>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<TradeChatService<KamadanTradeChatOptions>>()
-                .WithMessageHandler(this.SetupLoggingAndMetrics<TradeChatService<KamadanTradeChatOptions>>)
-                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
+                .WithMessageHandler(SetupLoggingAndMetrics<TradeChatService<KamadanTradeChatOptions>>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<TradeChatService<AscalonTradeChatOptions>>()
-                .WithMessageHandler(this.SetupLoggingAndMetrics<TradeChatService<AscalonTradeChatOptions>>)
-                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
+                .WithMessageHandler(SetupLoggingAndMetrics<TradeChatService<AscalonTradeChatOptions>>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<IconCache>()
-                .WithMessageHandler(this.SetupLoggingAndMetrics<IconCache>)
-                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
+                .WithMessageHandler(SetupLoggingAndMetrics<IconCache>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<TraderQuoteService>()
-                .WithMessageHandler(this.SetupLoggingAndMetrics<TraderQuoteService>)
-                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
+                .WithMessageHandler(SetupLoggingAndMetrics<TraderQuoteService>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<PriceHistoryService>()
-                .WithMessageHandler(this.SetupLoggingAndMetrics<PriceHistoryService>)
-                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
+                .WithMessageHandler(SetupLoggingAndMetrics<PriceHistoryService>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<InternetCheckingService>()
-                .WithMessageHandler(this.SetupLoggingAndMetrics<InternetCheckingService>)
-                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
+                .WithMessageHandler(SetupLoggingAndMetrics<InternetCheckingService>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<ChromiumBrowserWrapper>()
-                .WithMessageHandler(this.SetupLoggingAndMetrics<ChromiumBrowserWrapper>)
-                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
+                .WithMessageHandler(SetupLoggingAndMetrics<ChromiumBrowserWrapper>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<ToolboxClient>()
-                .WithMessageHandler(this.SetupLoggingAndMetrics<ToolboxClient>)
-                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
+                .WithMessageHandler(SetupLoggingAndMetrics<ToolboxClient>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<ReShadeService>()
-                .WithMessageHandler(this.SetupLoggingAndMetrics<ReShadeService>)
-                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
+                .WithMessageHandler(SetupLoggingAndMetrics<ReShadeService>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<UModService>()
-                .WithMessageHandler(this.SetupLoggingAndMetrics<UModService>)
-                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
+                .WithMessageHandler(SetupLoggingAndMetrics<UModService>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<UBlockOriginService>()
-                .WithMessageHandler(this.SetupLoggingAndMetrics<UBlockOriginService>)
-                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
+                .WithMessageHandler(SetupLoggingAndMetrics<UBlockOriginService>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<DXVKService>()
-                .WithMessageHandler(this.SetupLoggingAndMetrics<DXVKService>)
-                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
+                .WithMessageHandler(SetupLoggingAndMetrics<DXVKService>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<ScopedApiContext>()
-                .WithMessageHandler(this.SetupLoggingAndMetrics<ScopedApiContext>)
-                .WithDefaultRequestHeadersSetup(this.SetupDaybreakUserAgent)
+                .WithMessageHandler(SetupLoggingAndMetrics<ScopedApiContext>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build();
     }
 }

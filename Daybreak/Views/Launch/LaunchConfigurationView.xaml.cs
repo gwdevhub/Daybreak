@@ -5,11 +5,9 @@ using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.LaunchConfigurations;
 using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Notifications;
-using System;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 

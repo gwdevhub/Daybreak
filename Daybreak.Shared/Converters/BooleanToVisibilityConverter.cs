@@ -1,5 +1,4 @@
-﻿using System;
-using System.Extensions;
+﻿using System.Extensions;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
@@ -38,12 +37,12 @@ public class BooleanToVisibilityConverter : IValueConverter
         }
 
         var objValue = value.Cast<bool>();
-        if (objValue && this.TriggerValue && this.IsHidden || !objValue && !this.TriggerValue && this.IsHidden)
+        if ((objValue && this.TriggerValue && this.IsHidden) || (!objValue && !this.TriggerValue && this.IsHidden))
         {
             return Visibility.Hidden;
         }
 
-        if (objValue && this.TriggerValue && !this.IsHidden || !objValue && !this.TriggerValue && !this.IsHidden)
+        if ((objValue && this.TriggerValue && !this.IsHidden) || (!objValue && !this.TriggerValue && !this.IsHidden))
         {
             return Visibility.Collapsed;
         }

@@ -4,37 +4,25 @@ using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.Guildwars;
 using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.GuildWars;
-internal sealed class GuildWarsVersionChecker : IGuildWarsVersionChecker, IApplicationLifetimeService
+internal sealed class GuildWarsVersionChecker(
+    IGuildWarsExecutableManager guildWarsExecutableManager,
+    IGuildWarsInstaller guildWarsInstaller,
+    INotificationService notificationService,
+    ILogger<GuildWarsVersionChecker> logger) : IGuildWarsVersionChecker, IApplicationLifetimeService
 {
     public string Name => "GuildWars Version Checker";
     public bool IsEnabled { get; set; } = true;
     public bool IsInstalled => true;
 
-    private readonly IGuildWarsExecutableManager guildWarsExecutableManager;
-    private readonly IGuildWarsInstaller guildWarsInstaller;
-    private readonly INotificationService notificationService;
-    private readonly ILogger<GuildWarsVersionChecker> logger;
-
-    public GuildWarsVersionChecker(
-        IGuildWarsExecutableManager guildWarsExecutableManager,
-        IGuildWarsInstaller guildWarsInstaller,
-        INotificationService notificationService,
-        ILogger<GuildWarsVersionChecker> logger)
-    {
-        this.guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
-        this.guildWarsInstaller = guildWarsInstaller.ThrowIfNull();
-        this.notificationService = notificationService.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly IGuildWarsExecutableManager guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
+    private readonly IGuildWarsInstaller guildWarsInstaller = guildWarsInstaller.ThrowIfNull();
+    private readonly INotificationService notificationService = notificationService.ThrowIfNull();
+    private readonly ILogger<GuildWarsVersionChecker> logger = logger.ThrowIfNull();
 
     public IEnumerable<string> GetCustomArguments()
     {

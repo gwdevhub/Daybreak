@@ -1,23 +1,16 @@
 ﻿using Daybreak.Shared.Services.Mods;
 using Microsoft.Extensions.Logging;
 using Slim;
-using System.Collections.Generic;
 using System.Core.Extensions;
 
 namespace Daybreak.Services.Mods;
 
-internal sealed class ModsManager : IModsManager
+internal sealed class ModsManager(
+    IServiceManager serviceManager,
+    ILogger<ModsManager> logger) : IModsManager
 {
-    private readonly IServiceManager serviceManager;
-    private readonly ILogger<IModsManager> logger;
-
-    public ModsManager(
-        IServiceManager serviceManager,
-        ILogger<ModsManager> logger)
-    {
-        this.serviceManager = serviceManager.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly IServiceManager serviceManager = serviceManager.ThrowIfNull();
+    private readonly ILogger<IModsManager> logger = logger.ThrowIfNull();
 
     public IEnumerable<IModService> GetMods()
     {

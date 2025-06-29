@@ -4,18 +4,12 @@ using Daybreak.Shared.Models.Notifications.Handling;
 using Daybreak.Shared.Services.Navigation;
 using Daybreak.Views;
 using System.Core.Extensions;
-using System.Linq;
 
 namespace Daybreak.Services.Notifications.Handlers;
-public sealed class NavigateToCalendarViewHandler : INotificationHandler
+public sealed class NavigateToCalendarViewHandler(
+    IViewManager viewManager) : INotificationHandler
 {
-    private readonly IViewManager viewManager;
-
-    public NavigateToCalendarViewHandler(
-        IViewManager viewManager)
-    {
-        this.viewManager = viewManager.ThrowIfNull();
-    }
+    private readonly IViewManager viewManager = viewManager.ThrowIfNull();
 
     public void OpenNotification(Notification notification)
     {

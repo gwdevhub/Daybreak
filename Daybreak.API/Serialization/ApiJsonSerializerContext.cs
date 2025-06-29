@@ -11,8 +11,6 @@ namespace Daybreak.API.Serialization;
 [JsonSerializable(typeof(uint))]
 [JsonSerializable(typeof(nuint))]
 [JsonSerializable(typeof(bool))]
-[JsonSerializable(typeof(Task<IResult>))]
-[JsonSerializable(typeof(Task))]
 [JsonSerializable(typeof(Dictionary<string, string>))]
 [JsonSerializable(typeof(List<string>))]
 [JsonSerializable(typeof(JsonElement))]

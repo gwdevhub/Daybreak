@@ -1,8 +1,6 @@
 ﻿using Daybreak.Services.Notifications;
 using Daybreak.Services.TradeChat;
 using Daybreak.Shared.Models;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daybreak.Services.Startup.Actions;
 public sealed class EnsureDatabaseTablesExist(

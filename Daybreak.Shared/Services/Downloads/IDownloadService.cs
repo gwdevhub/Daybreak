@@ -1,6 +1,4 @@
 ﻿using Daybreak.Shared.Models.Progress;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daybreak.Shared.Services.Downloads;
 

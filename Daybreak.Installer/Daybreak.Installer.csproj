@@ -10,7 +10,6 @@
     <RuntimeIdentifier>win-x86</RuntimeIdentifier>
     <PublishAot>true</PublishAot>
     <StripSymbols>true</StripSymbols>
-    <Version>0.9.9.76</Version>
   </PropertyGroup>
 
 </Project>

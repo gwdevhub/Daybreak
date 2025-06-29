@@ -5,26 +5,23 @@ namespace Daybreak.Shared.Models.Builds;
 
 public sealed class AttributeEntry : INotifyPropertyChanged
 {
-    private Attribute? attribute;
-    private int points;
-
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public Attribute? Attribute
     {
-        get => this.attribute;
+        get;
         set
         {
-            this.attribute = value;
+            field = value;
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Attribute)));
         }
     }
     public int Points
     {
-        get => this.points;
+        get;
         set
         {
-            this.points = value;
+            field = value;
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Points)));
         }
     }

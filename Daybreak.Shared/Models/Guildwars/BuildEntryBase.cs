@@ -1,7 +1,5 @@
 ﻿using Daybreak.Shared.Models.Builds;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace Daybreak.Shared.Models.Guildwars;

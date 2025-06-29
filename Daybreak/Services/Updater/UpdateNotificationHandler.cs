@@ -1,19 +1,14 @@
 ﻿using Daybreak.Shared.Models.Notifications;
 using Daybreak.Shared.Models.Notifications.Handling;
-using Daybreak.Shared.Models.Versioning;
 using Daybreak.Shared.Services.Navigation;
 using Daybreak.Views;
 using System.Core.Extensions;
+using Version = Daybreak.Shared.Models.Versioning.Version;
 
 namespace Daybreak.Services.Updater;
-internal sealed class UpdateNotificationHandler : INotificationHandler
+internal sealed class UpdateNotificationHandler(IViewManager viewManager) : INotificationHandler
 {
-    private readonly IViewManager viewManager;
-
-    public UpdateNotificationHandler(IViewManager viewManager)
-    {
-        this.viewManager = viewManager.ThrowIfNull();
-    }
+    private readonly IViewManager viewManager = viewManager.ThrowIfNull();
 
     public void OpenNotification(Notification notification)
     {

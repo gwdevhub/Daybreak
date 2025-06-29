@@ -4,11 +4,9 @@ using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Sounds;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Threading;
 
@@ -77,7 +75,7 @@ public partial class NotificationStackpanel : UserControl
         }
 
         this.Notifications.Remove(notificationWrapper);
-        this.notificationProducer.OpenNotification(notificationWrapper.Notification!);
+        _ = this.notificationProducer.OpenNotification(notificationWrapper.Notification!);
         notificationWrapper.Notification!.Closed = true;
         this.soundService.PlayNotifyClose();
     }

@@ -1,7 +1,6 @@
 ﻿using Daybreak.Shared.Models.Trade;
 using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Notifications;
-using System;
 using System.Core.Extensions;
 using System.Windows;
 using System.Windows.Controls;

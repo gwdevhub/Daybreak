@@ -11,10 +11,7 @@ public sealed class UpdateStatus : DownloadStatus
         this.CurrentStep = Starting;
     }
 
-    public class UpdateStep : LoadStatus
+    public class UpdateStep(string name) : LoadStatus(name)
     {
-        public UpdateStep(string name) : base(name)
-        {
-        }
     }
 }

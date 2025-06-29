@@ -81,7 +81,6 @@ public sealed class UIService(
                 {
                     await this.Keypress(uiAction, null, CancellationToken.None);
                 }
-
             }, CancellationToken.None);
         });
     }

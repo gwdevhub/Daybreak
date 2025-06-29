@@ -8,12 +8,8 @@ using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Toolbox;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Linq;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
@@ -305,12 +301,12 @@ public partial class TeamBuildTemplateView : UserControl
         if (this.SelectedBuild == singleBuildEntry)
         {
             // We need to perform the check before we change the build collection, otherwise SelectedBuild will be null
-            this.CurrentBuild.Builds = this.CurrentBuild.Builds.Where(b => b != singleBuildEntry).ToList();
+            this.CurrentBuild.Builds = [.. this.CurrentBuild.Builds.Where(b => b != singleBuildEntry)];
             this.SelectedBuild = this.CurrentBuild.Builds.FirstOrDefault();
         }
         else
         {
-            this.CurrentBuild.Builds = this.CurrentBuild.Builds.Where(b => b != singleBuildEntry).ToList();
+            this.CurrentBuild.Builds = [.. this.CurrentBuild.Builds.Where(b => b != singleBuildEntry)];
         }
     }
 

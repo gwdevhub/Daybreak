@@ -1,16 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Logging;
+﻿using System.Logging;
 
 namespace Daybreak.Services.Logging;
 
-internal sealed class CompositeLogsWriter : ILogsWriter
+internal sealed class CompositeLogsWriter(params ILogsWriter[] innerLogsWriters) : ILogsWriter
 {
-    private readonly IEnumerable<ILogsWriter> logsWriters;
-
-    public CompositeLogsWriter(params ILogsWriter[] innerLogsWriters)
-    {
-        this.logsWriters = innerLogsWriters;
-    }
+    private readonly IEnumerable<ILogsWriter> logsWriters = innerLogsWriters;
 
     public void WriteLog(Log log)
     {

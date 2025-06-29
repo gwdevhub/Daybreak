@@ -1,5 +1,4 @@
-﻿using System;
-using System.Core.Extensions;
+﻿using System.Core.Extensions;
 using System.Extensions;
 
 namespace Daybreak.Shared.Models.Notifications;

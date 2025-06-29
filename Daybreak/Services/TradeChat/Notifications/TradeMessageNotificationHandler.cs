@@ -9,14 +9,9 @@ using System.Extensions;
 
 namespace Daybreak.Services.TradeChat.Notifications;
 
-internal sealed class TradeMessageNotificationHandler : INotificationHandler
+internal sealed class TradeMessageNotificationHandler(IViewManager viewManager) : INotificationHandler
 {
-    private readonly IViewManager viewManager;
-
-    public TradeMessageNotificationHandler(IViewManager viewManager)
-    {
-        this.viewManager = viewManager.ThrowIfNull();
-    }
+    private readonly IViewManager viewManager = viewManager.ThrowIfNull();
 
     public void OpenNotification(Notification notification)
     {

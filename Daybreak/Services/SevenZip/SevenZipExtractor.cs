@@ -1,26 +1,17 @@
 ﻿using Daybreak.Shared.Services.SevenZip;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daybreak.Services.SevenZip;
-internal sealed class SevenZipExtractor : ISevenZipExtractor
+internal sealed class SevenZipExtractor(
+    ILogger<SevenZipExtractor> logger) : ISevenZipExtractor
 {
     private const string ExtractorExeName = "Daybreak.7ZipExtractor.exe";
 
-    private readonly ILogger<SevenZipExtractor> logger;
-
-    public SevenZipExtractor(
-        ILogger<SevenZipExtractor> logger)
-    {
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly ILogger<SevenZipExtractor> logger = logger.ThrowIfNull();
 
     public async Task<bool> ExtractToDirectory(string sourceFile, string destinationDirectory, Action<double, string> progressTracker, CancellationToken cancellationToken)
     {

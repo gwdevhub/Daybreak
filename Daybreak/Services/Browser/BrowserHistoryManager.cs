@@ -1,11 +1,8 @@
 ﻿using Daybreak.Controls;
 using Daybreak.Shared.Models.Browser;
 using Microsoft.Web.WebView2.Core;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Core.Extensions;
-using System.Linq;
 
 namespace Daybreak.Services.Browser;
 public sealed class BrowserHistoryManager : IBrowserHistoryManager, INotifyPropertyChanged
@@ -15,31 +12,29 @@ public sealed class BrowserHistoryManager : IBrowserHistoryManager, INotifyPrope
 
     private DateTime lastOperation = DateTime.Now;
     private string lastUrlCache = string.Empty;
-    private HashSet<ulong> eventIds = [];
+    private readonly HashSet<ulong> eventIds = [];
     private DateTime userInitiatedTime = DateTime.MinValue;
     private bool userInitiated;
-    private bool canGoBack;
-    private bool canGoForward;
     private ChromiumBrowserWrapper? browserWrapper;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public bool CanGoBack
     {
-        get => this.canGoBack;
+        get;
         set
         {
-            this.canGoBack = value;
+            field = value;
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CanGoBack)));
         }
     }
 
     public bool CanGoForward
     {
-        get => this.canGoForward;
+        get;
         set
         {
-            this.canGoForward = value;
+            field = value;
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CanGoForward)));
         }
     }

@@ -4,10 +4,8 @@ using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.ApplicationLauncher;
 using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Screens;
-using System;
 using System.Configuration;
 using System.Extensions;
-using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 using System.Windows.Media;
@@ -42,7 +40,7 @@ public partial class ScreenChoiceView : UserControl
         this.applicationLauncher = applicationLauncher.ThrowIfNull(nameof(applicationLauncher));
         this.InitializeComponent();
         this.selectedId = this.liveOptions.Value.DesiredGuildwarsScreen;
-        this.CanTest = applicationLauncher.GetGuildwarsProcesses().FirstOrDefault() is not null;
+        this.CanTest = applicationLauncher.GetGuildwarsProcesses().Count > 0;
         this.SetupView();
     }
 
@@ -62,6 +60,7 @@ public partial class ScreenChoiceView : UserControl
                 minY = screen.Size.Top;
             }
         }
+
         foreach(var screen in this.screenManager.Screens)
         {
             var screenTemplate = new ScreenTemplate

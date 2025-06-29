@@ -51,7 +51,6 @@ public enum LivingAgentEffects : uint
     Bleeding        = 0x0001,
     Conditioned     = 0x0002,
     Crippled1       = 0x0008, // Part of the Crippled check
-    Crippled2       = 0x0002, // Part of the Crippled check
     Crippled        = 0x000A, // Combined flag for crippled (0x0008 | 0x0002)
     Dead            = 0x0010,
     DeepWound       = 0x0020,

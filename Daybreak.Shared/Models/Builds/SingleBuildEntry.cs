@@ -1,8 +1,5 @@
 ﻿using Daybreak.Shared.Models.Guildwars;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using Attribute = Daybreak.Shared.Models.Guildwars.Attribute;
 
 namespace Daybreak.Shared.Models.Builds;
@@ -190,7 +187,7 @@ public sealed class SingleBuildEntry : BuildEntryBase, IBuildEntry, INotifyPrope
 
         attributesToAdd.AddRange(this.Primary.Attributes);
         attributesToAdd.AddRange(this.Secondary.Attributes);
-        this.Attributes = attributesToAdd.Distinct().Select(attribute =>
+        this.Attributes = [.. attributesToAdd.Distinct().Select(attribute =>
         {
             if (this.Attributes.FirstOrDefault(attributeEntry => attributeEntry.Attribute == attribute) is AttributeEntry attributeEntry)
             {
@@ -198,7 +195,7 @@ public sealed class SingleBuildEntry : BuildEntryBase, IBuildEntry, INotifyPrope
             }
 
             return new AttributeEntry { Attribute = attribute };
-        }).ToList();
+        })];
     }
 
     private void UpdateSkills()

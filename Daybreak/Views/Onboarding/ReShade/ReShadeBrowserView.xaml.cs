@@ -2,10 +2,8 @@
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.UMod;
 using Daybreak.Utils;
-using System;
 using System.Core.Extensions;
 using System.IO;
-using System.Linq;
 using System.Windows.Controls;
 
 namespace Daybreak.Views.Onboarding.ReShade;
@@ -14,7 +12,7 @@ namespace Daybreak.Views.Onboarding.ReShade;
 /// </summary>
 public partial class ReShadeBrowserView : UserControl
 {
-    private static readonly string[] WhitelistedExtensions = new[] { ".tpf", ".zip" };
+    private static readonly string[] WhitelistedExtensions = [".tpf", ".zip"];
 
     private readonly INotificationService notificationService;
     private readonly IUModService uModService;
@@ -52,6 +50,7 @@ public partial class ReShadeBrowserView : UserControl
                     description: $"Downloading uMod mod to {e.ResultingFilePath}");
                 await this.Browser.WebBrowser.ExecuteScriptAsync(Scripts.CreateAlert($"Downloading {Path.GetFileName(e.ResultingFilePath)}"));
             }
+
             return;
         }
 

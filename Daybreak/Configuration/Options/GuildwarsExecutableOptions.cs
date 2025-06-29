@@ -1,6 +1,5 @@
 ﻿using Daybreak.Attributes;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 
 namespace Daybreak.Configuration.Options;
 [OptionsIgnore]

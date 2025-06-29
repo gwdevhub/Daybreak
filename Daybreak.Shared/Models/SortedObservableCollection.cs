@@ -1,18 +1,11 @@
 ﻿using System.Collections.Specialized;
-using System;
-using System.Linq;
 
 namespace Daybreak.Shared.Models;
 
-public class SortedObservableCollection<T, TKey> : BatchedObservableCollection<T>
+public class SortedObservableCollection<T, TKey>(Func<T, TKey> keySelector) : BatchedObservableCollection<T>
 {
-    public Func<T, TKey> KeySelector { get; set; }
+    public Func<T, TKey> KeySelector { get; set; } = keySelector;
     public bool Descending { get; set; } = false;
-
-    public SortedObservableCollection(Func<T, TKey> keySelector)
-    {
-        this.KeySelector = keySelector;
-    }
 
     protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
     {

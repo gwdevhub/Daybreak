@@ -2,7 +2,6 @@
 using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Updater;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Core.Extensions;
 using System.Windows;
 using System.Windows.Controls;

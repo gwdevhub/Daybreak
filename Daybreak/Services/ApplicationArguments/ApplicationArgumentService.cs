@@ -2,10 +2,8 @@
 using Daybreak.Shared.Services.ApplicationArguments.ArgumentHandling;
 using Microsoft.Extensions.Logging;
 using Slim;
-using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Linq;
 
 namespace Daybreak.Services.ApplicationArguments;
 

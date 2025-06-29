@@ -1,8 +1,5 @@
 ﻿using Daybreak.Shared.Converters;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Daybreak.Shared.Models.Guildwars;
 
@@ -716,8 +713,8 @@ public sealed class Map : IWikiEntity
     public static readonly Map AshfordCatacombs1070AE = new() { Id = 876, Name = "Ashford Catacombs 1070AE", WikiUrl = "https://wiki.guildwars.com/wiki/Ashford_Catacombs:_1070_AE" };
     public static readonly Map Count = new() { Id = 877, Name = "Count", WikiUrl = "" };
 
-    public static IEnumerable<Map> Maps { get; } = new List<Map>
-    {
+    public static IEnumerable<Map> Maps { get; } =
+    [
         None,
         GladiatorsArena,
         DEVTestArena1v1,
@@ -1419,7 +1416,7 @@ public sealed class Map : IWikiEntity
         LakesideCounty1070AE,
         AshfordCatacombs1070AE,
         Count,
-    };
+    ];
 
     public static bool TryParse(int id, out Map map)
     {

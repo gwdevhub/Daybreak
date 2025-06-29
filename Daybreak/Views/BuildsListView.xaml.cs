@@ -4,12 +4,8 @@ using Daybreak.Shared.Services.BuildTemplates;
 using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Toolbox;
 using Daybreak.Shared.Utils;
-using System;
-using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Linq;
-using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 

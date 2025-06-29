@@ -1,12 +1,9 @@
 ﻿using Daybreak.Shared.Services.Registry;
 using Microsoft.Win32;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.Core.Extensions;
 using System.Extensions;
 using System.IO;
-using System.Linq;
 
 namespace Daybreak.Services.Registry;
 

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Daybreak.Shared.Models.Menu;
+﻿namespace Daybreak.Shared.Models.Menu;
 public sealed class MenuCategory
 {
     private readonly List<MenuButton> buttons = [];

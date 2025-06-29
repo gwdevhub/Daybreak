@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Daybreak.Services.Graph.Models;
+﻿namespace Daybreak.Services.Graph.Models;
 
 public sealed class ViewRedirectContext
 {

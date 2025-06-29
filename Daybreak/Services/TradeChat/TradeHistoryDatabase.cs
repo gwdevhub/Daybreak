@@ -1,22 +1,12 @@
 ﻿using Daybreak.Services.TradeChat.Models;
-using System;
-using System.Collections.Generic;
 using System.Core.Extensions;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daybreak.Services.TradeChat;
 
-internal sealed class TradeHistoryDatabase : ITradeHistoryDatabase
+internal sealed class TradeHistoryDatabase(
+    TradeMessagesDbContext liteCollection) : ITradeHistoryDatabase
 {
-    private readonly TradeMessagesDbContext liteCollection;
-
-    public TradeHistoryDatabase(
-        TradeMessagesDbContext liteCollection)
-    {
-        this.liteCollection = liteCollection.ThrowIfNull();
-    }
+    private readonly TradeMessagesDbContext liteCollection = liteCollection.ThrowIfNull();
 
     public async ValueTask<IEnumerable<TraderMessageDTO>> GetTraderMessagesSinceTime(DateTimeOffset since, CancellationToken cancellationToken)
     {

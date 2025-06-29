@@ -1,26 +1,18 @@
 ﻿using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daybreak.Services.Injection;
-internal sealed class ProcessInjector : IProcessInjector
+internal sealed class ProcessInjector(
+    ILogger<ProcessInjector> logger) : IProcessInjector
 {
-    private readonly ILogger<ProcessInjector> logger;
-    
-    public ProcessInjector(
-        ILogger<ProcessInjector> logger)
-    {
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly ILogger<ProcessInjector> logger = logger.ThrowIfNull();
 
     public Task<bool> Inject(Process process, string pathToDll, CancellationToken cancellationToken)
     {

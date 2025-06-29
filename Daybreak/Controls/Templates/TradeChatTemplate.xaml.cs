@@ -1,16 +1,11 @@
-﻿using Daybreak.Launch;
-using Daybreak.Shared;
+﻿using Daybreak.Shared;
 using Daybreak.Shared.Models.Trade;
 using Daybreak.Shared.Services.TradeChat;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;

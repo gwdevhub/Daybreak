@@ -1,34 +1,22 @@
-﻿using Daybreak.Services.Logging;
-using Daybreak.Services.Notifications;
+﻿using Daybreak.Services.Notifications;
 using Daybreak.Services.TradeChat;
 using Daybreak.Shared.Models;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Daybreak.Services.Startup.Actions;
-internal sealed class CleanupDatabases : StartupActionBase
+internal sealed class CleanupDatabases(
+    TradeQuoteDbContext quotesCollection,
+    NotificationsDbContext notificationsCollection,
+    TradeMessagesDbContext traderMessagesCollection,
+    ILogger<CleanupDatabases> logger) : StartupActionBase
 {
-    private readonly TradeQuoteDbContext quotesCollection;
-    private readonly NotificationsDbContext notificationsCollection;
-    private readonly TradeMessagesDbContext traderMessagesCollection;
-    private readonly ILogger<CleanupDatabases> logger;
-
-    public CleanupDatabases(
-        TradeQuoteDbContext quotesCollection,
-        NotificationsDbContext notificationsCollection,
-        TradeMessagesDbContext traderMessagesCollection,
-        ILogger<CleanupDatabases> logger)
-    {
-        this.quotesCollection = quotesCollection.ThrowIfNull();
-        this.notificationsCollection = notificationsCollection.ThrowIfNull();
-        this.traderMessagesCollection = traderMessagesCollection.ThrowIfNull();
-        this.logger = logger.ThrowIfNull();
-    }
+    private readonly TradeQuoteDbContext quotesCollection = quotesCollection.ThrowIfNull();
+    private readonly NotificationsDbContext notificationsCollection = notificationsCollection.ThrowIfNull();
+    private readonly TradeMessagesDbContext traderMessagesCollection = traderMessagesCollection.ThrowIfNull();
+    private readonly ILogger<CleanupDatabases> logger = logger.ThrowIfNull();
 
     public override async Task ExecuteOnStartupAsync(CancellationToken cancellationToken)
     {
@@ -44,7 +32,7 @@ internal sealed class CleanupDatabases : StartupActionBase
         if (allQuotes.Count > 20000)
         {
             // Delete the oldest 2000 entries in the db. We probably won't need them anymore
-            var quotes = await this.quotesCollection.FindAll(cancellationToken).OrderBy(q => q.TimeStamp).Take(2000).ToListAsync();
+            var quotes = await this.quotesCollection.FindAll(cancellationToken).OrderBy(q => q.TimeStamp).Take(2000).ToListAsync(cancellationToken);
             foreach (var quote in quotes)
             {
                 await this.quotesCollection.Delete(quote.Id, cancellationToken);

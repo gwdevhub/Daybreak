@@ -366,7 +366,6 @@ public sealed class UIContextService
         {
             *pState |= 0x200u;   // set “hidden”
         }
-            
     }
 
     private static unsafe void SetFrameDisabledInternal(WrappedPointer<Frame> frame, bool disabled)

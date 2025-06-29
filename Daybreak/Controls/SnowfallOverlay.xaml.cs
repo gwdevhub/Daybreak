@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
 using System.Windows.Media.Imaging;
@@ -13,8 +9,8 @@ namespace Daybreak.Controls;
 /// </summary>
 public partial class SnowfallOverlay : UserControl
 {
-    private static readonly double[] Frequencies = new double[] { 0.1, 0.025, 1, 0.25 };
-    private static readonly double[] Amplitudes = new double[] { 1, 0.1, 0.1, 0.2 };
+    private static readonly double[] Frequencies = [0.1, 0.025, 1, 0.25];
+    private static readonly double[] Amplitudes = [1, 0.1, 0.1, 0.2];
     private static readonly double Divisor = Amplitudes.Sum();
 
     [GenerateDependencyProperty]
@@ -83,11 +79,11 @@ public partial class SnowfallOverlay : UserControl
         while (!cancellationToken.IsCancellationRequested)
         {
             var time = this.Time;
-            this.SnowfallTransform1.X += (this.BaseWind1 + (this.GetNoise(time) * this.WindStrength1)) / this.FlakeSize1;
-            this.SnowfallTransform2.X += (this.BaseWind2 + (this.GetNoise(time - 0.02) * this.WindStrength2)) / this.FlakeSize2;
-            this.SnowfallTransform3.X += (this.BaseWind3 + (this.GetNoise(time - 0.03) * this.WindStrength3)) / this.FlakeSize3;
-            this.SnowfallTransform4.X += (this.BaseWind4 + (this.GetNoise(time - 0.05) * this.WindStrength4)) / this.FlakeSize4;
-            this.SnowfallTransform5.X += (this.BaseWind5 + (this.GetNoise(time - 0.08) * this.WindStrength5)) / this.FlakeSize5;
+            this.SnowfallTransform1.X += (this.BaseWind1 + (GetNoise(time) * this.WindStrength1)) / this.FlakeSize1;
+            this.SnowfallTransform2.X += (this.BaseWind2 + (GetNoise(time - 0.02) * this.WindStrength2)) / this.FlakeSize2;
+            this.SnowfallTransform3.X += (this.BaseWind3 + (GetNoise(time - 0.03) * this.WindStrength3)) / this.FlakeSize3;
+            this.SnowfallTransform4.X += (this.BaseWind4 + (GetNoise(time - 0.05) * this.WindStrength4)) / this.FlakeSize4;
+            this.SnowfallTransform5.X += (this.BaseWind5 + (GetNoise(time - 0.08) * this.WindStrength5)) / this.FlakeSize5;
             await Task.Delay(16, cancellationToken).ConfigureAwait(true);
         }
     }
@@ -105,7 +101,7 @@ public partial class SnowfallOverlay : UserControl
         this.tokenSource = default;
     }
 
-    private double GetNoise(double source)
+    private static double GetNoise(double source)
     {
         var returnValue = 0d;
         for(var i = 0; i < Frequencies.Length; i++)

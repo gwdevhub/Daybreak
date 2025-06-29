@@ -23,5 +23,5 @@ public sealed class ThemeOptions
 
     [OptionIgnore]
     [OptionName(Name = "Wintersday Mode", Description = "If true, Daybreak will apply a Wintersday theme")]
-    public bool WintersdayMode => false;
+    public bool WintersdayMode { get; set; } = false;
 }

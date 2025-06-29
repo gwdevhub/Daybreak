@@ -15,14 +15,10 @@ using Daybreak.Shared.Services.Screens;
 using Daybreak.Shared.Services.Window;
 using Daybreak.Views.Trade;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Extensions;
@@ -291,6 +287,7 @@ public partial class FocusView : UserControl
     {
         if (this.DataContext is not FocusViewContext context ||
             context.ApiContext is not ScopedApiContext apiContext ||
+            e is null ||
             e.CharacterName.IsNullOrWhiteSpace())
         {
             return;
@@ -326,7 +323,6 @@ public partial class FocusView : UserControl
         {
             this.viewManager.ShowView<TeamBuildTemplateView>(e.Build);
         }
-        
     }
 
     private void Component_NavigateToClicked(object _, string e)
@@ -351,7 +347,7 @@ public partial class FocusView : UserControl
             return;
         }
 
-        var indexOfSeparator = e.IndexOf("[");
+        var indexOfSeparator = e.IndexOf('[');
         indexOfSeparator = indexOfSeparator >= 0 ? indexOfSeparator : e.Length;
         var curedNpcName = e[..indexOfSeparator];
         var npcUrl = WikiUrl.Replace(NamePlaceholder, curedNpcName);

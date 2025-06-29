@@ -1,19 +1,13 @@
 ﻿using Daybreak.Shared.Models.Trade;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
 
 namespace Daybreak.Shared.Converters;
 public sealed class TradeAlertConverter : JsonConverter<ITradeAlert>
 {
     public override ITradeAlert? ReadJson(JsonReader reader, Type objectType, ITradeAlert? existingValue, bool hasExistingValue, JsonSerializer serializer)
     {
-        var jObject = JObject.Load(reader).ToObject<dynamic>();
-        if (jObject is null)
-        {
-            throw new InvalidOperationException($"Unable to deserialize {nameof(ITradeAlert)}");
-        }
-
+        var jObject = JObject.Load(reader).ToObject<dynamic>() ?? throw new InvalidOperationException($"Unable to deserialize {nameof(ITradeAlert)}");
         if (jObject[nameof(TradeAlert.MessageCheck)] is null)
         {
             return new QuoteAlert
@@ -51,10 +45,12 @@ public sealed class TradeAlertConverter : JsonConverter<ITradeAlert>
             return;
         }
 
-        var jObject = new JObject();
-        jObject[nameof(ITradeAlert.Name)] = value.Name;
-        jObject[nameof(ITradeAlert.Enabled)] = value.Enabled;
-        jObject[nameof(ITradeAlert.Id)] = value.Id;
+        var jObject = new JObject
+        {
+            [nameof(ITradeAlert.Name)] = value.Name,
+            [nameof(ITradeAlert.Enabled)] = value.Enabled,
+            [nameof(ITradeAlert.Id)] = value.Id
+        };
         if (value is TradeAlert tradeAlert)
         {
             jObject[nameof(TradeAlert.MessageCheck)] = tradeAlert.MessageCheck;
