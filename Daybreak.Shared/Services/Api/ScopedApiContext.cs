@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using System.Extensions.Core;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text.Encodings.Web;
 
 namespace Daybreak.Shared.Services.Api;
 public sealed class ScopedApiContext(
@@ -74,7 +75,8 @@ public sealed class ScopedApiContext(
 
     public async Task<bool> PostMainPlayerBuild(string code, CancellationToken cancellationToken)
     {
-        var path = PostMainPlayerBuildPath.Replace(CodePlaceholder, code);
+        var encodedBuildCode = UrlEncoder.Default.Encode(code);
+        var path = PostMainPlayerBuildPath.Replace(CodePlaceholder, encodedBuildCode);
         using var emptyContent = new StringContent(string.Empty);
         return await this.Post(path, request => emptyContent, cancellationToken);
     }
