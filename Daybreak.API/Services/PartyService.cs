@@ -233,7 +233,7 @@ public sealed class PartyService(
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         scopedLogger.LogDebug("Spawning {heroCount} heroes for party loadout", partyLoadout.Entries.AsValueEnumerable().Count(c => c.HeroId != 0));
-        foreach (var entry in partyLoadout.Entries)
+        foreach (var entry in partyLoadout.Entries.AsValueEnumerable().OrderBy(e => e.Build.Primary))
         {
             if (entry.HeroId != 0 &&
                 Hero.TryParse(entry.HeroId, out var hero))
