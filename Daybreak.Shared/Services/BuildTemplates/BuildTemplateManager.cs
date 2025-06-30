@@ -204,15 +204,6 @@ public sealed class BuildTemplateManager(
             return (build, compositionEntry, index);
         });
 
-        var lockedSkill = loadoutEntryComposition
-            .Select(entry => entry.build.Skills.FirstOrDefault(s => s != Skill.NoSkill && !IsSkillUnlocked(s.Id, mainPlayerBuildContext.UnlockedAccountSkills)))
-            .OfType<Skill>()
-            .FirstOrDefault();
-        if (lockedSkill is not null)
-        {
-            scopedLogger.LogDebug("Invalid team build entry {buildName}. Skill {skillName} is not unlocked by the current account", teamBuildEntry.Name ?? string.Empty, lockedSkill.Name);
-        }
-
         return loadoutEntryComposition.Any(entry => entry.compositionEntry.Type is PartyCompositionMemberType.MainPlayer && this.CanApply(mainPlayerBuildContext, entry.build));
     }
 
@@ -229,12 +220,6 @@ public sealed class BuildTemplateManager(
             !IsProfessionUnlocked(singleBuildEntry.Secondary.Id, mainPlayerBuildContext.UnlockedProfessions))
         {
             scopedLogger.LogDebug("Invalid build entry {buildName}. Build secondary {buildSecondaryId} is not unlocked by the player", singleBuildEntry.Name ?? string.Empty, singleBuildEntry.Secondary.Id);
-            return false;
-        }
-
-        if (singleBuildEntry.Skills.FirstOrDefault(s => s != Skill.NoSkill && !IsSkillUnlocked(s.Id, mainPlayerBuildContext.UnlockedCharacterSkills)) is Skill lockedSkill)
-        {
-            scopedLogger.LogDebug("Invalid build entry {buildName}. Skill {skillName} is not unlocked by the current character", singleBuildEntry.Name ?? string.Empty, lockedSkill.Name);
             return false;
         }
 
@@ -255,16 +240,6 @@ public sealed class BuildTemplateManager(
         {
             scopedLogger.LogError("Secondary profession is not unlocked");
             return false;
-        }
-
-        foreach(var skill in request.BuildSkills)
-        {
-            if (skill is not 0 &&
-                !IsSkillUnlocked((int)skill, request.UnlockedSkills))
-            {
-                scopedLogger.LogError("Skill {skillId} is not unlocked", skill);
-                return false;
-            }
         }
 
         return true;
@@ -872,16 +847,17 @@ public sealed class BuildTemplateManager(
 
     private static bool IsProfessionUnlocked(int professionId, uint unlockedProfessions) => (unlockedProfessions & (1 << professionId)) != 0;
 
-    private static bool IsSkillUnlocked(int skillId, uint[] unlockedSkills)
-    {
-        var realIndex = skillId / 32;
-        if (realIndex >= unlockedSkills.Length)
-        {
-            return false;
-        }
+    // Not using anymore. Skills are marked as locked if they are not part of the primary/secondary of the current character. Cannot rely on this for build viability checks.
+    //private static bool IsSkillUnlocked(int skillId, uint[] unlockedSkills)
+    //{
+    //    var realIndex = skillId / 32;
+    //    if (realIndex >= unlockedSkills.Length)
+    //    {
+    //        return false;
+    //    }
 
-        var shift = skillId % 32;
-        var flag = 1U << shift;
-        return (unlockedSkills[realIndex] & flag) != 0;
-    }
+    //    var shift = skillId % 32;
+    //    var flag = 1U << shift;
+    //    return (unlockedSkills[realIndex] & flag) != 0;
+    //}
 }
