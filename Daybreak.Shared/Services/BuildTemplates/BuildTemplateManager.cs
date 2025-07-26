@@ -558,10 +558,17 @@ public sealed class BuildTemplateManager(
             }
             else
             {
-                build.Metadata =
-                    JsonConvert.DeserializeObject<Dictionary<string, string>>(
-                        Encoding.UTF8.GetString(
-                            Convert.FromBase64String(content[1])));   
+                try
+                {
+                    build.Metadata =
+                        JsonConvert.DeserializeObject<Dictionary<string, string>>(
+                            Encoding.UTF8.GetString(
+                                Convert.FromBase64String(content[1])));
+                }
+                catch(Exception ex)
+                {
+                    return new InvalidOperationException("Failed to parse build metadata", ex);
+                }
             }
         }
 
