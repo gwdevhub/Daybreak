@@ -10,7 +10,6 @@ using SkiaSharp;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;
 using System.Data;
-using System.Diagnostics;
 using System.Extensions;
 using System.Windows;
 using System.Windows.Controls;

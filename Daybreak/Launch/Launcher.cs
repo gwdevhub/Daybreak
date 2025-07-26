@@ -17,7 +17,6 @@ using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.Updater.PostUpdate;
 using Daybreak.Shared.Services.Window;
 using Daybreak.Shared.Utils;
-using LiveChartsCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Slim;
