@@ -3,6 +3,10 @@ using Daybreak.Shared.Models.Trade;
 using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.TradeChat;
 using LiveChartsCore;
+using LiveChartsCore.Defaults;
+using LiveChartsCore.Drawing;
+using LiveChartsCore.Kernel;
+using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using LiveChartsCore.SkiaSharpView.VisualElements;
@@ -46,6 +50,9 @@ public partial class PriceHistoryView : UserControl
     private DateTime endDateTime = DateTime.MaxValue;
 
     [GenerateDependencyProperty]
+    private Margin drawMargin = new(float.NaN, float.NaN, float.NaN, 300);
+
+    [GenerateDependencyProperty]
     private bool loading = false;
 
     public PriceHistoryView(
@@ -62,6 +69,7 @@ public partial class PriceHistoryView : UserControl
         this.foregroundPaint = new SolidColorPaint(new SKColor(skForegroundBrush.Color.R, skForegroundBrush.Color.G, skForegroundBrush.Color.B, skForegroundBrush.Color.A));
         this.accentPaint = new SolidColorPaint(new SKColor(skAccentBrush.Color.R, skAccentBrush.Color.G, skAccentBrush.Color.B, skAccentBrush.Color.A), 2);
         this.backgroundPaint = new SolidColorPaint(new SKColor(skBackgroundBrush.Color.R, skBackgroundBrush.Color.G, skBackgroundBrush.Color.B, skBackgroundBrush.Color.A));
+        this.PopulateChart();
     }
 
     private void UserControl_DataContextChanged(object _, DependencyPropertyChangedEventArgs __)
@@ -72,18 +80,6 @@ public partial class PriceHistoryView : UserControl
     private void BackButton_Clicked(object sender, EventArgs e)
     {
         this.viewManager.ShowView<PriceQuotesView>();
-    }
-
-    private void HighlightButton_Clicked(object sender, EventArgs e)
-    {
-        var xAxis = this.XAxes.FirstOrDefault();
-        if (xAxis is null)
-        {
-            return;
-        }
-
-        xAxis.MinLimit = this.StartDateTime.Ticks;
-        xAxis.MaxLimit = this.EndDateTime.Ticks;
     }
 
     private async void FetchPriceHistory()
@@ -115,33 +111,15 @@ public partial class PriceHistoryView : UserControl
 
     private void PopulateChart()
     {
-        this.EndDateTime = this.traderQuotes.OrderByDescending(t => t.Timestamp).FirstOrDefault()?.Timestamp ?? DateTime.Now;
-        this.StartDateTime = this.EndDateTime - TimeSpan.FromDays(1);
-
         this.XAxes =
         [
-            new Axis
+            new DateTimeAxis(TimeSpan.FromHours(1), dateTime => dateTime.ToString("d"))
             {
                 Name = "Date",
                 LabelsPaint = this.foregroundPaint,
-                Labeler = ticks =>
-                {
-                    if (double.IsNaN(ticks))
-                    {
-                        return string.Empty;
-                    }
-
-                    var t = (long)Math.Round(ticks);
-                    if (t < DateTime.MinValue.Ticks || t > DateTime.MaxValue.Ticks)
-                    {
-                        return string.Empty;
-                    }
-
-                    return new DateTime(t, DateTimeKind.Utc).ToString("d");
-                },
-                MinLimit = this.StartDateTime.Ticks,
-                MaxLimit = this.EndDateTime.Ticks,
-                MinStep  = TimeSpan.FromHours(1).Ticks,
+                NameTextSize = 16,
+                NamePaint = this.foregroundPaint,
+                InLineNamePlacement = true
             }
         ];
 
@@ -150,24 +128,25 @@ public partial class PriceHistoryView : UserControl
             new Axis
             {
                 Name = "Price",
+                NameTextSize = 16,
+                NamePadding = new Padding(0, 15),
+                NamePaint = this.foregroundPaint,
                 LabelsPaint = this.foregroundPaint,
-                Labeler = (price) => $"{price*20d:0}g",
+                Labeler = Labelers.Currency,
+                InLineNamePlacement = true
             }
         ];
 
         this.Series =
         [
-            new LineSeries<TraderQuote>
+            new StepLineSeries<DateTimePoint>
             {
-                Values = this.traderQuotes,
-                Fill = default,
-                IsHoverable = false,
+                Values = [.. ProcessQuotes(this.traderQuotes).Select(t => new DateTimePoint(t.Timestamp ?? DateTime.MinValue, t.Price))],
                 Stroke = this.accentPaint,
-                LineSmoothness = 0,
+                Name = "Historical Price",
                 GeometryStroke = default,
                 GeometryFill = default,
                 GeometrySize = default,
-                Name = string.Empty,
             }
         ];
 
@@ -175,7 +154,20 @@ public partial class PriceHistoryView : UserControl
         {
             Text = $"{this.traderQuotes.FirstOrDefault()?.Item?.Name} Price Chart",
             TextSize = 22,
-            Paint = this.foregroundPaint,
+            Paint = this.foregroundPaint
         };
+    }
+
+    private static IEnumerable<TraderQuote> ProcessQuotes(IEnumerable<TraderQuote> quotes)
+    {
+        var lastPricePoint = double.MinValue;
+        foreach(var quote in quotes.OrderBy(p => p.Timestamp))
+        {
+            if (quote.Price != lastPricePoint)
+            {
+                lastPricePoint = quote.Price;
+                yield return quote;
+            }
+        }
     }
 }
