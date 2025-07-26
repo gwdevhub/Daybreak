@@ -4,11 +4,13 @@ using Daybreak.Shared.Models.Notifications;
 using Daybreak.Shared.Models.Notifications.Handling;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Utils;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Slim;
 using System.Collections.Concurrent;
 using System.Core.Extensions;
 using System.Extensions;
+using System.Extensions.Core;
 using System.Runtime.CompilerServices;
 
 namespace Daybreak.Services.Notifications;
@@ -72,18 +74,26 @@ internal sealed class NotificationService(
     {
         if (storeNotification)
         {
-            await this.storage.OpenNotification(new NotificationDTO
+            try
             {
-                Title = notification.Title,
-                Description = notification.Description,
-                Id = notification.Id,
-                Level = (int)notification.Level,
-                MetaData = notification.Metadata,
-                HandlerType = notification.HandlingType?.AssemblyQualifiedName,
-                ExpirationTime = notification.ExpirationTime.ToSafeDateTimeOffset().ToUnixTimeMilliseconds(),
-                CreationTime = notification.CreationTime.ToSafeDateTimeOffset().ToUnixTimeMilliseconds(),
-                Closed = true
-            }, cancellationToken);
+                await this.storage.OpenNotification(new NotificationDTO
+                {
+                    Title = notification.Title,
+                    Description = notification.Description,
+                    Id = notification.Id,
+                    Level = (int)notification.Level,
+                    MetaData = notification.Metadata,
+                    HandlerType = notification.HandlingType?.AssemblyQualifiedName,
+                    ExpirationTime = notification.ExpirationTime.ToSafeDateTimeOffset().ToUnixTimeMilliseconds(),
+                    CreationTime = notification.CreationTime.ToSafeDateTimeOffset().ToUnixTimeMilliseconds(),
+                    Closed = true
+                }, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                this.logger.CreateScopedLogger().LogError(ex, "Failed to open notification");
+                return;
+            }
         }
 
         if (notification.HandlingType is null)
@@ -91,8 +101,8 @@ internal sealed class NotificationService(
             return;
         }
 
-        var handler = this.serviceManager.GetService(notification.HandlingType) as INotificationHandler;
-        handler?.OpenNotification(notification);
+        var handler = (INotificationHandler)this.serviceManager.GetRequiredService(notification.HandlingType);
+        handler.OpenNotification(notification);
     }
 
     async Task INotificationProducer.RemoveNotification(Notification notification, CancellationToken cancellationToken)
