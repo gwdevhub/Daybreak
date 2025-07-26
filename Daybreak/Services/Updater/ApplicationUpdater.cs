@@ -15,6 +15,7 @@ using System.Core.Extensions;
 using System.Data;
 using System.Diagnostics;
 using System.Extensions;
+using System.Extensions.Core;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -68,6 +69,7 @@ internal sealed class ApplicationUpdater(
 
     public async Task<bool> DownloadUpdate(Version version, UpdateStatus updateStatus)
     {
+        var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: version.ToString());
         if (version.HasPrefix is false)
         {
             version.HasPrefix = true;
@@ -78,21 +80,29 @@ internal sealed class ApplicationUpdater(
             return await this.DownloadUpdateInternalLegacy(version, updateStatus);
         }
 
-        var maybeMetadataResponse = await this.httpClient.GetAsync(
+        try
+        {
+            var maybeMetadataResponse = await this.httpClient.GetAsync(
             BlobStorageUrl
                 .Replace(VersionTag, version.ToString().Replace(".", "-"))
                 .Replace(FileTag, "Metadata.json"));
-        if (maybeMetadataResponse.IsSuccessStatusCode)
-        {
-            var metaData = await maybeMetadataResponse.Content.ReadFromJsonAsync<List<Metadata>>();
-            if (metaData is not null)
+            if (maybeMetadataResponse.IsSuccessStatusCode)
             {
-                return await
-                    await new TaskFactory().StartNew(() => this.DownloadUpdateInternalBlob(metaData, version, updateStatus), CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+                var metaData = await maybeMetadataResponse.Content.ReadFromJsonAsync<List<Metadata>>();
+                if (metaData is not null)
+                {
+                    return await
+                        await new TaskFactory().StartNew(() => this.DownloadUpdateInternalBlob(metaData, version, updateStatus), CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+                }
             }
-        }
 
-        return await this.DownloadUpdateInternalLegacy(version, updateStatus);
+            return await this.DownloadUpdateInternalLegacy(version, updateStatus);
+        }
+        catch (Exception e)
+        {
+            scopedLogger.LogError(e, "Failed to download update for version {version}", version);
+            return false;
+        }
     }
 
     public async Task<bool> DownloadLatestUpdate(UpdateStatus updateStatus)
@@ -122,31 +132,52 @@ internal sealed class ApplicationUpdater(
 
     public async Task<IEnumerable<Version>> GetVersions()
     {
-        this.logger.LogDebug($"Retrieving version list from {VersionListUrl}");
-        var response = await this.httpClient.GetAsync(VersionListUrl);
-        if (response.IsSuccessStatusCode)
+        var scopedLogger = this.logger.CreateScopedLogger();
+        scopedLogger.LogDebug($"Retrieving version list from {VersionListUrl}");
+        try
         {
-            var serializedList = await response.Content.ReadAsStringAsync();
-            var versionList = serializedList.Deserialize<GithubRefTag[]>();
-            return versionList!.Select(v => v.Ref![RefTagPrefix.Length..]).Select(v => new Version(v));
-        }
+            var response = await this.httpClient.GetAsync(VersionListUrl);
+            if (response.IsSuccessStatusCode)
+            {
+                var serializedList = await response.Content.ReadAsStringAsync();
+                var versionList = serializedList.Deserialize<GithubRefTag[]>();
+                return versionList!.Select(v => v.Ref![RefTagPrefix.Length..]).Select(v => new Version(v));
+            }
 
-        return [];
+            scopedLogger.LogError("Failed to retrieve version list. Status code: {statusCode}", response.StatusCode);
+            return [];
+        }
+        catch (Exception e)
+        {
+            scopedLogger.LogError(e, "Failed to retrieve version list from {url}", VersionListUrl);
+            return [];
+        }
     }
 
     public async Task<string?> GetChangelog(Version version)
     {
-        var changeLogResponse = await this.httpClient.GetAsync(
+        var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: version.ToString());
+        try
+        {
+            var changeLogResponse = await this.httpClient.GetAsync(
             BlobStorageUrl
                 .Replace(VersionTag, version.ToString().Replace(".", "-"))
                 .Replace(FileTag, "changelog.txt"));
 
-        if (!changeLogResponse.IsSuccessStatusCode)
+            if (!changeLogResponse.IsSuccessStatusCode)
+            {
+                scopedLogger.LogError("Failed to retrieve changelog for version {version}. Status code: {statusCode}", version, changeLogResponse.StatusCode);
+                return default;
+            }
+
+            scopedLogger.LogDebug("Retrieved changelog for version {version}", version);
+            return await changeLogResponse.Content.ReadAsStringAsync();
+        }
+        catch (Exception e)
         {
+            scopedLogger.LogError(e, "Failed to retrieve changelog for version {version}", version);
             return default;
         }
-
-        return await changeLogResponse.Content.ReadAsStringAsync();
     }
 
     public void PeriodicallyCheckForUpdates()
@@ -198,7 +229,7 @@ internal sealed class ApplicationUpdater(
 
     private async Task<bool> DownloadUpdateInternalBlob(List<Metadata> metadata, Version version, UpdateStatus updateStatus)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.DownloadUpdateInternalBlob), version.ToString());
+        var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: version.ToString());
         updateStatus.CurrentStep = DownloadStatus.InitializingDownload;
 
         // Exclude daybreak packed files
@@ -341,34 +372,46 @@ internal sealed class ApplicationUpdater(
 
     private async Task<bool> DownloadUpdateInternalLegacy(Version version, UpdateStatus updateStatus)
     {
+        var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: version.VersionString);
         updateStatus.CurrentStep = DownloadStatus.InitializingDownload;
         var uri = DownloadUrl.Replace(VersionTag, version.ToString());
         if (await this.downloadService.DownloadFile(uri, TempFile, updateStatus) is false)
         {
-            this.logger.LogError("Failed to download update file");
+            scopedLogger.LogError("Failed to download update file");
             return false;
         }
 
         updateStatus.CurrentStep = UpdateStatus.PendingRestart;
-        this.logger.LogDebug("Downloaded update file");
+        scopedLogger.LogDebug("Downloaded update file");
         return true;
     }
 
     private async Task<Version?> GetLatestVersion()
     {
-        using var response = await this.httpClient.GetAsync(Url);
-        if (response.IsSuccessStatusCode)
+        var scopedLogger = this.logger.CreateScopedLogger();
+        try
         {
-            var versionTag = response.RequestMessage!.RequestUri!.ToString().Split('/').Last().TrimStart('v');
-            if (Version.TryParse(versionTag, out var parsedVersion))
+            using var response = await this.httpClient.GetAsync(Url);
+            if (response.IsSuccessStatusCode)
             {
-                return parsedVersion;
+                var versionTag = response.RequestMessage!.RequestUri!.ToString().Split('/').Last().TrimStart('v');
+                if (Version.TryParse(versionTag, out var parsedVersion))
+                {
+                    return parsedVersion;
+                }
+
+                scopedLogger.LogError("Failed to parse version from {versionTag}", versionTag);
+                return default;
             }
 
+            scopedLogger.LogError("Failed to retrieve latest version. Status code: {statusCode}", response.StatusCode);
             return default;
         }
-
-        return default;
+        catch(Exception e)
+        {
+            scopedLogger.LogError(e, "Failed to retrieve latest version from {url}", Url);
+            return default;
+        }
     }
 
     private void LaunchExtractor()
