@@ -1,5 +1,6 @@
 ﻿using Daybreak.Shared.Models.Metrics;
 using Daybreak.Shared.Services.Metrics;
+using LiveChartsCore.Kernel;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using LiveChartsCore.SkiaSharpView.VisualElements;
@@ -112,13 +113,9 @@ public partial class MetricsView : UserControl
         cartesianChart.DrawMargin = new LiveChartsCore.Measure.Margin(30);
         cartesianChart.XAxes =
         [
-            new Axis
+            new DateTimeAxis(TimeSpan.FromSeconds(1), dateTime => dateTime.ToString("d"))
             {
                 Name = "Time",
-                Labeler = (ticks) =>
-                {
-                    return new DateTime((long)ticks).ToString("HH:mm:ss");
-                },
                 LabelsPaint = this.foregroundPaint,
                 SeparatorsPaint = this.transparentPaint,
                 CrosshairLabelsPaint = this.transparentPaint,
@@ -163,6 +160,7 @@ public partial class MetricsView : UserControl
                 Fill = default,
                 IsHoverable = false,
                 Stroke = this.accentPaint,
+                Mapping = (metric, index) => new Coordinate(metric.Timestamp.ToOADate(), System.Convert.ToDouble(metric.Measurement)),
                 LineSmoothness = 0,
                 GeometryStroke = default,
                 GeometryFill = default,

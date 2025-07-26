@@ -19,14 +19,6 @@ internal sealed class LiveChartInitializer : ILiveChartInitializer, IApplication
             config.AddSkiaSharp()
                 .AddDefaultMappers()
                 .AddDarkTheme()
-                .AddLightTheme()
-                .HasMap<Metric>((metric, index) =>
-                {
-                    return new Coordinate(metric.Timestamp.Ticks, Convert.ToDouble(metric.Measurement));
-                })
-                .HasMap<TraderQuote>((quote, point) =>
-                {
-                    return new Coordinate(quote.Timestamp?.Ticks ?? 0, ((double)quote.Price) / 20d);
-                }));
+                .AddLightTheme());
     }
 }
