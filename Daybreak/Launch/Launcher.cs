@@ -62,7 +62,6 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
 #endif
 
         Instance = new Launcher(args);
-        LiveCharts.UseGPU = true;
         RegisterExtraEncodingProviders();
         RegisterMahAppsStyle();
         return LaunchMainWindow();

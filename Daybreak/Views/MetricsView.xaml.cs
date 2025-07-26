@@ -1,5 +1,6 @@
 ﻿using Daybreak.Shared.Models.Metrics;
 using Daybreak.Shared.Services.Metrics;
+using LiveChartsCore.Defaults;
 using LiveChartsCore.Kernel;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
@@ -9,6 +10,7 @@ using SkiaSharp;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;
 using System.Data;
+using System.Diagnostics;
 using System.Extensions;
 using System.Windows;
 using System.Windows.Controls;
@@ -92,6 +94,7 @@ public partial class MetricsView : UserControl
     private void CartesianChart_Loaded(object sender, RoutedEventArgs e)
     {
         var cartesianChart = sender.Cast<CartesianChart>();
+        cartesianChart.CoreChart.Update(new ChartUpdateParams { IsAutomaticUpdate = false, Throttling = false });
         if (cartesianChart.DataContext is not MetricSetViewModel metricSet)
         {
             return;
@@ -117,14 +120,7 @@ public partial class MetricsView : UserControl
             {
                 Name = "Time",
                 LabelsPaint = this.foregroundPaint,
-                SeparatorsPaint = this.transparentPaint,
-                CrosshairLabelsPaint = this.transparentPaint,
-                CrosshairPaint = this.transparentPaint,
                 NamePaint = this.foregroundPaint,
-                SubseparatorsPaint = this.transparentPaint,
-                SubticksPaint = this.transparentPaint,
-                TicksPaint = this.transparentPaint,
-                ZeroPaint = this.transparentPaint,
             }
         ];
 
@@ -134,33 +130,25 @@ public partial class MetricsView : UserControl
             {
                 Name = metricSet.Instrument.Unit,
                 LabelsPaint = this.foregroundPaint,
-                SeparatorsPaint = this.transparentPaint,
-                CrosshairLabelsPaint = this.transparentPaint,
-                CrosshairPaint = this.transparentPaint,
                 NamePaint = this.foregroundPaint,
-                SubseparatorsPaint = this.transparentPaint,
-                SubticksPaint = this.transparentPaint,
-                TicksPaint = this.transparentPaint,
-                ZeroPaint = this.transparentPaint,
             }
         ];
 
         cartesianChart.Series =
         [
-            new LineSeries<Metric>
+            new LineSeries<DateTimePoint>
             {
                 Values = metricSet.AggregationType switch
                 {
-                    AggregationTypes.NoAggregate => PlotNoAggregation(metricSet.Metrics),
-                    AggregationTypes.P95 => PlotPercentageAggregation(metricSet.Metrics, 0.95),
-                    AggregationTypes.P98 => PlotPercentageAggregation(metricSet.Metrics, 0.98),
-                    AggregationTypes.P99 => PlotPercentageAggregation(metricSet.Metrics, 0.99),
+                    AggregationTypes.NoAggregate => ToDateTimePoint(PlotNoAggregation(metricSet.Metrics)),
+                    AggregationTypes.P95 => ToDateTimePoint(PlotPercentageAggregation(metricSet.Metrics, 0.95)),
+                    AggregationTypes.P98 => ToDateTimePoint(PlotPercentageAggregation(metricSet.Metrics, 0.98)),
+                    AggregationTypes.P99 => ToDateTimePoint(PlotPercentageAggregation(metricSet.Metrics, 0.99)),
                     _ => throw new InvalidOperationException("Unable to plot metrics. Unknown aggregation")
                 },
                 Fill = default,
                 IsHoverable = false,
                 Stroke = this.accentPaint,
-                Mapping = (metric, index) => new Coordinate(metric.Timestamp.ToOADate(), System.Convert.ToDouble(metric.Measurement)),
                 LineSmoothness = 0,
                 GeometryStroke = default,
                 GeometryFill = default,
@@ -195,5 +183,10 @@ public partial class MetricsView : UserControl
         var finalDataSet = orderedByValueDataSet.Take(valuesToTake).OrderBy(s => s.Timestamp);
 
         return [.. finalDataSet];
+    }
+
+    private static List<DateTimePoint> ToDateTimePoint(IEnumerable<Metric> dataSet)
+    {
+        return [.. dataSet.Select(s => new DateTimePoint(s.Timestamp, System.Convert.ToDouble(s.Measurement)))];
     }
 }
