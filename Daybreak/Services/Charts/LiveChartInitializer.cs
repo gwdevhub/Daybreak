@@ -1,7 +1,4 @@
-﻿using Daybreak.Shared.Models.Metrics;
-using Daybreak.Shared.Models.Trade;
-using LiveChartsCore;
-using LiveChartsCore.Kernel;
+﻿using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
 using System.Windows.Extensions.Services;
 
