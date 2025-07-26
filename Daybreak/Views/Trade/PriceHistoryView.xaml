@@ -19,23 +19,14 @@
     <Grid Background="{StaticResource Daybreak.Brushes.Background}">
         <chart:CartesianChart
             Title="{Binding ElementName=_this, Path=Title, Mode=OneWay}"
-            AnimationsSpeed="0:0:0.3"
+            AnimationsSpeed="0:0:0.1"
             Background="{StaticResource MahApps.Brushes.ThemeBackground}"
-            ClipToBounds="False"
             EasingFunction="{x:Static lvCore:EasingFunctions.BounceOut}"
             Foreground="{StaticResource MahApps.Brushes.ThemeForeground}"
             Series="{Binding ElementName=_this, Path=Series, Mode=OneWay}"
             XAxes="{Binding ElementName=_this, Path=XAxes, Mode=OneWay}"
             YAxes="{Binding ElementName=_this, Path=YAxes, Mode=OneWay}"
-            ZoomMode="X">
-            <chart:CartesianChart.DrawMargin>
-                <lvCoreMeasure:Margin
-                    Bottom="100"
-                    Left="100"
-                    Right="100"
-                    Top="100" />
-            </chart:CartesianChart.DrawMargin>
-        </chart:CartesianChart>
+            ZoomMode="X" />
         <buttons:BackButton
             Width="30"
             Height="30"
