@@ -9,8 +9,10 @@ using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Reflection;
+using System.Windows;
 using System.Windows.Extensions.Services;
 using System.Windows.Media;
+using Wpf.Ui.Appearance;
 
 namespace Daybreak.Services.Themes;
 internal sealed class ThemeManager : IThemeManager, IApplicationLifetimeService
@@ -21,6 +23,11 @@ internal sealed class ThemeManager : IThemeManager, IApplicationLifetimeService
     private const string AppsUseLightThemeValue = "AppsUseLightTheme";
     private const string DarkMode = "Dark";
     private const string LightMode = "Light";
+
+    private static readonly Uri LightThemeUri =
+        new Uri("pack://application:,,,/Wpf.Ui;component/Resources/Theme/Light.xaml", UriKind.Absolute);
+    private static readonly Uri DarkThemeUri =
+        new Uri("pack://application:,,,/Wpf.Ui;component/Resources/Theme/Dark.xaml", UriKind.Absolute);
 
     private readonly ILiveOptions<ThemeOptions> themeOptions;
 
@@ -88,6 +95,7 @@ internal sealed class ThemeManager : IThemeManager, IApplicationLifetimeService
             mahAppsResources[$"Daybreak.BlendedBrushes.{member.Name}"] = new SolidColorBrush(blendedColor);
         }
 
+        ApplicationThemeManager.ApplySystemTheme(true);
         ChangeTheme(themeManager, mode, theme);
         return definedTheme!;
     }

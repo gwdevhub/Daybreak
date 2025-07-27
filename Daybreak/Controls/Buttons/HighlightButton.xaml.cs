@@ -6,9 +6,9 @@ using System.Windows.Media;
 
 namespace Daybreak.Controls.Buttons;
 /// <summary>
-/// Interaction logic for HighlightButton.xaml
+/// HighlightButton control
 /// </summary>
-public partial class HighlightButton : UserControl
+public partial class HighlightButton : Control
 {
     public event EventHandler? Clicked;
 
@@ -36,9 +36,29 @@ public partial class HighlightButton : UserControl
     [GenerateDependencyProperty]
     private UIElement buttonContent = default!;
 
+    static HighlightButton()
+    {
+        // connect to default style in Themes/Generic.xaml
+        DefaultStyleKeyProperty.OverrideMetadata(
+            typeof(HighlightButton),
+            new FrameworkPropertyMetadata(typeof(HighlightButton)));
+    }
+
     public HighlightButton()
     {
-        this.InitializeComponent();
+    }
+
+    public override void OnApplyTemplate()
+    {
+        base.OnApplyTemplate();
+        
+        // Find the transparent rectangle for mouse handling
+        if (this.GetTemplateChild("PART_MouseHandler") is FrameworkElement mouseHandler)
+        {
+            mouseHandler.MouseEnter += this.Grid_MouseEnter;
+            mouseHandler.MouseLeave += this.Grid_MouseLeave;
+            mouseHandler.MouseLeftButtonDown += this.Rectangle_MouseLeftButtonDown;
+        }
     }
 
     private void Grid_MouseEnter(object sender, MouseEventArgs e)

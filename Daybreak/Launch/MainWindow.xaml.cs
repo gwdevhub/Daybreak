@@ -19,6 +19,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
+using Wpf.Ui.Appearance;
+using Wpf.Ui.Controls;
 
 namespace Daybreak.Launch;
 
@@ -27,7 +29,7 @@ namespace Daybreak.Launch;
 /// </summary>
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add read-only modifier", Justification = "Fields used by source generator for DependencyProperty")]
 [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Used by source generators")]
-public partial class MainWindow : MetroWindow
+public partial class MainWindow : FluentWindow
 {
     private const string IssueUrl = "https://github.com/gwdevhub/Daybreak/issues/new";
 
@@ -84,6 +86,7 @@ public partial class MainWindow : MetroWindow
         this.logger = logger.ThrowIfNull();
         optionsUpdateHook.ThrowIfNull().RegisterHook<ThemeOptions>(this.ThemeOptionsChanged);
         this.InitializeComponent();
+        ApplicationThemeManager.Apply(this);
         this.CurrentVersionText = this.applicationUpdater.CurrentVersion.ToString();
         this.IsRunningAsAdmin = this.privilegeManager.AdminPrivileges;
         this.ThemeOptionsChanged();
@@ -294,8 +297,6 @@ public partial class MainWindow : MetroWindow
             {
                 this.Foreground = Brushes.Black;
             }
-
-            this.WindowButtonCommands.Foreground = this.Foreground;
         }
     }
 
