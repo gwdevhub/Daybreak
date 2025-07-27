@@ -6,6 +6,7 @@
     <UseWPF>true</UseWPF>
     <LangVersion>preview</LangVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
 
   <ItemGroup>

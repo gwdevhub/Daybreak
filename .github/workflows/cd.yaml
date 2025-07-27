@@ -30,7 +30,7 @@ jobs:
 
     env:
       Configuration: Release
-      Solution_Path: Daybreak.sln
+      Solution_Path: Daybreak.slnx
       Test_Project_Path: Daybreak.Tests\Daybreak.Tests.csproj
       Wpf_Project_Path: Daybreak\Daybreak.csproj
       Actions_Allow_Unsecure_Commands: true

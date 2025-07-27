@@ -37,7 +37,9 @@
     <Platform Solution="Debug|x64" Project="x86" />
     <Platform Solution="Release|x64" Project="x64" />
   </Project>
-  <Project Path="Daybreak.Shared/Daybreak.Shared.csproj" />
+  <Project Path="Daybreak.Shared/Daybreak.Shared.csproj">
+    <Platform Solution="Debug|Any CPU" Project="x86" />
+  </Project>
   <Project Path="Daybreak.Tests/Daybreak.Tests.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
