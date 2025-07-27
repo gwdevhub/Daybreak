@@ -12,6 +12,7 @@ on:
   pull_request:
     branches:
       - master
+      - release/*
 
 jobs:
 
@@ -24,7 +25,7 @@ jobs:
     runs-on: windows-latest
 
     env:
-      Solution_Path: Daybreak.sln
+      Solution_Path: Daybreak.slnx
       Test_Project_Path: Daybreak.Tests\Daybreak.Tests.csproj
       Wpf_Project_Path: Daybreak\Daybreak.csproj
       Actions_Allow_Unsecure_Commands: true

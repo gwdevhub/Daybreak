@@ -20,7 +20,7 @@ jobs:
 
     env:
       Configuration: Release
-      Solution_Path: Daybreak.sln
+      Solution_Path: Daybreak.slnx
       Actions_Allow_Unsecure_Commands: true
 
     steps:
