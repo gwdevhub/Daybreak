@@ -1,0 +1,49 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Pipelines/">
+    <File Path=".github/dependabot.yml" />
+    <File Path=".github/workflows/cd.yaml" />
+    <File Path=".github/workflows/ci.yaml" />
+    <File Path=".github/workflows/codeql-analysis.yml" />
+    <File Path=".github/workflows/version_check.yaml" />
+  </Folder>
+  <Folder Name="/Scripts/">
+    <File Path="Scripts/BuildRelease.ps1" />
+    <File Path="Scripts/CompareVersions.ps1" />
+    <File Path="Scripts/GetBuildVersion.ps1" />
+    <File Path="Scripts/PushFilesToBlobStorage.ps1" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".github/CODEOWNERS" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="Daybreak.7ZipExtractor/Daybreak.7ZipExtractor.csproj">
+    <Platform Solution="*|x86" Project="x64" />
+    <Platform Solution="Debug|x64" Project="x64" />
+  </Project>
+  <Project Path="Daybreak.API/Daybreak.API.csproj">
+    <Platform Solution="Debug|x86" Project="x86" />
+  </Project>
+  <Project Path="Daybreak.Installer/Daybreak.Installer.csproj">
+    <Platform Solution="*|x86" Project="x86" />
+    <Platform Solution="Debug|Any CPU" Project="x86" />
+    <Platform Solution="Debug|x64" Project="x86" />
+    <Platform Solution="Release|x64" Project="x64" />
+  </Project>
+  <Project Path="Daybreak.Shared/Daybreak.Shared.csproj" />
+  <Project Path="Daybreak.Tests/Daybreak.Tests.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+  <Project Path="Daybreak/Daybreak.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+</Solution>
