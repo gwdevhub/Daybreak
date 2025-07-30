@@ -16,6 +16,7 @@
     <PackageVersion Include="MeaMod.DNS" Version="1.0.71" />
     <PackageVersion Include="MemoryPack" Version="1.21.4" />
     <PackageVersion Include="MemoryPack.Generator" Version="1.21.4" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="9.0.90" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.7" />
     <PackageVersion Include="Microsoft.CorrelationVector" Version="1.0.42" />
     <PackageVersion Include="Microsoft.Data.Sqlite" Version="9.0.7" />
@@ -47,7 +48,7 @@
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageVersion Include="SharpCompress" Version="0.40.0" />
-    <PackageVersion Include="Slim" Version="1.9.2" />
+    <PackageVersion Include="Slim" Version="1.11.1" />
     <PackageVersion Include="Squealify" Version="0.8.2.2" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="9.0.3" />
     <PackageVersion Include="Swashbuckle.AspNetCore.Swagger" Version="9.0.3" />
@@ -66,7 +67,7 @@
     <PackageVersion Include="SystemExtensions.NetStandard.DependencyInjection" Version="1.6.9" />
     <PackageVersion Include="SystemExtensions.NetStandard.Generators" Version="0.1.6" />
     <PackageVersion Include="WPF-UI" Version="4.0.3" />
-    <PackageVersion Include="WpfExtended" Version="0.7.9" />
+    <PackageVersion Include="WpfExtended" Version="0.7.13" />
     <PackageVersion Include="WpfExtended.SourceGeneration" Version="0.3.0" />
     <PackageVersion Include="WpfScreenHelper" Version="2.1.1" />
     <PackageVersion Include="WriteableBitmapEx" Version="1.6.8" />

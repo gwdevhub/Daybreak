@@ -1,0 +1,67 @@
+﻿@using Daybreak.Services.WindowInterop
+@using Microsoft.AspNetCore.Components.Web
+@inject IWindowInteropService WindowInterop
+
+<div class="title-bar" @onmousedown="HandleTitleBarDrag">
+    <span>Custom Blazor Title Bar - Click and drag to move window</span>
+</div>
+
+<div class="main-content">
+    <h1>Loading HTML in a WPF App: Not XAML</h1>
+    <h3>Programming Languages</h3>
+    
+    <div class="demo-section">
+        <h3>Window Drag Demo</h3>
+        <p>Click and drag the title bar above to move the window.</p>
+        <button class="btn" @onclick="HandleDragButtonClick">
+            Trigger Window Drag Programmatically
+        </button>
+    </div>
+    
+    <div class="demo-section">
+        <h3>Interactive Content</h3>
+        <p>This content is fully interactive within Blazor:</p>
+        <button class="btn" @onclick="HandleButtonClick">
+            Click Counter: @clickCount
+        </button>
+        
+        <br /><br />
+        
+        <input type="text" @bind="textValue" placeholder="Type something here..." style="padding: 8px; width: 200px;" />
+        <p>You typed: <strong>@textValue</strong></p>
+    </div>
+    
+    <div class="demo-section">
+        <h3>About This Setup</h3>
+        <p>This Blazor component is running inside a WPF BlazorWebView control.</p>
+        <p>It can communicate with the WPF host through dependency injection and services.</p>
+        <p>The title bar above uses Win32 API calls to perform window dragging that works even when mouse events are intercepted by the WebView.</p>
+    </div>
+</div>
+
+@namespace Daybreak.Views
+
+@code {
+    private int clickCount = 0;
+    private string textValue = "";
+
+    private void HandleTitleBarDrag(MouseEventArgs e)
+    {
+        // Only handle left mouse button
+        if (e.Button == 0)
+        {
+            // Get the window handle through JavaScript interop and call Win32 API directly
+            WindowInterop.RequestWindowDrag();
+        }
+    }
+    
+    private void HandleDragButtonClick()
+    {
+        WindowInterop.RequestWindowDrag();
+    }
+
+    private void HandleButtonClick()
+    {
+        clickCount++;
+    }
+}

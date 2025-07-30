@@ -132,6 +132,7 @@ using Daybreak.Services.Telemetry;
 using System.Reflection;
 using Version = Daybreak.Shared.Models.Versioning.Version;
 using Daybreak.Shared.Models.Plugins;
+using Daybreak.Services.WindowInterop;
 
 namespace Daybreak.Configuration;
 
@@ -243,6 +244,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IMDomainRegistrar, MDomainRegistrar>();
         services.AddSingleton<IAttachedApiAccessor, AttachedApiAccessor>();
         services.AddSingleton<TelemetryHost>();
+        services.AddSingleton<IWindowInteropService, WindowInteropService>();
         services.AddScoped<IBrowserExtensionsManager, BrowserExtensionsManager>();
         services.AddScoped<IBrowserExtensionsProducer, BrowserExtensionsManager>(sp => sp.GetRequiredService<IBrowserExtensionsManager>().Cast<BrowserExtensionsManager>());
         services.AddScoped<ICredentialManager, CredentialManager>();

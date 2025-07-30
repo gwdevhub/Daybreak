@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -75,6 +75,7 @@
     <PackageReference Include="ini-parser-netstandard" />
     <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" />
     <PackageReference Include="MahApps.Metro" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" />
     <PackageReference Include="Microsoft.CorrelationVector" />
     <PackageReference Include="Microsoft.Data.Sqlite" />
     <PackageReference Include="Microsoft.Data.Sqlite.Core" />

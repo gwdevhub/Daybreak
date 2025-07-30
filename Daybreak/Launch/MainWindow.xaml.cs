@@ -1,4 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Shared;
 using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Options;
@@ -21,6 +22,9 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
+using Microsoft.Extensions.DependencyInjection;
+using Daybreak.Services.WindowInterop;
+using System.Windows.Interop;
 
 namespace Daybreak.Launch;
 
@@ -86,11 +90,13 @@ public partial class MainWindow : FluentWindow
         this.logger = logger.ThrowIfNull();
         optionsUpdateHook.ThrowIfNull().RegisterHook<ThemeOptions>(this.ThemeOptionsChanged);
         this.InitializeComponent();
+        this.Resources.Add("services", Global.GlobalServiceProvider);
         ApplicationThemeManager.Apply(this);
         this.CurrentVersionText = this.applicationUpdater.CurrentVersion.ToString();
         this.IsRunningAsAdmin = this.privilegeManager.AdminPrivileges;
         this.ThemeOptionsChanged();
         this.SetupMenuService();
+        this.SetupWindowInteropService();
     }
 
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -303,6 +309,20 @@ public partial class MainWindow : FluentWindow
     private void SetupMenuService()
     {
         this.menuServiceInitializer.InitializeMenuService(this.OpenDropdownMenu, this.CloseDropdownMenu, this.ToggleDropdownMenu);
+    }
+
+    private void SetupWindowInteropService()
+    {
+        var windowInteropService = Global.GlobalServiceProvider?.GetService<IWindowInteropService>();
+        if (windowInteropService != null)
+        {
+            windowInteropService.WindowDragRequested += (_, _) => 
+            {
+                // Get the window handle and use Win32 API for dragging
+                var windowHandle = new WindowInteropHelper(this).Handle;
+                windowInteropService.RequestWindowDragWithHandle(windowHandle);
+            };
+        }
     }
 
     private static Color GetAverageColor(BitmapSource bitmap)
