@@ -1,3 +1,5 @@
+/* FluentUI tokens defined here: https://github.com/microsoft/fluentui-blazor/blob/dev/src/Extensions/DesignToken.Generator/DesignTokenConstants.cs */
+
 /* Base styles for the Blazor application */
 html, body {
     margin: 0;
