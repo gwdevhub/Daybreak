@@ -7,23 +7,19 @@ using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Services.Screenshots;
 using Daybreak.Shared.Services.Updater;
 using Daybreak.Views;
-using MahApps.Metro.Controls;
 using Microsoft.Extensions.Logging;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Extensions;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 using Microsoft.Extensions.DependencyInjection;
-using Daybreak.Services.WindowInterop;
 using System.Windows.Interop;
 
 namespace Daybreak.Launch;
@@ -96,7 +92,6 @@ public partial class MainWindow : FluentWindow
         this.IsRunningAsAdmin = this.privilegeManager.AdminPrivileges;
         this.ThemeOptionsChanged();
         this.SetupMenuService();
-        this.SetupWindowInteropService();
     }
 
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -222,52 +217,6 @@ public partial class MainWindow : FluentWindow
 
     private void ToggleDropdownMenu()
     {
-        this.Dispatcher.Invoke(() =>
-        {
-            var button = this.IsShowingDropdown ?
-            this.ClosingSettingsButton :
-            this.OpeningSettingsButton;
-            button.IsEnabled = false;
-            var widthAnimation = new DoubleAnimation
-            {
-                From = this.IsShowingDropdown ?
-                    this.MenuContainer.ActualWidth :
-                    0,
-                To = this.IsShowingDropdown ?
-                    0 :
-                    300,
-                Duration = new Duration(TimeSpan.FromMilliseconds(200)),
-                DecelerationRatio = 0.7
-            };
-
-            var opacityAnimation = new DoubleAnimation
-            {
-                From = this.IsShowingDropdown ?
-                    this.MenuContainer.Opacity :
-                    0,
-                To = this.IsShowingDropdown ?
-                    0 :
-                    1,
-                Duration = new Duration(TimeSpan.FromMilliseconds(100)),
-                DecelerationRatio = 0.7
-            };
-
-            var storyBoard = new Storyboard();
-            storyBoard.Children.Add(widthAnimation);
-            Storyboard.SetTarget(widthAnimation, this.MenuContainer);
-            Storyboard.SetTargetProperty(widthAnimation, new PropertyPath(Grid.WidthProperty));
-            storyBoard.Children.Add(opacityAnimation);
-            Storyboard.SetTarget(opacityAnimation, this.MenuContainer);
-            Storyboard.SetTargetProperty(opacityAnimation, new PropertyPath(Grid.OpacityProperty));
-
-            storyBoard.Completed += (_, _) =>
-            {
-                button.IsEnabled = true;
-                this.IsShowingDropdown = !this.IsShowingDropdown;
-            };
-
-            storyBoard.Begin();
-        });
     }
 
     private void CreditTextBox_MouseLeftButtonDown(object sender, EventArgs e)
@@ -290,39 +239,11 @@ public partial class MainWindow : FluentWindow
 
     private void SetImage(ImageSource imageSource)
     {
-        this.ImageViewer.ShowImage(imageSource);
-        if (imageSource is BitmapImage bitmapImage)
-        {
-            var avgColor = GetAverageColor(bitmapImage);
-            var luminace = GetLuminace(avgColor);
-            if (luminace < 0.15)
-            {
-                this.Foreground = Brushes.White;
-            }
-            else
-            {
-                this.Foreground = Brushes.Black;
-            }
-        }
     }
 
     private void SetupMenuService()
     {
         this.menuServiceInitializer.InitializeMenuService(this.OpenDropdownMenu, this.CloseDropdownMenu, this.ToggleDropdownMenu);
-    }
-
-    private void SetupWindowInteropService()
-    {
-        var windowInteropService = Global.GlobalServiceProvider?.GetService<IWindowInteropService>();
-        if (windowInteropService != null)
-        {
-            windowInteropService.WindowDragRequested += (_, _) => 
-            {
-                // Get the window handle and use Win32 API for dragging
-                var windowHandle = new WindowInteropHelper(this).Handle;
-                windowInteropService.RequestWindowDragWithHandle(windowHandle);
-            };
-        }
     }
 
     private static Color GetAverageColor(BitmapSource bitmap)

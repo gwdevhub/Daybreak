@@ -1,0 +1,146 @@
+﻿<FluentDesignSystemProvider 
+    AccentBaseColor="@this.ViewModel.AccentBaseColor"
+    NeutralBaseColor="@this.ViewModel.NeutralBaseColor"
+    BaseLayerLuminance="@this.ViewModel.BaseLayerLuminace">
+    
+    <div class="app-container">
+        <!-- Title Bar -->
+        <div class="title-bar" >
+            <!-- Drag hitbox - lower z-index, positioned behind other elements -->
+            <div class="title-bar-hitbox" @onmousedown="this.HandleTitleBarDrag" />
+
+            <div class="title-bar-left">
+                <div class="menu-toggle-btn" @onclick="this.ToggleNavigationPanel">
+                    <FluentIcon Value="@NavigationIcon" />
+                </div>
+            </div>
+            
+            <div class="title-bar-center">
+                <!-- Space for title or breadcrumbs -->
+            </div>
+            
+            <div class="title-bar-right">
+                <button class="title-bar-btn" @onclick="this.ViewModel.OpenIssues" title="Report an issue">
+                    <FluentIcon Value="@BugIcon" />
+                </button>
+                <button class="title-bar-btn" @onclick="this.ViewModel.OpenSynchronizationView" title="Updates">
+                    <FluentIcon Value="@ArrowDownloadIcon" />
+                </button>
+                
+                <!-- Window Control Buttons -->
+                <button class="title-bar-btn window-control-btn" @onclick="this.ViewModel.Minimize" title="Minimize">
+                    <FluentIcon Value="@SubtractIcon" />
+                </button>
+
+                @if(this.ViewModel.WindowState is WindowState.Maximized)
+                {
+                    <button class="title-bar-btn window-control-btn" @onclick="this.ViewModel.Restore" title="Restore">
+                        <FluentIcon Value="@SquareMultipleIcon" />
+                    </button>
+                }
+                else
+                {
+                    <button class="title-bar-btn window-control-btn" @onclick="this.ViewModel.Maximize" title="Maximize">
+                        <FluentIcon Value="@SquareIcon" />
+                    </button>
+                }
+
+                <button class="title-bar-btn window-control-btn close-btn" @onclick="this.ViewModel.Close" title="Close">
+                    <FluentIcon Value="@DismissIcon" />
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Navigation Panel -->
+            <div class="navigation-panel @(this.isNavigationOpen ? "open" : "")">
+                <NavigationMenu />
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <div class="page-content">
+                    @this.ChildContent
+                </div>
+            </div>
+
+            <!-- Notifications Panel -->
+            <div class="notifications-panel">
+                <NotificationArea />
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-left">
+                <span class="version-info">@this.ViewModel.CurrentVersionText</span>
+                @if (this.ViewModel.IsAdmin)
+                {
+                    <span class="admin-badge">[Admin]</span>
+                }
+            </div>
+            <div class="status-right">
+                @if (!string.IsNullOrEmpty(this.ViewModel.CreditText))
+                {
+                    <span class="credit-text" @onclick="this.ViewModel.OpenCreditLink">@this.ViewModel.CreditText</span>
+                }
+            </div>
+        </div>
+    </div>
+</FluentDesignSystemProvider>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    [Inject] public required AppViewModel ViewModel { get; set; }
+
+    private static readonly Icon NavigationIcon = new Regular.Size16.Navigation();
+    private static readonly Icon BugIcon = new Regular.Size16.Bug();
+    private static readonly Icon ArrowDownloadIcon = new Regular.Size16.ArrowDownload();
+    private static readonly Icon SubtractIcon = new Regular.Size16.Subtract();
+    private static readonly Icon SquareMultipleIcon = new Regular.Size16.SquareMultiple();
+    private static readonly Icon SquareIcon = new Regular.Size16.Square();
+    private static readonly Icon DismissIcon = new Regular.Size16.Dismiss();
+
+    private bool isNavigationOpen = false;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this.ViewModel.WindowStateChanged += this.OnWindowStateChanged;
+        this.ViewModel.RedrawRequested += (_, __) => this.StateHasChanged();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            this.ViewModel.InitializeApp();
+        }
+    }
+
+    private void OnWindowStateChanged(object? sender, WindowState state)
+    {
+        this.StateHasChanged();
+    }
+
+    private Icon GetMaximizeRestoreIcon()
+    {
+        return this.ViewModel.WindowState is WindowState.Maximized ? SquareMultipleIcon : SquareIcon;
+    }
+
+    private void HandleTitleBarDrag(MouseEventArgs e)
+    {
+        if (e.Button == 0) // Left mouse button
+        {
+            this.ViewModel.Drag();
+        }
+    }
+
+    private void ToggleNavigationPanel()
+    {
+        this.isNavigationOpen = !this.isNavigationOpen;
+    }
+}

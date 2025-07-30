@@ -1,0 +1,130 @@
+@using Microsoft.Extensions.Logging
+@inject INotificationProducer NotificationProducer
+@implements IDisposable
+
+<div class="notification-area">
+    @if (notifications.Any())
+    {
+        <div class="notification-list">
+            @foreach (var notification in notifications.Take(5)) // Show max 5 notifications
+            {
+                <div class="notification-item @GetNotificationClass(notification.Level)" @onclick="() => HandleNotificationClick(notification)">
+                    <div class="notification-header">
+                        <span class="notification-icon">@GetNotificationIcon(notification.Level)</span>
+                        <span class="notification-time">@notification.CreationTime.ToString("HH:mm")</span>
+                        <button class="notification-close" @onclick="() => CloseNotification(notification)" @onclick:stopPropagation="true">×</button>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title">@notification.Title</div>
+                        @if (!string.IsNullOrEmpty(notification.Description))
+                        {
+                            <div class="notification-description">@notification.Description</div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+        
+        @if (notifications.Count > 5)
+        {
+            <div class="notification-footer">
+                <button class="show-all-btn" @onclick="ShowAllNotifications">
+                    Show All (@notifications.Count)
+                </button>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="no-notifications">
+            No notifications
+        </div>
+    }
+</div>
+
+@code {
+    private List<Notification> notifications = new();
+    private CancellationTokenSource? cancellationTokenSource;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadNotifications();
+    }
+
+    private async Task LoadNotifications()
+    {
+        cancellationTokenSource = new CancellationTokenSource();
+        
+        try
+        {
+            // Consume notifications from the notification producer
+            await foreach (var notification in NotificationProducer.Consume(cancellationTokenSource.Token))
+            {
+                if (notification is Notification typedNotification)
+                {
+                    notifications.Insert(0, typedNotification); // Insert at beginning for newest first
+                    
+                    // Keep only last 50 notifications to prevent memory issues
+                    if (notifications.Count > 50)
+                    {
+                        notifications.RemoveRange(50, notifications.Count - 50);
+                    }
+                    
+                    StateHasChanged();
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Expected when cancellation token is cancelled
+        }
+    }
+
+    private void HandleNotificationClick(Notification notification)
+    {
+        // Mark notification as opened - note: the interface doesn't have this property
+        // We'll need to handle this differently in the actual implementation
+        StateHasChanged();
+    }
+
+    private void CloseNotification(Notification notification)
+    {
+        notifications.Remove(notification);
+        notification.Closed = true;
+        StateHasChanged();
+    }
+
+    private void ShowAllNotifications()
+    {
+        // Navigate to notifications view - you can inject IViewManager here
+        // ViewManager.ShowView<NotificationsView>();
+    }
+
+    private string GetNotificationClass(LogLevel level)
+    {
+        return level switch
+        {
+            LogLevel.Critical or LogLevel.Error => "error",
+            LogLevel.Warning => "warning",
+            LogLevel.Information => "info",
+            _ => "default"
+        };
+    }
+
+    private string GetNotificationIcon(LogLevel level)
+    {
+        return level switch
+        {
+            LogLevel.Critical or LogLevel.Error => "?",
+            LogLevel.Warning => "??",
+            LogLevel.Information => "??",
+            _ => "??"
+        };
+    }
+
+    public void Dispose()
+    {
+        cancellationTokenSource?.Cancel();
+        cancellationTokenSource?.Dispose();
+    }
+}

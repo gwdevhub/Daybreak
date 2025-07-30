@@ -9,7 +9,6 @@ using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Reflection;
-using System.Windows;
 using System.Windows.Extensions.Services;
 using System.Windows.Media;
 using Wpf.Ui.Appearance;
@@ -75,6 +74,7 @@ internal sealed class ThemeManager : IThemeManager, IApplicationLifetimeService
         var mahAppsResources = definedTheme?.Resources.MergedDictionaries.First().MergedDictionaries.First()!;
         var definedBackgroundBrush = mahAppsResources["MahApps.Brushes.ThemeBackground"].Cast<SolidColorBrush>();
         var foregroundColor = mahAppsResources["MahApps.Colors.ThemeForeground"].Cast<Color>();
+        var accentColor = mahAppsResources["MahApps.Colors.Accent"].Cast<Color>();
         var foregroundColorToBlend = Color.FromArgb(80, foregroundColor.R, foregroundColor.G, foregroundColor.B);
         var backgroundColorToBlend = Color.FromArgb(200, definedBackgroundBrush.Color.R, definedBackgroundBrush.Color.G, definedBackgroundBrush.Color.B);
         mahAppsResources["Daybreak.Brushes.Background"] = new SolidColorBrush(backgroundColorToBlend);
@@ -117,6 +117,7 @@ internal sealed class ThemeManager : IThemeManager, IApplicationLifetimeService
         if (mode == LightMode)
         {
             themeManager.ChangeTheme(Launcher.Instance, DarkMode, theme);
+            return;
         }
 
         themeManager.ChangeTheme(Launcher.Instance, mode, theme);

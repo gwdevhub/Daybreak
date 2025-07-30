@@ -1,0 +1,74 @@
+@inject IMenuServiceProducer MenuServiceProducer
+
+<div class="navigation-menu">    
+    <div class="menu-content">
+        @foreach (var category in categories)
+        {
+            <div class="menu-category">
+                <div class="category-header" @onclick="() => ToggleCategory(category.Name)">
+                    <span class="category-title">@category.Name</span>
+                    <span class="category-arrow @(expandedCategories.Contains(category.Name) ? "expanded" : "")">?</span>
+                </div>
+                
+                @if (expandedCategories.Contains(category.Name))
+                {
+                    <div class="category-items">
+                        @foreach (var button in category.Buttons)
+                        {
+                            <div class="menu-item" @onclick="() => ExecuteAction(button)">
+                                <span class="item-title">@button.Name</span>
+                                <span class="item-description">@button.Hint</span>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private List<MenuCategory> categories = new();
+    private HashSet<string> expandedCategories = new();
+
+    protected override void OnInitialized()
+    {
+        LoadMenuCategories();
+        // Expand first category by default
+        if (categories.Any())
+        {
+            expandedCategories.Add(categories.First().Name);
+        }
+    }
+
+    private void LoadMenuCategories()
+    {
+        categories = MenuServiceProducer.GetCategories().ToList();
+    }
+
+    private void ToggleCategory(string categoryName)
+    {
+        if (expandedCategories.Contains(categoryName))
+        {
+            expandedCategories.Remove(categoryName);
+        }
+        else
+        {
+            expandedCategories.Add(categoryName);
+        }
+    }
+
+    private void ExecuteAction(MenuButton button)
+    {
+        try
+        {
+            // Execute the button action - this will show the appropriate view
+            button.Action(Global.GlobalServiceProvider);
+        }
+        catch (Exception ex)
+        {
+            // Handle error - could inject ILogger here
+            Console.WriteLine($"Error executing menu action: {ex.Message}");
+        }
+    }
+}

@@ -16,6 +16,9 @@ public static class NativeMethods
     public const nint HWND_TOP = 0;
     public const int WH_KEYBOARD_LL = 13;
     public const uint LIST_MODULES_32BIT = 0x01;
+    public const int WM_SYSCOMMAND = 0x112;
+    public const int WM_NCLBUTTONDOWN = 0x00A1;
+    public const int HTCAPTION = 2;
 
     public delegate nint HookProc(int nCode, nint wParam, nint lParam);
 
@@ -365,7 +368,10 @@ public static class NativeMethods
 
     public delegate bool Win32Callback(nint hwnd, nint lParam);
 
-    public const int WM_SYSCOMMAND = 0x112;
+    [DllImport("user32.dll")]
+    public static extern IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
+    [DllImport("user32.dll")]
+    public static extern bool ReleaseCapture();
 
     [DllImport("kernel32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]

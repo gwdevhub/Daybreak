@@ -1,67 +1,65 @@
-﻿@using Daybreak.Services.WindowInterop
-@using Microsoft.AspNetCore.Components.Web
-@inject IWindowInteropService WindowInterop
-
-<div class="title-bar" @onmousedown="HandleTitleBarDrag">
-    <span>Custom Blazor Title Bar - Click and drag to move window</span>
-</div>
-
-<div class="main-content">
-    <h1>Loading HTML in a WPF App: Not XAML</h1>
-    <h3>Programming Languages</h3>
-    
-    <div class="demo-section">
-        <h3>Window Drag Demo</h3>
-        <p>Click and drag the title bar above to move the window.</p>
-        <button class="btn" @onclick="HandleDragButtonClick">
-            Trigger Window Drag Programmatically
-        </button>
-    </div>
-    
-    <div class="demo-section">
-        <h3>Interactive Content</h3>
-        <p>This content is fully interactive within Blazor:</p>
-        <button class="btn" @onclick="HandleButtonClick">
-            Click Counter: @clickCount
-        </button>
+﻿<App>
+    <div class="home-page">
+        <h1>Welcome to Daybreak</h1>
+        <p>This is the main application dashboard.</p>
         
-        <br /><br />
-        
-        <input type="text" @bind="textValue" placeholder="Type something here..." style="padding: 8px; width: 200px;" />
-        <p>You typed: <strong>@textValue</strong></p>
+        <div class="demo-sections">
+            <div class="demo-section">
+                <h3>Navigation Demo</h3>
+                <p>Click the menu button (☰) in the top-left to open the navigation panel.</p>
+                <p>The navigation panel contains all your existing menu categories and buttons.</p>
+            </div>
+            
+            <div class="demo-section">
+                <h3>Window Controls</h3>
+                <p>The title bar is fully functional:</p>
+                <ul>
+                    <li>Click and drag to move the window</li>
+                    <li>Use the bug button to report issues</li>
+                    <li>Use the download button for updates</li>
+                </ul>
+            </div>
+            
+            <div class="demo-section">
+                <h3>Notifications</h3>
+                <p>Notifications appear in the top-right corner automatically.</p>
+                <p>Click on notifications to interact with them.</p>
+            </div>
+            
+            <div class="demo-section">
+                <h3>Status Information</h3>
+                <p>The bottom status bar shows:</p>
+                <ul>
+                    <li>Current version information</li>
+                    <li>Administrator status</li>
+                    <li>Background image credits</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="interactive-demo">
+            <h3>Interactive Test</h3>
+            <button class="btn" @onclick="IncrementCounter">
+                Counter: @currentCount
+            </button>
+            
+            <div style="margin-top: 20px;">
+                <input type="text" @bind="textInput" placeholder="Type something..." 
+                       style="padding: 8px; margin-right: 10px; border-radius: 4px; border: 1px solid #ccc;" />
+                <span style="color: white;">You typed: @textInput</span>
+            </div>
+        </div>
     </div>
-    
-    <div class="demo-section">
-        <h3>About This Setup</h3>
-        <p>This Blazor component is running inside a WPF BlazorWebView control.</p>
-        <p>It can communicate with the WPF host through dependency injection and services.</p>
-        <p>The title bar above uses Win32 API calls to perform window dragging that works even when mouse events are intercepted by the WebView.</p>
-    </div>
-</div>
+</App>
 
 @namespace Daybreak.Views
 
 @code {
-    private int clickCount = 0;
-    private string textValue = "";
+    private int currentCount = 0;
+    private string textInput = "";
 
-    private void HandleTitleBarDrag(MouseEventArgs e)
+    private void IncrementCounter()
     {
-        // Only handle left mouse button
-        if (e.Button == 0)
-        {
-            // Get the window handle through JavaScript interop and call Win32 API directly
-            WindowInterop.RequestWindowDrag();
-        }
-    }
-    
-    private void HandleDragButtonClick()
-    {
-        WindowInterop.RequestWindowDrag();
-    }
-
-    private void HandleButtonClick()
-    {
-        clickCount++;
+        currentCount++;
     }
 }

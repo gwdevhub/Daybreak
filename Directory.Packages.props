@@ -24,6 +24,9 @@
     <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.7" />
     <PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.7" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.7" />
+    <PackageVersion Include="Microsoft.Fast.Components.FluentUI" Version="3.8.0" />
+    <PackageVersion Include="Microsoft.Fast.Components.FluentUI.Emojis" Version="3.6.0" />
+    <PackageVersion Include="Microsoft.Fast.Components.FluentUI.Icons" Version="3.8.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageVersion Include="Microsoft.Web.WebView2" Version="1.0.3351.48" />
     <PackageVersion Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />

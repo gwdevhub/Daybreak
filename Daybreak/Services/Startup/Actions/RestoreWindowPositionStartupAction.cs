@@ -27,7 +27,7 @@ internal sealed class RestoreWindowPositionStartupAction(
             await this.mainWindow.Dispatcher.InvokeAsync(this.splashScreenService.HideSplashScreen, DispatcherPriority.Normal);
             await this.mainWindow.Dispatcher.InvokeAsync(this.mainWindow.Show, DispatcherPriority.Render);
             await Task.Delay(1000);
-            await this.mainWindow.Dispatcher.InvokeAsync(this.viewManager.ShowView<LauncherView>, DispatcherPriority.Render);
+            //await this.mainWindow.Dispatcher.InvokeAsync(this.viewManager.ShowView<LauncherView>, DispatcherPriority.Render);
         }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current);
     }
 }

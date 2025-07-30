@@ -17,7 +17,6 @@ using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.Updater.PostUpdate;
 using Daybreak.Shared.Services.Window;
 using Daybreak.Shared.Utils;
-using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Slim;
@@ -70,8 +69,8 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
     protected override System.IServiceProvider SetupServiceProvider(IServiceCollection services)
     {
         var serviceManager = new ServiceManager();
-        services.AddWpfBlazorWebView();
         services.AddBlazorWebViewDeveloperTools();
+        services.AddWpfBlazorWebView();
         this.projectConfiguration.RegisterResolvers(serviceManager);
         serviceManager.RegisterSingleton<SplashWindow>();
         serviceManager.RegisterSingleton<StartupStatus>();

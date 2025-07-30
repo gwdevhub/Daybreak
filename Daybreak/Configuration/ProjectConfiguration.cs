@@ -132,7 +132,7 @@ using Daybreak.Services.Telemetry;
 using System.Reflection;
 using Version = Daybreak.Shared.Models.Versioning.Version;
 using Daybreak.Shared.Models.Plugins;
-using Daybreak.Services.WindowInterop;
+using Daybreak.ViewModels;
 
 namespace Daybreak.Configuration;
 
@@ -201,6 +201,10 @@ public class ProjectConfiguration : PluginConfigurationBase
             resourceBuilder.AddAttributes(attributes);
             return resourceBuilder;
         });
+
+        services.AddSingleton<AppViewModel>();
+
+        services.AddSingleton<BlazorThemeInteropService>();
         services.AddSingleton<ViewManager>();
         services.AddSingleton<ProcessorUsageMonitor>();
         services.AddSingleton<MemoryUsageMonitor>();
@@ -244,7 +248,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IMDomainRegistrar, MDomainRegistrar>();
         services.AddSingleton<IAttachedApiAccessor, AttachedApiAccessor>();
         services.AddSingleton<TelemetryHost>();
-        services.AddSingleton<IWindowInteropService, WindowInteropService>();
         services.AddScoped<IBrowserExtensionsManager, BrowserExtensionsManager>();
         services.AddScoped<IBrowserExtensionsProducer, BrowserExtensionsManager>(sp => sp.GetRequiredService<IBrowserExtensionsManager>().Cast<BrowserExtensionsManager>());
         services.AddScoped<ICredentialManager, CredentialManager>();
