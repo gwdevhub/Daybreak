@@ -20,6 +20,18 @@ public static class NativeMethods
     public const int WM_NCLBUTTONDOWN = 0x00A1;
     public const int HTCAPTION = 2;
 
+    public enum ResizeDirection
+    {
+        Left = 10,
+        Right = 11,
+        Top = 12,
+        TopLeft = 13,
+        TopRight = 14,
+        Bottom = 15,
+        BottomLeft = 16,
+        BottomRight = 17
+    }
+
     public delegate nint HookProc(int nCode, nint wParam, nint lParam);
 
     public enum DWMWINDOWATTRIBUTE { DWMWA_WINDOW_CORNER_PREFERENCE = 33 }

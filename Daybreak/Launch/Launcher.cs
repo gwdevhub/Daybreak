@@ -43,7 +43,7 @@ public sealed class Launcher : BlazorHybridApplication<App>
     public static Launcher Instance { get; private set; } = default!;
     public override bool DevToolsEnabled { get; } = true;
     public override string HostPage { get; } = "wwwroot/Index.html";
-    public override bool ShowTitleBar { get; } = false;
+    public override bool ShowTitleBar => false;
 
     private readonly ProjectConfiguration projectConfiguration = new();
     private readonly string[] launchArguments;

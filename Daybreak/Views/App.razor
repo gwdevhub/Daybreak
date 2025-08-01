@@ -1,9 +1,24 @@
-﻿<FluentDesignSystemProvider 
+﻿@using Daybreak.Shared.Utils
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.FluentUI.AspNetCore.Components
+@using System.Windows
+
+<FluentDesignSystemProvider 
     AccentBaseColor="@this.ViewModel.AccentBaseColor"
     NeutralBaseColor="@this.ViewModel.NeutralBaseColor"
     BaseLayerLuminance="@this.ViewModel.BaseLayerLuminace">
     
-    <div class="app-container">
+    <div class="app-container @(this.ViewModel.WindowState == WindowState.Maximized ? "maximized" : "")">
+        <!-- Resize borders for custom window chrome -->
+        <div class="resize-border resize-border-top" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.Top))" />
+        <div class="resize-border resize-border-bottom" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.Bottom))" />
+        <div class="resize-border resize-border-left" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.Left))" />
+        <div class="resize-border resize-border-right" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.Right))" />
+        <div class="resize-border resize-border-top-left" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.TopLeft))" />
+        <div class="resize-border resize-border-top-right" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.TopRight))" />
+        <div class="resize-border resize-border-bottom-left" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.BottomLeft))" />
+        <div class="resize-border resize-border-bottom-right" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.BottomRight))" />
+
         <!-- Title Bar -->
         <div class="title-bar" >
             <!-- Drag hitbox - lower z-index, positioned behind other elements -->
@@ -141,5 +156,13 @@
     private void ToggleNavigationPanel()
     {
         this.isNavigationOpen = !this.isNavigationOpen;
+    }
+
+    private void HandleResize(MouseEventArgs e, NativeMethods.ResizeDirection resizeDirection)
+    {
+        if (e.Button == 0) // Left mouse button
+        {
+            this.ViewModel.StartResize(resizeDirection);
+        }
     }
 }

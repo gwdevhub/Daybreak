@@ -24,6 +24,11 @@ html, body {
     backdrop-filter: blur(10px);
 }
 
+/* Hide resize borders when maximized */
+.app-container.maximized .resize-border {
+    display: none;
+}
+
 /* Title Bar */
 .title-bar {
     height: 40px;
@@ -93,7 +98,6 @@ html, body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    border-radius: 3px;
     transition: background-color 0.2s;
     background: none;
     border: none;
@@ -104,12 +108,6 @@ html, body {
     background: var(--accent-foreground-hover);
 }
 
-.menu-icon {
-}
-
-.window-controls {
-    pointer-events: none; /* Allow drag through window controls area */
-}
 
 /* Main Content - Now fills entire viewport */
 .main-content {
@@ -123,32 +121,74 @@ html, body {
 /* Navigation Panel */
 .navigation-panel {
     width: 0;
+    min-width: 0;
     background: var(--neutral-fill-secondary-rest);
     backdrop-filter: blur(10px);
     border-right: 1px solid var(--neutral-stroke-rest);
-    transition: width 0.3s ease-in-out;
-    transition: opacity 0.3s ease;
     overflow: hidden;
     z-index: 1000;
     height: 100vh;
+    transition: width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
+    opacity: 0;
+    box-shadow: none;
+    /* CSS custom properties for dynamic animation */
+    --stagger-delay: 0.05s;
+    --base-delay: 0.05s;
+    /* Custom properties for menu item animations */
+    --item-stagger-delay: 0.03s;
+    --item-base-delay: 0.1s;
 }
 
-.navigation-panel.open {
-    width: 250px;
-    opacity: 1;
-}
+    .navigation-panel.open {
+        width: 250px;
+        opacity: 1;
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    }
 
 .navigation-menu {
     padding: 20px;
     padding-top: 40px;
     color: var(--neutral-foreground-rest);
-    height: calc(100vh - 20px); /* Adjust height calculation */
+    height: calc(100vh - 20px);
     overflow-y: auto;
     box-sizing: border-box;
+    counter-reset: menu-item;
 }
 
 .menu-category {
     margin-bottom: 15px;
+    counter-increment: menu-item;
+}
+
+.navigation-panel.open .menu-category {
+    animation: slideInFromLeft 0.3s ease-out forwards;
+    animation-delay: calc(var(--base-delay) + (counter(menu-item) - 1) * var(--stagger-delay));
+}
+
+/* Keyframe for staggered menu category animation */
+@keyframes slideInFromLeft {
+    from {
+        transform: translateX(-30px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Keyframe for menu item slide-down animation */
+@keyframes slideInFromTop {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 .category-header {
@@ -182,6 +222,8 @@ html, body {
 
 .category-items {
     padding: 5px 0;
+    /* Reset counter for menu items within each category */
+    counter-reset: category-item;
 }
 
 .menu-item {
@@ -190,6 +232,18 @@ html, body {
     border-radius: 3px;
     transition: background-color 0.2s;
     margin: 2px 0;
+    /* Increment counter for each menu item */
+    counter-increment: category-item;
+    /* Initial state for animation */
+    opacity: 0;
+    transform: translateY(-20px);
+}
+
+/* Animate menu items when category is expanded and navigation panel is open */
+.navigation-panel.open .category-items .menu-item {
+    animation: slideInFromTop 0.25s ease-out forwards;
+    /* Dynamic delay calculation for each menu item */
+    animation-delay: calc(var(--item-base-delay) + (counter(category-item) - 1) * var(--item-stagger-delay));
 }
 
 .menu-item:hover {
@@ -406,23 +460,94 @@ html, body {
     opacity: 0.8;
 }
 
+/* Resize borders for custom window chrome */
+.resize-border {
+    position: absolute;
+    z-index: 30000; /* Above everything else */
+    background: transparent;
+}
+
+.resize-border-top {
+    top: 0;
+    left: 8px;
+    right: 8px;
+    height: 8px;
+    cursor: n-resize;
+}
+
+.resize-border-bottom {
+    bottom: 0;
+    left: 8px;
+    right: 8px;
+    height: 8px;
+    cursor: s-resize;
+}
+
+.resize-border-left {
+    top: 8px;
+    left: 0;
+    bottom: 8px;
+    width: 8px;
+    cursor: w-resize;
+}
+
+.resize-border-right {
+    top: 8px;
+    right: 0;
+    bottom: 8px;
+    width: 8px;
+    cursor: e-resize;
+}
+
+.resize-border-top-left {
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    cursor: nw-resize;
+}
+
+.resize-border-top-right {
+    top: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    cursor: ne-resize;
+}
+
+.resize-border-bottom-left {
+    bottom: 0;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    cursor: sw-resize;
+}
+
+.resize-border-bottom-right {
+    bottom: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    cursor: se-resize;
+}
+
 /* Scrollbar styling */
 ::-webkit-scrollbar {
     width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-    background: var(--accent-fill-rest);
+    background: var(--neutral-fill-rest);
     border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--accent-fill-active);
+    background: var(--neutral-fill-strong-rest);
     border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--accent-fill-hover);
+    background: var(--neutral-fill-strong-hover);
 }
 
 /* Responsive adjustments */
@@ -442,5 +567,23 @@ html, body {
     
     .home-page {
         padding: 0 10px;
+    }
+}
+
+/* Accessibility and reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .navigation-panel,
+    .navigation-menu,
+    .menu-category,
+    .category-header,
+    .menu-item {
+        transition: none;
+        animation: none;
+    }
+    
+    /* Ensure menu items are visible when animations are disabled */
+    .menu-item {
+        opacity: 1;
+        transform: none;
     }
 }

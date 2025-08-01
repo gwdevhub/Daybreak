@@ -73,7 +73,7 @@
     <PackageVersion Include="SystemExtensions.NetStandard.Generators" Version="0.1.6" />
     <PackageVersion Include="TrailBlazr" Version="0.2.2" />
     <PackageVersion Include="WPF-UI" Version="4.0.3" />
-    <PackageVersion Include="WpfExtended.Blazor" Version="0.7.15" />
+    <PackageVersion Include="WpfExtended.Blazor" Version="0.8.0" />
     <PackageVersion Include="WpfExtended.SourceGeneration" Version="0.3.0" />
     <PackageVersion Include="WpfScreenHelper" Version="2.1.1" />
     <PackageVersion Include="WriteableBitmapEx" Version="1.6.8" />

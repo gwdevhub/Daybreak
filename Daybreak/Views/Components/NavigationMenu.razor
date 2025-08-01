@@ -1,14 +1,14 @@
 <div class="navigation-menu">    
     <div class="menu-content">
-        @foreach (var category in categories)
+        @foreach (var category in this.categories)
         {
             <div class="menu-category">
                 <div class="category-header" @onclick="() => ToggleCategory(category.Name)">
                     <span class="category-title">@category.Name</span>
-                    <span class="category-arrow @(expandedCategories.Contains(category.Name) ? "expanded" : "")">?</span>
+                    <span class="category-arrow @(this.expandedCategories.Contains(category.Name) ? "expanded" : "")">?</span>
                 </div>
                 
-                @if (expandedCategories.Contains(category.Name))
+                @if (this.expandedCategories.Contains(category.Name))
                 {
                     <div class="category-items">
                         @foreach (var button in category.Buttons)

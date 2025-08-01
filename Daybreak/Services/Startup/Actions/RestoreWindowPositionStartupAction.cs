@@ -24,14 +24,6 @@ internal sealed class RestoreWindowPositionStartupAction(
             await this.mainWindow.Dispatcher.InvokeAsync(this.screenManager.MoveWindowToSavedPosition, DispatcherPriority.Normal);
             await this.mainWindow.Dispatcher.InvokeAsync(this.splashScreenService.HideSplashScreen, DispatcherPriority.Normal);
             await this.mainWindow.Dispatcher.InvokeAsync(this.mainWindow.Show, DispatcherPriority.Render);
-            
-            await Task.Delay(1000);
-            await this.mainWindow.Dispatcher.InvokeAsync(() =>
-            {
-                var hwnd = new WindowInteropHelper(this.mainWindow).Handle;
-                var preference = NativeMethods.DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND;
-                NativeMethods.DwmSetWindowAttribute(hwnd, NativeMethods.DWMWINDOWATTRIBUTE.DWMWA_WINDOW_CORNER_PREFERENCE, ref preference, sizeof(uint));
-            });
         }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current);
     }
 }

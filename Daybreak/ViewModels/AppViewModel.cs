@@ -18,6 +18,8 @@ public sealed class AppViewModel
     private readonly IPrivilegeManager privilegeManager;
     private readonly BlazorHostWindow blazorHostWindow;
 
+    private HwndSource? hwndSource;
+
     public event EventHandler<WindowState>? WindowStateChanged;
     public event EventHandler? RedrawRequested;
 
@@ -57,13 +59,24 @@ public sealed class AppViewModel
         this.NeutralBaseColor = this.blazorThemeInteropService.NeutralBaseColor;
         this.RedrawRequested?.Invoke(this, EventArgs.Empty);
         this.viewManager.ShowView<LaunchView>();
+        this.hwndSource = HwndSource.FromHwnd(new WindowInteropHelper(this.blazorHostWindow).Handle);
     }
 
     public void Drag()
     {
-        var handle = new WindowInteropHelper(this.blazorHostWindow).Handle;
         NativeMethods.ReleaseCapture();
-        NativeMethods.SendMessage(handle, NativeMethods.WM_NCLBUTTONDOWN, new IntPtr(NativeMethods.HTCAPTION), IntPtr.Zero);
+        NativeMethods.SendMessage(this.hwndSource?.Handle ?? 0, NativeMethods.WM_NCLBUTTONDOWN, new IntPtr(NativeMethods.HTCAPTION), IntPtr.Zero);
+    }
+
+    public void StartResize(NativeMethods.ResizeDirection resizeDirection)
+    {
+        if (this.blazorHostWindow.WindowState == WindowState.Maximized)
+        {
+            return; // Don't allow resizing when maximized
+        }
+
+        NativeMethods.ReleaseCapture();
+        NativeMethods.SendMessage(this.hwndSource?.Handle ?? 0, NativeMethods.WM_NCLBUTTONDOWN, new IntPtr((int)resizeDirection), IntPtr.Zero);
     }
 
     public void Minimize()
