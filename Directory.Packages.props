@@ -16,6 +16,7 @@
     <PackageVersion Include="MeaMod.DNS" Version="1.0.71" />
     <PackageVersion Include="MemoryPack" Version="1.21.4" />
     <PackageVersion Include="MemoryPack.Generator" Version="1.21.4" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components" Version="9.0.7" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="9.0.90" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.7" />
     <PackageVersion Include="Microsoft.CorrelationVector" Version="1.0.42" />
@@ -31,8 +32,8 @@
     <PackageVersion Include="Microsoft.Web.WebView2" Version="1.0.3351.48" />
     <PackageVersion Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
     <PackageVersion Include="MinHook.NET" Version="1.1.1" />
-    <PackageVersion Include="MSTest.TestAdapter" Version="3.9.3" />
-    <PackageVersion Include="MSTest.TestFramework" Version="3.9.3" />
+    <PackageVersion Include="MSTest.TestAdapter" Version="3.10.0" />
+    <PackageVersion Include="MSTest.TestFramework" Version="3.10.0" />
     <PackageVersion Include="NSubstitute" Version="5.3.0" />
     <PackageVersion Include="NSubstitute.Analyzers.CSharp" Version="1.0.17" />
     <PackageVersion Include="NAudio" Version="2.2.1" />

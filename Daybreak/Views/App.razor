@@ -61,7 +61,7 @@
             <!-- Content Area -->
             <div class="content-area">
                 <div class="page-content">
-                    @this.ChildContent
+                    <DynamicComponent Type="@this.ViewModel.CurrentViewType" Parameters="@this.ViewModel.CurrentViewParameters" />
                 </div>
             </div>
 
@@ -91,9 +91,8 @@
 </FluentDesignSystemProvider>
 
 @code {
-    [Parameter] public RenderFragment? ChildContent { get; set; }
-
-    [Inject] public required AppViewModel ViewModel { get; set; }
+    [Inject]
+    public required AppViewModel ViewModel { get; set; }
 
     private static readonly Icon NavigationIcon = new Regular.Size16.Navigation();
     private static readonly Icon BugIcon = new Regular.Size16.Bug();

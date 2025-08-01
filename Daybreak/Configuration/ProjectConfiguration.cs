@@ -203,6 +203,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         });
 
         services.AddSingleton<AppViewModel>();
+        services.AddSingleton<IBlazorViewManager, BlazorViewManager>();
 
         services.AddSingleton<BlazorThemeInteropService>();
         services.AddSingleton<ViewManager>();
@@ -363,6 +364,12 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<DXVKInstallingView>();
         viewProducer.RegisterView<DXVKOnboardingEntryView>();
         viewProducer.RegisterView<DXVKSwitchView>();
+    }
+
+    public void RegisterRazorView(IBlazorViewManager blazorViewManager)
+    {
+        blazorViewManager.ThrowIfNull();
+        blazorViewManager.RegisterView<LaunchView, LaunchViewModel>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)

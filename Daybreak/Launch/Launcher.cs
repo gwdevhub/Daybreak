@@ -131,6 +131,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
         var telemetryHost = this.ServiceProvider.GetRequiredService<TelemetryHost>();
         var serviceManager = this.ServiceProvider.GetRequiredService<IServiceManager>();
         var viewProducer = this.ServiceProvider.GetRequiredService<IViewManager>();
+        var blazorViewManager = this.ServiceProvider.GetRequiredService<IBlazorViewManager>();
         var postUpdateActionProducer = this.ServiceProvider.GetRequiredService<IPostUpdateActionProducer>();
         var startupActionProducer = this.ServiceProvider.GetRequiredService<IStartupActionProducer>();
         var notificationHandlerProducer = this.ServiceProvider.GetRequiredService<INotificationHandlerProducer>();
@@ -149,6 +150,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
 
         startupStatus.CurrentStep = StartupStatus.Custom("Loading views");
         this.projectConfiguration.RegisterViews(viewProducer);
+        this.projectConfiguration.RegisterRazorView(blazorViewManager);
         await Task.Delay(10);
 
         startupStatus.CurrentStep = StartupStatus.Custom("Loading post-update actions");

@@ -1,5 +1,3 @@
-@inject IMenuServiceProducer MenuServiceProducer
-
 <div class="navigation-menu">    
     <div class="menu-content">
         @foreach (var category in categories)
@@ -31,44 +29,35 @@
     private List<MenuCategory> categories = new();
     private HashSet<string> expandedCategories = new();
 
+    [Inject]
+    public required IMenuServiceProducer MenuServiceProducer { get; set; }
+    [Inject]
+    public required IMenuServiceButtonHandler MenuServiceButtonHandler { get; set; }
+
     protected override void OnInitialized()
     {
-        LoadMenuCategories();
-        // Expand first category by default
-        if (categories.Any())
-        {
-            expandedCategories.Add(categories.First().Name);
-        }
+        this.LoadMenuCategories();
     }
 
     private void LoadMenuCategories()
     {
-        categories = MenuServiceProducer.GetCategories().ToList();
+        this.categories = this.MenuServiceProducer.GetCategories().ToList();
     }
 
     private void ToggleCategory(string categoryName)
     {
-        if (expandedCategories.Contains(categoryName))
+        if (this.expandedCategories.Contains(categoryName))
         {
-            expandedCategories.Remove(categoryName);
+            this.expandedCategories.Remove(categoryName);
         }
         else
         {
-            expandedCategories.Add(categoryName);
+            this.expandedCategories.Add(categoryName);
         }
     }
 
     private void ExecuteAction(MenuButton button)
     {
-        try
-        {
-            // Execute the button action - this will show the appropriate view
-            button.Action(Global.GlobalServiceProvider);
-        }
-        catch (Exception ex)
-        {
-            // Handle error - could inject ILogger here
-            Console.WriteLine($"Error executing menu action: {ex.Message}");
-        }
+        this.MenuServiceButtonHandler.HandleButton(button);
     }
 }
