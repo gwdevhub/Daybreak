@@ -1,5 +1,15 @@
 ﻿<h3>FocusView</h3>
+
+<BlazorFrame Src="https://wiki.guildwars.com/wiki/Player-made_Modifications#Shared_player_content"
+             SecurityOptions="@this.securityOptions"
+             Width="100%"
+             Height="800px"
+             EnableAutoResize="true"
+             EnableScroll="true" />
+
 @inherits ViewBase<FocusView, FocusViewModel>
 @code {
-
+    private readonly MessageSecurityOptions securityOptions = new MessageSecurityOptions()
+            .ForDevelopment()
+            .WithPermissiveSandbox();
 }

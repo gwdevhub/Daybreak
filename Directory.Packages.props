@@ -4,6 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="AvalonEdit" Version="6.3.1.120" />
+    <PackageVersion Include="BlazorFrame" Version="2.1.2" />
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
     <PackageVersion Include="Daybreak.7ZipExtractor" Version="1.0.0" />
     <PackageVersion Include="DiffPlex" Version="1.8.0" />

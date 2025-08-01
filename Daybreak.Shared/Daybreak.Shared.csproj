@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BlazorFrame" />
     <PackageReference Include="MeaMod.DNS" />
     <PackageReference Include="MemoryPack" />
     <PackageReference Include="MemoryPack.Generator">
