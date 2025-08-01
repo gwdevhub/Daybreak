@@ -1,6 +1,5 @@
 ﻿using Daybreak.Shared.Models.LaunchConfigurations;
 using Daybreak.Shared.Services.LaunchConfigurations;
-using Daybreak.Shared.Services.Navigation;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;
 using System.Extensions;
@@ -13,16 +12,16 @@ namespace Daybreak.Views.Launch;
 /// </summary>
 public partial class LaunchConfigurationsView : UserControl
 {
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly ILaunchConfigurationService launchConfigurationService;
 
     public ObservableCollection<LaunchConfigurationWithCredentials> LaunchConfigurations { get; set; } = [];
 
     public LaunchConfigurationsView(
-        IViewManager viewManager,
+        //IViewManager viewManager,
         ILaunchConfigurationService launchConfigurationService)
     {
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.launchConfigurationService = launchConfigurationService.ThrowIfNull();
         this.InitializeComponent();
     }
@@ -41,12 +40,12 @@ public partial class LaunchConfigurationsView : UserControl
             this.launchConfigurationService.DeleteConfiguration(config);
         }
 
-        this.viewManager.ShowView<LauncherView>();
+        //this.viewManager.ShowView<LauncherView>();
     }
 
     private void AddButton_Clicked(object sender, EventArgs e)
     {
-        this.viewManager.ShowView<LaunchConfigurationView>(this.launchConfigurationService.CreateConfiguration()!);
+        //this.viewManager.ShowView<LaunchConfigurationView>(this.launchConfigurationService.CreateConfiguration()!);
     }
 
     private void BinButton_Clicked(object sender, EventArgs e)
@@ -68,6 +67,6 @@ public partial class LaunchConfigurationsView : UserControl
             return;
         }
 
-        this.viewManager.ShowView<LaunchConfigurationView>(config);
+        //this.viewManager.ShowView<LaunchConfigurationView>(config);
     }
 }

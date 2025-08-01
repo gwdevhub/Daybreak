@@ -1,8 +1,6 @@
 ﻿using Daybreak.Shared.Models.Onboarding;
 using Daybreak.Shared.Services.LaunchConfigurations;
 using Daybreak.Shared.Services.Menu;
-using Daybreak.Shared.Services.Navigation;
-using Daybreak.Views.Launch;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Windows.Controls;
@@ -17,7 +15,7 @@ public partial class LauncherOnboardingView : UserControl
 {
     private readonly ILaunchConfigurationService launchConfigurationService;
     private readonly IMenuService menuService;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly ILogger<LauncherOnboardingView> logger;
 
     [GenerateDependencyProperty]
@@ -28,12 +26,12 @@ public partial class LauncherOnboardingView : UserControl
     public LauncherOnboardingView(
         ILaunchConfigurationService launchConfigurationService,
         IMenuService menuService,
-        IViewManager viewManager,
+        //IViewManager viewManager,
         ILogger<LauncherOnboardingView> logger)
     {
         this.launchConfigurationService = launchConfigurationService.ThrowIfNull();
         this.menuService = menuService.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
 
         this.InitializeComponent();
@@ -44,15 +42,15 @@ public partial class LauncherOnboardingView : UserControl
         switch (this.onboardingStage)
         {
             case LauncherOnboardingStage.NeedsCredentials:
-                this.viewManager.ShowView<AccountsView>();
+                //this.viewManager.ShowView<AccountsView>();
                 this.menuService.OpenMenu();
                 break;
             case LauncherOnboardingStage.NeedsExecutable:
-                this.viewManager.ShowView<ExecutablesView>();
+                //this.viewManager.ShowView<ExecutablesView>();
                 this.menuService.OpenMenu();
                 break;
             case LauncherOnboardingStage.NeedsConfiguration:
-                this.viewManager.ShowView<LaunchConfigurationView>(this.launchConfigurationService.CreateConfiguration()!);
+                //this.viewManager.ShowView<LaunchConfigurationView>(this.launchConfigurationService.CreateConfiguration()!);
                 this.menuService.OpenMenu();
                 break;
             default:

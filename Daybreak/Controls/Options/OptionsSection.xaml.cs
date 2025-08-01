@@ -2,9 +2,7 @@
 using Daybreak.Controls.Buttons;
 using Daybreak.Shared;
 using Daybreak.Shared.Models.Options;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Options;
-using Daybreak.Views;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;
@@ -17,17 +15,15 @@ namespace Daybreak.Controls.Options;
 /// Interaction logic for OptionsSection.xaml
 /// </summary>
 public partial class OptionsSection(
-    IOptionsProvider optionsProvider,
-    IViewManager viewManager) : UserControl
+    IOptionsProvider optionsProvider) : UserControl
 {
     private readonly IOptionsProvider optionsProvider = optionsProvider.ThrowIfNull();
-    private readonly IViewManager viewManager = viewManager.ThrowIfNull();
+    //private readonly IViewManager viewManager = viewManager.ThrowIfNull();
 
     public ObservableCollection<OptionSection> Options { get; } = [];
 
     public OptionsSection()
-        : this(Global.GlobalServiceProvider.GetRequiredService<IOptionsProvider>(),
-               Global.GlobalServiceProvider.GetRequiredService<IViewManager>())
+        : this(Global.GlobalServiceProvider.GetRequiredService<IOptionsProvider>())
     {
         this.InitializeComponent();
         this.InitializeOptions();
@@ -95,6 +91,6 @@ public partial class OptionsSection(
             return;
         }
 
-        this.viewManager.ShowView<OptionSectionView>(optionSection);
+        //this.viewManager.ShowView<OptionSectionView>(optionSection);
     }
 }

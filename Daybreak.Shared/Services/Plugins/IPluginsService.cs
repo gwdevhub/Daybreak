@@ -21,7 +21,7 @@ public interface IPluginsService
     void LoadPlugins(
         IServiceManager serviceManager,
         IOptionsProducer optionsProducer,
-        IViewManager viewManager,
+        IViewProducer viewProducer,
         IPostUpdateActionProducer postUpdateActionProducer,
         IStartupActionProducer startupActionProducer,
         INotificationHandlerProducer notificationHandlerProducer,

@@ -1,6 +1,5 @@
 ﻿using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Services.DXVK;
-using Daybreak.Shared.Services.Navigation;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Extensions;
@@ -15,7 +14,7 @@ namespace Daybreak.Views.Onboarding.DXVK;
 public partial class DXVKInstallingView : UserControl
 {
     private readonly ILogger<DXVKInstallingView> logger;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly IDXVKService dXVKService;
 
     private CancellationTokenSource? cancellationTokenSource;
@@ -31,12 +30,12 @@ public partial class DXVKInstallingView : UserControl
 
     public DXVKInstallingView(
         IDXVKService dXVKService,
-        ILogger<DXVKInstallingView> logger,
-        IViewManager viewManager)
+        ILogger<DXVKInstallingView> logger)
+        //IViewManager viewManager)
     {
         this.dXVKService = dXVKService.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.InitializeComponent();
     }
 
@@ -86,6 +85,6 @@ public partial class DXVKInstallingView : UserControl
 
     private void OpaqueButton_Clicked(object sender, System.EventArgs e)
     {
-        this.viewManager.ShowView<DXVKSwitchView>();
+        //this.viewManager.ShowView<DXVKSwitchView>();
     }
 }

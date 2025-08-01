@@ -1,7 +1,6 @@
 ﻿using Daybreak.Controls.Templates;
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Models.Trade;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.TradeChat;
 using Daybreak.Shared.Utils;
 using System.Collections.ObjectModel;
@@ -17,7 +16,7 @@ namespace Daybreak.Views.Trade;
 /// </summary>
 public partial class PriceQuotesView : UserControl
 {
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly ITraderQuoteService traderQuoteService;
 
     private List<TraderQuoteModel> traderQuotesCache = [];
@@ -28,10 +27,10 @@ public partial class PriceQuotesView : UserControl
     public ObservableCollection<TraderQuoteModel> TraderQuotes { get; } = [];
 
     public PriceQuotesView(
-        IViewManager viewManager,
+        //IViewManager viewManager,
         ITraderQuoteService traderQuoteService)
     {
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.traderQuoteService = traderQuoteService.ThrowIfNull();
         this.InitializeComponent();
     }
@@ -72,7 +71,7 @@ public partial class PriceQuotesView : UserControl
             return;
         }
 
-        this.viewManager.ShowView<PriceHistoryView>(item);
+        //this.viewManager.ShowView<PriceHistoryView>(item);
     }
 
     private static void InsertQuotes(Dictionary<string, TraderQuoteModel> concat, IEnumerable<TraderQuote> items, bool isSellPrice)

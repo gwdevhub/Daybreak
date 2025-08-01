@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Models.Trade;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.TradeChat;
 using System.Core.Extensions;
 using System.Windows.Controls;
@@ -10,14 +9,14 @@ namespace Daybreak.Views.Trade;
 /// </summary>
 public partial class TradeAlertsChoiceView : UserControl
 {
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly ITradeAlertingService tradeAlertingService;
 
     public TradeAlertsChoiceView(
-        IViewManager viewManager,
+        //IViewManager viewManager,
         ITradeAlertingService tradeAlertingService)
     {
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.tradeAlertingService = tradeAlertingService.ThrowIfNull();
         this.InitializeComponent();
     }
@@ -31,7 +30,7 @@ public partial class TradeAlertsChoiceView : UserControl
         };
 
         this.tradeAlertingService.AddTradeAlert(tradeAlert);
-        this.viewManager.ShowView<TradeAlertSetupView>(tradeAlert);
+        //this.viewManager.ShowView<TradeAlertSetupView>(tradeAlert);
     }
 
     private void AddBuyQuoteAlertButton_Clicked(object _, EventArgs __)
@@ -44,7 +43,7 @@ public partial class TradeAlertsChoiceView : UserControl
         };
 
         this.tradeAlertingService.AddTradeAlert(tradeAlert);
-        this.viewManager.ShowView<QuoteAlertSetupView>(tradeAlert);
+        //this.viewManager.ShowView<QuoteAlertSetupView>(tradeAlert);
     }
 
     private void AddSellQuoteAlertButton_Clicked(object _, EventArgs __)
@@ -57,11 +56,11 @@ public partial class TradeAlertsChoiceView : UserControl
         };
 
         this.tradeAlertingService.AddTradeAlert(tradeAlert);
-        this.viewManager.ShowView<QuoteAlertSetupView>(tradeAlert);
+        //this.viewManager.ShowView<QuoteAlertSetupView>(tradeAlert);
     }
 
     private void BackButton_Clicked(object sender, EventArgs e)
     {
-        this.viewManager.ShowView<TradeAlertsView>();
+        //this.viewManager.ShowView<TradeAlertsView>();
     }
 }

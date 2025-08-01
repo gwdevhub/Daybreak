@@ -1,7 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Shared;
 using Daybreak.Shared.Services.Menu;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Services.Screenshots;
@@ -19,8 +18,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
-using Microsoft.Extensions.DependencyInjection;
-using System.Windows.Interop;
 
 namespace Daybreak.Launch;
 
@@ -35,7 +32,6 @@ public partial class MainWindow : FluentWindow
 
     private readonly IOptionsSynchronizationService optionsSynchronizationService;
     private readonly IMenuServiceInitializer menuServiceInitializer;
-    private readonly IViewManager viewManager;
     private readonly IBackgroundProvider backgroundProvider;
     private readonly IApplicationUpdater applicationUpdater;
     private readonly IPrivilegeManager privilegeManager;
@@ -66,7 +62,6 @@ public partial class MainWindow : FluentWindow
     public MainWindow(
         IOptionsSynchronizationService optionsSynchronizationService,
         IMenuServiceInitializer menuServiceInitializer,
-        IViewManager viewManager,
         IBackgroundProvider backgroundProvider,
         IApplicationUpdater applicationUpdater,
         IPrivilegeManager privilegeManager,
@@ -77,7 +72,6 @@ public partial class MainWindow : FluentWindow
     {
         this.optionsSynchronizationService = optionsSynchronizationService.ThrowIfNull();
         this.menuServiceInitializer = menuServiceInitializer.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
         this.backgroundProvider = backgroundProvider.ThrowIfNull();
         this.applicationUpdater = applicationUpdater.ThrowIfNull();
         this.privilegeManager = privilegeManager.ThrowIfNull();
@@ -118,7 +112,6 @@ public partial class MainWindow : FluentWindow
 
     private void SynchronizeButton_Click(object sender, EventArgs e)
     {
-        this.viewManager.ShowView<SettingsSynchronizationView>();
     }
 
     private void BugButton_Click(object sender, EventArgs e)
@@ -229,7 +222,6 @@ public partial class MainWindow : FluentWindow
 
     private void VersionText_Clicked(object sender, EventArgs e)
     {
-        this.viewManager.ShowView<VersionManagementView>();
     }
 
     private void AdminText_Clicked(object sender, EventArgs e)

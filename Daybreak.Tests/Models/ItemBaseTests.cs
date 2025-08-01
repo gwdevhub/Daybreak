@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text;
 using Daybreak.Shared.Models.Guildwars;
 

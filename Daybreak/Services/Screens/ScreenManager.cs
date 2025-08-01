@@ -1,7 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Launch;
 using Daybreak.Shared.Models;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Screens;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
@@ -12,17 +10,16 @@ using System.Extensions;
 using System.Windows;
 using System.Windows.Extensions.Services;
 using System.Windows.Media;
+using WpfExtended.Blazor.Launch;
 
 namespace Daybreak.Services.Screens;
 
 internal sealed class ScreenManager(
-    MainWindow host,
-    IViewManager viewManager,
+    BlazorHostWindow host,
     ILiveUpdateableOptions<ScreenManagerOptions> liveUpdateableOptions,
     ILogger<ScreenManager> logger) : IScreenManager, IApplicationLifetimeService
 {
-    private readonly MainWindow host = host.ThrowIfNull();
-    private readonly IViewManager viewManager = viewManager.ThrowIfNull();
+    private readonly BlazorHostWindow host = host.ThrowIfNull();
     private readonly ILiveUpdateableOptions<ScreenManagerOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
     private readonly ILogger<ScreenManager> logger = logger.ThrowIfNull();
 
@@ -106,7 +103,7 @@ internal sealed class ScreenManager(
 
     public void OnStartup()
     {
-        this.host.WindowParametersChanged += (_, _) => this.SaveWindowPositionAndSize();
+        //this.host.WindowParametersChanged += (_, _) => this.SaveWindowPositionAndSize();
     }
 
     public void OnClosing()

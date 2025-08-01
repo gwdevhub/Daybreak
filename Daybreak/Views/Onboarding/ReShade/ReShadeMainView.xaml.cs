@@ -1,6 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models.UMod;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.ReShade;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
@@ -18,7 +17,7 @@ public partial class ReShadeMainView : UserControl
 {
     private const string HomepageLink = "https://reshade.me/";
 
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly IReShadeService reShadeService;
     private readonly ILiveOptions<UModOptions> liveOptions;
 
@@ -31,11 +30,11 @@ public partial class ReShadeMainView : UserControl
     public ObservableCollection<UModEntry> Mods { get; } = [];
 
     public ReShadeMainView(
-        IViewManager viewManager,
+        //IViewManager viewManager,
         IReShadeService reShadeService,
         ILiveOptions<UModOptions> liveOptions)
     {
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.reShadeService = reShadeService.ThrowIfNull();
         this.liveOptions = liveOptions.ThrowIfNull();
 
@@ -46,23 +45,23 @@ public partial class ReShadeMainView : UserControl
 
     private void OpaqueButtonNo_Clicked(object sender, System.EventArgs e)
     {
-        this.viewManager.ShowView<LauncherView>();
+        //this.viewManager.ShowView<LauncherView>();
     }
 
     private void OpaqueButtonYes_Clicked(object sender, System.EventArgs e)
     {
         this.reShadeService.IsEnabled = !this.reShadeService.IsEnabled;
-        this.viewManager.ShowView<LauncherView>();
+        //this.viewManager.ShowView<LauncherView>();
     }
 
     private void Homepage_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-        this.viewManager.ShowView<ReShadeBrowserView>(HomepageLink);
+        //this.viewManager.ShowView<ReShadeBrowserView>(HomepageLink);
     }
 
     private void Download_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-        this.viewManager.ShowView<ReShadeStockEffectsSelectorView>();
+        //this.viewManager.ShowView<ReShadeStockEffectsSelectorView>();
     }
 
     private async void Import_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -96,11 +95,11 @@ public partial class ReShadeMainView : UserControl
 
     private void Config_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-        this.viewManager.ShowView<ReShadeConfigView>();
+        //this.viewManager.ShowView<ReShadeConfigView>();
     }
 
     private void Preset_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-        this.viewManager.ShowView<ReShadePresetView>();
+        //this.viewManager.ShowView<ReShadePresetView>();
     }
 }

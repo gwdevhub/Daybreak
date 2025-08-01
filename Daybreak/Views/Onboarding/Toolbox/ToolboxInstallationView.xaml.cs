@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Models.Progress;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Toolbox;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
@@ -15,7 +14,7 @@ namespace Daybreak.Views.Onboarding.Toolbox;
 public partial class ToolboxInstallationView : UserControl
 {
     private readonly ILogger<ToolboxInstallationView> logger;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly IToolboxService toolboxService;
 
     [GenerateDependencyProperty(InitialValue = "")]
@@ -29,12 +28,12 @@ public partial class ToolboxInstallationView : UserControl
 
     public ToolboxInstallationView(
         IToolboxService toolboxService,
-        ILogger<ToolboxInstallationView> logger,
-        IViewManager viewManager)
+        ILogger<ToolboxInstallationView> logger)
+        //IViewManager viewManager)
     {
         this.toolboxService = toolboxService.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.InitializeComponent();
     }
 
@@ -74,6 +73,6 @@ public partial class ToolboxInstallationView : UserControl
 
     private void OpaqueButton_Clicked(object sender, System.EventArgs e)
     {
-        this.viewManager.ShowView<ToolboxSwitchView>();
+        //this.viewManager.ShowView<ToolboxSwitchView>();
     }
 }

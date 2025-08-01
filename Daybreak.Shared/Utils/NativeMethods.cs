@@ -22,6 +22,16 @@ public static class NativeMethods
 
     public delegate nint HookProc(int nCode, nint wParam, nint lParam);
 
+    public enum DWMWINDOWATTRIBUTE { DWMWA_WINDOW_CORNER_PREFERENCE = 33 }
+
+    public enum DWM_WINDOW_CORNER_PREFERENCE
+    {
+        DWMWCP_DEFAULT = 0,
+        DWMWCP_DONOTROUND = 1,
+        DWMWCP_ROUND = 2,
+        DWMWCP_ROUNDSMALL = 3
+    }
+
     [Flags]
     public enum AllocationType : uint
     {
@@ -532,4 +542,7 @@ public static class NativeMethods
     [DllImport("user32.Dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool EnumChildWindows(nint parentHandle, Win32Callback callback, nint lParam);
+
+    [DllImport("dwmapi.dll", CharSet = CharSet.Unicode, PreserveSig = false)]
+    public static extern void DwmSetWindowAttribute(IntPtr hWnd, DWMWINDOWATTRIBUTE attribute, ref DWM_WINDOW_CORNER_PREFERENCE pvAttribute, uint cbAttribute);
 }

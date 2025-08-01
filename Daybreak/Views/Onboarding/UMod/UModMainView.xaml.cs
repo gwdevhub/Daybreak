@@ -1,6 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models.UMod;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.UMod;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
@@ -21,7 +20,7 @@ public partial class UModMainView : UserControl
     private const string WikiLink = "https://code.google.com/archive/p/texmod/wikis/uMod.wiki";
     private const string ModsLink = "https://wiki.guildwars.com/wiki/Player-made_Modifications#Shared_player_content";
 
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly IUModService uModService;
     private readonly ILiveOptions<UModOptions> liveOptions;
     private readonly Queue<Action> queuedSaveActions = new();
@@ -35,11 +34,11 @@ public partial class UModMainView : UserControl
     public ObservableCollection<UModEntry> Mods { get; } = [];
 
     public UModMainView(
-        IViewManager viewManager,
+        //IViewManager viewManager,
         IUModService uModService,
         ILiveOptions<UModOptions> liveOptions)
     {
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.uModService = uModService.ThrowIfNull();
         this.liveOptions = liveOptions.ThrowIfNull();
 
@@ -62,17 +61,17 @@ public partial class UModMainView : UserControl
             action();
         }
 
-        this.viewManager.ShowView<LauncherView>();
+        //this.viewManager.ShowView<LauncherView>();
     }
 
     private void HelpButton_Clicked(object sender, EventArgs e)
     {
-        this.viewManager.ShowView<UModBrowserView>(WikiLink);
+        //this.viewManager.ShowView<UModBrowserView>(WikiLink);
     }
 
     private void BrowserButton_Clicked(object sender, EventArgs e)
     {
-        this.viewManager.ShowView<UModBrowserView>(ModsLink);
+        //this.viewManager.ShowView<UModBrowserView>(ModsLink);
     }
 
     private void NavigateFileButton_Clicked(object sender, EventArgs e)

@@ -85,7 +85,7 @@ internal sealed class PluginsService : IPluginsService
     public void LoadPlugins(
         IServiceManager serviceManager,
         IOptionsProducer optionsProducer,
-        IViewManager viewManager,
+        IViewProducer viewProducer,
         IPostUpdateActionProducer postUpdateActionProducer,
         IStartupActionProducer startupActionProducer,
         INotificationHandlerProducer notificationHandlerProducer,
@@ -96,7 +96,7 @@ internal sealed class PluginsService : IPluginsService
     {
         serviceManager.ThrowIfNull();
         optionsProducer.ThrowIfNull();
-        viewManager.ThrowIfNull();
+        viewProducer.ThrowIfNull();
         postUpdateActionProducer.ThrowIfNull();
         startupActionProducer.ThrowIfNull();
         notificationHandlerProducer.ThrowIfNull();
@@ -166,7 +166,7 @@ internal sealed class PluginsService : IPluginsService
                 pluginScopedLogger.LogDebug("Registered services");
                 RegisterOptions(pluginConfig, optionsProducer);
                 pluginScopedLogger.LogDebug("Registered options");
-                RegisterViews(pluginConfig, viewManager);
+                RegisterViews(pluginConfig, viewProducer);
                 pluginScopedLogger.LogDebug("Registered views");
                 RegisterPostUpdateActions(pluginConfig, postUpdateActionProducer);
                 pluginScopedLogger.LogDebug("Registered post-update actions");
@@ -257,6 +257,11 @@ internal sealed class PluginsService : IPluginsService
         pluginConfig.RegisterServices(serviceCollection);
         foreach(var descriptor in serviceCollection)
         {
+            if (descriptor.ImplementationType is null)
+            {
+                throw new InvalidOperationException($"Failed to register {descriptor.ServiceType.Name}. Missing implementation type");
+            }
+
             switch (descriptor.Lifetime)
             {
                 case ServiceLifetime.Singleton:
@@ -310,7 +315,7 @@ internal sealed class PluginsService : IPluginsService
 
     private static void RegisterOptions(PluginConfigurationBase pluginConfig, IOptionsProducer optionsProducer) => pluginConfig.RegisterOptions(optionsProducer);
 
-    private static void RegisterViews(PluginConfigurationBase pluginConfig, IViewManager viewManager) => pluginConfig.RegisterViews(viewManager);
+    private static void RegisterViews(PluginConfigurationBase pluginConfig, IViewProducer viewProducer) => pluginConfig.RegisterViews(viewProducer);
 
     private static void RegisterPostUpdateActions(PluginConfigurationBase pluginConfig, IPostUpdateActionProducer postUpdateActionProducer) => pluginConfig.RegisterPostUpdateActions(postUpdateActionProducer);
 

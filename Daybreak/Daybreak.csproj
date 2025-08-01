@@ -61,7 +61,6 @@
     <PackageReference Include="Reloaded.Assembler" />
     <PackageReference Include="System.Private.Uri" />
     <PackageReference Include="WPF-UI" />
-    <PackageReference Include="WpfExtended" />
     <PackageReference Include="WpfExtended.SourceGeneration" />
     <PackageReference Include="WpfScreenHelper" />
     <PackageReference Include="WriteableBitmapEx" />

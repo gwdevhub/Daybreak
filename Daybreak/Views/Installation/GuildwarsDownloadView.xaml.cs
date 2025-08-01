@@ -1,14 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
-using System.Windows;
-using System.Core.Extensions;
-using System.Windows.Extensions;
-using System.Windows.Controls;
-using Daybreak.Services.Guildwars.Models;
-using Daybreak.Shared.Services.Menu;
+﻿using Daybreak.Services.Guildwars.Models;
 using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Services.Guildwars;
-using Daybreak.Shared.Services.Navigation;
+using Daybreak.Shared.Services.Menu;
+using Microsoft.Extensions.Logging;
+using System.Core.Extensions;
 using System.Extensions;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Extensions;
 
 namespace Daybreak.Views.Installation;
 
@@ -19,7 +18,7 @@ public partial class GuildWarsDownloadView : UserControl
 {
     private readonly IMenuService menuService;
     private readonly ILogger<GuildWarsDownloadView> logger;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly IGuildWarsInstaller guildwarsInstaller;
     
     private GuildwarsInstallationStatus? installationStatus;
@@ -37,13 +36,13 @@ public partial class GuildWarsDownloadView : UserControl
     public GuildWarsDownloadView(
         IMenuService menuService,
         IGuildWarsInstaller guildwarsInstaller,
-        ILogger<GuildWarsDownloadView> logger,
-        IViewManager viewManager)
+        //IViewManager viewManager,
+        ILogger<GuildWarsDownloadView> logger)
     {
         this.menuService = menuService.ThrowIfNull();
         this.guildwarsInstaller = guildwarsInstaller.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.InitializeComponent();
     }
 
@@ -83,7 +82,7 @@ public partial class GuildWarsDownloadView : UserControl
 
     private void OpaqueButton_Clicked(object sender, System.EventArgs e)
     {
-        this.viewManager.ShowView<LauncherView>();
+        //this.viewManager.ShowView<LauncherView>();
     }
 
     private void DownloadView_Unloaded(object sender, RoutedEventArgs e)

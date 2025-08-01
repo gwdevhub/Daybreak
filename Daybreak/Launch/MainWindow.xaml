@@ -7,7 +7,6 @@
     xmlns:controls="clr-namespace:Daybreak.Controls"
     xmlns:converters="clr-namespace:Daybreak.Shared.Converters;assembly=Daybreak.Shared"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:effects="clr-namespace:System.Windows.Media.Extensions.Effects;assembly=WpfExtended"
     xmlns:glyphs="clr-namespace:Daybreak.Controls.Glyphs"
     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -28,10 +27,6 @@
         <ResourceDictionary>
             <BooleanToVisibilityConverter x:Key="BaseBooleanToVisibilityConverter" />
             <converters:BooleanToEffectConverter x:Key="BooleanToEffectConverter" />
-            <effects:Kuwahara
-                x:Key="PaintifyEffect"
-                TexelHeight="50"
-                TexelWidth="200" />
             <BlurEffect
                 x:Key="BlurEffect"
                 KernelType="Box"

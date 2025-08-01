@@ -1,9 +1,5 @@
-using Daybreak.Shared;
 using Daybreak.Shared.Models;
-using Daybreak.Shared.Services.Themes;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.JSInterop;
 using System.Extensions;
 using System.Windows.Media;
 

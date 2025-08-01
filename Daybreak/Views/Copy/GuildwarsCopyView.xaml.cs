@@ -1,7 +1,5 @@
 ﻿using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Services.Guildwars;
-using Daybreak.Shared.Services.Navigation;
-using Daybreak.Views.Launch;
 using Microsoft.Extensions.Logging;
 using System.ComponentModel;
 using System.Core.Extensions;
@@ -18,7 +16,7 @@ public partial class GuildwarsCopyView : UserControl
 {
     private readonly CancellationTokenSource cancellationTokenSource = new();
     private readonly ILogger<GuildwarsCopyView> logger;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly IGuildWarsCopyService guildwarsCopyService;
     private readonly CopyStatus copyStatus = new();
 
@@ -33,12 +31,12 @@ public partial class GuildwarsCopyView : UserControl
 
     public GuildwarsCopyView(
         IGuildWarsCopyService guildwarsCopyService,
-        ILogger<GuildwarsCopyView> logger,
-        IViewManager viewManager)
+        ILogger<GuildwarsCopyView> logger)
+        //IViewManager viewManager)
     {
         this.guildwarsCopyService = guildwarsCopyService.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.copyStatus.PropertyChanged += this.CopyStatus_PropertyChanged!;
         this.InitializeComponent();
     }
@@ -89,6 +87,6 @@ public partial class GuildwarsCopyView : UserControl
 
     private void HighlightButton_Clicked(object sender, EventArgs e)
     {
-        this.viewManager.ShowView<ExecutablesView>();
+        //this.viewManager.ShowView<ExecutablesView>();
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Daybreak.Services.Guildwars.Models;
 using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Services.Guildwars;
-using Daybreak.Shared.Services.Navigation;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Windows;
@@ -13,16 +12,16 @@ namespace Daybreak.Views.Installation;
 /// </summary>
 public partial class GuildWarsDownloadSelectionView : System.Windows.Controls.UserControl
 {
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly IGuildWarsInstaller guildwarsInstaller;
     private readonly ILogger<GuildWarsDownloadSelectionView> logger;
 
     public GuildWarsDownloadSelectionView(
-        IViewManager viewManager,
+        //IViewManager viewManager,
         IGuildWarsInstaller guildwarsInstaller,
         ILogger<GuildWarsDownloadSelectionView> logger)
     {
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.guildwarsInstaller = guildwarsInstaller.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
         this.InitializeComponent();
@@ -41,7 +40,7 @@ public partial class GuildWarsDownloadSelectionView : System.Windows.Controls.Us
         var result = folderPicker.ShowDialog();
         if (result is DialogResult.Abort or DialogResult.Cancel or DialogResult.No)
         {
-            this.viewManager.ShowView<LauncherView>();
+            //this.viewManager.ShowView<LauncherView>();
             return;
         }
 
@@ -52,7 +51,7 @@ public partial class GuildWarsDownloadSelectionView : System.Windows.Controls.Us
         };
         var folderPath = folderPicker.SelectedPath;
         this.logger.LogDebug("Starting download procedure");
-        this.viewManager.ShowView<GuildWarsDownloadView>(context);
+        //this.viewManager.ShowView<GuildWarsDownloadView>(context);
         var success = await this.guildwarsInstaller.InstallGuildwars(folderPath, context.GuildwarsInstallationStatus, context.CancellationTokenSource.Token);
         if (success is false)
         {

@@ -1,6 +1,5 @@
 ﻿using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Models.Trade;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.TradeChat;
 using System.Core.Extensions;
 using System.Windows;
@@ -12,23 +11,23 @@ namespace Daybreak.Views.Trade;
 /// </summary>
 public partial class QuoteAlertSetupView : UserControl
 {
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly ITradeAlertingService tradeAlertingService;
 
     public List<ItemBase> AvailableItems { get; } = [.. ItemBase.AllItems.Where(i => i.Modifiers is null)];
 
     public QuoteAlertSetupView(
-        IViewManager viewManager,
+        //IViewManager viewManager,
         ITradeAlertingService tradeAlertingService)
     {
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.tradeAlertingService = tradeAlertingService.ThrowIfNull();
         this.InitializeComponent();
     }
 
     private void BackButton_Clicked(object sender, EventArgs e)
     {
-        this.viewManager.ShowView<TradeAlertsView>();
+        //this.viewManager.ShowView<TradeAlertsView>();
     }
 
     private void UserControl_Unloaded(object sender, RoutedEventArgs e)

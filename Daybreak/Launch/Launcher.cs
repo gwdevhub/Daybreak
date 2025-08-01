@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Services.ExceptionHandling;
+using Daybreak.Services.Navigation;
 using Daybreak.Services.Telemetry;
 using Daybreak.Shared;
 using Daybreak.Shared.Models.Progress;
@@ -7,7 +8,6 @@ using Daybreak.Shared.Services.ApplicationArguments;
 using Daybreak.Shared.Services.Browser;
 using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Mods;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Plugins;
@@ -15,8 +15,8 @@ using Daybreak.Shared.Services.Screens;
 using Daybreak.Shared.Services.Startup;
 using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.Updater.PostUpdate;
-using Daybreak.Shared.Services.Window;
 using Daybreak.Shared.Utils;
+using Daybreak.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Slim;
@@ -26,8 +26,8 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
-using System.Windows.Extensions;
 using System.Windows.Media;
+using WpfExtended.Blazor.Launch;
 
 //The following lines are needed to expose internal objects to the test project
 [assembly: InternalsVisibleTo("Daybreak.Tests")]
@@ -38,9 +38,12 @@ using System.Windows.Media;
 ]
 namespace Daybreak.Launch;
 
-public sealed class Launcher : ExtendedApplication<MainWindow>
+public sealed class Launcher : BlazorHybridApplication<App>
 {
     public static Launcher Instance { get; private set; } = default!;
+    public override bool DevToolsEnabled { get; } = true;
+    public override string HostPage { get; } = "wwwroot/Index.html";
+    public override bool ShowTitleBar { get; } = false;
 
     private readonly ProjectConfiguration projectConfiguration = new();
     private readonly string[] launchArguments;
@@ -69,8 +72,6 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
     protected override System.IServiceProvider SetupServiceProvider(IServiceCollection services)
     {
         var serviceManager = new ServiceManager();
-        services.AddBlazorWebViewDeveloperTools();
-        services.AddWpfBlazorWebView();
         this.projectConfiguration.RegisterResolvers(serviceManager);
         serviceManager.RegisterSingleton<SplashWindow>();
         serviceManager.RegisterSingleton<StartupStatus>();
@@ -79,6 +80,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
 
     protected override void RegisterServices(IServiceCollection services)
     {
+        base.RegisterServices(services);
         this.projectConfiguration.RegisterServices(services);
     }
 
@@ -130,8 +132,7 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
     {
         var telemetryHost = this.ServiceProvider.GetRequiredService<TelemetryHost>();
         var serviceManager = this.ServiceProvider.GetRequiredService<IServiceManager>();
-        var viewProducer = this.ServiceProvider.GetRequiredService<IViewManager>();
-        var blazorViewManager = this.ServiceProvider.GetRequiredService<IBlazorViewManager>();
+        var viewProducer = new TrailBlazrViewProducer(serviceManager);
         var postUpdateActionProducer = this.ServiceProvider.GetRequiredService<IPostUpdateActionProducer>();
         var startupActionProducer = this.ServiceProvider.GetRequiredService<IStartupActionProducer>();
         var notificationHandlerProducer = this.ServiceProvider.GetRequiredService<INotificationHandlerProducer>();
@@ -143,14 +144,13 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
         await this.Dispatcher.InvokeAsync(() => 
         {
             // Hide the main window until the application is fully loaded. Main window will be shown by the RestoreWindowPositionStartupAction
-            var mainWindow = this.ServiceProvider.GetRequiredService<MainWindow>();
+            var mainWindow = this.ServiceProvider.GetRequiredService<BlazorHostWindow>();
             mainWindow.Hide();
         });
         await Task.Delay(10);
 
         startupStatus.CurrentStep = StartupStatus.Custom("Loading views");
         this.projectConfiguration.RegisterViews(viewProducer);
-        this.projectConfiguration.RegisterRazorView(blazorViewManager);
         await Task.Delay(10);
 
         startupStatus.CurrentStep = StartupStatus.Custom("Loading post-update actions");
@@ -207,25 +207,12 @@ public sealed class Launcher : ExtendedApplication<MainWindow>
             this.exceptionHandler.HandleException(e);
         }
 
-        await this.Dispatcher.InvokeAsync(this.ServiceProvider.GetRequiredService<IWindowEventsHook<MainWindow>>);
-
-        startupStatus.CurrentStep = StartupStatus.Custom("Registering view container");
-        this.RegisterViewContainer();
-        await Task.Delay(10);
-
         startupStatus.CurrentStep = StartupStatus.Custom("Executing argument handlers");
         this.ServiceProvider.GetRequiredService<IApplicationArgumentService>().HandleArguments(this.launchArguments);
         await Task.Delay(10);
 
         startupStatus.CurrentStep = StartupStatus.Finished;
         await Task.Delay(10);
-    }
-
-    private void RegisterViewContainer()
-    {
-        var viewManager = this.ServiceProvider.GetRequiredService<IViewManager>();
-        var mainWindow = this.ServiceProvider.GetRequiredService<MainWindow>();
-        viewManager.RegisterContainer(mainWindow.Container);
     }
 
     private static int LaunchMainWindow()

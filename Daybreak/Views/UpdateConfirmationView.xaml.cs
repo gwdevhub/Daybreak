@@ -1,5 +1,4 @@
-﻿using Daybreak.Shared.Services.Navigation;
-using Daybreak.Shared.Services.Updater;
+﻿using Daybreak.Shared.Services.Updater;
 using System.Core.Extensions;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,7 +11,7 @@ namespace Daybreak.Views;
 /// </summary>
 public partial class UpdateConfirmationView : UserControl
 {
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly IApplicationUpdater applicationUpdater;
 
     [GenerateDependencyProperty]
@@ -22,10 +21,10 @@ public partial class UpdateConfirmationView : UserControl
     public string changeLog = default!;
 
     public UpdateConfirmationView(
-        IViewManager viewManager,
+        //IViewManager viewManager,
         IApplicationUpdater applicationUpdater)
     {
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.applicationUpdater = applicationUpdater.ThrowIfNull();
         this.InitializeComponent();
     }
@@ -47,11 +46,11 @@ public partial class UpdateConfirmationView : UserControl
 
     private void YesButton_Clicked(object sender, System.EventArgs e)
     {
-        this.viewManager.ShowView<UpdateView>(this.Version);
+        //this.viewManager.ShowView<UpdateView>(this.Version);
     }
 
     private void NoButton_Clicked(object sender, System.EventArgs e)
     {
-        this.viewManager.ShowView<LauncherView>();
+        //this.viewManager.ShowView<LauncherView>();
     }
 }

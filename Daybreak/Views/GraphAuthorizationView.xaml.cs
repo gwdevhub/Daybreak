@@ -1,6 +1,5 @@
 ﻿using Daybreak.Services.Graph;
 using Daybreak.Services.Graph.Models;
-using Daybreak.Shared.Services.Navigation;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Windows;
@@ -15,16 +14,16 @@ public partial class GraphAuthorizationView : UserControl
 {
     private readonly CancellationTokenSource cancellationTokenSource = new();
     private readonly IGraphClient graphClient;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly ILogger<GraphAuthorizationView> logger;
 
     public GraphAuthorizationView(
         IGraphClient graphClient,
-        IViewManager viewManager,
+        //IViewManager viewManager,
         ILogger<GraphAuthorizationView> logger)
     {
         this.graphClient = graphClient.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
 
         this.InitializeComponent();
@@ -36,18 +35,18 @@ public partial class GraphAuthorizationView : UserControl
         if (authorizationResult.TryExtractFailure(out var failure))
         {
             this.logger.LogError(failure, "Authorization failed");
-            this.viewManager.ShowView<LauncherView>();
+            //this.viewManager.ShowView<LauncherView>();
             return;
         }
 
         if (this.DataContext is not ViewRedirectContext redirectContext)
         {
             this.logger.LogError("Cannot redirect to proper view. No view set in context");
-            this.viewManager.ShowView<LauncherView>();
+            //this.viewManager.ShowView<LauncherView>();
             return;
         }
 
-        this.viewManager.ShowView(redirectContext.CallingView!);
+        //this.viewManager.ShowView(redirectContext.CallingView!);
     }
 
     private void UserControl_Unloaded(object sender, RoutedEventArgs e)

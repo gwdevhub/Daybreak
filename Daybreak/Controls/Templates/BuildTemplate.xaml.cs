@@ -4,9 +4,7 @@ using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.BuildTemplates;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Utils;
-using Daybreak.Views;
 using Microsoft.Extensions.DependencyInjection;
 using System.ComponentModel;
 using System.Core.Extensions;
@@ -30,7 +28,7 @@ public partial class BuildTemplate : UserControl
     private const string AttributePointInfo = "Attribute_point";
 
     private readonly IBuildTemplateManager buildTemplateManager;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly IAttributePointCalculator attributePointCalculator;
     private readonly CancellationTokenSource? cancellationTokenSource = new();
 
@@ -57,7 +55,7 @@ public partial class BuildTemplate : UserControl
 
     public BuildTemplate()
         : this(Global.GlobalServiceProvider.GetRequiredService<IBuildTemplateManager>(),
-              Global.GlobalServiceProvider.GetRequiredService<IViewManager>(),
+              //Global.GlobalServiceProvider.GetRequiredService<IViewManager>(),
               Global.GlobalServiceProvider.GetRequiredService<IAttributePointCalculator>())
     {
         
@@ -65,11 +63,11 @@ public partial class BuildTemplate : UserControl
     
     public BuildTemplate(
         IBuildTemplateManager buildTemplateManager,
-        IViewManager viewManager,
+        //IViewManager viewManager,
         IAttributePointCalculator attributePointCalculator)
     {
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.attributePointCalculator = attributePointCalculator.ThrowIfNull();
 
         this.InitializeComponent();
@@ -464,6 +462,6 @@ public partial class BuildTemplate : UserControl
         }
 
         e.Build!.Name = e.PreferredName ?? Guid.NewGuid().ToString();
-        this.viewManager.ShowView<SingleBuildTemplateView>(e.Build);
+        //this.viewManager.ShowView<SingleBuildTemplateView>(e.Build);
     }
 }

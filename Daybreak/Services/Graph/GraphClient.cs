@@ -4,8 +4,6 @@ using Daybreak.Controls;
 using Daybreak.Services.Graph.Models;
 using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Services.BuildTemplates;
-using Daybreak.Shared.Services.Navigation;
-using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Collections.Specialized;
@@ -47,7 +45,7 @@ internal sealed class GraphClient : IGraphClient
     private static readonly string ApplicationId = SecretManager.GetSecret(SecretKeys.AadApplicationId);
 
     private readonly IBuildTemplateManager buildTemplateManager;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly ILiveUpdateableOptions<SynchronizationOptions> liveUpdateableOptions;
     private readonly IHttpClient<GraphClient> httpClient;
     private readonly ILogger<GraphClient> logger;
@@ -56,13 +54,13 @@ internal sealed class GraphClient : IGraphClient
 
     public GraphClient(
         IBuildTemplateManager buildTemplateManager,
-        IViewManager viewManager,
+        //IViewManager viewManager,
         ILiveUpdateableOptions<SynchronizationOptions> liveUpdateableOptions,
         IHttpClient<GraphClient> httpClient,
         ILogger<GraphClient> logger)
     {
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
         this.httpClient = httpClient.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
@@ -108,7 +106,7 @@ internal sealed class GraphClient : IGraphClient
         var authCode = this.LoadAccessToken();
         if (authCode.ExtractValue() is not AccessToken accessToken)
         {
-            this.viewManager.ShowView<GraphAuthorizationView>(new ViewRedirectContext { CallingView = typeof(TViewType) });
+            //this.viewManager.ShowView<GraphAuthorizationView>(new ViewRedirectContext { CallingView = typeof(TViewType) });
             return new InvalidOperationException("Client is not authorized");
         }
 
@@ -117,7 +115,7 @@ internal sealed class GraphClient : IGraphClient
             var maybeToken = await this.RefreshAccessToken();
             if (maybeToken.ExtractValue() is not TokenResponse tokenResponse)
             {
-                this.viewManager.ShowView<GraphAuthorizationView>(new ViewRedirectContext { CallingView = typeof(TViewType) });
+                //this.viewManager.ShowView<GraphAuthorizationView>(new ViewRedirectContext { CallingView = typeof(TViewType) });
                 return new InvalidOperationException("Client authorization expired");
             }
 
@@ -129,7 +127,7 @@ internal sealed class GraphClient : IGraphClient
         var response = await this.httpClient.GetAsync(ProfileEndpoint);
         if (response.IsSuccessStatusCode is false)
         {
-            this.viewManager.ShowView<GraphAuthorizationView>(new ViewRedirectContext { CallingView = typeof(TViewType) });
+            //this.viewManager.ShowView<GraphAuthorizationView>(new ViewRedirectContext { CallingView = typeof(TViewType) });
             return new InvalidOperationException($"Failed to load profile. Response status code [{response.StatusCode}]");
         }
 

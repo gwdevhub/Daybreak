@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Models.Guildwars;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Daybreak.Tests.Models;
 

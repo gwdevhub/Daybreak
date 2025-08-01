@@ -5,9 +5,7 @@ using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Models.FocusView;
 using Daybreak.Shared.Services.Api;
 using Daybreak.Shared.Services.BuildTemplates;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Notifications;
-using Daybreak.Views;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;
@@ -27,7 +25,7 @@ public partial class BuildComponent : UserControl
     private readonly INotificationService notificationService;
     private readonly IBuildTemplateManager buildTemplateManager;
     private readonly IAttachedApiAccessor attachedApiAccessor;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
 
     private bool buildsInitialized = false;
     private List<IBuildEntry>? cachedBuilds;
@@ -45,7 +43,7 @@ public partial class BuildComponent : UserControl
 
     public BuildComponent()
         : this(Global.GlobalServiceProvider.GetRequiredService<INotificationService>(),
-               Global.GlobalServiceProvider.GetRequiredService<IViewManager>(),
+               //Global.GlobalServiceProvider.GetRequiredService<IViewManager>(),
                Global.GlobalServiceProvider.GetRequiredService<IAttachedApiAccessor>(),
                Global.GlobalServiceProvider.GetRequiredService<IBuildTemplateManager>())
     { 
@@ -53,12 +51,12 @@ public partial class BuildComponent : UserControl
 
     public BuildComponent(
         INotificationService notificationService,
-        IViewManager viewManager,
+        //IViewManager viewManager,
         IAttachedApiAccessor attachedApiAccessor,
         IBuildTemplateManager buildTemplateManager)
     {
         this.notificationService = notificationService.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.attachedApiAccessor = attachedApiAccessor.ThrowIfNull();
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
         this.InitializeComponent();
@@ -114,7 +112,7 @@ public partial class BuildComponent : UserControl
         try
         {
             var singleBuildEntry = this.buildTemplateManager.CreateSingleBuild(buildEntry);
-            this.viewManager.ShowView<SingleBuildTemplateView>(singleBuildEntry);
+            //this.viewManager.ShowView<SingleBuildTemplateView>(singleBuildEntry);
         }
         catch
         {
@@ -141,7 +139,7 @@ public partial class BuildComponent : UserControl
         try
         {
             var teamBuildEntry = this.buildTemplateManager.CreateTeamBuild(partyLoadout);
-            this.viewManager.ShowView<TeamBuildTemplateView>(teamBuildEntry);
+            //this.viewManager.ShowView<TeamBuildTemplateView>(teamBuildEntry);
         }
         catch
         {

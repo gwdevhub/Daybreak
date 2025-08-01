@@ -2,7 +2,6 @@
 using Daybreak.Controls.Templates;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.ApplicationLauncher;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Screens;
 using System.Configuration;
 using System.Extensions;
@@ -20,7 +19,7 @@ namespace Daybreak.Views;
 public partial class ScreenChoiceView : UserControl
 {        
     private readonly IScreenManager screenManager;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly ILiveUpdateableOptions<LauncherOptions> liveOptions;
     private readonly IApplicationLauncher applicationLauncher;
     private int selectedId;
@@ -29,12 +28,12 @@ public partial class ScreenChoiceView : UserControl
     private bool canTest;
 
     public ScreenChoiceView(
-        IViewManager viewManager,
+        //IViewManager viewManager,
         IScreenManager screenManager,
         ILiveUpdateableOptions<LauncherOptions> liveOptions,
         IApplicationLauncher applicationLauncher)
     {
-        this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
+        //this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
         this.screenManager = screenManager.ThrowIfNull(nameof(screenManager));
         this.liveOptions = liveOptions.ThrowIfNull(nameof(liveOptions));
         this.applicationLauncher = applicationLauncher.ThrowIfNull(nameof(applicationLauncher));
@@ -108,6 +107,6 @@ public partial class ScreenChoiceView : UserControl
     {
         this.liveOptions.Value.DesiredGuildwarsScreen = this.selectedId;
         this.liveOptions.UpdateOption();
-        this.viewManager.ShowView<LauncherView>();
+        //this.viewManager.ShowView<LauncherView>();
     }
 }

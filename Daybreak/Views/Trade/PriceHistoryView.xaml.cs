@@ -1,6 +1,5 @@
 ﻿using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Models.Trade;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.TradeChat;
 using LiveChartsCore;
 using LiveChartsCore.Defaults;
@@ -23,7 +22,7 @@ namespace Daybreak.Views.Trade;
 /// </summary>
 public partial class PriceHistoryView : UserControl
 {
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly IPriceHistoryService priceHistoryService;
     private readonly List<TraderQuote> traderQuotes = [];
     private readonly SolidColorPaint backgroundPaint;
@@ -55,10 +54,10 @@ public partial class PriceHistoryView : UserControl
     private bool loading = false;
 
     public PriceHistoryView(
-        IViewManager viewManager,
+        //IViewManager viewManager,
         IPriceHistoryService priceHistoryService)
     {
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.priceHistoryService = priceHistoryService.ThrowIfNull();
         this.InitializeComponent();
 
@@ -78,7 +77,7 @@ public partial class PriceHistoryView : UserControl
 
     private void BackButton_Clicked(object sender, EventArgs e)
     {
-        this.viewManager.ShowView<PriceQuotesView>();
+        //this.viewManager.ShowView<PriceQuotesView>();
     }
 
     private async void FetchPriceHistory()

@@ -1,6 +1,5 @@
 ﻿using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Services.DirectSong;
-using Daybreak.Shared.Services.Navigation;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Extensions;
@@ -15,7 +14,7 @@ namespace Daybreak.Views.Onboarding.DirectSong;
 public partial class DirectSongInstallationView : UserControl
 {
     private readonly ILogger<DirectSongInstallationView> logger;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly IDirectSongService directSongService;
 
     [GenerateDependencyProperty(InitialValue = "")]
@@ -31,12 +30,12 @@ public partial class DirectSongInstallationView : UserControl
 
     public DirectSongInstallationView(
         IDirectSongService directSongService,
-        ILogger<DirectSongInstallationView> logger,
-        IViewManager viewManager)
+        ILogger<DirectSongInstallationView> logger)
+        //IViewManager viewManager)
     {
         this.directSongService = directSongService.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.InitializeComponent();
     }
 
@@ -96,6 +95,6 @@ public partial class DirectSongInstallationView : UserControl
 
     private void OpaqueButton_Clicked(object sender, System.EventArgs e)
     {
-        this.viewManager.ShowView<DirectSongSwitchView>();
+        //this.viewManager.ShowView<DirectSongSwitchView>();
     }
 }

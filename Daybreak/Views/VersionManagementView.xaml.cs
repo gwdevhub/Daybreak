@@ -1,5 +1,4 @@
-﻿using Daybreak.Shared.Services.Navigation;
-using Daybreak.Shared.Services.Updater;
+﻿using Daybreak.Shared.Services.Updater;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Extensions;
@@ -18,7 +17,7 @@ public partial class VersionManagementView : UserControl
     private const string ReleaseURL = $"https://github.com/AlexMacocian/Daybreak/releases/tag/{VersionPlaceholder}";
 
     private readonly IApplicationUpdater applicationUpdater;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
 
     [GenerateDependencyProperty]
     private Version currentVersion;
@@ -29,11 +28,11 @@ public partial class VersionManagementView : UserControl
     public ObservableCollection<Version> Versions { get; } = [];
 
     public VersionManagementView(
-        IApplicationUpdater applicationUpdater,
-        IViewManager viewManager)
+        IApplicationUpdater applicationUpdater)
+        //IViewManager viewManager)
     {
         this.applicationUpdater = applicationUpdater.ThrowIfNull(nameof(applicationUpdater));
-        this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
+        //this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
         this.InitializeComponent();
         this.currentVersion = this.applicationUpdater.CurrentVersion;
         this.CurrentVersion = this.applicationUpdater.CurrentVersion;
@@ -79,6 +78,6 @@ public partial class VersionManagementView : UserControl
             return;
         }
 
-        this.viewManager.ShowView<UpdateConfirmationView>(desiredVersion);
+        //this.viewManager.ShowView<UpdateConfirmationView>(desiredVersion);
     }
 }

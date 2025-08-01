@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Models.Progress;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.UMod;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
@@ -15,7 +14,7 @@ namespace Daybreak.Views.Onboarding.UMod;
 public partial class UModInstallingView : UserControl
 {
     private readonly ILogger<UModInstallingView> logger;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly IUModService uModService;
 
     [GenerateDependencyProperty(InitialValue = "")]
@@ -29,12 +28,12 @@ public partial class UModInstallingView : UserControl
 
     public UModInstallingView(
         IUModService uModService,
-        ILogger<UModInstallingView> logger,
-        IViewManager viewManager)
+        ILogger<UModInstallingView> logger)
+        //IViewManager viewManager)
     {
         this.uModService = uModService.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.InitializeComponent();
     }
 
@@ -75,6 +74,6 @@ public partial class UModInstallingView : UserControl
 
     private void OpaqueButton_Clicked(object sender, System.EventArgs e)
     {
-        this.viewManager.ShowView<UModMainView>();
+        //this.viewManager.ShowView<UModMainView>();
     }
 }

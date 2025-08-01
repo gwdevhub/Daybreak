@@ -3,9 +3,7 @@ using Daybreak.Shared.Models.Notifications;
 using Daybreak.Shared.Models.Notifications.Handling;
 using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Services.Guildwars;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Notifications;
-using Daybreak.Views.Installation;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Extensions;
@@ -13,12 +11,12 @@ using System.IO;
 
 namespace Daybreak.Services.Guildwars;
 internal sealed class GuildWarsUpdateNotificationHandler(
-    IViewManager viewManager,
+    //IViewManager viewManager,
     IGuildWarsInstaller guildWarsInstaller,
     INotificationService notificationService,
     ILogger<GuildWarsUpdateNotificationHandler> logger) : INotificationHandler
 {
-    private readonly IViewManager viewManager = viewManager.ThrowIfNull();
+    //private readonly IViewManager viewManager = viewManager.ThrowIfNull();
     private readonly IGuildWarsInstaller guildWarsInstaller = guildWarsInstaller.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly ILogger<GuildWarsUpdateNotificationHandler> logger = logger.ThrowIfNull();
@@ -44,7 +42,7 @@ internal sealed class GuildWarsUpdateNotificationHandler(
         var status = new GuildwarsInstallationStatus();
         var cancellationTokenSource = new CancellationTokenSource();
         var context = new GuildWarsDownloadContext { CancellationTokenSource = cancellationTokenSource, GuildwarsInstallationStatus = status };
-        this.viewManager.ShowView<GuildWarsDownloadView>(context);
+        //this.viewManager.ShowView<GuildWarsDownloadView>(context);
         var response = await this.guildWarsInstaller.UpdateGuildwars(path, status, cancellationTokenSource.Token);
         scopedLogger.LogDebug($"Update result {response}");
     }

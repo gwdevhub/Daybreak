@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Models.Trade;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Notifications;
 using System.Core.Extensions;
 using System.Windows;
@@ -13,14 +12,14 @@ namespace Daybreak.Views.Trade;
 public partial class TradeNotificationView : UserControl
 {
     private readonly INotificationService notificationService;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
 
     public TradeNotificationView(
-        INotificationService notificationService,
-        IViewManager viewManager)
+        INotificationService notificationService)
+        //IViewManager viewManager)
     {
         this.notificationService = notificationService.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.InitializeComponent();
     }
 
@@ -44,6 +43,6 @@ public partial class TradeNotificationView : UserControl
 
     private void TradeChatMessageTemplate_CloseButtonClicked(object _, EventArgs e)
     {
-        this.viewManager.ShowView<NotificationsView>();
+        //this.viewManager.ShowView<NotificationsView>();
     }
 }

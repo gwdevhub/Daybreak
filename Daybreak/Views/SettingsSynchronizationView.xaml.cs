@@ -1,6 +1,5 @@
 ﻿using Daybreak.Services.Graph;
 using Daybreak.Shared.Models;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Options;
 using DiffPlex;
 using DiffPlex.DiffBuilder;
@@ -22,7 +21,7 @@ public partial class SettingsSynchronizationView : UserControl
     private readonly SimpleHighlightingBrush simpleGreenHighlightingBrush;
     private readonly SimpleHighlightingBrush simpleRedHighlightingBrush;
     private readonly SimpleHighlightingBrush simpleForegroundHighlightingBrush;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly IGraphClient graphClient;
     private readonly IOptionsSynchronizationService optionsSynchronizationService;
 
@@ -45,11 +44,11 @@ public partial class SettingsSynchronizationView : UserControl
     private bool synchronized;
 
     public SettingsSynchronizationView(
-        IViewManager viewManager,
+        //IViewManager viewManager,
         IGraphClient graphClient,
         IOptionsSynchronizationService optionsSynchronizationService)
     {
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.graphClient = graphClient.ThrowIfNull();
         this.optionsSynchronizationService = optionsSynchronizationService.ThrowIfNull();
 

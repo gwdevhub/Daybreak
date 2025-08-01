@@ -28,6 +28,8 @@
     <PackageReference Include="SystemExtensions.NetCore" />
     <PackageReference Include="SystemExtensions.NetStandard.DependencyInjection" />
     <PackageReference Include="SystemExtensions.NetStandard.Generators" PrivateAssets="all" />
+    <PackageReference Include="TrailBlazr" />
+    <PackageReference Include="WpfExtended.Blazor" />
   </ItemGroup>
 
   <Target Name="RemoveDuplicateAnalyzers" BeforeTargets="CoreCompile">

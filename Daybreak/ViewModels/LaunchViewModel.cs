@@ -1,8 +1,8 @@
-﻿using Daybreak.Shared.Models.Views;
-using Daybreak.Views;
+﻿using Daybreak.Views;
+using TrailBlazr.ViewModels;
 
 namespace Daybreak.ViewModels;
-public sealed class LaunchViewModel : DaybreakViewModel<LaunchViewModel, LaunchView>
+public sealed class LaunchViewModel : ViewModelBase<LaunchViewModel, LaunchView>
 {
     public override ValueTask Initialize(CancellationToken cancellationToken)
     {

@@ -3,7 +3,6 @@ using Daybreak.Shared.Models.LaunchConfigurations;
 using Daybreak.Shared.Services.Credentials;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.LaunchConfigurations;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Notifications;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;
@@ -22,7 +21,7 @@ public partial class LaunchConfigurationView : UserControl
     private readonly ILaunchConfigurationService launchConfigurationService;
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager;
     private readonly ICredentialManager credentialManager;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
 
     [GenerateDependencyProperty]
     private LoginCredentials selectedCredentials = default!;
@@ -38,14 +37,14 @@ public partial class LaunchConfigurationView : UserControl
         INotificationService notificationService,
         ILaunchConfigurationService launchConfigurationService,
         IGuildWarsExecutableManager guildWarsExecutableManager,
-        ICredentialManager credentialManager,
-        IViewManager viewManager)
+        ICredentialManager credentialManager)
+        //IViewManager viewManager)
     {
         this.notificationService = notificationService.ThrowIfNull();
         this.launchConfigurationService = launchConfigurationService.ThrowIfNull();
         this.guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
         this.credentialManager = credentialManager.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
 
         this.InitializeComponent();
     }
@@ -77,7 +76,7 @@ public partial class LaunchConfigurationView : UserControl
 
     private void BackButton_Clicked(object sender, EventArgs e)
     {
-        this.viewManager.ShowView<LaunchConfigurationsView>();
+        //this.viewManager.ShowView<LaunchConfigurationsView>();
     }
 
     private void SaveButton_Clicked(object sender, EventArgs e)
@@ -98,6 +97,6 @@ public partial class LaunchConfigurationView : UserControl
             return;
         }
 
-        this.viewManager.ShowView<LaunchConfigurationsView>();
+        //this.viewManager.ShowView<LaunchConfigurationsView>();
     }
 }

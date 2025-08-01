@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Services.DSOAL;
-using Daybreak.Shared.Services.Navigation;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Windows;
@@ -12,16 +11,16 @@ namespace Daybreak.Views.Onboarding.DSOAL;
 public partial class DSOALOnboardingEntryView : UserControl
 {
     private readonly IDSOALService dsoalService;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly ILogger<DSOALOnboardingEntryView> logger;
 
     public DSOALOnboardingEntryView(
         IDSOALService dsoalService,
-        IViewManager viewManager,
+        //IViewManager viewManager,
         ILogger<DSOALOnboardingEntryView> logger)
     {
         this.dsoalService = dsoalService.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
 
         this.InitializeComponent();
@@ -31,11 +30,11 @@ public partial class DSOALOnboardingEntryView : UserControl
     {
         if (this.dsoalService.IsInstalled)
         {
-            this.viewManager.ShowView<DSOALSwitchView>();
+            //this.viewManager.ShowView<DSOALSwitchView>();
         }
         else
         {
-            this.viewManager.ShowView<DSOALInstallingView>();
+            //this.viewManager.ShowView<DSOALInstallingView>();
         }
     }
 }

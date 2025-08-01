@@ -1,6 +1,5 @@
 ﻿using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Services.DSOAL;
-using Daybreak.Shared.Services.Navigation;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Extensions;
@@ -15,7 +14,7 @@ namespace Daybreak.Views.Onboarding.DSOAL;
 public partial class DSOALInstallingView : UserControl
 {
     private readonly ILogger<DSOALInstallingView> logger;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly IDSOALService dSOALService;
 
     [GenerateDependencyProperty(InitialValue = "")]
@@ -29,12 +28,12 @@ public partial class DSOALInstallingView : UserControl
 
     public DSOALInstallingView(
         IDSOALService dSOALService,
-        ILogger<DSOALInstallingView> logger,
-        IViewManager viewManager)
+        ILogger<DSOALInstallingView> logger)
+        //IViewManager viewManager)
     {
         this.dSOALService = dSOALService.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.InitializeComponent();
     }
 
@@ -75,6 +74,6 @@ public partial class DSOALInstallingView : UserControl
 
     private void OpaqueButton_Clicked(object sender, System.EventArgs e)
     {
-        this.viewManager.ShowView<DSOALSwitchView>();
+        //this.viewManager.ShowView<DSOALSwitchView>();
     }
 }

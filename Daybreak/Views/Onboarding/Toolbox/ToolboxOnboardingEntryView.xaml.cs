@@ -1,5 +1,4 @@
-﻿using Daybreak.Shared.Services.Navigation;
-using Daybreak.Shared.Services.Toolbox;
+﻿using Daybreak.Shared.Services.Toolbox;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Windows.Controls;
@@ -11,16 +10,16 @@ namespace Daybreak.Views.Onboarding.Toolbox;
 public partial class ToolboxOnboardingEntryView : UserControl
 {
     private readonly IToolboxService toolboxService;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly ILogger<ToolboxOnboardingEntryView> logger;
 
     public ToolboxOnboardingEntryView(
         IToolboxService toolboxService,
-        IViewManager viewManager,
+        //IViewManager viewManager,
         ILogger<ToolboxOnboardingEntryView> logger)
     {
         this.toolboxService = toolboxService.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
 
         this.InitializeComponent();
@@ -30,11 +29,11 @@ public partial class ToolboxOnboardingEntryView : UserControl
     {
         if (this.toolboxService.IsInstalled)
         {
-            this.viewManager.ShowView<ToolboxSwitchView>();
+            //this.viewManager.ShowView<ToolboxSwitchView>();
         }
         else
         {
-            this.viewManager.ShowView<ToolboxInstallationChoiceView>();
+            //this.viewManager.ShowView<ToolboxInstallationChoiceView>();
         }
     }
 }

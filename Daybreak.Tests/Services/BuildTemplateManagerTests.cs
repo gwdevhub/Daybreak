@@ -3,7 +3,6 @@ using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.BuildTemplates;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Attribute = Daybreak.Shared.Models.Guildwars.Attribute;
 

@@ -2,7 +2,6 @@
 using Daybreak.Controls.Buttons;
 using Daybreak.Controls.Options;
 using Daybreak.Shared.Models.Options;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Validators;
 using System.Collections.ObjectModel;
@@ -21,7 +20,7 @@ namespace Daybreak.Views;
 /// </summary>
 public partial class OptionSectionView : UserControl
 {
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly IOptionsProvider optionsProvider;
 
     private object currentOptions = new();
@@ -32,10 +31,10 @@ public partial class OptionSectionView : UserControl
     public ObservableCollection<OptionEntry> OptionEntries { get; } = [];
 
     public OptionSectionView(
-        IViewManager viewManager,
+        //IViewManager viewManager,
         IOptionsProvider optionsProvider)
     {
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.optionsProvider = optionsProvider.ThrowIfNull();
 
         this.InitializeComponent();
@@ -104,7 +103,7 @@ public partial class OptionSectionView : UserControl
     private void SaveButton_Clicked(object sender, EventArgs e)
     {
         this.optionsProvider.SaveRegisteredOptions(this.currentOptions);
-        this.viewManager.ShowView<LauncherView>();
+        //this.viewManager.ShowView<LauncherView>();
     }
 
     private void GetAndSetCurrentValue(Type optionType)
@@ -345,7 +344,7 @@ public partial class OptionSectionView : UserControl
             return;
         }
 
-        this.viewManager.ShowView(optionSetter.CustomSetterViewType!);
+        //this.viewManager.ShowView(optionSetter.CustomSetterViewType!);
     }
 
     private void HelpButton_Clicked(object sender, EventArgs e)

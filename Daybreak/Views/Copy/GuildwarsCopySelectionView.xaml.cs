@@ -1,7 +1,5 @@
 ﻿using Daybreak.Controls.Buttons;
-using Daybreak.Shared.Models.Onboarding;
 using Daybreak.Shared.Services.ExecutableManagement;
-using Daybreak.Shared.Services.Navigation;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Extensions;
@@ -15,7 +13,7 @@ namespace Daybreak.Views.Copy;
 /// </summary>
 public partial class GuildwarsCopySelectionView : UserControl
 {
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager;
     private readonly ILogger<GuildwarsCopySelectionView> logger;
 
@@ -23,11 +21,11 @@ public partial class GuildwarsCopySelectionView : UserControl
     private IEnumerable<string> existingPaths = default!;
 
     public GuildwarsCopySelectionView(
-        IViewManager viewManager,
+        //IViewManager viewManager,
         IGuildWarsExecutableManager guildWarsExecutableManager,
         ILogger<GuildwarsCopySelectionView> logger)
     {
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
         this.InitializeComponent();
@@ -39,7 +37,7 @@ public partial class GuildwarsCopySelectionView : UserControl
         this.ExistingPaths = executables;
         if (executables.None())
         {
-            this.viewManager.ShowView<LauncherOnboardingView>(LauncherOnboardingStage.NeedsExecutable);
+            //this.viewManager.ShowView<LauncherOnboardingView>(LauncherOnboardingStage.NeedsExecutable);
         }
     }
 
@@ -51,6 +49,6 @@ public partial class GuildwarsCopySelectionView : UserControl
             return;
         }
 
-        this.viewManager.ShowView<GuildwarsCopyView>(path);
+        //this.viewManager.ShowView<GuildwarsCopyView>(path);
     }
 }

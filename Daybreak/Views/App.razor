@@ -61,7 +61,7 @@
             <!-- Content Area -->
             <div class="content-area">
                 <div class="page-content">
-                    <DynamicComponent Type="@this.ViewModel.CurrentViewType" Parameters="@this.ViewModel.CurrentViewParameters" />
+                    <ViewContainer />
                 </div>
             </div>
 
@@ -92,7 +92,7 @@
 
 @code {
     [Inject]
-    public required AppViewModel ViewModel { get; set; }
+    public required AppViewModel ViewModel { get; init; }
 
     private static readonly Icon NavigationIcon = new Regular.Size16.Navigation();
     private static readonly Icon BugIcon = new Regular.Size16.Bug();

@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Services.DXVK;
-using Daybreak.Shared.Services.Navigation;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Windows;
@@ -12,16 +11,16 @@ namespace Daybreak.Views.Onboarding.DXVK;
 public partial class DXVKOnboardingEntryView : UserControl
 {
     private readonly IDXVKService dXVKService;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly ILogger<DXVKOnboardingEntryView> logger;
 
     public DXVKOnboardingEntryView(
         IDXVKService dXVKService,
-        IViewManager viewManager,
+        //IViewManager viewManager,
         ILogger<DXVKOnboardingEntryView> logger)
     {
         this.dXVKService = dXVKService.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
 
         this.InitializeComponent();
@@ -31,11 +30,11 @@ public partial class DXVKOnboardingEntryView : UserControl
     {
         if (this.dXVKService.IsInstalled)
         {
-            this.viewManager.ShowView<DXVKSwitchView>();
+            //this.viewManager.ShowView<DXVKSwitchView>();
         }
         else
         {
-            this.viewManager.ShowView<DXVKInstallationChoiceView>();
+            //this.viewManager.ShowView<DXVKInstallationChoiceView>();
         }
     }
 }

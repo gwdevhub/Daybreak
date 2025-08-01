@@ -1,7 +1,6 @@
 ﻿using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Services.BuildTemplates;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Toolbox;
 using Daybreak.Shared.Utils;
 using System.Core.Extensions;
@@ -17,7 +16,7 @@ namespace Daybreak.Views;
 public partial class BuildsListView : UserControl
 {
     private readonly IToolboxService toolboxService;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly IBuildTemplateManager buildTemplateManager;
 
     private IEnumerable<IBuildEntry>? buildEntries;
@@ -28,11 +27,11 @@ public partial class BuildsListView : UserControl
     public SortedObservableCollection<IBuildEntry, string> BuildEntries { get; } = new SortedObservableCollection<IBuildEntry, string>(entry => entry.Name!);
 
     public BuildsListView(
-        IViewManager viewManager,
+        //IViewManager viewManager,
         IToolboxService toolboxService,
         IBuildTemplateManager buildTemplateManager)
     {
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.toolboxService = toolboxService.ThrowIfNull();
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
         this.InitializeComponent();
@@ -51,14 +50,14 @@ public partial class BuildsListView : UserControl
 
     private void AddSingleButton_Clicked(object sender, EventArgs e)
     {
-        var build = this.buildTemplateManager.CreateSingleBuild();
-        this.viewManager.ShowView<SingleBuildTemplateView>(build);
+        //var build = this.buildTemplateManager.CreateSingleBuild();
+        //this.viewManager.ShowView<SingleBuildTemplateView>(build);
     }
 
     private void AddTeamButton_Clicked(object sender, EventArgs e)
     {
-        var build = this.buildTemplateManager.CreateTeamBuild();
-        this.viewManager.ShowView<TeamBuildTemplateView>(build);
+        //var build = this.buildTemplateManager.CreateTeamBuild();
+        //this.viewManager.ShowView<TeamBuildTemplateView>(build);
     }
 
     private void BuildEntryTemplate_RemoveClicked(object _, IBuildEntry e)
@@ -95,18 +94,18 @@ public partial class BuildsListView : UserControl
 
     private void SynchronizeButton_Clicked(object _, EventArgs __)
     {
-        this.viewManager.ShowView<BuildsSynchronizationView>();
+        //this.viewManager.ShowView<BuildsSynchronizationView>();
     }
 
     private void BuildEntryTemplate_EntryClicked(object _, IBuildEntry e)
     {
         if (e is SingleBuildEntry)
         {
-            this.viewManager.ShowView<SingleBuildTemplateView>(e);
+            //this.viewManager.ShowView<SingleBuildTemplateView>(e);
         }
         else if (e is TeamBuildEntry)
         {
-            this.viewManager.ShowView<TeamBuildTemplateView>(e);
+            //this.viewManager.ShowView<TeamBuildTemplateView>(e);
         }
     }
 }

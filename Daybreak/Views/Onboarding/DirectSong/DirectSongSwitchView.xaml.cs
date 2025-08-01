@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Services.DirectSong;
-using Daybreak.Shared.Services.Navigation;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Windows.Controls;
@@ -12,7 +11,7 @@ namespace Daybreak.Views.Onboarding.DirectSong;
 public partial class DirectSongSwitchView : UserControl
 {
     private readonly IDirectSongService directSongService;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly ILogger<DirectSongSwitchView> logger;
 
     [GenerateDependencyProperty]
@@ -20,11 +19,11 @@ public partial class DirectSongSwitchView : UserControl
 
     public DirectSongSwitchView(
         IDirectSongService directSongService,
-        IViewManager viewManager,
+        //IViewManager viewManager,
         ILogger<DirectSongSwitchView> logger)
     {
         this.directSongService = directSongService.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
 
         this.InitializeComponent();
@@ -33,13 +32,13 @@ public partial class DirectSongSwitchView : UserControl
 
     private void OpaqueButtonNo_Clicked(object sender, System.EventArgs e)
     {
-        this.viewManager.ShowView<LauncherView>();
+        //this.viewManager.ShowView<LauncherView>();
     }
 
     private void OpaqueButtonYes_Clicked(object sender, System.EventArgs e)
     {
         this.directSongService.IsEnabled = !this.directSongService.IsEnabled;
-        this.viewManager.ShowView<LauncherView>();
+        //this.viewManager.ShowView<LauncherView>();
     }
 
     private void Wiki_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)

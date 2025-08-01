@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Services.DirectSong;
-using Daybreak.Shared.Services.Navigation;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Windows.Controls;
@@ -11,16 +10,16 @@ namespace Daybreak.Views.Onboarding.DirectSong;
 public partial class DirectSongOnboardingEntryView : UserControl
 {
     private readonly IDirectSongService directSongService;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly ILogger<DirectSongOnboardingEntryView> logger;
 
     public DirectSongOnboardingEntryView(
         IDirectSongService directSongService,
-        IViewManager viewManager,
+        //IViewManager viewManager,
         ILogger<DirectSongOnboardingEntryView> logger)
     {
         this.directSongService = directSongService.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
 
         this.InitializeComponent();
@@ -30,15 +29,15 @@ public partial class DirectSongOnboardingEntryView : UserControl
     {
         if (this.directSongService.IsInstalled)
         {
-            this.viewManager.ShowView<DirectSongSwitchView>();
+            //this.viewManager.ShowView<DirectSongSwitchView>();
         }
         else if (this.directSongService.CachedInstallationStatus is not null)
         {
-            this.viewManager.ShowView<DirectSongInstallationView>();
+            //this.viewManager.ShowView<DirectSongInstallationView>();
         }
         else
         {
-            this.viewManager.ShowView<DirectSongInstallationChoiceView>();
+            //this.viewManager.ShowView<DirectSongInstallationChoiceView>();
         }
     }
 }

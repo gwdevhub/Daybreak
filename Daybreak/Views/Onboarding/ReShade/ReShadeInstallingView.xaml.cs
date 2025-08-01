@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Models.Progress;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.ReShade;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
@@ -16,7 +15,7 @@ public partial class ReShadeInstallingView : UserControl
 {
     private readonly CancellationTokenSource cancellationTokenSource = new();
     private readonly ILogger<ReShadeInstallingView> logger;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly IReShadeService reShadeService;
 
     [GenerateDependencyProperty(InitialValue = "")]
@@ -30,12 +29,12 @@ public partial class ReShadeInstallingView : UserControl
 
     public ReShadeInstallingView(
         IReShadeService reShadeService,
-        ILogger<ReShadeInstallingView> logger,
-        IViewManager viewManager)
+        ILogger<ReShadeInstallingView> logger)
+        //IViewManager viewManager)
     {
         this.reShadeService = reShadeService.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.InitializeComponent();
     }
 
@@ -76,7 +75,7 @@ public partial class ReShadeInstallingView : UserControl
 
     private void OpaqueButton_Clicked(object sender, System.EventArgs e)
     {
-        this.viewManager.ShowView<ReShadeMainView>();
+        //this.viewManager.ShowView<ReShadeMainView>();
     }
 
     private void UserControl_Unloaded(object sender, RoutedEventArgs e)

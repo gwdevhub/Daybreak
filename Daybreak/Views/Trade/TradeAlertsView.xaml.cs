@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Models.Trade;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.TradeChat;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;
@@ -13,16 +12,16 @@ namespace Daybreak.Views.Trade;
 /// </summary>
 public partial class TradeAlertsView : UserControl
 {
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly ITradeAlertingService tradeAlertingService;
 
     public ObservableCollection<ITradeAlert> TradeAlerts { get; set; } = [];
 
     public TradeAlertsView(
-        IViewManager viewManager,
+        //IViewManager viewManager,
         ITradeAlertingService tradeAlertingService)
     {
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.tradeAlertingService = tradeAlertingService.ThrowIfNull();
         this.InitializeComponent();
     }
@@ -45,7 +44,7 @@ public partial class TradeAlertsView : UserControl
 
     private void AddButton_Clicked(object _, EventArgs __)
     {
-        this.viewManager.ShowView<TradeAlertsChoiceView>();
+        //this.viewManager.ShowView<TradeAlertsChoiceView>();
     }
 
     private void HighlightButton_Clicked(object sender, EventArgs e)
@@ -58,11 +57,11 @@ public partial class TradeAlertsView : UserControl
 
         if (alert is TradeAlert)
         {
-            this.viewManager.ShowView<TradeAlertSetupView>(alert);
+            //this.viewManager.ShowView<TradeAlertSetupView>(alert);
         }
         else if (alert is QuoteAlert)
         {
-            this.viewManager.ShowView<QuoteAlertSetupView>(alert);
+            //this.viewManager.ShowView<QuoteAlertSetupView>(alert);
         }
     }
 

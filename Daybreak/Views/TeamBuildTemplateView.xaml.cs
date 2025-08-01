@@ -4,7 +4,6 @@ using Daybreak.Shared.Models.Api;
 using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.BuildTemplates;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Toolbox;
 using Microsoft.Extensions.Logging;
@@ -25,7 +24,7 @@ public partial class TeamBuildTemplateView : UserControl
 
     private readonly IToolboxService toolboxService;
     private readonly INotificationService notificationService;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly IBuildTemplateManager buildTemplateManager;
     private readonly ILogger<TeamBuildTemplateView> logger;
 
@@ -54,7 +53,7 @@ public partial class TeamBuildTemplateView : UserControl
     public TeamBuildTemplateView(
         IToolboxService toolboxService,
         INotificationService notificationService,
-        IViewManager viewManager,
+        //IViewManager viewManager,
         IBuildTemplateManager buildTemplateManager,
         ILogger<TeamBuildTemplateView> logger)
     {
@@ -62,7 +61,7 @@ public partial class TeamBuildTemplateView : UserControl
         this.notificationService = notificationService.ThrowIfNull();
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.InitializeComponent();
         this.DataContextChanged += (sender, contextArgs) =>
         {
@@ -219,14 +218,14 @@ public partial class TeamBuildTemplateView : UserControl
 
     private void BackButton_Clicked(object sender, EventArgs e)
     {
-        this.viewManager.ShowView<BuildsListView>();
+        //this.viewManager.ShowView<BuildsListView>();
     }
 
     private async void SaveButton_Clicked(object sender, EventArgs e)
     {
         if (this.CurrentBuild is null)
         {
-            this.viewManager.ShowView<BuildsListView>();
+            //this.viewManager.ShowView<BuildsListView>();
             return;
         }
 
@@ -240,20 +239,20 @@ public partial class TeamBuildTemplateView : UserControl
             this.buildTemplateManager.SaveBuild(this.CurrentBuild);
         }
 
-        this.viewManager.ShowView<BuildsListView>();
+        //this.viewManager.ShowView<BuildsListView>();
     }
 
     private async void ExportButton_Clicked(object sender, EventArgs e)
     {
         if (this.CurrentBuild is null)
         {
-            this.viewManager.ShowView<BuildsListView>();
+            //this.viewManager.ShowView<BuildsListView>();
             return;
         }
 
         this.CurrentBuild.SourceUrl = this.CurrentBuildSource;
         await this.toolboxService.ExportBuildToToolbox(this.CurrentBuild, CancellationToken.None);
-        this.viewManager.ShowView<BuildsListView>();
+        //this.viewManager.ShowView<BuildsListView>();
     }
 
     private void BrowserButton_Clicked(object sender, EventArgs e)

@@ -7,7 +7,6 @@ using System.Windows.Controls;
 using System.Extensions;
 using Daybreak.Shared.Services.BuildTemplates;
 using Daybreak.Shared.Models;
-using Daybreak.Shared.Services.Navigation;
 
 namespace Daybreak.Views;
 
@@ -18,7 +17,7 @@ public partial class BuildsSynchronizationView : UserControl
 {
     private readonly IBuildTemplateManager buildTemplateManager;
     private readonly IGraphClient graphClient;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly ILogger<BuildsSynchronizationView> logger;
 
     [GenerateDependencyProperty(InitialValue = true)]
@@ -44,12 +43,12 @@ public partial class BuildsSynchronizationView : UserControl
     public BuildsSynchronizationView(
         IBuildTemplateManager buildTemplateManager,
         IGraphClient graphClient,
-        IViewManager viewManager,
+        //IViewManager viewManager,
         ILogger<BuildsSynchronizationView> logger)
     {
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
         this.graphClient = graphClient.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
         this.InitializeComponent();
     }
@@ -125,7 +124,7 @@ public partial class BuildsSynchronizationView : UserControl
 
     private void BackButton_Clicked(object sender, EventArgs e)
     {
-        this.viewManager.ShowView<BuildsListView>();
+        //this.viewManager.ShowView<BuildsListView>();
     }
 
     private async void UploadButton_Clicked(object sender, EventArgs e)
@@ -223,7 +222,7 @@ public partial class BuildsSynchronizationView : UserControl
             {
                 if (logOutSuccess)
                 {
-                    this.viewManager.ShowView<BuildsListView>();
+                    //this.viewManager.ShowView<BuildsListView>();
                 }
             },
             onFailure: failure =>

@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Models.Progress;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Updater;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
@@ -18,7 +17,7 @@ namespace Daybreak.Views;
 public partial class UpdateView : UserControl
 {
     private readonly ILogger<UpdateView> logger;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly IApplicationUpdater applicationUpdater;
     private readonly UpdateStatus updateStatus = new();
 
@@ -36,12 +35,12 @@ public partial class UpdateView : UserControl
 
     public UpdateView(
         IApplicationUpdater applicationUpdater,
-        ILogger<UpdateView> logger,
-        IViewManager viewManager)
+        ILogger<UpdateView> logger)
+        //IViewManager viewManager)
     {
         this.applicationUpdater = applicationUpdater.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.updateStatus.PropertyChanged += this.UpdateStatus_PropertyChanged!;
         this.InitializeComponent();
     }
@@ -65,7 +64,7 @@ public partial class UpdateView : UserControl
     {
         if (this.DataContext is not Version version)
         {
-            this.viewManager.ShowView<LauncherView>();
+            //this.viewManager.ShowView<LauncherView>();
             throw new InvalidOperationException("No version specified for download");
         }
 
@@ -93,7 +92,7 @@ public partial class UpdateView : UserControl
         }
         else
         {
-            this.viewManager.ShowView<LauncherView>();
+            //this.viewManager.ShowView<LauncherView>();
         }
     }
 }

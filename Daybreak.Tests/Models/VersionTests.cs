@@ -1,6 +1,5 @@
 ﻿using Daybreak.Shared.Models.Versioning;
 using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Version = Daybreak.Shared.Models.Versioning.Version;
 
 namespace Daybreak.Tests.Models;

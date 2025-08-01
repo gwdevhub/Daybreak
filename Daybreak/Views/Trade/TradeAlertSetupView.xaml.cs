@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Models.Trade;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.TradeChat;
 using System.Core.Extensions;
 using System.Windows;
@@ -12,20 +11,20 @@ namespace Daybreak.Views.Trade;
 public partial class TradeAlertSetupView : UserControl
 {
     private readonly ITradeAlertingService tradeAlertingService;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
 
     public TradeAlertSetupView(
-        ITradeAlertingService tradeAlertingService,
-        IViewManager viewManager)
+        ITradeAlertingService tradeAlertingService)
+        //IViewManager viewManager)
     {
         this.tradeAlertingService = tradeAlertingService.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.InitializeComponent();
     }
 
     private void BackButton_Clicked(object sender, EventArgs e)
     {
-        this.viewManager.ShowView<TradeAlertsView>();
+        //this.viewManager.ShowView<TradeAlertsView>();
     }
 
     private void UserControl_Unloaded(object sender, RoutedEventArgs e)

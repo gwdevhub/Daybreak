@@ -1,7 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Api;
-using Daybreak.Shared.Models.FocusView;
 using Daybreak.Shared.Models.LaunchConfigurations;
 using Daybreak.Shared.Models.Onboarding;
 using Daybreak.Shared.Services.Api;
@@ -10,7 +9,6 @@ using Daybreak.Shared.Services.InternetChecker;
 using Daybreak.Shared.Services.LaunchConfigurations;
 using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Mods;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Onboarding;
 using Daybreak.Shared.Services.Screens;
@@ -39,7 +37,7 @@ public partial class LauncherView : UserControl
     private readonly IConnectivityStatus connectivityStatus;
     private readonly IOnboardingService onboardingService;
     private readonly IApplicationLauncher applicationLauncher;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly IScreenManager screenManager;
     private readonly ILiveOptions<FocusViewOptions> focusViewOptions;
 
@@ -68,7 +66,7 @@ public partial class LauncherView : UserControl
         IConnectivityStatus connectivityStatus,
         IOnboardingService onboardingService,
         IApplicationLauncher applicationLauncher,
-        IViewManager viewManager,
+        //IViewManager viewManager,
         IScreenManager screenManager,
         ILiveOptions<FocusViewOptions> focusViewOptions)
     {
@@ -80,7 +78,7 @@ public partial class LauncherView : UserControl
         this.onboardingService = onboardingService.ThrowIfNull();
         this.screenManager = screenManager.ThrowIfNull();
         this.applicationLauncher = applicationLauncher.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.focusViewOptions = focusViewOptions.ThrowIfNull();
         this.InitializeComponent();
     }
@@ -95,7 +93,7 @@ public partial class LauncherView : UserControl
 
         if (onboardingStage is LauncherOnboardingStage.NeedsCredentials or LauncherOnboardingStage.NeedsExecutable or LauncherOnboardingStage.NeedsConfiguration)
         {
-            this.viewManager.ShowView<LauncherOnboardingView>(onboardingStage);
+            //this.viewManager.ShowView<LauncherOnboardingView>(onboardingStage);
             return false;
         }
 
@@ -401,7 +399,7 @@ public partial class LauncherView : UserControl
         }
         else
         {
-            this.viewManager.ShowView<FocusView>(new FocusViewContext { ApiContext = apiContext, LaunchContext = context });
+            //this.viewManager.ShowView<FocusView>(new FocusViewContext { ApiContext = apiContext, LaunchContext = context });
             this.menuService.CloseMenu();
         }
     }
@@ -443,7 +441,7 @@ public partial class LauncherView : UserControl
 
         await this.daybreakApiService.AttachDaybreakApiContext(launchContext, apiContext, cancellationToken);
         this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(launcherViewContext.Configuration);
-        this.viewManager.ShowView<FocusView>(new FocusViewContext { ApiContext = apiContext, LaunchContext = launchContext });
+        //this.viewManager.ShowView<FocusView>(new FocusViewContext { ApiContext = apiContext, LaunchContext = launchContext });
         this.menuService.CloseMenu();
     }
 
@@ -494,7 +492,7 @@ public partial class LauncherView : UserControl
         }
         else
         {
-            this.viewManager.ShowView<FocusView>(new FocusViewContext { ApiContext = apiContext, LaunchContext = launchedContext });
+            //this.viewManager.ShowView<FocusView>(new FocusViewContext { ApiContext = apiContext, LaunchContext = launchedContext });
             this.menuService.CloseMenu();
         }
     }

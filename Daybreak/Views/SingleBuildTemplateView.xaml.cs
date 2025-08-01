@@ -1,6 +1,5 @@
 ﻿using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Services.BuildTemplates;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
@@ -19,7 +18,7 @@ public partial class SingleBuildTemplateView : UserControl
     private const string DisallowedChars = "\r\n/.";
 
     private readonly INotificationService notificationService;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly IBuildTemplateManager buildTemplateManager;
     private readonly ILogger<SingleBuildTemplateView> logger;
 
@@ -36,14 +35,14 @@ public partial class SingleBuildTemplateView : UserControl
 
     public SingleBuildTemplateView(
         INotificationService notificationService,
-        IViewManager viewManager,
+        //IViewManager viewManager,
         IBuildTemplateManager buildTemplateManager,
         ILogger<SingleBuildTemplateView> logger)
     {
         this.notificationService = notificationService.ThrowIfNull();
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.InitializeComponent();
         this.DataContextChanged += (sender, contextArgs) =>
         {
@@ -109,19 +108,19 @@ public partial class SingleBuildTemplateView : UserControl
     }
     private void BackButton_Clicked(object sender, EventArgs e)
     {
-        this.viewManager.ShowView<BuildsListView>();
+        //this.viewManager.ShowView<BuildsListView>();
     }
     private void SaveButton_Clicked(object sender, EventArgs e)
     {
         if (this.CurrentBuild is null)
         {
-            this.viewManager.ShowView<BuildsListView>();
+            //this.viewManager.ShowView<BuildsListView>();
             return;
         }
 
         this.CurrentBuild.SourceUrl = this.CurrentBuildSource;
         this.buildTemplateManager.SaveBuild(this.CurrentBuild);
-        this.viewManager.ShowView<BuildsListView>();
+        //this.viewManager.ShowView<BuildsListView>();
     }
 
     private void BrowserButton_Clicked(object sender, EventArgs e)
@@ -164,7 +163,7 @@ public partial class SingleBuildTemplateView : UserControl
         newTeamBuild.Name = this.CurrentBuild.Name;
         newTeamBuild.PreviousName = this.CurrentBuild.PreviousName;
         newTeamBuild.Builds.ClearAnd().Add(this.CurrentBuild);
-        this.viewManager.ShowView<TeamBuildTemplateView>(newTeamBuild);
+        //this.viewManager.ShowView<TeamBuildTemplateView>(newTeamBuild);
     }
 
     private void CopyButton_Clicked(object sender, EventArgs e)

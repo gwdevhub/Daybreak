@@ -1,6 +1,5 @@
 ﻿using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.ApplicationLauncher;
-using Daybreak.Shared.Services.Navigation;
 using Microsoft.Extensions.Logging;
 using System.Extensions;
 using System.Windows.Controls;
@@ -13,16 +12,16 @@ namespace Daybreak.Views;
 public partial class RequestElevationView : UserControl
 {
     private readonly IApplicationLauncher applicationLauncher;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly ILogger<RequestElevationView> logger;
 
     public RequestElevationView(
         IApplicationLauncher applicationLauncher,
-        IViewManager viewManager,
+        //IViewManager viewManager,
         ILogger<RequestElevationView> logger)
     {
         this.applicationLauncher = applicationLauncher.ThrowIfNull(nameof(applicationLauncher));
-        this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
+        //this.viewManager = viewManager.ThrowIfNull(nameof(viewManager));
         this.logger = logger.ThrowIfNull(nameof(logger));
         this.InitializeComponent();
     }
@@ -37,12 +36,12 @@ public partial class RequestElevationView : UserControl
         if (this.DataContext is ElevationRequest elevationRequest)
         {
             this.logger.LogWarning($"Elevation request denied. Showing {elevationRequest.View} with {elevationRequest.DataContext}");
-            this.viewManager.ShowView(elevationRequest.View!, elevationRequest.DataContext!);
+            //this.viewManager.ShowView(elevationRequest.View!, elevationRequest.DataContext!);
         }
         else
         {
             this.logger.LogWarning("Elevation request context is not set. Returning to home page");
-            this.viewManager.ShowView<LauncherView>();
+            //this.viewManager.ShowView<LauncherView>();
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Services.ApplicationLauncher;
-using Daybreak.Shared.Services.Navigation;
 using System.Core.Extensions;
 using System.Windows.Controls;
 
@@ -9,14 +8,14 @@ namespace Daybreak.Views;
 /// </summary>
 public partial class PluginsConfirmationView : UserControl
 {
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly IApplicationLauncher applicationLauncher;
 
     public PluginsConfirmationView(
-        IViewManager viewManager,
+        //IViewManager viewManager,
         IApplicationLauncher applicationLauncher)
     {
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.applicationLauncher = applicationLauncher.ThrowIfNull();
         this.InitializeComponent();
     }
@@ -28,6 +27,6 @@ public partial class PluginsConfirmationView : UserControl
 
     private void NoButton_Clicked(object sender, System.EventArgs e)
     {
-        this.viewManager.ShowView<LauncherView>();
+        //this.viewManager.ShowView<LauncherView>();
     }
 }

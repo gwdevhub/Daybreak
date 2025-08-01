@@ -4,7 +4,6 @@ using Daybreak.Controls.Options;
 using Daybreak.Services.Notifications;
 using Daybreak.Shared;
 using Daybreak.Shared.Services.Menu;
-using Daybreak.Shared.Services.Navigation;
 using Microsoft.Extensions.DependencyInjection;
 using System.Configuration;
 using System.Core.Extensions;
@@ -22,7 +21,7 @@ public partial class MenuList : UserControl
 {
     private readonly IMenuServiceButtonHandler menuServiceButtonHandler;
     private readonly IMenuServiceProducer menuServiceProducer;
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly INotificationStorage notificationStorage;
     private readonly ILiveOptions<LauncherOptions> liveOptions;
 
@@ -37,7 +36,7 @@ public partial class MenuList : UserControl
         : this(
               Global.GlobalServiceProvider.GetRequiredService<IMenuServiceButtonHandler>(),
               Global.GlobalServiceProvider.GetRequiredService<IMenuServiceProducer>(),
-              Global.GlobalServiceProvider.GetRequiredService<IViewManager>(),
+              //Global.GlobalServiceProvider.GetRequiredService<IViewManager>(),
               Global.GlobalServiceProvider.GetRequiredService<INotificationStorage>(),
               Global.GlobalServiceProvider.GetRequiredService<ILiveOptions<LauncherOptions>>())
     {
@@ -46,13 +45,13 @@ public partial class MenuList : UserControl
     private MenuList(
         IMenuServiceButtonHandler menuServiceButtonHandler,
         IMenuServiceProducer menuServiceProducer,
-        IViewManager viewManager,
+        //IViewManager viewManager,
         INotificationStorage notificationStorage,
         ILiveOptions<LauncherOptions> liveOptions)
     {
         this.menuServiceButtonHandler = menuServiceButtonHandler.ThrowIfNull();
         this.menuServiceProducer = menuServiceProducer.ThrowIfNull();
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.notificationStorage = notificationStorage.ThrowIfNull();
         this.liveOptions = liveOptions.ThrowIfNull();
 

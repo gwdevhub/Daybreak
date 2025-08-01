@@ -1,6 +1,5 @@
 ﻿using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.ExecutableManagement;
-using Daybreak.Shared.Services.Navigation;
 using System.Collections.ObjectModel;
 using System.Core.Extensions;
 using System.Extensions;
@@ -15,7 +14,7 @@ namespace Daybreak.Views.Launch;
 /// </summary>
 public partial class ExecutablesView : UserControl
 {
-    private readonly IViewManager viewManager;
+    //private readonly IViewManager viewManager;
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager;
 
     [GenerateDependencyProperty]
@@ -24,10 +23,10 @@ public partial class ExecutablesView : UserControl
     public ObservableCollection<ExecutablePath> Paths { get; } = [];
 
     public ExecutablesView(
-        IViewManager viewManager,
+        //IViewManager viewManager,
         IGuildWarsExecutableManager guildWarsExecutableManager)
     {
-        this.viewManager = viewManager.ThrowIfNull();
+        //this.viewManager = viewManager.ThrowIfNull();
         this.guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
         this.InitializeComponent();
         this.GetPaths();
@@ -58,7 +57,7 @@ public partial class ExecutablesView : UserControl
             this.guildWarsExecutableManager.RemoveExecutable(executable);
         }
 
-        this.viewManager.ShowView<LauncherView>();
+        //this.viewManager.ShowView<LauncherView>();
     }
 
     private void GuildwarsPathTemplate_RemoveClicked(object sender, EventArgs e)

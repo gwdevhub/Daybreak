@@ -52,7 +52,7 @@
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageVersion Include="SharpCompress" Version="0.40.0" />
-    <PackageVersion Include="Slim" Version="1.11.1" />
+    <PackageVersion Include="Slim" Version="1.11.2" />
     <PackageVersion Include="Squealify" Version="0.8.2.2" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="9.0.3" />
     <PackageVersion Include="Swashbuckle.AspNetCore.Swagger" Version="9.0.3" />
@@ -70,8 +70,9 @@
     <PackageVersion Include="SystemExtensions.NetCore" Version="1.6.12" />
     <PackageVersion Include="SystemExtensions.NetStandard.DependencyInjection" Version="1.6.9" />
     <PackageVersion Include="SystemExtensions.NetStandard.Generators" Version="0.1.6" />
+    <PackageVersion Include="TrailBlazr" Version="0.2.2" />
     <PackageVersion Include="WPF-UI" Version="4.0.3" />
-    <PackageVersion Include="WpfExtended" Version="0.7.13" />
+    <PackageVersion Include="WpfExtended.Blazor" Version="0.7.15" />
     <PackageVersion Include="WpfExtended.SourceGeneration" Version="0.3.0" />
     <PackageVersion Include="WpfScreenHelper" Version="2.1.1" />
     <PackageVersion Include="WriteableBitmapEx" Version="1.6.8" />
