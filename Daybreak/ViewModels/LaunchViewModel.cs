@@ -8,4 +8,10 @@ public sealed class LaunchViewModel(IViewManager viewManager)
     : ViewModelBase<LaunchViewModel, LaunchView>
 {
     private readonly IViewManager viewManager = viewManager.ThrowIfNull();
+
+    public override ValueTask Initialize(CancellationToken cancellationToken)
+    {
+        
+        return base.Initialize(cancellationToken);
+    }
 }

@@ -8,7 +8,11 @@
              EnableScroll="true" />
 
 @inherits ViewBase<FocusView, FocusViewModel>
+@page "/focus"
 @code {
+    [Parameter]
+    public required string FocusId { get; set; }
+
     private readonly MessageSecurityOptions securityOptions = new MessageSecurityOptions()
             .ForDevelopment()
             .WithPermissiveSandbox();

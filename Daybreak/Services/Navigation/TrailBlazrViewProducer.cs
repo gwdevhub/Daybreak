@@ -27,6 +27,7 @@ public sealed class TrailBlazrViewProducer(IServiceManager serviceManager)
             this.serviceManager.RegisterScoped<TViewModel>();
         }
 
-        this.serviceManager.RegisterSingleton(sp => new ViewRegistration<TView, TViewModel>());
+        var viewRegistration = new ViewRegistration<TView, TViewModel>();
+        this.serviceManager.RegisterSingleton(sp => viewRegistration);
     }
 }
