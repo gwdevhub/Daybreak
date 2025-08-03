@@ -121,6 +121,7 @@ using Daybreak.Shared.Models.Plugins;
 using Daybreak.ViewModels;
 using TrailBlazr.Extensions;
 using TrailBlazr.Services;
+using Microsoft.AspNetCore.Routing;
 
 namespace Daybreak.Configuration;
 
@@ -389,7 +390,7 @@ public class ProjectConfiguration : PluginConfigurationBase
             .RegisterButton("Manage client version", "Open version manager", sp => { });
         menuServiceProducer.CreateIfNotExistCategory("Guild Wars")
             .RegisterButton("Game companion", "Open game companion", sp => sp.GetRequiredService<IViewManager>().ShowView<LaunchView>())
-            .RegisterButton("Manage builds", "Open builds manager", sp => { })
+            .RegisterButton("Manage builds", "Open builds manager", sp => throw new InvalidOperationException())
             .RegisterButton("Download Guild Wars", "Download Guild Wars installer", sp => { })
             .RegisterButton("Copy Guild Wars", "Copy Guild Wars from an existing installation", sp => { })
             .RegisterButton("Event Calendar", "Show current and upcoming events", sp => { })

@@ -19,6 +19,7 @@ using Daybreak.Shared.Utils;
 using Daybreak.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Web.WebView2.Core;
 using Slim;
 using Slim.Integration.ServiceCollection;
 using System.Core.Extensions;
@@ -92,7 +93,7 @@ public sealed class Launcher : BlazorHybridApplication<App>
     protected override async ValueTask ApplicationStarting()
     {
         Global.GlobalServiceProvider = Instance.ServiceProvider;
-
+        await base.ApplicationStarting();
         /*
          * Show splash screen before beginning to load the rest of the application.
          * MainWindow will call HideSplashScreen() on Loaded event
@@ -126,6 +127,12 @@ public sealed class Launcher : BlazorHybridApplication<App>
 
     protected override void ApplicationClosing()
     {
+    }
+
+    protected override void Host_CoreWebView2Initialized(CoreWebView2 e)
+    {
+        base.Host_CoreWebView2Initialized(e);
+        Global.CoreWebView2 = e;
     }
 
     private async ValueTask InitializeApplicationServices(StartupStatus startupStatus, IOptionsProducer optionsProducer)

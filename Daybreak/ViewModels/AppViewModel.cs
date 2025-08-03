@@ -1,4 +1,5 @@
 ﻿using Daybreak.Services.Themes;
+using Daybreak.Shared;
 using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Services.Updater;
 using Daybreak.Shared.Utils;
@@ -117,6 +118,12 @@ public sealed class AppViewModel
     public void OpenVersionView()
     {
 
+    }
+
+    public void Reload()
+    {
+        this.viewManager.ShowView<LaunchView>();
+        Global.CoreWebView2?.Reload();
     }
 
     private void MainWindow_StateChanged(object? sender, EventArgs e)
