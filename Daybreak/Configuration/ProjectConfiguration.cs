@@ -390,7 +390,7 @@ public class ProjectConfiguration : PluginConfigurationBase
             .RegisterButton("Manage client version", "Open version manager", sp => { });
         menuServiceProducer.CreateIfNotExistCategory("Guild Wars")
             .RegisterButton("Game companion", "Open game companion", sp => sp.GetRequiredService<IViewManager>().ShowView<LaunchView>())
-            .RegisterButton("Manage builds", "Open builds manager", sp => throw new InvalidOperationException())
+            .RegisterButton("Manage builds", "Open builds manager", sp => { })
             .RegisterButton("Download Guild Wars", "Download Guild Wars installer", sp => { })
             .RegisterButton("Copy Guild Wars", "Copy Guild Wars from an existing installation", sp => { })
             .RegisterButton("Event Calendar", "Show current and upcoming events", sp => { })

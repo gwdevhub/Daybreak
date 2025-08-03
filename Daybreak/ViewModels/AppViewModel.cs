@@ -4,6 +4,7 @@ using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Services.Updater;
 using Daybreak.Shared.Utils;
 using Daybreak.Views;
+using Microsoft.AspNetCore.Components.Web;
 using System.Core.Extensions;
 using System.Windows;
 using System.Windows.Interop;
@@ -120,10 +121,8 @@ public sealed class AppViewModel
 
     }
 
-    public void Reload()
+    public void OnError(ErrorEventArgs args)
     {
-        this.viewManager.ShowView<LaunchView>();
-        Global.CoreWebView2?.Reload();
     }
 
     private void MainWindow_StateChanged(object? sender, EventArgs e)

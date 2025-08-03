@@ -2,111 +2,103 @@
     AccentBaseColor="@this.ViewModel.AccentBaseColor"
     NeutralBaseColor="@this.ViewModel.NeutralBaseColor"
     BaseLayerLuminance="@this.ViewModel.BaseLayerLuminace">
-    <ErrorBoundary>
-        <ChildContent>
-            <div class="app-container @(this.ViewModel.WindowState == WindowState.Maximized ? "maximized" : "")">
-                <!-- Resize borders for custom window chrome -->
-                <div class="resize-border resize-border-top" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.Top))" />
-                <div class="resize-border resize-border-bottom" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.Bottom))" />
-                <div class="resize-border resize-border-left" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.Left))" />
-                <div class="resize-border resize-border-right" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.Right))" />
-                <div class="resize-border resize-border-top-left" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.TopLeft))" />
-                <div class="resize-border resize-border-top-right" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.TopRight))" />
-                <div class="resize-border resize-border-bottom-left" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.BottomLeft))" />
-                <div class="resize-border resize-border-bottom-right" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.BottomRight))" />
+    <ErrorLoggingBoundary>
+        <div class="app-container @(this.ViewModel.WindowState == WindowState.Maximized ? "maximized" : "")">
+            <!-- Resize borders for custom window chrome -->
+            <div class="resize-border resize-border-top" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.Top))" />
+            <div class="resize-border resize-border-bottom" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.Bottom))" />
+            <div class="resize-border resize-border-left" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.Left))" />
+            <div class="resize-border resize-border-right" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.Right))" />
+            <div class="resize-border resize-border-top-left" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.TopLeft))" />
+            <div class="resize-border resize-border-top-right" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.TopRight))" />
+            <div class="resize-border resize-border-bottom-left" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.BottomLeft))" />
+            <div class="resize-border resize-border-bottom-right" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.BottomRight))" />
 
-                <!-- Title Bar -->
-                <div class="title-bar">
-                    <!-- Drag hitbox - lower z-index, positioned behind other elements -->
-                    <div class="title-bar-hitbox" @onmousedown="this.HandleTitleBarDrag" />
+            <!-- Title Bar -->
+            <div class="title-bar">
+                <!-- Drag hitbox - lower z-index, positioned behind other elements -->
+                <div class="title-bar-hitbox" @onmousedown="this.HandleTitleBarDrag" />
 
-                    <div class="title-bar-left">
-                        <div class="menu-toggle-btn" @onclick="this.ToggleNavigationPanel">
-                            <FluentIcon Value="@NavigationIcon" />
-                        </div>
-                    </div>
-
-                    <div class="title-bar-center">
-                        <!-- Space for title or breadcrumbs -->
-                    </div>
-
-                    <div class="title-bar-right">
-                        <button class="title-bar-btn" @onclick="this.ViewModel.OpenIssues" title="Report an issue">
-                            <FluentIcon Value="@BugIcon" />
-                        </button>
-                        <button class="title-bar-btn" @onclick="this.ViewModel.OpenSynchronizationView" title="Updates">
-                            <FluentIcon Value="@ArrowDownloadIcon" />
-                        </button>
-
-                        <!-- Window Control Buttons -->
-                        <button class="title-bar-btn window-control-btn" @onclick="this.ViewModel.Minimize" title="Minimize">
-                            <FluentIcon Value="@SubtractIcon" />
-                        </button>
-
-                        @if (this.ViewModel.WindowState is WindowState.Maximized)
-                        {
-                            <button class="title-bar-btn window-control-btn" @onclick="this.ViewModel.Restore" title="Restore">
-                                <FluentIcon Value="@SquareMultipleIcon" />
-                            </button>
-                        }
-                        else
-                        {
-                            <button class="title-bar-btn window-control-btn" @onclick="this.ViewModel.Maximize" title="Maximize">
-                                <FluentIcon Value="@SquareIcon" />
-                            </button>
-                        }
-
-                        <button class="title-bar-btn window-control-btn close-btn" @onclick="this.ViewModel.Close" title="Close">
-                            <FluentIcon Value="@DismissIcon" />
-                        </button>
+                <div class="title-bar-left">
+                    <div class="menu-toggle-btn" @onclick="this.ToggleNavigationPanel">
+                        <FluentIcon Value="@NavigationIcon" />
                     </div>
                 </div>
 
-                <!-- Main Content Area -->
-                <div class="main-content">
-                    <!-- Navigation Panel -->
-                    <div class="navigation-panel @(this.isNavigationOpen ? "open" : "")">
-                        <NavigationMenu />
-                    </div>
-
-                    <!-- Content Area -->
-                    <div class="content-area">
-                        <div class="page-content">
-                            <ViewContainer />
-                        </div>
-                    </div>
-
-                    <!-- Notifications Panel -->
-                    <div class="notifications-panel">
-                        <NotificationArea />
-                    </div>
+                <div class="title-bar-center">
+                    <!-- Space for title or breadcrumbs -->
                 </div>
 
-                <!-- Status Bar -->
-                <div class="status-bar">
-                    <div class="status-left">
-                        <span class="version-info">@this.ViewModel.CurrentVersionText</span>
-                        @if (this.ViewModel.IsAdmin)
-                        {
-                            <span class="admin-badge">[Admin]</span>
-                        }
-                    </div>
-                    <div class="status-right">
-                        @if (!string.IsNullOrEmpty(this.ViewModel.CreditText))
-                        {
-                            <span class="credit-text" @onclick="this.ViewModel.OpenCreditLink">@this.ViewModel.CreditText</span>
-                        }
-                    </div>
+                <div class="title-bar-right">
+                    <button class="title-bar-btn" @onclick="this.ViewModel.OpenIssues" title="Report an issue">
+                        <FluentIcon Value="@BugIcon" />
+                    </button>
+                    <button class="title-bar-btn" @onclick="this.ViewModel.OpenSynchronizationView" title="Updates">
+                        <FluentIcon Value="@ArrowDownloadIcon" />
+                    </button>
+
+                    <!-- Window Control Buttons -->
+                    <button class="title-bar-btn window-control-btn" @onclick="this.ViewModel.Minimize" title="Minimize">
+                        <FluentIcon Value="@SubtractIcon" />
+                    </button>
+
+                    @if (this.ViewModel.WindowState is WindowState.Maximized)
+                    {
+                        <button class="title-bar-btn window-control-btn" @onclick="this.ViewModel.Restore" title="Restore">
+                            <FluentIcon Value="@SquareMultipleIcon" />
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="title-bar-btn window-control-btn" @onclick="this.ViewModel.Maximize" title="Maximize">
+                            <FluentIcon Value="@SquareIcon" />
+                        </button>
+                    }
+
+                    <button class="title-bar-btn window-control-btn close-btn" @onclick="this.ViewModel.Close" title="Close">
+                        <FluentIcon Value="@DismissIcon" />
+                    </button>
                 </div>
             </div>
-        </ChildContent>
-        <ErrorContent>
-            <div class="fallback">
-                <h3>Something went wrong.</h3>
-                <button @onclick="this.ViewModel.Reload">Reload</button>
+
+            <!-- Main Content Area -->
+            <div class="main-content">
+                <!-- Navigation Panel -->
+                <div class="navigation-panel @(this.isNavigationOpen ? "open" : "")">
+                    <NavigationMenu />
+                </div>
+
+                <!-- Content Area -->
+                <div class="content-area">
+                    <div class="page-content">
+                        <ViewContainer />
+                    </div>
+                </div>
+
+                <!-- Notifications Panel -->
+                <div class="notifications-panel">
+                    <NotificationArea />
+                </div>
             </div>
-        </ErrorContent>
-    </ErrorBoundary>
+
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="status-left">
+                    <span class="version-info">@this.ViewModel.CurrentVersionText</span>
+                    @if (this.ViewModel.IsAdmin)
+                    {
+                        <span class="admin-badge">[Admin]</span>
+                    }
+                </div>
+                <div class="status-right">
+                    @if (!string.IsNullOrEmpty(this.ViewModel.CreditText))
+                    {
+                        <span class="credit-text" @onclick="this.ViewModel.OpenCreditLink">@this.ViewModel.CreditText</span>
+                    }
+                </div>
+            </div>
+        </div>
+    </ErrorLoggingBoundary>
 </FluentDesignSystemProvider>
 
 @code {
