@@ -65,7 +65,7 @@
             <div class="main-content">
                 <!-- Navigation Panel -->
                 <div class="navigation-panel @(this.isNavigationOpen ? "open" : "")">
-                    <NavigationMenu />
+                    <NavigationMenu MenuCategories="@this.ViewModel.MenuCategories" />
                 </div>
 
                 <!-- Content Area -->
@@ -119,7 +119,8 @@
     {
         base.OnInitialized();
         this.ViewModel.WindowStateChanged += this.OnWindowStateChanged;
-        this.ViewModel.RedrawRequested += (_, __) => this.StateHasChanged();
+        this.ViewModel.RedrawRequested += (_, __) => 
+            this.InvokeAsync(this.StateHasChanged);
     }
 
     protected override void OnAfterRender(bool firstRender)

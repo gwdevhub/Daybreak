@@ -1,11 +1,16 @@
-﻿using Daybreak.Services.Themes;
-using Daybreak.Shared;
+﻿using Daybreak.Attributes;
+using Daybreak.Services.Themes;
+using Daybreak.Shared.Models.Menu;
+using Daybreak.Shared.Services.Menu;
+using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Services.Updater;
 using Daybreak.Shared.Utils;
 using Daybreak.Views;
 using Microsoft.AspNetCore.Components.Web;
 using System.Core.Extensions;
+using System.Extensions;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Interop;
 using TrailBlazr.Services;
@@ -14,6 +19,9 @@ using WpfExtended.Blazor.Launch;
 namespace Daybreak.ViewModels;
 public sealed class AppViewModel
 {
+    private readonly IOptionsProvider optionsProvider;
+    private readonly IMenuServiceProducer menuServiceProducer;
+    private readonly IMenuServiceButtonHandler menuServiceButtonHandler;
     private readonly IViewManager viewManager;
     private readonly BlazorThemeInteropService blazorThemeInteropService;
     private readonly IApplicationUpdater applicationUpdater;
@@ -28,6 +36,8 @@ public sealed class AppViewModel
     public Type CurrentViewType { get; private set; } = typeof(LaunchView);
     public IDictionary<string, object> CurrentViewParameters { get; private set; } = new Dictionary<string, object>();
 
+    public List<MenuCategory> MenuCategories { get; private set; } = [];
+
     public WindowState WindowState => this.blazorHostWindow.WindowState;
     public bool IsAdmin => this.privilegeManager.AdminPrivileges;
     public string CurrentVersionText => this.applicationUpdater.CurrentVersion.ToString();
@@ -38,12 +48,18 @@ public sealed class AppViewModel
     public float BaseLayerLuminace { get; set; } = 0.0f;
 
     public AppViewModel(
+        IOptionsProvider optionsProvider,
+        IMenuServiceProducer menuServiceProducer,
+        IMenuServiceButtonHandler menuServiceButtonHandler,
         IViewManager viewManager,
         BlazorThemeInteropService blazorThemeInteropService,
         IApplicationUpdater applicationUpdater,
         IPrivilegeManager privilegeManager,
         BlazorHostWindow blazorHostWindow)
     {
+        this.optionsProvider = optionsProvider.ThrowIfNull();
+        this.menuServiceProducer = menuServiceProducer.ThrowIfNull();
+        this.menuServiceButtonHandler = menuServiceButtonHandler.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
         this.blazorThemeInteropService = blazorThemeInteropService.ThrowIfNull();
         this.applicationUpdater = applicationUpdater.ThrowIfNull();
@@ -62,6 +78,7 @@ public sealed class AppViewModel
         this.RedrawRequested?.Invoke(this, EventArgs.Empty);
         this.viewManager.ShowView<LaunchView>();
         this.hwndSource = HwndSource.FromHwnd(new WindowInteropHelper(this.blazorHostWindow).Handle);
+        this.AsynchronouslyLoadMenu();
     }
 
     public void Drag()
@@ -121,12 +138,71 @@ public sealed class AppViewModel
 
     }
 
-    public void OnError(ErrorEventArgs args)
+    public void OnError(ErrorEventArgs _)
     {
+    }
+
+    private Task AsynchronouslyLoadMenu()
+    {
+        return Task.Factory.StartNew(() =>
+        {
+            this.LoadMenuCategories();
+            this.RedrawRequested?.Invoke(this, EventArgs.Empty);
+        }, TaskCreationOptions.LongRunning);
+    }
+
+    private void LoadMenuCategories()
+    {
+        foreach(var category in this.menuServiceProducer.GetCategories())
+        {
+            this.MenuCategories.Add(category);
+            if (category.Name is "Settings")
+            {
+                foreach(var option in this.optionsProvider.GetRegisteredOptionsTypes().Where(IsOptionsVisible))
+                {
+                    var optionName = GetOptionsName(option);
+                    var optionTooltip = GetOptionsToolTip(option);
+                    
+                    //TODO: Handle option click
+                    category.RegisterButton(optionName, optionTooltip, sp => { });
+                }
+            }
+        }
     }
 
     private void MainWindow_StateChanged(object? sender, EventArgs e)
     {
         this.WindowStateChanged?.Invoke(this, this.WindowState);
+    }
+
+    private static string GetOptionsToolTip(Type type)
+    {
+        var name = GetOptionsName(type);
+        return $"{name} settings";
+    }
+
+    private static string GetOptionsName(Type type)
+    {
+        if (type.GetCustomAttributes(true).FirstOrDefault(a => a.GetType() == typeof(OptionsNameAttribute)) is not OptionsNameAttribute optionsNameAttribute)
+        {
+            return type.Name;
+        }
+
+        if (optionsNameAttribute.Name!.IsNullOrWhiteSpace())
+        {
+            return type.Name;
+        }
+
+        return optionsNameAttribute.Name!;
+    }
+
+    private static bool IsOptionsVisible(Type optionType)
+    {
+        if (optionType.GetCustomAttribute<OptionsIgnoreAttribute>() is not null)
+        {
+            return false;
+        }
+
+        return true;
     }
 }

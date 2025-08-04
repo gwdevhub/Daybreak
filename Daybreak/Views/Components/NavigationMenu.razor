@@ -1,11 +1,11 @@
-<div class="navigation-menu">    
+﻿<div class="navigation-menu">    
     <div class="menu-content">
-        @foreach (var category in this.categories)
+        @foreach (var category in this.MenuCategories)
         {
             <div class="menu-category">
-                <div class="category-header" @onclick="() => ToggleCategory(category.Name)">
+                <div class="category-header" @onclick="() => this.ToggleCategory(category.Name)">
                     <span class="category-title">@category.Name</span>
-                    <span class="category-arrow @(this.expandedCategories.Contains(category.Name) ? "expanded" : "")">?</span>
+                    <span class="category-arrow @(this.expandedCategories.Contains(category.Name) ? "expanded" : "")">⏷</span>
                 </div>
                 
                 @if (this.expandedCategories.Contains(category.Name))
@@ -13,7 +13,7 @@
                     <div class="category-items">
                         @foreach (var button in category.Buttons)
                         {
-                            <div class="menu-item" @onclick="() => ExecuteAction(button)">
+                            <div class="menu-item" @onclick="() => this.ExecuteAction(button)">
                                 <span class="item-title">@button.Name</span>
                                 <span class="item-description">@button.Hint</span>
                             </div>
@@ -26,23 +26,12 @@
 </div>
 
 @code {
-    private List<MenuCategory> categories = new();
     private HashSet<string> expandedCategories = new();
 
-    [Inject]
-    public required IMenuServiceProducer MenuServiceProducer { get; set; }
-    [Inject]
-    public required IMenuServiceButtonHandler MenuServiceButtonHandler { get; set; }
+    public event EventHandler<MenuButton>? OnMenuButtonClicked;
 
-    protected override void OnInitialized()
-    {
-        this.LoadMenuCategories();
-    }
-
-    private void LoadMenuCategories()
-    {
-        this.categories = this.MenuServiceProducer.GetCategories().ToList();
-    }
+    [Parameter]
+    public List<MenuCategory> MenuCategories { get; set; } = [];
 
     private void ToggleCategory(string categoryName)
     {
@@ -58,6 +47,6 @@
 
     private void ExecuteAction(MenuButton button)
     {
-        this.MenuServiceButtonHandler.HandleButton(button);
+        this.OnMenuButtonClicked?.Invoke(this, button);
     }
 }
