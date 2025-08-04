@@ -8,6 +8,8 @@ using Daybreak.Shared.Services.Updater;
 using Daybreak.Shared.Utils;
 using Daybreak.Views;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Reflection;
@@ -142,6 +144,11 @@ public sealed class AppViewModel
     {
     }
 
+    public void MenuButtonClicked(MenuButton menuButton)
+    {
+        this.menuServiceButtonHandler.HandleButton(menuButton);
+    }
+
     private Task AsynchronouslyLoadMenu()
     {
         return Task.Factory.StartNew(() =>
@@ -158,13 +165,16 @@ public sealed class AppViewModel
             this.MenuCategories.Add(category);
             if (category.Name is "Settings")
             {
-                foreach(var option in this.optionsProvider.GetRegisteredOptionsTypes().Where(IsOptionsVisible))
+                foreach (var option in this.optionsProvider.GetRegisteredOptionDefinitions())
                 {
-                    var optionName = GetOptionsName(option);
-                    var optionTooltip = GetOptionsToolTip(option);
-                    
                     //TODO: Handle option click
-                    category.RegisterButton(optionName, optionTooltip, sp => { });
+                    category.RegisterButton(
+                        option.Name,
+                        option.Description,
+                        sp => sp.GetRequiredService<ViewManager>().ShowView<OptionView>(new RouteValueDictionary
+                        {
+                            ["optionName"] = option.Name
+                        }));
                 }
             }
         }
@@ -173,36 +183,5 @@ public sealed class AppViewModel
     private void MainWindow_StateChanged(object? sender, EventArgs e)
     {
         this.WindowStateChanged?.Invoke(this, this.WindowState);
-    }
-
-    private static string GetOptionsToolTip(Type type)
-    {
-        var name = GetOptionsName(type);
-        return $"{name} settings";
-    }
-
-    private static string GetOptionsName(Type type)
-    {
-        if (type.GetCustomAttributes(true).FirstOrDefault(a => a.GetType() == typeof(OptionsNameAttribute)) is not OptionsNameAttribute optionsNameAttribute)
-        {
-            return type.Name;
-        }
-
-        if (optionsNameAttribute.Name!.IsNullOrWhiteSpace())
-        {
-            return type.Name;
-        }
-
-        return optionsNameAttribute.Name!;
-    }
-
-    private static bool IsOptionsVisible(Type optionType)
-    {
-        if (optionType.GetCustomAttribute<OptionsIgnoreAttribute>() is not null)
-        {
-            return false;
-        }
-
-        return true;
     }
 }

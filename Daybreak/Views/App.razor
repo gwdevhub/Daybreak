@@ -65,7 +65,7 @@
             <div class="main-content">
                 <!-- Navigation Panel -->
                 <div class="navigation-panel @(this.isNavigationOpen ? "open" : "")">
-                    <NavigationMenu MenuCategories="@this.ViewModel.MenuCategories" />
+                    <NavigationMenu MenuCategories="@this.ViewModel.MenuCategories" MenuButtonHandler="this.ViewModel.MenuButtonClicked" />
                 </div>
 
                 <!-- Content Area -->

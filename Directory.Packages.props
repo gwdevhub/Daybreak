@@ -71,7 +71,7 @@
     <PackageVersion Include="SystemExtensions.NetCore" Version="1.6.12" />
     <PackageVersion Include="SystemExtensions.NetStandard.DependencyInjection" Version="1.6.9" />
     <PackageVersion Include="SystemExtensions.NetStandard.Generators" Version="0.1.6" />
-    <PackageVersion Include="TrailBlazr" Version="0.2.5" />
+    <PackageVersion Include="TrailBlazr" Version="0.2.6" />
     <PackageVersion Include="WPF-UI" Version="4.0.3" />
     <PackageVersion Include="WpfExtended.Blazor" Version="0.8.1" />
     <PackageVersion Include="WpfExtended.SourceGeneration" Version="0.3.0" />

@@ -1,0 +1,8 @@
+﻿<h3>@this.OptionName</h3>
+
+@page "/options/{optionName}"
+@inherits ViewBase<OptionView, OptionViewModel>
+@code {
+    [Parameter]
+    public required string OptionName { get; set; }
+}

@@ -28,10 +28,11 @@
 @code {
     private HashSet<string> expandedCategories = new();
 
-    public event EventHandler<MenuButton>? OnMenuButtonClicked;
+    [Parameter]
+    public required Action<MenuButton> MenuButtonHandler { get; init; }
 
     [Parameter]
-    public List<MenuCategory> MenuCategories { get; set; } = [];
+    public required List<MenuCategory> MenuCategories { get; init; }
 
     private void ToggleCategory(string categoryName)
     {
@@ -47,6 +48,6 @@
 
     private void ExecuteAction(MenuButton button)
     {
-        this.OnMenuButtonClicked?.Invoke(this, button);
+        this.MenuButtonHandler?.Invoke(button);
     }
 }

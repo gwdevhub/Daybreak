@@ -1,6 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Controls.Buttons;
-using Daybreak.Controls.Options;
 using Daybreak.Services.Notifications;
 using Daybreak.Shared;
 using Daybreak.Shared.Services.Menu;
@@ -120,11 +119,6 @@ public partial class MenuList : UserControl
                 {
                     expandableMenuSection.Children.Add(menuButton);
                 }
-            }
-
-            if (category.Name is "Settings")
-            {
-                expandableMenuSection.Children.Add(new OptionsSection());
             }
 
             this.MenuStackPanel.Children.Add(expandableMenuSection);

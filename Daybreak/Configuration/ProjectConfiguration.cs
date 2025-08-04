@@ -281,6 +281,7 @@ public class ProjectConfiguration : PluginConfigurationBase
 
         viewProducer.RegisterView<LaunchView, LaunchViewModel>();
         viewProducer.RegisterView<Views.FocusView, FocusViewModel>();
+        viewProducer.RegisterView<OptionView, OptionViewModel>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
