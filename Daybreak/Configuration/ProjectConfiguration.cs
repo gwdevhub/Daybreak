@@ -122,6 +122,7 @@ using Daybreak.ViewModels;
 using TrailBlazr.Extensions;
 using TrailBlazr.Services;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Fast.Components.FluentUI;
 
 namespace Daybreak.Configuration;
 
@@ -144,6 +145,9 @@ public class ProjectConfiguration : PluginConfigurationBase
     {
         services.ThrowIfNull();
 
+        // Add FluentUI components
+        services.AddFluentUIComponents();
+        
         services.AddTrailBlazr();
         this.RegisterHttpClients(services);
         services.AddScoped(sp =>

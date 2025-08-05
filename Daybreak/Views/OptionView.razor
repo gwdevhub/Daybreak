@@ -1,46 +1,68 @@
-﻿<h3>@this.ViewModel.OptionInstance?.Type.Name</h3>
+﻿<div style="text-align: center; margin-bottom: 2rem;">
+    <h3>@this.ViewModel.OptionInstance?.Type.Name</h3>
+</div>
 
 @if (this.ViewModel.OptionInstance is not null)
 {
-    @foreach (var property in this.ViewModel.OptionInstance.Type.Properties)
-    {
-        @if (!property.IsVisible)
+    <div style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 700px; margin: 0 auto;">
+        @foreach (var property in this.ViewModel.OptionInstance.Type.Properties)
         {
-            continue;
-        }
+            @if (!property.IsVisible)
+            {
+                continue;
+            }
 
-        @if (property.Type == typeof(bool))
-        {
-            <BooleanOption
-                Name="@property.Name"
-                Description="@property.Description"
-                Instance="@this.ViewModel.OptionInstance"
+            @if (property.Type == typeof(bool))
+            {
+                <BooleanOption
+                    Name="@property.Name"
+                    Description="@property.Description"
+                    Instance="@this.ViewModel.OptionInstance"
                 Property="@property"/>
+            }
+            else if (property.Type == typeof(int) ||
+                    property.Type == typeof(uint) ||
+                    property.Type == typeof(long) ||
+                    property.Type == typeof(ulong) ||
+                    property.Type == typeof(short) ||
+                    property.Type == typeof(ushort) ||
+                    property.Type == typeof(float) ||
+                    property.Type == typeof(double))
+            {
+                @if (property.Validator is not null)
+                {
+                    <NumberRangeOption Name="@property.Name"
+                                       Description="@property.Description"
+                                       Instance="@this.ViewModel.OptionInstance"
+                                       Property="@property"
+                                       Validator="@property.Validator" />
+                }
+                else
+                {
+                    <NumberOption Name="@property.Name"
+                                  Description="@property.Description"
+                                  Instance="@this.ViewModel.OptionInstance"
+                                  Property="@property" />
+                }
+            }
+            else if (property.Type.IsEnum)
+            {
+                var possibleValues = Enum.GetValues(property.Type).OfType<object>().ToList();
+                <MultiSelectOption Name="@property.Name"
+                                   Description="@property.Description"
+                                   Instance="@this.ViewModel.OptionInstance"
+                                   Property="@property"
+                                   PossibleValues="@possibleValues"/>
+            }
+            else
+            {
+                <StringOption Name="@property.Name"
+                              Description="@property.Description"
+                              Instance="@this.ViewModel.OptionInstance"
+                    Property="@property"/>
+            }
         }
-        else if (property.Type == typeof(int) ||
-                property.Type == typeof(uint) ||
-                property.Type == typeof(long) ||
-                property.Type == typeof(ulong) ||
-                property.Type == typeof(short) ||
-                property.Type == typeof(ushort) ||
-                property.Type == typeof(float) ||
-                property.Type == typeof(double))
-        {
-            <NumberOption 
-                Name="@property.Name"
-                Description="@property.Description"
-                Instance="@this.ViewModel.OptionInstance"
-                Property="@property" />
-        }
-        else
-        {
-            <StringOption 
-                Name="@property.Name"
-                Description="@property.Description"
-                Instance="@this.ViewModel.OptionInstance"
-                Property="@property"/>
-        }
-    }
+    </div>
 }
 
 @page "/options/{optionName}"
