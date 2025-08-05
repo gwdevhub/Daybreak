@@ -167,14 +167,10 @@ public sealed class AppViewModel
             {
                 foreach (var option in this.optionsProvider.GetRegisteredOptionDefinitions())
                 {
-                    //TODO: Handle option click
                     category.RegisterButton(
                         option.Name,
                         option.Description,
-                        sp => sp.GetRequiredService<ViewManager>().ShowView<OptionView>(new RouteValueDictionary
-                        {
-                            ["optionName"] = option.Name
-                        }));
+                        sp => sp.GetRequiredService<ViewManager>().ShowView<OptionView>(("optionName", option.Name)));
                 }
             }
         }

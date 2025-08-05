@@ -17,15 +17,15 @@
     <PackageVersion Include="MeaMod.DNS" Version="1.0.71" />
     <PackageVersion Include="MemoryPack" Version="1.21.4" />
     <PackageVersion Include="MemoryPack.Generator" Version="1.21.4" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components" Version="9.0.7" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components" Version="9.0.8" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="9.0.90" />
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.7" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
     <PackageVersion Include="Microsoft.CorrelationVector" Version="1.0.42" />
-    <PackageVersion Include="Microsoft.Data.Sqlite" Version="9.0.7" />
-    <PackageVersion Include="Microsoft.Data.Sqlite.Core" Version="9.0.7" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.7" />
-    <PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.7" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.7" />
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="9.0.8" />
+    <PackageVersion Include="Microsoft.Data.Sqlite.Core" Version="9.0.8" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.8" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.8" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.8" />
     <PackageVersion Include="Microsoft.Fast.Components.FluentUI" Version="3.8.0" />
     <PackageVersion Include="Microsoft.Fast.Components.FluentUI.Emojis" Version="3.6.0" />
     <PackageVersion Include="Microsoft.Fast.Components.FluentUI.Icons" Version="3.8.0" />
@@ -59,19 +59,19 @@
     <PackageVersion Include="Swashbuckle.AspNetCore.Swagger" Version="9.0.3" />
     <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerGen" Version="9.0.3" />
     <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerUI" Version="9.0.3" />
-    <PackageVersion Include="System.Formats.Asn1" Version="9.0.7" />
+    <PackageVersion Include="System.Formats.Asn1" Version="9.0.8" />
     <PackageVersion Include="System.IO.Compression" Version="4.3.0" />
     <PackageVersion Include="System.Linq.Async" Version="6.0.3" />
     <PackageVersion Include="System.Net.Http" Version="4.3.4" />
     <PackageVersion Include="System.Private.Uri" Version="4.3.2" />
-    <PackageVersion Include="System.Reflection.Metadata" Version="9.0.7" />
-    <PackageVersion Include="System.Text.Encoding.CodePages" Version="9.0.7" />
-    <PackageVersion Include="System.Text.Json" Version="9.0.7" />
+    <PackageVersion Include="System.Reflection.Metadata" Version="9.0.8" />
+    <PackageVersion Include="System.Text.Encoding.CodePages" Version="9.0.8" />
+    <PackageVersion Include="System.Text.Json" Version="9.0.8" />
     <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1" />
     <PackageVersion Include="SystemExtensions.NetCore" Version="1.6.12" />
     <PackageVersion Include="SystemExtensions.NetStandard.DependencyInjection" Version="1.6.9" />
     <PackageVersion Include="SystemExtensions.NetStandard.Generators" Version="0.1.6" />
-    <PackageVersion Include="TrailBlazr" Version="0.2.6" />
+    <PackageVersion Include="TrailBlazr" Version="0.2.8" />
     <PackageVersion Include="WPF-UI" Version="4.0.3" />
     <PackageVersion Include="WpfExtended.Blazor" Version="0.8.1" />
     <PackageVersion Include="WpfExtended.SourceGeneration" Version="0.3.0" />

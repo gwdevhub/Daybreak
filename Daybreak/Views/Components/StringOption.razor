@@ -1,0 +1,11 @@
+﻿<h3>@this.Name</h3>
+@this.Description
+<h3>@this.Value</h3>
+@inherits OptionBase<string>
+@code {
+    public override string ConvertValue(OptionInstance optionInstance, OptionProperty property)
+    {
+        var value = property.Getter(optionInstance) as string;
+        return value ?? string.Empty;
+    }
+}

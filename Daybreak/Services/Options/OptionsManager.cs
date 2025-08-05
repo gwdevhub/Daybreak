@@ -126,6 +126,22 @@ internal sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptio
         return this.optionDefinitions.Where(o => o.IsVisible);
     }
 
+    public OptionInstance GetRegisteredOptionInstance(string optionName)
+    {
+        if (this.optionDefinitions.FirstOrDefault(t => t.Name == optionName) is not OptionType type)
+        {
+            throw new InvalidOperationException($"No registered options found for {optionName}");
+        }
+
+        if (this.optionsCache.TryGetValue(optionName, out var value) is false)
+        {
+            throw new InvalidOperationException($"No existing options found for {optionName}");
+        }
+
+        var instance = JsonConvert.DeserializeObject(value, type.Type) ?? Activator.CreateInstance(type.Type);
+        return new OptionInstance { Reference = instance!, Type = type };
+    }
+
     public void SaveRegisteredOptions(object options)
     {
         options.ThrowIfNull();

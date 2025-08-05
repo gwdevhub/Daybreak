@@ -1,8 +1,57 @@
-﻿<h3>@this.OptionName</h3>
+﻿<h3>@this.ViewModel.OptionInstance?.Type.Name</h3>
+
+@if (this.ViewModel.OptionInstance is not null)
+{
+    @foreach (var property in this.ViewModel.OptionInstance.Type.Properties)
+    {
+        @if (!property.IsVisible)
+        {
+            continue;
+        }
+
+        @if (property.Type == typeof(bool))
+        {
+            <BooleanOption
+                Name="@property.Name"
+                Description="@property.Description"
+                Instance="@this.ViewModel.OptionInstance"
+                Property="@property"/>
+        }
+        else if (property.Type == typeof(int) ||
+                property.Type == typeof(uint) ||
+                property.Type == typeof(long) ||
+                property.Type == typeof(ulong) ||
+                property.Type == typeof(short) ||
+                property.Type == typeof(ushort) ||
+                property.Type == typeof(float) ||
+                property.Type == typeof(double))
+        {
+            <NumberOption 
+                Name="@property.Name"
+                Description="@property.Description"
+                Instance="@this.ViewModel.OptionInstance"
+                Property="@property" />
+        }
+        else
+        {
+            <StringOption 
+                Name="@property.Name"
+                Description="@property.Description"
+                Instance="@this.ViewModel.OptionInstance"
+                Property="@property"/>
+        }
+    }
+}
 
 @page "/options/{optionName}"
 @inherits ViewBase<OptionView, OptionViewModel>
 @code {
     [Parameter]
     public required string OptionName { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        this.ViewModel.Initialize(CancellationToken.None);
+        return base.OnParametersSetAsync();
+    }
 }

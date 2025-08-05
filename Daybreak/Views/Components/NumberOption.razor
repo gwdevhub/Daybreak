@@ -1,0 +1,21 @@
+﻿<h3>@this.Name</h3>
+@this.Description
+<h3>@this.Value</h3>
+@inherits OptionBase<double>
+@code {
+    public override double ConvertValue(OptionInstance optionInstance, OptionProperty property)
+    {
+        var numberValue = property.Getter(optionInstance);
+        if (numberValue is null)
+        {
+            return 0.0;
+        }
+
+        var value = numberValue switch
+        {
+            double var => var,
+            IConvertible convertible => convertible.ToDouble(null)
+        };
+        return value;
+    }
+}
