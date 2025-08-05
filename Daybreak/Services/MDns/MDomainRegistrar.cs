@@ -34,6 +34,8 @@ public sealed class MDomainRegistrar(
     {
         this.serviceDiscovery.ServiceInstanceDiscovered -= this.ServiceDiscovery_ServiceInstanceDiscovered;
         this.serviceDiscovery.ServiceInstanceShutdown -= this.ServiceDiscovery_ServiceInstanceShutdown;
+        this.cts?.Cancel();
+        this.cts?.Dispose();
         this.serviceDiscovery.Dispose();
     }
 
