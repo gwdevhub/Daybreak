@@ -1,5 +1,4 @@
-﻿using Daybreak.Attributes;
-using Daybreak.Services.Themes;
+﻿using Daybreak.Services.Themes;
 using Daybreak.Shared.Models.Menu;
 using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Options;
@@ -8,11 +7,9 @@ using Daybreak.Shared.Services.Updater;
 using Daybreak.Shared.Utils;
 using Daybreak.Views;
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Interop;
 using TrailBlazr.Services;
@@ -42,6 +39,7 @@ public sealed class AppViewModel
 
     public WindowState WindowState => this.blazorHostWindow.WindowState;
     public bool IsAdmin => this.privilegeManager.AdminPrivileges;
+    public bool IsNavigationOpen { get; private set; }
     public string CurrentVersionText => this.applicationUpdater.CurrentVersion.ToString();
     public string CreditText { get; private set; } = string.Empty;
 
@@ -118,6 +116,12 @@ public sealed class AppViewModel
     public void Close()
     {
         this.blazorHostWindow.Close();
+    }
+
+    public void ToggleNavigationMenu()
+    {
+        this.IsNavigationOpen = !this.IsNavigationOpen;
+        this.RedrawRequested?.Invoke(this, EventArgs.Empty);
     }
 
     public void OpenCreditLink()

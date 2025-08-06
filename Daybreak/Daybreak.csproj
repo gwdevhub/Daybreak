@@ -5,6 +5,7 @@
     <RootNamespace>Daybreak</RootNamespace>
     <TargetFramework>net9.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
+    <ScopedCssEnabled>true</ScopedCssEnabled>
     <Nullable>enable</Nullable>
     <Platforms>x86;x64</Platforms>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>

@@ -1,27 +1,29 @@
-﻿<div class="navigation-menu backdrop-panel">    
-    <div class="menu-content">
-        @foreach (var category in this.MenuCategories)
-        {
-            <div class="menu-category">
-                <div class="category-header" @onclick="() => this.ToggleCategory(category.Name)">
-                    <span class="category-title">@category.Name</span>
-                    <span class="category-arrow @(this.expandedCategories.Contains(category.Name) ? "expanded" : "")">⏷</span>
-                </div>
-                
-                @if (this.expandedCategories.Contains(category.Name))
-                {
-                    <div class="category-items">
-                        @foreach (var button in category.Buttons)
-                        {
-                            <div class="menu-item" @onclick="() => this.ExecuteAction(button)">
-                                <span class="item-title">@button.Name</span>
-                                <span class="item-description">@button.Hint</span>
-                            </div>
-                        }
+﻿<div class="navigation-panel @(this.IsNavigationOpen ? "open" : "")">
+    <div class="navigation-menu backdrop-panel">
+        <div class="menu-content">
+            @foreach (var category in this.MenuCategories)
+            {
+                <div class="menu-category">
+                    <div class="category-header" @onclick="() => this.ToggleCategory(category.Name)">
+                        <span class="category-title">@category.Name</span>
+                        <span class="category-arrow @(this.expandedCategories.Contains(category.Name) ? "expanded" : "")">⏷</span>
                     </div>
-                }
-            </div>
-        }
+
+                    @if (this.expandedCategories.Contains(category.Name))
+                    {
+                        <div class="category-items">
+                            @foreach (var button in category.Buttons)
+                            {
+                                <div class="menu-item" @onclick="() => this.ExecuteAction(button)">
+                                    <span class="item-title">@button.Name</span>
+                                    <span class="item-description">@button.Hint</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
     </div>
 </div>
 
@@ -33,6 +35,9 @@
 
     [Parameter]
     public required List<MenuCategory> MenuCategories { get; init; }
+
+    [Parameter]
+    public required bool IsNavigationOpen { get; init; }
 
     private void ToggleCategory(string categoryName)
     {

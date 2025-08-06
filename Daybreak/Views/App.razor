@@ -4,70 +4,25 @@
     BaseLayerLuminance="@this.ViewModel.BaseLayerLuminace">
     <ErrorLoggingBoundary>
         <div class="app-container @(this.ViewModel.WindowState == WindowState.Maximized ? "maximized" : "")">
-            <!-- Resize borders for custom window chrome -->
-            <div class="resize-border resize-border-top" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.Top))" />
-            <div class="resize-border resize-border-bottom" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.Bottom))" />
-            <div class="resize-border resize-border-left" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.Left))" />
-            <div class="resize-border resize-border-right" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.Right))" />
-            <div class="resize-border resize-border-top-left" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.TopLeft))" />
-            <div class="resize-border resize-border-top-right" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.TopRight))" />
-            <div class="resize-border resize-border-bottom-left" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.BottomLeft))" />
-            <div class="resize-border resize-border-bottom-right" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.BottomRight))" />
+            <WindowBorders OnResize="@this.ViewModel.StartResize" />
 
-            <!-- Title Bar -->
-            <div class="title-bar">
-                <!-- Drag hitbox - lower z-index, positioned behind other elements -->
-                <div class="title-bar-hitbox" @onmousedown="this.HandleTitleBarDrag" />
+            <WindowTitlebar WindowState="@this.ViewModel.WindowState"
+                            OnTitleBarDrag="@this.ViewModel.Drag"
+                            OnNavigationButtonClick="@this.ViewModel.ToggleNavigationMenu"
+                            OnBugButtonClick="@this.ViewModel.OpenIssues"
+                            OnSyncButtonClick="@this.ViewModel.OpenSynchronizationView"
+                            OnCloseButtonClick="@this.ViewModel.Close"
+                            OnMinimizeButtonClick="@this.ViewModel.Minimize"
+                            OnMaximizeButtonClick="@this.ViewModel.Maximize"
+                            OnRestoreButtonClick="@this.ViewModel.Restore" />
 
-                <div class="title-bar-left">
-                    <div class="menu-toggle-btn" @onclick="this.ToggleNavigationPanel">
-                        <FluentIcon Value="@NavigationIcon" />
-                    </div>
-                </div>
-
-                <div class="title-bar-center">
-                    <!-- Space for title or breadcrumbs -->
-                </div>
-
-                <div class="title-bar-right">
-                    <button class="title-bar-btn" @onclick="this.ViewModel.OpenIssues" title="Report an issue">
-                        <FluentIcon Value="@BugIcon" />
-                    </button>
-                    <button class="title-bar-btn" @onclick="this.ViewModel.OpenSynchronizationView" title="Updates">
-                        <FluentIcon Value="@ArrowDownloadIcon" />
-                    </button>
-
-                    <!-- Window Control Buttons -->
-                    <button class="title-bar-btn window-control-btn" @onclick="this.ViewModel.Minimize" title="Minimize">
-                        <FluentIcon Value="@SubtractIcon" />
-                    </button>
-
-                    @if (this.ViewModel.WindowState is WindowState.Maximized)
-                    {
-                        <button class="title-bar-btn window-control-btn" @onclick="this.ViewModel.Restore" title="Restore">
-                            <FluentIcon Value="@SquareMultipleIcon" />
-                        </button>
-                    }
-                    else
-                    {
-                        <button class="title-bar-btn window-control-btn" @onclick="this.ViewModel.Maximize" title="Maximize">
-                            <FluentIcon Value="@SquareIcon" />
-                        </button>
-                    }
-
-                    <button class="title-bar-btn window-control-btn close-btn" @onclick="this.ViewModel.Close" title="Close">
-                        <FluentIcon Value="@DismissIcon" />
-                    </button>
-                </div>
-            </div>
+            <StatusBar IsAdmin="@this.ViewModel.IsAdmin"
+                       CurrentVersionText="@this.ViewModel.CurrentVersionText"
+                       CreditText="@this.ViewModel.CreditText"
+                       OpenCreditLink="@this.ViewModel.OpenCreditLink" />
 
             <!-- Main Content Area -->
             <div class="main-content">
-                <!-- Navigation Panel -->
-                <div class="navigation-panel @(this.isNavigationOpen ? "open" : "")">
-                    <NavigationMenu MenuCategories="@this.ViewModel.MenuCategories" MenuButtonHandler="this.ViewModel.MenuButtonClicked" />
-                </div>
-
                 <!-- Content Area -->
                 <div class="content-area">
                     <div class="page-content">
@@ -75,24 +30,11 @@
                     </div>
                 </div>
 
-                <!-- Notifications Panel -->
-            </div>
-
-            <!-- Status Bar -->
-            <div class="status-bar backdrop-panel">
-                <div class="status-left">
-                    <span class="version-info">@this.ViewModel.CurrentVersionText</span>
-                    @if (this.ViewModel.IsAdmin)
-                    {
-                        <span class="admin-badge">[Admin]</span>
-                    }
-                </div>
-                <div class="status-right">
-                    @if (!string.IsNullOrEmpty(this.ViewModel.CreditText))
-                    {
-                        <span class="credit-text" @onclick="this.ViewModel.OpenCreditLink">@this.ViewModel.CreditText</span>
-                    }
-                </div>
+                <!-- Navigation Panel -->
+                <NavigationMenu 
+                    MenuCategories="@this.ViewModel.MenuCategories"
+                    MenuButtonHandler="this.ViewModel.MenuButtonClicked"
+                    IsNavigationOpen="@this.ViewModel.IsNavigationOpen" />
             </div>
         </div>
     </ErrorLoggingBoundary>
@@ -102,22 +44,11 @@
     [Inject]
     public required AppViewModel ViewModel { get; init; }
 
-    private static readonly Icon NavigationIcon = new Regular.Size16.Navigation();
-    private static readonly Icon BugIcon = new Regular.Size16.Bug();
-    private static readonly Icon ArrowDownloadIcon = new Regular.Size16.ArrowDownload();
-    private static readonly Icon SubtractIcon = new Regular.Size16.Subtract();
-    private static readonly Icon SquareMultipleIcon = new Regular.Size16.SquareMultiple();
-    private static readonly Icon SquareIcon = new Regular.Size16.Square();
-    private static readonly Icon DismissIcon = new Regular.Size16.Dismiss();
-
-    private bool isNavigationOpen = false;
-
     protected override void OnInitialized()
     {
         base.OnInitialized();
         this.ViewModel.WindowStateChanged += this.OnWindowStateChanged;
-        this.ViewModel.RedrawRequested += (_, __) => 
-            this.InvokeAsync(this.StateHasChanged);
+        this.ViewModel.RedrawRequested += (_, __) => this.InvokeAsync(this.StateHasChanged);
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -132,31 +63,5 @@
     private void OnWindowStateChanged(object? sender, WindowState state)
     {
         this.StateHasChanged();
-    }
-
-    private Icon GetMaximizeRestoreIcon()
-    {
-        return this.ViewModel.WindowState is WindowState.Maximized ? SquareMultipleIcon : SquareIcon;
-    }
-
-    private void HandleTitleBarDrag(MouseEventArgs e)
-    {
-        if (e.Button == 0) // Left mouse button
-        {
-            this.ViewModel.Drag();
-        }
-    }
-
-    private void ToggleNavigationPanel()
-    {
-        this.isNavigationOpen = !this.isNavigationOpen;
-    }
-
-    private void HandleResize(MouseEventArgs e, NativeMethods.ResizeDirection resizeDirection)
-    {
-        if (e.Button == 0) // Left mouse button
-        {
-            this.ViewModel.StartResize(resizeDirection);
-        }
     }
 }

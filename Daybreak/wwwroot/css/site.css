@@ -18,7 +18,7 @@ html, body {
     flex-direction: column;
     height: 100vh;
     position: relative;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(2px);
     overflow: hidden;
 }
 
@@ -41,7 +41,7 @@ html, body {
 
 /* Backdrop Panel */
 .backdrop-panel {
-    background: color-mix(in srgb, var(--neutral-fill-rest) 50%, transparent);
+    background: color-mix(in srgb, var(--neutral-fill-rest) 70%, transparent);
     border: 1px solid var(--neutral-stroke-rest);
     backdrop-filter: blur(2px);
     border-radius: 6px;
@@ -53,177 +53,6 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-}
-
-/* Option Component Display Box */
-.option-display-box {
-}
-
-.option-display-box .option-content {
-    flex: 1;
-    margin-right: 1rem;
-}
-
-.option-display-box .option-title {
-    font-weight: 600;
-    color: var(--neutral-foreground-rest);
-    margin-bottom: 0.25rem;
-}
-
-.option-display-box .option-description {
-    color: var(--neutral-foreground-hint);
-    font-size: 0.85rem;
-    line-height: 1.3;
-}
-
-.option-display-box .option-control {
-    flex-shrink: 0;
-}
-
-.option-display-box .option-control-with-label {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    flex-shrink: 0;
-}
-
-.option-display-box .option-range-info {
-    font-size: 0.75rem;
-    margin-top: 0.25rem;
-    font-style: italic;
-}
-
-/* Title Bar */
-.title-bar {
-    height: 40px;
-    font-size: 20px;
-    display: flex;
-    align-items: start;
-    color: var(--neutral-foreground-rest);
-    cursor: default;
-    user-select: none;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 20000;
-}
-
-.title-bar-hitbox {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: -1;
-    cursor: default;
-}
-
-.title-bar-left {
-    display: flex;
-    align-items: center;
-    position: relative;
-}
-
-.title-bar-center {
-    flex: 1;
-    text-align: center;
-    position: relative;
-}
-
-.title-bar-right {
-    display: flex;
-    align-items: center;
-    position: relative;
-}
-
-.title-bar-btn {
-    width: 50px;
-    height: 34px;
-    border: none;
-    background: transparent;
-    color: var(--accent-foreground-rest);
-    cursor: pointer;
-    transition: background-color 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-}
-
-    .title-bar-btn:hover {
-        background: var(--accent-foreground-hover);
-    }
-
-.menu-toggle-btn {
-    width: 50px;
-    height: 34px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    background: none;
-    border: none;
-    color: inherit;
-}
-
-.menu-toggle-btn:hover {
-    background: color-mix(in srgb, var(--accent-foreground-hover) 60%, transparent);
-}
-
-
-/* Main Content - Now fills entire viewport */
-.main-content {
-    flex: 1;
-    display: flex;
-    position: relative;
-    overflow: hidden;
-    height: 100vh;
-}
-
-/* Navigation Panel */
-.navigation-panel {
-    width: 0;
-    min-width: 0;
-    border-right: 1px solid var(--neutral-stroke-rest);
-    overflow: hidden;
-    z-index: 1000;
-    height: 100vh;
-    transition: width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
-    opacity: 0;
-    box-shadow: none;
-    /* CSS custom properties for dynamic animation */
-    --stagger-delay: 0.05s;
-    --base-delay: 0.05s;
-    /* Custom properties for menu item animations */
-    --item-stagger-delay: 0.03s;
-    --item-base-delay: 0.1s;
-}
-
-    .navigation-panel.open {
-        width: 250px;
-        opacity: 1;
-    }
-
-.navigation-menu {
-    padding: 20px;
-    padding-top: 40px;
-    color: var(--neutral-foreground-rest);
-    height: calc(100vh - 20px);
-    overflow-y: auto;
-    box-sizing: border-box;
-    counter-reset: menu-item;
-}
-
-.menu-category {
-    margin-bottom: 15px;
-    counter-increment: menu-item;
-}
-
-.navigation-panel.open .menu-category {
-    animation: slideInFromLeft 0.3s ease-out forwards;
-    animation-delay: calc(var(--base-delay) + (counter(menu-item) - 1) * var(--stagger-delay));
 }
 
 /* Keyframe for staggered menu category animation */
@@ -252,348 +81,6 @@ html, body {
     }
 }
 
-.category-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 12px;
-    background: color-mix(in srgb, var(--neutral-fill-rest) 30%, transparent);
-    backdrop-filter: blur(10px);
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    border: 1px solid color-mix(in srgb, var(--neutral-stroke-rest) 30%, transparent);
-}
-
-.category-header:hover {
-    background: var(--neutral-fill-hover);
-}
-
-.category-title {
-    font-weight: 500;
-    font-size: 14px;
-}
-
-.category-arrow {
-    font-size: 10px;
-    transition: transform 0.2s;
-}
-
-.category-arrow.expanded {
-    transform: rotate(180deg);
-}
-
-.category-items {
-    padding: 5px 0;
-    /* Reset counter for menu items within each category */
-    counter-reset: category-item;
-}
-
-.menu-item {
-    padding: 8px 20px;
-    cursor: pointer;
-    border-radius: 3px;
-    transition: background-color 0.2s;
-    margin: 2px 0;
-    /* Increment counter for each menu item */
-    counter-increment: category-item;
-    /* Initial state for animation */
-    opacity: 0;
-    transform: translateY(-20px);
-}
-
-/* Animate menu items when category is expanded and navigation panel is open */
-.navigation-panel.open .category-items .menu-item {
-    animation: slideInFromTop 0.25s ease-out forwards;
-    /* Dynamic delay calculation for each menu item */
-    animation-delay: calc(var(--item-base-delay) + (counter(category-item) - 1) * var(--item-stagger-delay));
-}
-
-.menu-item:hover {
-    background: var(--neutral-fill-hover);
-}
-
-.item-title {
-    display: block;
-    font-size: 13px;
-    font-weight: 400;
-}
-
-.item-description {
-    display: block;
-    font-size: 11px;
-    opacity: 0.7;
-    margin-top: 2px;
-    color: var(--neutral-foreground-hint);
-}
-
-/* Content Area */
-.content-area {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    height: 100vh;
-}
-
-.page-content {
-    flex: 1;
-    padding: 20px;
-    padding-top: 60px; /* Add top padding to account for title bar overlay */
-    overflow: auto;
-    background: transparent;
-    box-sizing: border-box;
-}
-
-/* Notifications Panel */
-.notifications-panel {
-    position: absolute;
-    top: 54px; /* Position below title bar */
-    right: 20px;
-    width: 300px;
-    max-height: 400px;
-    z-index: 1001;
-}
-
-.notification-area {
-    background: var(--neutral-fill-secondary-rest);
-    backdrop-filter: blur(10px);
-    border-radius: 8px;
-    border: 1px solid var(--neutral-stroke-rest);
-    color: var(--foreground-color);
-}
-
-.notification-list {
-    max-height: 350px;
-    overflow-y: auto;
-}
-
-.notification-item {
-    padding: 12px;
-    border-bottom: 1px solid var(--neutral-stroke-divider-rest);
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.notification-item:hover {
-    background: var(--neutral-fill-hover);
-}
-
-.notification-item:last-child {
-    border-bottom: none;
-}
-
-.notification-item.error {
-    border-left: 3px solid var(--accent-fill-active);
-}
-
-.notification-item.warning {
-    border-left: 3px solid var(--accent-fill-active);
-}
-
-.notification-item.info {
-    border-left: 3px solid var(--accent-fill-rest);
-}
-
-.notification-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 5px;
-}
-
-.notification-icon {
-    font-size: 12px;
-    margin-right: 5px;
-}
-
-.notification-time {
-    font-size: 11px;
-    color: var(--input-placeholder-rest);
-}
-
-.notification-close {
-    background: none;
-    border: none;
-    color: var(--neutral-foreground-rest);
-    cursor: pointer;
-    font-size: 16px;
-    padding: 0;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 3px;
-    transition: background-color 0.2s;
-}
-
-.notification-close:hover {
-    background: var(--neutral-fill-strong-hover);
-}
-
-.notification-title {
-    font-size: 13px;
-    font-weight: 500;
-    margin-bottom: 3px;
-}
-
-.notification-description {
-    font-size: 11px;
-    color: var(--input-placeholder-rest);
-    line-height: 1.3;
-}
-
-.notification-footer {
-    padding: 10px;
-    text-align: center;
-    border-top: 1px solid var(--neutral-stroke-input-rest);
-}
-
-.show-all-btn {
-    background: var(--neutral-fill-rest);
-    border: none;
-    color: var(--neutral-foreground-rest);
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 11px;
-    transition: background-color 0.2s;
-}
-
-.show-all-btn:hover {
-    background: var(--neutral-fill-hover);
-}
-
-.no-notifications {
-    padding: 20px;
-    text-align: center;
-    font-size: 13px;
-    color: var(--neutral-foreground-rest);
-}
-
-/* Status Bar */
-.status-bar {
-    height: 24px;
-    background: var(--neutral-fill-rest);
-    border-top: 1px solid var(--neutral-stroke-rest);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 10px;
-    color: var(--neutral-foreground-rest);
-    font-size: 11px;
-    backdrop-filter: blur(5px);
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 2000;
-}
-
-.status-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.version-info {
-    color: var(--neutral-foreground-rest);
-}
-
-.admin-badge {
-    background: var(--neutral-fill-strong-rest);
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-size: 10px;
-}
-
-.status-right {
-    display: flex;
-    align-items: center;
-}
-
-.credit-text {
-    color: var(--neutral-foreground-rest);
-    cursor: pointer;
-    transition: opacity 0.2s;
-}
-
-.credit-text:hover {
-    opacity: 0.8;
-}
-
-/* Resize borders for custom window chrome */
-.resize-border {
-    position: absolute;
-    z-index: 30000; /* Above everything else */
-    background: transparent;
-}
-
-.resize-border-top {
-    top: 0;
-    left: 8px;
-    right: 8px;
-    height: 8px;
-    cursor: n-resize;
-}
-
-.resize-border-bottom {
-    bottom: 0;
-    left: 8px;
-    right: 8px;
-    height: 8px;
-    cursor: s-resize;
-}
-
-.resize-border-left {
-    top: 8px;
-    left: 0;
-    bottom: 8px;
-    width: 8px;
-    cursor: w-resize;
-}
-
-.resize-border-right {
-    top: 8px;
-    right: 0;
-    bottom: 8px;
-    width: 8px;
-    cursor: e-resize;
-}
-
-.resize-border-top-left {
-    top: 0;
-    left: 0;
-    width: 8px;
-    height: 8px;
-    cursor: nw-resize;
-}
-
-.resize-border-top-right {
-    top: 0;
-    right: 0;
-    width: 8px;
-    height: 8px;
-    cursor: ne-resize;
-}
-
-.resize-border-bottom-left {
-    bottom: 0;
-    left: 0;
-    width: 8px;
-    height: 8px;
-    cursor: sw-resize;
-}
-
-.resize-border-bottom-right {
-    bottom: 0;
-    right: 0;
-    width: 8px;
-    height: 8px;
-    cursor: se-resize;
-}
-
 /* Scrollbar styling */
 ::-webkit-scrollbar {
     width: 6px;
@@ -613,40 +100,55 @@ html, body {
     background: color-mix(in srgb, var(--neutral-fill-strong-hover) 80%, transparent);
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .navigation-panel.open {
-        width: 250px;
-    }
-    
-    .notifications-panel {
-        width: 250px;
-        right: 10px;
-    }
-    
-    .demo-sections {
-        grid-template-columns: 1fr;
-    }
-    
-    .home-page {
-        padding: 0 10px;
-    }
+/* Option Component Display Box */
+.option-display-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 60px; /* Ensures consistent row height */
+    padding: 0.5rem 0; /* Add some vertical padding for better spacing */
 }
 
-/* Accessibility and reduced motion support */
-@media (prefers-reduced-motion: reduce) {
-    .navigation-panel,
-    .navigation-menu,
-    .menu-category,
-    .category-header,
-    .menu-item {
-        transition: none;
-        animation: none;
+    .option-display-box .option-content {
+        flex: 1;
+        margin-right: 1rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* Centers content vertically */
     }
-    
-    /* Ensure menu items are visible when animations are disabled */
-    .menu-item {
-        opacity: 1;
-        transform: none;
+
+    .option-display-box .option-title {
+        font-weight: 600;
+        color: var(--neutral-foreground-rest);
+        margin-bottom: 0.25rem;
+        line-height: 1.2; /* Consistent line height */
     }
-}
+
+    .option-display-box .option-description {
+        color: var(--neutral-foreground-hint);
+        font-size: 0.85rem;
+        line-height: 1.3;
+        margin: 0; /* Remove any default margins */
+    }
+
+    .option-display-box .option-control {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end; /* Aligns controls to the right */
+    }
+
+    .option-display-box .option-control-with-label {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-shrink: 0;
+        justify-content: flex-end; /* Aligns controls to the right */
+    }
+
+    .option-display-box .option-range-info {
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+        font-style: italic;
+        color: var(--neutral-foreground-hint);
+    }

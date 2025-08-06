@@ -1,0 +1,77 @@
+﻿.title-bar {
+    height: 40px;
+    font-size: 20px;
+    display: flex;
+    align-items: start;
+    color: var(--neutral-foreground-rest);
+    cursor: default;
+    user-select: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 20000;
+}
+
+.title-bar-hitbox {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    cursor: default;
+}
+
+.title-bar-left {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.title-bar-center {
+    flex: 1;
+    text-align: center;
+    position: relative;
+}
+
+.title-bar-right {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.title-bar-btn {
+    width: 50px;
+    height: 34px;
+    border: none;
+    background: transparent;
+    color: var(--accent-foreground-rest);
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+    .title-bar-btn:hover {
+        background: var(--accent-foreground-hover);
+    }
+
+.menu-toggle-btn {
+    width: 50px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    background: none;
+    border: none;
+    color: inherit;
+}
+
+    .menu-toggle-btn:hover {
+        background: var(--accent-foreground-hover);
+    }
