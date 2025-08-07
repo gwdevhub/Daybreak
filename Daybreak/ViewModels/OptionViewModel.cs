@@ -23,4 +23,14 @@ public sealed class OptionViewModel(IOptionsProvider optionsProvider)
         this.OptionInstance = this.optionsProvider.GetRegisteredOptionInstance(view.OptionName ?? string.Empty);
         return base.ParametersSet(view, cancellationToken);
     }
+
+    public void OnValueChanged()
+    {
+        if (this.OptionInstance is null)
+        {
+            return;
+        }
+
+        this.optionsProvider.SaveRegisteredOptions(this.OptionInstance);
+    }
 }

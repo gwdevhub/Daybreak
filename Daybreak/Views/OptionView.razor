@@ -19,16 +19,17 @@
                         <BooleanOption Name="@property.Name"
                                        Description="@property.Description"
                                        Instance="@this.ViewModel.OptionInstance"
-                                       Property="@property" />
+                                       Property="@property"
+                                       ValueChanged="@this.ViewModel.OnValueChanged" />
                     }
                     else if (property.Type == typeof(int) ||
-                    property.Type == typeof(uint) ||
-                    property.Type == typeof(long) ||
-                    property.Type == typeof(ulong) ||
-                    property.Type == typeof(short) ||
-                    property.Type == typeof(ushort) ||
-                    property.Type == typeof(float) ||
-                    property.Type == typeof(double))
+                             property.Type == typeof(uint) ||
+                             property.Type == typeof(long) ||
+                             property.Type == typeof(ulong) ||
+                             property.Type == typeof(short) ||
+                             property.Type == typeof(ushort) ||
+                             property.Type == typeof(float) ||
+                             property.Type == typeof(double))
                     {
                         @if (property.Validator is not null)
                         {
@@ -36,14 +37,16 @@
                                                Description="@property.Description"
                                                Instance="@this.ViewModel.OptionInstance"
                                                Property="@property"
-                                               Validator="@property.Validator" />
+                                               Validator="@property.Validator"
+                                               ValueChanged="@this.ViewModel.OnValueChanged" />
                         }
                         else
                         {
                             <NumberOption Name="@property.Name"
                                           Description="@property.Description"
                                           Instance="@this.ViewModel.OptionInstance"
-                                          Property="@property" />
+                                          Property="@property"
+                                          ValueChanged="@this.ViewModel.OnValueChanged" />
                         }
                     }
                     else if (property.Type.IsEnum)
@@ -53,14 +56,16 @@
                                            Description="@property.Description"
                                            Instance="@this.ViewModel.OptionInstance"
                                            Property="@property"
-                                           PossibleValues="@possibleValues" />
+                                           PossibleValues="@possibleValues"
+                                           ValueChanged="@this.ViewModel.OnValueChanged" />
                     }
                     else
                     {
                         <StringOption Name="@property.Name"
                                       Description="@property.Description"
                                       Instance="@this.ViewModel.OptionInstance"
-                                      Property="@property" />
+                                      Property="@property"
+                                      ValueChanged="@this.ViewModel.OnValueChanged" />
                     }
                 }
             </div>

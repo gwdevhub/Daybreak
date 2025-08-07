@@ -149,6 +149,11 @@ internal sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptio
         this.SaveOptions(options.GetType(), options);
     }
 
+    public void SaveRegisteredOptions(OptionInstance optionInstance)
+    {
+        this.SaveOptions(optionInstance.Type.Type, optionInstance.Reference);
+    }
+
     public void SaveRegisteredOptions(string name, JObject options)
     {
         options.ThrowIfNull();

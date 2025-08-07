@@ -13,7 +13,7 @@
     </div>
     <div class="option-control">
         <FluentNumberField @bind-Value="this.Value" 
-                          @onchange="OnValueChanged"
+                          @onchange="this.OnValueChanged"
                           style="width: 180px;" 
                           Min="@(this.MinValue?.ToString())"
                           Max="@(this.MaxValue?.ToString())"
@@ -30,7 +30,7 @@
     private double? MinValue { get; set; }
     private double? MaxValue { get; set; }
 
-    public override double ConvertValue(OptionInstance optionInstance, OptionProperty property)
+    protected override double ConvertValue(OptionInstance optionInstance, OptionProperty property)
     {
         var numberValue = property.Getter(optionInstance);
         if (numberValue is null)
@@ -50,44 +50,22 @@
 
     protected override Task OnParametersSetAsync()
     {
-        ExtractValidatorLimits();
+        this.ExtractValidatorLimits();
         return base.OnParametersSetAsync();
     }
 
     private void ExtractValidatorLimits()
     {
-        if (this.Validator is not null)
+        if (this.Validator is ClampedValidator clampedValidator)
         {
-            var validatorType = this.Validator.GetType();
-            
-            // Check if it's a ClampedValidator
-            if (validatorType.IsGenericType && 
-                validatorType.GetGenericTypeDefinition().Name.Contains("ClampedValidator"))
+            if (clampedValidator.MinValue is IConvertible minConvertible)
             {
-                try
-                {
-                    // Use reflection to get the private fields
-                    var minField = validatorType.GetField("minValue", 
-                        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                    var maxField = validatorType.GetField("maxValue", 
-                        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                this.MinValue = minConvertible.ToDouble(null);
+            }
 
-                    if (minField?.GetValue(this.Validator) is IConvertible minConvertible)
-                    {
-                        this.MinValue = minConvertible.ToDouble(null);
-                    }
-
-                    if (maxField?.GetValue(this.Validator) is IConvertible maxConvertible)
-                    {
-                        this.MaxValue = maxConvertible.ToDouble(null);
-                    }
-                }
-                catch
-                {
-                    // Fallback if reflection fails
-                    this.MinValue = null;
-                    this.MaxValue = null;
-                }
+            if (clampedValidator.MaxValue is IConvertible maxConvertible)
+            {
+                this.MaxValue = maxConvertible.ToDouble(null);
             }
         }
     }
@@ -109,29 +87,26 @@
     {
         if (double.TryParse(e.Value?.ToString(), out var newValue))
         {
-            // Clamp the value to the valid range
-            if (this.MinValue.HasValue && newValue < this.MinValue.Value)
-                newValue = this.MinValue.Value;
-            if (this.MaxValue.HasValue && newValue > this.MaxValue.Value)
-                newValue = this.MaxValue.Value;
-
-            this.Value = newValue;
-            
             // Convert back to the original property type
             var convertedValue = this.Property.Type switch
             {
-                Type t when t == typeof(int) => (int)newValue,
-                Type t when t == typeof(uint) => (uint)newValue,
-                Type t when t == typeof(long) => (long)newValue,
-                Type t when t == typeof(ulong) => (ulong)newValue,
-                Type t when t == typeof(short) => (short)newValue,
-                Type t when t == typeof(ushort) => (ushort)newValue,
-                Type t when t == typeof(float) => (float)newValue,
-                Type t when t == typeof(double) => newValue,
-                _ => newValue
+                Type t when t == typeof(int) => (object)(int)newValue,
+                Type t when t == typeof(uint) => (object)(uint)newValue,
+                Type t when t == typeof(long) => (object)(long)newValue,
+                Type t when t == typeof(ulong) => (object)(ulong)newValue,
+                Type t when t == typeof(short) => (object)(short)newValue,
+                Type t when t == typeof(ushort) => (object)(ushort)newValue,
+                Type t when t == typeof(float) => (object)(float)newValue,
+                Type t when t == typeof(byte) => (object)(byte)newValue,
+                _ => (object)newValue
             };
-            
-            this.Property.Setter(this.Instance, convertedValue);
+
+            if (this.Validator.IsValid(convertedValue))
+            {
+                this.Value = newValue;
+                this.Property.Setter(this.Instance, convertedValue);
+                this.NotifyValueChanged();
+            }
         }
     }
 }

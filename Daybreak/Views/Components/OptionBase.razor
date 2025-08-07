@@ -9,14 +9,21 @@
     public required OptionInstance Instance { get; init; }
     [Parameter]
     public required OptionProperty Property { get; init; }
+    [Parameter]
+    public required Action ValueChanged { get; init; }
 
     public T? Value { get; set; }
 
-    public virtual T? ConvertValue(OptionInstance optionInstance, OptionProperty property) { throw new InvalidOperationException("Converter is not implemented"); }
+    protected virtual T? ConvertValue(OptionInstance optionInstance, OptionProperty property) { throw new InvalidOperationException("Converter is not implemented"); }
 
     protected override Task OnParametersSetAsync()
     {
         this.Value = this.ConvertValue(this.Instance, this.Property);
         return base.OnParametersSetAsync();
+    }
+
+    protected void NotifyValueChanged()
+    {
+        this.ValueChanged();
     }
 }

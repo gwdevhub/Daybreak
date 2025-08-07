@@ -13,7 +13,7 @@
 
 @inherits OptionBase<double>
 @code {
-    public override double ConvertValue(OptionInstance optionInstance, OptionProperty property)
+    protected override double ConvertValue(OptionInstance optionInstance, OptionProperty property)
     {
         var numberValue = property.Getter(optionInstance);
         if (numberValue is null)
@@ -35,7 +35,7 @@
         if (double.TryParse(e.Value?.ToString(), out var newValue))
         {
             this.Value = newValue;
-            
+
             // Convert back to the original property type
             var convertedValue = this.Property.Type switch
             {
@@ -49,8 +49,9 @@
                 Type t when t == typeof(double) => newValue,
                 _ => newValue
             };
-            
+
             this.Property.Setter(this.Instance, convertedValue);
+            this.NotifyValueChanged();
         }
     }
 }
