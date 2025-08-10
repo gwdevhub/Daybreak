@@ -53,15 +53,16 @@ public sealed class MDomainRegistrar(
     public IReadOnlyList<Uri>? QueryByServiceName(Func<string, bool> query)
     {
         var now = DateTimeOffset.UtcNow;
+        var returnList = new List<Uri>();
         foreach (var serviceRegistration in this.serviceLookup.Values.Where(s => s.Expiration > now))
         {
             if (query(serviceRegistration.Name))
             {
-                return [.. serviceRegistration.Uris];
+                returnList.AddRange(serviceRegistration.Uris);
             }
         }
 
-        return default;
+        return returnList;
     }
 
     public void QueryAllServices()

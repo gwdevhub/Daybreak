@@ -1,5 +1,55 @@
 ﻿@inherits ViewBase<LaunchView, LaunchViewModel>
+@using Daybreak.Shared.Models
 @page "/launch"
+
+<div class="launch-container">
+    <div class="launch-button-container">
+        <!-- Main Launch Button with Dropdown -->
+        <div class="launch-button-group">
+            <!-- Main Launch Button -->
+            <button class="launch-button @(this.ViewModel.CanLaunch ? "enabled" : "disabled")"
+                    @onclick="this.ViewModel.LaunchSelectedConfiguration"
+                    disabled="@(!this.ViewModel.CanLaunch)">
+                <div class="launch-button-content">
+                    @if (this.ViewModel.IsLaunching)
+                    {
+                        <div class="spinner"></div>
+                    }
+                    <span class="launch-text">@this.ViewModel.LaunchButtonText</span>
+                </div>
+            </button>
+            
+            <!-- Dropdown Arrow Button -->
+            <button class="dropdown-toggle-button @(this.ViewModel.LaunchConfigurations.Any() ? "enabled" : "disabled")"
+                    @onclick="this.ViewModel.ToggleDropdown"
+                    disabled="@(!this.ViewModel.LaunchConfigurations.Any())">
+                <span class="dropdown-arrow @(this.ViewModel.IsDropdownOpen ? "open" : "")">⏷</span>
+            </button>
+        </div>
+        
+        <!-- Dropdown Menu -->
+        @if (this.ViewModel.IsDropdownOpen && this.ViewModel.LaunchConfigurations.Any())
+        {
+            <div class="dropdown-menu" @onclick:stopPropagation="true">
+                @foreach (var config in this.ViewModel.LaunchConfigurations.Where(c => c != this.ViewModel.SelectedConfiguration))
+                {
+                    <div class="dropdown-item @(config == ViewModel.SelectedConfiguration ? "selected" : "")"
+                         @onclick="() => this.ViewModel.SelectConfiguration(config)">
+                        <div class="config-info">
+                            <div class="config-name">@(config.Configuration?.Credentials?.Username ?? "Unknown User")</div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Click outside to close dropdown -->
+@if (this.ViewModel.IsDropdownOpen)
+{
+    <div class="dropdown-backdrop" @onclick="this.ViewModel.CloseDropdown" />
+}
+
 @code {
-    
 }

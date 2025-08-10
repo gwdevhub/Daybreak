@@ -5,7 +5,6 @@
     left: 0;
     width: 0;
     min-width: 0;
-    border-right: 1px solid var(--neutral-stroke-rest);
     overflow: hidden;
     z-index: 1000;
     height: 100vh;
@@ -33,7 +32,7 @@
 .navigation-menu {
     padding: 15px;
     padding-top: 40px;
-    color: var(--neutral-foreground-rest);
+    color: var(--foreground-on-accent-rest);
     height: calc(100vh - 20px);
     overflow-y: auto;
     box-sizing: border-box;
@@ -50,16 +49,16 @@
     justify-content: space-between;
     align-items: center;
     padding: 8px 12px;
-    background: color-mix(in srgb, var(--neutral-fill-rest) 60%, transparent);
+    background: color-mix(in srgb, var(--accent-fill-active) 60%, transparent);
     backdrop-filter: blur(10px);
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.2s;
-    border: 1px solid color-mix(in srgb, var(--neutral-stroke-rest) 60%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent-stroke-active) 60%, transparent);
 }
 
     .category-header:hover {
-        background: var(--neutral-fill-hover);
+        background: var(--accent-fill-hover);
     }
 
 .category-title {
@@ -103,7 +102,7 @@
 }
 
 .menu-item:hover {
-    background: var(--neutral-fill-hover);
+    background: var(--accent-fill-hover);
 }
 
 .item-title {
@@ -116,5 +115,5 @@
     display: block;
     font-size: var(--font-size-medium);
     margin-top: 2px;
-    color: var(--neutral-foreground-hint);
+    color: var(--foreground-on-accent-rest);
 }

@@ -282,7 +282,7 @@ public class ProjectConfiguration : PluginConfigurationBase
     {
         viewProducer.ThrowIfNull();
 
-        viewProducer.RegisterView<LaunchView, LaunchViewModel>();
+        viewProducer.RegisterView<LaunchView, LaunchViewModel>(isSingleton: true);
         viewProducer.RegisterView<OptionView, OptionViewModel>();
     }
 

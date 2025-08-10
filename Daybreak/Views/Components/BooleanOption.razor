@@ -4,7 +4,7 @@
         <div class="option-description">@this.Description</div>
     </div>
     <div class="option-control-with-label">
-        <FluentLabel style="font-weight: 500; font-size: var(--font-size-small);">@(this.Value ? "On" : "Off")</FluentLabel>
+        <FluentLabel class="label">@(this.Value ? "On" : "Off")</FluentLabel>
         <FluentSwitch @bind-Value="this.Value" @bind-Value:after="this.OnToggleChanged" />
     </div>
 </div>
