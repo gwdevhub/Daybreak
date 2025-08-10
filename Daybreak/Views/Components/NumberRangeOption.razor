@@ -14,7 +14,6 @@
     <div class="option-control">
         <FluentNumberField @bind-Value="this.Value" 
                            @onchange="this.OnValueChanged"
-                           style="width: 220px;" 
                            Min="@(this.MinValue?.ToString())"
                            Max="@(this.MaxValue?.ToString())"
                            Step="@(this.GetStep().ToString())"

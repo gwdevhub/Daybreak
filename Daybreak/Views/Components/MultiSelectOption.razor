@@ -5,8 +5,7 @@
     </div>
     <div class="option-control">
         <FluentSelect TOption="string" @bind-Value="this.SelectedValue" 
-                      @onchange="OnSelectionChanged"
-                      style="width: 220px;">
+                      @onchange="OnSelectionChanged">
             @foreach (var option in this.PossibleValues)
             {
                 <FluentOption TOption="string" Value="@option.ToString()">@option.ToString()</FluentOption>

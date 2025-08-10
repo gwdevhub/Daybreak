@@ -1,6 +1,6 @@
 ﻿.title-bar {
     height: 40px;
-    font-size: 20px;
+    font-size: var(--font-size-medium);
     display: flex;
     align-items: start;
     color: var(--neutral-foreground-rest);

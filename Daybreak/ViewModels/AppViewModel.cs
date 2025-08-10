@@ -48,6 +48,15 @@ public sealed class AppViewModel
     public float BaseLayerLuminace { get; set; } = 0.0f;
     public string BackdropImage { get; set; } = string.Empty;
 
+    public double UIScale { get; set; }
+    public double XXSmallFontSize { get; set; }
+    public double XSmallFontSize { get; set; }
+    public double SmallFontSize { get; set; }
+    public double MediumFontSize { get; set; }
+    public double LargeFontSize { get; set; }
+    public double XLargeFontSize { get; set; }
+    public double XXLargeFontSize { get; set; }
+
     public AppViewModel(
         IOptionsProvider optionsProvider,
         IMenuServiceInitializer menuServiceInitializer,
@@ -175,6 +184,13 @@ public sealed class AppViewModel
         this.AccentBaseColor = this.themeManager.AccentBaseColor;
         this.NeutralBaseColor = this.themeManager.NeutralBaseColor;
         this.BackdropImage = this.themeManager.BackdropImage;
+        this.XXSmallFontSize = this.themeManager.XXSmallFontSize;
+        this.XSmallFontSize = this.themeManager.XSmallFontSize;
+        this.SmallFontSize = this.themeManager.SmallFontSize;
+        this.MediumFontSize = this.themeManager.MediumFontSize;
+        this.LargeFontSize = this.themeManager.LargeFontSize;
+        this.XLargeFontSize = this.themeManager.XLargeFontSize;
+        this.XXLargeFontSize = this.themeManager.XXLargeFontSize;
         this.RedrawRequested?.Invoke(this, EventArgs.Empty);
     }
 

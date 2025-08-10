@@ -103,6 +103,12 @@ html, body {
     background: color-mix(in srgb, var(--neutral-fill-strong-hover) 80%, transparent);
 }
 
+.option-view-title {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: var(--font-size-large)
+}
+
 /* Option Component Display Box */
 .option-display-box {
     display: flex;
@@ -123,13 +129,14 @@ html, body {
     .option-display-box .option-title {
         font-weight: 600;
         color: var(--neutral-foreground-rest);
+        font-size: var(--font-size-large);
         margin-bottom: 0.25rem;
         line-height: 1.2; /* Consistent line height */
     }
 
     .option-display-box .option-description {
         color: var(--neutral-foreground-hint);
-        font-size: 0.85rem;
+        font-size: var(--font-size-medium);
         line-height: 1.3;
         margin: 0; /* Remove any default margins */
     }
@@ -138,20 +145,62 @@ html, body {
         flex-shrink: 0;
         display: flex;
         align-items: center;
+        width: 250px;
+        font-size: var(--font-size-medium);
         justify-content: flex-end; /* Aligns controls to the right */
     }
 
     .option-display-box .option-control-with-label {
         display: flex;
         align-items: center;
+        font-size: var(--font-size-medium);
         gap: 0.75rem;
         flex-shrink: 0;
         justify-content: flex-end; /* Aligns controls to the right */
     }
 
     .option-display-box .option-range-info {
-        font-size: 0.75rem;
+        font-size: var(--font-size-medium);
         margin-top: 0.25rem;
         font-style: italic;
         color: var(--neutral-foreground-hint);
     }
+
+.option-control fluent-text-field,
+.option-control fluent-select,
+.option-control fluent-option,
+.option-control fluent-number-field {
+    font-size: var(--font-size-medium) !important;
+    width: 250px !important;
+    justify-content: flex-end !important;
+}
+
+    .option-control fluent-text-field::part(control),
+    .option-control fluent-select::part(control),
+    .option-control fluent-number-field::part(control) {
+        font-size: var(--font-size-medium) !important;
+        width: 250px !important;
+    }
+
+.option-control fluent-number-field::part(step-up-button),
+.option-control fluent-number-field::part(step-down-button) {
+    width: calc(var(--font-size-medium) * 1.5) !important;
+    height: calc(var(--font-size-medium) * 1.2) !important;
+    right: 2px !important;
+    font-size: calc(var(--font-size-medium) * 0.8) !important;
+}
+
+.option-control fluent-number-field::part(step-up-button) {
+    top: 1px !important;
+}
+
+.option-control fluent-number-field::part(step-down-button) {
+    bottom: 1px !important;
+}
+
+.option-control fluent-number-field::part(control) {
+    padding-right: calc(var(--font-size-medium) * 0) !important;
+    width: 220px !important;
+    max-width: 220px !important;
+    box-sizing: border-box !important;
+}

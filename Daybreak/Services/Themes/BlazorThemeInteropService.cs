@@ -15,6 +15,13 @@ public class BlazorThemeInteropService(
     IOptionsUpdateHook optionsUpdateHook,
     ILogger<BlazorThemeInteropService> logger) : IThemeManager, IThemeProducer, IApplicationLifetimeService
 {
+    private const double XXSmallFontSizeValue = 0.56;
+    private const double XSmallFontSizeValue = 0.625;
+    private const double SmallFontSizeValue = 0.8125;
+    private const double MediumFontSizeValue = 1.0;
+    private const double LargeFontSizeValue = 1.125;
+    private const double XLargeFontSizeValue = 1.5;
+    private const double XXLargeFontSizeValue = 2.0;
     private const string LightThemeValue = "Light";
     private const string RegistryKey = @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes";
     private const string PersonalizeKey = @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize";
@@ -31,6 +38,15 @@ public class BlazorThemeInteropService(
     public string NeutralBaseColor { get; private set; } = string.Empty;
     public string BackdropImage { get; private set; } = string.Empty;
     public float BaseLayerLuminance { get; private set; } = 0.0f;
+    public double UIScale { get; private set; } = 1.0;
+    public double XXSmallFontSize { get; private set; } = XXSmallFontSizeValue;
+    public double XSmallFontSize { get; private set; } = XSmallFontSizeValue;
+    public double SmallFontSize { get; private set; } = SmallFontSizeValue;
+    public double MediumFontSize { get; private set; } = MediumFontSizeValue;
+    public double LargeFontSize { get; private set; } = LargeFontSizeValue;
+    public double XLargeFontSize { get; private set; } = XLargeFontSizeValue;
+    public double XXLargeFontSize { get; private set; } = XXLargeFontSizeValue;
+
 
     public void OnStartup()
     {
@@ -63,6 +79,14 @@ public class BlazorThemeInteropService(
         this.AccentBaseColor = accentColor.Hex;
         this.NeutralBaseColor = backgroundColor.Hex;
         this.BaseLayerLuminance = baseLayerLuminance;
+        this.UIScale = themeOptions.ApplicationScale;
+        this.XXSmallFontSize = XXSmallFontSizeValue * this.UIScale;
+        this.XSmallFontSize = XSmallFontSizeValue * this.UIScale;
+        this.SmallFontSize = SmallFontSizeValue * this.UIScale;
+        this.MediumFontSize = MediumFontSizeValue * this.UIScale;
+        this.LargeFontSize = LargeFontSizeValue * this.UIScale;
+        this.XLargeFontSize = XLargeFontSizeValue * this.UIScale;
+        this.XXLargeFontSize = XXLargeFontSizeValue * this.UIScale;
         this.ThemeChanged?.Invoke(this, EventArgs.Empty);
     }
 

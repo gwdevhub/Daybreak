@@ -4,7 +4,14 @@
     BaseLayerLuminance="@this.ViewModel.BaseLayerLuminace">
     <ErrorLoggingBoundary>
         <div class="app-container @(this.ViewModel.WindowState == WindowState.Maximized ? "maximized" : "")"
-             style="--backdrop-image: url('../@this.ViewModel.BackdropImage');">
+             style="--backdrop-image: url('../@this.ViewModel.BackdropImage');
+                    --font-size-xx-small: @(this.ViewModel.XXSmallFontSize)rem;
+                    --font-size-x-small: @(this.ViewModel.XSmallFontSize)rem;
+                    --font-size-small: @(this.ViewModel.SmallFontSize)rem;
+                    --font-size-medium: @(this.ViewModel.MediumFontSize)rem;
+                    --font-size-large: @(this.ViewModel.LargeFontSize)rem;
+                    --font-size-x-large: @(this.ViewModel.XLargeFontSize)rem;
+                    --font-size-xx-large: @(this.ViewModel.XXLargeFontSize)rem;">
             <WindowBorders OnResize="@this.ViewModel.StartResize" />
 
             <WindowTitlebar WindowState="@this.ViewModel.WindowState"

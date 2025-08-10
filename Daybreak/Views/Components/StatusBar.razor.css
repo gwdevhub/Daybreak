@@ -6,7 +6,7 @@
     align-items: center;
     padding: 0 10px;
     color: var(--neutral-foreground-rest);
-    font-size: small;
+    font-size: var(--font-size-small);
     backdrop-filter: blur(5px);
     position: absolute;
     bottom: 0;
@@ -29,7 +29,7 @@
     background: var(--neutral-fill-strong-rest);
     padding: 2px 6px;
     border-radius: 3px;
-    font-size: small;
+    font-size: var(--font-size-small);
 }
 
 .status-right {

@@ -20,7 +20,8 @@
 }
 
     .navigation-panel.open {
-        width: 250px;
+        min-width: 25%;
+        width: auto;
         opacity: 1;
     }
 
@@ -30,7 +31,7 @@
         }
 
 .navigation-menu {
-    padding: 20px;
+    padding: 15px;
     padding-top: 40px;
     color: var(--neutral-foreground-rest);
     height: calc(100vh - 20px);
@@ -40,7 +41,7 @@
 }
 
 .menu-category {
-    margin-bottom: 15px;
+    margin-bottom: 5px;
     counter-increment: menu-item;
 }
 
@@ -63,11 +64,11 @@
 
 .category-title {
     font-weight: 400;
-    font-size: medium;
+    font-size: var(--font-size-medium);
 }
 
 .category-arrow {
-    font-size: medium;
+    font-size: var(--font-size-small);
     transition: transform 0.2s;
 }
 
@@ -82,7 +83,7 @@
 }
 
 .menu-item {
-    padding: 8px 20px;
+    padding: 8px 10px;
     cursor: pointer;
     border-radius: 3px;
     transition: background-color 0.2s;
@@ -107,13 +108,13 @@
 
 .item-title {
     display: block;
-    font-size: medium;
+    font-size: var(--font-size-medium);
     font-weight: 400;
 }
 
 .item-description {
     display: block;
-    font-size: small;
+    font-size: var(--font-size-medium);
     margin-top: 2px;
     color: var(--neutral-foreground-hint);
 }
