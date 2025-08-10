@@ -70,10 +70,11 @@ internal sealed class OnlinePictureClient : IOnlinePictureClient
 
     private async Task<(string Uri, string CreditText)> GetImageUri(bool localized)
     {
-        if (this.themeOptions.Value.WintersdayMode)
-        {
-            return await this.GetWintersdayUri(localized);
-        }
+        //TODO: Implement Wintersday mode
+        //if (this.themeOptions.Value.WintersdayMode)
+        //{
+        //    return await this.GetWintersdayUri(localized);
+        //}
 
         if (!localized)
         {

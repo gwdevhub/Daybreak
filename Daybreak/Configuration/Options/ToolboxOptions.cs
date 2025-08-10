@@ -1,4 +1,4 @@
-﻿using Daybreak.Attributes;
+﻿using Daybreak.Shared.Attributes;
 using Newtonsoft.Json;
 
 namespace Daybreak.Configuration.Options;

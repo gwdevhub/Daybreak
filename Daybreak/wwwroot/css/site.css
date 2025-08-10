@@ -24,14 +24,17 @@ html, body {
 
     .app-container::before {
         content: "";
-        position: absolute;
+        position: fixed;
         top: 0;
         left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('../img/backdrop.png') no-repeat center center;
+        width: 100vw;
+        height: 100vh;
+        background-image: var(--backdrop-image);
         background-size: cover;
-        z-index: -1; /* sit behind your content */
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        z-index: -1;
     }
 
     /* Hide resize borders when maximized */

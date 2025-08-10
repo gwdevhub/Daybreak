@@ -1,8 +1,8 @@
-﻿using Daybreak.Services.Themes;
-using Daybreak.Shared.Models.Menu;
+﻿using Daybreak.Shared.Models.Menu;
 using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Privilege;
+using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.Updater;
 using Daybreak.Shared.Utils;
 using Daybreak.Views;
@@ -22,7 +22,7 @@ public sealed class AppViewModel
     private readonly IMenuServiceProducer menuServiceProducer;
     private readonly IMenuServiceButtonHandler menuServiceButtonHandler;
     private readonly IViewManager viewManager;
-    private readonly BlazorThemeInteropService blazorThemeInteropService;
+    private readonly IThemeManager themeManager;
     private readonly IApplicationUpdater applicationUpdater;
     private readonly IPrivilegeManager privilegeManager;
     private readonly BlazorHostWindow blazorHostWindow;
@@ -46,13 +46,15 @@ public sealed class AppViewModel
     public string AccentBaseColor { get; set; } = string.Empty;
     public string NeutralBaseColor { get; set; } = string.Empty;
     public float BaseLayerLuminace { get; set; } = 0.0f;
+    public string BackdropImage { get; set; } = string.Empty;
 
     public AppViewModel(
         IOptionsProvider optionsProvider,
+        IMenuServiceInitializer menuServiceInitializer,
         IMenuServiceProducer menuServiceProducer,
         IMenuServiceButtonHandler menuServiceButtonHandler,
         IViewManager viewManager,
-        BlazorThemeInteropService blazorThemeInteropService,
+        IThemeManager themeManager,
         IApplicationUpdater applicationUpdater,
         IPrivilegeManager privilegeManager,
         BlazorHostWindow blazorHostWindow)
@@ -61,24 +63,26 @@ public sealed class AppViewModel
         this.menuServiceProducer = menuServiceProducer.ThrowIfNull();
         this.menuServiceButtonHandler = menuServiceButtonHandler.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
-        this.blazorThemeInteropService = blazorThemeInteropService.ThrowIfNull();
+        this.themeManager = themeManager.ThrowIfNull();
         this.applicationUpdater = applicationUpdater.ThrowIfNull();
         this.privilegeManager = privilegeManager.ThrowIfNull();
         this.blazorHostWindow = blazorHostWindow.ThrowIfNull();
 
         this.blazorHostWindow.StateChanged += this.MainWindow_StateChanged;
+        menuServiceInitializer.InitializeMenuService(
+            this.OpenNavigationMenu,
+            this.CloseNavigationMenu,
+            this.ToggleNavigationMenu);
     }
 
     public void InitializeApp()
     {
-        this.blazorThemeInteropService.InitializeTheme();
-        this.BaseLayerLuminace = this.blazorThemeInteropService.BaseLayerLuminance;
-        this.AccentBaseColor = this.blazorThemeInteropService.AccentBaseColor;
-        this.NeutralBaseColor = this.blazorThemeInteropService.NeutralBaseColor;
+        this.themeManager.ThemeChanged += (s, e) => this.OnThemeChange();
+        this.OnThemeChange();
+        this.LoadMenuCategories();
         this.RedrawRequested?.Invoke(this, EventArgs.Empty);
         this.viewManager.ShowView<LaunchView>();
         this.hwndSource = HwndSource.FromHwnd(new WindowInteropHelper(this.blazorHostWindow).Handle);
-        this.AsynchronouslyLoadMenu();
     }
 
     public void Drag()
@@ -124,6 +128,18 @@ public sealed class AppViewModel
         this.RedrawRequested?.Invoke(this, EventArgs.Empty);
     }
 
+    public void OpenNavigationMenu()
+    {
+        this.IsNavigationOpen = true;
+        this.RedrawRequested?.Invoke(this, EventArgs.Empty);
+    }
+
+    public void CloseNavigationMenu()
+    {
+        this.IsNavigationOpen = false;
+        this.RedrawRequested?.Invoke(this, EventArgs.Empty);
+    }
+
     public void OpenCreditLink()
     {
 
@@ -153,13 +169,13 @@ public sealed class AppViewModel
         this.menuServiceButtonHandler.HandleButton(menuButton);
     }
 
-    private Task AsynchronouslyLoadMenu()
+    private void OnThemeChange()
     {
-        return Task.Factory.StartNew(() =>
-        {
-            this.LoadMenuCategories();
-            this.RedrawRequested?.Invoke(this, EventArgs.Empty);
-        }, TaskCreationOptions.LongRunning);
+        this.BaseLayerLuminace = this.themeManager.BaseLayerLuminance;
+        this.AccentBaseColor = this.themeManager.AccentBaseColor;
+        this.NeutralBaseColor = this.themeManager.NeutralBaseColor;
+        this.BackdropImage = this.themeManager.BackdropImage;
+        this.RedrawRequested?.Invoke(this, EventArgs.Empty);
     }
 
     private void LoadMenuCategories()

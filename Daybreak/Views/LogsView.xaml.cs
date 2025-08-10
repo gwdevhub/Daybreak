@@ -38,9 +38,9 @@ public partial class LogsView : UserControl
         this.logManager = logManager.ThrowIfNull(nameof(logManager));
         this.logger = logger.ThrowIfNull(nameof(logger));
         this.InitializeComponent();
-        this.simpleRedHighlightingBrush = new SimpleHighlightingBrush(ColorPalette.Red);
-        this.simpleOrangeHighlightingBrush = new SimpleHighlightingBrush(ColorPalette.Orange);
-        this.simpleGreenHighlightingBrush = new SimpleHighlightingBrush(ColorPalette.Green);
+        this.simpleRedHighlightingBrush = new SimpleHighlightingBrush(ColorPalette.AccentColor.Red.Color);
+        this.simpleOrangeHighlightingBrush = new SimpleHighlightingBrush(ColorPalette.AccentColor.Orange.Color);
+        this.simpleGreenHighlightingBrush = new SimpleHighlightingBrush(ColorPalette.AccentColor.Green.Color);
         this.TextEditor.TextArea.TextView.LineTransformers.Add(new RichTextColorizer(this.richTextModel));
         SearchPanel.Install(this.TextEditor);
     }

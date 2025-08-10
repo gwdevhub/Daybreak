@@ -1,4 +1,4 @@
-﻿using Daybreak.Attributes;
+﻿using Daybreak.Shared.Attributes;
 
 namespace Daybreak.Configuration.Options;
 

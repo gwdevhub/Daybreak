@@ -143,9 +143,6 @@ public partial class MainWindow : FluentWindow
 
     private void ThemeOptionsChanged()
     {
-        this.PaintifyBackground = this.themeOptions.Value.BackgroundPaintify;
-        this.BlurBackground = this.themeOptions.Value.BackgroundBlur;
-        this.WintersdayMode = this.themeOptions.Value.WintersdayMode;
     }
 
     private void SetupImageCycle()

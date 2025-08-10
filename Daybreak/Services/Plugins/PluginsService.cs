@@ -11,6 +11,7 @@ using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Plugins;
 using Daybreak.Shared.Services.Startup;
+using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.Updater.PostUpdate;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.DependencyInjection;
@@ -92,7 +93,8 @@ internal sealed class PluginsService : IPluginsService
         IModsManager modsManager,
         IBrowserExtensionsProducer browserExtensionsProducer,
         IArgumentHandlerProducer argumentHandlerProducer,
-        IMenuServiceProducer menuServiceProducer)
+        IMenuServiceProducer menuServiceProducer,
+        IThemeProducer themeProducer)
     {
         serviceManager.ThrowIfNull();
         optionsProducer.ThrowIfNull();
@@ -104,6 +106,7 @@ internal sealed class PluginsService : IPluginsService
         browserExtensionsProducer.ThrowIfNull();
         argumentHandlerProducer.ThrowIfNull();
         menuServiceProducer.ThrowIfNull();
+        themeProducer.ThrowIfNull();
 
         this.pluginsSemaphore.Wait();
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.LoadPlugins), string.Empty);
@@ -166,6 +169,8 @@ internal sealed class PluginsService : IPluginsService
                 pluginScopedLogger.LogDebug("Registered services");
                 RegisterOptions(pluginConfig, optionsProducer);
                 pluginScopedLogger.LogDebug("Registered options");
+                RegisterTheme(pluginConfig, themeProducer);
+                pluginScopedLogger.LogDebug("Registered themes");
                 RegisterViews(pluginConfig, viewProducer);
                 pluginScopedLogger.LogDebug("Registered views");
                 RegisterPostUpdateActions(pluginConfig, postUpdateActionProducer);
@@ -330,4 +335,6 @@ internal sealed class PluginsService : IPluginsService
     private static void RegisterArgumentHandlers(PluginConfigurationBase pluginConfig, IArgumentHandlerProducer argumentHandlerProducer) => pluginConfig.RegisterLaunchArgumentHandlers(argumentHandlerProducer);
 
     private static void RegisterMenuButtons(PluginConfigurationBase pluginConfig, IMenuServiceProducer menuServiceProducer) => pluginConfig.RegisterMenuButtons(menuServiceProducer);
+
+    private static void RegisterTheme(PluginConfigurationBase pluginConfig, IThemeProducer themeProducer) => pluginConfig.RegisterThemes(themeProducer);
 }

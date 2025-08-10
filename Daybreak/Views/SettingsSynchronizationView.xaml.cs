@@ -52,8 +52,8 @@ public partial class SettingsSynchronizationView : UserControl
         this.graphClient = graphClient.ThrowIfNull();
         this.optionsSynchronizationService = optionsSynchronizationService.ThrowIfNull();
 
-        this.simpleGreenHighlightingBrush = new SimpleHighlightingBrush(ColorPalette.Green);
-        this.simpleRedHighlightingBrush = new SimpleHighlightingBrush(ColorPalette.Red);
+        this.simpleGreenHighlightingBrush = new SimpleHighlightingBrush(ColorPalette.AccentColor.Green.Color);
+        this.simpleRedHighlightingBrush = new SimpleHighlightingBrush(ColorPalette.AccentColor.Red.Color);
         this.simpleForegroundHighlightingBrush = new SimpleHighlightingBrush(this.FindResource("MahApps.Colors.ThemeForeground").Cast<Color>());
         this.InitializeComponent();
     }

@@ -3,7 +3,8 @@
     NeutralBaseColor="@this.ViewModel.NeutralBaseColor"
     BaseLayerLuminance="@this.ViewModel.BaseLayerLuminace">
     <ErrorLoggingBoundary>
-        <div class="app-container @(this.ViewModel.WindowState == WindowState.Maximized ? "maximized" : "")">
+        <div class="app-container @(this.ViewModel.WindowState == WindowState.Maximized ? "maximized" : "")"
+             style="--backdrop-image: url('../@this.ViewModel.BackdropImage');">
             <WindowBorders OnResize="@this.ViewModel.StartResize" />
 
             <WindowTitlebar WindowState="@this.ViewModel.WindowState"

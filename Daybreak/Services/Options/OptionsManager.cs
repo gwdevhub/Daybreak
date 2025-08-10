@@ -1,4 +1,4 @@
-﻿using Daybreak.Attributes;
+﻿using Daybreak.Shared.Attributes;
 using Daybreak.Shared.Models.Options;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Utils;
@@ -223,6 +223,7 @@ internal sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptio
             var propertyType = propertyInfo.PropertyType;
             (var name, var description) = GetNameAndDescription(propertyInfo, optionsName);
             var validator = GetValidator(propertyInfo);
+            var possibleValues = GetValuesFactory(propertyInfo);
             (var hasCustomSetter, var action, var customSetterViewType) = GetCustomSetter(propertyInfo);
             var converter = TypeDescriptor.GetConverter(propertyType);
             var getter = new Func<OptionInstance, object?>(instance => propertyInfo.GetValue(instance.Reference));
@@ -253,6 +254,7 @@ internal sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptio
             {
                 Name = name,
                 Description = description,
+                ValuesFactory = possibleValues,
                 Validator = validator ?? new AllGoesValidator(),
                 Setter = setter,
                 Getter = getter,
@@ -264,6 +266,27 @@ internal sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptio
 
             yield return optionProperty;
         }
+    }
+
+    private static Func<List<object>>? GetValuesFactory(PropertyInfo propertyInfo)
+    {
+        if (propertyInfo.GetCustomAttribute<OptionValuesAttribute>() is OptionValuesAttribute optionValuesAttribute)
+        {
+            return () => [.. optionValuesAttribute.Values];
+        }
+
+        if (propertyInfo.GetCustomAttribute<OptionValuesFactoryAttribute>() is OptionValuesFactoryAttribute optionValuesFactoryAttribute)
+        {
+            return optionValuesFactoryAttribute.ValuesFactory;
+        }
+
+        if (propertyInfo.PropertyType.IsEnum)
+        {
+            var values = Enum.GetValues(propertyInfo.PropertyType).Cast<object>().ToList();
+            return () => values;
+        }
+
+        return default;
     }
 
     private static string GetOptionsName<T>()

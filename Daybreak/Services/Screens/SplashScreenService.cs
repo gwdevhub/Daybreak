@@ -25,7 +25,6 @@ internal sealed class SplashScreenService : ISplashScreenService
         this.themeManager = themeManager.ThrowIfNull();
         this.options = options.ThrowIfNull();
         this.splashWindow = splashWindow.ThrowIfNull();
-        this.SetupThemeResources();
     }
 
     public void HideSplashScreen()
@@ -47,20 +46,6 @@ internal sealed class SplashScreenService : ISplashScreenService
         }
 
         this.splashWindow.Show();
-    }
-
-    private void SetupThemeResources()
-    {
-        var theme = this.themeManager.GetCurrentTheme()?.As<Theme>();
-        if (theme is null)
-        {
-            return;
-        }
-
-        foreach(var key in theme.Resources.Keys)
-        {
-            this.splashWindow.Resources.Add(key, theme.Resources[key]);
-        }
     }
 
     private static double CalculateAreaOfRectIntersection(Rect rect1, Rect rect2)

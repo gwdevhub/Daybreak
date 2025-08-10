@@ -7,6 +7,7 @@ using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Startup;
+using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.Updater.PostUpdate;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,6 +36,7 @@ public abstract class PluginConfigurationBase
     public virtual void RegisterBrowserExtensions(IBrowserExtensionsProducer browserExtensionsProducer) { }
     public virtual void RegisterLaunchArgumentHandlers(IArgumentHandlerProducer argumentHandlerProducer) { }
     public virtual void RegisterMenuButtons(IMenuServiceProducer menuServiceProducer) { }
+    public virtual void RegisterThemes(IThemeProducer themeProducer) { }
 
     public PluginConfigurationBase()
     {

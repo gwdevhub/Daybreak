@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Attributes;
+﻿namespace Daybreak.Shared.Attributes;
 
 [AttributeUsage(AttributeTargets.Class)]
 public sealed class OptionsNameAttribute : Attribute

@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace Daybreak.Attributes;
+namespace Daybreak.Shared.Attributes;
 
 /// <summary>
 /// Mark a custom view that is supposed to set the value of the option.

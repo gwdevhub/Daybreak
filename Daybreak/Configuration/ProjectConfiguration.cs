@@ -121,8 +121,8 @@ using Daybreak.Shared.Models.Plugins;
 using Daybreak.ViewModels;
 using TrailBlazr.Extensions;
 using TrailBlazr.Services;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Fast.Components.FluentUI;
+using Daybreak.Themes;
 
 namespace Daybreak.Configuration;
 
@@ -198,7 +198,6 @@ public class ProjectConfiguration : PluginConfigurationBase
 
         services.AddSingleton<AppViewModel>();
 
-        services.AddSingleton<BlazorThemeInteropService>();
         services.AddSingleton<ViewManager>();
         services.AddSingleton<ProcessorUsageMonitor>();
         services.AddSingleton<MemoryUsageMonitor>();
@@ -218,7 +217,8 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IOptionsProducer, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().Cast<OptionsManager>());
         services.AddSingleton<IOptionsUpdateHook, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().Cast<OptionsManager>());
         services.AddSingleton<IOptionsProvider, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().Cast<OptionsManager>());
-        services.AddSingleton<IThemeManager, ThemeManager>();
+        services.AddSingleton<IThemeManager, BlazorThemeInteropService>();
+        services.AddSingleton<IThemeProducer, BlazorThemeInteropService>(sp => sp.GetRequiredService<IThemeManager>().Cast<BlazorThemeInteropService>());
         services.AddSingleton<INotificationService, NotificationService>();
         services.AddSingleton<INotificationProducer, NotificationService>(sp => sp.GetRequiredService<INotificationService>().Cast<NotificationService>());
         services.AddSingleton<INotificationHandlerProducer, NotificationService>(sp => sp.GetRequiredService<INotificationService>().Cast<NotificationService>());
@@ -420,6 +420,20 @@ public class ProjectConfiguration : PluginConfigurationBase
             .RegisterButton("Telemetry", "Open telemetry view", sp => { })
             .RegisterButton("Logs", "Open logs view", sp => { })
             .RegisterButton("Metrics", "Open metrics view", sp => { });
+    }
+
+    public override void RegisterThemes(IThemeProducer themeProducer)
+    {
+        themeProducer.ThrowIfNull();
+        foreach(var theme in CoreThemes.Themes)
+        {
+            themeProducer.RegisterTheme(theme);
+        }
+
+        foreach (var theme in HeroThemes.Themes)
+        {
+            themeProducer.RegisterTheme(theme);
+        }
     }
 
     private IServiceCollection RegisterHttpClients(IServiceCollection services)

@@ -7,6 +7,7 @@ using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Startup;
+using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.Updater.PostUpdate;
 using Slim;
 
@@ -28,7 +29,8 @@ public interface IPluginsService
         IModsManager modsManager,
         IBrowserExtensionsProducer browserExtensionsProducer,
         IArgumentHandlerProducer argumentHandlerProducer,
-        IMenuServiceProducer menuServiceProducer);
+        IMenuServiceProducer menuServiceProducer,
+        IThemeProducer themeProducer);
 
     IEnumerable<AvailablePlugin> GetAvailablePlugins();
 

@@ -113,7 +113,6 @@ public sealed class Launcher : BlazorHybridApplication<App>
          * initializing the options.
          */
         this.ServiceProvider.GetRequiredService<ISplashScreenService>().ShowSplashScreen();
-        _ = this.ServiceProvider.GetRequiredService<IThemeManager>().GetCurrentTheme();
 
         /*
          * Hook into WPF traces and output them to logs
@@ -147,6 +146,7 @@ public sealed class Launcher : BlazorHybridApplication<App>
         var browserExtensionsProducer = this.ServiceProvider.GetRequiredService<IBrowserExtensionsProducer>();
         var argumentHandlerProducer = this.ServiceProvider.GetRequiredService<IArgumentHandlerProducer>();
         var menuServiceProducer = this.ServiceProvider.GetRequiredService<IMenuServiceProducer>();
+        var themeProducer = this.ServiceProvider.GetRequiredService<IThemeProducer>();
 
         await this.Dispatcher.InvokeAsync(() => 
         {
@@ -154,6 +154,10 @@ public sealed class Launcher : BlazorHybridApplication<App>
             var mainWindow = this.ServiceProvider.GetRequiredService<BlazorHostWindow>();
             mainWindow.Hide();
         });
+        await Task.Delay(10);
+
+        startupStatus.CurrentStep = StartupStatus.Custom("Loading themes");
+        this.projectConfiguration.RegisterThemes(themeProducer);
         await Task.Delay(10);
 
         startupStatus.CurrentStep = StartupStatus.Custom("Loading views");
@@ -205,7 +209,8 @@ public sealed class Launcher : BlazorHybridApplication<App>
                     modsManager,
                     browserExtensionsProducer,
                     argumentHandlerProducer,
-                    menuServiceProducer);
+                    menuServiceProducer,
+                    themeProducer);
             await Task.Delay(10);
         }
         catch (Exception e)

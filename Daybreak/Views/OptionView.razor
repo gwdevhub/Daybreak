@@ -14,7 +14,17 @@
                         continue;
                     }
 
-                    @if (property.Type == typeof(bool))
+                    @if (property.ValuesFactory is not null)
+                    {
+                        var values = property.ValuesFactory();
+                        <MultiSelectOption Name="@property.Name"
+                                           Description="@property.Description"
+                                           Instance="@this.ViewModel.OptionInstance"
+                                           Property="@property"
+                                           PossibleValues="@values"
+                                           ValueChanged="@this.ViewModel.OnValueChanged" />
+                    }
+                    else if (property.Type == typeof(bool))
                     {
                         <BooleanOption Name="@property.Name"
                                        Description="@property.Description"
@@ -48,16 +58,6 @@
                                           Property="@property"
                                           ValueChanged="@this.ViewModel.OnValueChanged" />
                         }
-                    }
-                    else if (property.Type.IsEnum)
-                    {
-                        var possibleValues = Enum.GetValues(property.Type).OfType<object>().ToList();
-                        <MultiSelectOption Name="@property.Name"
-                                           Description="@property.Description"
-                                           Instance="@this.ViewModel.OptionInstance"
-                                           Property="@property"
-                                           PossibleValues="@possibleValues"
-                                           ValueChanged="@this.ViewModel.OnValueChanged" />
                     }
                     else
                     {

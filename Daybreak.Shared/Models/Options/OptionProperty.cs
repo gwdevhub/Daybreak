@@ -7,6 +7,7 @@ public sealed class OptionProperty
     public required string Name { get; init; }
     public required string Description { get; init; }
     public required IValidator Validator { get; init; }
+    public required Func<List<object>>? ValuesFactory { get; init; }
     public required Action<OptionInstance, object?> Setter { get; init; }
     public required Func<OptionInstance, object?> Getter { get; init; }
     public required TypeConverter Converter { get; init; }
