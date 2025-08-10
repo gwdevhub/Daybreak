@@ -1,10 +1,9 @@
 ﻿using Daybreak.Shared.Services.Menu;
-using Daybreak.Views;
 using System.Core.Extensions;
 using TrailBlazr.Services;
 using TrailBlazr.ViewModels;
 
-namespace Daybreak.ViewModels;
+namespace Daybreak.Views;
 public sealed class LaunchViewModel(
     IViewManager viewManager,
     IMenuService menuService)

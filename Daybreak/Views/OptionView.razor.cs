@@ -1,15 +1,16 @@
 ﻿using Daybreak.Shared.Models.Options;
 using Daybreak.Shared.Services.Options;
-using Daybreak.Views;
 using TrailBlazr.ViewModels;
 
-namespace Daybreak.ViewModels;
+namespace Daybreak.Views;
+
 public sealed class OptionViewModel(IOptionsProvider optionsProvider)
     : ViewModelBase<OptionViewModel, OptionView>
 {
     private readonly IOptionsProvider optionsProvider = optionsProvider;
 
-    public OptionInstance? OptionInstance { 
+    public OptionInstance? OptionInstance
+    {
         get => field;
         set
         {

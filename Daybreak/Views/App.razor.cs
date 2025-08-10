@@ -5,17 +5,15 @@ using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.Updater;
 using Daybreak.Shared.Utils;
-using Daybreak.Views;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
 using System.Core.Extensions;
-using System.Extensions;
+using System.IO;
 using System.Windows;
 using System.Windows.Interop;
 using TrailBlazr.Services;
 using WpfExtended.Blazor.Launch;
 
-namespace Daybreak.ViewModels;
+namespace Daybreak.Views;
 public sealed class AppViewModel
 {
     private readonly IOptionsProvider optionsProvider;
@@ -196,7 +194,7 @@ public sealed class AppViewModel
 
     private void LoadMenuCategories()
     {
-        foreach(var category in this.menuServiceProducer.GetCategories())
+        foreach (var category in this.menuServiceProducer.GetCategories())
         {
             this.MenuCategories.Add(category);
             if (category.Name is "Settings")

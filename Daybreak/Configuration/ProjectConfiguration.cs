@@ -118,7 +118,6 @@ using Daybreak.Services.Telemetry;
 using System.Reflection;
 using Version = Daybreak.Shared.Models.Versioning.Version;
 using Daybreak.Shared.Models.Plugins;
-using Daybreak.ViewModels;
 using TrailBlazr.Extensions;
 using TrailBlazr.Services;
 using Microsoft.Fast.Components.FluentUI;
@@ -284,7 +283,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.ThrowIfNull();
 
         viewProducer.RegisterView<LaunchView, LaunchViewModel>();
-        viewProducer.RegisterView<Views.FocusView, FocusViewModel>();
         viewProducer.RegisterView<OptionView, OptionViewModel>();
     }
 
