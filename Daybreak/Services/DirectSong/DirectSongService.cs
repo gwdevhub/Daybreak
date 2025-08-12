@@ -145,7 +145,7 @@ internal sealed class DirectSongService(
 
         if (!this.privilegeManager.AdminPrivileges)
         {
-            this.privilegeManager.RequestAdminPrivileges<LauncherView>("DirectSong installation requires Administrator privileges in order to set up the registry entries");
+            //this.privilegeManager.RequestAdminPrivileges<LauncherView>("DirectSong installation requires Administrator privileges in order to set up the registry entries");
             this.InstallationTask = default;
             this.CachedInstallationStatus = default;
             return false;

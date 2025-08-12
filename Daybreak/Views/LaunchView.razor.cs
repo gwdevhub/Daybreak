@@ -1,6 +1,7 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Api;
+using Daybreak.Shared.Models.FocusView;
 using Daybreak.Shared.Models.LaunchConfigurations;
 using Daybreak.Shared.Models.Onboarding;
 using Daybreak.Shared.Services.Api;
@@ -503,6 +504,9 @@ public sealed class LaunchViewModel : ViewModelBase<LaunchViewModel, LaunchView>
         else
         {
             this.menuService.CloseMenu();
+            this.viewManager.ShowView<FocusView>(
+                (nameof(FocusView.ProcessId), context.ProcessId.ToString()),
+                (nameof(FocusView.ConfigurationId), context.LaunchConfiguration.Identifier ?? throw new InvalidOperationException("LaunchConfig identifier cannot be null")));
         }
     }
 
@@ -543,6 +547,9 @@ public sealed class LaunchViewModel : ViewModelBase<LaunchViewModel, LaunchView>
         await this.daybreakApiService.AttachDaybreakApiContext(launchContext, apiContext, cancellationToken);
         this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(launcherViewContext.Configuration);
         this.menuService.CloseMenu();
+        this.viewManager.ShowView<FocusView>(
+                (nameof(FocusView.ProcessId), launchContext.ProcessId.ToString()),
+                (nameof(FocusView.ConfigurationId), launchContext.LaunchConfiguration.Identifier ?? throw new InvalidOperationException("LaunchConfig identifier cannot be null")));
     }
 
     private async Task LaunchContext(LauncherViewContext launcherViewContext, CancellationToken cancellationToken)
@@ -600,6 +607,9 @@ public sealed class LaunchViewModel : ViewModelBase<LaunchViewModel, LaunchView>
         {
             launcherViewContext.ApiContext = apiContext;
             this.menuService.CloseMenu();
+            this.viewManager.ShowView<FocusView>(
+                (nameof(FocusView.ProcessId), launchedContext.ProcessId.ToString()),
+                (nameof(FocusView.ConfigurationId), launchedContext.LaunchConfiguration.Identifier ?? throw new InvalidOperationException("LaunchConfig identifier cannot be null")));
         }
     }
 

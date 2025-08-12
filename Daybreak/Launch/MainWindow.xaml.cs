@@ -223,7 +223,6 @@ public partial class MainWindow : FluentWindow
 
     private void AdminText_Clicked(object sender, EventArgs e)
     {
-        this.privilegeManager.RequestNormalPrivileges<LauncherView>(string.Empty);
     }
 
     private void SetImage(ImageSource imageSource)

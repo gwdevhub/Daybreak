@@ -13,6 +13,6 @@ public sealed class FixSymbolicLinkNotificationHandler(
 
     public void OpenNotification(Notification notification)
     {
-        this.privilegeManager.RequestAdminPrivileges<LauncherView>(DSOALService.DSOALFixAdminMessage);
+        //this.privilegeManager.RequestAdminPrivileges<LauncherView>(DSOALService.DSOALFixAdminMessage);
     }
 }

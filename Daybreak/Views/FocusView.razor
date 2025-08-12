@@ -1,0 +1,9 @@
+﻿<h3>FocusView</h3>
+@page "/focus"
+@inherits ViewBase<FocusView, FocusViewModel>
+@code {
+    [Parameter]
+    public required string ConfigurationId { get; init; }
+    [Parameter]
+    public required string ProcessId { get; init; }
+}

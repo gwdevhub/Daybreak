@@ -76,7 +76,7 @@ internal sealed class DSOALService(
 
         if (!this.privilegeManager.AdminPrivileges)
         {
-            this.privilegeManager.RequestAdminPrivileges<LauncherView>("Administrator privileges are required to install DSOAL");
+            //this.privilegeManager.RequestAdminPrivileges<LauncherView>("Administrator privileges are required to install DSOAL");
             return false;
         }
 
@@ -184,7 +184,7 @@ internal sealed class DSOALService(
             if (!this.privilegeManager.AdminPrivileges)
             {
                 this.registryService.SaveValue(DSOALFixRegistryKey, true);
-                this.privilegeManager.RequestAdminPrivileges<LauncherView>(DSOALFixAdminMessage);
+                //this.privilegeManager.RequestAdminPrivileges<LauncherView>(DSOALFixAdminMessage);
                 return false;
             }
 
@@ -202,7 +202,7 @@ internal sealed class DSOALService(
         if (!this.privilegeManager.AdminPrivileges)
         {
             this.registryService.SaveValue(DSOALFixRegistryKey, true);
-            this.privilegeManager.RequestAdminPrivileges<LauncherView>(DSOALFixAdminMessage);
+            //this.privilegeManager.RequestAdminPrivileges<LauncherView>(DSOALFixAdminMessage);
             return false;
         }
 
