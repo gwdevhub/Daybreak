@@ -89,6 +89,7 @@ public sealed class AppViewModel
         this.LoadMenuCategories();
         this.RedrawRequested?.Invoke(this, EventArgs.Empty);
         this.viewManager.ShowView<LaunchView>();
+        this.viewManager.ShowViewRequested += (s, e) => this.CloseNavigationMenu();
         this.hwndSource = HwndSource.FromHwnd(new WindowInteropHelper(this.blazorHostWindow).Handle);
     }
 

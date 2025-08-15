@@ -59,25 +59,6 @@
     color: var(--foreground-on-accent-rest)
 }
 
-.spinner {
-    width: 16px;
-    height: 16px;
-    border: 2px solid var(--input-placeholder-rest);
-    border-top: 2px solid var(--foreground-on-accent-rest);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
 .dropdown-toggle-button {
     padding: 1rem 0.75rem;
     border: none;

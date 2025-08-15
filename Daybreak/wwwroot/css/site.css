@@ -44,7 +44,7 @@ html, body {
 
 /* Backdrop Panel */
 .backdrop-panel {
-    background: color-mix(in srgb, var(--accent-fill-rest) 30%, transparent);
+    background: color-mix(in srgb, var(--neutral-fill-rest) 70%, transparent);
     border: 1px solid var(--neutral-stroke-rest);
     backdrop-filter: blur(2px);
     border-radius: 6px;
@@ -106,8 +106,36 @@ html, body {
 .option-view-title {
     text-align: center;
     margin-bottom: 2rem;
-    color: var(--foreground-on-accent-rest);
+    color: var(--neutral-foreground-rest);
     font-size: var(--font-size-large)
+}
+
+/* Icons */
+.icon-small {
+    display: flex;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+}
+
+/* Spinner */
+.spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--input-placeholder-rest);
+    border-top: 2px solid var(--neutral-foreground-rest);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Option Component Display Box */
@@ -129,14 +157,14 @@ html, body {
 
     .option-display-box .option-title {
         font-weight: 600;
-        color: var(--foreground-on-accent-rest);
+        color: var(--neutral-foreground-rest);
         font-size: var(--font-size-large);
         margin-bottom: 0.25rem;
         line-height: 1.2; /* Consistent line height */
     }
 
     .option-display-box .option-description {
-        color: var(--foreground-on-accent-rest);
+        color: var(--neutral-foreground-rest);
         font-size: var(--font-size-medium);
         line-height: 1.3;
         margin: 0; /* Remove any default margins */
@@ -155,14 +183,14 @@ html, body {
         display: flex;
         align-items: center;
         font-size: var(--font-size-medium);
-        color: var(--foreground-on-accent-rest) !important;
+        color: var(--neutral-foreground-rest);
         gap: 0.75rem;
         flex-shrink: 0;
         justify-content: flex-end; /* Aligns controls to the right */
     }
 
         .option-display-box .option-control-with-label .label {
-            color: var(--foreground-on-accent-rest) !important;
+            color: var(--neutral-foreground-rest) !important;
             font-weight: 500;
             font-size: var(--font-size-small);
         }
@@ -171,7 +199,7 @@ html, body {
         font-size: var(--font-size-medium);
         margin-top: 0.25rem;
         font-style: italic;
-        color: var(--foreground-on-accent-rest);
+        color: var(--neutral-foreground-rest);
     }
 
 .option-control fluent-text-field,
@@ -180,32 +208,21 @@ html, body {
 .option-control fluent-number-field {
     font-size: var(--font-size-medium) !important;
     width: 250px !important;
-    color: var(--foreground-on-accent-rest) !important;
     justify-content: flex-end !important;
-    background: var(--accent-fill-rest) !important;
     border-radius: 6px !important;
 }
 
     .option-control fluent-text-field::part(root),
     .option-control fluent-select::part(root),
     .option-control fluent-number-field::part(root) {
-        background: padding-box var(--accent-fill-rest), border-box var(--accent-stroke-rest);
         overflow: hidden;
-    }
-
-    .option-control fluent-text-field::part(listbox),
-    .option-control fluent-select::part(listbox),
-    .option-control fluent-number-field::part(listbox) {
-        background: var(--accent-fill-rest);
     }
 
     .option-control fluent-text-field::part(control),
     .option-control fluent-select::part(control),
     .option-control fluent-number-field::part(control) {
         font-size: var(--font-size-medium) !important;
-        color: var(--foreground-on-accent-rest) !important;
         width: 250px !important;
-        background: var(--accent-fill-rest) !important;
     }
 
     .option-control fluent-number-field::part(step-up-button),
@@ -214,18 +231,14 @@ html, body {
         height: calc(var(--font-size-medium) * 1.2) !important;
         right: 2px !important;
         font-size: calc(var(--font-size-medium) * 0.8) !important;
-        background: var(--accent-fill-rest) !important;
-        color: var(--foreground-on-accent-rest) !important;
     }
 
     .option-control fluent-number-field::part(step-up-button) {
         top: 1px !important;
-        background: var(--accent-fill-rest) !important;
     }
 
     .option-control fluent-number-field::part(step-down-button) {
         bottom: 1px !important;
-        background: var(--accent-fill-rest) !important;
     }
 
     .option-control fluent-number-field::part(control) {
@@ -233,41 +246,4 @@ html, body {
         width: 220px !important;
         max-width: 220px !important;
         box-sizing: border-box !important;
-        background: var(--accent-fill-rest) !important;
     }
-
-    /* Hover states for input controls */
-    .option-control fluent-text-field:hover::part(root),
-    .option-control fluent-select:hover::part(root),
-    .option-control fluent-number-field:hover::part(root) {
-        background: var(--accent-fill-hover) !important;
-    }
-
-    .option-control fluent-text-field:hover::part(control),
-    .option-control fluent-select:hover::part(control),
-    .option-control fluent-number-field:hover::part(control) {
-        background: transparent !important;
-    }
-
-    .option-control fluent-text-field:hover::part(listbox),
-    .option-control fluent-select:hover::part(listbox),
-    .option-control fluent-number-field:hover::part(listbox) {
-        background: var(--accent-fill-hover) !important;
-    }
-
-    /* Hover states for number field step buttons */
-    .option-control fluent-number-field:hover::part(step-up-button),
-    .option-control fluent-number-field:hover::part(step-down-button) {
-        background: transparent !important;
-    }
-
-    /* Hover states for dropdown options */
-    .option-control fluent-option:hover {
-        background: var(--accent-fill-hover) !important;
-    }
-
-        /* Alternative selector for fluent-option hover if the above doesn't work */
-        .option-control fluent-select fluent-option:hover,
-        .option-control fluent-option:hover::part(content) {
-            background: var(--accent-fill-hover) !important;
-        }

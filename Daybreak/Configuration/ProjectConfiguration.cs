@@ -285,6 +285,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<LaunchView, LaunchViewModel>(isSingleton: true);
         viewProducer.RegisterView<OptionView, OptionViewModel>();
         viewProducer.RegisterView<Views.FocusView, FocusViewModel>();
+        viewProducer.RegisterView<BuildListView, BuildListViewModel>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -394,7 +395,7 @@ public class ProjectConfiguration : PluginConfigurationBase
             .RegisterButton("Manage client version", "Open version manager", sp => { });
         menuServiceProducer.CreateIfNotExistCategory("Guild Wars")
             .RegisterButton("Game companion", "Open game companion", sp => sp.GetRequiredService<IViewManager>().ShowView<LaunchView>())
-            .RegisterButton("Manage builds", "Open builds manager", sp => { })
+            .RegisterButton("Manage builds", "Open builds manager", sp => sp.GetRequiredService<IViewManager>().ShowView<BuildListView>())
             .RegisterButton("Download Guild Wars", "Download Guild Wars installer", sp => { })
             .RegisterButton("Copy Guild Wars", "Copy Guild Wars from an existing installation", sp => { })
             .RegisterButton("Event Calendar", "Show current and upcoming events", sp => { })

@@ -1,0 +1,129 @@
+﻿.build-list-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 46px);
+    width: 100%;
+    gap: 16px;
+    padding-top: 46px;
+}
+
+.header-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 0 auto;
+}
+
+.content-section {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.loading-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.loading-text {
+    font-size: 14px;
+    color: var(--neutral-foreground-rest);
+    opacity: 0.8;
+}
+
+.build-list-wrapper {
+    height: 100%;
+    padding: 0px 10px;
+    overflow: auto;
+    transition: opacity 0.2s ease;
+    max-width: 800px;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.build-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 10px;
+    border-bottom: 1px solid var(--neutral-stroke-divider-rest);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    box-sizing: border-box;
+    border-radius: 6px;
+}
+
+    .build-item:hover {
+        background-color: var(--accent-fill-hover);
+    }
+
+    .build-item:focus {
+        outline: 2px solid var(--accent-fill-focus);
+        outline-offset: -2px;
+    }
+
+.build-info {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    min-width: 0;
+}
+
+.build-name {
+    font-weight: 600;
+    font-size: var(--font-size-medium);
+    color: var(--neutral-foreground-rest);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 16px;
+    color: var(--neutral-foreground-hint);
+}
+
+.empty-message {
+    font-size: var(--font-size-large);
+    text-align: center;
+}
+
+/* Spinner styles */
+.spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--neutral-stroke-control-default);
+    border-top: 3px solid var(--accent-fill-rest);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}

@@ -5,7 +5,7 @@ namespace Daybreak.Shared.Utils;
 
 public static partial class StringUtils
 {
-    private const int SearchSensitivity = 2;
+    private const double SimilarityThreshold = 0.8;
     private static readonly Regex SplitIntoWordsRegex = WordRegex();
 
     public static int DamerauLevenshteinDistance(string s, string t)
@@ -46,9 +46,17 @@ public static partial class StringUtils
     /// <param name="stringToSearch"></param>
     /// <param name="searchString"></param>
     /// <returns>True if strings match.</returns>
-    public static bool MatchesSearchString(string stringToSearch, string searchString)
+    public static bool MatchesSearchString(string stringToSearch, string searchString, double threshold = SimilarityThreshold)
     {
-        return MatchSearchStringScore(stringToSearch, searchString) < SearchSensitivity;
+        if (stringToSearch.IsNullOrWhiteSpace() ||
+            searchString.IsNullOrWhiteSpace())
+        {
+            return false;
+        }
+
+        var distance = MatchSearchStringScore(stringToSearch, searchString);
+        var similarity = 1.0 - (double)distance / searchString.Length;
+        return similarity >= threshold;
     }
 
     /// <summary>
@@ -59,19 +67,6 @@ public static partial class StringUtils
     /// <returns>True if strings match.</returns>
     public static int MatchSearchStringScore(string stringToSearch, string searchString)
     {
-        if (searchString.IsNullOrWhiteSpace() ||
-            searchString.Length < SearchSensitivity)
-        {
-            return 0;
-        }
-
-        if (stringToSearch.IsNullOrWhiteSpace() ||
-            stringToSearch.Length < SearchSensitivity)
-        {
-            return 0;
-        }
-
-        // Return true if either the distance between the entire text and the searchstring is small enough, or if any of the words are close to the search string.
         return Math.Min(
             DamerauLevenshteinDistance(stringToSearch.ToLower()[..Math.Min(stringToSearch.Length, searchString.Length)], searchString.ToLower()),
             SplitIntoWordsRegex.Split(stringToSearch.ToLower())

@@ -1,7 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Api;
-using Daybreak.Shared.Models.FocusView;
 using Daybreak.Shared.Models.LaunchConfigurations;
 using Daybreak.Shared.Models.Onboarding;
 using Daybreak.Shared.Services.Api;
@@ -26,7 +25,6 @@ public sealed class LaunchViewModel : ViewModelBase<LaunchViewModel, LaunchView>
 {
     private static readonly TimeSpan LaunchTimeout = TimeSpan.FromSeconds(10);
 
-    private readonly IMenuService menuService;
     private readonly IViewManager viewManager;
     private readonly INotificationService notificationService;
     private readonly IDaybreakApiService daybreakApiService;
@@ -41,7 +39,6 @@ public sealed class LaunchViewModel : ViewModelBase<LaunchViewModel, LaunchView>
 
     public LaunchViewModel(
         IViewManager viewManager,
-        IMenuService menuService,
         INotificationService notificationService,
         IDaybreakApiService daybreakApiService,
         ILaunchConfigurationService launchConfigurationService,
@@ -51,7 +48,6 @@ public sealed class LaunchViewModel : ViewModelBase<LaunchViewModel, LaunchView>
         IScreenManager screenManager,
         IOptions<FocusViewOptions> focusViewOptions)
     {
-        this.menuService = menuService.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
         this.notificationService = notificationService.ThrowIfNull();
         this.daybreakApiService = daybreakApiService.ThrowIfNull();
@@ -123,8 +119,6 @@ public sealed class LaunchViewModel : ViewModelBase<LaunchViewModel, LaunchView>
 
     public override ValueTask ParametersSet(LaunchView view, CancellationToken cancellationToken)
     {
-        this.menuService.CloseMenu();
-        
         if (!this.IsOnboarded())
         {
             //TODO: Do onboarding procedure
@@ -503,7 +497,6 @@ public sealed class LaunchViewModel : ViewModelBase<LaunchViewModel, LaunchView>
         }
         else
         {
-            this.menuService.CloseMenu();
             this.viewManager.ShowView<FocusView>(
                 (nameof(FocusView.ProcessId), context.ProcessId.ToString()),
                 (nameof(FocusView.ConfigurationId), context.LaunchConfiguration.Identifier ?? throw new InvalidOperationException("LaunchConfig identifier cannot be null")));
@@ -546,7 +539,6 @@ public sealed class LaunchViewModel : ViewModelBase<LaunchViewModel, LaunchView>
 
         await this.daybreakApiService.AttachDaybreakApiContext(launchContext, apiContext, cancellationToken);
         this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(launcherViewContext.Configuration);
-        this.menuService.CloseMenu();
         this.viewManager.ShowView<FocusView>(
                 (nameof(FocusView.ProcessId), launchContext.ProcessId.ToString()),
                 (nameof(FocusView.ConfigurationId), launchContext.LaunchConfiguration.Identifier ?? throw new InvalidOperationException("LaunchConfig identifier cannot be null")));
@@ -606,7 +598,6 @@ public sealed class LaunchViewModel : ViewModelBase<LaunchViewModel, LaunchView>
         else
         {
             launcherViewContext.ApiContext = apiContext;
-            this.menuService.CloseMenu();
             this.viewManager.ShowView<FocusView>(
                 (nameof(FocusView.ProcessId), launchedContext.ProcessId.ToString()),
                 (nameof(FocusView.ConfigurationId), launchedContext.LaunchConfiguration.Identifier ?? throw new InvalidOperationException("LaunchConfig identifier cannot be null")));

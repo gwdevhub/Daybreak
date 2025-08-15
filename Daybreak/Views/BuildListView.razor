@@ -1,0 +1,124 @@
+﻿<div class="build-list-container backdrop-panel">
+    <!-- Header Section -->
+    <div class="header-section">
+        <!-- Search Bar -->
+        <div class="search-container">
+            <FluentTextField 
+                             @bind-Value="this.ViewModel.SearchTerm"
+                             @oninput="EventUtil.AsNonRenderingEventHandler<ChangeEventArgs>(this.ViewModel.SearchTermChanged)"
+                             Placeholder="Search builds..." 
+                             style="width: 50vw; max-width: 600px;"
+                             Appearance="@FluentInputAppearance.Outline">
+                <FluentIcon Value="@(new Icons.Regular.Size16.Search())" 
+                           slot="start" 
+                           Color="Color.Neutral" />
+            </FluentTextField>
+        </div>
+    </div>
+
+    <!-- Content Section with Loading Overlay -->
+    <div class="content-section">
+        @if (this.ViewModel.IsLoading)
+        {
+            <div class="loading-overlay">
+                <SpinnerWidget IsLoading="true" />
+                <div class="loading-text">Loading builds...</div>
+            </div>
+        }
+        
+        <!-- Build List -->
+        <div class="build-list-wrapper" style="@(ViewModel.IsLoading ? "opacity: 0.3; pointer-events: none;" : "")">
+            @if (this.ViewModel.BuildEntries.Any())
+            {
+                <Virtualize Items="@this.ViewModel.BuildEntries"
+                            Context="entry"
+                            ItemSize="50">
+                    <ItemContent>
+                        <div class="build-item" tabindex="0" @onclick="@(() => this.ViewModel.BuildClicked(entry))">
+                            <div class="build-info">
+                                @if (entry.PrimaryProfession == Shared.Models.Guildwars.Profession.None)
+                                {
+                                    <Daybreak.Views.Components.Icons.Professions.Any />
+                                }
+                                else if (entry.PrimaryProfession == Shared.Models.Guildwars.Profession.Assassin)
+                                {
+                                    <Daybreak.Views.Components.Icons.Professions.Assassin />
+                                }
+                                else if (entry.PrimaryProfession == Shared.Models.Guildwars.Profession.Elementalist)
+                                {
+                                    <Daybreak.Views.Components.Icons.Professions.Elementalist />
+                                }
+                                else if (entry.PrimaryProfession == Shared.Models.Guildwars.Profession.Mesmer)
+                                {
+                                    <Daybreak.Views.Components.Icons.Professions.Mesmer />
+                                }
+                                else if (entry.PrimaryProfession == Shared.Models.Guildwars.Profession.Necromancer)
+                                {
+                                    <Daybreak.Views.Components.Icons.Professions.Necromancer />
+                                }
+                                else if (entry.PrimaryProfession == Shared.Models.Guildwars.Profession.Ranger)
+                                {
+                                    <Daybreak.Views.Components.Icons.Professions.Ranger />
+                                }
+                                else if (entry.PrimaryProfession == Shared.Models.Guildwars.Profession.Ritualist)
+                                {
+                                    <Daybreak.Views.Components.Icons.Professions.Ritualist />
+                                }
+                                else if (entry.PrimaryProfession == Shared.Models.Guildwars.Profession.Monk)
+                                {
+                                    <Daybreak.Views.Components.Icons.Professions.Monk />
+                                }
+                                else if (entry.PrimaryProfession == Shared.Models.Guildwars.Profession.Warrior)
+                                {
+                                    <Daybreak.Views.Components.Icons.Professions.Warrior />
+                                }
+                                else if (entry.PrimaryProfession == Shared.Models.Guildwars.Profession.Dervish)
+                                {
+                                    <Daybreak.Views.Components.Icons.Professions.Dervish />
+                                }
+                                else if (entry.PrimaryProfession == Shared.Models.Guildwars.Profession.Paragon)
+                                {
+                                    <Daybreak.Views.Components.Icons.Professions.Paragon />
+                                }
+                                else if (entry.BuildEntry is Daybreak.Shared.Models.Builds.TeamBuildEntry)
+                                {
+                                    <FluentIcon Value="@(new Icons.Regular.Size16.PeopleTeam())"
+                                                Color="Color.Neutral" />
+                                }
+
+                                <div class="build-name">@entry.BuildEntry.Name</div>
+                            </div>
+                            <div class="build-actions" @onclick="@(() => this.ViewModel.DeleteBuild(entry))">
+                                <FluentButton Appearance="Appearance.Stealth"
+                                              IconOnly="true">
+                                    <FluentIcon Value="@(new Icons.Regular.Size16.Delete())" />
+                                </FluentButton>
+                            </div>
+                        </div>
+                    </ItemContent>
+                </Virtualize>
+            }
+            else if (!this.ViewModel.IsLoading)
+            {
+                <div class="empty-state">
+                    <FluentIcon Value="@(new Icons.Regular.Size48.Search())" Color="Color.Neutral" />
+                    <div class="empty-message">
+                        @if (string.IsNullOrEmpty(this.ViewModel.SearchTerm))
+                        {
+                            <span>No builds available</span>
+                        }
+                        else
+                        {
+                            <span>No builds found matching "@this.ViewModel.SearchTerm"</span>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@page "/builds"
+@inherits ViewBase<BuildListView, BuildListViewModel>
+@code {
+}
