@@ -1,7 +1,5 @@
 ﻿<div class="build-list-container backdrop-panel">
-    <!-- Header Section -->
     <div class="header-section">
-        <!-- Search Bar -->
         <div class="search-container">
             <FluentTextField 
                              @bind-Value="this.ViewModel.SearchTerm"
@@ -14,9 +12,23 @@
                            Color="Color.Neutral" />
             </FluentTextField>
         </div>
+
+        <div class="header-actions">
+            <div @onclick="this.ViewModel.CreateNewSingleBuild">
+                <FluentButton Appearance="Appearance.Stealth"
+                              IconOnly="true">
+                    <FluentIcon Value="@(new Icons.Regular.Size16.PersonAdd())" />
+                </FluentButton>
+            </div>
+            <div @onclick="this.ViewModel.CreateNewTeamBuild">
+                <FluentButton Appearance="Appearance.Stealth"
+                              IconOnly="true">
+                    <FluentIcon Value="@(new Icons.Regular.Size16.PeopleAdd())" />
+                </FluentButton>
+            </div>
+        </div>
     </div>
 
-    <!-- Content Section with Loading Overlay -->
     <div class="content-section">
         @if (this.ViewModel.IsLoading)
         {
@@ -26,7 +38,6 @@
             </div>
         }
         
-        <!-- Build List -->
         <div class="build-list-wrapper" style="@(ViewModel.IsLoading ? "opacity: 0.3; pointer-events: none;" : "")">
             @if (this.ViewModel.BuildEntries.Any())
             {

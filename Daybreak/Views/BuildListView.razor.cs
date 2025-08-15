@@ -89,7 +89,18 @@ public sealed class BuildListViewModel(
 
     public void BuildClicked(BuildListEntry buildListEntry)
     {
-        //TODO: Implement this method to handle the build entry click event.
+        if (buildListEntry.BuildEntry is SingleBuildEntry singleBuildEntry)
+        {
+            this.viewManager.ShowView<SingleBuildTemplateView>((nameof(SingleBuildTemplateView.BuildName), singleBuildEntry.Name ?? string.Empty));
+        }
+        else if (buildListEntry.BuildEntry is TeamBuildEntry teamBuildEntry)
+        {
+            this.viewManager.ShowView<SingleBuildTemplateView>((nameof(SingleBuildTemplateView.BuildName), teamBuildEntry.Name ?? string.Empty));
+        }
+        else
+        {
+            throw new Exception($"Unexpected build entry type: {buildListEntry.BuildEntry.GetType().Name}");
+        }
     }
 
     public void DeleteBuild(BuildListEntry buildListEntry)
@@ -100,6 +111,16 @@ public sealed class BuildListViewModel(
         //TODO: Implement the deletion logic for the build entry.
         // this.buildTemplateManager.RemoveBuild(buildListEntry.BuildEntry);
         this.RefreshView();
+    }
+
+    public void CreateNewSingleBuild()
+    {
+        //TODO: Implement logic for creating a new build.
+    }
+
+    public void CreateNewTeamBuild()
+    {
+
     }
 
     private async ValueTask DelayedSearch(string term, CancellationToken cancellationToken)
