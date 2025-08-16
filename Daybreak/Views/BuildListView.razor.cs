@@ -89,18 +89,7 @@ public sealed class BuildListViewModel(
 
     public void BuildClicked(BuildListEntry buildListEntry)
     {
-        if (buildListEntry.BuildEntry is SingleBuildEntry singleBuildEntry)
-        {
-            this.viewManager.ShowView<SingleBuildTemplateView>((nameof(SingleBuildTemplateView.BuildName), singleBuildEntry.Name ?? string.Empty));
-        }
-        else if (buildListEntry.BuildEntry is TeamBuildEntry teamBuildEntry)
-        {
-            this.viewManager.ShowView<SingleBuildTemplateView>((nameof(SingleBuildTemplateView.BuildName), teamBuildEntry.Name ?? string.Empty));
-        }
-        else
-        {
-            throw new Exception($"Unexpected build entry type: {buildListEntry.BuildEntry.GetType().Name}");
-        }
+        this.viewManager.ShowView<BuildRoutingView>((nameof(BuildRoutingView.BuildName), buildListEntry.BuildEntry.Name ?? string.Empty));
     }
 
     public void DeleteBuild(BuildListEntry buildListEntry)
@@ -115,12 +104,16 @@ public sealed class BuildListViewModel(
 
     public void CreateNewSingleBuild()
     {
-        //TODO: Implement logic for creating a new build.
+        var build = this.buildTemplateManager.CreateSingleBuild();
+        this.buildTemplateManager.SaveBuild(build);
+        this.viewManager.ShowView<BuildRoutingView>((nameof(BuildRoutingView.BuildName), build.Name ?? string.Empty));
     }
 
     public void CreateNewTeamBuild()
     {
-
+        var build = this.buildTemplateManager.CreateTeamBuild();
+        this.buildTemplateManager.SaveBuild(build);
+        this.viewManager.ShowView<BuildRoutingView>((nameof(BuildRoutingView.BuildName), build.Name ?? string.Empty));
     }
 
     private async ValueTask DelayedSearch(string term, CancellationToken cancellationToken)

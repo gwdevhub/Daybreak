@@ -286,6 +286,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<OptionView, OptionViewModel>();
         viewProducer.RegisterView<Views.FocusView, FocusViewModel>();
         viewProducer.RegisterView<BuildListView, BuildListViewModel>();
+        viewProducer.RegisterView<BuildRoutingView, BuildRoutingViewModel>();
         viewProducer.RegisterView<SingleBuildTemplateView, SingleBuildTemplateViewModel>();
         viewProducer.RegisterView<TeamBuildTemplateView, TeamBuildTemplateViewModel>();
     }

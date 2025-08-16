@@ -75,6 +75,7 @@
     transition: background-color 0.2s ease;
     box-sizing: border-box;
     border-radius: 6px;
+    height: 75px;
 }
 
     .build-item:hover {

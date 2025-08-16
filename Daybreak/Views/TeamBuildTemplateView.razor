@@ -1,4 +1,5 @@
-﻿@inherits ViewBase<TeamBuildTemplateView, TeamBuildTemplateViewModel>
+﻿@page "/builds/teamBuilds/{BuildName}"
+@inherits ViewBase<TeamBuildTemplateView, TeamBuildTemplateViewModel>
 @code {
     [Parameter]
     public required string BuildName { get; set; }
