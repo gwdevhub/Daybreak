@@ -1,9 +1,11 @@
 ﻿using Daybreak.Shared.Converters;
 using Newtonsoft.Json;
+using System.ComponentModel;
 
 namespace Daybreak.Shared.Models.Guildwars;
 
 [JsonConverter(typeof(ProfessionJsonConverter))]
+[TypeConverter(typeof(ProfessionTypeConverter))]
 public sealed class Profession : IWikiEntity
 {
     public static readonly Profession None = new() { Name = "None", Id = 0, Alias = "Any" };

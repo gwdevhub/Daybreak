@@ -24,7 +24,6 @@ public sealed class BuildListViewModel(
     private readonly IToolboxService toolboxService = toolboxService.ThrowIfNull();
 
     private readonly List<BuildListEntry> buildEntryCache = [];
-    private CancellationTokenSource? searchCancellationTokenSource;
 
     public List<BuildListEntry> BuildEntries { get; } = [];
 
@@ -47,6 +46,16 @@ public sealed class BuildListViewModel(
             this.NotifyPropertyChanged(nameof(this.SearchTerm));
         }
     } = string.Empty;
+
+    public bool PendingSearch
+    {
+        get;
+        set
+        {
+            field = value;
+            this.NotifyPropertyChanged(nameof(this.PendingSearch));
+        }
+    }
 
     public override async ValueTask ParametersSet(BuildListView view, CancellationToken cancellationToken)
     {
@@ -73,18 +82,9 @@ public sealed class BuildListViewModel(
         await this.SearchByTerm(this.SearchTerm,  CancellationToken.None);
     }
 
-    public async Task SearchTermChanged(ChangeEventArgs args)
+    public void SearchTermChanged(string searchTerm)
     {
-        if (args.Value is not string searchTerm)
-        {
-            return;
-        }
-
-        this.searchCancellationTokenSource?.Cancel();
-        this.searchCancellationTokenSource?.Dispose();
-        this.searchCancellationTokenSource = new CancellationTokenSource();
-        var cancellationToken = this.searchCancellationTokenSource.Token;
-        await this.DelayedSearch(searchTerm, cancellationToken);
+        Task.Run(() => this.SearchByTerm(searchTerm, CancellationToken.None));
     }
 
     public void BuildClicked(BuildListEntry buildListEntry)
@@ -97,8 +97,7 @@ public sealed class BuildListViewModel(
         this.buildEntryCache.Remove(buildListEntry);
         this.BuildEntries.Remove(buildListEntry);
 
-        //TODO: Implement the deletion logic for the build entry.
-        // this.buildTemplateManager.RemoveBuild(buildListEntry.BuildEntry);
+        this.buildTemplateManager.RemoveBuild(buildListEntry.BuildEntry);
         this.RefreshView();
     }
 
@@ -116,12 +115,6 @@ public sealed class BuildListViewModel(
         this.viewManager.ShowView<BuildRoutingView>((nameof(BuildRoutingView.BuildName), build.Name ?? string.Empty));
     }
 
-    private async ValueTask DelayedSearch(string term, CancellationToken cancellationToken)
-    {
-        await Task.Delay(SearchDebounce, cancellationToken);
-        await this.SearchByTerm(term, cancellationToken);
-    }
-
     private async ValueTask SearchByTerm(string term, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(term))
@@ -132,6 +125,7 @@ public sealed class BuildListViewModel(
         }
 
         this.IsLoading = true;
+        await this.RefreshViewAsync();
         await Task.Factory.StartNew(() =>
         {
             var selectedEntries = this.buildEntryCache
@@ -143,7 +137,7 @@ public sealed class BuildListViewModel(
         }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
         this.IsLoading = false;
-        this.RefreshView();
+        await this.RefreshViewAsync();
     }
 
     private static BuildListEntry ConvertToBuildListEntry(IBuildEntry buildEntry)

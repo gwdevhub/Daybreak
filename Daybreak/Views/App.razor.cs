@@ -150,26 +150,27 @@ public sealed class AppViewModel
 
     public void OpenCreditLink()
     {
-
+        //TODO: Remove this
     }
 
     public void OpenIssues()
     {
-
+        //TODO: Handle open issue link
     }
 
     public void OpenSynchronizationView()
     {
-
+        //TODO: Handle open sync view
     }
 
     public void OpenVersionView()
     {
-
+        //TODO: Handle version view
     }
 
     public void OnError(ErrorEventArgs _)
     {
+        //TODO: Handle errors, possibly log them
     }
 
     public void MenuButtonClicked(MenuButton menuButton)

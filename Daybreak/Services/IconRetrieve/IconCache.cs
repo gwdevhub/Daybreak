@@ -101,6 +101,67 @@ internal sealed class IconCache : IIconCache
         return await this.GetIconUriInternal(curedName!, fileName!, wikiUri!, directLink);
     }
 
+    public async Task<string?> GetRemoteIconUri(Skill skill, bool prefHighQuality = true)
+    {
+        if (skill is null ||
+            skill.Name!.IsNullOrWhiteSpace())
+        {
+            return default;
+        }
+
+        var curedSkillName = CureSkillName(skill);
+        var highQFileName = SkillFileSafeName(skill, false);
+        var lowQFileName = SkillFileSafeName(skill, false);
+        if (curedSkillName!.IsNullOrWhiteSpace() ||
+            lowQFileName!.IsNullOrWhiteSpace() ||
+            highQFileName!.IsNullOrWhiteSpace())
+        {
+            return default;
+        }
+
+        if (prefHighQuality)
+        {
+            var highResWikiUri = $"{WikiUrl}/wiki/File:{curedSkillName}_(large).jpg";
+            var highResResult = await this.RetrieveIconUri(curedSkillName!, highResWikiUri, false);
+            if (highResResult is not null)
+            {
+                return highResResult;
+            }
+        }
+
+        var wikiUri = $"{WikiUrl}/wiki/{curedSkillName}";
+        return await this.RetrieveIconUri(curedSkillName!, wikiUri, false);
+    }
+
+    private async Task<string?> RetrieveIconUri(string curedName, string wikiUri, bool directLink)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(nameof(DownloadAndRetrieveIcon), curedName!);
+        if (curedName is null)
+        {
+            return default;
+        }
+
+        var remoteIconUri = new Uri(wikiUri);
+        if (!directLink)
+        {
+            remoteIconUri = await this.GetRemoteIconUri(curedName, wikiUri);
+        }
+
+        if (remoteIconUri is null)
+        {
+            return default;
+        }
+
+        var response = await this.httpClient.GetAsync(remoteIconUri);
+        if (!response.IsSuccessStatusCode)
+        {
+            scopedLogger.LogError($"Received [{response.StatusCode}]");
+            return default!;
+        }
+
+        return remoteIconUri.ToString();
+    }
+
     private async Task<string?> GetIconUriInternal(string curedName, string fileName, string wikiUri, bool directLink)
     {
         await this.diskSemaphore.WaitAsync();
