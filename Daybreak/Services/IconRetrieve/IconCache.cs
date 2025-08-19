@@ -12,6 +12,7 @@ using System.Net.Http;
 
 namespace Daybreak.Services.IconRetrieve;
 
+//TODO: Can be deleted once ui migration is over
 internal sealed class IconCache : IIconCache
 {
     private const string HighResolutionGalleryUrl = $"https://wiki.guildwars.com/wiki/File:{NamePlaceholder}_(large).jpg";

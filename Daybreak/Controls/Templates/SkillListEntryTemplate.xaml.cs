@@ -39,7 +39,7 @@ public partial class SkillListEntryTemplate : UserControl
     {
         if (e.NewValue is Skill skill)
         {
-            if (skill != Skill.NoSkill)
+            if (skill != Skill.None)
             {
                 this.FetchImage();
             }

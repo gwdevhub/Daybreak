@@ -122,6 +122,8 @@ using TrailBlazr.Extensions;
 using TrailBlazr.Services;
 using Microsoft.Fast.Components.FluentUI;
 using Daybreak.Themes;
+using Daybreak.Shared.Services.Wiki;
+using Daybreak.Services.Wiki;
 
 namespace Daybreak.Configuration;
 
@@ -276,6 +278,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IEventService, EventService>();
         services.AddScoped<IApplicationArgumentService, ApplicationArgumentService>();
         services.AddScoped<IArgumentHandlerProducer, IApplicationArgumentService>(sp => sp.GetRequiredService<IApplicationArgumentService>());
+        services.AddScoped<IWikiService, WikiService>();
     }
 
     public override void RegisterViews(IViewProducer viewProducer)
@@ -509,6 +512,10 @@ public class ProjectConfiguration : PluginConfigurationBase
                 .Build()
             .RegisterHttpClient<ScopedApiContext>()
                 .WithMessageHandler(SetupLoggingAndMetrics<ScopedApiContext>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
+                .Build()
+            .RegisterHttpClient<WikiService>()
+                .WithMessageHandler(SetupLoggingAndMetrics<WikiService>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build();
     }

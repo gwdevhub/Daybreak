@@ -1,11 +1,18 @@
 ﻿using Daybreak.Shared.Converters;
 using Newtonsoft.Json;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Daybreak.Shared.Models.Guildwars;
 
 [JsonConverter(typeof(CampaignJsonConverter))]
 public sealed class Campaign
 {
+    public static Campaign None { get; } = new()
+    {
+        Id = -1,
+        Name = "None"
+    };
+
     public static Campaign Core { get; } = new()
     {
         Id = 0,
@@ -78,6 +85,7 @@ public sealed class Campaign
 
     public static IReadOnlyList<Campaign> Campaigns { get; } =
     [
+        None,
         Core,
         Prophecies,
         Factions,
@@ -86,9 +94,9 @@ public sealed class Campaign
         BonusMissionPack
     ];
 
-    public static bool TryParse(int id, out Campaign campaign)
+    public static bool TryParse(int id, [NotNullWhen(true)] out Campaign? campaign)
     {
-        campaign = Campaigns.Where(campaign => campaign.Id == id).FirstOrDefault()!;
+        campaign = Campaigns.Where(campaign => campaign.Id == id).FirstOrDefault();
         if (campaign is null)
         {
             return false;
@@ -96,9 +104,9 @@ public sealed class Campaign
 
         return true;
     }
-    public static bool TryParse(string name, out Campaign campaign)
+    public static bool TryParse(string name, [NotNullWhen(true)] out Campaign? campaign)
     {
-        campaign = Campaigns.Where(region => region.Name == name).FirstOrDefault()!;
+        campaign = Campaigns.Where(region => region.Name?.Equals(name, StringComparison.OrdinalIgnoreCase) is true).FirstOrDefault();
         if (campaign is null)
         {
             return false;

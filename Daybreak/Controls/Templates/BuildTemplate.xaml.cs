@@ -224,7 +224,7 @@ public partial class BuildTemplate : UserControl
 
         foreach (var skill in Skill.Skills)
         {
-            if (skill == Skill.NoSkill)
+            if (skill == Skill.None)
             {
                 continue;
             }
@@ -313,7 +313,7 @@ public partial class BuildTemplate : UserControl
     private void SkillTemplate_Clicked(object sender, RoutedEventArgs e)
     {
         var skill = sender.As<SkillTemplate>()?.DataContext.As<Skill>();
-        if (skill == Skill.NoSkill)
+        if (skill == Skill.None)
         {
             this.SkillSearchText = string.Empty;
             this.ShowSkillListView();
@@ -337,43 +337,43 @@ public partial class BuildTemplate : UserControl
     {
         if (sender == this.SkillTemplate0)
         {
-            this.BuildEntry.FirstSkill = Skill.NoSkill;
-            this.SkillTemplate0.DataContext = Skill.NoSkill;
+            this.BuildEntry.FirstSkill = Skill.None;
+            this.SkillTemplate0.DataContext = Skill.None;
         }
         else if (sender == this.SkillTemplate1)
         {
-            this.BuildEntry.SecondSkill = Skill.NoSkill;
-            this.SkillTemplate1.DataContext = Skill.NoSkill;
+            this.BuildEntry.SecondSkill = Skill.None;
+            this.SkillTemplate1.DataContext = Skill.None;
         }
         else if (sender == this.SkillTemplate2)
         {
-            this.BuildEntry.ThirdSkill = Skill.NoSkill;
-            this.SkillTemplate2.DataContext = Skill.NoSkill;
+            this.BuildEntry.ThirdSkill = Skill.None;
+            this.SkillTemplate2.DataContext = Skill.None;
         }
         else if (sender == this.SkillTemplate3)
         {
-            this.BuildEntry.FourthSkill = Skill.NoSkill;
-            this.SkillTemplate3.DataContext = Skill.NoSkill;
+            this.BuildEntry.FourthSkill = Skill.None;
+            this.SkillTemplate3.DataContext = Skill.None;
         }
         else if (sender == this.SkillTemplate4)
         {
-            this.BuildEntry.FifthSkill = Skill.NoSkill;
-            this.SkillTemplate4.DataContext = Skill.NoSkill;
+            this.BuildEntry.FifthSkill = Skill.None;
+            this.SkillTemplate4.DataContext = Skill.None;
         }
         else if (sender == this.SkillTemplate5)
         {
-            this.BuildEntry.SixthSkill = Skill.NoSkill;
-            this.SkillTemplate5.DataContext = Skill.NoSkill;
+            this.BuildEntry.SixthSkill = Skill.None;
+            this.SkillTemplate5.DataContext = Skill.None;
         }
         else if (sender == this.SkillTemplate6)
         {
-            this.BuildEntry.SeventhSkill = Skill.NoSkill;
-            this.SkillTemplate6.DataContext = Skill.NoSkill;
+            this.BuildEntry.SeventhSkill = Skill.None;
+            this.SkillTemplate6.DataContext = Skill.None;
         }
         else if (sender == this.SkillTemplate7)
         {
-            this.BuildEntry.EigthSkill = Skill.NoSkill;
-            this.SkillTemplate7.DataContext = Skill.NoSkill;
+            this.BuildEntry.EigthSkill = Skill.None;
+            this.SkillTemplate7.DataContext = Skill.None;
         }
     }
 

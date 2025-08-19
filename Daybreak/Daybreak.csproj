@@ -133,10 +133,6 @@
     <DaybreakExtractorSources Include="..\Daybreak.Shared\**\*.cs" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Include="Views\TeamBuildTemplateView.razor.css" />
-  </ItemGroup>
-
   <!--
   This is a workaround to determine where to place the dependency projects
   It will first check if PublishDir is set.

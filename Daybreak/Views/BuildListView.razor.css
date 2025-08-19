@@ -99,6 +99,10 @@
     text-overflow: ellipsis;
 }
 
+.build-toolbox-marker {
+    font-size: var(--font-size-small);
+}
+
 .empty-state {
     display: flex;
     flex-direction: column;

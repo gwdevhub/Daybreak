@@ -1,6 +1,7 @@
 ﻿using Daybreak.Shared.Converters;
 using Newtonsoft.Json;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Daybreak.Shared.Models.Guildwars;
 
@@ -123,9 +124,9 @@ public sealed class Profession : IWikiEntity
         Paragon,
         Dervish
     ];
-    public static bool TryParse(int id, out Profession profession)
+    public static bool TryParse(int id, [NotNullWhen(true)] out Profession? profession)
     {
-        profession = Professions.Where(prof => prof.Id == id).FirstOrDefault()!;
+        profession = Professions.Where(prof => prof.Id == id).FirstOrDefault();
         if (profession is null)
         {
             return false;
@@ -133,9 +134,9 @@ public sealed class Profession : IWikiEntity
 
         return true;
     }
-    public static bool TryParse(string name, out Profession profession)
+    public static bool TryParse(string name, [NotNullWhen(true)] out Profession? profession)
     {
-        profession = Professions.Where(prof => prof.Name == name).FirstOrDefault()!;
+        profession = Professions.Where(prof => prof.Name?.Equals(name, StringComparison.OrdinalIgnoreCase) is true).FirstOrDefault();
         if (profession is null)
         {
             return false;

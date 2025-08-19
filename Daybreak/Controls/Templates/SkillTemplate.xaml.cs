@@ -49,7 +49,7 @@ public partial class SkillTemplate : UserControl
 
         if (e.NewValue is Skill skill)
         {
-            if (skill != Skill.NoSkill)
+            if (skill != Skill.None)
             {
                 var maybeUri = await this.iconRetriever.GetIconUri(skill).ConfigureAwait(true);
                 this.ImageUri = maybeUri;
@@ -84,7 +84,7 @@ public partial class SkillTemplate : UserControl
     {
         if (this.DataContext is Skill skill)
         {
-            return skill != Skill.NoSkill;
+            return skill != Skill.None;
         }
 
         return false;

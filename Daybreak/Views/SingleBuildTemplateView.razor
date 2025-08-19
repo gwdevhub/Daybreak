@@ -1,6 +1,6 @@
-﻿<div class="single-build-view">
+﻿<div class="single-build-view" @onmousemove="EventUtil.AsNonRenderingEventHandler<MouseEventArgs>(this.ViewModel.OnMouseMove)">
     <div class="title-bar-additional-btns-left">
-        <button class="title-bar-btn" @onclick="this.ViewModel.SaveBuild" title="Save Build">
+        <button class="title-bar-btn" @onclick="this.ViewModel.Save" title="Save Build">
             <FluentIcon Value="new Icons.Regular.Size16.Save()" />
         </button>
     </div>
@@ -20,14 +20,16 @@
                          SearchFilterChanged="@this.ViewModel.SearchFilterChanged"
                          PrimaryProfessionChanged="@this.ViewModel.PrimaryProfessionChanged"
                          SecondaryProfessionChanged="@this.ViewModel.SecondaryProfessionChanged"
-                         BuildNameChanged="@this.ViewModel.BuildNameChanged" />
+                         BuildNameChanged="@this.ViewModel.BuildNameChanged"
+                         OnSkillHoverEnter="@this.ViewModel.OpenSkillSnippet"
+                         OnSkillHoverLeave="@this.ViewModel.CloseSkillSnippet" />
+        }
+        @if (this.ViewModel.SkillSnippetContext is not null)
+        {
+            <SkillSnippet Context="this.ViewModel.SkillSnippetContext" />
         }
     </div>
 </div>
 
 @page "/builds/singleBuilds/{BuildName}"
-@inherits ViewBase<SingleBuildTemplateView, SingleBuildTemplateViewModel>
-@code {
-    [Parameter]
-    public required string BuildName { get; set; }
-}
+@inherits BuildTemplateViewBase<SingleBuildTemplateView, SingleBuildTemplateViewModel>

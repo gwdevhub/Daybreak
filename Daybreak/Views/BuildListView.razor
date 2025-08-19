@@ -31,49 +31,9 @@
                         <ItemContent>
                             <div class="build-item" tabindex="0" @onclick="@(() => this.ViewModel.BuildClicked(entry))">
                                 <div class="build-info">
-                                    @if (entry.PrimaryProfession == Shared.Models.Guildwars.Profession.None)
+                                    @if (entry.BuildEntry is Daybreak.Shared.Models.Builds.SingleBuildEntry)
                                     {
-                                        <Daybreak.Views.Components.Icons.Professions.Any />
-                                    }
-                                    else if (entry.PrimaryProfession == Shared.Models.Guildwars.Profession.Assassin)
-                                    {
-                                        <Daybreak.Views.Components.Icons.Professions.Assassin />
-                                    }
-                                    else if (entry.PrimaryProfession == Shared.Models.Guildwars.Profession.Elementalist)
-                                    {
-                                        <Daybreak.Views.Components.Icons.Professions.Elementalist />
-                                    }
-                                    else if (entry.PrimaryProfession == Shared.Models.Guildwars.Profession.Mesmer)
-                                    {
-                                        <Daybreak.Views.Components.Icons.Professions.Mesmer />
-                                    }
-                                    else if (entry.PrimaryProfession == Shared.Models.Guildwars.Profession.Necromancer)
-                                    {
-                                        <Daybreak.Views.Components.Icons.Professions.Necromancer />
-                                    }
-                                    else if (entry.PrimaryProfession == Shared.Models.Guildwars.Profession.Ranger)
-                                    {
-                                        <Daybreak.Views.Components.Icons.Professions.Ranger />
-                                    }
-                                    else if (entry.PrimaryProfession == Shared.Models.Guildwars.Profession.Ritualist)
-                                    {
-                                        <Daybreak.Views.Components.Icons.Professions.Ritualist />
-                                    }
-                                    else if (entry.PrimaryProfession == Shared.Models.Guildwars.Profession.Monk)
-                                    {
-                                        <Daybreak.Views.Components.Icons.Professions.Monk />
-                                    }
-                                    else if (entry.PrimaryProfession == Shared.Models.Guildwars.Profession.Warrior)
-                                    {
-                                        <Daybreak.Views.Components.Icons.Professions.Warrior />
-                                    }
-                                    else if (entry.PrimaryProfession == Shared.Models.Guildwars.Profession.Dervish)
-                                    {
-                                        <Daybreak.Views.Components.Icons.Professions.Dervish />
-                                    }
-                                    else if (entry.PrimaryProfession == Shared.Models.Guildwars.Profession.Paragon)
-                                    {
-                                        <Daybreak.Views.Components.Icons.Professions.Paragon />
+                                        <Daybreak.Views.Components.Icons.Professions.ProfessionIcon Profession="entry.PrimaryProfession" />
                                     }
                                     else if (entry.BuildEntry is Daybreak.Shared.Models.Builds.TeamBuildEntry)
                                     {
@@ -83,6 +43,11 @@
 
                                     <div class="build-name">@entry.BuildEntry.Name</div>
                                 </div>
+                                @if ((entry.BuildEntry is Shared.Models.Builds.SingleBuildEntry singleBuildEntry && singleBuildEntry.IsToolboxBuild) ||
+                                     (entry.BuildEntry is Shared.Models.Builds.TeamBuildEntry teamBuildEntry && teamBuildEntry.IsToolboxBuild))
+                                {
+                                    <div class="build-toolbox-marker">Toolbox build</div>
+                                }
                                 <div class="build-actions" @onclick="@(() => this.ViewModel.DeleteBuild(entry))" @onclick:stopPropagation="true">
                                     <FluentButton Appearance="Appearance.Stealth"
                                                   IconOnly="true">

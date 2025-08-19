@@ -1,0 +1,94 @@
+﻿.container {
+    position: fixed;
+    z-index: 1000;
+    display: flex;
+    padding: 10px;
+    border-radius: 4px;
+    max-width: 400px;
+    overflow: clip;
+    gap: 10px;
+    color: var(--neutral-foreground-rest);
+}
+
+.left-side {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.center {
+
+}
+
+.right-side {
+    align-items: start;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.skill-type-container {
+    display: flex;
+    flex-direction: row;
+    font-size: var(--font-size-small);
+    color: var(--neutral-foreground-hint);
+    gap: 10px;
+}
+
+.skill-type {
+}
+
+.skill-attribute {
+    font-weight: bolder;
+}
+
+.skill-campaign {
+    font-style: italic;
+}
+
+.skill-icon {
+    width: 40px;
+    height: 40px;
+}
+
+.skill-profession {
+
+}
+
+.skill-id {
+    font-size: var(--font-size-x-small);
+    align-items: center;
+}
+
+.skill-name {
+    font-size: var(--font-size-large);
+}
+
+.skill-description {
+    font-size: var(--font-size-medium);
+}
+
+.skill-concise-description {
+    color: var(--neutral-foreground-hint);
+    font-style: italic;
+    font-size: var(--font-size-x-small);
+}
+
+.skill-cost {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
+.skill-activation {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
+.skill-recharge {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}

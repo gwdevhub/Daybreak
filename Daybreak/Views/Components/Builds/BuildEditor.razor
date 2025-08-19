@@ -27,7 +27,7 @@
             
             <div class="profession-selector">
                 <label for="secondary-profession">Secondary Profession:</label>
-                <select id="secondary-profession" vaue="@this.SecondaryProfession" class="profession-select" @onchange="this.SecondaryProfessionChangedHandler">
+                <select id="secondary-profession" value="@this.SecondaryProfession" class="profession-select" @onchange="this.SecondaryProfessionChangedHandler">
                     <option value="@Profession.None">None</option>
                     @foreach (var profession in Profession.Professions.Where(p => p != Profession.None && p != this.PrimaryProfession))
                     {
@@ -73,11 +73,15 @@
                 {
                     var skillIndex = i;
                     var skill = this.Skills[skillIndex];
-                    <div class="skill-slot @(skill != Skill.NoSkill ? "has-skill" : "empty-skill")" @onclick="() => this.SkillSelected(skillIndex)" @onclick:stopPropagation="true">
-                        @if (skill != Skill.NoSkill)
+                    <div class="skill-slot @(skill != Skill.None ? "has-skill" : "empty-skill")" 
+                        @onclick="() => this.SkillSelected(skillIndex)"
+                        @onclick:stopPropagation="true"
+                        @onmouseenter="() => this.OnSkillHoverEnter(skill)"
+                        @onmouseleave="() => this.OnSkillHoverLeave(skill)">
+                        @if (skill != Skill.None)
                         {
                             <button class="skill-remove-btn"
-                                    @onclick="() => this.OnSkillChanged(skillIndex, Skill.NoSkill)"
+                                    @onclick="() => this.OnSkillChanged(skillIndex, Skill.None)"
                                     @onclick:stopPropagation="true"
                                     title="Remove skill">
                                 <FluentIcon Value="@(new Icons.Regular.Size12.Dismiss())" />
@@ -158,6 +162,12 @@
 
     [Parameter]
     public required Action<int, Skill> OnSkillChanged { get; init; }
+
+    [Parameter]
+    public required Action<Skill> OnSkillHoverEnter { get; init; }
+
+    [Parameter]
+    public required Action<Skill> OnSkillHoverLeave { get; init; }
 
     [Parameter]
     public required Action<string> SearchFilterChanged { get; init; }

@@ -212,7 +212,7 @@ public class BuildTemplateManagerTests
             Skill.GhostmirrorLight,
             Skill.FleshofMyFlesh,
             Skill.ResurrectionSignet,
-            Skill.NoSkill,
+            Skill.None,
             Skill.EdgeofExtinction
         ]);
 
@@ -475,7 +475,7 @@ public class BuildTemplateManagerTests
                         Skill.GhostmirrorLight,
                         Skill.FleshofMyFlesh,
                         Skill.ResurrectionSignet,
-                        Skill.NoSkill,
+                        Skill.None,
                         Skill.EdgeofExtinction
                     ]
                 },

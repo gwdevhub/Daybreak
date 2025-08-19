@@ -1,5 +1,6 @@
 ﻿using Daybreak.Shared.Converters;
 using Newtonsoft.Json;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Daybreak.Shared.Models.Guildwars;
 
@@ -860,7 +861,7 @@ public sealed class Skill : IIconUrlEntity
     public static readonly Skill NeverSurrenderPvP = new() { Id = 2880, Name = "Never Surrender! (PvP)", AlternativeName = "", Profession = Profession.Paragon, IconUrl = "", IsPvP = true, AlternativeSkill = NeverSurrender };
     public static readonly Skill NightmareWeapon = new() { Id = 795, Name = "Nightmare Weapon", AlternativeName = "", Profession = Profession.Ritualist, IconUrl = "https://wiki.guildwars.com/images/0/0d/Nightmare_Weapon_%28large%29.jpg?20081212205351" };
     public static readonly Skill NineTailStrike = new() { Id = 986, Name = "Nine Tail Strike", AlternativeName = "", Profession = Profession.Assassin, IconUrl = "https://wiki.guildwars.com/images/c/c8/Nine_Tail_Strike_%28large%29.jpg?20081212194450" };
-    public static readonly Skill NoSkill = new() { Id = 0, Name = "No Skill", AlternativeName = "", Profession = Profession.None, IconUrl = "" };
+    public static readonly Skill None = new() { Id = 0, Name = "None", AlternativeName = "", Profession = Profession.None, IconUrl = "" };
     public static readonly Skill NoneShallPass = new() { Id = 891, Name = "None Shall Pass!", AlternativeName = "", Profession = Profession.Warrior, IconUrl = "https://wiki.guildwars.com/images/3/3c/%22None_Shall_Pass%21%22_%28large%29.jpg" };
     public static readonly Skill OathShot = new() { Id = 405, Name = "Oath Shot", AlternativeName = "", Profession = Profession.Ranger, IconUrl = "https://wiki.guildwars.com/images/5/55/Oath_Shot_%28large%29.jpg?20081212205211" };
     public static readonly Skill ObsidianFlame = new() { Id = 219, Name = "Obsidian Flame", AlternativeName = "", Profession = Profession.Elementalist, IconUrl = "https://wiki.guildwars.com/images/4/49/Obsidian_Flame_%28large%29.jpg?20081212195153" };
@@ -1499,7 +1500,7 @@ public sealed class Skill : IIconUrlEntity
 
     public static readonly IReadOnlyCollection<Skill> Skills = [.. new List<Skill>
     {
-        NoSkill,
+        None,
         ResurrectionSignet,
         SignetofCapture,
         CycloneAxe,
@@ -2986,9 +2987,9 @@ public sealed class Skill : IIconUrlEntity
         HeroicRefrain,
     }.OrderBy(s => s.Name)];
 
-    public static bool TryParse(int id, out Skill skill)
+    public static bool TryParse(int id, [NotNullWhen(true)] out Skill? skill)
     {
-        skill = Skills.Where(skill => skill.Id == id).FirstOrDefault()!;
+        skill = Skills.Where(skill => skill.Id == id).FirstOrDefault();
         if (skill is null)
         {
             return false;
@@ -2996,9 +2997,9 @@ public sealed class Skill : IIconUrlEntity
 
         return true;
     }
-    public static bool TryParse(string name, out Skill skill)
+    public static bool TryParse(string name, [NotNullWhen(true)] out Skill? skill)
     {
-        skill = Skills.Where(skill => skill.Name == name).FirstOrDefault()!;
+        skill = Skills.Where(skill => skill.Name == name).FirstOrDefault();
         if (skill is null)
         {
             return false;

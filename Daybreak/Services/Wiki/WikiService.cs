@@ -1,0 +1,222 @@
+﻿using Daybreak.Shared.Models.Guildwars;
+using Daybreak.Shared.Services.Wiki;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
+using System.Collections.Concurrent;
+using System.Net.Http;
+using System.Text.Encodings.Web;
+using System.Text.RegularExpressions;
+using Attribute = Daybreak.Shared.Models.Guildwars.Attribute;
+
+namespace Daybreak.Services.Wiki;
+public sealed partial class WikiService(
+    IHttpClient<WikiService> httpClient,
+    ILogger<WikiService> logger)
+    : IWikiService
+{
+    private const string WikiQueryTitlePlaceholder = "[TITLE]";
+    private const string WikiQueryUrl = $"https://wiki.guildwars.com/api.php?action=query&format=json&titles={WikiQueryTitlePlaceholder}&prop=revisions&rvprop=content&rvslots=main";
+
+    private static readonly ConcurrentDictionary<int, SkillDescription> DescriptionCache = [];
+
+    private readonly IHttpClient<WikiService> httpClient = httpClient;
+    private readonly ILogger<WikiService> logger = logger;
+
+    public async Task<SkillDescription?> GetSkillDescription(Skill skill, CancellationToken cancellationToken)
+    {
+        if (DescriptionCache.TryGetValue(skill.Id, out var cachedDescription))
+        {
+            return cachedDescription;
+        }
+
+        var urlEncodedName = UrlEncoder.Default.Encode(skill.Name);
+        var wikiUrl = WikiQueryUrl.Replace(WikiQueryTitlePlaceholder, urlEncodedName);
+        var response = await this.httpClient.GetAsync(wikiUrl, cancellationToken);
+        if (!response.IsSuccessStatusCode)
+        {
+            return default;
+        }
+
+        var content = await response.Content.ReadAsStringAsync(cancellationToken);
+        var wikiText = ExtractWikiTextFromJson(content);
+        if (wikiText is null)
+        {
+            return default;
+        }
+
+        var description = ParseWikiText(wikiText);
+        if (description is null)
+        {
+            return default;
+        }
+
+        DescriptionCache[skill.Id] = description;
+        return description;
+    }
+
+    private static string? ExtractWikiTextFromJson(string jsonContent)
+    {
+        try
+        {
+            var json = JObject.Parse(jsonContent);
+            if (json["query"]?["pages"] is not JObject pages)
+            {
+                return null;
+            }
+
+            if (pages.Properties().FirstOrDefault()?.Value is not JObject page)
+            {
+                return null;
+            }
+
+            var revisions = page["revisions"] as JArray;
+            if (revisions == null || revisions.Count == 0)
+            {
+                return null;
+            }
+
+            var content = revisions[0]?["slots"]?["main"]?["*"]?.Value<string>();
+            return content;
+        }
+        catch (Exception)
+        {
+            return default;
+        }
+    }
+
+    private static SkillDescription? ParseWikiText(string wikiText)
+    {
+        var infoboxContent = ExtractSkillInfobox(CleanWikiText(wikiText));
+        if (infoboxContent is not null)
+        {
+            return new SkillDescription(
+                Id: ExtractField(infoboxContent, "id") is string idStr ? int.TryParse(idStr, out var id) ? id : -1 : -1,
+                Campaign: ExtractField(infoboxContent, "campaign") is string campaignStr ? Campaign.TryParse(campaignStr, out var campaign) ? campaign : Campaign.None : Campaign.None,
+                Name: ExtractField(infoboxContent, "name") ?? string.Empty,
+                Profession: ExtractField(infoboxContent, "profession") is string professionStr ? Profession.TryParse(professionStr, out var profession) ? profession : Profession.None : Profession.None,
+                Attribute: ExtractField(infoboxContent, "attribute") is string attrStr ? Attribute.TryParse(attrStr, out var attribute) ? attribute : Attribute.None :  Attribute.None,
+                Type: ExtractField(infoboxContent, "type") ?? string.Empty,
+                Energy: ExtractField(infoboxContent, "energy") ?? string.Empty,
+                Activation: ExtractField(infoboxContent, "activation") ?? string.Empty,
+                Recharge: ExtractField(infoboxContent, "recharge") ?? string.Empty,
+                Description: ExtractField(infoboxContent, "description") ?? string.Empty,
+                ConciseDescription: ExtractField(infoboxContent, "concise description") ?? string.Empty);
+        }
+
+        return default;
+    }
+
+    private static string CleanWikiText(string wikiText)
+    {
+        if (string.IsNullOrEmpty(wikiText))
+        {
+            return wikiText;
+        }
+
+        var cleaned = wikiText;
+
+        // Handle common fraction templates
+        cleaned = HalfFractionRegex().Replace(cleaned, "½");
+        cleaned = QuarterFractionRegex().Replace(cleaned, "¼");
+        cleaned = ThreeQuarterFractionRegex().Replace(cleaned, "¾");
+
+        // Handle {{gr|min|max}} templates (green range values)
+        cleaned = GreenRangeRegex().Replace(cleaned, "$1...$2");
+        cleaned = GreenRange2Regex().Replace(cleaned, "$1...$2");
+
+        // Handle simple links [[Link Text]]
+        cleaned = SimpleLinkRegex().Replace(cleaned, "$1");
+
+        // Handle links with display text [[Link|Display Text]]
+        cleaned = LinkWithDisplayTextRegex().Replace(cleaned, "$2");
+
+        // Handle skill type formatting
+        cleaned = SkillTypeLinkRegex().Replace(cleaned, "$1");
+
+        // Remove any remaining wiki markup
+        cleaned = BoldTextRegex().Replace(cleaned, "$1"); // Bold
+        cleaned = ItalicTextRegex().Replace(cleaned, "$1"); // Italic
+        cleaned = HtmlTagRegex().Replace(cleaned, ""); // HTML tags
+
+        // Clean up extra whitespace
+        cleaned = WhitespaceRegex().Replace(cleaned, " ").Trim();
+
+        return cleaned;
+    }
+
+    private static string? ExtractSkillInfobox(string wikiText)
+    {
+        var startPattern = "{{Skill infobox";
+        var startIndex = wikiText.IndexOf(startPattern, StringComparison.OrdinalIgnoreCase);
+        if (startIndex == -1)
+            return null;
+
+        // Find the pipe after "{{Skill infobox"
+        var pipeIndex = wikiText.IndexOf('|', startIndex);
+        if (pipeIndex == -1)
+            return null;
+
+        // Count braces to find the matching closing }}
+        var braceCount = 2; // Start with 2 for the opening {{
+        var index = startIndex + startPattern.Length;
+
+        while (index < wikiText.Length && braceCount > 0)
+        {
+            if (wikiText[index] == '{' && index + 1 < wikiText.Length && wikiText[index + 1] == '{')
+            {
+                braceCount += 2;
+                index += 2;
+            }
+            else if (wikiText[index] == '}' && index + 1 < wikiText.Length && wikiText[index + 1] == '}')
+            {
+                braceCount -= 2;
+                index += 2;
+            }
+            else
+            {
+                index++;
+            }
+        }
+
+        if (braceCount == 0)
+        {
+            // Extract content between the pipe and the closing }}
+            return wikiText.Substring(pipeIndex + 1, index - pipeIndex - 3).Trim();
+        }
+
+        return null;
+    }
+
+    private static string? ExtractField(string infoboxContent, string fieldName)
+    {
+        var pattern = $@"(?:^|\|\s*){Regex.Escape(fieldName)}\s*=\s*(.*?)(?=\s*\||$)";
+        var match = Regex.Match(infoboxContent, pattern, RegexOptions.IgnoreCase | RegexOptions.Multiline);
+
+        return match.Success ? match.Groups[1].Value.Trim() : null;
+    }
+
+    [GeneratedRegex(@"\{\{1/2\}\}")]
+    private static partial Regex HalfFractionRegex();
+    [GeneratedRegex(@"\{\{1/4\}\}")]
+    private static partial Regex QuarterFractionRegex();
+    [GeneratedRegex(@"\{\{3/4\}\}")]
+    private static partial Regex ThreeQuarterFractionRegex();
+    [GeneratedRegex(@"\{\{gr\|(\d+)\|(\d+)\}\}")]
+    private static partial Regex GreenRangeRegex();
+    [GeneratedRegex(@"\{\{gr2\|(\d+)\|(\d+)\}\}")]
+    private static partial Regex GreenRange2Regex();
+    [GeneratedRegex(@"\[\[([^\]|]+)\]\]")]
+    private static partial Regex SimpleLinkRegex();
+    [GeneratedRegex(@"\[\[([^|]+)\|([^\]]+)\]\]")]
+    private static partial Regex LinkWithDisplayTextRegex();
+    [GeneratedRegex(@"\[\[([^|]+)\]\]")]
+    private static partial Regex SkillTypeLinkRegex();
+    [GeneratedRegex(@"'''([^']+)'''")]
+    private static partial Regex BoldTextRegex();
+    [GeneratedRegex(@"''([^']+)''")]
+    private static partial Regex ItalicTextRegex();
+    [GeneratedRegex(@"<[^>]*>")]
+    private static partial Regex HtmlTagRegex();
+    [GeneratedRegex(@"\s+")]
+    private static partial Regex WhitespaceRegex();
+}

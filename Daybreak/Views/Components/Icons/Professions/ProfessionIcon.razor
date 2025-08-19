@@ -1,0 +1,50 @@
+﻿@if (this.Profession == Profession.None)
+{
+    <Any />
+}
+else if (this.Profession == Profession.Warrior)
+{
+    <Warrior />
+}
+else if (this.Profession == Profession.Ranger)
+{
+    <Ranger />
+}
+else if (this.Profession == Profession.Elementalist)
+{
+    <Elementalist />
+}
+else if (this.Profession == Profession.Necromancer)
+{
+    <Necromancer />
+}
+else if (this.Profession == Profession.Mesmer)
+{
+    <Mesmer />
+}
+else if (this.Profession == Profession.Monk)
+{
+    <Monk />
+}
+else if (this.Profession == Profession.Assassin)
+{
+    <Assassin />
+}
+else if (this.Profession == Profession.Dervish)
+{
+    <Dervish />
+}
+else if (this.Profession == Profession.Paragon)
+{
+    <Paragon />
+}
+else if (this.Profession == Profession.Ritualist)
+{
+    <Ritualist />
+}
+
+@using Daybreak.Shared.Models.Guildwars
+@code{
+    [Parameter]
+    public required Profession Profession { get; init; }
+}
