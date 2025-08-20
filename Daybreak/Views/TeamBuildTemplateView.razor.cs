@@ -1,17 +1,15 @@
 ﻿using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.BuildTemplates;
-using Daybreak.Shared.Services.Wiki;
 using Microsoft.AspNetCore.Components;
 using TrailBlazr.Services;
 
 namespace Daybreak.Views;
 
 public sealed class TeamBuildTemplateViewModel(
-    IWikiService wikiService,
     IBuildTemplateManager buildTemplateManager,
     IViewManager viewManager)
-    : BuildTemplateViewModelBase<TeamBuildTemplateViewModel, TeamBuildTemplateView>(wikiService, buildTemplateManager, viewManager)
+    : BuildTemplateViewModelBase<TeamBuildTemplateViewModel, TeamBuildTemplateView>(buildTemplateManager, viewManager)
 {
     public TeamBuildEntry? TeamEntry
     {

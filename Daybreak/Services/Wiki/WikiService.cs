@@ -29,16 +29,7 @@ public sealed partial class WikiService(
             return cachedDescription;
         }
 
-        var urlEncodedName = UrlEncoder.Default.Encode(skill.Name);
-        var wikiUrl = WikiQueryUrl.Replace(WikiQueryTitlePlaceholder, urlEncodedName);
-        var response = await this.httpClient.GetAsync(wikiUrl, cancellationToken);
-        if (!response.IsSuccessStatusCode)
-        {
-            return default;
-        }
-
-        var content = await response.Content.ReadAsStringAsync(cancellationToken);
-        var wikiText = ExtractWikiTextFromJson(content);
+        var wikiText = await this.GetWikiText(skill.Name, cancellationToken);
         if (wikiText is null)
         {
             return default;
@@ -52,6 +43,46 @@ public sealed partial class WikiService(
 
         DescriptionCache[skill.Id] = description;
         return description;
+    }
+
+    private async ValueTask<string?> GetWikiText(string name, CancellationToken cancellationToken)
+    {
+        while (true)
+        {
+            var urlEncodedName = UrlEncoder.Default.Encode(name);
+            var wikiUrl = WikiQueryUrl.Replace(WikiQueryTitlePlaceholder, urlEncodedName);
+            var response = await this.httpClient.GetAsync(wikiUrl, cancellationToken);
+            if (!response.IsSuccessStatusCode)
+            {
+                return default;
+            }
+
+            var content = await response.Content.ReadAsStringAsync(cancellationToken);
+            var wikiText = ExtractWikiTextFromJson(content);
+            if (wikiText is null)
+            {
+                return default;
+            }
+
+            var redirectTarget = ExtractRedirectTarget(wikiText);
+            if (redirectTarget is null)
+            {
+                return wikiText;
+            }
+
+            name = redirectTarget;
+        }
+    }
+
+    private static string? ExtractRedirectTarget(string wikiText)
+    {
+        if (string.IsNullOrWhiteSpace(wikiText))
+        {
+            return null;
+        }
+
+        var match = RedirectRegex().Match(wikiText.Trim());
+        return match.Success ? match.Groups[1].Value : null;
     }
 
     private static string? ExtractWikiTextFromJson(string jsonContent)
@@ -95,10 +126,16 @@ public sealed partial class WikiService(
                 Name: ExtractField(infoboxContent, "name") ?? string.Empty,
                 Profession: ExtractField(infoboxContent, "profession") is string professionStr ? Profession.TryParse(professionStr, out var profession) ? profession : Profession.None : Profession.None,
                 Attribute: ExtractField(infoboxContent, "attribute") is string attrStr ? Attribute.TryParse(attrStr, out var attribute) ? attribute : Attribute.None :  Attribute.None,
+                PveOnly: ExtractField(infoboxContent, "pve-only") is string pveOnlyStr && pveOnlyStr.StartsWith('y'),   // Some fields contain yes, others y
+                Pvp: ExtractField(infoboxContent, "is-pvp") is string pvpStr && pvpStr.StartsWith('y'),
+                Elite: ExtractField(infoboxContent, "elite") is string eliteStr && eliteStr.StartsWith('y'),            // Some fields contain yes, others y
                 Type: ExtractField(infoboxContent, "type") ?? string.Empty,
                 Energy: ExtractField(infoboxContent, "energy") ?? string.Empty,
                 Activation: ExtractField(infoboxContent, "activation") ?? string.Empty,
                 Recharge: ExtractField(infoboxContent, "recharge") ?? string.Empty,
+                Overcast: ExtractField(infoboxContent, "overcast") ?? string.Empty,
+                Adrenaline: ExtractField(infoboxContent, "adrenaline") ?? string.Empty,
+                Sacrifice: ExtractField(infoboxContent, "sacrifice") ?? string.Empty,
                 Description: ExtractField(infoboxContent, "description") ?? string.Empty,
                 ConciseDescription: ExtractField(infoboxContent, "concise description") ?? string.Empty);
         }
@@ -121,8 +158,9 @@ public sealed partial class WikiService(
         cleaned = ThreeQuarterFractionRegex().Replace(cleaned, "¾");
 
         // Handle {{gr|min|max}} templates (green range values)
-        cleaned = GreenRangeRegex().Replace(cleaned, "$1...$2");
-        cleaned = GreenRange2Regex().Replace(cleaned, "$1...$2");
+        cleaned = GreenRangeRegex().Replace(cleaned, "$1…$2");
+        cleaned = GreenRange2Regex().Replace(cleaned, "$1…$2");
+        cleaned = GrayRangeRegex().Replace(cleaned, "$1…$2");
 
         // Handle simple links [[Link Text]]
         cleaned = SimpleLinkRegex().Replace(cleaned, "$1");
@@ -195,6 +233,8 @@ public sealed partial class WikiService(
         return match.Success ? match.Groups[1].Value.Trim() : null;
     }
 
+    [GeneratedRegex(@"^#REDIRECT\s*\[\[([^\]]+)\]\]", RegexOptions.IgnoreCase)]
+    private static partial Regex RedirectRegex();
     [GeneratedRegex(@"\{\{1/2\}\}")]
     private static partial Regex HalfFractionRegex();
     [GeneratedRegex(@"\{\{1/4\}\}")]
@@ -205,6 +245,8 @@ public sealed partial class WikiService(
     private static partial Regex GreenRangeRegex();
     [GeneratedRegex(@"\{\{gr2\|(\d+)\|(\d+)\}\}")]
     private static partial Regex GreenRange2Regex();
+    [GeneratedRegex(@"\{\{gray\|(\d+)\|(\d+)\}\}")]
+    private static partial Regex GrayRangeRegex();
     [GeneratedRegex(@"\[\[([^\]|]+)\]\]")]
     private static partial Regex SimpleLinkRegex();
     [GeneratedRegex(@"\[\[([^|]+)\|([^\]]+)\]\]")]

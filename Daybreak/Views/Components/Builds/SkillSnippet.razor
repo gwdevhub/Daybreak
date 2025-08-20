@@ -1,41 +1,80 @@
 ﻿<div class="backdrop-panel container" style="top: @(this.Context.MousePosition.PosY)px; left: @(this.Context.MousePosition.PosX)px;">
     <div class="left-side">
-        <img class="skill-icon" src="@this.Context.Skill.IconUrl" />
+        <div class="skill-icon @(this.Context.Skill.Elite ? "elite" : "normal")">
+            <img class="skill-icon-img" src="@this.Context.Skill.IconUrl" />
+        </div>
         <div class="skill-profession">
             <Daybreak.Views.Components.Icons.Professions.ProfessionIcon Profession="this.Context.Skill.Profession" />
         </div>
         <div class="skill-id">@this.Context.Skill.Id</div>
+        @if (this.Context.Skill.PvEOnly)
+        {
+            <div class="skill-pveonly">PvE Only</div>
+        }
     </div>
     <div class="center">
         <div class="skill-name">@this.Context.Skill.Name</div>
         <div class="skill-type-container">
-            <div class="skill-type">@this.Context.Description.Type</div>
-            <div class="skill-attribute">@this.Context.Description.Attribute.Name</div>
-            <div class="skill-campaign">@this.Context.Description.Campaign.Name</div>
+            <div class="skill-type">@this.Context.Skill.Type</div>
+            <div class="skill-attribute">@this.Context.Skill.Attribute.Name</div>
+            <div class="skill-campaign">@this.Context.Skill.Campaign.Name</div>
         </div>
-        <div class="skill-description">@this.Context.Description.Description</div>
-        <div class="skill-concise-description">@this.Context.Description.ConciseDescription</div>
+        <div class="skill-description">@this.Context.Skill.Description</div>
+        <div class="skill-concise-description">@this.Context.Skill.ConciseDescription</div>
     </div>
     <div class="right-side">
-        @if (!string.IsNullOrWhiteSpace(this.Context.Description.Energy))
+        @if (!string.IsNullOrWhiteSpace(this.Context.Skill.Energy))
         {
-            <div class="skill-cost">
-                <img class="skill-cost-img" src="https://wiki.guildwars.com/images/b/be/Tango-energy.png" />
-                <div class="skill-cost-text">@this.Context.Description.Energy</div>
+            <div class="skill-resource">
+                <div class="skill-resource-img">
+                    <Daybreak.Views.Components.Icons.Misc.Energy />
+                </div>
+                <div class="skill-resource-text">@this.Context.Skill.Energy</div>
             </div>
         }
-        @if (!string.IsNullOrWhiteSpace(this.Context.Description.Activation))
+        @if (!string.IsNullOrWhiteSpace(this.Context.Skill.Activation))
         {
-            <div class="skill-activation">
-                <img class="skill-activation-img" src="https://wiki.guildwars.com/images/a/aa/Tango-activation-darker.png" />
-                <div class="skill-activation-text">@this.Context.Description.Activation</div>
+            <div class="skill-resource">
+                <div class="skill-resource-img">
+                    <Daybreak.Views.Components.Icons.Misc.Activation />
+                </div>
+                <div class="skill-resource-text">@this.Context.Skill.Activation</div>
             </div>
         }
-        @if (!string.IsNullOrWhiteSpace(this.Context.Description.Recharge))
+        @if (!string.IsNullOrWhiteSpace(this.Context.Skill.Recharge))
         {
-            <div class="skill-recharge">
-                <img class="skill-recharge-img" src="https://wiki.guildwars.com/images/f/f4/Tango-recharge-darker.png" />
-                <div class="skill-recharge-text">@this.Context.Description.Recharge</div>
+            <div class="skill-resource">
+                <div class="skill-resource-img">
+                    <Daybreak.Views.Components.Icons.Misc.Recharge />
+                </div>
+                <div class="skill-resource-text">@this.Context.Skill.Recharge</div>
+            </div>
+        }
+        @if (!string.IsNullOrWhiteSpace(this.Context.Skill.Overcast))
+        {
+            <div class="skill-resource">
+                <div class="skill-resource-img">
+                    <Daybreak.Views.Components.Icons.Misc.Overcast />
+                </div>
+                <div class="skill-resource-text">@this.Context.Skill.Overcast</div>
+            </div>
+        }
+        @if (!string.IsNullOrWhiteSpace(this.Context.Skill.Adrenaline))
+        {
+            <div class="skill-resource">
+                <div class="skill-resource-img">
+                    <Daybreak.Views.Components.Icons.Misc.Adrenaline />
+                </div>
+                <div class="skill-resource-text">@this.Context.Skill.Adrenaline</div>
+            </div>
+        }
+        @if (!string.IsNullOrWhiteSpace(this.Context.Skill.Sacrifice))
+        {
+            <div class="skill-resource">
+                <div class="skill-resource-img">
+                    <Daybreak.Views.Components.Icons.Misc.Sacrifice />
+                </div>
+                <div class="skill-resource-text">@this.Context.Skill.Sacrifice</div>
             </div>
         }
     </div>

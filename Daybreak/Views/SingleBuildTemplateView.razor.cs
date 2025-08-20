@@ -1,14 +1,12 @@
 ﻿using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Services.BuildTemplates;
-using Daybreak.Shared.Services.Wiki;
 using TrailBlazr.Services;
 
 namespace Daybreak.Views;
 public sealed class SingleBuildTemplateViewModel(
-    IWikiService wikiService,
     IViewManager viewManager,
     IBuildTemplateManager buildTemplateManager)
-    : BuildTemplateViewModelBase<SingleBuildTemplateViewModel, SingleBuildTemplateView>(wikiService, buildTemplateManager, viewManager)
+    : BuildTemplateViewModelBase<SingleBuildTemplateViewModel, SingleBuildTemplateView>(buildTemplateManager, viewManager)
 {
     protected override void LoadBuild(IBuildEntry? buildEntry)
     {

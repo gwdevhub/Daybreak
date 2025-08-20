@@ -191,6 +191,7 @@ public sealed class AppViewModel
         this.LargeFontSize = this.themeManager.LargeFontSize;
         this.XLargeFontSize = this.themeManager.XLargeFontSize;
         this.XXLargeFontSize = this.themeManager.XXLargeFontSize;
+        this.UIScale = this.themeManager.UIScale;
         this.RedrawRequested?.Invoke(this, EventArgs.Empty);
     }
 

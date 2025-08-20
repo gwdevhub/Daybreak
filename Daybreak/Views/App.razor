@@ -5,6 +5,7 @@
     <ErrorLoggingBoundary>
         <div class="app-container @(this.ViewModel.WindowState == WindowState.Maximized ? "maximized" : "")"
              style="--backdrop-image: url('../@this.ViewModel.BackdropImage');
+                    --ui-scale: @(this.ViewModel.UIScale);
                     --font-size-xx-small: @(this.ViewModel.XXSmallFontSize)rem;
                     --font-size-x-small: @(this.ViewModel.XSmallFontSize)rem;
                     --font-size-small: @(this.ViewModel.SmallFontSize)rem;

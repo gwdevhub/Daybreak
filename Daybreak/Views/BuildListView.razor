@@ -31,9 +31,11 @@
                         <ItemContent>
                             <div class="build-item" tabindex="0" @onclick="@(() => this.ViewModel.BuildClicked(entry))">
                                 <div class="build-info">
-                                    @if (entry.BuildEntry is Daybreak.Shared.Models.Builds.SingleBuildEntry)
+                                    @if (entry.PrimaryProfession is not null)
                                     {
-                                        <Daybreak.Views.Components.Icons.Professions.ProfessionIcon Profession="entry.PrimaryProfession" />
+                                        <div class="build-icon">
+                                            <Daybreak.Views.Components.Icons.Professions.ProfessionIcon Profession="entry.PrimaryProfession" />
+                                        </div>
                                     }
                                     else if (entry.BuildEntry is Daybreak.Shared.Models.Builds.TeamBuildEntry)
                                     {

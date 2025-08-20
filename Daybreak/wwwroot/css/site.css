@@ -172,3 +172,9 @@ html, body {
     display: flex;
     flex-direction: row;
 }
+
+.icon {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}

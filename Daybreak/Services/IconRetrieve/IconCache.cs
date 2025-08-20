@@ -284,7 +284,7 @@ internal sealed class IconCache : IIconCache
             return default;
         }
 
-        return CureName(skill.AlternativeName!.IsNullOrWhiteSpace() ? skill.Name : skill.AlternativeName);
+        return CureName(skill.Name);
     }
 
     private static string? SkillFileSafeName(Skill? skill, bool highQuality)
@@ -294,7 +294,7 @@ internal sealed class IconCache : IIconCache
             return default;
         }
 
-        return FileSafeName(skill.AlternativeName!.IsNullOrWhiteSpace() ? skill.Name : skill.AlternativeName, highQuality);
+        return FileSafeName(skill.Name, highQuality);
     }
 
     private static string? CureName(string? name)

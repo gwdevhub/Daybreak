@@ -106,6 +106,13 @@
   </Target>
 
   <!--
+  This ItemGroup embed everything under the wwwroot folder into the Daybreak.exe.
+  -->
+  <ItemGroup>
+    <EmbeddedResource Include="wwwroot\**\*" />
+  </ItemGroup>
+
+  <!--
   This ItemGroup takes into account changes in the dependency projects. Any changes in any of them will trigger a rebuild
   which will also build those dependencies
   -->

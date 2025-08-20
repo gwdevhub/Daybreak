@@ -24,11 +24,12 @@
                          OnSkillHoverEnter="@this.ViewModel.OpenSkillSnippet"
                          OnSkillHoverLeave="@this.ViewModel.CloseSkillSnippet" />
         }
-        @if (this.ViewModel.SkillSnippetContext is not null)
-        {
-            <SkillSnippet Context="this.ViewModel.SkillSnippetContext" />
-        }
     </div>
+
+    @if (this.ViewModel.ShowSkillSnippet)
+    {
+        <SkillSnippet Context="this.ViewModel.SkillSnippetContext" />
+    }
 </div>
 
 @page "/builds/singleBuilds/{BuildName}"

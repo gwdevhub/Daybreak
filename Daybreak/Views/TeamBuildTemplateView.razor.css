@@ -105,7 +105,7 @@
 .summary-attributes {
     display: flex;
     position: absolute;
-    background: color-mix(in srgb, var(--neutral-fill-strong-rest) 80%, transparent);
+    background: color-mix(in srgb, var(--neutral-fill-rest) 80%, transparent);
     border-radius: 4px;
     color: var(--neutral-foreground-rest);
     font-size: var(--font-size-small);

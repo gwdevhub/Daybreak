@@ -2,7 +2,6 @@
 using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.BuildTemplates;
-using Daybreak.Shared.Services.Wiki;
 using Daybreak.Shared.Utils;
 using Microsoft.AspNetCore.Components.Web;
 using System.Extensions;
@@ -11,21 +10,14 @@ using TrailBlazr.ViewModels;
 
 namespace Daybreak.Views;
 public abstract class BuildTemplateViewModelBase<TViewModel, TView>(
-    IWikiService wikiService,
     IBuildTemplateManager buildTemplateManager,
     IViewManager viewManager)
     : ViewModelBase<TViewModel, TView>
         where TViewModel : BuildTemplateViewModelBase<TViewModel, TView>
         where TView : BuildTemplateViewBase<TView, TViewModel>
 {
-    private static readonly TimeSpan PendingSkillTimeout = TimeSpan.FromSeconds(5);
-
-    private readonly IWikiService wikiService = wikiService;
     private readonly IBuildTemplateManager buildTemplateManager = buildTemplateManager;
     private readonly IViewManager viewManager = viewManager;
-
-    private bool pendingSkillSnippet = false;
-    private DateTimeOffset pendingSkillStartTime = DateTimeOffset.MinValue;
 
     public SingleBuildEntry? BuildEntry
     {
@@ -57,13 +49,23 @@ public abstract class BuildTemplateViewModelBase<TViewModel, TView>(
         }
     } = [];
 
-    public SkillSnippetContext? SkillSnippetContext
+    public SkillSnippetContext SkillSnippetContext
     {
         get;
         set
         {
             field = value;
             this.NotifyPropertyChanged(nameof(this.SkillSnippetContext));
+        }
+    } = new SkillSnippetContext((0, 0), Skill.None);
+
+    public bool ShowSkillSnippet
+    {
+        get;
+        set
+        {
+            field = value;
+            this.NotifyPropertyChanged(nameof(this.ShowSkillSnippet));
         }
     }
 
@@ -170,49 +172,22 @@ public abstract class BuildTemplateViewModelBase<TViewModel, TView>(
         this.RefreshView();
     }
 
-    public async void OpenSkillSnippet(Skill skill)
+    public void OpenSkillSnippet(Skill skill)
     {
-        if (this.pendingSkillSnippet &&
-            DateTimeOffset.UtcNow - this.pendingSkillStartTime > PendingSkillTimeout)
+        if (skill == Skill.None)
         {
             return;
         }
 
-        try
-        {
-            this.pendingSkillSnippet = true;
-            this.pendingSkillStartTime = DateTimeOffset.UtcNow;
-            var mousePosition = this.MousePosition;
-            var description = await this.wikiService.GetSkillDescription(skill, CancellationToken.None);
-            if (description is null)
-            {
-                return;
-            }
-
-            this.SkillSnippetContext = new SkillSnippetContext(
-                mousePosition,
-                skill,
-                description);
-            this.RefreshView();
-            
-            // Debounce the skill snippet to avoid flickering
-            await Task.Delay(TimeSpan.FromSeconds(1), CancellationToken.None);
-        }
-        finally
-        {
-            this.pendingSkillSnippet = false;
-        }
+        this.SkillSnippetContext = new SkillSnippetContext((this.MousePosition.PosX - 50, this.MousePosition.PosY + 50), skill);
+        this.ShowSkillSnippet = true;
+        this.RefreshView();
     }
 
-    public void CloseSkillSnippet(Skill _)
+    public void CloseSkillSnippet(Skill skill)
     {
-        if (this.pendingSkillSnippet &&
-            DateTimeOffset.UtcNow - this.pendingSkillStartTime > PendingSkillTimeout)
-        {
-            return;
-        }
-
-        this.SkillSnippetContext = default;
+        this.ShowSkillSnippet = false;
+        this.SkillSnippetContext = new SkillSnippetContext((0, 0), skill);
         this.RefreshView();
     }
 
@@ -235,7 +210,7 @@ public abstract class BuildTemplateViewModelBase<TViewModel, TView>(
     {
         var filteredSkills = Skill.Skills.Where(skill =>
         {
-            if (skill.IsPvP)
+            if (skill.PvP)
             {
                 return false;
             }
