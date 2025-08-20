@@ -153,9 +153,13 @@ public sealed partial class WikiService(
         var cleaned = wikiText;
 
         // Handle common fraction templates
-        cleaned = HalfFractionRegex().Replace(cleaned, "½");
-        cleaned = QuarterFractionRegex().Replace(cleaned, "¼");
-        cleaned = ThreeQuarterFractionRegex().Replace(cleaned, "¾");
+        cleaned = HalfFractionRegex().Replace(cleaned, "¹⁄₂");
+        cleaned = QuarterFractionRegex().Replace(cleaned, "¹⁄₄");
+        cleaned = ThreeQuarterFractionRegex().Replace(cleaned, "³⁄₄");
+        cleaned = ThreeOverTwoFractionRegex().Replace(cleaned, "³⁄₂");
+
+        // Handle decimal number templates
+        cleaned = DecimalRegex().Replace(cleaned, "$1");
 
         // Handle {{gr|min|max}} templates (green range values)
         cleaned = GreenRangeRegex().Replace(cleaned, "$1…$2");
@@ -164,6 +168,13 @@ public sealed partial class WikiService(
 
         // Handle simple links [[Link Text]]
         cleaned = SimpleLinkRegex().Replace(cleaned, "$1");
+
+        // Handle {{gray|text}} templates
+        cleaned = GrayTextRegex().Replace(cleaned, "");
+        cleaned = GreyTextRegex().Replace(cleaned, "");
+
+        // Handle {{sic|text}} templates (remove the sic notation but keep the content)
+        cleaned = SicTextRegex().Replace(cleaned, "");
 
         // Handle links with display text [[Link|Display Text]]
         cleaned = LinkWithDisplayTextRegex().Replace(cleaned, "$2");
@@ -235,30 +246,40 @@ public sealed partial class WikiService(
 
     [GeneratedRegex(@"^#REDIRECT\s*\[\[([^\]]+)\]\]", RegexOptions.IgnoreCase)]
     private static partial Regex RedirectRegex();
-    [GeneratedRegex(@"\{\{1/2\}\}")]
+    [GeneratedRegex(@"\{\{1/2\}\}", RegexOptions.IgnoreCase)]
     private static partial Regex HalfFractionRegex();
-    [GeneratedRegex(@"\{\{1/4\}\}")]
+    [GeneratedRegex(@"\{\{1/4\}\}", RegexOptions.IgnoreCase)]
     private static partial Regex QuarterFractionRegex();
-    [GeneratedRegex(@"\{\{3/4\}\}")]
+    [GeneratedRegex(@"\{\{3/4\}\}", RegexOptions.IgnoreCase)]
     private static partial Regex ThreeQuarterFractionRegex();
-    [GeneratedRegex(@"\{\{gr\|(\d+)\|(\d+)\}\}")]
+    [GeneratedRegex(@"\{\{3/2\}\}", RegexOptions.IgnoreCase)]
+    private static partial Regex ThreeOverTwoFractionRegex();
+    [GeneratedRegex(@"\{\{(\d+(?:\.\d+)?)\}\}", RegexOptions.IgnoreCase)]
+    private static partial Regex DecimalRegex();
+    [GeneratedRegex(@"\{\{gr\|(\+?-?\d+)\|(\+?-?\d+)\|?-?\}\}", RegexOptions.IgnoreCase)]
     private static partial Regex GreenRangeRegex();
-    [GeneratedRegex(@"\{\{gr2\|(\d+)\|(\d+)\}\}")]
+    [GeneratedRegex(@"\{\{gr2\|(\+?-?\d+)\|(\+?-?\d+)\|?-?\}\}", RegexOptions.IgnoreCase)]
     private static partial Regex GreenRange2Regex();
-    [GeneratedRegex(@"\{\{gray\|(\d+)\|(\d+)\}\}")]
+    [GeneratedRegex(@"\{\{gray\|(\+?-?\d+)\|(\+?-?\d+)\|?-?\}\}", RegexOptions.IgnoreCase)]
     private static partial Regex GrayRangeRegex();
-    [GeneratedRegex(@"\[\[([^\]|]+)\]\]")]
+    [GeneratedRegex(@"\{\{sic(?:\|([^}]*))?\}\}", RegexOptions.IgnoreCase)]
+    private static partial Regex SicTextRegex();
+    [GeneratedRegex(@"\[\[([^\]|]+)\]\]", RegexOptions.IgnoreCase)]
     private static partial Regex SimpleLinkRegex();
-    [GeneratedRegex(@"\[\[([^|]+)\|([^\]]+)\]\]")]
+    [GeneratedRegex(@"\[\[([^|]+)\|([^\]]+)\]\]", RegexOptions.IgnoreCase)]
     private static partial Regex LinkWithDisplayTextRegex();
-    [GeneratedRegex(@"\[\[([^|]+)\]\]")]
+    [GeneratedRegex(@"\[\[([^|]+)\]\]", RegexOptions.IgnoreCase)]
     private static partial Regex SkillTypeLinkRegex();
-    [GeneratedRegex(@"'''([^']+)'''")]
+    [GeneratedRegex(@"'''([^']+)'''", RegexOptions.IgnoreCase)]
     private static partial Regex BoldTextRegex();
-    [GeneratedRegex(@"''([^']+)''")]
+    [GeneratedRegex(@"''([^']+)''", RegexOptions.IgnoreCase)]
     private static partial Regex ItalicTextRegex();
-    [GeneratedRegex(@"<[^>]*>")]
+    [GeneratedRegex(@"<[^>]*>", RegexOptions.IgnoreCase)]
     private static partial Regex HtmlTagRegex();
-    [GeneratedRegex(@"\s+")]
+    [GeneratedRegex(@"\s+", RegexOptions.IgnoreCase)]
     private static partial Regex WhitespaceRegex();
+    [GeneratedRegex(@"\{\{gray\|([^}]+)\}\}", RegexOptions.IgnoreCase)]
+    private static partial Regex GrayTextRegex();
+    [GeneratedRegex(@"\{\{grey\|([^}]+)\}\}", RegexOptions.IgnoreCase)]
+    private static partial Regex GreyTextRegex();
 }
