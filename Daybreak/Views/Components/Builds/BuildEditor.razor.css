@@ -231,6 +231,7 @@
     height: 60px;
     margin-bottom: 8px;
     gap: 10px;
+    position: relative;
 }
 
 .skill-icon-placeholder {

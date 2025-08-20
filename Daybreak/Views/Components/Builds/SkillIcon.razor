@@ -1,0 +1,11 @@
+﻿<div class="icon-container">
+    <img class="icon" src="@this.Skill.IconUrl"/>
+    <div class="icon-border @(this.Skill.Elite ? "elite" : "normal")"></div>
+</div>
+
+
+@using Daybreak.Shared.Models.Guildwars
+@code {
+    [Parameter]
+    public required Skill Skill { get; init; }
+}

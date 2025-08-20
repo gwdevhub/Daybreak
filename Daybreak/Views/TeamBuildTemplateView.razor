@@ -1,4 +1,4 @@
-﻿<div class="team-build-view" @onmousemove="EventUtil.AsNonRenderingEventHandler<MouseEventArgs>(this.ViewModel.OnMouseMove)">
+﻿<div class="team-build-view">
     <div class="title-bar-additional-btns-left">
         <button class="title-bar-btn" @onclick="this.ViewModel.Save" title="Save Build">
             <FluentIcon Value="new Icons.Regular.Size16.Save()" />
@@ -73,9 +73,11 @@
                         <div class="summary-skills">
                             @foreach (var skill in build.Skills)
                             {
-                                <img class="summary-skill-icon" src="@skill.IconUrl" alt="@skill.Name"
-                                     @onmouseenter="@(() => this.ViewModel.SummarySkillMouseEnter(skill))" @onmouseenter:stopPropagation="true"
-                                     @onmouseleave="@(() => this.ViewModel.SummarySkillMouseLeave(skill))" @onmouseleave:stopPropagation="true" />
+                                <div class="summary-skill-icon"
+                                     @onmouseenter="@((e) => this.ViewModel.SummarySkillMouseEnter(skill, e))" @onmouseenter:stopPropagation="true"
+                                     @onmouseleave="@((e) => this.ViewModel.SummarySkillMouseLeave(skill, e))" @onmouseleave:stopPropagation="true">
+                                    <SkillIcon Skill="skill" />
+                                </div>
                             }
                         </div>
                         <div class="summary-attributes">

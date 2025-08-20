@@ -76,8 +76,8 @@
                     <div class="skill-slot @(skill != Skill.None ? "has-skill" : "empty-skill")" 
                         @onclick="() => this.SkillSelected(skillIndex)"
                         @onclick:stopPropagation="true"
-                        @onmouseenter="() => this.OnSkillHoverEnter(skill)"
-                        @onmouseleave="() => this.OnSkillHoverLeave(skill)">
+                        @onmouseenter="(e) => this.OnSkillHoverEnter(skill, e)"
+                        @onmouseleave="(e) => this.OnSkillHoverLeave(skill, e)">
                         @if (skill != Skill.None)
                         {
                             <button class="skill-remove-btn"
@@ -86,7 +86,9 @@
                                     title="Remove skill">
                                 <FluentIcon Value="@(new Icons.Regular.Size12.Dismiss())" />
                             </button>
-                            <img class="skill-icon" src="@skill.IconUrl" />
+                            <div class="skill-icon">
+                                <SkillIcon Skill="skill" />
+                            </div>
                             <div class="skill-name">@skill.Name</div>
                         }
                         else
@@ -119,7 +121,9 @@
                                 ItemSize="50"
                                 OverscanCount="5">
                         <div class="available-skill" @onclick="() => this.OnSkillSelectionFromPanel(skill)" @onclick:stopPropagation="true">
-                            <img class="skill-icon-small" src="@skill.IconUrl" alt="@skill.Name" />
+                            <div class="skill-icon-small">
+                                <SkillIcon Skill="skill" />
+                            </div>
                             <span class="skill-name-small">@skill.Name</span>
                             <span class="skill-profession">(@skill.Profession?.Alias)</span>
                         </div>
@@ -164,10 +168,10 @@
     public required Action<int, Skill> OnSkillChanged { get; init; }
 
     [Parameter]
-    public required Action<Skill> OnSkillHoverEnter { get; init; }
+    public required Action<Skill, MouseEventArgs> OnSkillHoverEnter { get; init; }
 
     [Parameter]
-    public required Action<Skill> OnSkillHoverLeave { get; init; }
+    public required Action<Skill, MouseEventArgs> OnSkillHoverLeave { get; init; }
 
     [Parameter]
     public required Action<string> SearchFilterChanged { get; init; }

@@ -2,6 +2,7 @@
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.BuildTemplates;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using TrailBlazr.Services;
 
 namespace Daybreak.Views;
@@ -68,14 +69,14 @@ public sealed class TeamBuildTemplateViewModel(
         this.TeamEntry.Name = buildName;
     }
 
-    public void SummarySkillMouseEnter(Skill skill)
+    public void SummarySkillMouseEnter(Skill skill, MouseEventArgs e)
     {
-        this.OpenSkillSnippet(skill);
+        this.OpenSkillSnippet(skill, e);
     }
 
-    public void SummarySkillMouseLeave(Skill skill)
+    public void SummarySkillMouseLeave(Skill skill, MouseEventArgs e)
     {
-        this.CloseSkillSnippet(skill);
+        this.CloseSkillSnippet(skill, e);
     }
 
     public void BuildNameChanged(string buildName)

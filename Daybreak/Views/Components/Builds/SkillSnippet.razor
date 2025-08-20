@@ -1,7 +1,7 @@
 ﻿<div class="backdrop-panel container" style="top: @(this.Context.MousePosition.PosY)px; left: @(this.Context.MousePosition.PosX)px;">
     <div class="left-side">
-        <div class="skill-icon @(this.Context.Skill.Elite ? "elite" : "normal")">
-            <img class="skill-icon-img" src="@this.Context.Skill.IconUrl" />
+        <div class="skill-icon">
+            <SkillIcon Skill="this.Context.Skill" />
         </div>
         <div class="skill-profession">
             <Daybreak.Views.Components.Icons.Professions.ProfessionIcon Profession="this.Context.Skill.Profession" />

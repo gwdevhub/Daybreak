@@ -69,16 +69,6 @@ public abstract class BuildTemplateViewModelBase<TViewModel, TView>(
         }
     }
 
-    public (int PosX, int PosY) MousePosition
-    {
-        get;
-        set
-        {
-            field = value;
-            this.NotifyPropertyChanged(nameof(this.MousePosition));
-        }
-    }
-
     protected abstract void LoadBuild(IBuildEntry? buildEntry);
     protected abstract IBuildEntry SaveBuild();
     protected abstract void ChangeBuildName(string buildName);
@@ -172,28 +162,23 @@ public abstract class BuildTemplateViewModelBase<TViewModel, TView>(
         this.RefreshView();
     }
 
-    public void OpenSkillSnippet(Skill skill)
+    public void OpenSkillSnippet(Skill skill, MouseEventArgs e)
     {
         if (skill == Skill.None)
         {
             return;
         }
 
-        this.SkillSnippetContext = new SkillSnippetContext((this.MousePosition.PosX - 50, this.MousePosition.PosY + 50), skill);
+        this.SkillSnippetContext = new SkillSnippetContext(((int)e.ClientX - 50, (int)e.ClientY + 50), skill);
         this.ShowSkillSnippet = true;
         this.RefreshView();
     }
 
-    public void CloseSkillSnippet(Skill skill)
+    public void CloseSkillSnippet(Skill skill, MouseEventArgs _)
     {
         this.ShowSkillSnippet = false;
         this.SkillSnippetContext = new SkillSnippetContext((0, 0), skill);
         this.RefreshView();
-    }
-
-    public void OnMouseMove(MouseEventArgs e)
-    {
-        this.MousePosition = ((int)e.ClientX, (int)e.ClientY);
     }
 
     protected void UpdateBuildCode()
