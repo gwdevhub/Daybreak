@@ -1,0 +1,89 @@
+﻿<div class="container">
+    <div class="title-bar-additional-btns-left">
+        <button class="title-bar-btn" @onclick="this.ViewModel.CreateCredential" title="Add new account">
+            <FluentIcon Value="new Icons.Regular.Size16.Add()" />
+        </button>
+    </div>
+    <div class="content backdrop-panel">
+        <div class="option-view-title">
+            <h3>Accounts</h3>
+        </div>
+        <div class="credentials-list">
+            @foreach (var credential in this.ViewModel.LoginCredentials)
+            {
+                <div class="credential-row">
+                    <div class="identifier-row">
+                        <div class="identifier-label">
+                            <FluentLabel>Identifier</FluentLabel>
+                        </div>
+                        <div class="identifier-field">
+                            <FluentTextField Value="@credential.LoginCredentials.Identifier"
+                                             Appearance="FluentInputAppearance.Outline"
+                                             AutoComplete="off"
+                                             ReadOnly="true"
+                                             Placeholder="Identifier">
+                                <FluentIcon Value="@(new Microsoft.Fast.Components.FluentUI.Icons.Regular.Size16.Delete())"
+                                            @onclick="@(() => this.ViewModel.RemoveCredential(credential))"
+                                            slot="end"
+                                            Color="Color.Neutral"
+                                            Title="Delete account" />
+                            </FluentTextField>
+                        </div>
+                    </div>
+                    <div class="username-row">
+                        <div class="username-label">
+                            <FluentLabel>Username</FluentLabel>
+                        </div>
+                        <div class="username-field">
+                            <FluentTextField Value="@credential.LoginCredentials.Username"
+                                             ValueChanged="@(e => this.ViewModel.UsernameChanged(credential, e))"
+                                             Appearance="FluentInputAppearance.Outline"
+                                             AutoComplete="off"
+                                             Immediate="true"
+                                             ImmediateDelay="500"
+                                             InputMode="InputMode.Text"
+                                             TextFieldType="TextFieldType.Email"
+                                             Placeholder="Username" />
+                        </div>
+                    </div>
+                    <div class="password-row">
+                        <div class="password-label">
+                            <FluentLabel>Password</FluentLabel>
+                        </div>
+                        <div class="password-field">
+                            <FluentTextField Value="@credential.LoginCredentials.Password"
+                                             ValueChanged="@(e => this.ViewModel.PasswordChanged(credential, e))"
+                                             Appearance="FluentInputAppearance.Outline"
+                                             AutoComplete="off"
+                                             Immediate="true"
+                                             ImmediateDelay="500"
+                                             InputMode="InputMode.Text"
+                                             TextFieldType="@(credential.PasswordVisible ? TextFieldType.Text : TextFieldType.Password)"
+                                             Placeholder="Password">
+                                @if (credential.PasswordVisible)
+                                {
+                                    <FluentIcon Value="@(new Microsoft.Fast.Components.FluentUI.Icons.Regular.Size16.Eye())"
+                                                @onclick="@(() => this.ViewModel.TogglePasswordVisibility(credential))"
+                                                slot="end"
+                                                Color="Color.Neutral"
+                                                Title="Hide password" />
+                                }
+                                else
+                                {
+                                    <FluentIcon Value="@(new Microsoft.Fast.Components.FluentUI.Icons.Regular.Size16.EyeOff())"
+                                                @onclick="@(() => this.ViewModel.TogglePasswordVisibility(credential))"
+                                                slot="end"
+                                                Color="Color.Neutral"
+                                                Title="Show password" />
+                                }
+                            </FluentTextField>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@page "/accounts"
+@inherits ViewBase<AccountsView, AccountsViewModel>

@@ -292,6 +292,8 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<BuildRoutingView, BuildRoutingViewModel>();
         viewProducer.RegisterView<SingleBuildTemplateView, SingleBuildTemplateViewModel>();
         viewProducer.RegisterView<TeamBuildTemplateView, TeamBuildTemplateViewModel>();
+        viewProducer.RegisterView<AccountsView, AccountsViewModel>();
+        viewProducer.RegisterView<ExecutablesView, ExecutablesViewModel>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -419,8 +421,8 @@ public class ProjectConfiguration : PluginConfigurationBase
             .RegisterButton("DirectSong", "Open DirectSong manager", sp => { })
             .RegisterButton("DXVK", "Open DXVK manager", sp => { });
         menuServiceProducer.CreateIfNotExistCategory("Settings")
-            .RegisterButton("Accounts", "Accounts Settings", sp => { })
-            .RegisterButton("Executables", "Executables Settings", sp => { })
+            .RegisterButton("Accounts", "Accounts Settings", sp => sp.GetRequiredService<IViewManager>().ShowView<AccountsView>())
+            .RegisterButton("Executables", "Executables Settings", sp => sp.GetRequiredService<IViewManager>().ShowView<ExecutablesView>())
             .RegisterButton("Launch configurations", "Launch configurations settings", sp => { });
         menuServiceProducer.CreateIfNotExistCategory("Diagnostics")
             .RegisterButton("Telemetry", "Open telemetry view", sp => { })

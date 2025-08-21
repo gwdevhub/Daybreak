@@ -1,9 +1,8 @@
 ﻿<div class="option-view-container backdrop-panel">
+    <div class="option-view-title">
+        <h3>@this.ViewModel.OptionInstance?.Type.Name</h3>
+    </div>
     <div class="option-view-content">
-        <div class="option-view-title">
-            <h3>@this.ViewModel.OptionInstance?.Type.Name</h3>
-        </div>
-
         @if (this.ViewModel.OptionInstance is not null)
         {
             <div style="display: flex; flex-direction: column; gap: 0.75rem; margin: 0 auto;">
