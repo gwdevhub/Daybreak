@@ -236,6 +236,7 @@ public class ColorPalette
         public static AccentColor LightGreen { get; } = new AccentColor(Colors.LightGreen, LightGreenColor, LightGreenHex);
         public static AccentColor Green { get; } = new AccentColor(Colors.Green, GreenColor, GreenHex);
         public static AccentColor DarkGreen { get; } = new AccentColor(Colors.DarkGreen, DarkGreenColor, DarkGreenHex);
+        public static AccentColor LightGray { get; } = new AccentColor(Colors.Gray30, Gray30Color, Gray30Hex);
 
         private AccentColor(Colors name, Color color, string hex) : base(name, color, hex)
         {

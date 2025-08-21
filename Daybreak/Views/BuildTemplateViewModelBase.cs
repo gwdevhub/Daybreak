@@ -169,7 +169,7 @@ public abstract class BuildTemplateViewModelBase<TViewModel, TView>(
             return;
         }
 
-        this.SkillSnippetContext = new SkillSnippetContext(((int)e.ClientX - 50, (int)e.ClientY + 50), skill);
+        this.SkillSnippetContext = new SkillSnippetContext(((int)e.ClientX, (int)e.ClientY), skill);
         this.ShowSkillSnippet = true;
         this.RefreshView();
     }

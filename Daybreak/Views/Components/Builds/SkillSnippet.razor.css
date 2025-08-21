@@ -10,6 +10,14 @@
     color: var(--neutral-foreground-rest);
 }
 
+.skill-snippet {
+    position: fixed;
+    left: calc(var(--mouse-x) - 80px);
+    top: calc(var(--mouse-y) + 40px);
+    max-width: min(400px, calc(100vw - var(--mouse-x) + 65px));
+    max-height: calc(100vh - var(--mouse-y));
+}
+
 .left-side {
     align-items: center;
     display: flex;

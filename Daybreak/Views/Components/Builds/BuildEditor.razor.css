@@ -155,7 +155,7 @@
 
 .skill-slot {
     width: 80px;
-    height: 120px;
+    height: 160px;
     border: 2px solid var(--neutral-stroke-rest);
     border-radius: 8px;
     display: flex;
@@ -227,8 +227,8 @@
         }
 
 .skill-icon {
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 70px;
     margin-bottom: 8px;
     gap: 10px;
     position: relative;

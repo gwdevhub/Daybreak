@@ -121,7 +121,9 @@
                                 ItemSize="50"
                                 OverscanCount="5">
                         <div class="available-skill" @onclick="() => this.OnSkillSelectionFromPanel(skill)" @onclick:stopPropagation="true">
-                            <div class="skill-icon-small">
+                            <div class="skill-icon-small" 
+                                 @onmouseenter="(e) => this.OnSkillHoverEnter(skill, e)"
+                                 @onmouseleave="(e) => this.OnSkillHoverLeave(skill, e)">
                                 <SkillIcon Skill="skill" />
                             </div>
                             <span class="skill-name-small">@skill.Name</span>
