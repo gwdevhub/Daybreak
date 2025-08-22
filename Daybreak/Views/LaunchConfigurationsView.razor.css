@@ -1,0 +1,91 @@
+﻿.container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    gap: 16px;
+}
+
+.content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.launch-configs-list {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    gap: 10px;
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.launch-configs-row {
+    display: flex;
+    width: calc(100% - 40px);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 2px solid var(--neutral-foreground-rest);
+    border-top: 0px;
+    border-left: 0px;
+    border-right: 0px;
+}
+
+.launch-config-identifier,
+.launch-config-executable,
+.launch-config-credentials,
+.launch-config-args {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    padding: 0px 20px 0px 20px;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.launch-config-identifier-label,
+.launch-config-executable-label,
+.launch-config-credentials-label,
+.launch-config-args-label {
+    width: 250px;
+}
+
+.launch-config-identifier-field,
+.launch-config-executable-field,
+.launch-config-credentials-field,
+.launch-config-args-field {
+    width: 50%;
+}
+
+/* Another alternative - target any text content */
+.launch-config-identifier-label ::deep *,
+.launch-config-executable-label ::deep *,
+.launch-config-credentials-label ::deep *,
+.launch-config-args-label ::deep * {
+    font-size: var(--font-size-large) !important;
+}
+
+.launch-config-identifier-field ::deep fluent-text-field,
+.launch-config-executable-field ::deep fluent-text-field,
+.launch-config-credentials-field ::deep fluent-text-field,
+.launch-config-args-field ::deep fluent-text-field {
+    width: 100%;
+    box-sizing: border-box !important;
+    font-size: var(--font-size-large);
+}
+
+.launch-config-identifier-field ::deep fluent-select,
+.launch-config-executable-field ::deep fluent-select,
+.launch-config-credentials-field ::deep fluent-select,
+.launch-config-args-field ::deep fluent-select {
+    width: 100%;
+    box-sizing: border-box !important;
+    font-size: var(--font-size-large) !important;
+    --type-ramp-base-font-size: var(--font-size-large);
+}

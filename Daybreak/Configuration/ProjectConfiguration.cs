@@ -294,6 +294,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<TeamBuildTemplateView, TeamBuildTemplateViewModel>();
         viewProducer.RegisterView<AccountsView, AccountsViewModel>();
         viewProducer.RegisterView<ExecutablesView, ExecutablesViewModel>();
+        viewProducer.RegisterView<LaunchConfigurationsView, LaunchConfigurationsViewModel>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -423,7 +424,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         menuServiceProducer.CreateIfNotExistCategory("Settings")
             .RegisterButton("Accounts", "Accounts Settings", sp => sp.GetRequiredService<IViewManager>().ShowView<AccountsView>())
             .RegisterButton("Executables", "Executables Settings", sp => sp.GetRequiredService<IViewManager>().ShowView<ExecutablesView>())
-            .RegisterButton("Launch configurations", "Launch configurations settings", sp => { });
+            .RegisterButton("Launch configurations", "Launch configurations settings", sp => sp.GetRequiredService<IViewManager>().ShowView<LaunchConfigurationsView>());
         menuServiceProducer.CreateIfNotExistCategory("Diagnostics")
             .RegisterButton("Telemetry", "Open telemetry view", sp => { })
             .RegisterButton("Logs", "Open logs view", sp => { })

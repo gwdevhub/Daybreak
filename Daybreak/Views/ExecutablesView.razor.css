@@ -55,10 +55,6 @@
     flex-direction: row;
 }
 
-.loading-circle {
-    display: flex;
-}
-
 .update-progress-text {
     position: absolute;
     font-size: var(--font-size-xx-small);

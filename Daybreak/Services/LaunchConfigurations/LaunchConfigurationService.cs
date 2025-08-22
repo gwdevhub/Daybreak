@@ -100,7 +100,7 @@ internal sealed class LaunchConfigurationService(
             LaunchConfiguration config)
         {
             config.Identifier = launchConfigurationWithCredentials.Identifier;
-            config.CredentialsIdentifier = launchConfigurationWithCredentials.Credentials!.Identifier;
+            config.CredentialsIdentifier = launchConfigurationWithCredentials.Credentials?.Identifier;
             config.Executable = launchConfigurationWithCredentials.ExecutablePath;
             config.Arguments = launchConfigurationWithCredentials.Arguments;
             this.liveUpdateableOptions.Value.LaunchConfigurations = configs;
@@ -110,7 +110,7 @@ internal sealed class LaunchConfigurationService(
 
         configs.Add(new LaunchConfiguration
         {
-            CredentialsIdentifier = launchConfigurationWithCredentials.Credentials!.Identifier,
+            CredentialsIdentifier = launchConfigurationWithCredentials.Credentials?.Identifier,
             Executable = launchConfigurationWithCredentials.ExecutablePath,
             Identifier = launchConfigurationWithCredentials.Identifier,
             Arguments = launchConfigurationWithCredentials.Arguments,
