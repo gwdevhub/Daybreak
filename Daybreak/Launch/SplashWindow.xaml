@@ -8,6 +8,7 @@
     xmlns:glyphs="clr-namespace:Daybreak.Controls.Glyphs"
     xmlns:local="clr-namespace:Daybreak.Launch"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
     x:Name="_this"
     Title="SplashWindow"
     Width="800"
@@ -16,6 +17,15 @@
     ShowInTaskbar="False"
     WindowStyle="None"
     mc:Ignorable="d">
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome
+            CaptionHeight="0"
+            CornerRadius="12"
+            GlassFrameThickness="0"
+            NonClientFrameEdges="None"
+            ResizeBorderThickness="0"
+            UseAeroCaptionButtons="False" />
+    </shell:WindowChrome.WindowChrome>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />

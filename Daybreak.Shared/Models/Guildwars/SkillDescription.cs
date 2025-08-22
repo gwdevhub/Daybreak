@@ -15,6 +15,7 @@ public sealed record SkillDescription(
     string Overcast,
     string Adrenaline,
     string Sacrifice,
+    string Upkeep,
     string Description,
     string ConciseDescription)
 {

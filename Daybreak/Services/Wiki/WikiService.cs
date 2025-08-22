@@ -136,6 +136,7 @@ public sealed partial class WikiService(
                 Overcast: ExtractField(infoboxContent, "overcast") ?? string.Empty,
                 Adrenaline: ExtractField(infoboxContent, "adrenaline") ?? string.Empty,
                 Sacrifice: ExtractField(infoboxContent, "sacrifice") ?? string.Empty,
+                Upkeep: ExtractField(infoboxContent, "upkeep") ?? string.Empty,
                 Description: ExtractField(infoboxContent, "description") ?? string.Empty,
                 ConciseDescription: ExtractField(infoboxContent, "concise description") ?? string.Empty);
         }

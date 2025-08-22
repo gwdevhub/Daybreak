@@ -77,6 +77,15 @@
                 <div class="skill-resource-text">@this.Context.Skill.Sacrifice</div>
             </div>
         }
+        @if (!string.IsNullOrWhiteSpace(this.Context.Skill.Upkeep))
+        {
+            <div class="skill-resource">
+                <div class="skill-resource-img">
+                    <Daybreak.Views.Components.Icons.Misc.Upkeep />
+                </div>
+                <div class="skill-resource-text">@this.Context.Skill.Upkeep</div>
+            </div>
+        }
     </div>
 </div>
 

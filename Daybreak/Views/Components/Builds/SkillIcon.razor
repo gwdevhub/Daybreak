@@ -1,6 +1,36 @@
 ﻿<div class="icon-container">
     <img class="icon" src="@this.Skill.IconUrl"/>
     <div class="icon-border @(this.Skill.Elite ? "elite" : "normal")"></div>
+    @if (this.Skill.Type.HasFlag(SkillType.Enchantment))
+    {
+        <div class="icon-type">
+            <Daybreak.Views.Components.Icons.Types.Enchantment />
+        </div>
+    }
+    else if (this.Skill.Type.HasFlag(SkillType.Hex))
+    {
+        <div class="icon-type">
+            <Daybreak.Views.Components.Icons.Types.Hex />
+        </div>
+    }
+    else if (this.Skill.Type.HasFlag(SkillType.Lead))
+    {
+        <div class="icon-type">
+            <Daybreak.Views.Components.Icons.Types.Lead />
+        </div>
+    }
+    else if (this.Skill.Type.HasFlag(SkillType.OffHand))
+    {
+        <div class="icon-type">
+            <Daybreak.Views.Components.Icons.Types.Offhand />
+        </div>
+    }
+    else if (this.Skill.Type.HasFlag(SkillType.Dual))
+    {
+        <div class="icon-type">
+            <Daybreak.Views.Components.Icons.Types.Dual />
+        </div>
+    }
 </div>
 
 

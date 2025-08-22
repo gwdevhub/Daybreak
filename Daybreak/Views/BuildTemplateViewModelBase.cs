@@ -207,7 +207,7 @@ public abstract class BuildTemplateViewModelBase<TViewModel, TView>(
 
             if (skill.Profession == Profession.None)
             {
-                return true;
+                return false;
             }
 
             if (this.BuildEntry.Primary == Profession.None)
