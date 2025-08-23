@@ -31,7 +31,7 @@
 
 .navigation-menu {
     padding: 15px;
-    padding-top: 40px;
+    margin-top: 40px;
     color: var(--neutral-foreground-rest);
     height: calc(100vh - 20px);
     overflow-y: auto;
