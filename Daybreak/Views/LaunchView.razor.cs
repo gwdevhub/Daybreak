@@ -7,9 +7,9 @@ using Daybreak.Shared.Services.Api;
 using Daybreak.Shared.Services.ApplicationLauncher;
 using Daybreak.Shared.Services.InternetChecker;
 using Daybreak.Shared.Services.LaunchConfigurations;
-using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Onboarding;
+using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Services.Screens;
 using Microsoft.Extensions.Options;
 using System.Collections.ObjectModel;
@@ -29,10 +29,8 @@ public sealed class LaunchViewModel : ViewModelBase<LaunchViewModel, LaunchView>
     private readonly INotificationService notificationService;
     private readonly IDaybreakApiService daybreakApiService;
     private readonly ILaunchConfigurationService launchConfigurationService;
-    private readonly IConnectivityStatus connectivityStatus;
     private readonly IOnboardingService onboardingService;
     private readonly IApplicationLauncher applicationLauncher;
-    private readonly IScreenManager screenManager;
     private readonly IOptions<FocusViewOptions> focusViewOptions;
 
     private CancellationTokenSource? cancellationTokenSource;
@@ -46,16 +44,15 @@ public sealed class LaunchViewModel : ViewModelBase<LaunchViewModel, LaunchView>
         IOnboardingService onboardingService,
         IApplicationLauncher applicationLauncher,
         IScreenManager screenManager,
-        IOptions<FocusViewOptions> focusViewOptions)
+        IOptions<FocusViewOptions> focusViewOptions,
+        IPrivilegeManager privilegeManager)
     {
         this.viewManager = viewManager.ThrowIfNull();
         this.notificationService = notificationService.ThrowIfNull();
         this.daybreakApiService = daybreakApiService.ThrowIfNull();
         this.launchConfigurationService = launchConfigurationService.ThrowIfNull();
-        this.connectivityStatus = connectivityStatus.ThrowIfNull();
         this.onboardingService = onboardingService.ThrowIfNull();
         this.applicationLauncher = applicationLauncher.ThrowIfNull();
-        this.screenManager = screenManager.ThrowIfNull();
         this.focusViewOptions = focusViewOptions.ThrowIfNull();
 
         this.viewManager.ShowViewRequested += (_, viewRequest) =>

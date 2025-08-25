@@ -39,7 +39,6 @@ public sealed class AppViewModel
     public bool IsAdmin => this.privilegeManager.AdminPrivileges;
     public bool IsNavigationOpen { get; private set; }
     public string CurrentVersionText => this.applicationUpdater.CurrentVersion.ToString();
-    public string CreditText { get; private set; } = string.Empty;
 
     public string AccentBaseColor { get; set; } = string.Empty;
     public string NeutralBaseColor { get; set; } = string.Empty;
@@ -148,11 +147,6 @@ public sealed class AppViewModel
         this.RedrawRequested?.Invoke(this, EventArgs.Empty);
     }
 
-    public void OpenCreditLink()
-    {
-        //TODO: Remove this
-    }
-
     public void OpenIssues()
     {
         //TODO: Handle open issue link
@@ -176,6 +170,11 @@ public sealed class AppViewModel
     public void MenuButtonClicked(MenuButton menuButton)
     {
         this.menuServiceButtonHandler.HandleButton(menuButton);
+    }
+
+    public void RestartAsNormalUser()
+    {
+        this.privilegeManager.RequestNormalPrivileges<LaunchView>("You are currently running Daybreak as administrator", default, CancellationToken.None);
     }
 
     private void OnThemeChange()

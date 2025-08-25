@@ -14,6 +14,7 @@
     display: flex;
     flex-direction: column;
     margin: 0 auto;
+    height: 100%;
 }
 
 /* Option component styles using ::deep to target child components in their respective option razor components */
@@ -23,6 +24,7 @@
     justify-content: space-between;
     min-height: 60px;
     padding: 0.5rem 0;
+    height: 100%;
 }
 
     ::deep .option-display-box .option-content {

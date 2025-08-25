@@ -1,15 +1,11 @@
 ﻿<div class="status-bar backdrop-panel">
     <div class="status-left">
         <span class="version-info">@this.CurrentVersionText</span>
-        @if (this.IsAdmin)
-        {
-            <span class="admin-badge">[Admin]</span>
-        }
     </div>
     <div class="status-right">
-        @if (!string.IsNullOrEmpty(this.CreditText))
+        @if (this.IsAdmin)
         {
-            <span class="credit-text" @onclick="this.OpenCreditLink">@this.CreditText</span>
+            <span class="admin-badge" @onclick="this.RestartAsNormalUser">[Admin]</span>
         }
     </div>
 </div>
@@ -18,9 +14,7 @@
     [Parameter]
     public required bool IsAdmin { get; init; }
     [Parameter]
-    public required string CreditText { get; init; }
-    [Parameter]
     public required string CurrentVersionText { get; init; }
     [Parameter]
-    public required Action OpenCreditLink { get; init; }
+    public required Action RestartAsNormalUser { get; init; }
 }

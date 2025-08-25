@@ -66,7 +66,6 @@ public sealed class Launcher : BlazorHybridApplication<App>
 
         Instance = new Launcher(args);
         RegisterExtraEncodingProviders();
-        RegisterMahAppsStyle();
         return LaunchMainWindow();
     }
 
@@ -238,29 +237,6 @@ public sealed class Launcher : BlazorHybridApplication<App>
          * This is a fix for encoding issues with zip files
          */
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-    }
-
-    private static void RegisterMahAppsStyle()
-    {
-        RegisterMahAppsComponent("Styles/Fonts.xaml");
-        RegisterMahAppsComponent("Styles/Controls.xaml");
-        RegisterMahAppsComponent("Styles/Themes/Light.Steel.xaml");
-        
-        //TODO: Hacky way to initialize a theme before startup and option loading
-        RegisterDaybreakComponent();
-    }
-
-    private static void RegisterMahAppsComponent(string component)
-    {
-        Instance.Resources.MergedDictionaries.Add(new ResourceDictionary
-        {
-            Source = new Uri($"pack://application:,,,/MahApps.Metro;component/{component}", UriKind.RelativeOrAbsolute)
-        });
-    }
-
-    private static void RegisterDaybreakComponent()
-    {
-        Instance.Resources.MergedDictionaries[2].Add("Daybreak.Brushes.Background", new SolidColorBrush(Colors.Transparent));
     }
 
     private static void AllocateAnsiConsole()

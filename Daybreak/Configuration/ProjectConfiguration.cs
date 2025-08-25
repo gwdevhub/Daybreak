@@ -203,7 +203,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<ProcessorUsageMonitor>();
         services.AddSingleton<MemoryUsageMonitor>();
         services.AddSingleton<DiskUsageMonitor>();
-        services.AddSingleton<IViewManager, ViewManager>(sp => sp.GetRequiredService<ViewManager>());
         services.AddSingleton<PostUpdateActionManager>();
         services.AddSingleton<IPostUpdateActionManager>(sp => sp.GetRequiredService<PostUpdateActionManager>());
         services.AddSingleton<IPostUpdateActionProducer>(sp => sp.GetRequiredService<PostUpdateActionManager>());
@@ -241,6 +240,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IMDomainRegistrar, MDomainRegistrar>();
         services.AddSingleton<IAttachedApiAccessor, AttachedApiAccessor>();
         services.AddSingleton<TelemetryHost>();
+        services.AddSingleton<PrivilegeContext>();
         services.AddScoped<IBrowserExtensionsManager, BrowserExtensionsManager>();
         services.AddScoped<IBrowserExtensionsProducer, BrowserExtensionsManager>(sp => sp.GetRequiredService<IBrowserExtensionsManager>().Cast<BrowserExtensionsManager>());
         services.AddScoped<ICredentialManager, CredentialManager>();
@@ -250,7 +250,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IApplicationUpdater, ApplicationUpdater>();
         services.AddScoped<IBuildTemplateManager, BuildTemplateManager>();
         services.AddScoped<IIconCache, IconCache>();
-        services.AddScoped<IPrivilegeManager, PrivilegeManager>();
         services.AddScoped<IScreenManager, ScreenManager>();
         services.AddScoped<IOnboardingService, OnboardingService>();
         services.AddScoped<IExperienceCalculator, ExperienceCalculator>();
@@ -279,6 +278,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IApplicationArgumentService, ApplicationArgumentService>();
         services.AddScoped<IArgumentHandlerProducer, IApplicationArgumentService>(sp => sp.GetRequiredService<IApplicationArgumentService>());
         services.AddScoped<IWikiService, WikiService>();
+        services.AddScoped<IPrivilegeManager, PrivilegeManager>();
     }
 
     public override void RegisterViews(IViewProducer viewProducer)
@@ -295,6 +295,8 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<AccountsView, AccountsViewModel>();
         viewProducer.RegisterView<ExecutablesView, ExecutablesViewModel>();
         viewProducer.RegisterView<LaunchConfigurationsView, LaunchConfigurationsViewModel>();
+        viewProducer.RegisterView<RequestElevationView, RequestElevationViewModel>();
+        viewProducer.RegisterView<RequestDelevationView, RequestDelevationViewModel>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
