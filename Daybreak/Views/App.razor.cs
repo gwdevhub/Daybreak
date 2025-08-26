@@ -154,7 +154,6 @@ public sealed class AppViewModel
 
     public void OpenSynchronizationView()
     {
-        //TODO: Handle open sync view
     }
 
     public void OpenVersionView()

@@ -17,7 +17,6 @@ using Microsoft.CorrelationVector;
 using System.Logging;
 using Daybreak.Services.Updater.PostUpdate;
 using System.Core.Extensions;
-using Daybreak.Services.Graph;
 using Microsoft.Extensions.DependencyInjection;
 using Daybreak.Services.Onboarding;
 using Daybreak.Services.Menu;
@@ -124,6 +123,12 @@ using Microsoft.Fast.Components.FluentUI;
 using Daybreak.Themes;
 using Daybreak.Shared.Services.Wiki;
 using Daybreak.Services.Wiki;
+using Daybreak.Services.Graph.Models;
+using Daybreak.Services.Graph;
+using Microsoft.Identity.Client;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
+using Microsoft.Identity.Client.Desktop;
+using System.Net.Http;
 
 namespace Daybreak.Configuration;
 
@@ -150,7 +155,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddFluentUIComponents();
         
         services.AddTrailBlazr();
-        this.RegisterHttpClients(services);
+        RegisterHttpClients(services);
         services.AddScoped(sp =>
         {
             var connection = new SqliteConnection(DbConnectionString);
@@ -160,6 +165,37 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped(sp => new TradeQuoteDbContext(sp.GetRequiredService<SqliteConnection>()));
         services.AddScoped(sp => new NotificationsDbContext(sp.GetRequiredService<SqliteConnection>()));
         services.AddScoped(sp => new TradeMessagesDbContext(sp.GetRequiredService<SqliteConnection>()));
+        services.AddSingleton<IPublicClientApplication>(sp =>
+        {
+            var logger = sp.GetRequiredService<ILogger<PublicClientApplication>>();
+            return PublicClientApplicationBuilder.Create(SecretManager.GetSecret(SecretKeys.AadApplicationId))
+                .WithLogging((logLevel, message, containsPii) =>
+                {
+                    if (containsPii && logLevel > Microsoft.Identity.Client.LogLevel.Info)
+                    {
+                        // Redact logs that contain PII which user can enable to send to the telemetry server
+                        message = "[REDACTED]";
+                    }
+                    
+                    var equivalentLogLevel = logLevel switch
+                    {
+                        Microsoft.Identity.Client.LogLevel.Error => LogLevel.Error,
+                        Microsoft.Identity.Client.LogLevel.Warning => LogLevel.Warning,
+                        Microsoft.Identity.Client.LogLevel.Info => LogLevel.Information,
+                        Microsoft.Identity.Client.LogLevel.Verbose => LogLevel.Debug,
+                        _ => LogLevel.None
+                    };
+
+                    logger.Log(equivalentLogLevel, message);
+                }, enablePiiLogging: true, enableDefaultPlatformLogging: true)
+                .WithCacheOptions(new CacheOptions { UseSharedCache = true })
+                .WithRedirectUri(BlazorGraphClient.RedirectUri)
+                .WithWindowsEmbeddedBrowserSupport()
+                .WithHttpClientFactory(
+                    new DaybreakMsalHttpClientProvider(new HttpClient(SetupLoggingAndMetrics<PublicClientApplication>(sp))))
+                .Build();
+        });
+            
         services.AddSingleton<SwappableLoggerProvider>();
         services.AddSingleton<ILogsManager, JsonLogsManager>();
         services.AddSingleton<IConsoleLogsWriter, ConsoleLogsWriter>();
@@ -234,13 +270,13 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<ISplashScreenService, SplashScreenService>();
         services.AddSingleton<IGuildWarsExecutableManager, GuildWarsExecutableManager>();
         services.AddSingleton<ISevenZipExtractor, SevenZipExtractor>();
-        services.AddSingleton<IGraphClient, GraphClient>();
         services.AddSingleton<IOptionsSynchronizationService, OptionsSynchronizationService>();
         services.AddSingleton<IMDomainNameService, MDomainNameService>();
         services.AddSingleton<IMDomainRegistrar, MDomainRegistrar>();
         services.AddSingleton<IAttachedApiAccessor, AttachedApiAccessor>();
         services.AddSingleton<TelemetryHost>();
         services.AddSingleton<PrivilegeContext>();
+        services.AddSingleton<ViewRedirectContext>();
         services.AddScoped<IBrowserExtensionsManager, BrowserExtensionsManager>();
         services.AddScoped<IBrowserExtensionsProducer, BrowserExtensionsManager>(sp => sp.GetRequiredService<IBrowserExtensionsManager>().Cast<BrowserExtensionsManager>());
         services.AddScoped<ICredentialManager, CredentialManager>();
@@ -279,6 +315,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IArgumentHandlerProducer, IApplicationArgumentService>(sp => sp.GetRequiredService<IApplicationArgumentService>());
         services.AddScoped<IWikiService, WikiService>();
         services.AddScoped<IPrivilegeManager, PrivilegeManager>();
+        services.AddScoped<IGraphClient, BlazorGraphClient>();
     }
 
     public override void RegisterViews(IViewProducer viewProducer)
@@ -447,7 +484,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         }
     }
 
-    private IServiceCollection RegisterHttpClients(IServiceCollection services)
+    private static IServiceCollection RegisterHttpClients(IServiceCollection services)
     {
         return services
             .ThrowIfNull()
@@ -458,10 +495,6 @@ public class ProjectConfiguration : PluginConfigurationBase
             .RegisterHttpClient<OnlinePictureClient>()
                 .WithMessageHandler(SetupLoggingAndMetrics<OnlinePictureClient>)
                 .WithDefaultRequestHeadersSetup(SetupChromeImpersonationUserAgent)
-                .Build()
-            .RegisterHttpClient<GraphClient>()
-                .WithMessageHandler(SetupLoggingAndMetrics<GraphClient>)
-                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<DownloadService>()
                 .WithMessageHandler(SetupLoggingAndMetrics<DownloadService>)
@@ -521,6 +554,10 @@ public class ProjectConfiguration : PluginConfigurationBase
                 .Build()
             .RegisterHttpClient<WikiService>()
                 .WithMessageHandler(SetupLoggingAndMetrics<WikiService>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
+                .Build()
+            .RegisterHttpClient<BlazorGraphClient>()
+                .WithMessageHandler(SetupLoggingAndMetrics<BlazorGraphClient>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build();
     }

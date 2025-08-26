@@ -76,81 +76,81 @@ public partial class SettingsSynchronizationView : UserControl
     }
 
     private async Task UpdateInfo()
-    {
-        var userProfile = await this.graphClient.GetUserProfile<SettingsSynchronizationView>();
-        userProfile.Do(
-            onSuccess: async user =>
-            {
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.DisplayName = user.DisplayName;
-                    this.Email = user.Email;
-                    this.Loading = true;
-                });
-                var currentOptions = await this.optionsSynchronizationService.GetLocalOptions(CancellationToken.None);
-                var remoteOptions = await this.optionsSynchronizationService.GetRemoteOptions(CancellationToken.None);
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    var richTextModelLocal = new RichTextModel();
-                    this.LocalTextEditor.TextArea.TextView.LineTransformers.ClearAnd().Add(new RichTextColorizer(richTextModelLocal));
-                    var richTextModelRemote = new RichTextModel();
-                    this.RemoteTextEditor.TextArea.TextView.LineTransformers.ClearAnd().Add(new RichTextColorizer(richTextModelRemote));
+    {   //TODO:
+        //var userProfile = await this.graphClient.GetUserProfile<SettingsSynchronizationView>();
+        //userProfile.Do(
+        //    onSuccess: async user =>
+        //    {
+        //        await this.Dispatcher.InvokeAsync(() =>
+        //        {
+        //            this.DisplayName = user.DisplayName;
+        //            this.Email = user.Email;
+        //            this.Loading = true;
+        //        });
+        //        var currentOptions = await this.optionsSynchronizationService.GetLocalOptions(CancellationToken.None);
+        //        var remoteOptions = await this.optionsSynchronizationService.GetRemoteOptions(CancellationToken.None);
+        //        await this.Dispatcher.InvokeAsync(() =>
+        //        {
+        //            var richTextModelLocal = new RichTextModel();
+        //            this.LocalTextEditor.TextArea.TextView.LineTransformers.ClearAnd().Add(new RichTextColorizer(richTextModelLocal));
+        //            var richTextModelRemote = new RichTextModel();
+        //            this.RemoteTextEditor.TextArea.TextView.LineTransformers.ClearAnd().Add(new RichTextColorizer(richTextModelRemote));
 
-                    var currentOptionsString = currentOptions is null ? string.Empty : JsonConvert.SerializeObject(currentOptions, new JsonSerializerSettings { Formatting = Formatting.Indented });
-                    var remoteOptionsString = remoteOptions is null ? string.Empty : JsonConvert.SerializeObject(remoteOptions, new JsonSerializerSettings { Formatting = Formatting.Indented });
-                    var diffBuilder1 = new InlineDiffBuilder(new Differ());
-                    var diff1 = diffBuilder1.BuildDiffModel(currentOptionsString, remoteOptionsString);
-                    var currentOptionsSb = new StringBuilder();
-                    var remoteOptionsSb = new StringBuilder();
-                    var diffBuilder2 = new InlineDiffBuilder(new Differ());
-                    var diff2 = diffBuilder2.BuildDiffModel(remoteOptionsString, currentOptionsString);
-                    foreach(var diff in diff1.Lines)
-                    {
-                        switch (diff.Type)
-                        {
-                            case DiffPlex.DiffBuilder.Model.ChangeType.Inserted:
-                                continue;
-                            case DiffPlex.DiffBuilder.Model.ChangeType.Imaginary:
-                            case DiffPlex.DiffBuilder.Model.ChangeType.Unchanged:
-                                richTextModelLocal.SetForeground(currentOptionsSb.Length, diff.Text.Length, this.simpleForegroundHighlightingBrush);
-                                break;
-                            case DiffPlex.DiffBuilder.Model.ChangeType.Deleted:
-                            case DiffPlex.DiffBuilder.Model.ChangeType.Modified:
-                                richTextModelLocal.SetForeground(currentOptionsSb.Length, diff.Text.Length, this.simpleGreenHighlightingBrush);
-                                break;
-                        }
+        //            var currentOptionsString = currentOptions is null ? string.Empty : JsonConvert.SerializeObject(currentOptions, new JsonSerializerSettings { Formatting = Formatting.Indented });
+        //            var remoteOptionsString = remoteOptions is null ? string.Empty : JsonConvert.SerializeObject(remoteOptions, new JsonSerializerSettings { Formatting = Formatting.Indented });
+        //            var diffBuilder1 = new InlineDiffBuilder(new Differ());
+        //            var diff1 = diffBuilder1.BuildDiffModel(currentOptionsString, remoteOptionsString);
+        //            var currentOptionsSb = new StringBuilder();
+        //            var remoteOptionsSb = new StringBuilder();
+        //            var diffBuilder2 = new InlineDiffBuilder(new Differ());
+        //            var diff2 = diffBuilder2.BuildDiffModel(remoteOptionsString, currentOptionsString);
+        //            foreach(var diff in diff1.Lines)
+        //            {
+        //                switch (diff.Type)
+        //                {
+        //                    case DiffPlex.DiffBuilder.Model.ChangeType.Inserted:
+        //                        continue;
+        //                    case DiffPlex.DiffBuilder.Model.ChangeType.Imaginary:
+        //                    case DiffPlex.DiffBuilder.Model.ChangeType.Unchanged:
+        //                        richTextModelLocal.SetForeground(currentOptionsSb.Length, diff.Text.Length, this.simpleForegroundHighlightingBrush);
+        //                        break;
+        //                    case DiffPlex.DiffBuilder.Model.ChangeType.Deleted:
+        //                    case DiffPlex.DiffBuilder.Model.ChangeType.Modified:
+        //                        richTextModelLocal.SetForeground(currentOptionsSb.Length, diff.Text.Length, this.simpleGreenHighlightingBrush);
+        //                        break;
+        //                }
 
-                        currentOptionsSb.AppendLine(diff.Text);
-                    }
+        //                currentOptionsSb.AppendLine(diff.Text);
+        //            }
 
-                    this.LocalTextEditor.Text = currentOptionsSb.ToString();
-                    foreach (var diff in diff2.Lines)
-                    {
-                        switch (diff.Type)
-                        {
-                            case DiffPlex.DiffBuilder.Model.ChangeType.Inserted:
-                                continue;
-                            case DiffPlex.DiffBuilder.Model.ChangeType.Imaginary:
-                            case DiffPlex.DiffBuilder.Model.ChangeType.Unchanged:
-                                richTextModelRemote.SetForeground(remoteOptionsSb.Length, diff.Text.Length, this.simpleForegroundHighlightingBrush);
-                                break;
-                            case DiffPlex.DiffBuilder.Model.ChangeType.Deleted:
-                            case DiffPlex.DiffBuilder.Model.ChangeType.Modified:
-                                richTextModelRemote.SetForeground(remoteOptionsSb.Length, diff.Text.Length, this.simpleRedHighlightingBrush);
-                                break;
-                        }
+        //            this.LocalTextEditor.Text = currentOptionsSb.ToString();
+        //            foreach (var diff in diff2.Lines)
+        //            {
+        //                switch (diff.Type)
+        //                {
+        //                    case DiffPlex.DiffBuilder.Model.ChangeType.Inserted:
+        //                        continue;
+        //                    case DiffPlex.DiffBuilder.Model.ChangeType.Imaginary:
+        //                    case DiffPlex.DiffBuilder.Model.ChangeType.Unchanged:
+        //                        richTextModelRemote.SetForeground(remoteOptionsSb.Length, diff.Text.Length, this.simpleForegroundHighlightingBrush);
+        //                        break;
+        //                    case DiffPlex.DiffBuilder.Model.ChangeType.Deleted:
+        //                    case DiffPlex.DiffBuilder.Model.ChangeType.Modified:
+        //                        richTextModelRemote.SetForeground(remoteOptionsSb.Length, diff.Text.Length, this.simpleRedHighlightingBrush);
+        //                        break;
+        //                }
 
-                        remoteOptionsSb.AppendLine(diff.Text);
-                    }
+        //                remoteOptionsSb.AppendLine(diff.Text);
+        //            }
 
-                    this.RemoteTextEditor.Text = remoteOptionsSb.ToString();
-                    this.Loading = false;
-                    this.Synchronized = currentOptionsSb.ToString() == remoteOptionsSb.ToString();
-                });
-            },
-            onFailure: exception =>
-            {
-                throw exception;
-            });
+        //            this.RemoteTextEditor.Text = remoteOptionsSb.ToString();
+        //            this.Loading = false;
+        //            this.Synchronized = currentOptionsSb.ToString() == remoteOptionsSb.ToString();
+        //        });
+        //    },
+        //    onFailure: exception =>
+        //    {
+        //        throw exception;
+        //    });
     }
 }
