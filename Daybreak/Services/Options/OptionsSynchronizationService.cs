@@ -90,7 +90,7 @@ public sealed class OptionsSynchronizationService(
     {
         return this.optionsProvider.GetRegisteredOptionInstances()
             .Where(o => o.Type.IsSynchronized)
-            .Select(o => (o, JObject.FromObject(o)))
+            .Select(o => (o, JObject.FromObject(o.Reference)))
             .Select(t =>
             {
                 var jObject = t.Item2;

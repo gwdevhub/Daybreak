@@ -334,6 +334,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<LaunchConfigurationsView, LaunchConfigurationsViewModel>();
         viewProducer.RegisterView<RequestElevationView, RequestElevationViewModel>();
         viewProducer.RegisterView<RequestDelevationView, RequestDelevationViewModel>();
+        viewProducer.RegisterView<SettingsSynchronizationView, SettingsSynchronizationViewModel>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)

@@ -64,7 +64,7 @@ internal sealed class BlazorGraphClient : IGraphClient
 
     public async Task<Result<bool, Exception>> PerformAuthorizationFlow(CancellationToken cancellationToken = default)
     {
-        if ((await this.GetValidAccessToken()) is string)
+        if (await this.GetValidAccessToken() is string)
         {
             return true;
         }

@@ -154,6 +154,7 @@ public sealed class AppViewModel
 
     public void OpenSynchronizationView()
     {
+        this.viewManager.ShowView<SettingsSynchronizationView>();
     }
 
     public void OpenVersionView()
