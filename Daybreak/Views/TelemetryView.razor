@@ -1,0 +1,17 @@
+﻿<div class="stretch-container backdrop-panel">
+    <div class="header">
+        <div class="header-title">
+            <h1>Telemetry</h1>
+        </div>
+        <div class="header-right">
+            <FluentLabel class="label">@(this.ViewModel.TelemetryEnabled ? "On" : "Off")</FluentLabel>
+            <FluentSwitch @bind-Value="this.ViewModel.TelemetryEnabled" @bind-Value:after="this.ViewModel.TelemetryEnabledChanged" />
+        </div>
+    </div>
+    <div class="body">
+        @TelemetryViewModel.DisclaimerText
+    </div>
+</div>
+
+@page "/telemetry"
+@inherits ViewBase<TelemetryView, TelemetryViewModel>

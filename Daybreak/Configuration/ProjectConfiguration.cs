@@ -335,6 +335,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<RequestElevationView, RequestElevationViewModel>();
         viewProducer.RegisterView<RequestDelevationView, RequestDelevationViewModel>();
         viewProducer.RegisterView<SettingsSynchronizationView, SettingsSynchronizationViewModel>();
+        viewProducer.RegisterView<TelemetryView, TelemetryViewModel>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -466,7 +467,7 @@ public class ProjectConfiguration : PluginConfigurationBase
             .RegisterButton("Executables", "Executables Settings", sp => sp.GetRequiredService<IViewManager>().ShowView<ExecutablesView>())
             .RegisterButton("Launch configurations", "Launch configurations settings", sp => sp.GetRequiredService<IViewManager>().ShowView<LaunchConfigurationsView>());
         menuServiceProducer.CreateIfNotExistCategory("Diagnostics")
-            .RegisterButton("Telemetry", "Open telemetry view", sp => { })
+            .RegisterButton("Telemetry", "Open telemetry view", sp => sp.GetRequiredService<IViewManager>().ShowView<TelemetryView>())
             .RegisterButton("Logs", "Open logs view", sp => { })
             .RegisterButton("Metrics", "Open metrics view", sp => { });
     }

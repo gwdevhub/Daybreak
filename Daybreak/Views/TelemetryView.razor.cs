@@ -1,16 +1,12 @@
 ﻿using Daybreak.Configuration.Options;
 using System.Configuration;
-using System.Core.Extensions;
-using System.Windows.Controls;
-using System.Windows.Extensions;
+using TrailBlazr.ViewModels;
 
 namespace Daybreak.Views;
-/// <summary>
-/// Interaction logic for TelemetryView.xaml
-/// </summary>
-public partial class TelemetryView : UserControl
+public sealed class TelemetryViewModel(ILiveUpdateableOptions<TelemetryOptions> options)
+    : ViewModelBase<TelemetryViewModel, TelemetryView>
 {
-    private const string DisclaimerTextDef =
+    public const string DisclaimerText =
 @"Telemetry Disclaimer
 Daybreak uses optional telemetry to help improve performance, stability, and feature development. When enabled, the telemetry system collects anonymous, non-personally identifiable information through the OpenTelemetry framework and securely transmits it to our monitoring service.
 
@@ -30,25 +26,19 @@ Telemetry is fully optional and can be turned off at any time in the settings. W
 
 For more information, you can view our source code or reach out to the maintainers.";
 
-    private readonly ILiveUpdateableOptions<TelemetryOptions> liveUpdateableOptions;
+    private readonly ILiveUpdateableOptions<TelemetryOptions> options = options;
 
-    [GenerateDependencyProperty(InitialValue = DisclaimerTextDef)]
-    private string disclaimerText = DisclaimerTextDef;
+    public bool TelemetryEnabled { get; set; }
 
-    [GenerateDependencyProperty]
-    private bool telemetryEnabled;
-
-    public TelemetryView(
-        ILiveUpdateableOptions<TelemetryOptions> liveUpdateableOptions)
+    public override ValueTask ParametersSet(TelemetryView view, CancellationToken cancellationToken)
     {
-        this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
-        this.InitializeComponent();
-        this.TelemetryEnabled = this.liveUpdateableOptions.Value.Enabled;
+        this.TelemetryEnabled = this.options.Value.Enabled;
+        return base.ParametersSet(view, cancellationToken);
     }
 
-    private void ToggleSwitch_Toggled(object sender, System.Windows.RoutedEventArgs e)
+    public void TelemetryEnabledChanged()
     {
-        this.liveUpdateableOptions.Value.Enabled = this.TelemetryEnabled;
-        this.liveUpdateableOptions.UpdateOption();
+        this.options.Value.Enabled = this.TelemetryEnabled;
+        this.options.UpdateOption();
     }
 }

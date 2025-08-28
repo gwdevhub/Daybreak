@@ -6,7 +6,9 @@ using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.Updater;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Interop;
@@ -16,6 +18,8 @@ using WpfExtended.Blazor.Launch;
 namespace Daybreak.Views;
 public sealed class AppViewModel
 {
+    private const string IssueUrl = "https://github.com/gwdevhub/Daybreak/issues/new";
+
     private readonly IOptionsProvider optionsProvider;
     private readonly IMenuServiceProducer menuServiceProducer;
     private readonly IMenuServiceButtonHandler menuServiceButtonHandler;
@@ -24,6 +28,7 @@ public sealed class AppViewModel
     private readonly IApplicationUpdater applicationUpdater;
     private readonly IPrivilegeManager privilegeManager;
     private readonly BlazorHostWindow blazorHostWindow;
+    private readonly ILogger<App> logger;
 
     private HwndSource? hwndSource;
 
@@ -63,7 +68,8 @@ public sealed class AppViewModel
         IThemeManager themeManager,
         IApplicationUpdater applicationUpdater,
         IPrivilegeManager privilegeManager,
-        BlazorHostWindow blazorHostWindow)
+        BlazorHostWindow blazorHostWindow,
+        ILogger<App> logger)
     {
         this.optionsProvider = optionsProvider.ThrowIfNull();
         this.menuServiceProducer = menuServiceProducer.ThrowIfNull();
@@ -73,6 +79,7 @@ public sealed class AppViewModel
         this.applicationUpdater = applicationUpdater.ThrowIfNull();
         this.privilegeManager = privilegeManager.ThrowIfNull();
         this.blazorHostWindow = blazorHostWindow.ThrowIfNull();
+        this.logger = logger.ThrowIfNull();
 
         this.blazorHostWindow.StateChanged += this.MainWindow_StateChanged;
         menuServiceInitializer.InitializeMenuService(
@@ -149,7 +156,18 @@ public sealed class AppViewModel
 
     public void OpenIssues()
     {
-        //TODO: Handle open issue link
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = IssueUrl,
+                UseShellExecute = true
+            });
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, "Encountered exception while opening issues page");
+        }
     }
 
     public void OpenSynchronizationView()

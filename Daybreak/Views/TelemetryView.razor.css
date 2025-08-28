@@ -1,0 +1,39 @@
+﻿.header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    border-bottom: groove;
+}
+
+.header-title {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+    .header-title h1 {
+        font-size: var(--font-size-xx-large);
+    }
+
+    .header-title .label {
+
+    }
+
+.header-right {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    align-items: center;
+    gap: 8px;
+    padding: 0px 20px 0px 0px;
+}
+
+.body {
+    white-space: pre-wrap;
+    font-size: var(--font-size-medium);
+    padding: 16px;
+    overflow-wrap: break-word;
+    overflow-y: auto;
+}
