@@ -336,6 +336,9 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<RequestDelevationView, RequestDelevationViewModel>();
         viewProducer.RegisterView<SettingsSynchronizationView, SettingsSynchronizationViewModel>();
         viewProducer.RegisterView<TelemetryView, TelemetryViewModel>();
+        viewProducer.RegisterView<VersionManagementView, VersionManagementViewModel>();
+        viewProducer.RegisterView<UpdateConfirmationView, UpdateConfirmationViewModel>();
+        viewProducer.RegisterView<UpdateView, UpdateViewModel>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -442,7 +445,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         menuServiceProducer.CreateIfNotExistCategory("Launcher")
             .RegisterButton("Notifications", "Open notifications view", sp => { })
             .RegisterButton("Plugins", "Open plugins view", sp => { })
-            .RegisterButton("Manage client version", "Open version manager", sp => { });
+            .RegisterButton("Manage client version", "Open version manager", sp => sp.GetRequiredService<ViewManager>().ShowView<VersionManagementView>());
         menuServiceProducer.CreateIfNotExistCategory("Guild Wars")
             .RegisterButton("Game companion", "Open game companion", sp => sp.GetRequiredService<IViewManager>().ShowView<LaunchView>())
             .RegisterButton("Manage builds", "Open builds manager", sp => sp.GetRequiredService<IViewManager>().ShowView<BuildListView>())

@@ -1,0 +1,78 @@
+﻿.stretch-container {
+}
+
+.header {
+    padding-top: 20px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+    .header h1 {
+        margin: 0 0 10px 0;
+        font-size: var(--font-size-x-large);
+        font-weight: 600;
+        color: var(--neutral-foreground-rest);
+    }
+
+.content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    height: 100%;
+    align-items: center;
+}
+
+.changelog-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.changelog-container {
+    flex: 1;
+    border: 1px solid var(--neutral-stroke-rest);
+    border-radius: var(--control-corner-radius);
+    background: var(--neutral-fill-rest);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    font-size: var(--font-size-medium);
+}
+
+.changelog-text {
+    height: 100%;
+    color: var(--neutral-foreground-rest);
+    background: transparent;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    line-height: 1.6;
+}
+
+.no-changelog {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--neutral-foreground-hint);
+    font-style: italic;
+}
+
+.button-group {
+    flex: auto;
+    max-width: 400px;
+    width: 100%;
+    display: flex;
+    gap: 12px;
+    align-content: center;
+    justify-content: space-between;
+    padding-top: 20px;
+}
+
+    .button-group ::deep fluent-button {
+        font-size: var(--font-size-medium) !important;
+        height: calc(32px * var(--ui-scale));
+    }
