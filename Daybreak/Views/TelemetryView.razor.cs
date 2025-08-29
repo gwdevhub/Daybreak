@@ -18,11 +18,11 @@ Collected data may include:
     • Performance metrics (e.g., memory usage, startup time)
 
 What we don’t collect:
-    • Your Guild Wars credentials or chat logs
+    • Your Guild Wars credentials
     • Your personal files or documents
     • Any identifying personal data
    
-Telemetry is fully optional and can be turned off at any time in the settings. When disabled, no telemetry data is collected or transmitted.
+Telemetry is fully optional and can be turned off at any time. When disabled, no telemetry data is collected or transmitted.
 
 For more information, you can view our source code or reach out to the maintainers.";
 
@@ -36,9 +36,22 @@ For more information, you can view our source code or reach out to the maintaine
         return base.ParametersSet(view, cancellationToken);
     }
 
-    public void TelemetryEnabledChanged()
+    public void EnableTelemetry()
+    {
+        this.TelemetryEnabled = true;
+        this.TelemetryEnabledChanged();
+    }
+
+    public void DisableTelemetry()
+    {
+        this.TelemetryEnabled = false;
+        this.TelemetryEnabledChanged();
+    }
+
+    private void TelemetryEnabledChanged()
     {
         this.options.Value.Enabled = this.TelemetryEnabled;
         this.options.UpdateOption();
+        this.RefreshView();
     }
 }

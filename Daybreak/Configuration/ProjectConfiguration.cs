@@ -339,6 +339,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<VersionManagementView, VersionManagementViewModel>();
         viewProducer.RegisterView<UpdateConfirmationView, UpdateConfirmationViewModel>();
         viewProducer.RegisterView<UpdateView, UpdateViewModel>();
+        viewProducer.RegisterView<PluginsView, PluginsViewModel>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -444,7 +445,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         menuServiceProducer.ThrowIfNull();
         menuServiceProducer.CreateIfNotExistCategory("Launcher")
             .RegisterButton("Notifications", "Open notifications view", sp => { })
-            .RegisterButton("Plugins", "Open plugins view", sp => { })
+            .RegisterButton("Plugins", "Open plugins view", sp => sp.GetRequiredService<ViewManager>().ShowView<PluginsView>())
             .RegisterButton("Manage client version", "Open version manager", sp => sp.GetRequiredService<ViewManager>().ShowView<VersionManagementView>());
         menuServiceProducer.CreateIfNotExistCategory("Guild Wars")
             .RegisterButton("Game companion", "Open game companion", sp => sp.GetRequiredService<IViewManager>().ShowView<LaunchView>())

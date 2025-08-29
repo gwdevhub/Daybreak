@@ -25,6 +25,7 @@ using System.Extensions;
 using System.IO;
 using System.Logging;
 using System.Reflection;
+using static SkiaSharp.HarfBuzz.SKShaper;
 
 namespace Daybreak.Services.Plugins;
 
@@ -146,6 +147,8 @@ internal sealed class PluginsService : IPluginsService
 
                 if (assembly is null)
                 {
+                    // Exclude the plugin from the enabled list if it failed to load
+                    this.DisablePlugin(result);
                     continue;
                 }
 
@@ -153,6 +156,7 @@ internal sealed class PluginsService : IPluginsService
                 if (entryPoint is null)
                 {
                     pluginScopedLogger.LogError($"Assembly loaded but unable to find entry point. The plugin will not start");
+                    this.DisablePlugin(result);
                     continue;
                 }
 
@@ -160,6 +164,7 @@ internal sealed class PluginsService : IPluginsService
                 if (pluginConfig is null)
                 {
                     pluginScopedLogger.LogError($"Assembly loaded but unable to create entry point. The plugin will not start");
+                    this.DisablePlugin(result);
                     continue;
                 }
 
@@ -227,6 +232,14 @@ internal sealed class PluginsService : IPluginsService
         using var destinationStream = new FileStream(destinationPath, FileMode.CreateNew);
         await sourceStream.CopyToAsync(destinationStream);
         return true;
+    }
+
+    private void DisablePlugin(PluginLoadOperation result)
+    {
+        var options = this.liveUpdateableOptions.Value;
+        options.EnabledPlugins = [.. options.EnabledPlugins.Where(p => p.Path != result.PluginEntry?.Path)];
+        this.liveUpdateableOptions.Value.EnabledPlugins = options.EnabledPlugins;
+        this.liveUpdateableOptions.UpdateOption();
     }
 
     private static void LogLoadOperation(PluginLoadOperation result, ScopedLogger<PluginsService> scopedLogger)

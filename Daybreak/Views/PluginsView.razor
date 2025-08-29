@@ -1,0 +1,40 @@
+﻿<div class="stretch-container">
+    <div class="title-bar-additional-btns-left">
+        <button class="title-bar-btn" @onclick="this.ViewModel.LoadPluginsFromDisk" title="Load plugins from disk">
+            <FluentIcon Value="new Icons.Regular.Size16.Add()" />
+        </button>
+        @if (this.ViewModel.CanSave)
+        {
+            <button class="title-bar-btn" @onclick="this.ViewModel.ReloadDaybreak" title="Reload Daybreak">
+                <FluentIcon Value="new Icons.Regular.Size16.ArrowSync()" />
+            </button>
+        }
+    </div>
+    <div class="stretch-container backdrop-panel">
+        <div class="title-bar-header">
+            Plugins
+        </div>
+        <div class="plugins-list">
+            @foreach(var plugin in this.ViewModel.AvailablePlugins)
+            {
+                <div class="plugin-row">
+                    <div class="plugin-row-left">
+                        <div class="plugin-row-name">
+                            @plugin.Name
+                        </div>
+                        <div class="plugin-row-path">
+                            @plugin.Path
+                        </div>
+                    </div>
+                    <div class="plugin-row-right">
+                        <FluentLabel class="label">@(plugin.Enabled ? "On" : "Off")</FluentLabel>
+                        <FluentSwitch class="control" Value="plugin.Enabled" ValueChanged="(e) => this.ViewModel.ChangePluginState(plugin, e)" />
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@page "/plugins"
+@inherits ViewBase<PluginsView, PluginsViewModel>

@@ -1,14 +1,22 @@
-﻿<div class="stretch-container backdrop-panel">
-    <div class="header">
-        <div class="header-title">
-            <h1>Telemetry</h1>
-        </div>
-        <div class="header-right">
-            <FluentLabel class="label">@(this.ViewModel.TelemetryEnabled ? "On" : "Off")</FluentLabel>
-            <FluentSwitch @bind-Value="this.ViewModel.TelemetryEnabled" @bind-Value:after="this.ViewModel.TelemetryEnabledChanged" />
-        </div>
+﻿<div class="stretch-container">
+    <div class="title-bar-additional-btns-left">
+        @if (this.ViewModel.TelemetryEnabled)
+        {
+            <button class="title-bar-btn" @onclick="this.ViewModel.DisableTelemetry" title="Disable telemetry">
+                <FluentIcon Value="new Icons.Regular.Size16.CloudCheckmark()" />
+            </button>
+        }
+        else
+        {
+            <button class="title-bar-btn" @onclick="this.ViewModel.EnableTelemetry" title="Enable telemetry">
+                <FluentIcon Value="new Icons.Regular.Size16.CloudDismiss()" />
+            </button>
+        }
     </div>
-    <div class="body">
+    <div class="title-bar-header">
+        Telemetry
+    </div>
+    <div class="body backdrop-panel">
         @TelemetryViewModel.DisclaimerText
     </div>
 </div>
