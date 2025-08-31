@@ -1,130 +1,212 @@
-@using Microsoft.Extensions.Logging
-@inject INotificationProducer NotificationProducer
-@implements IDisposable
-
 <div class="notification-area">
-    @if (notifications.Any())
+    @if (this.notifications.Any())
     {
-        <div class="notification-list">
-            @foreach (var notification in notifications.Take(5)) // Show max 5 notifications
+        <div class="notification-stack">
+            @foreach (var notificationTuple in this.notifications)
             {
-                <div class="notification-item @GetNotificationClass(notification.Level)" @onclick="() => HandleNotificationClick(notification)">
+                <div class="notification-item level-@notificationTuple.Notification.Level.ToString().ToLowerInvariant()" 
+                     key="@notificationTuple.Notification.Id"
+                     @onmouseenter="() => this.ExtendNotification(notificationTuple)"
+                     @onclick="() => this.OpenNofitication(notificationTuple)"
+                     @onclick:stopPropagation="true">
                     <div class="notification-header">
-                        <span class="notification-icon">@GetNotificationIcon(notification.Level)</span>
-                        <span class="notification-time">@notification.CreationTime.ToString("HH:mm")</span>
-                        <button class="notification-close" @onclick="() => CloseNotification(notification)" @onclick:stopPropagation="true">×</button>
-                    </div>
-                    <div class="notification-content">
-                        <div class="notification-title">@notification.Title</div>
-                        @if (!string.IsNullOrEmpty(notification.Description))
+                        <h4 class="notification-title">@notificationTuple.Notification.Title</h4>
+                        @if (notificationTuple.Notification.Dismissible)
                         {
-                            <div class="notification-description">@notification.Description</div>
+                            <button class="notification-close" 
+                                    @onclick="() => this.DismissNotification(notificationTuple)"
+                                    @onclick:stopPropagation="true"
+                                    aria-label="Close notification">
+                                <FluentIcon Value="@(new Microsoft.Fast.Components.FluentUI.Icons.Regular.Size16.Dismiss())" />
+                            </button>
                         }
                     </div>
+                    @if (!string.IsNullOrWhiteSpace(notificationTuple.Notification.Description))
+                    {
+                        <p class="notification-description">@notificationTuple.Notification.Description</p>
+                    }
                 </div>
             }
-        </div>
-        
-        @if (notifications.Count > 5)
-        {
-            <div class="notification-footer">
-                <button class="show-all-btn" @onclick="ShowAllNotifications">
-                    Show All (@notifications.Count)
-                </button>
-            </div>
-        }
-    }
-    else
-    {
-        <div class="no-notifications">
-            No notifications
         </div>
     }
 </div>
 
+@using Microsoft.Extensions.Logging
 @code {
-    private List<Notification> notifications = new();
+    private static readonly TimeSpan UpdateFrequency = TimeSpan.FromSeconds(1);
+    private static readonly TimeSpan NotificationExtension = TimeSpan.FromSeconds(5);
+
+    private readonly SemaphoreSlim notificationLock = new(1, 1);
+    private readonly List<NotificationWrapper> notifications = [];
+
     private CancellationTokenSource? cancellationTokenSource;
 
-    protected override async Task OnInitializedAsync()
+    [Parameter]
+    public required INotificationProducer NotificationProducer { get; init; }
+
+    public override Task SetParametersAsync(ParameterView parameters)
     {
-        await LoadNotifications();
+        this.cancellationTokenSource?.Cancel();
+        this.cancellationTokenSource?.Dispose();
+        this.cancellationTokenSource = new CancellationTokenSource();
+        var token = this.cancellationTokenSource.Token;
+        Task.Factory.StartNew(() => this.ListenForNotifications(token), token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        Task.Factory.StartNew(() => this.PeriodicallyUpdateNotifications(token), token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        return base.SetParametersAsync(parameters);
     }
 
-    private async Task LoadNotifications()
+    private async ValueTask ListenForNotifications(CancellationToken cancellationToken)
     {
-        cancellationTokenSource = new CancellationTokenSource();
-        
-        try
+        await foreach (var notification in this.NotificationProducer.Consume(cancellationToken))
         {
-            // Consume notifications from the notification producer
-            await foreach (var notification in NotificationProducer.Consume(cancellationTokenSource.Token))
+            if (cancellationToken.IsCancellationRequested)
             {
-                if (notification is Notification typedNotification)
+                break;
+            }
+
+            try
+            {
+                await this.notificationLock.WaitAsync(cancellationToken);
+                this.notifications.Add(new NotificationWrapper { Notification = notification, ExpirationTime = notification.ExpirationTime });
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            finally
+            {
+                if (this.notificationLock.CurrentCount == 0)
                 {
-                    notifications.Insert(0, typedNotification); // Insert at beginning for newest first
-                    
-                    // Keep only last 50 notifications to prevent memory issues
-                    if (notifications.Count > 50)
-                    {
-                        notifications.RemoveRange(50, notifications.Count - 50);
-                    }
-                    
-                    StateHasChanged();
+                    this.notificationLock.Release();
                 }
             }
+
+            if (!cancellationToken.IsCancellationRequested)
+            {
+                await this.InvokeAsync(this.StateHasChanged);
+            }
+        }
+    }
+
+    private async ValueTask PeriodicallyUpdateNotifications(CancellationToken cancellationToken)
+    {
+        var notificationsToRemove = new List<NotificationWrapper>();
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            try
+            {
+                await Task.Delay(UpdateFrequency, cancellationToken);
+                var changed = false;
+                var dateTimeNow = DateTimeOffset.UtcNow;
+
+                try
+                {
+                    await this.notificationLock.WaitAsync(cancellationToken);
+
+                    foreach(var notificationTuple in this.notifications)
+                    {
+                        var notification = notificationTuple.Notification;
+                        if (notification.CancellationRequested ||
+                            dateTimeNow > notificationTuple.ExpirationTime)
+                        {
+                            notification.Closed = true;
+                            notificationsToRemove.Add(notificationTuple);
+                        }
+                    }
+
+                    foreach(var notification in notificationsToRemove)
+                    {
+                        this.notifications.Remove(notification);
+                        changed = true;
+                    }
+
+                    notificationsToRemove.Clear();
+                }
+                finally
+                {
+                    if (this.notificationLock.CurrentCount == 0)
+                    {
+                        this.notificationLock.Release();
+                    }
+                }
+
+                if (changed && !cancellationToken.IsCancellationRequested)
+                {
+                    await this.InvokeAsync(this.StateHasChanged);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (ObjectDisposedException)
+            {
+                break;
+            }
+        }
+    }
+
+    private async Task DismissNotification(NotificationWrapper notification)
+    {
+        if (notification.Notification.Dismissible)
+        {
+            try
+            {
+                await this.NotificationProducer.OpenNotification(notification.Notification, cancellationToken: this.cancellationTokenSource?.Token ?? CancellationToken.None);
+                notification.Notification.Closed = true;
+                await this.RemoveNotification(notification);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+        }
+    }
+
+    private void ExtendNotification(NotificationWrapper notification)
+    {
+        notification.ExpirationTime = DateTimeOffset.Now + NotificationExtension;
+    }
+
+    private async Task OpenNofitication(NotificationWrapper notification)
+    {
+        try
+        {
+            await this.NotificationProducer.OpenNotification(notification.Notification, cancellationToken: this.cancellationTokenSource?.Token ?? CancellationToken.None);
+            notification.Notification.Closed = true;
+            await this.RemoveNotification(notification);
         }
         catch (OperationCanceledException)
         {
-            // Expected when cancellation token is cancelled
         }
     }
 
-    private void HandleNotificationClick(Notification notification)
+    private async ValueTask RemoveNotification(NotificationWrapper notification)
     {
-        // Mark notification as opened - note: the interface doesn't have this property
-        // We'll need to handle this differently in the actual implementation
-        StateHasChanged();
-    }
-
-    private void CloseNotification(Notification notification)
-    {
-        notifications.Remove(notification);
-        notification.Closed = true;
-        StateHasChanged();
-    }
-
-    private void ShowAllNotifications()
-    {
-        // Navigate to notifications view - you can inject IViewManager here
-        // ViewManager.ShowView<NotificationsView>();
-    }
-
-    private string GetNotificationClass(LogLevel level)
-    {
-        return level switch
+        if (this.cancellationTokenSource?.Token.IsCancellationRequested == true)
         {
-            LogLevel.Critical or LogLevel.Error => "error",
-            LogLevel.Warning => "warning",
-            LogLevel.Information => "info",
-            _ => "default"
-        };
-    }
+            return;
+        }
 
-    private string GetNotificationIcon(LogLevel level)
-    {
-        return level switch
+        try
         {
-            LogLevel.Critical or LogLevel.Error => "?",
-            LogLevel.Warning => "??",
-            LogLevel.Information => "??",
-            _ => "??"
-        };
-    }
+            await this.notificationLock.WaitAsync(this.cancellationTokenSource?.Token ?? CancellationToken.None);
+            this.notifications.Remove(notification);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        finally
+        {
+            if (this.notificationLock.CurrentCount == 0)
+            {
+                this.notificationLock.Release();
+            }
+        }
 
-    public void Dispose()
-    {
-        cancellationTokenSource?.Cancel();
-        cancellationTokenSource?.Dispose();
+        if (this.cancellationTokenSource?.Token.IsCancellationRequested == false)
+        {
+            await this.InvokeAsync(this.StateHasChanged);
+        }
     }
 }

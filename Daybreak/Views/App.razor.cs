@@ -1,5 +1,6 @@
 ﻿using Daybreak.Shared.Models.Menu;
 using Daybreak.Shared.Services.Menu;
+using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Services.Themes;
@@ -44,6 +45,7 @@ public sealed class AppViewModel
     public bool IsAdmin => this.privilegeManager.AdminPrivileges;
     public bool IsNavigationOpen { get; private set; }
     public string CurrentVersionText => this.applicationUpdater.CurrentVersion.ToString();
+    public INotificationProducer NotificationProducer { get; }
 
     public string AccentBaseColor { get; set; } = string.Empty;
     public string NeutralBaseColor { get; set; } = string.Empty;
@@ -69,6 +71,8 @@ public sealed class AppViewModel
         IApplicationUpdater applicationUpdater,
         IPrivilegeManager privilegeManager,
         BlazorHostWindow blazorHostWindow,
+        INotificationProducer notificationProducer,
+        INotificationService notificationService,
         ILogger<App> logger)
     {
         this.optionsProvider = optionsProvider.ThrowIfNull();
@@ -79,6 +83,7 @@ public sealed class AppViewModel
         this.applicationUpdater = applicationUpdater.ThrowIfNull();
         this.privilegeManager = privilegeManager.ThrowIfNull();
         this.blazorHostWindow = blazorHostWindow.ThrowIfNull();
+        this.NotificationProducer = notificationProducer.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
 
         this.blazorHostWindow.StateChanged += this.MainWindow_StateChanged;
@@ -86,6 +91,13 @@ public sealed class AppViewModel
             this.OpenNavigationMenu,
             this.CloseNavigationMenu,
             this.ToggleNavigationMenu);
+
+        notificationService.NotifyInformation("Notification 1", "notification 1 body", expirationTime: DateTime.Now + TimeSpan.FromSeconds(10));
+        notificationService.NotifyInformation("Notification 2", "notification 2 body", expirationTime: DateTime.Now + TimeSpan.FromSeconds(10));
+        notificationService.NotifyInformation("Notification 3", "notification 3 body", expirationTime: DateTime.Now + TimeSpan.FromSeconds(10));
+        notificationService.NotifyInformation("Notification 4", "notification 4 body", expirationTime: DateTime.Now + TimeSpan.FromSeconds(10));
+        notificationService.NotifyInformation("Notification 5", "notification 5 body", expirationTime: DateTime.Now + TimeSpan.FromSeconds(10));
+        notificationService.NotifyInformation("Notification 6", "notification 6 body", expirationTime: DateTime.Now + TimeSpan.FromSeconds(10));
     }
 
     public void InitializeApp()
