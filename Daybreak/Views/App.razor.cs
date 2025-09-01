@@ -72,7 +72,6 @@ public sealed class AppViewModel
         IPrivilegeManager privilegeManager,
         BlazorHostWindow blazorHostWindow,
         INotificationProducer notificationProducer,
-        INotificationService notificationService,
         ILogger<App> logger)
     {
         this.optionsProvider = optionsProvider.ThrowIfNull();
@@ -91,13 +90,6 @@ public sealed class AppViewModel
             this.OpenNavigationMenu,
             this.CloseNavigationMenu,
             this.ToggleNavigationMenu);
-
-        notificationService.NotifyInformation("Notification 1", "notification 1 body", expirationTime: DateTime.Now + TimeSpan.FromSeconds(10));
-        notificationService.NotifyInformation("Notification 2", "notification 2 body", expirationTime: DateTime.Now + TimeSpan.FromSeconds(10));
-        notificationService.NotifyInformation("Notification 3", "notification 3 body", expirationTime: DateTime.Now + TimeSpan.FromSeconds(10));
-        notificationService.NotifyInformation("Notification 4", "notification 4 body", expirationTime: DateTime.Now + TimeSpan.FromSeconds(10));
-        notificationService.NotifyInformation("Notification 5", "notification 5 body", expirationTime: DateTime.Now + TimeSpan.FromSeconds(10));
-        notificationService.NotifyInformation("Notification 6", "notification 6 body", expirationTime: DateTime.Now + TimeSpan.FromSeconds(10));
     }
 
     public void InitializeApp()

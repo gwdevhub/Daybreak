@@ -4,13 +4,13 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="AvalonEdit" Version="6.3.1.120" />
-    <PackageVersion Include="BlazorFrame" Version="2.1.2" />
+    <PackageVersion Include="BlazorFrame" Version="2.3.0" />
     <PackageVersion Include="CommunityToolkit.Authentication.Msal" Version="7.1.4" />
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
     <PackageVersion Include="Daybreak.7ZipExtractor" Version="1.0.0" />
     <PackageVersion Include="DiffPlex" Version="1.8.0" />
     <PackageVersion Include="Elastic.OpenTelemetry" Version="1.1.0" />
-    <PackageVersion Include="FluentAssertions" Version="8.5.0" />
+    <PackageVersion Include="FluentAssertions" Version="8.6.0" />
     <PackageVersion Include="HtmlAgilityPack" Version="1.12.2" />
     <PackageVersion Include="ini-parser-netstandard" Version="2.5.3" />
     <PackageVersion Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.0-rc4.5" />
@@ -34,11 +34,11 @@
     <PackageVersion Include="Microsoft.Identity.Client.Desktop" Version="4.76.0" />
     <PackageVersion Include="Microsoft.Identity.Client.Extensions.Msal" Version="4.76.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-    <PackageVersion Include="Microsoft.Web.WebView2" Version="1.0.3351.48" />
+    <PackageVersion Include="Microsoft.Web.WebView2" Version="1.0.3405.78" />
     <PackageVersion Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
     <PackageVersion Include="MinHook.NET" Version="1.1.1" />
-    <PackageVersion Include="MSTest.TestAdapter" Version="3.10.1" />
-    <PackageVersion Include="MSTest.TestFramework" Version="3.10.1" />
+    <PackageVersion Include="MSTest.TestAdapter" Version="3.10.3" />
+    <PackageVersion Include="MSTest.TestFramework" Version="3.10.3" />
     <PackageVersion Include="NSubstitute" Version="5.3.0" />
     <PackageVersion Include="NSubstitute.Analyzers.CSharp" Version="1.0.17" />
     <PackageVersion Include="NAudio" Version="2.2.1" />
@@ -59,10 +59,10 @@
     <PackageVersion Include="SharpCompress" Version="0.40.0" />
     <PackageVersion Include="Slim" Version="1.11.2" />
     <PackageVersion Include="Squealify" Version="0.8.2.2" />
-    <PackageVersion Include="Swashbuckle.AspNetCore" Version="9.0.3" />
-    <PackageVersion Include="Swashbuckle.AspNetCore.Swagger" Version="9.0.3" />
-    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerGen" Version="9.0.3" />
-    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerUI" Version="9.0.3" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="9.0.4" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.Swagger" Version="9.0.4" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerGen" Version="9.0.4" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerUI" Version="9.0.4" />
     <PackageVersion Include="System.Formats.Asn1" Version="9.0.8" />
     <PackageVersion Include="System.IO.Compression" Version="4.3.0" />
     <PackageVersion Include="System.Linq.Async" Version="6.0.3" />
@@ -75,7 +75,7 @@
     <PackageVersion Include="SystemExtensions.NetCore" Version="1.6.12" />
     <PackageVersion Include="SystemExtensions.NetStandard.DependencyInjection" Version="1.6.9" />
     <PackageVersion Include="SystemExtensions.NetStandard.Generators" Version="0.1.6" />
-    <PackageVersion Include="TrailBlazr" Version="0.2.9" />
+    <PackageVersion Include="TrailBlazr" Version="0.3.0" />
     <PackageVersion Include="WPF-UI" Version="4.0.3" />
     <PackageVersion Include="WpfExtended.Blazor" Version="0.8.1" />
     <PackageVersion Include="WpfExtended.SourceGeneration" Version="0.3.0" />

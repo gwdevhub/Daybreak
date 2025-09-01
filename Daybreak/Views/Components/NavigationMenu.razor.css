@@ -33,7 +33,7 @@
     padding: 15px;
     margin-top: 40px;
     color: var(--neutral-foreground-rest);
-    height: calc(100vh - 20px);
+    height: calc(100vh - 40px);
     overflow-y: auto;
     box-sizing: border-box;
     counter-reset: menu-item;

@@ -340,6 +340,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<UpdateConfirmationView, UpdateConfirmationViewModel>();
         viewProducer.RegisterView<UpdateView, UpdateViewModel>();
         viewProducer.RegisterView<PluginsView, PluginsViewModel>();
+        viewProducer.RegisterView<LogsView, LogsViewModel>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -472,7 +473,7 @@ public class ProjectConfiguration : PluginConfigurationBase
             .RegisterButton("Launch configurations", "Launch configurations settings", sp => sp.GetRequiredService<IViewManager>().ShowView<LaunchConfigurationsView>());
         menuServiceProducer.CreateIfNotExistCategory("Diagnostics")
             .RegisterButton("Telemetry", "Open telemetry view", sp => sp.GetRequiredService<IViewManager>().ShowView<TelemetryView>())
-            .RegisterButton("Logs", "Open logs view", sp => { })
+            .RegisterButton("Logs", "Open logs view", sp => sp.GetRequiredService<IViewManager>().ShowView<LogsView>())
             .RegisterButton("Metrics", "Open metrics view", sp => { });
     }
 
