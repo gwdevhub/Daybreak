@@ -1,10 +1,14 @@
-﻿namespace Daybreak.Shared.Services.Themes;
+﻿using static Daybreak.Shared.Models.ColorPalette;
+
+namespace Daybreak.Shared.Services.Themes;
 public interface IThemeManager
 {
     event EventHandler? ThemeChanged;
     bool IsLightMode { get; }
-    string AccentBaseColor { get; }
-    string NeutralBaseColor { get; }
+    AccentColor AccentBaseColor { get; }
+    BackgroundColor NeutralBaseColor { get; }
+    string AccentBaseColorHex { get; }
+    string NeutralBaseColorHex { get; }
     float BaseLayerLuminance { get; }
     string BackdropImage { get; }
     double UIScale { get; }

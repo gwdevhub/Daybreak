@@ -1,58 +1,90 @@
 ﻿<div class="logs-container">
-    <div class="title-bar-additional-btns-left">
-        <button class="title-bar-btn" @onclick="this.ViewModel.ClearLogs" title="Clear logs">
-            <FluentIcon Value="new Icons.Regular.Size16.Delete()" />
-        </button>
-        <button class="title-bar-btn" @onclick="this.ViewModel.ToggleAutoScroll" title="@(this.ViewModel.AutoScroll ? "Disable auto-scroll" : "Enable auto-scroll")">
-            @if (this.ViewModel.AutoScroll)
-            {
-                <FluentIcon Value="new Icons.Regular.Size16.ArrowDown()" />
-            }
-            else
-            {
-                <FluentIcon Value="new Icons.Regular.Size16.ArrowDownloadOff()" />
-            }
-        </button>
-    </div>
-    
-    <div class="stretch-container backdrop-panel">
-        <div class="console-container" @ref="this.consoleContainer" tabindex="0">
-            <div class="console-output">
-                @foreach (var log in this.ViewModel.Logs)
+    @if (this.ViewModel.Loading)
+    {
+        <SpinnerWidget IsLoading=true />
+    }
+    else
+    {
+        <div class="title-bar-additional-btns-left">
+            <button class="title-bar-btn" @onclick="this.ViewModel.ArchiveLogs" title="Archive logs">
+                <FluentIcon Value="new Icons.Regular.Size16.Archive()" />
+            </button>
+            <button class="title-bar-btn" @onclick="this.ViewModel.ClearLogs" title="Clear logs">
+                <FluentIcon Value="new Icons.Regular.Size16.Delete()" />
+            </button>
+            <button class="title-bar-btn" @onclick="this.ViewModel.ToggleAutoScroll" title="@(this.ViewModel.AutoScroll ? "Disable auto-scroll" : "Enable auto-scroll")">
+                @if (this.ViewModel.AutoScroll)
                 {
-                    <div class="console-entry @this.GetLogLevelClass(log.LogLevel)">
-                        <div class="log-header">
-                            <span class="log-timestamp">[@log.LogTime.ToString("u")]</span>
-                            <span class="log-level-badge">[@this.GetLogLevelText(log.LogLevel)]</span>
-                            @if (!string.IsNullOrEmpty(log.Category))
-                            {
-                                <span class="log-category">[@log.Category]</span>
-                            }
-                            @if (!string.IsNullOrEmpty(log.EventId))
-                            {
-                                <span class="log-event-id">[@log.EventId]</span>
-                            }
+                    <FluentIcon Value="new Icons.Regular.Size16.ArrowDownload()" />
+                }
+                else
+                {
+                    <FluentIcon Value="new Icons.Regular.Size16.ArrowDownloadOff()" />
+                }
+            </button>
+        </div>
+
+        <div class="stretch-container backdrop-panel">
+            <div class="console-container" id="logs-console-container" tabindex="0">
+                <div class="console-output">
+                    @foreach (var log in this.ViewModel.Logs)
+                    {
+                        <div class="console-entry @this.GetLogLevelClass(log.LogLevel)">
+                            <div class="log-header">
+                                <span class="log-timestamp">[@log.LogTime.ToString("u")]</span>
+                                <span class="log-level-badge">[@this.GetLogLevelText(log.LogLevel)]</span>
+                                @if (!string.IsNullOrEmpty(log.Category))
+                                {
+                                    <span class="log-category">[@log.Category]</span>
+                                }
+                                @if (!string.IsNullOrEmpty(log.EventId))
+                                {
+                                    <span class="log-event-id">[@log.EventId]</span>
+                                }
+                            </div>
+                            <div class="log-message">@log.Message?.Trim()</div>
                         </div>
-                        <div class="log-message">@log.Message?.Trim()</div>
+                    }
+                </div>
+
+                @if (!this.ViewModel.Logs.Any())
+                {
+                    <div class="no-logs">
+                        <span>No logs available</span>
                     </div>
                 }
             </div>
-            
-            @if (!this.ViewModel.Logs.Any())
-            {
-                <div class="no-logs">
-                    <span>No logs available</span>
-                </div>
-            }
         </div>
-    </div>
+    }
 </div>
 
 @page "/logs"
 @inherits ViewBase<LogsView, LogsViewModel>
+@inject IJSRuntime jSRuntime;
 @using Microsoft.Extensions.Logging
 @code {
-    private ElementReference consoleContainer;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        
+        if (this.ViewModel.AutoScroll)
+        {
+            await this.ScrollToBottomAsync();
+        }
+    }
+
+    private async Task ScrollToBottomAsync()
+    {
+        try
+        {
+            await this.jSRuntime.InvokeVoidAsync("eval", 
+                "document.getElementById('logs-console-container').scrollTop = document.getElementById('logs-console-container').scrollHeight");
+        }
+        catch
+        {
+            
+        }
+    }
 
     private string GetLogLevelClass(LogLevel level) => level switch
     { 

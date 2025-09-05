@@ -125,16 +125,6 @@ html, body {
     height: 30px;
 }
 
-/* Spinner */
-.spinner {
-    width: 16px;
-    height: 16px;
-    border: 2px solid var(--input-placeholder-rest);
-    border-top: 2px solid var(--neutral-foreground-rest);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
 @keyframes spin {
     0% {
         transform: rotate(0deg);

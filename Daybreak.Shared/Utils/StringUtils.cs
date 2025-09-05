@@ -54,8 +54,15 @@ public static partial class StringUtils
             return false;
         }
 
+        if (stringToSearch.Length > searchString.Length
+            ? stringToSearch.Contains(searchString, StringComparison.OrdinalIgnoreCase)
+            : searchString.Contains(stringToSearch, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
         var distance = MatchSearchStringScore(stringToSearch, searchString);
-        var similarity = 1.0 - (double)distance / searchString.Length;
+        var similarity = 1.0 - ((double)distance / searchString.Length);
         return similarity >= threshold;
     }
 

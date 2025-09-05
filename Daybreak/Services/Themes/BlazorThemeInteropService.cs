@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using System.Configuration;
 using System.Extensions;
 using System.Windows.Extensions.Services;
+using static Daybreak.Shared.Models.ColorPalette;
 
 namespace Daybreak.Services.Themes;
 
@@ -34,8 +35,10 @@ public class BlazorThemeInteropService(
     public event EventHandler? ThemeChanged;
 
     public bool IsLightMode { get; private set; }
-    public string AccentBaseColor { get; private set; } = string.Empty;
-    public string NeutralBaseColor { get; private set; } = string.Empty;
+    public AccentColor AccentBaseColor { get; private set; } = AccentColor.Blue;
+    public BackgroundColor NeutralBaseColor { get; private set; } = BackgroundColor.Gray40;
+    public string AccentBaseColorHex { get; private set; } = string.Empty;
+    public string NeutralBaseColorHex { get; private set; } = string.Empty;
     public string BackdropImage { get; private set; } = string.Empty;
     public float BaseLayerLuminance { get; private set; } = 0.0f;
     public double UIScale { get; private set; } = 1.0;
@@ -76,8 +79,10 @@ public class BlazorThemeInteropService(
         var baseLayerLuminance = lightMode ? 0.98f : 0.23f;
         this.BackdropImage = theme.Backdrop;
         this.IsLightMode = lightMode;
-        this.AccentBaseColor = accentColor.Hex;
-        this.NeutralBaseColor = backgroundColor.Hex;
+        this.AccentBaseColor = accentColor;
+        this.AccentBaseColorHex = accentColor.Hex;
+        this.NeutralBaseColor = backgroundColor;
+        this.NeutralBaseColorHex = backgroundColor.Hex;
         this.BaseLayerLuminance = baseLayerLuminance;
         this.UIScale = themeOptions.ApplicationScale;
         this.XXSmallFontSize = XXSmallFontSizeValue * this.UIScale;

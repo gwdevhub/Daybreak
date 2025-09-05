@@ -39,7 +39,6 @@ internal sealed class ExceptionHandler(
         if (e is FatalException fatalException)
         {
             this.logger.LogCritical(e, $"{nameof(FatalException)} encountered. Closing application");
-            ExceptionDialog.ShowException(fatalException);
             File.WriteAllText("crash.log", e.ToString());
             WriteCrashDump();
             return false;
@@ -64,7 +63,6 @@ internal sealed class ExceptionHandler(
         else if (e is TargetInvocationException targetInvocationException && e.InnerException is FatalException innerFatalException)
         {
             this.logger.LogCritical(e, $"{nameof(FatalException)} encountered. Closing application");
-            ExceptionDialog.ShowException(e);
             File.WriteAllText("crash.log", e.ToString());
             WriteCrashDump();
             return false;

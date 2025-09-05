@@ -202,8 +202,8 @@ public sealed class AppViewModel
     private void OnThemeChange()
     {
         this.BaseLayerLuminace = this.themeManager.BaseLayerLuminance;
-        this.AccentBaseColor = this.themeManager.AccentBaseColor;
-        this.NeutralBaseColor = this.themeManager.NeutralBaseColor;
+        this.AccentBaseColor = this.themeManager.AccentBaseColorHex;
+        this.NeutralBaseColor = this.themeManager.NeutralBaseColorHex;
         this.BackdropImage = this.themeManager.BackdropImage;
         this.XXSmallFontSize = this.themeManager.XXSmallFontSize;
         this.XSmallFontSize = this.themeManager.XSmallFontSize;
