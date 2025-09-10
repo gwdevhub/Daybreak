@@ -343,6 +343,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<PluginsView, PluginsViewModel>();
         viewProducer.RegisterView<LogsView, LogsViewModel>();
         viewProducer.RegisterView<MetricsView, MetricsViewModel>();
+        viewProducer.RegisterView<GuildWarsPartySearchView, GuildWarsPartySearchViewModel>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -456,7 +457,7 @@ public class ProjectConfiguration : PluginConfigurationBase
             .RegisterButton("Download Guild Wars", "Download Guild Wars installer", sp => { })
             .RegisterButton("Copy Guild Wars", "Copy Guild Wars from an existing installation", sp => { })
             .RegisterButton("Event Calendar", "Show current and upcoming events", sp => { })
-            .RegisterButton("Guild Wars Party Search", "Show party search broadcasts", sp => { });
+            .RegisterButton("Guild Wars Party Search", "Show party search broadcasts", sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsPartySearchView>());
         menuServiceProducer.CreateIfNotExistCategory("Trade")
             .RegisterButton("Alerts", "Open trade alerts manager", sp => { })
             .RegisterButton("Kamadan", "Open kamadan trade chat", sp => { })

@@ -1,0 +1,6 @@
+﻿.iframe-container {
+    display: flex;
+    width: 100%;
+    height: calc(100% - 32px);
+    margin-top: 32px;
+}
