@@ -1,0 +1,182 @@
+﻿<div class="metrics-container">
+    @if (this.ViewModel is not null && this.ViewModel.Metrics.Any())
+    {
+        @foreach (var metricSet in this.ViewModel.Metrics)
+        {
+            var instrumentName = metricSet.Instrument?.Name ?? "Unknown Metric";
+            var aggregationType = metricSet.AggregationType.ToString();
+            var title = $"{instrumentName} ({aggregationType})";
+            <div class="metric-graph-row">
+                <h3 class="metric-title">@title</h3>
+                <div class="chart-container">
+                    <canvas id="chart-@metricSet.GetHashCode()" 
+                            width="800" 
+                            height="400"></canvas>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="no-metrics">
+            <p>No metrics available to display.</p>
+        </div>
+    }
+</div>
+
+<script src="deps/chart.js/4.5.0/chart.umd.js"></script>
+<script src="scripts/charting.js"></script>
+
+@page "/metrics"
+@inherits ViewBase<MetricsView, MetricsViewModel>
+@inject IJSRuntime jsRuntime;
+@using Daybreak.Shared.Models.Metrics;
+@code {
+    public ValueTask DestroyChart(MetricSetViewModel metricSet)
+    {
+        return this.jsRuntime.InvokeVoidAsync("destroyChart", GetChartId(metricSet));
+    }
+
+    public async ValueTask CreateChart(MetricSetViewModel metricSet, Func<MetricSetViewModel, IEnumerable<Metric>> aggregation)
+    {
+        var canvasId = GetChartId(metricSet);
+        var chartConfig = this.GetChartConfig(metricSet, aggregation);
+        await this.jsRuntime.InvokeVoidAsync("createChart", canvasId, chartConfig);
+    }
+
+    public async ValueTask AddDataPoint(MetricSetViewModel metricSet, Metric newMetric)
+    {
+        var canvasId = GetChartId(metricSet);
+        var dataPoint = new
+        {
+            x = newMetric.Timestamp.Ticks / TimeSpan.TicksPerMillisecond,
+            y = System.Convert.ToDouble(newMetric.Measurement)
+        };
+
+        await this.jsRuntime.InvokeVoidAsync("addDataPoint", canvasId, 0, dataPoint);
+    }
+
+    private object GetChartConfig(MetricSetViewModel metricSet, Func<MetricSetViewModel, IEnumerable<Metric>> aggregation)
+    {
+        return new
+        {
+            type = "line",
+            data = this.GetChartData(metricSet, aggregation),
+            options = new
+            {
+                responsive = true,
+                maintainAspectRatio = false,
+                animation = new
+                {
+                    duration = 0
+                },
+                interaction = new
+                {
+                    intersect = false,
+                    mode = "index"
+                },
+                scales = new
+                {
+                    x = new
+                    {
+                        type = "linear",
+                        title = new
+                        {
+                            display = true,
+                            text = "Time"
+                        },
+                        grid = new
+                        {
+                            display = true
+                        },
+                        ticks = new
+                        {
+                            callback = "function(value) { if (value > 1000000000000) { try { return new Date(value).toLocaleTimeString(); } catch(e) { return value; } } return value; }"
+                        }
+                    },
+                    y = new
+                    {
+                        title = new
+                        {
+                            display = true,
+                            text = metricSet.Instrument?.Unit ?? "Value"
+                        },
+                        grid = new
+                        {
+                            display = true
+                        }
+                    }
+                },
+                plugins = new
+                {
+                    legend = new
+                    {
+                        display = true,
+                        position = "top"
+                    },
+                    title = new
+                    {
+                        display = false
+                    },
+                    tooltip = new
+                    {
+                        mode = "index",
+                        intersect = false
+                    }
+                }
+            }
+        };
+    }
+
+    private object GetChartData(MetricSetViewModel metricSet, Func<MetricSetViewModel, IEnumerable<Metric>> aggregation)
+    {
+        if (metricSet.Metrics is null || !metricSet.Metrics.Any())
+        {
+            return new
+            {
+                datasets = new[]
+                {
+                    new
+                    {
+                        label = metricSet.Instrument?.Name ?? "Metric",
+                        data = Array.Empty<object>(),
+                        borderWidth = 2,
+                        fill = false,
+                        tension = 0.1,
+                        pointRadius = 3,
+                        pointHoverRadius = 5
+                    }
+                }
+            };
+        }
+
+        var aggregatedMetrics = aggregation(metricSet);
+        var dataPoints = aggregatedMetrics
+            .OrderBy(m => m.Timestamp)
+            .Select(m => new
+            {
+                x = m.Timestamp.Ticks / TimeSpan.TicksPerMillisecond, // Convert to milliseconds timestamp
+                y = System.Convert.ToDouble(m.Measurement)
+            })
+            .ToArray();
+
+        return new
+        {
+            datasets = new[]
+            {
+                new
+                {
+                    label = metricSet.Instrument?.Name ?? "Metric",
+                    data = dataPoints,
+                    borderWidth = 2,
+                    fill = false,
+                    tension = 0.1,
+                    pointRadius = 3,
+                    pointHoverRadius = 5
+                }
+            }
+        };
+    }
+
+    private static string GetChartId(MetricSetViewModel metricSet) => $"chart-{metricSet.GetHashCode()}";
+}
