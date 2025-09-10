@@ -48,11 +48,17 @@
             </div>
         </div>
     </ErrorLoggingBoundary>
+
 </FluentDesignSystemProvider>
+
+<script src="js/console-interop.js"></script>
 
 @code {
     [Inject]
     public required AppViewModel ViewModel { get; init; }
+
+    [Inject]
+    public required IJSRuntime JSRuntime { get; init; }
 
     protected override void OnInitialized()
     {
@@ -61,12 +67,12 @@
         this.ViewModel.RedrawRequested += (_, __) => this.InvokeAsync(this.StateHasChanged);
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        base.OnAfterRender(firstRender);
+        await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
-            this.ViewModel.InitializeApp();
+            await this.ViewModel.InitializeApp(this.JSRuntime);
         }
     }
 

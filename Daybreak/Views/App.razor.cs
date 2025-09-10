@@ -1,4 +1,5 @@
-﻿using Daybreak.Shared.Models.Menu;
+﻿using Daybreak.Services.Logging;
+using Daybreak.Shared.Models.Menu;
 using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Options;
@@ -8,9 +9,11 @@ using Daybreak.Shared.Services.Updater;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.JSInterop;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.IO;
+using System.Printing;
 using System.Windows;
 using System.Windows.Interop;
 using TrailBlazr.Services;
@@ -29,6 +32,7 @@ public sealed class AppViewModel
     private readonly IApplicationUpdater applicationUpdater;
     private readonly IPrivilegeManager privilegeManager;
     private readonly BlazorHostWindow blazorHostWindow;
+    private readonly JSConsoleInterop jsConsoleInterop;
     private readonly ILogger<App> logger;
 
     private HwndSource? hwndSource;
@@ -71,6 +75,7 @@ public sealed class AppViewModel
         IApplicationUpdater applicationUpdater,
         IPrivilegeManager privilegeManager,
         BlazorHostWindow blazorHostWindow,
+        JSConsoleInterop jsConsoleInterop,
         INotificationProducer notificationProducer,
         ILogger<App> logger)
     {
@@ -82,6 +87,7 @@ public sealed class AppViewModel
         this.applicationUpdater = applicationUpdater.ThrowIfNull();
         this.privilegeManager = privilegeManager.ThrowIfNull();
         this.blazorHostWindow = blazorHostWindow.ThrowIfNull();
+        this.jsConsoleInterop = jsConsoleInterop.ThrowIfNull();
         this.NotificationProducer = notificationProducer.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
 
@@ -92,11 +98,12 @@ public sealed class AppViewModel
             this.ToggleNavigationMenu);
     }
 
-    public void InitializeApp()
+    public async ValueTask InitializeApp(IJSRuntime jsRuntime)
     {
         this.themeManager.ThemeChanged += (s, e) => this.OnThemeChange();
         this.OnThemeChange();
         this.LoadMenuCategories();
+        await this.jsConsoleInterop.InitializeConsoleRedirection(jsRuntime);
         this.RedrawRequested?.Invoke(this, EventArgs.Empty);
         this.viewManager.ShowView<LaunchView>();
         this.viewManager.ShowViewRequested += (s, e) => this.CloseNavigationMenu();

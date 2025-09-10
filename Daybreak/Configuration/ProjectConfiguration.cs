@@ -277,6 +277,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<TelemetryHost>();
         services.AddSingleton<PrivilegeContext>();
         services.AddSingleton<ViewRedirectContext>();
+        services.AddSingleton<JSConsoleInterop>();
         services.AddScoped<IBrowserExtensionsManager, BrowserExtensionsManager>();
         services.AddScoped<IBrowserExtensionsProducer, BrowserExtensionsManager>(sp => sp.GetRequiredService<IBrowserExtensionsManager>().Cast<BrowserExtensionsManager>());
         services.AddScoped<ICredentialManager, CredentialManager>();
