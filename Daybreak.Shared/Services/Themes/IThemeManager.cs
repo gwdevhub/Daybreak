@@ -1,4 +1,4 @@
-﻿using static Daybreak.Shared.Models.ColorPalette;
+﻿using Daybreak.Shared.Models.ColorPalette;
 
 namespace Daybreak.Shared.Services.Themes;
 public interface IThemeManager

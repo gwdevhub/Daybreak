@@ -1,7 +1,8 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.ColorPalette;
 using Daybreak.Shared.Models.Progress;
-using Daybreak.Shared.Services.Themes;
+using Daybreak.Shared.Utils;
 using Daybreak.Themes;
 using Microsoft.Extensions.Options;
 using System.ComponentModel;
@@ -33,11 +34,11 @@ public partial class SplashWindow : Window
         var theme = options.Value.ApplicationTheme ?? CoreThemes.Daybreak;
 
         this.Foreground = theme.Mode is Theme.LightDarkMode.Dark ?
-            new SolidColorBrush(Colors.White) :
-            new SolidColorBrush(Colors.Black);
+            new SolidColorBrush(System.Windows.Media.Colors.White) :
+            new SolidColorBrush(System.Windows.Media.Colors.Black);
         this.Background = theme.Mode is Theme.LightDarkMode.Dark ?
-            new SolidColorBrush(ColorPalette.BackgroundColor.Gray210.Color) :
-            new SolidColorBrush(ColorPalette.BackgroundColor.Gray40.Color);
+            new SolidColorBrush(BackgroundColor.Gray210.Color.ConvertToWPFColor()) :
+            new SolidColorBrush(BackgroundColor.Gray40.Color.ConvertToWPFColor());
         this.SplashText = this.startupStatus.CurrentStep.Description;
     }
 

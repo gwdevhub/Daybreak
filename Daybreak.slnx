@@ -9,6 +9,7 @@
     <File Path=".github/workflows/cd.yaml" />
     <File Path=".github/workflows/ci.yaml" />
     <File Path=".github/workflows/codeql-analysis.yml" />
+    <File Path=".github/workflows/gitlab-mirror.yaml" />
     <File Path=".github/workflows/version_check.yaml" />
   </Folder>
   <Folder Name="/Scripts/">

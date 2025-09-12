@@ -1,5 +1,6 @@
 using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.ColorPalette;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Themes;
 using Daybreak.Themes;
@@ -7,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using System.Configuration;
 using System.Extensions;
 using System.Windows.Extensions.Services;
-using static Daybreak.Shared.Models.ColorPalette;
 
 namespace Daybreak.Services.Themes;
 
@@ -75,7 +75,7 @@ public class BlazorThemeInteropService(
             ? IsWindowsLight()
             : theme.Mode is Theme.LightDarkMode.Light;
 
-        var backgroundColor = lightMode ? ColorPalette.BackgroundColor.Gray40 : ColorPalette.BackgroundColor.Gray210;
+        var backgroundColor = lightMode ? BackgroundColor.Gray40 : BackgroundColor.Gray210;
         var baseLayerLuminance = lightMode ? 0.98f : 0.23f;
         this.BackdropImage = theme.Backdrop;
         this.IsLightMode = lightMode;
