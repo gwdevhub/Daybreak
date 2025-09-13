@@ -3,6 +3,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     padding: 16px;
+    padding-top: 36px;
     background-color: var(--fill-color);
 }
 

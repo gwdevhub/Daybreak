@@ -34,14 +34,29 @@
 @code {
     public ValueTask DestroyChart(MetricSetViewModel metricSet)
     {
-        return this.jsRuntime.InvokeVoidAsync("destroyChart", GetChartId(metricSet));
+        try
+        {
+            return this.jsRuntime.InvokeVoidAsync("destroyChart", GetChartId(metricSet));
+        }
+        catch
+        {
+            // Ignore JS exceptions, which can happen if the chart was not created yet.
+            return ValueTask.CompletedTask;
+        }
     }
 
     public async ValueTask CreateChart(MetricSetViewModel metricSet, Func<MetricSetViewModel, IEnumerable<Metric>> aggregation)
     {
         var canvasId = GetChartId(metricSet);
         var chartConfig = this.GetChartConfig(metricSet, aggregation);
-        await this.jsRuntime.InvokeVoidAsync("createChart", canvasId, chartConfig);
+        try
+        {
+            await this.jsRuntime.InvokeVoidAsync("createChart", canvasId, chartConfig);
+        }
+        catch
+        {
+            // Ignore JS exceptions, which can happen if the chart was not created yet.
+        }
     }
 
     public async ValueTask AddDataPoint(MetricSetViewModel metricSet, Metric newMetric)
@@ -53,7 +68,14 @@
             y = System.Convert.ToDouble(newMetric.Measurement)
         };
 
-        await this.jsRuntime.InvokeVoidAsync("addDataPoint", canvasId, 0, dataPoint);
+        try
+        {
+            await this.jsRuntime.InvokeVoidAsync("addDataPoint", canvasId, 0, dataPoint);
+        }
+        catch
+        {
+            // Ignore JS exceptions, which can happen if the chart was not created yet.
+        }
     }
 
     private object GetChartConfig(MetricSetViewModel metricSet, Func<MetricSetViewModel, IEnumerable<Metric>> aggregation)
