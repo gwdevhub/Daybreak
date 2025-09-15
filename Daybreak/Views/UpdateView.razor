@@ -3,31 +3,10 @@
         <h1>Updating Daybreak</h1>
     </div>
     <div class="content">
-        <div class="update-content">
-            @if (!this.ViewModel.ContinueEnabled)
-            {
-                <div class="progress-section">
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: @(this.ViewModel.Progress * 100)%"></div>
-                    </div>
-                    <div class="progress-percentage">
-                        @(Math.Round(this.ViewModel.Progress * 100, 1))%
-                    </div>
-                </div>
-            }
-
-            <div class="description-section">
-                <p class="update-description">@this.ViewModel.Description</p>
-            </div>
-            @if (this.ViewModel.ContinueEnabled)
-            {
-                <div class="button-section">
-                    <FluentButton Appearance="Appearance.Accent" OnClick="this.ViewModel.Continue">
-                        Continue
-                    </FluentButton>
-                </div>
-            }
-        </div>
+        <ProgressComponent Progress="@this.ViewModel.Progress"
+                           Description="@this.ViewModel.Description"
+                           ContinueEnabled="@this.ViewModel.ContinueEnabled"
+                           Continue="@this.ViewModel.Continue"/>
     </div>
 </div>
 
