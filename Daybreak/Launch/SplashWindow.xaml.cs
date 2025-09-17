@@ -36,9 +36,12 @@ public partial class SplashWindow : Window
         this.Foreground = theme.Mode is Theme.LightDarkMode.Dark ?
             new SolidColorBrush(System.Windows.Media.Colors.White) :
             new SolidColorBrush(System.Windows.Media.Colors.Black);
-        this.Background = theme.Mode is Theme.LightDarkMode.Dark ?
-            new SolidColorBrush(BackgroundColor.Gray210.Color.ConvertToWPFColor()) :
-            new SolidColorBrush(BackgroundColor.Gray40.Color.ConvertToWPFColor());
+
+        var backgroundColor = theme.Mode is Theme.LightDarkMode.Dark ?
+            BackgroundColor.Gray210.Color :
+            BackgroundColor.Gray40.Color;
+
+        this.Background = new SolidColorBrush(Color.FromArgb(255, backgroundColor.R, backgroundColor.G, backgroundColor.B));
         this.SplashText = this.startupStatus.CurrentStep.Description;
     }
 

@@ -129,6 +129,8 @@ using Microsoft.Identity.Client;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 using Microsoft.Identity.Client.Desktop;
 using System.Net.Http;
+using Daybreak.Views.Trade;
+using Daybreak.Services.TradeChat.Models;
 
 namespace Daybreak.Configuration;
 
@@ -345,6 +347,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<MetricsView, MetricsViewModel>();
         viewProducer.RegisterView<GuildWarsPartySearchView, GuildWarsPartySearchViewModel>();
         viewProducer.RegisterView<EventCalendarView, EventCalendarViewModel>();
+        viewProducer.RegisterView<TradeChatView, TradeChatViewModel>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -461,9 +464,8 @@ public class ProjectConfiguration : PluginConfigurationBase
             .RegisterButton("Guild Wars Party Search", "Show party search broadcasts", sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsPartySearchView>());
         menuServiceProducer.CreateIfNotExistCategory("Trade")
             .RegisterButton("Alerts", "Open trade alerts manager", sp => { })
-            .RegisterButton("Kamadan", "Open kamadan trade chat", sp => { })
-            .RegisterButton("Ascalon", "Open ascalon trade chat", sp => { })
-            .RegisterButton("Trader Quotes", "Open trader quotes view", sp => { });
+            .RegisterButton("Kamadan", "Open kamadan trade chat", sp => sp.GetRequiredService<IViewManager>().ShowView<TradeChatView>(("source", nameof(TraderSource.Kamadan))))
+            .RegisterButton("Ascalon", "Open ascalon trade chat", sp => sp.GetRequiredService<IViewManager>().ShowView<TradeChatView>(("source", nameof(TraderSource.Ascalon))));
         menuServiceProducer.CreateIfNotExistCategory("Mods")
             .RegisterButton("uMod", "Open uMod manager", sp => { })
             .RegisterButton("GWToolboxpp", "Open GWToolbox manager", sp => { })
