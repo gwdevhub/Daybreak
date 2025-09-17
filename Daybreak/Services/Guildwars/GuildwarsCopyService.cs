@@ -2,9 +2,9 @@
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.Guildwars;
 using Microsoft.Extensions.Logging;
+using Microsoft.Win32;
 using System.Core.Extensions;
 using System.IO;
-using System.Windows.Forms;
 
 namespace Daybreak.Services.Guildwars;
 
@@ -98,21 +98,19 @@ internal sealed class GuildWarsCopyService(
     private static bool TryGetDestinationPath(out string path)
     {
         path = string.Empty;
-        var folderPicker = new FolderBrowserDialog()
+        var folderPicker = new OpenFolderDialog()
         {
-            ShowNewFolderButton = true,
-            AutoUpgradeEnabled = true,
-            Description = "Select destination folder to copy Guild Wars",
-            UseDescriptionForTitle = true
+            Title = "Select Destination Folder",
+            Multiselect = false,
+            ValidateNames = true
         };
 
-        var result = folderPicker.ShowDialog();
-        if (result is DialogResult.Abort or DialogResult.Cancel or DialogResult.No)
+        if (folderPicker.ShowDialog() is not true)
         {
             return false;
         }
 
-        path = folderPicker.SelectedPath;
+        path = Path.GetFullPath(folderPicker.FolderName);
         return true;
     }
 }
