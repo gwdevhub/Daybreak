@@ -131,6 +131,7 @@ using Microsoft.Identity.Client.Desktop;
 using System.Net.Http;
 using Daybreak.Views.Trade;
 using Daybreak.Services.TradeChat.Models;
+using Daybreak.Views.Installation;
 
 namespace Daybreak.Configuration;
 
@@ -348,6 +349,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<GuildWarsPartySearchView, GuildWarsPartySearchViewModel>();
         viewProducer.RegisterView<EventCalendarView, EventCalendarViewModel>();
         viewProducer.RegisterView<TradeChatView, TradeChatViewModel>();
+        viewProducer.RegisterView<GuildWarsDownloadView, GuildWarsDownloadViewModel>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -458,14 +460,14 @@ public class ProjectConfiguration : PluginConfigurationBase
         menuServiceProducer.CreateIfNotExistCategory("Guild Wars")
             .RegisterButton("Game companion", "Open game companion", sp => sp.GetRequiredService<IViewManager>().ShowView<LaunchView>())
             .RegisterButton("Manage builds", "Open builds manager", sp => sp.GetRequiredService<IViewManager>().ShowView<BuildListView>())
-            .RegisterButton("Download Guild Wars", "Download Guild Wars installer", sp => { })
+            .RegisterButton("Download Guild Wars", "Download Guild Wars installer", sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsDownloadView>())
             .RegisterButton("Copy Guild Wars", "Copy Guild Wars from an existing installation", sp => { })
             .RegisterButton("Event Calendar", "Show current and upcoming events", sp => sp.GetRequiredService<IViewManager>().ShowView<EventCalendarView>())
             .RegisterButton("Guild Wars Party Search", "Show party search broadcasts", sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsPartySearchView>());
         menuServiceProducer.CreateIfNotExistCategory("Trade")
             .RegisterButton("Alerts", "Open trade alerts manager", sp => { })
-            .RegisterButton("Kamadan", "Open kamadan trade chat", sp => sp.GetRequiredService<IViewManager>().ShowView<TradeChatView>(("source", nameof(TraderSource.Kamadan))))
-            .RegisterButton("Ascalon", "Open ascalon trade chat", sp => sp.GetRequiredService<IViewManager>().ShowView<TradeChatView>(("source", nameof(TraderSource.Ascalon))));
+            .RegisterButton("Kamadan", "Open kamadan trade chat", sp => sp.GetRequiredService<IViewManager>().ShowView<TradeChatView>((nameof(TradeChatView.Source), nameof(TraderSource.Kamadan))))
+            .RegisterButton("Ascalon", "Open ascalon trade chat", sp => sp.GetRequiredService<IViewManager>().ShowView<TradeChatView>((nameof(TradeChatView.Source), nameof(TraderSource.Ascalon))));
         menuServiceProducer.CreateIfNotExistCategory("Mods")
             .RegisterButton("uMod", "Open uMod manager", sp => { })
             .RegisterButton("GWToolboxpp", "Open GWToolbox manager", sp => { })
