@@ -65,6 +65,17 @@ html, body {
     flex-direction: column;
 }
 
+.center-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+}
+
+.min-half-width {
+    min-width: 50%;
+}
+
 /* Keyframe for staggered menu category animation */
 @keyframes slideInFromLeft {
     from {
