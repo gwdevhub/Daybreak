@@ -105,6 +105,7 @@ public sealed class TeamBuildTemplateViewModel(
         this.BuildEntry = this.TeamEntry.Builds.Skip(index).FirstOrDefault();
         this.BuildEntryIndex = index;
         this.UpdateBuildCode();
+        this.FilterSkillsByProfessionsAndString();
     }
 
     public void ShowSummary()

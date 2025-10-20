@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Attributes;
-using Daybreak.Views;
 using Newtonsoft.Json;
 
 namespace Daybreak.Configuration.Options;
@@ -19,7 +18,6 @@ public sealed class LauncherOptions
 
     [JsonProperty(nameof(DesiredGuildwarsScreen))]
     [OptionName(Name = "Desired GuildWars Screen", Description = "Sets the screen on which the GuildWars window will be placed")]
-    [OptionSetterView<ScreenChoiceView>(Action = "Screen Selector")]
     [OptionSynchronizationIgnore]
     public int DesiredGuildwarsScreen { get; set; }
 
