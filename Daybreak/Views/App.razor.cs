@@ -13,7 +13,6 @@ using Microsoft.JSInterop;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.IO;
-using System.Printing;
 using System.Windows;
 using System.Windows.Interop;
 using TrailBlazr.Services;
@@ -112,19 +111,46 @@ public sealed class AppViewModel
 
     public void Drag()
     {
-        NativeMethods.ReleaseCapture();
-        NativeMethods.SendMessage(this.hwndSource?.Handle ?? 0, NativeMethods.WM_NCLBUTTONDOWN, new IntPtr(NativeMethods.HTCAPTION), IntPtr.Zero);
+        /*
+         * This operation has to be queued on the UI thread and has to be done via PostMessage to avoid re-entrancy.
+         * Using SendMessage or doing it directly can cause crashes when WebView2 is handling a user callback while another sendmessage appears.
+         */
+        this.blazorHostWindow.Dispatcher.BeginInvoke(() =>
+        {
+            var hwnd = new WindowInteropHelper(this.blazorHostWindow).Handle;
+            if (hwnd == IntPtr.Zero)
+            {
+                return;
+            }
+
+            NativeMethods.ReleaseCapture();
+            NativeMethods.PostMessage(hwnd, NativeMethods.WM_SYSCOMMAND, (IntPtr)(NativeMethods.SC_MOVE | NativeMethods.HTCAPTION), IntPtr.Zero);
+        });
     }
 
     public void StartResize(NativeMethods.ResizeDirection resizeDirection)
     {
+        /*
+         * This operation has to be queued on the UI thread and has to be done via PostMessage to avoid re-entrancy.
+         * Using SendMessage or doing it directly can cause crashes when WebView2 is handling a user callback while another sendmessage appears.
+         */
+
         if (this.blazorHostWindow.WindowState == WindowState.Maximized)
         {
-            return; // Don't allow resizing when maximized
+            return;
         }
 
-        NativeMethods.ReleaseCapture();
-        NativeMethods.SendMessage(this.hwndSource?.Handle ?? 0, NativeMethods.WM_NCLBUTTONDOWN, new IntPtr((int)resizeDirection), IntPtr.Zero);
+        this.blazorHostWindow.Dispatcher.BeginInvoke(() =>
+        {
+            var hwnd = new WindowInteropHelper(this.blazorHostWindow).Handle;
+            if (hwnd == IntPtr.Zero)
+            {
+                return;
+            }
+
+            NativeMethods.ReleaseCapture();
+            NativeMethods.PostMessage(hwnd, NativeMethods.WM_NCLBUTTONDOWN, (IntPtr)(int)resizeDirection, IntPtr.Zero);
+        });
     }
 
     public void Minimize()

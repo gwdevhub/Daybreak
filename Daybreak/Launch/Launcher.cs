@@ -112,14 +112,6 @@ public sealed class Launcher : BlazorHybridApplication<App>
          * initializing the options.
          */
         this.ServiceProvider.GetRequiredService<ISplashScreenService>().ShowSplashScreen();
-
-        /*
-         * Hook into WPF traces and output them to logs
-         */
-
-        PresentationTraceSources.DataBindingSource.Switch.Level = SourceLevels.Warning | SourceLevels.Error;
-        PresentationTraceSources.DataBindingSource.Listeners.Add(new BindingErrorTraceListener(this.ServiceProvider.GetRequiredService<ILogger<Launcher>>()));
-
         await this.InitializeApplicationServices(startupStatus, optionsProducer);
     }
 
@@ -130,7 +122,13 @@ public sealed class Launcher : BlazorHybridApplication<App>
     protected override void Host_CoreWebView2Initialized(CoreWebView2 e)
     {
         base.Host_CoreWebView2Initialized(e);
+        e.ProcessFailed += this.CoreWebView2_ProcessFailed;
         Global.CoreWebView2 = e;
+    }
+
+    private void CoreWebView2_ProcessFailed(object? sender, CoreWebView2ProcessFailedEventArgs e)
+    {
+        this.logger?.LogCritical("WebView2 process failed.\nExit Code: {exitCode}\nSource: {source}\nKind: {kind}\nReason: {reason}\nFrame Infos: {frameInfos}\nProcess Description: {processDescription}", e.ExitCode, e.FailureSourceModulePath, e.ProcessFailedKind, e.Reason, e.FrameInfosForFailedProcess, e.ProcessDescription);
     }
 
     private async ValueTask InitializeApplicationServices(StartupStatus startupStatus, IOptionsProducer optionsProducer)

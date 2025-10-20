@@ -1,0 +1,49 @@
+﻿<div class="stretch-container">
+    <div class="title-bar-additional-btns-left">
+        <button class="title-bar-btn" @onclick="this.ViewModel.DeleteAlert" title="Delete alert">
+            <FluentIcon Value="new Icons.Regular.Size16.Delete()" />
+        </button>
+    </div>
+    @if (this.ViewModel.Alert is not null)
+    {
+        <div class="backdrop-panel">
+            <div class="container">
+                <div class="alert-row alert-enabled">
+                    <FluentInputLabel Label="Enabled" />
+                    <FluentCheckbox @bind-Value="@this.ViewModel.Alert.Enabled" @bind-Value:after="@this.ViewModel.SaveAlertChanges" />
+                </div>
+                <div class="alert-row alert-id">
+                    <FluentInputLabel Label="ID" />
+                    <FluentTextField @bind-Value="@this.ViewModel.Alert.Id" ReadOnly="true" />
+                </div>
+                <div class="alert-row alert-name">
+                    <FluentInputLabel Label="Name" />
+                    <FluentTextField @bind-Value="@this.ViewModel.Alert.Name" @bind-Value:after="@this.ViewModel.SaveAlertChanges" />
+                </div>
+                <div class="alert-row alert-message-regex-check">
+                    <FluentInputLabel Label="Message Check Regex" />
+                    <FluentCheckbox @bind-Value="@this.ViewModel.Alert.MessageRegexCheck" @bind-Value:after="@this.ViewModel.SaveAlertChanges" />
+                </div>
+                <div class="alert-row alert-message-check">
+                    <FluentInputLabel Label="Message Check" />
+                    <FluentTextField @bind-Value="@this.ViewModel.Alert.MessageCheck" @bind-Value:after="@this.ViewModel.SaveAlertChanges" />
+                </div>
+                <div class="alert-row alert-sender-regex-check">
+                    <FluentInputLabel Label="Sender Check Regex" />
+                    <FluentCheckbox @bind-Value="@this.ViewModel.Alert.SenderRegexCheck" @bind-Value:after="@this.ViewModel.SaveAlertChanges" />
+                </div>
+                <div class="alert-row alert-sender-check">
+                    <FluentInputLabel Label="Sender Check" />
+                    <FluentTextField @bind-Value="@this.ViewModel.Alert.SenderCheck" @bind-Value:after="@this.ViewModel.SaveAlertChanges" />
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@page "/trade/message/{AlertId}"
+@inherits ViewBase<TradeMessageView, TradeMessageViewModel>
+@code {
+    [Parameter]
+    public required string AlertId { get; init; }
+}

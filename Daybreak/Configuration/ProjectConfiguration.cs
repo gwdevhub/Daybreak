@@ -353,6 +353,9 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<GuildWarsDownloadView, GuildWarsDownloadViewModel>();
         viewProducer.RegisterView<GuildWarsCopySelectionView, GuildWarsCopySelectionViewModel>();
         viewProducer.RegisterView<GuildWarsCopyView, GuildWarsCopyViewModel>();
+        viewProducer.RegisterView<TradeAlertsView, TradeAlertsViewModel>();
+        viewProducer.RegisterView<TradeMessageView, TradeMessageViewModel>();
+        viewProducer.RegisterView<TradeQuoteView, TradeQuoteViewModel>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -468,7 +471,7 @@ public class ProjectConfiguration : PluginConfigurationBase
             .RegisterButton("Event Calendar", "Show current and upcoming events", sp => sp.GetRequiredService<IViewManager>().ShowView<EventCalendarView>())
             .RegisterButton("Guild Wars Party Search", "Show party search broadcasts", sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsPartySearchView>());
         menuServiceProducer.CreateIfNotExistCategory("Trade")
-            .RegisterButton("Alerts", "Open trade alerts manager", sp => { })
+            .RegisterButton("Alerts", "Open trade alerts manager", sp => sp.GetRequiredService<IViewManager>().ShowView<TradeAlertsView>())
             .RegisterButton("Kamadan", "Open kamadan trade chat", sp => sp.GetRequiredService<IViewManager>().ShowView<TradeChatView>((nameof(TradeChatView.Source), nameof(TraderSource.Kamadan))))
             .RegisterButton("Ascalon", "Open ascalon trade chat", sp => sp.GetRequiredService<IViewManager>().ShowView<TradeChatView>((nameof(TradeChatView.Source), nameof(TraderSource.Ascalon))));
         menuServiceProducer.CreateIfNotExistCategory("Mods")

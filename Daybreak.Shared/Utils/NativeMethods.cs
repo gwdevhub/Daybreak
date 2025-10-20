@@ -19,6 +19,8 @@ public static class NativeMethods
     public const int WM_SYSCOMMAND = 0x112;
     public const int WM_NCLBUTTONDOWN = 0x00A1;
     public const int HTCAPTION = 2;
+    public const int SC_MOVE = 0xF010;
+    public const int SC_SIZE = 0xF000;
 
     public enum ResizeDirection
     {
@@ -392,6 +394,8 @@ public static class NativeMethods
 
     [DllImport("user32.dll")]
     public static extern IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
+    [DllImport("user32.dll")]
+    public static extern IntPtr PostMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
     [DllImport("user32.dll")]
     public static extern bool ReleaseCapture();
 
