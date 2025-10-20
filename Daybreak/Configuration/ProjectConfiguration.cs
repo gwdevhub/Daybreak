@@ -133,6 +133,7 @@ using Daybreak.Views.Trade;
 using Daybreak.Services.TradeChat.Models;
 using Daybreak.Views.Installation;
 using Daybreak.Views.Copy;
+using Daybreak.Views.Onboarding;
 
 namespace Daybreak.Configuration;
 
@@ -356,6 +357,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<TradeAlertsView, TradeAlertsViewModel>();
         viewProducer.RegisterView<TradeMessageView, TradeMessageViewModel>();
         viewProducer.RegisterView<TradeQuoteView, TradeQuoteViewModel>();
+        viewProducer.RegisterView<LauncherOnboardingView, LauncherOnboardingViewModel>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)

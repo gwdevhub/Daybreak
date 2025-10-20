@@ -212,11 +212,6 @@ public sealed class AppViewModel
         this.viewManager.ShowView<SettingsSynchronizationView>();
     }
 
-    public void OpenVersionView()
-    {
-        //TODO: Handle version view
-    }
-
     public void OnError(ErrorEventArgs _)
     {
         //TODO: Handle errors, possibly log them

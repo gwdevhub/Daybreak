@@ -15,6 +15,7 @@ using System.Windows.Media;
 
 namespace Daybreak.Services.Screenshots;
 
+//TODO: Can probably be deleted once the migration is over. The launcher will instead use defined themes.
 internal sealed class OnlinePictureClient : IOnlinePictureClient
 {
     private const string CloudFlareCookieValue = "fcfd523b2470336531e47baff3d2c2d6a0e2412a.1689426482.1";

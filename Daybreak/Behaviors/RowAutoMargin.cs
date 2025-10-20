@@ -18,7 +18,7 @@ public sealed class RowAutoMargin : Behavior<Grid>
         this.AssociatedObject.Loaded += this.AssociatedObject_Loaded;
     }
 
-    // TODO #367: Super hacky code below. To be reworked
+    // TODO: To be deleted once migration is over
     public void RecalculateRows()
     {
         /*

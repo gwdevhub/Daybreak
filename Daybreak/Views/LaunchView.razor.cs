@@ -5,12 +5,10 @@ using Daybreak.Shared.Models.LaunchConfigurations;
 using Daybreak.Shared.Models.Onboarding;
 using Daybreak.Shared.Services.Api;
 using Daybreak.Shared.Services.ApplicationLauncher;
-using Daybreak.Shared.Services.InternetChecker;
 using Daybreak.Shared.Services.LaunchConfigurations;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Onboarding;
-using Daybreak.Shared.Services.Privilege;
-using Daybreak.Shared.Services.Screens;
+using Daybreak.Views.Onboarding;
 using Microsoft.Extensions.Options;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -40,12 +38,9 @@ public sealed class LaunchViewModel : ViewModelBase<LaunchViewModel, LaunchView>
         INotificationService notificationService,
         IDaybreakApiService daybreakApiService,
         ILaunchConfigurationService launchConfigurationService,
-        IConnectivityStatus connectivityStatus,
         IOnboardingService onboardingService,
         IApplicationLauncher applicationLauncher,
-        IScreenManager screenManager,
-        IOptions<FocusViewOptions> focusViewOptions,
-        IPrivilegeManager privilegeManager)
+        IOptions<FocusViewOptions> focusViewOptions)
     {
         this.viewManager = viewManager.ThrowIfNull();
         this.notificationService = notificationService.ThrowIfNull();
@@ -118,7 +113,7 @@ public sealed class LaunchViewModel : ViewModelBase<LaunchViewModel, LaunchView>
     {
         if (!this.IsOnboarded())
         {
-            //TODO: Do onboarding procedure
+            this.viewManager.ShowView<LauncherOnboardingView>((nameof(LauncherOnboardingView.Status), this.onboardingService.CheckOnboardingStage().ToString()));
             return base.ParametersSet(view, cancellationToken);
         }
 
