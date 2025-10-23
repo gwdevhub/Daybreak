@@ -1,6 +1,5 @@
 ﻿using Daybreak.Shared.Models.Plugins;
 using Daybreak.Shared.Services.ApplicationArguments;
-using Daybreak.Shared.Services.Browser;
 using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Mods;
 using Daybreak.Shared.Services.Navigation;
@@ -27,7 +26,6 @@ public interface IPluginsService
         IStartupActionProducer startupActionProducer,
         INotificationHandlerProducer notificationHandlerProducer,
         IModsManager modsManager,
-        IBrowserExtensionsProducer browserExtensionsProducer,
         IArgumentHandlerProducer argumentHandlerProducer,
         IMenuServiceProducer menuServiceProducer,
         IThemeProducer themeProducer);

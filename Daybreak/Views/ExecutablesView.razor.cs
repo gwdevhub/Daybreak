@@ -1,5 +1,5 @@
 ﻿using Daybreak.Models;
-using Daybreak.Shared.Models.Progress;
+using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.Guildwars;
 using System.Extensions;
@@ -79,36 +79,26 @@ public class ExecutablesViewModel(
         await this.RefreshViewAsync();
         try
         {
-            var installationStatus = new GuildwarsInstallationStatus();
-            installationStatus.PropertyChanged += (_, _) =>
+            var progressUpdate = new Progress<ProgressUpdate>();
+            progressUpdate.ProgressChanged += (_, e) =>
             {
-                if (installationStatus.CurrentStep is GuildwarsInstallationStatus.GuildwarsInstallationStep step &&
-                    step.Final)
-                {
-                    executable.UpdateProgress = default;
-                    executable.NeedsUpdate = false;
-                    executable.Validating = true;
-                    this.ValidateExecutables();
-                    this.RefreshView();
-                }
-                else
-                {
-                    executable.UpdateProgress = installationStatus.CurrentStep switch
-                    {
-                        GuildwarsInstallationStatus.UnpackingProgressStep unpackingProgress => $"{50 + (unpackingProgress.Progress * 50):F1}%",
-                        DownloadStatus.DownloadProgressStep downloadProgress => $"{downloadProgress.Progress * 50:F1}%",
-                        _ => default
-                    };
-                    this.RefreshView();
-                }
+                executable.UpdateProgress = $"{e.Percentage.Value * 100:F2}%";
+                this.RefreshView();
             };
 
-            if (!await this.guildWarsInstaller.UpdateGuildwars(executable.Path, installationStatus, CancellationToken.None))
+            executable.UpdateProgress = default;
+            if (!await this.guildWarsInstaller.UpdateGuildwars(executable.Path, progressUpdate, CancellationToken.None))
             {
                 executable.Validating = false;
                 executable.Valid = false;
                 executable.NeedsUpdate = true;
-                executable.UpdateProgress = default;
+            }
+            else
+            {
+                executable.Validating = true;
+                executable.Valid = true;
+                executable.NeedsUpdate = false;
+                this.ValidateExecutables();
             }
 
             await this.RefreshViewAsync();

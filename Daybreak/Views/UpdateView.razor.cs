@@ -1,9 +1,7 @@
-﻿using Daybreak.Shared.Models.Progress;
-using Daybreak.Shared.Services.Updater;
+﻿using Daybreak.Shared.Services.Updater;
 using System.Windows;
 using TrailBlazr.Services;
 using TrailBlazr.ViewModels;
-using Version = Daybreak.Shared.Models.Versioning.Version;
 
 namespace Daybreak.Views;
 public sealed class UpdateViewModel(
@@ -14,7 +12,6 @@ public sealed class UpdateViewModel(
     private readonly IViewManager viewManager = viewManager;
     private readonly IApplicationUpdater applicationUpdater = applicationUpdater;
 
-    public UpdateStatus? Status { get; set; }
     public string? Description { get; set; }
     public double Progress { get; set; }
     public bool ContinueEnabled { get; set; }
@@ -27,17 +24,7 @@ public sealed class UpdateViewModel(
             return base.ParametersSet(view, cancellationToken);
         }
 
-        this.ContinueEnabled = false;
-        this.Status = new UpdateStatus();
-        this.Status.PropertyChanged += (_, _) =>
-        {
-            this.Description = this.Status.CurrentStep.Description;
-            this.Progress = this.Status.CurrentStep.Progress;
-            this.ContinueEnabled = this.Status.CurrentStep == UpdateStatus.PendingRestart;
-            this.RefreshView();
-        };
-
-        Task.Factory.StartNew(() => this.applicationUpdater.DownloadUpdate(version, this.Status), TaskCreationOptions.LongRunning);
+        Task.Factory.StartNew(() => this.PerformUpdate(version), CancellationToken.None,  TaskCreationOptions.LongRunning, TaskScheduler.Current);
         return base.ParametersSet(view, cancellationToken);
     }
 
@@ -45,5 +32,21 @@ public sealed class UpdateViewModel(
     {
         this.applicationUpdater.FinalizeUpdate();
         Application.Current.Shutdown();
+    }
+
+    private async ValueTask PerformUpdate(Version version)
+    {
+        this.ContinueEnabled = false;
+        var updateOperation = this.applicationUpdater.DownloadUpdate(version, CancellationToken.None);
+        updateOperation.ProgressChanged += (_, up) =>
+        {
+            this.Description = up.StatusMessage;
+            this.Progress = up.Percentage;
+            this.RefreshView();
+        };
+
+        await updateOperation;
+        this.ContinueEnabled = true;
+        this.RefreshView();
     }
 }

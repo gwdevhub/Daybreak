@@ -1,4 +1,4 @@
-﻿using Daybreak.Shared.Models.Progress;
+﻿using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Services.Guildwars;
 using Daybreak.Shared.Services.Notifications;
 using Microsoft.Win32;
@@ -51,16 +51,16 @@ public sealed class GuildWarsDownloadViewModel(
         }
 
         var installationPath = Path.GetFullPath(dialog.FolderName);
-        var installationStatus = new GuildwarsInstallationStatus();
-        installationStatus.PropertyChanged += this.InstallationStatus_PropertyChanged;
+        var installationProgress = new Progress<ProgressUpdate>();
+        installationProgress.ProgressChanged += this.InstallationStatus_PropertyChanged;
         var result = false;
         try
         {
-            result = await this.guildWarsInstaller.InstallGuildwars(installationPath, installationStatus, CancellationToken.None);
+            result = await this.guildWarsInstaller.InstallGuildwars(installationPath, installationProgress, CancellationToken.None);
         }
         finally
         {
-            installationStatus.PropertyChanged -= this.InstallationStatus_PropertyChanged;
+            installationProgress.ProgressChanged -= this.InstallationStatus_PropertyChanged;
         }
         
         if (result)
@@ -80,15 +80,10 @@ public sealed class GuildWarsDownloadViewModel(
         }
     }
 
-    private void InstallationStatus_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void InstallationStatus_PropertyChanged(object? _, ProgressUpdate e)
     {
-        if (sender is not GuildwarsInstallationStatus status)
-        {
-            return;
-        }
-
-        this.Progress = status.CurrentStep.Progress;
-        this.Description = status.CurrentStep.Description;
+        this.Progress = e.Percentage;
+        this.Description = e.StatusMessage ?? string.Empty;
         this.RefreshView();
     }
 }

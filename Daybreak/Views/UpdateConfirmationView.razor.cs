@@ -1,7 +1,6 @@
 ﻿using Daybreak.Shared.Services.Updater;
 using TrailBlazr.Services;
 using TrailBlazr.ViewModels;
-using Version = Daybreak.Shared.Models.Versioning.Version;
 
 namespace Daybreak.Views;
 public sealed class UpdateConfirmationViewModel(
@@ -25,7 +24,7 @@ public sealed class UpdateConfirmationViewModel(
         }
 
         this.Version = parsedVersion;
-        this.ChangeLog = await this.applicationUpdater.GetChangelog(this.Version);
+        this.ChangeLog = await this.applicationUpdater.GetChangelog(this.Version, cancellationToken);
     }
 
     public void Confirm()

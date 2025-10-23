@@ -3,8 +3,8 @@ using Daybreak.Services.Downloads;
 using Daybreak.Services.ReShade.Notifications;
 using Daybreak.Services.ReShade.Utils;
 using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Models.Mods;
-using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Models.ReShade;
 using Daybreak.Shared.Services.Downloads;
 using Daybreak.Shared.Services.Injection;
@@ -44,8 +44,12 @@ internal sealed class ReShadeService(
     private const string ReShadeLog = "ReShade.log";
     private const string PresetsFolder = "reshade-shaders";
 
-    private static readonly string ReShadePath = PathUtils.GetAbsolutePathFromRoot(ReShadeSubPath);
+    private static readonly ProgressUpdate ProgressRetrieveLatestUrl = new(0, "Retrieving latest ReShade version");
+    private static readonly ProgressUpdate ProgressInstalling = new(1, "Installing ReShade files");
+    private static readonly ProgressUpdate ProgressFailed = new(1, "Failed to install ReShade");
+    private static readonly ProgressUpdate ProgressFinished = new(1, "Finished ReShade installation");
 
+    private static readonly string ReShadePath = PathUtils.GetAbsolutePathFromRoot(ReShadeSubPath);
     private static readonly string ReShadeDllPath = Path.Combine(ReShadePath, DllName);
     private static readonly string ConfigIniPath = Path.Combine(ReShadePath, ConfigIni);
     private static readonly string ReShadePresetPath = Path.Combine(ReShadePath, ReShadePreset);
@@ -63,6 +67,8 @@ internal sealed class ReShadeService(
     private readonly ILogger<ReShadeService> logger = logger.ThrowIfNull();
 
     public string Name => "ReShade";
+    public string Description => "ReShade is an advanced, fully generic post-processing injector for games and video software developed by crosire.";
+    public bool IsVisible { get; } = true;
     public bool IsEnabled
     {
         get => this.liveUpdateableOptions.Value.Enabled;
@@ -105,6 +111,14 @@ internal sealed class ReShadeService(
 
     public void OnClosing()
     {
+    }
+
+    public IProgressAsyncOperation<bool> PerformInstallation(CancellationToken cancellationToken)
+    {
+        return ProgressAsyncOperation.Create(async progress =>
+        {
+            return await this.SetupReShade(progress, cancellationToken);
+        }, cancellationToken);
     }
 
     public IEnumerable<string> GetCustomArguments() => [];
@@ -209,31 +223,31 @@ internal sealed class ReShadeService(
         return await this.SetupReshadeDllFromInstaller(selectedPath, cancellationToken);
     }
 
-    public async Task<bool> SetupReShade(ReShadeInstallationStatus reShadeInstallationStatus, CancellationToken cancellationToken)
+    public async Task<bool> SetupReShade(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.SetupReShade), string.Empty);
         scopedLogger.LogDebug("Retrieving ReShade latest version");
 
-        reShadeInstallationStatus.CurrentStep = ReShadeInstallationStatus.RetrievingLatestVersionUrl;
+        progress.Report(ProgressRetrieveLatestUrl);
         var downloadUrl = await this.GetLatestDownloadUrl(cancellationToken);
 
         if (downloadUrl is null)
         {
-            reShadeInstallationStatus.CurrentStep = ReShadeInstallationStatus.FailedDownload;
+            progress.Report(ProgressFailed);
             scopedLogger.LogError("Unable to retrieve latest version url");
             return false;
         }
 
         scopedLogger.LogDebug($"Downloading installer from {downloadUrl}");
         var destinationPath = Path.Combine(Path.GetFullPath(ReShadePath), ReShadeInstallerName);
-        var downloadResult = await this.downloadService.DownloadFile(downloadUrl, destinationPath, reShadeInstallationStatus, cancellationToken);
+        var downloadResult = await this.downloadService.DownloadFile(downloadUrl, destinationPath, progress, cancellationToken);
         if (!downloadResult)
         {
             scopedLogger.LogError($"Failed to download {downloadUrl}. Check {nameof(DownloadService)} logs for errors");
             return false;
         }
 
-        reShadeInstallationStatus.CurrentStep = ReShadeInstallationStatus.Installing;
+        progress.Report(ProgressInstalling);
         var setupResult = await this.SetupReshadeDllFromInstaller(destinationPath, cancellationToken);
         if (!setupResult)
         {
@@ -243,7 +257,7 @@ internal sealed class ReShadeService(
 
         var versionString = downloadUrl.Replace(ReShadeHomepageUrl + "/downloads/ReShade_Setup_", "").Replace(".exe", "");
         File.Delete(destinationPath);
-        reShadeInstallationStatus.CurrentStep = ReShadeInstallationStatus.Finished;
+        progress.Report(ProgressFinished);
         return true;
     }
 
@@ -627,14 +641,14 @@ internal sealed class ReShadeService(
         }
 
         var versionString = downloadUrl.Replace(ReShadeHomepageUrl + "/downloads/ReShade_Setup_", "").Replace(".exe", "");
-        if (!Shared.Models.Versioning.Version.TryParse(versionString, out var version))
+        if (!Version.TryParse(versionString, out var version))
         {
             scopedLogger.LogError("Unable to parse latest version");
             return;
         }
 
         if (File.Exists(ReShadeDllPath) &&
-            Shared.Models.Versioning.Version.TryParse(FileVersionInfo.GetVersionInfo(ReShadeDllPath).ProductVersion, out var currentVersion) &&
+            Version.TryParse(FileVersionInfo.GetVersionInfo(ReShadeDllPath).ProductVersion, out var currentVersion) &&
             currentVersion.CompareTo(version) >= 0)
         {
             scopedLogger.LogDebug("No update available. Current version is up to date");
@@ -646,7 +660,7 @@ internal sealed class ReShadeService(
                 "Updating ReShade",
                 $"Updating ReShade to version {version}");
 
-        if (await this.SetupReShade(new ReShadeInstallationStatus(), CancellationToken.None))
+        if (await this.SetupReShade(new Progress<ProgressUpdate>(), CancellationToken.None))
         {
             notificationToken.Cancel();
             scopedLogger.LogDebug($"ReShade updated to version {version}");

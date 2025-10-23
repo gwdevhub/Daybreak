@@ -1,4 +1,4 @@
-﻿using Daybreak.Shared.Models.Progress;
+﻿using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Services.Guildwars;
 using Daybreak.Shared.Services.Notifications;
 using System.IO;
@@ -45,31 +45,25 @@ public sealed class GuildWarsCopyViewModel(
             return;
         }
 
-        var copyStatus = new CopyStatus();
-        copyStatus.PropertyChanged += this.CopyStatus_PropertyChanged;
-
+        var operation = this.guildWarsCopyService.CopyGuildwars(this.sourcePath, CancellationToken.None);
+        operation.ProgressChanged += this.CopyStatus_PropertyChanged;
         try
         {
-            await this.guildWarsCopyService.CopyGuildwars(this.sourcePath, copyStatus, CancellationToken.None);
+            await operation;
         }
         finally
         {
-            copyStatus.PropertyChanged -= this.CopyStatus_PropertyChanged;
+            operation.ProgressChanged -= this.CopyStatus_PropertyChanged;
         }
 
         this.ContinueEnabled = true;
         this.RefreshView();
     }
 
-    private void CopyStatus_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void CopyStatus_PropertyChanged(object? _, ProgressUpdate e)
     {
-        if (sender is not CopyStatus copyStatus)
-        {
-            return;
-        }
-
-        this.Description = copyStatus.CurrentStep.Description;
-        this.Progress = copyStatus.CurrentStep.Progress;
+        this.Description = e.StatusMessage ?? string.Empty;
+        this.Progress = e.Percentage;
         this.RefreshView();
     }
 }

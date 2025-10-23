@@ -1,9 +1,7 @@
 ﻿using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Screens;
-using Daybreak.Shared.Utils;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Windows.Interop;
 using System.Windows.Threading;
 using WpfExtended.Blazor.Launch;
 

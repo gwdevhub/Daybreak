@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Services.ApplicationArguments;
-using Daybreak.Shared.Services.Browser;
 using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Metrics;
 using Daybreak.Shared.Services.Mods;
@@ -33,7 +32,6 @@ public abstract class PluginConfigurationBase
     public virtual void RegisterOptions(IOptionsProducer optionsProducer) { }
     public virtual void RegisterNotificationHandlers(INotificationHandlerProducer notificationHandlerProducer) { }
     public virtual void RegisterMods(IModsManager modsManager) { }
-    public virtual void RegisterBrowserExtensions(IBrowserExtensionsProducer browserExtensionsProducer) { }
     public virtual void RegisterLaunchArgumentHandlers(IArgumentHandlerProducer argumentHandlerProducer) { }
     public virtual void RegisterMenuButtons(IMenuServiceProducer menuServiceProducer) { }
     public virtual void RegisterThemes(IThemeProducer themeProducer) { }

@@ -1,8 +1,8 @@
 ﻿using Daybreak.Shared.Models.Notifications;
 using Daybreak.Shared.Models.Notifications.Handling;
-using Version = Daybreak.Shared.Models.Versioning.Version;
 
 namespace Daybreak.Services.Updater;
+//TODO: Implement update handling
 internal sealed class UpdateNotificationHandler() : INotificationHandler
 {
     //private readonly IViewManager viewManager = viewManager.ThrowIfNull();
@@ -15,7 +15,6 @@ internal sealed class UpdateNotificationHandler() : INotificationHandler
             return;
         }
 
-        version.HasPrefix = true;
         //this.viewManager.ShowView<UpdateConfirmationView>(version);
     }
 }

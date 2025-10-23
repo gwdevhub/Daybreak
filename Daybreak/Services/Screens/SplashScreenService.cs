@@ -1,5 +1,4 @@
-﻿using ControlzEx.Theming;
-using Daybreak.Configuration.Options;
+﻿using Daybreak.Configuration.Options;
 using Daybreak.Launch;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Screens;

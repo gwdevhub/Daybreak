@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
 using Newtonsoft.Json;
-using OpenTK;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;

@@ -1,16 +1,15 @@
-﻿using Daybreak.Shared.Models.Progress;
+﻿using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Models.UMod;
 using Daybreak.Shared.Services.Mods;
-using Version = Daybreak.Shared.Models.Versioning.Version;
 
 namespace Daybreak.Shared.Services.UMod;
 public interface IUModService : IModService
 {
     Version Version { get; }
 
-    Task<bool> SetupUMod(UModInstallationStatus uModInstallationStatus);
+    Task<bool> SetupUMod(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken);
 
-    Task CheckAndUpdateUMod(CancellationToken cancellationToken);
+    Task CheckAndUpdateUMod(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken);
 
     bool AddMod(string pathToTpf, bool? imported = default);
 

@@ -1,4 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Models.Mods;
 using Daybreak.Shared.Services.Screens;
 using Microsoft.Extensions.Logging;
@@ -19,6 +20,8 @@ internal sealed class GuildwarsScreenPlacer(
     private readonly ILogger<GuildwarsScreenPlacer> logger = logger.ThrowIfNull();
 
     public string Name => "Screen placer";
+    public string Description => "Moves the Guildwars window to the desired screen on launch.";
+    public bool IsVisible => false;
     public bool IsEnabled
     {
         get => this.liveOptions.Value.SetGuildwarsWindowSizeOnLaunch;
@@ -30,6 +33,11 @@ internal sealed class GuildwarsScreenPlacer(
     }
 
     public bool IsInstalled => true;
+
+    public IProgressAsyncOperation<bool> PerformInstallation(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException("GuildwarsScreenPlacer does not support manual installation.");
+    }
 
     public Task<bool> ShouldRunAgain(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken) => Task.FromResult(false);
 

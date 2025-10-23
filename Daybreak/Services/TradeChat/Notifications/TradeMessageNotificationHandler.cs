@@ -6,7 +6,8 @@ using System.Extensions;
 
 namespace Daybreak.Services.TradeChat.Notifications;
 
-internal sealed class TradeMessageNotificationHandler() : INotificationHandler
+//TODO: Handle trade message notifications
+internal sealed class TradeMessageNotificationHandler : INotificationHandler
 {
     //private readonly IViewManager viewManager = viewManager.ThrowIfNull();
 

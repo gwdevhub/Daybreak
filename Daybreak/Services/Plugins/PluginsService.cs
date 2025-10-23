@@ -3,7 +3,6 @@ using Daybreak.Services.Plugins.Resolvers;
 using Daybreak.Services.Plugins.Validators;
 using Daybreak.Shared.Models.Plugins;
 using Daybreak.Shared.Services.ApplicationArguments;
-using Daybreak.Shared.Services.Browser;
 using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Mods;
 using Daybreak.Shared.Services.Navigation;
@@ -25,7 +24,6 @@ using System.Extensions;
 using System.IO;
 using System.Logging;
 using System.Reflection;
-using static SkiaSharp.HarfBuzz.SKShaper;
 
 namespace Daybreak.Services.Plugins;
 
@@ -92,7 +90,6 @@ internal sealed class PluginsService : IPluginsService
         IStartupActionProducer startupActionProducer,
         INotificationHandlerProducer notificationHandlerProducer,
         IModsManager modsManager,
-        IBrowserExtensionsProducer browserExtensionsProducer,
         IArgumentHandlerProducer argumentHandlerProducer,
         IMenuServiceProducer menuServiceProducer,
         IThemeProducer themeProducer)
@@ -104,7 +101,6 @@ internal sealed class PluginsService : IPluginsService
         startupActionProducer.ThrowIfNull();
         notificationHandlerProducer.ThrowIfNull();
         modsManager.ThrowIfNull();
-        browserExtensionsProducer.ThrowIfNull();
         argumentHandlerProducer.ThrowIfNull();
         menuServiceProducer.ThrowIfNull();
         themeProducer.ThrowIfNull();
@@ -186,8 +182,6 @@ internal sealed class PluginsService : IPluginsService
                 pluginScopedLogger.LogDebug("Registered notification handlers");
                 RegisterMods(pluginConfig, modsManager);
                 pluginScopedLogger.LogDebug("Registered mods");
-                RegisterBrowserExtensions(pluginConfig, browserExtensionsProducer);
-                pluginScopedLogger.LogDebug("Registered browser extensions");
                 RegisterArgumentHandlers(pluginConfig, argumentHandlerProducer);
                 pluginScopedLogger.LogDebug("Registered argument handlers");
                 RegisterMenuButtons(pluginConfig, menuServiceProducer);
@@ -342,8 +336,6 @@ internal sealed class PluginsService : IPluginsService
     private static void RegisterNotificationHandlers(PluginConfigurationBase pluginConfig, INotificationHandlerProducer notificationHandlerProducer) => pluginConfig.RegisterNotificationHandlers(notificationHandlerProducer);
 
     private static void RegisterMods(PluginConfigurationBase pluginConfig, IModsManager modsManager) => pluginConfig.RegisterMods(modsManager);
-
-    private static void RegisterBrowserExtensions(PluginConfigurationBase pluginConfig, IBrowserExtensionsProducer browserExtensionsProducer) => pluginConfig.RegisterBrowserExtensions(browserExtensionsProducer);
 
     private static void RegisterArgumentHandlers(PluginConfigurationBase pluginConfig, IArgumentHandlerProducer argumentHandlerProducer) => pluginConfig.RegisterLaunchArgumentHandlers(argumentHandlerProducer);
 

@@ -1,8 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.ColorPalette;
-using Daybreak.Shared.Models.Progress;
-using Daybreak.Shared.Utils;
 using Daybreak.Themes;
 using Microsoft.Extensions.Options;
 using System.ComponentModel;
@@ -18,17 +16,17 @@ namespace Daybreak.Launch;
 /// </summary>
 public partial class SplashWindow : Window
 {
-    private readonly StartupStatus startupStatus;
+    private readonly StartupContext startupContext;
 
     [GenerateDependencyProperty]
     private string splashText = string.Empty;
 
     public SplashWindow(
         IOptions<ThemeOptions> options,
-        StartupStatus startupStatus)
+        StartupContext startupContext)
     {
-        this.startupStatus = startupStatus.ThrowIfNull();
-        this.startupStatus.PropertyChanged += this.StartupStatus_PropertyChanged;
+        this.startupContext = startupContext.ThrowIfNull();
+        this.startupContext.PropertyChanged += this.StartupStatus_PropertyChanged;
         this.InitializeComponent();
 
         var theme = options.Value.ApplicationTheme ?? CoreThemes.Daybreak;
@@ -42,11 +40,11 @@ public partial class SplashWindow : Window
             BackgroundColor.Gray40.Color;
 
         this.Background = new SolidColorBrush(Color.FromArgb(255, backgroundColor.R, backgroundColor.G, backgroundColor.B));
-        this.SplashText = this.startupStatus.CurrentStep.Description;
+        this.SplashText = this.startupContext.ProgressUpdate.StatusMessage;
     }
 
     private void StartupStatus_PropertyChanged(object? _, PropertyChangedEventArgs __)
     {
-        this.Dispatcher.InvokeAsync(() => this.SplashText = this.startupStatus.CurrentStep.Description);
+        this.Dispatcher.InvokeAsync(() => this.SplashText = this.startupContext.ProgressUpdate.StatusMessage);
     }
 }

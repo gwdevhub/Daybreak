@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Extensions;
 using TrailBlazr.Services;
 using TrailBlazr.ViewModels;
-using Version = Daybreak.Shared.Models.Versioning.Version;
 
 namespace Daybreak.Views;
 public sealed class VersionManagementViewModel(
@@ -21,7 +20,7 @@ public sealed class VersionManagementViewModel(
 
     public override async ValueTask ParametersSet(VersionManagementView view, CancellationToken cancellationToken)
     {
-        this.Versions.ClearAnd().AddRange((await this.applicationUpdater.GetVersions()).Reverse());
+        this.Versions.ClearAnd().AddRange((await this.applicationUpdater.GetVersions(cancellationToken)).OrderDescending());
         this.CurrentVersion = this.applicationUpdater.CurrentVersion;
     }
 

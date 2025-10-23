@@ -1,10 +1,8 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Services.Browser;
 using Daybreak.Shared;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Browser;
 using Daybreak.Shared.Models.Builds;
-using Daybreak.Shared.Services.Browser;
 using Daybreak.Shared.Services.BuildTemplates;
 using Daybreak.Shared.Utils;
 using Daybreak.Utils;
@@ -25,6 +23,7 @@ using System.Windows.Input;
 
 namespace Daybreak.Controls;
 
+//TODO: To be deleted once UI Migration is complete
 /// <summary>
 /// Interaction logic for ChromiumBrowserWrapper.xaml
 /// </summary>
@@ -57,7 +56,6 @@ public partial class ChromiumBrowserWrapper : UserControl
     private readonly ILiveOptions<BrowserOptions> liveOptions;
     private readonly ILogger<ChromiumBrowserWrapper> logger;
     private readonly IBuildTemplateManager buildTemplateManager;
-    private readonly IBrowserExtensionsManager browserExtensionsManager;
 
     [GenerateDependencyProperty(InitialValue = true)]
     private bool canDownloadBuild;
@@ -100,12 +98,8 @@ public partial class ChromiumBrowserWrapper : UserControl
         set => this.SetValue(AddressProperty, value);
     }
 
-    public IBrowserHistoryManager BrowserHistoryManager { get; }
-
     public ChromiumBrowserWrapper()
         : this(
-              Global.GlobalServiceProvider.GetRequiredService<IBrowserHistoryManager>(),
-              Global.GlobalServiceProvider.GetRequiredService<IBrowserExtensionsManager>(),
               Global.GlobalServiceProvider.GetRequiredService<IHttpClient<ChromiumBrowserWrapper>>(),
               Global.GlobalServiceProvider.GetRequiredService<ILiveOptions<BrowserOptions>>(),
               Global.GlobalServiceProvider.GetRequiredService<IBuildTemplateManager>(),
@@ -114,22 +108,17 @@ public partial class ChromiumBrowserWrapper : UserControl
     }
 
     public ChromiumBrowserWrapper(
-        IBrowserHistoryManager historyManager,
-        IBrowserExtensionsManager browserExtensionsManager,
         IHttpClient<ChromiumBrowserWrapper> httpClient,
         ILiveOptions<BrowserOptions> liveOptions,
         IBuildTemplateManager buildTemplateManager,
         ILogger<ChromiumBrowserWrapper> logger)
     {
-        this.BrowserHistoryManager = historyManager.ThrowIfNull();
-        this.browserExtensionsManager = browserExtensionsManager.ThrowIfNull();
         this.httpClient = httpClient.ThrowIfNull();
         this.liveOptions = liveOptions.ThrowIfNull();
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
         this.InitializeComponent();
 
-        this.BrowserHistoryManager.InitializeHistoryManager(this);
         this.initializationTask = Task.Run(this.InitializeBrowserSafe);
     }
 
@@ -221,7 +210,6 @@ public partial class ChromiumBrowserWrapper : UserControl
 
         this.ShowBrowserDisabledMessage = false;
         await this.WebBrowser.EnsureCoreWebView2Async(CoreWebView2Environment).ConfigureAwait(true);
-        await this.browserExtensionsManager.InitializeBrowserEnvironment(this.WebBrowser.CoreWebView2!.Profile, CoreWebView2Environment!.BrowserVersionString).ConfigureAwait(true);
         if (this.Address is not null &&
             Uri.TryCreate(this.Address, UriKind.RelativeOrAbsolute, out var uri))
         {
@@ -237,13 +225,11 @@ public partial class ChromiumBrowserWrapper : UserControl
             if ((e.Key == Key.Left && Keyboard.Modifiers == ModifierKeys.Alt) ||
                 (e.Key == Key.BrowserBack))
             {
-                this.BrowserHistoryManager.GoBack();
                 e.Handled = true; // Prevent default behavior
             }
             else if ((e.Key == Key.Right && Keyboard.Modifiers == ModifierKeys.Alt) ||
                      (e.Key == Key.BrowserForward))
             {
-                this.BrowserHistoryManager.GoForward();
                 e.Handled = true; // Prevent default behavior
             }
         };
@@ -454,14 +440,6 @@ public partial class ChromiumBrowserWrapper : UserControl
                 }
             });
         }
-        else if (payload?.Key is BrowserPayload.PayloadKeys.XButton1Pressed)
-        {
-            this.BrowserHistoryManager.GoBack();
-        }
-        else if (payload?.Key is BrowserPayload.PayloadKeys.XButton2Pressed)
-        {
-            this.BrowserHistoryManager.GoForward();
-        }
     }
 
     private void DownloadOperation_StateChanged(object? sender, object? e)
@@ -506,24 +484,8 @@ public partial class ChromiumBrowserWrapper : UserControl
             return;
         }
 
-        this.BrowserHistoryManager.UnInitializeHistoryManager();
         this.WebBrowser?.Dispose();
         this.browserInitialized = false;
-    }
-
-    private void BackButton_Clicked(object sender, EventArgs e)
-    {
-        this.BrowserHistoryManager.GoBack();
-    }
-
-    private void ForwardButton_Clicked(object sender, EventArgs e)
-    {
-        this.BrowserHistoryManager.GoForward();
-    }
-
-    private void RefreshGlyph_Clicked(object sender, EventArgs e)
-    {
-        this.BrowserHistoryManager.Reload();
     }
 
     private void CancelGlyph_Clicked(object sender, EventArgs e)

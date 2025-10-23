@@ -1,7 +1,4 @@
-﻿using Daybreak.Shared.Models.FocusView;
-using Daybreak.Shared.Models.LaunchConfigurations;
-using Daybreak.Shared.Services.Api;
-using Daybreak.Shared.Services.ApplicationLauncher;
+﻿using Daybreak.Shared.Services.Api;
 using Daybreak.Shared.Services.LaunchConfigurations;
 using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.Logging;

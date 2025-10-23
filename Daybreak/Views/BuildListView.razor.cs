@@ -4,7 +4,6 @@ using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.BuildTemplates;
 using Daybreak.Shared.Services.Toolbox;
 using Daybreak.Shared.Utils;
-using Microsoft.AspNetCore.Components;
 using System.Core.Extensions;
 using System.Extensions;
 using TrailBlazr.Services;

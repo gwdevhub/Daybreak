@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Models.LaunchConfigurations;
 using Daybreak.Shared.Models.Mods;
 using Daybreak.Shared.Services.Api;
@@ -44,6 +45,8 @@ public sealed class DaybreakApiService(
 
     public string Name { get; } = "Daybreak API";
 
+    public string Description { get; } = "Daybreak API integration with Guild Wars. Gets injected into Guild Wars to enable extended functionality such as loading builds, character switching, and more";
+
     public bool IsEnabled
     {
         get => this.liveUpdateableOptions.Value.Enabled;
@@ -55,8 +58,14 @@ public sealed class DaybreakApiService(
     }
 
     public bool IsInstalled { get; } = true;
+    public bool IsVisible { get; } = true;
 
     public IEnumerable<string> GetCustomArguments() => [];
+
+    public IProgressAsyncOperation<bool> PerformInstallation(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException("DaybreakApi mod does not support manual installation");
+    }
 
     public Task<ScopedApiContext?> AttachDaybreakApiContext(GuildWarsApplicationLaunchContext launchContext, ScopedApiContext apiContext, CancellationToken _)
     {

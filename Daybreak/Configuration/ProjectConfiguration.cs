@@ -56,8 +56,6 @@ using Daybreak.Services.ExecutableManagement;
 using Daybreak.Services.DirectSong;
 using Daybreak.Services.SevenZip;
 using Daybreak.Services.ReShade.Notifications;
-using Daybreak.Services.UBlockOrigin;
-using Daybreak.Services.Browser;
 using Daybreak.Services.ApplicationArguments;
 using Daybreak.Services.ApplicationArguments.ArgumentHandling;
 using Daybreak.Services.Toolbox.Notifications;
@@ -80,7 +78,6 @@ using Daybreak.Shared.Services.Credentials;
 using Daybreak.Shared.Services.Onboarding;
 using Daybreak.Shared.Services.Sounds;
 using Daybreak.Shared.Services.BuildTemplates;
-using Daybreak.Shared.Services.Browser;
 using Daybreak.Shared.Services.DSOAL;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.SevenZip;
@@ -115,7 +112,6 @@ using Daybreak.Services.MDns;
 using OpenTelemetry.Resources;
 using Daybreak.Services.Telemetry;
 using System.Reflection;
-using Version = Daybreak.Shared.Models.Versioning.Version;
 using Daybreak.Shared.Models.Plugins;
 using TrailBlazr.Extensions;
 using TrailBlazr.Services;
@@ -133,7 +129,6 @@ using Daybreak.Views.Trade;
 using Daybreak.Services.TradeChat.Models;
 using Daybreak.Views.Installation;
 using Daybreak.Views.Copy;
-using Daybreak.Views.Onboarding;
 
 namespace Daybreak.Configuration;
 
@@ -283,8 +278,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<PrivilegeContext>();
         services.AddSingleton<ViewRedirectContext>();
         services.AddSingleton<JSConsoleInterop>();
-        services.AddScoped<IBrowserExtensionsManager, BrowserExtensionsManager>();
-        services.AddScoped<IBrowserExtensionsProducer, BrowserExtensionsManager>(sp => sp.GetRequiredService<IBrowserExtensionsManager>().Cast<BrowserExtensionsManager>());
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
         services.AddScoped<IScreenshotProvider, ScreenshotProvider>();
@@ -315,7 +308,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IProcessInjector, ProcessInjector>();
         services.AddScoped<IStubInjector, StubInjector>();
         services.AddScoped<ILaunchConfigurationService, LaunchConfigurationService>();
-        services.AddScoped<IBrowserHistoryManager, BrowserHistoryManager>();
         services.AddScoped<IEventService, EventService>();
         services.AddScoped<IApplicationArgumentService, ApplicationArgumentService>();
         services.AddScoped<IArgumentHandlerProducer, IApplicationArgumentService>(sp => sp.GetRequiredService<IApplicationArgumentService>());
@@ -446,12 +438,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         modsManager.RegisterMod<IDirectSongService, DirectSongService>(singleton: true);
     }
 
-    public override void RegisterBrowserExtensions(IBrowserExtensionsProducer browserExtensionsProducer)
-    {
-        browserExtensionsProducer.ThrowIfNull();
-        browserExtensionsProducer.RegisterExtension<UBlockOriginService>();
-    }
-
     public override void RegisterLaunchArgumentHandlers(IArgumentHandlerProducer argumentHandlerProducer)
     {
         argumentHandlerProducer.ThrowIfNull();
@@ -561,10 +547,6 @@ public class ProjectConfiguration : PluginConfigurationBase
                 .Build()
             .RegisterHttpClient<UModService>()
                 .WithMessageHandler(SetupLoggingAndMetrics<UModService>)
-                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
-                .Build()
-            .RegisterHttpClient<UBlockOriginService>()
-                .WithMessageHandler(SetupLoggingAndMetrics<UBlockOriginService>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<DXVKService>()

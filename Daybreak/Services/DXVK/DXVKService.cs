@@ -1,6 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models.Mods;
-using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Services.Downloads;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Utils;
@@ -14,16 +13,14 @@ using System.Extensions.Core;
 using Daybreak.Shared.Models.Github;
 using System.Net.Http;
 using System.Extensions;
-using Version = Daybreak.Shared.Models.Versioning.Version;
-using Daybreak.Shared.Services.SevenZip;
 using System.Formats.Tar;
+using Daybreak.Shared.Models.Async;
 
 namespace Daybreak.Services.DXVK;
 /// <summary>
 /// Service for managing DXVK for GW1. https://github.com/doitsujin/dxvk
 /// </summary>
 internal sealed class DXVKService(
-    ISevenZipExtractor sevenZipExtractor,
     INotificationService notificationService,
     IDownloadService downloadService,
     IHttpClient<DXVKService> httpClient,
@@ -38,9 +35,13 @@ internal sealed class DXVKService(
     private const string DXVKDirectorySubpath = "DXVK";
     private const string D3D9Dll = "d3d9.dll";
 
+    private static readonly ProgressUpdate ProgressFailedToGetLatest = new(0, "Failed to get latest version");
+    private static readonly ProgressUpdate ProgressFailedDownload = new(0, "Failed to download files");
+    private static readonly ProgressUpdate ProgressUnpackingFiles = new(0, "Unpacking files");
+    private static readonly ProgressUpdate ProgressFinished = new(0, "Finished");
+
     private static readonly string DXVKDirectory = PathUtils.GetAbsolutePathFromRoot(DXVKDirectorySubpath);
 
-    private readonly ISevenZipExtractor sevenZipExtractor = sevenZipExtractor.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
     private readonly ILiveUpdateableOptions<DXVKOptions> options = options.ThrowIfNull();
@@ -48,6 +49,8 @@ internal sealed class DXVKService(
     private readonly ILogger<DXVKService> logger = logger.ThrowIfNull();
 
     public string Name => "DXVK";
+    public string Description { get; } = "Translation layer which converts DX9 3D calls to Vulkan. Can improve performance for some users";
+    public bool IsVisible { get; } = true;
     public bool IsEnabled
     {
         get => this.options.Value.Enabled;
@@ -60,7 +63,15 @@ internal sealed class DXVKService(
     public bool IsInstalled => Directory.Exists(this.options.Value.Path) &&
            File.Exists(Path.Combine(DXVKDirectory, D3D9Dll));
 
-    public async Task<bool> SetupDXVK(DXVKInstallationStatus dXVKInstallationStatus, CancellationToken cancellationToken)
+    public IProgressAsyncOperation<bool> PerformInstallation(CancellationToken cancellationToken)
+    {
+        return ProgressAsyncOperation.Create(async progress =>
+        {
+            return await this.SetupDXVK(progress, cancellationToken);
+        }, cancellationToken);
+    }
+
+    public async Task<bool> SetupDXVK(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
     {
         if (this.IsInstalled)
         {
@@ -73,24 +84,23 @@ internal sealed class DXVKService(
         if (latestVersion is null)
         {
             scopedLogger.LogError("Failed to get latest version");
-            dXVKInstallationStatus.CurrentStep = DXVKInstallationStatus.FailedToGetLatestVersion;
+            progress.Report(ProgressFailedToGetLatest);
             return false;
         }
 
-        latestVersion.HasPrefix = false;
         var downloadUrl = ReleaseUrl.Replace(TagPlaceholder, latestVersion.ToString());
-        if ((await this.downloadService.DownloadFile(downloadUrl, ArchiveName, dXVKInstallationStatus, cancellationToken)) is false)
+        if ((await this.downloadService.DownloadFile(downloadUrl, ArchiveName, progress, cancellationToken)) is false)
         {
             scopedLogger.LogError("Failed to install DXVK");
-            dXVKInstallationStatus.CurrentStep = DXVKInstallationStatus.FailedDownload;
+            progress.Report(ProgressFailedDownload);
             return false;
         }
 
         scopedLogger.LogDebug("Extracting DXVK files");
-        dXVKInstallationStatus.CurrentStep = DXVKInstallationStatus.ExtractingFiles;
+        progress.Report(ProgressUnpackingFiles);
         await this.ExtractFiles(latestVersion, cancellationToken);
 
-        dXVKInstallationStatus.CurrentStep = DXVKInstallationStatus.Finished;
+        progress.Report(ProgressFinished);
         return true;
     }
 

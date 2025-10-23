@@ -1,7 +1,6 @@
-﻿using Daybreak.Services.Guildwars.Models;
+﻿using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Models.Notifications;
 using Daybreak.Shared.Models.Notifications.Handling;
-using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Services.Guildwars;
 using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.Logging;
@@ -39,11 +38,10 @@ internal sealed class GuildWarsUpdateNotificationHandler(
             return;
         }
 
-        var status = new GuildwarsInstallationStatus();
+        var progress = new Progress<ProgressUpdate>();
         var cancellationTokenSource = new CancellationTokenSource();
-        var context = new GuildWarsDownloadContext { CancellationTokenSource = cancellationTokenSource, GuildwarsInstallationStatus = status };
         //this.viewManager.ShowView<GuildWarsDownloadView>(context);
-        var response = await this.guildWarsInstaller.UpdateGuildwars(path, status, cancellationTokenSource.Token);
+        var response = await this.guildWarsInstaller.UpdateGuildwars(path, progress, cancellationTokenSource.Token);
         scopedLogger.LogDebug($"Update result {response}");
     }
 }

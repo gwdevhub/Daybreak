@@ -1,4 +1,4 @@
-﻿using Daybreak.Shared.Models.Progress;
+﻿using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.Guildwars;
 using Microsoft.Extensions.Logging;
@@ -14,7 +14,13 @@ internal sealed class GuildWarsCopyService(
 {
     private const string ExecutableName = "Gw.exe";
 
-    private static readonly string[] FilesToCopy =
+    private readonly static ProgressUpdate ProgressInitializing = new(0, "Initializing copy");
+    private readonly static ProgressUpdate ProgressCompleted = new(1, "Copy completed");
+    private readonly static ProgressUpdate ProgressFailed = new(1, "Copy failed");
+    private readonly static ProgressUpdate ProgressCancelled = new(1, "Copy cancelled");
+    private static ProgressUpdate ProgressCopying(double progress) => new(progress, "Copying files");
+
+    private readonly static string[] FilesToCopy =
     [
         "Gw.dat",
         "Gw.exe",
@@ -24,75 +30,79 @@ internal sealed class GuildWarsCopyService(
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
     private readonly ILogger<GuildWarsCopyService> logger = logger.ThrowIfNull();
 
-    public async Task CopyGuildwars(string existingExecutable, CopyStatus copyStatus, CancellationToken cancellationToken)
+    public ProgressAsyncOperation<bool> CopyGuildwars(string existingExecutable, CancellationToken cancellationToken)
     {
-        copyStatus.CurrentStep = CopyStatus.InitializingCopy;
-        var sourceFolder = new FileInfo(existingExecutable).Directory;
-        if (sourceFolder?.Exists is not true)
+        return ProgressAsyncOperation.Create(async progress =>
         {
-            this.logger.LogError($"Source folder does not exist [{sourceFolder?.FullName}]");
-            copyStatus.CurrentStep = CopyStatus.CopyFailed;
-            return;
-        }
-
-        var totalBytesToCopy = 0d;
-        foreach(var file in FilesToCopy)
-        {
-            var completePath = Path.Combine(sourceFolder.FullName, file);
-            if (!File.Exists(completePath))
+            progress.Report(ProgressInitializing);
+            var sourceFolder = new FileInfo(existingExecutable).Directory;
+            if (sourceFolder?.Exists is not true)
             {
-                this.logger.LogError($"Source folder does not contain required file [{file}]");
-                copyStatus.CurrentStep = CopyStatus.CopyFailed;
-                return;
+                this.logger.LogError($"Source folder does not exist [{sourceFolder?.FullName}]");
+                progress.Report(ProgressFailed);
+                return false;
             }
 
-            var fi = new FileInfo(completePath);
-            totalBytesToCopy += fi.Length;
-        }
-
-        if (!TryGetDestinationPath(out var destinationPath))
-        {
-            this.logger.LogDebug("Copy cancelled. Destination path selection cancelled");
-            copyStatus.CurrentStep = CopyStatus.CopyFailed;
-            return;
-        }
-
-        var destinationFolder = new DirectoryInfo(destinationPath);
-        Directory.CreateDirectory(destinationFolder.FullName);
-        var buffer = new Memory<byte>(new byte[16777216]);
-        var totalBytesCopied = 0d;
-        foreach (var sourceFile in FilesToCopy)
-        {
-            var completeSourcePath = Path.Combine(sourceFolder.FullName, sourceFile);
-            var completeDestinationPath = Path.Combine(destinationFolder.FullName, sourceFile);
-            using var sourceFileStream = File.OpenRead(completeSourcePath);
-            using var destinationFileStream = File.OpenWrite(completeDestinationPath);
-            int bytesRead;
-            do
+            var totalBytesToCopy = 0d;
+            foreach (var file in FilesToCopy)
             {
-                if (cancellationToken.IsCancellationRequested)
+                var completePath = Path.Combine(sourceFolder.FullName, file);
+                if (!File.Exists(completePath))
                 {
-                    this.logger.LogError("Copy cancelled. CancellationToken cancelled");
-                    copyStatus.CurrentStep = CopyStatus.CopyCancelled;
-                    return;
+                    this.logger.LogError($"Source folder does not contain required file [{file}]");
+                    progress.Report(ProgressFailed);
+                    return false;
                 }
 
-                bytesRead = await sourceFileStream.ReadAsync(buffer, cancellationToken);
-                if (bytesRead > 0)
+                var fi = new FileInfo(completePath);
+                totalBytesToCopy += fi.Length;
+            }
+
+            if (!TryGetDestinationPath(out var destinationPath))
+            {
+                this.logger.LogDebug("Copy cancelled. Destination path selection cancelled");
+                progress.Report(ProgressCancelled);
+                return false;
+            }
+
+            var destinationFolder = new DirectoryInfo(destinationPath);
+            Directory.CreateDirectory(destinationFolder.FullName);
+            var buffer = new Memory<byte>(new byte[16777216]);
+            var totalBytesCopied = 0d;
+            foreach (var sourceFile in FilesToCopy)
+            {
+                var completeSourcePath = Path.Combine(sourceFolder.FullName, sourceFile);
+                var completeDestinationPath = Path.Combine(destinationFolder.FullName, sourceFile);
+                using var sourceFileStream = File.OpenRead(completeSourcePath);
+                using var destinationFileStream = File.OpenWrite(completeDestinationPath);
+                int bytesRead;
+                do
                 {
-                    await destinationFileStream.WriteAsync(buffer, cancellationToken);
-                }
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        this.logger.LogError("Copy cancelled. CancellationToken cancelled");
+                        progress.Report(ProgressCancelled);
+                        return false;
+                    }
 
-                totalBytesCopied += bytesRead;
-                copyStatus.CurrentStep = CopyStatus.Copying(totalBytesCopied / totalBytesToCopy);
-            } while (bytesRead > 0);
-        }
+                    bytesRead = await sourceFileStream.ReadAsync(buffer, cancellationToken);
+                    if (bytesRead > 0)
+                    {
+                        await destinationFileStream.WriteAsync(buffer, cancellationToken);
+                    }
 
-        var finalPath = Path.Combine(destinationFolder.FullName, ExecutableName);
-        this.guildWarsExecutableManager.AddExecutable(finalPath);
+                    totalBytesCopied += bytesRead;
+                    progress.Report(ProgressCopying(totalBytesCopied / totalBytesToCopy));
+                } while (bytesRead > 0);
+            }
 
-        this.logger.LogDebug("Copy succeeded");
-        copyStatus.CurrentStep = CopyStatus.CopyFinished;
+            var finalPath = Path.Combine(destinationFolder.FullName, ExecutableName);
+            this.guildWarsExecutableManager.AddExecutable(finalPath);
+
+            this.logger.LogDebug("Copy succeeded");
+            progress.Report(ProgressCancelled);
+            return true;
+        }, cancellationToken);
     }
 
     private static bool TryGetDestinationPath(out string path)

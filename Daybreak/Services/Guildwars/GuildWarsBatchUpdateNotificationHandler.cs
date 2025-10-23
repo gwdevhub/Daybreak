@@ -1,8 +1,6 @@
-﻿using Daybreak.Services.Guildwars.Models;
-using Daybreak.Shared.Models;
+﻿using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Notifications;
 using Daybreak.Shared.Models.Notifications.Handling;
-using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.Guildwars;
 using Daybreak.Shared.Services.Notifications;
@@ -11,6 +9,8 @@ using System.Core.Extensions;
 using System.Extensions;
 
 namespace Daybreak.Services.Guildwars;
+
+//TODO: Re-enable view manager and download view when implemented
 internal sealed class GuildWarsBatchUpdateNotificationHandler(
     //IViewManager viewManager,
     IGuildWarsInstaller guildWarsInstaller,
@@ -37,9 +37,7 @@ internal sealed class GuildWarsBatchUpdateNotificationHandler(
         }
 
         var updateList = new List<GuildWarsUpdateRequest>();
-        var status = new GuildwarsInstallationStatus();
         var cancellationTokenSource = new CancellationTokenSource();
-        var context = new GuildWarsDownloadContext { CancellationTokenSource = cancellationTokenSource, GuildwarsInstallationStatus = status };
         foreach(var executable in this.guildWarsExecutableManager.GetExecutableList())
         {
             if (await this.guildWarsInstaller.GetVersionId(executable, CancellationToken.None) is int version &&
@@ -52,7 +50,6 @@ internal sealed class GuildWarsBatchUpdateNotificationHandler(
             {
                 ExecutablePath = executable,
                 CancellationToken = cancellationTokenSource.Token,
-                Status = status
             });
         }
 

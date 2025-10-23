@@ -3,9 +3,9 @@ using Daybreak.Services.ExceptionHandling;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Telemetry;
 using Daybreak.Shared;
-using Daybreak.Shared.Models.Progress;
+using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Services.ApplicationArguments;
-using Daybreak.Shared.Services.Browser;
 using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Mods;
 using Daybreak.Shared.Services.Notifications;
@@ -27,7 +27,6 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
-using System.Windows.Media;
 using WpfExtended.Blazor.Launch;
 
 //The following lines are needed to expose internal objects to the test project
@@ -41,6 +40,19 @@ namespace Daybreak.Launch;
 
 public sealed class Launcher : BlazorHybridApplication<App>
 {
+    private static readonly ProgressUpdate ProgressLoadOptions = new(0, "Loading options");
+    private static readonly ProgressUpdate ProgressLoadThemes = new(0.1, "Loading themes");
+    private static readonly ProgressUpdate ProgressLoadingViews = new(0.2, "Loading views");
+    private static readonly ProgressUpdate ProgressLoadPostUpdateActions = new(0.3, "Loading post-update actions");
+    private static readonly ProgressUpdate ProgressLoadStartupActions = new(0.4, "Loading startup actions");
+    private static readonly ProgressUpdate ProgressLoadNotificationHandlers = new(0.5, "Loading notification handlers");
+    private static readonly ProgressUpdate ProgressLoadMods = new(0.6, "Loading mods");
+    private static readonly ProgressUpdate ProgressLoadArgumentHandlers = new(0.8, "Loading argument handlers");
+    private static readonly ProgressUpdate ProgressLoadMenuButtons = new(0.9, "Loading menu buttons");
+    private static readonly ProgressUpdate ProgressLoadPlugins = new(0.95, "Loading plugins");
+    private static readonly ProgressUpdate ProgressExecuteArgumentHandlers = new(0.99, "Executing argument handlers");
+    private static readonly ProgressUpdate ProgressFinished = new(1.0, "Finished");
+
     public static Launcher Instance { get; private set; } = default!;
     public override bool DevToolsEnabled { get; } = true;
     public override string HostPage { get; } = "wwwroot/Index.html";
@@ -74,7 +86,7 @@ public sealed class Launcher : BlazorHybridApplication<App>
         var serviceManager = new ServiceManager();
         this.projectConfiguration.RegisterResolvers(serviceManager);
         serviceManager.RegisterSingleton<SplashWindow>();
-        serviceManager.RegisterSingleton<StartupStatus>();
+        serviceManager.RegisterSingleton<StartupContext>();
         return services.BuildSlimServiceProvider(serviceManager);
     }
 
@@ -102,8 +114,8 @@ public sealed class Launcher : BlazorHybridApplication<App>
          */
 
         var optionsProducer = this.ServiceProvider.GetRequiredService<IOptionsProducer>();
-        var startupStatus = this.ServiceProvider.GetRequiredService<StartupStatus>();
-        startupStatus.CurrentStep = StartupStatus.Custom("Loading options");
+        var startupContext = this.ServiceProvider.GetRequiredService<StartupContext>();
+        startupContext.ProgressUpdate = ProgressLoadOptions;
         this.projectConfiguration.RegisterOptions(optionsProducer);
 
         /*
@@ -112,7 +124,7 @@ public sealed class Launcher : BlazorHybridApplication<App>
          * initializing the options.
          */
         this.ServiceProvider.GetRequiredService<ISplashScreenService>().ShowSplashScreen();
-        await this.InitializeApplicationServices(startupStatus, optionsProducer);
+        await this.InitializeApplicationServices(startupContext, optionsProducer);
     }
 
     protected override void ApplicationClosing()
@@ -131,7 +143,7 @@ public sealed class Launcher : BlazorHybridApplication<App>
         this.logger?.LogCritical("WebView2 process failed.\nExit Code: {exitCode}\nSource: {source}\nKind: {kind}\nReason: {reason}\nFrame Infos: {frameInfos}\nProcess Description: {processDescription}", e.ExitCode, e.FailureSourceModulePath, e.ProcessFailedKind, e.Reason, e.FrameInfosForFailedProcess, e.ProcessDescription);
     }
 
-    private async ValueTask InitializeApplicationServices(StartupStatus startupStatus, IOptionsProducer optionsProducer)
+    private async ValueTask InitializeApplicationServices(StartupContext startupContext, IOptionsProducer optionsProducer)
     {
         var telemetryHost = this.ServiceProvider.GetRequiredService<TelemetryHost>();
         var serviceManager = this.ServiceProvider.GetRequiredService<IServiceManager>();
@@ -140,7 +152,6 @@ public sealed class Launcher : BlazorHybridApplication<App>
         var startupActionProducer = this.ServiceProvider.GetRequiredService<IStartupActionProducer>();
         var notificationHandlerProducer = this.ServiceProvider.GetRequiredService<INotificationHandlerProducer>();
         var modsManager = this.ServiceProvider.GetRequiredService<IModsManager>();
-        var browserExtensionsProducer = this.ServiceProvider.GetRequiredService<IBrowserExtensionsProducer>();
         var argumentHandlerProducer = this.ServiceProvider.GetRequiredService<IArgumentHandlerProducer>();
         var menuServiceProducer = this.ServiceProvider.GetRequiredService<IMenuServiceProducer>();
         var themeProducer = this.ServiceProvider.GetRequiredService<IThemeProducer>();
@@ -153,39 +164,35 @@ public sealed class Launcher : BlazorHybridApplication<App>
         });
         await Task.Delay(10);
 
-        startupStatus.CurrentStep = StartupStatus.Custom("Loading themes");
+        startupContext.ProgressUpdate = ProgressLoadThemes;
         this.projectConfiguration.RegisterThemes(themeProducer);
         await Task.Delay(10);
 
-        startupStatus.CurrentStep = StartupStatus.Custom("Loading views");
+        startupContext.ProgressUpdate = ProgressLoadingViews;
         this.projectConfiguration.RegisterViews(viewProducer);
         await Task.Delay(10);
 
-        startupStatus.CurrentStep = StartupStatus.Custom("Loading post-update actions");
+        startupContext.ProgressUpdate = ProgressLoadPostUpdateActions;
         this.projectConfiguration.RegisterPostUpdateActions(postUpdateActionProducer);
         await Task.Delay(10);
 
-        startupStatus.CurrentStep = StartupStatus.Custom("Loading startup actions");
+        startupContext.ProgressUpdate = ProgressLoadStartupActions;
         this.projectConfiguration.RegisterStartupActions(startupActionProducer);
         await Task.Delay(10);
 
-        startupStatus.CurrentStep = StartupStatus.Custom("Loading notification handlers");
+        startupContext.ProgressUpdate = ProgressLoadNotificationHandlers;
         this.projectConfiguration.RegisterNotificationHandlers(notificationHandlerProducer);
         await Task.Delay(10);
 
-        startupStatus.CurrentStep = StartupStatus.Custom("Loading mods");
+        startupContext.ProgressUpdate = ProgressLoadMods;
         this.projectConfiguration.RegisterMods(modsManager);
         await Task.Delay(10);
 
-        startupStatus.CurrentStep = StartupStatus.Custom("Loading browser extensions");
-        this.projectConfiguration.RegisterBrowserExtensions(browserExtensionsProducer);
-        await Task.Delay(10);
-
-        startupStatus.CurrentStep = StartupStatus.Custom("Loading argument handlers");
+        startupContext.ProgressUpdate = ProgressLoadArgumentHandlers;
         this.projectConfiguration.RegisterLaunchArgumentHandlers(argumentHandlerProducer);
         await Task.Delay(10);
 
-        startupStatus.CurrentStep = StartupStatus.Custom("Loading menu buttons");
+        startupContext.ProgressUpdate = ProgressLoadMenuButtons;
         this.projectConfiguration.RegisterMenuButtons(menuServiceProducer);
         await Task.Delay(10);
 
@@ -194,7 +201,7 @@ public sealed class Launcher : BlazorHybridApplication<App>
         this.exceptionHandler = this.ServiceProvider.GetRequiredService<IExceptionHandler>();
         try
         {
-            startupStatus.CurrentStep = StartupStatus.Custom("Loading plugins");
+            startupContext.ProgressUpdate = ProgressLoadPlugins;
             this.ServiceProvider.GetRequiredService<IPluginsService>()
                 .LoadPlugins(
                     serviceManager,
@@ -204,7 +211,6 @@ public sealed class Launcher : BlazorHybridApplication<App>
                     startupActionProducer,
                     notificationHandlerProducer,
                     modsManager,
-                    browserExtensionsProducer,
                     argumentHandlerProducer,
                     menuServiceProducer,
                     themeProducer);
@@ -216,11 +222,11 @@ public sealed class Launcher : BlazorHybridApplication<App>
             this.exceptionHandler.HandleException(e);
         }
 
-        startupStatus.CurrentStep = StartupStatus.Custom("Executing argument handlers");
+        startupContext.ProgressUpdate = ProgressExecuteArgumentHandlers;
         this.ServiceProvider.GetRequiredService<IApplicationArgumentService>().HandleArguments(this.launchArguments);
         await Task.Delay(10);
 
-        startupStatus.CurrentStep = StartupStatus.Finished;
+        startupContext.ProgressUpdate = ProgressFinished;
         await Task.Delay(10);
     }
 

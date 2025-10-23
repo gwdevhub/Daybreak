@@ -9,7 +9,6 @@ using Daybreak.Shared.Services.Mods;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Utils;
-using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System.ComponentModel;

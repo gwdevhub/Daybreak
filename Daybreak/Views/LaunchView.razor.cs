@@ -8,7 +8,6 @@ using Daybreak.Shared.Services.ApplicationLauncher;
 using Daybreak.Shared.Services.LaunchConfigurations;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Onboarding;
-using Daybreak.Views.Onboarding;
 using Microsoft.Extensions.Options;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
