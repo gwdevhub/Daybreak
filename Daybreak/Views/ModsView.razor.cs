@@ -11,6 +11,12 @@ public sealed class ModsViewModel(IModsManager modsManager)
 
     public override ValueTask ParametersSet(ModsView view, CancellationToken cancellationToken)
     {
+        this.Mods = [.. this.modService.GetMods()];
         return base.ParametersSet(view, cancellationToken);
+    }
+
+    public void ToggleMod(IModService mod)
+    {
+        
     }
 }

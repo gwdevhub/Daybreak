@@ -350,6 +350,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<TradeMessageView, TradeMessageViewModel>();
         viewProducer.RegisterView<TradeQuoteView, TradeQuoteViewModel>();
         viewProducer.RegisterView<LauncherOnboardingView, LauncherOnboardingViewModel>();
+        viewProducer.RegisterView<ModsView, ModsViewModel>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -449,11 +450,12 @@ public class ProjectConfiguration : PluginConfigurationBase
         menuServiceProducer.ThrowIfNull();
         menuServiceProducer.CreateIfNotExistCategory("Launcher")
             .RegisterButton("Notifications", "Open notifications view", sp => { })
-            .RegisterButton("Plugins", "Open plugins view", sp => sp.GetRequiredService<ViewManager>().ShowView<PluginsView>())
+            .RegisterButton("Manage Plugins", "Open plugins view", sp => sp.GetRequiredService<ViewManager>().ShowView<PluginsView>())
             .RegisterButton("Manage client version", "Open version manager", sp => sp.GetRequiredService<ViewManager>().ShowView<VersionManagementView>());
         menuServiceProducer.CreateIfNotExistCategory("Guild Wars")
             .RegisterButton("Game companion", "Open game companion", sp => sp.GetRequiredService<IViewManager>().ShowView<LaunchView>())
             .RegisterButton("Manage builds", "Open builds manager", sp => sp.GetRequiredService<IViewManager>().ShowView<BuildListView>())
+            .RegisterButton("Manage Mods", "Open Guild Wars mods manager", sp => sp.GetRequiredService<IViewManager>().ShowView<ModsView>())
             .RegisterButton("Download Guild Wars", "Download Guild Wars installer", sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsDownloadView>())
             .RegisterButton("Copy Guild Wars", "Copy Guild Wars from an existing installation", sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsCopySelectionView>())
             .RegisterButton("Event Calendar", "Show current and upcoming events", sp => sp.GetRequiredService<IViewManager>().ShowView<EventCalendarView>())
@@ -462,13 +464,6 @@ public class ProjectConfiguration : PluginConfigurationBase
             .RegisterButton("Alerts", "Open trade alerts manager", sp => sp.GetRequiredService<IViewManager>().ShowView<TradeAlertsView>())
             .RegisterButton("Kamadan", "Open kamadan trade chat", sp => sp.GetRequiredService<IViewManager>().ShowView<TradeChatView>((nameof(TradeChatView.Source), nameof(TraderSource.Kamadan))))
             .RegisterButton("Ascalon", "Open ascalon trade chat", sp => sp.GetRequiredService<IViewManager>().ShowView<TradeChatView>((nameof(TradeChatView.Source), nameof(TraderSource.Ascalon))));
-        menuServiceProducer.CreateIfNotExistCategory("Mods")
-            .RegisterButton("uMod", "Open uMod manager", sp => { })
-            .RegisterButton("GWToolboxpp", "Open GWToolbox manager", sp => { })
-            .RegisterButton("DSOAL", "Open DSOAL manager", sp => { })
-            .RegisterButton("ReShade", "Open ReShade manager", sp => { })
-            .RegisterButton("DirectSong", "Open DirectSong manager", sp => { })
-            .RegisterButton("DXVK", "Open DXVK manager", sp => { });
         menuServiceProducer.CreateIfNotExistCategory("Settings")
             .RegisterButton("Accounts", "Accounts Settings", sp => sp.GetRequiredService<IViewManager>().ShowView<AccountsView>())
             .RegisterButton("Executables", "Executables Settings", sp => sp.GetRequiredService<IViewManager>().ShowView<ExecutablesView>())
