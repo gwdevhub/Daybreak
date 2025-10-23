@@ -54,10 +54,10 @@
 
 .mod-not-installed {
     border-color: var(--accent-fill-rest);
-    color: var(--foreground-on-accent-rest);
+    color: var(--neutral-foreground-rest);
     border-style: dashed;
     padding: 0.25rem 0.75rem;
-    background: var(--accent-fill-rest);
+    background: var(--neutral-fill-stealth-rest);
     border-radius: 12px;
     font-size: var(--font-size-small);
     margin-left: 1rem;

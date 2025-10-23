@@ -1,0 +1,18 @@
+﻿<div class="stretch-container backdrop-panel">
+    <div class="title-bar-header">
+        @(this.ViewModel.Mod?.Name ?? string.Empty)
+    </div>
+    <div class="center-container min-half-width">
+        <ProgressComponent Progress="@this.ViewModel.Progress"
+                           Description="@this.ViewModel.Description"
+                           ContinueEnabled="@this.ViewModel.ContinueEnabled"
+                           Continue="@this.ViewModel.Continue" />
+    </div>
+</div>
+
+@page "/mod-installation/{Name}"
+@inherits ViewBase<ModInstallationView, ModInstallationViewModel>
+@code {
+    [Parameter]
+    public required string Name { get; init; }
+}

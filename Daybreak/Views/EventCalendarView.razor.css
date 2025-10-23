@@ -20,7 +20,7 @@
 
 .panel-header h3 {
     margin: 0;
-    font-size: 1.2rem;
+    font-size: var(--font-size-large);
     font-weight: 600;
 }
 
@@ -59,7 +59,7 @@
 
 .event-title {
     font-weight: 600;
-    font-size: 1rem;
+    font-size: var(--font-size-large);
     color: var(--neutral-foreground-rest);
 }
 
@@ -72,7 +72,7 @@
 .status-badge {
     padding: 0.125rem 0.5rem;
     border-radius: 12px;
-    font-size: 0.75rem;
+    font-size: var(--font-size-small);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -89,14 +89,14 @@
 }
 
 .event-description {
-    font-size: 0.875rem;
+    font-size: var(--font-size-small);
     color: var(--neutral-foreground-hint);
     line-height: 1.4;
     margin-bottom: 0.5rem;
 }
 
 .event-dates {
-    font-size: 0.8rem;
+    font-size: var(--font-size-small);
     color: var(--neutral-foreground-disabled);
     font-weight: 500;
 }
@@ -119,7 +119,7 @@
 
 .calendar-header h3 {
     margin: 0;
-    font-size: 1.2rem;
+    font-size: var(--font-size-large);
     font-weight: 600;
     color: var(--neutral-foreground-rest);
 }
@@ -138,7 +138,7 @@
     padding: 0.5rem;
     text-align: center;
     font-weight: 600;
-    font-size: 0.875rem;
+    font-size: var(--font-size-small);
     color: var(--neutral-foreground-hint);
 }
 
@@ -194,7 +194,7 @@
 .event-indicator.more {
     background: var(--neutral-fill-strong-rest);
     color: var(--neutral-foreground-on-accent-rest);
-    font-size: 0.6rem;
+    font-size: var(--font-size-small);
     width: auto;
     height: auto;
     padding: 1px 3px;

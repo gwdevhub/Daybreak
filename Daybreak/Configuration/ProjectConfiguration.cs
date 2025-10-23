@@ -351,6 +351,8 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<TradeQuoteView, TradeQuoteViewModel>();
         viewProducer.RegisterView<LauncherOnboardingView, LauncherOnboardingViewModel>();
         viewProducer.RegisterView<ModsView, ModsViewModel>();
+        viewProducer.RegisterView<ModInstallationView, ModInstallationViewModel>();
+        viewProducer.RegisterView<ModInstallationConfirmationView, ModInstallationConfirmationViewModel>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)

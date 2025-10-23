@@ -1,10 +1,14 @@
 ﻿using Daybreak.Shared.Services.Mods;
+using TrailBlazr.Services;
 using TrailBlazr.ViewModels;
 
 namespace Daybreak.Views;
-public sealed class ModsViewModel(IModsManager modsManager)
+public sealed class ModsViewModel(
+    IViewManager viewManager,
+    IModsManager modsManager)
     : ViewModelBase<ModsViewModel, ModsView>
 {
+    private readonly IViewManager viewManager = viewManager;
     private readonly IModsManager modService = modsManager;
 
     public IEnumerable<IModService> Mods { get; private set; } = [];
@@ -19,7 +23,7 @@ public sealed class ModsViewModel(IModsManager modsManager)
     {
         if (!mod.IsInstalled)
         {
-            //TODO: Handle mod installation flow
+            this.viewManager.ShowView<ModInstallationConfirmationView>((nameof(ModInstallationConfirmationView.Name), mod.Name));
             return;
         }
 

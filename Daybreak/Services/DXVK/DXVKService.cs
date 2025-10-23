@@ -227,19 +227,22 @@ internal sealed class DXVKService(
         var latestRelease = releasesList?
             .Select(t => t.Ref?.Replace("refs/tags/", ""))
             .OfType<string>()
+            .Select(t =>
+            {
+                var parseResult = Version.TryParse(t.TrimStart('v'), out var parsedVersion);
+                return (parseResult, parsedVersion);
+            })
+            .Where(t => t.parseResult)
+            .OrderBy(t => t.parsedVersion)
             .LastOrDefault();
-        if (latestRelease is not string tag)
+
+        if (latestRelease is null)
         {
-            scopedLogger.LogError("Could not parse version list. No latest version found");
+            scopedLogger.LogError("No valid releases found");
             return default;
         }
 
-        if (!Version.TryParse(tag, out var version))
-        {
-            scopedLogger.LogError("Could not parse version from tag {tag}", tag);
-            return default;
-        }
-
+        var (_, version) = latestRelease.Value;
         return version;
     }
 }

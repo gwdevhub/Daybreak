@@ -31,3 +31,7 @@ p {
     justify-content: center;
     column-gap: 30%;
 }
+
+::deep .button-group * {
+    font-size: var(--font-size-medium) !important;
+}

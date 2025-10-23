@@ -45,7 +45,7 @@
 }
 
 .loading-text {
-    font-size: 14px;
+    font-size: var(--font-size-medium);
     color: var(--neutral-foreground-rest);
     opacity: 0.8;
 }

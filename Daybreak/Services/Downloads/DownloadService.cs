@@ -41,7 +41,7 @@ internal sealed class DownloadService(
             return false;
         }
 
-        using var downloadStream = await this.httpClient.GetStreamAsync(downloadUri);
+        using var downloadStream = await response.Content.ReadAsStreamAsync(cancellationToken);
         this.logger.LogDebug("Beginning download");
         var fileInfo = new FileInfo(destinationPath);
         fileInfo.Directory?.Create();

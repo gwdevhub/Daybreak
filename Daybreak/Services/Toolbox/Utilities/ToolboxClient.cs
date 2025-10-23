@@ -94,21 +94,26 @@ internal sealed class ToolboxClient(
 
         var responseString = await getListResponse.Content.ReadAsStringAsync(cancellationToken);
         var releasesList = responseString.Deserialize<List<GithubRefTag>>();
-        var latestRelease = releasesList?.Where(t => t.Ref?.Contains("Release") is true)
+        var latestReleaseTuple = releasesList?.Where(t => t.Ref?.Contains("Release") is true)
             .Select(t => t.Ref?.Replace("refs/tags/", ""))
             .OfType<string>()
-            .LastOrDefault(); // Replace _Release with -Release for the Version parser
-        if (latestRelease?.Replace('_', '-').ToLowerInvariant() is not string tag)
+            .Select(t => (t, t.Replace("_Release", "")))
+            .Select(t =>
+            {
+                var parseResult = Version.TryParse(t.Item2, out var parsedVersion);
+                return (parseResult, parsedVersion, t.t);
+            })
+            .Where(t => t.parseResult)
+            .OrderByDescending(t => t.parsedVersion)
+            .FirstOrDefault();
+
+        if (latestReleaseTuple is null)
         {
-            scopedLogger.LogError("Could not parse version list. No latest version found");
+            scopedLogger.LogError("No valid releases found");
             return default;
         }
 
-        if (!Version.TryParse(tag, out var toolboxVersion))
-        {
-            scopedLogger.LogError("Could not parse version. No latest version found");
-        }
-
-        return (toolboxVersion, latestRelease);
+        var (parseResult, latestReleaseVersion, latestReleaseTag) = latestReleaseTuple.Value;
+        return (latestReleaseVersion, latestReleaseTag);
     }
 }

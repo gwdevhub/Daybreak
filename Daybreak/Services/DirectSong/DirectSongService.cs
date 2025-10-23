@@ -177,8 +177,10 @@ internal sealed class DirectSongService(
             progress.Report(ProgressUnpacking(progressValue));
         }, cancellationToken))
         {
+            //TODO: Better handle corrupted downloaded archives
             scopedLogger.LogError("Extraction failed");
             progress.Report(ProgressFailed);
+            File.Delete(destinationPath);
             return false;
         }
 

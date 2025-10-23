@@ -36,7 +36,6 @@
 }
 
 .progress-percentage {
-    font-size: var(--type-ramp-base-font-size);
     font-weight: 600;
     color: var(--neutral-foreground-rest);
     text-align: center;
