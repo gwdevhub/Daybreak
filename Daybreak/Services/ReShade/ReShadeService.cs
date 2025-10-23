@@ -68,7 +68,8 @@ internal sealed class ReShadeService(
 
     public string Name => "ReShade";
     public string Description => "ReShade is an advanced, fully generic post-processing injector for games and video software developed by crosire.";
-    public bool IsVisible { get; } = true;
+    public bool IsVisible => true;
+    public bool CanCustomManage => true;
     public bool IsEnabled
     {
         get => this.liveUpdateableOptions.Value.Enabled;
@@ -119,6 +120,12 @@ internal sealed class ReShadeService(
         {
             return await this.SetupReShade(progress, cancellationToken);
         }, cancellationToken);
+    }
+
+    public Task OnCustomManagement(CancellationToken cancellationToken)
+    {
+        //TODO: ReShade custom management view
+        return Task.CompletedTask;
     }
 
     public IEnumerable<string> GetCustomArguments() => [];

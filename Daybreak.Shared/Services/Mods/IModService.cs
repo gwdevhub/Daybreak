@@ -31,6 +31,11 @@ public interface IModService
     bool IsVisible { get; }
 
     /// <summary>
+    /// Dictates if the mod has custom management.
+    /// </summary>
+    bool CanCustomManage { get; }
+
+    /// <summary>
     /// Called by the mod manager to perform installation steps for the mod.
     /// </summary>
     /// <returns>Returns an awaitable <see cref="IProgressAsyncOperation{bool}"/></returns>
@@ -77,4 +82,12 @@ public interface IModService
     /// Use this method to re-inject or re-apply the mod to the running Guild Wars process.
     /// </summary>
     Task OnGuildWarsRunning(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Called when the user requests custom management of the mod.
+    /// </summary>
+    /// <remarks>
+    /// This method is only called if <see cref="CanCustomManage"/> is true.
+    /// </remarks>
+    Task OnCustomManagement(CancellationToken cancellationToken);
 }

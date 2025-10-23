@@ -50,6 +50,7 @@ internal sealed class DirectSongService(
     public string Name => "DirectSong";
     public string Description => "Enables custom Guild Wars soundtrack composed by Jeremy Soule";
     public bool IsVisible => true;
+    public bool CanCustomManage => false;
     public bool IsEnabled
     {
         get => this.options.Value.Enabled;
@@ -70,6 +71,11 @@ internal sealed class DirectSongService(
         {
             return await Task.Factory.StartNew(() => this.SetupDirectSong(progress, cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap();
         }, cancellationToken);
+    }
+
+    public Task OnCustomManagement(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException("DirectSong does not support custom management");
     }
 
     public IEnumerable<string> GetCustomArguments() => [];

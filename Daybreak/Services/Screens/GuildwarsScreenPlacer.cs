@@ -19,9 +19,9 @@ internal sealed class GuildwarsScreenPlacer(
     private readonly IScreenManager screenManager = screenManager.ThrowIfNull();
     private readonly ILogger<GuildwarsScreenPlacer> logger = logger.ThrowIfNull();
 
-    public string Name => "Screen placer";
-    public string Description => "Moves the Guildwars window to the desired screen on launch.";
-    public bool IsVisible => false;
+    public string Name => "Auto screen placer";
+    public string Description => "Moves the Guildwars window to the desired screen on launch";
+    public bool IsVisible => true;
     public bool IsEnabled
     {
         get => this.liveOptions.Value.SetGuildwarsWindowSizeOnLaunch;
@@ -31,12 +31,18 @@ internal sealed class GuildwarsScreenPlacer(
             this.liveOptions.UpdateOption();
         }
     }
-
+    public bool CanCustomManage => true;
     public bool IsInstalled => true;
 
     public IProgressAsyncOperation<bool> PerformInstallation(CancellationToken cancellationToken)
     {
         throw new NotImplementedException("GuildwarsScreenPlacer does not support manual installation.");
+    }
+
+    public Task OnCustomManagement(CancellationToken cancellationToken)
+    {
+        //TODO: Implement custom management UI
+        return Task.CompletedTask;
     }
 
     public Task<bool> ShouldRunAgain(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken) => Task.FromResult(false);

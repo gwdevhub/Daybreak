@@ -56,6 +56,7 @@ internal sealed class ToolboxService(
     public string Name => "GWToolbox";
     public string Description => "GWToolboxpp is a popular third-party mod for Guild Wars that enhances the game's user interface and provides various quality-of-life improvements.";
     public bool IsVisible => true;
+    public bool CanCustomManage => false;
     public bool IsEnabled
     {
         get => this.toolboxOptions.Value.Enabled;
@@ -73,6 +74,11 @@ internal sealed class ToolboxService(
         {
             return await Task.Factory.StartNew(() => this.SetupToolbox(progress, cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap();
         }, cancellationToken);
+    }
+
+    public Task OnCustomManagement(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException("Toolbox mod does not support custom management");
     }
 
     public Task<bool> ShouldRunAgain(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken)

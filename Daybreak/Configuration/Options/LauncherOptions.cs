@@ -6,6 +6,7 @@ namespace Daybreak.Configuration.Options;
 [OptionsName(Name = "Launcher")]
 public sealed class LauncherOptions
 {
+    //TODO: Remove DynamicBackground after UI migration
     [JsonProperty(nameof(DynamicBackgrounds))]
     [OptionName(Name = "Dyamic Backgrounds", Description = "If enabled, Daybreak will periodically change the background image. Otherwise, Daybreak will show a plain background")]
     [OptionSynchronizationIgnore]

@@ -49,7 +49,8 @@ internal sealed class UModService(
 
     public string Name => "gMod";
     public string Description => "gMod (formerly uMod) is a mod loader for Guild Wars that allows you to load custom textures and mods into the game";
-    public bool IsVisible { get; }
+    public bool IsVisible => true;
+    public bool CanCustomManage => true;
     public bool IsEnabled
     {
         get => this.uModOptions.Value.Enabled;
@@ -74,6 +75,11 @@ internal sealed class UModService(
         {
             return await Task.Factory.StartNew(() => this.SetupUMod(progress, cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap();
         }, cancellationToken);
+    }
+
+    public Task OnCustomManagement(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
     }
 
     public IEnumerable<string> GetCustomArguments() => [];

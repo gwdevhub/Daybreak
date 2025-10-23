@@ -21,6 +21,7 @@ internal sealed class GuildWarsVersionChecker(
     public bool IsVisible => false;
     public bool IsEnabled { get; set; } = true;
     public bool IsInstalled => true;
+    public bool CanCustomManage => false;
 
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
     private readonly IGuildWarsInstaller guildWarsInstaller = guildWarsInstaller.ThrowIfNull();
@@ -30,6 +31,11 @@ internal sealed class GuildWarsVersionChecker(
     public IProgressAsyncOperation<bool> PerformInstallation(CancellationToken cancellationToken)
     {
         throw new NotImplementedException("GuildWars Version Checker does not support manual installation");
+    }
+
+    public Task OnCustomManagement(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException("GuildWars Version Checker does not support custom management");
     }
 
     public IEnumerable<string> GetCustomArguments()

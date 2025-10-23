@@ -60,6 +60,39 @@
     background: var(--accent-fill-rest);
     border-radius: 12px;
     font-size: var(--font-size-small);
-    font-weight: 500;
     margin-left: 1rem;
+    min-width: 100px;
+    text-align: center;
+}
+
+.mod-installed {
+    border-color: var(--accent-fill-rest);
+    color: var(--foreground-on-accent-rest);
+    border-style: dashed;
+    padding: 0.25rem 0.75rem;
+    background: var(--accent-fill-rest);
+    border-radius: 12px;
+    font-size: var(--font-size-small);
+    margin-left: 1rem;
+    min-width: 100px;
+    text-align: center;
+}
+
+.mod-can-manage {
+    border-color: var(--accent-fill-active);
+    color: var(--foreground-on-accent-active);
+    border-style: dashed;
+    padding: 0.25rem 0.75rem;
+    background: var(--accent-fill-active);
+    border-radius: 12px;
+    font-size: var(--font-size-small);
+    margin-left: 1rem;
+    cursor: pointer;
+    min-width: 100px;
+    text-align: center;
+}
+
+::deep .label {
+    color: var(--neutral-foreground-rest) !important;
+    font-size: var(--font-size-medium) !important;
 }

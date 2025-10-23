@@ -56,6 +56,7 @@ internal sealed class DSOALService(
     public string Name => "DSOAL";
     public string Description => "3D Positional Audio and EAX Effects";
     public bool IsVisible => true;
+    public bool CanCustomManage => false;
     public bool IsEnabled
     {
         get => this.options.Value.Enabled;
@@ -73,6 +74,11 @@ internal sealed class DSOALService(
     public IProgressAsyncOperation<bool> PerformInstallation(CancellationToken cancellationToken)
     {
         return this.SetupDSOAL(cancellationToken);
+    }
+
+    public Task OnCustomManagement(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException("DSOAL does not support custom management");
     }
 
     public void EnsureDSOALSymbolicLinkExists()

@@ -49,8 +49,9 @@ internal sealed class DXVKService(
     private readonly ILogger<DXVKService> logger = logger.ThrowIfNull();
 
     public string Name => "DXVK";
-    public string Description { get; } = "Translation layer which converts DX9 3D calls to Vulkan. Can improve performance for some users";
-    public bool IsVisible { get; } = true;
+    public string Description => "Translation layer which converts DX9 3D calls to Vulkan. Can improve performance for some users";
+    public bool IsVisible => true;
+    public bool CanCustomManage => false;
     public bool IsEnabled
     {
         get => this.options.Value.Enabled;
@@ -69,6 +70,11 @@ internal sealed class DXVKService(
         {
             return await this.SetupDXVK(progress, cancellationToken);
         }, cancellationToken);
+    }
+
+    public Task OnCustomManagement(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException("DXVK mod does not support custom management");
     }
 
     public async Task<bool> SetupDXVK(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)

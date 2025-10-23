@@ -17,14 +17,27 @@
                 </div>
                 <div class="mod-row-right">
                     <div class="mod-toggle">
-                        <FluentSwitch Label="Enabled"
-                                      Value="@(mod.IsInstalled && mod.IsEnabled)"
+                        <FluentLabel class="label">@((mod.IsInstalled && mod.IsEnabled) ? "Enabled" : "Disabled")</FluentLabel>
+                        <FluentSwitch Value="@(mod.IsInstalled && mod.IsEnabled)"
                                       @onchange="() => this.ViewModel.ToggleMod(mod)" />
                     </div>
                     @if (!mod.IsInstalled)
                     {
                         <div class="mod-not-installed">
                             Not Installed
+                        </div>
+                    }
+                    else if (mod.CanCustomManage)
+                    {
+                        <div class="mod-can-manage"
+                             @onclick="@(() => this.ViewModel.ManageMod(mod))">
+                            Manage
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="mod-installed">
+                            Installed
                         </div>
                     }
                 </div>

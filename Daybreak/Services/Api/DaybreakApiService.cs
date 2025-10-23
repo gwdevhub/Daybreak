@@ -57,14 +57,20 @@ public sealed class DaybreakApiService(
         }
     }
 
-    public bool IsInstalled { get; } = true;
-    public bool IsVisible { get; } = true;
+    public bool IsInstalled => true;
+    public bool IsVisible => true;
+    public bool CanCustomManage => false;
 
     public IEnumerable<string> GetCustomArguments() => [];
 
     public IProgressAsyncOperation<bool> PerformInstallation(CancellationToken cancellationToken)
     {
         throw new NotImplementedException("DaybreakApi mod does not support manual installation");
+    }
+
+    public Task OnCustomManagement(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException("DaybreakApi mod does not support custom management");
     }
 
     public Task<ScopedApiContext?> AttachDaybreakApiContext(GuildWarsApplicationLaunchContext launchContext, ScopedApiContext apiContext, CancellationToken _)
