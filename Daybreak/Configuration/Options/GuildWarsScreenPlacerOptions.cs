@@ -3,11 +3,13 @@ using Newtonsoft.Json;
 
 namespace Daybreak.Configuration.Options;
 
-[OptionsName(Name = "GWToolbox")]
+[OptionsSynchronizationIgnore]
 [OptionsIgnore]
-internal sealed class ToolboxOptions
+internal sealed class GuildWarsScreenPlacerOptions
 {
     [JsonProperty(nameof(Enabled))]
-    [OptionName(Name = "Enabled", Description = "If true, Daybreak will also launch GWToolboxdll when launching GuildWars")]
     public bool Enabled { get; set; }
+
+    [JsonProperty(nameof(DesiredScreen))]
+    public int DesiredScreen { get; set; }
 }

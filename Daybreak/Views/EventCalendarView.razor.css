@@ -78,15 +78,15 @@
     letter-spacing: 0.5px;
 }
 
-.status-badge.active {
-    background: var(--accent-fill-rest);
-    color: var(--accent-foreground-rest);
-}
+    .status-badge.active {
+        background: var(--accent-fill-rest);
+        color: var( --foreground-on-accent-rest-large);
+    }
 
-.status-badge.upcoming {
-    background: var(--neutral-fill-strong-rest);
-    color: var(--neutral-foreground-on-accent-rest);
-}
+    .status-badge.upcoming {
+        background: var(--neutral-fill-strong-rest);
+        color: var(--accent-foreground-rest);
+    }
 
 .event-description {
     font-size: var(--font-size-small);

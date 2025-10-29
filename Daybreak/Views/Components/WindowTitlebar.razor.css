@@ -40,20 +40,3 @@
     align-items: center;
     position: relative;
 }
-
-.menu-toggle-btn {
-    width: 50px;
-    height: 34px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    background: none;
-    border: none;
-    color: inherit;
-}
-
-    .menu-toggle-btn:hover {
-        background: var(--accent-foreground-hover);
-    }

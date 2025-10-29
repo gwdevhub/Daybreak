@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 namespace Daybreak.Configuration.Options;
 
 [OptionsName(Name = "Focus View")]
+[OptionsIgnore]
 public sealed class FocusViewOptions
 {
     [JsonProperty(nameof(Enabled))]

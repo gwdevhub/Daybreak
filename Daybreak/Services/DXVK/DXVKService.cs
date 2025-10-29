@@ -61,7 +61,7 @@ internal sealed class DXVKService(
             this.options.UpdateOption();
         }
     }
-    public bool IsInstalled => Directory.Exists(this.options.Value.Path) &&
+    public bool IsInstalled => Directory.Exists(DXVKDirectory) &&
            File.Exists(Path.Combine(DXVKDirectory, D3D9Dll));
 
     public IProgressAsyncOperation<bool> PerformInstallation(CancellationToken cancellationToken)
@@ -205,7 +205,6 @@ internal sealed class DXVKService(
         }
 
         var options = this.options.Value;
-        options.Path = DXVKDirectory;
         options.Version = version.ToString();
         this.options.UpdateOption();
         File.Delete(ArchiveName);

@@ -12,7 +12,6 @@ using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Toolbox;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
-using Microsoft.Win32;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
@@ -66,7 +65,7 @@ internal sealed class ToolboxService(
             this.toolboxOptions.UpdateOption();
         }
     }
-    public bool IsInstalled => File.Exists(this.toolboxOptions.Value.DllPath);
+    public bool IsInstalled => File.Exists(UsualToolboxLocation);
 
     public IProgressAsyncOperation<bool> PerformInstallation(CancellationToken cancellationToken)
     {
@@ -106,38 +105,6 @@ internal sealed class ToolboxService(
     public Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public IEnumerable<string> GetCustomArguments() => [];
-
-    public bool LoadToolboxFromUsualLocation()
-    {
-        if (!File.Exists(UsualToolboxLocation))
-        {
-            return false;
-        }
-
-        this.toolboxOptions.Value.DllPath = UsualToolboxLocation;
-        this.toolboxOptions.UpdateOption();
-        return true;
-    }
-
-    public bool LoadToolboxFromDisk()
-    {
-        var filePicker = new OpenFileDialog
-        {
-            Filter = "GWToolboxdll (GWToolboxdll.dll)|GWToolboxdll.dll",
-            Multiselect = false,
-            RestoreDirectory = true,
-            Title = "Please select the GWToolboxdll dll"
-        };
-        if (filePicker.ShowDialog() is false)
-        {
-            return false;
-        }
-
-        var fileName = filePicker.FileName;
-        this.toolboxOptions.Value.DllPath = Path.GetFullPath(fileName);
-        this.toolboxOptions.UpdateOption();
-        return true;
-    }
 
     public async Task NotifyUserIfUpdateAvailable(CancellationToken cancellationToken)
     {
@@ -295,7 +262,7 @@ internal sealed class ToolboxService(
     private async Task<bool> SetupToolboxDll(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        if (File.Exists(this.toolboxOptions.Value.DllPath) && !await this.IsUpdateAvailable(cancellationToken))
+        if (File.Exists(UsualToolboxLocation) && !await this.IsUpdateAvailable(cancellationToken))
         {
             return true;
         }
@@ -310,14 +277,11 @@ internal sealed class ToolboxService(
             _ => throw new InvalidOperationException("Unexpected result")
         };
 
-        if (result is not DownloadLatestOperation.Success success)
+        if (result is not DownloadLatestOperation.Success)
         {
             return false;
         }
 
-        var toolboxOptions = this.toolboxOptions.Value;
-        toolboxOptions.DllPath = Path.GetFullPath(success.PathToDll);
-        this.toolboxOptions.UpdateOption();
         return true;
     }
 
@@ -330,7 +294,7 @@ internal sealed class ToolboxService(
             return;
         }
 
-        var dll = this.toolboxOptions.Value.DllPath;
+        var dll = UsualToolboxLocation;
         if (File.Exists(dll) is false)
         {
             scopedLogger.LogError("Dll file does not exist");
@@ -358,7 +322,7 @@ internal sealed class ToolboxService(
 
     private async Task<bool> IsUpdateAvailable(CancellationToken cancellationToken)
     {
-        if (!File.Exists(this.toolboxOptions.Value.DllPath))
+        if (!File.Exists(UsualToolboxLocation))
         {
             return true;
         }
@@ -369,7 +333,7 @@ internal sealed class ToolboxService(
             return false;
         }
 
-        var fileInfo = FileVersionInfo.GetVersionInfo(this.toolboxOptions.Value.DllPath);
+        var fileInfo = FileVersionInfo.GetVersionInfo(UsualToolboxLocation);
         var current = fileInfo.ProductVersion?.Replace('_', '-');
         if (latestVersion.ToString().EndsWith("-release") &&
             current?.EndsWith("-release") is not true)

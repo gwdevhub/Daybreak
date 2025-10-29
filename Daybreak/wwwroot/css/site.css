@@ -164,6 +164,11 @@ html, body {
 
     .title-bar-btn:hover {
         background: var(--accent-foreground-hover);
+        color: var(--foreground-on-accent-rest-large);
+    }
+
+    .title-bar-btn:hover svg {
+        fill: var(--foreground-on-accent-rest-large) !important;
     }
 
 .title-bar-additional-btns-left {

@@ -9,13 +9,13 @@ using System.Core.Extensions;
 namespace Daybreak.Services.Screens;
 
 internal sealed class GuildwarsScreenPlacer(
-    ILiveUpdateableOptions<LauncherOptions> liveOptions,
+    ILiveUpdateableOptions<GuildWarsScreenPlacerOptions> liveOptions,
     IScreenManager screenManager,
     ILogger<GuildwarsScreenPlacer> logger) : IGuildwarsScreenPlacer
 {
     private static readonly TimeSpan Delay = TimeSpan.FromSeconds(5);
 
-    private readonly ILiveUpdateableOptions<LauncherOptions> liveOptions = liveOptions.ThrowIfNull();
+    private readonly ILiveUpdateableOptions<GuildWarsScreenPlacerOptions> liveOptions = liveOptions.ThrowIfNull();
     private readonly IScreenManager screenManager = screenManager.ThrowIfNull();
     private readonly ILogger<GuildwarsScreenPlacer> logger = logger.ThrowIfNull();
 
@@ -24,10 +24,10 @@ internal sealed class GuildwarsScreenPlacer(
     public bool IsVisible => true;
     public bool IsEnabled
     {
-        get => this.liveOptions.Value.SetGuildwarsWindowSizeOnLaunch;
+        get => this.liveOptions.Value.Enabled;
         set
         {
-            this.liveOptions.Value.SetGuildwarsWindowSizeOnLaunch = value;
+            this.liveOptions.Value.Enabled = value;
             this.liveOptions.UpdateOption();
         }
     }
@@ -51,7 +51,7 @@ internal sealed class GuildwarsScreenPlacer(
 
     public async Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken)
     {
-        var screen = this.screenManager.Screens.Skip(this.liveOptions.Value.DesiredGuildwarsScreen).FirstOrDefault();
+        var screen = this.screenManager.Screens.Skip(this.liveOptions.Value.DesiredScreen).FirstOrDefault();
         if (screen is null)
         {
             return;

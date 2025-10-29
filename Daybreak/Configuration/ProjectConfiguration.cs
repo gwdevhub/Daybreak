@@ -1,11 +1,9 @@
 ﻿using Daybreak.Services.ApplicationLauncher;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Credentials;
-using Daybreak.Services.IconRetrieve;
 using Daybreak.Services.Logging;
 using Daybreak.Services.Privilege;
 using Daybreak.Services.Screens;
-using Daybreak.Services.Screenshots;
 using Daybreak.Services.Shortcuts;
 using Daybreak.Services.Updater;
 using Daybreak.Views;
@@ -37,7 +35,6 @@ using Daybreak.Services.TradeChat;
 using System.Net.WebSockets;
 using Daybreak.Services.Notifications;
 using Daybreak.Services.Charts;
-using Daybreak.Services.Images;
 using Daybreak.Services.InternetChecker;
 using Daybreak.Services.Sounds;
 using Daybreak.Services.TradeChat.Notifications;
@@ -46,7 +43,6 @@ using Daybreak.Services.Mods;
 using Daybreak.Services.Registry;
 using Daybreak.Services.DSOAL.Actions;
 using Daybreak.Services.Events;
-using Daybreak.Controls;
 using Daybreak.Services.Plugins;
 using Daybreak.Services.Toolbox.Utilities;
 using Daybreak.Services.Injection;
@@ -73,7 +69,6 @@ using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.Shortcuts;
 using Daybreak.Shared.Services.Guildwars;
 using Daybreak.Shared.Services.Registry;
-using Daybreak.Shared.Services.Images;
 using Daybreak.Shared.Services.Credentials;
 using Daybreak.Shared.Services.Onboarding;
 using Daybreak.Shared.Services.Sounds;
@@ -88,10 +83,8 @@ using Daybreak.Shared.Services.UMod;
 using Daybreak.Shared.Services.Updater;
 using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.Metrics;
-using Daybreak.Shared.Services.IconRetrieve;
 using Daybreak.Shared.Services.Updater.PostUpdate;
 using Daybreak.Shared.Services.Mods;
-using Daybreak.Shared.Services.Screenshots;
 using Daybreak.Shared.Services.Plugins;
 using Daybreak.Shared.Services.Experience;
 using Daybreak.Shared.Services.ApplicationLauncher;
@@ -259,7 +252,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<INotificationProducer, NotificationService>(sp => sp.GetRequiredService<INotificationService>().Cast<NotificationService>());
         services.AddSingleton<INotificationHandlerProducer, NotificationService>(sp => sp.GetRequiredService<INotificationService>().Cast<NotificationService>());
         services.AddSingleton<ILiveChartInitializer, LiveChartInitializer>();
-        services.AddSingleton<IImageCache, ImageCache>();
         services.AddSingleton<ISoundService, SoundService>();
         services.AddSingleton<IInternetCheckingService, InternetCheckingService>();
         services.AddSingleton<IConnectivityStatus, ConnectivityStatus>();
@@ -280,11 +272,8 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<JSConsoleInterop>();
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
-        services.AddScoped<IScreenshotProvider, ScreenshotProvider>();
-        services.AddScoped<IOnlinePictureClient, OnlinePictureClient>();
         services.AddScoped<IApplicationUpdater, ApplicationUpdater>();
         services.AddScoped<IBuildTemplateManager, BuildTemplateManager>();
-        services.AddScoped<IIconCache, IconCache>();
         services.AddScoped<IScreenManager, ScreenManager>();
         services.AddScoped<IOnboardingService, OnboardingService>();
         services.AddScoped<IExperienceCalculator, ExperienceCalculator>();
@@ -295,15 +284,12 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<ITradeChatService<KamadanTradeChatOptions>, TradeChatService<KamadanTradeChatOptions>>();
         services.AddScoped<ITradeChatService<AscalonTradeChatOptions>, TradeChatService<AscalonTradeChatOptions>>();
         services.AddScoped<ITraderQuoteService, TraderQuoteService>();
-        services.AddScoped<IPriceHistoryDatabase, PriceHistoryDatabase>();
-        services.AddScoped<IPriceHistoryService, PriceHistoryService>();
         services.AddScoped<IWordHighlightingService, WordHighlightingService>();
         services.AddScoped<ITradeHistoryDatabase, TradeHistoryDatabase>();
         services.AddScoped<IGuildWarsCopyService, GuildWarsCopyService>();
         services.AddScoped<IItemHashService, ItemHashService>();
         services.AddScoped<IRegistryService, RegistryService>();
         services.AddScoped<IEventNotifierService, EventNotifierService>();
-        services.AddScoped<IBackgroundProvider, BackgroundProvider>();
         services.AddScoped<IToolboxClient, ToolboxClient>();
         services.AddScoped<IProcessInjector, ProcessInjector>();
         services.AddScoped<IStubInjector, StubInjector>();
@@ -389,10 +375,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         optionsProducer.RegisterOptions<SynchronizationOptions>();
         optionsProducer.RegisterOptions<FocusViewOptions>();
 
-        optionsProducer.RegisterOptions<ImageCacheOptions>();
-
-        optionsProducer.RegisterOptions<BackgroundProviderOptions>();
-
         optionsProducer.RegisterOptions<ToolboxOptions>();
         optionsProducer.RegisterOptions<UModOptions>();
         optionsProducer.RegisterOptions<DSOALOptions>();
@@ -402,7 +384,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         optionsProducer.RegisterOptions<ScreenManagerOptions>();
         optionsProducer.RegisterOptions<KamadanTradeChatOptions>();
         optionsProducer.RegisterOptions<AscalonTradeChatOptions>();
-        optionsProducer.RegisterOptions<PriceHistoryOptions>();
         optionsProducer.RegisterOptions<TraderQuotesOptions>();
         optionsProducer.RegisterOptions<TradeAlertingOptions>();
         optionsProducer.RegisterOptions<EventNotifierOptions>();
@@ -411,7 +392,8 @@ public class ProjectConfiguration : PluginConfigurationBase
         optionsProducer.RegisterOptions<CredentialManagerOptions>();
         optionsProducer.RegisterOptions<LaunchConfigurationServiceOptions>();
         optionsProducer.RegisterOptions<DirectSongOptions>();
-        optionsProducer.RegisterOptions<MinimapWindowOptions>();
+
+        optionsProducer.RegisterOptions<GuildWarsScreenPlacerOptions>();
     }
 
     public override void RegisterNotificationHandlers(INotificationHandlerProducer notificationHandlerProducer)
@@ -498,10 +480,6 @@ public class ProjectConfiguration : PluginConfigurationBase
                 .WithMessageHandler(SetupLoggingAndMetrics<ApplicationUpdater>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
-            .RegisterHttpClient<OnlinePictureClient>()
-                .WithMessageHandler(SetupLoggingAndMetrics<OnlinePictureClient>)
-                .WithDefaultRequestHeadersSetup(SetupChromeImpersonationUserAgent)
-                .Build()
             .RegisterHttpClient<DownloadService>()
                 .WithMessageHandler(SetupLoggingAndMetrics<DownloadService>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
@@ -514,24 +492,12 @@ public class ProjectConfiguration : PluginConfigurationBase
                 .WithMessageHandler(SetupLoggingAndMetrics<TradeChatService<AscalonTradeChatOptions>>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
-            .RegisterHttpClient<IconCache>()
-                .WithMessageHandler(SetupLoggingAndMetrics<IconCache>)
-                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
-                .Build()
             .RegisterHttpClient<TraderQuoteService>()
                 .WithMessageHandler(SetupLoggingAndMetrics<TraderQuoteService>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
-            .RegisterHttpClient<PriceHistoryService>()
-                .WithMessageHandler(SetupLoggingAndMetrics<PriceHistoryService>)
-                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
-                .Build()
             .RegisterHttpClient<InternetCheckingService>()
                 .WithMessageHandler(SetupLoggingAndMetrics<InternetCheckingService>)
-                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
-                .Build()
-            .RegisterHttpClient<ChromiumBrowserWrapper>()
-                .WithMessageHandler(SetupLoggingAndMetrics<ChromiumBrowserWrapper>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<ToolboxClient>()

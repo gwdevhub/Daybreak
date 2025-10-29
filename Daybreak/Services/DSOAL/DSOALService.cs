@@ -66,7 +66,7 @@ internal sealed class DSOALService(
             this.options.UpdateOption();
         }
     }
-    public bool IsInstalled => Directory.Exists(this.options.Value.Path) &&
+    public bool IsInstalled => Directory.Exists(DSOALDirectory) &&
            File.Exists(Path.Combine(DSOALDirectory, DsoundDll)) &&
            File.Exists(Path.Combine(DSOALDirectory, AlsoftIni)) &&
            File.Exists(Path.Combine(DSOALDirectory, AlsoftIni));
@@ -238,9 +238,6 @@ internal sealed class DSOALService(
     {
         ZipFile.ExtractToDirectory(ArchiveName, DSOALDirectory, true);
         ZipFile.ExtractToDirectory(Path.Combine(DSOALDirectory, HRTFArchiveName), DSOALDirectory, true);
-        var options = this.options.Value;
-        options.Path = DSOALDirectory;
-        this.options.UpdateOption();
         File.Delete(ArchiveName);
         File.Delete(Path.Combine(DSOALDirectory, HRTFArchiveName));
     }

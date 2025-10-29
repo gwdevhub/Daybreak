@@ -5,10 +5,6 @@ using Daybreak.Shared.Services.Mods;
 namespace Daybreak.Shared.Services.Toolbox;
 public interface IToolboxService : IModService
 {
-    bool LoadToolboxFromDisk();
-
-    bool LoadToolboxFromUsualLocation();
-
     Task NotifyUserIfUpdateAvailable(CancellationToken cancellationToken);
 
     Task<bool> SetupToolbox(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken);
