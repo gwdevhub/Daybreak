@@ -122,6 +122,7 @@ using Daybreak.Views.Trade;
 using Daybreak.Services.TradeChat.Models;
 using Daybreak.Views.Installation;
 using Daybreak.Views.Copy;
+using Daybreak.Views.Mods;
 
 namespace Daybreak.Configuration;
 
@@ -339,6 +340,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<ModsView, ModsViewModel>();
         viewProducer.RegisterView<ModInstallationView, ModInstallationViewModel>();
         viewProducer.RegisterView<ModInstallationConfirmationView, ModInstallationConfirmationViewModel>();
+        viewProducer.RegisterView<ScreenSelectorView, ScreenSelectorViewModel>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)

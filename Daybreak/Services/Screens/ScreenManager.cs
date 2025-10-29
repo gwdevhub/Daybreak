@@ -24,7 +24,7 @@ internal sealed class ScreenManager(
     private readonly ILogger<ScreenManager> logger = logger.ThrowIfNull();
 
     public IEnumerable<Screen> Screens { get; } = WpfScreenHelper.Screen.AllScreens
-        .Select((screen, index) => new Screen { Id = index, Size = screen.Bounds });
+        .Select((screen, index) => new Screen(index, screen.Bounds));
 
     public void MoveWindowToSavedPosition()
     {
@@ -88,17 +88,23 @@ internal sealed class ScreenManager(
         this.liveUpdateableOptions.UpdateOption();
     }
 
-    public void MoveGuildwarsToScreen(Screen screen)
+    public bool MoveGuildwarsToScreen(Screen screen)
     {
         this.logger.LogDebug("Attempting to move guildwars to screen {screenId}", screen.Id);
         var hwnd = GetMainWindowHandle();
-        NativeMethods.SetWindowPos(hwnd, NativeMethods.HWND_TOP, screen.Size.Left.ToInt(), screen.Size.Top.ToInt(), screen.Size.Width.ToInt(), screen.Size.Height.ToInt(), NativeMethods.SWP_SHOWWINDOW);
+        if (hwnd.HasValue is false)
+        {
+            return false;
+        }
+
+        NativeMethods.SetWindowPos(hwnd.Value, NativeMethods.HWND_TOP, screen.Size.Left.ToInt(), screen.Size.Top.ToInt(), screen.Size.Width.ToInt(), screen.Size.Height.ToInt(), NativeMethods.SWP_SHOWWINDOW);
+        return true;
     }
 
-    private static IntPtr GetMainWindowHandle()
+    private static IntPtr? GetMainWindowHandle()
     {
         var process = Process.GetProcessesByName("gw").FirstOrDefault();
-        return process is not null ? process.MainWindowHandle : throw new InvalidOperationException("Could not find guildwars process");
+        return process is not null ? process.MainWindowHandle : default;
     }
 
     public void OnStartup()

@@ -1,20 +1,29 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Models.Mods;
+using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Screens;
+using Daybreak.Views.Mods;
 using Microsoft.Extensions.Logging;
 using System.Configuration;
 using System.Core.Extensions;
+using System.Extensions.Core;
+using TrailBlazr.Services;
 
 namespace Daybreak.Services.Screens;
 
 internal sealed class GuildwarsScreenPlacer(
+    IViewManager viewManager,
+    INotificationService notificationService,
     ILiveUpdateableOptions<GuildWarsScreenPlacerOptions> liveOptions,
     IScreenManager screenManager,
     ILogger<GuildwarsScreenPlacer> logger) : IGuildwarsScreenPlacer
 {
-    private static readonly TimeSpan Delay = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan Delay = TimeSpan.FromSeconds(10);
 
+    private readonly IViewManager viewManager = viewManager.ThrowIfNull();
+    private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly ILiveUpdateableOptions<GuildWarsScreenPlacerOptions> liveOptions = liveOptions.ThrowIfNull();
     private readonly IScreenManager screenManager = screenManager.ThrowIfNull();
     private readonly ILogger<GuildwarsScreenPlacer> logger = logger.ThrowIfNull();
@@ -41,7 +50,7 @@ internal sealed class GuildwarsScreenPlacer(
 
     public Task OnCustomManagement(CancellationToken cancellationToken)
     {
-        //TODO: Implement custom management UI
+        this.viewManager.ShowView<ScreenSelectorView>();
         return Task.CompletedTask;
     }
 
@@ -51,14 +60,33 @@ internal sealed class GuildwarsScreenPlacer(
 
     public async Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken)
     {
+        var scopedLogger = this.logger.CreateScopedLogger();
         var screen = this.screenManager.Screens.Skip(this.liveOptions.Value.DesiredScreen).FirstOrDefault();
-        if (screen is null)
+        if (screen.Id != this.liveOptions.Value.DesiredScreen)
         {
+            this.notificationService.NotifyError(
+                title: "Failed to move Guild Wars window",
+                description: $"Failed to move Guild Wars to desired screen {this.liveOptions.Value.DesiredScreen}. Screen id is invalid");
+            scopedLogger.LogError("Failed to move guild wars to desired screen {screenId}. Screen id is invalid", this.liveOptions.Value.DesiredScreen);
             return;
         }
 
         await Task.Delay(Delay, cancellationToken);
-        this.screenManager.MoveGuildwarsToScreen(screen);
+        if (!this.screenManager.MoveGuildwarsToScreen(screen))
+        {
+            this.notificationService.NotifyError(
+                title: "Failed to move Guild Wars window",
+                description: $"Failed to move Guild Wars to desired screen {this.liveOptions.Value.DesiredScreen}. Failed to move window");
+            scopedLogger.LogError("Failed to move guild wars to desired screen {screenId}. Failed to move window", this.liveOptions.Value.DesiredScreen);
+        }
+        else
+        {
+            this.notificationService.NotifyInformation(
+                title: "Moved Guild Wars window",
+                description: $"Moved Guild Wars to desired screen {this.liveOptions.Value.DesiredScreen}");
+            scopedLogger.LogInformation("Moved guild wars to desired screen {screenId}", this.liveOptions.Value.DesiredScreen);
+        }
+
         return;
     }
 
@@ -69,4 +97,21 @@ internal sealed class GuildwarsScreenPlacer(
     public Task OnGuildWarsStartingDisabled(GuildWarsStartingDisabledContext guildWarsStartingDisabledContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public IEnumerable<Screen> GetScreens()
+    {
+        return this.screenManager.Screens;
+    }
+
+    public void SetDesiredScreen(Screen screen)
+    {
+        var option = this.liveOptions.Value;
+        option.DesiredScreen = screen.Id;
+        this.liveOptions.UpdateOption();
+    }
+
+    public Screen? GetDesiredScreen()
+    {
+        return this.screenManager.Screens.Skip(this.liveOptions.Value.DesiredScreen).FirstOrDefault();
+    }
 }

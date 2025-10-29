@@ -1,5 +1,49 @@
-﻿@inherits ViewBase<ScreenSelectorView, ScreenSelectorViewModel>
-@page "/mods/screen-selector"
-@code {
+﻿<div class="stretch-container">
+    <div class="stretch-container backdrop-panel">
+        <div class="screen-selector-container">
+            @if (this.ViewModel?.Screens is not null)
+            {
+                @foreach (var screen in this.ViewModel.Screens)
+                {
+                    var isSelected = this.ViewModel.SelectedScreen.HasValue && this.ViewModel.SelectedScreen.Value.Id == screen.Id;
 
+                    <div class="@($"screen-display {(isSelected ? "screen-selected" : "")}")" 
+                         style="@this.GetScreenStyle(screen)"
+                         @onclick="() => this.ViewModel.SelectScreen(screen)">
+                        <div class="screen-id">@screen.Id</div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@inherits ViewBase<ScreenSelectorView, ScreenSelectorViewModel>
+@page "/mods/screen-selector"
+@using Daybreak.Shared.Models
+@code{
+    public string GetScreenStyle(Screen screen)
+    {
+        // Calculate the bounding box of all screens
+        var allScreens = this.ViewModel.Screens.ToList();
+        if (!allScreens.Any()) return string.Empty;
+
+        var minX = allScreens.Min(s => s.Size.Left);
+        var minY = allScreens.Min(s => s.Size.Top);
+        var maxX = allScreens.Max(s => s.Size.Right);
+        var maxY = allScreens.Max(s => s.Size.Bottom);
+
+        var totalWidth = maxX - minX;
+        var totalHeight = maxY - minY;
+
+        const double padding = 5; // 5% padding on each side
+
+        // Calculate screen position and size as percentages
+        var leftPercent = ((screen.Size.Left - minX) / totalWidth) * (100 - padding * 2) + padding;
+        var topPercent = ((screen.Size.Top - minY) / totalHeight) * (100 - padding * 2) + padding;
+        var widthPercent = (screen.Size.Width / totalWidth) * (100 - padding * 2);
+        var heightPercent = (screen.Size.Height / totalHeight) * (100 - padding * 2);
+
+        return $"left: {leftPercent:F2}%; top: {topPercent:F2}%; width: {widthPercent:F2}%; height: {heightPercent:F2}%;";
+    }
 }
