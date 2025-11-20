@@ -124,7 +124,7 @@ internal sealed class ReShadeService(
 
     public Task OnCustomManagement(CancellationToken cancellationToken)
     {
-        //TODO: ReShade custom management view
+        Process.Start("explorer.exe", ReShadePath);
         return Task.CompletedTask;
     }
 
