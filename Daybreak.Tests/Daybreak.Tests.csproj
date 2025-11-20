@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0-windows</TargetFramework>
+    <TargetFramework>$(TargetFrameworkVersionWindows)</TargetFramework>
     <IsPackable>false</IsPackable>
     <Platforms>x86</Platforms>
     <RuntimeIdentifier>win-x86</RuntimeIdentifier>
@@ -21,7 +21,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Linq.Async" />
     <PackageReference Include="System.Private.Uri" />
   </ItemGroup>
 

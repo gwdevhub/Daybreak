@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFramework>net9.0-windows</TargetFramework>
+    <TargetFramework>$(TargetFrameworkVersionWindows)</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <LangVersion>preview</LangVersion>
@@ -20,7 +20,6 @@
     <PackageReference Include="Microsoft.Extensions.Http" />
     <PackageReference Include="Microsoft.Web.WebView2" />
     <PackageReference Include="Slim" />
-    <PackageReference Include="System.Linq.Async" />
     <PackageReference Include="System.Net.Http" />
     <PackageReference Include="System.Reflection.Metadata" />
     <PackageReference Include="System.Text.Encoding.CodePages" />

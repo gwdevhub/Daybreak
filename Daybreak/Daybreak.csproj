@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <RootNamespace>Daybreak</RootNamespace>
-    <TargetFramework>net9.0-windows</TargetFramework>
+    <TargetFramework>$(TargetFrameworkVersionWindows)</TargetFramework>
     <UseWPF>true</UseWPF>
     <ScopedCssEnabled>true</ScopedCssEnabled>
     <Nullable>enable</Nullable>
@@ -70,7 +70,6 @@
     <PackageReference Include="Squealify" />
     <PackageReference Include="System.Formats.Asn1" />
     <PackageReference Include="System.IO.Compression" />
-    <PackageReference Include="System.Linq.Async" />
     <PackageReference Include="PeNet" />
     <PackageReference Include="Plumsy" />
     <PackageReference Include="securifybv.ShellLink" />

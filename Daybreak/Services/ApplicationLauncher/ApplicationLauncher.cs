@@ -472,11 +472,11 @@ internal sealed class ApplicationLauncher(
         };
 
         var modsNeedReapply = await this.modsManager.GetMods().ToAsyncEnumerable()
-            .WhereAwait(async m =>
+            .Where(async (m, ct) =>
             {
                 try
                 {
-                    return await m.ShouldRunAgain(guildWarsRunningContext, cancellationToken);
+                    return await m.ShouldRunAgain(guildWarsRunningContext, ct);
                 }
                 catch(Exception e)
                 {

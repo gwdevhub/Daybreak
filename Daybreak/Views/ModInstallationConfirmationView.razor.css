@@ -4,7 +4,8 @@
     flex-direction: column;
     height: 100%;
     align-items: center;
-    margin: 40% 0px 0px 0px;
+    justify-content: center;
+    gap: 20px;
 }
 
 .message {
