@@ -9,17 +9,21 @@ using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.UMod;
 using Daybreak.Shared.Utils;
+using Daybreak.Views.Mods;
 using Microsoft.Extensions.Logging;
+using Microsoft.Win32;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.IO;
 using System.Net.Http;
+using TrailBlazr.Services;
 
 namespace Daybreak.Services.UMod;
 
 internal sealed class UModService(
+    IViewManager viewManager,
     IProcessInjector processInjector,
     INotificationService notificationService,
     IDownloadService downloadService,
@@ -39,6 +43,7 @@ internal sealed class UModService(
 
     private static readonly string UModDirectory = PathUtils.GetAbsolutePathFromRoot(UModDirectorySubPath);
 
+    private readonly IViewManager viewManager = viewManager.ThrowIfNull();
     private readonly IProcessInjector processInjector = processInjector.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
@@ -79,6 +84,7 @@ internal sealed class UModService(
 
     public Task OnCustomManagement(CancellationToken cancellationToken)
     {
+        this.viewManager.ShowView<UModManagementView>();
         return Task.CompletedTask;
     }
 
@@ -185,6 +191,27 @@ internal sealed class UModService(
         this.uModOptions.UpdateOption();
     }
 
+    public Task<IReadOnlyCollection<string>> LoadModsFromDisk(CancellationToken cancellationToken)
+    {
+        return Task.Factory.StartNew<IReadOnlyCollection<string>>(() =>
+        {
+            var openFileDialog = new OpenFileDialog
+            {
+                Filter = "Mod files (*.tpf;*.zip)|*.tpf;*.zip|TPF files (*.tpf)|*.tpf|ZIP files (*.zip)|*.zip",
+                Title = "Select Mod Files",
+                Multiselect = true
+            };
+
+            var result = openFileDialog.ShowDialog();
+            if (result != true || openFileDialog.FileNames.Length == 0)
+            {
+                return [];
+            }
+
+            return [.. openFileDialog.FileNames.Where(f => this.AddMod(f, imported: true))];
+        }, cancellationToken);
+    }
+
     public async Task CheckAndUpdateUMod(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.CheckAndUpdateUMod), string.Empty);
@@ -226,17 +253,6 @@ internal sealed class UModService(
         this.notificationService.NotifyInformation(
             title: "UMod updated",
             description: $"UMod has been updated to version {latestRelease}");
-    }
-
-    private void NotifyFaultyInstallation()
-    {
-        /*
-             * Known issue where Guild Wars updater breaks the executable, which in turn breaks the integration with uMod.
-             * Prompt the user to manually reinstall Guild Wars.
-             */
-        this.notificationService.NotifyInformation(
-            title: "uMod failed to start",
-            description: "uMod failed to start due to a known issue with Guild Wars updating process. Please manually re-install Guild Wars in order to restore uMod functionality");
     }
 
     private async Task<bool> SetupUModDll(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)

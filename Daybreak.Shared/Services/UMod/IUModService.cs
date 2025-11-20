@@ -18,4 +18,6 @@ public interface IUModService : IModService
     List<UModEntry> GetMods();
 
     void SaveMods(List<UModEntry> list);
+
+    Task<IReadOnlyCollection<string>> LoadModsFromDisk(CancellationToken cancellationToken);
 }
