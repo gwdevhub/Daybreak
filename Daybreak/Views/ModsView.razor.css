@@ -2,7 +2,7 @@
     gap: 1rem;
     padding: 1rem;
     overflow-y: auto;
-    margin-top: calc(var(--font-size-x-large));
+    margin-top: 40px;
 }
 
 .mod-row {

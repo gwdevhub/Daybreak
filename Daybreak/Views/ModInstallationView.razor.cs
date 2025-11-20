@@ -17,6 +17,7 @@ public sealed class ModInstallationViewModel(
     public double Progress { get; private set; }
     public string Description { get; private set; } = string.Empty;
     public bool ContinueEnabled { get; private set; } = false;
+    public bool ForceInstallation { get; private set; } = false;
 
     private readonly SemaphoreSlim installationSemaphore = new(1, 1);
 
@@ -31,6 +32,11 @@ public sealed class ModInstallationViewModel(
         this.Progress = 0;
         this.Description = string.Empty;
         this.ContinueEnabled = false;
+        if (bool.TryParse(view.ForceInstallation, out var forceInstallation))
+        {
+            this.ForceInstallation = forceInstallation;
+        }
+
         _ = Task.Run(this.PerformInstallation);
         return base.ParametersSet(view, cancellationToken);
     }
@@ -49,7 +55,7 @@ public sealed class ModInstallationViewModel(
 
         using var ctx = await this.installationSemaphore.Acquire();
 
-        if (this.Mod.IsInstalled)
+        if (this.Mod.IsInstalled && !this.ForceInstallation)
         {
             this.viewManager.ShowView<ModsView>();
             return;
