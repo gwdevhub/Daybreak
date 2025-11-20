@@ -160,6 +160,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
     {
         while (!cancellationToken.IsCancellationRequested)
         {
+            
             if (this.tradeAlerts.OfType<QuoteAlert>().None(q => q.Enabled))
             {
                 await Task.Delay(TimeSpan.FromSeconds(this.options.Value.QuoteAlertsInterval), cancellationToken);

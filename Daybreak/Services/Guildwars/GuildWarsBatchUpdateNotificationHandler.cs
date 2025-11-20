@@ -10,9 +10,7 @@ using System.Extensions;
 
 namespace Daybreak.Services.Guildwars;
 
-//TODO: Re-enable view manager and download view when implemented
 internal sealed class GuildWarsBatchUpdateNotificationHandler(
-    //IViewManager viewManager,
     IGuildWarsInstaller guildWarsInstaller,
     IGuildWarsExecutableManager guildWarsExecutableManager,
     INotificationService notificationService,
@@ -59,7 +57,6 @@ internal sealed class GuildWarsBatchUpdateNotificationHandler(
             return;
         }
 
-        //this.viewManager.ShowView<GuildWarsDownloadView>(context);
         await foreach (var result in this.guildWarsInstaller.CheckAndUpdateGuildWarsExecutables(updateList, cancellationTokenSource.Token))
         {
             if (result.Result)

@@ -342,6 +342,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<ModInstallationConfirmationView, ModInstallationConfirmationViewModel>();
         viewProducer.RegisterView<ScreenSelectorView, ScreenSelectorViewModel>();
         viewProducer.RegisterView<UModManagementView, UModManagementViewModel>();
+        viewProducer.RegisterView<TradeNotificationView, TradeNotificationViewModel>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
