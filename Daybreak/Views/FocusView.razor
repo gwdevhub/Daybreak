@@ -1,6 +1,47 @@
-﻿<h3>FocusView</h3>
+﻿@using Daybreak.Views.Components.FocusView
+
 @page "/focus"
 @inherits ViewBase<FocusView, FocusViewModel>
+
+<div class="focus-dashboard">
+    <div class="dashboard-grid">
+        <!-- Character Component Tile -->
+        <div class="dashboard-tile">
+            <CharacterComponent Context="@this.ViewModel?.CharacterComponentContext" />
+        </div>
+
+        <!-- Current Map Component Tile -->
+        <div class="dashboard-tile">
+            <CurrentMapComponent Context="@this.ViewModel?.CurrentMapComponentContext" />
+        </div>
+
+        <!-- Player Resources Component Tile -->
+        <div class="dashboard-tile">
+            <PlayerResourcesComponent Context="@this.ViewModel?.PlayerResourcesComponentContext" />
+        </div>
+
+        <!-- Quest Log Component Tile -->
+        <div class="dashboard-tile">
+            <QuestLogComponent Context="@this.ViewModel?.QuestLogComponentContext" />
+        </div>
+
+        <!-- Title Information Component Tile -->
+        <div class="dashboard-tile">
+            <TitleInformationComponent Context="@this.ViewModel?.TitleInformationComponentContext" />
+        </div>
+
+        <!-- Vanquish Component Tile -->
+        <div class="dashboard-tile">
+            <VanquishComponent Context="@this.ViewModel?.VanquishComponentContext" />
+        </div>
+
+        <!-- Build Component Tile -->
+        <div class="dashboard-tile">
+            <BuildComponent Context="@this.ViewModel?.BuildComponentContext" />
+        </div>
+    </div>
+</div>
+
 @code {
     [Parameter]
     public required string ConfigurationId { get; init; }

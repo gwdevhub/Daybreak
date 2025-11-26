@@ -1,4 +1,10 @@
-﻿using Daybreak.Services.Logging;
+﻿using System.Core.Extensions;
+using System.Diagnostics;
+using System.IO;
+using System.Windows;
+using System.Windows.Interop;
+using Daybreak.Services.Logging;
+using Daybreak.Services.Notifications.Handlers;
 using Daybreak.Shared.Models.Menu;
 using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Notifications;
@@ -10,15 +16,11 @@ using Daybreak.Shared.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
-using System.Core.Extensions;
-using System.Diagnostics;
-using System.IO;
-using System.Windows;
-using System.Windows.Interop;
 using TrailBlazr.Services;
 using WpfExtended.Blazor.Launch;
 
 namespace Daybreak.Views;
+
 public sealed class AppViewModel
 {
     private const string IssueUrl = "https://github.com/gwdevhub/Daybreak/issues/new";
@@ -32,6 +34,7 @@ public sealed class AppViewModel
     private readonly IPrivilegeManager privilegeManager;
     private readonly BlazorHostWindow blazorHostWindow;
     private readonly JSConsoleInterop jsConsoleInterop;
+    private readonly INotificationService notificationService;
     private readonly ILogger<App> logger;
 
     private HwndSource? hwndSource;
@@ -40,7 +43,8 @@ public sealed class AppViewModel
     public event EventHandler? RedrawRequested;
 
     public Type CurrentViewType { get; private set; } = typeof(LaunchView);
-    public IDictionary<string, object> CurrentViewParameters { get; private set; } = new Dictionary<string, object>();
+    public IDictionary<string, object> CurrentViewParameters { get; private set; } =
+        new Dictionary<string, object>();
 
     public List<MenuCategory> MenuCategories { get; private set; } = [];
 
@@ -76,7 +80,9 @@ public sealed class AppViewModel
         BlazorHostWindow blazorHostWindow,
         JSConsoleInterop jsConsoleInterop,
         INotificationProducer notificationProducer,
-        ILogger<App> logger)
+        INotificationService notificationService,
+        ILogger<App> logger
+    )
     {
         this.optionsProvider = optionsProvider.ThrowIfNull();
         this.menuServiceProducer = menuServiceProducer.ThrowIfNull();
@@ -88,13 +94,15 @@ public sealed class AppViewModel
         this.blazorHostWindow = blazorHostWindow.ThrowIfNull();
         this.jsConsoleInterop = jsConsoleInterop.ThrowIfNull();
         this.NotificationProducer = notificationProducer.ThrowIfNull();
+        this.notificationService = notificationService.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
 
         this.blazorHostWindow.StateChanged += this.MainWindow_StateChanged;
         menuServiceInitializer.InitializeMenuService(
             this.OpenNavigationMenu,
             this.CloseNavigationMenu,
-            this.ToggleNavigationMenu);
+            this.ToggleNavigationMenu
+        );
     }
 
     public async ValueTask InitializeApp(IJSRuntime jsRuntime)
@@ -106,7 +114,9 @@ public sealed class AppViewModel
         this.RedrawRequested?.Invoke(this, EventArgs.Empty);
         this.viewManager.ShowView<LaunchView>();
         this.viewManager.ShowViewRequested += (s, e) => this.CloseNavigationMenu();
-        this.hwndSource = HwndSource.FromHwnd(new WindowInteropHelper(this.blazorHostWindow).Handle);
+        this.hwndSource = HwndSource.FromHwnd(
+            new WindowInteropHelper(this.blazorHostWindow).Handle
+        );
     }
 
     public void Drag()
@@ -124,7 +134,12 @@ public sealed class AppViewModel
             }
 
             NativeMethods.ReleaseCapture();
-            NativeMethods.PostMessage(hwnd, NativeMethods.WM_SYSCOMMAND, (IntPtr)(NativeMethods.SC_MOVE | NativeMethods.HTCAPTION), IntPtr.Zero);
+            NativeMethods.PostMessage(
+                hwnd,
+                NativeMethods.WM_SYSCOMMAND,
+                (IntPtr)(NativeMethods.SC_MOVE | NativeMethods.HTCAPTION),
+                IntPtr.Zero
+            );
         });
     }
 
@@ -149,7 +164,12 @@ public sealed class AppViewModel
             }
 
             NativeMethods.ReleaseCapture();
-            NativeMethods.PostMessage(hwnd, NativeMethods.WM_NCLBUTTONDOWN, (IntPtr)(int)resizeDirection, IntPtr.Zero);
+            NativeMethods.PostMessage(
+                hwnd,
+                NativeMethods.WM_NCLBUTTONDOWN,
+                (IntPtr)(int)resizeDirection,
+                IntPtr.Zero
+            );
         });
     }
 
@@ -195,11 +215,7 @@ public sealed class AppViewModel
     {
         try
         {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = IssueUrl,
-                UseShellExecute = true
-            });
+            Process.Start(new ProcessStartInfo { FileName = IssueUrl, UseShellExecute = true });
         }
         catch (Exception ex)
         {
@@ -212,9 +228,22 @@ public sealed class AppViewModel
         this.viewManager.ShowView<SettingsSynchronizationView>();
     }
 
-    public void OnError(ErrorEventArgs _)
+    public void OnError(ErrorEventArgs eventArgs)
     {
-        //TODO: Handle errors, possibly log them
+        if (eventArgs.GetException() is Exception ex)
+        {
+            this.notificationService.NotifyError<MessageBoxHandler>(
+                title: "Caught unhandled render exception",
+                description: ex.ToString()
+            );
+        }
+        else
+        {
+            this.notificationService.NotifyError<MessageBoxHandler>(
+                title: "Caught unhandled render exception",
+                description: "Could not retrieve exception"
+            );
+        }
     }
 
     public void MenuButtonClicked(MenuButton menuButton)
@@ -224,7 +253,11 @@ public sealed class AppViewModel
 
     public void RestartAsNormalUser()
     {
-        this.privilegeManager.RequestNormalPrivileges<LaunchView>("You are currently running Daybreak as administrator", default, CancellationToken.None);
+        this.privilegeManager.RequestNormalPrivileges<LaunchView>(
+            "You are currently running Daybreak as administrator",
+            default,
+            CancellationToken.None
+        );
     }
 
     private void OnThemeChange()
@@ -256,7 +289,10 @@ public sealed class AppViewModel
                     category.RegisterButton(
                         option.Name,
                         option.Description,
-                        sp => sp.GetRequiredService<ViewManager>().ShowView<OptionView>(("optionName", option.Name)));
+                        sp =>
+                            sp.GetRequiredService<ViewManager>()
+                                .ShowView<OptionView>(("optionName", option.Name))
+                    );
                 }
             }
         }

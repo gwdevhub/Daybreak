@@ -2,11 +2,5 @@
 
 @code {
     [Parameter]
-    public required CharacterSelectComponentEntry SelectedCharacter { get; init; }
-    [Parameter]
-    public required List<CharacterSelectComponentEntry> Characters { get; init; }
-    [Parameter]
-    public required double CurrentExperienceInLevel { get; init; }
-    [Parameter]
-    public required double NextLevelExperienceThreshold { get; init; }
+    public required CharacterComponentContext? Context { get; init; }
 }
