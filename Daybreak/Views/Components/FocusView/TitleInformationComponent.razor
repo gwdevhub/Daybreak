@@ -1,6 +1,92 @@
-﻿<h3>TitleInformationComponent</h3>
+﻿<div class="container backdrop-panel">
+    @if (this.Context is not null)
+    {
+        <div class="title-track-container">
+            <div class="title-label">
+                Title Track
+            </div>
+            <div class="title-name">
+                @this.GetTitleDescription()
+            </div>
+        </div>
+
+        <div class="title-bar-container">
+            <div class="title-bar">
+                <div class="title-bar-fill" style="@(this.GetTitleBarWidth())"></div>
+                <div class="title-bar-text">
+                    @this.GetTitleBarText()
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <SpinnerWidget IsLoading="true" />
+    }
+</div>
 
 @code {
     [Parameter]
     public required TitleInformationComponentContext? Context { get; init; }
+
+    private string GetTitleBarWidth()
+    {
+        if (this.Context is null)
+        {
+            return string.Empty;
+        }
+
+        if (this.Context.IsPercentage)
+        {
+            return $"width: {this.Context.CurrentPoints / 10d}%;";
+        }
+
+        var percentage = this.Context.TierNumber >= this.Context.MaxTierNumber
+        ? 100
+        : this.Context.CurrentPoints == this.Context.PointsForNextRank
+            ? 100
+            : ((int)this.Context.CurrentPoints - this.Context.PointsForCurrentRank) * 100d / ((int)this.Context.PointsForNextRank - this.Context.PointsForCurrentRank);
+        return $"width: {percentage}%;";
+    }
+
+    private string GetTitleBarText()
+    {
+        if (this.Context is null)
+        {
+            return string.Empty;
+        }
+
+        if (this.Context.IsPercentage)
+        {
+            return $"{this.Context.CurrentPoints / 10d}%";
+        }
+
+        return $"{this.Context.CurrentPoints} / {this.Context.PointsForNextRank} Points";
+    }
+
+    private string GetTitleDescription()
+    {
+        if (this.Context is null)
+        {
+            return string.Empty;
+        }
+
+        if (this.Context.IsPercentage)
+        {
+            return this.Context.Title?.Name ?? string.Empty;
+        }
+        else
+        {
+            var currentTier = this.Context.TierNumber;
+            if (this.Context.Title.Tiers is null ||
+                currentTier <= 0 ||
+                currentTier > this.Context.Title.Tiers.Count)
+            {
+                return this.Context.Title.Name ?? string.Empty;
+            }
+
+            var titleName = this.Context.Title.Tiers[(int)currentTier - 1];
+            return $"{titleName} ({currentTier}/{this.Context.Title.Tiers.Count})";
+        }
+    }
 }

@@ -114,15 +114,7 @@ public sealed class FocusViewModel(
     public void OnExperienceDisplayClicked()
     {
         var options = this.options.Value;
-        options.ExperienceDisplay = options.ExperienceDisplay switch
-        {
-            ExperienceDisplay.CurrentLevelCurrentAndCurrentLevelMax => ExperienceDisplay.Percentage,
-            ExperienceDisplay.Percentage => ExperienceDisplay.RemainingUntilNextLevel,
-            ExperienceDisplay.RemainingUntilNextLevel => ExperienceDisplay.TotalCurretAndTotalMax,
-            ExperienceDisplay.TotalCurretAndTotalMax => ExperienceDisplay.CurrentLevelCurrentAndCurrentLevelMax,
-            _ => throw new InvalidOperationException()
-        };
-
+        options.ExperienceDisplay = CycleValue(options.ExperienceDisplay);
         this.options.UpdateOption();
         if (this.CharacterComponentContext is null)
         {
@@ -146,14 +138,7 @@ public sealed class FocusViewModel(
     public void OnVanquishingDisplayClicked()
     {
         var options = this.options.Value;
-        options.VanquishingDisplay = options.VanquishingDisplay switch
-        {
-            PointsDisplay.CurrentAndMax => PointsDisplay.Remaining,
-            PointsDisplay.Remaining => PointsDisplay.Percentage,
-            PointsDisplay.Percentage => PointsDisplay.CurrentAndMax,
-            _ => throw new InvalidOperationException()
-        };
-
+        options.VanquishingDisplay = CycleValue(options.VanquishingDisplay);
         this.options.UpdateOption();
         if (this.VanquishComponentContext is null)
         {
@@ -493,6 +478,29 @@ public sealed class FocusViewModel(
             AccountUnlockedSkills = mainPlayerBuildContext.UnlockedAccountSkills,
             CharacterUnlockedSkills = mainPlayerBuildContext.UnlockedCharacterSkills,
             UnlockedProfessions = mainPlayerBuildContext.UnlockedProfessions,
+        };
+    }
+
+    private static PointsDisplay CycleValue(PointsDisplay points)
+    {
+        return points switch
+        {
+            PointsDisplay.CurrentAndMax => PointsDisplay.Remaining,
+            PointsDisplay.Remaining => PointsDisplay.Percentage,
+            PointsDisplay.Percentage => PointsDisplay.CurrentAndMax,
+            _ => throw new InvalidOperationException()
+        };
+    }
+
+    private static ExperienceDisplay CycleValue(ExperienceDisplay display)
+    {
+        return display switch
+        {
+            ExperienceDisplay.CurrentLevelCurrentAndCurrentLevelMax => ExperienceDisplay.Percentage,
+            ExperienceDisplay.Percentage => ExperienceDisplay.RemainingUntilNextLevel,
+            ExperienceDisplay.RemainingUntilNextLevel => ExperienceDisplay.TotalCurretAndTotalMax,
+            ExperienceDisplay.TotalCurretAndTotalMax => ExperienceDisplay.CurrentLevelCurrentAndCurrentLevelMax,
+            _ => throw new InvalidOperationException()
         };
     }
 }
