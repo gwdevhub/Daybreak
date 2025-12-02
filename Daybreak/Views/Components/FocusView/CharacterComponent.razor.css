@@ -15,7 +15,6 @@
 .character-name {
     font-size: var(--font-size-large);
     color: var(--neutral-foreground-rest);
-    font-weight: 600;
 }
 
 .character-dropdown-wrapper {

@@ -94,7 +94,7 @@
         {
             ExperienceDisplay.TotalCurretAndTotalMax => $"{this.Context.CurrentTotalExperience} / {this.Context.TotalExperienceForNextLevel} xp",
             ExperienceDisplay.CurrentLevelCurrentAndCurrentLevelMax => $"{this.Context.ExperienceForCurrentLevel} / {this.Context.NextExperienceThreshold} xp",
-            ExperienceDisplay.Percentage => $"{this.Context.ExperienceForCurrentLevel * 100d / this.Context.NextExperienceThreshold}%",
+            ExperienceDisplay.Percentage => $"{(this.Context.ExperienceForCurrentLevel * 100d / this.Context.NextExperienceThreshold):F2}%",
             ExperienceDisplay.RemainingUntilNextLevel => $"{this.Context.ExperienceForNextLevel} xp remaining",
             _ => throw new InvalidOperationException()
         };

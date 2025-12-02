@@ -143,6 +143,34 @@ public sealed class FocusViewModel(
         this.RefreshView();
     }
 
+    public void OnVanquishingDisplayClicked()
+    {
+        var options = this.options.Value;
+        options.VanquishingDisplay = options.VanquishingDisplay switch
+        {
+            PointsDisplay.CurrentAndMax => PointsDisplay.Remaining,
+            PointsDisplay.Remaining => PointsDisplay.Percentage,
+            PointsDisplay.Percentage => PointsDisplay.CurrentAndMax,
+            _ => throw new InvalidOperationException()
+        };
+
+        this.options.UpdateOption();
+        if (this.VanquishComponentContext is null)
+        {
+            return;
+        }
+
+        this.VanquishComponentContext = new VanquishComponentContext
+        {
+            Display = options.VanquishingDisplay,
+            FoesKilled = this.VanquishComponentContext.FoesKilled,
+            FoesToKill = this.VanquishComponentContext.FoesToKill,
+            HardMode = this.VanquishComponentContext.HardMode,
+            Vanquishing = this.VanquishComponentContext.Vanquishing
+        };
+        this.RefreshView();
+    }
+
     private void ViewManager_ShowViewRequested(object? _, TrailBlazr.Models.ViewRequest e)
     {
         if (e.ViewModelType == typeof(FocusViewModel))
@@ -280,7 +308,7 @@ public sealed class FocusViewModel(
         this.PlayerResourcesComponentContext = ParsePlayerResourcesContext(mainPlayerState);
         this.QuestLogComponentContext = ParseQuestLogComponentContext(questLog);
         this.TitleInformationComponentContext = ParseTitleInformationComponentContext(titleInformation);
-        this.VanquishComponentContext = ParseVanquishComponentContext(mainPlayerInstance);
+        this.VanquishComponentContext = this.ParseVanquishComponentContext(mainPlayerInstance);
         this.BuildComponentContext = ParseBuildComponentContext(mainPlayerInstance, mainPlayerBuildContext);
         return true;
     }
@@ -434,7 +462,7 @@ public sealed class FocusViewModel(
         };
     }
 
-    private static VanquishComponentContext? ParseVanquishComponentContext(InstanceInfo? instanceInfo)
+    private VanquishComponentContext? ParseVanquishComponentContext(InstanceInfo? instanceInfo)
     {
         if (instanceInfo is null)
         {
@@ -446,7 +474,8 @@ public sealed class FocusViewModel(
             FoesKilled = instanceInfo.FoesKilled,
             FoesToKill = instanceInfo.FoesToKill,
             HardMode = instanceInfo.Difficulty is DifficultyInfo.Hard,
-            Vanquishing = (instanceInfo.FoesToKill + instanceInfo.FoesKilled > 0U) && instanceInfo.Difficulty is DifficultyInfo.Hard
+            Vanquishing = (instanceInfo.FoesToKill + instanceInfo.FoesKilled > 0U) && instanceInfo.Difficulty is DifficultyInfo.Hard,
+            Display = this.options.Value.VanquishingDisplay
         };
     }
 

@@ -12,7 +12,8 @@
                                 OnExperienceBarClicked="@this.ViewModel.OnExperienceDisplayClicked"/>
         </div>
         <div class="component vanquish-component">
-            <VanquishComponent Context="@this.ViewModel.VanquishComponentContext" />
+            <VanquishComponent Context="@this.ViewModel.VanquishComponentContext"
+                               OnVanquishBarClicked="@this.ViewModel.OnVanquishingDisplayClicked" />
         </div>
         <div class="component title-component">
             <TitleInformationComponent Context="@this.ViewModel.TitleInformationComponentContext" />
