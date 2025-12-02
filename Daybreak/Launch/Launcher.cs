@@ -17,6 +17,7 @@ using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.Updater.PostUpdate;
 using Daybreak.Shared.Utils;
 using Daybreak.Views;
+using Microsoft.AspNetCore.Components.WebView;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Web.WebView2.Core;
@@ -131,11 +132,11 @@ public sealed class Launcher : BlazorHybridApplication<App>
     {
     }
 
-    protected override void Host_CoreWebView2Initialized(CoreWebView2 e)
+    protected override void Host_BlazorWebViewInitialized(BlazorWebViewInitializedEventArgs e)
     {
-        base.Host_CoreWebView2Initialized(e);
-        e.ProcessFailed += this.CoreWebView2_ProcessFailed;
-        Global.CoreWebView2 = e;
+        e.WebView.CoreWebView2.ProcessFailed += this.CoreWebView2_ProcessFailed;
+        Global.CoreWebView2 = e.WebView.CoreWebView2;
+        base.Host_BlazorWebViewInitialized(e);
     }
 
     private void CoreWebView2_ProcessFailed(object? sender, CoreWebView2ProcessFailedEventArgs e)

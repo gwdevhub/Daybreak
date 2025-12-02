@@ -1,43 +1,37 @@
-﻿@using Daybreak.Views.Components.FocusView
+﻿@using BlazorFrame.Models
+@using Daybreak.Views.Components.FocusView
 
 @page "/focus"
 @inherits ViewBase<FocusView, FocusViewModel>
 
 <div class="focus-dashboard">
-    <div class="dashboard-grid">
-        <!-- Character Component Tile -->
-        <div class="dashboard-tile">
-            <CharacterComponent Context="@this.ViewModel?.CharacterComponentContext" />
+    <div class="dashboard-half">
+        <div class="component character-component">
+            <CharacterComponent Context="@this.ViewModel.CharacterComponentContext"
+                                OnCharacterChanged="@this.ViewModel.OnCharacterChanged"
+                                OnExperienceBarClicked="@this.ViewModel.OnExperienceDisplayClicked"/>
         </div>
-
-        <!-- Current Map Component Tile -->
-        <div class="dashboard-tile">
-            <CurrentMapComponent Context="@this.ViewModel?.CurrentMapComponentContext" />
+        <div class="component vanquish-component">
+            <VanquishComponent Context="@this.ViewModel.VanquishComponentContext" />
         </div>
-
-        <!-- Player Resources Component Tile -->
-        <div class="dashboard-tile">
-            <PlayerResourcesComponent Context="@this.ViewModel?.PlayerResourcesComponentContext" />
+        <div class="component title-component">
+            <TitleInformationComponent Context="@this.ViewModel.TitleInformationComponentContext" />
         </div>
-
-        <!-- Quest Log Component Tile -->
-        <div class="dashboard-tile">
-            <QuestLogComponent Context="@this.ViewModel?.QuestLogComponentContext" />
+        <div class="component map-component">
+            <CurrentMapComponent Context="@this.ViewModel.CurrentMapComponentContext" />
         </div>
-
-        <!-- Title Information Component Tile -->
-        <div class="dashboard-tile">
-            <TitleInformationComponent Context="@this.ViewModel?.TitleInformationComponentContext" />
+        <div class="component quest-component">
+            <QuestLogComponent Context="@this.ViewModel.QuestLogComponentContext" />
         </div>
-
-        <!-- Vanquish Component Tile -->
-        <div class="dashboard-tile">
-            <VanquishComponent Context="@this.ViewModel?.VanquishComponentContext" />
+    </div>
+    <div class="dashboard-half">
+        <div class="component build-component">
+            <BuildComponent Context="@this.ViewModel.BuildComponentContext" />
         </div>
-
-        <!-- Build Component Tile -->
-        <div class="dashboard-tile">
-            <BuildComponent Context="@this.ViewModel?.BuildComponentContext" />
+        <div class="component browser-component">
+            <iframe sandbox="allow-scripts allow-same-origin"
+                    style="height: 100%; width: 100%; margin: -2px;"
+                    src="@this.ViewModel.BrowserSource" />
         </div>
     </div>
 </div>

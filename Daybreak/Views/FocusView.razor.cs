@@ -1,10 +1,13 @@
-﻿using Daybreak.Shared.Models.Api;
+﻿using Daybreak.Configuration.Options;
+using Daybreak.Shared.Models.Api;
 using Daybreak.Shared.Models.FocusView;
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.Api;
+using Daybreak.Shared.Services.Experience;
 using Daybreak.Shared.Services.LaunchConfigurations;
 using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.Logging;
+using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
@@ -20,6 +23,8 @@ public sealed class FocusViewModel(
     INotificationService notificationService,
     ILaunchConfigurationService launchConfigurationService,
     IDaybreakApiService daybreakApiService,
+    IExperienceCalculator experienceCalculator,
+    ILiveUpdateableOptions<FocusViewOptions> options,
     ILogger<FocusView> logger)
     : ViewModelBase<FocusViewModel, FocusView>
 {
@@ -32,6 +37,8 @@ public sealed class FocusViewModel(
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly ILaunchConfigurationService launchConfigurationService = launchConfigurationService.ThrowIfNull();
     private readonly IDaybreakApiService daybreakApiService = daybreakApiService.ThrowIfNull();
+    private readonly IExperienceCalculator experienceCalculator = experienceCalculator.ThrowIfNull();
+    private readonly ILiveUpdateableOptions<FocusViewOptions> options = options.ThrowIfNull();
     private readonly ILogger<FocusView> logger = logger.ThrowIfNull();
 
     private ScopedApiContext? apiContext;
@@ -45,6 +52,7 @@ public sealed class FocusViewModel(
     public TitleInformationComponentContext? TitleInformationComponentContext { get; private set; }
     public VanquishComponentContext? VanquishComponentContext { get; private set; }
     public BuildComponentContext? BuildComponentContext { get; private set; }
+    public string? BrowserSource { get; private set; } = "https://wiki.guildwars.com/wiki/Main_Page";
 
     public override async ValueTask ParametersSet(FocusView view, CancellationToken cancellationToken)
     {
@@ -89,6 +97,50 @@ public sealed class FocusViewModel(
 
         this.apiContext = apiContext;
         this.Initialize();
+    }
+
+    public async void OnCharacterChanged(CharacterSelectComponentEntry selectedCharacter)
+    {
+        if (this.apiContext is null ||
+            this.cancellationSource is null)
+        {
+            return;
+        }
+
+        this.SetupDefaultValues();
+        await this.apiContext.SwitchCharacter(selectedCharacter.CharacterName, this.cancellationSource.Token);
+    }
+
+    public void OnExperienceDisplayClicked()
+    {
+        var options = this.options.Value;
+        options.ExperienceDisplay = options.ExperienceDisplay switch
+        {
+            ExperienceDisplay.CurrentLevelCurrentAndCurrentLevelMax => ExperienceDisplay.Percentage,
+            ExperienceDisplay.Percentage => ExperienceDisplay.RemainingUntilNextLevel,
+            ExperienceDisplay.RemainingUntilNextLevel => ExperienceDisplay.TotalCurretAndTotalMax,
+            ExperienceDisplay.TotalCurretAndTotalMax => ExperienceDisplay.CurrentLevelCurrentAndCurrentLevelMax,
+            _ => throw new InvalidOperationException()
+        };
+
+        this.options.UpdateOption();
+        if (this.CharacterComponentContext is null)
+        {
+            return;
+        }
+
+        this.CharacterComponentContext = new CharacterComponentContext
+        {
+            Characters = this.CharacterComponentContext.Characters,
+            CurrentCharacter = this.CharacterComponentContext.CurrentCharacter,
+            CurrentTotalExperience = this.CharacterComponentContext.CurrentTotalExperience,
+            ExperienceForCurrentLevel = this.CharacterComponentContext.ExperienceForCurrentLevel,
+            ExperienceForNextLevel = this.CharacterComponentContext.ExperienceForNextLevel,
+            NextExperienceThreshold = this.CharacterComponentContext.NextExperienceThreshold,
+            TotalExperienceForNextLevel = this.CharacterComponentContext.TotalExperienceForNextLevel,
+            ExperienceDisplay = options.ExperienceDisplay
+        };
+        this.RefreshView();
     }
 
     private void ViewManager_ShowViewRequested(object? _, TrailBlazr.Models.ViewRequest e)
@@ -216,7 +268,14 @@ public sealed class FocusViewModel(
         var questLog = await questLogTask;
         var mainPlayerBuildContext = await mainPlayerBuildContextTask;
 
-        this.CharacterComponentContext = ParseCharacterComponentContext(characterList, mainPlayerState);
+        if (mainPlayerInstance is null ||
+            mainPlayerInstance.Type is Shared.Models.Api.InstanceType.Loading)
+        {
+            this.SetupDefaultValues();
+            return true;
+        }
+
+        this.CharacterComponentContext = this.ParseCharacterComponentContext(characterList, mainPlayerState);
         this.CurrentMapComponentContext = ParseCurrentMapComponentContext(mainPlayerInstance);
         this.PlayerResourcesComponentContext = ParsePlayerResourcesContext(mainPlayerState);
         this.QuestLogComponentContext = ParseQuestLogComponentContext(questLog);
@@ -226,7 +285,7 @@ public sealed class FocusViewModel(
         return true;
     }
 
-    private static CharacterComponentContext? ParseCharacterComponentContext(CharacterSelectInformation? characterSelectInformation, MainPlayerState? mainPlayerState)
+    private CharacterComponentContext? ParseCharacterComponentContext(CharacterSelectInformation? characterSelectInformation, MainPlayerState? mainPlayerState)
     {
         if (characterSelectInformation is null ||
             characterSelectInformation.CharacterNames is null ||
@@ -260,7 +319,22 @@ public sealed class FocusViewModel(
             return default;
         }
 
-        return new CharacterComponentContext { Characters = parsedCharacters, CurrentCharacter = selectedCharacter, CurrentExperience = mainPlayerState?.CurrentExperience ?? 0 };
+        var currentExperience = mainPlayerState?.CurrentExperience ?? 0U;
+        var experienceForCurrentLevel = this.experienceCalculator.GetExperienceForCurrentLevel(currentExperience);
+        var experienceForNextLevel = this.experienceCalculator.GetRemainingExperienceForNextLevel(currentExperience);
+        var nextExperienceThreshold = this.experienceCalculator.GetNextExperienceThreshold(currentExperience);
+        var totalExperienceForNextLevel = this.experienceCalculator.GetTotalExperienceForNextLevel(currentExperience);
+        return new CharacterComponentContext
+        {
+            Characters = parsedCharacters,
+            CurrentCharacter = selectedCharacter,
+            CurrentTotalExperience = currentExperience,
+            ExperienceForCurrentLevel = experienceForCurrentLevel,
+            ExperienceForNextLevel = experienceForNextLevel,
+            NextExperienceThreshold = nextExperienceThreshold,
+            TotalExperienceForNextLevel = totalExperienceForNextLevel,
+            ExperienceDisplay = this.options.Value.ExperienceDisplay
+        };
     }
 
     private static CurrentMapComponentContext? ParseCurrentMapComponentContext(InstanceInfo? mainPlayerInstance)

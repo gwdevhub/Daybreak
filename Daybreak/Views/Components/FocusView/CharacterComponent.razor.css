@@ -1,0 +1,105 @@
+﻿.container {
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+}
+
+.character-selector-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    overflow: visible;
+}
+
+.character-name {
+    font-size: var(--font-size-large);
+    color: var(--neutral-foreground-rest);
+    font-weight: 600;
+}
+
+.character-dropdown-wrapper {
+    position: relative;
+    overflow: visible;
+}
+
+.character-dropdown-toggle {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--neutral-stroke-rest);
+    background: var(--neutral-fill-rest);
+    color: var(--neutral-foreground-rest);
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+    .character-dropdown-toggle:hover {
+        background: var(--neutral-fill-hover);
+        border-color: var(--neutral-stroke-hover);
+    }
+
+.character-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    min-width: 200px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: var(--neutral-fill-rest);
+    border: 1px solid var(--neutral-stroke-rest);
+    border-radius: 6px;
+    z-index: 1000;
+    animation: slideInFromTop 0.15s ease-out;
+}
+
+.character-dropdown-item {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    color: var(--neutral-foreground-rest);
+    transition: background-color 0.2s;
+    border-bottom: 1px solid var(--neutral-stroke-rest);
+}
+
+    .character-dropdown-item:last-child {
+        border-bottom: none;
+    }
+
+    .character-dropdown-item:hover {
+        background: var(--neutral-fill-hover);
+    }
+
+.experience-bar-container {
+    width: 100%;
+}
+
+.experience-bar {
+    position: relative;
+    width: 100%;
+    height: var(--font-size-x-large);
+    background: var(--neutral-fill-rest);
+    border-radius: 0px 0px 8px 8px;
+    overflow: hidden;
+}
+
+.experience-bar-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: color-mix(in srgb, var(--accent-lightyellow) 70%, transparent);
+    transition: width 0.3s ease-out;
+}
+
+.experience-bar-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: var(--font-size-medium);
+    color: var(--neutral-foreground-rest);
+    z-index: 1;
+}

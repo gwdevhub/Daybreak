@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Configuration.FocusView;
+﻿namespace Daybreak.Shared.Models.FocusView;
 
 public enum ExperienceDisplay
 {

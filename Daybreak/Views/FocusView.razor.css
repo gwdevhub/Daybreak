@@ -1,29 +1,52 @@
 ﻿.focus-dashboard {
+    display: flex;
     width: 100%;
+    height: calc(100% - 55px);
+    margin-top: 35px;
+    overflow: hidden;
+}
+
+.dashboard-half {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
     height: 100%;
-    padding: 1rem;
+}
+
+.component {
+    border-radius: 8px;
+    overflow: clip;
+}
+
+.character-component {
+    flex-shrink: 0;
+    overflow: visible !important;
+}
+
+.vanquish-component {
+    flex-shrink: 0;
+}
+
+.title-component {
+    flex-shrink: 0;
+}
+
+.map-component {
+    flex-shrink: 0;
+}
+
+.quest-component {
+    flex: 1;
+    min-height: 0;
     overflow-y: auto;
 }
 
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1rem;
-    width: 100%;
+.build-component {
+    height: 35%;
+    flex-shrink: 0;
 }
 
-.dashboard-tile {
-    background: color-mix(in srgb, var(--neutral-fill-rest) 70%, transparent);
-    border: 1px solid var(--neutral-stroke-rest);
-    backdrop-filter: blur(2px);
-    border-radius: 6px;
-    padding: 1rem;
-    min-height: 200px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.dashboard-tile:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    border-color: var(--accent-fill-rest);
+.browser-component {
+    height: 65%;
+    flex-shrink: 0;
 }

@@ -1,6 +1,102 @@
-﻿<h3>CharacterComponent</h3>
+﻿<div class="container backdrop-panel">
+    @if (this.Context is not null)
+    {
+        <div class="character-selector-container">
+            <div class="character-name">
+                @this.Context.CurrentCharacter.DisplayName
+            </div>
+            <div class="character-dropdown-wrapper">
+                <button class="character-dropdown-toggle" @onclick="this.ToggleDropdown">
+                    @if (!this.isDropdownOpen)
+                    {
+                        <FluentIcon Value="new Icons.Regular.Size16.ArrowDown()" />
+                    }
+                    else
+                    {
+                        <FluentIcon Value="new Icons.Regular.Size16.ArrowUp()" />
+                    }
+                </button>
+                @if (this.isDropdownOpen)
+                {
+                    <div class="character-dropdown-menu">
+                        @foreach (var character in this.Context.Characters.Where(character => character != this.Context.CurrentCharacter))
+                        {
+                            <div class="character-dropdown-item" @onclick="() => this.CharacterNameClicked(character)">
+                                @character.DisplayName
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="experience-bar-container">
+            <div class="experience-bar" @onclick="@(() => this.ExperienceBarClicked())">
+                <div class="experience-bar-fill" style="@(this.GetExperienceBarWidth())"></div>
+                <div class="experience-bar-text">
+                    @this.GetExperienceBarText()
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <SpinnerWidget IsLoading="true" />
+    }
+</div>
 
 @code {
     [Parameter]
     public required CharacterComponentContext? Context { get; init; }
+
+    [Parameter]
+    public required Action<CharacterSelectComponentEntry> OnCharacterChanged { get; init; }
+
+    [Parameter]
+    public required Action OnExperienceBarClicked { get; init; }
+
+    private bool isDropdownOpen = false;
+
+    private void ExperienceBarClicked()
+    {
+        this.OnExperienceBarClicked();
+    }
+
+    private void CharacterNameClicked(CharacterSelectComponentEntry entry)
+    {
+        this.isDropdownOpen = false;
+        this.OnCharacterChanged(entry);
+    }
+
+    private void ToggleDropdown()
+    {
+        this.isDropdownOpen = !this.isDropdownOpen;
+    }
+
+    private string GetExperienceBarWidth()
+    {
+        if (this.Context is null)
+        {
+            return string.Empty;
+        }
+
+        return $"width: {(this.Context.ExperienceForCurrentLevel * 100d / this.Context.NextExperienceThreshold)}%;";
+    }
+
+    private string GetExperienceBarText()
+    {
+        if (this.Context is null)
+        {
+            return string.Empty;
+        }
+
+        return this.Context.ExperienceDisplay switch
+        {
+            ExperienceDisplay.TotalCurretAndTotalMax => $"{this.Context.CurrentTotalExperience} / {this.Context.TotalExperienceForNextLevel} xp",
+            ExperienceDisplay.CurrentLevelCurrentAndCurrentLevelMax => $"{this.Context.ExperienceForCurrentLevel} / {this.Context.NextExperienceThreshold} xp",
+            ExperienceDisplay.Percentage => $"{this.Context.ExperienceForCurrentLevel * 100d / this.Context.NextExperienceThreshold}%",
+            ExperienceDisplay.RemainingUntilNextLevel => $"{this.Context.ExperienceForNextLevel} xp remaining",
+            _ => throw new InvalidOperationException()
+        };
+    }
 }
