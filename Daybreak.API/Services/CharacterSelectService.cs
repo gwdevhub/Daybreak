@@ -272,13 +272,14 @@ public sealed class CharacterSelectService(
                         return false;
                     }
 
-                    var uiState = 10U;
-                    this.uiContextService.SendMessage(Models.UIMessage.CheckUIState, 0, (uint)&uiState);
-                    var loginScreen = uiState == 2;
-                    if (!loginScreen)
-                    {
-                        return false;
-                    }
+                    //TODO: Re-enable login screen check once we have a reliable way to detect it
+                    //var uiState = 10U;
+                    //this.uiContextService.SendMessage(Models.UIMessage.CheckUIState, 0, (uint)&uiState);
+                    //var loginScreen = uiState == 2;
+                    //if (!loginScreen)
+                    //{
+                    //    return false;
+                    //}
 
                     for (var i = 0U; i < preGameContext.Pointer->LoginCharacters.Size; i++)
                     {

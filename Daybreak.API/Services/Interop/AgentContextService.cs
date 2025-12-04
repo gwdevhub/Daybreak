@@ -12,9 +12,9 @@ public unsafe sealed class AgentContextService : IAddressHealthService
     private const int AgentArrayOffset = -0x4;
     private static readonly byte[] AgentArrayAddressPattern = [0x8b, 0x0c, 0x90, 0x85, 0xc9, 0x74, 0x19];
 
-    private const string PlayerAgentIdMask = "xx????xxxx";
+    private const string PlayerAgentIdMask = "xx????xxxxxxx";
     private const int PlayerAgentIdOffset = -0xE;
-    private static readonly byte[] PlayerAgentIdAddressPattern = [0x5d, 0xe9, 0x00, 0x00, 0x00, 0x00, 0x55, 0x8b, 0xec, 0x53];
+    private static readonly byte[] PlayerAgentIdAddressPattern = [0x5d, 0xe9, 0x00, 0x00, 0x00, 0x00, 0x55, 0x8b, 0xec, 0x56, 0x57, 0x8b, 0x7d];
 
     private readonly MemoryScanningService memoryScanningService;
     private readonly GWAddressCache agentArrayAddress;

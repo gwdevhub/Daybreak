@@ -3,14 +3,23 @@ using Daybreak.API.Interop.GuildWars;
 using Daybreak.API.Models;
 using System.Core.Extensions;
 using System.Extensions.Core;
+using System.Runtime.InteropServices;
 
 namespace Daybreak.API.Services.Interop;
 
 public unsafe sealed class GameContextService : IAddressHealthService
 {
-    private const string BaseAddressMask = "xxxxxxx";
-    private const int BaseAddressOffset = +7;
-    private static readonly byte[] BaseAddressPattern = [0x50, 0x6A, 0x0F, 0x6A, 0x00, 0xFF, 0x35];
+    // TLS-based pattern to find GameContext getter function
+    private const string GameContextTlsMask = "xx????xxxxxxxxxxx????x";
+    private const int GameContextTlsOffset = 0;
+    private static readonly byte[] GameContextTlsPattern = 
+    [
+        0x8B, 0x0D, 0x00, 0x00, 0x00, 0x00,  // mov ecx, [TlsIndexPtr]       - 6 bytes: xx????
+        0x64, 0xA1, 0x2C, 0x00, 0x00, 0x00,  // mov eax, fs:[0000002C]       - 6 bytes: xxxxxx
+        0x8B, 0x04, 0x88,                    // mov eax, [eax+ecx*4]         - 3 bytes: xxx
+        0x8B, 0x80, 0x04, 0x00, 0x00, 0x00,  // mov eax, [eax+00000004]      - 6 bytes: xx????
+        0xC3                                 // ret                          - 1 byte:  x
+    ];                                       // Total: 22 bytes, mask: 22 chars
 
     private const string PreGameContextFile = "UiPregame.cpp";
     private const string PreGameContextAssertion = "!s_scene";
@@ -21,7 +30,7 @@ public unsafe sealed class GameContextService : IAddressHealthService
     private static readonly byte[] AvailableCharsPattern = [0x8B, 0x35, 0x00, 0x00, 0x00, 0x00, 0x57, 0x69, 0xF8, 0x84, 0x00, 0x00, 0x00];
 
     private readonly MemoryScanningService memoryScanningService;
-    private readonly GWAddressCache baseAddress;
+    private readonly GWAddressCache gameContextGetterAddress;
     private readonly GWAddressCache preGameContextAddress;
     private readonly GWAddressCache availableCharsAddress;
     private readonly ILogger<GameContextService> logger;
@@ -32,18 +41,21 @@ public unsafe sealed class GameContextService : IAddressHealthService
     {
         this.logger = logger.ThrowIfNull();
         this.memoryScanningService = memoryScanningService.ThrowIfNull();
-        this.baseAddress = new GWAddressCache(this.GetBaseAddress);
+        this.gameContextGetterAddress = new GWAddressCache(this.GetGameContextGetterAddress);
         this.preGameContextAddress = new GWAddressCache(this.GetPreGameContextAddress);
         this.availableCharsAddress = new GWAddressCache(this.GetAvailableCharactersAddress);
     }
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate nuint GetGameContextDelegate();
 
     public List<AddressState> GetAddressStates()
     {
         return [
             new AddressState
             {
-                Address = this.baseAddress.GetAddress() ?? 0,
-                Name = nameof(this.baseAddress),
+                Address = this.gameContextGetterAddress.GetAddress() ?? 0,
+                Name = nameof(this.gameContextGetterAddress),
             },
             new AddressState
             {
@@ -113,41 +125,46 @@ public unsafe sealed class GameContextService : IAddressHealthService
     private nuint GetGameContextAddress()
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        if (this.baseAddress.GetAddress() is not nuint basePtr)
+        
+        // Get the address of the GameContext getter function
+        var getterAddress = this.gameContextGetterAddress.GetAddress();
+        if (getterAddress is null or 0)
         {
-            scopedLogger.LogError("Failed to get base address");
-            return default;
+            scopedLogger.LogError("Failed to get GameContext getter function address");
+            return 0;
         }
 
-        nuint** baseContext = *(nuint***)basePtr;
-        if (baseContext is null)
+        // Call the function to get GameContext
+        var getter = Marshal.GetDelegateForFunctionPointer<GetGameContextDelegate>((nint)getterAddress);
+        var gameContextPtr = getter();
+
+        if (gameContextPtr == 0)
         {
-            scopedLogger.LogError("Failed to get base context address");
-            return default;
+            scopedLogger.LogError("GameContext getter returned null");
+            return 0;
         }
 
-        var globalContextPtr = baseContext[0x6];
-        if (globalContextPtr is null)
-        {
-            scopedLogger.LogError("Failed to get game context address");
-            return default;
-        }
-
-        return (nuint)globalContextPtr;
+        scopedLogger.LogInformation("GameContext address: 0x{address:X8}", gameContextPtr);
+        return gameContextPtr;
     }
 
-    private nuint GetBaseAddress()
+    private nuint GetGameContextGetterAddress()
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        var baseAddress = this.memoryScanningService.FindAndResolveAddress(BaseAddressPattern, BaseAddressMask, BaseAddressOffset);
-        if (baseAddress is 0)
+        
+        var address = this.memoryScanningService.FindAddress(
+            GameContextTlsPattern, 
+            GameContextTlsMask, 
+            0);
+            
+        if (address is 0)
         {
-            scopedLogger.LogError("Failed to find base address");
+            scopedLogger.LogError("Failed to find GameContext getter function");
             return 0U;
         }
 
-        scopedLogger.LogInformation("Base address: 0x{address:X8}", baseAddress);
-        return baseAddress;
+        scopedLogger.LogInformation("GameContext getter function: 0x{address:X8}", address);
+        return address;
     }
 
     private unsafe nuint GetPreGameContextAddress()

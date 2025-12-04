@@ -155,52 +155,52 @@ public readonly unsafe struct AgentLivingContext
     [FieldOffset(0x00F6)]
     public readonly AgentModelType AgentModelType;
 
-    [FieldOffset(0x0104)]
+    [FieldOffset(0x0108)]
     public readonly TagInfo* Tags;
 
-    [FieldOffset(0x010A)]
+    [FieldOffset(0x010E)]
     public readonly byte Primary;
 
-    [FieldOffset(0x010B)]
+    [FieldOffset(0x010F)]
     public readonly byte Secondary;
 
-    [FieldOffset(0x010C)]
+    [FieldOffset(0x0110)]
     public readonly byte Level;
 
-    [FieldOffset(0x010D)]
+    [FieldOffset(0x0111)]
     public readonly byte TeamId;
 
-    [FieldOffset(0x0114)]
+    [FieldOffset(0x0118)]
     public readonly float EnergyRegen;
 
-    [FieldOffset(0x011C)]
+    [FieldOffset(0x0120)]
     public readonly float Energy;
 
-    [FieldOffset(0x0120)]
+    [FieldOffset(0x0124)]
     public readonly uint MaxEnergy;
 
-    [FieldOffset(0x0128)]
+    [FieldOffset(0x012C)]
     public readonly float HealthRegen;
 
-    [FieldOffset(0x0130)]
+    [FieldOffset(0x0134)]
     public readonly float Health;
 
-    [FieldOffset(0x0134)]
+    [FieldOffset(0x0138)]
     public readonly uint MaxHealth;
 
-    [FieldOffset(0x0138)]
+    [FieldOffset(0x013C)]
     public readonly uint Effects;
 
-    [FieldOffset(0x0154)]
+    [FieldOffset(0x0158)]
     public readonly LivingAgentModelState ModelState;
 
-    [FieldOffset(0x0158)]
+    [FieldOffset(0x015C)]
     public readonly LivingAgentState State;
 
-    [FieldOffset(0x0180)]
+    [FieldOffset(0x0184)]
     public readonly uint LoginNumber;
 
-    [FieldOffset(0x01B1)]
+    [FieldOffset(0x01B5)]
     public readonly LivingAgentAllegiance Allegiance;
 
     public readonly bool IsAlive => (!this.State.HasFlag(LivingAgentState.Dead)) && this.Health > 0f;

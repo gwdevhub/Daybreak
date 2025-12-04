@@ -6,13 +6,13 @@ public enum UIMessage : uint
     Resize = 0x8,
     InitFrame = 0x9,
     DestroyFrame = 0xb,
-    KeyDown = 0x1e, // wparam = UIPacket::kKeyAction*
-    KeyUp = 0x20, // wparam = UIPacket::kKeyAction*
+    KeyDown = 0x20, // wparam = UIPacket::kKeyAction*
+    KeyUp = 0x22, // wparam = UIPacket::kKeyAction*
     MouseClick = 0x22, // wparam = UIPacket::kMouseClick*
-    MouseClick2 = 0x2e, // wparam = UIPacket::kMouseAction*
+    MouseClick2 = 0x31, // wparam = UIPacket::kMouseAction*
     MouseAction = 0x2f, // wparam = UIPacket::kMouseAction*
     SetLayout = 0x33,
-    FrameMessage_0x47 = 0x47, // Multiple uses depending on frame
+    FrameMessage_0x47 = 0x55, // Multiple uses depending on frame
     UpdateAgentEffects = 0x10000000 | 0x9,
     RerenderAgentModel = 0x10000000 | 0x7, // wparam = uint32_t agent_id
     AgentSpeechBubble = 0x10000000 | 0x17,
@@ -94,7 +94,7 @@ public enum UIMessage : uint
     PreferenceFlagChanged = 0x10000000 | 0x13F, // wparam = UiPacket::kPreferenceFlagChanged
     PreferenceValueChanged = 0x10000000 | 0x140, // wparam = UiPacket::kPreferenceValueChanged
     UIPositionChanged = 0x10000000 | 0x141, // wparam = UIPacket::kUIPositionChanged
-    QuestAdded = 0x10000000 | 0x149, // wparam = { quest_id, ... }
+    QuestAdded = 0x10000000 | 0x14C, // wparam = { quest_id, ... }
     QuestDetailsChanged = 0x10000000 | 0x14A, // wparam = { quest_id, ... }
     ClientActiveQuestChanged = 0x10000000 | 0x14C, // wparam = { quest_id, ... }. Triggered when the game requests the current quest to change
     ServerActiveQuestChanged = 0x10000000 | 0x14E, // wparam = UIPacket::kServerActiveQuestChanged*. Triggered when the server requests the current quest to change

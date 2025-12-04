@@ -11,6 +11,16 @@ public static class UIPackets
         Right = 0x2
     }
 
+    public enum ActionState
+    {
+        MouseDown = 0x6,
+        MouseUp = 0x7,
+        MouseClick = 0x8,
+        MouseDoubleClick = 0x9,
+        DragRelease = 0xb,
+        KeyDown = 0xe
+    }
+
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public readonly struct LogChatMessage(string message, Channel channel)
     {
@@ -42,5 +52,15 @@ public static class UIPackets
         public readonly MouseButtons MouseButton = mouseButton;
         public readonly uint IsDoubleClick = isDoubleClick;
         public readonly uint UnknownTypeScreenPos = unknownTypeScreenPos;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public readonly struct MouseAction(uint frameId, uint childOffsetId, ActionState currentState, nuint wparam = 0, nuint lparam = 0)
+    {
+        public readonly uint FrameId = frameId;
+        public readonly uint ChildOffsetId = childOffsetId;
+        public readonly ActionState CurrentState = currentState;
+        public readonly nuint WParam = wparam;
+        public readonly nuint LParam = lparam;
     }
 }
