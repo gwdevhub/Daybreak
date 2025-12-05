@@ -25,27 +25,27 @@
     <File Path="LICENSE.md" />
     <File Path="README.md" />
   </Folder>
-  <Project Path="D:/Dev/Daybreak/Daybreak/Daybreak.7ZipExtractor/Daybreak.7ZipExtractor.csproj">
+  <Project Path="Daybreak.7ZipExtractor/Daybreak.7ZipExtractor.csproj">
     <Platform Solution="*|x86" Project="x64" />
     <Platform Solution="Debug|x64" Project="x64" />
   </Project>
-  <Project Path="D:/Dev/Daybreak/Daybreak/Daybreak.API/Daybreak.API.csproj">
+  <Project Path="Daybreak.API/Daybreak.API.csproj">
     <Platform Solution="Debug|x86" Project="x86" />
   </Project>
-  <Project Path="D:/Dev/Daybreak/Daybreak/Daybreak.Installer/Daybreak.Installer.csproj">
+  <Project Path="Daybreak.Installer/Daybreak.Installer.csproj">
     <Platform Solution="*|x86" Project="x86" />
     <Platform Solution="Debug|Any CPU" Project="x86" />
     <Platform Solution="Debug|x64" Project="x86" />
     <Platform Solution="Release|x64" Project="x64" />
   </Project>
-  <Project Path="D:/Dev/Daybreak/Daybreak/Daybreak.Shared/Daybreak.Shared.csproj">
+  <Project Path="Daybreak.Shared/Daybreak.Shared.csproj">
     <Platform Solution="Debug|Any CPU" Project="x86" />
   </Project>
-  <Project Path="D:/Dev/Daybreak/Daybreak/Daybreak.Tests/Daybreak.Tests.csproj">
+  <Project Path="Daybreak.Tests/Daybreak.Tests.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>
-  <Project Path="D:/Dev/Daybreak/Daybreak/Daybreak/Daybreak.csproj">
+  <Project Path="Daybreak/Daybreak.csproj">
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>
