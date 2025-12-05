@@ -35,5 +35,5 @@
     public bool ContinueEnabled { get; set; } = false;
 
     [Parameter]
-    public Action? Continue { get; set; }
+    public required Action Continue { get; set; }
 }

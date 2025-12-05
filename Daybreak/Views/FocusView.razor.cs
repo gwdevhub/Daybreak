@@ -1,5 +1,4 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Models;
 using Daybreak.Shared.Models.Api;
 using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Models.FocusView;
@@ -10,13 +9,11 @@ using Daybreak.Shared.Services.Experience;
 using Daybreak.Shared.Services.LaunchConfigurations;
 using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.Logging;
-using OpenTK.Graphics.OpenGL;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
-using System.Threading.Tasks;
 using TrailBlazr.Services;
 using TrailBlazr.ViewModels;
 

@@ -34,7 +34,6 @@ using Daybreak.Services.Themes;
 using Daybreak.Services.TradeChat;
 using System.Net.WebSockets;
 using Daybreak.Services.Notifications;
-using Daybreak.Services.Charts;
 using Daybreak.Services.InternetChecker;
 using Daybreak.Services.Sounds;
 using Daybreak.Services.TradeChat.Notifications;
@@ -252,7 +251,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<INotificationService, NotificationService>();
         services.AddSingleton<INotificationProducer, NotificationService>(sp => sp.GetRequiredService<INotificationService>().Cast<NotificationService>());
         services.AddSingleton<INotificationHandlerProducer, NotificationService>(sp => sp.GetRequiredService<INotificationService>().Cast<NotificationService>());
-        services.AddSingleton<ILiveChartInitializer, LiveChartInitializer>();
         services.AddSingleton<ISoundService, SoundService>();
         services.AddSingleton<IInternetCheckingService, InternetCheckingService>();
         services.AddSingleton<IConnectivityStatus, ConnectivityStatus>();
@@ -435,11 +433,6 @@ public class ProjectConfiguration : PluginConfigurationBase
     public override void RegisterMenuButtons(IMenuServiceProducer menuServiceProducer)
     {
         menuServiceProducer.ThrowIfNull();
-        menuServiceProducer.CreateIfNotExistCategory("Launcher")
-            //TODO: Implement Notifications view
-            //.RegisterButton("Notifications", "Open notifications view", sp => { })
-            .RegisterButton("Manage Plugins", "Open plugins view", sp => sp.GetRequiredService<ViewManager>().ShowView<PluginsView>())
-            .RegisterButton("Manage client version", "Open version manager", sp => sp.GetRequiredService<ViewManager>().ShowView<VersionManagementView>());
         menuServiceProducer.CreateIfNotExistCategory("Guild Wars")
             .RegisterButton("Game companion", "Open game companion", sp => sp.GetRequiredService<IViewManager>().ShowView<LaunchView>())
             .RegisterButton("Manage builds", "Open builds manager", sp => sp.GetRequiredService<IViewManager>().ShowView<BuildListView>())
@@ -448,6 +441,11 @@ public class ProjectConfiguration : PluginConfigurationBase
             .RegisterButton("Copy Guild Wars", "Copy Guild Wars from an existing installation", sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsCopySelectionView>())
             .RegisterButton("Event Calendar", "Show current and upcoming events", sp => sp.GetRequiredService<IViewManager>().ShowView<EventCalendarView>())
             .RegisterButton("Guild Wars Party Search", "Show party search broadcasts", sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsPartySearchView>());
+        menuServiceProducer.CreateIfNotExistCategory("Daybreak")
+            //TODO: Implement Notifications view
+            //.RegisterButton("Notifications", "Open notifications view", sp => { })
+            .RegisterButton("Manage Plugins", "Open plugins view", sp => sp.GetRequiredService<ViewManager>().ShowView<PluginsView>())
+            .RegisterButton("Manage version", "Open version manager", sp => sp.GetRequiredService<ViewManager>().ShowView<VersionManagementView>());
         menuServiceProducer.CreateIfNotExistCategory("Trade")
             .RegisterButton("Alerts", "Open trade alerts manager", sp => sp.GetRequiredService<IViewManager>().ShowView<TradeAlertsView>())
             .RegisterButton("Kamadan", "Open kamadan trade chat", sp => sp.GetRequiredService<IViewManager>().ShowView<TradeChatView>((nameof(TradeChatView.Source), nameof(TraderSource.Kamadan))))

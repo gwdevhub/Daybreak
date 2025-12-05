@@ -16,8 +16,13 @@ internal static class EncryptionHelper
         var saltBytes = Generate128BitsOfRandomEntropy();
         var ivBytes = Generate128BitsOfRandomEntropy();
 
-        using var password = new Rfc2898DeriveBytes(key, saltBytes, Iterations, HashAlgorithmName.SHA512);
-        var keyBytes = password.GetBytes(Aes.KeySize / 8);
+        var keyBytes = Rfc2898DeriveBytes.Pbkdf2(
+            password: key,
+            salt: saltBytes,
+            iterations: Iterations,
+            hashAlgorithm: HashAlgorithmName.SHA512,
+            outputLength: Aes.KeySize / 8);
+
         using var encryptor = Aes.CreateEncryptor(keyBytes, ivBytes);
         using var memoryStream = new MemoryStream();
         using var cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write);
@@ -42,8 +47,13 @@ internal static class EncryptionHelper
         encryptedStream.Read(ivBytes, 0, ivBytes.Length);
         encryptedStream.Read(cipherBytes, 0, cipherBytes.Length);
 
-        using var password = new Rfc2898DeriveBytes(key, saltBytes, Iterations, HashAlgorithmName.SHA512);
-        var keyBytes = password.GetBytes(Aes.KeySize / 8);
+        var keyBytes = Rfc2898DeriveBytes.Pbkdf2(
+            password: key,
+            salt: saltBytes,
+            iterations: Iterations,
+            hashAlgorithm: HashAlgorithmName.SHA512,
+            outputLength: Aes.KeySize / 8);
+
         using var decryptor = Aes.CreateDecryptor(keyBytes, ivBytes);
         using var memoryStream = new MemoryStream(cipherBytes);
         using var cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Read);

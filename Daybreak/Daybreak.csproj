@@ -16,6 +16,7 @@
     <UserSecretsId>cfb2a489-db80-448d-a969-80270f314c46</UserSecretsId>
     <RuntimeIdentifier>win-x86</RuntimeIdentifier>
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
 
   <ItemGroup>
@@ -64,14 +65,9 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" />
     <PackageReference Include="Reloaded.Assembler" />
-    <PackageReference Include="System.Private.Uri" />
-    <PackageReference Include="WPF-UI" />
     <PackageReference Include="WpfExtended.SourceGeneration" />
     <PackageReference Include="WpfScreenHelper" />
-    <PackageReference Include="WriteableBitmapEx" />
     <PackageReference Include="Squealify" />
-    <PackageReference Include="System.Formats.Asn1" />
-    <PackageReference Include="System.IO.Compression" />
     <PackageReference Include="PeNet" />
     <PackageReference Include="Plumsy" />
     <PackageReference Include="securifybv.ShellLink" />
@@ -79,8 +75,6 @@
     <PackageReference Include="DiffPlex" />
     <PackageReference Include="HtmlAgilityPack" />
     <PackageReference Include="ini-parser-netstandard" />
-    <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" />
-    <PackageReference Include="MahApps.Metro" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" />
     <PackageReference Include="Microsoft.CorrelationVector" />
     <PackageReference Include="Microsoft.Data.Sqlite" />

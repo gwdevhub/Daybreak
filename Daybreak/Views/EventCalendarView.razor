@@ -99,7 +99,9 @@
             <div class="frame-container">
                 @if (!string.IsNullOrEmpty(this.ViewModel.FrameAddress))
                 {
-                    <BlazorFrame Src="@this.ViewModel.FrameAddress" />
+                    <iframe sandbox="allow-scripts allow-same-origin"
+                            style="height: 100%; width: 100%; margin: -2px;"
+                            src="@this.ViewModel.FrameAddress" />
                 }
                 else
                 {

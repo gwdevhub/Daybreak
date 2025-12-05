@@ -10,7 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BlazorFrame" />
     <PackageReference Include="MeaMod.DNS" />
     <PackageReference Include="MemoryPack" />
     <PackageReference Include="MemoryPack.Generator">
@@ -20,11 +19,6 @@
     <PackageReference Include="Microsoft.Extensions.Http" />
     <PackageReference Include="Microsoft.Web.WebView2" />
     <PackageReference Include="Slim" />
-    <PackageReference Include="System.Net.Http" />
-    <PackageReference Include="System.Reflection.Metadata" />
-    <PackageReference Include="System.Text.Encoding.CodePages" />
-    <PackageReference Include="System.Text.Json" />
-    <PackageReference Include="System.Text.RegularExpressions" />
     <PackageReference Include="SystemExtensions.NetCore" />
     <PackageReference Include="SystemExtensions.NetStandard.DependencyInjection" />
     <PackageReference Include="SystemExtensions.NetStandard.Generators" PrivateAssets="all" />

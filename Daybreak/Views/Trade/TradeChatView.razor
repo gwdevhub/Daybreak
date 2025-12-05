@@ -2,9 +2,9 @@
     <div class="trade-chat-container">
         @if (this.ViewModel.TradeChatUrl is not null)
         {
-            <BlazorFrame Src="@this.ViewModel.TradeChatUrl"
-                         Width="100%"
-                         Height="100%"/>
+            <iframe sandbox="allow-scripts allow-same-origin"
+                    style="height: 100%; width: 100%; margin: -2px;"
+                    src="@this.ViewModel.TradeChatUrl" />
         }
     </div>
 </div>
