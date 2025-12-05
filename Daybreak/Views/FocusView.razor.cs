@@ -156,6 +156,42 @@ public sealed class FocusViewModel(
         this.RefreshView();
     }
 
+    public void OnCurrentMapClicked()
+    {
+        if (this.CurrentMapComponentContext?.CurrentMap is not Map map)
+        {
+            return;
+        }
+
+        this.BrowserSource = map.WikiUrl;
+    }
+
+    public void OnTitleClicked()
+    {
+        if (this.TitleInformationComponentContext?.Title is not Title title)
+        {
+            return;
+        }
+
+        this.BrowserSource = title.WikiUrl;
+    }
+
+    public void OnKurzickBarClicked()
+    {
+    }
+
+    public void OnLuxonBarClicked()
+    {
+    }
+
+    public void OnBalthazarBarClicked()
+    {
+    }
+
+    public void OnImperialBarClicked()
+    {
+    }
+
     private void ViewManager_ShowViewRequested(object? _, TrailBlazr.Models.ViewRequest e)
     {
         if (e.ViewModelType == typeof(FocusViewModel))
@@ -206,27 +242,39 @@ public sealed class FocusViewModel(
             if (cancellationToken.IsCancellationRequested)
             {
                 scopedLogger.LogInformation("Cancellation requested, stopping game information fetch loop");
+                this.viewManager.ShowView<LaunchView>();
                 return;
             }
 
             if (this.apiContext is null || this.process is null || this.process.HasExited)
             {
                 scopedLogger.LogInformation("Process has exited or API context is null, stopping game information fetch loop");
+                this.viewManager.ShowView<LaunchView>();
                 return;
             }
 
-            if (!await this.FetchGameInformation(cancellationToken))
+            try
             {
+                if (!await this.FetchGameInformation(cancellationToken))
+                {
+                    retryCount++;
+                }
+                else
+                {
+                    retryCount = 0;
+                    await this.RefreshViewAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                scopedLogger.LogError(ex, "Error occurred while fetching game information");
                 retryCount++;
             }
-            else
-            {
-                retryCount = 0;
-                await this.RefreshViewAsync();
-            }
+            
 
             if (retryCount >= MaxRetryAttempts)
             {
+                this.viewManager.ShowView<LaunchView>();
                 return;
             }
 

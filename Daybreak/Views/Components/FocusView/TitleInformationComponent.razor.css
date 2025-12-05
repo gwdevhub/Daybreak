@@ -15,6 +15,7 @@
 .title-name {
     font-size: var(--font-size-large);
     color: var(--neutral-foreground-rest);
+    cursor: pointer;
 }
 
 .title-label {

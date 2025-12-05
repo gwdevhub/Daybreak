@@ -5,7 +5,7 @@
             <div class="title-label">
                 Title Track
             </div>
-            <div class="title-name">
+            <div class="title-name" @onclick="this.TitleClicked">
                 @this.GetTitleDescription()
             </div>
         </div>
@@ -28,6 +28,13 @@
 @code {
     [Parameter]
     public required TitleInformationComponentContext? Context { get; init; }
+    [Parameter]
+    public required Action OnTitleClicked { get; init; }
+
+    private void TitleClicked()
+    {
+        this.OnTitleClicked();
+    }
 
     private string GetTitleBarWidth()
     {

@@ -436,7 +436,8 @@ public class ProjectConfiguration : PluginConfigurationBase
     {
         menuServiceProducer.ThrowIfNull();
         menuServiceProducer.CreateIfNotExistCategory("Launcher")
-            .RegisterButton("Notifications", "Open notifications view", sp => { })
+            //TODO: Implement Notifications view
+            //.RegisterButton("Notifications", "Open notifications view", sp => { })
             .RegisterButton("Manage Plugins", "Open plugins view", sp => sp.GetRequiredService<ViewManager>().ShowView<PluginsView>())
             .RegisterButton("Manage client version", "Open version manager", sp => sp.GetRequiredService<ViewManager>().ShowView<VersionManagementView>());
         menuServiceProducer.CreateIfNotExistCategory("Guild Wars")

@@ -27,6 +27,10 @@
     flex-shrink: 0;
 }
 
+.resources-component {
+    flex-shrink: 0;
+}
+
 .title-component {
     flex-shrink: 0;
 }
