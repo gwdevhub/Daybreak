@@ -25,6 +25,7 @@ using Slim;
 using Slim.Integration.ServiceCollection;
 using System.Core.Extensions;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
@@ -136,7 +137,44 @@ public sealed class Launcher : BlazorHybridApplication<App>
     {
         e.WebView.CoreWebView2.ProcessFailed += this.CoreWebView2_ProcessFailed;
         Global.CoreWebView2 = e.WebView.CoreWebView2;
+
+        e.WebView.CoreWebView2.AddWebResourceRequestedFilter("*", CoreWebView2WebResourceContext.All);
+        e.WebView.CoreWebView2.WebResourceRequested += this.CoreWebView2_WebResourceRequested;
+
         base.Host_BlazorWebViewInitialized(e);
+    }
+
+    private void CoreWebView2_WebResourceRequested(object? sender, CoreWebView2WebResourceRequestedEventArgs e)
+    {
+        if (sender is not CoreWebView2 webView)
+        {
+            return;
+        }
+
+        var uri = new Uri(e.Request.Uri);
+
+        // Only handle requests for our embedded resources
+        if (!uri.Host.Equals("0.0.0.1", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        // Convert URI path to embedded resource name
+        var resourcePath = uri.AbsolutePath.TrimStart('/');
+        var resourceName = $"Daybreak.wwwroot.{resourcePath.Replace('/', '.')}";
+
+        var assembly = typeof(Launcher).Assembly;
+        var stream = assembly.GetManifestResourceStream(resourceName);
+
+        if (stream is not null)
+        {
+            var contentType = GetContentType(resourcePath);
+            e.Response = webView.Environment.CreateWebResourceResponse(
+                stream,
+                200,
+                "OK",
+                $"Content-Type: {contentType}");
+        }
     }
 
     private void CoreWebView2_ProcessFailed(object? sender, CoreWebView2ProcessFailedEventArgs e)
@@ -198,7 +236,7 @@ public sealed class Launcher : BlazorHybridApplication<App>
         await Task.Delay(10);
 
         this.logger = this.ServiceProvider.GetRequiredService<ILogger<Launcher>>();
-        this.logger.LogDebug($"Running in {Environment.CurrentDirectory}");
+        this.logger.LogDebug("Running in {Environment.CurrentDirectory}", Environment.CurrentDirectory);
         this.exceptionHandler = this.ServiceProvider.GetRequiredService<IExceptionHandler>();
         try
         {
@@ -272,5 +310,22 @@ public sealed class Launcher : BlazorHybridApplication<App>
         {
             this.logger.LogWarning("WPF Binding error: {bindingMessage}", message);
         }
+    }
+
+    private static string GetContentType(string path)
+    {
+        return Path.GetExtension(path).ToLowerInvariant() switch
+        {
+            ".html" => "text/html",
+            ".css" => "text/css",
+            ".js" => "application/javascript",
+            ".json" => "application/json",
+            ".png" => "image/png",
+            ".jpg" or ".jpeg" => "image/jpeg",
+            ".svg" => "image/svg+xml",
+            ".woff" => "font/woff",
+            ".woff2" => "font/woff2",
+            _ => "application/octet-stream"
+        };
     }
 }

@@ -15,6 +15,7 @@
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <UserSecretsId>cfb2a489-db80-448d-a969-80270f314c46</UserSecretsId>
     <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
   </PropertyGroup>
 
   <ItemGroup>
@@ -53,6 +54,7 @@
 		
   <ItemGroup>
     <PackageReference Include="Elastic.OpenTelemetry" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" />
     <PackageReference Include="Microsoft.Fast.Components.FluentUI" />
     <PackageReference Include="Microsoft.Fast.Components.FluentUI.Emojis" />
     <PackageReference Include="Microsoft.Fast.Components.FluentUI.Icons" />

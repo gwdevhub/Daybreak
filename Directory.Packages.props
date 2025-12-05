@@ -26,6 +26,7 @@
     <PackageVersion Include="Microsoft.Data.Sqlite" Version="9.0.10" />
     <PackageVersion Include="Microsoft.Data.Sqlite.Core" Version="9.0.10" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.10" />
+    <PackageVersion Include="Microsoft.Extensions.FileProviders.Embedded" Version="10.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.10" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.10" />
     <PackageVersion Include="Microsoft.Fast.Components.FluentUI" Version="3.8.0" />
