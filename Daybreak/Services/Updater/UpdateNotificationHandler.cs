@@ -1,12 +1,12 @@
 ﻿using Daybreak.Shared.Models.Notifications;
 using Daybreak.Shared.Models.Notifications.Handling;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Views;
 using System.Core.Extensions;
-using Version = Daybreak.Shared.Models.Versioning.Version;
+using TrailBlazr.Services;
 
 namespace Daybreak.Services.Updater;
-internal sealed class UpdateNotificationHandler(IViewManager viewManager) : INotificationHandler
+internal sealed class UpdateNotificationHandler(IViewManager viewManager)
+    : INotificationHandler
 {
     private readonly IViewManager viewManager = viewManager.ThrowIfNull();
 
@@ -18,7 +18,6 @@ internal sealed class UpdateNotificationHandler(IViewManager viewManager) : INot
             return;
         }
 
-        version.HasPrefix = true;
-        this.viewManager.ShowView<UpdateConfirmationView>(version);
+        this.viewManager.ShowView<UpdateConfirmationView>((nameof(UpdateConfirmationView.Version), version.ToString()));
     }
 }

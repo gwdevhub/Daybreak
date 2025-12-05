@@ -1,0 +1,86 @@
+﻿<div class="option-view-container backdrop-panel">
+    <div class="option-view-title">
+        <h3>@this.ViewModel.OptionInstance?.Type.Name</h3>
+    </div>
+    <div class="option-view-content">
+        @if (this.ViewModel.OptionInstance is not null)
+        {
+            <div style="display: flex; flex-direction: column; gap: 0.75rem; margin: 0 auto;">
+                @foreach (var property in this.ViewModel.OptionInstance.Type.Properties)
+                {
+                    @if (!property.IsVisible)
+                    {
+                        continue;
+                    }
+
+                    @if (property.ValuesFactory is not null)
+                    {
+                        var values = property.ValuesFactory();
+                        <MultiSelectOption Name="@property.Name"
+                                           Description="@property.Description"
+                                           Instance="@this.ViewModel.OptionInstance"
+                                           Property="@property"
+                                           PossibleValues="@values"
+                                           ValueChanged="@this.ViewModel.OnValueChanged" />
+                    }
+                    else if (property.Type == typeof(bool))
+                    {
+                        <BooleanOption Name="@property.Name"
+                                       Description="@property.Description"
+                                       Instance="@this.ViewModel.OptionInstance"
+                                       Property="@property"
+                                       ValueChanged="@this.ViewModel.OnValueChanged" />
+                    }
+                    else if (property.Type == typeof(int) ||
+                             property.Type == typeof(uint) ||
+                             property.Type == typeof(long) ||
+                             property.Type == typeof(ulong) ||
+                             property.Type == typeof(short) ||
+                             property.Type == typeof(ushort) ||
+                             property.Type == typeof(float) ||
+                             property.Type == typeof(double))
+                    {
+                        @if (property.Validator is not null)
+                        {
+                            <NumberRangeOption Name="@property.Name"
+                                               Description="@property.Description"
+                                               Instance="@this.ViewModel.OptionInstance"
+                                               Property="@property"
+                                               Validator="@property.Validator"
+                                               ValueChanged="@this.ViewModel.OnValueChanged" />
+                        }
+                        else
+                        {
+                            <NumberOption Name="@property.Name"
+                                          Description="@property.Description"
+                                          Instance="@this.ViewModel.OptionInstance"
+                                          Property="@property"
+                                          ValueChanged="@this.ViewModel.OnValueChanged" />
+                        }
+                    }
+                    else
+                    {
+                        <StringOption Name="@property.Name"
+                                      Description="@property.Description"
+                                      Instance="@this.ViewModel.OptionInstance"
+                                      Property="@property"
+                                      ValueChanged="@this.ViewModel.OnValueChanged" />
+                    }
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@page "/options/{optionName}"
+@inherits ViewBase<OptionView, OptionViewModel>
+@code {
+    [Parameter]
+    public required string OptionName { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        this.ViewModel.Initialize(CancellationToken.None);
+        return base.OnParametersSetAsync();
+    }
+}

@@ -1,0 +1,57 @@
+﻿<div class="container backdrop-panel">
+    @if (this.Context is not null)
+    {
+        <div class="title">
+            Quest Log
+        </div>
+        <div class="active-container">
+            <div class="active-label">
+                Active Quest
+            </div>
+            <div class="active-name" @onclick="() => this.QuestClicked(this.Context.CurrentQuest)">
+                @this.Context.CurrentQuest?.Quest?.Name
+            </div>
+        </div>
+        <div class="log-container">
+            @foreach (var group in this.Context.Quests.GroupBy(q => q.From))
+            {
+                <div class="quest-group">
+                    <div class="quest-location">
+                        @group.Key?.Name
+                    </div>
+                    <div class="quest-list">
+                        @foreach (var questEntry in group)
+                        {
+                            <div class="quest-entry" @onclick="() => this.QuestClicked(questEntry)">
+                                @questEntry.Quest?.Name
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <SpinnerWidget IsLoading="true" />
+    }
+
+</div>
+
+@using Daybreak.Shared.Models.Guildwars
+@code {
+    [Parameter]
+    public required QuestLogComponentContext? Context { get; init; }
+    [Parameter]
+    public required Action<QuestMetadata> OnQuestClicked { get; init; }
+
+    private void QuestClicked(QuestMetadata? quest)
+    {
+        if (quest is null)
+        {
+            return;
+        }
+
+        this.OnQuestClicked(quest);
+    }
+}

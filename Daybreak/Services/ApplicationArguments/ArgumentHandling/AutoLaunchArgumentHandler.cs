@@ -1,20 +1,18 @@
 ﻿using Daybreak.Shared.Services.ApplicationArguments.ArgumentHandling;
 using Daybreak.Shared.Services.LaunchConfigurations;
-using Daybreak.Shared.Services.Navigation;
-using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Extensions;
 
 namespace Daybreak.Services.ApplicationArguments.ArgumentHandling;
 internal sealed class AutoLaunchArgumentHandler(
-    IViewManager viewManager,
+    //IViewManager viewManager,
     ILaunchConfigurationService launchConfigurationService,
     ILogger<AutoLaunchArgumentHandler> logger) : IArgumentHandler
 {
     private static readonly TimeSpan StartupDelay = TimeSpan.FromSeconds(1);
 
-    private readonly IViewManager viewManager = viewManager.ThrowIfNull();
+    //private readonly IViewManager viewManager = viewManager.ThrowIfNull();
     private readonly ILaunchConfigurationService launchConfigurationService = launchConfigurationService.ThrowIfNull();
     private readonly ILogger<AutoLaunchArgumentHandler> logger = logger.ThrowIfNull();
 
@@ -38,6 +36,6 @@ internal sealed class AutoLaunchArgumentHandler(
         }
 
         await Task.Delay(StartupDelay);
-        this.viewManager.ShowView<LauncherView>(desiredConfig);
+        //this.viewManager.ShowView<LauncherView>(desiredConfig);
     }
 }

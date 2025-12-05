@@ -1,6 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models.Mods;
-using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Services.Downloads;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Utils;
@@ -14,16 +13,14 @@ using System.Extensions.Core;
 using Daybreak.Shared.Models.Github;
 using System.Net.Http;
 using System.Extensions;
-using Version = Daybreak.Shared.Models.Versioning.Version;
-using Daybreak.Shared.Services.SevenZip;
 using System.Formats.Tar;
+using Daybreak.Shared.Models.Async;
 
 namespace Daybreak.Services.DXVK;
 /// <summary>
 /// Service for managing DXVK for GW1. https://github.com/doitsujin/dxvk
 /// </summary>
 internal sealed class DXVKService(
-    ISevenZipExtractor sevenZipExtractor,
     INotificationService notificationService,
     IDownloadService downloadService,
     IHttpClient<DXVKService> httpClient,
@@ -38,9 +35,13 @@ internal sealed class DXVKService(
     private const string DXVKDirectorySubpath = "DXVK";
     private const string D3D9Dll = "d3d9.dll";
 
+    private static readonly ProgressUpdate ProgressFailedToGetLatest = new(0, "Failed to get latest version");
+    private static readonly ProgressUpdate ProgressFailedDownload = new(0, "Failed to download files");
+    private static readonly ProgressUpdate ProgressUnpackingFiles = new(0, "Unpacking files");
+    private static readonly ProgressUpdate ProgressFinished = new(0, "Finished");
+
     private static readonly string DXVKDirectory = PathUtils.GetAbsolutePathFromRoot(DXVKDirectorySubpath);
 
-    private readonly ISevenZipExtractor sevenZipExtractor = sevenZipExtractor.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
     private readonly ILiveUpdateableOptions<DXVKOptions> options = options.ThrowIfNull();
@@ -48,6 +49,9 @@ internal sealed class DXVKService(
     private readonly ILogger<DXVKService> logger = logger.ThrowIfNull();
 
     public string Name => "DXVK";
+    public string Description => "Translation layer which converts DX9 3D calls to Vulkan. Can improve performance for some users";
+    public bool IsVisible => true;
+    public bool CanCustomManage => false;
     public bool IsEnabled
     {
         get => this.options.Value.Enabled;
@@ -57,10 +61,23 @@ internal sealed class DXVKService(
             this.options.UpdateOption();
         }
     }
-    public bool IsInstalled => Directory.Exists(this.options.Value.Path) &&
+    public bool IsInstalled => Directory.Exists(DXVKDirectory) &&
            File.Exists(Path.Combine(DXVKDirectory, D3D9Dll));
 
-    public async Task<bool> SetupDXVK(DXVKInstallationStatus dXVKInstallationStatus, CancellationToken cancellationToken)
+    public IProgressAsyncOperation<bool> PerformInstallation(CancellationToken cancellationToken)
+    {
+        return ProgressAsyncOperation.Create(async progress =>
+        {
+            return await this.SetupDXVK(progress, cancellationToken);
+        }, cancellationToken);
+    }
+
+    public Task OnCustomManagement(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException("DXVK mod does not support custom management");
+    }
+
+    public async Task<bool> SetupDXVK(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
     {
         if (this.IsInstalled)
         {
@@ -73,24 +90,23 @@ internal sealed class DXVKService(
         if (latestVersion is null)
         {
             scopedLogger.LogError("Failed to get latest version");
-            dXVKInstallationStatus.CurrentStep = DXVKInstallationStatus.FailedToGetLatestVersion;
+            progress.Report(ProgressFailedToGetLatest);
             return false;
         }
 
-        latestVersion.HasPrefix = false;
         var downloadUrl = ReleaseUrl.Replace(TagPlaceholder, latestVersion.ToString());
-        if ((await this.downloadService.DownloadFile(downloadUrl, ArchiveName, dXVKInstallationStatus, cancellationToken)) is false)
+        if ((await this.downloadService.DownloadFile(downloadUrl, ArchiveName, progress, cancellationToken)) is false)
         {
             scopedLogger.LogError("Failed to install DXVK");
-            dXVKInstallationStatus.CurrentStep = DXVKInstallationStatus.FailedDownload;
+            progress.Report(ProgressFailedDownload);
             return false;
         }
 
         scopedLogger.LogDebug("Extracting DXVK files");
-        dXVKInstallationStatus.CurrentStep = DXVKInstallationStatus.ExtractingFiles;
+        progress.Report(ProgressUnpackingFiles);
         await this.ExtractFiles(latestVersion, cancellationToken);
 
-        dXVKInstallationStatus.CurrentStep = DXVKInstallationStatus.Finished;
+        progress.Report(ProgressFinished);
         return true;
     }
 
@@ -189,7 +205,6 @@ internal sealed class DXVKService(
         }
 
         var options = this.options.Value;
-        options.Path = DXVKDirectory;
         options.Version = version.ToString();
         this.options.UpdateOption();
         File.Delete(ArchiveName);
@@ -211,19 +226,22 @@ internal sealed class DXVKService(
         var latestRelease = releasesList?
             .Select(t => t.Ref?.Replace("refs/tags/", ""))
             .OfType<string>()
+            .Select(t =>
+            {
+                var parseResult = Version.TryParse(t.TrimStart('v'), out var parsedVersion);
+                return (parseResult, parsedVersion);
+            })
+            .Where(t => t.parseResult)
+            .OrderBy(t => t.parsedVersion)
             .LastOrDefault();
-        if (latestRelease is not string tag)
+
+        if (latestRelease is null)
         {
-            scopedLogger.LogError("Could not parse version list. No latest version found");
+            scopedLogger.LogError("No valid releases found");
             return default;
         }
 
-        if (!Version.TryParse(tag, out var version))
-        {
-            scopedLogger.LogError("Could not parse version from tag {tag}", tag);
-            return default;
-        }
-
+        var (_, version) = latestRelease.Value;
         return version;
     }
 }

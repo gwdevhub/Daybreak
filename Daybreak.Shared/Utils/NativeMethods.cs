@@ -16,8 +16,35 @@ public static class NativeMethods
     public const nint HWND_TOP = 0;
     public const int WH_KEYBOARD_LL = 13;
     public const uint LIST_MODULES_32BIT = 0x01;
+    public const int WM_SYSCOMMAND = 0x112;
+    public const int WM_NCLBUTTONDOWN = 0x00A1;
+    public const int HTCAPTION = 2;
+    public const int SC_MOVE = 0xF010;
+    public const int SC_SIZE = 0xF000;
+
+    public enum ResizeDirection
+    {
+        Left = 10,
+        Right = 11,
+        Top = 12,
+        TopLeft = 13,
+        TopRight = 14,
+        Bottom = 15,
+        BottomLeft = 16,
+        BottomRight = 17
+    }
 
     public delegate nint HookProc(int nCode, nint wParam, nint lParam);
+
+    public enum DWMWINDOWATTRIBUTE { DWMWA_WINDOW_CORNER_PREFERENCE = 33 }
+
+    public enum DWM_WINDOW_CORNER_PREFERENCE
+    {
+        DWMWCP_DEFAULT = 0,
+        DWMWCP_DONOTROUND = 1,
+        DWMWCP_ROUND = 2,
+        DWMWCP_ROUNDSMALL = 3
+    }
 
     [Flags]
     public enum AllocationType : uint
@@ -365,7 +392,12 @@ public static class NativeMethods
 
     public delegate bool Win32Callback(nint hwnd, nint lParam);
 
-    public const int WM_SYSCOMMAND = 0x112;
+    [DllImport("user32.dll")]
+    public static extern IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
+    [DllImport("user32.dll")]
+    public static extern IntPtr PostMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
+    [DllImport("user32.dll")]
+    public static extern bool ReleaseCapture();
 
     [DllImport("kernel32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -526,4 +558,7 @@ public static class NativeMethods
     [DllImport("user32.Dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool EnumChildWindows(nint parentHandle, Win32Callback callback, nint lParam);
+
+    [DllImport("dwmapi.dll", CharSet = CharSet.Unicode, PreserveSig = false)]
+    public static extern void DwmSetWindowAttribute(IntPtr hWnd, DWMWINDOWATTRIBUTE attribute, ref DWM_WINDOW_CORNER_PREFERENCE pvAttribute, uint cbAttribute);
 }

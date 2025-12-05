@@ -1,14 +1,16 @@
-﻿using Daybreak.Launch;
-using Daybreak.Services.Notifications.Handlers;
+﻿using Daybreak.Services.Notifications.Handlers;
+using Daybreak.Shared;
 using Daybreak.Shared.Exceptions;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
+using Microsoft.Web.WebView2.Core;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using WpfExtended.Blazor.Exceptions;
 
 namespace Daybreak.Services.ExceptionHandling;
 
@@ -36,10 +38,21 @@ internal sealed class ExceptionHandler(
         if (e is FatalException fatalException)
         {
             this.logger.LogCritical(e, $"{nameof(FatalException)} encountered. Closing application");
-            ExceptionDialog.ShowException(fatalException);
             File.WriteAllText("crash.log", e.ToString());
             WriteCrashDump();
             return false;
+        }
+        else if (e is CoreWebView2Exception coreWebView2Exception &&
+            coreWebView2Exception.Args.ProcessFailedKind is CoreWebView2ProcessFailedKind.RenderProcessExited)
+        {
+            if (Global.CoreWebView2 is null)
+            {
+                this.logger.LogCritical(e, "CoreWebView2 is null. Cannot handle exception");
+                return false;
+            }
+
+            this.logger.LogError(e, "CoreWebView2 render process exited unexpectedly. Reloading browser");
+            Global.CoreWebView2.Reload();
         }
         else if (e is TaskCanceledException)
         {
@@ -49,7 +62,6 @@ internal sealed class ExceptionHandler(
         else if (e is TargetInvocationException targetInvocationException && e.InnerException is FatalException innerFatalException)
         {
             this.logger.LogCritical(e, $"{nameof(FatalException)} encountered. Closing application");
-            ExceptionDialog.ShowException(e);
             File.WriteAllText("crash.log", e.ToString());
             WriteCrashDump();
             return false;
@@ -95,7 +107,7 @@ internal sealed class ExceptionHandler(
             return true;
         }
 
-            this.logger.LogError(e, $"Unhandled exception caught {e.GetType()}");
+        this.logger.LogError(e, $"Unhandled exception caught {e.GetType()}");
         this.notificationService.NotifyError<MessageBoxHandler>(e.GetType().Name, e.ToString());
         return true;
     }

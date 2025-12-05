@@ -1,0 +1,120 @@
+﻿/* Navigation Panel */
+.navigation-panel {
+    position: absolute; /* Changed to absolute positioning */
+    top: 0;
+    left: 0;
+    width: 0;
+    min-width: 0;
+    overflow: hidden;
+    z-index: 1000;
+    height: 100vh;
+    transition: width 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    opacity: 0;
+    /* CSS custom properties for dynamic animation */
+    --stagger-delay: 0.05s;
+    --base-delay: 0.05s;
+    /* Custom properties for menu item animations */
+    --item-stagger-delay: 0.03s;
+    --item-base-delay: 0.1s;
+}
+
+    .navigation-panel.open {
+        min-width: 250px;
+        width: 25%;
+        opacity: 1;
+    }
+
+        .navigation-panel.open .menu-category {
+            animation: slideInFromLeft 0.3s ease-out forwards;
+            animation-delay: calc(var(--base-delay) + (counter(menu-item) - 1) * var(--stagger-delay));
+        }
+
+.navigation-menu {
+    padding: 15px;
+    margin-top: 40px;
+    color: var(--neutral-foreground-rest);
+    height: calc(100vh - 40px);
+    overflow-y: auto;
+    box-sizing: border-box;
+    counter-reset: menu-item;
+}
+
+.menu-category {
+    margin-bottom: 5px;
+    counter-increment: menu-item;
+}
+
+.category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: color-mix(in srgb, var(--accent-fill-active) 60%, transparent);
+    backdrop-filter: blur(10px);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border: 1px solid color-mix(in srgb, var(--accent-stroke-active) 60%, transparent);
+}
+
+    .category-header:hover {
+        background: var(--accent-fill-hover);
+        color: var( --foreground-on-accent-rest-large);
+    }
+
+.category-title {
+    font-weight: 400;
+    font-size: var(--font-size-medium);
+}
+
+.category-arrow {
+    font-size: var(--font-size-small);
+    transition: transform 0.2s;
+}
+
+    .category-arrow.expanded {
+        transform: rotate(180deg);
+    }
+
+.category-items {
+    padding: 5px 0;
+    /* Reset counter for menu items within each category */
+    counter-reset: category-item;
+}
+
+.menu-item {
+    padding: 8px 10px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+    margin: 2px 0;
+    /* Increment counter for each menu item */
+    counter-increment: category-item;
+    /* Initial state for animation */
+    opacity: 0;
+    transform: translateY(-20px);
+}
+
+/* Animate menu items when category is expanded and navigation panel is open */
+.navigation-panel.open .category-items .menu-item {
+    animation: slideInFromTop 0.25s ease-out forwards;
+    /* Dynamic delay calculation for each menu item */
+    animation-delay: calc(var(--item-base-delay) + (counter(category-item) - 1) * var(--item-stagger-delay));
+}
+
+.menu-item:hover {
+    background: var(--accent-fill-hover);
+    color: var( --foreground-on-accent-rest-large);
+}
+
+.item-title {
+    display: block;
+    font-size: var(--font-size-medium);
+    font-weight: 400;
+}
+
+.item-description {
+    display: block;
+    font-size: var(--font-size-small);
+    margin-top: 2px;
+}

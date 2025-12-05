@@ -9,6 +9,7 @@ using Daybreak.Shared.Services.BuildTemplates;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
+using System.Windows.Controls;
 using ZLinq;
 using InstanceType = Daybreak.API.Interop.GuildWars.InstanceType;
 
@@ -47,7 +48,7 @@ public sealed class PartyService(
             return false;
         }
 
-        if (!await this.LeaveParty(cancellationToken))
+        if (!await this.KickAllHeroes(cancellationToken))
         {
             scopedLogger.LogError("Could not set party loadout. Could not leave party");
             return false;
@@ -67,14 +68,15 @@ public sealed class PartyService(
             return false;
         }
 
-        var heroBehaviorSetup = await this.gameThreadService.QueueOnGameThread(() => this.GetHeroBehaviorSetup(partyLoadout), cancellationToken);
-        foreach(var heroBehaviorEntry in heroBehaviorSetup ?? [])
-        {
-            if (!await this.SetHeroBehavior(heroBehaviorEntry.AgentId, heroBehaviorEntry.Behavior, cancellationToken))
-            {
-                scopedLogger.LogWarning("Could not set hero behavior for agent {agentId} to {behavior}", heroBehaviorEntry.AgentId, heroBehaviorEntry.Behavior);
-            }
-        }
+        // TODO: Hashing is broken
+        //var heroBehaviorSetup = await this.gameThreadService.QueueOnGameThread(() => this.GetHeroBehaviorSetup(partyLoadout), cancellationToken);
+        //foreach (var heroBehaviorEntry in heroBehaviorSetup ?? [])
+        //{
+        //    if (!await this.SetHeroBehavior(heroBehaviorEntry.AgentId, heroBehaviorEntry.Behavior, cancellationToken))
+        //    {
+        //        scopedLogger.LogWarning("Could not set hero behavior for agent {agentId} to {behavior}", heroBehaviorEntry.AgentId, heroBehaviorEntry.Behavior);
+        //    }
+        //}
 
         return true;
     }
@@ -143,7 +145,7 @@ public sealed class PartyService(
         }, cancellationToken);
     }
 
-    public async Task<bool> LeaveParty(CancellationToken cancellationToken)
+    public async Task<bool> KickAllHeroes(CancellationToken cancellationToken)
     {
         var partySize = await this.GetPartySize(cancellationToken);
         if (partySize is 1 or 0)
@@ -151,7 +153,7 @@ public sealed class PartyService(
             return true;
         }
 
-        return await this.gameThreadService.QueueOnGameThread(this.partyContextService.LeaveParty, cancellationToken);
+        return await this.gameThreadService.QueueOnGameThread(this.partyContextService.KickAllHeroes, cancellationToken);
     }
 
     public async Task<uint> GetPartySize(CancellationToken cancellationToken)

@@ -1,9 +1,10 @@
-﻿using Daybreak.Attributes;
+﻿using Daybreak.Shared.Attributes;
 using Newtonsoft.Json;
 
 namespace Daybreak.Configuration.Options;
 
 [OptionsName(Name = "ReShade")]
+[OptionsIgnore]
 internal sealed class ReShadeOptions
 {
     [JsonProperty(nameof(Enabled))]

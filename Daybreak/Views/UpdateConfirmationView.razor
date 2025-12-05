@@ -1,0 +1,34 @@
+﻿<div class="stretch-container backdrop-panel">
+    <div class="title-bar-header">
+        Version @this.ViewModel.Version?.ToString()
+    </div>
+    <div class="content">
+        <div class="changelog-section">
+            <div class="changelog-container">
+                @if (!string.IsNullOrWhiteSpace(this.ViewModel.ChangeLog))
+                {
+                    <pre class="changelog-text">@this.ViewModel.ChangeLog</pre>
+                }
+                else
+                {
+                    <p class="no-changelog">No changelog available for this version.</p>
+                }
+            </div>
+        </div>
+        <div class="button-group">
+            <FluentButton Appearance="Appearance.Accent" OnClick="this.ViewModel.Confirm">
+                Continue
+            </FluentButton>
+            <FluentButton Appearance="Appearance.Neutral" OnClick="this.ViewModel.Cancel">
+                Cancel
+            </FluentButton>
+        </div>
+    </div>
+</div>
+
+@page "/update-confirmation"
+@inherits ViewBase<UpdateConfirmationView, UpdateConfirmationViewModel>
+@code{
+    [Parameter]
+    public string Version { get; set; } = string.Empty;
+}

@@ -1,4 +1,5 @@
 ﻿using Daybreak.Services.Guildwars;
+using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Models.Mods;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.Guildwars;
@@ -16,13 +17,26 @@ internal sealed class GuildWarsVersionChecker(
     ILogger<GuildWarsVersionChecker> logger) : IGuildWarsVersionChecker, IApplicationLifetimeService
 {
     public string Name => "GuildWars Version Checker";
+    public string Description => "Checks if the Guild Wars executable is up to date before launching";
+    public bool IsVisible => false;
     public bool IsEnabled { get; set; } = true;
     public bool IsInstalled => true;
+    public bool CanCustomManage => false;
 
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
     private readonly IGuildWarsInstaller guildWarsInstaller = guildWarsInstaller.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly ILogger<GuildWarsVersionChecker> logger = logger.ThrowIfNull();
+
+    public IProgressAsyncOperation<bool> PerformInstallation(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException("GuildWars Version Checker does not support manual installation");
+    }
+
+    public Task OnCustomManagement(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException("GuildWars Version Checker does not support custom management");
+    }
 
     public IEnumerable<string> GetCustomArguments()
     {

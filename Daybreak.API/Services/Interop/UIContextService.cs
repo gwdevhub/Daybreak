@@ -1,6 +1,7 @@
 ﻿using Daybreak.API.Interop;
 using Daybreak.API.Interop.GuildWars;
 using Daybreak.API.Models;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using System.Core.Extensions;
 using System.Extensions.Core;
 using System.Runtime.InteropServices;
@@ -13,28 +14,30 @@ public sealed class UIContextService
 {
     private const string GetChildFrameIdFile = "CtlView.cpp";
     private const string GetChildFrameIdAssertion = "pageId";
-    private const int GetChildFrameIdOffset = 0x19;
-    private const string SetFrameFlagFile = "FrApi.cpp";
-    private const string SetFrameFlagAssertion = "frameId";
-    private const int SetFrameVisibleOffset = 0x4f9;
-    private const int SetFrameDisabledOffset = 0x4e3;
-    private static readonly byte[] SendFrameUiMessageByIdSeq = [0x83, 0xFB, 0x47, 0x73, 0x14];
-    private const string SendFrameUiMessageByIdMask = "xxxxx";
-    private const int SendFrameUiMessageByIdOffset = -0x34;
+    private const int GetChildFrameIdOffset = 0x12;
+    private static readonly byte[] GetChildFrameIdPattern = [0xE8];
+    private const string GetChildFrameIdMask = "x";
+
+    private static readonly byte[] SendFrameUiMessageSeq = [
+        0x83, 0xC1, 0xDC,              // add ecx, -24
+        0xE8, 0x00, 0x00, 0x00, 0x00,  // call
+        0x8B, 0x4D, 0xFC               // mov ecx, [ebp-04]
+    ];
+    private const string SendFrameUiMessageMask = "xxxx????xxx";
+    private const int SendFrameUiMessageOffset = 0x3;
+
     private static readonly byte[] SendUIMessageSeq = [0xB9, 0x00, 0x00, 0x00, 0x00, 0xE8, 0x00, 0x00, 0x00, 0x00, 0x5D, 0xC3, 0x89, 0x45, 0x08];
     private const string SendUIMessageMask = "x????x????xxxxx";
-    private const string CreateHashFromStringMask = "xxxxxxx";
-    private const int CreateHashFromStringOffset = 0x7;
-    private static readonly byte[] CreateHashFromStringSeq = [0x85, 0xC0, 0x74, 0x0D, 0x6A, 0xFF, 0x50];
+
     private const string FrameArrayFile = "\\Code\\Engine\\Frame\\FrMsg.cpp";
     private const string FrameArrayAssertion = "frame";
-    private static readonly byte[] GetRootFrameSeq = [0x05, 0xE0, 0xFE, 0xFF, 0xFF, 0xC3];
-    private const string GetRootFrameMask = "xxxxxx";
-    private const int GetRootFrameOffset = -0x3C;
-
-    [SuppressUnmanagedCodeSecurity]
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private unsafe delegate uint CreateHashFromStringFunc(char* value, int seed);
+    
+    private static readonly byte[] GetRootFrameSeq = [
+        0xA1, 0x00, 0x00, 0x00, 0x00,  // mov eax,[address]
+        0x05, 0xD8, 0xFE, 0xFF, 0xFF,  // add eax,FFFFFED8
+        0xC3                           // ret
+    ];
+    private const string GetRootFrameMask = "x????xxxxxx";
 
     [SuppressUnmanagedCodeSecurity]
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -54,7 +57,7 @@ public sealed class UIContextService
 
     private readonly SemaphoreSlim semaphoreSlim = new(1);
     private readonly MemoryScanningService memoryScanningService;
-    private readonly GWDelegateCache<CreateHashFromStringFunc> createHashFromString;
+    private readonly HashingService hashingService;
     private readonly GWDelegateCache<GetChildFrameIdFunc> getChildFrameId;
     private readonly GWAddressCache frameArrayAddressCache;
     private readonly GWHook<SendUIMessageFunc> sendUiMessageHook;
@@ -66,13 +69,13 @@ public sealed class UIContextService
     private CancellationTokenSource? cts = default;
 
     public UIContextService(
+        HashingService hashingService,
         MemoryScanningService memoryScanningService,
         ILogger<UIContextService> logger)
     {
         this.logger = logger.ThrowIfNull();
         this.memoryScanningService = memoryScanningService.ThrowIfNull();
-        this.createHashFromString = new GWDelegateCache<CreateHashFromStringFunc>(new GWAddressCache(() => this.memoryScanningService.FunctionFromNearCall(
-                this.memoryScanningService.FindAddress(CreateHashFromStringSeq, CreateHashFromStringMask, CreateHashFromStringOffset))));
+        this.hashingService = hashingService.ThrowIfNull();
         this.frameArrayAddressCache = new GWAddressCache(() => this.memoryScanningService.FindAssertion(FrameArrayFile, FrameArrayAssertion, 0, -0x14));
         this.sendUiMessageHook = new GWHook<SendUIMessageFunc>(
             new GWAddressCache(() => this.memoryScanningService.ToFunctionStart(
@@ -80,23 +83,24 @@ public sealed class UIContextService
             this.OnSendUIMessage);
         this.sendFrameUIMessage = new(
             new GWAddressCache(() => this.memoryScanningService.FunctionFromNearCall(
-                this.memoryScanningService.FindAddress(SendFrameUiMessageByIdSeq, SendFrameUiMessageByIdMask, SendFrameUiMessageByIdOffset) + 0x67)));
+                this.memoryScanningService.FindAddress(SendFrameUiMessageSeq, SendFrameUiMessageMask, SendFrameUiMessageOffset))));
         this.getChildFrameId = new GWDelegateCache<GetChildFrameIdFunc>(
-            new GWAddressCache(() => this.memoryScanningService.FunctionFromNearCall(
-                this.memoryScanningService.FindAssertion(GetChildFrameIdFile, GetChildFrameIdAssertion, 0, GetChildFrameIdOffset))));
+            new GWAddressCache(() =>
+            {
+                var address = this.memoryScanningService.FindAssertion(GetChildFrameIdFile, GetChildFrameIdAssertion, 0, GetChildFrameIdOffset);
+                return this.memoryScanningService.FunctionFromNearCall(
+                    this.memoryScanningService.FindAddress(GetChildFrameIdPattern, GetChildFrameIdMask, 0, address, address + 0xFF));
+            }));
         this.getRootFrame = new GWDelegateCache<GetRootFrameFunc>(
-            new GWAddressCache(() => this.memoryScanningService.FindAddress(GetRootFrameSeq, GetRootFrameMask, GetRootFrameOffset)));
+            new GWAddressCache(() => this.memoryScanningService.FindAddress(GetRootFrameSeq, GetRootFrameMask, 0)));
     }
 
     public List<AddressState> GetAddressStates()
     {
+        var assertion = this.memoryScanningService.FindAssertion(GetChildFrameIdFile, GetChildFrameIdAssertion, 0, GetChildFrameIdOffset);
+        Console.WriteLine(assertion);
         return
         [
-            new()
-            {
-                Name = nameof(this.createHashFromString),
-                Address = this.createHashFromString.Cache.GetAddress() ?? 0U
-            },
             new()
             {
                 Name = nameof(this.frameArrayAddressCache),
@@ -104,13 +108,13 @@ public sealed class UIContextService
             },
             new()
             {
-                Name = nameof(this.getChildFrameId),
-                Address = this.getChildFrameId.Cache.GetAddress() ?? 0U
+                Name = nameof(this.sendFrameUIMessage),
+                Address = this.sendFrameUIMessage.Cache.GetAddress() ?? 0U
             },
             new()
             {
-                Name = nameof(this.sendFrameUIMessage),
-                Address = this.sendFrameUIMessage.Cache.GetAddress() ?? 0U
+                Name = nameof(this.getChildFrameId),
+                Address = this.getChildFrameId.Cache.GetAddress() ?? 0U
             },
             new()
             {
@@ -268,7 +272,7 @@ public sealed class UIContextService
             return null;
         }
 
-        var hash = this.CreateHashFromString(label, -1);
+        var hash = this.CreateHashFromString(label);
         if (hash is 0)
         {
             scopedLogger.LogError("Failed to get hash for label {label}", label);
@@ -315,19 +319,9 @@ public sealed class UIContextService
         return frame;
     }
 
-    public unsafe uint CreateHashFromString(string value, int seed)
+    public uint CreateHashFromString(string value)
     {
-        var scopedLogger = this.logger.CreateScopedLogger();
-        if (this.createHashFromString.GetDelegate() is not CreateHashFromStringFunc del)
-        {
-            scopedLogger.LogError("Failed to get CreateHashFromString delegate");
-            return 0;
-        }
-
-        fixed (char* valuePtr = value)
-        {
-            return del(valuePtr, seed);
-        }
+        return this.hashingService.Hash(value);
     }
 
     public unsafe void SendMessage(UIMessage message, nuint wParam, nuint lParam)
@@ -357,24 +351,24 @@ public sealed class UIContextService
 
     private static unsafe void SetFrameVisibleInternal(WrappedPointer<Frame> frame, bool visible)
     {
-        uint* pState = &frame.Pointer->Field91;   // direct field address
+        uint* pState = &frame.Pointer->FrameState;   // direct field address
         if (visible)
         {
-            *pState &= ~0x200u;   // clear “hidden”
+            *pState &= ~0x200u;   // clear "hidden"
         }
         else
         {
-            *pState |= 0x200u;   // set “hidden”
+            *pState |= 0x200u;   // set "hidden"
         }
     }
 
     private static unsafe void SetFrameDisabledInternal(WrappedPointer<Frame> frame, bool disabled)
     {
-        uint* pState = &frame.Pointer->Field91;   // same word (offset 0x184)
+        uint* pState = &frame.Pointer->FrameState;   // same word (offset 0x184)
 
         if (disabled)
         {
-            *pState |= 0x10u;    // set “disabled”
+            *pState |= 0x10u;    // set "disabled"
         }
         else
         {

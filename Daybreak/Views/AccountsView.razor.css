@@ -1,0 +1,76 @@
+﻿.container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    gap: 16px;
+}
+
+.content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.credentials-list {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    gap: 10px;
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.credential-row {
+    display: flex;
+    width: calc(100% - 40px);
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    gap: 10px;
+    border: 2px solid var(--neutral-foreground-rest);
+    border-top: 0px;
+    border-left: 0px;
+    border-right: 0px;
+}
+
+.identifier-row,
+.username-row,
+.password-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.identifier-label,
+.username-label,
+.password-label {
+    width: 150px;
+    flex-shrink: 0;
+}
+
+.identifier-field,
+.username-field,
+.password-field {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Another alternative - target any text content */
+.identifier-label ::deep *,
+.username-label ::deep *,
+.password-label ::deep * {
+    font-size: var(--font-size-large) !important;
+}
+
+.identifier-field ::deep fluent-text-field,
+.username-field ::deep fluent-text-field,
+.password-field ::deep fluent-text-field {
+    width: 100%;
+    box-sizing: border-box !important;
+    font-size: var(--font-size-large);
+}

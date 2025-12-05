@@ -19,25 +19,25 @@ public readonly struct Frame
     [FieldOffset(0x0024)]
     public readonly uint TemplateType;
 
-    [FieldOffset(0x00A0)]
+    [FieldOffset(0x00A8)]
     public readonly GuildWarsArray<FrameInteractionCallback> FrameCallbacks;
 
-    [FieldOffset(0x00b0)]
+    [FieldOffset(0x00b8)]
     public readonly uint ChildOffsetId;
 
-    [FieldOffset(0x00b4)]
+    [FieldOffset(0x00bc)]
     public readonly uint FrameId;
 
-    [FieldOffset(0x0120)]
+    [FieldOffset(0x0128)]
     public readonly FrameRelation Relation;
 
-    [FieldOffset(0x0184)]
-    public readonly uint Field91;
+    [FieldOffset(0x018C)]
+    public readonly uint FrameState;
 
-    public bool IsCreated => (this.Field91 & 0x4) != 0;
-    public bool IsHidden => (this.Field91 & 0x200) != 0;
+    public bool IsCreated => (this.FrameState & 0x4) != 0;
+    public bool IsHidden => (this.FrameState & 0x200) != 0;
     public bool IsVisible => !this.IsHidden;
-    public bool IsDIsabled => (this.Field91 & 0x10) != 0;
+    public bool IsDIsabled => (this.FrameState & 0x10) != 0;
 }
 
 [StructLayout(LayoutKind.Explicit, Pack = 1, Size = 0x1C)]

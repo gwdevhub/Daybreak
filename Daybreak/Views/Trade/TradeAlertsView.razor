@@ -1,0 +1,41 @@
+﻿<div class="container">
+    <div class="title-bar-additional-btns-left">
+        <button class="title-bar-btn" @onclick="this.ViewModel.CreateMessageAlert" title="Create message alert">
+            <FluentIcon Value="new Icons.Regular.Size16.ChatAdd()" />
+        </button>
+        <button class="title-bar-btn" @onclick="this.ViewModel.CreateQuoteAlert" title="Create quote alert">
+            <FluentIcon Value="new Icons.Regular.Size16.ShoppingBagAdd()" />
+        </button>
+    </div>
+    <div class="stretch-container backdrop-panel">
+        <div class="alert-list">
+            @foreach (var alert in this.ViewModel.TradeAlerts.Where(a => a.Type is not TradeAlertViewModel.TradeAlertType.Unknown))
+            {
+                <div class="alert-container"
+                     @onclick="@(() => this.ViewModel.SelectAlert(alert))">
+                    <div class="alert-left">
+                        <div class="alert-type">
+                            @alert.Type
+                        </div>
+                        <div class="alert-name">
+                            @alert.TradeAlert.Name
+                        </div>
+                        <div class="alert-id">
+                            @alert.TradeAlert.Id
+                        </div>
+                    </div>
+                    <div class="alert-right">
+                        <FluentButton Appearance="Appearance.Stealth"
+                                      Title="Delete alert"
+                                      OnClick="@(() => this.ViewModel.DeleteAlert(alert))">
+                            <FluentIcon Value="@(new Icons.Regular.Size16.Delete())" />
+                        </FluentButton>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@page "/trade/alerts"
+@inherits ViewBase<TradeAlertsView, TradeAlertsViewModel>

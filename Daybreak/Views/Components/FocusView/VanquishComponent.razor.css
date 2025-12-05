@@ -1,0 +1,42 @@
+﻿.container {
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+}
+
+.title {
+    font-size: var(--font-size-large);
+    color: var(--neutral-foreground-rest);
+}
+
+.vanquish-bar-container {
+    width: 100%;
+}
+
+.vanquish-bar-container {
+    position: relative;
+    width: 100%;
+    height: var(--font-size-x-large);
+    background: var(--neutral-fill-rest);
+    border-radius: 0px 0px 8px 8px;
+    overflow: hidden;
+}
+
+.vanquish-bar-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: color-mix(in srgb, var(--accent-red) 70%, transparent);
+    transition: width 0.3s ease-out;
+}
+
+.vanquish-bar-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: var(--font-size-medium);
+    color: var(--neutral-foreground-rest);
+    z-index: 1;
+}

@@ -1,11 +1,11 @@
-﻿using System.Windows.Controls;
+﻿using TrailBlazr.ViewModels;
+using TrailBlazr.Views;
 
 namespace Daybreak.Shared.Services.Navigation;
 
 public interface IViewProducer
 {
-    void RegisterView<T>()
-        where T : UserControl;
-    void RegisterPermanentView<T>()
-        where T : UserControl;
+    void RegisterView<TView, TViewModel>(bool isSingleton = false)
+        where TView : ViewBase<TView, TViewModel>
+        where TViewModel : ViewModelBase<TViewModel, TView>;
 }

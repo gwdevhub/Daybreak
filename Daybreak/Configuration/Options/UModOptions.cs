@@ -1,10 +1,11 @@
-﻿using Daybreak.Attributes;
+﻿using Daybreak.Shared.Attributes;
 using Daybreak.Shared.Models.UMod;
 using Newtonsoft.Json;
 
 namespace Daybreak.Configuration.Options;
 
 [OptionsName(Name = "uMod")]
+[OptionsIgnore]
 public sealed class UModOptions
 {
     [JsonProperty(nameof(Enabled))]

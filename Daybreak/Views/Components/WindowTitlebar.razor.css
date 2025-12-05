@@ -1,0 +1,42 @@
+﻿.title-bar {
+    height: 40px;
+    font-size: var(--font-size-medium);
+    display: flex;
+    align-items: start;
+    color: var(--neutral-foreground-rest);
+    cursor: default;
+    user-select: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 20000;
+}
+
+.title-bar-hitbox {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+    cursor: default;
+}
+
+.title-bar-left {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.title-bar-center {
+    flex: 1;
+    text-align: center;
+    position: relative;
+}
+
+.title-bar-right {
+    display: flex;
+    align-items: center;
+    position: relative;
+}

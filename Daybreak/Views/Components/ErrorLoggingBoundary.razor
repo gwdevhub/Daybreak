@@ -1,0 +1,24 @@
+﻿@this.ChildContent
+
+@inherits ErrorBoundary
+@code {
+    [Inject]
+    public required IExceptionHandler ExceptionHandler { get; init; }
+
+    [Inject]
+    public required IViewManager ViewManager { get; init; }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+    }
+
+    protected override Task OnErrorAsync(Exception exception)
+    {
+        this.ExceptionHandler.HandleException(exception);
+        this.Recover();
+        this.ViewManager.ShowView<LaunchView>();
+        this.InvokeAsync(this.StateHasChanged);
+        return Task.CompletedTask;
+    }
+}

@@ -29,6 +29,8 @@ Write-Output "Deleting pdb file"
 Remove-item .\Publish\Daybreak.pdb
 Remove-item .\Publish\Daybreak.Installer.pdb
 Remove-item .\Publish\Daybreak.7ZipExtractor.pdb
+Remove-item .\Publish\Daybreak.API.pdb
+Remove-item .\Publish\Daybreak.Shared.pdb
 Move-Item -Path .\Publish\Daybreak.Installer.exe -Destination .\Publish\Daybreak.Installer.Temp.exe
 
 Compress-Archive .\Publish\* $zipPath -Force

@@ -1,0 +1,36 @@
+﻿<div class="single-build-view">
+    <div class="title-bar-additional-btns-left">
+        <button class="title-bar-btn" @onclick="this.ViewModel.Save" title="Save Build">
+            <FluentIcon Value="new Icons.Regular.Size16.Save()" />
+        </button>
+    </div>
+    <div class="backdrop-panel stretch-container">
+        @if (this.ViewModel.BuildEntry is not null)
+        {
+            <BuildEditor BuildTemplateCode="@this.ViewModel.BuildTemplateCode"
+                         AvailableSkills="@this.ViewModel.AvailableSkills"
+                         Attributes="@this.ViewModel.BuildEntry.Attributes"
+                         BuildName="@this.ViewModel.BuildEntry.Name"
+                         PrimaryProfession="@this.ViewModel.BuildEntry.Primary"
+                         SecondaryProfession="@this.ViewModel.BuildEntry.Secondary"
+                         Skills="@this.ViewModel.BuildEntry.Skills"
+                         OnAttributeIncreased="@this.ViewModel.AttributeIncreased"
+                         OnAttributeDecreased="@this.ViewModel.AttributeDecreased"
+                         OnSkillChanged="@this.ViewModel.SkillChanged"
+                         SearchFilterChanged="@this.ViewModel.SearchFilterChanged"
+                         PrimaryProfessionChanged="@this.ViewModel.PrimaryProfessionChanged"
+                         SecondaryProfessionChanged="@this.ViewModel.SecondaryProfessionChanged"
+                         BuildNameChanged="@this.ViewModel.BuildNameChanged"
+                         OnSkillHoverEnter="@this.ViewModel.OpenSkillSnippet"
+                         OnSkillHoverLeave="@this.ViewModel.CloseSkillSnippet" />
+        }
+    </div>
+
+    @if (this.ViewModel.ShowSkillSnippet)
+    {
+        <SkillSnippet Context="this.ViewModel.SkillSnippetContext" />
+    }
+</div>
+
+@page "/builds/singleBuilds/{BuildName}"
+@inherits BuildTemplateViewBase<SingleBuildTemplateView, SingleBuildTemplateViewModel>

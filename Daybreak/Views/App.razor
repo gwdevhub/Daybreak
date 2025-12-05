@@ -1,0 +1,85 @@
+﻿@using Daybreak.Shared.Models.ColorPalette
+<FluentDesignSystemProvider 
+    AccentBaseColor="@this.ViewModel.AccentBaseColor"
+    NeutralBaseColor="@this.ViewModel.NeutralBaseColor"
+    BaseLayerLuminance="@this.ViewModel.BaseLayerLuminace">
+    <ErrorLoggingBoundary>
+        <div class="app-container @(this.ViewModel.WindowState == WindowState.Maximized ? "maximized" : "")"
+             style="--backdrop-image: url('../@this.ViewModel.BackdropImage');
+                    --ui-scale: @(this.ViewModel.UIScale);
+                    --font-size-xx-small: @(this.ViewModel.XXSmallFontSize)rem;
+                    --font-size-x-small: @(this.ViewModel.XSmallFontSize)rem;
+                    --font-size-small: @(this.ViewModel.SmallFontSize)rem;
+                    --font-size-medium: @(this.ViewModel.MediumFontSize)rem;
+                    --font-size-large: @(this.ViewModel.LargeFontSize)rem;
+                    --font-size-x-large: @(this.ViewModel.XLargeFontSize)rem;
+                    --font-size-xx-large: @(this.ViewModel.XXLargeFontSize)rem;
+                    @(string.Join(";\n", AccentColor.Accents.Select(c => $"--accent-{c.Name.ToString().ToLower()}: {c.Hex}")))">
+            <WindowBorders OnResize="@this.ViewModel.StartResize" />
+
+            <WindowTitlebar WindowState="@this.ViewModel.WindowState"
+                            OnTitleBarDrag="@this.ViewModel.Drag"
+                            OnNavigationButtonClick="@this.ViewModel.ToggleNavigationMenu"
+                            OnBugButtonClick="@this.ViewModel.OpenIssues"
+                            OnSyncButtonClick="@this.ViewModel.OpenSynchronizationView"
+                            OnCloseButtonClick="@this.ViewModel.Close"
+                            OnMinimizeButtonClick="@this.ViewModel.Minimize"
+                            OnMaximizeButtonClick="@this.ViewModel.Maximize"
+                            OnRestoreButtonClick="@this.ViewModel.Restore" />
+
+            <StatusBar IsAdmin="@this.ViewModel.IsAdmin"
+                       CurrentVersionText="@this.ViewModel.CurrentVersionText"
+                       RestartAsNormalUser="@this.ViewModel.RestartAsNormalUser" />
+            
+            <!-- Main Content Area -->
+            <div class="main-content">
+                <!-- Content Area -->
+                <div class="content-area">
+                    <div class="page-content">
+                        <ViewContainer />
+                    </div>
+                </div>
+
+                <!-- Navigation Panel -->
+                <NavigationMenu 
+                    MenuCategories="@this.ViewModel.MenuCategories"
+                    MenuButtonHandler="this.ViewModel.MenuButtonClicked"
+                    IsNavigationOpen="@this.ViewModel.IsNavigationOpen" />
+
+                <NotificationArea NotificationProducer="this.ViewModel.NotificationProducer" />
+            </div>
+        </div>
+    </ErrorLoggingBoundary>
+
+</FluentDesignSystemProvider>
+
+<script src="js/console-interop.js"></script>
+
+@code {
+    [Inject]
+    public required AppViewModel ViewModel { get; init; }
+
+    [Inject]
+    public required IJSRuntime JSRuntime { get; init; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this.ViewModel.WindowStateChanged += this.OnWindowStateChanged;
+        this.ViewModel.RedrawRequested += (_, __) => this.InvokeAsync(this.StateHasChanged);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            await this.ViewModel.InitializeApp(this.JSRuntime);
+        }
+    }
+
+    private void OnWindowStateChanged(object? sender, WindowState state)
+    {
+        this.StateHasChanged();
+    }
+}

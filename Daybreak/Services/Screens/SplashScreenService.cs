@@ -1,5 +1,4 @@
-﻿using ControlzEx.Theming;
-using Daybreak.Configuration.Options;
+﻿using Daybreak.Configuration.Options;
 using Daybreak.Launch;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Screens;
@@ -25,7 +24,6 @@ internal sealed class SplashScreenService : ISplashScreenService
         this.themeManager = themeManager.ThrowIfNull();
         this.options = options.ThrowIfNull();
         this.splashWindow = splashWindow.ThrowIfNull();
-        this.SetupThemeResources();
     }
 
     public void HideSplashScreen()
@@ -40,27 +38,13 @@ internal sealed class SplashScreenService : ISplashScreenService
          */
         var launcherCoords = new Rect((int)this.options.Value.X, (int)this.options.Value.Y, (int)this.options.Value.Width, (int)this.options.Value.Height);
         var targetScreen = GetScreens().MaxBy(s => CalculateAreaOfRectIntersection(s.Size, launcherCoords));
-        if (targetScreen is not null)
+        if (targetScreen.Size.Width > 0 && targetScreen.Size.Height > 0)
         {
             this.splashWindow.Left = targetScreen.Size.Left + (targetScreen.Size.Width / 2) - (this.splashWindow.Width / 2);
             this.splashWindow.Top = targetScreen.Size.Top + (targetScreen.Size.Height / 2) - (this.splashWindow.Height / 2);
         }
 
         this.splashWindow.Show();
-    }
-
-    private void SetupThemeResources()
-    {
-        var theme = this.themeManager.GetCurrentTheme()?.As<Theme>();
-        if (theme is null)
-        {
-            return;
-        }
-
-        foreach(var key in theme.Resources.Keys)
-        {
-            this.splashWindow.Resources.Add(key, theme.Resources[key]);
-        }
     }
 
     private static double CalculateAreaOfRectIntersection(Rect rect1, Rect rect2)
@@ -76,5 +60,5 @@ internal sealed class SplashScreenService : ISplashScreenService
     }
 
     private static IEnumerable<Screen> GetScreens() => WpfScreenHelper.Screen.AllScreens
-        .Select((screen, index) => new Screen { Id = index, Size = screen.Bounds });
+        .Select((screen, index) => new Screen(index, screen.Bounds));
 }

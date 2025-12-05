@@ -16,6 +16,8 @@ public sealed unsafe class MemoryScanningService(
     private readonly (nuint BaseAddress, ImageSectionHeader Section) textSection = GetSectionHeader(".text");
     private readonly (nuint BaseAddress, ImageSectionHeader Section) dataSection = GetSectionHeader(".rdata");
 
+    public uint GameTlsIndex { get; } = GetGameTlsIndex();
+
     public nuint FunctionFromNearCall(nuint callInstructionAddress, bool checkValidPtr = true)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
@@ -118,7 +120,7 @@ public sealed unsafe class MemoryScanningService(
 
                 fileSearchPos = filePtr + 1;
 
-                // If what we found is “…/file.hpp” (no drive letter) fix it
+                // If what we found is "…/file.hpp" (no drive letter) fix it
                 if (Marshal.ReadByte((nint)(filePtr + 1)) != (byte)':')
                 {
                     // look ≤128 bytes backward for ':' and back-up one char
@@ -199,6 +201,12 @@ public sealed unsafe class MemoryScanningService(
         return address;
     }
 
+    public nuint FindAddress(byte[] pattern, string mask, int offset, nuint startAddress, nuint endAddress)
+    {
+        var address = FindAddressInternal(startAddress, endAddress, pattern, mask, offset);
+        return address;
+    }
+
     public nuint ToFunctionStart(nuint callInstructionAddress, uint scanRange = 0x500)
     {
         if (callInstructionAddress == 0)
@@ -214,6 +222,92 @@ public sealed unsafe class MemoryScanningService(
         var end = callInstructionAddress - scanRange;    // scan backwards
 
         return FindInRange(prologue, mask, 0, start, end);
+    }
+
+    public nuint FindNthUseOfString(string str, uint nth, int offset = 0, bool useTextSection = true)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        var strBytes = Encoding.ASCII.GetBytes(str);
+        var mask = new string('x', strBytes.Length);
+
+        var foundStr = FindAddressInternal(this.dataSection, strBytes, mask, 0);
+        if (foundStr is 0)
+        {
+            scopedLogger.LogError("Failed to find string in .rdata section");
+            return 0;
+        }
+
+        var firstNullChar = FindInRange([0x0], "x", 1, foundStr, foundStr - 0x64);
+        if (firstNullChar is 0)
+        {
+            scopedLogger.LogError("Failed to find null terminator");
+            return 0;
+        }
+
+        return this.FindNthUseOfAddress(firstNullChar, nth, offset, useTextSection);
+    }
+
+    public nuint FindUseOfString(string str, int offset = 0, bool useTextSection = true)
+    {
+        return this.FindNthUseOfString(str, 0, offset, useTextSection);
+    }
+
+    public nuint FindNthUseOfWideString(string str, uint nth, int offset = 0, bool useTextSection = true)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        var strBytes = Encoding.Unicode.GetBytes(str);
+        var mask = new string('x', strBytes.Length);
+
+        var foundStr = FindAddressInternal(this.dataSection, strBytes, mask, 0);
+        if (foundStr is 0)
+        {
+            scopedLogger.LogError("Failed to find wide string in .rdata section");
+            return 0;
+        }
+
+        var firstNullChar = FindInRange([0x0, 0x0], "xx", 2, foundStr, foundStr - 0x128);
+        if (firstNullChar is 0)
+        {
+            scopedLogger.LogError("Failed to find null terminator for wide string");
+            return 0;
+        }
+
+        return this.FindNthUseOfAddress(firstNullChar, nth, offset, useTextSection);
+    }
+
+    public nuint FindUseOfWideString(string str, int offset = 0, bool useTextSection = true)
+    {
+        return this.FindNthUseOfWideString(str, 0, offset, useTextSection);
+    }
+
+    private nuint FindNthUseOfAddress(nuint address, uint nth, int offset, bool useTextSection)
+    {
+        var (BaseAddress, Section) = useTextSection ? this.textSection : this.dataSection;
+        var addressBytes = BitConverter.GetBytes((uint)address);
+        var mask = "xxxx";
+
+        var currentAddress = BaseAddress + Section.VirtualAddress;
+        var endAddress = currentAddress + Section.VirtualSize;
+
+        uint foundCount = 0;
+        while (currentAddress < endAddress)
+        {
+            var found = FindAddressInternal(currentAddress, endAddress, addressBytes, mask, 0);
+            if (found is 0)
+            {
+                break;
+            }
+
+            if (foundCount == nth)
+            {
+                return (nuint)((nint)found + offset);
+            }
+
+            foundCount++;
+            currentAddress = found + 1;
+        }
+
+        return 0;
     }
 
     private static bool IsValidPtr(nuint address, (nuint BaseAddress, ImageSectionHeader Section) section)
@@ -276,8 +370,12 @@ public sealed unsafe class MemoryScanningService(
     {
         var textStart = section.BaseAddress + section.Section.VirtualAddress;
         var textEnd = textStart + section.Section.VirtualSize - (uint)pattern.Length;
+        return FindAddressInternal(textStart, textEnd, pattern, mask, offset);
+    }
 
-        for (var cur = textStart; cur <= textEnd; ++cur)
+    private static nuint FindAddressInternal(nuint startAddr, nuint endAddr, byte[] pattern, string mask, int offset = 0)
+    {
+        for (var cur = startAddr; cur <= endAddr; ++cur)
         {
             if (Marshal.ReadByte((nint)cur) != pattern[0])
             {
@@ -311,5 +409,31 @@ public sealed unsafe class MemoryScanningService(
         return textHdr is null
             ? throw new InvalidOperationException($"Failed to initialize memory scanner. Failed to find {headerName} section")
             : ((nuint, ImageSectionHeader))(baseAddr, textHdr);
+    }
+
+    private static uint GetGameTlsIndex()
+    {
+        var m = Process.GetCurrentProcess().MainModule ?? throw new InvalidOperationException("Failed to get TLS index. Failed to find main module");
+        var baseAddr = (nint)m.BaseAddress;
+        var pe = new PeFile(m.FileName);
+
+        // Get the TLS data directory entry (index 9 = IMAGE_DIRECTORY_ENTRY_TLS)
+        var tlsDirectory = pe.ImageNtHeaders?.OptionalHeader.DataDirectory[9];
+        if (tlsDirectory is null || tlsDirectory.VirtualAddress == 0)
+        {
+            throw new InvalidOperationException("Failed to get TLS index. No TLS directory found");
+        }
+
+        // Calculate the address of the TLS directory in memory
+        var tlsDirectoryAddress = baseAddr + (nint)tlsDirectory.VirtualAddress;
+
+        // Read the IMAGE_TLS_DIRECTORY structure
+        // AddressOfIndex is at offset 8 (after StartAddressOfRawData and EndAddressOfRawData)
+        var addressOfIndexPtr = Marshal.ReadIntPtr(tlsDirectoryAddress + 8);
+
+        // Read the TLS index from the location pointed to by AddressOfIndex
+        var tlsIndex = (uint)Marshal.ReadInt32(addressOfIndexPtr);
+
+        return tlsIndex;
     }
 }

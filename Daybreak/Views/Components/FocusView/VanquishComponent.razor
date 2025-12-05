@@ -1,0 +1,63 @@
+﻿@if (this.Context is not null &&
+     this.Context.HardMode &&
+     this.Context.Vanquishing)
+{
+    <div class="container backdrop-panel">
+        <div class="title">
+            Vanquishing
+        </div>
+        <div class="vanquish-bar-container">
+            <div class="vanquish-bar" @onclick="@(() => this.VanquishBarClicked())">
+                <div class="vanquish-bar-fill" style="@(this.GetVanquishBarWidth())"></div>
+                <div class="vanquish-bar-text">
+                    @this.GetVanquishBarText()
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public required VanquishComponentContext? Context { get; init; }
+
+    [Parameter]
+    public required Action OnVanquishBarClicked { get; init; }
+
+    private void VanquishBarClicked()
+    {
+        this.OnVanquishBarClicked();
+    }
+
+    private string GetVanquishBarWidth()
+    {
+        if (this.Context is null)
+        {
+            return string.Empty;
+        }
+
+        var totalFoes = this.Context.FoesToKill + this.Context.FoesKilled;
+        return $"width: {this.Context.FoesKilled * 100d / totalFoes}%;";
+    }
+
+    private string GetVanquishBarText()
+    {
+        if (this.Context is null)
+        {
+            return string.Empty;
+        }
+
+        if (this.Context.FoesToKill is 0)
+        {
+            return string.Empty;
+        }
+
+        return this.Context.Display switch
+        {
+            PointsDisplay.CurrentAndMax => $"{this.Context.FoesKilled} / {this.Context.FoesToKill + this.Context.FoesKilled}",
+            PointsDisplay.Percentage => $"{(this.Context.FoesKilled * 100d / (this.Context.FoesToKill + this.Context.FoesKilled)):F2}%",
+            PointsDisplay.Remaining => $"{this.Context.FoesToKill} Remaining",
+            _ => throw new InvalidOperationException()
+        };
+    }
+}

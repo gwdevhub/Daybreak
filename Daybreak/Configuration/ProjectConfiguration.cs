@@ -1,11 +1,9 @@
 ﻿using Daybreak.Services.ApplicationLauncher;
 using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Credentials;
-using Daybreak.Services.IconRetrieve;
 using Daybreak.Services.Logging;
 using Daybreak.Services.Privilege;
 using Daybreak.Services.Screens;
-using Daybreak.Services.Screenshots;
 using Daybreak.Services.Shortcuts;
 using Daybreak.Services.Updater;
 using Daybreak.Views;
@@ -17,9 +15,7 @@ using Microsoft.CorrelationVector;
 using System.Logging;
 using Daybreak.Services.Updater.PostUpdate;
 using System.Core.Extensions;
-using Daybreak.Services.Graph;
 using Microsoft.Extensions.DependencyInjection;
-using Daybreak.Services.Navigation;
 using Daybreak.Services.Onboarding;
 using Daybreak.Services.Menu;
 using Daybreak.Services.Experience;
@@ -34,45 +30,29 @@ using Daybreak.Configuration.Options;
 using System.Configuration;
 using Daybreak.Services.UMod;
 using Daybreak.Services.Toolbox;
-using Daybreak.Views.Onboarding.UMod;
-using Daybreak.Views.Onboarding.Toolbox;
 using Daybreak.Services.Themes;
 using Daybreak.Services.TradeChat;
-using Daybreak.Views.Trade;
 using System.Net.WebSockets;
 using Daybreak.Services.Notifications;
-using Daybreak.Services.Charts;
-using Daybreak.Services.Images;
 using Daybreak.Services.InternetChecker;
 using Daybreak.Services.Sounds;
 using Daybreak.Services.TradeChat.Notifications;
-using Daybreak.Views.Copy;
 using Daybreak.Services.DSOAL;
 using Daybreak.Services.Mods;
-using Daybreak.Views.Onboarding.DSOAL;
 using Daybreak.Services.Registry;
 using Daybreak.Services.DSOAL.Actions;
 using Daybreak.Services.Events;
-using Daybreak.Controls;
 using Daybreak.Services.Plugins;
 using Daybreak.Services.Toolbox.Utilities;
 using Daybreak.Services.Injection;
 using Daybreak.Services.ReShade;
-using Daybreak.Views.Onboarding.ReShade;
 using Daybreak.Services.LaunchConfigurations;
 using Daybreak.Services.ExecutableManagement;
-using Daybreak.Views.Launch;
 using Daybreak.Services.DirectSong;
-using Daybreak.Views.Onboarding.DirectSong;
 using Daybreak.Services.SevenZip;
 using Daybreak.Services.ReShade.Notifications;
-using Daybreak.Services.UBlockOrigin;
-using Daybreak.Services.Browser;
 using Daybreak.Services.ApplicationArguments;
 using Daybreak.Services.ApplicationArguments.ArgumentHandling;
-using Daybreak.Services.Window;
-using Daybreak.Launch;
-using Daybreak.Views.Installation;
 using Daybreak.Services.Toolbox.Notifications;
 using Daybreak.Services.Guildwars;
 using Daybreak.Services.Api;
@@ -88,12 +68,10 @@ using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.Shortcuts;
 using Daybreak.Shared.Services.Guildwars;
 using Daybreak.Shared.Services.Registry;
-using Daybreak.Shared.Services.Images;
 using Daybreak.Shared.Services.Credentials;
 using Daybreak.Shared.Services.Onboarding;
 using Daybreak.Shared.Services.Sounds;
 using Daybreak.Shared.Services.BuildTemplates;
-using Daybreak.Shared.Services.Browser;
 using Daybreak.Shared.Services.DSOAL;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.SevenZip;
@@ -104,13 +82,10 @@ using Daybreak.Shared.Services.UMod;
 using Daybreak.Shared.Services.Updater;
 using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.Metrics;
-using Daybreak.Shared.Services.IconRetrieve;
 using Daybreak.Shared.Services.Updater.PostUpdate;
 using Daybreak.Shared.Services.Mods;
-using Daybreak.Shared.Services.Screenshots;
 using Daybreak.Shared.Services.Plugins;
 using Daybreak.Shared.Services.Experience;
-using Daybreak.Shared.Services.Window;
 using Daybreak.Shared.Services.ApplicationLauncher;
 using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Toolbox;
@@ -124,14 +99,29 @@ using Daybreak.Shared.Services.Downloads;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.DXVK;
 using Daybreak.Services.DXVK;
-using Daybreak.Views.Onboarding.DXVK;
 using Daybreak.Shared.Services.MDns;
 using Daybreak.Services.MDns;
 using OpenTelemetry.Resources;
 using Daybreak.Services.Telemetry;
 using System.Reflection;
-using Version = Daybreak.Shared.Models.Versioning.Version;
 using Daybreak.Shared.Models.Plugins;
+using TrailBlazr.Extensions;
+using TrailBlazr.Services;
+using Microsoft.Fast.Components.FluentUI;
+using Daybreak.Themes;
+using Daybreak.Shared.Services.Wiki;
+using Daybreak.Services.Wiki;
+using Daybreak.Services.Graph.Models;
+using Daybreak.Services.Graph;
+using Microsoft.Identity.Client;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
+using Microsoft.Identity.Client.Desktop;
+using System.Net.Http;
+using Daybreak.Views.Trade;
+using Daybreak.Services.TradeChat.Models;
+using Daybreak.Views.Installation;
+using Daybreak.Views.Copy;
+using Daybreak.Views.Mods;
 
 namespace Daybreak.Configuration;
 
@@ -154,7 +144,11 @@ public class ProjectConfiguration : PluginConfigurationBase
     {
         services.ThrowIfNull();
 
-        this.RegisterHttpClients(services);
+        // Add FluentUI components
+        services.AddFluentUIComponents();
+        
+        services.AddTrailBlazr();
+        RegisterHttpClients(services);
         services.AddScoped(sp =>
         {
             var connection = new SqliteConnection(DbConnectionString);
@@ -164,6 +158,37 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped(sp => new TradeQuoteDbContext(sp.GetRequiredService<SqliteConnection>()));
         services.AddScoped(sp => new NotificationsDbContext(sp.GetRequiredService<SqliteConnection>()));
         services.AddScoped(sp => new TradeMessagesDbContext(sp.GetRequiredService<SqliteConnection>()));
+        services.AddSingleton<IPublicClientApplication>(sp =>
+        {
+            var logger = sp.GetRequiredService<ILogger<PublicClientApplication>>();
+            return PublicClientApplicationBuilder.Create(SecretManager.GetSecret(SecretKeys.AadApplicationId))
+                .WithLogging((logLevel, message, containsPii) =>
+                {
+                    if (containsPii && logLevel > Microsoft.Identity.Client.LogLevel.Info)
+                    {
+                        // Redact logs that contain PII which user can enable to send to the telemetry server
+                        message = "[REDACTED]";
+                    }
+                    
+                    var equivalentLogLevel = logLevel switch
+                    {
+                        Microsoft.Identity.Client.LogLevel.Error => LogLevel.Error,
+                        Microsoft.Identity.Client.LogLevel.Warning => LogLevel.Warning,
+                        Microsoft.Identity.Client.LogLevel.Info => LogLevel.Information,
+                        Microsoft.Identity.Client.LogLevel.Verbose => LogLevel.Debug,
+                        _ => LogLevel.None
+                    };
+
+                    logger.Log(equivalentLogLevel, message);
+                }, enablePiiLogging: true, enableDefaultPlatformLogging: true)
+                .WithCacheOptions(new CacheOptions { UseSharedCache = true })
+                .WithRedirectUri(BlazorGraphClient.RedirectUri)
+                .WithWindowsEmbeddedBrowserSupport()
+                .WithHttpClientFactory(
+                    new DaybreakMsalHttpClientProvider(new HttpClient(SetupLoggingAndMetrics<PublicClientApplication>(sp))))
+                .Build();
+        });
+            
         services.AddSingleton<SwappableLoggerProvider>();
         services.AddSingleton<ILogsManager, JsonLogsManager>();
         services.AddSingleton<IConsoleLogsWriter, ConsoleLogsWriter>();
@@ -200,12 +225,13 @@ public class ProjectConfiguration : PluginConfigurationBase
             resourceBuilder.AddAttributes(attributes);
             return resourceBuilder;
         });
+
+        services.AddSingleton<AppViewModel>();
+
         services.AddSingleton<ViewManager>();
         services.AddSingleton<ProcessorUsageMonitor>();
         services.AddSingleton<MemoryUsageMonitor>();
         services.AddSingleton<DiskUsageMonitor>();
-        services.AddSingleton<IViewManager, ViewManager>(sp => sp.GetRequiredService<ViewManager>());
-        services.AddSingleton<IViewProducer, ViewManager>(sp => sp.GetRequiredService<ViewManager>());
         services.AddSingleton<PostUpdateActionManager>();
         services.AddSingleton<IPostUpdateActionManager>(sp => sp.GetRequiredService<PostUpdateActionManager>());
         services.AddSingleton<IPostUpdateActionProducer>(sp => sp.GetRequiredService<PostUpdateActionManager>());
@@ -220,12 +246,11 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IOptionsProducer, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().Cast<OptionsManager>());
         services.AddSingleton<IOptionsUpdateHook, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().Cast<OptionsManager>());
         services.AddSingleton<IOptionsProvider, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().Cast<OptionsManager>());
-        services.AddSingleton<IThemeManager, ThemeManager>();
+        services.AddSingleton<IThemeManager, BlazorThemeInteropService>();
+        services.AddSingleton<IThemeProducer, BlazorThemeInteropService>(sp => sp.GetRequiredService<IThemeManager>().Cast<BlazorThemeInteropService>());
         services.AddSingleton<INotificationService, NotificationService>();
         services.AddSingleton<INotificationProducer, NotificationService>(sp => sp.GetRequiredService<INotificationService>().Cast<NotificationService>());
         services.AddSingleton<INotificationHandlerProducer, NotificationService>(sp => sp.GetRequiredService<INotificationService>().Cast<NotificationService>());
-        services.AddSingleton<ILiveChartInitializer, LiveChartInitializer>();
-        services.AddSingleton<IImageCache, ImageCache>();
         services.AddSingleton<ISoundService, SoundService>();
         services.AddSingleton<IInternetCheckingService, InternetCheckingService>();
         services.AddSingleton<IConnectivityStatus, ConnectivityStatus>();
@@ -236,23 +261,18 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<ISplashScreenService, SplashScreenService>();
         services.AddSingleton<IGuildWarsExecutableManager, GuildWarsExecutableManager>();
         services.AddSingleton<ISevenZipExtractor, SevenZipExtractor>();
-        services.AddSingleton<IGraphClient, GraphClient>();
         services.AddSingleton<IOptionsSynchronizationService, OptionsSynchronizationService>();
-        services.AddSingleton<IWindowEventsHook<MainWindow>, WindowEventsHook<MainWindow>>();
         services.AddSingleton<IMDomainNameService, MDomainNameService>();
         services.AddSingleton<IMDomainRegistrar, MDomainRegistrar>();
         services.AddSingleton<IAttachedApiAccessor, AttachedApiAccessor>();
         services.AddSingleton<TelemetryHost>();
-        services.AddScoped<IBrowserExtensionsManager, BrowserExtensionsManager>();
-        services.AddScoped<IBrowserExtensionsProducer, BrowserExtensionsManager>(sp => sp.GetRequiredService<IBrowserExtensionsManager>().Cast<BrowserExtensionsManager>());
+        services.AddSingleton<PrivilegeContext>();
+        services.AddSingleton<ViewRedirectContext>();
+        services.AddSingleton<JSConsoleInterop>();
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
-        services.AddScoped<IScreenshotProvider, ScreenshotProvider>();
-        services.AddScoped<IOnlinePictureClient, OnlinePictureClient>();
         services.AddScoped<IApplicationUpdater, ApplicationUpdater>();
         services.AddScoped<IBuildTemplateManager, BuildTemplateManager>();
-        services.AddScoped<IIconCache, IconCache>();
-        services.AddScoped<IPrivilegeManager, PrivilegeManager>();
         services.AddScoped<IScreenManager, ScreenManager>();
         services.AddScoped<IOnboardingService, OnboardingService>();
         services.AddScoped<IExperienceCalculator, ExperienceCalculator>();
@@ -263,101 +283,64 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<ITradeChatService<KamadanTradeChatOptions>, TradeChatService<KamadanTradeChatOptions>>();
         services.AddScoped<ITradeChatService<AscalonTradeChatOptions>, TradeChatService<AscalonTradeChatOptions>>();
         services.AddScoped<ITraderQuoteService, TraderQuoteService>();
-        services.AddScoped<IPriceHistoryDatabase, PriceHistoryDatabase>();
-        services.AddScoped<IPriceHistoryService, PriceHistoryService>();
         services.AddScoped<IWordHighlightingService, WordHighlightingService>();
         services.AddScoped<ITradeHistoryDatabase, TradeHistoryDatabase>();
         services.AddScoped<IGuildWarsCopyService, GuildWarsCopyService>();
         services.AddScoped<IItemHashService, ItemHashService>();
         services.AddScoped<IRegistryService, RegistryService>();
         services.AddScoped<IEventNotifierService, EventNotifierService>();
-        services.AddScoped<IBackgroundProvider, BackgroundProvider>();
         services.AddScoped<IToolboxClient, ToolboxClient>();
         services.AddScoped<IProcessInjector, ProcessInjector>();
         services.AddScoped<IStubInjector, StubInjector>();
         services.AddScoped<ILaunchConfigurationService, LaunchConfigurationService>();
-        services.AddScoped<IBrowserHistoryManager, BrowserHistoryManager>();
         services.AddScoped<IEventService, EventService>();
         services.AddScoped<IApplicationArgumentService, ApplicationArgumentService>();
         services.AddScoped<IArgumentHandlerProducer, IApplicationArgumentService>(sp => sp.GetRequiredService<IApplicationArgumentService>());
+        services.AddScoped<IWikiService, WikiService>();
+        services.AddScoped<IPrivilegeManager, PrivilegeManager>();
+        services.AddScoped<IGraphClient, BlazorGraphClient>();
     }
 
     public override void RegisterViews(IViewProducer viewProducer)
     {
         viewProducer.ThrowIfNull();
 
-        viewProducer.RegisterPermanentView<Views.FocusView>();
-        viewProducer.RegisterView<LauncherView>();
-        viewProducer.RegisterView<UpdateView>();
-        viewProducer.RegisterView<AccountsView>();
-        viewProducer.RegisterView<ExecutablesView>();
-        viewProducer.RegisterView<SingleBuildTemplateView>();
-        viewProducer.RegisterView<BuildsListView>();
-        viewProducer.RegisterView<RequestElevationView>();
-        viewProducer.RegisterView<RequestDelevationView>();
-        viewProducer.RegisterView<ScreenChoiceView>();
-        viewProducer.RegisterView<VersionManagementView>();
-        viewProducer.RegisterView<LogsView>();
-        viewProducer.RegisterView<TelemetryView>();
-        viewProducer.RegisterView<GraphAuthorizationView>();
-        viewProducer.RegisterView<BuildsSynchronizationView>();
-        viewProducer.RegisterView<LauncherOnboardingView>();
-        viewProducer.RegisterView<MetricsView>();
-        viewProducer.RegisterView<GuildWarsDownloadView>();
-        viewProducer.RegisterView<GuildWarsDownloadSelectionView>();
-        viewProducer.RegisterView<UModInstallingView>();
-        viewProducer.RegisterView<UModInstallationChoiceView>();
-        viewProducer.RegisterView<UModOnboardingEntryView>();
-        viewProducer.RegisterView<UModMainView>();
-        viewProducer.RegisterView<UModBrowserView>();
-        viewProducer.RegisterView<ToolboxInstallationView>();
-        viewProducer.RegisterView<ToolboxInstallationChoiceView>();
-        viewProducer.RegisterView<ToolboxOnboardingEntryView>();
-        viewProducer.RegisterView<ToolboxSwitchView>();
-        viewProducer.RegisterView<ToolboxHomepageView>();
-        viewProducer.RegisterView<OptionSectionView>();
-        viewProducer.RegisterView<KamadanTradeChatView>();
-        viewProducer.RegisterView<AscalonTradeChatView>();
-        viewProducer.RegisterView<PriceQuotesView>();
-        viewProducer.RegisterView<PriceHistoryView>();
-        viewProducer.RegisterView<NotificationsView>();
-        viewProducer.RegisterView<TradeAlertsView>();
-        viewProducer.RegisterView<TradeAlertSetupView>();
-        viewProducer.RegisterView<TradeNotificationView>();
-        viewProducer.RegisterView<TradeAlertsChoiceView>();
-        viewProducer.RegisterView<QuoteAlertSetupView>();
-        viewProducer.RegisterView<GuildwarsCopySelectionView>();
-        viewProducer.RegisterView<GuildwarsCopyView>();
-        viewProducer.RegisterView<DSOALInstallingView>();
-        viewProducer.RegisterView<DSOALOnboardingEntryView>();
-        viewProducer.RegisterView<DSOALSwitchView>();
-        viewProducer.RegisterView<DSOALHomepageView>();
-        viewProducer.RegisterView<DSOALBrowserView>();
-        viewProducer.RegisterView<PluginsView>();
-        viewProducer.RegisterView<PluginsConfirmationView>();
-        viewProducer.RegisterView<ReShadeInstallingView>();
-        viewProducer.RegisterView<ReShadeInstallationChoiceView>();
-        viewProducer.RegisterView<ReShadeOnboardingEntryView>();
-        viewProducer.RegisterView<ReShadeMainView>();
-        viewProducer.RegisterView<ReShadeBrowserView>();
-        viewProducer.RegisterView<ReShadeStockEffectsSelectorView>();
-        viewProducer.RegisterView<ReShadeConfigView>();
-        viewProducer.RegisterView<ReShadePresetView>();
-        viewProducer.RegisterView<LaunchConfigurationView>();
-        viewProducer.RegisterView<LaunchConfigurationsView>();
-        viewProducer.RegisterView<DirectSongInstallationView>();
-        viewProducer.RegisterView<DirectSongInstallationChoiceView>();
-        viewProducer.RegisterView<DirectSongOnboardingEntryView>();
-        viewProducer.RegisterView<DirectSongSwitchView>();
-        viewProducer.RegisterView<SettingsSynchronizationView>();
-        viewProducer.RegisterView<TeamBuildTemplateView>();
-        viewProducer.RegisterView<EventCalendarView>();
-        viewProducer.RegisterView<UpdateConfirmationView>();
-        viewProducer.RegisterView<GuildWarsPartySearchView>();
-        viewProducer.RegisterView<DXVKInstallationChoiceView>();
-        viewProducer.RegisterView<DXVKInstallingView>();
-        viewProducer.RegisterView<DXVKOnboardingEntryView>();
-        viewProducer.RegisterView<DXVKSwitchView>();
+        viewProducer.RegisterView<LaunchView, LaunchViewModel>(isSingleton: true);
+        viewProducer.RegisterView<OptionView, OptionViewModel>();
+        viewProducer.RegisterView<Views.FocusView, FocusViewModel>();
+        viewProducer.RegisterView<BuildListView, BuildListViewModel>();
+        viewProducer.RegisterView<BuildRoutingView, BuildRoutingViewModel>();
+        viewProducer.RegisterView<SingleBuildTemplateView, SingleBuildTemplateViewModel>();
+        viewProducer.RegisterView<TeamBuildTemplateView, TeamBuildTemplateViewModel>();
+        viewProducer.RegisterView<AccountsView, AccountsViewModel>();
+        viewProducer.RegisterView<ExecutablesView, ExecutablesViewModel>();
+        viewProducer.RegisterView<LaunchConfigurationsView, LaunchConfigurationsViewModel>();
+        viewProducer.RegisterView<RequestElevationView, RequestElevationViewModel>();
+        viewProducer.RegisterView<RequestDelevationView, RequestDelevationViewModel>();
+        viewProducer.RegisterView<SettingsSynchronizationView, SettingsSynchronizationViewModel>();
+        viewProducer.RegisterView<TelemetryView, TelemetryViewModel>();
+        viewProducer.RegisterView<VersionManagementView, VersionManagementViewModel>();
+        viewProducer.RegisterView<UpdateConfirmationView, UpdateConfirmationViewModel>();
+        viewProducer.RegisterView<UpdateView, UpdateViewModel>();
+        viewProducer.RegisterView<PluginsView, PluginsViewModel>();
+        viewProducer.RegisterView<LogsView, LogsViewModel>();
+        viewProducer.RegisterView<MetricsView, MetricsViewModel>();
+        viewProducer.RegisterView<GuildWarsPartySearchView, GuildWarsPartySearchViewModel>();
+        viewProducer.RegisterView<EventCalendarView, EventCalendarViewModel>();
+        viewProducer.RegisterView<TradeChatView, TradeChatViewModel>();
+        viewProducer.RegisterView<GuildWarsDownloadView, GuildWarsDownloadViewModel>();
+        viewProducer.RegisterView<GuildWarsCopySelectionView, GuildWarsCopySelectionViewModel>();
+        viewProducer.RegisterView<GuildWarsCopyView, GuildWarsCopyViewModel>();
+        viewProducer.RegisterView<TradeAlertsView, TradeAlertsViewModel>();
+        viewProducer.RegisterView<TradeMessageView, TradeMessageViewModel>();
+        viewProducer.RegisterView<TradeQuoteView, TradeQuoteViewModel>();
+        viewProducer.RegisterView<LauncherOnboardingView, LauncherOnboardingViewModel>();
+        viewProducer.RegisterView<ModsView, ModsViewModel>();
+        viewProducer.RegisterView<ModInstallationView, ModInstallationViewModel>();
+        viewProducer.RegisterView<ModInstallationConfirmationView, ModInstallationConfirmationViewModel>();
+        viewProducer.RegisterView<ScreenSelectorView, ScreenSelectorViewModel>();
+        viewProducer.RegisterView<UModManagementView, UModManagementViewModel>();
+        viewProducer.RegisterView<TradeNotificationView, TradeNotificationViewModel>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -370,7 +353,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         startupActionProducer.RegisterAction<FixSymbolicLinkStartupAction>();
         startupActionProducer.RegisterAction<UpdateUModAction>();
         startupActionProducer.RegisterAction<CredentialsOptionsMigrator>();
-        startupActionProducer.RegisterAction<BrowserHistorySizeEnforcer>();
         startupActionProducer.RegisterAction<CleanupDatabases>();
         startupActionProducer.RegisterAction<DeleteOldDatabase>();
         startupActionProducer.RegisterAction<UpdateToolboxAction>();
@@ -394,10 +376,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         optionsProducer.RegisterOptions<SynchronizationOptions>();
         optionsProducer.RegisterOptions<FocusViewOptions>();
 
-        optionsProducer.RegisterOptions<ImageCacheOptions>();
-
-        optionsProducer.RegisterOptions<BackgroundProviderOptions>();
-
         optionsProducer.RegisterOptions<ToolboxOptions>();
         optionsProducer.RegisterOptions<UModOptions>();
         optionsProducer.RegisterOptions<DSOALOptions>();
@@ -407,7 +385,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         optionsProducer.RegisterOptions<ScreenManagerOptions>();
         optionsProducer.RegisterOptions<KamadanTradeChatOptions>();
         optionsProducer.RegisterOptions<AscalonTradeChatOptions>();
-        optionsProducer.RegisterOptions<PriceHistoryOptions>();
         optionsProducer.RegisterOptions<TraderQuotesOptions>();
         optionsProducer.RegisterOptions<TradeAlertingOptions>();
         optionsProducer.RegisterOptions<EventNotifierOptions>();
@@ -416,7 +393,8 @@ public class ProjectConfiguration : PluginConfigurationBase
         optionsProducer.RegisterOptions<CredentialManagerOptions>();
         optionsProducer.RegisterOptions<LaunchConfigurationServiceOptions>();
         optionsProducer.RegisterOptions<DirectSongOptions>();
-        optionsProducer.RegisterOptions<MinimapWindowOptions>();
+
+        optionsProducer.RegisterOptions<GuildWarsScreenPlacerOptions>();
     }
 
     public override void RegisterNotificationHandlers(INotificationHandlerProducer notificationHandlerProducer)
@@ -446,12 +424,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         modsManager.RegisterMod<IDirectSongService, DirectSongService>(singleton: true);
     }
 
-    public override void RegisterBrowserExtensions(IBrowserExtensionsProducer browserExtensionsProducer)
-    {
-        browserExtensionsProducer.ThrowIfNull();
-        browserExtensionsProducer.RegisterExtension<UBlockOriginService>();
-    }
-
     public override void RegisterLaunchArgumentHandlers(IArgumentHandlerProducer argumentHandlerProducer)
     {
         argumentHandlerProducer.ThrowIfNull();
@@ -461,53 +433,53 @@ public class ProjectConfiguration : PluginConfigurationBase
     public override void RegisterMenuButtons(IMenuServiceProducer menuServiceProducer)
     {
         menuServiceProducer.ThrowIfNull();
-        menuServiceProducer.CreateIfNotExistCategory("Launcher")
-            .RegisterButton("Notifications", "Open notifications view", sp => sp.GetRequiredService<ViewManager>().ShowView<NotificationsView>())
-            .RegisterButton("Plugins", "Open plugins view", sp => sp.GetRequiredService<ViewManager>().ShowView<PluginsView>())
-            .RegisterButton("Manage client version", "Open version manager", sp => sp.GetRequiredService<ViewManager>().ShowView<VersionManagementView>());
         menuServiceProducer.CreateIfNotExistCategory("Guild Wars")
-            .RegisterButton("Game companion", "Open game companion", sp => sp.GetRequiredService<ViewManager>().ShowView<LauncherView>())
-            .RegisterButton("Manage builds", "Open builds manager", sp => sp.GetRequiredService<ViewManager>().ShowView<BuildsListView>())
-            .RegisterButton("Download Guild Wars", "Download Guild Wars installer", sp => sp.GetRequiredService<ViewManager>().ShowView<GuildWarsDownloadSelectionView>())
-            .RegisterButton("Copy Guild Wars", "Copy Guild Wars from an existing installation", sp => sp.GetRequiredService<ViewManager>().ShowView<GuildwarsCopySelectionView>())
-            .RegisterButton("Event Calendar", "Show current and upcoming events", sp => sp.GetRequiredService<ViewManager>().ShowView<EventCalendarView>())
-            .RegisterButton("Guild Wars Party Search", "Show party search broadcasts", sp => sp.GetRequiredService<ViewManager>().ShowView<GuildWarsPartySearchView>());
+            .RegisterButton("Game companion", "Open game companion", sp => sp.GetRequiredService<IViewManager>().ShowView<LaunchView>())
+            .RegisterButton("Manage builds", "Open builds manager", sp => sp.GetRequiredService<IViewManager>().ShowView<BuildListView>())
+            .RegisterButton("Manage Mods", "Open Guild Wars mods manager", sp => sp.GetRequiredService<IViewManager>().ShowView<ModsView>())
+            .RegisterButton("Download Guild Wars", "Download Guild Wars installer", sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsDownloadView>())
+            .RegisterButton("Copy Guild Wars", "Copy Guild Wars from an existing installation", sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsCopySelectionView>())
+            .RegisterButton("Event Calendar", "Show current and upcoming events", sp => sp.GetRequiredService<IViewManager>().ShowView<EventCalendarView>())
+            .RegisterButton("Guild Wars Party Search", "Show party search broadcasts", sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsPartySearchView>());
+        menuServiceProducer.CreateIfNotExistCategory("Daybreak")
+            //TODO: Implement Notifications view
+            //.RegisterButton("Notifications", "Open notifications view", sp => { })
+            .RegisterButton("Manage Plugins", "Open plugins view", sp => sp.GetRequiredService<ViewManager>().ShowView<PluginsView>())
+            .RegisterButton("Manage version", "Open version manager", sp => sp.GetRequiredService<ViewManager>().ShowView<VersionManagementView>());
         menuServiceProducer.CreateIfNotExistCategory("Trade")
-            .RegisterButton("Alerts", "Open trade alerts manager", sp => sp.GetRequiredService<ViewManager>().ShowView<TradeAlertsView>())
-            .RegisterButton("Kamadan", "Open kamadan trade chat", sp => sp.GetRequiredService<ViewManager>().ShowView<KamadanTradeChatView>())
-            .RegisterButton("Ascalon", "Open ascalon trade chat", sp => sp.GetRequiredService<ViewManager>().ShowView<AscalonTradeChatView>())
-            .RegisterButton("Trader Quotes", "Open trader quotes view", sp => sp.GetRequiredService<ViewManager>().ShowView<PriceQuotesView>());
-        menuServiceProducer.CreateIfNotExistCategory("Mods")
-            .RegisterButton("uMod", "Open uMod manager", sp => sp.GetRequiredService<ViewManager>().ShowView<UModOnboardingEntryView>())
-            .RegisterButton("GWToolboxpp", "Open GWToolbox manager", sp => sp.GetRequiredService<ViewManager>().ShowView<ToolboxOnboardingEntryView>())
-            .RegisterButton("DSOAL", "Open DSOAL manager", sp => sp.GetRequiredService<ViewManager>().ShowView<DSOALOnboardingEntryView>())
-            .RegisterButton("ReShade", "Open ReShade manager", sp => sp.GetRequiredService<ViewManager>().ShowView<ReShadeOnboardingEntryView>())
-            .RegisterButton("DirectSong", "Open DirectSong manager", sp => sp.GetRequiredService<ViewManager>().ShowView<DirectSongOnboardingEntryView>())
-            .RegisterButton("DXVK", "Open DXVK manager", sp => sp.GetRequiredService<ViewManager>().ShowView<DXVKOnboardingEntryView>());
+            .RegisterButton("Alerts", "Open trade alerts manager", sp => sp.GetRequiredService<IViewManager>().ShowView<TradeAlertsView>())
+            .RegisterButton("Kamadan", "Open kamadan trade chat", sp => sp.GetRequiredService<IViewManager>().ShowView<TradeChatView>((nameof(TradeChatView.Source), nameof(TraderSource.Kamadan))))
+            .RegisterButton("Ascalon", "Open ascalon trade chat", sp => sp.GetRequiredService<IViewManager>().ShowView<TradeChatView>((nameof(TradeChatView.Source), nameof(TraderSource.Ascalon))));
         menuServiceProducer.CreateIfNotExistCategory("Settings")
-            .RegisterButton("Accounts", "Accounts Settings", sp => sp.GetRequiredService<ViewManager>().ShowView<AccountsView>())
-            .RegisterButton("Executables", "Executables Settings", sp => sp.GetRequiredService<ViewManager>().ShowView<ExecutablesView>())
-            .RegisterButton("Launch configurations", "Launch configurations settings", sp => sp.GetRequiredService<ViewManager>().ShowView<LaunchConfigurationsView>());
+            .RegisterButton("Accounts", "Accounts Settings", sp => sp.GetRequiredService<IViewManager>().ShowView<AccountsView>())
+            .RegisterButton("Executables", "Executables Settings", sp => sp.GetRequiredService<IViewManager>().ShowView<ExecutablesView>())
+            .RegisterButton("Launch configurations", "Launch configurations settings", sp => sp.GetRequiredService<IViewManager>().ShowView<LaunchConfigurationsView>());
         menuServiceProducer.CreateIfNotExistCategory("Diagnostics")
-            .RegisterButton("Telemetry", "Open telemetry view", sp => sp.GetRequiredService<ViewManager>().ShowView<TelemetryView>())
-            .RegisterButton("Logs", "Open logs view", sp => sp.GetRequiredService<ViewManager>().ShowView<LogsView>())
-            .RegisterButton("Metrics", "Open metrics view", sp => sp.GetRequiredService<ViewManager>().ShowView<MetricsView>());
+            .RegisterButton("Telemetry", "Open telemetry view", sp => sp.GetRequiredService<IViewManager>().ShowView<TelemetryView>())
+            .RegisterButton("Logs", "Open logs view", sp => sp.GetRequiredService<IViewManager>().ShowView<LogsView>())
+            .RegisterButton("Metrics", "Open metrics view", sp => sp.GetRequiredService<IViewManager>().ShowView<MetricsView>());
     }
 
-    private IServiceCollection RegisterHttpClients(IServiceCollection services)
+    public override void RegisterThemes(IThemeProducer themeProducer)
+    {
+        themeProducer.ThrowIfNull();
+        foreach(var theme in CoreThemes.Themes)
+        {
+            themeProducer.RegisterTheme(theme);
+        }
+
+        foreach (var theme in HeroThemes.Themes)
+        {
+            themeProducer.RegisterTheme(theme);
+        }
+    }
+
+    private static IServiceCollection RegisterHttpClients(IServiceCollection services)
     {
         return services
             .ThrowIfNull()
             .RegisterHttpClient<ApplicationUpdater>()
                 .WithMessageHandler(SetupLoggingAndMetrics<ApplicationUpdater>)
-                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
-                .Build()
-            .RegisterHttpClient<OnlinePictureClient>()
-                .WithMessageHandler(SetupLoggingAndMetrics<OnlinePictureClient>)
-                .WithDefaultRequestHeadersSetup(SetupChromeImpersonationUserAgent)
-                .Build()
-            .RegisterHttpClient<GraphClient>()
-                .WithMessageHandler(SetupLoggingAndMetrics<GraphClient>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<DownloadService>()
@@ -522,24 +494,12 @@ public class ProjectConfiguration : PluginConfigurationBase
                 .WithMessageHandler(SetupLoggingAndMetrics<TradeChatService<AscalonTradeChatOptions>>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
-            .RegisterHttpClient<IconCache>()
-                .WithMessageHandler(SetupLoggingAndMetrics<IconCache>)
-                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
-                .Build()
             .RegisterHttpClient<TraderQuoteService>()
                 .WithMessageHandler(SetupLoggingAndMetrics<TraderQuoteService>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
-            .RegisterHttpClient<PriceHistoryService>()
-                .WithMessageHandler(SetupLoggingAndMetrics<PriceHistoryService>)
-                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
-                .Build()
             .RegisterHttpClient<InternetCheckingService>()
                 .WithMessageHandler(SetupLoggingAndMetrics<InternetCheckingService>)
-                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
-                .Build()
-            .RegisterHttpClient<ChromiumBrowserWrapper>()
-                .WithMessageHandler(SetupLoggingAndMetrics<ChromiumBrowserWrapper>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<ToolboxClient>()
@@ -554,16 +514,20 @@ public class ProjectConfiguration : PluginConfigurationBase
                 .WithMessageHandler(SetupLoggingAndMetrics<UModService>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
-            .RegisterHttpClient<UBlockOriginService>()
-                .WithMessageHandler(SetupLoggingAndMetrics<UBlockOriginService>)
-                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
-                .Build()
             .RegisterHttpClient<DXVKService>()
                 .WithMessageHandler(SetupLoggingAndMetrics<DXVKService>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<ScopedApiContext>()
                 .WithMessageHandler(SetupLoggingAndMetrics<ScopedApiContext>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
+                .Build()
+            .RegisterHttpClient<WikiService>()
+                .WithMessageHandler(SetupLoggingAndMetrics<WikiService>)
+                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
+                .Build()
+            .RegisterHttpClient<BlazorGraphClient>()
+                .WithMessageHandler(SetupLoggingAndMetrics<BlazorGraphClient>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build();
     }

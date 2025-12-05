@@ -40,7 +40,6 @@ internal sealed class TradeChatService<TChannelOptions> : ITradeChatService<TCha
     private static readonly TimeSpan MaxBackoffTime = TimeSpan.FromSeconds(16);
 
     private readonly byte[] webSocketBuffer = new byte[1024];
-    private readonly IPriceHistoryDatabase priceHistoryDatabase;
     private readonly IOptions<TChannelOptions> options;
     private readonly IClientWebSocket<TradeChatService<TChannelOptions>> clientWebSocket;
     private readonly IHttpClient<TradeChatService<TChannelOptions>> httpClient;
@@ -49,13 +48,11 @@ internal sealed class TradeChatService<TChannelOptions> : ITradeChatService<TCha
     private TimeSpan backoffTime = MinBackoffTime;
 
     public TradeChatService(
-        IPriceHistoryDatabase priceHistoryDatabase,
         IOptions<TChannelOptions> options,
         IClientWebSocket<TradeChatService<TChannelOptions>> clientWebSocket,
         IHttpClient<TradeChatService<TChannelOptions>> client,
         ILogger<TradeChatService<TChannelOptions>> logger)
     {
-        this.priceHistoryDatabase = priceHistoryDatabase.ThrowIfNull();
         this.options = options.ThrowIfNull();
         this.clientWebSocket = clientWebSocket.ThrowIfNull();
         this.httpClient = client.ThrowIfNull();

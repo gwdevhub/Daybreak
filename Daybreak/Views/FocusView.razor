@@ -1,0 +1,57 @@
+﻿@using Daybreak.Views.Components.FocusView
+
+@page "/focus"
+@inherits ViewBase<FocusView, FocusViewModel>
+
+<div class="focus-dashboard">
+    <div class="dashboard-half">
+        <div class="component character-component">
+            <CharacterComponent Context="@this.ViewModel.CharacterComponentContext"
+                                OnCharacterChanged="@this.ViewModel.OnCharacterChanged"
+                                OnExperienceBarClicked="@this.ViewModel.OnExperienceDisplayClicked" />
+        </div>
+        <div class="component resources-component">
+            <PlayerResourcesComponent Context="@this.ViewModel.PlayerResourcesComponentContext"
+                                      OnBalthazarBarClicked="@this.ViewModel.OnBalthazarBarClicked"
+                                      OnKurzickBarClicked="@this.ViewModel.OnKurzickBarClicked"
+                                      OnImperialBarClicked="@this.ViewModel.OnImperialBarClicked"
+                                      OnLuxonBarClicked="@this.ViewModel.OnLuxonBarClicked" />
+        </div>
+        <div class="component vanquish-component">
+            <VanquishComponent Context="@this.ViewModel.VanquishComponentContext"
+                               OnVanquishBarClicked="@this.ViewModel.OnVanquishingDisplayClicked" />
+        </div>
+        <div class="component title-component">
+            <TitleInformationComponent Context="@this.ViewModel.TitleInformationComponentContext"
+                                       OnTitleClicked="@this.ViewModel.OnTitleClicked" />
+        </div>
+        <div class="component map-component">
+            <CurrentMapComponent Context="@this.ViewModel.CurrentMapComponentContext"
+                                 OnCurrentMapClicked="@this.ViewModel.OnCurrentMapClicked"/>
+        </div>
+        <div class="component quest-component">
+            <QuestLogComponent Context="@this.ViewModel.QuestLogComponentContext"
+                               OnQuestClicked="@this.ViewModel.OnQuestClicked"/>
+        </div>
+    </div>
+    <div class="dashboard-half">
+        <div class="component build-component">
+            <BuildComponent Context="@this.ViewModel.BuildComponentContext"
+                            OnBuildClicked="@this.ViewModel.OnBuildClicked"
+                            OnLoadPlayerSingleBuildClicked="@this.ViewModel.OnPlayerSingleBuildClicked"
+                            OnLoadPlayerTeamBuildClicked="@this.ViewModel.OnPlayerTeamBuildClicked" />
+        </div>
+        <div class="component browser-component">
+            <iframe sandbox="allow-scripts allow-same-origin"
+                    style="height: 100%; width: 100%; margin: -2px;"
+                    src="@this.ViewModel.BrowserSource" />
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public required string ConfigurationId { get; init; }
+    [Parameter]
+    public required string ProcessId { get; init; }
+}

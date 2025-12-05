@@ -1,0 +1,61 @@
+﻿.plugins-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+    overflow-y: auto;
+    flex: 1;
+    margin-top: 50px;
+}
+
+.plugin-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: color-mix(in srgb, var(--neutral-fill-rest) 50%, transparent);
+    border: 1px solid var(--neutral-stroke-rest);
+    border-radius: 6px;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+    .plugin-row:hover {
+        background: color-mix(in srgb, var(--neutral-fill-hover) 60%, transparent);
+        border-color: var(--neutral-stroke-hover);
+    }
+
+.plugin-row-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.plugin-row-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
+.plugin-row-name {
+    font-weight: 600;
+    color: var(--neutral-foreground-rest);
+    font-size: var(--font-size-medium);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.plugin-row-path {
+    color: var(--neutral-foreground-hint);
+    font-size: var(--font-size-small);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.plugin-row-right ::deep .label {
+    font-size: var(--font-size-medium);
+}

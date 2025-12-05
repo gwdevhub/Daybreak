@@ -1,8 +1,8 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Configuration.Options;
 using Daybreak.Services.Updater.Models;
+using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Models.Github;
-using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Services.Downloads;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Registry;
@@ -21,8 +21,6 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
 using System.Windows.Extensions.Services;
-using UpdateStatus = Daybreak.Shared.Models.Progress.UpdateStatus;
-using Version = Daybreak.Shared.Models.Versioning.Version;
 
 namespace Daybreak.Services.Updater;
 
@@ -42,17 +40,22 @@ internal sealed class ApplicationUpdater(
     private const string TempFileSubPath = "tempfile.zip";
     private const string VersionTag = "{VERSION}";
     private const string FileTag = "{FILE}";
-    private const string RefTagPrefix = "/refs/tags";
+    private const string RefTagPrefix = "/refs/tags/v";
     private const string VersionListUrl = "https://api.github.com/repos/gwdevhub/Daybreak/git/refs/tags";
     private const string Url = "https://github.com/gwdevhub/Daybreak/releases/latest";
-    private const string DownloadUrl = $"https://github.com/gwdevhub/Daybreak/releases/download/{VersionTag}/Daybreak{VersionTag}.zip";
-    private const string BlobStorageUrl = $"https://daybreak.blob.core.windows.net/{VersionTag}/{FileTag}";
+    private const string DownloadUrl = $"https://github.com/gwdevhub/Daybreak/releases/download/v{VersionTag}/Daybreakv{VersionTag}.zip";
+    private const string BlobStorageUrl = $"https://daybreak.blob.core.windows.net/v{VersionTag}/{FileTag}";
     private const int DownloadParallelTasks = 10;
 
     private readonly static string TempInstallerFileName = PathUtils.GetAbsolutePathFromRoot(TempInstallerFileNameSubPath);
     private readonly static string InstallerFileName = PathUtils.GetAbsolutePathFromRoot(InstallerFileNameSubPath);
     private readonly static string TempFile = PathUtils.GetAbsolutePathFromRoot(TempFileSubPath);
     private readonly static string UpdatePkg = PathUtils.GetAbsolutePathFromRoot(UpdatePkgSubPath);
+
+    private readonly static ProgressUpdate ProgressInitialize = new(0, "Initializing update");
+    private readonly static ProgressUpdate ProgressCheckLatest = new(0, "Checking latest version");
+    private readonly static ProgressUpdate ProgressFinalize = new(1, "Downloaded update. Please restart Daybreak to finalize the update");
+    private static ProgressUpdate ProgressDownload(double progress) => new(progress, "Downloading update");
 
     private readonly static TimeSpan DownloadInfoUpdateInterval = TimeSpan.FromMilliseconds(16);
 
@@ -67,60 +70,64 @@ internal sealed class ApplicationUpdater(
 
     public Version CurrentVersion { get; } = ProjectConfiguration.CurrentVersion;
 
-    public async Task<bool> DownloadUpdate(Version version, UpdateStatus updateStatus)
+    public IProgressAsyncOperation<bool> DownloadUpdate(Version version, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: version.ToString());
-        if (version.HasPrefix is false)
-        {
-            version.HasPrefix = true;
-        }
-
         if (!this.liveOptions.Value.BetaUpdate)
         {
-            return await this.DownloadUpdateInternalLegacy(version, updateStatus);
+            return ProgressAsyncOperation.Create(async progress =>
+            {
+                return await Task.Factory.StartNew(() => this.DownloadUpdateInternalLegacy(version, progress, cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap();
+            }, cancellationToken);
         }
 
-        try
+        return ProgressAsyncOperation.Create(async progress =>
         {
-            var maybeMetadataResponse = await this.httpClient.GetAsync(
-            BlobStorageUrl
+            try
+            {
+                progress.Report(ProgressInitialize);
+                var maybeMetadataResponse = await this.httpClient.GetAsync(
+                BlobStorageUrl
                 .Replace(VersionTag, version.ToString().Replace(".", "-"))
                 .Replace(FileTag, "Metadata.json"));
-            if (maybeMetadataResponse.IsSuccessStatusCode)
-            {
-                var metaData = await maybeMetadataResponse.Content.ReadFromJsonAsync<List<Metadata>>();
-                if (metaData is not null)
+                if (maybeMetadataResponse.IsSuccessStatusCode)
                 {
-                    return await
-                        await new TaskFactory().StartNew(() => this.DownloadUpdateInternalBlob(metaData, version, updateStatus), CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+                    var metaData = await maybeMetadataResponse.Content.ReadFromJsonAsync<List<Metadata>>();
+                    if (metaData is not null)
+                    {
+                        return await Task.Factory.StartNew(() => this.DownloadUpdateInternalBlob(metaData, version, progress, cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap();
+                    }
                 }
+
+                return await Task.Factory.StartNew(() => this.DownloadUpdateInternalLegacy(version, progress, cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap();
+            }
+            catch (Exception e)
+            {
+                scopedLogger.LogError(e, "Failed to download update for version {version}", version);
+                return false;
+            }
+        }, cancellationToken);
+    }
+
+    public IProgressAsyncOperation<bool> DownloadLatestUpdate(CancellationToken cancellationToken)
+    {
+        return ProgressAsyncOperation.Create(async progress =>
+        {
+            progress.Report(ProgressCheckLatest);
+            var latestVersion = await this.GetLatestVersion(cancellationToken);
+            if (latestVersion is null)
+            {
+                this.logger.LogWarning("Failed to retrieve latest version. Aborting update");
+                return false;
             }
 
-            return await this.DownloadUpdateInternalLegacy(version, updateStatus);
-        }
-        catch (Exception e)
-        {
-            scopedLogger.LogError(e, "Failed to download update for version {version}", version);
-            return false;
-        }
+            return await this.DownloadUpdate(latestVersion, cancellationToken);
+        }, cancellationToken);
     }
 
-    public async Task<bool> DownloadLatestUpdate(UpdateStatus updateStatus)
+    public async Task<bool> UpdateAvailable(CancellationToken cancellationToken)
     {
-        updateStatus.CurrentStep = UpdateStatus.CheckingLatestVersion;
-        var latestVersion = await this.GetLatestVersion();
-        if (latestVersion is null)
-        {
-            this.logger.LogWarning("Failed to retrieve latest version. Aborting update");
-            return false;
-        }
-
-        return await this.DownloadUpdate(latestVersion, updateStatus);
-    }
-
-    public async Task<bool> UpdateAvailable()
-    {
-        var maybeLatestVersion = await this.GetLatestVersion();
+        var maybeLatestVersion = await this.GetLatestVersion(cancellationToken);
         if (maybeLatestVersion is null)
         {
             this.logger.LogWarning("Failed to retrieve latest version");
@@ -130,18 +137,25 @@ internal sealed class ApplicationUpdater(
         return this.CurrentVersion.CompareTo(maybeLatestVersion) < 0;
     }
 
-    public async Task<IEnumerable<Version>> GetVersions()
+    public async Task<IEnumerable<Version>> GetVersions(CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         scopedLogger.LogDebug($"Retrieving version list from {VersionListUrl}");
         try
         {
-            var response = await this.httpClient.GetAsync(VersionListUrl);
+            var response = await this.httpClient.GetAsync(VersionListUrl, cancellationToken);
             if (response.IsSuccessStatusCode)
             {
-                var serializedList = await response.Content.ReadAsStringAsync();
+                var serializedList = await response.Content.ReadAsStringAsync(cancellationToken);
                 var versionList = serializedList.Deserialize<GithubRefTag[]>();
-                return versionList!.Select(v => v.Ref![RefTagPrefix.Length..]).Select(v => new Version(v));
+                return versionList!.Select(v => v.Ref![(RefTagPrefix.Length - 1)..])
+                    .Select(v =>
+                    {
+                        var result = Version.TryParse(v, out var version);
+                        return (result, version);
+                    })
+                    .Where(v => v.result)
+                    .Select(v => v.version ?? throw new InvalidOperationException("Parsed version cannot be null"));
             }
 
             scopedLogger.LogError("Failed to retrieve version list. Status code: {statusCode}", response.StatusCode);
@@ -154,7 +168,7 @@ internal sealed class ApplicationUpdater(
         }
     }
 
-    public async Task<string?> GetChangelog(Version version)
+    public async Task<string?> GetChangelog(Version version, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: version.ToString());
         try
@@ -162,7 +176,7 @@ internal sealed class ApplicationUpdater(
             var changeLogResponse = await this.httpClient.GetAsync(
             BlobStorageUrl
                 .Replace(VersionTag, version.ToString().Replace(".", "-"))
-                .Replace(FileTag, "changelog.txt"));
+                .Replace(FileTag, "changelog.txt"), cancellationToken);
 
             if (!changeLogResponse.IsSuccessStatusCode)
             {
@@ -171,7 +185,7 @@ internal sealed class ApplicationUpdater(
             }
 
             scopedLogger.LogDebug("Retrieved changelog for version {version}", version);
-            return await changeLogResponse.Content.ReadAsStringAsync();
+            return await changeLogResponse.Content.ReadAsStringAsync(cancellationToken);
         }
         catch (Exception e)
         {
@@ -189,9 +203,9 @@ internal sealed class ApplicationUpdater(
                 return;
             }
 
-            if (await this.UpdateAvailable())
+            if (await this.UpdateAvailable(CancellationToken.None))
             {
-                var maybeLatestVersion = await this.GetLatestVersion();
+                var maybeLatestVersion = await this.GetLatestVersion(CancellationToken.None);
                 if (maybeLatestVersion is null)
                 {
                     return;
@@ -227,10 +241,10 @@ internal sealed class ApplicationUpdater(
     {
     }
 
-    private async Task<bool> DownloadUpdateInternalBlob(List<Metadata> metadata, Version version, UpdateStatus updateStatus)
+    private async Task<bool> DownloadUpdateInternalBlob(List<Metadata> metadata, Version version, IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: version.ToString());
-        updateStatus.CurrentStep = DownloadStatus.InitializingDownload;
+        progress.Report(ProgressInitialize);
 
         // Exclude daybreak packed files
         var daybreakArchive = $"daybreak{version}.zip";
@@ -306,7 +320,7 @@ internal sealed class ApplicationUpdater(
                 return Task.Run(async () =>
                 {
                     var downloadUrl = BlobStorageUrl.Replace(VersionTag, version.ToString().Replace('.', '-')).Replace(FileTag, file.RelativePath);
-                    var response = await this.httpClient.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead);
+                    var response = await this.httpClient.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     if (!response.IsSuccessStatusCode)
                     {
                         scopedLogger.LogError($"Error {response.StatusCode} when downloading {file.RelativePath}");
@@ -320,27 +334,30 @@ internal sealed class ApplicationUpdater(
             foreach(var result in parallelResponses)
             {
                 (var file, var fileDownloadResult, var response) = await result;
-                if (fileDownloadResult is false)
+                if (fileDownloadResult is false ||
+                    file is null ||
+                    file.Name is null ||
+                    file.RelativePath is null)
                 {
-                    scopedLogger.LogError($"{file.RelativePath} failed to download. Cancelling update");
+                    scopedLogger.LogError($"{file?.RelativePath ?? string.Empty} failed to download. Cancelling update");
                     return false;
                 }
 
-                var fileNameBytes = Encoding.UTF8.GetBytes(file.Name!);
-                var relativePathBytes = Encoding.UTF8.GetBytes(file.RelativePath!);
-                await packageStream.WriteAsync(BitConverter.GetBytes(fileNameBytes.Length));
-                await packageStream.WriteAsync(fileNameBytes);
-                await packageStream.WriteAsync(BitConverter.GetBytes(relativePathBytes.Length));
-                await packageStream.WriteAsync(relativePathBytes);
-                await packageStream.WriteAsync(BitConverter.GetBytes(file.Size));
+                var fileNameBytes = Encoding.UTF8.GetBytes(file.Name);
+                var relativePathBytes = Encoding.UTF8.GetBytes(file.RelativePath);
+                await packageStream.WriteAsync(BitConverter.GetBytes(fileNameBytes.Length), cancellationToken);
+                await packageStream.WriteAsync(fileNameBytes, cancellationToken);
+                await packageStream.WriteAsync(BitConverter.GetBytes(relativePathBytes.Length), cancellationToken);
+                await packageStream.WriteAsync(relativePathBytes, cancellationToken);
+                await packageStream.WriteAsync(BitConverter.GetBytes(file.Size), cancellationToken);
 
-                var downloadStream = await response.Content.ReadAsStreamAsync();
+                var downloadStream = await response.Content.ReadAsStreamAsync(cancellationToken);
                 var maxMeasurements = 100;
                 var fileSize = file.Size;
                 while (fileSize > 0)
                 {
-                    var readBytes = await downloadStream.ReadAsync(downloadBuffer);
-                    await packageStream.WriteAsync(downloadBuffer.AsMemory(0, readBytes));
+                    var readBytes = await downloadStream.ReadAsync(downloadBuffer, cancellationToken);
+                    await packageStream.WriteAsync(downloadBuffer.AsMemory(0, readBytes), cancellationToken);
 
                     fileSize -= readBytes;
                     downloaded += readBytes;
@@ -356,51 +373,50 @@ internal sealed class ApplicationUpdater(
                         speedMeasurements.Add(currentSpeed);
                         var averageSpeed = speedMeasurements.Average();
                         var remainingBytes = sizeToDownload - downloaded;
-                        var etaMillis = averageSpeed > 0 ? remainingBytes / averageSpeed : 0;
-                        updateStatus.CurrentStep = DownloadStatus.Downloading(downloaded / sizeToDownload, TimeSpan.FromMilliseconds(etaMillis));
+                        // var etaMillis = averageSpeed > 0 ? remainingBytes / averageSpeed : 0;
+                        // var eta = TimeSpan.FromMilliseconds(etaMillis);
+                        progress.Report(ProgressDownload(downloaded / sizeToDownload));
                     }
                 }
             }
         }
 
-        updateStatus.CurrentStep = DownloadStatus.Downloading(1, TimeSpan.Zero);
-
-        scopedLogger.LogDebug($"Prepared update package at {UpdatePkg}");
-        updateStatus.CurrentStep = UpdateStatus.PendingRestart;
+        scopedLogger.LogDebug("Prepared update package at {updatePkg}", UpdatePkg);
+        progress.Report(ProgressFinalize);
         return true;
     }
 
-    private async Task<bool> DownloadUpdateInternalLegacy(Version version, UpdateStatus updateStatus)
+    private async Task<bool> DownloadUpdateInternalLegacy(Version version, IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: version.VersionString);
-        updateStatus.CurrentStep = DownloadStatus.InitializingDownload;
+        var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: version.ToString());
+        progress.Report(ProgressInitialize);
         var uri = DownloadUrl.Replace(VersionTag, version.ToString());
-        if (await this.downloadService.DownloadFile(uri, TempFile, updateStatus) is false)
+        if (await this.downloadService.DownloadFile(uri, TempFile, progress, cancellationToken) is false)
         {
             scopedLogger.LogError("Failed to download update file");
             return false;
         }
 
-        updateStatus.CurrentStep = UpdateStatus.PendingRestart;
+        progress.Report(ProgressFinalize);
         scopedLogger.LogDebug("Downloaded update file");
         return true;
     }
 
-    private async Task<Version?> GetLatestVersion()
+    private async Task<Version?> GetLatestVersion(CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         try
         {
-            using var response = await this.httpClient.GetAsync(Url);
+            using var response = await this.httpClient.GetAsync(Url, cancellationToken);
             if (response.IsSuccessStatusCode)
             {
-                var versionTag = response.RequestMessage!.RequestUri!.ToString().Split('/').Last().TrimStart('v');
+                var versionTag = response.RequestMessage?.RequestUri?.ToString().Split('/').Last().TrimStart('v');
                 if (Version.TryParse(versionTag, out var parsedVersion))
                 {
                     return parsedVersion;
                 }
 
-                scopedLogger.LogError("Failed to parse version from {versionTag}", versionTag);
+                scopedLogger.LogError("Failed to parse version from {versionTag}", versionTag ?? string.Empty);
                 return default;
             }
 

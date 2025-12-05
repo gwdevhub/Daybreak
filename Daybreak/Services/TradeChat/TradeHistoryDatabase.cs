@@ -12,7 +12,7 @@ internal sealed class TradeHistoryDatabase(
     {
         return await this.liteCollection
             .FindAll(cancellationToken)
-            .Where(t => t.Timestamp > since)
+            .Where(async (t, ct) => await Task.FromResult(t.Timestamp > since))
             .ToListAsync(cancellationToken);
     }
 

@@ -1,6 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Models.Mods;
-using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Services.Downloads;
 using Daybreak.Shared.Services.DSOAL;
 using Daybreak.Shared.Services.Notifications;
@@ -38,6 +38,12 @@ internal sealed class DSOALService(
     private const string AlsoftIni = "alsoft.ini";
     private const string OpenAlDirectory = "openal";
 
+    private static readonly ProgressUpdate ProgressInitialize = new(0, "Initializing");
+    private static readonly ProgressUpdate ProgressFailed = new(1, "Failed to install DSOAL");
+    private static readonly ProgressUpdate ProgressUnpacking = new(1, "Unpacking DSOAL files");
+    private static readonly ProgressUpdate ProgressSetupFiles = new(1, "Setting up DSOAL files");
+    private static readonly ProgressUpdate ProgressSuccess = new(1, "DSOAL installation succeeded");
+
     private static readonly string DSOALDirectory = PathUtils.GetAbsolutePathFromRoot(DSOALDirectorySubPath);
 
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
@@ -48,6 +54,9 @@ internal sealed class DSOALService(
     private readonly ILogger<DSOALService> logger = logger.ThrowIfNull();
 
     public string Name => "DSOAL";
+    public string Description => "3D Positional Audio and EAX Effects";
+    public bool IsVisible => true;
+    public bool CanCustomManage => false;
     public bool IsEnabled
     {
         get => this.options.Value.Enabled;
@@ -57,44 +66,58 @@ internal sealed class DSOALService(
             this.options.UpdateOption();
         }
     }
-    public bool IsInstalled => Directory.Exists(this.options.Value.Path) &&
+    public bool IsInstalled => Directory.Exists(DSOALDirectory) &&
            File.Exists(Path.Combine(DSOALDirectory, DsoundDll)) &&
            File.Exists(Path.Combine(DSOALDirectory, AlsoftIni)) &&
            File.Exists(Path.Combine(DSOALDirectory, AlsoftIni));
+
+    public IProgressAsyncOperation<bool> PerformInstallation(CancellationToken cancellationToken)
+    {
+        return this.SetupDSOAL(cancellationToken);
+    }
+
+    public Task OnCustomManagement(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException("DSOAL does not support custom management");
+    }
 
     public void EnsureDSOALSymbolicLinkExists()
     {
         this.EnsureSymbolicLinkExists();
     }
 
-    public async Task<bool> SetupDSOAL(DSOALInstallationStatus dSOALInstallationStatus)
+    public ProgressAsyncOperation<bool> SetupDSOAL(CancellationToken cancellationToken)
     {
-        if (this.IsInstalled)
+        return ProgressAsyncOperation.Create(async progress =>
         {
+            progress.Report(ProgressInitialize);
+            if (this.IsInstalled)
+            {
+                return true;
+            }
+
+            if (!this.privilegeManager.AdminPrivileges)
+            {
+                await this.privilegeManager.RequestAdminPrivileges<LaunchView>("Administrator privileges are required to install DSOAL", cancelViewParams: default, cancellationToken);
+                return false;
+            }
+
+            if ((await this.downloadService.DownloadFile(DownloadUrl, ArchiveName, progress, cancellationToken)) is false)
+            {
+                this.logger.LogError("Failed to install DSOAL");
+                return false;
+            }
+
+            this.logger.LogDebug("Extracting DSOAL files");
+            progress.Report(ProgressUnpacking);
+
+            this.ExtractFiles();
+            progress.Report(ProgressSetupFiles);
+
+            this.SetupHrtfAndPresetFiles();
+            progress.Report(ProgressSuccess);
             return true;
-        }
-
-        if (!this.privilegeManager.AdminPrivileges)
-        {
-            this.privilegeManager.RequestAdminPrivileges<LauncherView>("Administrator privileges are required to install DSOAL");
-            return false;
-        }
-
-        if ((await this.downloadService.DownloadFile(DownloadUrl, ArchiveName, dSOALInstallationStatus)) is false)
-        {
-            this.logger.LogError("Failed to install DSOAL");
-            return false;
-        }
-
-        this.logger.LogDebug("Extracting DSOAL files");
-        dSOALInstallationStatus.CurrentStep = DSOALInstallationStatus.ExtractingFiles;
-
-        this.ExtractFiles();
-        dSOALInstallationStatus.CurrentStep = DSOALInstallationStatus.SetupOpenALFiles;
-        
-        this.SetupHrtfAndPresetFiles();
-        dSOALInstallationStatus.CurrentStep = DSOALInstallationStatus.Finished;
-        return true;
+        }, cancellationToken);
     }
 
     public IEnumerable<string> GetCustomArguments()
@@ -184,7 +207,7 @@ internal sealed class DSOALService(
             if (!this.privilegeManager.AdminPrivileges)
             {
                 this.registryService.SaveValue(DSOALFixRegistryKey, true);
-                this.privilegeManager.RequestAdminPrivileges<LauncherView>(DSOALFixAdminMessage);
+                //this.privilegeManager.RequestAdminPrivileges<LauncherView>(DSOALFixAdminMessage);
                 return false;
             }
 
@@ -202,7 +225,7 @@ internal sealed class DSOALService(
         if (!this.privilegeManager.AdminPrivileges)
         {
             this.registryService.SaveValue(DSOALFixRegistryKey, true);
-            this.privilegeManager.RequestAdminPrivileges<LauncherView>(DSOALFixAdminMessage);
+            //this.privilegeManager.RequestAdminPrivileges<LauncherView>(DSOALFixAdminMessage);
             return false;
         }
 
@@ -215,9 +238,6 @@ internal sealed class DSOALService(
     {
         ZipFile.ExtractToDirectory(ArchiveName, DSOALDirectory, true);
         ZipFile.ExtractToDirectory(Path.Combine(DSOALDirectory, HRTFArchiveName), DSOALDirectory, true);
-        var options = this.options.Value;
-        options.Path = DSOALDirectory;
-        this.options.UpdateOption();
         File.Delete(ArchiveName);
         File.Delete(Path.Combine(DSOALDirectory, HRTFArchiveName));
     }

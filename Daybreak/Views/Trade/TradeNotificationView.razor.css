@@ -1,0 +1,30 @@
+﻿.message {
+    font-size: var(--font-size-medium);
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 500px;
+}
+
+.row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.row-left {
+    display: flex;
+    flex-direction: row;
+    margin-right: 10px;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.row-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}

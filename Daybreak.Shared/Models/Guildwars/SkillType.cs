@@ -1,0 +1,43 @@
+﻿namespace Daybreak.Shared.Models.Guildwars;
+
+[Flags]
+public enum SkillType : long
+{
+    None = 0,
+    Skill = 1L << 0,
+    Touch = 1L << 1,
+    Spell = 1L << 2,
+    Hex = 1L << 3,
+    Enchantment = 1L << 4,
+    Flash = 1L << 5,
+    Echo = 1L << 6,
+    Ward = 1L << 7,
+    Glyph = 1L << 8,
+    Well = 1L << 9,
+    Ritual = 1L << 10,
+    Binding = 1L << 11,
+    Nature = 1L << 12,
+    EbonVanguard = 1L << 13,
+    Item = 1L << 15,
+    Weapon = 1L << 16,
+    Attack = 1L << 20,
+    Axe = 1L << 21,
+    Bow = 1L << 22,
+    Melee = 1L << 23,
+    Hammer = 1L << 24,
+    Sword = 1L << 25,
+    Spear = 1L << 26,
+    Pet = 1L << 27,
+    Lead = 1L << 28,
+    OffHand = 1L << 29,
+    Dual = 1L << 30,
+    Scythe = 1L << 31,
+    Ranged = 1L << 32,
+    Chant = 1L << 40,
+    Shout = 1L << 41,
+    Signet = 1L << 45,
+    Preparation = 1L << 46,
+    Stance = 1L << 47,
+    Form = 1L << 48,
+    Trap = 1L << 49
+}

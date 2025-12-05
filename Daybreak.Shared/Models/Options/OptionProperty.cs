@@ -1,15 +1,17 @@
 ﻿using Daybreak.Shared.Validators;
 using System.ComponentModel;
-using System.Core.Extensions;
 
 namespace Daybreak.Shared.Models.Options;
-public sealed class OptionProperty(string name, string description, IValidator validator, Action<object> setter, Func<object> getter, TypeConverter converter, Type type)
+public sealed class OptionProperty
 {
-    public string Name { get; } = name.ThrowIfNull();
-    public string Description { get; } = description;
-    public IValidator Validator { get; } = validator.ThrowIfNull();
-    public Action<object> Setter { get; } = setter.ThrowIfNull();
-    public Func<object> Getter { get; } = getter.ThrowIfNull();
-    public TypeConverter Converter { get; } = converter.ThrowIfNull();
-    public Type Type { get; } = type.ThrowIfNull();
+    public required string Name { get; init; }
+    public required string Description { get; init; }
+    public required IValidator Validator { get; init; }
+    public required Func<List<object>>? ValuesFactory { get; init; }
+    public required Action<OptionInstance, object?> Setter { get; init; }
+    public required Func<OptionInstance, object?> Getter { get; init; }
+    public required TypeConverter Converter { get; init; }
+    public required Type Type { get; init; }
+    public required bool IsSynchronized { get; init; }
+    public required bool IsVisible { get; init; }
 }

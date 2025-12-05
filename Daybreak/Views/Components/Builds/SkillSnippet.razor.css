@@ -1,0 +1,102 @@
+﻿.container {
+    position: fixed;
+    z-index: 1000;
+    display: flex;
+    padding: 10px;
+    border-radius: 4px;
+    max-width: 400px;
+    overflow: clip;
+    gap: 10px;
+    color: var(--neutral-foreground-rest);
+}
+
+.skill-snippet {
+    position: fixed;
+    left: calc(var(--mouse-x) - 80px);
+    top: calc(var(--mouse-y) + 40px);
+    max-width: min(400px, calc(100vw - var(--mouse-x) + 65px));
+    max-height: calc(100vh - var(--mouse-y));
+}
+
+.left-side {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.center {
+
+}
+
+.right-side {
+    align-items: start;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.skill-type-container {
+    display: flex;
+    flex-direction: row;
+    font-size: var(--font-size-small);
+    color: var(--neutral-foreground-hint);
+    gap: 10px;
+}
+
+.skill-type {
+}
+
+.skill-attribute {
+    font-weight: bolder;
+}
+
+.skill-campaign {
+    font-style: italic;
+}
+
+.skill-pveonly {
+    font-size: var(--font-size-x-small);
+    font-style: oblique;
+    text-align: center;
+}
+
+.skill-icon {
+    width: 40px;
+    height: 40px;
+}
+
+.skill-profession {
+    width: 40px;
+    height: 40px;
+}
+
+.skill-id {
+    font-size: var(--font-size-x-small);
+    align-items: center;
+}
+
+.skill-name {
+    font-size: var(--font-size-large);
+}
+
+.skill-description {
+    font-size: var(--font-size-medium);
+}
+
+.skill-concise-description {
+    color: var(--neutral-foreground-hint);
+    font-style: italic;
+    font-size: var(--font-size-x-small);
+}
+
+.skill-resource {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
+.skill-resource-img {
+    width: calc(var(--ui-scale) * 15px);
+    height: calc(var(--ui-scale) * 15px);
+}

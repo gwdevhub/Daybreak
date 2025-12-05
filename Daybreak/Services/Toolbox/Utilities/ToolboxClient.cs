@@ -1,6 +1,6 @@
 ﻿using Daybreak.Services.Toolbox.Models;
+using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Models.Github;
-using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Services.Downloads;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
@@ -8,7 +8,6 @@ using System.Extensions;
 using System.Extensions.Core;
 using System.IO;
 using System.Net.Http;
-using Version = Daybreak.Shared.Models.Versioning.Version;
 
 namespace Daybreak.Services.Toolbox.Utilities;
 internal sealed class ToolboxClient(
@@ -25,12 +24,12 @@ internal sealed class ToolboxClient(
     private readonly IHttpClient<ToolboxClient> httpClient = httpClient.ThrowIfNull();
     private readonly ILogger<ToolboxClient> logger = logger.ThrowIfNull();
 
-    public async Task<DownloadLatestOperation> DownloadLatestDll(ToolboxInstallationStatus toolboxInstallationStatus, string destinationFolder, CancellationToken cancellationToken)
+    public async Task<DownloadLatestOperation> DownloadLatestDll(IProgress<ProgressUpdate> progress, string destinationFolder, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         try
         {
-            return await this.DownloadLatestVersion(toolboxInstallationStatus, destinationFolder, cancellationToken);
+            return await this.DownloadLatestVersion(progress, destinationFolder, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -60,7 +59,7 @@ internal sealed class ToolboxClient(
         }
     }
 
-    private async Task<DownloadLatestOperation> DownloadLatestVersion(ToolboxInstallationStatus toolboxInstallationStatus, string destinationFolderPath, CancellationToken cancellationToken)
+    private async Task<DownloadLatestOperation> DownloadLatestVersion(IProgress<ProgressUpdate> progress, string destinationFolderPath, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         (_, var tag) = await this.GetLatestVersionTag(cancellationToken);
@@ -73,7 +72,7 @@ internal sealed class ToolboxClient(
         var downloadUrl = ReleaseUrl.Replace(TagPlaceholder, tag.ToString());
         var destinationFolder = Path.GetFullPath(destinationFolderPath);
         var destinationPath = Path.Combine(destinationFolder, DllName);
-        var success = await this.downloadService.DownloadFile(downloadUrl, destinationPath, toolboxInstallationStatus, cancellationToken);
+        var success = await this.downloadService.DownloadFile(downloadUrl, destinationPath, progress, cancellationToken);
         if (!success)
         {
             throw new InvalidOperationException($"Failed to download GWToolboxdll version {tag}");
@@ -95,21 +94,26 @@ internal sealed class ToolboxClient(
 
         var responseString = await getListResponse.Content.ReadAsStringAsync(cancellationToken);
         var releasesList = responseString.Deserialize<List<GithubRefTag>>();
-        var latestRelease = releasesList?.Where(t => t.Ref?.Contains("Release") is true)
+        var latestReleaseTuple = releasesList?.Where(t => t.Ref?.Contains("Release") is true)
             .Select(t => t.Ref?.Replace("refs/tags/", ""))
             .OfType<string>()
-            .LastOrDefault(); // Replace _Release with -Release for the Version parser
-        if (latestRelease?.Replace('_', '-').ToLowerInvariant() is not string tag)
+            .Select(t => (t, t.Replace("_Release", "")))
+            .Select(t =>
+            {
+                var parseResult = Version.TryParse(t.Item2, out var parsedVersion);
+                return (parseResult, parsedVersion, t.t);
+            })
+            .Where(t => t.parseResult)
+            .OrderByDescending(t => t.parsedVersion)
+            .FirstOrDefault();
+
+        if (latestReleaseTuple is null)
         {
-            scopedLogger.LogError("Could not parse version list. No latest version found");
+            scopedLogger.LogError("No valid releases found");
             return default;
         }
 
-        if (!Version.TryParse(tag, out var toolboxVersion))
-        {
-            scopedLogger.LogError("Could not parse version. No latest version found");
-        }
-
-        return (toolboxVersion, latestRelease);
+        var (parseResult, latestReleaseVersion, latestReleaseTag) = latestReleaseTuple.Value;
+        return (latestReleaseVersion, latestReleaseTag);
     }
 }

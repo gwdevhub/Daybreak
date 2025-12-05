@@ -1,0 +1,6 @@
+﻿@page "/builds/{BuildName}"
+@inherits ViewBase<BuildRoutingView, BuildRoutingViewModel>
+@code {
+    [Parameter]
+    public required string BuildName { get; set; }
+}

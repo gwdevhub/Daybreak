@@ -1,6 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Models.Mods;
-using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Services.DirectSong;
 using Daybreak.Shared.Services.Downloads;
 using Daybreak.Shared.Services.Notifications;
@@ -31,7 +31,14 @@ internal sealed class DirectSongService(
     private const string WMVCOREDll = "WMVCORE.DLL";
     private const string DsGuildwarsDll = "ds_GuildWars.dll";
 
-    private readonly static string InstallationDirectory = PathUtils.GetAbsolutePathFromRoot(InstallationDirectorySubPath);
+    private static readonly ProgressUpdate ProgressStarting = new(0, "Starting DirectSong installation");
+    private static readonly ProgressUpdate ProgressInitializingDownload = new(0, "Initializing DirectSong download");
+    private static readonly ProgressUpdate ProgressFailed = new(1, "DirectSong installation failed");
+    private static readonly ProgressUpdate ProgressCompleted = new(1, "DirectSong installation completed");
+    private static readonly ProgressUpdate ProgressRegistry = new(1, "Setting up DirectSong registry entries");
+    private static ProgressUpdate ProgressUnpacking(double progress) => new(progress, "Unpacking DirectSong files");
+
+    private static readonly string InstallationDirectory = PathUtils.GetAbsolutePathFromRoot(InstallationDirectorySubPath);
 
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IPrivilegeManager privilegeManager = privilegeManager.ThrowIfNull();
@@ -41,6 +48,9 @@ internal sealed class DirectSongService(
     private readonly ILogger<DirectSongService> logger = logger.ThrowIfNull();
 
     public string Name => "DirectSong";
+    public string Description => "Enables custom Guild Wars soundtrack composed by Jeremy Soule";
+    public bool IsVisible => true;
+    public bool CanCustomManage => false;
     public bool IsEnabled
     {
         get => this.options.Value.Enabled;
@@ -54,8 +64,19 @@ internal sealed class DirectSongService(
         Directory.Exists(InstallationDirectory) &&
         File.Exists(Path.Combine(Path.GetFullPath(InstallationDirectory), WMVCOREDll)) &&
         File.Exists(Path.Combine(Path.GetFullPath(InstallationDirectory), DsGuildwarsDll));
-    public DirectSongInstallationStatus? CachedInstallationStatus { get; private set; }
-    public Task<bool>? InstallationTask { get; private set; }
+
+    public IProgressAsyncOperation<bool> PerformInstallation(CancellationToken cancellationToken)
+    {
+        return ProgressAsyncOperation.Create(async progress =>
+        {
+            return await Task.Factory.StartNew(() => this.SetupDirectSong(progress, cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap();
+        }, cancellationToken);
+    }
+
+    public Task OnCustomManagement(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException("DirectSong does not support custom management");
+    }
 
     public IEnumerable<string> GetCustomArguments() => [];
 
@@ -114,88 +135,67 @@ internal sealed class DirectSongService(
         return Task.CompletedTask;
     }
 
-    public Task<bool> SetupDirectSong(DirectSongInstallationStatus directSongInstallationStatus, CancellationToken cancellationToken)
+    public Task<bool> SetupDirectSong(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
     {
-        if (this.InstallationTask is not null &&
-            !this.InstallationTask.IsCompleted)
-        {
-            return this.InstallationTask;
-        }
-
-        this.InstallationTask = Task.Run(() => this.SetupDirectSongInternal(directSongInstallationStatus, cancellationToken));
-        return this.InstallationTask;
+        return this.SetupDirectSongInternal(progress, cancellationToken);
     }
 
-    private async Task<bool> SetupDirectSongInternal(DirectSongInstallationStatus directSongInstallationStatus, CancellationToken cancellationToken)
+    private async Task<bool> SetupDirectSongInternal(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.SetupDirectSongInternal), string.Empty);
-        if (this.CachedInstallationStatus is not null)
-        {
-            scopedLogger.LogWarning($"Another installation already in progress. Check {nameof(this.CachedInstallationStatus)}");
-            return false;
-        }
-
         if (this.IsInstalled)
         {
             scopedLogger.LogDebug("Already installed");
-            this.InstallationTask = default;
-            this.CachedInstallationStatus = default;
             return true;
         }
 
         if (!this.privilegeManager.AdminPrivileges)
         {
-            this.privilegeManager.RequestAdminPrivileges<LauncherView>("DirectSong installation requires Administrator privileges in order to set up the registry entries");
-            this.InstallationTask = default;
-            this.CachedInstallationStatus = default;
+            await this.privilegeManager.RequestAdminPrivileges<LaunchView>("DirectSong installation requires Administrator privileges in order to set up the registry entries", cancelViewParams: default, cancellationToken);
             return false;
         }
 
-        this.CachedInstallationStatus = directSongInstallationStatus;
-        directSongInstallationStatus.CurrentStep = DirectSongInstallationStatus.StartingStep;
+        progress.Report(ProgressStarting);
         var destinationPath = Path.Combine(Path.GetFullPath(InstallationDirectory), DestinationZipFile);
         if (!File.Exists(destinationPath))
         {
             Directory.CreateDirectory(Path.GetFullPath(InstallationDirectory));
             scopedLogger.LogDebug($"Downloading {DestinationZipFile}");
-            directSongInstallationStatus.CurrentStep = DirectSongInstallationStatus.InitializingDownload;
-            if (!await this.downloadService.DownloadFile(DownloadUrl, destinationPath, directSongInstallationStatus, cancellationToken))
+            progress.Report(ProgressInitializingDownload);
+            if (!await this.downloadService.DownloadFile(DownloadUrl, destinationPath, progress, cancellationToken))
             {
                 scopedLogger.LogError("Download failed. Check logs");
-                this.InstallationTask = default;
-                this.CachedInstallationStatus = default;
+                progress.Report(ProgressFailed);
                 return false;
             }
         }
 
         scopedLogger.LogDebug("Extracting DirectSong files");
-        if (!await this.sevenZipExtractor.ExtractToDirectory(destinationPath, InstallationDirectory, (progress, fileName) =>
+        if (!await this.sevenZipExtractor.ExtractToDirectory(destinationPath, InstallationDirectory, (progressValue, fileName) =>
         {
             scopedLogger.LogDebug($"Extracted {fileName}");
-            directSongInstallationStatus.CurrentStep = DirectSongInstallationStatus.Extracting(progress);
+            progress.Report(ProgressUnpacking(progressValue));
         }, cancellationToken))
         {
+            //TODO: Better handle corrupted downloaded archives
             scopedLogger.LogError("Extraction failed");
-            this.InstallationTask = default;
-            this.CachedInstallationStatus = default;
+            progress.Report(ProgressFailed);
+            File.Delete(destinationPath);
             return false;
         }
 
         scopedLogger.LogDebug("Extracted files. Setting up registry entries");
-        directSongInstallationStatus.CurrentStep = DirectSongInstallationStatus.SetupRegistry;
+        progress.Report(ProgressRegistry);
         if (!await RunRegisterDirectSongDirectory(cancellationToken))
         {
             scopedLogger.LogError("Failed to set up registry entries");
-            this.InstallationTask = default;
-            this.CachedInstallationStatus = default;
+            progress.Report(ProgressFailed);
             return false;
         }
 
         scopedLogger.LogDebug($"Deleting archive {destinationPath}");
         File.Delete(destinationPath);
-        directSongInstallationStatus.CurrentStep = DirectSongInstallationStatus.Finished;
-        this.InstallationTask = default;
-        this.CachedInstallationStatus = default;
+        progress.Report(ProgressCompleted);
         return true;
     }
 
