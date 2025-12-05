@@ -7,7 +7,13 @@ namespace Daybreak.Services.Guildwars.Utils;
 /// </summary>
 internal sealed class GuildWarsExecutableParser
 {
+    // Used by older Guild Wars versions
     private readonly static byte[] VersionPattern = [0x8B, 0xC8, 0x33, 0xDB, 0x39, 0x8D, 0xC0, 0xFD, 0xFF, 0xFF, 0x0F, 0x95, 0xC3];
+    
+    // Used by Guild Wars Reforged
+    // Pattern: test ecx,ecx | jne | mov eax,[addr] | test eax,eax | je
+    // Bytes:   85 C9        | 75 E6 | A1 xx xx xx xx | 85 C0       | 74 09
+    private readonly static byte[] VersionPattern2 = [0x85, 0xC9, 0x75, 0xE6, 0xA1];
 
     private readonly PeFile peFile;
     private readonly ImageSectionHeader textSection;
@@ -26,6 +32,22 @@ internal sealed class GuildWarsExecutableParser
             var functionRva = this.FollowCall(offset - 5);
             var fileId = (int)this.Read(functionRva + 1);
             return fileId;
+        }, cancellationToken);
+    }
+
+    public Task<int> GetVersion2(CancellationToken cancellationToken)
+    {
+        return Task.Run(() =>
+        {
+            //TODO: This points to a portion in .data which contains the version, but it only gets populated at runtime.
+
+            var patternRva = this.Find(VersionPattern2);
+            var patternFileOffset = this.RvaToOffset(patternRva);
+            var absoluteVa = BitConverter.ToUInt32(this.peFile.RawFile.ToArray(), patternFileOffset + 5);
+            var imageBase = this.peFile.ImageNtHeaders?.OptionalHeader.ImageBase ?? 0;
+            var versionRva = absoluteVa - (uint)imageBase;
+            var version = (int)this.Read(versionRva);
+            return version;
         }, cancellationToken);
     }
 

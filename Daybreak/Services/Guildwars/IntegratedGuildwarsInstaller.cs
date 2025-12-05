@@ -121,7 +121,14 @@ internal sealed class IntegratedGuildwarsInstaller(
         }
         catch
         {
-            return default;
+            try
+            {
+                return await parser.GetVersion2(cancellationToken);
+            }
+            catch
+            {
+                return default;
+            }
         }
     }
 

@@ -7,6 +7,7 @@ using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Extensions;
+using TrailBlazr.Services;
 
 namespace Daybreak.Services.Guildwars;
 
@@ -16,7 +17,6 @@ internal sealed class GuildWarsBatchUpdateNotificationHandler(
     INotificationService notificationService,
     ILogger<GuildWarsBatchUpdateNotificationHandler> logger) : INotificationHandler
 {
-    //private readonly IViewManager viewManager = viewManager.ThrowIfNull();
     private readonly IGuildWarsInstaller guildWarsInstaller = guildWarsInstaller.ThrowIfNull();
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();

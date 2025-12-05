@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Attributes;
-using Daybreak.Shared.Models.Browser;
 using Newtonsoft.Json;
 using Daybreak.Shared.Models.FocusView;
 
@@ -11,7 +10,7 @@ public sealed class FocusViewOptions
 {
     [JsonProperty(nameof(Enabled))]
     [OptionName(Name = "Enabled", Description = "If true, the focus view is enabled, showing live information from the game")]
-    public bool Enabled { get; set; } = true;
+    public bool Enabled { get; set; } = false;
 
     [JsonProperty(nameof(ExperienceDisplay))]
     [OptionName(Name = "Experience Display Mode", Description = "Sets how should the experience display show the information")]
@@ -44,8 +43,4 @@ public sealed class FocusViewOptions
     [JsonProperty(nameof(EnergyDisplay))]
     [OptionName(Name = "Energy Display Mode", Description = "Sets how should the energy display show the information")]
     public PointsDisplay EnergyDisplay { get; set; }
-
-    [JsonProperty(nameof(BrowserHistory))]
-    [OptionIgnore]
-    public BrowserHistory BrowserHistory { get; set; } = new();
 }

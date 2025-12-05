@@ -355,7 +355,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         startupActionProducer.RegisterAction<FixSymbolicLinkStartupAction>();
         startupActionProducer.RegisterAction<UpdateUModAction>();
         startupActionProducer.RegisterAction<CredentialsOptionsMigrator>();
-        startupActionProducer.RegisterAction<BrowserHistorySizeEnforcer>();
         startupActionProducer.RegisterAction<CleanupDatabases>();
         startupActionProducer.RegisterAction<DeleteOldDatabase>();
         startupActionProducer.RegisterAction<UpdateToolboxAction>();

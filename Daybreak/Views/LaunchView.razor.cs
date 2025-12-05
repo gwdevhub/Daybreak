@@ -116,14 +116,7 @@ public sealed class LaunchViewModel : ViewModelBase<LaunchViewModel, LaunchView>
             return base.ParametersSet(view, cancellationToken);
         }
 
-        this.cancellationTokenSource?.Dispose();
-        this.cancellationTokenSource = new CancellationTokenSource();
-        var token = this.cancellationTokenSource.Token;
-        
-        this.RetrieveLaunchConfigurations();
-        
-        // Start periodic check in background
-        _ = Task.Run(() => this.PeriodicallyCheckSelectedConfigState(token), token);
+        this.Initialize();
         return base.ParametersSet(view, cancellationToken);
     }
 
@@ -192,6 +185,36 @@ public sealed class LaunchViewModel : ViewModelBase<LaunchViewModel, LaunchView>
     {
         this.IsDropdownOpen = false;
         this.RefreshView();
+    }
+
+    private void Initialize()
+    {
+        this.viewManager.ShowViewRequested += this.ViewManager_ShowViewRequested;
+        this.cancellationTokenSource?.Cancel();
+        this.cancellationTokenSource?.Dispose();
+        this.cancellationTokenSource = new CancellationTokenSource();
+
+        this.RetrieveLaunchConfigurations();
+        var ct = this.cancellationTokenSource.Token;
+        Task.Factory.StartNew(() => this.PeriodicallyCheckSelectedConfigState(ct), ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+    }
+
+    private void Cleanup()
+    {
+        this.viewManager.ShowViewRequested -= this.ViewManager_ShowViewRequested;
+        this.cancellationTokenSource?.Cancel();
+        this.cancellationTokenSource?.Dispose();
+        this.cancellationTokenSource = default;
+    }
+
+    private void ViewManager_ShowViewRequested(object? sender, TrailBlazr.Models.ViewRequest e)
+    {
+        if (e.ViewModelType == typeof(LaunchView))
+        {
+            return;
+        }
+
+        this.Cleanup();
     }
 
     private bool IsOnboarded()
