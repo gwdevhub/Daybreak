@@ -1,5 +1,6 @@
 ﻿using PeNet;
 using PeNet.Header.Pe;
+using System;
 
 namespace Daybreak.Services.Guildwars.Utils;
 /// <summary>
@@ -9,11 +10,9 @@ internal sealed class GuildWarsExecutableParser
 {
     // Used by older Guild Wars versions
     private readonly static byte[] VersionPattern = [0x8B, 0xC8, 0x33, 0xDB, 0x39, 0x8D, 0xC0, 0xFD, 0xFF, 0xFF, 0x0F, 0x95, 0xC3];
-    
-    // Used by Guild Wars Reforged
-    // Pattern: test ecx,ecx | jne | mov eax,[addr] | test eax,eax | je
-    // Bytes:   85 C9        | 75 E6 | A1 xx xx xx xx | 85 C0       | 74 09
-    private readonly static byte[] VersionPattern2 = [0x85, 0xC9, 0x75, 0xE6, 0xA1];
+
+    // Used by newer Guild Wars versions
+    private readonly static byte?[] FileIdFunctionPattern = [0x55, 0x8B, 0xEC, 0x83, 0xEC, 0x08, 0xE8, null, null, null, null, 0x83, 0x3D, null, null, null, null, 0x00];
 
     private readonly PeFile peFile;
     private readonly ImageSectionHeader textSection;
@@ -24,7 +23,7 @@ internal sealed class GuildWarsExecutableParser
         this.textSection = this.peFile.ImageSectionHeaders?.FirstOrDefault(s => s.Name == ".text") ?? throw new InvalidOperationException("Unable to find .text section");
     }
 
-    public Task<int> GetVersion(CancellationToken cancellationToken)
+    public Task<int> GetVersionLegacy(CancellationToken cancellationToken)
     {
         return Task.Run(() =>
         {
@@ -35,26 +34,46 @@ internal sealed class GuildWarsExecutableParser
         }, cancellationToken);
     }
 
-    public Task<int> GetVersion2(CancellationToken cancellationToken)
+    public Task<int> GetFileId(CancellationToken cancellationToken)
     {
         return Task.Run(() =>
         {
-            //TODO: This points to a portion in .data which contains the version, but it only gets populated at runtime.
-
-            var patternRva = this.Find(VersionPattern2);
-            var patternFileOffset = this.RvaToOffset(patternRva);
-            var absoluteVa = BitConverter.ToUInt32(this.peFile.RawFile.ToArray(), patternFileOffset + 5);
-            var imageBase = this.peFile.ImageNtHeaders?.OptionalHeader.ImageBase ?? 0;
-            var versionRva = absoluteVa - (uint)imageBase;
-            var version = (int)this.Read(versionRva);
-            return version;
+            var patternRva = this.FindWithWildcards(FileIdFunctionPattern);
+            var callRva = patternRva + 0x32;
+            var fileIdFunctionRva = this.FollowCall(callRva);
+            var fileId = (int)this.Read(fileIdFunctionRva + 1);
+            return fileId;
         }, cancellationToken);
+    }
+
+    private uint FindWithWildcards(byte?[] pattern, int offset = 0)
+    {
+        var buffer = this.peFile.RawFile.AsSpan((int)this.textSection.PointerToRawData, (int)this.textSection.SizeOfRawData);
+        for (int i = 0; i <= buffer.Length - pattern.Length; i++)
+        {
+            bool match = true;
+            for (int j = 0; j < pattern.Length; j++)
+            {
+                if (pattern[j].HasValue &&
+                    buffer[i + j] != pattern[j])
+                {
+                    match = false;
+                    break;
+                }
+            }
+
+            if (match)
+            {
+                return this.textSection.VirtualAddress + (uint)i + (uint)offset;
+            }
+        }
+
+        throw new Exception("Couldn't find the pattern");
     }
 
     private uint Find(byte[] pattern, int offset = 0)
     {
-        var buffer = new byte[this.textSection.SizeOfRawData];
-        Buffer.BlockCopy(this.peFile.RawFile.ToArray(), (int)this.textSection.PointerToRawData, buffer, 0, (int)this.textSection.SizeOfRawData);
+        var buffer = this.peFile.RawFile.AsSpan(this.textSection.PointerToRawData, this.textSection.SizeOfRawData);
         var pos = IndexOf(buffer, pattern);
         if (pos == -1)
         {
@@ -67,7 +86,7 @@ internal sealed class GuildWarsExecutableParser
     private uint FollowCall(uint callRva)
     {
         var posInFile = this.RvaToOffset(callRva);
-        var op = this.peFile.RawFile.ToArray()[posInFile];
+        var op = this.peFile.RawFile.ReadByte(posInFile);
         var callParam = BitConverter.ToInt32(this.peFile.RawFile.ToArray(), posInFile + 1);
 
         if (op != 0xE8 && op != 0xE9)
@@ -92,11 +111,11 @@ internal sealed class GuildWarsExecutableParser
             : (int)(rva - section.VirtualAddress + section.PointerToRawData);
     }
 
-    private static int IndexOf(byte[] haystack, byte[] needle)
+    private static int IndexOf(Span<byte> haystack, Span<byte> needle)
     {
         for (int i = 0; i <= haystack.Length - needle.Length; i++)
         {
-            if (needle.SequenceEqual(haystack.Skip(i).Take(needle.Length)))
+            if (needle.SequenceEqual(haystack.Slice(i, needle.Length)))
             {
                 return i;
             }

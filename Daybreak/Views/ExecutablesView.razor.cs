@@ -3,6 +3,7 @@ using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.Guildwars;
 using System.Extensions;
+using System.Threading.Tasks;
 using TrailBlazr.ViewModels;
 
 namespace Daybreak.Views;
@@ -13,6 +14,7 @@ public class ExecutablesViewModel(
 {
     private readonly IGuildWarsInstaller guildWarsInstaller = guildWarsInstaller;
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager = guildWarsExecutableManager;
+    private readonly SemaphoreSlim semaphoreSlim = new(1, 1);
 
     private CancellationTokenSource? validationTokenSource;
 
@@ -23,7 +25,8 @@ public class ExecutablesViewModel(
     public override ValueTask ParametersSet(ExecutablesView view, CancellationToken cancellationToken)
     {
         this.Executables.ClearAnd().AddRange(this.guildWarsExecutableManager.GetExecutableList().Select(s => new ExecutablePath { Path = s, Validating = true, Valid = false }));
-        this.ValidateExecutables();
+        _ = Task.Factory.StartNew(() => this.ValidateExecutables())
+            .ContinueWith(t => this.AutoUpdate(t, view), CancellationToken.None);
         return base.ParametersSet(view, cancellationToken);
     }
 
@@ -50,7 +53,7 @@ public class ExecutablesViewModel(
 
         this.Executables.Add(newExecutable);
         this.guildWarsExecutableManager.AddExecutable(newExecutable.Path);
-        this.ValidateExecutables();
+        Task.Run(() => this.ValidateExecutables());
     }
 
     public void ModifyPath(ExecutablePath executable)
@@ -64,7 +67,7 @@ public class ExecutablesViewModel(
         this.guildWarsExecutableManager.RemoveExecutable(executable.Path);
         executable.Path = maybePath;
         this.guildWarsExecutableManager.AddExecutable(executable.Path);
-        this.ValidateExecutables();
+        Task.Run(() => this.ValidateExecutables());
     }
 
     public async void UpdateExecutable(ExecutablePath executable)
@@ -87,18 +90,26 @@ public class ExecutablesViewModel(
             };
 
             executable.UpdateProgress = default;
-            if (!await this.guildWarsInstaller.UpdateGuildwars(executable.Path, progressUpdate, CancellationToken.None))
+            try
             {
-                executable.Validating = false;
-                executable.Valid = false;
-                executable.NeedsUpdate = true;
+                await this.semaphoreSlim.WaitAsync();
+                if (!await this.guildWarsInstaller.UpdateGuildwars(executable.Path, progressUpdate, CancellationToken.None))
+                {
+                    executable.Validating = false;
+                    executable.Valid = false;
+                    executable.NeedsUpdate = true;
+                }
+                else
+                {
+                    executable.Validating = true;
+                    executable.Valid = true;
+                    executable.NeedsUpdate = false;
+                    await this.ValidateExecutables();
+                }
             }
-            else
+            finally
             {
-                executable.Validating = true;
-                executable.Valid = true;
-                executable.NeedsUpdate = false;
-                this.ValidateExecutables();
+                this.semaphoreSlim.Release();
             }
 
             await this.RefreshViewAsync();
@@ -119,12 +130,12 @@ public class ExecutablesViewModel(
         }
     }
 
-    private void ValidateExecutables()
+    private async Task ValidateExecutables()
     {
         this.validationTokenSource?.Cancel();
         this.validationTokenSource = new CancellationTokenSource();
         var token = this.validationTokenSource.Token;
-        Task.Factory.StartNew(async () =>
+        await await Task.Factory.StartNew(async () =>
         {
             if (this.Executables.None(e => e.Validating))
             {
@@ -174,6 +185,20 @@ public class ExecutablesViewModel(
                 await this.RefreshViewAsync();
             }
         }, token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+    }
+
+    private async Task AutoUpdate(Task<Task> validationTask, ExecutablesView view)
+    {
+        await await validationTask;
+        if (bool.TryParse(view.AutoRun, out var autoRun) &&
+            autoRun is true)
+        {
+            var toUpdate = this.Executables.Where(e => e.NeedsUpdate).ToList();
+            foreach (var exec in toUpdate)
+            {
+                this.UpdateExecutable(exec);
+            }
+        }
     }
 
     private static string? GetPath()

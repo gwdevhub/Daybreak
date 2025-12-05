@@ -4,6 +4,7 @@ using Daybreak.Shared.Models.Notifications.Handling;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.Guildwars;
 using Daybreak.Shared.Services.Notifications;
+using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Extensions;
@@ -12,11 +13,13 @@ using TrailBlazr.Services;
 namespace Daybreak.Services.Guildwars;
 
 internal sealed class GuildWarsBatchUpdateNotificationHandler(
+    IViewManager viewManager,
     IGuildWarsInstaller guildWarsInstaller,
     IGuildWarsExecutableManager guildWarsExecutableManager,
     INotificationService notificationService,
     ILogger<GuildWarsBatchUpdateNotificationHandler> logger) : INotificationHandler
 {
+    private readonly IViewManager viewManager = viewManager.ThrowIfNull();
     private readonly IGuildWarsInstaller guildWarsInstaller = guildWarsInstaller.ThrowIfNull();
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
@@ -57,22 +60,6 @@ internal sealed class GuildWarsBatchUpdateNotificationHandler(
             return;
         }
 
-        await foreach (var result in this.guildWarsInstaller.CheckAndUpdateGuildWarsExecutables(updateList, cancellationTokenSource.Token))
-        {
-            if (result.Result)
-            {
-                scopedLogger.LogDebug($"Updated {result.ExecutablePath}");
-                this.notificationService.NotifyInformation(
-                    title: "Updated executable",
-                    description: $"Updated executable at {result.ExecutablePath}");
-            }
-            else
-            {
-                scopedLogger.LogDebug($"Failed to update {result.ExecutablePath}");
-                this.notificationService.NotifyInformation(
-                    title: "Failed to update executable",
-                    description: $"Failed to update executable at {result.ExecutablePath}");
-            }
-        }
+        this.viewManager.ShowView<ExecutablesView>((nameof(ExecutablesView.AutoRun), "true"));
     }
 }

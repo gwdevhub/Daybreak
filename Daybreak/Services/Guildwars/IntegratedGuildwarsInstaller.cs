@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
+using System.Extensions.Core;
 using System.IO;
 using System.Runtime.CompilerServices;
 
@@ -39,7 +40,7 @@ internal sealed class IntegratedGuildwarsInstaller(
     public async IAsyncEnumerable<GuildWarsUpdateResponse> CheckAndUpdateGuildWarsExecutables(List<GuildWarsUpdateRequest> requests, [EnumeratorCancellation]CancellationToken cancellationToken)
     {
         requests.ThrowIfNull();
-        var mainScopedLogger = this.logger.CreateScopedLogger(nameof(this.CheckAndUpdateGuildWarsExecutables), string.Empty);
+        var mainScopedLogger = this.logger.CreateScopedLogger(flowIdentifier: string.Empty);
         if (await this.GetLatestVersionId(CancellationToken.None) is not int latestVersion)
         {
             mainScopedLogger.LogError("Failed to fetch latest GuildWars version");
@@ -55,7 +56,7 @@ internal sealed class IntegratedGuildwarsInstaller(
                 continue;
             }
 
-            var scopedLogger = this.logger.CreateScopedLogger(nameof(this.CheckAndUpdateGuildWarsExecutables), request.ExecutablePath!);
+            var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: request.ExecutablePath!);
             if (!File.Exists(request.ExecutablePath))
             {
                 scopedLogger.LogError($"File not found at [{request.ExecutablePath}]");
@@ -71,7 +72,7 @@ internal sealed class IntegratedGuildwarsInstaller(
                 continue;
             }
 
-            var success = false;
+            bool success;
             try
             {
                 success = await this.UpdateGuildwars(request.ExecutablePath, request.Progress, request.CancellationToken);
@@ -109,6 +110,7 @@ internal sealed class IntegratedGuildwarsInstaller(
 
     public async Task<int?> GetVersionId(string executablePath, CancellationToken cancellationToken)
     {
+        var scopedLogger = this.logger.CreateScopedLogger();
         var parser = GuildWarsExecutableParser.TryParse(executablePath);
         if (parser is null)
         {
@@ -117,16 +119,18 @@ internal sealed class IntegratedGuildwarsInstaller(
 
         try
         {
-            return await parser.GetVersion(cancellationToken);
+            return await parser.GetFileId(cancellationToken);
         }
-        catch
+        catch(Exception e)
         {
+            scopedLogger.LogError(e, "Failed to get version using new method, trying legacy method");
             try
             {
-                return await parser.GetVersion2(cancellationToken);
+                return await parser.GetVersionLegacy(cancellationToken);
             }
-            catch
+            catch(Exception e2)
             {
+                scopedLogger.LogError(e2, "Failed to get version");
                 return default;
             }
         }
@@ -148,7 +152,7 @@ internal sealed class IntegratedGuildwarsInstaller(
 
     private async Task<string?> FetchLatestGuildwarsInternal(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.FetchLatestGuildwarsInternal), string.Empty);
+        var scopedLogger = this.logger.CreateScopedLogger();
         GuildWarsClientContext? maybeContext = default;
         try
         {
@@ -211,7 +215,7 @@ internal sealed class IntegratedGuildwarsInstaller(
 
     private async Task<bool> InstallGuildwarsInternal(string destinationPath, IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.InstallGuildwarsInternal), destinationPath);
+        var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: destinationPath);
         var exePath = Path.Combine(destinationPath, ExeName);
         var latestGwPath = await this.FetchLatestGuildwarsInternal(progress, cancellationToken);
         if (latestGwPath is null)
@@ -244,7 +248,7 @@ internal sealed class IntegratedGuildwarsInstaller(
         IProgress<ProgressUpdate> progress,
         CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.DownloadCompressedExecutable), fileName);
+        var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: fileName);
         var maybeStream = await guildWarsClient.GetFileStream(context, manifest.LatestExe, 0, cancellationToken);
         if (maybeStream is null)
         {
@@ -285,7 +289,7 @@ internal sealed class IntegratedGuildwarsInstaller(
         int expectedFinalSize,
         IProgress<ProgressUpdate> progress)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.DecompressExecutable), tempName);
+        var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: tempName);
         try
         {
             var byteBuffer = new Memory<byte>(new byte[1]);

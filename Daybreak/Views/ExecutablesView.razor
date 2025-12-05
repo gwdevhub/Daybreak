@@ -72,3 +72,7 @@
 
 @page "/executables"
 @inherits ViewBase<ExecutablesView, ExecutablesViewModel>
+@code{
+    [Parameter]
+    public string AutoRun { get; set; } = string.Empty;
+}
