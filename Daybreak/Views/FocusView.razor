@@ -31,7 +31,8 @@
                                  OnCurrentMapClicked="@this.ViewModel.OnCurrentMapClicked"/>
         </div>
         <div class="component quest-component">
-            <QuestLogComponent Context="@this.ViewModel.QuestLogComponentContext" />
+            <QuestLogComponent Context="@this.ViewModel.QuestLogComponentContext"
+                               OnQuestClicked="@this.ViewModel.OnQuestClicked"/>
         </div>
     </div>
     <div class="dashboard-half">

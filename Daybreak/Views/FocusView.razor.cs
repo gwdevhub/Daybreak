@@ -192,6 +192,16 @@ public sealed class FocusViewModel(
     {
     }
 
+    public void OnQuestClicked(QuestMetadata questMetadata)
+    {
+        if (questMetadata.Quest is null)
+        {
+            return;
+        }
+
+        this.BrowserSource = questMetadata.Quest.WikiUrl;
+    }
+
     private void ViewManager_ShowViewRequested(object? _, TrailBlazr.Models.ViewRequest e)
     {
         if (e.ViewModelType == typeof(FocusViewModel))

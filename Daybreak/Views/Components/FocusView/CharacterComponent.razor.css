@@ -23,8 +23,6 @@
 }
 
 .character-dropdown-toggle {
-    width: 32px;
-    height: 32px;
     border: 1px solid var(--neutral-stroke-rest);
     background: var(--neutral-fill-rest);
     color: var(--neutral-foreground-rest);
