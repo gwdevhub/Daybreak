@@ -1,4 +1,6 @@
-﻿namespace Daybreak.Shared.Models.FocusView;
+﻿using Daybreak.Shared.Models.Builds;
+
+namespace Daybreak.Shared.Models.FocusView;
 public sealed class BuildComponentContext
 {
     public required bool IsInOutpost { get; init; }
@@ -6,4 +8,5 @@ public sealed class BuildComponentContext
     public required uint UnlockedProfessions { get; init; }
     public required uint[] CharacterUnlockedSkills { get; init; }
     public required uint[] AccountUnlockedSkills { get; init; }
+    public required List<IBuildEntry> AvailableBuilds { get; init; }
 }

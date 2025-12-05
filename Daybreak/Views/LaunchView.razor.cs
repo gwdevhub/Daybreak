@@ -209,7 +209,7 @@ public sealed class LaunchViewModel : ViewModelBase<LaunchViewModel, LaunchView>
 
     private void ViewManager_ShowViewRequested(object? sender, TrailBlazr.Models.ViewRequest e)
     {
-        if (e.ViewModelType == typeof(LaunchView))
+        if (e.ViewModelType == typeof(LaunchViewModel))
         {
             return;
         }
@@ -260,11 +260,9 @@ public sealed class LaunchViewModel : ViewModelBase<LaunchViewModel, LaunchView>
             }
             catch (OperationCanceledException)
             {
-                break;
             }
             catch (Exception)
             {
-                // Continue on error
             }
         }
     }

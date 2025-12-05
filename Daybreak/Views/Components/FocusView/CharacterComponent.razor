@@ -6,7 +6,7 @@
                 @this.Context.CurrentCharacter.DisplayName
             </div>
             <div class="character-dropdown-wrapper">
-                <button class="character-dropdown-toggle" @onclick="this.ToggleDropdown">
+                <button class="character-dropdown-toggle" title="Select character" @onclick="this.ToggleDropdown">
                     @if (!this.isDropdownOpen)
                     {
                         <FluentIcon Value="new Icons.Regular.Size16.ArrowDown()" />

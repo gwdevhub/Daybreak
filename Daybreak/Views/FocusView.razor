@@ -37,7 +37,10 @@
     </div>
     <div class="dashboard-half">
         <div class="component build-component">
-            <BuildComponent Context="@this.ViewModel.BuildComponentContext" />
+            <BuildComponent Context="@this.ViewModel.BuildComponentContext"
+                            OnBuildClicked="@this.ViewModel.OnBuildClicked"
+                            OnLoadPlayerSingleBuildClicked="@this.ViewModel.OnPlayerSingleBuildClicked"
+                            OnLoadPlayerTeamBuildClicked="@this.ViewModel.OnPlayerTeamBuildClicked" />
         </div>
         <div class="component browser-component">
             <iframe sandbox="allow-scripts allow-same-origin"

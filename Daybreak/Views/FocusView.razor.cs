@@ -1,24 +1,29 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Models;
 using Daybreak.Shared.Models.Api;
+using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Models.FocusView;
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.Api;
+using Daybreak.Shared.Services.BuildTemplates;
 using Daybreak.Shared.Services.Experience;
 using Daybreak.Shared.Services.LaunchConfigurations;
 using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.Logging;
+using OpenTK.Graphics.OpenGL;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
+using System.Threading.Tasks;
 using TrailBlazr.Services;
 using TrailBlazr.ViewModels;
 
 namespace Daybreak.Views;
 
-//TODO: Setup FocusView
 public sealed class FocusViewModel(
+    IBuildTemplateManager buildTemplateManager,
     IViewManager viewManager,
     INotificationService notificationService,
     ILaunchConfigurationService launchConfigurationService,
@@ -32,7 +37,9 @@ public sealed class FocusViewModel(
 
     private static readonly TimeSpan GameInfoFrequency = TimeSpan.FromSeconds(1);
     private static readonly TimeSpan GameInfoTimeout = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan BuildsCheckFrequency = TimeSpan.FromSeconds(30);
 
+    private readonly IBuildTemplateManager buildTemplateManager = buildTemplateManager.ThrowIfNull();
     private readonly IViewManager viewManager = viewManager.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly ILaunchConfigurationService launchConfigurationService = launchConfigurationService.ThrowIfNull();
@@ -44,6 +51,7 @@ public sealed class FocusViewModel(
     private ScopedApiContext? apiContext;
     private Process? process;
     private CancellationTokenSource? cancellationSource = default;
+    private DateTime lastBuildCheck = DateTime.MinValue;
 
     public CharacterComponentContext? CharacterComponentContext { get; private set; }
     public CurrentMapComponentContext? CurrentMapComponentContext { get; private set; }
@@ -202,6 +210,59 @@ public sealed class FocusViewModel(
         this.BrowserSource = questMetadata.Quest.WikiUrl;
     }
 
+    public async void OnBuildClicked(IBuildEntry buildEntry)
+    {
+        if (this.apiContext is null)
+        {
+            return;
+        }
+
+        if (buildEntry is SingleBuildEntry singleBuild)
+        {
+            var code = this.buildTemplateManager.EncodeTemplate(singleBuild);
+            await this.apiContext.PostMainPlayerBuild(code, this.cancellationSource?.Token ?? CancellationToken.None);
+        }
+        else if (buildEntry is TeamBuildEntry teamBuild)
+        {
+            var partyLoadout = this.buildTemplateManager.ConvertToPartyLoadout(teamBuild);
+            await this.apiContext.PostPartyLoadout(partyLoadout, this.cancellationSource?.Token ?? CancellationToken.None);
+        }
+    }
+
+    public async void OnPlayerSingleBuildClicked()
+    {
+        if (this.apiContext is null)
+        {
+            return;
+        }
+
+        var entry = await this.apiContext.GetMainPlayerBuild(this.cancellationSource?.Token ?? CancellationToken.None);
+        if (entry is null)
+        {
+            return;
+        }
+
+        var singleBuildEntry = this.buildTemplateManager.CreateSingleBuild(entry);
+        this.viewManager.ShowView<BuildRoutingView>((nameof(BuildRoutingView.BuildName), singleBuildEntry.Name ?? throw new InvalidOperationException()));
+    }
+
+    public async void OnPlayerTeamBuildClicked()
+    {
+        if (this.apiContext is null)
+        {
+            return;
+        }
+
+        var loadout = await this.apiContext.GetPartyLoadout(this.cancellationSource?.Token ?? CancellationToken.None);
+        if (loadout is null)
+        {
+            return;
+        }
+
+        var teamBuildEntry = this.buildTemplateManager.CreateTeamBuild(loadout);
+        this.viewManager.ShowView<BuildRoutingView>((nameof(BuildRoutingView.BuildName), teamBuildEntry.Name ?? throw new InvalidOperationException()));
+    }
+
     private void ViewManager_ShowViewRequested(object? _, TrailBlazr.Models.ViewRequest e)
     {
         if (e.ViewModelType == typeof(FocusViewModel))
@@ -352,7 +413,7 @@ public sealed class FocusViewModel(
         this.QuestLogComponentContext = ParseQuestLogComponentContext(questLog);
         this.TitleInformationComponentContext = ParseTitleInformationComponentContext(titleInformation);
         this.VanquishComponentContext = this.ParseVanquishComponentContext(mainPlayerInstance);
-        this.BuildComponentContext = ParseBuildComponentContext(mainPlayerInstance, mainPlayerBuildContext);
+        this.BuildComponentContext = await this.ParseBuildComponentContext(mainPlayerInstance, mainPlayerBuildContext, cancellationToken);
         return true;
     }
 
@@ -405,6 +466,51 @@ public sealed class FocusViewModel(
             NextExperienceThreshold = nextExperienceThreshold,
             TotalExperienceForNextLevel = totalExperienceForNextLevel,
             ExperienceDisplay = this.options.Value.ExperienceDisplay
+        };
+    }
+
+    private async Task<BuildComponentContext?> ParseBuildComponentContext(InstanceInfo? instanceInfo, MainPlayerBuildContext? mainPlayerBuildContext, CancellationToken cancellationToken)
+    {
+        if (instanceInfo is null || mainPlayerBuildContext is null)
+        {
+            return default;
+        }
+
+        if (this.BuildComponentContext?.CharacterUnlockedSkills.SequenceEqual(mainPlayerBuildContext.UnlockedCharacterSkills) is true &&
+            this.BuildComponentContext?.AccountUnlockedSkills.SequenceEqual(mainPlayerBuildContext.UnlockedAccountSkills) is true &&
+            this.BuildComponentContext?.UnlockedProfessions == mainPlayerBuildContext.UnlockedProfessions &&
+            this.BuildComponentContext?.PrimaryProfessionId == mainPlayerBuildContext.PrimaryProfessionId &&
+            DateTime.Now < this.lastBuildCheck + BuildsCheckFrequency)
+        {
+            return this.BuildComponentContext;
+        }
+
+        var matchingBuilds = await this.buildTemplateManager.GetBuilds()
+            .Where(b =>
+            {
+                if (b is SingleBuildEntry singleBuild &&
+                    this.buildTemplateManager.CanApply(mainPlayerBuildContext, singleBuild))
+                {
+                    return true;
+                }
+                else if (b is TeamBuildEntry teamBuild &&
+                    this.buildTemplateManager.CanApply(mainPlayerBuildContext, teamBuild))
+                {
+                    return true;
+                }
+
+                return false;
+            }).ToListAsync(cancellationToken);
+
+        this.lastBuildCheck = DateTime.Now;
+        return new BuildComponentContext
+        {
+            IsInOutpost = instanceInfo.Type is Shared.Models.Api.InstanceType.Outpost,
+            PrimaryProfessionId = mainPlayerBuildContext.PrimaryProfessionId,
+            AccountUnlockedSkills = mainPlayerBuildContext.UnlockedAccountSkills,
+            CharacterUnlockedSkills = mainPlayerBuildContext.UnlockedCharacterSkills,
+            UnlockedProfessions = mainPlayerBuildContext.UnlockedProfessions,
+            AvailableBuilds = matchingBuilds
         };
     }
 
@@ -519,23 +625,6 @@ public sealed class FocusViewModel(
             HardMode = instanceInfo.Difficulty is DifficultyInfo.Hard,
             Vanquishing = (instanceInfo.FoesToKill + instanceInfo.FoesKilled > 0U) && instanceInfo.Difficulty is DifficultyInfo.Hard,
             Display = this.options.Value.VanquishingDisplay
-        };
-    }
-
-    private static BuildComponentContext? ParseBuildComponentContext(InstanceInfo? instanceInfo, MainPlayerBuildContext? mainPlayerBuildContext)
-    {
-        if (instanceInfo is null || mainPlayerBuildContext is null)
-        {
-            return default;
-        }
-
-        return new BuildComponentContext
-        {
-            IsInOutpost = instanceInfo.Type is Shared.Models.Api.InstanceType.Outpost,
-            PrimaryProfessionId = mainPlayerBuildContext.PrimaryProfessionId,
-            AccountUnlockedSkills = mainPlayerBuildContext.UnlockedAccountSkills,
-            CharacterUnlockedSkills = mainPlayerBuildContext.UnlockedCharacterSkills,
-            UnlockedProfessions = mainPlayerBuildContext.UnlockedProfessions,
         };
     }
 

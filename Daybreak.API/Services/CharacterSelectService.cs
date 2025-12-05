@@ -1,4 +1,5 @@
-﻿using Daybreak.API.Services.Interop;
+﻿using Daybreak.API.Interop.GuildWars;
+using Daybreak.API.Services.Interop;
 using Daybreak.Shared.Models.Api;
 using System.Core.Extensions;
 using System.Extensions.Core;
@@ -68,8 +69,18 @@ public sealed class CharacterSelectService(
                         charContext.IsPvp));
                 }
 
-                var currentCharacter = availableChars.FirstOrDefault(c => c.Uuid == currentUuid);
-                return new CharacterSelectInformation(currentCharacter, availableChars);
+                // TODO: Reforged sometimes returns Zero UUID even when in-game, need to investigate why
+                if (currentUuid != Uuid.Zero.ToString())
+                {
+                    var currentCharacter = availableChars.FirstOrDefault(c => c.Uuid == currentUuid);
+                    return new CharacterSelectInformation(currentCharacter, availableChars);
+                }
+                else
+                {
+                    var currentCharacter = availableChars.FirstOrDefault();
+                    return new CharacterSelectInformation(currentCharacter, availableChars);
+                }
+                
             }
         }, cancellationToken);
     }

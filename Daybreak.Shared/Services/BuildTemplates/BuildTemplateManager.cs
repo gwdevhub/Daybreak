@@ -21,6 +21,8 @@ public sealed class BuildTemplateManager(
     private const string DecodingLookupTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
     private readonly static string BuildsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Guild Wars\\Templates\\Skills";
 
+    private List<IBuildEntry> BuildMemoryCache { get; } = [];
+
     private readonly ILogger<BuildTemplateManager> logger = logger.ThrowIfNull(nameof(logger));
 
     public bool IsTemplate(string template)
@@ -50,6 +52,8 @@ public sealed class BuildTemplateManager(
             Skills = emptyBuild.Skills,
             CreationTime = DateTimeOffset.UtcNow
         };
+
+        this.BuildMemoryCache.Add(entry);
         return entry;
     }
 
@@ -64,6 +68,8 @@ public sealed class BuildTemplateManager(
             Skills = emptyBuild.Skills,
             CreationTime = DateTimeOffset.UtcNow
         };
+
+        this.BuildMemoryCache.Add(entry);
         return entry;
     }
 
@@ -89,6 +95,8 @@ public sealed class BuildTemplateManager(
             Builds = [this.CreateSingleBuild()],
             CreationTime = DateTimeOffset.UtcNow
         };
+
+        this.BuildMemoryCache.Add(entry);
         return entry;
     }
 
@@ -101,6 +109,8 @@ public sealed class BuildTemplateManager(
             Builds = [this.CreateSingleBuild(name)],
             CreationTime = DateTimeOffset.UtcNow
         };
+
+        this.BuildMemoryCache.Add(entry);
         return entry;
     }
 
@@ -293,6 +303,9 @@ public sealed class BuildTemplateManager(
                     JsonConvert.SerializeObject(buildEntry.Metadata, Formatting.None)))
             : string.Empty;
         File.WriteAllText(newPath, $"{encodedBuild.ToString().Trim()}\n{metadata}");
+
+        // Remove the build from the memory cache once it's created on disk
+        this.BuildMemoryCache.Remove(buildEntry);
     }
 
     public void RemoveBuild(IBuildEntry buildEntry)
@@ -308,10 +321,23 @@ public sealed class BuildTemplateManager(
         }
     }
 
-    public Task<Result<IBuildEntry, Exception>> GetBuild(string name)
+    public async Task<Result<IBuildEntry, Exception>> GetBuild(string name)
     {
+        // Use the cache as fallback for newly created builds that are not yet saved to the disk
         var path = Path.Combine(BuildsPath, $"{name}.txt");
-        return this.LoadBuildFromFile(path, name);
+        var result = await this.LoadBuildFromFile(path, name);
+        if (result.TryExtractFailure(out var exception) && exception is not null)
+        {
+            var maybeCachedBuild = this.BuildMemoryCache.FirstOrDefault(b => b.Name == name);
+            if (maybeCachedBuild is not null)
+            {
+                return Result<IBuildEntry, Exception>.Success(maybeCachedBuild);
+            }
+
+            return Result<IBuildEntry, Exception>.Failure(exception);
+        }
+
+        return result;
     }
 
     public void ClearBuilds()
