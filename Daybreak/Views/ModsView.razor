@@ -1,0 +1,47 @@
+﻿<div class="stretch-container backdrop-panel">
+    <div class="mods-container">
+        @foreach (var mod in this.ViewModel.Mods)
+        {
+            if (!mod.IsVisible)
+            {
+                continue;
+            }
+
+            <div class="mod-row">
+                <div class="mod-row-left">
+                    <div class="mod-name-label">@mod.Name</div>
+                    <div class="mod-description-label">@mod.Description</div>
+                </div>
+                <div class="mod-row-right">
+                    <div class="mod-toggle">
+                        <FluentLabel class="label">@((mod.IsInstalled && mod.IsEnabled) ? "Enabled" : "Disabled")</FluentLabel>
+                        <FluentSwitch Value="@(mod.IsInstalled && mod.IsEnabled)"
+                                      @onchange="() => this.ViewModel.ToggleMod(mod)" />
+                    </div>
+                    @if (!mod.IsInstalled)
+                    {
+                        <div class="mod-not-installed">
+                            Not Installed
+                        </div>
+                    }
+                    else if (mod.CanCustomManage)
+                    {
+                        <div class="mod-can-manage"
+                             @onclick="@(() => this.ViewModel.ManageMod(mod))">
+                            Manage
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="mod-installed">
+                            Installed
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@page "/mods"
+@inherits ViewBase<ModsView, ModsViewModel>

@@ -1,4 +1,5 @@
 ﻿using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Services.UMod;
 using System.Core.Extensions;
 
@@ -10,6 +11,7 @@ internal sealed class UpdateUModAction(
 
     public override async Task ExecuteOnStartupAsync(CancellationToken cancellationToken)
     {
-        await this.uModService.CheckAndUpdateUMod(cancellationToken);
+        var progress = new Progress<ProgressUpdate>();
+        await this.uModService.CheckAndUpdateUMod(progress, cancellationToken);
     }
 }

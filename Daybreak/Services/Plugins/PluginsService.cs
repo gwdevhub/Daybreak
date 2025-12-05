@@ -3,7 +3,6 @@ using Daybreak.Services.Plugins.Resolvers;
 using Daybreak.Services.Plugins.Validators;
 using Daybreak.Shared.Models.Plugins;
 using Daybreak.Shared.Services.ApplicationArguments;
-using Daybreak.Shared.Services.Browser;
 using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Mods;
 using Daybreak.Shared.Services.Navigation;
@@ -11,6 +10,7 @@ using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Plugins;
 using Daybreak.Shared.Services.Startup;
+using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.Updater.PostUpdate;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.DependencyInjection;
@@ -85,25 +85,25 @@ internal sealed class PluginsService : IPluginsService
     public void LoadPlugins(
         IServiceManager serviceManager,
         IOptionsProducer optionsProducer,
-        IViewManager viewManager,
+        IViewProducer viewProducer,
         IPostUpdateActionProducer postUpdateActionProducer,
         IStartupActionProducer startupActionProducer,
         INotificationHandlerProducer notificationHandlerProducer,
         IModsManager modsManager,
-        IBrowserExtensionsProducer browserExtensionsProducer,
         IArgumentHandlerProducer argumentHandlerProducer,
-        IMenuServiceProducer menuServiceProducer)
+        IMenuServiceProducer menuServiceProducer,
+        IThemeProducer themeProducer)
     {
         serviceManager.ThrowIfNull();
         optionsProducer.ThrowIfNull();
-        viewManager.ThrowIfNull();
+        viewProducer.ThrowIfNull();
         postUpdateActionProducer.ThrowIfNull();
         startupActionProducer.ThrowIfNull();
         notificationHandlerProducer.ThrowIfNull();
         modsManager.ThrowIfNull();
-        browserExtensionsProducer.ThrowIfNull();
         argumentHandlerProducer.ThrowIfNull();
         menuServiceProducer.ThrowIfNull();
+        themeProducer.ThrowIfNull();
 
         this.pluginsSemaphore.Wait();
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.LoadPlugins), string.Empty);
@@ -143,6 +143,8 @@ internal sealed class PluginsService : IPluginsService
 
                 if (assembly is null)
                 {
+                    // Exclude the plugin from the enabled list if it failed to load
+                    this.DisablePlugin(result);
                     continue;
                 }
 
@@ -150,6 +152,7 @@ internal sealed class PluginsService : IPluginsService
                 if (entryPoint is null)
                 {
                     pluginScopedLogger.LogError($"Assembly loaded but unable to find entry point. The plugin will not start");
+                    this.DisablePlugin(result);
                     continue;
                 }
 
@@ -157,6 +160,7 @@ internal sealed class PluginsService : IPluginsService
                 if (pluginConfig is null)
                 {
                     pluginScopedLogger.LogError($"Assembly loaded but unable to create entry point. The plugin will not start");
+                    this.DisablePlugin(result);
                     continue;
                 }
 
@@ -166,7 +170,9 @@ internal sealed class PluginsService : IPluginsService
                 pluginScopedLogger.LogDebug("Registered services");
                 RegisterOptions(pluginConfig, optionsProducer);
                 pluginScopedLogger.LogDebug("Registered options");
-                RegisterViews(pluginConfig, viewManager);
+                RegisterTheme(pluginConfig, themeProducer);
+                pluginScopedLogger.LogDebug("Registered themes");
+                RegisterViews(pluginConfig, viewProducer);
                 pluginScopedLogger.LogDebug("Registered views");
                 RegisterPostUpdateActions(pluginConfig, postUpdateActionProducer);
                 pluginScopedLogger.LogDebug("Registered post-update actions");
@@ -176,8 +182,6 @@ internal sealed class PluginsService : IPluginsService
                 pluginScopedLogger.LogDebug("Registered notification handlers");
                 RegisterMods(pluginConfig, modsManager);
                 pluginScopedLogger.LogDebug("Registered mods");
-                RegisterBrowserExtensions(pluginConfig, browserExtensionsProducer);
-                pluginScopedLogger.LogDebug("Registered browser extensions");
                 RegisterArgumentHandlers(pluginConfig, argumentHandlerProducer);
                 pluginScopedLogger.LogDebug("Registered argument handlers");
                 RegisterMenuButtons(pluginConfig, menuServiceProducer);
@@ -224,6 +228,14 @@ internal sealed class PluginsService : IPluginsService
         return true;
     }
 
+    private void DisablePlugin(PluginLoadOperation result)
+    {
+        var options = this.liveUpdateableOptions.Value;
+        options.EnabledPlugins = [.. options.EnabledPlugins.Where(p => p.Path != result.PluginEntry?.Path)];
+        this.liveUpdateableOptions.Value.EnabledPlugins = options.EnabledPlugins;
+        this.liveUpdateableOptions.UpdateOption();
+    }
+
     private static void LogLoadOperation(PluginLoadOperation result, ScopedLogger<PluginsService> scopedLogger)
     {
         _ = result switch
@@ -257,6 +269,11 @@ internal sealed class PluginsService : IPluginsService
         pluginConfig.RegisterServices(serviceCollection);
         foreach(var descriptor in serviceCollection)
         {
+            if (descriptor.ImplementationType is null)
+            {
+                throw new InvalidOperationException($"Failed to register {descriptor.ServiceType.Name}. Missing implementation type");
+            }
+
             switch (descriptor.Lifetime)
             {
                 case ServiceLifetime.Singleton:
@@ -310,7 +327,7 @@ internal sealed class PluginsService : IPluginsService
 
     private static void RegisterOptions(PluginConfigurationBase pluginConfig, IOptionsProducer optionsProducer) => pluginConfig.RegisterOptions(optionsProducer);
 
-    private static void RegisterViews(PluginConfigurationBase pluginConfig, IViewManager viewManager) => pluginConfig.RegisterViews(viewManager);
+    private static void RegisterViews(PluginConfigurationBase pluginConfig, IViewProducer viewProducer) => pluginConfig.RegisterViews(viewProducer);
 
     private static void RegisterPostUpdateActions(PluginConfigurationBase pluginConfig, IPostUpdateActionProducer postUpdateActionProducer) => pluginConfig.RegisterPostUpdateActions(postUpdateActionProducer);
 
@@ -320,9 +337,9 @@ internal sealed class PluginsService : IPluginsService
 
     private static void RegisterMods(PluginConfigurationBase pluginConfig, IModsManager modsManager) => pluginConfig.RegisterMods(modsManager);
 
-    private static void RegisterBrowserExtensions(PluginConfigurationBase pluginConfig, IBrowserExtensionsProducer browserExtensionsProducer) => pluginConfig.RegisterBrowserExtensions(browserExtensionsProducer);
-
     private static void RegisterArgumentHandlers(PluginConfigurationBase pluginConfig, IArgumentHandlerProducer argumentHandlerProducer) => pluginConfig.RegisterLaunchArgumentHandlers(argumentHandlerProducer);
 
     private static void RegisterMenuButtons(PluginConfigurationBase pluginConfig, IMenuServiceProducer menuServiceProducer) => pluginConfig.RegisterMenuButtons(menuServiceProducer);
+
+    private static void RegisterTheme(PluginConfigurationBase pluginConfig, IThemeProducer themeProducer) => pluginConfig.RegisterThemes(themeProducer);
 }

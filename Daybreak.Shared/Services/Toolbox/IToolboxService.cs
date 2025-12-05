@@ -1,17 +1,13 @@
-﻿using Daybreak.Shared.Models.Builds;
-using Daybreak.Shared.Models.Progress;
+﻿using Daybreak.Shared.Models.Async;
+using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Services.Mods;
 
 namespace Daybreak.Shared.Services.Toolbox;
 public interface IToolboxService : IModService
 {
-    bool LoadToolboxFromDisk();
-
-    bool LoadToolboxFromUsualLocation();
-
     Task NotifyUserIfUpdateAvailable(CancellationToken cancellationToken);
 
-    Task<bool> SetupToolbox(ToolboxInstallationStatus toolboxInstallationStatus);
+    Task<bool> SetupToolbox(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken);
 
     IAsyncEnumerable<TeamBuildEntry> GetToolboxBuilds(CancellationToken cancellationToken);
 

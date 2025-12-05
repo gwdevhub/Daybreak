@@ -34,6 +34,8 @@ public sealed class MDomainRegistrar(
     {
         this.serviceDiscovery.ServiceInstanceDiscovered -= this.ServiceDiscovery_ServiceInstanceDiscovered;
         this.serviceDiscovery.ServiceInstanceShutdown -= this.ServiceDiscovery_ServiceInstanceShutdown;
+        this.cts?.Cancel();
+        this.cts?.Dispose();
         this.serviceDiscovery.Dispose();
     }
 
@@ -51,15 +53,16 @@ public sealed class MDomainRegistrar(
     public IReadOnlyList<Uri>? QueryByServiceName(Func<string, bool> query)
     {
         var now = DateTimeOffset.UtcNow;
+        var returnList = new List<Uri>();
         foreach (var serviceRegistration in this.serviceLookup.Values.Where(s => s.Expiration > now))
         {
             if (query(serviceRegistration.Name))
             {
-                return [.. serviceRegistration.Uris];
+                returnList.AddRange(serviceRegistration.Uris);
             }
         }
 
-        return default;
+        return returnList;
     }
 
     public void QueryAllServices()

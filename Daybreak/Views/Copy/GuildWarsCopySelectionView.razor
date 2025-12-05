@@ -1,0 +1,16 @@
+﻿<div class="stretch-container backdrop-panel">
+    <div class="title-bar-header">
+        Select source executable
+    </div>
+    <div class="executables-list">
+        @foreach(var executable in this.ViewModel.Executables)
+        {
+            <div class="executable-item" @onclick="() => this.ViewModel.SelectExecutable(executable)">
+                @executable
+            </div>
+        }
+    </div>
+</div>
+
+@page "/guildwars/copy-selection"
+@inherits ViewBase<GuildWarsCopySelectionView, GuildWarsCopySelectionViewModel>

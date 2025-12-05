@@ -1,9 +1,14 @@
-﻿using Daybreak.Shared.Models.Progress;
+﻿using Daybreak.Configuration.Options;
+using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.ColorPalette;
+using Daybreak.Themes;
+using Microsoft.Extensions.Options;
 using System.ComponentModel;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Windows;
 using System.Windows.Extensions;
+using System.Windows.Media;
 
 namespace Daybreak.Launch;
 /// <summary>
@@ -11,23 +16,35 @@ namespace Daybreak.Launch;
 /// </summary>
 public partial class SplashWindow : Window
 {
-    private readonly StartupStatus startupStatus;
+    private readonly StartupContext startupContext;
 
     [GenerateDependencyProperty]
     private string splashText = string.Empty;
 
     public SplashWindow(
-        StartupStatus startupStatus)
+        IOptions<ThemeOptions> options,
+        StartupContext startupContext)
     {
-        this.startupStatus = startupStatus.ThrowIfNull();
-        this.startupStatus.PropertyChanged += this.StartupStatus_PropertyChanged;
+        this.startupContext = startupContext.ThrowIfNull();
+        this.startupContext.PropertyChanged += this.StartupStatus_PropertyChanged;
         this.InitializeComponent();
 
-        this.SplashText = this.startupStatus.CurrentStep.Description;
+        var theme = options.Value.ApplicationTheme ?? CoreThemes.Daybreak;
+
+        this.Foreground = theme.Mode is Theme.LightDarkMode.Dark ?
+            new SolidColorBrush(System.Windows.Media.Colors.White) :
+            new SolidColorBrush(System.Windows.Media.Colors.Black);
+
+        var backgroundColor = theme.Mode is Theme.LightDarkMode.Dark ?
+            BackgroundColor.Gray210.Color :
+            BackgroundColor.Gray40.Color;
+
+        this.Background = new SolidColorBrush(Color.FromArgb(255, backgroundColor.R, backgroundColor.G, backgroundColor.B));
+        this.SplashText = this.startupContext.ProgressUpdate.StatusMessage;
     }
 
     private void StartupStatus_PropertyChanged(object? _, PropertyChangedEventArgs __)
     {
-        this.Dispatcher.InvokeAsync(() => this.SplashText = this.startupStatus.CurrentStep.Description);
+        this.Dispatcher.InvokeAsync(() => this.SplashText = this.startupContext.ProgressUpdate.StatusMessage);
     }
 }

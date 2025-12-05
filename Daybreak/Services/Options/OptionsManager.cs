@@ -1,8 +1,11 @@
-﻿using Daybreak.Attributes;
+﻿using Daybreak.Shared.Attributes;
+using Daybreak.Shared.Models.Options;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Utils;
+using Daybreak.Shared.Validators;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.ComponentModel;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
@@ -20,6 +23,7 @@ internal sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptio
     private readonly Dictionary<string, string> optionsCache = [];
     private readonly Dictionary<Type, List<Action>> optionsUpdateHooks = [];
     private readonly HashSet<Type> optionsTypes = [];
+    private readonly List<OptionType> optionDefinitions = [];
 
     public OptionsManager()
     {
@@ -54,7 +58,7 @@ internal sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptio
     }
 
     public void RegisterOptions<T>()
-        where T : new()
+        where T : class, new()
     {
         var optionsName = GetOptionsName<T>();
         if (this.optionsCache.ContainsKey(optionsName) is false)
@@ -63,6 +67,15 @@ internal sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptio
         }
 
         this.optionsTypes.Add(typeof(T));
+        this.optionDefinitions.Add(new OptionType
+        {
+            Name = optionsName,
+            Description = GetOptionsToolTip(typeof(T)),
+            Type = typeof(T),
+            IsVisible = IsOptionsVisible(typeof(T)),
+            IsSynchronized = IsSynchronizedOption(typeof(T)),
+            Properties = [.. GetOptionProperties(typeof(T), optionsName)]
+        });
     }
 
     public void RegisterHook<TOptionsType>(Action action)
@@ -93,23 +106,40 @@ internal sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptio
         this.SaveOptions(typeof(T), value);
     }
 
-    public IEnumerable<object> GetRegisteredOptions()
+    public IEnumerable<OptionInstance> GetRegisteredOptionInstances()
     {
-        foreach(var type in this.optionsTypes)
+        foreach (var type in this.optionDefinitions)
         {
-            var optionsName = GetOptionsName(type);
+            var optionsName = GetOptionsName(type.Type);
             if (this.optionsCache.TryGetValue(optionsName, out var value) is false)
             {
                 continue;
             }
 
-            yield return JsonConvert.DeserializeObject(value, type) ?? Activator.CreateInstance(type)!;
+            var instance = JsonConvert.DeserializeObject(value, type.Type) ?? Activator.CreateInstance(type.Type);
+            yield return new OptionInstance { Reference = instance!, Type = type };
         }
     }
 
-    public IEnumerable<Type> GetRegisteredOptionsTypes()
+    public IEnumerable<OptionType> GetRegisteredOptionDefinitions()
     {
-        return this.optionsTypes;
+        return this.optionDefinitions.Where(o => o.IsVisible);
+    }
+
+    public OptionInstance GetRegisteredOptionInstance(string optionName)
+    {
+        if (this.optionDefinitions.FirstOrDefault(t => t.Name == optionName) is not OptionType type)
+        {
+            throw new InvalidOperationException($"No registered options found for {optionName}");
+        }
+
+        if (this.optionsCache.TryGetValue(optionName, out var value) is false)
+        {
+            throw new InvalidOperationException($"No existing options found for {optionName}");
+        }
+
+        var instance = JsonConvert.DeserializeObject(value, type.Type) ?? Activator.CreateInstance(type.Type);
+        return new OptionInstance { Reference = instance!, Type = type };
     }
 
     public void SaveRegisteredOptions(object options)
@@ -117,6 +147,11 @@ internal sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptio
         options.ThrowIfNull();
 
         this.SaveOptions(options.GetType(), options);
+    }
+
+    public void SaveRegisteredOptions(OptionInstance optionInstance)
+    {
+        this.SaveOptions(optionInstance.Type.Type, optionInstance.Reference);
     }
 
     public void SaveRegisteredOptions(string name, JObject options)
@@ -181,6 +216,79 @@ internal sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptio
         }
     }
 
+    private static IEnumerable<OptionProperty> GetOptionProperties(Type type, string optionsName)
+    {
+        foreach (var propertyInfo in type.GetProperties())
+        {
+            var propertyType = propertyInfo.PropertyType;
+            (var name, var description) = GetNameAndDescription(propertyInfo, optionsName);
+            var validator = GetValidator(propertyInfo);
+            var possibleValues = GetValuesFactory(propertyInfo);
+            (var hasCustomSetter, var action, var customSetterViewType) = GetCustomSetter(propertyInfo);
+            var converter = TypeDescriptor.GetConverter(propertyType);
+            var getter = new Func<OptionInstance, object?>(instance => propertyInfo.GetValue(instance.Reference));
+            var setter = new Action<OptionInstance, object?>((instance, newValue) =>
+            {
+                if (newValue is null && !propertyType.IsValueType)
+                {
+                    propertyInfo.SetValue(instance.Reference, newValue);
+                    return;
+                }
+
+                if (propertyType == newValue?.GetType())
+                {
+                    propertyInfo.SetValue(instance.Reference, newValue);
+                    return;
+                }
+
+                if (newValue is not null)
+                {
+                    propertyInfo.SetValue(instance.Reference, converter.ConvertFrom(newValue));
+                    return;
+                }
+
+                throw new InvalidOperationException("Unable to set null to value type property");
+            });
+
+            var optionProperty = new OptionProperty
+            {
+                Name = name,
+                Description = description,
+                ValuesFactory = possibleValues,
+                Validator = validator ?? new AllGoesValidator(),
+                Setter = setter,
+                Getter = getter,
+                Converter = converter,
+                Type = propertyType,
+                IsSynchronized = IsSynchronizedProperty(propertyInfo),
+                IsVisible = IsPropertyVisible(propertyInfo)
+            };
+
+            yield return optionProperty;
+        }
+    }
+
+    private static Func<List<object>>? GetValuesFactory(PropertyInfo propertyInfo)
+    {
+        if (propertyInfo.GetCustomAttribute<OptionValuesAttribute>() is OptionValuesAttribute optionValuesAttribute)
+        {
+            return () => [.. optionValuesAttribute.Values];
+        }
+
+        if (propertyInfo.GetCustomAttribute<OptionValuesFactoryAttribute>() is OptionValuesFactoryAttribute optionValuesFactoryAttribute)
+        {
+            return optionValuesFactoryAttribute.ValuesFactory;
+        }
+
+        if (propertyInfo.PropertyType.IsEnum)
+        {
+            var values = Enum.GetValues(propertyInfo.PropertyType).Cast<object>().ToList();
+            return () => values;
+        }
+
+        return default;
+    }
+
     private static string GetOptionsName<T>()
     {
         return GetOptionsName(typeof(T));
@@ -199,5 +307,225 @@ internal sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptio
         }
 
         return optionsNameAttribute.Name!;
+    }
+
+    private static string GetOptionsToolTip(Type type)
+    {
+        var name = GetOptionsName(type);
+        return $"{name} settings";
+    }
+
+    private static bool IsOptionsVisible(Type optionType)
+    {
+        if (optionType.GetCustomAttribute<OptionsIgnoreAttribute>() is not null)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private static (bool HasCustomSetter, string? CustomSetterAction, Type? CustomSetterViewType) GetCustomSetter(PropertyInfo propertyInfo)
+    {
+        if (propertyInfo.GetCustomAttributes()
+                .FirstOrDefault(a =>
+                {
+                    var attributeType = a.GetType();
+                    if (!attributeType.IsGenericType)
+                    {
+                        return false;
+                    }
+
+                    return a.GetType().GetGenericTypeDefinition() == typeof(OptionSetterView<>);
+                }) is not object customSetterViewAttribute)
+        {
+            return (false, default, default);
+        }
+
+        var action = customSetterViewAttribute.GetType().GetProperty(nameof(OptionSetterView<>.Action))?
+            .GetValue(customSetterViewAttribute)?.As<string>();
+        var viewType = customSetterViewAttribute.GetType().GetGenericArguments().FirstOrDefault();
+
+        return (viewType is not null,
+            action,
+            viewType);
+    }
+
+    private static bool IsSynchronizedOption(Type optionType)
+    {
+        if (optionType.GetCustomAttribute<OptionsSynchronizationIgnoreAttribute>() is not null)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private static bool IsSynchronizedProperty(PropertyInfo propertyInfo)
+    {
+        if (propertyInfo.GetCustomAttribute<OptionSynchronizationIgnoreAttribute>() is not null)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private static bool IsPropertyVisible(PropertyInfo propertyInfo)
+    {
+        return propertyInfo.GetCustomAttribute<OptionIgnoreAttribute>() is null;
+    }
+
+    private static IValidator? GetValidator(PropertyInfo propertyInfo)
+    {
+        // If property has a custom validator, return that validator
+        if (propertyInfo.GetCustomAttributes()
+                .FirstOrDefault(a =>
+                {
+                    var attributeType = a.GetType();
+                    if (!attributeType.IsGenericType)
+                    {
+                        return false;
+                    }
+
+                    return a.GetType().GetGenericTypeDefinition() == typeof(OptionCustomValidatorAttribute<>);
+                }) is object customValidatorAttribute)
+        {
+            var validatorPropertyInfo = customValidatorAttribute.GetType().GetProperty(nameof(OptionCustomValidatorAttribute<>.Validator));
+            return validatorPropertyInfo?.GetValue(customValidatorAttribute) as IValidator;
+        }
+
+        if (propertyInfo.PropertyType.IsPrimitive ||
+            propertyInfo.PropertyType == typeof(string))
+        {
+            return GetPrimitiveValidator(propertyInfo);
+        }
+        else if (propertyInfo.PropertyType.IsEnum)
+        {
+            return Activator.CreateInstance(typeof(EnumValidator<>).MakeGenericType(propertyInfo.PropertyType)) as IValidator;
+        }
+
+        return default;
+    }
+
+    private static IValidator? GetPrimitiveValidator(PropertyInfo propertyInfo)
+    {
+        if (propertyInfo.PropertyType == typeof(byte) ||
+            propertyInfo.PropertyType == typeof(byte?))
+        {
+            var validator = GetClampedValidator(propertyInfo, byte.MinValue, byte.MaxValue, out _);
+            return validator;
+        }
+        else if (propertyInfo.PropertyType == typeof(sbyte) ||
+                propertyInfo.PropertyType == typeof(sbyte?))
+        {
+            var validator = GetClampedValidator(propertyInfo, sbyte.MinValue, sbyte.MaxValue, out _);
+            return validator;
+        }
+        else if (propertyInfo.PropertyType == typeof(short) ||
+                propertyInfo.PropertyType == typeof(short?))
+        {
+            var validator = GetClampedValidator(propertyInfo, short.MinValue, short.MaxValue, out _);
+            return validator;
+        }
+        else if (propertyInfo.PropertyType == typeof(ushort) ||
+                propertyInfo.PropertyType == typeof(ushort?))
+        {
+            var validator = GetClampedValidator(propertyInfo, ushort.MinValue, ushort.MaxValue, out _);
+            return validator;
+        }
+        else if (propertyInfo.PropertyType == typeof(int) ||
+                propertyInfo.PropertyType == typeof(int?))
+        {
+            var validator = GetClampedValidator(propertyInfo, int.MinValue, int.MaxValue, out _);
+            return validator;
+        }
+        else if (propertyInfo.PropertyType == typeof(uint) ||
+                propertyInfo.PropertyType == typeof(uint?))
+        {
+            var validator = GetClampedValidator(propertyInfo, uint.MinValue, uint.MaxValue, out _);
+            return validator;
+        }
+        else if (propertyInfo.PropertyType == typeof(long) ||
+                propertyInfo.PropertyType == typeof(long?))
+        {
+            var validator = GetClampedValidator(propertyInfo, long.MinValue, long.MaxValue, out _);
+            return validator;
+        }
+        else if (propertyInfo.PropertyType == typeof(ulong) ||
+                propertyInfo.PropertyType == typeof(ulong?))
+        {
+            var validator = GetClampedValidator(propertyInfo, ulong.MinValue, ulong.MaxValue, out _);
+            return validator;
+        }
+        else if (propertyInfo.PropertyType == typeof(float) ||
+                propertyInfo.PropertyType == typeof(float?))
+        {
+            var validator = GetClampedValidator(propertyInfo, float.MinValue, float.MaxValue, out _);
+            return validator;
+        }
+        else if (propertyInfo.PropertyType == typeof(double) ||
+                propertyInfo.PropertyType == typeof(double?))
+        {
+            var validator = GetClampedValidator(propertyInfo, double.MinValue, double.MaxValue, out _);
+            return validator;
+        }
+        else if (propertyInfo.PropertyType == typeof(bool) ||
+                propertyInfo.PropertyType == typeof(bool?))
+        {
+            return new BooleanValidator();
+        }
+        else if (propertyInfo.PropertyType == typeof(string))
+        {
+            return new AllGoesValidator();
+        }
+
+        return default;
+    }
+
+    private static ClampedValidator<T>? GetClampedValidator<T>(PropertyInfo propertyInfo, T defaultMinValue, T defaultMaxValue, out (bool IsRange, T Min, T Max) clampDetails)
+        where T : IComparable<T>
+    {
+        var maybeOptionRangeAttribute = propertyInfo.GetCustomAttribute<OptionRangeAttribute<T>>();
+        var minValue = maybeOptionRangeAttribute is not null ?
+            maybeOptionRangeAttribute.MinValue :
+            defaultMinValue;
+
+        var maxValue = maybeOptionRangeAttribute is not null ?
+            maybeOptionRangeAttribute.MaxValue :
+            defaultMaxValue;
+
+        clampDetails = maybeOptionRangeAttribute is not null ?
+            (true, minValue, maxValue) :
+            (false, minValue, maxValue);
+
+        return new ClampedValidator<T>(minValue, maxValue);
+    }
+
+    private static (string Name, string Description) GetNameAndDescription(PropertyInfo propertyInfo, string optionName)
+    {
+        string? name;
+        var description = string.Empty;
+        if (propertyInfo.GetCustomAttribute<OptionNameAttribute>() is not OptionNameAttribute optionNameAttribute)
+        {
+            name = propertyInfo.Name;
+        }
+        else
+        {
+            name = optionNameAttribute.Name;
+            description = optionNameAttribute.Description;
+        }
+
+        if (description.IsNullOrWhiteSpace())
+        {
+            description = GetDefaultDescription(name, optionName);
+        }
+
+        return (name, description);
+    }
+
+    private static string GetDefaultDescription(string optionName, string optionSectionName)
+    {
+        return $"{optionName} property of {optionSectionName}";
     }
 }

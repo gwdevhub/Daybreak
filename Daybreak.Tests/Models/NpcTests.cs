@@ -1,6 +1,5 @@
 ﻿using Daybreak.Shared.Models.Guildwars;
 using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Reflection;

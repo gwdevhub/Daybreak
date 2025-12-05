@@ -22,6 +22,7 @@
     <File Path=".github/CODEOWNERS" />
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
+    <File Path="LICENSE.md" />
     <File Path="README.md" />
   </Folder>
   <Project Path="Daybreak.7ZipExtractor/Daybreak.7ZipExtractor.csproj">

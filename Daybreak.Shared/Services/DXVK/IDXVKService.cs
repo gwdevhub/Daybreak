@@ -1,9 +1,9 @@
-﻿using Daybreak.Shared.Models.Progress;
+﻿using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Services.Mods;
 
 namespace Daybreak.Shared.Services.DXVK;
 
 public interface IDXVKService : IModService
 {
-    Task<bool> SetupDXVK(DXVKInstallationStatus dXVKInstallationStatus, CancellationToken cancellationToken);
+    Task<bool> SetupDXVK(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken);
 }

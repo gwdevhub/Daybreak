@@ -1,0 +1,98 @@
+﻿<div class="team-build-view">
+    <div class="title-bar-additional-btns-left">
+        <button class="title-bar-btn" @onclick="this.ViewModel.Save" title="Save Build">
+            <FluentIcon Value="new Icons.Regular.Size16.Save()" />
+        </button>
+        <button class="title-bar-btn" @onclick="this.ViewModel.ShowSummary" title="Show Summary">
+            <FluentIcon Value="new Icons.Regular.Size16.BroadActivityFeed()" />
+        </button>
+    </div>
+    <div class="backdrop-panel stretch-container" @onclick="this.ViewModel.HideSummary">
+        @if (this.ViewModel.TeamEntry is not null)
+        {
+            <div class="build-selection">
+                <div class="build-selector">
+                    <label for="current-build">Selected Build:</label>
+                    <select id="current-build" value="0" class="build-select" @onchange="this.ViewModel.BuildSelectionChanged">
+                        @foreach (var (build, index) in this.ViewModel.TeamEntry.Builds.Select((b, i) => (b, i)))
+                        {
+                            var composition = this.ViewModel.TeamEntry.PartyComposition?.Skip(index).FirstOrDefault();
+                            if (composition?.Type is Shared.Models.Guildwars.PartyCompositionMemberType.MainPlayer)
+                            {
+                                <option value="@index">@build.Primary.Alias / @build.Secondary.Alias Main Player</option>
+                            }
+                            else if (composition?.Type is Shared.Models.Guildwars.PartyCompositionMemberType.Hero)
+                            {
+                                _ = Shared.Models.Guildwars.Hero.TryParse(composition?.HeroId ?? -1, out var hero);
+                                <option value="@index">@build.Primary.Alias / @build.Secondary.Alias @hero.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+        }
+
+        @if (this.ViewModel.BuildEntry is not null && this.ViewModel.TeamEntry is not null)
+        {
+            <BuildEditor BuildTemplateCode="@this.ViewModel.BuildTemplateCode"
+                         AvailableSkills="@this.ViewModel.AvailableSkills"
+                         Attributes="@this.ViewModel.BuildEntry.Attributes"
+                         BuildName="@this.ViewModel.TeamEntry.Name"
+                         PrimaryProfession="@this.ViewModel.BuildEntry.Primary"
+                         SecondaryProfession="@this.ViewModel.BuildEntry.Secondary"
+                         Skills="@this.ViewModel.BuildEntry.Skills"
+                         OnAttributeIncreased="@this.ViewModel.AttributeIncreased"
+                         OnAttributeDecreased="@this.ViewModel.AttributeDecreased"
+                         OnSkillChanged="@this.ViewModel.SkillChanged"
+                         SearchFilterChanged="@this.ViewModel.SearchFilterChanged"
+                         PrimaryProfessionChanged="@this.ViewModel.PrimaryProfessionChanged"
+                         SecondaryProfessionChanged="@this.ViewModel.SecondaryProfessionChanged"
+                         BuildNameChanged="@this.ViewModel.BuildNameChanged"
+                         OnSkillHoverEnter="@this.ViewModel.OpenSkillSnippet"
+                         OnSkillHoverLeave="@this.ViewModel.CloseSkillSnippet" />
+        }
+    </div>
+    @if (this.ViewModel.SummaryVisible)
+    {
+        <div class="backdrop-panel summary-popup">
+            @foreach (var (build, index) in this.ViewModel.TeamEntry?.Builds?.Select((b, i) => (b, i)) ?? [])
+            {
+                var composition = this.ViewModel.TeamEntry?.PartyComposition?.Skip(index).FirstOrDefault();
+                var name = composition?.Type switch
+                {
+                    Shared.Models.Guildwars.PartyCompositionMemberType.MainPlayer => "Main Player",
+                    Shared.Models.Guildwars.PartyCompositionMemberType.Hero => Shared.Models.Guildwars.Hero.TryParse(composition?.HeroId ?? -1, out var hero) ? hero.Name : "Unknown Hero",
+                    _ => "Unknown Member"
+                };
+                var attributesString = string.Join(", ", build.Attributes.Where(a => a.Points > 0).Select(a => $"{a.Attribute?.AlternativeName ?? string.Empty}: {a.Points}"));
+                <div class="summary-row">
+                    <div class="summary-name">
+                        @build.Primary.Alias / @build.Secondary.Alias @name
+                    </div>
+                    <div class="summary-details">
+                        <div class="summary-skills">
+                            @foreach (var skill in build.Skills)
+                            {
+                                <div class="summary-skill-icon"
+                                     @onmouseenter="@((e) => this.ViewModel.SummarySkillMouseEnter(skill, e))" @onmouseenter:stopPropagation="true"
+                                     @onmouseleave="@((e) => this.ViewModel.SummarySkillMouseLeave(skill, e))" @onmouseleave:stopPropagation="true">
+                                    <SkillIcon Skill="skill" />
+                                </div>
+                            }
+                        </div>
+                        <div class="summary-attributes">
+                            @attributesString
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    @if (this.ViewModel.ShowSkillSnippet)
+    {
+        <SkillSnippet Context="this.ViewModel.SkillSnippetContext" />
+    }
+</div>
+
+@page "/builds/teamBuilds/{BuildName}"
+@inherits BuildTemplateViewBase<TeamBuildTemplateView, TeamBuildTemplateViewModel>

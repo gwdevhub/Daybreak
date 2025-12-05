@@ -1,15 +1,12 @@
-﻿using Daybreak.Attributes;
+﻿using Daybreak.Shared.Attributes;
 using Newtonsoft.Json;
 
 namespace Daybreak.Configuration.Options;
+
 [OptionsName(Name = "DXVK")]
+[OptionsIgnore]
 internal sealed class DXVKOptions
 {
-    [JsonProperty(nameof(Path))]
-    [OptionName(Name = "Path", Description = "The path to the DXVK installation")]
-    [OptionSynchronizationIgnore]
-    public string? Path { get; set; }
-
     [JsonProperty(nameof(Version))]
     [OptionSynchronizationIgnore]
     [OptionIgnore]

@@ -1,0 +1,98 @@
+﻿.mods-container {
+    gap: 1rem;
+    padding: 1rem;
+    overflow-y: auto;
+    margin-top: 40px;
+}
+
+.mod-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: color-mix(in srgb, var(--neutral-fill-rest) 50%, transparent);
+    border: 1px solid var(--neutral-stroke-rest);
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.mod-row:hover {
+    background: color-mix(in srgb, var(--neutral-fill-rest) 60%, transparent);
+    transform: translateX(2px);
+}
+
+.mod-row-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.mod-name-label {
+    font-size: var(--font-size-large);
+    font-weight: 600;
+    color: var(--neutral-foreground-rest);
+}
+
+.mod-description-label {
+    font-size: var(--font-size-small);
+    color: var(--neutral-foreground-rest);
+    opacity: 0.8;
+}
+
+.mod-row-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.mod-toggle {
+    display: flex;
+    align-items: center;
+}
+
+.mod-not-installed {
+    border-color: var(--accent-fill-rest);
+    color: var(--neutral-foreground-rest);
+    border-style: dashed;
+    padding: 0.25rem 0.75rem;
+    background: var(--neutral-fill-stealth-rest);
+    border-radius: 12px;
+    font-size: var(--font-size-small);
+    margin-left: 1rem;
+    min-width: 100px;
+    text-align: center;
+}
+
+.mod-installed {
+    border-color: var(--accent-fill-rest);
+    color: var(--foreground-on-accent-rest);
+    border-style: dashed;
+    padding: 0.25rem 0.75rem;
+    background: var(--accent-fill-rest);
+    border-radius: 12px;
+    font-size: var(--font-size-small);
+    margin-left: 1rem;
+    min-width: 100px;
+    text-align: center;
+}
+
+.mod-can-manage {
+    border-color: var(--accent-fill-active);
+    color: var(--foreground-on-accent-active);
+    border-style: dashed;
+    padding: 0.25rem 0.75rem;
+    background: var(--accent-fill-active);
+    border-radius: 12px;
+    font-size: var(--font-size-small);
+    margin-left: 1rem;
+    cursor: pointer;
+    min-width: 100px;
+    text-align: center;
+}
+
+::deep .label {
+    color: var(--neutral-foreground-rest) !important;
+    font-size: var(--font-size-medium) !important;
+}

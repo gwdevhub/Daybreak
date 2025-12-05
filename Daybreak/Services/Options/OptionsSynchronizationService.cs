@@ -1,5 +1,4 @@
-﻿using Daybreak.Attributes;
-using Daybreak.Configuration.Options;
+﻿using Daybreak.Configuration.Options;
 using Daybreak.Services.Graph;
 using Daybreak.Shared.Services.Options;
 using Microsoft.Extensions.Logging;
@@ -89,20 +88,25 @@ public sealed class OptionsSynchronizationService(
 
     private Dictionary<string, JObject> GetCurrentOptionsInternal()
     {
-        return this.optionsProvider.GetRegisteredOptions()
-            .Where(o => o.GetType().GetCustomAttributes(true).None(a => a is OptionsSynchronizationIgnoreAttribute))
-            .Select(o => (GetOptionsName(o.GetType()), JObject.FromObject(o), o.GetType()))
+        return this.optionsProvider.GetRegisteredOptionInstances()
+            .Where(o => o.Type.IsSynchronized)
+            .Select(o => (o, JObject.FromObject(o.Reference)))
             .Select(t =>
             {
                 var jObject = t.Item2;
-                var objectType = t.Item3;
-                var properties = objectType.GetProperties().Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() is null);
+                var objectType = t.o.Type.Type;
+                var properties = t.o.Type.Properties;
                 foreach(var property in properties)
                 {
-                    if (property.GetCustomAttributes().Any(a => a is OptionSynchronizationIgnoreAttribute))
+                    if (property.Type.GetCustomAttributes().Any(a => a is JsonIgnoreAttribute))
+                    {
+                        continue;
+                    }
+
+                    if (!property.IsSynchronized)
                     {
                         var name = property.Name;
-                        if (property.GetCustomAttribute<JsonPropertyAttribute>() is JsonPropertyAttribute jsonPropertyAttribute &&
+                        if (property.Type.GetCustomAttribute<JsonPropertyAttribute>() is JsonPropertyAttribute jsonPropertyAttribute &&
                             jsonPropertyAttribute.PropertyName is string propertyName)
                         {
                             name = propertyName;
@@ -112,24 +116,9 @@ public sealed class OptionsSynchronizationService(
                     }
                 }
 
-                return (t.Item1, t.Item2);
+                return (t.o.Type.Name, t.Item2);
             })
             .ToDictionary();
-    }
-
-    private static string GetOptionsName(Type type)
-    {
-        if (type.GetCustomAttributes(true).FirstOrDefault(a => a.GetType() == typeof(OptionsNameAttribute)) is not OptionsNameAttribute optionsNameAttribute)
-        {
-            return type.Name;
-        }
-
-        if (optionsNameAttribute.Name!.IsNullOrWhiteSpace())
-        {
-            return type.Name;
-        }
-
-        return optionsNameAttribute.Name!;
     }
 
     public async void OnStartup()

@@ -1,0 +1,22 @@
+﻿<div class="stretch-container">
+    <div class="title-bar-additional-btns-left">
+        @if (this.ViewModel.TelemetryEnabled)
+        {
+            <button class="title-bar-btn" @onclick="this.ViewModel.DisableTelemetry" title="Disable telemetry">
+                <FluentIcon Value="new Icons.Regular.Size16.CloudCheckmark()" />
+            </button>
+        }
+        else
+        {
+            <button class="title-bar-btn" @onclick="this.ViewModel.EnableTelemetry" title="Enable telemetry">
+                <FluentIcon Value="new Icons.Regular.Size16.CloudDismiss()" />
+            </button>
+        }
+    </div>
+    <div class="body backdrop-panel">
+        @TelemetryViewModel.DisclaimerText
+    </div>
+</div>
+
+@page "/telemetry"
+@inherits ViewBase<TelemetryView, TelemetryViewModel>

@@ -1,12 +1,53 @@
-﻿using Daybreak.Shared.Models.Mods;
+﻿using Daybreak.Shared.Models.Async;
+using Daybreak.Shared.Models.Mods;
 
 namespace Daybreak.Shared.Services.Mods;
 
 public interface IModService
 {
+    /// <summary>
+    /// The name of the mod. Displayed in the mod manager UI.
+    /// </summary>
     string Name { get; }
+
+    /// <summary>
+    /// The description of the mod. Displayed in the mod manager UI.
+    /// </summary>
+    string Description { get; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the mod is enabled. If true, the mod will be applied when starting Guild Wars.
+    /// </summary>
     bool IsEnabled { get; set; }
+
+    /// <summary>
+    /// True if the mod is intalled in the Daybreak staging directory and ready to be used.
+    /// </summary>
     bool IsInstalled { get; }
+
+    /// <summary>
+    /// Dictates if the mod is visible in the mod manager UI.
+    /// </summary>
+    bool IsVisible { get; }
+
+    /// <summary>
+    /// Dictates if the mod has custom management.
+    /// </summary>
+    bool CanCustomManage { get; }
+
+    /// <summary>
+    /// Called by the mod manager to perform installation steps for the mod.
+    /// </summary>
+    /// <returns>Returns an awaitable <see cref="IProgressAsyncOperation{bool}"/></returns>
+    /// <remarks>
+    /// See <see cref="ProgressAsyncOperation{T}"/> on how to get progress reports and await the operation.
+    /// </remarks>
+    IProgressAsyncOperation<bool> PerformInstallation(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Custom command-line arguments to pass to the Guild Wars process.
+    /// </summary>
+    /// <returns></returns>
     IEnumerable<string> GetCustomArguments();
     /// <summary>
     /// Called before starting the guild wars process.
@@ -41,4 +82,12 @@ public interface IModService
     /// Use this method to re-inject or re-apply the mod to the running Guild Wars process.
     /// </summary>
     Task OnGuildWarsRunning(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Called when the user requests custom management of the mod.
+    /// </summary>
+    /// <remarks>
+    /// This method is only called if <see cref="CanCustomManage"/> is true.
+    /// </remarks>
+    Task OnCustomManagement(CancellationToken cancellationToken);
 }

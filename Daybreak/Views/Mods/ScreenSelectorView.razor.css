@@ -1,0 +1,40 @@
+﻿.screen-selector-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.screen-display {
+    position: absolute;
+    background: var(--neutral-fill-rest);
+    color: var(--neutral-foreground-rest);
+    border: 2px solid var(--neutral-stroke-rest);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    transform: scale(0.98);
+}
+
+    .screen-display.screen-selected {
+        background: var(--accent-fill-rest);
+        color: var(--foreground-on-accent-rest);
+    }
+
+    .screen-display:hover {
+        background: var(--accent-foreground-hover);
+        transform: scale(1.0);
+        z-index: 10000;
+    }
+
+.screen-id {
+    font-size: var(--font-size-xx-large);
+    font-weight: bold;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}

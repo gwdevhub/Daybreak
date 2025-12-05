@@ -12,15 +12,32 @@ using OpenTelemetry.Trace;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
+using System.Net.Http;
 using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.Telemetry;
 internal sealed class TelemetryHost : IDisposable, IApplicationLifetimeService
 {
     private const string ServiceName = "Daybreak";
+    private const string UnknownHost = "Unknown";
+    private const string MaskedValue = "[REDACTED]";
 
     private static readonly Uri ApmEndpoint = new UriBuilder(SecretManager.GetSecret(SecretKeys.ApmUri)).Uri;
     private static readonly string ApmApiKey = SecretManager.GetSecret(SecretKeys.ApmApiKey);
+
+    // Headers that should be masked for security
+    private static readonly HashSet<string> SensitiveHeaders = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "Authorization",
+        "Api-Key",
+        "X-API-Key",
+        "Bearer",
+        "Cookie",
+        "Set-Cookie",
+        "X-Auth-Token",
+        "X-Access-Token",
+        "Authentication"
+    };
 
     public static readonly ActivitySource Source = new(ServiceName);
 
@@ -113,12 +130,16 @@ internal sealed class TelemetryHost : IDisposable, IApplicationLifetimeService
                 o.RecordException = true;
                 o.EnrichWithHttpRequestMessage = (activity, request) =>
                 {
-                    activity.DisplayName = $"{request.Method} {request.RequestUri}";
+                    activity.DisplayName = request.RequestUri?.IdnHost ?? UnknownHost;
+                    activity.SetTag("http.url", request.RequestUri?.ToString() ?? string.Empty);
+                    activity.SetTag("http.method", request.Method.Method);
+                    AddRequestHeaders(activity, request);
                 };
                 o.EnrichWithHttpResponseMessage = (activity, response) =>
                 {
                     activity.SetTag("http.status_code", (int)response.StatusCode);
-                    activity.SetTag("http.response_content_length", response.Content?.Headers.ContentLength ?? 0);
+                    activity.SetStatus(response.IsSuccessStatusCode ? ActivityStatusCode.Ok : ActivityStatusCode.Error);
+                    AddResponseHeaders(activity, response);
                 };
                 o.EnrichWithException = (activity, exception) =>
                 {
@@ -151,5 +172,31 @@ internal sealed class TelemetryHost : IDisposable, IApplicationLifetimeService
 
         this.logger = new OpenTelemetryLoggerProvider(this.logOptions);
         this.swappableLoggerProvider.SetInner(this.logger);
+    }
+
+    private static void AddRequestHeaders(Activity activity, HttpRequestMessage request)
+    {
+        foreach (var header in request.Headers.Concat(request.Content?.Headers.AsEnumerable() ?? []))
+        {
+            var headerName = header.Key;
+            var headerValue = SensitiveHeaders.Contains(headerName) 
+                ? MaskedValue 
+                : string.Join(", ", header.Value);
+            
+            activity.SetTag($"http.request.header.{headerName.ToLowerInvariant()}", headerValue);
+        }
+    }
+
+    private static void AddResponseHeaders(Activity activity, HttpResponseMessage response)
+    {
+        foreach (var header in response.Headers.Concat(response.Content?.Headers.AsEnumerable() ?? []))
+        {
+            var headerName = header.Key;
+            var headerValue = SensitiveHeaders.Contains(headerName) 
+                ? MaskedValue 
+                : string.Join(", ", header.Value);
+            
+            activity.SetTag($"http.response.header.{headerName.ToLowerInvariant()}", headerValue);
+        }
     }
 }

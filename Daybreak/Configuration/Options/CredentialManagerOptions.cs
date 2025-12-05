@@ -1,4 +1,4 @@
-﻿using Daybreak.Attributes;
+﻿using Daybreak.Shared.Attributes;
 using Daybreak.Shared.Models;
 using Newtonsoft.Json;
 

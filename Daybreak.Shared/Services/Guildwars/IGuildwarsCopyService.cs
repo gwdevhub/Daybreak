@@ -1,8 +1,8 @@
-﻿using Daybreak.Shared.Models.Progress;
+﻿using Daybreak.Shared.Models.Async;
 
 namespace Daybreak.Shared.Services.Guildwars;
 
 public interface IGuildWarsCopyService
 {
-    Task CopyGuildwars(string existingExecutable, CopyStatus copyStatus, CancellationToken cancellationToken);
+    ProgressAsyncOperation<bool> CopyGuildwars(string existingExecutable, CancellationToken cancellationToken);
 }

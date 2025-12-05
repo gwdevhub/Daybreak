@@ -1,10 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <RootNamespace>Daybreak</RootNamespace>
-    <TargetFramework>net9.0-windows</TargetFramework>
+    <TargetFramework>$(TargetFrameworkVersionWindows)</TargetFramework>
     <UseWPF>true</UseWPF>
+    <ScopedCssEnabled>true</ScopedCssEnabled>
     <Nullable>enable</Nullable>
     <Platforms>x86;x64</Platforms>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -14,6 +15,8 @@
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <UserSecretsId>cfb2a489-db80-448d-a969-80270f314c46</UserSecretsId>
     <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
 
   <ItemGroup>
@@ -52,19 +55,19 @@
 		
   <ItemGroup>
     <PackageReference Include="Elastic.OpenTelemetry" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" />
+    <PackageReference Include="Microsoft.Fast.Components.FluentUI" />
+    <PackageReference Include="Microsoft.Fast.Components.FluentUI.Emojis" />
+    <PackageReference Include="Microsoft.Fast.Components.FluentUI.Icons" />
+    <PackageReference Include="Microsoft.Identity.Client.Desktop" />
+    <PackageReference Include="Microsoft.Identity.Client.Extensions.Msal" />
     <PackageReference Include="OpenTelemetry.Exporter.Console" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" />
     <PackageReference Include="Reloaded.Assembler" />
-    <PackageReference Include="System.Private.Uri" />
-    <PackageReference Include="WpfExtended" />
     <PackageReference Include="WpfExtended.SourceGeneration" />
     <PackageReference Include="WpfScreenHelper" />
-    <PackageReference Include="WriteableBitmapEx" />
     <PackageReference Include="Squealify" />
-    <PackageReference Include="System.Formats.Asn1" />
-    <PackageReference Include="System.IO.Compression" />
-    <PackageReference Include="System.Linq.Async" />
     <PackageReference Include="PeNet" />
     <PackageReference Include="Plumsy" />
     <PackageReference Include="securifybv.ShellLink" />
@@ -72,8 +75,7 @@
     <PackageReference Include="DiffPlex" />
     <PackageReference Include="HtmlAgilityPack" />
     <PackageReference Include="ini-parser-netstandard" />
-    <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" />
-    <PackageReference Include="MahApps.Metro" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" />
     <PackageReference Include="Microsoft.CorrelationVector" />
     <PackageReference Include="Microsoft.Data.Sqlite" />
     <PackageReference Include="Microsoft.Data.Sqlite.Core" />
@@ -99,6 +101,13 @@
       <Analyzer Include="@(FilteredAnalyzer)" />
     </ItemGroup>
   </Target>
+
+  <!--
+  This ItemGroup embed everything under the wwwroot folder into the Daybreak.exe.
+  -->
+  <ItemGroup>
+    <EmbeddedResource Include="wwwroot\**\*" />
+  </ItemGroup>
 
   <!--
   This ItemGroup takes into account changes in the dependency projects. Any changes in any of them will trigger a rebuild

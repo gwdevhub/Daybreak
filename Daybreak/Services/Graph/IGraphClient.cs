@@ -1,15 +1,14 @@
-﻿using Daybreak.Controls;
-using Daybreak.Services.Graph.Models;
+﻿using Daybreak.Services.Graph.Models;
+using Microsoft.AspNetCore.Components;
 using System.Extensions;
-using System.Windows.Controls;
 
 namespace Daybreak.Services.Graph;
 
 public interface IGraphClient
 {
     Task<Result<User, Exception>> GetUserProfile<TViewType>()
-        where TViewType : UserControl;
-    Task<Result<bool, Exception>> PerformAuthorizationFlow(ChromiumBrowserWrapper chromiumBrowserWrapper, CancellationToken cancellationToken = default);
+        where TViewType : ComponentBase;
+    Task<Result<bool, Exception>> PerformAuthorizationFlow(CancellationToken cancellationToken = default);
     Task<Result<bool, Exception>> LogOut();
     Task<Result<bool, Exception>> UploadBuilds();
     Task<Result<bool, Exception>> DownloadBuilds();

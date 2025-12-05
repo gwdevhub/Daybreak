@@ -1,18 +1,17 @@
-﻿using Daybreak.Services.Guildwars.Models;
-using Daybreak.Shared.Models;
+﻿using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Notifications;
 using Daybreak.Shared.Models.Notifications.Handling;
-using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.Guildwars;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Notifications;
-using Daybreak.Views.Installation;
+using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Extensions;
+using TrailBlazr.Services;
 
 namespace Daybreak.Services.Guildwars;
+
 internal sealed class GuildWarsBatchUpdateNotificationHandler(
     IViewManager viewManager,
     IGuildWarsInstaller guildWarsInstaller,
@@ -39,9 +38,7 @@ internal sealed class GuildWarsBatchUpdateNotificationHandler(
         }
 
         var updateList = new List<GuildWarsUpdateRequest>();
-        var status = new GuildwarsInstallationStatus();
         var cancellationTokenSource = new CancellationTokenSource();
-        var context = new GuildWarsDownloadContext { CancellationTokenSource = cancellationTokenSource, GuildwarsInstallationStatus = status };
         foreach(var executable in this.guildWarsExecutableManager.GetExecutableList())
         {
             if (await this.guildWarsInstaller.GetVersionId(executable, CancellationToken.None) is int version &&
@@ -54,7 +51,6 @@ internal sealed class GuildWarsBatchUpdateNotificationHandler(
             {
                 ExecutablePath = executable,
                 CancellationToken = cancellationTokenSource.Token,
-                Status = status
             });
         }
 
@@ -64,23 +60,6 @@ internal sealed class GuildWarsBatchUpdateNotificationHandler(
             return;
         }
 
-        this.viewManager.ShowView<GuildWarsDownloadView>(context);
-        await foreach (var result in this.guildWarsInstaller.CheckAndUpdateGuildWarsExecutables(updateList, cancellationTokenSource.Token))
-        {
-            if (result.Result)
-            {
-                scopedLogger.LogDebug($"Updated {result.ExecutablePath}");
-                this.notificationService.NotifyInformation(
-                    title: "Updated executable",
-                    description: $"Updated executable at {result.ExecutablePath}");
-            }
-            else
-            {
-                scopedLogger.LogDebug($"Failed to update {result.ExecutablePath}");
-                this.notificationService.NotifyInformation(
-                    title: "Failed to update executable",
-                    description: $"Failed to update executable at {result.ExecutablePath}");
-            }
-        }
+        this.viewManager.ShowView<ExecutablesView>((nameof(ExecutablesView.AutoRun), "true"));
     }
 }

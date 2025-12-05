@@ -1,12 +1,12 @@
 ﻿using Daybreak.Shared.Models.Plugins;
 using Daybreak.Shared.Services.ApplicationArguments;
-using Daybreak.Shared.Services.Browser;
 using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Mods;
 using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Startup;
+using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.Updater.PostUpdate;
 using Slim;
 
@@ -21,14 +21,14 @@ public interface IPluginsService
     void LoadPlugins(
         IServiceManager serviceManager,
         IOptionsProducer optionsProducer,
-        IViewManager viewManager,
+        IViewProducer viewProducer,
         IPostUpdateActionProducer postUpdateActionProducer,
         IStartupActionProducer startupActionProducer,
         INotificationHandlerProducer notificationHandlerProducer,
         IModsManager modsManager,
-        IBrowserExtensionsProducer browserExtensionsProducer,
         IArgumentHandlerProducer argumentHandlerProducer,
-        IMenuServiceProducer menuServiceProducer);
+        IMenuServiceProducer menuServiceProducer,
+        IThemeProducer themeProducer);
 
     IEnumerable<AvailablePlugin> GetAvailablePlugins();
 

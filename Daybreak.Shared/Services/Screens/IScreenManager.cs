@@ -7,5 +7,5 @@ public interface IScreenManager
     IEnumerable<Screen> Screens { get; }
     void SaveWindowPositionAndSize();
     void MoveWindowToSavedPosition();
-    void MoveGuildwarsToScreen(Screen screen);
+    bool MoveGuildwarsToScreen(Screen screen);
 }

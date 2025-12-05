@@ -1,0 +1,17 @@
+﻿.content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.message {
+    font-size: var(--font-size-medium);
+}
+
+::deep .button-group * {
+    font-size: var(--font-size-medium) !important;
+}

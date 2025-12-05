@@ -8,5 +8,5 @@ public sealed class Build
     public Profession Primary { get; set; } = Profession.None;
     public Profession Secondary { get; set; } = Profession.None;
     public List<AttributeEntry> Attributes { get; set; } = [];
-    public List<Skill> Skills { get; set; } = [Skill.NoSkill, Skill.NoSkill, Skill.NoSkill, Skill.NoSkill, Skill.NoSkill, Skill.NoSkill, Skill.NoSkill, Skill.NoSkill];
+    public List<Skill> Skills { get; set; } = [Skill.None, Skill.None, Skill.None, Skill.None, Skill.None, Skill.None, Skill.None, Skill.None];
 }

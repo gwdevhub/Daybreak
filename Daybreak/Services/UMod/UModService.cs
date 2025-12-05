@@ -1,25 +1,29 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Services.Toolbox.Models;
+using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Models.Github;
 using Daybreak.Shared.Models.Mods;
-using Daybreak.Shared.Models.Progress;
 using Daybreak.Shared.Models.UMod;
 using Daybreak.Shared.Services.Downloads;
 using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.UMod;
 using Daybreak.Shared.Utils;
+using Daybreak.Views.Mods;
 using Microsoft.Extensions.Logging;
+using Microsoft.Win32;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.IO;
 using System.Net.Http;
+using TrailBlazr.Services;
 
 namespace Daybreak.Services.UMod;
 
 internal sealed class UModService(
+    IViewManager viewManager,
     IProcessInjector processInjector,
     INotificationService notificationService,
     IDownloadService downloadService,
@@ -35,8 +39,11 @@ internal sealed class UModService(
     private const string UModDll = "uMod.dll";
     private const string UModModList = "modlist.txt";
 
+    private static readonly ProgressUpdate ProgressFinished = new(1, "uMod installation finished");
+
     private static readonly string UModDirectory = PathUtils.GetAbsolutePathFromRoot(UModDirectorySubPath);
 
+    private readonly IViewManager viewManager = viewManager.ThrowIfNull();
     private readonly IProcessInjector processInjector = processInjector.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
@@ -45,8 +52,10 @@ internal sealed class UModService(
     private readonly ILiveUpdateableOptions<UModOptions> uModOptions = uModOptions.ThrowIfNull();
     private readonly ILogger<UModService> logger = logger.ThrowIfNull();
 
-    public string Name => "uMod";
-
+    public string Name => "gMod";
+    public string Description => "gMod (formerly uMod) is a mod loader for Guild Wars that allows you to load custom textures and mods into the game";
+    public bool IsVisible => true;
+    public bool CanCustomManage => true;
     public bool IsEnabled
     {
         get => this.uModOptions.Value.Enabled;
@@ -59,11 +68,25 @@ internal sealed class UModService(
 
     public bool IsInstalled => File.Exists(Path.GetFullPath(Path.Combine(UModDirectory, UModDll)));
 
-    public Shared.Models.Versioning.Version Version => File.Exists(Path.Combine(Path.GetFullPath(UModDirectory), UModDll)) ?
-        Shared.Models.Versioning.Version.TryParse(FileVersionInfo.GetVersionInfo(Path.Combine(Path.GetFullPath(UModDirectory), UModDll)).FileVersion!, out var version) ?
+    public Version Version => File.Exists(Path.Combine(Path.GetFullPath(UModDirectory), UModDll)) ?
+        Version.TryParse(FileVersionInfo.GetVersionInfo(Path.Combine(Path.GetFullPath(UModDirectory), UModDll)).FileVersion!, out var version) ?
             version :
-            Shared.Models.Versioning.Version.Zero :
-        Shared.Models.Versioning.Version.Zero;
+            Version.Parse("0") :
+        Version.Parse("0");
+
+    public IProgressAsyncOperation<bool> PerformInstallation(CancellationToken cancellationToken)
+    {
+        return ProgressAsyncOperation.Create(async progress =>
+        {
+            return await Task.Factory.StartNew(() => this.SetupUMod(progress, cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap();
+        }, cancellationToken);
+    }
+
+    public Task OnCustomManagement(CancellationToken cancellationToken)
+    {
+        this.viewManager.ShowView<UModManagementView>();
+        return Task.CompletedTask;
+    }
 
     public IEnumerable<string> GetCustomArguments() => [];
 
@@ -97,15 +120,15 @@ internal sealed class UModService(
 
     public Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public async Task<bool> SetupUMod(UModInstallationStatus uModInstallationStatus)
+    public async Task<bool> SetupUMod(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
     {
-        if ((await this.SetupUModDll(uModInstallationStatus)) is false)
+        if ((await this.SetupUModDll(progress, cancellationToken)) is false)
         {
             this.logger.LogError("Failed to setup the uMod executable");
             return false;
         }
 
-        uModInstallationStatus.CurrentStep = UModInstallationStatus.Finished;
+        progress.Report(ProgressFinished);
         return true;
     }
 
@@ -168,7 +191,28 @@ internal sealed class UModService(
         this.uModOptions.UpdateOption();
     }
 
-    public async Task CheckAndUpdateUMod(CancellationToken cancellationToken)
+    public Task<IReadOnlyCollection<string>> LoadModsFromDisk(CancellationToken cancellationToken)
+    {
+        return Task.Factory.StartNew<IReadOnlyCollection<string>>(() =>
+        {
+            var openFileDialog = new OpenFileDialog
+            {
+                Filter = "Mod files (*.tpf;*.zip)|*.tpf;*.zip|TPF files (*.tpf)|*.tpf|ZIP files (*.zip)|*.zip",
+                Title = "Select Mod Files",
+                Multiselect = true
+            };
+
+            var result = openFileDialog.ShowDialog();
+            if (result != true || openFileDialog.FileNames.Length == 0)
+            {
+                return [];
+            }
+
+            return [.. openFileDialog.FileNames.Where(f => this.AddMod(f, imported: true))];
+        }, cancellationToken);
+    }
+
+    public async Task CheckAndUpdateUMod(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.CheckAndUpdateUMod), string.Empty);
         var existingUMod = Path.Combine(UModDirectory, UModDll);
@@ -193,7 +237,7 @@ internal sealed class UModService(
             .OfType<string>()
             .LastOrDefault();
 
-        if (!Shared.Models.Versioning.Version.TryParse(latestRelease ?? string.Empty, out var latestVersion))
+        if (!Version.TryParse(latestRelease ?? string.Empty, out var latestVersion))
         {
             scopedLogger.LogError($"Unable to parse latest version {latestRelease}");
             return;
@@ -205,31 +249,20 @@ internal sealed class UModService(
             return;
         }
 
-        await this.DownloadLatestDll(new UModInstallationStatus(), cancellationToken);
+        await this.DownloadLatestDll(progress, cancellationToken);
         this.notificationService.NotifyInformation(
             title: "UMod updated",
             description: $"UMod has been updated to version {latestRelease}");
     }
 
-    private void NotifyFaultyInstallation()
-    {
-        /*
-             * Known issue where Guild Wars updater breaks the executable, which in turn breaks the integration with uMod.
-             * Prompt the user to manually reinstall Guild Wars.
-             */
-        this.notificationService.NotifyInformation(
-            title: "uMod failed to start",
-            description: "uMod failed to start due to a known issue with Guild Wars updating process. Please manually re-install Guild Wars in order to restore uMod functionality");
-    }
-
-    private async Task<bool> SetupUModDll(UModInstallationStatus uModInstallationStatus)
+    private async Task<bool> SetupUModDll(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
     {
         if (this.IsInstalled)
         {
             return true;
         }
 
-        if (await this.DownloadLatestDll(uModInstallationStatus, CancellationToken.None) is not DownloadLatestOperation.Success)
+        if (await this.DownloadLatestDll(progress, cancellationToken) is not DownloadLatestOperation.Success)
         {
             this.logger.LogError("Failed to install uMod. Failed to download uMod");
             return false;
@@ -238,11 +271,11 @@ internal sealed class UModService(
         return true;
     }
 
-    private async Task<DownloadLatestOperation> DownloadLatestDll(UModInstallationStatus uModInstallationStatus, CancellationToken cancellationToken)
+    private async Task<DownloadLatestOperation> DownloadLatestDll(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
     {
         try
         {
-            return await this.GetLatestVersion(uModInstallationStatus, cancellationToken);
+            return await this.GetLatestVersion(progress, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -251,7 +284,7 @@ internal sealed class UModService(
         }
     }
 
-    private async Task<DownloadLatestOperation> GetLatestVersion(UModInstallationStatus uModInstallationStatus, CancellationToken cancellationToken)
+    private async Task<DownloadLatestOperation> GetLatestVersion(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetLatestVersion), string.Empty);
         scopedLogger.LogDebug("Retrieving version list");
@@ -278,7 +311,7 @@ internal sealed class UModService(
         var downloadUrl = ReleaseUrl.Replace(TagPlaceholder, tag);
         var destinationFolder = UModDirectory;
         var destinationPath = Path.Combine(destinationFolder, UModDll);
-        var success = await this.downloadService.DownloadFile(downloadUrl, destinationPath, uModInstallationStatus, cancellationToken);
+        var success = await this.downloadService.DownloadFile(downloadUrl, destinationPath, progress, cancellationToken);
         if (!success)
         {
             throw new InvalidOperationException($"Failed to download uMod version {tag}");

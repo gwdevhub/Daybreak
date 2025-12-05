@@ -16,3 +16,8 @@ Please check the [wiki](https://github.com/AlexMacocian/Daybreak/wiki) for proje
 - .Net 9 SDK
 - WPF
 - Winforms
+
+# Credits:
+- Daybreak project is distributed under [MIT license](https://mit-license.org/)
+- Tango icons - [LordBiro](https://wiki.guildwars.com/wiki/User:LordBiro) 
+	- Icons `Daybreak/wwwroot/img/tango` are distributed under [GFDL license](https://en.wikipedia.org/wiki/GNU_Free_Documentation_License)
