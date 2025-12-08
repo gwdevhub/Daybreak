@@ -90,7 +90,7 @@ internal sealed class ExceptionHandler(
             Global.CoreWebView2.Reload();
             return HandleResult.Handled;
         }
-        else if (e.Message.Contains("Invalid window handle.") && e.StackTrace?.Contains("CoreWebView2Environment.CreateCoreWebView2ControllerAsync") is true)
+        else if (e?.Message.Contains("Invalid window handle.") is true && e.StackTrace?.Contains("CoreWebView2Environment.CreateCoreWebView2ControllerAsync") is true)
         {
             logger.LogError(e, "Failed to initialize browser");
             return HandleResult.Handled;
