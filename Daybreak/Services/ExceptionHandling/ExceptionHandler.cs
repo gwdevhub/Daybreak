@@ -7,7 +7,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Web.WebView2.Core;
 using System.Core.Extensions;
 using System.Diagnostics;
+using System.Extensions.Core;
 using System.IO;
+using System.Logging;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using WpfExtended.Blazor.Exceptions;
@@ -18,105 +20,146 @@ internal sealed class ExceptionHandler(
     INotificationService notificationService,
     ILogger<ExceptionHandler> logger) : IExceptionHandler
 {
+    private enum HandleResult
+    {
+        Handled,
+        Unhandled,
+        Fatal
+    }
+
+    private static readonly IReadOnlyCollection<Func<Exception?, ScopedLogger<ExceptionHandler>, HandleResult>> ExceptionHandlers = [
+        ExitOnNullException,
+        ExitOnFatalException,
+        HandleCoreWebView2Exception,
+        IgnoreCancelledExceptions,
+        HandleRecoverableBrowserExceptions,
+        IgnoreUnexpectedGuildWarsCrashes
+        ];
+
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly ILogger<ExceptionHandler> logger = logger.ThrowIfNull();
 
     public bool HandleException(Exception e)
     {
-        if (e is null)
-        {
-            WriteCrashDump();
-            return false;
-        }
-
         if (this.logger is null)
         {
-            WriteCrashDump();
+            WriteCrashFiles(e);
             return false;
         }
 
-        if (e is FatalException fatalException)
+        var scopedLogger = this.logger.CreateScopedLogger();
+        foreach (var handler in ExceptionHandlers)
         {
-            this.logger.LogCritical(e, $"{nameof(FatalException)} encountered. Closing application");
-            File.WriteAllText("crash.log", e.ToString());
-            WriteCrashDump();
-            return false;
-        }
-        else if (e is CoreWebView2Exception coreWebView2Exception &&
-            coreWebView2Exception.Args.ProcessFailedKind is CoreWebView2ProcessFailedKind.RenderProcessExited)
-        {
-            if (Global.CoreWebView2 is null)
+            switch (handler(e, scopedLogger))
             {
-                this.logger.LogCritical(e, "CoreWebView2 is null. Cannot handle exception");
-                return false;
+                case HandleResult.Handled:
+                    return true;
+                case HandleResult.Fatal:
+                    WriteCrashDump();
+                    return false;
+                case HandleResult.Unhandled:
+                default:
+                    continue;
             }
-
-            this.logger.LogError(e, "CoreWebView2 render process exited unexpectedly. Reloading browser");
-            Global.CoreWebView2.Reload();
-        }
-        else if (e is TaskCanceledException)
-        {
-            this.logger.LogDebug(e, $"Encountered {nameof(TaskCanceledException)}. Ignoring");
-            return true;
-        }
-        else if (e is TargetInvocationException targetInvocationException && e.InnerException is FatalException innerFatalException)
-        {
-            this.logger.LogCritical(e, $"{nameof(FatalException)} encountered. Closing application");
-            File.WriteAllText("crash.log", e.ToString());
-            WriteCrashDump();
-            return false;
-        }
-        else if (e is AggregateException aggregateException)
-        {
-            if (aggregateException.InnerExceptions.FirstOrDefault() is COMException comException &&
-                comException.Message.Contains("Invalid window handle"))
-            {
-                /* 
-                 * Ignore exception caused by browser failing to initialize due to missing window.
-                 * Likely caused by switching views before browser was initialized.
-                 */
-                this.logger.LogError(e, "Failed to initialize browser");
-                return true;
-            }
-            else if (aggregateException.InnerExceptions.FirstOrDefault() is OperationCanceledException)
-            {
-                this.logger.LogError(e, "Encountered operation canceled exception");
-                return true;
-            }
-            else if (aggregateException.InnerExceptions.FirstOrDefault() is ArgumentException argumentException &&
-                aggregateException.Message.Contains("A Task's exception(s) were not observed") &&
-                argumentException.Message?.Contains("Process with an Id of") is true)
-            {
-                this.logger.LogError(e, "Encountered argument exception. Guild Wars process terminated unexpectedly");
-                return true;
-            }
-        }
-        else if (e.Message.Contains("Invalid window handle.") && e.StackTrace?.Contains("CoreWebView2Environment.CreateCoreWebView2ControllerAsync") is true)
-        {
-            /*
-             * Ignore exception caused by browser failing to initialize due to missing window.
-             * Likely caused by switching views before the browser was initialized.
-             */
-            this.logger.LogError(e, "Failed to initialize browser");
-            return true;
-        }
-        else if (e is ArgumentException argumentException &&
-            argumentException.Message.Contains("Process with an Id of"))
-        {
-            this.logger.LogError(e, "Encountered argument exception. Guild Wars process terminated unexpectedly");
-            return true;
         }
 
-        this.logger.LogError(e, $"Unhandled exception caught {e.GetType()}");
+        scopedLogger.LogError(e, "Unhandled exception caught {exceptionType}", e.GetType());
         this.notificationService.NotifyError<MessageBoxHandler>(e.GetType().Name, e.ToString());
         return true;
     }
 
+    private static HandleResult ExitOnNullException(Exception? e, ScopedLogger<ExceptionHandler> _) => e is null ? HandleResult.Fatal : HandleResult.Unhandled;
+
+    private static HandleResult ExitOnFatalException(Exception? e, ScopedLogger<ExceptionHandler> _) => 
+        (e is FatalException || (e is TargetInvocationException && e.InnerException is FatalException))
+        ? HandleResult.Fatal
+        : HandleResult.Unhandled;
+
+    private static HandleResult HandleCoreWebView2Exception(Exception? e, ScopedLogger<ExceptionHandler> logger)
+    {
+        if (e is CoreWebView2Exception coreWebView2Exception &&
+            coreWebView2Exception.Args.ProcessFailedKind is CoreWebView2ProcessFailedKind.RenderProcessExited)
+        {
+            if (Global.CoreWebView2 is null)
+            {
+                logger.LogCritical(e, "CoreWebView2 is null. Cannot handle exception");
+                return HandleResult.Fatal;
+            }
+
+            logger.LogError(e, "CoreWebView2 render process exited unexpectedly. Reloading browser");
+            Global.CoreWebView2.Reload();
+            return HandleResult.Handled;
+        }
+        else if (e.Message.Contains("Invalid window handle.") && e.StackTrace?.Contains("CoreWebView2Environment.CreateCoreWebView2ControllerAsync") is true)
+        {
+            logger.LogError(e, "Failed to initialize browser");
+            return HandleResult.Handled;
+        }
+
+        return HandleResult.Unhandled;
+    }
+
+    private static HandleResult IgnoreCancelledExceptions(Exception? e, ScopedLogger<ExceptionHandler> logger) =>
+        (e is TaskCanceledException || e is OperationCanceledException ||
+        (e is AggregateException aggregateException && 
+            (aggregateException.InnerExceptions?.FirstOrDefault() is OperationCanceledException ||
+             (aggregateException.InnerExceptions?.FirstOrDefault() is ArgumentException argumentException &&
+                aggregateException.Message.Contains("A Task's exception(s) were not observed") &&
+                argumentException.Message?.Contains("Process with an Id of") is true))))
+        ? HandleResult.Handled
+        : HandleResult.Unhandled;
+
+    private static HandleResult HandleRecoverableBrowserExceptions(Exception? e, ScopedLogger<ExceptionHandler> logger) => 
+        e is AggregateException aggregateException &&
+        aggregateException.InnerExceptions.FirstOrDefault() is COMException comException &&
+        comException.Message.Contains("Invalid window handle")
+        ? HandleResult.Handled
+        : HandleResult.Unhandled;
+
+    private static HandleResult IgnoreUnexpectedGuildWarsCrashes(Exception? e, ScopedLogger<ExceptionHandler> logger)
+    {
+        if (e is AggregateException aggregateException &&
+            aggregateException.InnerExceptions.FirstOrDefault() is ArgumentException argumentException &&
+            argumentException.Message.Contains("Process with an Id of"))
+        {
+            logger.LogWarning(e, "Ignoring unexpected Guild Wars crash");
+            return HandleResult.Handled;
+        }
+
+        if (e is ArgumentException argumentException2 &&
+            argumentException2.Message.Contains("Process with an Id of"))
+        {
+            logger.LogWarning(e, "Ignoring unexpected Guild Wars crash");
+            return HandleResult.Handled;
+        }
+
+        return HandleResult.Unhandled;
+    }
+        
+    private static void WriteCrashFiles(Exception e)
+    {
+        WriteCrashLog(e);
+        WriteCrashDump();
+    }
+
+    private static void WriteCrashLog(Exception? e)
+    {
+        File.WriteAllText(GetCrashFileName("log"), e?.ToString() ?? "NULL EXCEPTION");
+    }
+
     private static void WriteCrashDump()
     {
-        string dumpFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"crash-{DateTime.Now.ToOADate()}.dmp");
+        var dumpFilePath = GetCrashFileName("dmp");
         using var fs = new FileStream(dumpFilePath, FileMode.Create, FileAccess.Write);
         var process = Process.GetCurrentProcess();
         NativeMethods.MiniDumpWriteDump(process.Handle, process.Id, fs.SafeFileHandle, NativeMethods.MinidumpType.MiniDumpWithFullMemory, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
+    }
+
+    private static string GetCrashFileName(string extension)
+    {
+        var directoryPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Crashes");
+        var path = Path.Combine(directoryPath, $"crash-{DateTime.UtcNow.ToOADate()}.{extension}");
+        Directory.CreateDirectory(directoryPath);
+        return path;
     }
 }
