@@ -4,6 +4,9 @@ namespace Daybreak.Shared.Models.LaunchConfigurations;
 
 public sealed class LaunchConfiguration
 {
+    [JsonProperty(nameof(Name))]
+    public string? Name { get; set; }
+
     [JsonProperty(nameof(Identifier))]
     public string? Identifier { get; set; }
 

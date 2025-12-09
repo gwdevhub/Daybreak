@@ -15,7 +15,13 @@
                     {
                         <div class="spinner" />
                     }
-                    <span class="launch-text">@this.ViewModel.LaunchButtonText</span>
+                    <div class="launch-text-container">
+                        <span class="launch-text">@this.ViewModel.LaunchButtonText</span>
+                        @if (!string.IsNullOrEmpty(this.ViewModel.LaunchButtonSubtext))
+                        {
+                            <span class="launch-subtext">@this.ViewModel.LaunchButtonSubtext</span>
+                        }
+                    </div>
                 </div>
             </button>
             
@@ -36,7 +42,11 @@
                     <div class="dropdown-item @(config == ViewModel.SelectedConfiguration ? "selected" : "")"
                          @onclick="() => this.ViewModel.SelectConfiguration(config)">
                         <div class="config-info">
-                            <div class="config-name">@(config.Configuration?.Credentials?.Username ?? "Unknown User")</div>
+                            <div class="config-name">@(config.Configuration?.Name ?? config.Configuration?.Credentials?.Username ?? "Unknown User")</div>
+                            @if (!string.IsNullOrEmpty(config.Configuration?.ExecutablePath))
+                            {
+                                <div class="config-path">@config.Configuration.ExecutablePath</div>
+                            }
                         </div>
                     </div>
                 }

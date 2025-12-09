@@ -71,4 +71,10 @@ public sealed class LaunchConfigurationsViewModel(
         this.launchConfigurationService.DeleteConfiguration(configuration);
         this.LaunchConfigurations.Remove(configuration);
     }
+
+    public void CustomNameChanged(LaunchConfigurationWithCredentials configuration, string newName)
+    {
+        configuration.Name = newName;
+        this.launchConfigurationService.SaveConfiguration(configuration);
+    }
 }
