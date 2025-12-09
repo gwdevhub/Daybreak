@@ -235,7 +235,7 @@ internal sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptio
                     return;
                 }
 
-                if (propertyType == newValue?.GetType())
+                if (newValue is not null && propertyType.IsAssignableFrom(newValue.GetType()))
                 {
                     propertyInfo.SetValue(instance.Reference, newValue);
                     return;

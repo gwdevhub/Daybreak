@@ -5,7 +5,8 @@
     BaseLayerLuminance="@this.ViewModel.BaseLayerLuminace">
     <ErrorLoggingBoundary>
         <div class="app-container @(this.ViewModel.WindowState == WindowState.Maximized ? "maximized" : "")"
-             style="--backdrop-image: url('../@this.ViewModel.BackdropImage');
+             style="--backdrop-image: @this.ViewModel.BackdropImage;
+                    --backdrop-image-filter: @this.ViewModel.BackdropImageFilter;
                     --ui-scale: @(this.ViewModel.UIScale);
                     --font-size-xx-small: @(this.ViewModel.XXSmallFontSize)rem;
                     --font-size-x-small: @(this.ViewModel.XSmallFontSize)rem;
