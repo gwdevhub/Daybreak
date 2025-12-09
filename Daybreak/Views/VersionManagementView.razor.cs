@@ -11,7 +11,7 @@ public sealed class VersionManagementViewModel(
     : ViewModelBase<VersionManagementViewModel, VersionManagementView>
 {
     private const string VersionPlaceholder = "{VERSION}";
-    private const string ReleaseURL = $"https://github.com/AlexMacocian/Daybreak/releases/tag/{VersionPlaceholder}";
+    private const string ReleaseURL = $"https://github.com/AlexMacocian/Daybreak/releases/tag/v{VersionPlaceholder}";
     private readonly IViewManager viewManager = viewManager;
     private readonly IApplicationUpdater applicationUpdater = applicationUpdater;
 
