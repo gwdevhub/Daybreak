@@ -7,6 +7,7 @@ using System.Core.Extensions;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Extensions;
+using System.Extensions.Core;
 using System.Net.Http;
 using System.Net.NetworkInformation;
 
@@ -20,9 +21,7 @@ internal sealed class InternetCheckingService(
     private const string ConnectionVerificationLatency = "Connection verification latency";
     private const string ConnectionVerificationUnit = "ms";
     private const string ConnectionVerificationDescription = "Measure how long it takes to verify internet connectivity (in ms).";
-    private const string GoogleUrl = "https://google.com";
-    private const string BingUrl = "https://bing.com";
-    private const string GuildwarsUrl = "https://guildwars.com";
+    private const string GStaticUrl = "http://www.gstatic.com/generate_204";
 
     private readonly Histogram<double> connectionCheckingLatency = metricsService.ThrowIfNull().CreateHistogram<double>(ConnectionVerificationLatency, ConnectionVerificationUnit, ConnectionVerificationDescription, AggregationTypes.NoAggregate);
     private readonly IHttpClient<InternetCheckingService> httpClient = httpClient.ThrowIfNull();
@@ -39,38 +38,12 @@ internal sealed class InternetCheckingService(
             return InternetConnectionState.Unavailable;
         }
 
-        var queryTasks = new Task<bool>[]
-        {
-            this.UrlAvailable(GoogleUrl),
-            this.UrlAvailable(BingUrl),
-            this.UrlAvailable(GuildwarsUrl),
-        };
-
-        var googleQueryResult = await queryTasks[0];
-        var bingQueryResult = await queryTasks[1];
-        var guildwarsQueryResult = await queryTasks[2];
-
-        if (googleQueryResult && bingQueryResult && guildwarsQueryResult)
+        var gstaticQuery = await this.UrlAvailable(GStaticUrl);
+        if (gstaticQuery)
         {
             this.logger.LogDebug("Connection is available");
             this.connectionCheckingLatency.Record(sw.ElapsedMilliseconds);
             return InternetConnectionState.Available;
-        }
-
-        if (googleQueryResult || bingQueryResult)
-        {
-            if (guildwarsQueryResult)
-            {
-                this.logger.LogWarning($"Partial outage detected. {GuildwarsUrl} is available");
-                this.connectionCheckingLatency.Record(sw.ElapsedMilliseconds);
-                return InternetConnectionState.PartialOutage;
-            }
-            else
-            {
-                this.logger.LogError($"Partial outage detected. {GuildwarsUrl} is unavailable");
-                this.connectionCheckingLatency.Record(sw.ElapsedMilliseconds);
-                return InternetConnectionState.GuildwarsOutage;
-            }
         }
 
         this.logger.LogError($"Outage detected. Internet is unavailable");
@@ -80,7 +53,8 @@ internal sealed class InternetCheckingService(
 
     private async Task<bool> UrlAvailable(string url)
     {
-        this.logger.LogDebug($"Verifying connection to {url}");
+        var scopedLogger = this.logger.CreateScopedLogger();
+        scopedLogger.LogDebug($"Verifying connection to {url}");
         try
         {
             _ = await this.httpClient.GetAsync(GoogleUrl);
@@ -88,7 +62,7 @@ internal sealed class InternetCheckingService(
         }
         catch
         {
-            this.logger.LogWarning($"Failed to verify connection to {url}");
+            scopedLogger.LogWarning($"Failed to verify connection to {url}");
             return false;
         }
     }
