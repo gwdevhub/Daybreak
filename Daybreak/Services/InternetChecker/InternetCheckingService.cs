@@ -57,7 +57,7 @@ internal sealed class InternetCheckingService(
         scopedLogger.LogDebug($"Verifying connection to {url}");
         try
         {
-            _ = await this.httpClient.GetAsync(GoogleUrl);
+            _ = await this.httpClient.GetAsync(url);
             return true;
         }
         catch
