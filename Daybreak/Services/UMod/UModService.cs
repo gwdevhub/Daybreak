@@ -235,7 +235,8 @@ internal sealed class UModService(
         var latestRelease = releasesList?
             .Select(t => t.Ref?.Replace("refs/tags/", ""))
             .OfType<string>()
-            .LastOrDefault();
+            .LastOrDefault()?
+            .TrimStart('v');
 
         if (!Version.TryParse(latestRelease ?? string.Empty, out var latestVersion))
         {
