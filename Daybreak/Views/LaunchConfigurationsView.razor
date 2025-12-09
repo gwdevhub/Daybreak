@@ -29,6 +29,21 @@
                             </FluentTextField>
                         </div>
                     </div>
+                    <div class="launch-config-name">
+                        <div class="launch-config-name-label">
+                            <FluentLabel>Name</FluentLabel>
+                        </div>
+                        <div class="launch-config-name-field">
+                            <FluentTextField Value="@config.Name"
+                                             ValueChanged="@((newValue) => this.ViewModel.CustomNameChanged(config, newValue))"
+                                             Spellcheck="false"
+                                             Immediate="true"
+                                             ImmediateDelay="500"
+                                             InputMode="InputMode.Text"
+                                             AutoComplete="false"
+                                             Placeholder="Custom name" />
+                        </div>
+                    </div>
                     <div class="launch-config-executable">
                         <div class="launch-config-executable-label">
                             <FluentLabel>Executable</FluentLabel>

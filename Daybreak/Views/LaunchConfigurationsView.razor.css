@@ -40,6 +40,7 @@
 .launch-config-identifier,
 .launch-config-executable,
 .launch-config-credentials,
+.launch-config-name,
 .launch-config-args {
     display: flex;
     flex-direction: row;
@@ -52,6 +53,7 @@
 .launch-config-identifier-label,
 .launch-config-executable-label,
 .launch-config-credentials-label,
+.launch-config-name-label,
 .launch-config-args-label {
     width: 250px;
 }
@@ -59,6 +61,7 @@
 .launch-config-identifier-field,
 .launch-config-executable-field,
 .launch-config-credentials-field,
+.launch-config-name-field,
 .launch-config-args-field {
     width: 50%;
 }
@@ -67,6 +70,7 @@
 .launch-config-identifier-label ::deep *,
 .launch-config-executable-label ::deep *,
 .launch-config-credentials-label ::deep *,
+.launch-config-name-label ::deep *,
 .launch-config-args-label ::deep * {
     font-size: var(--font-size-large) !important;
 }
@@ -74,6 +78,7 @@
 .launch-config-identifier-field ::deep fluent-text-field,
 .launch-config-executable-field ::deep fluent-text-field,
 .launch-config-credentials-field ::deep fluent-text-field,
+.launch-config-name-field ::deep fluent-text-field,
 .launch-config-args-field ::deep fluent-text-field {
     width: 100%;
     box-sizing: border-box !important;
@@ -83,6 +88,7 @@
 .launch-config-identifier-field ::deep fluent-select,
 .launch-config-executable-field ::deep fluent-select,
 .launch-config-credentials-field ::deep fluent-select,
+.launch-config-name-field ::deep fluent-select,
 .launch-config-args-field ::deep fluent-select {
     width: 100%;
     box-sizing: border-box !important;

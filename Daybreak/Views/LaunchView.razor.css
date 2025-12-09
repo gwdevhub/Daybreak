@@ -59,6 +59,17 @@
     color: var(--foreground-on-accent-rest)
 }
 
+.launch-text-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.launch-subtext {
+    font-size: var(--font-size-small);
+}
+
 .dropdown-toggle-button {
     padding: 1rem 0.75rem;
     border: none;
@@ -134,6 +145,12 @@
 .config-name {
     font-weight: 600;
     font-size: var(--font-size-large);
+    color: var(--accent-foreground-rest);
+    margin-bottom: 0.25rem;
+}
+
+.config-path {
+    font-size: var(--font-size-small);
     color: var(--accent-foreground-rest);
     margin-bottom: 0.25rem;
 }

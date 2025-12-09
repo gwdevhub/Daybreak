@@ -108,6 +108,8 @@ public sealed class LaunchViewModel : ViewModelBase<LaunchViewModel, LaunchView>
     
     public string LaunchButtonText => this.GetLaunchButtonText();
 
+    public string LaunchButtonSubtext => this.GetLaunchButtonSubtext();
+
     public override ValueTask ParametersSet(LaunchView view, CancellationToken cancellationToken)
     {
         if (!this.IsOnboarded())
@@ -306,7 +308,9 @@ public sealed class LaunchViewModel : ViewModelBase<LaunchViewModel, LaunchView>
 
     private string GetLaunchButtonText()
     {
-        var configName = this.SelectedConfiguration?.Configuration?.Credentials?.Username ?? "Guild Wars";
+        var configName = this.SelectedConfiguration?.Configuration?.Name ??
+            this.SelectedConfiguration?.Configuration?.Credentials?.Username ??
+            "Guild Wars";
         if (this.IsLaunching)
         {
             return "Launching...";
@@ -323,6 +327,22 @@ public sealed class LaunchViewModel : ViewModelBase<LaunchViewModel, LaunchView>
         }
 
         return $"Launch {configName}";
+    }
+
+    private string GetLaunchButtonSubtext()
+    {
+        var configName = this.SelectedConfiguration?.Configuration?.Name;
+        if (this.IsLaunching)
+        {
+            return string.Empty;
+        }
+
+        if (configName is not null)
+        {
+            return string.Empty;
+        }
+
+        return this.SelectedConfiguration?.Configuration?.ExecutablePath ?? string.Empty;
     }
 
     private void KillGuildWars()
