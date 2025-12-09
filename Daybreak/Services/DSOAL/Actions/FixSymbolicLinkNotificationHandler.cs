@@ -6,6 +6,7 @@ using System.Core.Extensions;
 
 namespace Daybreak.Services.DSOAL.Actions;
 
+//TODO: Remove once DSOAL is removed
 public sealed class FixSymbolicLinkNotificationHandler(
     IPrivilegeManager privilegeManager) : INotificationHandler
 {

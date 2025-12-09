@@ -54,7 +54,7 @@ internal sealed class DSOALService(
     private readonly ILogger<DSOALService> logger = logger.ThrowIfNull();
 
     public string Name => "DSOAL";
-    public string Description => "3D Positional Audio and EAX Effects";
+    public string Description => "[DEPRECATED] 3D Positional Audio and EAX Effects. [Included by default since Reforged]";
     public bool IsVisible => true;
     public bool CanCustomManage => false;
     public bool IsEnabled
