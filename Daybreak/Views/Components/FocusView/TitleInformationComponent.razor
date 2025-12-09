@@ -1,6 +1,6 @@
-﻿<div class="container backdrop-panel">
-    @if (this.Context is not null)
-    {
+﻿@if (this.Context is not null)
+{
+    <div class="container backdrop-panel">
         <div class="title-track-container">
             <div class="title-label">
                 Title Track
@@ -18,12 +18,8 @@
                 </div>
             </div>
         </div>
-    }
-    else
-    {
-        <SpinnerWidget IsLoading="true" />
-    }
-</div>
+    </div>
+}
 
 @code {
     [Parameter]
