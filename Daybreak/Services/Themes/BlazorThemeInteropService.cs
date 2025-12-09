@@ -32,7 +32,7 @@ public class BlazorThemeInteropService(
     private readonly IOptionsUpdateHook optionsUpdateHook = optionsUpdateHook;
     private readonly ILogger<BlazorThemeInteropService> logger = logger;
 
-    public event EventHandler? ThemeChanged;
+    public event EventHandler<Theme>? ThemeChanged;
 
     public bool IsLightMode { get; private set; }
     public AccentColor AccentBaseColor { get; private set; } = AccentColor.Blue;
@@ -49,7 +49,7 @@ public class BlazorThemeInteropService(
     public double LargeFontSize { get; private set; } = LargeFontSizeValue;
     public double XLargeFontSize { get; private set; } = XLargeFontSizeValue;
     public double XXLargeFontSize { get; private set; } = XXLargeFontSizeValue;
-
+    public Theme? CurrentTheme { get; private set; }
 
     public void OnStartup()
     {
@@ -66,6 +66,11 @@ public class BlazorThemeInteropService(
         Theme.Themes.Add(theme);
     }
 
+    public void ReapplyTheme()
+    {
+        this.OnThemeUpdated();
+    }
+
     private void OnThemeUpdated()
     {
         var themeOptions = this.themeOptions.Value;
@@ -77,6 +82,7 @@ public class BlazorThemeInteropService(
 
         var backgroundColor = lightMode ? BackgroundColor.Gray40 : BackgroundColor.Gray210;
         var baseLayerLuminance = lightMode ? 0.98f : 0.23f;
+        this.CurrentTheme = theme;
         this.BackdropImage = theme.Backdrop;
         this.IsLightMode = lightMode;
         this.AccentBaseColor = accentColor;
@@ -92,7 +98,7 @@ public class BlazorThemeInteropService(
         this.LargeFontSize = LargeFontSizeValue * this.UIScale;
         this.XLargeFontSize = XLargeFontSizeValue * this.UIScale;
         this.XXLargeFontSize = XXLargeFontSizeValue * this.UIScale;
-        this.ThemeChanged?.Invoke(this, EventArgs.Empty);
+        this.ThemeChanged?.Invoke(this, theme);
     }
 
     /*

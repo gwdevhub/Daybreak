@@ -1,9 +1,11 @@
-﻿using Daybreak.Shared.Models.ColorPalette;
+﻿using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.ColorPalette;
 
 namespace Daybreak.Shared.Services.Themes;
 public interface IThemeManager
 {
-    event EventHandler? ThemeChanged;
+    event EventHandler<Theme>? ThemeChanged;
+    Theme? CurrentTheme { get; }
     bool IsLightMode { get; }
     AccentColor AccentBaseColor { get; }
     BackgroundColor NeutralBaseColor { get; }
@@ -19,4 +21,5 @@ public interface IThemeManager
     double LargeFontSize { get; }
     double XLargeFontSize { get; }
     double XXLargeFontSize { get; }
+    void ReapplyTheme();
 }

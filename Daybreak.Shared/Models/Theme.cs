@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace Daybreak.Shared.Models;
 [JsonConverter(typeof(ThemeJsonConverter))]
-public sealed class Theme(string name, AccentColor accentColor, string backdrop, Theme.LightDarkMode mode)
+public class Theme(string name, AccentColor accentColor, string backdrop, Theme.LightDarkMode mode, string filter)
 {
     public enum LightDarkMode
     {
@@ -14,9 +14,10 @@ public sealed class Theme(string name, AccentColor accentColor, string backdrop,
     }
 
     public string Name { get; init; } = name;
-    public AccentColor AccentColor { get; init; } = accentColor;
-    public string Backdrop { get; init; } = backdrop;
-    public LightDarkMode Mode { get; init; } = mode;
+    public AccentColor AccentColor { get; internal set; } = accentColor;
+    public string Backdrop { get; internal set; } = backdrop;
+    public LightDarkMode Mode { get; internal set; } = mode;
+    public string Filter { get; internal set; } = filter;
 
     public static readonly List<Theme> Themes =
     [

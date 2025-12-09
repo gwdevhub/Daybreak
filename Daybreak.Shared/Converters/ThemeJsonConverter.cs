@@ -1,4 +1,5 @@
 ﻿using Daybreak.Shared.Models;
+using Daybreak.Shared.Services.Themes;
 using Newtonsoft.Json;
 
 namespace Daybreak.Shared.Converters;
@@ -11,6 +12,11 @@ public sealed class ThemeJsonConverter : JsonConverter<Theme>
             var themeName = reader.Value?.ToString();
             if (themeName is not null)
             {
+                if (themeName is GameScreenshotsTheme.ThemeName)
+                {
+                    return Theme.Themes.FirstOrDefault(t => t is GameScreenshotsTheme);
+                }
+
                 return Theme.Themes.FirstOrDefault(t => t.Name.Equals(themeName, StringComparison.OrdinalIgnoreCase));
             }
         }
