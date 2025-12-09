@@ -100,9 +100,9 @@ internal sealed class ToolboxService(
 
     public Task OnGuildWarsStartingDisabled(GuildWarsStartingDisabledContext guildWarsStartingDisabledContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken) => this.LaunchToolbox(guildWarsCreatedContext.ApplicationLauncherContext.Process, cancellationToken);
+    public Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken) => Task.CompletedTask;
+    public Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken) => this.LaunchToolbox(guildWarsStartedContext.ApplicationLauncherContext.Process, cancellationToken);
 
     public IEnumerable<string> GetCustomArguments() => [];
 
