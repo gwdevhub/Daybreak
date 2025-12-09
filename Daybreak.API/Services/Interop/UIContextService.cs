@@ -1,7 +1,6 @@
 ﻿using Daybreak.API.Interop;
 using Daybreak.API.Interop.GuildWars;
 using Daybreak.API.Models;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using System.Core.Extensions;
 using System.Extensions.Core;
 using System.Runtime.InteropServices;
