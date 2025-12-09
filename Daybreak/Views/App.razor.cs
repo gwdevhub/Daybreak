@@ -58,6 +58,7 @@ public sealed class AppViewModel
     public string NeutralBaseColor { get; set; } = string.Empty;
     public float BaseLayerLuminace { get; set; } = 0.0f;
     public string BackdropImage { get; set; } = string.Empty;
+    public string BackdropImageFilter { get; set; } = string.Empty;
 
     public double UIScale { get; set; }
     public double XXSmallFontSize { get; set; }
@@ -262,10 +263,10 @@ public sealed class AppViewModel
 
     private void OnThemeChange()
     {
+        this.BackdropImage = this.GetBackdropImageUrl(this.themeManager.BackdropImage);
         this.BaseLayerLuminace = this.themeManager.BaseLayerLuminance;
         this.AccentBaseColor = this.themeManager.AccentBaseColorHex;
         this.NeutralBaseColor = this.themeManager.NeutralBaseColorHex;
-        this.BackdropImage = this.themeManager.BackdropImage;
         this.XXSmallFontSize = this.themeManager.XXSmallFontSize;
         this.XSmallFontSize = this.themeManager.XSmallFontSize;
         this.SmallFontSize = this.themeManager.SmallFontSize;
@@ -274,6 +275,7 @@ public sealed class AppViewModel
         this.XLargeFontSize = this.themeManager.XLargeFontSize;
         this.XXLargeFontSize = this.themeManager.XXLargeFontSize;
         this.UIScale = this.themeManager.UIScale;
+        this.BackdropImageFilter = this.themeManager.CurrentTheme?.Filter ?? string.Empty;
         this.RedrawRequested?.Invoke(this, EventArgs.Empty);
     }
 
@@ -301,5 +303,60 @@ public sealed class AppViewModel
     private void MainWindow_StateChanged(object? sender, EventArgs e)
     {
         this.WindowStateChanged?.Invoke(this, this.WindowState);
+    }
+
+    private string GetBackdropImageUrl(string backdropPath)
+    {
+        if (string.IsNullOrWhiteSpace(backdropPath))
+        {
+            return string.Empty;
+        }
+
+        // Relative paths are served from wwwroot
+        if (!Path.IsPathRooted(backdropPath))
+        {
+            var normalizedPath = backdropPath.Replace('\\', '/');
+            if (!normalizedPath.StartsWith('/'))
+            {
+                normalizedPath = "/" + normalizedPath;
+            }
+
+            return $"url('{normalizedPath}')";
+        }
+
+        // Absolute paths need to be embedded as base64
+        return this.ConvertImageToBase64DataUri(backdropPath);
+    }
+
+    private string ConvertImageToBase64DataUri(string filePath)
+    {
+        try
+        {
+            if (!File.Exists(filePath))
+            {
+                this.logger.LogWarning("Backdrop file does not exist: {FilePath}", filePath);
+                return string.Empty;
+            }
+
+            var extension = Path.GetExtension(filePath).ToLowerInvariant();
+            var mimeType = extension switch
+            {
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                ".gif" => "image/gif",
+                ".bmp" => "image/bmp",
+                ".webp" => "image/webp",
+                _ => "image/jpeg"
+            };
+
+            var imageBytes = File.ReadAllBytes(filePath);
+            var base64 = Convert.ToBase64String(imageBytes);
+            return $"url('data:{mimeType};base64,{base64}')";
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, "Failed to convert image to base64: {FilePath}", filePath);
+            return string.Empty;
+        }
     }
 }

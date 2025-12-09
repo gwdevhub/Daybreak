@@ -117,6 +117,8 @@ using Daybreak.Services.TradeChat.Models;
 using Daybreak.Views.Installation;
 using Daybreak.Views.Copy;
 using Daybreak.Views.Mods;
+using Daybreak.Shared.Services.Screenshots;
+using Daybreak.Services.Screenshots;
 
 namespace Daybreak.Configuration;
 
@@ -264,6 +266,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<PrivilegeContext>();
         services.AddSingleton<ViewRedirectContext>();
         services.AddSingleton<JSConsoleInterop>();
+        services.AddSingleton<GameScreenshotsTheme>();
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
         services.AddScoped<IApplicationUpdater, ApplicationUpdater>();
@@ -294,6 +297,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IWikiService, WikiService>();
         services.AddScoped<IPrivilegeManager, PrivilegeManager>();
         services.AddScoped<IGraphClient, BlazorGraphClient>();
+        services.AddScoped<IScreenshotService, ScreenshotService>();
     }
 
     public override void RegisterViews(IViewProducer viewProducer)
@@ -454,7 +458,7 @@ public class ProjectConfiguration : PluginConfigurationBase
     public override void RegisterThemes(IThemeProducer themeProducer)
     {
         themeProducer.ThrowIfNull();
-        foreach(var theme in CoreThemes.Themes)
+        foreach (var theme in CoreThemes.Themes)
         {
             themeProducer.RegisterTheme(theme);
         }

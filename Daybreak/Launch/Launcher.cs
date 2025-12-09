@@ -166,6 +166,11 @@ public sealed class Launcher : BlazorHybridApplication<App>
         await Task.Delay(10);
 
         startupContext.ProgressUpdate = ProgressLoadThemes;
+
+        // TODO: This is pretty hacky so it should be reworked
+        var gameScreenshotsTheme = this.ServiceProvider.GetRequiredService<GameScreenshotsTheme>();
+        themeProducer.RegisterTheme(gameScreenshotsTheme);
+
         this.projectConfiguration.RegisterThemes(themeProducer);
         await Task.Delay(10);
 
@@ -257,22 +262,5 @@ public sealed class Launcher : BlazorHybridApplication<App>
         {
             Console.WriteLine("Failed to enable virtual terminal processing");
         }
-    }
-
-    private static string GetContentType(string path)
-    {
-        return Path.GetExtension(path).ToLowerInvariant() switch
-        {
-            ".html" => "text/html",
-            ".css" => "text/css",
-            ".js" => "application/javascript",
-            ".json" => "application/json",
-            ".png" => "image/png",
-            ".jpg" or ".jpeg" => "image/jpeg",
-            ".svg" => "image/svg+xml",
-            ".woff" => "font/woff",
-            ".woff2" => "font/woff2",
-            _ => "application/octet-stream"
-        };
     }
 }

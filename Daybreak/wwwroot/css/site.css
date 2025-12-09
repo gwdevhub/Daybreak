@@ -34,6 +34,7 @@ html, body {
         background-position: center;
         background-repeat: no-repeat;
         background-attachment: fixed;
+        filter: var(--backdrop-image-filter);
         z-index: -1;
     }
 
