@@ -99,6 +99,7 @@ internal sealed class LaunchConfigurationService(
         if (configs.FirstOrDefault(c => c.Identifier == launchConfigurationWithCredentials.Identifier) is 
             LaunchConfiguration config)
         {
+            config.Name = launchConfigurationWithCredentials.Name;
             config.Identifier = launchConfigurationWithCredentials.Identifier;
             config.CredentialsIdentifier = launchConfigurationWithCredentials.Credentials?.Identifier;
             config.Executable = launchConfigurationWithCredentials.ExecutablePath;
@@ -110,6 +111,7 @@ internal sealed class LaunchConfigurationService(
 
         configs.Add(new LaunchConfiguration
         {
+            Name = launchConfigurationWithCredentials.Name,
             CredentialsIdentifier = launchConfigurationWithCredentials.Credentials?.Identifier,
             Executable = launchConfigurationWithCredentials.ExecutablePath,
             Identifier = launchConfigurationWithCredentials.Identifier,
@@ -138,7 +140,8 @@ internal sealed class LaunchConfigurationService(
             Identifier = launchConfiguration.Identifier,
             Credentials = credentials,
             ExecutablePath = launchConfiguration.Executable,
-            Arguments = launchConfiguration.Arguments
+            Arguments = launchConfiguration.Arguments,
+            Name = launchConfiguration.Name
         };
     }
 }
