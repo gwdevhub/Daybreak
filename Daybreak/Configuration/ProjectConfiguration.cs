@@ -37,10 +37,8 @@ using Daybreak.Services.Notifications;
 using Daybreak.Services.InternetChecker;
 using Daybreak.Services.Sounds;
 using Daybreak.Services.TradeChat.Notifications;
-using Daybreak.Services.DSOAL;
 using Daybreak.Services.Mods;
 using Daybreak.Services.Registry;
-using Daybreak.Services.DSOAL.Actions;
 using Daybreak.Services.Events;
 using Daybreak.Services.Plugins;
 using Daybreak.Services.Toolbox.Utilities;
@@ -72,7 +70,6 @@ using Daybreak.Shared.Services.Credentials;
 using Daybreak.Shared.Services.Onboarding;
 using Daybreak.Shared.Services.Sounds;
 using Daybreak.Shared.Services.BuildTemplates;
-using Daybreak.Shared.Services.DSOAL;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.SevenZip;
 using Daybreak.Shared.Services.DirectSong;
@@ -97,8 +94,6 @@ using Daybreak.Shared.Services.Api;
 using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Services.Downloads;
 using Daybreak.Shared.Models;
-using Daybreak.Shared.Services.DXVK;
-using Daybreak.Services.DXVK;
 using Daybreak.Shared.Services.MDns;
 using Daybreak.Services.MDns;
 using OpenTelemetry.Resources;
@@ -350,7 +345,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         startupActionProducer.RegisterAction<RestoreWindowPositionStartupAction>();
         startupActionProducer.RegisterAction<EnsureDatabaseTablesExist>();
         startupActionProducer.RegisterAction<RenameInstallerAction>();
-        //startupActionProducer.RegisterAction<FixSymbolicLinkStartupAction>();
         startupActionProducer.RegisterAction<UpdateUModAction>();
         startupActionProducer.RegisterAction<CredentialsOptionsMigrator>();
         startupActionProducer.RegisterAction<CleanupDatabases>();
@@ -402,7 +396,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         notificationHandlerProducer.RegisterNotificationHandler<NoActionHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<MessageBoxHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<TradeMessageNotificationHandler>();
-        //notificationHandlerProducer.RegisterNotificationHandler<FixSymbolicLinkNotificationHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<UpdateNotificationHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<ReShadeConfigChangedHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<NavigateToCalendarViewHandler>();
@@ -418,8 +411,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         modsManager.RegisterMod<IToolboxService, ToolboxService>();
         modsManager.RegisterMod<IReShadeService, ReShadeService>();
         modsManager.RegisterMod<IUModService, UModService>();
-        //modsManager.RegisterMod<IDSOALService, DSOALService>();
-        //modsManager.RegisterMod<IDXVKService, DXVKService>();
         modsManager.RegisterMod<IGuildwarsScreenPlacer, GuildwarsScreenPlacer>();
         modsManager.RegisterMod<IDirectSongService, DirectSongService>(singleton: true);
     }
@@ -512,10 +503,6 @@ public class ProjectConfiguration : PluginConfigurationBase
                 .Build()
             .RegisterHttpClient<UModService>()
                 .WithMessageHandler(SetupLoggingAndMetrics<UModService>)
-                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
-                .Build()
-            .RegisterHttpClient<DXVKService>()
-                .WithMessageHandler(SetupLoggingAndMetrics<DXVKService>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<ScopedApiContext>()

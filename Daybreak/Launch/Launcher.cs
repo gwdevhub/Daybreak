@@ -24,7 +24,6 @@ using Microsoft.Web.WebView2.Core;
 using Slim;
 using Slim.Integration.ServiceCollection;
 using System.Core.Extensions;
-using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
