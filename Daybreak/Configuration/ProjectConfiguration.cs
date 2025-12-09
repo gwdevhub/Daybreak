@@ -350,7 +350,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         startupActionProducer.RegisterAction<RestoreWindowPositionStartupAction>();
         startupActionProducer.RegisterAction<EnsureDatabaseTablesExist>();
         startupActionProducer.RegisterAction<RenameInstallerAction>();
-        startupActionProducer.RegisterAction<FixSymbolicLinkStartupAction>();
+        //startupActionProducer.RegisterAction<FixSymbolicLinkStartupAction>();
         startupActionProducer.RegisterAction<UpdateUModAction>();
         startupActionProducer.RegisterAction<CredentialsOptionsMigrator>();
         startupActionProducer.RegisterAction<CleanupDatabases>();
@@ -402,7 +402,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         notificationHandlerProducer.RegisterNotificationHandler<NoActionHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<MessageBoxHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<TradeMessageNotificationHandler>();
-        notificationHandlerProducer.RegisterNotificationHandler<FixSymbolicLinkNotificationHandler>();
+        //notificationHandlerProducer.RegisterNotificationHandler<FixSymbolicLinkNotificationHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<UpdateNotificationHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<ReShadeConfigChangedHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<NavigateToCalendarViewHandler>();
@@ -418,8 +418,8 @@ public class ProjectConfiguration : PluginConfigurationBase
         modsManager.RegisterMod<IToolboxService, ToolboxService>();
         modsManager.RegisterMod<IReShadeService, ReShadeService>();
         modsManager.RegisterMod<IUModService, UModService>();
-        modsManager.RegisterMod<IDSOALService, DSOALService>();
-        modsManager.RegisterMod<IDXVKService, DXVKService>();
+        //modsManager.RegisterMod<IDSOALService, DSOALService>();
+        //modsManager.RegisterMod<IDXVKService, DXVKService>();
         modsManager.RegisterMod<IGuildwarsScreenPlacer, GuildwarsScreenPlacer>();
         modsManager.RegisterMod<IDirectSongService, DirectSongService>(singleton: true);
     }

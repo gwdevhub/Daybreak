@@ -49,7 +49,7 @@ internal sealed class DXVKService(
     private readonly ILogger<DXVKService> logger = logger.ThrowIfNull();
 
     public string Name => "DXVK";
-    public string Description => "Translation layer which converts DX9 3D calls to Vulkan. Can improve performance for some users";
+    public string Description => "[DEPRECATED] Translation layer which converts DX9 3D calls to Vulkan. Can improve performance for some users. [No longer works with Reforged]";
     public bool IsVisible => true;
     public bool CanCustomManage => false;
     public bool IsEnabled
