@@ -20,6 +20,7 @@ namespace Daybreak.API.Services;
 
 public sealed class MainPlayerService : IDisposable
 {
+    private readonly ChatService chatService;
     private readonly InstanceContextService instanceContextService;
     private readonly IBuildTemplateManager buildTemplateManager;
     private readonly SkillbarContextService skillbarContextService;
@@ -39,6 +40,7 @@ public sealed class MainPlayerService : IDisposable
     private DateTimeOffset lastFrequencyUpdate = DateTimeOffset.MinValue;
 
     public MainPlayerService(
+        ChatService chatService,
         InstanceContextService instanceContextService,
         IBuildTemplateManager buildTemplateManager,
         SkillbarContextService skillbarContextService,
@@ -47,6 +49,7 @@ public sealed class MainPlayerService : IDisposable
         GameThreadService gameThreadService,
         ILogger<MainPlayerService> logger)
     {
+        this.chatService = chatService.ThrowIfNull();
         this.instanceContextService = instanceContextService.ThrowIfNull();
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
         this.skillbarContextService = skillbarContextService.ThrowIfNull();
@@ -62,17 +65,17 @@ public sealed class MainPlayerService : IDisposable
         this.callbackRegistration?.Dispose();
     }
 
-    public Task<bool> SetCurrentBuild(string buildCode, CancellationToken cancellationToken)
+    public async Task<bool> SetCurrentBuild(string buildCode, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         if (!this.buildTemplateManager.TryDecodeTemplate(buildCode, out var build) ||
             build is not SingleBuildEntry singleBuild)
         {
             scopedLogger.LogError("Failed to decode build template from code {buildCode}", buildCode);
-            return Task.FromResult(false);
+            return false;
         }
 
-        return this.gameThreadService.QueueOnGameThread(() =>
+        var result = await this.gameThreadService.QueueOnGameThread(() =>
         {
             unsafe
             {
@@ -165,6 +168,17 @@ public sealed class MainPlayerService : IDisposable
                 return true;
             }
         }, cancellationToken);
+
+        if (result)
+        {
+            await this.chatService.AddMessageAsync("Build applied successfully.", "Daybreak.API", Channel.Moderator, cancellationToken);
+        }
+        else
+        {
+            await this.chatService.AddMessageAsync("Failed to apply build.", "Daybreak.API", Channel.Moderator, cancellationToken);
+        }
+
+        return result;
     }
 
     public Task<BuildEntry?> GetCurrentBuild(CancellationToken cancellationToken)

@@ -9,13 +9,13 @@ using Daybreak.Shared.Services.BuildTemplates;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
-using System.Windows.Controls;
 using ZLinq;
 using InstanceType = Daybreak.API.Interop.GuildWars.InstanceType;
 
 namespace Daybreak.API.Services;
 
 public sealed class PartyService(
+    ChatService chatService,
     IBuildTemplateManager buildTemplateManager,
     UIService uiService,
     UIContextService uIContextService,
@@ -28,6 +28,7 @@ public sealed class PartyService(
 {
     private static readonly TimeSpan HeroSpawnDelay = TimeSpan.FromSeconds(1);
 
+    private readonly ChatService chatService = chatService.ThrowIfNull();
     private readonly IBuildTemplateManager buildTemplateManager = buildTemplateManager.ThrowIfNull();
     private readonly UIService uiService = uiService.ThrowIfNull();
     private readonly UIContextService uIContextService = uIContextService.ThrowIfNull();
@@ -45,18 +46,21 @@ public sealed class PartyService(
         if (!await this.IsInValidOutpost(cancellationToken))
         {
             scopedLogger.LogError("Could not set party loadout. Not in a valid outpost");
+            await this.chatService.AddMessageAsync("Cannot set party loadout. Not in a valid outpost.", "Daybreak.API", Channel.Moderator, cancellationToken);
             return false;
         }
 
         if (!await this.KickAllHeroes(cancellationToken))
         {
             scopedLogger.LogError("Could not set party loadout. Could not leave party");
+            await this.chatService.AddMessageAsync("Cannot set party loadout. Could not leave party.", "Daybreak.API", Channel.Moderator, cancellationToken);
             return false;
         }
 
         if (!await this.gameThreadService.QueueOnGameThread(() => this.SpawnHeroes(partyLoadout), cancellationToken))
         {
             scopedLogger.LogError("Could not set party loadout. Could not spawn heroes");
+            await this.chatService.AddMessageAsync("Cannot set party loadout. Could not spawn heroes.", "Daybreak.API", Channel.Moderator, cancellationToken);
             return false;
         }
 
@@ -65,6 +69,7 @@ public sealed class PartyService(
         if (!await this.gameThreadService.QueueOnGameThread(() => this.ApplyBuilds(partyLoadout), cancellationToken))
         {
             scopedLogger.LogError("Could not set party loadout. Could not apply builds");
+            await this.chatService.AddMessageAsync("Cannot set party loadout. Could not apply builds.", "Daybreak.API", Channel.Moderator, cancellationToken);
             return false;
         }
 
@@ -75,9 +80,11 @@ public sealed class PartyService(
         //    if (!await this.SetHeroBehavior(heroBehaviorEntry.AgentId, heroBehaviorEntry.Behavior, cancellationToken))
         //    {
         //        scopedLogger.LogWarning("Could not set hero behavior for agent {agentId} to {behavior}", heroBehaviorEntry.AgentId, heroBehaviorEntry.Behavior);
+        //        await this.chatService.AddMessageAsync($"Cannot set party loadout. Could not set behavior {behavior} for agent {agentId}.", "Daybreak.API", Channel.Moderator, cancellationToken);
         //    }
         //}
 
+        await this.chatService.AddMessageAsync("Party loadout set.", "Daybreak.API", Channel.Moderator, cancellationToken);
         return true;
     }
 
