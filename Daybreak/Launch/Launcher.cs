@@ -137,44 +137,7 @@ public sealed class Launcher : BlazorHybridApplication<App>
     {
         e.WebView.CoreWebView2.ProcessFailed += this.CoreWebView2_ProcessFailed;
         Global.CoreWebView2 = e.WebView.CoreWebView2;
-
-        e.WebView.CoreWebView2.AddWebResourceRequestedFilter("*", CoreWebView2WebResourceContext.All);
-        e.WebView.CoreWebView2.WebResourceRequested += this.CoreWebView2_WebResourceRequested;
-
         base.Host_BlazorWebViewInitialized(e);
-    }
-
-    private void CoreWebView2_WebResourceRequested(object? sender, CoreWebView2WebResourceRequestedEventArgs e)
-    {
-        if (sender is not CoreWebView2 webView)
-        {
-            return;
-        }
-
-        var uri = new Uri(e.Request.Uri);
-
-        // Only handle requests for our embedded resources
-        if (!uri.Host.Equals("0.0.0.1", StringComparison.OrdinalIgnoreCase))
-        {
-            return;
-        }
-
-        // Convert URI path to embedded resource name
-        var resourcePath = uri.AbsolutePath.TrimStart('/');
-        var resourceName = $"Daybreak.wwwroot.{resourcePath.Replace('/', '.')}";
-
-        var assembly = typeof(Launcher).Assembly;
-        var stream = assembly.GetManifestResourceStream(resourceName);
-
-        if (stream is not null)
-        {
-            var contentType = GetContentType(resourcePath);
-            e.Response = webView.Environment.CreateWebResourceResponse(
-                stream,
-                200,
-                "OK",
-                $"Content-Type: {contentType}");
-        }
     }
 
     private void CoreWebView2_ProcessFailed(object? sender, CoreWebView2ProcessFailedEventArgs e)
@@ -294,21 +257,6 @@ public sealed class Launcher : BlazorHybridApplication<App>
         if (!NativeMethods.SetConsoleMode(handle, mode | NativeMethods.ENABLE_VIRTUAL_TERMINAL_PROCESSING | NativeMethods.ENABLE_PROCESSED_OUTPUT))
         {
             Console.WriteLine("Failed to enable virtual terminal processing");
-        }
-    }
-
-    internal sealed class BindingErrorTraceListener(ILogger logger) : TraceListener
-    {
-        private readonly ILogger logger = logger;
-
-        public override void Write(string? message)
-        {
-            this.logger.LogWarning("WPF Binding error: {bindingMessage}", message);
-        }
-
-        public override void WriteLine(string? message)
-        {
-            this.logger.LogWarning("WPF Binding error: {bindingMessage}", message);
         }
     }
 

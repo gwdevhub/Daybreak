@@ -12,8 +12,10 @@ using OpenTelemetry.Trace;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Net.Http;
 using System.Windows.Extensions.Services;
+using TrailBlazr.Services;
 
 namespace Daybreak.Services.Telemetry;
 internal sealed class TelemetryHost : IDisposable, IApplicationLifetimeService
@@ -44,24 +46,28 @@ internal sealed class TelemetryHost : IDisposable, IApplicationLifetimeService
     private readonly ResourceBuilder resourceBuilder;
     private readonly ILoggerFactory loggerFactory;
     private readonly SwappableLoggerProvider swappableLoggerProvider;
+    private readonly IViewManager viewManager;
     private readonly ILiveOptions<TelemetryOptions> options;
     private readonly IOptionsMonitor<OpenTelemetryLoggerOptions> logOptions;
 
     private TracerProvider? tracer;
     private MeterProvider? meter;
     private OpenTelemetryLoggerProvider? logger;
+    private Activity? currentActivity;
 
     public TelemetryHost(
         ResourceBuilder resourceBuilder,
         IOptionsUpdateHook optionsHook,
         ILoggerFactory loggerFactory,
         SwappableLoggerProvider swappableLoggerProvider,
+        IViewManager viewManager,
         ILiveOptions<TelemetryOptions> liveOptions)
     {
         this.resourceBuilder = resourceBuilder.ThrowIfNull();
         this.options = liveOptions.ThrowIfNull();
         this.loggerFactory = loggerFactory.ThrowIfNull();
         this.swappableLoggerProvider = swappableLoggerProvider.ThrowIfNull();
+        this.viewManager = viewManager.ThrowIfNull();
         optionsHook.RegisterHook<TelemetryOptions>(this.OnOptionsUpdated);
         var logOpts = new OpenTelemetryLoggerOptions
         {
@@ -79,6 +85,8 @@ internal sealed class TelemetryHost : IDisposable, IApplicationLifetimeService
         });
 
         this.logOptions = new StaticOptionsMonitor<OpenTelemetryLoggerOptions>(logOpts);
+        this.viewManager.ShowViewRequested += this.ViewManager_ShowViewRequested;
+        this.EnableSelfDiagnostics();
         this.BuildTelemetryProvider();
     }
 
@@ -97,6 +105,44 @@ internal sealed class TelemetryHost : IDisposable, IApplicationLifetimeService
         this.meter?.Dispose();
         this.tracer = default;
         this.meter = default;
+    }
+
+    private void ViewManager_ShowViewRequested(object? sender, TrailBlazr.Models.ViewRequest e)
+    {
+        this.currentActivity?.Stop();
+        this.currentActivity?.Dispose();
+        this.currentActivity = Source.StartActivity("ViewNavigation");
+        if (this.currentActivity is null)
+        {
+            return;
+        }
+
+        this.currentActivity.AddEvent(new ActivityEvent("View Requested"));
+        this.currentActivity.SetTag("viewType", e.ViewType?.Name ?? "Unknown");
+        this.currentActivity.SetTag("viewModelType", e.ViewModelType?.Name ?? "Unknown");
+        this.currentActivity.SetStatus(ActivityStatusCode.Ok);
+    }
+
+    private void EnableSelfDiagnostics()
+    {
+        // Subscribe to OpenTelemetry's internal diagnostic events
+        var listener = new ActivityListener
+        {
+            ShouldListenTo = source => source.Name == ServiceName,
+            Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded,
+            ActivityStarted = activity => Debug.WriteLine($"[OTel] Activity started: {activity.DisplayName}"),
+            ActivityStopped = activity => Debug.WriteLine($"[OTel] Activity stopped: {activity.DisplayName}, Duration: {activity.Duration}")
+        };
+        ActivitySource.AddActivityListener(listener);
+
+        // Enable verbose logging for OpenTelemetry SDK
+        AppContext.SetSwitch("OpenTelemetry.Exporter.Otlp.EnableDebugLogging", true);
+
+        // Enable OpenTelemetry self-diagnostics to file (writes to log file in specified directory)
+        Environment.SetEnvironmentVariable("OTEL_DIAGNOSTICS_ENABLED", "true");
+
+        // Subscribe to OpenTelemetry's EventSource for internal logs
+        var otelListener = new OpenTelemetryEventListener(this.loggerFactory);
     }
 
     private void OnOptionsUpdated()
@@ -197,6 +243,44 @@ internal sealed class TelemetryHost : IDisposable, IApplicationLifetimeService
                 : string.Join(", ", header.Value);
             
             activity.SetTag($"http.response.header.{headerName.ToLowerInvariant()}", headerValue);
+        }
+    }
+
+    internal sealed class OpenTelemetryEventListener(ILoggerFactory loggerFactory) : EventListener
+    {
+        private readonly ILogger logger = loggerFactory.CreateLogger("OpenTelemetry.Diagnostics");
+
+        protected override void OnEventSourceCreated(EventSource eventSource)
+        {
+            base.OnEventSourceCreated(eventSource);
+
+            if (eventSource.Name.StartsWith("OpenTelemetry", StringComparison.OrdinalIgnoreCase))
+            {
+                this.EnableEvents(eventSource, EventLevel.Verbose, EventKeywords.All);
+            }
+        }
+
+        protected override void OnEventWritten(EventWrittenEventArgs eventData)
+        {
+            var message = eventData.Message is not null && eventData.Payload is not null
+                ? string.Format(eventData.Message, [.. eventData.Payload])
+                : eventData.Message ?? string.Empty;
+
+            if (eventData.Level is EventLevel.Verbose or EventLevel.Informational or EventLevel.LogAlways)
+            {
+                // Ignore verbose logs for brevity
+                return;
+            }
+
+            var logLevel = eventData.Level switch
+            {
+                EventLevel.Critical => LogLevel.Critical,
+                EventLevel.Error => LogLevel.Error,
+                EventLevel.Warning => LogLevel.Warning,
+                _ => LogLevel.Debug
+            };
+
+            this.logger.Log(logLevel, "[{Source}] {Message}", eventData.EventSource.Name, message);
         }
     }
 }
