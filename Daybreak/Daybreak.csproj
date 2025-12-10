@@ -68,7 +68,6 @@
     <PackageReference Include="Reloaded.Assembler" />
     <PackageReference Include="WpfExtended.SourceGeneration" />
     <PackageReference Include="WpfScreenHelper" />
-    <PackageReference Include="Squealify" />
     <PackageReference Include="PeNet" />
     <PackageReference Include="Plumsy" />
     <PackageReference Include="securifybv.ShellLink" />

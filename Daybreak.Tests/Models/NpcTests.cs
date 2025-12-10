@@ -1,9 +1,9 @@
-﻿using Daybreak.Shared.Models.Guildwars;
-using FluentAssertions;
-using System.Core.Extensions;
+﻿using System.Core.Extensions;
 using System.Extensions;
 using System.Reflection;
 using System.Text;
+using Daybreak.Shared.Models.Guildwars;
+using FluentAssertions;
 
 namespace Daybreak.Tests.Models;
 
@@ -45,7 +45,7 @@ public sealed class NpcTests
     {
         var npcMap = new Dictionary<string, int>();
 
-        foreach(var npc in Npc.Npcs)
+        foreach (var npc in Npc.Npcs)
         {
             if (!npcMap.TryGetValue(npc.Name.ToLower(), out _))
             {
@@ -56,7 +56,7 @@ public sealed class NpcTests
         }
 
         var errorMessage = new StringBuilder("Duplicated npc entries: ");
-        foreach(var tuple in npcMap)
+        foreach (var tuple in npcMap)
         {
             if (tuple.Value > 1)
             {
@@ -76,19 +76,19 @@ public sealed class NpcTests
     {
         var npcMap = new Dictionary<Npc, bool>();
         var definedNpcsFields = typeof(Npc).GetFields(BindingFlags.Static | BindingFlags.Public).Where(f => f.FieldType == typeof(Npc));
-        foreach(var field in definedNpcsFields)
+        foreach (var field in definedNpcsFields)
         {
             var npc = field.GetValue(default).ThrowIfNull().Cast<Npc>();
             npcMap[npc] = false;
         }
 
-        foreach(var npc in Npc.Npcs)
+        foreach (var npc in Npc.Npcs)
         {
             npcMap[npc] = true;
         }
 
         var errorMessage = new StringBuilder("Npcs not in list: ");
-        foreach(var tuple in npcMap)
+        foreach (var tuple in npcMap)
         {
             if (tuple.Value is false)
             {

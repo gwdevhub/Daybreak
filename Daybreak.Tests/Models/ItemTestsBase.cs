@@ -1,8 +1,8 @@
-﻿using Daybreak.Shared.Models.Guildwars;
-using System.Core.Extensions;
+﻿using System.Core.Extensions;
 using System.Extensions;
 using System.Reflection;
 using System.Text;
+using Daybreak.Shared.Models.Guildwars;
 
 namespace Daybreak.Tests.Models;
 

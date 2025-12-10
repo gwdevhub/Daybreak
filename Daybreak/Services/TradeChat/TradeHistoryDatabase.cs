@@ -1,24 +1,23 @@
-﻿using Daybreak.Services.TradeChat.Models;
-using System.Core.Extensions;
+﻿using System.Extensions;
+using Daybreak.Services.TradeChat.Models;
 
 namespace Daybreak.Services.TradeChat;
 
-internal sealed class TradeHistoryDatabase(
-    TradeMessagesDbContext liteCollection) : ITradeHistoryDatabase
+internal sealed class TradeHistoryDatabase : ITradeHistoryDatabase
 {
-    private readonly TradeMessagesDbContext liteCollection = liteCollection.ThrowIfNull();
+    private readonly SemaphoreSlim semaphore = new(1, 1);
+    private readonly List<TraderMessageDTO> inMemoryStore = [];
 
     public async ValueTask<IEnumerable<TraderMessageDTO>> GetTraderMessagesSinceTime(DateTimeOffset since, CancellationToken cancellationToken)
     {
-        return await this.liteCollection
-            .FindAll(cancellationToken)
-            .Where(async (t, ct) => await Task.FromResult(t.Timestamp > since))
-            .ToListAsync(cancellationToken);
+        using var ctx = await this.semaphore.Acquire(cancellationToken);
+        return [.. this.inMemoryStore.Where(t => t.Timestamp > since)];
     }
 
     public async ValueTask<bool> StoreTraderMessage(TraderMessageDTO message, CancellationToken cancellationToken)
     {
-        await this.liteCollection.Update(message, cancellationToken);
+        using var ctx = await this.semaphore.Acquire(cancellationToken);
+        this.inMemoryStore.Add(message);
         return true;
     }
 }

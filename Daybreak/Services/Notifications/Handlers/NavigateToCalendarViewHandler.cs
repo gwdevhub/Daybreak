@@ -1,11 +1,15 @@
-﻿using Daybreak.Shared.Models.Guildwars;
+﻿using System.Core.Extensions;
+using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Models.Notifications;
 using Daybreak.Shared.Models.Notifications.Handling;
+using Daybreak.Views;
+using TrailBlazr.Services;
 
 namespace Daybreak.Services.Notifications.Handlers;
-public sealed class NavigateToCalendarViewHandler() : INotificationHandler
+
+public sealed class NavigateToCalendarViewHandler(IViewManager viewManager) : INotificationHandler
 {
-    //private readonly IViewManager viewManager = viewManager.ThrowIfNull();
+    private readonly IViewManager viewManager = viewManager.ThrowIfNull();
 
     public void OpenNotification(Notification notification)
     {
@@ -16,6 +20,6 @@ public sealed class NavigateToCalendarViewHandler() : INotificationHandler
             return;
         }
 
-        //this.viewManager.ShowView<EventCalendarView>();
+        this.viewManager.ShowView<EventCalendarView>();
     }
 }

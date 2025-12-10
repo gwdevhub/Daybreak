@@ -1,11 +1,7 @@
-﻿using Squealify;
+﻿namespace Daybreak.Services.Notifications.Models;
 
-namespace Daybreak.Services.Notifications.Models;
-
-[Table("notifications")]
 public partial class NotificationDTO
 {
-    [PrimaryKey]
     public required string Id { get; init; } = string.Empty;
     public int Level { get; init; }
     public long ExpirationTime { get; set; }

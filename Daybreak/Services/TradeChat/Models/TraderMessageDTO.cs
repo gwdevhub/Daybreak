@@ -1,11 +1,7 @@
-﻿using Squealify;
+﻿namespace Daybreak.Services.TradeChat.Models;
 
-namespace Daybreak.Services.TradeChat.Models;
-
-[Table("traderMessages")]
-public partial class TraderMessageDTO
+public sealed class TraderMessageDTO
 {
-    [PrimaryKey]
     public required long Id { get; init; }
 
     public int TraderSource { get; init; }
