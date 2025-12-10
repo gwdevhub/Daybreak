@@ -57,7 +57,6 @@
     <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageVersion Include="SharpCompress" Version="0.41.0" />
     <PackageVersion Include="Slim" Version="1.11.2" />
-    <PackageVersion Include="Squealify" Version="0.8.2.2" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="9.0.6" />
     <PackageVersion Include="Swashbuckle.AspNetCore.Swagger" Version="9.0.6" />
     <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerGen" Version="9.0.6" />

@@ -1,131 +1,129 @@
-﻿using Daybreak.Services.ApplicationLauncher;
-using Daybreak.Services.BuildTemplates;
-using Daybreak.Services.Credentials;
-using Daybreak.Services.Logging;
-using Daybreak.Services.Privilege;
-using Daybreak.Services.Screens;
-using Daybreak.Services.Shortcuts;
-using Daybreak.Services.Updater;
-using Daybreak.Views;
-using Microsoft.Extensions.Logging;
-using Slim;
-using System.Extensions;
-using Daybreak.Services.Options;
-using Microsoft.CorrelationVector;
-using System.Logging;
-using Daybreak.Services.Updater.PostUpdate;
+﻿using System.Configuration;
 using System.Core.Extensions;
-using Microsoft.Extensions.DependencyInjection;
-using Daybreak.Services.Onboarding;
-using Daybreak.Services.Menu;
-using Daybreak.Services.Experience;
-using Daybreak.Services.Metrics;
-using Daybreak.Services.Monitoring;
-using Daybreak.Services.Downloads;
-using Daybreak.Services.ExceptionHandling;
-using Daybreak.Services.Startup;
-using Daybreak.Services.Startup.Actions;
-using Daybreak.Services.GuildWars;
-using Daybreak.Configuration.Options;
-using System.Configuration;
-using Daybreak.Services.UMod;
-using Daybreak.Services.Toolbox;
-using Daybreak.Services.Themes;
-using Daybreak.Services.TradeChat;
+using System.Extensions;
+using System.Logging;
+using System.Net.Http;
 using System.Net.WebSockets;
-using Daybreak.Services.Notifications;
-using Daybreak.Services.InternetChecker;
-using Daybreak.Services.Sounds;
-using Daybreak.Services.TradeChat.Notifications;
-using Daybreak.Services.Mods;
-using Daybreak.Services.Registry;
-using Daybreak.Services.Events;
-using Daybreak.Services.Plugins;
-using Daybreak.Services.Toolbox.Utilities;
-using Daybreak.Services.Injection;
-using Daybreak.Services.ReShade;
-using Daybreak.Services.LaunchConfigurations;
-using Daybreak.Services.ExecutableManagement;
-using Daybreak.Services.DirectSong;
-using Daybreak.Services.SevenZip;
-using Daybreak.Services.ReShade.Notifications;
+using System.Reflection;
+using Daybreak.Configuration.Options;
+using Daybreak.Services.Api;
 using Daybreak.Services.ApplicationArguments;
 using Daybreak.Services.ApplicationArguments.ArgumentHandling;
-using Daybreak.Services.Toolbox.Notifications;
+using Daybreak.Services.ApplicationLauncher;
+using Daybreak.Services.BuildTemplates;
+using Daybreak.Services.Credentials;
+using Daybreak.Services.DirectSong;
+using Daybreak.Services.Downloads;
+using Daybreak.Services.Events;
+using Daybreak.Services.ExceptionHandling;
+using Daybreak.Services.ExecutableManagement;
+using Daybreak.Services.Experience;
+using Daybreak.Services.Graph;
+using Daybreak.Services.Graph.Models;
 using Daybreak.Services.Guildwars;
-using Daybreak.Services.Api;
+using Daybreak.Services.GuildWars;
+using Daybreak.Services.Injection;
+using Daybreak.Services.InternetChecker;
+using Daybreak.Services.LaunchConfigurations;
+using Daybreak.Services.Logging;
+using Daybreak.Services.MDns;
+using Daybreak.Services.Menu;
+using Daybreak.Services.Metrics;
+using Daybreak.Services.Mods;
+using Daybreak.Services.Monitoring;
+using Daybreak.Services.Notifications;
 using Daybreak.Services.Notifications.Handlers;
-using Microsoft.Data.Sqlite;
-using Daybreak.Shared.Services.Options;
-using Daybreak.Shared.Services.Menu;
-using Daybreak.Shared.Services.Screens;
-using Daybreak.Shared.Services.Logging;
-using Daybreak.Shared.Services.Notifications;
-using Daybreak.Shared.Services.TradeChat;
-using Daybreak.Shared.Services.Themes;
-using Daybreak.Shared.Services.Shortcuts;
-using Daybreak.Shared.Services.Guildwars;
-using Daybreak.Shared.Services.Registry;
-using Daybreak.Shared.Services.Credentials;
-using Daybreak.Shared.Services.Onboarding;
-using Daybreak.Shared.Services.Sounds;
-using Daybreak.Shared.Services.BuildTemplates;
-using Daybreak.Shared.Services.ExecutableManagement;
-using Daybreak.Shared.Services.SevenZip;
-using Daybreak.Shared.Services.DirectSong;
+using Daybreak.Services.Onboarding;
+using Daybreak.Services.Options;
+using Daybreak.Services.Plugins;
+using Daybreak.Services.Privilege;
+using Daybreak.Services.Registry;
+using Daybreak.Services.ReShade;
+using Daybreak.Services.ReShade.Notifications;
+using Daybreak.Services.Screens;
+using Daybreak.Services.Screenshots;
+using Daybreak.Services.SevenZip;
+using Daybreak.Services.Shortcuts;
+using Daybreak.Services.Sounds;
+using Daybreak.Services.Startup;
+using Daybreak.Services.Startup.Actions;
+using Daybreak.Services.Telemetry;
+using Daybreak.Services.Themes;
+using Daybreak.Services.Toolbox;
+using Daybreak.Services.Toolbox.Notifications;
+using Daybreak.Services.Toolbox.Utilities;
+using Daybreak.Services.TradeChat;
+using Daybreak.Services.TradeChat.Models;
+using Daybreak.Services.TradeChat.Notifications;
+using Daybreak.Services.UMod;
+using Daybreak.Services.Updater;
+using Daybreak.Services.Updater.PostUpdate;
+using Daybreak.Services.Wiki;
+using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.Plugins;
+using Daybreak.Shared.Services.Api;
 using Daybreak.Shared.Services.ApplicationArguments;
+using Daybreak.Shared.Services.ApplicationLauncher;
+using Daybreak.Shared.Services.BuildTemplates;
+using Daybreak.Shared.Services.Credentials;
+using Daybreak.Shared.Services.DirectSong;
+using Daybreak.Shared.Services.Downloads;
+using Daybreak.Shared.Services.Events;
+using Daybreak.Shared.Services.ExecutableManagement;
+using Daybreak.Shared.Services.Experience;
+using Daybreak.Shared.Services.Guildwars;
+using Daybreak.Shared.Services.Injection;
+using Daybreak.Shared.Services.InternetChecker;
 using Daybreak.Shared.Services.LaunchConfigurations;
+using Daybreak.Shared.Services.Logging;
+using Daybreak.Shared.Services.MDns;
+using Daybreak.Shared.Services.Menu;
+using Daybreak.Shared.Services.Metrics;
+using Daybreak.Shared.Services.Mods;
+using Daybreak.Shared.Services.Navigation;
+using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.Onboarding;
+using Daybreak.Shared.Services.Options;
+using Daybreak.Shared.Services.Plugins;
+using Daybreak.Shared.Services.Privilege;
+using Daybreak.Shared.Services.Registry;
+using Daybreak.Shared.Services.ReShade;
+using Daybreak.Shared.Services.Screens;
+using Daybreak.Shared.Services.Screenshots;
+using Daybreak.Shared.Services.SevenZip;
+using Daybreak.Shared.Services.Shortcuts;
+using Daybreak.Shared.Services.Sounds;
+using Daybreak.Shared.Services.Startup;
+using Daybreak.Shared.Services.Themes;
+using Daybreak.Shared.Services.Toolbox;
+using Daybreak.Shared.Services.TradeChat;
 using Daybreak.Shared.Services.UMod;
 using Daybreak.Shared.Services.Updater;
-using Daybreak.Shared.Services.Injection;
-using Daybreak.Shared.Services.Metrics;
 using Daybreak.Shared.Services.Updater.PostUpdate;
-using Daybreak.Shared.Services.Mods;
-using Daybreak.Shared.Services.Plugins;
-using Daybreak.Shared.Services.Experience;
-using Daybreak.Shared.Services.ApplicationLauncher;
-using Daybreak.Shared.Services.Navigation;
-using Daybreak.Shared.Services.Toolbox;
-using Daybreak.Shared.Services.Events;
-using Daybreak.Shared.Services.Startup;
-using Daybreak.Shared.Services.InternetChecker;
-using Daybreak.Shared.Services.ReShade;
-using Daybreak.Shared.Services.Api;
-using Daybreak.Shared.Services.Privilege;
-using Daybreak.Shared.Services.Downloads;
-using Daybreak.Shared.Models;
-using Daybreak.Shared.Services.MDns;
-using Daybreak.Services.MDns;
+using Daybreak.Shared.Services.Wiki;
+using Daybreak.Themes;
+using Daybreak.Views;
+using Daybreak.Views.Copy;
+using Daybreak.Views.Installation;
+using Daybreak.Views.Mods;
+using Daybreak.Views.Trade;
+using Microsoft.CorrelationVector;
+using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Fast.Components.FluentUI;
+using Microsoft.Identity.Client;
+using Microsoft.Identity.Client.Desktop;
 using OpenTelemetry.Resources;
-using Daybreak.Services.Telemetry;
-using System.Reflection;
-using Daybreak.Shared.Models.Plugins;
+using Slim;
 using TrailBlazr.Extensions;
 using TrailBlazr.Services;
-using Microsoft.Fast.Components.FluentUI;
-using Daybreak.Themes;
-using Daybreak.Shared.Services.Wiki;
-using Daybreak.Services.Wiki;
-using Daybreak.Services.Graph.Models;
-using Daybreak.Services.Graph;
-using Microsoft.Identity.Client;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
-using Microsoft.Identity.Client.Desktop;
-using System.Net.Http;
-using Daybreak.Views.Trade;
-using Daybreak.Services.TradeChat.Models;
-using Daybreak.Views.Installation;
-using Daybreak.Views.Copy;
-using Daybreak.Views.Mods;
-using Daybreak.Shared.Services.Screenshots;
-using Daybreak.Services.Screenshots;
 
 namespace Daybreak.Configuration;
 
 public class ProjectConfiguration : PluginConfigurationBase
 {
-    private const string DbConnectionString = "Data Source=Daybreak.sqlite.db";
-
     public static readonly Version CurrentVersion = Version.Parse(Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? throw new InvalidOperationException("Unable to get current version"));
 
     public override void RegisterResolvers(IServiceManager serviceManager)
@@ -143,18 +141,9 @@ public class ProjectConfiguration : PluginConfigurationBase
 
         // Add FluentUI components
         services.AddFluentUIComponents();
-        
+
         services.AddTrailBlazr();
         RegisterHttpClients(services);
-        services.AddScoped(sp =>
-        {
-            var connection = new SqliteConnection(DbConnectionString);
-            connection.Open();
-            return connection;
-        });
-        services.AddScoped(sp => new TradeQuoteDbContext(sp.GetRequiredService<SqliteConnection>()));
-        services.AddScoped(sp => new NotificationsDbContext(sp.GetRequiredService<SqliteConnection>()));
-        services.AddScoped(sp => new TradeMessagesDbContext(sp.GetRequiredService<SqliteConnection>()));
         services.AddSingleton<IPublicClientApplication>(sp =>
         {
             var logger = sp.GetRequiredService<ILogger<PublicClientApplication>>();
@@ -166,7 +155,7 @@ public class ProjectConfiguration : PluginConfigurationBase
                         // Redact logs that contain PII which user can enable to send to the telemetry server
                         message = "[REDACTED]";
                     }
-                    
+
                     var equivalentLogLevel = logLevel switch
                     {
                         Microsoft.Identity.Client.LogLevel.Error => LogLevel.Error,
@@ -185,7 +174,7 @@ public class ProjectConfiguration : PluginConfigurationBase
                     new DaybreakMsalHttpClientProvider(new HttpClient(SetupLoggingAndMetrics<PublicClientApplication>(sp))))
                 .Build();
         });
-            
+
         services.AddSingleton<SwappableLoggerProvider>();
         services.AddSingleton<ILogsManager, JsonLogsManager>();
         services.AddSingleton<IConsoleLogsWriter, ConsoleLogsWriter>();
@@ -251,7 +240,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<ISoundService, SoundService>();
         services.AddSingleton<IInternetCheckingService, InternetCheckingService>();
         services.AddSingleton<IConnectivityStatus, ConnectivityStatus>();
-        services.AddSingleton<INotificationStorage, NotificationStorage>();
+        services.AddSingleton<INotificationStorage, InMemoryNotificationStorage>();
         services.AddSingleton<ITradeAlertingService, TradeAlertingService>();
         services.AddSingleton<IModsManager, ModsManager>();
         services.AddSingleton<IPluginsService, PluginsService>();
@@ -306,7 +295,7 @@ public class ProjectConfiguration : PluginConfigurationBase
 
         viewProducer.RegisterView<LaunchView, LaunchViewModel>(isSingleton: true);
         viewProducer.RegisterView<OptionView, OptionViewModel>();
-        viewProducer.RegisterView<Views.FocusView, FocusViewModel>();
+        viewProducer.RegisterView<FocusView, FocusViewModel>();
         viewProducer.RegisterView<BuildListView, BuildListViewModel>();
         viewProducer.RegisterView<BuildRoutingView, BuildRoutingViewModel>();
         viewProducer.RegisterView<SingleBuildTemplateView, SingleBuildTemplateViewModel>();
@@ -347,12 +336,9 @@ public class ProjectConfiguration : PluginConfigurationBase
         startupActionProducer.ThrowIfNull();
 
         startupActionProducer.RegisterAction<RestoreWindowPositionStartupAction>();
-        startupActionProducer.RegisterAction<EnsureDatabaseTablesExist>();
         startupActionProducer.RegisterAction<RenameInstallerAction>();
         startupActionProducer.RegisterAction<UpdateUModAction>();
         startupActionProducer.RegisterAction<CredentialsOptionsMigrator>();
-        startupActionProducer.RegisterAction<CleanupDatabases>();
-        startupActionProducer.RegisterAction<DeleteOldDatabase>();
         startupActionProducer.RegisterAction<UpdateToolboxAction>();
     }
 

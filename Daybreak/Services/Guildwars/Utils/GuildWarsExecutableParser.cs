@@ -1,6 +1,5 @@
 ﻿using PeNet;
 using PeNet.Header.Pe;
-using System;
 
 namespace Daybreak.Services.Guildwars.Utils;
 /// <summary>

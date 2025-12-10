@@ -1,11 +1,7 @@
-﻿using Squealify;
+﻿namespace Daybreak.Services.TradeChat.Models;
 
-namespace Daybreak.Services.TradeChat.Models;
-
-[Table("quotes")]
 public sealed class TraderQuoteDTO
 {
-    [PrimaryKey]
     public required string Id { get; init; } = Guid.NewGuid().ToString();
 
     public int ItemId { get; set; }
