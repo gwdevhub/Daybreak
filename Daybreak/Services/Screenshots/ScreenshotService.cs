@@ -1,9 +1,9 @@
-﻿using Daybreak.Shared.Models;
-using Daybreak.Shared.Models.ColorPalette;
-using Daybreak.Shared.Services.Screenshots;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Drawing;
 using System.IO;
+using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.ColorPalette;
+using Daybreak.Shared.Services.Screenshots;
 using static Daybreak.Shared.Models.Theme;
 
 namespace Daybreak.Services.Screenshots;
@@ -24,6 +24,11 @@ public sealed class ScreenshotService : IScreenshotService
 
     private async Task<ScreenshotEntry?> GetRandomScreenshotInternal()
     {
+        if (!Directory.Exists(ScreenshotsDirectory))
+        {
+            return default;
+        }
+
         var screenshots = Directory.GetFiles(ScreenshotsDirectory, "*", SearchOption.AllDirectories);
         if (screenshots is null || screenshots.Length is 0)
         {
