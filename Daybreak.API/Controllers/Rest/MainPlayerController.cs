@@ -1,8 +1,8 @@
-﻿using Daybreak.API.Services;
+﻿using System.Core.Extensions;
+using Daybreak.API.Services;
 using Daybreak.Shared.Models.Api;
 using Microsoft.AspNetCore.Mvc;
 using Net.Sdk.Web;
-using System.Core.Extensions;
 
 namespace Daybreak.API.Controllers.Rest;
 

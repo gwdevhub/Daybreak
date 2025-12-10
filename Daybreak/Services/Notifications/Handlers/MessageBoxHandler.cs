@@ -1,6 +1,6 @@
-﻿using Daybreak.Shared.Models.Notifications;
+﻿using System.Windows;
+using Daybreak.Shared.Models.Notifications;
 using Daybreak.Shared.Models.Notifications.Handling;
-using System.Windows;
 
 namespace Daybreak.Services.Notifications.Handlers;
 

@@ -3,10 +3,10 @@ using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.Guildwars;
 using System.Extensions;
-using System.Threading.Tasks;
 using TrailBlazr.ViewModels;
 
 namespace Daybreak.Views;
+
 public class ExecutablesViewModel(
     IGuildWarsInstaller guildWarsInstaller,
     IGuildWarsExecutableManager guildWarsExecutableManager)
@@ -72,7 +72,7 @@ public class ExecutablesViewModel(
 
     public async void UpdateExecutable(ExecutablePath executable)
     {
-        foreach(var e in this.Executables)
+        foreach (var e in this.Executables)
         {
             e.Locked = true;
         }
@@ -116,7 +116,7 @@ public class ExecutablesViewModel(
         }
         catch
         {
-            
+
         }
         finally
         {

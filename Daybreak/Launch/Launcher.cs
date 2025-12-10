@@ -1,4 +1,8 @@
-﻿using Daybreak.Configuration;
+﻿using System.Core.Extensions;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Windows;
+using Daybreak.Configuration;
 using Daybreak.Services.ExceptionHandling;
 using Daybreak.Services.Navigation;
 using Daybreak.Services.Telemetry;
@@ -23,11 +27,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Web.WebView2.Core;
 using Slim;
 using Slim.Integration.ServiceCollection;
-using System.Core.Extensions;
-using System.IO;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Windows;
 using WpfExtended.Blazor.Launch;
 
 //The following lines are needed to expose internal objects to the test project
@@ -157,7 +156,7 @@ public sealed class Launcher : BlazorHybridApplication<App>
         var menuServiceProducer = this.ServiceProvider.GetRequiredService<IMenuServiceProducer>();
         var themeProducer = this.ServiceProvider.GetRequiredService<IThemeProducer>();
 
-        await this.Dispatcher.InvokeAsync(() => 
+        await this.Dispatcher.InvokeAsync(() =>
         {
             // Hide the main window until the application is fully loaded. Main window will be shown by the RestoreWindowPositionStartupAction
             var mainWindow = this.ServiceProvider.GetRequiredService<BlazorHostWindow>();

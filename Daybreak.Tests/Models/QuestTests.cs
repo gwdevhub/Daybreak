@@ -1,9 +1,9 @@
-﻿using FluentAssertions;
+﻿using System.Core.Extensions;
+using System.Extensions;
 using System.Reflection;
 using System.Text;
-using System.Extensions;
 using Daybreak.Shared.Models.Guildwars;
-using System.Core.Extensions;
+using FluentAssertions;
 
 namespace Daybreak.Tests.Models;
 

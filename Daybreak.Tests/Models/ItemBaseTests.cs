@@ -1,6 +1,6 @@
-﻿using FluentAssertions;
-using System.Text;
+﻿using System.Text;
 using Daybreak.Shared.Models.Guildwars;
+using FluentAssertions;
 
 namespace Daybreak.Tests.Models;
 
