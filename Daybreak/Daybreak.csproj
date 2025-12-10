@@ -56,6 +56,7 @@
   <ItemGroup>
     <PackageReference Include="Elastic.OpenTelemetry" />
     <PackageReference Include="ksemenenko.ColorThief" />
+    <PackageReference Include="Markdig" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" />
     <PackageReference Include="Microsoft.Fast.Components.FluentUI" />
     <PackageReference Include="Microsoft.Fast.Components.FluentUI.Emojis" />
@@ -88,6 +89,16 @@
   <ItemGroup>
     <ProjectReference Include="..\Daybreak.Shared\Daybreak.Shared.csproj" />
   </ItemGroup>
+
+  <!-- Copy Daybreak.wiki to wwwroot/wiki for both Debug and Release builds -->
+  <ItemGroup>
+    <WikiFiles Include="..\Daybreak.wiki\**\*.*" Exclude="..\Daybreak.wiki\.git\**" />
+  </ItemGroup>
+
+  <Target Name="CopyWikiToWwwroot" BeforeTargets="BeforeBuild">
+    <Message Importance="high" Text="📚 Copying Daybreak.wiki to wwwroot/wiki" />
+    <Copy SourceFiles="@(WikiFiles)" DestinationFiles="@(WikiFiles->'wwwroot\wiki\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
 	
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
     <Exec Command="echo.&gt;$(Version).version" />
@@ -110,6 +121,7 @@
     <UpToDateCheckInput Include="..\Daybreak.API\**\*.cs" />
     <UpToDateCheckInput Include="..\Daybreak.7ZipExtractor\**\*.cs" />
     <UpToDateCheckInput Include="..\Daybreak.Installer\**\*.cs" />
+    <UpToDateCheckInput Include="..\Daybreak.wiki\**\*.*" Exclude="..\Daybreak.wiki\.git\**" />
   </ItemGroup>
 
   <ItemGroup>
