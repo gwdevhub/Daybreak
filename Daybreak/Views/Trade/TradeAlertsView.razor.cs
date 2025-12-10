@@ -55,6 +55,13 @@ public sealed class TradeAlertsViewModel(
         }
     }
 
+    public void ToggleAlert(TradeAlertViewModel alert)
+    {
+        alert.TradeAlert.Enabled = !alert.TradeAlert.Enabled;
+        this.tradeAlertingService.ModifyTradeAlert(alert.TradeAlert);
+        this.RefreshView();
+    }
+
     private static TradeAlertViewModel ConvertToViewModel(ITradeAlert alert)
     {
         return new TradeAlertViewModel
