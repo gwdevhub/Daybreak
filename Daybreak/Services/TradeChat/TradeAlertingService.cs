@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
+using System.Extensions.Core;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Windows.Extensions.Services;
@@ -240,6 +241,13 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
 
     private void NotifyAlertMatch(TraderMessageDTO traderMessageDTO, TradeAlert alert)
     {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        var source = (TraderSource)traderMessageDTO.TraderSource;
+        if (source is not TraderSource.Ascalon and not TraderSource.Kamadan)
+        {
+            scopedLogger.LogWarning("Unknown trader source {TraderSource} for trader message {TraderMessageId}", traderMessageDTO.TraderSource, traderMessageDTO.Id);
+        }
+
         var traderMessage = new TraderMessage
         {
             Message = traderMessageDTO.Message,
@@ -248,7 +256,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
         };
 
         this.notificationService.NotifyInformation<TradeMessageNotificationHandler>(
-            title: $"{traderMessageDTO.TraderSource} Trader Alert",
+            title: $"{source} Trader Alert",
             description: $"{alert.Name} has matched on a trader message. Sender: {traderMessageDTO.Sender}. Message: {traderMessageDTO.Message}",
             metaData: JsonConvert.SerializeObject(traderMessage),
             expirationTime: DateTime.Now + TimeSpan.FromDays(1));
