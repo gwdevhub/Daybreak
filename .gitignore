@@ -365,3 +365,5 @@ MigrationBackup/
 FodyWeavers.xsd
 
 .idea
+
+Daybreak/wwwroot/wiki/*

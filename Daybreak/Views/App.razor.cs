@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Interop;
 using Daybreak.Services.Logging;
 using Daybreak.Services.Notifications.Handlers;
@@ -104,6 +105,15 @@ public sealed class AppViewModel
             this.CloseNavigationMenu,
             this.ToggleNavigationMenu
         );
+        this.blazorHostWindow.PreviewKeyUp += this.BlazorHostWindow_PreviewKeyDown;
+    }
+
+    private void BlazorHostWindow_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key is Key.F1)
+        {
+            this.viewManager.ShowView<WikiView>((nameof(WikiView.Page), "Home"));
+        }
     }
 
     public async ValueTask InitializeApp(IJSRuntime jsRuntime)

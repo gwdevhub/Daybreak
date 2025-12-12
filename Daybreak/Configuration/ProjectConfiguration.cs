@@ -329,6 +329,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<ScreenSelectorView, ScreenSelectorViewModel>();
         viewProducer.RegisterView<UModManagementView, UModManagementViewModel>();
         viewProducer.RegisterView<TradeNotificationView, TradeNotificationViewModel>();
+        viewProducer.RegisterView<WikiView, WikiViewModel>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -425,8 +426,9 @@ public class ProjectConfiguration : PluginConfigurationBase
         menuServiceProducer.CreateIfNotExistCategory("Daybreak")
             //TODO: Implement Notifications view
             //.RegisterButton("Notifications", "Open notifications view", sp => { })
-            .RegisterButton("Manage Plugins", "Open plugins view", sp => sp.GetRequiredService<ViewManager>().ShowView<PluginsView>())
-            .RegisterButton("Manage version", "Open version manager", sp => sp.GetRequiredService<ViewManager>().ShowView<VersionManagementView>());
+            .RegisterButton("Manage Plugins", "Open plugins view", sp => sp.GetRequiredService<IViewManager>().ShowView<PluginsView>())
+            .RegisterButton("Manage version", "Open version manager", sp => sp.GetRequiredService<IViewManager>().ShowView<VersionManagementView>())
+            .RegisterButton("Help", "Open Daybreak wiki", sp => sp.GetRequiredService<IViewManager>().ShowView<WikiView>((nameof(WikiView.Page), "Home")));
         menuServiceProducer.CreateIfNotExistCategory("Trade")
             .RegisterButton("Alerts", "Open trade alerts manager", sp => sp.GetRequiredService<IViewManager>().ShowView<TradeAlertsView>())
             .RegisterButton("Kamadan", "Open kamadan trade chat", sp => sp.GetRequiredService<IViewManager>().ShowView<TradeChatView>((nameof(TradeChatView.Source), nameof(TraderSource.Kamadan))))
