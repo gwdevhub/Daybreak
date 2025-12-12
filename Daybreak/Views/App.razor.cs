@@ -38,6 +38,7 @@ public sealed class AppViewModel
     private readonly INotificationService notificationService;
     private readonly ILogger<App> logger;
 
+    private bool isInitialized = false;
     private HwndSource? hwndSource;
 
     public event EventHandler<WindowState>? WindowStateChanged;
@@ -118,6 +119,11 @@ public sealed class AppViewModel
 
     public async ValueTask InitializeApp(IJSRuntime jsRuntime)
     {
+        if (this.isInitialized)
+        {
+            return;
+        }
+
         this.themeManager.ThemeChanged += (s, e) => this.OnThemeChange();
         this.OnThemeChange();
         this.LoadMenuCategories();
@@ -128,6 +134,7 @@ public sealed class AppViewModel
         this.hwndSource = HwndSource.FromHwnd(
             new WindowInteropHelper(this.blazorHostWindow).Handle
         );
+        this.isInitialized = true;
     }
 
     public void Drag()
