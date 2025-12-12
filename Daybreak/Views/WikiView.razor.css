@@ -1,0 +1,93 @@
+.wiki-container {
+    display: flex;
+    height: 100%;
+    overflow: hidden;
+}
+
+.wiki-toc {
+    order: 1;
+    width: 220px;
+    min-width: 220px;
+    padding: 1rem;
+    overflow-y: auto;
+    border-left: 1px solid var(--neutral-stroke-rest);
+}
+
+    .wiki-toc h3 {
+        margin: 0 0 1rem 0;
+        font-size: 1.1rem;
+        color: var(--neutral-foreground-rest);
+    }
+
+    .wiki-toc ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .wiki-toc li {
+        margin: 0.25rem 0;
+    }
+
+        .wiki-toc li a {
+            display: block;
+            padding: 0.4rem 0.6rem;
+            color: var(--neutral-foreground-rest);
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.15s ease;
+        }
+
+        .wiki-toc li a:hover {
+            background: var(--neutral-fill-rest);
+        }
+
+        .wiki-toc li.active a {
+            background: var(--accent-fill-rest);
+            color: var(--accent-foreground-cut-rest);
+        }
+
+.wiki-content {
+    flex: 1;
+    overflow-y: auto;
+    color: var(--neutral-foreground-rest);
+    line-height: 1.6;
+    padding: 0px 1rem 0px 1rem;
+}
+
+    .wiki-content ::deep h1,
+    .wiki-content ::deep h2,
+    .wiki-content ::deep h3 {
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .wiki-content ::deep h1 {
+        font-size: 2rem;
+        border-bottom: 1px solid var(--neutral-stroke-rest);
+        padding-bottom: 0.5rem;
+    }
+
+    .wiki-content ::deep a {
+        color: var(--accent-fill-rest);
+    }
+
+    .wiki-content ::deep code {
+        background: var(--neutral-fill-rest);
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+    }
+
+    .wiki-content ::deep pre {
+        background: var(--neutral-fill-rest);
+        padding: 1rem;
+        border-radius: 6px;
+        overflow-x: auto;
+    }
+
+    .wiki-content ::deep blockquote {
+        border-left: 4px solid var(--accent-fill-rest);
+        margin: 1rem 0;
+        padding: 0.5rem 1rem;
+        background: var(--neutral-fill-rest);
+    }
