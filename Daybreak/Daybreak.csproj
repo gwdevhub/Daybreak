@@ -56,7 +56,6 @@
   <ItemGroup>
     <PackageReference Include="Elastic.OpenTelemetry" />
     <PackageReference Include="ksemenenko.ColorThief" />
-    <PackageReference Include="Markdig" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" />
     <PackageReference Include="Microsoft.Fast.Components.FluentUI" />
     <PackageReference Include="Microsoft.Fast.Components.FluentUI.Emojis" />
@@ -85,14 +84,18 @@
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" />
     <PackageReference Include="NAudio" />
   </ItemGroup>
-	
+
   <ItemGroup>
     <ProjectReference Include="..\Daybreak.Shared\Daybreak.Shared.csproj" />
   </ItemGroup>
 
   <!-- Copy Daybreak.wiki to wwwroot/wiki for both Debug and Release builds -->
+  <PropertyGroup>
+    <WikiSourcePath>..\Daybreak.wiki</WikiSourcePath>
+  </PropertyGroup>  
+
   <ItemGroup>
-    <WikiFiles Include="..\Daybreak.wiki\**\*.*" Exclude="..\Daybreak.wiki\.git\**" />
+    <WikiFiles Include="$(WikiSourcePath)\**\*.*" Exclude="$(WikiSourcePath)\.git\**" />
   </ItemGroup>
 
   <Target Name="CopyWikiToWwwroot" BeforeTargets="BeforeBuild">
