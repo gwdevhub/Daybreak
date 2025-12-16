@@ -18,47 +18,26 @@ using TrailBlazr.Services;
 using TrailBlazr.ViewModels;
 
 namespace Daybreak.Views;
-public sealed class LaunchViewModel : ViewModelBase<LaunchViewModel, LaunchView>, INotifyPropertyChanged, IDisposable
+public sealed class LaunchViewModel(
+    IViewManager viewManager,
+    INotificationService notificationService,
+    IDaybreakApiService daybreakApiService,
+    ILaunchConfigurationService launchConfigurationService,
+    IOnboardingService onboardingService,
+    IApplicationLauncher applicationLauncher,
+    IOptions<FocusViewOptions> focusViewOptions) : ViewModelBase<LaunchViewModel, LaunchView>, INotifyPropertyChanged, IDisposable
 {
     private static readonly TimeSpan LaunchTimeout = TimeSpan.FromSeconds(10);
 
-    private readonly IViewManager viewManager;
-    private readonly INotificationService notificationService;
-    private readonly IDaybreakApiService daybreakApiService;
-    private readonly ILaunchConfigurationService launchConfigurationService;
-    private readonly IOnboardingService onboardingService;
-    private readonly IApplicationLauncher applicationLauncher;
-    private readonly IOptions<FocusViewOptions> focusViewOptions;
+    private readonly IViewManager viewManager = viewManager.ThrowIfNull();
+    private readonly INotificationService notificationService = notificationService.ThrowIfNull();
+    private readonly IDaybreakApiService daybreakApiService = daybreakApiService.ThrowIfNull();
+    private readonly ILaunchConfigurationService launchConfigurationService = launchConfigurationService.ThrowIfNull();
+    private readonly IOnboardingService onboardingService = onboardingService.ThrowIfNull();
+    private readonly IApplicationLauncher applicationLauncher = applicationLauncher.ThrowIfNull();
+    private readonly IOptions<FocusViewOptions> focusViewOptions = focusViewOptions.ThrowIfNull();
 
     private CancellationTokenSource? cancellationTokenSource;
-
-    public LaunchViewModel(
-        IViewManager viewManager,
-        INotificationService notificationService,
-        IDaybreakApiService daybreakApiService,
-        ILaunchConfigurationService launchConfigurationService,
-        IOnboardingService onboardingService,
-        IApplicationLauncher applicationLauncher,
-        IOptions<FocusViewOptions> focusViewOptions)
-    {
-        this.viewManager = viewManager.ThrowIfNull();
-        this.notificationService = notificationService.ThrowIfNull();
-        this.daybreakApiService = daybreakApiService.ThrowIfNull();
-        this.launchConfigurationService = launchConfigurationService.ThrowIfNull();
-        this.onboardingService = onboardingService.ThrowIfNull();
-        this.applicationLauncher = applicationLauncher.ThrowIfNull();
-        this.focusViewOptions = focusViewOptions.ThrowIfNull();
-
-        this.viewManager.ShowViewRequested += (_, viewRequest) =>
-        {
-            if (viewRequest.ViewType != typeof(LaunchView))
-            {
-                this.cancellationTokenSource?.Cancel();
-                this.cancellationTokenSource?.Dispose();
-                this.cancellationTokenSource = null;
-            }
-        };
-    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -199,6 +178,7 @@ public sealed class LaunchViewModel : ViewModelBase<LaunchViewModel, LaunchView>
         this.RetrieveLaunchConfigurations();
         var ct = this.cancellationTokenSource.Token;
         Task.Factory.StartNew(() => this.PeriodicallyCheckSelectedConfigState(ct), ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        this.RefreshView();
     }
 
     private void Cleanup()

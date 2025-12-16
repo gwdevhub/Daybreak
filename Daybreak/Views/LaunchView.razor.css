@@ -52,6 +52,12 @@
         cursor: not-allowed;
     }
 
+    .launch-button.disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
 .launch-button-content {
     display: flex;
     align-items: center;
@@ -90,6 +96,12 @@
     .dropdown-toggle-button:disabled {
         opacity: 0.6;
         cursor: not-allowed;
+    }
+
+    .dropdown-toggle-button.disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        pointer-events: none;
     }
 
 .dropdown-arrow {
