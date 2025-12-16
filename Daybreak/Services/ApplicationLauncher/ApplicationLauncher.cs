@@ -35,6 +35,8 @@ internal sealed class ApplicationLauncher(
     IPrivilegeManager privilegeManager,
     ILogger<ApplicationLauncher> logger) : IApplicationLauncher
 {
+    private const string SteamAppIdFile = "steam_appid.txt";
+    private const string SteamAppId = "29720";
     private const string ProcessName = "gw";
     private const double LaunchMemoryThreshold = 200000000;
 
@@ -155,13 +157,24 @@ internal sealed class ApplicationLauncher(
                     description: "No available executables found. All executables are currently in use");
                 return default;
             }
-            else
-            {
-                executable = firstAvailableExecutable;
-                this.notificationService.NotifyError(
-                    title: "Launching Guild Wars",
-                    description: $"Found available executable at {firstAvailableExecutable}");
-            }
+
+            executable = firstAvailableExecutable;
+        }
+
+        if (executable is null)
+        {
+            this.notificationService.NotifyError(
+                    title: "Can not launch Guild Wars",
+                    description: "No executable path provided and no available executables found");
+            throw new InvalidOperationException("No executable path provided and no available executables found");
+        }
+
+        if (Path.GetDirectoryName(executable) is not string workingDirectory)
+        {
+            this.notificationService.NotifyError(
+                title: "Can not launch Guild Wars",
+                description: "Unable to determine executable directory");
+            throw new InvalidOperationException("Unable to determine executable directory for Steam support");
         }
 
         var args = new List<string>();
@@ -194,6 +207,18 @@ internal sealed class ApplicationLauncher(
                 FileName = executable,
             },
         };
+
+        var steamAppIdFilePath = Path.Combine(workingDirectory, SteamAppIdFile);
+        if (launchConfigurationWithCredentials.SteamSupport)
+        {
+            await File.WriteAllTextAsync(steamAppIdFilePath, SteamAppId, cancellationToken);
+            scopedLogger.LogDebug("Created {SteamAppIdFile} for Steam support at {steamAppIdFilePath}", SteamAppIdFile, steamAppIdFilePath);
+        }
+        else if (File.Exists(steamAppIdFilePath))
+        {
+            File.Delete(steamAppIdFilePath);
+            scopedLogger.LogDebug("Deleted existing {SteamAppIdFile} to disable Steam support at {steamAppIdFilePath}", SteamAppIdFile, steamAppIdFilePath);
+        }
 
         var applicationLauncherContext = new ApplicationLauncherContext { Process = process, ExecutablePath = executable, ProcessId = 0 };
         var guildWarsStartingDisabledContext = new GuildWarsStartingDisabledContext { ApplicationLauncherContext = applicationLauncherContext };

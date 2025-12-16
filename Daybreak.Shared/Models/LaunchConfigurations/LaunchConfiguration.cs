@@ -18,4 +18,7 @@ public sealed class LaunchConfiguration
 
     [JsonProperty(nameof(CredentialsIdentifier))]
     public string? CredentialsIdentifier { get; set; }
+
+    [JsonProperty(nameof(SteamSupport))]
+    public bool? SteamSupport { get; set; } = true;
 }

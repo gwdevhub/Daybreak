@@ -77,4 +77,10 @@ public sealed class LaunchConfigurationsViewModel(
         configuration.Name = newName;
         this.launchConfigurationService.SaveConfiguration(configuration);
     }
+
+    public void SteamSupportChanged(LaunchConfigurationWithCredentials configuration, bool isEnabled)
+    {
+        configuration.SteamSupport = isEnabled;
+        this.launchConfigurationService.SaveConfiguration(configuration);
+    }
 }

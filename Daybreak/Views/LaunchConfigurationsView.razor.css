@@ -41,7 +41,8 @@
 .launch-config-executable,
 .launch-config-credentials,
 .launch-config-name,
-.launch-config-args {
+.launch-config-args,
+.launch-config-steam {
     display: flex;
     flex-direction: row;
     width: 100%;
@@ -54,7 +55,8 @@
 .launch-config-executable-label,
 .launch-config-credentials-label,
 .launch-config-name-label,
-.launch-config-args-label {
+.launch-config-args-label,
+.launch-config-steam-label {
     width: 250px;
 }
 
@@ -62,7 +64,8 @@
 .launch-config-executable-field,
 .launch-config-credentials-field,
 .launch-config-name-field,
-.launch-config-args-field {
+.launch-config-args-field,
+.launch-config-steam-field {
     width: 50%;
 }
 
@@ -71,7 +74,8 @@
 .launch-config-executable-label ::deep *,
 .launch-config-credentials-label ::deep *,
 .launch-config-name-label ::deep *,
-.launch-config-args-label ::deep * {
+.launch-config-args-label ::deep *,
+.launch-config-steam-label ::deep * {
     font-size: var(--font-size-large) !important;
 }
 
@@ -79,7 +83,8 @@
 .launch-config-executable-field ::deep fluent-text-field,
 .launch-config-credentials-field ::deep fluent-text-field,
 .launch-config-name-field ::deep fluent-text-field,
-.launch-config-args-field ::deep fluent-text-field {
+.launch-config-args-field ::deep fluent-text-field,
+.launch-config-steam-field ::deep fluent-text-field {
     width: 100%;
     box-sizing: border-box !important;
     font-size: var(--font-size-large);
@@ -89,7 +94,8 @@
 .launch-config-executable-field ::deep fluent-select,
 .launch-config-credentials-field ::deep fluent-select,
 .launch-config-name-field ::deep fluent-select,
-.launch-config-args-field ::deep fluent-select {
+.launch-config-args-field ::deep fluent-select,
+.launch-config-steam-field ::deep fluent-select {
     width: 100%;
     box-sizing: border-box !important;
     font-size: var(--font-size-large) !important;
