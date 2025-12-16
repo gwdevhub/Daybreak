@@ -308,9 +308,9 @@ public sealed class LaunchViewModel : ViewModelBase<LaunchViewModel, LaunchView>
 
     private string GetLaunchButtonText()
     {
-        var configName = this.SelectedConfiguration?.Configuration?.Name ??
-            this.SelectedConfiguration?.Configuration?.Credentials?.Username ??
-            "Guild Wars";
+        var configName = this.SelectedConfiguration?.Configuration?.Name is not null and not ""
+            ? this.SelectedConfiguration?.Configuration.Name
+            : this.SelectedConfiguration?.Configuration?.Credentials?.Username ?? "Guild Wars";
         if (this.IsLaunching)
         {
             return "Launching...";

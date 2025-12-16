@@ -91,6 +91,15 @@
                                              Placeholder="Launch arguments"/>
                         </div>
                     </div>
+                    <div class="launch-config-steam">
+                        <div class="launch-config-steam-label">
+                            <FluentLabel>Steam support</FluentLabel>
+                        </div>
+                        <div class="launch-config-steam-field">
+                            <FluentCheckbox Value="@config.SteamSupport"
+                                            ValueChanged="@((newValue) => this.ViewModel.SteamSupportChanged(config, newValue))" />
+                        </div>
+                    </div>
                 </div>
             }
         </div>
