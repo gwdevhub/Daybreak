@@ -4,6 +4,7 @@ using Daybreak.Shared.Services.Credentials;
 using Microsoft.Extensions.Logging;
 using System.Configuration;
 using System.Extensions;
+using System.Extensions.Core;
 using System.Security.Cryptography;
 using System.Text;
 using Convert = System.Convert;
@@ -44,7 +45,8 @@ internal sealed class CredentialManager(
             .ProtectedLoginCredentials
             .Select(this.UnprotectCredentials)
             .Where(this.CredentialsUnprotected)
-            .Select(this.ExtractCredentials)];
+            .Select(this.ExtractCredentials)
+            .OfType<LoginCredentials>()];
     }
 
     public void StoreCredentials(List<LoginCredentials> loginCredentials)
@@ -53,7 +55,8 @@ internal sealed class CredentialManager(
         this.liveOptions.Value.ProtectedLoginCredentials = [.. loginCredentials
             .Select(this.ProtectCredentials)
             .Where(this.CredentialsProtected)
-            .Select(this.ExtractProtectedCredentials)];
+            .Select(this.ExtractProtectedCredentials)
+            .OfType<ProtectedLoginCredentials>()];
         this.liveOptions.UpdateOption();
     }
 
@@ -69,39 +72,42 @@ internal sealed class CredentialManager(
 
     private Optional<LoginCredentials> UnprotectCredentials(ProtectedLoginCredentials protectedLoginCredentials)
     {
+        var scopedLogger = this.logger.CreateScopedLogger();
         try
         {
-            var usrbytes = Convert.FromBase64String(protectedLoginCredentials.ProtectedUsername!);
-            var psdBytes = Convert.FromBase64String(protectedLoginCredentials.ProtectedPassword!);
+            var usrbytes = protectedLoginCredentials.ProtectedUsername is not null ? Convert.FromBase64String(protectedLoginCredentials.ProtectedUsername) : default;
+            var psdBytes = protectedLoginCredentials.ProtectedPassword is not null ? Convert.FromBase64String(protectedLoginCredentials.ProtectedPassword) : default;
             return new LoginCredentials
             {
                 Identifier = protectedLoginCredentials.Identifier,
-                Username = Encoding.UTF8.GetString(ProtectedData.Unprotect(usrbytes, Entropy, DataProtectionScope.LocalMachine)),
-                Password = Encoding.UTF8.GetString(ProtectedData.Unprotect(psdBytes, Entropy, DataProtectionScope.LocalMachine)),
+                Username = usrbytes is not null ? Encoding.UTF8.GetString(ProtectedData.Unprotect(usrbytes, Entropy, DataProtectionScope.LocalMachine)) : default,
+                Password = psdBytes is not null ? Encoding.UTF8.GetString(ProtectedData.Unprotect(psdBytes, Entropy, DataProtectionScope.LocalMachine)) : default,
             };
         }
         catch (Exception e)
         {
-            this.logger.LogError($"Unable to retrieve credentials. Details: {e}");
+            scopedLogger.LogError(e, "Unable to retrieve credentials");
             return Optional.None<LoginCredentials>();
         }
     }
 
     private Optional<ProtectedLoginCredentials> ProtectCredentials(LoginCredentials loginCredentials)
     {
+        var scopedLogger = this.logger.CreateScopedLogger();
         try
         {
-            var usrBytes = Encoding.UTF8.GetBytes(loginCredentials.Username!);
-            var psdBytes = Encoding.UTF8.GetBytes(loginCredentials.Password!);
+            var usrBytes = loginCredentials.Username is not null ? Encoding.UTF8.GetBytes(loginCredentials.Username) : default;
+            var psdBytes = loginCredentials.Password is not null ? Encoding.UTF8.GetBytes(loginCredentials.Password) : default;
             return new ProtectedLoginCredentials
             {
                 Identifier = loginCredentials.Identifier,
-                ProtectedUsername = Convert.ToBase64String(ProtectedData.Protect(usrBytes, Entropy, DataProtectionScope.LocalMachine)),
-                ProtectedPassword = Convert.ToBase64String(ProtectedData.Protect(psdBytes, Entropy, DataProtectionScope.LocalMachine)),
+                ProtectedUsername = usrBytes is not null ? Convert.ToBase64String(ProtectedData.Protect(usrBytes, Entropy, DataProtectionScope.LocalMachine)) : default,
+                ProtectedPassword = psdBytes is not null ? Convert.ToBase64String(ProtectedData.Protect(psdBytes, Entropy, DataProtectionScope.LocalMachine)) : default,
             };
         }
-        catch
+        catch(Exception e)
         {
+            scopedLogger.LogError(e, "Unable to encrypt credentials");
             return Optional.None<ProtectedLoginCredentials>();
         }
     }
@@ -120,13 +126,13 @@ internal sealed class CredentialManager(
             .ExtractValue();
     }
 
-    private ProtectedLoginCredentials ExtractProtectedCredentials(Optional<ProtectedLoginCredentials> optional)
+    private ProtectedLoginCredentials? ExtractProtectedCredentials(Optional<ProtectedLoginCredentials> optional)
     {
-        return optional.ExtractValue()!;
+        return optional.ExtractValue();
     }
 
-    private LoginCredentials ExtractCredentials(Optional<LoginCredentials> optional)
+    private LoginCredentials? ExtractCredentials(Optional<LoginCredentials> optional)
     {
-        return optional.ExtractValue()!;
+        return optional.ExtractValue();
     }
 }

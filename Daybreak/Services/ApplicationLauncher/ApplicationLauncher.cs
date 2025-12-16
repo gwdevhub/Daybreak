@@ -50,7 +50,7 @@ internal sealed class ApplicationLauncher(
     public async Task<GuildWarsApplicationLaunchContext?> LaunchGuildwars(LaunchConfigurationWithCredentials launchConfigurationWithCredentials, CancellationToken cancellationToken)
     {
         launchConfigurationWithCredentials.ThrowIfNull();
-        launchConfigurationWithCredentials.Credentials!.ThrowIfNull();
+        launchConfigurationWithCredentials.Credentials.ThrowIfNull();
         using var timeout = new CancellationTokenSource(LaunchTimeout);
         using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeout.Token);
         var gwProcess = await this.LaunchGuildwarsProcess(launchConfigurationWithCredentials, cancellation.Token);
@@ -135,8 +135,8 @@ internal sealed class ApplicationLauncher(
     private async Task<Process?> LaunchGuildwarsProcess(LaunchConfigurationWithCredentials launchConfigurationWithCredentials, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        var email = launchConfigurationWithCredentials.Credentials!.Username;
-        var password = launchConfigurationWithCredentials.Credentials!.Password;
+        var email = launchConfigurationWithCredentials.Credentials?.Username;
+        var password = launchConfigurationWithCredentials.Credentials?.Password;
         var executable = launchConfigurationWithCredentials.ExecutablePath;
         if (executable is not null &&
             File.Exists(executable) is false)
@@ -164,24 +164,20 @@ internal sealed class ApplicationLauncher(
             }
         }
 
-        var args = new List<string>()
-        {
-            "-email",
-            $"\"{email}\"",
-            "-password",
-            $"\"{password}\"",
-            "-character",
-            "\"Daybreak\""
-        };
+        var args = new List<string>();
 
-        foreach(var arg in launchConfigurationWithCredentials.Arguments?.Split(" ") ?? [])
+        args.AddRange(PopulateCommandLineArgs("-email", email) ?? []);
+        args.AddRange(PopulateCommandLineArgs("-password", password) ?? []);
+        args.AddRange(PopulateCommandLineArgs("-character", "Daybreak") ?? []);
+
+        foreach (var arg in launchConfigurationWithCredentials.Arguments?.Split(" ") ?? [])
         {
             args.Add(arg);
         }
 
         var mods = this.modsManager.GetMods().Where(m => m.IsEnabled && m.IsInstalled).ToList();
         var disabledmods = this.modsManager.GetMods().Where(m => !m.IsEnabled && m.IsInstalled).ToList();
-        foreach(var mod in mods)
+        foreach (var mod in mods)
         {
             args.AddRange(mod.GetCustomArguments());
         }
@@ -201,7 +197,7 @@ internal sealed class ApplicationLauncher(
 
         var applicationLauncherContext = new ApplicationLauncherContext { Process = process, ExecutablePath = executable, ProcessId = 0 };
         var guildWarsStartingDisabledContext = new GuildWarsStartingDisabledContext { ApplicationLauncherContext = applicationLauncherContext };
-        foreach(var mod in disabledmods)
+        foreach (var mod in disabledmods)
         {
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.Value.ModStartupTimeout));
             try
@@ -273,7 +269,7 @@ internal sealed class ApplicationLauncher(
         }
 
         // Reset launch context with the launched process
-        applicationLauncherContext = new ApplicationLauncherContext { ExecutablePath =  executable, Process = process, ProcessId = (uint)pId };
+        applicationLauncherContext = new ApplicationLauncherContext { ExecutablePath = executable, Process = process, ProcessId = (uint)pId };
         var guildWarsCreatedContext = new GuildWarsCreatedContext { ApplicationLauncherContext = applicationLauncherContext, CancelStartup = false };
         foreach (var mod in mods)
         {
@@ -435,7 +431,7 @@ internal sealed class ApplicationLauncher(
             scopedLogger.LogError(e, "Insuficient privileges to kill GuildWars process with id {guildWarsApplicationLaunchContext.ProcessId}", guildWarsApplicationLaunchContext.ProcessId);
             Task.Run(() => this.privilegeManager.RequestAdminPrivileges<LaunchView>("Insufficient privileges to kill Guild Wars process. Please restart as administrator and try again.", default, CancellationToken.None));
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             scopedLogger.LogError(e, "Failed to kill GuildWars process with id {guildWarsApplicationLaunchContext.ProcessId}", guildWarsApplicationLaunchContext.ProcessId);
             this.notificationService.NotifyError(
@@ -481,7 +477,7 @@ internal sealed class ApplicationLauncher(
                 {
                     return await m.ShouldRunAgain(guildWarsRunningContext, ct);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     scopedLogger.LogError(e, "Mod {modName} encountered an error while checking if it should run again", m.Name);
                     return false;
@@ -515,7 +511,7 @@ internal sealed class ApplicationLauncher(
             {
                 await mod.OnGuildWarsRunning(guildWarsRunningContext, cancellationToken);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 scopedLogger.LogError(e, "Mod {modName} encountered an error while reapplying", mod.Name);
                 this.notificationService.NotifyError(
@@ -833,5 +829,15 @@ internal sealed class ApplicationLauncher(
     {
         using var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(registryPath);
         key.SetValue(valueName, newValue, RegistryValueKind.String);
+    }
+
+    private static string[]? PopulateCommandLineArgs(string argName, string? argValue)
+    {
+        if (argValue is null || argValue.IsNullOrWhiteSpace())
+        {
+            return default;
+        }
+
+        return [argName, $"\"{argValue}\""];
     }
 }

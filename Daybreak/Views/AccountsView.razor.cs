@@ -22,13 +22,13 @@ public sealed class AccountsViewModel(
     public void UsernameChanged(CredentialModel credentials, string newUsername)
     {
         credentials.LoginCredentials.Username = newUsername;
-        this.credentialManager.StoreCredentials([.. this.LoginCredentials.Select(c => c.LoginCredentials)]);
+        this.SaveCredentials();
     }
 
     public void PasswordChanged(CredentialModel credentials, string password)
     {
         credentials.LoginCredentials.Password = password;
-        this.credentialManager.StoreCredentials([.. this.LoginCredentials.Select(c => c.LoginCredentials)]);
+        this.SaveCredentials();
     }
 
     public void TogglePasswordVisibility(CredentialModel credentials)
@@ -41,13 +41,19 @@ public sealed class AccountsViewModel(
     {
         var newCredentials = this.credentialManager.CreateUniqueCredentials();
         this.LoginCredentials.Insert(0, new CredentialModel { LoginCredentials = newCredentials, PasswordVisible = false });
+        this.SaveCredentials();
         this.RefreshView();
     }
 
     public void RemoveCredential(CredentialModel credentials)
     {
         this.LoginCredentials.Remove(credentials);
-        this.credentialManager.StoreCredentials([.. this.LoginCredentials.Select(c => c.LoginCredentials)]);
+        this.SaveCredentials();
         this.RefreshView();
+    }
+
+    private void SaveCredentials()
+    {
+        this.credentialManager.StoreCredentials([.. this.LoginCredentials.Select(c => c.LoginCredentials)]);
     }
 }
