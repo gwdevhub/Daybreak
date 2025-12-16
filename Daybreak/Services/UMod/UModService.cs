@@ -16,6 +16,7 @@ using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
+using System.Extensions.Core;
 using System.IO;
 using System.Net.Http;
 using TrailBlazr.Services;
@@ -28,7 +29,6 @@ internal sealed class UModService(
     INotificationService notificationService,
     IDownloadService downloadService,
     IHttpClient<UModService> httpClient,
-    ILiveOptions<LauncherOptions> launcherOptions,
     ILiveUpdateableOptions<UModOptions> uModOptions,
     ILogger<UModService> logger) : IUModService
 {
@@ -48,7 +48,6 @@ internal sealed class UModService(
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
     private readonly IHttpClient<UModService> httpClient = httpClient.ThrowIfNull();
-    private readonly ILiveOptions<LauncherOptions> launcherOptions = launcherOptions.ThrowIfNull();
     private readonly ILiveUpdateableOptions<UModOptions> uModOptions = uModOptions.ThrowIfNull();
     private readonly ILogger<UModService> logger = logger.ThrowIfNull();
 
@@ -100,21 +99,41 @@ internal sealed class UModService(
 
     public async Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken)
     {
+        var scopedLogger = this.logger.CreateScopedLogger();
         var modListFilePath = Path.Combine(UModDirectory, UModModList);
-        var lines = this.uModOptions.Value.Mods.Where(e => e.Enabled && e.PathToFile is not null).Select(e => e.PathToFile).ToList();
-        await File.WriteAllLinesAsync(modListFilePath, lines!, cancellationToken);
+        var lines = this.uModOptions.Value.Mods
+            .Where(e => e.Enabled && e.PathToFile is not null)
+            .Select(e => e.PathToFile)
+            .OfType<string>()
+            .Where(e =>
+            {
+                if (!File.Exists(e))
+                {
+                    scopedLogger.LogWarning("Mod file {ModFile} does not exist", e);
+                    this.notificationService.NotifyError(
+                        title: "gMod Mod Missing",
+                        description: $"The mod file {e} could not be found. gMod will not load this mod");
+
+                    return false;
+                }
+
+                return true;
+            })
+            .ToList();
+
+        await File.WriteAllLinesAsync(modListFilePath, lines, cancellationToken);
         var result = await this.processInjector.Inject(guildWarsCreatedContext.ApplicationLauncherContext.Process, Path.Combine(UModDirectory, UModDll), cancellationToken);
         if (result)
         {
             this.notificationService.NotifyInformation(
-                title: "uMod loaded",
-                description: "uMod.dll has been loaded. Textures will start loading asynchronously");
+                title: "gMod loaded",
+                description: "gMod.dll has been loaded. Textures will start loading asynchronously");
         }
         else
         {
             this.notificationService.NotifyError(
-                title: "uMod failed to load",
-                description: "uMod.dll has failed to load. Check logs for details");
+                title: "gMod failed to load",
+                description: "gMod.dll has failed to load. Check logs for details");
         }
     }
 
@@ -214,7 +233,7 @@ internal sealed class UModService(
 
     public async Task CheckAndUpdateUMod(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.CheckAndUpdateUMod), string.Empty);
+        var scopedLogger = this.logger.CreateScopedLogger();
         var existingUMod = Path.Combine(UModDirectory, UModDll);
         if (!this.IsInstalled)
         {
@@ -287,7 +306,7 @@ internal sealed class UModService(
 
     private async Task<DownloadLatestOperation> GetLatestVersion(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetLatestVersion), string.Empty);
+        var scopedLogger = this.logger.CreateScopedLogger();
         scopedLogger.LogDebug("Retrieving version list");
         var getListResponse = await this.httpClient.GetAsync(ReleasesUrl, cancellationToken);
         if (!getListResponse.IsSuccessStatusCode)
