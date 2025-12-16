@@ -99,7 +99,7 @@
   </ItemGroup>
 
   <Target Name="CopyWikiToWwwroot" BeforeTargets="BeforeBuild">
-    <Message Importance="high" Text="📚 Copying Daybreak.wiki to wwwroot/wiki" />
+    <Message Importance="high" Text="📦 Daybreak.wiki -&gt; wwwroot/wiki" />
     <Copy SourceFiles="@(WikiFiles)" DestinationFiles="@(WikiFiles->'wwwroot\wiki\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
   </Target>
 	
