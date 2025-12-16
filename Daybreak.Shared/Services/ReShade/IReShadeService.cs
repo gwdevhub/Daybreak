@@ -6,6 +6,7 @@ namespace Daybreak.Shared.Services.ReShade;
 public interface IReShadeService : IModService
 {
     bool AutoUpdate { get; set; }
+    void OpenReShadeFolder();
     Task<bool> LoadReShadeFromDisk(CancellationToken cancellationToken);
     Task<bool> InstallPackage(ShaderPackage package, CancellationToken cancellationToken);
     Task<bool> InstallPackage(string pathToZip, CancellationToken cancellationToken);

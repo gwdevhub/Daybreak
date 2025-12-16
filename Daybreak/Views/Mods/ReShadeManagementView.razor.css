@@ -1,0 +1,52 @@
+﻿.shaders-container {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    overflow-y: auto;
+    margin-top: 40px;
+}
+
+.shader-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: color-mix(in srgb, var(--neutral-fill-rest) 50%, transparent);
+    border: 1px solid var(--neutral-stroke-rest);
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+    transition: background-color 0.2s, transform 0.1s;
+    cursor: pointer;
+}
+
+    .shader-row:hover {
+        background: color-mix(in srgb, var(--neutral-fill-rest) 60%, transparent);
+        transform: translateX(2px);
+    }
+
+.shader-name {
+    font-size: var(--font-size-large);
+    font-weight: 600;
+    color: var(--neutral-foreground-rest);
+}
+
+.shader-description {
+    font-size: var(--font-size-small);
+    color: var(--neutral-foreground-rest);
+}
+
+.shader-effects {
+    font-size: var(--font-size-x-small);
+    font-style: italic;
+    color: var(--neutral-foreground-rest);
+}
+
+.center-container {
+    flex: 1;
+}
+
+::deep .label {
+    color: var(--neutral-foreground-rest) !important;
+    font-size: var(--font-size-medium) !important;
+}
