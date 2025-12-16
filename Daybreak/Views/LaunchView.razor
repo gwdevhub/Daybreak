@@ -8,8 +8,7 @@
         <div class="launch-button-group">
             <!-- Main Launch Button -->
             <button class="launch-button @(this.ViewModel.CanLaunch ? "enabled" : "disabled")"
-                    @onclick="this.ViewModel.LaunchSelectedConfiguration"
-                    disabled="@(!this.ViewModel.CanLaunch)">
+                    @onclick="this.ViewModel.LaunchSelectedConfiguration">
                 <div class="launch-button-content">
                     @if (this.ViewModel.IsLaunching)
                     {
@@ -27,8 +26,7 @@
             
             <!-- Dropdown Arrow Button -->
             <button class="dropdown-toggle-button @(this.ViewModel.LaunchConfigurations.Any() ? "enabled" : "disabled")"
-                    @onclick="this.ViewModel.ToggleDropdown"
-                    disabled="@(!this.ViewModel.LaunchConfigurations.Any())">
+                    @onclick="this.ViewModel.ToggleDropdown">
                 <span class="dropdown-arrow @(this.ViewModel.IsDropdownOpen ? "open" : "")">⏷</span>
             </button>
         </div>
@@ -42,7 +40,9 @@
                     <div class="dropdown-item @(config == ViewModel.SelectedConfiguration ? "selected" : "")"
                          @onclick="() => this.ViewModel.SelectConfiguration(config)">
                         <div class="config-info">
-                            <div class="config-name">@(config.Configuration?.Name ?? config.Configuration?.Credentials?.Username ?? "Unknown User")</div>
+                            <div class="config-name">@(config.Configuration?.Name is null or ""
+                                ? config.Configuration?.Credentials?.Username ?? "Unknown User"
+                                : config.Configuration.Name)</div>
                             @if (!string.IsNullOrEmpty(config.Configuration?.ExecutablePath))
                             {
                                 <div class="config-path">@config.Configuration.ExecutablePath</div>
