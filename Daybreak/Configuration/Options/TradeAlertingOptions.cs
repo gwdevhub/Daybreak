@@ -17,7 +17,7 @@ internal sealed class TradeAlertingOptions
     [OptionIgnore]
     public List<ITradeAlert> Alerts { get; set; } = [];
 
-    [OptionName(Name = "Quote Alerts Interval", Description = "The amount of seconds in between checking for alerts based on trade quotes")]
+    [OptionName(Name = "Alerts Interval", Description = "The amount of seconds in between checking for alerts based on trade messages and quotes")]
     [OptionRange<double>(MinValue = 30d, MaxValue = 1440d)]
     public double QuoteAlertsInterval { get; set; } = 30;
 }
