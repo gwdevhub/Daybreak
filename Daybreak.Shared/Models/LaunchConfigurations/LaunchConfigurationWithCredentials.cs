@@ -6,6 +6,7 @@ public sealed class LaunchConfigurationWithCredentials : IEquatable<LaunchConfig
     public string? Name { get; set; }
     public string? ExecutablePath { get; set; }
     public string? Arguments { get; set; }
+    public bool SteamSupport { get; set; } = true;
     public LoginCredentials? Credentials { get; set; }
 
     public bool Equals(LaunchConfigurationWithCredentials? other)
@@ -18,7 +19,8 @@ public sealed class LaunchConfigurationWithCredentials : IEquatable<LaunchConfig
         return this?.Identifier?.Equals(other?.Identifier) is true &&
             this?.ExecutablePath?.Equals(other?.ExecutablePath) is not false && //ExecutablePath can be null, so in that case the comparison returns null
             this?.Credentials?.Equals(other?.Credentials) is true &&
-            this?.Name?.Equals(other?.Name) is true;
+            this?.Name?.Equals(other?.Name) is true &&
+            this?.SteamSupport == other?.SteamSupport;
     }
 
     public override bool Equals(object? obj)

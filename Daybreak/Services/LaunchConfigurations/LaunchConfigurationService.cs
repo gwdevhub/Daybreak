@@ -8,6 +8,7 @@ using System.Core.Extensions;
 using System.Extensions;
 
 namespace Daybreak.Services.LaunchConfigurations;
+
 internal sealed class LaunchConfigurationService(
     ICredentialManager credentialManager,
     IGuildWarsExecutableManager guildWarsExecutableManager,
@@ -28,7 +29,7 @@ internal sealed class LaunchConfigurationService(
     public LaunchConfigurationWithCredentials? CreateConfiguration()
     {
         var config = new LaunchConfigurationWithCredentials
-        { 
+        {
             Identifier = Guid.NewGuid().ToString()
         };
 
@@ -96,7 +97,7 @@ internal sealed class LaunchConfigurationService(
     private bool SaveConfigurationInternal(LaunchConfigurationWithCredentials launchConfigurationWithCredentials)
     {
         var configs = this.liveUpdateableOptions.Value.LaunchConfigurations.ToList();
-        if (configs.FirstOrDefault(c => c.Identifier == launchConfigurationWithCredentials.Identifier) is 
+        if (configs.FirstOrDefault(c => c.Identifier == launchConfigurationWithCredentials.Identifier) is
             LaunchConfiguration config)
         {
             config.Name = launchConfigurationWithCredentials.Name;
@@ -104,6 +105,7 @@ internal sealed class LaunchConfigurationService(
             config.CredentialsIdentifier = launchConfigurationWithCredentials.Credentials?.Identifier;
             config.Executable = launchConfigurationWithCredentials.ExecutablePath;
             config.Arguments = launchConfigurationWithCredentials.Arguments;
+            config.SteamSupport = launchConfigurationWithCredentials.SteamSupport;
             this.liveUpdateableOptions.Value.LaunchConfigurations = configs;
             this.liveUpdateableOptions.UpdateOption();
             return true;
@@ -116,6 +118,7 @@ internal sealed class LaunchConfigurationService(
             Executable = launchConfigurationWithCredentials.ExecutablePath,
             Identifier = launchConfigurationWithCredentials.Identifier,
             Arguments = launchConfigurationWithCredentials.Arguments,
+            SteamSupport = launchConfigurationWithCredentials.SteamSupport
         });
         this.liveUpdateableOptions.Value.LaunchConfigurations = configs;
         this.liveUpdateableOptions.UpdateOption();
@@ -141,7 +144,8 @@ internal sealed class LaunchConfigurationService(
             Credentials = credentials,
             ExecutablePath = launchConfiguration.Executable,
             Arguments = launchConfiguration.Arguments,
-            Name = launchConfiguration.Name
+            Name = launchConfiguration.Name,
+            SteamSupport = launchConfiguration.SteamSupport ?? true
         };
     }
 }
