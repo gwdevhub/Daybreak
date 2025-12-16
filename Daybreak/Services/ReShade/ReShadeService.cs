@@ -11,6 +11,7 @@ using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.ReShade;
 using Daybreak.Shared.Utils;
+using Daybreak.Views.Mods;
 using HtmlAgilityPack;
 using IniParser.Parser;
 using Microsoft.Extensions.Logging;
@@ -24,6 +25,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
 using System.Windows.Extensions.Services;
+using TrailBlazr.Services;
 
 namespace Daybreak.Services.ReShade;
 internal sealed class ReShadeService(
@@ -32,6 +34,7 @@ internal sealed class ReShadeService(
     ILiveUpdateableOptions<ReShadeOptions> liveUpdateableOptions,
     IHttpClient<ReShadeService> httpClient,
     IDownloadService downloadService,
+    IViewManager viewManager,
     ILogger<ReShadeService> logger) : IReShadeService, IApplicationLifetimeService
 {
     private const string PackagesIniUrl = "https://raw.githubusercontent.com/crosire/reshade-shaders/list/EffectPackages.ini";
@@ -64,6 +67,7 @@ internal sealed class ReShadeService(
     private readonly ILiveUpdateableOptions<ReShadeOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
     private readonly IHttpClient<ReShadeService> httpClient = httpClient.ThrowIfNull();
     private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
+    private readonly IViewManager viewManager = viewManager.ThrowIfNull();
     private readonly ILogger<ReShadeService> logger = logger.ThrowIfNull();
 
     public string Name => "ReShade";
@@ -124,7 +128,7 @@ internal sealed class ReShadeService(
 
     public Task OnCustomManagement(CancellationToken cancellationToken)
     {
-        Process.Start("explorer.exe", ReShadePath);
+        this.viewManager.ShowView<ReShadeManagementView>();
         return Task.CompletedTask;
     }
 
@@ -183,6 +187,11 @@ internal sealed class ReShadeService(
         }
 
         return Task.CompletedTask;
+    }
+
+    public void OpenReShadeFolder()
+    {
+        Process.Start("explorer.exe", ReShadePath);
     }
 
     public async Task<IEnumerable<ShaderPackage>> GetStockPackages(CancellationToken cancellationToken)

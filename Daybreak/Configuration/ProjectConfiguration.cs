@@ -330,6 +330,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<UModManagementView, UModManagementViewModel>();
         viewProducer.RegisterView<TradeNotificationView, TradeNotificationViewModel>();
         viewProducer.RegisterView<WikiView, WikiViewModel>();
+        viewProducer.RegisterView<ReShadeManagementView, ReShadeManagementViewModel>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
