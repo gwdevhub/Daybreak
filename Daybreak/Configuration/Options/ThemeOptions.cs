@@ -1,6 +1,6 @@
 ﻿using Daybreak.Attributes;
 using Daybreak.Shared.Attributes;
-using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.Themes;
 using Daybreak.Themes;
 
 namespace Daybreak.Configuration.Options;

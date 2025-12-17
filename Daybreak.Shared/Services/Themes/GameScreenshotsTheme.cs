@@ -1,5 +1,5 @@
-﻿using Daybreak.Shared.Models;
-using Daybreak.Shared.Models.ColorPalette;
+﻿using Daybreak.Shared.Models.ColorPalette;
+using Daybreak.Shared.Models.Themes;
 using Daybreak.Shared.Services.Screenshots;
 using System.Windows.Extensions.Services;
 
@@ -12,7 +12,7 @@ namespace Daybreak.Shared.Services.Themes;
 public sealed class GameScreenshotsTheme(
     IThemeManager themeManager,
     IScreenshotService screenshotService)
-    : Theme(ThemeName, AccentColor.Orange, string.Empty, LightDarkMode.SystemSynchronized, string.Empty), IApplicationLifetimeService
+    : Theme(ThemeName, AccentColor.Orange, new StaticBackground(string.Empty), LightDarkMode.SystemSynchronized, string.Empty), IApplicationLifetimeService
 {
     public const string ThemeName = "Dynamic Screenshots";
 
@@ -37,7 +37,7 @@ public sealed class GameScreenshotsTheme(
             }
 
             this.AccentColor = entry.AccentColor;
-            this.Backdrop = entry.FilePath;
+            this.Background = new StaticBackground(entry.FilePath);
             this.Mode = entry.LightDarkMode;
             this.Filter = entry.LightDarkMode is LightDarkMode.Light
                 ? "blur(3px) brightness(1.3) sepia(0.2) saturate(1.2)"

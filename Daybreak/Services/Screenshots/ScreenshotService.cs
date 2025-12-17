@@ -4,7 +4,7 @@ using System.IO;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.ColorPalette;
 using Daybreak.Shared.Services.Screenshots;
-using static Daybreak.Shared.Models.Theme;
+using static Daybreak.Shared.Models.Themes.Theme;
 
 namespace Daybreak.Services.Screenshots;
 

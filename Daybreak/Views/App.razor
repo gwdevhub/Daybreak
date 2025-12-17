@@ -5,8 +5,7 @@
     BaseLayerLuminance="@this.ViewModel.BaseLayerLuminace">
     <ErrorLoggingBoundary>
         <div class="app-container @(this.ViewModel.WindowState == WindowState.Maximized ? "maximized" : "")"
-             style="--backdrop-image: @this.ViewModel.BackdropImage;
-                    --backdrop-image-filter: @this.ViewModel.BackdropImageFilter;
+             style="@(string.IsNullOrWhiteSpace(this.ViewModel.BackdropImage) is false ? $"--backdrop-image: {this.ViewModel.BackdropImage}; --backdrop-image-filter: {this.ViewModel.BackdropImageFilter};" : string.Empty)
                     --ui-scale: @(this.ViewModel.UIScale);
                     --font-size-xx-small: @(this.ViewModel.XXSmallFontSize)rem;
                     --font-size-x-small: @(this.ViewModel.XSmallFontSize)rem;
@@ -16,6 +15,12 @@
                     --font-size-x-large: @(this.ViewModel.XLargeFontSize)rem;
                     --font-size-xx-large: @(this.ViewModel.XXLargeFontSize)rem;
                     @(string.Join(";\n", AccentColor.Accents.Select(c => $"--accent-{c.Name.ToString().ToLower()}: {c.Hex}")))">
+            @if (!string.IsNullOrWhiteSpace(this.ViewModel.BackdropEmbed))
+            {
+                <div id="video-background">
+                    @((MarkupString)this.ViewModel.BackdropEmbed)
+                </div>
+            }
             <WindowBorders OnResize="@this.ViewModel.StartResize" />
 
             <WindowTitlebar WindowState="@this.ViewModel.WindowState"

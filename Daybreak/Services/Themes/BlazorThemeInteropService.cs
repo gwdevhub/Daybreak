@@ -1,6 +1,6 @@
 using Daybreak.Configuration.Options;
-using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.ColorPalette;
+using Daybreak.Shared.Models.Themes;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Themes;
 using Daybreak.Themes;
@@ -39,7 +39,8 @@ public class BlazorThemeInteropService(
     public BackgroundColor NeutralBaseColor { get; private set; } = BackgroundColor.Gray40;
     public string AccentBaseColorHex { get; private set; } = string.Empty;
     public string NeutralBaseColorHex { get; private set; } = string.Empty;
-    public string BackdropImage { get; private set; } = string.Empty;
+    public string? BackdropImage { get; private set; }
+    public string? BackdropEmbed { get; private set; }
     public float BaseLayerLuminance { get; private set; } = 0.0f;
     public double UIScale { get; private set; } = 1.0;
     public double XXSmallFontSize { get; private set; } = XXSmallFontSizeValue;
@@ -83,7 +84,8 @@ public class BlazorThemeInteropService(
         var backgroundColor = lightMode ? BackgroundColor.Gray40 : BackgroundColor.Gray210;
         var baseLayerLuminance = lightMode ? 0.98f : 0.23f;
         this.CurrentTheme = theme;
-        this.BackdropImage = theme.Backdrop;
+        this.BackdropImage = theme.Background is StaticBackground staticBackground ? staticBackground.BackdropImage : default;
+        this.BackdropEmbed = theme.Background is EmbedBackground embeddedBackground ? embeddedBackground.EmbedCode : default;
         this.IsLightMode = lightMode;
         this.AccentBaseColor = accentColor;
         this.AccentBaseColorHex = accentColor.Hex;

@@ -447,12 +447,10 @@ public class ProjectConfiguration : PluginConfigurationBase
     public override void RegisterThemes(IThemeProducer themeProducer)
     {
         themeProducer.ThrowIfNull();
-        foreach (var theme in CoreThemes.Themes)
-        {
-            themeProducer.RegisterTheme(theme);
-        }
-
-        foreach (var theme in HeroThemes.Themes)
+        var themes = CoreThemes.Themes
+            .Concat(HeroThemes.Themes)
+            .Concat(LiveThemes.Themes);
+        foreach (var theme in themes)
         {
             themeProducer.RegisterTheme(theme);
         }

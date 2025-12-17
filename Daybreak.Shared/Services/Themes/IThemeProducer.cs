@@ -1,4 +1,4 @@
-﻿using Daybreak.Shared.Models;
+﻿using Daybreak.Shared.Models.Themes;
 
 namespace Daybreak.Shared.Services.Themes;
 public interface IThemeProducer
