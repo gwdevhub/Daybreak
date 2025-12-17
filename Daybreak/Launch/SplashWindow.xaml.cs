@@ -1,6 +1,7 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.ColorPalette;
+using Daybreak.Shared.Models.Themes;
 using Daybreak.Themes;
 using Microsoft.Extensions.Options;
 using System.ComponentModel;

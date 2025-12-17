@@ -1,4 +1,4 @@
-﻿using Daybreak.Shared.Models;
+﻿using Daybreak.Shared.Models.Themes;
 using Daybreak.Shared.Services.Themes;
 using Newtonsoft.Json;
 

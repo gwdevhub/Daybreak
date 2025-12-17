@@ -1,5 +1,5 @@
-﻿using Daybreak.Shared.Models;
-using Daybreak.Shared.Models.ColorPalette;
+﻿using Daybreak.Shared.Models.ColorPalette;
+using Daybreak.Shared.Models.Themes;
 
 namespace Daybreak.Shared.Services.Themes;
 public interface IThemeManager
@@ -12,7 +12,8 @@ public interface IThemeManager
     string AccentBaseColorHex { get; }
     string NeutralBaseColorHex { get; }
     float BaseLayerLuminance { get; }
-    string BackdropImage { get; }
+    string? BackdropImage { get; }
+    string? BackdropEmbed { get; }
     double UIScale { get; }
     double XXSmallFontSize { get; }
     double XSmallFontSize { get; }

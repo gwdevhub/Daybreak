@@ -59,8 +59,9 @@ public sealed class AppViewModel
     public string AccentBaseColor { get; set; } = string.Empty;
     public string NeutralBaseColor { get; set; } = string.Empty;
     public float BaseLayerLuminace { get; set; } = 0.0f;
-    public string BackdropImage { get; set; } = string.Empty;
-    public string BackdropImageFilter { get; set; } = string.Empty;
+    public string? BackdropImage { get; set; } = string.Empty;
+    public string? BackdropImageFilter { get; set; } = string.Empty;
+    public string? BackdropEmbed { get; set; } = string.Empty;
 
     public double UIScale { get; set; }
     public double XXSmallFontSize { get; set; }
@@ -280,7 +281,9 @@ public sealed class AppViewModel
 
     private void OnThemeChange()
     {
-        this.BackdropImage = this.GetBackdropImageUrl(this.themeManager.BackdropImage);
+        this.BackdropImage = !string.IsNullOrWhiteSpace(this.themeManager.BackdropImage) ? this.GetBackdropImageUrl(this.themeManager.BackdropImage) : default;
+        this.BackdropEmbed = !string.IsNullOrWhiteSpace(this.themeManager.BackdropEmbed) ? this.themeManager.BackdropEmbed : default;
+        this.BackdropImageFilter = this.themeManager.CurrentTheme?.Filter ?? string.Empty;
         this.BaseLayerLuminace = this.themeManager.BaseLayerLuminance;
         this.AccentBaseColor = this.themeManager.AccentBaseColorHex;
         this.NeutralBaseColor = this.themeManager.NeutralBaseColorHex;
@@ -292,7 +295,6 @@ public sealed class AppViewModel
         this.XLargeFontSize = this.themeManager.XLargeFontSize;
         this.XXLargeFontSize = this.themeManager.XXLargeFontSize;
         this.UIScale = this.themeManager.UIScale;
-        this.BackdropImageFilter = this.themeManager.CurrentTheme?.Filter ?? string.Empty;
         this.RedrawRequested?.Invoke(this, EventArgs.Empty);
     }
 
