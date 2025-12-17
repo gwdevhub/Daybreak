@@ -1,5 +1,5 @@
 ﻿using Daybreak.Shared.Models.ColorPalette;
-using static Daybreak.Shared.Models.Theme;
+using static Daybreak.Shared.Models.Themes.Theme;
 
 namespace Daybreak.Shared.Models;
 

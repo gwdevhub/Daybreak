@@ -1,5 +1,5 @@
 ﻿using Daybreak.Shared.Attributes;
-using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.Themes;
 
 namespace Daybreak.Attributes;
 public sealed class DaybreakThemeOptionsAttribute : OptionValuesFactoryAttribute

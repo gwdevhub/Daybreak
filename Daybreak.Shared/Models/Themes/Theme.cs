@@ -2,9 +2,14 @@
 using Daybreak.Shared.Models.ColorPalette;
 using Newtonsoft.Json;
 
-namespace Daybreak.Shared.Models;
+namespace Daybreak.Shared.Models.Themes;
 [JsonConverter(typeof(ThemeJsonConverter))]
-public class Theme(string name, AccentColor accentColor, string backdrop, Theme.LightDarkMode mode, string filter)
+public class Theme(
+    string name,
+    AccentColor accentColor,
+    IAppBackground background,
+    Theme.LightDarkMode mode,
+    string filter)
 {
     public enum LightDarkMode
     {
@@ -15,7 +20,7 @@ public class Theme(string name, AccentColor accentColor, string backdrop, Theme.
 
     public string Name { get; init; } = name;
     public AccentColor AccentColor { get; internal set; } = accentColor;
-    public string Backdrop { get; internal set; } = backdrop;
+    public IAppBackground Background { get; internal set; } = background;
     public LightDarkMode Mode { get; internal set; } = mode;
     public string Filter { get; internal set; } = filter;
 
