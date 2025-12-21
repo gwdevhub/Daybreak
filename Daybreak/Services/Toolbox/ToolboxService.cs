@@ -67,6 +67,16 @@ internal sealed class ToolboxService(
     }
     public bool IsInstalled => File.Exists(UsualToolboxLocation);
 
+    public Task<bool> IsUpdateAvailable(CancellationToken cancellationToken)
+    {
+        return this.IsUpdateAvailableInternal(cancellationToken);
+    }
+
+    public async Task<bool> PerformUpdate(CancellationToken cancellationToken)
+    {
+        return await this.PerformInstallation(cancellationToken);
+    }
+
     public IProgressAsyncOperation<bool> PerformInstallation(CancellationToken cancellationToken)
     {
         return ProgressAsyncOperation.Create(async progress =>
@@ -108,7 +118,7 @@ internal sealed class ToolboxService(
 
     public async Task NotifyUserIfUpdateAvailable(CancellationToken cancellationToken)
     {
-        if (await this.IsUpdateAvailable(cancellationToken))
+        if (await this.IsUpdateAvailableInternal(cancellationToken))
         {
             this.notificationService.NotifyInformation<ToolboxUpdateHandler>("GWToolboxpp update available", "Click on this notification to update GWToolboxpp");
         }
@@ -262,7 +272,7 @@ internal sealed class ToolboxService(
     private async Task<bool> SetupToolboxDll(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        if (File.Exists(UsualToolboxLocation) && !await this.IsUpdateAvailable(cancellationToken))
+        if (File.Exists(UsualToolboxLocation) && !await this.IsUpdateAvailableInternal(cancellationToken))
         {
             return true;
         }
@@ -283,6 +293,40 @@ internal sealed class ToolboxService(
         }
 
         return true;
+    }
+
+    private async Task<bool> IsUpdateAvailableInternal(CancellationToken cancellationToken)
+    {
+        if (!File.Exists(UsualToolboxLocation))
+        {
+            return true;
+        }
+
+        var latestVersion = await this.toolboxClient.GetLatestVersion(cancellationToken);
+        if (latestVersion is null)
+        {
+            return false;
+        }
+
+        var fileInfo = FileVersionInfo.GetVersionInfo(UsualToolboxLocation);
+        var current = fileInfo.ProductVersion?.Replace('_', '-');
+        if (latestVersion.ToString().EndsWith("-release") &&
+            current?.EndsWith("-release") is not true)
+        {
+            current += "-release";
+        }
+
+        if (!Version.TryParse(current, out var currentVersion))
+        {
+            return true;
+        }
+
+        if (latestVersion.CompareTo(currentVersion) > 0)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     private async Task LaunchToolbox(Process process, CancellationToken cancellationToken)
@@ -318,40 +362,6 @@ internal sealed class ToolboxService(
         }
 
         return;
-    }
-
-    private async Task<bool> IsUpdateAvailable(CancellationToken cancellationToken)
-    {
-        if (!File.Exists(UsualToolboxLocation))
-        {
-            return true;
-        }
-
-        var latestVersion = await this.toolboxClient.GetLatestVersion(cancellationToken);
-        if (latestVersion is null)
-        {
-            return false;
-        }
-
-        var fileInfo = FileVersionInfo.GetVersionInfo(UsualToolboxLocation);
-        var current = fileInfo.ProductVersion?.Replace('_', '-');
-        if (latestVersion.ToString().EndsWith("-release") &&
-            current?.EndsWith("-release") is not true)
-        {
-            current += "-release";
-        }
-
-        if (!Version.TryParse(current, out var currentVersion))
-        {
-            return true;
-        }
-
-        if (latestVersion.CompareTo(currentVersion) > 0)
-        {   
-            return true;
-        }
-
-        return false;
     }
 
     private async IAsyncEnumerable<TeamBuildEntry> ParseToolboxBuilds(TextReader textReader, [EnumeratorCancellation] CancellationToken cancellationToken)

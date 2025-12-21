@@ -13,27 +13,39 @@
                     <div class="mod-description-label">@mod.Description</div>
                 </div>
                 <div class="mod-row-right">
-                    <div class="mod-toggle">
-                        <FluentLabel class="label">@((mod.IsInstalled && mod.IsEnabled) ? "Enabled" : "Disabled")</FluentLabel>
-                        <FluentSwitch Value="@(mod.IsInstalled && mod.IsEnabled)"
+                    <div class="mod-toggle @((mod.IsInstalled ? string.Empty : "disabled"))">
+                        <FluentLabel class="label">@(mod.IsEnabled ? "Enabled" : "Disabled")</FluentLabel>
+                        <FluentSwitch Value="@(mod.IsEnabled)"
                                       @onchange="() => this.ViewModel.ToggleMod(mod)" />
                     </div>
-                    @if (!mod.IsInstalled)
+                    @if (mod.Loading)
                     {
-                        <div class="mod-not-installed">
-                            Not Installed
+                        <SpinnerWidget IsLoading="true" />
+                    }
+                    else if (!mod.IsInstalled)
+                    {
+                        <div class="mod-action-button"
+                            @onclick="(() => this.ViewModel.InstallMod(mod))">
+                            Install
                         </div>
                     }
-                    else if (mod.CanCustomManage)
+                    else if (mod.CanUpdate)
                     {
-                        <div class="mod-can-manage"
+                        <div class="mod-action-button"
+                             @onclick="@(() => this.ViewModel.UpdateMod(mod))">
+                            Update
+                        </div>
+                    }
+                    else if (mod.CanManage)
+                    {
+                        <div class="mod-action-button"
                              @onclick="@(() => this.ViewModel.ManageMod(mod))">
                             Manage
                         </div>
                     }
                     else
                     {
-                        <div class="mod-installed">
+                        <div class="mod-action-button-disabled">
                             Installed
                         </div>
                     }

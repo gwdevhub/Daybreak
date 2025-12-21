@@ -28,6 +28,13 @@ internal sealed class GuildWarsVersionChecker(
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly ILogger<GuildWarsVersionChecker> logger = logger.ThrowIfNull();
 
+    public Task<bool> IsUpdateAvailable(CancellationToken cancellationToken) => Task.FromResult(false);
+
+    public Task<bool> PerformUpdate(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException("GuildWars Version Checker mod does not support manual updates");
+    }
+
     public IProgressAsyncOperation<bool> PerformInstallation(CancellationToken cancellationToken)
     {
         throw new NotImplementedException("GuildWars Version Checker does not support manual installation");

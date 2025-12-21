@@ -80,6 +80,13 @@ internal sealed class DirectSongService(
 
     public IEnumerable<string> GetCustomArguments() => [];
 
+    public Task<bool> IsUpdateAvailable(CancellationToken cancellationToken) => Task.FromResult(false);
+
+    public Task<bool> PerformUpdate(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException("DirectSong mod does not support manual updates");
+    }
+
     public Task<bool> ShouldRunAgain(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken) => Task.FromResult(false);
 
     public Task OnGuildWarsRunning(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken) => Task.CompletedTask;
