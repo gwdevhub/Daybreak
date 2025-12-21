@@ -97,6 +97,7 @@ internal sealed class ReShadeService(
                                File.Exists(ReShadePresetPath) &&
                                File.Exists(ReShadeLogPath) &&
                                File.Exists(ConfigIniPath);
+    public bool CanUninstall => true;
 
     public void OnStartup()
     {
@@ -117,6 +118,29 @@ internal sealed class ReShadeService(
 
     public void OnClosing()
     {
+    }
+
+    public IProgressAsyncOperation<bool> PerformUninstallation(CancellationToken cancellationToken)
+    {
+        return ProgressAsyncOperation.Create<bool>(progress =>
+        {
+            progress.Report(new ProgressUpdate(0, "Uninstalling ReShade"));
+            if (!this.IsInstalled)
+            {
+                progress.Report(new ProgressUpdate(1, "ReShade is not installed"));
+                return Task.FromResult(true);
+            }
+
+            if (!Directory.Exists(ReShadePath))
+            {
+                progress.Report(new ProgressUpdate(1, "ReShade is not installed"));
+                return Task.FromResult(true);
+            }
+
+            Directory.Delete(ReShadePath, true);
+            progress.Report(new ProgressUpdate(1, "ReShade uninstalled successfully"));
+            return Task.FromResult(true);
+        }, cancellationToken);
     }
 
     public async Task<bool> IsUpdateAvailable(CancellationToken cancellationToken)

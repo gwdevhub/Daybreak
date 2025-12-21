@@ -56,6 +56,7 @@ internal sealed class ToolboxService(
     public string Description => "GWToolboxpp is a popular third-party mod for Guild Wars that enhances the game's user interface and provides various quality-of-life improvements.";
     public bool IsVisible => true;
     public bool CanCustomManage => false;
+    public bool CanUninstall => true;
     public bool IsEnabled
     {
         get => this.toolboxOptions.Value.Enabled;
@@ -75,6 +76,29 @@ internal sealed class ToolboxService(
     public async Task<bool> PerformUpdate(CancellationToken cancellationToken)
     {
         return await this.PerformInstallation(cancellationToken);
+    }
+
+    public IProgressAsyncOperation<bool> PerformUninstallation(CancellationToken cancellationToken)
+    {
+        return ProgressAsyncOperation.Create<bool>(progress =>
+        {
+            progress.Report(new ProgressUpdate(0, "Uninstalling Toolbox"));
+            if (!this.IsInstalled)
+            {
+                progress.Report(new ProgressUpdate(1, "Toolbox is not installed"));
+                return Task.FromResult(true);
+            }
+
+            if (!File.Exists(UsualToolboxLocation))
+            {
+                progress.Report(new ProgressUpdate(1, "Toolbox is not installed"));
+                return Task.FromResult(true);
+            }
+
+            File.Delete(UsualToolboxLocation);
+            progress.Report(new ProgressUpdate(1, "Toolbox uninstalled successfully"));
+            return Task.FromResult(true);
+        }, cancellationToken);
     }
 
     public IProgressAsyncOperation<bool> PerformInstallation(CancellationToken cancellationToken)

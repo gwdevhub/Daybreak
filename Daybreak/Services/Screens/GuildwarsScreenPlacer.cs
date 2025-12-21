@@ -43,6 +43,13 @@ internal sealed class GuildwarsScreenPlacer(
     public bool CanCustomManage => true;
     public bool IsInstalled => true;
 
+    public bool CanUninstall => false;
+
+    public IProgressAsyncOperation<bool> PerformUninstallation(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException("GuildwarsScreenPlacer mod does not support manual uninstallation");
+    }
+
     public Task<bool> IsUpdateAvailable(CancellationToken cancellationToken) => Task.FromResult(false);
 
     public Task<bool> PerformUpdate(CancellationToken cancellationToken)

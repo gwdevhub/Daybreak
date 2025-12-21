@@ -24,7 +24,11 @@ public sealed class UpdateConfirmationViewModel(
         }
 
         this.Version = parsedVersion;
-        this.ChangeLog = await this.applicationUpdater.GetChangelog(this.Version, cancellationToken);
+        _ = Task.Factory.StartNew(async () =>
+        {
+            this.ChangeLog = await this.applicationUpdater.GetChangelog(this.Version, cancellationToken);
+            await this.RefreshViewAsync();
+        }, CancellationToken.None);
     }
 
     public void Confirm()

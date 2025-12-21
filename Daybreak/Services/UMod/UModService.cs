@@ -55,6 +55,7 @@ internal sealed class UModService(
     public string Description => "gMod (formerly uMod) is a texture mod loader for Guild Wars that allows you to load custom textures and mods into the game";
     public bool IsVisible => true;
     public bool CanCustomManage => true;
+    public bool CanUninstall => true;
     public bool IsEnabled
     {
         get => this.uModOptions.Value.Enabled;
@@ -94,6 +95,30 @@ internal sealed class UModService(
         return ProgressAsyncOperation.Create(async progress =>
         {
             return await Task.Factory.StartNew(() => this.SetupUMod(progress, cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap();
+        }, cancellationToken);
+    }
+
+    public IProgressAsyncOperation<bool> PerformUninstallation(CancellationToken cancellationToken)
+    {
+        return ProgressAsyncOperation.Create<bool>(progress =>
+        {
+            progress.Report(new ProgressUpdate(0, "Uninstalling gMod"));
+            if (!this.IsInstalled)
+            {
+                progress.Report(new ProgressUpdate(1, "gMod is not installed"));
+                return Task.FromResult(true);
+            }
+
+            var gModPath = Path.GetFullPath(Path.Combine(UModDirectory, UModDll));
+            if (!File.Exists(gModPath))
+            {
+                progress.Report(new ProgressUpdate(1, "gMod is not installed"));
+                return Task.FromResult(true);
+            }
+
+            File.Delete(gModPath);
+            progress.Report(new ProgressUpdate(1, "gMod uninstalled successfully"));
+            return Task.FromResult(true);
         }, cancellationToken);
     }
 
