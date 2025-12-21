@@ -21,6 +21,7 @@ using System.Core.Extensions;
 using System.Data;
 using System.Diagnostics;
 using System.Extensions;
+using System.Extensions.Core;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
@@ -118,6 +119,26 @@ internal sealed class ReShadeService(
     {
     }
 
+    public async Task<bool> IsUpdateAvailable(CancellationToken cancellationToken)
+    {
+        if (this.GetCurrentVersion() is not Version currentVersion)
+        {
+            return false;
+        }
+
+        if (await this.GetLatestVersion(cancellationToken) is not Version latestVersion)
+        {
+            return false;
+        }
+
+        return latestVersion.CompareTo(currentVersion) > 0;
+    }
+
+    public async Task<bool> PerformUpdate(CancellationToken cancellationToken)
+    {
+        return await this.PerformInstallation(cancellationToken);
+    }
+
     public IProgressAsyncOperation<bool> PerformInstallation(CancellationToken cancellationToken)
     {
         return ProgressAsyncOperation.Create(async progress =>
@@ -140,7 +161,7 @@ internal sealed class ReShadeService(
 
     public async Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.OnGuildWarsCreated), guildWarsCreatedContext.ApplicationLauncherContext.ExecutablePath ?? string.Empty);
+        var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: guildWarsCreatedContext.ApplicationLauncherContext.ExecutablePath ?? string.Empty);
         if (await this.processInjector.Inject(guildWarsCreatedContext.ApplicationLauncherContext.Process, ReShadeDllPath, cancellationToken))
         {
             scopedLogger.LogDebug("Injected ReShade dll");
@@ -241,7 +262,7 @@ internal sealed class ReShadeService(
 
     public async Task<bool> SetupReShade(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.SetupReShade), string.Empty);
+        var scopedLogger = this.logger.CreateScopedLogger();
         scopedLogger.LogDebug("Retrieving ReShade latest version");
 
         progress.Report(ProgressRetrieveLatestUrl);
@@ -279,7 +300,7 @@ internal sealed class ReShadeService(
 
     public async Task<bool> InstallPackage(ShaderPackage package, CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.InstallPackage), package.Name ?? string.Empty);
+        var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: package.Name ?? string.Empty);
         if (package.DownloadUrl!.IsNullOrWhiteSpace() is not false)
         {
             scopedLogger.LogError("Unable to install. Package has no download url");
@@ -309,7 +330,7 @@ internal sealed class ReShadeService(
 
     public async Task<bool> InstallPackage(string pathToZip, CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.InstallPackage), pathToZip ?? string.Empty);
+        var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: pathToZip ?? string.Empty);
         var fullPath = pathToZip is not null ? Path.GetFullPath(pathToZip) : default;
         if (fullPath?.IsNullOrWhiteSpace() is not false)
         {
@@ -368,7 +389,7 @@ internal sealed class ReShadeService(
     public async Task<bool> UpdateIniFromPath(string pathToIni, CancellationToken cancellationToken)
     {
         pathToIni = Path.GetFullPath(pathToIni);
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.UpdateIniFromPath), pathToIni);
+        var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: pathToIni);
         if (!File.Exists(pathToIni))
         {
             scopedLogger.LogError("File doesn't exist");
@@ -391,7 +412,7 @@ internal sealed class ReShadeService(
 
     private async void PeriodicallyCheckPresetChanges(ApplicationLauncherContext applicationLauncherContext, string presetsFile, string configFile)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.PeriodicallyCheckPresetChanges), presetsFile);
+        var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: presetsFile);
         if (!File.Exists(presetsFile))
         {
             scopedLogger.LogError("File does not exist");
@@ -460,7 +481,7 @@ internal sealed class ReShadeService(
         string? desiredTextureInstallationPath = default,
         List<string>? fxFilter = default)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.InstallPackageInternal), string.Empty);
+        var scopedLogger = this.logger.CreateScopedLogger();
         var basePath = Path.GetFullPath(ReShadePath);
         desiredInstallationPath = desiredInstallationPath?.Replace(".\\", basePath + "\\");
         desiredTextureInstallationPath = desiredTextureInstallationPath?.Replace(".\\", basePath + "\\");
@@ -532,7 +553,7 @@ internal sealed class ReShadeService(
 
     private async Task<string?> GetLatestDownloadUrl(CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetLatestDownloadUrl), string.Empty);
+        var scopedLogger = this.logger.CreateScopedLogger();
         var homePageResult = await this.httpClient.GetAsync(ReShadeHomepageUrl, cancellationToken);
         if (!homePageResult.IsSuccessStatusCode)
         {
@@ -566,7 +587,7 @@ internal sealed class ReShadeService(
 
     private async Task<bool> SetupReshadeDllFromInstaller(string pathToInstaller, CancellationToken cancellationToken)
     {
-        var scoppedLogger = this.logger.CreateScopedLogger(nameof(this.SetupReshadeDllFromInstaller), pathToInstaller);
+        var scoppedLogger = this.logger.CreateScopedLogger(flowIdentifier: pathToInstaller);
         try
         {
             using var fs = File.OpenRead(pathToInstaller);
@@ -648,23 +669,9 @@ internal sealed class ReShadeService(
             return;
         }
 
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.CheckUpdates), string.Empty);
-        var downloadUrl = await this.GetLatestDownloadUrl(CancellationToken.None);
-        if (downloadUrl?.IsNullOrWhiteSpace() is not false)
-        {
-            scopedLogger.LogError("Unable to retrieve latest download url");
-            return;
-        }
-
-        var versionString = downloadUrl.Replace(ReShadeHomepageUrl + "/downloads/ReShade_Setup_", "").Replace(".exe", "");
-        if (!Version.TryParse(versionString, out var version))
-        {
-            scopedLogger.LogError("Unable to parse latest version");
-            return;
-        }
-
-        if (File.Exists(ReShadeDllPath) &&
-            Version.TryParse(FileVersionInfo.GetVersionInfo(ReShadeDllPath).ProductVersion, out var currentVersion) &&
+        var scopedLogger = this.logger.CreateScopedLogger();
+        var version = await this.GetLatestVersion(CancellationToken.None);
+        if (this.GetCurrentVersion() is not Version currentVersion ||
             currentVersion.CompareTo(version) >= 0)
         {
             scopedLogger.LogDebug("No update available. Current version is up to date");
@@ -691,6 +698,37 @@ internal sealed class ReShadeService(
         this.notificationService.NotifyInformation(
                 "Failed to update ReShade",
                 $"Could not update ReShade to version {version}. Check logs for details");
+    }
+    
+    private async Task<Version?> GetLatestVersion(CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        var downloadUrl = await this.GetLatestDownloadUrl(cancellationToken);
+        if (downloadUrl?.IsNullOrWhiteSpace() is not false)
+        {
+            scopedLogger.LogError("Unable to retrieve latest download url");
+            return default;
+        }
+
+        var versionString = downloadUrl.Replace(ReShadeHomepageUrl + "/downloads/ReShade_Setup_", "").Replace(".exe", "");
+        if (!Version.TryParse(versionString, out var version))
+        {
+            scopedLogger.LogError("Unable to parse latest version");
+            return default;
+        }
+
+        return version;
+    }
+
+    private Version? GetCurrentVersion()
+    {
+        if (File.Exists(ReShadeDllPath) &&
+            Version.TryParse(FileVersionInfo.GetVersionInfo(ReShadeDllPath).ProductVersion, out var currentVersion))
+        {
+            return currentVersion;
+        }
+
+        return default;
     }
 
     /// <summary>

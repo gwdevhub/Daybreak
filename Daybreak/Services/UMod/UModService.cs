@@ -52,7 +52,7 @@ internal sealed class UModService(
     private readonly ILogger<UModService> logger = logger.ThrowIfNull();
 
     public string Name => "gMod";
-    public string Description => "gMod (formerly uMod) is a mod loader for Guild Wars that allows you to load custom textures and mods into the game";
+    public string Description => "gMod (formerly uMod) is a texture mod loader for Guild Wars that allows you to load custom textures and mods into the game";
     public bool IsVisible => true;
     public bool CanCustomManage => true;
     public bool IsEnabled
@@ -72,6 +72,22 @@ internal sealed class UModService(
             version :
             Version.Parse("0") :
         Version.Parse("0");
+
+    public async Task<bool> IsUpdateAvailable(CancellationToken cancellationToken)
+    {
+        var latestVersion = await this.GetLatestVersion(cancellationToken);
+        if (latestVersion is null)
+        {
+            return false;
+        }
+
+        return this.Version < latestVersion;
+    }
+
+    public async Task<bool> PerformUpdate(CancellationToken cancellationToken)
+    {
+        return await this.PerformInstallation(cancellationToken);
+    }
 
     public IProgressAsyncOperation<bool> PerformInstallation(CancellationToken cancellationToken)
     {
@@ -234,45 +250,29 @@ internal sealed class UModService(
     public async Task CheckAndUpdateUMod(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        var existingUMod = Path.Combine(UModDirectory, UModDll);
-        if (!this.IsInstalled)
+        if (this.IsInstalled is false)
         {
-            scopedLogger.LogDebug("UMod is not installed");
+            scopedLogger.LogInformation("uMod is not installed. Skipping update check");
             return;
         }
 
-        scopedLogger.LogDebug("Retrieving version list");
-        var getListResponse = await this.httpClient.GetAsync(ReleasesUrl, cancellationToken);
-        if (!getListResponse.IsSuccessStatusCode)
+        var latestVersion = await this.GetLatestVersion(cancellationToken);
+        if (latestVersion is null)
         {
-            scopedLogger.LogError($"Received non success status code [{getListResponse.StatusCode}]");
+            scopedLogger.LogError("Could not retrieve latest uMod version. Skipping update");
             return;
         }
 
-        var responseString = await getListResponse.Content.ReadAsStringAsync(cancellationToken);
-        var releasesList = responseString.Deserialize<List<GithubRefTag>>();
-        var latestRelease = releasesList?
-            .Select(t => t.Ref?.Replace("refs/tags/", ""))
-            .OfType<string>()
-            .LastOrDefault()?
-            .TrimStart('v');
-
-        if (!Version.TryParse(latestRelease ?? string.Empty, out var latestVersion))
+        if (this.Version >= latestVersion)
         {
-            scopedLogger.LogError($"Unable to parse latest version {latestRelease}");
-            return;
-        }
-
-        if (this.Version.CompareTo(latestVersion) >= 0)
-        {
-            scopedLogger.LogDebug($"UMod is up to date");
+            scopedLogger.LogInformation("uMod is up to date. Current version: {currentVersion}, Latest version: {latestVersion}", this.Version, latestVersion);
             return;
         }
 
         await this.DownloadLatestDll(progress, cancellationToken);
         this.notificationService.NotifyInformation(
             title: "UMod updated",
-            description: $"UMod has been updated to version {latestRelease}");
+            description: $"UMod has been updated to version {latestVersion}");
     }
 
     private async Task<bool> SetupUModDll(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
@@ -295,7 +295,7 @@ internal sealed class UModService(
     {
         try
         {
-            return await this.GetLatestVersion(progress, cancellationToken);
+            return await this.GetLatestVersionDll(progress, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -304,7 +304,7 @@ internal sealed class UModService(
         }
     }
 
-    private async Task<DownloadLatestOperation> GetLatestVersion(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
+    private async Task<DownloadLatestOperation> GetLatestVersionDll(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         scopedLogger.LogDebug("Retrieving version list");
@@ -338,5 +338,33 @@ internal sealed class UModService(
         }
 
         return new DownloadLatestOperation.Success(destinationPath);
+    }
+
+    private async Task<Version?> GetLatestVersion(CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        scopedLogger.LogDebug("Retrieving version list");
+        var getListResponse = await this.httpClient.GetAsync(ReleasesUrl, cancellationToken);
+        if (!getListResponse.IsSuccessStatusCode)
+        {
+            scopedLogger.LogError("Received non success status code [{getListResponse.StatusCode}]", getListResponse.StatusCode);
+            return default;
+        }
+
+        var responseString = await getListResponse.Content.ReadAsStringAsync(cancellationToken);
+        var releasesList = responseString.Deserialize<List<GithubRefTag>>();
+        var latestRelease = releasesList?
+            .Select(t => t.Ref?.Replace("refs/tags/", ""))
+            .OfType<string>()
+            .LastOrDefault()?
+            .TrimStart('v');
+
+        if (!Version.TryParse(latestRelease ?? string.Empty, out var latestVersion))
+        {
+            scopedLogger.LogError("Unable to parse latest version {latestRelease}", latestRelease ?? string.Empty);
+            return default;
+        }
+
+        return latestVersion;
     }
 }

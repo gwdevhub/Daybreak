@@ -63,6 +63,13 @@ public sealed class DaybreakApiService(
 
     public IEnumerable<string> GetCustomArguments() => [];
 
+    public Task<bool> IsUpdateAvailable(CancellationToken cancellationToken) => Task.FromResult(false);
+
+    public Task<bool> PerformUpdate(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException("DaybreakApi mod does not support manual updates");
+    }
+
     public IProgressAsyncOperation<bool> PerformInstallation(CancellationToken cancellationToken)
     {
         throw new NotImplementedException("DaybreakApi mod does not support manual installation");
