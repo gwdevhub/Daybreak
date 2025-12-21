@@ -169,7 +169,7 @@
 
     private void ExtendNotification(NotificationWrapper notification)
     {
-        notification.ExpirationTime = DateTimeOffset.Now + NotificationExtension;
+        notification.ExpirationTime = DateTime.Now + NotificationExtension;
     }
 
     private async Task OpenNofitication(NotificationWrapper notification)
