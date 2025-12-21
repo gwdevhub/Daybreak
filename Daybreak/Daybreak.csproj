@@ -19,26 +19,6 @@
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Resources\NotifyClose.wav" />
-    <None Remove="Resources\NotifyError.wav" />
-    <None Remove="Resources\NotifyInformation.wav" />
-    <None Remove="Resources\Snow1.png" />
-    <None Remove="Resources\Snow2.png" />
-    <None Remove="Resources\Snow3.png" />
-    <None Remove="Resources\Snow4.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\NotifyClose.wav" />
-    <EmbeddedResource Include="Resources\NotifyError.wav" />
-    <EmbeddedResource Include="Resources\NotifyInformation.wav" />
-    <EmbeddedResource Include="Resources\Snow1.png" />
-    <EmbeddedResource Include="Resources\Snow2.png" />
-    <EmbeddedResource Include="Resources\Snow3.png" />
-    <EmbeddedResource Include="Resources\Snow4.png" />
-  </ItemGroup>
-
   <Target Name="AddUserSecrets" BeforeTargets="PrepareForBuild" Condition=" '$(UserSecretsId)' != '' ">
     <PropertyGroup>
       <UserSecretsFilePath Condition=" '$(OS)' == 'Windows_NT' ">
@@ -104,15 +84,6 @@
 	
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
     <Exec Command="echo.&gt;$(Version).version" />
-  </Target>
-
-  <Target Name="RemoveDuplicateAnalyzers" BeforeTargets="CoreCompile">
-		<!-- Work around https://github.com/dotnet/wpf/issues/6792 -->
-    <ItemGroup>
-      <FilteredAnalyzer Include="@(Analyzer-&gt;Distinct())" />
-      <Analyzer Remove="@(Analyzer)" />
-      <Analyzer Include="@(FilteredAnalyzer)" />
-    </ItemGroup>
   </Target>
 
   <!--
