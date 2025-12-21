@@ -13,6 +13,7 @@ using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
+using System.Extensions.Core;
 using System.IO;
 
 namespace Daybreak.Services.DirectSong;
@@ -51,6 +52,7 @@ internal sealed class DirectSongService(
     public string Description => "Enables custom Guild Wars soundtrack composed by Jeremy Soule";
     public bool IsVisible => true;
     public bool CanCustomManage => false;
+    public bool CanUninstall => true;
     public bool IsEnabled
     {
         get => this.options.Value.Enabled;
@@ -64,6 +66,29 @@ internal sealed class DirectSongService(
         Directory.Exists(InstallationDirectory) &&
         File.Exists(Path.Combine(Path.GetFullPath(InstallationDirectory), WMVCOREDll)) &&
         File.Exists(Path.Combine(Path.GetFullPath(InstallationDirectory), DsGuildwarsDll));
+
+    public IProgressAsyncOperation<bool> PerformUninstallation(CancellationToken cancellationToken)
+    {
+        return ProgressAsyncOperation.Create<bool>(progress =>
+        {
+            progress.Report(new ProgressUpdate(0, "Uninstalling DirectSong"));
+            if (!this.IsInstalled)
+            {
+                progress.Report(new ProgressUpdate(1, "DirectSong is not installed"));
+                return Task.FromResult(true);
+            }
+
+            if (!Directory.Exists(InstallationDirectory))
+            {
+                progress.Report(new ProgressUpdate(1, "DirectSong is not installed"));
+                return Task.FromResult(true);
+            }
+
+            Directory.Delete(InstallationDirectory, true);
+            progress.Report(new ProgressUpdate(1, "DirectSong uninstalled successfully"));
+            return Task.FromResult(true);
+        }, cancellationToken);
+    }
 
     public IProgressAsyncOperation<bool> PerformInstallation(CancellationToken cancellationToken)
     {
@@ -149,7 +174,7 @@ internal sealed class DirectSongService(
 
     private async Task<bool> SetupDirectSongInternal(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.SetupDirectSongInternal), string.Empty);
+        var scopedLogger = this.logger.CreateScopedLogger();
         if (this.IsInstalled)
         {
             scopedLogger.LogDebug("Already installed");

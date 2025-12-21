@@ -36,6 +36,11 @@ public interface IModService
     bool CanCustomManage { get; }
 
     /// <summary>
+    /// Dictates if the mod can be uninstalled.
+    /// </summary>
+    bool CanUninstall { get; }
+
+    /// <summary>
     /// Called by the mod manager to perform installation steps for the mod.
     /// </summary>
     /// <returns>Returns an awaitable <see cref="IProgressAsyncOperation{bool}"/></returns>
@@ -43,6 +48,15 @@ public interface IModService
     /// See <see cref="ProgressAsyncOperation{T}"/> on how to get progress reports and await the operation.
     /// </remarks>
     IProgressAsyncOperation<bool> PerformInstallation(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Called by the mod manager to perform uninstallation steps for the mod.
+    /// </summary>
+    /// <returns>Returns an awaitable <see cref="IProgressAsyncOperation{bool}"/></returns>
+    /// <remarks>
+    /// See <see cref="ProgressAsyncOperation{T}"/> on how to get progress reports and await the operation.
+    /// </remarks>
+    IProgressAsyncOperation<bool> PerformUninstallation(CancellationToken cancellationToken);
 
     /// <summary>
     /// Custom command-line arguments to pass to the Guild Wars process.

@@ -9,6 +9,7 @@ public sealed class ModListEntry
     public required string Description { get; init; }
     public required bool IsVisible { get; init; }
     public required bool CanManage { get; init; }
+    public required bool CanUninstall { get; init; }
 
     public bool IsEnabled { get; set; }
     public bool IsInstalled { get; set; }

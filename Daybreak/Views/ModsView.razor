@@ -36,11 +36,18 @@
                             Update
                         </div>
                     }
-                    else if (mod.CanManage)
+                    else if (mod.IsEnabled && mod.CanManage)
                     {
                         <div class="mod-action-button"
                              @onclick="@(() => this.ViewModel.ManageMod(mod))">
                             Manage
+                        </div>
+                    }
+                    else if (mod.CanUninstall)
+                    {
+                        <div class="mod-action-button"
+                             @onclick="@(() => this.ViewModel.UninstallMod(mod))">
+                            Uninstall
                         </div>
                     }
                     else
