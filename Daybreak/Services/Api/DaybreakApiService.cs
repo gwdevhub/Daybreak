@@ -61,6 +61,13 @@ public sealed class DaybreakApiService(
     public bool IsVisible => true;
     public bool CanCustomManage => false;
 
+    public bool CanUninstall => false;
+
+    public IProgressAsyncOperation<bool> PerformUninstallation(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException("DaybreakApi mod does not support manual uninstallation");
+    }
+
     public IEnumerable<string> GetCustomArguments() => [];
 
     public Task<bool> IsUpdateAvailable(CancellationToken cancellationToken) => Task.FromResult(false);

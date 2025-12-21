@@ -31,6 +31,7 @@ public sealed class ModsViewModel(
                 IsEnabled = m.IsEnabled,
                 CanManage = m.CanCustomManage,
                 IsInstalled = m.IsInstalled,
+                CanUninstall = m.CanUninstall,
                 CanUpdate = false,
                 Loading = true,
             })];
@@ -90,6 +91,26 @@ public sealed class ModsViewModel(
         }
 
         mod.Loading = false;
+        await this.RefreshViewAsync();
+    }
+
+    public async Task UninstallMod(ModListEntry mod)
+    {
+        if (!mod.CanUninstall)
+        {
+            return;
+        }
+
+        mod.Loading = true;
+        await this.RefreshViewAsync();
+        if (!await mod.ModService.PerformUninstallation(this.cts?.Token ?? CancellationToken.None))
+        {
+            this.notificationService.NotifyError($"{mod.Name} uninstallation failed", $"{mod.Name} has failed to uninstall. Please check logs for more details.");
+            
+        }
+
+        mod.Loading = false;
+        mod.IsInstalled = mod.ModService.IsInstalled;
         await this.RefreshViewAsync();
     }
 

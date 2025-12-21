@@ -28,6 +28,13 @@ internal sealed class GuildWarsVersionChecker(
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly ILogger<GuildWarsVersionChecker> logger = logger.ThrowIfNull();
 
+    public bool CanUninstall => false;
+
+    public IProgressAsyncOperation<bool> PerformUninstallation(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException("GuildWars Version Checker mod does not support manual uninstallation");
+    }
+
     public Task<bool> IsUpdateAvailable(CancellationToken cancellationToken) => Task.FromResult(false);
 
     public Task<bool> PerformUpdate(CancellationToken cancellationToken)
