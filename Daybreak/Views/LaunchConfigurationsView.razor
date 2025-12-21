@@ -51,11 +51,14 @@
                         <div class="launch-config-executable-field">
                             <FluentSelect TOption="string"
                                           Multiple="false"
+                                          Width="100%"
                                           Items="@this.ViewModel.Executables"
                                           SelectedOption="@config.ExecutablePath"
                                           SelectedOptionChanged="@((newValue) => this.ViewModel.ExecutableChanged(config, newValue))">
                                 <OptionTemplate>
-                                    @(string.IsNullOrWhiteSpace(context) ? "Any Executable" : context)
+                                    <div title="@(context)">
+                                        @(string.IsNullOrWhiteSpace(context) ? "Any Executable" : context)
+                                    </div>
                                 </OptionTemplate>
                             </FluentSelect>
                         </div>
