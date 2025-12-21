@@ -90,4 +90,17 @@ public interface IModService
     /// This method is only called if <see cref="CanCustomManage"/> is true.
     /// </remarks>
     Task OnCustomManagement(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Determines asynchronously whether the mod can be updated.
+    /// </summary>
+    Task<bool> IsUpdateAvailable(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Updates the mod to the latest version.
+    /// </summary>
+    /// <remarks>
+    /// This method is only called if <see cref="IsUpdateAvailable"/> returns true.
+    /// </remarks>
+    Task<bool> PerformUpdate(CancellationToken cancellationToken);
 }

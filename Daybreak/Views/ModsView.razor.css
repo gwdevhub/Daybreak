@@ -52,23 +52,13 @@
     align-items: center;
 }
 
-.mod-not-installed {
-    border-color: var(--accent-fill-rest);
-    color: var(--neutral-foreground-rest);
-    border-style: dashed;
-    padding: 0.25rem 0.75rem;
-    background: var(--neutral-fill-stealth-rest);
-    border-radius: 12px;
-    font-size: var(--font-size-small);
-    margin-left: 1rem;
-    min-width: 100px;
-    text-align: center;
+.disabled {
+    pointer-events: none;
+    opacity: 0.5;
 }
 
-.mod-installed {
-    border-color: var(--accent-fill-rest);
+.mod-action-button {
     color: var(--foreground-on-accent-rest);
-    border-style: dashed;
     padding: 0.25rem 0.75rem;
     background: var(--accent-fill-rest);
     border-radius: 12px;
@@ -76,20 +66,25 @@
     margin-left: 1rem;
     min-width: 100px;
     text-align: center;
+    cursor: pointer;
 }
 
-.mod-can-manage {
-    border-color: var(--accent-fill-active);
-    color: var(--foreground-on-accent-active);
+    .mod-action-button:hover {
+        background: var(--accent-fill-active);
+    }
+
+.mod-action-button-disabled {
+    border: var(--accent-fill-rest);
     border-style: dashed;
+    color: var(--neutral-foreground-rest);
     padding: 0.25rem 0.75rem;
-    background: var(--accent-fill-active);
+    background: var(--accent-fill-stealth-rest);
     border-radius: 12px;
     font-size: var(--font-size-small);
     margin-left: 1rem;
-    cursor: pointer;
     min-width: 100px;
     text-align: center;
+    pointer-events: none;
 }
 
 ::deep .label {
