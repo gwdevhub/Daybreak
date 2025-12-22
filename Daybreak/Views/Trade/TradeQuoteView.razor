@@ -9,40 +9,48 @@
         <div class="backdrop-panel">
             <div class="container">
                 <div class="alert-row alert-enabled">
-                    <FluentInputLabel Label="Enabled" />
+                    <FluentLabel>Enabled</FluentLabel>
                     <FluentCheckbox @bind-Value="@this.ViewModel.Alert.Enabled" @bind-Value:after="@this.ViewModel.SaveAlertChanges" />
                 </div>
                 <div class="alert-row alert-id">
-                    <FluentInputLabel Label="ID" />
+                    <FluentLabel>ID</FluentLabel>
                     <FluentTextField @bind-Value="@this.ViewModel.Alert.Id" ReadOnly="true" />
                 </div>
                 <div class="alert-row alert-name">
-                    <FluentInputLabel Label="Name" />
+                    <FluentLabel>Name</FluentLabel>
                     <FluentTextField @bind-Value="@this.ViewModel.Alert.Name" @bind-Value:after="@this.ViewModel.SaveAlertChanges" />
                 </div>
                 <div class="alert-row alert-item">
-                    <FluentInputLabel Label="Item" />
+                    <FluentLabel>Item</FluentLabel>
                     <FluentSelect TOption="Daybreak.Shared.Models.Guildwars.ItemBase"
                                   Items="@ItemOptions"
                                   OptionText="@(i => i.Name ?? $"Item {i.Id}")"
                                   OptionValue="@(i => i.Id.ToString())"
                                   @bind-SelectedOption="SelectedItem"
-                                  @bind-SelectedOption:after="@OnItemSelected" />
+                                  @bind-SelectedOption:after="@OnItemSelected">
+                        <OptionTemplate Context="item">
+                            @if (item is Daybreak.Shared.Models.Guildwars.IIconUrlEntity iconEntity)
+                            {
+                                <img src="@iconEntity.IconUrl"/>
+                            }
+                            <span>@(item.Name ?? $"Item {item.Id}")</span>
+                        </OptionTemplate>
+                    </FluentSelect>
                 </div>
                 <div class="alert-row alert-quote-upper-price-check">
-                    <FluentInputLabel Label="Upper price target enabled" />
+                    <FluentLabel>Upper price target enabled</FluentLabel>
                     <FluentCheckbox @bind-Value="@this.ViewModel.Alert.UpperPriceTargetEnabled" @bind-Value:after="@this.ViewModel.SaveAlertChanges" />
                 </div>
                 <div class="alert-row alert-quote-upper-price">
-                    <FluentInputLabel Label="Upper price target" />
+                    <FluentLabel>Upper price target</FluentLabel>
                     <FluentNumberField @bind-Value="@this.ViewModel.Alert.UpperPriceTarget" @bind-Value:after="@this.ViewModel.SaveAlertChanges" />
                 </div>
                 <div class="alert-row alert-quote-lower-price-check">
-                    <FluentInputLabel Label="Lower price target enabled" />
+                    <FluentLabel>Lower price target enabled</FluentLabel>
                     <FluentCheckbox @bind-Value="@this.ViewModel.Alert.LowerPriceTargetEnabled" @bind-Value:after="@this.ViewModel.SaveAlertChanges" />
                 </div>
                 <div class="alert-row alert-quote-lower-price">
-                    <FluentInputLabel Label="Lower price target" />
+                    <FluentLabel>Lower price target</FluentLabel>
                     <FluentNumberField @bind-Value="@this.ViewModel.Alert.LowerPriceTarget" @bind-Value:after="@this.ViewModel.SaveAlertChanges" />
                 </div>
             </div>
