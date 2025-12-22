@@ -40,7 +40,7 @@ public sealed class LaunchConfigurationsViewModel(
         config.Credentials = this.Credentials.FirstOrDefault();
         config.ExecutablePath = this.Executables.FirstOrDefault();
         this.launchConfigurationService.SaveConfiguration(config);
-        this.LaunchConfigurations.Add(config);
+        this.LaunchConfigurations.Insert(0, config);
     }
 
     public void ExecutableChanged(LaunchConfigurationWithCredentials configuration, string newValue)
