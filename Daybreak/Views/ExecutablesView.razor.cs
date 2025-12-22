@@ -51,9 +51,9 @@ public class ExecutablesViewModel(
             NeedsUpdate = false
         };
 
-        this.Executables.Add(newExecutable);
+        this.Executables.Insert(0, newExecutable);
         this.guildWarsExecutableManager.AddExecutable(newExecutable.Path);
-        Task.Run(() => this.ValidateExecutables());
+        Task.Run(this.ValidateExecutables);
     }
 
     public void ModifyPath(ExecutablePath executable)

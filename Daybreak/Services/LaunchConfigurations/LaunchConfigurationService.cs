@@ -111,7 +111,7 @@ internal sealed class LaunchConfigurationService(
             return true;
         }
 
-        configs.Add(new LaunchConfiguration
+        configs.Insert(0, new LaunchConfiguration
         {
             Name = launchConfigurationWithCredentials.Name,
             CredentialsIdentifier = launchConfigurationWithCredentials.Credentials?.Identifier,
