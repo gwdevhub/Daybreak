@@ -37,7 +37,7 @@ internal sealed class GuildWarsExecutableManager(
         var list = this.liveUpdateableOptions.Value.ExecutablePaths;
         if (list.None(e => e == executablePath))
         {
-            list.Add(executablePath);
+            list.Insert(0, executablePath);
         }
 
         this.liveUpdateableOptions.Value.ExecutablePaths = list;
