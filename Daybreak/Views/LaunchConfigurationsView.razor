@@ -52,6 +52,7 @@
                             <FluentSelect TOption="string"
                                           Multiple="false"
                                           Width="100%"
+                                          Position="SelectPosition.Below"
                                           Items="@this.ViewModel.Executables"
                                           SelectedOption="@config.ExecutablePath"
                                           SelectedOptionChanged="@((newValue) => this.ViewModel.ExecutableChanged(config, newValue))">
@@ -70,6 +71,8 @@
                         <div class="launch-config-credentials-field">
                             <FluentSelect TOption="string"
                                           Multiple="false"
+                                          Width="100%"
+                                          Position="SelectPosition.Below"
                                           Items="@this.ViewModel.Credentials.Select(c => c.Identifier ?? string.Empty)"
                                           SelectedOption="@(config.Credentials?.Identifier ?? string.Empty)"
                                           SelectedOptionChanged="@((newValue) => this.ViewModel.CredentialsChanged(config, newValue))">
