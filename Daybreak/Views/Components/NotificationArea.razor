@@ -157,8 +157,6 @@
         {
             try
             {
-                await this.NotificationProducer.OpenNotification(notification.Notification, cancellationToken: this.cancellationTokenSource?.Token ?? CancellationToken.None);
-                notification.Notification.Closed = true;
                 await this.RemoveNotification(notification);
             }
             catch (OperationCanceledException)
