@@ -62,3 +62,12 @@
     align-items: center;
     gap: 8px;
 }
+
+::deep .alert-toggle p.fluent-typography,
+::deep .alert-toggle fluent-switch {
+    font-size: var(--font-size-medium) !important;
+}
+
+::deep .alert-toggle fluent-switch::part(label) {
+    font-size: var(--font-size-medium) !important;
+}
