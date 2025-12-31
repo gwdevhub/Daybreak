@@ -11,6 +11,7 @@ using Daybreak.Shared.Services.Onboarding;
 using Microsoft.Extensions.Options;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -25,7 +26,7 @@ public sealed class LaunchViewModel(
     ILaunchConfigurationService launchConfigurationService,
     IOnboardingService onboardingService,
     IApplicationLauncher applicationLauncher,
-    IOptions<FocusViewOptions> focusViewOptions) : ViewModelBase<LaunchViewModel, LaunchView>, INotifyPropertyChanged, IDisposable
+    ILiveOptions<FocusViewOptions> focusViewOptions) : ViewModelBase<LaunchViewModel, LaunchView>, INotifyPropertyChanged, IDisposable
 {
     private static readonly TimeSpan LaunchTimeout = TimeSpan.FromSeconds(10);
 
@@ -35,7 +36,7 @@ public sealed class LaunchViewModel(
     private readonly ILaunchConfigurationService launchConfigurationService = launchConfigurationService.ThrowIfNull();
     private readonly IOnboardingService onboardingService = onboardingService.ThrowIfNull();
     private readonly IApplicationLauncher applicationLauncher = applicationLauncher.ThrowIfNull();
-    private readonly IOptions<FocusViewOptions> focusViewOptions = focusViewOptions.ThrowIfNull();
+    private readonly ILiveOptions<FocusViewOptions> focusViewOptions = focusViewOptions.ThrowIfNull();
 
     private CancellationTokenSource? cancellationTokenSource;
 
