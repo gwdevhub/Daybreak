@@ -85,8 +85,37 @@ public class EntryPoint
 
         builder.Services.AddOpenApi();
 
+        // Add CORS policy - allow localhost and trusted community sites
+        builder.Services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(policy =>
+            {
+                policy.SetIsOriginAllowed(origin =>
+                    {
+                        if (Uri.TryCreate(origin, UriKind.Absolute, out var uri))
+                        {
+                            // Always allow localhost
+                            if (uri.Host is "localhost" or "127.0.0.1")
+                            {
+                                return true;
+                            }
+
+                            // Allow known Guild Wars community sites
+                            return uri.Host.EndsWith("guildwars.app", StringComparison.OrdinalIgnoreCase)
+                                || uri.Host.EndsWith("gwmarket.net", StringComparison.OrdinalIgnoreCase);
+                        }
+
+                        return false;
+                    })
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
+            });
+        });
+
         var app = builder.Build();
 
+        app.UseCors();
         app.UseWebSockets(new WebSocketOptions { KeepAliveInterval = TimeSpan.FromSeconds(30) });
 
         return app
