@@ -1,11 +1,13 @@
 ﻿using System.Core.Extensions;
 using System.Diagnostics;
+using System.Extensions;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using Daybreak.Services.Logging;
 using Daybreak.Services.Notifications.Handlers;
+using Daybreak.Shared;
 using Daybreak.Shared.Models.Menu;
 using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Notifications;
@@ -19,6 +21,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using TrailBlazr.Services;
 using WpfExtended.Blazor.Launch;
+using static Daybreak.Shared.Models.Themes.Theme;
 
 namespace Daybreak.Views;
 
@@ -38,6 +41,8 @@ public sealed class AppViewModel
     private readonly INotificationService notificationService;
     private readonly ILogger<App> logger;
 
+    private SemaphoreSlim themeChangeSemaphore = new(1, 1);
+    private string? tradeChatThemeSetterScript = default;
     private bool isInitialized = false;
     private HwndSource? hwndSource;
 
@@ -279,8 +284,10 @@ public sealed class AppViewModel
         );
     }
 
-    private void OnThemeChange()
+    private async void OnThemeChange()
     {
+        using var ctx = await this.themeChangeSemaphore.Acquire();
+
         this.BackdropImage = !string.IsNullOrWhiteSpace(this.themeManager.BackdropImage) ? this.GetBackdropImageUrl(this.themeManager.BackdropImage) : default;
         this.BackdropEmbed = !string.IsNullOrWhiteSpace(this.themeManager.BackdropEmbed) ? this.themeManager.BackdropEmbed : default;
         this.BackdropImageFilter = this.themeManager.CurrentTheme?.Filter ?? string.Empty;
@@ -296,6 +303,26 @@ public sealed class AppViewModel
         this.XXLargeFontSize = this.themeManager.XXLargeFontSize;
         this.UIScale = this.themeManager.UIScale;
         this.RedrawRequested?.Invoke(this, EventArgs.Empty);
+
+        /*
+         * Below code hooks into the webview to set the trade chat theme based on the current application theme.
+         */
+        if (Global.CoreWebView2 is null)
+        {
+            return;
+        }
+
+        if (this.tradeChatThemeSetterScript is not null)
+        {
+            Global.CoreWebView2.RemoveScriptToExecuteOnDocumentCreated(this.tradeChatThemeSetterScript);
+            this.tradeChatThemeSetterScript = default;
+        }
+
+        this.tradeChatThemeSetterScript = await Global.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(@$"
+            if (location.origin === 'https://kamadan.gwtoolbox.com' || 
+                location.origin === 'https://ascalon.gwtoolbox.com') {{
+                localStorage.setItem('mode', '{(this.themeManager.CurrentTheme?.Mode is LightDarkMode.Light ? "light" : "dark")}');
+            }}");
     }
 
     private void LoadMenuCategories()
@@ -369,7 +396,7 @@ public sealed class AppViewModel
             };
 
             var imageBytes = File.ReadAllBytes(filePath);
-            var base64 = Convert.ToBase64String(imageBytes);
+            var base64 = System.Convert.ToBase64String(imageBytes);
             return $"url('data:{mimeType};base64,{base64}')";
         }
         catch (Exception ex)
