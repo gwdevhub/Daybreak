@@ -39,11 +39,11 @@ public static class UIPackets
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public readonly struct KeyAction(uint key)
+    public readonly struct KeyAction(uint key, uint wParam = 0x4000, uint lParam = 0x0006)
     {
         public readonly uint Key = key;
-        public readonly uint WParam = 0x4000;
-        public readonly uint LParam = 0x0006;
+        public readonly uint WParam = wParam;
+        public readonly uint LParam = lParam;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]

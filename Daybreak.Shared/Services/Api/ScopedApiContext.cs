@@ -29,7 +29,9 @@ public sealed class ScopedApiContext(
     private const string GetTitleInfoPath = "/api/v1/rest/main-player/title";
     private const string GetLoginInfoPath = "/api/v1/rest/login";
 
-    private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(2);
+    private static readonly TimeSpan DefaultRequestTimeout = TimeSpan.FromSeconds(2);
+    private static readonly TimeSpan PostPartyLoadoutTimeout = TimeSpan.FromSeconds(10);
+    private static readonly TimeSpan SwitchCharacterTimeout = TimeSpan.FromSeconds(30);
 
     private readonly ILogger<ScopedApiContext> logger = logger;
     private readonly DaybreakAPIContext context = context;
@@ -45,15 +47,15 @@ public sealed class ScopedApiContext(
             }
 
             return Task.FromResult(false);
-        }, cancellationToken);
+        }, DefaultRequestTimeout, cancellationToken);
     }
 
-    public Task<CharacterSelectInformation?> GetCharacters(CancellationToken cancellationToken) => this.GetPayload<CharacterSelectInformation>(GetCharacterSelectPath, cancellationToken);
+    public Task<CharacterSelectInformation?> GetCharacters(CancellationToken cancellationToken) => this.GetPayload<CharacterSelectInformation>(GetCharacterSelectPath, DefaultRequestTimeout, cancellationToken);
 
     public async Task<bool> SwitchCharacter(string characterName, CancellationToken cancellationToken)
     {
         var path = PostCharacterSelectPath.Replace(IdentifierPlaceholder, characterName);
-        var result = await this.Post(path, request => new StringContent(string.Empty), cancellationToken);
+        var result = await this.Post(path, request => new StringContent(string.Empty), SwitchCharacterTimeout, cancellationToken);
         if (!result)
         {
             this.logger.LogError("Failed to switch character to {characterName}", characterName);
@@ -63,52 +65,52 @@ public sealed class ScopedApiContext(
         return true;
     }
 
-    public Task<MainPlayerState?> GetMainPlayerState(CancellationToken cancellationToken) => this.GetPayload<MainPlayerState>(GetMainPlayerStatePath, cancellationToken);
+    public Task<MainPlayerState?> GetMainPlayerState(CancellationToken cancellationToken) => this.GetPayload<MainPlayerState>(GetMainPlayerStatePath, DefaultRequestTimeout, cancellationToken);
 
-    public Task<QuestLogInformation?> GetMainPlayerQuestLog(CancellationToken cancellationToken) => this.GetPayload<QuestLogInformation>(GetMainPlayerQuestLogPath, cancellationToken);
+    public Task<QuestLogInformation?> GetMainPlayerQuestLog(CancellationToken cancellationToken) => this.GetPayload<QuestLogInformation>(GetMainPlayerQuestLogPath, DefaultRequestTimeout, cancellationToken);
 
-    public Task<MainPlayerInformation?> GetMainPlayerInfo(CancellationToken cancellationToken) => this.GetPayload<MainPlayerInformation>(GetMainPlayerInfoPath, cancellationToken);
+    public Task<MainPlayerInformation?> GetMainPlayerInfo(CancellationToken cancellationToken) => this.GetPayload<MainPlayerInformation>(GetMainPlayerInfoPath, DefaultRequestTimeout, cancellationToken);
 
-    public Task<InstanceInfo?> GetMainPlayerInstanceInfo(CancellationToken cancellationToken) => this.GetPayload<InstanceInfo>(GetMainPlayerInstanceInfoPath, cancellationToken);
+    public Task<InstanceInfo?> GetMainPlayerInstanceInfo(CancellationToken cancellationToken) => this.GetPayload<InstanceInfo>(GetMainPlayerInstanceInfoPath, DefaultRequestTimeout, cancellationToken);
 
-    public Task<BuildEntry?> GetMainPlayerBuild(CancellationToken cancellationToken) => this.GetPayload<BuildEntry>(GetMainPlayerBuildPath, cancellationToken);
+    public Task<BuildEntry?> GetMainPlayerBuild(CancellationToken cancellationToken) => this.GetPayload<BuildEntry>(GetMainPlayerBuildPath, DefaultRequestTimeout, cancellationToken);
 
     public async Task<bool> PostMainPlayerBuild(string code, CancellationToken cancellationToken)
     {
         var encodedBuildCode = UrlEncoder.Default.Encode(code);
         var path = PostMainPlayerBuildPath.Replace(CodePlaceholder, encodedBuildCode);
         using var emptyContent = new StringContent(string.Empty);
-        return await this.Post(path, request => emptyContent, cancellationToken);
+        return await this.Post(path, request => emptyContent, DefaultRequestTimeout, cancellationToken);
     }
 
-    public Task<PartyLoadout?> GetPartyLoadout(CancellationToken cancellationToken) => this.GetPayload<PartyLoadout>(PartyLoadoutPath, cancellationToken);
+    public Task<PartyLoadout?> GetPartyLoadout(CancellationToken cancellationToken) => this.GetPayload<PartyLoadout>(PartyLoadoutPath, DefaultRequestTimeout, cancellationToken);
 
-    public Task<TitleInfo?> GetTitleInfo(CancellationToken cancellationToken) => this.GetPayload<TitleInfo>(GetTitleInfoPath, cancellationToken);
+    public Task<TitleInfo?> GetTitleInfo(CancellationToken cancellationToken) => this.GetPayload<TitleInfo>(GetTitleInfoPath, DefaultRequestTimeout, cancellationToken);
 
-    public Task<LoginInfo?> GetLoginInfo(CancellationToken cancellationToken) => this.GetPayload<LoginInfo>(GetLoginInfoPath, cancellationToken);
+    public Task<LoginInfo?> GetLoginInfo(CancellationToken cancellationToken) => this.GetPayload<LoginInfo>(GetLoginInfoPath, DefaultRequestTimeout, cancellationToken);
 
-    public Task<ProcessIdResponse?> GetProcessId(CancellationToken cancellationToken) => this.GetPayload<ProcessIdResponse>(GetHealthPath, cancellationToken);
+    public Task<ProcessIdResponse?> GetProcessId(CancellationToken cancellationToken) => this.GetPayload<ProcessIdResponse>(GetHealthPath, DefaultRequestTimeout, cancellationToken);
 
-    public Task<MainPlayerBuildContext?> GetMainPlayerBuildContext(CancellationToken cancellationToken) => this.GetPayload<MainPlayerBuildContext>(GetMainPlayerBuildContextPath, cancellationToken);
+    public Task<MainPlayerBuildContext?> GetMainPlayerBuildContext(CancellationToken cancellationToken) => this.GetPayload<MainPlayerBuildContext>(GetMainPlayerBuildContextPath, DefaultRequestTimeout, cancellationToken);
 
-    public async Task<bool> PostPartyLoadout(PartyLoadout partyLoadout, CancellationToken cancellationToken) => await this.PostPayload(PartyLoadoutPath, partyLoadout, cancellationToken);
+    public async Task<bool> PostPartyLoadout(PartyLoadout partyLoadout, CancellationToken cancellationToken) => await this.PostPayload(PartyLoadoutPath, partyLoadout, PostPartyLoadoutTimeout, cancellationToken);
 
-    private async Task<bool> PostPayload<T>(string path, T payload, CancellationToken cancellationToken)
+    private async Task<bool> PostPayload<T>(string path, T payload, TimeSpan timeout, CancellationToken cancellationToken)
     {
         using var content = JsonContent.Create(payload);
         var result = await this.Post(path, (request) =>
         {
             request.Headers.Add("Accept", "application/json");
             return content;
-        }, cancellationToken);
+        }, timeout, cancellationToken);
 
         return result;
     }
 
-    private async Task<bool> Post(string path, Func<HttpRequestMessage, HttpContent> contentBuilder, CancellationToken cancellationToken)
+    private async Task<bool> Post(string path, Func<HttpRequestMessage, HttpContent> contentBuilder, TimeSpan timeout, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(path);
-        using var timeoutCts = new CancellationTokenSource(RequestTimeout);
+        using var timeoutCts = new CancellationTokenSource(timeout);
         using var compositeCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
         if (!Uri.TryCreate(this.context.ApiUri, path, out var uri))
         {
@@ -136,7 +138,7 @@ public sealed class ScopedApiContext(
         }
     }
 
-    private async Task<T?> GetPayload<T>(string path, CancellationToken cancellationToken)
+    private async Task<T?> GetPayload<T>(string path, TimeSpan timeout, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(path);
         return await this.Get(path, async (response) =>
@@ -149,13 +151,13 @@ public sealed class ScopedApiContext(
 
             var payload = await response.Content.ReadFromJsonAsync<T>(cancellationToken);
             return payload;
-        }, cancellationToken);
+        }, timeout, cancellationToken);
     }
 
-    private async Task<T?> Get<T>(string path, Func<HttpResponseMessage, Task<T?>> responseBuilder, CancellationToken cancellationToken)
+    private async Task<T?> Get<T>(string path, Func<HttpResponseMessage, Task<T?>> responseBuilder, TimeSpan timeout, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(path);
-        using var timeoutCts = new CancellationTokenSource(RequestTimeout);
+        using var timeoutCts = new CancellationTokenSource(timeout);
         using var compositeCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
         if (!Uri.TryCreate(this.context.ApiUri, path, out var uri))
         {
