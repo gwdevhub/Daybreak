@@ -7,12 +7,12 @@ public sealed class ByteConsumerEntry(
 {
     private readonly Action<ReadOnlySpan<byte>> handler = handler.ThrowIfNull();
 
-    private DateTimeOffset lastConsume = DateTimeOffset.MinValue;
+    private DateTime lastConsume = DateTime.MinValue;
 
     public Guid Id { get; } = id;
     public TimeSpan Frequency { get; } = freq;
 
-    public void TryConsume(DateTimeOffset currentTime, ReadOnlySpan<byte> value)
+    public void TryConsume(DateTime currentTime, ReadOnlySpan<byte> value)
     {
         if (currentTime - this.lastConsume >= this.Frequency)
         {

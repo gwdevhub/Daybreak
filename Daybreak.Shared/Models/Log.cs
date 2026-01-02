@@ -9,5 +9,5 @@ public sealed class Log
     public LogLevel LogLevel { get; set; }
     public string? CorrelationVector { get; set; }
     public string? EventId { get; set; }
-    public DateTimeOffset LogTime { get; set; }
+    public DateTime LogTime { get; set; }
 }

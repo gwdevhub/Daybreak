@@ -37,21 +37,21 @@
     public bool AutoComplete { get; set; } = false;
 
     private bool pendingSearch;
-    private DateTimeOffset debounceSearchTime = DateTimeOffset.MinValue;
+    private DateTime debounceSearchTime = DateTime.MinValue;
     private Task? pendingSearchTask;
 
     private void SearchTermChanged(ChangeEventArgs args)
     {
         this.pendingSearchTask ??= Task.Run(() => this.PerformPendingSearch());
         this.SearchTerm = args.Value?.ToString() ?? string.Empty;
-        this.debounceSearchTime = DateTimeOffset.Now + DebounceDelay;
+        this.debounceSearchTime = DateTime.Now + DebounceDelay;
     }
 
     private async Task PerformPendingSearch()
     {
         this.pendingSearch = true;
         await this.InvokeAsync(this.StateHasChanged);
-        while ((this.debounceSearchTime - DateTimeOffset.Now) is TimeSpan remainingTime &&
+        while ((this.debounceSearchTime - DateTime.Now) is TimeSpan remainingTime &&
                 remainingTime > TimeSpan.Zero)
         {
             await Task.Delay(remainingTime);

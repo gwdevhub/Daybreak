@@ -10,5 +10,5 @@ public sealed class TraderMessageDTO
 
     public string Sender { get; init; } = string.Empty;
 
-    public DateTimeOffset Timestamp { get; init; }
+    public DateTime Timestamp { get; init; }
 }

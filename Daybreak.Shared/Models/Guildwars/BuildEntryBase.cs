@@ -1,4 +1,5 @@
 ﻿using Daybreak.Shared.Models.Builds;
+using Daybreak.Shared.Utils;
 using Newtonsoft.Json;
 using System.ComponentModel;
 
@@ -48,22 +49,22 @@ public abstract class BuildEntryBase : INotifyPropertyChanged, IBuildEntry
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.IsToolboxBuild)));
         }
     }
-    public DateTimeOffset CreationTime
+    public DateTime CreationTime
     {
         get
         {
             if (this.Metadata?.TryGetValue(nameof(this.CreationTime), out var creationTimeString) is true &&
                 int.TryParse(creationTimeString, out var creationTimeUnix))
             {
-                return DateTimeOffset.FromUnixTimeSeconds(creationTimeUnix);
+                return DateTimeOffset.FromUnixTimeSeconds(creationTimeUnix).DateTime;
             }
 
-            return DateTimeOffset.MinValue;
+            return DateTime.MinValue;
         }
         set
         {
             this.Metadata ??= [];
-            this.Metadata[nameof(this.CreationTime)] = value.ToUniversalTime().ToUnixTimeSeconds().ToString();
+            this.Metadata[nameof(this.CreationTime)] = value.ToUniversalTime().ToSafeDateTimeOffset().ToUnixTimeSeconds().ToString();
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CreationTime)));
         }
     }
@@ -109,7 +110,7 @@ public abstract class BuildEntryBase : INotifyPropertyChanged, IBuildEntry
         set
         {
             this.Metadata ??= [];
-            this.Metadata[nameof(this.PartyComposition)] = value is null 
+            this.Metadata[nameof(this.PartyComposition)] = value is null
                 ? string.Empty
                 : JsonConvert.SerializeObject(value, Formatting.None);
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.PartyComposition)));
