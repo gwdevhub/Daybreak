@@ -29,7 +29,7 @@ public sealed class ScopedApiContext(
     private const string GetTitleInfoPath = "/api/v1/rest/main-player/title";
     private const string GetLoginInfoPath = "/api/v1/rest/login";
 
-    private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(2);
 
     private readonly ILogger<ScopedApiContext> logger = logger;
     private readonly DaybreakAPIContext context = context;

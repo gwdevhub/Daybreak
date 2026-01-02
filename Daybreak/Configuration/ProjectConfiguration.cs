@@ -495,6 +495,7 @@ public class ProjectConfiguration : PluginConfigurationBase
             .RegisterHttpClient<ScopedApiContext>()
                 .WithMessageHandler(SetupLoggingAndMetrics<ScopedApiContext>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
+                .WithTimeout(TimeSpan.FromSeconds(2))
                 .Build()
             .RegisterHttpClient<WikiService>()
                 .WithMessageHandler(SetupLoggingAndMetrics<WikiService>)
