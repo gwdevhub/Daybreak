@@ -73,16 +73,15 @@ public sealed class PartyService(
             return false;
         }
 
-        // TODO: Hashing is broken
-        //var heroBehaviorSetup = await this.gameThreadService.QueueOnGameThread(() => this.GetHeroBehaviorSetup(partyLoadout), cancellationToken);
-        //foreach (var heroBehaviorEntry in heroBehaviorSetup ?? [])
-        //{
-        //    if (!await this.SetHeroBehavior(heroBehaviorEntry.AgentId, heroBehaviorEntry.Behavior, cancellationToken))
-        //    {
-        //        scopedLogger.LogWarning("Could not set hero behavior for agent {agentId} to {behavior}", heroBehaviorEntry.AgentId, heroBehaviorEntry.Behavior);
-        //        await this.chatService.AddMessageAsync($"Cannot set party loadout. Could not set behavior {behavior} for agent {agentId}.", "Daybreak.API", Channel.Moderator, cancellationToken);
-        //    }
-        //}
+        var heroBehaviorSetup = await this.gameThreadService.QueueOnGameThread(() => this.GetHeroBehaviorSetup(partyLoadout), cancellationToken);
+        foreach (var heroBehaviorEntry in heroBehaviorSetup ?? [])
+        {
+            if (!await this.SetHeroBehavior(heroBehaviorEntry.AgentId, heroBehaviorEntry.Behavior, cancellationToken))
+            {
+                scopedLogger.LogWarning("Could not set hero behavior for agent {agentId} to {behavior}", heroBehaviorEntry.AgentId, heroBehaviorEntry.Behavior);
+                await this.chatService.AddMessageAsync($"Cannot set party loadout. Could not set behavior {heroBehaviorEntry.Behavior} for agent {heroBehaviorEntry.AgentId}.", "Daybreak.API", Channel.Moderator, cancellationToken);
+            }
+        }
 
         await this.chatService.AddMessageAsync("Party loadout set.", "Daybreak.API", Channel.Moderator, cancellationToken);
         return true;
