@@ -3,7 +3,6 @@ using Daybreak.Shared.Models.Api;
 using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.BuildTemplates.Models;
-using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Extensions;
@@ -50,7 +49,7 @@ public sealed class BuildTemplateManager(
             PreviousName = string.Empty,
             Attributes = emptyBuild.Attributes,
             Skills = emptyBuild.Skills,
-            CreationTime = DateTimeOffset.UtcNow
+            CreationTime = DateTime.UtcNow
         };
 
         this.BuildMemoryCache.Add(entry);
@@ -66,7 +65,7 @@ public sealed class BuildTemplateManager(
             PreviousName = string.Empty,
             Attributes = emptyBuild.Attributes,
             Skills = emptyBuild.Skills,
-            CreationTime = DateTimeOffset.UtcNow
+            CreationTime = DateTime.UtcNow
         };
 
         this.BuildMemoryCache.Add(entry);
@@ -93,7 +92,7 @@ public sealed class BuildTemplateManager(
             Name = name,
             PreviousName = string.Empty,
             Builds = [this.CreateSingleBuild()],
-            CreationTime = DateTimeOffset.UtcNow
+            CreationTime = DateTime.UtcNow
         };
 
         this.BuildMemoryCache.Add(entry);
@@ -107,7 +106,7 @@ public sealed class BuildTemplateManager(
             Name = name,
             PreviousName = string.Empty,
             Builds = [this.CreateSingleBuild(name)],
-            CreationTime = DateTimeOffset.UtcNow
+            CreationTime = DateTime.UtcNow
         };
 
         this.BuildMemoryCache.Add(entry);
@@ -598,9 +597,9 @@ public sealed class BuildTemplateManager(
             }
         }
 
-        if (build.CreationTime == DateTimeOffset.MinValue)
+        if (build.CreationTime == DateTime.MinValue)
         {
-            build.CreationTime = new FileInfo(path).CreationTimeUtc.ToSafeDateTimeOffset();
+            build.CreationTime = new FileInfo(path).CreationTimeUtc;
         }
 
         return Result<IBuildEntry, Exception>.Success(build);
@@ -632,12 +631,13 @@ public sealed class BuildTemplateManager(
 
     private Result<Build, Exception> DecodeTemplateInner(string template)
     {
-        this.logger.LogDebug("Attempting to decode template");
+        var scopedLogger = this.logger.CreateScopedLogger();
+        scopedLogger.LogDebug("Attempting to decode template");
         var buildMetadata = ParseEncodedTemplate(template);
-        this.logger.LogDebug("Decoded template. Beginning parsing");
+        scopedLogger.LogDebug("Decoded template. Beginning parsing");
         if (buildMetadata.VersionNumber != 0)
         {
-            this.logger.LogError($"Expected version number to be 0 but found {buildMetadata.VersionNumber}");
+            scopedLogger.LogError("Expected version number to be 0 but found {buildMetadata.VersionNumber}", buildMetadata.VersionNumber);
             return new InvalidOperationException($"Failed to parse template");
         }
 
@@ -649,14 +649,14 @@ public sealed class BuildTemplateManager(
 
         if (Profession.TryParse(buildMetadata.PrimaryProfessionId, out var primaryProfession) is false)
         {
-            this.logger.LogError($"Failed to parse profession with id {buildMetadata.PrimaryProfessionId}");
+            scopedLogger.LogError("Failed to parse profession with id {buildMetadata.PrimaryProfessionId}", buildMetadata.PrimaryProfessionId);
             return new InvalidOperationException($"Failed to parse template");
         }
 
         build.Primary = primaryProfession;
         if (Profession.TryParse(buildMetadata.SecondaryProfessionId, out var secondaryProfession) is false)
         {
-            this.logger.LogError($"Failed to parse profession with id {buildMetadata.SecondaryProfessionId}");
+            scopedLogger.LogError("Failed to parse profession with id {buildMetadata.SecondaryProfessionId}", buildMetadata.SecondaryProfessionId);
             return new InvalidOperationException($"Failed to parse template");
         }
 
@@ -683,7 +683,7 @@ public sealed class BuildTemplateManager(
             if (maybeAttribute is null)
             {
                 var msg = $"Failed to parse attribute with id {attributeId} for professions {primaryProfession.Name}/{secondaryProfession.Name}";
-                this.logger.LogError(msg);
+                scopedLogger.LogError(msg);
                 return new InvalidOperationException(msg);
             }
 
@@ -694,20 +694,21 @@ public sealed class BuildTemplateManager(
         {
             if (Skill.TryParse(buildMetadata.SkillIds[i], out var skill) is false)
             {
-                this.logger.LogError($"Failed to parse skill with id {buildMetadata.SkillIds[i]}");
+                scopedLogger.LogError("Failed to parse skill with id {skillId}", buildMetadata.SkillIds[i]);
                 return new InvalidOperationException($"Failed to parse template");
             }
 
             build.Skills.Add(skill);
         }
 
-        this.logger.LogDebug("Successfully parsed build template");
+        scopedLogger.LogDebug("Successfully parsed build template");
         return build;
     }
 
     private string EncodeTemplateInner(Build build)
     {
-        this.logger.LogDebug("Building build metadata");
+        var scopedLogger = this.logger.CreateScopedLogger();
+        scopedLogger.LogDebug("Building build metadata");
         var buildMetadata = new BuildMetadata
         {
             VersionNumber = 0,
@@ -722,7 +723,7 @@ public sealed class BuildTemplateManager(
             TailPresent = true
         };
 
-        this.logger.LogDebug("Encoding metadata into binary");
+        scopedLogger.LogDebug("Encoding metadata into binary");
         var encodedBinary = BuildEncodedString(buildMetadata);
         int index = 0;
         var encodedBase64 = new List<int>();

@@ -10,6 +10,7 @@ using System.Extensions;
 using System.Extensions.Core;
 
 namespace Daybreak.Services.MDns;
+
 public sealed class MDomainRegistrar(
     ILogger<MDomainRegistrar> logger)
     : IMDomainRegistrar, IApplicationLifetimeService
@@ -21,7 +22,7 @@ public sealed class MDomainRegistrar(
     private readonly ServiceDiscovery serviceDiscovery = new();
     private readonly CancellationTokenSource cts = new();
     private readonly ILogger<MDomainRegistrar> logger = logger.ThrowIfNull();
-    
+
     public void OnStartup()
     {
         this.serviceDiscovery.ServiceInstanceDiscovered += this.ServiceDiscovery_ServiceInstanceDiscovered;
@@ -42,7 +43,7 @@ public sealed class MDomainRegistrar(
     public IReadOnlyList<Uri>? Resolve(string service)
     {
         if (this.serviceLookup.TryGetValue(service, out var registration) &&
-            registration.Expiration > DateTimeOffset.UtcNow)
+            registration.Expiration > DateTime.UtcNow)
         {
             return [.. registration.Uris];
         }
@@ -52,7 +53,7 @@ public sealed class MDomainRegistrar(
 
     public IReadOnlyList<Uri>? QueryByServiceName(Func<string, bool> query)
     {
-        var now = DateTimeOffset.UtcNow;
+        var now = DateTime.UtcNow;
         var returnList = new List<Uri>();
         foreach (var serviceRegistration in this.serviceLookup.Values.Where(s => s.Expiration > now))
         {
@@ -112,8 +113,8 @@ public sealed class MDomainRegistrar(
         var ttl = ptrRecord.TTL > MaxTTL
             ? MaxTTL
             : ptrRecord.TTL;
-        var expiration = DateTimeOffset.UtcNow + ttl;
-        this.serviceLookup[name] = new ServiceRegistration { Name = name, Expiration = expiration, Uris = [..BuildUrisFromResponse(e.Message)] };
+        var expiration = DateTime.UtcNow + ttl;
+        this.serviceLookup[name] = new ServiceRegistration { Name = name, Expiration = expiration, Uris = [.. BuildUrisFromResponse(e.Message)] };
     }
 
     private async ValueTask QueryServicesPeriodically(CancellationToken cancellationToken)

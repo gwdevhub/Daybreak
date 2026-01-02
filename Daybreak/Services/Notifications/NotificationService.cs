@@ -3,7 +3,6 @@ using Daybreak.Services.Notifications.Models;
 using Daybreak.Shared.Models.Notifications;
 using Daybreak.Shared.Models.Notifications.Handling;
 using Daybreak.Shared.Services.Notifications;
-using Daybreak.Shared.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Slim;
@@ -84,8 +83,8 @@ internal sealed class NotificationService(
                     Level = (int)notification.Level,
                     MetaData = notification.Metadata,
                     HandlerType = notification.HandlingType?.AssemblyQualifiedName,
-                    ExpirationTime = notification.ExpirationTime.ToSafeDateTimeOffset().ToUnixTimeMilliseconds(),
-                    CreationTime = notification.CreationTime.ToSafeDateTimeOffset().ToUnixTimeMilliseconds(),
+                    ExpirationTime = notification.ExpirationTime.ToBinary(),
+                    CreationTime = notification.CreationTime.ToBinary(),
                     Closed = true
                 }, cancellationToken);
             }
@@ -158,7 +157,7 @@ internal sealed class NotificationService(
             Title = title,
             Description = description,
             Metadata = metaData ?? string.Empty,
-            ExpirationTime = expirationTime ?? DateTime.Now + TimeSpan.FromSeconds(5),
+            ExpirationTime = expirationTime ?? (DateTime.Now + TimeSpan.FromSeconds(5)),
             Dismissible = dismissible,
             Level = logLevel,
         };
@@ -189,8 +188,8 @@ internal sealed class NotificationService(
             Level = (LogLevel)dto.Level,
             Title = dto.Title ?? string.Empty,
             Description = dto.Description ?? string.Empty,
-            ExpirationTime = DateTimeOffset.FromUnixTimeMilliseconds(dto.ExpirationTime).LocalDateTime,
-            CreationTime = DateTimeOffset.FromUnixTimeMilliseconds(dto.CreationTime).LocalDateTime,
+            ExpirationTime = DateTime.FromBinary(dto.ExpirationTime),
+            CreationTime = DateTime.FromBinary(dto.CreationTime),
             Metadata = dto.MetaData ?? string.Empty,
             Dismissible = dto.Dismissible,
             Closed = dto.Closed,
@@ -206,8 +205,8 @@ internal sealed class NotificationService(
             Level = (int)notification.Level,
             Title = notification.Title,
             Description = notification.Description,
-            ExpirationTime = notification.ExpirationTime.ToSafeDateTimeOffset().ToUnixTimeMilliseconds(),
-            CreationTime = notification.CreationTime.ToSafeDateTimeOffset().ToUnixTimeMilliseconds(),
+            ExpirationTime = notification.ExpirationTime.ToBinary(),
+            CreationTime = notification.CreationTime.ToBinary(),
             MetaData = notification.Metadata,
             Dismissible = notification.Dismissible,
             Closed = notification.Closed,
