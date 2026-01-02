@@ -394,62 +394,38 @@ public sealed class LaunchViewModel(
         }
 
         (var appContext, var apiContext) = await this.GetAppAndApiContext(launcherViewContext, cancellationToken);
-        if (appContext is not null)
+        
+        // No app context means game is not running for this configuration - allow launch
+        if (appContext is null)
         {
-            if (apiContext is null)
-            {
-                launcherViewContext.AppContext = appContext;
-                launcherViewContext.ApiContext = apiContext;
-                launcherViewContext.GameRunning = false;
-                launcherViewContext.CanLaunch = false;
-                launcherViewContext.CanAttach = false;
-                launcherViewContext.CanKill = true;
-            }
-            else
-            {
-                launcherViewContext.AppContext = appContext;
-                launcherViewContext.ApiContext = apiContext;
-                launcherViewContext.GameRunning = true;
-                launcherViewContext.CanLaunch = false;
-                launcherViewContext.CanAttach = this.focusViewOptions.Value.Enabled;
-                launcherViewContext.CanKill = !this.focusViewOptions.Value.Enabled;
-            }
+            launcherViewContext.AppContext = default;
+            launcherViewContext.ApiContext = default;
+            launcherViewContext.GameRunning = false;
+            launcherViewContext.CanLaunch = true;
+            launcherViewContext.CanAttach = false;
+            launcherViewContext.CanKill = false;
+            return;
+        }
+
+        // Game is running
+        launcherViewContext.AppContext = appContext;
+        launcherViewContext.ApiContext = apiContext;
+
+        if (apiContext is null)
+        {
+            // Game running but API mod not available - can only kill
+            launcherViewContext.GameRunning = false;
+            launcherViewContext.CanLaunch = false;
+            launcherViewContext.CanAttach = false;
+            launcherViewContext.CanKill = true;
         }
         else
         {
-            if (apiContext is null)
-            {
-                launcherViewContext.AppContext = appContext;
-                launcherViewContext.ApiContext = apiContext;
-                launcherViewContext.GameRunning = false;
-                launcherViewContext.CanLaunch = true;
-                launcherViewContext.CanAttach = false;
-                launcherViewContext.CanKill = false;
-            }
-            else
-            {
-                var processIdResponse = await apiContext.GetProcessId(cancellationToken);
-                if (processIdResponse is not null)
-                {
-                    launcherViewContext.AppContext = new GuildWarsApplicationLaunchContext
-                    {
-                        GuildWarsProcess = Process.GetProcessById(processIdResponse.ProcessId),
-                        ProcessId = (uint)processIdResponse.ProcessId,
-                        LaunchConfiguration = launcherViewContext.Configuration
-                    };
-
-                    launcherViewContext.CanKill = !this.focusViewOptions.Value.Enabled;
-                }
-                else
-                {
-                    launcherViewContext.CanKill = false;
-                }
-
-                launcherViewContext.ApiContext = apiContext;
-                launcherViewContext.GameRunning = true;
-                launcherViewContext.CanLaunch = false;
-                launcherViewContext.CanAttach = this.focusViewOptions.Value.Enabled;
-            }
+            // Game running with API mod - can attach or kill based on focus view setting
+            launcherViewContext.GameRunning = true;
+            launcherViewContext.CanLaunch = false;
+            launcherViewContext.CanAttach = this.focusViewOptions.Value.Enabled;
+            launcherViewContext.CanKill = !this.focusViewOptions.Value.Enabled;
         }
     }
 
