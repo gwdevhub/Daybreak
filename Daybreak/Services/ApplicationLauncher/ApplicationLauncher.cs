@@ -1,4 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Services.Toolbox;
 using Daybreak.Shared.Exceptions;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.LaunchConfigurations;
@@ -177,19 +178,24 @@ internal sealed class ApplicationLauncher(
             throw new InvalidOperationException("Unable to determine executable directory for Steam support");
         }
 
+        var mods = this.modsManager.GetMods().Where(m => m.IsEnabled && m.IsInstalled).ToList();
+        var disabledmods = this.modsManager.GetMods().Where(m => !m.IsEnabled && m.IsInstalled).ToList();
+
         var args = new List<string>();
 
         args.AddRange(PopulateCommandLineArgs("-email", email) ?? []);
         args.AddRange(PopulateCommandLineArgs("-password", password) ?? []);
-        args.AddRange(PopulateCommandLineArgs("-character", "Daybreak") ?? []);
+
+        if (!mods.OfType<ToolboxService>().Any())
+        {
+            args.AddRange(PopulateCommandLineArgs("-character", "Daybreak") ?? []);
+        }
 
         foreach (var arg in launchConfigurationWithCredentials.Arguments?.Split(" ") ?? [])
         {
             args.Add(arg);
         }
 
-        var mods = this.modsManager.GetMods().Where(m => m.IsEnabled && m.IsInstalled).ToList();
-        var disabledmods = this.modsManager.GetMods().Where(m => !m.IsEnabled && m.IsInstalled).ToList();
         foreach (var mod in mods)
         {
             args.AddRange(mod.GetCustomArguments());
