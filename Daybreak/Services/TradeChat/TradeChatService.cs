@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System.Core.Extensions;
 using System.Extensions;
+using System.Extensions.Core;
 using System.IO;
 using System.Logging;
 using System.Net.Http;
@@ -23,17 +24,7 @@ namespace Daybreak.Services.TradeChat;
 internal sealed class TradeChatService<TChannelOptions> : ITradeChatService<TChannelOptions>, IDisposable
     where TChannelOptions : class, ITradeChatOptions, new()
 {
-    private const long MinEpochTime = 1420070400;
-
-    private const string ModelIdPlaceholder = "[MODELID]";
-    private const string FromPlaceholder = "[FROM]";
-    private const string ToPlaceholder = "[TO]";
-    private const string PricingHistory = $"pricing_history/{ModelIdPlaceholder}/{FromPlaceholder}/{ToPlaceholder}";
-    private const string TraderQuotesUri = "trader_quotes";
     private const string LatestTradesUri = "m";
-    private const string SearchQueryUri = $"s/{QueryPlaceholder}";
-    private const string SearchUsernameUri = $"u/{QueryPlaceholder}";
-    private const string QueryPlaceholder = "[QUERY]";
     private const string IfNoneMatchHeader = "if-none-match";
 
     private static readonly TimeSpan MinBackoffTime = TimeSpan.FromSeconds(1);
@@ -85,49 +76,8 @@ internal sealed class TradeChatService<TChannelOptions> : ITradeChatService<TCha
 
     public async Task<IEnumerable<TraderMessage>> GetLatestTrades(CancellationToken cancellationToken, DateTime? from = default)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetLatestTrades), string.Empty);
+        var scopedLogger = this.logger.CreateScopedLogger();
         return await this.GetTradeMessagesInternal(LatestTradesUri, from, scopedLogger, cancellationToken);
-    }
-
-    public async Task<IEnumerable<TraderMessage>> GetTradesByQuery(string query, CancellationToken cancellationToken, DateTime? from = default, DateTime? to = default)
-    {
-        var queryBuilder = new StringBuilder();
-        queryBuilder.Append(SearchQueryUri.Replace(QueryPlaceholder, query));
-        if (from.HasValue)
-        {
-            var fromUnixTimestamp = new DateTimeOffset(from.Value).ToUnixTimeMilliseconds();
-            queryBuilder.Append('/').Append(fromUnixTimestamp);
-        }
-
-        if (to.HasValue)
-        {
-            var fromUnixTimestamp = new DateTimeOffset(to.Value).ToUnixTimeMilliseconds();
-            queryBuilder.Append('/').Append(fromUnixTimestamp);
-        }
-
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetTradesByQuery), query);
-        return await this.GetTradeMessagesInternal(queryBuilder.ToString(), default, scopedLogger, cancellationToken);
-    }
-
-    public async Task<IEnumerable<TraderMessage>> GetTradesByUsername(string username, CancellationToken cancellationToken, DateTime? from = default, DateTime? to = default)
-    {
-        var queryBuilder = new StringBuilder();
-        queryBuilder.Append(SearchUsernameUri.Replace(QueryPlaceholder, username));
-        if (from.HasValue)
-        {
-            var fromUnixTimestamp = new DateTimeOffset(from.Value).ToUnixTimeMilliseconds();
-            queryBuilder.Append('/').Append(fromUnixTimestamp);
-        }
-
-        if (to.HasValue)
-        {
-            var fromUnixTimestamp = new DateTimeOffset(to.Value).ToUnixTimeMilliseconds();
-            queryBuilder.Append('/').Append(fromUnixTimestamp);
-        }
-
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetTradesByUsername), username);
-        return await this.GetTradeMessagesInternal(queryBuilder.ToString(), default, scopedLogger, cancellationToken);
-        
     }
 
     private async Task<IEnumerable<TraderMessage>> GetTradeMessagesInternal(string uri, DateTime? from, ScopedLogger<TradeChatService<TChannelOptions>> scopedLogger, CancellationToken cancellationToken)
@@ -163,7 +113,7 @@ internal sealed class TradeChatService<TChannelOptions> : ITradeChatService<TCha
             await this.httpClient.GetAsync(uri!, cancellationToken);
         if (!response.IsSuccessStatusCode)
         {
-            scopedLogger.LogError($"Error occurred while retrieving trades from {this.httpClient.BaseAddress}/{uri}");
+            scopedLogger.LogError("Error occurred while retrieving trades from {uri}", $"{this.httpClient.BaseAddress}/{uri}");
             throw new InvalidOperationException($"Received [{response.StatusCode}] from [{this.httpClient.BaseAddress}/{uri}]");
         }
 
@@ -173,7 +123,7 @@ internal sealed class TradeChatService<TChannelOptions> : ITradeChatService<TCha
 
     private async Task<TraderMessageResponse?> ReceiveTraderMessageResponseSafe(CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.ReceiveTraderMessageResponseSafe), string.Empty);
+        var scopedLogger = this.logger.CreateScopedLogger();
         try
         {
             var responseString = await this.ReceiveWebsocketResponseSafe(cancellationToken);
@@ -194,7 +144,7 @@ internal sealed class TradeChatService<TChannelOptions> : ITradeChatService<TCha
 
     private async Task<string> ReceiveWebsocketResponseSafe(CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(ReceiveWebsocketResponseSafe), string.Empty);
+        var scopedLogger = this.logger.CreateScopedLogger();
 
         try
         {
@@ -204,12 +154,12 @@ internal sealed class TradeChatService<TChannelOptions> : ITradeChatService<TCha
         }
         catch (OperationCanceledException ex)
         {
-            this.logger.LogError(ex, "Receive operation timed out");
+            scopedLogger.LogError(ex, "Receive operation timed out");
             return string.Empty;
         }
         catch (Exception ex)
         {
-            this.logger.LogError(ex, $"Encountered exception while receiving response. Waiting {this.backoffTime.TotalSeconds}s and retrying");
+            scopedLogger.LogError(ex, "Encountered exception while receiving response. Waiting {this.backoffTime.TotalSeconds}s and retrying", this.backoffTime.TotalSeconds);
             await Task.Delay(this.backoffTime, cancellationToken);
             this.backoffTime = TimeSpan.FromSeconds(Math.Min(this.backoffTime.TotalSeconds * 2, MaxBackoffTime.TotalSeconds));
             return await this.ReceiveWebsocketResponseSafe(cancellationToken);
@@ -218,7 +168,7 @@ internal sealed class TradeChatService<TChannelOptions> : ITradeChatService<TCha
 
     private async Task<string> ReceiveWebsocketResponse(CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.ReceiveWebsocketResponse), string.Empty);
+        var scopedLogger = this.logger.CreateScopedLogger();
         await this.EnsureConnectionAsync(cancellationToken);
         var buffer = new ArraySegment<byte>(this.webSocketBuffer, 0, this.webSocketBuffer.Length);
         using var finalResponseBuffer = new MemoryStream();

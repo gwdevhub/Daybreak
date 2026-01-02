@@ -12,7 +12,7 @@ public sealed class TraderQuoteDTO
 
     public int TraderQuoteType { get; set; }
 
-    public DateTimeOffset TimeStamp { get; set; }
+    public DateTime TimeStamp { get; set; }
 
-    public DateTimeOffset InsertionTime { get; set; }
+    public DateTime InsertionTime { get; set; }
 }

@@ -1,6 +1,5 @@
-﻿using Daybreak.Shared.Services.Logging;
-using Daybreak.Shared.Utils;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
+using Daybreak.Shared.Services.Logging;
 
 namespace Daybreak.Services.Logging;
 
@@ -28,7 +27,7 @@ internal sealed class JsonLogsManager : ILogsManager
             Message = log.Exception is null ? log.Message : $"{log.Message}{Environment.NewLine}{log.Exception}",
             Category = log.Category,
             LogLevel = log.LogLevel,
-            LogTime = log.LogTime.ToSafeDateTimeOffset(),
+            LogTime = log.LogTime,
             CorrelationVector = log.CorrelationVector
         };
 

@@ -36,8 +36,8 @@ public sealed class MainPlayerService : IDisposable
 
     private TimeSpan minUpdateFrequency = TimeSpan.MaxValue;
     private MainPlayerState? mainPlayerState;
-    private DateTimeOffset lastUpdateTime = DateTimeOffset.MinValue;
-    private DateTimeOffset lastFrequencyUpdate = DateTimeOffset.MinValue;
+    private DateTime lastUpdateTime = DateTime.MinValue;
+    private DateTime lastFrequencyUpdate = DateTime.MinValue;
 
     public MainPlayerService(
         ChatService chatService,
@@ -140,7 +140,7 @@ public sealed class MainPlayerService : IDisposable
                 var attributeIds = new Array12Uint();
                 var attributeValues = new Array12Uint();
                 var skills = new Array8Uint();
-                for(var i = 0; i < singleBuild.Attributes.Count && i < 12; i++)
+                for (var i = 0; i < singleBuild.Attributes.Count && i < 12; i++)
                 {
                     if (singleBuild.Attributes[i].Attribute is null)
                     {
@@ -151,7 +151,7 @@ public sealed class MainPlayerService : IDisposable
                     attributeValues[i] = (uint)singleBuild.Attributes[i].Points;
                 }
 
-                for(var i =0; i < singleBuild.Skills.Count && i < 8; i++)
+                for (var i = 0; i < singleBuild.Skills.Count && i < 8; i++)
                 {
                     skills[i] = (uint)singleBuild.Skills[i].Id;
                 }
@@ -408,7 +408,7 @@ public sealed class MainPlayerService : IDisposable
                 var currentTier = player.ActiveTitleTier;
                 TitleContext? currentTitle = default;
                 int? id = -1;
-                for(var i = 0; i < gameContext.Pointer->WorldContext->Titles.Size; i++)
+                for (var i = 0; i < gameContext.Pointer->WorldContext->Titles.Size; i++)
                 {
                     var title = gameContext.Pointer->WorldContext->Titles.Skip(i).FirstOrDefault();
                     if (title.CurrentTitleTierIndex == currentTier)
@@ -493,7 +493,7 @@ public sealed class MainPlayerService : IDisposable
         ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(frequency, TimeSpan.Zero);
 
         var id = Guid.NewGuid();
-        var now = DateTimeOffset.UtcNow;
+        var now = DateTime.UtcNow;
         var entry = new ByteConsumerEntry(id, frequency, onUpdate);
 
         this.consumers[id] = entry;
@@ -509,7 +509,7 @@ public sealed class MainPlayerService : IDisposable
     private unsafe void OnGameThreadProc()
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        var now = DateTimeOffset.UtcNow;
+        var now = DateTime.UtcNow;
 
         /*
          * Periodically adjust the frequency of updates based on connected clients.
@@ -627,13 +627,13 @@ public sealed class MainPlayerService : IDisposable
         {
             this.minUpdateFrequency = TimeSpan.MaxValue;
             scopedLogger.LogDebug("No consumers registered, disabling updates");
-            this.lastFrequencyUpdate = DateTimeOffset.UtcNow;
+            this.lastFrequencyUpdate = DateTime.UtcNow;
             return;
         }
 
         var minValue = this.consumers.Values.Min(c => c.Frequency);
         scopedLogger.LogDebug("Adjusted update frequency to {frequency}", minValue);
-        this.lastFrequencyUpdate = DateTimeOffset.UtcNow;
+        this.lastFrequencyUpdate = DateTime.UtcNow;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

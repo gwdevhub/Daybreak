@@ -102,7 +102,7 @@
             {
                 await Task.Delay(UpdateFrequency, cancellationToken);
                 var changed = false;
-                var dateTimeNow = DateTimeOffset.UtcNow;
+                var dateTimeNow = DateTime.UtcNow;
 
                 try
                 {
