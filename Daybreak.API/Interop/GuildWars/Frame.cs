@@ -20,9 +20,6 @@ public readonly struct Frame
     [FieldOffset(0x0024)]
     public readonly uint TemplateType;
 
-    [FieldOffset(0x0028)]
-    public readonly unsafe void* FrameContext; // Context pointer for frame-specific data
-
     [FieldOffset(0x00A8)]
     public readonly GuildWarsArray<FrameInteractionCallback> FrameCallbacks;
 
@@ -85,7 +82,7 @@ public readonly unsafe struct CharSelectorContext
     public readonly uint FrameId;
 
     [FieldOffset(0x0008)]
-    public readonly GuildWarsArray<CharSelectorChar> Chars;
+    public readonly GuildWarsArray<WrappedPointer<CharSelectorChar>> Chars;
 }
 
 [StructLayout(LayoutKind.Explicit, Pack = 1)]

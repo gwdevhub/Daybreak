@@ -1,5 +1,4 @@
-﻿using Daybreak.API.Interop;
-using Daybreak.API.Interop.GuildWars;
+﻿using Daybreak.API.Interop.GuildWars;
 using Daybreak.API.Models;
 using Daybreak.API.Services.Interop;
 using Daybreak.Shared.Models.Api;
@@ -135,43 +134,6 @@ public sealed class CharacterSelectService(
         return true;
     }
 
-    private async Task<bool> ValidateState(CancellationToken cancellationToken)
-    {
-        return await this.gameThreadService.QueueOnGameThread(() =>
-        {
-            return this.instanceContextService.GetInstanceType() is not API.Interop.GuildWars.InstanceType.Loading;
-        }, cancellationToken);
-    }
-
-    /// <summary>
-    /// Checks if the character select screen is ready by verifying the CharacterSelector frame has a valid context.
-    /// Based on GWToolboxpp's LoginMgr::IsCharSelectReady().
-    /// </summary>
-    private unsafe bool IsCharSelectReady()
-    {
-        var selectorFrame = this.uiContextService.GetFrameByLabel("CharacterSelector");
-        if (selectorFrame.IsNull)
-        {
-            return false;
-        }
-
-        return selectorFrame.Pointer->FrameContext != null;
-    }
-
-    /// <summary>
-    /// Gets the CharSelectorContext from the CharacterSelector frame.
-    /// </summary>
-    private unsafe CharSelectorContext* GetCharSelectorContext()
-    {
-        var selectorFrame = this.uiContextService.GetFrameByLabel("CharacterSelector");
-        if (selectorFrame.IsNull)
-        {
-            return null;
-        }
-
-        return (CharSelectorContext*)selectorFrame.Pointer->FrameContext;
-    }
-
     /// <summary>
     /// Selects a character by name using frame-based UI messages.
     /// Based on GWToolboxpp's LoginMgr::SelectCharacterToPlay().
@@ -184,17 +146,17 @@ public sealed class CharacterSelectService(
         {
             unsafe
             {
-                var selectorFrame = this.uiContextService.GetFrameByLabel("CharacterSelector");
-                if (selectorFrame.IsNull)
+                var selectorFrame = this.GetCharSelectorFrame();
+                if (selectorFrame is null)
                 {
-                    scopedLogger.LogError("CharacterSelector frame not found");
+                    scopedLogger.LogError("Character selector frame not found");
                     return false;
                 }
 
-                var ctx = (CharSelectorContext*)selectorFrame.Pointer->FrameContext;
-                if (ctx == null)
+                var ctx = this.uiContextService.GetFrameContext<CharSelectorContext>(selectorFrame);
+                if (ctx.IsNull)
                 {
-                    scopedLogger.LogError("CharacterSelector context is null");
+                    scopedLogger.LogError("Character selector context not found");
                     return false;
                 }
 
@@ -206,69 +168,50 @@ public sealed class CharacterSelectService(
                 }
 
                 // Get current selected index
-                uint selectedIdx = 0;
+                var selectedIdx = 0;
                 this.uiContextService.SendFrameUIMessage(panesFrame, UIMessage.FrameMessage_QuerySelectedIndex, null, &selectedIdx);
 
-                // Find the target character index
-                uint? targetIndex = null;
-                for (uint i = 0; i < ctx->Chars.Size; i++)
+                var chosen = false;
+                for (uint i = 0; !chosen && i < ctx.Pointer->Chars.Size; i++)
                 {
-                    var charNameSpan = ctx->Chars.Buffer[i].Name.AsSpan();
+                    var c = ctx.Pointer->Chars.Buffer[i];
+                    var charNameSpan = c.Pointer->Name.AsSpan();
                     var nullIdx = charNameSpan.IndexOf('\0');
                     if (nullIdx <= 0)
                     {
-                        continue; // Skip empty slots
+                        continue;
                     }
 
                     var charName = new string(charNameSpan[..nullIdx]);
-                    if (charName == characterName)
+                    if (!charName.StartsWith(characterName, StringComparison.OrdinalIgnoreCase))
                     {
-                        targetIndex = i;
-                        break;
+                        continue;
                     }
+
+                    while (selectedIdx != i)
+                    {
+                        var keyAction = new UIPackets.KeyAction(0x1c);
+                        this.uiContextService.SendFrameUIMessage(panesFrame, UIMessage.KeyDown, &keyAction);
+
+                        var newIdx = selectedIdx;
+                        this.uiContextService.SendFrameUIMessage(panesFrame, UIMessage.FrameMessage_QuerySelectedIndex, null, &newIdx);
+
+                        if (newIdx == selectedIdx)
+                        {
+                            break; // This shouldn't happen - the character should have changed
+                        }
+
+                        selectedIdx = newIdx;
+                    }
+
+                    chosen = selectedIdx == i;
+                    break;
                 }
 
-                if (targetIndex is null)
+                if (!chosen)
                 {
-                    scopedLogger.LogError("Character {name} not found in selector", characterName);
+                    scopedLogger.LogError("Failed to select character {name}", characterName);
                     return false;
-                }
-
-                // Navigate to the target character using arrow key emulation
-                var keyAction = new UIPackets.KeyAction(0x1c); // Right arrow key in GW UI terms
-                while (selectedIdx != targetIndex.Value)
-                {
-                    this.uiContextService.SendFrameUIMessage(panesFrame, UIMessage.KeyDown, &keyAction);
-
-                    uint newIdx = selectedIdx;
-                    this.uiContextService.SendFrameUIMessage(panesFrame, UIMessage.FrameMessage_QuerySelectedIndex, null, &newIdx);
-
-                    if (newIdx == selectedIdx)
-                    {
-                        scopedLogger.LogError("Failed to navigate to character - index didn't change");
-                        return false;
-                    }
-
-                    selectedIdx = newIdx;
-                }
-
-                if (selectedIdx != targetIndex.Value)
-                {
-                    scopedLogger.LogError("Failed to navigate to character {name}", characterName);
-                    return false;
-                }
-
-                if (play)
-                {
-                    // Click the Play button
-                    var playButton = this.uiContextService.GetFrameByLabel("Play");
-                    if (playButton.IsNull)
-                    {
-                        scopedLogger.LogError("Play button not found");
-                        return false;
-                    }
-
-                    this.uiContextService.SendFrameUIMessage(playButton, Models.UIMessage.MouseClick, null);
                 }
 
                 return true;
@@ -364,5 +307,29 @@ public sealed class CharacterSelectService(
                 this.uiContextService.SendMessage(Models.UIMessage.Logout, (uint)&logoutMessage, 0);
             }
         }, cancellationToken);
+    }
+
+    private async Task<bool> ValidateState(CancellationToken cancellationToken)
+    {
+        return await this.gameThreadService.QueueOnGameThread(() =>
+        {
+            return this.instanceContextService.GetInstanceType() is not API.Interop.GuildWars.InstanceType.Loading;
+        }, cancellationToken);
+    }
+
+    private unsafe bool IsCharSelectReady()
+    {
+        return this.GetCharSelectorFrame() is not null;
+    }
+
+    private unsafe Frame* GetCharSelectorFrame()
+    {
+        var selectorFrame = this.uiContextService.GetFrameByLabel("Selector");
+        if (selectorFrame.IsNull)
+        {
+            return null;
+        }
+
+        return selectorFrame.Pointer;
     }
 }
