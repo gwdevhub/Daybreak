@@ -153,6 +153,26 @@ public sealed class UIContextService
         return Task.CompletedTask;
     }
 
+    public unsafe WrappedPointer<T> GetFrameContext<T>(WrappedPointer<Frame> frame)
+        where T : unmanaged
+    {
+        if (frame.IsNull || frame.Pointer->FrameCallbacks.Size == 0)
+        {
+            return null;
+        }
+
+        for (uint i = 0; i < frame.Pointer->FrameCallbacks.Size; i++)
+        {
+            var callback = frame.Pointer->FrameCallbacks.Buffer[i];
+            if (callback.UiCtl_Context != null)
+            {
+                return new WrappedPointer<T>((T*)callback.UiCtl_Context);
+            }
+        }
+
+        return null;
+    }
+
     public unsafe WrappedPointer<Frame> GetChildFrame(WrappedPointer<Frame> parent, uint childOffset)
     {
         var scopedLogger = this.logger.CreateScopedLogger();

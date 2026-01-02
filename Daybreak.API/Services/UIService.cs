@@ -1,5 +1,6 @@
 ﻿using Daybreak.API.Interop;
 using Daybreak.API.Interop.GuildWars;
+using Daybreak.API.Models;
 using Daybreak.API.Services.Interop;
 using System.Extensions.Core;
 

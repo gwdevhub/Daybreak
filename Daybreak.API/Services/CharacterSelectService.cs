@@ -1,4 +1,5 @@
 ﻿using Daybreak.API.Interop.GuildWars;
+using Daybreak.API.Models;
 using Daybreak.API.Services.Interop;
 using Daybreak.Shared.Models.Api;
 using System.Core.Extensions;
@@ -54,7 +55,7 @@ public sealed class CharacterSelectService(
 
                 var currentUuid = gameContext.Pointer->CharContext->PlayerUuid.ToString();
                 var availableChars = new List<CharacterSelectEntry>((int)availableCharsContext.Pointer->Size);
-                foreach(var charContext in *availableCharsContext.Pointer)
+                foreach (var charContext in *availableCharsContext.Pointer)
                 {
                     var nameSpan = charContext.Name.AsSpan();
                     var name = new string(nameSpan[..nameSpan.IndexOf('\0')]);
@@ -80,7 +81,6 @@ public sealed class CharacterSelectService(
                     var currentCharacter = availableChars.FirstOrDefault();
                     return new CharacterSelectInformation(currentCharacter, availableChars);
                 }
-                
             }
         }, cancellationToken);
     }
@@ -96,20 +96,10 @@ public sealed class CharacterSelectService(
 
         await this.TriggerLogOut(cancellationToken);
 
-        var indexResult = await this.WaitForLoginScreenAndGetCurrentAndDesiredIndex(characterName, cancellationToken);
-        if (indexResult is null)
+        var selectResult = await this.WaitForCharSelectAndSelectCharacter(characterName, cancellationToken);
+        if (!selectResult)
         {
-            scopedLogger.LogError("Failed to find index by name {name}", characterName);
-            return false;
-        }
-
-        var currentIndex = indexResult.Value.CurrentIndex;
-        var desiredIndex = indexResult.Value.DesiredIndex;
-        scopedLogger.LogInformation("Changing character to {name} with index {index}", characterName, desiredIndex);
-        var navigateResult = await this.NavigateToCharAndPlay(currentIndex, desiredIndex, cancellationToken);
-        if (!navigateResult)
-        {
-            scopedLogger.LogError("Failed to navigate to character {name} with index {index}", characterName, desiredIndex);
+            scopedLogger.LogError("Failed to select character {name}", characterName);
             return false;
         }
 
@@ -134,86 +124,138 @@ public sealed class CharacterSelectService(
 
         await this.TriggerLogOut(cancellationToken);
 
-        var indexResult = await this.WaitForLoginScreenAndGetCurrentAndDesiredIndex(desiredCharName, cancellationToken);
-        if (indexResult is null)
+        var selectResult = await this.WaitForCharSelectAndSelectCharacter(desiredCharName, cancellationToken);
+        if (!selectResult)
         {
-            scopedLogger.LogError("Resolved character by uuid {uuid} but failed to find index by name {name}", uuid, desiredCharName);
-            return false;
-        }
-
-        var currentIndex = indexResult.Value.CurrentIndex;
-        var desiredIndex = indexResult.Value.DesiredIndex;
-        scopedLogger.LogInformation("Changing character to {name} with index {index} and uuid {uuid}", desiredCharName, desiredIndex, uuid);
-        var navigateResult = await this.NavigateToCharAndPlay(currentIndex, desiredIndex, cancellationToken);
-        if (!navigateResult)
-        {
-            scopedLogger.LogError("Failed to navigate to character {name} with index {index} and uuid {uuid}", desiredCharName, desiredIndex, uuid);
+            scopedLogger.LogError("Failed to select character {name} with uuid {uuid}", desiredCharName, uuid);
             return false;
         }
 
         return true;
     }
 
-    private async Task<bool> ValidateState(CancellationToken cancellationToken)
+    private async Task<bool> SelectCharacterToPlay(string characterName, bool play, CancellationToken cancellationToken)
     {
+        var scopedLogger = this.logger.CreateScopedLogger();
+
         return await this.gameThreadService.QueueOnGameThread(() =>
         {
-            return this.instanceContextService.GetInstanceType() is not API.Interop.GuildWars.InstanceType.Loading;
+            unsafe
+            {
+                var selectorFrame = this.GetCharSelectorFrame();
+                if (selectorFrame is null)
+                {
+                    scopedLogger.LogError("Character selector frame not found");
+                    return false;
+                }
+
+                var ctx = this.uiContextService.GetFrameContext<CharSelectorContext>(selectorFrame);
+                if (ctx.IsNull)
+                {
+                    scopedLogger.LogError("Character selector context not found");
+                    return false;
+                }
+
+                var panesFrame = this.uiContextService.GetChildFrame(selectorFrame, 0);
+                if (panesFrame.IsNull)
+                {
+                    scopedLogger.LogError("Character panes frame not found");
+                    return false;
+                }
+
+                // Get current selected index
+                var selectedIdx = 0;
+                this.uiContextService.SendFrameUIMessage(panesFrame, UIMessage.FrameMessage_QuerySelectedIndex, null, &selectedIdx);
+
+                var chosen = false;
+                for (uint i = 0; !chosen && i < ctx.Pointer->Chars.Size; i++)
+                {
+                    var c = ctx.Pointer->Chars.Buffer[i];
+                    var charNameSpan = c.Pointer->Name.AsSpan();
+                    var nullIdx = charNameSpan.IndexOf('\0');
+                    if (nullIdx <= 0)
+                    {
+                        continue;
+                    }
+
+                    var charName = new string(charNameSpan[..nullIdx]);
+                    if (!charName.StartsWith(characterName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    while (selectedIdx != i)
+                    {
+                        var keyAction = new UIPackets.KeyAction(0x1c);
+                        this.uiContextService.SendFrameUIMessage(panesFrame, UIMessage.KeyDown, &keyAction);
+
+                        var newIdx = selectedIdx;
+                        this.uiContextService.SendFrameUIMessage(panesFrame, UIMessage.FrameMessage_QuerySelectedIndex, null, &newIdx);
+
+                        if (newIdx == selectedIdx)
+                        {
+                            break; // This shouldn't happen - the character should have changed
+                        }
+
+                        selectedIdx = newIdx;
+                    }
+
+                    chosen = selectedIdx == i;
+                    break;
+                }
+
+                if (!chosen)
+                {
+                    scopedLogger.LogError("Failed to select character {name}", characterName);
+                    return false;
+                }
+
+                // TODO: This needs to be reworked to use UI messages to click on Play
+                var hwnd = this.platformContextService.GetWindowHandle();
+                if (!hwnd.HasValue)
+                {
+                    scopedLogger.LogError("Failed to get game window handle");
+                    return false;
+                }
+
+                NativeMethods.SendMessageW((nint)hwnd.Value, NativeMethods.WM_KEYDOWN, 0x50, 0x00190001);
+                NativeMethods.SendMessageW((nint)hwnd.Value, NativeMethods.WM_CHAR, 0x70, 0x00190001);
+                NativeMethods.SendMessageW((nint)hwnd.Value, NativeMethods.WM_KEYUP, 0x50, 0x00190001);
+                return true;
+            }
         }, cancellationToken);
     }
 
-    private async Task<bool> NavigateToCharAndPlay(uint currentIndex, uint desiredIndex, CancellationToken cancellationToken)
+    private async Task<bool> WaitForCharSelectAndSelectCharacter(string characterName, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
+
+        // Wait for character select to be ready
         while (!cancellationToken.IsCancellationRequested)
         {
-            await Task.Delay(100, cancellationToken);
-            var result = await this.gameThreadService.QueueOnGameThread(() =>
+            try
             {
-                unsafe
+                if (await this.gameThreadService.QueueOnGameThread(this.IsCharSelectReady, cancellationToken))
                 {
-                    var preGameContext = this.gameContextService.GetPreGameContext();
-                    if (preGameContext.IsNull)
-                    {
-                        scopedLogger.LogError("Pre-game context is not initialized");
-                        return false;
-                    }
-
-                    var hwnd = this.platformContextService.GetWindowHandle();
-                    if (hwnd is null or 0)
-                    {
-                        scopedLogger.LogError("Failed to get window handle");
-                        return false;
-                    }
-
-                    if (preGameContext.Pointer->Index1 == currentIndex)
-                    {
-                        return false; //Not moved yet
-                    }
-
-                    if (preGameContext.Pointer->Index1 == desiredIndex)
-                    {
-                        // We're on the desired character. Trigger play
-                        NativeMethods.SendMessageW((nint)hwnd.Value, NativeMethods.WM_KEYDOWN, 0x50, 0x00190001);
-                        NativeMethods.SendMessageW((nint)hwnd.Value, NativeMethods.WM_CHAR, 0x70, 0x00190001);
-                        NativeMethods.SendMessageW((nint)hwnd.Value, NativeMethods.WM_KEYUP, 0x50, 0x00190001);
-                        return true;
-                    }
-
-                    currentIndex = preGameContext.Pointer->Index1;
-                    NativeMethods.SendMessageW((nint)hwnd.Value, NativeMethods.WM_KEYDOWN, NativeMethods.VK_RIGHT, 0x014D0001);
-                    NativeMethods.SendMessageW((nint)hwnd.Value, NativeMethods.WM_KEYUP, NativeMethods.VK_RIGHT, 0x014D0001);
-                    return false;
+                    break;
                 }
-            }, cancellationToken);
 
-            if (result)
+                await Task.Delay(100, cancellationToken);
+            }
+            catch(Exception e)
             {
-                return true;
+                scopedLogger.LogError(e, "Error while waiting for character select to be ready");
+                throw;
             }
         }
 
-        return false;
+        if (cancellationToken.IsCancellationRequested)
+        {
+            return false;
+        }
+
+        scopedLogger.LogInformation("Character select ready, selecting {name}", characterName);
+        return await this.SelectCharacterToPlay(characterName, play: true, cancellationToken);
     }
 
     private async Task<string?> GetCharNameByUuid(string uuid, CancellationToken cancellationToken)
@@ -258,7 +300,7 @@ public sealed class CharacterSelectService(
     {
         await this.gameThreadService.QueueOnGameThread(() =>
         {
-            var logoutMessage = new LogOutMessage(0, 0);
+            var logoutMessage = new LogOutMessage(0, 1); // Changed to 1 for character select
             unsafe
             {
                 this.uiContextService.SendMessage(Models.UIMessage.Logout, (uint)&logoutMessage, 0);
@@ -266,60 +308,27 @@ public sealed class CharacterSelectService(
         }, cancellationToken);
     }
 
-    private async Task<(uint DesiredIndex, uint CurrentIndex)?> WaitForLoginScreenAndGetCurrentAndDesiredIndex(string desiredCharName, CancellationToken cancellationToken)
+    private async Task<bool> ValidateState(CancellationToken cancellationToken)
     {
-        uint? desiredIndex = default;
-        uint? currentIndex = default;
-        while (!cancellationToken.IsCancellationRequested)
+        return await this.gameThreadService.QueueOnGameThread(() =>
         {
-            await Task.Delay(100, cancellationToken);
-            var ready = await this.gameThreadService.QueueOnGameThread(() =>
-            {
-                unsafe
-                {
-                    var preGameContext = this.gameContextService.GetPreGameContext();
-                    if (preGameContext.IsNull)
-                    {
-                        return false;
-                    }
+            return this.instanceContextService.GetInstanceType() is not API.Interop.GuildWars.InstanceType.Loading;
+        }, cancellationToken);
+    }
 
-                    //TODO: Re-enable login screen check once we have a reliable way to detect it
-                    //var uiState = 10U;
-                    //this.uiContextService.SendMessage(Models.UIMessage.CheckUIState, 0, (uint)&uiState);
-                    //var loginScreen = uiState == 2;
-                    //if (!loginScreen)
-                    //{
-                    //    return false;
-                    //}
+    private unsafe bool IsCharSelectReady()
+    {
+        return this.GetCharSelectorFrame() is not null;
+    }
 
-                    for (var i = 0U; i < preGameContext.Pointer->LoginCharacters.Size; i++)
-                    {
-                        var loginCharacter = preGameContext.Pointer->LoginCharacters.Buffer[i];
-                        var charNameSpan = loginCharacter.CharacterName.AsSpan();
-                        var charName = new string(charNameSpan[..charNameSpan.IndexOf('\0')]);
-                        if (charName == desiredCharName)
-                        {
-                            desiredIndex = i;
-                            currentIndex = 0xffffffdd;
-                            return true;
-                        }
-                    }
-
-                    return false;
-                }
-            }, cancellationToken);
-
-            if (ready)
-            {
-                break;
-            }
+    private unsafe Frame* GetCharSelectorFrame()
+    {
+        var selectorFrame = this.uiContextService.GetFrameByLabel("Selector");
+        if (selectorFrame.IsNull)
+        {
+            return null;
         }
 
-        if (desiredIndex is not null && currentIndex is not null)
-        {
-            return (desiredIndex.Value, currentIndex.Value);
-        }
-
-        return default;
+        return selectorFrame.Pointer;
     }
 }

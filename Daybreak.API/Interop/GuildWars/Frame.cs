@@ -1,4 +1,5 @@
 ﻿using Daybreak.API.Models;
+using System.Extensions;
 using System.Runtime.InteropServices;
 
 namespace Daybreak.API.Interop.GuildWars;
@@ -50,7 +51,7 @@ public readonly unsafe struct FrameRelation
     public readonly uint FrameHashId;
 }
 
-[StructLayout(LayoutKind.Sequential, Pack =1)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public readonly unsafe struct InteractionMessage
 {
     public readonly uint FrameId;
@@ -65,4 +66,24 @@ public unsafe readonly struct FrameInteractionCallback
 {
     public readonly void* Callback; // UIInteractionCallback
     public readonly void* UiCtl_Context;
+}
+
+[StructLayout(LayoutKind.Explicit, Pack = 1)]
+public readonly unsafe struct CharSelectorContext
+{
+    [FieldOffset(0x0000)]
+    public readonly uint Vtable;
+
+    [FieldOffset(0x0004)]
+    public readonly uint FrameId;
+
+    [FieldOffset(0x0008)]
+    public readonly GuildWarsArray<WrappedPointer<CharSelectorChar>> Chars;
+}
+
+[StructLayout(LayoutKind.Explicit, Pack = 1)]
+public readonly struct CharSelectorChar
+{
+    [FieldOffset(0x0020)]
+    public readonly Array20Char Name;
 }
