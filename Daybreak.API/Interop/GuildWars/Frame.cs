@@ -1,4 +1,5 @@
 ﻿using Daybreak.API.Models;
+using System.Extensions;
 using System.Runtime.InteropServices;
 
 namespace Daybreak.API.Interop.GuildWars;
@@ -18,6 +19,9 @@ public readonly struct Frame
 
     [FieldOffset(0x0024)]
     public readonly uint TemplateType;
+
+    [FieldOffset(0x0028)]
+    public readonly unsafe void* FrameContext; // Context pointer for frame-specific data
 
     [FieldOffset(0x00A8)]
     public readonly GuildWarsArray<FrameInteractionCallback> FrameCallbacks;
@@ -50,7 +54,7 @@ public readonly unsafe struct FrameRelation
     public readonly uint FrameHashId;
 }
 
-[StructLayout(LayoutKind.Sequential, Pack =1)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public readonly unsafe struct InteractionMessage
 {
     public readonly uint FrameId;
@@ -65,4 +69,28 @@ public unsafe readonly struct FrameInteractionCallback
 {
     public readonly void* Callback; // UIInteractionCallback
     public readonly void* UiCtl_Context;
+}
+
+/// <summary>
+/// Context structure for the character selector frame.
+/// Based on GWToolboxpp's CharSelectorContext.
+/// </summary>
+[StructLayout(LayoutKind.Explicit, Pack = 1)]
+public readonly unsafe struct CharSelectorContext
+{
+    [FieldOffset(0x0000)]
+    public readonly uint Vtable;
+
+    [FieldOffset(0x0004)]
+    public readonly uint FrameId;
+
+    [FieldOffset(0x0008)]
+    public readonly GuildWarsArray<CharSelectorChar> Chars;
+}
+
+[StructLayout(LayoutKind.Explicit, Pack = 1)]
+public readonly struct CharSelectorChar
+{
+    [FieldOffset(0x0020)]
+    public readonly Array20Char Name;
 }

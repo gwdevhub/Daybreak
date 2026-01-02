@@ -108,7 +108,7 @@ public sealed class HashingService
             }
 
             seed1 = (seed1 << 3) ^ uc;
-            seed2 += StringHashTable[seed1 & 0xff];
+            seed2 += StringHashTable[seed1 & 0xf];
             hash ^= seed2 + seed1;
         }
 
