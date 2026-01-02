@@ -134,10 +134,6 @@ public sealed class CharacterSelectService(
         return true;
     }
 
-    /// <summary>
-    /// Selects a character by name using frame-based UI messages.
-    /// Based on GWToolboxpp's LoginMgr::SelectCharacterToPlay().
-    /// </summary>
     private async Task<bool> SelectCharacterToPlay(string characterName, bool play, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
@@ -214,14 +210,22 @@ public sealed class CharacterSelectService(
                     return false;
                 }
 
+                // TODO: This needs to be reworked to use UI messages to click on Play
+                var hwnd = this.platformContextService.GetWindowHandle();
+                if (!hwnd.HasValue)
+                {
+                    scopedLogger.LogError("Failed to get game window handle");
+                    return false;
+                }
+
+                NativeMethods.SendMessageW((nint)hwnd.Value, NativeMethods.WM_KEYDOWN, 0x50, 0x00190001);
+                NativeMethods.SendMessageW((nint)hwnd.Value, NativeMethods.WM_CHAR, 0x70, 0x00190001);
+                NativeMethods.SendMessageW((nint)hwnd.Value, NativeMethods.WM_KEYUP, 0x50, 0x00190001);
                 return true;
             }
         }, cancellationToken);
     }
 
-    /// <summary>
-    /// Waits for the character select screen to be ready and then selects the specified character.
-    /// </summary>
     private async Task<bool> WaitForCharSelectAndSelectCharacter(string characterName, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
@@ -231,10 +235,7 @@ public sealed class CharacterSelectService(
         {
             try
             {
-                if (await this.gameThreadService.QueueOnGameThread(() =>
-                {
-                    return this.IsCharSelectReady();
-                }, cancellationToken))
+                if (await this.gameThreadService.QueueOnGameThread(this.IsCharSelectReady, cancellationToken))
                 {
                     break;
                 }
@@ -254,8 +255,6 @@ public sealed class CharacterSelectService(
         }
 
         scopedLogger.LogInformation("Character select ready, selecting {name}", characterName);
-
-        // Select the character and click play
         return await this.SelectCharacterToPlay(characterName, play: true, cancellationToken);
     }
 

@@ -68,10 +68,6 @@ public unsafe readonly struct FrameInteractionCallback
     public readonly void* UiCtl_Context;
 }
 
-/// <summary>
-/// Context structure for the character selector frame.
-/// Based on GWToolboxpp's CharSelectorContext.
-/// </summary>
 [StructLayout(LayoutKind.Explicit, Pack = 1)]
 public readonly unsafe struct CharSelectorContext
 {
