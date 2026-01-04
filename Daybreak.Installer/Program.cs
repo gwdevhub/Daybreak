@@ -31,6 +31,12 @@ while (Process.GetProcesses().Where(p => p.ProcessName == "Daybreak").FirstOrDef
     await Task.Delay(5000);
 }
 
+while (Process.GetProcessesByName("gw").FirstOrDefault()?.HasExited is false)
+{
+    Console.WriteLine($"Detected Guild Wars process is still running. Waiting 5s and retrying");
+    await Task.Delay(5000);
+}
+
 if (File.Exists(updatePkg))
 {
     Console.WriteLine("Unpacking files...");
