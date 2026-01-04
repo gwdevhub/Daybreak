@@ -54,7 +54,7 @@ internal sealed class ApplicationUpdater(
 
     private readonly static ProgressUpdate ProgressInitialize = new(0, "Initializing update");
     private readonly static ProgressUpdate ProgressCheckLatest = new(0, "Checking latest version");
-    private readonly static ProgressUpdate ProgressFinalize = new(1, "Downloaded update. Please restart Daybreak to finalize the update");
+    private readonly static ProgressUpdate ProgressFinalize = new(1, "Downloaded update. Please close any running Guild Wars instances and restart Daybreak to finalize the update");
     private static ProgressUpdate ProgressDownload(double progress) => new(progress, "Downloading update");
 
     private readonly static TimeSpan DownloadInfoUpdateInterval = TimeSpan.FromMilliseconds(16);
