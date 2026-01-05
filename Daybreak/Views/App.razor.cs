@@ -307,22 +307,25 @@ public sealed class AppViewModel
         /*
          * Below code hooks into the webview to set the trade chat theme based on the current application theme.
          */
-        if (Global.CoreWebView2 is null)
+        await this.blazorHostWindow.Dispatcher.InvokeAsync(async () =>
         {
-            return;
-        }
+            if (Global.CoreWebView2 is null)
+            {
+                return;
+            }
 
-        if (this.tradeChatThemeSetterScript is not null)
-        {
-            Global.CoreWebView2.RemoveScriptToExecuteOnDocumentCreated(this.tradeChatThemeSetterScript);
-            this.tradeChatThemeSetterScript = default;
-        }
+            if (this.tradeChatThemeSetterScript is not null)
+            {
+                Global.CoreWebView2.RemoveScriptToExecuteOnDocumentCreated(this.tradeChatThemeSetterScript);
+                this.tradeChatThemeSetterScript = default;
+            }
 
-        this.tradeChatThemeSetterScript = await Global.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(@$"
+            this.tradeChatThemeSetterScript = await Global.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(@$"
             if (location.origin === 'https://kamadan.gwtoolbox.com' || 
                 location.origin === 'https://ascalon.gwtoolbox.com') {{
                 localStorage.setItem('mode', '{(this.themeManager.CurrentTheme?.Mode is LightDarkMode.Light ? "light" : "dark")}');
             }}");
+        });
     }
 
     private void LoadMenuCategories()
