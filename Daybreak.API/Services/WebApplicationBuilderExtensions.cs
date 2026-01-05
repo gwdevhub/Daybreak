@@ -20,6 +20,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddSingleton<PartyService>();
         builder.Services.AddSingleton<UIService>();
         builder.Services.AddSingleton<LoginService>();
+        builder.Services.AddSingleton<InventoryService>();
         builder.WithHookHostedService<GameThreadService>();
         builder.WithHookHostedService<ChatHandlingService>();
         builder.WithAddressService<SkillbarContextService>();

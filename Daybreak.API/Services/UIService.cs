@@ -3,15 +3,19 @@ using Daybreak.API.Interop.GuildWars;
 using Daybreak.API.Models;
 using Daybreak.API.Services.Interop;
 using System.Extensions.Core;
+using System.Runtime.InteropServices;
+using static Daybreak.API.Services.Interop.UIContextService;
 
 namespace Daybreak.API.Services;
 
 public sealed class UIService(
     GameThreadService gameThreadService,
+    GameContextService gameContextService,
     UIContextService uIContextService,
     ILogger<UIService> logger)
 {
     private readonly GameThreadService gameThreadService = gameThreadService;
+    private readonly GameContextService gameContextService = gameContextService;
     private readonly UIContextService uIContextService = uIContextService;
     private readonly ILogger<UIService> logger = logger;
 
@@ -84,6 +88,92 @@ public sealed class UIService(
                 }
             }, CancellationToken.None);
         });
+    }
+
+    public async Task<string?> DecodeString(string encoded, Language language, CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        var taskCompletionSource = new TaskCompletionSource<string?>();
+        var byteCount = (encoded.Length + 1) * sizeof(char);
+        var encodedPtr = Marshal.AllocHGlobal(byteCount);
+        unsafe
+        {
+            var encodedPtrC = (char*)encodedPtr;
+            fixed (char* src = encoded)
+            {
+                Buffer.MemoryCopy(src, encodedPtrC, byteCount, encoded.Length * sizeof(char));
+            }
+
+            encodedPtrC[encoded.Length] = '\0';
+        }
+
+        GCHandle callbackHandle = default;
+        DecodeStrCallback callback;
+        unsafe
+        {
+            callback = (_, decodePtr) =>
+            {
+                try
+                {
+                    if (decodePtr is null)
+                    {
+                        taskCompletionSource.TrySetResult(null);
+                        return;
+                    }
+
+                    var decoded = new string(decodePtr);
+                    taskCompletionSource.TrySetResult(decoded);
+                }
+                catch (Exception ex)
+                {
+                    taskCompletionSource.TrySetException(ex);
+                }
+            };
+
+            callbackHandle = GCHandle.Alloc(callback);
+        }
+
+        try
+        {
+            await this.gameThreadService.QueueOnGameThread(() =>
+            {
+                unsafe
+                {
+                    var gameContext = this.gameContextService.GetGameContext();
+                    if (gameContext.IsNull)
+                    {
+                        scopedLogger.LogError("Game context is null");
+                        return;
+                    }
+
+                    var textParser = gameContext.Pointer->TextParserContext;
+                    if (textParser is null)
+                    {
+                        scopedLogger.LogError("Text parser context is null");
+                        return;
+                    }
+
+                    var prevLanguage = textParser->Language;
+                    if (language is not Language.Unknown)
+                    {
+                        textParser->Language = language;
+                    }
+
+                    this.uIContextService.ValidateDecodeString((char*)encodedPtr, callback, nuint.Zero);
+                    textParser->Language = prevLanguage;
+                }
+            }, cancellationToken);
+
+            return await taskCompletionSource.Task;
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(encodedPtr);
+            if (callbackHandle.IsAllocated)
+            {
+                callbackHandle.Free();
+            }
+        }
     }
 
     private static UIAction GetUIActionFromFrameLabel(string frameLabel)

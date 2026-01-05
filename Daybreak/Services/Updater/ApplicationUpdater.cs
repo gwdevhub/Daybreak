@@ -448,13 +448,14 @@ internal sealed class ApplicationUpdater(
 
     private async void ExecutePostUpdateActions()
     {
+        var scopedLogger = this.logger.CreateScopedLogger();
         this.logger.LogDebug("Executing post-update actions");
         foreach(var action in this.postUpdateActionProvider.GetPostUpdateActions())
         {
-            this.logger.LogDebug("Starting [{actionName}]", action.GetType().Name);
+            scopedLogger.LogDebug("Starting [{actionName}]", action.GetType().Name);
             action.DoPostUpdateAction();
             await action.DoPostUpdateActionAsync();
-            this.logger.LogDebug("Finished [{actionName}]", action.GetType().Name);
+            scopedLogger.LogDebug("Finished [{actionName}]", action.GetType().Name);
         }
     }
 

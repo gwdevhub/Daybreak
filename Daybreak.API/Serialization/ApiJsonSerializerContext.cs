@@ -34,6 +34,7 @@ namespace Daybreak.API.Serialization;
 [JsonSerializable(typeof(TitleInfo))]
 [JsonSerializable(typeof(LoginInfo))]
 [JsonSerializable(typeof(MainPlayerBuildContext))]
+[JsonSerializable(typeof(InventoryInformation))]
 public partial class ApiJsonSerializerContext : JsonSerializerContext
 {
 }
