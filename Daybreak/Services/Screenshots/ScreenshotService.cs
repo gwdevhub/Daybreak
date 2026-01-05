@@ -61,12 +61,8 @@ public sealed class ScreenshotService(
 
         try
         {
-            using var bitmap = GetBitmap(path);
-            if (bitmap is null)
-            {
-                return default;
-            }
-
+            using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+            using var bitmap = new Bitmap(fileStream);
             var dominantColor = ColorThief.GetColor(bitmap, quality: 2);
             var closestAccent = GetClosestAccentColor(Color.FromArgb(dominantColor.Color.A, dominantColor.Color.R, dominantColor.Color.G, dominantColor.Color.B));
             var entry = new ScreenshotEntry(path, closestAccent, dominantColor.IsDark ? LightDarkMode.Dark : LightDarkMode.Light);
@@ -74,7 +70,7 @@ public sealed class ScreenshotService(
             scopedLogger.LogDebug("Screenshot entry created and cached for path {path}", path);
             return entry;
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             scopedLogger.LogError(e, "Failed to get screenshot entry from path {path}", path);
             return default;
