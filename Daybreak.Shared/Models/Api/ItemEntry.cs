@@ -8,6 +8,7 @@ public sealed record ItemEntry(
     string DecodedSingleName,
     string EncodedCompleteName,
     string DecodedCompleteName,
+    string ItemType,
     int Quantity,
     uint[] Modifiers)
 {
