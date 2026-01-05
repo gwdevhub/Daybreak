@@ -37,7 +37,7 @@ public sealed class InventoryService(
                     return default;
                 }
 
-                var itemTuples = new List<(BagType Type,List<(uint ModelId, string EncodedCompleteName, string EncodedSingleName, string EncodedName, int Quantity, uint[] Modifiers)>)>();
+                var itemTuples = new List<(BagType Type,List<(uint ModelId, string EncodedCompleteName, string EncodedSingleName, string EncodedName, int Quantity, uint[] Modifiers, ItemType ItemType)>)>();
                 foreach (var bag in inventory.Pointer->Bags)
                 {
                     if (bag is null)
@@ -45,7 +45,7 @@ public sealed class InventoryService(
                         continue;
                     }
 
-                    var retBag = new List<(uint ModelId, string EncodedCompleteName, string EncodedSingleName, string EncodedName, int Quantity, uint[] Modifiers)>();
+                    var retBag = new List<(uint ModelId, string EncodedCompleteName, string EncodedSingleName, string EncodedName, int Quantity, uint[] Modifiers, ItemType ItemType)>();
                     itemTuples.Add((bag->Type, retBag));
                     if (bag->ItemsCount is 0)
                     {
@@ -69,7 +69,7 @@ public sealed class InventoryService(
                             modifiers[j] = item.Pointer->Modifiers[j].Mod;
                         }
 
-                        retBag.Add((item.Pointer->ModelId, completeNameEncoded, singleItemName, nameEncoded, item.Pointer->Quantity, modifiers));
+                        retBag.Add((item.Pointer->ModelId, completeNameEncoded, singleItemName, nameEncoded, item.Pointer->Quantity, modifiers, item.Pointer->Type));
                     }
                 }
 
@@ -89,7 +89,7 @@ public sealed class InventoryService(
                 var decodedName = await this.uIService.DecodeString(item.EncodedName, Language.English, cancellationToken);
                 var decodedCompleteName = await this.uIService.DecodeString(item.EncodedCompleteName, Language.English, cancellationToken);
                 var decodedSingleName = await this.uIService.DecodeString(item.EncodedSingleName, Language.English, cancellationToken);
-                return (item.ModelId, item.EncodedName, DecodedName: decodedName, item.EncodedSingleName, DecodedSingleName: decodedSingleName, item.EncodedCompleteName, DecodedCompleteName: decodedCompleteName, item.Quantity, item.Modifiers);
+                return (item.ModelId, item.EncodedName, DecodedName: decodedName, item.EncodedSingleName, DecodedSingleName: decodedSingleName, item.EncodedCompleteName, DecodedCompleteName: decodedCompleteName, item.Quantity, item.Modifiers, item.ItemType);
             }));
             return (tuple.Type, Items: decodedItems.ToList());
         }));
@@ -108,7 +108,8 @@ public sealed class InventoryService(
                             EncodedCompleteName: ToBase64(item.EncodedCompleteName),
                             DecodedCompleteName: item.DecodedCompleteName ?? string.Empty,
                             Quantity: item.Quantity,
-                            Modifiers: item.Modifiers))]))]);
+                            Modifiers: item.Modifiers,
+                            ItemType: item.ItemType.ToString()))]))]);
     }
 
     private static string ToBase64(string encoded)
