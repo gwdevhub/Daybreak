@@ -1,0 +1,121 @@
+﻿using Daybreak.API.Interop.GuildWars;
+using Daybreak.API.Services.Interop;
+using Daybreak.Shared.Models.Api;
+using Microsoft.AspNetCore.Mvc.Formatters.Xml;
+using System.Extensions.Core;
+
+namespace Daybreak.API.Services;
+
+public sealed class InventoryService(
+    GameContextService gameContextService,
+    GameThreadService gameThreadService,
+    UIService uIService,
+    ILogger<InventoryService> logger)
+{
+    private readonly GameContextService gameContextService = gameContextService;
+    private readonly GameThreadService gameThreadService = gameThreadService;
+    private readonly UIService uIService = uIService;
+    private readonly ILogger<InventoryService> logger = logger;
+
+    public async Task<InventoryInformation?> GetInventoryInformation(CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        var itemTuples = await this.gameThreadService.QueueOnGameThread(() =>
+        {
+            unsafe
+            {
+                var gameContext = this.gameContextService.GetGameContext();
+                if (gameContext.IsNull)
+                {
+                    scopedLogger.LogError("Game context is null");
+                    return default;
+                }
+
+                var inventory = gameContext.Pointer->ItemContext->Inventory;
+                if (inventory.IsNull)
+                {
+                    scopedLogger.LogError("Inventory is null");
+                    return default;
+                }
+
+                var itemTuples = new List<(BagType Type,List<(uint ModelId, string EncodedCompleteName, string EncodedSingleName, string EncodedName, int Quantity, uint[] Modifiers)>)>();
+                foreach (var bag in inventory.Pointer->Bags)
+                {
+                    if (bag is null)
+                    {
+                        continue;
+                    }
+
+                    var retBag = new List<(uint ModelId, string EncodedCompleteName, string EncodedSingleName, string EncodedName, int Quantity, uint[] Modifiers)>();
+                    itemTuples.Add((bag->Type, retBag));
+                    if (bag->ItemsCount is 0)
+                    {
+                        continue;
+                    }
+
+                    for(var i = 0; i < bag->ItemsCount; i++)
+                    {
+                        var item = bag->Items.Buffer[i];
+                        if (item.IsNull)
+                        {
+                            continue;
+                        }
+
+                        var singleItemName = new string(item.Pointer->SingleItemName);
+                        var nameEncoded = new string(item.Pointer->NameEncoded);
+                        var completeNameEncoded = new string(item.Pointer->CompleteNameEncoded);
+                        var modifiers = new uint[item.Pointer->ModifiersCount];
+                        for(var j = 0; j < item.Pointer->ModifiersCount; j++)
+                        {
+                            modifiers[j] = item.Pointer->Modifiers[j].Mod;
+                        }
+
+                        retBag.Add((item.Pointer->ModelId, completeNameEncoded, singleItemName, nameEncoded, item.Pointer->Quantity, modifiers));
+                    }
+                }
+
+                return itemTuples;
+            }
+        }, cancellationToken);
+
+        if (itemTuples is null)
+        {
+            return default;
+        }
+
+        var decodedItemTuples = await Task.WhenAll(itemTuples.Select(async tuple =>
+        {
+            var decodedItems = await Task.WhenAll(tuple.Item2.Select(async item =>
+            {
+                var decodedName = await this.uIService.DecodeString(item.EncodedName, Language.English, cancellationToken);
+                var decodedCompleteName = await this.uIService.DecodeString(item.EncodedCompleteName, Language.English, cancellationToken);
+                var decodedSingleName = await this.uIService.DecodeString(item.EncodedSingleName, Language.English, cancellationToken);
+                return (item.ModelId, item.EncodedName, DecodedName: decodedName, item.EncodedSingleName, DecodedSingleName: decodedSingleName, item.EncodedCompleteName, DecodedCompleteName: decodedCompleteName, item.Quantity, item.Modifiers);
+            }));
+            return (tuple.Type, Items: decodedItems.ToList());
+        }));
+
+        return new InventoryInformation(
+            Bags: [.. decodedItemTuples.Select(tuple =>
+                new BagEntry(
+                    BagType: tuple.Type.ToString(),
+                    Items: [.. tuple.Items.Select(item =>
+                        new ItemEntry(
+                            ItemModelId: item.ModelId,
+                            EncodedName: ToBase64(item.EncodedName),
+                            DecodedName: item.DecodedName ?? string.Empty,
+                            EncodedSingleName: ToBase64(item.EncodedSingleName),
+                            DecodedSingleName: item.DecodedSingleName ?? string.Empty,
+                            EncodedCompleteName: ToBase64(item.EncodedCompleteName),
+                            DecodedCompleteName: item.DecodedCompleteName ?? string.Empty,
+                            Quantity: item.Quantity,
+                            Modifiers: item.Modifiers))]))]);
+    }
+
+    private static string ToBase64(string encoded)
+    {
+        var bytes = new byte[encoded.Length * sizeof(char)];
+        Buffer.BlockCopy(encoded.ToCharArray(), 0, bytes, 0, bytes.Length);
+        return Convert.ToBase64String(bytes);
+    }
+}

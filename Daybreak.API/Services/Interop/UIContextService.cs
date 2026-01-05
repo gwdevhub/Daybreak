@@ -54,13 +54,25 @@ public sealed class UIContextService
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private unsafe delegate Frame* GetRootFrameFunc();
 
-    private readonly SemaphoreSlim semaphoreSlim = new(1);
+    [SuppressUnmanagedCodeSecurity]
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private unsafe delegate void ValidateAsyncDecodeStr(char* s, DecodeStrCallback callback, void* wParam);
+
+    [SuppressUnmanagedCodeSecurity]
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private unsafe delegate uint DoAsyncDecodeStr(char* encodedStr, DecodeStrCallback callback, void* wParam);
+
+    public unsafe delegate void DecodeStrCallback(void* param, char* s);
+
+    private readonly SemaphoreSlim sendUiMessageSemaphore = new(1);
+    private readonly SemaphoreSlim decodeStringSemaphore = new(1);
     private readonly MemoryScanningService memoryScanningService;
     private readonly HashingService hashingService;
     private readonly GWDelegateCache<GetChildFrameIdFunc> getChildFrameId;
     private readonly GWAddressCache frameArrayAddressCache;
     private readonly GWHook<SendUIMessageFunc> sendUiMessageHook;
     private readonly GWDelegateCache<GetRootFrameFunc> getRootFrame;
+    private readonly GWDelegateCache<ValidateAsyncDecodeStr> validateAsyncDecodeStr;
     // This fastcall equivalent is <GuildWarsArray<FrameInteractionCallback>*, void*, UIMessage, void*, void*>
     private readonly GWFastCall<nint, nint, UIMessage, nint, nint, GWFastCall.Void> sendFrameUIMessage;
     private readonly ILogger<UIContextService> logger;
@@ -92,12 +104,14 @@ public sealed class UIContextService
             }));
         this.getRootFrame = new GWDelegateCache<GetRootFrameFunc>(
             new GWAddressCache(() => this.memoryScanningService.FindAddress(GetRootFrameSeq, GetRootFrameMask, 0)));
+
+        this.validateAsyncDecodeStr = new GWDelegateCache<ValidateAsyncDecodeStr>(
+            new GWAddressCache(() => this.memoryScanningService.ToFunctionStart(
+            this.memoryScanningService.FindUseOfString("(codedString[0] & ~WORD_BIT_MORE) >= WORD_VALUE_BASE"))));
     }
 
     public List<AddressState> GetAddressStates()
     {
-        var assertion = this.memoryScanningService.FindAssertion(GetChildFrameIdFile, GetChildFrameIdAssertion, 0, GetChildFrameIdOffset);
-        Console.WriteLine(assertion);
         return
         [
             new()
@@ -119,6 +133,11 @@ public sealed class UIContextService
             {
                 Name = nameof(this.getRootFrame),
                 Address = this.getRootFrame.Cache.GetAddress() ?? 0U
+            },
+            new()
+            {
+                Name = nameof(this.validateAsyncDecodeStr),
+                Address = this.validateAsyncDecodeStr.Cache.GetAddress() ?? 0U
             }
         ];
     }
@@ -250,10 +269,10 @@ public sealed class UIContextService
             frame = this.GetButtonActionFrame();
         }
 
-        this.semaphoreSlim.Wait();
+        this.sendUiMessageSemaphore.Wait();
         var packet = new UIPackets.KeyAction((uint)action);
         this.SendFrameUIMessage(frame, UIMessage.KeyDown, &packet);
-        this.semaphoreSlim.Release();
+        this.sendUiMessageSemaphore.Release();
         return true;
     }
 
@@ -264,10 +283,10 @@ public sealed class UIContextService
             frame = this.GetButtonActionFrame();
         }
 
-        this.semaphoreSlim.Wait();
+        this.sendUiMessageSemaphore.Wait();
         var packet = new UIPackets.KeyAction((uint)action);
         this.SendFrameUIMessage(frame, UIMessage.KeyUp, &packet);
-        this.semaphoreSlim.Release();
+        this.sendUiMessageSemaphore.Release();
         return true;
     }
 
@@ -345,9 +364,41 @@ public sealed class UIContextService
 
     public unsafe void SendMessage(UIMessage message, nuint wParam, nuint lParam)
     {
-        this.semaphoreSlim.Wait();
+        this.sendUiMessageSemaphore.Wait();
         this.sendUiMessageHook.Continue(message, wParam, lParam);
-        this.semaphoreSlim.Release();
+        this.sendUiMessageSemaphore.Release();
+    }
+
+    /// <summary>
+    /// Decodes a string asynchronously using the game's internal decoding mechanism.
+    /// </summary>
+    /// <remarks>
+    /// Inside the DecodeStrCallback, the decoded string has to be cleaned up by calling Marshal.FreeHGlobal on the char* pointer.
+    /// </remarks>
+    public unsafe void ValidateDecodeString(char* encoded, DecodeStrCallback callback, nuint callbackParam)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        this.decodeStringSemaphore.Wait();
+        try
+        {
+            
+            var validateDecodeStrFnc = this.validateAsyncDecodeStr.GetDelegate();
+            if (validateDecodeStrFnc is null)
+            {
+                scopedLogger.LogError("{funcName} is null", nameof(this.validateAsyncDecodeStr));
+                return;
+            }
+
+            validateDecodeStrFnc(encoded, callback, (void*)callbackParam);
+        }
+        catch(Exception e)
+        {
+            scopedLogger.LogError(e, "Encountered exception while decoding string");
+        }
+        finally
+        {
+            this.decodeStringSemaphore.Release();
+        }
     }
 
     private async ValueTask InitializeHooks(CancellationToken cancellationToken)
