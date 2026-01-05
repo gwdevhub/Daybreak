@@ -1,7 +1,6 @@
 ﻿using Daybreak.API.Interop.GuildWars;
 using Daybreak.API.Services.Interop;
 using Daybreak.Shared.Models.Api;
-using Microsoft.AspNetCore.Mvc.Formatters.Xml;
 using System.Extensions.Core;
 
 namespace Daybreak.API.Services;

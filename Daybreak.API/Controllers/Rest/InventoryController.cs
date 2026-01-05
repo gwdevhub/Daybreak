@@ -6,6 +6,7 @@ using Net.Sdk.Web;
 namespace Daybreak.API.Controllers.Rest;
 
 [GenerateController("api/v1/rest/inventory")]
+[Tags("Inventory")]
 public sealed class InventoryController(
     InventoryService inventoryService)
 {
