@@ -18,7 +18,21 @@
     <EnableIISSupport>false</EnableIISSupport>
     <InvariantGlobalization>true</InvariantGlobalization>
     <Platforms>x86</Platforms>
+    
+    <!-- Prevent static web asset conflicts -->
+    <StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
+    <GenerateStaticWebAssetsManifest>false</GenerateStaticWebAssetsManifest>
+    <ResolveStaticWebAssetsInputsDependsOn>RemoveDuplicateStaticWebAssets;$(ResolveStaticWebAssetsInputsDependsOn)</ResolveStaticWebAssetsInputsDependsOn>
   </PropertyGroup>
+
+  <!-- Remove duplicate static web assets coming from referenced projects -->
+  <Target Name="RemoveDuplicateStaticWebAssets" BeforeTargets="ResolveStaticWebAssetsInputs;GenerateStaticWebAssetsManifest">
+    <ItemGroup>
+      <!-- Remove all blazor webview static assets since this is a Web API project, not a Blazor Hybrid app -->
+      <StaticWebAsset Remove="@(StaticWebAsset)" 
+                      Condition="$([System.String]::new('%(RelativePath)').Contains('blazor.modules')) Or $([System.String]::new('%(RelativePath)').Contains('blazor.webview'))" />
+    </ItemGroup>
+  </Target>
 
   <PropertyGroup>
     <!--Ignore trim warnings. NativeAOT support is still experimental so it should be tested with a Publish build generated from Daybreak build-->

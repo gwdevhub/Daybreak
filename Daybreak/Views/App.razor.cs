@@ -5,6 +5,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Media;
 using Daybreak.Services.Logging;
 using Daybreak.Services.Notifications.Handlers;
 using Daybreak.Shared;
@@ -28,6 +29,14 @@ namespace Daybreak.Views;
 public sealed class AppViewModel
 {
     private const string IssueUrl = "https://github.com/gwdevhub/Daybreak/issues/new";
+
+    // WM_NCHITTEST constants
+    private const int WM_NCHITTEST = 0x0084;
+    private const int HTCLIENT = 1;
+    private const int HTCAPTION = 2;
+    private const int HTMINBUTTON = 8;
+    private const int HTMAXBUTTON = 9;
+    private const int HTCLOSE = 20;
 
     private readonly IOptionsProvider optionsProvider;
     private readonly IMenuServiceProducer menuServiceProducer;
@@ -140,7 +149,44 @@ public sealed class AppViewModel
         this.hwndSource = HwndSource.FromHwnd(
             new WindowInteropHelper(this.blazorHostWindow).Handle
         );
+
+        // Hook WndProc to handle WM_NCHITTEST for custom title bar
+        this.hwndSource?.AddHook(this.WndProc);
+
         this.isInitialized = true;
+    }
+
+    /// <summary>
+    /// Handles Windows messages to ensure the custom title bar area is treated as client area,
+    /// preventing Windows from intercepting mouse events for native window buttons.
+    /// </summary>
+    private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    {
+        if (msg == WM_NCHITTEST)
+        {
+            // Get the mouse position from lParam
+            var x = (short)(lParam.ToInt32() & 0xFFFF);
+            var y = (short)((lParam.ToInt32() >> 16) & 0xFFFF);
+
+            // Convert screen coordinates to window coordinates
+            var point = new System.Windows.Point(x, y);
+            point = this.blazorHostWindow.PointFromScreen(point);
+
+            // Define the title bar height (should match the CSS title bar height of 40px)
+            // Account for DPI scaling
+            var dpi = VisualTreeHelper.GetDpi(this.blazorHostWindow);
+            var titleBarHeight = 40 * dpi.DpiScaleY;
+
+            // If the mouse is in the title bar area, return HTCLIENT to let WebView2 handle it
+            // This prevents Windows from returning HTMINBUTTON, HTMAXBUTTON, or HTCLOSE
+            if (point.Y >= 0 && point.Y < titleBarHeight)
+            {
+                handled = true;
+                return new IntPtr(HTCLIENT);
+            }
+        }
+
+        return IntPtr.Zero;
     }
 
     public void Drag()
