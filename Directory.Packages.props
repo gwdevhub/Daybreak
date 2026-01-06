@@ -3,63 +3,58 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="AvalonEdit" Version="6.3.1.120" />
     <PackageVersion Include="CommunityToolkit.Authentication.Msal" Version="7.1.4" />
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
     <PackageVersion Include="Daybreak.7ZipExtractor" Version="1.0.0" />
     <PackageVersion Include="DiffPlex" Version="1.9.0" />
-    <PackageVersion Include="Elastic.OpenTelemetry" Version="1.1.0" />
-    <PackageVersion Include="FluentAssertions" Version="8.7.1" />
+    <PackageVersion Include="Elastic.OpenTelemetry" Version="1.2.1" />
+    <PackageVersion Include="FluentAssertions" Version="8.8.0" />
     <PackageVersion Include="HtmlAgilityPack" Version="1.12.4" />
     <PackageVersion Include="ini-parser-netstandard" Version="2.5.3" />
     <PackageVersion Include="ksemenenko.ColorThief" Version="1.1.1.4" />
     <PackageVersion Include="MeaMod.DNS" Version="1.0.71" />
     <PackageVersion Include="MemoryPack" Version="1.21.4" />
     <PackageVersion Include="MemoryPack.Generator" Version="1.21.4" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components" Version="9.0.10" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="9.0.120" />
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.10" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="10.0.20" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.1" />
     <PackageVersion Include="Microsoft.Authentication.WebAssembly.Msal" Version="9.0.8" />
     <PackageVersion Include="Microsoft.CorrelationVector" Version="1.0.42" />
-    <PackageVersion Include="Microsoft.Data.Sqlite" Version="9.0.10" />
-    <PackageVersion Include="Microsoft.Data.Sqlite.Core" Version="9.0.10" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.10" />
-    <PackageVersion Include="Microsoft.Extensions.FileProviders.Embedded" Version="10.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.10" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.10" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.FileProviders.Embedded" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.1" />
     <PackageVersion Include="Microsoft.Fast.Components.FluentUI" Version="3.8.0" />
     <PackageVersion Include="Microsoft.Fast.Components.FluentUI.Icons" Version="3.8.0" />
-    <PackageVersion Include="Microsoft.Identity.Client.Desktop" Version="4.77.1" />
-    <PackageVersion Include="Microsoft.Identity.Client.Extensions.Msal" Version="4.77.1" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
-    <PackageVersion Include="Microsoft.Web.WebView2" Version="1.0.3537.50" />
-    <PackageVersion Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
-    <PackageVersion Include="MinHook.NET" Version="1.1.1" />
-    <PackageVersion Include="MSTest.TestAdapter" Version="4.0.1" />
-    <PackageVersion Include="MSTest.TestFramework" Version="4.0.1" />
+    <PackageVersion Include="Microsoft.Identity.Client.Desktop" Version="4.80.0" />
+    <PackageVersion Include="Microsoft.Identity.Client.Extensions.Msal" Version="4.80.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+    <PackageVersion Include="Microsoft.Web.WebView2" Version="1.0.3650.58" />
+    <PackageVersion Include="MinHook.NET" Version="1.1.2" />
+    <PackageVersion Include="MSTest.TestAdapter" Version="4.0.2" />
+    <PackageVersion Include="MSTest.TestFramework" Version="4.0.2" />
     <PackageVersion Include="NSubstitute" Version="5.3.0" />
     <PackageVersion Include="NSubstitute.Analyzers.CSharp" Version="1.0.17" />
-    <PackageVersion Include="NAudio" Version="2.2.1" />
     <PackageVersion Include="Net.Sdk.Web.Extensions" Version="0.8.13" />
     <PackageVersion Include="Net.Sdk.Web.Extensions.SourceGenerators" Version="0.9.5" />
-    <PackageVersion Include="OpenTelemetry.Exporter.Console" Version="1.13.1" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.12.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.12.0" />
+    <PackageVersion Include="OpenTelemetry.Exporter.Console" Version="1.14.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.14.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.14.0" />
     <PackageVersion Include="PeNet" Version="5.1.0" />
     <PackageVersion Include="Plumsy" Version="1.2.0" />
     <PackageVersion Include="Reloaded.Assembler" Version="1.0.16" />
     <PackageVersion Include="securifybv.ShellLink" Version="0.1.0" />
     <PackageVersion Include="Serilog" Version="4.3.0" />
-    <PackageVersion Include="Serilog.Extensions.Logging" Version="9.0.2" />
-    <PackageVersion Include="Serilog.Settings.Configuration" Version="9.0.0" />
-    <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageVersion Include="Serilog.Extensions.Logging" Version="10.0.0" />
+    <PackageVersion Include="Serilog.Settings.Configuration" Version="10.0.0" />
+    <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
     <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
-    <PackageVersion Include="SharpCompress" Version="0.41.0" />
+    <PackageVersion Include="SharpCompress" Version="0.43.0" />
     <PackageVersion Include="Slim" Version="1.11.2" />
-    <PackageVersion Include="Swashbuckle.AspNetCore" Version="9.0.6" />
-    <PackageVersion Include="Swashbuckle.AspNetCore.Swagger" Version="9.0.6" />
-    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerGen" Version="9.0.6" />
-    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerUI" Version="9.0.6" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.1.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.Swagger" Version="10.1.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.1.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.0" />
     <PackageVersion Include="System.IO.Compression" Version="4.3.0" />
     <PackageVersion Include="System.Linq.Async" Version="6.0.3" />
     <PackageVersion Include="System.Reflection.Metadata" Version="9.0.10" />
@@ -72,6 +67,6 @@
     <PackageVersion Include="WpfExtended.Blazor" Version="0.8.1" />
     <PackageVersion Include="WpfExtended.SourceGeneration" Version="0.3.0" />
     <PackageVersion Include="WpfScreenHelper" Version="2.1.1" />
-    <PackageVersion Include="ZLinq" Version="1.5.3" />
+    <PackageVersion Include="ZLinq" Version="1.5.4" />
   </ItemGroup>
 </Project>

@@ -50,18 +50,13 @@
     <PackageReference Include="PeNet" />
     <PackageReference Include="Plumsy" />
     <PackageReference Include="securifybv.ShellLink" />
-    <PackageReference Include="AvalonEdit" />
     <PackageReference Include="DiffPlex" />
     <PackageReference Include="HtmlAgilityPack" />
     <PackageReference Include="ini-parser-netstandard" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" />
     <PackageReference Include="Microsoft.CorrelationVector" />
-    <PackageReference Include="Microsoft.Data.Sqlite" />
-    <PackageReference Include="Microsoft.Data.Sqlite.Core" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" />
-    <PackageReference Include="NAudio" />
   </ItemGroup>
 
   <ItemGroup>
