@@ -7,6 +7,10 @@
     <LangVersion>preview</LangVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <Platforms>AnyCPU;x86</Platforms>
+    
+    <!-- Prevent static web asset conflicts when referenced by multiple projects -->
+    <StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
+    <GenerateStaticWebAssetsManifest>false</GenerateStaticWebAssetsManifest>
   </PropertyGroup>
 
   <ItemGroup>

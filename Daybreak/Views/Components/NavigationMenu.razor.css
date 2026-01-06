@@ -8,7 +8,8 @@
     overflow: hidden;
     z-index: 1000;
     height: 100vh;
-    transition: width 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    /* Use transform instead of width for GPU-accelerated animation */
+    transition: width 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.15s ease-out;
     opacity: 0;
     /* CSS custom properties for dynamic animation */
     --stagger-delay: 0.05s;
@@ -16,6 +17,9 @@
     /* Custom properties for menu item animations */
     --item-stagger-delay: 0.03s;
     --item-base-delay: 0.1s;
+    /* Promote to GPU layer */
+    will-change: width, opacity;
+    transform: translateZ(0);
 }
 
     .navigation-panel.open {
@@ -37,11 +41,15 @@
     overflow-y: auto;
     box-sizing: border-box;
     counter-reset: menu-item;
+    /* Promote to GPU layer for smooth scrolling */
+    transform: translateZ(0);
 }
 
 .menu-category {
     margin-bottom: 5px;
     counter-increment: menu-item;
+    /* Promote to GPU layer */
+    will-change: transform, opacity;
 }
 
 .category-header {
@@ -53,8 +61,10 @@
     backdrop-filter: blur(10px);
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s ease-out;
     border: 1px solid color-mix(in srgb, var(--accent-stroke-active) 60%, transparent);
+    /* Promote to GPU layer */
+    transform: translateZ(0);
 }
 
     .category-header:hover {
@@ -86,13 +96,15 @@
     padding: 8px 10px;
     cursor: pointer;
     border-radius: 3px;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s ease-out;
     margin: 2px 0;
     /* Increment counter for each menu item */
     counter-increment: category-item;
     /* Initial state for animation */
     opacity: 0;
     transform: translateY(-20px);
+    /* Promote to GPU layer */
+    will-change: transform, opacity;
 }
 
 /* Animate menu items when category is expanded and navigation panel is open */

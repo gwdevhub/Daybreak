@@ -41,9 +41,10 @@ internal sealed class ExceptionHandler(
 
     public bool HandleException(Exception e)
     {
+        var exceptionDate = DateTime.UtcNow;
         if (this.logger is null)
         {
-            WriteCrashFiles(e);
+            WriteCrashFiles(e, exceptionDate);
             return false;
         }
 
@@ -55,7 +56,7 @@ internal sealed class ExceptionHandler(
                 case HandleResult.Handled:
                     return true;
                 case HandleResult.Fatal:
-                    WriteCrashDump();
+                    WriteCrashFiles(e, exceptionDate);
                     return false;
                 case HandleResult.Unhandled:
                 default:
@@ -136,29 +137,29 @@ internal sealed class ExceptionHandler(
         return HandleResult.Unhandled;
     }
         
-    private static void WriteCrashFiles(Exception e)
+    private static void WriteCrashFiles(Exception e, DateTime crashTime)
     {
-        WriteCrashLog(e);
-        WriteCrashDump();
+        WriteCrashLog(e, crashTime);
+        WriteCrashDump(crashTime);
     }
 
-    private static void WriteCrashLog(Exception? e)
+    private static void WriteCrashLog(Exception? e, DateTime crashTime)
     {
-        File.WriteAllText(GetCrashFileName("log"), e?.ToString() ?? "NULL EXCEPTION");
+        File.WriteAllText(GetCrashFileName("log", crashTime), e?.ToString() ?? "NULL EXCEPTION");
     }
 
-    private static void WriteCrashDump()
+    private static void WriteCrashDump(DateTime crashTime)
     {
-        var dumpFilePath = GetCrashFileName("dmp");
+        var dumpFilePath = GetCrashFileName("dmp", crashTime);
         using var fs = new FileStream(dumpFilePath, FileMode.Create, FileAccess.Write);
         var process = Process.GetCurrentProcess();
         NativeMethods.MiniDumpWriteDump(process.Handle, process.Id, fs.SafeFileHandle, NativeMethods.MinidumpType.MiniDumpWithFullMemory, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
     }
 
-    private static string GetCrashFileName(string extension)
+    private static string GetCrashFileName(string extension, DateTime crashTime)
     {
         var directoryPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Crashes");
-        var path = Path.Combine(directoryPath, $"crash-{DateTime.UtcNow.ToOADate()}.{extension}");
+        var path = Path.Combine(directoryPath, $"crash-{crashTime.ToOADate()}.{extension}");
         Directory.CreateDirectory(directoryPath);
         return path;
     }
