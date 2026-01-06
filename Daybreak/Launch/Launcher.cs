@@ -76,6 +76,11 @@ public sealed class Launcher : BlazorHybridApplication<App>
         AllocateAnsiConsole();
 #endif
 
+        // Ensure GPU acceleration is enabled in WebView2
+        // This environment variable is read by WebView2 before creating the browser process
+        Environment.SetEnvironmentVariable("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", 
+            "--enable-gpu --enable-gpu-rasterization --enable-zero-copy --ignore-gpu-blocklist");
+
         Instance = new Launcher(args);
         RegisterExtraEncodingProviders();
         return LaunchMainWindow();

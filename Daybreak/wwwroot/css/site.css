@@ -20,6 +20,9 @@ html, body {
     position: relative;
     backdrop-filter: blur(2px);
     overflow: hidden;
+    /* Promote to GPU layer for better performance */
+    will-change: contents;
+    transform: translateZ(0);
 }
 
     .app-container::before {
@@ -36,6 +39,9 @@ html, body {
         background-attachment: fixed;
         filter: var(--backdrop-image-filter);
         z-index: -1;
+        /* Promote to its own GPU layer to prevent repainting */
+        will-change: transform;
+        transform: translateZ(0);
     }
 
     /* Hide resize borders when maximized */
@@ -49,6 +55,8 @@ html, body {
     border: 1px solid var(--neutral-stroke-rest);
     backdrop-filter: blur(2px);
     border-radius: 6px;
+    /* Promote to GPU layer */
+    transform: translateZ(0);
 }
 
 /* Display Box */
@@ -155,12 +163,16 @@ html, body {
     background: transparent;
     color: var(--accent-foreground-rest);
     cursor: pointer;
-    transition: background-color 0.2s;
+    /* Use GPU-accelerated properties only */
+    transition: background-color 0.15s ease-out, color 0.15s ease-out;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 20px;
     position: relative;
+    /* Promote to GPU layer for smooth hover transitions */
+    will-change: background-color;
+    transform: translateZ(0);
 }
 
     .title-bar-btn:hover {

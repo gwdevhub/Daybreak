@@ -21,22 +21,35 @@
     bottom: 0;
     z-index: 0;
     cursor: default;
+    /* Ensure hitbox doesn't capture events when buttons are hovered */
+    pointer-events: auto;
 }
 
 .title-bar-left {
     display: flex;
     align-items: center;
     position: relative;
+    z-index: 1;
 }
 
 .title-bar-center {
     flex: 1;
     text-align: center;
     position: relative;
+    z-index: 1;
+    /* Allow clicks to pass through to hitbox for dragging */
+    pointer-events: none;
 }
 
 .title-bar-right {
     display: flex;
     align-items: center;
     position: relative;
+    z-index: 1;
+}
+
+/* Ensure buttons receive pointer events */
+.title-bar-left .title-bar-btn,
+.title-bar-right .title-bar-btn {
+    pointer-events: auto;
 }

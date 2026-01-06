@@ -17,7 +17,20 @@
     <RuntimeIdentifier>win-x86</RuntimeIdentifier>
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+	
+    <!-- Static web assets configuration for .NET 10 Blazor Hybrid -->
+    <StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
+    <ResolveStaticWebAssetsInputsDependsOn>RemoveDuplicateStaticWebAssets;$(ResolveStaticWebAssetsInputsDependsOn)</ResolveStaticWebAssetsInputsDependsOn>
   </PropertyGroup>
+
+  <!-- Remove duplicate static web assets from referenced projects -->
+  <Target Name="RemoveDuplicateStaticWebAssets" BeforeTargets="ResolveStaticWebAssetsInputs;GenerateStaticWebAssetsManifest">
+    <ItemGroup>
+      <!-- Remove duplicate blazor.modules.json and blazor.webview.js from non-primary sources -->
+      <StaticWebAsset Remove="@(StaticWebAsset)" 
+                      Condition="'%(SourceId)' != '$(MSBuildProjectName)' And ($([System.String]::new('%(RelativePath)').Contains('blazor.modules')) Or $([System.String]::new('%(RelativePath)').Contains('blazor.webview')))" />
+    </ItemGroup>
+  </Target>
 
   <Target Name="AddUserSecrets" BeforeTargets="PrepareForBuild" Condition=" '$(UserSecretsId)' != '' ">
     <PropertyGroup>
