@@ -10,6 +10,13 @@ public static class NativeMethods
     public const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004;
     public const uint ENABLE_PROCESSED_OUTPUT = 0x0001;
 
+    public const int WM_NCHITTEST = 0x0084;
+    public const int HTCLIENT = 1;
+    public const int HTCAPTION = 2;
+    public const int HTMINBUTTON = 8;
+    public const int HTMAXBUTTON = 9;
+    public const int HTCLOSE = 20;
+
     public const uint WM_KEYDOWN = 0x0100;
     public const uint SWP_SHOWWINDOW = 0x0040;
     public const nint HWND_TOPMOST = -1;
@@ -18,7 +25,6 @@ public static class NativeMethods
     public const uint LIST_MODULES_32BIT = 0x01;
     public const int WM_SYSCOMMAND = 0x112;
     public const int WM_NCLBUTTONDOWN = 0x00A1;
-    public const int HTCAPTION = 2;
     public const int SC_MOVE = 0xF010;
     public const int SC_SIZE = 0xF000;
 
@@ -44,6 +50,20 @@ public static class NativeMethods
         DWMWCP_DONOTROUND = 1,
         DWMWCP_ROUND = 2,
         DWMWCP_ROUNDSMALL = 3
+    }
+
+    [Flags]
+    public enum ThreadAccess : uint
+    {
+        Terminate = 0x0001,
+        SuspendResume = 0x0002,
+        GetContext = 0x0008,
+        SetContext = 0x0010,
+        SetInformation = 0x0020,
+        QueryInformation = 0x0040,
+        SetThreadToken = 0x0080,
+        Impersonate = 0x0100,
+        DirectImpersonation = 0x0200
     }
 
     [Flags]
@@ -561,4 +581,7 @@ public static class NativeMethods
 
     [DllImport("dwmapi.dll", CharSet = CharSet.Unicode, PreserveSig = false)]
     public static extern void DwmSetWindowAttribute(IntPtr hWnd, DWMWINDOWATTRIBUTE attribute, ref DWM_WINDOW_CORNER_PREFERENCE pvAttribute, uint cbAttribute);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern nint OpenThread(ThreadAccess dwDesiredAccess, bool bInheritHandle, uint dwThreadId);
 }

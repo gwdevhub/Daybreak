@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>$(TargetFrameworkVersionWindows)</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Platforms>x86</Platforms>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+    <PublishAot>true</PublishAot>
+    <StripSymbols>true</StripSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Reloaded.Assembler" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Daybreak.Shared\Daybreak.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -7,14 +7,14 @@
     <UseWPF>true</UseWPF>
     <ScopedCssEnabled>true</ScopedCssEnabled>
     <Nullable>enable</Nullable>
-    <Platforms>x86;x64</Platforms>
+    <Platforms>x64</Platforms>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <LangVersion>preview</LangVersion>
     <ApplicationIcon>Daybreak.ico</ApplicationIcon>
     <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <UserSecretsId>cfb2a489-db80-448d-a969-80270f314c46</UserSecretsId>
-    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 	
@@ -27,8 +27,7 @@
   <Target Name="RemoveDuplicateStaticWebAssets" BeforeTargets="ResolveStaticWebAssetsInputs;GenerateStaticWebAssetsManifest">
     <ItemGroup>
       <!-- Remove duplicate blazor.modules.json and blazor.webview.js from non-primary sources -->
-      <StaticWebAsset Remove="@(StaticWebAsset)" 
-                      Condition="'%(SourceId)' != '$(MSBuildProjectName)' And ($([System.String]::new('%(RelativePath)').Contains('blazor.modules')) Or $([System.String]::new('%(RelativePath)').Contains('blazor.webview')))" />
+      <StaticWebAsset Remove="@(StaticWebAsset)" Condition="'%(SourceId)' != '$(MSBuildProjectName)' And ($([System.String]::new('%(RelativePath)').Contains('blazor.modules')) Or $([System.String]::new('%(RelativePath)').Contains('blazor.webview')))" />
     </ItemGroup>
   </Target>
 
@@ -57,7 +56,6 @@
     <PackageReference Include="OpenTelemetry.Exporter.Console" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" />
-    <PackageReference Include="Reloaded.Assembler" />
     <PackageReference Include="WpfExtended.SourceGeneration" />
     <PackageReference Include="WpfScreenHelper" />
     <PackageReference Include="PeNet" />
@@ -102,6 +100,7 @@
     <UpToDateCheckInput Include="..\Daybreak.API\**\*.cs" />
     <UpToDateCheckInput Include="..\Daybreak.7ZipExtractor\**\*.cs" />
     <UpToDateCheckInput Include="..\Daybreak.Installer\**\*.cs" />
+    <UpToDateCheckInput Include="..\Daybreak.Injector\**\*.cs" />
     <UpToDateCheckInput Include="..\Daybreak.wiki\**\*.*" Exclude="..\Daybreak.wiki\.git\**" />
   </ItemGroup>
 
@@ -123,6 +122,12 @@
     <DaybreakExtractorSources Include="..\Daybreak.Shared\**\*.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <DaybreakInjectorSources Include="..\Daybreak.Injector\**\*.cs" />
+    <DaybreakInjectorSources Include="..\Daybreak.Injector\Daybreak.Injector.csproj" />
+    <DaybreakInjectorSources Include="..\Daybreak.Shared\**\*.cs" />
+  </ItemGroup>
+
   <!--
   This is a workaround to determine where to place the dependency projects
   It will first check if PublishDir is set.
@@ -136,7 +141,7 @@
   </PropertyGroup>
   
   <!--
-  The targets below build Daybreak.7ZipExtractor.csproj, Daybreak.Installer.csproj and Daybreak.API.csproj
+  The targets below build Daybreak.7ZipExtractor.csproj, Daybreak.Installer.csproj, Daybreak.Injector and Daybreak.API.csproj
   and places the resulting binaries in the same folder as Daybreak.exe.
   These work with the normal build, as well as with the dotnet publish
   -->
@@ -152,6 +157,13 @@
     <Message Importance="high" Text="📦 Daybreak.Installer -&gt; $(DependencyOutput)"></Message>
     
     <Exec Command="dotnet publish ..\Daybreak.Installer\Daybreak.Installer.csproj -c $(Configuration) -o $(DependencyOutput)" />
+  </Target>
+
+  <Target Name="PublishDaybreakInjector" AfterTargets="Build" Inputs="@(DaybreakInjectorSources)" Outputs="$(OutDir)Daybreak.Injector.exe">
+
+    <Message Importance="high" Text="📦 Daybreak.Injector -&gt; $(DependencyOutput)"></Message>
+
+    <Exec Command="dotnet publish ..\Daybreak.Injector\Daybreak.Injector.csproj -c $(Configuration) -o $(DependencyOutput)" />
   </Target>
 
   <Target Name="PublishDaybreakAPI" AfterTargets="Build" Inputs="@(DaybreakApiSources)" Outputs="$(OutDir)Daybreak.API.dll">

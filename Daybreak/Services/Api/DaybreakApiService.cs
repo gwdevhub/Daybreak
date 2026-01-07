@@ -173,7 +173,7 @@ public sealed class DaybreakApiService(
     }
 
     public Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken) =>
-        Task.Factory.StartNew(() => this.InjectWithStub(guildWarsCreatedContext.ApplicationLauncherContext), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        this.InjectWithStub(guildWarsCreatedContext.ApplicationLauncherContext, cancellationToken);
 
     public Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
@@ -193,9 +193,9 @@ public sealed class DaybreakApiService(
     }
 
     public Task OnGuildWarsRunning(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken)
-        => Task.Factory.StartNew(() => this.InjectWithStub(guildWarsRunningContext.ApplicationLauncherContext), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        => this.InjectWithStub(guildWarsRunningContext.ApplicationLauncherContext, cancellationToken);
 
-    private void InjectWithStub(ApplicationLauncherContext context)
+    private async Task InjectWithStub(ApplicationLauncherContext context, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         var dllName = 
@@ -215,7 +215,7 @@ public sealed class DaybreakApiService(
         }
 
         scopedLogger.LogInformation("Injecting {dllName} into {processId}", dllName, context.Process.Id);
-        if (!this.stubInjector.Inject(context.Process, dllName, out var port))
+        if (!await this.stubInjector.Inject(context.Process, dllName, cancellationToken))
         {
             this.notificationService.NotifyError(
                 "Daybreak API Failure",
@@ -224,17 +224,17 @@ public sealed class DaybreakApiService(
             return;
         }
 
-        if (port <= 0)
-        {
-            this.notificationService.NotifyError(
-                "Daybreak API Failure",
-                "Failed to start API. Non-success exit code");
-            scopedLogger.LogError($"Failed to start API. Exit code {port}");
-            return;
-        }
+        //if (port <= 0)
+        //{
+        //    this.notificationService.NotifyError(
+        //        "Daybreak API Failure",
+        //        "Failed to start API. Non-success exit code");
+        //    scopedLogger.LogError($"Failed to start API. Exit code {port}");
+        //    return;
+        //}
 
-        this.notificationService.NotifyInformation(
-            "Injected Daybreak API",
-            $"Daybreak API started on port {port}");
+        //this.notificationService.NotifyInformation(
+        //    "Injected Daybreak API",
+        //    $"Daybreak API started on port {port}");
     }
 }

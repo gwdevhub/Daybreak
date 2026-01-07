@@ -5,9 +5,9 @@
     <TargetFramework>$(TargetFrameworkVersion)</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Platforms>AnyCPU;x86</Platforms>
+    <Platforms>x64</Platforms>
     <Self-Contained>True</Self-Contained>
-    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <PublishAot>true</PublishAot>
     <StripSymbols>true</StripSymbols>
   </PropertyGroup>

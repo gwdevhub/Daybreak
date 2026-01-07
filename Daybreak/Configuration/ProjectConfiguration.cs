@@ -273,6 +273,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IRegistryService, RegistryService>();
         services.AddScoped<IEventNotifierService, EventNotifierService>();
         services.AddScoped<IToolboxClient, ToolboxClient>();
+        services.AddScoped<IDaybreakInjector, DaybreakInjector>();
         services.AddScoped<IProcessInjector, ProcessInjector>();
         services.AddScoped<IStubInjector, StubInjector>();
         services.AddScoped<ILaunchConfigurationService, LaunchConfigurationService>();
