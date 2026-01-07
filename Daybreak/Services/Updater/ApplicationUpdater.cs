@@ -34,8 +34,8 @@ internal sealed class ApplicationUpdater(
     ILogger<ApplicationUpdater> logger) : IApplicationUpdater, IApplicationLifetimeService
 {
     private const string UpdatePkgSubPath = "update.pkg";
-    private const string TempInstallerFileNameSubPath = "Daybreak.Installer.Temp.exe";
-    private const string InstallerFileNameSubPath = "Daybreak.Installer.exe";
+    private const string TempInstallerFileNameSubPath = "Installer/Daybreak.Installer.Temp.exe";
+    private const string InstallerFileNameSubPath = "Installer/Daybreak.Installer.exe";
     private const string UpdatedKey = "LauncherUpdating";
     private const string TempFileSubPath = "tempfile.zip";
     private const string VersionTag = "{VERSION}";
@@ -436,7 +436,8 @@ internal sealed class ApplicationUpdater(
         {
             StartInfo = new ProcessStartInfo
             {
-                FileName = InstallerFileName
+                FileName = InstallerFileName,
+                Arguments = PathUtils.GetRootFolder()
             }
         };
         this.logger.LogDebug("Launching installer");

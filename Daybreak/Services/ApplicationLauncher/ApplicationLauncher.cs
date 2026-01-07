@@ -5,6 +5,7 @@ using Daybreak.Shared.Models.LaunchConfigurations;
 using Daybreak.Shared.Models.Mods;
 using Daybreak.Shared.Services.ApplicationLauncher;
 using Daybreak.Shared.Services.ExecutableManagement;
+using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.Mods;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Privilege;
@@ -28,6 +29,7 @@ using static Daybreak.Shared.Utils.NativeMethods;
 namespace Daybreak.Services.ApplicationLauncher;
 
 internal sealed class ApplicationLauncher(
+    IDaybreakInjector daybreakInjector,
     IGuildWarsExecutableManager guildWarsExecutableManager,
     INotificationService notificationService,
     ILiveOptions<LauncherOptions> launcherOptions,
@@ -42,6 +44,7 @@ internal sealed class ApplicationLauncher(
 
     private static readonly TimeSpan LaunchTimeout = TimeSpan.FromMinutes(1);
 
+    private readonly IDaybreakInjector daybreakInjector = daybreakInjector.ThrowIfNull();
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly ILiveOptions<LauncherOptions> launcherOptions = launcherOptions.ThrowIfNull();
@@ -279,21 +282,29 @@ internal sealed class ApplicationLauncher(
             }
         }
 
-        var pId = LaunchClient(executable, string.Join(" ", args), this.privilegeManager.AdminPrivileges, out var clientHandle);
-        do
+        var launchResult = await this.daybreakInjector.Launch(executable, this.privilegeManager.AdminPrivileges, [.. args], cancellationToken);
+        if ((int)launchResult.ExitCode < 0)
         {
-            process = Process.GetProcessById(pId);
-            await Task.Delay(100, cancellationToken);
-        } while (process is null);
+            scopedLogger.LogError("Failed to launch Guild Wars via injector with launch result {launchResult}", launchResult);
+            this.notificationService.NotifyError(
+                title: "Failed to launch Guild Wars",
+                description: $"Injector failed to launch Guild Wars with launch result {launchResult}. Check logs for details");
+            return default;
+        }
 
-        if (!McPatch(process.Handle))
+        var threadHandle = launchResult.ThreadHandle;
+        var pId = launchResult.ProcessId;
+        if (threadHandle <= 0 || pId <= 0)
         {
-            var lastErr = Marshal.GetLastWin32Error();
-            scopedLogger.LogError("Failed to patch GuildWars process. Error code: {lastErr}", lastErr);
+            scopedLogger.LogError("Invalid process or thread handle returned from injector. ProcessId: {pId}, ThreadHandle: {threadHandle}", pId, threadHandle);
+            this.notificationService.NotifyError(
+                title: "Failed to launch Guild Wars",
+                description: "Injector returned invalid process or thread handle. Check logs for details");
             return default;
         }
 
         // Reset launch context with the launched process
+        process = Process.GetProcessById(pId);
         applicationLauncherContext = new ApplicationLauncherContext { ExecutablePath = executable, Process = process, ProcessId = (uint)pId };
         var guildWarsCreatedContext = new GuildWarsCreatedContext { ApplicationLauncherContext = applicationLauncherContext, CancelStartup = false };
         foreach (var mod in mods)
@@ -330,10 +341,14 @@ internal sealed class ApplicationLauncher(
             }
         }
 
-        if (clientHandle != IntPtr.Zero)
+        var resumeResult = await this.daybreakInjector.Resume(threadHandle, cancellationToken);
+        if (resumeResult < 0)
         {
-            _ = ResumeThread(clientHandle);
-            CloseHandle(clientHandle);
+            scopedLogger.LogError("Failed to resume Guild Wars process via injector with resume result {resumeResult}", resumeResult);
+            this.notificationService.NotifyError(
+                title: "Failed to launch Guild Wars",
+                description: $"Injector failed to resume Guild Wars with resume result {resumeResult}. Check logs for details");
+            return default;
         }
 
         var sw = Stopwatch.StartNew();
@@ -616,186 +631,6 @@ internal sealed class ApplicationLauncher(
         }
     }
 
-    /// <summary>
-    /// Launches the Guild Wars in suspended state. This fixes a lot of the injection issues
-    /// Once everything is injected, the process is resumed.
-    /// Source: https://github.com/GregLando113/gwlauncher/blob/master/GW%20Launcher/MulticlientPatch.cs
-    /// </summary>
-    private static int LaunchClient(string path, string args, bool elevated, out IntPtr hThread)
-    {
-        var commandLine = $"\"{path}\" {args}";
-        hThread = IntPtr.Zero;
-
-        ProcessInformation procinfo;
-        var startinfo = new StartupInfo
-        {
-            cb = Marshal.SizeOf<StartupInfo>()
-        };
-        var saProcess = new SecurityAttributes();
-        saProcess.nLength = (uint)Marshal.SizeOf(saProcess);
-        var saThread = new SecurityAttributes();
-        saThread.nLength = (uint)Marshal.SizeOf(saThread);
-
-        var lastDirectory = Directory.GetCurrentDirectory();
-        Directory.SetCurrentDirectory(Path.GetDirectoryName(path)!);
-
-        SetRegistryValue(@"Software\ArenaNet\Guild Wars", "Path", path);
-        SetRegistryValue(@"Software\ArenaNet\Guild Wars", "Src", path);
-
-        if (!elevated)
-        {
-            if (!SaferCreateLevel(SaferLevelScope.User, SaferLevel.NormalUser, SaferOpen.Open, out var hLevel,
-                    IntPtr.Zero))
-            {
-                Debug.WriteLine("SaferCreateLevel");
-                return 0;
-            }
-
-            if (!SaferComputeTokenFromLevel(hLevel, IntPtr.Zero, out var hRestrictedToken, 0, IntPtr.Zero))
-            {
-                Debug.WriteLine("SaferComputeTokenFromLevel");
-                return 0;
-            }
-
-            SaferCloseLevel(hLevel);
-
-            // Set the token to medium integrity.
-
-            TokenMandatoryLabel tml;
-            tml.Label.Attributes = 0x20; // SE_GROUP_INTEGRITY
-            if (!ConvertStringSidToSid("S-1-16-8192", out tml.Label.Sid))
-            {
-                CloseHandle(hRestrictedToken);
-                Debug.WriteLine("ConvertStringSidToSid");
-            }
-
-            if (!SetTokenInformation(hRestrictedToken, TokenInformationClass.TokenIntegrityLevel, ref tml,
-                    (uint)Marshal.SizeOf(tml) + GetLengthSid(tml.Label.Sid)))
-            {
-                LocalFree(tml.Label.Sid);
-                CloseHandle(hRestrictedToken);
-                return 0;
-            }
-
-            LocalFree(tml.Label.Sid);
-            if (!CreateProcessAsUser(hRestrictedToken, null!, commandLine, ref saProcess,
-                    ref saProcess, false, (uint)CreationFlags.CreateSuspended, IntPtr.Zero,
-                    null!, ref startinfo, out procinfo))
-            {
-                var error = Marshal.GetLastWin32Error();
-                Debug.WriteLine($"CreateProcessAsUser {error}");
-                CloseHandle(procinfo.hThread);
-                return 0;
-            }
-
-            CloseHandle(hRestrictedToken);
-        }
-        else
-        {
-            if (!CreateProcess(null!, commandLine, ref saProcess,
-                    ref saThread, false, (uint)CreationFlags.CreateSuspended, IntPtr.Zero,
-                    null!, ref startinfo, out procinfo))
-            {
-                var error = Marshal.GetLastWin32Error();
-                Debug.WriteLine($"CreateProcess {error}");
-                _ = ResumeThread(procinfo.hThread);
-                CloseHandle(procinfo.hThread);
-                return 0;
-            }
-        }
-
-        Directory.SetCurrentDirectory(lastDirectory);
-
-        CloseHandle(procinfo.hProcess);
-        hThread = procinfo.hThread;
-        return procinfo.dwProcessId;
-    }
-
-    /// <summary>
-    /// https://github.com/GregLando113/gwlauncher/blob/master/GW%20Launcher/MulticlientPatch.cs
-    /// </summary>
-    private static bool McPatch(IntPtr processHandle)
-    {
-        byte[] sigPatch =
-        [
-            0x56, 0x57, 0x68, 0x00, 0x01, 0x00, 0x00, 0x89, 0x85, 0xF4, 0xFE, 0xFF, 0xFF, 0xC7, 0x00, 0x00, 0x00, 0x00,
-            0x00
-        ];
-        var moduleBase = GetProcessModuleBase(processHandle);
-        var gwdata = new byte[0x48D000];
-
-        if (!NativeMethods.ReadProcessMemory(processHandle, moduleBase, gwdata, gwdata.Length, out _))
-        {
-            return false;
-        }
-
-        var idx = SearchBytes(gwdata, sigPatch);
-
-        if (idx == -1)
-        {
-            return false;
-        }
-
-        var mcpatch = moduleBase + idx - 0x1A;
-
-        byte[] payload = [0x31, 0xC0, 0x90, 0xC3];
-
-        return NativeMethods.WriteProcessMemory(processHandle, mcpatch, payload, payload.Length, out _);
-    }
-
-    /// <summary>
-    /// https://github.com/GregLando113/gwlauncher/blob/master/GW%20Launcher/MulticlientPatch.cs
-    /// </summary>
-    private static int SearchBytes(Memory<byte> haystack, Memory<byte> needle)
-    {
-        var len = needle.Length;
-        var limit = haystack.Length - len;
-        for (var i = 0; i <= limit; i++)
-        {
-            var k = 0;
-            for (; k < len; k++)
-            {
-                if (needle.Span[k] != haystack.Span[i + k])
-                {
-                    break;
-                }
-            }
-
-            if (k == len)
-            {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    /// <summary>
-    /// https://github.com/GregLando113/gwlauncher/blob/master/GW%20Launcher/MulticlientPatch.cs
-    /// </summary>
-    private static IntPtr GetProcessModuleBase(IntPtr process)
-    {
-        if (NativeMethods.NtQueryInformationProcess(process, NativeMethods.ProcessInfoClass.ProcessBasicInformation, out var pbi,
-                Marshal.SizeOf<ProcessBasicInformation>(), out _) != 0)
-        {
-            return IntPtr.Zero;
-        }
-
-        var buffer = new byte[Marshal.SizeOf<PEB>()];
-
-        if (!NativeMethods.ReadProcessMemory(process, pbi.PebBaseAddress, buffer, Marshal.SizeOf<PEB>(), out _))
-        {
-            return IntPtr.Zero;
-        }
-
-        PEB peb = new()
-        {
-            ImageBaseAddress = (IntPtr)BitConverter.ToInt32(buffer, 8)
-        };
-
-        return peb.ImageBaseAddress + 0x1000;
-    }
-
     private static List<IntPtr> GetRootWindowsOfProcess(int pid)
     {
         var rootWindows = GetChildWindows(IntPtr.Zero);
@@ -848,12 +683,6 @@ internal sealed class ApplicationLauncher(
 
         list.Add(handle);
         return true;
-    }
-
-    private static void SetRegistryValue(string registryPath, string valueName, object newValue)
-    {
-        using var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(registryPath);
-        key.SetValue(valueName, newValue, RegistryValueKind.String);
     }
 
     private static string[]? PopulateCommandLineArgs(string argName, string? argValue)

@@ -54,7 +54,13 @@ public sealed class Launcher : BlazorHybridApplication<App>
     private static readonly ProgressUpdate ProgressFinished = new(1.0, "Finished");
 
     public static Launcher Instance { get; private set; } = default!;
+
+#if DEBUG
     public override bool DevToolsEnabled { get; } = true;
+#else
+    public override bool DevToolsEnabled { get; } = false;
+#endif
+
     public override string HostPage { get; } = "wwwroot/Index.html";
     public override bool ShowTitleBar => false;
 
@@ -75,11 +81,6 @@ public sealed class Launcher : BlazorHybridApplication<App>
 #if DEBUG
         AllocateAnsiConsole();
 #endif
-
-        // Ensure GPU acceleration is enabled in WebView2
-        // This environment variable is read by WebView2 before creating the browser process
-        Environment.SetEnvironmentVariable("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", 
-            "--enable-gpu --enable-gpu-rasterization --enable-zero-copy --ignore-gpu-blocklist");
 
         Instance = new Launcher(args);
         RegisterExtraEncodingProviders();
@@ -140,6 +141,8 @@ public sealed class Launcher : BlazorHybridApplication<App>
     {
         e.WebView.CoreWebView2.ProcessFailed += this.CoreWebView2_ProcessFailed;
         Global.CoreWebView2 = e.WebView.CoreWebView2;
+        this.logger?.LogInformation("WebView2 initialized with version {version}", e.WebView.CoreWebView2.Environment.BrowserVersionString);
+        this.logger?.LogInformation("Process: {architecture}", Environment.Is64BitProcess ? "x64" : "x86");
         base.Host_BlazorWebViewInitialized(e);
     }
 

@@ -1,9 +1,6 @@
-﻿// See https://aka.ms/new-console-template for more information
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO.Compression;
 using System.Text;
-
-var cts = new CancellationTokenSource();
 
 static void RenderProgressBar(int currentStep, int totalSteps, int barSize)
 {
@@ -20,9 +17,6 @@ static void RenderProgressBar(int currentStep, int totalSteps, int barSize)
     Console.Write($"{pctComplete:P0}"); // Display the percentage completed
 }
 
-const string tempFile = "tempfile.zip";
-const string updatePkg = "update.pkg";
-const string executableName = "Daybreak.exe";
 Console.Title = "Daybreak Installer";
 Console.WriteLine("Starting installation...");
 while (Process.GetProcesses().Where(p => p.ProcessName == "Daybreak").FirstOrDefault()?.HasExited is false)
@@ -36,6 +30,27 @@ while (Process.GetProcessesByName("gw").FirstOrDefault()?.HasExited is false)
     Console.WriteLine($"Detected Guild Wars process is still running. Waiting 5s and retrying");
     await Task.Delay(5000);
 }
+
+if (args.Length < 1)
+{
+    Console.WriteLine("No working directory specified");
+    Console.ReadKey();
+    return;
+}
+
+var workingDirectory = args[0];
+if (!Directory.Exists(workingDirectory))
+{
+    Console.WriteLine("Working directory does not exist");
+    Console.ReadKey();
+    return;
+}
+
+Console.WriteLine($"Working directory: {workingDirectory}");
+
+var tempFile = Path.GetFullPath("tempfile.zip", workingDirectory);
+var updatePkg = Path.GetFullPath("update.pkg", workingDirectory);
+var executableName = Path.GetFullPath("Daybreak.exe", workingDirectory);
 
 if (File.Exists(updatePkg))
 {
@@ -76,7 +91,7 @@ if (File.Exists(updatePkg))
         var binarySize = BitConverter.ToInt32(sizeBuffer.Span);
         var fileInfo = new FileInfo(relativePath);
         fileInfo.Directory!.Create();
-        using var destinationStream = new FileStream(relativePath, FileMode.Create);
+        using var destinationStream = new FileStream(Path.GetFullPath(workingDirectory, relativePath), FileMode.Create);
         while(binarySize > 0)
         {
             var toRead = Math.Min(binarySize, copyBuffer.Length);
@@ -98,7 +113,7 @@ else if (File.Exists(tempFile))
     Console.WriteLine("Unpacking files...");
     try
     {
-        ZipFile.ExtractToDirectory(tempFile, AppContext.BaseDirectory, true);
+        ZipFile.ExtractToDirectory(tempFile, Path.GetFullPath(workingDirectory), true);
     }
     catch
     {

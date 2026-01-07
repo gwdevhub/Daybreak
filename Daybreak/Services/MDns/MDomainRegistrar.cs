@@ -168,7 +168,7 @@ public sealed class MDomainRegistrar(
     {
         // split "instance._http._tcp.local." → ["instance", "_http", "_tcp", "local"]
         var labels = srvRecord.Target.Labels;
-        if (labels.Count < 2) return "http";
+        if (labels.Count <= 2) return "http";
 
         return labels[^3] switch
         {

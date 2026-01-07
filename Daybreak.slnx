@@ -1,8 +1,6 @@
 <Solution>
   <Configurations>
-    <Platform Name="Any CPU" />
     <Platform Name="x64" />
-    <Platform Name="x86" />
   </Configurations>
   <Folder Name="/Pipelines/">
     <File Path=".github/dependabot.yml" />
@@ -25,28 +23,20 @@
     <File Path="LICENSE.md" />
     <File Path="README.md" />
   </Folder>
-  <Project Path="Daybreak.7ZipExtractor/Daybreak.7ZipExtractor.csproj">
-    <Platform Solution="*|x86" Project="x64" />
-    <Platform Solution="Debug|x64" Project="x64" />
+  <Project Path="Daybreak/Daybreak.csproj">
+    <Platform Project="x64" />
   </Project>
   <Project Path="Daybreak.API/Daybreak.API.csproj">
-    <Platform Solution="Debug|x86" Project="x86" />
+    <Platform Project="x86" />
+  </Project>
+  <Project Path="Daybreak.Injector/Daybreak.Injector.csproj">
+    <Platform Project="x86" />
   </Project>
   <Project Path="Daybreak.Installer/Daybreak.Installer.csproj">
-    <Platform Solution="*|x86" Project="x86" />
-    <Platform Solution="Debug|Any CPU" Project="x86" />
-    <Platform Solution="Debug|x64" Project="x86" />
-    <Platform Solution="Release|x64" Project="x64" />
+    <Platform Project="x64" />
   </Project>
-  <Project Path="Daybreak.Shared/Daybreak.Shared.csproj">
-    <Platform Solution="Debug|Any CPU" Project="x86" />
-  </Project>
+  <Project Path="Daybreak.Shared/Daybreak.Shared.csproj" />
   <Project Path="Daybreak.Tests/Daybreak.Tests.csproj">
-    <Platform Solution="*|x64" Project="x64" />
-    <Platform Solution="*|x86" Project="x86" />
-  </Project>
-  <Project Path="Daybreak/Daybreak.csproj">
-    <Platform Solution="*|x64" Project="x64" />
-    <Platform Solution="*|x86" Project="x86" />
+    <Platform Project="x64" />
   </Project>
 </Solution>

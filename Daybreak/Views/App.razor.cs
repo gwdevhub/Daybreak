@@ -30,14 +30,6 @@ public sealed class AppViewModel
 {
     private const string IssueUrl = "https://github.com/gwdevhub/Daybreak/issues/new";
 
-    // WM_NCHITTEST constants
-    private const int WM_NCHITTEST = 0x0084;
-    private const int HTCLIENT = 1;
-    private const int HTCAPTION = 2;
-    private const int HTMINBUTTON = 8;
-    private const int HTMAXBUTTON = 9;
-    private const int HTCLOSE = 20;
-
     private readonly IOptionsProvider optionsProvider;
     private readonly IMenuServiceProducer menuServiceProducer;
     private readonly IMenuServiceButtonHandler menuServiceButtonHandler;
@@ -162,14 +154,14 @@ public sealed class AppViewModel
     /// </summary>
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
-        if (msg == WM_NCHITTEST)
+        if (msg == NativeMethods.WM_NCHITTEST)
         {
             // Get the mouse position from lParam
             var x = (short)(lParam.ToInt32() & 0xFFFF);
             var y = (short)((lParam.ToInt32() >> 16) & 0xFFFF);
 
             // Convert screen coordinates to window coordinates
-            var point = new System.Windows.Point(x, y);
+            var point = new Point(x, y);
             point = this.blazorHostWindow.PointFromScreen(point);
 
             // Define the title bar height (should match the CSS title bar height of 40px)
@@ -182,7 +174,7 @@ public sealed class AppViewModel
             if (point.Y >= 0 && point.Y < titleBarHeight)
             {
                 handled = true;
-                return new IntPtr(HTCLIENT);
+                return new IntPtr(NativeMethods.HTCLIENT);
             }
         }
 
