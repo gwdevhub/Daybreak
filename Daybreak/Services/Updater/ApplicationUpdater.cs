@@ -437,7 +437,7 @@ internal sealed class ApplicationUpdater(
             StartInfo = new ProcessStartInfo
             {
                 FileName = InstallerFileName,
-                Arguments = PathUtils.GetRootFolder()
+                Arguments = $"update \"{PathUtils.GetRootFolder()}\""
             }
         };
         this.logger.LogDebug("Launching installer");
