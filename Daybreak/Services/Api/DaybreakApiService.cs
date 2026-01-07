@@ -28,8 +28,9 @@ public sealed class DaybreakApiService(
     ILogger<ScopedApiContext> scopedApiLogger)
     : IDaybreakApiService
 {
+    private const string EntryPoint = "ThreadInit";
     private const string LocalHost = "localhost";
-    private const string DaybreakApiName = "Daybreak.API.dll";
+    private const string DaybreakApiName = "Api/Daybreak.API.dll";
     private const string ProcessIdPlaceholder = "{PID}";
     private const string DaybreakApiServiceName = $"daybreak-api-{ProcessIdPlaceholder}";
     private const string ServiceSubType = "daybreak-api";
@@ -173,7 +174,7 @@ public sealed class DaybreakApiService(
     }
 
     public Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken) =>
-        Task.Factory.StartNew(() => this.InjectWithStub(guildWarsCreatedContext.ApplicationLauncherContext), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        this.InjectWithStub(guildWarsCreatedContext.ApplicationLauncherContext, cancellationToken);
 
     public Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
@@ -193,9 +194,9 @@ public sealed class DaybreakApiService(
     }
 
     public Task OnGuildWarsRunning(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken)
-        => Task.Factory.StartNew(() => this.InjectWithStub(guildWarsRunningContext.ApplicationLauncherContext), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        => this.InjectWithStub(guildWarsRunningContext.ApplicationLauncherContext, cancellationToken);
 
-    private void InjectWithStub(ApplicationLauncherContext context)
+    private async Task InjectWithStub(ApplicationLauncherContext context, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         var dllName = 
@@ -215,7 +216,8 @@ public sealed class DaybreakApiService(
         }
 
         scopedLogger.LogInformation("Injecting {dllName} into {processId}", dllName, context.Process.Id);
-        if (!this.stubInjector.Inject(context.Process, dllName, out var port))
+        var result = await this.stubInjector.Inject(context.Process, dllName, EntryPoint, cancellationToken);
+        if (result < 0)
         {
             this.notificationService.NotifyError(
                 "Daybreak API Failure",
@@ -224,6 +226,7 @@ public sealed class DaybreakApiService(
             return;
         }
 
+        var port = result;
         if (port <= 0)
         {
             this.notificationService.NotifyError(

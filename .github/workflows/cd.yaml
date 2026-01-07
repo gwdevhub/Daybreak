@@ -24,7 +24,7 @@ jobs:
 
     strategy:
       matrix:
-        targetplatform: [x86]
+        targetplatform: [x64]
 
     runs-on: windows-latest
 
@@ -60,6 +60,7 @@ jobs:
       uses: actions/setup-dotnet@v5
       with:
         dotnet-version: '10.x'
+        architecture: x64
 
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v2.0.0
@@ -72,9 +73,7 @@ jobs:
         dotnet user-secrets --project Daybreak\Daybreak.csproj set ApmUri "${{ secrets.ApmUri }}"
 
     - name:  Restore project
-      run: msbuild $env:Solution_Path /t:Restore /p:Configuration=$env:Configuration /p:RuntimeIdentifier=$env:RuntimeIdentifier --property:SolutionDir=$GITHUB_WORKSPACE
-      env:
-        RuntimeIdentifier: win-${{ matrix.targetplatform }}
+      run: msbuild $env:Solution_Path /t:Restore /p:Configuration=$env:Configuration --property:SolutionDir=$GITHUB_WORKSPACE
 
     - name: Build Daybreak project
       run: dotnet build Daybreak -c $env:Configuration --property:SolutionDir=$env:GITHUB_WORKSPACE
@@ -85,9 +84,7 @@ jobs:
         echo "::set-env name=Version::$version"
 
     - name: Create publish launcher files
-      run: dotnet publish .\Daybreak\Daybreak.csproj -c $env:Configuration -r $env:RuntimeIdentifier --property:SolutionDir=$env:GITHUB_WORKSPACE -p:PublishReadyToRun=true -p:PublishSingleFile=false --self-contained true -o .\Publish
-      env:
-        RuntimeIdentifier: win-${{ matrix.targetplatform }}
+      run: dotnet publish .\Daybreak\Daybreak.csproj -c $env:Configuration --property:SolutionDir=$env:GITHUB_WORKSPACE -p:PublishReadyToRun=true -p:PublishSingleFile=false --self-contained true -o .\Publish
 
     - name: Pack publish files
       run: |

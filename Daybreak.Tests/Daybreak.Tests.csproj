@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>$(TargetFrameworkVersionWindows)</TargetFramework>
     <IsPackable>false</IsPackable>
-    <Platforms>x86</Platforms>
-    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+    <Platforms>x64</Platforms>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>
