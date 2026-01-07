@@ -27,11 +27,12 @@ function Get-FileMetadata {
 $zipPath = "Publish\daybreakv$version.zip"
 Write-Output "Deleting pdb file"
 Remove-item .\Publish\Daybreak.pdb
-Remove-item .\Publish\Daybreak.Installer.pdb
-Remove-item .\Publish\Daybreak.7ZipExtractor.pdb
-Remove-item .\Publish\Daybreak.API.pdb
+Remove-item .\Publish\Installer\Daybreak.Installer.pdb
+Remove-item .\Publish\Api\Daybreak.API.pdb
+Remove-item .\Publish\Injector\Daybreak.Injector.pdb
+Remove-item .\Publish\Injector\Daybreak.Shared.pdb
 Remove-item .\Publish\Daybreak.Shared.pdb
-Move-Item -Path .\Publish\Daybreak.Installer.exe -Destination .\Publish\Daybreak.Installer.Temp.exe
+Move-Item -Path .\Publish\Installer\Daybreak.Installer.exe -Destination .\Publish\Installer\Daybreak.Installer.Temp.exe
 
 Compress-Archive .\Publish\* $zipPath -Force
 
