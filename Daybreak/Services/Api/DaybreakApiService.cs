@@ -28,8 +28,9 @@ public sealed class DaybreakApiService(
     ILogger<ScopedApiContext> scopedApiLogger)
     : IDaybreakApiService
 {
+    private const string EntryPoint = "ThreadInit";
     private const string LocalHost = "localhost";
-    private const string DaybreakApiName = "Daybreak.API.dll";
+    private const string DaybreakApiName = "Api/Daybreak.API.dll";
     private const string ProcessIdPlaceholder = "{PID}";
     private const string DaybreakApiServiceName = $"daybreak-api-{ProcessIdPlaceholder}";
     private const string ServiceSubType = "daybreak-api";
@@ -215,7 +216,8 @@ public sealed class DaybreakApiService(
         }
 
         scopedLogger.LogInformation("Injecting {dllName} into {processId}", dllName, context.Process.Id);
-        if (!await this.stubInjector.Inject(context.Process, dllName, cancellationToken))
+        var result = await this.stubInjector.Inject(context.Process, dllName, EntryPoint, cancellationToken);
+        if (result < 0)
         {
             this.notificationService.NotifyError(
                 "Daybreak API Failure",
@@ -224,17 +226,18 @@ public sealed class DaybreakApiService(
             return;
         }
 
-        //if (port <= 0)
-        //{
-        //    this.notificationService.NotifyError(
-        //        "Daybreak API Failure",
-        //        "Failed to start API. Non-success exit code");
-        //    scopedLogger.LogError($"Failed to start API. Exit code {port}");
-        //    return;
-        //}
+        var port = result;
+        if (port <= 0)
+        {
+            this.notificationService.NotifyError(
+                "Daybreak API Failure",
+                "Failed to start API. Non-success exit code");
+            scopedLogger.LogError($"Failed to start API. Exit code {port}");
+            return;
+        }
 
-        //this.notificationService.NotifyInformation(
-        //    "Injected Daybreak API",
-        //    $"Daybreak API started on port {port}");
+        this.notificationService.NotifyInformation(
+            "Injected Daybreak API",
+            $"Daybreak API started on port {port}");
     }
 }

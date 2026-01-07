@@ -24,31 +24,19 @@
     <File Path="README.md" />
   </Folder>
   <Project Path="Daybreak/Daybreak.csproj">
-    <Platform Solution="Debug|x64" Project="x64" />
-    <Platform Solution="Release|x64" Project="x64" />
-  </Project>
-  <Project Path="Daybreak.7ZipExtractor/Daybreak.7ZipExtractor.csproj">
-    <Platform Solution="Debug|x64" Project="x64" />
-    <Platform Solution="Release|x64" Project="x64" />
+    <Platform Project="x64" />
   </Project>
   <Project Path="Daybreak.API/Daybreak.API.csproj">
-    <Platform Solution="Debug|x64" Project="x86" />
-    <Platform Solution="Release|x64" Project="x86" />
+    <Platform Project="x86" />
   </Project>
   <Project Path="Daybreak.Injector/Daybreak.Injector.csproj">
-    <Platform Solution="Debug|x64" Project="x86" />
-    <Platform Solution="Release|x64" Project="x86" />
+    <Platform Project="x86" />
   </Project>
   <Project Path="Daybreak.Installer/Daybreak.Installer.csproj">
-    <Platform Solution="Debug|x64" Project="x64" />
-    <Platform Solution="Release|x64" Project="x64" />
+    <Platform Project="x64" />
   </Project>
-  <Project Path="Daybreak.Shared/Daybreak.Shared.csproj">
-    <Platform Solution="Debug|x64" Project="Any CPU" />
-    <Platform Solution="Release|x64" Project="Any CPU" />
-  </Project>
+  <Project Path="Daybreak.Shared/Daybreak.Shared.csproj" />
   <Project Path="Daybreak.Tests/Daybreak.Tests.csproj">
-    <Platform Solution="Debug|x64" Project="x64" />
-    <Platform Solution="Release|x64" Project="x64" />
+    <Platform Project="x64" />
   </Project>
 </Solution>

@@ -1,6 +1,5 @@
 ﻿using Daybreak.Injector;
 using Daybreak.Shared.Models;
-using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
@@ -15,13 +14,13 @@ static void PrintUsage()
     Console.WriteLine("- resume");
     Console.WriteLine("Examples:");
     Console.WriteLine("1) Daybreak.Injector winapi 1234 C:\\path\\to\\dll.dll");
-    Console.WriteLine("2) Daybreak.Injector stub 1234 C:\\path\\to\\dll.dll");
+    Console.WriteLine("2) Daybreak.Injector stub 1234 entryPoint C:\\path\\to\\dll.dll");
     Console.WriteLine("3) Daybreak.Injector launch true C:\\path\\to\\dll.dll arg1 arg2 arg3");
     Console.WriteLine("4) Daybreak.Injector resume 1234");
     Console.WriteLine("======================================================");
 }
 
-static bool TryParseInjectArgs(
+static bool TryParseInjectWinApiArgs(
     string[] args,
     [NotNullWhen(true)] out Process? process,
     [NotNullWhen(true)] out string? dllPath,
@@ -44,6 +43,52 @@ static bool TryParseInjectArgs(
     }
 
     dllPath = Path.GetFullPath(args[2]);
+    process = Process.GetProcessById(processId);
+    if (process is null)
+    {
+        Console.WriteLine($"Process {processId} could not be found");
+        exitCode = InjectorResponses.InjectResult.InvalidProcess;
+        return false;
+    }
+
+
+    if (!File.Exists(dllPath))
+    {
+        Console.WriteLine($"DLL path {dllPath} could not be found");
+        exitCode = InjectorResponses.InjectResult.InvalidDllPath;
+        return false;
+    }
+
+    exitCode = 0;
+    return true;
+}
+
+static bool TryParseInjectStubArgs(
+    string[] args,
+    [NotNullWhen(true)] out Process? process,
+    [NotNullWhen(true)] out string? dllPath,
+    [NotNullWhen(true)] out string? entryPoint,
+    out InjectorResponses.InjectResult exitCode)
+{
+    process = default;
+    dllPath = default;
+    entryPoint = default;
+    if (!int.TryParse(args[1], out var processId))
+    {
+        PrintUsage();
+        exitCode = InjectorResponses.InjectResult.InvalidProcess;
+        return false;
+    }
+
+    if (args.Length < 4)
+    {
+        PrintUsage();
+        exitCode = InjectorResponses.InjectResult.InvalidArgs;
+        return false;
+    }
+
+    entryPoint = args[2];
+    dllPath = Path.GetFullPath(args[3]);
     process = Process.GetProcessById(processId);
     if (process is null)
     {
@@ -140,7 +185,7 @@ switch (mode)
 {
     case "winapi":
         {
-            if (!TryParseInjectArgs(args, out var process, out var dllPath, out var parseResult))
+            if (!TryParseInjectWinApiArgs(args, out var process, out var dllPath, out var parseResult))
             {
                 return (int)parseResult;
             }
@@ -150,13 +195,13 @@ switch (mode)
         }
     case "stub":
         {
-            if (!TryParseInjectArgs(args, out var process, out var dllPath, out var parseResult))
+            if (!TryParseInjectStubArgs(args, out var process, out var dllPath, out var entryPoint, out var parseResult))
             {
                 return (int)parseResult;
             }
 
-            Console.WriteLine($"Starting stub injection. Process {process.Id}. DllPath: {dllPath}");
-            var result = StubInjector.Inject(process, dllPath, out var exitCode);
+            Console.WriteLine($"Starting stub injection. Process {process.Id}. EntryPoint {entryPoint}. DllPath: {dllPath}");
+            var result = StubInjector.Inject(process, dllPath, entryPoint, out var exitCode);
             if (result is not InjectorResponses.InjectResult.Success)
             {
                 return (int)result;

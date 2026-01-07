@@ -17,19 +17,11 @@
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-	
-    <!-- Static web assets configuration for .NET 10 Blazor Hybrid -->
-    <StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
-    <ResolveStaticWebAssetsInputsDependsOn>RemoveDuplicateStaticWebAssets;$(ResolveStaticWebAssetsInputsDependsOn)</ResolveStaticWebAssetsInputsDependsOn>
   </PropertyGroup>
 
-  <!-- Remove duplicate static web assets from referenced projects -->
-  <Target Name="RemoveDuplicateStaticWebAssets" BeforeTargets="ResolveStaticWebAssetsInputs;GenerateStaticWebAssetsManifest">
-    <ItemGroup>
-      <!-- Remove duplicate blazor.modules.json and blazor.webview.js from non-primary sources -->
-      <StaticWebAsset Remove="@(StaticWebAsset)" Condition="'%(SourceId)' != '$(MSBuildProjectName)' And ($([System.String]::new('%(RelativePath)').Contains('blazor.modules')) Or $([System.String]::new('%(RelativePath)').Contains('blazor.webview')))" />
-    </ItemGroup>
-  </Target>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <StripSymbols>true</StripSymbols>
+  </PropertyGroup>
 
   <Target Name="AddUserSecrets" BeforeTargets="PrepareForBuild" Condition=" '$(UserSecretsId)' != '' ">
     <PropertyGroup>
@@ -68,6 +60,7 @@
     <PackageReference Include="Microsoft.CorrelationVector" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="SevenZipExtractor" />
   </ItemGroup>
 
   <ItemGroup>
@@ -98,7 +91,6 @@
   -->
   <ItemGroup>
     <UpToDateCheckInput Include="..\Daybreak.API\**\*.cs" />
-    <UpToDateCheckInput Include="..\Daybreak.7ZipExtractor\**\*.cs" />
     <UpToDateCheckInput Include="..\Daybreak.Installer\**\*.cs" />
     <UpToDateCheckInput Include="..\Daybreak.Injector\**\*.cs" />
     <UpToDateCheckInput Include="..\Daybreak.wiki\**\*.*" Exclude="..\Daybreak.wiki\.git\**" />
@@ -117,12 +109,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <DaybreakExtractorSources Include="..\Daybreak.7ZipExtractor\**\*.cs" />
-    <DaybreakExtractorSources Include="..\Daybreak.7ZipExtractor\Daybreak.7ZipExtractor.csproj" />
-    <DaybreakExtractorSources Include="..\Daybreak.Shared\**\*.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <DaybreakInjectorSources Include="..\Daybreak.Injector\**\*.cs" />
     <DaybreakInjectorSources Include="..\Daybreak.Injector\Daybreak.Injector.csproj" />
     <DaybreakInjectorSources Include="..\Daybreak.Shared\**\*.cs" />
@@ -138,6 +124,9 @@
     <BaseBuildDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\$(TargetFramework)\$(RuntimeIdentifier)\</BaseBuildDir>
     <DependencyOutput Condition="'$(PublishDir)' != ''">$(PublishDir)</DependencyOutput>
     <DependencyOutput Condition="'$(PublishDir)' == ''">$(BaseBuildDir)</DependencyOutput>
+    <InstallerOutput>$(DependencyOutput)\Installer\</InstallerOutput>
+    <InjectorOutput>$(DependencyOutput)\Injector\</InjectorOutput>
+    <ApiOutput>$(DependencyOutput)\Api\</ApiOutput>
   </PropertyGroup>
   
   <!--
@@ -145,31 +134,24 @@
   and places the resulting binaries in the same folder as Daybreak.exe.
   These work with the normal build, as well as with the dotnet publish
   -->
-  <Target Name="PublishDaybreak7ZipExtractor" AfterTargets="Build" Inputs="@(DaybreakExtractorSources)" Outputs="$(OutDir)Daybreak.7ZipExtractor.exe">
+  <Target Name="PublishDaybreakInstaller" AfterTargets="Build" Inputs="@(DaybreakInstallerSources)" Outputs="$(InstallerOutput)Daybreak.Installer.exe">
+
+    <Message Importance="high" Text="📦 Daybreak.Installer -&gt; $(InstallerOutput)"></Message>
     
-    <Message Importance="high" Text="📦 Daybreak.7ZipExtractor -&gt; $(DependencyOutput)"></Message>
-    
-    <Exec Command="dotnet publish ..\Daybreak.7ZipExtractor\Daybreak.7ZipExtractor.csproj -c $(Configuration) -o $(DependencyOutput)" />
+    <Exec Command="dotnet publish ..\Daybreak.Installer\Daybreak.Installer.csproj -c $(Configuration) -o $(InstallerOutput)" />
   </Target>
 
-  <Target Name="PublishDaybreakInstaller" AfterTargets="Build" Inputs="@(DaybreakInstallerSources)" Outputs="$(OutDir)Daybreak.Installer.exe">
+  <Target Name="PublishDaybreakInjector" AfterTargets="Build" Inputs="@(DaybreakInjectorSources)" Outputs="$(InjectorOutput)Daybreak.Injector.exe">
 
-    <Message Importance="high" Text="📦 Daybreak.Installer -&gt; $(DependencyOutput)"></Message>
-    
-    <Exec Command="dotnet publish ..\Daybreak.Installer\Daybreak.Installer.csproj -c $(Configuration) -o $(DependencyOutput)" />
+    <Message Importance="high" Text="📦 Daybreak.Injector -&gt; $(InjectorOutput)"></Message>
+
+    <Exec Command="dotnet publish ..\Daybreak.Injector\Daybreak.Injector.csproj -c $(Configuration) -o $(InjectorOutput)" />
   </Target>
 
-  <Target Name="PublishDaybreakInjector" AfterTargets="Build" Inputs="@(DaybreakInjectorSources)" Outputs="$(OutDir)Daybreak.Injector.exe">
-
-    <Message Importance="high" Text="📦 Daybreak.Injector -&gt; $(DependencyOutput)"></Message>
-
-    <Exec Command="dotnet publish ..\Daybreak.Injector\Daybreak.Injector.csproj -c $(Configuration) -o $(DependencyOutput)" />
-  </Target>
-
-  <Target Name="PublishDaybreakAPI" AfterTargets="Build" Inputs="@(DaybreakApiSources)" Outputs="$(OutDir)Daybreak.API.dll">
+  <Target Name="PublishDaybreakAPI" AfterTargets="Build" Inputs="@(DaybreakApiSources)" Outputs="$(ApiOutput)Daybreak.API.dll">
     
-    <Message Importance="high" Text="📦 Daybreak.API -&gt; $(DependencyOutput)"></Message>
+    <Message Importance="high" Text="📦 Daybreak.API -&gt; $(ApiOutput)"></Message>
     
-    <Exec Command="dotnet publish ..\Daybreak.API\Daybreak.API.csproj -c $(Configuration) -o $(DependencyOutput)" />
+    <Exec Command="dotnet publish ..\Daybreak.API\Daybreak.API.csproj -c $(Configuration) -o $(ApiOutput)" />
   </Target>
 </Project>

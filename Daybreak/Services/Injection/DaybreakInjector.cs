@@ -12,7 +12,7 @@ public class DaybreakInjector(
     ILogger<DaybreakInjector> logger)
     : IDaybreakInjector
 {
-    private const string ExecutableName = "Daybreak.Injector.exe";
+    private const string ExecutableName = "Injector/Daybreak.Injector.exe";
 
     private readonly ILogger<DaybreakInjector> logger = logger;
 
@@ -43,7 +43,7 @@ public class DaybreakInjector(
         return (InjectorResponses.InjectResult)exitCode;
     }
 
-    public async Task<InjectorResponses.InjectResult> InjectStub(int processId, string dllPath, CancellationToken cancellationToken)
+    public async Task<InjectorResponses.InjectResult> InjectStub(int processId, string dllPath, string entryPoint, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         if (!this.InjectorAvailable())
@@ -56,6 +56,7 @@ public class DaybreakInjector(
             [
                 "stub",
                 processId.ToString(),
+                $"\"{entryPoint}\"",
                 $"\"{dllPath}\""
             ],
             cancellationToken);
@@ -137,6 +138,7 @@ public class DaybreakInjector(
             {
                 FileName = executablePath,
                 Arguments = string.Join(' ', arguments),
+                WorkingDirectory = Path.GetDirectoryName(executablePath),
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,

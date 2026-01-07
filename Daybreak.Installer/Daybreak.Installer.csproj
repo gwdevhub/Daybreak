@@ -10,6 +10,7 @@
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <PublishAot>true</PublishAot>
     <StripSymbols>true</StripSymbols>
+    <PublishSingleFile>true</PublishSingleFile>
   </PropertyGroup>
 
 </Project>

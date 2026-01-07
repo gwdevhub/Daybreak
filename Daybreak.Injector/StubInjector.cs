@@ -8,8 +8,6 @@ namespace Daybreak.Injector;
 
 public static class StubInjector
 {
-    const string ListenerEntryPoint = "ThreadInit";
-
     /// <summary>
     /// ebp+8 is the dll path pointer
     /// 0xDEADBEEF is a placeholder to be patched later for LoadLibraryA
@@ -42,7 +40,7 @@ leave                        ; = mov esp, ebp / pop ebp
 ret  4                      ; stdcall: pop lpParameter
 ";
 
-    public static InjectorResponses.InjectResult Inject(Process target, string dllPath, out int exitCode)
+    public static InjectorResponses.InjectResult Inject(Process target, string dllPath, string entryPoint, out int exitCode)
     {
         var hProcess = NativeMethods.OpenProcess(
             NativeMethods.ProcessAccessFlags.All, false, (uint)target.Id);
@@ -83,7 +81,7 @@ ret  4                      ; stdcall: pop lpParameter
         Patch(stubBytes, 0xFEEDF00D, pGetProc);
 
         var dllBytes = Encoding.ASCII.GetBytes(dllPath + '\0');
-        var funcBytes = Encoding.ASCII.GetBytes(ListenerEntryPoint + '\0');
+        var funcBytes = Encoding.ASCII.GetBytes(entryPoint + '\0');
         var remoteDll = AllocWrite(hProcess, dllBytes, NativeMethods.MemoryProtection.PAGE_READWRITE);
         if (remoteDll is 0)
         {

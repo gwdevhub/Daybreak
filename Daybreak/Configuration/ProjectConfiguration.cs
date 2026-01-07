@@ -42,7 +42,6 @@ using Daybreak.Services.ReShade;
 using Daybreak.Services.ReShade.Notifications;
 using Daybreak.Services.Screens;
 using Daybreak.Services.Screenshots;
-using Daybreak.Services.SevenZip;
 using Daybreak.Services.Shortcuts;
 using Daybreak.Services.Startup;
 using Daybreak.Services.Startup.Actions;
@@ -242,7 +241,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IPluginsService, PluginsService>();
         services.AddSingleton<ISplashScreenService, SplashScreenService>();
         services.AddSingleton<IGuildWarsExecutableManager, GuildWarsExecutableManager>();
-        services.AddSingleton<ISevenZipExtractor, SevenZipExtractor>();
+        services.AddSingleton<ISevenZipExtractor, Daybreak.Services.SevenZip.SevenZipExtractor>();
         services.AddSingleton<IOptionsSynchronizationService, OptionsSynchronizationService>();
         services.AddSingleton<IMDomainNameService, MDomainNameService>();
         services.AddSingleton<IMDomainRegistrar, MDomainRegistrar>();

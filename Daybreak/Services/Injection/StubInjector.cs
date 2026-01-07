@@ -12,17 +12,17 @@ internal sealed class StubInjector(
     private readonly IDaybreakInjector daybreakInjector = daybreakInjector.ThrowIfNull();
     private readonly ILogger<StubInjector> logger = logger;
 
-    public async Task<bool> Inject(Process target, string dllPath, CancellationToken cancellationToken)
+    public async Task<int> Inject(Process target, string dllPath, string entryPoint, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        var result = await this.daybreakInjector.InjectStub(target.Id, dllPath, cancellationToken);
+        var result = await this.daybreakInjector.InjectStub(target.Id, dllPath, entryPoint, cancellationToken);
         if (result < 0)
         {
             scopedLogger.LogError("Failed to inject DLL into process {ProcessId} with error code {ErrorCode}", target.Id, result);
-            return false;
+            return (int)result;
         }
 
         scopedLogger.LogInformation("Successfully injected DLL into process {ProcessId}. Stub response: {ExitCode}", target.Id, result);
-        return true;
+        return (int)result;
     }
 }
