@@ -21,7 +21,12 @@ public static class WebApplicationBuilderExtensions
                 theme: AnsiConsoleTheme.Sixteen)
             .WriteTo.File(
                 outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss}] {Level:u4}: [{SourceContext}] [{CorrelationVector}] {NewLine}{Message:lj}{NewLine}{Exception}",
-                path: "Daybreak.API.log")
+                path: "Daybreak.API.log",
+                rollingInterval: RollingInterval.Day,
+                rollOnFileSizeLimit: true,
+                fileSizeLimitBytes: 50 * 1024 * 1024,
+                retainedFileCountLimit: 1,
+                shared: true)
             .CreateLogger());
         builder.Services.AddScoped<LoggingEnrichmentMiddleware>();
         builder.Services.AddOptions<CorrelationVectorOptions>()
