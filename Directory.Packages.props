@@ -16,9 +16,9 @@
     <PackageVersion Include="MemoryPack" Version="1.21.4" />
     <PackageVersion Include="MemoryPack.Generator" Version="1.21.4" />
     <!-- Pinned. TODO: #1226 New version of Microsoft.AspNetCore.Components.WebView.Wpf is unstable -->
-    <PackageVersion Include="Microsoft.AspNetCore.Components" Version="9.0.10" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components" Version="10.0.1" />
     <!-- Pinned. TODO: #1226 New version of Microsoft.AspNetCore.Components.WebView.Wpf is unstable -->
-    <PackageVersion Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="9.0.120" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="10.0.20" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.1" />
     <PackageVersion Include="Microsoft.Authentication.WebAssembly.Msal" Version="9.0.8" />
     <PackageVersion Include="Microsoft.CorrelationVector" Version="1.0.42" />
@@ -68,7 +68,7 @@
     <PackageVersion Include="SystemExtensions.NetStandard.Generators" Version="0.1.6" />
     <PackageVersion Include="TrailBlazr" Version="0.3.1" />
     <!-- Pinned. TODO: #1226 New version of Microsoft.AspNetCore.Components.WebView.Wpf is unstable -->
-    <PackageVersion Include="WpfExtended.Blazor" Version="0.8.1" />
+    <PackageVersion Include="WpfExtended.Blazor" Version="0.9.0.1" />
     <PackageVersion Include="WpfExtended.SourceGeneration" Version="0.3.1" />
     <PackageVersion Include="WpfScreenHelper" Version="2.1.1" />
     <PackageVersion Include="zgabi.ManagedXZ" Version="1.0.2" />

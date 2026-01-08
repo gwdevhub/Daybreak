@@ -8,9 +8,12 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <Platforms>AnyCPU;x86</Platforms>
     
-    <!-- Prevent static web asset conflicts when referenced by multiple projects -->
+    <!-- Configure this project as a Razor class library that doesn't generate static web assets -->
+    <!-- Only the final host application (Daybreak) should generate static web assets -->
     <StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
     <GenerateStaticWebAssetsManifest>false</GenerateStaticWebAssetsManifest>
+    <ResolveStaticWebAssetsInputsDependsOn></ResolveStaticWebAssetsInputsDependsOn>
+    <IncludePackageReferencesDuringMarkupCompilation>false</IncludePackageReferencesDuringMarkupCompilation>
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,7 +36,7 @@
   <Target Name="RemoveDuplicateAnalyzers" BeforeTargets="CoreCompile">
     <!-- Work around https://github.com/dotnet/wpf/issues/6792 -->
     <ItemGroup>
-      <FilteredAnalyzer Include="@(Analyzer-&gt;Distinct())" />
+      <FilteredAnalyzer Include="@(Analyzer->Distinct())" />
       <Analyzer Remove="@(Analyzer)" />
       <Analyzer Include="@(FilteredAnalyzer)" />
     </ItemGroup>
