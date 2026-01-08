@@ -7,7 +7,6 @@ using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.Logging;
 using System.Configuration;
 using System.Core.Extensions;
-using System.Globalization;
 
 namespace Daybreak.Services.Events;
 
@@ -17,7 +16,6 @@ internal sealed class EventNotifierService(
     ILiveOptions<EventNotifierOptions> liveOptions,
     ILogger<IEventNotifierService> logger) : IEventNotifierService
 {
-    private readonly TimespanToETAConverter timespanToETAConverter = new();
     private readonly IEventService eventService = eventService.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly ILiveOptions<EventNotifierOptions> liveOptions = liveOptions.ThrowIfNull();
@@ -37,16 +35,16 @@ internal sealed class EventNotifierService(
         await Task.Delay(5000);
         foreach(var e in this.eventService.GetCurrentActiveEvents())
         {
-            this.notificationService.NotifyInformation<NavigateToCalendarViewHandler>(e.Title!, $"{this.GetRemainingTime(e)}\n{e.Description!}", expirationTime: DateTime.Now + TimeSpan.FromSeconds(15), metaData: e.Title);
+            this.notificationService.NotifyInformation<NavigateToCalendarViewHandler>(e.Title!, $"{GetRemainingTime(e)}\n{e.Description!}", expirationTime: DateTime.Now + TimeSpan.FromSeconds(15), metaData: e.Title);
         }
     }
 
-    private string? GetRemainingTime(Event e)
+    private static string? GetRemainingTime(Event e)
     {
         var currentTime = DateTime.UtcNow;
         var eventEndTime = new DateTime(currentTime.Year, e.To.Month, e.To.Day, 19, 0, 0);
 
         var remainingTime = eventEndTime - currentTime;
-        return this.timespanToETAConverter.Convert(remainingTime, typeof(string), default!, CultureInfo.CurrentCulture) as string;
+        return TimespanToETAConverter.GetETAString(remainingTime);
     }
 }

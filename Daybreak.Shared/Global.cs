@@ -1,5 +1,4 @@
-﻿using Microsoft.Web.WebView2.Core;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Daybreak")]
 
@@ -11,5 +10,5 @@ public static class Global
     public static IServiceProvider GlobalServiceProvider { get; internal set; } = default!;
 
     //Will get set by Daybreak on successful WebView2 initialization
-    public static CoreWebView2? CoreWebView2 { get; internal set; }
+    public static object? CoreWebView2 { get; internal set; }
 }

@@ -1,29 +1,11 @@
-﻿using System.Globalization;
-using System.Windows.Data;
+﻿namespace Daybreak.Shared.Converters;
 
-namespace Daybreak.Shared.Converters;
-
-public sealed class TimespanToETAConverter : IValueConverter
+public static class TimespanToETAConverter
 {
     private const char PluralAppend = 's';
 
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    public static string GetETAString(TimeSpan timeSpan)
     {
-        return GetETAString(value);
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        throw new NotImplementedException();
-    }
-
-    private static string GetETAString(object obj)
-    {
-        if (obj is not TimeSpan timeSpan)
-        {
-            return string.Empty;
-        }
-
         if ((int)timeSpan.TotalDays > 0)
         {
             return $"{(int)timeSpan.TotalDays} day{((int)timeSpan.TotalDays > 1 ? PluralAppend : string.Empty)} remaining";

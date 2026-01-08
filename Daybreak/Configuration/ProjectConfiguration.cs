@@ -265,7 +265,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<ITradeChatService<KamadanTradeChatOptions>, TradeChatService<KamadanTradeChatOptions>>();
         services.AddScoped<ITradeChatService<AscalonTradeChatOptions>, TradeChatService<AscalonTradeChatOptions>>();
         services.AddScoped<ITraderQuoteService, TraderQuoteService>();
-        services.AddScoped<IWordHighlightingService, WordHighlightingService>();
         services.AddScoped<ITradeHistoryDatabase, TradeHistoryDatabase>();
         services.AddScoped<IGuildWarsCopyService, GuildWarsCopyService>();
         services.AddScoped<IItemHashService, ItemHashService>();

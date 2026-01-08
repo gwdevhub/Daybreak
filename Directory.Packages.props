@@ -68,7 +68,7 @@
     <PackageVersion Include="SystemExtensions.NetStandard.Generators" Version="0.1.6" />
     <PackageVersion Include="TrailBlazr" Version="0.3.1" />
     <!-- Pinned. TODO: #1226 New version of Microsoft.AspNetCore.Components.WebView.Wpf is unstable -->
-    <PackageVersion Include="WpfExtended.Blazor" Version="0.9.0.1" />
+    <PackageVersion Include="WpfExtended.Blazor" Version="0.9.0" />
     <PackageVersion Include="WpfExtended.SourceGeneration" Version="0.3.1" />
     <PackageVersion Include="WpfScreenHelper" Version="2.1.1" />
     <PackageVersion Include="zgabi.ManagedXZ" Version="1.0.2" />

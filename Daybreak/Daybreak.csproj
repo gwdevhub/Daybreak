@@ -48,6 +48,8 @@
     <PackageReference Include="Microsoft.Fast.Components.FluentUI.Icons" />
     <PackageReference Include="Microsoft.Identity.Client.Desktop" />
     <PackageReference Include="Microsoft.Identity.Client.Extensions.Msal" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" />
+    <PackageReference Include="Microsoft.Web.WebView2" />
     <PackageReference Include="OpenTelemetry.Exporter.Console" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" />
@@ -64,6 +66,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
     <PackageReference Include="SevenZipExtractor" />
+    <PackageReference Include="WpfExtended.Blazor" />
   </ItemGroup>
 
   <ItemGroup>

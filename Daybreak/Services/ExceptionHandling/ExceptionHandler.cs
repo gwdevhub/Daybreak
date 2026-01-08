@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Web.WebView2.Core;
 using System.Core.Extensions;
 using System.Diagnostics;
+using System.Extensions;
 using System.Extensions.Core;
 using System.IO;
 using System.Logging;
@@ -88,7 +89,7 @@ internal sealed class ExceptionHandler(
             }
 
             logger.LogError(e, "CoreWebView2 render process exited unexpectedly. Reloading browser");
-            Global.CoreWebView2.Reload();
+            Global.CoreWebView2.Cast<CoreWebView2>().Reload();
             return HandleResult.Handled;
         }
         else if (e?.Message.Contains("Invalid window handle.") is true && e.StackTrace?.Contains("CoreWebView2Environment.CreateCoreWebView2ControllerAsync") is true)

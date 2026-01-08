@@ -6,7 +6,7 @@ using Daybreak.Shared.Services.Themes;
 using Microsoft.Extensions.Options;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Windows;
+using Windows.Foundation;
 
 namespace Daybreak.Services.Screens;
 
@@ -60,5 +60,5 @@ internal sealed class SplashScreenService : ISplashScreenService
     }
 
     private static IEnumerable<Screen> GetScreens() => WpfScreenHelper.Screen.AllScreens
-        .Select((screen, index) => new Screen(index, screen.Bounds));
+        .Select((screen, index) => new Screen(index, new Rect(screen.Bounds.X, screen.Bounds.Y, screen.Bounds.Width, screen.Bounds.Height)));
 }

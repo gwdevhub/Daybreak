@@ -20,6 +20,7 @@ using Daybreak.Shared.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
+using Microsoft.Web.WebView2.Core;
 using TrailBlazr.Services;
 using WpfExtended.Blazor.Launch;
 using static Daybreak.Shared.Models.Themes.Theme;
@@ -354,11 +355,11 @@ public sealed class AppViewModel
 
             if (this.tradeChatThemeSetterScript is not null)
             {
-                Global.CoreWebView2.RemoveScriptToExecuteOnDocumentCreated(this.tradeChatThemeSetterScript);
+                Global.CoreWebView2.Cast<CoreWebView2>().RemoveScriptToExecuteOnDocumentCreated(this.tradeChatThemeSetterScript);
                 this.tradeChatThemeSetterScript = default;
             }
 
-            this.tradeChatThemeSetterScript = await Global.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(@$"
+            this.tradeChatThemeSetterScript = await Global.CoreWebView2.Cast<CoreWebView2>().AddScriptToExecuteOnDocumentCreatedAsync(@$"
             if (location.origin === 'https://kamadan.gwtoolbox.com' || 
                 location.origin === 'https://ascalon.gwtoolbox.com') {{
                 localStorage.setItem('mode', '{(this.themeManager.CurrentTheme?.Mode is LightDarkMode.Light ? "light" : "dark")}');

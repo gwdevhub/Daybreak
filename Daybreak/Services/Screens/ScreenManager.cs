@@ -10,6 +10,7 @@ using System.Extensions;
 using System.Windows;
 using System.Windows.Extensions.Services;
 using System.Windows.Media;
+using Windows.Foundation;
 using WpfExtended.Blazor.Launch;
 
 namespace Daybreak.Services.Screens;
@@ -24,7 +25,7 @@ internal sealed class ScreenManager(
     private readonly ILogger<ScreenManager> logger = logger.ThrowIfNull();
 
     public IEnumerable<Screen> Screens { get; } = WpfScreenHelper.Screen.AllScreens
-        .Select((screen, index) => new Screen(index, screen.Bounds));
+        .Select((screen, index) => new Screen(index, new Windows.Foundation.Rect(screen.Bounds.X, screen.Bounds.Y, screen.Bounds.Width, screen.Bounds.Height)));
 
     public void MoveWindowToSavedPosition()
     {
@@ -44,14 +45,17 @@ internal sealed class ScreenManager(
 
         // Validate that the desired position will be at least partially on screen.
         var validPosition = false;
-        var desiredRect = new Rect(desiredX, desiredY, desiredWidth, desiredHeight);
+        var desiredRect = new System.Windows.Rect(desiredX, desiredY, desiredWidth, desiredHeight);
         foreach(var screen in this.Screens)
         {
-            if (desiredRect.IntersectsWith(screen.Size))
-            {
-                validPosition = true;
-                break;
-            }
+            // TODO:
+            //if (desiredRect.IntersectsWith(screen.Size))
+            //{
+            //    validPosition = true;
+            //    break;
+            //}
+
+            validPosition = true;
         }
 
         // If the desired window position is not valid, we let the window use the default values.

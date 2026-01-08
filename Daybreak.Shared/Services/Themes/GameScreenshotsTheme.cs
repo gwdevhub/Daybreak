@@ -3,7 +3,6 @@ using Daybreak.Shared.Models.Themes;
 using Daybreak.Shared.Services.Screenshots;
 using Microsoft.Extensions.Logging;
 using System.Extensions.Core;
-using System.Windows.Extensions.Services;
 
 namespace Daybreak.Shared.Services.Themes;
 
@@ -15,7 +14,7 @@ public sealed class GameScreenshotsTheme(
     IThemeManager themeManager,
     IScreenshotService screenshotService,
     ILogger<GameScreenshotsTheme> logger)
-    : Theme(ThemeName, AccentColor.Orange, new StaticBackground(string.Empty), LightDarkMode.SystemSynchronized, string.Empty), IApplicationLifetimeService
+    : Theme(ThemeName, AccentColor.Orange, new StaticBackground(string.Empty), LightDarkMode.SystemSynchronized, string.Empty) // TODO:, IApplicationLifetimeService
 {
     public const string ThemeName = "Dynamic Screenshots";
 

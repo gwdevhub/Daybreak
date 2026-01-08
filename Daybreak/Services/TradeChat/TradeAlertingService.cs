@@ -6,14 +6,12 @@ using Daybreak.Shared.Converters;
 using Daybreak.Shared.Models.Trade;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.TradeChat;
-using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
-using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Windows.Extensions.Services;
 
@@ -21,8 +19,6 @@ namespace Daybreak.Services.TradeChat;
 
 internal sealed class TradeAlertingService : ITradeAlertingService, IApplicationLifetimeService
 {
-    private static readonly PriceToStringConverter PriceToStringConverter = new();
-
     private readonly List<ITradeAlert> tradeAlerts = [];
     private readonly ITraderQuoteService traderQuoteService;
     private readonly INotificationService notificationService;
@@ -303,6 +299,6 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
 
     private static string ConvertPriceToString(int price)
     {
-        return PriceToStringConverter.Convert(price, typeof(string), default!, CultureInfo.CurrentCulture).Cast<string>();
+        return PriceToStringConverter.Convert(price);
     }
 }

@@ -327,28 +327,7 @@ internal sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptio
 
     private static (bool HasCustomSetter, string? CustomSetterAction, Type? CustomSetterViewType) GetCustomSetter(PropertyInfo propertyInfo)
     {
-        if (propertyInfo.GetCustomAttributes()
-                .FirstOrDefault(a =>
-                {
-                    var attributeType = a.GetType();
-                    if (!attributeType.IsGenericType)
-                    {
-                        return false;
-                    }
-
-                    return a.GetType().GetGenericTypeDefinition() == typeof(OptionSetterView<>);
-                }) is not object customSetterViewAttribute)
-        {
-            return (false, default, default);
-        }
-
-        var action = customSetterViewAttribute.GetType().GetProperty(nameof(OptionSetterView<>.Action))?
-            .GetValue(customSetterViewAttribute)?.As<string>();
-        var viewType = customSetterViewAttribute.GetType().GetGenericArguments().FirstOrDefault();
-
-        return (viewType is not null,
-            action,
-            viewType);
+        return (false, default, default);
     }
 
     private static bool IsSynchronizedOption(Type optionType)

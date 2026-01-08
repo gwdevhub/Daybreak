@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFramework>$(TargetFrameworkVersionWindows)</TargetFramework>
     <Nullable>enable</Nullable>
-    <UseWPF>true</UseWPF>
     <LangVersion>preview</LangVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <Platforms>AnyCPU;x86</Platforms>
@@ -22,15 +21,12 @@
     <PackageReference Include="MemoryPack.Generator">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.Components" />
     <PackageReference Include="Microsoft.Extensions.Http" />
-    <PackageReference Include="Microsoft.Web.WebView2" />
     <PackageReference Include="Slim" />
     <PackageReference Include="SystemExtensions.NetCore" />
     <PackageReference Include="SystemExtensions.NetStandard.DependencyInjection" />
     <PackageReference Include="SystemExtensions.NetStandard.Generators" PrivateAssets="all" />
     <PackageReference Include="TrailBlazr" />
-    <PackageReference Include="WpfExtended.Blazor" />
   </ItemGroup>
 
   <Target Name="RemoveDuplicateAnalyzers" BeforeTargets="CoreCompile">
