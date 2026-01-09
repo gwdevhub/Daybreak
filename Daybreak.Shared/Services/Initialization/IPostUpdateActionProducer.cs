@@ -1,6 +1,6 @@
 ﻿using Daybreak.Shared.Models;
 
-namespace Daybreak.Shared.Services.Updater.PostUpdate;
+namespace Daybreak.Shared.Services.Initialization;
 
 public interface IPostUpdateActionProducer
 {

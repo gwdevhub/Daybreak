@@ -3,22 +3,15 @@ using Daybreak.Services.Plugins.Resolvers;
 using Daybreak.Services.Plugins.Validators;
 using Daybreak.Shared.Models.Plugins;
 using Daybreak.Shared.Services.ApplicationArguments;
-using Daybreak.Shared.Services.Menu;
-using Daybreak.Shared.Services.Mods;
-using Daybreak.Shared.Services.Navigation;
-using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.Initialization;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Plugins;
-using Daybreak.Shared.Services.Startup;
-using Daybreak.Shared.Services.Themes;
-using Daybreak.Shared.Services.Updater.PostUpdate;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Plumsy;
 using Plumsy.Models;
-using Slim;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
@@ -94,7 +87,7 @@ internal sealed class PluginsService : IPluginsService
         IPostUpdateActionProducer postUpdateActionProducer,
         IStartupActionProducer startupActionProducer,
         INotificationHandlerProducer notificationHandlerProducer,
-        IModsManager modsManager,
+        IModsProducer modsProducer,
         IArgumentHandlerProducer argumentHandlerProducer,
         IMenuServiceProducer menuServiceProducer,
         IThemeProducer themeProducer)
@@ -105,7 +98,7 @@ internal sealed class PluginsService : IPluginsService
         postUpdateActionProducer.ThrowIfNull();
         startupActionProducer.ThrowIfNull();
         notificationHandlerProducer.ThrowIfNull();
-        modsManager.ThrowIfNull();
+        modsProducer.ThrowIfNull();
         argumentHandlerProducer.ThrowIfNull();
         menuServiceProducer.ThrowIfNull();
         themeProducer.ThrowIfNull();
@@ -183,7 +176,7 @@ internal sealed class PluginsService : IPluginsService
                 pluginScopedLogger.LogDebug("Registered startup actions");
                 RegisterNotificationHandlers(pluginConfig, notificationHandlerProducer);
                 pluginScopedLogger.LogDebug("Registered notification handlers");
-                RegisterMods(pluginConfig, modsManager);
+                RegisterMods(pluginConfig, modsProducer);
                 pluginScopedLogger.LogDebug("Registered mods");
                 RegisterArgumentHandlers(pluginConfig, argumentHandlerProducer);
                 pluginScopedLogger.LogDebug("Registered argument handlers");
@@ -274,7 +267,7 @@ internal sealed class PluginsService : IPluginsService
 
     private static void RegisterNotificationHandlers(PluginConfigurationBase pluginConfig, INotificationHandlerProducer notificationHandlerProducer) => pluginConfig.RegisterNotificationHandlers(notificationHandlerProducer);
 
-    private static void RegisterMods(PluginConfigurationBase pluginConfig, IModsManager modsManager) => pluginConfig.RegisterMods(modsManager);
+    private static void RegisterMods(PluginConfigurationBase pluginConfig, IModsProducer modsManager) => pluginConfig.RegisterMods(modsManager);
 
     private static void RegisterArgumentHandlers(PluginConfigurationBase pluginConfig, IArgumentHandlerProducer argumentHandlerProducer) => pluginConfig.RegisterLaunchArgumentHandlers(argumentHandlerProducer);
 

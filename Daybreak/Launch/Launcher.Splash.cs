@@ -1,4 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Extensions;
 using Daybreak.Services.Options;
 using Daybreak.Services.Screens;
 using Daybreak.Services.Themes;

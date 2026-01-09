@@ -5,6 +5,7 @@ using System.Extensions;
 using Daybreak.Services.Logging;
 using Daybreak.Services.Notifications.Handlers;
 using Daybreak.Shared.Models.Menu;
+using Daybreak.Shared.Services.Initialization;
 using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Options;
@@ -25,6 +26,7 @@ public sealed class AppViewModel
 
     private readonly IOptionsProvider optionsProvider;
     private readonly IMenuServiceProducer menuServiceProducer;
+    private readonly IMenuServiceInitializer menuServiceInitializer;
     private readonly IMenuServiceButtonHandler menuServiceButtonHandler;
     private readonly IViewManager viewManager;
     private readonly IThemeManager themeManager;
@@ -88,6 +90,7 @@ public sealed class AppViewModel
     {
         this.optionsProvider = optionsProvider.ThrowIfNull();
         this.menuServiceProducer = menuServiceProducer.ThrowIfNull();
+        this.menuServiceInitializer = menuServiceInitializer.ThrowIfNull();
         this.menuServiceButtonHandler = menuServiceButtonHandler.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
         this.themeManager = themeManager.ThrowIfNull();
@@ -100,7 +103,7 @@ public sealed class AppViewModel
         this.logger = logger.ThrowIfNull();
 
         //this.blazorHostWindow.StateChanged += this.MainWindow_StateChanged;
-        menuServiceInitializer.InitializeMenuService(
+        this.menuServiceInitializer.InitializeMenuService(
             this.OpenNavigationMenu,
             this.CloseNavigationMenu,
             this.ToggleNavigationMenu
@@ -372,7 +375,7 @@ public sealed class AppViewModel
 
     private void LoadMenuCategories()
     {
-        foreach (var category in this.menuServiceProducer.GetCategories())
+        foreach (var category in this.menuServiceInitializer.GetCategories())
         {
             this.MenuCategories.Add(category);
             if (category.Name is "Settings")

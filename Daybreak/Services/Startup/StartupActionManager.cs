@@ -1,17 +1,15 @@
 ﻿using Daybreak.Shared.Models;
-using Daybreak.Shared.Services.Startup;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Slim;
 using System.Core.Extensions;
 
 namespace Daybreak.Services.Startup;
 
 internal sealed class StartupActionManager(
-    IServiceManager serviceManager,
-    ILogger<StartupActionManager> logger) : IStartupActionProducer, IHostedService
+    IEnumerable<StartupActionBase> startupActions,
+    ILogger<StartupActionManager> logger) : IHostedService
 {
-    private readonly IServiceManager serviceManager = serviceManager.ThrowIfNull();
+    private readonly IEnumerable<StartupActionBase> startupActions = startupActions.ThrowIfNull();
     private readonly ILogger<StartupActionManager> logger = logger.ThrowIfNull();
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -20,7 +18,7 @@ internal sealed class StartupActionManager(
         {
             var asyncTasks = new List<Task>();
             var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            foreach (var action in this.serviceManager.GetServicesOfType<StartupActionBase>())
+            foreach (var action in this.startupActions)
             {
                 action.ExecuteOnStartup();
                 asyncTasks.Add(Task.Run(() => action.ExecuteOnStartupAsync(cts.Token)));
@@ -40,10 +38,5 @@ internal sealed class StartupActionManager(
     public Task StopAsync(CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
-    }
-
-    public void RegisterAction<T>() where T : StartupActionBase
-    {
-        this.serviceManager.RegisterScoped<T>();
     }
 }

@@ -1,7 +1,7 @@
 ﻿using TrailBlazr.ViewModels;
 using TrailBlazr.Views;
 
-namespace Daybreak.Shared.Services.Navigation;
+namespace Daybreak.Shared.Services.Initialization;
 
 public interface IViewProducer
 {

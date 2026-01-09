@@ -1,4 +1,4 @@
-﻿namespace Daybreak.Shared.Services.Options;
+﻿namespace Daybreak.Shared.Services.Initialization;
 
 public interface IOptionsProducer
 {

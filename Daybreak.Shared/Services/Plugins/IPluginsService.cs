@@ -1,13 +1,6 @@
 ﻿using Daybreak.Shared.Models.Plugins;
 using Daybreak.Shared.Services.ApplicationArguments;
-using Daybreak.Shared.Services.Menu;
-using Daybreak.Shared.Services.Mods;
-using Daybreak.Shared.Services.Navigation;
-using Daybreak.Shared.Services.Notifications;
-using Daybreak.Shared.Services.Options;
-using Daybreak.Shared.Services.Startup;
-using Daybreak.Shared.Services.Themes;
-using Daybreak.Shared.Services.Updater.PostUpdate;
+using Daybreak.Shared.Services.Initialization;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Daybreak.Shared.Services.Plugins;
@@ -25,7 +18,7 @@ public interface IPluginsService
         IPostUpdateActionProducer postUpdateActionProducer,
         IStartupActionProducer startupActionProducer,
         INotificationHandlerProducer notificationHandlerProducer,
-        IModsManager modsManager,
+        IModsProducer modsManager,
         IArgumentHandlerProducer argumentHandlerProducer,
         IMenuServiceProducer menuServiceProducer,
         IThemeProducer themeProducer);

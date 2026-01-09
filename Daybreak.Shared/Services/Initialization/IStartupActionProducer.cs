@@ -1,6 +1,6 @@
 ﻿using Daybreak.Shared.Models;
 
-namespace Daybreak.Shared.Services.Startup;
+namespace Daybreak.Shared.Services.Initialization;
 
 public interface IStartupActionProducer
 {

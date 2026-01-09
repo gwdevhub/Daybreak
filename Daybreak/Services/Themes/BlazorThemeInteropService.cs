@@ -12,7 +12,7 @@ namespace Daybreak.Services.Themes;
 
 public class BlazorThemeInteropService(
     IOptionsMonitor<ThemeOptions> themeOptions,
-    ILogger<BlazorThemeInteropService> logger) : IThemeManager, IThemeProducer, IHostedService
+    ILogger<BlazorThemeInteropService> logger) : IThemeManager, IHostedService
 {
     private const double XXSmallFontSizeValue = 0.56;
     private const double XSmallFontSizeValue = 0.625;
@@ -59,11 +59,6 @@ public class BlazorThemeInteropService(
     public Task StopAsync(CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
-    }
-
-    public void RegisterTheme(Theme theme)
-    {
-        Theme.Themes.Add(theme);
     }
 
     public void ReapplyTheme()

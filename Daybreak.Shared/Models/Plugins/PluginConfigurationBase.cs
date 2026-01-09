@@ -1,13 +1,6 @@
 ﻿using Daybreak.Shared.Services.ApplicationArguments;
-using Daybreak.Shared.Services.Menu;
+using Daybreak.Shared.Services.Initialization;
 using Daybreak.Shared.Services.Metrics;
-using Daybreak.Shared.Services.Mods;
-using Daybreak.Shared.Services.Navigation;
-using Daybreak.Shared.Services.Notifications;
-using Daybreak.Shared.Services.Options;
-using Daybreak.Shared.Services.Startup;
-using Daybreak.Shared.Services.Themes;
-using Daybreak.Shared.Services.Updater.PostUpdate;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http.Logging;
@@ -28,7 +21,7 @@ public abstract class PluginConfigurationBase
     public virtual void RegisterPostUpdateActions(IPostUpdateActionProducer postUpdateActionProducer) { }
     public virtual void RegisterOptions(IOptionsProducer optionsProducer) { }
     public virtual void RegisterNotificationHandlers(INotificationHandlerProducer notificationHandlerProducer) { }
-    public virtual void RegisterMods(IModsManager modsManager) { }
+    public virtual void RegisterMods(IModsProducer modsProducer) { }
     public virtual void RegisterLaunchArgumentHandlers(IArgumentHandlerProducer argumentHandlerProducer) { }
     public virtual void RegisterMenuButtons(IMenuServiceProducer menuServiceProducer) { }
     public virtual void RegisterThemes(IThemeProducer themeProducer) { }
@@ -37,7 +30,7 @@ public abstract class PluginConfigurationBase
     {
     }
     
-    public static HttpMessageHandler SetupLoggingAndMetrics<T>(System.IServiceProvider serviceProvider)
+    public static HttpMessageHandler SetupLoggingAndMetrics<T>(IServiceProvider serviceProvider)
     {
         var logger = serviceProvider.GetRequiredService<ILogger<T>>();
         var metricsService = serviceProvider.GetRequiredService<IMetricsService>();
