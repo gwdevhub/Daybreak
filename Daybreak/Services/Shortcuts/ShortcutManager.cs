@@ -1,5 +1,4 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Shortcuts;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -31,12 +30,11 @@ internal sealed class ShortcutManager : IShortcutManager, IHostedService
     }
 
     public ShortcutManager(
-        IOptionsUpdateHook optionsUpdateHook,
         IOptionsMonitor<LauncherOptions> liveOptions)
     {
         this.liveOptions = liveOptions.ThrowIfNull(nameof(liveOptions));
-        optionsUpdateHook.RegisterHook<LauncherOptions>(this.LoadConfiguration);
-        this.LoadConfiguration();
+        this.liveOptions.OnChange(this.LoadConfiguration);
+        this.LoadConfiguration(this.liveOptions.CurrentValue, default);
     }
 
     Task IHostedService.StartAsync(CancellationToken cancellationToken)
@@ -49,7 +47,7 @@ internal sealed class ShortcutManager : IShortcutManager, IHostedService
         return Task.CompletedTask;
     }
 
-    private void LoadConfiguration()
+    private void LoadConfiguration(LauncherOptions _, string? __)
     {
         var shortcutEnabled = this.liveOptions.CurrentValue.PlaceShortcut;
         if (shortcutEnabled && this.ShortcutEnabled is false)

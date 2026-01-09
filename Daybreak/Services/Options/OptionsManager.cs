@@ -12,7 +12,7 @@ using System.Reflection;
 
 namespace Daybreak.Services.Options;
 
-internal sealed class OptionsManager : IOptionsProducer, IOptionsUpdateHook, IOptionsProvider
+internal sealed class OptionsManager : IOptionsProducer, IOptionsProvider
 {
     private const string OptionsFileSubPath = "Daybreak.options";
 

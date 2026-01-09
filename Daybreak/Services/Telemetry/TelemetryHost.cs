@@ -1,7 +1,6 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models;
-using Daybreak.Shared.Services.Options;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -10,11 +9,9 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
-using System.Net.Http;
 using TrailBlazr.Services;
 
 namespace Daybreak.Services.Telemetry;
@@ -57,7 +54,6 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
 
     public TelemetryHost(
         ResourceBuilder resourceBuilder,
-        IOptionsUpdateHook optionsHook,
         ILoggerFactory loggerFactory,
         SwappableLoggerProvider swappableLoggerProvider,
         IViewManager viewManager,
@@ -68,7 +64,8 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
         this.loggerFactory = loggerFactory.ThrowIfNull();
         this.swappableLoggerProvider = swappableLoggerProvider.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
-        optionsHook.RegisterHook<TelemetryOptions>(this.OnOptionsUpdated);
+        
+        this.options.OnChange(this.OnOptionsUpdated);
         var logOpts = new OpenTelemetryLoggerOptions
         {
             IncludeFormattedMessage = true,
@@ -147,7 +144,7 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
         var otelListener = new OpenTelemetryEventListener(this.loggerFactory);
     }
 
-    private void OnOptionsUpdated()
+    private void OnOptionsUpdated(TelemetryOptions _, string? __)
     {
         this.BuildTelemetryProvider();
     }

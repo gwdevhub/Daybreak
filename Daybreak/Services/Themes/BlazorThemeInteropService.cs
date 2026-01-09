@@ -1,7 +1,6 @@
 using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models.ColorPalette;
 using Daybreak.Shared.Models.Themes;
-using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Themes;
 using Daybreak.Themes;
 using Microsoft.Extensions.Hosting;
@@ -13,7 +12,6 @@ namespace Daybreak.Services.Themes;
 
 public class BlazorThemeInteropService(
     IOptionsMonitor<ThemeOptions> themeOptions,
-    IOptionsUpdateHook optionsUpdateHook,
     ILogger<BlazorThemeInteropService> logger) : IThemeManager, IThemeProducer, IHostedService
 {
     private const double XXSmallFontSizeValue = 0.56;
@@ -29,7 +27,6 @@ public class BlazorThemeInteropService(
     private const string AppsUseLightThemeValue = "AppsUseLightTheme";
 
     private readonly IOptionsMonitor<ThemeOptions> themeOptions = themeOptions;
-    private readonly IOptionsUpdateHook optionsUpdateHook = optionsUpdateHook;
     private readonly ILogger<BlazorThemeInteropService> logger = logger;
 
     public event EventHandler<Theme>? ThemeChanged;
@@ -54,8 +51,8 @@ public class BlazorThemeInteropService(
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        this.optionsUpdateHook.RegisterHook<ThemeOptions>(this.OnThemeUpdated);
-        this.OnThemeUpdated();
+        this.themeOptions.OnChange(this.OnThemeUpdated);
+        this.OnThemeUpdated(this.themeOptions.CurrentValue, default);
         return Task.CompletedTask;
     }
 
@@ -71,12 +68,11 @@ public class BlazorThemeInteropService(
 
     public void ReapplyTheme()
     {
-        this.OnThemeUpdated();
+        this.OnThemeUpdated(this.themeOptions.CurrentValue, default);
     }
 
-    private void OnThemeUpdated()
+    private void OnThemeUpdated(ThemeOptions themeOptions, string? _)
     {
-        var themeOptions = this.themeOptions.CurrentValue;
         var theme = themeOptions.ApplicationTheme ?? CoreThemes.Daybreak;
         var accentColor = theme.AccentColor;
         var lightMode = theme.Mode is Theme.LightDarkMode.SystemSynchronized 
