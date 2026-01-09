@@ -3,9 +3,9 @@ using Daybreak.Services.Graph;
 using Daybreak.Shared.Services.Options;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Reflection;
@@ -15,7 +15,7 @@ namespace Daybreak.Services.Options;
 public sealed class OptionsSynchronizationService(
     IOptionsProvider optionsProvider,
     IGraphClient graphClient,
-    ILiveOptions<LauncherOptions> liveOptions,
+    IOptionsMonitor<LauncherOptions> liveOptions,
     ILogger<OptionsSynchronizationService> logger) : IOptionsSynchronizationService, IHostedService
 {
     private static readonly TimeSpan StartupDelay = TimeSpan.FromMinutes(1);
@@ -23,7 +23,7 @@ public sealed class OptionsSynchronizationService(
 
     private readonly IOptionsProvider optionsProvider = optionsProvider.ThrowIfNull();
     private readonly IGraphClient graphClient = graphClient.ThrowIfNull();
-    private readonly ILiveOptions<LauncherOptions> liveOptions = liveOptions.ThrowIfNull();
+    private readonly IOptionsMonitor<LauncherOptions> liveOptions = liveOptions.ThrowIfNull();
     private readonly ILogger<OptionsSynchronizationService> logger = logger.ThrowIfNull();
 
     async Task IHostedService.StartAsync(CancellationToken cancellationToken)
@@ -37,7 +37,7 @@ public sealed class OptionsSynchronizationService(
             var currentOptions = JsonConvert.SerializeObject(this.GetCurrentOptionsInternal());
             if (remoteOptions is not null &&
                 currentOptions != remoteOptionsSerialized &&
-                this.liveOptions.Value.AutoBackupSettings)
+                this.liveOptions.CurrentValue.AutoBackupSettings)
             {
                 try
                 {

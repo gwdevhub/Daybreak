@@ -1,29 +1,29 @@
-﻿using Daybreak.Configuration.Options;
-using Daybreak.Shared.Models.LaunchConfigurations;
+﻿using Daybreak.Shared.Models.LaunchConfigurations;
 using Daybreak.Shared.Services.Credentials;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.LaunchConfigurations;
-using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 
 namespace Daybreak.Services.LaunchConfigurations;
 
+//TODO: Fix live updateable options usage
 internal sealed class LaunchConfigurationService(
+    //ILiveUpdateableOptions<LaunchConfigurationServiceOptions> liveUpdateableOptions
     ICredentialManager credentialManager,
-    IGuildWarsExecutableManager guildWarsExecutableManager,
-    ILiveUpdateableOptions<LaunchConfigurationServiceOptions> liveUpdateableOptions) : ILaunchConfigurationService
+    IGuildWarsExecutableManager guildWarsExecutableManager) : ILaunchConfigurationService
 {
     private readonly ICredentialManager credentialManager = credentialManager.ThrowIfNull();
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
-    private readonly ILiveUpdateableOptions<LaunchConfigurationServiceOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
+    //private readonly ILiveUpdateableOptions<LaunchConfigurationServiceOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
 
     public IEnumerable<LaunchConfigurationWithCredentials> GetLaunchConfigurations()
     {
-        return this.liveUpdateableOptions.Value.LaunchConfigurations
-            .Select(this.ConvertToConfigurationWithCredentials)
-            .OfType<LaunchConfigurationWithCredentials>()
-            .Where(this.IsValidInternal);
+        //return this.liveUpdateableOptions.Value.LaunchConfigurations
+        //    .Select(this.ConvertToConfigurationWithCredentials)
+        //    .OfType<LaunchConfigurationWithCredentials>()
+        //    .Where(this.IsValidInternal);
+        return [];
     }
 
     public LaunchConfigurationWithCredentials? CreateConfiguration()
@@ -55,18 +55,18 @@ internal sealed class LaunchConfigurationService(
     public bool DeleteConfiguration(LaunchConfigurationWithCredentials launchConfigurationWithCredentials)
     {
         launchConfigurationWithCredentials.ThrowIfNull();
-        var configs = this.liveUpdateableOptions.Value.LaunchConfigurations;
-        var maybeConfig = configs
-            .FirstOrDefault(l => l.Identifier == launchConfigurationWithCredentials.Identifier);
+        //var configs = this.liveUpdateableOptions.Value.LaunchConfigurations;
+        //var maybeConfig = configs
+        //    .FirstOrDefault(l => l.Identifier == launchConfigurationWithCredentials.Identifier);
 
-        if (maybeConfig is null)
-        {
-            return false;
-        }
+        //if (maybeConfig is null)
+        //{
+        //    return false;
+        //}
 
-        configs.Remove(maybeConfig);
-        this.liveUpdateableOptions.Value.LaunchConfigurations = configs;
-        this.liveUpdateableOptions.UpdateOption();
+        //configs.Remove(maybeConfig);
+        //this.liveUpdateableOptions.Value.LaunchConfigurations = configs;
+        //this.liveUpdateableOptions.UpdateOption();
         return true;
     }
 
@@ -84,44 +84,44 @@ internal sealed class LaunchConfigurationService(
 
     public void SetLastLaunchConfigurationWithCredentials(LaunchConfigurationWithCredentials launchConfigurationWithCredentials)
     {
-        var configs = this.liveUpdateableOptions.Value.LaunchConfigurations;
-        var maybeConfig = configs
-            .FirstOrDefault(l => l.CredentialsIdentifier == launchConfigurationWithCredentials.Credentials?.Identifier &&
-                                 l.Executable == launchConfigurationWithCredentials.ExecutablePath) ?? throw new InvalidOperationException("Provided launch configuration is not part of the known list of launch configurations");
-        configs.Remove(maybeConfig);
-        configs.Add(maybeConfig);
-        this.liveUpdateableOptions.Value.LaunchConfigurations = configs;
-        this.liveUpdateableOptions.UpdateOption();
+        //var configs = this.liveUpdateableOptions.Value.LaunchConfigurations;
+        //var maybeConfig = configs
+        //    .FirstOrDefault(l => l.CredentialsIdentifier == launchConfigurationWithCredentials.Credentials?.Identifier &&
+        //                         l.Executable == launchConfigurationWithCredentials.ExecutablePath) ?? throw new InvalidOperationException("Provided launch configuration is not part of the known list of launch configurations");
+        //configs.Remove(maybeConfig);
+        //configs.Add(maybeConfig);
+        //this.liveUpdateableOptions.Value.LaunchConfigurations = configs;
+        //this.liveUpdateableOptions.UpdateOption();
     }
 
     private bool SaveConfigurationInternal(LaunchConfigurationWithCredentials launchConfigurationWithCredentials)
     {
-        var configs = this.liveUpdateableOptions.Value.LaunchConfigurations.ToList();
-        if (configs.FirstOrDefault(c => c.Identifier == launchConfigurationWithCredentials.Identifier) is
-            LaunchConfiguration config)
-        {
-            config.Name = launchConfigurationWithCredentials.Name;
-            config.Identifier = launchConfigurationWithCredentials.Identifier;
-            config.CredentialsIdentifier = launchConfigurationWithCredentials.Credentials?.Identifier;
-            config.Executable = launchConfigurationWithCredentials.ExecutablePath;
-            config.Arguments = launchConfigurationWithCredentials.Arguments;
-            config.SteamSupport = launchConfigurationWithCredentials.SteamSupport;
-            this.liveUpdateableOptions.Value.LaunchConfigurations = configs;
-            this.liveUpdateableOptions.UpdateOption();
-            return true;
-        }
+        //var configs = this.liveUpdateableOptions.Value.LaunchConfigurations.ToList();
+        //if (configs.FirstOrDefault(c => c.Identifier == launchConfigurationWithCredentials.Identifier) is
+        //    LaunchConfiguration config)
+        //{
+        //    config.Name = launchConfigurationWithCredentials.Name;
+        //    config.Identifier = launchConfigurationWithCredentials.Identifier;
+        //    config.CredentialsIdentifier = launchConfigurationWithCredentials.Credentials?.Identifier;
+        //    config.Executable = launchConfigurationWithCredentials.ExecutablePath;
+        //    config.Arguments = launchConfigurationWithCredentials.Arguments;
+        //    config.SteamSupport = launchConfigurationWithCredentials.SteamSupport;
+        //    this.liveUpdateableOptions.Value.LaunchConfigurations = configs;
+        //    this.liveUpdateableOptions.UpdateOption();
+        //    return true;
+        //}
 
-        configs.Insert(0, new LaunchConfiguration
-        {
-            Name = launchConfigurationWithCredentials.Name,
-            CredentialsIdentifier = launchConfigurationWithCredentials.Credentials?.Identifier,
-            Executable = launchConfigurationWithCredentials.ExecutablePath,
-            Identifier = launchConfigurationWithCredentials.Identifier,
-            Arguments = launchConfigurationWithCredentials.Arguments,
-            SteamSupport = launchConfigurationWithCredentials.SteamSupport
-        });
-        this.liveUpdateableOptions.Value.LaunchConfigurations = configs;
-        this.liveUpdateableOptions.UpdateOption();
+        //configs.Insert(0, new LaunchConfiguration
+        //{
+        //    Name = launchConfigurationWithCredentials.Name,
+        //    CredentialsIdentifier = launchConfigurationWithCredentials.Credentials?.Identifier,
+        //    Executable = launchConfigurationWithCredentials.ExecutablePath,
+        //    Identifier = launchConfigurationWithCredentials.Identifier,
+        //    Arguments = launchConfigurationWithCredentials.Arguments,
+        //    SteamSupport = launchConfigurationWithCredentials.SteamSupport
+        //});
+        //this.liveUpdateableOptions.Value.LaunchConfigurations = configs;
+        //this.liveUpdateableOptions.UpdateOption();
         return true;
     }
 

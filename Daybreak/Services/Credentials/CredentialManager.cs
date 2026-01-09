@@ -11,13 +11,15 @@ using Convert = System.Convert;
 
 namespace Daybreak.Services.Credentials;
 
+
+//TODO: Fix live updateable options usage
 internal sealed class CredentialManager(
-    ILogger<CredentialManager> logger,
-    ILiveUpdateableOptions<CredentialManagerOptions> liveOptions) : ICredentialManager
+    //ILiveUpdateableOptions<CredentialManagerOptions> liveOptions,
+    ILogger<CredentialManager> logger) : ICredentialManager
 {
     private static readonly byte[] Entropy = Convert.FromBase64String("uXB8Vmz5MmuDar36v8SRGzpALi0Wv5Gx");
     private readonly ILogger<CredentialManager> logger = logger.ThrowIfNull(nameof(logger));
-    private readonly ILiveUpdateableOptions<CredentialManagerOptions> liveOptions = liveOptions.ThrowIfNull(nameof(liveOptions));
+    //private readonly ILiveUpdateableOptions<CredentialManagerOptions> liveOptions = liveOptions.ThrowIfNull(nameof(liveOptions));
 
     public bool TryGetCredentialsByIdentifier(string identifier, out LoginCredentials? loginCredentials)
     {
@@ -34,30 +36,31 @@ internal sealed class CredentialManager(
     public List<LoginCredentials> GetCredentialList()
     {
         this.logger.LogDebug("Retrieving credentials");
-        var config = this.liveOptions.Value;
-        if (config.ProtectedLoginCredentials is null || config.ProtectedLoginCredentials.Count == 0)
-        {
-            this.logger.LogDebug("No credentials found");
-            return [];
-        }
+        //var config = this.liveOptions.Value;
+        //if (config.ProtectedLoginCredentials is null || config.ProtectedLoginCredentials.Count == 0)
+        //{
+        //    this.logger.LogDebug("No credentials found");
+        //    return [];
+        //}
 
-        return [.. config
-            .ProtectedLoginCredentials
-            .Select(this.UnprotectCredentials)
-            .Where(this.CredentialsUnprotected)
-            .Select(this.ExtractCredentials)
-            .OfType<LoginCredentials>()];
+        //return [.. config
+        //    .ProtectedLoginCredentials
+        //    .Select(this.UnprotectCredentials)
+        //    .Where(this.CredentialsUnprotected)
+        //    .Select(this.ExtractCredentials)
+        //    .OfType<LoginCredentials>()];
+        return [];
     }
 
     public void StoreCredentials(List<LoginCredentials> loginCredentials)
     {
         this.logger.LogDebug("Storing credentials");
-        this.liveOptions.Value.ProtectedLoginCredentials = [.. loginCredentials
-            .Select(this.ProtectCredentials)
-            .Where(this.CredentialsProtected)
-            .Select(this.ExtractProtectedCredentials)
-            .OfType<ProtectedLoginCredentials>()];
-        this.liveOptions.UpdateOption();
+        //this.liveOptions.Value.ProtectedLoginCredentials = [.. loginCredentials
+        //    .Select(this.ProtectCredentials)
+        //    .Where(this.CredentialsProtected)
+        //    .Select(this.ExtractProtectedCredentials)
+        //    .OfType<ProtectedLoginCredentials>()];
+        //this.liveOptions.UpdateOption();
     }
 
     public LoginCredentials CreateUniqueCredentials()

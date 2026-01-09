@@ -1,5 +1,4 @@
-﻿using Daybreak.Configuration.Options;
-using Daybreak.Shared.Models.Api;
+﻿using Daybreak.Shared.Models.Api;
 using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Models.FocusView;
 using Daybreak.Shared.Models.Guildwars;
@@ -9,7 +8,6 @@ using Daybreak.Shared.Services.Experience;
 using Daybreak.Shared.Services.LaunchConfigurations;
 using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.Logging;
-using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
@@ -19,6 +17,8 @@ using TrailBlazr.ViewModels;
 
 namespace Daybreak.Views;
 
+
+//TODO: Fix live updateable options usage
 public sealed class FocusViewModel(
     IBuildTemplateManager buildTemplateManager,
     IViewManager viewManager,
@@ -26,7 +26,7 @@ public sealed class FocusViewModel(
     ILaunchConfigurationService launchConfigurationService,
     IDaybreakApiService daybreakApiService,
     IExperienceCalculator experienceCalculator,
-    ILiveUpdateableOptions<FocusViewOptions> options,
+    //ILiveUpdateableOptions<FocusViewOptions> options,
     ILogger<FocusView> logger)
     : ViewModelBase<FocusViewModel, FocusView>
 {
@@ -42,7 +42,7 @@ public sealed class FocusViewModel(
     private readonly ILaunchConfigurationService launchConfigurationService = launchConfigurationService.ThrowIfNull();
     private readonly IDaybreakApiService daybreakApiService = daybreakApiService.ThrowIfNull();
     private readonly IExperienceCalculator experienceCalculator = experienceCalculator.ThrowIfNull();
-    private readonly ILiveUpdateableOptions<FocusViewOptions> options = options.ThrowIfNull();
+    //private readonly ILiveUpdateableOptions<FocusViewOptions> options = options.ThrowIfNull();
     private readonly ILogger<FocusView> logger = logger.ThrowIfNull();
 
     private ScopedApiContext? apiContext;
@@ -118,9 +118,9 @@ public sealed class FocusViewModel(
 
     public void OnExperienceDisplayClicked()
     {
-        var options = this.options.Value;
-        options.ExperienceDisplay = CycleValue(options.ExperienceDisplay);
-        this.options.UpdateOption();
+        //var options = this.options.Value;
+        //options.ExperienceDisplay = CycleValue(options.ExperienceDisplay);
+        //this.options.UpdateOption();
         if (this.CharacterComponentContext is null)
         {
             return;
@@ -135,16 +135,16 @@ public sealed class FocusViewModel(
             ExperienceForNextLevel = this.CharacterComponentContext.ExperienceForNextLevel,
             NextExperienceThreshold = this.CharacterComponentContext.NextExperienceThreshold,
             TotalExperienceForNextLevel = this.CharacterComponentContext.TotalExperienceForNextLevel,
-            ExperienceDisplay = options.ExperienceDisplay
+            //ExperienceDisplay = options.ExperienceDisplay
         };
         this.RefreshView();
     }
 
     public void OnVanquishingDisplayClicked()
     {
-        var options = this.options.Value;
-        options.VanquishingDisplay = CycleValue(options.VanquishingDisplay);
-        this.options.UpdateOption();
+        //var options = this.options.Value;
+        //options.VanquishingDisplay = CycleValue(options.VanquishingDisplay);
+        //this.options.UpdateOption();
         if (this.VanquishComponentContext is null)
         {
             return;
@@ -152,7 +152,7 @@ public sealed class FocusViewModel(
 
         this.VanquishComponentContext = new VanquishComponentContext
         {
-            Display = options.VanquishingDisplay,
+            Display = default, //options.VanquishingDisplay,
             FoesKilled = this.VanquishComponentContext.FoesKilled,
             FoesToKill = this.VanquishComponentContext.FoesToKill,
             HardMode = this.VanquishComponentContext.HardMode,
@@ -462,7 +462,7 @@ public sealed class FocusViewModel(
             ExperienceForNextLevel = experienceForNextLevel,
             NextExperienceThreshold = nextExperienceThreshold,
             TotalExperienceForNextLevel = totalExperienceForNextLevel,
-            ExperienceDisplay = this.options.Value.ExperienceDisplay
+            //ExperienceDisplay = this.options.Value.ExperienceDisplay
         };
     }
 
@@ -621,7 +621,7 @@ public sealed class FocusViewModel(
             FoesToKill = instanceInfo.FoesToKill,
             HardMode = instanceInfo.Difficulty is DifficultyInfo.Hard,
             Vanquishing = (instanceInfo.FoesToKill + instanceInfo.FoesKilled > 0U) && instanceInfo.Difficulty is DifficultyInfo.Hard,
-            Display = this.options.Value.VanquishingDisplay
+            Display =  default //this.options.Value.VanquishingDisplay
         };
     }
 

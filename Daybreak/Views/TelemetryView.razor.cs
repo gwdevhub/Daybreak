@@ -3,7 +3,10 @@ using System.Configuration;
 using TrailBlazr.ViewModels;
 
 namespace Daybreak.Views;
-public sealed class TelemetryViewModel(ILiveUpdateableOptions<TelemetryOptions> options)
+
+//TODO: Fix live updateable options usage
+public sealed class TelemetryViewModel()
+    //ILiveUpdateableOptions<TelemetryOptions> options)
     : ViewModelBase<TelemetryViewModel, TelemetryView>
 {
     public const string DisclaimerText =
@@ -26,13 +29,13 @@ Telemetry is fully optional and can be turned off at any time. When disabled, no
 
 For more information, you can view our source code or reach out to the maintainers.";
 
-    private readonly ILiveUpdateableOptions<TelemetryOptions> options = options;
+    //private readonly ILiveUpdateableOptions<TelemetryOptions> options = options;
 
     public bool TelemetryEnabled { get; set; }
 
     public override ValueTask ParametersSet(TelemetryView view, CancellationToken cancellationToken)
     {
-        this.TelemetryEnabled = this.options.Value.Enabled;
+        //this.TelemetryEnabled = this.options.Value.Enabled;
         return base.ParametersSet(view, cancellationToken);
     }
 
@@ -50,8 +53,8 @@ For more information, you can view our source code or reach out to the maintaine
 
     private void TelemetryEnabledChanged()
     {
-        this.options.Value.Enabled = this.TelemetryEnabled;
-        this.options.UpdateOption();
+        //this.options.Value.Enabled = this.TelemetryEnabled;
+        //this.options.UpdateOption();
         this.RefreshView();
     }
 }

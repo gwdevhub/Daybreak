@@ -1,5 +1,4 @@
-﻿using Daybreak.Configuration.Options;
-using Daybreak.Services.Plugins.Resolvers;
+﻿using Daybreak.Services.Plugins.Resolvers;
 using Daybreak.Services.Plugins.Validators;
 using Daybreak.Shared.Models.Plugins;
 using Daybreak.Shared.Services.ApplicationArguments;
@@ -18,15 +17,14 @@ using Microsoft.Extensions.Logging;
 using Plumsy;
 using Plumsy.Models;
 using Slim;
-using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
-using System.IO;
 using System.Logging;
 using System.Reflection;
 
 namespace Daybreak.Services.Plugins;
 
+//TODO: Fix live updateable options usage
 internal sealed class PluginsService : IPluginsService
 {
     private const string DllExtension = ".dll";
@@ -35,17 +33,17 @@ internal sealed class PluginsService : IPluginsService
 
     private readonly SemaphoreSlim pluginsSemaphore = new(1, 1);
     private readonly List<AvailablePlugin> loadedPlugins = [];
-    private readonly ILiveUpdateableOptions<PluginsServiceOptions> liveUpdateableOptions;
+    //private readonly ILiveUpdateableOptions<PluginsServiceOptions> liveUpdateableOptions;
     private readonly ILogger<PluginsService> logger;
     private readonly DaybreakPluginValidator daybreakPluginValidator = new();
     private readonly DaybreakPluginDependencyResolver daybreakPluginDependencyResolver = new();
     private readonly PluginManager pluginManager;
 
     public PluginsService(
-        ILiveUpdateableOptions<PluginsServiceOptions> liveUpdateableOptions,
+        ///ILiveUpdateableOptions<PluginsServiceOptions> liveUpdateableOptions,
         ILogger<PluginsService> logger)
     {
-        this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
+        //this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
         this.pluginManager = new PluginManager(PluginsDirectory)
             .WithEnvironmentVersionValidator(this.daybreakPluginValidator)
@@ -59,27 +57,29 @@ internal sealed class PluginsService : IPluginsService
 
     public IEnumerable<AvailablePlugin> GetAvailablePlugins()
     {
-        var availablePlugins = this.pluginManager.GetAvailablePlugins();
-        var enabledPlugins = this.liveUpdateableOptions.Value.EnabledPlugins;
-        return availablePlugins
-            .Select(plugin => new AvailablePlugin
-            {
-                Name = plugin.Name,
-                Path = plugin.Path,
-                Enabled = enabledPlugins.Any(p => p.Name == plugin.Name)
-            });
+        //var availablePlugins = this.pluginManager.GetAvailablePlugins();
+        //var enabledPlugins = this.liveUpdateableOptions.Value.EnabledPlugins;
+        //return availablePlugins
+        //    .Select(plugin => new AvailablePlugin
+        //    {
+        //        Name = plugin.Name,
+        //        Path = plugin.Path,
+        //        Enabled = enabledPlugins.Any(p => p.Name == plugin.Name)
+        //    });
+
+        return [];
     }
 
     public void SaveEnabledPlugins(IEnumerable<AvailablePlugin> availablePlugins)
     {
-        this.liveUpdateableOptions.Value.EnabledPlugins = [.. availablePlugins
-            .Where(p => p.Enabled)
-            .Select(p => new Models.PluginEntry
-            {
-                Name = p.Name,
-                Path = p.Path
-            })];
-        this.liveUpdateableOptions.UpdateOption();
+    //    this.liveUpdateableOptions.Value.EnabledPlugins = [.. availablePlugins
+    //        .Where(p => p.Enabled)
+    //        .Select(p => new Models.PluginEntry
+    //        {
+    //            Name = p.Name,
+    //            Path = p.Path
+    //        })];
+    //    this.liveUpdateableOptions.UpdateOption();
     }
 
     public void LoadPlugins(
@@ -118,20 +118,20 @@ internal sealed class PluginsService : IPluginsService
         var availablePlugins = this.pluginManager.GetAvailablePlugins().ToList();
         foreach (var availablePlugin in availablePlugins)
         {
-            scopedLogger.LogDebug($"[{availablePlugin.Name}] - [{(this.liveUpdateableOptions.Value.EnabledPlugins.Any(p => p.Name == availablePlugin.Name) ? "Enabled" : "Disabled")}] - {availablePlugin.Path}");
+            //scopedLogger.LogDebug($"[{availablePlugin.Name}] - [{(this.liveUpdateableOptions.Value.EnabledPlugins.Any(p => p.Name == availablePlugin.Name) ? "Enabled" : "Disabled")}] - {availablePlugin.Path}");
         }
 
         scopedLogger.LogDebug("Loading plugins");
-        IEnumerable<PluginLoadOperation> results;
-        try
-        {
-            results = this.pluginManager.LoadPlugins(availablePlugins.Where(plugin => this.liveUpdateableOptions.Value.EnabledPlugins.Any(p => p.Name == plugin.Name)));
-        }
-        catch (Exception e)
-        {
-            scopedLogger.LogError(e, "Caught exception while loading plugins");
-            throw;
-        }
+        IEnumerable<PluginLoadOperation> results = [];
+        //try
+        //{
+        //    results = this.pluginManager.LoadPlugins(availablePlugins.Where(plugin => this.liveUpdateableOptions.Value.EnabledPlugins.Any(p => p.Name == plugin.Name)));
+        //}
+        //catch (Exception e)
+        //{
+        //    scopedLogger.LogError(e, "Caught exception while loading plugins");
+        //    throw;
+        //}
 
         foreach (var result in results)
         {
@@ -164,8 +164,6 @@ internal sealed class PluginsService : IPluginsService
                     continue;
                 }
 
-                RegisterResolvers(pluginConfig, serviceManager);
-                pluginScopedLogger.LogDebug("Registered resolvers");
                 RegisterServices(pluginConfig, serviceManager);
                 pluginScopedLogger.LogDebug("Registered services");
                 RegisterOptions(pluginConfig, optionsProducer);
@@ -230,10 +228,10 @@ internal sealed class PluginsService : IPluginsService
 
     private void DisablePlugin(PluginLoadOperation result)
     {
-        var options = this.liveUpdateableOptions.Value;
-        options.EnabledPlugins = [.. options.EnabledPlugins.Where(p => p.Path != result.PluginEntry?.Path)];
-        this.liveUpdateableOptions.Value.EnabledPlugins = options.EnabledPlugins;
-        this.liveUpdateableOptions.UpdateOption();
+        //var options = this.liveUpdateableOptions.Value;
+        //options.EnabledPlugins = [.. options.EnabledPlugins.Where(p => p.Path != result.PluginEntry?.Path)];
+        //this.liveUpdateableOptions.Value.EnabledPlugins = options.EnabledPlugins;
+        //this.liveUpdateableOptions.UpdateOption();
     }
 
     private static void LogLoadOperation(PluginLoadOperation result, ScopedLogger<PluginsService> scopedLogger)
@@ -254,8 +252,6 @@ internal sealed class PluginsService : IPluginsService
         PluginLoadOperation.Success success => success.Plugin.Assembly,
         _ => default
     };
-
-    private static void RegisterResolvers(PluginConfigurationBase pluginConfig, IServiceManager serviceManager) => pluginConfig.RegisterResolvers(serviceManager);
 
     private static void RegisterServices(PluginConfigurationBase pluginConfig, IServiceManager serviceManager)
     {

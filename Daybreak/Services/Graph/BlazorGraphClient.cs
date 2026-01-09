@@ -6,15 +6,14 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
 using Newtonsoft.Json;
-using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
-using System.Net.Http;
 using System.Net.Http.Headers;
 
 namespace Daybreak.Services.Graph;
 
+//TODO: Fix live updateable options usage
 internal sealed class BlazorGraphClient : IGraphClient
 {
     private const string GraphBaseUrl = "https://graph.microsoft.com/v1.0/";
@@ -38,7 +37,7 @@ internal sealed class BlazorGraphClient : IGraphClient
 
     private readonly IPublicClientApplication publicClientApplication;
     private readonly IBuildTemplateManager buildTemplateManager;
-    private readonly ILiveUpdateableOptions<SynchronizationOptions> liveUpdateableOptions;
+    //private readonly ILiveUpdateableOptions<SynchronizationOptions> liveUpdateableOptions;
     private readonly IHttpClient<BlazorGraphClient> httpClient;
     private readonly ILogger<BlazorGraphClient> logger;
 
@@ -47,13 +46,13 @@ internal sealed class BlazorGraphClient : IGraphClient
     public BlazorGraphClient(
         IPublicClientApplication publicClientApplication,
         IBuildTemplateManager buildTemplateManager,
-        ILiveUpdateableOptions<SynchronizationOptions> liveUpdateableOptions,
+        //ILiveUpdateableOptions<SynchronizationOptions> liveUpdateableOptions,
         IHttpClient<BlazorGraphClient> httpClient,
         ILogger<BlazorGraphClient> logger)
     {
         this.publicClientApplication = publicClientApplication.ThrowIfNull();
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
-        this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
+        //this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
         this.httpClient = httpClient.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
 
@@ -262,9 +261,9 @@ internal sealed class BlazorGraphClient : IGraphClient
 
     public void ResetAuthorization()
     {
-        this.liveUpdateableOptions.Value.ProtectedGraphAccessToken = null;
-        this.liveUpdateableOptions.Value.ProtectedGraphRefreshToken = null;
-        this.liveUpdateableOptions.UpdateOption();
+        //this.liveUpdateableOptions.Value.ProtectedGraphAccessToken = null;
+        //this.liveUpdateableOptions.Value.ProtectedGraphRefreshToken = null;
+        //this.liveUpdateableOptions.UpdateOption();
     }
 
     private async Task<string?> GetValidAccessToken()

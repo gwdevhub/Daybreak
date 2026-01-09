@@ -29,10 +29,11 @@ using System.Net.Http;
 using TrailBlazr.Services;
 
 namespace Daybreak.Services.ReShade;
+//TODO: Fix live updateable options usage
 internal sealed class ReShadeService(
     INotificationService notificationService,
     IProcessInjector processInjector,
-    ILiveUpdateableOptions<ReShadeOptions> liveUpdateableOptions,
+    //ILiveUpdateableOptions<ReShadeOptions> liveUpdateableOptions,
     IHttpClient<ReShadeService> httpClient,
     IDownloadService downloadService,
     IViewManager viewManager,
@@ -65,7 +66,7 @@ internal sealed class ReShadeService(
 
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IProcessInjector processInjector = processInjector.ThrowIfNull();
-    private readonly ILiveUpdateableOptions<ReShadeOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
+    //private readonly ILiveUpdateableOptions<ReShadeOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
     private readonly IHttpClient<ReShadeService> httpClient = httpClient.ThrowIfNull();
     private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
     private readonly IViewManager viewManager = viewManager.ThrowIfNull();
@@ -75,24 +76,24 @@ internal sealed class ReShadeService(
     public string Description => "ReShade is an advanced, fully generic post-processing injector for games and video software developed by crosire.";
     public bool IsVisible => true;
     public bool CanCustomManage => true;
-    public bool IsEnabled
-    {
-        get => this.liveUpdateableOptions.Value.Enabled;
-        set
-        {
-            this.liveUpdateableOptions.Value.Enabled = value;
-            this.liveUpdateableOptions.UpdateOption();
-        }
-    }
-    public bool AutoUpdate
-    {
-        get => this.liveUpdateableOptions.Value.AutoUpdate;
-        set
-        {
-            this.liveUpdateableOptions.Value.AutoUpdate = value;
-            this.liveUpdateableOptions.UpdateOption();
-        }
-    }
+    public bool IsEnabled { get; set; }
+    //{
+    //    get => this.liveUpdateableOptions.Value.Enabled;
+    //    set
+    //    {
+    //        this.liveUpdateableOptions.Value.Enabled = value;
+    //        this.liveUpdateableOptions.UpdateOption();
+    //    }
+    //}
+    public bool AutoUpdate { get; set; }
+    //{
+    //    get => this.liveUpdateableOptions.Value.AutoUpdate;
+    //    set
+    //    {
+    //        this.liveUpdateableOptions.Value.AutoUpdate = value;
+    //        this.liveUpdateableOptions.UpdateOption();
+    //    }
+    //}
     public bool IsInstalled => File.Exists(ReShadeDllPath) &&
                                File.Exists(ReShadePresetPath) &&
                                File.Exists(ReShadeLogPath) &&
@@ -684,10 +685,11 @@ internal sealed class ReShadeService(
             return;
         }
 
-        if (!this.liveUpdateableOptions.Value.AutoUpdate)
-        {
-            return;
-        }
+        //TODO: Fix live updateable options usage
+        //if (!this.liveUpdateableOptions.Value.AutoUpdate)
+        //{
+        //    return;
+        //}
 
         var scopedLogger = this.logger.CreateScopedLogger();
         var version = await this.GetLatestVersion(cancellationToken);

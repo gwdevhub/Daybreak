@@ -6,7 +6,7 @@ using Daybreak.Shared.Services.Events;
 using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System.Configuration;
+using Microsoft.Extensions.Options;
 using System.Core.Extensions;
 
 namespace Daybreak.Services.Events;
@@ -14,17 +14,17 @@ namespace Daybreak.Services.Events;
 internal sealed class EventNotifierService(
     IEventService eventService,
     INotificationService notificationService,
-    ILiveOptions<EventNotifierOptions> liveOptions,
+    IOptionsMonitor<EventNotifierOptions> liveOptions,
     ILogger<IEventNotifierService> logger) : IEventNotifierService, IHostedService
 {
     private readonly IEventService eventService = eventService.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
-    private readonly ILiveOptions<EventNotifierOptions> liveOptions = liveOptions.ThrowIfNull();
+    private readonly IOptionsMonitor<EventNotifierOptions> liveOptions = liveOptions.ThrowIfNull();
     private readonly ILogger<IEventNotifierService> logger = logger.ThrowIfNull();
 
     async Task IHostedService.StartAsync(CancellationToken cancellationToken)
     {
-        if (!this.liveOptions.Value.Enabled)
+        if (!this.liveOptions.CurrentValue.Enabled)
         {
             return;
         }

@@ -23,13 +23,14 @@ using TrailBlazr.Services;
 
 namespace Daybreak.Services.UMod;
 
+//TODO: Fix live updateable options usage
 internal sealed class UModService(
     IViewManager viewManager,
     IProcessInjector processInjector,
     INotificationService notificationService,
     IDownloadService downloadService,
     IHttpClient<UModService> httpClient,
-    ILiveUpdateableOptions<UModOptions> uModOptions,
+    //ILiveUpdateableOptions<UModOptions> uModOptions,
     ILogger<UModService> logger) : IUModService
 {
     private const string TagPlaceholder = "[TAG_PLACEHOLDER]";
@@ -48,7 +49,7 @@ internal sealed class UModService(
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
     private readonly IHttpClient<UModService> httpClient = httpClient.ThrowIfNull();
-    private readonly ILiveUpdateableOptions<UModOptions> uModOptions = uModOptions.ThrowIfNull();
+    //private readonly ILiveUpdateableOptions<UModOptions> uModOptions = uModOptions.ThrowIfNull();
     private readonly ILogger<UModService> logger = logger.ThrowIfNull();
 
     public string Name => "gMod";
@@ -56,15 +57,15 @@ internal sealed class UModService(
     public bool IsVisible => true;
     public bool CanCustomManage => true;
     public bool CanUninstall => true;
-    public bool IsEnabled
-    {
-        get => this.uModOptions.Value.Enabled;
-        set
-        {
-            this.uModOptions.Value.Enabled = value;
-            this.uModOptions.UpdateOption();
-        }
-    }
+    public bool IsEnabled { get; set; }
+    //{
+    //    get => this.uModOptions.Value.Enabled;
+    //    set
+    //    {
+    //        this.uModOptions.Value.Enabled = value;
+    //        this.uModOptions.UpdateOption();
+    //    }
+    //}
 
     public bool IsInstalled => File.Exists(Path.GetFullPath(Path.Combine(UModDirectory, UModDll)));
 
@@ -142,25 +143,26 @@ internal sealed class UModService(
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         var modListFilePath = Path.Combine(UModDirectory, UModModList);
-        var lines = this.uModOptions.Value.Mods
-            .Where(e => e.Enabled && e.PathToFile is not null)
-            .Select(e => e.PathToFile)
-            .OfType<string>()
-            .Where(e =>
-            {
-                if (!File.Exists(e))
-                {
-                    scopedLogger.LogWarning("Mod file {ModFile} does not exist", e);
-                    this.notificationService.NotifyError(
-                        title: "gMod Mod Missing",
-                        description: $"The mod file {e} could not be found. gMod will not load this mod");
+        //var lines = this.uModOptions.Value.Mods
+        //    .Where(e => e.Enabled && e.PathToFile is not null)
+        //    .Select(e => e.PathToFile)
+        //    .OfType<string>()
+        //    .Where(e =>
+        //    {
+        //        if (!File.Exists(e))
+        //        {
+        //            scopedLogger.LogWarning("Mod file {ModFile} does not exist", e);
+        //            this.notificationService.NotifyError(
+        //                title: "gMod Mod Missing",
+        //                description: $"The mod file {e} could not be found. gMod will not load this mod");
 
-                    return false;
-                }
+        //            return false;
+        //        }
 
-                return true;
-            })
-            .ToList();
+        //        return true;
+        //    })
+        //    .ToList();
+        var lines = new List<string>();
 
         await File.WriteAllLinesAsync(modListFilePath, lines, cancellationToken);
         var result = await this.processInjector.Inject(guildWarsCreatedContext.ApplicationLauncherContext.Process, Path.Combine(UModDirectory, UModDll), cancellationToken);
@@ -200,55 +202,56 @@ internal sealed class UModService(
             return false;
         }
 
-        if (this.uModOptions.Value.Mods.Any(m => m.PathToFile == fullPath))
-        {
-            return true;
-        }
+        //if (this.uModOptions.Value.Mods.Any(m => m.PathToFile == fullPath))
+        //{
+        //    return true;
+        //}
 
-        var entry = new UModEntry
-        {
-            Enabled = this.uModOptions.Value.AutoEnableMods,
-            PathToFile = fullPath,
-            Name = Path.GetFileNameWithoutExtension(fullPath),
-            Imported = imported is true
-        };
+        //var entry = new UModEntry
+        //{
+        //    Enabled = this.uModOptions.Value.AutoEnableMods,
+        //    PathToFile = fullPath,
+        //    Name = Path.GetFileNameWithoutExtension(fullPath),
+        //    Imported = imported is true
+        //};
 
-        this.uModOptions.Value.Mods.Add(entry);
-        this.uModOptions.UpdateOption();
+        //this.uModOptions.Value.Mods.Add(entry);
+        //this.uModOptions.UpdateOption();
         return true;
     }
 
     public bool RemoveMod(string pathToTpf)
     {
         var fullPath = Path.GetFullPath(pathToTpf);
-        var mods = this.uModOptions.Value.Mods;
-        var maybeMod = mods.FirstOrDefault(m => m.PathToFile == fullPath);
-        if (maybeMod is null)
-        {
-            return true;
-        }
+        //var mods = this.uModOptions.Value.Mods;
+        //var maybeMod = mods.FirstOrDefault(m => m.PathToFile == fullPath);
+        //if (maybeMod is null)
+        //{
+        //    return true;
+        //}
 
-        mods.Remove(maybeMod);
-        this.SaveMods(mods);
+        //mods.Remove(maybeMod);
+        //this.SaveMods(mods);
 
-        // If the mod was downloaded and managed entirely through Daybreak, we can safely delete it
-        if (!maybeMod.Imported)
-        {
-            File.Delete(fullPath);
-        }
+        //// If the mod was downloaded and managed entirely through Daybreak, we can safely delete it
+        //if (!maybeMod.Imported)
+        //{
+        //    File.Delete(fullPath);
+        //}
 
         return true;
     }
 
     public List<UModEntry> GetMods()
     {
-        return this.uModOptions.Value.Mods;
+        //return this.uModOptions.Value.Mods;
+        return [];
     }
 
     public void SaveMods(List<UModEntry> list)
     {
-        this.uModOptions.Value.Mods = list;
-        this.uModOptions.UpdateOption();
+        //this.uModOptions.Value.Mods = list;
+        //this.uModOptions.UpdateOption();
     }
 
     public Task<IReadOnlyCollection<string>> LoadModsFromDisk(CancellationToken cancellationToken)

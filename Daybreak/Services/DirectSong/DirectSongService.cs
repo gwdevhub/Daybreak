@@ -9,20 +9,20 @@ using Daybreak.Shared.Services.SevenZip;
 using Daybreak.Shared.Utils;
 using Daybreak.Views;
 using Microsoft.Extensions.Logging;
-using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
-using System.IO;
 
 namespace Daybreak.Services.DirectSong;
+
+//TODO: Fix live updateable options usage
 internal sealed class DirectSongService(
     INotificationService notificationService,
     IPrivilegeManager privilegeManager,
     ISevenZipExtractor sevenZipExtractor,
     IDownloadService downloadService,
-    ILiveUpdateableOptions<DirectSongOptions> options,
+    //ILiveUpdateableOptions<DirectSongOptions> options,
     ILogger<DirectSongService> logger) : IDirectSongService
 {
     private const string DownloadUrl = "https://guildwarslegacy.com/DirectSong.7z";
@@ -45,7 +45,7 @@ internal sealed class DirectSongService(
     private readonly IPrivilegeManager privilegeManager = privilegeManager.ThrowIfNull();
     private readonly ISevenZipExtractor sevenZipExtractor = sevenZipExtractor.ThrowIfNull();
     private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
-    private readonly ILiveUpdateableOptions<DirectSongOptions> options = options.ThrowIfNull();
+    //private readonly ILiveUpdateableOptions<DirectSongOptions> options = options.ThrowIfNull();
     private readonly ILogger<DirectSongService> logger = logger.ThrowIfNull();
 
     public string Name => "DirectSong";
@@ -53,15 +53,15 @@ internal sealed class DirectSongService(
     public bool IsVisible => true;
     public bool CanCustomManage => false;
     public bool CanUninstall => true;
-    public bool IsEnabled
-    {
-        get => this.options.Value.Enabled;
-        set
-        {
-            this.options.Value.Enabled = value;
-            this.options.UpdateOption();
-        }
-    }
+    public bool IsEnabled { get; set; }
+    //{
+    //    get => this.options.Value.Enabled;
+    //    set
+    //    {
+    //        this.options.Value.Enabled = value;
+    //        this.options.UpdateOption();
+    //    }
+    //}
     public bool IsInstalled =>
         Directory.Exists(InstallationDirectory) &&
         File.Exists(Path.Combine(Path.GetFullPath(InstallationDirectory), WMVCOREDll)) &&

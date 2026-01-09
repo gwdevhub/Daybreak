@@ -7,7 +7,7 @@
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
     <PackageVersion Include="Daybreak.7ZipExtractor" Version="1.0.0" />
     <PackageVersion Include="DiffPlex" Version="1.9.0" />
-    <PackageVersion Include="Elastic.OpenTelemetry" Version="1.2.1" />
+    <PackageVersion Include="Elastic.OpenTelemetry" Version="1.2.2" />
     <PackageVersion Include="FluentAssertions" Version="8.8.0" />
     <PackageVersion Include="HtmlAgilityPack" Version="1.12.4" />
     <PackageVersion Include="ini-parser-netstandard" Version="2.5.3" />
@@ -28,8 +28,8 @@
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.1" />
     <PackageVersion Include="Microsoft.Fast.Components.FluentUI" Version="3.8.0" />
     <PackageVersion Include="Microsoft.Fast.Components.FluentUI.Icons" Version="3.8.0" />
-    <PackageVersion Include="Microsoft.Identity.Client.Desktop" Version="4.80.0" />
-    <PackageVersion Include="Microsoft.Identity.Client.Extensions.Msal" Version="4.80.0" />
+    <PackageVersion Include="Microsoft.Identity.Client.Desktop" Version="4.81.0" />
+    <PackageVersion Include="Microsoft.Identity.Client.Extensions.Msal" Version="4.81.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageVersion Include="Microsoft.Web.WebView2" Version="1.0.3650.58" />
     <PackageVersion Include="MinHook.NET" Version="1.1.2" />
@@ -64,8 +64,8 @@
     <PackageVersion Include="System.Reflection.Metadata" Version="9.0.10" />
     <PackageVersion Include="System.Text.Json" Version="9.0.10" />
     <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1" />
-    <PackageVersion Include="SystemExtensions.NetCore" Version="1.6.12" />
-    <PackageVersion Include="SystemExtensions.NetStandard.DependencyInjection" Version="1.6.9" />
+    <PackageVersion Include="SystemExtensions.NetCore" Version="1.7.0" />
+    <PackageVersion Include="SystemExtensions.NetStandard.DependencyInjection" Version="1.7.0" />
     <PackageVersion Include="SystemExtensions.NetStandard.Generators" Version="0.1.6" />
     <PackageVersion Include="TrailBlazr" Version="0.3.1" />
     <!-- Pinned. TODO: #1226 New version of Microsoft.AspNetCore.Components.WebView.Wpf is unstable -->

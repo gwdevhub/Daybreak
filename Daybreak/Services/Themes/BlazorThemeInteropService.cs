@@ -6,13 +6,13 @@ using Daybreak.Shared.Services.Themes;
 using Daybreak.Themes;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System.Configuration;
+using Microsoft.Extensions.Options;
 using System.Extensions;
 
 namespace Daybreak.Services.Themes;
 
 public class BlazorThemeInteropService(
-    ILiveOptions<ThemeOptions> themeOptions,
+    IOptionsMonitor<ThemeOptions> themeOptions,
     IOptionsUpdateHook optionsUpdateHook,
     ILogger<BlazorThemeInteropService> logger) : IThemeManager, IThemeProducer, IHostedService
 {
@@ -28,7 +28,7 @@ public class BlazorThemeInteropService(
     private const string PersonalizeKey = @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize";
     private const string AppsUseLightThemeValue = "AppsUseLightTheme";
 
-    private readonly ILiveOptions<ThemeOptions> themeOptions = themeOptions;
+    private readonly IOptionsMonitor<ThemeOptions> themeOptions = themeOptions;
     private readonly IOptionsUpdateHook optionsUpdateHook = optionsUpdateHook;
     private readonly ILogger<BlazorThemeInteropService> logger = logger;
 
@@ -76,7 +76,7 @@ public class BlazorThemeInteropService(
 
     private void OnThemeUpdated()
     {
-        var themeOptions = this.themeOptions.Value;
+        var themeOptions = this.themeOptions.CurrentValue;
         var theme = themeOptions.ApplicationTheme ?? CoreThemes.Daybreak;
         var accentColor = theme.AccentColor;
         var lightMode = theme.Mode is Theme.LightDarkMode.SystemSynchronized 

@@ -17,13 +17,15 @@ using System.IO;
 using System.Net.Http;
 
 namespace Daybreak.Services.Api;
+
+//TODO: Fix updateable options usage
 public sealed class DaybreakApiService(
     IAttachedApiAccessor attachedApiAccessor,
     IMDomainRegistrar mDomainRegistrar,
     IStubInjector stubInjector,
     INotificationService notificationService,
     IHttpClient<ScopedApiContext> scopedApiClient,
-    ILiveUpdateableOptions<FocusViewOptions> liveUpdateableOptions,
+    //ILiveUpdateableOptions<FocusViewOptions> liveUpdateableOptions,
     ILogger<DaybreakApiService> logger,
     ILogger<ScopedApiContext> scopedApiLogger)
     : IDaybreakApiService
@@ -40,7 +42,7 @@ public sealed class DaybreakApiService(
     private readonly IStubInjector stubInjector = stubInjector.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IHttpClient<ScopedApiContext> scopedApiClient = scopedApiClient.ThrowIfNull();
-    private readonly ILiveUpdateableOptions<FocusViewOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
+    //private readonly ILiveUpdateableOptions<FocusViewOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
     private readonly ILogger<DaybreakApiService> logger = logger.ThrowIfNull();
     private readonly ILogger<ScopedApiContext> scopedApiLogger = scopedApiLogger.ThrowIfNull();
 
@@ -48,15 +50,15 @@ public sealed class DaybreakApiService(
 
     public string Description { get; } = "Daybreak API integration with Guild Wars. Gets injected into Guild Wars to enable extended functionality such as loading builds, character switching, and more";
 
-    public bool IsEnabled
-    {
-        get => this.liveUpdateableOptions.Value.Enabled;
-        set
-        {
-            this.liveUpdateableOptions.Value.Enabled = value;
-            this.liveUpdateableOptions.UpdateOption();
-        }
-    }
+    public bool IsEnabled { get; set; }
+    //{
+    //    get => this.liveUpdateableOptions.Value.Enabled;
+    //    set
+    //    {
+    //        this.liveUpdateableOptions.Value.Enabled = value;
+    //        this.liveUpdateableOptions.UpdateOption();
+    //    }
+    //}
 
     public bool IsInstalled => true;
     public bool IsVisible => true;

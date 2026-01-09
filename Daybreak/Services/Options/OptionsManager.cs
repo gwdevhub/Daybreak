@@ -6,15 +6,13 @@ using Daybreak.Shared.Validators;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel;
-using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
-using System.IO;
 using System.Reflection;
 
 namespace Daybreak.Services.Options;
 
-internal sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptionsUpdateHook, IOptionsProvider
+internal sealed class OptionsManager : IOptionsProducer, IOptionsUpdateHook, IOptionsProvider
 {
     private const string OptionsFileSubPath = "Daybreak.options";
 
@@ -224,7 +222,6 @@ internal sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptio
             (var name, var description) = GetNameAndDescription(propertyInfo, optionsName);
             var validator = GetValidator(propertyInfo);
             var possibleValues = GetValuesFactory(propertyInfo);
-            (var hasCustomSetter, var action, var customSetterViewType) = GetCustomSetter(propertyInfo);
             var converter = TypeDescriptor.GetConverter(propertyType);
             var getter = new Func<OptionInstance, object?>(instance => propertyInfo.GetValue(instance.Reference));
             var setter = new Action<OptionInstance, object?>((instance, newValue) =>
@@ -323,11 +320,6 @@ internal sealed class OptionsManager : IOptionsManager, IOptionsProducer, IOptio
         }
 
         return true;
-    }
-
-    private static (bool HasCustomSetter, string? CustomSetterAction, Type? CustomSetterViewType) GetCustomSetter(PropertyInfo propertyInfo)
-    {
-        return (false, default, default);
     }
 
     private static bool IsSynchronizedOption(Type optionType)

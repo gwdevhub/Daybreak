@@ -17,6 +17,7 @@ using System.Text.RegularExpressions;
 
 namespace Daybreak.Services.TradeChat;
 
+//TODO: Fix live updateable options usage
 internal sealed class TradeAlertingService : ITradeAlertingService, IHostedService
 {
     private readonly List<ITradeAlert> tradeAlerts = [];
@@ -25,7 +26,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IHostedServi
     private readonly ITradeHistoryDatabase tradeHistoryDatabase;
     private readonly ITradeChatService<KamadanTradeChatOptions> kamadanTradeChatService;
     private readonly ITradeChatService<AscalonTradeChatOptions> ascalonTradeChatService;
-    private readonly ILiveUpdateableOptions<TradeAlertingOptions> options;
+    //private readonly ILiveUpdateableOptions<TradeAlertingOptions> options;
     private readonly ILogger<TradeAlertingService> logger;
 
     public IEnumerable<ITradeAlert> TradeAlerts => this.tradeAlerts;
@@ -36,7 +37,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IHostedServi
         ITradeHistoryDatabase tradeHistoryDatabase,
         ITradeChatService<KamadanTradeChatOptions> kamadanTradeChatService,
         ITradeChatService<AscalonTradeChatOptions> ascalonTradeChatService,
-        ILiveUpdateableOptions<TradeAlertingOptions> options,
+        //ILiveUpdateableOptions<TradeAlertingOptions> options,
         ILogger<TradeAlertingService> logger)
     {
         this.traderQuoteService = traderQuoteService.ThrowIfNull();
@@ -44,9 +45,9 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IHostedServi
         this.tradeHistoryDatabase = tradeHistoryDatabase.ThrowIfNull();
         this.kamadanTradeChatService = kamadanTradeChatService.ThrowIfNull();
         this.ascalonTradeChatService = ascalonTradeChatService.ThrowIfNull();
-        this.options = options.ThrowIfNull();
+        //this.options = options.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
-        this.tradeAlerts = this.options.Value.Alerts ?? [];
+        //this.tradeAlerts = this.options.Value.Alerts ?? [];
     }
 
     Task IHostedService.StartAsync(CancellationToken cancellationToken)
@@ -97,39 +98,39 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IHostedServi
 
     private async Task StartAlertingService(CancellationToken cancellationToken)
     {
-        var lastCheckTime = this.options.Value.LastCheckTime;
-        var timeSinceLastCheckTime = DateTime.UtcNow - lastCheckTime;
-        if (timeSinceLastCheckTime > this.options.Value.MaxLookbackPeriod)
-        {
-            timeSinceLastCheckTime = this.options.Value.MaxLookbackPeriod;
-        }
+        //var lastCheckTime = this.options.Value.LastCheckTime;
+        //var timeSinceLastCheckTime = DateTime.UtcNow - lastCheckTime;
+        //if (timeSinceLastCheckTime > this.options.Value.MaxLookbackPeriod)
+        //{
+        //    timeSinceLastCheckTime = this.options.Value.MaxLookbackPeriod;
+        //}
 
-        this.options.Value.LastCheckTime = DateTime.UtcNow;
-        this.options.UpdateOption();
-        var savedTrades = await this.tradeHistoryDatabase.GetTraderMessagesSinceTime(DateTime.UtcNow - timeSinceLastCheckTime, cancellationToken);
-        if (savedTrades.None())
-        {
-            var kamadanHistoryTradesTask = GetTraderMessages(this.kamadanTradeChatService, TraderSource.Kamadan, DateTime.UtcNow - timeSinceLastCheckTime, cancellationToken);
-            var ascalonHistoryTradesTask = GetTraderMessages(this.ascalonTradeChatService, TraderSource.Kamadan, DateTime.UtcNow - timeSinceLastCheckTime, cancellationToken);
-            await Task.WhenAll(kamadanHistoryTradesTask, ascalonHistoryTradesTask);
-            var kamadanHistoryTrades = await kamadanHistoryTradesTask;
-            var ascalonHistoryTrades = await ascalonHistoryTradesTask;
-            savedTrades = [.. kamadanHistoryTrades, .. ascalonHistoryTrades];
-            foreach (var trade in savedTrades)
-            {
-                await this.tradeHistoryDatabase.StoreTraderMessage(trade, cancellationToken);
-            }
-        }
+        //this.options.Value.LastCheckTime = DateTime.UtcNow;
+        //this.options.UpdateOption();
+        //var savedTrades = await this.tradeHistoryDatabase.GetTraderMessagesSinceTime(DateTime.UtcNow - timeSinceLastCheckTime, cancellationToken);
+        //if (savedTrades.None())
+        //{
+        //    var kamadanHistoryTradesTask = GetTraderMessages(this.kamadanTradeChatService, TraderSource.Kamadan, DateTime.UtcNow - timeSinceLastCheckTime, cancellationToken);
+        //    var ascalonHistoryTradesTask = GetTraderMessages(this.ascalonTradeChatService, TraderSource.Kamadan, DateTime.UtcNow - timeSinceLastCheckTime, cancellationToken);
+        //    await Task.WhenAll(kamadanHistoryTradesTask, ascalonHistoryTradesTask);
+        //    var kamadanHistoryTrades = await kamadanHistoryTradesTask;
+        //    var ascalonHistoryTrades = await ascalonHistoryTradesTask;
+        //    savedTrades = [.. kamadanHistoryTrades, .. ascalonHistoryTrades];
+        //    foreach (var trade in savedTrades)
+        //    {
+        //        await this.tradeHistoryDatabase.StoreTraderMessage(trade, cancellationToken);
+        //    }
+        //}
 
-        foreach (var trade in savedTrades)
-        {
-            this.CheckTrade(trade);
-        }
+        //foreach (var trade in savedTrades)
+        //{
+        //    this.CheckTrade(trade);
+        //}
 
-        await Task.WhenAll(
-            new TaskFactory().StartNew(() => this.CheckTraderQuotes(cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap(),
-            new TaskFactory().StartNew(() => this.CheckLiveTrades(this.kamadanTradeChatService, TraderSource.Kamadan, cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap(),
-            new TaskFactory().StartNew(() => this.CheckLiveTrades(this.ascalonTradeChatService, TraderSource.Ascalon, cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap());
+        //await Task.WhenAll(
+        //    new TaskFactory().StartNew(() => this.CheckTraderQuotes(cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap(),
+        //    new TaskFactory().StartNew(() => this.CheckLiveTrades(this.kamadanTradeChatService, TraderSource.Kamadan, cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap(),
+        //    new TaskFactory().StartNew(() => this.CheckLiveTrades(this.ascalonTradeChatService, TraderSource.Ascalon, cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap());
     }
 
     private async Task CheckLiveTrades<T>(ITradeChatService<T> tradeChatService, TraderSource traderSource, CancellationToken cancellationToken)
@@ -153,51 +154,51 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IHostedServi
 
     private async Task CheckTraderQuotes(CancellationToken cancellationToken)
     {
-        while (!cancellationToken.IsCancellationRequested)
-        {
+        //while (!cancellationToken.IsCancellationRequested)
+        //{
 
-            if (this.tradeAlerts.OfType<QuoteAlert>().None(q => q.Enabled))
-            {
-                await Task.Delay(TimeSpan.FromSeconds(this.options.Value.QuoteAlertsInterval), cancellationToken);
-                continue;
-            }
+        //    if (this.tradeAlerts.OfType<QuoteAlert>().None(q => q.Enabled))
+        //    {
+        //        await Task.Delay(TimeSpan.FromSeconds(this.options.Value.QuoteAlertsInterval), cancellationToken);
+        //        continue;
+        //    }
 
-            var buyQuotes = await this.traderQuoteService.GetBuyQuotes(cancellationToken);
-            var sellQuotes = await this.traderQuoteService.GetSellQuotes(cancellationToken);
-            var matches = new List<(TraderQuote Quote, QuoteAlert Alert, int TargetPrice)>();
-            foreach (var alert in this.tradeAlerts.OfType<QuoteAlert>())
-            {
-                var maybeQuote = alert.TraderQuoteType is TraderQuoteType.Buy ?
-                    buyQuotes.FirstOrDefault(q => q.Item?.Id == alert.ItemId) :
-                    sellQuotes.FirstOrDefault(q => q.Item?.Id == alert.ItemId);
-                if (maybeQuote is null)
-                {
-                    continue;
-                }
+        //    var buyQuotes = await this.traderQuoteService.GetBuyQuotes(cancellationToken);
+        //    var sellQuotes = await this.traderQuoteService.GetSellQuotes(cancellationToken);
+        //    var matches = new List<(TraderQuote Quote, QuoteAlert Alert, int TargetPrice)>();
+        //    foreach (var alert in this.tradeAlerts.OfType<QuoteAlert>())
+        //    {
+        //        var maybeQuote = alert.TraderQuoteType is TraderQuoteType.Buy ?
+        //            buyQuotes.FirstOrDefault(q => q.Item?.Id == alert.ItemId) :
+        //            sellQuotes.FirstOrDefault(q => q.Item?.Id == alert.ItemId);
+        //        if (maybeQuote is null)
+        //        {
+        //            continue;
+        //        }
 
-                if (maybeQuote.Price >= alert.UpperPriceTarget &&
-                    alert.UpperPriceTargetEnabled)
-                {
-                    matches.Add((maybeQuote, alert, alert.UpperPriceTarget));
-                }
-                else if (maybeQuote.Price <= alert.LowerPriceTarget &&
-                    alert.LowerPriceTargetEnabled)
-                {
-                    matches.Add((maybeQuote, alert, alert.LowerPriceTarget));
-                }
-            }
+        //        if (maybeQuote.Price >= alert.UpperPriceTarget &&
+        //            alert.UpperPriceTargetEnabled)
+        //        {
+        //            matches.Add((maybeQuote, alert, alert.UpperPriceTarget));
+        //        }
+        //        else if (maybeQuote.Price <= alert.LowerPriceTarget &&
+        //            alert.LowerPriceTargetEnabled)
+        //        {
+        //            matches.Add((maybeQuote, alert, alert.LowerPriceTarget));
+        //        }
+        //    }
 
-            if (matches.Count > 0)
-            {
-                var description = string.Join('\n', matches.Select(m => $"[{m.Quote.Item?.Name}] Target: {ConvertPriceToString(m.TargetPrice)}, Current: {ConvertPriceToString(m.Quote.Price)}"));
-                this.notificationService.NotifyInformation(
-                    title: "Quote alert!",
-                    description: description,
-                    expirationTime: DateTime.Now + TimeSpan.FromSeconds(15));
-            }
+        //    if (matches.Count > 0)
+        //    {
+        //        var description = string.Join('\n', matches.Select(m => $"[{m.Quote.Item?.Name}] Target: {ConvertPriceToString(m.TargetPrice)}, Current: {ConvertPriceToString(m.Quote.Price)}"));
+        //        this.notificationService.NotifyInformation(
+        //            title: "Quote alert!",
+        //            description: description,
+        //            expirationTime: DateTime.Now + TimeSpan.FromSeconds(15));
+        //    }
 
-            await Task.Delay(TimeSpan.FromSeconds(this.options.Value.QuoteAlertsInterval), cancellationToken);
-        }
+        //    await Task.Delay(TimeSpan.FromSeconds(this.options.Value.QuoteAlertsInterval), cancellationToken);
+        //}
     }
 
     private void CheckTrade(TraderMessageDTO traderMessageDTO)
@@ -229,8 +230,8 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IHostedServi
 
     private void SaveTradeAlerts()
     {
-        this.options.Value.Alerts = this.tradeAlerts;
-        this.options.UpdateOption();
+        //this.options.Value.Alerts = this.tradeAlerts;
+        //this.options.UpdateOption();
     }
 
     private void NotifyAlertMatch(TraderMessageDTO traderMessageDTO, TradeAlert alert)

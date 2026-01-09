@@ -1,23 +1,22 @@
 ﻿using Daybreak.Shared.Models;
-using Daybreak.Shared.Services.Logging;
 using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using Newtonsoft.Json;
-using System.Extensions;
-using System.IO;
 using System.IO.Compression;
 using TrailBlazr.ViewModels;
 
 namespace Daybreak.Views;
+
+//TODO: Fix logs manager usage
 public sealed class LogsViewModel(
     INotificationService notificationService,
-    ILogsManager logsManager,
+    //ILogsManager logsManager,
     ILogger<LogsViewModel> logger)
     : ViewModelBase<LogsViewModel, LogsView>
 {
     private readonly INotificationService notificationService = notificationService;
-    private readonly ILogsManager logsManager = logsManager;
+    //private readonly ILogsManager logsManager = logsManager;
     private readonly ILogger<LogsViewModel> logger = logger;
     private readonly SemaphoreSlim semaphore = new(1, 1);
     private readonly List<Log> logs = [];
@@ -47,14 +46,14 @@ public sealed class LogsViewModel(
     {
         if (!this.attached)
         {
-            this.logsManager.ReceivedLog += this.LogsManager_ReceivedLog;
+            //this.logsManager.ReceivedLog += this.LogsManager_ReceivedLog;
             this.attached = true;
         }
 
         await this.semaphore.WaitAsync(cancellationToken);
         try
         {
-            this.logs.ClearAnd().AddRange(this.logsManager.GetLogs().Where(l => l is not null && l.LogLevel > Microsoft.Extensions.Logging.LogLevel.Debug && l.LogLevel != Microsoft.Extensions.Logging.LogLevel.None));
+            //this.logs.ClearAnd().AddRange(this.logsManager.GetLogs().Where(l => l is not null && l.LogLevel > Microsoft.Extensions.Logging.LogLevel.Debug && l.LogLevel != Microsoft.Extensions.Logging.LogLevel.None));
             await base.ParametersSet(view, cancellationToken);
         }
         finally
@@ -90,7 +89,7 @@ public sealed class LogsViewModel(
         await this.RefreshViewAsync();
         var serializedLogsTask = Task.Factory.StartNew(() =>
         {
-            var logs = this.logsManager.GetLogs();
+            //var logs = this.logsManager.GetLogs();
             return JsonConvert.SerializeObject(logs, Formatting.Indented);
         }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
@@ -170,7 +169,7 @@ public sealed class LogsViewModel(
     {
         if (disposing)
         {
-            this.logsManager.ReceivedLog -= this.LogsManager_ReceivedLog;
+            //this.logsManager.ReceivedLog -= this.LogsManager_ReceivedLog;
             this.semaphore.Dispose();
         }
 

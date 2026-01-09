@@ -11,14 +11,12 @@ using Daybreak.Shared.Services.Updater.PostUpdate;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System.Configuration;
+using Microsoft.Extensions.Options;
 using System.Core.Extensions;
 using System.Data;
 using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
-using System.IO;
-using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
 
@@ -29,7 +27,7 @@ internal sealed class ApplicationUpdater(
     IRegistryService registryService,
     IDownloadService downloadService,
     IPostUpdateActionProvider postUpdateActionProvider,
-    ILiveOptions<LauncherOptions> liveOptions,
+    IOptionsMonitor<LauncherOptions> liveOptions,
     IHttpClient<ApplicationUpdater> httpClient,
     ILogger<ApplicationUpdater> logger) : IApplicationUpdater, IHostedService
 {
@@ -63,7 +61,7 @@ internal sealed class ApplicationUpdater(
     private readonly IRegistryService registryService = registryService.ThrowIfNull();
     private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
     private readonly IPostUpdateActionProvider postUpdateActionProvider = postUpdateActionProvider.ThrowIfNull();
-    private readonly ILiveOptions<LauncherOptions> liveOptions = liveOptions.ThrowIfNull();
+    private readonly IOptionsMonitor<LauncherOptions> liveOptions = liveOptions.ThrowIfNull();
     private readonly IHttpClient<ApplicationUpdater> httpClient = httpClient.ThrowIfNull();
     private readonly ILogger<ApplicationUpdater> logger = logger.ThrowIfNull();
 
@@ -81,7 +79,7 @@ internal sealed class ApplicationUpdater(
         {
             try
             {
-                if (this.liveOptions.Value.AutoCheckUpdate is false)
+                if (this.liveOptions.CurrentValue.AutoCheckUpdate is false)
                 {
                     return;
                 }
@@ -116,7 +114,7 @@ internal sealed class ApplicationUpdater(
     public IProgressAsyncOperation<bool> DownloadUpdate(Version version, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: version.ToString());
-        if (!this.liveOptions.Value.BetaUpdate)
+        if (!this.liveOptions.CurrentValue.BetaUpdate)
         {
             return ProgressAsyncOperation.Create(async progress =>
             {

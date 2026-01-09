@@ -8,14 +8,15 @@ using System.Extensions;
 using System.IO;
 
 namespace Daybreak.Services.ExecutableManagement;
+//TODO: Fix live updateable options usage
 internal sealed class GuildWarsExecutableManager(
-    ILiveUpdateableOptions<GuildwarsExecutableOptions> liveUpdateableOptions,
+    //ILiveUpdateableOptions<GuildwarsExecutableOptions> liveUpdateableOptions,
     ILogger<GuildWarsExecutableManager> logger) : IGuildWarsExecutableManager, IHostedService
 {
     private readonly static TimeSpan ExecutableVerificationLatency = TimeSpan.FromSeconds(5);
     private readonly static SemaphoreSlim ExecutablesSemaphore = new(1, 1);
 
-    private readonly ILiveUpdateableOptions<GuildwarsExecutableOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
+    //private readonly ILiveUpdateableOptions<GuildwarsExecutableOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
     private readonly ILogger<GuildWarsExecutableManager> logger = logger.ThrowIfNull();
 
     async Task IHostedService.StartAsync(CancellationToken cancellationToken)
@@ -32,10 +33,11 @@ internal sealed class GuildWarsExecutableManager(
     {
         ExecutablesSemaphore.Wait();
 
-        var list = this.liveUpdateableOptions.Value.ExecutablePaths.Where(this.IsValidExecutable).ToList();
+        //var list = this.liveUpdateableOptions.Value.ExecutablePaths.Where(this.IsValidExecutable).ToList();
         ExecutablesSemaphore.Release();
 
-        return list;
+        //return list;
+        return [];
     }
 
     public void AddExecutable(string executablePath)
@@ -43,14 +45,14 @@ internal sealed class GuildWarsExecutableManager(
         var fullPath = Path.GetFullPath(executablePath);
         ExecutablesSemaphore.Wait();
 
-        var list = this.liveUpdateableOptions.Value.ExecutablePaths;
-        if (list.None(e => e == executablePath))
-        {
-            list.Insert(0, executablePath);
-        }
+        //var list = this.liveUpdateableOptions.Value.ExecutablePaths;
+        //if (list.None(e => e == executablePath))
+        //{
+        //    list.Insert(0, executablePath);
+        //}
 
-        this.liveUpdateableOptions.Value.ExecutablePaths = list;
-        this.liveUpdateableOptions.UpdateOption();
+        //this.liveUpdateableOptions.Value.ExecutablePaths = list;
+        //this.liveUpdateableOptions.UpdateOption();
         ExecutablesSemaphore.Release();
     }
 
@@ -59,14 +61,14 @@ internal sealed class GuildWarsExecutableManager(
         var fullPath = Path.GetFullPath(executablePath);
         ExecutablesSemaphore.Wait();
 
-        var list = this.liveUpdateableOptions.Value.ExecutablePaths;
-        if (list.Any(e => e == executablePath))
-        {
-            list.Remove(executablePath);
-        }
+        //var list = this.liveUpdateableOptions.Value.ExecutablePaths;
+        //if (list.Any(e => e == executablePath))
+        //{
+        //    list.Remove(executablePath);
+        //}
 
-        this.liveUpdateableOptions.Value.ExecutablePaths = list;
-        this.liveUpdateableOptions.UpdateOption();
+        //this.liveUpdateableOptions.Value.ExecutablePaths = list;
+        //this.liveUpdateableOptions.UpdateOption();
         ExecutablesSemaphore.Release();
     }
 
@@ -82,27 +84,27 @@ internal sealed class GuildWarsExecutableManager(
         {
             await ExecutablesSemaphore.WaitAsync(cancellationToken);
 
-            var executables = this.liveUpdateableOptions.Value.ExecutablePaths;
-            var deletedExecutable = false;
-            for(var i = 0; i < executables.Count; i++)
-            {
-                var executable = executables[i];
-                if (IsValidExecutableInternal(executable))
-                {
-                    continue;
-                }
+            //var executables = this.liveUpdateableOptions.Value.ExecutablePaths;
+            //var deletedExecutable = false;
+            //for(var i = 0; i < executables.Count; i++)
+            //{
+            //    var executable = executables[i];
+            //    if (IsValidExecutableInternal(executable))
+            //    {
+            //        continue;
+            //    }
 
-                scopedLogger.LogWarning($"Detected deleted executable at {executable}");
-                deletedExecutable = true;
-                executables.Remove(executable);
-                i--;
-            }
+            //    scopedLogger.LogWarning($"Detected deleted executable at {executable}");
+            //    deletedExecutable = true;
+            //    executables.Remove(executable);
+            //    i--;
+            //}
 
-            if (deletedExecutable)
-            {
-                this.liveUpdateableOptions.Value.ExecutablePaths = executables;
-                this.liveUpdateableOptions.UpdateOption();
-            }
+            //if (deletedExecutable)
+            //{
+            //    this.liveUpdateableOptions.Value.ExecutablePaths = executables;
+            //    this.liveUpdateableOptions.UpdateOption();
+            //}
 
             ExecutablesSemaphore.Release();
             await Task.Delay(ExecutableVerificationLatency, cancellationToken);

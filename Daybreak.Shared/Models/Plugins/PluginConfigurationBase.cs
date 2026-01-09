@@ -12,9 +12,7 @@ using Daybreak.Shared.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http.Logging;
 using Microsoft.Extensions.Logging;
-using Slim;
 using System.Core.Extensions;
-using System.Net.Http;
 using System.Net.Http.Headers;
 
 namespace Daybreak.Shared.Models.Plugins;
@@ -24,7 +22,6 @@ public abstract class PluginConfigurationBase
     private const string DaybreakUserAgent = "Daybreak";
     private const string ChromeImpersonationUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.79";
 
-    public virtual void RegisterResolvers(IServiceManager serviceManager) { }
     public virtual void RegisterServices(IServiceCollection services) { }
     public virtual void RegisterViews(IViewProducer viewProducer) { }
     public virtual void RegisterStartupActions(IStartupActionProducer startupActionProducer) { }

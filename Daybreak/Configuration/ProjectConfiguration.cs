@@ -73,7 +73,6 @@ using Daybreak.Shared.Services.Guildwars;
 using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.InternetChecker;
 using Daybreak.Shared.Services.LaunchConfigurations;
-using Daybreak.Shared.Services.Logging;
 using Daybreak.Shared.Services.MDns;
 using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Metrics;
@@ -111,7 +110,6 @@ using Microsoft.Fast.Components.FluentUI;
 using Microsoft.Identity.Client;
 using Microsoft.Identity.Client.Desktop;
 using OpenTelemetry.Resources;
-using Slim;
 using TrailBlazr.Extensions;
 using TrailBlazr.Services;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
@@ -121,15 +119,6 @@ namespace Daybreak.Configuration;
 public class ProjectConfiguration : PluginConfigurationBase
 {
     public static readonly Version CurrentVersion = Version.Parse(Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? throw new InvalidOperationException("Unable to get current version"));
-
-    public override void RegisterResolvers(IServiceManager serviceManager)
-    {
-        serviceManager.ThrowIfNull();
-
-        serviceManager.RegisterOptionsManager<OptionsManager>();
-        serviceManager.RegisterResolver(new LoggerResolver());
-        serviceManager.RegisterResolver(new ClientWebSocketResolver());
-    }
 
     public override void RegisterServices(IServiceCollection services)
     {
@@ -172,9 +161,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         });
 
         services.AddSingleton<SwappableLoggerProvider>();
-        services.AddSingleton<ILogsManager, JsonLogsManager>();
-        services.AddSingleton<IConsoleLogsWriter, ConsoleLogsWriter>();
-        services.AddSingleton<IEventViewerLogsWriter, EventViewerLogsWriter>();
         services.AddSingleton<ILoggerFactory, ILoggerFactory>(sp =>
         {
             var swappableLoggerProvider = sp.GetRequiredService<SwappableLoggerProvider>();
@@ -182,17 +168,12 @@ public class ProjectConfiguration : PluginConfigurationBase
             {
                 logging.ClearProviders();
                 logging.SetMinimumLevel(LogLevel.Trace);
-                logging.AddProvider(new CVLoggerProvider(sp.GetRequiredService<ILogsWriter>()));
                 logging.AddProvider(swappableLoggerProvider);
                 logging.AddFilter<SwappableLoggerProvider>(static (_, level) => level >= LogLevel.Warning);
             });
 
             return factory;
         });
-        services.AddSingleton<ILogsWriter, CompositeLogsWriter>(sp => new CompositeLogsWriter(
-            sp.GetRequiredService<ILogsManager>(),
-            sp.GetRequiredService<IConsoleLogsWriter>(),
-            sp.GetRequiredService<IEventViewerLogsWriter>()));
 
         services.AddScoped((sp) => new ScopeMetadata(new CorrelationVector()));
         services.AddSingleton(sp =>
@@ -225,9 +206,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IShortcutManager, ShortcutManager>();
         services.AddSingleton<IMetricsService, MetricsService>();
         services.AddSingleton<IStartupActionProducer, StartupActionManager>();
-        services.AddSingleton<IOptionsProducer, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().Cast<OptionsManager>());
-        services.AddSingleton<IOptionsUpdateHook, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().Cast<OptionsManager>());
-        services.AddSingleton<IOptionsProvider, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().Cast<OptionsManager>());
         services.AddSingleton<IThemeManager, BlazorThemeInteropService>();
         services.AddSingleton<IThemeProducer, BlazorThemeInteropService>(sp => sp.GetRequiredService<IThemeManager>().Cast<BlazorThemeInteropService>());
         services.AddSingleton<INotificationService, NotificationService>();

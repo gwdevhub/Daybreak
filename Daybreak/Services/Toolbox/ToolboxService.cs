@@ -12,23 +12,22 @@ using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Toolbox;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
-using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
-using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Daybreak.Services.Toolbox;
 
+//TODO: Fix live updateable options usage
 internal sealed class ToolboxService(
     IBuildTemplateManager buildTemplateManager,
     INotificationService notificationService,
     IProcessInjector processInjector,
     IToolboxClient toolboxClient,
-    ILiveUpdateableOptions<ToolboxOptions> toolboxOptions,
+    //ILiveUpdateableOptions<ToolboxOptions> toolboxOptions,
     ILogger<ToolboxService> logger) : IToolboxService
 {
     private const string ToolboxDllName = "GWToolboxdll.dll";
@@ -49,7 +48,7 @@ internal sealed class ToolboxService(
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IProcessInjector processInjector = processInjector.ThrowIfNull();
     private readonly IToolboxClient toolboxClient = toolboxClient.ThrowIfNull();
-    private readonly ILiveUpdateableOptions<ToolboxOptions> toolboxOptions = toolboxOptions.ThrowIfNull();
+    //private readonly ILiveUpdateableOptions<ToolboxOptions> toolboxOptions = toolboxOptions.ThrowIfNull();
     private readonly ILogger<ToolboxService> logger = logger.ThrowIfNull();
 
     public string Name => "GWToolbox";
@@ -57,15 +56,15 @@ internal sealed class ToolboxService(
     public bool IsVisible => true;
     public bool CanCustomManage => false;
     public bool CanUninstall => true;
-    public bool IsEnabled
-    {
-        get => this.toolboxOptions.Value.Enabled;
-        set
-        {
-            this.toolboxOptions.Value.Enabled = value;
-            this.toolboxOptions.UpdateOption();
-        }
-    }
+    public bool IsEnabled { get; set; }
+    //{
+    //    get => this.toolboxOptions.Value.Enabled;
+    //    set
+    //    {
+    //        this.toolboxOptions.Value.Enabled = value;
+    //        this.toolboxOptions.UpdateOption();
+    //    }
+    //}
     public bool IsInstalled => File.Exists(UsualToolboxLocation);
 
     public Task<bool> IsUpdateAvailable(CancellationToken cancellationToken)
@@ -356,7 +355,7 @@ internal sealed class ToolboxService(
     private async Task LaunchToolbox(Process process, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        if (this.toolboxOptions.Value.Enabled is false)
+        if (this.IsEnabled is false)
         {
             scopedLogger.LogDebug("Toolbox disabled");
             return;

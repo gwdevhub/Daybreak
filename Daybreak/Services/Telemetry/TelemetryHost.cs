@@ -47,7 +47,7 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
     private readonly ILoggerFactory loggerFactory;
     private readonly SwappableLoggerProvider swappableLoggerProvider;
     private readonly IViewManager viewManager;
-    private readonly ILiveOptions<TelemetryOptions> options;
+    private readonly IOptionsMonitor<TelemetryOptions> options;
     private readonly IOptionsMonitor<OpenTelemetryLoggerOptions> logOptions;
 
     private TracerProvider? tracer;
@@ -61,7 +61,7 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
         ILoggerFactory loggerFactory,
         SwappableLoggerProvider swappableLoggerProvider,
         IViewManager viewManager,
-        ILiveOptions<TelemetryOptions> liveOptions)
+        IOptionsMonitor<TelemetryOptions> liveOptions)
     {
         this.resourceBuilder = resourceBuilder.ThrowIfNull();
         this.options = liveOptions.ThrowIfNull();
@@ -162,7 +162,7 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
         this.logger?.Dispose();
         this.logger = default;
 
-        if (!this.options.Value.Enabled)
+        if (!this.options.CurrentValue.Enabled)
         {
             return;
         }
