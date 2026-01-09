@@ -1,15 +1,12 @@
 ﻿using Daybreak.Services.Notifications.Handlers;
-using Daybreak.Shared;
 using Daybreak.Shared.Exceptions;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
-using Microsoft.Web.WebView2.Core;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
-using System.IO;
 using System.Logging;
 using System.Reflection;
 using System.Runtime.InteropServices;

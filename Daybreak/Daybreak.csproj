@@ -14,11 +14,21 @@
     <UserSecretsId>cfb2a489-db80-448d-a969-80270f314c46</UserSecretsId>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-    <!-- Disable static web assets to prevent duplicate asset conflicts -->
-    <!-- This is a desktop app using Photino/embedded file provider, not a web server -->
+    <!-- Disable static web assets completely - this is a desktop app using Photino/embedded file provider -->
     <StaticWebAssetsBuildEnabled>false</StaticWebAssetsBuildEnabled>
     <GenerateStaticWebAssetsManifest>false</GenerateStaticWebAssetsManifest>
+    <GenerateStaticWebAssetsDevelopmentManifest>false</GenerateStaticWebAssetsDevelopmentManifest>
+    <ResolveStaticWebAssetsInputsDependsOn></ResolveStaticWebAssetsInputsDependsOn>
+    <UseRazorBuildServer>false</UseRazorBuildServer>
   </PropertyGroup>
+
+  <!-- Clear all static web assets to prevent SDK bugs in .NET 10 -->
+  <Target Name="ClearStaticWebAssets" BeforeTargets="GenerateStaticWebAssetsDevelopmentManifest;GenerateStaticWebAssetsManifest;ResolveStaticWebAssetsInputs">
+    <ItemGroup>
+      <StaticWebAsset Remove="@(StaticWebAsset)" />
+      <StaticWebAssetEndpoint Remove="@(StaticWebAssetEndpoint)" />
+    </ItemGroup>
+  </Target>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <StripSymbols>true</StripSymbols>
@@ -47,7 +57,6 @@
     <PackageReference Include="Microsoft.Identity.Client.Desktop" />
     <PackageReference Include="Microsoft.Identity.Client.Extensions.Msal" />
     <PackageReference Include="Microsoft.AspNetCore.Components" />
-    <PackageReference Include="Microsoft.Web.WebView2" />
     <PackageReference Include="OpenTelemetry.Exporter.Console" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" />
@@ -62,6 +71,10 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
     <PackageReference Include="SevenZipExtractor" />
+    <!-- Exclude WPF assets from WebView2 to avoid WindowsBase version conflict (MSB3277) -->
+    <PackageReference Include="Microsoft.Web.WebView2" ExcludeAssets="buildTransitive" PrivateAssets="all">
+      <IncludeAssets>runtime; compile; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

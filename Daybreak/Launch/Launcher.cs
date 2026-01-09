@@ -1,6 +1,10 @@
 ﻿using Daybreak.Shared.Utils;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("Daybreak.Tests")]
 
 namespace Daybreak.Launch;
+
 public static class Launcher
 {
     //public static WpfLauncher Instance { get; private set; } = default!;
