@@ -4,6 +4,7 @@ using Daybreak.Shared.Converters;
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.Events;
 using Daybreak.Shared.Services.Notifications;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Configuration;
 using System.Core.Extensions;
@@ -14,29 +15,30 @@ internal sealed class EventNotifierService(
     IEventService eventService,
     INotificationService notificationService,
     ILiveOptions<EventNotifierOptions> liveOptions,
-    ILogger<IEventNotifierService> logger) : IEventNotifierService
+    ILogger<IEventNotifierService> logger) : IEventNotifierService, IHostedService
 {
     private readonly IEventService eventService = eventService.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly ILiveOptions<EventNotifierOptions> liveOptions = liveOptions.ThrowIfNull();
     private readonly ILogger<IEventNotifierService> logger = logger.ThrowIfNull();
 
-    public void OnClosing()
-    {
-    }
-
-    public async void OnStartup()
+    async Task IHostedService.StartAsync(CancellationToken cancellationToken)
     {
         if (!this.liveOptions.Value.Enabled)
         {
             return;
         }
 
-        await Task.Delay(5000);
-        foreach(var e in this.eventService.GetCurrentActiveEvents())
+        await Task.Delay(5000, cancellationToken);
+        foreach (var e in this.eventService.GetCurrentActiveEvents())
         {
             this.notificationService.NotifyInformation<NavigateToCalendarViewHandler>(e.Title!, $"{GetRemainingTime(e)}\n{e.Description!}", expirationTime: DateTime.Now + TimeSpan.FromSeconds(15), metaData: e.Title);
         }
+    }
+
+    Task IHostedService.StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
     }
 
     private static string? GetRemainingTime(Event e)

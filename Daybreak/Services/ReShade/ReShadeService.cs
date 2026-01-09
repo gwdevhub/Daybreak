@@ -14,6 +14,7 @@ using Daybreak.Shared.Utils;
 using Daybreak.Views.Mods;
 using HtmlAgilityPack;
 using IniParser.Parser;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System.Configuration;
@@ -25,7 +26,6 @@ using System.Extensions.Core;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
-using System.Windows.Extensions.Services;
 using TrailBlazr.Services;
 
 namespace Daybreak.Services.ReShade;
@@ -36,7 +36,7 @@ internal sealed class ReShadeService(
     IHttpClient<ReShadeService> httpClient,
     IDownloadService downloadService,
     IViewManager viewManager,
-    ILogger<ReShadeService> logger) : IReShadeService, IApplicationLifetimeService
+    ILogger<ReShadeService> logger) : IReShadeService, IHostedService
 {
     private const string PackagesIniUrl = "https://raw.githubusercontent.com/crosire/reshade-shaders/list/EffectPackages.ini";
     private const string ReShadeHomepageUrl = "https://reshade.me";
@@ -99,25 +99,21 @@ internal sealed class ReShadeService(
                                File.Exists(ConfigIniPath);
     public bool CanUninstall => true;
 
-    public void OnStartup()
+    async Task IHostedService.StartAsync(CancellationToken cancellationToken)
     {
-        Task.Factory.StartNew(async () =>
+        try
         {
-            try
-            {
-                await this.CheckUpdates();
-            }
-            catch (Exception e)
-            {
-                this.logger.LogError(e, "Encountered exception while checking for updates");
-            }
-
-            await Task.Delay(TimeSpan.FromMinutes(60));
-        }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+            await this.CheckUpdates(cancellationToken);
+        }
+        catch (Exception e)
+        {
+            this.logger.LogError(e, "Encountered exception while checking for updates on startup");
+        }
     }
 
-    public void OnClosing()
+    Task IHostedService.StopAsync(CancellationToken cancellationToken)
     {
+        return Task.CompletedTask;
     }
 
     public IProgressAsyncOperation<bool> PerformUninstallation(CancellationToken cancellationToken)
@@ -681,7 +677,7 @@ internal sealed class ReShadeService(
         Directory.CreateSymbolicLink(destination, SourcePresetsFolderPath);
     }
 
-    private async Task CheckUpdates()
+    private async Task CheckUpdates(CancellationToken cancellationToken)
     {
         if (!this.IsInstalled)
         {
@@ -694,7 +690,7 @@ internal sealed class ReShadeService(
         }
 
         var scopedLogger = this.logger.CreateScopedLogger();
-        var version = await this.GetLatestVersion(CancellationToken.None);
+        var version = await this.GetLatestVersion(cancellationToken);
         if (this.GetCurrentVersion() is not Version currentVersion ||
             currentVersion.CompareTo(version) >= 0)
         {
@@ -707,7 +703,7 @@ internal sealed class ReShadeService(
                 "Updating ReShade",
                 $"Updating ReShade to version {version}");
 
-        if (await this.SetupReShade(new Progress<ProgressUpdate>(), CancellationToken.None))
+        if (await this.SetupReShade(new Progress<ProgressUpdate>(), cancellationToken))
         {
             notificationToken.Cancel();
             scopedLogger.LogDebug($"ReShade updated to version {version}");

@@ -43,6 +43,7 @@
     <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.14.0" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.14.0" />
     <PackageVersion Include="PeNet" Version="5.1.0" />
+    <PackageVersion Include="Photino.Blazor" Version="4.0.13" />
     <PackageVersion Include="Plumsy" Version="1.2.0" />
     <PackageVersion Include="Reloaded.Assembler" Version="1.0.16" />
     <PackageVersion Include="securifybv.ShellLink" Version="0.1.0" />

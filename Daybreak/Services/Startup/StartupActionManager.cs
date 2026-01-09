@@ -1,26 +1,22 @@
 ﻿using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Startup;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Slim;
 using System.Core.Extensions;
-using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.Startup;
 
 internal sealed class StartupActionManager(
     IServiceManager serviceManager,
-    ILogger<StartupActionManager> logger) : IStartupActionProducer, IApplicationLifetimeService
+    ILogger<StartupActionManager> logger) : IStartupActionProducer, IHostedService
 {
     private readonly IServiceManager serviceManager = serviceManager.ThrowIfNull();
     private readonly ILogger<StartupActionManager> logger = logger.ThrowIfNull();
 
-    public void OnClosing()
+    public Task StartAsync(CancellationToken cancellationToken)
     {
-    }
-
-    public void OnStartup()
-    {
-        Task.Factory.StartNew(() =>
+        return Task.Factory.StartNew(() =>
         {
             var asyncTasks = new List<Task>();
             var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
@@ -38,7 +34,12 @@ internal sealed class StartupActionManager(
             {
                 this.logger.LogError(e, "Encountered an exception while processing startup actions");
             }
-        }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
     }
 
     public void RegisterAction<T>() where T : StartupActionBase

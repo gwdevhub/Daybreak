@@ -6,6 +6,7 @@ using Daybreak.Shared.Converters;
 using Daybreak.Shared.Models.Trade;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.TradeChat;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Configuration;
@@ -13,11 +14,10 @@ using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
 using System.Text.RegularExpressions;
-using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.TradeChat;
 
-internal sealed class TradeAlertingService : ITradeAlertingService, IApplicationLifetimeService
+internal sealed class TradeAlertingService : ITradeAlertingService, IHostedService
 {
     private readonly List<ITradeAlert> tradeAlerts = [];
     private readonly ITraderQuoteService traderQuoteService;
@@ -27,7 +27,6 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
     private readonly ITradeChatService<AscalonTradeChatOptions> ascalonTradeChatService;
     private readonly ILiveUpdateableOptions<TradeAlertingOptions> options;
     private readonly ILogger<TradeAlertingService> logger;
-    private readonly CancellationTokenSource cancellationTokenSource = new();
 
     public IEnumerable<ITradeAlert> TradeAlerts => this.tradeAlerts;
 
@@ -48,6 +47,16 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
         this.options = options.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
         this.tradeAlerts = this.options.Value.Alerts ?? [];
+    }
+
+    Task IHostedService.StartAsync(CancellationToken cancellationToken)
+    {
+        return this.StartAlertingService(cancellationToken);
+    }
+
+    Task IHostedService.StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
     }
 
     public void AddTradeAlert(ITradeAlert tradeAlert)
@@ -86,18 +95,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
         this.SaveTradeAlerts();
     }
 
-    public void OnClosing()
-    {
-        this.cancellationTokenSource.Cancel();
-        this.cancellationTokenSource.Dispose();
-    }
-
-    public void OnStartup()
-    {
-        this.StartAlertingService(this.cancellationTokenSource.Token);
-    }
-
-    private async void StartAlertingService(CancellationToken cancellationToken)
+    private async Task StartAlertingService(CancellationToken cancellationToken)
     {
         var lastCheckTime = this.options.Value.LastCheckTime;
         var timeSinceLastCheckTime = DateTime.UtcNow - lastCheckTime;

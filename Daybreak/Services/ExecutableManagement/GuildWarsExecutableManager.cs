@@ -1,23 +1,32 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Shared.Services.ExecutableManagement;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 using System.IO;
-using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.ExecutableManagement;
 internal sealed class GuildWarsExecutableManager(
     ILiveUpdateableOptions<GuildwarsExecutableOptions> liveUpdateableOptions,
-    ILogger<GuildWarsExecutableManager> logger) : IGuildWarsExecutableManager, IApplicationLifetimeService
+    ILogger<GuildWarsExecutableManager> logger) : IGuildWarsExecutableManager, IHostedService
 {
     private readonly static TimeSpan ExecutableVerificationLatency = TimeSpan.FromSeconds(5);
     private readonly static SemaphoreSlim ExecutablesSemaphore = new(1, 1);
 
-    private readonly CancellationTokenSource cancellationTokenSource = new();
     private readonly ILiveUpdateableOptions<GuildwarsExecutableOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
     private readonly ILogger<GuildWarsExecutableManager> logger = logger.ThrowIfNull();
+
+    async Task IHostedService.StartAsync(CancellationToken cancellationToken)
+    {
+        await this.VerifyExecutables(cancellationToken);
+    }
+
+    Task IHostedService.StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
 
     public IEnumerable<string> GetExecutableList()
     {
@@ -66,16 +75,7 @@ internal sealed class GuildWarsExecutableManager(
         return IsValidExecutableInternal(executablePath);
     }
 
-    public void OnClosing()
-    {
-    }
-
-    public void OnStartup()
-    {
-        this.VerifyExecutables(this.cancellationTokenSource.Token);
-    }
-
-    private async void VerifyExecutables(CancellationToken cancellationToken)
+    private async Task VerifyExecutables(CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.VerifyExecutables), string.Empty);
         while (!cancellationToken.IsCancellationRequested)

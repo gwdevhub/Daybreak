@@ -1,16 +1,16 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Shortcuts;
+using Microsoft.Extensions.Hosting;
 using ShellLink;
 using System.Configuration;
 using System.Diagnostics;
 using System.Extensions;
 using System.IO;
-using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.Shortcuts;
 
-internal sealed class ShortcutManager : IShortcutManager, IApplicationLifetimeService
+internal sealed class ShortcutManager : IShortcutManager, IHostedService
 {
     private const string ShortcutName = "Daybreak.lnk";
 
@@ -38,6 +38,16 @@ internal sealed class ShortcutManager : IShortcutManager, IApplicationLifetimeSe
         this.liveOptions = liveOptions.ThrowIfNull(nameof(liveOptions));
         optionsUpdateHook.RegisterHook<LauncherOptions>(this.LoadConfiguration);
         this.LoadConfiguration();
+    }
+
+    Task IHostedService.StartAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    Task IHostedService.StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
     }
 
     private void LoadConfiguration()
@@ -108,13 +118,5 @@ internal sealed class ShortcutManager : IShortcutManager, IApplicationLifetimeSe
         var shortcutFolder = this.liveOptions.Value.ShortcutLocation;
         var shortcutPath = $"{shortcutFolder}\\{ShortcutName}";
         File.Delete(shortcutPath);
-    }
-
-    public void OnStartup()
-    {
-    }
-
-    public void OnClosing()
-    {
     }
 }

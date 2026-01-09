@@ -1,15 +1,15 @@
 ﻿using System.Diagnostics.Metrics;
 using System.Diagnostics;
-using System.Windows.Extensions.Services;
 using System.Core.Extensions;
 using System.Extensions;
 using Daybreak.Shared.Services.Metrics;
 using Daybreak.Shared.Models.Metrics;
+using Microsoft.Extensions.Hosting;
 
 namespace Daybreak.Services.Monitoring;
 
 internal sealed class DiskUsageMonitor(
-    IMetricsService metricsService) : IApplicationLifetimeService
+    IMetricsService metricsService) : IHostedService
 {
     private const string WriteDiskUsage = "Write Disk Usage";
     private const string WriteDiskUsageUnit = "MBs/s";
@@ -20,32 +20,31 @@ internal sealed class DiskUsageMonitor(
 
     private readonly Histogram<double> writeDiskUsageHistogram = metricsService.ThrowIfNull().CreateHistogram<double>(WriteDiskUsage, WriteDiskUsageUnit, WriteDiskUsageDescription, AggregationTypes.NoAggregate);
     private readonly Histogram<double> readDiskUsageHistogram = metricsService.ThrowIfNull().CreateHistogram<double>(ReadDiskUsage, ReadDiskUsageUnit, ReadDiskUsageDescription, AggregationTypes.NoAggregate);
-    private readonly CancellationTokenSource cancellationTokenSource = new();
 
     private PerformanceCounter? readPerformanceCounter;
     private PerformanceCounter? writePerformanceCounter;
 
-    public void OnClosing()
+    async Task IHostedService.StartAsync(CancellationToken cancellationToken)
     {
-        this.cancellationTokenSource.Cancel();
+        await this.StartupAndPeriodicallyReadDiskUsage(cancellationToken);
     }
 
-    public void OnStartup()
+    Task IHostedService.StopAsync(CancellationToken cancellationToken)
     {
-        _ = Task.Run(this.StartupAndPeriodicallyReadDiskUsage, this.cancellationTokenSource.Token);
+        return Task.CompletedTask;
     }
 
-    private async Task StartupAndPeriodicallyReadDiskUsage()
+    private async Task StartupAndPeriodicallyReadDiskUsage(CancellationToken cancellationToken)
     {
         var processName = Process.GetCurrentProcess().ProcessName;
         this.readPerformanceCounter = new PerformanceCounter("Process", "IO Read Bytes/sec", processName);
         this.writePerformanceCounter = new PerformanceCounter("Process", "IO Write Bytes/sec", processName);
-        while (!this.cancellationTokenSource.Token.IsCancellationRequested)
+        while (!cancellationToken.IsCancellationRequested)
         {
             try
             {
                 this.PeriodicallyCheckMemoryUsagePerfCounterBased();
-                await Task.Delay(1000, this.cancellationTokenSource.Token);
+                await Task.Delay(1000, cancellationToken);
             }
             catch
             {

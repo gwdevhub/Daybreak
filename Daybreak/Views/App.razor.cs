@@ -22,7 +22,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using Microsoft.Web.WebView2.Core;
 using TrailBlazr.Services;
-using WpfExtended.Blazor.Launch;
 using static Daybreak.Shared.Models.Themes.Theme;
 
 namespace Daybreak.Views;
@@ -38,7 +37,6 @@ public sealed class AppViewModel
     private readonly IThemeManager themeManager;
     private readonly IApplicationUpdater applicationUpdater;
     private readonly IPrivilegeManager privilegeManager;
-    private readonly BlazorHostWindow blazorHostWindow;
     private readonly JSConsoleInterop jsConsoleInterop;
     private readonly INotificationService notificationService;
     private readonly ILogger<App> logger;
@@ -57,7 +55,7 @@ public sealed class AppViewModel
 
     public List<MenuCategory> MenuCategories { get; private set; } = [];
 
-    public WindowState WindowState => this.blazorHostWindow.WindowState;
+    public WindowState WindowState { get; }
     public bool IsAdmin => this.privilegeManager.AdminPrivileges;
     public bool IsNavigationOpen { get; private set; }
     public string CurrentVersionText => this.applicationUpdater.CurrentVersion.ToString();
@@ -88,7 +86,7 @@ public sealed class AppViewModel
         IThemeManager themeManager,
         IApplicationUpdater applicationUpdater,
         IPrivilegeManager privilegeManager,
-        BlazorHostWindow blazorHostWindow,
+        //BlazorHostWindow blazorHostWindow,
         JSConsoleInterop jsConsoleInterop,
         INotificationProducer notificationProducer,
         INotificationService notificationService,
@@ -102,19 +100,19 @@ public sealed class AppViewModel
         this.themeManager = themeManager.ThrowIfNull();
         this.applicationUpdater = applicationUpdater.ThrowIfNull();
         this.privilegeManager = privilegeManager.ThrowIfNull();
-        this.blazorHostWindow = blazorHostWindow.ThrowIfNull();
+        //this.blazorHostWindow = blazorHostWindow.ThrowIfNull();
         this.jsConsoleInterop = jsConsoleInterop.ThrowIfNull();
         this.NotificationProducer = notificationProducer.ThrowIfNull();
         this.notificationService = notificationService.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
 
-        this.blazorHostWindow.StateChanged += this.MainWindow_StateChanged;
+        //this.blazorHostWindow.StateChanged += this.MainWindow_StateChanged;
         menuServiceInitializer.InitializeMenuService(
             this.OpenNavigationMenu,
             this.CloseNavigationMenu,
             this.ToggleNavigationMenu
         );
-        this.blazorHostWindow.PreviewKeyUp += this.BlazorHostWindow_PreviewKeyDown;
+        //this.blazorHostWindow.PreviewKeyUp += this.BlazorHostWindow_PreviewKeyDown;
     }
 
     private void BlazorHostWindow_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -139,12 +137,12 @@ public sealed class AppViewModel
         this.RedrawRequested?.Invoke(this, EventArgs.Empty);
         this.viewManager.ShowView<LaunchView>();
         this.viewManager.ShowViewRequested += (s, e) => this.CloseNavigationMenu();
-        this.hwndSource = HwndSource.FromHwnd(
-            new WindowInteropHelper(this.blazorHostWindow).Handle
-        );
+        //this.hwndSource = HwndSource.FromHwnd(
+        //    new WindowInteropHelper(this.blazorHostWindow).Handle
+        //);
 
-        // Hook WndProc to handle WM_NCHITTEST for custom title bar
-        this.hwndSource?.AddHook(this.WndProc);
+        //// Hook WndProc to handle WM_NCHITTEST for custom title bar
+        //this.hwndSource?.AddHook(this.WndProc);
 
         this.isInitialized = true;
     }
@@ -155,6 +153,7 @@ public sealed class AppViewModel
     /// </summary>
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
+        //TODO: Fix WndProc
         if (msg == NativeMethods.WM_NCHITTEST)
         {
             // Get the mouse position from lParam
@@ -163,20 +162,20 @@ public sealed class AppViewModel
 
             // Convert screen coordinates to window coordinates
             var point = new Point(x, y);
-            point = this.blazorHostWindow.PointFromScreen(point);
+            //point = this.blazorHostWindow.PointFromScreen(point);
 
             // Define the title bar height (should match the CSS title bar height of 40px)
             // Account for DPI scaling
-            var dpi = VisualTreeHelper.GetDpi(this.blazorHostWindow);
-            var titleBarHeight = 40 * dpi.DpiScaleY;
+            //var dpi = VisualTreeHelper.GetDpi(this.blazorHostWindow);
+            //var titleBarHeight = 40 * dpi.DpiScaleY;
 
             // If the mouse is in the title bar area, return HTCLIENT to let WebView2 handle it
             // This prevents Windows from returning HTMINBUTTON, HTMAXBUTTON, or HTCLOSE
-            if (point.Y >= 0 && point.Y < titleBarHeight)
-            {
-                handled = true;
-                return new IntPtr(NativeMethods.HTCLIENT);
-            }
+            //if (point.Y >= 0 && point.Y < titleBarHeight)
+            //{
+            //    handled = true;
+            //    return new IntPtr(NativeMethods.HTCLIENT);
+            //}
         }
 
         return IntPtr.Zero;
@@ -184,76 +183,84 @@ public sealed class AppViewModel
 
     public void Drag()
     {
+        //TODO: Fix Drag
+
         /*
          * This operation has to be queued on the UI thread and has to be done via PostMessage to avoid re-entrancy.
          * Using SendMessage or doing it directly can cause crashes when WebView2 is handling a user callback while another sendmessage appears.
          */
-        this.blazorHostWindow.Dispatcher.BeginInvoke(() =>
-        {
-            var hwnd = new WindowInteropHelper(this.blazorHostWindow).Handle;
-            if (hwnd == IntPtr.Zero)
-            {
-                return;
-            }
+        //this.blazorHostWindow.Dispatcher.BeginInvoke(() =>
+        //{
+        //    var hwnd = new WindowInteropHelper(this.blazorHostWindow).Handle;
+        //    if (hwnd == IntPtr.Zero)
+        //    {
+        //        return;
+        //    }
 
-            NativeMethods.ReleaseCapture();
-            NativeMethods.PostMessage(
-                hwnd,
-                NativeMethods.WM_SYSCOMMAND,
-                (IntPtr)(NativeMethods.SC_MOVE | NativeMethods.HTCAPTION),
-                IntPtr.Zero
-            );
-        });
+        //    NativeMethods.ReleaseCapture();
+        //    NativeMethods.PostMessage(
+        //        hwnd,
+        //        NativeMethods.WM_SYSCOMMAND,
+        //        (IntPtr)(NativeMethods.SC_MOVE | NativeMethods.HTCAPTION),
+        //        IntPtr.Zero
+        //    );
+        //});
     }
 
     public void StartResize(NativeMethods.ResizeDirection resizeDirection)
     {
+        //TODO: Fix StartResize
+
         /*
          * This operation has to be queued on the UI thread and has to be done via PostMessage to avoid re-entrancy.
          * Using SendMessage or doing it directly can cause crashes when WebView2 is handling a user callback while another sendmessage appears.
          */
 
-        if (this.blazorHostWindow.WindowState == WindowState.Maximized)
-        {
-            return;
-        }
+        //if (this.blazorHostWindow.WindowState == WindowState.Maximized)
+        //{
+        //    return;
+        //}
 
-        this.blazorHostWindow.Dispatcher.BeginInvoke(() =>
-        {
-            var hwnd = new WindowInteropHelper(this.blazorHostWindow).Handle;
-            if (hwnd == IntPtr.Zero)
-            {
-                return;
-            }
+        //this.blazorHostWindow.Dispatcher.BeginInvoke(() =>
+        //{
+        //    var hwnd = new WindowInteropHelper(this.blazorHostWindow).Handle;
+        //    if (hwnd == IntPtr.Zero)
+        //    {
+        //        return;
+        //    }
 
-            NativeMethods.ReleaseCapture();
-            NativeMethods.PostMessage(
-                hwnd,
-                NativeMethods.WM_NCLBUTTONDOWN,
-                (IntPtr)(int)resizeDirection,
-                IntPtr.Zero
-            );
-        });
+        //    NativeMethods.ReleaseCapture();
+        //    NativeMethods.PostMessage(
+        //        hwnd,
+        //        NativeMethods.WM_NCLBUTTONDOWN,
+        //        (IntPtr)(int)resizeDirection,
+        //        IntPtr.Zero
+        //    );
+        //});
     }
 
     public void Minimize()
     {
-        this.blazorHostWindow.WindowState = WindowState.Minimized;
+        //TODO: Fix Minimize
+        // this.blazorHostWindow.WindowState = WindowState.Minimized;
     }
 
     public void Maximize()
     {
-        this.blazorHostWindow.WindowState = WindowState.Maximized;
+        //TODO: Fix Maximize
+        // this.blazorHostWindow.WindowState = WindowState.Maximized;
     }
 
     public void Restore()
     {
-        this.blazorHostWindow.WindowState = WindowState.Normal;
+        //TODO: Fix Restore
+        //this.blazorHostWindow.WindowState = WindowState.Normal;
     }
 
     public void Close()
     {
-        this.blazorHostWindow.Close();
+        //TODO: Fix Close
+        //this.blazorHostWindow.Close();
     }
 
     public void ToggleNavigationMenu()
@@ -343,28 +350,30 @@ public sealed class AppViewModel
         this.UIScale = this.themeManager.UIScale;
         this.RedrawRequested?.Invoke(this, EventArgs.Empty);
 
+
+        //TODO: Fix Trade Chat Theme Setter
         /*
          * Below code hooks into the webview to set the trade chat theme based on the current application theme.
          */
-        await this.blazorHostWindow.Dispatcher.InvokeAsync(async () =>
-        {
-            if (Global.CoreWebView2 is null)
-            {
-                return;
-            }
+        //await this.blazorHostWindow.Dispatcher.InvokeAsync(async () =>
+        //{
+        //    if (Global.CoreWebView2 is null)
+        //    {
+        //        return;
+        //    }
 
-            if (this.tradeChatThemeSetterScript is not null)
-            {
-                Global.CoreWebView2.Cast<CoreWebView2>().RemoveScriptToExecuteOnDocumentCreated(this.tradeChatThemeSetterScript);
-                this.tradeChatThemeSetterScript = default;
-            }
+        //    if (this.tradeChatThemeSetterScript is not null)
+        //    {
+        //        Global.CoreWebView2.Cast<CoreWebView2>().RemoveScriptToExecuteOnDocumentCreated(this.tradeChatThemeSetterScript);
+        //        this.tradeChatThemeSetterScript = default;
+        //    }
 
-            this.tradeChatThemeSetterScript = await Global.CoreWebView2.Cast<CoreWebView2>().AddScriptToExecuteOnDocumentCreatedAsync(@$"
-            if (location.origin === 'https://kamadan.gwtoolbox.com' || 
-                location.origin === 'https://ascalon.gwtoolbox.com') {{
-                localStorage.setItem('mode', '{(this.themeManager.CurrentTheme?.Mode is LightDarkMode.Light ? "light" : "dark")}');
-            }}");
-        });
+        //    this.tradeChatThemeSetterScript = await Global.CoreWebView2.Cast<CoreWebView2>().AddScriptToExecuteOnDocumentCreatedAsync(@$"
+        //    if (location.origin === 'https://kamadan.gwtoolbox.com' || 
+        //        location.origin === 'https://ascalon.gwtoolbox.com') {{
+        //        localStorage.setItem('mode', '{(this.themeManager.CurrentTheme?.Mode is LightDarkMode.Light ? "light" : "dark")}');
+        //    }}");
+        //});
     }
 
     private void LoadMenuCategories()

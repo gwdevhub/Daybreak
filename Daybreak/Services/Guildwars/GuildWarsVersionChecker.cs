@@ -4,17 +4,18 @@ using Daybreak.Shared.Models.Mods;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.Guildwars;
 using Daybreak.Shared.Services.Notifications;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Windows.Extensions.Services;
+using System.Extensions.Core;
 
 namespace Daybreak.Services.GuildWars;
 internal sealed class GuildWarsVersionChecker(
     IGuildWarsExecutableManager guildWarsExecutableManager,
     IGuildWarsInstaller guildWarsInstaller,
     INotificationService notificationService,
-    ILogger<GuildWarsVersionChecker> logger) : IGuildWarsVersionChecker, IApplicationLifetimeService
+    ILogger<GuildWarsVersionChecker> logger) : IGuildWarsVersionChecker, IHostedService
 {
     public string Name => "GuildWars Version Checker";
     public string Description => "Checks if the Guild Wars executable is up to date before launching";
@@ -63,7 +64,7 @@ internal sealed class GuildWarsVersionChecker(
 
     public async Task OnGuildWarsStarting(GuildWarsStartingContext guildWarsStartingContext, CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.OnGuildWarsStarting), guildWarsStartingContext.ApplicationLauncherContext.ExecutablePath);
+        var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: guildWarsStartingContext.ApplicationLauncherContext.ExecutablePath);
         var notificationToken = this.notificationService.NotifyInformation(
             title: "Checking Guild Wars version",
             description: "Checking if Guild Wars needs an update",
@@ -104,9 +105,15 @@ internal sealed class GuildWarsVersionChecker(
             expirationTime: DateTime.Now + TimeSpan.FromSeconds(15));
     }
 
-    public void OnStartup()
+    Task IHostedService.StartAsync(CancellationToken cancellationToken)
     {
         _ = new TaskFactory().StartNew(this.CheckExecutables, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        return Task.CompletedTask;
+    }
+
+    Task IHostedService.StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
     }
 
     public Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken) => Task.CompletedTask;
@@ -121,7 +128,7 @@ internal sealed class GuildWarsVersionChecker(
 
     private async void CheckExecutables()
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.OnStartup), string.Empty);
+        var scopedLogger = this.logger.CreateScopedLogger();
         if (await this.guildWarsInstaller.GetLatestVersionId(CancellationToken.None) is not int latestVersion)
         {
             scopedLogger.LogError("Failed to fetch latest version. Skipping version check");

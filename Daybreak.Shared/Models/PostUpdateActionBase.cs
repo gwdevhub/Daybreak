@@ -6,7 +6,7 @@ public abstract class PostUpdateActionBase
     {
     }
 
-    public virtual Task DoPostUpdateActionAsync()
+    public virtual Task DoPostUpdateActionAsync(CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }

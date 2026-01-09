@@ -4,17 +4,17 @@ using Daybreak.Shared.Models.Themes;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Themes;
 using Daybreak.Themes;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Configuration;
 using System.Extensions;
-using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.Themes;
 
 public class BlazorThemeInteropService(
     ILiveOptions<ThemeOptions> themeOptions,
     IOptionsUpdateHook optionsUpdateHook,
-    ILogger<BlazorThemeInteropService> logger) : IThemeManager, IThemeProducer, IApplicationLifetimeService
+    ILogger<BlazorThemeInteropService> logger) : IThemeManager, IThemeProducer, IHostedService
 {
     private const double XXSmallFontSizeValue = 0.56;
     private const double XSmallFontSizeValue = 0.625;
@@ -52,14 +52,16 @@ public class BlazorThemeInteropService(
     public double XXLargeFontSize { get; private set; } = XXLargeFontSizeValue;
     public Theme? CurrentTheme { get; private set; }
 
-    public void OnStartup()
+    public Task StartAsync(CancellationToken cancellationToken)
     {
         this.optionsUpdateHook.RegisterHook<ThemeOptions>(this.OnThemeUpdated);
         this.OnThemeUpdated();
+        return Task.CompletedTask;
     }
 
-    public void OnClosing()
+    public Task StopAsync(CancellationToken cancellationToken)
     {
+        return Task.CompletedTask;
     }
 
     public void RegisterTheme(Theme theme)

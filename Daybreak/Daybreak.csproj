@@ -4,7 +4,6 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>Daybreak</RootNamespace>
     <TargetFramework>$(TargetFrameworkVersionWindows)</TargetFramework>
-    <UseWPF>true</UseWPF>
     <ScopedCssEnabled>true</ScopedCssEnabled>
     <Nullable>enable</Nullable>
     <Platforms>x64</Platforms>
@@ -17,9 +16,6 @@
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-    
-    <!-- This is the main host application - it should generate static web assets -->
-    <StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
@@ -53,8 +49,7 @@
     <PackageReference Include="OpenTelemetry.Exporter.Console" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" />
-    <PackageReference Include="WpfExtended.SourceGeneration" />
-    <PackageReference Include="WpfScreenHelper" />
+    <PackageReference Include="Photino.Blazor" />
     <PackageReference Include="PeNet" />
     <PackageReference Include="Plumsy" />
     <PackageReference Include="securifybv.ShellLink" />
@@ -66,7 +61,6 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
     <PackageReference Include="SevenZipExtractor" />
-    <PackageReference Include="WpfExtended.Blazor" />
   </ItemGroup>
 
   <ItemGroup>
@@ -77,7 +71,7 @@
   <PropertyGroup>
     <WikiSourcePath>..\Daybreak.wiki</WikiSourcePath>
   </PropertyGroup>  
-
+    
   <ItemGroup>
     <WikiFiles Include="$(WikiSourcePath)\**\*.*" Exclude="$(WikiSourcePath)\.git\**" />
   </ItemGroup>

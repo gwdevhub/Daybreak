@@ -2,6 +2,7 @@
 using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Options;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenTelemetry;
@@ -14,11 +15,10 @@ using System.Core.Extensions;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.Net.Http;
-using System.Windows.Extensions.Services;
 using TrailBlazr.Services;
 
 namespace Daybreak.Services.Telemetry;
-internal sealed class TelemetryHost : IDisposable, IApplicationLifetimeService
+internal sealed class TelemetryHost : IDisposable, IHostedService
 {
     private const string ServiceName = "Daybreak";
     private const string UnknownHost = "Unknown";
@@ -90,13 +90,15 @@ internal sealed class TelemetryHost : IDisposable, IApplicationLifetimeService
         this.BuildTelemetryProvider();
     }
 
-    public void OnClosing()
+    public Task StartAsync(CancellationToken cancellationToken)
     {
-        this.Dispose();
+        return Task.CompletedTask;
     }
 
-    public void OnStartup()
+    public Task StopAsync(CancellationToken cancellationToken)
     {
+        this.Dispose();
+        return Task.CompletedTask;
     }
 
     public void Dispose()

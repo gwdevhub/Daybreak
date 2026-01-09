@@ -239,7 +239,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<ITradeAlertingService, TradeAlertingService>();
         services.AddSingleton<IModsManager, ModsManager>();
         services.AddSingleton<IPluginsService, PluginsService>();
-        services.AddSingleton<ISplashScreenService, SplashScreenService>();
         services.AddSingleton<IGuildWarsExecutableManager, GuildWarsExecutableManager>();
         services.AddSingleton<ISevenZipExtractor, Daybreak.Services.SevenZip.SevenZipExtractor>();
         services.AddSingleton<IOptionsSynchronizationService, OptionsSynchronizationService>();
