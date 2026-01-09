@@ -1,8 +1,5 @@
-﻿using Daybreak.Configuration.Options;
-using Daybreak.Services.Downloads;
-using Daybreak.Services.ReShade.Notifications;
+﻿using Daybreak.Services.Downloads;
 using Daybreak.Services.ReShade.Utils;
-using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Models.Mods;
 using Daybreak.Shared.Models.ReShade;
@@ -16,16 +13,12 @@ using HtmlAgilityPack;
 using IniParser.Parser;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Win32;
-using System.Configuration;
 using System.Core.Extensions;
 using System.Data;
 using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
-using System.IO;
 using System.IO.Compression;
-using System.Net.Http;
 using TrailBlazr.Services;
 
 namespace Daybreak.Services.ReShade;
@@ -199,14 +192,7 @@ internal sealed class ReShadeService(
         }
     }
 
-    public Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken)
-    {
-        var destinationDirectory = Path.GetFullPath(new FileInfo(guildWarsStartedContext.ApplicationLauncherContext.ExecutablePath).DirectoryName!);
-        var destinationPreset = Path.Combine(destinationDirectory, ReShadePreset);
-        var destinationIni = Path.Combine(destinationDirectory, ConfigIni);
-        this.PeriodicallyCheckPresetChanges(guildWarsStartedContext.ApplicationLauncherContext, destinationPreset, destinationIni);
-        return Task.CompletedTask;
-    }
+    public Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public Task OnGuildWarsStarting(GuildWarsStartingContext guildWarsStartingContext, CancellationToken cancellationToken)
     {
@@ -432,70 +418,6 @@ internal sealed class ReShadeService(
         }
 
         return true;
-    }
-
-    private async void PeriodicallyCheckPresetChanges(ApplicationLauncherContext applicationLauncherContext, string presetsFile, string configFile)
-    {
-        var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: presetsFile);
-        if (!File.Exists(presetsFile))
-        {
-            scopedLogger.LogError("File does not exist");
-            return;
-        }
-
-        var presetsCache = File.ReadAllText(presetsFile);
-        var configCache = File.ReadAllText(configFile);
-        try
-        {
-            while (true)
-            {
-                if (applicationLauncherContext.Process.HasExited)
-                {
-                    scopedLogger.LogDebug("Process has exited");
-                    return;
-                }
-
-                await Task.Delay(1000);
-                if (!File.Exists(presetsFile))
-                {
-                    scopedLogger.LogError("Preset file has been deleted");
-                    return;
-                }
-
-                if (!File.Exists(configFile))
-                {
-                    scopedLogger.LogError("Config file has been deleted");
-                    return;
-                }
-
-                var currentPresets = File.ReadAllText(presetsFile);
-                if (currentPresets != presetsCache)
-                {
-                    presetsCache = currentPresets;
-                    this.notificationService.NotifyInformation<ReShadeConfigChangedHandler>(
-                        title: "ReShade presets changed",
-                        description: $"ReShade presets have been changed by {applicationLauncherContext.ExecutablePath}. Click on this notification to save the changes in Daybreak",
-                        metaData: presetsFile);
-                    continue;
-                }
-
-                var currentConfig = File.ReadAllText(configFile);
-                if (currentConfig != configCache)
-                {
-                    configCache = currentConfig;
-                    this.notificationService.NotifyInformation<ReShadeConfigChangedHandler>(
-                        title: "ReShade config changed",
-                        description: $"ReShade config has been changed by {applicationLauncherContext.ExecutablePath}. Click on this notification to save the changes in Daybreak",
-                        metaData: configFile);
-                    continue;
-                }
-            }
-        }
-        catch(Exception e)
-        {
-            scopedLogger.LogError(e, "Encountered exception. Cancelling preset monitoring");
-            return;
-        }
     }
 
     private async Task InstallPackageInternal(

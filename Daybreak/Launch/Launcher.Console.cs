@@ -2,7 +2,7 @@
 
 namespace Daybreak.Launch;
 
-public static partial class Launcher
+public partial class Launcher
 {
     private static void AllocateAnsiConsole()
     {

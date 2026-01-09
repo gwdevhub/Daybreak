@@ -1,8 +1,11 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Extensions;
 using Daybreak.Services.Options;
+using Daybreak.Services.Plugins;
 using Daybreak.Services.Screens;
 using Daybreak.Services.Themes;
+using Daybreak.Shared.Services.Options;
+using Daybreak.Shared.Services.Plugins;
 using Daybreak.Shared.Services.Screens;
 using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Utils;
@@ -15,7 +18,7 @@ using System.Extensions;
 
 namespace Daybreak.Launch;
 
-public static partial class Launcher
+public partial class Launcher
 {
     private static PhotinoBlazorApp? SplashWindowApp;
 
@@ -29,6 +32,7 @@ public static partial class Launcher
         BootstrapOptionsManager(splashBuilder);
         BootstrapThemeOptions(splashBuilder);
         BootstrapScreenManager(splashBuilder);
+        BootstrapPluginsService(splashBuilder);
         SplashWindowApp = splashBuilder.Build();
         SplashWindowApp.MainWindow
             .SetChromeless(true)
@@ -53,9 +57,15 @@ public static partial class Launcher
         SplashWindowApp.Run();
     }
 
+    private static void BootstrapPluginsService(PhotinoBlazorAppBuilder builder)
+    {
+        builder.Services.AddSingleton<IPluginsService, PluginsService>();
+    }
+
     private static void BootstrapOptionsManager(PhotinoBlazorAppBuilder builder)
     {
         builder.Services.AddSingleton<OptionsManager>();
+        builder.Services.AddSingleton<IOptionsProvider>(sp => sp.GetRequiredService<OptionsManager>());
     }
 
     private static void BootstrapThemeOptions(PhotinoBlazorAppBuilder builder)
@@ -86,5 +96,10 @@ public static partial class Launcher
 
         app.MainWindow.SetLocation(desiredScreen.Size.Location + (desiredScreen.Size.Size / 2));
         app.MainWindow.SetSize(desiredScreen.Size.Size / 2);
+    }
+
+    private static void CloseSplash(PhotinoBlazorApp app)
+    {
+        app.MainWindow.Close();
     }
 }

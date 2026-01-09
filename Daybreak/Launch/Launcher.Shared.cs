@@ -8,7 +8,7 @@ using Serilog.Sinks.SystemConsole.Themes;
 
 namespace Daybreak.Launch;
 
-public static partial class Launcher
+public partial class Launcher
 {
     private const string OutputTemplate = "[{Timestamp:yyyy-MM-dd HH:mm:ss}] {Level:u4}: [{EnvironmentName}] [{ThreadId}:{ThreadName}] [{SourceContext}]{NewLine}{Message:lj}{NewLine}{Exception}";
 

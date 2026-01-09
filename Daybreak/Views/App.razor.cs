@@ -25,7 +25,6 @@ public sealed class AppViewModel
     private const string IssueUrl = "https://github.com/gwdevhub/Daybreak/issues/new";
 
     private readonly IOptionsProvider optionsProvider;
-    private readonly IMenuServiceProducer menuServiceProducer;
     private readonly IMenuServiceInitializer menuServiceInitializer;
     private readonly IMenuServiceButtonHandler menuServiceButtonHandler;
     private readonly IViewManager viewManager;
@@ -75,7 +74,6 @@ public sealed class AppViewModel
     public AppViewModel(
         IOptionsProvider optionsProvider,
         IMenuServiceInitializer menuServiceInitializer,
-        IMenuServiceProducer menuServiceProducer,
         IMenuServiceButtonHandler menuServiceButtonHandler,
         IViewManager viewManager,
         IThemeManager themeManager,
@@ -89,7 +87,6 @@ public sealed class AppViewModel
     )
     {
         this.optionsProvider = optionsProvider.ThrowIfNull();
-        this.menuServiceProducer = menuServiceProducer.ThrowIfNull();
         this.menuServiceInitializer = menuServiceInitializer.ThrowIfNull();
         this.menuServiceButtonHandler = menuServiceButtonHandler.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();

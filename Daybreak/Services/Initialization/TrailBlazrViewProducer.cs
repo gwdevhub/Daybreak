@@ -30,7 +30,8 @@ public sealed class TrailBlazrViewProducer(IServiceCollection services, ILogger<
         }
 
         var viewRegistration = new ViewRegistration<TView, TViewModel>();
-        this.services.AddSingleton(sp => viewRegistration);
+        this.services.AddSingleton(viewRegistration);
+        this.services.AddSingleton<ViewRegistration>(viewRegistration);
         scopedLogger.LogDebug("Registered {View.Name}:{ViewModel.Name} as {lifetime}", typeof(TView).Name, typeof(TViewModel).Name, isSingleton ? "Singleton" : "Scoped");
     }
 }

@@ -36,7 +36,6 @@ using Daybreak.Services.Plugins;
 using Daybreak.Services.Privilege;
 using Daybreak.Services.Registry;
 using Daybreak.Services.ReShade;
-using Daybreak.Services.ReShade.Notifications;
 using Daybreak.Services.Screens;
 using Daybreak.Services.Screenshots;
 using Daybreak.Services.Shortcuts;
@@ -331,7 +330,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         notificationHandlerProducer.RegisterNotificationHandler<MessageBoxHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<TradeMessageNotificationHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<UpdateNotificationHandler>();
-        notificationHandlerProducer.RegisterNotificationHandler<ReShadeConfigChangedHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<NavigateToCalendarViewHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<GuildWarsUpdateNotificationHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<GuildWarsBatchUpdateNotificationHandler>();

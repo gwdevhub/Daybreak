@@ -2,12 +2,9 @@
 using Daybreak.Services.Plugins.Resolvers;
 using Daybreak.Services.Plugins.Validators;
 using Daybreak.Shared.Models.Plugins;
-using Daybreak.Shared.Services.ApplicationArguments;
-using Daybreak.Shared.Services.Initialization;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Plugins;
 using Daybreak.Shared.Utils;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Plumsy;
@@ -80,29 +77,8 @@ internal sealed class PluginsService : IPluginsService
         this.optionsProvider.SaveOption(options);
     }
 
-    public void LoadPlugins(
-        IServiceCollection services,
-        IOptionsProducer optionsProducer,
-        IViewProducer viewProducer,
-        IPostUpdateActionProducer postUpdateActionProducer,
-        IStartupActionProducer startupActionProducer,
-        INotificationHandlerProducer notificationHandlerProducer,
-        IModsProducer modsProducer,
-        IArgumentHandlerProducer argumentHandlerProducer,
-        IMenuServiceProducer menuServiceProducer,
-        IThemeProducer themeProducer)
+    public void LoadPlugins()
     {
-        services.ThrowIfNull();
-        optionsProducer.ThrowIfNull();
-        viewProducer.ThrowIfNull();
-        postUpdateActionProducer.ThrowIfNull();
-        startupActionProducer.ThrowIfNull();
-        notificationHandlerProducer.ThrowIfNull();
-        modsProducer.ThrowIfNull();
-        argumentHandlerProducer.ThrowIfNull();
-        menuServiceProducer.ThrowIfNull();
-        themeProducer.ThrowIfNull();
-
         this.pluginsSemaphore.Wait();
         var scopedLogger = this.logger.CreateScopedLogger();
         var pluginsPath = PluginsDirectory;
@@ -162,28 +138,7 @@ internal sealed class PluginsService : IPluginsService
                     continue;
                 }
 
-                RegisterServices(pluginConfig, services);
-                pluginScopedLogger.LogDebug("Registered services");
-                RegisterOptions(pluginConfig, optionsProducer);
-                pluginScopedLogger.LogDebug("Registered options");
-                RegisterTheme(pluginConfig, themeProducer);
-                pluginScopedLogger.LogDebug("Registered themes");
-                RegisterViews(pluginConfig, viewProducer);
-                pluginScopedLogger.LogDebug("Registered views");
-                RegisterPostUpdateActions(pluginConfig, postUpdateActionProducer);
-                pluginScopedLogger.LogDebug("Registered post-update actions");
-                RegisterStartupActions(pluginConfig, startupActionProducer);
-                pluginScopedLogger.LogDebug("Registered startup actions");
-                RegisterNotificationHandlers(pluginConfig, notificationHandlerProducer);
-                pluginScopedLogger.LogDebug("Registered notification handlers");
-                RegisterMods(pluginConfig, modsProducer);
-                pluginScopedLogger.LogDebug("Registered mods");
-                RegisterArgumentHandlers(pluginConfig, argumentHandlerProducer);
-                pluginScopedLogger.LogDebug("Registered argument handlers");
-                RegisterMenuButtons(pluginConfig, menuServiceProducer);
-                pluginScopedLogger.LogDebug("Registered menu buttons");
-                this.loadedPlugins.Add(new AvailablePlugin { Name = result.PluginEntry?.Name ?? string.Empty, Path = result.PluginEntry?.Path ?? string.Empty, Enabled = true });
-                pluginScopedLogger.LogDebug("Loaded plugin");
+                this.loadedPlugins.Add(new AvailablePlugin { Name = result.PluginEntry?.Name ?? string.Empty, Path = result.PluginEntry?.Path ?? string.Empty, Enabled = true, Configuration = pluginConfig });
             }
             catch(Exception e)
             {
@@ -249,29 +204,4 @@ internal sealed class PluginsService : IPluginsService
         PluginLoadOperation.Success success => success.Plugin.Assembly,
         _ => default
     };
-
-    private static void RegisterServices(PluginConfigurationBase pluginConfig, IServiceCollection services)
-    {
-        var serviceCollection = new ServiceCollection();
-        pluginConfig.RegisterServices(serviceCollection);
-        services.AddSingleton(serviceCollection);
-    }
-
-    private static void RegisterOptions(PluginConfigurationBase pluginConfig, IOptionsProducer optionsProducer) => pluginConfig.RegisterOptions(optionsProducer);
-
-    private static void RegisterViews(PluginConfigurationBase pluginConfig, IViewProducer viewProducer) => pluginConfig.RegisterViews(viewProducer);
-
-    private static void RegisterPostUpdateActions(PluginConfigurationBase pluginConfig, IPostUpdateActionProducer postUpdateActionProducer) => pluginConfig.RegisterPostUpdateActions(postUpdateActionProducer);
-
-    private static void RegisterStartupActions(PluginConfigurationBase pluginConfig, IStartupActionProducer startupActionProducer) => pluginConfig.RegisterStartupActions(startupActionProducer);
-
-    private static void RegisterNotificationHandlers(PluginConfigurationBase pluginConfig, INotificationHandlerProducer notificationHandlerProducer) => pluginConfig.RegisterNotificationHandlers(notificationHandlerProducer);
-
-    private static void RegisterMods(PluginConfigurationBase pluginConfig, IModsProducer modsManager) => pluginConfig.RegisterMods(modsManager);
-
-    private static void RegisterArgumentHandlers(PluginConfigurationBase pluginConfig, IArgumentHandlerProducer argumentHandlerProducer) => pluginConfig.RegisterLaunchArgumentHandlers(argumentHandlerProducer);
-
-    private static void RegisterMenuButtons(PluginConfigurationBase pluginConfig, IMenuServiceProducer menuServiceProducer) => pluginConfig.RegisterMenuButtons(menuServiceProducer);
-
-    private static void RegisterTheme(PluginConfigurationBase pluginConfig, IThemeProducer themeProducer) => pluginConfig.RegisterThemes(themeProducer);
 }

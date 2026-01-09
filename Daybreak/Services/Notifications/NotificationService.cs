@@ -4,6 +4,7 @@ using Daybreak.Shared;
 using Daybreak.Shared.Models.Notifications;
 using Daybreak.Shared.Models.Notifications.Handling;
 using Daybreak.Shared.Services.Notifications;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 using System.Core.Extensions;
@@ -14,12 +15,13 @@ using System.Runtime.CompilerServices;
 namespace Daybreak.Services.Notifications;
 
 internal sealed class NotificationService(
-    IEnumerable<INotificationHandler> notificationHandlers,
+    IServiceProvider serviceProvider,
     INotificationStorage notificationStorage,
     ILogger<NotificationService> logger) : INotificationService, INotificationProducer
 {
     private readonly ConcurrentQueue<Notification> pendingNotifications = new();
-    private readonly IEnumerable<INotificationHandler> handlers = notificationHandlers.ThrowIfNull();
+    // Using lazy rezolving to break dependency cycle
+    private readonly IServiceProvider serviceProvider = serviceProvider.ThrowIfNull();
     private readonly INotificationStorage storage = notificationStorage.ThrowIfNull();
     private readonly ILogger<NotificationService> logger = logger.ThrowIfNull();
 
@@ -99,7 +101,7 @@ internal sealed class NotificationService(
             return;
         }
 
-        var handler = this.handlers.FirstOrDefault(handler => handler.GetType() == notification.HandlingType)
+        var handler = this.serviceProvider.GetRequiredService<IEnumerable<INotificationHandler>>().FirstOrDefault(handler => handler.GetType() == notification.HandlingType)
             ?? throw new InvalidOperationException($"Could not find notification handler {notification.HandlingType}");
         handler.OpenNotification(notification);
     }
