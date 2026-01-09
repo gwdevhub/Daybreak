@@ -1,5 +1,24 @@
-﻿<h3>Splash</h3>
-<div class="splash-container">
-    <Daybreak.Views.Components.Icons.Misc.GoldenArrowGlyph Foreground="red" />
-    <h3>Loading...</h3>
+﻿<div class="splash-container">
+    <div class="splash-logo">
+        <Daybreak.Views.Components.Icons.Misc.GoldenArrowGlyph Foreground="red" />
+    </div>
+    <FluentProgressRing Min="0"
+                        Max="100"
+                        Value="@((int)(LaunchState.Progress.Percentage.Value * 100))" />
+    <h3>@LaunchState.Progress.StatusMessage</h3>
 </div>
+
+@using Daybreak.Launch
+@using Daybreak.Shared.Models.Async
+@code{
+    protected override Task OnInitializedAsync()
+    {
+        LaunchState.ProgressChanged += this.OnProgressChanged;
+        return base.OnInitializedAsync();
+    }
+
+    private void OnProgressChanged(object? sender, ProgressUpdate e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+}

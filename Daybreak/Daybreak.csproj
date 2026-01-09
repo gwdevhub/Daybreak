@@ -16,14 +16,6 @@
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
 
-  <!-- Clear all static web assets to prevent SDK bugs in .NET 10 -->
-  <Target Name="ClearStaticWebAssets" BeforeTargets="GenerateStaticWebAssetsDevelopmentManifest;GenerateStaticWebAssetsManifest;ResolveStaticWebAssetsInputs">
-    <ItemGroup>
-      <StaticWebAsset Remove="@(StaticWebAsset)" />
-      <StaticWebAssetEndpoint Remove="@(StaticWebAssetEndpoint)" />
-    </ItemGroup>
-  </Target>
-
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <StripSymbols>true</StripSymbols>
   </PropertyGroup>

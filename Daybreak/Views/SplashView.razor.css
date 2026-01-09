@@ -6,13 +6,12 @@
     height: 100vh;
     background: white;
 }
-
-    .splash-container svg {
-        width: 200px;
-        height: 200px;
-    }
-
     .splash-container h3 {
         margin-top: 1rem;
         color: black;
     }
+
+.splash-logo {
+    width: 200px;
+    height: 200px;
+}
