@@ -1,34 +1,29 @@
 ﻿using Daybreak.Shared.Utils;
 using Daybreak.Views;
-using Microsoft.Extensions.FileProviders;
 using Photino.Blazor;
-using System.Reflection;
 
 namespace Daybreak.Launch;
 
-public sealed class SplashWindow
+public static partial class Launcher
 {
-    public PhotinoBlazorApp SplashWindowApp { get; }
-    
-    public SplashWindow(string[] launchArguments)
-    {
-        var fileProvider = new ManifestEmbeddedFileProvider(
-            Assembly.GetExecutingAssembly(),
-            "wwwroot");
+    private static PhotinoBlazorApp? SplashWindowApp;
 
-        var splashBuilder = PhotinoBlazorAppBuilder.CreateDefault(fileProvider, launchArguments);
+    private static void CreateAndShowSplash(string[] args, EventHandler splashShownContinue)
+    {
+        var splashBuilder = PhotinoBlazorAppBuilder.CreateDefault(args);
         splashBuilder.RootComponents.Add<SplashView>("#app");
         splashBuilder.Services.AddBlazorDesktop();
+        SetupLogging(splashBuilder);
 
-        this.SplashWindowApp = splashBuilder.Build();
-        this.SplashWindowApp.MainWindow
-            .SetChromeless(true)
+        SplashWindowApp = splashBuilder.Build();
+        SplashWindowApp.MainWindow
+            .SetChromeless(false)
             .SetTitle("Daybreak - Loading...")
-            .SetResizable(false)
+            .SetResizable(true)
             .Center()
             .RegisterWindowCreatedHandler((sender, args) =>
             {
-                var hwnd = this.SplashWindowApp.MainWindow.WindowHandle;
+                var hwnd = SplashWindowApp.MainWindow.WindowHandle;
                 var preference = NativeMethods.DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND;
                 NativeMethods.DwmSetWindowAttribute(
                     hwnd,
@@ -36,5 +31,8 @@ public sealed class SplashWindow
                     ref preference,
                     sizeof(uint));
             });
+
+        SplashWindowApp.MainWindow.RegisterWindowCreatedHandler(splashShownContinue);
+        SplashWindowApp.Run();
     }
 }

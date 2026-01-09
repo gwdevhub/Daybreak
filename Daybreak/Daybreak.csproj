@@ -14,12 +14,6 @@
     <UserSecretsId>cfb2a489-db80-448d-a969-80270f314c46</UserSecretsId>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-    <!-- Disable static web assets completely - this is a desktop app using Photino/embedded file provider -->
-    <StaticWebAssetsBuildEnabled>false</StaticWebAssetsBuildEnabled>
-    <GenerateStaticWebAssetsManifest>false</GenerateStaticWebAssetsManifest>
-    <GenerateStaticWebAssetsDevelopmentManifest>false</GenerateStaticWebAssetsDevelopmentManifest>
-    <ResolveStaticWebAssetsInputsDependsOn></ResolveStaticWebAssetsInputsDependsOn>
-    <UseRazorBuildServer>false</UseRazorBuildServer>
   </PropertyGroup>
 
   <!-- Clear all static web assets to prevent SDK bugs in .NET 10 -->
@@ -47,7 +41,7 @@
       <EmbeddedResource Include="$(UserSecretsFilePath)" Condition="Exists($(UserSecretsFilePath))" />
     </ItemGroup>
   </Target>
-		
+
   <ItemGroup>
     <PackageReference Include="Elastic.OpenTelemetry" />
     <PackageReference Include="ksemenenko.ColorThief" />
@@ -70,6 +64,14 @@
     <PackageReference Include="Microsoft.CorrelationVector" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Serilog" />
+    <PackageReference Include="Serilog.Enrichers.AssemblyName" />
+    <PackageReference Include="Serilog.Enrichers.Environment" />
+    <PackageReference Include="Serilog.Enrichers.Process" />
+    <PackageReference Include="Serilog.Enrichers.Thread" />
+    <PackageReference Include="Serilog.Extensions.Logging" />
+    <PackageReference Include="Serilog.Sinks.Console" />
+    <PackageReference Include="Serilog.Sinks.Debug" />
     <PackageReference Include="SevenZipExtractor" />
     <!-- Exclude WPF assets from WebView2 to avoid WindowsBase version conflict (MSB3277) -->
     <PackageReference Include="Microsoft.Web.WebView2" ExcludeAssets="buildTransitive" PrivateAssets="all">
@@ -94,7 +96,17 @@
     <Message Importance="high" Text="📦 Daybreak.wiki -&gt; wwwroot/wiki" />
     <Copy SourceFiles="@(WikiFiles)" DestinationFiles="@(WikiFiles->'wwwroot\wiki\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
   </Target>
-	
+
+  <!-- Copy wwwroot to output directory for Photino.Blazor -->
+  <ItemGroup>
+    <WwwrootFiles Include="wwwroot\**\*.*" />
+  </ItemGroup>
+
+  <Target Name="CopyWwwrootToOutput" AfterTargets="Build">
+    <Message Importance="high" Text="📦 wwwroot -&gt; $(DependencyOutput)wwwroot" />
+    <Copy SourceFiles="@(WwwrootFiles)" DestinationFiles="@(WwwrootFiles->'$(DependencyOutput)wwwroot\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
     <Exec Command="echo.&gt;$(Version).version" />
   </Target>
