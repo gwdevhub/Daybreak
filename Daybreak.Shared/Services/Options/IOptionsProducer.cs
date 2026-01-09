@@ -2,6 +2,6 @@
 
 public interface IOptionsProducer
 {
-    void RegisterOptions<T>()
-        where T : class, new();
+    void RegisterOptions<TOptions>()
+        where TOptions : class, new();
 }

@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using Photino.Blazor;
+using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Daybreak.Tests")]
 namespace Daybreak.Launch;
@@ -11,14 +12,13 @@ public static partial class Launcher
 #if DEBUG
         AllocateAnsiConsole();
 #endif
-        CreateAndShowSplash(args,
-            (_, __) => LaunchSequence(args));
+        CreateAndShowSplash(args, LaunchSequence);
         return 0;
     }
 
-    private static void LaunchSequence(string[] args)
+    private static void LaunchSequence(string[] args, PhotinoBlazorApp splashApp)
     {
         var builder = CreateMainBuilder(args);
-        
+        LaunchState.UpdateProgress(LaunchState.LoadingOptions);
     }
 }

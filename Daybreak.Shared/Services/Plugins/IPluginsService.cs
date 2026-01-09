@@ -8,7 +8,7 @@ using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Startup;
 using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.Updater.PostUpdate;
-using Slim;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Daybreak.Shared.Services.Plugins;
 
@@ -19,7 +19,7 @@ public interface IPluginsService
     IEnumerable<AvailablePlugin> GetCurrentlyLoadedPlugins();
 
     void LoadPlugins(
-        IServiceManager serviceManager,
+        IServiceCollection services,
         IOptionsProducer optionsProducer,
         IViewProducer viewProducer,
         IPostUpdateActionProducer postUpdateActionProducer,

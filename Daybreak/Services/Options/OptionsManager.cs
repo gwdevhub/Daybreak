@@ -1,4 +1,5 @@
-﻿using Daybreak.Shared.Attributes;
+﻿using Daybreak.Models;
+using Daybreak.Shared.Attributes;
 using Daybreak.Shared.Models.Options;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Utils;
@@ -12,7 +13,7 @@ using System.Reflection;
 
 namespace Daybreak.Services.Options;
 
-internal sealed class OptionsManager : IOptionsProducer, IOptionsProvider
+internal sealed class OptionsManager : IOptionsProvider
 {
     private const string OptionsFileSubPath = "Daybreak.options";
 
@@ -23,7 +24,8 @@ internal sealed class OptionsManager : IOptionsProducer, IOptionsProvider
     private readonly HashSet<Type> optionsTypes = [];
     private readonly List<OptionType> optionDefinitions = [];
 
-    public OptionsManager()
+    public OptionsManager(
+        IEnumerable<OptionEntry> registeredOptions)
     {
         if (File.Exists(OptionsFile) is false)
         {
@@ -40,6 +42,11 @@ internal sealed class OptionsManager : IOptionsProducer, IOptionsProvider
             this.optionsCache = JsonConvert.DeserializeObject<Dictionary<string, string>>(optionsFileContent) ??
             throw new InvalidOperationException("Unable to load options. Operation failed during deserialization");
         }
+
+        foreach(var option in registeredOptions)
+        {
+            this.RegisterOptions(option.OptionType);
+        }
     }
 
     public T GetOptions<T>()
@@ -53,27 +60,6 @@ internal sealed class OptionsManager : IOptionsProducer, IOptionsProvider
 
         return JsonConvert.DeserializeObject<T>(value) ??
             throw new InvalidOperationException($"Failed to deserialize options {optionsName}");
-    }
-
-    public void RegisterOptions<T>()
-        where T : class, new()
-    {
-        var optionsName = GetOptionsName<T>();
-        if (this.optionsCache.ContainsKey(optionsName) is false)
-        {
-            this.optionsCache.Add(optionsName, JsonConvert.SerializeObject(Activator.CreateInstance<T>()));
-        }
-
-        this.optionsTypes.Add(typeof(T));
-        this.optionDefinitions.Add(new OptionType
-        {
-            Name = optionsName,
-            Description = GetOptionsToolTip(typeof(T)),
-            Type = typeof(T),
-            IsVisible = IsOptionsVisible(typeof(T)),
-            IsSynchronized = IsSynchronizedOption(typeof(T)),
-            Properties = [.. GetOptionProperties(typeof(T), optionsName)]
-        });
     }
 
     public void RegisterHook<TOptionsType>(Action action)
@@ -140,6 +126,12 @@ internal sealed class OptionsManager : IOptionsProducer, IOptionsProvider
         return new OptionInstance { Reference = instance!, Type = type };
     }
 
+    public void SaveOption<TOptions>(TOptions options)
+        where TOptions : notnull
+    {
+        this.SaveRegisteredOptions(options);
+    }
+
     public void SaveRegisteredOptions(object options)
     {
         options.ThrowIfNull();
@@ -184,6 +176,27 @@ internal sealed class OptionsManager : IOptionsProducer, IOptionsProvider
 
         return JsonConvert.DeserializeObject<JObject>(value);
     }
+
+    private void RegisterOptions(Type optionType)
+    {
+        var optionsName = GetOptionsName(optionType);
+        if (this.optionsCache.ContainsKey(optionsName) is false)
+        {
+            this.optionsCache.Add(optionsName, JsonConvert.SerializeObject(Activator.CreateInstance(optionType)));
+        }
+
+        this.optionsTypes.Add(optionType);
+        this.optionDefinitions.Add(new OptionType
+        {
+            Name = optionsName,
+            Description = GetOptionsToolTip(optionType),
+            Type = optionType,
+            IsVisible = IsOptionsVisible(optionType),
+            IsSynchronized = IsSynchronizedOption(optionType),
+            Properties = [.. GetOptionProperties(optionType, optionsName)]
+        });
+    }
+
 
     private void SaveOptions(Type type, object value)
     {

@@ -1,12 +1,13 @@
-﻿using Daybreak.Configuration.Options;
-using Daybreak.Shared.Models;
+﻿using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Screens;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Diagnostics;
+using System.Drawing;
 using System.Extensions;
+using System.Runtime.InteropServices;
 
 namespace Daybreak.Services.Screens;
 
@@ -18,7 +19,7 @@ internal sealed class ScreenManager(
     //private readonly ILiveUpdateableOptions<ScreenManagerOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
     private readonly ILogger<ScreenManager> logger = logger.ThrowIfNull();
 
-    public IEnumerable<Screen> Screens { get; } = []; //TODO: Implement screen detection
+    public IEnumerable<Screen> Screens => GetAllScreens();
 
     Task IHostedService.StartAsync(CancellationToken cancellationToken)
     {
@@ -59,5 +60,26 @@ internal sealed class ScreenManager(
     {
         var process = Process.GetProcessesByName("gw").FirstOrDefault();
         return process is not null ? process.MainWindowHandle : default;
+    }
+
+    private static List<Screen> GetAllScreens()
+    {
+        var screens = new List<Screen>();
+        int index = 0;
+
+        NativeMethods.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, (IntPtr hMonitor, IntPtr hdcMonitor, ref NativeMethods.RECT lprcMonitor, IntPtr dwData) =>
+        {
+            var monitorInfo = new NativeMethods.MonitorInfoEx();
+            monitorInfo.CbSize = (uint)Marshal.SizeOf<NativeMethods.MonitorInfoEx>();
+
+            if (NativeMethods.GetMonitorInfo(hMonitor, ref monitorInfo))
+            {
+                screens.Add(new Screen(index++, new Rectangle(monitorInfo.RcMonitor.Left, monitorInfo.RcMonitor.Top, monitorInfo.RcMonitor.Width, monitorInfo.RcMonitor.Height)));
+            }
+
+            return true;
+        }, IntPtr.Zero);
+
+        return screens;
     }
 }

@@ -1,6 +1,6 @@
-﻿<div class="splash-container">
+﻿<div class="splash-container" style="background: @(this.ThemeManager.NeutralBaseColorHex)">
     <div class="splash-logo">
-        <Daybreak.Views.Components.Icons.Misc.GoldenArrowGlyph Foreground="red" />
+        <Daybreak.Views.Components.Icons.Misc.GoldenArrowGlyph Foreground="@this.ThemeManager.AccentBaseColorHex" />
     </div>
     <FluentProgressRing Min="0"
                         Max="100"
@@ -10,15 +10,21 @@
 
 @using Daybreak.Launch
 @using Daybreak.Shared.Models.Async
+@using Daybreak.Shared.Services.Themes
+@using Microsoft.Extensions.Options
 @code{
+    [Inject]
+    public required IThemeManager ThemeManager { get; init; }
+
     protected override Task OnInitializedAsync()
     {
+        this.ThemeManager.ThemeChanged += (_, _) => this.InvokeAsync(this.StateHasChanged);
         LaunchState.ProgressChanged += this.OnProgressChanged;
         return base.OnInitializedAsync();
     }
 
     private void OnProgressChanged(object? sender, ProgressUpdate e)
     {
-        InvokeAsync(StateHasChanged);
+        this.InvokeAsync(this.StateHasChanged);
     }
 }

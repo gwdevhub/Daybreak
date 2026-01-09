@@ -40,6 +40,7 @@ public static class NativeMethods
         BottomRight = 17
     }
 
+    public delegate bool MonitorEnumProc(IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData);
     public delegate nint HookProc(int nCode, nint wParam, nint lParam);
 
     public enum DWMWINDOWATTRIBUTE { DWMWA_WINDOW_CORNER_PREFERENCE = 33 }
@@ -164,6 +165,16 @@ public static class NativeMethods
         MEM_PHYSICAL = 0x00400000,
         MEM_TOP_DOWN = 0x00100000,
         MEM_WRITE_WATCH = 0x00200000
+    }
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+    public struct MonitorInfoEx
+    {
+        public uint CbSize;
+        public readonly RECT RcMonitor;
+        public readonly RECT RcWork;
+        public readonly uint DwFlags;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+        public readonly string SzDevice;
     }
     [StructLayout(LayoutKind.Sequential)]
     public readonly struct RECT(int left, int top, int right, int bottom)
@@ -584,4 +595,9 @@ public static class NativeMethods
 
     [DllImport("kernel32.dll", SetLastError = true)]
     public static extern nint OpenThread(ThreadAccess dwDesiredAccess, bool bInheritHandle, uint dwThreadId);
+    [DllImport("user32.dll")]
+    public static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, MonitorEnumProc lpfnEnum, IntPtr dwData);
+
+    [DllImport("user32.dll", CharSet = CharSet.Auto)]
+    public static extern bool GetMonitorInfo(IntPtr hMonitor, ref MonitorInfoEx lpmi);
 }
