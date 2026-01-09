@@ -5,7 +5,6 @@
   <ItemGroup>
     <PackageVersion Include="CommunityToolkit.Authentication.Msal" Version="7.1.4" />
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
-    <PackageVersion Include="Daybreak.7ZipExtractor" Version="1.0.0" />
     <PackageVersion Include="DiffPlex" Version="1.9.0" />
     <PackageVersion Include="Elastic.OpenTelemetry" Version="1.2.2" />
     <PackageVersion Include="FluentAssertions" Version="8.8.0" />
@@ -15,10 +14,7 @@
     <PackageVersion Include="MeaMod.DNS" Version="1.0.71" />
     <PackageVersion Include="MemoryPack" Version="1.21.4" />
     <PackageVersion Include="MemoryPack.Generator" Version="1.21.4" />
-    <!-- Pinned. TODO: #1226 New version of Microsoft.AspNetCore.Components.WebView.Wpf is unstable -->
     <PackageVersion Include="Microsoft.AspNetCore.Components" Version="10.0.1" />
-    <!-- Pinned. TODO: #1226 New version of Microsoft.AspNetCore.Components.WebView.Wpf is unstable -->
-    <PackageVersion Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="10.0.20" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.1" />
     <PackageVersion Include="Microsoft.Authentication.WebAssembly.Msal" Version="9.0.8" />
     <PackageVersion Include="Microsoft.CorrelationVector" Version="1.0.42" />
@@ -68,10 +64,6 @@
     <PackageVersion Include="SystemExtensions.NetStandard.DependencyInjection" Version="1.7.0" />
     <PackageVersion Include="SystemExtensions.NetStandard.Generators" Version="0.1.6" />
     <PackageVersion Include="TrailBlazr" Version="0.3.1" />
-    <!-- Pinned. TODO: #1226 New version of Microsoft.AspNetCore.Components.WebView.Wpf is unstable -->
-    <PackageVersion Include="WpfExtended.Blazor" Version="0.9.0" />
-    <PackageVersion Include="WpfExtended.SourceGeneration" Version="0.3.1" />
-    <PackageVersion Include="WpfScreenHelper" Version="2.1.1" />
     <PackageVersion Include="zgabi.ManagedXZ" Version="1.0.2" />
     <PackageVersion Include="ZLinq" Version="1.5.4" />
   </ItemGroup>

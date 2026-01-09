@@ -108,19 +108,20 @@ internal sealed class GuildWarsCopyService(
     private static bool TryGetDestinationPath(out string path)
     {
         path = string.Empty;
-        var folderPicker = new OpenFolderDialog()
-        {
-            Title = "Select Destination Folder",
-            Multiselect = false,
-            ValidateNames = true
-        };
+        //TODO: Implement folder picker for .NET 10
+        //var folderPicker = new OpenFolderDialog()
+        //{
+        //    Title = "Select Destination Folder",
+        //    Multiselect = false,
+        //    ValidateNames = true
+        //};
 
-        if (folderPicker.ShowDialog() is not true)
-        {
-            return false;
-        }
+        //if (folderPicker.ShowDialog() is not true)
+        //{
+        //    return false;
+        //}
 
-        path = Path.GetFullPath(folderPicker.FolderName);
+        //path = Path.GetFullPath(folderPicker.FolderName);
         return true;
     }
 }

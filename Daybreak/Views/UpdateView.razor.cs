@@ -31,7 +31,8 @@ public sealed class UpdateViewModel(
     public void Continue()
     {
         this.applicationUpdater.FinalizeUpdate();
-        Application.Current.Shutdown();
+        //TODO: Re-enable application restart
+        //Application.Current.Shutdown();
     }
 
     private async ValueTask PerformUpdate(Version version)

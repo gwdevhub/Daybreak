@@ -166,12 +166,13 @@ internal sealed class NotificationService(
 
         if (Global.CoreWebView2 is null && logLevel is LogLevel.Error or LogLevel.Critical)
         {
+            // TODO: Implement message box for .NET 10
             // If WebView2 is not initialized, we cannot show UI notifications.
-            MessageBox.Show(
-                description,
-                title,
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
+            //MessageBox.Show(
+            //    description,
+            //    title,
+            //    MessageBoxButton.OK,
+            //    MessageBoxImage.Error);
         }
         else
         {

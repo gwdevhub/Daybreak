@@ -51,22 +51,23 @@ public sealed class PluginsViewModel(
 
     public async void LoadPluginsFromDisk()
     {
-        var filePicker = new OpenFileDialog
-        {
-            Filter = "Dll Files (*.dll)|*.dll",
-            Multiselect = true,
-            RestoreDirectory = true,
-            Title = "Please select dll files"
-        };
-        if (filePicker.ShowDialog() is false)
-        {
-            return;
-        }
+        //TODO: Re-enable file picker dialog
+        //var filePicker = new OpenFileDialog
+        //{
+        //    Filter = "Dll Files (*.dll)|*.dll",
+        //    Multiselect = true,
+        //    RestoreDirectory = true,
+        //    Title = "Please select dll files"
+        //};
+        //if (filePicker.ShowDialog() is false)
+        //{
+        //    return;
+        //}
 
-        foreach (var name in filePicker.FileNames)
-        {
-            await this.pluginsService.AddPlugin(name);
-        }
+        //foreach (var name in filePicker.FileNames)
+        //{
+        //    await this.pluginsService.AddPlugin(name);
+        //}
 
         this.UpdatePlugins();
         this.CheckChanges();

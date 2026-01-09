@@ -89,29 +89,32 @@ public sealed class LogsViewModel(
         await this.RefreshViewAsync();
         var serializedLogsTask = Task.Factory.StartNew(() =>
         {
+            //TODO: Re-enable logs serialization
             //var logs = this.logsManager.GetLogs();
-            return JsonConvert.SerializeObject(logs, Formatting.Indented);
+            //return JsonConvert.SerializeObject(logs, Formatting.Indented);
+            return string.Empty;
         }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
         var selectedFilePath = Task.Factory.StartNew(() =>
         {
-            var saveFileDialog = new SaveFileDialog()
-            {
-                Title = "Save Logs",
-                Filter = "Zip Files (*.zip)|*.zip|All Files (*.*)|*.*",
-                DefaultExt = "zip",
-                AddExtension = true,
-                OverwritePrompt = true,
-                FileName = $"logs-{DateTime.Now:yyyyMMdd-HHmmss}.zip",
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
-            };
+            //TODO: Re-enable file save dialog
+            //var saveFileDialog = new SaveFileDialog()
+            //{
+            //    Title = "Save Logs",
+            //    Filter = "Zip Files (*.zip)|*.zip|All Files (*.*)|*.*",
+            //    DefaultExt = "zip",
+            //    AddExtension = true,
+            //    OverwritePrompt = true,
+            //    FileName = $"logs-{DateTime.Now:yyyyMMdd-HHmmss}.zip",
+            //    InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+            //};
 
-            if (saveFileDialog.ShowDialog() is true)
-            {
-                return saveFileDialog.FileName;
-            }
+            //if (saveFileDialog.ShowDialog() is true)
+            //{
+            //    return saveFileDialog.FileName;
+            //}
 
-            return default;
+            return string.Empty;
         });
 
         try

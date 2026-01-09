@@ -1,15 +1,18 @@
-﻿using System.Windows;
-using Windows.Foundation;
+﻿using static Daybreak.Shared.Utils.NativeMethods;
 
 namespace Daybreak.Shared.Models;
 
-public readonly struct Screen(int id, Rect size)
+public readonly struct Screen(int id, RECT size)
     : IEquatable<Screen>
 {
     public readonly int Id = id;
-    public readonly Rect Size = size;
+    public readonly RECT Size = size;
 
-    public bool Equals(Screen other) => this.Id == other.Id && this.Size == other.Size;
+    public bool Equals(Screen other) => this.Id == other.Id
+        && this.Size.Top == other.Size.Top
+        && this.Size.Bottom == other.Size.Bottom
+        && this.Size.Left == other.Size.Left
+        && this.Size.Right == other.Size.Right;
 
     public override int GetHashCode() => HashCode.Combine(this.Id, this.Size);
 

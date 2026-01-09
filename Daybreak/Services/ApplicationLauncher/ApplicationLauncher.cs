@@ -107,7 +107,8 @@ internal sealed class ApplicationLauncher(
             throw new InvalidOperationException($"Unable to start {processName} as admin");
         }
 
-        Application.Current.Shutdown();
+        //TODO: Graceful shutdown
+        //Application.Current.Shutdown();
     }
 
     public void RestartDaybreakAsNormalUser()
@@ -135,7 +136,8 @@ internal sealed class ApplicationLauncher(
             throw new InvalidOperationException($"Unable to start {processName} as normal user");
         }
 
-        Application.Current.Shutdown();
+        //TODO: Graceful shutdown
+        //Application.Current.Shutdown();
     }
 
     private async Task<Process?> LaunchGuildwarsProcess(LaunchConfigurationWithCredentials launchConfigurationWithCredentials, CancellationToken cancellationToken)

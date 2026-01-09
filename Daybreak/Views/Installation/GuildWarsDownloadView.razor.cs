@@ -34,23 +34,25 @@ public sealed class GuildWarsDownloadViewModel(
 
     private async ValueTask StartDownload()
     {
-        var dialog = new OpenFolderDialog
-        {
-            Title = "Select Guild Wars Installation Folder",
-            Multiselect = false,
-            ValidateNames = true
-        };
+        //TODO: Re-enable folder selection dialog
+        //var dialog = new OpenFolderDialog
+        //{
+        //    Title = "Select Guild Wars Installation Folder",
+        //    Multiselect = false,
+        //    ValidateNames = true
+        //};
 
-        if (dialog.ShowDialog() is not true)
-        {
-            this.notificationService.NotifyInformation(
-                title: "Guild Wars Installation Cancelled",
-                description: "Installation cancelled by user.");
-            this.viewManager.ShowView<LaunchView>();
-            return;
-        }
+        //if (dialog.ShowDialog() is not true)
+        //{
+        //    this.notificationService.NotifyInformation(
+        //        title: "Guild Wars Installation Cancelled",
+        //        description: "Installation cancelled by user.");
+        //    this.viewManager.ShowView<LaunchView>();
+        //    return;
+        //}
 
-        var installationPath = Path.GetFullPath(dialog.FolderName);
+        //var installationPath = Path.GetFullPath(dialog.FolderName);
+        var installationPath = string.Empty;
         var installationProgress = new Progress<ProgressUpdate>();
         installationProgress.ProgressChanged += this.InstallationStatus_PropertyChanged;
         var result = false;

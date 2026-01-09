@@ -51,7 +51,7 @@ internal sealed class ScreenManager(
             return false;
         }
 
-        NativeMethods.SetWindowPos(hwnd.Value, NativeMethods.HWND_TOP, screen.Size.Left.ToInt(), screen.Size.Top.ToInt(), screen.Size.Width.ToInt(), screen.Size.Height.ToInt(), NativeMethods.SWP_SHOWWINDOW);
+        NativeMethods.SetWindowPos(hwnd.Value, NativeMethods.HWND_TOP, screen.Size.Left, screen.Size.Top, screen.Size.Width, screen.Size.Height, NativeMethods.SWP_SHOWWINDOW);
         return true;
     }
 

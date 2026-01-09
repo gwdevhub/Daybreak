@@ -203,20 +203,21 @@ public class ExecutablesViewModel(
 
     private static string? GetPath()
     {
-        var filePicker = new Microsoft.Win32.OpenFileDialog()
-        {
-            CheckFileExists = true,
-            CheckPathExists = true,
-            DefaultExt = "exe",
-            Filter = "Executable Files (*.exe)|*.exe|All Files (*.*)|*.*",
-            Multiselect = false,
-            Title = "Select Guild Wars Executable"
-        };
+        //TODO: Implement file picker dialog
+        //var filePicker = new Microsoft.Win32.OpenFileDialog()
+        //{
+        //    CheckFileExists = true,
+        //    CheckPathExists = true,
+        //    DefaultExt = "exe",
+        //    Filter = "Executable Files (*.exe)|*.exe|All Files (*.*)|*.*",
+        //    Multiselect = false,
+        //    Title = "Select Guild Wars Executable"
+        //};
 
-        if (filePicker.ShowDialog() == true)
-        {
-            return filePicker.FileName;
-        }
+        //if (filePicker.ShowDialog() == true)
+        //{
+        //    return filePicker.FileName;
+        //}
 
         return default;
     }

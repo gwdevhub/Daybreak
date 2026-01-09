@@ -8,6 +8,7 @@ public sealed class MessageBoxHandler : INotificationHandler
 {
     public void OpenNotification(Notification notification)
     {
-        MessageBox.Show(notification.Description, notification.Title);
+        //TODO: Implement message box
+        //MessageBox.Show(notification.Description, notification.Title);
     }
 }

@@ -5,14 +5,7 @@
     <Nullable>enable</Nullable>
     <LangVersion>preview</LangVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <Platforms>AnyCPU;x86</Platforms>
-    
-    <!-- Configure this project as a Razor class library that doesn't generate static web assets -->
-    <!-- Only the final host application (Daybreak) should generate static web assets -->
-    <StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
-    <GenerateStaticWebAssetsManifest>false</GenerateStaticWebAssetsManifest>
-    <ResolveStaticWebAssetsInputsDependsOn></ResolveStaticWebAssetsInputsDependsOn>
-    <IncludePackageReferencesDuringMarkupCompilation>false</IncludePackageReferencesDuringMarkupCompilation>
+    <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,10 +20,6 @@
     <PackageReference Include="SystemExtensions.NetStandard.DependencyInjection" />
     <PackageReference Include="SystemExtensions.NetStandard.Generators" PrivateAssets="all" />
     <PackageReference Include="TrailBlazr" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Services\Window\" />
   </ItemGroup>
 
   <Target Name="RemoveDuplicateAnalyzers" BeforeTargets="CoreCompile">

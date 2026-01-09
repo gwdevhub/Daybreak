@@ -258,20 +258,23 @@ internal sealed class UModService(
     {
         return Task.Factory.StartNew<IReadOnlyCollection<string>>(() =>
         {
-            var openFileDialog = new OpenFileDialog
-            {
-                Filter = "Mod files (*.tpf;*.zip)|*.tpf;*.zip|TPF files (*.tpf)|*.tpf|ZIP files (*.zip)|*.zip",
-                Title = "Select Mod Files",
-                Multiselect = true
-            };
+            //TODO: Implement file dialog in a platform agnostic way
+            //var openFileDialog = new OpenFileDialog
+            //{
+            //    Filter = "Mod files (*.tpf;*.zip)|*.tpf;*.zip|TPF files (*.tpf)|*.tpf|ZIP files (*.zip)|*.zip",
+            //    Title = "Select Mod Files",
+            //    Multiselect = true
+            //};
 
-            var result = openFileDialog.ShowDialog();
-            if (result != true || openFileDialog.FileNames.Length == 0)
-            {
-                return [];
-            }
+            //var result = openFileDialog.ShowDialog();
+            //if (result != true || openFileDialog.FileNames.Length == 0)
+            //{
+            //    return [];
+            //}
 
-            return [.. openFileDialog.FileNames.Where(f => this.AddMod(f, imported: true))];
+            //return [.. openFileDialog.FileNames.Where(f => this.AddMod(f, imported: true))];
+
+            return [];
         }, cancellationToken);
     }
 

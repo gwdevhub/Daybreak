@@ -1,14 +1,9 @@
 ﻿using System.Core.Extensions;
 using System.Diagnostics;
+using System.Drawing;
 using System.Extensions;
-using System.IO;
-using System.Windows;
-using System.Windows.Input;
-using System.Windows.Interop;
-using System.Windows.Media;
 using Daybreak.Services.Logging;
 using Daybreak.Services.Notifications.Handlers;
-using Daybreak.Shared;
 using Daybreak.Shared.Models.Menu;
 using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Notifications;
@@ -20,9 +15,7 @@ using Daybreak.Shared.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
-using Microsoft.Web.WebView2.Core;
 using TrailBlazr.Services;
-using static Daybreak.Shared.Models.Themes.Theme;
 
 namespace Daybreak.Views;
 
@@ -44,9 +37,9 @@ public sealed class AppViewModel
     private SemaphoreSlim themeChangeSemaphore = new(1, 1);
     private string? tradeChatThemeSetterScript = default;
     private bool isInitialized = false;
-    private HwndSource? hwndSource;
+    //private HwndSource? hwndSource;
 
-    public event EventHandler<WindowState>? WindowStateChanged;
+    //public event EventHandler<WindowState>? WindowStateChanged;
     public event EventHandler? RedrawRequested;
 
     public Type CurrentViewType { get; private set; } = typeof(LaunchView);
@@ -55,7 +48,7 @@ public sealed class AppViewModel
 
     public List<MenuCategory> MenuCategories { get; private set; } = [];
 
-    public WindowState WindowState { get; }
+    //public WindowState WindowState { get; }
     public bool IsAdmin => this.privilegeManager.AdminPrivileges;
     public bool IsNavigationOpen { get; private set; }
     public string CurrentVersionText => this.applicationUpdater.CurrentVersion.ToString();
@@ -115,13 +108,14 @@ public sealed class AppViewModel
         //this.blazorHostWindow.PreviewKeyUp += this.BlazorHostWindow_PreviewKeyDown;
     }
 
-    private void BlazorHostWindow_PreviewKeyDown(object sender, KeyEventArgs e)
-    {
-        if (e.Key is Key.F1)
-        {
-            this.viewManager.ShowView<WikiView>((nameof(WikiView.Page), "Home"));
-        }
-    }
+    //TODO: Fix F1 press handling
+    //private void BlazorHostWindow_PreviewKeyDown(object sender, KeyEventArgs e)
+    //{
+    //    if (e.Key is Key.F1)
+    //    {
+    //        this.viewManager.ShowView<WikiView>((nameof(WikiView.Page), "Home"));
+    //    }
+    //}
 
     public async ValueTask InitializeApp(IJSRuntime jsRuntime)
     {
@@ -397,10 +391,11 @@ public sealed class AppViewModel
         }
     }
 
-    private void MainWindow_StateChanged(object? sender, EventArgs e)
-    {
-        this.WindowStateChanged?.Invoke(this, this.WindowState);
-    }
+    // Fix window state change handling
+    //private void MainWindow_StateChanged(object? sender, EventArgs e)
+    //{
+    //    this.WindowStateChanged?.Invoke(this, this.WindowState);
+    //}
 
     private string GetBackdropImageUrl(string backdropPath)
     {

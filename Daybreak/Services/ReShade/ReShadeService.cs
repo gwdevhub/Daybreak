@@ -266,19 +266,22 @@ internal sealed class ReShadeService(
 
     public async Task<bool> LoadReShadeFromDisk(CancellationToken cancellationToken)
     {
-        var dialog = new OpenFileDialog
-        {
-            Filter = "ReShade Installer (ReShade_Setup_*.exe)|ReShade_Setup_*.exe",
-            Multiselect = false
-        };
+        //TODO: Implement file dialog
+        //var dialog = new OpenFileDialog
+        //{
+        //    Filter = "ReShade Installer (ReShade_Setup_*.exe)|ReShade_Setup_*.exe",
+        //    Multiselect = false
+        //};
 
-        if (dialog.ShowDialog() is not true)
-        {
-            return false;
-        }
+        //if (dialog.ShowDialog() is not true)
+        //{
+        //    return false;
+        //}
 
-        var selectedPath = dialog.FileName;
-        return await this.SetupReshadeDllFromInstaller(selectedPath, cancellationToken);
+        //var selectedPath = dialog.FileName;
+        //return await this.SetupReshadeDllFromInstaller(selectedPath, cancellationToken);
+
+        return false;
     }
 
     public async Task<bool> SetupReShade(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
