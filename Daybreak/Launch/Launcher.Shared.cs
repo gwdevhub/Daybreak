@@ -1,4 +1,5 @@
 ﻿using Daybreak.Services.Logging;
+using Daybreak.Shared.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -12,7 +13,7 @@ public partial class Launcher
 {
     private const string OutputTemplate = "[{Timestamp:yyyy-MM-dd HH:mm:ss}] {Level:u4}: [{EnvironmentName}] [{ThreadId}:{ThreadName}] [{SourceContext}]{NewLine}{Message:lj}{NewLine}{Exception}";
 
-    public static void SetupLogging(PhotinoBlazorAppBuilder builder)
+    public static void SetupLogging(IServiceCollection services)
     {
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
@@ -27,19 +28,17 @@ public partial class Launcher
             .WriteTo.Console(
                 outputTemplate: OutputTemplate,
                 theme: AnsiConsoleTheme.Sixteen)
-            .WriteTo.Debug(
-                outputTemplate: OutputTemplate)
             .WriteTo.Sink(InMemorySink.Instance)
             .CreateLogger();
 
-        builder.Services.AddLogging(loggingBuilder =>
+        services.AddLogging(loggingBuilder =>
         {
             loggingBuilder.ClearProviders();
             loggingBuilder.AddSerilog(dispose: true);
         });
     }
 
-    internal static void StartHostedServices(PhotinoBlazorApp app, CancellationTokenSource cts)
+    private static void StartHostedServices(PhotinoBlazorApp app, CancellationTokenSource cts)
     {
         var hostedServices = app.Services.GetServices<IHostedService>();
         foreach (var hostedService in hostedServices)
@@ -48,7 +47,7 @@ public partial class Launcher
         }
     }
 
-    private static bool StopHostedServicesAsync(PhotinoBlazorApp app, CancellationTokenSource cts)
+    private static bool StopHostedServices(PhotinoBlazorApp app, CancellationTokenSource cts)
     {
         cts.CancelAfter(TimeSpan.FromSeconds(2));
         var hostedServices = app.Services.GetServices<IHostedService>();
@@ -57,5 +56,16 @@ public partial class Launcher
 
         cts.Dispose();
         return false;
+    }
+
+    private static void SetupRoundedWindows(PhotinoBlazorApp app)
+    {
+        var hwnd = app.MainWindow.WindowHandle;
+        var preference = NativeMethods.DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND;
+        NativeMethods.DwmSetWindowAttribute(
+            hwnd,
+            NativeMethods.DWMWINDOWATTRIBUTE.DWMWA_WINDOW_CORNER_PREFERENCE,
+            ref preference,
+            sizeof(uint));
     }
 }

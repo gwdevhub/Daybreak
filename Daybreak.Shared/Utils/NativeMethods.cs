@@ -10,6 +10,7 @@ public static class NativeMethods
     public const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004;
     public const uint ENABLE_PROCESSED_OUTPUT = 0x0001;
 
+    public const int GWLP_WNDPROC = -4;
     public const int WM_NCHITTEST = 0x0084;
     public const int HTCLIENT = 1;
     public const int HTCAPTION = 2;
@@ -18,6 +19,7 @@ public static class NativeMethods
     public const int HTCLOSE = 20;
 
     public const uint WM_KEYDOWN = 0x0100;
+    public const uint WM_KEYUP = 0x0101;
     public const uint SWP_SHOWWINDOW = 0x0040;
     public const nint HWND_TOPMOST = -1;
     public const nint HWND_TOP = 0;
@@ -42,6 +44,7 @@ public static class NativeMethods
 
     public delegate bool MonitorEnumProc(IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData);
     public delegate nint HookProc(int nCode, nint wParam, nint lParam);
+    public delegate nint WndProcDelegate(nint hwnd, uint msg, nint wParam, nint lParam);
 
     public enum DWMWINDOWATTRIBUTE { DWMWA_WINDOW_CORNER_PREFERENCE = 33 }
 
@@ -420,6 +423,12 @@ public static class NativeMethods
         CreateNoWindow = 0x08000000,
         ExtendedStartupInfoPresent = 0x00080000
     }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct POINT
+    {
+        public int X;
+        public int Y;
+    }
 
     public delegate bool Win32Callback(nint hwnd, nint lParam);
 
@@ -600,4 +609,12 @@ public static class NativeMethods
 
     [DllImport("user32.dll", CharSet = CharSet.Auto)]
     public static extern bool GetMonitorInfo(IntPtr hMonitor, ref MonitorInfoEx lpmi);
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern nint SetWindowLongPtr(nint hWnd, int nIndex, nint dwNewLong);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern nint CallWindowProc(nint lpPrevWndFunc, nint hWnd, uint Msg, nint wParam, nint lParam);
+
+    [DllImport("user32.dll")]
+    public static extern bool ScreenToClient(nint hWnd, ref POINT lpPoint);
 }

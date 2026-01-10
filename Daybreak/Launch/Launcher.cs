@@ -1,10 +1,9 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Services.Initialization;
-using Daybreak.Services.Options;
 using Daybreak.Shared.Models.Menu;
 using Daybreak.Shared.Models.Plugins;
 using Daybreak.Shared.Services.ApplicationArguments;
-using Daybreak.Shared.Services.Options;
+using Daybreak.Shared.Services.Keyboard;
 using Daybreak.Shared.Services.Plugins;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -19,35 +18,27 @@ namespace Daybreak.Launch;
 public partial class Launcher
 {
     [STAThread]
-    public static int Main(string[] args)
+    public static void Main(string[] args)
     {
 #if DEBUG
         AllocateAnsiConsole();
 #endif
-        CreateAndShowSplash(args, LaunchSequence);
-        return 0;
+        var bootstrap = SetupBootstrap();
+        LaunchSequence(args, bootstrap);
     }
 
-    private static void LaunchSequence(string[] args, PhotinoBlazorApp splashApp)
+    private static void LaunchSequence(string[] args, IServiceProvider bootstrap)
     {
-        var scopedLogger = splashApp.Services.GetRequiredService<ILogger<Launcher>>().CreateScopedLogger();
+        var scopedLogger = bootstrap.GetRequiredService<ILogger<Launcher>>().CreateScopedLogger();
         var builder = CreateMainBuilder(args);
-        var pluginsService = splashApp.Services.GetRequiredService<IPluginsService>();
-        var optionsManager = splashApp.Services.GetRequiredService<OptionsManager>();
-        var optionsProvider = splashApp.Services.GetRequiredService<IOptionsProvider>();
-
+        var pluginsService = bootstrap.GetRequiredService<IPluginsService>();
         pluginsService.LoadPlugins();
+
         var loadedPlugins = pluginsService.GetCurrentlyLoadedPlugins();
         var configurations = loadedPlugins.Select<AvailablePlugin, (string, PluginConfigurationBase?, AvailablePlugin?)>(p => (p.Name, p.Configuration, (AvailablePlugin?)p))
             .Prepend(("Daybreak Core", new ProjectConfiguration(), default)).ToList();
 
-        var menuEntryProducer = new MenuProducer(splashApp.Services.GetRequiredService<ILogger<MenuProducer>>());
-        var minProgress = 0.1;
-        var maxProgress = 0.9;
-        var totalConfigurations = configurations.Count;
-        var stepsPerConfiguration = 10; // Number of operations for each configuration
-        var step = (maxProgress - minProgress) / (totalConfigurations * stepsPerConfiguration);
-        var progress = minProgress;
+        var menuEntryProducer = new MenuProducer(bootstrap.GetRequiredService<ILogger<MenuProducer>>());
         foreach (var (pluginName, configuration, plugin) in configurations)
         {
             if (configuration is null)
@@ -56,22 +47,17 @@ public partial class Launcher
                 continue;
             }
 
-            LoadConfiguration(pluginName, splashApp, builder, configuration, menuEntryProducer, progress, step);
-            progress += stepsPerConfiguration * step;
+            LoadConfiguration(pluginName, bootstrap, builder, configuration, menuEntryProducer);
         }
 
-        // Setup bootstrapped services
         builder.Services.AddSingleton<IReadOnlyDictionary<string, MenuCategory>>(menuEntryProducer.categories.AsReadOnly());
         builder.Services.AddSingleton(pluginsService);
-        builder.Services.AddSingleton(optionsManager);
-        builder.Services.AddSingleton(optionsProvider);
 
         var mainApp = CreateMainApp(builder);
-        LaunchState.UpdateProgress(LaunchState.ExecutingArgumentHandlers);
-        ExecuteArgumentHandlers(mainApp, args);
 
-        LaunchState.UpdateProgress(LaunchState.Finalizing);
-        CloseSplash(splashApp);
+        var keyboardHook = mainApp.Services.GetRequiredService<IKeyboardHookService>();
+        keyboardHook.Start();
+        ExecuteArgumentHandlers(mainApp, args);
         RunMainApp(mainApp);
     }
 
@@ -83,54 +69,23 @@ public partial class Launcher
 
     private static void LoadConfiguration(
         string name,
-        PhotinoBlazorApp bootstrap,
+        IServiceProvider bootstrap,
         PhotinoBlazorAppBuilder builder,
         PluginConfigurationBase configuration,
-        MenuProducer menuProducer,
-        double progress,
-        double step)
+        MenuProducer menuProducer)
     {
-        var scopedLogger = bootstrap.Services.GetRequiredService<ILogger<Launcher>>().CreateScopedLogger();
+        var scopedLogger = bootstrap.GetRequiredService<ILogger<Launcher>>().CreateScopedLogger();
         scopedLogger.LogInformation("Loading configuration for {Configuration.Name}", name);
 
-        progress += step;
-        LaunchState.UpdateProgress(LaunchState.LoadingServices(progress));
         RegisterServices(builder, configuration, scopedLogger);
-
-        progress += step;
-        LaunchState.UpdateProgress(LaunchState.LoadingOptions(progress));
         RegisterOptions(bootstrap, builder, configuration, scopedLogger);
-
-        progress += step;
-        LaunchState.UpdateProgress(LaunchState.LoadingViews(progress));
         RegisterViews(bootstrap, builder, configuration, scopedLogger);
-
-        progress += step;
-        LaunchState.UpdateProgress(LaunchState.LoadingMods(progress));
         RegisterMods(bootstrap, builder, configuration, scopedLogger);
-
-        progress += step;
-        LaunchState.UpdateProgress(LaunchState.LoadingStartupActions(progress));
         RegisterStartupActions(bootstrap, builder, configuration, scopedLogger);
-
-        progress += step;
-        LaunchState.UpdateProgress(LaunchState.LoadingPostUpdateActions(progress));
         RegisterPostUpdateActions(bootstrap, builder, configuration, scopedLogger);
-
-        progress += step;
-        LaunchState.UpdateProgress(LaunchState.LoadingNotificationHandlers(progress));
         RegisterNotificationHandlers(bootstrap, builder, configuration, scopedLogger);
-
-        progress += step;
-        LaunchState.UpdateProgress(LaunchState.LoadingArgumentHandlers(progress));
         RegisterArgumentHandlers(bootstrap, builder, configuration, scopedLogger);
-
-        progress += step;
-        LaunchState.UpdateProgress(LaunchState.LoadingThemes(progress));
         RegisterThemes(bootstrap, builder, configuration, scopedLogger);
-
-        progress += step;
-        LaunchState.UpdateProgress(LaunchState.LoadingMenuEntries(progress));
         RegisterMenuEntries(configuration, menuProducer, scopedLogger);
 
         scopedLogger.LogInformation("Finished loading configuration for {Configuration.Name}", name);
@@ -148,11 +103,11 @@ public partial class Launcher
         }
     }
 
-    private static void RegisterOptions(PhotinoBlazorApp bootstrap, PhotinoBlazorAppBuilder builder, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
+    private static void RegisterOptions(IServiceProvider bootstrap, PhotinoBlazorAppBuilder builder, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
     {
         try
         {
-            var optionsProducer = new OptionProducer(builder.Services, bootstrap.Services.GetRequiredService<ILogger<OptionProducer>>());
+            var optionsProducer = new OptionProducer(builder.Services, bootstrap.GetRequiredService<ILogger<OptionProducer>>());
             configuration.RegisterOptions(optionsProducer);
         }
         catch (Exception ex)
@@ -161,11 +116,11 @@ public partial class Launcher
         }
     }
 
-    private static void RegisterViews(PhotinoBlazorApp bootstrap, PhotinoBlazorAppBuilder builder, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
+    private static void RegisterViews(IServiceProvider bootstrap, PhotinoBlazorAppBuilder builder, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
     {
         try
         {
-            var viewProducer = new TrailBlazrViewProducer(builder.Services, bootstrap.Services.GetRequiredService<ILogger<TrailBlazrViewProducer>>());
+            var viewProducer = new TrailBlazrViewProducer(builder.Services, bootstrap.GetRequiredService<ILogger<TrailBlazrViewProducer>>());
             configuration.RegisterViews(viewProducer);
         }
         catch(Exception ex)
@@ -174,11 +129,11 @@ public partial class Launcher
         }
     }
 
-    private static void RegisterMods(PhotinoBlazorApp bootstrap, PhotinoBlazorAppBuilder builder, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
+    private static void RegisterMods(IServiceProvider bootstrap, PhotinoBlazorAppBuilder builder, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
     {
         try
         {
-            var modsProducer = new ModsProducer(builder.Services, bootstrap.Services.GetRequiredService<ILogger<ModsProducer>>());
+            var modsProducer = new ModsProducer(builder.Services, bootstrap.GetRequiredService<ILogger<ModsProducer>>());
             configuration.RegisterMods(modsProducer);
         }
         catch(Exception ex)
@@ -187,11 +142,11 @@ public partial class Launcher
         }
     }
 
-    private static void RegisterStartupActions(PhotinoBlazorApp bootstrap, PhotinoBlazorAppBuilder builder, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
+    private static void RegisterStartupActions(IServiceProvider bootstrap, PhotinoBlazorAppBuilder builder, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
     {
         try
         {
-            var startupActionProducer = new StartupActionsProducer(builder.Services, bootstrap.Services.GetRequiredService<ILogger<StartupActionsProducer>>());
+            var startupActionProducer = new StartupActionsProducer(builder.Services, bootstrap.GetRequiredService<ILogger<StartupActionsProducer>>());
             configuration.RegisterStartupActions(startupActionProducer);
         }
         catch (Exception ex)
@@ -200,11 +155,11 @@ public partial class Launcher
         }
     }
 
-    private static void RegisterPostUpdateActions(PhotinoBlazorApp bootstrap, PhotinoBlazorAppBuilder builder, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
+    private static void RegisterPostUpdateActions(IServiceProvider bootstrap, PhotinoBlazorAppBuilder builder, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
     {
         try
         {
-            var postUpdateActionProducer = new PostUpdateActionProducer(builder.Services, bootstrap.Services.GetRequiredService<ILogger<PostUpdateActionProducer>>());
+            var postUpdateActionProducer = new PostUpdateActionProducer(builder.Services, bootstrap.GetRequiredService<ILogger<PostUpdateActionProducer>>());
             configuration.RegisterPostUpdateActions(postUpdateActionProducer);
         }
         catch (Exception ex)
@@ -213,11 +168,11 @@ public partial class Launcher
         }
     }
 
-    private static void RegisterNotificationHandlers(PhotinoBlazorApp bootstrap, PhotinoBlazorAppBuilder builder, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
+    private static void RegisterNotificationHandlers(IServiceProvider bootstrap, PhotinoBlazorAppBuilder builder, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
     {
         try
         {
-            var notificationHandlerProducer = new NotificationHandlerProducer(builder.Services, bootstrap.Services.GetRequiredService<ILogger<NotificationHandlerProducer>>());
+            var notificationHandlerProducer = new NotificationHandlerProducer(builder.Services, bootstrap.GetRequiredService<ILogger<NotificationHandlerProducer>>());
             configuration.RegisterNotificationHandlers(notificationHandlerProducer);
         }
         catch (Exception ex)
@@ -226,11 +181,11 @@ public partial class Launcher
         }
     }
 
-    private static void RegisterArgumentHandlers(PhotinoBlazorApp bootstrap, PhotinoBlazorAppBuilder builder, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
+    private static void RegisterArgumentHandlers(IServiceProvider bootstrap, PhotinoBlazorAppBuilder builder, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
     {
         try
         {
-            var argumentHandlerProducer = new ArgumentHandlerProducer(builder.Services, bootstrap.Services.GetRequiredService<ILogger<ArgumentHandlerProducer>>());
+            var argumentHandlerProducer = new ArgumentHandlerProducer(builder.Services, bootstrap.GetRequiredService<ILogger<ArgumentHandlerProducer>>());
             configuration.RegisterLaunchArgumentHandlers(argumentHandlerProducer);
         }
         catch(Exception ex)
@@ -239,11 +194,11 @@ public partial class Launcher
         }
     }
 
-    private static void RegisterThemes(PhotinoBlazorApp bootstrap, PhotinoBlazorAppBuilder builder, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
+    private static void RegisterThemes(IServiceProvider bootstrap, PhotinoBlazorAppBuilder builder, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
     {
         try
         {
-            var themeProducer = new ThemeProducer(builder.Services, bootstrap.Services.GetRequiredService<ILogger<ThemeProducer>>());
+            var themeProducer = new ThemeProducer(builder.Services, bootstrap.GetRequiredService<ILogger<ThemeProducer>>());
             configuration.RegisterThemes(themeProducer);
         }
         catch(Exception ex)

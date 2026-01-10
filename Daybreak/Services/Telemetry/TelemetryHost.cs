@@ -15,6 +15,8 @@ using System.Diagnostics.Tracing;
 using TrailBlazr.Services;
 
 namespace Daybreak.Services.Telemetry;
+
+//TODO: Fix swappable logger
 internal sealed class TelemetryHost : IDisposable, IHostedService
 {
     private const string ServiceName = "Daybreak";
@@ -42,7 +44,6 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
 
     private readonly ResourceBuilder resourceBuilder;
     private readonly ILoggerFactory loggerFactory;
-    private readonly SwappableLoggerProvider swappableLoggerProvider;
     private readonly IViewManager viewManager;
     private readonly IOptionsMonitor<TelemetryOptions> options;
     private readonly IOptionsMonitor<OpenTelemetryLoggerOptions> logOptions;
@@ -55,14 +56,12 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
     public TelemetryHost(
         ResourceBuilder resourceBuilder,
         ILoggerFactory loggerFactory,
-        SwappableLoggerProvider swappableLoggerProvider,
         IViewManager viewManager,
         IOptionsMonitor<TelemetryOptions> liveOptions)
     {
         this.resourceBuilder = resourceBuilder.ThrowIfNull();
         this.options = liveOptions.ThrowIfNull();
         this.loggerFactory = loggerFactory.ThrowIfNull();
-        this.swappableLoggerProvider = swappableLoggerProvider.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
         
         this.options.OnChange(this.OnOptionsUpdated);
@@ -155,7 +154,7 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
         this.meter?.Dispose();
         this.tracer = default;
         this.meter = default;
-        this.swappableLoggerProvider.SetInner(null);
+        //this.swappableLoggerProvider.SetInner(null);
         this.logger?.Dispose();
         this.logger = default;
 
@@ -216,7 +215,7 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
             .Build();
 
         this.logger = new OpenTelemetryLoggerProvider(this.logOptions);
-        this.swappableLoggerProvider.SetInner(this.logger);
+        //this.swappableLoggerProvider.SetInner(this.logger);
     }
 
     private static void AddRequestHeaders(Activity activity, HttpRequestMessage request)

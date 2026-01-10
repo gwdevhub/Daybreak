@@ -21,6 +21,7 @@ using Daybreak.Services.Guildwars;
 using Daybreak.Services.GuildWars;
 using Daybreak.Services.Injection;
 using Daybreak.Services.InternetChecker;
+using Daybreak.Services.Keyboard;
 using Daybreak.Services.LaunchConfigurations;
 using Daybreak.Services.Logging;
 using Daybreak.Services.MDns;
@@ -67,6 +68,7 @@ using Daybreak.Shared.Services.Guildwars;
 using Daybreak.Shared.Services.Initialization;
 using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.InternetChecker;
+using Daybreak.Shared.Services.Keyboard;
 using Daybreak.Shared.Services.LaunchConfigurations;
 using Daybreak.Shared.Services.MDns;
 using Daybreak.Shared.Services.Menu;
@@ -172,7 +174,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IMenuServiceButtonHandler, MenuService>(sp => sp.GetRequiredService<IMenuService>().Cast<MenuService>());
         services.AddSingleton<IShortcutManager, ShortcutManager>();
         services.AddSingleton<IMetricsService, MetricsService>();
-        services.AddSingleton<IThemeManager, BlazorThemeInteropService>();
         services.AddSingleton<INotificationService, NotificationService>();
         services.AddSingleton<INotificationProducer, NotificationService>(sp => sp.GetRequiredService<INotificationService>().Cast<NotificationService>());
         services.AddSingleton<IInternetCheckingService, InternetCheckingService>();
@@ -187,10 +188,14 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IMDomainNameService, MDomainNameService>();
         services.AddSingleton<IMDomainRegistrar, MDomainRegistrar>();
         services.AddSingleton<IAttachedApiAccessor, AttachedApiAccessor>();
+        services.AddSingleton<IKeyboardHookService, KeyboardHookService>();
         services.AddSingleton<PrivilegeContext>();
         services.AddSingleton<ViewRedirectContext>();
         services.AddSingleton<JSConsoleInterop>();
         services.AddSingleton<GameScreenshotsTheme>();
+        services.AddSingleton<OptionsManager>();
+        services.AddSingleton<IOptionsProvider, OptionsManager>(sp => sp.GetRequiredService<OptionsManager>());
+        
 
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
@@ -222,8 +227,9 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IGraphClient, BlazorGraphClient>();
         services.AddScoped<IScreenshotService, ScreenshotService>();
 
-        services.AddHostedService<StartupActionManager>();
         services.AddHostedSingleton<IApplicationUpdater, ApplicationUpdater>();
+        services.AddHostedSingleton<IThemeManager, BlazorThemeInteropService>();
+        services.AddHostedService<StartupActionManager>();
         services.AddHostedService<ProcessorUsageMonitor>();
         services.AddHostedService<MemoryUsageMonitor>();
         services.AddHostedService<TelemetryHost>();
