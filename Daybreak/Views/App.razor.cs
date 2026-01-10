@@ -387,6 +387,9 @@ public sealed class AppViewModel
                 WindowState.Minimized :
                 WindowState.Normal;
 
-        this.WindowStateChanged?.Invoke(this, this.WindowState);
+        this.photinoApp.WindowManager.Dispatcher.InvokeAsync(() =>
+        {
+            this.WindowStateChanged?.Invoke(this, this.WindowState);
+        });
     }
 }

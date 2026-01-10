@@ -35,6 +35,7 @@ public partial class Launcher
             .SetChromeless(true);
         app.MainWindow.SetLogVerbosity(0);
         app.MainWindow.RegisterWindowCreatedHandler((_, __) => SetupRoundedWindows(app));
+        app.MainWindow.RegisterWindowCreatedHandler((_, __) => SetupBorderless(app));
         app.MainWindow.RegisterWindowCreatedHandler((_, __) => StartHostedServices(app, cts));
         app.MainWindow.RegisterWindowClosingHandler((_, __) => StopHostedServices(app, cts));
         MainApp = app;

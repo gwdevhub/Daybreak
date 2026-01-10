@@ -17,6 +17,7 @@ using System.Reflection;
 
 namespace Daybreak.Services.Plugins;
 
+//TODO: Fix bootstraping. Plugin loading should happen in two steps, one the initial loading and second the saving of the results after the main app is loaded.
 internal sealed class PluginsService : IPluginsService
 {
     private const string DllExtension = ".dll";

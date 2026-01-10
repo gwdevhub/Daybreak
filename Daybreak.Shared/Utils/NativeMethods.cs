@@ -7,28 +7,55 @@ namespace Daybreak.Shared.Utils;
 public static class NativeMethods
 {
     public const int STD_OUTPUT_HANDLE = -11;
-    public const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004;
-    public const uint ENABLE_PROCESSED_OUTPUT = 0x0001;
+    public const int ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004;
+    public const int ENABLE_PROCESSED_OUTPUT = 0x0001;
+
+    public const int HWND_TOPMOST = -1;
+    public const int HWND_TOP = 0;
+    public const int WH_KEYBOARD_LL = 13;
+    public const int LIST_MODULES_32BIT = 0x01;
+    public const int SC_MOVE = 0xF010;
+    public const int SC_SIZE = 0xF000;
 
     public const int GWLP_WNDPROC = -4;
+    public const int GWL_STYLE = -16;
+    public const int GWL_EXSTYLE = -20;
+
+    public const int WS_CAPTION = 0x00C00000;
+    public const int WS_THICKFRAME = 0x00040000;
+    public const int WS_MINIMIZEBOX = 0x00020000;
+    public const int WS_MAXIMIZEBOX = 0x00010000;
+    public const int WS_SYSMENU = 0x00080000;
+
+    public const int WM_NCCALCSIZE = 0x0083;
+    public const int WM_SYSCOMMAND = 0x112;
+    public const int WM_NCLBUTTONDOWN = 0x00A1;
     public const int WM_NCHITTEST = 0x0084;
+    public const int WM_KEYDOWN = 0x0100;
+    public const int WM_KEYUP = 0x0101;
+
+    public const int SWP_SHOWWINDOW = 0x0040;
+    public const int SWP_NOMOVE = 0x0002;
+    public const int SWP_NOSIZE = 0x0001;
+    public const int SWP_NOZORDER = 0x0004;
+    public const int SWP_FRAMECHANGED = 0x0020;
+    
+    public const int SW_SHOWMAXIMIZED = 3;
+    public const int MONITOR_DEFAULTTONEAREST = 2;
+
     public const int HTCLIENT = 1;
     public const int HTCAPTION = 2;
     public const int HTMINBUTTON = 8;
     public const int HTMAXBUTTON = 9;
+    public const int HTLEFT = 10;
+    public const int HTRIGHT = 11;
+    public const int HTTOP = 12;
+    public const int HTTOPLEFT = 13;
+    public const int HTTOPRIGHT = 14;
+    public const int HTBOTTOM = 15;
+    public const int HTBOTTOMLEFT = 16;
+    public const int HTBOTTOMRIGHT = 17;
     public const int HTCLOSE = 20;
-
-    public const uint WM_KEYDOWN = 0x0100;
-    public const uint WM_KEYUP = 0x0101;
-    public const uint SWP_SHOWWINDOW = 0x0040;
-    public const nint HWND_TOPMOST = -1;
-    public const nint HWND_TOP = 0;
-    public const int WH_KEYBOARD_LL = 13;
-    public const uint LIST_MODULES_32BIT = 0x01;
-    public const int WM_SYSCOMMAND = 0x112;
-    public const int WM_NCLBUTTONDOWN = 0x00A1;
-    public const int SC_MOVE = 0xF010;
-    public const int SC_SIZE = 0xF000;
 
     public enum ResizeDirection
     {
@@ -111,6 +138,42 @@ public static class NativeMethods
         MiniDumpValidTypeFlags = 0x001fffff,
     }
     [StructLayout(LayoutKind.Sequential)]
+    public struct WINDOWPLACEMENT
+    {
+        public int length;
+        public int flags;
+        public int showCmd;
+        public POINT ptMinPosition;
+        public POINT ptMaxPosition;
+        public RECT rcNormalPosition;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct MONITORINFO
+    {
+        public int cbSize;
+        public RECT rcMonitor;
+        public RECT rcWork;
+        public int dwFlags;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct NCCALCSIZE_PARAMS
+    {
+        public RECT rgrc0;
+        public RECT rgrc1;
+        public RECT rgrc2;
+        public nint lppos;
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct MARGINS
+    {
+        public int Left;
+        public int Right;
+        public int Top;
+        public int Bottom;
+    }
+    [StructLayout(LayoutKind.Sequential)]
     public struct ProcessEntry32
     {
         public uint dwSize;
@@ -180,9 +243,9 @@ public static class NativeMethods
         public readonly string SzDevice;
     }
     [StructLayout(LayoutKind.Sequential)]
-    public readonly struct RECT(int left, int top, int right, int bottom)
+    public struct RECT(int left, int top, int right, int bottom)
     {
-        public readonly int Left = left, Top = top, Right = right, Bottom = bottom;
+        public int Left = left, Top = top, Right = right, Bottom = bottom;
 
         public int Height => this.Bottom - this.Top;
 
@@ -617,4 +680,23 @@ public static class NativeMethods
 
     [DllImport("user32.dll")]
     public static extern bool ScreenToClient(nint hWnd, ref POINT lpPoint);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern nint GetWindowLongPtr(nint hWnd, int nIndex);
+
+    [DllImport("dwmapi.dll")]
+    public static extern int DwmExtendFrameIntoClientArea(nint hWnd, ref MARGINS pMarInset);
+
+    [DllImport("user32.dll")]
+    public static extern bool GetCursorPos(out POINT lpPoint);
+
+    [DllImport("user32.dll")]
+    public static extern bool GetWindowPlacement(nint hWnd, ref WINDOWPLACEMENT lpwndpl);
+
+    [DllImport("user32.dll")]
+    public static extern nint MonitorFromWindow(nint hwnd, int dwFlags);
+
+    [DllImport("user32.dll")]
+    public static extern bool GetMonitorInfo(nint hMonitor, ref MONITORINFO lpmi);
+
 }
