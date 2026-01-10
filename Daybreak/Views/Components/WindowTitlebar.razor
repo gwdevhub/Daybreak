@@ -25,13 +25,7 @@
             <FluentIcon Value="@SubtractIcon" />
         </button>
 
-        <!-- TODO: Fix WindowState
         @if (this.WindowState is WindowState.Maximized)
-                {
-                        
-                }
-        -->
-        @if (true)
         {
             <button class="title-bar-btn window-control-btn" @onclick="this.OnRestoreButtonClick" title="Restore">
                 <FluentIcon Value="@SquareMultipleIcon" />
@@ -59,9 +53,8 @@
     private static readonly Icon SquareIcon = new Regular.Size16.Square();
     private static readonly Icon DismissIcon = new Regular.Size16.Dismiss();
 
-    //TODO: Fix WindowState
-    // [Parameter]
-    // public required WindowState WindowState { get; init; }
+    [Parameter]
+    public required WindowState WindowState { get; init; }
     [Parameter]
     public required Action OnTitleBarDrag { get; init; }
     [Parameter]

@@ -1,29 +1,37 @@
-﻿using Daybreak.Shared.Models;
+﻿using Daybreak.Configuration.Options;
+using Daybreak.Shared.Models;
+using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Screens;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Photino.NET;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Drawing;
 using System.Extensions;
+using System.Extensions.Core;
 using System.Runtime.InteropServices;
 
 namespace Daybreak.Services.Screens;
 
-//TODO: Fix live updateable options usage
 internal sealed class ScreenManager(
-    //ILiveUpdateableOptions<ScreenManagerOptions> liveUpdateableOptions,
+    PhotinoWindow photinoWindow,
+    IOptionsProvider optionsProvider,
+    IOptionsMonitor<ScreenManagerOptions> liveUpdateableOptions,
     ILogger<ScreenManager> logger) : IScreenManager, IHostedService
 {
-    //private readonly ILiveUpdateableOptions<ScreenManagerOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
+    private readonly PhotinoWindow photinoWindow = photinoWindow.ThrowIfNull();
+    private readonly IOptionsProvider optionsProvider = optionsProvider.ThrowIfNull();
+    private readonly IOptionsMonitor<ScreenManagerOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
     private readonly ILogger<ScreenManager> logger = logger.ThrowIfNull();
 
     public IEnumerable<Screen> Screens => GetAllScreens();
 
     Task IHostedService.StartAsync(CancellationToken cancellationToken)
     {
-        this.SaveWindowPositionAndSize();
+        this.MoveWindowToSavedPosition();
         return Task.CompletedTask;
     }
 
@@ -35,17 +43,36 @@ internal sealed class ScreenManager(
 
     public void MoveWindowToSavedPosition()
     {
-        //TODO: Implement moving window to saved position
+        var savedPosition = new Rectangle(
+            (int)this.liveUpdateableOptions.CurrentValue.X,
+            (int)this.liveUpdateableOptions.CurrentValue.Y,
+            (int)this.liveUpdateableOptions.CurrentValue.Width,
+            (int)this.liveUpdateableOptions.CurrentValue.Height);
+
+        var hwnd = this.photinoWindow.WindowHandle;
+        NativeMethods.SetWindowPos(hwnd, NativeMethods.HWND_TOP, savedPosition.Left, savedPosition.Top, savedPosition.Width, savedPosition.Height, NativeMethods.SWP_SHOWWINDOW);
     }
 
     public void SaveWindowPositionAndSize()
     {
-        //TODO: Implement saving window position and size
+        var position = new Rectangle(
+            this.photinoWindow.Left,
+            this.photinoWindow.Top,
+            this.photinoWindow.Width,
+            this.photinoWindow.Height);
+
+        var options = this.liveUpdateableOptions.CurrentValue;
+        options.X = position.Left;
+        options.Y = position.Top;
+        options.Width = position.Width;
+        options.Height = position.Height;
+        this.optionsProvider.SaveOption(options);
     }
 
     public bool MoveGuildwarsToScreen(Screen screen)
     {
-        this.logger.LogDebug("Attempting to move guildwars to screen {screenId}", screen.Id);
+        var scopedLogger = this.logger.CreateScopedLogger();
+        scopedLogger.LogDebug("Attempting to move guildwars to screen {screenId}", screen.Id);
         var hwnd = GetMainWindowHandle();
         if (hwnd.HasValue is false)
         {
@@ -67,10 +94,12 @@ internal sealed class ScreenManager(
         var screens = new List<Screen>();
         int index = 0;
 
-        NativeMethods.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, (IntPtr hMonitor, IntPtr hdcMonitor, ref NativeMethods.RECT lprcMonitor, IntPtr dwData) =>
+        NativeMethods.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, (hMonitor, hdcMonitor, ref lprcMonitor, dwData) =>
         {
-            var monitorInfo = new NativeMethods.MonitorInfoEx();
-            monitorInfo.CbSize = (uint)Marshal.SizeOf<NativeMethods.MonitorInfoEx>();
+            var monitorInfo = new NativeMethods.MonitorInfoEx
+            {
+                CbSize = (uint)Marshal.SizeOf<NativeMethods.MonitorInfoEx>()
+            };
 
             if (NativeMethods.GetMonitorInfo(hMonitor, ref monitorInfo))
             {

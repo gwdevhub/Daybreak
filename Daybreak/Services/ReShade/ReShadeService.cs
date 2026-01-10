@@ -1,4 +1,5 @@
-﻿using Daybreak.Services.Downloads;
+﻿using Daybreak.Configuration.Options;
+using Daybreak.Services.Downloads;
 using Daybreak.Services.ReShade.Utils;
 using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Models.Mods;
@@ -6,6 +7,7 @@ using Daybreak.Shared.Models.ReShade;
 using Daybreak.Shared.Services.Downloads;
 using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.ReShade;
 using Daybreak.Shared.Utils;
 using Daybreak.Views.Mods;
@@ -13,6 +15,8 @@ using HtmlAgilityPack;
 using IniParser.Parser;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Photino.NET;
 using System.Core.Extensions;
 using System.Data;
 using System.Diagnostics;
@@ -22,11 +26,12 @@ using System.IO.Compression;
 using TrailBlazr.Services;
 
 namespace Daybreak.Services.ReShade;
-//TODO: Fix live updateable options usage
 internal sealed class ReShadeService(
+    PhotinoWindow photinoWindow,
+    IOptionsProvider optionsProvider,
     INotificationService notificationService,
     IProcessInjector processInjector,
-    //ILiveUpdateableOptions<ReShadeOptions> liveUpdateableOptions,
+    IOptionsMonitor<ReShadeOptions> liveUpdateableOptions,
     IHttpClient<ReShadeService> httpClient,
     IDownloadService downloadService,
     IViewManager viewManager,
@@ -57,9 +62,11 @@ internal sealed class ReShadeService(
     private static readonly string[] FxExtensions = [".fx",];
     private static readonly string[] FxHeaderExtensions = [".fxh"];
 
+    private readonly PhotinoWindow photinoWindow = photinoWindow.ThrowIfNull();
+    private readonly IOptionsProvider optionsProvider = optionsProvider.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IProcessInjector processInjector = processInjector.ThrowIfNull();
-    //private readonly ILiveUpdateableOptions<ReShadeOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
+    private readonly IOptionsMonitor<ReShadeOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
     private readonly IHttpClient<ReShadeService> httpClient = httpClient.ThrowIfNull();
     private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
     private readonly IViewManager viewManager = viewManager.ThrowIfNull();
@@ -69,24 +76,26 @@ internal sealed class ReShadeService(
     public string Description => "ReShade is an advanced, fully generic post-processing injector for games and video software developed by crosire.";
     public bool IsVisible => true;
     public bool CanCustomManage => true;
-    public bool IsEnabled { get; set; }
-    //{
-    //    get => this.liveUpdateableOptions.Value.Enabled;
-    //    set
-    //    {
-    //        this.liveUpdateableOptions.Value.Enabled = value;
-    //        this.liveUpdateableOptions.UpdateOption();
-    //    }
-    //}
-    public bool AutoUpdate { get; set; }
-    //{
-    //    get => this.liveUpdateableOptions.Value.AutoUpdate;
-    //    set
-    //    {
-    //        this.liveUpdateableOptions.Value.AutoUpdate = value;
-    //        this.liveUpdateableOptions.UpdateOption();
-    //    }
-    //}
+    public bool IsEnabled
+    {
+        get => this.liveUpdateableOptions.CurrentValue.Enabled;
+        set
+        {
+            var options = this.liveUpdateableOptions.CurrentValue;
+            options.Enabled = value;
+            this.optionsProvider.SaveOption(options);
+        }
+    }
+    public bool AutoUpdate
+    {
+        get => this.liveUpdateableOptions.CurrentValue.AutoUpdate;
+        set
+        {
+            var options = this.liveUpdateableOptions.CurrentValue;
+            options.AutoUpdate = value;
+            this.optionsProvider.SaveOption(options);
+        }
+    }
     public bool IsInstalled => File.Exists(ReShadeDllPath) &&
                                File.Exists(ReShadePresetPath) &&
                                File.Exists(ReShadeLogPath) &&
@@ -248,26 +257,6 @@ internal sealed class ReShadeService(
                 EffectFiles = section.Keys.FirstOrDefault(k => k.KeyName == "EffectFiles")?.Value?.Split(',').ToList()
             };
         });
-    }
-
-    public async Task<bool> LoadReShadeFromDisk(CancellationToken cancellationToken)
-    {
-        //TODO: Implement file dialog
-        //var dialog = new OpenFileDialog
-        //{
-        //    Filter = "ReShade Installer (ReShade_Setup_*.exe)|ReShade_Setup_*.exe",
-        //    Multiselect = false
-        //};
-
-        //if (dialog.ShowDialog() is not true)
-        //{
-        //    return false;
-        //}
-
-        //var selectedPath = dialog.FileName;
-        //return await this.SetupReshadeDllFromInstaller(selectedPath, cancellationToken);
-
-        return false;
     }
 
     public async Task<bool> SetupReShade(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
@@ -610,11 +599,10 @@ internal sealed class ReShadeService(
             return;
         }
 
-        //TODO: Fix live updateable options usage
-        //if (!this.liveUpdateableOptions.Value.AutoUpdate)
-        //{
-        //    return;
-        //}
+        if (!this.liveUpdateableOptions.CurrentValue.AutoUpdate)
+        {
+            return;
+        }
 
         var scopedLogger = this.logger.CreateScopedLogger();
         var version = await this.GetLatestVersion(cancellationToken);

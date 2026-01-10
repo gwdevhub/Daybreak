@@ -7,30 +7,30 @@ using Daybreak.Shared.Models.UMod;
 using Daybreak.Shared.Services.Downloads;
 using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.UMod;
 using Daybreak.Shared.Utils;
 using Daybreak.Views.Mods;
 using Microsoft.Extensions.Logging;
-using Microsoft.Win32;
-using System.Configuration;
+using Microsoft.Extensions.Options;
+using Photino.NET;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
-using System.IO;
-using System.Net.Http;
 using TrailBlazr.Services;
 
 namespace Daybreak.Services.UMod;
 
-//TODO: Fix live updateable options usage
 internal sealed class UModService(
+    PhotinoWindow photinoWindow,
+    IOptionsProvider optionsProvider,
     IViewManager viewManager,
     IProcessInjector processInjector,
     INotificationService notificationService,
     IDownloadService downloadService,
     IHttpClient<UModService> httpClient,
-    //ILiveUpdateableOptions<UModOptions> uModOptions,
+    IOptionsMonitor<UModOptions> uModOptions,
     ILogger<UModService> logger) : IUModService
 {
     private const string TagPlaceholder = "[TAG_PLACEHOLDER]";
@@ -44,12 +44,14 @@ internal sealed class UModService(
 
     private static readonly string UModDirectory = PathUtils.GetAbsolutePathFromRoot(UModDirectorySubPath);
 
+    private readonly PhotinoWindow photinoWindow = photinoWindow.ThrowIfNull();
+    private readonly IOptionsProvider optionsProvider = optionsProvider.ThrowIfNull();
     private readonly IViewManager viewManager = viewManager.ThrowIfNull();
     private readonly IProcessInjector processInjector = processInjector.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
     private readonly IHttpClient<UModService> httpClient = httpClient.ThrowIfNull();
-    //private readonly ILiveUpdateableOptions<UModOptions> uModOptions = uModOptions.ThrowIfNull();
+    private readonly IOptionsMonitor<UModOptions> uModOptions = uModOptions.ThrowIfNull();
     private readonly ILogger<UModService> logger = logger.ThrowIfNull();
 
     public string Name => "gMod";
@@ -57,15 +59,16 @@ internal sealed class UModService(
     public bool IsVisible => true;
     public bool CanCustomManage => true;
     public bool CanUninstall => true;
-    public bool IsEnabled { get; set; }
-    //{
-    //    get => this.uModOptions.Value.Enabled;
-    //    set
-    //    {
-    //        this.uModOptions.Value.Enabled = value;
-    //        this.uModOptions.UpdateOption();
-    //    }
-    //}
+    public bool IsEnabled
+    {
+        get => this.uModOptions.CurrentValue.Enabled;
+        set
+        {
+            var options = this.uModOptions.CurrentValue;
+            options.Enabled = value;
+            this.optionsProvider.SaveOption(options);
+        }
+    }
 
     public bool IsInstalled => File.Exists(Path.GetFullPath(Path.Combine(UModDirectory, UModDll)));
 
@@ -143,26 +146,25 @@ internal sealed class UModService(
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         var modListFilePath = Path.Combine(UModDirectory, UModModList);
-        //var lines = this.uModOptions.Value.Mods
-        //    .Where(e => e.Enabled && e.PathToFile is not null)
-        //    .Select(e => e.PathToFile)
-        //    .OfType<string>()
-        //    .Where(e =>
-        //    {
-        //        if (!File.Exists(e))
-        //        {
-        //            scopedLogger.LogWarning("Mod file {ModFile} does not exist", e);
-        //            this.notificationService.NotifyError(
-        //                title: "gMod Mod Missing",
-        //                description: $"The mod file {e} could not be found. gMod will not load this mod");
+        var lines = this.uModOptions.CurrentValue.Mods
+            .Where(e => e.Enabled && e.PathToFile is not null)
+            .Select(e => e.PathToFile)
+            .OfType<string>()
+            .Where(e =>
+            {
+                if (!File.Exists(e))
+                {
+                    scopedLogger.LogWarning("Mod file {ModFile} does not exist", e);
+                    this.notificationService.NotifyError(
+                        title: "gMod Mod Missing",
+                        description: $"The mod file {e} could not be found. gMod will not load this mod");
 
-        //            return false;
-        //        }
+                    return false;
+                }
 
-        //        return true;
-        //    })
-        //    .ToList();
-        var lines = new List<string>();
+                return true;
+            })
+            .ToList();
 
         await File.WriteAllLinesAsync(modListFilePath, lines, cancellationToken);
         var result = await this.processInjector.Inject(guildWarsCreatedContext.ApplicationLauncherContext.Process, Path.Combine(UModDirectory, UModDll), cancellationToken);
@@ -202,80 +204,63 @@ internal sealed class UModService(
             return false;
         }
 
-        //if (this.uModOptions.Value.Mods.Any(m => m.PathToFile == fullPath))
-        //{
-        //    return true;
-        //}
+        if (this.uModOptions.CurrentValue.Mods.Any(m => m.PathToFile == fullPath))
+        {
+            return true;
+        }
 
-        //var entry = new UModEntry
-        //{
-        //    Enabled = this.uModOptions.Value.AutoEnableMods,
-        //    PathToFile = fullPath,
-        //    Name = Path.GetFileNameWithoutExtension(fullPath),
-        //    Imported = imported is true
-        //};
+        var entry = new UModEntry
+        {
+            Enabled = this.uModOptions.CurrentValue.AutoEnableMods,
+            PathToFile = fullPath,
+            Name = Path.GetFileNameWithoutExtension(fullPath),
+            Imported = imported is true
+        };
 
-        //this.uModOptions.Value.Mods.Add(entry);
-        //this.uModOptions.UpdateOption();
+        var options = this.uModOptions.CurrentValue;
+        options.Mods.Add(entry);
+        this.optionsProvider.SaveOption(options);
         return true;
     }
 
     public bool RemoveMod(string pathToTpf)
     {
         var fullPath = Path.GetFullPath(pathToTpf);
-        //var mods = this.uModOptions.Value.Mods;
-        //var maybeMod = mods.FirstOrDefault(m => m.PathToFile == fullPath);
-        //if (maybeMod is null)
-        //{
-        //    return true;
-        //}
+        var mods = this.uModOptions.CurrentValue.Mods;
+        var maybeMod = mods.FirstOrDefault(m => m.PathToFile == fullPath);
+        if (maybeMod is null)
+        {
+            return true;
+        }
 
-        //mods.Remove(maybeMod);
-        //this.SaveMods(mods);
+        mods.Remove(maybeMod);
+        this.SaveMods(mods);
 
-        //// If the mod was downloaded and managed entirely through Daybreak, we can safely delete it
-        //if (!maybeMod.Imported)
-        //{
-        //    File.Delete(fullPath);
-        //}
+        // If the mod was downloaded and managed entirely through Daybreak, we can safely delete it
+        if (!maybeMod.Imported)
+        {
+            File.Delete(fullPath);
+        }
 
         return true;
     }
 
     public List<UModEntry> GetMods()
     {
-        //return this.uModOptions.Value.Mods;
-        return [];
+        return this.uModOptions.CurrentValue.Mods;
     }
 
     public void SaveMods(List<UModEntry> list)
     {
-        //this.uModOptions.Value.Mods = list;
-        //this.uModOptions.UpdateOption();
+        var options = this.uModOptions.CurrentValue;
+        options.Mods = list;
+        this.optionsProvider.SaveOption(options);
     }
 
-    public Task<IReadOnlyCollection<string>> LoadModsFromDisk(CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<string>> LoadModsFromDisk(CancellationToken cancellationToken)
     {
-        return Task.Factory.StartNew<IReadOnlyCollection<string>>(() =>
-        {
-            //TODO: Implement file dialog in a platform agnostic way
-            //var openFileDialog = new OpenFileDialog
-            //{
-            //    Filter = "Mod files (*.tpf;*.zip)|*.tpf;*.zip|TPF files (*.tpf)|*.tpf|ZIP files (*.zip)|*.zip",
-            //    Title = "Select Mod Files",
-            //    Multiselect = true
-            //};
-
-            //var result = openFileDialog.ShowDialog();
-            //if (result != true || openFileDialog.FileNames.Length == 0)
-            //{
-            //    return [];
-            //}
-
-            //return [.. openFileDialog.FileNames.Where(f => this.AddMod(f, imported: true))];
-
-            return [];
-        }, cancellationToken);
+        var files = await this.photinoWindow.ShowOpenFileAsync("Select Mod Files", multiSelect: true, filters: [("Mod Files", ["zip", "tpf"])]);
+        return [.. files.Where(f => this.AddMod(f, imported: true))];
     }
 
     public async Task CheckAndUpdateUMod(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)

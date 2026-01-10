@@ -9,9 +9,11 @@ using Daybreak.Shared.Models.Mods;
 using Daybreak.Shared.Services.BuildTemplates;
 using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Toolbox;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
@@ -21,13 +23,13 @@ using System.Text;
 
 namespace Daybreak.Services.Toolbox;
 
-//TODO: Fix live updateable options usage
 internal sealed class ToolboxService(
+    IOptionsProvider optionsProvider,
     IBuildTemplateManager buildTemplateManager,
     INotificationService notificationService,
     IProcessInjector processInjector,
     IToolboxClient toolboxClient,
-    //ILiveUpdateableOptions<ToolboxOptions> toolboxOptions,
+    IOptionsMonitor<ToolboxOptions> toolboxOptions,
     ILogger<ToolboxService> logger) : IToolboxService
 {
     private const string ToolboxDllName = "GWToolboxdll.dll";
@@ -44,11 +46,12 @@ internal sealed class ToolboxService(
     private static readonly string UsualToolboxLocation = Path.GetFullPath(
         Path.Combine(UsualToolboxFolderLocation, ToolboxDllName));
 
+    private readonly IOptionsProvider optionsProvider = optionsProvider.ThrowIfNull();
     private readonly IBuildTemplateManager buildTemplateManager = buildTemplateManager.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IProcessInjector processInjector = processInjector.ThrowIfNull();
     private readonly IToolboxClient toolboxClient = toolboxClient.ThrowIfNull();
-    //private readonly ILiveUpdateableOptions<ToolboxOptions> toolboxOptions = toolboxOptions.ThrowIfNull();
+    private readonly IOptionsMonitor<ToolboxOptions> toolboxOptions = toolboxOptions.ThrowIfNull();
     private readonly ILogger<ToolboxService> logger = logger.ThrowIfNull();
 
     public string Name => "GWToolbox";
@@ -56,15 +59,16 @@ internal sealed class ToolboxService(
     public bool IsVisible => true;
     public bool CanCustomManage => false;
     public bool CanUninstall => true;
-    public bool IsEnabled { get; set; }
-    //{
-    //    get => this.toolboxOptions.Value.Enabled;
-    //    set
-    //    {
-    //        this.toolboxOptions.Value.Enabled = value;
-    //        this.toolboxOptions.UpdateOption();
-    //    }
-    //}
+    public bool IsEnabled
+    {
+        get => this.toolboxOptions.CurrentValue.Enabled;
+        set
+        {
+            var options = this.toolboxOptions.CurrentValue;
+            options.Enabled = value;
+            this.optionsProvider.SaveOption(options);
+        }
+    }
     public bool IsInstalled => File.Exists(UsualToolboxLocation);
 
     public Task<bool> IsUpdateAvailable(CancellationToken cancellationToken)

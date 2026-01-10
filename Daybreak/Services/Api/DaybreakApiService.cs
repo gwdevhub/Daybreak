@@ -7,25 +7,24 @@ using Daybreak.Shared.Services.Api;
 using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.MDns;
 using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
-using System.Configuration;
+using Microsoft.Extensions.Options;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions.Core;
-using System.IO;
-using System.Net.Http;
 
 namespace Daybreak.Services.Api;
 
-//TODO: Fix updateable options usage
 public sealed class DaybreakApiService(
+    IOptionsProvider optionsProvider,
     IAttachedApiAccessor attachedApiAccessor,
     IMDomainRegistrar mDomainRegistrar,
     IStubInjector stubInjector,
     INotificationService notificationService,
     IHttpClient<ScopedApiContext> scopedApiClient,
-    //ILiveUpdateableOptions<FocusViewOptions> liveUpdateableOptions,
+    IOptionsMonitor<FocusViewOptions> liveUpdateableOptions,
     ILogger<DaybreakApiService> logger,
     ILogger<ScopedApiContext> scopedApiLogger)
     : IDaybreakApiService
@@ -37,12 +36,13 @@ public sealed class DaybreakApiService(
     private const string DaybreakApiServiceName = $"daybreak-api-{ProcessIdPlaceholder}";
     private const string ServiceSubType = "daybreak-api";
 
+    private readonly IOptionsProvider optionsProvider = optionsProvider.ThrowIfNull();
     private readonly IAttachedApiAccessor attachedApiAccessor = attachedApiAccessor.ThrowIfNull();
     private readonly IMDomainRegistrar mDomainRegistrar = mDomainRegistrar.ThrowIfNull();
     private readonly IStubInjector stubInjector = stubInjector.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IHttpClient<ScopedApiContext> scopedApiClient = scopedApiClient.ThrowIfNull();
-    //private readonly ILiveUpdateableOptions<FocusViewOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
+    private readonly IOptionsMonitor<FocusViewOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
     private readonly ILogger<DaybreakApiService> logger = logger.ThrowIfNull();
     private readonly ILogger<ScopedApiContext> scopedApiLogger = scopedApiLogger.ThrowIfNull();
 
@@ -50,20 +50,20 @@ public sealed class DaybreakApiService(
 
     public string Description { get; } = "Daybreak API integration with Guild Wars. Gets injected into Guild Wars to enable extended functionality such as loading builds, character switching, and more";
 
-    public bool IsEnabled { get; set; }
-    //{
-    //    get => this.liveUpdateableOptions.Value.Enabled;
-    //    set
-    //    {
-    //        this.liveUpdateableOptions.Value.Enabled = value;
-    //        this.liveUpdateableOptions.UpdateOption();
-    //    }
-    //}
+    public bool IsEnabled
+    {
+        get => this.liveUpdateableOptions.CurrentValue.Enabled;
+        set
+        {
+            var options = this.liveUpdateableOptions.CurrentValue;
+            options.Enabled = value;
+            this.optionsProvider.SaveOption(options);
+        }
+    }
 
     public bool IsInstalled => true;
     public bool IsVisible => true;
     public bool CanCustomManage => false;
-
     public bool CanUninstall => false;
 
     public IProgressAsyncOperation<bool> PerformUninstallation(CancellationToken cancellationToken)

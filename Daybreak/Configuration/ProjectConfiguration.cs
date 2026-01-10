@@ -201,7 +201,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
         services.AddScoped<IBuildTemplateManager, BuildTemplateManager>();
-        services.AddScoped<IScreenManager, ScreenManager>();
         services.AddScoped<IOnboardingService, OnboardingService>();
         services.AddScoped<IExperienceCalculator, ExperienceCalculator>();
         services.AddScoped<IAttributePointCalculator, AttributePointCalculator>();
@@ -231,6 +230,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddHostedSingleton<IApplicationUpdater, ApplicationUpdater>();
         services.AddHostedSingleton<IThemeManager, BlazorThemeInteropService>();
         services.AddHostedSingleton<IKeyboardHookService, KeyboardHookService>();
+        services.AddHostedSingleton<IScreenManager, ScreenManager>();
         services.AddHostedSingleton<GameScreenshotsTheme>();
         services.AddHostedService<StartupActionManager>();
         services.AddHostedService<ProcessorUsageMonitor>();
@@ -287,7 +287,6 @@ public class ProjectConfiguration : PluginConfigurationBase
     {
         startupActionProducer.ThrowIfNull();
 
-        startupActionProducer.RegisterAction<RestoreWindowPositionStartupAction>();
         startupActionProducer.RegisterAction<RenameInstallerAction>();
         startupActionProducer.RegisterAction<UpdateUModAction>();
         startupActionProducer.RegisterAction<CredentialsOptionsMigrator>();

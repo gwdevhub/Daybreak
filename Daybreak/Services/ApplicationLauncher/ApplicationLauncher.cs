@@ -13,23 +13,21 @@ using Daybreak.Shared.Utils;
 using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.Win32;
+using Photino.NET;
 using System.ComponentModel;
-using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
-using System.Windows;
 using static Daybreak.Shared.Utils.NativeMethods;
 
 namespace Daybreak.Services.ApplicationLauncher;
 
 internal sealed class ApplicationLauncher(
+    PhotinoWindow photinoWindow,
     IDaybreakInjector daybreakInjector,
     IGuildWarsExecutableManager guildWarsExecutableManager,
     INotificationService notificationService,
@@ -45,6 +43,7 @@ internal sealed class ApplicationLauncher(
 
     private static readonly TimeSpan LaunchTimeout = TimeSpan.FromMinutes(1);
 
+    private readonly PhotinoWindow photinoWindow = photinoWindow.ThrowIfNull();
     private readonly IDaybreakInjector daybreakInjector = daybreakInjector.ThrowIfNull();
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
@@ -107,8 +106,7 @@ internal sealed class ApplicationLauncher(
             throw new InvalidOperationException($"Unable to start {processName} as admin");
         }
 
-        //TODO: Graceful shutdown
-        //Application.Current.Shutdown();
+        this.photinoWindow.Close();
     }
 
     public void RestartDaybreakAsNormalUser()
@@ -136,8 +134,7 @@ internal sealed class ApplicationLauncher(
             throw new InvalidOperationException($"Unable to start {processName} as normal user");
         }
 
-        //TODO: Graceful shutdown
-        //Application.Current.Shutdown();
+        this.photinoWindow.Close();
     }
 
     private async Task<Process?> LaunchGuildwarsProcess(LaunchConfigurationWithCredentials launchConfigurationWithCredentials, CancellationToken cancellationToken)

@@ -4,9 +4,7 @@
     NeutralBaseColor="@this.ViewModel.NeutralBaseColor"
     BaseLayerLuminance="@this.ViewModel.BaseLayerLuminace">
     <ErrorLoggingBoundary>
-        <!-- div class="app-container at (this.ViewModel.WindowState == WindowState.Maximized ? "maximized" : "")" -->
-
-        <div class="app-container"
+        <div class="app-container @(this.ViewModel.WindowState == WindowState.Maximized ? "maximized" : "")"
              style="@(string.IsNullOrWhiteSpace(this.ViewModel.BackdropImage) is false ? $"--backdrop-image: {this.ViewModel.BackdropImage}; --backdrop-image-filter: {this.ViewModel.BackdropImageFilter};" : string.Empty)
                     --ui-scale: @(this.ViewModel.UIScale);
                     --font-size-xx-small: @(this.ViewModel.XXSmallFontSize)rem;
@@ -25,8 +23,8 @@
             }
             <WindowBorders OnResize="@this.ViewModel.StartResize" />
 
-            <!-- TODO: Fix WindowState -->
-            <WindowTitlebar OnTitleBarDrag="@this.ViewModel.Drag"
+            <WindowTitlebar WindowState="this.ViewModel.WindowState"
+                            OnTitleBarDrag="@this.ViewModel.Drag"
                             OnNavigationButtonClick="@this.ViewModel.ToggleNavigationMenu"
                             OnBugButtonClick="@this.ViewModel.OpenIssues"
                             OnSyncButtonClick="@this.ViewModel.OpenSynchronizationView"
@@ -72,10 +70,8 @@
 
     protected override void OnInitialized()
     {
-        //TODO: Fix WindowState
-
         base.OnInitialized();
-        //this.ViewModel.WindowStateChanged += this.OnWindowStateChanged;
+        this.ViewModel.WindowStateChanged += this.OnWindowStateChanged;
         this.ViewModel.RedrawRequested += (_, __) => this.InvokeAsync(this.StateHasChanged);
     }
 
@@ -88,8 +84,8 @@
         }
     }
 
-    // private void OnWindowStateChanged(object? sender, WindowState state)
-    // {
-    //     this.StateHasChanged();
-    // }
+    private void OnWindowStateChanged(object? sender, WindowState state)
+    {
+        this.StateHasChanged();
+    }
 }

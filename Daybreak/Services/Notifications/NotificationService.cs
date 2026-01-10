@@ -1,6 +1,5 @@
 ﻿using Daybreak.Services.Notifications.Handlers;
 using Daybreak.Services.Notifications.Models;
-using Daybreak.Shared;
 using Daybreak.Shared.Models.Notifications;
 using Daybreak.Shared.Models.Notifications.Handling;
 using Daybreak.Shared.Services.Notifications;
@@ -159,21 +158,7 @@ internal sealed class NotificationService(
             Level = logLevel,
         };
 
-        if (Global.CoreWebView2 is null && logLevel is LogLevel.Error or LogLevel.Critical)
-        {
-            // TODO: Implement message box for .NET 10
-            // If WebView2 is not initialized, we cannot show UI notifications.
-            //MessageBox.Show(
-            //    description,
-            //    title,
-            //    MessageBoxButton.OK,
-            //    MessageBoxImage.Error);
-        }
-        else
-        {
-            this.EnqueueNotification(notification, persistent);
-        }
-
+        this.EnqueueNotification(notification, persistent);
         return new NotificationToken(notification);
     }
 
