@@ -52,14 +52,6 @@
     outline-offset: -1px;
 }
 
-.log-header {
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: baseline;
-    gap: 4px;
-    line-height: 1.2;
-}
-
 .log-timestamp {
     color: var(--neutral-foreground-2);
     user-select: text;
@@ -67,27 +59,41 @@
     flex-shrink: 0;
 }
 
-.log-level-badge {
+.log-level {
     font-weight: 600;
     user-select: text;
     white-space: nowrap;
     flex-shrink: 0;
 }
 
-.log-category {
+    .log-level .default {
+        color: var(--neutral-foreground-3);
+    }
+
+    .log-level .info {
+        color: color-mix(in srgb, var(--accent-foreground-rest) 80%, #4ec9b0);
+    }
+
+    .log-level .warning {
+        color: color-mix(in srgb, var(--accent-foreground-rest) 80%, #ffa500);
+    }
+
+    .log-level .error {
+        color: color-mix(in srgb, var(--accent-foreground-rest) 80%, #ff6b47);
+    }
+
+    .log-level .critical {
+        color: color-mix(in srgb, var(--accent-foreground-rest) 80%, #ff4757);
+    }
+
+.log-property {
     color: var(--accent-foreground-rest);
     user-select: text;
     white-space: nowrap;
     flex-shrink: 0;
 }
 
-.log-event-id {
-    color: var(--neutral-foreground-2);
-    user-select: text;
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-
+.log-exception,
 .log-message {
     user-select: text;
     white-space: pre-wrap;
@@ -96,35 +102,6 @@
     margin: 0;
     padding: 0;
     line-height: 1.4;
-}
-
-/* Console-like color scheme for log levels - ONLY the badge is colored */
-.log-trace .log-level-badge {
-    color: var(--neutral-foreground-3);
-}
-
-.log-debug .log-level-badge {
-    color: var(--accent-foreground-rest);
-}
-
-.log-info .log-level-badge {
-    color: color-mix(in srgb, var(--accent-foreground-rest) 80%, #4ec9b0);
-}
-
-.log-warning .log-level-badge {
-    color: #ffa500;
-}
-
-.log-error .log-level-badge {
-    color: #ff6b47;
-}
-
-.log-critical .log-level-badge {
-    color: #ff4757;
-}
-
-.log-default .log-level-badge {
-    color: var(--neutral-foreground-rest);
 }
 
 .no-logs {

@@ -1,7 +1,8 @@
-﻿using Daybreak.Services.Logging;
+﻿using Daybreak.Models;
+using Daybreak.Services.Logging;
 using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.Logging;
-using Serilog.Events;
+using Photino.NET;
 using System.Extensions;
 using System.IO.Compression;
 using TrailBlazr.ViewModels;
@@ -9,18 +10,22 @@ using TrailBlazr.ViewModels;
 namespace Daybreak.Views;
 
 public sealed class LogsViewModel(
+    PhotinoWindow window,
     INotificationService notificationService,
     ILogger<LogsViewModel> logger)
     : ViewModelBase<LogsViewModel, LogsView>
 {
+    private const int MaxLogEntries = 200;
+
+    private readonly PhotinoWindow window = window;
     private readonly INotificationService notificationService = notificationService;
     private readonly ILogger<LogsViewModel> logger = logger;
     private readonly SemaphoreSlim semaphore = new(1, 1);
-    private readonly List<LogEvent> logs = [];
+    private readonly List<StructuredLogEntry> logs = [];
 
     private bool isAttached = false;
 
-    public IEnumerable<LogEvent> Logs
+    public IEnumerable<StructuredLogEntry> Logs
     {
         get
         {
@@ -50,7 +55,7 @@ public sealed class LogsViewModel(
                 this.isAttached = true;
             }
 
-            this.logs.ClearAnd().AddRange(InMemorySink.Instance.GetSnapshot());
+            this.logs.ClearAnd().AddRange(InMemorySink.Instance.GetSnapshot().TakeLast(MaxLogEntries));
             await base.ParametersSet(view, cancellationToken);
         }
         finally
@@ -84,39 +89,9 @@ public sealed class LogsViewModel(
     {
         this.Loading = true;
         await this.RefreshViewAsync();
-        var serializedLogsTask = Task.Factory.StartNew(() =>
-        {
-            //TODO: Re-enable logs serialization
-            //var logs = this.logsManager.GetLogs();
-            //return JsonConvert.SerializeObject(logs, Formatting.Indented);
-            return string.Empty;
-        }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current);
-
-        var selectedFilePath = Task.Factory.StartNew(() =>
-        {
-            //TODO: Re-enable file save dialog
-            //var saveFileDialog = new SaveFileDialog()
-            //{
-            //    Title = "Save Logs",
-            //    Filter = "Zip Files (*.zip)|*.zip|All Files (*.*)|*.*",
-            //    DefaultExt = "zip",
-            //    AddExtension = true,
-            //    OverwritePrompt = true,
-            //    FileName = $"logs-{DateTime.Now:yyyyMMdd-HHmmss}.zip",
-            //    InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
-            //};
-
-            //if (saveFileDialog.ShowDialog() is true)
-            //{
-            //    return saveFileDialog.FileName;
-            //}
-
-            return string.Empty;
-        });
-
+        var selectedFilePath = this.window.ShowSaveFileAsync("Save Logs", filters: [("Zip Files", [".zip"])]);
         try
         {
-            var serializedLogs = await serializedLogsTask;
             var selectedFile = await selectedFilePath;
             if (string.IsNullOrWhiteSpace(selectedFile))
             {
@@ -128,7 +103,7 @@ public sealed class LogsViewModel(
             using var fileStream = File.Open(selectedFile, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
             using var compressedStream = new GZipStream(fileStream, CompressionLevel.SmallestSize);
             using var streamWriter = new StreamWriter(compressedStream);
-            streamWriter.Write(serializedLogs);
+            streamWriter.Write(string.Join(Environment.NewLine, this.logs.ToArray()));
             streamWriter.Flush();
             this.notificationService.NotifyInformation("Logs archived", $"Logs were successfully archived to {selectedFile}");
         }
@@ -143,7 +118,7 @@ public sealed class LogsViewModel(
         }
     }
 
-    private void Instance_LogEventEmitted(object? sender, LogEvent e)
+    private void Instance_LogEventEmitted(object? sender, StructuredLogEntry e)
     {
         this.semaphore.Wait();
         try

@@ -32,6 +32,7 @@ public partial class Launcher
     private static void LaunchSequence(string[] args, IServiceProvider bootstrap)
     {
         var scopedLogger = bootstrap.GetRequiredService<ILogger<Launcher>>().CreateScopedLogger();
+        scopedLogger.LogDebug("Starting Daybreak Launcher...");
         var builder = CreateMainBuilder(args);
         var pluginsService = bootstrap.GetRequiredService<IPluginsService>();
         pluginsService.LoadPlugins();
