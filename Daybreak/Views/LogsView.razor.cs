@@ -3,6 +3,7 @@ using Daybreak.Services.Logging;
 using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.Logging;
 using Photino.NET;
+using System.Collections.Immutable;
 using System.Extensions;
 using System.IO.Compression;
 using TrailBlazr.ViewModels;
@@ -103,7 +104,12 @@ public sealed class LogsViewModel(
             using var fileStream = File.Open(selectedFile, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
             using var compressedStream = new GZipStream(fileStream, CompressionLevel.SmallestSize);
             using var streamWriter = new StreamWriter(compressedStream);
-            streamWriter.Write(string.Join(Environment.NewLine, this.logs.ToArray()));
+            var snapshot = this.logs.ToImmutableArray();
+            foreach(var log in snapshot)
+            {
+                await streamWriter.WriteLineAsync(log.FormattedText);
+            }
+
             streamWriter.Flush();
             this.notificationService.NotifyInformation("Logs archived", $"Logs were successfully archived to {selectedFile}");
         }
