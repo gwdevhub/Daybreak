@@ -86,8 +86,7 @@ public sealed class AppViewModel
         JSConsoleInterop jsConsoleInterop,
         INotificationProducer notificationProducer,
         INotificationService notificationService,
-        ILogger<App> logger
-    )
+        ILogger<App> logger)
     {
         this.keyboardHookService = keyboardHookService.ThrowIfNull();
         this.optionsProvider = optionsProvider.ThrowIfNull();

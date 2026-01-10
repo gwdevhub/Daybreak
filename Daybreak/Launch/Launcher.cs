@@ -2,9 +2,11 @@
 using Daybreak.Services.Initialization;
 using Daybreak.Shared.Models.Menu;
 using Daybreak.Shared.Models.Plugins;
+using Daybreak.Shared.Models.Themes;
 using Daybreak.Shared.Services.ApplicationArguments;
 using Daybreak.Shared.Services.Keyboard;
 using Daybreak.Shared.Services.Plugins;
+using Daybreak.Shared.Services.Themes;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Photino.Blazor;
@@ -54,7 +56,19 @@ public partial class Launcher
         builder.Services.AddSingleton(pluginsService);
 
         var mainApp = CreateMainApp(builder);
+        foreach(var (pluginName, configuration, plugin) in configurations)
+        {
+            if (configuration is null)
+            {
+                scopedLogger.LogWarning("No configuration found for plugin {PluginName}, skipping theme registration...", pluginName);
+                continue;
+            }
 
+            RegisterThemes(bootstrap, configuration, scopedLogger);
+        }
+
+        var theme = mainApp.Services.GetRequiredService<GameScreenshotsTheme>();
+        Theme.Themes.Add(theme);
         var keyboardHook = mainApp.Services.GetRequiredService<IKeyboardHookService>();
         keyboardHook.Start();
         ExecuteArgumentHandlers(mainApp, args);
@@ -85,7 +99,6 @@ public partial class Launcher
         RegisterPostUpdateActions(bootstrap, builder, configuration, scopedLogger);
         RegisterNotificationHandlers(bootstrap, builder, configuration, scopedLogger);
         RegisterArgumentHandlers(bootstrap, builder, configuration, scopedLogger);
-        RegisterThemes(bootstrap, builder, configuration, scopedLogger);
         RegisterMenuEntries(configuration, menuProducer, scopedLogger);
 
         scopedLogger.LogInformation("Finished loading configuration for {Configuration.Name}", name);
@@ -194,11 +207,11 @@ public partial class Launcher
         }
     }
 
-    private static void RegisterThemes(IServiceProvider bootstrap, PhotinoBlazorAppBuilder builder, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
+    private static void RegisterThemes(IServiceProvider bootstrap, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
     {
         try
         {
-            var themeProducer = new ThemeProducer(builder.Services, bootstrap.GetRequiredService<ILogger<ThemeProducer>>());
+            var themeProducer = new ThemeProducer(bootstrap.GetRequiredService<ILogger<ThemeProducer>>());
             configuration.RegisterThemes(themeProducer);
         }
         catch(Exception ex)

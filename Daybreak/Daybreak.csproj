@@ -46,7 +46,6 @@
     <PackageReference Include="OpenTelemetry.Exporter.Console" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" />
-    <PackageReference Include="Photino.Blazor" />
     <PackageReference Include="PeNet" />
     <PackageReference Include="Plumsy" />
     <PackageReference Include="securifybv.ShellLink" />

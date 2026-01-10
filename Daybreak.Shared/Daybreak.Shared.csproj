@@ -14,20 +14,13 @@
     <PackageReference Include="MemoryPack.Generator">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Http" />
+    <PackageReference Include="Photino.Blazor" />
     <PackageReference Include="SystemExtensions.NetCore" />
     <PackageReference Include="SystemExtensions.NetStandard.DependencyInjection" />
     <PackageReference Include="SystemExtensions.NetStandard.Generators" PrivateAssets="all" />
     <PackageReference Include="TrailBlazr" />
   </ItemGroup>
-
-  <Target Name="RemoveDuplicateAnalyzers" BeforeTargets="CoreCompile">
-    <!-- Work around https://github.com/dotnet/wpf/issues/6792 -->
-    <ItemGroup>
-      <FilteredAnalyzer Include="@(Analyzer-&gt;Distinct())" />
-      <Analyzer Remove="@(Analyzer)" />
-      <Analyzer Include="@(FilteredAnalyzer)" />
-    </ItemGroup>
-  </Target>
 
 </Project>

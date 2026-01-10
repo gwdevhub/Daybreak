@@ -9,6 +9,7 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Serilog.Events;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
@@ -16,7 +17,6 @@ using TrailBlazr.Services;
 
 namespace Daybreak.Services.Telemetry;
 
-//TODO: Fix swappable logger
 internal sealed class TelemetryHost : IDisposable, IHostedService
 {
     private const string ServiceName = "Daybreak";
@@ -43,44 +43,28 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
     public static readonly ActivitySource Source = new(ServiceName);
 
     private readonly ResourceBuilder resourceBuilder;
-    private readonly ILoggerFactory loggerFactory;
     private readonly IViewManager viewManager;
     private readonly IOptionsMonitor<TelemetryOptions> options;
-    private readonly IOptionsMonitor<OpenTelemetryLoggerOptions> logOptions;
+    private readonly ILoggerFactory loggerFactory;
 
     private TracerProvider? tracer;
     private MeterProvider? meter;
-    private OpenTelemetryLoggerProvider? logger;
+    private OpenTelemetryLoggerProvider? otlpLoggerProvider;
+    private ILogger? otlpLogger;
     private Activity? currentActivity;
 
     public TelemetryHost(
         ResourceBuilder resourceBuilder,
-        ILoggerFactory loggerFactory,
         IViewManager viewManager,
-        IOptionsMonitor<TelemetryOptions> liveOptions)
+        IOptionsMonitor<TelemetryOptions> liveOptions,
+        ILoggerFactory loggerFactory)
     {
         this.resourceBuilder = resourceBuilder.ThrowIfNull();
         this.options = liveOptions.ThrowIfNull();
-        this.loggerFactory = loggerFactory.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
-        
+        this.loggerFactory = loggerFactory.ThrowIfNull();
+
         this.options.OnChange(this.OnOptionsUpdated);
-        var logOpts = new OpenTelemetryLoggerOptions
-        {
-            IncludeFormattedMessage = true,
-            IncludeScopes = true,
-            ParseStateValues = true
-        };
-
-        logOpts.SetResourceBuilder(this.resourceBuilder);
-        logOpts.AddOtlpExporter(exp =>
-        {
-            exp.Endpoint = new Uri(ApmEndpoint, "v1/logs");
-            exp.Headers = $"Authorization=ApiKey {ApmApiKey}";
-            exp.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
-        });
-
-        this.logOptions = new StaticOptionsMonitor<OpenTelemetryLoggerOptions>(logOpts);
         this.viewManager.ShowViewRequested += this.ViewManager_ShowViewRequested;
         this.EnableSelfDiagnostics();
         this.BuildTelemetryProvider();
@@ -99,10 +83,14 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
 
     public void Dispose()
     {
+        TelemetryLogSink.Instance.LoggingHandler = default;
         this.tracer?.Dispose();
         this.meter?.Dispose();
+        this.otlpLoggerProvider?.Dispose();
         this.tracer = default;
         this.meter = default;
+        this.otlpLoggerProvider = default;
+        this.otlpLogger = default;
     }
 
     private void ViewManager_ShowViewRequested(object? sender, TrailBlazr.Models.ViewRequest e)
@@ -150,13 +138,14 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
 
     private void BuildTelemetryProvider()
     {
+        TelemetryLogSink.Instance.LoggingHandler = default;
         this.tracer?.Dispose();
         this.meter?.Dispose();
         this.tracer = default;
         this.meter = default;
-        //this.swappableLoggerProvider.SetInner(null);
-        this.logger?.Dispose();
-        this.logger = default;
+        this.otlpLoggerProvider?.Dispose();
+        this.otlpLoggerProvider = default;
+        this.otlpLogger = default;
 
         if (!this.options.CurrentValue.Enabled)
         {
@@ -214,8 +203,51 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
             })
             .Build();
 
-        this.logger = new OpenTelemetryLoggerProvider(this.logOptions);
-        //this.swappableLoggerProvider.SetInner(this.logger);
+        var logOpts = new OpenTelemetryLoggerOptions
+        {
+            IncludeFormattedMessage = true,
+            IncludeScopes = true,
+            ParseStateValues = true
+        };
+        logOpts.SetResourceBuilder(this.resourceBuilder);
+        logOpts.AddOtlpExporter(exp =>
+        {
+            exp.Endpoint = new Uri(ApmEndpoint, "v1/logs");
+            exp.Headers = $"Authorization=ApiKey {ApmApiKey}";
+            exp.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
+        });
+
+        this.otlpLoggerProvider = new OpenTelemetryLoggerProvider(new StaticOptionsMonitor<OpenTelemetryLoggerOptions>(logOpts));
+        this.otlpLogger = this.otlpLoggerProvider.CreateLogger(ServiceName);
+
+        // Register handler to forward Serilog events to OpenTelemetry
+        TelemetryLogSink.Instance.LoggingHandler = this.ForwardLogEvent;
+    }
+
+    private void ForwardLogEvent(LogEvent logEvent)
+    {
+        if (this.otlpLogger is null)
+        {
+            return;
+        }
+
+        if (logEvent.Level <= LogEventLevel.Information)
+        {
+            return;
+        }
+
+        var logLevel = logEvent.Level switch
+        {
+            LogEventLevel.Verbose => LogLevel.Trace,
+            LogEventLevel.Debug => LogLevel.Debug,
+            LogEventLevel.Information => LogLevel.Information,
+            LogEventLevel.Warning => LogLevel.Warning,
+            LogEventLevel.Error => LogLevel.Error,
+            LogEventLevel.Fatal => LogLevel.Critical,
+            _ => LogLevel.None
+        };
+
+        this.otlpLogger.Log(logLevel, logEvent.Exception, logEvent.RenderMessage());
     }
 
     private static void AddRequestHeaders(Activity activity, HttpRequestMessage request)

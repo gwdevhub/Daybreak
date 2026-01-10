@@ -122,6 +122,10 @@ public class ProjectConfiguration : PluginConfigurationBase
 
         services.AddTrailBlazr();
         RegisterHttpClients(services);
+        services.RegisterClientWebSocket<TradeChatService<KamadanTradeChatOptions>>()
+            .Build();
+        services.RegisterClientWebSocket<TradeChatService<AscalonTradeChatOptions>>()
+            .Build();
         services.AddSingleton<IPublicClientApplication>(sp =>
         {
             var logger = sp.GetRequiredService<ILogger<PublicClientApplication>>();
@@ -188,15 +192,12 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IMDomainNameService, MDomainNameService>();
         services.AddSingleton<IMDomainRegistrar, MDomainRegistrar>();
         services.AddSingleton<IAttachedApiAccessor, AttachedApiAccessor>();
-        services.AddSingleton<IKeyboardHookService, KeyboardHookService>();
         services.AddSingleton<PrivilegeContext>();
         services.AddSingleton<ViewRedirectContext>();
         services.AddSingleton<JSConsoleInterop>();
-        services.AddSingleton<GameScreenshotsTheme>();
         services.AddSingleton<OptionsManager>();
         services.AddSingleton<IOptionsProvider, OptionsManager>(sp => sp.GetRequiredService<OptionsManager>());
         
-
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
         services.AddScoped<IBuildTemplateManager, BuildTemplateManager>();
@@ -229,6 +230,8 @@ public class ProjectConfiguration : PluginConfigurationBase
 
         services.AddHostedSingleton<IApplicationUpdater, ApplicationUpdater>();
         services.AddHostedSingleton<IThemeManager, BlazorThemeInteropService>();
+        services.AddHostedSingleton<IKeyboardHookService, KeyboardHookService>();
+        services.AddHostedSingleton<GameScreenshotsTheme>();
         services.AddHostedService<StartupActionManager>();
         services.AddHostedService<ProcessorUsageMonitor>();
         services.AddHostedService<MemoryUsageMonitor>();
@@ -305,7 +308,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         optionsProducer.RegisterOptions<SoundOptions>();
         optionsProducer.RegisterOptions<ThemeOptions>();
 
-        optionsProducer.RegisterOptions<BrowserOptions>();
         optionsProducer.RegisterOptions<SynchronizationOptions>();
         optionsProducer.RegisterOptions<FocusViewOptions>();
 

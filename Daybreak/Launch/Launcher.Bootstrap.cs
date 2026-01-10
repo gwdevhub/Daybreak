@@ -15,7 +15,7 @@ namespace Daybreak.Launch;
 
 public partial class Launcher
 {
-    private static IServiceProvider SetupBootstrap()
+    private static ServiceProvider SetupBootstrap()
     {
         var serviceCollection = new ServiceCollection();
         SetupLogging(serviceCollection);

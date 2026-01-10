@@ -20,6 +20,7 @@
     <PackageVersion Include="Microsoft.CorrelationVector" Version="1.0.42" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.1" />
     <PackageVersion Include="Microsoft.Extensions.FileProviders.Embedded" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.1" />
     <PackageVersion Include="Microsoft.Fast.Components.FluentUI" Version="3.8.0" />

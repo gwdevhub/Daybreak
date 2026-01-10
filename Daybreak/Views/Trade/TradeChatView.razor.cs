@@ -1,18 +1,39 @@
 ﻿using Daybreak.Services.TradeChat.Models;
+using Daybreak.Shared.Services.Themes;
 using TrailBlazr.ViewModels;
 
 namespace Daybreak.Views.Trade;
-public class TradeChatViewModel
+public class TradeChatViewModel(
+    IThemeManager themeManager)
     : ViewModelBase<TradeChatViewModel, TradeChatView>
 {
-    public string? TradeChatUrl { get; private set; }
+    private readonly IThemeManager themeManager = themeManager;
+
+    public string? TradeChatUrl => this.TraderSource switch
+    {
+        TraderSource.Ascalon => $"https://ascalon.gwtoolbox.com/?theme={(this.themeManager.IsLightMode ? "light" : "dark")}",
+        TraderSource.Kamadan => $"https://kamadan.gwtoolbox.com/?theme={(this.themeManager.IsLightMode ? "light" : "dark")}",
+        _ => null,
+    };
+    public TraderSource TraderSource { get; private set; }
+
+    public override ValueTask Initialize(CancellationToken cancellationToken)
+    {
+        this.themeManager.ThemeChanged += this.ThemeManager_ThemeChanged;
+        return base.Initialize(cancellationToken);
+    }
+
+    private void ThemeManager_ThemeChanged(object? sender, Shared.Models.Themes.Theme e)
+    {
+        this.RefreshView();
+    }
 
     public override ValueTask ParametersSet(TradeChatView view, CancellationToken cancellationToken)
     {
-        this.TradeChatUrl = view.Source switch
+        this.TraderSource = view.Source switch
         {
-            nameof(TraderSource.Ascalon) => "https://ascalon.gwtoolbox.com/",
-            nameof(TraderSource.Kamadan) => "https://kamadan.gwtoolbox.com/",
+            nameof(TraderSource.Ascalon) => TraderSource.Ascalon,
+            nameof(TraderSource.Kamadan) => TraderSource.Kamadan,
             _ => throw new NotSupportedException($"The source {view.Source} is not supported."),
         };
 

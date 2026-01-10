@@ -1,7 +1,6 @@
 ﻿using Daybreak.Shared.Services.Metrics;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
-using System.Net.Http;
 
 namespace Daybreak.Shared.Utils;
 

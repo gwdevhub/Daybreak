@@ -1,4 +1,5 @@
 ﻿using Daybreak.Services.Logging;
+using Daybreak.Services.Telemetry;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -29,6 +30,7 @@ public partial class Launcher
                 outputTemplate: OutputTemplate,
                 theme: AnsiConsoleTheme.Sixteen)
             .WriteTo.Sink(InMemorySink.Instance)
+            .WriteTo.Sink(TelemetryLogSink.Instance)
             .CreateLogger();
 
         services.AddLogging(loggingBuilder =>

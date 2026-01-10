@@ -29,8 +29,8 @@ public partial class Launcher
         var app = mainBuilder.Build();
         var cts = new CancellationTokenSource();
         app.MainWindow.SetTitle("Daybreak")
-            .SetContextMenuEnabled(false)
-            .SetDevToolsEnabled(false)
+            .SetContextMenuEnabled(IsDebug)
+            .SetDevToolsEnabled(IsDebug)
             .SetSmoothScrollingEnabled(true)
             .SetChromeless(true);
         app.MainWindow.SetLogVerbosity(0);
