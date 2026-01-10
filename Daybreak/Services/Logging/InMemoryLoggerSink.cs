@@ -11,6 +11,7 @@ public sealed class InMemorySink : ILogEventSink, IDisposable
     private readonly Lock snapShotLock = new();
 
     public readonly static InMemorySink Instance = new();
+    public event EventHandler<LogEvent>? LogEventEmitted;
 
     private InMemorySink()
     {
@@ -33,6 +34,15 @@ public sealed class InMemorySink : ILogEventSink, IDisposable
             }
 
             this.logEvents.Add(logEvent);
+            this.LogEventEmitted?.Invoke(this, logEvent);
+        }
+    }
+
+    public IEnumerable<LogEvent> GetSnapshot()
+    {
+        lock (this.snapShotLock)
+        {
+            return [.. this.logEvents];
         }
     }
 }

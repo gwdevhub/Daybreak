@@ -29,20 +29,12 @@
                 <div class="console-output">
                     @foreach (var log in this.ViewModel.Logs)
                     {
-                        <div class="console-entry @this.GetLogLevelClass(log.LogLevel)">
+                        <div class="console-entry @this.GetLogLevelClass(log.Level)">
                             <div class="log-header">
-                                <span class="log-timestamp">[@log.LogTime.ToString("u")]</span>
-                                <span class="log-level-badge">[@this.GetLogLevelText(log.LogLevel)]</span>
-                                @if (!string.IsNullOrEmpty(log.Category))
-                                {
-                                    <span class="log-category">[@log.Category]</span>
-                                }
-                                @if (!string.IsNullOrEmpty(log.EventId))
-                                {
-                                    <span class="log-event-id">[@log.EventId]</span>
-                                }
+                                <span class="log-timestamp">[@log.Timestamp.ToString("u")]</span>
+                                <span class="log-level-badge">[@this.GetLogLevelText(log.Level)]</span>
                             </div>
-                            <div class="log-message">@log.Message?.Trim()</div>
+                            <div class="log-message">@log.MessageTemplate.Render(log.Properties).Trim()</div>
                         </div>
                     }
                 </div>
@@ -61,7 +53,7 @@
 @page "/logs"
 @inherits ViewBase<LogsView, LogsViewModel>
 @inject IJSRuntime jSRuntime;
-@using Microsoft.Extensions.Logging
+@using Serilog.Events
 @code {
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -86,21 +78,23 @@
         }
     }
 
-    private string GetLogLevelClass(LogLevel level) => level switch
+    private string GetLogLevelClass(LogEventLevel level) => level switch
     { 
-        LogLevel.Information => "log-info",
-        LogLevel.Warning => "log-warning",
-        LogLevel.Error => "log-error",
-        LogLevel.Critical => "log-critical",
+        LogEventLevel.Information => "log-info",
+        LogEventLevel.Warning => "log-warning",
+        LogEventLevel.Error => "log-error",
+        LogEventLevel.Fatal => "log-critical",
         _ => "log-default"
     };
 
-    private string GetLogLevelText(LogLevel level) => level switch
+    private string GetLogLevelText(LogEventLevel level) => level switch
     {
-        LogLevel.Information => "INFO",
-        LogLevel.Warning => "WARN",
-        LogLevel.Error => "ERRO",
-        LogLevel.Critical => "CRIT",
+        LogEventLevel.Verbose => "VERB",
+        LogEventLevel.Debug => "DEBG",
+        LogEventLevel.Information => "INFO",
+        LogEventLevel.Warning => "WARN",
+        LogEventLevel.Error => "ERRO",
+        LogEventLevel.Fatal => "CRIT",
         _ => "????"
     };
 }

@@ -1,36 +1,33 @@
-﻿using Daybreak.Shared.Models;
+﻿using Daybreak.Services.Logging;
 using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.Logging;
-using Microsoft.Win32;
-using Newtonsoft.Json;
+using Serilog.Events;
+using System.Extensions;
 using System.IO.Compression;
 using TrailBlazr.ViewModels;
 
 namespace Daybreak.Views;
 
-//TODO: Fix logs manager usage
 public sealed class LogsViewModel(
     INotificationService notificationService,
-    //ILogsManager logsManager,
     ILogger<LogsViewModel> logger)
     : ViewModelBase<LogsViewModel, LogsView>
 {
     private readonly INotificationService notificationService = notificationService;
-    //private readonly ILogsManager logsManager = logsManager;
     private readonly ILogger<LogsViewModel> logger = logger;
     private readonly SemaphoreSlim semaphore = new(1, 1);
-    private readonly List<Log> logs = [];
+    private readonly List<LogEvent> logs = [];
 
-    private bool attached;
+    private bool isAttached = false;
 
-    public IEnumerable<Log> Logs
+    public IEnumerable<LogEvent> Logs
     {
         get
         {
             this.semaphore.Wait();
             try
             {
-                return [.. this.logs.Where(l => l is not null && l.LogLevel > Microsoft.Extensions.Logging.LogLevel.Debug && l.LogLevel != Microsoft.Extensions.Logging.LogLevel.None)];
+                return [.. this.logs];
             }
             finally
             {
@@ -44,16 +41,16 @@ public sealed class LogsViewModel(
 
     public override async ValueTask ParametersSet(LogsView view, CancellationToken cancellationToken)
     {
-        if (!this.attached)
-        {
-            //this.logsManager.ReceivedLog += this.LogsManager_ReceivedLog;
-            this.attached = true;
-        }
-
         await this.semaphore.WaitAsync(cancellationToken);
         try
         {
-            //this.logs.ClearAnd().AddRange(this.logsManager.GetLogs().Where(l => l is not null && l.LogLevel > Microsoft.Extensions.Logging.LogLevel.Debug && l.LogLevel != Microsoft.Extensions.Logging.LogLevel.None));
+            if (!this.isAttached)
+            {
+                InMemorySink.Instance.LogEventEmitted += this.Instance_LogEventEmitted;
+                this.isAttached = true;
+            }
+
+            this.logs.ClearAnd().AddRange(InMemorySink.Instance.GetSnapshot());
             await base.ParametersSet(view, cancellationToken);
         }
         finally
@@ -146,15 +143,8 @@ public sealed class LogsViewModel(
         }
     }
 
-    private void LogsManager_ReceivedLog(object? sender, Log e)
+    private void Instance_LogEventEmitted(object? sender, LogEvent e)
     {
-        if (e is null ||
-            e.LogLevel <= LogLevel.Debug ||
-            e.LogLevel == LogLevel.None)
-        {
-            return;
-        }
-
         this.semaphore.Wait();
         try
         {
@@ -164,7 +154,7 @@ public sealed class LogsViewModel(
         {
             this.semaphore.Release();
         }
-        
+
         this.RefreshView();
     }
 
@@ -172,7 +162,7 @@ public sealed class LogsViewModel(
     {
         if (disposing)
         {
-            //this.logsManager.ReceivedLog -= this.LogsManager_ReceivedLog;
+            InMemorySink.Instance.LogEventEmitted -= this.Instance_LogEventEmitted;
             this.semaphore.Dispose();
         }
 

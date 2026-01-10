@@ -1,18 +1,19 @@
 ﻿using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Services.Guildwars;
 using Daybreak.Shared.Services.Notifications;
-using Microsoft.Win32;
-using System.IO;
+using Photino.NET;
 using TrailBlazr.Services;
 using TrailBlazr.ViewModels;
 
 namespace Daybreak.Views.Installation;
 public sealed class GuildWarsDownloadViewModel(
+    PhotinoWindow window,
     INotificationService notificationService,
     IViewManager viewManager,
     IGuildWarsInstaller guildWarsInstaller)
     : ViewModelBase<GuildWarsDownloadViewModel, GuildWarsDownloadView>
 {
+    private readonly PhotinoWindow window = window;
     private readonly INotificationService notificationService = notificationService;
     private readonly IViewManager viewManager = viewManager;
     private readonly IGuildWarsInstaller guildWarsInstaller = guildWarsInstaller;
@@ -34,25 +35,18 @@ public sealed class GuildWarsDownloadViewModel(
 
     private async ValueTask StartDownload()
     {
-        //TODO: Re-enable folder selection dialog
-        //var dialog = new OpenFolderDialog
-        //{
-        //    Title = "Select Guild Wars Installation Folder",
-        //    Multiselect = false,
-        //    ValidateNames = true
-        //};
+        var path = (await this.window.ShowOpenFolderAsync("Select Guild Wars Installation Folder", multiSelect: false)).FirstOrDefault();
+        if (path is null)
+        {
+            this.notificationService.NotifyInformation(
+                title: "Guild Wars Installation Cancelled",
+                description: "Installation cancelled by user.");
+            this.viewManager.ShowView<LaunchView>();
+            return;
 
-        //if (dialog.ShowDialog() is not true)
-        //{
-        //    this.notificationService.NotifyInformation(
-        //        title: "Guild Wars Installation Cancelled",
-        //        description: "Installation cancelled by user.");
-        //    this.viewManager.ShowView<LaunchView>();
-        //    return;
-        //}
+        }
 
-        //var installationPath = Path.GetFullPath(dialog.FolderName);
-        var installationPath = string.Empty;
+        var installationPath = Path.GetFullPath(path);
         var installationProgress = new Progress<ProgressUpdate>();
         installationProgress.ProgressChanged += this.InstallationStatus_PropertyChanged;
         var result = false;
