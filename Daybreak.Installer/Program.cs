@@ -311,11 +311,11 @@ var mode = args.Length > 1
 var workingDirectory = args.Length > 2
     ? args[1] : Path.GetFullPath("..", AppContext.BaseDirectory);
 
-if (args.Length > 1 && args[1] is "update")
+if (mode is "install")
 {
-    await PerformUpdate(workingDirectory);
+    await PerformFreshInstall(workingDirectory);
 }
 else
 {
-    await PerformFreshInstall(workingDirectory);
+    await PerformUpdate(workingDirectory);
 }
