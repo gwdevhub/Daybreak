@@ -11,7 +11,6 @@ using Daybreak.Shared.Services.Onboarding;
 using Microsoft.Extensions.Options;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -39,6 +38,7 @@ public sealed class LaunchViewModel(
     private readonly IOptionsMonitor<FocusViewOptions> focusViewOptions = focusViewOptions.ThrowIfNull();
 
     private CancellationTokenSource? cancellationTokenSource;
+    private string? autoLaunchConfigurationId;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -98,6 +98,7 @@ public sealed class LaunchViewModel(
             return base.ParametersSet(view, cancellationToken);
         }
 
+        this.autoLaunchConfigurationId = view.AutoLaunchConfigurationId;
         this.Initialize();
         return base.ParametersSet(view, cancellationToken);
     }
@@ -179,6 +180,13 @@ public sealed class LaunchViewModel(
         this.RetrieveLaunchConfigurations();
         var ct = this.cancellationTokenSource.Token;
         Task.Factory.StartNew(() => this.PeriodicallyCheckSelectedConfigState(ct), ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        if (this.autoLaunchConfigurationId is not null &&
+            this.LaunchConfigurations.FirstOrDefault(c => c.Configuration?.Identifier == this.autoLaunchConfigurationId) is LauncherViewContext context)
+        {
+            this.SelectedConfiguration = context;
+            Task.Run(this.LaunchSelectedConfiguration);
+        }
+
         this.RefreshView();
     }
 
