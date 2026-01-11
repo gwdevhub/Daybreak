@@ -176,21 +176,15 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IMenuService, MenuService>();
         services.AddSingleton<IMenuServiceInitializer, MenuService>(sp => sp.GetRequiredService<IMenuService>().Cast<MenuService>());
         services.AddSingleton<IMenuServiceButtonHandler, MenuService>(sp => sp.GetRequiredService<IMenuService>().Cast<MenuService>());
-        services.AddSingleton<IShortcutManager, ShortcutManager>();
         services.AddSingleton<IMetricsService, MetricsService>();
         services.AddSingleton<INotificationService, NotificationService>();
         services.AddSingleton<INotificationProducer, NotificationService>(sp => sp.GetRequiredService<INotificationService>().Cast<NotificationService>());
         services.AddSingleton<IInternetCheckingService, InternetCheckingService>();
-        services.AddSingleton<IConnectivityStatus, ConnectivityStatus>();
         services.AddSingleton<INotificationStorage, InMemoryNotificationStorage>();
-        services.AddSingleton<ITradeAlertingService, TradeAlertingService>();
         services.AddSingleton<IModsManager, ModsManager>();
         services.AddSingleton<IPluginsService, PluginsService>();
-        services.AddSingleton<IGuildWarsExecutableManager, GuildWarsExecutableManager>();
         services.AddSingleton<ISevenZipExtractor, Daybreak.Services.SevenZip.SevenZipExtractor>();
-        services.AddSingleton<IOptionsSynchronizationService, OptionsSynchronizationService>();
         services.AddSingleton<IMDomainNameService, MDomainNameService>();
-        services.AddSingleton<IMDomainRegistrar, MDomainRegistrar>();
         services.AddSingleton<IAttachedApiAccessor, AttachedApiAccessor>();
         services.AddSingleton<PrivilegeContext>();
         services.AddSingleton<ViewRedirectContext>();
@@ -214,7 +208,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IGuildWarsCopyService, GuildWarsCopyService>();
         services.AddScoped<IItemHashService, ItemHashService>();
         services.AddScoped<IRegistryService, RegistryService>();
-        services.AddScoped<IEventNotifierService, EventNotifierService>();
         services.AddScoped<IToolboxClient, ToolboxClient>();
         services.AddScoped<IDaybreakInjector, DaybreakInjector>();
         services.AddScoped<IProcessInjector, ProcessInjector>();
@@ -231,6 +224,13 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddHostedSingleton<IThemeManager, BlazorThemeInteropService>();
         services.AddHostedSingleton<IKeyboardHookService, KeyboardHookService>();
         services.AddHostedSingleton<IScreenManager, ScreenManager>();
+        services.AddHostedSingleton<IConnectivityStatus, ConnectivityStatus>();
+        services.AddHostedSingleton<ITradeAlertingService, TradeAlertingService>();
+        services.AddHostedSingleton<IGuildWarsExecutableManager, GuildWarsExecutableManager>();
+        services.AddHostedSingleton<IEventNotifierService, EventNotifierService>();
+        services.AddHostedSingleton<IShortcutManager, ShortcutManager>();
+        services.AddHostedSingleton<IMDomainRegistrar, MDomainRegistrar>();
+        services.AddHostedSingleton<IOptionsSynchronizationService, OptionsSynchronizationService>();
         services.AddHostedSingleton<GameScreenshotsTheme>();
         services.AddHostedService<StartupActionManager>();
         services.AddHostedService<ProcessorUsageMonitor>();
@@ -291,6 +291,8 @@ public class ProjectConfiguration : PluginConfigurationBase
         startupActionProducer.RegisterAction<UpdateUModAction>();
         startupActionProducer.RegisterAction<CredentialsOptionsMigrator>();
         startupActionProducer.RegisterAction<UpdateToolboxAction>();
+        startupActionProducer.RegisterAction<UpdateGuildWarsExecutable>();
+        startupActionProducer.RegisterAction<UpdateReShadeAction>();
     }
 
     public override void RegisterPostUpdateActions(IPostUpdateActionProducer postUpdateActionProducer)
@@ -345,10 +347,10 @@ public class ProjectConfiguration : PluginConfigurationBase
 
     public override void RegisterMods(IModsProducer modsManager)
     {
+        modsManager.RegisterMod<IReShadeService, ReShadeService>();
         modsManager.RegisterMod<IGuildWarsVersionChecker, GuildWarsVersionChecker>();
         modsManager.RegisterMod<IDaybreakApiService, DaybreakApiService>();
         modsManager.RegisterMod<IToolboxService, ToolboxService>();
-        modsManager.RegisterMod<IReShadeService, ReShadeService>();
         modsManager.RegisterMod<IUModService, UModService>();
         modsManager.RegisterMod<IGuildwarsScreenPlacer, GuildwarsScreenPlacer>();
         modsManager.RegisterMod<IDirectSongService, DirectSongService>(singleton: true);

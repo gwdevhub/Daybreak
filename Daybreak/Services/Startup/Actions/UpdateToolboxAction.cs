@@ -12,13 +12,16 @@ public sealed class UpdateToolboxAction(
     private readonly IToolboxService toolboxService = toolboxService.ThrowIfNull();
     private readonly ILogger<UpdateToolboxAction> logger = logger.ThrowIfNull();
 
-    public override async Task ExecuteOnStartupAsync(CancellationToken cancellationToken)
+    public override void ExecuteOnStartup()
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        if (this.toolboxService.IsInstalled)
+        if (!this.toolboxService.IsInstalled)
         {
-            scopedLogger.LogDebug("Checking toolbox for updates");
-            await this.toolboxService.NotifyUserIfUpdateAvailable(cancellationToken);
+            scopedLogger.LogDebug("Toolbox is not installed. Skipping update check.");
+            return;
         }
+
+        scopedLogger.LogDebug("Checking toolbox for updates");
+        Task.Factory.StartNew(async () => await this.toolboxService.NotifyUserIfUpdateAvailable(CancellationToken.None));
     }
 }

@@ -21,16 +21,28 @@ public sealed class MetricsHttpMessageHandler<T> : DelegatingHandler
     protected override HttpResponseMessage Send(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         var sw = Stopwatch.StartNew();
-        var response = base.Send(request, cancellationToken);
-        this.latencyHistogram.Record(sw.ElapsedMilliseconds);
-        return response;
+        try
+        {
+            var response = base.Send(request, cancellationToken);
+            return response;
+        }
+        finally
+        {
+            this.latencyHistogram.Record(sw.ElapsedMilliseconds);
+        }
     }
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         var sw = Stopwatch.StartNew();
-        var response = await base.SendAsync(request, cancellationToken);
-        this.latencyHistogram.Record(sw.ElapsedMilliseconds);
-        return response;
+        try
+        {
+            var response = await base.SendAsync(request, cancellationToken);
+            return response;
+        }
+        finally
+        {
+            this.latencyHistogram.Record(sw.ElapsedMilliseconds);
+        }
     }
 }

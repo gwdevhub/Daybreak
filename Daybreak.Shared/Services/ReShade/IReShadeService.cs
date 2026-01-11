@@ -16,4 +16,5 @@ public interface IReShadeService : IModService
     Task<string> GetPreset(CancellationToken cancellationToken);
     Task<bool> SavePreset(string config, CancellationToken cancellationToken);
     Task<bool> UpdateIniFromPath(string pathToIni, CancellationToken cancellationToken);
+    Task CheckUpdates(CancellationToken cancellationToken);
 }

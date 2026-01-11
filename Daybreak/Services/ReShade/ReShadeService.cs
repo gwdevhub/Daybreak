@@ -13,10 +13,8 @@ using Daybreak.Shared.Utils;
 using Daybreak.Views.Mods;
 using HtmlAgilityPack;
 using IniParser.Parser;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Photino.NET;
 using System.Core.Extensions;
 using System.Data;
 using System.Diagnostics;
@@ -27,7 +25,6 @@ using TrailBlazr.Services;
 
 namespace Daybreak.Services.ReShade;
 internal sealed class ReShadeService(
-    PhotinoWindow photinoWindow,
     IOptionsProvider optionsProvider,
     INotificationService notificationService,
     IProcessInjector processInjector,
@@ -35,7 +32,7 @@ internal sealed class ReShadeService(
     IHttpClient<ReShadeService> httpClient,
     IDownloadService downloadService,
     IViewManager viewManager,
-    ILogger<ReShadeService> logger) : IReShadeService, IHostedService
+    ILogger<ReShadeService> logger) : IReShadeService
 {
     private const string PackagesIniUrl = "https://raw.githubusercontent.com/crosire/reshade-shaders/list/EffectPackages.ini";
     private const string ReShadeHomepageUrl = "https://reshade.me";
@@ -62,7 +59,6 @@ internal sealed class ReShadeService(
     private static readonly string[] FxExtensions = [".fx",];
     private static readonly string[] FxHeaderExtensions = [".fxh"];
 
-    private readonly PhotinoWindow photinoWindow = photinoWindow.ThrowIfNull();
     private readonly IOptionsProvider optionsProvider = optionsProvider.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IProcessInjector processInjector = processInjector.ThrowIfNull();
@@ -101,23 +97,6 @@ internal sealed class ReShadeService(
                                File.Exists(ReShadeLogPath) &&
                                File.Exists(ConfigIniPath);
     public bool CanUninstall => true;
-
-    async Task IHostedService.StartAsync(CancellationToken cancellationToken)
-    {
-        try
-        {
-            await this.CheckUpdates(cancellationToken);
-        }
-        catch (Exception e)
-        {
-            this.logger.LogError(e, "Encountered exception while checking for updates on startup");
-        }
-    }
-
-    Task IHostedService.StopAsync(CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
-    }
 
     public IProgressAsyncOperation<bool> PerformUninstallation(CancellationToken cancellationToken)
     {
@@ -409,6 +388,49 @@ internal sealed class ReShadeService(
         return true;
     }
 
+    public async Task CheckUpdates(CancellationToken cancellationToken)
+    {
+        if (!this.IsInstalled)
+        {
+            return;
+        }
+
+        if (!this.liveUpdateableOptions.CurrentValue.AutoUpdate)
+        {
+            return;
+        }
+
+        var scopedLogger = this.logger.CreateScopedLogger();
+        var version = await this.GetLatestVersion(cancellationToken);
+        if (this.GetCurrentVersion() is not Version currentVersion ||
+            currentVersion.CompareTo(version) >= 0)
+        {
+            scopedLogger.LogDebug("No update available. Current version is up to date");
+            return;
+        }
+
+        scopedLogger.LogDebug($"Found an update for ReShade. Latest version: {version}");
+        var notificationToken = this.notificationService.NotifyInformation(
+                "Updating ReShade",
+                $"Updating ReShade to version {version}");
+
+        if (await this.SetupReShade(new Progress<ProgressUpdate>(), cancellationToken))
+        {
+            notificationToken.Cancel();
+            scopedLogger.LogDebug($"ReShade updated to version {version}");
+            this.notificationService.NotifyInformation(
+                "ReShade updated",
+                $"ReShade has been updated to version {version}");
+            return;
+        }
+
+        notificationToken.Cancel();
+        scopedLogger.LogError("Failed to update ReShade");
+        this.notificationService.NotifyInformation(
+                "Failed to update ReShade",
+                $"Could not update ReShade to version {version}. Check logs for details");
+    }
+
     private async Task InstallPackageInternal(
         ZipArchive archive,
         CancellationToken cancellationToken,
@@ -590,49 +612,6 @@ internal sealed class ReShadeService(
         }
 
         Directory.CreateSymbolicLink(destination, SourcePresetsFolderPath);
-    }
-
-    private async Task CheckUpdates(CancellationToken cancellationToken)
-    {
-        if (!this.IsInstalled)
-        {
-            return;
-        }
-
-        if (!this.liveUpdateableOptions.CurrentValue.AutoUpdate)
-        {
-            return;
-        }
-
-        var scopedLogger = this.logger.CreateScopedLogger();
-        var version = await this.GetLatestVersion(cancellationToken);
-        if (this.GetCurrentVersion() is not Version currentVersion ||
-            currentVersion.CompareTo(version) >= 0)
-        {
-            scopedLogger.LogDebug("No update available. Current version is up to date");
-            return;
-        }
-
-        scopedLogger.LogDebug($"Found an update for ReShade. Latest version: {version}");
-        var notificationToken = this.notificationService.NotifyInformation(
-                "Updating ReShade",
-                $"Updating ReShade to version {version}");
-
-        if (await this.SetupReShade(new Progress<ProgressUpdate>(), cancellationToken))
-        {
-            notificationToken.Cancel();
-            scopedLogger.LogDebug($"ReShade updated to version {version}");
-            this.notificationService.NotifyInformation(
-                "ReShade updated",
-                $"ReShade has been updated to version {version}");
-            return;
-        }
-
-        notificationToken.Cancel();
-        scopedLogger.LogError("Failed to update ReShade");
-        this.notificationService.NotifyInformation(
-                "Failed to update ReShade",
-                $"Could not update ReShade to version {version}. Check logs for details");
     }
     
     private async Task<Version?> GetLatestVersion(CancellationToken cancellationToken)
