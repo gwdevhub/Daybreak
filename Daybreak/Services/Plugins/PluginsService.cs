@@ -78,7 +78,12 @@ internal sealed class PluginsService : IPluginsService
         this.optionsProvider.SaveOption(options);
     }
 
-    public void LoadPlugins()
+    public void UpdateLoadedPlugins(IReadOnlyList<AvailablePlugin> loadedPlugins)
+    {
+        this.loadedPlugins.ClearAnd().AddRange(loadedPlugins);
+    }
+
+    public IReadOnlyList<AvailablePlugin> LoadPlugins()
     {
         this.pluginsSemaphore.Wait();
         var scopedLogger = this.logger.CreateScopedLogger();
@@ -105,9 +110,11 @@ internal sealed class PluginsService : IPluginsService
         catch (Exception e)
         {
             scopedLogger.LogError(e, "Caught exception while loading plugins");
+            this.pluginsSemaphore.Release();
             throw;
         }
 
+        var loadedPlugins = new List<AvailablePlugin>();
         foreach (var result in results)
         {
             var pluginScopedLogger = this.logger.CreateScopedLogger(flowIdentifier: result.PluginEntry?.Name ?? string.Empty);
@@ -119,7 +126,6 @@ internal sealed class PluginsService : IPluginsService
                 if (assembly is null)
                 {
                     // Exclude the plugin from the enabled list if it failed to load
-                    this.DisablePlugin(result);
                     continue;
                 }
 
@@ -127,7 +133,6 @@ internal sealed class PluginsService : IPluginsService
                 if (entryPoint is null)
                 {
                     pluginScopedLogger.LogError($"Assembly loaded but unable to find entry point. The plugin will not start");
-                    this.DisablePlugin(result);
                     continue;
                 }
 
@@ -135,19 +140,19 @@ internal sealed class PluginsService : IPluginsService
                 if (pluginConfig is null)
                 {
                     pluginScopedLogger.LogError($"Assembly loaded but unable to create entry point. The plugin will not start");
-                    this.DisablePlugin(result);
                     continue;
                 }
 
-                this.loadedPlugins.Add(new AvailablePlugin { Name = result.PluginEntry?.Name ?? string.Empty, Path = result.PluginEntry?.Path ?? string.Empty, Enabled = true, Configuration = pluginConfig });
+                loadedPlugins.Add(new AvailablePlugin { Name = result.PluginEntry?.Name ?? string.Empty, Path = result.PluginEntry?.Path ?? string.Empty, Enabled = true, Configuration = pluginConfig });
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 pluginScopedLogger.LogError(e, $"Encountered exception while loading plugin");
             }
         }
 
         this.pluginsSemaphore.Release();
+        return loadedPlugins;
     }
 
     public async Task<bool> AddPlugin(string pathToPlugin)

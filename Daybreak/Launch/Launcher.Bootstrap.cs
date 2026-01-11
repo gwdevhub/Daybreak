@@ -28,6 +28,7 @@ public partial class Launcher
 
     private static void BootstrapPluginsService(IServiceCollection services)
     {
+        services.AddDaybreakOptions<PluginsServiceOptions>();
         services.AddSingleton<IPluginsService, PluginsService>();
     }
 
