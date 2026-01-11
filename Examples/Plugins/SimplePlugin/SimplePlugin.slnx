@@ -1,0 +1,8 @@
+<Solution>
+  <Configurations>
+    <Configuration Name="Debug" />
+    <Configuration Name="Release" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="SimplePlugin/SimplePlugin.csproj" />
+</Solution>
