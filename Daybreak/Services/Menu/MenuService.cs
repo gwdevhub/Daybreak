@@ -6,12 +6,13 @@ using System.Core.Extensions;
 namespace Daybreak.Services.Menu;
 
 internal sealed class MenuService(
+    IReadOnlyDictionary<string, MenuCategory> menuCategories,
     IServiceProvider serviceProvider,
-    ILogger<MenuService> logger) : IMenuService, IMenuServiceInitializer, IMenuServiceProducer, IMenuServiceButtonHandler
+    ILogger<MenuService> logger) : IMenuService, IMenuServiceInitializer, IMenuServiceButtonHandler
 {
+    private readonly IReadOnlyDictionary<string, MenuCategory> categories = menuCategories.ThrowIfNull();
     private readonly IServiceProvider serviceProvider = serviceProvider.ThrowIfNull();
     private readonly ILogger<MenuService> logger = logger.ThrowIfNull();
-    private readonly Dictionary<string, MenuCategory> categories = [];
 
     private Action? openMenuAction, closeMenuAction, toggleMenuAction;
     private bool initialized;
@@ -52,17 +53,6 @@ internal sealed class MenuService(
         }
 
         this.toggleMenuAction?.Invoke();
-    }
-
-    public MenuCategory CreateIfNotExistCategory(string name)
-    {
-        if (!this.categories.TryGetValue(name, out var category))
-        {
-            category = new MenuCategory(name);
-            this.categories.Add(name, category);
-        }
-
-        return category;
     }
 
     public IEnumerable<MenuCategory> GetCategories()

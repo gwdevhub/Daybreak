@@ -26,7 +26,7 @@ public sealed class LaunchViewModel(
     ILaunchConfigurationService launchConfigurationService,
     IOnboardingService onboardingService,
     IApplicationLauncher applicationLauncher,
-    ILiveOptions<FocusViewOptions> focusViewOptions) : ViewModelBase<LaunchViewModel, LaunchView>, INotifyPropertyChanged, IDisposable
+    IOptionsMonitor<FocusViewOptions> focusViewOptions) : ViewModelBase<LaunchViewModel, LaunchView>, INotifyPropertyChanged, IDisposable
 {
     private static readonly TimeSpan LaunchTimeout = TimeSpan.FromSeconds(10);
 
@@ -36,7 +36,7 @@ public sealed class LaunchViewModel(
     private readonly ILaunchConfigurationService launchConfigurationService = launchConfigurationService.ThrowIfNull();
     private readonly IOnboardingService onboardingService = onboardingService.ThrowIfNull();
     private readonly IApplicationLauncher applicationLauncher = applicationLauncher.ThrowIfNull();
-    private readonly ILiveOptions<FocusViewOptions> focusViewOptions = focusViewOptions.ThrowIfNull();
+    private readonly IOptionsMonitor<FocusViewOptions> focusViewOptions = focusViewOptions.ThrowIfNull();
 
     private CancellationTokenSource? cancellationTokenSource;
 
@@ -424,8 +424,8 @@ public sealed class LaunchViewModel(
             // Game running with API mod - can attach or kill based on focus view setting
             launcherViewContext.GameRunning = true;
             launcherViewContext.CanLaunch = false;
-            launcherViewContext.CanAttach = this.focusViewOptions.Value.Enabled;
-            launcherViewContext.CanKill = !this.focusViewOptions.Value.Enabled;
+            launcherViewContext.CanAttach = this.focusViewOptions.CurrentValue.Enabled;
+            launcherViewContext.CanKill = !this.focusViewOptions.CurrentValue.Enabled;
         }
     }
 
@@ -468,7 +468,7 @@ public sealed class LaunchViewModel(
 
     private async Task AttachContext(GuildWarsApplicationLaunchContext context, CancellationToken cancellationToken)
     {
-        if (!this.focusViewOptions.Value.Enabled)
+        if (!this.focusViewOptions.CurrentValue.Enabled)
         {
             return;
         }
@@ -499,7 +499,7 @@ public sealed class LaunchViewModel(
             return;
         }
 
-        if (!this.focusViewOptions.Value.Enabled)
+        if (!this.focusViewOptions.CurrentValue.Enabled)
         {
             return;
         }
@@ -558,7 +558,7 @@ public sealed class LaunchViewModel(
         launchNotificationToken.Cancel();
         this.daybreakApiService.RequestInstancesAnnouncement();
         this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(launcherViewContext.Configuration);
-        if (!this.focusViewOptions.Value.Enabled)
+        if (!this.focusViewOptions.CurrentValue.Enabled)
         {
             return;
         }

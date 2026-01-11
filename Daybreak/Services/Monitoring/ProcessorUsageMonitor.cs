@@ -1,14 +1,14 @@
 ﻿using Daybreak.Shared.Models.Metrics;
 using Daybreak.Shared.Services.Metrics;
+using Microsoft.Extensions.Hosting;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
-using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.Monitoring;
 
 internal sealed class ProcessorUsageMonitor(
-    IMetricsService metricsService) : IApplicationLifetimeService
+    IMetricsService metricsService) : IHostedService
 {
     private const string ProcessorTime = "Processor Usage";
     private const string ProcessorTimeUnit = "% CPU";
@@ -17,25 +17,24 @@ internal sealed class ProcessorUsageMonitor(
     private readonly Histogram<double> processorTimeHistogram = metricsService.ThrowIfNull().CreateHistogram<double>(ProcessorTime, ProcessorTimeUnit, ProcessorTimeDescription, AggregationTypes.NoAggregate);
     private readonly Process currentProcess = Process.GetCurrentProcess();
     private readonly int processorCount = Environment.ProcessorCount;
-    private readonly CancellationTokenSource cancellationTokenSource = new();
 
-    public void OnClosing()
+    async Task IHostedService.StartAsync(CancellationToken cancellationToken)
     {
-        this.cancellationTokenSource.Cancel();
+        await this.PeriodicallyCheckCPU(cancellationToken);
     }
 
-    public void OnStartup()
+    Task IHostedService.StopAsync(CancellationToken cancellationToken)
     {
-        _ = Task.Run(this.PeriodicallyCheckCPU, this.cancellationTokenSource.Token);
+        return Task.CompletedTask;
     }
 
-    private async Task PeriodicallyCheckCPU()
+    private async Task PeriodicallyCheckCPU(CancellationToken cancellationToken)
     {
-        while (!this.cancellationTokenSource.IsCancellationRequested)
+        while (!cancellationToken.IsCancellationRequested)
         {
             var stopwatch = Stopwatch.StartNew();
             var startCpuUsage = this.currentProcess.TotalProcessorTime;
-            await Task.Delay(1000, this.cancellationTokenSource.Token);
+            await Task.Delay(1000, cancellationToken);
 
             var endCpuUsage = this.currentProcess.TotalProcessorTime;
             var elapsedTicks = stopwatch.ElapsedTicks;

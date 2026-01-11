@@ -4,12 +4,11 @@ using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Models.Trade;
 using Daybreak.Shared.Services.TradeChat;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Logging;
-using System.Net.Http;
 
 namespace Daybreak.Services.TradeChat;
 
@@ -22,13 +21,13 @@ internal sealed class TraderQuoteService : ITraderQuoteService
     private const string TraderQuotesUri = "trader_quotes";
 
     private readonly IItemHashService itemHashService;
-    private readonly ILiveUpdateableOptions<TraderQuotesOptions> options;
+    private readonly IOptionsMonitor<TraderQuotesOptions> options;
     private readonly IHttpClient<TraderQuoteService> httpClient;
     private readonly ILogger<TraderQuoteService> logger;
 
     public TraderQuoteService(
         IItemHashService itemHashService,
-        ILiveUpdateableOptions<TraderQuotesOptions> options,
+        IOptionsMonitor<TraderQuotesOptions> options,
         IHttpClient<TraderQuoteService> client,
         ILogger<TraderQuoteService> logger)
     {
@@ -37,7 +36,7 @@ internal sealed class TraderQuoteService : ITraderQuoteService
         this.httpClient = client.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
 
-        this.httpClient.BaseAddress = new Uri(this.options.Value.HttpsUri);
+        this.httpClient.BaseAddress = new Uri(this.options.CurrentValue.HttpsUri);
     }
 
     public Task<IEnumerable<TraderQuote>> GetBuyQuotes(CancellationToken cancellationToken)

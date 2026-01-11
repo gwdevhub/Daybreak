@@ -12,4 +12,6 @@ public interface IOptionsProvider
     void SaveRegisteredOptions(object options);
     void SaveRegisteredOptions(OptionInstance optionInstance);
     void SaveRegisteredOptions(string name, JObject options);
+    void SaveOption<TOptions>(TOptions options)
+        where TOptions : notnull;
 }

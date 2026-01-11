@@ -1,4 +1,5 @@
 ﻿using Daybreak.Shared.Models;
+using System.Drawing;
 
 namespace Daybreak.Shared.Services.Screens;
 
@@ -8,4 +9,5 @@ public interface IScreenManager
     void SaveWindowPositionAndSize();
     void MoveWindowToSavedPosition();
     bool MoveGuildwarsToScreen(Screen screen);
+    Rectangle GetSavedPosition();
 }

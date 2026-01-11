@@ -2,16 +2,19 @@
 using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.Guildwars;
+using Photino.NET;
 using System.Extensions;
 using TrailBlazr.ViewModels;
 
 namespace Daybreak.Views;
 
 public class ExecutablesViewModel(
+    PhotinoWindow window,
     IGuildWarsInstaller guildWarsInstaller,
     IGuildWarsExecutableManager guildWarsExecutableManager)
     : ViewModelBase<ExecutablesViewModel, ExecutablesView>
 {
+    private readonly PhotinoWindow window = window;
     private readonly IGuildWarsInstaller guildWarsInstaller = guildWarsInstaller;
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager = guildWarsExecutableManager;
     private readonly SemaphoreSlim semaphoreSlim = new(1, 1);
@@ -36,9 +39,10 @@ public class ExecutablesViewModel(
         this.guildWarsExecutableManager.RemoveExecutable(executable.Path);
     }
 
-    public void CreateExecutable()
+    public async Task CreateExecutable()
     {
-        if (GetPath() is not string path)
+        var path = await this.GetPath();
+        if (path is null)
         {
             return;
         }
@@ -53,12 +57,12 @@ public class ExecutablesViewModel(
 
         this.Executables.Insert(0, newExecutable);
         this.guildWarsExecutableManager.AddExecutable(newExecutable.Path);
-        Task.Run(this.ValidateExecutables);
+        await this.ValidateExecutables();
     }
 
-    public void ModifyPath(ExecutablePath executable)
+    public async void ModifyPath(ExecutablePath executable)
     {
-        var maybePath = GetPath();
+        var maybePath = await this.GetPath();
         if (maybePath is null)
         {
             return;
@@ -67,7 +71,7 @@ public class ExecutablesViewModel(
         this.guildWarsExecutableManager.RemoveExecutable(executable.Path);
         executable.Path = maybePath;
         this.guildWarsExecutableManager.AddExecutable(executable.Path);
-        Task.Run(() => this.ValidateExecutables());
+        await this.ValidateExecutables();
     }
 
     public async void UpdateExecutable(ExecutablePath executable)
@@ -201,23 +205,9 @@ public class ExecutablesViewModel(
         }
     }
 
-    private static string? GetPath()
+    private async Task<string?> GetPath()
     {
-        var filePicker = new Microsoft.Win32.OpenFileDialog()
-        {
-            CheckFileExists = true,
-            CheckPathExists = true,
-            DefaultExt = "exe",
-            Filter = "Executable Files (*.exe)|*.exe|All Files (*.*)|*.*",
-            Multiselect = false,
-            Title = "Select Guild Wars Executable"
-        };
-
-        if (filePicker.ShowDialog() == true)
-        {
-            return filePicker.FileName;
-        }
-
-        return default;
+        var path = await this.window.ShowOpenFileAsync("Select Guild Wars Executable", multiSelect: false, filters: [("Executables", ["exe", "*"])]);
+        return path.FirstOrDefault();
     }
 }

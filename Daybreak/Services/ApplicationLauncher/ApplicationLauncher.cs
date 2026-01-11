@@ -12,27 +12,26 @@ using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Utils;
 using Daybreak.Views;
 using Microsoft.Extensions.Logging;
-using Microsoft.Win32;
+using Microsoft.Extensions.Options;
+using Photino.NET;
 using System.ComponentModel;
-using System.Configuration;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
-using System.Windows;
 using static Daybreak.Shared.Utils.NativeMethods;
 
 namespace Daybreak.Services.ApplicationLauncher;
 
 internal sealed class ApplicationLauncher(
+    PhotinoWindow photinoWindow,
     IDaybreakInjector daybreakInjector,
     IGuildWarsExecutableManager guildWarsExecutableManager,
     INotificationService notificationService,
-    ILiveOptions<LauncherOptions> launcherOptions,
+    IOptionsMonitor<LauncherOptions> launcherOptions,
     IModsManager modsManager,
     IPrivilegeManager privilegeManager,
     ILogger<ApplicationLauncher> logger) : IApplicationLauncher
@@ -44,10 +43,11 @@ internal sealed class ApplicationLauncher(
 
     private static readonly TimeSpan LaunchTimeout = TimeSpan.FromMinutes(1);
 
+    private readonly PhotinoWindow photinoWindow = photinoWindow.ThrowIfNull();
     private readonly IDaybreakInjector daybreakInjector = daybreakInjector.ThrowIfNull();
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
-    private readonly ILiveOptions<LauncherOptions> launcherOptions = launcherOptions.ThrowIfNull();
+    private readonly IOptionsMonitor<LauncherOptions> launcherOptions = launcherOptions.ThrowIfNull();
     private readonly IModsManager modsManager = modsManager.ThrowIfNull();
     private readonly ILogger<ApplicationLauncher> logger = logger.ThrowIfNull();
     private readonly IPrivilegeManager privilegeManager = privilegeManager.ThrowIfNull();
@@ -106,7 +106,7 @@ internal sealed class ApplicationLauncher(
             throw new InvalidOperationException($"Unable to start {processName} as admin");
         }
 
-        Application.Current.Shutdown();
+        this.photinoWindow.Close();
     }
 
     public void RestartDaybreakAsNormalUser()
@@ -134,7 +134,7 @@ internal sealed class ApplicationLauncher(
             throw new InvalidOperationException($"Unable to start {processName} as normal user");
         }
 
-        Application.Current.Shutdown();
+        this.photinoWindow.Close();
     }
 
     private async Task<Process?> LaunchGuildwarsProcess(LaunchConfigurationWithCredentials launchConfigurationWithCredentials, CancellationToken cancellationToken)
@@ -198,7 +198,7 @@ internal sealed class ApplicationLauncher(
             args.AddRange(mod.GetCustomArguments());
         }
 
-        var identity = this.launcherOptions.Value.LaunchGuildwarsAsCurrentUser ?
+        var identity = this.launcherOptions.CurrentValue.LaunchGuildwarsAsCurrentUser ?
             WindowsIdentity.GetCurrent().Name :
             WindowsIdentity.GetAnonymous().Name;
         scopedLogger.LogDebug("Launching guildwars as [{identity}] identity", identity);
@@ -227,7 +227,7 @@ internal sealed class ApplicationLauncher(
         var guildWarsStartingDisabledContext = new GuildWarsStartingDisabledContext { ApplicationLauncherContext = applicationLauncherContext };
         foreach (var mod in disabledmods)
         {
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.Value.ModStartupTimeout));
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.CurrentValue.ModStartupTimeout));
             try
             {
                 await mod.OnGuildWarsStartingDisabled(guildWarsStartingDisabledContext, cts.Token);
@@ -252,7 +252,7 @@ internal sealed class ApplicationLauncher(
         var guildWarsStartingContext = new GuildWarsStartingContext { ApplicationLauncherContext = applicationLauncherContext, CancelStartup = false };
         foreach (var mod in mods)
         {
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.Value.ModStartupTimeout));
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.CurrentValue.ModStartupTimeout));
             try
             {
                 await mod.OnGuildWarsStarting(guildWarsStartingContext, cts.Token);
@@ -309,7 +309,7 @@ internal sealed class ApplicationLauncher(
         var guildWarsCreatedContext = new GuildWarsCreatedContext { ApplicationLauncherContext = applicationLauncherContext, CancelStartup = false };
         foreach (var mod in mods)
         {
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.Value.ModStartupTimeout));
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.CurrentValue.ModStartupTimeout));
             try
             {
                 await mod.OnGuildWarsCreated(guildWarsCreatedContext, cts.Token);
@@ -400,7 +400,7 @@ internal sealed class ApplicationLauncher(
             var guildWarsStartedContext = new GuildWarsStartedContext { ApplicationLauncherContext = applicationLauncherContext };
             foreach (var mod in mods)
             {
-                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.Value.ModStartupTimeout));
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.CurrentValue.ModStartupTimeout));
                 try
                 {
                     await mod.OnGuildWarsStarted(guildWarsStartedContext, cts.Token);

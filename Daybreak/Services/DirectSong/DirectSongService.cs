@@ -4,25 +4,27 @@ using Daybreak.Shared.Models.Mods;
 using Daybreak.Shared.Services.DirectSong;
 using Daybreak.Shared.Services.Downloads;
 using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Services.SevenZip;
 using Daybreak.Shared.Utils;
 using Daybreak.Views;
 using Microsoft.Extensions.Logging;
-using System.Configuration;
+using Microsoft.Extensions.Options;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
-using System.IO;
 
 namespace Daybreak.Services.DirectSong;
+
 internal sealed class DirectSongService(
+    IOptionsProvider optionsProvider,
     INotificationService notificationService,
     IPrivilegeManager privilegeManager,
     ISevenZipExtractor sevenZipExtractor,
     IDownloadService downloadService,
-    ILiveUpdateableOptions<DirectSongOptions> options,
+    IOptionsMonitor<DirectSongOptions> options,
     ILogger<DirectSongService> logger) : IDirectSongService
 {
     private const string DownloadUrl = "https://guildwarslegacy.com/DirectSong.7z";
@@ -41,11 +43,12 @@ internal sealed class DirectSongService(
 
     private static readonly string InstallationDirectory = PathUtils.GetAbsolutePathFromRoot(InstallationDirectorySubPath);
 
+    private readonly IOptionsProvider optionsProvider = optionsProvider.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IPrivilegeManager privilegeManager = privilegeManager.ThrowIfNull();
     private readonly ISevenZipExtractor sevenZipExtractor = sevenZipExtractor.ThrowIfNull();
     private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
-    private readonly ILiveUpdateableOptions<DirectSongOptions> options = options.ThrowIfNull();
+    private readonly IOptionsMonitor<DirectSongOptions> options = options.ThrowIfNull();
     private readonly ILogger<DirectSongService> logger = logger.ThrowIfNull();
 
     public string Name => "DirectSong";
@@ -55,11 +58,12 @@ internal sealed class DirectSongService(
     public bool CanUninstall => true;
     public bool IsEnabled
     {
-        get => this.options.Value.Enabled;
+        get => this.options.CurrentValue.Enabled;
         set
         {
-            this.options.Value.Enabled = value;
-            this.options.UpdateOption();
+            var options = this.options.CurrentValue;
+            options.Enabled = value;
+            this.optionsProvider.SaveOption(options);
         }
     }
     public bool IsInstalled =>

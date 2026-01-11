@@ -1,7 +1,7 @@
 ﻿<div class="container">
     <div class="title-bar-additional-btns-left">
         <button class="title-bar-btn" @onclick="this.ViewModel.CreateNewLaunchConfiguration" title="Add new launch configuration">
-            <FluentIcon Value="new Icons.Regular.Size16.Add()" />
+            <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Add()" />
         </button>
     </div>
     <div class="content backdrop-panel">
@@ -21,7 +21,7 @@
                                              ReadOnly="true"
                                              Spellcheck="false"
                                              Placeholder="Launch config identifier">
-                                <FluentIcon Value="@(new Microsoft.Fast.Components.FluentUI.Icons.Regular.Size16.Delete())"
+                                <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Delete())"
                                             @onclick="@(() => this.ViewModel.DeleteLaunchConfiguration(config))"
                                             slot="end"
                                             Color="Color.Neutral"

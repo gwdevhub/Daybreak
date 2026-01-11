@@ -1,15 +1,9 @@
-﻿using System.Core.Extensions;
-using System.Diagnostics;
-using System.Extensions;
-using System.IO;
-using System.Windows;
-using System.Windows.Input;
-using System.Windows.Interop;
-using System.Windows.Media;
+﻿using Daybreak.Models;
 using Daybreak.Services.Logging;
 using Daybreak.Services.Notifications.Handlers;
-using Daybreak.Shared;
+using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Menu;
+using Daybreak.Shared.Services.Keyboard;
 using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Options;
@@ -20,9 +14,11 @@ using Daybreak.Shared.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
+using Photino.Blazor;
+using System.Core.Extensions;
+using System.Diagnostics;
+using System.Extensions;
 using TrailBlazr.Services;
-using WpfExtended.Blazor.Launch;
-using static Daybreak.Shared.Models.Themes.Theme;
 
 namespace Daybreak.Views;
 
@@ -30,22 +26,21 @@ public sealed class AppViewModel
 {
     private const string IssueUrl = "https://github.com/gwdevhub/Daybreak/issues/new";
 
+    private readonly IKeyboardHookService keyboardHookService;
     private readonly IOptionsProvider optionsProvider;
-    private readonly IMenuServiceProducer menuServiceProducer;
+    private readonly IMenuServiceInitializer menuServiceInitializer;
     private readonly IMenuServiceButtonHandler menuServiceButtonHandler;
     private readonly IViewManager viewManager;
     private readonly IThemeManager themeManager;
     private readonly IApplicationUpdater applicationUpdater;
     private readonly IPrivilegeManager privilegeManager;
-    private readonly BlazorHostWindow blazorHostWindow;
+    private readonly PhotinoBlazorApp photinoApp;
     private readonly JSConsoleInterop jsConsoleInterop;
     private readonly INotificationService notificationService;
     private readonly ILogger<App> logger;
 
     private SemaphoreSlim themeChangeSemaphore = new(1, 1);
-    private string? tradeChatThemeSetterScript = default;
     private bool isInitialized = false;
-    private HwndSource? hwndSource;
 
     public event EventHandler<WindowState>? WindowStateChanged;
     public event EventHandler? RedrawRequested;
@@ -56,7 +51,7 @@ public sealed class AppViewModel
 
     public List<MenuCategory> MenuCategories { get; private set; } = [];
 
-    public WindowState WindowState => this.blazorHostWindow.WindowState;
+    public WindowState WindowState { get; private set; }
     public bool IsAdmin => this.privilegeManager.AdminPrivileges;
     public bool IsNavigationOpen { get; private set; }
     public string CurrentVersionText => this.applicationUpdater.CurrentVersion.ToString();
@@ -79,46 +74,51 @@ public sealed class AppViewModel
     public double XXLargeFontSize { get; set; }
 
     public AppViewModel(
+        IKeyboardHookService keyboardHookService,
         IOptionsProvider optionsProvider,
         IMenuServiceInitializer menuServiceInitializer,
-        IMenuServiceProducer menuServiceProducer,
         IMenuServiceButtonHandler menuServiceButtonHandler,
         IViewManager viewManager,
         IThemeManager themeManager,
         IApplicationUpdater applicationUpdater,
         IPrivilegeManager privilegeManager,
-        BlazorHostWindow blazorHostWindow,
+        PhotinoBlazorApp photinoApp,
         JSConsoleInterop jsConsoleInterop,
         INotificationProducer notificationProducer,
         INotificationService notificationService,
-        ILogger<App> logger
-    )
+        ILogger<App> logger)
     {
+        this.keyboardHookService = keyboardHookService.ThrowIfNull();
         this.optionsProvider = optionsProvider.ThrowIfNull();
-        this.menuServiceProducer = menuServiceProducer.ThrowIfNull();
+        this.menuServiceInitializer = menuServiceInitializer.ThrowIfNull();
         this.menuServiceButtonHandler = menuServiceButtonHandler.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
         this.themeManager = themeManager.ThrowIfNull();
         this.applicationUpdater = applicationUpdater.ThrowIfNull();
         this.privilegeManager = privilegeManager.ThrowIfNull();
-        this.blazorHostWindow = blazorHostWindow.ThrowIfNull();
+        this.photinoApp = photinoApp.ThrowIfNull();
         this.jsConsoleInterop = jsConsoleInterop.ThrowIfNull();
         this.NotificationProducer = notificationProducer.ThrowIfNull();
         this.notificationService = notificationService.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
 
-        this.blazorHostWindow.StateChanged += this.MainWindow_StateChanged;
-        menuServiceInitializer.InitializeMenuService(
+        
+        this.photinoApp.MainWindow.RegisterMaximizedHandler(this.OnWindowStateChanged)
+            .RegisterMinimizedHandler(this.OnWindowStateChanged)
+            .RegisterRestoredHandler(this.OnWindowStateChanged);
+
+        this.menuServiceInitializer.InitializeMenuService(
             this.OpenNavigationMenu,
             this.CloseNavigationMenu,
             this.ToggleNavigationMenu
         );
-        this.blazorHostWindow.PreviewKeyUp += this.BlazorHostWindow_PreviewKeyDown;
+
+        this.keyboardHookService.KeyUp += this.KeyboardHook_PreviewKeyUp;
     }
 
-    private void BlazorHostWindow_PreviewKeyDown(object sender, KeyEventArgs e)
+    private void KeyboardHook_PreviewKeyUp(object? _, KeyboardEventArgs eventArgs)
     {
-        if (e.Key is Key.F1)
+        if (eventArgs.Key is VirtualKey.F1)
         {
             this.viewManager.ShowView<WikiView>((nameof(WikiView.Page), "Home"));
         }
@@ -138,47 +138,7 @@ public sealed class AppViewModel
         this.RedrawRequested?.Invoke(this, EventArgs.Empty);
         this.viewManager.ShowView<LaunchView>();
         this.viewManager.ShowViewRequested += (s, e) => this.CloseNavigationMenu();
-        this.hwndSource = HwndSource.FromHwnd(
-            new WindowInteropHelper(this.blazorHostWindow).Handle
-        );
-
-        // Hook WndProc to handle WM_NCHITTEST for custom title bar
-        this.hwndSource?.AddHook(this.WndProc);
-
         this.isInitialized = true;
-    }
-
-    /// <summary>
-    /// Handles Windows messages to ensure the custom title bar area is treated as client area,
-    /// preventing Windows from intercepting mouse events for native window buttons.
-    /// </summary>
-    private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-    {
-        if (msg == NativeMethods.WM_NCHITTEST)
-        {
-            // Get the mouse position from lParam
-            var x = (short)(lParam.ToInt32() & 0xFFFF);
-            var y = (short)((lParam.ToInt32() >> 16) & 0xFFFF);
-
-            // Convert screen coordinates to window coordinates
-            var point = new Point(x, y);
-            point = this.blazorHostWindow.PointFromScreen(point);
-
-            // Define the title bar height (should match the CSS title bar height of 40px)
-            // Account for DPI scaling
-            var dpi = VisualTreeHelper.GetDpi(this.blazorHostWindow);
-            var titleBarHeight = 40 * dpi.DpiScaleY;
-
-            // If the mouse is in the title bar area, return HTCLIENT to let WebView2 handle it
-            // This prevents Windows from returning HTMINBUTTON, HTMAXBUTTON, or HTCLOSE
-            if (point.Y >= 0 && point.Y < titleBarHeight)
-            {
-                handled = true;
-                return new IntPtr(NativeMethods.HTCLIENT);
-            }
-        }
-
-        return IntPtr.Zero;
     }
 
     public void Drag()
@@ -187,9 +147,9 @@ public sealed class AppViewModel
          * This operation has to be queued on the UI thread and has to be done via PostMessage to avoid re-entrancy.
          * Using SendMessage or doing it directly can cause crashes when WebView2 is handling a user callback while another sendmessage appears.
          */
-        this.blazorHostWindow.Dispatcher.BeginInvoke(() =>
+        this.photinoApp.WindowManager.Dispatcher.InvokeAsync(() =>
         {
-            var hwnd = new WindowInteropHelper(this.blazorHostWindow).Handle;
+            var hwnd = this.photinoApp.MainWindow.WindowHandle;
             if (hwnd == IntPtr.Zero)
             {
                 return;
@@ -212,14 +172,14 @@ public sealed class AppViewModel
          * Using SendMessage or doing it directly can cause crashes when WebView2 is handling a user callback while another sendmessage appears.
          */
 
-        if (this.blazorHostWindow.WindowState == WindowState.Maximized)
+        if (this.WindowState == WindowState.Maximized)
         {
             return;
         }
 
-        this.blazorHostWindow.Dispatcher.BeginInvoke(() =>
+        this.photinoApp.WindowManager.Dispatcher.InvokeAsync(() =>
         {
-            var hwnd = new WindowInteropHelper(this.blazorHostWindow).Handle;
+            var hwnd = this.photinoApp.MainWindow.WindowHandle;
             if (hwnd == IntPtr.Zero)
             {
                 return;
@@ -237,22 +197,22 @@ public sealed class AppViewModel
 
     public void Minimize()
     {
-        this.blazorHostWindow.WindowState = WindowState.Minimized;
+        this.photinoApp.MainWindow.SetMinimized(true);
     }
 
     public void Maximize()
     {
-        this.blazorHostWindow.WindowState = WindowState.Maximized;
+        this.photinoApp.MainWindow.SetMaximized(true);
     }
 
     public void Restore()
     {
-        this.blazorHostWindow.WindowState = WindowState.Normal;
+        this.photinoApp.MainWindow.SetMaximized(false);
     }
 
     public void Close()
     {
-        this.blazorHostWindow.Close();
+        this.photinoApp.MainWindow.Close();
     }
 
     public void ToggleNavigationMenu()
@@ -341,34 +301,11 @@ public sealed class AppViewModel
         this.XXLargeFontSize = this.themeManager.XXLargeFontSize;
         this.UIScale = this.themeManager.UIScale;
         this.RedrawRequested?.Invoke(this, EventArgs.Empty);
-
-        /*
-         * Below code hooks into the webview to set the trade chat theme based on the current application theme.
-         */
-        await this.blazorHostWindow.Dispatcher.InvokeAsync(async () =>
-        {
-            if (Global.CoreWebView2 is null)
-            {
-                return;
-            }
-
-            if (this.tradeChatThemeSetterScript is not null)
-            {
-                Global.CoreWebView2.RemoveScriptToExecuteOnDocumentCreated(this.tradeChatThemeSetterScript);
-                this.tradeChatThemeSetterScript = default;
-            }
-
-            this.tradeChatThemeSetterScript = await Global.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(@$"
-            if (location.origin === 'https://kamadan.gwtoolbox.com' || 
-                location.origin === 'https://ascalon.gwtoolbox.com') {{
-                localStorage.setItem('mode', '{(this.themeManager.CurrentTheme?.Mode is LightDarkMode.Light ? "light" : "dark")}');
-            }}");
-        });
     }
 
     private void LoadMenuCategories()
     {
-        foreach (var category in this.menuServiceProducer.GetCategories())
+        foreach (var category in this.menuServiceInitializer.GetCategories())
         {
             this.MenuCategories.Add(category);
             if (category.Name is "Settings")
@@ -379,17 +316,12 @@ public sealed class AppViewModel
                         option.Name,
                         option.Description,
                         sp =>
-                            sp.GetRequiredService<ViewManager>()
+                            sp.GetRequiredService<IViewManager>()
                                 .ShowView<OptionView>(("optionName", option.Name))
                     );
                 }
             }
         }
-    }
-
-    private void MainWindow_StateChanged(object? sender, EventArgs e)
-    {
-        this.WindowStateChanged?.Invoke(this, this.WindowState);
     }
 
     private string GetBackdropImageUrl(string backdropPath)
@@ -445,5 +377,19 @@ public sealed class AppViewModel
             this.logger.LogError(ex, "Failed to convert image to base64: {FilePath}", filePath);
             return string.Empty;
         }
+    }
+
+    private void OnWindowStateChanged(object? _, EventArgs __)
+    {
+        this.WindowState = this.photinoApp.MainWindow.Maximized ?
+            WindowState.Maximized :
+            this.photinoApp.MainWindow.Minimized ?
+                WindowState.Minimized :
+                WindowState.Normal;
+
+        this.photinoApp.WindowManager.Dispatcher.InvokeAsync(() =>
+        {
+            this.WindowStateChanged?.Invoke(this, this.WindowState);
+        });
     }
 }

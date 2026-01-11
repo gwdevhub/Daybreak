@@ -1,273 +1,235 @@
-﻿using System.Core.Extensions;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Windows;
-using Daybreak.Configuration;
-using Daybreak.Services.ExceptionHandling;
-using Daybreak.Services.Navigation;
-using Daybreak.Services.Telemetry;
-using Daybreak.Shared;
-using Daybreak.Shared.Models;
-using Daybreak.Shared.Models.Async;
+﻿using Daybreak.Configuration;
+using Daybreak.Services.Initialization;
+using Daybreak.Shared.Models.Menu;
+using Daybreak.Shared.Models.Plugins;
+using Daybreak.Shared.Models.Themes;
 using Daybreak.Shared.Services.ApplicationArguments;
-using Daybreak.Shared.Services.Menu;
-using Daybreak.Shared.Services.Mods;
-using Daybreak.Shared.Services.Notifications;
-using Daybreak.Shared.Services.Options;
+using Daybreak.Shared.Services.Keyboard;
 using Daybreak.Shared.Services.Plugins;
-using Daybreak.Shared.Services.Screens;
-using Daybreak.Shared.Services.Startup;
 using Daybreak.Shared.Services.Themes;
-using Daybreak.Shared.Services.Updater.PostUpdate;
-using Daybreak.Shared.Utils;
-using Daybreak.Views;
-using Microsoft.AspNetCore.Components.WebView;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Web.WebView2.Core;
-using Slim;
-using Slim.Integration.ServiceCollection;
-using WpfExtended.Blazor.Launch;
+using Photino.Blazor;
+using System.Extensions.Core;
+using System.Logging;
+using System.Runtime.CompilerServices;
 
-//The following lines are needed to expose internal objects to the test project
 [assembly: InternalsVisibleTo("Daybreak.Tests")]
-[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
-[assembly: ThemeInfo(
-    ResourceDictionaryLocation.None,
-    ResourceDictionaryLocation.SourceAssembly)
-]
 namespace Daybreak.Launch;
 
-public sealed class Launcher : BlazorHybridApplication<App>
+public partial class Launcher
 {
-    private static readonly ProgressUpdate ProgressLoadOptions = new(0, "Loading options");
-    private static readonly ProgressUpdate ProgressLoadThemes = new(0.1, "Loading themes");
-    private static readonly ProgressUpdate ProgressLoadingViews = new(0.2, "Loading views");
-    private static readonly ProgressUpdate ProgressLoadPostUpdateActions = new(0.3, "Loading post-update actions");
-    private static readonly ProgressUpdate ProgressLoadStartupActions = new(0.4, "Loading startup actions");
-    private static readonly ProgressUpdate ProgressLoadNotificationHandlers = new(0.5, "Loading notification handlers");
-    private static readonly ProgressUpdate ProgressLoadMods = new(0.6, "Loading mods");
-    private static readonly ProgressUpdate ProgressLoadArgumentHandlers = new(0.8, "Loading argument handlers");
-    private static readonly ProgressUpdate ProgressLoadMenuButtons = new(0.9, "Loading menu buttons");
-    private static readonly ProgressUpdate ProgressLoadPlugins = new(0.95, "Loading plugins");
-    private static readonly ProgressUpdate ProgressExecuteArgumentHandlers = new(0.99, "Executing argument handlers");
-    private static readonly ProgressUpdate ProgressFinished = new(1.0, "Finished");
-
-    public static Launcher Instance { get; private set; } = default!;
-
-#if DEBUG
-    public override bool DevToolsEnabled { get; } = true;
-#else
-    public override bool DevToolsEnabled { get; } = false;
-#endif
-
-    public override string HostPage { get; } = "wwwroot/Index.html";
-    public override bool ShowTitleBar => false;
-
-    private readonly ProjectConfiguration projectConfiguration = new();
-    private readonly string[] launchArguments;
-    private ILogger? logger;
-    private IExceptionHandler? exceptionHandler;
-
-    internal Launcher(string[] args)
-    {
-        this.launchArguments = args.ThrowIfNull();
-        this.ShowWindowOnStartup = false;
-    }
-
     [STAThread]
-    public static int Main(string[] args)
+    public static void Main(string[] args)
     {
 #if DEBUG
         AllocateAnsiConsole();
 #endif
-
-        Instance = new Launcher(args);
-        RegisterExtraEncodingProviders();
-        return LaunchMainWindow();
+        var bootstrap = SetupBootstrap();
+        LaunchSequence(args, bootstrap);
     }
 
-    protected override System.IServiceProvider SetupServiceProvider(IServiceCollection services)
+    private static void LaunchSequence(string[] args, IServiceProvider bootstrap)
     {
-        var serviceManager = new ServiceManager();
-        this.projectConfiguration.RegisterResolvers(serviceManager);
-        serviceManager.RegisterSingleton<SplashWindow>();
-        serviceManager.RegisterSingleton<StartupContext>();
-        return services.BuildSlimServiceProvider(serviceManager);
-    }
+        var scopedLogger = bootstrap.GetRequiredService<ILogger<Launcher>>().CreateScopedLogger();
+        scopedLogger.LogDebug("Starting Daybreak Launcher...");
+        var builder = CreateMainBuilder(args);
+        var pluginsService = bootstrap.GetRequiredService<IPluginsService>();
+        pluginsService.LoadPlugins();
 
-    protected override void RegisterServices(IServiceCollection services)
-    {
-        base.RegisterServices(services);
-        this.projectConfiguration.RegisterServices(services);
-    }
+        var loadedPlugins = pluginsService.GetCurrentlyLoadedPlugins();
+        var configurations = loadedPlugins.Select<AvailablePlugin, (string, PluginConfigurationBase?, AvailablePlugin?)>(p => (p.Name, p.Configuration, (AvailablePlugin?)p))
+            .Prepend(("Daybreak Core", new ProjectConfiguration(), default)).ToList();
 
-    protected override bool HandleException(Exception e)
-    {
-        return this.exceptionHandler?.HandleException(e) is true;
-    }
-
-    protected override async ValueTask ApplicationStarting()
-    {
-        Global.GlobalServiceProvider = Instance.ServiceProvider;
-        await base.ApplicationStarting();
-        /*
-         * Show splash screen before beginning to load the rest of the application.
-         * MainWindow will call HideSplashScreen() on Loaded event
-         * 
-         * OptionsProducer needs to be created before everything else, otherwise all
-         * the other services will fail to get options for their needs.
-         */
-
-        var optionsProducer = this.ServiceProvider.GetRequiredService<IOptionsProducer>();
-        var startupContext = this.ServiceProvider.GetRequiredService<StartupContext>();
-        startupContext.ProgressUpdate = ProgressLoadOptions;
-        this.projectConfiguration.RegisterOptions(optionsProducer);
-
-        /*
-         * SplashScreenService has a dependency on IOptionsProducer, due to needing to style the
-         * SplashScreen based on the theme in the options. Thus, it can only be called after
-         * initializing the options.
-         */
-        this.ServiceProvider.GetRequiredService<ISplashScreenService>().ShowSplashScreen();
-        await this.InitializeApplicationServices(startupContext, optionsProducer);
-    }
-
-    protected override void ApplicationClosing()
-    {
-    }
-
-    protected override void Host_BlazorWebViewInitialized(BlazorWebViewInitializedEventArgs e)
-    {
-        e.WebView.CoreWebView2.ProcessFailed += this.CoreWebView2_ProcessFailed;
-        Global.CoreWebView2 = e.WebView.CoreWebView2;
-        this.logger?.LogInformation("WebView2 initialized with version {version}", e.WebView.CoreWebView2.Environment.BrowserVersionString);
-        this.logger?.LogInformation("Process: {architecture}", Environment.Is64BitProcess ? "x64" : "x86");
-        base.Host_BlazorWebViewInitialized(e);
-    }
-
-    private void CoreWebView2_ProcessFailed(object? sender, CoreWebView2ProcessFailedEventArgs e)
-    {
-        this.logger?.LogCritical("WebView2 process failed.\nExit Code: {exitCode}\nSource: {source}\nKind: {kind}\nReason: {reason}\nFrame Infos: {frameInfos}\nProcess Description: {processDescription}", e.ExitCode, e.FailureSourceModulePath, e.ProcessFailedKind, e.Reason, e.FrameInfosForFailedProcess, e.ProcessDescription);
-    }
-
-    private async ValueTask InitializeApplicationServices(StartupContext startupContext, IOptionsProducer optionsProducer)
-    {
-        var telemetryHost = this.ServiceProvider.GetRequiredService<TelemetryHost>();
-        var serviceManager = this.ServiceProvider.GetRequiredService<IServiceManager>();
-        var viewProducer = new TrailBlazrViewProducer(serviceManager);
-        var postUpdateActionProducer = this.ServiceProvider.GetRequiredService<IPostUpdateActionProducer>();
-        var startupActionProducer = this.ServiceProvider.GetRequiredService<IStartupActionProducer>();
-        var notificationHandlerProducer = this.ServiceProvider.GetRequiredService<INotificationHandlerProducer>();
-        var modsManager = this.ServiceProvider.GetRequiredService<IModsManager>();
-        var argumentHandlerProducer = this.ServiceProvider.GetRequiredService<IArgumentHandlerProducer>();
-        var menuServiceProducer = this.ServiceProvider.GetRequiredService<IMenuServiceProducer>();
-        var themeProducer = this.ServiceProvider.GetRequiredService<IThemeProducer>();
-
-        await this.Dispatcher.InvokeAsync(() =>
+        var menuEntryProducer = new MenuProducer(bootstrap.GetRequiredService<ILogger<MenuProducer>>());
+        foreach (var (pluginName, configuration, plugin) in configurations)
         {
-            // Hide the main window until the application is fully loaded. Main window will be shown by the RestoreWindowPositionStartupAction
-            var mainWindow = this.ServiceProvider.GetRequiredService<BlazorHostWindow>();
-            mainWindow.Hide();
-        });
-        await Task.Delay(10);
+            if (configuration is null)
+            {
+                scopedLogger.LogWarning("No configuration found for plugin {PluginName}, skipping...", pluginName);
+                continue;
+            }
 
-        startupContext.ProgressUpdate = ProgressLoadThemes;
+            LoadConfiguration(pluginName, bootstrap, builder, configuration, menuEntryProducer);
+        }
 
-        // TODO: This is pretty hacky so it should be reworked
-        var gameScreenshotsTheme = this.ServiceProvider.GetRequiredService<GameScreenshotsTheme>();
-        themeProducer.RegisterTheme(gameScreenshotsTheme);
+        builder.Services.AddSingleton<IReadOnlyDictionary<string, MenuCategory>>(menuEntryProducer.categories.AsReadOnly());
+        builder.Services.AddSingleton(pluginsService);
 
-        this.projectConfiguration.RegisterThemes(themeProducer);
-        await Task.Delay(10);
+        var mainApp = CreateMainApp(builder);
+        foreach(var (pluginName, configuration, plugin) in configurations)
+        {
+            if (configuration is null)
+            {
+                scopedLogger.LogWarning("No configuration found for plugin {PluginName}, skipping theme registration...", pluginName);
+                continue;
+            }
 
-        startupContext.ProgressUpdate = ProgressLoadingViews;
-        this.projectConfiguration.RegisterViews(viewProducer);
-        await Task.Delay(10);
+            RegisterThemes(bootstrap, configuration, scopedLogger);
+        }
 
-        startupContext.ProgressUpdate = ProgressLoadPostUpdateActions;
-        this.projectConfiguration.RegisterPostUpdateActions(postUpdateActionProducer);
-        await Task.Delay(10);
+        var theme = mainApp.Services.GetRequiredService<GameScreenshotsTheme>();
+        Theme.Themes.Add(theme);
+        var keyboardHook = mainApp.Services.GetRequiredService<IKeyboardHookService>();
+        keyboardHook.Start();
+        ExecuteArgumentHandlers(mainApp, args);
+        RunMainApp(mainApp);
+    }
 
-        startupContext.ProgressUpdate = ProgressLoadStartupActions;
-        this.projectConfiguration.RegisterStartupActions(startupActionProducer);
-        await Task.Delay(10);
+    private static void ExecuteArgumentHandlers(PhotinoBlazorApp app, string[] args)
+    {
+        var applicationArgumentService = app.Services.GetRequiredService<IApplicationArgumentService>();
+        applicationArgumentService.HandleArguments(args);
+    }
 
-        startupContext.ProgressUpdate = ProgressLoadNotificationHandlers;
-        this.projectConfiguration.RegisterNotificationHandlers(notificationHandlerProducer);
-        await Task.Delay(10);
+    private static void LoadConfiguration(
+        string name,
+        IServiceProvider bootstrap,
+        PhotinoBlazorAppBuilder builder,
+        PluginConfigurationBase configuration,
+        MenuProducer menuProducer)
+    {
+        var scopedLogger = bootstrap.GetRequiredService<ILogger<Launcher>>().CreateScopedLogger();
+        scopedLogger.LogInformation("Loading configuration for {Configuration.Name}", name);
 
-        startupContext.ProgressUpdate = ProgressLoadMods;
-        this.projectConfiguration.RegisterMods(modsManager);
-        await Task.Delay(10);
+        RegisterServices(builder, configuration, scopedLogger);
+        RegisterOptions(bootstrap, builder, configuration, scopedLogger);
+        RegisterViews(bootstrap, builder, configuration, scopedLogger);
+        RegisterMods(bootstrap, builder, configuration, scopedLogger);
+        RegisterStartupActions(bootstrap, builder, configuration, scopedLogger);
+        RegisterPostUpdateActions(bootstrap, builder, configuration, scopedLogger);
+        RegisterNotificationHandlers(bootstrap, builder, configuration, scopedLogger);
+        RegisterArgumentHandlers(bootstrap, builder, configuration, scopedLogger);
+        RegisterMenuEntries(configuration, menuProducer, scopedLogger);
 
-        startupContext.ProgressUpdate = ProgressLoadArgumentHandlers;
-        this.projectConfiguration.RegisterLaunchArgumentHandlers(argumentHandlerProducer);
-        await Task.Delay(10);
+        scopedLogger.LogInformation("Finished loading configuration for {Configuration.Name}", name);
+    }
 
-        startupContext.ProgressUpdate = ProgressLoadMenuButtons;
-        this.projectConfiguration.RegisterMenuButtons(menuServiceProducer);
-        await Task.Delay(10);
-
-        this.logger = this.ServiceProvider.GetRequiredService<ILogger<Launcher>>();
-        this.logger.LogDebug("Running in {Environment.CurrentDirectory}", Environment.CurrentDirectory);
-        this.exceptionHandler = this.ServiceProvider.GetRequiredService<IExceptionHandler>();
+    private static void RegisterServices(PhotinoBlazorAppBuilder builder, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
+    {
         try
         {
-            startupContext.ProgressUpdate = ProgressLoadPlugins;
-            this.ServiceProvider.GetRequiredService<IPluginsService>()
-                .LoadPlugins(
-                    serviceManager,
-                    optionsProducer,
-                    viewProducer,
-                    postUpdateActionProducer,
-                    startupActionProducer,
-                    notificationHandlerProducer,
-                    modsManager,
-                    argumentHandlerProducer,
-                    menuServiceProducer,
-                    themeProducer);
-            await Task.Delay(10);
+            configuration.RegisterServices(builder.Services);
         }
-        catch (Exception e)
+        catch(Exception ex)
         {
-            this.logger.LogError(e, "Encountered exception while loading plugins. Aborting...");
-            this.exceptionHandler.HandleException(e);
+            scopedLogger.LogError(ex, "An error occurred while registering services");
         }
-
-        startupContext.ProgressUpdate = ProgressExecuteArgumentHandlers;
-        this.ServiceProvider.GetRequiredService<IApplicationArgumentService>().HandleArguments(this.launchArguments);
-        await Task.Delay(10);
-
-        startupContext.ProgressUpdate = ProgressFinished;
-        await Task.Delay(10);
     }
 
-    private static int LaunchMainWindow()
+    private static void RegisterOptions(IServiceProvider bootstrap, PhotinoBlazorAppBuilder builder, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
     {
-        return Instance.Run();
-    }
-
-    private static void RegisterExtraEncodingProviders()
-    {
-        /*
-         * This is a fix for encoding issues with zip files
-         */
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-    }
-
-    private static void AllocateAnsiConsole()
-    {
-        NativeMethods.AllocConsole();
-        var handle = NativeMethods.GetStdHandle(NativeMethods.STD_OUTPUT_HANDLE);
-        if (!NativeMethods.GetConsoleMode(handle, out var mode))
+        try
         {
-            Console.WriteLine("Failed to get console mode");
+            var optionsProducer = new OptionProducer(builder.Services, bootstrap.GetRequiredService<ILogger<OptionProducer>>());
+            configuration.RegisterOptions(optionsProducer);
         }
-
-        if (!NativeMethods.SetConsoleMode(handle, mode | NativeMethods.ENABLE_VIRTUAL_TERMINAL_PROCESSING | NativeMethods.ENABLE_PROCESSED_OUTPUT))
+        catch (Exception ex)
         {
-            Console.WriteLine("Failed to enable virtual terminal processing");
+            scopedLogger.LogError(ex, "An error occurred while registering options");
+        }
+    }
+
+    private static void RegisterViews(IServiceProvider bootstrap, PhotinoBlazorAppBuilder builder, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
+    {
+        try
+        {
+            var viewProducer = new TrailBlazrViewProducer(builder.Services, bootstrap.GetRequiredService<ILogger<TrailBlazrViewProducer>>());
+            configuration.RegisterViews(viewProducer);
+        }
+        catch(Exception ex)
+        {
+            scopedLogger.LogError(ex, "An error occurred while registering views");
+        }
+    }
+
+    private static void RegisterMods(IServiceProvider bootstrap, PhotinoBlazorAppBuilder builder, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
+    {
+        try
+        {
+            var modsProducer = new ModsProducer(builder.Services, bootstrap.GetRequiredService<ILogger<ModsProducer>>());
+            configuration.RegisterMods(modsProducer);
+        }
+        catch(Exception ex)
+        {
+            scopedLogger.LogError(ex, "An error occurred while registering mods");
+        }
+    }
+
+    private static void RegisterStartupActions(IServiceProvider bootstrap, PhotinoBlazorAppBuilder builder, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
+    {
+        try
+        {
+            var startupActionProducer = new StartupActionsProducer(builder.Services, bootstrap.GetRequiredService<ILogger<StartupActionsProducer>>());
+            configuration.RegisterStartupActions(startupActionProducer);
+        }
+        catch (Exception ex)
+        {
+            scopedLogger.LogError(ex, "An error occurred while registering startup actions");
+        }
+    }
+
+    private static void RegisterPostUpdateActions(IServiceProvider bootstrap, PhotinoBlazorAppBuilder builder, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
+    {
+        try
+        {
+            var postUpdateActionProducer = new PostUpdateActionProducer(builder.Services, bootstrap.GetRequiredService<ILogger<PostUpdateActionProducer>>());
+            configuration.RegisterPostUpdateActions(postUpdateActionProducer);
+        }
+        catch (Exception ex)
+        {
+            scopedLogger.LogError(ex, "An error occurred while registering post-update actions");
+        }
+    }
+
+    private static void RegisterNotificationHandlers(IServiceProvider bootstrap, PhotinoBlazorAppBuilder builder, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
+    {
+        try
+        {
+            var notificationHandlerProducer = new NotificationHandlerProducer(builder.Services, bootstrap.GetRequiredService<ILogger<NotificationHandlerProducer>>());
+            configuration.RegisterNotificationHandlers(notificationHandlerProducer);
+        }
+        catch (Exception ex)
+        {
+            scopedLogger.LogError(ex, "An error occurred while registering notification handlers");
+        }
+    }
+
+    private static void RegisterArgumentHandlers(IServiceProvider bootstrap, PhotinoBlazorAppBuilder builder, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
+    {
+        try
+        {
+            var argumentHandlerProducer = new ArgumentHandlerProducer(builder.Services, bootstrap.GetRequiredService<ILogger<ArgumentHandlerProducer>>());
+            configuration.RegisterLaunchArgumentHandlers(argumentHandlerProducer);
+        }
+        catch(Exception ex)
+        {
+            scopedLogger.LogError(ex, "An error occurred while registering argument handlers");
+        }
+    }
+
+    private static void RegisterThemes(IServiceProvider bootstrap, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
+    {
+        try
+        {
+            var themeProducer = new ThemeProducer(bootstrap.GetRequiredService<ILogger<ThemeProducer>>());
+            configuration.RegisterThemes(themeProducer);
+        }
+        catch(Exception ex)
+        {
+            scopedLogger.LogError(ex, "An error occurred while registering themes");
+        }
+    }
+
+    private static void RegisterMenuEntries(PluginConfigurationBase configuration, MenuProducer menuProducer, ScopedLogger<Launcher> scopedLogger)
+    {
+        try
+        {
+            configuration.RegisterMenuButtons(menuProducer);
+        }
+        catch(Exception ex)
+        {
+            scopedLogger.LogError(ex, "An error occurred while registering menu entries");
         }
     }
 }

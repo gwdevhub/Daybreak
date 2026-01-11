@@ -7,19 +7,19 @@
     {
         <div class="title-bar-additional-btns-left">
             <button class="title-bar-btn" @onclick="this.ViewModel.ArchiveLogs" title="Archive logs">
-                <FluentIcon Value="new Icons.Regular.Size16.Archive()" />
+                <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Archive()" />
             </button>
             <button class="title-bar-btn" @onclick="this.ViewModel.ClearLogs" title="Clear logs">
-                <FluentIcon Value="new Icons.Regular.Size16.Delete()" />
+                <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Delete()" />
             </button>
             <button class="title-bar-btn" @onclick="this.ViewModel.ToggleAutoScroll" title="@(this.ViewModel.AutoScroll ? "Disable auto-scroll" : "Enable auto-scroll")">
                 @if (this.ViewModel.AutoScroll)
                 {
-                    <FluentIcon Value="new Icons.Regular.Size16.ArrowDownload()" />
+                    <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowDownload()" />
                 }
                 else
                 {
-                    <FluentIcon Value="new Icons.Regular.Size16.ArrowDownloadOff()" />
+                    <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowDownloadOff()" />
                 }
             </button>
         </div>
@@ -29,20 +29,34 @@
                 <div class="console-output">
                     @foreach (var log in this.ViewModel.Logs)
                     {
-                        <div class="console-entry @this.GetLogLevelClass(log.LogLevel)">
-                            <div class="log-header">
-                                <span class="log-timestamp">[@log.LogTime.ToString("u")]</span>
-                                <span class="log-level-badge">[@this.GetLogLevelText(log.LogLevel)]</span>
-                                @if (!string.IsNullOrEmpty(log.Category))
+                        <div class="console-entry">
+                            @foreach(var token in log.Tokens)
+                            {
+                                switch (token.Type)
                                 {
-                                    <span class="log-category">[@log.Category]</span>
+                                    case LogTokenType.NewLine:
+                                        <br />
+                                        break;
+                                    case LogTokenType.Timestamp:
+                                        <span class="log-timestamp">@token.Value</span>
+                                        break;
+                                    case LogTokenType.Level:
+                                        <span class="log-level @(this.GetLogLevelClass(log.Log.Level))">@token.Value</span>
+                                        break;
+                                    case LogTokenType.Message:
+                                        <span class="log-message">@token.Value</span>
+                                        break;
+                                    case LogTokenType.Exception:
+                                        <span class="log-exception">@token.Value</span>
+                                        break;
+                                    case LogTokenType.Property:
+                                        <span class="log-property">@token.Value</span>
+                                        break;
+                                    default:
+                                        <span>@token.Value</span>
+                                        break;
                                 }
-                                @if (!string.IsNullOrEmpty(log.EventId))
-                                {
-                                    <span class="log-event-id">[@log.EventId]</span>
-                                }
-                            </div>
-                            <div class="log-message">@log.Message?.Trim()</div>
+                            }
                         </div>
                     }
                 </div>
@@ -61,7 +75,8 @@
 @page "/logs"
 @inherits ViewBase<LogsView, LogsViewModel>
 @inject IJSRuntime jSRuntime;
-@using Microsoft.Extensions.Logging
+@using Serilog.Events
+@using static Daybreak.Services.Logging.StructuredLogFormatter
 @code {
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -86,21 +101,12 @@
         }
     }
 
-    private string GetLogLevelClass(LogLevel level) => level switch
+    private string GetLogLevelClass(LogEventLevel level) => level switch
     { 
-        LogLevel.Information => "log-info",
-        LogLevel.Warning => "log-warning",
-        LogLevel.Error => "log-error",
-        LogLevel.Critical => "log-critical",
-        _ => "log-default"
-    };
-
-    private string GetLogLevelText(LogLevel level) => level switch
-    {
-        LogLevel.Information => "INFO",
-        LogLevel.Warning => "WARN",
-        LogLevel.Error => "ERRO",
-        LogLevel.Critical => "CRIT",
-        _ => "????"
+        LogEventLevel.Information => ".info",
+        LogEventLevel.Warning => ".warning",
+        LogEventLevel.Error => ".error",
+        LogEventLevel.Fatal => ".critical",
+        _ => ".default"
     };
 }

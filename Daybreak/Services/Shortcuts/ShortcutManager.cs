@@ -1,20 +1,18 @@
 ﻿using Daybreak.Configuration.Options;
-using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Shortcuts;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using ShellLink;
-using System.Configuration;
 using System.Diagnostics;
 using System.Extensions;
-using System.IO;
-using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.Shortcuts;
 
-internal sealed class ShortcutManager : IShortcutManager, IApplicationLifetimeService
+internal sealed class ShortcutManager : IShortcutManager, IHostedService
 {
     private const string ShortcutName = "Daybreak.lnk";
 
-    private readonly ILiveOptions<LauncherOptions> liveOptions;
+    private readonly IOptionsMonitor<LauncherOptions> liveOptions;
 
     public bool ShortcutEnabled {
         get => this.ShortcutExists();
@@ -32,17 +30,26 @@ internal sealed class ShortcutManager : IShortcutManager, IApplicationLifetimeSe
     }
 
     public ShortcutManager(
-        IOptionsUpdateHook optionsUpdateHook,
-        ILiveOptions<LauncherOptions> liveOptions)
+        IOptionsMonitor<LauncherOptions> liveOptions)
     {
         this.liveOptions = liveOptions.ThrowIfNull(nameof(liveOptions));
-        optionsUpdateHook.RegisterHook<LauncherOptions>(this.LoadConfiguration);
-        this.LoadConfiguration();
+        this.liveOptions.OnChange(this.LoadConfiguration);
+        this.LoadConfiguration(this.liveOptions.CurrentValue, default);
     }
 
-    private void LoadConfiguration()
+    Task IHostedService.StartAsync(CancellationToken cancellationToken)
     {
-        var shortcutEnabled = this.liveOptions.Value.PlaceShortcut;
+        return Task.CompletedTask;
+    }
+
+    Task IHostedService.StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    private void LoadConfiguration(LauncherOptions _, string? __)
+    {
+        var shortcutEnabled = this.liveOptions.CurrentValue.PlaceShortcut;
         if (shortcutEnabled && this.ShortcutEnabled is false)
         {
             this.ShortcutEnabled = true;
@@ -55,7 +62,7 @@ internal sealed class ShortcutManager : IShortcutManager, IApplicationLifetimeSe
 
     private bool ShortcutExists()
     {
-        var shortcutFolder = this.liveOptions.Value.ShortcutLocation;
+        var shortcutFolder = this.liveOptions.CurrentValue.ShortcutLocation;
         var shortcutPath = $"{shortcutFolder}\\{ShortcutName}";
         if (File.Exists(shortcutPath))
         {
@@ -79,7 +86,7 @@ internal sealed class ShortcutManager : IShortcutManager, IApplicationLifetimeSe
             return;
         }
 
-        var shortcutFolder = this.liveOptions.Value.ShortcutLocation;
+        var shortcutFolder = this.liveOptions.CurrentValue.ShortcutLocation;
         var shortcutPath = $"{shortcutFolder}\\{ShortcutName}";
         var currentExecutable = Process.GetCurrentProcess()?.MainModule?.FileName;
         var shortcut = Shortcut.CreateShortcut(currentExecutable);
@@ -105,16 +112,8 @@ internal sealed class ShortcutManager : IShortcutManager, IApplicationLifetimeSe
             return;
         }
 
-        var shortcutFolder = this.liveOptions.Value.ShortcutLocation;
+        var shortcutFolder = this.liveOptions.CurrentValue.ShortcutLocation;
         var shortcutPath = $"{shortcutFolder}\\{ShortcutName}";
         File.Delete(shortcutPath);
-    }
-
-    public void OnStartup()
-    {
-    }
-
-    public void OnClosing()
-    {
     }
 }

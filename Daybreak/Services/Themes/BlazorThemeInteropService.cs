@@ -1,20 +1,18 @@
 using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models.ColorPalette;
 using Daybreak.Shared.Models.Themes;
-using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Themes;
 using Daybreak.Themes;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System.Configuration;
+using Microsoft.Extensions.Options;
 using System.Extensions;
-using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.Themes;
 
 public class BlazorThemeInteropService(
-    ILiveOptions<ThemeOptions> themeOptions,
-    IOptionsUpdateHook optionsUpdateHook,
-    ILogger<BlazorThemeInteropService> logger) : IThemeManager, IThemeProducer, IApplicationLifetimeService
+    IOptionsMonitor<ThemeOptions> themeOptions,
+    ILogger<BlazorThemeInteropService> logger) : IThemeManager, IHostedService
 {
     private const double XXSmallFontSizeValue = 0.56;
     private const double XSmallFontSizeValue = 0.625;
@@ -28,8 +26,7 @@ public class BlazorThemeInteropService(
     private const string PersonalizeKey = @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize";
     private const string AppsUseLightThemeValue = "AppsUseLightTheme";
 
-    private readonly ILiveOptions<ThemeOptions> themeOptions = themeOptions;
-    private readonly IOptionsUpdateHook optionsUpdateHook = optionsUpdateHook;
+    private readonly IOptionsMonitor<ThemeOptions> themeOptions = themeOptions;
     private readonly ILogger<BlazorThemeInteropService> logger = logger;
 
     public event EventHandler<Theme>? ThemeChanged;
@@ -52,29 +49,25 @@ public class BlazorThemeInteropService(
     public double XXLargeFontSize { get; private set; } = XXLargeFontSizeValue;
     public Theme? CurrentTheme { get; private set; }
 
-    public void OnStartup()
+    public Task StartAsync(CancellationToken cancellationToken)
     {
-        this.optionsUpdateHook.RegisterHook<ThemeOptions>(this.OnThemeUpdated);
-        this.OnThemeUpdated();
+        this.themeOptions.OnChange(this.OnThemeUpdated);
+        this.OnThemeUpdated(this.themeOptions.CurrentValue, default);
+        return Task.CompletedTask;
     }
 
-    public void OnClosing()
+    public Task StopAsync(CancellationToken cancellationToken)
     {
-    }
-
-    public void RegisterTheme(Theme theme)
-    {
-        Theme.Themes.Add(theme);
+        return Task.CompletedTask;
     }
 
     public void ReapplyTheme()
     {
-        this.OnThemeUpdated();
+        this.OnThemeUpdated(this.themeOptions.CurrentValue, default);
     }
 
-    private void OnThemeUpdated()
+    private void OnThemeUpdated(ThemeOptions themeOptions, string? _)
     {
-        var themeOptions = this.themeOptions.Value;
         var theme = themeOptions.ApplicationTheme ?? CoreThemes.Daybreak;
         var accentColor = theme.AccentColor;
         var lightMode = theme.Mode is Theme.LightDarkMode.SystemSynchronized 

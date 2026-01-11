@@ -4,18 +4,15 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>Daybreak</RootNamespace>
     <TargetFramework>$(TargetFrameworkVersionWindows)</TargetFramework>
-    <UseWPF>true</UseWPF>
     <ScopedCssEnabled>true</ScopedCssEnabled>
     <Nullable>enable</Nullable>
     <Platforms>x64</Platforms>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <LangVersion>preview</LangVersion>
     <ApplicationIcon>Daybreak.ico</ApplicationIcon>
-    <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <UserSecretsId>cfb2a489-db80-448d-a969-80270f314c46</UserSecretsId>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
 
@@ -36,31 +33,39 @@
       <EmbeddedResource Include="$(UserSecretsFilePath)" Condition="Exists($(UserSecretsFilePath))" />
     </ItemGroup>
   </Target>
-		
+
   <ItemGroup>
     <PackageReference Include="Elastic.OpenTelemetry" />
     <PackageReference Include="ksemenenko.ColorThief" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" />
-    <PackageReference Include="Microsoft.Fast.Components.FluentUI" />
-    <PackageReference Include="Microsoft.Fast.Components.FluentUI.Icons" />
+    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" />
+    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" />
     <PackageReference Include="Microsoft.Identity.Client.Desktop" />
     <PackageReference Include="Microsoft.Identity.Client.Extensions.Msal" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" />
     <PackageReference Include="OpenTelemetry.Exporter.Console" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" />
-    <PackageReference Include="WpfExtended.SourceGeneration" />
-    <PackageReference Include="WpfScreenHelper" />
     <PackageReference Include="PeNet" />
     <PackageReference Include="Plumsy" />
     <PackageReference Include="securifybv.ShellLink" />
     <PackageReference Include="DiffPlex" />
     <PackageReference Include="HtmlAgilityPack" />
     <PackageReference Include="ini-parser-netstandard" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" />
     <PackageReference Include="Microsoft.CorrelationVector" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Serilog" />
+    <PackageReference Include="Serilog.Enrichers.Environment" />
+    <PackageReference Include="Serilog.Enrichers.Thread" />
+    <PackageReference Include="Serilog.Extensions.Logging" />
+    <PackageReference Include="Serilog.Sinks.Console" />
+    <PackageReference Include="Serilog.Sinks.Debug" />
     <PackageReference Include="SevenZipExtractor" />
+    <!-- Exclude WPF assets from WebView2 to avoid WindowsBase version conflict (MSB3277) -->
+    <PackageReference Include="Microsoft.Web.WebView2" ExcludeAssets="buildTransitive" PrivateAssets="all">
+      <IncludeAssets>runtime; compile; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
@@ -71,7 +76,7 @@
   <PropertyGroup>
     <WikiSourcePath>..\Daybreak.wiki</WikiSourcePath>
   </PropertyGroup>  
-
+    
   <ItemGroup>
     <WikiFiles Include="$(WikiSourcePath)\**\*.*" Exclude="$(WikiSourcePath)\.git\**" />
   </ItemGroup>
@@ -80,7 +85,17 @@
     <Message Importance="high" Text="📦 Daybreak.wiki -&gt; wwwroot/wiki" />
     <Copy SourceFiles="@(WikiFiles)" DestinationFiles="@(WikiFiles->'wwwroot\wiki\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
   </Target>
-	
+
+  <!-- Copy wwwroot to output directory for Photino.Blazor -->
+  <ItemGroup>
+    <WwwrootFiles Include="wwwroot\**\*.*" />
+  </ItemGroup>
+
+  <Target Name="CopyWwwrootToOutput" AfterTargets="Build">
+    <Message Importance="high" Text="📦 wwwroot -&gt; $(DependencyOutput)\wwwroot" />
+    <Copy SourceFiles="@(WwwrootFiles)" DestinationFiles="@(WwwrootFiles->'$(DependencyOutput)\wwwroot\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
     <Exec Command="echo.&gt;$(Version).version" />
   </Target>

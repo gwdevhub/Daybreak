@@ -4,9 +4,8 @@ namespace Daybreak.Shared.Services.Updater;
 
 public interface IApplicationUpdater
 {
-    Version CurrentVersion { get; }
     void FinalizeUpdate();
-    void PeriodicallyCheckForUpdates();
+    Version CurrentVersion { get; }
     Task<IEnumerable<Version>> GetVersions(CancellationToken cancellationToken);
     Task<bool> UpdateAvailable(CancellationToken cancellationToken);
     IProgressAsyncOperation<bool> DownloadUpdate(Version version, CancellationToken cancellationToken);

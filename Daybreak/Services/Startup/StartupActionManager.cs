@@ -1,30 +1,24 @@
 ﻿using Daybreak.Shared.Models;
-using Daybreak.Shared.Services.Startup;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Slim;
 using System.Core.Extensions;
-using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.Startup;
 
 internal sealed class StartupActionManager(
-    IServiceManager serviceManager,
-    ILogger<StartupActionManager> logger) : IStartupActionProducer, IApplicationLifetimeService
+    IEnumerable<StartupActionBase> startupActions,
+    ILogger<StartupActionManager> logger) : IHostedService
 {
-    private readonly IServiceManager serviceManager = serviceManager.ThrowIfNull();
+    private readonly IEnumerable<StartupActionBase> startupActions = startupActions.ThrowIfNull();
     private readonly ILogger<StartupActionManager> logger = logger.ThrowIfNull();
 
-    public void OnClosing()
+    public Task StartAsync(CancellationToken cancellationToken)
     {
-    }
-
-    public void OnStartup()
-    {
-        Task.Factory.StartNew(() =>
+        return Task.Factory.StartNew(() =>
         {
             var asyncTasks = new List<Task>();
             var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            foreach (var action in this.serviceManager.GetServicesOfType<StartupActionBase>())
+            foreach (var action in this.startupActions)
             {
                 action.ExecuteOnStartup();
                 asyncTasks.Add(Task.Run(() => action.ExecuteOnStartupAsync(cts.Token)));
@@ -38,11 +32,11 @@ internal sealed class StartupActionManager(
             {
                 this.logger.LogError(e, "Encountered an exception while processing startup actions");
             }
-        }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
     }
 
-    public void RegisterAction<T>() where T : StartupActionBase
+    public Task StopAsync(CancellationToken cancellationToken)
     {
-        this.serviceManager.RegisterScoped<T>();
+        return Task.CompletedTask;
     }
 }

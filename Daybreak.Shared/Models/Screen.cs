@@ -1,14 +1,15 @@
-﻿using System.Windows;
+﻿using System.Drawing;
 
 namespace Daybreak.Shared.Models;
 
-public readonly struct Screen(int id, Rect size)
+public readonly struct Screen(int id, Rectangle size)
     : IEquatable<Screen>
 {
     public readonly int Id = id;
-    public readonly Rect Size = size;
+    public readonly Rectangle Size = size;
 
-    public bool Equals(Screen other) => this.Id == other.Id && this.Size == other.Size;
+    public bool Equals(Screen other) => this.Id == other.Id
+        && this.Size == other.Size;
 
     public override int GetHashCode() => HashCode.Combine(this.Id, this.Size);
 

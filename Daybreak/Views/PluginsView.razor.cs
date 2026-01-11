@@ -1,7 +1,7 @@
 ﻿using Daybreak.Shared.Models.Plugins;
 using Daybreak.Shared.Services.ApplicationLauncher;
 using Daybreak.Shared.Services.Plugins;
-using Microsoft.Win32;
+using Photino.NET;
 using System.Diagnostics;
 using System.Extensions;
 using TrailBlazr.Services;
@@ -9,11 +9,13 @@ using TrailBlazr.ViewModels;
 
 namespace Daybreak.Views;
 public sealed class PluginsViewModel(
+    PhotinoWindow window,
     IApplicationLauncher applicationLauncher,
     IViewManager viewManager,
     IPluginsService pluginsService)
     : ViewModelBase<PluginsViewModel, PluginsView>
 {
+    private readonly PhotinoWindow window = window;
     private readonly IApplicationLauncher applicationLauncher = applicationLauncher;
     private readonly IViewManager viewManager = viewManager;
     private readonly IPluginsService pluginsService = pluginsService;
@@ -51,19 +53,13 @@ public sealed class PluginsViewModel(
 
     public async void LoadPluginsFromDisk()
     {
-        var filePicker = new OpenFileDialog
-        {
-            Filter = "Dll Files (*.dll)|*.dll",
-            Multiselect = true,
-            RestoreDirectory = true,
-            Title = "Please select dll files"
-        };
-        if (filePicker.ShowDialog() is false)
+        var paths = await this.window.ShowOpenFileAsync("Please select dll files", multiSelect: true, filters: [("Dll Files", ["dll"])]);
+        if (paths is null || paths.Length == 0)
         {
             return;
         }
 
-        foreach (var name in filePicker.FileNames)
+        foreach (var name in paths)
         {
             await this.pluginsService.AddPlugin(name);
         }

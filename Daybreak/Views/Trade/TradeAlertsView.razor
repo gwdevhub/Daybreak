@@ -1,10 +1,10 @@
 ﻿<div class="container">
     <div class="title-bar-additional-btns-left">
         <button class="title-bar-btn" @onclick="this.ViewModel.CreateMessageAlert" title="Create message alert">
-            <FluentIcon Value="new Icons.Regular.Size16.ChatAdd()" />
+            <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ChatAdd()" />
         </button>
         <button class="title-bar-btn" @onclick="this.ViewModel.CreateQuoteAlert" title="Create quote alert">
-            <FluentIcon Value="new Icons.Regular.Size16.ShoppingBagAdd()" />
+            <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ShoppingBagAdd()" />
         </button>
     </div>
     <div class="stretch-container backdrop-panel">
@@ -33,7 +33,7 @@
                         <FluentButton Appearance="Appearance.Stealth"
                                       Title="Delete alert"
                                       OnClick="@(() => this.ViewModel.DeleteAlert(alert))">
-                            <FluentIcon Value="@(new Icons.Regular.Size16.Delete())" />
+                            <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Delete())" />
                         </FluentButton>
                     </div>
                 </div>
