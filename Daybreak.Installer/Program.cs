@@ -34,11 +34,20 @@ static void CleanWorkingDirectory(string workingDirectory)
         installerPath,
         optionsPath
     };
+    var preserveExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    {
+        ".tpf"
+    };
 
     foreach (var entry in Directory.GetFileSystemEntries(workingDirectory))
     {
         var fullPath = Path.GetFullPath(entry);
         if (preserve.Contains(fullPath))
+        {
+            continue;
+        }
+
+        if (preserveExtensions.Contains(Path.GetExtension(fullPath)))
         {
             continue;
         }
