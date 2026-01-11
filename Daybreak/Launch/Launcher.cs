@@ -35,9 +35,7 @@ public partial class Launcher
         scopedLogger.LogDebug("Starting Daybreak Launcher...");
         var builder = CreateMainBuilder(args);
         var pluginsService = bootstrap.GetRequiredService<IPluginsService>();
-        pluginsService.LoadPlugins();
-
-        var loadedPlugins = pluginsService.GetCurrentlyLoadedPlugins();
+        var loadedPlugins = pluginsService.LoadPlugins();
         var configurations = loadedPlugins.Select<AvailablePlugin, (string, PluginConfigurationBase?, AvailablePlugin?)>(p => (p.Name, p.Configuration, (AvailablePlugin?)p))
             .Prepend(("Daybreak Core", new ProjectConfiguration(), default)).ToList();
 
@@ -54,8 +52,6 @@ public partial class Launcher
         }
 
         builder.Services.AddSingleton<IReadOnlyDictionary<string, MenuCategory>>(menuEntryProducer.categories.AsReadOnly());
-        builder.Services.AddSingleton(pluginsService);
-
         var mainApp = CreateMainApp(builder);
         foreach(var (pluginName, configuration, plugin) in configurations)
         {
@@ -67,6 +63,10 @@ public partial class Launcher
 
             RegisterThemes(bootstrap, configuration, scopedLogger);
         }
+
+        scopedLogger.LogInformation("Registering loaded plugins");
+        var finalPluginService = mainApp.Services.GetRequiredService<IPluginsService>();
+        finalPluginService.UpdateLoadedPlugins(loadedPlugins);
 
         var theme = mainApp.Services.GetRequiredService<GameScreenshotsTheme>();
         Theme.Themes.Add(theme);
