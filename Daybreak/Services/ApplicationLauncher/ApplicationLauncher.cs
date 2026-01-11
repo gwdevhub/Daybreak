@@ -123,10 +123,9 @@ internal sealed class ApplicationLauncher(
             StartInfo = new()
             {
                 WorkingDirectory = Environment.CurrentDirectory,
-                FileName = "cmd.exe",
+                FileName = processName,
                 UseShellExecute = true,
-                CreateNoWindow = true,
-                Arguments = $"/c cd /d \"{Environment.CurrentDirectory}\" && timeout /t 1 /nobreak && runas /machine:x86 /trustlevel:0x20000 \"{processName}\" && exit"
+                CreateNoWindow = true
             }
         };
         if (process.Start() is false)
