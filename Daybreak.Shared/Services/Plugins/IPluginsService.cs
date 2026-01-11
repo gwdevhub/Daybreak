@@ -8,7 +8,9 @@ public interface IPluginsService
 
     IEnumerable<AvailablePlugin> GetCurrentlyLoadedPlugins();
 
-    void LoadPlugins();
+    void UpdateLoadedPlugins(IReadOnlyList<AvailablePlugin> loadedPlugins);
+
+    IReadOnlyList<AvailablePlugin> LoadPlugins();
 
     IEnumerable<AvailablePlugin> GetAvailablePlugins();
 
