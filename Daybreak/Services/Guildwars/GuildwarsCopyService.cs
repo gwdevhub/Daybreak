@@ -101,7 +101,8 @@ internal sealed class GuildWarsCopyService(
             this.guildWarsExecutableManager.AddExecutable(finalPath);
 
             this.logger.LogDebug("Copy succeeded");
-            progress.Report(ProgressCancelled);
+            progress.Report(ProgressCompleted);
+            await Task.Delay(100, cancellationToken);
             return true;
         }, cancellationToken);
     }

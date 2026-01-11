@@ -17,6 +17,7 @@ public sealed class ProgressAsyncOperation<T> : IProgressAsyncOperation<T>
     private readonly CancellationTokenSource cancellationTokenSource;
 
     public event EventHandler<ProgressUpdate>? ProgressChanged;
+    public ProgressUpdate? CurrentProgress { get; private set; }
 
     public bool IsCompleted => this.task.IsCompleted;
     public bool IsCanceled => this.task.IsCanceled;
@@ -25,7 +26,12 @@ public sealed class ProgressAsyncOperation<T> : IProgressAsyncOperation<T>
 
     internal ProgressAsyncOperation(Func<Progress<ProgressUpdate>, Task<T>> wrappedTaskWithProgress, CancellationToken cancellationToken)
     {
-        this.progress.ProgressChanged += (s, e) => this.ProgressChanged?.Invoke(this, e);
+        this.progress.ProgressChanged += (s, e) =>
+        {
+            this.CurrentProgress = e;
+            this.ProgressChanged?.Invoke(this, e);
+        };
+        
         this.task = wrappedTaskWithProgress(this.progress);
         this.cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
     }

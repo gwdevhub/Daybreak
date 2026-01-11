@@ -1,7 +1,7 @@
-﻿using Daybreak.Shared.Models.Async;
+﻿using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Services.Guildwars;
 using Daybreak.Shared.Services.Notifications;
-using System.IO;
 using TrailBlazr.Services;
 using TrailBlazr.ViewModels;
 
@@ -45,6 +45,8 @@ public sealed class GuildWarsCopyViewModel(
             return;
         }
 
+        this.ContinueEnabled = false;
+        this.RefreshView();
         var operation = this.guildWarsCopyService.CopyGuildwars(this.sourcePath, CancellationToken.None);
         operation.ProgressChanged += this.CopyStatus_PropertyChanged;
         try
@@ -56,6 +58,8 @@ public sealed class GuildWarsCopyViewModel(
             operation.ProgressChanged -= this.CopyStatus_PropertyChanged;
         }
 
+        this.Description = operation.CurrentProgress?.StatusMessage ?? string.Empty;
+        this.Progress = operation.CurrentProgress?.Percentage ?? 1;
         this.ContinueEnabled = true;
         this.RefreshView();
     }
