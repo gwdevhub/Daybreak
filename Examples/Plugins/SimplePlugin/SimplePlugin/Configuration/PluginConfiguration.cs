@@ -2,6 +2,7 @@
 using Daybreak.Shared.Services.Initialization;
 using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.DependencyInjection;
+using SimplePlugin.Options;
 using SimplePlugin.Services;
 
 namespace SimplePlugin.Configuration;
@@ -36,6 +37,7 @@ public sealed class PluginConfiguration : PluginConfigurationBase
 
     public override void RegisterOptions(IOptionsProducer optionsProducer)
     {
+        optionsProducer.RegisterOptions<SimpleOptions>();
     }
 
     public override void RegisterNotificationHandlers(INotificationHandlerProducer notificationHandlerProducer)
