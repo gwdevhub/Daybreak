@@ -8,6 +8,7 @@ using Photino.Blazor;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
+using System.Extensions.Core;
 using System.Runtime.InteropServices;
 
 namespace Daybreak.Launch;
@@ -73,13 +74,30 @@ public partial class Launcher
 
     private static void SetupRoundedWindows(PhotinoBlazorApp app)
     {
-        var hwnd = app.MainWindow.WindowHandle;
-        var preference = NativeMethods.DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND;
-        NativeMethods.DwmSetWindowAttribute(
-            hwnd,
-            NativeMethods.DWMWINDOWATTRIBUTE.DWMWA_WINDOW_CORNER_PREFERENCE,
-            ref preference,
-            sizeof(uint));
+        var scopedLogger = app.Services.GetRequiredService<ILogger<Launcher>>().CreateScopedLogger();
+        try
+        {
+            // DWMWA_WINDOW_CORNER_PREFERENCE is only supported on Windows 11 (Build 22000+)
+            if (!OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000))
+            {
+                scopedLogger.LogWarning("Rounded corners are not supported on this version of Windows.");
+                return;
+            }
+
+
+            var hwnd = app.MainWindow.WindowHandle;
+            var preference = NativeMethods.DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND;
+            NativeMethods.DwmSetWindowAttribute(
+                hwnd,
+                NativeMethods.DWMWINDOWATTRIBUTE.DWMWA_WINDOW_CORNER_PREFERENCE,
+                ref preference,
+                sizeof(uint));
+            scopedLogger.LogDebug("Setup rounded corners");
+        }
+        catch (Exception ex)
+        {
+            scopedLogger.LogError(ex, "Failed to set rounded corners on window.");
+        }
     }
 
     private static void SetupBorderless(PhotinoBlazorApp app)
