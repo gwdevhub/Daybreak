@@ -1,26 +1,24 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Configuration.Options;
 using Daybreak.Services.Updater.Models;
+using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Models.Github;
 using Daybreak.Shared.Services.Downloads;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Registry;
 using Daybreak.Shared.Services.Updater;
-using Daybreak.Shared.Services.Updater.PostUpdate;
 using Daybreak.Shared.Utils;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System.Configuration;
+using Microsoft.Extensions.Options;
 using System.Core.Extensions;
 using System.Data;
 using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
-using System.IO;
-using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
-using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.Updater;
 
@@ -28,10 +26,10 @@ internal sealed class ApplicationUpdater(
     INotificationService notificationService,
     IRegistryService registryService,
     IDownloadService downloadService,
-    IPostUpdateActionProvider postUpdateActionProvider,
-    ILiveOptions<LauncherOptions> liveOptions,
+    IEnumerable<PostUpdateActionBase> postUpdateActions,
+    IOptionsMonitor<LauncherOptions> liveOptions,
     IHttpClient<ApplicationUpdater> httpClient,
-    ILogger<ApplicationUpdater> logger) : IApplicationUpdater, IApplicationLifetimeService
+    ILogger<ApplicationUpdater> logger) : IApplicationUpdater, IHostedService
 {
     private const string UpdatePkgSubPath = "update.pkg";
     private const string TempInstallerFileNameSubPath = "Installer/Daybreak.Installer.Temp.exe";
@@ -59,21 +57,64 @@ internal sealed class ApplicationUpdater(
 
     private readonly static TimeSpan DownloadInfoUpdateInterval = TimeSpan.FromMilliseconds(16);
 
-    private readonly CancellationTokenSource updateCancellationTokenSource = new();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IRegistryService registryService = registryService.ThrowIfNull();
     private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
-    private readonly IPostUpdateActionProvider postUpdateActionProvider = postUpdateActionProvider.ThrowIfNull();
-    private readonly ILiveOptions<LauncherOptions> liveOptions = liveOptions.ThrowIfNull();
+    private readonly IEnumerable<PostUpdateActionBase> postUpdateActions = postUpdateActions.ThrowIfNull();
+    private readonly IOptionsMonitor<LauncherOptions> liveOptions = liveOptions.ThrowIfNull();
     private readonly IHttpClient<ApplicationUpdater> httpClient = httpClient.ThrowIfNull();
     private readonly ILogger<ApplicationUpdater> logger = logger.ThrowIfNull();
 
     public Version CurrentVersion { get; } = ProjectConfiguration.CurrentVersion;
 
+    async Task IHostedService.StartAsync(CancellationToken cancellationToken)
+    {
+        if (this.UpdateMarkedInRegistry())
+        {
+            this.UnmarkUpdateInRegistry();
+            await this.ExecutePostUpdateActions(cancellationToken);
+        }
+
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            try
+            {
+                if (this.liveOptions.CurrentValue.AutoCheckUpdate is false)
+                {
+                    return;
+                }
+
+                if (await this.UpdateAvailable(CancellationToken.None))
+                {
+                    var maybeLatestVersion = await this.GetLatestVersion(CancellationToken.None);
+                    if (maybeLatestVersion is null)
+                    {
+                        return;
+                    }
+
+                    this.notificationService.NotifyInformation<UpdateNotificationHandler>(
+                        title: "Daybreak Update Available",
+                        description: $"Version v{maybeLatestVersion} of Daybreak is available.\nClick this notification to start the update process",
+                        metaData: maybeLatestVersion.ToString(),
+                        persistent: true);
+                }
+            }
+            finally
+            {
+                await Task.Delay(TimeSpan.FromMinutes(15), cancellationToken);
+            }
+        }
+    }
+
+    Task IHostedService.StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
     public IProgressAsyncOperation<bool> DownloadUpdate(Version version, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: version.ToString());
-        if (!this.liveOptions.Value.BetaUpdate)
+        if (!this.liveOptions.CurrentValue.BetaUpdate)
         {
             return ProgressAsyncOperation.Create(async progress =>
             {
@@ -194,51 +235,10 @@ internal sealed class ApplicationUpdater(
         }
     }
 
-    public void PeriodicallyCheckForUpdates()
-    {
-        System.Extensions.TaskExtensions.RunPeriodicAsync(async () =>
-        {
-            if (this.liveOptions.Value.AutoCheckUpdate is false)
-            {
-                return;
-            }
-
-            if (await this.UpdateAvailable(CancellationToken.None))
-            {
-                var maybeLatestVersion = await this.GetLatestVersion(CancellationToken.None);
-                if (maybeLatestVersion is null)
-                {
-                    return;
-                }
-
-                this.notificationService.NotifyInformation<UpdateNotificationHandler>(
-                    title: "Daybreak Update Available",
-                    description: $"Version v{maybeLatestVersion} of Daybreak is available.\nClick this notification to start the update process",
-                    metaData: maybeLatestVersion.ToString(),
-                    persistent: true);
-            }
-        }, TimeSpan.FromSeconds(0), TimeSpan.FromMinutes(15), this.updateCancellationTokenSource.Token);
-    }
-
     public void FinalizeUpdate()
     {
         this.MarkUpdateInRegistry();
         this.LaunchExtractor();
-    }
-
-    public void OnStartup()
-    {
-        if (this.UpdateMarkedInRegistry())
-        {
-            this.UnmarkUpdateInRegistry();
-            Task.Factory.StartNew(this.ExecutePostUpdateActions, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current);
-        }
-
-        this.PeriodicallyCheckForUpdates();
-    }
-
-    public void OnClosing()
-    {
     }
 
     private async Task<bool> DownloadUpdateInternalBlob(List<Metadata> metadata, Version version, IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
@@ -447,15 +447,15 @@ internal sealed class ApplicationUpdater(
         }
     }
 
-    private async void ExecutePostUpdateActions()
+    private async Task ExecutePostUpdateActions(CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         this.logger.LogDebug("Executing post-update actions");
-        foreach(var action in this.postUpdateActionProvider.GetPostUpdateActions())
+        foreach(var action in this.postUpdateActions)
         {
             scopedLogger.LogDebug("Starting [{actionName}]", action.GetType().Name);
             action.DoPostUpdateAction();
-            await action.DoPostUpdateActionAsync();
+            await action.DoPostUpdateActionAsync(cancellationToken);
             scopedLogger.LogDebug("Finished [{actionName}]", action.GetType().Name);
         }
     }

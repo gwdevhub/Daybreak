@@ -1,14 +1,16 @@
 ﻿using Daybreak.Shared.Services.Updater;
-using System.Windows;
+using Photino.NET;
 using TrailBlazr.Services;
 using TrailBlazr.ViewModels;
 
 namespace Daybreak.Views;
 public sealed class UpdateViewModel(
+    PhotinoWindow window,
     IViewManager viewManager,
     IApplicationUpdater applicationUpdater)
     : ViewModelBase<UpdateViewModel, UpdateView>
 {
+    private readonly PhotinoWindow window = window;
     private readonly IViewManager viewManager = viewManager;
     private readonly IApplicationUpdater applicationUpdater = applicationUpdater;
 
@@ -31,7 +33,7 @@ public sealed class UpdateViewModel(
     public void Continue()
     {
         this.applicationUpdater.FinalizeUpdate();
-        Application.Current.Shutdown();
+        this.window.Close();
     }
 
     private async ValueTask PerformUpdate(Version version)

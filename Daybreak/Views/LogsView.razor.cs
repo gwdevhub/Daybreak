@@ -1,37 +1,39 @@
-﻿using Daybreak.Shared.Models;
-using Daybreak.Shared.Services.Logging;
+﻿using Daybreak.Models;
+using Daybreak.Services.Logging;
 using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.Logging;
-using Microsoft.Win32;
-using Newtonsoft.Json;
+using Photino.NET;
+using System.Collections.Immutable;
 using System.Extensions;
-using System.IO;
 using System.IO.Compression;
 using TrailBlazr.ViewModels;
 
 namespace Daybreak.Views;
+
 public sealed class LogsViewModel(
+    PhotinoWindow window,
     INotificationService notificationService,
-    ILogsManager logsManager,
     ILogger<LogsViewModel> logger)
     : ViewModelBase<LogsViewModel, LogsView>
 {
+    private const int MaxLogEntries = 200;
+
+    private readonly PhotinoWindow window = window;
     private readonly INotificationService notificationService = notificationService;
-    private readonly ILogsManager logsManager = logsManager;
     private readonly ILogger<LogsViewModel> logger = logger;
     private readonly SemaphoreSlim semaphore = new(1, 1);
-    private readonly List<Log> logs = [];
+    private readonly List<StructuredLogEntry> logs = [];
 
-    private bool attached;
+    private bool isAttached = false;
 
-    public IEnumerable<Log> Logs
+    public IEnumerable<StructuredLogEntry> Logs
     {
         get
         {
             this.semaphore.Wait();
             try
             {
-                return [.. this.logs.Where(l => l is not null && l.LogLevel > Microsoft.Extensions.Logging.LogLevel.Debug && l.LogLevel != Microsoft.Extensions.Logging.LogLevel.None)];
+                return [.. this.logs];
             }
             finally
             {
@@ -45,16 +47,16 @@ public sealed class LogsViewModel(
 
     public override async ValueTask ParametersSet(LogsView view, CancellationToken cancellationToken)
     {
-        if (!this.attached)
-        {
-            this.logsManager.ReceivedLog += this.LogsManager_ReceivedLog;
-            this.attached = true;
-        }
-
         await this.semaphore.WaitAsync(cancellationToken);
         try
         {
-            this.logs.ClearAnd().AddRange(this.logsManager.GetLogs().Where(l => l is not null && l.LogLevel > Microsoft.Extensions.Logging.LogLevel.Debug && l.LogLevel != Microsoft.Extensions.Logging.LogLevel.None));
+            if (!this.isAttached)
+            {
+                InMemorySink.Instance.LogEventEmitted += this.Instance_LogEventEmitted;
+                this.isAttached = true;
+            }
+
+            this.logs.ClearAnd().AddRange(InMemorySink.Instance.GetSnapshot().TakeLast(MaxLogEntries));
             await base.ParametersSet(view, cancellationToken);
         }
         finally
@@ -75,6 +77,7 @@ public sealed class LogsViewModel(
             this.semaphore.Release();
         }
 
+        InMemorySink.Instance.Clear();
         this.RefreshView();
     }
 
@@ -88,36 +91,9 @@ public sealed class LogsViewModel(
     {
         this.Loading = true;
         await this.RefreshViewAsync();
-        var serializedLogsTask = Task.Factory.StartNew(() =>
-        {
-            var logs = this.logsManager.GetLogs();
-            return JsonConvert.SerializeObject(logs, Formatting.Indented);
-        }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current);
-
-        var selectedFilePath = Task.Factory.StartNew(() =>
-        {
-            var saveFileDialog = new SaveFileDialog()
-            {
-                Title = "Save Logs",
-                Filter = "Zip Files (*.zip)|*.zip|All Files (*.*)|*.*",
-                DefaultExt = "zip",
-                AddExtension = true,
-                OverwritePrompt = true,
-                FileName = $"logs-{DateTime.Now:yyyyMMdd-HHmmss}.zip",
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
-            };
-
-            if (saveFileDialog.ShowDialog() is true)
-            {
-                return saveFileDialog.FileName;
-            }
-
-            return default;
-        });
-
+        var selectedFilePath = this.window.ShowSaveFileAsync("Save Logs", filters: [("Zip Files", [".zip"])]);
         try
         {
-            var serializedLogs = await serializedLogsTask;
             var selectedFile = await selectedFilePath;
             if (string.IsNullOrWhiteSpace(selectedFile))
             {
@@ -129,7 +105,12 @@ public sealed class LogsViewModel(
             using var fileStream = File.Open(selectedFile, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
             using var compressedStream = new GZipStream(fileStream, CompressionLevel.SmallestSize);
             using var streamWriter = new StreamWriter(compressedStream);
-            streamWriter.Write(serializedLogs);
+            var snapshot = this.logs.ToImmutableArray();
+            foreach(var log in snapshot)
+            {
+                await streamWriter.WriteLineAsync(log.FormattedText);
+            }
+
             streamWriter.Flush();
             this.notificationService.NotifyInformation("Logs archived", $"Logs were successfully archived to {selectedFile}");
         }
@@ -144,15 +125,8 @@ public sealed class LogsViewModel(
         }
     }
 
-    private void LogsManager_ReceivedLog(object? sender, Log e)
+    private void Instance_LogEventEmitted(object? sender, StructuredLogEntry e)
     {
-        if (e is null ||
-            e.LogLevel <= LogLevel.Debug ||
-            e.LogLevel == LogLevel.None)
-        {
-            return;
-        }
-
         this.semaphore.Wait();
         try
         {
@@ -162,7 +136,7 @@ public sealed class LogsViewModel(
         {
             this.semaphore.Release();
         }
-        
+
         this.RefreshView();
     }
 
@@ -170,7 +144,7 @@ public sealed class LogsViewModel(
     {
         if (disposing)
         {
-            this.logsManager.ReceivedLog -= this.LogsManager_ReceivedLog;
+            InMemorySink.Instance.LogEventEmitted -= this.Instance_LogEventEmitted;
             this.semaphore.Dispose();
         }
 

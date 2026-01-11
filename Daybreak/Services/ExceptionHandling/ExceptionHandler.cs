@@ -1,18 +1,15 @@
 ﻿using Daybreak.Services.Notifications.Handlers;
-using Daybreak.Shared;
 using Daybreak.Shared.Exceptions;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
-using Microsoft.Web.WebView2.Core;
 using System.Core.Extensions;
 using System.Diagnostics;
+using System.Extensions;
 using System.Extensions.Core;
-using System.IO;
 using System.Logging;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using WpfExtended.Blazor.Exceptions;
 
 namespace Daybreak.Services.ExceptionHandling;
 
@@ -30,7 +27,6 @@ internal sealed class ExceptionHandler(
     private static readonly IReadOnlyCollection<Func<Exception?, ScopedLogger<ExceptionHandler>, HandleResult>> ExceptionHandlers = [
         ExitOnNullException,
         ExitOnFatalException,
-        HandleCoreWebView2Exception,
         IgnoreCancelledExceptions,
         HandleRecoverableBrowserExceptions,
         IgnoreUnexpectedGuildWarsCrashes
@@ -75,30 +71,6 @@ internal sealed class ExceptionHandler(
         (e is FatalException || (e is TargetInvocationException && e.InnerException is FatalException))
         ? HandleResult.Fatal
         : HandleResult.Unhandled;
-
-    private static HandleResult HandleCoreWebView2Exception(Exception? e, ScopedLogger<ExceptionHandler> logger)
-    {
-        if (e is CoreWebView2Exception coreWebView2Exception &&
-            coreWebView2Exception.Args.ProcessFailedKind is CoreWebView2ProcessFailedKind.RenderProcessExited)
-        {
-            if (Global.CoreWebView2 is null)
-            {
-                logger.LogCritical(e, "CoreWebView2 is null. Cannot handle exception");
-                return HandleResult.Fatal;
-            }
-
-            logger.LogError(e, "CoreWebView2 render process exited unexpectedly. Reloading browser");
-            Global.CoreWebView2.Reload();
-            return HandleResult.Handled;
-        }
-        else if (e?.Message.Contains("Invalid window handle.") is true && e.StackTrace?.Contains("CoreWebView2Environment.CreateCoreWebView2ControllerAsync") is true)
-        {
-            logger.LogError(e, "Failed to initialize browser");
-            return HandleResult.Handled;
-        }
-
-        return HandleResult.Unhandled;
-    }
 
     private static HandleResult IgnoreCancelledExceptions(Exception? e, ScopedLogger<ExceptionHandler> logger) =>
         (e is TaskCanceledException || e is OperationCanceledException ||

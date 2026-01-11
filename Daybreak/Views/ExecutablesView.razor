@@ -1,7 +1,7 @@
 ﻿<div class="container">
     <div class="title-bar-additional-btns-left">
         <button class="title-bar-btn" @onclick="this.ViewModel.CreateExecutable" title="Add new executable" disabled="@(!this.ViewModel.AddButtonEnabled)">
-            <FluentIcon Value="new Icons.Regular.Size16.Add()" />
+            <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Add()" />
         </button>
     </div>
     <div class="content backdrop-panel">
@@ -35,29 +35,29 @@
                                 }
                                 else if (executable.Valid)
                                 {
-                                    <FluentIcon Value="@(new Microsoft.Fast.Components.FluentUI.Icons.Regular.Size16.CheckmarkCircle())"
+                                    <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.CheckmarkCircle())"
                                                 Color="Color.Neutral"
                                                 Title="Executable is valid" />
                                 }
                                 else if (executable.NeedsUpdate)
                                 {
-                                    <FluentIcon Value="@(new Microsoft.Fast.Components.FluentUI.Icons.Regular.Size16.ArrowDownload())"
+                                    <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowDownload())"
                                                 @onclick="@(() => this.ViewModel.UpdateExecutable(executable))"
                                                 Color="Color.Neutral"
                                                 Title="Update executable" />
                                 }
                                 else
                                 {
-                                    <FluentIcon Value="@(new Microsoft.Fast.Components.FluentUI.Icons.Regular.Size16.CheckmarkCircleWarning())"
+                                    <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.CheckmarkCircleWarning())"
                                                 Color="Color.Neutral"
                                                 Title="Executable is invalid" />
                                 }
 
-                                <FluentIcon Value="@(new Microsoft.Fast.Components.FluentUI.Icons.Regular.Size16.FolderOpen())"
+                                <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.FolderOpen())"
                                             @onclick="@(() => { if (executable.Locked) { return; } this.ViewModel.ModifyPath(executable); })"
                                             Color="Color.Neutral"
                                             Title="Modify path" />
-                                <FluentIcon Value="@(new Microsoft.Fast.Components.FluentUI.Icons.Regular.Size16.Delete())"
+                                <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Delete())"
                                             @onclick="@(() => { if (executable.Locked) { return; } this.ViewModel.RemoveExecutable(executable); })"
                                             Color="Color.Neutral"
                                             Title="Remove executable" />

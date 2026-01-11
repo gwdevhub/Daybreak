@@ -1,42 +1,38 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Services.Downloads;
-using Daybreak.Services.ReShade.Notifications;
 using Daybreak.Services.ReShade.Utils;
-using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Models.Mods;
 using Daybreak.Shared.Models.ReShade;
 using Daybreak.Shared.Services.Downloads;
 using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.ReShade;
 using Daybreak.Shared.Utils;
 using Daybreak.Views.Mods;
 using HtmlAgilityPack;
 using IniParser.Parser;
 using Microsoft.Extensions.Logging;
-using Microsoft.Win32;
-using System.Configuration;
+using Microsoft.Extensions.Options;
 using System.Core.Extensions;
 using System.Data;
 using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
-using System.IO;
 using System.IO.Compression;
-using System.Net.Http;
-using System.Windows.Extensions.Services;
 using TrailBlazr.Services;
 
 namespace Daybreak.Services.ReShade;
 internal sealed class ReShadeService(
+    IOptionsProvider optionsProvider,
     INotificationService notificationService,
     IProcessInjector processInjector,
-    ILiveUpdateableOptions<ReShadeOptions> liveUpdateableOptions,
+    IOptionsMonitor<ReShadeOptions> liveUpdateableOptions,
     IHttpClient<ReShadeService> httpClient,
     IDownloadService downloadService,
     IViewManager viewManager,
-    ILogger<ReShadeService> logger) : IReShadeService, IApplicationLifetimeService
+    ILogger<ReShadeService> logger) : IReShadeService
 {
     private const string PackagesIniUrl = "https://raw.githubusercontent.com/crosire/reshade-shaders/list/EffectPackages.ini";
     private const string ReShadeHomepageUrl = "https://reshade.me";
@@ -63,9 +59,10 @@ internal sealed class ReShadeService(
     private static readonly string[] FxExtensions = [".fx",];
     private static readonly string[] FxHeaderExtensions = [".fxh"];
 
+    private readonly IOptionsProvider optionsProvider = optionsProvider.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IProcessInjector processInjector = processInjector.ThrowIfNull();
-    private readonly ILiveUpdateableOptions<ReShadeOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
+    private readonly IOptionsMonitor<ReShadeOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
     private readonly IHttpClient<ReShadeService> httpClient = httpClient.ThrowIfNull();
     private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
     private readonly IViewManager viewManager = viewManager.ThrowIfNull();
@@ -77,20 +74,22 @@ internal sealed class ReShadeService(
     public bool CanCustomManage => true;
     public bool IsEnabled
     {
-        get => this.liveUpdateableOptions.Value.Enabled;
+        get => this.liveUpdateableOptions.CurrentValue.Enabled;
         set
         {
-            this.liveUpdateableOptions.Value.Enabled = value;
-            this.liveUpdateableOptions.UpdateOption();
+            var options = this.liveUpdateableOptions.CurrentValue;
+            options.Enabled = value;
+            this.optionsProvider.SaveOption(options);
         }
     }
     public bool AutoUpdate
     {
-        get => this.liveUpdateableOptions.Value.AutoUpdate;
+        get => this.liveUpdateableOptions.CurrentValue.AutoUpdate;
         set
         {
-            this.liveUpdateableOptions.Value.AutoUpdate = value;
-            this.liveUpdateableOptions.UpdateOption();
+            var options = this.liveUpdateableOptions.CurrentValue;
+            options.AutoUpdate = value;
+            this.optionsProvider.SaveOption(options);
         }
     }
     public bool IsInstalled => File.Exists(ReShadeDllPath) &&
@@ -98,27 +97,6 @@ internal sealed class ReShadeService(
                                File.Exists(ReShadeLogPath) &&
                                File.Exists(ConfigIniPath);
     public bool CanUninstall => true;
-
-    public void OnStartup()
-    {
-        Task.Factory.StartNew(async () =>
-        {
-            try
-            {
-                await this.CheckUpdates();
-            }
-            catch (Exception e)
-            {
-                this.logger.LogError(e, "Encountered exception while checking for updates");
-            }
-
-            await Task.Delay(TimeSpan.FromMinutes(60));
-        }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current);
-    }
-
-    public void OnClosing()
-    {
-    }
 
     public IProgressAsyncOperation<bool> PerformUninstallation(CancellationToken cancellationToken)
     {
@@ -202,14 +180,7 @@ internal sealed class ReShadeService(
         }
     }
 
-    public Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken)
-    {
-        var destinationDirectory = Path.GetFullPath(new FileInfo(guildWarsStartedContext.ApplicationLauncherContext.ExecutablePath).DirectoryName!);
-        var destinationPreset = Path.Combine(destinationDirectory, ReShadePreset);
-        var destinationIni = Path.Combine(destinationDirectory, ConfigIni);
-        this.PeriodicallyCheckPresetChanges(guildWarsStartedContext.ApplicationLauncherContext, destinationPreset, destinationIni);
-        return Task.CompletedTask;
-    }
+    public Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public Task OnGuildWarsStarting(GuildWarsStartingContext guildWarsStartingContext, CancellationToken cancellationToken)
     {
@@ -265,23 +236,6 @@ internal sealed class ReShadeService(
                 EffectFiles = section.Keys.FirstOrDefault(k => k.KeyName == "EffectFiles")?.Value?.Split(',').ToList()
             };
         });
-    }
-
-    public async Task<bool> LoadReShadeFromDisk(CancellationToken cancellationToken)
-    {
-        var dialog = new OpenFileDialog
-        {
-            Filter = "ReShade Installer (ReShade_Setup_*.exe)|ReShade_Setup_*.exe",
-            Multiselect = false
-        };
-
-        if (dialog.ShowDialog() is not true)
-        {
-            return false;
-        }
-
-        var selectedPath = dialog.FileName;
-        return await this.SetupReshadeDllFromInstaller(selectedPath, cancellationToken);
     }
 
     public async Task<bool> SetupReShade(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
@@ -434,68 +388,47 @@ internal sealed class ReShadeService(
         return true;
     }
 
-    private async void PeriodicallyCheckPresetChanges(ApplicationLauncherContext applicationLauncherContext, string presetsFile, string configFile)
+    public async Task CheckUpdates(CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: presetsFile);
-        if (!File.Exists(presetsFile))
+        if (!this.IsInstalled)
         {
-            scopedLogger.LogError("File does not exist");
             return;
         }
 
-        var presetsCache = File.ReadAllText(presetsFile);
-        var configCache = File.ReadAllText(configFile);
-        try
+        if (!this.liveUpdateableOptions.CurrentValue.AutoUpdate)
         {
-            while (true)
-            {
-                if (applicationLauncherContext.Process.HasExited)
-                {
-                    scopedLogger.LogDebug("Process has exited");
-                    return;
-                }
-
-                await Task.Delay(1000);
-                if (!File.Exists(presetsFile))
-                {
-                    scopedLogger.LogError("Preset file has been deleted");
-                    return;
-                }
-
-                if (!File.Exists(configFile))
-                {
-                    scopedLogger.LogError("Config file has been deleted");
-                    return;
-                }
-
-                var currentPresets = File.ReadAllText(presetsFile);
-                if (currentPresets != presetsCache)
-                {
-                    presetsCache = currentPresets;
-                    this.notificationService.NotifyInformation<ReShadeConfigChangedHandler>(
-                        title: "ReShade presets changed",
-                        description: $"ReShade presets have been changed by {applicationLauncherContext.ExecutablePath}. Click on this notification to save the changes in Daybreak",
-                        metaData: presetsFile);
-                    continue;
-                }
-
-                var currentConfig = File.ReadAllText(configFile);
-                if (currentConfig != configCache)
-                {
-                    configCache = currentConfig;
-                    this.notificationService.NotifyInformation<ReShadeConfigChangedHandler>(
-                        title: "ReShade config changed",
-                        description: $"ReShade config has been changed by {applicationLauncherContext.ExecutablePath}. Click on this notification to save the changes in Daybreak",
-                        metaData: configFile);
-                    continue;
-                }
-            }
-        }
-        catch(Exception e)
-        {
-            scopedLogger.LogError(e, "Encountered exception. Cancelling preset monitoring");
             return;
         }
+
+        var scopedLogger = this.logger.CreateScopedLogger();
+        var version = await this.GetLatestVersion(cancellationToken);
+        if (this.GetCurrentVersion() is not Version currentVersion ||
+            currentVersion.CompareTo(version) >= 0)
+        {
+            scopedLogger.LogDebug("No update available. Current version is up to date");
+            return;
+        }
+
+        scopedLogger.LogDebug($"Found an update for ReShade. Latest version: {version}");
+        var notificationToken = this.notificationService.NotifyInformation(
+                "Updating ReShade",
+                $"Updating ReShade to version {version}");
+
+        if (await this.SetupReShade(new Progress<ProgressUpdate>(), cancellationToken))
+        {
+            notificationToken.Cancel();
+            scopedLogger.LogDebug($"ReShade updated to version {version}");
+            this.notificationService.NotifyInformation(
+                "ReShade updated",
+                $"ReShade has been updated to version {version}");
+            return;
+        }
+
+        notificationToken.Cancel();
+        scopedLogger.LogError("Failed to update ReShade");
+        this.notificationService.NotifyInformation(
+                "Failed to update ReShade",
+                $"Could not update ReShade to version {version}. Check logs for details");
     }
 
     private async Task InstallPackageInternal(
@@ -679,49 +612,6 @@ internal sealed class ReShadeService(
         }
 
         Directory.CreateSymbolicLink(destination, SourcePresetsFolderPath);
-    }
-
-    private async Task CheckUpdates()
-    {
-        if (!this.IsInstalled)
-        {
-            return;
-        }
-
-        if (!this.liveUpdateableOptions.Value.AutoUpdate)
-        {
-            return;
-        }
-
-        var scopedLogger = this.logger.CreateScopedLogger();
-        var version = await this.GetLatestVersion(CancellationToken.None);
-        if (this.GetCurrentVersion() is not Version currentVersion ||
-            currentVersion.CompareTo(version) >= 0)
-        {
-            scopedLogger.LogDebug("No update available. Current version is up to date");
-            return;
-        }
-
-        scopedLogger.LogDebug($"Found an update for ReShade. Latest version: {version}");
-        var notificationToken = this.notificationService.NotifyInformation(
-                "Updating ReShade",
-                $"Updating ReShade to version {version}");
-
-        if (await this.SetupReShade(new Progress<ProgressUpdate>(), CancellationToken.None))
-        {
-            notificationToken.Cancel();
-            scopedLogger.LogDebug($"ReShade updated to version {version}");
-            this.notificationService.NotifyInformation(
-                "ReShade updated",
-                $"ReShade has been updated to version {version}");
-            return;
-        }
-
-        notificationToken.Cancel();
-        scopedLogger.LogError("Failed to update ReShade");
-        this.notificationService.NotifyInformation(
-                "Failed to update ReShade",
-                $"Could not update ReShade to version {version}. Check logs for details");
     }
     
     private async Task<Version?> GetLatestVersion(CancellationToken cancellationToken)

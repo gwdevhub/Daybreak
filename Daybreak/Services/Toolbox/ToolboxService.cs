@@ -9,26 +9,27 @@ using Daybreak.Shared.Models.Mods;
 using Daybreak.Shared.Services.BuildTemplates;
 using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Toolbox;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
-using System.Configuration;
+using Microsoft.Extensions.Options;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
-using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Daybreak.Services.Toolbox;
 
 internal sealed class ToolboxService(
+    IOptionsProvider optionsProvider,
     IBuildTemplateManager buildTemplateManager,
     INotificationService notificationService,
     IProcessInjector processInjector,
     IToolboxClient toolboxClient,
-    ILiveUpdateableOptions<ToolboxOptions> toolboxOptions,
+    IOptionsMonitor<ToolboxOptions> toolboxOptions,
     ILogger<ToolboxService> logger) : IToolboxService
 {
     private const string ToolboxDllName = "GWToolboxdll.dll";
@@ -45,11 +46,12 @@ internal sealed class ToolboxService(
     private static readonly string UsualToolboxLocation = Path.GetFullPath(
         Path.Combine(UsualToolboxFolderLocation, ToolboxDllName));
 
+    private readonly IOptionsProvider optionsProvider = optionsProvider.ThrowIfNull();
     private readonly IBuildTemplateManager buildTemplateManager = buildTemplateManager.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IProcessInjector processInjector = processInjector.ThrowIfNull();
     private readonly IToolboxClient toolboxClient = toolboxClient.ThrowIfNull();
-    private readonly ILiveUpdateableOptions<ToolboxOptions> toolboxOptions = toolboxOptions.ThrowIfNull();
+    private readonly IOptionsMonitor<ToolboxOptions> toolboxOptions = toolboxOptions.ThrowIfNull();
     private readonly ILogger<ToolboxService> logger = logger.ThrowIfNull();
 
     public string Name => "GWToolbox";
@@ -59,11 +61,12 @@ internal sealed class ToolboxService(
     public bool CanUninstall => true;
     public bool IsEnabled
     {
-        get => this.toolboxOptions.Value.Enabled;
+        get => this.toolboxOptions.CurrentValue.Enabled;
         set
         {
-            this.toolboxOptions.Value.Enabled = value;
-            this.toolboxOptions.UpdateOption();
+            var options = this.toolboxOptions.CurrentValue;
+            options.Enabled = value;
+            this.optionsProvider.SaveOption(options);
         }
     }
     public bool IsInstalled => File.Exists(UsualToolboxLocation);
@@ -356,7 +359,7 @@ internal sealed class ToolboxService(
     private async Task LaunchToolbox(Process process, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        if (this.toolboxOptions.Value.Enabled is false)
+        if (this.IsEnabled is false)
         {
             scopedLogger.LogDebug("Toolbox disabled");
             return;

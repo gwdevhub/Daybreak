@@ -1,11 +1,9 @@
-﻿using Daybreak.Configuration.Options;
-using Daybreak.Shared.Models.Onboarding;
+﻿using Daybreak.Shared.Models.Onboarding;
 using Daybreak.Shared.Services.Credentials;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.LaunchConfigurations;
 using Daybreak.Shared.Services.Onboarding;
 using Microsoft.Extensions.Logging;
-using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 
@@ -15,13 +13,11 @@ internal sealed class OnboardingService(
     ICredentialManager credentialManager,
     IGuildWarsExecutableManager guildWarsExecutableManager,
     ILaunchConfigurationService launchConfigurationService,
-    ILiveOptions<LauncherOptions> liveOptions,
     ILogger<OnboardingService> logger) : IOnboardingService
 {
     private readonly ICredentialManager credentialManager = credentialManager.ThrowIfNull();
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
     private readonly ILaunchConfigurationService launchConfigurationService = launchConfigurationService.ThrowIfNull();
-    private readonly ILiveOptions<LauncherOptions> options = liveOptions.ThrowIfNull();
     private readonly ILogger<OnboardingService> logger = logger.ThrowIfNull();
 
     public LauncherOnboardingStage CheckOnboardingStage()

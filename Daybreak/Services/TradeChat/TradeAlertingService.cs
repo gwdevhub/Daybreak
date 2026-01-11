@@ -5,53 +5,62 @@ using Daybreak.Shared.Configuration.Options;
 using Daybreak.Shared.Converters;
 using Daybreak.Shared.Models.Trade;
 using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.TradeChat;
-using Daybreak.Shared.Utils;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
-using System.Globalization;
 using System.Text.RegularExpressions;
-using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.TradeChat;
 
-internal sealed class TradeAlertingService : ITradeAlertingService, IApplicationLifetimeService
+internal sealed class TradeAlertingService : ITradeAlertingService, IHostedService
 {
-    private static readonly PriceToStringConverter PriceToStringConverter = new();
-
     private readonly List<ITradeAlert> tradeAlerts = [];
     private readonly ITraderQuoteService traderQuoteService;
+    private readonly IOptionsProvider optionsProvider;
     private readonly INotificationService notificationService;
     private readonly ITradeHistoryDatabase tradeHistoryDatabase;
     private readonly ITradeChatService<KamadanTradeChatOptions> kamadanTradeChatService;
     private readonly ITradeChatService<AscalonTradeChatOptions> ascalonTradeChatService;
-    private readonly ILiveUpdateableOptions<TradeAlertingOptions> options;
+    private readonly IOptionsMonitor<TradeAlertingOptions> options;
     private readonly ILogger<TradeAlertingService> logger;
-    private readonly CancellationTokenSource cancellationTokenSource = new();
 
     public IEnumerable<ITradeAlert> TradeAlerts => this.tradeAlerts;
 
     public TradeAlertingService(
         ITraderQuoteService traderQuoteService,
+        IOptionsProvider optionsProvider,
         INotificationService notificationService,
         ITradeHistoryDatabase tradeHistoryDatabase,
         ITradeChatService<KamadanTradeChatOptions> kamadanTradeChatService,
         ITradeChatService<AscalonTradeChatOptions> ascalonTradeChatService,
-        ILiveUpdateableOptions<TradeAlertingOptions> options,
+        IOptionsMonitor<TradeAlertingOptions> options,
         ILogger<TradeAlertingService> logger)
     {
         this.traderQuoteService = traderQuoteService.ThrowIfNull();
+        this.optionsProvider = optionsProvider.ThrowIfNull();
         this.notificationService = notificationService.ThrowIfNull();
         this.tradeHistoryDatabase = tradeHistoryDatabase.ThrowIfNull();
         this.kamadanTradeChatService = kamadanTradeChatService.ThrowIfNull();
         this.ascalonTradeChatService = ascalonTradeChatService.ThrowIfNull();
         this.options = options.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
-        this.tradeAlerts = this.options.Value.Alerts ?? [];
+        this.tradeAlerts = this.options.CurrentValue.Alerts ?? [];
+    }
+
+    Task IHostedService.StartAsync(CancellationToken cancellationToken)
+    {
+        return this.StartAlertingService(cancellationToken);
+    }
+
+    Task IHostedService.StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
     }
 
     public void AddTradeAlert(ITradeAlert tradeAlert)
@@ -90,28 +99,18 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
         this.SaveTradeAlerts();
     }
 
-    public void OnClosing()
+    private async Task StartAlertingService(CancellationToken cancellationToken)
     {
-        this.cancellationTokenSource.Cancel();
-        this.cancellationTokenSource.Dispose();
-    }
-
-    public void OnStartup()
-    {
-        this.StartAlertingService(this.cancellationTokenSource.Token);
-    }
-
-    private async void StartAlertingService(CancellationToken cancellationToken)
-    {
-        var lastCheckTime = this.options.Value.LastCheckTime;
+        var options = this.options.CurrentValue;
+        var lastCheckTime = options.LastCheckTime;
         var timeSinceLastCheckTime = DateTime.UtcNow - lastCheckTime;
-        if (timeSinceLastCheckTime > this.options.Value.MaxLookbackPeriod)
+        if (timeSinceLastCheckTime > options.MaxLookbackPeriod)
         {
-            timeSinceLastCheckTime = this.options.Value.MaxLookbackPeriod;
+            timeSinceLastCheckTime = options.MaxLookbackPeriod;
         }
 
-        this.options.Value.LastCheckTime = DateTime.UtcNow;
-        this.options.UpdateOption();
+        options.LastCheckTime = DateTime.UtcNow;
+        this.optionsProvider.SaveOption(options);
         var savedTrades = await this.tradeHistoryDatabase.GetTraderMessagesSinceTime(DateTime.UtcNow - timeSinceLastCheckTime, cancellationToken);
         if (savedTrades.None())
         {
@@ -161,10 +160,9 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
     {
         while (!cancellationToken.IsCancellationRequested)
         {
-
             if (this.tradeAlerts.OfType<QuoteAlert>().None(q => q.Enabled))
             {
-                await Task.Delay(TimeSpan.FromSeconds(this.options.Value.QuoteAlertsInterval), cancellationToken);
+                await Task.Delay(TimeSpan.FromSeconds(this.options.CurrentValue.QuoteAlertsInterval), cancellationToken);
                 continue;
             }
 
@@ -202,7 +200,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
                     expirationTime: DateTime.Now + TimeSpan.FromSeconds(15));
             }
 
-            await Task.Delay(TimeSpan.FromSeconds(this.options.Value.QuoteAlertsInterval), cancellationToken);
+            await Task.Delay(TimeSpan.FromSeconds(this.options.CurrentValue.QuoteAlertsInterval), cancellationToken);
         }
     }
 
@@ -235,8 +233,9 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
 
     private void SaveTradeAlerts()
     {
-        this.options.Value.Alerts = this.tradeAlerts;
-        this.options.UpdateOption();
+        var options = this.options.CurrentValue;
+        options.Alerts = this.tradeAlerts;
+        this.optionsProvider.SaveOption(options);
     }
 
     private void NotifyAlertMatch(TraderMessageDTO traderMessageDTO, TradeAlert alert)
@@ -303,6 +302,6 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IApplication
 
     private static string ConvertPriceToString(int price)
     {
-        return PriceToStringConverter.Convert(price, typeof(string), default!, CultureInfo.CurrentCulture).Cast<string>();
+        return PriceToStringConverter.Convert(price);
     }
 }

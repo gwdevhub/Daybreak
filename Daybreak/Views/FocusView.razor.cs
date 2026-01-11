@@ -8,8 +8,9 @@ using Daybreak.Shared.Services.BuildTemplates;
 using Daybreak.Shared.Services.Experience;
 using Daybreak.Shared.Services.LaunchConfigurations;
 using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.Options;
 using Microsoft.Extensions.Logging;
-using System.Configuration;
+using Microsoft.Extensions.Options;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
@@ -19,14 +20,16 @@ using TrailBlazr.ViewModels;
 
 namespace Daybreak.Views;
 
+
 public sealed class FocusViewModel(
+    IOptionsProvider optionsProvider,
     IBuildTemplateManager buildTemplateManager,
     IViewManager viewManager,
     INotificationService notificationService,
     ILaunchConfigurationService launchConfigurationService,
     IDaybreakApiService daybreakApiService,
     IExperienceCalculator experienceCalculator,
-    ILiveUpdateableOptions<FocusViewOptions> options,
+    IOptionsMonitor<FocusViewOptions> options,
     ILogger<FocusView> logger)
     : ViewModelBase<FocusViewModel, FocusView>
 {
@@ -36,13 +39,14 @@ public sealed class FocusViewModel(
     private static readonly TimeSpan GameInfoTimeout = TimeSpan.FromSeconds(5);
     private static readonly TimeSpan BuildsCheckFrequency = TimeSpan.FromSeconds(30);
 
+    private readonly IOptionsProvider optionsProvider = optionsProvider.ThrowIfNull();
     private readonly IBuildTemplateManager buildTemplateManager = buildTemplateManager.ThrowIfNull();
     private readonly IViewManager viewManager = viewManager.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly ILaunchConfigurationService launchConfigurationService = launchConfigurationService.ThrowIfNull();
     private readonly IDaybreakApiService daybreakApiService = daybreakApiService.ThrowIfNull();
     private readonly IExperienceCalculator experienceCalculator = experienceCalculator.ThrowIfNull();
-    private readonly ILiveUpdateableOptions<FocusViewOptions> options = options.ThrowIfNull();
+    private readonly IOptionsMonitor<FocusViewOptions> options = options.ThrowIfNull();
     private readonly ILogger<FocusView> logger = logger.ThrowIfNull();
 
     private ScopedApiContext? apiContext;
@@ -118,9 +122,9 @@ public sealed class FocusViewModel(
 
     public void OnExperienceDisplayClicked()
     {
-        var options = this.options.Value;
+        var options = this.options.CurrentValue;
         options.ExperienceDisplay = CycleValue(options.ExperienceDisplay);
-        this.options.UpdateOption();
+        this.optionsProvider.SaveOption(options);
         if (this.CharacterComponentContext is null)
         {
             return;
@@ -142,9 +146,9 @@ public sealed class FocusViewModel(
 
     public void OnVanquishingDisplayClicked()
     {
-        var options = this.options.Value;
+        var options = this.options.CurrentValue;
         options.VanquishingDisplay = CycleValue(options.VanquishingDisplay);
-        this.options.UpdateOption();
+        this.optionsProvider.SaveOption(options);
         if (this.VanquishComponentContext is null)
         {
             return;
@@ -462,7 +466,7 @@ public sealed class FocusViewModel(
             ExperienceForNextLevel = experienceForNextLevel,
             NextExperienceThreshold = nextExperienceThreshold,
             TotalExperienceForNextLevel = totalExperienceForNextLevel,
-            ExperienceDisplay = this.options.Value.ExperienceDisplay
+            ExperienceDisplay = this.options.CurrentValue.ExperienceDisplay
         };
     }
 
@@ -621,7 +625,7 @@ public sealed class FocusViewModel(
             FoesToKill = instanceInfo.FoesToKill,
             HardMode = instanceInfo.Difficulty is DifficultyInfo.Hard,
             Vanquishing = (instanceInfo.FoesToKill + instanceInfo.FoesKilled > 0U) && instanceInfo.Difficulty is DifficultyInfo.Hard,
-            Display = this.options.Value.VanquishingDisplay
+            Display =  this.options.CurrentValue.VanquishingDisplay
         };
     }
 

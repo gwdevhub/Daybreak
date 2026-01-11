@@ -1,7 +1,7 @@
 ﻿<div class="build-list-container">
     <div class="title-bar-additional-btns-left">
         <button class="title-bar-btn" @onclick="this.ViewModel.CreateNewSingleBuild" title="Create build">
-            <FluentIcon Value="new Icons.Regular.Size16.PersonAdd()" />
+            <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.PersonAdd()" />
         </button>
     </div>
     <div class="stretch-container backdrop-panel">
@@ -39,7 +39,7 @@
                                     }
                                     else if (entry.BuildEntry is Daybreak.Shared.Models.Builds.TeamBuildEntry)
                                     {
-                                        <FluentIcon Value="@(new Icons.Regular.Size16.PeopleTeam())"
+                                        <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.PeopleTeam())"
                                                     Color="Color.Neutral" />
                                     }
 
@@ -53,7 +53,7 @@
                                 <div class="build-actions" @onclick="@(() => this.ViewModel.DeleteBuild(entry))" @onclick:stopPropagation="true">
                                     <FluentButton Appearance="Appearance.Stealth"
                                                   IconOnly="true">
-                                        <FluentIcon Value="@(new Icons.Regular.Size16.Delete())" />
+                                        <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Delete())" />
                                     </FluentButton>
                                 </div>
                             </div>
@@ -63,7 +63,7 @@
                 else if (!this.ViewModel.IsLoading)
                 {
                     <div class="empty-state">
-                        <FluentIcon Value="@(new Icons.Regular.Size48.Search())" Color="Color.Neutral" />
+                        <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size48.Search())" Color="Color.Neutral" />
                         <div class="empty-message">
                             @if (string.IsNullOrEmpty(this.ViewModel.SearchTerm))
                             {

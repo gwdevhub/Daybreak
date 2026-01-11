@@ -1,28 +1,26 @@
 ﻿using Daybreak.Services.Notifications.Handlers;
 using Daybreak.Services.Notifications.Models;
-using Daybreak.Shared;
 using Daybreak.Shared.Models.Notifications;
 using Daybreak.Shared.Models.Notifications.Handling;
 using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Slim;
 using System.Collections.Concurrent;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
 using System.Runtime.CompilerServices;
-using System.Windows;
 
 namespace Daybreak.Services.Notifications;
 
 internal sealed class NotificationService(
-    IServiceManager serviceManager,
+    IServiceProvider serviceProvider,
     INotificationStorage notificationStorage,
-    ILogger<NotificationService> logger) : INotificationService, INotificationProducer, INotificationHandlerProducer
+    ILogger<NotificationService> logger) : INotificationService, INotificationProducer
 {
     private readonly ConcurrentQueue<Notification> pendingNotifications = new();
-    private readonly IServiceManager serviceManager = serviceManager.ThrowIfNull();
+    // Using lazy rezolving to break dependency cycle
+    private readonly IServiceProvider serviceProvider = serviceProvider.ThrowIfNull();
     private readonly INotificationStorage storage = notificationStorage.ThrowIfNull();
     private readonly ILogger<NotificationService> logger = logger.ThrowIfNull();
 
@@ -102,7 +100,8 @@ internal sealed class NotificationService(
             return;
         }
 
-        var handler = (INotificationHandler)this.serviceManager.GetRequiredService(notification.HandlingType);
+        var handler = this.serviceProvider.GetRequiredService<IEnumerable<INotificationHandler>>().FirstOrDefault(handler => handler.GetType() == notification.HandlingType)
+            ?? throw new InvalidOperationException($"Could not find notification handler {notification.HandlingType}");
         handler.OpenNotification(notification);
     }
 
@@ -139,11 +138,6 @@ internal sealed class NotificationService(
         return (await this.storage.GetPendingNotifications(cancellationToken)).Select(FromDTO);
     }
 
-    void INotificationHandlerProducer.RegisterNotificationHandler<T>()
-    {
-        this.serviceManager.RegisterScoped<T>();
-    }
-
     private NotificationToken NotifyInternal<THandlingType>(
         string title,
         string description,
@@ -164,20 +158,7 @@ internal sealed class NotificationService(
             Level = logLevel,
         };
 
-        if (Global.CoreWebView2 is null && logLevel is LogLevel.Error or LogLevel.Critical)
-        {
-            // If WebView2 is not initialized, we cannot show UI notifications.
-            MessageBox.Show(
-                description,
-                title,
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
-        }
-        else
-        {
-            this.EnqueueNotification(notification, persistent);
-        }
-
+        this.EnqueueNotification(notification, persistent);
         return new NotificationToken(notification);
     }
 

@@ -1,6 +1,6 @@
 ﻿namespace Daybreak.Shared.Services.ApplicationArguments;
 
-public interface IApplicationArgumentService : IArgumentHandlerProducer
+public interface IApplicationArgumentService
 {
     void HandleArguments(string[] args);
 }

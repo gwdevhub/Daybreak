@@ -3,41 +3,39 @@ using MeaMod.DNS.Model;
 using MeaMod.DNS.Multicast;
 using System.Collections.Concurrent;
 using System.Net;
-using System.Windows.Extensions.Services;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
+using Microsoft.Extensions.Hosting;
 
 namespace Daybreak.Services.MDns;
 
 public sealed class MDomainRegistrar(
     ILogger<MDomainRegistrar> logger)
-    : IMDomainRegistrar, IApplicationLifetimeService
+    : IMDomainRegistrar, IHostedService
 {
     private static readonly TimeSpan ScanFrequency = TimeSpan.FromSeconds(15);
     private static readonly TimeSpan MaxTTL = TimeSpan.FromSeconds(20);
 
     private readonly ConcurrentDictionary<string, ServiceRegistration> serviceLookup = [];
     private readonly ServiceDiscovery serviceDiscovery = new();
-    private readonly CancellationTokenSource cts = new();
     private readonly ILogger<MDomainRegistrar> logger = logger.ThrowIfNull();
 
-    public void OnStartup()
+    Task IHostedService.StartAsync(CancellationToken cancellationToken)
     {
         this.serviceDiscovery.ServiceInstanceDiscovered += this.ServiceDiscovery_ServiceInstanceDiscovered;
         this.serviceDiscovery.ServiceInstanceShutdown += this.ServiceDiscovery_ServiceInstanceShutdown;
         this.serviceDiscovery.ServiceDiscovered += this.ServiceDiscovery_ServiceDiscovered;
-        Task.Factory.StartNew(() => this.QueryServicesPeriodically(this.cts.Token), this.cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        return Task.Factory.StartNew(() => this.QueryServicesPeriodically(cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
     }
 
-    public void OnClosing()
+    Task IHostedService.StopAsync(CancellationToken cancellationToken)
     {
         this.serviceDiscovery.ServiceInstanceDiscovered -= this.ServiceDiscovery_ServiceInstanceDiscovered;
         this.serviceDiscovery.ServiceInstanceShutdown -= this.ServiceDiscovery_ServiceInstanceShutdown;
-        this.cts?.Cancel();
-        this.cts?.Dispose();
         this.serviceDiscovery.Dispose();
+        return Task.CompletedTask;
     }
 
     public IReadOnlyList<Uri>? Resolve(string service)

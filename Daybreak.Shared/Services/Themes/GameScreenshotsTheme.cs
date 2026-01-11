@@ -1,9 +1,9 @@
 ﻿using Daybreak.Shared.Models.ColorPalette;
 using Daybreak.Shared.Models.Themes;
 using Daybreak.Shared.Services.Screenshots;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Extensions.Core;
-using System.Windows.Extensions.Services;
 
 namespace Daybreak.Shared.Services.Themes;
 
@@ -15,7 +15,7 @@ public sealed class GameScreenshotsTheme(
     IThemeManager themeManager,
     IScreenshotService screenshotService,
     ILogger<GameScreenshotsTheme> logger)
-    : Theme(ThemeName, AccentColor.Orange, new StaticBackground(string.Empty), LightDarkMode.SystemSynchronized, string.Empty), IApplicationLifetimeService
+    : Theme(ThemeName, AccentColor.Orange, new StaticBackground(string.Empty), LightDarkMode.SystemSynchronized, string.Empty), IHostedService
 {
     public const string ThemeName = "Dynamic Screenshots";
 
@@ -63,16 +63,18 @@ public sealed class GameScreenshotsTheme(
         }
     }
 
-    public void OnClosing()
-    {
-        this.cancellationTokenSource?.Cancel();
-        this.cancellationTokenSource?.Dispose();
-    }
-
-    public void OnStartup()
+    public Task StartAsync(CancellationToken cancellationToken)
     {
         this.cancellationTokenSource?.Dispose();
         this.cancellationTokenSource = new CancellationTokenSource();
         Task.Factory.StartNew(() => this.PeriodicallyUpdateGameScreenshots(this.cancellationTokenSource.Token), this.cancellationTokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        this.cancellationTokenSource?.Cancel();
+        this.cancellationTokenSource?.Dispose();
+        return Task.CompletedTask;
     }
 }

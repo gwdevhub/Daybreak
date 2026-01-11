@@ -1,7 +1,7 @@
-﻿using System.Windows.Extensions.Services;
+﻿using Microsoft.Extensions.Hosting;
 
 namespace Daybreak.Services.Events;
 
-public interface IEventNotifierService : IApplicationLifetimeService
+public interface IEventNotifierService
 {
 }

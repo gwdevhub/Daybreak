@@ -1,28 +1,44 @@
-﻿using Daybreak.Services.Guildwars;
+﻿using Daybreak.Configuration.Options;
+using Daybreak.Services.Guildwars;
 using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Models.Mods;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.Guildwars;
 using Daybreak.Shared.Services.Notifications;
+using Daybreak.Shared.Services.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Core.Extensions;
 using System.Extensions;
-using System.Windows.Extensions.Services;
+using System.Extensions.Core;
 
 namespace Daybreak.Services.GuildWars;
 internal sealed class GuildWarsVersionChecker(
+    IOptionsProvider optionsProvider,
+    IOptionsMonitor<GuildWarsVersionCheckerOptions> options,
     IGuildWarsExecutableManager guildWarsExecutableManager,
     IGuildWarsInstaller guildWarsInstaller,
     INotificationService notificationService,
-    ILogger<GuildWarsVersionChecker> logger) : IGuildWarsVersionChecker, IApplicationLifetimeService
+    ILogger<GuildWarsVersionChecker> logger) : IGuildWarsVersionChecker
 {
     public string Name => "GuildWars Version Checker";
     public string Description => "Checks if the Guild Wars executable is up to date before launching";
-    public bool IsVisible => false;
-    public bool IsEnabled { get; set; } = true;
+    public bool IsVisible => true;
+    public bool IsEnabled
+    {
+        get => this.options.CurrentValue.IsEnabled;
+        set
+        {
+            var options = this.options.CurrentValue;
+            options.IsEnabled = value;
+            this.optionsProvider.SaveOption(options);
+        }
+    }
     public bool IsInstalled => true;
     public bool CanCustomManage => false;
 
+    private readonly IOptionsProvider optionsProvider = optionsProvider.ThrowIfNull();
+    private readonly IOptionsMonitor<GuildWarsVersionCheckerOptions> options = options.ThrowIfNull();
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
     private readonly IGuildWarsInstaller guildWarsInstaller = guildWarsInstaller.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
@@ -63,7 +79,13 @@ internal sealed class GuildWarsVersionChecker(
 
     public async Task OnGuildWarsStarting(GuildWarsStartingContext guildWarsStartingContext, CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.OnGuildWarsStarting), guildWarsStartingContext.ApplicationLauncherContext.ExecutablePath);
+        var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: guildWarsStartingContext.ApplicationLauncherContext.ExecutablePath);
+        if (this.IsEnabled is false)
+        {
+            scopedLogger.LogDebug("Guild Wars Version Checker is disabled. Skipping version check");
+            return;
+        }
+
         var notificationToken = this.notificationService.NotifyInformation(
             title: "Checking Guild Wars version",
             description: "Checking if Guild Wars needs an update",
@@ -104,24 +126,15 @@ internal sealed class GuildWarsVersionChecker(
             expirationTime: DateTime.Now + TimeSpan.FromSeconds(15));
     }
 
-    public void OnStartup()
-    {
-        _ = new TaskFactory().StartNew(this.CheckExecutables, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Current);
-    }
-
     public Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public Task OnGuildWarsStarted(GuildWarsStartedContext guildWarsStartedContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public Task OnGuildWarsStartingDisabled(GuildWarsStartingDisabledContext guildWarsStartingDisabledContext, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    public void OnClosing()
+    public async ValueTask CheckExecutables()
     {
-    }
-
-    private async void CheckExecutables()
-    {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.OnStartup), string.Empty);
+        var scopedLogger = this.logger.CreateScopedLogger();
         if (await this.guildWarsInstaller.GetLatestVersionId(CancellationToken.None) is not int latestVersion)
         {
             scopedLogger.LogError("Failed to fetch latest version. Skipping version check");

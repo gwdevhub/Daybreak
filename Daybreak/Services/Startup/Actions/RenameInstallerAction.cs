@@ -2,7 +2,7 @@
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
-using System.IO;
+using System.Extensions.Core;
 
 namespace Daybreak.Services.Startup.Actions;
 
@@ -19,12 +19,14 @@ internal sealed class RenameInstallerAction(
 
     public override void ExecuteOnStartup()
     {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        scopedLogger.LogInformation("Checking for new installer version to rename");
         if (File.Exists(TemporaryInstallerFileName))
         {
-            this.logger.LogDebug("Detected new installer version. Overwriting old installer with new one");
+            scopedLogger.LogDebug("Detected new installer version. Overwriting old installer with new one");
             File.Copy(TemporaryInstallerFileName, InstallerFileName, true);
 
-            this.logger.LogDebug("Deleting new installer temporary file");
+            scopedLogger.LogDebug("Deleting new installer temporary file");
             File.Delete(TemporaryInstallerFileName);
         }
     }

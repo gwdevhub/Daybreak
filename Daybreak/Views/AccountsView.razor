@@ -1,7 +1,7 @@
 ﻿<div class="container">
     <div class="title-bar-additional-btns-left">
         <button class="title-bar-btn" @onclick="this.ViewModel.CreateCredential" title="Add new account">
-            <FluentIcon Value="new Icons.Regular.Size16.Add()" />
+            <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Add()" />
         </button>
     </div>
     <div class="content backdrop-panel">
@@ -22,7 +22,7 @@
                                              AutoComplete="off"
                                              ReadOnly="true"
                                              Placeholder="Identifier">
-                                <FluentIcon Value="@(new Microsoft.Fast.Components.FluentUI.Icons.Regular.Size16.Delete())"
+                                <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Delete())"
                                             @onclick="@(() => this.ViewModel.RemoveCredential(credential))"
                                             slot="end"
                                             Color="Color.Neutral"
@@ -62,7 +62,7 @@
                                              Placeholder="Password">
                                 @if (credential.PasswordVisible)
                                 {
-                                    <FluentIcon Value="@(new Microsoft.Fast.Components.FluentUI.Icons.Regular.Size16.Eye())"
+                                    <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Eye())"
                                                 @onclick="@(() => this.ViewModel.TogglePasswordVisibility(credential))"
                                                 slot="end"
                                                 Color="Color.Neutral"
@@ -70,7 +70,7 @@
                                 }
                                 else
                                 {
-                                    <FluentIcon Value="@(new Microsoft.Fast.Components.FluentUI.Icons.Regular.Size16.EyeOff())"
+                                    <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.EyeOff())"
                                                 @onclick="@(() => this.ViewModel.TogglePasswordVisibility(credential))"
                                                 slot="end"
                                                 Color="Color.Neutral"

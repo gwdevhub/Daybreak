@@ -7,7 +7,6 @@ public interface IReShadeService : IModService
 {
     bool AutoUpdate { get; set; }
     void OpenReShadeFolder();
-    Task<bool> LoadReShadeFromDisk(CancellationToken cancellationToken);
     Task<bool> InstallPackage(ShaderPackage package, CancellationToken cancellationToken);
     Task<bool> InstallPackage(string pathToZip, CancellationToken cancellationToken);
     Task<IEnumerable<ShaderPackage>> GetStockPackages(CancellationToken cancellationToken);
@@ -17,4 +16,5 @@ public interface IReShadeService : IModService
     Task<string> GetPreset(CancellationToken cancellationToken);
     Task<bool> SavePreset(string config, CancellationToken cancellationToken);
     Task<bool> UpdateIniFromPath(string pathToIni, CancellationToken cancellationToken);
+    Task CheckUpdates(CancellationToken cancellationToken);
 }

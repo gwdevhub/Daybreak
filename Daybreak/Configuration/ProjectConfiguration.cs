@@ -1,11 +1,8 @@
-﻿using System.Configuration;
-using System.Core.Extensions;
+﻿using System.Core.Extensions;
 using System.Extensions;
-using System.Logging;
-using System.Net.Http;
-using System.Net.WebSockets;
 using System.Reflection;
 using Daybreak.Configuration.Options;
+using Daybreak.Extensions;
 using Daybreak.Services.Api;
 using Daybreak.Services.ApplicationArguments;
 using Daybreak.Services.ApplicationArguments.ArgumentHandling;
@@ -24,10 +21,10 @@ using Daybreak.Services.Guildwars;
 using Daybreak.Services.GuildWars;
 using Daybreak.Services.Injection;
 using Daybreak.Services.InternetChecker;
+using Daybreak.Services.Keyboard;
 using Daybreak.Services.LaunchConfigurations;
 using Daybreak.Services.Logging;
 using Daybreak.Services.MDns;
-using Daybreak.Services.Menu;
 using Daybreak.Services.Metrics;
 using Daybreak.Services.Mods;
 using Daybreak.Services.Monitoring;
@@ -39,7 +36,6 @@ using Daybreak.Services.Plugins;
 using Daybreak.Services.Privilege;
 using Daybreak.Services.Registry;
 using Daybreak.Services.ReShade;
-using Daybreak.Services.ReShade.Notifications;
 using Daybreak.Services.Screens;
 using Daybreak.Services.Screenshots;
 using Daybreak.Services.Shortcuts;
@@ -55,9 +51,7 @@ using Daybreak.Services.TradeChat.Models;
 using Daybreak.Services.TradeChat.Notifications;
 using Daybreak.Services.UMod;
 using Daybreak.Services.Updater;
-using Daybreak.Services.Updater.PostUpdate;
 using Daybreak.Services.Wiki;
-using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Plugins;
 using Daybreak.Shared.Services.Api;
 using Daybreak.Shared.Services.ApplicationArguments;
@@ -70,15 +64,15 @@ using Daybreak.Shared.Services.Events;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.Experience;
 using Daybreak.Shared.Services.Guildwars;
+using Daybreak.Shared.Services.Initialization;
 using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.InternetChecker;
+using Daybreak.Shared.Services.Keyboard;
 using Daybreak.Shared.Services.LaunchConfigurations;
-using Daybreak.Shared.Services.Logging;
 using Daybreak.Shared.Services.MDns;
 using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Metrics;
 using Daybreak.Shared.Services.Mods;
-using Daybreak.Shared.Services.Navigation;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Onboarding;
 using Daybreak.Shared.Services.Options;
@@ -90,13 +84,11 @@ using Daybreak.Shared.Services.Screens;
 using Daybreak.Shared.Services.Screenshots;
 using Daybreak.Shared.Services.SevenZip;
 using Daybreak.Shared.Services.Shortcuts;
-using Daybreak.Shared.Services.Startup;
 using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.Toolbox;
 using Daybreak.Shared.Services.TradeChat;
 using Daybreak.Shared.Services.UMod;
 using Daybreak.Shared.Services.Updater;
-using Daybreak.Shared.Services.Updater.PostUpdate;
 using Daybreak.Shared.Services.Wiki;
 using Daybreak.Themes;
 using Daybreak.Views;
@@ -104,32 +96,23 @@ using Daybreak.Views.Copy;
 using Daybreak.Views.Installation;
 using Daybreak.Views.Mods;
 using Daybreak.Views.Trade;
-using Microsoft.CorrelationVector;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Fast.Components.FluentUI;
+using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.Identity.Client;
 using Microsoft.Identity.Client.Desktop;
 using OpenTelemetry.Resources;
-using Slim;
 using TrailBlazr.Extensions;
 using TrailBlazr.Services;
+using IMenuService = Daybreak.Shared.Services.Menu.IMenuService;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
+using MenuService = Daybreak.Services.Menu.MenuService;
 
 namespace Daybreak.Configuration;
 
 public class ProjectConfiguration : PluginConfigurationBase
 {
     public static readonly Version CurrentVersion = Version.Parse(Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? throw new InvalidOperationException("Unable to get current version"));
-
-    public override void RegisterResolvers(IServiceManager serviceManager)
-    {
-        serviceManager.ThrowIfNull();
-
-        serviceManager.RegisterOptionsManager<OptionsManager>();
-        serviceManager.RegisterResolver(new LoggerResolver());
-        serviceManager.RegisterResolver(new ClientWebSocketResolver());
-    }
 
     public override void RegisterServices(IServiceCollection services)
     {
@@ -140,6 +123,10 @@ public class ProjectConfiguration : PluginConfigurationBase
 
         services.AddTrailBlazr();
         RegisterHttpClients(services);
+        services.RegisterClientWebSocket<TradeChatService<KamadanTradeChatOptions>>()
+            .Build();
+        services.RegisterClientWebSocket<TradeChatService<AscalonTradeChatOptions>>()
+            .Build();
         services.AddSingleton<IPublicClientApplication>(sp =>
         {
             var logger = sp.GetRequiredService<ILogger<PublicClientApplication>>();
@@ -171,30 +158,6 @@ public class ProjectConfiguration : PluginConfigurationBase
                 .Build();
         });
 
-        services.AddSingleton<SwappableLoggerProvider>();
-        services.AddSingleton<ILogsManager, JsonLogsManager>();
-        services.AddSingleton<IConsoleLogsWriter, ConsoleLogsWriter>();
-        services.AddSingleton<IEventViewerLogsWriter, EventViewerLogsWriter>();
-        services.AddSingleton<ILoggerFactory, ILoggerFactory>(sp =>
-        {
-            var swappableLoggerProvider = sp.GetRequiredService<SwappableLoggerProvider>();
-            var factory = LoggerFactory.Create(logging =>
-            {
-                logging.ClearProviders();
-                logging.SetMinimumLevel(LogLevel.Trace);
-                logging.AddProvider(new CVLoggerProvider(sp.GetRequiredService<ILogsWriter>()));
-                logging.AddProvider(swappableLoggerProvider);
-                logging.AddFilter<SwappableLoggerProvider>(static (_, level) => level >= LogLevel.Warning);
-            });
-
-            return factory;
-        });
-        services.AddSingleton<ILogsWriter, CompositeLogsWriter>(sp => new CompositeLogsWriter(
-            sp.GetRequiredService<ILogsManager>(),
-            sp.GetRequiredService<IConsoleLogsWriter>(),
-            sp.GetRequiredService<IEventViewerLogsWriter>()));
-
-        services.AddScoped((sp) => new ScopeMetadata(new CorrelationVector()));
         services.AddSingleton(sp =>
         {
             var resourceBuilder = ResourceBuilder.CreateDefault().AddService("Daybreak", serviceVersion: CurrentVersion.ToString());
@@ -211,51 +174,28 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<AppViewModel>();
 
         services.AddSingleton<ViewManager>();
-        services.AddSingleton<ProcessorUsageMonitor>();
-        services.AddSingleton<MemoryUsageMonitor>();
-        services.AddSingleton<DiskUsageMonitor>();
-        services.AddSingleton<PostUpdateActionManager>();
-        services.AddSingleton<IPostUpdateActionManager>(sp => sp.GetRequiredService<PostUpdateActionManager>());
-        services.AddSingleton<IPostUpdateActionProducer>(sp => sp.GetRequiredService<PostUpdateActionManager>());
-        services.AddSingleton<IPostUpdateActionProvider>(sp => sp.GetRequiredService<PostUpdateActionManager>());
         services.AddSingleton<IMenuService, MenuService>();
         services.AddSingleton<IMenuServiceInitializer, MenuService>(sp => sp.GetRequiredService<IMenuService>().Cast<MenuService>());
-        services.AddSingleton<IMenuServiceProducer, MenuService>(sp => sp.GetRequiredService<IMenuService>().Cast<MenuService>());
         services.AddSingleton<IMenuServiceButtonHandler, MenuService>(sp => sp.GetRequiredService<IMenuService>().Cast<MenuService>());
-        services.AddSingleton<IShortcutManager, ShortcutManager>();
         services.AddSingleton<IMetricsService, MetricsService>();
-        services.AddSingleton<IStartupActionProducer, StartupActionManager>();
-        services.AddSingleton<IOptionsProducer, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().Cast<OptionsManager>());
-        services.AddSingleton<IOptionsUpdateHook, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().Cast<OptionsManager>());
-        services.AddSingleton<IOptionsProvider, OptionsManager>(sp => sp.GetRequiredService<IOptionsManager>().Cast<OptionsManager>());
-        services.AddSingleton<IThemeManager, BlazorThemeInteropService>();
-        services.AddSingleton<IThemeProducer, BlazorThemeInteropService>(sp => sp.GetRequiredService<IThemeManager>().Cast<BlazorThemeInteropService>());
         services.AddSingleton<INotificationService, NotificationService>();
         services.AddSingleton<INotificationProducer, NotificationService>(sp => sp.GetRequiredService<INotificationService>().Cast<NotificationService>());
-        services.AddSingleton<INotificationHandlerProducer, NotificationService>(sp => sp.GetRequiredService<INotificationService>().Cast<NotificationService>());
         services.AddSingleton<IInternetCheckingService, InternetCheckingService>();
-        services.AddSingleton<IConnectivityStatus, ConnectivityStatus>();
         services.AddSingleton<INotificationStorage, InMemoryNotificationStorage>();
-        services.AddSingleton<ITradeAlertingService, TradeAlertingService>();
         services.AddSingleton<IModsManager, ModsManager>();
         services.AddSingleton<IPluginsService, PluginsService>();
-        services.AddSingleton<ISplashScreenService, SplashScreenService>();
-        services.AddSingleton<IGuildWarsExecutableManager, GuildWarsExecutableManager>();
         services.AddSingleton<ISevenZipExtractor, Daybreak.Services.SevenZip.SevenZipExtractor>();
-        services.AddSingleton<IOptionsSynchronizationService, OptionsSynchronizationService>();
         services.AddSingleton<IMDomainNameService, MDomainNameService>();
-        services.AddSingleton<IMDomainRegistrar, MDomainRegistrar>();
         services.AddSingleton<IAttachedApiAccessor, AttachedApiAccessor>();
-        services.AddSingleton<TelemetryHost>();
         services.AddSingleton<PrivilegeContext>();
         services.AddSingleton<ViewRedirectContext>();
         services.AddSingleton<JSConsoleInterop>();
-        services.AddSingleton<GameScreenshotsTheme>();
+        services.AddSingleton<OptionsManager>();
+        services.AddSingleton<IOptionsProvider, OptionsManager>(sp => sp.GetRequiredService<OptionsManager>());
+        
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
-        services.AddScoped<IApplicationUpdater, ApplicationUpdater>();
         services.AddScoped<IBuildTemplateManager, BuildTemplateManager>();
-        services.AddScoped<IScreenManager, ScreenManager>();
         services.AddScoped<IOnboardingService, OnboardingService>();
         services.AddScoped<IExperienceCalculator, ExperienceCalculator>();
         services.AddScoped<IAttributePointCalculator, AttributePointCalculator>();
@@ -265,12 +205,10 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<ITradeChatService<KamadanTradeChatOptions>, TradeChatService<KamadanTradeChatOptions>>();
         services.AddScoped<ITradeChatService<AscalonTradeChatOptions>, TradeChatService<AscalonTradeChatOptions>>();
         services.AddScoped<ITraderQuoteService, TraderQuoteService>();
-        services.AddScoped<IWordHighlightingService, WordHighlightingService>();
         services.AddScoped<ITradeHistoryDatabase, TradeHistoryDatabase>();
         services.AddScoped<IGuildWarsCopyService, GuildWarsCopyService>();
         services.AddScoped<IItemHashService, ItemHashService>();
         services.AddScoped<IRegistryService, RegistryService>();
-        services.AddScoped<IEventNotifierService, EventNotifierService>();
         services.AddScoped<IToolboxClient, ToolboxClient>();
         services.AddScoped<IDaybreakInjector, DaybreakInjector>();
         services.AddScoped<IProcessInjector, ProcessInjector>();
@@ -278,11 +216,28 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<ILaunchConfigurationService, LaunchConfigurationService>();
         services.AddScoped<IEventService, EventService>();
         services.AddScoped<IApplicationArgumentService, ApplicationArgumentService>();
-        services.AddScoped<IArgumentHandlerProducer, IApplicationArgumentService>(sp => sp.GetRequiredService<IApplicationArgumentService>());
         services.AddScoped<IWikiService, WikiService>();
         services.AddScoped<IPrivilegeManager, PrivilegeManager>();
         services.AddScoped<IGraphClient, BlazorGraphClient>();
         services.AddScoped<IScreenshotService, ScreenshotService>();
+
+        services.AddHostedSingleton<IApplicationUpdater, ApplicationUpdater>();
+        services.AddHostedSingleton<IThemeManager, BlazorThemeInteropService>();
+        services.AddHostedSingleton<IKeyboardHookService, KeyboardHookService>();
+        services.AddHostedSingleton<IScreenManager, ScreenManager>();
+        services.AddHostedSingleton<IConnectivityStatus, ConnectivityStatus>();
+        services.AddHostedSingleton<ITradeAlertingService, TradeAlertingService>();
+        services.AddHostedSingleton<IGuildWarsExecutableManager, GuildWarsExecutableManager>();
+        services.AddHostedSingleton<IEventNotifierService, EventNotifierService>();
+        services.AddHostedSingleton<IShortcutManager, ShortcutManager>();
+        services.AddHostedSingleton<IMDomainRegistrar, MDomainRegistrar>();
+        services.AddHostedSingleton<IOptionsSynchronizationService, OptionsSynchronizationService>();
+        services.AddHostedSingleton<GameScreenshotsTheme>();
+        services.AddHostedService<StartupActionManager>();
+        services.AddHostedService<ProcessorUsageMonitor>();
+        services.AddHostedService<MemoryUsageMonitor>();
+        services.AddHostedService<TelemetryHost>();
+        services.AddHostedService<DiskUsageMonitor>();
     }
 
     public override void RegisterViews(IViewProducer viewProducer)
@@ -333,11 +288,12 @@ public class ProjectConfiguration : PluginConfigurationBase
     {
         startupActionProducer.ThrowIfNull();
 
-        startupActionProducer.RegisterAction<RestoreWindowPositionStartupAction>();
         startupActionProducer.RegisterAction<RenameInstallerAction>();
         startupActionProducer.RegisterAction<UpdateUModAction>();
         startupActionProducer.RegisterAction<CredentialsOptionsMigrator>();
         startupActionProducer.RegisterAction<UpdateToolboxAction>();
+        startupActionProducer.RegisterAction<UpdateGuildWarsExecutable>();
+        startupActionProducer.RegisterAction<UpdateReShadeAction>();
     }
 
     public override void RegisterPostUpdateActions(IPostUpdateActionProducer postUpdateActionProducer)
@@ -351,10 +307,8 @@ public class ProjectConfiguration : PluginConfigurationBase
 
         optionsProducer.RegisterOptions<TelemetryOptions>();
         optionsProducer.RegisterOptions<LauncherOptions>();
-        optionsProducer.RegisterOptions<SoundOptions>();
         optionsProducer.RegisterOptions<ThemeOptions>();
 
-        optionsProducer.RegisterOptions<BrowserOptions>();
         optionsProducer.RegisterOptions<SynchronizationOptions>();
         optionsProducer.RegisterOptions<FocusViewOptions>();
 
@@ -375,6 +329,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         optionsProducer.RegisterOptions<CredentialManagerOptions>();
         optionsProducer.RegisterOptions<LaunchConfigurationServiceOptions>();
         optionsProducer.RegisterOptions<DirectSongOptions>();
+        optionsProducer.RegisterOptions<GuildWarsVersionCheckerOptions>();
 
         optionsProducer.RegisterOptions<GuildWarsScreenPlacerOptions>();
     }
@@ -385,19 +340,18 @@ public class ProjectConfiguration : PluginConfigurationBase
         notificationHandlerProducer.RegisterNotificationHandler<MessageBoxHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<TradeMessageNotificationHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<UpdateNotificationHandler>();
-        notificationHandlerProducer.RegisterNotificationHandler<ReShadeConfigChangedHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<NavigateToCalendarViewHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<GuildWarsUpdateNotificationHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<GuildWarsBatchUpdateNotificationHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<ToolboxUpdateHandler>();
     }
 
-    public override void RegisterMods(IModsManager modsManager)
+    public override void RegisterMods(IModsProducer modsManager)
     {
+        modsManager.RegisterMod<IReShadeService, ReShadeService>();
         modsManager.RegisterMod<IGuildWarsVersionChecker, GuildWarsVersionChecker>();
         modsManager.RegisterMod<IDaybreakApiService, DaybreakApiService>();
         modsManager.RegisterMod<IToolboxService, ToolboxService>();
-        modsManager.RegisterMod<IReShadeService, ReShadeService>();
         modsManager.RegisterMod<IUModService, UModService>();
         modsManager.RegisterMod<IGuildwarsScreenPlacer, GuildwarsScreenPlacer>();
         modsManager.RegisterMod<IDirectSongService, DirectSongService>(singleton: true);

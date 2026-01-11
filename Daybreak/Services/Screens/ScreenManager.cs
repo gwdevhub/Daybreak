@@ -1,104 +1,90 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models;
+using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Screens;
 using Daybreak.Shared.Utils;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System.Configuration;
+using Microsoft.Extensions.Options;
+using Photino.NET;
 using System.Core.Extensions;
 using System.Diagnostics;
+using System.Drawing;
 using System.Extensions;
-using System.Windows;
-using System.Windows.Extensions.Services;
-using System.Windows.Media;
-using WpfExtended.Blazor.Launch;
+using System.Extensions.Core;
+using System.Runtime.InteropServices;
 
 namespace Daybreak.Services.Screens;
 
 internal sealed class ScreenManager(
-    BlazorHostWindow host,
-    ILiveUpdateableOptions<ScreenManagerOptions> liveUpdateableOptions,
-    ILogger<ScreenManager> logger) : IScreenManager, IApplicationLifetimeService
+    PhotinoWindow photinoWindow,
+    IOptionsProvider optionsProvider,
+    IOptionsMonitor<ScreenManagerOptions> liveUpdateableOptions,
+    ILogger<ScreenManager> logger) : IScreenManager, IHostedService
 {
-    private readonly BlazorHostWindow host = host.ThrowIfNull();
-    private readonly ILiveUpdateableOptions<ScreenManagerOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
+    private readonly PhotinoWindow photinoWindow = photinoWindow.ThrowIfNull();
+    private readonly IOptionsProvider optionsProvider = optionsProvider.ThrowIfNull();
+    private readonly IOptionsMonitor<ScreenManagerOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
     private readonly ILogger<ScreenManager> logger = logger.ThrowIfNull();
 
-    public IEnumerable<Screen> Screens { get; } = WpfScreenHelper.Screen.AllScreens
-        .Select((screen, index) => new Screen(index, screen.Bounds));
+    public IEnumerable<Screen> Screens => GetAllScreens();
+
+    Task IHostedService.StartAsync(CancellationToken cancellationToken)
+    {
+        // No need to move window on start here. Window position is set in the launcher before creation
+        return Task.CompletedTask;
+    }
+
+    Task IHostedService.StopAsync(CancellationToken cancellationToken)
+    {
+        this.SaveWindowPositionAndSize();
+        return Task.CompletedTask;
+    }
 
     public void MoveWindowToSavedPosition()
     {
-        var screenOptions = this.liveUpdateableOptions.Value;
-        var dpiScale = VisualTreeHelper.GetDpi(this.host);
-        var desiredX = screenOptions.X;
-        var desiredY = screenOptions.Y;
-        var desiredWidth = screenOptions.Width;
-        var desiredHeight = screenOptions.Height;
-        if (screenOptions.DpiX > 0 && screenOptions.DpiY > 0)
-        {
-            desiredX *= dpiScale.DpiScaleX / screenOptions.DpiX;
-            desiredY *= dpiScale.DpiScaleY / screenOptions.DpiY;
-            desiredWidth *= dpiScale.DpiScaleX / screenOptions.DpiX;
-            desiredHeight *= dpiScale.DpiScaleY / screenOptions.DpiY;
-        }
-
-        // Validate that the desired position will be at least partially on screen.
-        var validPosition = false;
-        var desiredRect = new Rect(desiredX, desiredY, desiredWidth, desiredHeight);
-        foreach(var screen in this.Screens)
-        {
-            if (desiredRect.IntersectsWith(screen.Size))
-            {
-                validPosition = true;
-                break;
-            }
-        }
-
-        // If the desired window position is not valid, we let the window use the default values.
-        if (validPosition is true)
-        {
-            this.host.Left = desiredX;
-            this.host.Top = desiredY;
-        }
-
-        // If the desired size of the window is not valid, we let the window use the default values.
-        if (desiredWidth > 0 &&
-            desiredHeight > 0)
-        {
-            this.host.Width = desiredWidth;
-            this.host.Height = desiredHeight;
-        }
+        var savedPosition = this.GetSavedPosition();
+        var hwnd = this.photinoWindow.WindowHandle;
+        NativeMethods.SetWindowPos(hwnd, NativeMethods.HWND_TOP, savedPosition.Left, savedPosition.Top, savedPosition.Width, savedPosition.Height, NativeMethods.SWP_SHOWWINDOW);
     }
 
     public void SaveWindowPositionAndSize()
     {
-        if (this.host.WindowState is not WindowState.Normal)
-        {
-            return;
-        }
+        var position = new Rectangle(
+            this.photinoWindow.Left,
+            this.photinoWindow.Top,
+            this.photinoWindow.Width,
+            this.photinoWindow.Height);
 
-        var dpiScale = VisualTreeHelper.GetDpi(this.host);
-        var config = this.liveUpdateableOptions.Value;
-        config.X = this.host.Left;
-        config.Y = this.host.Top;
-        config.Width = this.host.ActualWidth;
-        config.Height = this.host.ActualHeight;
-        config.DpiX = dpiScale.DpiScaleX;
-        config.DpiY = dpiScale.DpiScaleY;
-        this.liveUpdateableOptions.UpdateOption();
+        var options = this.liveUpdateableOptions.CurrentValue;
+        options.X = position.Left;
+        options.Y = position.Top;
+        options.Width = position.Width;
+        options.Height = position.Height;
+        this.optionsProvider.SaveOption(options);
     }
 
     public bool MoveGuildwarsToScreen(Screen screen)
     {
-        this.logger.LogDebug("Attempting to move guildwars to screen {screenId}", screen.Id);
+        var scopedLogger = this.logger.CreateScopedLogger();
+        scopedLogger.LogDebug("Attempting to move guildwars to screen {screenId}", screen.Id);
         var hwnd = GetMainWindowHandle();
         if (hwnd.HasValue is false)
         {
             return false;
         }
 
-        NativeMethods.SetWindowPos(hwnd.Value, NativeMethods.HWND_TOP, screen.Size.Left.ToInt(), screen.Size.Top.ToInt(), screen.Size.Width.ToInt(), screen.Size.Height.ToInt(), NativeMethods.SWP_SHOWWINDOW);
+        NativeMethods.SetWindowPos(hwnd.Value, NativeMethods.HWND_TOP, screen.Size.Left, screen.Size.Top, screen.Size.Width, screen.Size.Height, NativeMethods.SWP_SHOWWINDOW);
         return true;
+    }
+
+    public Rectangle GetSavedPosition()
+    {
+        return new Rectangle(
+            (int)this.liveUpdateableOptions.CurrentValue.X,
+            (int)this.liveUpdateableOptions.CurrentValue.Y,
+            (int)this.liveUpdateableOptions.CurrentValue.Width,
+            (int)this.liveUpdateableOptions.CurrentValue.Height);
     }
 
     private static IntPtr? GetMainWindowHandle()
@@ -107,13 +93,26 @@ internal sealed class ScreenManager(
         return process is not null ? process.MainWindowHandle : default;
     }
 
-    public void OnStartup()
+    private static List<Screen> GetAllScreens()
     {
-        //this.host.WindowParametersChanged += (_, _) => this.SaveWindowPositionAndSize();
-    }
+        var screens = new List<Screen>();
+        int index = 0;
 
-    public void OnClosing()
-    {
-        this.SaveWindowPositionAndSize();
+        NativeMethods.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, (hMonitor, hdcMonitor, ref lprcMonitor, dwData) =>
+        {
+            var monitorInfo = new NativeMethods.MonitorInfoEx
+            {
+                CbSize = (uint)Marshal.SizeOf<NativeMethods.MonitorInfoEx>()
+            };
+
+            if (NativeMethods.GetMonitorInfo(hMonitor, ref monitorInfo))
+            {
+                screens.Add(new Screen(index++, new Rectangle(monitorInfo.RcMonitor.Left, monitorInfo.RcMonitor.Top, monitorInfo.RcMonitor.Width, monitorInfo.RcMonitor.Height)));
+            }
+
+            return true;
+        }, IntPtr.Zero);
+
+        return screens;
     }
 }

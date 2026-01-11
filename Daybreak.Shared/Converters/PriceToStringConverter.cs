@@ -1,16 +1,8 @@
-﻿using System.Globalization;
-using System.Windows.Data;
-
-namespace Daybreak.Shared.Converters;
-public sealed class PriceToStringConverter : IValueConverter
+﻿namespace Daybreak.Shared.Converters;
+public static class PriceToStringConverter
 {
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    public static string Convert(object value)
     {
-        if (targetType != typeof(string))
-        {
-            throw new InvalidOperationException($"Unable to convert to {targetType.Name}");
-        }
-
         var price = value switch
         {
             byte byteVal => byteVal,
@@ -34,10 +26,5 @@ public sealed class PriceToStringConverter : IValueConverter
         }
 
         return $"{price}{suffix}";
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        throw new NotImplementedException();
     }
 }

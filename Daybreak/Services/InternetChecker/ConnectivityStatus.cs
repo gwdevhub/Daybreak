@@ -2,24 +2,23 @@
 using Daybreak.Shared.Models.Notifications;
 using Daybreak.Shared.Services.InternetChecker;
 using Daybreak.Shared.Services.Notifications;
+using Microsoft.Extensions.Hosting;
 using System.Core.Extensions;
-using System.Windows.Extensions.Services;
 
 namespace Daybreak.Services.InternetChecker;
 
 internal sealed class ConnectivityStatus(
     IInternetCheckingService internetCheckingService,
-    INotificationService notificationService) : IConnectivityStatus, IApplicationLifetimeService
+    INotificationService notificationService) : IConnectivityStatus, IHostedService
 {
     private static readonly TimeSpan ConnectivityBackoff = TimeSpan.FromSeconds(30);
 
-    private readonly CancellationTokenSource cancellationTokenSource = new();
     private readonly IInternetCheckingService internetCheckingService = internetCheckingService.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
 
     public bool IsInternetAvailable { get; private set; } = false;
 
-    public async void OnStartup()
+    async Task IHostedService.StartAsync(CancellationToken cancellationToken)
     {
         var checkingConnectionNotification = this.notificationService.NotifyInformation(
             "Checking connection",
@@ -28,9 +27,9 @@ internal sealed class ConnectivityStatus(
             clickClosable: false,
             persistent: false);
         NotificationToken? internetUnavailableNotification = default;
-        while (!this.cancellationTokenSource.IsCancellationRequested)
+        while (!cancellationToken.IsCancellationRequested)
         {
-            var connectionStatus = await this.internetCheckingService.CheckConnectionAvailable(this.cancellationTokenSource.Token);
+            var connectionStatus = await this.internetCheckingService.CheckConnectionAvailable(cancellationToken);
             if (checkingConnectionNotification.Closed is not true)
             {
                 checkingConnectionNotification.Cancel();
@@ -64,13 +63,12 @@ internal sealed class ConnectivityStatus(
                     persistent: false);
             }
 
-            await Task.Delay(ConnectivityBackoff, this.cancellationTokenSource.Token);
+            await Task.Delay(ConnectivityBackoff, cancellationToken);
         }
     }
 
-    public void OnClosing()
+    Task IHostedService.StopAsync(CancellationToken cancellationToken)
     {
-        this.cancellationTokenSource.Cancel();
-        this.cancellationTokenSource.Dispose();
+        return Task.CompletedTask;
     }
 }

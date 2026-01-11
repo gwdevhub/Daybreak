@@ -2,15 +2,15 @@
 using Daybreak.Services.Graph.Models;
 using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Services.BuildTemplates;
+using Daybreak.Shared.Services.Options;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.Identity.Client;
 using Newtonsoft.Json;
-using System.Configuration;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
-using System.Net.Http;
 using System.Net.Http.Headers;
 
 namespace Daybreak.Services.Graph;
@@ -21,7 +21,6 @@ internal sealed class BlazorGraphClient : IGraphClient
     private const string ProfileEndpoint = "me";
     private const string BuildsSyncFileUri = $"me/drive/root:/Daybreak/Builds/daybreak.json:/content";
     private const string SettingsSyncFileUri = $"me/drive/root:/Daybreak/Settings/daybreak.json:/content";
-    private const string ContentSuffix = ":/content";
 
     public const string RedirectUri = "http://localhost:42111";
 
@@ -34,23 +33,24 @@ internal sealed class BlazorGraphClient : IGraphClient
         "offline_access"
     ];
 
-    private static readonly byte[] Entropy = System.Convert.FromBase64String("R3VpbGR3YXJz");
-
+    private readonly IOptionsProvider optionsProvider;
     private readonly IPublicClientApplication publicClientApplication;
     private readonly IBuildTemplateManager buildTemplateManager;
-    private readonly ILiveUpdateableOptions<SynchronizationOptions> liveUpdateableOptions;
+    private readonly IOptionsMonitor<SynchronizationOptions> liveUpdateableOptions;
     private readonly IHttpClient<BlazorGraphClient> httpClient;
     private readonly ILogger<BlazorGraphClient> logger;
 
     private List<BuildFile>? buildsCache;
 
     public BlazorGraphClient(
+        IOptionsProvider optionsProvider,
         IPublicClientApplication publicClientApplication,
         IBuildTemplateManager buildTemplateManager,
-        ILiveUpdateableOptions<SynchronizationOptions> liveUpdateableOptions,
+        IOptionsMonitor<SynchronizationOptions> liveUpdateableOptions,
         IHttpClient<BlazorGraphClient> httpClient,
         ILogger<BlazorGraphClient> logger)
     {
+        this.optionsProvider = optionsProvider.ThrowIfNull();
         this.publicClientApplication = publicClientApplication.ThrowIfNull();
         this.buildTemplateManager = buildTemplateManager.ThrowIfNull();
         this.liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
@@ -262,9 +262,10 @@ internal sealed class BlazorGraphClient : IGraphClient
 
     public void ResetAuthorization()
     {
-        this.liveUpdateableOptions.Value.ProtectedGraphAccessToken = null;
-        this.liveUpdateableOptions.Value.ProtectedGraphRefreshToken = null;
-        this.liveUpdateableOptions.UpdateOption();
+        var options = this.liveUpdateableOptions.CurrentValue;
+        options.ProtectedGraphAccessToken = null;
+        options.ProtectedGraphRefreshToken = null;
+        this.optionsProvider.SaveOption(options);
     }
 
     private async Task<string?> GetValidAccessToken()

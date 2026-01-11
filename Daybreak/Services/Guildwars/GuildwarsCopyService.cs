@@ -2,13 +2,13 @@
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.Guildwars;
 using Microsoft.Extensions.Logging;
-using Microsoft.Win32;
+using Photino.NET;
 using System.Core.Extensions;
-using System.IO;
 
 namespace Daybreak.Services.Guildwars;
 
 internal sealed class GuildWarsCopyService(
+    PhotinoWindow photinoWindow,
     IGuildWarsExecutableManager guildWarsExecutableManager,
     ILogger<GuildWarsCopyService> logger) : IGuildWarsCopyService
 {
@@ -27,6 +27,7 @@ internal sealed class GuildWarsCopyService(
         "GwLoginClient.dll"
     ];
 
+    private readonly PhotinoWindow photinoWindow = photinoWindow.ThrowIfNull();
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
     private readonly ILogger<GuildWarsCopyService> logger = logger.ThrowIfNull();
 
@@ -58,7 +59,7 @@ internal sealed class GuildWarsCopyService(
                 totalBytesToCopy += fi.Length;
             }
 
-            if (!TryGetDestinationPath(out var destinationPath))
+            if ((await this.photinoWindow.ShowOpenFolderAsync("Select Destination Folder")).FirstOrDefault() is not string destinationPath)
             {
                 this.logger.LogDebug("Copy cancelled. Destination path selection cancelled");
                 progress.Report(ProgressCancelled);
@@ -103,24 +104,5 @@ internal sealed class GuildWarsCopyService(
             progress.Report(ProgressCancelled);
             return true;
         }, cancellationToken);
-    }
-
-    private static bool TryGetDestinationPath(out string path)
-    {
-        path = string.Empty;
-        var folderPicker = new OpenFolderDialog()
-        {
-            Title = "Select Destination Folder",
-            Multiselect = false,
-            ValidateNames = true
-        };
-
-        if (folderPicker.ShowDialog() is not true)
-        {
-            return false;
-        }
-
-        path = Path.GetFullPath(folderPicker.FolderName);
-        return true;
     }
 }

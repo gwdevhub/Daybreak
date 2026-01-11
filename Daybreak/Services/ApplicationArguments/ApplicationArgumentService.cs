@@ -1,21 +1,21 @@
 ﻿using Daybreak.Shared.Services.ApplicationArguments;
 using Daybreak.Shared.Services.ApplicationArguments.ArgumentHandling;
 using Microsoft.Extensions.Logging;
-using Slim;
 using System.Core.Extensions;
 using System.Extensions;
+using System.Extensions.Core;
 
 namespace Daybreak.Services.ApplicationArguments;
 
-internal sealed class ApplicationArgumentService(IServiceManager serviceManager, ILogger<ApplicationArgumentService> logger) : IApplicationArgumentService
+internal sealed class ApplicationArgumentService(IEnumerable<IArgumentHandler> argumentHandlers, ILogger<ApplicationArgumentService> logger) : IApplicationArgumentService
 {
-    private readonly IServiceManager serviceManager = serviceManager.ThrowIfNull();
     private readonly ILogger<ApplicationArgumentService> logger = logger.ThrowIfNull();
+    private readonly IEnumerable<IArgumentHandler> argumentHandlers = argumentHandlers.ThrowIfNull();
 
     public void HandleArguments(string[] args)
     {
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.HandleArguments), string.Empty);
-        var handlers = this.serviceManager.GetServicesOfType<IArgumentHandler>().ToList();
+        var scopedLogger = this.logger.CreateScopedLogger();
+        var handlers = this.argumentHandlers.ToList();
         var argQueue = new Queue<string>(args);
         while (argQueue.TryDequeue(out var arg))
         {
@@ -45,11 +45,5 @@ internal sealed class ApplicationArgumentService(IServiceManager serviceManager,
 
             handler.HandleArguments([.. handlerArgs]);
         }
-    }
-
-    public void RegisterArgumentHandler<T>()
-        where T : class, IArgumentHandler
-    {
-        this.serviceManager.RegisterScoped<T>();
     }
 }

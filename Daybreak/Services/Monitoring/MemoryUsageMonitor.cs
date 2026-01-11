@@ -1,15 +1,15 @@
 ﻿using System.Diagnostics.Metrics;
 using System.Diagnostics;
-using System.Windows.Extensions.Services;
 using System.Core.Extensions;
 using System.Extensions;
 using Daybreak.Shared.Services.Metrics;
 using Daybreak.Shared.Models.Metrics;
+using Microsoft.Extensions.Hosting;
 
 namespace Daybreak.Services.Monitoring;
 
 internal sealed class MemoryUsageMonitor(
-    IMetricsService metricsService) : IApplicationLifetimeService
+    IMetricsService metricsService) : IHostedService
 {
     private const string MemoryUsage = "Memory Usage";
     private const string MemoryUsageUnit = "MBs";
@@ -17,54 +17,53 @@ internal sealed class MemoryUsageMonitor(
 
     private readonly Histogram<long> memoryUsageHistogram = metricsService.ThrowIfNull().CreateHistogram<long>(MemoryUsage, MemoryUsageUnit, MemoryUsageDescription, AggregationTypes.NoAggregate);
     private readonly Process currentProcess = Process.GetCurrentProcess();
-    private readonly CancellationTokenSource cancellationTokenSource = new();
 
     private PerformanceCounter? memoryPerformanceCounter;
 
-    public void OnClosing()
+    async Task IHostedService.StartAsync(CancellationToken cancellationToken)
     {
-        this.cancellationTokenSource.Cancel();
+        await this.StartupAndPeriodicallyReadMemoryUsage(cancellationToken);
     }
 
-    public void OnStartup()
+    Task IHostedService.StopAsync(CancellationToken cancellationToken)
     {
-        _ = Task.Run(this.StartupAndPeriodicallyReadMemoryUsage, this.cancellationTokenSource.Token);
+        return Task.CompletedTask;
     }
 
-    private async Task StartupAndPeriodicallyReadMemoryUsage()
+    private async Task StartupAndPeriodicallyReadMemoryUsage(CancellationToken cancellationToken)
     {
         var processName = this.currentProcess.ProcessName;
         try
         {
             this.memoryPerformanceCounter = new PerformanceCounter("Process", "Working Set - Private", processName);
-            await this.PeriodicallyCheckMemoryUsagePerfCounterBased();
+            await this.PeriodicallyCheckMemoryUsagePerfCounterBased(cancellationToken);
         }
         catch
         {
-            await this.PeriodicallyCheckMemoryUsageProcessBased();
+            await this.PeriodicallyCheckMemoryUsageProcessBased(cancellationToken);
         }
     }
 
-    private async Task PeriodicallyCheckMemoryUsagePerfCounterBased()
+    private async Task PeriodicallyCheckMemoryUsagePerfCounterBased(CancellationToken cancellationToken)
     {
-        while (!this.cancellationTokenSource.IsCancellationRequested)
+        while (!cancellationToken.IsCancellationRequested)
         {
             if (this.memoryPerformanceCounter is not null)
             {
                 this.memoryUsageHistogram.Record(this.memoryPerformanceCounter.RawValue / 1024);
             }
 
-            await Task.Delay(1000);
+            await Task.Delay(1000, cancellationToken);
         }
     }
 
-    private async Task PeriodicallyCheckMemoryUsageProcessBased()
+    private async Task PeriodicallyCheckMemoryUsageProcessBased(CancellationToken cancellationToken)
     {
-        while (!this.cancellationTokenSource.IsCancellationRequested)
+        while (!cancellationToken.IsCancellationRequested)
         {
             this.currentProcess.Refresh();
             this.memoryUsageHistogram.Record(this.currentProcess.PrivateMemorySize64 / 1000000);
-            await Task.Delay(1000);
+            await Task.Delay(1000, cancellationToken);
         }
     }
 }

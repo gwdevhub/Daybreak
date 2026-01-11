@@ -3,4 +3,5 @@
 namespace Daybreak.Shared.Services.Guildwars;
 public interface IGuildWarsVersionChecker : IModService
 {
+    ValueTask CheckExecutables();
 }
