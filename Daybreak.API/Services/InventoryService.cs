@@ -52,9 +52,8 @@ public sealed class InventoryService(
                         continue;
                     }
 
-                    for(var i = 0; i < bag->ItemsCount; i++)
+                    foreach(var item in bag->Items)
                     {
-                        var item = bag->Items.Buffer[i];
                         if (item.IsNull)
                         {
                             continue;
