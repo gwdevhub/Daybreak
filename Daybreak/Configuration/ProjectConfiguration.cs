@@ -25,7 +25,6 @@ using Daybreak.Services.Keyboard;
 using Daybreak.Services.LaunchConfigurations;
 using Daybreak.Services.Logging;
 using Daybreak.Services.MDns;
-using Daybreak.Services.Menu;
 using Daybreak.Services.Metrics;
 using Daybreak.Services.Mods;
 using Daybreak.Services.Monitoring;
@@ -99,13 +98,15 @@ using Daybreak.Views.Mods;
 using Daybreak.Views.Trade;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Fast.Components.FluentUI;
+using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.Identity.Client;
 using Microsoft.Identity.Client.Desktop;
 using OpenTelemetry.Resources;
 using TrailBlazr.Extensions;
 using TrailBlazr.Services;
+using IMenuService = Daybreak.Shared.Services.Menu.IMenuService;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
+using MenuService = Daybreak.Services.Menu.MenuService;
 
 namespace Daybreak.Configuration;
 
@@ -306,7 +307,6 @@ public class ProjectConfiguration : PluginConfigurationBase
 
         optionsProducer.RegisterOptions<TelemetryOptions>();
         optionsProducer.RegisterOptions<LauncherOptions>();
-        optionsProducer.RegisterOptions<SoundOptions>();
         optionsProducer.RegisterOptions<ThemeOptions>();
 
         optionsProducer.RegisterOptions<SynchronizationOptions>();
@@ -329,6 +329,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         optionsProducer.RegisterOptions<CredentialManagerOptions>();
         optionsProducer.RegisterOptions<LaunchConfigurationServiceOptions>();
         optionsProducer.RegisterOptions<DirectSongOptions>();
+        optionsProducer.RegisterOptions<GuildWarsVersionCheckerOptions>();
 
         optionsProducer.RegisterOptions<GuildWarsScreenPlacerOptions>();
     }

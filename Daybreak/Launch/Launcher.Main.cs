@@ -1,5 +1,9 @@
-﻿using Daybreak.Views;
+﻿using Daybreak.Shared.Services.Screens;
+using Daybreak.Views;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Photino.Blazor;
+using System.Extensions.Core;
 
 namespace Daybreak.Launch;
 
@@ -27,6 +31,7 @@ public partial class Launcher
     private static PhotinoBlazorApp CreateMainApp(PhotinoBlazorAppBuilder mainBuilder)
     {
         var app = mainBuilder.Build();
+
         var cts = new CancellationTokenSource();
         app.MainWindow.SetTitle("Daybreak")
             .SetContextMenuEnabled(IsDebug)
@@ -38,6 +43,8 @@ public partial class Launcher
         app.MainWindow.RegisterWindowCreatedHandler((_, __) => SetupBorderless(app));
         app.MainWindow.RegisterWindowCreatedHandler((_, __) => StartHostedServices(app, cts));
         app.MainWindow.RegisterWindowClosingHandler((_, __) => StopHostedServices(app, cts));
+
+        SetWindowPosition(app);
         MainApp = app;
         return app;
     }
@@ -45,5 +52,35 @@ public partial class Launcher
     private static void RunMainApp(PhotinoBlazorApp app)
     {
         app.Run();
+    }
+
+    private static void SetWindowPosition(PhotinoBlazorApp app)
+    {
+        var scopedLogger = app.Services.GetRequiredService<ILogger<Launcher>>().CreateScopedLogger();
+        var screenManager = app.Services.GetRequiredService<IScreenManager>();
+        var savedPosition = screenManager.GetSavedPosition();
+
+        if (savedPosition.Width is 0 || savedPosition.Height is 0)
+        {
+            scopedLogger.LogDebug("No saved window position found, centering the window");
+            var firstScreen = screenManager.Screens.FirstOrDefault();
+            if (firstScreen.Size.IsEmpty)
+            {
+                scopedLogger.LogWarning("No valid screen found to center the window. Window will spawn with minimal size");
+                return;
+            }
+
+            app.MainWindow.Center();
+            app.MainWindow.Width = firstScreen.Size.Width / 2;
+            app.MainWindow.Height = firstScreen.Size.Height / 2;
+        }
+        else
+        {
+            scopedLogger.LogDebug("Restoring saved window position");
+            app.MainWindow.Left = savedPosition.X;
+            app.MainWindow.Top = savedPosition.Y;
+            app.MainWindow.Width = savedPosition.Width;
+            app.MainWindow.Height = savedPosition.Height;
+        }
     }
 }

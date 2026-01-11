@@ -53,6 +53,14 @@ public sealed class InMemorySink : ILogEventSink, IDisposable
         }
     }
 
+    public void Clear()
+    {
+        lock (this.snapShotLock)
+        {
+            this.logEvents.Clear();
+        }
+    }
+
     private string FormatStringLogEvent(LogEvent logEvent)
     {
         using var writer = new StringWriter();

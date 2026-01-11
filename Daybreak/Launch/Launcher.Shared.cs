@@ -27,6 +27,8 @@ public partial class Launcher
             .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
             .MinimumLevel.Override("System", LogEventLevel.Warning)
             .MinimumLevel.Override("Daybreak.Services.TradeChat.TradeChatService", LogEventLevel.Information)
+            .MinimumLevel.Override("Daybreak.Services.Credentials.CredentialManager", LogEventLevel.Information)
+            .MinimumLevel.Override("Daybreak.Shared.Services.BuildTemplates.BuildTemplateManager", LogEventLevel.Information)
 
             .Enrich.FromLogContext()
 

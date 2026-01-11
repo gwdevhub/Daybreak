@@ -1,12 +1,12 @@
 ﻿<div class="stretch-container">
     <div class="title-bar-additional-btns-left">
         <button class="title-bar-btn" @onclick="this.ViewModel.LoadPluginsFromDisk" title="Load plugins from disk">
-            <FluentIcon Value="new Icons.Regular.Size16.Add()" />
+            <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Add()" />
         </button>
         @if (this.ViewModel.CanSave)
         {
             <button class="title-bar-btn" @onclick="this.ViewModel.ReloadDaybreak" title="Reload Daybreak">
-                <FluentIcon Value="new Icons.Regular.Size16.ArrowSync()" />
+                <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowSync()" />
             </button>
         }
     </div>

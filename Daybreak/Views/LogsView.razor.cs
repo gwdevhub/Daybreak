@@ -77,6 +77,7 @@ public sealed class LogsViewModel(
             this.semaphore.Release();
         }
 
+        InMemorySink.Instance.Clear();
         this.RefreshView();
     }
 

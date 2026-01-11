@@ -7,19 +7,19 @@
     {
         <div class="title-bar-additional-btns-left">
             <button class="title-bar-btn" @onclick="this.ViewModel.ArchiveLogs" title="Archive logs">
-                <FluentIcon Value="new Icons.Regular.Size16.Archive()" />
+                <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Archive()" />
             </button>
             <button class="title-bar-btn" @onclick="this.ViewModel.ClearLogs" title="Clear logs">
-                <FluentIcon Value="new Icons.Regular.Size16.Delete()" />
+                <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Delete()" />
             </button>
             <button class="title-bar-btn" @onclick="this.ViewModel.ToggleAutoScroll" title="@(this.ViewModel.AutoScroll ? "Disable auto-scroll" : "Enable auto-scroll")">
                 @if (this.ViewModel.AutoScroll)
                 {
-                    <FluentIcon Value="new Icons.Regular.Size16.ArrowDownload()" />
+                    <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowDownload()" />
                 }
                 else
                 {
-                    <FluentIcon Value="new Icons.Regular.Size16.ArrowDownloadOff()" />
+                    <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowDownloadOff()" />
                 }
             </button>
         </div>

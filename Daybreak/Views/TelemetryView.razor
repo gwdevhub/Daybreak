@@ -3,13 +3,13 @@
         @if (this.ViewModel.TelemetryEnabled)
         {
             <button class="title-bar-btn" @onclick="this.ViewModel.DisableTelemetry" title="Disable telemetry">
-                <FluentIcon Value="new Icons.Regular.Size16.CloudCheckmark()" />
+                <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.CloudCheckmark()" />
             </button>
         }
         else
         {
             <button class="title-bar-btn" @onclick="this.ViewModel.EnableTelemetry" title="Enable telemetry">
-                <FluentIcon Value="new Icons.Regular.Size16.CloudDismiss()" />
+                <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.CloudDismiss()" />
             </button>
         }
     </div>

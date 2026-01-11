@@ -31,7 +31,7 @@ internal sealed class ScreenManager(
 
     Task IHostedService.StartAsync(CancellationToken cancellationToken)
     {
-        this.MoveWindowToSavedPosition();
+        // No need to move window on start here. Window position is set in the launcher before creation
         return Task.CompletedTask;
     }
 
@@ -43,12 +43,7 @@ internal sealed class ScreenManager(
 
     public void MoveWindowToSavedPosition()
     {
-        var savedPosition = new Rectangle(
-            (int)this.liveUpdateableOptions.CurrentValue.X,
-            (int)this.liveUpdateableOptions.CurrentValue.Y,
-            (int)this.liveUpdateableOptions.CurrentValue.Width,
-            (int)this.liveUpdateableOptions.CurrentValue.Height);
-
+        var savedPosition = this.GetSavedPosition();
         var hwnd = this.photinoWindow.WindowHandle;
         NativeMethods.SetWindowPos(hwnd, NativeMethods.HWND_TOP, savedPosition.Left, savedPosition.Top, savedPosition.Width, savedPosition.Height, NativeMethods.SWP_SHOWWINDOW);
     }
@@ -81,6 +76,15 @@ internal sealed class ScreenManager(
 
         NativeMethods.SetWindowPos(hwnd.Value, NativeMethods.HWND_TOP, screen.Size.Left, screen.Size.Top, screen.Size.Width, screen.Size.Height, NativeMethods.SWP_SHOWWINDOW);
         return true;
+    }
+
+    public Rectangle GetSavedPosition()
+    {
+        return new Rectangle(
+            (int)this.liveUpdateableOptions.CurrentValue.X,
+            (int)this.liveUpdateableOptions.CurrentValue.Y,
+            (int)this.liveUpdateableOptions.CurrentValue.Width,
+            (int)this.liveUpdateableOptions.CurrentValue.Height);
     }
 
     private static IntPtr? GetMainWindowHandle()

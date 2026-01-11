@@ -4,7 +4,7 @@
     </div>
     <div class="title-bar-additional-btns-left">
         <button class="title-bar-btn" @onclick="@this.ViewModel.LoadModsFromDisk" title="Load mods from disk">
-            <FluentIcon Value="new Icons.Regular.Size16.Add()" />
+            <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Add()" />
         </button>
     </div>
     <div class="stretch-container backdrop-panel">
@@ -19,7 +19,7 @@
                             <FluentButton Appearance="Appearance.Stealth"
                                           IconOnly="true"
                                           OnClick="@(() => this.ViewModel.MoveModUp(mod))">
-                                <FluentIcon Value="@(new Icons.Regular.Size16.ArrowUp())" />
+                                <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowUp())" />
                             </FluentButton>
                         }
 
@@ -28,7 +28,7 @@
                             <FluentButton Appearance="Appearance.Stealth"
                                           IconOnly="true"
                                           OnClick="@(() => this.ViewModel.MoveModDown(mod))">
-                                <FluentIcon Value="@(new Icons.Regular.Size16.ArrowDown())"/>
+                                <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowDown())"/>
                             </FluentButton>
                         }
 
@@ -43,7 +43,7 @@
                         <div @onclick="@(() => this.ViewModel.RemoveMod(mod))" @onclick:stopPropagation="true">
                             <FluentButton Appearance="Appearance.Stealth"
                                           IconOnly="true">
-                                <FluentIcon Value="@(new Icons.Regular.Size16.Delete())" />
+                                <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Delete())" />
                             </FluentButton>
                         </div>
                     </div>
