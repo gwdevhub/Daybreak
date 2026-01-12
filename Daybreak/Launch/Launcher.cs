@@ -22,6 +22,10 @@ public partial class Launcher
     [STAThread]
     public static void Main(string[] args)
     {
+#if DEBUG
+        AllocateAnsiConsole();
+#endif
+
         var bootstrap = SetupBootstrap();
         LaunchSequence(args, bootstrap);
     }

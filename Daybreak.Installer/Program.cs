@@ -124,7 +124,7 @@ static async ValueTask PerformUpdate(string workingDirectory)
             var binarySize = BitConverter.ToInt32(sizeBuffer.Span);
             var fileInfo = new FileInfo(relativePath);
             fileInfo.Directory!.Create();
-            using var destinationStream = new FileStream(Path.GetFullPath(workingDirectory, relativePath), FileMode.Create);
+            using var destinationStream = new FileStream(Path.GetFullPath(relativePath, workingDirectory), FileMode.Create);
             while (binarySize > 0)
             {
                 var toRead = Math.Min(binarySize, copyBuffer.Length);
