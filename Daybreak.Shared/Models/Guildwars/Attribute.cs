@@ -1,10 +1,8 @@
-﻿using Daybreak.Shared.Converters;
-using Newtonsoft.Json;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace Daybreak.Shared.Models.Guildwars;
 
-[JsonConverter(typeof(AttributeJsonConverter))]
 public sealed class Attribute
 {
     public static readonly Attribute None = new() { Name = "None", Id = -1, Profession = Profession.None };
@@ -137,10 +135,18 @@ public sealed class Attribute
         return attribute;
     }
 
+    [JsonPropertyName("id")]
     public int Id { get; private set; }
+
+    [JsonPropertyName("name")]
     public string? Name { get; private set; }
+
+    [JsonPropertyName("alternativeName")]
     public string? AlternativeName { get; private set; }
+
+    [JsonPropertyName("profession")]
     public Profession? Profession { get; private set; }
+
     public override string ToString() => this.Name ?? string.Empty;
     private Attribute()
     {

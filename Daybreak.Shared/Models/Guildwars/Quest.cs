@@ -1,13 +1,16 @@
-﻿using Daybreak.Shared.Converters;
-using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Daybreak.Shared.Models.Guildwars;
 
-[JsonConverter(typeof(QuestJsonConverter))]
 public sealed class Quest : IWikiEntity
 {
+    [JsonPropertyName("id")]
     public int Id { get; init; }
+
+    [JsonPropertyName("name")]
     public string? Name { get; init; }
+
+    [JsonPropertyName("wikiUrl")]
     public string? WikiUrl { get; init; }
 
     public static readonly Quest TheAscalonSettlement = new() { Id = 0, Name = "The Ascalon Settlement", WikiUrl = "https://wiki.guildwars.com/wiki/The_Ascalon_Settlement" };

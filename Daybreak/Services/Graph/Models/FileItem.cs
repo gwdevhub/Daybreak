@@ -1,13 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Daybreak.Services.Graph.Models;
 
 public sealed class FileItem
 {
-    [JsonProperty("@microsoft.graph.downloadUrl")]
+    [JsonPropertyName("@microsoft.graph.downloadUrl")]
     public string? DownloadUrl { get; set; }
-    [JsonProperty("name")]
+    [JsonPropertyName("name")]
     public string? Name { get; set; }
-    [JsonProperty("lastModifiedDateTime")]
+    [JsonPropertyName("lastModifiedDateTime")]
     public DateTime LastModifiedDateTime { get; set; }
 }

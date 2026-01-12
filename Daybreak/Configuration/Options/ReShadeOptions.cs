@@ -1,5 +1,5 @@
 ﻿using Daybreak.Shared.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Daybreak.Configuration.Options;
 
@@ -7,11 +7,11 @@ namespace Daybreak.Configuration.Options;
 [OptionsIgnore]
 internal sealed class ReShadeOptions
 {
-    [JsonProperty(nameof(Enabled))]
+    [JsonPropertyName(nameof(Enabled))]
     [OptionName(Name = "Enabled", Description = "If true, Daybreak will attempt to inject ReShade into the starting Guild Wars executable")]
     public bool Enabled { get; set; } = false;
 
-    [JsonProperty(nameof(AutoUpdate))]
+    [JsonPropertyName(nameof(AutoUpdate))]
     [OptionName(Name = "Auto-update", Description = "If true, Daybreak will periodically check ReShade for updates")]
     public bool AutoUpdate { get; set; } = true;
 }

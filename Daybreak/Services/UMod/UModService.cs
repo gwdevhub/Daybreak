@@ -18,6 +18,7 @@ using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
+using System.Net.Http.Json;
 using TrailBlazr.Services;
 
 namespace Daybreak.Services.UMod;
@@ -331,8 +332,7 @@ internal sealed class UModService(
             return new DownloadLatestOperation.NonSuccessStatusCode((int)getListResponse.StatusCode);
         }
 
-        var responseString = await getListResponse.Content.ReadAsStringAsync(cancellationToken);
-        var releasesList = responseString.Deserialize<List<GithubRefTag>>();
+        var releasesList = await getListResponse.Content.ReadFromJsonAsync<List<GithubRefTag>>(cancellationToken);
         var latestRelease = releasesList?
             .Select(t => t.Ref?.Replace("refs/tags/", ""))
             .OfType<string>()
@@ -367,8 +367,7 @@ internal sealed class UModService(
             return default;
         }
 
-        var responseString = await getListResponse.Content.ReadAsStringAsync(cancellationToken);
-        var releasesList = responseString.Deserialize<List<GithubRefTag>>();
+        var releasesList = await getListResponse.Content.ReadFromJsonAsync<List<GithubRefTag>>(cancellationToken);
         var latestRelease = releasesList?
             .Select(t => t.Ref?.Replace("refs/tags/", ""))
             .OfType<string>()

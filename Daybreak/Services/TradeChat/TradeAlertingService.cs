@@ -10,10 +10,10 @@ using Daybreak.Shared.Services.TradeChat;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace Daybreak.Services.TradeChat;
@@ -257,7 +257,7 @@ internal sealed class TradeAlertingService : ITradeAlertingService, IHostedServi
         this.notificationService.NotifyInformation<TradeMessageNotificationHandler>(
             title: $"{source} Trader Alert",
             description: $"{alert.Name} has matched on a trader message. Sender: {traderMessageDTO.Sender}. Message: {traderMessageDTO.Message}",
-            metaData: JsonConvert.SerializeObject(traderMessage),
+            metaData: JsonSerializer.Serialize(traderMessage),
             expirationTime: DateTime.Now + TimeSpan.FromDays(1));
     }
 

@@ -4,9 +4,8 @@ using Daybreak.Shared.Services.Options;
 using DiffPlex;
 using DiffPlex.DiffBuilder;
 using DiffPlex.DiffBuilder.Model;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Core.Extensions;
+using System.Text.Json;
 using TrailBlazr.ViewModels;
 
 namespace Daybreak.Views;
@@ -16,12 +15,14 @@ public sealed class SettingsSynchronizationViewModel(
     IOptionsSynchronizationService optionsSynchronizationService)
     : ViewModelBase<SettingsSynchronizationViewModel, SettingsSynchronizationView>
 {
+    private static readonly JsonSerializerOptions IndentedOptions = new() { WriteIndented = true };
+
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IGraphClient graphClient = graphClient.ThrowIfNull();
     private readonly IOptionsSynchronizationService optionsSynchronizationService = optionsSynchronizationService.ThrowIfNull();
 
-    private Dictionary<string, JObject>? remoteOptions;
-    private Dictionary<string, JObject>? localOptions;
+    private Dictionary<string, JsonDocument>? remoteOptions;
+    private Dictionary<string, JsonDocument>? localOptions;
 
     public bool Loading { get; set; }
 
@@ -52,11 +53,11 @@ public sealed class SettingsSynchronizationViewModel(
     {
         var localOptionsString = this.localOptions is null
             ? "{}"
-            : JsonConvert.SerializeObject(this.localOptions, Formatting.Indented);
+            : JsonSerializer.Serialize(this.localOptions, IndentedOptions);
 
         var remoteOptionsString = this.remoteOptions is null
             ? "{}"
-            : JsonConvert.SerializeObject(this.remoteOptions, Formatting.Indented);
+            : JsonSerializer.Serialize(this.remoteOptions, IndentedOptions );
 
         var diffBuilder = new SideBySideDiffBuilder(new Differ());
         this.SideBySideDiff = diffBuilder.BuildDiffModel(localOptionsString, remoteOptionsString);

@@ -4,11 +4,11 @@ using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.BuildTemplates.Models;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using System.Diagnostics.CodeAnalysis;
 using System.Extensions;
 using System.Extensions.Core;
-using System.IO;
 using System.Text;
+using System.Text.Json;
 using AttributeEntry = Daybreak.Shared.Models.Builds.AttributeEntry;
 using Convert = System.Convert;
 
@@ -299,7 +299,7 @@ public sealed class BuildTemplateManager(
         var metadata = buildEntry.Metadata is not null
             ? Convert.ToBase64String(
                 Encoding.UTF8.GetBytes(
-                    JsonConvert.SerializeObject(buildEntry.Metadata, Formatting.None)))
+                    JsonSerializer.Serialize(buildEntry.Metadata)))
             : string.Empty;
         File.WriteAllText(newPath, $"{encodedBuild.ToString().Trim()}\n{metadata}");
 
@@ -320,20 +320,20 @@ public sealed class BuildTemplateManager(
         }
     }
 
-    public async Task<Result<IBuildEntry, Exception>> GetBuild(string name)
+    public async Task<IBuildEntry?> GetBuild(string name)
     {
         // Use the cache as fallback for newly created builds that are not yet saved to the disk
         var path = Path.Combine(BuildsPath, $"{name}.txt");
         var result = await this.LoadBuildFromFile(path, name);
-        if (result.TryExtractFailure(out var exception) && exception is not null)
+        if (result is null)
         {
             var maybeCachedBuild = this.BuildMemoryCache.FirstOrDefault(b => b.Name == name);
             if (maybeCachedBuild is not null)
             {
-                return Result<IBuildEntry, Exception>.Success(maybeCachedBuild);
+                return maybeCachedBuild;
             }
 
-            return Result<IBuildEntry, Exception>.Failure(exception);
+            return default;
         }
 
         return result;
@@ -358,9 +358,9 @@ public sealed class BuildTemplateManager(
         {
             var name = Path.GetRelativePath(BuildsPath, file).Replace(".txt", string.Empty);
             var result = await this.LoadBuildFromFile(file, name);
-            if (result.TryExtractSuccess(out var buildEntry) && buildEntry is not null)
+            if (result is not null)
             {
-                yield return buildEntry;
+                yield return result;
             }
         }
     }
@@ -368,9 +368,10 @@ public sealed class BuildTemplateManager(
     public IBuildEntry DecodeTemplate(string template)
     {
         var randomName = Guid.NewGuid().ToString();
-        var maybeTemplate = this.DecodeTemplatesInner(template);
-        return maybeTemplate.Switch(
-            onSuccess: builds => (IBuildEntry)(builds.Length == 1 ?
+        var builds = this.DecodeTemplatesInner(template);
+        return builds is null
+            ? throw new InvalidOperationException("Failed to decode build template")
+            : builds.Length == 1 ?
                 new SingleBuildEntry
                 {
                     Name = randomName,
@@ -393,35 +394,30 @@ public sealed class BuildTemplateManager(
                         Attributes = b.Attributes,
                         Skills = b.Skills
                     })]
-                }),
-            onFailure: exception => throw exception);
+                };
     }
 
-    public bool TryDecodeTemplate(string template, out IBuildEntry build)
+    public bool TryDecodeTemplate(string template, [NotNullWhen(true)] out IBuildEntry? build)
     {
         var maybeBuilds = this.DecodeTemplatesInner(template);
-        (var result, var parsedBuilds) = maybeBuilds.Switch(
-            onSuccess: parsedBuild => (true, parsedBuild),
-            onFailure: _ => (false, default!));
-
-        if (result)
+        if (maybeBuilds is not null)
         {
             var randomName = Guid.NewGuid().ToString();
-            build = parsedBuilds.Length == 1 ?
+            build = maybeBuilds.Length == 1 ?
                 new SingleBuildEntry
                 {
                     Name = randomName,
                     PreviousName = randomName,
-                    Primary = parsedBuilds[0].Primary,
-                    Secondary = parsedBuilds[0].Secondary,
-                    Attributes = parsedBuilds[0].Attributes,
-                    Skills = parsedBuilds[0].Skills
+                    Primary = maybeBuilds[0].Primary,
+                    Secondary = maybeBuilds[0].Secondary,
+                    Attributes = maybeBuilds[0].Attributes,
+                    Skills = maybeBuilds[0].Skills
                 } :
                 new TeamBuildEntry
                 {
                     Name = randomName,
                     PreviousName = randomName,
-                    Builds = parsedBuilds.Select(b => new SingleBuildEntry
+                    Builds = maybeBuilds.Select(b => new SingleBuildEntry
                     {
                         Name = randomName,
                         PreviousName = randomName,
@@ -432,11 +428,11 @@ public sealed class BuildTemplateManager(
                     }).ToList()
                 };
 
-            return result;
+            return true;
         }
 
-        build = default!;
-        return result;
+        build = default;
+        return false;
     }
 
     public string EncodeTemplate(IBuildEntry build)
@@ -554,22 +550,26 @@ public sealed class BuildTemplateManager(
         return singleBuildEntry;
     }
 
-    private async Task<Result<IBuildEntry, Exception>> LoadBuildFromFile(string path, string buildName)
+    private async Task<IBuildEntry?> LoadBuildFromFile(string path, string buildName)
     {
+        var scopedLogger = this.logger.CreateScopedLogger();
         if (File.Exists(path) is false)
         {
-            return new InvalidOperationException("Unable to find build file");
+            scopedLogger.LogError("Unable to find build file at path {path}", path);
+            return default;
         }
 
         var content = await File.ReadAllLinesAsync(path);
         if (content.Length == 0)
         {
-            return new InvalidOperationException("File does not contain a valid template code");
+            scopedLogger.LogError("File at path {path} does not contain a valid template code", path);
+            return default;
         }
 
         if (this.TryDecodeTemplate(content.First(), out var build) is false)
         {
-            return new InvalidOperationException("Unable to parse build file");
+            scopedLogger.LogError("Unable to parse build file at path {path}", path);
+            return default;
         }
 
         build.Name = buildName;
@@ -586,13 +586,14 @@ public sealed class BuildTemplateManager(
                 try
                 {
                     build.Metadata =
-                        JsonConvert.DeserializeObject<Dictionary<string, string>>(
+                        JsonSerializer.Deserialize<Dictionary<string, string>>(
                             Encoding.UTF8.GetString(
                                 Convert.FromBase64String(content[1])));
                 }
                 catch(Exception ex)
                 {
-                    return new InvalidOperationException("Failed to parse build metadata", ex);
+                    scopedLogger.LogError(ex, "Failed to parse build metadata at path {path}", path);
+                    return default;
                 }
             }
         }
@@ -602,34 +603,33 @@ public sealed class BuildTemplateManager(
             build.CreationTime = new FileInfo(path).CreationTimeUtc;
         }
 
-        return Result<IBuildEntry, Exception>.Success(build);
+        return build;
     }
 
-    private Result<Build[], Exception> DecodeTemplatesInner(string template)
+    private Build[]? DecodeTemplatesInner(string template)
     {
         var buildTemplates = template.Split(' ').Where(s => !s.IsNullOrWhiteSpace()).ToArray();
         if (buildTemplates.Length == 0)
         {
-            return new InvalidOperationException("Invalid build template");
+            return [];
         }
 
         var builds = new Build[buildTemplates.Length];
         for(var i = 0; i < builds.Length; i++)
         {
             var result = this.DecodeTemplateInner(buildTemplates[i]);
-            if (result.TryExtractFailure(out var exception))
+            if (result is null)
             {
-                return exception!;
+                return default;
             }
 
-            result.TryExtractSuccess(out var maybeBuild);
-            builds[i] = maybeBuild!;
+            builds[i] = result;
         }
 
         return builds;
     }
 
-    private Result<Build, Exception> DecodeTemplateInner(string template)
+    private Build? DecodeTemplateInner(string template)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         scopedLogger.LogDebug("Attempting to decode template");
@@ -638,7 +638,7 @@ public sealed class BuildTemplateManager(
         if (buildMetadata.VersionNumber != 0)
         {
             scopedLogger.LogError("Expected version number to be 0 but found {buildMetadata.VersionNumber}", buildMetadata.VersionNumber);
-            return new InvalidOperationException($"Failed to parse template");
+            return default;
         }
 
         var build = new Build()
@@ -650,14 +650,14 @@ public sealed class BuildTemplateManager(
         if (Profession.TryParse(buildMetadata.PrimaryProfessionId, out var primaryProfession) is false)
         {
             scopedLogger.LogError("Failed to parse profession with id {buildMetadata.PrimaryProfessionId}", buildMetadata.PrimaryProfessionId);
-            return new InvalidOperationException($"Failed to parse template");
+            return default;
         }
 
         build.Primary = primaryProfession;
         if (Profession.TryParse(buildMetadata.SecondaryProfessionId, out var secondaryProfession) is false)
         {
             scopedLogger.LogError("Failed to parse profession with id {buildMetadata.SecondaryProfessionId}", buildMetadata.SecondaryProfessionId);
-            return new InvalidOperationException($"Failed to parse template");
+            return default;
         }
 
         build.Secondary = secondaryProfession;
@@ -682,9 +682,8 @@ public sealed class BuildTemplateManager(
             var maybeAttribute = build.Attributes.FirstOrDefault(a => a.Attribute!.Id == attributeId);
             if (maybeAttribute is null)
             {
-                var msg = $"Failed to parse attribute with id {attributeId} for professions {primaryProfession.Name}/{secondaryProfession.Name}";
-                scopedLogger.LogError(msg);
-                return new InvalidOperationException(msg);
+                scopedLogger.LogError("Failed to parse attribute with id {attributeId} for professions {primaryProfession.Name}/{secondaryProfession.Name}", attributeId, primaryProfession.Name ?? string.Empty, secondaryProfession.Name ?? string.Empty);
+                return default;
             }
 
             maybeAttribute!.Points = buildMetadata.AttributePoints[i];
@@ -695,7 +694,7 @@ public sealed class BuildTemplateManager(
             if (Skill.TryParse(buildMetadata.SkillIds[i], out var skill) is false)
             {
                 scopedLogger.LogError("Failed to parse skill with id {skillId}", buildMetadata.SkillIds[i]);
-                return new InvalidOperationException($"Failed to parse template");
+                return default;
             }
 
             build.Skills.Add(skill);

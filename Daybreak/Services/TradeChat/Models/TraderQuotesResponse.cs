@@ -1,12 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Daybreak.Services.TradeChat.Models;
 
 internal sealed class TraderQuotesResponse
 {
-    [JsonProperty("buy")]
+    [JsonPropertyName("buy")]
     public Dictionary<string, TraderQuotePayload> BuyQuotes { get; set; } = default!;
 
-    [JsonProperty("sell")]
+    [JsonPropertyName("sell")]
     public Dictionary<string, TraderQuotePayload> SellQuotes { get; set; } = default!;
 }

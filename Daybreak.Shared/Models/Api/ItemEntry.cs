@@ -1,4 +1,6 @@
-﻿namespace Daybreak.Shared.Models.Api;
+﻿using Daybreak.Shared.Models.Guildwars;
+
+namespace Daybreak.Shared.Models.Api;
 
 public sealed record ItemEntry(
     uint ItemModelId,
@@ -10,6 +12,7 @@ public sealed record ItemEntry(
     string DecodedCompleteName,
     string ItemType,
     int Quantity,
-    uint[] Modifiers)
+    uint[] Modifiers,
+    ItemProperty[] Properties)
 {
 }

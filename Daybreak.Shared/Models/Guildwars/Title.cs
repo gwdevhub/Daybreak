@@ -1,9 +1,7 @@
-﻿using Daybreak.Shared.Converters;
-using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Daybreak.Shared.Models.Guildwars;
 
-[JsonConverter(typeof(TitleJsonConverter))]
 public sealed class Title : IWikiEntity
 {
     public static readonly Title None = new() { Id = 0xFF, };
@@ -142,9 +140,16 @@ public sealed class Title : IWikiEntity
         return title;
     }
 
+    [JsonPropertyName("id")]
     public int Id { get; init; }
+
+    [JsonPropertyName("name")]
     public string? Name { get; init; }
+
+    [JsonPropertyName("wikiUrl")]
     public string? WikiUrl { get; init; }
+
+    [JsonPropertyName("tiers")]
     public List<string>? Tiers { get; init; }
 
     private Title()

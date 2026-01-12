@@ -3,10 +3,11 @@ using Daybreak.Shared.Attributes;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Options;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
 using System.Core.Extensions;
 using System.Extensions;
+using System.Extensions.Core;
 using System.Reflection;
+using System.Text.Json;
 
 namespace Daybreak.Services.Startup.Actions;
 internal sealed class CredentialsOptionsMigrator(
@@ -21,20 +22,20 @@ internal sealed class CredentialsOptionsMigrator(
     public override void ExecuteOnStartup()
     {
         var newOptionsKey = GetNewOptionsKey();
-        var scopedLogger = this.logger.CreateScopedLogger(nameof(this.ExecuteOnStartup), string.Empty);
+        var scopedLogger = this.logger.CreateScopedLogger();
         if (this.optionsProvider.TryGetKeyedOptions(newOptionsKey) is not null)
         {
-            scopedLogger.LogDebug($"Found [{newOptionsKey}]. No migration needed");
+            scopedLogger.LogDebug("Found [{newOptionsKey}]. No migration needed", newOptionsKey);
             return;
         }
 
-        if (this.optionsProvider.TryGetKeyedOptions(OldOptionsKey) is not JObject options)
+        if (this.optionsProvider.TryGetKeyedOptions(OldOptionsKey) is not JsonDocument options)
         {
-            scopedLogger.LogDebug($"Could not find [{OldOptionsKey}]. No migration possible");
+            scopedLogger.LogDebug("Could not find [{OldOptionsKey}]. No migration possible", OldOptionsKey);
             return;
         }
 
-        this.logger.LogDebug($"Found [{OldOptionsKey}]. Migrating options to [{newOptionsKey}]");
+        this.logger.LogDebug("Found [{OldOptionsKey}]. Migrating options to [{newOptionsKey}]", OldOptionsKey, newOptionsKey);
         this.optionsProvider.SaveRegisteredOptions(newOptionsKey, options);
     }
 

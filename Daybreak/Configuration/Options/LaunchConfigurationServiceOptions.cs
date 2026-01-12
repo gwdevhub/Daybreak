@@ -1,6 +1,6 @@
 ﻿using Daybreak.Shared.Attributes;
 using Daybreak.Shared.Models.LaunchConfigurations;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Daybreak.Configuration.Options;
 
@@ -8,6 +8,6 @@ namespace Daybreak.Configuration.Options;
 [OptionsSynchronizationIgnore]
 internal sealed class LaunchConfigurationServiceOptions
 {
-    [JsonProperty(nameof(LaunchConfigurations))]
+    [JsonPropertyName(nameof(LaunchConfigurations))]
     public List<LaunchConfiguration> LaunchConfigurations { get; set; } = [];
 }

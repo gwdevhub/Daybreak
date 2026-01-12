@@ -1,18 +1,20 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Services.Graph;
+using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Options;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Daybreak.Services.Options;
 
 public sealed class OptionsSynchronizationService(
+    INotificationService notificationService,
     IOptionsProvider optionsProvider,
     IGraphClient graphClient,
     IOptionsMonitor<LauncherOptions> liveOptions,
@@ -21,6 +23,7 @@ public sealed class OptionsSynchronizationService(
     private static readonly TimeSpan StartupDelay = TimeSpan.FromMinutes(1);
     private static readonly TimeSpan BackupFrequency = TimeSpan.FromSeconds(15);
 
+    private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IOptionsProvider optionsProvider = optionsProvider.ThrowIfNull();
     private readonly IGraphClient graphClient = graphClient.ThrowIfNull();
     private readonly IOptionsMonitor<LauncherOptions> liveOptions = liveOptions.ThrowIfNull();
@@ -33,8 +36,8 @@ public sealed class OptionsSynchronizationService(
         {
             await Task.Delay(BackupFrequency, cancellationToken);
             var remoteOptions = await this.GetRemoteOptionsInternal(cancellationToken);
-            var remoteOptionsSerialized = JsonConvert.SerializeObject(remoteOptions);
-            var currentOptions = JsonConvert.SerializeObject(this.GetCurrentOptionsInternal());
+            var remoteOptionsSerialized = JsonSerializer.Serialize(remoteOptions);
+            var currentOptions = JsonSerializer.Serialize(this.GetCurrentOptionsInternal());
             if (remoteOptions is not null &&
                 currentOptions != remoteOptionsSerialized &&
                 this.liveOptions.CurrentValue.AutoBackupSettings)
@@ -55,12 +58,12 @@ public sealed class OptionsSynchronizationService(
         return Task.CompletedTask;
     }
 
-    public Task<Dictionary<string, JObject>> GetLocalOptions(CancellationToken cancellationToken)
+    public Task<Dictionary<string, JsonDocument>> GetLocalOptions(CancellationToken cancellationToken)
     {
         return Task.FromResult(this.GetCurrentOptionsInternal());
     }
 
-    public async Task<Dictionary<string, JObject>?> GetRemoteOptions(CancellationToken cancellationToken)
+    public async Task<Dictionary<string, JsonDocument>?> GetRemoteOptions(CancellationToken cancellationToken)
     {
         return await this.GetRemoteOptionsInternal(cancellationToken);
     }
@@ -68,13 +71,14 @@ public sealed class OptionsSynchronizationService(
     public async Task BackupOptions(CancellationToken cancellationToken)
     {
         var currentOptions = this.GetCurrentOptionsInternal();
-        var serializedOptions = JsonConvert.SerializeObject(currentOptions);
+        var serializedOptions = JsonSerializer.Serialize(currentOptions);
         var result = await this.graphClient.UploadSettings(serializedOptions, cancellationToken);
-        result.DoAny(
-            onFailure: exception =>
-            {
-                throw exception;
-            });
+        if (result is false)
+        {
+            this.notificationService.NotifyError(
+                title: "Failed to backup settings",
+                description: "Encountered an error while backing up your settings to the cloud. Check logs for details.");
+        }
     }
 
     public async Task RestoreOptions(CancellationToken cancellationToken)
@@ -91,41 +95,35 @@ public sealed class OptionsSynchronizationService(
         }
     }
 
-    private async Task<Dictionary<string, JObject>?> GetRemoteOptionsInternal(CancellationToken cancellationToken)
+    private async Task<Dictionary<string, JsonDocument>?> GetRemoteOptionsInternal(CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(nameof(this.GetRemoteOptionsInternal), string.Empty);
         var maybeContent = await this.graphClient.DownloadSettings(cancellationToken);
-        return maybeContent.Switch(
-            onSuccess: content =>
-            {
-                try
-                {
-                    return JsonConvert.DeserializeObject<Dictionary<string, JObject>>(content);
-                }
-                catch(Exception e)
-                {
-                    scopedLogger.LogError(e, "Encountered exception when deserializing content");
-                    return default;
-                }
-            },
-            onFailure: ex =>
-            {
-                scopedLogger.LogError(ex, "Encountered exception when retrieving remote options");
-                return default;
-            });
+        if (maybeContent is null)
+        {
+            scopedLogger.LogError("Failed to download remote settings");
+            return default;
+        }
+
+        return JsonSerializer.Deserialize<Dictionary<string, JsonDocument>>(maybeContent);
     }
 
-    private Dictionary<string, JObject> GetCurrentOptionsInternal()
+    private Dictionary<string, JsonDocument> GetCurrentOptionsInternal()
     {
         return this.optionsProvider.GetRegisteredOptionInstances()
             .Where(o => o.Type.IsSynchronized)
-            .Select(o => (o, JObject.FromObject(o.Reference)))
+            .Select(o => (o, JsonSerializer.SerializeToDocument(o.Reference)))
             .Select(t =>
             {
-                var jObject = t.Item2;
+                var jsonDocument = t.Item2;
                 var objectType = t.o.Type.Type;
                 var properties = t.o.Type.Properties;
-                foreach(var property in properties)
+
+                // Create a mutable dictionary from the JSON
+                var dict = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(jsonDocument.RootElement.GetRawText())
+                    ?? [];
+
+                foreach (var property in properties)
                 {
                     if (property.Type.GetCustomAttributes().Any(a => a is JsonIgnoreAttribute))
                     {
@@ -135,17 +133,18 @@ public sealed class OptionsSynchronizationService(
                     if (!property.IsSynchronized)
                     {
                         var name = property.Name;
-                        if (property.Type.GetCustomAttribute<JsonPropertyAttribute>() is JsonPropertyAttribute jsonPropertyAttribute &&
-                            jsonPropertyAttribute.PropertyName is string propertyName)
+                        if (property.Type.GetCustomAttribute<JsonPropertyNameAttribute>() is JsonPropertyNameAttribute jsonPropertyNameAttribute)
                         {
-                            name = propertyName;
+                            name = jsonPropertyNameAttribute.Name;
                         }
 
-                        jObject.Remove(name);
+                        dict.Remove(name);
                     }
                 }
 
-                return (t.o.Type.Name, t.Item2);
+                // Convert back to JsonDocument
+                var filteredDocument = JsonSerializer.SerializeToDocument(dict);
+                return (t.o.Type.Name, filteredDocument);
             })
             .ToDictionary();
     }

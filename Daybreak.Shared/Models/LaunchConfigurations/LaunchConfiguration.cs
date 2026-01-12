@@ -1,24 +1,24 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Daybreak.Shared.Models.LaunchConfigurations;
 
 public sealed class LaunchConfiguration
 {
-    [JsonProperty(nameof(Name))]
+    [JsonPropertyName(nameof(Name))]
     public string? Name { get; set; }
 
-    [JsonProperty(nameof(Identifier))]
+    [JsonPropertyName(nameof(Identifier))]
     public string? Identifier { get; set; }
 
-    [JsonProperty(nameof(Executable))]
+    [JsonPropertyName(nameof(Executable))]
     public string? Executable { get; set; }
 
-    [JsonProperty(nameof(Arguments))]
+    [JsonPropertyName(nameof(Arguments))]
     public string? Arguments { get; set; }
 
-    [JsonProperty(nameof(CredentialsIdentifier))]
+    [JsonPropertyName(nameof(CredentialsIdentifier))]
     public string? CredentialsIdentifier { get; set; }
 
-    [JsonProperty(nameof(SteamSupport))]
+    [JsonPropertyName(nameof(SteamSupport))]
     public bool? SteamSupport { get; set; } = true;
 }

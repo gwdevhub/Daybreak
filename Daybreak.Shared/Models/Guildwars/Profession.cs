@@ -1,11 +1,10 @@
 ﻿using Daybreak.Shared.Converters;
-using Newtonsoft.Json;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace Daybreak.Shared.Models.Guildwars;
 
-[JsonConverter(typeof(ProfessionJsonConverter))]
 [TypeConverter(typeof(ProfessionTypeConverter))]
 public sealed class Profession : IWikiEntity
 {
@@ -163,13 +162,27 @@ public sealed class Profession : IWikiEntity
         return profession;
     }
 
+    [JsonPropertyName("wikiUrl")]
     public string? WikiUrl { get; init; } = string.Empty;
+
+    [JsonPropertyName("buildsUrl")]
     public string? BuildsUrl { get; init; }
+
+    [JsonPropertyName("alias")]
     public string? Alias { get; init; }
+
+    [JsonPropertyName("name")]
     public string? Name { get; init; }
+
+    [JsonPropertyName("id")]
     public int Id { get; set; }
+
+    [JsonPropertyName("primaryAttribute")]
     public Attribute? PrimaryAttribute { get; private set; }
+
+    [JsonPropertyName("attributes")]
     public List<Attribute> Attributes { get; private set; } = [];
+
     private Profession()
     {
     }

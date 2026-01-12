@@ -48,8 +48,6 @@ internal sealed class CredentialManager(
         return [.. config
             .ProtectedLoginCredentials
             .Select(this.UnprotectCredentials)
-            .Where(this.CredentialsUnprotected)
-            .Select(this.ExtractCredentials)
             .OfType<LoginCredentials>()];
     }
 
@@ -59,8 +57,6 @@ internal sealed class CredentialManager(
         var options = this.liveOptions.CurrentValue;
         options.ProtectedLoginCredentials = [.. loginCredentials
             .Select(this.ProtectCredentials)
-            .Where(this.CredentialsProtected)
-            .Select(this.ExtractProtectedCredentials)
             .OfType<ProtectedLoginCredentials>()];
         this.optionsProvider.SaveOption(options);
     }
@@ -75,7 +71,7 @@ internal sealed class CredentialManager(
         };
     }
 
-    private Optional<LoginCredentials> UnprotectCredentials(ProtectedLoginCredentials protectedLoginCredentials)
+    private LoginCredentials? UnprotectCredentials(ProtectedLoginCredentials protectedLoginCredentials)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         try
@@ -92,11 +88,11 @@ internal sealed class CredentialManager(
         catch (Exception e)
         {
             scopedLogger.LogError(e, "Unable to retrieve credentials");
-            return Optional.None<LoginCredentials>();
+            return default;
         }
     }
 
-    private Optional<ProtectedLoginCredentials> ProtectCredentials(LoginCredentials loginCredentials)
+    private ProtectedLoginCredentials? ProtectCredentials(LoginCredentials loginCredentials)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         try
@@ -113,31 +109,7 @@ internal sealed class CredentialManager(
         catch(Exception e)
         {
             scopedLogger.LogError(e, "Unable to encrypt credentials");
-            return Optional.None<ProtectedLoginCredentials>();
+            return default;
         }
-    }
-
-    private bool CredentialsUnprotected(Optional<LoginCredentials> optional)
-    {
-        return optional
-            .Switch(onSome: _ => true, onNone: () => false)
-            .ExtractValue();
-    }
-
-    private bool CredentialsProtected(Optional<ProtectedLoginCredentials> optional)
-    {
-        return optional
-            .Switch(onSome: _ => true, onNone: () => false)
-            .ExtractValue();
-    }
-
-    private ProtectedLoginCredentials? ExtractProtectedCredentials(Optional<ProtectedLoginCredentials> optional)
-    {
-        return optional.ExtractValue();
-    }
-
-    private LoginCredentials? ExtractCredentials(Optional<LoginCredentials> optional)
-    {
-        return optional.ExtractValue();
     }
 }

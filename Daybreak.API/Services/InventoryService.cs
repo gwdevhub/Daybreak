@@ -1,16 +1,20 @@
 ﻿using Daybreak.API.Interop.GuildWars;
 using Daybreak.API.Services.Interop;
 using Daybreak.Shared.Models.Api;
+using Daybreak.Shared.Services.Items;
+using System.Collections.Immutable;
 using System.Extensions.Core;
 
 namespace Daybreak.API.Services;
 
 public sealed class InventoryService(
+    IItemModifierParser itemModifierParser,
     GameContextService gameContextService,
     GameThreadService gameThreadService,
     UIService uIService,
     ILogger<InventoryService> logger)
 {
+    private readonly IItemModifierParser itemModifierParser = itemModifierParser;
     private readonly GameContextService gameContextService = gameContextService;
     private readonly GameThreadService gameThreadService = gameThreadService;
     private readonly UIService uIService = uIService;
@@ -108,6 +112,7 @@ public sealed class InventoryService(
                             DecodedCompleteName: item.DecodedCompleteName ?? string.Empty,
                             Quantity: item.Quantity,
                             Modifiers: item.Modifiers,
+                            Properties: [.. this.itemModifierParser.ParseItemModifiers([.. item.Modifiers.Select(m => (Shared.Models.Guildwars.ItemModifier)m)])],
                             ItemType: item.ItemType.ToString()))]))]);
     }
 

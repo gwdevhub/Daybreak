@@ -4,7 +4,6 @@ using Daybreak.Shared.Models.Trade;
 using Daybreak.Shared.Services.TradeChat;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
@@ -12,6 +11,7 @@ using System.Logging;
 using System.Net.WebSockets;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
 
 namespace Daybreak.Services.TradeChat;
 
@@ -89,7 +89,7 @@ internal sealed class TradeChatService<TChannelOptions> : ITradeChatService<TCha
             }
 
             var content = await this.GetAsync(uri, requestMessage, scopedLogger, cancellationToken);
-            var responses = JsonConvert.DeserializeObject<List<TraderMessageResponse>>(content) ?? Array.Empty<TraderMessageResponse>().As<IEnumerable<TraderMessageResponse>>();
+            var responses = JsonSerializer.Deserialize<List<TraderMessageResponse>>(content) ?? Array.Empty<TraderMessageResponse>().As<IEnumerable<TraderMessageResponse>>();
             return responses!.Select(t => new TraderMessage
             {
                 Message = t.Message ?? string.Empty,
@@ -125,9 +125,9 @@ internal sealed class TradeChatService<TChannelOptions> : ITradeChatService<TCha
         try
         {
             var responseString = await this.ReceiveWebsocketResponseSafe(cancellationToken);
-            return JsonConvert.DeserializeObject<TraderMessageResponse>(responseString) ?? default;
+            return JsonSerializer.Deserialize<TraderMessageResponse>(responseString) ?? default;
         }
-        catch (JsonSerializationException ex)
+        catch (JsonException ex)
         {
             scopedLogger.LogError(ex, "Encountered serialization exception. Returning default response");
             return default;

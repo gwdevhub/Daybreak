@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace Daybreak.Shared.Models.Guildwars;
 
@@ -172,6 +173,7 @@ public sealed class ItemUpgrade
     public static readonly ItemUpgrade OfScytheMastery = new(397, "of Scythe Mastery", ItemUpgradeType.Suffix);
     public static readonly ItemUpgrade Fiery_Scythe = new(523, "Fiery", ItemUpgradeType.Prefix);
     public static readonly ItemUpgrade Shocking_Scythe = new(524, "Shocking", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade OfTheProfession_Scythe = new(556, "of the Profession", ItemUpgradeType.Suffix);
 
     // Shield
     public static readonly ItemUpgrade OfValor_Shield = new(337, "of Valor", ItemUpgradeType.Suffix);
@@ -893,8 +895,13 @@ public sealed class ItemUpgrade
         return upgrade is not null;
     }
 
+    [JsonPropertyName("id")]
     public int Id { get; }
+
+    [JsonPropertyName("name")]
     public string Name { get; }
+
+    [JsonPropertyName("type")]
     public ItemUpgradeType Type { get; }
 
     private ItemUpgrade(int id, string name, ItemUpgradeType type)
