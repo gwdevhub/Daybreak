@@ -6,13 +6,9 @@
 name:  Daybreak CI Pipeline
 
 on:
-  push:
-    branches:
-      - master
   pull_request:
     branches:
       - master
-      - release/*
 
 jobs:
 
