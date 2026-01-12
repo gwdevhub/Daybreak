@@ -23,8 +23,7 @@ internal sealed class GuildWarsCopyService(
     private readonly static string[] FilesToCopy =
     [
         "Gw.dat",
-        "Gw.exe",
-        "GwLoginClient.dll"
+        "Gw.exe"
     ];
 
     private readonly PhotinoWindow photinoWindow = photinoWindow.ThrowIfNull();
