@@ -6,6 +6,10 @@ namespace Daybreak.Shared.Utils;
 
 public static class NativeMethods
 {
+    public const uint WM_SETICON = 0x0080;
+    public const nint ICON_BIG = 1;    // 32x32 (taskbar icon)
+    public const nint ICON_SMALL = 0;  // 16x16 (title bar icon)
+
     public const int STD_OUTPUT_HANDLE = -11;
     public const int ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004;
     public const int ENABLE_PROCESSED_OUTPUT = 0x0001;
