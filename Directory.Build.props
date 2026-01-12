@@ -2,7 +2,7 @@
   <PropertyGroup>
     <NoWarn>$(NoWarn);IL2104;IL3053;IL3000;IL3002;NU1701;CS0108</NoWarn>
 
-    <Version>0.9.9.95</Version>
+    <Version>0.9.9.96</Version>
 
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
