@@ -2,7 +2,8 @@
 public readonly struct ItemModifier
 {
     public uint Modifier { get; init; }
-    public uint Identifier => this.Modifier >> 16;
+    public ItemModifierIdentifier Identifier => (ItemModifierIdentifier)(this.Modifier >> 16);
+    public uint UpgradeId => this.Modifier & 0x0000FFFF;
     public uint Argument1 => (this.Modifier & 0x0000FF00) >> 8;
     public uint Argument2 => this.Modifier & 0x000000FF;
 

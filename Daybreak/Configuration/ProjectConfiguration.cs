@@ -67,6 +67,7 @@ using Daybreak.Shared.Services.Guildwars;
 using Daybreak.Shared.Services.Initialization;
 using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.InternetChecker;
+using Daybreak.Shared.Services.Items;
 using Daybreak.Shared.Services.Keyboard;
 using Daybreak.Shared.Services.LaunchConfigurations;
 using Daybreak.Shared.Services.MDns;
@@ -192,6 +193,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<JSConsoleInterop>();
         services.AddSingleton<OptionsManager>();
         services.AddSingleton<IOptionsProvider, OptionsManager>(sp => sp.GetRequiredService<OptionsManager>());
+        services.AddSingleton<IItemModifierParser, ItemModifierParser>();
         
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
