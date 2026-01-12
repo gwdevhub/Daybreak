@@ -311,6 +311,8 @@ var mode = args.Length > 1
 var workingDirectory = args.Length > 2
     ? args[1] : Path.GetFullPath("..", AppContext.BaseDirectory);
 
+// Normalize working directory path
+workingDirectory = Path.GetFullPath(workingDirectory);
 if (mode is "install")
 {
     await PerformFreshInstall(workingDirectory);
