@@ -372,20 +372,20 @@ public class ProjectConfiguration : PluginConfigurationBase
             .RegisterButton("Manage Builds", "Open builds manager", sp => sp.GetRequiredService<IViewManager>().ShowView<BuildListView>())
             .RegisterButton("Manage Mods", "Open Guild Wars mods manager", sp => sp.GetRequiredService<IViewManager>().ShowView<ModsView>())
             .RegisterButton("Download Guild Wars", "Download Guild Wars installer", sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsDownloadView>())
-            .RegisterButton("Copy Guild Wars", "Copy Guild Wars from an existing installation", sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsCopySelectionView>())
-            .RegisterButton("Event Calendar", "Show current and upcoming events", sp => sp.GetRequiredService<IViewManager>().ShowView<EventCalendarView>())
-            .RegisterButton("Guild Wars Party Search", "Show party search broadcasts", sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsPartySearchView>())
-            .RegisterButton("Guild Wars Marketplace", "Show guild wars marketplace", sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsMarketView>());
+            .RegisterButton("Copy Guild Wars", "Copy Guild Wars from an existing installation", sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsCopySelectionView>());
         menuServiceProducer.CreateIfNotExistCategory("Daybreak")
             //TODO: Implement Notifications view
             //.RegisterButton("Notifications", "Open notifications view", sp => { })
             .RegisterButton("Manage Plugins", "Open plugins view", sp => sp.GetRequiredService<IViewManager>().ShowView<PluginsView>())
             .RegisterButton("Manage version", "Open version manager", sp => sp.GetRequiredService<IViewManager>().ShowView<VersionManagementView>())
             .RegisterButton("Help", "Open Daybreak wiki", sp => sp.GetRequiredService<IViewManager>().ShowView<WikiView>((nameof(WikiView.Page), "Home")));
-        menuServiceProducer.CreateIfNotExistCategory("Trade")
+        menuServiceProducer.CreateIfNotExistCategory("Services")
             .RegisterButton("Alerts", "Open trade alerts manager", sp => sp.GetRequiredService<IViewManager>().ShowView<TradeAlertsView>())
             .RegisterButton("Kamadan", "Open kamadan trade chat", sp => sp.GetRequiredService<IViewManager>().ShowView<TradeChatView>((nameof(TradeChatView.Source), nameof(TraderSource.Kamadan))))
-            .RegisterButton("Ascalon", "Open ascalon trade chat", sp => sp.GetRequiredService<IViewManager>().ShowView<TradeChatView>((nameof(TradeChatView.Source), nameof(TraderSource.Ascalon))));
+            .RegisterButton("Ascalon", "Open ascalon trade chat", sp => sp.GetRequiredService<IViewManager>().ShowView<TradeChatView>((nameof(TradeChatView.Source), nameof(TraderSource.Ascalon))))
+            .RegisterButton("Guild Wars Party Search", "Show party search broadcasts", sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsPartySearchView>())
+            .RegisterButton("Guild Wars Marketplace", "Show guild wars marketplace", sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsMarketView>())
+            .RegisterButton("Event Calendar", "Show current and upcoming events", sp => sp.GetRequiredService<IViewManager>().ShowView<EventCalendarView>());
         menuServiceProducer.CreateIfNotExistCategory("Settings")
             .RegisterButton("Accounts", "Accounts Settings", sp => sp.GetRequiredService<IViewManager>().ShowView<AccountsView>())
             .RegisterButton("Executables", "Executables Settings", sp => sp.GetRequiredService<IViewManager>().ShowView<ExecutablesView>())
