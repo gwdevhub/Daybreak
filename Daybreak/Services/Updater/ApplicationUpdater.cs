@@ -18,6 +18,7 @@ using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
 using System.Net.Http.Json;
+using System.Net.WebSockets;
 using System.Text;
 
 namespace Daybreak.Services.Updater;
@@ -43,6 +44,7 @@ internal sealed class ApplicationUpdater(
     private const string Url = "https://github.com/gwdevhub/Daybreak/releases/latest";
     private const string DownloadUrl = $"https://github.com/gwdevhub/Daybreak/releases/download/v{VersionTag}/Daybreakv{VersionTag}.zip";
     private const string BlobStorageUrl = $"https://daybreak.blob.core.windows.net/v{VersionTag}/{FileTag}";
+    private const string GithubReleasesUrl = $"https://api.github.com/repos/gwdevhub/daybreak/releases";
     private const int DownloadParallelTasks = 10;
 
     private readonly static string TempInstallerFileName = PathUtils.GetAbsolutePathFromRoot(TempInstallerFileNameSubPath);
@@ -214,19 +216,29 @@ internal sealed class ApplicationUpdater(
         var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: version.ToString());
         try
         {
-            var changeLogResponse = await this.httpClient.GetAsync(
-            BlobStorageUrl
-                .Replace(VersionTag, version.ToString().Replace(".", "-"))
-                .Replace(FileTag, "changelog.txt"), cancellationToken);
+            using var blobChangeLogResponse = await this.httpClient.GetAsync(
+                BlobStorageUrl
+                    .Replace(VersionTag, version.ToString().Replace(".", "-"))
+                    .Replace(FileTag, "changelog.txt"), cancellationToken);
 
-            if (!changeLogResponse.IsSuccessStatusCode)
+            if (blobChangeLogResponse.IsSuccessStatusCode)
             {
-                scopedLogger.LogError("Failed to retrieve changelog for version {version}. Status code: {statusCode}", version, changeLogResponse.StatusCode);
+                scopedLogger.LogDebug("Retrieved changelog from blob for version {version}", version);
+                var blobChangeLog = await blobChangeLogResponse.Content.ReadAsStringAsync(cancellationToken);
+                return blobChangeLog;
+            }
+
+            scopedLogger.LogWarning("Failed to retrieve changelog from blob storage for version {version}. Status code: {statusCode}", version, blobChangeLogResponse.StatusCode);
+            var githubChangeLogResponse = await this.GetChangeLogFromGithub(version, cancellationToken);
+
+            if (githubChangeLogResponse is null)
+            {
+                scopedLogger.LogError("Failed to retrieve changelog from github for version {version}", version);
                 return default;
             }
 
-            scopedLogger.LogDebug("Retrieved changelog for version {version}", version);
-            return await changeLogResponse.Content.ReadAsStringAsync(cancellationToken);
+            scopedLogger.LogDebug("Retrieved changelog from github for version {version}", version);
+            return githubChangeLogResponse;
         }
         catch (Exception e)
         {
@@ -239,6 +251,35 @@ internal sealed class ApplicationUpdater(
     {
         this.MarkUpdateInRegistry();
         this.LaunchExtractor();
+    }
+
+    private async Task<string?> GetChangeLogFromGithub(Version version, CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: version.ToString());
+        try
+        {
+            using var response = await this.httpClient.GetAsync(GithubReleasesUrl, cancellationToken);
+            if (!response.IsSuccessStatusCode)
+            {
+                scopedLogger.LogError("Failed to retrieve releases list from github for version. Status code: {statusCode}", response.StatusCode);
+                return default;
+            }
+
+            var releases = await response.Content.ReadFromJsonAsync<List<GithubRelease>>(cancellationToken);
+            var release = releases?.FirstOrDefault(r => r.TagName == $"v{version}");
+            if (release is null)
+            {
+                scopedLogger.LogError("Failed to find release info for version {version} on github", version);
+                return default;
+            }
+
+            return release.Body.Replace("<br />", $"<br />{Environment.NewLine}");
+        }
+        catch (Exception e)
+        {
+            scopedLogger.LogError(e, "Failed to retrieve changelog from github for version {version}", version);
+            return default;
+        }
     }
 
     private async Task<bool> DownloadUpdateInternalBlob(List<Metadata> metadata, Version version, IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
