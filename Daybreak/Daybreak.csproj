@@ -129,6 +129,16 @@
     <DaybreakInjectorSources Include="..\Daybreak.Shared\**\*.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Daybreak.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Daybreak.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
   <!--
   This is a workaround to determine where to place the dependency projects
   It will first check if PublishDir is set.
