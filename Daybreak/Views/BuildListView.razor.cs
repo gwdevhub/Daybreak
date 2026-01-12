@@ -16,8 +16,6 @@ public sealed class BuildListViewModel(
     IToolboxService toolboxService)
     : ViewModelBase<BuildListViewModel, BuildListView>
 {
-    private static readonly TimeSpan SearchDebounce = TimeSpan.FromSeconds(1);
-
     private readonly IViewManager viewManager = viewManager.ThrowIfNull();
     private readonly IBuildTemplateManager buildTemplateManager = buildTemplateManager.ThrowIfNull();
     private readonly IToolboxService toolboxService = toolboxService.ThrowIfNull();
