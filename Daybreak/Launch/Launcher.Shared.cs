@@ -8,17 +8,22 @@ using Photino.Blazor;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
+using System.Drawing;
 using System.Extensions.Core;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace Daybreak.Launch;
 
 public partial class Launcher
 {
+    private const string IconResourceName = "Daybreak.Daybreak.ico";
+
     public const string OutputTemplate = "[{Timestamp:yyyy-MM-dd HH:mm:ss}] {Level:u4}: [{EnvironmentName}] [{ThreadId}:{ThreadName}] [{SourceContext}]{NewLine}{Message:lj}{NewLine}{Exception}";
 
     private static nint OriginalWndProc;
     private static NativeMethods.WndProcDelegate? WndProcDelegate;
+    private static Icon? WindowIcon; 
 
     public static void SetupLogging(IServiceCollection services)
     {
@@ -128,6 +133,49 @@ public partial class Launcher
             IntPtr.Zero,
             0, 0, 0, 0,
             0x0001 | 0x0002 | 0x0004 | 0x0020); // SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED
+    }
+
+    private static void SetupWindowIcon(PhotinoBlazorApp app)
+    {
+        var hwnd = app.MainWindow.WindowHandle;
+        if (hwnd == IntPtr.Zero)
+        {
+            return;
+        }
+
+        var scopedLogger = app.Services.GetRequiredService<ILogger<Launcher>>().CreateScopedLogger();
+        try
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            if (assembly.GetManifestResourceInfo(IconResourceName) is not ManifestResourceInfo info)
+            {
+                scopedLogger.LogWarning("Icon resource '{IconResourceName}' not found in assembly.", IconResourceName);
+                return;
+            }
+
+            var embeddedIconStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(IconResourceName);
+            if (embeddedIconStream is null)
+            {
+                scopedLogger.LogWarning("Icon resource '{IconResourceName}' stream is null.", IconResourceName);
+                return;
+            }
+
+            WindowIcon = new Icon(embeddedIconStream);
+            var hIcon = WindowIcon.Handle;
+            if (hIcon is 0)
+            {
+                scopedLogger.LogWarning("Failed to get handle for window icon.");
+                return;
+            }
+
+            NativeMethods.SendMessage(hwnd, NativeMethods.WM_SETICON, NativeMethods.ICON_BIG, hIcon);
+            NativeMethods.SendMessage(hwnd, NativeMethods.WM_SETICON, NativeMethods.ICON_SMALL, hIcon);
+            scopedLogger.LogDebug("Window icon set successfully.");
+        }
+        catch(Exception ex)
+        {
+            scopedLogger.LogError(ex, "Failed to set window icon.");
+        }
     }
 
     private static nint WndProc(nint hwnd, uint msg, nint wParam, nint lParam)

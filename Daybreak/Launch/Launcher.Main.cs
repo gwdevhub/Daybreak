@@ -1,4 +1,5 @@
 ﻿using Daybreak.Shared.Services.Screens;
+using Daybreak.Shared.Utils;
 using Daybreak.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -39,6 +40,7 @@ public partial class Launcher
             .SetSmoothScrollingEnabled(true)
             .SetChromeless(true);
         app.MainWindow.SetLogVerbosity(0);
+        app.MainWindow.RegisterWindowCreatedHandler((_, __) => SetupWindowIcon(app));
         app.MainWindow.RegisterWindowCreatedHandler((_, __) => SetupRoundedWindows(app));
         app.MainWindow.RegisterWindowCreatedHandler((_, __) => SetupBorderless(app));
         app.MainWindow.RegisterWindowCreatedHandler((_, __) => StartHostedServices(app, cts));
