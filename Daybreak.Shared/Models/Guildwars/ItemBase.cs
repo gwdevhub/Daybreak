@@ -1,9 +1,7 @@
-﻿using Daybreak.Shared.Converters;
-using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Daybreak.Shared.Models.Guildwars;
 
-[JsonConverter(typeof(ItemBaseJsonConverter))]
 public abstract class ItemBase
 {
     public static IReadOnlyCollection<ItemBase> AllItems { get; } = Enumerable.Empty<ItemBase>()
@@ -134,10 +132,13 @@ public abstract class ItemBase
         .Where(filter)
         .FirstOrDefault();
 
+    [JsonPropertyName("id")]
     public int Id { get; init; }
 
+    [JsonPropertyName("name")]
     public string? Name { get; init; }
 
+    [JsonPropertyName("modifiers")]
     public IEnumerable<ItemModifier>? Modifiers { get; init; }
 
     public sealed class Unknown : ItemBase

@@ -19,28 +19,26 @@ public sealed class BuildRoutingViewModel(
     public override async ValueTask ParametersSet(BuildRoutingView view, CancellationToken cancellationToken)
     {
         var build = await this.buildTemplateManager.GetBuild(view.BuildName);
-        build.Do(
-            onSuccess: parsedBuild =>
-            {
-                if (parsedBuild is SingleBuildEntry singleBuildEntry)
-                {
-                    this.viewManager.ShowView<SingleBuildTemplateView>((nameof(SingleBuildTemplateView.BuildName), singleBuildEntry.Name ?? string.Empty));
-                }
-                else if (parsedBuild is TeamBuildEntry teamBuildEntry)
-                {
-                    this.viewManager.ShowView<TeamBuildTemplateView>((nameof(TeamBuildTemplateView.BuildName), teamBuildEntry.Name ?? string.Empty));
-                }
-                else
-                {
-                    throw new Exception($"Unexpected build entry type: {parsedBuild.GetType().Name}");
-                }
-            },
-            onFailure: failure =>
-            {
-                this.notificationService.NotifyError(
+        if (build is null)
+        {
+            this.notificationService.NotifyError(
                     title: "Failed to load build",
                     description: $"Encountered an error while loading build {view.BuildName}. Check logs for details");
-                this.viewManager.ShowView<LaunchView>();
-            });
+            this.viewManager.ShowView<LaunchView>();
+            return;
+        }
+
+        if (build is SingleBuildEntry singleBuildEntry)
+        {
+            this.viewManager.ShowView<SingleBuildTemplateView>((nameof(SingleBuildTemplateView.BuildName), singleBuildEntry.Name ?? string.Empty));
+        }
+        else if (build is TeamBuildEntry teamBuildEntry)
+        {
+            this.viewManager.ShowView<TeamBuildTemplateView>((nameof(TeamBuildTemplateView.BuildName), teamBuildEntry.Name ?? string.Empty));
+        }
+        else
+        {
+            throw new Exception($"Unexpected build entry type: {build.GetType().Name}");
+        }
     }
 }

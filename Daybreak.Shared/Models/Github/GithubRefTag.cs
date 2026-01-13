@@ -1,13 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Daybreak.Shared.Models.Github;
 
 public sealed class GithubRefTag
 {
-    [JsonProperty("ref")]
-    public string? Ref;
-    [JsonProperty("node_id")]
-    public string? NodeId;
-    [JsonProperty("url")]
-    public string? Url;
+    [JsonPropertyName("ref")]
+    public string? Ref { get; set; }
+    [JsonPropertyName("node_id")]
+    public string? NodeId { get; set; }
+    [JsonPropertyName("url")]
+    public string? Url { get; set; }
 }

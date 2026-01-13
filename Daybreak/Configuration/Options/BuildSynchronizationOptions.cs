@@ -1,5 +1,5 @@
 ﻿using Daybreak.Shared.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Daybreak.Configuration.Options;
 
@@ -8,8 +8,8 @@ namespace Daybreak.Configuration.Options;
 [OptionsSynchronizationIgnore]
 internal sealed class SynchronizationOptions
 {
-    [JsonProperty(nameof(ProtectedGraphAccessToken))]
+    [JsonPropertyName(nameof(ProtectedGraphAccessToken))]
     public string? ProtectedGraphAccessToken { get; set; }
-    [JsonProperty(nameof(ProtectedGraphRefreshToken))]
+    [JsonPropertyName(nameof(ProtectedGraphRefreshToken))]
     public string? ProtectedGraphRefreshToken { get; set; }
 }

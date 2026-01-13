@@ -1,6 +1,6 @@
 ﻿using Daybreak.Shared.Attributes;
 using Daybreak.Shared.Models;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Daybreak.Configuration.Options;
 
@@ -8,6 +8,6 @@ namespace Daybreak.Configuration.Options;
 [OptionsName(Name = "Credentials")]
 internal sealed class CredentialManagerOptions
 {
-    [JsonProperty(nameof(ProtectedLoginCredentials))]
+    [JsonPropertyName(nameof(ProtectedLoginCredentials))]
     public List<ProtectedLoginCredentials> ProtectedLoginCredentials { get; set; } = [];
 }

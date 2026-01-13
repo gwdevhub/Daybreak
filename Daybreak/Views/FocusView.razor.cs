@@ -91,7 +91,17 @@ public sealed class FocusViewModel(
             return;
         }
 
-        this.process = Process.GetProcessById(processId);
+        try
+        {
+            this.process = Process.GetProcessById(processId);
+        }
+        catch(Exception ex)
+        {
+            scopedLogger.LogError(ex, "Encountered exception when fetching process with id {processId}", processId);
+            this.viewManager.ShowView<LaunchView>();
+            return;
+        }
+        
         var apiContext = await this.daybreakApiService.GetDaybreakApiContext(this.process, cancellationToken);
         if (apiContext is null)
         {

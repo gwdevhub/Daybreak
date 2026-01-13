@@ -4,12 +4,11 @@ using Daybreak.Shared.Models.Options;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Utils;
 using Daybreak.Shared.Validators;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.ComponentModel;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Reflection;
+using System.Text.Json;
 
 namespace Daybreak.Services.Options;
 
@@ -39,7 +38,7 @@ internal sealed class OptionsManager : IOptionsProvider
         }
         else
         {
-            this.optionsCache = JsonConvert.DeserializeObject<Dictionary<string, string>>(optionsFileContent) ??
+            this.optionsCache = JsonSerializer.Deserialize<Dictionary<string, string>>(optionsFileContent) ??
             throw new InvalidOperationException("Unable to load options. Operation failed during deserialization");
         }
 
@@ -58,7 +57,7 @@ internal sealed class OptionsManager : IOptionsProvider
             throw new InvalidOperationException($"No registered or existing options found for {optionsName}");
         }
 
-        return JsonConvert.DeserializeObject<T>(value) ??
+        return JsonSerializer.Deserialize<T>(value) ??
             throw new InvalidOperationException($"Failed to deserialize options {optionsName}");
     }
 
@@ -100,7 +99,7 @@ internal sealed class OptionsManager : IOptionsProvider
                 continue;
             }
 
-            var instance = JsonConvert.DeserializeObject(value, type.Type) ?? Activator.CreateInstance(type.Type);
+            var instance = JsonSerializer.Deserialize(value, type.Type) ?? Activator.CreateInstance(type.Type);
             yield return new OptionInstance { Reference = instance!, Type = type };
         }
     }
@@ -122,7 +121,7 @@ internal sealed class OptionsManager : IOptionsProvider
             throw new InvalidOperationException($"No existing options found for {optionName}");
         }
 
-        var instance = JsonConvert.DeserializeObject(value, type.Type) ?? Activator.CreateInstance(type.Type);
+        var instance = JsonSerializer.Deserialize(value, type.Type) ?? Activator.CreateInstance(type.Type);
         return new OptionInstance { Reference = instance!, Type = type };
     }
 
@@ -144,7 +143,7 @@ internal sealed class OptionsManager : IOptionsProvider
         this.SaveOptions(optionInstance.Type.Type, optionInstance.Reference);
     }
 
-    public void SaveRegisteredOptions(string name, JObject options)
+    public void SaveRegisteredOptions(string name, JsonDocument options)
     {
         options.ThrowIfNull();
 
@@ -167,14 +166,14 @@ internal sealed class OptionsManager : IOptionsProvider
         this.SaveOptions(registeredType, options);
     }
 
-    public JObject? TryGetKeyedOptions(string key)
+    public JsonDocument? TryGetKeyedOptions(string key)
     {
         if (!this.optionsCache.TryGetValue(key, out var value))
         {
             return default;
         }
 
-        return JsonConvert.DeserializeObject<JObject>(value);
+        return JsonSerializer.Deserialize<JsonDocument>(value);
     }
 
     private void RegisterOptions(Type optionType)
@@ -182,7 +181,7 @@ internal sealed class OptionsManager : IOptionsProvider
         var optionsName = GetOptionsName(optionType);
         if (this.optionsCache.ContainsKey(optionsName) is false)
         {
-            this.optionsCache.Add(optionsName, JsonConvert.SerializeObject(Activator.CreateInstance(optionType)));
+            this.optionsCache.Add(optionsName, JsonSerializer.Serialize(Activator.CreateInstance(optionType)));
         }
 
         this.optionsTypes.Add(optionType);
@@ -206,14 +205,14 @@ internal sealed class OptionsManager : IOptionsProvider
             throw new InvalidOperationException($"No registered or existing options found for {optionsName}");
         }
 
-        this.optionsCache[optionsName] = JsonConvert.SerializeObject(value);
+        this.optionsCache[optionsName] = JsonSerializer.Serialize(value);
         this.SaveOptions();
         this.CallHooks(type);
     }
 
     private void SaveOptions()
     {
-        File.WriteAllText(OptionsFile, JsonConvert.SerializeObject(this.optionsCache));
+        File.WriteAllText(OptionsFile, JsonSerializer.Serialize(this.optionsCache));
     }
 
     private void CallHooks(Type type)

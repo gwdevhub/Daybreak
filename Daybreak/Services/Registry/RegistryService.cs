@@ -1,9 +1,8 @@
 ﻿using Daybreak.Shared.Services.Registry;
 using Microsoft.Win32;
-using Newtonsoft.Json;
 using System.Core.Extensions;
 using System.Extensions;
-using System.IO;
+using System.Text.Json;
 
 namespace Daybreak.Services.Registry;
 
@@ -41,7 +40,7 @@ internal sealed class RegistryService : IRegistryService
 
         return RegistryKeyExecute(key, (destinationRegistryKey, mappingKey) =>
         {
-            destinationRegistryKey.SetValue(mappingKey, JsonConvert.SerializeObject(value));
+            destinationRegistryKey.SetValue(mappingKey, JsonSerializer.Serialize(value));
             return true;
         });
     }
@@ -69,7 +68,7 @@ internal sealed class RegistryService : IRegistryService
             return false;
         }
 
-        value = JsonConvert.DeserializeObject<T>(serializedValue);
+        value = JsonSerializer.Deserialize<T>(serializedValue);
         return value is not null;
     }
 

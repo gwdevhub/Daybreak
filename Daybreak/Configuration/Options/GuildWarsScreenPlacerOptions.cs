@@ -1,5 +1,5 @@
 ﻿using Daybreak.Shared.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Daybreak.Configuration.Options;
 
@@ -7,9 +7,9 @@ namespace Daybreak.Configuration.Options;
 [OptionsIgnore]
 internal sealed class GuildWarsScreenPlacerOptions
 {
-    [JsonProperty(nameof(Enabled))]
+    [JsonPropertyName(nameof(Enabled))]
     public bool Enabled { get; set; }
 
-    [JsonProperty(nameof(DesiredScreen))]
+    [JsonPropertyName(nameof(DesiredScreen))]
     public int DesiredScreen { get; set; }
 }

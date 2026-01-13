@@ -1,10 +1,9 @@
 ﻿using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.Wiki;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
 using System.Collections.Concurrent;
-using System.Net.Http;
 using System.Text.Encodings.Web;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using Attribute = Daybreak.Shared.Models.Guildwars.Attribute;
 
@@ -89,25 +88,39 @@ public sealed partial class WikiService(
     {
         try
         {
-            var json = JObject.Parse(jsonContent);
-            if (json["query"]?["pages"] is not JObject pages)
+            using var json = JsonDocument.Parse(jsonContent);
+            var root = json.RootElement;
+
+            if (!root.TryGetProperty("query", out var query) ||
+                !query.TryGetProperty("pages", out var pages))
             {
                 return null;
             }
 
-            if (pages.Properties().FirstOrDefault()?.Value is not JObject page)
+            // Get the first property (page) from pages object
+            using var pagesEnumerator = pages.EnumerateObject();
+            if (!pagesEnumerator.MoveNext())
             {
                 return null;
             }
 
-            var revisions = page["revisions"] as JArray;
-            if (revisions == null || revisions.Count == 0)
+            var page = pagesEnumerator.Current.Value;
+
+            if (!page.TryGetProperty("revisions", out var revisions) ||
+                revisions.GetArrayLength() == 0)
             {
                 return null;
             }
 
-            var content = revisions[0]?["slots"]?["main"]?["*"]?.Value<string>();
-            return content;
+            var firstRevision = revisions[0];
+            if (firstRevision.TryGetProperty("slots", out var slots) &&
+                slots.TryGetProperty("main", out var main) &&
+                main.TryGetProperty("*", out var content))
+            {
+                return content.GetString();
+            }
+
+            return null;
         }
         catch (Exception)
         {

@@ -1,12 +1,12 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Text.Json;
 
 namespace Daybreak.Shared.Services.Options;
 
 public interface IOptionsSynchronizationService
 {
-    Task<Dictionary<string, JObject>> GetLocalOptions(CancellationToken cancellationToken);
+    Task<Dictionary<string, JsonDocument>> GetLocalOptions(CancellationToken cancellationToken);
 
-    Task<Dictionary<string, JObject>?> GetRemoteOptions(CancellationToken cancellationToken);
+    Task<Dictionary<string, JsonDocument>?> GetRemoteOptions(CancellationToken cancellationToken);
 
     /// <summary>
     /// Back up options on remote

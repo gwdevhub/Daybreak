@@ -1,73 +1,78 @@
 ﻿using Daybreak.Shared.Models.Trade;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Daybreak.Shared.Converters;
 public sealed class TradeAlertConverter : JsonConverter<ITradeAlert>
 {
-    public override ITradeAlert? ReadJson(JsonReader reader, Type objectType, ITradeAlert? existingValue, bool hasExistingValue, JsonSerializer serializer)
+    public override ITradeAlert? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        var jObject = JObject.Load(reader).ToObject<dynamic>() ?? throw new InvalidOperationException($"Unable to deserialize {nameof(ITradeAlert)}");
-        if (jObject[nameof(TradeAlert.MessageCheck)] is null)
+        if (reader.TokenType != JsonTokenType.StartObject)
         {
-            return new QuoteAlert
+            throw new JsonException("Expected StartObject token");
+        }
+
+        using var jsonDoc = JsonDocument.ParseValue(ref reader);
+        var root = jsonDoc.RootElement;
+
+        // Discriminate based on presence of MessageCheck property
+        if (root.TryGetProperty(nameof(TradeAlert.MessageCheck), out _))
+        {
+            return new TradeAlert
             {
-                Name = jObject[nameof(QuoteAlert.Name)],
-                Id = jObject[nameof(QuoteAlert.Id)],
-                Enabled = jObject[nameof(QuoteAlert.Enabled)],
-                UpperPriceTarget = jObject[nameof(QuoteAlert.UpperPriceTarget)],
-                LowerPriceTarget = jObject[nameof(QuoteAlert.LowerPriceTarget)],
-                UpperPriceTargetEnabled = jObject[nameof(QuoteAlert.UpperPriceTargetEnabled)],
-                LowerPriceTargetEnabled = jObject[nameof(QuoteAlert.LowerPriceTargetEnabled)],
-                ItemId = jObject[nameof(QuoteAlert.ItemId)]
+                Name = root.GetProperty(nameof(TradeAlert.Name)).GetString() ?? string.Empty,
+                Id = root.GetProperty(nameof(TradeAlert.Id)).GetString() ?? string.Empty,
+                Enabled = root.GetProperty(nameof(TradeAlert.Enabled)).GetBoolean(),
+                MessageCheck = root.TryGetProperty(nameof(TradeAlert.MessageCheck), out var msgCheck) ? msgCheck.GetString() : null,
+                MessageRegexCheck = root.TryGetProperty(nameof(TradeAlert.MessageRegexCheck), out var msgRegex) && msgRegex.GetBoolean(),
+                SenderCheck = root.TryGetProperty(nameof(TradeAlert.SenderCheck), out var senderCheck) ? senderCheck.GetString() : null,
+                SenderRegexCheck = root.TryGetProperty(nameof(TradeAlert.SenderRegexCheck), out var senderRegex) && senderRegex.GetBoolean()
             };
         }
         else
         {
-            return new TradeAlert
+            return new QuoteAlert
             {
-                Name = jObject[nameof(TradeAlert.Name)],
-                Id = jObject[nameof(TradeAlert.Id)],
-                Enabled = jObject[nameof(TradeAlert.Enabled)],
-                MessageCheck = jObject[nameof(TradeAlert.MessageCheck)],
-                MessageRegexCheck = jObject[nameof(TradeAlert.MessageRegexCheck)],
-                SenderCheck = jObject[nameof(TradeAlert.SenderCheck)],
-                SenderRegexCheck = jObject[nameof(TradeAlert.SenderRegexCheck)]
+                Name = root.GetProperty(nameof(QuoteAlert.Name)).GetString() ?? string.Empty,
+                Id = root.GetProperty(nameof(QuoteAlert.Id)).GetString() ?? string.Empty,
+                Enabled = root.GetProperty(nameof(QuoteAlert.Enabled)).GetBoolean(),
+                ItemId = root.TryGetProperty(nameof(QuoteAlert.ItemId), out var itemId) ? itemId.GetInt32() : 0,
+                TraderQuoteType = root.TryGetProperty(nameof(QuoteAlert.TraderQuoteType), out var quoteType)
+                    ? Enum.Parse<TraderQuoteType>(quoteType.GetString() ?? nameof(TraderQuoteType.Buy))
+                    : default,
+                UpperPriceTarget = root.TryGetProperty(nameof(QuoteAlert.UpperPriceTarget), out var upperPrice) ? upperPrice.GetInt32() : 0,
+                UpperPriceTargetEnabled = root.TryGetProperty(nameof(QuoteAlert.UpperPriceTargetEnabled), out var upperEnabled) && upperEnabled.GetBoolean(),
+                LowerPriceTarget = root.TryGetProperty(nameof(QuoteAlert.LowerPriceTarget), out var lowerPrice) ? lowerPrice.GetInt32() : 0,
+                LowerPriceTargetEnabled = root.TryGetProperty(nameof(QuoteAlert.LowerPriceTargetEnabled), out var lowerEnabled) && lowerEnabled.GetBoolean()
             };
         }
     }
 
-    public override void WriteJson(JsonWriter writer, ITradeAlert? value, JsonSerializer serializer)
+    public override void Write(Utf8JsonWriter writer, ITradeAlert value, JsonSerializerOptions options)
     {
-        if (value is null)
-        {
-            serializer.Serialize(writer, null);
-            return;
-        }
+        writer.WriteStartObject();
 
-        var jObject = new JObject
-        {
-            [nameof(ITradeAlert.Name)] = value.Name,
-            [nameof(ITradeAlert.Enabled)] = value.Enabled,
-            [nameof(ITradeAlert.Id)] = value.Id
-        };
+        writer.WriteString(nameof(ITradeAlert.Id), value.Id);
+        writer.WriteString(nameof(ITradeAlert.Name), value.Name);
+        writer.WriteBoolean(nameof(ITradeAlert.Enabled), value.Enabled);
+
         if (value is TradeAlert tradeAlert)
         {
-            jObject[nameof(TradeAlert.MessageCheck)] = tradeAlert.MessageCheck;
-            jObject[nameof(TradeAlert.MessageRegexCheck)] = tradeAlert.MessageRegexCheck;
-            jObject[nameof(TradeAlert.SenderCheck)] = tradeAlert.SenderCheck;
-            jObject[nameof(TradeAlert.SenderRegexCheck)] = tradeAlert.SenderRegexCheck;
+            writer.WriteString(nameof(TradeAlert.MessageCheck), tradeAlert.MessageCheck);
+            writer.WriteBoolean(nameof(TradeAlert.MessageRegexCheck), tradeAlert.MessageRegexCheck);
+            writer.WriteString(nameof(TradeAlert.SenderCheck), tradeAlert.SenderCheck);
+            writer.WriteBoolean(nameof(TradeAlert.SenderRegexCheck), tradeAlert.SenderRegexCheck);
         }
         else if (value is QuoteAlert quoteAlert)
         {
-            jObject[nameof(QuoteAlert.TraderQuoteType)] = quoteAlert.TraderQuoteType.ToString();
-            jObject[nameof(QuoteAlert.ItemId)] = quoteAlert.ItemId;
-            jObject[nameof(QuoteAlert.UpperPriceTarget)] = quoteAlert.UpperPriceTarget;
-            jObject[nameof(QuoteAlert.UpperPriceTargetEnabled)] = quoteAlert.UpperPriceTargetEnabled;
-            jObject[nameof(QuoteAlert.LowerPriceTarget)] = quoteAlert.LowerPriceTarget;
-            jObject[nameof(QuoteAlert.LowerPriceTargetEnabled)] = quoteAlert.LowerPriceTargetEnabled;
+            writer.WriteString(nameof(QuoteAlert.TraderQuoteType), quoteAlert.TraderQuoteType.ToString());
+            writer.WriteNumber(nameof(QuoteAlert.ItemId), quoteAlert.ItemId);
+            writer.WriteNumber(nameof(QuoteAlert.UpperPriceTarget), quoteAlert.UpperPriceTarget);
+            writer.WriteBoolean(nameof(QuoteAlert.UpperPriceTargetEnabled), quoteAlert.UpperPriceTargetEnabled);
+            writer.WriteNumber(nameof(QuoteAlert.LowerPriceTarget), quoteAlert.LowerPriceTarget);
+            writer.WriteBoolean(nameof(QuoteAlert.LowerPriceTargetEnabled), quoteAlert.LowerPriceTargetEnabled);
         }
 
-        serializer.Serialize(writer, jObject);
+        writer.WriteEndObject();
     }
 }

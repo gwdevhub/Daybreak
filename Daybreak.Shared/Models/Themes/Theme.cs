@@ -1,6 +1,6 @@
 ﻿using Daybreak.Shared.Converters;
 using Daybreak.Shared.Models.ColorPalette;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Daybreak.Shared.Models.Themes;
 [JsonConverter(typeof(ThemeJsonConverter))]

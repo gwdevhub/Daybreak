@@ -2,9 +2,9 @@
 using Daybreak.Shared.Models.Notifications.Handling;
 using Daybreak.Shared.Models.Trade;
 using Daybreak.Views.Trade;
-using Newtonsoft.Json;
 using System.Core.Extensions;
 using System.Extensions;
+using System.Text.Json;
 using TrailBlazr.Services;
 
 namespace Daybreak.Services.TradeChat.Notifications;
@@ -21,7 +21,7 @@ internal sealed class TradeMessageNotificationHandler(IViewManager viewManager)
             return;
         }
 
-        var trade = JsonConvert.DeserializeObject<TraderMessage>(notification.Metadata);
+        var trade = JsonSerializer.Deserialize<TraderMessage>(notification.Metadata);
         if (trade is null)
         {
             return;

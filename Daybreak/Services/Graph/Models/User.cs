@@ -1,12 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Daybreak.Services.Graph.Models;
 
 public sealed class User
 {
-    [JsonProperty("displayName")]
+    [JsonPropertyName("displayName")]
     public string? DisplayName { get; set; }
 
-    [JsonProperty("mail")]
+    [JsonPropertyName("mail")]
     public string? Email { get; set; }
 }

@@ -1,5 +1,5 @@
 ﻿using Daybreak.Shared.Converters;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Daybreak.Shared.Models.Trade;
 

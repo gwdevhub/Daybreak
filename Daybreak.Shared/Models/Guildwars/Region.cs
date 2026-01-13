@@ -1,9 +1,7 @@
-﻿using Daybreak.Shared.Converters;
-using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Daybreak.Shared.Models.Guildwars;
 
-[JsonConverter(typeof(RegionJsonConverter))]
 public sealed class Region : IWikiEntity
 {
     public static readonly Region Kryta = new()
@@ -888,9 +886,16 @@ public sealed class Region : IWikiEntity
     private Region()
     {
     }
-    
+
+    [JsonPropertyName("id")]
     public int Id { get; init; }
+
+    [JsonPropertyName("name")]
     public string? Name { get; init; }
+
+    [JsonPropertyName("wikiUrl")]
     public string? WikiUrl { get; init; }
+
+    [JsonPropertyName("maps")]
     public IReadOnlyList<Map>? Maps { get; init; }
 }

@@ -1,13 +1,16 @@
-﻿using Daybreak.Shared.Converters;
-using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Daybreak.Shared.Models.Guildwars;
 
-[JsonConverter(typeof(MapJsonConverter))]
 public sealed class Map : IWikiEntity
 {
+    [JsonPropertyName("id")]
     public int Id { get; private set; }
+
+    [JsonPropertyName("name")]
     public string? Name { get; private set; }
+
+    [JsonPropertyName("wikiUrl")]
     public string? WikiUrl { get; private set; }
 
     public static readonly Map None = new() { Id = 0, Name = "", WikiUrl = "https://wiki.guildwars.com/wiki/" };

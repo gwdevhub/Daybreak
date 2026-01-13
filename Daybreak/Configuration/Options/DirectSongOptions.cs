@@ -1,5 +1,5 @@
 ﻿using Daybreak.Shared.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Daybreak.Configuration.Options;
 
@@ -7,7 +7,7 @@ namespace Daybreak.Configuration.Options;
 [OptionsIgnore]
 internal sealed class DirectSongOptions
 {
-    [JsonProperty(nameof(Enabled))]
+    [JsonPropertyName(nameof(Enabled))]
     [OptionName(Name = "Enabled", Description = "If true, Daybreak will setup DirectSong when launching Guild Wars")]
     public bool Enabled { get; set; } = false;
 }

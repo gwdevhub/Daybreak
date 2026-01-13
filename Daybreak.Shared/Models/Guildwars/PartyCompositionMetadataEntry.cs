@@ -1,6 +1,5 @@
 ﻿using Daybreak.Shared.Models.Api;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using System.Text.Json.Serialization;
 
 namespace Daybreak.Shared.Models.Guildwars;
 
@@ -10,14 +9,14 @@ public sealed class PartyCompositionMetadataEntry
 
     public required int Index { get; init; }
 
-    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? HeroId { get; init; }
 
-    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public HeroBehavior? Behavior { get; init; }
 }
 
-[JsonConverter(typeof(StringEnumConverter))]
+[JsonConverter(typeof(JsonStringEnumConverter<PartyCompositionMemberType>))]
 public enum PartyCompositionMemberType
 {
     Unknown,

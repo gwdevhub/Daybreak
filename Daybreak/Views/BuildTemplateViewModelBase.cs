@@ -82,12 +82,7 @@ public abstract class BuildTemplateViewModelBase<TViewModel, TView>(
     public override sealed async ValueTask ParametersSet(TView view, CancellationToken cancellationToken)
     {
         var buildLoad = await this.buildTemplateManager.GetBuild(view.BuildName);
-        if (!buildLoad.TryExtractSuccess(out var buildEntry))
-        {
-            throw new InvalidOperationException($"Failed to load build by name {view.BuildName}");
-        }
-
-        this.LoadBuild(buildEntry);
+        this.LoadBuild(buildLoad);
         this.UpdateBuildCode();
         this.FilterSkillsByProfessionsAndString();
         await this.RefreshViewAsync();

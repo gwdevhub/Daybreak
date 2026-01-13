@@ -1,31 +1,26 @@
 ﻿using Daybreak.Shared.Models.Themes;
 using Daybreak.Shared.Services.Themes;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Daybreak.Shared.Converters;
 public sealed class ThemeJsonConverter : JsonConverter<Theme>
 {
-    public override Theme? ReadJson(JsonReader reader, Type objectType, Theme? existingValue, bool hasExistingValue, JsonSerializer serializer)
+    public override Theme? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        if (reader.TokenType is JsonToken.String)
+        return reader.TokenType switch
         {
-            var themeName = reader.Value?.ToString();
-            if (themeName is not null)
-            {
-                if (themeName is GameScreenshotsTheme.ThemeName)
-                {
-                    return Theme.Themes.FirstOrDefault(t => t is GameScreenshotsTheme);
-                }
-
-                return Theme.Themes.FirstOrDefault(t => t.Name.Equals(themeName, StringComparison.OrdinalIgnoreCase));
-            }
-        }
-
-        throw new JsonSerializationException($"Unexpected token {reader.TokenType} when parsing theme. Expected a string representing the theme name.");
+            JsonTokenType.String => reader.GetString() is string themeName
+                ? themeName is GameScreenshotsTheme.ThemeName
+                    ? Theme.Themes.FirstOrDefault(t => t is GameScreenshotsTheme)
+                    : Theme.Themes.FirstOrDefault(t => t.Name.Equals(themeName, StringComparison.OrdinalIgnoreCase))
+                : default,
+            _ => default
+        };
     }
 
-    public override void WriteJson(JsonWriter writer, Theme? value, JsonSerializer serializer)
+    public override void Write(Utf8JsonWriter writer, Theme value, JsonSerializerOptions options)
     {
-        writer.WriteValue(value?.Name ?? string.Empty);
+        writer.WriteStringValue(value.Name);
     }
 }
