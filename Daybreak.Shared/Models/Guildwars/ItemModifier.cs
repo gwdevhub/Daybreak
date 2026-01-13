@@ -3,11 +3,12 @@
 public readonly struct ItemModifier
 {
     public uint Modifier { get; init; }
-    public ItemModifierIdentifier Identifier => (ItemModifierIdentifier)(this.Modifier >> 20);
-    public ItemModifierParam Param => (ItemModifierParam)((this.Modifier & 0x000F0000) >> 16);
-    public uint UpgradeId => this.Modifier & 0x0000FFFF;
-    public uint Argument1 => (this.Modifier & 0x0000FF00) >> 8;
-    public uint Argument2 => this.Modifier & 0x000000FF;
+    public uint Flags => (this.Modifier >> 30) & 0xC;
+    public ItemModifierIdentifier Identifier => (ItemModifierIdentifier)((this.Modifier >> 20) & 0x3FF);
+    public ItemModifierParam Param => (ItemModifierParam)((this.Modifier >> 16) & 0xF);
+    public uint UpgradeId => this.Modifier & 0xFFFF;
+    public uint Argument1 => (this.Modifier >> 8) & 0xFF;
+    public uint Argument2 => this.Modifier & 0xFF;
 
     public static implicit operator uint(ItemModifier modifier) => modifier.Modifier;
     public static implicit operator ItemModifier(uint modifier) => new(){ Modifier = modifier };
@@ -15,18 +16,18 @@ public readonly struct ItemModifier
 
 public enum ItemModifierIdentifier : uint
 {
-    BaneSpecies                         = 0x808,
-    Attribute                           = 0x279,
-    Damage                              = 0xA7A,
-    Armor1                              = 0xA7B,
-    Armor2                              = 0xA3C,
-    Energy                              = 0x67C,
-    Upgrade1                            = 0x21E,
-    Upgrade2                            = 0x240,
-    OfTheProfession                     = 0x28A,
-    DamageType                          = 0x24B,
+    BaneSpecies                         = 0x008,    // Dmg increased vs species (arg1)
+    Attribute                           = 0x279,    // Requires points in attribute (arg2) (arg1)
+    Damage                              = 0x27A,    // Min damage - Max damage (arg2) (arg1)
+    Armor1                              = 0x27B,    // Armor value (arg1)
+    Armor2                              = 0x23C,    // Armor value (arg1)
+    Energy                              = 0x27C,    // Energy value (arg1)
+    Upgrade1                            = 0x21E,    // Suffix/Prefix/Inscription upgrade (upgrade id)
+    Upgrade2                            = 0x240,    // Suffix/Prefix/Inscription upgrade (upgrade id)
+    OfTheProfession                     = 0x28A,    // +5 to primary of profession (arg2) (arg1)
+    DamageType                          = 0x24B,    // Damage type (arg1)
 
-    DamagePlusCustomized                = 0xA49,    // 120 for +20% damage (Customized) (arg2)
+    DamagePlusCustomized                = 0x249,    // 120 for +20% damage (Customized) (arg2)
 
     DamagePlus                          = 0x223,    // +20% damage (arg2)
     DamagePlusVsHexed                   = 0x225,    // +15% damage vs hexed (arg2)
@@ -41,15 +42,16 @@ public enum ItemModifierIdentifier : uint
     HalvesCastingTimeItemAttribute      = 0x280,    // 10 for 10% chance to halve casting time for attribute of equipped item (arg1)
 
     HalvesSkillRechargeGeneral          = 0x23A,    // 10 for 10% skill recharge for any skill (arg1)
-    HalvesSkillRechargeAttribute        = 0x282,    // 20 for 20% skill recharge for attribute skill (arg1) (arg2)
+    HalvesSkillRechargeAttribute        = 0x239,    // 20 for 20% skill recharge for attribute skill (arg1) (arg2)
     HalvesSkillRechargeItemAttribute    = 0x282,    // 10 for 10% skill recharge for attribute of equipped item (arg1)
 
     EnergyPlus                          = 0x22D,    // 15 for +15 energy (arg2)
     EnergyPlusEnchanted                 = 0x22F,    // 10 for +10 energy while enchanted (arg2)
     EnergyPlusHexed                     = 0x232,    // 10 for +10 energy while hexed (arg2)
 
-    EnergyMinus                         = 0x20B,    // 5 for -5 energy (arg2)
-    EnergyDegen                         = 0x20C,    // 1 for -1 energy regen (arg2)
+    EnergyMinus                         = 0x20B,    // -5 energy (arg2)
+    EnergyDegen                         = 0x20C,    // -1 energy regen (arg2)
+    EnergyRegen                         = 0x262,    // 1 energy regen (arg2)
 
     ArmorPlus                           = 0x210,    // +5 armor (arg2)
     ArmorPlusVsDamage                   = 0x211,    // +10 armor vs damage type attacks (arg2) (arg1)
@@ -63,8 +65,9 @@ public enum ItemModifierIdentifier : uint
 
     ArmorMinusAttacking                 = 0x201,    // -5 armor while attacking (arg2)
 
-    HealthPlusWhileDown                 = 0x230,    // 20 for +20 health while below 50% HP (arg2) (arg1)
-    HealthMinus                         = 0x20D,    // 20 for -20 health (arg2)
+    HealthPlus                          = 0x289,    // +60 hp (arg2)
+    HealthPlusWhileDown                 = 0x230,    // +20 health while below 50% HP (arg2) (arg1)
+    HealthMinus                         = 0x20D,    // -20 health (arg2)
 
     ReceiveLessDamage                   = 0x207,    // Receive 5 less damage (20%) (arg2) (arg1)
     ReceiveLessPhysDamageEnchanted      = 0x208,    // Receive 2 less physical damage while enchanted (arg2)

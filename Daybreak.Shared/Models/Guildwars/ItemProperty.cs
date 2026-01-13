@@ -33,6 +33,7 @@ namespace Daybreak.Shared.Models.Guildwars;
 [JsonDerivedType(typeof(EnergyPlusWhileHexedProperty), "EnergyPlusWhileHexed")]
 [JsonDerivedType(typeof(EnergyMinusProperty), "EnergyMinus")]
 [JsonDerivedType(typeof(EnergyDegenProperty), "EnergyDegen")]
+[JsonDerivedType(typeof(EnergyRegenProperty), "EnergyRegen")]
 [JsonDerivedType(typeof(ArmorPlusProperty), "ArmorPlus")]
 [JsonDerivedType(typeof(ArmorPlusVsDamageProperty), "ArmorPlusVsDamage")]
 [JsonDerivedType(typeof(ArmorPlusVsSpeciesProperty), "ArmorPlusVsSpecies")]
@@ -42,6 +43,7 @@ namespace Daybreak.Shared.Models.Guildwars;
 [JsonDerivedType(typeof(ArmorPlusWhileHexedProperty), "ArmorPlusWhileHexed")]
 [JsonDerivedType(typeof(ArmorPlusWhileDownProperty), "ArmorPlusWhileDown")]
 [JsonDerivedType(typeof(ArmorMinusWhileAttackingProperty), "ArmorMinusWhileAttacking")]
+[JsonDerivedType(typeof(HealthPlusProperty), "HealthPlus")]
 [JsonDerivedType(typeof(HealthPlusWhileDownProperty), "HealthPlusWhileDown")]
 [JsonDerivedType(typeof(HealthMinusProperty), "HealthMinus")]
 [JsonDerivedType(typeof(ReceiveLessDamageProperty), "ReceiveLessDamage")]
@@ -85,7 +87,7 @@ public abstract class ItemProperty
 
                 ItemModifierIdentifier.HalvesSkillRechargeGeneral                   => new HalvesSkillRechargeGeneralProperty { Chance = (int)m.Argument1 },
                 ItemModifierIdentifier.HalvesSkillRechargeAttribute                 => new HalvesSkillRechargeAttributeProperty { Chance = (int)m.Argument1, Attribute = ParseAttributeName(m.Argument2) },
-                //ItemModifierIdentifier.HalvesSkillRechargeItemAttribute             => new HalvesSkillRechargeItemAttributeProperty { Chance = (int)m.Argument1 }, Duplicate of HalvesSkillRechargeGeneral
+                ItemModifierIdentifier.HalvesSkillRechargeItemAttribute             => new HalvesSkillRechargeItemAttributeProperty { Chance = (int)m.Argument1 },
 
                 ItemModifierIdentifier.EnergyPlus                                   => new EnergyPlusProperty { Energy = (int)m.Argument2 },
                 ItemModifierIdentifier.EnergyPlusEnchanted                          => new EnergyPlusWhileEnchantedProperty { Energy = (int)m.Argument2 },
@@ -93,6 +95,7 @@ public abstract class ItemProperty
 
                 ItemModifierIdentifier.EnergyMinus                                  => new EnergyMinusProperty { Energy = (int)m.Argument2 },
                 ItemModifierIdentifier.EnergyDegen                                  => new EnergyDegenProperty { EnergyDegen = (int)m.Argument2 },
+                ItemModifierIdentifier.EnergyRegen                                  => new EnergyRegenProperty { EnergyRegen = (int)m.Argument2 },
 
                 ItemModifierIdentifier.ArmorPlus                                    => new ArmorPlusProperty { Armor = (int)m.Argument2 },
                 ItemModifierIdentifier.ArmorPlusVsDamage                            => new ArmorPlusVsDamageProperty { Armor = (int)m.Argument2, DamageType = (DamageType)m.Argument1 },
@@ -106,6 +109,7 @@ public abstract class ItemProperty
 
                 ItemModifierIdentifier.ArmorMinusAttacking                          => new ArmorMinusWhileAttackingProperty { Armor = (int)m.Argument2 },
 
+                ItemModifierIdentifier.HealthPlus                                   => new HealthPlusProperty { Health = (int)m.Argument2 },
                 ItemModifierIdentifier.HealthPlusWhileDown                          => new HealthPlusWhileDownProperty { Health = (int)m.Argument2, HealthThreshold = (int)m.Argument1 },
                 ItemModifierIdentifier.HealthMinus                                  => new HealthMinusProperty { Health = (int)m.Argument2 },
 
@@ -355,6 +359,12 @@ public sealed class EnergyDegenProperty : ItemProperty
     public required int EnergyDegen { get; init; }
 }
 
+public sealed class EnergyRegenProperty : ItemProperty
+{
+    [JsonPropertyName("energyRegen")]
+    public required int EnergyRegen { get; init; }
+}
+
 public sealed class ArmorPlusProperty : ItemProperty
 {
     [JsonPropertyName("armor")]
@@ -413,6 +423,12 @@ public sealed class ArmorMinusWhileAttackingProperty : ItemProperty
 {
     [JsonPropertyName("armor")]
     public required int Armor { get; init; }
+}
+
+public sealed class HealthPlusProperty : ItemProperty
+{
+    [JsonPropertyName("health")]
+    public required int Health { get; init; }
 }
 
 public sealed class HealthPlusWhileDownProperty : ItemProperty
