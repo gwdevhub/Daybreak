@@ -1,15 +1,15 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Daybreak.Services.TradeChat.Models;
 
 internal sealed class TraderMessageQueryResponse
 {
-    [JsonProperty("query")]
+    [JsonPropertyName("query")]
     public string? Query { get; set; }
 
-    [JsonProperty("num_results")]
+    [JsonPropertyName("num_results")]
     public int ResultCount { get; set; }
 
-    [JsonProperty("messages")]
+    [JsonPropertyName("messages")]
     public List<TraderMessageResponse>? Messages { get; set; }
 }

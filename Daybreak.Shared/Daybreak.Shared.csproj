@@ -22,5 +22,4 @@
     <PackageReference Include="SystemExtensions.NetStandard.Generators" PrivateAssets="all" />
     <PackageReference Include="TrailBlazr" />
   </ItemGroup>
-
 </Project>

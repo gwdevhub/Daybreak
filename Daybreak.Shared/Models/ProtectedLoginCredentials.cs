@@ -1,13 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Daybreak.Shared.Models;
 
 public sealed class ProtectedLoginCredentials
 {
-    [JsonProperty(nameof(Identifier))]
+    [JsonPropertyName(nameof(Identifier))]
     public string? Identifier { get; set; }
-    [JsonProperty(nameof(ProtectedUsername))]
+    [JsonPropertyName(nameof(ProtectedUsername))]
     public string? ProtectedUsername { get; set; }
-    [JsonProperty(nameof(ProtectedPassword))]
+    [JsonPropertyName(nameof(ProtectedPassword))]
     public string? ProtectedPassword { get; set; }
 }

@@ -189,8 +189,7 @@ internal sealed class ApplicationUpdater(
             var response = await this.httpClient.GetAsync(VersionListUrl, cancellationToken);
             if (response.IsSuccessStatusCode)
             {
-                var serializedList = await response.Content.ReadAsStringAsync(cancellationToken);
-                var versionList = serializedList.Deserialize<GithubRefTag[]>();
+                var versionList = await response.Content.ReadFromJsonAsync<GithubRefTag[]>(cancellationToken);
                 return versionList!.Select(v => v.Ref![(RefTagPrefix.Length - 1)..])
                     .Select(v =>
                     {

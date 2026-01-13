@@ -1,7 +1,7 @@
 ﻿using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Api;
 using Daybreak.Shared.Models.Builds;
-using System.Extensions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Daybreak.Shared.Services.BuildTemplates;
 
@@ -27,8 +27,8 @@ public interface IBuildTemplateManager
     void SaveBuild(IBuildEntry buildEntry);
     void RemoveBuild(IBuildEntry buildEntry);
     IAsyncEnumerable<IBuildEntry> GetBuilds();
-    Task<Result<IBuildEntry, Exception>> GetBuild(string name);
+    Task<IBuildEntry?> GetBuild(string name);
     IBuildEntry DecodeTemplate(string template);
-    bool TryDecodeTemplate(string template, out IBuildEntry build);
+    bool TryDecodeTemplate(string template, [NotNullWhen(true)] out IBuildEntry? build);
     string EncodeTemplate(IBuildEntry buildEntry);
 }

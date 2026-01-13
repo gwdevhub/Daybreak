@@ -1,9 +1,7 @@
-﻿using Daybreak.Shared.Converters;
-using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Daybreak.Shared.Models.Guildwars;
 
-[JsonConverter(typeof(ContinentJsonConverter))]
 public sealed class Continent
 {
     public static Continent Tyria { get; } = new Continent
@@ -145,8 +143,15 @@ public sealed class Continent
     {
     }
 
+    [JsonPropertyName("id")]
     public int Id { get; init; }
+
+    [JsonPropertyName("name")]
     public string? Name { get; init; }
+
+    [JsonPropertyName("wikiUrl")]
     public string? WikiUrl { get; init; }
+
+    [JsonPropertyName("regions")]
     public IReadOnlyList<Region>? Regions { get; init; }
 }

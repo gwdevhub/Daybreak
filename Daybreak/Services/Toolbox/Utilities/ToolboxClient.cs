@@ -6,8 +6,8 @@ using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
-using System.IO;
-using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace Daybreak.Services.Toolbox.Utilities;
 internal sealed class ToolboxClient(
@@ -92,8 +92,7 @@ internal sealed class ToolboxClient(
             return default;
         }
 
-        var responseString = await getListResponse.Content.ReadAsStringAsync(cancellationToken);
-        var releasesList = responseString.Deserialize<List<GithubRefTag>>();
+        var releasesList = await getListResponse.Content.ReadFromJsonAsync<List<GithubRefTag>>(cancellationToken);
         var latestReleaseTuple = releasesList?.Where(t => t.Ref?.Contains("Release") is true)
             .Select(t => t.Ref?.Replace("refs/tags/", ""))
             .OfType<string>()

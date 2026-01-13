@@ -1,7 +1,6 @@
 ﻿using Daybreak.Services.Guildwars.Models;
 using Daybreak.Services.Guildwars.Utils;
 using System.Core.Extensions;
-using System.IO;
 
 namespace Daybreak.Services.GuildWars.Utils;
 internal sealed class GuildwarsFileStream(GuildWarsClientContext guildwarsClientContext, GuildWarsClient guildwarsClient, int fileId, int sizeCompressed, int sizeDecompressed, int crc) : Stream
@@ -89,7 +88,7 @@ internal sealed class GuildwarsFileStream(GuildWarsClientContext guildwarsClient
 
     public override int Read(byte[] buffer, int offset, int count)
     {
-        return System.Extensions.TaskExtensions.RunSync(() => this.ReadAsync(buffer, offset, count));
+        return Task.Run(() => this.ReadAsync(buffer, offset, count)).Result;
     }
 
     public override long Seek(long offset, SeekOrigin origin)

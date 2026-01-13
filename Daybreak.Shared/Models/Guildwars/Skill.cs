@@ -1,6 +1,5 @@
-﻿using Daybreak.Shared.Converters;
-using Newtonsoft.Json;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace Daybreak.Shared.Models.Guildwars;
 
@@ -12,7 +11,6 @@ namespace Daybreak.Shared.Models.Guildwars;
 /// https://wiki.guildwars.com/wiki/Gallery_of_high_resolution_skill_icons/large
 /// Details can be fetched using <see cref="Services.Wiki.IWikiService.GetSkillDescription(Skill, CancellationToken)"/>
 /// </remarks>
-[JsonConverter(typeof(SkillJsonConverter))]
 public sealed class Skill : IIconUrlEntity
 {
     public static readonly Skill ATouchofGuile = new() { Id = 2357, Name = "A Touch of Guile", Elite = false, PvEOnly = true, PvP = false, Campaign = Campaign.EyeOfTheNorth, Profession = Profession.None, Attribute = Attribute.None, Type = SkillType.Touch | SkillType.Hex | SkillType.Spell, Energy = "5", Activation = "³⁄₄", Recharge = "15", Overcast = "", Adrenaline = "", Sacrifice = "", Upkeep = "", Description = "Hex Spell. Target touched foe takes 44…80 damage. If target foe was knocked down, that foe cannot attack for 5…8 seconds.", ConciseDescription = "Touch Hex Spell. Deals 44…80 damage. Target foe cannot attack (5…8 seconds) if it was knocked-down.", IconUrl = "https://wiki.guildwars.com/images/2/2d/A_Touch_of_Guile.jpg" };
@@ -3032,26 +3030,65 @@ public sealed class Skill : IIconUrlEntity
         return skill;
     }
 
+    [JsonPropertyName("name")]
     public required string Name { get; init; }
+
+    [JsonPropertyName("id")]
     public required int Id { get; init; }
+
+    [JsonPropertyName("profession")]
     public required Profession Profession { get; init; }
+
+    [JsonPropertyName("attribute")]
     public required Attribute Attribute { get; init; }
+
+    [JsonPropertyName("campaign")]
     public required Campaign Campaign { get; init; }
+
+    [JsonPropertyName("elite")]
     public required bool Elite { get; init; }
+
+    [JsonPropertyName("pveOnly")]
     public required bool PvEOnly { get; init; }
+
+    [JsonPropertyName("pvp")]
     public required bool PvP { get; init; }
+
+    [JsonPropertyName("type")]
     public required SkillType Type { get; init; }
+
+    [JsonPropertyName("energy")]
     public required string Energy { get; init; }
+
+    [JsonPropertyName("activation")]
     public required string Activation { get; init; }
+
+    [JsonPropertyName("recharge")]
     public required string Recharge { get; init; }
+
+    [JsonPropertyName("overcast")]
     public required string Overcast { get; init; }
+
+    [JsonPropertyName("adrenaline")]
     public required string Adrenaline { get; init; }
+
+    [JsonPropertyName("sacrifice")]
     public required string Sacrifice { get; init; }
+
+    [JsonPropertyName("description")]
     public required string Description { get; init; }
+
+    [JsonPropertyName("conciseDescription")]
     public required string ConciseDescription { get; init; }
+
+    [JsonPropertyName("iconUrl")]
     public required string IconUrl { get; init; }
+
+    [JsonPropertyName("upkeep")]
     public required string Upkeep { get; init; }
+
     public override string ToString() => this.Name ?? nameof(Skill);
+
     private Skill()
     {
     }

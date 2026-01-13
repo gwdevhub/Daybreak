@@ -1,7 +1,7 @@
 ﻿using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Utils;
-using Newtonsoft.Json;
 using System.ComponentModel;
+using System.Text.Json;
 
 namespace Daybreak.Shared.Models.Guildwars;
 
@@ -102,7 +102,7 @@ public abstract class BuildEntryBase : INotifyPropertyChanged, IBuildEntry
             if (this.Metadata?.TryGetValue(nameof(this.PartyComposition), out var serializedPartyComposition) is true &&
                 !string.IsNullOrWhiteSpace(serializedPartyComposition))
             {
-                return JsonConvert.DeserializeObject<List<PartyCompositionMetadataEntry>>(serializedPartyComposition);
+                return JsonSerializer.Deserialize<List<PartyCompositionMetadataEntry>>(serializedPartyComposition);
             }
 
             return default;
@@ -112,7 +112,7 @@ public abstract class BuildEntryBase : INotifyPropertyChanged, IBuildEntry
             this.Metadata ??= [];
             this.Metadata[nameof(this.PartyComposition)] = value is null
                 ? string.Empty
-                : JsonConvert.SerializeObject(value, Formatting.None);
+                : JsonSerializer.Serialize(value);
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.PartyComposition)));
         }
     }

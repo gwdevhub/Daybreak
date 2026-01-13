@@ -1,10 +1,8 @@
-﻿using Daybreak.Shared.Converters;
-using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Daybreak.Shared.Models.Guildwars;
 
 // TODO: Add missing npcs
-[JsonConverter(typeof(NpcJsonConverter))]
 public sealed class Npc
 {
     public static readonly Npc Unknown = new() { Ids = [0], Name = "Unknown" };
@@ -3032,8 +3030,13 @@ public sealed class Npc
         return npc;
     }
 
+    [JsonPropertyName("ids")]
     public int[] Ids { get; private set; } = [];
+
+    [JsonPropertyName("name")]
     public string Name { get; private set; } = string.Empty;
+
+    [JsonPropertyName("wikiUrl")]
     public string WikiUrl { get; private set; } = string.Empty;
 
     private Npc()

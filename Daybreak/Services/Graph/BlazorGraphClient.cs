@@ -7,11 +7,11 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Identity.Client;
-using Newtonsoft.Json;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
 using System.Net.Http.Headers;
+using System.Text.Json;
 
 namespace Daybreak.Services.Graph;
 
@@ -61,9 +61,9 @@ internal sealed class BlazorGraphClient : IGraphClient
         this.httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
     }
 
-    public async Task<Result<bool, Exception>> PerformAuthorizationFlow(CancellationToken cancellationToken = default)
+    public async Task<bool> PerformAuthorizationFlow(CancellationToken cancellationToken = default)
     {
-        if (await this.GetValidAccessToken() is string)
+        if (await this.GetValidAccessToken() is not null)
         {
             return true;
         }
@@ -79,19 +79,21 @@ internal sealed class BlazorGraphClient : IGraphClient
         catch (Exception ex)
         {
             this.logger.LogError(ex, "OAuth flow failed");
-            return ex;
+            return false;
         }
     }
 
-    public async Task<Result<User, Exception>> GetUserProfile<TViewType>()
+    public async Task<User?> GetUserProfile<TViewType>()
         where TViewType : ComponentBase
     {
+        var scopedLogger = this.logger.CreateScopedLogger();
         try
         {
             var accessToken = await this.GetValidAccessToken();
             if (string.IsNullOrEmpty(accessToken))
             {
-                return new InvalidOperationException("Client is not authorized");
+                scopedLogger.LogError("Client is not authorized");
+                return default;
             }
 
             this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
@@ -99,46 +101,48 @@ internal sealed class BlazorGraphClient : IGraphClient
             
             if (!response.IsSuccessStatusCode)
             {
-                return new InvalidOperationException($"Failed to load profile. Response status code [{response.StatusCode}]");
+                scopedLogger.LogError("Failed to load profile. Status code: {StatusCode}", response.StatusCode);
+                return default;
             }
 
-            var profile = JsonConvert.DeserializeObject<User>(await response.Content.ReadAsStringAsync());
-            return profile!;
+            var profile = JsonSerializer.Deserialize<User>(await response.Content.ReadAsStringAsync());
+            return profile;
         }
         catch (Exception ex)
         {
-            this.logger.LogError(ex, "Failed to get user profile");
-            return ex;
+            scopedLogger.LogError(ex, "Failed to get user profile");
+            return default;
         }
     }
 
-    public async Task<Result<bool, Exception>> UploadBuilds()
+    public async Task<bool> UploadBuilds()
     {
         var builds = await this.buildTemplateManager.GetBuilds().ToListAsync();
         return await this.PutBuilds(builds);
     }
 
-    public async Task<Result<bool, Exception>> DownloadBuilds()
+    public async Task<bool> DownloadBuilds()
     {
+        var scopedLogger = this.logger.CreateScopedLogger();
         var retrieveBuildsResponse = await this.RetrieveBuildsList();
-        if (retrieveBuildsResponse.TryExtractFailure(out var failure))
+        if (retrieveBuildsResponse is null)
         {
-            this.logger.LogError(failure, "Unable to download builds");
-            return false;
-        }
-
-        if (retrieveBuildsResponse.TryExtractSuccess(out var builds) is false)
-        {
-            this.logger.LogError("Unexpected error occurred");
+            scopedLogger.LogError("Unable to download builds");
             return false;
         }
 
         this.buildTemplateManager.ClearBuilds();
         var compiledBuilds = this.buildsCache?.Select(buildFile =>
         {
-            if (this.buildTemplateManager.TryDecodeTemplate(buildFile.TemplateCode!, out var build) is false)
+            if (buildFile is null ||
+                buildFile.TemplateCode is null)
             {
-                return null;
+                return default;
+            }
+
+            if (this.buildTemplateManager.TryDecodeTemplate(buildFile.TemplateCode, out var build) is false)
+            {
+                return default;
             }
 
             build.SourceUrl = buildFile.SourceUrl;
@@ -151,18 +155,13 @@ internal sealed class BlazorGraphClient : IGraphClient
         return true;
     }
 
-    public async Task<Result<bool, Exception>> DownloadBuild(string buildName)
+    public async Task<bool> DownloadBuild(string buildName)
     {
+        var scopedLogger = this.logger.CreateScopedLogger();
         var retrieveBuildsResponse = await this.RetrieveBuildsList();
-        if (retrieveBuildsResponse.TryExtractFailure(out var failure))
+        if (retrieveBuildsResponse is null)
         {
-            this.logger.LogError(failure, "Unable to download builds");
-            return false;
-        }
-
-        if (retrieveBuildsResponse.TryExtractSuccess(out var builds) is false)
-        {
-            this.logger.LogError("Unexpected error occurred");
+            scopedLogger.LogError("Unable to download builds");
             return false;
         }
 
@@ -185,33 +184,36 @@ internal sealed class BlazorGraphClient : IGraphClient
         return true;
     }
 
-    public async Task<Result<bool, Exception>> UploadBuild(string buildName)
+    public async Task<bool> UploadBuild(string buildName)
     {
+        var scopedLogger = this.logger.CreateScopedLogger();
         var getBuildResult = await this.buildTemplateManager.GetBuild(buildName);
-        if (getBuildResult.TryExtractSuccess(out var buildEntry) is false)
+        if (getBuildResult is null)
         {
-            return getBuildResult.SwitchAny(onFailure: exception => exception)!;
+            scopedLogger.LogError("Build {BuildName} not found for upload", buildName);
+            return false;
         }
 
-        return await this.PutBuild(buildEntry!);
+        return await this.PutBuild(getBuildResult);
     }
 
-    public async Task<Result<IEnumerable<BuildFile>, Exception>> RetrieveBuildsList()
+    public async Task<IEnumerable<BuildFile>?> RetrieveBuildsList()
     {
         var maybeBuildsBackup = await this.GetBuildsBackup();
-        var buildsBackup = maybeBuildsBackup.ExtractValue();
-        this.buildsCache = buildsBackup;
-        return buildsBackup!;
+        this.buildsCache = maybeBuildsBackup;
+        return maybeBuildsBackup;
     }
 
-    public async Task<Result<bool, Exception>> UploadSettings(string settings, CancellationToken cancellationToken)
+    public async Task<bool> UploadSettings(string settings, CancellationToken cancellationToken)
     {
+        var scopedLogger = this.logger.CreateScopedLogger();
         try
         {
             var accessToken = await this.GetValidAccessToken();
             if (string.IsNullOrEmpty(accessToken))
             {
-                return new InvalidOperationException("Client is not authorized");
+                scopedLogger.LogError("Client is not authorized");
+                return false;
             }
 
             this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
@@ -221,19 +223,21 @@ internal sealed class BlazorGraphClient : IGraphClient
         }
         catch (Exception e)
         {
-            this.logger.LogError(e, "Failed to upload settings");
-            return e;
+            scopedLogger.LogError(e, "Failed to upload settings");
+            return false;
         }
     }
 
-    public async Task<Result<string, Exception>> DownloadSettings(CancellationToken cancellationToken)
+    public async Task<string?> DownloadSettings(CancellationToken cancellationToken)
     {
+        var scopedLogger = this.logger.CreateScopedLogger();
         try
         {
             var accessToken = await this.GetValidAccessToken();
             if (string.IsNullOrEmpty(accessToken))
             {
-                return new InvalidOperationException("Client is not authorized");
+                scopedLogger.LogError("Client is not authorized");
+                return default;
             }
 
             this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
@@ -241,7 +245,7 @@ internal sealed class BlazorGraphClient : IGraphClient
             
             if (fileItemResponse.IsSuccessStatusCode is false)
             {
-                return string.Empty;
+                return default;
             }
 
             var driveItemContent = await fileItemResponse.Content.ReadAsStringAsync(cancellationToken);
@@ -249,15 +253,15 @@ internal sealed class BlazorGraphClient : IGraphClient
         }
         catch (Exception e)
         {
-            this.logger.LogError(e, "Failed to download settings");
-            return e;
+            scopedLogger.LogError(e, "Failed to download settings");
+            return default;
         }
     }
 
-    public Task<Result<bool, Exception>> LogOut()
+    public Task<bool> LogOut()
     {
         this.ResetAuthorization();
-        return Task.FromResult(Result<bool, Exception>.Success(true));
+        return Task.FromResult(true);
     }
 
     public void ResetAuthorization()
@@ -321,7 +325,7 @@ internal sealed class BlazorGraphClient : IGraphClient
             buildList = [.. buildList.OrderBy(b => b.FileName)];
 
             this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-            using var stringContent = new StringContent(JsonConvert.SerializeObject(buildList));
+            using var stringContent = new StringContent(JsonSerializer.Serialize(buildList));
             var response = await this.httpClient.PutAsync(BuildsSyncFileUri, stringContent);
             
             if (response.IsSuccessStatusCode is false)
@@ -361,7 +365,7 @@ internal sealed class BlazorGraphClient : IGraphClient
             buildList = [.. buildList.OrderBy(b => b.FileName)];
 
             this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-            using var stringContent = new StringContent(JsonConvert.SerializeObject(buildList));
+            using var stringContent = new StringContent(JsonSerializer.Serialize(buildList));
             var response = await this.httpClient.PutAsync(BuildsSyncFileUri, stringContent);
             
             if (response.IsSuccessStatusCode is false)
@@ -379,14 +383,16 @@ internal sealed class BlazorGraphClient : IGraphClient
         }
     }
 
-    private async Task<Optional<List<BuildFile>>> GetBuildsBackup()
+    private async Task<List<BuildFile>?> GetBuildsBackup()
     {
+        var scopedLogger = this.logger.CreateScopedLogger();
         try
         {
             var accessToken = await this.GetValidAccessToken();
             if (string.IsNullOrEmpty(accessToken))
             {
-                return Optional.None<List<BuildFile>>();
+                scopedLogger.LogError("Client is not authorized");
+                return default;
             }
 
             this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
@@ -394,15 +400,17 @@ internal sealed class BlazorGraphClient : IGraphClient
             
             if (fileItemResponse.IsSuccessStatusCode is false)
             {
-                return Optional.None<List<BuildFile>>();
+                scopedLogger.LogError("Failed to retrieve builds backup. Status code: {StatusCode}", fileItemResponse.StatusCode);
+                return default;
             }
 
             var driveItemContent = await fileItemResponse.Content.ReadAsStringAsync();
-            var backup = JsonConvert.DeserializeObject<List<BuildFile>>(driveItemContent);
+            var backup = JsonSerializer.Deserialize<List<BuildFile>>(driveItemContent);
             
             if (backup is null)
             {
-                return Optional.None<List<BuildFile>>();
+                scopedLogger.LogError("Deserialized builds backup is null");
+                return default;
             }
 
             return backup;
@@ -410,7 +418,7 @@ internal sealed class BlazorGraphClient : IGraphClient
         catch (Exception ex)
         {
             this.logger.LogError(ex, "Failed to get builds backup");
-            return Optional.None<List<BuildFile>>();
+            return default;
         }
     }
 }

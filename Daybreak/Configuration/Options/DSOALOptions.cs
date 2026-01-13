@@ -1,5 +1,5 @@
 ﻿using Daybreak.Shared.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Daybreak.Configuration.Options;
 
@@ -7,7 +7,7 @@ namespace Daybreak.Configuration.Options;
 [OptionsIgnore]
 internal sealed class DSOALOptions
 {
-    [JsonProperty(nameof(Enabled))]
+    [JsonPropertyName(nameof(Enabled))]
     [OptionName(Name = "Enabled", Description = "If true, the launcher will also launch DSOAL when launching GuildWars")]
     public bool Enabled { get; set; }
 }

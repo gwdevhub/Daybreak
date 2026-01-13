@@ -1,17 +1,17 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Daybreak.Services.Updater.Models;
 internal sealed class Metadata
 {
-    [JsonProperty(nameof(RelativePath))]
+    [JsonPropertyName(nameof(RelativePath))]
     public string? RelativePath { get; set; }
 
-    [JsonProperty(nameof(Name))]
+    [JsonPropertyName(nameof(Name))]
     public string? Name { get; set; }
 
-    [JsonProperty(nameof(Size))]
+    [JsonPropertyName(nameof(Size))]
     public int Size { get; set; }
 
-    [JsonProperty(nameof(VersionInfo))]
+    [JsonPropertyName(nameof(VersionInfo))]
     public string? VersionInfo { get; set; }
 }

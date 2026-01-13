@@ -1,16 +1,16 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿using Daybreak.Shared.Converters;
+using System.Text.Json.Serialization;
 
 namespace Daybreak.Services.TradeChat.Models;
 internal sealed class TraderQuotePayload
 {
-    [JsonProperty("p")]
+    [JsonPropertyName("p")]
     public int Price { get; set; }
 
-    [JsonProperty("t")]
+    [JsonPropertyName("t")]
     [JsonConverter(typeof(UnixDateTimeConverter))]
     public DateTime TimeStamp { get; set; }
 
-    [JsonProperty("s")]
+    [JsonPropertyName("s")]
     public int Type { get; set; }
 }

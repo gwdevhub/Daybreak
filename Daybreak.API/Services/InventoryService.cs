@@ -1,7 +1,9 @@
 ﻿using Daybreak.API.Interop.GuildWars;
 using Daybreak.API.Services.Interop;
 using Daybreak.Shared.Models.Api;
+using Daybreak.Shared.Models.Guildwars;
 using System.Extensions.Core;
+using System.Text;
 
 namespace Daybreak.API.Services;
 
@@ -37,7 +39,7 @@ public sealed class InventoryService(
                     return default;
                 }
 
-                var itemTuples = new List<(BagType Type,List<(uint ModelId, string EncodedCompleteName, string EncodedSingleName, string EncodedName, int Quantity, uint[] Modifiers, ItemType ItemType)>)>();
+                var itemTuples = new List<(BagType Type,List<(uint ModelId, string EncodedCompleteName, string EncodedSingleName, string EncodedName, bool Inscribable, int Quantity, uint[] Modifiers, ItemType ItemType)>)>();
                 foreach (var bag in inventory.Pointer->Bags)
                 {
                     if (bag is null)
@@ -45,7 +47,7 @@ public sealed class InventoryService(
                         continue;
                     }
 
-                    var retBag = new List<(uint ModelId, string EncodedCompleteName, string EncodedSingleName, string EncodedName, int Quantity, uint[] Modifiers, ItemType ItemType)>();
+                    var retBag = new List<(uint ModelId, string EncodedCompleteName, string EncodedSingleName, string EncodedName, bool Inscribable, int Quantity, uint[] Modifiers, ItemType ItemType)>();
                     itemTuples.Add((bag->Type, retBag));
                     if (bag->ItemsCount is 0)
                     {
@@ -68,7 +70,7 @@ public sealed class InventoryService(
                             modifiers[j] = item.Pointer->Modifiers[j].Mod;
                         }
 
-                        retBag.Add((item.Pointer->ModelId, completeNameEncoded, singleItemName, nameEncoded, item.Pointer->Quantity, modifiers, item.Pointer->Type));
+                        retBag.Add((item.Pointer->ModelId, completeNameEncoded, singleItemName, nameEncoded, item.Pointer->Inscribable, item.Pointer->Quantity, modifiers, item.Pointer->Type));
                     }
                 }
 
@@ -88,7 +90,7 @@ public sealed class InventoryService(
                 var decodedName = await this.uIService.DecodeString(item.EncodedName, Language.English, cancellationToken);
                 var decodedCompleteName = await this.uIService.DecodeString(item.EncodedCompleteName, Language.English, cancellationToken);
                 var decodedSingleName = await this.uIService.DecodeString(item.EncodedSingleName, Language.English, cancellationToken);
-                return (item.ModelId, item.EncodedName, DecodedName: decodedName, item.EncodedSingleName, DecodedSingleName: decodedSingleName, item.EncodedCompleteName, DecodedCompleteName: decodedCompleteName, item.Quantity, item.Modifiers, item.ItemType);
+                return (item.ModelId, item.EncodedName, DecodedName: decodedName, item.EncodedSingleName, DecodedSingleName: decodedSingleName, item.EncodedCompleteName, DecodedCompleteName: decodedCompleteName, item.Inscribable, item.Quantity, item.Modifiers, item.ItemType);
             }));
             return (tuple.Type, Items: decodedItems.ToList());
         }));
@@ -106,15 +108,15 @@ public sealed class InventoryService(
                             DecodedSingleName: item.DecodedSingleName ?? string.Empty,
                             EncodedCompleteName: ToBase64(item.EncodedCompleteName),
                             DecodedCompleteName: item.DecodedCompleteName ?? string.Empty,
+                            Inscribable: item.Inscribable,
                             Quantity: item.Quantity,
                             Modifiers: item.Modifiers,
+                            Properties: [.. ItemProperty.ParseItemModifiers([.. item.Modifiers.Select(m => (Shared.Models.Guildwars.ItemModifier)m)])],
                             ItemType: item.ItemType.ToString()))]))]);
     }
 
     private static string ToBase64(string encoded)
     {
-        var bytes = new byte[encoded.Length * sizeof(char)];
-        Buffer.BlockCopy(encoded.ToCharArray(), 0, bytes, 0, bytes.Length);
-        return Convert.ToBase64String(bytes);
+        return Convert.ToBase64String(Encoding.Unicode.GetBytes(encoded));
     }
 }

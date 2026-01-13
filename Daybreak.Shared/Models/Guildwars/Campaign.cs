@@ -1,10 +1,8 @@
-﻿using Daybreak.Shared.Converters;
-using Newtonsoft.Json;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace Daybreak.Shared.Models.Guildwars;
 
-[JsonConverter(typeof(CampaignJsonConverter))]
 public sealed class Campaign
 {
     public static Campaign None { get; } = new()
@@ -137,8 +135,15 @@ public sealed class Campaign
     {
     }
 
+    [JsonPropertyName("id")]
     public int Id { get; init; }
+
+    [JsonPropertyName("name")]
     public string? Name { get; init; }
+
+    [JsonPropertyName("wikiUrl")]
     public string? WikiUrl { get; init; }
+
+    [JsonPropertyName("continents")]
     public IReadOnlyList<Continent>? Continents { get; init; }
 }

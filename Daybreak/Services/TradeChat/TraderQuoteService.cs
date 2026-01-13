@@ -5,10 +5,10 @@ using Daybreak.Shared.Models.Trade;
 using Daybreak.Shared.Services.TradeChat;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Logging;
+using System.Text.Json;
 
 namespace Daybreak.Services.TradeChat;
 
@@ -55,7 +55,7 @@ internal sealed class TraderQuoteService : ITraderQuoteService
         try
         {
             var content = await this.GetAsync(TraderQuotesUri, default, scopedLogger, cancellationToken);
-            var response = JsonConvert.DeserializeObject<TraderQuotesResponse>(content);
+            var response = JsonSerializer.Deserialize<TraderQuotesResponse>(content);
             var responseList = new List<TraderQuote>();
             foreach (var buyQuote in response?.BuyQuotes!)
             {
@@ -101,7 +101,7 @@ internal sealed class TraderQuoteService : ITraderQuoteService
         try
         {
             var content = await this.GetAsync(TraderQuotesUri, default, scopedLogger, cancellationToken);
-            var response = JsonConvert.DeserializeObject<TraderQuotesResponse>(content);
+            var response = JsonSerializer.Deserialize<TraderQuotesResponse>(content);
             var responseList = new List<TraderQuote>();
             foreach (var sellQuote in response?.SellQuotes!)
             {
