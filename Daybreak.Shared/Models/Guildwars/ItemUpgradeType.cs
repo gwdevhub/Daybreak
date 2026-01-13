@@ -8,5 +8,7 @@ public enum ItemUpgradeType
     Unknown,
     Prefix,
     Suffix,
-    Inscription
+    Inscription,
+    UpgradeRune,
+    AppliesToRune
 }

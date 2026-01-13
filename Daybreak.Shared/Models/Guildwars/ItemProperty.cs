@@ -12,6 +12,8 @@ namespace Daybreak.Shared.Models.Guildwars;
 [JsonDerivedType(typeof(SuffixProperty), "Suffix")]
 [JsonDerivedType(typeof(PrefixProperty), "Prefix")]
 [JsonDerivedType(typeof(InscriptionProperty), "Inscription")]
+[JsonDerivedType(typeof(UpgradesRuneProperty), "UpgradesRune")]
+[JsonDerivedType(typeof(AppliesToRuneProperty), "AppliesToRune")]
 [JsonDerivedType(typeof(OfTheProfessionProperty), "OfTheProfession")]
 [JsonDerivedType(typeof(CustomizedProperty), "Customized")]
 [JsonDerivedType(typeof(DamageTypeProperty), "DamageType")]
@@ -151,6 +153,8 @@ public abstract class ItemProperty
             ItemUpgradeType.Suffix => new SuffixProperty { Upgrade = upgrade },
             ItemUpgradeType.Prefix => new PrefixProperty { Upgrade = upgrade },
             ItemUpgradeType.Inscription => new InscriptionProperty { Upgrade = upgrade },
+            ItemUpgradeType.UpgradeRune => new UpgradesRuneProperty { Upgrade = upgrade },
+            ItemUpgradeType.AppliesToRune => new AppliesToRuneProperty { Upgrade = upgrade },
             _ => new UnknownUpgradeProperty { RawModifier = m }
         };
     }
@@ -218,6 +222,18 @@ public sealed class PrefixProperty : ItemProperty
 }
 
 public sealed class InscriptionProperty : ItemProperty
+{
+    [JsonPropertyName("upgrade")]
+    public required ItemUpgrade Upgrade { get; init; }
+}
+
+public sealed class UpgradesRuneProperty : ItemProperty
+{
+    [JsonPropertyName("upgrade")]
+    public required ItemUpgrade Upgrade { get; init; }
+}
+
+public sealed class AppliesToRuneProperty : ItemProperty
 {
     [JsonPropertyName("upgrade")]
     public required ItemUpgrade Upgrade { get; init; }

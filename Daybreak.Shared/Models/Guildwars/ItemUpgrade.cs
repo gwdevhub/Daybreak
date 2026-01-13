@@ -6,480 +6,482 @@ namespace Daybreak.Shared.Models.Guildwars;
 
 public sealed class ItemUpgrade
 {
-    public static readonly ItemUpgrade Unknown = new(-1, "Unknown", ItemUpgradeType.Unknown);
+    public static readonly ItemUpgrade Unknown                              = new(-1, "Unknown", ItemUpgradeType.Unknown);
+    public static readonly ItemUpgrade Icy_Axe                              = new(0x0081, "Icy", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Ebon_Axe                             = new(0x0082, "Ebon", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Shocking_Axe                         = new(0x0083, "Shocking", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Fiery_Axe                            = new(0x0084, "Fiery", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Barbed_Axe                           = new(0x0092, "Barbed", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Crippling_Axe                        = new(0x0094, "Crippling", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Cruel_Axe                            = new(0x0096, "Cruel", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Furious_Axe                          = new(0x0099, "Furious", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Poisonous_Axe                        = new(0x009E, "Poisonous", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Heavy_Axe                            = new(0x00A1, "Heavy", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Zealous_Axe                          = new(0x00A3, "Zealous", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Vampiric_Axe                         = new(0x00A7, "Vampiric", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Sundering_Axe                        = new(0x00AB, "Sundering", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade OfDefense_Axe                        = new(0x00C5, "of Defense", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfWarding_Axe                        = new(0x00C7, "of Warding", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfShelter_Axe                        = new(0x00CD, "of Shelter", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSlaying_Axe                        = new(0x00D4, "of ____slaying", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfFortitude_Axe                      = new(0x00D9, "of Fortitude", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfEnchanting_Axe                     = new(0x00DE, "of Enchanting", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfAxeMastery                         = new(0x00E8, "of Axe Mastery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfTheProfession_Axe                  = new(0x0226, "of the Profession", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade Icy_Bow                              = new(0x0085, "Icy", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Ebon_Bow                             = new(0x0086, "Ebon", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Shocking_Bow                         = new(0x0087, "Shocking", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Fiery_Bow                            = new(0x0088, "Fiery", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Poisonous_Bow                        = new(0x009F, "Poisonous", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Zealous_Bow                          = new(0x00A5, "Zealous", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Vampiric_Bow                         = new(0x00A9, "Vampiric", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Sundering_Bow                        = new(0x00AD, "Sundering", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade OfDefense_Bow                        = new(0x00C6, "of Defense", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfWarding_Bow                        = new(0x00C8, "of Warding", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfShelter_Bow                        = new(0x00CE, "of Shelter", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSlaying_Bow                        = new(0x00D5, "of _____slaying", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfFortitude_Bow                      = new(0x00DA, "of Fortitude", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfEnchanting_Bow                     = new(0x00DF, "of Enchanting", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMarksmanship                       = new(0x00E9, "of Marksmanship", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade Barbed_Bow                           = new(0x0147, "Barbed", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Crippling_Bow                        = new(0x0148, "Crippling", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Silencing_Bow                        = new(0x0149, "Silencing", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade OfTheProfession_Bow                  = new(0x0227, "of the Profession", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade Icy_Daggers                          = new(0x012E, "Icy", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Ebon_Daggers                         = new(0x012F, "Ebon", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Fiery_Daggers                        = new(0x0130, "Fiery", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Shocking_Daggers                     = new(0x0131, "Shocking", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Zealous_Daggers                      = new(0x0132, "Zealous", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Vampiric_Daggers                     = new(0x0133, "Vampiric", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Sundering_Daggers                    = new(0x0134, "Sundering", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Barbed_Daggers                       = new(0x0135, "Barbed", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Crippling_Daggers                    = new(0x0136, "Crippling", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Cruel_Daggers                        = new(0x0137, "Cruel", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Poisonous_Daggers                    = new(0x0138, "Poisonous", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Silencing_Daggers                    = new(0x0139, "Silencing", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Furious_Daggers                      = new(0x013A, "Furious", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade OfDefense_Daggers                    = new(0x0141, "of Defense", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfWarding_Daggers                    = new(0x0142, "of Warding", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfShelter_Daggers                    = new(0x0143, "of Shelter", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfEnchanting_Daggers                 = new(0x0144, "of Enchanting", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfFortitude_Daggers                  = new(0x0145, "of Fortitude", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfDaggerMastery                      = new(0x0146, "of Dagger Mastery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfTheProfession_Daggers              = new(0x0228, "of the Profession", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfAptitude_Focus                     = new(0x0217, "of Aptitude", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfFortitude_Focus                    = new(0x0218, "of Fortitude", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfDevotion_Focus                     = new(0x0219, "of Devotion", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfValor_Focus                        = new(0x021A, "of Valor", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfEndurance_Focus                    = new(0x021B, "of Endurance", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSwiftness_Focus                    = new(0x021C, "of Swiftness", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade Icy_Hammer                           = new(0x0089, "Icy", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Ebon_Hammer                          = new(0x008A, "Ebon", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Shocking_Hammer                      = new(0x008B, "Shocking", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Fiery_Hammer                         = new(0x008C, "Fiery", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Cruel_Hammer                         = new(0x0097, "Cruel", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Furious_Hammer                       = new(0x009A, "Furious", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Heavy_Hammer                         = new(0x00A2, "Heavy", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Zealous_Hammer                       = new(0x00A4, "Zealous", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Vampiric_Hammer                      = new(0x00A8, "Vampiric", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Sundering_Hammer                     = new(0x00AC, "Sundering", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade OfWarding_Hammer                     = new(0x00C9, "of Warding", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfDefense_Hammer                     = new(0x00CC, "of Defense", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfShelter_Hammer                     = new(0x00CF, "of Shelter", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSlaying_Hammer                     = new(0x00D6, "of _____slaying", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfFortitude_Hammer                   = new(0x00DB, "of Fortitude", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfEnchanting_Hammer                  = new(0x00E0, "of Enchanting", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfHammerMastery                      = new(0x00EA, "of Hammer Mastery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfTheProfession_Hammer               = new(0x0229, "of the Profession", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade IHaveThePower                        = new(0x015C, "\"I have the power!\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade LetTheMemoryLiveAgain                = new(0x015E, "\"Let the Memory Live Again!\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade TooMuchInformation                   = new(0x0163, "\"Too Much Information\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade GuidedByFate                         = new(0x0164, "\"Guided by Fate\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade StrengthAndHonor                     = new(0x0165, "\"Strength and Honor\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade VengeanceIsMine                      = new(0x0166, "\"Vengeance is Mine\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade DontFearTheReaper                    = new(0x0167, "\"Don't Fear the Reaper\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade DanceWithDeath                       = new(0x0168, "\"Dance with Death\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade BrawnOverBrains                      = new(0x0169, "\"Brawn over Brains\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade ToThePain                            = new(0x016A, "\"To The Pain!\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade IgnoranceIsBliss                     = new(0x01B6, "\"Ignorance is Bliss\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade LifeIsPain                           = new(0x01B7, "\"Life is Pain\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade ManForAllSeasons                     = new(0x01B8, "\"Man for All Seasons\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade SurvivalOfTheFittest                 = new(0x01B9, "\"Survival of the Fittest\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade MightMakesRight                      = new(0x01BA, "\"Might makes Right!\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade KnowingIsHalfTheBattle               = new(0x01BB, "\"Knowing is Half the Battle.\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade FaithIsMy                            = new(0x01BC, "\"Faith is My \"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade DownButNotOut                        = new(0x01BD, "\"Down But Not Out\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade HailToTheKing                        = new(0x01BE, "\"Hail to the King\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade BeJustAndFearNot                     = new(0x01BF, "\"Be Just and Fear Not\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade LiveForToday                         = new(0x01C0, "\"Live for Today\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade SerenityNow                          = new(0x01C1, "\"Serenity Now\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade ForgetMeNot                          = new(0x01C2, "\"Forget Me Not\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade NotTheFace                           = new(0x01C3, "\"Not the face!\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade LeafOnTheWind                        = new(0x01C4, "\"Leaf on the Wind\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade LikeARollingStone                    = new(0x01C5, "\"Like a Rolling Stone\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade RidersOnTheStorm                     = new(0x01C6, "\"Riders on the Storm\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade SleepNowInTheFire                    = new(0x01C7, "\"Sleep Now in the Fire\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade ThroughThickAndThin                  = new(0x01C8, "\"Through Thick and Thin\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade TheRiddleOfSteel                     = new(0x01C9, "\"The Riddle of Steel\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade FearCutsDeeper                       = new(0x01CA, "\"Fear Cuts Deeper\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade ICanSeeClearlyNow                    = new(0x01CB, "\"I Can See Clearly Now\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade SwiftAsTheWind                       = new(0x01CC, "\"Swift as the Wind\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade StrengthOfBody                       = new(0x01CD, "\"Strength of Body\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade CastOutTheUnclean                    = new(0x01CE, "\"Cast Out the Unclean\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade PureOfHeart                          = new(0x01CF, "\"Pure of Heart\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade SoundnessOfMind                      = new(0x01D0, "\"Soundness of Mind\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade OnlyTheStrongSurvive                 = new(0x01D1, "\"Only the Strong Survive\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade LuckOfTheDraw                        = new(0x01D2, "\"Luck of the Draw\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade ShelteredByFaith                     = new(0x01D3, "\"Sheltered by Faith\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade NothingToFear                        = new(0x01D4, "\"Nothing to Fear\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade RunForYourLife                       = new(0x01D5, "\"Run For Your Life!\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade MasterOfMyDomain                     = new(0x01D6, "\"Master of My Domain\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade AptitudeNotAttitude                  = new(0x01D7, "\"Aptitude not Attitude\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade SeizeTheDay                          = new(0x01D8, "\"Seize the Day\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade HaveFaith                            = new(0x01D9, "\"Have Faith\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade HaleAndHearty                        = new(0x01DA, "\"Hale and Hearty\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade DontCallItAComeback                  = new(0x01DB, "\"Don't call it a comeback!\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade IAmSorrow                            = new(0x01DC, "\"I am Sorrow.\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade DontThinkTwice                       = new(0x01DD, "\"Don't Think Twice\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade ShowMeTheMoney                       = new(0x021E, "\"Show me the money\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade MeasureForMeasure                    = new(0x021F, "\"Measure for Measure\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade Icy_Scythe                           = new(0x016B, "Icy", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Ebon_Scythe                          = new(0x016C, "Ebon", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Zealous_Scythe                       = new(0x016F, "Zealous", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Vampiric_Scythe                      = new(0x0171, "Vampiric", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Sundering_Scythe                     = new(0x0173, "Sundering", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Barbed_Scythe                        = new(0x0174, "Barbed", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Crippling_Scythe                     = new(0x0175, "Crippling", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Cruel_Scythe                         = new(0x0176, "Cruel", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Poisonous_Scythe                     = new(0x0177, "Poisonous", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Heavy_Scythe                         = new(0x0178, "Heavy", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Furious_Scythe                       = new(0x0179, "Furious", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade OfDefense_Scythe                     = new(0x0188, "of Defense", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfWarding_Scythe                     = new(0x0189, "of Warding", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfShelter_Scythe                     = new(0x018A, "of Shelter", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfEnchanting_Scythe                  = new(0x018B, "of Enchanting", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfFortitude_Scythe                   = new(0x018C, "of Fortitude", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfScytheMastery                      = new(0x018D, "of Scythe Mastery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade Fiery_Scythe                         = new(0x020B, "Fiery", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Shocking_Scythe                      = new(0x020C, "Shocking", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade OfTheProfession_Scythe               = new(0x022C, "of the Profession", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfValor_Shield                       = new(0x0151, "of Valor", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfEndurance_Shield                   = new(0x0152, "of Endurance", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfFortitude_Shield                   = new(0x0161, "of Fortitude", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfDevotion_Shield                    = new(0x0162, "of Devotion", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade Fiery_Spear                          = new(0x016D, "Fiery", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Shocking_Spear                       = new(0x016E, "Shocking", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Zealous_Spear                        = new(0x0170, "Zealous", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Vampiric_Spear                       = new(0x0172, "Vampiric", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Sundering_Spear                      = new(0x017A, "Sundering", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Barbed_Spear                         = new(0x017B, "Barbed", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Crippling_Spear                      = new(0x017C, "Crippling", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Cruel_Spear                          = new(0x017D, "Cruel", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Poisonous_Spear                      = new(0x017E, "Poisonous", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Silencing_Spear                      = new(0x017F, "Silencing", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Furious_Spear                        = new(0x0180, "Furious", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Heavy_Spear                          = new(0x0181, "Heavy", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade OfDefense_Spear                      = new(0x018E, "of Defense", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfWarding_Spear                      = new(0x018F, "of Warding", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfShelter_Spear                      = new(0x0190, "of Shelter", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfEnchanting_Spear                   = new(0x0191, "of Enchanting", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfFortitude_Spear                    = new(0x0192, "of Fortitude", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSpearMastery                       = new(0x0193, "of Spear Mastery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade Icy_Spear                            = new(0x020D, "Icy", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Ebon_Spear                           = new(0x020E, "Ebon", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade OfTheProfession_Spear                = new(0x022D, "of the Profession", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade Defensive_Staff                      = new(0x0091, "Defensive", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Insightful_Staff                     = new(0x009C, "Insightful", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Hale_Staff                           = new(0x009D, "Hale", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade OfAttribute_Staff                    = new(0x00C3, "of <Attribute>", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfWarding_Staff                      = new(0x00CA, "of Warding", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfShelter_Staff                      = new(0x00D0, "of Shelter", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfDefense_Staff                      = new(0x00D2, "of Defense", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSlaying_Staff                      = new(0x00D7, "of _____slaying", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfFortitude_Staff                    = new(0x00DC, "of Fortitude", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfEnchanting_Staff                   = new(0x00E1, "of Enchanting", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMastery_Staff                      = new(0x0153, "of Mastery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfDevotion_Staff                     = new(0x0154, "of Devotion", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfValor_Staff                        = new(0x0155, "of Valor", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfEndurance_Staff                    = new(0x0156, "of Endurance", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade Swift_Staff                          = new(0x020F, "Swift", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Adept_Staff                          = new(0x0210, "Adept", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade OfTheProfession_Staff                = new(0x022B, "of the Profession", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade Icy_Sword                            = new(0x008D, "Icy", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Ebon_Sword                           = new(0x008E, "Ebon", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Shocking_Sword                       = new(0x008F, "Shocking", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Fiery_Sword                          = new(0x0090, "Fiery", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Barbed_Sword                         = new(0x0093, "Barbed", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Crippling_Sword                      = new(0x0095, "Crippling", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Cruel_Sword                          = new(0x0098, "Cruel", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Furious_Sword                        = new(0x009B, "Furious", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Poisonous_Sword                      = new(0x00A0, "Poisonous", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Zealous_Sword                        = new(0x00A6, "Zealous", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Vampiric_Sword                       = new(0x00AA, "Vampiric", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Sundering_Sword                      = new(0x00AE, "Sundering", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade OfWarding_Sword                      = new(0x00CB, "of Warding", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfShelter_Sword                      = new(0x00D1, "of Shelter", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfDefense_Sword                      = new(0x00D3, "of Defense", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSlaying_Sword                      = new(0x00D8, "of _____slaying", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfFortitude_Sword                    = new(0x00DD, "of Fortitude", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfEnchanting_Sword                   = new(0x00E2, "of Enchanting", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSwordsmanship                      = new(0x00EB, "of Swordsmanship", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfTheProfession_Sword                = new(0x022E, "of the Profession", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMemory_Wand                        = new(0x015F, "of Memory", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfQuickening_Wand                    = new(0x0160, "of Quickening", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfTheProfession_Wand                 = new(0x022A, "of the Profession", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade Survivor                             = new(0x01E6, "Survivor", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Radiant                              = new(0x01E5, "Radiant", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Stalwart                             = new(0x01E7, "Stalwart", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Brawlers                             = new(0x01E8, "Brawler's", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Blessed                              = new(0x01E9, "Blessed", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Heralds                              = new(0x01EA, "Herald's", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Sentrys                              = new(0x01EB, "Sentry's", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Knights                              = new(0x01F9, "Knight's", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Lieutenants                          = new(0x0208, "Lieutenant's", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Stonefist                            = new(0x0209, "Stonefist", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Dreadnought                          = new(0x01FA, "Dreadnought", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Sentinels                            = new(0x01FB, "Sentinel's", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Frostbound                           = new(0x01FC, "Frostbound", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Pyrebound                            = new(0x01FE, "Pyrebound", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Stormbound                           = new(0x01FF, "Stormbound", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Scouts                               = new(0x0201, "Scout's", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Earthbound                           = new(0x01FD, "Earthbound", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Beastmasters                         = new(0x0200, "Beastmaster's", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Wanderers                            = new(0x01F6, "Wanderer's", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Disciples                            = new(0x01F7, "Disciple's", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Anchorites                           = new(0x01F8, "Anchorite's", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Bloodstained                         = new(0x020A, "Bloodstained", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Tormentors                           = new(0x01EC, "Tormentor's", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Bonelace                             = new(0x01EE, "Bonelace", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade MinionMasters                        = new(0x01EF, "Minion Master's", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Blighters                            = new(0x01F0, "Blighter's", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Undertakers                          = new(0x01ED, "Undertaker's", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Virtuosos                            = new(0x01E4, "Virtuoso's", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Artificers                           = new(0x01E2, "Artificer's", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Prodigys                             = new(0x01E3, "Prodigy's", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Hydromancer                          = new(0x01F2, "Hydromancer", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Geomancer                            = new(0x01F3, "Geomancer", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Pyromancer                           = new(0x01F4, "Pyromancer", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Aeromancer                           = new(0x01F5, "Aeromancer", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Prismatic                            = new(0x01F1, "Prismatic", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Vanguards                            = new(0x01DE, "Vanguard's", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Infiltrators                         = new(0x01DF, "Infiltrator's", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Saboteurs                            = new(0x01E0, "Saboteur's", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Nightstalkers                        = new(0x01E1, "Nightstalker's", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Shamans                              = new(0x0204, "Shaman's", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade GhostForge                           = new(0x0205, "Ghost Forge", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Mystics                              = new(0x0206, "Mystic's", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Windwalker                           = new(0x0202, "Windwalker", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Forsaken                             = new(0x0203, "Forsaken", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade Centurions                           = new(0x0207, "Centurion's", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade OfAttunement                         = new(0x0211, "of Attunement", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfRecovery                           = new(0x0213, "of Recovery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfRestoration                        = new(0x0214, "of Restoration", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfClarity                            = new(0x0215, "of Clarity", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfPurity                             = new(0x0216, "of Purity", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorVigor                         = new(0x00FF, "of Minor Vigor", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorVigor2                        = new(0x00C2, "of Minor Vigor", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorVigor                      = new(0x0101, "of Superior Vigor", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorVigor                         = new(0x0100, "of Major Vigor", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfVitae                              = new(0x0212, "of Vitae", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorAbsorption                    = new(0x00FC, "of Minor Absorption", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorTactics                       = new(0x1501, "of Minor Tactics", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorStrength                      = new(0x1101, "of Minor Strength", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorAxeMastery                    = new(0x1201, "of Minor Axe Mastery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorHammerMastery                 = new(0x1301, "of Minor Hammer Mastery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorSwordsmanship                 = new(0x1401, "of Minor Swordsmanship", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorAbsorption                    = new(0x00FD, "of Major Absorption", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorTactics                       = new(0x1502, "of Major Tactics", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorStrength                      = new(0x1102, "of Major Strength", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorAxeMastery                    = new(0x1202, "of Major Axe Mastery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorHammerMastery                 = new(0x1302, "of Major Hammer Mastery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorSwordsmanship                 = new(0x1402, "of Major Swordsmanship", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorAbsorption                 = new(0x00FE, "of Superior Absorption", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorTactics                    = new(0x1503, "of Superior Tactics", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorStrength                   = new(0x1103, "of Superior Strength", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorAxeMastery                 = new(0x1203, "of Superior Axe Mastery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorHammerMastery              = new(0x1303, "of Superior Hammer Mastery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorSwordsmanship              = new(0x1403, "of Superior Swordsmanship", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorWildernessSurvival            = new(0x1801, "of Minor Wilderness Survival", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorExpertise                     = new(0x1701, "of Minor Expertise", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorBeastMastery                  = new(0x1601, "of Minor Beast Mastery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorMarksmanship                  = new(0x1901, "of Minor Marksmanship", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorWildernessSurvival            = new(0x1802, "of Major Wilderness Survival", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorExpertise                     = new(0x1702, "of Major Expertise", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorBeastMastery                  = new(0x1602, "of Major Beast Mastery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorMarksmanship                  = new(0x1902, "of Major Marksmanship", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorWildernessSurvival         = new(0x1803, "of Superior Wilderness Survival", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorExpertise                  = new(0x1703, "of Superior Expertise", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorBeastMastery               = new(0x1603, "of Superior Beast Mastery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorMarksmanship               = new(0x1903, "of Superior Marksmanship", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorHealingPrayers                = new(0x0D01, "of Minor Healing Prayers", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorSmitingPrayers                = new(0x0E01, "of Minor Smiting Prayers", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorProtectionPrayers             = new(0x0F01, "of Minor Protection Prayers", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorDivineFavor                   = new(0x1001, "of Minor Divine Favor", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorHealingPrayers                = new(0x0D02, "of Major Healing Prayers", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorSmitingPrayers                = new(0x0E02, "of Major Smiting Prayers", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorProtectionPrayers             = new(0x0F02, "of Major Protection Prayers", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorDivineFavor                   = new(0x1002, "of Major Divine Favor", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorHealingPrayers             = new(0x0D03, "of Superior Healing Prayers", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorSmitingPrayers             = new(0x0E03, "of Superior Smiting Prayers", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorProtectionPrayers          = new(0x0F03, "of Superior Protection Prayers", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorDivineFavor                = new(0x1003, "of Superior Divine Favor", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorBloodMagic                    = new(0x0401, "of Minor Blood Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorDeathMagic                    = new(0x0501, "of Minor Death Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorCurses                        = new(0x0701, "of Minor Curses", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorSoulReaping                   = new(0x0601, "of Minor Soul Reaping", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorBloodMagic                    = new(0x0402, "of Major Blood Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorDeathMagic                    = new(0x0502, "of Major Death Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorCurses                        = new(0x0702, "of Major Curses", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorSoulReaping                   = new(0x0602, "of Major Soul Reaping", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorBloodMagic                 = new(0x0403, "of Superior Blood Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorDeathMagic                 = new(0x0503, "of Superior Death Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorCurses                     = new(0x0703, "of Superior Curses", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorSoulReaping                = new(0x0603, "of Superior Soul Reaping", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorFastCasting                   = new(0x0001, "of Minor Fast Casting", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorDominationMagic               = new(0x0201, "of Minor Domination Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorIllusionMagic                 = new(0x0101, "of Minor Illusion Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorInspirationMagic              = new(0x0301, "of Minor Inspiration Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorFastCasting                   = new(0x0002, "of Major Fast Casting", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorDominationMagic               = new(0x0202, "of Major Domination Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorIllusionMagic                 = new(0x0102, "of Major Illusion Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorInspirationMagic              = new(0x0302, "of Major Inspiration Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorFastCasting                = new(0x0003, "of Superior Fast Casting", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorDominationMagic            = new(0x0203, "of Superior Domination Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorIllusionMagic              = new(0x0103, "of Superior Illusion Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorInspirationMagic           = new(0x0303, "of Superior Inspiration Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorEnergyStorage                 = new(0x0C01, "of Minor Energy Storage", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorFireMagic                     = new(0x0A01, "of Minor Fire Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorAirMagic                      = new(0x0801, "of Minor Air Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorEarthMagic                    = new(0x0901, "of Minor Earth Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorWaterMagic                    = new(0x0B01, "of Minor Water Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorEnergyStorage                 = new(0x0C02, "of Major Energy Storage", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorFireMagic                     = new(0x0A02, "of Major Fire Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorAirMagic                      = new(0x0802, "of Major Air Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorEarthMagic                    = new(0x0902, "of Major Earth Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorWaterMagic                    = new(0x0B02, "of Major Water Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorEnergyStorage              = new(0x0C03, "of Superior Energy Storage", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorFireMagic                  = new(0x0A03, "of Superior Fire Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorAirMagic                   = new(0x0803, "of Superior Air Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorEarthMagic                 = new(0x0903, "of Superior Earth Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorWaterMagic                 = new(0x0B03, "of Superior Water Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorCriticalStrikes               = new(0x2301, "of Minor Critical Strikes", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorDaggerMastery                 = new(0x1D01, "of Minor Dagger Mastery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorDeadlyArts                    = new(0x1E01, "of Minor Deadly Arts", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorShadowArts                    = new(0x1F01, "of Minor Shadow Arts", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorCriticalStrikes               = new(0x2302, "of Major Critical Strikes", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorDaggerMastery                 = new(0x1D02, "of Major Dagger Mastery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorDeadlyArts                    = new(0x1E02, "of Major Deadly Arts", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorShadowArts                    = new(0x1F02, "of Major Shadow Arts", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorCriticalStrikes            = new(0x2303, "of Superior Critical Strikes", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorDaggerMastery              = new(0x1D03, "of Superior Dagger Mastery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorDeadlyArts                 = new(0x1E03, "of Superior Deadly Arts", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorShadowArts                 = new(0x1F03, "of Superior Shadow Arts", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorChannelingMagic               = new(0x2201, "of Minor Channeling Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorRestorationMagic              = new(0x2101, "of Minor Restoration Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorCommuning                     = new(0x2001, "of Minor Communing", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorSpawningPower                 = new(0x2401, "of Minor Spawning Power", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorChannelingMagic               = new(0x2202, "of Major Channeling Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorRestorationMagic              = new(0x2102, "of Major Restoration Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorCommuning                     = new(0x2002, "of Major Communing", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorSpawningPower                 = new(0x2402, "of Major Spawning Power", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorChannelingMagic            = new(0x2203, "of Superior Channeling Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorRestorationMagic           = new(0x2103, "of Superior Restoration Magic", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorCommuning                  = new(0x2003, "of Superior Communing", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorSpawningPower              = new(0x2403, "of Superior Spawning Power", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorMysticism                     = new(0x2C01, "of Minor Mysticism", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorEarthPrayers                  = new(0x2B01, "of Minor Earth Prayers", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorScytheMastery                 = new(0x2901, "of Minor Scythe Mastery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorWindPrayers                   = new(0x2A01, "of Minor Wind Prayers", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorMysticism                     = new(0x2C02, "of Major Mysticism", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorEarthPrayers                  = new(0x2B02, "of Major Earth Prayers", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorScytheMastery                 = new(0x2902, "of Major Scythe Mastery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorWindPrayers                   = new(0x2A02, "of Major Wind Prayers", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorMysticism                  = new(0x2C03, "of Superior Mysticism", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorEarthPrayers               = new(0x2B03, "of Superior Earth Prayers", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorScytheMastery              = new(0x2903, "of Superior Scythe Mastery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorWindPrayers                = new(0x2A03, "of Superior Wind Prayers", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorLeadership                    = new(0x2801, "of Minor Leadership", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorMotivation                    = new(0x2701, "of Minor Motivation", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorCommand                       = new(0x2601, "of Minor Command", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMinorSpearMastery                  = new(0x2501, "of Minor Spear Mastery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorLeadership                    = new(0x2802, "of Major Leadership", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorMotivation                    = new(0x2702, "of Major Motivation", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorCommand                       = new(0x2602, "of Major Command", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorSpearMastery                  = new(0x2502, "of Major Spear Mastery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorLeadership                 = new(0x2803, "of Superior Leadership", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorMotivation                 = new(0x2703, "of Superior Motivation", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorCommand                    = new(0x2603, "of Superior Command", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorSpearMastery               = new(0x2503, "of Superior Spear Mastery", ItemUpgradeType.Suffix);
 
-    // Axe
-    public static readonly ItemUpgrade Icy_Axe = new(129, "Icy", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Ebon_Axe = new(130, "Ebon", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Shocking_Axe = new(131, "Shocking", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Fiery_Axe = new(132, "Fiery", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Barbed_Axe = new(146, "Barbed", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Crippling_Axe = new(148, "Crippling", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Cruel_Axe = new(150, "Cruel", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Furious_Axe = new(153, "Furious", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Poisonous_Axe = new(158, "Poisonous", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Heavy_Axe = new(161, "Heavy", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Zealous_Axe = new(163, "Zealous", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Vampiric_Axe = new(167, "Vampiric", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Sundering_Axe = new(171, "Sundering", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade OfDefense_Axe = new(197, "of Defense", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfWarding_Axe = new(199, "of Warding", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfShelter_Axe = new(205, "of Shelter", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSlaying_Axe = new(212, "of ____slaying", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfFortitude_Axe = new(217, "of Fortitude", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfEnchanting_Axe = new(222, "of Enchanting", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfAxeMastery = new(232, "of Axe Mastery", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfTheProfession_Axe = new(550, "of the Profession", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade UpgradeMinorRune_Warrior             = new(0x00B3, "Upgrade warrior minor rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToMinorRune_Warrior           = new(0x0167, "Applies to warrior minor rune", ItemUpgradeType.AppliesToRune);
+    public static readonly ItemUpgrade UpgradeMajorRune_Warrior             = new(0x00B9, "Upgrade warrior major rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToMajorRune_Warrior           = new(0x0173, "Applies to warrior major rune", ItemUpgradeType.AppliesToRune);
+    public static readonly ItemUpgrade UpgradeSuperiorRune_Warrior          = new(0x00BF, "Upgrade warrior superior rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToSuperiorRune_Warrior        = new(0x017F, "Applies to warrior superior rune", ItemUpgradeType.AppliesToRune);
 
-    // Bow
-    public static readonly ItemUpgrade Icy_Bow = new(133, "Icy", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Ebon_Bow = new(134, "Ebon", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Shocking_Bow = new(135, "Shocking", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Fiery_Bow = new(136, "Fiery", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Poisonous_Bow = new(159, "Poisonous", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Zealous_Bow = new(165, "Zealous", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Vampiric_Bow = new(169, "Vampiric", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Sundering_Bow = new(173, "Sundering", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade OfDefense_Bow = new(198, "of Defense", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfWarding_Bow = new(200, "of Warding", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfShelter_Bow = new(206, "of Shelter", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSlaying_Bow = new(213, "of _____slaying", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfFortitude_Bow = new(218, "of Fortitude", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfEnchanting_Bow = new(223, "of Enchanting", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMarksmanship = new(233, "of Marksmanship", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade Barbed_Bow = new(327, "Barbed", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Crippling_Bow = new(328, "Crippling", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Silencing_Bow = new(329, "Silencing", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade OfTheProfession_Bow = new(551, "of the Profession", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade UpgradeMinorRune_Ranger              = new(0x00B4, "Upgrade ranger minor rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToMinorRune_Ranger            = new(0x0169, "Applies to ranger minor rune", ItemUpgradeType.AppliesToRune);
+    public static readonly ItemUpgrade UpgradeMajorRune_Ranger              = new(0x00BA, "Upgrade ranger major rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToMajorRune_Ranger            = new(0x0175, "Applies to ranger major rune", ItemUpgradeType.AppliesToRune);
+    public static readonly ItemUpgrade UpgradeSuperiorRune_Ranger           = new(0x00C0, "Upgrade ranger superior rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToSuperiorRune_Ranger         = new(0x0181, "Applies to ranger superior rune", ItemUpgradeType.AppliesToRune);
 
-    // Daggers
-    public static readonly ItemUpgrade Icy_Daggers = new(302, "Icy", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Ebon_Daggers = new(303, "Ebon", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Fiery_Daggers = new(304, "Fiery", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Shocking_Daggers = new(305, "Shocking", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Zealous_Daggers = new(306, "Zealous", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Vampiric_Daggers = new(307, "Vampiric", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Sundering_Daggers = new(308, "Sundering", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Barbed_Daggers = new(309, "Barbed", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Crippling_Daggers = new(310, "Crippling", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Cruel_Daggers = new(311, "Cruel", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Poisonous_Daggers = new(312, "Poisonous", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Silencing_Daggers = new(313, "Silencing", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Furious_Daggers = new(314, "Furious", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade OfDefense_Daggers = new(321, "of Defense", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfWarding_Daggers = new(322, "of Warding", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfShelter_Daggers = new(323, "of Shelter", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfEnchanting_Daggers = new(324, "of Enchanting", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfFortitude_Daggers = new(325, "of Fortitude", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfDaggerMastery = new(326, "of Dagger Mastery", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfTheProfession_Daggers = new(552, "of the Profession", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade UpgradeMinorRune_Monk                = new(0x00B2, "Upgrade monk major rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToMinorRune_Monk              = new(0x0165, "Applies to monk minor rune", ItemUpgradeType.AppliesToRune);
+    public static readonly ItemUpgrade UpgradeMajorRune_Monk                = new(0x00B8, "Upgrade monk major rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToMajorRune_Monk              = new(0x0171, "Applies to monk major rune", ItemUpgradeType.AppliesToRune);
+    public static readonly ItemUpgrade UpgradeSuperiorRune_Monk             = new(0x00BE, "Upgrade monk superior rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToSuperiorRune_Monk           = new(0x017D, "Applies to monk superior rune", ItemUpgradeType.AppliesToRune);
 
-    // Focus
-    public static readonly ItemUpgrade OfAptitude_Focus = new(535, "of Aptitude", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfFortitude_Focus = new(536, "of Fortitude", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfDevotion_Focus = new(537, "of Devotion", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfValor_Focus = new(538, "of Valor", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfEndurance_Focus = new(539, "of Endurance", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSwiftness_Focus = new(540, "of Swiftness", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade UpgradeMinorRune_Necromancer         = new(0x00B0, "Upgrade necromancer minor rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToMinorRune_Necromancer       = new(0x0161, "Applies to necromancer minor rune", ItemUpgradeType.AppliesToRune);
+    public static readonly ItemUpgrade UpgradeMajorRune_Necromancer         = new(0x00B6, "Upgrade necromancer major rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToMajorRune_Necromancer       = new(0x016D, "Applies to necromancer major rune", ItemUpgradeType.AppliesToRune);
+    public static readonly ItemUpgrade UpgradeSuperiorRune_Necromancer      = new(0x00BC, "Upgrade necromancer superior rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToSuperiorRune_Necromancer    = new(0x0179, "Applies to necromancer superior rune", ItemUpgradeType.AppliesToRune);
 
-    // Hammer
-    public static readonly ItemUpgrade Icy_Hammer = new(137, "Icy", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Ebon_Hammer = new(138, "Ebon", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Shocking_Hammer = new(139, "Shocking", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Fiery_Hammer = new(140, "Fiery", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Cruel_Hammer = new(151, "Cruel", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Furious_Hammer = new(154, "Furious", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Heavy_Hammer = new(162, "Heavy", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Zealous_Hammer = new(164, "Zealous", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Vampiric_Hammer = new(168, "Vampiric", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Sundering_Hammer = new(172, "Sundering", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade OfWarding_Hammer = new(201, "of Warding", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfDefense_Hammer = new(204, "of Defense", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfShelter_Hammer = new(207, "of Shelter", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSlaying_Hammer = new(214, "of _____slaying", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfFortitude_Hammer = new(219, "of Fortitude", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfEnchanting_Hammer = new(224, "of Enchanting", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfHammerMastery = new(234, "of Hammer Mastery", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfTheProfession_Hammer = new(553, "of the Profession", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade UpgradeMinorRune_Mesmer              = new(0x00AF, "Upgrade mesmer minor rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToMinorRune_Mesmer            = new(0x015F, "Applies to mesmer minor rune", ItemUpgradeType.AppliesToRune);
+    public static readonly ItemUpgrade UpgradeMajorRune_Mesmer              = new(0x00B5, "Upgrade mesmer major rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToMajorRune_Mesmer            = new(0x016B, "Applies to mesmer major rune", ItemUpgradeType.AppliesToRune);
+    public static readonly ItemUpgrade UpgradeSuperiorRune_Mesmer           = new(0x00BB, "Upgrade mesmer superior rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToSuperiorRune_Mesmer         = new(0x0177, "Applies to mesmer superior rune", ItemUpgradeType.AppliesToRune);
 
-    // Inscription
-    public static readonly ItemUpgrade IHaveThePower = new(348, "\"I have the power!\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade LetTheMemoryLiveAgain = new(350, "\"Let the Memory Live Again!\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade TooMuchInformation = new(355, "\"Too Much Information\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade GuidedByFate = new(356, "\"Guided by Fate\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade StrengthAndHonor = new(357, "\"Strength and Honor\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade VengeanceIsMine = new(358, "\"Vengeance is Mine\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade DontFearTheReaper = new(359, "\"Don't Fear the Reaper\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade DanceWithDeath = new(360, "\"Dance with Death\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade BrawnOverBrains = new(361, "\"Brawn over Brains\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade ToThePain = new(362, "\"To The Pain!\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade IgnoranceIsBliss = new(438, "\"Ignorance is Bliss\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade LifeIsPain = new(439, "\"Life is Pain\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade ManForAllSeasons = new(440, "\"Man for All Seasons\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade SurvivalOfTheFittest = new(441, "\"Survival of the Fittest\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade MightMakesRight = new(442, "\"Might makes Right!\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade KnowingIsHalfTheBattle = new(443, "\"Knowing is Half the Battle.\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade FaithIsMy = new(444, "\"Faith is My \"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade DownButNotOut = new(445, "\"Down But Not Out\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade HailToTheKing = new(446, "\"Hail to the King\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade BeJustAndFearNot = new(447, "\"Be Just and Fear Not\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade LiveForToday = new(448, "\"Live for Today\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade SerenityNow = new(449, "\"Serenity Now\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade ForgetMeNot = new(450, "\"Forget Me Not\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade NotTheFace = new(451, "\"Not the face!\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade LeafOnTheWind = new(452, "\"Leaf on the Wind\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade LikeARollingStone = new(453, "\"Like a Rolling Stone\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade RidersOnTheStorm = new(454, "\"Riders on the Storm\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade SleepNowInTheFire = new(455, "\"Sleep Now in the Fire\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade ThroughThickAndThin = new(456, "\"Through Thick and Thin\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade TheRiddleOfSteel = new(457, "\"The Riddle of Steel\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade FearCutsDeeper = new(458, "\"Fear Cuts Deeper\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade ICanSeeClearlyNow = new(459, "\"I Can See Clearly Now\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade SwiftAsTheWind = new(460, "\"Swift as the Wind\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade StrengthOfBody = new(461, "\"Strength of Body\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade CastOutTheUnclean = new(462, "\"Cast Out the Unclean\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade PureOfHeart = new(463, "\"Pure of Heart\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade SoundnessOfMind = new(464, "\"Soundness of Mind\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade OnlyTheStrongSurvive = new(465, "\"Only the Strong Survive\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade LuckOfTheDraw = new(466, "\"Luck of the Draw\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade ShelteredByFaith = new(467, "\"Sheltered by Faith\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade NothingToFear = new(468, "\"Nothing to Fear\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade RunForYourLife = new(469, "\"Run For Your Life!\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade MasterOfMyDomain = new(470, "\"Master of My Domain\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade AptitudeNotAttitude = new(471, "\"Aptitude not Attitude\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade SeizeTheDay = new(472, "\"Seize the Day\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade HaveFaith = new(473, "\"Have Faith\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade HaleAndHearty = new(474, "\"Hale and Hearty\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade DontCallItAComeback = new(475, "\"Don't call it a comeback!\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade IAmSorrow = new(476, "\"I am Sorrow.\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade DontThinkTwice = new(477, "\"Don't Think Twice\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade ShowMeTheMoney = new(542, "\"Show me the money\"", ItemUpgradeType.Inscription);
-    public static readonly ItemUpgrade MeasureForMeasure = new(543, "\"Measure for Measure\"", ItemUpgradeType.Inscription);
+    public static readonly ItemUpgrade UpgradeMinorRune_Elementalist        = new(0x00B1, "Upgrade elementalist minor rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToMinorRune_Elementalist      = new(0x0163, "Applies to elementalist minor rune", ItemUpgradeType.AppliesToRune);
+    public static readonly ItemUpgrade UpgradeMajorRune_Elementalist        = new(0x00B7, "Upgrade elementalist major rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToMajorRune_Elementalist      = new(0x016F, "Applies to elementalist major rune", ItemUpgradeType.AppliesToRune);
+    public static readonly ItemUpgrade UpgradeSuperiorRune_Elementalist     = new(0x00BD, "Upgrade elementalist superior rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToSuperiorRune_Elementalist   = new(0x017B, "Applies to elementalist superior rune", ItemUpgradeType.AppliesToRune);
 
-    // Scythe
-    public static readonly ItemUpgrade Icy_Scythe = new(363, "Icy", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Ebon_Scythe = new(364, "Ebon", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Zealous_Scythe = new(367, "Zealous", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Vampiric_Scythe = new(369, "Vampiric", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Sundering_Scythe = new(371, "Sundering", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Barbed_Scythe = new(372, "Barbed", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Crippling_Scythe = new(373, "Crippling", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Cruel_Scythe = new(374, "Cruel", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Poisonous_Scythe = new(375, "Poisonous", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Heavy_Scythe = new(376, "Heavy", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Furious_Scythe = new(377, "Furious", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade OfDefense_Scythe = new(392, "of Defense", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfWarding_Scythe = new(393, "of Warding", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfShelter_Scythe = new(394, "of Shelter", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfEnchanting_Scythe = new(395, "of Enchanting", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfFortitude_Scythe = new(396, "of Fortitude", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfScytheMastery = new(397, "of Scythe Mastery", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade Fiery_Scythe = new(523, "Fiery", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Shocking_Scythe = new(524, "Shocking", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade OfTheProfession_Scythe = new(556, "of the Profession", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade UpgradeMinorRune_Assassin            = new(0x013B, "Upgrade assassin minor rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToMinorRune_Assassin          = new(0x0277, "Applies to assassin minor rune", ItemUpgradeType.AppliesToRune);
+    public static readonly ItemUpgrade UpgradeMajorRune_Assassin            = new(0x014C, "Upgrade assassin major rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToMajorRune_Assassin          = new(0x0279, "Applies to assassin major rune", ItemUpgradeType.AppliesToRune);
+    public static readonly ItemUpgrade UpgradeSuperiorRune_Assassin         = new(0x013D, "Upgrade assassin superior rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToSuperiorRune_Assassin       = new(0x027B, "Applies to assassin superior rune", ItemUpgradeType.AppliesToRune);
 
-    // Shield
-    public static readonly ItemUpgrade OfValor_Shield = new(337, "of Valor", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfEndurance_Shield = new(338, "of Endurance", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfFortitude_Shield = new(353, "of Fortitude", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfDevotion_Shield = new(354, "of Devotion", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade UpgradeMinorRune_Ritualist           = new(0x013E, "Upgrade ritualist minor rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToMinorRune_Ritualist         = new(0x027D, "Applies to ritualist minor rune", ItemUpgradeType.AppliesToRune);
+    public static readonly ItemUpgrade UpgradeMajorRune_Ritualist           = new(0x013F, "Upgrade ritualist major rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToMajorRune_Ritualist         = new(0x027F, "Applies to ritualist major rune", ItemUpgradeType.AppliesToRune);
+    public static readonly ItemUpgrade UpgradeSuperiorRune_Ritualist        = new(0x0140, "Upgrade ritualist superior rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToSuperiorRune_Ritualist      = new(0x0281, "Applies to ritualist superior rune", ItemUpgradeType.AppliesToRune);
 
-    // Spear
-    public static readonly ItemUpgrade Fiery_Spear = new(365, "Fiery", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Shocking_Spear = new(366, "Shocking", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Zealous_Spear = new(368, "Zealous", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Vampiric_Spear = new(370, "Vampiric", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Sundering_Spear = new(378, "Sundering", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Barbed_Spear = new(379, "Barbed", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Crippling_Spear = new(380, "Crippling", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Cruel_Spear = new(381, "Cruel", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Poisonous_Spear = new(382, "Poisonous", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Silencing_Spear = new(383, "Silencing", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Furious_Spear = new(384, "Furious", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Heavy_Spear = new(385, "Heavy", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade OfDefense_Spear = new(398, "of Defense", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfWarding_Spear = new(399, "of Warding", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfShelter_Spear = new(400, "of Shelter", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfEnchanting_Spear = new(401, "of Enchanting", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfFortitude_Spear = new(402, "of Fortitude", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSpearMastery = new(403, "of Spear Mastery", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade Icy_Spear = new(525, "Icy", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Ebon_Spear = new(526, "Ebon", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade OfTheProfession_Spear = new(557, "of the Profession", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade UpgradeMinorRune_Dervish             = new(0x0182, "Upgrade dervish minor rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToMinorRune_Dervish           = new(0x0305, "Applies to dervish minor rune", ItemUpgradeType.AppliesToRune);
+    public static readonly ItemUpgrade UpgradeMajorRune_Dervish             = new(0x0183, "Upgrade dervish major rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToMajorRune_Dervish           = new(0x0307, "Applies to dervish major rune", ItemUpgradeType.AppliesToRune);
+    public static readonly ItemUpgrade UpgradeSuperiorRune_Dervish          = new(0x0184, "Upgrade dervish superior rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToSuperiorRune_Dervish        = new(0x0309, "Applies to dervish superior rune", ItemUpgradeType.AppliesToRune);
 
-    // Staff
-    public static readonly ItemUpgrade Defensive_Staff = new(145, "Defensive", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Insightful_Staff = new(156, "Insightful", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Hale_Staff = new(157, "Hale", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade OfAttribute_Staff = new(195, "of <Attribute>", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfWarding_Staff = new(202, "of Warding", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfShelter_Staff = new(208, "of Shelter", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfDefense_Staff = new(210, "of Defense", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSlaying_Staff = new(215, "of _____slaying", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfFortitude_Staff = new(220, "of Fortitude", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfEnchanting_Staff = new(225, "of Enchanting", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMastery_Staff = new(339, "of Mastery", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfDevotion_Staff = new(340, "of Devotion", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfValor_Staff = new(341, "of Valor", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfEndurance_Staff = new(342, "of Endurance", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade Swift_Staff = new(527, "Swift", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Adept_Staff = new(528, "Adept", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade OfTheProfession_Staff = new(555, "of the Profession", ItemUpgradeType.Suffix);
-
-    // Sword
-    public static readonly ItemUpgrade Icy_Sword = new(141, "Icy", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Ebon_Sword = new(142, "Ebon", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Shocking_Sword = new(143, "Shocking", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Fiery_Sword = new(144, "Fiery", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Barbed_Sword = new(147, "Barbed", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Crippling_Sword = new(149, "Crippling", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Cruel_Sword = new(152, "Cruel", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Furious_Sword = new(155, "Furious", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Poisonous_Sword = new(160, "Poisonous", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Zealous_Sword = new(166, "Zealous", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Vampiric_Sword = new(170, "Vampiric", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Sundering_Sword = new(174, "Sundering", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade OfWarding_Sword = new(203, "of Warding", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfShelter_Sword = new(209, "of Shelter", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfDefense_Sword = new(211, "of Defense", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSlaying_Sword = new(216, "of _____slaying", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfFortitude_Sword = new(221, "of Fortitude", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfEnchanting_Sword = new(226, "of Enchanting", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSwordsmanship = new(235, "of Swordsmanship", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfTheProfession_Sword = new(558, "of the Profession", ItemUpgradeType.Suffix);
-
-    // Wand
-    public static readonly ItemUpgrade OfMemory_Wand = new(351, "of Memory", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfQuickening_Wand = new(352, "of Quickening", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfTheProfession_Wand = new(554, "of the Profession", ItemUpgradeType.Suffix);
-
-    // Insignia
-    public static readonly ItemUpgrade Survivor = new(486, "Survivor", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Radiant = new(485, "Radiant", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Stalwart = new(487, "Stalwart", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Brawlers = new(488, "Brawler's", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Blessed = new(489, "Blessed", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Heralds = new(490, "Herald's", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Sentrys = new(491, "Sentry's", ItemUpgradeType.Prefix);
-
-    // Warrior
-    public static readonly ItemUpgrade Knights = new(505, "Knight's", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Lieutenants = new(520, "Lieutenant's", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Stonefist = new(521, "Stonefist", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Dreadnought = new(506, "Dreadnought", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Sentinels = new(507, "Sentinel's", ItemUpgradeType.Prefix);
-
-    // Ranger
-    public static readonly ItemUpgrade Frostbound = new(508, "Frostbound", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Pyrebound = new(510, "Pyrebound", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Stormbound = new(511, "Stormbound", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Scouts = new(513, "Scout's", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Earthbound = new(509, "Earthbound", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Beastmasters = new(512, "Beastmaster's", ItemUpgradeType.Prefix);
-
-    // Monk
-    public static readonly ItemUpgrade Wanderers = new(502, "Wanderer's", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Disciples = new(503, "Disciple's", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Anchorites = new(504, "Anchorite's", ItemUpgradeType.Prefix);
-
-    // Necromancer
-    public static readonly ItemUpgrade Bloodstained = new(522, "Bloodstained", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Tormentors = new(492, "Tormentor's", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Bonelace = new(494, "Bonelace", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade MinionMasters = new(495, "Minion Master's", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Blighters = new(496, "Blighter's", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Undertakers = new(493, "Undertaker's", ItemUpgradeType.Prefix);
-
-    // Mesmer
-    public static readonly ItemUpgrade Virtuosos = new(484, "Virtuoso's", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Artificers = new(482, "Artificer's", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Prodigys = new(483, "Prodigy's", ItemUpgradeType.Prefix);
-
-    // Elementalist
-    public static readonly ItemUpgrade Hydromancer = new(498, "Hydromancer", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Geomancer = new(499, "Geomancer", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Pyromancer = new(500, "Pyromancer", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Aeromancer = new(501, "Aeromancer", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Prismatic = new(497, "Prismatic", ItemUpgradeType.Prefix);
-
-    // Assassin
-    public static readonly ItemUpgrade Vanguards = new(478, "Vanguard's", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Infiltrators = new(479, "Infiltrator's", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Saboteurs = new(480, "Saboteur's", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Nightstalkers = new(481, "Nightstalker's", ItemUpgradeType.Prefix);
-
-    // Ritualist
-    public static readonly ItemUpgrade Shamans = new(516, "Shaman's", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade GhostForge = new(517, "Ghost Forge", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Mystics = new(518, "Mystic's", ItemUpgradeType.Prefix);
-
-    // Dervish
-    public static readonly ItemUpgrade Windwalker = new(514, "Windwalker", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade Forsaken = new(515, "Forsaken", ItemUpgradeType.Prefix);
-
-    // Paragon
-    public static readonly ItemUpgrade Centurions = new(519, "Centurion's", ItemUpgradeType.Prefix);
-
-    // Runes
-    public static readonly ItemUpgrade OfAttunement = new(529, "of Attunement", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfRecovery = new(531, "of Recovery", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfRestoration = new(532, "of Restoration", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfClarity = new(533, "of Clarity", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfPurity = new(534, "of Purity", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorVigor = new(255, "of Minor Vigor", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorVigor2 = new(194, "of Minor Vigor", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorVigor = new(257, "of Superior Vigor", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorVigor = new(256, "of Major Vigor", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfVitae = new(530, "of Vitae", ItemUpgradeType.Suffix);
-
-    // Warrior
-    public static readonly ItemUpgrade OfMinorAbsorption = new(252, "of Minor Absorption", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorTactics = new(5377, "of Minor Tactics", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorStrength = new(4353, "of Minor Strength", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorAxeMastery = new(4609, "of Minor Axe Mastery", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorHammerMastery = new(4865, "of Minor Hammer Mastery", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorSwordsmanship = new(5121, "of Minor Swordsmanship", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorAbsorption = new(253, "of Major Absorption", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorTactics = new(5378, "of Major Tactics", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorStrength = new(4354, "of Major Strength", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorAxeMastery = new(4610, "of Major Axe Mastery", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorHammerMastery = new(4866, "of Major Hammer Mastery", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorSwordsmanship = new(5122, "of Major Swordsmanship", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorAbsorption = new(254, "of Superior Absorption", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorTactics = new(5379, "of Superior Tactics", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorStrength = new(4355, "of Superior Strength", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorAxeMastery = new(4611, "of Superior Axe Mastery", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorHammerMastery = new(4867, "of Superior Hammer Mastery", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorSwordsmanship = new(5123, "of Superior Swordsmanship", ItemUpgradeType.Suffix);
-
-    // Ranger
-    public static readonly ItemUpgrade OfMinorWildernessSurvival = new(6145, "of Minor Wilderness Survival", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorExpertise = new(5889, "of Minor Expertise", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorBeastMastery = new(5633, "of Minor Beast Mastery", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorMarksmanship = new(6401, "of Minor Marksmanship", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorWildernessSurvival = new(6146, "of Major Wilderness Survival", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorExpertise = new(5890, "of Major Expertise", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorBeastMastery = new(5634, "of Major Beast Mastery", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorMarksmanship = new(6402, "of Major Marksmanship", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorWildernessSurvival = new(6147, "of Superior Wilderness Survival", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorExpertise = new(5891, "of Superior Expertise", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorBeastMastery = new(5635, "of Superior Beast Mastery", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorMarksmanship = new(6403, "of Superior Marksmanship", ItemUpgradeType.Suffix);
-
-    // Monk
-    public static readonly ItemUpgrade OfMinorHealingPrayers = new(3329, "of Minor Healing Prayers", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorSmitingPrayers = new(3585, "of Minor Smiting Prayers", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorProtectionPrayers = new(3841, "of Minor Protection Prayers", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorDivineFavor = new(4097, "of Minor Divine Favor", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorHealingPrayers = new(3330, "of Major Healing Prayers", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorSmitingPrayers = new(3586, "of Major Smiting Prayers", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorProtectionPrayers = new(3842, "of Major Protection Prayers", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorDivineFavor = new(4098, "of Major Divine Favor", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorHealingPrayers = new(3331, "of Superior Healing Prayers", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorSmitingPrayers = new(3587, "of Superior Smiting Prayers", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorProtectionPrayers = new(3843, "of Superior Protection Prayers", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorDivineFavor = new(4099, "of Superior Divine Favor", ItemUpgradeType.Suffix);
-
-    // Necromancer
-    public static readonly ItemUpgrade OfMinorBloodMagic = new(1025, "of Minor Blood Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorDeathMagic = new(1281, "of Minor Death Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorCurses = new(1793, "of Minor Curses", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorSoulReaping = new(1537, "of Minor Soul Reaping", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorBloodMagic = new(1026, "of Major Blood Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorDeathMagic = new(1282, "of Major Death Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorCurses = new(1794, "of Major Curses", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorSoulReaping = new(1538, "of Major Soul Reaping", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorBloodMagic = new(1027, "of Superior Blood Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorDeathMagic = new(1283, "of Superior Death Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorCurses = new(1795, "of Superior Curses", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorSoulReaping = new(1539, "of Superior Soul Reaping", ItemUpgradeType.Suffix);
-
-    // Mesmer
-    public static readonly ItemUpgrade OfMinorFastCasting = new(1, "of Minor Fast Casting", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorDominationMagic = new(513, "of Minor Domination Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorIllusionMagic = new(257, "of Minor Illusion Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorInspirationMagic = new(769, "of Minor Inspiration Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorFastCasting = new(2, "of Major Fast Casting", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorDominationMagic = new(514, "of Major Domination Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorIllusionMagic = new(258, "of Major Illusion Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorInspirationMagic = new(770, "of Major Inspiration Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorFastCasting = new(3, "of Superior Fast Casting", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorDominationMagic = new(515, "of Superior Domination Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorIllusionMagic = new(259, "of Superior Illusion Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorInspirationMagic = new(771, "of Superior Inspiration Magic", ItemUpgradeType.Suffix);
-
-    // Elementalist
-    public static readonly ItemUpgrade OfMinorEnergyStorage = new(3073, "of Minor Energy Storage", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorFireMagic = new(2561, "of Minor Fire Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorAirMagic = new(2049, "of Minor Air Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorEarthMagic = new(2305, "of Minor Earth Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorWaterMagic = new(2817, "of Minor Water Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorEnergyStorage = new(3074, "of Major Energy Storage", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorFireMagic = new(2562, "of Major Fire Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorAirMagic = new(2050, "of Major Air Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorEarthMagic = new(2306, "of Major Earth Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorWaterMagic = new(2818, "of Major Water Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorEnergyStorage = new(3075, "of Superior Energy Storage", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorFireMagic = new(2563, "of Superior Fire Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorAirMagic = new(2051, "of Superior Air Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorEarthMagic = new(2307, "of Superior Earth Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorWaterMagic = new(2819, "of Superior Water Magic", ItemUpgradeType.Suffix);
-
-    // Assassin
-    public static readonly ItemUpgrade OfMinorCriticalStrikes = new(8961, "of Minor Critical Strikes", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorDaggerMastery = new(7425, "of Minor Dagger Mastery", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorDeadlyArts = new(7681, "of Minor Deadly Arts", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorShadowArts = new(7937, "of Minor Shadow Arts", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorCriticalStrikes = new(8962, "of Major Critical Strikes", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorDaggerMastery = new(7426, "of Major Dagger Mastery", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorDeadlyArts = new(7682, "of Major Deadly Arts", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorShadowArts = new(7938, "of Major Shadow Arts", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorCriticalStrikes = new(8963, "of Superior Critical Strikes", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorDaggerMastery = new(7427, "of Superior Dagger Mastery", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorDeadlyArts = new(7683, "of Superior Deadly Arts", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorShadowArts = new(7939, "of Superior Shadow Arts", ItemUpgradeType.Suffix);
-
-    // Ritualist
-    public static readonly ItemUpgrade OfMinorChannelingMagic = new(8705, "of Minor Channeling Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorRestorationMagic = new(8449, "of Minor Restoration Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorCommuning = new(8193, "of Minor Communing", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorSpawningPower = new(9217, "of Minor Spawning Power", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorChannelingMagic = new(8706, "of Major Channeling Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorRestorationMagic = new(8450, "of Major Restoration Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorCommuning = new(8194, "of Major Communing", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorSpawningPower = new(9218, "of Major Spawning Power", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorChannelingMagic = new(8707, "of Superior Channeling Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorRestorationMagic = new(8451, "of Superior Restoration Magic", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorCommuning = new(8195, "of Superior Communing", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorSpawningPower = new(9219, "of Superior Spawning Power", ItemUpgradeType.Suffix);
-
-    // Dervish
-    public static readonly ItemUpgrade OfMinorMysticism = new(11265, "of Minor Mysticism", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorEarthPrayers = new(11009, "of Minor Earth Prayers", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorScytheMastery = new(10497, "of Minor Scythe Mastery", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorWindPrayers = new(10753, "of Minor Wind Prayers", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorMysticism = new(11266, "of Major Mysticism", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorEarthPrayers = new(11010, "of Major Earth Prayers", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorScytheMastery = new(10498, "of Major Scythe Mastery", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorWindPrayers = new(10754, "of Major Wind Prayers", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorMysticism = new(11267, "of Superior Mysticism", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorEarthPrayers = new(11011, "of Superior Earth Prayers", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorScytheMastery = new(10499, "of Superior Scythe Mastery", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorWindPrayers = new(10755, "of Superior Wind Prayers", ItemUpgradeType.Suffix);
-
-    // Paragon
-    public static readonly ItemUpgrade OfMinorLeadership = new(10241, "of Minor Leadership", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorMotivation = new(9985, "of Minor Motivation", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorCommand = new(9729, "of Minor Command", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorSpearMastery = new(9473, "of Minor Spear Mastery", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorLeadership = new(10242, "of Major Leadership", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorMotivation = new(9986, "of Major Motivation", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorCommand = new(9730, "of Major Command", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorSpearMastery = new(9474, "of Major Spear Mastery", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorLeadership = new(10243, "of Superior Leadership", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorMotivation = new(9987, "of Superior Motivation", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorCommand = new(9731, "of Superior Command", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorSpearMastery = new(9475, "of Superior Spear Mastery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade UpgradeMinorRune_Paragon             = new(0x0185, "Upgrade paragon minor rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToMinorRune_Paragon           = new(0x030B, "Applies to paragon minor rune", ItemUpgradeType.AppliesToRune);
+    public static readonly ItemUpgrade UpgradeMajorRune_Paragon             = new(0x0186, "Upgrade paragon major rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToMajorRune_Paragon           = new(0x030D, "Applies to paragon major rune", ItemUpgradeType.AppliesToRune);
+    public static readonly ItemUpgrade UpgradeSuperiorRune_Paragon          = new(0x0187, "Upgrade paragon superior rune", ItemUpgradeType.UpgradeRune);
+    public static readonly ItemUpgrade AppliesToSuperiorRune_Paragon        = new(0x030F, "Applies to paragon superior rune", ItemUpgradeType.AppliesToRune);
 
     public static readonly ImmutableArray<ItemUpgrade> ItemUpgrades = [
         Unknown,
@@ -888,6 +890,66 @@ public sealed class ItemUpgrade
         OfSuperiorMotivation,
         OfSuperiorCommand,
         OfSuperiorSpearMastery,
+        UpgradeMinorRune_Warrior,
+        AppliesToMinorRune_Warrior,
+        UpgradeMajorRune_Warrior,
+        AppliesToMajorRune_Warrior,
+        UpgradeSuperiorRune_Warrior,
+        AppliesToSuperiorRune_Warrior,
+        UpgradeMinorRune_Ranger,
+        AppliesToMinorRune_Ranger,
+        UpgradeMajorRune_Ranger,
+        AppliesToMajorRune_Ranger,
+        UpgradeSuperiorRune_Ranger,
+        AppliesToSuperiorRune_Ranger,
+        UpgradeMinorRune_Monk,
+        AppliesToMinorRune_Monk,
+        UpgradeMajorRune_Monk,
+        AppliesToMajorRune_Monk,
+        UpgradeSuperiorRune_Monk,
+        AppliesToSuperiorRune_Monk,
+        UpgradeMinorRune_Mesmer,
+        AppliesToMinorRune_Mesmer,
+        UpgradeMajorRune_Mesmer,
+        AppliesToMajorRune_Mesmer,
+        UpgradeSuperiorRune_Mesmer,
+        AppliesToSuperiorRune_Mesmer,
+        UpgradeMinorRune_Necromancer,
+        AppliesToMinorRune_Necromancer,
+        UpgradeMajorRune_Necromancer,
+        AppliesToMajorRune_Necromancer,
+        UpgradeSuperiorRune_Necromancer,
+        AppliesToSuperiorRune_Necromancer,
+        UpgradeMinorRune_Elementalist,
+        AppliesToMinorRune_Elementalist,
+        UpgradeMajorRune_Elementalist,
+        AppliesToMajorRune_Elementalist,
+        UpgradeSuperiorRune_Elementalist,
+        AppliesToSuperiorRune_Elementalist,
+        UpgradeMinorRune_Assassin,
+        AppliesToMinorRune_Assassin,
+        UpgradeMajorRune_Assassin,
+        AppliesToMajorRune_Assassin,
+        UpgradeSuperiorRune_Assassin,
+        AppliesToSuperiorRune_Assassin,
+        UpgradeMinorRune_Ritualist,
+        AppliesToMinorRune_Ritualist,
+        UpgradeMajorRune_Ritualist,
+        AppliesToMajorRune_Ritualist,
+        UpgradeSuperiorRune_Ritualist,
+        AppliesToSuperiorRune_Ritualist,
+        UpgradeMinorRune_Dervish,
+        AppliesToMinorRune_Dervish,
+        UpgradeMajorRune_Dervish,
+        AppliesToMajorRune_Dervish,
+        UpgradeSuperiorRune_Dervish,
+        AppliesToSuperiorRune_Dervish,
+        UpgradeMinorRune_Paragon,
+        AppliesToMinorRune_Paragon,
+        UpgradeMajorRune_Paragon,
+        AppliesToMajorRune_Paragon,
+        UpgradeSuperiorRune_Paragon,
+        AppliesToSuperiorRune_Paragon,
         ];
 
     public static ItemUpgrade Parse(int id)
