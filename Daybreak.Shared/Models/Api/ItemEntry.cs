@@ -11,6 +11,7 @@ public sealed record ItemEntry(
     string EncodedCompleteName,
     string DecodedCompleteName,
     string ItemType,
+    bool Inscribable,
     int Quantity,
     uint[] Modifiers,
     ItemProperty[] Properties)

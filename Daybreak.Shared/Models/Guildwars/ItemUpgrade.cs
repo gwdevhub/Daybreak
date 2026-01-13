@@ -50,6 +50,7 @@ public sealed class ItemUpgrade
     public static readonly ItemUpgrade Barbed_Bow = new(327, "Barbed", ItemUpgradeType.Prefix);
     public static readonly ItemUpgrade Crippling_Bow = new(328, "Crippling", ItemUpgradeType.Prefix);
     public static readonly ItemUpgrade Silencing_Bow = new(329, "Silencing", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade OfTheProfession_Bow = new(551, "of the Profession", ItemUpgradeType.Suffix);
 
     // Daggers
     public static readonly ItemUpgrade Icy_Daggers = new(302, "Icy", ItemUpgradeType.Prefix);
@@ -71,6 +72,7 @@ public sealed class ItemUpgrade
     public static readonly ItemUpgrade OfEnchanting_Daggers = new(324, "of Enchanting", ItemUpgradeType.Suffix);
     public static readonly ItemUpgrade OfFortitude_Daggers = new(325, "of Fortitude", ItemUpgradeType.Suffix);
     public static readonly ItemUpgrade OfDaggerMastery = new(326, "of Dagger Mastery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfTheProfession_Daggers = new(552, "of the Profession", ItemUpgradeType.Suffix);
 
     // Focus
     public static readonly ItemUpgrade OfAptitude_Focus = new(535, "of Aptitude", ItemUpgradeType.Suffix);
@@ -98,6 +100,7 @@ public sealed class ItemUpgrade
     public static readonly ItemUpgrade OfFortitude_Hammer = new(219, "of Fortitude", ItemUpgradeType.Suffix);
     public static readonly ItemUpgrade OfEnchanting_Hammer = new(224, "of Enchanting", ItemUpgradeType.Suffix);
     public static readonly ItemUpgrade OfHammerMastery = new(234, "of Hammer Mastery", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfTheProfession_Hammer = new(553, "of the Profession", ItemUpgradeType.Suffix);
 
     // Inscription
     public static readonly ItemUpgrade IHaveThePower = new(348, "\"I have the power!\"", ItemUpgradeType.Inscription);
@@ -202,6 +205,7 @@ public sealed class ItemUpgrade
     public static readonly ItemUpgrade OfSpearMastery = new(403, "of Spear Mastery", ItemUpgradeType.Suffix);
     public static readonly ItemUpgrade Icy_Spear = new(525, "Icy", ItemUpgradeType.Prefix);
     public static readonly ItemUpgrade Ebon_Spear = new(526, "Ebon", ItemUpgradeType.Prefix);
+    public static readonly ItemUpgrade OfTheProfession_Spear = new(557, "of the Profession", ItemUpgradeType.Suffix);
 
     // Staff
     public static readonly ItemUpgrade Defensive_Staff = new(145, "Defensive", ItemUpgradeType.Prefix);
@@ -242,6 +246,7 @@ public sealed class ItemUpgrade
     public static readonly ItemUpgrade OfFortitude_Sword = new(221, "of Fortitude", ItemUpgradeType.Suffix);
     public static readonly ItemUpgrade OfEnchanting_Sword = new(226, "of Enchanting", ItemUpgradeType.Suffix);
     public static readonly ItemUpgrade OfSwordsmanship = new(235, "of Swordsmanship", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfTheProfession_Sword = new(558, "of the Profession", ItemUpgradeType.Suffix);
 
     // Wand
     public static readonly ItemUpgrade OfMemory_Wand = new(351, "of Memory", ItemUpgradeType.Suffix);
@@ -691,8 +696,14 @@ public sealed class ItemUpgrade
         OfMemory_Wand,
         OfQuickening_Wand,
         OfTheProfession_Axe,
-        OfTheProfession_Staff,
+        OfTheProfession_Bow,
+        OfTheProfession_Daggers,
+        OfTheProfession_Hammer,
         OfTheProfession_Wand,
+        OfTheProfession_Staff,
+        OfTheProfession_Scythe,
+        OfTheProfession_Spear,
+        OfTheProfession_Sword,
         Survivor,
         Radiant,
         Stalwart,

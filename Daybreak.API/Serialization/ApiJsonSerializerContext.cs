@@ -1,5 +1,6 @@
 ﻿using Daybreak.API.Models;
 using Daybreak.Shared.Models.Api;
+using Daybreak.Shared.Models.Guildwars;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -35,6 +36,7 @@ namespace Daybreak.API.Serialization;
 [JsonSerializable(typeof(LoginInfo))]
 [JsonSerializable(typeof(MainPlayerBuildContext))]
 [JsonSerializable(typeof(InventoryInformation))]
+[JsonSerializable(typeof(ItemProperty))]
 [JsonSourceGenerationOptions(UseStringEnumConverter = true)]
 public partial class ApiJsonSerializerContext : JsonSerializerContext
 {

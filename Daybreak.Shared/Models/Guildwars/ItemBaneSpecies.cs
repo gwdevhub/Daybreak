@@ -14,5 +14,4 @@ public enum ItemBaneSpecies
     Dragonslaying,
     Ogreslaying,
     Unknown = -1,
-
 }
