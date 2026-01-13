@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using Daybreak.Shared.Converters;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
@@ -969,6 +970,7 @@ public sealed class ItemUpgrade
     }
 
     [JsonPropertyName("id")]
+    [JsonConverter(typeof(HexIntConverter))]
     public int Id { get; }
 
     [JsonPropertyName("name")]

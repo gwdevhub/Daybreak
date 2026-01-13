@@ -1,4 +1,6 @@
-﻿using Daybreak.Shared.Models.Guildwars;
+﻿using Daybreak.Shared.Converters;
+using Daybreak.Shared.Models.Guildwars;
+using System.Text.Json.Serialization;
 
 namespace Daybreak.Shared.Models.Api;
 
@@ -13,7 +15,7 @@ public sealed record ItemEntry(
     string ItemType,
     bool Inscribable,
     int Quantity,
-    uint[] Modifiers,
+    [property: JsonConverter(typeof(HexUIntArrayJsonConverter))] uint[] Modifiers,
     ItemProperty[] Properties)
 {
 }
