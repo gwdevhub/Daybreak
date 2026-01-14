@@ -17,20 +17,18 @@
                 </button>
             </div>
         </div>
-        <div class="builds-list @(this.Context.IsInOutpost ? "" : "read-only")">
-            @foreach(var build in this.Context.AvailableBuilds)
-            {
-                <div class="build-entry">
-                    <div class="build-name">
-                        @build.Name
+        <div class="builds-list @((this.Context.IsInOutpost ? string.Empty : "read-only"))">
+            <Virtualize Items="this.Context.AvailableBuilds"
+                        Context="build"
+                        ItemSize="50">
+                <ItemContent>
+                    <div class="build-entry" @onclick="() => this.BuildClicked(build)">
+                        <div class="build-name">
+                            @build.Name
+                        </div>
                     </div>
-                    <div class="build-actions">
-                        <button class="load-button" title="Load build into game" @onclick="() => this.BuildClicked(build)">
-                            <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowUp())" />
-                        </button>
-                    </div>
-                </div>
-            }
+                </ItemContent>
+            </Virtualize>
         </div>
     }
     else

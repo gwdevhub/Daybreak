@@ -34,6 +34,8 @@
     flex: 1;
     overflow-y: auto;
     min-height: 0;
+    display: flex;
+    flex-direction: column;
 }
 
     .builds-list.read-only {
@@ -46,7 +48,19 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    padding: 8px;
+    cursor: pointer;
 }
+    
+    .build-entry:hover {
+        background-color: var(--accent-fill-hover);
+        border-radius: 8px;
+    }
+
+    .build-entry:focus {
+        outline: 2px solid var(--accent-fill-focus);
+        outline-offset: -2px;
+    }
 
 .build-name {
     font-size: var(--font-size-medium);
