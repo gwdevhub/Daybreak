@@ -13,28 +13,24 @@ public static class SecretManager
         SecretsHolder ??= LoadSecrets();
         if (SecretsHolder.RootElement.TryGetProperty(secretKey.Key, out var element))
         {
-            return element.GetString() ?? throw new InvalidOperationException($"Could not find secret by key {secretKey.Key}");
+            return element.GetString() ?? string.Empty;
         }
 
-        throw new InvalidOperationException($"Could not find secret by key {secretKey.Key}");
-    }
-
-    public static T GetSecret<T>(SecretKeys secretKey)
-    {
-        SecretsHolder ??= LoadSecrets();
-        if (SecretsHolder.RootElement.TryGetProperty(secretKey.Key, out var element))
-        {
-            return element.Deserialize<T>() ?? throw new InvalidOperationException($"Could not find secret by key {secretKey.Key}");
-        }
-
-        throw new InvalidOperationException($"Could not find secret by key {secretKey.Key}");
+        return string.Empty;
     }
 
     private static JsonDocument LoadSecrets()
     {
-        var serializedSecrets = Assembly.GetExecutingAssembly().GetManifestResourceStream("Daybreak.secrets.json")?.ReadAllBytes().GetString() ?? throw new InvalidOperationException("Could not load Daybreak.secrets.json from assembly");
-        serializedSecrets = TrimUnwantedCharacters(serializedSecrets);
-        return JsonDocument.Parse(serializedSecrets);
+        try
+        {
+            var serializedSecrets = Assembly.GetExecutingAssembly().GetManifestResourceStream("Daybreak.secrets.json")?.ReadAllBytes().GetString() ?? throw new InvalidOperationException("Could not load Daybreak.secrets.json from assembly");
+            serializedSecrets = TrimUnwantedCharacters(serializedSecrets);
+            return JsonDocument.Parse(serializedSecrets);
+        }
+        catch
+        {
+            return JsonDocument.Parse("{}");
+        }
     }
 
     private static string TrimUnwantedCharacters(string s)

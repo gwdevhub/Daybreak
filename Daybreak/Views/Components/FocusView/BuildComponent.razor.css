@@ -2,7 +2,8 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    overflow: hidden;
+    overflow: visible;
+    position: relative;
 }
 
 .component-title {
@@ -51,9 +52,10 @@
     padding: 8px;
     cursor: pointer;
 }
-    
+
     .build-entry:hover {
-        background-color: var(--accent-fill-hover);
+        border-color: var(--accent-fill-hover);
+        border: solid 1px;
         border-radius: 8px;
     }
 
@@ -77,4 +79,11 @@
     cursor: pointer;
     border-radius: 4px;
     transition: background-color 0.2s, border-color 0.2s;
+}
+
+.build-snippet-overlay {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    z-index: 1000;
 }
