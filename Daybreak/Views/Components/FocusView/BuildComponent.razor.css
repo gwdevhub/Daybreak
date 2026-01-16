@@ -2,7 +2,8 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    overflow: hidden;
+    overflow: visible;
+    position: relative;
 }
 
 .component-title {
@@ -34,6 +35,8 @@
     flex: 1;
     overflow-y: auto;
     min-height: 0;
+    display: flex;
+    flex-direction: column;
 }
 
     .builds-list.read-only {
@@ -46,7 +49,20 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    padding: 8px;
+    cursor: pointer;
 }
+
+    .build-entry:hover {
+        border-color: var(--accent-fill-hover);
+        border: solid 1px;
+        border-radius: 8px;
+    }
+
+    .build-entry:focus {
+        outline: 2px solid var(--accent-fill-focus);
+        outline-offset: -2px;
+    }
 
 .build-name {
     font-size: var(--font-size-medium);
@@ -63,4 +79,11 @@
     cursor: pointer;
     border-radius: 4px;
     transition: background-color 0.2s, border-color 0.2s;
+}
+
+.build-snippet-overlay {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    z-index: 1000;
 }

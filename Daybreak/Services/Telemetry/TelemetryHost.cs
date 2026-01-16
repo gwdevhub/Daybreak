@@ -13,6 +13,7 @@ using Serilog.Events;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
+using System.Extensions.Core;
 using TrailBlazr.Services;
 
 namespace Daybreak.Services.Telemetry;
@@ -23,7 +24,7 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
     private const string UnknownHost = "Unknown";
     private const string MaskedValue = "[REDACTED]";
 
-    private static readonly Uri ApmEndpoint = new UriBuilder(SecretManager.GetSecret(SecretKeys.ApmUri)).Uri;
+    private static readonly string ApmEndpoint = SecretManager.GetSecret(SecretKeys.ApmUri);
     private static readonly string ApmApiKey = SecretManager.GetSecret(SecretKeys.ApmApiKey);
 
     // Headers that should be masked for security
@@ -46,6 +47,7 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
     private readonly IViewManager viewManager;
     private readonly IOptionsMonitor<TelemetryOptions> options;
     private readonly ILoggerFactory loggerFactory;
+    private readonly ILogger<TelemetryHost> logger;
 
     private TracerProvider? tracer;
     private MeterProvider? meter;
@@ -57,12 +59,14 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
         ResourceBuilder resourceBuilder,
         IViewManager viewManager,
         IOptionsMonitor<TelemetryOptions> liveOptions,
-        ILoggerFactory loggerFactory)
+        ILoggerFactory loggerFactory,
+        ILogger<TelemetryHost> logger)
     {
         this.resourceBuilder = resourceBuilder.ThrowIfNull();
         this.options = liveOptions.ThrowIfNull();
         this.viewManager = viewManager.ThrowIfNull();
         this.loggerFactory = loggerFactory.ThrowIfNull();
+        this.logger = logger.ThrowIfNull();
 
         this.options.OnChange(this.OnOptionsUpdated);
         this.viewManager.ShowViewRequested += this.ViewManager_ShowViewRequested;
@@ -138,6 +142,7 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
 
     private void BuildTelemetryProvider()
     {
+        var scopedLogger = this.logger.CreateScopedLogger();
         TelemetryLogSink.Instance.LoggingHandler = default;
         this.tracer?.Dispose();
         this.meter?.Dispose();
@@ -152,6 +157,13 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
             return;
         }
 
+        if (string.IsNullOrWhiteSpace(ApmApiKey) || string.IsNullOrWhiteSpace(ApmEndpoint))
+        {
+            scopedLogger.LogError("ApmApiKey or ApmEndpoint is not configured. Telemetry is disabled.");
+            return;
+        }
+
+        var apmUri = new Uri(ApmEndpoint);
         this.tracer = Sdk.CreateTracerProviderBuilder()
             .SetResourceBuilder(this.resourceBuilder)
             .AddSource(ServiceName)
@@ -184,7 +196,7 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
             .AddSqlClientInstrumentation()
             .AddOtlpExporter(o =>
             {
-                o.Endpoint = new Uri(ApmEndpoint, "v1/traces");
+                o.Endpoint = new Uri(apmUri, "v1/traces");
                 o.Headers = $"Authorization=ApiKey {ApmApiKey}";
                 o.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
             })
@@ -197,7 +209,7 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
             .AddRuntimeInstrumentation()
             .AddOtlpExporter(o =>
             {
-                o.Endpoint = new Uri(ApmEndpoint, "v1/metrics");
+                o.Endpoint = new Uri(apmUri, "v1/metrics");
                 o.Headers = $"Authorization=ApiKey {ApmApiKey}";
                 o.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
             })
@@ -212,7 +224,7 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
         logOpts.SetResourceBuilder(this.resourceBuilder);
         logOpts.AddOtlpExporter(exp =>
         {
-            exp.Endpoint = new Uri(ApmEndpoint, "v1/logs");
+            exp.Endpoint = new Uri(apmUri, "v1/logs");
             exp.Headers = $"Authorization=ApiKey {ApmApiKey}";
             exp.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
         });

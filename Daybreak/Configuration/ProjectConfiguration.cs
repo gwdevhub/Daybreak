@@ -130,32 +130,41 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IPublicClientApplication>(sp =>
         {
             var logger = sp.GetRequiredService<ILogger<PublicClientApplication>>();
-            return PublicClientApplicationBuilder.Create(SecretManager.GetSecret(SecretKeys.AadApplicationId))
-                .WithLogging((logLevel, message, containsPii) =>
-                {
-                    if (containsPii && logLevel > Microsoft.Identity.Client.LogLevel.Info)
+            try
+            {
+                return PublicClientApplicationBuilder.Create(SecretManager.GetSecret(SecretKeys.AadApplicationId))
+                    .WithLogging((logLevel, message, containsPii) =>
                     {
-                        // Redact logs that contain PII which user can enable to send to the telemetry server
-                        message = "[REDACTED]";
-                    }
+                        if (containsPii && logLevel > Microsoft.Identity.Client.LogLevel.Info)
+                        {
+                            // Redact logs that contain PII which user can enable to send to the telemetry server
+                            message = "[REDACTED]";
+                        }
 
-                    var equivalentLogLevel = logLevel switch
-                    {
-                        Microsoft.Identity.Client.LogLevel.Error => LogLevel.Error,
-                        Microsoft.Identity.Client.LogLevel.Warning => LogLevel.Warning,
-                        Microsoft.Identity.Client.LogLevel.Info => LogLevel.Information,
-                        Microsoft.Identity.Client.LogLevel.Verbose => LogLevel.Debug,
-                        _ => LogLevel.None
-                    };
+                        var equivalentLogLevel = logLevel switch
+                        {
+                            Microsoft.Identity.Client.LogLevel.Error => LogLevel.Error,
+                            Microsoft.Identity.Client.LogLevel.Warning => LogLevel.Warning,
+                            Microsoft.Identity.Client.LogLevel.Info => LogLevel.Information,
+                            Microsoft.Identity.Client.LogLevel.Verbose => LogLevel.Debug,
+                            _ => LogLevel.None
+                        };
 
-                    logger.Log(equivalentLogLevel, message);
-                }, enablePiiLogging: true, enableDefaultPlatformLogging: true)
-                .WithCacheOptions(new CacheOptions { UseSharedCache = true })
-                .WithRedirectUri(BlazorGraphClient.RedirectUri)
-                .WithWindowsEmbeddedBrowserSupport()
-                .WithHttpClientFactory(
-                    new DaybreakMsalHttpClientProvider(new HttpClient(SetupLoggingAndMetrics<PublicClientApplication>(sp))))
-                .Build();
+                        logger.Log(equivalentLogLevel, message);
+                    }, enablePiiLogging: true, enableDefaultPlatformLogging: true)
+                    .WithCacheOptions(new CacheOptions { UseSharedCache = true })
+                    .WithRedirectUri(BlazorGraphClient.RedirectUri)
+                    .WithWindowsEmbeddedBrowserSupport()
+                    .WithHttpClientFactory(
+                        new DaybreakMsalHttpClientProvider(new HttpClient(SetupLoggingAndMetrics<PublicClientApplication>(sp))))
+                    .Build();
+            }
+            catch(Exception e)
+            {
+                logger.LogError(e, "Failed to create PublicClientApplication, using dummy implementation");
+                return new DummyPublicClientApplication();
+            }
+            
         });
 
         services.AddSingleton(sp =>
