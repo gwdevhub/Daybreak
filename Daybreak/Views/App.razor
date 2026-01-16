@@ -4,7 +4,8 @@
     NeutralBaseColor="@this.ViewModel.NeutralBaseColor"
     BaseLayerLuminance="@this.ViewModel.BaseLayerLuminace">
     <ErrorLoggingBoundary>
-        <div class="app-container @(this.ViewModel.WindowState == WindowState.Maximized ? "maximized" : "")"
+        <div id="main-app-container"
+             class="app-container @(this.ViewModel.WindowState == WindowState.Maximized ? "maximized" : "")"
              style="@(string.IsNullOrWhiteSpace(this.ViewModel.BackdropImage) is false ? $"--backdrop-image: {this.ViewModel.BackdropImage}; --backdrop-image-filter: {this.ViewModel.BackdropImageFilter};" : string.Empty)
                     --ui-scale: @(this.ViewModel.UIScale);
                     --font-size-xx-small: @(this.ViewModel.XXSmallFontSize)rem;
