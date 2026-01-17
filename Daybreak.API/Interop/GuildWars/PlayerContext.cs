@@ -9,7 +9,7 @@ public enum PlayerContextFlags : uint
     PvP = 0x800
 }
 
-[StructLayout(LayoutKind.Explicit, Pack = 1, Size = 0x4C)]
+[StructLayout(LayoutKind.Explicit, Pack = 1, Size = 0x50)]
 public readonly unsafe struct PlayerContext
 {
     [FieldOffset(0x0000)]
@@ -37,8 +37,11 @@ public readonly unsafe struct PlayerContext
     public readonly uint ActiveTitleTier;
 
     [FieldOffset(0x0034)]
-    public readonly uint PlayerNumber;
+    public readonly uint ReforgedOrDhuumsFlags;
 
     [FieldOffset(0x0038)]
+    public readonly uint PlayerNumber;
+
+    [FieldOffset(0x003C)]
     public readonly uint PartySize;
 }
