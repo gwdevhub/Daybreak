@@ -10,4 +10,9 @@
     <ProjectReference Include="..\..\..\..\Daybreak.Shared\Daybreak.Shared.csproj" />
   </ItemGroup>
 
+  <!-- Embed wwwroot files as embedded resources -->
+  <ItemGroup>
+    <EmbeddedResource Include="wwwroot\**\*.*" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
 </Project>

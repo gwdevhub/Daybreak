@@ -81,20 +81,15 @@
     <WikiFiles Include="$(WikiSourcePath)\**\*.*" Exclude="$(WikiSourcePath)\.git\**" />
   </ItemGroup>
 
-  <Target Name="CopyWikiToWwwroot" BeforeTargets="BeforeBuild">
+  <Target Name="CopyWikiToWwwroot" BeforeTargets="PrepareForBuild">
     <Message Importance="high" Text="📦 Daybreak.wiki -&gt; wwwroot/wiki" />
     <Copy SourceFiles="@(WikiFiles)" DestinationFiles="@(WikiFiles->'wwwroot\wiki\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
   </Target>
 
-  <!-- Copy wwwroot to output directory for Photino.Blazor -->
+  <!-- Embed wwwroot files as embedded resources -->
   <ItemGroup>
-    <WwwrootFiles Include="wwwroot\**\*.*" />
+    <EmbeddedResource Include="wwwroot\**\*.*" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
-
-  <Target Name="CopyWwwrootToOutput" AfterTargets="Build">
-    <Message Importance="high" Text="📦 wwwroot -&gt; $(DependencyOutput)\wwwroot" />
-    <Copy SourceFiles="@(WwwrootFiles)" DestinationFiles="@(WwwrootFiles->'$(DependencyOutput)\wwwroot\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
-  </Target>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
     <Exec Command="echo.&gt;$(Version).version" />
