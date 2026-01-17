@@ -1,4 +1,5 @@
 ﻿using Daybreak.Shared.Services.ApplicationArguments;
+using Daybreak.Shared.Services.FileProviders;
 using Daybreak.Shared.Services.Initialization;
 using Daybreak.Shared.Services.Metrics;
 using Daybreak.Shared.Utils;
@@ -25,6 +26,7 @@ public abstract class PluginConfigurationBase
     public virtual void RegisterLaunchArgumentHandlers(IArgumentHandlerProducer argumentHandlerProducer) { }
     public virtual void RegisterMenuButtons(IMenuServiceProducer menuServiceProducer) { }
     public virtual void RegisterThemes(IThemeProducer themeProducer) { }
+    public virtual void RegisterProviderAssemblies(IFileProviderProducer fileProviderProducer) { }
 
     public PluginConfigurationBase()
     {

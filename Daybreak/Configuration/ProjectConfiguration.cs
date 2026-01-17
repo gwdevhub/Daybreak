@@ -15,6 +15,7 @@ using Daybreak.Services.Events;
 using Daybreak.Services.ExceptionHandling;
 using Daybreak.Services.ExecutableManagement;
 using Daybreak.Services.Experience;
+using Daybreak.Services.FileProviders;
 using Daybreak.Services.Graph;
 using Daybreak.Services.Graph.Models;
 using Daybreak.Services.Guildwars;
@@ -63,6 +64,7 @@ using Daybreak.Shared.Services.Downloads;
 using Daybreak.Shared.Services.Events;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.Experience;
+using Daybreak.Shared.Services.FileProviders;
 using Daybreak.Shared.Services.Guildwars;
 using Daybreak.Shared.Services.Initialization;
 using Daybreak.Shared.Services.Injection;
@@ -97,6 +99,7 @@ using Daybreak.Views.Installation;
 using Daybreak.Views.Mods;
 using Daybreak.Views.Trade;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.Identity.Client;
@@ -118,10 +121,10 @@ public class ProjectConfiguration : PluginConfigurationBase
     {
         services.ThrowIfNull();
 
-        // Add FluentUI components
         services.AddFluentUIComponents();
-
         services.AddTrailBlazr();
+        services.AddSingleton<IFileProvider, DaybreakFileProvider>();
+
         RegisterHttpClients(services);
         services.RegisterClientWebSocket<TradeChatService<KamadanTradeChatOptions>>()
             .Build();
@@ -415,6 +418,11 @@ public class ProjectConfiguration : PluginConfigurationBase
         {
             themeProducer.RegisterTheme(theme);
         }
+    }
+
+    public override void RegisterProviderAssemblies(IFileProviderProducer fileProviderProducer)
+    {
+        fileProviderProducer.RegisterAssembly(typeof(ProjectConfiguration).Assembly);
     }
 
     private static IServiceCollection RegisterHttpClients(IServiceCollection services)

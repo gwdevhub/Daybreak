@@ -1,4 +1,5 @@
 ﻿using Daybreak.Configuration;
+using Daybreak.Services.FileProviders;
 using Daybreak.Services.Initialization;
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Models.Menu;
@@ -103,6 +104,7 @@ public partial class Launcher
         RegisterNotificationHandlers(bootstrap, builder, configuration, scopedLogger);
         RegisterArgumentHandlers(bootstrap, builder, configuration, scopedLogger);
         RegisterMenuEntries(configuration, menuProducer, scopedLogger);
+        RegisterFileProviders(bootstrap, builder, configuration, scopedLogger);
 
         scopedLogger.LogInformation("Finished loading configuration for {Configuration.Name}", name);
     }
@@ -232,6 +234,19 @@ public partial class Launcher
         catch(Exception ex)
         {
             scopedLogger.LogError(ex, "An error occurred while registering menu entries");
+        }
+    }
+
+    private static void RegisterFileProviders(IServiceProvider bootstrap, PhotinoBlazorAppBuilder builder, PluginConfigurationBase configuration, ScopedLogger<Launcher> scopedLogger)
+    {
+        try
+        {
+            var fileProviderProducer = new AssemblyFileProviderProducer(builder.Services, bootstrap.GetRequiredService<ILogger<AssemblyFileProviderProducer>>());
+            configuration.RegisterProviderAssemblies(fileProviderProducer);
+        }
+        catch (Exception ex)
+        {
+            scopedLogger.LogError(ex, "An error occurred while registering file providers");
         }
     }
 }

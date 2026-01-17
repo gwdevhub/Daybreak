@@ -1,9 +1,11 @@
 ﻿using Daybreak.Shared.Models.Plugins;
+using Daybreak.Shared.Services.FileProviders;
 using Daybreak.Shared.Services.Initialization;
 using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.DependencyInjection;
 using SimplePlugin.Options;
 using SimplePlugin.Services;
+using SimplePlugin.Themes;
 
 namespace SimplePlugin.Configuration;
 
@@ -20,6 +22,7 @@ public sealed class PluginConfiguration : PluginConfigurationBase
 
     public override void RegisterThemes(IThemeProducer themeProducer)
     {
+        themeProducer.RegisterTheme(SimpleTheme.Instance);
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -57,5 +60,10 @@ public sealed class PluginConfiguration : PluginConfigurationBase
     public override void RegisterMods(IModsProducer modsProducer)
     {
         modsProducer.RegisterMod<SimpleNotificationMod, SimpleNotificationMod>(true);
+    }
+
+    public override void RegisterProviderAssemblies(IFileProviderProducer fileProviderProducer)
+    {
+        fileProviderProducer.RegisterAssembly(typeof(PluginConfiguration).Assembly);
     }
 }
