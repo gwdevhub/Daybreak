@@ -10,6 +10,7 @@ public static class CoreThemes
     public static readonly Theme WhiteMantle = new("White Mantle", AccentColor.Red, new StaticBackground("img/backdrops/whitemantle.png"), LightDarkMode.Dark, string.Empty);
     public static readonly Theme ShiningBlade = new("Shining Blade", AccentColor.DarkGreen, new StaticBackground("img/backdrops/shiningblade.png"), LightDarkMode.Dark, string.Empty);
     public static readonly Theme Jade = new("Jade", AccentColor.LightTeal, new StaticBackground("img/backdrops/jade.png"), LightDarkMode.Light, string.Empty);
+    public static readonly Theme Dervish = new("Dervish", AccentColor.MidBlue, new StaticBackground("img/backdrops/dervish.png"), LightDarkMode.Dark, string.Empty);
 
     public static readonly IReadOnlyList<Theme> Themes = [
         Daybreak,
@@ -17,5 +18,6 @@ public static class CoreThemes
         WhiteMantle,
         ShiningBlade,
         Jade,
+        Dervish,
         ];
 }
