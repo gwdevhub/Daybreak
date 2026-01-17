@@ -15,6 +15,8 @@ namespace Daybreak.Shared.Models.Guildwars;
 [JsonDerivedType(typeof(UpgradesRuneProperty), "UpgradesRune")]
 [JsonDerivedType(typeof(AppliesToRuneProperty), "AppliesToRune")]
 [JsonDerivedType(typeof(OfTheProfessionProperty), "OfTheProfession")]
+[JsonDerivedType(typeof(IncreasedSaleValueProperty), "IncreasedSaleValue")]
+[JsonDerivedType(typeof(HighlySalvageableProperty), "HighlySalvageable")]
 [JsonDerivedType(typeof(CustomizedProperty), "Customized")]
 [JsonDerivedType(typeof(DamageTypeProperty), "DamageType")]
 [JsonDerivedType(typeof(DamagePlusProperty), "DamagePlus")]
@@ -33,11 +35,15 @@ namespace Daybreak.Shared.Models.Guildwars;
 [JsonDerivedType(typeof(EnergyPlusProperty), "EnergyPlus")]
 [JsonDerivedType(typeof(EnergyPlusWhileEnchantedProperty), "EnergyPlusWhileEnchanted")]
 [JsonDerivedType(typeof(EnergyPlusWhileHexedProperty), "EnergyPlusWhileHexed")]
+[JsonDerivedType(typeof(EnergyPlusWhileDownProperty), "EnergyPlusWhileDown")]
 [JsonDerivedType(typeof(EnergyMinusProperty), "EnergyMinus")]
 [JsonDerivedType(typeof(EnergyDegenProperty), "EnergyDegen")]
 [JsonDerivedType(typeof(EnergyRegenProperty), "EnergyRegen")]
+[JsonDerivedType(typeof(EnergyGainOnHitProperty), "EnergyGainOnHit")]
 [JsonDerivedType(typeof(ArmorPlusProperty), "ArmorPlus")]
 [JsonDerivedType(typeof(ArmorPlusVsDamageProperty), "ArmorPlusVsDamage")]
+[JsonDerivedType(typeof(ArmorPlusVsPhysical), "ArmorPlusVsPhysical")]
+[JsonDerivedType(typeof(ArmorPlusVsElemental), "ArmorPlusVsElemental")]
 [JsonDerivedType(typeof(ArmorPlusVsSpeciesProperty), "ArmorPlusVsSpecies")]
 [JsonDerivedType(typeof(ArmorPlusWhileAttackingProperty), "ArmorPlusWhileAttacking")]
 [JsonDerivedType(typeof(ArmorPlusWhileCastingProperty), "ArmorPlusWhileCasting")]
@@ -45,9 +51,13 @@ namespace Daybreak.Shared.Models.Guildwars;
 [JsonDerivedType(typeof(ArmorPlusWhileHexedProperty), "ArmorPlusWhileHexed")]
 [JsonDerivedType(typeof(ArmorPlusWhileDownProperty), "ArmorPlusWhileDown")]
 [JsonDerivedType(typeof(ArmorMinusWhileAttackingProperty), "ArmorMinusWhileAttacking")]
+[JsonDerivedType(typeof(ArmorPenetrationProperty), "ArmorPenetration")]
 [JsonDerivedType(typeof(HealthPlusProperty), "HealthPlus")]
+[JsonDerivedType(typeof(HealthPlusWhileHexedProperty), "HealthPlusWhileHexed")]
 [JsonDerivedType(typeof(HealthPlusWhileDownProperty), "HealthPlusWhileDown")]
 [JsonDerivedType(typeof(HealthMinusProperty), "HealthMinus")]
+[JsonDerivedType(typeof(HealthDegenProperty), "HealthDegen")]
+[JsonDerivedType(typeof(HealthStealOnHitProperty), "HealthStealOnHit")]
 [JsonDerivedType(typeof(ReceiveLessDamageProperty), "ReceiveLessDamage")]
 [JsonDerivedType(typeof(ReceiveLessPhysDamageWhileEnchantedProperty), "ReceiveLessPhysDamageWhileEnchanted")]
 [JsonDerivedType(typeof(ReceiveLessPhysDamageWhileHexedProperty), "ReceiveLessPhysDamageWhileHexed")]
@@ -55,6 +65,9 @@ namespace Daybreak.Shared.Models.Guildwars;
 [JsonDerivedType(typeof(AttributePlusOneProperty), "AttributePlusOne")]
 [JsonDerivedType(typeof(AttributePlusOneItemProperty), "AttributePlusOneItem")]
 [JsonDerivedType(typeof(ReduceConditionDurationProperty), "ReduceConditionDuration")]
+[JsonDerivedType(typeof(ReduceConditionTupleDurationProperty), "ReduceConditionTupleDuration")]
+[JsonDerivedType(typeof(IncreaseEnchantmentDurationProperty), "IncreaseEnchantmentDuration")]
+[JsonDerivedType(typeof(IncreaseConditionDurationProperty), "IncreaseConditionDuration")]
 [JsonDerivedType(typeof(UnknownUpgradeProperty), "Unknown")]
 public abstract class ItemProperty
 {
@@ -73,6 +86,10 @@ public abstract class ItemProperty
                 ItemModifierIdentifier.Upgrade2                                     => ParseUpgradeProperty(m),
                 ItemModifierIdentifier.OfTheProfession                              => ParseOfTheProfessionProperty(m),
                 ItemModifierIdentifier.DamageType                                   => new DamageTypeProperty { DamageType = (DamageType)m.Argument1 },
+
+                ItemModifierIdentifier.IncreasedSaleValue                           => new IncreasedSaleValueProperty { SaleValueBonus = (int)m.Argument1 },
+                ItemModifierIdentifier.HighlySalvageable                            => new HighlySalvageableProperty { SalvageBonus = (int)m.Argument1 },
+
                 ItemModifierIdentifier.DamagePlusCustomized when m.Argument1 is 120 => new CustomizedProperty(),
 
                 ItemModifierIdentifier.DamagePlus                                   => new DamagePlusProperty { Percentage = (int)m.Argument2 },
@@ -80,8 +97,8 @@ public abstract class ItemProperty
                 ItemModifierIdentifier.DamagePlusEnchanted                          => new DamagePlusWhileEnchantedProperty { Percentage = (int)m.Argument2 },
                 ItemModifierIdentifier.DamagePlusWhileUp                            => new DamagePlusWhileUpProperty { Percentage = (int)m.Argument2 },
                 ItemModifierIdentifier.DamagePlusWhileDown                          => new DamagePlusWhileDownProperty { Percentage = (int)m.Argument2 },
-                ItemModifierIdentifier.DamagePlusHexed                              => new DamagePlusVsHexedProperty { Percentage = (int)m.Argument2 },
-                ItemModifierIdentifier.DamagePlusStance                             => new DamagePlusVsHexedProperty { Percentage = (int)m.Argument2 },
+                ItemModifierIdentifier.DamagePlusHexed                              => new DamagePlusWhileHexedProperty { Percentage = (int)m.Argument2 },
+                ItemModifierIdentifier.DamagePlusStance                             => new DamagePlusWhileInStanceProperty { Percentage = (int)m.Argument2 },
 
                 ItemModifierIdentifier.HalvesCastingTimeGeneral                     => new HalvesCastingTimeGeneralProperty { Chance = (int)m.Argument1 },
                 ItemModifierIdentifier.HalvesCastingTimeAttribute                   => new HalvesCastingTimeAttributeProperty { Chance = (int)m.Argument1, Attribute = ParseAttributeName(m.Argument2) },
@@ -94,14 +111,18 @@ public abstract class ItemProperty
                 ItemModifierIdentifier.EnergyPlus                                   => new EnergyPlusProperty { Energy = (int)m.Argument2 },
                 ItemModifierIdentifier.EnergyPlusEnchanted                          => new EnergyPlusWhileEnchantedProperty { Energy = (int)m.Argument2 },
                 ItemModifierIdentifier.EnergyPlusHexed                              => new EnergyPlusWhileHexedProperty { Energy = (int)m.Argument2 },
+                ItemModifierIdentifier.EnergyPlusWhileDown                          => new EnergyPlusWhileDownProperty { Energy = (int)m.Argument2, HealthThreshold = (int)m.Argument1 },
 
                 ItemModifierIdentifier.EnergyMinus                                  => new EnergyMinusProperty { Energy = (int)m.Argument2 },
                 ItemModifierIdentifier.EnergyDegen                                  => new EnergyDegenProperty { EnergyDegen = (int)m.Argument2 },
                 ItemModifierIdentifier.EnergyRegen                                  => new EnergyRegenProperty { EnergyRegen = (int)m.Argument2 },
+                ItemModifierIdentifier.EnergyGainOnHit                              => new EnergyGainOnHitProperty { EnergyGain = (int)m.Argument2 },
 
                 ItemModifierIdentifier.ArmorPlus                                    => new ArmorPlusProperty { Armor = (int)m.Argument2 },
                 ItemModifierIdentifier.ArmorPlusVsDamage                            => new ArmorPlusVsDamageProperty { Armor = (int)m.Argument2, DamageType = (DamageType)m.Argument1 },
-                ItemModifierIdentifier.ArmorPlusVsDamage2                           => new ArmorPlusVsDamageProperty { Armor = (int)m.Argument2, DamageType = (DamageType)m.Argument1 },
+                ItemModifierIdentifier.ArmorPlusVsPhysical                          => new ArmorPlusVsPhysical { Armor = (int)m.Argument2 },
+                ItemModifierIdentifier.ArmorPlusVsPhysical2                         => new ArmorPlusVsPhysical { Armor = (int)m.Argument2 },
+                ItemModifierIdentifier.ArmorPlusVsElemental                         => new ArmorPlusVsElemental { Armor = (int)m.Argument2 },
                 ItemModifierIdentifier.ArmorPlusVsSpecies                           => new ArmorPlusVsSpeciesProperty { Armor = (int)m.Argument2, Species = (ItemBaneSpecies)m.Argument1 },
                 ItemModifierIdentifier.ArmorPlusAttacking                           => new ArmorPlusWhileAttackingProperty { Armor = (int)m.Argument2 },
                 ItemModifierIdentifier.ArmorPlusCasting                             => new ArmorPlusWhileCastingProperty { Armor = (int)m.Argument2 },
@@ -111,9 +132,15 @@ public abstract class ItemProperty
 
                 ItemModifierIdentifier.ArmorMinusAttacking                          => new ArmorMinusWhileAttackingProperty { Armor = (int)m.Argument2 },
 
+                ItemModifierIdentifier.ArmorPenetration                             => new ArmorPenetrationProperty { ArmorPenetration = (int)m.Argument2, Chance = (int)m.Argument1 },
+
                 ItemModifierIdentifier.HealthPlus                                   => new HealthPlusProperty { Health = (int)m.Argument2 },
+                ItemModifierIdentifier.HealthPlus2                                  => new HealthPlusProperty { Health = (int)m.Argument1 },
+                ItemModifierIdentifier.HealthPlusHexed                              => new HealthPlusWhileHexedProperty { Health = (int)m.Argument1 },
                 ItemModifierIdentifier.HealthPlusWhileDown                          => new HealthPlusWhileDownProperty { Health = (int)m.Argument2, HealthThreshold = (int)m.Argument1 },
                 ItemModifierIdentifier.HealthMinus                                  => new HealthMinusProperty { Health = (int)m.Argument2 },
+                ItemModifierIdentifier.HealthDegen                                  => new HealthDegenProperty { HealthDegen = (int)m.Argument2 },
+                ItemModifierIdentifier.HealthStealOnHit                             => new HealthStealOnHitProperty { HealthSteal = (int)m.Argument1 },
 
                 ItemModifierIdentifier.ReceiveLessDamage                            => new ReceiveLessDamageProperty { LessDamage = (int)m.Argument2, Chance = (int)m.Argument1 },
                 ItemModifierIdentifier.ReceiveLessPhysDamageEnchanted               => new ReceiveLessPhysDamageWhileEnchantedProperty { LessDamage = (int)m.Argument2 },
@@ -124,6 +151,10 @@ public abstract class ItemProperty
                 ItemModifierIdentifier.AttributePlusOneItem                         => new AttributePlusOneItemProperty { Chance = (int)m.Argument1 },
 
                 ItemModifierIdentifier.ReduceConditionDuration                      => new ReduceConditionDurationProperty { Condition = (ConditionType)m.Argument1 },
+                ItemModifierIdentifier.ReduceConditionTupleDuration                 => new ReduceConditionTupleDurationProperty { Condition1 = (ConditionType)m.Argument1, Condition2 = (ConditionType)m.Argument2 },
+
+                ItemModifierIdentifier.IncreaseEnchantmentDuration                  => new IncreaseEnchantmentDurationProperty { Percentage = (int)m.Argument2 },
+                ItemModifierIdentifier.IncreaseConditionDuration                    => new IncreaseConditionDurationProperty { Condition = (SkillIdToCondition)m.UpgradeId },
                 _ => default
             })
             .OfType<ItemProperty>()];
@@ -225,6 +256,18 @@ public sealed class InscriptionProperty : ItemProperty
 {
     [JsonPropertyName("upgrade")]
     public required ItemUpgrade Upgrade { get; init; }
+}
+
+public sealed class IncreasedSaleValueProperty : ItemProperty
+{
+    [JsonPropertyName("saleValueBonus")]
+    public required int SaleValueBonus { get; init; }
+}
+
+public sealed class HighlySalvageableProperty : ItemProperty
+{
+    [JsonPropertyName("salvageBonus")]
+    public required int SalvageBonus { get; init; }
 }
 
 public sealed class UpgradesRuneProperty : ItemProperty
@@ -363,6 +406,15 @@ public sealed class EnergyPlusWhileHexedProperty : ItemProperty
     public required int Energy { get; init; }
 }
 
+public sealed class EnergyPlusWhileDownProperty : ItemProperty
+{
+    [JsonPropertyName("energy")]
+    public required int Energy { get; init; }
+
+    [JsonPropertyName("healthThreshold")]
+    public required int HealthThreshold { get; init; }
+}
+
 public sealed class EnergyMinusProperty : ItemProperty
 {
     [JsonPropertyName("energy")]
@@ -371,7 +423,7 @@ public sealed class EnergyMinusProperty : ItemProperty
 
 public sealed class EnergyDegenProperty : ItemProperty
 {
-    [JsonPropertyName("energyRegen")]
+    [JsonPropertyName("energyDegen")]
     public required int EnergyDegen { get; init; }
 }
 
@@ -381,7 +433,25 @@ public sealed class EnergyRegenProperty : ItemProperty
     public required int EnergyRegen { get; init; }
 }
 
+public sealed class EnergyGainOnHitProperty : ItemProperty
+{
+    [JsonPropertyName("energyGain")]
+    public required int EnergyGain { get; init; }
+}
+
 public sealed class ArmorPlusProperty : ItemProperty
+{
+    [JsonPropertyName("armor")]
+    public required int Armor { get; init; }
+}
+
+public sealed class ArmorPlusVsPhysical : ItemProperty
+{
+    [JsonPropertyName("armor")]
+    public required int Armor { get; init; }
+}
+
+public sealed class ArmorPlusVsElemental : ItemProperty
 {
     [JsonPropertyName("armor")]
     public required int Armor { get; init; }
@@ -441,7 +511,22 @@ public sealed class ArmorMinusWhileAttackingProperty : ItemProperty
     public required int Armor { get; init; }
 }
 
+public sealed class ArmorPenetrationProperty : ItemProperty
+{
+    [JsonPropertyName("armorPenetration")]
+    public required int ArmorPenetration { get; init; }
+
+    [JsonPropertyName("chance")]
+    public required int Chance { get; init; }
+}
+
 public sealed class HealthPlusProperty : ItemProperty
+{
+    [JsonPropertyName("health")]
+    public required int Health { get; init; }
+}
+
+public sealed class HealthPlusWhileHexedProperty : ItemProperty
 {
     [JsonPropertyName("health")]
     public required int Health { get; init; }
@@ -460,6 +545,18 @@ public sealed class HealthMinusProperty : ItemProperty
 {
     [JsonPropertyName("health")]
     public required int Health { get; init; }
+}
+
+public sealed class HealthDegenProperty : ItemProperty
+{
+    [JsonPropertyName("healthDegen")]
+    public required int HealthDegen { get; init; }
+}
+
+public sealed class HealthStealOnHitProperty : ItemProperty
+{
+    [JsonPropertyName("healthSteal")]
+    public required int HealthSteal { get; init; }
 }
 
 public sealed class ReceiveLessDamageProperty : ItemProperty
@@ -508,4 +605,25 @@ public sealed class ReduceConditionDurationProperty : ItemProperty
 {
     [JsonPropertyName("conditionType")]
     public required ConditionType Condition { get; init; }
+}
+
+public sealed class ReduceConditionTupleDurationProperty : ItemProperty
+{
+    [JsonPropertyName("condition1Type")]
+    public required ConditionType Condition1 { get; init; }
+
+    [JsonPropertyName("condition2Type")]
+    public required ConditionType Condition2 { get; init; }
+}
+
+public sealed class IncreaseEnchantmentDurationProperty : ItemProperty
+{
+    [JsonPropertyName("percentage")]
+    public required int Percentage { get; init; }
+}
+
+public sealed class IncreaseConditionDurationProperty : ItemProperty
+{
+    [JsonPropertyName("conditionType")]
+    public required SkillIdToCondition Condition { get; init; }
 }
