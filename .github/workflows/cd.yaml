@@ -92,12 +92,6 @@ jobs:
         .\Scripts\BuildRelease.ps1 -version $env:Version
       shell: pwsh
 
-    - name: Publish blob files
-      run: |
-        Write-Host $env
-        .\Scripts\PushFilesToBlobStorage.ps1 -version $env:Version -sourcePath .\Publish\ -connectionString "${{ secrets.BLOBSTORAGE_CONNECTIONSTRING }}"
-      shell: pwsh
-
     - name: Create release draft
       uses: Xotl/cool-github-releases@v1.1.10
       with:

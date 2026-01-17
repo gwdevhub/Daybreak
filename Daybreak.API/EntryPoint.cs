@@ -26,6 +26,8 @@ public class EntryPoint
     [UnmanagedCallersOnly(EntryPoint = "ThreadInit"), STAThread]
     [RequiresUnreferencedCode("The handler uses a static method that gets referenced, so there's no unreferenced code to worry about")]
     [RequiresDynamicCode("The handler uses a static method, so there's no dynamic code to worry about")]
+    [SuppressMessage("Trimming", "IL2123:The use of 'RequiresUnreferencedCodeAttribute' on entry points is disallowed since the method will be called from outside the visible app.", Justification = "<Pending>")]
+    [SuppressMessage("AOT", "IL3057:The use of 'RequiresDynamicCodeAttribute' on entry points is disallowed since the method will be called from outside the visible app.", Justification = "<Pending>")]
     public static int ThreadInit(IntPtr _, int __)
     {
         Environment.SetEnvironmentVariable("ASPNETCORE_HOSTINGSTARTUPASSEMBLIES", null, EnvironmentVariableTarget.Process);
