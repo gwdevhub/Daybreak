@@ -1,6 +1,5 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Configuration.Options;
-using Daybreak.Services.Updater.Models;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Models.Github;
@@ -18,8 +17,6 @@ using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
 using System.Net.Http.Json;
-using System.Net.WebSockets;
-using System.Text;
 
 namespace Daybreak.Services.Updater;
 
@@ -38,14 +35,11 @@ internal sealed class ApplicationUpdater(
     private const string UpdatedKey = "LauncherUpdating";
     private const string TempFileSubPath = "tempfile.zip";
     private const string VersionTag = "{VERSION}";
-    private const string FileTag = "{FILE}";
     private const string RefTagPrefix = "/refs/tags/v";
     private const string VersionListUrl = "https://api.github.com/repos/gwdevhub/Daybreak/git/refs/tags";
     private const string Url = "https://github.com/gwdevhub/Daybreak/releases/latest";
     private const string DownloadUrl = $"https://github.com/gwdevhub/Daybreak/releases/download/v{VersionTag}/Daybreakv{VersionTag}.zip";
-    private const string BlobStorageUrl = $"https://daybreak.blob.core.windows.net/v{VersionTag}/{FileTag}";
     private const string GithubReleasesUrl = $"https://api.github.com/repos/gwdevhub/daybreak/releases";
-    private const int DownloadParallelTasks = 10;
 
     private readonly static string TempInstallerFileName = PathUtils.GetAbsolutePathFromRoot(TempInstallerFileNameSubPath);
     private readonly static string InstallerFileName = PathUtils.GetAbsolutePathFromRoot(InstallerFileNameSubPath);
@@ -116,39 +110,9 @@ internal sealed class ApplicationUpdater(
     public IProgressAsyncOperation<bool> DownloadUpdate(Version version, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: version.ToString());
-        if (!this.liveOptions.CurrentValue.BetaUpdate)
-        {
-            return ProgressAsyncOperation.Create(async progress =>
-            {
-                return await Task.Factory.StartNew(() => this.DownloadUpdateInternalLegacy(version, progress, cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap();
-            }, cancellationToken);
-        }
-
         return ProgressAsyncOperation.Create(async progress =>
         {
-            try
-            {
-                progress.Report(ProgressInitialize);
-                var maybeMetadataResponse = await this.httpClient.GetAsync(
-                BlobStorageUrl
-                .Replace(VersionTag, version.ToString().Replace(".", "-"))
-                .Replace(FileTag, "Metadata.json"));
-                if (maybeMetadataResponse.IsSuccessStatusCode)
-                {
-                    var metaData = await maybeMetadataResponse.Content.ReadFromJsonAsync<List<Metadata>>();
-                    if (metaData is not null)
-                    {
-                        return await Task.Factory.StartNew(() => this.DownloadUpdateInternalBlob(metaData, version, progress, cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap();
-                    }
-                }
-
-                return await Task.Factory.StartNew(() => this.DownloadUpdateInternalLegacy(version, progress, cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap();
-            }
-            catch (Exception e)
-            {
-                scopedLogger.LogError(e, "Failed to download update for version {version}", version);
-                return false;
-            }
+            return await Task.Factory.StartNew(() => this.DownloadUpdateInternalLegacy(version, progress, cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap();
         }, cancellationToken);
     }
 
@@ -215,21 +179,7 @@ internal sealed class ApplicationUpdater(
         var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: version.ToString());
         try
         {
-            using var blobChangeLogResponse = await this.httpClient.GetAsync(
-                BlobStorageUrl
-                    .Replace(VersionTag, version.ToString().Replace(".", "-"))
-                    .Replace(FileTag, "changelog.txt"), cancellationToken);
-
-            if (blobChangeLogResponse.IsSuccessStatusCode)
-            {
-                scopedLogger.LogDebug("Retrieved changelog from blob for version {version}", version);
-                var blobChangeLog = await blobChangeLogResponse.Content.ReadAsStringAsync(cancellationToken);
-                return blobChangeLog;
-            }
-
-            scopedLogger.LogWarning("Failed to retrieve changelog from blob storage for version {version}. Status code: {statusCode}", version, blobChangeLogResponse.StatusCode);
             var githubChangeLogResponse = await this.GetChangeLogFromGithub(version, cancellationToken);
-
             if (githubChangeLogResponse is null)
             {
                 scopedLogger.LogError("Failed to retrieve changelog from github for version {version}", version);
@@ -279,151 +229,6 @@ internal sealed class ApplicationUpdater(
             scopedLogger.LogError(e, "Failed to retrieve changelog from github for version {version}", version);
             return default;
         }
-    }
-
-    private async Task<bool> DownloadUpdateInternalBlob(List<Metadata> metadata, Version version, IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
-    {
-        var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: version.ToString());
-        progress.Report(ProgressInitialize);
-
-        // Exclude daybreak packed files
-        var daybreakArchive = $"daybreak{version}.zip";
-        var filesToDownload = metadata
-            .Where(m => m.Name != daybreakArchive)
-            .Where(m =>
-            {
-                var fileInfo = new FileInfo(m.RelativePath!);
-                if (!fileInfo.Exists)
-                {
-                    return true;
-                }
-
-                if (fileInfo.Length != m.Size)
-                {
-                    return true;
-                }
-
-                try
-                {
-                    var info = FileVersionInfo.GetVersionInfo(fileInfo.FullName);
-                    if (info is null && m.VersionInfo is null)
-                    {
-                        return false;
-                    }
-
-                    if (info is null && m.VersionInfo is not null)
-                    {
-                        return true;
-                    }
-
-                    if (info is not null && m.VersionInfo is null)
-                    {
-                        return false;
-                    }
-
-                    return m.VersionInfo!.CompareTo(info!.ProductVersion) > 0;
-                }
-                catch
-                {
-                    return false;
-                }
-            })
-            .Where(m =>
-            {
-                // Special case for Daybreak.Installer
-                if (m.Name != TempInstallerFileName)
-                {
-                    return true;
-                }
-
-                var existingInstaller = new FileInfo(InstallerFileName);
-                return !existingInstaller.Exists || existingInstaller.Length != m.Size;
-            })
-            .ToList();
-
-        using var packageStream = new FileStream(UpdatePkg, FileMode.Create);
-        var downloaded = 0d;
-        var downloadBuffer = new byte[8192];
-        var sizeToDownload = (double)filesToDownload.Sum(m => m.Size);
-        var sw = Stopwatch.StartNew();
-        var lastUpdate = DateTime.Now;
-        var speedMeasurements = new List<double>();
-        var fileQueue = filesToDownload;
-        var pendingDownloads = fileQueue.AsEnumerable();
-        while(pendingDownloads.Any())
-        {
-            var parallelDownloads = pendingDownloads.Take(DownloadParallelTasks);
-            pendingDownloads = pendingDownloads.Skip(DownloadParallelTasks);
-            // Setup the download streams for all the parallel downloads
-            var parallelResponses = parallelDownloads.Select(file =>
-            {
-                return Task.Run(async () =>
-                {
-                    var downloadUrl = BlobStorageUrl.Replace(VersionTag, version.ToString().Replace('.', '-')).Replace(FileTag, file.RelativePath);
-                    var response = await this.httpClient.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        scopedLogger.LogError($"Error {response.StatusCode} when downloading {file.RelativePath}");
-                        return (file, false, response);
-                    }
-
-                    return (file, true, response);
-                });
-            });
-
-            foreach(var result in parallelResponses)
-            {
-                (var file, var fileDownloadResult, var response) = await result;
-                if (fileDownloadResult is false ||
-                    file is null ||
-                    file.Name is null ||
-                    file.RelativePath is null)
-                {
-                    scopedLogger.LogError($"{file?.RelativePath ?? string.Empty} failed to download. Cancelling update");
-                    return false;
-                }
-
-                var fileNameBytes = Encoding.UTF8.GetBytes(file.Name);
-                var relativePathBytes = Encoding.UTF8.GetBytes(file.RelativePath);
-                await packageStream.WriteAsync(BitConverter.GetBytes(fileNameBytes.Length), cancellationToken);
-                await packageStream.WriteAsync(fileNameBytes, cancellationToken);
-                await packageStream.WriteAsync(BitConverter.GetBytes(relativePathBytes.Length), cancellationToken);
-                await packageStream.WriteAsync(relativePathBytes, cancellationToken);
-                await packageStream.WriteAsync(BitConverter.GetBytes(file.Size), cancellationToken);
-
-                var downloadStream = await response.Content.ReadAsStreamAsync(cancellationToken);
-                var maxMeasurements = 100;
-                var fileSize = file.Size;
-                while (fileSize > 0)
-                {
-                    var readBytes = await downloadStream.ReadAsync(downloadBuffer, cancellationToken);
-                    await packageStream.WriteAsync(downloadBuffer.AsMemory(0, readBytes), cancellationToken);
-
-                    fileSize -= readBytes;
-                    downloaded += readBytes;
-                    if (DateTime.Now - lastUpdate > DownloadInfoUpdateInterval)
-                    {
-                        lastUpdate = DateTime.Now;
-                        var currentSpeed = downloaded / sw.ElapsedMilliseconds;
-                        if (speedMeasurements.Count > maxMeasurements)
-                        {
-                            speedMeasurements.Remove(0);
-                        }
-
-                        speedMeasurements.Add(currentSpeed);
-                        var averageSpeed = speedMeasurements.Average();
-                        var remainingBytes = sizeToDownload - downloaded;
-                        // var etaMillis = averageSpeed > 0 ? remainingBytes / averageSpeed : 0;
-                        // var eta = TimeSpan.FromMilliseconds(etaMillis);
-                        progress.Report(ProgressDownload(downloaded / sizeToDownload));
-                    }
-                }
-            }
-        }
-
-        scopedLogger.LogDebug("Prepared update package at {updatePkg}", UpdatePkg);
-        progress.Report(ProgressFinalize);
-        return true;
     }
 
     private async Task<bool> DownloadUpdateInternalLegacy(Version version, IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)

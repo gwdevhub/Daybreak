@@ -32,10 +32,6 @@ public sealed class LauncherOptions
     [OptionRange<double>(MinValue = 30, MaxValue = 300)]
     public double ModStartupTimeout { get; set; } = 30;
 
-    [JsonPropertyName(nameof(BetaUpdate))]
-    [OptionName(Name = "Beta Update", Description = "If true, the launcher will use the new update procedure")]
-    public bool BetaUpdate { get; set; } = true;
-
     [JsonPropertyName(nameof(AutoBackupSettings))]
     [OptionName(Name = "Auto Backup Settings", Description = "If true, the launcher will attempt to backup settings periodically")]
     public bool AutoBackupSettings { get; set; } = false;
