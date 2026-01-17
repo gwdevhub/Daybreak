@@ -653,6 +653,7 @@ public sealed class Map : IWikiEntity
     public static readonly Map TheElusiveGolemancerMission = new() { Id = 769, Name = "The Elusive Golemancer Mission", WikiUrl = "https://wiki.guildwars.com/wiki/The_Elusive_Golemancer" };
     public static readonly Map SecretLairOftheSnowmen2 = new() { Id = 770, Name = "Secret Lair of the Snowmen2", WikiUrl = "https://wiki.guildwars.com/wiki/Secret_Lair_of_the_Snowmen" };
     public static readonly Map SecretLairOftheSnowmen3 = new() { Id = 782, Name = "Secret Lair of the Snowmen3", WikiUrl = "https://wiki.guildwars.com/wiki/Secret_Lair_of_the_Snowmen" };
+    public static readonly Map PikenSquarePreSearingOutpost = new() { Id = 779, Name = "Piken Square", WikiUrl = "https://wiki.guildwars.com/wiki/Piken_Square_(pre-Searing)" };
     public static readonly Map DroknarsForgeCinematic = new() { Id = 783, Name = "Droknars Forge (cinematic)", WikiUrl = "https://wiki.guildwars.com/wiki/Droknar's_Forge" };
     public static readonly Map IsleOfTheNamelessPvP = new() { Id = 784, Name = "Isle of the Nameless PvP", WikiUrl = "https://wiki.guildwars.com/wiki/Isle_of_the_Nameless_(PvP)" };
     public static readonly Map TempleOfTheAgesROX = new() { Id = 785, Name = "Temple of the Ages ROX", WikiUrl = "https://wiki.guildwars.com/wiki/Deactivating_R.O.X." };
@@ -1357,6 +1358,7 @@ public sealed class Map : IWikiEntity
         TheElusiveGolemancerMission,
         SecretLairOftheSnowmen2,
         SecretLairOftheSnowmen3,
+        PikenSquarePreSearingOutpost,
         DroknarsForgeCinematic,
         IsleOfTheNamelessPvP,
         TempleOfTheAgesROX,

@@ -16,7 +16,7 @@ public sealed class GameThreadService
 
     [SuppressUnmanagedCodeSecurity]
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void LeaveGameThread(nint ctx);
+    private delegate void LeaveGameThread(nint arg1, nint arg2);
 
     private readonly MemoryScanningService memoryScanningService;
     private readonly GWHook<LeaveGameThread> leaveGameThreadHook;
@@ -103,7 +103,7 @@ public sealed class GameThreadService
         scopedLogger.LogInformation("Hooks initialized");
     }
 
-    private void OnLeaveGameThread(nint ctx)
+    private void OnLeaveGameThread(nint arg1, nint arg2)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         while(this.queuedItems.TryDequeue(out var item))
@@ -137,6 +137,6 @@ public sealed class GameThreadService
             }
         }
 
-        this.leaveGameThreadHook.Continue(ctx);
+        this.leaveGameThreadHook.Continue(arg1, arg2);
     }
 }
