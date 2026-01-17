@@ -392,19 +392,15 @@ public sealed class MainPlayerService : IDisposable
                     return default;
                 }
 
-                if (!gameContext.TryGetPlayerId(out var playerId))
+                var playerIndex = gameContext.Pointer->CharContext->PlayerNumber;
+                var players = gameContext.Pointer->WorldContext->Players;
+                if (playerIndex < 0 || playerIndex >= players.Size)
                 {
-                    scopedLogger.LogError("Failed to get player id");
+                    scopedLogger.LogError("Failed to get player id. Got {playerNumber}", playerIndex);
                     return default;
                 }
 
-                var player = gameContext.Pointer->WorldContext->Players.AsValueEnumerable().FirstOrDefault(p => p.AgentId == playerId);
-                if (player.AgentId != playerId)
-                {
-                    scopedLogger.LogError("Failed to find player with id {playerId}", playerId);
-                    return default;
-                }
-
+                var player = gameContext.Pointer->WorldContext->Players[(int)playerIndex];
                 var currentTier = player.ActiveTitleTier;
                 TitleContext? currentTitle = default;
                 int? id = -1;

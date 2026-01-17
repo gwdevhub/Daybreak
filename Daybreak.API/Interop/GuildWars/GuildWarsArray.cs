@@ -12,6 +12,16 @@ public readonly unsafe struct GuildWarsArray<T> : IEnumerable<T>
     public readonly uint Size;
     public readonly uint Param;
 
+    public T this[int index]
+    {
+        get
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(index);
+            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual((uint)index, this.Size);
+            return this.Buffer[index];
+        }
+    }
+
     public Enumerator GetEnumerator() => new(this.Buffer, this.Size);
 
     IEnumerator<T> IEnumerable<T>.GetEnumerator() => this.GetEnumerator();
