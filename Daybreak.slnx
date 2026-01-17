@@ -8,12 +8,12 @@
     <File Path=".github/workflows/ci.yaml" />
     <File Path=".github/workflows/codeql-analysis.yml" />
     <File Path=".github/workflows/version_check.yaml" />
+    <File Path="mark-issues-merged.yml" />
   </Folder>
   <Folder Name="/Scripts/">
     <File Path="Scripts/BuildRelease.ps1" />
     <File Path="Scripts/CompareVersions.ps1" />
     <File Path="Scripts/GetBuildVersion.ps1" />
-    <File Path="Scripts/PushFilesToBlobStorage.ps1" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
