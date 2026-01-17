@@ -35,7 +35,7 @@ window.getChartTheme = () => {
 };
 
 window.createChart = (canvasId, config) => {
-    console.log('createChart called for:', canvasId);
+    console.debug('createChart called for:', canvasId);
     const ctx = document.getElementById(canvasId);
     if (!ctx) {
         console.error('Canvas not found:', canvasId);
@@ -65,7 +65,7 @@ window.createChart = (canvasId, config) => {
 
     // For WPF/WebView, we'll use linear scale instead of time scale to avoid adapter issues
     if (config.options?.scales?.x?.type === 'time') {
-        console.log('Converting time scale to linear scale for WebView compatibility');
+        console.debug('Converting time scale to linear scale for WebView compatibility');
         config.options.scales.x = {
             type: 'linear',
             title: config.options.scales.x.title || { display: true, text: 'Time' },
@@ -99,7 +99,7 @@ window.createChart = (canvasId, config) => {
 
     try {
         window.chartInstances[canvasId] = new Chart(ctx, config);
-        console.log('Chart created successfully:', canvasId);
+        console.debug('Chart created successfully:', canvasId);
         return window.chartInstances[canvasId];
     } catch (error) {
         console.error('Error creating chart:', error);
@@ -110,12 +110,12 @@ window.createChart = (canvasId, config) => {
 window.addDataPoint = (canvasId, datasetIndex, newDataPoint) => {
     const chart = window.chartInstances[canvasId];
     if (!chart) {
-        console.warn('Chart not found:', canvasId);
+        console.debug('Chart not found:', canvasId);
         return;
     }
 
     if (!chart.data.datasets[datasetIndex]) {
-        console.warn('Dataset not found:', datasetIndex);
+        console.debug('Dataset not found:', datasetIndex);
         return;
     }
 
@@ -152,12 +152,12 @@ window.replaceChartData = (canvasId, newData) => {
 };
 
 // Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded, checking for Chart.js...');
+document.addEventListener('DOMContentLoaded', function () {
+    console.debug('DOM loaded, checking for Chart.js...');
     
     function initializeCharting() {
         if (typeof Chart !== 'undefined') {
-            console.log('Chart.js is available');
+            console.debug('Chart.js is available');
             window.chartjsReady = true;
             
             // Register a simple time formatter for linear scales
@@ -186,4 +186,4 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeCharting();
 });
 
-console.log('Charting script loaded');
+console.debug('Charting script loaded');

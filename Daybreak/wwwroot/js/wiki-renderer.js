@@ -1,5 +1,6 @@
 ﻿window.wikiRenderer = {
     render: async function (filePath, targetId) {
+        console.debug('wiki-renderer: Rendering', filePath, 'into', targetId);
         const element = document.getElementById(targetId);
         if (!element) {
             console.error('wiki-renderer: Element not found:', targetId);

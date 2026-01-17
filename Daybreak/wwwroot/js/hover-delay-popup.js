@@ -59,7 +59,7 @@
 
     function start(dotNetRef, callbackMethod) {
         createProgressElement();
-
+        console.debug('Hover start requested');
         if (activeHover) {
             stop();
         }
@@ -92,6 +92,7 @@
 
     function stop() {
         activeHover = null;
+        console.debug('Hover stopped');
         if (animationFrame) {
             cancelAnimationFrame(animationFrame);
             animationFrame = null;
