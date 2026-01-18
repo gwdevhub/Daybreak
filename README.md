@@ -13,9 +13,8 @@ Requires webview2 runtime https://go.microsoft.com/fwlink/p/?LinkId=2124703.
 Please check the [wiki](https://github.com/AlexMacocian/Daybreak/wiki) for project description and features
 
 # Build requirements:
-- .Net 9 SDK
-- WPF
-- Winforms
+- .Net 10 SDK
+- Asp.NET Core package
 
 # Credits:
 - Daybreak project is distributed under [MIT license](https://mit-license.org/)
