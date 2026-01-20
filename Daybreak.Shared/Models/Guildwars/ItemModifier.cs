@@ -73,8 +73,7 @@ public enum ItemModifierIdentifier : uint
 
     ArmorMinusAttacking                 = 0x201,    // -5 armor while attacking (arg2)
 
-    ArmorPenetration                    = 0x263,    // 20% armor penetration (20% chance) (arg2) (arg1)
-    ArmorPenetration2                   = 0x23F,    // 20% armor penetration (20% chance) (arg2) (arg1)
+    ArmorPenetration                    = 0x23F,    // 20% armor penetration (20% chance) (arg2) (arg1)
 
     HealthPlus                          = 0x289,    // +60 hp (arg2)
     HealthPlus2                         = 0x234,    // +30 health (arg1)

@@ -136,7 +136,6 @@ public abstract class ItemProperty
                 ItemModifierIdentifier.ArmorMinusAttacking                          => new ArmorMinusWhileAttackingProperty { Armor = (int)m.Argument2 },
 
                 ItemModifierIdentifier.ArmorPenetration                             => new ArmorPenetrationProperty { ArmorPenetration = (int)m.Argument2, Chance = (int)m.Argument1 },
-                ItemModifierIdentifier.ArmorPenetration2                            => new ArmorPenetrationProperty { ArmorPenetration = (int)m.Argument2, Chance = (int)m.Argument1 },
 
                 ItemModifierIdentifier.HealthPlus                                   => new HealthPlusProperty { Health = (int)m.Argument2 },
                 ItemModifierIdentifier.HealthPlus2                                  => new HealthPlusProperty { Health = (int)m.Argument1 },
