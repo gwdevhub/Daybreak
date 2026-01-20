@@ -6,7 +6,6 @@ using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Extensions;
-using System.IO;
 
 namespace Daybreak.Services.Guildwars;
 internal sealed class GuildWarsUpdateNotificationHandler(

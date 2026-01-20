@@ -1,7 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Drawing;
 using System.Extensions.Core;
-using System.IO;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.ColorPalette;
 using Daybreak.Shared.Services.Screenshots;

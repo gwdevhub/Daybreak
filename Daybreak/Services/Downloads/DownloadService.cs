@@ -6,8 +6,6 @@ using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Diagnostics.Metrics;
 using System.Extensions.Core;
-using System.IO;
-using System.Net.Http;
 
 namespace Daybreak.Services.Downloads;
 

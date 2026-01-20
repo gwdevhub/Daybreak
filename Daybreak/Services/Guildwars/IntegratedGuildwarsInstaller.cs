@@ -12,7 +12,6 @@ using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
-using System.IO;
 using System.Runtime.CompilerServices;
 
 namespace Daybreak.Services.GuildWars;

@@ -1,11 +1,11 @@
-﻿using Daybreak.Shared.Models;
-using Daybreak.Shared.Models.Async;
+﻿using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Services.Guildwars;
 using Daybreak.Shared.Services.Notifications;
 using TrailBlazr.Services;
 using TrailBlazr.ViewModels;
 
 namespace Daybreak.Views.Copy;
+
 public sealed class GuildWarsCopyViewModel(
     INotificationService notificationService,
     IViewManager viewManager,

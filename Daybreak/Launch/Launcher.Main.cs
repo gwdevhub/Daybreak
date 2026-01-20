@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Services.Screens;
-using Daybreak.Shared.Utils;
 using Daybreak.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
