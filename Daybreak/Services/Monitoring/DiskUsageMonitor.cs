@@ -11,10 +11,10 @@ namespace Daybreak.Services.Monitoring;
 internal sealed class DiskUsageMonitor(
     IMetricsService metricsService) : IHostedService
 {
-    private const string WriteDiskUsage = "Write Disk Usage";
+    private const string WriteDiskUsage = "disk.write.usage";
     private const string WriteDiskUsageUnit = "MBs/s";
     private const string WriteDiskUsageDescription = "MBs/s written by Daybreak";
-    private const string ReadDiskUsage = "Read Disk Usage";
+    private const string ReadDiskUsage = "disk.read.usage";
     private const string ReadDiskUsageUnit = "MBs/s";
     private const string ReadDiskUsageDescription = "MBs/s read by Daybreak";
 

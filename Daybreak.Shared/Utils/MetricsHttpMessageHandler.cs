@@ -1,10 +1,11 @@
 ﻿using Daybreak.Shared.Services.Metrics;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
+using System.Text.RegularExpressions;
 
 namespace Daybreak.Shared.Utils;
 
-public sealed class MetricsHttpMessageHandler<T> : DelegatingHandler
+public sealed partial class MetricsHttpMessageHandler<T> : DelegatingHandler
 {
     private const string LatencyUnitsName = "ms";
     private const string LatencyDescription = "Http Request Latency";
@@ -14,7 +15,12 @@ public sealed class MetricsHttpMessageHandler<T> : DelegatingHandler
 
     public MetricsHttpMessageHandler(IMetricsService metricsService, HttpMessageHandler innerHandler) : base(innerHandler)
     {
-        this.name = typeof(T).Name;
+        // Sanitize the type name to be OpenTelemetry compliant
+        // OpenTelemetry instrument names must match: [a-zA-Z][a-zA-Z0-9_.\-/]*
+        var typeName = typeof(T).Name;
+        // Remove generic arity suffix (e.g., `1, `2) and replace invalid characters
+        var sanitizedName = InvalidCharsRegex().Replace(typeName, "").ToLower();
+        this.name = $"http.client.latency.{sanitizedName}";
         this.latencyHistogram = metricsService.CreateHistogram<double>(this.name, LatencyUnitsName, LatencyDescription, Models.Metrics.AggregationTypes.P95);
     }
 
@@ -45,4 +51,7 @@ public sealed class MetricsHttpMessageHandler<T> : DelegatingHandler
             this.latencyHistogram.Record(sw.ElapsedMilliseconds);
         }
     }
+
+    [GeneratedRegex(@"[^a-zA-Z0-9_.\-/]")]
+    private static partial Regex InvalidCharsRegex();
 }

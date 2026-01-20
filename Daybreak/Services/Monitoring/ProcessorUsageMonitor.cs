@@ -10,7 +10,7 @@ namespace Daybreak.Services.Monitoring;
 internal sealed class ProcessorUsageMonitor(
     IMetricsService metricsService) : IHostedService
 {
-    private const string ProcessorTime = "Processor Usage";
+    private const string ProcessorTime = "processor.usage";
     private const string ProcessorTimeUnit = "% CPU";
     private const string ProcessorTimeDescription = "Percentage of CPU used by Daybreak";
     

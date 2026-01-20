@@ -11,7 +11,7 @@ namespace Daybreak.Services.Monitoring;
 internal sealed class MemoryUsageMonitor(
     IMetricsService metricsService) : IHostedService
 {
-    private const string MemoryUsage = "Memory Usage";
+    private const string MemoryUsage = "memory.usage";
     private const string MemoryUsageUnit = "MBs";
     private const string MemoryUsageDescription = "MBs used by Daybreak";
 
