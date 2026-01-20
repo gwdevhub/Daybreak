@@ -16,6 +16,7 @@ using System.Logging;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Daybreak.Tests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 namespace Daybreak.Launch;
 
 public partial class Launcher

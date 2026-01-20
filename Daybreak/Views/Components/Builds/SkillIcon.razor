@@ -1,5 +1,9 @@
 ﻿<div class="icon-container">
-    <img class="icon" src="@this.Skill.IconUrl"/>
+    @if (this.Skill != Skill.None)
+    {
+        <img class="icon" src="@this.Skill.IconUrl" />
+    }
+
     <div class="icon-border @(this.Skill.Elite ? "elite" : "normal")"></div>
     @if (this.Skill.Type.HasFlag(SkillType.Enchantment))
     {
