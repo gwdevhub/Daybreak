@@ -26,6 +26,7 @@ namespace Daybreak.Shared.Models.Guildwars;
 [JsonDerivedType(typeof(DamagePlusWhileDownProperty), "DamagePlusWhileDown")]
 [JsonDerivedType(typeof(DamagePlusWhileHexedProperty), "DamagePlusWhileHexed")]
 [JsonDerivedType(typeof(DamagePlusWhileInStanceProperty), "DamagePlusWhileInStance")]
+[JsonDerivedType(typeof(DamagePlusVsSpeciesProperty), "DamagePlusVsSpecies")]
 [JsonDerivedType(typeof(HalvesCastingTimeGeneralProperty), "HalvesCastingTimeGeneral")]
 [JsonDerivedType(typeof(HalvesCastingTimeAttributeProperty), "HalvesCastingTimeAttribute")]
 [JsonDerivedType(typeof(HalvesCastingTimeItemAttributeProperty), "HalvesCastingTimeItemAttribute")]
@@ -55,6 +56,7 @@ namespace Daybreak.Shared.Models.Guildwars;
 [JsonDerivedType(typeof(HealthPlusProperty), "HealthPlus")]
 [JsonDerivedType(typeof(HealthPlusWhileHexedProperty), "HealthPlusWhileHexed")]
 [JsonDerivedType(typeof(HealthPlusWhileDownProperty), "HealthPlusWhileDown")]
+[JsonDerivedType(typeof(HealthPlusStance), "HealthPlusStance")]
 [JsonDerivedType(typeof(HealthMinusProperty), "HealthMinus")]
 [JsonDerivedType(typeof(HealthDegenProperty), "HealthDegen")]
 [JsonDerivedType(typeof(HealthStealOnHitProperty), "HealthStealOnHit")]
@@ -99,6 +101,7 @@ public abstract class ItemProperty
                 ItemModifierIdentifier.DamagePlusWhileDown                          => new DamagePlusWhileDownProperty { Percentage = (int)m.Argument2 },
                 ItemModifierIdentifier.DamagePlusHexed                              => new DamagePlusWhileHexedProperty { Percentage = (int)m.Argument2 },
                 ItemModifierIdentifier.DamagePlusStance                             => new DamagePlusWhileInStanceProperty { Percentage = (int)m.Argument2 },
+                ItemModifierIdentifier.DamagePlusVsSpecies                          => new DamagePlusVsSpeciesProperty { Percentage = (int)m.Argument1 },
 
                 ItemModifierIdentifier.HalvesCastingTimeGeneral                     => new HalvesCastingTimeGeneralProperty { Chance = (int)m.Argument1 },
                 ItemModifierIdentifier.HalvesCastingTimeAttribute                   => new HalvesCastingTimeAttributeProperty { Chance = (int)m.Argument1, Attribute = ParseAttributeName(m.Argument2) },
@@ -133,11 +136,13 @@ public abstract class ItemProperty
                 ItemModifierIdentifier.ArmorMinusAttacking                          => new ArmorMinusWhileAttackingProperty { Armor = (int)m.Argument2 },
 
                 ItemModifierIdentifier.ArmorPenetration                             => new ArmorPenetrationProperty { ArmorPenetration = (int)m.Argument2, Chance = (int)m.Argument1 },
+                ItemModifierIdentifier.ArmorPenetration2                            => new ArmorPenetrationProperty { ArmorPenetration = (int)m.Argument2, Chance = (int)m.Argument1 },
 
                 ItemModifierIdentifier.HealthPlus                                   => new HealthPlusProperty { Health = (int)m.Argument2 },
                 ItemModifierIdentifier.HealthPlus2                                  => new HealthPlusProperty { Health = (int)m.Argument1 },
                 ItemModifierIdentifier.HealthPlusHexed                              => new HealthPlusWhileHexedProperty { Health = (int)m.Argument1 },
                 ItemModifierIdentifier.HealthPlusWhileDown                          => new HealthPlusWhileDownProperty { Health = (int)m.Argument2, HealthThreshold = (int)m.Argument1 },
+                ItemModifierIdentifier.HealthPlusStance                             => new HealthPlusStance { Health = (int)m.Argument1 },
                 ItemModifierIdentifier.HealthMinus                                  => new HealthMinusProperty { Health = (int)m.Argument2 },
                 ItemModifierIdentifier.HealthDegen                                  => new HealthDegenProperty { HealthDegen = (int)m.Argument2 },
                 ItemModifierIdentifier.HealthStealOnHit                             => new HealthStealOnHitProperty { HealthSteal = (int)m.Argument1 },
@@ -346,6 +351,12 @@ public sealed class DamagePlusWhileInStanceProperty : ItemProperty
     public required int Percentage { get; init; }
 }
 
+public sealed class DamagePlusVsSpeciesProperty : ItemProperty
+{
+    [JsonPropertyName("percentage")]
+    public required int Percentage { get; init; }
+}
+
 public sealed class HalvesCastingTimeGeneralProperty : ItemProperty
 {
     [JsonPropertyName("chance")]
@@ -539,6 +550,13 @@ public sealed class HealthPlusWhileDownProperty : ItemProperty
 
     [JsonPropertyName("healthThreshold")]
     public required int HealthThreshold { get; init; }
+}
+
+public sealed class HealthPlusStance : ItemProperty
+{
+    [JsonPropertyName("health")]
+    public required int Health { get; init; }
+
 }
 
 public sealed class HealthMinusProperty : ItemProperty
