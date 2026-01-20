@@ -14,6 +14,7 @@ using System.Core.Extensions;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.Extensions.Core;
+using System.Xml.Linq;
 using TrailBlazr.Services;
 
 namespace Daybreak.Services.Telemetry;
@@ -205,13 +206,18 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
         this.meter = Sdk.CreateMeterProviderBuilder()
             .SetResourceBuilder(this.resourceBuilder)
             .AddProcessInstrumentation()
-            .AddMeter("Daybreak.MetricsStore")
             .AddRuntimeInstrumentation()
-            .AddOtlpExporter(o =>
+            .AddMeter("Daybreak.MetricsStore")
+            .AddMeter("System.Net.Http")
+            .AddMeter("System.Net.NameResolution")
+            .AddMeter("OpenTelemetry.Instrumentation.SqlClient")
+            .AddOtlpExporter((exporterOptions, readerOptions) =>
             {
-                o.Endpoint = new Uri(apmUri, "v1/metrics");
-                o.Headers = $"Authorization=ApiKey {ApmApiKey}";
-                o.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
+                exporterOptions.Endpoint = new Uri(apmUri, "v1/metrics");
+                exporterOptions.Headers = $"Authorization=ApiKey {ApmApiKey}";
+                exporterOptions.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
+                readerOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 300_000;
+                readerOptions.TemporalityPreference = MetricReaderTemporalityPreference.Delta;
             })
             .Build();
 
