@@ -4,5 +4,5 @@ namespace Daybreak.Views;
 
 public sealed class GuildWarsMarketViewModel : ViewModelBase<GuildWarsMarketViewModel, GuildWarsMarketView>
 {
-    public string GwMarketUrl { get; } = "https://gwmarket.net/";
+    public string GwMarketUrl { get; } = "https://v2.gwmarket.net/";
 }
