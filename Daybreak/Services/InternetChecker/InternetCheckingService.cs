@@ -17,7 +17,7 @@ internal sealed class InternetCheckingService(
     IHttpClient<InternetCheckingService> httpClient,
     ILogger<InternetCheckingService> logger) : IInternetCheckingService
 {
-    private const string ConnectionVerificationLatency = "Connection verification latency";
+    private const string ConnectionVerificationLatency = "connection.verification.latency";
     private const string ConnectionVerificationUnit = "ms";
     private const string ConnectionVerificationDescription = "Measure how long it takes to verify internet connectivity (in ms).";
     private const string GStaticUrl = "http://www.gstatic.com/generate_204";

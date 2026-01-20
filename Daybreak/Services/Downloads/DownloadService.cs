@@ -15,6 +15,7 @@ internal sealed class DownloadService(
     ILogger<DownloadService> logger) : IDownloadService
 {
     private const double StatusUpdateInterval = 50;
+    private const string MetricName = "download.speed";
     private const string MetricUnits = "bytes/sec";
     private const string MetricDescription = "Average download speed. Specified in bytes per second";
 
@@ -23,7 +24,7 @@ internal sealed class DownloadService(
     private readonly static ProgressUpdate ProgressCompleted = new(1, "Download finished");
     private static ProgressUpdate ProgressDownload(double progress) => new(progress, "Downloading");
 
-    private readonly Histogram<double> averageDownloadSpeed = metricsService.ThrowIfNull().CreateHistogram<double>(nameof(DownloadService), MetricUnits, MetricDescription, AggregationTypes.NoAggregate);
+    private readonly Histogram<double> averageDownloadSpeed = metricsService.ThrowIfNull().CreateHistogram<double>(MetricName, MetricUnits, MetricDescription, AggregationTypes.NoAggregate);
     private readonly IHttpClient<DownloadService> httpClient = httpClient.ThrowIfNull();
     private readonly ILogger<DownloadService> logger = logger.ThrowIfNull();
 
