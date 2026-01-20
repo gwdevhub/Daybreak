@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace Daybreak.Utils;
+﻿namespace Daybreak.Utils;
 
 public static class WebRootUtil
 {

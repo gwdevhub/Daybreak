@@ -7,9 +7,9 @@ using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
 using System.Net.Http.Json;
-using System.Text.Json;
 
 namespace Daybreak.Services.Toolbox.Utilities;
+
 internal sealed class ToolboxClient(
     IDownloadService downloadService,
     IHttpClient<ToolboxClient> httpClient,
@@ -77,7 +77,7 @@ internal sealed class ToolboxClient(
         {
             throw new InvalidOperationException($"Failed to download GWToolboxdll version {tag}");
         }
-        
+
         return new DownloadLatestOperation.Success(destinationPath);
     }
 

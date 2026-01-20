@@ -204,7 +204,8 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<JSConsoleInterop>();
         services.AddSingleton<OptionsManager>();
         services.AddSingleton<IOptionsProvider, OptionsManager>(sp => sp.GetRequiredService<OptionsManager>());
-        
+        services.AddSingleton<IOptionsSynchronizationService, OptionsSynchronizationService>();
+
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
         services.AddScoped<IBuildTemplateManager, BuildTemplateManager>();
@@ -243,7 +244,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddHostedSingleton<IEventNotifierService, EventNotifierService>();
         services.AddHostedSingleton<IShortcutManager, ShortcutManager>();
         services.AddHostedSingleton<IMDomainRegistrar, MDomainRegistrar>();
-        services.AddHostedSingleton<IOptionsSynchronizationService, OptionsSynchronizationService>();
         services.AddHostedSingleton<GameScreenshotsTheme>();
         services.AddHostedService<StartupActionManager>();
         services.AddHostedService<ProcessorUsageMonitor>();

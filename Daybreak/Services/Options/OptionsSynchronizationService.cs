@@ -1,10 +1,7 @@
-﻿using Daybreak.Configuration.Options;
-using Daybreak.Services.Graph;
+﻿using Daybreak.Services.Graph;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Options;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Reflection;
@@ -17,46 +14,12 @@ public sealed class OptionsSynchronizationService(
     INotificationService notificationService,
     IOptionsProvider optionsProvider,
     IGraphClient graphClient,
-    IOptionsMonitor<LauncherOptions> liveOptions,
-    ILogger<OptionsSynchronizationService> logger) : IOptionsSynchronizationService, IHostedService
+    ILogger<OptionsSynchronizationService> logger) : IOptionsSynchronizationService
 {
-    private static readonly TimeSpan StartupDelay = TimeSpan.FromMinutes(1);
-    private static readonly TimeSpan BackupFrequency = TimeSpan.FromSeconds(15);
-
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IOptionsProvider optionsProvider = optionsProvider.ThrowIfNull();
     private readonly IGraphClient graphClient = graphClient.ThrowIfNull();
-    private readonly IOptionsMonitor<LauncherOptions> liveOptions = liveOptions.ThrowIfNull();
     private readonly ILogger<OptionsSynchronizationService> logger = logger.ThrowIfNull();
-
-    async Task IHostedService.StartAsync(CancellationToken cancellationToken)
-    {
-        await Task.Delay(StartupDelay, cancellationToken);
-        while (true)
-        {
-            await Task.Delay(BackupFrequency, cancellationToken);
-            var remoteOptions = await this.GetRemoteOptionsInternal(cancellationToken);
-            var remoteOptionsSerialized = JsonSerializer.Serialize(remoteOptions);
-            var currentOptions = JsonSerializer.Serialize(this.GetCurrentOptionsInternal());
-            if (remoteOptions is not null &&
-                currentOptions != remoteOptionsSerialized &&
-                this.liveOptions.CurrentValue.AutoBackupSettings)
-            {
-                try
-                {
-                    await this.BackupOptions(cancellationToken);
-                }
-                catch
-                {
-                }
-            }
-        }
-    }
-
-    Task IHostedService.StopAsync(CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
-    }
 
     public Task<Dictionary<string, JsonDocument>> GetLocalOptions(CancellationToken cancellationToken)
     {
@@ -73,7 +36,7 @@ public sealed class OptionsSynchronizationService(
         var currentOptions = this.GetCurrentOptionsInternal();
         var serializedOptions = JsonSerializer.Serialize(currentOptions);
         var result = await this.graphClient.UploadSettings(serializedOptions, cancellationToken);
-        if (result is false)
+        if (!result)
         {
             this.notificationService.NotifyError(
                 title: "Failed to backup settings",
@@ -89,7 +52,7 @@ public sealed class OptionsSynchronizationService(
             return;
         }
 
-        foreach(var tuple in remoteOptions)
+        foreach (var tuple in remoteOptions)
         {
             this.optionsProvider.SaveRegisteredOptions(tuple.Key, tuple.Value);
         }
