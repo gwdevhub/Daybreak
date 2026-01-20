@@ -1,5 +1,4 @@
 ﻿using Microsoft.Identity.Client;
-using System.Net.Http;
 
 namespace Daybreak.Services.Graph;
 internal sealed class DaybreakMsalHttpClientProvider(HttpClient httpClient)

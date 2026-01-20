@@ -31,8 +31,4 @@ public sealed class LauncherOptions
     [OptionName(Name = "Mod Startup Timeout", Description = "Amount of seconds that Daybreak will wait for each mod to start-up before cancelling the tasks")]
     [OptionRange<double>(MinValue = 30, MaxValue = 300)]
     public double ModStartupTimeout { get; set; } = 30;
-
-    [JsonPropertyName(nameof(AutoBackupSettings))]
-    [OptionName(Name = "Auto Backup Settings", Description = "If true, the launcher will attempt to backup settings periodically")]
-    public bool AutoBackupSettings { get; set; } = false;
 }

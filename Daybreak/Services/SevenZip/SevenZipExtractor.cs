@@ -3,9 +3,9 @@ using Microsoft.Extensions.Logging;
 using SevenZipExtractor;
 using System.Core.Extensions;
 using System.Extensions;
-using System.IO;
 
 namespace Daybreak.Services.SevenZip;
+
 internal sealed class SevenZipExtractor(
     ILogger<SevenZipExtractor> logger) : ISevenZipExtractor
 {

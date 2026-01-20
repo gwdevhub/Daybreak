@@ -8,7 +8,6 @@ using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Extensions;
 using System.Extensions.Core;
-using System.Net.Http;
 using System.Net.NetworkInformation;
 
 namespace Daybreak.Services.InternetChecker;

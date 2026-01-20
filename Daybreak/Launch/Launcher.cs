@@ -1,7 +1,6 @@
 ﻿using Daybreak.Configuration;
 using Daybreak.Services.FileProviders;
 using Daybreak.Services.Initialization;
-using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Models.Menu;
 using Daybreak.Shared.Models.Plugins;
 using Daybreak.Shared.Models.Themes;
