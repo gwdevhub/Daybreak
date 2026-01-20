@@ -39,6 +39,7 @@ public enum ItemModifierIdentifier : uint
     DamagePlusWhileDown                 = 0x228,    // +10% damage while below 50% HP (arg2)
     DamagePlusHexed                     = 0x229,    // +15% damage while hexed (arg2)
     DamagePlusStance                    = 0x22A,    // +15% damage while in stance (arg2)
+    DamagePlusVsSpecies                 = 0x224,    // +20% damage vs species (arg1) (species given by BaneSpecies property)
 
     HalvesCastingTimeGeneral            = 0x220,    // 10% chance to halve casting time for any skill (arg1)
     HalvesCastingTimeAttribute          = 0x221,    // 20% chance to halve casting time for attribute skill (arg1) (arg2)
@@ -72,12 +73,13 @@ public enum ItemModifierIdentifier : uint
 
     ArmorMinusAttacking                 = 0x201,    // -5 armor while attacking (arg2)
 
-    ArmorPenetration                    = 0x263,    // 20% armor penetration (20% chance) (arg2) (arg1)
+    ArmorPenetration                    = 0x23F,    // 20% armor penetration (20% chance) (arg2) (arg1)
 
     HealthPlus                          = 0x289,    // +60 hp (arg2)
     HealthPlus2                         = 0x234,    // +30 health (arg1)
     HealthPlusWhileDown                 = 0x230,    // +20 health while below 50% HP (arg2) (arg1)
     HealthPlusHexed                     = 0x237,    // +60 health while hexed (arg1)
+    HealthPlusStance                    = 0x238,    // +60 health while in stance (arg1)
     HealthMinus                         = 0x20D,    // -20 health (arg2)
     HealthDegen                         = 0x20E,    // -1 health regen (arg2)
     HealthStealOnHit                    = 0x252,    // Steal 5 health on hit (arg1)
