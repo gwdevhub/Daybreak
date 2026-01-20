@@ -1,55 +1,39 @@
 ﻿using Daybreak.Services.ApplicationArguments;
+using Daybreak.Shared.Services.ApplicationArguments.ArgumentHandling;
 using Daybreak.Tests.Services.Models;
 using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using Slim;
+using System.Extensions;
 
 namespace Daybreak.Tests.Services;
 
 [TestClass]
 public class ApplicationArgumentServiceTests
 {
-    private readonly ServiceManager serviceManager = new();
+    private readonly List<IArgumentHandler> argumentHandlers = [new TestArgumentHandler(), new TestArgumentHandler2()];
     private readonly ApplicationArgumentService applicationArgumentService;
 
     public ApplicationArgumentServiceTests()
     {
-        this.applicationArgumentService = new ApplicationArgumentService(this.serviceManager, Substitute.For<ILogger<ApplicationArgumentService>>());
+        this.applicationArgumentService = new ApplicationArgumentService(this.argumentHandlers, Substitute.For<ILogger<ApplicationArgumentService>>());
     }
 
     [TestMethod]
     public void HandleArguments_ExpectedArguments_HandlesCorrectly()
     {
-        this.serviceManager.RegisterSingleton<TestArgumentHandler>();
-        this.serviceManager.RegisterSingleton<TestArgumentHandler2>();
-
         this.applicationArgumentService.HandleArguments("-r so me arg -c uments he re and there".Split(" "));
         
-        this.serviceManager.GetRequiredService<TestArgumentHandler>().Called.Should().BeTrue();
-        this.serviceManager.GetRequiredService<TestArgumentHandler2>().Called.Should().BeTrue();
+        this.argumentHandlers[0].Cast<TestArgumentHandler>().Called.Should().BeTrue();
+        this.argumentHandlers[1].Cast<TestArgumentHandler2>().Called.Should().BeTrue();
     }
 
     [TestMethod]
     public void HandleArguments_NotEnoughArguments_DoesNotCallHandlers()
     {
-        this.serviceManager.RegisterScoped<TestArgumentHandler>();
-        this.serviceManager.RegisterScoped<TestArgumentHandler2>();
-
         this.applicationArgumentService.HandleArguments("-r so me arg -c uments he re".Split(" "));
 
-        this.serviceManager.GetRequiredService<TestArgumentHandler>().Called.Should().BeTrue();
-        this.serviceManager.GetRequiredService<TestArgumentHandler2>().Called.Should().BeFalse();
-    }
-
-    [TestMethod]
-    public void RegisterHandler_RegistersHandler()
-    {
-        this.applicationArgumentService.RegisterArgumentHandler<TestArgumentHandler>();
-
-        var action = this.serviceManager.GetRequiredService<TestArgumentHandler>;
-
-        action.Should().NotThrow();
+        this.argumentHandlers[0].Cast<TestArgumentHandler>().Called.Should().BeTrue();
+        this.argumentHandlers[1].Cast<TestArgumentHandler2>().Called.Should().BeFalse();
     }
 }
