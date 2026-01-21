@@ -11,36 +11,108 @@ public abstract class GWFastCall(GWAddressCache target)
     public GWAddressCache Cache { get; } = target;
     public abstract void Initialize();
 
-    protected unsafe static nint BuildFastCallThunk(nuint target)
+    /// <summary>
+    /// Builds a thunk for __fastcall with 1 parameter (ECX only).
+    /// </summary>
+    protected unsafe static nint BuildFastCallThunk1(nuint target)
     {
         if (target is 0)
         {
             return 0;
         }
 
-        var code = stackalloc byte[13]
+        var code = stackalloc byte[10]
         {
             0x58,                      // pop eax               (ret)
-            0x59,                      // pop ecx               (ctx)
-            0x5A,                      // pop edx               (edxVal)
-            0x5B,                      // pop ebx               (wparam)
-            0x53,                      // push ebx              (wparam)
+            0x59,                      // pop ecx               (arg1)
             0x50,                      // push eax              (ret)
-            0xB8,0,0,0,0,              // mov  eax, TARGET
-            0xFF,0xE0                  // jmp  eax
-        };                             // 13 bytes total
+            0xB8, 0, 0, 0, 0,          // mov  eax, TARGET
+            0xFF, 0xE0                 // jmp  eax
+        };                             // 10 bytes total
 
-        const int TARGET_OFFSET = 7;
+        const int TARGET_OFFSET = 4;
         Unsafe.WriteUnaligned(ref code[TARGET_OFFSET], (uint)target);
 
-        var mem = NativeMethods.VirtualAlloc(0, 13, NativeMethods.MEM_COMMIT | NativeMethods.MEM_RESERVE, NativeMethods.PAGE_EXECUTE_READWRITE);
+        var mem = NativeMethods.VirtualAlloc(0, 10, NativeMethods.MEM_COMMIT | NativeMethods.MEM_RESERVE, NativeMethods.PAGE_EXECUTE_READWRITE);
         if (mem is 0)
         {
             throw new Win32Exception(Marshal.GetLastWin32Error(), "VirtualAlloc");
         }
 
-        Buffer.MemoryCopy(code, (void*)mem, 13, 13);
+        Buffer.MemoryCopy(code, (void*)mem, 10, 10);
         return mem;
+    }
+
+    /// <summary>
+    /// Builds a thunk for __fastcall with 2+ parameters (ECX and EDX).
+    /// </summary>
+    protected unsafe static nint BuildFastCallThunk2(nuint target)
+    {
+        if (target is 0)
+        {
+            return 0;
+        }
+
+        var code = stackalloc byte[11]
+        {
+            0x58,                      // pop eax               (ret)
+            0x59,                      // pop ecx               (ctx)
+            0x5A,                      // pop edx               (edxVal)
+            0x50,                      // push eax              (ret)
+            0xB8,0,0,0,0,              // mov  eax, TARGET
+            0xFF,0xE0                  // jmp  eax
+        };                             // 11 bytes total
+
+        const int TARGET_OFFSET = 5;
+        Unsafe.WriteUnaligned(ref code[TARGET_OFFSET], (uint)target);
+
+        var mem = NativeMethods.VirtualAlloc(0, 11, NativeMethods.MEM_COMMIT | NativeMethods.MEM_RESERVE, NativeMethods.PAGE_EXECUTE_READWRITE);
+        if (mem is 0)
+        {
+            throw new Win32Exception(Marshal.GetLastWin32Error(), "VirtualAlloc");
+        }
+
+        Buffer.MemoryCopy(code, (void*)mem, 11, 11);
+        return mem;
+    }
+}
+
+public unsafe sealed class GWFastCall<T1, T2>(GWAddressCache target) : GWFastCall(target)
+{
+    private delegate* unmanaged[Stdcall]<T1, T2> func = null;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public unsafe T2? Invoke(T1 t1)
+    {
+        if (this.func is null)
+        {
+            this.Initialize();
+        }
+
+        if (this.func is not null)
+        {
+            if (typeof(T2) == typeof(Void))
+            {
+                ((delegate* unmanaged[Stdcall]<T1, void>)this.func)(t1);
+                return default;
+            }
+
+            return this.func(t1);
+        }
+
+        return default;
+    }
+
+    public override void Initialize()
+    {
+        if (this.Cache.GetAddress() is not nuint addr ||
+            addr is 0)
+        {
+            return;
+        }
+
+        var call = BuildFastCallThunk1(addr);
+        this.func = (delegate* unmanaged[Stdcall]<T1, T2>)call;
     }
 }
 
@@ -78,7 +150,7 @@ public unsafe sealed class GWFastCall<T1, T2, T3>(GWAddressCache target) : GWFas
             return;
         }
 
-        var call = BuildFastCallThunk(addr);
+        var call = BuildFastCallThunk2(addr);
         this.func = (delegate* unmanaged[Stdcall]<T1, T2, T3>)call;
     }
 }
@@ -117,7 +189,7 @@ public unsafe sealed class GWFastCall<T1, T2, T3, T4>(GWAddressCache target) : G
             return;
         }
 
-        var call = BuildFastCallThunk(addr);
+        var call = BuildFastCallThunk2(addr);
         this.func = (delegate* unmanaged[Stdcall]<T1, T2, T3, T4>)call;
     }
 }
@@ -156,7 +228,7 @@ public unsafe sealed class GWFastCall<T1, T2, T3, T4, T5>(GWAddressCache target)
             return;
         }
 
-        var call = BuildFastCallThunk(addr);
+        var call = BuildFastCallThunk2(addr);
         this.func = (delegate* unmanaged[Stdcall]<T1, T2, T3, T4, T5>)call;
     }
 }
@@ -195,7 +267,7 @@ public unsafe sealed class GWFastCall<T1, T2, T3, T4, T5, T6>(GWAddressCache tar
             return;
         }
 
-        var call = BuildFastCallThunk(addr);
+        var call = BuildFastCallThunk2(addr);
         this.func = (delegate* unmanaged[Stdcall]<T1, T2, T3, T4, T5, T6>)call;
     }
 }
@@ -234,7 +306,7 @@ public unsafe sealed class GWFastCall<T1, T2, T3, T4, T5, T6, T7>(GWAddressCache
             return;
         }
 
-        var call = BuildFastCallThunk(addr);
+        var call = BuildFastCallThunk2(addr);
         this.func = (delegate* unmanaged[Stdcall]<T1, T2, T3, T4, T5, T6, T7>)call;
     }
 }
