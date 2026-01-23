@@ -555,20 +555,20 @@ public sealed class BuildTemplateManager(
         var scopedLogger = this.logger.CreateScopedLogger();
         if (File.Exists(path) is false)
         {
-            scopedLogger.LogError("Unable to find build file at path {path}", path);
+            scopedLogger.LogError("Unable to find build file by name {buildName}", buildName);
             return default;
         }
 
         var content = await File.ReadAllLinesAsync(path);
         if (content.Length == 0)
         {
-            scopedLogger.LogError("File at path {path} does not contain a valid template code", path);
+            scopedLogger.LogError("File {buildName} does not contain a valid template code", buildName);
             return default;
         }
 
         if (this.TryDecodeTemplate(content.First(), out var build) is false)
         {
-            scopedLogger.LogError("Unable to parse build file at path {path}", path);
+            scopedLogger.LogError("Unable to parse build file {buildName}", buildName);
             return default;
         }
 
@@ -592,7 +592,7 @@ public sealed class BuildTemplateManager(
                 }
                 catch(Exception ex)
                 {
-                    scopedLogger.LogError(ex, "Failed to parse build metadata at path {path}", path);
+                    scopedLogger.LogError(ex, "Failed to parse build metadata {buildName}", buildName);
                     return default;
                 }
             }
