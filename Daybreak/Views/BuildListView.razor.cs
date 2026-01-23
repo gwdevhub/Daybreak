@@ -1,28 +1,50 @@
 ﻿using Daybreak.Models;
+using Daybreak.Shared.Extensions;
 using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.BuildTemplates;
 using Daybreak.Shared.Services.Toolbox;
 using Daybreak.Shared.Utils;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using System.Core.Extensions;
+using System.Drawing;
 using System.Extensions;
 using TrailBlazr.Services;
 using TrailBlazr.ViewModels;
 
 namespace Daybreak.Views;
-public sealed class BuildListViewModel(
-    IViewManager viewManager,
-    IBuildTemplateManager buildTemplateManager,
-    IToolboxService toolboxService)
+public sealed class BuildListViewModel
     : ViewModelBase<BuildListViewModel, BuildListView>
 {
-    private readonly IViewManager viewManager = viewManager.ThrowIfNull();
-    private readonly IBuildTemplateManager buildTemplateManager = buildTemplateManager.ThrowIfNull();
-    private readonly IToolboxService toolboxService = toolboxService.ThrowIfNull();
+    private readonly DotNetObjectReference<BuildListViewModel> dotNetObjectReference;
+    private readonly IViewManager viewManager;
+    private readonly IBuildTemplateManager buildTemplateManager;
+    private readonly IJSRuntime jsRuntime;
+    private readonly IToolboxService toolboxService;
 
     private readonly List<BuildListEntry> buildEntryCache = [];
 
+    public BuildListViewModel(
+        IViewManager viewManager,
+        IBuildTemplateManager buildTemplateManager,
+        IJSRuntime jsRuntime,
+        IToolboxService toolboxService)
+    {
+        this.dotNetObjectReference = DotNetObjectReference.Create(this);
+        this.viewManager = viewManager;
+        this.buildTemplateManager = buildTemplateManager;
+        this.jsRuntime = jsRuntime;
+        this.toolboxService = toolboxService;
+    }
+
     public List<BuildListEntry> BuildEntries { get; } = [];
+
+    public BuildListEntry? HoveredEntry { get; private set; }
+
+    public Point? SnippetPosition { get; private set; }
+
+    public bool ShowSnippet { get; private set; }
 
     public bool IsLoading
     {
@@ -86,6 +108,7 @@ public sealed class BuildListViewModel(
 
     public void BuildClicked(BuildListEntry buildListEntry)
     {
+        this.CloseSnippet();
         this.viewManager.ShowView<BuildRoutingView>((nameof(BuildRoutingView.BuildName), buildListEntry.BuildEntry.Name ?? string.Empty));
     }
 
@@ -110,6 +133,37 @@ public sealed class BuildListViewModel(
         var build = this.buildTemplateManager.CreateTeamBuild();
         this.buildTemplateManager.SaveBuild(build);
         this.viewManager.ShowView<BuildRoutingView>((nameof(BuildRoutingView.BuildName), build.Name ?? string.Empty));
+    }
+
+    public async void OpenSnippet(BuildListEntry buildListEntry, MouseEventArgs e)
+    {
+        this.ShowSnippet = false;
+        this.HoveredEntry = buildListEntry;
+        this.SnippetPosition = new Point((int)e.ClientX, (int)e.ClientY);
+        await this.jsRuntime.HoverDelayStart(this.dotNetObjectReference, nameof(this.HoverComplete));
+    }
+
+    public async void CloseSnippet()
+    {
+        this.HoveredEntry = default;
+        this.ShowSnippet = false;
+        await this.jsRuntime.HoverDelayStop();
+    }
+
+    public async void MouseMoveBuildEntry(MouseEventArgs e)
+    {
+        if (!this.ShowSnippet)
+        {
+            this.SnippetPosition = new Point((int)e.ClientX, (int)e.ClientY);
+        }
+    }
+
+
+    [JSInvokable]
+    public void HoverComplete()
+    {
+        this.ShowSnippet = true;
+        this.RefreshView();
     }
 
     private async ValueTask SearchByTerm(string term, CancellationToken cancellationToken)

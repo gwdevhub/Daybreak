@@ -128,3 +128,10 @@
         height: 100%;
         object-fit: contain;
     }
+
+.build-snippet-overlay {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    z-index: 1000;
+}
