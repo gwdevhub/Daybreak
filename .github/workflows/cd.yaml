@@ -69,7 +69,8 @@ jobs:
       run: |
         dotnet user-secrets --project Daybreak\Daybreak.csproj set AadApplicationId "${{ secrets.AadApplicationId }}"
         dotnet user-secrets --project Daybreak\Daybreak.csproj set AadTenantId "${{ secrets.AadTenantId }}"
-        dotnet user-secrets --project Daybreak\Daybreak.csproj set ApmApiKey "${{ secrets.ApmApiKey }}"
+        dotnet user-secrets --project Daybreak\Daybreak.csproj set ApmServiceAccount "${{ secrets.ApmServiceAccount }}"
+        dotnet user-secrets --project Daybreak\Daybreak.csproj set ApmServiceKey "${{ secrets.ApmServiceKey }}"
         dotnet user-secrets --project Daybreak\Daybreak.csproj set ApmUri "${{ secrets.ApmUri }}"
 
     - name:  Restore project
