@@ -14,7 +14,6 @@ using System.Core.Extensions;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.Extensions.Core;
-using System.Xml.Linq;
 using TrailBlazr.Services;
 
 namespace Daybreak.Services.Telemetry;
@@ -26,7 +25,8 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
     private const string MaskedValue = "[REDACTED]";
 
     private static readonly string ApmEndpoint = SecretManager.GetSecret(SecretKeys.ApmUri);
-    private static readonly string ApmApiKey = SecretManager.GetSecret(SecretKeys.ApmApiKey);
+    private static readonly string ApmServiceAccount = SecretManager.GetSecret(SecretKeys.ApmServiceAccount);
+    private static readonly string ApmServiceKey = SecretManager.GetSecret(SecretKeys.ApmServiceKey);
 
     // Headers that should be masked for security
     private static readonly HashSet<string> SensitiveHeaders = new(StringComparer.OrdinalIgnoreCase)
@@ -50,7 +50,6 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
     private readonly ILoggerFactory loggerFactory;
     private readonly ILogger<TelemetryHost> logger;
 
-    private TracerProvider? tracer;
     private MeterProvider? meter;
     private OpenTelemetryLoggerProvider? otlpLoggerProvider;
     private ILogger? otlpLogger;
@@ -89,10 +88,8 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
     public void Dispose()
     {
         TelemetryLogSink.Instance.LoggingHandler = default;
-        this.tracer?.Dispose();
         this.meter?.Dispose();
         this.otlpLoggerProvider?.Dispose();
-        this.tracer = default;
         this.meter = default;
         this.otlpLoggerProvider = default;
         this.otlpLogger = default;
@@ -145,9 +142,7 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         TelemetryLogSink.Instance.LoggingHandler = default;
-        this.tracer?.Dispose();
         this.meter?.Dispose();
-        this.tracer = default;
         this.meter = default;
         this.otlpLoggerProvider?.Dispose();
         this.otlpLoggerProvider = default;
@@ -158,50 +153,14 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(ApmApiKey) || string.IsNullOrWhiteSpace(ApmEndpoint))
+        if (string.IsNullOrWhiteSpace(ApmServiceKey) || string.IsNullOrWhiteSpace(ApmEndpoint) || string.IsNullOrWhiteSpace(ApmServiceAccount))
         {
             scopedLogger.LogError("ApmApiKey or ApmEndpoint is not configured. Telemetry is disabled.");
             return;
         }
 
         var apmUri = new Uri(ApmEndpoint);
-        this.tracer = Sdk.CreateTracerProviderBuilder()
-            .SetResourceBuilder(this.resourceBuilder)
-            .AddSource(ServiceName)
-            .ConfigureResource(r => r.AddService(
-                serviceName: ServiceName,
-                serviceVersion: ProjectConfiguration.CurrentVersion.ToString()))
-            .AddHttpClientInstrumentation(o =>
-            {
-                o.RecordException = true;
-                o.EnrichWithHttpRequestMessage = (activity, request) =>
-                {
-                    activity.DisplayName = request.RequestUri?.IdnHost ?? UnknownHost;
-                    activity.SetTag("http.url", request.RequestUri?.ToString() ?? string.Empty);
-                    activity.SetTag("http.method", request.Method.Method);
-                    AddRequestHeaders(activity, request);
-                };
-                o.EnrichWithHttpResponseMessage = (activity, response) =>
-                {
-                    activity.SetTag("http.status_code", (int)response.StatusCode);
-                    activity.SetStatus(response.IsSuccessStatusCode ? ActivityStatusCode.Ok : ActivityStatusCode.Error);
-                    AddResponseHeaders(activity, response);
-                };
-                o.EnrichWithException = (activity, exception) =>
-                {
-                    activity.SetTag("exception.type", exception.GetType().FullName);
-                    activity.SetTag("exception.message", exception.Message);
-                    activity.SetTag("exception.stacktrace", exception.StackTrace);
-                };
-            })
-            .AddSqlClientInstrumentation()
-            .AddOtlpExporter(o =>
-            {
-                o.Endpoint = new Uri(apmUri, "v1/traces");
-                o.Headers = $"Authorization=ApiKey {ApmApiKey}";
-                o.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
-            })
-            .Build();
+        var creds = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes($"{ApmServiceAccount}:{ApmServiceKey}"));
 
         this.meter = Sdk.CreateMeterProviderBuilder()
             .SetResourceBuilder(this.resourceBuilder)
@@ -214,9 +173,9 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
             .AddOtlpExporter((exporterOptions, readerOptions) =>
             {
                 exporterOptions.Endpoint = new Uri(apmUri, "v1/metrics");
-                exporterOptions.Headers = $"Authorization=ApiKey {ApmApiKey}";
+                exporterOptions.Headers = $"Authorization=Basic {creds}";
                 exporterOptions.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
-                readerOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 300_000;
+                readerOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 10_000;
                 readerOptions.TemporalityPreference = MetricReaderTemporalityPreference.Delta;
             })
             .Build();
@@ -231,7 +190,7 @@ internal sealed class TelemetryHost : IDisposable, IHostedService
         logOpts.AddOtlpExporter(exp =>
         {
             exp.Endpoint = new Uri(apmUri, "v1/logs");
-            exp.Headers = $"Authorization=ApiKey {ApmApiKey}";
+            exp.Headers = $"Authorization=Basic  {creds}";
             exp.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
         });
 
