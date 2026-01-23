@@ -1,19 +1,19 @@
-﻿<div class="build-list-container">
+﻿<div class="build-list-container" @onmouseenter="this.ViewModel.CloseSnippet">
     <div class="title-bar-additional-btns-left">
         <button class="title-bar-btn" @onclick="this.ViewModel.CreateNewSingleBuild" title="Create build">
             <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.PersonAdd()" />
         </button>
     </div>
     <div class="stretch-container backdrop-panel">
-        <div class="header-section">
-            <div class="search-container">
+        <div class="header-section" @onmouseenter="this.ViewModel.CloseSnippet">
+            <div class="search-container" @onmouseenter="this.ViewModel.CloseSnippet">
                 <DebouncedTextField Style="width: 50vw; max-width: 600px; font-size: var(--font-size-medium);"
                                     Placeholder="Search builds..."
                                     OnSearch="@this.ViewModel.SearchTermChanged" />
             </div>
         </div>
 
-        <div class="content-section">
+        <div class="content-section" @onmouseenter="this.ViewModel.CloseSnippet">
             @if (this.ViewModel.IsLoading)
             {
                 <div class="loading-overlay">
@@ -22,14 +22,18 @@
                 </div>
             }
 
-            <div class="build-list-wrapper" style="@(ViewModel.IsLoading ? "opacity: 0.3; pointer-events: none;" : "")">
+            <div @onmouseenter="this.ViewModel.CloseSnippet" 
+                class="build-list-wrapper" style="@(ViewModel.IsLoading ? "opacity: 0.3; pointer-events: none;" : "")">
                 @if (this.ViewModel.BuildEntries.Any())
                 {
                     <Virtualize Items="@this.ViewModel.BuildEntries"
                                 Context="entry"
                                 ItemSize="75">
                         <ItemContent>
-                            <div class="build-item" tabindex="0" @onclick="@(() => this.ViewModel.BuildClicked(entry))">
+                            <div class="build-item" tabindex="0" 
+                                 @onclick="() => this.ViewModel.BuildClicked(entry)"
+                                 @onmouseenter="(e) => this.ViewModel.OpenSnippet(entry, e)"
+                                 @onmousemove="(e) => this.ViewModel.MouseMoveBuildEntry(e)">
                                 <div class="build-info">
                                     @if (entry.PrimaryProfession is not null)
                                     {
@@ -50,7 +54,7 @@
                                 {
                                     <div class="build-toolbox-marker">Toolbox build</div>
                                 }
-                                <div class="build-actions" @onclick="@(() => this.ViewModel.DeleteBuild(entry))" @onclick:stopPropagation="true">
+                                <div class="build-actions" @onclick="@(() => this.ViewModel.DeleteBuild(entry))" @onclick:stopPropagation="true" @onmouseenter="this.ViewModel.CloseSnippet">
                                     <FluentButton Appearance="Appearance.Stealth"
                                                   IconOnly="true">
                                         <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Delete())" />
@@ -59,6 +63,12 @@
                             </div>
                         </ItemContent>
                     </Virtualize>
+                    @if (this.ViewModel.ShowSnippet && this.ViewModel.HoveredEntry is not null && this.ViewModel.SnippetPosition.HasValue)
+                    {
+                        <div class="build-snippet-overlay" style="top: @(this.ViewModel.SnippetPosition.Value.Y)px; left: @(this.ViewModel.SnippetPosition.Value.X)px;">
+                            <BuildSnippet BuildEntry="this.ViewModel.HoveredEntry.BuildEntry" />
+                        </div>
+                    }
                 }
                 else if (!this.ViewModel.IsLoading)
                 {
