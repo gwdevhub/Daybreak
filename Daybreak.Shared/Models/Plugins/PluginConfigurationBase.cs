@@ -1,8 +1,5 @@
-﻿using Daybreak.Shared.Services.ApplicationArguments;
-using Daybreak.Shared.Services.FileProviders;
+﻿using Daybreak.Shared.Services.FileProviders;
 using Daybreak.Shared.Services.Initialization;
-using Daybreak.Shared.Services.Metrics;
-using Daybreak.Shared.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http.Logging;
 using Microsoft.Extensions.Logging;
@@ -35,12 +32,7 @@ public abstract class PluginConfigurationBase
     public static HttpMessageHandler SetupLoggingAndMetrics<T>(IServiceProvider serviceProvider)
     {
         var logger = serviceProvider.GetRequiredService<ILogger<T>>();
-        var metricsService = serviceProvider.GetRequiredService<IMetricsService>();
-
-
-        return new MetricsHttpMessageHandler<T>(
-            metricsService,
-            new LoggingHttpMessageHandler(logger!) { InnerHandler = new HttpClientHandler() });
+        return new LoggingHttpMessageHandler(logger) { InnerHandler = new HttpClientHandler() };
     }
 
     public static void SetupDaybreakUserAgent(HttpRequestHeaders httpRequestHeaders)
