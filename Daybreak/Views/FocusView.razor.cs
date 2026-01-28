@@ -573,11 +573,9 @@ public sealed class FocusViewModel(
         {
             _ = Quest.TryParse((int)questLog.CurrentQuestId, out var currentQuest);
             _ = Map.TryParse((int)currentQuestEntry.MapFrom, out var mapFrom);
-            _ = Map.TryParse((int)currentQuestEntry.MapTo, out var mapTo);
             currentQuestMeta = new QuestMetadata
             {
                 From = mapFrom,
-                To = mapTo,
                 Quest = currentQuest
             };
         }
@@ -590,13 +588,12 @@ public sealed class FocusViewModel(
                 .Select(quest =>
                 {
                     if (!Quest.TryParse((int)quest.QuestId, out var parsedQuest) ||
-                        !Map.TryParse((int)quest.MapFrom, out var mapFrom) ||
-                        !Map.TryParse((int)quest.MapTo, out var mapTo))
+                        !Map.TryParse((int)quest.MapFrom, out var mapFrom))
                     {
                         return default;
                     }
 
-                    return new QuestMetadata { From = mapFrom, To = mapTo, Quest = parsedQuest };
+                    return new QuestMetadata { From = mapFrom, Quest = parsedQuest };
                 })
                 .OfType<QuestMetadata>()]
         };

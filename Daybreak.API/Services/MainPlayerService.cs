@@ -261,7 +261,7 @@ public sealed class MainPlayerService : IDisposable
 
                 return new QuestLogInformation(
                     gameContext.Pointer->WorldContext->ActiveQuestId,
-                    gameContext.Pointer->WorldContext->QuestLog.AsValueEnumerable().Select(q => new QuestInformation(q.QuestId, q.MapFrom, q.MapTo)).ToList());
+                    gameContext.Pointer->WorldContext->QuestLog.AsValueEnumerable().Select(q => new QuestInformation(q.QuestId, q.MapFrom)).ToList());
             }
         }, cancellationToken);
     }
