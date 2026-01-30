@@ -11,7 +11,6 @@ using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Toolbox;
-using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Core.Extensions;
@@ -33,14 +32,11 @@ internal sealed class ToolboxService(
     ILogger<ToolboxService> logger) : IToolboxService
 {
     private const string ToolboxDllName = "GWToolboxdll.dll";
-    private const string ToolboxDestinationDirectorySubPath = "GWToolbox";
     private const string ToolboxBuildsFileName = "builds.ini";
 
     private static readonly ProgressUpdate ProgressStarting = new(0, "Starting GWToolboxpp setup");
     private static readonly ProgressUpdate ProgressFinished = new(1, "GWToolboxpp setup complete");
     private static readonly ProgressUpdate ProgressFailed = new(1, "Failed to setup GWToolboxpp");
-
-    private static readonly string ToolboxDestinationDirectoryPath = PathUtils.GetAbsolutePathFromRoot(ToolboxDestinationDirectorySubPath);
     private static readonly string UsualToolboxFolderLocation = Path.GetFullPath(
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "GWToolboxpp"));
     private static readonly string UsualToolboxLocation = Path.GetFullPath(
@@ -83,7 +79,7 @@ internal sealed class ToolboxService(
 
     public IProgressAsyncOperation<bool> PerformUninstallation(CancellationToken cancellationToken)
     {
-        return ProgressAsyncOperation.Create<bool>(progress =>
+        return ProgressAsyncOperation.Create(progress =>
         {
             progress.Report(new ProgressUpdate(0, "Uninstalling Toolbox"));
             if (!this.IsInstalled)
@@ -106,10 +102,7 @@ internal sealed class ToolboxService(
 
     public IProgressAsyncOperation<bool> PerformInstallation(CancellationToken cancellationToken)
     {
-        return ProgressAsyncOperation.Create(async progress =>
-        {
-            return await Task.Factory.StartNew(() => this.SetupToolbox(progress, cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap();
-        }, cancellationToken);
+        return ProgressAsyncOperation.Create(async progress => await Task.Factory.StartNew(() => this.SetupToolbox(progress, cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap(), cancellationToken);
     }
 
     public Task OnCustomManagement(CancellationToken cancellationToken)
@@ -147,14 +140,14 @@ internal sealed class ToolboxService(
     {
         if (await this.IsUpdateAvailableInternal(cancellationToken))
         {
-            this.notificationService.NotifyInformation<ToolboxUpdateHandler>("GWToolboxpp update available", "Click on this notification to update GWToolboxpp");
+            this.notificationService.NotifyInformation<ToolboxUpdateHandler>("GWToolboxpp update available", "Click on this notification to update GWToolboxpp", expirationTime: DateTime.UtcNow + TimeSpan.FromSeconds(15));
         }
     }
 
     public async Task<bool> SetupToolbox(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
     {
         progress.Report(ProgressStarting);
-        if ((await this.SetupToolboxDll(progress, cancellationToken)) is false)
+        if (!await this.SetupToolboxDll(progress, cancellationToken))
         {
             this.logger.LogError("Failed to setup the uMod executable");
             progress.Report(ProgressFailed);
@@ -200,7 +193,7 @@ internal sealed class ToolboxService(
 
         var buildsToSave = new List<TeamBuildEntry>();
         using var textReader = new StreamReader(new FileStream(toolboxBuildsFile, FileMode.Open, FileAccess.Read));
-        await foreach(var build in this.ParseToolboxBuilds(textReader, cancellationToken))
+        await foreach (var build in this.ParseToolboxBuilds(textReader, cancellationToken))
         {
             if (!build.ToolboxBuildId.HasValue)
             {
@@ -260,7 +253,7 @@ internal sealed class ToolboxService(
 
         textReader.Close();
         textReader.Dispose();
-        using var textWriter = new StreamWriter(new FileStream(toolboxBuildsFile, FileMode.Create, FileAccess.Write));
+        await using var textWriter = new StreamWriter(new FileStream(toolboxBuildsFile, FileMode.Create, FileAccess.Write));
         return await this.WriteBuildsToStream(buildsToSave, textWriter, cancellationToken);
     }
 
@@ -292,7 +285,7 @@ internal sealed class ToolboxService(
         buildsToSave.Add(teamBuildEntry);
         textReader.Close();
         textReader.Dispose();
-        using var textWriter = new StreamWriter(new FileStream(toolboxBuildsFile, FileMode.Create, FileAccess.Write));
+        await using var textWriter = new StreamWriter(new FileStream(toolboxBuildsFile, FileMode.Create, FileAccess.Write));
         return await this.WriteBuildsToStream(buildsToSave, textWriter, cancellationToken);
     }
 
@@ -314,12 +307,7 @@ internal sealed class ToolboxService(
             _ => throw new InvalidOperationException("Unexpected result")
         };
 
-        if (result is not DownloadLatestOperation.Success)
-        {
-            return false;
-        }
-
-        return true;
+        return result is DownloadLatestOperation.Success;
     }
 
     private async Task<bool> IsUpdateAvailableInternal(CancellationToken cancellationToken)
@@ -359,14 +347,14 @@ internal sealed class ToolboxService(
     private async Task LaunchToolbox(Process process, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        if (this.IsEnabled is false)
+        if (!this.IsEnabled)
         {
             scopedLogger.LogDebug("Toolbox disabled");
             return;
         }
 
         var dll = UsualToolboxLocation;
-        if (File.Exists(dll) is false)
+        if (!File.Exists(dll))
         {
             scopedLogger.LogError("Dll file does not exist");
             throw new ExecutableNotFoundException($"GWToolbox dll doesn't exist at {dll}");
@@ -505,7 +493,7 @@ internal sealed class ToolboxService(
             var stringBuilder = new StringBuilder();
             stringBuilder.AppendLine($"[builds{i:D3}]");
             stringBuilder.AppendLine($"buildname = {build.Name}");
-            stringBuilder.AppendLine($"showNumbers = true");
+            stringBuilder.AppendLine("showNumbers = true");
             stringBuilder.AppendLine($"count = {build.Builds.Count}");
             for (var j = 0; j < build.Builds.Count; j++)
             {
