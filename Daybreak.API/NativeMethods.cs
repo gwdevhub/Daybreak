@@ -11,6 +11,7 @@ internal unsafe static partial class NativeMethods
     public const int WM_KEYDOWN = 0x0100;
     public const int WM_KEYUP = 0x0101;
     public const int WM_CHAR = 0x0102;
+    public const int VK_LEFT = 0x25;
     public const int VK_RIGHT = 0x27;
 
     public const uint MEM_COMMIT = 0x1000;
@@ -36,7 +37,7 @@ internal unsafe static partial class NativeMethods
     public static partial bool SetConsoleMode(nint hConsoleHandle, uint dwMode);
 
     [LibraryImport("user32.dll")]
-    public static partial nint SendMessageW(nint hWnd, int Msg, nint wParam, nint lParam);
+    public static partial nint SendMessageW(nint hWnd, int Msg, nint wParam, nuint lParam);
 
     [LibraryImport("kernel32.dll", SetLastError = true)]
     public static partial nint VirtualAlloc(

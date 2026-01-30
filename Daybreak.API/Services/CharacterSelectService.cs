@@ -15,6 +15,7 @@ public sealed class CharacterSelectService(
     UIContextService uiContextService,
     GameThreadService gameThreadService,
     GameContextService gameContextService,
+    PreferencesService preferencesService,
     ILogger<CharacterSelectService> logger)
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -29,6 +30,7 @@ public sealed class CharacterSelectService(
     private readonly UIContextService uiContextService = uiContextService.ThrowIfNull();
     private readonly GameThreadService gameThreadService = gameThreadService.ThrowIfNull();
     private readonly GameContextService gameContextService = gameContextService.ThrowIfNull();
+    private readonly PreferencesService preferencesService = preferencesService.ThrowIfNull();
     private readonly ILogger<CharacterSelectService> logger = logger.ThrowIfNull();
 
     public Task<CharacterSelectInformation?> GetCharacterSelectInformation(CancellationToken cancellationToken)
@@ -137,7 +139,6 @@ public sealed class CharacterSelectService(
     private async Task<bool> SelectCharacterToPlay(string characterName, bool play, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-
         return await this.gameThreadService.QueueOnGameThread(() =>
         {
             unsafe
@@ -254,8 +255,25 @@ public sealed class CharacterSelectService(
             return false;
         }
 
-        scopedLogger.LogInformation("Character select ready, selecting {name}", characterName);
-        return await this.SelectCharacterToPlay(characterName, play: true, cancellationToken);
+        var previousOrderPreference = await this.gameThreadService.QueueOnGameThread(() => this.preferencesService.GetEnumPreference(EnumPreference.CharSortOrder), cancellationToken);
+        if (previousOrderPreference is null)
+        {
+            scopedLogger.LogError("Failed to get previous character sort order preference");
+            return false;
+        }
+
+        scopedLogger.LogInformation("Previous character sort order preference: {order}. Setting order to alphabetize", (CharSortOrder)previousOrderPreference);
+        await this.gameThreadService.QueueOnGameThread(() => this.preferencesService.SetEnumPreference(EnumPreference.CharSortOrder, (uint)CharSortOrder.Alphabetize), cancellationToken);
+        try
+        {
+            return await this.SelectCharacterToPlay(characterName, play: true, cancellationToken);
+        }
+        finally
+        {
+            // TODO: Delay to ensure character select has fully processed the selection before reverting sort order. Should be done after loading into the map.
+            await Task.Delay(1000, cancellationToken);
+            await this.gameThreadService.QueueOnGameThread(() => this.preferencesService.SetEnumPreference(EnumPreference.CharSortOrder, previousOrderPreference.Value), cancellationToken);
+        }
     }
 
     private async Task<string?> GetCharNameByUuid(string uuid, CancellationToken cancellationToken)
@@ -303,7 +321,7 @@ public sealed class CharacterSelectService(
             var logoutMessage = new LogOutMessage(0, 1); // Changed to 1 for character select
             unsafe
             {
-                this.uiContextService.SendMessage(Models.UIMessage.Logout, (uint)&logoutMessage, 0);
+                this.uiContextService.SendMessage(UIMessage.Logout, (uint)&logoutMessage, 0);
             }
         }, cancellationToken);
     }

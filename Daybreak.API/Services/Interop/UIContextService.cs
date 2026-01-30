@@ -30,7 +30,7 @@ public sealed class UIContextService
 
     private const string FrameArrayFile = "\\Code\\Engine\\Frame\\FrMsg.cpp";
     private const string FrameArrayAssertion = "frame";
-    
+
     private static readonly byte[] GetRootFrameSeq = [
         0xA1, 0x00, 0x00, 0x00, 0x00,  // mov eax,[address]
         0x05, 0xD8, 0xFE, 0xFF, 0xFF,  // add eax,FFFFFED8
@@ -44,10 +44,6 @@ public sealed class UIContextService
 
     [SuppressUnmanagedCodeSecurity]
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void SetFrameFlagFunc(uint frameId, uint flag);
-
-    [SuppressUnmanagedCodeSecurity]
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate uint GetChildFrameIdFunc(uint parentFrameId, uint childOffset);
 
     [SuppressUnmanagedCodeSecurity]
@@ -57,10 +53,6 @@ public sealed class UIContextService
     [SuppressUnmanagedCodeSecurity]
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private unsafe delegate void ValidateAsyncDecodeStr(char* s, DecodeStrCallback callback, void* wParam);
-
-    [SuppressUnmanagedCodeSecurity]
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private unsafe delegate uint DoAsyncDecodeStr(char* encodedStr, DecodeStrCallback callback, void* wParam);
 
     public unsafe delegate void DecodeStrCallback(void* param, char* s);
 
@@ -77,7 +69,7 @@ public sealed class UIContextService
     private readonly GWFastCall<nint, nint, UIMessage, nint, nint, GWFastCall.Void> sendFrameUIMessage;
     private readonly ILogger<UIContextService> logger;
 
-    private CancellationTokenSource? cts = default;
+    private CancellationTokenSource? cts;
 
     public UIContextService(
         HashingService hashingService,
@@ -236,7 +228,7 @@ public sealed class UIContextService
         return true;
     }
 
-    public unsafe bool SetFrameDisabled(WrappedPointer<Frame> frame, bool disabled)
+    public bool SetFrameDisabled(WrappedPointer<Frame> frame, bool disabled)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         if (frame.IsNull)
@@ -249,7 +241,7 @@ public sealed class UIContextService
         return true;
     }
 
-    public unsafe bool SetFrameVisible(WrappedPointer<Frame> frame, bool visible)
+    public bool SetFrameVisible(WrappedPointer<Frame> frame, bool visible)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         if (frame.IsNull)
@@ -317,7 +309,7 @@ public sealed class UIContextService
             return null;
         }
 
-        for(var i = 0; i < frameArray.Pointer->Size; i++)
+        for (var i = 0; i < frameArray.Pointer->Size; i++)
         {
             var frame = frameArray.Pointer->Buffer[i];
             if (frame.Pointer is null ||
@@ -362,7 +354,7 @@ public sealed class UIContextService
         return this.hashingService.Hash(value);
     }
 
-    public unsafe void SendMessage(UIMessage message, nuint wParam, nuint lParam)
+    public void SendMessage(UIMessage message, nuint wParam, nuint lParam)
     {
         this.sendUiMessageSemaphore.Wait();
         this.sendUiMessageHook.Continue(message, wParam, lParam);
@@ -381,7 +373,6 @@ public sealed class UIContextService
         this.decodeStringSemaphore.Wait();
         try
         {
-            
             var validateDecodeStrFnc = this.validateAsyncDecodeStr.GetDelegate();
             if (validateDecodeStrFnc is null)
             {
@@ -391,7 +382,7 @@ public sealed class UIContextService
 
             validateDecodeStrFnc(encoded, callback, (void*)callbackParam);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             scopedLogger.LogError(e, "Encountered exception while decoding string");
         }
