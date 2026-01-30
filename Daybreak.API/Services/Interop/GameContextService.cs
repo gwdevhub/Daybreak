@@ -177,9 +177,9 @@ public unsafe sealed class GameContextService : IAddressHealthService
             return 0U;
         }
 
-        preGameContextAddress = *(nuint*)preGameContextAddress;
-        scopedLogger.LogInformation("Pre-game context address: 0x{address:X8}", preGameContextAddress);
-        return preGameContextAddress;
+        var actualAddress = *(nuint*)preGameContextAddress;
+        scopedLogger.LogInformation("Pre-game context address: 0x{address:X8}", actualAddress);
+        return actualAddress;
     }
 
     private unsafe nuint GetAvailableCharactersAddress()

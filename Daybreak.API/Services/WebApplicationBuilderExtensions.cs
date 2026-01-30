@@ -29,6 +29,7 @@ public static class WebApplicationBuilderExtensions
         builder.WithAddressService<AgentContextService>();
         builder.WithAddressService<PlatformContextService>();
         builder.WithAddressService<PartyContextService>();
+        builder.WithAddressService<PreferencesService>();
         builder.WithHookAddressHostedService<UIContextService>();
         return builder;
     }
