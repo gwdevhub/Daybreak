@@ -267,7 +267,7 @@ internal sealed class UModService(
     public async Task CheckAndUpdateUMod(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        if (this.IsInstalled is false)
+        if (!this.IsInstalled)
         {
             scopedLogger.LogInformation("uMod is not installed. Skipping update check");
             return;
