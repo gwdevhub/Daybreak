@@ -12,13 +12,7 @@ public readonly struct PreGameContext
     [FieldOffset(0x0124)]
     public readonly uint ChosenCharacterIndex;
 
-    [FieldOffset(0x0140)]
-    public readonly uint Index1;
-
-    [FieldOffset(0x0144)]
-    public readonly uint Index2;
-
-    [FieldOffset(0x00148)]
+    [FieldOffset(0x0148)]
     public readonly GuildWarsArray<LoginCharacterContext> LoginCharacters;
 }
 
