@@ -6,6 +6,7 @@ using System.Core.Extensions;
 using System.Extensions.Core;
 
 namespace Daybreak.Services.Startup.Actions;
+
 internal sealed class UpdateUModAction(
     IUModService uModService,
     ILogger<UpdateUModAction> logger) : StartupActionBase
@@ -25,6 +26,5 @@ internal sealed class UpdateUModAction(
 
         scopedLogger.LogInformation("Checking for UMod updates...");
         Task.Factory.StartNew(async () => await this.uModService.CheckAndUpdateUMod(progress, CancellationToken.None));
-        
     }
 }

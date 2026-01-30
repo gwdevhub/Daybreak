@@ -13,6 +13,7 @@ using System.Extensions;
 using System.Extensions.Core;
 
 namespace Daybreak.Services.GuildWars;
+
 internal sealed class GuildWarsVersionChecker(
     IOptionsProvider optionsProvider,
     IOptionsMonitor<GuildWarsVersionCheckerOptions> options,
@@ -80,7 +81,7 @@ internal sealed class GuildWarsVersionChecker(
     public async Task OnGuildWarsStarting(GuildWarsStartingContext guildWarsStartingContext, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: guildWarsStartingContext.ApplicationLauncherContext.ExecutablePath);
-        if (this.IsEnabled is false)
+        if (!this.IsEnabled)
         {
             scopedLogger.LogDebug("Guild Wars Version Checker is disabled. Skipping version check");
             return;
@@ -89,13 +90,13 @@ internal sealed class GuildWarsVersionChecker(
         var notificationToken = this.notificationService.NotifyInformation(
             title: "Checking Guild Wars version",
             description: "Checking if Guild Wars needs an update",
-            persistent: false,
-            expirationTime: DateTime.MaxValue);
+            expirationTime: DateTime.MaxValue,
+            persistent: false);
         if (await this.guildWarsInstaller.GetLatestVersionId(cancellationToken) is not int latestVersion)
         {
             scopedLogger.LogInformation("Failed to fetch latest version. Skipping version check");
             notificationToken.Cancel();
-            return; 
+            return;
         }
 
         if (await this.guildWarsInstaller.GetVersionId(guildWarsStartingContext.ApplicationLauncherContext.ExecutablePath, cancellationToken) is not int version)
@@ -105,7 +106,7 @@ internal sealed class GuildWarsVersionChecker(
             this.notificationService.NotifyError(
                 title: "Potentially damaged executable",
                 description: $"Daybreak has detected a potentially damaged executable at {guildWarsStartingContext.ApplicationLauncherContext.ExecutablePath}. " +
-                $"It's recommended that you download the executable again through the menu. Daybreak will still attempt to launch it");
+                "It's recommended that you download the executable again through the menu. Daybreak will still attempt to launch it");
             return;
         }
 
@@ -152,7 +153,8 @@ internal sealed class GuildWarsVersionChecker(
             scopedLogger.LogInformation("Discovered out of date executable. Prompting user to update");
             this.notificationService.NotifyInformation<GuildWarsBatchUpdateNotificationHandler>(
                 title: "Guild Wars needs an update",
-                description: "One or more Guild Wars executables are out of date and require an update. Click here to start the update");
+                description: "One or more Guild Wars executables are out of date and require an update. Click here to start the update",
+                expirationTime: DateTime.UtcNow + TimeSpan.FromSeconds(15));
             return;
         }
     }

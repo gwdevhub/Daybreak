@@ -29,8 +29,6 @@ internal sealed class ApplicationUpdater(
     IHttpClient<ApplicationUpdater> httpClient,
     ILogger<ApplicationUpdater> logger) : IApplicationUpdater, IHostedService
 {
-    private const string UpdatePkgSubPath = "update.pkg";
-    private const string TempInstallerFileNameSubPath = "Installer/Daybreak.Installer.Temp.exe";
     private const string InstallerFileNameSubPath = "Installer/Daybreak.Installer.exe";
     private const string UpdatedKey = "LauncherUpdating";
     private const string TempFileSubPath = "tempfile.zip";
@@ -39,19 +37,13 @@ internal sealed class ApplicationUpdater(
     private const string VersionListUrl = "https://api.github.com/repos/gwdevhub/Daybreak/git/refs/tags";
     private const string Url = "https://github.com/gwdevhub/Daybreak/releases/latest";
     private const string DownloadUrl = $"https://github.com/gwdevhub/Daybreak/releases/download/v{VersionTag}/Daybreakv{VersionTag}.zip";
-    private const string GithubReleasesUrl = $"https://api.github.com/repos/gwdevhub/daybreak/releases";
-
-    private readonly static string TempInstallerFileName = PathUtils.GetAbsolutePathFromRoot(TempInstallerFileNameSubPath);
+    private const string GithubReleasesUrl = "https://api.github.com/repos/gwdevhub/daybreak/releases";
     private readonly static string InstallerFileName = PathUtils.GetAbsolutePathFromRoot(InstallerFileNameSubPath);
     private readonly static string TempFile = PathUtils.GetAbsolutePathFromRoot(TempFileSubPath);
-    private readonly static string UpdatePkg = PathUtils.GetAbsolutePathFromRoot(UpdatePkgSubPath);
 
     private readonly static ProgressUpdate ProgressInitialize = new(0, "Initializing update");
     private readonly static ProgressUpdate ProgressCheckLatest = new(0, "Checking latest version");
     private readonly static ProgressUpdate ProgressFinalize = new(1, "Downloaded update. Please close any running Guild Wars instances and restart Daybreak to finalize the update");
-    private static ProgressUpdate ProgressDownload(double progress) => new(progress, "Downloading update");
-
-    private readonly static TimeSpan DownloadInfoUpdateInterval = TimeSpan.FromMilliseconds(16);
 
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IRegistryService registryService = registryService.ThrowIfNull();
@@ -75,7 +67,7 @@ internal sealed class ApplicationUpdater(
         {
             try
             {
-                if (this.liveOptions.CurrentValue.AutoCheckUpdate is false)
+                if (!this.liveOptions.CurrentValue.AutoCheckUpdate)
                 {
                     return;
                 }
@@ -92,6 +84,7 @@ internal sealed class ApplicationUpdater(
                         title: "Daybreak Update Available",
                         description: $"Version v{maybeLatestVersion} of Daybreak is available.\nClick this notification to start the update process",
                         metaData: maybeLatestVersion.ToString(),
+                        expirationTime: DateTime.UtcNow + TimeSpan.FromSeconds(15),
                         persistent: true);
                 }
             }
@@ -110,10 +103,7 @@ internal sealed class ApplicationUpdater(
     public IProgressAsyncOperation<bool> DownloadUpdate(Version version, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: version.ToString());
-        return ProgressAsyncOperation.Create(async progress =>
-        {
-            return await Task.Factory.StartNew(() => this.DownloadUpdateInternalLegacy(version, progress, cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap();
-        }, cancellationToken);
+        return ProgressAsyncOperation.Create(async progress => await Task.Factory.StartNew(() => this.DownloadUpdateInternalLegacy(version, progress, cancellationToken), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current).Unwrap(), cancellationToken);
     }
 
     public IProgressAsyncOperation<bool> DownloadLatestUpdate(CancellationToken cancellationToken)
@@ -236,7 +226,7 @@ internal sealed class ApplicationUpdater(
         var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: version.ToString());
         progress.Report(ProgressInitialize);
         var uri = DownloadUrl.Replace(VersionTag, version.ToString());
-        if (await this.downloadService.DownloadFile(uri, TempFile, progress, cancellationToken) is false)
+        if (!await this.downloadService.DownloadFile(uri, TempFile, progress, cancellationToken))
         {
             scopedLogger.LogError("Failed to download update file");
             return false;
@@ -268,7 +258,7 @@ internal sealed class ApplicationUpdater(
             scopedLogger.LogError("Failed to retrieve latest version. Status code: {statusCode}", response.StatusCode);
             return default;
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             scopedLogger.LogError(e, "Failed to retrieve latest version from {url}", Url);
             return default;
@@ -286,7 +276,7 @@ internal sealed class ApplicationUpdater(
             }
         };
         this.logger.LogDebug("Launching installer");
-        if (process.Start() is false)
+        if (!process.Start())
         {
             throw new InvalidOperationException("Failed to launch installer");
         }
@@ -296,7 +286,7 @@ internal sealed class ApplicationUpdater(
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         this.logger.LogDebug("Executing post-update actions");
-        foreach(var action in this.postUpdateActions)
+        foreach (var action in this.postUpdateActions)
         {
             scopedLogger.LogDebug("Starting [{actionName}]", action.GetType().Name);
             action.DoPostUpdateAction();
@@ -317,11 +307,6 @@ internal sealed class ApplicationUpdater(
 
     private bool UpdateMarkedInRegistry()
     {
-        if (this.registryService.TryGetValue<bool>(UpdatedKey, out _))
-        {
-            return true;
-        }
-
-        return false;
+        return this.registryService.TryGetValue<bool>(UpdatedKey, out _);
     }
 }
