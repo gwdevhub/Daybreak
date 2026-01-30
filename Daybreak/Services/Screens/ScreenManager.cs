@@ -44,8 +44,10 @@ internal sealed class ScreenManager(
     public void MoveWindowToSavedPosition()
     {
         var savedPosition = this.GetSavedPosition();
-        var hwnd = this.photinoWindow.WindowHandle;
-        NativeMethods.SetWindowPos(hwnd, NativeMethods.HWND_TOP, savedPosition.Left, savedPosition.Top, savedPosition.Width, savedPosition.Height, NativeMethods.SWP_SHOWWINDOW);
+        this.photinoWindow.Left = savedPosition.Left;
+        this.photinoWindow.Top = savedPosition.Top;
+        this.photinoWindow.Width = savedPosition.Width;
+        this.photinoWindow.Height = savedPosition.Height;
     }
 
     public void SaveWindowPositionAndSize()
@@ -64,12 +66,22 @@ internal sealed class ScreenManager(
         this.optionsProvider.SaveOption(options);
     }
 
+    public void ResetSavedPosition()
+    {
+        var options = this.liveUpdateableOptions.CurrentValue;
+        options.X = 0;
+        options.Y = 0;
+        options.Width = 0;
+        options.Height = 0;
+        this.optionsProvider.SaveOption(options);
+    }
+
     public bool MoveGuildwarsToScreen(Screen screen)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         scopedLogger.LogDebug("Attempting to move guildwars to screen {screenId}", screen.Id);
         var hwnd = GetMainWindowHandle();
-        if (hwnd.HasValue is false)
+        if (!hwnd.HasValue)
         {
             return false;
         }
@@ -80,17 +92,34 @@ internal sealed class ScreenManager(
 
     public Rectangle GetSavedPosition()
     {
-        return new Rectangle(
+        var savedPosition = new Rectangle(
             (int)this.liveUpdateableOptions.CurrentValue.X,
             (int)this.liveUpdateableOptions.CurrentValue.Y,
             (int)this.liveUpdateableOptions.CurrentValue.Width,
             (int)this.liveUpdateableOptions.CurrentValue.Height);
+
+        if (savedPosition.Width is 0 || savedPosition.Height is 0)
+        {
+            var firstScreen = this.Screens.FirstOrDefault();
+            if (firstScreen.Size.IsEmpty)
+            {
+                throw new InvalidOperationException("Could not detect any screen");
+            }
+
+            return new Rectangle(
+                    firstScreen.Size.X + (firstScreen.Size.Width / 4),
+                    firstScreen.Size.Y + (firstScreen.Size.Height / 4),
+                    firstScreen.Size.Width / 2,
+                    firstScreen.Size.Height / 2);
+        }
+
+        return savedPosition;
     }
 
     private static IntPtr? GetMainWindowHandle()
     {
         var process = Process.GetProcessesByName("gw").FirstOrDefault();
-        return process is not null ? process.MainWindowHandle : default;
+        return (process?.MainWindowHandle) ?? default;
     }
 
     private static List<Screen> GetAllScreens()

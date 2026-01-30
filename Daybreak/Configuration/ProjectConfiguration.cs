@@ -130,7 +130,7 @@ public class ProjectConfiguration : PluginConfigurationBase
             .Build();
         services.RegisterClientWebSocket<TradeChatService<AscalonTradeChatOptions>>()
             .Build();
-        services.AddSingleton<IPublicClientApplication>(sp =>
+        services.AddSingleton(sp =>
         {
             var logger = sp.GetRequiredService<ILogger<PublicClientApplication>>();
             try
@@ -162,15 +162,14 @@ public class ProjectConfiguration : PluginConfigurationBase
                         new DaybreakMsalHttpClientProvider(new HttpClient(SetupLoggingAndMetrics<PublicClientApplication>(sp))))
                     .Build();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 logger.LogError(e, "Failed to create PublicClientApplication, using dummy implementation");
                 return new DummyPublicClientApplication();
             }
-            
         });
 
-        services.AddSingleton(sp =>
+        services.AddSingleton(_ =>
         {
             var resourceBuilder = ResourceBuilder.CreateDefault().AddService("Daybreak", serviceVersion: CurrentVersion.ToString());
             var attributes = new List<KeyValuePair<string, object>>();
@@ -373,6 +372,7 @@ public class ProjectConfiguration : PluginConfigurationBase
     {
         argumentHandlerProducer.ThrowIfNull();
         argumentHandlerProducer.RegisterArgumentHandler<AutoLaunchArgumentHandler>();
+        argumentHandlerProducer.RegisterArgumentHandler<ResetWindowPositionArgumentHandler>();
     }
 
     public override void RegisterMenuButtons(IMenuServiceProducer menuServiceProducer)
