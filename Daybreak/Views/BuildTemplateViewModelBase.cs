@@ -75,12 +75,30 @@ public abstract class BuildTemplateViewModelBase<TViewModel, TView>(
 
     public void BuildNameChanged(string buildName)
     {
-        if (this.View is null)
+        this.ChangeBuildName(buildName);
+        this.RefreshView();
+    }
+
+    public void BuildCodeChanged(string buildCode)
+    {
+        if (!this.buildTemplateManager.TryDecodeTemplate(buildCode, out var build))
         {
             return;
         }
 
-        this.ChangeBuildName(buildName);
+        if (build is SingleBuildEntry s1 && this.BuildEntry is SingleBuildEntry thisBuild)
+        {
+            thisBuild.Skills = s1.Skills;
+            thisBuild.Attributes = s1.Attributes;
+            thisBuild.Primary = s1.Primary;
+            thisBuild.Secondary = s1.Secondary;
+        }
+        else
+        {
+            // Currently only SingleBuildEntry is supported to change build code.
+            return;
+        }
+
         this.RefreshView();
     }
 

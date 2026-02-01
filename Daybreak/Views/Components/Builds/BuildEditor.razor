@@ -4,7 +4,7 @@
         <div class="build-info-section">
             <div class="build-field">
                 <label for="build-code">Build Code:</label>
-                <input id="build-code" type="text" @bind="this.BuildTemplateCode" readonly class="build-code-input" />
+                <input id="build-code" type="text" @bind="this.BuildTemplateCode" @oninput="this.BuildCodeChangedHandler" class="build-code-input" />
             </div>
             
             <div class="build-field">
@@ -187,6 +187,9 @@
     [Parameter]
     public required Action<string> BuildNameChanged { get; init; }
 
+    [Parameter]
+    public required Action<string> BuildCodeChanged { get; init; }
+
     private bool isSkillsPanelExpanded = false;
     private int selectedSkillIndex = -1;
     private string searchTerm = string.Empty;
@@ -255,6 +258,14 @@
         if (e.Value is string newName)
         {
             this.BuildNameChanged(newName);
+        }
+    }
+
+    private void BuildCodeChangedHandler(ChangeEventArgs e)
+    {
+        if (e.Value is string newCode)
+        {
+            this.BuildCodeChanged(newCode);
         }
     }
 }
