@@ -75,6 +75,11 @@ public abstract class BuildTemplateViewModelBase<TViewModel, TView>(
 
     public void BuildNameChanged(string buildName)
     {
+        if (this.View is null)
+        {
+            return;
+        }
+
         this.ChangeBuildName(buildName);
         this.RefreshView();
     }
@@ -82,6 +87,11 @@ public abstract class BuildTemplateViewModelBase<TViewModel, TView>(
     public override sealed async ValueTask ParametersSet(TView view, CancellationToken cancellationToken)
     {
         var buildLoad = await this.buildTemplateManager.GetBuild(view.BuildName);
+        if (buildLoad is null)
+        {
+            return;
+        }
+
         this.LoadBuild(buildLoad);
         this.UpdateBuildCode();
         this.FilterSkillsByProfessionsAndString();

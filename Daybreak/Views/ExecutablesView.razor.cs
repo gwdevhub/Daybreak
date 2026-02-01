@@ -28,7 +28,7 @@ public class ExecutablesViewModel(
     public override ValueTask ParametersSet(ExecutablesView view, CancellationToken cancellationToken)
     {
         this.Executables.ClearAnd().AddRange(this.guildWarsExecutableManager.GetExecutableList().Select(s => new ExecutablePath { Path = s, Validating = true, Valid = false }));
-        _ = Task.Factory.StartNew(() => this.ValidateExecutables())
+        _ = Task.Factory.StartNew(this.ValidateExecutables)
             .ContinueWith(t => this.AutoUpdate(t, view), CancellationToken.None);
         return base.ParametersSet(view, cancellationToken);
     }
