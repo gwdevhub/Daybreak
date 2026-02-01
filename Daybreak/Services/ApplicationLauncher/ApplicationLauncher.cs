@@ -1,4 +1,5 @@
 ﻿using Daybreak.Configuration.Options;
+using Daybreak.Services.Toolbox;
 using Daybreak.Shared.Exceptions;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.LaunchConfigurations;
@@ -84,7 +85,7 @@ internal sealed class ApplicationLauncher(
     {
         this.logger.LogInformation("Restarting daybreak with admin rights");
         var processName = Process.GetCurrentProcess()?.MainModule?.FileName;
-        if (processName!.IsNullOrWhiteSpace() || File.Exists(processName) is false)
+        if (processName!.IsNullOrWhiteSpace() || !File.Exists(processName))
         {
             throw new InvalidOperationException("Unable to find executable. Aborting restart");
         }
@@ -101,7 +102,7 @@ internal sealed class ApplicationLauncher(
                 Arguments = $"/c cd /d \"{Environment.CurrentDirectory}\" && timeout /t 1 /nobreak && start \"\" \"{processName}\" && exit"
             }
         };
-        if (process.Start() is false)
+        if (!process.Start())
         {
             throw new InvalidOperationException($"Unable to start {processName} as admin");
         }
@@ -113,7 +114,7 @@ internal sealed class ApplicationLauncher(
     {
         this.logger.LogInformation("Restarting daybreak as normal user");
         var processName = Process.GetCurrentProcess()?.MainModule?.FileName;
-        if (processName!.IsNullOrWhiteSpace() || File.Exists(processName) is false)
+        if (processName!.IsNullOrWhiteSpace() || !File.Exists(processName))
         {
             throw new InvalidOperationException("Unable to find executable. Aborting restart");
         }
@@ -128,7 +129,7 @@ internal sealed class ApplicationLauncher(
                 CreateNoWindow = true
             }
         };
-        if (process.Start() is false)
+        if (!process.Start())
         {
             throw new InvalidOperationException($"Unable to start {processName} as normal user");
         }
@@ -142,8 +143,7 @@ internal sealed class ApplicationLauncher(
         var email = launchConfigurationWithCredentials.Credentials?.Username;
         var password = launchConfigurationWithCredentials.Credentials?.Password;
         var executable = launchConfigurationWithCredentials.ExecutablePath;
-        if (executable is not null &&
-            File.Exists(executable) is false)
+        if (executable is not null && !File.Exists(executable))
         {
             throw new ExecutableNotFoundException($"Guildwars executable doesn't exist at {executable}");
         }
@@ -179,19 +179,20 @@ internal sealed class ApplicationLauncher(
             throw new InvalidOperationException("Unable to determine executable directory for Steam support");
         }
 
+        var mods = this.modsManager.GetMods().Where(m => m.IsEnabled && m.IsInstalled).ToList();
+        var disabledmods = this.modsManager.GetMods().Where(m => !m.IsEnabled && m.IsInstalled).ToList();
         var args = new List<string>();
 
         args.AddRange(PopulateCommandLineArgs("-email", email) ?? []);
         args.AddRange(PopulateCommandLineArgs("-password", password) ?? []);
-        args.AddRange(PopulateCommandLineArgs("-character", "Daybreak") ?? []);
 
-        foreach (var arg in launchConfigurationWithCredentials.Arguments?.Split(" ") ?? [])
+        if (!mods.OfType<ToolboxService>().Any())
         {
-            args.Add(arg);
+            args.AddRange(PopulateCommandLineArgs("-character", "Daybreak") ?? []);
         }
 
-        var mods = this.modsManager.GetMods().Where(m => m.IsEnabled && m.IsInstalled).ToList();
-        var disabledmods = this.modsManager.GetMods().Where(m => !m.IsEnabled && m.IsInstalled).ToList();
+        args.AddRange(launchConfigurationWithCredentials.Arguments?.Split(" ") ?? []);
+
         foreach (var mod in mods)
         {
             args.AddRange(mod.GetCustomArguments());
@@ -509,7 +510,7 @@ internal sealed class ApplicationLauncher(
             LoadedModules = [.. this.GetLoadedModules(guildWarsApplicationLaunchContext)]
         };
 
-        var modsNeedReapply = await this.modsManager.GetMods().ToAsyncEnumerable()
+        return await this.modsManager.GetMods().ToAsyncEnumerable()
             .Where(async (m, ct) =>
             {
                 try
@@ -522,7 +523,6 @@ internal sealed class ApplicationLauncher(
                     return false;
                 }
             }).ToListAsync(cancellationToken);
-        return modsNeedReapply;
     }
 
     public async Task<bool> ReapplyMods(GuildWarsApplicationLaunchContext guildWarsApplicationLaunchContext, IEnumerable<IModService> mods, CancellationToken cancellationToken)
@@ -576,7 +576,7 @@ internal sealed class ApplicationLauncher(
             .Select(tuple => new GuildWarsApplicationLaunchContext
             {
                 GuildWarsProcess = tuple.Process,
-                LaunchConfiguration = tuple.AssociatedConfiguration!,
+                LaunchConfiguration = tuple.AssociatedConfiguration,
                 ProcessId = tuple.ProcessId
             });
     }
@@ -664,12 +664,10 @@ internal sealed class ApplicationLauncher(
 
     private static string GetWindowTitle(IntPtr hwnd)
     {
-        var titleLength = NativeMethods.GetWindowTextLength(hwnd);
+        var titleLength = GetWindowTextLength(hwnd);
         var titleBuffer = new StringBuilder(titleLength);
-        _ = NativeMethods.GetWindowText(hwnd, titleBuffer, titleLength + 1);
-        var title = titleBuffer.ToString();
-
-        return title;
+        _ = GetWindowText(hwnd, titleBuffer, titleLength + 1);
+        return titleBuffer.ToString();
     }
 
     private static bool EnumWindow(IntPtr handle, IntPtr pointer)
@@ -686,7 +684,7 @@ internal sealed class ApplicationLauncher(
 
     private static string[]? PopulateCommandLineArgs(string argName, string? argValue)
     {
-        if (argValue is null || argValue.IsNullOrWhiteSpace())
+        if (argValue?.IsNullOrWhiteSpace() != false)
         {
             return default;
         }

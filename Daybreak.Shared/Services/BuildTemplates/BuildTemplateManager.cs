@@ -31,7 +31,7 @@ public sealed class BuildTemplateManager(
             return false;
         }
 
-        if (template.Where(c => DecodingLookupTable.Contains(c) is false).Any())
+        if (template.Any(c => !DecodingLookupTable.Contains(c)))
         {
             return false;
         }
@@ -133,7 +133,7 @@ public sealed class BuildTemplateManager(
             throw new InvalidOperationException($"Cannot convert {nameof(TeamBuildEntry)} with {teamBuildEntry.Builds.Count} builds into a {nameof(SingleBuildEntry)}");
         }
 
-        var singleBuildEntry = teamBuildEntry.Builds.First();
+        var singleBuildEntry = teamBuildEntry.Builds[0];
         singleBuildEntry.Name = teamBuildEntry.Name;
         singleBuildEntry.PreviousName = teamBuildEntry.PreviousName;
         singleBuildEntry.SourceUrl = teamBuildEntry.SourceUrl;
@@ -144,16 +144,14 @@ public sealed class BuildTemplateManager(
 
     public TeamBuildEntry ConvertToTeamBuildEntry(SingleBuildEntry singleBuildEntry)
     {
-        var teamBuildEntry = new TeamBuildEntry
+        return new TeamBuildEntry
         {
             Name = singleBuildEntry.Name,
             PreviousName = singleBuildEntry.PreviousName,
             SourceUrl = singleBuildEntry.SourceUrl,
-            Builds = [ singleBuildEntry ],
+            Builds = [singleBuildEntry],
             Metadata = singleBuildEntry.Metadata
         };
-
-        return teamBuildEntry;
     }
 
     public PartyLoadout ConvertToPartyLoadout(TeamBuildEntry teamBuildEntry)
@@ -271,7 +269,7 @@ public sealed class BuildTemplateManager(
         }
         else if (buildEntry is TeamBuildEntry teamBuild)
         {
-            foreach(var singleBuildEntry in teamBuild.Builds)
+            foreach (var singleBuildEntry in teamBuild.Builds)
             {
                 var build = new Build
                 {
@@ -286,7 +284,7 @@ public sealed class BuildTemplateManager(
         }
 
         var newPath = Path.Combine(BuildsPath, $"{buildEntry.Name}.txt");
-        if (string.IsNullOrWhiteSpace(buildEntry.PreviousName) is false)
+        if (!string.IsNullOrWhiteSpace(buildEntry.PreviousName))
         {
             var oldPath = Path.GetFullPath(Path.Combine(BuildsPath, $"{buildEntry.PreviousName}.txt"));
             if (File.Exists(oldPath))
@@ -328,12 +326,7 @@ public sealed class BuildTemplateManager(
         if (result is null)
         {
             var maybeCachedBuild = this.BuildMemoryCache.FirstOrDefault(b => b.Name == name);
-            if (maybeCachedBuild is not null)
-            {
-                return maybeCachedBuild;
-            }
-
-            return default;
+            return maybeCachedBuild ?? default;
         }
 
         return result;
@@ -341,7 +334,7 @@ public sealed class BuildTemplateManager(
 
     public void ClearBuilds()
     {
-        foreach(var file in Directory.GetFiles(BuildsPath, "*.txt", SearchOption.AllDirectories))
+        foreach (var file in Directory.GetFiles(BuildsPath, "*.txt", SearchOption.AllDirectories))
         {
             File.Delete(file);
         }
@@ -349,7 +342,7 @@ public sealed class BuildTemplateManager(
 
     public async IAsyncEnumerable<IBuildEntry> GetBuilds()
     {
-        if (Directory.Exists(BuildsPath) is false)
+        if (!Directory.Exists(BuildsPath))
         {
             yield break;
         }
@@ -452,7 +445,7 @@ public sealed class BuildTemplateManager(
         else if (build is TeamBuildEntry teamBuildEntry)
         {
             var encodedString = new StringBuilder();
-            foreach(var teamBuild in teamBuildEntry.Builds)
+            foreach (var teamBuild in teamBuildEntry.Builds)
             {
                 var preparedBuild = new Build
                 {
@@ -485,7 +478,7 @@ public sealed class BuildTemplateManager(
             {
                 Type = entry.HeroId is 0 ? PartyCompositionMemberType.MainPlayer : PartyCompositionMemberType.Hero,
                 Index = entry.HeroId is 0 ? 0 : teamBuildEntry.Builds.Count,
-                Behavior = entry.HeroId is 0 ? default : (HeroBehavior)entry.HeroBehavior,
+                Behavior = entry.HeroId is 0 ? default : entry.HeroBehavior,
                 HeroId = entry.HeroId is 0 ? default : entry.HeroId
             };
 
@@ -524,13 +517,13 @@ public sealed class BuildTemplateManager(
         singleBuildEntry.Secondary = secondary;
         singleBuildEntry.Attributes = [.. buildEntry.Attributes.Select(a =>
         {
-            if (!Daybreak.Shared.Models.Guildwars.Attribute.TryParse((int)a.Id, out var attr))
+            if (!Shared.Models.Guildwars.Attribute.TryParse((int)a.Id, out var attr))
             {
                 scopedLogger.LogError("Failed to parse attribute with id {attributeId}", a.Id);
                 throw new InvalidOperationException($"Failed to parse attribute with id {a.Id}");
             }
 
-            return new Daybreak.Shared.Models.Builds.AttributeEntry
+            return new AttributeEntry
             {
                 Attribute = attr,
                 Points = (int)a.BasePoints
@@ -553,7 +546,7 @@ public sealed class BuildTemplateManager(
     private async Task<IBuildEntry?> LoadBuildFromFile(string path, string buildName)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        if (File.Exists(path) is false)
+        if (!File.Exists(path))
         {
             scopedLogger.LogError("Unable to find build file by name {buildName}", buildName);
             return default;
@@ -566,7 +559,7 @@ public sealed class BuildTemplateManager(
             return default;
         }
 
-        if (this.TryDecodeTemplate(content.First(), out var build) is false)
+        if (!this.TryDecodeTemplate(content.First(), out var build))
         {
             scopedLogger.LogError("Unable to parse build file {buildName}", buildName);
             return default;
@@ -590,7 +583,7 @@ public sealed class BuildTemplateManager(
                             Encoding.UTF8.GetString(
                                 Convert.FromBase64String(content[1])));
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     scopedLogger.LogError(ex, "Failed to parse build metadata {buildName}", buildName);
                     return default;
@@ -615,7 +608,7 @@ public sealed class BuildTemplateManager(
         }
 
         var builds = new Build[buildTemplates.Length];
-        for(var i = 0; i < builds.Length; i++)
+        for (var i = 0; i < builds.Length; i++)
         {
             var result = this.DecodeTemplateInner(buildTemplates[i]);
             if (result is null)
@@ -647,14 +640,14 @@ public sealed class BuildTemplateManager(
             Skills = []
         };
 
-        if (Profession.TryParse(buildMetadata.PrimaryProfessionId, out var primaryProfession) is false)
+        if (!Profession.TryParse(buildMetadata.PrimaryProfessionId, out var primaryProfession))
         {
             scopedLogger.LogError("Failed to parse profession with id {buildMetadata.PrimaryProfessionId}", buildMetadata.PrimaryProfessionId);
             return default;
         }
 
         build.Primary = primaryProfession;
-        if (Profession.TryParse(buildMetadata.SecondaryProfessionId, out var secondaryProfession) is false)
+        if (!Profession.TryParse(buildMetadata.SecondaryProfessionId, out var secondaryProfession))
         {
             scopedLogger.LogError("Failed to parse profession with id {buildMetadata.SecondaryProfessionId}", buildMetadata.SecondaryProfessionId);
             return default;
@@ -670,13 +663,13 @@ public sealed class BuildTemplateManager(
             build.Attributes.Add(new AttributeEntry { Attribute = primaryProfession.PrimaryAttribute });
             build.Attributes.AddRange(primaryProfession.Attributes!.Select(a => new AttributeEntry { Attribute = a }));
         }
-        
+
         if (secondaryProfession != Profession.None)
         {
             build.Attributes.AddRange(secondaryProfession.Attributes!.Select(a => new AttributeEntry { Attribute = a }));
         }
 
-        for(int i = 0; i < buildMetadata.AttributeCount; i++)
+        for (int i = 0; i < buildMetadata.AttributeCount; i++)
         {
             var attributeId = buildMetadata.AttributesIds[i];
             var maybeAttribute = build.Attributes.FirstOrDefault(a => a.Attribute!.Id == attributeId);
@@ -689,9 +682,9 @@ public sealed class BuildTemplateManager(
             maybeAttribute!.Points = buildMetadata.AttributePoints[i];
         }
 
-        for(int i = 0; i < 8; i++)
+        for (int i = 0; i < 8; i++)
         {
-            if (Skill.TryParse(buildMetadata.SkillIds[i], out var skill) is false)
+            if (!Skill.TryParse(buildMetadata.SkillIds[i], out var skill))
             {
                 scopedLogger.LogError("Failed to parse skill with id {skillId}", buildMetadata.SkillIds[i]);
                 return default;
@@ -715,7 +708,7 @@ public sealed class BuildTemplateManager(
             Header = 14,
             PrimaryProfessionId = build.Primary.Id,
             SecondaryProfessionId = build.Secondary.Id,
-            AttributeCount = build.Attributes.Where(attrEntry => attrEntry.Points > 0).Count(),
+            AttributeCount = build.Attributes.Count(attrEntry => attrEntry.Points > 0),
             AttributesIds = [.. build.Attributes.Where(attrEntry => attrEntry.Points > 0).OrderBy(attrEntry => attrEntry.Attribute!.Id).Select(attrEntry => attrEntry.Attribute!.Id)],
             AttributePoints = [.. build.Attributes.Where(attrEntry => attrEntry.Points > 0).OrderBy(attrEntry => attrEntry.Attribute!.Id).Select(attrEntry => attrEntry.Points)],
             SkillIds = [.. build.Skills.Select(skill => skill.Id)],
@@ -733,20 +726,19 @@ public sealed class BuildTemplateManager(
             index += 6;
         }
 
-        var template = new string([.. encodedBase64.Select(b => DecodingLookupTable[b])]);
-        return template;
+        return new string([.. encodedBase64.Select(b => DecodingLookupTable[b])]);
     }
 
     private static string ToBitString(int value)
     {
         var sb = new StringBuilder();
-        while(value > 0)
+        while (value > 0)
         {
             sb.Append(value % 2 == 1 ? 1 : 0);
             value /= 2;
         }
 
-        while(sb.Length < 6)
+        while (sb.Length < 6)
         {
             sb.Append(0);
         }
@@ -800,31 +792,31 @@ public sealed class BuildTemplateManager(
         }
 
         return buildMetadata;
-    } 
+    }
 
     private static string BuildEncodedString(BuildMetadata buildMetadata)
     {
         var stream = new EncodeCharStream();
-        if(buildMetadata.NewTemplate || buildMetadata.Header == 14)
+        if (buildMetadata.NewTemplate || buildMetadata.Header == 14)
         {
             stream.Write(14, 4);
         }
 
         stream.Write(0, 4);
-        
+
         var desiredProfessionIdLength = GetBitLength(new List<int> { buildMetadata.PrimaryProfessionId, buildMetadata.SecondaryProfessionId }.Max());
         var professionIdLength = Math.Max((desiredProfessionIdLength - 4) / 2, 0);
         var finalProfessionIdLength = (professionIdLength * 2) + 4;
         stream.Write(professionIdLength, 2);
         stream.Write(buildMetadata.PrimaryProfessionId, finalProfessionIdLength);
         stream.Write(buildMetadata.SecondaryProfessionId, finalProfessionIdLength);
-        
+
         stream.Write(buildMetadata.AttributeCount, 4);
         var desiredAttributesLength = GetBitLength(buildMetadata.AttributesIds.Count != 0 ? buildMetadata.AttributesIds.Max() : 0);
         var attributesLength = Math.Max(desiredAttributesLength - 4, 0);
         var finalAttributesLength = attributesLength + 4;
         stream.Write(attributesLength, 4);
-        for(int i = 0; i < buildMetadata.AttributeCount; i++)
+        for (int i = 0; i < buildMetadata.AttributeCount; i++)
         {
             stream.Write(buildMetadata.AttributesIds[i], finalAttributesLength);
             stream.Write(buildMetadata.AttributePoints[i], 4);
@@ -834,7 +826,7 @@ public sealed class BuildTemplateManager(
         var skillsLength = Math.Max(desiredSkillsLength - 8, 0);
         var finalSkillsLength = skillsLength + 8;
         stream.Write(skillsLength, 4);
-        for(int i = 0; i < 8; i++)
+        for (int i = 0; i < 8; i++)
         {
             stream.Write(buildMetadata.SkillIds[i], finalSkillsLength);
         }
