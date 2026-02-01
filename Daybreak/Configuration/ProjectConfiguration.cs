@@ -352,7 +352,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         notificationHandlerProducer.RegisterNotificationHandler<TradeMessageNotificationHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<UpdateNotificationHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<NavigateToCalendarViewHandler>();
-        notificationHandlerProducer.RegisterNotificationHandler<GuildWarsUpdateNotificationHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<GuildWarsBatchUpdateNotificationHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<ToolboxUpdateHandler>();
     }
