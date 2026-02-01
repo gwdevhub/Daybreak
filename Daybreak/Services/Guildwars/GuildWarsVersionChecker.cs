@@ -120,10 +120,9 @@ internal sealed class GuildWarsVersionChecker(
         notificationToken.Cancel();
         scopedLogger.LogInformation("Found out of date executable. Prompting user to update");
         guildWarsStartingContext.CancelStartup = true;
-        this.notificationService.NotifyError<GuildWarsUpdateNotificationHandler>(
+        this.notificationService.NotifyError<GuildWarsBatchUpdateNotificationHandler>(
             title: "Guild Wars needs an update",
             description: $"Click here to update the executable located at {guildWarsStartingContext.ApplicationLauncherContext.ExecutablePath}",
-            metaData: guildWarsStartingContext.ApplicationLauncherContext.ExecutablePath,
             expirationTime: DateTime.Now + TimeSpan.FromSeconds(15));
     }
 
