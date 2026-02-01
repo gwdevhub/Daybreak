@@ -399,36 +399,44 @@ public sealed class BuildTemplateManager(
 
     public bool TryDecodeTemplate(string template, [NotNullWhen(true)] out IBuildEntry? build)
     {
-        var maybeBuilds = this.DecodeTemplatesInner(template);
-        if (maybeBuilds is not null)
+        try
         {
-            var randomName = Guid.NewGuid().ToString();
-            build = maybeBuilds.Length == 1 ?
-                new SingleBuildEntry
-                {
-                    Name = randomName,
-                    PreviousName = randomName,
-                    Primary = maybeBuilds[0].Primary,
-                    Secondary = maybeBuilds[0].Secondary,
-                    Attributes = maybeBuilds[0].Attributes,
-                    Skills = maybeBuilds[0].Skills
-                } :
-                new TeamBuildEntry
-                {
-                    Name = randomName,
-                    PreviousName = randomName,
-                    Builds = maybeBuilds.Select(b => new SingleBuildEntry
+            var maybeBuilds = this.DecodeTemplatesInner(template);
+            if (maybeBuilds is not null)
+            {
+                var randomName = Guid.NewGuid().ToString();
+                build = maybeBuilds.Length == 1 ?
+                    new SingleBuildEntry
                     {
                         Name = randomName,
                         PreviousName = randomName,
-                        Primary = b.Primary,
-                        Secondary = b.Secondary,
-                        Attributes = b.Attributes,
-                        Skills = b.Skills
-                    }).ToList()
-                };
+                        Primary = maybeBuilds[0].Primary,
+                        Secondary = maybeBuilds[0].Secondary,
+                        Attributes = maybeBuilds[0].Attributes,
+                        Skills = maybeBuilds[0].Skills
+                    } :
+                    new TeamBuildEntry
+                    {
+                        Name = randomName,
+                        PreviousName = randomName,
+                        Builds = maybeBuilds.Select(b => new SingleBuildEntry
+                        {
+                            Name = randomName,
+                            PreviousName = randomName,
+                            Primary = b.Primary,
+                            Secondary = b.Secondary,
+                            Attributes = b.Attributes,
+                            Skills = b.Skills
+                        }).ToList()
+                    };
 
-            return true;
+                return true;
+            }
+        }
+        catch (Exception e)
+        {
+            var scopedLogger = this.logger.CreateScopedLogger();
+            scopedLogger.LogError(e, "Failed to decode build template");
         }
 
         build = default;
