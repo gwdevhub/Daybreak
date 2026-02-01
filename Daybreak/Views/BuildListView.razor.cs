@@ -7,7 +7,6 @@ using Daybreak.Shared.Services.Toolbox;
 using Daybreak.Shared.Utils;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
-using System.Core.Extensions;
 using System.Drawing;
 using System.Extensions;
 using TrailBlazr.Services;
