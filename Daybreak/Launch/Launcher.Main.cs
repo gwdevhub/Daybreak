@@ -1,9 +1,9 @@
-﻿using Daybreak.Shared.Services.Screens;
+﻿using System.Extensions.Core;
+using Daybreak.Shared.Services.Screens;
 using Daybreak.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Photino.Blazor;
-using System.Extensions.Core;
 
 namespace Daybreak.Launch;
 
@@ -57,7 +57,9 @@ public partial class Launcher
 
     private static void SetWindowPosition(PhotinoBlazorApp app)
     {
-        var scopedLogger = app.Services.GetRequiredService<ILogger<Launcher>>().CreateScopedLogger();
+        var scopedLogger = app
+            .Services.GetRequiredService<ILogger<Launcher>>()
+            .CreateScopedLogger();
         var screenManager = app.Services.GetRequiredService<IScreenManager>();
         var savedPosition = screenManager.GetSavedPosition();
 
@@ -67,7 +69,9 @@ public partial class Launcher
             var firstScreen = screenManager.Screens.FirstOrDefault();
             if (firstScreen.Size.IsEmpty)
             {
-                scopedLogger.LogWarning("No valid screen found to center the window. Window will spawn with minimal size");
+                scopedLogger.LogWarning(
+                    "No valid screen found to center the window. Window will spawn with minimal size"
+                );
                 return;
             }
 
