@@ -56,7 +56,7 @@ public partial class Launcher
 
         builder.Services.AddSingleton<IReadOnlyDictionary<string, MenuCategory>>(menuEntryProducer.categories.AsReadOnly());
         var mainApp = CreateMainApp(builder);
-        foreach(var (pluginName, configuration, plugin) in configurations)
+        foreach (var (pluginName, configuration, plugin) in configurations)
         {
             if (configuration is null)
             {
@@ -115,7 +115,7 @@ public partial class Launcher
         {
             configuration.RegisterServices(builder.Services);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             scopedLogger.LogError(ex, "An error occurred while registering services");
         }
@@ -141,7 +141,7 @@ public partial class Launcher
             var viewProducer = new TrailBlazrViewProducer(builder.Services, bootstrap.GetRequiredService<ILogger<TrailBlazrViewProducer>>());
             configuration.RegisterViews(viewProducer);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             scopedLogger.LogError(ex, "An error occurred while registering views");
         }
@@ -154,7 +154,7 @@ public partial class Launcher
             var modsProducer = new ModsProducer(builder.Services, bootstrap.GetRequiredService<ILogger<ModsProducer>>());
             configuration.RegisterMods(modsProducer);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             scopedLogger.LogError(ex, "An error occurred while registering mods");
         }
@@ -206,7 +206,7 @@ public partial class Launcher
             var argumentHandlerProducer = new ArgumentHandlerProducer(builder.Services, bootstrap.GetRequiredService<ILogger<ArgumentHandlerProducer>>());
             configuration.RegisterLaunchArgumentHandlers(argumentHandlerProducer);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             scopedLogger.LogError(ex, "An error occurred while registering argument handlers");
         }
@@ -219,7 +219,7 @@ public partial class Launcher
             var themeProducer = new ThemeProducer(bootstrap.GetRequiredService<ILogger<ThemeProducer>>());
             configuration.RegisterThemes(themeProducer);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             scopedLogger.LogError(ex, "An error occurred while registering themes");
         }
@@ -231,7 +231,7 @@ public partial class Launcher
         {
             configuration.RegisterMenuButtons(menuProducer);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             scopedLogger.LogError(ex, "An error occurred while registering menu entries");
         }
