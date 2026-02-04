@@ -92,7 +92,8 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
-    <Exec Command="echo.&gt;$(Version).version" />
+    <!-- Cross-platform: use Touch task instead of Windows-only echo.> -->
+    <Touch Files="$(Version).version" AlwaysCreate="true" />
   </Target>
 
   <!--
