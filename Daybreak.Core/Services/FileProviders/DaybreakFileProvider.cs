@@ -10,7 +10,9 @@ internal sealed class DaybreakFileProvider
     : IFileProvider
 {
     private static readonly string WwwrootPath = PathUtils.GetAbsolutePathFromRoot("wwwroot");
-    private readonly Dictionary<string, FileProviderAssembly> manifestMapping = [];
+    // Use case-insensitive dictionary for cross-platform compatibility (Linux is case-sensitive)
+    private readonly Dictionary<string, (string OriginalKey, FileProviderAssembly Provider)> manifestMapping = 
+        new(StringComparer.OrdinalIgnoreCase);
     private readonly IEnumerable<FileProviderAssembly> fileProviderAssemblies;
     private readonly ILogger<DaybreakFileProvider> logger;
 
@@ -26,13 +28,13 @@ internal sealed class DaybreakFileProvider
             var manifestNames = provider.Assembly.GetManifestResourceNames();
             foreach(var name in manifestNames)
             {
-                // Store both forward and backslash versions for cross-platform compatibility
-                this.manifestMapping[name] = provider;
-                // Normalize to forward slashes as well
+                // Store with original key preserved for resource loading
+                this.manifestMapping[name] = (name, provider);
+                // Also store normalized forward-slash version
                 var normalizedName = name.Replace("\\", "/");
-                if (normalizedName != name)
+                if (normalizedName != name && !this.manifestMapping.ContainsKey(normalizedName))
                 {
-                    this.manifestMapping[normalizedName] = provider;
+                    this.manifestMapping[normalizedName] = (name, provider);
                 }
             }
         }
@@ -52,20 +54,19 @@ internal sealed class DaybreakFileProvider
     public IFileInfo GetFileInfo(string subpath)
     {
         // Normalize to forward slashes for cross-platform lookup
-        var normalizedKey = subpath.Replace("\\", "/");
+        var normalizedKey = subpath.Replace("\\", "/").TrimStart('/');
         // Also try with backslashes for Windows-built embedded resources
-        var windowsKey = subpath.Replace("/", "\\");
+        var windowsKey = subpath.Replace("/", "\\").TrimStart('\\');
         
-        // Try normalized key first, then Windows key
-        if (this.manifestMapping.TryGetValue(normalizedKey, out var provider) ||
-            this.manifestMapping.TryGetValue(windowsKey, out provider))
+        // Try normalized key first, then Windows key (case-insensitive due to dictionary comparer)
+        if (this.manifestMapping.TryGetValue(normalizedKey, out var match) ||
+            this.manifestMapping.TryGetValue(windowsKey, out match))
         {
             var name = Path.GetFileName(subpath);
-            // Use the key format that matched
-            var resourceKey = this.manifestMapping.ContainsKey(normalizedKey) ? normalizedKey : windowsKey;
+            // Use the original key that was registered (preserves case for resource loading)
             return new Microsoft.Extensions.FileProviders.Embedded.EmbeddedResourceFileInfo(
-                provider.Assembly,
-                resourceKey,
+                match.Provider.Assembly,
+                match.OriginalKey,
                 name,
                 DateTime.UtcNow);
         }
