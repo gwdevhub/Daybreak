@@ -1,5 +1,7 @@
 ﻿using System.Collections.Concurrent;
+#if WINDOWS
 using System.Drawing;
+#endif
 using System.Extensions.Core;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.ColorPalette;
@@ -17,7 +19,9 @@ public sealed class ScreenshotService(
     private const string ScreensFolder = "Screens";
 
     private static readonly string ScreenshotsDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), GuildWarsFolder, ScreensFolder, "");
+#if WINDOWS
     private static readonly ColorThiefDotNet.ColorThief ColorThief = new();
+#endif
     private static readonly ConcurrentDictionary<string, ScreenshotEntry> EntryCache = [];
 
     private readonly ILogger<ScreenshotService> logger = logger;
@@ -58,6 +62,7 @@ public sealed class ScreenshotService(
             return cachedEntry;
         }
 
+#if WINDOWS
         try
         {
             using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
@@ -74,8 +79,15 @@ public sealed class ScreenshotService(
             scopedLogger.LogError(e, "Failed to get screenshot entry from path {path}", path);
             return default;
         }
+#else
+        // On non-Windows platforms, return a default entry without color extraction
+        var entry = new ScreenshotEntry(path, AccentColor.Accents[0], LightDarkMode.Dark);
+        EntryCache[path] = entry;
+        return entry;
+#endif
     }
 
+#if WINDOWS
     private static AccentColor GetClosestAccentColor(Color color)
     {
         var closest = AccentColor.Accents[0];
@@ -111,4 +123,5 @@ public sealed class ScreenshotService(
 
         return bitmapImage;
     }
+#endif
 }

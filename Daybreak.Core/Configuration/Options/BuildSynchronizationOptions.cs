@@ -6,7 +6,7 @@ namespace Daybreak.Configuration.Options;
 [OptionsName(Name = "Synchronization")]
 [OptionsIgnore]
 [OptionsSynchronizationIgnore]
-internal sealed class SynchronizationOptions
+public sealed class SynchronizationOptions
 {
     [JsonPropertyName(nameof(ProtectedGraphAccessToken))]
     public string? ProtectedGraphAccessToken { get; set; }

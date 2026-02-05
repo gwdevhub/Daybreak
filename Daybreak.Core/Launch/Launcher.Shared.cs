@@ -8,7 +8,9 @@ using Photino.Blazor;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
+#if WINDOWS
 using System.Drawing;
+#endif
 using System.Extensions.Core;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -23,7 +25,9 @@ public partial class Launcher
 
     private static nint OriginalWndProc;
     private static NativeMethods.WndProcDelegate? WndProcDelegate;
-    private static Icon? WindowIcon; 
+#if WINDOWS
+    private static Icon? WindowIcon;
+#endif
 
     public static void SetupLogging(IServiceCollection services)
     {
@@ -137,6 +141,7 @@ public partial class Launcher
             0x0001 | 0x0002 | 0x0004 | 0x0020); // SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED
     }
 
+#if WINDOWS
     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
     private static void SetupWindowIcon(PhotinoBlazorApp app)
     {
@@ -180,6 +185,7 @@ public partial class Launcher
             scopedLogger.LogError(ex, "Failed to set window icon.");
         }
     }
+#endif
 
     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
     private static nint WndProc(nint hwnd, uint msg, nint wParam, nint lParam)

@@ -1,7 +1,7 @@
-﻿using Microsoft.Identity.Client;
+using Microsoft.Identity.Client;
 using System.Security;
 
-namespace Daybreak.Services.Graph;
+namespace Daybreak.Windows.Services.Graph;
 
 internal sealed class DummyPublicClientApplication : IPublicClientApplication
 {

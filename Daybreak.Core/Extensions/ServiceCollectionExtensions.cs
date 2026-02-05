@@ -7,9 +7,9 @@ using System.Extensions;
 
 namespace Daybreak.Extensions;
 
-internal static class ServiceCollectionExtensions
+public static class ServiceCollectionExtensions
 {
-    internal static IServiceCollection AddDaybreakOptions<TOptions>(this IServiceCollection services)
+    public static IServiceCollection AddDaybreakOptions<TOptions>(this IServiceCollection services)
         where TOptions : class, new()
     {
         services.AddSingleton(new OptionEntry(typeof(TOptions)));
@@ -41,7 +41,7 @@ internal static class ServiceCollectionExtensions
         return services;
     }
 
-    internal static IServiceCollection AddHostedSingleton<TInterface, TImplementation>(this IServiceCollection services)
+    public static IServiceCollection AddHostedSingleton<TInterface, TImplementation>(this IServiceCollection services)
         where TImplementation : class, TInterface, IHostedService
         where TInterface : class
     {
@@ -50,7 +50,7 @@ internal static class ServiceCollectionExtensions
         return services;
     }
 
-    internal static IServiceCollection AddHostedSingleton<TImplementation>(this IServiceCollection services)
+    public static IServiceCollection AddHostedSingleton<TImplementation>(this IServiceCollection services)
         where TImplementation : class, IHostedService
     {
         services.AddSingleton<TImplementation>();

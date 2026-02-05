@@ -16,7 +16,6 @@ using Daybreak.Services.ExceptionHandling;
 using Daybreak.Services.ExecutableManagement;
 using Daybreak.Services.Experience;
 using Daybreak.Services.FileProviders;
-using Daybreak.Services.Graph;
 using Daybreak.Services.Graph.Models;
 using Daybreak.Services.Guildwars;
 using Daybreak.Services.GuildWars;
@@ -39,7 +38,7 @@ using Daybreak.Services.Registry;
 using Daybreak.Services.ReShade;
 using Daybreak.Services.Screens;
 using Daybreak.Services.Screenshots;
-using Daybreak.Services.Shortcuts;
+
 using Daybreak.Services.Startup;
 using Daybreak.Services.Startup.Actions;
 using Daybreak.Services.Telemetry;
@@ -102,8 +101,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.FluentUI.AspNetCore.Components;
-using Microsoft.Identity.Client;
-using Microsoft.Identity.Client.Desktop;
+
 using OpenTelemetry.Resources;
 using TrailBlazr.Extensions;
 using TrailBlazr.Services;
@@ -130,44 +128,6 @@ public class ProjectConfiguration : PluginConfigurationBase
             .Build();
         services.RegisterClientWebSocket<TradeChatService<AscalonTradeChatOptions>>()
             .Build();
-        services.AddSingleton(sp =>
-        {
-            var logger = sp.GetRequiredService<ILogger<PublicClientApplication>>();
-            try
-            {
-                return PublicClientApplicationBuilder.Create(SecretManager.GetSecret(SecretKeys.AadApplicationId))
-                    .WithLogging((logLevel, message, containsPii) =>
-                    {
-                        if (containsPii && logLevel > Microsoft.Identity.Client.LogLevel.Info)
-                        {
-                            // Redact logs that contain PII which user can enable to send to the telemetry server
-                            message = "[REDACTED]";
-                        }
-
-                        var equivalentLogLevel = logLevel switch
-                        {
-                            Microsoft.Identity.Client.LogLevel.Error => LogLevel.Error,
-                            Microsoft.Identity.Client.LogLevel.Warning => LogLevel.Warning,
-                            Microsoft.Identity.Client.LogLevel.Info => LogLevel.Information,
-                            Microsoft.Identity.Client.LogLevel.Verbose => LogLevel.Debug,
-                            _ => LogLevel.None
-                        };
-
-                        logger.Log(equivalentLogLevel, message);
-                    }, enablePiiLogging: true, enableDefaultPlatformLogging: true)
-                    .WithCacheOptions(new CacheOptions { UseSharedCache = true })
-                    .WithRedirectUri(BlazorGraphClient.RedirectUri)
-                    .WithWindowsEmbeddedBrowserSupport()
-                    .WithHttpClientFactory(
-                        new DaybreakMsalHttpClientProvider(new HttpClient(SetupLoggingAndMetrics<PublicClientApplication>(sp))))
-                    .Build();
-            }
-            catch (Exception e)
-            {
-                logger.LogError(e, "Failed to create PublicClientApplication, using dummy implementation");
-                return new DummyPublicClientApplication();
-            }
-        });
 
         services.AddSingleton(_ =>
         {
@@ -230,7 +190,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IApplicationArgumentService, ApplicationArgumentService>();
         services.AddScoped<IWikiService, WikiService>();
         services.AddScoped<IPrivilegeManager, PrivilegeManager>();
-        services.AddScoped<IGraphClient, BlazorGraphClient>();
         services.AddScoped<IScreenshotService, ScreenshotService>();
 
         services.AddHostedSingleton<IApplicationUpdater, ApplicationUpdater>();
@@ -241,14 +200,11 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddHostedSingleton<ITradeAlertingService, TradeAlertingService>();
         services.AddHostedSingleton<IGuildWarsExecutableManager, GuildWarsExecutableManager>();
         services.AddHostedSingleton<IEventNotifierService, EventNotifierService>();
-        services.AddHostedSingleton<IShortcutManager, ShortcutManager>();
         services.AddHostedSingleton<IMDomainRegistrar, MDomainRegistrar>();
         services.AddHostedSingleton<GameScreenshotsTheme>();
         services.AddHostedService<StartupActionManager>();
         services.AddHostedService<ProcessorUsageMonitor>();
-        services.AddHostedService<MemoryUsageMonitor>();
         services.AddHostedService<TelemetryHost>();
-        services.AddHostedService<DiskUsageMonitor>();
     }
 
     public override void RegisterViews(IViewProducer viewProducer)
@@ -468,10 +424,6 @@ public class ProjectConfiguration : PluginConfigurationBase
                 .Build()
             .RegisterHttpClient<WikiService>()
                 .WithMessageHandler(SetupLoggingAndMetrics<WikiService>)
-                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
-                .Build()
-            .RegisterHttpClient<BlazorGraphClient>()
-                .WithMessageHandler(SetupLoggingAndMetrics<BlazorGraphClient>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build();
     }

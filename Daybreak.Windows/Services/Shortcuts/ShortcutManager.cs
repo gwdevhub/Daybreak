@@ -1,4 +1,4 @@
-﻿using Daybreak.Configuration.Options;
+using Daybreak.Configuration.Options;
 using Daybreak.Shared.Services.Shortcuts;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -6,7 +6,7 @@ using ShellLink;
 using System.Diagnostics;
 using System.Extensions;
 
-namespace Daybreak.Services.Shortcuts;
+namespace Daybreak.Windows.Services.Shortcuts;
 
 internal sealed class ShortcutManager : IShortcutManager, IHostedService
 {

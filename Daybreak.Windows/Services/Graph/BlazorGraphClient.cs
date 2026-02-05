@@ -1,4 +1,5 @@
-﻿using Daybreak.Configuration.Options;
+using Daybreak.Configuration.Options;
+using Daybreak.Services.Graph;
 using Daybreak.Services.Graph.Models;
 using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Services.BuildTemplates;
@@ -13,7 +14,7 @@ using System.Extensions.Core;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
-namespace Daybreak.Services.Graph;
+namespace Daybreak.Windows.Services.Graph;
 
 internal sealed class BlazorGraphClient : IGraphClient
 {

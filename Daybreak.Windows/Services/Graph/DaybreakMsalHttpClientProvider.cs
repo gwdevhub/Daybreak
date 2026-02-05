@@ -1,6 +1,7 @@
-﻿using Microsoft.Identity.Client;
+using Microsoft.Identity.Client;
 
-namespace Daybreak.Services.Graph;
+namespace Daybreak.Windows.Services.Graph;
+
 internal sealed class DaybreakMsalHttpClientProvider(HttpClient httpClient)
     : IMsalHttpClientFactory
 {

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.Metrics;
+using System.Diagnostics.Metrics;
 using System.Diagnostics;
 using System.Core.Extensions;
 using System.Extensions;
@@ -6,7 +6,7 @@ using Daybreak.Shared.Services.Metrics;
 using Daybreak.Shared.Models.Metrics;
 using Microsoft.Extensions.Hosting;
 
-namespace Daybreak.Services.Monitoring;
+namespace Daybreak.Windows.Services.Monitoring;
 
 internal sealed class MemoryUsageMonitor(
     IMetricsService metricsService) : IHostedService
