@@ -26,14 +26,21 @@ internal sealed class DaybreakFileProvider
             var manifestNames = provider.Assembly.GetManifestResourceNames();
             foreach(var name in manifestNames)
             {
+                // Store both forward and backslash versions for cross-platform compatibility
                 this.manifestMapping[name] = provider;
+                // Normalize to forward slashes as well
+                var normalizedName = name.Replace("\\", "/");
+                if (normalizedName != name)
+                {
+                    this.manifestMapping[normalizedName] = provider;
+                }
             }
         }
     }
 
     public IDirectoryContents GetDirectoryContents(string subpath)
     {
-        var path = Path.Combine(WwwrootPath, subpath);
+        var path = Path.Combine(WwwrootPath, subpath.TrimStart('/'));
         if (Directory.Exists(path))
         {
             return new Microsoft.Extensions.FileProviders.Physical.PhysicalDirectoryInfo(new DirectoryInfo(path));
@@ -44,18 +51,26 @@ internal sealed class DaybreakFileProvider
 
     public IFileInfo GetFileInfo(string subpath)
     {
-        var key = subpath.Replace("/", "\\");
-        if (this.manifestMapping.TryGetValue(key, out var provider))
+        // Normalize to forward slashes for cross-platform lookup
+        var normalizedKey = subpath.Replace("\\", "/");
+        // Also try with backslashes for Windows-built embedded resources
+        var windowsKey = subpath.Replace("/", "\\");
+        
+        // Try normalized key first, then Windows key
+        if (this.manifestMapping.TryGetValue(normalizedKey, out var provider) ||
+            this.manifestMapping.TryGetValue(windowsKey, out provider))
         {
             var name = Path.GetFileName(subpath);
+            // Use the key format that matched
+            var resourceKey = this.manifestMapping.ContainsKey(normalizedKey) ? normalizedKey : windowsKey;
             return new Microsoft.Extensions.FileProviders.Embedded.EmbeddedResourceFileInfo(
                 provider.Assembly,
-                key,
+                resourceKey,
                 name,
                 DateTime.UtcNow);
         }
 
-        var path = Path.Combine(WwwrootPath, subpath);
+        var path = Path.Combine(WwwrootPath, subpath.TrimStart('/'));
         if (File.Exists(path))
         {
             return new Microsoft.Extensions.FileProviders.Physical.PhysicalFileInfo(new FileInfo(path));

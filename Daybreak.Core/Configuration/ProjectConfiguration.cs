@@ -21,7 +21,6 @@ using Daybreak.Services.Guildwars;
 using Daybreak.Services.GuildWars;
 using Daybreak.Services.Injection;
 using Daybreak.Services.InternetChecker;
-using Daybreak.Services.Keyboard;
 using Daybreak.Services.LaunchConfigurations;
 using Daybreak.Services.Logging;
 using Daybreak.Services.MDns;
@@ -193,7 +192,6 @@ public class ProjectConfiguration : PluginConfigurationBase
 
         services.AddHostedSingleton<IApplicationUpdater, ApplicationUpdater>();
         services.AddHostedSingleton<IThemeManager, BlazorThemeInteropService>();
-        services.AddHostedSingleton<IKeyboardHookService, KeyboardHookService>();
         services.AddHostedSingleton<IConnectivityStatus, ConnectivityStatus>();
         services.AddHostedSingleton<ITradeAlertingService, TradeAlertingService>();
         services.AddHostedSingleton<IGuildWarsExecutableManager, GuildWarsExecutableManager>();
