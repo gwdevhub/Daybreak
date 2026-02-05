@@ -1,0 +1,18 @@
+﻿<div class="stretch-container backdrop-panel">
+    <div class="trade-chat-container">
+        @if (this.ViewModel.TradeChatUrl is not null)
+        {
+            <iframe sandbox="allow-scripts allow-same-origin allow-forms allow-top-navigation-to-custom-protocols allow-clipboard-write allow-clipboard-read"
+                    style="height: 100%; width: 100%; margin: -2px;"
+                    src="@this.ViewModel.TradeChatUrl" />
+        }
+    </div>
+</div>
+
+@page "/trade-chat/{Source}"
+@using Daybreak.Services.TradeChat.Models
+@inherits ViewBase<TradeChatView, TradeChatViewModel>
+@code {
+    [Parameter]
+    public required string Source { get; init; }
+}

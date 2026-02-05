@@ -1,0 +1,25 @@
+﻿<div class="stretch-container backdrop-panel">
+    <div class="title-bar-header">
+        @(this.ViewModel.Mod?.Name ?? string.Empty)
+    </div>
+    <div class="content">
+        <div class="message">
+            Are you sure you want to install the mod "<strong>@this.ViewModel.Mod?.Name</strong>"?
+        </div>
+        <div class="button-group">
+            <FluentButton Appearance="Appearance.Accent" OnClick="this.ViewModel.Confirm">
+                Continue
+            </FluentButton>
+            <FluentButton Appearance="Appearance.Neutral" OnClick="this.ViewModel.Cancel">
+                Cancel
+            </FluentButton>
+        </div>
+    </div>
+</div>
+
+@page "/mod-installation-confirmation/{Name}"
+@inherits ViewBase<ModInstallationConfirmationView, ModInstallationConfirmationViewModel>
+@code {
+    [Parameter]
+    public required string Name { get; init; }
+}

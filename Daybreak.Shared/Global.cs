@@ -1,6 +1,8 @@
 ﻿using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Daybreak")]
+[assembly: InternalsVisibleTo("Daybreak.Core")]
+[assembly: InternalsVisibleTo("Daybreak.Windows")]
+[assembly: InternalsVisibleTo("Daybreak.Linux")]
 
 namespace Daybreak.Shared;
 

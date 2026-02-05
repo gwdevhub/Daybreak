@@ -1,0 +1,22 @@
+﻿<div class="stretch-container backdrop-panel">
+    <div class="content">
+        <Virtualize Items="@this.ViewModel.Versions"
+                    Context="version">
+            <div class="version-row">
+                <div class="version-row-center" @onclick="@(() => this.ViewModel.OpenVersionPage(version))">
+                    <span>@version.ToString()</span>
+                </div>
+                <div class="version-row-right">
+                    <FluentButton Appearance="Appearance.Stealth"
+                                  IconOnly="true"
+                                  OnClick="@(() => this.ViewModel.DownloadVersion(version))">
+                        <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowDownload())" />
+                    </FluentButton>
+                </div>
+            </div>
+        </Virtualize>
+    </div>
+</div>
+
+@page "/version-management"
+@inherits ViewBase<VersionManagementView, VersionManagementViewModel>

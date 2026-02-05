@@ -1,0 +1,28 @@
+﻿<div class="option-display-box">
+    <div class="option-content">
+        <div class="option-title">@this.Name</div>
+        <div class="option-description">@this.Description</div>
+    </div>
+    <div class="option-control">
+        <FluentTextField @bind-Value="this.Value" 
+                        @onchange="this.OnValueChanged"
+                        Placeholder="Enter text" />
+    </div>
+</div>
+
+@inherits OptionBase<string>
+@code {
+    protected override string ConvertValue(OptionInstance optionInstance, OptionProperty property)
+    {
+        var value = property.Getter(optionInstance) as string;
+        return value ?? string.Empty;
+    }
+
+    private void OnValueChanged(ChangeEventArgs e)
+    {
+        var newValue = e.Value?.ToString() ?? string.Empty;
+        this.Value = newValue;
+        this.Property.Setter(this.Instance, newValue);
+        this.NotifyValueChanged();
+    }
+}

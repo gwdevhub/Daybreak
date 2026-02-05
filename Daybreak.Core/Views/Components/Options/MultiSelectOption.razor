@@ -1,0 +1,51 @@
+﻿<div class="option-display-box">
+    <div class="option-content">
+        <div class="option-title">@this.Name</div>
+        <div class="option-description">@this.Description</div>
+    </div>
+    <div class="option-control">
+        <FluentSelect TOption="string" @bind-Value="this.SelectedValue" 
+                      @onchange="OnSelectionChanged">
+            @foreach (var option in this.PossibleValues)
+            {
+                <FluentOption TOption="string" Value="@option.ToString()">@option.ToString()</FluentOption>
+            }
+        </FluentSelect>
+    </div>
+</div>
+
+@inherits OptionBase<object>
+@code {
+    [Parameter]
+    public required List<object> PossibleValues { get; init; }
+
+    private string SelectedValue { get; set; } = string.Empty;
+
+    protected override object ConvertValue(OptionInstance optionInstance, OptionProperty property)
+    {
+        var value = property.Getter(optionInstance);
+        return value!;
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        var result = base.OnParametersSetAsync();
+        this.SelectedValue = this.Value?.ToString() ?? string.Empty;
+        return result;
+    }
+
+    private void OnSelectionChanged(ChangeEventArgs e)
+    {
+        var selectedString = e.Value?.ToString() ?? string.Empty;
+        this.SelectedValue = selectedString;
+
+        // Find the matching enum value
+        var selectedValue = this.PossibleValues.FirstOrDefault(v => v.ToString() == selectedString);
+        if (selectedValue is not null)
+        {
+            this.Value = selectedValue;
+            this.Property.Setter(this.Instance, selectedValue);
+            this.NotifyValueChanged();
+        }
+    }
+}

@@ -1,0 +1,271 @@
+﻿<div class="build-editor" @onclick="this.BackdropClicked">
+    <div class="build-editor-main">
+        <!-- Build Code and Name Section -->
+        <div class="build-info-section">
+            <div class="build-field">
+                <label for="build-code">Build Code:</label>
+                <input id="build-code" type="text" @bind="this.BuildTemplateCode" @oninput="this.BuildCodeChangedHandler" class="build-code-input" />
+            </div>
+            
+            <div class="build-field">
+                <label for="build-name">Build Name:</label>
+                <input id="build-name" type="text" @bind="this.BuildName" @oninput="this.BuildNameChangedHandler" class="build-name-input" />
+            </div>
+        </div>
+
+        <!-- Profession Selection Section -->
+        <div class="profession-section">
+            <div class="profession-selector">
+                <label for="primary-profession">Primary Profession:</label>
+                <select id="primary-profession" value="@this.PrimaryProfession" class="profession-select" @onchange="this.PrimaryProfessionChangedHandler">
+                    @foreach (var profession in Profession.Professions.Where(p => p != Profession.None))
+                    {
+                        <option value="@profession">@profession.Name (@profession.Alias)</option>
+                    }
+                </select>
+            </div>
+            
+            <div class="profession-selector">
+                <label for="secondary-profession">Secondary Profession:</label>
+                <select id="secondary-profession" value="@this.SecondaryProfession" class="profession-select" @onchange="this.SecondaryProfessionChangedHandler">
+                    <option value="@Profession.None">None</option>
+                    @foreach (var profession in Profession.Professions.Where(p => p != Profession.None && p != this.PrimaryProfession))
+                    {
+                        <option value="@profession">@profession.Name (@profession.Alias)</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <!-- Attributes Section -->
+        <div class="attributes-section">
+            <h4>Attributes</h4>
+            <div class="attributes-list">
+                @foreach (var attributeEntry in this.Attributes)
+                {
+                    <div class="attribute-entry">
+                        <span class="attribute-name">@attributeEntry.Attribute?.Name</span>
+                        <div class="attribute-controls">
+                            <button class="attribute-btn decrease" 
+                                    @onclick="() => this.OnAttributeDecreased(attributeEntry)"
+                                    @onclick:stopPropagation="true"
+                                    disabled="@(attributeEntry.Points <= 0)">
+                                -
+                            </button>
+                            <span class="attribute-points">@attributeEntry.Points</span>
+                            <button class="attribute-btn increase" 
+                                    @onclick="() => this.OnAttributeIncreased(attributeEntry)"
+                                    @onclick:stopPropagation="true"
+                                    disabled="@(attributeEntry.Points >= 12)">
+                                +
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Skills Section -->
+        <div class="skills-section">
+            <h4>Skills</h4>
+            <div class="skill-bar">
+                @for (int i = 0; i < 8 && i < this.Skills.Count; i++)
+                {
+                    var skillIndex = i;
+                    var skill = this.Skills[skillIndex];
+                    <div class="skill-slot @(skill != Skill.None ? "has-skill" : "empty-skill")" 
+                        @onclick="() => this.SkillSelected(skillIndex)"
+                        @onclick:stopPropagation="true"
+                        @onmouseenter="(e) => this.OnSkillHoverEnter(skill, e)"
+                        @onmouseleave="(e) => this.OnSkillHoverLeave(skill, e)">
+                        @if (skill != Skill.None)
+                        {
+                            <button class="skill-remove-btn"
+                                    @onclick="() => this.OnSkillChanged(skillIndex, Skill.None)"
+                                    @onclick:stopPropagation="true"
+                                    title="Remove skill">
+                                <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size12.Dismiss())" />
+                            </button>
+                            <div class="skill-icon">
+                                <SkillIcon Skill="skill" />
+                            </div>
+                            <div class="skill-name">@skill.Name</div>
+                        }
+                        else
+                        {
+                            <div class="skill-icon">
+                                <div class="skill-icon-placeholder empty">?</div>
+                            </div>
+                            <div class="skill-name">Empty</div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Skills Panel (Right Side) -->
+    <div class="skills-panel @(this.isSkillsPanelExpanded ? "expanded" : "collapsed")" @onclick:stopPropagation="true">
+        @if (this.isSkillsPanelExpanded)
+        {
+            <div class="skills-panel-content">
+                <div class="skills-filter">
+                    <DebouncedTextField Style="font-size: var(--font-size-medium); width: 100%;"
+                                        Placeholder="Search skills..."
+                                        SearchTerm="@this.searchTerm"
+                                        OnSearch="@this.SearchTermChanged" />
+                </div>
+                <div class="skills-list">
+                    <Virtualize Items="@this.AvailableSkills"
+                                Context="skill"
+                                ItemSize="50"
+                                OverscanCount="5">
+                        <div class="available-skill" @onclick="() => this.OnSkillSelectionFromPanel(skill)" @onclick:stopPropagation="true">
+                            <div class="skill-icon-small" 
+                                 @onmouseenter="(e) => this.OnSkillHoverEnter(skill, e)"
+                                 @onmouseleave="(e) => this.OnSkillHoverLeave(skill, e)">
+                                <SkillIcon Skill="skill" />
+                            </div>
+                            <span class="skill-name-small">@skill.Name</span>
+                            <span class="skill-profession">(@skill.Profession?.Alias)</span>
+                        </div>
+                    </Virtualize>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@using Daybreak.Shared.Models.Builds;
+@using Daybreak.Shared.Models.Guildwars;
+@code {
+    [Parameter]
+    public string BuildName { get; set; } = string.Empty;
+
+    [Parameter]
+    public string BuildTemplateCode { get; set; } = string.Empty;
+
+    [Parameter]
+    public Profession PrimaryProfession { get; set; } = Profession.None;
+
+    [Parameter]
+    public Profession SecondaryProfession { get; set; } = Profession.None;
+
+    [Parameter]
+    public List<AttributeEntry> Attributes { get; set; } = new List<AttributeEntry>();
+
+    [Parameter]
+    public List<Skill> Skills { get; set; } = [];
+
+    [Parameter]
+    public required List<Skill> AvailableSkills { get; set; }
+
+    [Parameter]
+    public required Action<AttributeEntry> OnAttributeIncreased { get; init; }
+
+    [Parameter]
+    public required Action<AttributeEntry> OnAttributeDecreased { get; init; }
+
+    [Parameter]
+    public required Action<int, Skill> OnSkillChanged { get; init; }
+
+    [Parameter]
+    public required Action<Skill, MouseEventArgs> OnSkillHoverEnter { get; init; }
+
+    [Parameter]
+    public required Action<Skill, MouseEventArgs> OnSkillHoverLeave { get; init; }
+
+    [Parameter]
+    public required Action<string> SearchFilterChanged { get; init; }
+
+    [Parameter]
+    public required Action<Profession> PrimaryProfessionChanged { get; init; }
+
+    [Parameter]
+    public required Action<Profession> SecondaryProfessionChanged { get; init; }
+
+    [Parameter]
+    public required Action<string> BuildNameChanged { get; init; }
+
+    [Parameter]
+    public required Action<string> BuildCodeChanged { get; init; }
+
+    private bool isSkillsPanelExpanded = false;
+    private int selectedSkillIndex = -1;
+    private string searchTerm = string.Empty;
+
+    private void ToggleSkillsPanel()
+    {
+        this.isSkillsPanelExpanded = !this.isSkillsPanelExpanded;
+    }
+
+    private void ShowSkillsPanel()
+    {
+        this.isSkillsPanelExpanded = true;
+    }
+
+    private void HideSkillsPanel()
+    {
+        this.isSkillsPanelExpanded = false;
+    }
+
+    private void SkillSelected(int skillIndex)
+    {
+        this.selectedSkillIndex = skillIndex;
+        this.ShowSkillsPanel();
+    }
+
+    private void BackdropClicked()
+    {
+        this.HideSkillsPanel();
+    }
+
+    private void OnSkillSelectionFromPanel(Skill skill)
+    {
+        if (this.selectedSkillIndex >= 0)
+        {
+            this.OnSkillChanged(this.selectedSkillIndex, skill);
+            this.HideSkillsPanel();
+        }
+    }
+
+    private void SearchTermChanged(string searchTerm)
+    {
+        this.searchTerm = searchTerm;
+        this.SearchFilterChanged(searchTerm);
+    }
+
+    private void SecondaryProfessionChangedHandler(ChangeEventArgs e)
+    {
+        if (Profession.TryParse(e.Value?.ToString() ?? string.Empty, out var profession))
+        {
+            this.SecondaryProfession = profession;
+            this.SecondaryProfessionChanged(profession);
+        }
+    }
+
+    private void PrimaryProfessionChangedHandler(ChangeEventArgs e)
+    {
+        if (Profession.TryParse(e.Value?.ToString() ?? string.Empty, out var profession))
+        {
+            this.PrimaryProfession = profession;
+            this.PrimaryProfessionChanged(profession);
+        }
+    }
+
+    private void BuildNameChangedHandler(ChangeEventArgs e)
+    {
+        if (e.Value is string newName)
+        {
+            this.BuildNameChanged(newName);
+        }
+    }
+
+    private void BuildCodeChangedHandler(ChangeEventArgs e)
+    {
+        if (e.Value is string newCode)
+        {
+            this.BuildCodeChanged(newCode);
+        }
+    }
+}

@@ -1,0 +1,238 @@
+<div class="notification-area">
+    @if (this.notifications.Any())
+    {
+        <div class="notification-stack">
+            @foreach (var notificationTuple in this.notifications)
+            {
+                <div class="notification-item level-@notificationTuple.Notification.Level.ToString().ToLowerInvariant()" 
+                     key="@notificationTuple.Notification.Id"
+                     @onmouseenter="() => this.ExtendNotification(notificationTuple)"
+                     @onclick="() => this.OpenNofitication(notificationTuple)"
+                     @onclick:stopPropagation="true">
+                    <div class="notification-header">
+                        <h4 class="notification-title">@notificationTuple.Notification.Title</h4>
+                        @if (notificationTuple.Notification.Dismissible)
+                        {
+                            <button class="notification-close" 
+                                    @onclick="() => this.DismissNotification(notificationTuple)"
+                                    @onclick:stopPropagation="true"
+                                    aria-label="Close notification">
+                                <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Dismiss())" />
+                            </button>
+                        }
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(notificationTuple.Notification.Description))
+                    {
+                        <p class="notification-description">@notificationTuple.Notification.Description</p>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@implements IDisposable
+@using Microsoft.Extensions.Logging
+@code {
+    private static readonly TimeSpan UpdateFrequency = TimeSpan.FromSeconds(1);
+    private static readonly TimeSpan NotificationExtension = TimeSpan.FromSeconds(5);
+
+    private readonly SemaphoreSlim notificationLock = new(1, 1);
+    private readonly List<NotificationWrapper> notifications = [];
+
+    private CancellationTokenSource? cancellationTokenSource;
+    private bool disposedValue;
+
+    [Parameter]
+    public required INotificationProducer NotificationProducer { get; init; }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            this.cancellationTokenSource?.Cancel();
+            this.cancellationTokenSource?.Dispose();
+            this.cancellationTokenSource = new CancellationTokenSource();
+            var token = this.cancellationTokenSource.Token;
+            Task.Factory.StartNew(() => this.ListenForNotifications(token), token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+            Task.Factory.StartNew(() => this.PeriodicallyUpdateNotifications(token), token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        }
+    }
+
+    private async ValueTask ListenForNotifications(CancellationToken cancellationToken)
+    {
+        await foreach (var notification in this.NotificationProducer.Consume(cancellationToken))
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                break;
+            }
+
+            try
+            {
+                await this.notificationLock.WaitAsync(cancellationToken);
+                this.notifications.Add(new NotificationWrapper { Notification = notification, ExpirationTime = notification.ExpirationTime });
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            finally
+            {
+                if (this.notificationLock.CurrentCount == 0)
+                {
+                    this.notificationLock.Release();
+                }
+            }
+
+            if (!cancellationToken.IsCancellationRequested)
+            {
+                await this.InvokeAsync(this.StateHasChanged);
+            }
+        }
+    }
+
+    private async ValueTask PeriodicallyUpdateNotifications(CancellationToken cancellationToken)
+    {
+        var notificationsToRemove = new List<NotificationWrapper>();
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            try
+            {
+                await Task.Delay(UpdateFrequency, cancellationToken);
+                var changed = false;
+                var dateTimeNow = DateTime.UtcNow;
+
+                try
+                {
+                    await this.notificationLock.WaitAsync(cancellationToken);
+
+                    foreach(var notificationTuple in this.notifications)
+                    {
+                        var notification = notificationTuple.Notification;
+                        if (notification.CancellationRequested ||
+                            dateTimeNow > notificationTuple.ExpirationTime)
+                        {
+                            notification.Closed = true;
+                            notificationsToRemove.Add(notificationTuple);
+                        }
+                    }
+
+                    foreach(var notification in notificationsToRemove)
+                    {
+                        this.notifications.Remove(notification);
+                        changed = true;
+                    }
+
+                    notificationsToRemove.Clear();
+                }
+                finally
+                {
+                    if (this.notificationLock.CurrentCount == 0)
+                    {
+                        this.notificationLock.Release();
+                    }
+                }
+
+                if (changed && !cancellationToken.IsCancellationRequested)
+                {
+                    await this.InvokeAsync(this.StateHasChanged);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (ObjectDisposedException)
+            {
+                break;
+            }
+        }
+    }
+
+    private async Task DismissNotification(NotificationWrapper notification)
+    {
+        if (notification.Notification.Dismissible)
+        {
+            try
+            {
+                await this.RemoveNotification(notification);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+        }
+    }
+
+    private void ExtendNotification(NotificationWrapper notification)
+    {
+        notification.ExpirationTime = DateTime.Now + NotificationExtension;
+    }
+
+    private async Task OpenNofitication(NotificationWrapper notification)
+    {
+        try
+        {
+            await this.NotificationProducer.OpenNotification(notification.Notification, cancellationToken: this.cancellationTokenSource?.Token ?? CancellationToken.None);
+            notification.Notification.Closed = true;
+            await this.RemoveNotification(notification);
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    private async ValueTask RemoveNotification(NotificationWrapper notification)
+    {
+        if (this.cancellationTokenSource?.Token.IsCancellationRequested == true)
+        {
+            return;
+        }
+
+        try
+        {
+            await this.notificationLock.WaitAsync(this.cancellationTokenSource?.Token ?? CancellationToken.None);
+            this.notifications.Remove(notification);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        finally
+        {
+            if (this.notificationLock.CurrentCount == 0)
+            {
+                this.notificationLock.Release();
+            }
+        }
+
+        if (this.cancellationTokenSource?.Token.IsCancellationRequested == false)
+        {
+            await this.InvokeAsync(this.StateHasChanged);
+        }
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!this.disposedValue)
+        {
+            if (disposing)
+            {
+                this.cancellationTokenSource?.Cancel();
+                this.cancellationTokenSource?.Dispose();
+                this.notificationLock.Dispose();
+                this.notifications.Clear();
+            }
+
+            this.cancellationTokenSource = null;
+            this.disposedValue = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        this.Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+}

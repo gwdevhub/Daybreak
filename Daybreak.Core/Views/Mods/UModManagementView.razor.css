@@ -1,0 +1,52 @@
+﻿.mods-container {
+    gap: 1rem;
+    padding: 1rem;
+    overflow-y: auto;
+    margin-top: 40px;
+}
+
+.mod-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: color-mix(in srgb, var(--neutral-fill-rest) 50%, transparent);
+    border: 1px solid var(--neutral-stroke-rest);
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+    .mod-row:hover {
+        background: color-mix(in srgb, var(--neutral-fill-rest) 60%, transparent);
+        transform: translateX(2px);
+    }
+
+.mod-row-left {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.mod-name-label {
+    font-size: var(--font-size-large);
+    font-weight: 600;
+    color: var(--neutral-foreground-rest);
+}
+
+.mod-row-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.mod-toggle {
+    display: flex;
+    align-items: center;
+}
+
+::deep .label {
+    color: var(--neutral-foreground-rest) !important;
+    font-size: var(--font-size-medium) !important;
+}

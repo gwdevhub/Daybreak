@@ -1,0 +1,82 @@
+﻿<div class="title-bar">
+    <!-- Drag hitbox - lower z-index, positioned behind other elements -->
+    <div class="title-bar-hitbox" @onmousedown="this.HandleTitleBarDrag" />
+
+    <div class="title-bar-left">
+        <div class="title-bar-btn" @onclick="this.OnNavigationButtonClick" title="Toggle navigation menu">
+            <FluentIcon Value="@NavigationIcon" />
+        </div>
+    </div>
+
+    <div class="title-bar-center">
+        <!-- Space for title or breadcrumbs -->
+    </div>
+
+    <div class="title-bar-right">
+        <button class="title-bar-btn" @onclick="this.OnBugButtonClick" title="Report an issue">
+            <FluentIcon Value="@BugIcon" />
+        </button>
+        <button class="title-bar-btn" @onclick="this.OnSyncButtonClick" title="Synchronize options">
+            <FluentIcon Value="@ArrowDownloadIcon" />
+        </button>
+
+        <!-- Window Control Buttons -->
+        <button class="title-bar-btn window-control-btn" @onclick="this.OnMinimizeButtonClick" title="Minimize">
+            <FluentIcon Value="@SubtractIcon" />
+        </button>
+
+        @if (this.WindowState is WindowState.Maximized)
+        {
+            <button class="title-bar-btn window-control-btn" @onclick="this.OnRestoreButtonClick" title="Restore">
+                <FluentIcon Value="@SquareMultipleIcon" />
+            </button>
+        }
+        else
+        {
+            <button class="title-bar-btn window-control-btn" @onclick="this.OnMaximizeButtonClick" title="Maximize">
+                <FluentIcon Value="@SquareIcon" />
+            </button>
+        }
+
+        <button class="title-bar-btn window-control-btn close-btn" @onclick="this.OnCloseButtonClick" title="Close">
+            <FluentIcon Value="@DismissIcon" />
+        </button>
+    </div>
+</div>
+
+@code{
+    private static readonly Icon NavigationIcon = new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Navigation();
+    private static readonly Icon BugIcon = new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Bug();
+    private static readonly Icon ArrowDownloadIcon = new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.CloudSync();
+    private static readonly Icon SubtractIcon = new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Subtract();
+    private static readonly Icon SquareMultipleIcon = new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.SquareMultiple();
+    private static readonly Icon SquareIcon = new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Square();
+    private static readonly Icon DismissIcon = new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Dismiss();
+
+    [Parameter]
+    public required WindowState WindowState { get; init; }
+    [Parameter]
+    public required Action OnTitleBarDrag { get; init; }
+    [Parameter]
+    public required Action OnNavigationButtonClick { get; init; }
+    [Parameter]
+    public required Action OnBugButtonClick { get; init; }
+    [Parameter]
+    public required Action OnSyncButtonClick { get; init; }
+    [Parameter]
+    public required Action OnMinimizeButtonClick { get; init; }
+    [Parameter]
+    public required Action OnMaximizeButtonClick { get; init; }
+    [Parameter]
+    public required Action OnRestoreButtonClick { get; init; }
+    [Parameter]
+    public required Action OnCloseButtonClick { get; init; }
+
+    private void HandleTitleBarDrag(MouseEventArgs e)
+    {
+        if (e.Button == 0) // Left mouse button
+        {
+            this.OnTitleBarDrag();
+        }
+    }
+}

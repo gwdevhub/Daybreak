@@ -1,0 +1,20 @@
+﻿<div class="status-bar backdrop-panel">
+    <div class="status-left">
+        <span class="version-info">@this.CurrentVersionText</span>
+    </div>
+    <div class="status-right">
+        @if (this.IsAdmin)
+        {
+            <span class="admin-badge" @onclick="this.RestartAsNormalUser">[Admin]</span>
+        }
+    </div>
+</div>
+
+@code{
+    [Parameter]
+    public required bool IsAdmin { get; init; }
+    [Parameter]
+    public required string CurrentVersionText { get; init; }
+    [Parameter]
+    public required Action RestartAsNormalUser { get; init; }
+}

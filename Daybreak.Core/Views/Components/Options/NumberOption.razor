@@ -1,0 +1,56 @@
+﻿<div class="option-display-box">
+    <div class="option-content">
+        <div class="option-title">@this.Name</div>
+        <div class="option-description">@this.Description</div>
+    </div>
+    <div class="option-control">
+        <FluentNumberField @bind-Value="this.Value" 
+                          @onchange="OnValueChanged" 
+                          Placeholder="Enter a number" />
+    </div>
+</div>
+
+@inherits OptionBase<double>
+@code {
+    protected override double ConvertValue(OptionInstance optionInstance, OptionProperty property)
+    {
+        var numberValue = property.Getter(optionInstance);
+        if (numberValue is null)
+        {
+            return 0.0;
+        }
+
+        var value = numberValue switch
+        {
+            double var => var,
+            IConvertible convertible => convertible.ToDouble(null),
+            _ => 0.0
+        };
+        return value;
+    }
+
+    private void OnValueChanged(ChangeEventArgs e)
+    {
+        if (double.TryParse(e.Value?.ToString(), out var newValue))
+        {
+            this.Value = newValue;
+
+            // Convert back to the original property type
+            var convertedValue = this.Property.Type switch
+            {
+                Type t when t == typeof(int) => (int)newValue,
+                Type t when t == typeof(uint) => (uint)newValue,
+                Type t when t == typeof(long) => (long)newValue,
+                Type t when t == typeof(ulong) => (ulong)newValue,
+                Type t when t == typeof(short) => (short)newValue,
+                Type t when t == typeof(ushort) => (ushort)newValue,
+                Type t when t == typeof(float) => (float)newValue,
+                Type t when t == typeof(double) => newValue,
+                _ => newValue
+            };
+
+            this.Property.Setter(this.Instance, convertedValue);
+            this.NotifyValueChanged();
+        }
+    }
+}

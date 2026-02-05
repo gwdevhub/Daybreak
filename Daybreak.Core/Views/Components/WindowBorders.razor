@@ -1,0 +1,25 @@
+﻿<div>
+    <div class="resize-border resize-border-top" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.Top))" />
+    <div class="resize-border resize-border-left" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.Left))" />
+    <div class="resize-border resize-border-right" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.Right))" />
+    <div class="resize-border resize-border-bottom" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.Bottom))" />
+    <div class="resize-border resize-border-top-left" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.TopLeft))" />
+    <div class="resize-border resize-border-top-right" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.TopRight))" />
+    <div class="resize-border resize-border-bottom-left" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.BottomLeft))" />
+    <div class="resize-border resize-border-bottom-right" @onmousedown="@(e => this.HandleResize(e, NativeMethods.ResizeDirection.BottomRight))" />
+</div>
+
+@code {
+    [Parameter]
+    public required Action<NativeMethods.ResizeDirection> OnResize { get; init; }
+
+    public void HandleResize(MouseEventArgs e, NativeMethods.ResizeDirection direction)
+    {
+        if (e.Button != 0)
+        {
+            return; // Only handle left mouse button clicks
+        }
+
+        this.OnResize(direction);
+    }
+}

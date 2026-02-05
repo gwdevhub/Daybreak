@@ -1,0 +1,87 @@
+﻿<div class="stretch-container">
+    <div class="title-bar-additional-btns-left">
+        <button class="title-bar-btn" @onclick="this.ViewModel.DeleteAlert" title="Delete alert">
+            <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Delete()" />
+        </button>
+    </div>
+    @if (this.ViewModel.Alert is not null)
+    {
+        <div class="backdrop-panel">
+            <div class="container">
+                <div class="alert-row alert-enabled">
+                    <FluentLabel>Enabled</FluentLabel>
+                    <FluentCheckbox @bind-Value="@this.ViewModel.Alert.Enabled" @bind-Value:after="@this.ViewModel.SaveAlertChanges" />
+                </div>
+                <div class="alert-row alert-id">
+                    <FluentLabel>ID</FluentLabel>
+                    <FluentTextField @bind-Value="@this.ViewModel.Alert.Id" ReadOnly="true" />
+                </div>
+                <div class="alert-row alert-name">
+                    <FluentLabel>Name</FluentLabel>
+                    <FluentTextField @bind-Value="@this.ViewModel.Alert.Name" @bind-Value:after="@this.ViewModel.SaveAlertChanges" />
+                </div>
+                <div class="alert-row alert-item">
+                    <FluentLabel>Item</FluentLabel>
+                    <FluentSelect TOption="Daybreak.Shared.Models.Guildwars.ItemBase"
+                                  Items="@ItemOptions"
+                                  OptionText="@(i => i.Name ?? $"Item {i.Id}")"
+                                  OptionValue="@(i => i.Id.ToString())"
+                                  @bind-SelectedOption="SelectedItem"
+                                  @bind-SelectedOption:after="@OnItemSelected">
+                        <OptionTemplate Context="item">
+                            @if (item is Daybreak.Shared.Models.Guildwars.IIconUrlEntity iconEntity)
+                            {
+                                <img src="@iconEntity.IconUrl"/>
+                            }
+                            <span>@(item.Name ?? $"Item {item.Id}")</span>
+                        </OptionTemplate>
+                    </FluentSelect>
+                </div>
+                <div class="alert-row alert-quote-upper-price-check">
+                    <FluentLabel>Upper price target enabled</FluentLabel>
+                    <FluentCheckbox @bind-Value="@this.ViewModel.Alert.UpperPriceTargetEnabled" @bind-Value:after="@this.ViewModel.SaveAlertChanges" />
+                </div>
+                <div class="alert-row alert-quote-upper-price">
+                    <FluentLabel>Upper price target</FluentLabel>
+                    <FluentNumberField @bind-Value="@this.ViewModel.Alert.UpperPriceTarget" @bind-Value:after="@this.ViewModel.SaveAlertChanges" />
+                </div>
+                <div class="alert-row alert-quote-lower-price-check">
+                    <FluentLabel>Lower price target enabled</FluentLabel>
+                    <FluentCheckbox @bind-Value="@this.ViewModel.Alert.LowerPriceTargetEnabled" @bind-Value:after="@this.ViewModel.SaveAlertChanges" />
+                </div>
+                <div class="alert-row alert-quote-lower-price">
+                    <FluentLabel>Lower price target</FluentLabel>
+                    <FluentNumberField @bind-Value="@this.ViewModel.Alert.LowerPriceTarget" @bind-Value:after="@this.ViewModel.SaveAlertChanges" />
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@page "/trade/quote/{AlertId}"
+@inherits ViewBase<TradeQuoteView, TradeQuoteViewModel>
+@code{
+    [Parameter]
+    public required string AlertId { get; init; }
+
+    private IEnumerable<Daybreak.Shared.Models.Guildwars.ItemBase> ItemOptions =>
+        Daybreak.Shared.Models.Guildwars.ItemBase.AllItems
+            .OrderBy(i => i.Name ?? string.Empty);
+
+    private Daybreak.Shared.Models.Guildwars.ItemBase? SelectedItem
+    {
+        get => ItemOptions.FirstOrDefault(i => i.Id == this.ViewModel.Alert?.ItemId);
+        set
+        {
+            if (this.ViewModel.Alert is not null && value is not null)
+            {
+                this.ViewModel.Alert.ItemId = value.Id;
+            }
+        }
+    }
+
+    private void OnItemSelected()
+    {
+        this.ViewModel.SaveAlertChanges();
+    }
+}

@@ -1,0 +1,57 @@
+﻿<div class="stretch-container">
+    <div class="title-bar-header">
+        gMod
+    </div>
+    <div class="title-bar-additional-btns-left">
+        <button class="title-bar-btn" @onclick="@this.ViewModel.LoadModsFromDisk" title="Load mods from disk">
+            <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Add()" />
+        </button>
+    </div>
+    <div class="stretch-container backdrop-panel">
+        <div class="mods-container">
+            @for (var i = 0; i < this.ViewModel.Mods.Count; i++)
+            {
+                var mod = this.ViewModel.Mods[i];
+                <div class="mod-row">
+                    <div class="mod-row-left">
+                        @if (i > 0)
+                        {
+                            <FluentButton Appearance="Appearance.Stealth"
+                                          IconOnly="true"
+                                          OnClick="@(() => this.ViewModel.MoveModUp(mod))">
+                                <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowUp())" />
+                            </FluentButton>
+                        }
+
+                        @if (i < this.ViewModel.Mods.Count - 1)
+                        {
+                            <FluentButton Appearance="Appearance.Stealth"
+                                          IconOnly="true"
+                                          OnClick="@(() => this.ViewModel.MoveModDown(mod))">
+                                <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowDown())"/>
+                            </FluentButton>
+                        }
+
+                        <div class="mod-name-label">@mod.Name</div>
+                    </div>
+                    <div class="mod-row-right">
+                        <div class="mod-toggle">
+                            <FluentLabel class="label">@((mod.Enabled) ? "Enabled" : "Disabled")</FluentLabel>
+                            <FluentSwitch Value="@(mod.Enabled)"
+                                          @onclick="() => this.ViewModel.ToggleMod(mod)" />
+                        </div>
+                        <div @onclick="@(() => this.ViewModel.RemoveMod(mod))" @onclick:stopPropagation="true">
+                            <FluentButton Appearance="Appearance.Stealth"
+                                          IconOnly="true">
+                                <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Delete())" />
+                            </FluentButton>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@page "/mods/umod"
+@inherits ViewBase<UModManagementView, UModManagementViewModel>

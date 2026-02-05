@@ -1,0 +1,31 @@
+﻿.executables-list{
+    margin-top: 40px;
+    height: calc(100% - 40px);
+    overflow-y: auto;
+}
+
+.executable-item {
+    padding: 12px 16px;
+    margin: 12px;
+    background-color: var(--neutral-fill-rest);
+    border: 1px solid var(--neutral-stroke-rest);
+    border-radius: 6px;
+    color: var(--neutral-foreground-rest);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: var(--font-size-medium);
+    display: flex;
+    align-items: center;
+    min-height: 30px;
+}
+
+    .executable-item:hover {
+        background: var(--neutral-fill-hover);
+        border-color: var(--neutral-stroke-hover);
+        transform: translateY(-1px);
+    }
+
+    .executable-item:active {
+        background: var(--accent-fill-rest);
+        transform: translateY(0);
+    }

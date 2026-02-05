@@ -1,0 +1,65 @@
+﻿<FluentTextField @oninput="EventUtil.AsNonRenderingEventHandler<ChangeEventArgs>(this.SearchTermChanged)"
+                 Placeholder="@this.Placeholder"
+                 Value="@this.SearchTerm"
+                 style="@this.Style"
+                 Appearance="@FluentInputAppearance.Outline"
+                 AutoComplete="@(this.AutoComplete ? "on" : "off")"
+                 Spellcheck="@this.Spellcheck">
+    <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Search())"
+                slot="start"
+                Color="Color.Neutral" />
+    @if (this.pendingSearch)
+    {
+        <div slot="end" style="margin: 5px;">
+            <SpinnerWidget IsLoading="true" />
+        </div>
+    }
+</FluentTextField>
+@code {
+    private static readonly TimeSpan DebounceDelay = TimeSpan.FromSeconds(1);
+
+    [Parameter]
+    public string Style { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Placeholder { get; set; } = string.Empty;
+
+    [Parameter]
+    public string SearchTerm { get; set; } = string.Empty;
+
+    [Parameter]
+    public required Action<string> OnSearch { get; set; }
+
+    [Parameter]
+    public bool Spellcheck { get; set; } = false;
+
+    [Parameter]
+    public bool AutoComplete { get; set; } = false;
+
+    private bool pendingSearch;
+    private DateTime debounceSearchTime = DateTime.MinValue;
+    private Task? pendingSearchTask;
+
+    private void SearchTermChanged(ChangeEventArgs args)
+    {
+        this.pendingSearchTask ??= Task.Run(() => this.PerformPendingSearch());
+        this.SearchTerm = args.Value?.ToString() ?? string.Empty;
+        this.debounceSearchTime = DateTime.Now + DebounceDelay;
+    }
+
+    private async Task PerformPendingSearch()
+    {
+        this.pendingSearch = true;
+        await this.InvokeAsync(this.StateHasChanged);
+        while ((this.debounceSearchTime - DateTime.Now) is TimeSpan remainingTime &&
+                remainingTime > TimeSpan.Zero)
+        {
+            await Task.Delay(remainingTime);
+        }
+
+        this.OnSearch(this.SearchTerm);
+        this.pendingSearch = false;
+        await this.InvokeAsync(this.StateHasChanged);
+        this.pendingSearchTask = null;
+    }
+}

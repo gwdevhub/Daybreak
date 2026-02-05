@@ -1,0 +1,5 @@
+﻿.gwmarket-container {
+    margin-top: 33px;
+    height: calc(100% - 33px);
+    display: flex;
+}

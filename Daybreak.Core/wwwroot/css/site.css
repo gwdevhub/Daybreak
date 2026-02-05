@@ -1,0 +1,212 @@
+/* FluentUI tokens defined here: https://github.com/microsoft/fluentui-blazor/blob/dev/src/Extensions/DesignToken.Generator/DesignTokenConstants.cs */
+
+/* Base styles for the Blazor application */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: transparent;
+}
+
+#app {
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* App Container */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: relative;
+    backdrop-filter: blur(2px);
+    overflow: hidden;
+    /* Promote to GPU layer for better performance */
+    will-change: contents;
+    transform: translateZ(0);
+}
+
+    .app-container::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-image: var(--backdrop-image);
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        filter: var(--backdrop-image-filter);
+        z-index: -1;
+        /* Promote to its own GPU layer to prevent repainting */
+        will-change: transform;
+        transform: translateZ(0);
+    }
+
+    /* Hide resize borders when maximized */
+    .app-container.maximized .resize-border {
+        display: none;
+    }
+
+/* Backdrop Panel */
+.backdrop-panel {
+    background: color-mix(in srgb, var(--neutral-fill-rest) 70%, transparent);
+    border: 1px solid var(--neutral-stroke-rest);
+    backdrop-filter: blur(2px);
+    border-radius: 6px;
+    /* Promote to GPU layer */
+    transform: translateZ(0);
+}
+
+/* Display Box */
+.display-box {
+    padding: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.stretch-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.center-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+}
+
+.min-half-width {
+    min-width: 50%;
+}
+
+/* Keyframe for staggered menu category animation */
+@keyframes slideInFromLeft {
+    from {
+        transform: translateX(-30px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Keyframe for menu item slide-down animation */
+@keyframes slideInFromTop {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: color-mix(in srgb, var(--neutral-fill-rest) 30%, transparent);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--neutral-fill-strong-rest) 80%, transparent);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--neutral-fill-strong-hover) 80%, transparent);
+}
+
+.option-view-title {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--neutral-foreground-rest);
+    font-size: var(--font-size-large)
+}
+
+/* Icons */
+.icon-small {
+    display: flex;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Title bar buttons to be used in views */
+.title-bar-btn {
+    width: 50px;
+    height: 34px;
+    border: none;
+    background: transparent;
+    color: var(--accent-foreground-rest);
+    cursor: pointer;
+    /* Use GPU-accelerated properties only */
+    transition: background-color 0.15s ease-out, color 0.15s ease-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    position: relative;
+    /* Promote to GPU layer for smooth hover transitions */
+    will-change: background-color;
+    transform: translateZ(0);
+}
+
+    .title-bar-btn:hover {
+        background: var(--accent-foreground-hover);
+        color: var(--foreground-on-accent-rest-large);
+    }
+
+    .title-bar-btn:hover svg {
+        fill: var(--foreground-on-accent-rest-large) !important;
+    }
+
+.title-bar-additional-btns-left {
+    position: absolute;
+    left: 50px;
+    z-index: 20001;
+    display: flex;
+    flex-direction: row;
+}
+
+.title-bar-header {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: row;
+    z-index: 20001;
+    font-size: var(--font-size-x-large);
+}
+
+.icon {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}

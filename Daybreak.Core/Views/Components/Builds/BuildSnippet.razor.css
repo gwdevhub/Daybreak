@@ -1,0 +1,52 @@
+﻿.container {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    background: var(--neutral-layer-floating);
+    border: 1px solid var(--neutral-stroke-rest);
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    pointer-events: auto;
+    max-height: 150px;
+    display: flex;
+    flex-direction: column;
+}
+
+.build-entry-list {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+}
+
+.build-entry {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    margin-bottom: 6px;
+}
+
+.skill-icon-wrapper {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+}
+
+.build-attributes {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin-right: auto;
+    font-size: var(--font-size-x-small);
+    color: var(--neutral-foreground-rest);
+    padding: 2px 4px;
+    white-space: nowrap;
+    align-self: flex-start;
+    background: color-mix(in srgb, var(--neutral-fill-rest) 70%, transparent);
+    pointer-events: none;
+}

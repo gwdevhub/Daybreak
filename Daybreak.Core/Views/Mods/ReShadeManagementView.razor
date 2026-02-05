@@ -1,0 +1,36 @@
+<div class="stretch-container">
+    <div class="title-bar-header">
+        ReShade
+    </div>
+    <div class="title-bar-additional-btns-left">
+        <button class="title-bar-btn" @onclick="@this.ViewModel.OpenReShadeFolder" title="Manage ReShade files">
+            <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Folder()" />
+        </button>
+    </div>
+    <div class="stretch-container backdrop-panel">
+        <div class="shaders-container">
+            @if (!this.ViewModel.IsLoading)
+            {
+                @for (var i = 0; i < this.ViewModel.ShaderPackages.Count; i++)
+                {
+                    var shader = this.ViewModel.ShaderPackages[i];
+                    <div class="shader-row" title=@($"Install {shader.Name}") @onclick="() => this.ViewModel.InstallShaderPackage(shader)">
+                        <div class="shader-name">@shader.Name</div>
+                        <div class="shader-description">@shader.Description</div>
+                        <br />
+                        <div class="shader-effects">@string.Join(", ", shader.EffectFiles ?? [])</div>
+                    </div>
+                }
+            }
+        </div>
+        @if (this.ViewModel.IsLoading)
+        {
+            <div class="center-container">
+                <SpinnerWidget IsLoading="true" />
+            </div>
+        }
+    </div>
+</div>
+
+@inherits ViewBase<ReShadeManagementView, ReShadeManagementViewModel>
+@page "/mods/reshade"

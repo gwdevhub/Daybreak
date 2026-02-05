@@ -1,0 +1,78 @@
+﻿<div class="container">
+    <div class="title-bar-additional-btns-left">
+        <button class="title-bar-btn" @onclick="this.ViewModel.CreateExecutable" title="Add new executable" disabled="@(!this.ViewModel.AddButtonEnabled)">
+            <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Add()" />
+        </button>
+    </div>
+    <div class="content backdrop-panel">
+        <div class="option-view-title">
+            <h3>Executables</h3>
+        </div>
+        <div class="executables-list">
+            @foreach (var executable in this.ViewModel.Executables)
+            {
+                <div class="executable-row">
+                    <div class="executable-label">
+                        <FluentLabel>Path</FluentLabel>
+                    </div>
+                    <div class="executable-field">
+                        <FluentTextField Value="@executable.Path"
+                                         ReadOnly="true"
+                                         Appearance="FluentInputAppearance.Outline"
+                                         AutoComplete="off"
+                                         Placeholder="Path">
+                            <div class="executable-field-controls"
+                                 slot="end">
+                                @if (executable.Validating)
+                                {
+                                    <div class="loading-circle">
+                                        <SpinnerWidget IsLoading="true" />
+                                        @if (executable.UpdateProgress is string progress)
+                                        {
+                                            <div class="update-progress-text">@progress</div>
+                                        }
+                                    </div>
+                                }
+                                else if (executable.Valid)
+                                {
+                                    <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.CheckmarkCircle())"
+                                                Color="Color.Neutral"
+                                                Title="Executable is valid" />
+                                }
+                                else if (executable.NeedsUpdate)
+                                {
+                                    <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowDownload())"
+                                                @onclick="@(() => this.ViewModel.UpdateExecutable(executable))"
+                                                Color="Color.Neutral"
+                                                Title="Update executable" />
+                                }
+                                else
+                                {
+                                    <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.CheckmarkCircleWarning())"
+                                                Color="Color.Neutral"
+                                                Title="Executable is invalid" />
+                                }
+
+                                <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.FolderOpen())"
+                                            @onclick="@(() => { if (executable.Locked) { return; } this.ViewModel.ModifyPath(executable); })"
+                                            Color="Color.Neutral"
+                                            Title="Modify path" />
+                                <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Delete())"
+                                            @onclick="@(() => { if (executable.Locked) { return; } this.ViewModel.RemoveExecutable(executable); })"
+                                            Color="Color.Neutral"
+                                            Title="Remove executable" />
+                            </div>
+                        </FluentTextField>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@page "/executables"
+@inherits ViewBase<ExecutablesView, ExecutablesViewModel>
+@code{
+    [Parameter]
+    public string AutoRun { get; set; } = string.Empty;
+}

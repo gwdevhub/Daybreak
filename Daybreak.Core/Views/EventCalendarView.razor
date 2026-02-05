@@ -1,0 +1,118 @@
+﻿<div class="stretch-container backdrop-panel">
+    <div class="event-calendar-container">
+        <!-- Left side: Event list -->
+        <div class="event-list-panel">
+            <div class="panel-header">
+                <h3>Guild Wars Events</h3>
+            </div>
+            <div class="events-container">
+                @foreach (var eventItem in this.ViewModel.Events)
+                {
+                    var eventColor = this.ViewModel.GetEventColor(eventItem.SeasonalEvent!);
+                    var isSelected = this.ViewModel.SelectedEvent == eventItem;
+                    
+                    <div class="event-item @(isSelected ? "selected" : "")" 
+                         @onclick="() => this.ViewModel.SelectEvent(eventItem)"
+                         style="border-left: 4px solid @eventColor.Hex;">
+                        <div class="event-header">
+                            <span class="event-title">@eventItem.SeasonalEvent?.Title</span>
+                            <div class="event-status">
+                                @if (eventItem.Active)
+                                {
+                                    <span class="status-badge active">ACTIVE</span>
+                                }
+                                @if (eventItem.Upcoming)
+                                {
+                                    <span class="status-badge upcoming">UPCOMING</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="event-description">
+                            @eventItem.SeasonalEvent?.Description
+                        </div>
+                        <div class="event-dates">
+                            @eventItem.SeasonalEvent?.From.ToString("MMM dd") - @eventItem.SeasonalEvent?.To.ToString("MMM dd")
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Right side: Calendar and BlazorFrame -->
+        <div class="calendar-panel">
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <h3>@DateTime.Now.ToString("MMMM yyyy")</h3>
+                </div>
+                <div class="calendar-grid">
+                    <!-- Day headers -->
+                    <div class="calendar-day-header">Sun</div>
+                    <div class="calendar-day-header">Mon</div>
+                    <div class="calendar-day-header">Tue</div>
+                    <div class="calendar-day-header">Wed</div>
+                    <div class="calendar-day-header">Thu</div>
+                    <div class="calendar-day-header">Fri</div>
+                    <div class="calendar-day-header">Sat</div>
+
+                    @{
+                        var calendarDates = this.ViewModel.GetCalendarDates();
+                        var firstDayOfMonth = calendarDates.First();
+                        var startDayOfWeek = (int)firstDayOfMonth.DayOfWeek;
+                    }
+
+                    <!-- Empty cells for days before the first day of the month -->
+                    @for (int i = 0; i < startDayOfWeek; i++)
+                    {
+                        <div class="calendar-day empty"></div>
+                    }
+
+                    <!-- Calendar days -->
+                    @foreach (var date in calendarDates)
+                    {
+                        var eventsForDate = this.ViewModel.GetEventsForDate(date);
+                        var isToday = date.Date == DateTime.Today;
+                        var isSelectedDate = date.Date == this.ViewModel.SelectedDate.Date;
+
+                        <div class="calendar-day @(isToday ? "today" : "") @(isSelectedDate ? "selected" : "")"
+                             @onclick="() => this.ViewModel.SelectedDate = date">
+                            <div class="day-number">@date.Day</div>
+                            @if (eventsForDate.Any())
+                            {
+                                <div class="event-indicators">
+                                    @foreach (var eventItem in eventsForDate.Take(3))
+                                    {
+                                        var eventColor = this.ViewModel.GetEventColor(eventItem);
+                                        <div class="event-indicator" style="background-color: @eventColor.Hex;" title="@eventItem.Title"></div>
+                                    }
+                                    @if (eventsForDate.Count > 3)
+                                    {
+                                        <div class="event-indicator more" title="@(eventsForDate.Count - 3) more events">+@(eventsForDate.Count - 3)</div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- BlazorFrame for wiki content -->
+            <div class="frame-container">
+                @if (!string.IsNullOrEmpty(this.ViewModel.FrameAddress))
+                {
+                    <iframe sandbox="allow-scripts allow-same-origin allow-forms"
+                            style="height: 100%; width: 100%; margin: -2px;"
+                            src="@this.ViewModel.FrameAddress" />
+                }
+                else
+                {
+                    <div class="frame-placeholder">
+                        <p>Select an event to view its wiki page</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@page "/event-calendar"
+@inherits ViewBase<EventCalendarView, EventCalendarViewModel>

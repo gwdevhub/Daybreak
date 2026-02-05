@@ -1,0 +1,91 @@
+﻿namespace Daybreak.Utils;
+
+public static class Scripts
+{
+    public static string CreateAlert(string notificationMessage) => @$"
+        window.alert('{notificationMessage}');";
+
+    public const string SendSelectionOnContextMenu = @"
+            window.addEventListener('contextmenu', function (event)
+            {
+                console.log('Triggering build selection parser');
+                var text = '';
+                var activeEl = document.activeElement;
+                var activeElTagName = activeEl ? activeEl.tagName.toLowerCase() : null;
+                if ((activeElTagName == 'textarea') || (activeElTagName == 'input' &&
+                    /^(?:text|search|password|tel|url)$/i.test(activeEl.type)) &&
+                    (typeof activeEl.selectionStart == 'number'))
+                {
+                    text = activeEl.value.slice(activeEl.selectionStart, activeEl.selectionEnd);
+                }
+                    else if (window.getSelection)
+                {
+                    text = window.getSelection().toString();
+                }
+
+                let jsonObject =
+                {
+                    Key: 'ContextMenu',
+                    Value:
+                    {
+                        X: event.screenX,
+                        Y: event.screenY,
+                        Selection: text,
+                        Url: document.URL
+                    }
+                };
+                window.chrome.webview.postMessage(jsonObject);
+            });";
+
+    public const string GetHrefFromSkillPage = @"
+            new function(){
+                var img = document.getElementsByClassName('fullImageLink')[0].childNodes[0].childNodes[0];
+                function getDataUrl(img) {
+                    // Create canvas
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    // Set width and height
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    // Draw the image
+                    ctx.drawImage(img, 0, 0);
+                    return canvas.toDataURL('image/jpeg');
+                }
+                
+                console.log(img.src);
+                var imageBase64 = getDataUrl(img);
+                console.log(imageBase64);
+                let jsonObject =
+                {
+                    skillUrl: document.URL,
+                    skillImage: imageBase64
+                }
+                window.chrome.webview.postMessage(jsonObject);
+                return jsonObject;
+            }";
+
+    public const string CaptureNavigationButtons = @"
+    (function() {
+        if (!document._navigationButtonListenerAdded) {
+            document.addEventListener('mouseup', function(event) {
+                if (event.button === 3) {
+                    let jsonObject = 
+                    {
+                        Key: 'XButton1Pressed'
+                    };
+                    window.chrome.webview.postMessage(jsonObject);
+                    event.preventDefault();
+                } else if (event.button === 4) {
+                    let jsonObject = 
+                    {
+                        Key: 'XButton2Pressed'
+                    };
+                    window.chrome.webview.postMessage(jsonObject);
+                    event.preventDefault();
+                }
+            });
+            document._navigationButtonListenerAdded = true;
+        }
+    })();
+";
+}
