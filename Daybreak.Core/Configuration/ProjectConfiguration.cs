@@ -36,7 +36,6 @@ using Daybreak.Services.Plugins;
 using Daybreak.Services.Privilege;
 using Daybreak.Services.Registry;
 using Daybreak.Services.ReShade;
-using Daybreak.Services.Screens;
 using Daybreak.Services.Screenshots;
 
 using Daybreak.Services.Startup;
@@ -195,7 +194,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddHostedSingleton<IApplicationUpdater, ApplicationUpdater>();
         services.AddHostedSingleton<IThemeManager, BlazorThemeInteropService>();
         services.AddHostedSingleton<IKeyboardHookService, KeyboardHookService>();
-        services.AddHostedSingleton<IScreenManager, ScreenManager>();
         services.AddHostedSingleton<IConnectivityStatus, ConnectivityStatus>();
         services.AddHostedSingleton<ITradeAlertingService, TradeAlertingService>();
         services.AddHostedSingleton<IGuildWarsExecutableManager, GuildWarsExecutableManager>();
@@ -319,7 +317,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         modsManager.RegisterMod<IDaybreakApiService, DaybreakApiService>();
         modsManager.RegisterMod<IToolboxService, ToolboxService>();
         modsManager.RegisterMod<IUModService, UModService>();
-        modsManager.RegisterMod<IGuildwarsScreenPlacer, GuildwarsScreenPlacer>();
         modsManager.RegisterMod<IDirectSongService, DirectSongService>(singleton: true);
     }
 

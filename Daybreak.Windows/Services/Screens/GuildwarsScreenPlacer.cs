@@ -1,4 +1,4 @@
-﻿using Daybreak.Configuration.Options;
+using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Models.Mods;
@@ -12,7 +12,7 @@ using System.Core.Extensions;
 using System.Extensions.Core;
 using TrailBlazr.Services;
 
-namespace Daybreak.Services.Screens;
+namespace Daybreak.Windows.Services.Screens;
 
 internal sealed class GuildwarsScreenPlacer(
     IOptionsProvider optionsProvider,

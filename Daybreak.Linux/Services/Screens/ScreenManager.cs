@@ -1,21 +1,18 @@
-﻿using Daybreak.Configuration.Options;
+using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Screens;
-using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Photino.NET;
 using System.Core.Extensions;
-using System.Diagnostics;
 using System.Drawing;
 using System.Extensions;
-using System.Extensions.Core;
-using System.Runtime.InteropServices;
 
-namespace Daybreak.Services.Screens;
+namespace Daybreak.Linux.Services.Screens;
 
+// TODO: Implement proper Linux screen management using X11/Wayland APIs
 internal sealed class ScreenManager(
     PhotinoWindow photinoWindow,
     IOptionsProvider optionsProvider,
@@ -27,11 +24,11 @@ internal sealed class ScreenManager(
     private readonly IOptionsMonitor<ScreenManagerOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
     private readonly ILogger<ScreenManager> logger = logger.ThrowIfNull();
 
-    public IEnumerable<Screen> Screens => GetAllScreens();
+    // TODO: Implement proper screen enumeration for Linux
+    public IEnumerable<Screen> Screens => GetDummyScreens();
 
     Task IHostedService.StartAsync(CancellationToken cancellationToken)
     {
-        // No need to move window on start here. Window position is set in the launcher before creation
         return Task.CompletedTask;
     }
 
@@ -76,18 +73,11 @@ internal sealed class ScreenManager(
         this.optionsProvider.SaveOption(options);
     }
 
+    // TODO: Implement for Linux - this is Windows-specific
     public bool MoveGuildwarsToScreen(Screen screen)
     {
-        var scopedLogger = this.logger.CreateScopedLogger();
-        scopedLogger.LogDebug("Attempting to move guildwars to screen {screenId}", screen.Id);
-        var hwnd = GetMainWindowHandle();
-        if (!hwnd.HasValue)
-        {
-            return false;
-        }
-
-        NativeMethods.SetWindowPos(hwnd.Value, NativeMethods.HWND_TOP, screen.Size.Left, screen.Size.Top, screen.Size.Width, screen.Size.Height, NativeMethods.SWP_SHOWWINDOW);
-        return true;
+        this.logger.LogWarning("MoveGuildwarsToScreen is not implemented on Linux");
+        return false;
     }
 
     public Rectangle GetSavedPosition()
@@ -103,7 +93,8 @@ internal sealed class ScreenManager(
             var firstScreen = this.Screens.FirstOrDefault();
             if (firstScreen.Size.IsEmpty)
             {
-                throw new InvalidOperationException("Could not detect any screen");
+                // Return a reasonable default instead of throwing
+                return new Rectangle(0, 100, 1000, 900);
             }
 
             return new Rectangle(
@@ -116,32 +107,10 @@ internal sealed class ScreenManager(
         return savedPosition;
     }
 
-    private static IntPtr? GetMainWindowHandle()
+    private static List<Screen> GetDummyScreens()
     {
-        var process = Process.GetProcessesByName("gw").FirstOrDefault();
-        return (process?.MainWindowHandle) ?? default;
-    }
-
-    private static List<Screen> GetAllScreens()
-    {
-        var screens = new List<Screen>();
-        int index = 0;
-
-        NativeMethods.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, (hMonitor, hdcMonitor, ref lprcMonitor, dwData) =>
-        {
-            var monitorInfo = new NativeMethods.MonitorInfoEx
-            {
-                CbSize = (uint)Marshal.SizeOf<NativeMethods.MonitorInfoEx>()
-            };
-
-            if (NativeMethods.GetMonitorInfo(hMonitor, ref monitorInfo))
-            {
-                screens.Add(new Screen(index++, new Rectangle(monitorInfo.RcMonitor.Left, monitorInfo.RcMonitor.Top, monitorInfo.RcMonitor.Width, monitorInfo.RcMonitor.Height)));
-            }
-
-            return true;
-        }, IntPtr.Zero);
-
-        return screens;
+        // TODO: Use X11/Wayland APIs to enumerate actual screens
+        // For now, return a single dummy screen with reasonable defaults
+        return [new Screen(0, new Rectangle(0, 0, 1920, 1080))];
     }
 }

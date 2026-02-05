@@ -1,4 +1,7 @@
+using Daybreak.Extensions;
+using Daybreak.Linux.Services.Screens;
 using Daybreak.Shared.Models.Plugins;
+using Daybreak.Shared.Services.Screens;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Daybreak.Linux.Configuration;
@@ -11,9 +14,11 @@ public sealed class LinuxPlatformConfiguration : PluginConfigurationBase
 {
     public override void RegisterServices(IServiceCollection services)
     {
-        // TODO: Register Linux-specific service implementations
+        // Screen manager (Linux-specific dummy implementation)
+        services.AddHostedSingleton<IScreenManager, ScreenManager>();
+
+        // TODO: Register additional Linux-specific service implementations
         // For example:
-        // - Linux screen manager (using X11/Wayland APIs)
         // - Wine-based Guild Wars launcher
         // - Linux keyboard hook service (or no-op)
     }

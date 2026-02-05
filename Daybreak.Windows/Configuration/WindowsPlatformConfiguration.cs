@@ -2,9 +2,12 @@ using Daybreak.Configuration;
 using Daybreak.Extensions;
 using Daybreak.Services.Graph;
 using Daybreak.Shared.Models.Plugins;
+using Daybreak.Shared.Services.Initialization;
+using Daybreak.Shared.Services.Screens;
 using Daybreak.Shared.Services.Shortcuts;
 using Daybreak.Windows.Services.Graph;
 using Daybreak.Windows.Services.Monitoring;
+using Daybreak.Windows.Services.Screens;
 using Daybreak.Windows.Services.Shortcuts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -63,11 +66,20 @@ public sealed class WindowsPlatformConfiguration : PluginConfigurationBase
         // Graph client
         services.AddScoped<IGraphClient, BlazorGraphClient>();
 
+        // Screen manager (Windows-specific)
+        services.AddHostedSingleton<IScreenManager, ScreenManager>();
+
         // Shortcut manager
         services.AddHostedSingleton<IShortcutManager, ShortcutManager>();
 
         // Performance monitoring (Windows-only PerformanceCounter)
         services.AddHostedService<MemoryUsageMonitor>();
         services.AddHostedService<DiskUsageMonitor>();
+    }
+
+    public override void RegisterMods(IModsProducer modsProducer)
+    {
+        // Windows-specific mods
+        modsProducer.RegisterMod<IGuildwarsScreenPlacer, GuildwarsScreenPlacer>();
     }
 }

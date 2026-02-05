@@ -2,11 +2,9 @@
 using Daybreak.Extensions;
 using Daybreak.Services.Options;
 using Daybreak.Services.Plugins;
-using Daybreak.Services.Screens;
 using Daybreak.Services.Themes;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Plugins;
-using Daybreak.Shared.Services.Screens;
 using Daybreak.Shared.Services.Themes;
 using Microsoft.Extensions.DependencyInjection;
 using System.Extensions;
@@ -21,7 +19,7 @@ public partial class Launcher
         SetupLogging(serviceCollection);
         BootstrapOptionsManager(serviceCollection);
         BootstrapThemeOptions(serviceCollection);
-        BootstrapScreenManager(serviceCollection);
+        BootstrapScreenManagerOptions(serviceCollection);
         BootstrapPluginsService(serviceCollection);
         return serviceCollection.BuildServiceProvider();
     }
@@ -45,10 +43,9 @@ public partial class Launcher
         services.AddHostedService(sp => sp.GetRequiredService<IThemeManager>().Cast<BlazorThemeInteropService>());
     }
 
-    private static void BootstrapScreenManager(IServiceCollection services)
+    private static void BootstrapScreenManagerOptions(IServiceCollection services)
     {
+        // Only register options here - actual ScreenManager is registered by platform-specific configuration
         services.AddDaybreakOptions<ScreenManagerOptions>();
-        services.AddSingleton<IScreenManager, ScreenManager>();
-        services.AddHostedService(sp => sp.GetRequiredService<IScreenManager>().Cast<ScreenManager>());
     }
 }
