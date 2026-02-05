@@ -159,20 +159,20 @@
 
     <Message Importance="high" Text="📦 Daybreak.Installer -&gt; $(InstallerOutput)"></Message>
     
-    <Exec Command="dotnet publish ..\Daybreak.Installer\Daybreak.Installer.csproj -c $(Configuration) -o $(InstallerOutput)" />
+    <Exec Command="dotnet publish ../Daybreak.Installer/Daybreak.Installer.csproj -c $(Configuration) -o $(InstallerOutput)" WorkingDirectory="$(ProjectDir)" />
   </Target>
 
   <Target Name="PublishDaybreakInjector" AfterTargets="Build" Inputs="@(DaybreakInjectorSources)" Outputs="$(InjectorOutput)Daybreak.Injector.exe">
 
     <Message Importance="high" Text="📦 Daybreak.Injector -&gt; $(InjectorOutput)"></Message>
 
-    <Exec Command="dotnet publish ..\Daybreak.Injector\Daybreak.Injector.csproj -c $(Configuration) -o $(InjectorOutput)" />
+    <Exec Command="dotnet publish ../Daybreak.Injector/Daybreak.Injector.csproj -c $(Configuration) -o $(InjectorOutput)" WorkingDirectory="$(ProjectDir)" />
   </Target>
 
   <Target Name="PublishDaybreakAPI" AfterTargets="Build" Inputs="@(DaybreakApiSources)" Outputs="$(ApiOutput)Daybreak.API.dll">
     
     <Message Importance="high" Text="📦 Daybreak.API -&gt; $(ApiOutput)"></Message>
     
-    <Exec Command="dotnet publish ..\Daybreak.API\Daybreak.API.csproj -c $(Configuration) -o $(ApiOutput)" />
+    <Exec Command="dotnet publish ../Daybreak.API/Daybreak.API.csproj -c $(Configuration) -o $(ApiOutput)" WorkingDirectory="$(ProjectDir)" />
   </Target>
 </Project>
