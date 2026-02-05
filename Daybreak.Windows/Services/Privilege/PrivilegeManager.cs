@@ -1,4 +1,5 @@
-﻿using Daybreak.Shared.Services.Privilege;
+using Daybreak.Services.Privilege;
+using Daybreak.Shared.Services.Privilege;
 using Daybreak.Views;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
@@ -7,7 +8,7 @@ using System.Extensions;
 using System.Security.Principal;
 using TrailBlazr.Services;
 
-namespace Daybreak.Services.Privilege;
+namespace Daybreak.Windows.Services.Privilege;
 
 internal sealed class PrivilegeManager(
     PrivilegeContext privilegeContext,

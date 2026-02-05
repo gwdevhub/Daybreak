@@ -187,7 +187,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IEventService, EventService>();
         services.AddScoped<IApplicationArgumentService, ApplicationArgumentService>();
         services.AddScoped<IWikiService, WikiService>();
-        services.AddScoped<IPrivilegeManager, PrivilegeManager>();
         services.AddScoped<IScreenshotService, ScreenshotService>();
 
         services.AddHostedSingleton<IApplicationUpdater, ApplicationUpdater>();

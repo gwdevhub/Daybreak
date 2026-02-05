@@ -1,8 +1,10 @@
 using Daybreak.Extensions;
 using Daybreak.Linux.Services.Keyboard;
+using Daybreak.Linux.Services.Privilege;
 using Daybreak.Linux.Services.Screens;
 using Daybreak.Shared.Models.Plugins;
 using Daybreak.Shared.Services.Keyboard;
+using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Services.Screens;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -21,6 +23,9 @@ public sealed class LinuxPlatformConfiguration : PluginConfigurationBase
 
         // Keyboard hook service (Linux dummy - no-op)
         services.AddHostedSingleton<IKeyboardHookService, KeyboardHookService>();
+
+        // Privilege manager (Linux dummy - TODO: implement with pkexec/polkit)
+        services.AddScoped<IPrivilegeManager, PrivilegeManager>();
 
         // TODO: Register additional Linux-specific service implementations
         // For example:

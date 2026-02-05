@@ -4,11 +4,13 @@ using Daybreak.Services.Graph;
 using Daybreak.Shared.Models.Plugins;
 using Daybreak.Shared.Services.Initialization;
 using Daybreak.Shared.Services.Keyboard;
+using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Services.Screens;
 using Daybreak.Shared.Services.Shortcuts;
 using Daybreak.Windows.Services.Graph;
 using Daybreak.Windows.Services.Keyboard;
 using Daybreak.Windows.Services.Monitoring;
+using Daybreak.Windows.Services.Privilege;
 using Daybreak.Windows.Services.Screens;
 using Daybreak.Windows.Services.Shortcuts;
 using Microsoft.Extensions.DependencyInjection;
@@ -80,6 +82,9 @@ public sealed class WindowsPlatformConfiguration : PluginConfigurationBase
 
         // Keyboard hook service (Windows-only low-level hooks)
         services.AddHostedSingleton<IKeyboardHookService, KeyboardHookService>();
+
+        // Privilege manager (Windows-specific using WindowsIdentity)
+        services.AddScoped<IPrivilegeManager, PrivilegeManager>();
     }
 
     public override void RegisterMods(IModsProducer modsProducer)
