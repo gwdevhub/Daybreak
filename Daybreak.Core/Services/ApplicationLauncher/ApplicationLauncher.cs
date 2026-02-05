@@ -26,6 +26,11 @@ using static Daybreak.Shared.Utils.NativeMethods;
 
 namespace Daybreak.Services.ApplicationLauncher;
 
+// NOTE: ApplicationLauncher stays as-is. It orchestrates launching via IDaybreakInjector.
+// For Linux support, IDaybreakInjector needs a platform-specific implementation that:
+// 1. Sets up Wine prefix (WINEPREFIX environment variable)
+// 2. Calls "wine Daybreak.Injector.exe <args>" instead of direct execution
+// See DaybreakInjector.cs for the Windows implementation.
 internal sealed class ApplicationLauncher(
     PhotinoWindow photinoWindow,
     IDaybreakInjector daybreakInjector,

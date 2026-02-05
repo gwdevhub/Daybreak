@@ -1,12 +1,16 @@
-﻿using Daybreak.Shared.Models;
+using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Extensions.Core;
 
-namespace Daybreak.Services.Injection;
+namespace Daybreak.Windows.Services.Injection;
 
+/// <summary>
+/// Windows-specific implementation of IDaybreakInjector.
+/// Directly calls Daybreak.Injector.exe to launch, inject, and resume GuildWars processes.
+/// </summary>
 public class DaybreakInjector(
     ILogger<DaybreakInjector> logger)
     : IDaybreakInjector
@@ -156,7 +160,7 @@ public class DaybreakInjector(
             var error = await process.StandardError.ReadToEndAsync(cancellationToken);
             return (output, error, process.ExitCode);
         }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }

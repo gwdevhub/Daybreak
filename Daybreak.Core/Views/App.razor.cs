@@ -147,6 +147,7 @@ public sealed class AppViewModel
          * This operation has to be queued on the UI thread and has to be done via PostMessage to avoid re-entrancy.
          * Using SendMessage or doing it directly can cause crashes when WebView2 is handling a user callback while another sendmessage appears.
          */
+        // TODO: This doesn't work on Linux. Needs to be removed/reworked
         this.photinoApp.WindowManager.Dispatcher.InvokeAsync(() =>
         {
             var hwnd = this.photinoApp.MainWindow.WindowHandle;

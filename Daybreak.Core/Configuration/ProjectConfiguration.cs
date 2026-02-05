@@ -180,7 +180,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IItemHashService, ItemHashService>();
         services.AddScoped<IRegistryService, RegistryService>();
         services.AddScoped<IToolboxClient, ToolboxClient>();
-        services.AddScoped<IDaybreakInjector, DaybreakInjector>();
         services.AddScoped<IProcessInjector, ProcessInjector>();
         services.AddScoped<IStubInjector, StubInjector>();
         services.AddScoped<ILaunchConfigurationService, LaunchConfigurationService>();

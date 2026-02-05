@@ -34,7 +34,7 @@ public partial class Launcher
         // Add platform-specific configuration if provided
         if (platformConfiguration is not null)
         {
-            configurations = configurations.Prepend(("Platform", platformConfiguration, default)).ToList();
+            configurations = configurations.Prepend(("Platform-Specific", platformConfiguration, default)).ToList();
         }
 
         var menuEntryProducer = new MenuProducer(bootstrap.GetRequiredService<ILogger<MenuProducer>>());

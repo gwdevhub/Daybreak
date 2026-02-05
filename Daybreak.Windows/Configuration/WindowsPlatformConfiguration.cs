@@ -3,11 +3,13 @@ using Daybreak.Extensions;
 using Daybreak.Services.Graph;
 using Daybreak.Shared.Models.Plugins;
 using Daybreak.Shared.Services.Initialization;
+using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.Keyboard;
 using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Services.Screens;
 using Daybreak.Shared.Services.Shortcuts;
 using Daybreak.Windows.Services.Graph;
+using Daybreak.Windows.Services.Injection;
 using Daybreak.Windows.Services.Keyboard;
 using Daybreak.Windows.Services.Monitoring;
 using Daybreak.Windows.Services.Privilege;
@@ -85,6 +87,9 @@ public sealed class WindowsPlatformConfiguration : PluginConfigurationBase
 
         // Privilege manager (Windows-specific using WindowsIdentity)
         services.AddScoped<IPrivilegeManager, PrivilegeManager>();
+
+        // Daybreak injector (Windows - direct process execution)
+        services.AddScoped<IDaybreakInjector, DaybreakInjector>();
     }
 
     public override void RegisterMods(IModsProducer modsProducer)

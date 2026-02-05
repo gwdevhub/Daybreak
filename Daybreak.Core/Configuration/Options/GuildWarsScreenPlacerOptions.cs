@@ -5,7 +5,7 @@ namespace Daybreak.Configuration.Options;
 
 [OptionsSynchronizationIgnore]
 [OptionsIgnore]
-internal sealed class GuildWarsScreenPlacerOptions
+public sealed class GuildWarsScreenPlacerOptions
 {
     [JsonPropertyName(nameof(Enabled))]
     public bool Enabled { get; set; }
