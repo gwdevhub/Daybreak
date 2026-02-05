@@ -55,7 +55,7 @@ public partial class Launcher
         }
 
         builder.Services.AddSingleton<IReadOnlyDictionary<string, MenuCategory>>(menuEntryProducer.categories.AsReadOnly());
-        var mainApp = CreateMainApp(builder);
+        var mainApp = CreateMainApp(builder, args);
         foreach (var (pluginName, configuration, plugin) in configurations)
         {
             if (configuration is null)
