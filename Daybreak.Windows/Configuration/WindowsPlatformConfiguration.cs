@@ -3,9 +3,11 @@ using Daybreak.Extensions;
 using Daybreak.Services.Graph;
 using Daybreak.Shared.Models.Plugins;
 using Daybreak.Shared.Services.Initialization;
+using Daybreak.Shared.Services.Keyboard;
 using Daybreak.Shared.Services.Screens;
 using Daybreak.Shared.Services.Shortcuts;
 using Daybreak.Windows.Services.Graph;
+using Daybreak.Windows.Services.Keyboard;
 using Daybreak.Windows.Services.Monitoring;
 using Daybreak.Windows.Services.Screens;
 using Daybreak.Windows.Services.Shortcuts;
@@ -75,6 +77,9 @@ public sealed class WindowsPlatformConfiguration : PluginConfigurationBase
         // Performance monitoring (Windows-only PerformanceCounter)
         services.AddHostedService<MemoryUsageMonitor>();
         services.AddHostedService<DiskUsageMonitor>();
+
+        // Keyboard hook service (Windows-only low-level hooks)
+        services.AddHostedSingleton<IKeyboardHookService, KeyboardHookService>();
     }
 
     public override void RegisterMods(IModsProducer modsProducer)
