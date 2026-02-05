@@ -28,16 +28,20 @@ public partial class Launcher
         return mainBuilder;
     }
 
-    private static PhotinoBlazorApp CreateMainApp(PhotinoBlazorAppBuilder mainBuilder)
+    private static PhotinoBlazorApp CreateMainApp(
+        PhotinoBlazorAppBuilder mainBuilder,
+        string[] args
+    )
     {
         var app = mainBuilder.Build();
 
         var cts = new CancellationTokenSource();
         app.MainWindow.SetTitle("Daybreak")
-            .SetContextMenuEnabled(IsDebug)
-            .SetDevToolsEnabled(IsDebug)
+            .SetContextMenuEnabled(IsDebug || args.Any(s => string.Equals(s, "--enable-context-menu")))
+            .SetDevToolsEnabled(IsDebug || args.Any(s => string.Equals(s, "--enable-dev-tools")))
             .SetSmoothScrollingEnabled(true)
-            .SetChromeless(true);
+            .SetChromeless(!args.Any(s => string.Equals(s, "--disable-chromeless")))
+            .SetBrowserControlInitParameters(string.Join(" ", args));
         app.MainWindow.SetLogVerbosity(0);
         app.MainWindow.RegisterWindowCreatedHandler((_, __) => SetupWindowIcon(app));
         app.MainWindow.RegisterWindowCreatedHandler((_, __) => SetupRoundedWindows(app));
