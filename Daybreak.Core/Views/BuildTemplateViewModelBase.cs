@@ -104,7 +104,7 @@ public abstract class BuildTemplateViewModelBase<TViewModel, TView>(
 
     public override sealed async ValueTask ParametersSet(TView view, CancellationToken cancellationToken)
     {
-        var buildLoad = await this.buildTemplateManager.GetBuild(view.BuildName);
+        var buildLoad = await this.buildTemplateManager.GetBuild(Uri.UnescapeDataString(view.BuildName));
         if (buildLoad is null)
         {
             return;

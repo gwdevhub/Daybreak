@@ -254,7 +254,7 @@ public sealed class FocusViewModel(
         }
 
         var singleBuildEntry = this.buildTemplateManager.CreateSingleBuild(entry);
-        this.viewManager.ShowView<BuildRoutingView>((nameof(BuildRoutingView.BuildName), singleBuildEntry.Name ?? throw new InvalidOperationException()));
+        this.viewManager.ShowView<BuildRoutingView>((nameof(BuildRoutingView.BuildName), Uri.EscapeDataString(singleBuildEntry.Name ?? throw new InvalidOperationException())));
     }
 
     public async void OnPlayerTeamBuildClicked()
@@ -271,7 +271,7 @@ public sealed class FocusViewModel(
         }
 
         var teamBuildEntry = this.buildTemplateManager.CreateTeamBuild(loadout);
-        this.viewManager.ShowView<BuildRoutingView>((nameof(BuildRoutingView.BuildName), teamBuildEntry.Name ?? throw new InvalidOperationException()));
+        this.viewManager.ShowView<BuildRoutingView>((nameof(BuildRoutingView.BuildName), Uri.EscapeDataString(teamBuildEntry.Name ?? throw new InvalidOperationException())));
     }
 
     private void ViewManager_ShowViewRequested(object? _, TrailBlazr.Models.ViewRequest e)

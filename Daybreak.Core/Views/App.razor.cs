@@ -166,6 +166,7 @@ public sealed class AppViewModel
         });
     }
 
+    //TODO: This does not work on linux and needs to be reworked
     public void StartResize(NativeMethods.ResizeDirection resizeDirection)
     {
         /*

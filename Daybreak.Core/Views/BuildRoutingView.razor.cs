@@ -18,7 +18,7 @@ public sealed class BuildRoutingViewModel(
 
     public override async ValueTask ParametersSet(BuildRoutingView view, CancellationToken cancellationToken)
     {
-        var build = await this.buildTemplateManager.GetBuild(view.BuildName);
+        var build = await this.buildTemplateManager.GetBuild(Uri.UnescapeDataString(view.BuildName));
         if (build is null)
         {
             this.notificationService.NotifyError(
@@ -30,11 +30,11 @@ public sealed class BuildRoutingViewModel(
 
         if (build is SingleBuildEntry singleBuildEntry)
         {
-            this.viewManager.ShowView<SingleBuildTemplateView>((nameof(SingleBuildTemplateView.BuildName), singleBuildEntry.Name ?? string.Empty));
+            this.viewManager.ShowView<SingleBuildTemplateView>((nameof(SingleBuildTemplateView.BuildName), Uri.EscapeDataString(singleBuildEntry.Name ?? string.Empty)));
         }
         else if (build is TeamBuildEntry teamBuildEntry)
         {
-            this.viewManager.ShowView<TeamBuildTemplateView>((nameof(TeamBuildTemplateView.BuildName), teamBuildEntry.Name ?? string.Empty));
+            this.viewManager.ShowView<TeamBuildTemplateView>((nameof(TeamBuildTemplateView.BuildName), Uri.EscapeDataString(teamBuildEntry.Name ?? string.Empty)));
         }
         else
         {

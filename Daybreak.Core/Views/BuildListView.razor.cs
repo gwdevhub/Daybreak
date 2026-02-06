@@ -108,7 +108,7 @@ public sealed class BuildListViewModel
     public void BuildClicked(BuildListEntry buildListEntry)
     {
         this.CloseSnippet();
-        this.viewManager.ShowView<BuildRoutingView>((nameof(BuildRoutingView.BuildName), buildListEntry.BuildEntry.Name ?? string.Empty));
+        this.viewManager.ShowView<BuildRoutingView>((nameof(BuildRoutingView.BuildName), Uri.EscapeDataString(buildListEntry.BuildEntry.Name ?? string.Empty)));
     }
 
     public void DeleteBuild(BuildListEntry buildListEntry)
@@ -124,14 +124,14 @@ public sealed class BuildListViewModel
     {
         var build = this.buildTemplateManager.CreateSingleBuild();
         this.buildTemplateManager.SaveBuild(build);
-        this.viewManager.ShowView<BuildRoutingView>((nameof(BuildRoutingView.BuildName), build.Name ?? string.Empty));
+        this.viewManager.ShowView<BuildRoutingView>((nameof(BuildRoutingView.BuildName), Uri.EscapeDataString(build.Name ?? string.Empty)));
     }
 
     public void CreateNewTeamBuild()
     {
         var build = this.buildTemplateManager.CreateTeamBuild();
         this.buildTemplateManager.SaveBuild(build);
-        this.viewManager.ShowView<BuildRoutingView>((nameof(BuildRoutingView.BuildName), build.Name ?? string.Empty));
+        this.viewManager.ShowView<BuildRoutingView>((nameof(BuildRoutingView.BuildName), Uri.EscapeDataString(build.Name ?? string.Empty)));
     }
 
     public async void OpenSnippet(BuildListEntry buildListEntry, MouseEventArgs e)
