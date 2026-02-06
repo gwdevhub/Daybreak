@@ -9,6 +9,8 @@ using Daybreak.Shared.Services.Keyboard;
 using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Services.Screens;
 using Daybreak.Shared.Services.Shortcuts;
+using Daybreak.Shared.Services.ApplicationLauncher;
+using Daybreak.Windows.Services.ApplicationLauncher;
 using Daybreak.Windows.Services.Credentials;
 using Daybreak.Windows.Services.Graph;
 using Daybreak.Windows.Services.Injection;
@@ -71,35 +73,20 @@ public sealed class WindowsPlatformConfiguration : PluginConfigurationBase
             }
         });
 
-        // Graph client
         services.AddScoped<IGraphClient, BlazorGraphClient>();
-
-        // Screen manager (Windows-specific)
         services.AddHostedSingleton<IScreenManager, ScreenManager>();
-
-        // Shortcut manager
         services.AddHostedSingleton<IShortcutManager, ShortcutManager>();
-
-        // Performance monitoring (Windows-only PerformanceCounter)
         services.AddHostedService<MemoryUsageMonitor>();
         services.AddHostedService<DiskUsageMonitor>();
-
-        // Keyboard hook service (Windows-only low-level hooks)
         services.AddHostedSingleton<IKeyboardHookService, KeyboardHookService>();
-
-        // Privilege manager (Windows-specific using WindowsIdentity)
         services.AddScoped<IPrivilegeManager, PrivilegeManager>();
-
-        // Credential protector (Windows DPAPI)
         services.AddSingleton<ICredentialProtector, CredentialProtector>();
-
-        // Daybreak injector (Windows - direct process execution)
         services.AddScoped<IDaybreakInjector, DaybreakInjector>();
+        services.AddScoped<IGuildWarsReadyChecker, GuildWarsReadyChecker>();
     }
 
     public override void RegisterMods(IModsProducer modsProducer)
     {
-        // Windows-specific mods
         modsProducer.RegisterMod<IGuildwarsScreenPlacer, GuildwarsScreenPlacer>();
     }
 }

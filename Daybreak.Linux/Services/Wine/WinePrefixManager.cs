@@ -320,8 +320,7 @@ public sealed class WinePrefixManager(
         string workingDirectory,
         string[] arguments,
         CancellationToken cancellationToken,
-        Func<IReadOnlyList<string>, IReadOnlyList<string>, (bool IsComplete, int ExitCode)>? outputCompletionChecker = null,
-        TimeSpan? timeout = null)
+        Func<string, IReadOnlyList<string>, bool>? completionChecker = null)
     {
         if (!this.IsAvailable())
         {
@@ -362,23 +361,14 @@ public sealed class WinePrefixManager(
 
             var outputLines = new List<string>();
             var errorLines = new List<string>();
-            var outputComplete = new TaskCompletionSource<bool>();
-            var exitCodeFromOutput = 0;
-            var foundExitCode = false;
 
-            void CheckCompletion()
-            {
-                if (outputCompletionChecker is not null && !foundExitCode)
-                {
-                    var (isComplete, exitCode) = outputCompletionChecker(outputLines, errorLines);
-                    if (isComplete)
-                    {
-                        foundExitCode = true;
-                        exitCodeFromOutput = exitCode;
-                        outputComplete.TrySetResult(true);
-                    }
-                }
-            }
+            // When a completionChecker is provided, we use it to detect when the
+            // Windows exe has finished writing its expected output. This avoids
+            // waiting on WaitForExitAsync which hangs because Wine's wrapper process
+            // stays alive as long as child processes (e.g. Guild Wars) are running.
+            var completionTcs = completionChecker is not null
+                ? new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously)
+                : null;
 
             process.OutputDataReceived += (sender, e) =>
             {
@@ -386,12 +376,14 @@ public sealed class WinePrefixManager(
                 {
                     this.logger.LogDebug("Wine stdout: {Line}", e.Data);
                     outputLines.Add(e.Data);
-                    CheckCompletion();
-                }
-                else
-                {
-                    // null data means end of stream
-                    outputComplete.TrySetResult(true);
+
+                    if (completionTcs is not null &&
+                        !completionTcs.Task.IsCompleted &&
+                        completionChecker!(e.Data, outputLines))
+                    {
+                        this.logger.LogDebug("Completion checker signalled done");
+                        completionTcs.TrySetResult(true);
+                    }
                 }
             };
 
@@ -401,7 +393,6 @@ public sealed class WinePrefixManager(
                 {
                     this.logger.LogDebug("Wine stderr: {Line}", e.Data);
                     errorLines.Add(e.Data);
-                    CheckCompletion();
                 }
             };
 
@@ -409,63 +400,28 @@ public sealed class WinePrefixManager(
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
 
-            var effectiveTimeout = timeout ?? TimeSpan.FromSeconds(30);
-            using var timeoutCts = new CancellationTokenSource(effectiveTimeout);
-
-            try
+            if (completionTcs is not null)
             {
-                await Task.WhenAny(
-                    outputComplete.Task,
-                    process.WaitForExitAsync(timeoutCts.Token)
-                );
+                // Wait for the completion checker to signal, or cancellation.
+                // Don't wait for Wine to exit — it may never exit while GW runs.
+                using var registration = cancellationToken.Register(
+                    () => completionTcs.TrySetCanceled(cancellationToken));
+                await completionTcs.Task;
             }
-            catch (OperationCanceledException) when (timeoutCts.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+            else
             {
-                this.logger.LogDebug("Wine process timeout reached after {Timeout}", effectiveTimeout);
-            }
-
-            try
-            {
-                await Task.Delay(50, cancellationToken);
-            }
-            catch (OperationCanceledException)
-            {
-                throw;
+                await process.WaitForExitAsync(cancellationToken);
             }
 
             var output = string.Join(Environment.NewLine, outputLines);
             var error = string.Join(Environment.NewLine, errorLines);
 
-            int exitCode;
-            if (process.HasExited)
-            {
-                exitCode = process.ExitCode;
-            }
-            else if (foundExitCode)
-            {
-                // We got the output we needed, but Wine hasn't exited (waiting for child)
-                // Use the exit code we determined from the output
-                exitCode = exitCodeFromOutput;
-                this.logger.LogDebug("Wine process still running (child process alive), but we have the output we need");
-            }
-            else
-            {
-                // Timeout with no useful output
-                exitCode = -999;
-                this.logger.LogWarning("Wine process did not produce expected output within timeout");
-
-                try
-                {
-                    process.Kill(entireProcessTree: true);
-                }
-                catch (Exception ex)
-                {
-                    this.logger.LogDebug(ex, "Failed to kill Wine process tree");
-                }
-            }
+            var exitCode = completionTcs is not null
+                ? 0 // We didn't wait for exit, assume success since output was captured
+                : process.ExitCode;
 
             this.logger.LogDebug(
-                "Wine process result - ExitCode: {ExitCode}, Output: {Output}, Error: {Error}",
+                "Wine process completed. ExitCode: {ExitCode}. Output: {Output}, Error: {Error}",
                 exitCode,
                 output,
                 error

@@ -1,4 +1,5 @@
 using Daybreak.Extensions;
+using Daybreak.Linux.Services.ApplicationLauncher;
 using Daybreak.Linux.Services.Credentials;
 using Daybreak.Linux.Services.Injection;
 using Daybreak.Linux.Services.Keyboard;
@@ -8,6 +9,7 @@ using Daybreak.Linux.Services.Startup.Actions;
 using Daybreak.Linux.Services.Startup.Notifications;
 using Daybreak.Linux.Services.Wine;
 using Daybreak.Shared.Models.Plugins;
+using Daybreak.Shared.Services.ApplicationLauncher;
 using Daybreak.Shared.Services.Credentials;
 using Daybreak.Shared.Services.FileProviders;
 using Daybreak.Shared.Services.Initialization;
@@ -33,6 +35,7 @@ public sealed class LinuxPlatformConfiguration : PluginConfigurationBase
         services.AddScoped<IDaybreakInjector, DaybreakInjector>();
         services.AddSingleton<ICredentialProtector, CredentialProtector>();
         services.AddSingleton<IWinePidMapper, WinePidMapper>();
+        services.AddScoped<IGuildWarsReadyChecker, GuildWarsReadyChecker>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)

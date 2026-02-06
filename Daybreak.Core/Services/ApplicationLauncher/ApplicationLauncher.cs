@@ -38,6 +38,7 @@ internal sealed class ApplicationLauncher(
     IOptionsMonitor<LauncherOptions> launcherOptions,
     IModsManager modsManager,
     IPrivilegeManager privilegeManager,
+    IGuildWarsReadyChecker guildWarsReadyChecker,
     ILogger<ApplicationLauncher> logger) : IApplicationLauncher
 {
     private const string SteamAppIdFile = "steam_appid.txt";
@@ -55,6 +56,7 @@ internal sealed class ApplicationLauncher(
     private readonly IModsManager modsManager = modsManager.ThrowIfNull();
     private readonly ILogger<ApplicationLauncher> logger = logger.ThrowIfNull();
     private readonly IPrivilegeManager privilegeManager = privilegeManager.ThrowIfNull();
+    private readonly IGuildWarsReadyChecker guildWarsReadyChecker = guildWarsReadyChecker.ThrowIfNull();
 
     public async Task<GuildWarsApplicationLaunchContext?> LaunchGuildwars(LaunchConfigurationWithCredentials launchConfigurationWithCredentials, CancellationToken cancellationToken)
     {
@@ -351,81 +353,46 @@ internal sealed class ApplicationLauncher(
         }
 
         var sw = Stopwatch.StartNew();
-        while (sw.Elapsed.TotalSeconds < LaunchTimeout.TotalSeconds)
+        var isReady = await this.guildWarsReadyChecker.WaitForReady(process, LaunchTimeout - sw.Elapsed, cancellationToken);
+        if (!isReady)
         {
-            await Task.Delay(500, cancellationToken);
-            if (process.HasExited)
-            {
-                scopedLogger.LogError("Guild Wars process exited before the main window was shown. Process ID: {process.Id}", process.Id);
-                this.notificationService.NotifyError(
-                    title: "Guild Wars process exited",
-                    description: "Guild Wars process exited before the main window was shown. Please check logs for details");
-                return default;
-            }
-
-            if (process.MainWindowHandle == IntPtr.Zero)
-            {
-                continue;
-            }
-
-            var windows = GetRootWindowsOfProcess(process.Id)
-                .Select(root => (root, GetChildWindows(root)))
-                .SelectMany(tuple =>
-                {
-                    tuple.Item2.Add(tuple.root);
-                    return tuple.Item2;
-                })
-                .Select(GetWindowTitle).ToList();
-
-            /*
-             * Detect when the game window has shown. Because both the updater and the game window are called Guild Wars,
-             * we need to look at the other windows created by the process. Especially, we need to detect the input windows
-             * to check when the game is ready to accept input
-             */
-            if (!windows.Contains("Guild Wars Reforged"))
-            {
-                continue;
-            }
-
-            var virtualMemory = process.VirtualMemorySize64;
-            if (virtualMemory < LaunchMemoryThreshold)
-            {
-                continue;
-            }
-
-            /*
-             * Run the actions one by one, to avoid injection issues
-             */
-            var guildWarsStartedContext = new GuildWarsStartedContext { ApplicationLauncherContext = applicationLauncherContext };
-            foreach (var mod in mods)
-            {
-                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.CurrentValue.ModStartupTimeout));
-                try
-                {
-                    await mod.OnGuildWarsStarted(guildWarsStartedContext, cts.Token);
-                }
-                catch (TaskCanceledException)
-                {
-                    scopedLogger.LogError("{mod.Name} timeout", mod.Name);
-                    this.notificationService.NotifyError(
-                        title: $"{mod.Name} timeout",
-                        description: $"Mod timed out while processing {nameof(mod.OnGuildWarsStarted)}");
-                }
-                catch (Exception e)
-                {
-                    this.KillGuildWarsProcess(new GuildWarsApplicationLaunchContext { GuildWarsProcess = process, LaunchConfiguration = launchConfigurationWithCredentials, ProcessId = (uint)pId });
-                    scopedLogger.LogError(e, "{mod.Name} unhandled exception", mod.Name);
-                    this.notificationService.NotifyError(
-                        title: $"{mod.Name} exception",
-                        description: $"Mod encountered exception of type {e.GetType().Name} while processing {nameof(mod.OnGuildWarsStarted)}");
-                    return default;
-                }
-            }
-
-            return process;
+            scopedLogger.LogError("Guild Wars process was not ready in time");
+            this.notificationService.NotifyError(
+                title: "Guild Wars process not ready",
+                description: "Guild Wars process exited or timed out before becoming ready. Please check logs for details");
+            return default;
         }
 
-        throw new InvalidOperationException("Unable to launch Guild Wars process. Timed out waiting for the main window to launch");
+        /*
+         * Run the actions one by one, to avoid injection issues
+         */
+        var guildWarsStartedContext = new GuildWarsStartedContext { ApplicationLauncherContext = applicationLauncherContext };
+        foreach (var mod in mods)
+        {
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.CurrentValue.ModStartupTimeout));
+            try
+            {
+                await mod.OnGuildWarsStarted(guildWarsStartedContext, cts.Token);
+            }
+            catch (TaskCanceledException)
+            {
+                scopedLogger.LogError("{mod.Name} timeout", mod.Name);
+                this.notificationService.NotifyError(
+                    title: $"{mod.Name} timeout",
+                    description: $"Mod timed out while processing {nameof(mod.OnGuildWarsStarted)}");
+            }
+            catch (Exception e)
+            {
+                this.KillGuildWarsProcess(new GuildWarsApplicationLaunchContext { GuildWarsProcess = process, LaunchConfiguration = launchConfigurationWithCredentials, ProcessId = (uint)pId });
+                scopedLogger.LogError(e, "{mod.Name} unhandled exception", mod.Name);
+                this.notificationService.NotifyError(
+                    title: $"{mod.Name} exception",
+                    description: $"Mod encountered exception of type {e.GetType().Name} while processing {nameof(mod.OnGuildWarsStarted)}");
+                return default;
+            }
+        }
+
+        return process;
     }
 
     public GuildWarsApplicationLaunchContext? GetGuildwarsProcess(LaunchConfigurationWithCredentials launchConfigurationWithCredentials)
@@ -628,60 +595,6 @@ internal sealed class ApplicationLauncher(
             CloseHandle(hSnapshot);
             return false;
         }
-    }
-
-    private static List<IntPtr> GetRootWindowsOfProcess(int pid)
-    {
-        var rootWindows = GetChildWindows(IntPtr.Zero);
-        var dsProcRootWindows = new List<IntPtr>();
-        foreach (IntPtr hWnd in rootWindows)
-        {
-            _ = GetWindowThreadProcessId(hWnd, out var lpdwProcessId);
-            if (lpdwProcessId == pid)
-                dsProcRootWindows.Add(hWnd);
-        }
-
-        return dsProcRootWindows;
-    }
-
-    private static List<IntPtr> GetChildWindows(IntPtr parent)
-    {
-        var result = new List<IntPtr>();
-        var listHandle = GCHandle.Alloc(result);
-        try
-        {
-            var childProc = new Win32Callback(EnumWindow);
-            EnumChildWindows(parent, childProc, GCHandle.ToIntPtr(listHandle));
-        }
-        finally
-        {
-            if (listHandle.IsAllocated)
-                listHandle.Free();
-        }
-
-        return result;
-    }
-
-    private static string GetWindowTitle(IntPtr hwnd)
-    {
-        var titleLength = NativeMethods.GetWindowTextLength(hwnd);
-        var titleBuffer = new StringBuilder(titleLength);
-        _ = NativeMethods.GetWindowText(hwnd, titleBuffer, titleLength + 1);
-        var title = titleBuffer.ToString();
-
-        return title;
-    }
-
-    private static bool EnumWindow(IntPtr handle, IntPtr pointer)
-    {
-        var gch = GCHandle.FromIntPtr(pointer);
-        if (gch.Target is not List<IntPtr> list)
-        {
-            return false;
-        }
-
-        list.Add(handle);
-        return true;
     }
 
     private static string[]? PopulateCommandLineArgs(string argName, string? argValue)

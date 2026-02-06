@@ -69,8 +69,12 @@ public class DaybreakInjector(
         var wineDllPath = PathUtils.ToWinePath(dllPath);
         var (output, error, exitCode) = await this.LaunchInjector(
             ["winapi", winePid.Value.ToString(), $"\"{wineDllPath}\""],
-            cancellationToken
+            cancellationToken,
+            // All injector paths now print "ExitCode: X" as their last line.
+            completionChecker: (line, _) => line.StartsWith("ExitCode: ")
         );
+
+        exitCode = ParseExitCodeFromOutput(output, exitCode);
 
         scopedLogger.LogInformation(
             "Injector exit code: {ExitCode}\nInjector output: {Output}\nInjector error: {Error}",
@@ -108,8 +112,11 @@ public class DaybreakInjector(
         var wineDllPath = PathUtils.ToWinePath(dllPath);
         var (output, error, exitCode) = await this.LaunchInjector(
             ["stub", winePid.Value.ToString(), $"\"{entryPoint}\"", $"\"{wineDllPath}\""],
-            cancellationToken
+            cancellationToken,
+            completionChecker: (line, _) => line.StartsWith("ExitCode: ")
         );
+
+        exitCode = ParseExitCodeFromOutput(output, exitCode);
 
         scopedLogger.LogInformation(
             "Injector exit code: {ExitCode}\nInjector output: {Output}\nInjector error: {Error}",
@@ -149,29 +156,14 @@ public class DaybreakInjector(
         }
 
         var wineExePath = PathUtils.ToWinePath(executablePath);
-
-        // Completion checker: We're done when we see both ProcessId and ThreadHandle
-        static (bool IsComplete, int ExitCode) LaunchCompletionChecker(
-            IReadOnlyList<string> outputLines,
-            IReadOnlyList<string> errorLines)
-        {
-            var hasProcessId = outputLines.Any(l => l.StartsWith("ProcessId: "));
-            var hasThreadHandle = outputLines.Any(l => l.StartsWith("ThreadHandle: "));
-
-            if (hasProcessId && hasThreadHandle)
-            {
-                return (true, 0); // Success
-            }
-
-            return (false, 0);
-        }
-
         var (output, error, exitCode) = await this.LaunchInjector(
             ["launch", forceElevated.ToString(), $"\"{wineExePath}\"", string.Join(' ', args)],
             cancellationToken,
-            LaunchCompletionChecker,
-            TimeSpan.FromSeconds(15) // Short timeout - we just need ProcessId/ThreadHandle output
+            // All injector paths now print "ExitCode: X" as their last line.
+            completionChecker: (line, _) => line.StartsWith("ExitCode: ")
         );
+
+        exitCode = ParseExitCodeFromOutput(output, exitCode);
 
         scopedLogger.LogInformation(
             "Injector exit code: {ExitCode}\nInjector output: {Output}\nInjector error: {Error}",
@@ -241,8 +233,11 @@ public class DaybreakInjector(
 
         var (output, error, exitCode) = await this.LaunchInjector(
             ["resume", threadHandle.ToString()],
-            cancellationToken
+            cancellationToken,
+            completionChecker: (line, _) => line.StartsWith("ExitCode: ")
         );
+
+        exitCode = ParseExitCodeFromOutput(output, exitCode);
 
         scopedLogger.LogInformation(
             "Injector exit code: {ExitCode}\nInjector output: {Output}\nInjector error: {Error}",
@@ -257,8 +252,7 @@ public class DaybreakInjector(
     private async Task<(string? Output, string? Error, int ExitCode)> LaunchInjector(
         string[] arguments,
         CancellationToken cancellationToken,
-        Func<IReadOnlyList<string>, IReadOnlyList<string>, (bool IsComplete, int ExitCode)>? outputCompletionChecker = null,
-        TimeSpan? timeout = null
+        Func<string, IReadOnlyList<string>, bool>? completionChecker = null
     )
     {
         var injectorPath = PathUtils.GetAbsolutePathFromRoot(InjectorRelativePath);
@@ -269,8 +263,32 @@ public class DaybreakInjector(
             workingDirectory,
             arguments,
             cancellationToken,
-            outputCompletionChecker,
-            timeout
+            completionChecker
         );
+    }
+
+    /// <summary>
+    /// Parses the exit code from the injector's stdout output.
+    /// The injector writes "ExitCode: X" as its last line on all paths.
+    /// Falls back to the provided default if parsing fails.
+    /// </summary>
+    private static int ParseExitCodeFromOutput(string? output, int defaultExitCode)
+    {
+        if (output is null)
+        {
+            return defaultExitCode;
+        }
+
+        var lines = output.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+        for (var i = lines.Length - 1; i >= 0; i--)
+        {
+            if (lines[i].StartsWith("ExitCode: ") &&
+                int.TryParse(lines[i]["ExitCode: ".Length..], out var parsedCode))
+            {
+                return parsedCode;
+            }
+        }
+
+        return defaultExitCode;
     }
 }
