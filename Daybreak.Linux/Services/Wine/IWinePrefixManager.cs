@@ -33,14 +33,11 @@ public interface IWinePrefixManager : IModService
     /// <summary>
     /// Launches a Windows executable through Wine with the managed prefix.
     /// </summary>
-    /// <param name="exePath">Path to the Windows executable (Linux path, will be converted to Wine path).</param>
-    /// <param name="workingDirectory">Working directory for the process (Linux path).</param>
-    /// <param name="arguments">Arguments to pass to the executable.</param>
-    /// <param name="cancellationToken">Cancellation token.</param>
-    /// <returns>Output, error, and exit code from the process.</returns>
     Task<(string? Output, string? Error, int ExitCode)> LaunchProcess(
         string exePath,
         string workingDirectory,
         string[] arguments,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken,
+        Func<IReadOnlyList<string>, IReadOnlyList<string>, (bool IsComplete, int ExitCode)>? outputCompletionChecker = null,
+        TimeSpan? timeout = null);
 }

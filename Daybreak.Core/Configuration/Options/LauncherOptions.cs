@@ -6,10 +6,6 @@ namespace Daybreak.Configuration.Options;
 [OptionsName(Name = "Launcher")]
 public sealed class LauncherOptions
 {
-    [JsonPropertyName(nameof(LaunchGuildwarsAsCurrentUser))]
-    [OptionName(Name = "Launch GuildWars As Current User", Description = "If true, will attempt to launch GuildWars as the current user. Otherwise will attempt to launch as system user")]
-    public bool LaunchGuildwarsAsCurrentUser { get; set; } = true;
-
     [JsonPropertyName(nameof(ShortcutLocation))]
     [OptionName(Name = "Shortcut Location", Description = "Location where the shortcut will be placed")]
     [OptionSynchronizationIgnore]

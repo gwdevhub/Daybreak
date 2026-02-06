@@ -13,20 +13,23 @@ namespace Daybreak.Linux.Services.Injection;
 /// </summary>
 public class DaybreakInjector(
     ILogger<DaybreakInjector> logger,
-    IWinePrefixManager winePrefixManager
+    IWinePrefixManager winePrefixManager,
+    IWinePidMapper winePidMapper
 ) : IDaybreakInjector
 {
     private const string InjectorRelativePath = "Injector/Daybreak.Injector.exe";
 
     private readonly ILogger<DaybreakInjector> logger = logger;
     private readonly IWinePrefixManager winePrefixManager = winePrefixManager;
+    private readonly IWinePidMapper winePidMapper = winePidMapper;
 
     public bool InjectorAvailable()
     {
+        var scopedLogger = this.logger.CreateScopedLogger();
         // Check if Wine is installed and the injector executable exists
         if (!this.winePrefixManager.IsAvailable())
         {
-            this.logger.LogWarning("Wine is not available");
+            scopedLogger.LogWarning("Wine is not available");
             return false;
         }
 
@@ -35,7 +38,7 @@ public class DaybreakInjector(
 
         if (!exists)
         {
-            this.logger.LogWarning("Injector not found at {InjectorPath}", injectorPath);
+            scopedLogger.LogWarning("Injector not found at {InjectorPath}", injectorPath);
         }
 
         return exists;
@@ -55,9 +58,17 @@ public class DaybreakInjector(
             return InjectorResponses.InjectResult.InvalidInjector;
         }
 
+        // Convert Linux PID to Wine PID for the injector
+        var winePid = this.winePidMapper.LinuxPidToWinePid(processId);
+        if (winePid is null)
+        {
+            scopedLogger.LogError("No Wine PID mapping found for Linux PID {ProcessId}", processId);
+            return InjectorResponses.InjectResult.InvalidProcess;
+        }
+
         var wineDllPath = PathUtils.ToWinePath(dllPath);
         var (output, error, exitCode) = await this.LaunchInjector(
-            ["winapi", processId.ToString(), $"\"{wineDllPath}\""],
+            ["winapi", winePid.Value.ToString(), $"\"{wineDllPath}\""],
             cancellationToken
         );
 
@@ -86,9 +97,17 @@ public class DaybreakInjector(
             return InjectorResponses.InjectResult.InvalidInjector;
         }
 
+        // Convert Linux PID to Wine PID for the injector
+        var winePid = this.winePidMapper.LinuxPidToWinePid(processId);
+        if (winePid is null)
+        {
+            scopedLogger.LogError("No Wine PID mapping found for Linux PID {ProcessId}", processId);
+            return InjectorResponses.InjectResult.InvalidProcess;
+        }
+
         var wineDllPath = PathUtils.ToWinePath(dllPath);
         var (output, error, exitCode) = await this.LaunchInjector(
-            ["stub", processId.ToString(), $"\"{entryPoint}\"", $"\"{wineDllPath}\""],
+            ["stub", winePid.Value.ToString(), $"\"{entryPoint}\"", $"\"{wineDllPath}\""],
             cancellationToken
         );
 
@@ -121,10 +140,37 @@ public class DaybreakInjector(
             return (InjectorResponses.LaunchResult.InvalidInjector, -1, -1);
         }
 
+        // Wine doesn't support SaferCreateLevel/SaferComputeTokenFromLevel APIs used for non-elevated launch.
+        // Always use elevated mode on Linux to skip the restricted token creation.
+        const bool forceElevated = true;
+        if (!elevated)
+        {
+            scopedLogger.LogDebug("Forcing elevated mode for Wine compatibility");
+        }
+
         var wineExePath = PathUtils.ToWinePath(executablePath);
+
+        // Completion checker: We're done when we see both ProcessId and ThreadHandle
+        static (bool IsComplete, int ExitCode) LaunchCompletionChecker(
+            IReadOnlyList<string> outputLines,
+            IReadOnlyList<string> errorLines)
+        {
+            var hasProcessId = outputLines.Any(l => l.StartsWith("ProcessId: "));
+            var hasThreadHandle = outputLines.Any(l => l.StartsWith("ThreadHandle: "));
+
+            if (hasProcessId && hasThreadHandle)
+            {
+                return (true, 0); // Success
+            }
+
+            return (false, 0);
+        }
+
         var (output, error, exitCode) = await this.LaunchInjector(
-            ["launch", elevated.ToString(), $"\"{wineExePath}\"", string.Join(' ', args)],
-            cancellationToken
+            ["launch", forceElevated.ToString(), $"\"{wineExePath}\"", string.Join(' ', args)],
+            cancellationToken,
+            LaunchCompletionChecker,
+            TimeSpan.FromSeconds(15) // Short timeout - we just need ProcessId/ThreadHandle output
         );
 
         scopedLogger.LogInformation(
@@ -136,7 +182,7 @@ public class DaybreakInjector(
 
         // Parse the output for process ID and thread handle
         var lines =
-            output?.Split([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries) ?? [];
+            output?.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries) ?? [];
         var processId = 0;
         var threadHandle = 0;
 
@@ -151,6 +197,29 @@ public class DaybreakInjector(
             {
                 var threadHandleString = line["ThreadHandle: ".Length..];
                 _ = int.TryParse(threadHandleString, out threadHandle);
+            }
+        }
+
+        // Convert Wine PID to Linux PID so the rest of Daybreak can use Process.GetProcessById()
+        if (processId > 0)
+        {
+            var executableName = Path.GetFileName(executablePath);
+            var linuxPid = this.winePidMapper.WinePidToLinuxPid(processId, executableName);
+            if (linuxPid is not null)
+            {
+                scopedLogger.LogInformation(
+                    "Mapped Wine PID {WinePid} to Linux PID {LinuxPid}",
+                    processId,
+                    linuxPid.Value
+                );
+                processId = linuxPid.Value;
+            }
+            else
+            {
+                scopedLogger.LogWarning(
+                    "Could not map Wine PID {WinePid} to Linux PID. Process.GetProcessById will likely fail",
+                    processId
+                );
             }
         }
 
@@ -187,7 +256,9 @@ public class DaybreakInjector(
 
     private async Task<(string? Output, string? Error, int ExitCode)> LaunchInjector(
         string[] arguments,
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken,
+        Func<IReadOnlyList<string>, IReadOnlyList<string>, (bool IsComplete, int ExitCode)>? outputCompletionChecker = null,
+        TimeSpan? timeout = null
     )
     {
         var injectorPath = PathUtils.GetAbsolutePathFromRoot(InjectorRelativePath);
@@ -197,7 +268,9 @@ public class DaybreakInjector(
             injectorPath,
             workingDirectory,
             arguments,
-            cancellationToken
+            cancellationToken,
+            outputCompletionChecker,
+            timeout
         );
     }
 }

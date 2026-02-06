@@ -20,7 +20,6 @@ using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
 using System.Runtime.InteropServices;
-using System.Security.Principal;
 using System.Text;
 using static Daybreak.Shared.Utils.NativeMethods;
 
@@ -202,10 +201,6 @@ internal sealed class ApplicationLauncher(
             args.AddRange(mod.GetCustomArguments());
         }
 
-        var identity = this.launcherOptions.CurrentValue.LaunchGuildwarsAsCurrentUser ?
-            WindowsIdentity.GetCurrent().Name :
-            WindowsIdentity.GetAnonymous().Name;
-        scopedLogger.LogDebug("Launching guildwars as [{identity}] identity", identity);
         var process = new Process()
         {
             StartInfo = new ProcessStartInfo

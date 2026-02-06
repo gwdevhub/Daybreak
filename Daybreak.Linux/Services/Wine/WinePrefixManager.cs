@@ -319,8 +319,9 @@ public sealed class WinePrefixManager(
         string exePath,
         string workingDirectory,
         string[] arguments,
-        CancellationToken cancellationToken
-    )
+        CancellationToken cancellationToken,
+        Func<IReadOnlyList<string>, IReadOnlyList<string>, (bool IsComplete, int ExitCode)>? outputCompletionChecker = null,
+        TimeSpan? timeout = null)
     {
         if (!this.IsAvailable())
         {
@@ -358,20 +359,119 @@ public sealed class WinePrefixManager(
         try
         {
             using var process = new Process { StartInfo = startInfo };
-            process.Start();
-            await process.WaitForExitAsync(cancellationToken);
 
-            var output = await process.StandardOutput.ReadToEndAsync(cancellationToken);
-            var error = await process.StandardError.ReadToEndAsync(cancellationToken);
+            var outputLines = new List<string>();
+            var errorLines = new List<string>();
+            var outputComplete = new TaskCompletionSource<bool>();
+            var exitCodeFromOutput = 0;
+            var foundExitCode = false;
+
+            void CheckCompletion()
+            {
+                if (outputCompletionChecker is not null && !foundExitCode)
+                {
+                    var (isComplete, exitCode) = outputCompletionChecker(outputLines, errorLines);
+                    if (isComplete)
+                    {
+                        foundExitCode = true;
+                        exitCodeFromOutput = exitCode;
+                        outputComplete.TrySetResult(true);
+                    }
+                }
+            }
+
+            process.OutputDataReceived += (sender, e) =>
+            {
+                if (e.Data is not null)
+                {
+                    this.logger.LogDebug("Wine stdout: {Line}", e.Data);
+                    outputLines.Add(e.Data);
+                    CheckCompletion();
+                }
+                else
+                {
+                    // null data means end of stream
+                    outputComplete.TrySetResult(true);
+                }
+            };
+
+            process.ErrorDataReceived += (sender, e) =>
+            {
+                if (e.Data is not null)
+                {
+                    this.logger.LogDebug("Wine stderr: {Line}", e.Data);
+                    errorLines.Add(e.Data);
+                    CheckCompletion();
+                }
+            };
+
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+
+            var effectiveTimeout = timeout ?? TimeSpan.FromSeconds(30);
+            using var timeoutCts = new CancellationTokenSource(effectiveTimeout);
+
+            try
+            {
+                await Task.WhenAny(
+                    outputComplete.Task,
+                    process.WaitForExitAsync(timeoutCts.Token)
+                );
+            }
+            catch (OperationCanceledException) when (timeoutCts.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+            {
+                this.logger.LogDebug("Wine process timeout reached after {Timeout}", effectiveTimeout);
+            }
+
+            try
+            {
+                await Task.Delay(50, cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+
+            var output = string.Join(Environment.NewLine, outputLines);
+            var error = string.Join(Environment.NewLine, errorLines);
+
+            int exitCode;
+            if (process.HasExited)
+            {
+                exitCode = process.ExitCode;
+            }
+            else if (foundExitCode)
+            {
+                // We got the output we needed, but Wine hasn't exited (waiting for child)
+                // Use the exit code we determined from the output
+                exitCode = exitCodeFromOutput;
+                this.logger.LogDebug("Wine process still running (child process alive), but we have the output we need");
+            }
+            else
+            {
+                // Timeout with no useful output
+                exitCode = -999;
+                this.logger.LogWarning("Wine process did not produce expected output within timeout");
+
+                try
+                {
+                    process.Kill(entireProcessTree: true);
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogDebug(ex, "Failed to kill Wine process tree");
+                }
+            }
 
             this.logger.LogDebug(
-                "Wine process exited with code {ExitCode}. Output: {Output}, Error: {Error}",
-                process.ExitCode,
+                "Wine process result - ExitCode: {ExitCode}, Output: {Output}, Error: {Error}",
+                exitCode,
                 output,
                 error
             );
 
-            return (output, error, process.ExitCode);
+            return (output, error, exitCode);
         }
         catch (OperationCanceledException)
         {
