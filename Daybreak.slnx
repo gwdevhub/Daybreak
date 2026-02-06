@@ -23,13 +23,13 @@
     <File Path="LICENSE.md" />
     <File Path="README.md" />
   </Folder>
-  <Project Path="Daybreak/Daybreak.Core.csproj">
+  <Project Path="Daybreak.Core/Daybreak.Core.csproj">
     <Platform Project="x64" />
   </Project>
-  <Project Path="Daybreak/Daybreak.Windows.csproj">
+  <Project Path="Daybreak.Windows/Daybreak.Windows.csproj">
     <Platform Project="x64" />
   </Project>
-  <Project Path="Daybreak/Daybreak.Linux.csproj">
+  <Project Path="Daybreak.Linux/Daybreak.Linux.csproj">
     <Platform Project="x64" />
   </Project>
   <Project Path="Daybreak.API/Daybreak.API.csproj">

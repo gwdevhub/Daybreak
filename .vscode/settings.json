@@ -1,0 +1,5 @@
+{
+    "dotnet.defaultSolution": "Daybreak.slnx",
+    "omnisharp.projectLoadTimeout": 120,
+    "csharp.semanticHighlighting.enabled": true
+}

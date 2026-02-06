@@ -27,9 +27,6 @@ public sealed class LinuxPlatformConfiguration : PluginConfigurationBase
 {
     public override void RegisterServices(IServiceCollection services)
     {
-        // Notification handlers
-        services.AddScoped<WinePrefixSetupHandler>();
-
         // Screen manager (Linux-specific dummy implementation)
         services.AddHostedSingleton<IScreenManager, ScreenManager>();
 
@@ -43,7 +40,7 @@ public sealed class LinuxPlatformConfiguration : PluginConfigurationBase
         services.AddScoped<IDaybreakInjector, DaybreakInjector>();
 
         // Credential protector (Linux AES with machine-id derived key)
-        services.AddSingleton<ICredentialProtector, LinuxCredentialProtector>();
+        services.AddSingleton<ICredentialProtector, CredentialProtector>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -57,7 +54,9 @@ public sealed class LinuxPlatformConfiguration : PluginConfigurationBase
         fileProviderProducer.RegisterAssembly(typeof(LinuxPlatformConfiguration).Assembly);
     }
 
-    public override void RegisterNotificationHandlers(INotificationHandlerProducer notificationHandlerProducer)
+    public override void RegisterNotificationHandlers(
+        INotificationHandlerProducer notificationHandlerProducer
+    )
     {
         notificationHandlerProducer.RegisterNotificationHandler<WinePrefixSetupHandler>();
     }

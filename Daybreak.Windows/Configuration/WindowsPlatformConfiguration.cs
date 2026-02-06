@@ -91,7 +91,7 @@ public sealed class WindowsPlatformConfiguration : PluginConfigurationBase
         services.AddScoped<IPrivilegeManager, PrivilegeManager>();
 
         // Credential protector (Windows DPAPI)
-        services.AddSingleton<ICredentialProtector, WindowsCredentialProtector>();
+        services.AddSingleton<ICredentialProtector, CredentialProtector>();
 
         // Daybreak injector (Windows - direct process execution)
         services.AddScoped<IDaybreakInjector, DaybreakInjector>();

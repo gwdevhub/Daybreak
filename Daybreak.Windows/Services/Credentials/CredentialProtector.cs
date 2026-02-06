@@ -7,12 +7,11 @@ namespace Daybreak.Windows.Services.Credentials;
 /// <summary>
 /// Windows-specific credential protector using DPAPI (Data Protection API).
 /// </summary>
-public sealed class WindowsCredentialProtector(ILogger<WindowsCredentialProtector> logger) : ICredentialProtector
+public sealed class CredentialProtector(ILogger<CredentialProtector> logger) : ICredentialProtector
 {
     private static readonly byte[] Entropy = Convert.FromBase64String("uXB8Vmz5MmuDar36v8SRGzpALi0Wv5Gx");
 
-    private readonly ILogger<WindowsCredentialProtector> logger = logger;
-
+    private readonly ILogger<CredentialProtector> logger = logger;
     public byte[]? Protect(byte[] data)
     {
         try

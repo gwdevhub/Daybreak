@@ -9,16 +9,16 @@ namespace Daybreak.Linux.Services.Credentials;
 /// Linux-specific credential protector using AES encryption with a machine-derived key.
 /// The key is derived from /etc/machine-id which is unique per Linux installation.
 /// </summary>
-public sealed class LinuxCredentialProtector : ICredentialProtector
+public sealed class CredentialProtector : ICredentialProtector
 {
     private const string MachineIdPath = "/etc/machine-id";
     private const string FallbackMachineIdPath = "/var/lib/dbus/machine-id";
     private static readonly byte[] Salt = Convert.FromBase64String("uXB8Vmz5MmuDar36v8SRGzpALi0Wv5Gx");
 
-    private readonly ILogger<LinuxCredentialProtector> logger;
+    private readonly ILogger<CredentialProtector> logger;
     private readonly byte[]? derivedKey;
 
-    public LinuxCredentialProtector(ILogger<LinuxCredentialProtector> logger)
+    public CredentialProtector(ILogger<CredentialProtector> logger)
     {
         this.logger = logger;
         this.derivedKey = DeriveKeyFromMachineId();
