@@ -194,7 +194,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddHostedSingleton<ITradeAlertingService, TradeAlertingService>();
         services.AddHostedSingleton<IGuildWarsExecutableManager, GuildWarsExecutableManager>();
         services.AddHostedSingleton<IEventNotifierService, EventNotifierService>();
-        services.AddHostedSingleton<IMDomainRegistrar, MDomainRegistrar>();
         services.AddHostedSingleton<GameScreenshotsTheme>();
         services.AddHostedService<StartupActionManager>();
         services.AddHostedService<ProcessorUsageMonitor>();

@@ -1,11 +1,13 @@
 using Daybreak.Configuration;
 using Daybreak.Extensions;
 using Daybreak.Services.Graph;
+using Daybreak.Services.MDns;
 using Daybreak.Shared.Models.Plugins;
 using Daybreak.Shared.Services.Credentials;
 using Daybreak.Shared.Services.Initialization;
 using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.Keyboard;
+using Daybreak.Shared.Services.MDns;
 using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Services.Screens;
 using Daybreak.Shared.Services.Shortcuts;
@@ -83,6 +85,8 @@ public sealed class WindowsPlatformConfiguration : PluginConfigurationBase
         services.AddSingleton<ICredentialProtector, CredentialProtector>();
         services.AddScoped<IDaybreakInjector, DaybreakInjector>();
         services.AddScoped<IGuildWarsReadyChecker, GuildWarsReadyChecker>();
+        services.AddScoped<IGuildWarsProcessFinder, GuildWarsProcessFinder>();
+        services.AddHostedSingleton<IMDomainRegistrar, MDomainRegistrar>();
     }
 
     public override void RegisterMods(IModsProducer modsProducer)

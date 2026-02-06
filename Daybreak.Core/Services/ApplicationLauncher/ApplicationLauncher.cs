@@ -14,22 +14,13 @@ using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Photino.NET;
-using System.ComponentModel;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
-using System.Runtime.InteropServices;
-using System.Text;
-using static Daybreak.Shared.Utils.NativeMethods;
 
 namespace Daybreak.Services.ApplicationLauncher;
 
-// NOTE: ApplicationLauncher stays as-is. It orchestrates launching via IDaybreakInjector.
-// For Linux support, IDaybreakInjector needs a platform-specific implementation that:
-// 1. Sets up Wine prefix (WINEPREFIX environment variable)
-// 2. Calls "wine Daybreak.Injector.exe <args>" instead of direct execution
-// See DaybreakInjector.cs for the Windows implementation.
 internal sealed class ApplicationLauncher(
     PhotinoWindow photinoWindow,
     IDaybreakInjector daybreakInjector,
@@ -39,11 +30,11 @@ internal sealed class ApplicationLauncher(
     IModsManager modsManager,
     IPrivilegeManager privilegeManager,
     IGuildWarsReadyChecker guildWarsReadyChecker,
+    IGuildWarsProcessFinder guildWarsProcessFinder,
     ILogger<ApplicationLauncher> logger) : IApplicationLauncher
 {
     private const string SteamAppIdFile = "steam_appid.txt";
     private const string SteamAppId = "29720";
-    private const string ProcessName = "gw";
     private const double LaunchMemoryThreshold = 200000000;
 
     private static readonly TimeSpan LaunchTimeout = TimeSpan.FromMinutes(1);
@@ -57,6 +48,7 @@ internal sealed class ApplicationLauncher(
     private readonly ILogger<ApplicationLauncher> logger = logger.ThrowIfNull();
     private readonly IPrivilegeManager privilegeManager = privilegeManager.ThrowIfNull();
     private readonly IGuildWarsReadyChecker guildWarsReadyChecker = guildWarsReadyChecker.ThrowIfNull();
+    private readonly IGuildWarsProcessFinder guildWarsProcessFinder = guildWarsProcessFinder.ThrowIfNull();
 
     public async Task<GuildWarsApplicationLaunchContext?> LaunchGuildwars(LaunchConfigurationWithCredentials launchConfigurationWithCredentials, CancellationToken cancellationToken)
     {
@@ -74,6 +66,7 @@ internal sealed class ApplicationLauncher(
         return new GuildWarsApplicationLaunchContext { LaunchConfiguration = launchConfigurationWithCredentials, GuildWarsProcess = gwProcess, ProcessId = (uint)gwProcess.Id };
     }
 
+    // TODO: Needs to be reworked to be cross-platform
     public void RestartDaybreak()
     {
         if (this.privilegeManager.AdminPrivileges)
@@ -86,6 +79,7 @@ internal sealed class ApplicationLauncher(
         }
     }
 
+    // TODO: Needs to be reworked to be cross-platform
     public void RestartDaybreakAsAdmin()
     {
         this.logger.LogInformation("Restarting daybreak with admin rights");
@@ -115,6 +109,7 @@ internal sealed class ApplicationLauncher(
         this.photinoWindow.Close();
     }
 
+    // TODO: Needs to be reworked to be cross-platform
     public void RestartDaybreakAsNormalUser()
     {
         this.logger.LogInformation("Restarting daybreak as normal user");
@@ -399,20 +394,19 @@ internal sealed class ApplicationLauncher(
     {
         launchConfigurationWithCredentials.ThrowIfNull();
 
-        return GetGuildwarsProcessesInternal(launchConfigurationWithCredentials)
-            .FirstOrDefault();
+        return this.guildWarsProcessFinder.FindProcess(launchConfigurationWithCredentials);
     }
 
     public IEnumerable<GuildWarsApplicationLaunchContext?> GetGuildwarsProcesses(params LaunchConfigurationWithCredentials[] launchConfigurationWithCredentials)
     {
         launchConfigurationWithCredentials.ThrowIfNull();
 
-        return GetGuildwarsProcessesInternal(launchConfigurationWithCredentials);
+        return this.guildWarsProcessFinder.FindProcesses(launchConfigurationWithCredentials);
     }
 
     public IReadOnlyList<Process> GetGuildwarsProcesses()
     {
-        return Process.GetProcessesByName(ProcessName);
+        return this.guildWarsProcessFinder.GetGuildWarsProcesses();
     }
 
     public void KillGuildWarsProcess(GuildWarsApplicationLaunchContext guildWarsApplicationLaunchContext)
@@ -428,11 +422,11 @@ internal sealed class ApplicationLauncher(
                 return;
             }
         }
-        catch (Win32Exception e) when (e.Message.Contains("Only part of a ReadProcessMemory or WriteProcessMemory request was completed"))
+        catch (Exception e) when (e.Message.Contains("Only part of a ReadProcessMemory or WriteProcessMemory request was completed"))
         {
             guildWarsApplicationLaunchContext.GuildWarsProcess.Kill();
         }
-        catch (Win32Exception e) when (e.Message.Contains("Access is denied"))
+        catch (Exception e) when (e.Message.Contains("Access is denied"))
         {
             scopedLogger.LogError(e, "Insuficient privileges to kill GuildWars process with id {guildWarsApplicationLaunchContext.ProcessId}", guildWarsApplicationLaunchContext.ProcessId);
             Task.Run(() => this.privilegeManager.RequestAdminPrivileges<LaunchView>("Insufficient privileges to kill Guild Wars process. Please restart as administrator and try again.", default, CancellationToken.None));
@@ -457,6 +451,7 @@ internal sealed class ApplicationLauncher(
         }
     }
 
+    // TODO: Needs to be reworked to be cross-platform
     public async Task<IEnumerable<IModService>> CheckMods(GuildWarsApplicationLaunchContext guildWarsApplicationLaunchContext, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
@@ -527,74 +522,6 @@ internal sealed class ApplicationLauncher(
         }
 
         return true;
-    }
-
-    private static IEnumerable<GuildWarsApplicationLaunchContext?> GetGuildwarsProcessesInternal(params LaunchConfigurationWithCredentials[] launchConfigurationWithCredentials)
-    {
-        return Process.GetProcessesByName(ProcessName)
-            .Select(Process =>
-            {
-                (var AssociatedConfiguration, _, var ProcessId) = launchConfigurationWithCredentials
-                    .Select(c => (c, ConfigurationMatchesProcess(c, Process, out var processId), processId))
-                    .FirstOrDefault(c => c.Item2);
-                return (Process, AssociatedConfiguration, ProcessId);
-            })
-            .Where(tuple => tuple.AssociatedConfiguration is not null)
-            .Select(tuple => new GuildWarsApplicationLaunchContext
-            {
-                GuildWarsProcess = tuple.Process,
-                LaunchConfiguration = tuple.AssociatedConfiguration!,
-                ProcessId = tuple.ProcessId
-            });
-    }
-
-    private static bool ConfigurationMatchesProcess(LaunchConfigurationWithCredentials launchConfigurationWithCredentials, Process process, out uint processId)
-    {
-        try
-        {
-            processId = (uint)process.Id;
-            return launchConfigurationWithCredentials.ExecutablePath == process.MainModule?.FileName;
-        }
-        catch (Win32Exception ex) when (ex.Message.Contains("Access is denied") || ex.Message.Contains("Only part of a ReadProcessMemory or WriteProcessMemory request was completed."))
-        {
-            processId = 0;
-            /*
-             * The process is running elevated. There is no way to use the standard C# libraries
-             * to figure out what is the path of the running process.
-             * We have to resort to low-leve Windows API to figure out the path of the elevated process.
-             * We create a process snapshot and compare the paths
-             */
-            var hSnapshot = CreateToolhelp32Snapshot(0x00000002, 0); // 0x00000002 is the TH32CS_SNAPPROCESS flag
-            var pe32 = new ProcessEntry32
-            {
-                dwSize = (uint)Marshal.SizeOf<ProcessEntry32>()
-            };
-
-            var nameBuffer = new StringBuilder(1024);
-            if (Process32First(hSnapshot, ref pe32))
-            {
-                do
-                {
-                    var size = 1024U;
-                    if (pe32.szExeFile == "Gw.exe")
-                    {
-                        var maybeDesiredProcessHandle = OpenProcess(ProcessAccessFlags.QueryLimitedInformation, false, pe32.th32ProcessID);
-                        if (QueryFullProcessImageName(maybeDesiredProcessHandle, 0, nameBuffer, ref size) &&
-                            nameBuffer.ToString() == launchConfigurationWithCredentials.ExecutablePath)
-                        {
-                            processId = pe32.th32ProcessID;
-                            CloseHandle(maybeDesiredProcessHandle);
-                            return true;
-                        }
-
-                        CloseHandle(maybeDesiredProcessHandle);
-                    }
-                } while (Process32Next(hSnapshot, ref pe32));
-            }
-
-            CloseHandle(hSnapshot);
-            return false;
-        }
     }
 
     private static string[]? PopulateCommandLineArgs(string argName, string? argValue)
