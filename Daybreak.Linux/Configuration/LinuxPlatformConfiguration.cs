@@ -3,7 +3,12 @@ using Daybreak.Linux.Services.Injection;
 using Daybreak.Linux.Services.Keyboard;
 using Daybreak.Linux.Services.Privilege;
 using Daybreak.Linux.Services.Screens;
+using Daybreak.Linux.Services.Startup.Actions;
+using Daybreak.Linux.Services.Startup.Notifications;
+using Daybreak.Linux.Services.Wine;
 using Daybreak.Shared.Models.Plugins;
+using Daybreak.Shared.Services.FileProviders;
+using Daybreak.Shared.Services.Initialization;
 using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.Keyboard;
 using Daybreak.Shared.Services.Privilege;
@@ -20,6 +25,9 @@ public sealed class LinuxPlatformConfiguration : PluginConfigurationBase
 {
     public override void RegisterServices(IServiceCollection services)
     {
+        // Notification handlers
+        services.AddScoped<WinePrefixSetupHandler>();
+
         // Screen manager (Linux-specific dummy implementation)
         services.AddHostedSingleton<IScreenManager, ScreenManager>();
 
@@ -29,11 +37,28 @@ public sealed class LinuxPlatformConfiguration : PluginConfigurationBase
         // Privilege manager (Linux dummy - TODO: implement with pkexec/polkit)
         services.AddScoped<IPrivilegeManager, PrivilegeManager>();
 
-        // Daybreak injector (Linux - Wine-based, TODO: implement)
+        // Daybreak injector (Linux - Wine-based)
         services.AddScoped<IDaybreakInjector, DaybreakInjector>();
+    }
 
-        // TODO: Register additional Linux-specific service implementations
-        // For example:
-        // - Wine-based Guild Wars launcher
+    public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
+    {
+        // Check Wine prefix setup on startup
+        startupActionProducer.RegisterAction<SetupWinePrefixAction>();
+    }
+
+    public override void RegisterProviderAssemblies(IFileProviderProducer fileProviderProducer)
+    {
+        fileProviderProducer.RegisterAssembly(typeof(LinuxPlatformConfiguration).Assembly);
+    }
+
+    public override void RegisterNotificationHandlers(INotificationHandlerProducer notificationHandlerProducer)
+    {
+        notificationHandlerProducer.RegisterNotificationHandler<WinePrefixSetupHandler>();
+    }
+
+    public override void RegisterMods(IModsProducer modsProducer)
+    {
+        modsProducer.RegisterMod<IWinePrefixManager, WinePrefixManager>(singleton: true);
     }
 }

@@ -125,7 +125,110 @@ In addition to .NET, the following are required to run Daybreak on Linux:
 - **GTK 3** and **WebKitGTK** (for Photino)
 - **Wine** (for running the Windows-based injector and Guild Wars)
 
-<!-- TODO: Add Wine prefix management documentation -->
+---
+
+## Wine Integration (Linux)
+
+On Linux, Daybreak uses Wine to run the Windows-based `Daybreak.Injector.exe` and Guild Wars itself. This section documents the architecture and implementation plan.
+
+### Architecture
+
+```mermaid
+graph LR
+    subgraph "Linux (Native)"
+        UI[Daybreak.Linux<br/><i>Photino/GTK</i>]
+        INJ_L[DaybreakInjector<br/><i>Linux impl</i>]
+        WPM[WinePrefixManager]
+    end
+
+    subgraph "Wine Prefix"
+        WINE[wine]
+        INJ_W[Daybreak.Injector.exe<br/><i>x86</i>]
+        GW[Gw.exe]
+        API[Daybreak.API.dll]
+    end
+
+    UI --> INJ_L
+    INJ_L --> WPM
+    WPM --> WINE
+    WINE --> INJ_W
+    INJ_W -->|launches suspended| GW
+    INJ_W -->|injects| API
+```
+
+### Wine Prefix Management
+
+Daybreak manages a single dedicated Wine prefix for all Wine operations. This is handled by `IWinePrefixManager`:
+
+```csharp
+public interface IWinePrefixManager
+{
+    /// <summary>
+    /// Checks if Wine is installed and available on the system.
+    /// </summary>
+    bool IsAvailable();
+
+    /// <summary>
+    /// Initializes the Wine prefix if it doesn't exist (wineboot --init).
+    /// </summary>
+    Task Install(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Returns the path to Daybreak's Wine prefix directory.
+    /// </summary>
+    string GetWinePrefixPath();
+
+    /// <summary>
+    /// Launches a Windows executable through Wine with the managed prefix.
+    /// </summary>
+    Task<(string? Output, string? Error, int ExitCode)> LaunchProcess(
+        string exePath, 
+        string workingDirectory, 
+        string[] arguments,
+        CancellationToken cancellationToken);
+}
+```
+
+### Path Translation
+
+Wine exposes the Linux filesystem through the `Z:` drive. The `PathUtils` class provides a method to convert native Linux paths to Wine-compatible paths:
+
+| Linux Path | Wine Path |
+|------------|-----------|
+| `/mnt/games/Guild Wars/Gw.exe` | `Z:/mnt/games/Guild Wars/Gw.exe` |
+| `/home/user/.daybreak/Injector/Daybreak.Injector.exe` | `Z:/home/user/.daybreak/Injector/Daybreak.Injector.exe` |
+
+```csharp
+// PathUtils.cs
+public static string ToWinePath(string linuxPath)
+{
+    // Convert /path/to/file to Z:/path/to/file
+    return $"Z:{linuxPath.Replace('/', '\\')}";
+}
+```
+
+### Injection Flow on Linux
+
+1. **User clicks "Launch"** in the Daybreak UI
+2. **DaybreakInjector (Linux)** receives the launch request
+3. **WinePrefixManager.LaunchProcess()** is called with:
+   - `exePath`: Path to `Daybreak.Injector.exe` (translated to Wine path)
+   - `arguments`: `launch false "Z:\path\to\Gw.exe" <args>`
+4. **Wine** executes `Daybreak.Injector.exe` within the managed prefix
+5. **Daybreak.Injector.exe** launches Guild Wars suspended and returns process/thread handles
+6. **DaybreakInjector** parses the output and continues with injection
+7. **WinePrefixManager.LaunchProcess()** is called again for DLL injection
+8. **Resume** is called to start the game
+
+### Implementation Checklist
+
+- [ ] Create `IWinePrefixManager` interface in `Daybreak.Shared`
+- [ ] Create `WinePrefixManager` implementation in `Daybreak.Linux`
+- [ ] Add `ToWinePath()` method to `PathUtils`
+- [ ] Update `DaybreakInjector` (Linux) to use `WinePrefixManager`
+- [ ] Handle Wine process ID mapping (Wine PIDs vs native PIDs)
+- [ ] Add Wine installation detection and user guidance
+- [ ] Test with Guild Wars launch and injection
 
 ---
 
