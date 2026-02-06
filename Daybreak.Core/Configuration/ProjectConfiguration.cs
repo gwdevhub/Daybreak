@@ -249,6 +249,7 @@ public class ProjectConfiguration : PluginConfigurationBase
     {
         startupActionProducer.ThrowIfNull();
 
+        startupActionProducer.RegisterAction<VerifyNativeComponentsAction>();
         startupActionProducer.RegisterAction<RenameInstallerAction>();
         startupActionProducer.RegisterAction<UpdateUModAction>();
         startupActionProducer.RegisterAction<CredentialsOptionsMigrator>();
