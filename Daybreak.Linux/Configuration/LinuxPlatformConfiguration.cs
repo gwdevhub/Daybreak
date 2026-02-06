@@ -8,6 +8,7 @@ using Daybreak.Linux.Services.Privilege;
 using Daybreak.Linux.Services.Screens;
 using Daybreak.Linux.Services.Startup.Actions;
 using Daybreak.Linux.Services.Startup.Notifications;
+using Daybreak.Linux.Services.UMod;
 using Daybreak.Linux.Services.Wine;
 using Daybreak.Shared.Models.Plugins;
 using Daybreak.Shared.Services.ApplicationLauncher;
@@ -19,6 +20,7 @@ using Daybreak.Shared.Services.Keyboard;
 using Daybreak.Shared.Services.MDns;
 using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Services.Screens;
+using Daybreak.Shared.Services.UMod;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Daybreak.Linux.Configuration;
@@ -39,6 +41,7 @@ public sealed class LinuxPlatformConfiguration : PluginConfigurationBase
         services.AddSingleton<IWinePidMapper, WinePidMapper>();
         services.AddScoped<IGuildWarsReadyChecker, GuildWarsReadyChecker>();
         services.AddScoped<IGuildWarsProcessFinder, GuildWarsProcessFinder>();
+        services.AddSingleton<IModPathResolver, ModPathResolver>();
         services.AddHostedSingleton<IMDomainRegistrar, PortScanningDomainRegistrar>();
     }
 

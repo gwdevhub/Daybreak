@@ -2,8 +2,8 @@
 using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Async;
-using Daybreak.Shared.Models.Github;
 using Daybreak.Shared.Services.Downloads;
+using Daybreak.Shared.Services.Github;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Registry;
 using Daybreak.Shared.Services.Updater;
@@ -16,7 +16,6 @@ using System.Data;
 using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
-using System.Net.Http.Json;
 
 namespace Daybreak.Services.Updater;
 
@@ -26,18 +25,16 @@ internal sealed class ApplicationUpdater(
     IDownloadService downloadService,
     IEnumerable<PostUpdateActionBase> postUpdateActions,
     IOptionsMonitor<LauncherOptions> liveOptions,
-    IHttpClient<ApplicationUpdater> httpClient,
+    IGithubClient githubClient,
     ILogger<ApplicationUpdater> logger) : IApplicationUpdater, IHostedService
 {
+    private const string GithubOwner = "gwdevhub";
+    private const string GithubRepo = "Daybreak";
     private const string InstallerFileNameSubPath = "Installer/Daybreak.Installer.exe";
     private const string UpdatedKey = "LauncherUpdating";
     private const string TempFileSubPath = "tempfile.zip";
     private const string VersionTag = "{VERSION}";
-    private const string RefTagPrefix = "/refs/tags/v";
-    private const string VersionListUrl = "https://api.github.com/repos/gwdevhub/Daybreak/git/refs/tags";
-    private const string Url = "https://github.com/gwdevhub/Daybreak/releases/latest";
     private const string DownloadUrl = $"https://github.com/gwdevhub/Daybreak/releases/download/v{VersionTag}/Daybreakv{VersionTag}.zip";
-    private const string GithubReleasesUrl = "https://api.github.com/repos/gwdevhub/daybreak/releases";
     private readonly static string InstallerFileName = PathUtils.GetAbsolutePathFromRoot(InstallerFileNameSubPath);
     private readonly static string TempFile = PathUtils.GetAbsolutePathFromRoot(TempFileSubPath);
 
@@ -50,7 +47,7 @@ internal sealed class ApplicationUpdater(
     private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
     private readonly IEnumerable<PostUpdateActionBase> postUpdateActions = postUpdateActions.ThrowIfNull();
     private readonly IOptionsMonitor<LauncherOptions> liveOptions = liveOptions.ThrowIfNull();
-    private readonly IHttpClient<ApplicationUpdater> httpClient = httpClient.ThrowIfNull();
+    private readonly IGithubClient githubClient = githubClient.ThrowIfNull();
     private readonly ILogger<ApplicationUpdater> logger = logger.ThrowIfNull();
 
     public Version CurrentVersion { get; } = ProjectConfiguration.CurrentVersion;
@@ -137,29 +134,24 @@ internal sealed class ApplicationUpdater(
     public async Task<IEnumerable<Version>> GetVersions(CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        scopedLogger.LogDebug($"Retrieving version list from {VersionListUrl}");
+        scopedLogger.LogDebug("Retrieving version list");
         try
         {
-            var response = await this.httpClient.GetAsync(VersionListUrl, cancellationToken);
-            if (response.IsSuccessStatusCode)
-            {
-                var versionList = await response.Content.ReadFromJsonAsync<GithubRefTag[]>(cancellationToken);
-                return versionList!.Select(v => v.Ref![(RefTagPrefix.Length - 1)..])
-                    .Select(v =>
-                    {
-                        var result = Version.TryParse(v, out var version);
-                        return (result, version);
-                    })
-                    .Where(v => v.result)
-                    .Select(v => v.version ?? throw new InvalidOperationException("Parsed version cannot be null"));
-            }
-
-            scopedLogger.LogError("Failed to retrieve version list. Status code: {statusCode}", response.StatusCode);
-            return [];
+            var tags = await this.githubClient.GetRefTags(GithubOwner, GithubRepo, cancellationToken);
+            return tags
+                .Select(v => v.Ref?.Replace("refs/tags/v", ""))
+                .OfType<string>()
+                .Select(v =>
+                {
+                    var result = Version.TryParse(v, out var version);
+                    return (result, version);
+                })
+                .Where(v => v.result)
+                .Select(v => v.version ?? throw new InvalidOperationException("Parsed version cannot be null"));
         }
         catch (Exception e)
         {
-            scopedLogger.LogError(e, "Failed to retrieve version list from {url}", VersionListUrl);
+            scopedLogger.LogError(e, "Failed to retrieve version list");
             return [];
         }
     }
@@ -197,15 +189,8 @@ internal sealed class ApplicationUpdater(
         var scopedLogger = this.logger.CreateScopedLogger(flowIdentifier: version.ToString());
         try
         {
-            using var response = await this.httpClient.GetAsync(GithubReleasesUrl, cancellationToken);
-            if (!response.IsSuccessStatusCode)
-            {
-                scopedLogger.LogError("Failed to retrieve releases list from github for version. Status code: {statusCode}", response.StatusCode);
-                return default;
-            }
-
-            var releases = await response.Content.ReadFromJsonAsync<List<GithubRelease>>(cancellationToken);
-            var release = releases?.FirstOrDefault(r => r.TagName == $"v{version}");
+            var releases = await this.githubClient.GetReleases(GithubOwner, GithubRepo, cancellationToken);
+            var release = releases.FirstOrDefault(r => r.TagName == $"v{version}");
             if (release is null)
             {
                 scopedLogger.LogError("Failed to find release info for version {version} on github", version);
@@ -239,30 +224,7 @@ internal sealed class ApplicationUpdater(
 
     private async Task<Version?> GetLatestVersion(CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger();
-        try
-        {
-            using var response = await this.httpClient.GetAsync(Url, cancellationToken);
-            if (response.IsSuccessStatusCode)
-            {
-                var versionTag = response.RequestMessage?.RequestUri?.ToString().Split('/').Last().TrimStart('v');
-                if (Version.TryParse(versionTag, out var parsedVersion))
-                {
-                    return parsedVersion;
-                }
-
-                scopedLogger.LogError("Failed to parse version from {versionTag}", versionTag ?? string.Empty);
-                return default;
-            }
-
-            scopedLogger.LogError("Failed to retrieve latest version. Status code: {statusCode}", response.StatusCode);
-            return default;
-        }
-        catch (Exception e)
-        {
-            scopedLogger.LogError(e, "Failed to retrieve latest version from {url}", Url);
-            return default;
-        }
+        return await this.githubClient.GetLatestVersionFromRedirect(GithubOwner, GithubRepo, cancellationToken);
     }
 
     private void LaunchExtractor()

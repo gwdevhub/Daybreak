@@ -1,10 +1,10 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Services.Toolbox.Models;
 using Daybreak.Shared.Models.Async;
-using Daybreak.Shared.Models.Github;
 using Daybreak.Shared.Models.Mods;
 using Daybreak.Shared.Models.UMod;
 using Daybreak.Shared.Services.Downloads;
+using Daybreak.Shared.Services.Github;
 using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Options;
@@ -18,7 +18,6 @@ using System.Core.Extensions;
 using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
-using System.Net.Http.Json;
 using TrailBlazr.Services;
 
 namespace Daybreak.Services.UMod;
@@ -28,15 +27,17 @@ internal sealed class UModService(
     IOptionsProvider optionsProvider,
     IViewManager viewManager,
     IProcessInjector processInjector,
+    IModPathResolver modPathResolver,
     INotificationService notificationService,
     IDownloadService downloadService,
-    IHttpClient<UModService> httpClient,
+    IGithubClient githubClient,
     IOptionsMonitor<UModOptions> uModOptions,
     ILogger<UModService> logger) : IUModService
 {
+    private const string GithubOwner = "gwdevhub";
+    private const string GithubRepo = "gMod";
     private const string TagPlaceholder = "[TAG_PLACEHOLDER]";
     private const string ReleaseUrl = "https://github.com/gwdevhub/gMod/releases/download/[TAG_PLACEHOLDER]/gMod.dll";
-    private const string ReleasesUrl = "https://api.github.com/repos/gwdevhub/gMod/git/refs/tags";
     private const string UModDirectorySubPath = "uMod";
     private const string UModDll = "uMod.dll";
     private const string UModModList = "modlist.txt";
@@ -49,9 +50,10 @@ internal sealed class UModService(
     private readonly IOptionsProvider optionsProvider = optionsProvider.ThrowIfNull();
     private readonly IViewManager viewManager = viewManager.ThrowIfNull();
     private readonly IProcessInjector processInjector = processInjector.ThrowIfNull();
+    private readonly IModPathResolver modPathResolver = modPathResolver.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
-    private readonly IHttpClient<UModService> httpClient = httpClient.ThrowIfNull();
+    private readonly IGithubClient githubClient = githubClient.ThrowIfNull();
     private readonly IOptionsMonitor<UModOptions> uModOptions = uModOptions.ThrowIfNull();
     private readonly ILogger<UModService> logger = logger.ThrowIfNull();
 
@@ -165,6 +167,7 @@ internal sealed class UModService(
 
                 return true;
             })
+            .Select(this.modPathResolver.ResolveForModLoader)
             .ToList();
 
         await File.WriteAllLinesAsync(modListFilePath, lines, cancellationToken);
@@ -260,7 +263,7 @@ internal sealed class UModService(
 
     public async Task<IReadOnlyCollection<string>> LoadModsFromDisk(CancellationToken cancellationToken)
     {
-        var files = await this.photinoWindow.ShowOpenFileAsync("Select Mod Files", multiSelect: true, filters: [("Mod Files", ["zip", "tpf"])]);
+        var files = await this.photinoWindow.ShowOpenFileAsync("Select Mod Files", multiSelect: true, filters: [("Zip Files", ["zip"]), ("TPF Files", ["tpf"])]);
         return [.. files.Where(f => this.AddMod(f, imported: true))];
     }
 
@@ -325,15 +328,8 @@ internal sealed class UModService(
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         scopedLogger.LogDebug("Retrieving version list");
-        var getListResponse = await this.httpClient.GetAsync(ReleasesUrl, cancellationToken);
-        if (!getListResponse.IsSuccessStatusCode)
-        {
-            scopedLogger.LogError($"Received non success status code [{getListResponse.StatusCode}]");
-            return new DownloadLatestOperation.NonSuccessStatusCode((int)getListResponse.StatusCode);
-        }
-
-        var releasesList = await getListResponse.Content.ReadFromJsonAsync<List<GithubRefTag>>(cancellationToken);
-        var latestRelease = releasesList?
+        var tags = await this.githubClient.GetRefTags(GithubOwner, GithubRepo, cancellationToken);
+        var latestRelease = tags
             .Select(t => t.Ref?.Replace("refs/tags/", ""))
             .OfType<string>()
             .LastOrDefault();
@@ -360,15 +356,8 @@ internal sealed class UModService(
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         scopedLogger.LogDebug("Retrieving version list");
-        var getListResponse = await this.httpClient.GetAsync(ReleasesUrl, cancellationToken);
-        if (!getListResponse.IsSuccessStatusCode)
-        {
-            scopedLogger.LogError("Received non success status code [{getListResponse.StatusCode}]", getListResponse.StatusCode);
-            return default;
-        }
-
-        var releasesList = await getListResponse.Content.ReadFromJsonAsync<List<GithubRefTag>>(cancellationToken);
-        var latestRelease = releasesList?
+        var tags = await this.githubClient.GetRefTags(GithubOwner, GithubRepo, cancellationToken);
+        var latestRelease = tags
             .Select(t => t.Ref?.Replace("refs/tags/", ""))
             .OfType<string>()
             .LastOrDefault()?

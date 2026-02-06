@@ -207,7 +207,7 @@ public class ExecutablesViewModel(
 
     private async Task<string?> GetPath()
     {
-        var path = await this.window.ShowOpenFileAsync("Select Guild Wars Executable", multiSelect: false, filters: [("Executables", ["exe", "*"])]);
+        var path = await this.window.ShowOpenFileAsync("Select Guild Wars Executable", multiSelect: false, filters: [("Executables", ["exe"]), ("All Files", ["*"])]);
         return path.FirstOrDefault();
     }
 }

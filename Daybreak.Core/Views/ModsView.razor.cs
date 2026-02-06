@@ -1,6 +1,8 @@
-﻿using Daybreak.Models;
+﻿using System.Extensions.Core;
+using Daybreak.Models;
 using Daybreak.Shared.Services.Mods;
 using Daybreak.Shared.Services.Notifications;
+using Microsoft.Extensions.Logging;
 using TrailBlazr.Services;
 using TrailBlazr.ViewModels;
 
@@ -8,12 +10,14 @@ namespace Daybreak.Views;
 public sealed class ModsViewModel(
     INotificationService notificationService,
     IViewManager viewManager,
-    IModsManager modsManager)
+    IModsManager modsManager,
+    ILogger<ModsViewModel> logger)
     : ViewModelBase<ModsViewModel, ModsView>
 {
     private readonly INotificationService notificationService = notificationService;
     private readonly IViewManager viewManager = viewManager;
     private readonly IModsManager modService = modsManager;
+    private readonly ILogger<ModsViewModel> logger = logger;
 
     private CancellationTokenSource? cts;
 
@@ -137,13 +141,23 @@ public sealed class ModsViewModel(
         await this.RefreshViewAsync();
         foreach (var mod in this.Mods)
         {
-            if (mod.ModService.IsInstalled)
+            try
             {
-                mod.CanUpdate = await mod.ModService.IsUpdateAvailable(cancellationToken);
+                if (mod.ModService.IsInstalled)
+                {
+                    mod.CanUpdate = await mod.ModService.IsUpdateAvailable(cancellationToken);
+                }
+                else
+                {
+                    mod.CanUpdate = false;
+                }
             }
-            else
+            catch(Exception ex)
             {
                 mod.CanUpdate = false;
+                var modName = mod.Name ?? "Unknown mod";
+                var scopedLogger = this.logger.CreateScopedLogger();
+                scopedLogger.LogError(ex, "Failed to check for updates for mod {ModName}", modName);
             }
 
             mod.Loading = false;

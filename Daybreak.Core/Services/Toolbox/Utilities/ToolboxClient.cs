@@ -1,27 +1,27 @@
 ﻿using Daybreak.Services.Toolbox.Models;
 using Daybreak.Shared.Models.Async;
-using Daybreak.Shared.Models.Github;
 using Daybreak.Shared.Services.Downloads;
+using Daybreak.Shared.Services.Github;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
-using System.Net.Http.Json;
 
 namespace Daybreak.Services.Toolbox.Utilities;
 
 internal sealed class ToolboxClient(
     IDownloadService downloadService,
-    IHttpClient<ToolboxClient> httpClient,
+    IGithubClient githubClient,
     ILogger<ToolboxClient> logger) : IToolboxClient
 {
+    private const string GithubOwner = "gwdevhub";
+    private const string GithubRepo = "GWToolboxpp";
     private const string DllName = "GWToolboxdll.dll";
     private const string TagPlaceholder = "[TAG_PLACEHOLDER]";
     private const string ReleaseUrl = "https://github.com/gwdevhub/GWToolboxpp/releases/download/[TAG_PLACEHOLDER]/GWToolboxdll.dll";
-    private const string ReleasesUrl = "https://api.github.com/repos/gwdevhub/GWToolboxpp/git/refs/tags";
 
     private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
-    private readonly IHttpClient<ToolboxClient> httpClient = httpClient.ThrowIfNull();
+    private readonly IGithubClient githubClient = githubClient.ThrowIfNull();
     private readonly ILogger<ToolboxClient> logger = logger.ThrowIfNull();
 
     public async Task<DownloadLatestOperation> DownloadLatestDll(IProgress<ProgressUpdate> progress, string destinationFolder, CancellationToken cancellationToken)
@@ -81,19 +81,12 @@ internal sealed class ToolboxClient(
         return new DownloadLatestOperation.Success(destinationPath);
     }
 
-    private async Task<(Version? Version, string Literal)> GetLatestVersionTag(CancellationToken cancellationToken)
+    private async Task<(Version? Version, string? Literal)> GetLatestVersionTag(CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         scopedLogger.LogDebug("Retrieving version list");
-        var getListResponse = await this.httpClient.GetAsync(ReleasesUrl, cancellationToken);
-        if (!getListResponse.IsSuccessStatusCode)
-        {
-            scopedLogger.LogError($"Received non success status code [{getListResponse.StatusCode}]");
-            return default;
-        }
-
-        var releasesList = await getListResponse.Content.ReadFromJsonAsync<List<GithubRefTag>>(cancellationToken);
-        var latestReleaseTuple = releasesList?.Where(t => t.Ref?.Contains("Release") is true)
+        var tags = await this.githubClient.GetRefTags(GithubOwner, GithubRepo, cancellationToken);
+        var latestReleaseTuple = tags.Where(t => t.Ref?.Contains("Release") is true)
             .Select(t => t.Ref?.Replace("refs/tags/", ""))
             .OfType<string>()
             .Select(t => (t, t.Replace("_Release", "")))
@@ -106,13 +99,13 @@ internal sealed class ToolboxClient(
             .OrderByDescending(t => t.parsedVersion)
             .FirstOrDefault();
 
-        if (latestReleaseTuple is null)
+        if (latestReleaseTuple == default)
         {
             scopedLogger.LogError("No valid releases found");
             return default;
         }
 
-        var (parseResult, latestReleaseVersion, latestReleaseTag) = latestReleaseTuple.Value;
+        var (parseResult, latestReleaseVersion, latestReleaseTag) = latestReleaseTuple;
         return (latestReleaseVersion, latestReleaseTag);
     }
 }

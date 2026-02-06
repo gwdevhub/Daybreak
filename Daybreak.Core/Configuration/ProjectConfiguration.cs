@@ -16,6 +16,7 @@ using Daybreak.Services.ExceptionHandling;
 using Daybreak.Services.ExecutableManagement;
 using Daybreak.Services.Experience;
 using Daybreak.Services.FileProviders;
+using Daybreak.Services.Github;
 using Daybreak.Services.Graph.Models;
 using Daybreak.Services.Guildwars;
 using Daybreak.Services.GuildWars;
@@ -62,6 +63,7 @@ using Daybreak.Shared.Services.Events;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.Experience;
 using Daybreak.Shared.Services.FileProviders;
+using Daybreak.Shared.Services.Github;
 using Daybreak.Shared.Services.Guildwars;
 using Daybreak.Shared.Services.Initialization;
 using Daybreak.Shared.Services.Injection;
@@ -180,6 +182,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IItemHashService, ItemHashService>();
         services.AddScoped<IRegistryService, RegistryService>();
         services.AddScoped<IToolboxClient, ToolboxClient>();
+        services.AddSingleton<IGithubClient, GithubClient>();
         services.AddScoped<IProcessInjector, ProcessInjector>();
         services.AddScoped<IStubInjector, StubInjector>();
         services.AddScoped<ILaunchConfigurationService, LaunchConfigurationService>();
@@ -375,10 +378,6 @@ public class ProjectConfiguration : PluginConfigurationBase
     {
         return services
             .ThrowIfNull()
-            .RegisterHttpClient<ApplicationUpdater>()
-                .WithMessageHandler(SetupLoggingAndMetrics<ApplicationUpdater>)
-                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
-                .Build()
             .RegisterHttpClient<DownloadService>()
                 .WithMessageHandler(SetupLoggingAndMetrics<DownloadService>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
@@ -399,16 +398,12 @@ public class ProjectConfiguration : PluginConfigurationBase
                 .WithMessageHandler(SetupLoggingAndMetrics<InternetCheckingService>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
-            .RegisterHttpClient<ToolboxClient>()
-                .WithMessageHandler(SetupLoggingAndMetrics<ToolboxClient>)
-                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
-                .Build()
             .RegisterHttpClient<ReShadeService>()
                 .WithMessageHandler(SetupLoggingAndMetrics<ReShadeService>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
-            .RegisterHttpClient<UModService>()
-                .WithMessageHandler(SetupLoggingAndMetrics<UModService>)
+            .RegisterHttpClient<GithubClient>()
+                .WithMessageHandler(SetupLoggingAndMetrics<GithubClient>)
                 .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
                 .Build()
             .RegisterHttpClient<ScopedApiContext>()
