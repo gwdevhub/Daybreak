@@ -1,4 +1,5 @@
 using Daybreak.Extensions;
+using Daybreak.Linux.Services.Credentials;
 using Daybreak.Linux.Services.Injection;
 using Daybreak.Linux.Services.Keyboard;
 using Daybreak.Linux.Services.Privilege;
@@ -7,6 +8,7 @@ using Daybreak.Linux.Services.Startup.Actions;
 using Daybreak.Linux.Services.Startup.Notifications;
 using Daybreak.Linux.Services.Wine;
 using Daybreak.Shared.Models.Plugins;
+using Daybreak.Shared.Services.Credentials;
 using Daybreak.Shared.Services.FileProviders;
 using Daybreak.Shared.Services.Initialization;
 using Daybreak.Shared.Services.Injection;
@@ -39,6 +41,9 @@ public sealed class LinuxPlatformConfiguration : PluginConfigurationBase
 
         // Daybreak injector (Linux - Wine-based)
         services.AddScoped<IDaybreakInjector, DaybreakInjector>();
+
+        // Credential protector (Linux AES with machine-id derived key)
+        services.AddSingleton<ICredentialProtector, LinuxCredentialProtector>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)

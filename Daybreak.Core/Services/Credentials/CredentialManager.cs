@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Extensions;
 using System.Extensions.Core;
-using System.Security.Cryptography;
 using System.Text;
 using Convert = System.Convert;
 
@@ -14,11 +13,12 @@ namespace Daybreak.Services.Credentials;
 
 
 internal sealed class CredentialManager(
+    ICredentialProtector credentialProtector,
     IOptionsProvider optionsProvider,
     IOptionsMonitor<CredentialManagerOptions> liveOptions,
     ILogger<CredentialManager> logger) : ICredentialManager
 {
-    private static readonly byte[] Entropy = Convert.FromBase64String("uXB8Vmz5MmuDar36v8SRGzpALi0Wv5Gx");
+    private readonly ICredentialProtector credentialProtector = credentialProtector.ThrowIfNull(nameof(credentialProtector));
     private readonly ILogger<CredentialManager> logger = logger.ThrowIfNull(nameof(logger));
     private readonly IOptionsMonitor<CredentialManagerOptions> liveOptions = liveOptions.ThrowIfNull(nameof(liveOptions));
     private readonly IOptionsProvider optionsProvider = optionsProvider.ThrowIfNull(nameof(optionsProvider));
@@ -76,13 +76,17 @@ internal sealed class CredentialManager(
         var scopedLogger = this.logger.CreateScopedLogger();
         try
         {
-            var usrbytes = protectedLoginCredentials.ProtectedUsername is not null ? Convert.FromBase64String(protectedLoginCredentials.ProtectedUsername) : default;
+            var usrBytes = protectedLoginCredentials.ProtectedUsername is not null ? Convert.FromBase64String(protectedLoginCredentials.ProtectedUsername) : default;
             var psdBytes = protectedLoginCredentials.ProtectedPassword is not null ? Convert.FromBase64String(protectedLoginCredentials.ProtectedPassword) : default;
+
+            var decryptedUsr = usrBytes is not null ? this.credentialProtector.Unprotect(usrBytes) : default;
+            var decryptedPsd = psdBytes is not null ? this.credentialProtector.Unprotect(psdBytes) : default;
+
             return new LoginCredentials
             {
                 Identifier = protectedLoginCredentials.Identifier,
-                Username = usrbytes is not null ? Encoding.UTF8.GetString(ProtectedData.Unprotect(usrbytes, Entropy, DataProtectionScope.LocalMachine)) : default,
-                Password = psdBytes is not null ? Encoding.UTF8.GetString(ProtectedData.Unprotect(psdBytes, Entropy, DataProtectionScope.LocalMachine)) : default,
+                Username = decryptedUsr is not null ? Encoding.UTF8.GetString(decryptedUsr) : default,
+                Password = decryptedPsd is not null ? Encoding.UTF8.GetString(decryptedPsd) : default,
             };
         }
         catch (Exception e)
@@ -99,14 +103,18 @@ internal sealed class CredentialManager(
         {
             var usrBytes = loginCredentials.Username is not null ? Encoding.UTF8.GetBytes(loginCredentials.Username) : default;
             var psdBytes = loginCredentials.Password is not null ? Encoding.UTF8.GetBytes(loginCredentials.Password) : default;
+
+            var encryptedUsr = usrBytes is not null ? this.credentialProtector.Protect(usrBytes) : default;
+            var encryptedPsd = psdBytes is not null ? this.credentialProtector.Protect(psdBytes) : default;
+
             return new ProtectedLoginCredentials
             {
                 Identifier = loginCredentials.Identifier,
-                ProtectedUsername = usrBytes is not null ? Convert.ToBase64String(ProtectedData.Protect(usrBytes, Entropy, DataProtectionScope.LocalMachine)) : default,
-                ProtectedPassword = psdBytes is not null ? Convert.ToBase64String(ProtectedData.Protect(psdBytes, Entropy, DataProtectionScope.LocalMachine)) : default,
+                ProtectedUsername = encryptedUsr is not null ? Convert.ToBase64String(encryptedUsr) : default,
+                ProtectedPassword = encryptedPsd is not null ? Convert.ToBase64String(encryptedPsd) : default,
             };
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             scopedLogger.LogError(e, "Unable to encrypt credentials");
             return default;

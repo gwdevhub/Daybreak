@@ -227,13 +227,6 @@ internal sealed class IntegratedGuildwarsInstaller(
         File.Copy(latestGwPath, filePath, true);
         progress.Report(ProgressStartingExecutable);
         await Task.Delay(100, cancellationToken);
-        using var process = Process.Start(filePath);
-        scopedLogger.LogDebug("Starting executable. Waiting for the process to end before finishing installation");
-        while (!process.HasExited)
-        {
-            await Task.Delay(1000, cancellationToken);
-        }
-
         this.guildWarsExecutableManager.AddExecutable(filePath);
         progress.Report(ProgressFinished);
         return true;
