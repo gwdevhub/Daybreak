@@ -1,4 +1,8 @@
-﻿using Daybreak.Configuration.Options;
+﻿using System.Core.Extensions;
+using System.Diagnostics;
+using System.Extensions;
+using System.Extensions.Core;
+using Daybreak.Configuration.Options;
 using Daybreak.Shared.Exceptions;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.LaunchConfigurations;
@@ -9,15 +13,10 @@ using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.Mods;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Privilege;
-using Daybreak.Shared.Utils;
 using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Photino.NET;
-using System.Core.Extensions;
-using System.Diagnostics;
-using System.Extensions;
-using System.Extensions.Core;
 
 namespace Daybreak.Services.ApplicationLauncher;
 
@@ -31,7 +30,8 @@ internal sealed class ApplicationLauncher(
     IPrivilegeManager privilegeManager,
     IGuildWarsReadyChecker guildWarsReadyChecker,
     IGuildWarsProcessFinder guildWarsProcessFinder,
-    ILogger<ApplicationLauncher> logger) : IApplicationLauncher
+    ILogger<ApplicationLauncher> logger
+) : IApplicationLauncher
 {
     private const string SteamAppIdFile = "steam_appid.txt";
     private const string SteamAppId = "29720";
@@ -41,29 +41,46 @@ internal sealed class ApplicationLauncher(
 
     private readonly PhotinoWindow photinoWindow = photinoWindow.ThrowIfNull();
     private readonly IDaybreakInjector daybreakInjector = daybreakInjector.ThrowIfNull();
-    private readonly IGuildWarsExecutableManager guildWarsExecutableManager = guildWarsExecutableManager.ThrowIfNull();
+    private readonly IGuildWarsExecutableManager guildWarsExecutableManager =
+        guildWarsExecutableManager.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
-    private readonly IOptionsMonitor<LauncherOptions> launcherOptions = launcherOptions.ThrowIfNull();
+    private readonly IOptionsMonitor<LauncherOptions> launcherOptions =
+        launcherOptions.ThrowIfNull();
     private readonly IModsManager modsManager = modsManager.ThrowIfNull();
     private readonly ILogger<ApplicationLauncher> logger = logger.ThrowIfNull();
     private readonly IPrivilegeManager privilegeManager = privilegeManager.ThrowIfNull();
-    private readonly IGuildWarsReadyChecker guildWarsReadyChecker = guildWarsReadyChecker.ThrowIfNull();
-    private readonly IGuildWarsProcessFinder guildWarsProcessFinder = guildWarsProcessFinder.ThrowIfNull();
+    private readonly IGuildWarsReadyChecker guildWarsReadyChecker =
+        guildWarsReadyChecker.ThrowIfNull();
+    private readonly IGuildWarsProcessFinder guildWarsProcessFinder =
+        guildWarsProcessFinder.ThrowIfNull();
 
-    public async Task<GuildWarsApplicationLaunchContext?> LaunchGuildwars(LaunchConfigurationWithCredentials launchConfigurationWithCredentials, CancellationToken cancellationToken)
+    public async Task<GuildWarsApplicationLaunchContext?> LaunchGuildwars(
+        LaunchConfigurationWithCredentials launchConfigurationWithCredentials,
+        CancellationToken cancellationToken
+    )
     {
         launchConfigurationWithCredentials.ThrowIfNull();
         launchConfigurationWithCredentials.Credentials.ThrowIfNull();
         using var timeout = new CancellationTokenSource(LaunchTimeout);
-        using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeout.Token);
-        var gwProcess = await this.LaunchGuildwarsProcess(launchConfigurationWithCredentials, cancellation.Token);
+        using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(
+            cancellationToken,
+            timeout.Token
+        );
+        var gwProcess = await this.LaunchGuildwarsProcess(
+            launchConfigurationWithCredentials,
+            cancellation.Token
+        );
         if (gwProcess is null)
         {
             return default;
         }
 
-
-        return new GuildWarsApplicationLaunchContext { LaunchConfiguration = launchConfigurationWithCredentials, GuildWarsProcess = gwProcess, ProcessId = (uint)gwProcess.Id };
+        return new GuildWarsApplicationLaunchContext
+        {
+            LaunchConfiguration = launchConfigurationWithCredentials,
+            GuildWarsProcess = gwProcess,
+            ProcessId = (uint)gwProcess.Id,
+        };
     }
 
     // TODO: Needs to be reworked to be cross-platform
@@ -98,8 +115,9 @@ internal sealed class ApplicationLauncher(
                 UseShellExecute = true,
                 CreateNoWindow = true,
                 FileName = "cmd.exe",
-                Arguments = $"/c cd /d \"{Environment.CurrentDirectory}\" && timeout /t 1 /nobreak && start \"\" \"{processName}\" && exit"
-            }
+                Arguments =
+                    $"/c cd /d \"{Environment.CurrentDirectory}\" && timeout /t 1 /nobreak && start \"\" \"{processName}\" && exit",
+            },
         };
         if (process.Start() is false)
         {
@@ -126,8 +144,8 @@ internal sealed class ApplicationLauncher(
                 WorkingDirectory = Environment.CurrentDirectory,
                 FileName = processName,
                 UseShellExecute = true,
-                CreateNoWindow = true
-            }
+                CreateNoWindow = true,
+            },
         };
         if (process.Start() is false)
         {
@@ -137,27 +155,36 @@ internal sealed class ApplicationLauncher(
         this.photinoWindow.Close();
     }
 
-    private async Task<Process?> LaunchGuildwarsProcess(LaunchConfigurationWithCredentials launchConfigurationWithCredentials, CancellationToken cancellationToken)
+    private async Task<Process?> LaunchGuildwarsProcess(
+        LaunchConfigurationWithCredentials launchConfigurationWithCredentials,
+        CancellationToken cancellationToken
+    )
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         var email = launchConfigurationWithCredentials.Credentials?.Username;
         var password = launchConfigurationWithCredentials.Credentials?.Password;
         var executable = launchConfigurationWithCredentials.ExecutablePath;
-        if (executable is not null &&
-            File.Exists(executable) is false)
+        if (executable is not null && File.Exists(executable) is false)
         {
-            throw new ExecutableNotFoundException($"Guildwars executable doesn't exist at {executable}");
+            throw new ExecutableNotFoundException(
+                $"Guildwars executable doesn't exist at {executable}"
+            );
         }
         else if (executable is null)
         {
             var availableExecutables = this.guildWarsExecutableManager.GetExecutableList();
             var runningInstances = this.GetGuildwarsProcesses();
-            var firstAvailableExecutable = availableExecutables.FirstOrDefault(e => !runningInstances.Any(p => Path.GetFullPath(p.MainModule?.FileName ?? string.Empty) == Path.GetFullPath(e)));
+            var firstAvailableExecutable = availableExecutables.FirstOrDefault(e =>
+                !runningInstances.Any(p =>
+                    Path.GetFullPath(p.MainModule?.FileName ?? string.Empty) == Path.GetFullPath(e)
+                )
+            );
             if (firstAvailableExecutable is null)
             {
                 this.notificationService.NotifyError(
                     title: "Can not launch Guild Wars",
-                    description: "No available executables found. All executables are currently in use");
+                    description: "No available executables found. All executables are currently in use"
+                );
                 return default;
             }
 
@@ -167,17 +194,23 @@ internal sealed class ApplicationLauncher(
         if (executable is null)
         {
             this.notificationService.NotifyError(
-                    title: "Can not launch Guild Wars",
-                    description: "No executable path provided and no available executables found");
-            throw new InvalidOperationException("No executable path provided and no available executables found");
+                title: "Can not launch Guild Wars",
+                description: "No executable path provided and no available executables found"
+            );
+            throw new InvalidOperationException(
+                "No executable path provided and no available executables found"
+            );
         }
 
         if (Path.GetDirectoryName(executable) is not string workingDirectory)
         {
             this.notificationService.NotifyError(
                 title: "Can not launch Guild Wars",
-                description: "Unable to determine executable directory");
-            throw new InvalidOperationException("Unable to determine executable directory for Steam support");
+                description: "Unable to determine executable directory"
+            );
+            throw new InvalidOperationException(
+                "Unable to determine executable directory for Steam support"
+            );
         }
 
         var args = new List<string>();
@@ -192,7 +225,10 @@ internal sealed class ApplicationLauncher(
         }
 
         var mods = this.modsManager.GetMods().Where(m => m.IsEnabled && m.IsInstalled).ToList();
-        var disabledmods = this.modsManager.GetMods().Where(m => !m.IsEnabled && m.IsInstalled).ToList();
+        var disabledmods = this
+            .modsManager.GetMods()
+            .Where(m => !m.IsEnabled && m.IsInstalled)
+            .ToList();
         foreach (var mod in mods)
         {
             args.AddRange(mod.GetCustomArguments());
@@ -211,19 +247,37 @@ internal sealed class ApplicationLauncher(
         if (launchConfigurationWithCredentials.SteamSupport)
         {
             await File.WriteAllTextAsync(steamAppIdFilePath, SteamAppId, cancellationToken);
-            scopedLogger.LogDebug("Created {SteamAppIdFile} for Steam support at {steamAppIdFilePath}", SteamAppIdFile, steamAppIdFilePath);
+            scopedLogger.LogDebug(
+                "Created {SteamAppIdFile} for Steam support at {steamAppIdFilePath}",
+                SteamAppIdFile,
+                steamAppIdFilePath
+            );
         }
         else if (File.Exists(steamAppIdFilePath))
         {
             File.Delete(steamAppIdFilePath);
-            scopedLogger.LogDebug("Deleted existing {SteamAppIdFile} to disable Steam support at {steamAppIdFilePath}", SteamAppIdFile, steamAppIdFilePath);
+            scopedLogger.LogDebug(
+                "Deleted existing {SteamAppIdFile} to disable Steam support at {steamAppIdFilePath}",
+                SteamAppIdFile,
+                steamAppIdFilePath
+            );
         }
 
-        var applicationLauncherContext = new ApplicationLauncherContext { Process = process, ExecutablePath = executable, ProcessId = 0 };
-        var guildWarsStartingDisabledContext = new GuildWarsStartingDisabledContext { ApplicationLauncherContext = applicationLauncherContext };
+        var applicationLauncherContext = new ApplicationLauncherContext
+        {
+            Process = process,
+            ExecutablePath = executable,
+            ProcessId = 0,
+        };
+        var guildWarsStartingDisabledContext = new GuildWarsStartingDisabledContext
+        {
+            ApplicationLauncherContext = applicationLauncherContext,
+        };
         foreach (var mod in disabledmods)
         {
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.CurrentValue.ModStartupTimeout));
+            using var cts = new CancellationTokenSource(
+                TimeSpan.FromSeconds(this.launcherOptions.CurrentValue.ModStartupTimeout)
+            );
             try
             {
                 await mod.OnGuildWarsStartingDisabled(guildWarsStartingDisabledContext, cts.Token);
@@ -233,22 +287,30 @@ internal sealed class ApplicationLauncher(
                 scopedLogger.LogError("{mod.Name} timeout", mod.Name);
                 this.notificationService.NotifyError(
                     title: $"{mod.Name} timeout",
-                    description: $"Mod timed out while processing {nameof(mod.OnGuildWarsStartingDisabled)}");
+                    description: $"Mod timed out while processing {nameof(mod.OnGuildWarsStartingDisabled)}"
+                );
             }
             catch (Exception e)
             {
                 scopedLogger.LogError(e, "{mod.Name} unhandled exception", mod.Name);
                 this.notificationService.NotifyError(
                     title: $"{mod.Name} exception",
-                    description: $"Mod encountered exception of type {e.GetType().Name} while processing {nameof(mod.OnGuildWarsStartingDisabled)}");
+                    description: $"Mod encountered exception of type {e.GetType().Name} while processing {nameof(mod.OnGuildWarsStartingDisabled)}"
+                );
                 return default;
             }
         }
 
-        var guildWarsStartingContext = new GuildWarsStartingContext { ApplicationLauncherContext = applicationLauncherContext, CancelStartup = false };
+        var guildWarsStartingContext = new GuildWarsStartingContext
+        {
+            ApplicationLauncherContext = applicationLauncherContext,
+            CancelStartup = false,
+        };
         foreach (var mod in mods)
         {
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.CurrentValue.ModStartupTimeout));
+            using var cts = new CancellationTokenSource(
+                TimeSpan.FromSeconds(this.launcherOptions.CurrentValue.ModStartupTimeout)
+            );
             try
             {
                 await mod.OnGuildWarsStarting(guildWarsStartingContext, cts.Token);
@@ -257,7 +319,8 @@ internal sealed class ApplicationLauncher(
                     scopedLogger.LogError("{mod.Name} canceled startup", mod.Name);
                     this.notificationService.NotifyError(
                         title: $"{mod.Name} canceled startup",
-                        description: $"Mod canceled the startup during {nameof(mod.OnGuildWarsStarting)}");
+                        description: $"Mod canceled the startup during {nameof(mod.OnGuildWarsStarting)}"
+                    );
                     return default;
                 }
             }
@@ -266,25 +329,36 @@ internal sealed class ApplicationLauncher(
                 scopedLogger.LogError("{mod.Name} timeout", mod.Name);
                 this.notificationService.NotifyError(
                     title: $"{mod.Name} timeout",
-                    description: $"Mod timed out while processing {nameof(mod.OnGuildWarsStarting)}");
+                    description: $"Mod timed out while processing {nameof(mod.OnGuildWarsStarting)}"
+                );
             }
             catch (Exception e)
             {
                 scopedLogger.LogError(e, "{mod.Name} unhandled exception", mod.Name);
                 this.notificationService.NotifyError(
                     title: $"{mod.Name} exception",
-                    description: $"Mod encountered exception of type {e.GetType().Name} while processing {nameof(mod.OnGuildWarsStarting)}");
+                    description: $"Mod encountered exception of type {e.GetType().Name} while processing {nameof(mod.OnGuildWarsStarting)}"
+                );
                 return default;
             }
         }
 
-        var launchResult = await this.daybreakInjector.Launch(executable, this.privilegeManager.AdminPrivileges, [.. args], cancellationToken);
+        var launchResult = await this.daybreakInjector.Launch(
+            executable,
+            this.privilegeManager.AdminPrivileges,
+            [.. args],
+            cancellationToken
+        );
         if ((int)launchResult.ExitCode < 0)
         {
-            scopedLogger.LogError("Failed to launch Guild Wars via injector with launch result {launchResult}", launchResult);
+            scopedLogger.LogError(
+                "Failed to launch Guild Wars via injector with launch result {launchResult}",
+                launchResult
+            );
             this.notificationService.NotifyError(
                 title: "Failed to launch Guild Wars",
-                description: $"Injector failed to launch Guild Wars with launch result {launchResult}. Check logs for details");
+                description: $"Injector failed to launch Guild Wars with launch result {launchResult}. Check logs for details"
+            );
             return default;
         }
 
@@ -292,20 +366,36 @@ internal sealed class ApplicationLauncher(
         var pId = launchResult.ProcessId;
         if (threadHandle <= 0 || pId <= 0)
         {
-            scopedLogger.LogError("Invalid process or thread handle returned from injector. ProcessId: {pId}, ThreadHandle: {threadHandle}", pId, threadHandle);
+            scopedLogger.LogError(
+                "Invalid process or thread handle returned from injector. ProcessId: {pId}, ThreadHandle: {threadHandle}",
+                pId,
+                threadHandle
+            );
             this.notificationService.NotifyError(
                 title: "Failed to launch Guild Wars",
-                description: "Injector returned invalid process or thread handle. Check logs for details");
+                description: "Injector returned invalid process or thread handle. Check logs for details"
+            );
             return default;
         }
 
         // Reset launch context with the launched process
         process = Process.GetProcessById(pId);
-        applicationLauncherContext = new ApplicationLauncherContext { ExecutablePath = executable, Process = process, ProcessId = (uint)pId };
-        var guildWarsCreatedContext = new GuildWarsCreatedContext { ApplicationLauncherContext = applicationLauncherContext, CancelStartup = false };
+        applicationLauncherContext = new ApplicationLauncherContext
+        {
+            ExecutablePath = executable,
+            Process = process,
+            ProcessId = (uint)pId,
+        };
+        var guildWarsCreatedContext = new GuildWarsCreatedContext
+        {
+            ApplicationLauncherContext = applicationLauncherContext,
+            CancelStartup = false,
+        };
         foreach (var mod in mods)
         {
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.CurrentValue.ModStartupTimeout));
+            using var cts = new CancellationTokenSource(
+                TimeSpan.FromSeconds(this.launcherOptions.CurrentValue.ModStartupTimeout)
+            );
             try
             {
                 await mod.OnGuildWarsCreated(guildWarsCreatedContext, cts.Token);
@@ -314,8 +404,16 @@ internal sealed class ApplicationLauncher(
                     scopedLogger.LogError("{mod.Name} canceled startup", mod.Name);
                     this.notificationService.NotifyError(
                         title: $"{mod.Name} canceled startup",
-                        description: $"Mod canceled the startup during {nameof(mod.OnGuildWarsStarting)}");
-                    this.KillGuildWarsProcess(new GuildWarsApplicationLaunchContext { GuildWarsProcess = process, LaunchConfiguration = launchConfigurationWithCredentials, ProcessId = (uint)pId });
+                        description: $"Mod canceled the startup during {nameof(mod.OnGuildWarsStarting)}"
+                    );
+                    this.KillGuildWarsProcess(
+                        new GuildWarsApplicationLaunchContext
+                        {
+                            GuildWarsProcess = process,
+                            LaunchConfiguration = launchConfigurationWithCredentials,
+                            ProcessId = (uint)pId,
+                        }
+                    );
                     return default;
                 }
             }
@@ -324,15 +422,24 @@ internal sealed class ApplicationLauncher(
                 scopedLogger.LogError("{mod.Name} timeout", mod.Name);
                 this.notificationService.NotifyError(
                     title: $"{mod.Name} timeout",
-                    description: $"Mod timed out while processing {nameof(mod.OnGuildWarsCreated)}");
+                    description: $"Mod timed out while processing {nameof(mod.OnGuildWarsCreated)}"
+                );
             }
             catch (Exception e)
             {
-                this.KillGuildWarsProcess(new GuildWarsApplicationLaunchContext { GuildWarsProcess = process, LaunchConfiguration = launchConfigurationWithCredentials, ProcessId = (uint)pId });
+                this.KillGuildWarsProcess(
+                    new GuildWarsApplicationLaunchContext
+                    {
+                        GuildWarsProcess = process,
+                        LaunchConfiguration = launchConfigurationWithCredentials,
+                        ProcessId = (uint)pId,
+                    }
+                );
                 scopedLogger.LogError(e, "{mod.Name} unhandled exception", mod.Name);
                 this.notificationService.NotifyError(
                     title: $"{mod.Name} exception",
-                    description: $"Mod encountered exception of type {e.GetType().Name} while processing {nameof(mod.OnGuildWarsCreated)}");
+                    description: $"Mod encountered exception of type {e.GetType().Name} while processing {nameof(mod.OnGuildWarsCreated)}"
+                );
                 return default;
             }
         }
@@ -340,31 +447,45 @@ internal sealed class ApplicationLauncher(
         var resumeResult = await this.daybreakInjector.Resume(threadHandle, cancellationToken);
         if (resumeResult < 0)
         {
-            scopedLogger.LogError("Failed to resume Guild Wars process via injector with resume result {resumeResult}", resumeResult);
+            scopedLogger.LogError(
+                "Failed to resume Guild Wars process via injector with resume result {resumeResult}",
+                resumeResult
+            );
             this.notificationService.NotifyError(
                 title: "Failed to launch Guild Wars",
-                description: $"Injector failed to resume Guild Wars with resume result {resumeResult}. Check logs for details");
+                description: $"Injector failed to resume Guild Wars with resume result {resumeResult}. Check logs for details"
+            );
             return default;
         }
 
         var sw = Stopwatch.StartNew();
-        var isReady = await this.guildWarsReadyChecker.WaitForReady(process, LaunchTimeout - sw.Elapsed, cancellationToken);
+        var isReady = await this.guildWarsReadyChecker.WaitForReady(
+            process,
+            LaunchTimeout - sw.Elapsed,
+            cancellationToken
+        );
         if (!isReady)
         {
             scopedLogger.LogError("Guild Wars process was not ready in time");
             this.notificationService.NotifyError(
                 title: "Guild Wars process not ready",
-                description: "Guild Wars process exited or timed out before becoming ready. Please check logs for details");
+                description: "Guild Wars process exited or timed out before becoming ready. Please check logs for details"
+            );
             return default;
         }
 
         /*
          * Run the actions one by one, to avoid injection issues
          */
-        var guildWarsStartedContext = new GuildWarsStartedContext { ApplicationLauncherContext = applicationLauncherContext };
+        var guildWarsStartedContext = new GuildWarsStartedContext
+        {
+            ApplicationLauncherContext = applicationLauncherContext,
+        };
         foreach (var mod in mods)
         {
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(this.launcherOptions.CurrentValue.ModStartupTimeout));
+            using var cts = new CancellationTokenSource(
+                TimeSpan.FromSeconds(this.launcherOptions.CurrentValue.ModStartupTimeout)
+            );
             try
             {
                 await mod.OnGuildWarsStarted(guildWarsStartedContext, cts.Token);
@@ -374,15 +495,24 @@ internal sealed class ApplicationLauncher(
                 scopedLogger.LogError("{mod.Name} timeout", mod.Name);
                 this.notificationService.NotifyError(
                     title: $"{mod.Name} timeout",
-                    description: $"Mod timed out while processing {nameof(mod.OnGuildWarsStarted)}");
+                    description: $"Mod timed out while processing {nameof(mod.OnGuildWarsStarted)}"
+                );
             }
             catch (Exception e)
             {
-                this.KillGuildWarsProcess(new GuildWarsApplicationLaunchContext { GuildWarsProcess = process, LaunchConfiguration = launchConfigurationWithCredentials, ProcessId = (uint)pId });
+                this.KillGuildWarsProcess(
+                    new GuildWarsApplicationLaunchContext
+                    {
+                        GuildWarsProcess = process,
+                        LaunchConfiguration = launchConfigurationWithCredentials,
+                        ProcessId = (uint)pId,
+                    }
+                );
                 scopedLogger.LogError(e, "{mod.Name} unhandled exception", mod.Name);
                 this.notificationService.NotifyError(
                     title: $"{mod.Name} exception",
-                    description: $"Mod encountered exception of type {e.GetType().Name} while processing {nameof(mod.OnGuildWarsStarted)}");
+                    description: $"Mod encountered exception of type {e.GetType().Name} while processing {nameof(mod.OnGuildWarsStarted)}"
+                );
                 return default;
             }
         }
@@ -390,14 +520,18 @@ internal sealed class ApplicationLauncher(
         return process;
     }
 
-    public GuildWarsApplicationLaunchContext? GetGuildwarsProcess(LaunchConfigurationWithCredentials launchConfigurationWithCredentials)
+    public GuildWarsApplicationLaunchContext? GetGuildwarsProcess(
+        LaunchConfigurationWithCredentials launchConfigurationWithCredentials
+    )
     {
         launchConfigurationWithCredentials.ThrowIfNull();
 
         return this.guildWarsProcessFinder.FindProcess(launchConfigurationWithCredentials);
     }
 
-    public IEnumerable<GuildWarsApplicationLaunchContext?> GetGuildwarsProcesses(params LaunchConfigurationWithCredentials[] launchConfigurationWithCredentials)
+    public IEnumerable<GuildWarsApplicationLaunchContext?> GetGuildwarsProcesses(
+        params LaunchConfigurationWithCredentials[] launchConfigurationWithCredentials
+    )
     {
         launchConfigurationWithCredentials.ThrowIfNull();
 
@@ -409,42 +543,72 @@ internal sealed class ApplicationLauncher(
         return this.guildWarsProcessFinder.GetGuildWarsProcesses();
     }
 
-    public void KillGuildWarsProcess(GuildWarsApplicationLaunchContext guildWarsApplicationLaunchContext)
+    public void KillGuildWarsProcess(
+        GuildWarsApplicationLaunchContext guildWarsApplicationLaunchContext
+    )
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         try
         {
             var process = guildWarsApplicationLaunchContext.GuildWarsProcess;
-            if (process.MainModule?.FileName is not null &&
-                process.MainModule.FileName.Contains("Gw.exe", StringComparison.OrdinalIgnoreCase))
+            if (
+                process.MainModule?.FileName is not null
+                && process.MainModule.FileName.Contains(
+                    "Gw.exe",
+                    StringComparison.OrdinalIgnoreCase
+                )
+            )
             {
                 process.Kill(true);
                 return;
             }
         }
-        catch (Exception e) when (e.Message.Contains("Only part of a ReadProcessMemory or WriteProcessMemory request was completed"))
+        catch (Exception e)
+            when (e.Message.Contains(
+                    "Only part of a ReadProcessMemory or WriteProcessMemory request was completed"
+                )
+            )
         {
             guildWarsApplicationLaunchContext.GuildWarsProcess.Kill();
         }
         catch (Exception e) when (e.Message.Contains("Access is denied"))
         {
-            scopedLogger.LogError(e, "Insuficient privileges to kill GuildWars process with id {guildWarsApplicationLaunchContext.ProcessId}", guildWarsApplicationLaunchContext.ProcessId);
-            Task.Run(() => this.privilegeManager.RequestAdminPrivileges<LaunchView>("Insufficient privileges to kill Guild Wars process. Please restart as administrator and try again.", default, CancellationToken.None));
+            scopedLogger.LogError(
+                e,
+                "Insuficient privileges to kill GuildWars process with id {guildWarsApplicationLaunchContext.ProcessId}",
+                guildWarsApplicationLaunchContext.ProcessId
+            );
+            Task.Run(() =>
+                this.privilegeManager.RequestAdminPrivileges<LaunchView>(
+                    "Insufficient privileges to kill Guild Wars process. Please restart as administrator and try again.",
+                    default,
+                    CancellationToken.None
+                )
+            );
         }
         catch (Exception e)
         {
-            scopedLogger.LogError(e, "Failed to kill GuildWars process with id {guildWarsApplicationLaunchContext.ProcessId}", guildWarsApplicationLaunchContext.ProcessId);
+            scopedLogger.LogError(
+                e,
+                "Failed to kill GuildWars process with id {guildWarsApplicationLaunchContext.ProcessId}",
+                guildWarsApplicationLaunchContext.ProcessId
+            );
             this.notificationService.NotifyError(
                 title: "Failed to kill GuildWars process",
-                description: $"Encountered exception while trying to kill GuildWars process with id {guildWarsApplicationLaunchContext.ProcessId}. Check logs for details");
+                description: $"Encountered exception while trying to kill GuildWars process with id {guildWarsApplicationLaunchContext.ProcessId}. Check logs for details"
+            );
         }
     }
 
-    public IEnumerable<string> GetLoadedModules(GuildWarsApplicationLaunchContext guildWarsApplicationLaunchContext)
+    public IEnumerable<string> GetLoadedModules(
+        GuildWarsApplicationLaunchContext guildWarsApplicationLaunchContext
+    )
     {
         if (guildWarsApplicationLaunchContext.GuildWarsProcess?.HasExited is false)
         {
-            foreach (ProcessModule module in guildWarsApplicationLaunchContext.GuildWarsProcess.Modules)
+            foreach (
+                ProcessModule module in guildWarsApplicationLaunchContext.GuildWarsProcess.Modules
+            )
             {
                 yield return module.ModuleName;
             }
@@ -452,7 +616,10 @@ internal sealed class ApplicationLauncher(
     }
 
     // TODO: Needs to be reworked to be cross-platform
-    public async Task<IEnumerable<IModService>> CheckMods(GuildWarsApplicationLaunchContext guildWarsApplicationLaunchContext, CancellationToken cancellationToken)
+    public async Task<IEnumerable<IModService>> CheckMods(
+        GuildWarsApplicationLaunchContext guildWarsApplicationLaunchContext,
+        CancellationToken cancellationToken
+    )
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         if (guildWarsApplicationLaunchContext.LaunchConfiguration.ExecutablePath is null)
@@ -464,30 +631,45 @@ internal sealed class ApplicationLauncher(
         {
             ApplicationLauncherContext = new ApplicationLauncherContext
             {
-                ExecutablePath = guildWarsApplicationLaunchContext.LaunchConfiguration.ExecutablePath,
+                ExecutablePath = guildWarsApplicationLaunchContext
+                    .LaunchConfiguration
+                    .ExecutablePath,
                 Process = guildWarsApplicationLaunchContext.GuildWarsProcess,
-                ProcessId = guildWarsApplicationLaunchContext.ProcessId
+                ProcessId = guildWarsApplicationLaunchContext.ProcessId,
             },
-            LoadedModules = [.. this.GetLoadedModules(guildWarsApplicationLaunchContext)]
+            LoadedModules = [.. this.GetLoadedModules(guildWarsApplicationLaunchContext)],
         };
 
-        var modsNeedReapply = await this.modsManager.GetMods().ToAsyncEnumerable()
-            .Where(async (m, ct) =>
-            {
-                try
+        var modsNeedReapply = await this
+            .modsManager.GetMods()
+            .ToAsyncEnumerable()
+            .Where(
+                async (m, ct) =>
                 {
-                    return await m.ShouldRunAgain(guildWarsRunningContext, ct);
+                    try
+                    {
+                        return await m.ShouldRunAgain(guildWarsRunningContext, ct);
+                    }
+                    catch (Exception e)
+                    {
+                        scopedLogger.LogError(
+                            e,
+                            "Mod {modName} encountered an error while checking if it should run again",
+                            m.Name
+                        );
+                        return false;
+                    }
                 }
-                catch (Exception e)
-                {
-                    scopedLogger.LogError(e, "Mod {modName} encountered an error while checking if it should run again", m.Name);
-                    return false;
-                }
-            }).ToListAsync(cancellationToken);
+            )
+            .ToListAsync(cancellationToken);
         return modsNeedReapply;
     }
 
-    public async Task<bool> ReapplyMods(GuildWarsApplicationLaunchContext guildWarsApplicationLaunchContext, IEnumerable<IModService> mods, CancellationToken cancellationToken)
+    public async Task<bool> ReapplyMods(
+        GuildWarsApplicationLaunchContext guildWarsApplicationLaunchContext,
+        IEnumerable<IModService> mods,
+        CancellationToken cancellationToken
+    )
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         if (guildWarsApplicationLaunchContext.LaunchConfiguration.ExecutablePath is null)
@@ -499,11 +681,13 @@ internal sealed class ApplicationLauncher(
         {
             ApplicationLauncherContext = new ApplicationLauncherContext
             {
-                ExecutablePath = guildWarsApplicationLaunchContext.LaunchConfiguration.ExecutablePath,
+                ExecutablePath = guildWarsApplicationLaunchContext
+                    .LaunchConfiguration
+                    .ExecutablePath,
                 Process = guildWarsApplicationLaunchContext.GuildWarsProcess,
-                ProcessId = guildWarsApplicationLaunchContext.ProcessId
+                ProcessId = guildWarsApplicationLaunchContext.ProcessId,
             },
-            LoadedModules = [.. this.GetLoadedModules(guildWarsApplicationLaunchContext)]
+            LoadedModules = [.. this.GetLoadedModules(guildWarsApplicationLaunchContext)],
         };
 
         foreach (var mod in mods)
@@ -514,10 +698,15 @@ internal sealed class ApplicationLauncher(
             }
             catch (Exception e)
             {
-                scopedLogger.LogError(e, "Mod {modName} encountered an error while reapplying", mod.Name);
+                scopedLogger.LogError(
+                    e,
+                    "Mod {modName} encountered an error while reapplying",
+                    mod.Name
+                );
                 this.notificationService.NotifyError(
                     title: $"{mod.Name} encountered an error",
-                    description: $"Mod {mod.Name} encountered an error while reapplying. Check logs for details");
+                    description: $"Mod {mod.Name} encountered an error while reapplying. Check logs for details"
+                );
             }
         }
 

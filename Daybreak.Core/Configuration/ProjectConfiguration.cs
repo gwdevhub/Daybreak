@@ -24,7 +24,6 @@ using Daybreak.Services.Injection;
 using Daybreak.Services.InternetChecker;
 using Daybreak.Services.LaunchConfigurations;
 using Daybreak.Services.Logging;
-using Daybreak.Services.MDns;
 using Daybreak.Services.Metrics;
 using Daybreak.Services.Mods;
 using Daybreak.Services.Monitoring;
@@ -37,7 +36,6 @@ using Daybreak.Services.Privilege;
 using Daybreak.Services.Registry;
 using Daybreak.Services.ReShade;
 using Daybreak.Services.Screenshots;
-
 using Daybreak.Services.Startup;
 using Daybreak.Services.Startup.Actions;
 using Daybreak.Services.Telemetry;
@@ -68,7 +66,6 @@ using Daybreak.Shared.Services.Guildwars;
 using Daybreak.Shared.Services.Initialization;
 using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.InternetChecker;
-using Daybreak.Shared.Services.Keyboard;
 using Daybreak.Shared.Services.LaunchConfigurations;
 using Daybreak.Shared.Services.MDns;
 using Daybreak.Shared.Services.Menu;
@@ -78,13 +75,10 @@ using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Onboarding;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Plugins;
-using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Services.Registry;
 using Daybreak.Shared.Services.ReShade;
-using Daybreak.Shared.Services.Screens;
 using Daybreak.Shared.Services.Screenshots;
 using Daybreak.Shared.Services.SevenZip;
-using Daybreak.Shared.Services.Shortcuts;
 using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.Toolbox;
 using Daybreak.Shared.Services.TradeChat;
@@ -99,21 +93,21 @@ using Daybreak.Views.Mods;
 using Daybreak.Views.Trade;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Logging;
 using Microsoft.FluentUI.AspNetCore.Components;
-
 using OpenTelemetry.Resources;
 using TrailBlazr.Extensions;
 using TrailBlazr.Services;
 using IMenuService = Daybreak.Shared.Services.Menu.IMenuService;
-using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 using MenuService = Daybreak.Services.Menu.MenuService;
 
 namespace Daybreak.Configuration;
 
 public class ProjectConfiguration : PluginConfigurationBase
 {
-    public static readonly Version CurrentVersion = Version.Parse(Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? throw new InvalidOperationException("Unable to get current version"));
+    public static readonly Version CurrentVersion = Version.Parse(
+        Assembly.GetExecutingAssembly().GetName().Version?.ToString()
+            ?? throw new InvalidOperationException("Unable to get current version")
+    );
 
     public override void RegisterServices(IServiceCollection services)
     {
@@ -124,19 +118,21 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IFileProvider, DaybreakFileProvider>();
 
         RegisterHttpClients(services);
-        services.RegisterClientWebSocket<TradeChatService<KamadanTradeChatOptions>>()
-            .Build();
-        services.RegisterClientWebSocket<TradeChatService<AscalonTradeChatOptions>>()
-            .Build();
+        services.RegisterClientWebSocket<TradeChatService<KamadanTradeChatOptions>>().Build();
+        services.RegisterClientWebSocket<TradeChatService<AscalonTradeChatOptions>>().Build();
 
         services.AddSingleton(_ =>
         {
-            var resourceBuilder = ResourceBuilder.CreateDefault().AddService("Daybreak", serviceVersion: CurrentVersion.ToString());
+            var resourceBuilder = ResourceBuilder
+                .CreateDefault()
+                .AddService("Daybreak", serviceVersion: CurrentVersion.ToString());
             var attributes = new List<KeyValuePair<string, object>>();
 #if DEBUG
             attributes.Add(new KeyValuePair<string, object>("deployment.environment", "debug"));
 #else
-            attributes.Add(new KeyValuePair<string, object>("deployment.environment", "production"));
+            attributes.Add(
+                new KeyValuePair<string, object>("deployment.environment", "production")
+            );
 #endif
             resourceBuilder.AddAttributes(attributes);
             return resourceBuilder;
@@ -146,11 +142,17 @@ public class ProjectConfiguration : PluginConfigurationBase
 
         services.AddSingleton<ViewManager>();
         services.AddSingleton<IMenuService, MenuService>();
-        services.AddSingleton<IMenuServiceInitializer, MenuService>(sp => sp.GetRequiredService<IMenuService>().Cast<MenuService>());
-        services.AddSingleton<IMenuServiceButtonHandler, MenuService>(sp => sp.GetRequiredService<IMenuService>().Cast<MenuService>());
+        services.AddSingleton<IMenuServiceInitializer, MenuService>(sp =>
+            sp.GetRequiredService<IMenuService>().Cast<MenuService>()
+        );
+        services.AddSingleton<IMenuServiceButtonHandler, MenuService>(sp =>
+            sp.GetRequiredService<IMenuService>().Cast<MenuService>()
+        );
         services.AddSingleton<IMetricsService, MetricsService>();
         services.AddSingleton<INotificationService, NotificationService>();
-        services.AddSingleton<INotificationProducer, NotificationService>(sp => sp.GetRequiredService<INotificationService>().Cast<NotificationService>());
+        services.AddSingleton<INotificationProducer, NotificationService>(sp =>
+            sp.GetRequiredService<INotificationService>().Cast<NotificationService>()
+        );
         services.AddSingleton<IInternetCheckingService, InternetCheckingService>();
         services.AddSingleton<INotificationStorage, InMemoryNotificationStorage>();
         services.AddSingleton<IModsManager, ModsManager>();
@@ -162,7 +164,9 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<ViewRedirectContext>();
         services.AddSingleton<JSConsoleInterop>();
         services.AddSingleton<OptionsManager>();
-        services.AddSingleton<IOptionsProvider, OptionsManager>(sp => sp.GetRequiredService<OptionsManager>());
+        services.AddSingleton<IOptionsProvider, OptionsManager>(sp =>
+            sp.GetRequiredService<OptionsManager>()
+        );
         services.AddSingleton<IOptionsSynchronizationService, OptionsSynchronizationService>();
 
         services.AddScoped<ICredentialManager, CredentialManager>();
@@ -174,8 +178,14 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<IDownloadService, DownloadService>();
         services.AddScoped<IGuildWarsInstaller, IntegratedGuildwarsInstaller>();
         services.AddScoped<IExceptionHandler, ExceptionHandler>();
-        services.AddScoped<ITradeChatService<KamadanTradeChatOptions>, TradeChatService<KamadanTradeChatOptions>>();
-        services.AddScoped<ITradeChatService<AscalonTradeChatOptions>, TradeChatService<AscalonTradeChatOptions>>();
+        services.AddScoped<
+            ITradeChatService<KamadanTradeChatOptions>,
+            TradeChatService<KamadanTradeChatOptions>
+        >();
+        services.AddScoped<
+            ITradeChatService<AscalonTradeChatOptions>,
+            TradeChatService<AscalonTradeChatOptions>
+        >();
         services.AddScoped<ITraderQuoteService, TraderQuoteService>();
         services.AddScoped<ITradeHistoryDatabase, TradeHistoryDatabase>();
         services.AddScoped<IGuildWarsCopyService, GuildWarsCopyService>();
@@ -238,7 +248,10 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<LauncherOnboardingView, LauncherOnboardingViewModel>();
         viewProducer.RegisterView<ModsView, ModsViewModel>();
         viewProducer.RegisterView<ModInstallationView, ModInstallationViewModel>();
-        viewProducer.RegisterView<ModInstallationConfirmationView, ModInstallationConfirmationViewModel>();
+        viewProducer.RegisterView<
+            ModInstallationConfirmationView,
+            ModInstallationConfirmationViewModel
+        >();
         viewProducer.RegisterView<ScreenSelectorView, ScreenSelectorViewModel>();
         viewProducer.RegisterView<UModManagementView, UModManagementViewModel>();
         viewProducer.RegisterView<TradeNotificationView, TradeNotificationViewModel>();
@@ -260,7 +273,9 @@ public class ProjectConfiguration : PluginConfigurationBase
         startupActionProducer.RegisterAction<UpdateReShadeAction>();
     }
 
-    public override void RegisterPostUpdateActions(IPostUpdateActionProducer postUpdateActionProducer)
+    public override void RegisterPostUpdateActions(
+        IPostUpdateActionProducer postUpdateActionProducer
+    )
     {
         postUpdateActionProducer.ThrowIfNull();
     }
@@ -298,7 +313,9 @@ public class ProjectConfiguration : PluginConfigurationBase
         optionsProducer.RegisterOptions<GuildWarsScreenPlacerOptions>();
     }
 
-    public override void RegisterNotificationHandlers(INotificationHandlerProducer notificationHandlerProducer)
+    public override void RegisterNotificationHandlers(
+        INotificationHandlerProducer notificationHandlerProducer
+    )
     {
         notificationHandlerProducer.RegisterNotificationHandler<NoActionHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<MessageBoxHandler>();
@@ -319,7 +336,9 @@ public class ProjectConfiguration : PluginConfigurationBase
         modsManager.RegisterMod<IDirectSongService, DirectSongService>(singleton: true);
     }
 
-    public override void RegisterLaunchArgumentHandlers(IArgumentHandlerProducer argumentHandlerProducer)
+    public override void RegisterLaunchArgumentHandlers(
+        IArgumentHandlerProducer argumentHandlerProducer
+    )
     {
         argumentHandlerProducer.ThrowIfNull();
         argumentHandlerProducer.RegisterArgumentHandler<AutoLaunchArgumentHandler>();
@@ -329,40 +348,129 @@ public class ProjectConfiguration : PluginConfigurationBase
     public override void RegisterMenuButtons(IMenuServiceProducer menuServiceProducer)
     {
         menuServiceProducer.ThrowIfNull();
-        menuServiceProducer.CreateIfNotExistCategory("Guild Wars")
-            .RegisterButton("Game Companion", "Open game companion", sp => sp.GetRequiredService<IViewManager>().ShowView<LaunchView>())
-            .RegisterButton("Manage Builds", "Open builds manager", sp => sp.GetRequiredService<IViewManager>().ShowView<BuildListView>())
-            .RegisterButton("Manage Mods", "Open Guild Wars mods manager", sp => sp.GetRequiredService<IViewManager>().ShowView<ModsView>())
-            .RegisterButton("Download Guild Wars", "Download Guild Wars installer", sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsDownloadView>())
-            .RegisterButton("Copy Guild Wars", "Copy Guild Wars from an existing installation", sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsCopySelectionView>());
-        menuServiceProducer.CreateIfNotExistCategory("Daybreak")
+        menuServiceProducer
+            .CreateIfNotExistCategory("Guild Wars")
+            .RegisterButton(
+                "Game Companion",
+                "Open game companion",
+                sp => sp.GetRequiredService<IViewManager>().ShowView<LaunchView>()
+            )
+            .RegisterButton(
+                "Manage Builds",
+                "Open builds manager",
+                sp => sp.GetRequiredService<IViewManager>().ShowView<BuildListView>()
+            )
+            .RegisterButton(
+                "Manage Mods",
+                "Open Guild Wars mods manager",
+                sp => sp.GetRequiredService<IViewManager>().ShowView<ModsView>()
+            )
+            .RegisterButton(
+                "Download Guild Wars",
+                "Download Guild Wars installer",
+                sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsDownloadView>()
+            )
+            .RegisterButton(
+                "Copy Guild Wars",
+                "Copy Guild Wars from an existing installation",
+                sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsCopySelectionView>()
+            );
+        menuServiceProducer
+            .CreateIfNotExistCategory("Daybreak")
             //TODO: Implement Notifications view
             //.RegisterButton("Notifications", "Open notifications view", sp => { })
-            .RegisterButton("Manage Plugins", "Open plugins view", sp => sp.GetRequiredService<IViewManager>().ShowView<PluginsView>())
-            .RegisterButton("Manage version", "Open version manager", sp => sp.GetRequiredService<IViewManager>().ShowView<VersionManagementView>())
-            .RegisterButton("Help", "Open Daybreak wiki", sp => sp.GetRequiredService<IViewManager>().ShowView<WikiView>((nameof(WikiView.Page), "Home")));
-        menuServiceProducer.CreateIfNotExistCategory("Services")
-            .RegisterButton("Alerts", "Open trade alerts manager", sp => sp.GetRequiredService<IViewManager>().ShowView<TradeAlertsView>())
-            .RegisterButton("Kamadan", "Open kamadan trade chat", sp => sp.GetRequiredService<IViewManager>().ShowView<TradeChatView>((nameof(TradeChatView.Source), nameof(TraderSource.Kamadan))))
-            .RegisterButton("Ascalon", "Open ascalon trade chat", sp => sp.GetRequiredService<IViewManager>().ShowView<TradeChatView>((nameof(TradeChatView.Source), nameof(TraderSource.Ascalon))))
-            .RegisterButton("Guild Wars Party Search", "Show party search broadcasts", sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsPartySearchView>())
-            .RegisterButton("Guild Wars Marketplace", "Show guild wars marketplace", sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsMarketView>())
-            .RegisterButton("Event Calendar", "Show current and upcoming events", sp => sp.GetRequiredService<IViewManager>().ShowView<EventCalendarView>());
-        menuServiceProducer.CreateIfNotExistCategory("Settings")
-            .RegisterButton("Accounts", "Accounts Settings", sp => sp.GetRequiredService<IViewManager>().ShowView<AccountsView>())
-            .RegisterButton("Executables", "Executables Settings", sp => sp.GetRequiredService<IViewManager>().ShowView<ExecutablesView>())
-            .RegisterButton("Launch configurations", "Launch configurations settings", sp => sp.GetRequiredService<IViewManager>().ShowView<LaunchConfigurationsView>());
-        menuServiceProducer.CreateIfNotExistCategory("Diagnostics")
-            .RegisterButton("Telemetry", "Open telemetry view", sp => sp.GetRequiredService<IViewManager>().ShowView<TelemetryView>())
-            .RegisterButton("Logs", "Open logs view", sp => sp.GetRequiredService<IViewManager>().ShowView<LogsView>());
+            .RegisterButton(
+                "Manage Plugins",
+                "Open plugins view",
+                sp => sp.GetRequiredService<IViewManager>().ShowView<PluginsView>()
+            )
+            .RegisterButton(
+                "Manage version",
+                "Open version manager",
+                sp => sp.GetRequiredService<IViewManager>().ShowView<VersionManagementView>()
+            )
+            .RegisterButton(
+                "Help",
+                "Open Daybreak wiki",
+                sp =>
+                    sp.GetRequiredService<IViewManager>()
+                        .ShowView<WikiView>((nameof(WikiView.Page), "Home"))
+            );
+        menuServiceProducer
+            .CreateIfNotExistCategory("Services")
+            .RegisterButton(
+                "Alerts",
+                "Open trade alerts manager",
+                sp => sp.GetRequiredService<IViewManager>().ShowView<TradeAlertsView>()
+            )
+            .RegisterButton(
+                "Kamadan",
+                "Open kamadan trade chat",
+                sp =>
+                    sp.GetRequiredService<IViewManager>()
+                        .ShowView<TradeChatView>(
+                            (nameof(TradeChatView.Source), nameof(TraderSource.Kamadan))
+                        )
+            )
+            .RegisterButton(
+                "Ascalon",
+                "Open ascalon trade chat",
+                sp =>
+                    sp.GetRequiredService<IViewManager>()
+                        .ShowView<TradeChatView>(
+                            (nameof(TradeChatView.Source), nameof(TraderSource.Ascalon))
+                        )
+            )
+            .RegisterButton(
+                "Guild Wars Party Search",
+                "Show party search broadcasts",
+                sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsPartySearchView>()
+            )
+            .RegisterButton(
+                "Guild Wars Marketplace",
+                "Show guild wars marketplace",
+                sp => sp.GetRequiredService<IViewManager>().ShowView<GuildWarsMarketView>()
+            )
+            .RegisterButton(
+                "Event Calendar",
+                "Show current and upcoming events",
+                sp => sp.GetRequiredService<IViewManager>().ShowView<EventCalendarView>()
+            );
+        menuServiceProducer
+            .CreateIfNotExistCategory("Settings")
+            .RegisterButton(
+                "Accounts",
+                "Accounts Settings",
+                sp => sp.GetRequiredService<IViewManager>().ShowView<AccountsView>()
+            )
+            .RegisterButton(
+                "Executables",
+                "Executables Settings",
+                sp => sp.GetRequiredService<IViewManager>().ShowView<ExecutablesView>()
+            )
+            .RegisterButton(
+                "Launch configurations",
+                "Launch configurations settings",
+                sp => sp.GetRequiredService<IViewManager>().ShowView<LaunchConfigurationsView>()
+            );
+        menuServiceProducer
+            .CreateIfNotExistCategory("Diagnostics")
+            .RegisterButton(
+                "Telemetry",
+                "Open telemetry view",
+                sp => sp.GetRequiredService<IViewManager>().ShowView<TelemetryView>()
+            )
+            .RegisterButton(
+                "Logs",
+                "Open logs view",
+                sp => sp.GetRequiredService<IViewManager>().ShowView<LogsView>()
+            );
     }
 
     public override void RegisterThemes(IThemeProducer themeProducer)
     {
         themeProducer.ThrowIfNull();
-        var themes = CoreThemes.Themes
-            .Concat(HeroThemes.Themes)
-            .Concat(LiveThemes.Themes);
+        var themes = CoreThemes.Themes.Concat(HeroThemes.Themes).Concat(LiveThemes.Themes);
         foreach (var theme in themes)
         {
             themeProducer.RegisterTheme(theme);
@@ -379,40 +487,40 @@ public class ProjectConfiguration : PluginConfigurationBase
         return services
             .ThrowIfNull()
             .RegisterHttpClient<DownloadService>()
-                .WithMessageHandler(SetupLoggingAndMetrics<DownloadService>)
-                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
-                .Build()
+            .WithMessageHandler(SetupLoggingAndMetrics<DownloadService>)
+            .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
+            .Build()
             .RegisterHttpClient<TradeChatService<KamadanTradeChatOptions>>()
-                .WithMessageHandler(SetupLoggingAndMetrics<TradeChatService<KamadanTradeChatOptions>>)
-                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
-                .Build()
+            .WithMessageHandler(SetupLoggingAndMetrics<TradeChatService<KamadanTradeChatOptions>>)
+            .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
+            .Build()
             .RegisterHttpClient<TradeChatService<AscalonTradeChatOptions>>()
-                .WithMessageHandler(SetupLoggingAndMetrics<TradeChatService<AscalonTradeChatOptions>>)
-                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
-                .Build()
+            .WithMessageHandler(SetupLoggingAndMetrics<TradeChatService<AscalonTradeChatOptions>>)
+            .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
+            .Build()
             .RegisterHttpClient<TraderQuoteService>()
-                .WithMessageHandler(SetupLoggingAndMetrics<TraderQuoteService>)
-                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
-                .Build()
+            .WithMessageHandler(SetupLoggingAndMetrics<TraderQuoteService>)
+            .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
+            .Build()
             .RegisterHttpClient<InternetCheckingService>()
-                .WithMessageHandler(SetupLoggingAndMetrics<InternetCheckingService>)
-                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
-                .Build()
+            .WithMessageHandler(SetupLoggingAndMetrics<InternetCheckingService>)
+            .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
+            .Build()
             .RegisterHttpClient<ReShadeService>()
-                .WithMessageHandler(SetupLoggingAndMetrics<ReShadeService>)
-                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
-                .Build()
+            .WithMessageHandler(SetupLoggingAndMetrics<ReShadeService>)
+            .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
+            .Build()
             .RegisterHttpClient<GithubClient>()
-                .WithMessageHandler(SetupLoggingAndMetrics<GithubClient>)
-                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
-                .Build()
+            .WithMessageHandler(SetupLoggingAndMetrics<GithubClient>)
+            .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
+            .Build()
             .RegisterHttpClient<ScopedApiContext>()
-                .WithMessageHandler(SetupLoggingAndMetrics<ScopedApiContext>)
-                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
-                .Build()
+            .WithMessageHandler(SetupLoggingAndMetrics<ScopedApiContext>)
+            .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
+            .Build()
             .RegisterHttpClient<WikiService>()
-                .WithMessageHandler(SetupLoggingAndMetrics<WikiService>)
-                .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
-                .Build();
+            .WithMessageHandler(SetupLoggingAndMetrics<WikiService>)
+            .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
+            .Build();
     }
 }
