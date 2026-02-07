@@ -171,7 +171,7 @@ jobs:
 
     - name: Set version variable
       run: |
-        version=$(ls Daybreak/*.version | head -1 | xargs basename | sed 's/\.version$//')
+        version=$(grep '<Version>' Directory.Build.props | sed 's/.*<Version>\(.*\)<\/Version>.*/\1/')
         echo "Version=$version" >> $GITHUB_ENV
 
     # ── Windows package ──
