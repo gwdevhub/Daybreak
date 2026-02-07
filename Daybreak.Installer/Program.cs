@@ -4,6 +4,9 @@ using System.Net;
 using System.Text;
 
 const string LatestUrl = "https://github.com/gwdevhub/Daybreak/releases/latest";
+var daybreakExecutable = OperatingSystem.IsWindows() ? "Daybreak.exe" : "Daybreak.Linux";
+var daybreakProcessName = OperatingSystem.IsWindows() ? "Daybreak" : "Daybreak.Linux";
+var releaseAssetSuffix = OperatingSystem.IsWindows() ? "" : "-linux";
 
 static void RenderProgressBar(int currentStep, int totalSteps, int barSize)
 {
@@ -67,7 +70,7 @@ static void CleanWorkingDirectory(string workingDirectory)
     }
 }
 
-static async ValueTask PerformUpdate(string workingDirectory)
+async ValueTask PerformUpdate(string workingDirectory)
 {
     if (!Directory.Exists(workingDirectory))
     {
@@ -80,7 +83,7 @@ static async ValueTask PerformUpdate(string workingDirectory)
 
     var tempFile = Path.GetFullPath("tempfile.zip", workingDirectory);
     var updatePkg = Path.GetFullPath("update.pkg", workingDirectory);
-    var executableName = Path.GetFullPath("Daybreak.exe", workingDirectory);
+    var executableName = Path.GetFullPath(daybreakExecutable, workingDirectory);
 
     if (File.Exists(updatePkg))
     {
@@ -178,7 +181,7 @@ static async ValueTask PerformUpdate(string workingDirectory)
     }
 }
 
-static async ValueTask PerformFreshInstall(string workingDirectory)
+async ValueTask PerformFreshInstall(string workingDirectory)
 {
     using var handler = new HttpClientHandler { AllowAutoRedirect = false };
     var client = new HttpClient(handler);
@@ -216,7 +219,7 @@ static async ValueTask PerformFreshInstall(string workingDirectory)
 
     var version = finalUri.Segments.Last().TrimEnd('/');
     var downloadUri = new Uri(
-        $"https://github.com/gwdevhub/Daybreak/releases/download/{version}/daybreak{version}.zip"
+        $"https://github.com/gwdevhub/Daybreak/releases/download/{version}/daybreak{version}{releaseAssetSuffix}.zip"
     );
     var tempFile = Path.GetFullPath("tempfile.zip", workingDirectory);
 
@@ -281,7 +284,7 @@ static async ValueTask PerformFreshInstall(string workingDirectory)
     File.Delete(tempFile);
 
     Console.WriteLine("Installation complete. Launching application...");
-    var executableName = Path.GetFullPath("Daybreak.exe", workingDirectory);
+    var executableName = Path.GetFullPath(daybreakExecutable, workingDirectory);
     var process = new Process { StartInfo = new ProcessStartInfo { FileName = executableName } };
 
     if (process.Start() is false)
@@ -293,16 +296,19 @@ static async ValueTask PerformFreshInstall(string workingDirectory)
 
 Console.Title = "Daybreak Installer";
 Console.WriteLine("Starting installation...");
-while (Process.GetProcesses().FirstOrDefault(p => p.ProcessName == "Daybreak")?.HasExited is false)
+while (Process.GetProcesses().FirstOrDefault(p => p.ProcessName == daybreakProcessName)?.HasExited is false)
 {
     Console.WriteLine($"Detected Daybreak process is still running. Waiting 5s and retrying");
     await Task.Delay(5000);
 }
 
-while (Process.GetProcessesByName("gw").FirstOrDefault()?.HasExited is false)
+if (OperatingSystem.IsWindows())
 {
-    Console.WriteLine($"Detected Guild Wars process is still running. Waiting 5s and retrying");
-    await Task.Delay(5000);
+    while (Process.GetProcessesByName("gw").FirstOrDefault()?.HasExited is false)
+    {
+        Console.WriteLine($"Detected Guild Wars process is still running. Waiting 5s and retrying");
+        await Task.Delay(5000);
+    }
 }
 
 var mode = args.Length > 1 ? args[0] : "install";
