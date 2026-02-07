@@ -41,7 +41,9 @@
   <Project Path="Daybreak.Installer/Daybreak.Installer.csproj">
     <Platform Project="x64" />
   </Project>
-  <Project Path="Daybreak.Shared/Daybreak.Shared.csproj" />
+  <Project Path="Daybreak.Shared/Daybreak.Shared.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="Daybreak.Tests/Daybreak.Tests.csproj">
     <Platform Project="x64" />
   </Project>
