@@ -37,11 +37,10 @@ public partial class Launcher
 
         var cts = new CancellationTokenSource();
         app.MainWindow.SetTitle("Daybreak")
-            .SetContextMenuEnabled(IsDebug || args.Any(s => string.Equals(s, "--enable-context-menu")))
-            .SetDevToolsEnabled(IsDebug || args.Any(s => string.Equals(s, "--enable-dev-tools")))
+            .SetContextMenuEnabled(!IsDebug || args.Any(s => string.Equals(s, "--enable-context-menu")))
+            .SetDevToolsEnabled(!IsDebug || args.Any(s => string.Equals(s, "--enable-dev-tools")))
             .SetSmoothScrollingEnabled(true)
-            .SetChromeless(!args.Any(s => string.Equals(s, "--disable-chromeless")))
-            .SetBrowserControlInitParameters(string.Join(" ", args));
+            .SetChromeless(!args.Any(s => string.Equals(s, "--disable-chromeless")));
         app.MainWindow.SetLogVerbosity(0);
         
         app.MainWindow.RegisterWindowCreatedHandler((_, __) => StartHostedServices(app, cts));

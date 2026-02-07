@@ -92,11 +92,6 @@
     <Copy SourceFiles="@(WikiFiles)" DestinationFiles="@(WikiFiles->'wwwroot\wiki\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
   </Target>
 
-  <!-- Embed wwwroot files as embedded resources -->
-  <ItemGroup>
-    <EmbeddedResource Include="wwwroot\**\*.*" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
-  </ItemGroup>
-
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
     <!-- Cross-platform: use Touch task instead of Windows-only echo.> -->
     <Touch Files="$(Version).version" AlwaysCreate="true" />
