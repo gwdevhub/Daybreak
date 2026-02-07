@@ -14,6 +14,7 @@ using Daybreak.Shared.Services.Shortcuts;
 using Daybreak.Shared.Services.DirectSong;
 using Daybreak.Shared.Services.Registry;
 using Daybreak.Shared.Services.SevenZip;
+using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.UMod;
 using Daybreak.Shared.Services.ReShade;
 using Daybreak.Shared.Services.ApplicationLauncher;
@@ -35,6 +36,7 @@ using Microsoft.Identity.Client.Desktop;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 using Daybreak.Windows.Services.DirectSong;
 using Daybreak.Windows.Services.Registry;
+using Daybreak.Windows.Services.Themes;
 using Daybreak.Services.ReShade;
 using Daybreak.Services.Startup.Actions;
 
@@ -100,6 +102,7 @@ public sealed class WindowsPlatformConfiguration : PluginConfigurationBase
         services.AddSingleton<IModPathResolver, ModPathResolver>();
         services.AddSingleton<IDirectSongRegistrar, DirectSongRegistrar>();
         services.AddScoped<IRegistryService, RegistryService>();
+        services.AddSingleton<ISystemThemeDetector, SystemThemeDetector>();
         services.AddSingleton<ISevenZipExtractor, SevenZipArchiveExtractor>();
         services.AddHostedSingleton<IMDomainRegistrar, MDomainRegistrar>();
     }

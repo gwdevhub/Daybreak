@@ -11,6 +11,7 @@ using Daybreak.Linux.Services.Startup.Notifications;
 using Daybreak.Linux.Services.UMod;
 using Daybreak.Linux.Services.DirectSong;
 using Daybreak.Linux.Services.Registry;
+using Daybreak.Linux.Services.Themes;
 using Daybreak.Linux.Services.SevenZip;
 using Daybreak.Linux.Services.Wine;
 using Daybreak.Shared.Models.Plugins;
@@ -25,6 +26,7 @@ using Daybreak.Shared.Services.Keyboard;
 using Daybreak.Shared.Services.MDns;
 using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Services.Screens;
+using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.SevenZip;
 using Daybreak.Shared.Services.UMod;
 using Microsoft.Extensions.DependencyInjection;
@@ -50,6 +52,7 @@ public sealed class LinuxPlatformConfiguration : PluginConfigurationBase
         services.AddSingleton<IModPathResolver, ModPathResolver>();
         services.AddSingleton<IDirectSongRegistrar, DirectSongRegistrar>();
         services.AddScoped<IRegistryService, RegistryService>();
+        services.AddSingleton<ISystemThemeDetector, SystemThemeDetector>();
         services.AddSingleton<ISevenZipExtractor, SevenZipArchiveExtractor>();
         services.AddHostedSingleton<IMDomainRegistrar, PortScanningDomainRegistrar>();
     }

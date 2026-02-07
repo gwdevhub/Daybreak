@@ -12,6 +12,7 @@ namespace Daybreak.Services.Themes;
 
 public class BlazorThemeInteropService(
     IOptionsMonitor<ThemeOptions> themeOptions,
+    ISystemThemeDetector systemThemeDetector,
     ILogger<BlazorThemeInteropService> logger) : IThemeManager, IHostedService
 {
     private const double XXSmallFontSizeValue = 0.56;
@@ -21,12 +22,9 @@ public class BlazorThemeInteropService(
     private const double LargeFontSizeValue = 1.125;
     private const double XLargeFontSizeValue = 1.5;
     private const double XXLargeFontSizeValue = 2.0;
-    private const string LightThemeValue = "Light";
-    private const string RegistryKey = @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes";
-    private const string PersonalizeKey = @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize";
-    private const string AppsUseLightThemeValue = "AppsUseLightTheme";
 
     private readonly IOptionsMonitor<ThemeOptions> themeOptions = themeOptions;
+    private readonly ISystemThemeDetector systemThemeDetector = systemThemeDetector;
     private readonly ILogger<BlazorThemeInteropService> logger = logger;
 
     public event EventHandler<Theme>? ThemeChanged;
@@ -71,7 +69,7 @@ public class BlazorThemeInteropService(
         var theme = themeOptions.ApplicationTheme ?? CoreThemes.Daybreak;
         var accentColor = theme.AccentColor;
         var lightMode = theme.Mode is Theme.LightDarkMode.SystemSynchronized 
-            ? IsWindowsLight()
+            ? this.systemThemeDetector.IsLightTheme()
             : theme.Mode is Theme.LightDarkMode.Light;
 
         var backgroundColor = lightMode ? BackgroundColor.Gray40 : BackgroundColor.Gray210;
@@ -96,27 +94,4 @@ public class BlazorThemeInteropService(
         this.ThemeChanged?.Invoke(this, theme);
     }
 
-    /*
-     * By default, windows 10 comes with dark mode and windows 11 with light mode.
-     * When migrating from windows 7 to windows 10, the theme will be called roamed.
-     * As such, it is easier to check for the light theme and treat everything else as dark theme.
-     */
-    private static bool IsWindowsLight()
-    {
-        var theme = Microsoft.Win32.Registry.GetValue(RegistryKey, "CurrentTheme", string.Empty)?.As<string>();
-        // Windows 11 light theme is called aero.theme
-        if (theme?.EndsWith("aero.theme") is true)
-        {
-            return true;
-        }
-
-
-        var themeMode = Microsoft.Win32.Registry.GetValue(PersonalizeKey, AppsUseLightThemeValue, null);
-        if (themeMode is int themeModeValue && themeModeValue is 1)
-        {
-            return true;
-        }
-
-        return LightThemeValue.Equals(theme?.Split('\\').Last().Split('.').First().ToString(), System.StringComparison.OrdinalIgnoreCase);
-    }
 }
