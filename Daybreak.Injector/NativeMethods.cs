@@ -67,7 +67,7 @@ internal static partial class NativeMethods
     public static partial nint LocalFree(nint hMem);
 
     // CreateProcess needs manual DllImport due to complex string + struct marshalling with AOT
-    [DllImport("kernel32.dll", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
+    [DllImport("kernel32.dll", EntryPoint = "CreateProcessW", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool CreateProcess(
         string? lpApplicationName,
@@ -85,7 +85,7 @@ internal static partial class NativeMethods
     //  advapi32.dll
     // ──────────────────────────────────────────────
 
-    [DllImport("advapi32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
+    [DllImport("advapi32.dll", EntryPoint = "CreateProcessAsUserW", SetLastError = true, CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool CreateProcessAsUser(
         nint hToken,
@@ -112,7 +112,7 @@ internal static partial class NativeMethods
     [return: MarshalAs(UnmanagedType.Bool)]
     public static partial bool SaferCloseLevel(nint levelHandle);
 
-    [LibraryImport("advapi32.dll", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
+    [LibraryImport("advapi32.dll", EntryPoint = "ConvertStringSidToSidW", StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static partial bool ConvertStringSidToSid(string stringSid, out nint ptrSid);
 
