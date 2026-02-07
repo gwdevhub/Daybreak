@@ -1,7 +1,7 @@
 ﻿using Daybreak.Services.Notifications.Handlers;
 using Daybreak.Shared.Exceptions;
+using Daybreak.Shared.Services.ExceptionHandling;
 using Daybreak.Shared.Services.Notifications;
-using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
 using System.Diagnostics;
@@ -14,6 +14,7 @@ using System.Runtime.InteropServices;
 namespace Daybreak.Services.ExceptionHandling;
 
 internal sealed class ExceptionHandler(
+    ICrashDumpService crashDumpService,
     INotificationService notificationService,
     ILogger<ExceptionHandler> logger) : IExceptionHandler
 {
@@ -32,6 +33,7 @@ internal sealed class ExceptionHandler(
         IgnoreUnexpectedGuildWarsCrashes
         ];
 
+    private readonly ICrashDumpService crashDumpService = crashDumpService.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly ILogger<ExceptionHandler> logger = logger.ThrowIfNull();
 
@@ -109,23 +111,15 @@ internal sealed class ExceptionHandler(
         return HandleResult.Unhandled;
     }
         
-    private static void WriteCrashFiles(Exception e, DateTime crashTime)
+    private void WriteCrashFiles(Exception e, DateTime crashTime)
     {
         WriteCrashLog(e, crashTime);
-        WriteCrashDump(crashTime);
+        this.crashDumpService.WriteCrashDump(GetCrashFileName("dmp", crashTime));
     }
 
     private static void WriteCrashLog(Exception? e, DateTime crashTime)
     {
         File.WriteAllText(GetCrashFileName("log", crashTime), e?.ToString() ?? "NULL EXCEPTION");
-    }
-
-    private static void WriteCrashDump(DateTime crashTime)
-    {
-        var dumpFilePath = GetCrashFileName("dmp", crashTime);
-        using var fs = new FileStream(dumpFilePath, FileMode.Create, FileAccess.Write);
-        var process = Process.GetCurrentProcess();
-        NativeMethods.MiniDumpWriteDump(process.Handle, process.Id, fs.SafeFileHandle, NativeMethods.MinidumpType.MiniDumpWithFullMemory, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
     }
 
     private static string GetCrashFileName(string extension, DateTime crashTime)

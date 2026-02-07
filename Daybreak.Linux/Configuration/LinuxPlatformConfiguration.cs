@@ -13,6 +13,8 @@ using Daybreak.Linux.Services.DirectSong;
 using Daybreak.Linux.Services.Registry;
 using Daybreak.Linux.Services.Themes;
 using Daybreak.Linux.Services.SevenZip;
+using Daybreak.Linux.Services.Window;
+using Daybreak.Linux.Services.ExceptionHandling;
 using Daybreak.Linux.Services.Wine;
 using Daybreak.Shared.Models.Plugins;
 using Daybreak.Shared.Services.ApplicationLauncher;
@@ -29,6 +31,8 @@ using Daybreak.Shared.Services.Screens;
 using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.SevenZip;
 using Daybreak.Shared.Services.UMod;
+using Daybreak.Shared.Services.ExceptionHandling;
+using Daybreak.Shared.Services.Window;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Daybreak.Linux.Configuration;
@@ -55,6 +59,8 @@ public sealed class LinuxPlatformConfiguration : PluginConfigurationBase
         services.AddSingleton<ISystemThemeDetector, SystemThemeDetector>();
         services.AddSingleton<ISevenZipExtractor, SevenZipArchiveExtractor>();
         services.AddHostedSingleton<IMDomainRegistrar, PortScanningDomainRegistrar>();
+        services.AddSingleton<IWindowManipulationService, WindowManipulationService>();
+        services.AddSingleton<ICrashDumpService, CrashDumpService>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)

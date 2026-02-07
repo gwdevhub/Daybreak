@@ -10,6 +10,7 @@ using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.Updater;
+using Daybreak.Shared.Services.Window;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -37,6 +38,7 @@ public sealed class AppViewModel
     private readonly PhotinoBlazorApp photinoApp;
     private readonly JSConsoleInterop jsConsoleInterop;
     private readonly INotificationService notificationService;
+    private readonly IWindowManipulationService windowManipulationService;
     private readonly ILogger<App> logger;
 
     private SemaphoreSlim themeChangeSemaphore = new(1, 1);
@@ -86,6 +88,7 @@ public sealed class AppViewModel
         JSConsoleInterop jsConsoleInterop,
         INotificationProducer notificationProducer,
         INotificationService notificationService,
+        IWindowManipulationService windowManipulationService,
         ILogger<App> logger)
     {
         this.keyboardHookService = keyboardHookService.ThrowIfNull();
@@ -100,6 +103,7 @@ public sealed class AppViewModel
         this.jsConsoleInterop = jsConsoleInterop.ThrowIfNull();
         this.NotificationProducer = notificationProducer.ThrowIfNull();
         this.notificationService = notificationService.ThrowIfNull();
+        this.windowManipulationService = windowManipulationService.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
 
         
@@ -147,7 +151,6 @@ public sealed class AppViewModel
          * This operation has to be queued on the UI thread and has to be done via PostMessage to avoid re-entrancy.
          * Using SendMessage or doing it directly can cause crashes when WebView2 is handling a user callback while another sendmessage appears.
          */
-        // TODO: This doesn't work on Linux. Needs to be removed/reworked
         this.photinoApp.WindowManager.Dispatcher.InvokeAsync(() =>
         {
             var hwnd = this.photinoApp.MainWindow.WindowHandle;
@@ -156,18 +159,11 @@ public sealed class AppViewModel
                 return;
             }
 
-            NativeMethods.ReleaseCapture();
-            NativeMethods.PostMessage(
-                hwnd,
-                NativeMethods.WM_SYSCOMMAND,
-                (IntPtr)(NativeMethods.SC_MOVE | NativeMethods.HTCAPTION),
-                IntPtr.Zero
-            );
+            this.windowManipulationService.DragWindow(hwnd);
         });
     }
 
-    //TODO: This does not work on linux and needs to be reworked
-    public void StartResize(NativeMethods.ResizeDirection resizeDirection)
+    public void StartResize(ResizeDirection resizeDirection)
     {
         /*
          * This operation has to be queued on the UI thread and has to be done via PostMessage to avoid re-entrancy.
@@ -187,13 +183,7 @@ public sealed class AppViewModel
                 return;
             }
 
-            NativeMethods.ReleaseCapture();
-            NativeMethods.PostMessage(
-                hwnd,
-                NativeMethods.WM_NCLBUTTONDOWN,
-                (IntPtr)(int)resizeDirection,
-                IntPtr.Zero
-            );
+            this.windowManipulationService.ResizeWindow(hwnd, resizeDirection);
         });
     }
 

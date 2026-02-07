@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
-using static Daybreak.Shared.Utils.NativeMethods;
+using static Daybreak.Windows.Utils.NativeMethods;
 
 namespace Daybreak.Windows.Services.ApplicationLauncher;
 

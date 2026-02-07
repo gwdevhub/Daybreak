@@ -2,7 +2,7 @@ using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Screens;
-using Daybreak.Shared.Utils;
+using Daybreak.Windows.Utils;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

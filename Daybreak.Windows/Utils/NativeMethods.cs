@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 
-namespace Daybreak.Shared.Utils;
+namespace Daybreak.Windows.Utils;
 
 public static class NativeMethods
 {

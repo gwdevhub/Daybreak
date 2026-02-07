@@ -51,6 +51,25 @@ public partial class Launcher
 
         builder.Services.AddSingleton<IReadOnlyDictionary<string, MenuCategory>>(menuEntryProducer.categories.AsReadOnly());
         var mainApp = CreateMainApp(builder, args);
+
+        // Allow platform-specific and plugin configurations to customize the window
+        foreach (var (pluginName, configuration, plugin) in configurations)
+        {
+            if (configuration is null)
+            {
+                continue;
+            }
+
+            try
+            {
+                configuration.ConfigureWindow(mainApp);
+            }
+            catch (Exception ex)
+            {
+                scopedLogger.LogError(ex, "An error occurred while configuring window for {PluginName}", pluginName);
+            }
+        }
+
         foreach (var (pluginName, configuration, plugin) in configurations)
         {
             if (configuration is null)

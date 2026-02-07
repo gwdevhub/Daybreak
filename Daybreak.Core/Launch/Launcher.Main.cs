@@ -44,16 +44,6 @@ public partial class Launcher
             .SetBrowserControlInitParameters(string.Join(" ", args));
         app.MainWindow.SetLogVerbosity(0);
         
-        // Windows-specific window customizations
-#if WINDOWS
-        if (OperatingSystem.IsWindows())
-        {
-            app.MainWindow.RegisterWindowCreatedHandler((_, __) => SetupWindowIcon(app));
-            app.MainWindow.RegisterWindowCreatedHandler((_, __) => SetupRoundedWindows(app));
-            app.MainWindow.RegisterWindowCreatedHandler((_, __) => SetupBorderless(app));
-        }
-#endif
-        
         app.MainWindow.RegisterWindowCreatedHandler((_, __) => StartHostedServices(app, cts));
         app.MainWindow.RegisterWindowClosingHandler((_, __) => StopHostedServices(app, cts));
 
