@@ -74,11 +74,11 @@ jobs:
 
     - name: Setup project secrets
       run: |
-        dotnet user-secrets --project Daybreak\Daybreak.csproj set AadApplicationId "${{ secrets.AadApplicationId }}"
-        dotnet user-secrets --project Daybreak\Daybreak.csproj set AadTenantId "${{ secrets.AadTenantId }}"
-        dotnet user-secrets --project Daybreak\Daybreak.csproj set ApmServiceAccount "${{ secrets.ApmServiceAccount }}"
-        dotnet user-secrets --project Daybreak\Daybreak.csproj set ApmServiceKey "${{ secrets.ApmServiceKey }}"
-        dotnet user-secrets --project Daybreak\Daybreak.csproj set ApmUri "${{ secrets.ApmUri }}"
+        dotnet user-secrets --project Daybreak.Core\Daybreak.Core.csproj set AadApplicationId "${{ secrets.AadApplicationId }}"
+        dotnet user-secrets --project Daybreak.Core\Daybreak.Core.csproj set AadTenantId "${{ secrets.AadTenantId }}"
+        dotnet user-secrets --project Daybreak.Core\Daybreak.Core.csproj set ApmServiceAccount "${{ secrets.ApmServiceAccount }}"
+        dotnet user-secrets --project Daybreak.Core\Daybreak.Core.csproj set ApmServiceKey "${{ secrets.ApmServiceKey }}"
+        dotnet user-secrets --project Daybreak.Core\Daybreak.Core.csproj set ApmUri "${{ secrets.ApmUri }}"
 
     - name: Download x86 artifacts
       uses: actions/download-artifact@v4
@@ -116,6 +116,13 @@ jobs:
       with:
         dotnet-version: '10.x'
 
+    - name: Setup project secrets
+      run: |
+        dotnet user-secrets --project Daybreak.Core/Daybreak.Core.csproj set AadApplicationId "${{ secrets.AadApplicationId }}"
+        dotnet user-secrets --project Daybreak.Core/Daybreak.Core.csproj set AadTenantId "${{ secrets.AadTenantId }}"
+        dotnet user-secrets --project Daybreak.Core/Daybreak.Core.csproj set ApmServiceAccount "${{ secrets.ApmServiceAccount }}"
+        dotnet user-secrets --project Daybreak.Core/Daybreak.Core.csproj set ApmServiceKey "${{ secrets.ApmServiceKey }}"
+        dotnet user-secrets --project Daybreak.Core/Daybreak.Core.csproj set ApmUri "${{ secrets.ApmUri }}"
     - name: Download x86 artifacts
       uses: actions/download-artifact@v4
       with:
