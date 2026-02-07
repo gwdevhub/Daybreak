@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT license.
 
-# This continuous integration pipeline is triggered anytime a user pushes code to the repo.
-# This pipeline builds the Wpf project, runs unit tests, then saves the MSIX build artifact.
-name:  Daybreak CI Pipeline
+# This continuous integration pipeline is triggered on pull requests to master.
+# It validates that both the Windows and Linux builds compile successfully.
+name: Daybreak CI Pipeline
 
 on:
   pull_request:
@@ -12,19 +12,11 @@ on:
 
 jobs:
 
-  build:
-
-    strategy:
-      matrix:
-        targetplatform: [x64]
-
+  build-windows:
     runs-on: windows-latest
 
     env:
-      Solution_Path: Daybreak.slnx
-      Test_Project_Path: Daybreak.Tests\Daybreak.Tests.csproj
-      Wpf_Project_Path: Daybreak\Daybreak.csproj
-      Actions_Allow_Unsecure_Commands: true
+      Configuration: Debug
 
     steps:
     - name: Checkout
@@ -33,16 +25,49 @@ jobs:
         fetch-depth: 0
         submodules: recursive
 
-    - name: Install .NET Core
+    - name: Install .NET
       uses: actions/setup-dotnet@v5
       with:
         dotnet-version: '10.x'
-        architecture: x64
 
-    - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v2.0.0
+    - name: Build Windows project
+      run: dotnet build Daybreak.Windows/Daybreak.Windows.csproj -c $env:Configuration
 
-    - name:  Restore the Wpf application to populate the obj folder
-      run: msbuild $env:Solution_Path /t:Restore /p:Configuration=$env:Configuration --property:SolutionDir=$env:GITHUB_WORKSPACE
-      env:
-        Configuration: Debug
+    - name: Build Injector
+      run: dotnet build Daybreak.Injector/Daybreak.Injector.csproj -c $env:Configuration
+
+    - name: Build API
+      run: dotnet build Daybreak.API/Daybreak.API.csproj -c $env:Configuration
+
+    - name: Build Installer
+      run: dotnet build Daybreak.Installer/Daybreak.Installer.csproj -c $env:Configuration
+
+    - name: Run tests
+      run: dotnet test Daybreak.Tests/Daybreak.Tests.csproj -c $env:Configuration
+
+  build-linux:
+    runs-on: ubuntu-latest
+
+    env:
+      Configuration: Debug
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+        submodules: recursive
+
+    - name: Install .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: '10.x'
+
+    - name: Build Linux project
+      run: dotnet build Daybreak.Linux/Daybreak.Linux.csproj -c $Configuration
+
+    - name: Build Installer (linux-x64)
+      run: dotnet build Daybreak.Installer/Daybreak.Installer.csproj -c $Configuration
+
+    - name: Run tests
+      run: dotnet test Daybreak.Tests/Daybreak.Tests.csproj -c $Configuration
