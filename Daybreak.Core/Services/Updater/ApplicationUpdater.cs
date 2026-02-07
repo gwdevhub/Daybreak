@@ -30,11 +30,15 @@ internal sealed class ApplicationUpdater(
 {
     private const string GithubOwner = "gwdevhub";
     private const string GithubRepo = "Daybreak";
-    private const string InstallerFileNameSubPath = "Installer/Daybreak.Installer.exe";
     private const string UpdatedKey = "LauncherUpdating";
     private const string TempFileSubPath = "tempfile.zip";
     private const string VersionTag = "{VERSION}";
-    private const string DownloadUrl = $"https://github.com/gwdevhub/Daybreak/releases/download/v{VersionTag}/Daybreakv{VersionTag}.zip";
+    private static readonly string InstallerFileNameSubPath = OperatingSystem.IsWindows()
+        ? "Installer/Daybreak.Installer.exe"
+        : "Installer/Daybreak.Installer";
+    private static readonly string DownloadUrl = OperatingSystem.IsWindows()
+        ? $"https://github.com/gwdevhub/Daybreak/releases/download/v{VersionTag}/Daybreakv{VersionTag}.zip"
+        : $"https://github.com/gwdevhub/Daybreak/releases/download/v{VersionTag}/Daybreakv{VersionTag}-linux.zip";
     private readonly static string InstallerFileName = PathUtils.GetAbsolutePathFromRoot(InstallerFileNameSubPath);
     private readonly static string TempFile = PathUtils.GetAbsolutePathFromRoot(TempFileSubPath);
 

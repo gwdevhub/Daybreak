@@ -18,10 +18,16 @@ public sealed class VerifyNativeComponentsAction(
     private const string ApiFolder = "Api";
     private const string InstallerFolder = "Installer";
 
-    private static readonly string[] InjectorFiles = ["Daybreak.Injector.exe", "FASM.DLL"];
+    private static readonly string[] InjectorFiles = OperatingSystem.IsWindows()
+        ? ["Daybreak.Injector.exe", "FASM.DLL"]
+        : ["Daybreak.Injector.exe", "FASM.DLL"];
     private static readonly string[] ApiFiles = ["Daybreak.API.dll"];
-    private static readonly string[] InstallerFiles = ["Daybreak.Installer.exe"];
-    private static readonly string[] InstallerFallbackFiles = ["Daybreak.Installer.dll"];
+    private static readonly string[] InstallerFiles = OperatingSystem.IsWindows()
+        ? ["Daybreak.Installer.exe"]
+        : ["Daybreak.Installer"];
+    private static readonly string[] InstallerFallbackFiles = OperatingSystem.IsWindows()
+        ? ["Daybreak.Installer.dll"]
+        : ["Daybreak.Installer"];
 
     private readonly INotificationService notificationService = notificationService;
     private readonly ILogger<VerifyNativeComponentsAction> logger = logger;

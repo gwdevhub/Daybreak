@@ -33,7 +33,6 @@ using Daybreak.Services.Onboarding;
 using Daybreak.Services.Options;
 using Daybreak.Services.Plugins;
 using Daybreak.Services.Privilege;
-using Daybreak.Services.Registry;
 using Daybreak.Services.ReShade;
 using Daybreak.Services.Screenshots;
 using Daybreak.Services.Startup;
@@ -75,7 +74,6 @@ using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Onboarding;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Plugins;
-using Daybreak.Shared.Services.Registry;
 using Daybreak.Shared.Services.ReShade;
 using Daybreak.Shared.Services.Screenshots;
 
@@ -189,7 +187,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddScoped<ITradeHistoryDatabase, TradeHistoryDatabase>();
         services.AddScoped<IGuildWarsCopyService, GuildWarsCopyService>();
         services.AddScoped<IItemHashService, ItemHashService>();
-        services.AddScoped<IRegistryService, RegistryService>();
         services.AddScoped<IToolboxClient, ToolboxClient>();
         services.AddSingleton<IGithubClient, GithubClient>();
         services.AddScoped<IProcessInjector, ProcessInjector>();

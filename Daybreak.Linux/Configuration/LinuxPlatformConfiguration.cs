@@ -10,12 +10,14 @@ using Daybreak.Linux.Services.Startup.Actions;
 using Daybreak.Linux.Services.Startup.Notifications;
 using Daybreak.Linux.Services.UMod;
 using Daybreak.Linux.Services.DirectSong;
+using Daybreak.Linux.Services.Registry;
 using Daybreak.Linux.Services.SevenZip;
 using Daybreak.Linux.Services.Wine;
 using Daybreak.Shared.Models.Plugins;
 using Daybreak.Shared.Services.ApplicationLauncher;
 using Daybreak.Shared.Services.Credentials;
 using Daybreak.Shared.Services.DirectSong;
+using Daybreak.Shared.Services.Registry;
 using Daybreak.Shared.Services.FileProviders;
 using Daybreak.Shared.Services.Initialization;
 using Daybreak.Shared.Services.Injection;
@@ -47,6 +49,7 @@ public sealed class LinuxPlatformConfiguration : PluginConfigurationBase
         services.AddScoped<IGuildWarsProcessFinder, GuildWarsProcessFinder>();
         services.AddSingleton<IModPathResolver, ModPathResolver>();
         services.AddSingleton<IDirectSongRegistrar, DirectSongRegistrar>();
+        services.AddScoped<IRegistryService, RegistryService>();
         services.AddSingleton<ISevenZipExtractor, SevenZipArchiveExtractor>();
         services.AddHostedSingleton<IMDomainRegistrar, PortScanningDomainRegistrar>();
     }

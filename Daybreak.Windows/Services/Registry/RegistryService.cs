@@ -1,10 +1,10 @@
-﻿using Daybreak.Shared.Services.Registry;
+using Daybreak.Shared.Services.Registry;
 using Microsoft.Win32;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Text.Json;
 
-namespace Daybreak.Services.Registry;
+namespace Daybreak.Windows.Services.Registry;
 
 internal sealed class RegistryService : IRegistryService
 {
