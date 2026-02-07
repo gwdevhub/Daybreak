@@ -153,13 +153,7 @@ public sealed class AppViewModel
          */
         this.photinoApp.WindowManager.Dispatcher.InvokeAsync(() =>
         {
-            var hwnd = this.photinoApp.MainWindow.WindowHandle;
-            if (hwnd == IntPtr.Zero)
-            {
-                return;
-            }
-
-            this.windowManipulationService.DragWindow(hwnd);
+            this.windowManipulationService.DragWindow();
         });
     }
 
@@ -177,13 +171,7 @@ public sealed class AppViewModel
 
         this.photinoApp.WindowManager.Dispatcher.InvokeAsync(() =>
         {
-            var hwnd = this.photinoApp.MainWindow.WindowHandle;
-            if (hwnd == IntPtr.Zero)
-            {
-                return;
-            }
-
-            this.windowManipulationService.ResizeWindow(hwnd, resizeDirection);
+            this.windowManipulationService.ResizeWindow(resizeDirection);
         });
     }
 

@@ -1,6 +1,8 @@
 using Daybreak.Shared.Services.Window;
 using Daybreak.Shared.Utils;
 using Daybreak.Windows.Utils;
+using Photino.Blazor;
+using System.Core.Extensions;
 using System.Runtime.Versioning;
 
 namespace Daybreak.Windows.Services.Window;
@@ -8,8 +10,21 @@ namespace Daybreak.Windows.Services.Window;
 [SupportedOSPlatform("windows")]
 internal sealed class WindowManipulationService : IWindowManipulationService
 {
-    public void DragWindow(nint windowHandle)
+    private readonly PhotinoBlazorApp photinoApp;
+
+    public WindowManipulationService(PhotinoBlazorApp photinoApp)
     {
+        this.photinoApp = photinoApp.ThrowIfNull();
+    }
+
+    public void DragWindow()
+    {
+        var windowHandle = this.photinoApp.MainWindow.WindowHandle;
+        if (windowHandle == IntPtr.Zero)
+        {
+            return;
+        }
+
         NativeMethods.ReleaseCapture();
         NativeMethods.PostMessage(
             windowHandle,
@@ -19,8 +34,14 @@ internal sealed class WindowManipulationService : IWindowManipulationService
         );
     }
 
-    public void ResizeWindow(nint windowHandle, ResizeDirection direction)
+    public void ResizeWindow(ResizeDirection direction)
     {
+        var windowHandle = this.photinoApp.MainWindow.WindowHandle;
+        if (windowHandle == IntPtr.Zero)
+        {
+            return;
+        }
+
         NativeMethods.ReleaseCapture();
         NativeMethods.PostMessage(
             windowHandle,

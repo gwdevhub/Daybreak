@@ -9,13 +9,12 @@ namespace Daybreak.Shared.Services.Window;
 public interface IWindowManipulationService
 {
     /// <summary>
-    /// Initiates a window drag-move operation on the given window handle.
+    /// Initiates a window drag-move operation.
     /// </summary>
-    void DragWindow(nint windowHandle);
+    void DragWindow();
 
     /// <summary>
-    /// Initiates a window resize operation on the given window handle
-    /// in the specified direction.
+    /// Initiates a window resize operation in the specified direction.
     /// </summary>
-    void ResizeWindow(nint windowHandle, ResizeDirection direction);
+    void ResizeWindow(ResizeDirection direction);
 }
