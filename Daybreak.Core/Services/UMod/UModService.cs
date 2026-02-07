@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Services.Toolbox.Models;
+using Daybreak.Utils;
 using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Models.Mods;
 using Daybreak.Shared.Models.UMod;
@@ -76,7 +77,7 @@ internal sealed class UModService(
     public bool IsInstalled => File.Exists(Path.GetFullPath(Path.Combine(UModDirectory, UModDll)));
 
     public Version Version => File.Exists(Path.Combine(Path.GetFullPath(UModDirectory), UModDll)) ?
-        Version.TryParse(FileVersionInfo.GetVersionInfo(Path.Combine(Path.GetFullPath(UModDirectory), UModDll)).FileVersion!, out var version) ?
+        Version.TryParse(PeVersionReader.GetFileVersion(Path.Combine(Path.GetFullPath(UModDirectory), UModDll)), out var version) ?
             version :
             Version.Parse("0") :
         Version.Parse("0");

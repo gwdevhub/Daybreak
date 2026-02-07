@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Services.Downloads;
+using Daybreak.Utils;
 using Daybreak.Services.ReShade.Utils;
 using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Models.Mods;
@@ -637,7 +638,7 @@ internal sealed class ReShadeService(
     private Version? GetCurrentVersion()
     {
         if (File.Exists(ReShadeDllPath) &&
-            Version.TryParse(FileVersionInfo.GetVersionInfo(ReShadeDllPath).ProductVersion, out var currentVersion))
+            Version.TryParse(PeVersionReader.GetProductVersion(ReShadeDllPath), out var currentVersion))
         {
             return currentVersion;
         }

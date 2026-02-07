@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Services.Toolbox.Models;
+using Daybreak.Utils;
 using Daybreak.Services.Toolbox.Notifications;
 using Daybreak.Services.Toolbox.Utilities;
 using Daybreak.Shared.Exceptions;
@@ -323,8 +324,7 @@ internal sealed class ToolboxService(
             return false;
         }
 
-        var fileInfo = FileVersionInfo.GetVersionInfo(UsualToolboxLocation);
-        var current = fileInfo.ProductVersion?.Replace('_', '-');
+        var current = PeVersionReader.GetProductVersion(UsualToolboxLocation)?.Replace('_', '-');
         if (latestVersion.ToString().EndsWith("-release") &&
             current?.EndsWith("-release") is not true)
         {
