@@ -78,7 +78,7 @@ using Daybreak.Shared.Services.Plugins;
 using Daybreak.Shared.Services.Registry;
 using Daybreak.Shared.Services.ReShade;
 using Daybreak.Shared.Services.Screenshots;
-using Daybreak.Shared.Services.SevenZip;
+
 using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.Toolbox;
 using Daybreak.Shared.Services.TradeChat;
@@ -157,7 +157,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<INotificationStorage, InMemoryNotificationStorage>();
         services.AddSingleton<IModsManager, ModsManager>();
         services.AddSingleton<IPluginsService, PluginsService>();
-        services.AddSingleton<ISevenZipExtractor, Daybreak.Services.SevenZip.SevenZipExtractor>();
         services.AddSingleton<IMDomainNameService, MDomainNameService>();
         services.AddSingleton<IAttachedApiAccessor, AttachedApiAccessor>();
         services.AddSingleton<PrivilegeContext>();
@@ -270,7 +269,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         startupActionProducer.RegisterAction<CredentialsOptionsMigrator>();
         startupActionProducer.RegisterAction<UpdateToolboxAction>();
         startupActionProducer.RegisterAction<UpdateGuildWarsExecutable>();
-        startupActionProducer.RegisterAction<UpdateReShadeAction>();
     }
 
     public override void RegisterPostUpdateActions(
@@ -328,7 +326,6 @@ public class ProjectConfiguration : PluginConfigurationBase
 
     public override void RegisterMods(IModsProducer modsManager)
     {
-        modsManager.RegisterMod<IReShadeService, ReShadeService>();
         modsManager.RegisterMod<IGuildWarsVersionChecker, GuildWarsVersionChecker>();
         modsManager.RegisterMod<IDaybreakApiService, DaybreakApiService>();
         modsManager.RegisterMod<IToolboxService, ToolboxService>();
@@ -506,10 +503,6 @@ public class ProjectConfiguration : PluginConfigurationBase
             .WithMessageHandler(SetupLoggingAndMetrics<InternetCheckingService>)
             .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
             .Build()
-            .RegisterHttpClient<ReShadeService>()
-            .WithMessageHandler(SetupLoggingAndMetrics<ReShadeService>)
-            .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
-            .Build()
             .RegisterHttpClient<GithubClient>()
             .WithMessageHandler(SetupLoggingAndMetrics<GithubClient>)
             .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
@@ -520,6 +513,10 @@ public class ProjectConfiguration : PluginConfigurationBase
             .Build()
             .RegisterHttpClient<WikiService>()
             .WithMessageHandler(SetupLoggingAndMetrics<WikiService>)
+            .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
+            .Build()
+            .RegisterHttpClient<ReShadeService>()
+            .WithMessageHandler(SetupLoggingAndMetrics<ReShadeService>)
             .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
             .Build();
     }

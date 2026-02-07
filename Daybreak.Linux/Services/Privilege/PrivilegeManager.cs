@@ -4,30 +4,28 @@ using Microsoft.Extensions.Logging;
 
 namespace Daybreak.Linux.Services.Privilege;
 
-// TODO: Implement Linux privilege management
-// On Linux, privilege escalation typically uses pkexec/sudo
-// For now, this is a no-op implementation that always reports non-admin
+/// <summary>
+/// Linux implementation of the privilege manager.
+/// Since Linux relies on Wine, we assume admin privileges are always available and do not implement elevation logic.
+/// </summary>
 internal sealed class PrivilegeManager(
     ILogger<PrivilegeManager> logger) : IPrivilegeManager
 {
     private readonly ILogger<PrivilegeManager> logger = logger;
 
-    // TODO: Check if running as root (uid 0) or with specific capabilities
-    public bool AdminPrivileges => false;
+    public bool AdminPrivileges => true;
 
     public Task<bool> RequestAdminPrivileges<TCancelView>(string messageToUser, (string, object)[]? cancelViewParams, CancellationToken cancellationToken)
         where TCancelView : ComponentBase
     {
-        // TODO: Implement privilege escalation via pkexec or polkit
-        this.logger.LogWarning("RequestAdminPrivileges called but not implemented on Linux");
-        return Task.FromResult(false);
+        this.logger.LogWarning("AdminPrivileges not implemented on Linux.");
+        return Task.FromResult(true);
     }
 
     public Task<bool> RequestNormalPrivileges<TCancelView>(string messageToUser, (string, object)[]? cancelViewParams, CancellationToken cancellationToken)
         where TCancelView : ComponentBase
     {
-        // TODO: Implement privilege de-escalation
-        this.logger.LogWarning("RequestNormalPrivileges called but not implemented on Linux");
-        return Task.FromResult(false);
+        this.logger.LogWarning("Admin privileges not implemented on Linux.");
+        return Task.FromResult(true);
     }
 }

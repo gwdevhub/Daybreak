@@ -12,7 +12,6 @@ using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Core.Extensions;
-using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
 
@@ -24,6 +23,7 @@ internal sealed class DirectSongService(
     IPrivilegeManager privilegeManager,
     ISevenZipExtractor sevenZipExtractor,
     IDownloadService downloadService,
+    IDirectSongRegistrar directSongRegistrar,
     IOptionsMonitor<DirectSongOptions> options,
     ILogger<DirectSongService> logger) : IDirectSongService
 {
@@ -48,6 +48,7 @@ internal sealed class DirectSongService(
     private readonly IPrivilegeManager privilegeManager = privilegeManager.ThrowIfNull();
     private readonly ISevenZipExtractor sevenZipExtractor = sevenZipExtractor.ThrowIfNull();
     private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
+    private readonly IDirectSongRegistrar directSongRegistrar = directSongRegistrar.ThrowIfNull();
     private readonly IOptionsMonitor<DirectSongOptions> options = options.ThrowIfNull();
     private readonly ILogger<DirectSongService> logger = logger.ThrowIfNull();
 
@@ -222,7 +223,7 @@ internal sealed class DirectSongService(
 
         scopedLogger.LogDebug("Extracted files. Setting up registry entries");
         progress.Report(ProgressRegistry);
-        if (!await RunRegisterDirectSongDirectory(cancellationToken))
+        if (!await this.directSongRegistrar.RegisterDirectSongDirectory(InstallationDirectory, RegistryEditorName, cancellationToken))
         {
             scopedLogger.LogError("Failed to set up registry entries");
             progress.Report(ProgressFailed);
@@ -233,45 +234,5 @@ internal sealed class DirectSongService(
         File.Delete(destinationPath);
         progress.Report(ProgressCompleted);
         return true;
-    }
-
-    private static async Task<bool> RunRegisterDirectSongDirectory(CancellationToken cancellationToken)
-    {
-        using var process = new Process()
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = Path.Combine(Path.GetFullPath(InstallationDirectory), RegistryEditorName),
-                WorkingDirectory = Path.GetFullPath(InstallationDirectory),
-                CreateNoWindow = true,
-                RedirectStandardOutput = true,
-                UseShellExecute = false
-            },
-            EnableRaisingEvents = true
-        };
-
-        var success = false;
-        process.OutputDataReceived += (s, e) =>
-        {
-            if (e.Data == Path.GetFullPath(InstallationDirectory))
-            {
-                success = true;
-            }
-        };
-
-        process.Start();
-        process.BeginOutputReadLine();
-        while (!process.HasExited && !success)
-        {
-            await Task.Delay(1000, cancellationToken);
-        }
-
-        process.CancelOutputRead();
-        if (!process.HasExited)
-        {
-            process.Close();
-        }
-
-        return success;
     }
 }

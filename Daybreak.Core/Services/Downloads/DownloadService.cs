@@ -71,6 +71,16 @@ internal sealed class DownloadService(
             }
         }
 
+        // Verify the full file was downloaded when Content-Length is known
+        if (downloadSize != double.MaxValue && downloaded < downloadSize)
+        {
+            scopedLogger.LogError("Download incomplete. Expected {ExpectedSize} bytes but received {ActualSize} bytes", (long)downloadSize, (long)downloaded);
+            progress.Report(ProgressFailed);
+            fileStream.Close();
+            File.Delete(destinationPath);
+            return false;
+        }
+
         progress.Report(ProgressCompleted);
         scopedLogger.LogDebug("Downloaded file");
         return true;
