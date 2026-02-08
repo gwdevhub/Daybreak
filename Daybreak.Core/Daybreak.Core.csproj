@@ -98,6 +98,13 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <!-- Embed wwwroot files as embedded resources -->
+  <ItemGroup>
+    <EmbeddedResource Include="wwwroot\**\*" Exclude="wwwroot\wiki\**">
+      <LogicalName>wwwroot/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
     <!-- Cross-platform: use Touch task instead of Windows-only echo.> -->
     <Touch Files="$(Version).version" AlwaysCreate="true" />
