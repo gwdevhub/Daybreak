@@ -1,9 +1,9 @@
+using System.Diagnostics;
+using System.Extensions.Core;
 using Daybreak.Linux.Services.Wine;
 using Daybreak.Shared.Models.LaunchConfigurations;
 using Daybreak.Shared.Services.ApplicationLauncher;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics;
-using System.Extensions.Core;
 
 namespace Daybreak.Linux.Services.ApplicationLauncher;
 
@@ -15,24 +15,25 @@ namespace Daybreak.Linux.Services.ApplicationLauncher;
 /// </summary>
 public sealed class GuildWarsProcessFinder(
     IWinePrefixManager winePrefixManager,
-    ILogger<GuildWarsProcessFinder> logger)
-    : IGuildWarsProcessFinder
+    ILogger<GuildWarsProcessFinder> logger
+) : IGuildWarsProcessFinder
 {
     private const string GuildWarsExeName = "Gw.exe";
 
+    private readonly Memory<Process> guildWarsProcesses = new(new Process[256]);
     private readonly IWinePrefixManager winePrefixManager = winePrefixManager;
     private readonly ILogger<GuildWarsProcessFinder> logger = logger;
 
-    public IReadOnlyList<Process> GetGuildWarsProcesses()
+    public Memory<Process> GetGuildWarsProcesses()
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        var processes = new List<Process>();
-
+        var index = 0;
         foreach (var (pid, _) in this.ScanForGuildWarsProcesses())
         {
             try
             {
-                processes.Add(Process.GetProcessById(pid));
+                this.guildWarsProcesses.Span[index] = Process.GetProcessById(pid);
+                index++;
             }
             catch (Exception ex)
             {
@@ -40,16 +41,20 @@ public sealed class GuildWarsProcessFinder(
             }
         }
 
-        scopedLogger.LogDebug("Found {Count} Guild Wars process(es) under Wine", processes.Count);
-        return processes;
+        scopedLogger.LogDebug("Found {Count} Guild Wars process(es) under Wine", index);
+        return this.guildWarsProcesses[..index];
     }
 
-    public GuildWarsApplicationLaunchContext? FindProcess(LaunchConfigurationWithCredentials configuration)
+    public GuildWarsApplicationLaunchContext? FindProcess(
+        LaunchConfigurationWithCredentials configuration
+    )
     {
         return this.FindProcesses(configuration).FirstOrDefault();
     }
 
-    public IEnumerable<GuildWarsApplicationLaunchContext?> FindProcesses(params LaunchConfigurationWithCredentials[] configurations)
+    public IEnumerable<GuildWarsApplicationLaunchContext?> FindProcesses(
+        params LaunchConfigurationWithCredentials[] configurations
+    )
     {
         var scopedLogger = this.logger.CreateScopedLogger();
 
@@ -57,7 +62,8 @@ public sealed class GuildWarsProcessFinder(
         {
             // Match executable path from Wine cmdline to configuration
             var matchedConfig = configurations.FirstOrDefault(c =>
-                ConfigurationMatchesPath(c, executablePath));
+                ConfigurationMatchesPath(c, executablePath)
+            );
 
             if (matchedConfig is null)
             {
@@ -79,7 +85,7 @@ public sealed class GuildWarsProcessFinder(
             {
                 GuildWarsProcess = process,
                 LaunchConfiguration = matchedConfig,
-                ProcessId = (uint)pid
+                ProcessId = (uint)pid,
             };
         }
     }
@@ -132,7 +138,8 @@ public sealed class GuildWarsProcessFinder(
                 // cmdline is null-separated; find the segment containing Gw.exe
                 var segments = cmdline.Split('\0', StringSplitOptions.RemoveEmptyEntries);
                 var exeSegment = segments.FirstOrDefault(s =>
-                    s.EndsWith(GuildWarsExeName, StringComparison.OrdinalIgnoreCase));
+                    s.EndsWith(GuildWarsExeName, StringComparison.OrdinalIgnoreCase)
+                );
 
                 if (exeSegment is not null)
                 {
@@ -140,8 +147,14 @@ public sealed class GuildWarsProcessFinder(
                     executablePath = WinePathToLinuxPath(exeSegment);
                 }
             }
-            catch (UnauthorizedAccessException) { continue; }
-            catch (IOException) { continue; }
+            catch (UnauthorizedAccessException)
+            {
+                continue;
+            }
+            catch (IOException)
+            {
+                continue;
+            }
 
             if (executablePath is not null)
             {
@@ -157,8 +170,10 @@ public sealed class GuildWarsProcessFinder(
     private static string WinePathToLinuxPath(string winePath)
     {
         // Strip Z: prefix and convert backslashes
-        if (winePath.StartsWith("Z:", StringComparison.OrdinalIgnoreCase) ||
-            winePath.StartsWith("z:", StringComparison.OrdinalIgnoreCase))
+        if (
+            winePath.StartsWith("Z:", StringComparison.OrdinalIgnoreCase)
+            || winePath.StartsWith("z:", StringComparison.OrdinalIgnoreCase)
+        )
         {
             winePath = winePath[2..];
         }
@@ -168,7 +183,8 @@ public sealed class GuildWarsProcessFinder(
 
     private static bool ConfigurationMatchesPath(
         LaunchConfigurationWithCredentials configuration,
-        string executablePath)
+        string executablePath
+    )
     {
         if (configuration.ExecutablePath is null)
         {
@@ -178,6 +194,7 @@ public sealed class GuildWarsProcessFinder(
         return string.Equals(
             Path.GetFullPath(configuration.ExecutablePath),
             Path.GetFullPath(executablePath),
-            StringComparison.OrdinalIgnoreCase);
+            StringComparison.OrdinalIgnoreCase
+        );
     }
 }

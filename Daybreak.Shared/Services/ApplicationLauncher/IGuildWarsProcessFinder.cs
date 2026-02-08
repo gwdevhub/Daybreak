@@ -1,5 +1,6 @@
-using Daybreak.Shared.Models.LaunchConfigurations;
+using System.Collections.Immutable;
 using System.Diagnostics;
+using Daybreak.Shared.Models.LaunchConfigurations;
 
 namespace Daybreak.Shared.Services.ApplicationLauncher;
 
@@ -13,16 +14,20 @@ public interface IGuildWarsProcessFinder
     /// <summary>
     /// Returns all running Guild Wars processes.
     /// </summary>
-    IReadOnlyList<Process> GetGuildWarsProcesses();
+    Memory<Process> GetGuildWarsProcesses();
 
     /// <summary>
     /// Finds a running Guild Wars process that matches the given launch configuration.
     /// Returns null if no matching process is found.
     /// </summary>
-    GuildWarsApplicationLaunchContext? FindProcess(LaunchConfigurationWithCredentials configuration);
+    GuildWarsApplicationLaunchContext? FindProcess(
+        LaunchConfigurationWithCredentials configuration
+    );
 
     /// <summary>
     /// Finds all running Guild Wars processes that match any of the given launch configurations.
     /// </summary>
-    IEnumerable<GuildWarsApplicationLaunchContext?> FindProcesses(params LaunchConfigurationWithCredentials[] configurations);
+    IEnumerable<GuildWarsApplicationLaunchContext?> FindProcesses(
+        params LaunchConfigurationWithCredentials[] configurations
+    );
 }
