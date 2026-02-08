@@ -57,7 +57,7 @@ graph TB
 ### Component Descriptions
 
 | Project | Description |
-|---------|-------------|
+| ------- | ----------- |
 | **Daybreak.Windows** | Windows executable with WebView2, MSAL authentication, shortcuts, and native screen management |
 | **Daybreak.Linux** | Linux executable using GTK/WebKit via Photino, with Wine-based game injection |
 | **Daybreak.Core** | Shared Blazor UI, services, and configuration (multi-targeted for Windows-specific features) |
@@ -65,13 +65,6 @@ graph TB
 | **Daybreak.Injector** | NativeAOT x86 executable that injects DLLs into the Guild Wars process |
 | **Daybreak.API** | NativeAOT x86 library injected into Guild Wars, exposes game data via WebSocket/REST |
 | **Daybreak.Installer** | Standalone installer/updater executable |
-
-### Platform-Specific Services
-
-The platform executables provide their own implementations for OS-specific functionality:
-
-- **Windows**: Native Win32 APIs for screen management, keyboard hooks, process injection, Microsoft Graph integration
-- **Linux**: Stub implementations with Wine-based process injection (uses `wine Daybreak.Injector.exe`)
 
 ---
 
@@ -206,29 +199,6 @@ public static string ToWinePath(string linuxPath)
     return $"Z:{linuxPath.Replace('/', '\\')}";
 }
 ```
-
-### Injection Flow on Linux
-
-1. **User clicks "Launch"** in the Daybreak UI
-2. **DaybreakInjector (Linux)** receives the launch request
-3. **WinePrefixManager.LaunchProcess()** is called with:
-   - `exePath`: Path to `Daybreak.Injector.exe` (translated to Wine path)
-   - `arguments`: `launch false "Z:\path\to\Gw.exe" <args>`
-4. **Wine** executes `Daybreak.Injector.exe` within the managed prefix
-5. **Daybreak.Injector.exe** launches Guild Wars suspended and returns process/thread handles
-6. **DaybreakInjector** parses the output and continues with injection
-7. **WinePrefixManager.LaunchProcess()** is called again for DLL injection
-8. **Resume** is called to start the game
-
-### Implementation Checklist
-
-- [ ] Create `IWinePrefixManager` interface in `Daybreak.Shared`
-- [ ] Create `WinePrefixManager` implementation in `Daybreak.Linux`
-- [ ] Add `ToWinePath()` method to `PathUtils`
-- [ ] Update `DaybreakInjector` (Linux) to use `WinePrefixManager`
-- [ ] Handle Wine process ID mapping (Wine PIDs vs native PIDs)
-- [ ] Add Wine installation detection and user guidance
-- [ ] Test with Guild Wars launch and injection
 
 ---
 
