@@ -42,7 +42,7 @@ jobs:
         uses: WyriHaximus/github-action-get-previous-tag@v1
 
       - name: Build Daybreak project
-        run: dotnet build Daybreak.Linux -c $env:Configuration --property:SolutionDir=$env:GITHUB_WORKSPACE
+        run: dotnet build Daybreak.Linux -c $Configuration --property:SolutionDir=$GITHUB_WORKSPACE
 
       - name: Set version variable
         run: |
@@ -50,8 +50,7 @@ jobs:
           echo "Version=$version" >> $GITHUB_ENV
 
       - name: Check version difference
-        run: |
-          .\Scripts\CompareVersions -currentVersion ${{ env.Version }} -lastVersion ${{ env.LatestReleaseTag }}
+        run: pwsh ./Scripts/CompareVersions.ps1 -currentVersion ${{ env.Version }} -lastVersion ${{ env.LatestReleaseTag }}
         env:
           LatestReleaseTag: ${{ steps.getLatestTag.outputs.tag }}
 
