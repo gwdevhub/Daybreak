@@ -87,6 +87,14 @@ public static class NativeMethods
         DWMWCP_ROUNDSMALL = 3
     }
 
+    public enum MonitorDpiType
+    {
+        MDT_EFFECTIVE_DPI = 0,
+        MDT_ANGULAR_DPI = 1,
+        MDT_RAW_DPI = 2,
+        MDT_DEFAULT = MDT_EFFECTIVE_DPI
+    }
+
     [Flags]
     public enum ThreadAccess : uint
     {
@@ -702,5 +710,13 @@ public static class NativeMethods
 
     [DllImport("user32.dll")]
     public static extern bool GetMonitorInfo(nint hMonitor, ref MONITORINFO lpmi);
+
+    [DllImport("shcore.dll")]
+    public static extern int GetDpiForMonitor(IntPtr hMonitor, MonitorDpiType dpiType, out int dpiX, out int dpiY);
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr MonitorFromPoint(POINT pt, uint dwFlags);
+
+
 
 }

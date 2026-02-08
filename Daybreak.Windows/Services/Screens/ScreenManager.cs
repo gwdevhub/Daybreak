@@ -24,6 +24,8 @@ internal sealed class ScreenManager(
     ILogger<ScreenManager> logger
 ) : IScreenManager, IHostedService
 {
+    private const int DefaultDpi = 96;
+
     private readonly PhotinoWindow photinoWindow = photinoWindow.ThrowIfNull();
     private readonly IOptionsProvider optionsProvider = optionsProvider.ThrowIfNull();
     private readonly IOptionsMonitor<ScreenManagerOptions> liveUpdateableOptions =
@@ -70,11 +72,15 @@ internal sealed class ScreenManager(
             this.photinoWindow.Height
         );
 
+        var currentDpi = GetDpiForPosition(position.Left, position.Top);
+
         var options = this.liveUpdateableOptions.CurrentValue;
         options.X = position.Left;
         options.Y = position.Top;
         options.Width = position.Width;
         options.Height = position.Height;
+        options.DpiX = currentDpi.X;
+        options.DpiY = currentDpi.Y;
         this.optionsProvider.SaveOption(options);
     }
 
@@ -85,6 +91,8 @@ internal sealed class ScreenManager(
         options.Y = 0;
         options.Width = 0;
         options.Height = 0;
+        options.DpiX = DefaultDpi;
+        options.DpiY = DefaultDpi;
         this.optionsProvider.SaveOption(options);
     }
 
@@ -112,11 +120,12 @@ internal sealed class ScreenManager(
 
     public Rectangle GetSavedPosition()
     {
+        var savedOptions = this.liveUpdateableOptions.CurrentValue;
         var savedPosition = new Rectangle(
-            (int)this.liveUpdateableOptions.CurrentValue.X,
-            (int)this.liveUpdateableOptions.CurrentValue.Y,
-            (int)this.liveUpdateableOptions.CurrentValue.Width,
-            (int)this.liveUpdateableOptions.CurrentValue.Height
+            (int)savedOptions.X,
+            (int)savedOptions.Y,
+            (int)savedOptions.Width,
+            (int)savedOptions.Height
         );
 
         if (
@@ -139,7 +148,72 @@ internal sealed class ScreenManager(
             );
         }
 
+        // Adjust position based on DPI scaling changes
+        var savedDpiX = savedOptions.DpiX > 0 ? savedOptions.DpiX : DefaultDpi;
+        var savedDpiY = savedOptions.DpiY > 0 ? savedOptions.DpiY : DefaultDpi;
+        var currentDpi = GetDpiForPosition(savedPosition.Left, savedPosition.Top);
+        
+        if (savedDpiX != currentDpi.X || savedDpiY != currentDpi.Y)
+        {
+            var scaleX = (double)currentDpi.X / savedDpiX;
+            var scaleY = (double)currentDpi.Y / savedDpiY;
+            savedPosition = new Rectangle(
+                (int)(savedPosition.X * scaleX),
+                (int)(savedPosition.Y * scaleY),
+                (int)(savedPosition.Width * scaleX),
+                (int)(savedPosition.Height * scaleY)
+            );
+        }
+
+        // Validate that the position is within visible screen bounds
+        savedPosition = this.EnsurePositionIsOnScreen(savedPosition);
+
         return savedPosition;
+    }
+
+    private Rectangle EnsurePositionIsOnScreen(Rectangle position)
+    {
+        var screens = this.Screens.ToList();
+        if (screens.Count == 0)
+        {
+            return position;
+        }
+
+        // Check if the window center is within any screen
+        var centerX = position.Left + (position.Width / 2);
+        var centerY = position.Top + (position.Height / 2);
+
+        var isOnScreen = screens.Any(s =>
+            centerX >= s.Size.Left && centerX <= s.Size.Right &&
+            centerY >= s.Size.Top && centerY <= s.Size.Bottom);
+
+        if (isOnScreen)
+        {
+            return position;
+        }
+
+        // Window is off-screen, move to the first available screen
+        var firstScreen = screens.First();
+        return new Rectangle(
+            firstScreen.Size.X + (firstScreen.Size.Width / 4),
+            firstScreen.Size.Y + (firstScreen.Size.Height / 4),
+            Math.Min(position.Width, firstScreen.Size.Width / 2),
+            Math.Min(position.Height, firstScreen.Size.Height / 2)
+        );
+    }
+
+    private static Point GetDpiForPosition(int x, int y)
+    {
+        var point = new NativeMethods.POINT { X = x, Y = y };
+        var monitor = NativeMethods.MonitorFromPoint(point, NativeMethods.MONITOR_DEFAULTTONEAREST);
+        
+        if (monitor != IntPtr.Zero && 
+            NativeMethods.GetDpiForMonitor(monitor, NativeMethods.MonitorDpiType.MDT_EFFECTIVE_DPI, out var dpiX, out var dpiY) == 0)
+        {
+            return new Point(dpiX, dpiY);
+        }
+
+        return new Point(DefaultDpi, DefaultDpi);
     }
 
     private static IntPtr? GetMainWindowHandle()
