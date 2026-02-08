@@ -81,7 +81,7 @@ jobs:
     #   ./location_of_script_within_repo/buildscript.sh
 
     - name: Build Daybreak project
-      run: dotnet build Daybreak -c $env:Configuration --property:SolutionDir=$env:GITHUB_WORKSPACE
+      run: dotnet build Daybreak.Windows -c $env:Configuration --property:SolutionDir=$env:GITHUB_WORKSPACE
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
