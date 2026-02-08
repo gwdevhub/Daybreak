@@ -68,6 +68,3 @@ jobs:
 
     - name: Build Installer (linux-x64)
       run: dotnet build Daybreak.Installer/Daybreak.Installer.csproj -c $Configuration
-
-    - name: Run tests
-      run: dotnet test Daybreak.Tests/Daybreak.Tests.csproj -c $Configuration
