@@ -210,6 +210,7 @@ jobs:
         if [ -f Installer/Daybreak.Installer ]; then
           mv Installer/Daybreak.Installer Installer/Daybreak.Installer.Temp
         fi
+        chmod +x Daybreak Daybreak.Wayland.sh
         cd ..
         cd linux-publish && zip -r ../daybreakv${{ env.Version }}-linux.zip . && cd ..
 
