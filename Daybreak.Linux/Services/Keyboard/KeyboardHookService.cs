@@ -1,150 +1,167 @@
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Keyboard;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Photino.Blazor;
 using System.Runtime.InteropServices;
 
 namespace Daybreak.Linux.Services.Keyboard;
 
-public partial class KeyboardHookService(IServiceProvider serviceProvider) : IHostedService, IKeyboardHookService, IDisposable
+public partial class KeyboardHookService : IHostedService, IKeyboardHookService, IDisposable
 {
-    private const string GtkLib = "libgtk-3.so.0";
-    private const string GObjectLib = "libgobject-2.0.so.0";
+    private const string X11Lib = "libX11.so.6";
 
-    // GTK signal names
-    private const string KeyPressEvent = "key-press-event";
-    private const string KeyReleaseEvent = "key-release-event";
+    // X11 event types
+    private const int KeyPress = 2;
+    private const int KeyRelease = 3;
 
-    // GDK key codes (from gdk/gdkkeysyms.h)
-    private const uint GDK_KEY_Escape = 0xff1b;
-    private const uint GDK_KEY_Return = 0xff0d;
-    private const uint GDK_KEY_space = 0x020;
-    private const uint GDK_KEY_F1 = 0xffbe;
-    private const uint GDK_KEY_F2 = 0xffbf;
-    private const uint GDK_KEY_F3 = 0xffc0;
-    private const uint GDK_KEY_F4 = 0xffc1;
-    private const uint GDK_KEY_F5 = 0xffc2;
-    private const uint GDK_KEY_F6 = 0xffc3;
-    private const uint GDK_KEY_F7 = 0xffc4;
-    private const uint GDK_KEY_F8 = 0xffc5;
-    private const uint GDK_KEY_F9 = 0xffc6;
-    private const uint GDK_KEY_F10 = 0xffc7;
-    private const uint GDK_KEY_F11 = 0xffc8;
-    private const uint GDK_KEY_F12 = 0xffc9;
+    // XK key codes (from X11/keysymdef.h)
+    private const uint XK_Escape = 0xff1b;
+    private const uint XK_Return = 0xff0d;
+    private const uint XK_space = 0x0020;
+    private const uint XK_F1 = 0xffbe;
+    private const uint XK_F2 = 0xffbf;
+    private const uint XK_F3 = 0xffc0;
+    private const uint XK_F4 = 0xffc1;
+    private const uint XK_F5 = 0xffc2;
+    private const uint XK_F6 = 0xffc3;
+    private const uint XK_F7 = 0xffc4;
+    private const uint XK_F8 = 0xffc5;
+    private const uint XK_F9 = 0xffc6;
+    private const uint XK_F10 = 0xffc7;
+    private const uint XK_F11 = 0xffc8;
+    private const uint XK_F12 = 0xffc9;
 
     [StructLayout(LayoutKind.Sequential)]
-    private struct GdkEventKey
+    private struct XKeyEvent
     {
         public int type;
-        public nint window;
-        public sbyte send_event;
-        public uint time;
+        public ulong serial;
+        public int send_event;
+        public nint display;
+        public ulong window;
+        public ulong root;
+        public ulong subwindow;
+        public ulong time;
+        public int x, y;
+        public int x_root, y_root;
         public uint state;
-        public uint keyval;
-        public int length;
-        public nint @string;
-        public ushort hardware_keycode;
-        public byte group;
-        public uint is_modifier;
+        public uint keycode;
+        public int same_screen;
     }
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate bool GtkKeyEventHandler(nint widget, nint eventKey, nint userData);
+    // XEvent is a union, we need 192 bytes to cover all cases
+    [StructLayout(LayoutKind.Explicit, Size = 192)]
+    private struct XEvent
+    {
+        [FieldOffset(0)]
+        public int type;
 
-    [LibraryImport(GObjectLib, EntryPoint = "g_signal_connect_data")]
-    private static partial nuint GSignalConnectData(
-        nint instance,
-        [MarshalAs(UnmanagedType.LPStr)] string detailed_signal,
-        nint c_handler,
-        nint data,
-        nint destroy_data,
-        int connect_flags);
+        [FieldOffset(0)]
+        public XKeyEvent xkey;
+    }
 
-    [LibraryImport(GObjectLib, EntryPoint = "g_signal_handler_disconnect")]
-    private static partial void GSignalHandlerDisconnect(nint instance, nuint handler_id);
+    [LibraryImport(X11Lib, EntryPoint = "XOpenDisplay")]
+    private static partial nint XOpenDisplay(nint display_name);
 
-    [LibraryImport(GtkLib, EntryPoint = "gtk_widget_get_window")]
-    private static partial nint GtkWidgetGetWindow(nint widget);
+    [LibraryImport(X11Lib, EntryPoint = "XCloseDisplay")]
+    private static partial int XCloseDisplay(nint display);
 
-    private readonly IServiceProvider serviceProvider = serviceProvider;
+    [LibraryImport(X11Lib, EntryPoint = "XDefaultRootWindow")]
+    private static partial ulong XDefaultRootWindow(nint display);
 
-    private nint windowHandle;
-    private nuint keyPressHandlerId;
-    private nuint keyReleaseHandlerId;
-    private GtkKeyEventHandler? keyPressDelegate;
-    private GtkKeyEventHandler? keyReleaseDelegate;
+    [LibraryImport(X11Lib, EntryPoint = "XPending")]
+    private static partial int XPending(nint display);
+
+    [LibraryImport(X11Lib, EntryPoint = "XNextEvent")]
+    private static partial int XNextEvent(nint display, ref XEvent event_return);
+
+    [LibraryImport(X11Lib, EntryPoint = "XLookupKeysym")]
+    private static partial uint XLookupKeysym(ref XKeyEvent key_event, int index);
+
+    [LibraryImport(X11Lib, EntryPoint = "XGrabKey")]
+    private static partial int XGrabKey(
+        nint display,
+        int keycode,
+        uint modifiers,
+        ulong grab_window,
+        int owner_events,
+        int pointer_mode,
+        int keyboard_mode);
+
+    [LibraryImport(X11Lib, EntryPoint = "XUngrabKey")]
+    private static partial int XUngrabKey(nint display, int keycode, uint modifiers, ulong grab_window);
+
+    [LibraryImport(X11Lib, EntryPoint = "XKeysymToKeycode")]
+    private static partial byte XKeysymToKeycode(nint display, uint keysym);
+
+    private nint display;
+    private ulong rootWindow;
+    private Thread? eventThread;
+    private CancellationTokenSource? cts;
     private bool isStarted;
+    private readonly List<byte> grabbedKeycodes = [];
 
     public event EventHandler<KeyboardEventArgs>? KeyDown;
     public event EventHandler<KeyboardEventArgs>? KeyUp;
 
     Task IHostedService.StartAsync(CancellationToken cancellationToken)
     {
-        var app = this.serviceProvider.GetRequiredService<PhotinoBlazorApp>();
-        this.windowHandle = app.MainWindow.WindowHandle;
         return Task.CompletedTask;
     }
 
     Task IHostedService.StopAsync(CancellationToken cancellationToken)
     {
+        this.Stop();
         return Task.CompletedTask;
     }
 
     public void Start()
     {
-        if (this.isStarted || this.windowHandle == nint.Zero)
+        if (this.isStarted)
         {
             return;
         }
 
-        // Keep delegates alive to prevent GC
-        this.keyPressDelegate = this.OnKeyPress;
-        this.keyReleaseDelegate = this.OnKeyRelease;
+        this.display = XOpenDisplay(nint.Zero);
+        if (this.display == nint.Zero)
+        {
+            return;
+        }
 
-        var keyPressPtr = Marshal.GetFunctionPointerForDelegate(this.keyPressDelegate);
-        var keyReleasePtr = Marshal.GetFunctionPointerForDelegate(this.keyReleaseDelegate);
+        this.rootWindow = XDefaultRootWindow(this.display);
 
-        this.keyPressHandlerId = GSignalConnectData(
-            this.windowHandle,
-            KeyPressEvent,
-            keyPressPtr,
-            nint.Zero,
-            nint.Zero,
-            0);
+        // Grab the keys we're interested in on the root window
+        this.GrabKeys();
 
-        this.keyReleaseHandlerId = GSignalConnectData(
-            this.windowHandle,
-            KeyReleaseEvent,
-            keyReleasePtr,
-            nint.Zero,
-            nint.Zero,
-            0);
+        this.cts = new CancellationTokenSource();
+        this.eventThread = new Thread(this.EventLoop)
+        {
+            IsBackground = true,
+            Name = "X11 Keyboard Event Loop"
+        };
+        this.eventThread.Start();
 
         this.isStarted = true;
     }
 
     public void Stop()
     {
-        if (!this.isStarted || this.windowHandle == nint.Zero)
+        if (!this.isStarted)
         {
             return;
         }
 
-        if (this.keyPressHandlerId != 0)
+        this.cts?.Cancel();
+        this.eventThread?.Join(TimeSpan.FromSeconds(1));
+
+        if (this.display != nint.Zero)
         {
-            GSignalHandlerDisconnect(this.windowHandle, this.keyPressHandlerId);
-            this.keyPressHandlerId = 0;
+            this.UngrabKeys();
+            XCloseDisplay(this.display);
+            this.display = nint.Zero;
         }
 
-        if (this.keyReleaseHandlerId != 0)
-        {
-            GSignalHandlerDisconnect(this.windowHandle, this.keyReleaseHandlerId);
-            this.keyReleaseHandlerId = 0;
-        }
-
-        this.keyPressDelegate = null;
-        this.keyReleaseDelegate = null;
+        this.cts?.Dispose();
+        this.cts = null;
         this.isStarted = false;
     }
 
@@ -153,47 +170,92 @@ public partial class KeyboardHookService(IServiceProvider serviceProvider) : IHo
         this.Stop();
     }
 
-    private bool OnKeyPress(nint widget, nint eventKeyPtr, nint userData)
+    private void GrabKeys()
     {
-        var eventKey = Marshal.PtrToStructure<GdkEventKey>(eventKeyPtr);
-        if (TryMapGdkKeyToVirtualKey(eventKey.keyval, out var virtualKey))
+        uint[] keysyms = [XK_F1, XK_F2, XK_F3, XK_F4, XK_F5, XK_F6, XK_F7, XK_F8, XK_F9, XK_F10, XK_F11, XK_F12, XK_Escape, XK_Return, XK_space];
+
+        foreach (var keysym in keysyms)
+        {
+            var keycode = XKeysymToKeycode(this.display, keysym);
+            if (keycode != 0)
+            {
+                // GrabModeAsync = 1
+                XGrabKey(this.display, keycode, 0, this.rootWindow, 1, 1, 1);
+                this.grabbedKeycodes.Add(keycode);
+            }
+        }
+    }
+
+    private void UngrabKeys()
+    {
+        foreach (var keycode in this.grabbedKeycodes)
+        {
+            XUngrabKey(this.display, keycode, 0, this.rootWindow);
+        }
+
+        this.grabbedKeycodes.Clear();
+    }
+
+    private void EventLoop()
+    {
+        while (this.cts is { IsCancellationRequested: false })
+        {
+            if (XPending(this.display) > 0)
+            {
+                var xEvent = new XEvent();
+                XNextEvent(this.display, ref xEvent);
+                this.ProcessEvent(ref xEvent);
+            }
+            else
+            {
+                Thread.Sleep(10);
+            }
+        }
+    }
+
+    private void ProcessEvent(ref XEvent xEvent)
+    {
+        if (xEvent.type is not KeyPress and not KeyRelease)
+        {
+            return;
+        }
+
+        var keysym = XLookupKeysym(ref xEvent.xkey, 0);
+
+        if (!TryMapXKeyToVirtualKey(keysym, out var virtualKey))
+        {
+            return;
+        }
+
+        if (xEvent.type == KeyPress)
         {
             this.KeyDown?.Invoke(this, new KeyboardEventArgs(virtualKey));
         }
-
-        return false; // Allow event to propagate
-    }
-
-    private bool OnKeyRelease(nint widget, nint eventKeyPtr, nint userData)
-    {
-        var eventKey = Marshal.PtrToStructure<GdkEventKey>(eventKeyPtr);
-        if (TryMapGdkKeyToVirtualKey(eventKey.keyval, out var virtualKey))
+        else
         {
             this.KeyUp?.Invoke(this, new KeyboardEventArgs(virtualKey));
         }
-
-        return false;
     }
 
-    private static bool TryMapGdkKeyToVirtualKey(uint gdkKey, out VirtualKey virtualKey)
+    private static bool TryMapXKeyToVirtualKey(uint keysym, out VirtualKey virtualKey)
     {
-        virtualKey = gdkKey switch
+        virtualKey = keysym switch
         {
-            GDK_KEY_F1 => VirtualKey.F1,
-            GDK_KEY_F2 => VirtualKey.F2,
-            GDK_KEY_F3 => VirtualKey.F3,
-            GDK_KEY_F4 => VirtualKey.F4,
-            GDK_KEY_F5 => VirtualKey.F5,
-            GDK_KEY_F6 => VirtualKey.F6,
-            GDK_KEY_F7 => VirtualKey.F7,
-            GDK_KEY_F8 => VirtualKey.F8,
-            GDK_KEY_F9 => VirtualKey.F9,
-            GDK_KEY_F10 => VirtualKey.F10,
-            GDK_KEY_F11 => VirtualKey.F11,
-            GDK_KEY_F12 => VirtualKey.F12,
-            GDK_KEY_Escape => VirtualKey.Escape,
-            GDK_KEY_Return => VirtualKey.Enter,
-            GDK_KEY_space => VirtualKey.Space,
+            XK_F1 => VirtualKey.F1,
+            XK_F2 => VirtualKey.F2,
+            XK_F3 => VirtualKey.F3,
+            XK_F4 => VirtualKey.F4,
+            XK_F5 => VirtualKey.F5,
+            XK_F6 => VirtualKey.F6,
+            XK_F7 => VirtualKey.F7,
+            XK_F8 => VirtualKey.F8,
+            XK_F9 => VirtualKey.F9,
+            XK_F10 => VirtualKey.F10,
+            XK_F11 => VirtualKey.F11,
+            XK_F12 => VirtualKey.F12,
+            XK_Escape => VirtualKey.Escape,
+            XK_Return => VirtualKey.Enter,
+            XK_space => VirtualKey.Space,
             _ => default
         };
 
