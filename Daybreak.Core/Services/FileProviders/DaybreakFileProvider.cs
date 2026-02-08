@@ -29,11 +29,22 @@ internal sealed class DaybreakFileProvider : IFileProvider
             {
                 // Store with original key preserved for resource loading
                 this.manifestMapping[name] = (name, provider);
-                // Also store normalized forward-slash version
+                
+                // Normalize to forward slashes
                 var normalizedName = name.Replace("\\", "/");
                 if (normalizedName != name && !this.manifestMapping.ContainsKey(normalizedName))
                 {
                     this.manifestMapping[normalizedName] = (name, provider);
+                }
+                
+                // Also register without wwwroot/ prefix for runtime lookups
+                if (normalizedName.StartsWith(WwwrootPrefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    var withoutWwwroot = normalizedName.Substring(WwwrootPrefix.Length);
+                    if (!this.manifestMapping.ContainsKey(withoutWwwroot))
+                    {
+                        this.manifestMapping[withoutWwwroot] = (name, provider);
+                    }
                 }
             }
         }
