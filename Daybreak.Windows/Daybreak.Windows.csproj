@@ -43,4 +43,17 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <!-- Embed the scoped CSS bundle from Daybreak.Core after it's built -->
+  <PropertyGroup>
+    <CoreScopedCssBundle>..\Daybreak.Core\obj\$(Platform)\$(Configuration)\$(TargetFramework)\scopedcss\bundle\Daybreak.Core.styles.css</CoreScopedCssBundle>
+  </PropertyGroup>
+  
+  <Target Name="EmbedCoreScopedCssBundle" BeforeTargets="AssignTargetPaths">
+    <ItemGroup Condition="Exists('$(CoreScopedCssBundle)')">
+      <EmbeddedResource Include="$(CoreScopedCssBundle)">
+        <LogicalName>Daybreak.Core.styles.css</LogicalName>
+      </EmbeddedResource>
+    </ItemGroup>
+  </Target>
+
 </Project>
