@@ -3,6 +3,7 @@ using Daybreak.Shared.Services.Initialization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http.Logging;
 using Microsoft.Extensions.Logging;
+using Photino.Blazor;
 using System.Core.Extensions;
 using System.Net.Http.Headers;
 
@@ -24,6 +25,7 @@ public abstract class PluginConfigurationBase
     public virtual void RegisterMenuButtons(IMenuServiceProducer menuServiceProducer) { }
     public virtual void RegisterThemes(IThemeProducer themeProducer) { }
     public virtual void RegisterProviderAssemblies(IFileProviderProducer fileProviderProducer) { }
+    public virtual void ConfigureWindow(PhotinoBlazorApp app) { }
 
     public PluginConfigurationBase()
     {

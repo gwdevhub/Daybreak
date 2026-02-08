@@ -187,16 +187,20 @@ switch (mode)
         {
             if (!TryParseInjectWinApiArgs(args, out var process, out var dllPath, out var parseResult))
             {
+                Console.WriteLine($"ExitCode: {(int)parseResult}");
                 return (int)parseResult;
             }
 
             Console.WriteLine($"Starting WinAPI injection. Process {process.Id}. DllPath: {dllPath}");
-            return (int)ProcessInjector.InjectWithApi(process, dllPath);
+            var result = (int)ProcessInjector.InjectWithApi(process, dllPath);
+            Console.WriteLine($"ExitCode: {result}");
+            return result;
         }
     case "stub":
         {
             if (!TryParseInjectStubArgs(args, out var process, out var dllPath, out var entryPoint, out var parseResult))
             {
+                Console.WriteLine($"ExitCode: {(int)parseResult}");
                 return (int)parseResult;
             }
 
@@ -204,16 +208,19 @@ switch (mode)
             var result = StubInjector.Inject(process, dllPath, entryPoint, out var exitCode);
             if (result is not InjectorResponses.InjectResult.Success)
             {
+                Console.WriteLine($"ExitCode: {(int)result}");
                 return (int)result;
             }
 
             Console.WriteLine($"Stub returned {exitCode}");
+            Console.WriteLine($"ExitCode: {exitCode}");
             return exitCode;
         }
     case "launch":
         {
             if (!TryParseLaunchArgs(args, out var gwPath, out var gwArgs, out var elevated, out var parseResult))
             {
+                Console.WriteLine($"ExitCode: {(int)parseResult}");
                 return (int)parseResult;
             }
 
@@ -221,19 +228,24 @@ switch (mode)
             var result = ProcessLauncher.LaunchGuildWars(gwPath, gwArgs, elevated.Value, out var threadHandle, out var processId);
             Console.WriteLine($"ThreadHandle: {threadHandle}");
             Console.WriteLine($"ProcessId: {processId}");
+            Console.WriteLine($"ExitCode: {(int)result}");
             return (int)result;
         }
     case "resume":
         {
             if (!TryParseThreadResumeArgs(args, out var threadHwnd, out var parseResult))
             {
+                Console.WriteLine($"ExitCode: {(int)parseResult}");
                 return (int)parseResult;
             }
 
             Console.WriteLine($"Resuming thread {threadHwnd.Value}");
-            return (int) ThreadResumer.Resume(threadHwnd.Value);
+            var result = (int) ThreadResumer.Resume(threadHwnd.Value);
+            Console.WriteLine($"ExitCode: {result}");
+            return result;
         }
     default:
         PrintUsage();
+        Console.WriteLine($"ExitCode: {(int)InjectorResponses.GenericResults.InvalidMode}");
         return (int)InjectorResponses.GenericResults.InvalidMode;
 }

@@ -1,0 +1,26 @@
+﻿<div>
+    <div class="resize-border resize-border-top" @onmousedown="@(e => this.HandleResize(e, ResizeDirection.Top))" />
+    <div class="resize-border resize-border-left" @onmousedown="@(e => this.HandleResize(e, ResizeDirection.Left))" />
+    <div class="resize-border resize-border-right" @onmousedown="@(e => this.HandleResize(e, ResizeDirection.Right))" />
+    <div class="resize-border resize-border-bottom" @onmousedown="@(e => this.HandleResize(e, ResizeDirection.Bottom))" />
+    <div class="resize-border resize-border-top-left" @onmousedown="@(e => this.HandleResize(e, ResizeDirection.TopLeft))" />
+    <div class="resize-border resize-border-top-right" @onmousedown="@(e => this.HandleResize(e, ResizeDirection.TopRight))" />
+    <div class="resize-border resize-border-bottom-left" @onmousedown="@(e => this.HandleResize(e, ResizeDirection.BottomLeft))" />
+    <div class="resize-border resize-border-bottom-right" @onmousedown="@(e => this.HandleResize(e, ResizeDirection.BottomRight))" />
+</div>
+
+@using Daybreak.Shared.Utils
+@code {
+    [Parameter]
+    public required Action<ResizeDirection> OnResize { get; init; }
+
+    public void HandleResize(MouseEventArgs e, ResizeDirection direction)
+    {
+        if (e.Button != 0)
+        {
+            return; // Only handle left mouse button clicks
+        }
+
+        this.OnResize(direction);
+    }
+}

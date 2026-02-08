@@ -4,6 +4,9 @@ using System.Net;
 using System.Text;
 
 const string LatestUrl = "https://github.com/gwdevhub/Daybreak/releases/latest";
+var daybreakExecutable = OperatingSystem.IsWindows() ? "Daybreak.exe" : "Daybreak.Linux";
+var daybreakProcessName = OperatingSystem.IsWindows() ? "Daybreak" : "Daybreak.Linux";
+var releaseAssetSuffix = OperatingSystem.IsWindows() ? "" : "-linux";
 
 static void RenderProgressBar(int currentStep, int totalSteps, int barSize)
 {
@@ -32,12 +35,9 @@ static void CleanWorkingDirectory(string workingDirectory)
     var preserve = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
     {
         installerPath,
-        optionsPath
+        optionsPath,
     };
-    var preserveExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-    {
-        ".tpf"
-    };
+    var preserveExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".tpf" };
 
     foreach (var entry in Directory.GetFileSystemEntries(workingDirectory))
     {
@@ -70,7 +70,7 @@ static void CleanWorkingDirectory(string workingDirectory)
     }
 }
 
-static async ValueTask PerformUpdate(string workingDirectory)
+async ValueTask PerformUpdate(string workingDirectory)
 {
     if (!Directory.Exists(workingDirectory))
     {
@@ -83,7 +83,7 @@ static async ValueTask PerformUpdate(string workingDirectory)
 
     var tempFile = Path.GetFullPath("tempfile.zip", workingDirectory);
     var updatePkg = Path.GetFullPath("update.pkg", workingDirectory);
-    var executableName = Path.GetFullPath("Daybreak.exe", workingDirectory);
+    var executableName = Path.GetFullPath(daybreakExecutable, workingDirectory);
 
     if (File.Exists(updatePkg))
     {
@@ -124,7 +124,10 @@ static async ValueTask PerformUpdate(string workingDirectory)
             var binarySize = BitConverter.ToInt32(sizeBuffer.Span);
             var fileInfo = new FileInfo(relativePath);
             fileInfo.Directory!.Create();
-            using var destinationStream = new FileStream(Path.GetFullPath(relativePath, workingDirectory), FileMode.Create);
+            using var destinationStream = new FileStream(
+                Path.GetFullPath(relativePath, workingDirectory),
+                FileMode.Create
+            );
             while (binarySize > 0)
             {
                 var toRead = Math.Min(binarySize, copyBuffer.Length);
@@ -148,9 +151,7 @@ static async ValueTask PerformUpdate(string workingDirectory)
         {
             ZipFile.ExtractToDirectory(tempFile, Path.GetFullPath(workingDirectory), true);
         }
-        catch
-        {
-        }
+        catch { }
 
         Console.WriteLine("Deleting package");
         try
@@ -171,13 +172,7 @@ static async ValueTask PerformUpdate(string workingDirectory)
     }
 
     Console.WriteLine("Launching application");
-    var process = new Process
-    {
-        StartInfo = new ProcessStartInfo
-        {
-            FileName = executableName
-        }
-    };
+    var process = new Process { StartInfo = new ProcessStartInfo { FileName = executableName } };
 
     if (process.Start() is false)
     {
@@ -186,25 +181,26 @@ static async ValueTask PerformUpdate(string workingDirectory)
     }
 }
 
-static async ValueTask PerformFreshInstall(string workingDirectory)
+async ValueTask PerformFreshInstall(string workingDirectory)
 {
-    using var handler = new HttpClientHandler
-    {
-        AllowAutoRedirect = false
-    };
+    using var handler = new HttpClientHandler { AllowAutoRedirect = false };
     var client = new HttpClient(handler);
     using var latestResponse = await client.GetAsync(LatestUrl);
 
-    var isRedirect = latestResponse.StatusCode is HttpStatusCode.Redirect
-        or HttpStatusCode.MovedPermanently
-        or HttpStatusCode.Found
-        or HttpStatusCode.SeeOther
-        or HttpStatusCode.TemporaryRedirect
-        or HttpStatusCode.PermanentRedirect;
+    var isRedirect =
+        latestResponse.StatusCode
+        is HttpStatusCode.Redirect
+            or HttpStatusCode.MovedPermanently
+            or HttpStatusCode.Found
+            or HttpStatusCode.SeeOther
+            or HttpStatusCode.TemporaryRedirect
+            or HttpStatusCode.PermanentRedirect;
 
     if (!isRedirect)
     {
-        Console.WriteLine($"Failed to get latest release information. Status: {latestResponse.StatusCode}");
+        Console.WriteLine(
+            $"Failed to get latest release information. Status: {latestResponse.StatusCode}"
+        );
         Console.ReadKey();
         return;
     }
@@ -222,7 +218,9 @@ static async ValueTask PerformFreshInstall(string workingDirectory)
         : new Uri(latestResponse.RequestMessage!.RequestUri!, redirectTarget);
 
     var version = finalUri.Segments.Last().TrimEnd('/');
-    var downloadUri = new Uri($"https://github.com/gwdevhub/Daybreak/releases/download/{version}/daybreak{version}.zip");
+    var downloadUri = new Uri(
+        $"https://github.com/gwdevhub/Daybreak/releases/download/{version}/daybreak{version}{releaseAssetSuffix}.zip"
+    );
     var tempFile = Path.GetFullPath("tempfile.zip", workingDirectory);
 
     Console.WriteLine($"Cleaning installation directory {workingDirectory}");
@@ -234,17 +232,27 @@ static async ValueTask PerformFreshInstall(string workingDirectory)
     client.Dispose();
 
     client = new HttpClient();
-    using var downloadResponse = await client.GetAsync(downloadUri, HttpCompletionOption.ResponseHeadersRead);
+    using var downloadResponse = await client.GetAsync(
+        downloadUri,
+        HttpCompletionOption.ResponseHeadersRead
+    );
     if (!downloadResponse.IsSuccessStatusCode)
     {
-        Console.WriteLine($"Failed to download Daybreak package. Status: {downloadResponse.StatusCode}");
+        Console.WriteLine(
+            $"Failed to download Daybreak package. Status: {downloadResponse.StatusCode}"
+        );
         Console.ReadKey();
         return;
     }
 
     var totalBytes = downloadResponse.Content.Headers.ContentLength ?? -1L;
     using var contentStream = await downloadResponse.Content.ReadAsStreamAsync();
-    using var fileStream = new FileStream(tempFile, FileMode.Create, FileAccess.Write, FileShare.None);
+    using var fileStream = new FileStream(
+        tempFile,
+        FileMode.Create,
+        FileAccess.Write,
+        FileShare.None
+    );
     var totalRead = 0L;
     var buffer = new Memory<byte>(new byte[8192]);
     int bytesRead;
@@ -276,14 +284,8 @@ static async ValueTask PerformFreshInstall(string workingDirectory)
     File.Delete(tempFile);
 
     Console.WriteLine("Installation complete. Launching application...");
-    var executableName = Path.GetFullPath("Daybreak.exe", workingDirectory);
-    var process = new Process
-    {
-        StartInfo = new ProcessStartInfo
-        {
-            FileName = executableName
-        }
-    };
+    var executableName = Path.GetFullPath(daybreakExecutable, workingDirectory);
+    var process = new Process { StartInfo = new ProcessStartInfo { FileName = executableName } };
 
     if (process.Start() is false)
     {
@@ -294,22 +296,23 @@ static async ValueTask PerformFreshInstall(string workingDirectory)
 
 Console.Title = "Daybreak Installer";
 Console.WriteLine("Starting installation...");
-while (Process.GetProcesses().Where(p => p.ProcessName == "Daybreak").FirstOrDefault()?.HasExited is false)
+while (Process.GetProcesses().FirstOrDefault(p => p.ProcessName == daybreakProcessName)?.HasExited is false)
 {
     Console.WriteLine($"Detected Daybreak process is still running. Waiting 5s and retrying");
     await Task.Delay(5000);
 }
 
-while (Process.GetProcessesByName("gw").FirstOrDefault()?.HasExited is false)
+if (OperatingSystem.IsWindows())
 {
-    Console.WriteLine($"Detected Guild Wars process is still running. Waiting 5s and retrying");
-    await Task.Delay(5000);
+    while (Process.GetProcessesByName("gw").FirstOrDefault()?.HasExited is false)
+    {
+        Console.WriteLine($"Detected Guild Wars process is still running. Waiting 5s and retrying");
+        await Task.Delay(5000);
+    }
 }
 
-var mode = args.Length > 1
-    ? args[0] : "install";
-var workingDirectory = args.Length > 2
-    ? args[1] : Path.GetFullPath("..", AppContext.BaseDirectory);
+var mode = args.Length > 1 ? args[0] : "install";
+var workingDirectory = args.Length > 2 ? args[1] : Path.GetFullPath("..", AppContext.BaseDirectory);
 
 // Normalize working directory path
 workingDirectory = Path.GetFullPath(workingDirectory);

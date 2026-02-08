@@ -1,9 +1,8 @@
 ﻿using Daybreak.Shared.Models;
-using Daybreak.Shared.Utils;
 using Microsoft.Win32;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using static Daybreak.Shared.Utils.NativeMethods;
+using static Daybreak.Injector.NativeMethods;
 
 namespace Daybreak.Injector;
 

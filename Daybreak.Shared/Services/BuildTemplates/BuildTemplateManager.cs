@@ -18,7 +18,7 @@ public sealed class BuildTemplateManager(
     ILogger<BuildTemplateManager> logger) : IBuildTemplateManager
 {
     private const string DecodingLookupTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-    private readonly static string BuildsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Guild Wars\\Templates\\Skills";
+    private readonly static string BuildsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Guild Wars", "Templates", "Skills");
 
     private List<IBuildEntry> BuildMemoryCache { get; } = [];
 
@@ -309,14 +309,16 @@ public sealed class BuildTemplateManager(
 
     public void RemoveBuild(IBuildEntry buildEntry)
     {
-        if (File.Exists($"{BuildsPath}\\{buildEntry.Name}.txt"))
+        var namePath = Path.Combine(BuildsPath, $"{buildEntry.Name}.txt");
+        if (File.Exists(namePath))
         {
-            File.Delete($"{BuildsPath}\\{buildEntry.Name}.txt");
+            File.Delete(namePath);
         }
 
-        if (File.Exists($"{BuildsPath}\\{buildEntry.PreviousName}.txt"))
+        var previousNamePath = Path.Combine(BuildsPath, $"{buildEntry.PreviousName}.txt");
+        if (File.Exists(previousNamePath))
         {
-            File.Delete($"{BuildsPath}\\{buildEntry.PreviousName}.txt");
+            File.Delete(previousNamePath);
         }
     }
 

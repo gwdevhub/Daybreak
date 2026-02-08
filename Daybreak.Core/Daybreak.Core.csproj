@@ -1,0 +1,100 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <RootNamespace>Daybreak</RootNamespace>
+    <TargetFrameworks>$(TargetFrameworkVersion);$(TargetFrameworkVersionWindows)</TargetFrameworks>
+    <ScopedCssEnabled>true</ScopedCssEnabled>
+    <Nullable>enable</Nullable>
+    <Platforms>x64</Platforms>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <LangVersion>preview</LangVersion>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <UserSecretsId>cfb2a489-db80-448d-a969-80270f314c46</UserSecretsId>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <!-- Define WINDOWS constant when targeting Windows -->
+  <PropertyGroup Condition="$(TargetFramework.Contains('windows'))">
+    <DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <StripSymbols>true</StripSymbols>
+  </PropertyGroup>
+
+  <Target Name="AddUserSecrets" BeforeTargets="PrepareForBuild" Condition=" '$(UserSecretsId)' != '' ">
+    <PropertyGroup>
+      <UserSecretsFilePath Condition=" '$(OS)' == 'Windows_NT' ">
+		$([System.Environment]::GetFolderPath(SpecialFolder.UserProfile))\AppData\Roaming\Microsoft\UserSecrets\$(UserSecretsId)\secrets.json
+	  </UserSecretsFilePath>
+	  <UserSecretsFilePath Condition=" '$(OS)' == 'Unix' ">
+		$([System.Environment]::GetFolderPath(SpecialFolder.UserProfile))/.microsoft/usersecrets/$(UserSecretsId)/secrets.json
+	  </UserSecretsFilePath>
+    </PropertyGroup>
+    <ItemGroup>
+      <EmbeddedResource Include="$(UserSecretsFilePath)" Condition="Exists($(UserSecretsFilePath))" />
+    </ItemGroup>
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="Elastic.OpenTelemetry" />
+    <PackageReference Include="ksemenenko.ColorThief" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" />
+    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" />
+    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" />
+    <PackageReference Include="OpenTelemetry.Exporter.Console" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" />
+    <PackageReference Include="PeNet" />
+    <PackageReference Include="Plumsy" />
+    <PackageReference Include="DiffPlex" />
+    <PackageReference Include="HtmlAgilityPack" />
+    <PackageReference Include="ini-parser-netstandard" />
+    <PackageReference Include="Microsoft.CorrelationVector" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Serilog" />
+    <PackageReference Include="Serilog.Enrichers.Environment" />
+    <PackageReference Include="Serilog.Enrichers.Thread" />
+    <PackageReference Include="Serilog.Extensions.Logging" />
+    <PackageReference Include="Serilog.Sinks.Console" />
+    <PackageReference Include="Serilog.Sinks.Debug" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" />
+  </ItemGroup>
+
+  <!-- Windows-only packages -->
+  <ItemGroup Condition="$(TargetFramework.Contains('windows'))">
+    <PackageReference Include="Microsoft.Identity.Client.Desktop" />
+    <PackageReference Include="Microsoft.Identity.Client.Extensions.Msal" />
+    <PackageReference Include="securifybv.ShellLink" />
+    <!-- Exclude WPF assets from WebView2 to avoid WindowsBase version conflict (MSB3277) -->
+    <PackageReference Include="Microsoft.Web.WebView2" ExcludeAssets="buildTransitive" PrivateAssets="all">
+      <IncludeAssets>runtime; compile; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Daybreak.Shared\Daybreak.Shared.csproj" />
+  </ItemGroup>
+
+  <!-- Copy Daybreak.wiki to wwwroot/wiki for both Debug and Release builds -->
+  <PropertyGroup>
+    <WikiSourcePath>..\Daybreak.wiki</WikiSourcePath>
+  </PropertyGroup>  
+    
+  <ItemGroup>
+    <WikiFiles Include="$(WikiSourcePath)\**\*.*" Exclude="$(WikiSourcePath)\.git\**" />
+  </ItemGroup>
+
+  <Target Name="CopyWikiToWwwroot" BeforeTargets="PrepareForBuild">
+    <Message Importance="high" Text="📦 Daybreak.wiki -&gt; wwwroot/wiki" />
+    <Copy SourceFiles="@(WikiFiles)" DestinationFiles="@(WikiFiles->'wwwroot\wiki\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
+    <!-- Cross-platform: use Touch task instead of Windows-only echo.> -->
+    <Touch Files="$(Version).version" AlwaysCreate="true" />
+  </Target>
+
+</Project>
