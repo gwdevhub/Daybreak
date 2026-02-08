@@ -23,7 +23,13 @@
     <File Path="LICENSE.md" />
     <File Path="README.md" />
   </Folder>
-  <Project Path="Daybreak/Daybreak.csproj">
+  <Project Path="Daybreak.Core/Daybreak.Core.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="Daybreak.Windows/Daybreak.Windows.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="Daybreak.Linux/Daybreak.Linux.csproj">
     <Platform Project="x64" />
   </Project>
   <Project Path="Daybreak.API/Daybreak.API.csproj">
@@ -35,7 +41,9 @@
   <Project Path="Daybreak.Installer/Daybreak.Installer.csproj">
     <Platform Project="x64" />
   </Project>
-  <Project Path="Daybreak.Shared/Daybreak.Shared.csproj" />
+  <Project Path="Daybreak.Shared/Daybreak.Shared.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="Daybreak.Tests/Daybreak.Tests.csproj">
     <Platform Project="x64" />
   </Project>

@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>Daybreak</AssemblyName>
+    <RootNamespace>Daybreak.Linux</RootNamespace>
+    <TargetFramework>$(TargetFrameworkVersion)</TargetFramework>
+    <Nullable>enable</Nullable>
+    <Platforms>x64</Platforms>
+    <LangVersion>preview</LangVersion>
+    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>false</PublishSingleFile>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <StripSymbols>true</StripSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Photino.Blazor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Daybreak.Core\Daybreak.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Daybreak.Wayland.sh" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <Target Name="SetShellScriptPermissions" AfterTargets="Build;Publish">
+    <Exec Command="chmod +x $(OutputPath)Daybreak.Wayland.sh" Condition="Exists('$(OutputPath)Daybreak.Wayland.sh')" />
+    <Exec Command="chmod +x $(PublishDir)Daybreak.Wayland.sh" Condition="Exists('$(PublishDir)Daybreak.Wayland.sh')" />
+  </Target>
+
+</Project>

@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <OutputType>Library</OutputType>
-    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win-x86</RuntimeIdentifier>
     <StripSymbols>true</StripSymbols>
     <InteropExports>true</InteropExports>
     <EnableRequestDelegateGenerator>true</EnableRequestDelegateGenerator>
@@ -17,6 +17,7 @@
     <UseAppHost>false</UseAppHost>
     <EnableIISSupport>false</EnableIISSupport>
     <InvariantGlobalization>true</InvariantGlobalization>
+    <AllowMissingPrunePackageData>true</AllowMissingPrunePackageData>
     <Platforms>x86</Platforms>
     
     <!-- Prevent static web asset conflicts -->
