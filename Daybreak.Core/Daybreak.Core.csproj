@@ -78,19 +78,25 @@
     <ProjectReference Include="..\Daybreak.Shared\Daybreak.Shared.csproj" />
   </ItemGroup>
 
-  <!-- Copy Daybreak.wiki to wwwroot/wiki for both Debug and Release builds -->
+  <!-- Embed Daybreak.wiki files as embedded resources with web-friendly logical names -->
   <PropertyGroup>
     <WikiSourcePath>..\Daybreak.wiki</WikiSourcePath>
-  </PropertyGroup>  
-    
-  <ItemGroup>
-    <WikiFiles Include="$(WikiSourcePath)\**\*.*" Exclude="$(WikiSourcePath)\.git\**" />
-  </ItemGroup>
+  </PropertyGroup>
 
-  <Target Name="CopyWikiToWwwroot" BeforeTargets="PrepareForBuild">
-    <Message Importance="high" Text="📦 Daybreak.wiki -&gt; wwwroot/wiki" />
-    <Copy SourceFiles="@(WikiFiles)" DestinationFiles="@(WikiFiles->'wwwroot\wiki\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
-  </Target>
+  <ItemGroup>
+    <EmbeddedResource Include="$(WikiSourcePath)\**\*.md" Exclude="$(WikiSourcePath)\.git\**">
+      <LogicalName>wiki/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(WikiSourcePath)\**\*.png" Exclude="$(WikiSourcePath)\.git\**">
+      <LogicalName>wiki/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(WikiSourcePath)\**\*.jpg" Exclude="$(WikiSourcePath)\.git\**">
+      <LogicalName>wiki/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(WikiSourcePath)\**\*.gif" Exclude="$(WikiSourcePath)\.git\**">
+      <LogicalName>wiki/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
     <!-- Cross-platform: use Touch task instead of Windows-only echo.> -->
