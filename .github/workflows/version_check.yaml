@@ -54,4 +54,6 @@ jobs:
           .\Scripts\CompareVersions -currentVersion ${{ env.Version }} -lastVersion ${{ env.LatestReleaseTag }}
         env:
           LatestReleaseTag: ${{ steps.getLatestTag.outputs.tag }}
+        shell:
+          pwsh
 

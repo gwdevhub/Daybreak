@@ -1,4 +1,3 @@
-using Daybreak.Utils;
 using System.Extensions;
 using TrailBlazr.ViewModels;
 
@@ -6,6 +5,9 @@ namespace Daybreak.Views;
 
 public sealed class WikiViewModel : ViewModelBase<WikiViewModel, WikiView>
 {
+    private const string WikiPrefix = "wiki/";
+    private const string MarkdownExtension = ".md";
+
     public string? CurrentPage { get; private set; }
     public List<string> Pages { get; } = [];
 
@@ -18,10 +20,11 @@ public sealed class WikiViewModel : ViewModelBase<WikiViewModel, WikiView>
 
     private static IEnumerable<string> LoadPages()
     {
-        var webRoot = WebRootUtil.GetWebRootPath();
-        var wikiPath = Path.Combine(webRoot, "wiki");
-        return Directory.EnumerateFiles(wikiPath, "*.md")
-            .Select(Path.GetFileNameWithoutExtension)
+        var assembly = typeof(WikiViewModel).Assembly;
+        return assembly.GetManifestResourceNames()
+            .Where(name => name.StartsWith(WikiPrefix, StringComparison.OrdinalIgnoreCase)
+                        && name.EndsWith(MarkdownExtension, StringComparison.OrdinalIgnoreCase))
+            .Select(name => Path.GetFileNameWithoutExtension(name[WikiPrefix.Length..]))
             .OfType<string>();
     }
 }
