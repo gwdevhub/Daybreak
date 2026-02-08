@@ -8,7 +8,16 @@
 name: Daybreak CD Pipeline
 
 on:
-  pull_request:
+  push:
+    branches:
+      - master
+    paths:
+      - "Daybreak/**"
+      - "Daybreak.Installer/**"
+      - "Daybreak.API/**"
+      - "Daybreak.7ZipExtractor/**"
+      - "Daybreak.Installer/**"
+      - "Daybreak.Shared/**"
   workflow_dispatch:
 
 jobs:
@@ -227,5 +236,10 @@ jobs:
         body_mrkdwn: |
             ${{ env.Changelog }}
         isDraft: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Publish release
+      run: gh release edit v${{ env.Version }} --draft=false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
