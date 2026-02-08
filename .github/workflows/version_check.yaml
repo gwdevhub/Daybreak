@@ -1,4 +1,4 @@
-name:  Daybreak Version Check
+name: Daybreak Version Check
 
 on:
   pull_request:
@@ -7,16 +7,19 @@ on:
     paths:
       - "Daybreak/**"
       - "Daybreak.Installer/**"
+      - "Daybreak.Linux/**"
+      - "Daybreak.Windows/**"
+      - "Daybreak.API/**"
+      - "Daybreak.Shared/**"
+      - "Daybreak.Injector/**"
 
 jobs:
-
   check_version:
-
     strategy:
       matrix:
-        targetplatform: [x86]
+        targetplatform: [x64]
 
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     env:
       Configuration: Release
@@ -24,30 +27,31 @@ jobs:
       Actions_Allow_Unsecure_Commands: true
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v6
-      with:
-        fetch-depth: 0
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
-    - name: Install .NET Core
-      uses: actions/setup-dotnet@v5
-      with:
-        dotnet-version: '9.x'
+      - name: Install .NET Core
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "10.x"
 
-    - name: Get Latest Tag
-      id: getLatestTag
-      uses: WyriHaximus/github-action-get-previous-tag@v1
+      - name: Get Latest Tag
+        id: getLatestTag
+        uses: WyriHaximus/github-action-get-previous-tag@v1
 
-    - name: Build Daybreak project
-      run: dotnet build Daybreak -c $env:Configuration --property:SolutionDir=$env:GITHUB_WORKSPACE
+      - name: Build Daybreak project
+        run: dotnet build Daybreak.Linux -c $env:Configuration --property:SolutionDir=$env:GITHUB_WORKSPACE
 
-    - name: Set version variable
-      run: |
-        $version = .\Scripts\GetBuildVersion.ps1
-        echo "::set-env name=Version::$version"
+      - name: Set version variable
+        run: |
+          version=$(grep '<Version>' Directory.Build.props | sed 's/.*<Version>\(.*\)<\/Version>.*/\1/')
+          echo "Version=$version" >> $GITHUB_ENV
 
-    - name: Check version difference
-      run: |
-        .\Scripts\CompareVersions -currentVersion ${{ env.Version }} -lastVersion ${{ env.LatestReleaseTag }}
-      env:
-        LatestReleaseTag: ${{ steps.getLatestTag.outputs.tag }}
+      - name: Check version difference
+        run: |
+          .\Scripts\CompareVersions -currentVersion ${{ env.Version }} -lastVersion ${{ env.LatestReleaseTag }}
+        env:
+          LatestReleaseTag: ${{ steps.getLatestTag.outputs.tag }}
+

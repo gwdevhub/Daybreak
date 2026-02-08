@@ -1,4 +1,9 @@
-﻿using Daybreak.Configuration.Options;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Core.Extensions;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Api;
 using Daybreak.Shared.Models.LaunchConfigurations;
@@ -9,15 +14,11 @@ using Daybreak.Shared.Services.LaunchConfigurations;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Onboarding;
 using Microsoft.Extensions.Options;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Core.Extensions;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using TrailBlazr.Services;
 using TrailBlazr.ViewModels;
 
 namespace Daybreak.Views;
+
 public sealed class LaunchViewModel(
     IViewManager viewManager,
     INotificationService notificationService,
@@ -25,17 +26,20 @@ public sealed class LaunchViewModel(
     ILaunchConfigurationService launchConfigurationService,
     IOnboardingService onboardingService,
     IApplicationLauncher applicationLauncher,
-    IOptionsMonitor<FocusViewOptions> focusViewOptions) : ViewModelBase<LaunchViewModel, LaunchView>, INotifyPropertyChanged, IDisposable
+    IOptionsMonitor<FocusViewOptions> focusViewOptions
+) : ViewModelBase<LaunchViewModel, LaunchView>, INotifyPropertyChanged, IDisposable
 {
     private static readonly TimeSpan LaunchTimeout = TimeSpan.FromSeconds(10);
 
     private readonly IViewManager viewManager = viewManager.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IDaybreakApiService daybreakApiService = daybreakApiService.ThrowIfNull();
-    private readonly ILaunchConfigurationService launchConfigurationService = launchConfigurationService.ThrowIfNull();
+    private readonly ILaunchConfigurationService launchConfigurationService =
+        launchConfigurationService.ThrowIfNull();
     private readonly IOnboardingService onboardingService = onboardingService.ThrowIfNull();
     private readonly IApplicationLauncher applicationLauncher = applicationLauncher.ThrowIfNull();
-    private readonly IOptionsMonitor<FocusViewOptions> focusViewOptions = focusViewOptions.ThrowIfNull();
+    private readonly IOptionsMonitor<FocusViewOptions> focusViewOptions =
+        focusViewOptions.ThrowIfNull();
 
     private CancellationTokenSource? cancellationTokenSource;
     private string? autoLaunchConfigurationId;
@@ -43,12 +47,12 @@ public sealed class LaunchViewModel(
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public ObservableCollection<LauncherViewContext> LaunchConfigurations { get; } = [];
-    
-    public LauncherViewContext? SelectedConfiguration 
-    { 
+
+    public LauncherViewContext? SelectedConfiguration
+    {
         get;
-        private set 
-        { 
+        private set
+        {
             if (field != value)
             {
                 field = value;
@@ -57,12 +61,12 @@ public sealed class LaunchViewModel(
             }
         }
     }
-    
-    public bool CanLaunch 
-    { 
+
+    public bool CanLaunch
+    {
         get;
-        private set 
-        { 
+        private set
+        {
             if (field != value)
             {
                 field = value;
@@ -73,19 +77,19 @@ public sealed class LaunchViewModel(
 
     public bool IsLaunching { get; private set; }
 
-    public bool IsDropdownOpen 
-    { 
-        get; 
-        set 
-        { 
+    public bool IsDropdownOpen
+    {
+        get;
+        set
+        {
             if (field != value)
             {
                 field = value;
                 this.OnPropertyChanged();
             }
-        } 
+        }
     }
-    
+
     public string LaunchButtonText => this.GetLaunchButtonText();
 
     public string LaunchButtonSubtext => this.GetLaunchButtonSubtext();
@@ -94,7 +98,12 @@ public sealed class LaunchViewModel(
     {
         if (!this.IsOnboarded())
         {
-            this.viewManager.ShowView<LauncherOnboardingView>((nameof(LauncherOnboardingView.Status), this.onboardingService.CheckOnboardingStage().ToString()));
+            this.viewManager.ShowView<LauncherOnboardingView>(
+                (
+                    nameof(LauncherOnboardingView.Status),
+                    this.onboardingService.CheckOnboardingStage().ToString()
+                )
+            );
             return base.ParametersSet(view, cancellationToken);
         }
 
@@ -128,14 +137,17 @@ public sealed class LaunchViewModel(
             }
             else
             {
-                await this.LaunchGuildWars(this.cancellationTokenSource?.Token ?? CancellationToken.None);
+                await this.LaunchGuildWars(
+                    this.cancellationTokenSource?.Token ?? CancellationToken.None
+                );
             }
         }
         catch (Exception ex)
         {
             this.notificationService.NotifyError(
-                title: "Launch Failed", 
-                description: $"Failed to launch: {ex.Message}");
+                title: "Launch Failed",
+                description: $"Failed to launch: {ex.Message}"
+            );
         }
         finally
         {
@@ -153,7 +165,7 @@ public sealed class LaunchViewModel(
             this.SelectedConfiguration = configuration;
             this.UpdateCanLaunch();
         }
-        
+
         this.IsDropdownOpen = false;
         this.RefreshView();
     }
@@ -179,9 +191,19 @@ public sealed class LaunchViewModel(
 
         this.RetrieveLaunchConfigurations();
         var ct = this.cancellationTokenSource.Token;
-        Task.Factory.StartNew(() => this.PeriodicallyCheckSelectedConfigState(ct), ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
-        if (this.autoLaunchConfigurationId is not null &&
-            this.LaunchConfigurations.FirstOrDefault(c => c.Configuration?.Identifier == this.autoLaunchConfigurationId) is LauncherViewContext context)
+        Task.Factory.StartNew(
+            () => this.PeriodicallyCheckSelectedConfigState(ct),
+            ct,
+            TaskCreationOptions.LongRunning,
+            TaskScheduler.Current
+        );
+        if (
+            this.autoLaunchConfigurationId is not null
+            && this.LaunchConfigurations.FirstOrDefault(c =>
+                c.Configuration?.Identifier == this.autoLaunchConfigurationId
+            )
+                is LauncherViewContext context
+        )
         {
             this.SelectedConfiguration = context;
             Task.Run(this.LaunchSelectedConfiguration);
@@ -216,24 +238,33 @@ public sealed class LaunchViewModel(
             throw new InvalidOperationException($"Unexpected onboarding stage {onboardingStage}");
         }
 
-        return onboardingStage is not (LauncherOnboardingStage.NeedsCredentials or LauncherOnboardingStage.NeedsExecutable or LauncherOnboardingStage.NeedsConfiguration);
+        return onboardingStage
+            is not (
+                LauncherOnboardingStage.NeedsCredentials
+                or LauncherOnboardingStage.NeedsExecutable
+                or LauncherOnboardingStage.NeedsConfiguration
+            );
     }
 
     private void RetrieveLaunchConfigurations()
     {
-        var latestLaunchConfiguration = this.launchConfigurationService.GetLastLaunchConfigurationWithCredentials();
-        var configurations = this.launchConfigurationService.GetLaunchConfigurations()
+        var latestLaunchConfiguration =
+            this.launchConfigurationService.GetLastLaunchConfigurationWithCredentials();
+        var configurations = this
+            .launchConfigurationService.GetLaunchConfigurations()
             .Select(c => new LauncherViewContext { Configuration = c, CanLaunch = false })
             .ToList();
-        
+
         this.LaunchConfigurations.Clear();
         foreach (var config in configurations)
         {
             this.LaunchConfigurations.Add(config);
         }
-        
-        this.SelectedConfiguration = this.LaunchConfigurations.FirstOrDefault(c => c.Configuration?.Equals(latestLaunchConfiguration) is true) 
-                              ?? this.LaunchConfigurations.FirstOrDefault();
+
+        this.SelectedConfiguration =
+            this.LaunchConfigurations.FirstOrDefault(c =>
+                c.Configuration?.Equals(latestLaunchConfiguration) is true
+            ) ?? this.LaunchConfigurations.FirstOrDefault();
     }
 
     private async Task PeriodicallyCheckSelectedConfigState(CancellationToken cancellationToken)
@@ -249,12 +280,8 @@ public sealed class LaunchViewModel(
 
                 await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
             }
-            catch (OperationCanceledException)
-            {
-            }
-            catch (Exception)
-            {
-            }
+            catch (OperationCanceledException) { }
+            catch (Exception) { }
         }
     }
 
@@ -291,7 +318,12 @@ public sealed class LaunchViewModel(
         }
         else
         {
-            this.CanLaunch = (this.SelectedConfiguration.CanKill || this.SelectedConfiguration.CanLaunch || this.SelectedConfiguration.CanAttach) && !this.IsLaunching;
+            this.CanLaunch =
+                (
+                    this.SelectedConfiguration.CanKill
+                    || this.SelectedConfiguration.CanLaunch
+                    || this.SelectedConfiguration.CanAttach
+                ) && !this.IsLaunching;
         }
     }
 
@@ -351,8 +383,10 @@ public sealed class LaunchViewModel(
             return;
         }
 
-        this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(this.SelectedConfiguration.Configuration);
-        
+        this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(
+            this.SelectedConfiguration.Configuration
+        );
+
         try
         {
             if (this.SelectedConfiguration.AppContext is not null)
@@ -361,7 +395,11 @@ public sealed class LaunchViewModel(
             }
             else if (this.SelectedConfiguration.ApiContext is not null)
             {
-                await this.AttachContext(this.SelectedConfiguration, this.SelectedConfiguration.ApiContext, cancellationToken);
+                await this.AttachContext(
+                    this.SelectedConfiguration,
+                    this.SelectedConfiguration.ApiContext,
+                    cancellationToken
+                );
             }
             else
             {
@@ -375,11 +413,17 @@ public sealed class LaunchViewModel(
         }
     }
 
-    private async Task CheckGameState(LauncherViewContext launcherViewContext, bool isSelected, CancellationToken cancellationToken)
+    private async Task CheckGameState(
+        LauncherViewContext launcherViewContext,
+        bool isSelected,
+        CancellationToken cancellationToken
+    )
     {
-        if (launcherViewContext.Configuration is null ||
-            launcherViewContext.Configuration.Credentials is null ||
-            !isSelected)
+        if (
+            launcherViewContext.Configuration is null
+            || launcherViewContext.Configuration.Credentials is null
+            || !isSelected
+        )
         {
             launcherViewContext.GameRunning = false;
             launcherViewContext.CanLaunch = false;
@@ -390,7 +434,7 @@ public sealed class LaunchViewModel(
             return;
         }
 
-        if (this.applicationLauncher.GetGuildwarsProcesses().Count == 0)
+        if (this.applicationLauncher.GetGuildwarsProcesses().Length == 0)
         {
             launcherViewContext.GameRunning = false;
             launcherViewContext.CanLaunch = true;
@@ -401,8 +445,11 @@ public sealed class LaunchViewModel(
             return;
         }
 
-        (var appContext, var apiContext) = await this.GetAppAndApiContext(launcherViewContext, cancellationToken);
-        
+        (var appContext, var apiContext) = await this.GetAppAndApiContext(
+            launcherViewContext,
+            cancellationToken
+        );
+
         // No app context means game is not running for this configuration - allow launch
         if (appContext is null)
         {
@@ -437,32 +484,49 @@ public sealed class LaunchViewModel(
         }
     }
 
-    private async Task<(GuildWarsApplicationLaunchContext? AppContext, ScopedApiContext? ApiContext)> GetAppAndApiContext(LauncherViewContext launcherViewContext, CancellationToken cancellationToken)
+    private async Task<(
+        GuildWarsApplicationLaunchContext? AppContext,
+        ScopedApiContext? ApiContext
+    )> GetAppAndApiContext(
+        LauncherViewContext launcherViewContext,
+        CancellationToken cancellationToken
+    )
     {
-        if (launcherViewContext.Configuration is null ||
-            launcherViewContext.Configuration.Credentials is null)
+        if (
+            launcherViewContext.Configuration is null
+            || launcherViewContext.Configuration.Credentials is null
+        )
         {
             return default;
         }
 
         // Return early if the app and api context are already initialized
-        if (launcherViewContext.AppContext is not null &&
-            !launcherViewContext.AppContext.GuildWarsProcess.HasExited &&
-            launcherViewContext.ApiContext is not null &&
-            await launcherViewContext.ApiContext.IsAvailable(cancellationToken))
+        if (
+            launcherViewContext.AppContext is not null
+            && !launcherViewContext.AppContext.GuildWarsProcess.HasExited
+            && launcherViewContext.ApiContext is not null
+            && await launcherViewContext.ApiContext.IsAvailable(cancellationToken)
+        )
         {
             return (launcherViewContext.AppContext, launcherViewContext.ApiContext);
         }
 
-        var processContext = this.applicationLauncher.GetGuildwarsProcess(launcherViewContext.Configuration);
+        var processContext = this.applicationLauncher.GetGuildwarsProcess(
+            launcherViewContext.Configuration
+        );
         if (processContext is not null)
         {
-            var maybeApiContext = await this.daybreakApiService.GetDaybreakApiContext(processContext.GuildWarsProcess, cancellationToken);
+            var maybeApiContext = await this.daybreakApiService.GetDaybreakApiContext(
+                processContext.GuildWarsProcess,
+                cancellationToken
+            );
 
             // If the API is available but it does not belong to the desired user, return null
-            if (maybeApiContext is not null &&
-                await maybeApiContext.GetLoginInfo(cancellationToken) is LoginInfo loginInfo &&
-                loginInfo.Email != launcherViewContext.Configuration.Credentials.Username)
+            if (
+                maybeApiContext is not null
+                && await maybeApiContext.GetLoginInfo(cancellationToken) is LoginInfo loginInfo
+                && loginInfo.Email != launcherViewContext.Configuration.Credentials.Username
+            )
             {
                 return (processContext, default);
             }
@@ -470,11 +534,17 @@ public sealed class LaunchViewModel(
             return (processContext, maybeApiContext);
         }
 
-        var apiContext = await this.daybreakApiService.FindDaybreakApiContextByCredentials(launcherViewContext.Configuration.Credentials, cancellationToken);
+        var apiContext = await this.daybreakApiService.FindDaybreakApiContextByCredentials(
+            launcherViewContext.Configuration.Credentials,
+            cancellationToken
+        );
         return (processContext, apiContext);
     }
 
-    private async Task AttachContext(GuildWarsApplicationLaunchContext context, CancellationToken cancellationToken)
+    private async Task AttachContext(
+        GuildWarsApplicationLaunchContext context,
+        CancellationToken cancellationToken
+    )
     {
         if (!this.focusViewOptions.CurrentValue.Enabled)
         {
@@ -482,25 +552,41 @@ public sealed class LaunchViewModel(
         }
 
         using var notificationToken = this.notificationService.NotifyInformation(
-                    title: "Attaching to Guild Wars process...",
-                    description: "Attempting to attach to Guild Wars process");
-        var apiContext = await this.daybreakApiService.AttachDaybreakApiContext(context, cancellationToken);
+            title: "Attaching to Guild Wars process...",
+            description: "Attempting to attach to Guild Wars process"
+        );
+        var apiContext = await this.daybreakApiService.AttachDaybreakApiContext(
+            context,
+            cancellationToken
+        );
 
         if (apiContext is null)
         {
             this.notificationService.NotifyError(
                 title: "Could not attach to Guild Wars",
-                description: "Could not find the Api context to attach to Guild Wars. Check the logs for more details");
+                description: "Could not find the Api context to attach to Guild Wars. Check the logs for more details"
+            );
         }
         else
         {
             this.viewManager.ShowView<FocusView>(
                 (nameof(FocusView.ProcessId), context.ProcessId.ToString()),
-                (nameof(FocusView.ConfigurationId), context.LaunchConfiguration.Identifier ?? throw new InvalidOperationException("LaunchConfig identifier cannot be null")));
+                (
+                    nameof(FocusView.ConfigurationId),
+                    context.LaunchConfiguration.Identifier
+                        ?? throw new InvalidOperationException(
+                            "LaunchConfig identifier cannot be null"
+                        )
+                )
+            );
         }
     }
 
-    private async Task AttachContext(LauncherViewContext launcherViewContext, ScopedApiContext apiContext, CancellationToken cancellationToken)
+    private async Task AttachContext(
+        LauncherViewContext launcherViewContext,
+        ScopedApiContext apiContext,
+        CancellationToken cancellationToken
+    )
     {
         if (launcherViewContext.Configuration is null)
         {
@@ -513,17 +599,21 @@ public sealed class LaunchViewModel(
         }
 
         using var notificationToken = this.notificationService.NotifyInformation(
-                    title: "Attaching to Guild Wars process...",
-                    description: "Attempting to attach to Guild Wars process");
+            title: "Attaching to Guild Wars process...",
+            description: "Attempting to attach to Guild Wars process"
+        );
 
         var processIdResponse = await apiContext.GetProcessId(cancellationToken);
-        if (processIdResponse is null ||
-            Process.GetProcessById(processIdResponse.ProcessId) is not Process guildWarsProcess)
+        if (
+            processIdResponse is null
+            || Process.GetProcessById(processIdResponse.ProcessId) is not Process guildWarsProcess
+        )
         {
             notificationToken.Cancel();
             this.notificationService.NotifyError(
                 title: "Could not attach to Guild Wars",
-                description: "Could not find the Api context to attach to Guild Wars. Check the logs for more details");
+                description: "Could not find the Api context to attach to Guild Wars. Check the logs for more details"
+            );
             return;
         }
 
@@ -531,17 +621,31 @@ public sealed class LaunchViewModel(
         {
             ProcessId = (uint)processIdResponse.ProcessId,
             GuildWarsProcess = guildWarsProcess,
-            LaunchConfiguration = launcherViewContext.Configuration
+            LaunchConfiguration = launcherViewContext.Configuration,
         };
 
-        await this.daybreakApiService.AttachDaybreakApiContext(launchContext, apiContext, cancellationToken);
-        this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(launcherViewContext.Configuration);
+        await this.daybreakApiService.AttachDaybreakApiContext(
+            launchContext,
+            apiContext,
+            cancellationToken
+        );
+        this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(
+            launcherViewContext.Configuration
+        );
         this.viewManager.ShowView<FocusView>(
-                (nameof(FocusView.ProcessId), launchContext.ProcessId.ToString()),
-                (nameof(FocusView.ConfigurationId), launchContext.LaunchConfiguration.Identifier ?? throw new InvalidOperationException("LaunchConfig identifier cannot be null")));
+            (nameof(FocusView.ProcessId), launchContext.ProcessId.ToString()),
+            (
+                nameof(FocusView.ConfigurationId),
+                launchContext.LaunchConfiguration.Identifier
+                    ?? throw new InvalidOperationException("LaunchConfig identifier cannot be null")
+            )
+        );
     }
 
-    private async Task LaunchContext(LauncherViewContext launcherViewContext, CancellationToken cancellationToken)
+    private async Task LaunchContext(
+        LauncherViewContext launcherViewContext,
+        CancellationToken cancellationToken
+    )
     {
         if (launcherViewContext.Configuration is null)
         {
@@ -549,15 +653,20 @@ public sealed class LaunchViewModel(
         }
 
         var launchNotificationToken = this.notificationService.NotifyInformation(
-                    title: "Launching Guild Wars...",
-                    description: $"Attempting to launch Guild Wars process at {launcherViewContext.Configuration.ExecutablePath}",
-                    expirationTime: DateTime.MaxValue);
-        var launchedContext = await this.applicationLauncher.LaunchGuildwars(launcherViewContext.Configuration, cancellationToken);
+            title: "Launching Guild Wars...",
+            description: $"Attempting to launch Guild Wars process at {launcherViewContext.Configuration.ExecutablePath}",
+            expirationTime: DateTime.MaxValue
+        );
+        var launchedContext = await this.applicationLauncher.LaunchGuildwars(
+            launcherViewContext.Configuration,
+            cancellationToken
+        );
         if (launchedContext is null)
         {
             this.notificationService.NotifyError(
                 title: "Could not launch Guild Wars",
-                description: $"Could not launch Guild Wars at {launcherViewContext.Configuration.ExecutablePath}. Check the logs for more details");
+                description: $"Could not launch Guild Wars at {launcherViewContext.Configuration.ExecutablePath}. Check the logs for more details"
+            );
             launchNotificationToken.Cancel();
             return;
         }
@@ -565,39 +674,60 @@ public sealed class LaunchViewModel(
         launcherViewContext.AppContext = launchedContext;
         launchNotificationToken.Cancel();
         this.daybreakApiService.RequestInstancesAnnouncement();
-        this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(launcherViewContext.Configuration);
+        this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(
+            launcherViewContext.Configuration
+        );
         if (!this.focusViewOptions.CurrentValue.Enabled)
         {
             return;
         }
 
         var attachNotificationToken = this.notificationService.NotifyInformation(
-                title: "Attaching to Guild Wars process...",
-                description: "Attempting to attach to Guild Wars process");
+            title: "Attaching to Guild Wars process...",
+            description: "Attempting to attach to Guild Wars process"
+        );
 
         //Wait 1 second to allow the launched Guild Wars process to advertise itself
         var sw = Stopwatch.StartNew();
-        var apiContext = await this.daybreakApiService.AttachDaybreakApiContext(launchedContext, cancellationToken);
-        while (sw.Elapsed < LaunchTimeout && !cancellationToken.IsCancellationRequested && apiContext is null)
+        var apiContext = await this.daybreakApiService.AttachDaybreakApiContext(
+            launchedContext,
+            cancellationToken
+        );
+        while (
+            sw.Elapsed < LaunchTimeout
+            && !cancellationToken.IsCancellationRequested
+            && apiContext is null
+        )
         {
             await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
-            apiContext = await this.daybreakApiService.AttachDaybreakApiContext(launchedContext, cancellationToken);
+            apiContext = await this.daybreakApiService.AttachDaybreakApiContext(
+                launchedContext,
+                cancellationToken
+            );
         }
-        
+
         attachNotificationToken.Cancel();
 
         if (apiContext is null)
         {
             this.notificationService.NotifyError(
                 title: "Could not attach to Guild Wars",
-                description: "Could not find the Api context to attach to Guild Wars. Check the logs for more details");
+                description: "Could not find the Api context to attach to Guild Wars. Check the logs for more details"
+            );
         }
         else
         {
             launcherViewContext.ApiContext = apiContext;
             this.viewManager.ShowView<FocusView>(
                 (nameof(FocusView.ProcessId), launchedContext.ProcessId.ToString()),
-                (nameof(FocusView.ConfigurationId), launchedContext.LaunchConfiguration.Identifier ?? throw new InvalidOperationException("LaunchConfig identifier cannot be null")));
+                (
+                    nameof(FocusView.ConfigurationId),
+                    launchedContext.LaunchConfiguration.Identifier
+                        ?? throw new InvalidOperationException(
+                            "LaunchConfig identifier cannot be null"
+                        )
+                )
+            );
         }
     }
 

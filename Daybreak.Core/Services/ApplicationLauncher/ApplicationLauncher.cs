@@ -175,9 +175,13 @@ internal sealed class ApplicationLauncher(
             var availableExecutables = this.guildWarsExecutableManager.GetExecutableList();
             var runningInstances = this.GetGuildwarsProcesses();
             var firstAvailableExecutable = availableExecutables.FirstOrDefault(e =>
-                !runningInstances.Any(p =>
-                    Path.GetFullPath(p.MainModule?.FileName ?? string.Empty) == Path.GetFullPath(e)
+                FindFirstOrDefault(
+                    runningInstances,
+                    p =>
+                        Path.GetFullPath(p.MainModule?.FileName ?? string.Empty)
+                        == Path.GetFullPath(e)
                 )
+                    is null
             );
             if (firstAvailableExecutable is null)
             {
@@ -538,7 +542,7 @@ internal sealed class ApplicationLauncher(
         return this.guildWarsProcessFinder.FindProcesses(launchConfigurationWithCredentials);
     }
 
-    public IReadOnlyList<Process> GetGuildwarsProcesses()
+    public ReadOnlyMemory<Process> GetGuildwarsProcesses()
     {
         return this.guildWarsProcessFinder.GetGuildWarsProcesses();
     }
@@ -721,5 +725,22 @@ internal sealed class ApplicationLauncher(
         }
 
         return [argName, $"\"{argValue}\""];
+    }
+
+    private static Process? FindFirstOrDefault(
+        ReadOnlyMemory<Process> processes,
+        Func<Process, bool> selector
+    )
+    {
+        var span = processes.Span;
+        for (var i = 0; i < span.Length; i++)
+        {
+            if (selector(span[i]))
+            {
+                return span[i];
+            }
+        }
+
+        return default;
     }
 }
