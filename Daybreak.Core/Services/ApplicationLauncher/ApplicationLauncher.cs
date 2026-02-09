@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
 using Daybreak.Configuration.Options;
+using Daybreak.Services.Notifications.Handlers;
 using Daybreak.Shared.Exceptions;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.LaunchConfigurations;
@@ -35,7 +36,6 @@ internal sealed class ApplicationLauncher(
 {
     private const string SteamAppIdFile = "steam_appid.txt";
     private const string SteamAppId = "29720";
-    private const double LaunchMemoryThreshold = 200000000;
 
     private static readonly TimeSpan LaunchTimeout = TimeSpan.FromMinutes(1);
 
@@ -228,12 +228,32 @@ internal sealed class ApplicationLauncher(
             args.Add(arg);
         }
 
-        var mods = this.modsManager.GetMods().Where(m => m.IsEnabled && m.IsInstalled).ToList();
-        var disabledmods = this
+        var enabledMods = this
+            .modsManager.GetMods()
+            .Where(m => m.IsEnabled && m.IsInstalled)
+            .ToList();
+        var disabledMods = this
             .modsManager.GetMods()
             .Where(m => !m.IsEnabled && m.IsInstalled)
             .ToList();
-        foreach (var mod in mods)
+
+        if (this.launcherOptions.CurrentValue.CancelLaunchOutOfDateMods)
+        {
+            foreach (var mod in enabledMods)
+            {
+                if (await mod.IsUpdateAvailable(cancellationToken))
+                {
+                    this.notificationService.NotifyError<NavigateToModsViewHandler>(
+                        title: "Can not launch Guild Wars",
+                        description: "Mods are out of date. Please update your mods to launch Guild Wars"
+                    );
+
+                    throw new InvalidOperationException("Mods are out of date");
+                }
+            }
+        }
+
+        foreach (var mod in enabledMods)
         {
             args.AddRange(mod.GetCustomArguments());
         }
@@ -277,7 +297,7 @@ internal sealed class ApplicationLauncher(
         {
             ApplicationLauncherContext = applicationLauncherContext,
         };
-        foreach (var mod in disabledmods)
+        foreach (var mod in disabledMods)
         {
             using var cts = new CancellationTokenSource(
                 TimeSpan.FromSeconds(this.launcherOptions.CurrentValue.ModStartupTimeout)
@@ -310,7 +330,7 @@ internal sealed class ApplicationLauncher(
             ApplicationLauncherContext = applicationLauncherContext,
             CancelStartup = false,
         };
-        foreach (var mod in mods)
+        foreach (var mod in enabledMods)
         {
             using var cts = new CancellationTokenSource(
                 TimeSpan.FromSeconds(this.launcherOptions.CurrentValue.ModStartupTimeout)
@@ -395,7 +415,7 @@ internal sealed class ApplicationLauncher(
             ApplicationLauncherContext = applicationLauncherContext,
             CancelStartup = false,
         };
-        foreach (var mod in mods)
+        foreach (var mod in enabledMods)
         {
             using var cts = new CancellationTokenSource(
                 TimeSpan.FromSeconds(this.launcherOptions.CurrentValue.ModStartupTimeout)
@@ -485,7 +505,7 @@ internal sealed class ApplicationLauncher(
         {
             ApplicationLauncherContext = applicationLauncherContext,
         };
-        foreach (var mod in mods)
+        foreach (var mod in enabledMods)
         {
             using var cts = new CancellationTokenSource(
                 TimeSpan.FromSeconds(this.launcherOptions.CurrentValue.ModStartupTimeout)
