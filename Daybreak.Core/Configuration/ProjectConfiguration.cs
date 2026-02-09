@@ -74,9 +74,7 @@ using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Onboarding;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Plugins;
-using Daybreak.Shared.Services.ReShade;
 using Daybreak.Shared.Services.Screenshots;
-
 using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.Toolbox;
 using Daybreak.Shared.Services.TradeChat;
@@ -319,6 +317,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         notificationHandlerProducer.RegisterNotificationHandler<NavigateToCalendarViewHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<GuildWarsBatchUpdateNotificationHandler>();
         notificationHandlerProducer.RegisterNotificationHandler<ToolboxUpdateHandler>();
+        notificationHandlerProducer.RegisterNotificationHandler<NavigateToModsViewHandler>();
     }
 
     public override void RegisterMods(IModsProducer modsManager)
