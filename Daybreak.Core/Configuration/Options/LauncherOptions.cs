@@ -41,6 +41,13 @@ public sealed class LauncherOptions
     [OptionRange<double>(MinValue = 30, MaxValue = 300)]
     public double ModStartupTimeout { get; set; } = 30;
 
+    [JsonPropertyName(nameof(CancelLaunchOutOfDateMods))]
+    [OptionName(
+        Name = "Cancel launch on mod updates",
+        Description = "If true, the launcher will stop launching Guild Wars when it detects that an active mod has an update available"
+    )]
+    public bool CancelLaunchOutOfDateMods { get; set; }
+
     [JsonPropertyName(nameof(SaveWindowPosition))]
     [OptionName(
         Name = "Save Window Position",
