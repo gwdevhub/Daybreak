@@ -1,6 +1,5 @@
 using Daybreak.Configuration;
 using Daybreak.Extensions;
-using Daybreak.Services.Graph;
 using Daybreak.Services.MDns;
 using Daybreak.Shared.Models.Plugins;
 using Daybreak.Shared.Services.Credentials;
@@ -22,7 +21,6 @@ using Daybreak.Shared.Services.ExceptionHandling;
 using Daybreak.Shared.Services.Window;
 using Daybreak.Windows.Services.ApplicationLauncher;
 using Daybreak.Windows.Services.Credentials;
-using Daybreak.Windows.Services.Graph;
 using Daybreak.Windows.Services.Injection;
 using Daybreak.Windows.Services.Keyboard;
 using Daybreak.Windows.Services.Monitoring;
@@ -35,9 +33,6 @@ using Daybreak.Windows.Services.Window;
 using Daybreak.Windows.Services.ExceptionHandling;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Identity.Client;
-using Microsoft.Identity.Client.Desktop;
-using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 using Daybreak.Windows.Services.DirectSong;
 using Daybreak.Windows.Services.Registry;
 using Daybreak.Windows.Services.Themes;
@@ -55,7 +50,8 @@ namespace Daybreak.Windows.Configuration;
 
 /// <summary>
 /// Windows-specific platform configuration.
-/// Registers Windows-only services like Graph client, shortcuts, and monitoring.
+/// Registers Windows-only services like shortcuts, screen management, and monitoring.
+/// Graph/MSAL authentication is now handled cross-platform in ProjectConfiguration.
 /// </summary>
 public sealed class WindowsPlatformConfiguration : PluginConfigurationBase
 {
@@ -66,45 +62,6 @@ public sealed class WindowsPlatformConfiguration : PluginConfigurationBase
     private static Icon? WindowIcon;
     public override void RegisterServices(IServiceCollection services)
     {
-        // Register IPublicClientApplication for MSAL
-        services.AddSingleton<IPublicClientApplication>(sp =>
-        {
-            var logger = sp.GetRequiredService<ILogger<PublicClientApplication>>();
-            try
-            {
-                return PublicClientApplicationBuilder.Create(SecretManager.GetSecret(SecretKeys.AadApplicationId))
-                    .WithLogging((logLevel, message, containsPii) =>
-                    {
-                        if (containsPii && logLevel > Microsoft.Identity.Client.LogLevel.Info)
-                        {
-                            message = "[REDACTED]";
-                        }
-
-                        var equivalentLogLevel = logLevel switch
-                        {
-                            Microsoft.Identity.Client.LogLevel.Error => LogLevel.Error,
-                            Microsoft.Identity.Client.LogLevel.Warning => LogLevel.Warning,
-                            Microsoft.Identity.Client.LogLevel.Info => LogLevel.Information,
-                            Microsoft.Identity.Client.LogLevel.Verbose => LogLevel.Debug,
-                            _ => LogLevel.None
-                        };
-
-                        logger.Log(equivalentLogLevel, message);
-                    }, enablePiiLogging: true, enableDefaultPlatformLogging: true)
-                    .WithCacheOptions(new CacheOptions { UseSharedCache = true })
-                    .WithRedirectUri(BlazorGraphClient.RedirectUri)
-                    .WithWindowsEmbeddedBrowserSupport()
-                    .WithHttpClientFactory(new DaybreakMsalHttpClientProvider(new HttpClient()))
-                    .Build();
-            }
-            catch (Exception e)
-            {
-                logger.LogError(e, "Failed to create PublicClientApplication, using dummy implementation");
-                return new DummyPublicClientApplication();
-            }
-        });
-
-        services.AddScoped<IGraphClient, BlazorGraphClient>();
         services.AddHostedSingleton<IScreenManager, ScreenManager>();
         services.AddHostedSingleton<IShortcutManager, ShortcutManager>();
         services.AddHostedService<MemoryUsageMonitor>();
