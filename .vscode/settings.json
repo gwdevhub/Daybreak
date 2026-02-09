@@ -1,5 +1,26 @@
 {
-    "dotnet.defaultSolution": "Daybreak.slnx",
-    "omnisharp.projectLoadTimeout": 120,
-    "csharp.semanticHighlighting.enabled": true
+  "dotnet.defaultSolution": "Daybreak.slnx",
+  "omnisharp.projectLoadTimeout": 120,
+  "csharp.semanticHighlighting.enabled": true,
+  "search.followSymlinks": false,
+  "search.exclude": {
+    "**/.git": true,
+    "**/.vs": true,
+    "**/bin": true,
+    "**/obj": true,
+    "**/node_modules": true,
+    "**/.idea": true
+  },
+  "files.watcherExclude": {
+    "**/.git/**": true,
+    "**/.vs/**": true,
+    "**/bin/**": true,
+    "**/obj/**": true,
+    "**/node_modules/**": true
+  },
+  "files.exclude": {
+    "**/.vs": true,
+    "**/bin": true,
+    "**/obj": true
+  }
 }
