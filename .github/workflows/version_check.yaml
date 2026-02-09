@@ -39,7 +39,7 @@ jobs:
 
       - name: Get Latest Tag
         id: getLatestTag
-        uses: WyriHaximus/github-action-get-previous-tag@v1
+        uses: WyriHaximus/github-action-get-previous-tag@v2
 
       - name: Build Daybreak project
         run: dotnet build Daybreak.Linux -c $Configuration --property:SolutionDir=$GITHUB_WORKSPACE
