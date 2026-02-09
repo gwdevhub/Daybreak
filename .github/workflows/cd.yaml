@@ -50,7 +50,7 @@ jobs:
       shell: pwsh
 
     - name: Upload x86 artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: x86-components
         path: |
@@ -100,7 +100,7 @@ jobs:
       shell: pwsh
 
     - name: Upload Windows build
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: windows-build
         path: Publish/
@@ -148,7 +148,7 @@ jobs:
         chmod +x Publish/Daybreak.Wayland.sh
 
     - name: Upload Linux build
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: linux-build
         path: Publish/
