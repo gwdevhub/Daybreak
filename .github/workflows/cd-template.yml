@@ -1,0 +1,273 @@
+# Reusable CD pipeline with optional release publishing
+name: Daybreak CD Template
+
+on:
+  workflow_call:
+    inputs:
+      publishRelease:
+        description: "Whether to create and publish the GitHub release"
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  # ───────────────────────────────────────────────────────
+  #  Stage 1 — Build the x86 Windows-only components
+  #            (Injector + API) that both platforms need.
+  # ───────────────────────────────────────────────────────
+  build-x86:
+    runs-on: windows-latest
+
+    env:
+      Configuration: Release
+      Actions_Allow_Unsecure_Commands: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "10.x"
+
+      - name: Publish x86 components
+        run: .\Scripts\PublishWindowsX86.ps1
+        shell: pwsh
+
+      - name: Upload x86 artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: x86-components
+          path: |
+            Publish/Injector/
+            Publish/Api/
+          retention-days: 1
+
+  # ───────────────────────────────────────────────────────
+  #  Stage 2 — Platform builds (parallel)
+  # ───────────────────────────────────────────────────────
+  build-windows:
+    needs: build-x86
+    runs-on: windows-latest
+
+    env:
+      Configuration: Release
+      Actions_Allow_Unsecure_Commands: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "10.x"
+
+      - name: Setup project secrets
+        run: |
+          dotnet user-secrets --project Daybreak.Core\Daybreak.Core.csproj set AadApplicationId "${{ secrets.AadApplicationId }}"
+          dotnet user-secrets --project Daybreak.Core\Daybreak.Core.csproj set AadTenantId "${{ secrets.AadTenantId }}"
+          dotnet user-secrets --project Daybreak.Core\Daybreak.Core.csproj set ApmServiceAccount "${{ secrets.ApmServiceAccount }}"
+          dotnet user-secrets --project Daybreak.Core\Daybreak.Core.csproj set ApmServiceKey "${{ secrets.ApmServiceKey }}"
+          dotnet user-secrets --project Daybreak.Core\Daybreak.Core.csproj set ApmUri "${{ secrets.ApmUri }}"
+
+      - name: Download x86 artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: x86-components
+          path: Publish/
+
+      - name: Publish Windows x64
+        run: .\Scripts\PublishWindows.ps1
+        shell: pwsh
+
+      - name: Upload Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: Publish/
+          retention-days: 1
+
+  build-linux:
+    needs: build-x86
+    runs-on: ubuntu-latest
+
+    env:
+      Configuration: Release
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "10.x"
+
+      - name: Setup project secrets
+        run: |
+          dotnet user-secrets --project Daybreak.Core/Daybreak.Core.csproj set AadApplicationId "${{ secrets.AadApplicationId }}"
+          dotnet user-secrets --project Daybreak.Core/Daybreak.Core.csproj set AadTenantId "${{ secrets.AadTenantId }}"
+          dotnet user-secrets --project Daybreak.Core/Daybreak.Core.csproj set ApmServiceAccount "${{ secrets.ApmServiceAccount }}"
+          dotnet user-secrets --project Daybreak.Core/Daybreak.Core.csproj set ApmServiceKey "${{ secrets.ApmServiceKey }}"
+          dotnet user-secrets --project Daybreak.Core/Daybreak.Core.csproj set ApmUri "${{ secrets.ApmUri }}"
+
+      - name: Download x86 artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: x86-components
+          path: Publish/
+
+      - name: Publish Linux x64
+        run: pwsh ./Scripts/PublishLinux.ps1
+        shell: bash
+
+      - name: Set executable permissions
+        run: |
+          chmod +x Publish/Daybreak
+          chmod +x Publish/Daybreak.Wayland.sh
+
+      - name: Upload Linux build
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-build
+          path: Publish/
+          retention-days: 1
+
+  # ───────────────────────────────────────────────────────
+  #  Stage 3 — Package (always)
+  # ───────────────────────────────────────────────────────
+  package:
+    needs: [build-windows, build-linux]
+    runs-on: ubuntu-latest
+
+    env:
+      Actions_Allow_Unsecure_Commands: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Get Latest Tag
+        id: getLatestTag
+        uses: WyriHaximus/github-action-get-previous-tag@v1
+
+      - name: Generate changelog
+        id: gen_changelog
+        run: |
+          changeLog=$(git log --no-merges --pretty="%h - %s (%an)<br />" ${{ steps.getLatestTag.outputs.tag }}..HEAD)
+          echo "Changelog<<EOF" >> $GITHUB_ENV
+          echo "$changeLog" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Set version variable
+        run: |
+          version=$(grep '<Version>' Directory.Build.props | sed 's/.*<Version>\(.*\)<\/Version>.*/\1/')
+          echo "Version=$version" >> $GITHUB_ENV
+
+      # ── Windows package ──
+      - name: Download Windows build
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-build
+          path: windows-publish/
+
+      - name: Clean and zip Windows build
+        run: |
+          cd windows-publish
+          find . -name '*.pdb' -delete
+          if [ -f Installer/Daybreak.Installer.exe ]; then
+            mv Installer/Daybreak.Installer.exe Installer/Daybreak.Installer.Temp.exe
+          fi
+          cd ..
+          cd windows-publish && zip -r ../daybreakv${{ env.Version }}.zip . && cd ..
+
+      # ── Linux package ──
+      - name: Download Linux build
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-build
+          path: linux-publish/
+
+      - name: Clean and zip Linux build
+        run: |
+          cd linux-publish
+          find . -name '*.pdb' -delete
+          if [ -f Installer/Daybreak.Installer ]; then
+            mv Installer/Daybreak.Installer Installer/Daybreak.Installer.Temp
+          fi
+          chmod +x Daybreak Daybreak.Wayland.sh
+          cd ..
+          cd linux-publish && zip -r ../daybreakv${{ env.Version }}-linux.zip . && cd ..
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-zips
+          path: |
+            daybreakv${{ env.Version }}.zip
+            daybreakv${{ env.Version }}-linux.zip
+          retention-days: 7
+
+  # ───────────────────────────────────────────────────────
+  #  Stage 4 — Release (optional)
+  # ───────────────────────────────────────────────────────
+  release:
+    needs: package
+    runs-on: ubuntu-latest
+    if: ${{ inputs.publishRelease }}
+
+    env:
+      Actions_Allow_Unsecure_Commands: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Download release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-zips
+          path: release-assets/
+
+      - name: Set version variable
+        run: |
+          version=$(grep '<Version>' Directory.Build.props | sed 's/.*<Version>\(.*\)<\/Version>.*/\1/')
+          echo "Version=$version" >> $GITHUB_ENV
+
+      # ── Release ──
+      - name: Create release draft
+        uses: Xotl/cool-github-releases@v1.1.10
+        with:
+          mode: update
+          tag_name: v${{ env.Version }}
+          release_name: Daybreak v${{ env.Version }}
+          assets: release-assets/daybreakv${{ env.Version }}.zip;release-assets/daybreakv${{ env.Version }}-linux.zip
+          github_token: ${{ env.GITHUB_TOKEN }}
+          replace_assets: true
+          body_mrkdwn: |
+            ${{ env.Changelog }}
+          isDraft: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish release
+        run: gh release edit v${{ env.Version }} --draft=false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

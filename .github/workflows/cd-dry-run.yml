@@ -1,8 +1,6 @@
-# This continuous delivery pipeline is triggered on pushes to master.
-# It builds the Windows x86 components (Injector + API), then builds
-# the Windows x64 and Linux x64 platform bundles in parallel, and
-# finally packages both into release zips and publishes a GitHub release.
-name: Daybreak CD Pipeline
+# This action simulates a CD pipeline without the package publishing
+# to ensure that changes don't break the real run
+name: Daybreak Dry-Run CD Pipeline
 
 on:
   push:
@@ -21,5 +19,5 @@ jobs:
   cd:
     uses: ./.github/workflows/cd-template.yml
     with:
-      publishRelease: true
+      publishRelease: false
     secrets: inherit
