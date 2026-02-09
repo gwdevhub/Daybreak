@@ -1,67 +1,72 @@
 using Microsoft.Identity.Client;
 using System.Security;
 
-namespace Daybreak.Windows.Services.Graph;
+namespace Daybreak.Services.Graph;
 
+/// <summary>
+/// A dummy implementation of IPublicClientApplication used as a fallback
+/// when MSAL initialization fails. Returns empty/null results instead of throwing
+/// so the application can gracefully handle unavailable authentication.
+/// </summary>
 internal sealed class DummyPublicClientApplication : IPublicClientApplication
 {
-    public bool IsSystemWebViewAvailable { get; }
+    public bool IsSystemWebViewAvailable => false;
     public IAppConfig AppConfig { get; } = default!;
     public ITokenCache UserTokenCache { get; } = default!;
     public string Authority { get; } = string.Empty;
 
     public AcquireTokenByIntegratedWindowsAuthParameterBuilder AcquireTokenByIntegratedWindowsAuth(IEnumerable<string> scopes)
     {
-        throw new NotImplementedException();
+        throw new InvalidOperationException("MSAL is not available. Authentication cannot be performed.");
     }
 
     public AcquireTokenByUsernamePasswordParameterBuilder AcquireTokenByUsernamePassword(IEnumerable<string> scopes, string username, SecureString password)
     {
-        throw new NotImplementedException();
+        throw new InvalidOperationException("MSAL is not available. Authentication cannot be performed.");
     }
 
     public AcquireTokenByUsernamePasswordParameterBuilder AcquireTokenByUsernamePassword(IEnumerable<string> scopes, string username, string password)
     {
-        throw new NotImplementedException();
+        throw new InvalidOperationException("MSAL is not available. Authentication cannot be performed.");
     }
 
     public AcquireTokenInteractiveParameterBuilder AcquireTokenInteractive(IEnumerable<string> scopes)
     {
-        throw new NotImplementedException();
+        throw new InvalidOperationException("MSAL is not available. Authentication cannot be performed.");
     }
 
     public AcquireTokenSilentParameterBuilder AcquireTokenSilent(IEnumerable<string> scopes, IAccount account)
     {
-        throw new NotImplementedException();
+        throw new InvalidOperationException("MSAL is not available. Authentication cannot be performed.");
     }
 
     public AcquireTokenSilentParameterBuilder AcquireTokenSilent(IEnumerable<string> scopes, string loginHint)
     {
-        throw new NotImplementedException();
+        throw new InvalidOperationException("MSAL is not available. Authentication cannot be performed.");
     }
 
     public AcquireTokenWithDeviceCodeParameterBuilder AcquireTokenWithDeviceCode(IEnumerable<string> scopes, Func<DeviceCodeResult, Task> deviceCodeResultCallback)
     {
-        throw new NotImplementedException();
+        throw new InvalidOperationException("MSAL is not available. Authentication cannot be performed.");
     }
 
-    public Task<IAccount> GetAccountAsync(string identifier)
+    public Task<IAccount?> GetAccountAsync(string identifier)
     {
-        throw new NotImplementedException();
+        return Task.FromResult<IAccount?>(null);
     }
 
     public Task<IEnumerable<IAccount>> GetAccountsAsync()
     {
-        throw new NotImplementedException();
+        return Task.FromResult<IEnumerable<IAccount>>([]);
     }
 
     public Task<IEnumerable<IAccount>> GetAccountsAsync(string userFlow)
     {
-        throw new NotImplementedException();
+        return Task.FromResult<IEnumerable<IAccount>>([]);
     }
 
     public Task RemoveAsync(IAccount account)
     {
-        throw new NotImplementedException();
+        return Task.CompletedTask;
     }
 }

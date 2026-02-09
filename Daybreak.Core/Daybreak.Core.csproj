@@ -45,6 +45,7 @@
     <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" />
     <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" />
     <PackageReference Include="Microsoft.AspNetCore.Components" />
+    <PackageReference Include="Microsoft.Identity.Client" />
     <PackageReference Include="OpenTelemetry.Exporter.Console" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" />
@@ -67,9 +68,8 @@
 
   <!-- Windows-only packages -->
   <ItemGroup Condition="$(TargetFramework.Contains('windows'))">
-    <PackageReference Include="Microsoft.Identity.Client.Desktop" />
-    <PackageReference Include="Microsoft.Identity.Client.Extensions.Msal" />
     <PackageReference Include="securifybv.ShellLink" />
+    <PackageReference Include="System.Drawing.Common" />
     <!-- Exclude WPF assets from WebView2 to avoid WindowsBase version conflict (MSB3277) -->
     <PackageReference Include="Microsoft.Web.WebView2" ExcludeAssets="buildTransitive" PrivateAssets="all">
       <IncludeAssets>runtime; compile; native; contentfiles; analyzers</IncludeAssets>

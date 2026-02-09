@@ -81,6 +81,7 @@ using Daybreak.Shared.Services.TradeChat;
 using Daybreak.Shared.Services.UMod;
 using Daybreak.Shared.Services.Updater;
 using Daybreak.Shared.Services.Wiki;
+using Daybreak.Services.Graph;
 using Daybreak.Themes;
 using Daybreak.Views;
 using Daybreak.Views.Copy;
@@ -89,12 +90,15 @@ using Daybreak.Views.Mods;
 using Daybreak.Views.Trade;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
 using Microsoft.FluentUI.AspNetCore.Components;
+using Microsoft.Identity.Client;
 using OpenTelemetry.Resources;
 using TrailBlazr.Extensions;
 using TrailBlazr.Services;
 using IMenuService = Daybreak.Shared.Services.Menu.IMenuService;
 using MenuService = Daybreak.Services.Menu.MenuService;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace Daybreak.Configuration;
 
@@ -163,6 +167,53 @@ public class ProjectConfiguration : PluginConfigurationBase
             sp.GetRequiredService<OptionsManager>()
         );
         services.AddSingleton<IOptionsSynchronizationService, OptionsSynchronizationService>();
+
+        // Register MSAL IPublicClientApplication for cross-platform OAuth
+        services.AddSingleton<IPublicClientApplication>(sp =>
+        {
+            var logger = sp.GetRequiredService<ILogger<PublicClientApplication>>();
+            try
+            {
+                var clientId = SecretManager.GetSecret(SecretKeys.AadApplicationId);
+                if (string.IsNullOrWhiteSpace(clientId))
+                {
+                    logger.LogWarning("AAD Application ID not configured. OneDrive sync will not be available.");
+                    return new DummyPublicClientApplication();
+                }
+
+                var builder = PublicClientApplicationBuilder.Create(clientId)
+                    .WithLogging((logLevel, message, containsPii) =>
+                    {
+                        if (containsPii && logLevel > Microsoft.Identity.Client.LogLevel.Info)
+                        {
+                            message = "[REDACTED]";
+                        }
+
+                        var equivalentLogLevel = logLevel switch
+                        {
+                            Microsoft.Identity.Client.LogLevel.Error => LogLevel.Error,
+                            Microsoft.Identity.Client.LogLevel.Warning => LogLevel.Warning,
+                            Microsoft.Identity.Client.LogLevel.Info => LogLevel.Information,
+                            Microsoft.Identity.Client.LogLevel.Verbose => LogLevel.Debug,
+                            _ => LogLevel.None
+                        };
+
+                        logger.Log(equivalentLogLevel, message);
+                    }, enablePiiLogging: true, enableDefaultPlatformLogging: true)
+                    .WithCacheOptions(new CacheOptions { UseSharedCache = true })
+                    .WithRedirectUri(GraphClient.RedirectUri)
+                    .WithHttpClientFactory(new DaybreakMsalHttpClientProvider(sp.GetRequiredService<ILogger<GraphClient>>()));
+
+                return builder.Build();
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Failed to create PublicClientApplication, using dummy implementation");
+                return new DummyPublicClientApplication();
+            }
+        });
+
+        services.AddScoped<IGraphClient, GraphClient>();
 
         services.AddScoped<ICredentialManager, CredentialManager>();
         services.AddScoped<IApplicationLauncher, ApplicationLauncher>();
@@ -513,6 +564,10 @@ public class ProjectConfiguration : PluginConfigurationBase
             .Build()
             .RegisterHttpClient<ReShadeService>()
             .WithMessageHandler(SetupLoggingAndMetrics<ReShadeService>)
+            .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
+            .Build()
+            .RegisterHttpClient<GraphClient>()
+            .WithMessageHandler(SetupLoggingAndMetrics<GraphClient>)
             .WithDefaultRequestHeadersSetup(SetupDaybreakUserAgent)
             .Build();
     }
