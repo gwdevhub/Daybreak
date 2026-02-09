@@ -90,7 +90,7 @@ jobs:
         dotnet user-secrets --project Daybreak.Core\Daybreak.Core.csproj set ApmUri "${{ secrets.ApmUri }}"
 
     - name: Download x86 artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: x86-components
         path: Publish/
@@ -133,7 +133,7 @@ jobs:
         dotnet user-secrets --project Daybreak.Core/Daybreak.Core.csproj set ApmServiceKey "${{ secrets.ApmServiceKey }}"
         dotnet user-secrets --project Daybreak.Core/Daybreak.Core.csproj set ApmUri "${{ secrets.ApmUri }}"
     - name: Download x86 artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: x86-components
         path: Publish/
@@ -190,7 +190,7 @@ jobs:
 
     # ── Windows package ──
     - name: Download Windows build
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: windows-build
         path: windows-publish/
@@ -207,7 +207,7 @@ jobs:
 
     # ── Linux package ──
     - name: Download Linux build
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: linux-build
         path: linux-publish/
