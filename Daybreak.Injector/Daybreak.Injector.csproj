@@ -10,6 +10,12 @@
     <RuntimeIdentifier>win-x86</RuntimeIdentifier>
     <PublishAot>true</PublishAot>
     <StripSymbols>true</StripSymbols>
+    <InvariantGlobalization>enable</InvariantGlobalization>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
 
   <ItemGroup>
