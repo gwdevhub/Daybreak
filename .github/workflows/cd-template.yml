@@ -39,7 +39,7 @@ jobs:
         shell: pwsh
 
       - name: Upload x86 artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: x86-components
           path: |
@@ -79,7 +79,7 @@ jobs:
           dotnet user-secrets --project Daybreak.Core\Daybreak.Core.csproj set ApmUri "${{ secrets.ApmUri }}"
 
       - name: Download x86 artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: x86-components
           path: Publish/
@@ -89,7 +89,7 @@ jobs:
         shell: pwsh
 
       - name: Upload Windows build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: windows-build
           path: Publish/
@@ -123,7 +123,7 @@ jobs:
           dotnet user-secrets --project Daybreak.Core/Daybreak.Core.csproj set ApmUri "${{ secrets.ApmUri }}"
 
       - name: Download x86 artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: x86-components
           path: Publish/
@@ -138,7 +138,7 @@ jobs:
           chmod +x Publish/Daybreak.Wayland.sh
 
       - name: Upload Linux build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: linux-build
           path: Publish/
@@ -163,7 +163,7 @@ jobs:
 
       - name: Get Latest Tag
         id: getLatestTag
-        uses: WyriHaximus/github-action-get-previous-tag@v1
+        uses: WyriHaximus/github-action-get-previous-tag@v2
 
       - name: Generate changelog
         id: gen_changelog
@@ -180,7 +180,7 @@ jobs:
 
       # ── Windows package ──
       - name: Download Windows build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: windows-build
           path: windows-publish/
@@ -197,7 +197,7 @@ jobs:
 
       # ── Linux package ──
       - name: Download Linux build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: linux-build
           path: linux-publish/
@@ -214,7 +214,7 @@ jobs:
           cd linux-publish && zip -r ../daybreakv${{ env.Version }}-linux.zip . && cd ..
 
       - name: Upload release artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: release-zips
           path: |
@@ -241,7 +241,7 @@ jobs:
           submodules: recursive
 
       - name: Download release artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: release-zips
           path: release-assets/
@@ -251,7 +251,7 @@ jobs:
           version=$(grep '<Version>' Directory.Build.props | sed 's/.*<Version>\(.*\)<\/Version>.*/\1/')
           echo "Version=$version" >> $GITHUB_ENV
 
-      # ── Release ──
+        # ── Release ──
       - name: Create release draft
         uses: Xotl/cool-github-releases@v1.1.10
         with:
