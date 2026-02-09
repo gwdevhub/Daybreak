@@ -1,8 +1,8 @@
+using System.Extensions.Core;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Utils;
 using Microsoft.Extensions.Logging;
-using System.Extensions.Core;
 
 namespace Daybreak.Services.Startup.Actions;
 
@@ -12,7 +12,8 @@ namespace Daybreak.Services.Startup.Actions;
 /// </summary>
 public sealed class VerifyNativeComponentsAction(
     INotificationService notificationService,
-    ILogger<VerifyNativeComponentsAction> logger) : StartupActionBase
+    ILogger<VerifyNativeComponentsAction> logger
+) : StartupActionBase
 {
     private const string InjectorFolder = "Injector";
     private const string ApiFolder = "Api";
@@ -26,8 +27,8 @@ public sealed class VerifyNativeComponentsAction(
         ? ["Daybreak.Installer.exe"]
         : ["Daybreak.Installer"];
     private static readonly string[] InstallerFallbackFiles = OperatingSystem.IsWindows()
-        ? ["Daybreak.Installer.dll"]
-        : ["Daybreak.Installer"];
+        ? ["Daybreak.Installer.Temp.exe"]
+        : ["Daybreak.Installer.Temp"];
 
     private readonly INotificationService notificationService = notificationService;
     private readonly ILogger<VerifyNativeComponentsAction> logger = logger;
@@ -47,7 +48,11 @@ public sealed class VerifyNativeComponentsAction(
             scopedLogger.LogWarning("Missing API files");
         }
 
-        var installerMissing = this.CheckComponentFilesWithFallback(InstallerFolder, InstallerFiles, InstallerFallbackFiles);
+        var installerMissing = this.CheckComponentFilesWithFallback(
+            InstallerFolder,
+            InstallerFiles,
+            InstallerFallbackFiles
+        );
         if (!installerMissing)
         {
             scopedLogger.LogWarning("Missing Installer files");
@@ -59,7 +64,8 @@ public sealed class VerifyNativeComponentsAction(
             this.notificationService.NotifyError(
                 title: "Missing native components",
                 description: "Daybreak detected missing native components and some features may not work.",
-                expirationTime: DateTime.UtcNow + TimeSpan.FromSeconds(15));
+                expirationTime: DateTime.UtcNow + TimeSpan.FromSeconds(15)
+            );
         }
         else
         {
@@ -89,7 +95,11 @@ public sealed class VerifyNativeComponentsAction(
         return true;
     }
 
-    private bool CheckComponentFilesWithFallback(string folder, string[] primaryFiles, string[] fallbackFiles)
+    private bool CheckComponentFilesWithFallback(
+        string folder,
+        string[] primaryFiles,
+        string[] fallbackFiles
+    )
     {
         var folderPath = PathUtils.GetAbsolutePathFromRoot(folder);
 
