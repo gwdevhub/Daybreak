@@ -24,8 +24,6 @@
   <ItemGroup>
     <PackageReference Include="Photino.Blazor" />
     <!-- Windows-specific packages -->
-    <PackageReference Include="Microsoft.Identity.Client.Desktop" />
-    <PackageReference Include="Microsoft.Identity.Client.Extensions.Msal" />
     <PackageReference Include="securifybv.ShellLink" />
     <PackageReference Include="System.Diagnostics.PerformanceCounter" />
     <PackageReference Include="SevenZipExtractor" />

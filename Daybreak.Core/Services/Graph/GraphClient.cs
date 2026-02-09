@@ -1,5 +1,9 @@
+using System.Core.Extensions;
+using System.Extensions;
+using System.Extensions.Core;
+using System.Net.Http.Headers;
+using System.Text.Json;
 using Daybreak.Configuration.Options;
-using Daybreak.Services.Graph;
 using Daybreak.Services.Graph.Models;
 using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Services.BuildTemplates;
@@ -8,48 +12,51 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Identity.Client;
-using System.Core.Extensions;
-using System.Extensions;
-using System.Extensions.Core;
-using System.Net.Http.Headers;
-using System.Text.Json;
 
-namespace Daybreak.Windows.Services.Graph;
+namespace Daybreak.Services.Graph;
 
-internal sealed class BlazorGraphClient : IGraphClient
+/// <summary>
+/// Cross-platform Microsoft Graph client for OneDrive synchronization.
+/// Uses system browser for OAuth flow to work on Windows, Linux, and macOS.
+/// </summary>
+internal sealed class GraphClient : IGraphClient
 {
     private const string GraphBaseUrl = "https://graph.microsoft.com/v1.0/";
     private const string ProfileEndpoint = "me";
-    private const string BuildsSyncFileUri = $"me/drive/root:/Daybreak/Builds/daybreak.json:/content";
-    private const string SettingsSyncFileUri = $"me/drive/root:/Daybreak/Settings/daybreak.json:/content";
+    private const string BuildsSyncFileUri =
+        $"me/drive/root:/Daybreak/Builds/daybreak.json:/content";
+    private const string SettingsSyncFileUri =
+        $"me/drive/root:/Daybreak/Settings/daybreak.json:/content";
 
     public const string RedirectUri = "http://localhost:42111";
 
-    public static readonly string[] GraphScopes = [
-        "Files.Read", 
-        "Files.Read.All", 
-        "Files.ReadWrite", 
-        "Files.ReadWrite.All", 
-        "User.Read", 
-        "offline_access"
+    public static readonly string[] GraphScopes =
+    [
+        "Files.Read",
+        "Files.Read.All",
+        "Files.ReadWrite",
+        "Files.ReadWrite.All",
+        "User.Read",
+        "offline_access",
     ];
 
     private readonly IOptionsProvider optionsProvider;
     private readonly IPublicClientApplication publicClientApplication;
     private readonly IBuildTemplateManager buildTemplateManager;
     private readonly IOptionsMonitor<SynchronizationOptions> liveUpdateableOptions;
-    private readonly IHttpClient<BlazorGraphClient> httpClient;
-    private readonly ILogger<BlazorGraphClient> logger;
+    private readonly IHttpClient<GraphClient> httpClient;
+    private readonly ILogger<GraphClient> logger;
 
     private List<BuildFile>? buildsCache;
 
-    public BlazorGraphClient(
+    public GraphClient(
         IOptionsProvider optionsProvider,
         IPublicClientApplication publicClientApplication,
         IBuildTemplateManager buildTemplateManager,
         IOptionsMonitor<SynchronizationOptions> liveUpdateableOptions,
-        IHttpClient<BlazorGraphClient> httpClient,
-        ILogger<BlazorGraphClient> logger)
+        IHttpClient<GraphClient> httpClient,
+        ILogger<GraphClient> logger
+    )
     {
         this.optionsProvider = optionsProvider.ThrowIfNull();
         this.publicClientApplication = publicClientApplication.ThrowIfNull();
@@ -59,7 +66,9 @@ internal sealed class BlazorGraphClient : IGraphClient
         this.logger = logger.ThrowIfNull();
 
         this.httpClient.BaseAddress = new Uri(GraphBaseUrl);
-        this.httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        this.httpClient.DefaultRequestHeaders.Accept.Add(
+            new MediaTypeWithQualityHeaderValue("application/json")
+        );
     }
 
     public async Task<bool> PerformAuthorizationFlow(CancellationToken cancellationToken = default)
@@ -71,11 +80,41 @@ internal sealed class BlazorGraphClient : IGraphClient
 
         try
         {
-            var result = await this.publicClientApplication.AcquireTokenInteractive(GraphScopes)
-                .WithEmbeddedWebViewOptions(new EmbeddedWebViewOptions { Title = "Daybreak - Sign in with Microsoft" })
-                .WithUseEmbeddedWebView(true)
+            // Use system browser for cross-platform compatibility
+            // This opens the user's default browser for authentication
+            var result = await this
+                .publicClientApplication.AcquireTokenInteractive(GraphScopes)
+                .WithUseEmbeddedWebView(false)
+                .WithSystemWebViewOptions(
+                    new SystemWebViewOptions
+                    {
+                        HtmlMessageSuccess = """
+                        <html>
+                        <head><title>Daybreak - Authentication Successful</title></head>
+                        <body style="font-family: system-ui, -apple-system, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <div style="text-align: center; color: white; padding: 40px;">
+                                <h1 style="margin-bottom: 20px;">✓ Authentication Successful</h1>
+                                <p>You can now close this window and return to Daybreak.</p>
+                            </div>
+                        </body>
+                        </html>
+                        """,
+                        HtmlMessageError = """
+                        <html>
+                        <head><title>Daybreak - Authentication Failed</title></head>
+                        <body style="font-family: system-ui, -apple-system, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: linear-gradient(135deg, #f44336 0%, #e91e63 100%);">
+                            <div style="text-align: center; color: white; padding: 40px;">
+                                <h1 style="margin-bottom: 20px;">✗ Authentication Failed</h1>
+                                <p>Please close this window and try again in Daybreak.</p>
+                            </div>
+                        </body>
+                        </html>
+                        """,
+                    }
+                )
                 .ExecuteAsync(cancellationToken);
-            return false;
+
+            return result?.AccessToken is not null;
         }
         catch (Exception ex)
         {
@@ -97,16 +136,24 @@ internal sealed class BlazorGraphClient : IGraphClient
                 return default;
             }
 
-            this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Bearer",
+                accessToken
+            );
             var response = await this.httpClient.GetAsync(ProfileEndpoint);
-            
+
             if (!response.IsSuccessStatusCode)
             {
-                scopedLogger.LogError("Failed to load profile. Status code: {StatusCode}", response.StatusCode);
+                scopedLogger.LogError(
+                    "Failed to load profile. Status code: {StatusCode}",
+                    response.StatusCode
+                );
                 return default;
             }
 
-            var profile = JsonSerializer.Deserialize<User>(await response.Content.ReadAsStringAsync());
+            var profile = JsonSerializer.Deserialize<User>(
+                await response.Content.ReadAsStringAsync()
+            );
             return profile;
         }
         catch (Exception ex)
@@ -133,25 +180,33 @@ internal sealed class BlazorGraphClient : IGraphClient
         }
 
         this.buildTemplateManager.ClearBuilds();
-        var compiledBuilds = this.buildsCache?.Select(buildFile =>
-        {
-            if (buildFile is null ||
-                buildFile.TemplateCode is null)
+        var compiledBuilds = this
+            .buildsCache?.Select(buildFile =>
             {
-                return default;
-            }
+                if (buildFile is null || buildFile.TemplateCode is null)
+                {
+                    return default;
+                }
 
-            if (this.buildTemplateManager.TryDecodeTemplate(buildFile.TemplateCode, out var build) is false)
-            {
-                return default;
-            }
+                if (
+                    this.buildTemplateManager.TryDecodeTemplate(
+                        buildFile.TemplateCode,
+                        out var build
+                    )
+                    is false
+                )
+                {
+                    return default;
+                }
 
-            build.SourceUrl = buildFile.SourceUrl;
-            build.Name = buildFile.FileName;
-            build.PreviousName = buildFile.FileName;
-            return build;
-        }).Where(entry => entry is not null).ToList();
-        
+                build.SourceUrl = buildFile.SourceUrl;
+                build.Name = buildFile.FileName;
+                build.PreviousName = buildFile.FileName;
+                return build;
+            })
+            .Where(entry => entry is not null)
+            .ToList();
+
         _ = compiledBuilds?.Do(this.buildTemplateManager.SaveBuild!).ToList();
         return true;
     }
@@ -166,11 +221,17 @@ internal sealed class BlazorGraphClient : IGraphClient
             return false;
         }
 
-        var compiledBuilds = this.buildsCache?
-            .Where(b => b.FileName == buildName)
+        var compiledBuilds = this
+            .buildsCache?.Where(b => b.FileName == buildName)
             .Select(buildFile =>
             {
-                if (this.buildTemplateManager.TryDecodeTemplate(buildFile.TemplateCode!, out var build) is false)
+                if (
+                    this.buildTemplateManager.TryDecodeTemplate(
+                        buildFile.TemplateCode!,
+                        out var build
+                    )
+                    is false
+                )
                 {
                     return null;
                 }
@@ -179,8 +240,10 @@ internal sealed class BlazorGraphClient : IGraphClient
                 build.Name = buildFile.FileName;
                 build.PreviousName = buildFile.FileName;
                 return build;
-            }).Where(entry => entry is not null).ToList();
-        
+            })
+            .Where(entry => entry is not null)
+            .ToList();
+
         _ = compiledBuilds?.Do(this.buildTemplateManager.SaveBuild!).ToList();
         return true;
     }
@@ -217,9 +280,16 @@ internal sealed class BlazorGraphClient : IGraphClient
                 return false;
             }
 
-            this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Bearer",
+                accessToken
+            );
             using var stringContent = new StringContent(settings);
-            var response = await this.httpClient.PutAsync(SettingsSyncFileUri, stringContent, cancellationToken);
+            var response = await this.httpClient.PutAsync(
+                SettingsSyncFileUri,
+                stringContent,
+                cancellationToken
+            );
             return response.IsSuccessStatusCode;
         }
         catch (Exception e)
@@ -241,15 +311,23 @@ internal sealed class BlazorGraphClient : IGraphClient
                 return default;
             }
 
-            this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-            var fileItemResponse = await this.httpClient.GetAsync(SettingsSyncFileUri, cancellationToken);
-            
+            this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Bearer",
+                accessToken
+            );
+            var fileItemResponse = await this.httpClient.GetAsync(
+                SettingsSyncFileUri,
+                cancellationToken
+            );
+
             if (fileItemResponse.IsSuccessStatusCode is false)
             {
                 return default;
             }
 
-            var driveItemContent = await fileItemResponse.Content.ReadAsStringAsync(cancellationToken);
+            var driveItemContent = await fileItemResponse.Content.ReadAsStringAsync(
+                cancellationToken
+            );
             return driveItemContent;
         }
         catch (Exception e)
@@ -286,12 +364,13 @@ internal sealed class BlazorGraphClient : IGraphClient
         var firstAccount = accounts.First();
         try
         {
-            var result = await this.publicClientApplication.AcquireTokenSilent(GraphScopes, firstAccount)
+            var result = await this
+                .publicClientApplication.AcquireTokenSilent(GraphScopes, firstAccount)
                 .ExecuteAsync();
 
             return result.AccessToken;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             scopedLogger.LogError(ex, "Failed to acquire token silently");
             return default;
@@ -317,7 +396,7 @@ internal sealed class BlazorGraphClient : IGraphClient
             {
                 FileName = buildEntry.Name,
                 TemplateCode = this.buildTemplateManager.EncodeTemplate(buildEntry),
-                SourceUrl = buildEntry.SourceUrl
+                SourceUrl = buildEntry.SourceUrl,
             };
 
             var buildList = this.buildsCache ?? [];
@@ -325,10 +404,13 @@ internal sealed class BlazorGraphClient : IGraphClient
             buildList.Add(buildFile);
             buildList = [.. buildList.OrderBy(b => b.FileName)];
 
-            this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Bearer",
+                accessToken
+            );
             using var stringContent = new StringContent(JsonSerializer.Serialize(buildList));
             var response = await this.httpClient.PutAsync(BuildsSyncFileUri, stringContent);
-            
+
             if (response.IsSuccessStatusCode is false)
             {
                 return false;
@@ -358,17 +440,20 @@ internal sealed class BlazorGraphClient : IGraphClient
             {
                 FileName = buildEntry.Name,
                 TemplateCode = this.buildTemplateManager.EncodeTemplate(buildEntry),
-                SourceUrl = buildEntry.SourceUrl
+                SourceUrl = buildEntry.SourceUrl,
             });
 
             var buildList = new List<BuildFile>();
             buildList.AddRange(buildFiles);
             buildList = [.. buildList.OrderBy(b => b.FileName)];
 
-            this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Bearer",
+                accessToken
+            );
             using var stringContent = new StringContent(JsonSerializer.Serialize(buildList));
             var response = await this.httpClient.PutAsync(BuildsSyncFileUri, stringContent);
-            
+
             if (response.IsSuccessStatusCode is false)
             {
                 return false;
@@ -396,18 +481,24 @@ internal sealed class BlazorGraphClient : IGraphClient
                 return default;
             }
 
-            this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Bearer",
+                accessToken
+            );
             var fileItemResponse = await this.httpClient.GetAsync(BuildsSyncFileUri);
-            
+
             if (fileItemResponse.IsSuccessStatusCode is false)
             {
-                scopedLogger.LogError("Failed to retrieve builds backup. Status code: {StatusCode}", fileItemResponse.StatusCode);
+                scopedLogger.LogError(
+                    "Failed to retrieve builds backup. Status code: {StatusCode}",
+                    fileItemResponse.StatusCode
+                );
                 return default;
             }
 
             var driveItemContent = await fileItemResponse.Content.ReadAsStringAsync();
             var backup = JsonSerializer.Deserialize<List<BuildFile>>(driveItemContent);
-            
+
             if (backup is null)
             {
                 scopedLogger.LogError("Deserialized builds backup is null");
