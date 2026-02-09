@@ -11,7 +11,7 @@ namespace Daybreak.Linux.Services.Registry;
 internal sealed class RegistryService : IRegistryService
 {
     private static readonly string RegistryFilePath = PathUtils.GetAbsolutePathFromRoot("Daybreak.registry.json");
-    private readonly object fileLock = new();
+    private readonly Lock fileLock = new();
 
     public bool SaveValue<T>(string key, T value)
     {

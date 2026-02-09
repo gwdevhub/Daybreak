@@ -12,19 +12,16 @@ internal sealed class SystemThemeDetector : ISystemThemeDetector
 {
     public bool IsLightTheme()
     {
-        // 1. XDG Desktop Portal — most universal, works on Hyprland, Sway, GNOME, KDE, etc.
         if (TryReadXdgPortalColorScheme(out var portalResult))
         {
             return portalResult;
         }
 
-        // 2. gsettings — GNOME 42+ / GTK4 color-scheme
         if (TryReadGsettingsColorScheme(out var gsettingsResult))
         {
             return gsettingsResult;
         }
 
-        // 3. GTK_THEME environment variable (e.g. "Adwaita:dark")
         var gtkThemeEnv = Environment.GetEnvironmentVariable("GTK_THEME");
         if (!string.IsNullOrWhiteSpace(gtkThemeEnv))
         {

@@ -27,7 +27,6 @@ public sealed class WinePrefixSetupHandler(
             "User clicked Wine prefix setup notification. Starting installation..."
         );
 
-        // Start the installation in the background
         _ = Task.Factory.StartNew(this.PerformInstallation);
     }
 
@@ -37,8 +36,6 @@ public sealed class WinePrefixSetupHandler(
         try
         {
             var installOperation = this.winePrefixManager.Install(CancellationToken.None);
-
-            // Subscribe to progress updates
             installOperation.ProgressChanged += (sender, progress) =>
             {
                 scopedLogger.LogDebug(
