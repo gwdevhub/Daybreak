@@ -8,15 +8,17 @@ namespace Daybreak.Linux.Services.Keyboard;
 public partial class KeyboardHookService : IHostedService, IKeyboardHookService, IDisposable
 {
     private const string X11Lib = "libX11.so.6";
+    private const string XtstLib = "libXtst.so.6";
 
     // X11 event types
     private const int KeyPress = 2;
     private const int KeyRelease = 3;
 
+    // XRecord constants
+    private const int XRecordFromServer = 0;
+    private const int XRecordAllClients = 3;
+
     // XK key codes (from X11/keysymdef.h)
-    private const uint XK_Escape = 0xff1b;
-    private const uint XK_Return = 0xff0d;
-    private const uint XK_space = 0x0020;
     private const uint XK_F1 = 0xffbe;
     private const uint XK_F2 = 0xffbf;
     private const uint XK_F3 = 0xffc0;
@@ -30,75 +32,116 @@ public partial class KeyboardHookService : IHostedService, IKeyboardHookService,
     private const uint XK_F11 = 0xffc8;
     private const uint XK_F12 = 0xffc9;
 
+    // XRecordRange structure
     [StructLayout(LayoutKind.Sequential)]
-    private struct XKeyEvent
+    private struct XRecordRange
     {
-        public int type;
-        public ulong serial;
-        public int send_event;
-        public nint display;
-        public ulong window;
-        public ulong root;
-        public ulong subwindow;
-        public ulong time;
-        public int x, y;
-        public int x_root, y_root;
-        public uint state;
-        public uint keycode;
-        public int same_screen;
+        public XRecordRange8 core_requests;
+        public XRecordRange8 core_replies;
+        public XRecordExtRange ext_requests;
+        public XRecordExtRange ext_replies;
+        public XRecordRange8 delivered_events;
+        public XRecordRange8 device_events;
+        public XRecordRange8 errors;
+        public byte client_started;
+        public byte client_died;
     }
 
-    // XEvent is a union, we need 192 bytes to cover all cases
-    [StructLayout(LayoutKind.Explicit, Size = 192)]
-    private struct XEvent
+    [StructLayout(LayoutKind.Sequential)]
+    private struct XRecordRange8
     {
-        [FieldOffset(0)]
-        public int type;
-
-        [FieldOffset(0)]
-        public XKeyEvent xkey;
+        public byte first;
+        public byte last;
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    private struct XRecordExtRange
+    {
+        public XRecordRange16 ext_major;
+        public XRecordRange8 ext_minor;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct XRecordRange16
+    {
+        public ushort first;
+        public ushort last;
+    }
+
+    // Callback delegate for XRecordEnableContext
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void XRecordInterceptProc(nint closure, ref XRecordInterceptData recorded_data);
+
+    // XRecordInterceptData structure
+    [StructLayout(LayoutKind.Sequential)]
+    private struct XRecordInterceptData
+    {
+        public nint id_base;
+        public nint server_time;
+        public nint client_seq;
+        public int category;
+        public byte client_swapped;
+        private byte pad1;
+        private byte pad2;
+        private byte pad3;
+        public nint data;
+        public uint data_len;
+    }
+
+    // X11 P/Invoke
     [LibraryImport(X11Lib, EntryPoint = "XOpenDisplay")]
     private static partial nint XOpenDisplay(nint display_name);
 
     [LibraryImport(X11Lib, EntryPoint = "XCloseDisplay")]
     private static partial int XCloseDisplay(nint display);
 
-    [LibraryImport(X11Lib, EntryPoint = "XDefaultRootWindow")]
-    private static partial ulong XDefaultRootWindow(nint display);
+    [LibraryImport(X11Lib, EntryPoint = "XFlush")]
+    private static partial int XFlush(nint display);
 
-    [LibraryImport(X11Lib, EntryPoint = "XPending")]
-    private static partial int XPending(nint display);
+    [LibraryImport(X11Lib, EntryPoint = "XKeycodeToKeysym")]
+    private static partial uint XKeycodeToKeysym(nint display, byte keycode, int index);
 
-    [LibraryImport(X11Lib, EntryPoint = "XNextEvent")]
-    private static partial int XNextEvent(nint display, ref XEvent event_return);
+    [LibraryImport(X11Lib, EntryPoint = "XFree")]
+    private static partial int XFree(nint data);
 
-    [LibraryImport(X11Lib, EntryPoint = "XLookupKeysym")]
-    private static partial uint XLookupKeysym(ref XKeyEvent key_event, int index);
+    // XRecord extension P/Invoke
+    [LibraryImport(XtstLib, EntryPoint = "XRecordQueryVersion")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool XRecordQueryVersion(nint display, out int major, out int minor);
 
-    [LibraryImport(X11Lib, EntryPoint = "XGrabKey")]
-    private static partial int XGrabKey(
+    [LibraryImport(XtstLib, EntryPoint = "XRecordAllocRange")]
+    private static partial nint XRecordAllocRange();
+
+    [LibraryImport(XtstLib, EntryPoint = "XRecordCreateContext")]
+    private static partial ulong XRecordCreateContext(
         nint display,
-        int keycode,
-        uint modifiers,
-        ulong grab_window,
-        int owner_events,
-        int pointer_mode,
-        int keyboard_mode);
+        int flags,
+        nint[] client_specs,
+        int nclients,
+        nint[] ranges,
+        int nranges);
 
-    [LibraryImport(X11Lib, EntryPoint = "XUngrabKey")]
-    private static partial int XUngrabKey(nint display, int keycode, uint modifiers, ulong grab_window);
+    [LibraryImport(XtstLib, EntryPoint = "XRecordEnableContext")]
+    private static partial int XRecordEnableContext(
+        nint display,
+        ulong context,
+        XRecordInterceptProc callback,
+        nint closure);
 
-    [LibraryImport(X11Lib, EntryPoint = "XKeysymToKeycode")]
-    private static partial byte XKeysymToKeycode(nint display, uint keysym);
+    [LibraryImport(XtstLib, EntryPoint = "XRecordDisableContext")]
+    private static partial int XRecordDisableContext(nint display, ulong context);
 
-    private nint display;
-    private ulong rootWindow;
-    private Thread? eventThread;
+    [LibraryImport(XtstLib, EntryPoint = "XRecordFreeContext")]
+    private static partial int XRecordFreeContext(nint display, ulong context);
+
+    // Instance fields
+    private nint controlDisplay;
+    private nint dataDisplay;
+    private ulong recordContext;
+    private Thread? recordThread;
     private CancellationTokenSource? cts;
     private bool isStarted;
-    private readonly List<byte> grabbedKeycodes = [];
+    private XRecordInterceptProc? callbackDelegate;
 
     public event EventHandler<KeyboardEventArgs>? KeyDown;
     public event EventHandler<KeyboardEventArgs>? KeyUp;
@@ -121,24 +164,74 @@ public partial class KeyboardHookService : IHostedService, IKeyboardHookService,
             return;
         }
 
-        this.display = XOpenDisplay(nint.Zero);
-        if (this.display == nint.Zero)
+        // We need two display connections for XRecord:
+        // - controlDisplay: for controlling the recording (enable/disable)
+        // - dataDisplay: for receiving the recorded data (blocks in XRecordEnableContext)
+        this.controlDisplay = XOpenDisplay(nint.Zero);
+        this.dataDisplay = XOpenDisplay(nint.Zero);
+
+        if (this.controlDisplay == nint.Zero || this.dataDisplay == nint.Zero)
         {
+            this.Cleanup();
             return;
         }
 
-        this.rootWindow = XDefaultRootWindow(this.display);
+        // Check if XRecord extension is available
+        if (!XRecordQueryVersion(this.controlDisplay, out _, out _))
+        {
+            this.Cleanup();
+            return;
+        }
 
-        // Grab the keys we're interested in on the root window
-        this.GrabKeys();
+        // Create a record range for keyboard events only
+        var rangePtr = XRecordAllocRange();
+        if (rangePtr == nint.Zero)
+        {
+            this.Cleanup();
+            return;
+        }
+
+        // Set up the range to capture keyboard events (KeyPress and KeyRelease)
+        var range = Marshal.PtrToStructure<XRecordRange>(rangePtr);
+        range.device_events.first = KeyPress;
+        range.device_events.last = KeyRelease;
+        Marshal.StructureToPtr(range, rangePtr, false);
+
+        // Create client spec for all clients
+        var clientSpec = new nint[1];
+        clientSpec[0] = XRecordAllClients;
+
+        var ranges = new nint[1];
+        ranges[0] = rangePtr;
+
+        // Create the record context on the DATA display (not control)
+        // The context must be created and enabled on the same display
+        this.recordContext = XRecordCreateContext(
+            this.dataDisplay,
+            0,
+            clientSpec,
+            1,
+            ranges,
+            1);
+
+        XFree(rangePtr);
+
+        if (this.recordContext == 0)
+        {
+            this.Cleanup();
+            return;
+        }
+
+        // Keep a reference to prevent GC
+        this.callbackDelegate = this.RecordCallback;
 
         this.cts = new CancellationTokenSource();
-        this.eventThread = new Thread(this.EventLoop)
+        this.recordThread = new Thread(this.RecordLoop)
         {
             IsBackground = true,
-            Name = "X11 Keyboard Event Loop"
+            Name = "X11 XRecord Event Loop"
         };
-        this.eventThread.Start();
+        this.recordThread.Start();
 
         this.isStarted = true;
     }
@@ -151,18 +244,43 @@ public partial class KeyboardHookService : IHostedService, IKeyboardHookService,
         }
 
         this.cts?.Cancel();
-        this.eventThread?.Join(TimeSpan.FromSeconds(1));
 
-        if (this.display != nint.Zero)
+        // Disable the context to unblock XRecordEnableContext
+        if (this.controlDisplay != nint.Zero && this.recordContext != 0)
         {
-            this.UngrabKeys();
-            XCloseDisplay(this.display);
-            this.display = nint.Zero;
+            XRecordDisableContext(this.controlDisplay, this.recordContext);
+            XFlush(this.controlDisplay);
+        }
+
+        this.recordThread?.Join(TimeSpan.FromSeconds(2));
+
+        this.Cleanup();
+        this.isStarted = false;
+    }
+
+    private void Cleanup()
+    {
+        if (this.controlDisplay != nint.Zero && this.recordContext != 0)
+        {
+            XRecordFreeContext(this.controlDisplay, this.recordContext);
+            this.recordContext = 0;
+        }
+
+        if (this.dataDisplay != nint.Zero)
+        {
+            XCloseDisplay(this.dataDisplay);
+            this.dataDisplay = nint.Zero;
+        }
+
+        if (this.controlDisplay != nint.Zero)
+        {
+            XCloseDisplay(this.controlDisplay);
+            this.controlDisplay = nint.Zero;
         }
 
         this.cts?.Dispose();
         this.cts = null;
-        this.isStarted = false;
+        this.callbackDelegate = null;
     }
 
     public void Dispose()
@@ -170,64 +288,39 @@ public partial class KeyboardHookService : IHostedService, IKeyboardHookService,
         this.Stop();
     }
 
-    private void GrabKeys()
+    private void RecordLoop()
     {
-        uint[] keysyms = [XK_F1, XK_F2, XK_F3, XK_F4, XK_F5, XK_F6, XK_F7, XK_F8, XK_F9, XK_F10, XK_F11, XK_F12, XK_Escape, XK_Return, XK_space];
-
-        foreach (var keysym in keysyms)
-        {
-            var keycode = XKeysymToKeycode(this.display, keysym);
-            if (keycode != 0)
-            {
-                // GrabModeAsync = 1
-                XGrabKey(this.display, keycode, 0, this.rootWindow, 1, 1, 1);
-                this.grabbedKeycodes.Add(keycode);
-            }
-        }
+        // This call blocks until XRecordDisableContext is called
+        XRecordEnableContext(this.dataDisplay, this.recordContext, this.callbackDelegate!, nint.Zero);
     }
 
-    private void UngrabKeys()
+    private void RecordCallback(nint closure, ref XRecordInterceptData data)
     {
-        foreach (var keycode in this.grabbedKeycodes)
-        {
-            XUngrabKey(this.display, keycode, 0, this.rootWindow);
-        }
-
-        this.grabbedKeycodes.Clear();
-    }
-
-    private void EventLoop()
-    {
-        while (this.cts is { IsCancellationRequested: false })
-        {
-            if (XPending(this.display) > 0)
-            {
-                var xEvent = new XEvent();
-                XNextEvent(this.display, ref xEvent);
-                this.ProcessEvent(ref xEvent);
-            }
-            else
-            {
-                Thread.Sleep(10);
-            }
-        }
-    }
-
-    private void ProcessEvent(ref XEvent xEvent)
-    {
-        if (xEvent.type is not KeyPress and not KeyRelease)
+        if (data.category != XRecordFromServer || data.data == nint.Zero)
         {
             return;
         }
 
-        var keysym = XLookupKeysym(ref xEvent.xkey, 0);
+        // The data contains the raw X11 event
+        // First byte is the event type, second byte is the keycode
+        var eventType = Marshal.ReadByte(data.data, 0);
+        var keycode = Marshal.ReadByte(data.data, 1);
 
+        if (eventType is not KeyPress and not KeyRelease)
+        {
+            return;
+        }
+
+        // Convert keycode to keysym
+        var keysym = XKeycodeToKeysym(this.controlDisplay, keycode, 0);
+
+        // Only process F1-F12 keys
         if (!TryMapXKeyToVirtualKey(keysym, out var virtualKey))
         {
             return;
         }
 
-        if (xEvent.type == KeyPress)
+        if (eventType == KeyPress)
         {
             this.KeyDown?.Invoke(this, new KeyboardEventArgs(virtualKey));
         }
@@ -239,6 +332,7 @@ public partial class KeyboardHookService : IHostedService, IKeyboardHookService,
 
     private static bool TryMapXKeyToVirtualKey(uint keysym, out VirtualKey virtualKey)
     {
+        // Only map F1-F12 - these are the only keys we need to detect
         virtualKey = keysym switch
         {
             XK_F1 => VirtualKey.F1,
@@ -253,9 +347,6 @@ public partial class KeyboardHookService : IHostedService, IKeyboardHookService,
             XK_F10 => VirtualKey.F10,
             XK_F11 => VirtualKey.F11,
             XK_F12 => VirtualKey.F12,
-            XK_Escape => VirtualKey.Escape,
-            XK_Return => VirtualKey.Enter,
-            XK_space => VirtualKey.Space,
             _ => default
         };
 

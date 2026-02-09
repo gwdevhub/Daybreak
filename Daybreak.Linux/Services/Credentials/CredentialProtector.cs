@@ -21,7 +21,7 @@ public sealed class CredentialProtector : ICredentialProtector
     public CredentialProtector(ILogger<CredentialProtector> logger)
     {
         this.logger = logger;
-        this.derivedKey = DeriveKeyFromMachineId();
+        this.derivedKey = this.DeriveKeyFromMachineId();
     }
 
     public byte[]? Protect(byte[] data)

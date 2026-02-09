@@ -26,7 +26,6 @@ public class DaybreakInjector(
     public bool InjectorAvailable()
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        // Check if Wine is installed and the injector executable exists
         if (!this.winePrefixManager.IsAvailable())
         {
             scopedLogger.LogWarning("Wine is not available");
@@ -70,7 +69,6 @@ public class DaybreakInjector(
         var (output, error, exitCode) = await this.LaunchInjector(
             ["winapi", winePid.Value.ToString(), $"\"{wineDllPath}\""],
             cancellationToken,
-            // All injector paths now print "ExitCode: X" as their last line.
             completionChecker: (line, _) => line.StartsWith("ExitCode: ")
         );
 
