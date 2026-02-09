@@ -173,7 +173,7 @@ jobs:
 
     - name: Get Latest Tag
       id: getLatestTag
-      uses: WyriHaximus/github-action-get-previous-tag@v1
+      uses: WyriHaximus/github-action-get-previous-tag@v2
 
     - name: Generate changelog
       id: gen_changelog
