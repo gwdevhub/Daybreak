@@ -189,6 +189,7 @@ jobs:
         run: |
           cd windows-publish
           find . -name '*.pdb' -delete
+          find . -name '*.dbg' -delete
           if [ -f Installer/Daybreak.Installer.exe ]; then
             mv Installer/Daybreak.Installer.exe Installer/Daybreak.Installer.Temp.exe
           fi
@@ -206,6 +207,7 @@ jobs:
         run: |
           cd linux-publish
           find . -name '*.pdb' -delete
+          find . -name '*.dbg' -delete
           if [ -f Installer/Daybreak.Installer ]; then
             mv Installer/Daybreak.Installer Installer/Daybreak.Installer.Temp
           fi

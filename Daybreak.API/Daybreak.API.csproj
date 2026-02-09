@@ -26,6 +26,11 @@
     <ResolveStaticWebAssetsInputsDependsOn>RemoveDuplicateStaticWebAssets;$(ResolveStaticWebAssetsInputsDependsOn)</ResolveStaticWebAssetsInputsDependsOn>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
   <!-- Remove duplicate static web assets coming from referenced projects -->
   <Target Name="RemoveDuplicateStaticWebAssets" BeforeTargets="ResolveStaticWebAssetsInputs;GenerateStaticWebAssetsManifest">
     <ItemGroup>
