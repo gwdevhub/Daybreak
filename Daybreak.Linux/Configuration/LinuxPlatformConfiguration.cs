@@ -61,6 +61,7 @@ public sealed class LinuxPlatformConfiguration : PluginConfigurationBase
         services.AddHostedSingleton<IMDomainRegistrar, PortScanningDomainRegistrar>();
         services.AddSingleton<IWindowManipulationService, WindowManipulationService>();
         services.AddSingleton<ICrashDumpService, CrashDumpService>();
+        services.AddSingleton<IDaybreakRestartingService, DaybreakRestartingService>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)

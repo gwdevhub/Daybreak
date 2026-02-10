@@ -80,6 +80,7 @@ public sealed class WindowsPlatformConfiguration : PluginConfigurationBase
         services.AddHostedSingleton<IMDomainRegistrar, MDomainRegistrar>();
         services.AddSingleton<IWindowManipulationService, WindowManipulationService>();
         services.AddSingleton<ICrashDumpService, CrashDumpService>();
+        services.AddSingleton<IDaybreakRestartingService, DaybreakRestartingService>();
     }
 
     public override void RegisterMods(IModsProducer modsProducer)
