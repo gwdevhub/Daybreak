@@ -4,8 +4,8 @@ using System.Net;
 using System.Text;
 
 const string LatestUrl = "https://github.com/gwdevhub/Daybreak/releases/latest";
-var daybreakExecutable = OperatingSystem.IsWindows() ? "Daybreak.exe" : "Daybreak.Linux";
-var daybreakProcessName = OperatingSystem.IsWindows() ? "Daybreak" : "Daybreak.Linux";
+var daybreakExecutable = OperatingSystem.IsWindows() ? "Daybreak.exe" : "Daybreak";
+var daybreakProcessName = "Daybreak";
 var releaseAssetSuffix = OperatingSystem.IsWindows() ? "" : "-linux";
 
 static void RenderProgressBar(int currentStep, int totalSteps, int barSize)

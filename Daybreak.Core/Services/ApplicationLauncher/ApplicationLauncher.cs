@@ -28,9 +28,10 @@ internal sealed class ApplicationLauncher(
     INotificationService notificationService,
     IOptionsMonitor<LauncherOptions> launcherOptions,
     IModsManager modsManager,
-    IPrivilegeManager privilegeManager,
     IGuildWarsReadyChecker guildWarsReadyChecker,
     IGuildWarsProcessFinder guildWarsProcessFinder,
+    IDaybreakRestartingService daybreakRestartingService,
+    IPrivilegeManager privilegeManager,
     ILogger<ApplicationLauncher> logger
 ) : IApplicationLauncher
 {
@@ -48,11 +49,15 @@ internal sealed class ApplicationLauncher(
         launcherOptions.ThrowIfNull();
     private readonly IModsManager modsManager = modsManager.ThrowIfNull();
     private readonly ILogger<ApplicationLauncher> logger = logger.ThrowIfNull();
-    private readonly IPrivilegeManager privilegeManager = privilegeManager.ThrowIfNull();
     private readonly IGuildWarsReadyChecker guildWarsReadyChecker =
         guildWarsReadyChecker.ThrowIfNull();
     private readonly IGuildWarsProcessFinder guildWarsProcessFinder =
         guildWarsProcessFinder.ThrowIfNull();
+    private readonly IDaybreakRestartingService daybreakRestartingService =
+        daybreakRestartingService.ThrowIfNull();
+
+    private readonly IPrivilegeManager privilegeManager =
+        privilegeManager.ThrowIfNull();
 
     public async Task<GuildWarsApplicationLaunchContext?> LaunchGuildwars(
         LaunchConfigurationWithCredentials launchConfigurationWithCredentials,
@@ -83,76 +88,19 @@ internal sealed class ApplicationLauncher(
         };
     }
 
-    // TODO: Needs to be reworked to be cross-platform
     public void RestartDaybreak()
     {
-        if (this.privilegeManager.AdminPrivileges)
-        {
-            this.RestartDaybreakAsAdmin();
-        }
-        else
-        {
-            this.RestartDaybreakAsNormalUser();
-        }
+        this.daybreakRestartingService.RestartDaybreak();
     }
 
-    // TODO: Needs to be reworked to be cross-platform
     public void RestartDaybreakAsAdmin()
     {
-        this.logger.LogInformation("Restarting daybreak with admin rights");
-        var processName = Process.GetCurrentProcess()?.MainModule?.FileName;
-        if (processName!.IsNullOrWhiteSpace() || File.Exists(processName) is false)
-        {
-            throw new InvalidOperationException("Unable to find executable. Aborting restart");
-        }
-
-        var process = new Process()
-        {
-            StartInfo = new()
-            {
-                Verb = "runas",
-                WorkingDirectory = Environment.CurrentDirectory,
-                UseShellExecute = true,
-                CreateNoWindow = true,
-                FileName = "cmd.exe",
-                Arguments =
-                    $"/c cd /d \"{Environment.CurrentDirectory}\" && timeout /t 1 /nobreak && start \"\" \"{processName}\" && exit",
-            },
-        };
-        if (process.Start() is false)
-        {
-            throw new InvalidOperationException($"Unable to start {processName} as admin");
-        }
-
-        this.photinoWindow.Close();
+        this.daybreakRestartingService.RestartDaybreakAsAdmin();
     }
 
-    // TODO: Needs to be reworked to be cross-platform
     public void RestartDaybreakAsNormalUser()
     {
-        this.logger.LogInformation("Restarting daybreak as normal user");
-        var processName = Process.GetCurrentProcess()?.MainModule?.FileName;
-        if (processName!.IsNullOrWhiteSpace() || File.Exists(processName) is false)
-        {
-            throw new InvalidOperationException("Unable to find executable. Aborting restart");
-        }
-
-        var process = new Process()
-        {
-            StartInfo = new()
-            {
-                WorkingDirectory = Environment.CurrentDirectory,
-                FileName = processName,
-                UseShellExecute = true,
-                CreateNoWindow = true,
-            },
-        };
-        if (process.Start() is false)
-        {
-            throw new InvalidOperationException($"Unable to start {processName} as normal user");
-        }
-
-        this.photinoWindow.Close();
+        this.daybreakRestartingService.RestartDaybreakAsNormalUser();
     }
 
     private async Task<Process?> LaunchGuildwarsProcess(
