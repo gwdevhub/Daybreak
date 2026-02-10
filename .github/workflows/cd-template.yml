@@ -136,6 +136,7 @@ jobs:
         run: |
           chmod +x Publish/Daybreak
           chmod +x Publish/Daybreak.Wayland.sh
+          chmod +x Publish/Installer/Daybreak.Installer
 
       - name: Upload Linux build
         uses: actions/upload-artifact@v6
@@ -209,6 +210,7 @@ jobs:
           find . -name '*.pdb' -delete
           find . -name '*.dbg' -delete
           if [ -f Installer/Daybreak.Installer ]; then
+            chmod +x Installer/Daybreak.Installer
             mv Installer/Daybreak.Installer Installer/Daybreak.Installer.Temp
           fi
           chmod +x Daybreak Daybreak.Wayland.sh
