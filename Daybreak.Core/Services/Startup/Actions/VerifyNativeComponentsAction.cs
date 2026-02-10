@@ -1,4 +1,5 @@
 using System.Extensions.Core;
+using Daybreak.Shared;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Utils;
@@ -64,7 +65,7 @@ public sealed class VerifyNativeComponentsAction(
             this.notificationService.NotifyError(
                 title: "Missing native components",
                 description: "Daybreak detected missing native components and some features may not work.",
-                expirationTime: DateTime.UtcNow + TimeSpan.FromSeconds(15)
+                expirationTime: Global.NotificationLongExpiration
             );
         }
         else

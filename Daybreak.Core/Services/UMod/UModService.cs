@@ -20,6 +20,7 @@ using System.Diagnostics;
 using System.Extensions;
 using System.Extensions.Core;
 using TrailBlazr.Services;
+using Daybreak.Shared;
 
 namespace Daybreak.Services.UMod;
 
@@ -293,7 +294,8 @@ internal sealed class UModService(
         await this.DownloadLatestDll(progress, cancellationToken);
         this.notificationService.NotifyInformation(
             title: "UMod updated",
-            description: $"UMod has been updated to version {latestVersion}");
+            description: $"UMod has been updated to version {latestVersion}",
+            expirationTime: Global.NotificationLongExpiration);
     }
 
     private async Task<bool> SetupUModDll(IProgress<ProgressUpdate> progress, CancellationToken cancellationToken)
