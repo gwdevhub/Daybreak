@@ -1,5 +1,6 @@
 using System.Extensions.Core;
 using Daybreak.Linux.Services.Wine;
+using Daybreak.Shared;
 using Daybreak.Shared.Models.Notifications;
 using Daybreak.Shared.Models.Notifications.Handling;
 using Daybreak.Shared.Services.Notifications;
@@ -53,7 +54,7 @@ public sealed class WinePrefixSetupHandler(
                 this.notificationService.NotifyInformation(
                     title: "Wine prefix ready",
                     description: "Wine prefix has been initialized successfully. You can now launch Guild Wars.",
-                    expirationTime: DateTime.UtcNow + TimeSpan.FromSeconds(5)
+                    expirationTime: Global.NotificationLongExpiration
                 );
             }
             else
@@ -62,7 +63,7 @@ public sealed class WinePrefixSetupHandler(
                 this.notificationService.NotifyError(
                     title: "Wine prefix setup failed",
                     description: "Failed to initialize the Wine prefix. Check the logs for more details.",
-                    expirationTime: DateTime.UtcNow + TimeSpan.FromSeconds(5)
+                    expirationTime: Global.NotificationLongExpiration
                 );
             }
         }
