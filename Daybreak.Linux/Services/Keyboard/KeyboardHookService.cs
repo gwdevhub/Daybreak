@@ -1,3 +1,4 @@
+using Daybreak.Linux.Utils;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Keyboard;
 using Microsoft.Extensions.Hosting;
@@ -5,149 +6,23 @@ using System.Runtime.InteropServices;
 
 namespace Daybreak.Linux.Services.Keyboard;
 
-public partial class KeyboardHookService : IHostedService, IKeyboardHookService, IDisposable
+public sealed class KeyboardHookService : IHostedService, IKeyboardHookService, IDisposable
 {
-    private const string X11Lib = "libX11.so.6";
-    private const string XtstLib = "libXtst.so.6";
-
-    // X11 event types
-    private const int KeyPress = 2;
-    private const int KeyRelease = 3;
-
-    // XRecord constants
-    private const int XRecordFromServer = 0;
-    private const int XRecordAllClients = 3;
-
-    // XK key codes (from X11/keysymdef.h)
-    private const uint XK_F1 = 0xffbe;
-    private const uint XK_F2 = 0xffbf;
-    private const uint XK_F3 = 0xffc0;
-    private const uint XK_F4 = 0xffc1;
-    private const uint XK_F5 = 0xffc2;
-    private const uint XK_F6 = 0xffc3;
-    private const uint XK_F7 = 0xffc4;
-    private const uint XK_F8 = 0xffc5;
-    private const uint XK_F9 = 0xffc6;
-    private const uint XK_F10 = 0xffc7;
-    private const uint XK_F11 = 0xffc8;
-    private const uint XK_F12 = 0xffc9;
-
-    // XRecordRange structure
-    [StructLayout(LayoutKind.Sequential)]
-    private struct XRecordRange
-    {
-        public XRecordRange8 core_requests;
-        public XRecordRange8 core_replies;
-        public XRecordExtRange ext_requests;
-        public XRecordExtRange ext_replies;
-        public XRecordRange8 delivered_events;
-        public XRecordRange8 device_events;
-        public XRecordRange8 errors;
-        public byte client_started;
-        public byte client_died;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct XRecordRange8
-    {
-        public byte first;
-        public byte last;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct XRecordExtRange
-    {
-        public XRecordRange16 ext_major;
-        public XRecordRange8 ext_minor;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct XRecordRange16
-    {
-        public ushort first;
-        public ushort last;
-    }
-
-    // Callback delegate for XRecordEnableContext
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void XRecordInterceptProc(nint closure, ref XRecordInterceptData recorded_data);
-
-    // XRecordInterceptData structure
-    [StructLayout(LayoutKind.Sequential)]
-    private struct XRecordInterceptData
-    {
-        public nint id_base;
-        public nint server_time;
-        public nint client_seq;
-        public int category;
-        public byte client_swapped;
-        private byte pad1;
-        private byte pad2;
-        private byte pad3;
-        public nint data;
-        public uint data_len;
-    }
-
-    // X11 P/Invoke
-    [LibraryImport(X11Lib, EntryPoint = "XOpenDisplay")]
-    private static partial nint XOpenDisplay(nint display_name);
-
-    [LibraryImport(X11Lib, EntryPoint = "XCloseDisplay")]
-    private static partial int XCloseDisplay(nint display);
-
-    [LibraryImport(X11Lib, EntryPoint = "XFlush")]
-    private static partial int XFlush(nint display);
-
-    [LibraryImport(X11Lib, EntryPoint = "XKeycodeToKeysym")]
-    private static partial uint XKeycodeToKeysym(nint display, byte keycode, int index);
-
-    [LibraryImport(X11Lib, EntryPoint = "XFree")]
-    private static partial int XFree(nint data);
-
-    // XRecord extension P/Invoke
-    [LibraryImport(XtstLib, EntryPoint = "XRecordQueryVersion")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static partial bool XRecordQueryVersion(nint display, out int major, out int minor);
-
-    [LibraryImport(XtstLib, EntryPoint = "XRecordAllocRange")]
-    private static partial nint XRecordAllocRange();
-
-    [LibraryImport(XtstLib, EntryPoint = "XRecordCreateContext")]
-    private static partial ulong XRecordCreateContext(
-        nint display,
-        int flags,
-        nint[] client_specs,
-        int nclients,
-        nint[] ranges,
-        int nranges);
-
-    [LibraryImport(XtstLib, EntryPoint = "XRecordEnableContext")]
-    private static partial int XRecordEnableContext(
-        nint display,
-        ulong context,
-        XRecordInterceptProc callback,
-        nint closure);
-
-    [LibraryImport(XtstLib, EntryPoint = "XRecordDisableContext")]
-    private static partial int XRecordDisableContext(nint display, ulong context);
-
-    [LibraryImport(XtstLib, EntryPoint = "XRecordFreeContext")]
-    private static partial int XRecordFreeContext(nint display, ulong context);
-
-    // Instance fields
     private nint controlDisplay;
     private nint dataDisplay;
     private ulong recordContext;
-    private Thread? recordThread;
+    private Task? recordTask;
     private CancellationTokenSource? cts;
     private bool isStarted;
-    private XRecordInterceptProc? callbackDelegate;
+    private NativeMethods.XRecordInterceptProc? callbackDelegate;
+    private ulong appWindowId;
 
     public event EventHandler<KeyboardEventArgs>? KeyDown;
     public event EventHandler<KeyboardEventArgs>? KeyUp;
 
     Task IHostedService.StartAsync(CancellationToken cancellationToken)
     {
+        this.appWindowId = FindAppWindowId();
         return Task.CompletedTask;
     }
 
@@ -167,8 +42,8 @@ public partial class KeyboardHookService : IHostedService, IKeyboardHookService,
         // We need two display connections for XRecord:
         // - controlDisplay: for controlling the recording (enable/disable)
         // - dataDisplay: for receiving the recorded data (blocks in XRecordEnableContext)
-        this.controlDisplay = XOpenDisplay(nint.Zero);
-        this.dataDisplay = XOpenDisplay(nint.Zero);
+        this.controlDisplay = NativeMethods.XOpenDisplay(nint.Zero);
+        this.dataDisplay = NativeMethods.XOpenDisplay(nint.Zero);
 
         if (this.controlDisplay == nint.Zero || this.dataDisplay == nint.Zero)
         {
@@ -177,14 +52,14 @@ public partial class KeyboardHookService : IHostedService, IKeyboardHookService,
         }
 
         // Check if XRecord extension is available
-        if (!XRecordQueryVersion(this.controlDisplay, out _, out _))
+        if (!NativeMethods.XRecordQueryVersion(this.controlDisplay, out _, out _))
         {
             this.Cleanup();
             return;
         }
 
         // Create a record range for keyboard events only
-        var rangePtr = XRecordAllocRange();
+        var rangePtr = NativeMethods.XRecordAllocRange();
         if (rangePtr == nint.Zero)
         {
             this.Cleanup();
@@ -192,21 +67,21 @@ public partial class KeyboardHookService : IHostedService, IKeyboardHookService,
         }
 
         // Set up the range to capture keyboard events (KeyPress and KeyRelease)
-        var range = Marshal.PtrToStructure<XRecordRange>(rangePtr);
-        range.device_events.first = KeyPress;
-        range.device_events.last = KeyRelease;
+        var range = Marshal.PtrToStructure<NativeMethods.XRecordRange>(rangePtr);
+        range.device_events.first = NativeMethods.KeyPress;
+        range.device_events.last = NativeMethods.KeyRelease;
         Marshal.StructureToPtr(range, rangePtr, false);
 
         // Create client spec for all clients
         var clientSpec = new nint[1];
-        clientSpec[0] = XRecordAllClients;
+        clientSpec[0] = NativeMethods.XRecordAllClients;
 
         var ranges = new nint[1];
         ranges[0] = rangePtr;
 
         // Create the record context on the DATA display (not control)
         // The context must be created and enabled on the same display
-        this.recordContext = XRecordCreateContext(
+        this.recordContext = NativeMethods.XRecordCreateContext(
             this.dataDisplay,
             0,
             clientSpec,
@@ -214,7 +89,7 @@ public partial class KeyboardHookService : IHostedService, IKeyboardHookService,
             ranges,
             1);
 
-        XFree(rangePtr);
+        NativeMethods.XFree(rangePtr);
 
         if (this.recordContext == 0)
         {
@@ -226,12 +101,11 @@ public partial class KeyboardHookService : IHostedService, IKeyboardHookService,
         this.callbackDelegate = this.RecordCallback;
 
         this.cts = new CancellationTokenSource();
-        this.recordThread = new Thread(this.RecordLoop)
-        {
-            IsBackground = true,
-            Name = "X11 XRecord Event Loop"
-        };
-        this.recordThread.Start();
+        this.recordTask = Task.Factory.StartNew(
+            this.RecordLoop,
+            this.cts.Token,
+            TaskCreationOptions.LongRunning,
+            TaskScheduler.Default);
 
         this.isStarted = true;
     }
@@ -248,11 +122,11 @@ public partial class KeyboardHookService : IHostedService, IKeyboardHookService,
         // Disable the context to unblock XRecordEnableContext
         if (this.controlDisplay != nint.Zero && this.recordContext != 0)
         {
-            XRecordDisableContext(this.controlDisplay, this.recordContext);
-            XFlush(this.controlDisplay);
+            NativeMethods.XRecordDisableContext(this.controlDisplay, this.recordContext);
+            NativeMethods.XFlush(this.controlDisplay);
         }
 
-        this.recordThread?.Join(TimeSpan.FromSeconds(2));
+        this.recordTask = null;
 
         this.Cleanup();
         this.isStarted = false;
@@ -262,19 +136,19 @@ public partial class KeyboardHookService : IHostedService, IKeyboardHookService,
     {
         if (this.controlDisplay != nint.Zero && this.recordContext != 0)
         {
-            XRecordFreeContext(this.controlDisplay, this.recordContext);
+            NativeMethods.XRecordFreeContext(this.controlDisplay, this.recordContext);
             this.recordContext = 0;
         }
 
         if (this.dataDisplay != nint.Zero)
         {
-            XCloseDisplay(this.dataDisplay);
+            NativeMethods.XCloseDisplay(this.dataDisplay);
             this.dataDisplay = nint.Zero;
         }
 
         if (this.controlDisplay != nint.Zero)
         {
-            XCloseDisplay(this.controlDisplay);
+            NativeMethods.XCloseDisplay(this.controlDisplay);
             this.controlDisplay = nint.Zero;
         }
 
@@ -291,12 +165,18 @@ public partial class KeyboardHookService : IHostedService, IKeyboardHookService,
     private void RecordLoop()
     {
         // This call blocks until XRecordDisableContext is called
-        XRecordEnableContext(this.dataDisplay, this.recordContext, this.callbackDelegate!, nint.Zero);
+        NativeMethods.XRecordEnableContext(this.dataDisplay, this.recordContext, this.callbackDelegate!, nint.Zero);
     }
 
-    private void RecordCallback(nint closure, ref XRecordInterceptData data)
+    private void RecordCallback(nint closure, ref NativeMethods.XRecordInterceptData data)
     {
-        if (data.category != XRecordFromServer || data.data == nint.Zero)
+        if (data.category != NativeMethods.XRecordFromServer || data.data == nint.Zero)
+        {
+            return;
+        }
+
+        // Only process events when our app window is focused
+        if (!this.IsAppWindowFocused())
         {
             return;
         }
@@ -306,13 +186,13 @@ public partial class KeyboardHookService : IHostedService, IKeyboardHookService,
         var eventType = Marshal.ReadByte(data.data, 0);
         var keycode = Marshal.ReadByte(data.data, 1);
 
-        if (eventType is not KeyPress and not KeyRelease)
+        if (eventType is not NativeMethods.KeyPress and not NativeMethods.KeyRelease)
         {
             return;
         }
 
         // Convert keycode to keysym
-        var keysym = XKeycodeToKeysym(this.controlDisplay, keycode, 0);
+        var keysym = NativeMethods.XKeycodeToKeysym(this.controlDisplay, keycode, 0);
 
         // Only process F1-F12 keys
         if (!TryMapXKeyToVirtualKey(keysym, out var virtualKey))
@@ -320,7 +200,7 @@ public partial class KeyboardHookService : IHostedService, IKeyboardHookService,
             return;
         }
 
-        if (eventType == KeyPress)
+        if (eventType == NativeMethods.KeyPress)
         {
             this.KeyDown?.Invoke(this, new KeyboardEventArgs(virtualKey));
         }
@@ -335,21 +215,143 @@ public partial class KeyboardHookService : IHostedService, IKeyboardHookService,
         // Only map F1-F12 - these are the only keys we need to detect
         virtualKey = keysym switch
         {
-            XK_F1 => VirtualKey.F1,
-            XK_F2 => VirtualKey.F2,
-            XK_F3 => VirtualKey.F3,
-            XK_F4 => VirtualKey.F4,
-            XK_F5 => VirtualKey.F5,
-            XK_F6 => VirtualKey.F6,
-            XK_F7 => VirtualKey.F7,
-            XK_F8 => VirtualKey.F8,
-            XK_F9 => VirtualKey.F9,
-            XK_F10 => VirtualKey.F10,
-            XK_F11 => VirtualKey.F11,
-            XK_F12 => VirtualKey.F12,
+            NativeMethods.XK_F1 => VirtualKey.F1,
+            NativeMethods.XK_F2 => VirtualKey.F2,
+            NativeMethods.XK_F3 => VirtualKey.F3,
+            NativeMethods.XK_F4 => VirtualKey.F4,
+            NativeMethods.XK_F5 => VirtualKey.F5,
+            NativeMethods.XK_F6 => VirtualKey.F6,
+            NativeMethods.XK_F7 => VirtualKey.F7,
+            NativeMethods.XK_F8 => VirtualKey.F8,
+            NativeMethods.XK_F9 => VirtualKey.F9,
+            NativeMethods.XK_F10 => VirtualKey.F10,
+            NativeMethods.XK_F11 => VirtualKey.F11,
+            NativeMethods.XK_F12 => VirtualKey.F12,
             _ => default
         };
 
         return virtualKey != default;
+    }
+
+    /// <summary>
+    /// Checks if the application window is currently focused.
+    /// </summary>
+    private bool IsAppWindowFocused()
+    {
+        if (this.controlDisplay == nint.Zero)
+        {
+            return false;
+        }
+
+        // Lazily get app window ID if not yet cached
+        if (this.appWindowId == 0)
+        {
+            this.appWindowId = FindAppWindowId();
+            if (this.appWindowId == 0)
+            {
+                return false;
+            }
+        }
+
+        if (NativeMethods.XGetInputFocus(this.controlDisplay, out var focusedWindow, out _) == 0)
+        {
+            return false;
+        }
+
+        // Check if focused window is the app window or a descendant of it
+        return this.IsWindowOrDescendant(focusedWindow, this.appWindowId);
+    }
+
+    /// <summary>
+    /// Checks if the focused window is the target window or a descendant (child) of it.
+    /// This handles cases where focus is on a child widget within the main window.
+    /// </summary>
+    private bool IsWindowOrDescendant(ulong focusedWindow, ulong targetWindow)
+    {
+        if (focusedWindow == 0)
+        {
+            return false;
+        }
+
+        var current = focusedWindow;
+        while (current != 0)
+        {
+            if (current == targetWindow)
+            {
+                return true;
+            }
+
+            // Get parent of current window
+            if (NativeMethods.XQueryTree(this.controlDisplay, current, out var root, out var parent, out var children, out _) == 0)
+            {
+                break;
+            }
+
+            // Free the children list if allocated
+            if (children != nint.Zero)
+            {
+                NativeMethods.XFree(children);
+            }
+
+            // Stop if we've reached the root
+            if (parent == root || parent == 0)
+            {
+                break;
+            }
+
+            current = parent;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Finds the X11 window ID for the application using GTK's toplevel window list.
+    /// </summary>
+    private static ulong FindAppWindowId()
+    {
+        var gtkWindow = FindGtkWindowForCurrentProcess();
+        if (gtkWindow == nint.Zero)
+        {
+            return 0;
+        }
+
+        var gdkWindow = NativeMethods.gtk_widget_get_window(gtkWindow);
+        if (gdkWindow == nint.Zero)
+        {
+            return 0;
+        }
+
+        return NativeMethods.gdk_x11_window_get_xid(gdkWindow);
+    }
+
+    /// <summary>
+    /// Finds the GTK window belonging to the current process using gtk_window_list_toplevels.
+    /// </summary>
+    private static nint FindGtkWindowForCurrentProcess()
+    {
+        var list = NativeMethods.gtk_window_list_toplevels();
+        if (list == nint.Zero)
+        {
+            return nint.Zero;
+        }
+
+        var current = list;
+        nint result = nint.Zero;
+
+        while (current != nint.Zero)
+        {
+            var window = NativeMethods.G_list_data(current);
+            if (window != nint.Zero && NativeMethods.gtk_widget_get_visible(window))
+            {
+                // Return the first visible toplevel window (Photino creates one main window)
+                result = window;
+                break;
+            }
+            current = NativeMethods.G_list_next(current);
+        }
+
+        NativeMethods.g_list_free(list);
+        return result;
     }
 }
