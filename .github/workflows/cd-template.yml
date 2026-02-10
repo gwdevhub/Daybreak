@@ -162,18 +162,6 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
-      - name: Get Latest Tag
-        id: getLatestTag
-        uses: WyriHaximus/github-action-get-previous-tag@v2
-
-      - name: Generate changelog
-        id: gen_changelog
-        run: |
-          changeLog=$(git log --no-merges --pretty="%h - %s (%an)<br />" ${{ steps.getLatestTag.outputs.tag }}..HEAD)
-          echo "Changelog<<EOF" >> $GITHUB_ENV
-          echo "$changeLog" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-
       - name: Set version variable
         run: |
           version=$(grep '<Version>' Directory.Build.props | sed 's/.*<Version>\(.*\)<\/Version>.*/\1/')
@@ -249,6 +237,18 @@ jobs:
         with:
           name: release-zips
           path: release-assets/
+
+      - name: Get Latest Tag
+        id: getLatestTag
+        uses: WyriHaximus/github-action-get-previous-tag@v2
+
+      - name: Generate changelog
+        id: gen_changelog
+        run: |
+          changeLog=$(git log --no-merges --pretty="%h - %s (%an)<br />" ${{ steps.getLatestTag.outputs.tag }}..HEAD)
+          echo "Changelog<<EOF" >> $GITHUB_ENV
+          echo "$changeLog" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       - name: Set version variable
         run: |
