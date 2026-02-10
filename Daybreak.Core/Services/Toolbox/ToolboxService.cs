@@ -20,6 +20,7 @@ using System.Extensions;
 using System.Extensions.Core;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Daybreak.Shared;
 
 namespace Daybreak.Services.Toolbox;
 
@@ -141,7 +142,7 @@ internal sealed class ToolboxService(
     {
         if (await this.IsUpdateAvailableInternal(cancellationToken))
         {
-            this.notificationService.NotifyInformation<ToolboxUpdateHandler>("GWToolboxpp update available", "Click on this notification to update GWToolboxpp", expirationTime: DateTime.UtcNow + TimeSpan.FromSeconds(15));
+            this.notificationService.NotifyInformation<ToolboxUpdateHandler>("GWToolboxpp update available", "Click on this notification to update GWToolboxpp", expirationTime: Global.NotificationNeverExpire);
         }
     }
 

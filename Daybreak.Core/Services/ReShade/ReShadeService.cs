@@ -23,6 +23,7 @@ using System.Extensions;
 using System.Extensions.Core;
 using System.IO.Compression;
 using TrailBlazr.Services;
+using Daybreak.Shared;
 
 namespace Daybreak.Services.ReShade;
 internal sealed class ReShadeService(
@@ -421,7 +422,8 @@ internal sealed class ReShadeService(
             scopedLogger.LogDebug($"ReShade updated to version {version}");
             this.notificationService.NotifyInformation(
                 "ReShade updated",
-                $"ReShade has been updated to version {version}");
+                $"ReShade has been updated to version {version}",
+                expirationTime: Global.NotificationLongExpiration);
             return;
         }
 
@@ -429,7 +431,8 @@ internal sealed class ReShadeService(
         scopedLogger.LogError("Failed to update ReShade");
         this.notificationService.NotifyInformation(
                 "Failed to update ReShade",
-                $"Could not update ReShade to version {version}. Check logs for details");
+                $"Could not update ReShade to version {version}. Check logs for details",
+                expirationTime: Global.NotificationLongExpiration);
     }
 
     private async Task InstallPackageInternal(

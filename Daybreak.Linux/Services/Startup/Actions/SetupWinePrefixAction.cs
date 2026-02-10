@@ -1,6 +1,7 @@
 using System.Extensions.Core;
 using Daybreak.Linux.Services.Startup.Notifications;
 using Daybreak.Linux.Services.Wine;
+using Daybreak.Shared;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.Logging;
@@ -49,7 +50,7 @@ public sealed class SetupWinePrefixAction(
         this.notificationService.NotifyInformation<WinePrefixSetupHandler>(
             title: "Wine prefix setup required",
             description: "Click here to initialize the Wine prefix for Guild Wars launching.",
-            expirationTime: DateTime.UtcNow + TimeSpan.FromSeconds(15)
+            expirationTime: Global.NotificationLongExpiration
         );
     }
 }

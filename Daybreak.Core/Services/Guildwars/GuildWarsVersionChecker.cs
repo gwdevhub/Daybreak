@@ -1,5 +1,6 @@
 ﻿using Daybreak.Configuration.Options;
 using Daybreak.Services.Guildwars;
+using Daybreak.Shared;
 using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Models.Mods;
 using Daybreak.Shared.Services.ExecutableManagement;
@@ -153,7 +154,7 @@ internal sealed class GuildWarsVersionChecker(
             this.notificationService.NotifyInformation<GuildWarsBatchUpdateNotificationHandler>(
                 title: "Guild Wars needs an update",
                 description: "One or more Guild Wars executables are out of date and require an update. Click here to start the update",
-                expirationTime: DateTime.UtcNow + TimeSpan.FromSeconds(15));
+                expirationTime: Global.NotificationNeverExpire);
             return;
         }
     }
