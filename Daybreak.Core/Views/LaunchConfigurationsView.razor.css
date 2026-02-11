@@ -52,7 +52,8 @@
 .launch-config-name,
 .launch-config-args,
 .launch-config-steam,
-.launch-config-custom-mods {
+.launch-config-custom-mods,
+.launch-config-color {
     display: flex;
     flex-direction: row;
     width: 100%;
@@ -67,7 +68,8 @@
 .launch-config-name-label,
 .launch-config-args-label,
 .launch-config-steam-label,
-.launch-config-custom-mods-label {
+.launch-config-custom-mods-label,
+.launch-config-color-label {
     width: 250px;
 }
 
@@ -77,7 +79,8 @@
 .launch-config-name-field,
 .launch-config-args-field,
 .launch-config-steam-field,
-.launch-config-custom-mods-field {
+.launch-config-custom-mods-field,
+.launch-config-color-field {
     width: 50%;
     display: flex;
     flex-direction: row;
@@ -87,7 +90,8 @@
 
 /* Limit dropdown height to prevent container overflow */
 .launch-config-executable-field ::deep fluent-select::part(listbox),
-.launch-config-credentials-field ::deep fluent-select::part(listbox) {
+.launch-config-credentials-field ::deep fluent-select::part(listbox),
+.launch-config-color-field ::deep fluent-select::part(listbox) {
     max-height: 150px;
     overflow-y: auto;
     overflow-x: hidden;
@@ -95,18 +99,21 @@
 
 /* Scrollbar styling for the dropdown */
 .launch-config-executable-field ::deep fluent-select::part(listbox)::-webkit-scrollbar,
-.launch-config-credentials-field ::deep fluent-select::part(listbox)::-webkit-scrollbar {
+.launch-config-credentials-field ::deep fluent-select::part(listbox)::-webkit-scrollbar,
+.launch-config-color-field ::deep fluent-select::part(listbox)::-webkit-scrollbar {
     width: 6px;
 }
 
 .launch-config-executable-field ::deep fluent-select::part(listbox)::-webkit-scrollbar-track,
-.launch-config-credentials-field ::deep fluent-select::part(listbox)::-webkit-scrollbar-track {
+.launch-config-credentials-field ::deep fluent-select::part(listbox)::-webkit-scrollbar-track,
+.launch-config-color-field ::deep fluent-select::part(listbox)::-webkit-scrollbar-track {
     background: color-mix(in srgb, var(--neutral-fill-rest) 30%, transparent);
     border-radius: 3px;
 }
 
 .launch-config-executable-field ::deep fluent-select::part(listbox)::-webkit-scrollbar-thumb,
-.launch-config-credentials-field ::deep fluent-select::part(listbox)::-webkit-scrollbar-thumb {
+.launch-config-credentials-field ::deep fluent-select::part(listbox)::-webkit-scrollbar-thumb,
+.launch-config-color-field ::deep fluent-select::part(listbox)::-webkit-scrollbar-thumb {
     background: color-mix(in srgb, var(--neutral-fill-strong-rest) 80%, transparent);
     border-radius: 3px;
 }
@@ -118,7 +125,8 @@
 .launch-config-name-label ::deep *,
 .launch-config-args-label ::deep *,
 .launch-config-steam-label ::deep *,
-.launch-config-custom-mods-label ::deep * {
+.launch-config-custom-mods-label ::deep *,
+.launch-config-color-label ::deep * {
     font-size: var(--font-size-large) !important;
 }
 
@@ -128,7 +136,8 @@
 .launch-config-name-field ::deep fluent-text-field,
 .launch-config-args-field ::deep fluent-text-field,
 .launch-config-steam-field ::deep fluent-text-field,
-.launch-config-custom-mods-field ::deep fluent-text-field {
+.launch-config-custom-mods-field ::deep fluent-text-field,
+.launch-config-color-field ::deep fluent-text-field {
     width: 100%;
     box-sizing: border-box !important;
     font-size: var(--font-size-large);
@@ -140,9 +149,26 @@
 .launch-config-name-field ::deep fluent-select,
 .launch-config-args-field ::deep fluent-select,
 .launch-config-steam-field ::deep fluent-select,
-.launch-config-custom-mods-field ::deep fluent-select {
+.launch-config-custom-mods-field ::deep fluent-select,
+.launch-config-color-field ::deep fluent-select {
     width: 100%;
     box-sizing: border-box !important;
     font-size: var(--font-size-large) !important;
     --type-ramp-base-font-size: var(--font-size-large);
+}
+
+/* Color option styling */
+.color-option {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.color-swatch {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1px solid var(--neutral-stroke-rest);
+    flex-shrink: 0;
 }

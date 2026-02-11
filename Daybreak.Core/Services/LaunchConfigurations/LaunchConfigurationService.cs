@@ -113,6 +113,7 @@ internal sealed class LaunchConfigurationService(
             config.SteamSupport = launchConfigurationWithCredentials.SteamSupport;
             config.EnabledMods = launchConfigurationWithCredentials.EnabledMods;
             config.CustomModLoadoutEnabled = launchConfigurationWithCredentials.CustomModLoadoutEnabled;
+            config.Color = launchConfigurationWithCredentials.Color;
             var options = this.liveUpdateableOptions.CurrentValue;
             options.LaunchConfigurations = configs;
             this.optionsProvider.SaveOption(options);
@@ -128,7 +129,8 @@ internal sealed class LaunchConfigurationService(
             Arguments = launchConfigurationWithCredentials.Arguments,
             SteamSupport = launchConfigurationWithCredentials.SteamSupport,
             EnabledMods = launchConfigurationWithCredentials.EnabledMods,
-            CustomModLoadoutEnabled = launchConfigurationWithCredentials.CustomModLoadoutEnabled
+            CustomModLoadoutEnabled = launchConfigurationWithCredentials.CustomModLoadoutEnabled,
+            Color = launchConfigurationWithCredentials.Color
         });
         var optionsNew = this.liveUpdateableOptions.CurrentValue;
         optionsNew.LaunchConfigurations = configs;
@@ -158,7 +160,8 @@ internal sealed class LaunchConfigurationService(
             Name = launchConfiguration.Name,
             SteamSupport = launchConfiguration.SteamSupport ?? true,
             EnabledMods = launchConfiguration.EnabledMods,
-            CustomModLoadoutEnabled = launchConfiguration.CustomModLoadoutEnabled ?? false
+            CustomModLoadoutEnabled = launchConfiguration.CustomModLoadoutEnabled ?? false,
+            Color = launchConfiguration.Color
         };
     }
 }
