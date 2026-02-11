@@ -11,7 +11,6 @@ using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Credentials;
 using Daybreak.Services.DirectSong;
 using Daybreak.Services.Downloads;
-using Daybreak.Services.DXVK;
 using Daybreak.Services.Events;
 using Daybreak.Services.ExceptionHandling;
 using Daybreak.Services.ExecutableManagement;
@@ -58,7 +57,6 @@ using Daybreak.Shared.Services.BuildTemplates;
 using Daybreak.Shared.Services.Credentials;
 using Daybreak.Shared.Services.DirectSong;
 using Daybreak.Shared.Services.Downloads;
-using Daybreak.Shared.Services.DXVK;
 using Daybreak.Shared.Services.Events;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.Experience;
@@ -383,7 +381,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         modsManager.RegisterMod<IDaybreakApiService, DaybreakApiService>();
         modsManager.RegisterMod<IToolboxService, ToolboxService>();
         modsManager.RegisterMod<IUModService, UModService>();
-        modsManager.RegisterMod<IDXVKService, DXVKService>();
         modsManager.RegisterMod<IDirectSongService, DirectSongService>(singleton: true);
     }
 
