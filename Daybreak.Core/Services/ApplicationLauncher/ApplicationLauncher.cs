@@ -17,12 +17,10 @@ using Daybreak.Shared.Services.Privilege;
 using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Photino.NET;
 
 namespace Daybreak.Services.ApplicationLauncher;
 
 internal sealed class ApplicationLauncher(
-    PhotinoWindow photinoWindow,
     IDaybreakInjector daybreakInjector,
     IGuildWarsExecutableManager guildWarsExecutableManager,
     INotificationService notificationService,
@@ -40,7 +38,6 @@ internal sealed class ApplicationLauncher(
 
     private static readonly TimeSpan LaunchTimeout = TimeSpan.FromMinutes(1);
 
-    private readonly PhotinoWindow photinoWindow = photinoWindow.ThrowIfNull();
     private readonly IDaybreakInjector daybreakInjector = daybreakInjector.ThrowIfNull();
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager =
         guildWarsExecutableManager.ThrowIfNull();
@@ -178,11 +175,15 @@ internal sealed class ApplicationLauncher(
 
         var enabledMods = this
             .modsManager.GetMods()
-            .Where(m => m.IsEnabled && m.IsInstalled)
+            .Where(m => launchConfigurationWithCredentials.CustomModLoadoutEnabled
+                    ? m.IsInstalled && (!m.CanDisable || launchConfigurationWithCredentials.EnabledMods?.Contains(m.Name) is true)
+                    : m.IsInstalled && m.IsEnabled)
             .ToList();
         var disabledMods = this
             .modsManager.GetMods()
-            .Where(m => !m.IsEnabled && m.IsInstalled)
+            .Where(m => launchConfigurationWithCredentials.CustomModLoadoutEnabled
+                    ? m.IsInstalled && (!m.CanDisable || launchConfigurationWithCredentials.EnabledMods?.Contains(m.Name) is not true)
+                    : m.IsInstalled && !m.IsEnabled)
             .ToList();
 
         if (this.launcherOptions.CurrentValue.CancelLaunchOutOfDateMods)

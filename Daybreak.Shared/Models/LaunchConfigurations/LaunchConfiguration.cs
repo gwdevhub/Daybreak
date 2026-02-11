@@ -21,4 +21,10 @@ public sealed class LaunchConfiguration
 
     [JsonPropertyName(nameof(SteamSupport))]
     public bool? SteamSupport { get; set; } = true;
+
+    [JsonPropertyName(nameof(EnabledMods))]
+    public List<string>? EnabledMods { get; set; }
+
+    [JsonPropertyName(nameof(CustomModLoadoutEnabled))]
+    public bool? CustomModLoadoutEnabled { get; set; }
 }

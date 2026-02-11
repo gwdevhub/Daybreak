@@ -65,6 +65,7 @@ public sealed class DaybreakApiService(
     public bool IsVisible => true;
     public bool CanCustomManage => false;
     public bool CanUninstall => false;
+    public bool CanDisable => true;
 
     public IProgressAsyncOperation<bool> PerformUninstallation(CancellationToken cancellationToken)
     {

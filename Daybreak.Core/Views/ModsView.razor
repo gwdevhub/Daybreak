@@ -1,66 +1,79 @@
 ﻿<div class="stretch-container backdrop-panel">
-    <div class="mods-container">
-        @foreach (var mod in this.ViewModel.Mods)
-        {
-            if (!mod.IsVisible)
-            {
-                continue;
-            }
+  <div class="view-title">
+    <h3>
+      @if (this.ViewModel.LaunchConfiguration is not null)
+      {
+        @($"Mods - {this.ViewModel.LaunchConfiguration.Name ?? this.ViewModel.LaunchConfiguration.Identifier}")
+      }
+      else
+      {
+        @("Mods")
+      }
+    </h3>
+  </div>
 
-            <div class="mod-row">
-                <div class="mod-row-left">
-                    <div class="mod-name-label">@mod.Name</div>
-                    <div class="mod-description-label">@mod.Description</div>
-                </div>
-                <div class="mod-row-right">
-                    <div class="mod-toggle @((mod.IsInstalled ? string.Empty : "disabled"))">
-                        <FluentLabel class="label">@(mod.IsEnabled ? "Enabled" : "Disabled")</FluentLabel>
-                        <FluentSwitch Value="@(mod.IsEnabled)"
-                                      @onchange="() => this.ViewModel.ToggleMod(mod)" />
-                    </div>
-                    @if (mod.Loading)
-                    {
-                        <SpinnerWidget IsLoading="true" />
-                    }
-                    else if (!mod.IsInstalled)
-                    {
-                        <div class="mod-action-button"
-                            @onclick="(() => this.ViewModel.InstallMod(mod))">
-                            Install
-                        </div>
-                    }
-                    else if (mod.CanUpdate)
-                    {
-                        <div class="mod-action-button"
-                             @onclick="@(() => this.ViewModel.UpdateMod(mod))">
-                            Update
-                        </div>
-                    }
-                    else if (mod.IsEnabled && mod.CanManage)
-                    {
-                        <div class="mod-action-button"
-                             @onclick="@(() => this.ViewModel.ManageMod(mod))">
-                            Manage
-                        </div>
-                    }
-                    else if (mod.CanUninstall)
-                    {
-                        <div class="mod-action-button"
-                             @onclick="@(() => this.ViewModel.UninstallMod(mod))">
-                            Uninstall
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="mod-action-button-disabled">
-                            Installed
-                        </div>
-                    }
-                </div>
+  <div class="mods-container">
+    @foreach (var mod in this.ViewModel.Mods)
+    {
+      if (!mod.IsVisible)
+      {
+        continue;
+      }
+
+      <div class="mod-row">
+        <div class="mod-row-left">
+          <div class="mod-name-label">@mod.Name</div>
+          <div class="mod-description-label">@mod.Description</div>
+        </div>
+        <div class="mod-row-right">
+          <div class="mod-toggle @((mod.IsInstalled && mod.CanDisable ? string.Empty : "disabled"))">
+            <FluentLabel class="label">@(mod.IsEnabled ? "Enabled" : "Disabled")</FluentLabel>
+            <FluentSwitch Value="@(mod.IsEnabled)" Disabled="@(!mod.CanDisable)" @onchange="() => this.ViewModel.ToggleMod(mod)" />
+          </div>
+          @if (mod.Loading)
+          {
+            <SpinnerWidget IsLoading="true" />
+          }
+          else if (!mod.IsInstalled)
+          {
+            <div class="mod-action-button" @onclick="(() => this.ViewModel.InstallMod(mod))">
+              Install
             </div>
-        }
-    </div>
+          }
+          else if (mod.CanUpdate)
+          {
+            <div class="mod-action-button" @onclick="@(() => this.ViewModel.UpdateMod(mod))">
+              Update
+            </div>
+          }
+          else if (mod.IsEnabled && mod.CanManage)
+          {
+            <div class="mod-action-button" @onclick="@(() => this.ViewModel.ManageMod(mod))">
+              Manage
+            </div>
+          }
+          else if (mod.CanUninstall)
+          {
+            <div class="mod-action-button" @onclick="@(() => this.ViewModel.UninstallMod(mod))">
+              Uninstall
+            </div>
+          }
+          else
+          {
+            <div class="mod-action-button-disabled">
+              Installed
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
 </div>
 
 @page "/mods"
 @inherits ViewBase<ModsView, ModsViewModel>
+@code
+{
+  [Parameter]
+  public string? LaunchConfigurationIdentifier { get; set; }
+}

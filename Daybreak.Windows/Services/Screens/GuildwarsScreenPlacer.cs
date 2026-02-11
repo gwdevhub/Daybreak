@@ -48,6 +48,7 @@ internal sealed class GuildwarsScreenPlacer(
     public bool IsInstalled => true;
 
     public bool CanUninstall => false;
+    public bool CanDisable => true;
 
     public IProgressAsyncOperation<bool> PerformUninstallation(CancellationToken cancellationToken)
     {

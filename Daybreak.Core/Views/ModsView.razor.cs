@@ -1,5 +1,7 @@
 ﻿using System.Extensions.Core;
 using Daybreak.Models;
+using Daybreak.Shared.Models.LaunchConfigurations;
+using Daybreak.Shared.Services.LaunchConfigurations;
 using Daybreak.Shared.Services.Mods;
 using Daybreak.Shared.Services.Notifications;
 using Microsoft.Extensions.Logging;
@@ -7,25 +9,29 @@ using TrailBlazr.Services;
 using TrailBlazr.ViewModels;
 
 namespace Daybreak.Views;
+
 public sealed class ModsViewModel(
     INotificationService notificationService,
     IViewManager viewManager,
     IModsManager modsManager,
+    ILaunchConfigurationService launchConfigurationService,
     ILogger<ModsViewModel> logger)
     : ViewModelBase<ModsViewModel, ModsView>
 {
     private readonly INotificationService notificationService = notificationService;
     private readonly IViewManager viewManager = viewManager;
     private readonly IModsManager modService = modsManager;
+    private readonly ILaunchConfigurationService launchConfigurationService = launchConfigurationService;
     private readonly ILogger<ModsViewModel> logger = logger;
 
     private CancellationTokenSource? cts;
 
+    public LaunchConfigurationWithCredentials? LaunchConfiguration { get; private set; }
     public IEnumerable<ModListEntry> Mods { get; private set; } = [];
 
     public override ValueTask ParametersSet(ModsView view, CancellationToken cancellationToken)
     {
-        this.Mods = [.. this.modService.GetMods().OrderBy(m => m.Name)
+        var globalMods = this.modService.GetMods().OrderBy(m => m.Name)
             .Select(m => new ModListEntry
             {
                 Name = m.Name,
@@ -36,9 +42,26 @@ public sealed class ModsViewModel(
                 CanManage = m.CanCustomManage,
                 IsInstalled = m.IsInstalled,
                 CanUninstall = m.CanUninstall,
+                CanDisable = m.CanDisable,
                 CanUpdate = false,
                 Loading = true,
-            })];
+            }).ToList();
+
+        if (this.launchConfigurationService.GetLaunchConfigurations().FirstOrDefault(l => l.Identifier == view.LaunchConfigurationIdentifier) is LaunchConfigurationWithCredentials config)
+        {
+            this.LaunchConfiguration = config;
+            foreach (var mod in globalMods)
+            {
+                // Mods that cannot be disabled are always enabled
+                mod.IsEnabled = !mod.CanDisable || config.EnabledMods?.Any(m => m == mod.Name) is true;
+            }
+        }
+        else
+        {
+            this.LaunchConfiguration = null;
+        }
+
+        this.Mods = globalMods;
         this.viewManager.ShowViewRequested += this.ViewManager_ShowViewRequested;
         this.cts?.Cancel();
         this.cts?.Dispose();
@@ -49,13 +72,34 @@ public sealed class ModsViewModel(
 
     public void ToggleMod(ModListEntry mod)
     {
-        if (!mod.IsInstalled)
+        if (!mod.IsInstalled || !mod.CanDisable)
         {
             return;
         }
 
         mod.IsEnabled = !mod.IsEnabled;
-        mod.ModService.IsEnabled = mod.IsEnabled;
+        if (this.LaunchConfiguration is not null)
+        {
+            if (mod.IsEnabled)
+            {
+                this.LaunchConfiguration.EnabledMods ??= [];
+                if (!this.LaunchConfiguration.EnabledMods.Any(m => m == mod.Name))
+                {
+                    this.LaunchConfiguration.EnabledMods.Add(mod.Name);
+                }
+            }
+            else
+            {
+                this.LaunchConfiguration.EnabledMods?.Remove(mod.Name);
+            }
+
+            this.launchConfigurationService.SaveConfiguration(this.LaunchConfiguration);
+        }
+        else
+        {
+            mod.ModService.IsEnabled = mod.IsEnabled;
+        }
+
         this.RefreshView();
     }
 
@@ -110,7 +154,7 @@ public sealed class ModsViewModel(
         if (!await mod.ModService.PerformUninstallation(this.cts?.Token ?? CancellationToken.None))
         {
             this.notificationService.NotifyError($"{mod.Name} uninstallation failed", $"{mod.Name} has failed to uninstall. Please check logs for more details.");
-            
+
         }
 
         mod.Loading = false;
@@ -133,7 +177,7 @@ public sealed class ModsViewModel(
 
     private async ValueTask CheckForUpdates(CancellationToken cancellationToken)
     {
-        foreach(var mod in this.Mods)
+        foreach (var mod in this.Mods)
         {
             mod.Loading = true;
         }
@@ -152,7 +196,7 @@ public sealed class ModsViewModel(
                     mod.CanUpdate = false;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 mod.CanUpdate = false;
                 var modName = mod.Name ?? "Unknown mod";

@@ -8,6 +8,8 @@ public sealed class LaunchConfigurationWithCredentials : IEquatable<LaunchConfig
     public string? Arguments { get; set; }
     public bool SteamSupport { get; set; } = true;
     public LoginCredentials? Credentials { get; set; }
+    public List<string>? EnabledMods { get; set; }
+    public bool CustomModLoadoutEnabled { get; set; }
 
     public bool Equals(LaunchConfigurationWithCredentials? other)
     {
@@ -27,7 +29,10 @@ public sealed class LaunchConfigurationWithCredentials : IEquatable<LaunchConfig
             (this.Name is not null && other.Name is not null && string.Equals(this.Name, other.Name, StringComparison.Ordinal))) &&
 
             this.Credentials?.Equals(other.Credentials) is true &&
-            this.SteamSupport == other.SteamSupport;
+            this.SteamSupport == other.SteamSupport &&
+
+            this.EnabledMods?.SequenceEqual(other.EnabledMods ?? []) is true &&
+            this.CustomModLoadoutEnabled == other.CustomModLoadoutEnabled;
     }
 
     public override bool Equals(object? obj)
