@@ -70,6 +70,9 @@ public sealed class WinePrefixManager(
     public bool CanUninstall => false;
 
     /// <inheritdoc />
+    public bool CanDisable => false;
+
+    /// <inheritdoc />
     public IProgressAsyncOperation<bool> PerformInstallation(CancellationToken cancellationToken)
     {
         return this.Install(cancellationToken);

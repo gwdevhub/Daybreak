@@ -133,6 +133,13 @@ html, body {
     background: color-mix(in srgb, var(--neutral-fill-strong-hover) 80%, transparent);
 }
 
+.view-title {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--neutral-foreground-rest);
+    font-size: var(--font-size-large);
+}
+
 .option-view-title {
     text-align: center;
     margin-bottom: 2rem;

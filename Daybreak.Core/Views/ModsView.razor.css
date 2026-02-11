@@ -2,7 +2,8 @@
     gap: 1rem;
     padding: 1rem;
     overflow-y: auto;
-    margin-top: 40px;
+    flex: 1;
+    min-height: 0;
 }
 
 .mod-row {

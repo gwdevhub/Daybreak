@@ -41,6 +41,11 @@ public interface IModService
     bool CanUninstall { get; }
 
     /// <summary>
+    /// Dictates if the mod can be disabled by the user. If false, the mod is always enabled when installed.
+    /// </summary>
+    bool CanDisable { get; }
+
+    /// <summary>
     /// Called by the mod manager to perform installation steps for the mod.
     /// </summary>
     /// <returns>Returns an awaitable <see cref="IProgressAsyncOperation{bool}"/></returns>

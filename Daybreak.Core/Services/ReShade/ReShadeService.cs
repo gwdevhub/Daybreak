@@ -99,6 +99,7 @@ internal sealed class ReShadeService(
                                File.Exists(ReShadeLogPath) &&
                                File.Exists(ConfigIniPath);
     public bool CanUninstall => true;
+    public bool CanDisable => true;
 
     public IProgressAsyncOperation<bool> PerformUninstallation(CancellationToken cancellationToken)
     {

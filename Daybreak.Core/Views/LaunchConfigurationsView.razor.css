@@ -51,7 +51,8 @@
 .launch-config-credentials,
 .launch-config-name,
 .launch-config-args,
-.launch-config-steam {
+.launch-config-steam,
+.launch-config-custom-mods {
     display: flex;
     flex-direction: row;
     width: 100%;
@@ -65,7 +66,8 @@
 .launch-config-credentials-label,
 .launch-config-name-label,
 .launch-config-args-label,
-.launch-config-steam-label {
+.launch-config-steam-label,
+.launch-config-custom-mods-label {
     width: 250px;
 }
 
@@ -74,8 +76,13 @@
 .launch-config-credentials-field,
 .launch-config-name-field,
 .launch-config-args-field,
-.launch-config-steam-field {
+.launch-config-steam-field,
+.launch-config-custom-mods-field {
     width: 50%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
 }
 
 /* Limit dropdown height to prevent container overflow */
@@ -110,7 +117,8 @@
 .launch-config-credentials-label ::deep *,
 .launch-config-name-label ::deep *,
 .launch-config-args-label ::deep *,
-.launch-config-steam-label ::deep * {
+.launch-config-steam-label ::deep *,
+.launch-config-custom-mods-label ::deep * {
     font-size: var(--font-size-large) !important;
 }
 
@@ -119,7 +127,8 @@
 .launch-config-credentials-field ::deep fluent-text-field,
 .launch-config-name-field ::deep fluent-text-field,
 .launch-config-args-field ::deep fluent-text-field,
-.launch-config-steam-field ::deep fluent-text-field {
+.launch-config-steam-field ::deep fluent-text-field,
+.launch-config-custom-mods-field ::deep fluent-text-field {
     width: 100%;
     box-sizing: border-box !important;
     font-size: var(--font-size-large);
@@ -130,7 +139,8 @@
 .launch-config-credentials-field ::deep fluent-select,
 .launch-config-name-field ::deep fluent-select,
 .launch-config-args-field ::deep fluent-select,
-.launch-config-steam-field ::deep fluent-select {
+.launch-config-steam-field ::deep fluent-select,
+.launch-config-custom-mods-field ::deep fluent-select {
     width: 100%;
     box-sizing: border-box !important;
     font-size: var(--font-size-large) !important;
