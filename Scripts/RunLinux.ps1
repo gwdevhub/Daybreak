@@ -11,4 +11,3 @@ if (-not $env:WEBKIT_DISABLE_DMABUF_RENDERER) { $env:WEBKIT_DISABLE_DMABUF_RENDE
 if (-not $env:WEBKIT_DISABLE_COMPOSITING_MODE) { $env:WEBKIT_DISABLE_COMPOSITING_MODE = "1" }
 
 dotnet run --project Daybreak.Linux
-

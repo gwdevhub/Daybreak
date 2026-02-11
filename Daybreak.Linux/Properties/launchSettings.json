@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Daybreak.Linux": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "GDK_BACKEND": "x11",
+        "WEBKIT_DISABLE_DMABUF_RENDERER": "1",
+        "WEBKIT_DISABLE_COMPOSITING_MODE": "1"
+      }
+    }
+  }
+}
