@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Core.Extensions;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Api;
 using Daybreak.Shared.Models.LaunchConfigurations;
@@ -13,7 +12,6 @@ using Daybreak.Shared.Services.ApplicationLauncher;
 using Daybreak.Shared.Services.LaunchConfigurations;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Onboarding;
-using Microsoft.Extensions.Options;
 using TrailBlazr.Services;
 using TrailBlazr.ViewModels;
 
@@ -25,8 +23,7 @@ public sealed class LaunchViewModel(
     IDaybreakApiService daybreakApiService,
     ILaunchConfigurationService launchConfigurationService,
     IOnboardingService onboardingService,
-    IApplicationLauncher applicationLauncher,
-    IOptionsMonitor<FocusViewOptions> focusViewOptions
+    IApplicationLauncher applicationLauncher
 ) : ViewModelBase<LaunchViewModel, LaunchView>, INotifyPropertyChanged, IDisposable
 {
     private static readonly TimeSpan LaunchTimeout = TimeSpan.FromSeconds(10);
@@ -38,8 +35,6 @@ public sealed class LaunchViewModel(
         launchConfigurationService.ThrowIfNull();
     private readonly IOnboardingService onboardingService = onboardingService.ThrowIfNull();
     private readonly IApplicationLauncher applicationLauncher = applicationLauncher.ThrowIfNull();
-    private readonly IOptionsMonitor<FocusViewOptions> focusViewOptions =
-        focusViewOptions.ThrowIfNull();
 
     private CancellationTokenSource? cancellationTokenSource;
     private string? autoLaunchConfigurationId;
@@ -476,11 +471,11 @@ public sealed class LaunchViewModel(
         }
         else
         {
-            // Game running with API mod - can attach or kill based on focus view setting
+            // Game running with API mod available - can attach to use FocusView
             launcherViewContext.GameRunning = true;
             launcherViewContext.CanLaunch = false;
-            launcherViewContext.CanAttach = this.focusViewOptions.CurrentValue.Enabled;
-            launcherViewContext.CanKill = !this.focusViewOptions.CurrentValue.Enabled;
+            launcherViewContext.CanAttach = true;
+            launcherViewContext.CanKill = false;
         }
     }
 
@@ -546,7 +541,8 @@ public sealed class LaunchViewModel(
         CancellationToken cancellationToken
     )
     {
-        if (!this.focusViewOptions.CurrentValue.Enabled)
+        // Only attach if Daybreak API was enabled for this launch
+        if (!context.EnabledMods.OfType<IDaybreakApiService>().Any())
         {
             return;
         }
@@ -593,11 +589,7 @@ public sealed class LaunchViewModel(
             return;
         }
 
-        if (!this.focusViewOptions.CurrentValue.Enabled)
-        {
-            return;
-        }
-
+        // If we have an apiContext, the Daybreak API is running and we can attach
         using var notificationToken = this.notificationService.NotifyInformation(
             title: "Attaching to Guild Wars process...",
             description: "Attempting to attach to Guild Wars process"
@@ -677,7 +669,9 @@ public sealed class LaunchViewModel(
         this.launchConfigurationService.SetLastLaunchConfigurationWithCredentials(
             launcherViewContext.Configuration
         );
-        if (!this.focusViewOptions.CurrentValue.Enabled)
+
+        // Only attach to focus view if Daybreak API was enabled for this launch
+        if (!launchedContext.EnabledMods.OfType<IDaybreakApiService>().Any())
         {
             return;
         }
