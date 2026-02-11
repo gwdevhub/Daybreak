@@ -24,7 +24,7 @@ public sealed class DaybreakApiService(
     IStubInjector stubInjector,
     INotificationService notificationService,
     IHttpClient<ScopedApiContext> scopedApiClient,
-    IOptionsMonitor<FocusViewOptions> liveUpdateableOptions,
+    IOptionsMonitor<DaybreakApiOptions> daybreakApiOptions,
     ILogger<DaybreakApiService> logger,
     ILogger<ScopedApiContext> scopedApiLogger)
     : IDaybreakApiService
@@ -42,7 +42,7 @@ public sealed class DaybreakApiService(
     private readonly IStubInjector stubInjector = stubInjector.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IHttpClient<ScopedApiContext> scopedApiClient = scopedApiClient.ThrowIfNull();
-    private readonly IOptionsMonitor<FocusViewOptions> liveUpdateableOptions = liveUpdateableOptions.ThrowIfNull();
+    private readonly IOptionsMonitor<DaybreakApiOptions> daybreakApiOptions = daybreakApiOptions.ThrowIfNull();
     private readonly ILogger<DaybreakApiService> logger = logger.ThrowIfNull();
     private readonly ILogger<ScopedApiContext> scopedApiLogger = scopedApiLogger.ThrowIfNull();
 
@@ -52,10 +52,10 @@ public sealed class DaybreakApiService(
 
     public bool IsEnabled
     {
-        get => this.liveUpdateableOptions.CurrentValue.Enabled;
+        get => this.daybreakApiOptions.CurrentValue.Enabled;
         set
         {
-            var options = this.liveUpdateableOptions.CurrentValue;
+            var options = this.daybreakApiOptions.CurrentValue;
             options.Enabled = value;
             this.optionsProvider.SaveOption(options);
         }
@@ -65,6 +65,7 @@ public sealed class DaybreakApiService(
     public bool IsVisible => true;
     public bool CanCustomManage => false;
     public bool CanUninstall => false;
+    public bool CanDisable => true;
 
     public IProgressAsyncOperation<bool> PerformUninstallation(CancellationToken cancellationToken)
     {

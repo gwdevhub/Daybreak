@@ -17,12 +17,10 @@ using Daybreak.Shared.Services.Privilege;
 using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Photino.NET;
 
 namespace Daybreak.Services.ApplicationLauncher;
 
 internal sealed class ApplicationLauncher(
-    PhotinoWindow photinoWindow,
     IDaybreakInjector daybreakInjector,
     IGuildWarsExecutableManager guildWarsExecutableManager,
     INotificationService notificationService,
@@ -40,7 +38,6 @@ internal sealed class ApplicationLauncher(
 
     private static readonly TimeSpan LaunchTimeout = TimeSpan.FromMinutes(1);
 
-    private readonly PhotinoWindow photinoWindow = photinoWindow.ThrowIfNull();
     private readonly IDaybreakInjector daybreakInjector = daybreakInjector.ThrowIfNull();
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager =
         guildWarsExecutableManager.ThrowIfNull();
@@ -71,7 +68,7 @@ internal sealed class ApplicationLauncher(
             cancellationToken,
             timeout.Token
         );
-        var gwProcess = await this.LaunchGuildwarsProcess(
+        var (gwProcess, enabledMods) = await this.LaunchGuildwarsProcess(
             launchConfigurationWithCredentials,
             cancellation.Token
         );
@@ -85,6 +82,7 @@ internal sealed class ApplicationLauncher(
             LaunchConfiguration = launchConfigurationWithCredentials,
             GuildWarsProcess = gwProcess,
             ProcessId = (uint)gwProcess.Id,
+            EnabledMods = enabledMods,
         };
     }
 
@@ -103,7 +101,7 @@ internal sealed class ApplicationLauncher(
         this.daybreakRestartingService.RestartDaybreakAsNormalUser();
     }
 
-    private async Task<Process?> LaunchGuildwarsProcess(
+    private async Task<(Process? Process, IReadOnlyList<IModService> EnabledMods)> LaunchGuildwarsProcess(
         LaunchConfigurationWithCredentials launchConfigurationWithCredentials,
         CancellationToken cancellationToken
     )
@@ -137,7 +135,7 @@ internal sealed class ApplicationLauncher(
                     title: "Can not launch Guild Wars",
                     description: "No available executables found. All executables are currently in use"
                 );
-                return default;
+                return (default, []);
             }
 
             executable = firstAvailableExecutable;
@@ -178,11 +176,15 @@ internal sealed class ApplicationLauncher(
 
         var enabledMods = this
             .modsManager.GetMods()
-            .Where(m => m.IsEnabled && m.IsInstalled)
+            .Where(m => launchConfigurationWithCredentials.CustomModLoadoutEnabled
+                    ? m.IsInstalled && (!m.CanDisable || launchConfigurationWithCredentials.EnabledMods?.Contains(m.Name) is true)
+                    : m.IsInstalled && m.IsEnabled)
             .ToList();
         var disabledMods = this
             .modsManager.GetMods()
-            .Where(m => !m.IsEnabled && m.IsInstalled)
+            .Where(m => launchConfigurationWithCredentials.CustomModLoadoutEnabled
+                    ? m.IsInstalled && (!m.CanDisable || launchConfigurationWithCredentials.EnabledMods?.Contains(m.Name) is not true)
+                    : m.IsInstalled && !m.IsEnabled)
             .ToList();
 
         if (this.launcherOptions.CurrentValue.CancelLaunchOutOfDateMods)
@@ -269,7 +271,7 @@ internal sealed class ApplicationLauncher(
                     title: $"{mod.Name} exception",
                     description: $"Mod encountered exception of type {e.GetType().Name} while processing {nameof(mod.OnGuildWarsStartingDisabled)}"
                 );
-                return default;
+                return (default, []);
             }
         }
 
@@ -293,7 +295,7 @@ internal sealed class ApplicationLauncher(
                         title: $"{mod.Name} canceled startup",
                         description: $"Mod canceled the startup during {nameof(mod.OnGuildWarsStarting)}"
                     );
-                    return default;
+                    return (default, []);
                 }
             }
             catch (TaskCanceledException)
@@ -311,7 +313,7 @@ internal sealed class ApplicationLauncher(
                     title: $"{mod.Name} exception",
                     description: $"Mod encountered exception of type {e.GetType().Name} while processing {nameof(mod.OnGuildWarsStarting)}"
                 );
-                return default;
+                return (default, []);
             }
         }
 
@@ -331,7 +333,7 @@ internal sealed class ApplicationLauncher(
                 title: "Failed to launch Guild Wars",
                 description: $"Injector failed to launch Guild Wars with launch result {launchResult}. Check logs for details"
             );
-            return default;
+            return (default, []);
         }
 
         var threadHandle = launchResult.ThreadHandle;
@@ -347,7 +349,7 @@ internal sealed class ApplicationLauncher(
                 title: "Failed to launch Guild Wars",
                 description: "Injector returned invalid process or thread handle. Check logs for details"
             );
-            return default;
+            return (default, []);
         }
 
         // Reset launch context with the launched process
@@ -386,7 +388,7 @@ internal sealed class ApplicationLauncher(
                             ProcessId = (uint)pId,
                         }
                     );
-                    return default;
+                    return (default, []);
                 }
             }
             catch (TaskCanceledException)
@@ -412,7 +414,7 @@ internal sealed class ApplicationLauncher(
                     title: $"{mod.Name} exception",
                     description: $"Mod encountered exception of type {e.GetType().Name} while processing {nameof(mod.OnGuildWarsCreated)}"
                 );
-                return default;
+                return (default, []);
             }
         }
 
@@ -427,7 +429,7 @@ internal sealed class ApplicationLauncher(
                 title: "Failed to launch Guild Wars",
                 description: $"Injector failed to resume Guild Wars with resume result {resumeResult}. Check logs for details"
             );
-            return default;
+            return (default, []);
         }
 
         var sw = Stopwatch.StartNew();
@@ -443,7 +445,7 @@ internal sealed class ApplicationLauncher(
                 title: "Guild Wars process not ready",
                 description: "Guild Wars process exited or timed out before becoming ready. Please check logs for details"
             );
-            return default;
+            return (default, []);
         }
 
         /*
@@ -485,11 +487,11 @@ internal sealed class ApplicationLauncher(
                     title: $"{mod.Name} exception",
                     description: $"Mod encountered exception of type {e.GetType().Name} while processing {nameof(mod.OnGuildWarsStarted)}"
                 );
-                return default;
+                return (default, []);
             }
         }
 
-        return process;
+        return (process, enabledMods);
     }
 
     public GuildWarsApplicationLaunchContext? GetGuildwarsProcess(

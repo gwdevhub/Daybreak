@@ -64,6 +64,7 @@ internal sealed class UModService(
     public bool IsVisible => true;
     public bool CanCustomManage => true;
     public bool CanUninstall => true;
+    public bool CanDisable => true;
     public bool IsEnabled
     {
         get => this.uModOptions.CurrentValue.Enabled;

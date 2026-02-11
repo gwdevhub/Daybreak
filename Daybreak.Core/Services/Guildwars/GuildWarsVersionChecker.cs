@@ -47,6 +47,7 @@ internal sealed class GuildWarsVersionChecker(
     private readonly ILogger<GuildWarsVersionChecker> logger = logger.ThrowIfNull();
 
     public bool CanUninstall => false;
+    public bool CanDisable => true;
 
     public IProgressAsyncOperation<bool> PerformUninstallation(CancellationToken cancellationToken)
     {

@@ -8,10 +8,6 @@ namespace Daybreak.Configuration.Options;
 [OptionsIgnore]
 public sealed class FocusViewOptions
 {
-    [JsonPropertyName(nameof(Enabled))]
-    [OptionName(Name = "Enabled", Description = "If true, the focus view is enabled, showing live information from the game")]
-    public bool Enabled { get; set; } = false;
-
     [JsonPropertyName(nameof(ExperienceDisplay))]
     [OptionName(Name = "Experience Display Mode", Description = "Sets how should the experience display show the information")]
     public ExperienceDisplay ExperienceDisplay { get; set; }

@@ -27,6 +27,7 @@ public sealed class SimpleNotificationMod(
     public bool IsVisible { get; } = true;
     public bool CanCustomManage { get; } = false;
     public bool CanUninstall { get; } = false;
+    public bool CanDisable { get; } = true;
 
     public IEnumerable<string> GetCustomArguments() => [];
 

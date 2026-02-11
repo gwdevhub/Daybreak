@@ -4,18 +4,22 @@ using Daybreak.Shared.Services.Credentials;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.LaunchConfigurations;
 using System.Extensions;
+using TrailBlazr.Services;
 using TrailBlazr.ViewModels;
 
 namespace Daybreak.Views;
+
 public sealed class LaunchConfigurationsViewModel(
     ILaunchConfigurationService launchConfigurationService,
     ICredentialManager credentialManager,
-    IGuildWarsExecutableManager guildWarsExecutableManager)
+    IGuildWarsExecutableManager guildWarsExecutableManager,
+    IViewManager viewManager)
     : ViewModelBase<LaunchConfigurationsViewModel, LaunchConfigurationsView>
 {
     private readonly ILaunchConfigurationService launchConfigurationService = launchConfigurationService;
     private readonly ICredentialManager credentialManager = credentialManager;
     private readonly IGuildWarsExecutableManager guildWarsExecutableManager = guildWarsExecutableManager;
+    private readonly IViewManager viewManager = viewManager;
 
     public List<string> Executables { get; } = [];
     public List<LoginCredentials> Credentials { get; } = [];
@@ -82,5 +86,16 @@ public sealed class LaunchConfigurationsViewModel(
     {
         configuration.SteamSupport = isEnabled;
         this.launchConfigurationService.SaveConfiguration(configuration);
+    }
+
+    public void CustomModLoadoutChanged(LaunchConfigurationWithCredentials configuration, bool isEnabled)
+    {
+        configuration.CustomModLoadoutEnabled = isEnabled;
+        this.launchConfigurationService.SaveConfiguration(configuration);
+    }
+
+    public void ManageCustomMods(LaunchConfigurationWithCredentials configuration)
+    {
+        this.viewManager.ShowView<ModsView>((nameof(ModsView.LaunchConfigurationIdentifier), configuration.Identifier ?? throw new InvalidOperationException("Managed configuration identifier cannot be null")));
     }
 }

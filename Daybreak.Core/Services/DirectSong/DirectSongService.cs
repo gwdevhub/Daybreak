@@ -57,6 +57,7 @@ internal sealed class DirectSongService(
     public bool IsVisible => true;
     public bool CanCustomManage => false;
     public bool CanUninstall => true;
+    public bool CanDisable => true;
     public bool IsEnabled
     {
         get => this.options.CurrentValue.Enabled;
