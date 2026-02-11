@@ -1,4 +1,5 @@
 ﻿using Daybreak.Shared.Models;
+using Daybreak.Shared.Models.ColorPalette;
 using Daybreak.Shared.Models.LaunchConfigurations;
 using Daybreak.Shared.Services.Credentials;
 using Daybreak.Shared.Services.ExecutableManagement;
@@ -24,6 +25,7 @@ public sealed class LaunchConfigurationsViewModel(
     public List<string> Executables { get; } = [];
     public List<LoginCredentials> Credentials { get; } = [];
     public List<LaunchConfigurationWithCredentials> LaunchConfigurations { get; } = [];
+    public List<string> AvailableColors { get; } = [string.Empty, .. AccentColor.Accents.Select(a => a.Name.ToString())];
 
     public override ValueTask ParametersSet(LaunchConfigurationsView view, CancellationToken cancellationToken)
     {
@@ -97,5 +99,16 @@ public sealed class LaunchConfigurationsViewModel(
     public void ManageCustomMods(LaunchConfigurationWithCredentials configuration)
     {
         this.viewManager.ShowView<ModsView>((nameof(ModsView.LaunchConfigurationIdentifier), configuration.Identifier ?? throw new InvalidOperationException("Managed configuration identifier cannot be null")));
+    }
+
+    public void ColorChanged(LaunchConfigurationWithCredentials configuration, string newColor)
+    {
+        configuration.Color = string.IsNullOrWhiteSpace(newColor) ? null : newColor;
+        this.launchConfigurationService.SaveConfiguration(configuration);
+    }
+
+    public string GetColorDisplayName(string colorName)
+    {
+        return string.IsNullOrWhiteSpace(colorName) ? "Default" : colorName;
     }
 }
