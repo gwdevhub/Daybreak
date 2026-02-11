@@ -16,7 +16,9 @@ using Daybreak.Linux.Services.SevenZip;
 using Daybreak.Linux.Services.Window;
 using Daybreak.Linux.Services.ExceptionHandling;
 using Daybreak.Linux.Services.Wine;
+using Daybreak.Services.DXVK;
 using Daybreak.Shared.Models.Plugins;
+using Daybreak.Shared.Services.DXVK;
 using Daybreak.Shared.Services.ApplicationLauncher;
 using Daybreak.Shared.Services.Credentials;
 using Daybreak.Shared.Services.DirectSong;
@@ -85,5 +87,6 @@ public sealed class LinuxPlatformConfiguration : PluginConfigurationBase
     public override void RegisterMods(IModsProducer modsProducer)
     {
         modsProducer.RegisterMod<IWinePrefixManager, WinePrefixManager>(singleton: true);
+        modsProducer.RegisterMod<IDXVKService, DXVKService>();
     }
 }

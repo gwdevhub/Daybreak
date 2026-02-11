@@ -213,7 +213,29 @@ public sealed class WinePrefixManager(
         // Check if the prefix directory exists and has been initialized
         // Wine creates a system.reg file when the prefix is initialized
         var systemRegPath = Path.Combine(this.winePrefixPath, "system.reg");
-        return File.Exists(systemRegPath);
+        if (!File.Exists(systemRegPath))
+        {
+            return false;
+        }
+
+        // Also check if the d3d9 DLL override is set in user.reg
+        // This ensures Wine will prefer native DLLs (from GW folder) over builtin
+        var userRegPath = Path.Combine(this.winePrefixPath, "user.reg");
+        if (!File.Exists(userRegPath))
+        {
+            return false;
+        }
+
+        try
+        {
+            var userRegContent = File.ReadAllText(userRegPath);
+            // Check for d3d9 override in the DllOverrides section
+            return userRegContent.Contains("\"d3d9\"") && userRegContent.Contains("native,builtin");
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     public string GetWinePrefixPath()
@@ -302,6 +324,15 @@ public sealed class WinePrefixManager(
                 return false;
             }
 
+            // Set d3d9 DLL override to native,builtin
+            // This ensures Wine prefers DLLs from the application folder (e.g., DXVK's d3d9.dll)
+            // over its builtin implementation. When no native DLL exists, it falls back to builtin.
+            progress.Report(new ProgressUpdate(0.8, "Configuring DLL overrides"));
+            if (!await this.SetDllOverride("d3d9", "native,builtin", cancellationToken))
+            {
+                this.logger.LogWarning("Failed to set d3d9 DLL override, but continuing...");
+            }
+
             this.logger.LogInformation("Wine prefix initialized successfully");
             progress.Report(ProgressFinished);
             return true;
@@ -358,6 +389,7 @@ public sealed class WinePrefixManager(
         };
 
         startInfo.Environment["WINEPREFIX"] = this.winePrefixPath;
+
         try
         {
             using var process = new Process { StartInfo = startInfo };
@@ -440,6 +472,51 @@ public sealed class WinePrefixManager(
         {
             this.logger.LogError(ex, "Failed to launch Wine process");
             return (null, ex.Message, -1);
+        }
+    }
+
+    /// <summary>
+    /// Sets a DLL override in the Wine registry.
+    /// </summary>
+    /// <param name="dllName">Name of the DLL (without .dll extension).</param>
+    /// <param name="mode">Override mode (e.g., "native,builtin").</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>True if successful, false otherwise.</returns>
+    private async Task<bool> SetDllOverride(string dllName, string mode, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = WineExecutable,
+                Arguments = $"reg add \"HKCU\\Software\\Wine\\DllOverrides\" /v {dllName} /d {mode} /f",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+            };
+
+            startInfo.Environment["WINEPREFIX"] = this.winePrefixPath;
+
+            using var process = new Process { StartInfo = startInfo };
+            process.Start();
+            await process.WaitForExitAsync(cancellationToken);
+
+            if (process.ExitCode != 0)
+            {
+                var error = await process.StandardError.ReadToEndAsync(cancellationToken);
+                this.logger.LogError("Failed to set DLL override for {Dll}. Exit code: {ExitCode}, Error: {Error}",
+                    dllName, process.ExitCode, error);
+                return false;
+            }
+
+            this.logger.LogDebug("Set DLL override: {Dll}={Mode}", dllName, mode);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, "Exception while setting DLL override for {Dll}", dllName);
+            return false;
         }
     }
 }

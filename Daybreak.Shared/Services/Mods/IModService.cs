@@ -68,6 +68,7 @@ public interface IModService
     /// </summary>
     /// <returns></returns>
     IEnumerable<string> GetCustomArguments();
+
     /// <summary>
     /// Called before starting the guild wars process.
     /// Do mod preparation here.
