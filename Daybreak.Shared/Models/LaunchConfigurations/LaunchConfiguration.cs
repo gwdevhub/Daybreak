@@ -27,4 +27,7 @@ public sealed class LaunchConfiguration
 
     [JsonPropertyName(nameof(CustomModLoadoutEnabled))]
     public bool? CustomModLoadoutEnabled { get; set; }
+
+    [JsonPropertyName(nameof(Color))]
+    public string? Color { get; set; }
 }

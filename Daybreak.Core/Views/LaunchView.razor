@@ -1,11 +1,12 @@
 ﻿@inherits ViewBase<LaunchView, LaunchViewModel>
 @using Daybreak.Shared.Models
+@using Daybreak.Shared.Models.ColorPalette
 @page "/launch"
 
 <div class="launch-container">
     <div class="launch-button-container">
         <!-- Main Launch Button with Dropdown -->
-        <div class="launch-button-group">
+        <div class="launch-button-group" style="@this.GetButtonGroupStyle()">
             <!-- Main Launch Button -->
             <button class="launch-button @(this.ViewModel.CanLaunch ? "enabled" : "disabled")"
                     @onclick="this.ViewModel.LaunchSelectedConfiguration">
@@ -38,6 +39,7 @@
                 @foreach (var config in this.ViewModel.LaunchConfigurations.Where(c => c != this.ViewModel.SelectedConfiguration))
                 {
                     <div class="dropdown-item @(config == ViewModel.SelectedConfiguration ? "selected" : "")"
+                         style="@this.GetDropdownItemStyle(config)"
                          @onclick="() => this.ViewModel.SelectConfiguration(config)">
                         <div class="config-info">
                             <div class="config-name">@(config.Configuration?.Name is null or ""
@@ -64,4 +66,38 @@
 @code {
     [Parameter]
     public string? AutoLaunchConfigurationId { get; set; }
+
+    private string GetButtonGroupStyle()
+    {
+        var colorName = this.ViewModel.SelectedConfiguration?.Configuration?.Color;
+        if (string.IsNullOrWhiteSpace(colorName))
+        {
+            return string.Empty;
+        }
+
+        var accentColor = AccentColor.Accents.FirstOrDefault(a => a.Name.ToString() == colorName);
+        if (accentColor is null)
+        {
+            return string.Empty;
+        }
+
+        return $"background: {accentColor.Hex};";
+    }
+
+    private string GetDropdownItemStyle(LauncherViewContext config)
+    {
+        var colorName = config.Configuration?.Color;
+        if (string.IsNullOrWhiteSpace(colorName))
+        {
+            return string.Empty;
+        }
+
+        var accentColor = AccentColor.Accents.FirstOrDefault(a => a.Name.ToString() == colorName);
+        if (accentColor is null)
+        {
+            return string.Empty;
+        }
+
+        return $"border-left: 4px solid {accentColor.Hex};";
+    }
 }

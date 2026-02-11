@@ -37,6 +37,27 @@
                                Placeholder="Custom name" />
             </div>
           </div>
+          <div class="launch-config-color">
+            <div class="launch-config-color-label">
+              <FluentLabel>Accent Color</FluentLabel>
+            </div>
+            <div class="launch-config-color-field">
+              <FluentSelect TOption="string" Multiple="false" Width="100%" Position="SelectPosition.Below"
+                            Items="@this.ViewModel.AvailableColors"
+                            SelectedOption="@(config.Color ?? string.Empty)"
+                            SelectedOptionChanged="@((newValue) => this.ViewModel.ColorChanged(config, newValue))">
+                <OptionTemplate>
+                  <div class="color-option">
+                    @if (!string.IsNullOrWhiteSpace(context))
+                    {
+                      <div class="color-swatch" style="background-color: @(Daybreak.Shared.Models.ColorPalette.AccentColor.Accents.FirstOrDefault(a => a.Name.ToString() == context)?.Hex ?? "transparent")"></div>
+                    }
+                    <span>@this.ViewModel.GetColorDisplayName(context)</span>
+                  </div>
+                </OptionTemplate>
+              </FluentSelect>
+            </div>
+          </div>
           <div class="launch-config-executable">
             <div class="launch-config-executable-label">
               <FluentLabel>Executable</FluentLabel>
