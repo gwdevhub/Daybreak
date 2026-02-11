@@ -11,6 +11,7 @@ using Daybreak.Services.BuildTemplates;
 using Daybreak.Services.Credentials;
 using Daybreak.Services.DirectSong;
 using Daybreak.Services.Downloads;
+using Daybreak.Services.DXVK;
 using Daybreak.Services.Events;
 using Daybreak.Services.ExceptionHandling;
 using Daybreak.Services.ExecutableManagement;
@@ -37,6 +38,7 @@ using Daybreak.Services.ReShade;
 using Daybreak.Services.Screenshots;
 using Daybreak.Services.Startup;
 using Daybreak.Services.Startup.Actions;
+using Daybreak.Services.TarGz;
 using Daybreak.Services.Telemetry;
 using Daybreak.Services.Themes;
 using Daybreak.Services.Toolbox;
@@ -56,6 +58,7 @@ using Daybreak.Shared.Services.BuildTemplates;
 using Daybreak.Shared.Services.Credentials;
 using Daybreak.Shared.Services.DirectSong;
 using Daybreak.Shared.Services.Downloads;
+using Daybreak.Shared.Services.DXVK;
 using Daybreak.Shared.Services.Events;
 using Daybreak.Shared.Services.ExecutableManagement;
 using Daybreak.Shared.Services.Experience;
@@ -75,6 +78,7 @@ using Daybreak.Shared.Services.Onboarding;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Plugins;
 using Daybreak.Shared.Services.Screenshots;
+using Daybreak.Shared.Services.TarGz;
 using Daybreak.Shared.Services.Themes;
 using Daybreak.Shared.Services.Toolbox;
 using Daybreak.Shared.Services.TradeChat;
@@ -240,6 +244,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<IGithubClient, GithubClient>();
         services.AddScoped<IProcessInjector, ProcessInjector>();
         services.AddScoped<IStubInjector, StubInjector>();
+        services.AddScoped<ITarGzExtractor, TarGzExtractor>();
         services.AddScoped<ILaunchConfigurationService, LaunchConfigurationService>();
         services.AddScoped<IEventService, EventService>();
         services.AddScoped<IApplicationArgumentService, ApplicationArgumentService>();
@@ -378,6 +383,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         modsManager.RegisterMod<IDaybreakApiService, DaybreakApiService>();
         modsManager.RegisterMod<IToolboxService, ToolboxService>();
         modsManager.RegisterMod<IUModService, UModService>();
+        modsManager.RegisterMod<IDXVKService, DXVKService>();
         modsManager.RegisterMod<IDirectSongService, DirectSongService>(singleton: true);
     }
 

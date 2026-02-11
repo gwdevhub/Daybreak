@@ -52,4 +52,27 @@ internal static class PeVersionReader
             return null;
         }
     }
+
+    /// <summary>
+    /// Reads the ProductName string from a PE file's version resource.
+    /// Returns null if the file doesn't exist or has no version info.
+    /// </summary>
+    public static string? GetProductName(string filePath)
+    {
+        try
+        {
+            if (!File.Exists(filePath))
+            {
+                return null;
+            }
+
+            var peFile = new PeFile(filePath);
+            return peFile.Resources?.VsVersionInfo?.StringFileInfo?.StringTable
+                ?.FirstOrDefault()?.ProductName;
+        }
+        catch
+        {
+            return null;
+        }
+    }
 }
