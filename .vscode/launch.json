@@ -3,19 +3,15 @@
     "configurations": [
         {
             "name": "Debug Daybreak.Linux",
-            "type": "coreclr",
+            "type": "dotnet",
             "request": "launch",
-            "preLaunchTask": "build-linux",
-            "program": "${workspaceFolder}/Daybreak.Linux/bin/Debug/net10.0/linux-x64/Daybreak.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/Daybreak.Linux/bin/Debug/net10.0/linux-x64",
-            "env": {
-                "GDK_BACKEND": "x11",
-                "WEBKIT_DISABLE_DMABUF_RENDERER": "1",
-                "WEBKIT_DISABLE_COMPOSITING_MODE": "1"
-            },
-            "console": "integratedTerminal",
-            "stopAtEntry": false
+            "projectPath": "${workspaceFolder}/Daybreak.Linux/Daybreak.Linux.csproj"
+        },
+        {
+            "name": "Debug Daybreak.Windows",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}/Daybreak.Windows/Daybreak.Windows.csproj"
         }
     ]
 }
