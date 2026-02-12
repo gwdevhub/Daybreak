@@ -1,0 +1,12 @@
+# Manually trigger to create a new release branch with bumped major version
+name: Create Major Release Branch
+
+on:
+  workflow_dispatch:
+
+jobs:
+  create-release:
+    uses: ./.github/workflows/create-release-branch-template.yml
+    with:
+      versionBump: bump-major
+    secrets: inherit

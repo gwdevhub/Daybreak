@@ -18,6 +18,9 @@ jobs:
   build-x86:
     runs-on: windows-latest
 
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+
     env:
       Configuration: Release
       Actions_Allow_Unsecure_Commands: true
@@ -28,6 +31,13 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+
+      - name: Get version
+        id: get_version
+        shell: pwsh
+        run: |
+          $version = (Select-String -Path Directory.Build.props -Pattern '<Version>(.*)</Version>').Matches.Groups[1].Value
+          echo "version=$version" >> $env:GITHUB_OUTPUT
 
       - name: Install .NET
         uses: actions/setup-dotnet@v5
@@ -149,24 +159,14 @@ jobs:
   #  Stage 3 — Package (always)
   # ───────────────────────────────────────────────────────
   package:
-    needs: [build-windows, build-linux]
+    needs: [build-x86, build-windows, build-linux]
     runs-on: ubuntu-latest
 
     env:
       Actions_Allow_Unsecure_Commands: true
+      Version: ${{ needs.build-x86.outputs.version }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          submodules: recursive
-
-      - name: Set version variable
-        run: |
-          version=$(grep '<Version>' Directory.Build.props | sed 's/.*<Version>\(.*\)<\/Version>.*/\1/')
-          echo "Version=$version" >> $GITHUB_ENV
-
       # ── Windows package ──
       - name: Download Windows build
         uses: actions/download-artifact@v7
@@ -218,12 +218,13 @@ jobs:
   #  Stage 4 — Release (optional)
   # ───────────────────────────────────────────────────────
   release:
-    needs: package
+    needs: [build-x86, package]
     runs-on: ubuntu-latest
     if: ${{ inputs.publishRelease }}
 
     env:
       Actions_Allow_Unsecure_Commands: true
+      Version: ${{ needs.build-x86.outputs.version }}
 
     steps:
       - name: Checkout
@@ -243,17 +244,12 @@ jobs:
         uses: WyriHaximus/github-action-get-previous-tag@v2
 
       - name: Generate changelog
-        id: gen_changelog
+        id: changelog
         run: |
           changeLog=$(git log --no-merges --pretty="%h - %s (%an)<br />" ${{ steps.getLatestTag.outputs.tag }}..HEAD)
-          echo "Changelog<<EOF" >> $GITHUB_ENV
-          echo "$changeLog" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-
-      - name: Set version variable
-        run: |
-          version=$(grep '<Version>' Directory.Build.props | sed 's/.*<Version>\(.*\)<\/Version>.*/\1/')
-          echo "Version=$version" >> $GITHUB_ENV
+          echo "content<<EOF" >> $GITHUB_OUTPUT
+          echo "$changeLog" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
         # ── Release ──
       - name: Create release draft
@@ -263,13 +259,11 @@ jobs:
           tag_name: v${{ env.Version }}
           release_name: Daybreak v${{ env.Version }}
           assets: release-assets/daybreakv${{ env.Version }}.zip;release-assets/daybreakv${{ env.Version }}-linux.zip
-          github_token: ${{ env.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           replace_assets: true
           body_mrkdwn: |
-            ${{ env.Changelog }}
+            ${{ steps.changelog.outputs.content }}
           isDraft: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish release
         run: gh release edit v${{ env.Version }} --draft=false

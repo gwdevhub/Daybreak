@@ -1,0 +1,20 @@
+# Automatically creates a new release branch with bumped revision
+# after a successful CD pipeline run on master
+name: Create Revision Release Branch
+
+on:
+  workflow_run:
+    workflows: ["Daybreak CD Pipeline"]
+    types:
+      - completed
+    branches:
+      - master
+
+jobs:
+  create-release:
+    # Only run if the CD pipeline succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    uses: ./.github/workflows/create-release-branch-template.yml
+    with:
+      versionBump: bump-revision
+    secrets: inherit

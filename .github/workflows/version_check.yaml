@@ -5,13 +5,12 @@ on:
     branches:
       - master
     paths:
-      - "Daybreak/**"
+      - "Daybreak.Core/**"
       - "Daybreak.Installer/**"
-      - "Daybreak.Linux/**"
-      - "Daybreak.Windows/**"
       - "Daybreak.API/**"
       - "Daybreak.Shared/**"
-      - "Daybreak.Injector/**"
+      - "Daybreak.Windows/**"
+      - "Daybreak.Linux/**"
 
 jobs:
   check_version:
@@ -44,15 +43,13 @@ jobs:
       - name: Build Daybreak project
         run: dotnet build Daybreak.Linux -c $Configuration --property:SolutionDir=$GITHUB_WORKSPACE
 
-      - name: Set version variable
+      - name: Get version
+        id: get_version
         run: |
           version=$(grep '<Version>' Directory.Build.props | sed 's/.*<Version>\(.*\)<\/Version>.*/\1/')
-          echo "Version=$version" >> $GITHUB_ENV
+          echo "version=$version" >> $GITHUB_OUTPUT
 
       - name: Check version difference
-        run: pwsh ./Scripts/CompareVersions.ps1 -currentVersion ${{ env.Version }} -lastVersion ${{ env.LatestReleaseTag }}
-        env:
-          LatestReleaseTag: ${{ steps.getLatestTag.outputs.tag }}
-        shell:
-          pwsh
+        run: pwsh ./Scripts/CompareVersions.ps1 -currentVersion ${{ steps.get_version.outputs.version }} -lastVersion ${{ steps.getLatestTag.outputs.tag }}
+        shell: pwsh
 

@@ -9,12 +9,12 @@ on:
     branches:
       - master
     paths:
-      - "Daybreak/**"
+      - "Daybreak.Core/**"
       - "Daybreak.Installer/**"
       - "Daybreak.API/**"
-      - "Daybreak.7ZipExtractor/**"
-      - "Daybreak.Installer/**"
       - "Daybreak.Shared/**"
+      - "Daybreak.Windows/**"
+      - "Daybreak.Linux/**"
   workflow_dispatch:
 
 jobs:

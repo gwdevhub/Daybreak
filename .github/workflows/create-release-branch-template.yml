@@ -1,0 +1,66 @@
+# Reusable template for creating release branches with version bumps
+name: Create Release Branch Template
+
+on:
+  workflow_call:
+    inputs:
+      versionBump:
+        description: "Version bump command: bump-major, bump-minor, bump-build, bump-revision"
+        required: true
+        type: string
+
+jobs:
+  create-release-branch:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump version in Directory.Build.props
+        id: bump
+        uses: vers-one/dotnet-project-version-updater@v1.7
+        with:
+          file: "Directory.Build.props"
+          version: ${{ inputs.versionBump }}
+
+      - name: Check if release branch already exists
+        id: check_branch
+        run: |
+          branch_name="release/${{ steps.bump.outputs.newVersion }}"
+          if git ls-remote --heads origin "$branch_name" | grep -q "$branch_name"; then
+            echo "Branch $branch_name already exists"
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "Branch $branch_name does not exist"
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create release branch
+        if: steps.check_branch.outputs.exists == 'false'
+        run: |
+          new_version="${{ steps.bump.outputs.newVersion }}"
+          branch_name="release/$new_version"
+          
+          # Create new branch from master
+          git checkout -b "$branch_name"
+          
+          # Commit the version change (already updated by the action)
+          git add Directory.Build.props
+          git commit -m "Bump version to $new_version"
+          
+          # Push the new branch
+          git push origin "$branch_name"
+          
+          echo "✅ Created release branch: $branch_name with version $new_version"

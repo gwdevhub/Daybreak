@@ -3,17 +3,16 @@
 name: Daybreak Dry-Run CD Pipeline
 
 on:
-  push:
+  pull_request:
     branches:
       - master
     paths:
-      - "Daybreak/**"
+      - "Daybreak.Core/**"
       - "Daybreak.Installer/**"
       - "Daybreak.API/**"
-      - "Daybreak.7ZipExtractor/**"
-      - "Daybreak.Installer/**"
       - "Daybreak.Shared/**"
-  workflow_dispatch:
+      - "Daybreak.Windows/**"
+      - "Daybreak.Linux/**"
 
 jobs:
   cd:
