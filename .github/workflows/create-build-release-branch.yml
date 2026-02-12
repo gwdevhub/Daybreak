@@ -8,5 +8,5 @@ jobs:
   create-release:
     uses: ./.github/workflows/create-release-branch-template.yml
     with:
-      versionBump: bump-build
+      versionBump: "*.*.^.0"
     secrets: inherit
