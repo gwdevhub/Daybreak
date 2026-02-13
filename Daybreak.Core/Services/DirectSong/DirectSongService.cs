@@ -7,10 +7,8 @@ using Daybreak.Shared.Services.Downloads;
 using Daybreak.Shared.Services.Github;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Options;
-using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Services.SevenZip;
 using Daybreak.Shared.Utils;
-using Daybreak.Views;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Core.Extensions;
@@ -22,7 +20,6 @@ namespace Daybreak.Services.DirectSong;
 internal sealed class DirectSongService(
     IOptionsProvider optionsProvider,
     INotificationService notificationService,
-    IPrivilegeManager privilegeManager,
     ISevenZipExtractor sevenZipExtractor,
     IDownloadService downloadService,
     IDirectSongRegistrar directSongRegistrar,
@@ -59,7 +56,6 @@ internal sealed class DirectSongService(
 
     private readonly IOptionsProvider optionsProvider = optionsProvider.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
-    private readonly IPrivilegeManager privilegeManager = privilegeManager.ThrowIfNull();
     private readonly ISevenZipExtractor sevenZipExtractor = sevenZipExtractor.ThrowIfNull();
     private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
     private readonly IDirectSongRegistrar directSongRegistrar = directSongRegistrar.ThrowIfNull();
@@ -200,12 +196,6 @@ internal sealed class DirectSongService(
                 expirationTime: DateTime.UtcNow + TimeSpan.FromMinutes(5));
             scopedLogger.LogWarning("GStreamer libav plugin not found. DirectSong WMA playback may not work.");
             // Continue with installation - the user can install gstreamer later
-        }
-
-        if (!this.privilegeManager.AdminPrivileges)
-        {
-            await this.privilegeManager.RequestAdminPrivileges<LaunchView>("DirectSong installation requires Administrator privileges in order to set up the registry entries", cancelViewParams: default, cancellationToken);
-            return false;
         }
 
         progress.Report(ProgressStarting);
