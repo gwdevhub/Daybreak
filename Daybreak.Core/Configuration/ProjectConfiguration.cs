@@ -318,6 +318,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         startupActionProducer.RegisterAction<CredentialsOptionsMigrator>();
         startupActionProducer.RegisterAction<UpdateToolboxAction>();
         startupActionProducer.RegisterAction<UpdateGuildWarsExecutable>();
+        startupActionProducer.RegisterAction<UpdateDirectSongAction>();
     }
 
     public override void RegisterPostUpdateActions(
