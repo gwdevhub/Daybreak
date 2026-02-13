@@ -482,7 +482,7 @@ public sealed class WinePrefixManager(
     /// <param name="mode">Override mode (e.g., "native,builtin").</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>True if successful, false otherwise.</returns>
-    private async Task<bool> SetDllOverride(string dllName, string mode, CancellationToken cancellationToken)
+    public async Task<bool> SetDllOverride(string dllName, string mode, CancellationToken cancellationToken)
     {
         try
         {
@@ -516,6 +516,53 @@ public sealed class WinePrefixManager(
         catch (Exception ex)
         {
             this.logger.LogError(ex, "Exception while setting DLL override for {Dll}", dllName);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Adds a registry value to the Wine prefix registry using 'wine reg add'.
+    /// </summary>
+    /// <param name="keyPath">Registry key path (e.g., "HKLM\\Software\\DirectSong").</param>
+    /// <param name="valueName">Name of the value to set.</param>
+    /// <param name="value">The value data.</param>
+    /// <param name="valueType">Registry value type (e.g., "REG_SZ" for string).</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>True if successful, false otherwise.</returns>
+    public async Task<bool> AddRegistryValue(string keyPath, string valueName, string value, string valueType, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = WineExecutable,
+                Arguments = $"reg add \"{keyPath}\" /v {valueName} /t {valueType} /d \"{value}\" /f",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+            };
+
+            startInfo.Environment["WINEPREFIX"] = this.winePrefixPath;
+
+            using var process = new Process { StartInfo = startInfo };
+            process.Start();
+            await process.WaitForExitAsync(cancellationToken);
+
+            if (process.ExitCode != 0)
+            {
+                var error = await process.StandardError.ReadToEndAsync(cancellationToken);
+                this.logger.LogError("Failed to add registry value {Key}\\{Value}. Exit code: {ExitCode}, Error: {Error}",
+                    keyPath, valueName, process.ExitCode, error);
+                return false;
+            }
+
+            this.logger.LogDebug("Added registry value: {Key}\\{Value}={Data}", keyPath, valueName, value);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex, "Exception while adding registry value {Key}\\{Value}", keyPath, valueName);
             return false;
         }
     }
