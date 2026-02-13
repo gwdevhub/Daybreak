@@ -44,7 +44,7 @@ internal sealed class TarGzExtractor(
 
             // Use ReaderFactory which properly handles nested archives like .tar.gz
             using var stream = File.OpenRead(sourceFile);
-            using var reader = ReaderFactory.Open(stream);
+            using var reader = ReaderFactory.OpenReader(stream, new ReaderOptions { ExtractFullPath = true, Overwrite = true });
 
             var processedEntries = 0;
 
@@ -68,11 +68,7 @@ internal sealed class TarGzExtractor(
                 progressTracker(0.5, entryKey);
 
                 // Extract the entry
-                reader.WriteEntryToDirectory(destinationDirectory, new ExtractionOptions
-                {
-                    ExtractFullPath = true,
-                    Overwrite = true
-                });
+                reader.WriteEntryToDirectory(destinationDirectory);
 
                 processedEntries++;
             }
