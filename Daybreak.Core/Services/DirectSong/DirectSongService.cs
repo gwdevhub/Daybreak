@@ -1,4 +1,5 @@
-﻿using Daybreak.Configuration.Options;
+﻿using CG.Web.MegaApiClient;
+using Daybreak.Configuration.Options;
 using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Models.Mods;
 using Daybreak.Shared.Services.DirectSong;
@@ -27,19 +28,20 @@ internal sealed class DirectSongService(
     IOptionsMonitor<DirectSongOptions> options,
     ILogger<DirectSongService> logger) : IDirectSongService
 {
-    private const string DownloadUrl = "https://guildwarslegacy.com/DirectSong.7z";
+    // Mega URL for DirectSong Revival Pack (more complete than the legacy pack)
+    private const string MegaDownloadUrl = "https://mega.nz/file/P2pWGK7C#FLZZOOWE1c5gYSgCqD4MC464m6ZvK1oGTlS08hLpnKw";
     private const string RegistryEditorName = "RegisterDirectSongDirectory.exe";
     private const string InstallationDirectorySubPath = "DirectSong";
     private const string DestinationZipFile = "DirectSong.7z";
-    private const string WMVCOREDll = "WMVCORE.DLL";
-    private const string DsGuildwarsDll = "ds_GuildWars.dll";
 
     private static readonly ProgressUpdate ProgressStarting = new(0, "Starting DirectSong installation");
-    private static readonly ProgressUpdate ProgressInitializingDownload = new(0, "Initializing DirectSong download");
+    private static readonly ProgressUpdate ProgressPlatformFiles = new(0.78, "Setting up platform-specific files");
     private static readonly ProgressUpdate ProgressFailed = new(1, "DirectSong installation failed");
     private static readonly ProgressUpdate ProgressCompleted = new(1, "DirectSong installation completed");
-    private static readonly ProgressUpdate ProgressRegistry = new(1, "Setting up DirectSong registry entries");
-    private static ProgressUpdate ProgressUnpacking(double progress) => new(progress, "Unpacking DirectSong files");
+    private static readonly ProgressUpdate ProgressRegistry = new(0.88, "Setting up DirectSong registry entries");
+    private static readonly ProgressUpdate ProgressDllOverrides = new(0.94, "Setting up DLL overrides");
+    private static ProgressUpdate ProgressDownloading(double progress) => new(Math.Clamp(progress * 0.50, 0, 0.50), $"Downloading DirectSong Revival Pack: {progress:P0}");
+    private static ProgressUpdate ProgressUnpacking(double progress) => new(Math.Clamp((progress * 0.25) + 0.50, 0.50, 0.75), "Unpacking DirectSong files");
 
     private static readonly string InstallationDirectory = PathUtils.GetAbsolutePathFromRoot(InstallationDirectorySubPath);
 
@@ -70,8 +72,7 @@ internal sealed class DirectSongService(
     }
     public bool IsInstalled =>
         Directory.Exists(InstallationDirectory) &&
-        File.Exists(Path.Combine(Path.GetFullPath(InstallationDirectory), WMVCOREDll)) &&
-        File.Exists(Path.Combine(Path.GetFullPath(InstallationDirectory), DsGuildwarsDll));
+        this.directSongRegistrar.ArePlatformFilesInstalled(InstallationDirectory);
 
     public IProgressAsyncOperation<bool> PerformUninstallation(CancellationToken cancellationToken)
     {
@@ -135,17 +136,8 @@ internal sealed class DirectSongService(
 
         var gwPath = Path.GetFullPath(guildWarsStartingContext.ApplicationLauncherContext.ExecutablePath);
         var gwDirectory = Path.GetDirectoryName(gwPath)!;
-        var wmCorePath = Path.Combine(gwDirectory, WMVCOREDll);
-        var dsGuildWarsDll = Path.Combine(gwDirectory, DsGuildwarsDll);
-        if (!File.Exists(wmCorePath))
-        {
-            File.Copy(Path.Combine(Path.GetFullPath(InstallationDirectory), WMVCOREDll), wmCorePath);
-        }
 
-        if (!File.Exists(dsGuildWarsDll))
-        {
-            File.Copy(Path.Combine(Path.GetFullPath(InstallationDirectory), DsGuildwarsDll), dsGuildWarsDll);
-        }
+        this.directSongRegistrar.CopyFilesToGuildWars(InstallationDirectory, gwDirectory);
 
         this.notificationService.NotifyInformation(
                 title: "DirectSong started",
@@ -157,18 +149,8 @@ internal sealed class DirectSongService(
     {
         var gwPath = Path.GetFullPath(guildWarsStartingDisabledContext.ApplicationLauncherContext.ExecutablePath);
         var gwDirectory = Path.GetDirectoryName(gwPath)!;
-        var wmCorePath = Path.Combine(gwDirectory, WMVCOREDll);
-        var dsGuildWarsDll = Path.Combine(gwDirectory, DsGuildwarsDll);
 
-        if (File.Exists(wmCorePath))
-        {
-            File.Delete(wmCorePath);
-        }
-
-        if (File.Exists(dsGuildWarsDll))
-        {
-            File.Delete(dsGuildWarsDll);
-        }
+        this.directSongRegistrar.RemoveFilesFromGuildWars(gwDirectory);
 
         return Task.CompletedTask;
     }
@@ -187,6 +169,18 @@ internal sealed class DirectSongService(
             return true;
         }
 
+        // Check for gstreamer availability (no-op on Windows)
+        if (!this.directSongRegistrar.IsGStreamerAvailable())
+        {
+            var instructions = this.directSongRegistrar.GetGStreamerInstallInstructions();
+            this.notificationService.NotifyError(
+                title: "GStreamer libav plugin missing",
+                description: instructions,
+                expirationTime: DateTime.UtcNow + TimeSpan.FromMinutes(5));
+            scopedLogger.LogWarning("GStreamer libav plugin not found. DirectSong WMA playback may not work.");
+            // Continue with installation - the user can install gstreamer later
+        }
+
         if (!this.privilegeManager.AdminPrivileges)
         {
             await this.privilegeManager.RequestAdminPrivileges<LaunchView>("DirectSong installation requires Administrator privileges in order to set up the registry entries", cancelViewParams: default, cancellationToken);
@@ -198,11 +192,34 @@ internal sealed class DirectSongService(
         if (!File.Exists(destinationPath))
         {
             Directory.CreateDirectory(Path.GetFullPath(InstallationDirectory));
-            scopedLogger.LogDebug($"Downloading {DestinationZipFile}");
-            progress.Report(ProgressInitializingDownload);
-            if (!await this.downloadService.DownloadFile(DownloadUrl, destinationPath, progress, cancellationToken))
+            scopedLogger.LogDebug($"Downloading DirectSong Revival Pack from Mega");
+            progress.Report(ProgressDownloading(0));
+            
+            try
             {
-                scopedLogger.LogError("Download failed. Check logs");
+                var megaClient = new MegaApiClient();
+                await megaClient.LoginAnonymousAsync();
+                
+                var fileUri = new Uri(MegaDownloadUrl);
+                var node = await megaClient.GetNodeFromLinkAsync(fileUri);
+                
+                scopedLogger.LogDebug($"Downloading {node.Name} ({node.Size} bytes)");
+                
+                using var downloadStream = await megaClient.DownloadAsync(fileUri, new Progress<double>(p =>
+                {
+                    // MegaApiClient reports progress as 0-100, normalize to 0-1
+                    var normalizedProgress = p / 100.0;
+                    progress.Report(ProgressDownloading(normalizedProgress));
+                }), cancellationToken);
+                
+                using var fileStream = File.Create(destinationPath);
+                await downloadStream.CopyToAsync(fileStream, cancellationToken);
+                
+                await megaClient.LogoutAsync();
+            }
+            catch (Exception ex)
+            {
+                scopedLogger.LogError(ex, "Failed to download from Mega");
                 progress.Report(ProgressFailed);
                 return false;
             }
@@ -222,11 +239,31 @@ internal sealed class DirectSongService(
             return false;
         }
 
-        scopedLogger.LogDebug("Extracted files. Setting up registry entries");
+        // Set up platform-specific files (downloads extra DLLs on Linux, no-op on Windows)
+        scopedLogger.LogDebug("Setting up platform-specific files");
+        progress.Report(ProgressPlatformFiles);
+        if (!await this.directSongRegistrar.SetupPlatformFiles(InstallationDirectory, this.downloadService, progress, cancellationToken))
+        {
+            scopedLogger.LogError("Failed to set up platform-specific files");
+            progress.Report(ProgressFailed);
+            return false;
+        }
+
+        scopedLogger.LogDebug("Setting up registry entries");
         progress.Report(ProgressRegistry);
         if (!await this.directSongRegistrar.RegisterDirectSongDirectory(InstallationDirectory, RegistryEditorName, cancellationToken))
         {
             scopedLogger.LogError("Failed to set up registry entries");
+            progress.Report(ProgressFailed);
+            return false;
+        }
+
+        // Set up DLL overrides (wmvcore, wmasf to native,builtin) - no-op on Windows
+        scopedLogger.LogDebug("Setting up DLL overrides");
+        progress.Report(ProgressDllOverrides);
+        if (!await this.directSongRegistrar.SetupDllOverrides(cancellationToken))
+        {
+            scopedLogger.LogError("Failed to set up DLL overrides");
             progress.Report(ProgressFailed);
             return false;
         }

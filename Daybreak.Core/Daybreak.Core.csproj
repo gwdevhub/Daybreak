@@ -54,6 +54,7 @@
     <PackageReference Include="DiffPlex" />
     <PackageReference Include="HtmlAgilityPack" />
     <PackageReference Include="ini-parser-netstandard" />
+    <PackageReference Include="MegaApiClient" />
     <PackageReference Include="Microsoft.CorrelationVector" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />

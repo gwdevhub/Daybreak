@@ -52,4 +52,24 @@ public interface IWinePrefixManager : IModService
         string[] arguments,
         CancellationToken cancellationToken,
         Func<string, IReadOnlyList<string>, bool>? completionChecker = null);
+
+    /// <summary>
+    /// Sets a DLL override in the Wine registry.
+    /// </summary>
+    /// <param name="dllName">Name of the DLL (without .dll extension).</param>
+    /// <param name="mode">Override mode (e.g., "native,builtin").</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>True if successful, false otherwise.</returns>
+    Task<bool> SetDllOverride(string dllName, string mode, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Adds a registry value to the Wine prefix registry using 'wine reg add'.
+    /// </summary>
+    /// <param name="keyPath">Registry key path (e.g., "HKLM\\Software\\DirectSong").</param>
+    /// <param name="valueName">Name of the value to set.</param>
+    /// <param name="value">The value data.</param>
+    /// <param name="valueType">Registry value type (e.g., "REG_SZ" for string).</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>True if successful, false otherwise.</returns>
+    Task<bool> AddRegistryValue(string keyPath, string valueName, string value, string valueType, CancellationToken cancellationToken);
 }
