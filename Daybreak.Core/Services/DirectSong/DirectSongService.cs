@@ -4,6 +4,7 @@ using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Models.Mods;
 using Daybreak.Shared.Services.DirectSong;
 using Daybreak.Shared.Services.Downloads;
+using Daybreak.Shared.Services.Github;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Services.Privilege;
@@ -25,6 +26,7 @@ internal sealed class DirectSongService(
     ISevenZipExtractor sevenZipExtractor,
     IDownloadService downloadService,
     IDirectSongRegistrar directSongRegistrar,
+    IGithubClient githubClient,
     IOptionsMonitor<DirectSongOptions> options,
     ILogger<DirectSongService> logger) : IDirectSongService
 {
@@ -34,12 +36,21 @@ internal sealed class DirectSongService(
     private const string InstallationDirectorySubPath = "DirectSong";
     private const string DestinationZipFile = "DirectSong.7z";
 
+    // DirectSong Remix from ChthonVII - enhanced GuildWars.ds playlist
+    private const string RemixRepoOwner = "ChthonVII";
+    private const string RemixRepoName = "gwdirectsongremix";
+    private const string RemixBranch = "main";
+    private const string RemixFilePath = "GuildWars.ds";
+    private const string RemixVersionFile = "GuildWars.ds.version"; // Stores commit SHA
+    private const string DirectSongSubdir = "DirectSong"; // Nested folder from archive
+
     private static readonly ProgressUpdate ProgressStarting = new(0, "Starting DirectSong installation");
     private static readonly ProgressUpdate ProgressPlatformFiles = new(0.78, "Setting up platform-specific files");
     private static readonly ProgressUpdate ProgressFailed = new(1, "DirectSong installation failed");
     private static readonly ProgressUpdate ProgressCompleted = new(1, "DirectSong installation completed");
-    private static readonly ProgressUpdate ProgressRegistry = new(0.88, "Setting up DirectSong registry entries");
-    private static readonly ProgressUpdate ProgressDllOverrides = new(0.94, "Setting up DLL overrides");
+    private static readonly ProgressUpdate ProgressRegistry = new(0.85, "Setting up DirectSong registry entries");
+    private static readonly ProgressUpdate ProgressDllOverrides = new(0.90, "Setting up DLL overrides");
+    private static readonly ProgressUpdate ProgressRemix = new(0.95, "Downloading DirectSong Remix playlist");
     private static ProgressUpdate ProgressDownloading(double progress) => new(Math.Clamp(progress * 0.50, 0, 0.50), $"Downloading DirectSong Revival Pack: {progress:P0}");
     private static ProgressUpdate ProgressUnpacking(double progress) => new(Math.Clamp((progress * 0.25) + 0.50, 0.50, 0.75), "Unpacking DirectSong files");
 
@@ -51,6 +62,7 @@ internal sealed class DirectSongService(
     private readonly ISevenZipExtractor sevenZipExtractor = sevenZipExtractor.ThrowIfNull();
     private readonly IDownloadService downloadService = downloadService.ThrowIfNull();
     private readonly IDirectSongRegistrar directSongRegistrar = directSongRegistrar.ThrowIfNull();
+    private readonly IGithubClient githubClient = githubClient.ThrowIfNull();
     private readonly IOptionsMonitor<DirectSongOptions> options = options.ThrowIfNull();
     private readonly ILogger<DirectSongService> logger = logger.ThrowIfNull();
 
@@ -112,11 +124,19 @@ internal sealed class DirectSongService(
 
     public IEnumerable<string> GetCustomArguments() => [];
 
-    public Task<bool> IsUpdateAvailable(CancellationToken cancellationToken) => Task.FromResult(false);
-
-    public Task<bool> PerformUpdate(CancellationToken cancellationToken)
+    public async Task<bool> IsUpdateAvailable(CancellationToken cancellationToken)
     {
-        throw new NotImplementedException("DirectSong mod does not support manual updates");
+        return await this.IsRemixUpdateAvailable(cancellationToken);
+    }
+
+    public async Task<bool> PerformUpdate(CancellationToken cancellationToken)
+    {
+        if (!this.IsInstalled)
+        {
+            return false;
+        }
+
+        return await this.UpdateRemixPlaylist(cancellationToken);
     }
 
     public Task<bool> ShouldRunAgain(GuildWarsRunningContext guildWarsRunningContext, CancellationToken cancellationToken) => Task.FromResult(false);
@@ -268,9 +288,134 @@ internal sealed class DirectSongService(
             return false;
         }
 
+        // Download DirectSong Remix GuildWars.ds from ChthonVII's repo
+        scopedLogger.LogDebug("Downloading DirectSong Remix playlist");
+        progress.Report(ProgressRemix);
+        var directSongDir = Path.Combine(Path.GetFullPath(InstallationDirectory), DirectSongSubdir);
+        var guildWarsDsPath = Path.Combine(directSongDir, RemixFilePath);
+        var versionFilePath = Path.Combine(directSongDir, RemixVersionFile);
+
+        if (await this.githubClient.DownloadRawFile(RemixRepoOwner, RemixRepoName, RemixBranch, RemixFilePath, guildWarsDsPath, cancellationToken))
+        {
+            // Save the commit SHA for version tracking
+            var commitSha = await this.githubClient.GetLatestCommitSha(RemixRepoOwner, RemixRepoName, RemixBranch, cancellationToken);
+            if (!string.IsNullOrEmpty(commitSha))
+            {
+                await File.WriteAllTextAsync(versionFilePath, commitSha, cancellationToken);
+                scopedLogger.LogDebug("Downloaded DirectSong Remix (commit {CommitSha})", commitSha);
+            }
+            else
+            {
+                scopedLogger.LogDebug("Downloaded DirectSong Remix (commit SHA unavailable)");
+            }
+        }
+        else
+        {
+            scopedLogger.LogWarning("Failed to download DirectSong Remix, using default GuildWars.ds from Revival Pack");
+            // Not a fatal error - the original GuildWars.ds from the Revival Pack will still work
+        }
+
         scopedLogger.LogDebug($"Deleting archive {destinationPath}");
         File.Delete(destinationPath);
         progress.Report(ProgressCompleted);
+        return true;
+    }
+
+    /// <summary>
+    /// Gets the currently installed DirectSong Remix commit SHA from the version file.
+    /// </summary>
+    private string? GetInstalledRemixCommitSha()
+    {
+        var directSongDir = Path.Combine(Path.GetFullPath(InstallationDirectory), DirectSongSubdir);
+        var versionFilePath = Path.Combine(directSongDir, RemixVersionFile);
+
+        if (!File.Exists(versionFilePath))
+        {
+            return null;
+        }
+
+        try
+        {
+            // Version file contains just the commit SHA
+            return File.ReadAllText(versionFilePath).Trim();
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogDebug(ex, "Failed to read remix version file");
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Checks if a newer version of the DirectSong Remix playlist is available.
+    /// </summary>
+    private async Task<bool> IsRemixUpdateAvailable(CancellationToken cancellationToken)
+    {
+        if (!this.IsInstalled)
+        {
+            return false;
+        }
+
+        var installedSha = this.GetInstalledRemixCommitSha();
+        if (string.IsNullOrEmpty(installedSha))
+        {
+            // No version file means we should try to download/update
+            return true;
+        }
+
+        var latestSha = await this.githubClient.GetLatestCommitSha(RemixRepoOwner, RemixRepoName, RemixBranch, cancellationToken);
+        if (string.IsNullOrEmpty(latestSha))
+        {
+            // Can't determine latest version, assume no update
+            return false;
+        }
+
+        // Compare SHAs (case-insensitive since git SHAs are hex)
+        var updateAvailable = !installedSha.Equals(latestSha, StringComparison.OrdinalIgnoreCase);
+        if (updateAvailable)
+        {
+            this.logger.LogDebug("DirectSong Remix update available. Installed: {Installed}, Latest: {Latest}", installedSha, latestSha);
+        }
+
+        return updateAvailable;
+    }
+
+    /// <summary>
+    /// Updates the DirectSong Remix playlist to the latest version.
+    /// </summary>
+    private async Task<bool> UpdateRemixPlaylist(CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        var directSongDir = Path.Combine(Path.GetFullPath(InstallationDirectory), DirectSongSubdir);
+        var guildWarsDsPath = Path.Combine(directSongDir, RemixFilePath);
+        var versionFilePath = Path.Combine(directSongDir, RemixVersionFile);
+
+        scopedLogger.LogDebug("Updating DirectSong Remix playlist");
+
+        if (!await this.githubClient.DownloadRawFile(RemixRepoOwner, RemixRepoName, RemixBranch, RemixFilePath, guildWarsDsPath, cancellationToken))
+        {
+            scopedLogger.LogError("Failed to download DirectSong Remix update");
+            return false;
+        }
+
+        // Save the new commit SHA
+        var commitSha = await this.githubClient.GetLatestCommitSha(RemixRepoOwner, RemixRepoName, RemixBranch, cancellationToken);
+        if (!string.IsNullOrEmpty(commitSha))
+        {
+            await File.WriteAllTextAsync(versionFilePath, commitSha, cancellationToken);
+            scopedLogger.LogDebug("Updated DirectSong Remix to commit {CommitSha}", commitSha);
+            this.notificationService.NotifyInformation(
+                title: "DirectSong Remix updated",
+                description: $"Updated to commit {commitSha[..7]}");
+        }
+        else
+        {
+            scopedLogger.LogWarning("Updated DirectSong Remix but could not determine commit SHA");
+            this.notificationService.NotifyInformation(
+                title: "DirectSong Remix updated",
+                description: "Downloaded latest version");
+        }
+
         return true;
     }
 }
