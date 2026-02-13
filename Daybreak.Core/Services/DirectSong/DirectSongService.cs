@@ -41,8 +41,9 @@ internal sealed class DirectSongService(
     private const string RemixRepoName = "gwdirectsongremix";
     private const string RemixBranch = "main";
     private const string RemixFilePath = "GuildWars.ds";
-    private const string RemixVersionFile = "GuildWars.ds.version"; // Stores commit SHA
-    private const string DirectSongSubdir = "DirectSong"; // Nested folder from archive
+    private const string RemixVersionFile = "GuildWars.ds.version";
+    private const string RemixAudioFolder = "GWDirectSongRemix";
+    private const string DirectSongSubdir = "DirectSong";
 
     private static readonly ProgressUpdate ProgressStarting = new(0, "Starting DirectSong installation");
     private static readonly ProgressUpdate ProgressPlatformFiles = new(0.78, "Setting up platform-specific files");
@@ -315,6 +316,9 @@ internal sealed class DirectSongService(
             // Not a fatal error - the original GuildWars.ds from the Revival Pack will still work
         }
 
+        // Sync audio files from the GWDirectSongRemix folder
+        await this.SyncRemixAudioFiles(cancellationToken);
+
         scopedLogger.LogDebug($"Deleting archive {destinationPath}");
         File.Delete(destinationPath);
         progress.Report(ProgressCompleted);
@@ -398,6 +402,9 @@ internal sealed class DirectSongService(
             return false;
         }
 
+        // Sync audio files from the GWDirectSongRemix folder
+        await this.SyncRemixAudioFiles(cancellationToken);
+
         // Save the new commit SHA
         var commitSha = await this.githubClient.GetLatestCommitSha(RemixRepoOwner, RemixRepoName, RemixBranch, cancellationToken);
         if (!string.IsNullOrEmpty(commitSha))
@@ -417,5 +424,67 @@ internal sealed class DirectSongService(
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// Syncs the GWDirectSongRemix audio files from the GitHub repository.
+    /// Downloads any missing files (except readme.txt) to the DirectSong folder.
+    /// </summary>
+    private async Task<int> SyncRemixAudioFiles(CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        var directSongDir = Path.Combine(Path.GetFullPath(InstallationDirectory), DirectSongSubdir);
+        var remixAudioDir = Path.Combine(directSongDir, RemixAudioFolder);
+
+        // Ensure the directory exists
+        Directory.CreateDirectory(remixAudioDir);
+
+        // Get list of files from GitHub
+        var repoFiles = await this.githubClient.GetDirectoryContents(
+            RemixRepoOwner, RemixRepoName, RemixAudioFolder, RemixBranch, cancellationToken);
+
+        var filesToDownload = repoFiles
+            .Where(f => !f.Equals("readme.txt", StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        if (filesToDownload.Count == 0)
+        {
+            scopedLogger.LogDebug("No audio files found in GWDirectSongRemix folder");
+            return 0;
+        }
+
+        var downloadedCount = 0;
+        foreach (var fileName in filesToDownload)
+        {
+            var localPath = Path.Combine(remixAudioDir, fileName);
+            if (File.Exists(localPath))
+            {
+                scopedLogger.LogDebug("File already exists: {FileName}", fileName);
+                continue;
+            }
+
+            var repoPath = $"{RemixAudioFolder}/{fileName}";
+            scopedLogger.LogDebug("Downloading missing audio file: {FileName}", fileName);
+
+            if (await this.githubClient.DownloadRawFile(
+                RemixRepoOwner, RemixRepoName, RemixBranch, repoPath, localPath, cancellationToken))
+            {
+                downloadedCount++;
+                scopedLogger.LogInformation("Downloaded audio file: {FileName}", fileName);
+            }
+            else
+            {
+                scopedLogger.LogWarning("Failed to download audio file: {FileName}", fileName);
+            }
+        }
+
+        if (downloadedCount > 0)
+        {
+            this.notificationService.NotifyInformation(
+                title: "DirectSong Remix audio files synced",
+                description: $"Downloaded {downloadedCount} new audio file(s)");
+        }
+
+        return downloadedCount;
     }
 }

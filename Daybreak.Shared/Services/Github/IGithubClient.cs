@@ -46,4 +46,16 @@ public interface IGithubClient
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The commit SHA or null if failed</returns>
     Task<string?> GetLatestCommitSha(string owner, string repo, string branch, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the list of files in a directory from a GitHub repository.
+    /// Note: Uses GitHub API which has rate limits (60 requests/hour unauthenticated).
+    /// </summary>
+    /// <param name="owner">Repository owner</param>
+    /// <param name="repo">Repository name</param>
+    /// <param name="path">Directory path in the repository</param>
+    /// <param name="branch">Branch name (e.g., "main")</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>List of file names in the directory, or empty if failed</returns>
+    Task<IEnumerable<string>> GetDirectoryContents(string owner, string repo, string path, string branch, CancellationToken cancellationToken);
 }

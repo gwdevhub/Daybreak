@@ -14,10 +14,9 @@ internal sealed class GithubClient(
     private const string RefTagsUrlTemplate = "https://api.github.com/repos/{0}/{1}/git/refs/tags";
     private const string ReleasesUrlTemplate = "https://api.github.com/repos/{0}/{1}/releases";
     private const string LatestReleaseUrlTemplate = "https://github.com/{0}/{1}/releases/latest";
-    // Raw file URL - no API rate limiting
     private const string RawFileUrlTemplate = "https://raw.githubusercontent.com/{0}/{1}/{2}/{3}";
-    // Atom feed URL for commits - no API rate limiting
     private const string CommitsAtomUrlTemplate = "https://github.com/{0}/{1}/commits/{2}.atom";
+    private const string ContentsUrlTemplate = "https://api.github.com/repos/{0}/{1}/contents/{2}?ref={3}";
 
     private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(10);
     private static readonly TimeSpan DownloadTimeout = TimeSpan.FromMinutes(5);
@@ -217,6 +216,54 @@ internal sealed class GithubClient(
         {
             scopedLogger.LogError(e, "Failed to fetch commits from {Url}", url);
             return null;
+        }
+    }
+
+    public async Task<IEnumerable<string>> GetDirectoryContents(string owner, string repo, string path, string branch, CancellationToken cancellationToken)
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        var url = string.Format(ContentsUrlTemplate, owner, repo, path, branch);
+        try
+        {
+            using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            timeoutCts.CancelAfter(RequestTimeout);
+
+            scopedLogger.LogDebug("Fetching directory contents from {Url}", url);
+            using var response = await this.httpClient.GetAsync(url, timeoutCts.Token);
+            if (!response.IsSuccessStatusCode)
+            {
+                scopedLogger.LogError("Failed to fetch directory contents. Status code: {StatusCode}", response.StatusCode);
+                return [];
+            }
+
+            var items = await response.Content.ReadFromJsonAsync<List<GithubContentItem>>(timeoutCts.Token);
+            if (items is null)
+            {
+                scopedLogger.LogWarning("Failed to deserialize directory contents");
+                return [];
+            }
+
+            var files = items
+                .Where(item => item.IsFile && !string.IsNullOrEmpty(item.Name))
+                .Select(item => item.Name!)
+                .ToList();
+
+            foreach (var fileName in files)
+            {
+                scopedLogger.LogDebug("Found file: {FileName}", fileName);
+            }
+
+            return files;
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            scopedLogger.LogWarning("Request to {Url} timed out", url);
+            return [];
+        }
+        catch (Exception e)
+        {
+            scopedLogger.LogError(e, "Failed to fetch directory contents from {Url}", url);
+            return [];
         }
     }
 }
