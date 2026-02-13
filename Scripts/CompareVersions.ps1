@@ -15,34 +15,26 @@ if ($lastVersion.StartsWith("v")){
 
 $currentVersionTokens = $currentVersion.Split('.')
 $lastVersionTokens = $lastVersion.Split('.')
-if ($currentVersionTokens.Length -eq $lastVersionTokens.Length)
+
+# Compare versions segment by segment
+$maxLength = [Math]::Max($currentVersionTokens.Length, $lastVersionTokens.Length)
+for($i = 0; $i -lt $maxLength; $i++)
 {
-    for($i = 0 ; $i -lt $currentVersionTokens.Length; $i++)
-    {
-        $currentVersionToken = [int]$currentVersionTokens[$i]
-        $lastVersionToken = [int]$lastVersionTokens[$i]
-        if ($currentVersionToken -lt $lastVersionToken){
-            throw "Version is not incremented. Current version " + $currentVersion + ". Last version " + $lastVersion
-        }
+    # Treat missing segments as 0
+    $currentVersionToken = if ($i -lt $currentVersionTokens.Length) { [int]$currentVersionTokens[$i] } else { 0 }
+    $lastVersionToken = if ($i -lt $lastVersionTokens.Length) { [int]$lastVersionTokens[$i] } else { 0 }
+    
+    if ($currentVersionToken -gt $lastVersionToken) {
+        # Current version is greater, we're done
+        Write-Host "Version has been incremented"
+        exit 0
     }
-
-    if ($currentVersionToken -le $lastVersionToken){
+    elseif ($currentVersionToken -lt $lastVersionToken) {
+        # Current version is less, fail
         throw "Version is not incremented. Current version " + $currentVersion + ". Last version " + $lastVersion
     }
-
-    Write-Host "Version has been incremented"
+    # If equal, continue to next segment
 }
-elseif ($currentVersionTokens.Length -gt $lastVersionTokens.Length){
-    if ($currentVersionTokens[$lastVersionTokens.Length - 1] -lt $lastVersionTokens[$lastVersionTokens.Length - 1]){
-        throw "Version is not incremented. Current version " + $currentVersion + ". Last version " + $lastVersion
-    }
 
-    Write-Host "Version has been incremented"
-}
-elseif ($currentVersionTokens.Length -lt $lastVersionTokens.Length){
-    if ($currentVersionTokens[$currentVersionTokens.Length - 1] -le $lastVersionTokens[$currentVersionTokens.Length - 1]){
-        throw "Version is not incremented. Current version " + $currentVersion + ". Last version " + $lastVersion
-    }
-
-    Write-Host "Version has been incremented"
-}
+# All segments are equal - version is not incremented
+throw "Version is not incremented. Current version " + $currentVersion + ". Last version " + $lastVersion
