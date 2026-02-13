@@ -2,7 +2,6 @@ using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Services.DirectSong;
 using Daybreak.Shared.Services.Downloads;
 using Microsoft.Extensions.Logging;
-using Microsoft.Win32;
 
 namespace Daybreak.Windows.Services.DirectSong;
 
