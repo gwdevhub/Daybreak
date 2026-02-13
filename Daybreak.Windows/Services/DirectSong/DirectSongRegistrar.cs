@@ -15,16 +15,11 @@ internal sealed class DirectSongRegistrar(
 {
     // The Revival Pack extracts DirectSong files to a nested DirectSong subfolder
     private const string DirectSongSubdir = "DirectSong";
-    // Windows 10 requires a specific WMVCORE.DLL from the archive
-    private const string Windows10WmvcoreSubdir = "wmvcore_dll_for_Windows10";
-    private const string Windows10WmvcoreVersion = "11.0.6001.7006";
 
     // Registry paths for DirectSong
     // Using HKCU instead of HKLM to avoid requiring admin privileges
     private const string DirectSongRegistryKey = @"Software\DirectSong";
     private const string MusicPathValueName = "MusicPath";
-
-    private const string WMVCOREDll = "WMVCORE.DLL";
     private const string DsGuildWarsDll = "ds_GuildWars.dll";
 
     private readonly ILogger<DirectSongRegistrar> logger = logger;
@@ -93,12 +88,9 @@ internal sealed class DirectSongRegistrar(
     {
         var fullInstallDir = Path.GetFullPath(installationDirectory);
         var directSongDir = Path.Combine(fullInstallDir, DirectSongSubdir);
-        var wmvcoreDir = Path.Combine(fullInstallDir, Windows10WmvcoreSubdir, Windows10WmvcoreVersion);
-
-        var wmcorePath = Path.Combine(wmvcoreDir, WMVCOREDll);
         var dsGuildWarsPath = Path.Combine(directSongDir, DsGuildWarsDll);
 
-        return File.Exists(wmcorePath) && File.Exists(dsGuildWarsPath);
+        return File.Exists(dsGuildWarsPath);
     }
 
     public Task<bool> SetupPlatformFiles(string installationDirectory, IDownloadService downloadService, IProgress<ProgressUpdate>? progress, CancellationToken cancellationToken)
@@ -111,19 +103,8 @@ internal sealed class DirectSongRegistrar(
     {
         var fullInstallDir = Path.GetFullPath(installationDirectory);
         var directSongDir = Path.Combine(fullInstallDir, DirectSongSubdir);
-        var wmvcoreDir = Path.Combine(fullInstallDir, Windows10WmvcoreSubdir, Windows10WmvcoreVersion);
-
-        var wmcoreSrc = Path.Combine(wmvcoreDir, WMVCOREDll);
         var dsGuildWarsSrc = Path.Combine(directSongDir, DsGuildWarsDll);
-
-        var wmcoreDst = Path.Combine(gwDirectory, WMVCOREDll);
         var dsGuildWarsDst = Path.Combine(gwDirectory, DsGuildWarsDll);
-
-        if (!File.Exists(wmcoreDst) && File.Exists(wmcoreSrc))
-        {
-            File.Copy(wmcoreSrc, wmcoreDst);
-            this.logger.LogDebug("Copied {Dll} to {Path}", WMVCOREDll, wmcoreDst);
-        }
 
         if (!File.Exists(dsGuildWarsDst) && File.Exists(dsGuildWarsSrc))
         {
@@ -134,14 +115,7 @@ internal sealed class DirectSongRegistrar(
 
     public void RemoveFilesFromGuildWars(string gwDirectory)
     {
-        var wmcorePath = Path.Combine(gwDirectory, WMVCOREDll);
         var dsGuildWarsPath = Path.Combine(gwDirectory, DsGuildWarsDll);
-
-        if (File.Exists(wmcorePath))
-        {
-            File.Delete(wmcorePath);
-            this.logger.LogDebug("Removed {Dll} from {Path}", WMVCOREDll, gwDirectory);
-        }
 
         if (File.Exists(dsGuildWarsPath))
         {
