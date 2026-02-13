@@ -2,12 +2,13 @@ using Daybreak.Shared.Models.Async;
 using Daybreak.Shared.Services.DirectSong;
 using Daybreak.Shared.Services.Downloads;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics;
+using Microsoft.Win32;
 
 namespace Daybreak.Windows.Services.DirectSong;
 
 /// <summary>
-/// Windows implementation that runs the DirectSong registry editor natively.
+/// Windows implementation that registers DirectSong via the Windows registry.
+/// Uses HKEY_CURRENT_USER to avoid requiring administrator privileges.
 /// </summary>
 internal sealed class DirectSongRegistrar(
     ILogger<DirectSongRegistrar> logger) : IDirectSongRegistrar
@@ -18,52 +19,57 @@ internal sealed class DirectSongRegistrar(
     private const string Windows10WmvcoreSubdir = "wmvcore_dll_for_Windows10";
     private const string Windows10WmvcoreVersion = "11.0.6001.7006";
 
+    // Registry paths for DirectSong
+    // Using HKCU instead of HKLM to avoid requiring admin privileges
+    private const string DirectSongRegistryKey = @"Software\DirectSong";
+    private const string MusicPathValueName = "MusicPath";
+
     private const string WMVCOREDll = "WMVCORE.DLL";
     private const string DsGuildWarsDll = "ds_GuildWars.dll";
 
     private readonly ILogger<DirectSongRegistrar> logger = logger;
 
-    public async Task<bool> RegisterDirectSongDirectory(string installationDirectory, string registryEditorName, CancellationToken cancellationToken)
+    public Task<bool> RegisterDirectSongDirectory(string installationDirectory, string registryEditorName, CancellationToken cancellationToken)
     {
         // The actual DirectSong files are in the nested DirectSong subfolder
         var directSongDir = Path.Combine(Path.GetFullPath(installationDirectory), DirectSongSubdir);
-        using var process = new Process()
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = Path.Combine(directSongDir, registryEditorName),
-                WorkingDirectory = directSongDir,
-                CreateNoWindow = true,
-                RedirectStandardOutput = true,
-                UseShellExecute = false
-            },
-            EnableRaisingEvents = true
-        };
 
-        var success = false;
-        process.OutputDataReceived += (s, e) =>
+        try
         {
-            if (e.Data == directSongDir)
+            // Try HKEY_CURRENT_USER first (no admin required)
+            using var hkcuKey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(DirectSongRegistryKey);
+            if (hkcuKey is not null)
             {
-                success = true;
+                hkcuKey.SetValue(MusicPathValueName, directSongDir);
+                this.logger.LogDebug("Set DirectSong registry in HKCU: {Path}", directSongDir);
+                return Task.FromResult(true);
             }
-        };
 
-        process.Start();
-        process.BeginOutputReadLine();
-        while (!process.HasExited && !success)
-        {
-            await Task.Delay(1000, cancellationToken);
+            this.logger.LogWarning("Failed to create registry key in HKCU");
+            
+            // Fallback to HKEY_LOCAL_MACHINE (requires admin, but try anyway)
+            try
+            {
+                using var hklmKey = Microsoft.Win32.Registry.LocalMachine.CreateSubKey(DirectSongRegistryKey);
+                if (hklmKey is not null)
+                {
+                    hklmKey.SetValue(MusicPathValueName, directSongDir);
+                    this.logger.LogDebug("Set DirectSong registry in HKLM: {Path}", directSongDir);
+                    return Task.FromResult(true);
+                }
+            }
+            catch (UnauthorizedAccessException)
+            {
+                this.logger.LogWarning("Cannot write to HKLM without administrator privileges");
+            }
+
+            return Task.FromResult(false);
         }
-
-        process.CancelOutputRead();
-        if (!process.HasExited)
+        catch (Exception ex)
         {
-            process.Close();
+            this.logger.LogError(ex, "Failed to set DirectSong registry");
+            return Task.FromResult(false);
         }
-
-        this.logger.LogDebug("DirectSong registry registration result: {Success}", success);
-        return success;
     }
 
     public Task<bool> SetupDllOverrides(CancellationToken cancellationToken)
