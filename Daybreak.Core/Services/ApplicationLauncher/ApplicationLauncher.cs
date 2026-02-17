@@ -174,19 +174,26 @@ internal sealed class ApplicationLauncher(
             args.Add(arg);
         }
 
-        var enabledMods = this
-            .modsManager.GetMods()
-            .Where(m => launchConfigurationWithCredentials.CustomModLoadoutEnabled
-                    ? m.IsInstalled && (!m.CanDisable || launchConfigurationWithCredentials.EnabledMods?.Contains(m.Name) is true)
-                    : m.IsInstalled && m.IsEnabled)
-            .ToList();
-        var disabledMods = this
-            .modsManager.GetMods()
-            .Where(m => launchConfigurationWithCredentials.CustomModLoadoutEnabled
-                    ? m.IsInstalled && (!m.CanDisable || launchConfigurationWithCredentials.EnabledMods?.Contains(m.Name) is not true)
-                    : m.IsInstalled && !m.IsEnabled)
+        if (launchConfigurationWithCredentials.CustomModLoadoutEnabled)
+        {
+            scopedLogger.LogDebug("Custom mod loadout enabled. Overriding mod list with: {modList}", string.Join(',', launchConfigurationWithCredentials.EnabledMods ?? []));
+        }
+
+        var mods = this.modsManager.GetMods();
+        var enabledMods = mods
+            .Where(m =>
+            {
+                var willRun = launchConfigurationWithCredentials.CustomModLoadoutEnabled
+                    ? !m.CanDisable || (launchConfigurationWithCredentials.EnabledMods?.Contains(m.Name) is true)
+                    : m.IsEnabled;
+                scopedLogger.LogDebug(
+                        "Checking {ModName}.\nIsInstalled: {isInstalled}.\nCanDisable: {canDisable}.\nIsEnabled: {isEnabled}.\nWillRun: {willRun}",
+                        m.Name, m.IsInstalled, m.CanDisable, m.IsEnabled, willRun);
+                return willRun;
+            })
             .ToList();
 
+        var disabledMods = mods.Except(enabledMods);
         if (this.launcherOptions.CurrentValue.CancelLaunchOutOfDateMods)
         {
             foreach (var mod in enabledMods)
