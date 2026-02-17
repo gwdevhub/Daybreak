@@ -28,7 +28,7 @@
     <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.14.0" />
     <PackageVersion Include="Microsoft.Identity.Client" Version="4.82.1" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
-    <PackageVersion Include="Microsoft.Web.WebView2" Version="1.0.3719.77" />
+    <PackageVersion Include="Microsoft.Web.WebView2" Version="1.0.3800.47" />
     <PackageVersion Include="MinHook.NET" Version="1.1.2" />
     <PackageVersion Include="MSTest.TestAdapter" Version="4.1.0" />
     <PackageVersion Include="MSTest.TestFramework" Version="4.1.0" />
