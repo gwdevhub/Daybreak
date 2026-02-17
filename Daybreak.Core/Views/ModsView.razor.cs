@@ -27,7 +27,7 @@ public sealed class ModsViewModel(
     private CancellationTokenSource? cts;
 
     public LaunchConfigurationWithCredentials? LaunchConfiguration { get; private set; }
-    public IEnumerable<ModListEntry> Mods { get; private set; } = [];
+    public IReadOnlyList<ModListEntry> Mods { get; private set; } = [];
 
     public override ValueTask ParametersSet(ModsView view, CancellationToken cancellationToken)
     {
@@ -177,36 +177,41 @@ public sealed class ModsViewModel(
 
     private async ValueTask CheckForUpdates(CancellationToken cancellationToken)
     {
+        var scopedLogger = this.logger.CreateScopedLogger();
         foreach (var mod in this.Mods)
         {
             mod.Loading = true;
         }
 
         await this.RefreshViewAsync();
-        foreach (var mod in this.Mods)
+
+        // Kinda hacky. Add delay for deduplication when navigating away.
+        await Task.Delay(1000, cancellationToken);
+
+        var tasks = this.Mods.Select(async m =>
         {
+            var modName = m.Name ?? "Unknown mod";
             try
             {
-                if (mod.ModService.IsInstalled)
+                if (m.ModService.IsInstalled)
                 {
-                    mod.CanUpdate = await mod.ModService.IsUpdateAvailable(cancellationToken);
+                    scopedLogger.LogDebug("Checking for updates for mod {ModName}", modName);
+                    m.CanUpdate = await m.ModService.IsUpdateAvailable(cancellationToken);
                 }
                 else
                 {
-                    mod.CanUpdate = false;
+                    m.CanUpdate = false;
                 }
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                mod.CanUpdate = false;
-                var modName = mod.Name ?? "Unknown mod";
-                var scopedLogger = this.logger.CreateScopedLogger();
-                scopedLogger.LogError(ex, "Failed to check for updates for mod {ModName}", modName);
+                scopedLogger.LogError(e, "Failed to check for updates for mod {ModName}", modName);
             }
 
-            mod.Loading = false;
-        }
+            m.Loading = false;
+        });
 
+        await Task.WhenAll(tasks);
         await this.RefreshViewAsync();
     }
 }
