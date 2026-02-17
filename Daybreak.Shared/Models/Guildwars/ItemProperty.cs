@@ -81,6 +81,7 @@ public abstract class ItemProperty
                 ItemModifierIdentifier.BaneSpecies                                  => new BaneProperty { BaneSpecies = (ItemBaneSpecies)m.Argument1 },
                 ItemModifierIdentifier.Attribute                                    => new RequirementProperty { Attribute = ParseAttributeName(m.Argument1), Requirement = (int)m.Argument2 },
                 ItemModifierIdentifier.Damage                                       => new DamageProperty { MinDamage = (int)m.Argument2, MaxDamage = (int)m.Argument1 },
+                ItemModifierIdentifier.Damage2                                      => new DamageProperty { MinDamage = (int)m.Argument2, MaxDamage = (int)m.Argument1 },
                 ItemModifierIdentifier.Armor1                                       => new ArmorProperty { Armor =(int)m.Argument1 },
                 ItemModifierIdentifier.Armor2                                       => new ArmorProperty { Armor = (int)m.Argument1 },
                 ItemModifierIdentifier.Energy                                       => new EnergyProperty { Energy = (int)m.Argument1 },

@@ -19,6 +19,7 @@ public enum ItemModifierIdentifier : uint
     BaneSpecies                         = 0x008,    // Dmg increased vs species (arg1)
     Attribute                           = 0x279,    // Requires points in attribute (arg2) (arg1)
     Damage                              = 0x27A,    // Min damage - Max damage (arg2) (arg1)
+    Damage2                             = 0x248,    // Damage without attribute. Min dmg - Max dmg (arg2) (arg1)
     Armor1                              = 0x27B,    // Armor value (arg1)
     Armor2                              = 0x23C,    // Armor value (arg1)
     Energy                              = 0x27C,    // Energy value (arg1)
