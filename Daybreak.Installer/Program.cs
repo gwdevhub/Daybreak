@@ -7,6 +7,15 @@ const string LatestUrl = "https://github.com/gwdevhub/Daybreak/releases/latest";
 var daybreakExecutable = OperatingSystem.IsWindows() ? "Daybreak.exe" : "Daybreak";
 var daybreakProcessName = "Daybreak";
 var releaseAssetSuffix = OperatingSystem.IsWindows() ? "" : "-linux";
+var installerExtension = OperatingSystem.IsWindows() ? ".exe" : "";
+
+// Paths relative to the zip root that should be skipped during extraction
+// These are the installer executables that may be currently running
+var skipEntriesOnExtract = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+{
+    $"Installer/Daybreak.Installer{installerExtension}",
+    $"Installer/Daybreak.Installer.Temp{installerExtension}",
+};
 
 static void RenderProgressBar(int currentStep, int totalSteps, int barSize)
 {
@@ -23,18 +32,64 @@ static void RenderProgressBar(int currentStep, int totalSteps, int barSize)
     Console.Write($"{pctComplete:P0}"); // Display the percentage completed
 }
 
-static void CleanWorkingDirectory(string workingDirectory)
+static void ExtractZipSkippingEntries(string zipPath, string destinationDirectory, HashSet<string> skipEntries)
+{
+    using var archive = ZipFile.OpenRead(zipPath);
+    foreach (var entry in archive.Entries)
+    {
+        // Normalize entry path separators
+        var entryPath = entry.FullName.Replace('\\', '/');
+
+        // Skip entries in the skip list
+        if (skipEntries.Any(skip => entryPath.Equals(skip, StringComparison.OrdinalIgnoreCase)))
+        {
+            Console.WriteLine($"Skipping: {entry.FullName}");
+            continue;
+        }
+
+        var destinationPath = Path.GetFullPath(Path.Combine(destinationDirectory, entry.FullName));
+
+        // Ensure the destination is within the target directory (security check)
+        if (!destinationPath.StartsWith(Path.GetFullPath(destinationDirectory), StringComparison.OrdinalIgnoreCase))
+        {
+            continue;
+        }
+
+        // If entry is a directory, create it
+        if (entry.FullName.EndsWith('/') || entry.FullName.EndsWith('\\'))
+        {
+            Directory.CreateDirectory(destinationPath);
+        }
+        else
+        {
+            // Ensure parent directory exists
+            var parentDir = Path.GetDirectoryName(destinationPath);
+            if (!string.IsNullOrEmpty(parentDir))
+            {
+                Directory.CreateDirectory(parentDir);
+            }
+
+            entry.ExtractToFile(destinationPath, overwrite: true);
+        }
+    }
+}
+
+static void CleanWorkingDirectory(string workingDirectory, string installerExtension)
 {
     if (!Directory.Exists(workingDirectory))
     {
         return;
     }
 
-    var installerPath = Path.GetFullPath(Path.Combine(workingDirectory, "Installer"));
+    var installerFolder = Path.GetFullPath(Path.Combine(workingDirectory, "Installer"));
+    var installerPath = Path.GetFullPath(Path.Combine(installerFolder, $"Daybreak.Installer{installerExtension}"));
+    var installerTempPath = Path.GetFullPath(Path.Combine(installerFolder, $"Daybreak.Installer.Temp{installerExtension}"));
     var optionsPath = Path.GetFullPath(Path.Combine(workingDirectory, "Daybreak.options"));
     var preserve = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
     {
+        installerFolder,
         installerPath,
+        installerTempPath,
         optionsPath,
     };
     var preserveExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".tpf" };
@@ -149,7 +204,7 @@ async ValueTask PerformUpdate(string workingDirectory)
         Console.WriteLine("Unpacking files...");
         try
         {
-            ZipFile.ExtractToDirectory(tempFile, Path.GetFullPath(workingDirectory), true);
+            ExtractZipSkippingEntries(tempFile, Path.GetFullPath(workingDirectory), skipEntriesOnExtract);
         }
         catch { }
 
@@ -224,7 +279,7 @@ async ValueTask PerformFreshInstall(string workingDirectory)
     var tempFile = Path.GetFullPath("tempfile.zip", workingDirectory);
 
     Console.WriteLine($"Cleaning installation directory {workingDirectory}");
-    CleanWorkingDirectory(workingDirectory);
+    CleanWorkingDirectory(workingDirectory, installerExtension);
 
     Console.WriteLine($"Downloading Daybreak {version}...");
 
@@ -272,7 +327,7 @@ async ValueTask PerformFreshInstall(string workingDirectory)
     Console.WriteLine("\nDownload complete. Extracting files...");
     try
     {
-        ZipFile.ExtractToDirectory(tempFile, Path.GetFullPath(workingDirectory), true);
+        ExtractZipSkippingEntries(tempFile, Path.GetFullPath(workingDirectory), skipEntriesOnExtract);
     }
     catch (Exception e)
     {
