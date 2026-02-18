@@ -64,6 +64,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>gwca.dll</Link>
     </None>
+    <AdditionalFiles Include="..\Dependencies\GWCA\gwca.dll" />
   </ItemGroup>
 
   <ItemGroup>
@@ -93,6 +94,8 @@
     <ProjectReference Include="..\Daybreak.Shared\Daybreak.Shared.csproj" />
     <ProjectReference Include="..\Daybreak.Generators\Daybreak.Generators.csproj"
                       OutputItemType="Analyzer"
-                      ReferenceOutputAssembly="false" />
+                      ReferenceOutputAssembly="false"
+                      SkipGetTargetFrameworkProperties="true"
+                      UndefineProperties="RuntimeIdentifier;PublishAot;SelfContained;TargetFramework" />
   </ItemGroup>
 </Project>

@@ -1,4 +1,7 @@
-namespace GenerateGWCABindings;
+using System;
+using System.Collections.Generic;
+
+namespace Daybreak.Generators;
 
 /// <summary>
 /// Minimal MSVC C++ decorated name demangler.
@@ -6,6 +9,9 @@ namespace GenerateGWCABindings;
 /// free functions (?name@ns@@Y...), static/virtual member functions,
 /// basic types, pointers, references, enums, structs, function pointers,
 /// templates (first arg only), and back-references (global name table).
+///
+/// Ported from the standalone GenerateGWCABindings tool for use inside
+/// a Roslyn source generator (targets netstandard2.0).
 /// </summary>
 internal sealed class MsvcDemangler
 {
@@ -32,19 +38,26 @@ internal sealed class MsvcDemangler
         ["_W"] = "ushort",  // wchar_t (ushort is blittable, char is not)
     };
 
+    // ── Public types ───────────────────────────────────────────────
+
     /// <summary>
     /// Represents a demangled C++ type with enough detail to resolve to C# types.
     /// </summary>
-    public record DemangledType(TypeKind Kind, string Name, string? QualifiedName = null, DemangledType? TemplateArg = null, string? UnderlyingType = null)
+    public record DemangledType(
+        TypeKind Kind,
+        string Name,
+        string? QualifiedName = null,
+        DemangledType? TemplateArg = null,
+        string? UnderlyingType = null)
     {
-        public override string ToString() => Kind switch
+        public override string ToString() => this.Kind switch
         {
-            TypeKind.Primitive => Name,
-            TypeKind.Pointer => TemplateArg is not null ? $"ptr:{Name}<{TemplateArg}>" : $"ptr:{QualifiedName ?? Name}",
-            TypeKind.Enum => $"enum:{QualifiedName ?? Name}",
-            TypeKind.Struct => TemplateArg is not null ? $"struct:{Name}<{TemplateArg}>" : $"struct:{QualifiedName ?? Name}",
+            TypeKind.Primitive => this.Name,
+            TypeKind.Pointer => this.TemplateArg is not null ? $"ptr:{this.Name}<{this.TemplateArg}>" : $"ptr:{this.QualifiedName ?? this.Name}",
+            TypeKind.Enum => $"enum:{this.QualifiedName ?? this.Name}",
+            TypeKind.Struct => this.TemplateArg is not null ? $"struct:{this.Name}<{this.TemplateArg}>" : $"struct:{this.QualifiedName ?? this.Name}",
             TypeKind.FuncPtr => "funcptr",
-            _ => Name
+            _ => this.Name
         };
     }
 
@@ -56,29 +69,30 @@ internal sealed class MsvcDemangler
         bool IsMember,
         DemangledType ReturnType,
         DemangledType[] ParameterTypes,
-        bool IsVarArgs
-    )
+        bool IsVarArgs)
     {
         public string QualifiedCppName
         {
             get
             {
-                var ns = string.Join("::", NamespaceParts);
-                return ns.Length > 0 ? $"{ns}::{FunctionName}" : FunctionName;
+                var ns = string.Join("::", this.NamespaceParts);
+                return ns.Length > 0 ? $"{ns}::{this.FunctionName}" : this.FunctionName;
             }
         }
 
-        public string Region => NamespaceParts.Length > 0
-            ? string.Join("::", NamespaceParts)
+        public string Region => this.NamespaceParts.Length > 0
+            ? string.Join("::", this.NamespaceParts)
             : "GW";
     }
 
+    // ── Entry point ────────────────────────────────────────────────
+
     public static DemangledFunction? Demangle(string mangled)
     {
-        if (!mangled.StartsWith('?'))
+        if (mangled.Length == 0 || mangled[0] != '?')
             return null;
 
-        var s = mangled.AsSpan()[1..]; // skip '?'
+        var s = mangled.AsSpan().Slice(1); // skip '?'
         int pos = 0;
 
         // Global name table — shared across all ReadQualifiedName calls
@@ -146,6 +160,8 @@ internal sealed class MsvcDemangler
         return new DemangledFunction(nsParts, funcName, isMember, retType, [.. paramTypes], isVarArgs);
     }
 
+    // ── Qualified name parsing ─────────────────────────────────────
+
     private static List<string> ReadQualifiedName(ReadOnlySpan<char> s, ref int pos, List<string> nameTable)
     {
         // MSVC qualified names are encoded as Name1@Name2@...@NameN@@
@@ -164,14 +180,12 @@ internal sealed class MsvcDemangler
                     pos += 2;
                     return parts;
                 }
+
                 pos++;
                 continue;
             }
 
             // Handle numeric back-references (single digit 0-9)
-            // Unlike text name parts which need a trailing @ separator,
-            // digit back-refs are self-delimiting — a single @ after a
-            // digit terminates the qualified name.
             if (char.IsDigit(s[pos]))
             {
                 int refIdx = s[pos] - '0';
@@ -187,6 +201,7 @@ internal sealed class MsvcDemangler
                     pos++;
                     return parts;
                 }
+
                 continue;
             }
 
@@ -194,10 +209,10 @@ internal sealed class MsvcDemangler
             if (s[pos] == '?' && pos + 1 < s.Length && s[pos + 1] == '$')
             {
                 pos += 2;
-                int nameEnd = s[pos..].IndexOf('@');
+                int nameEnd = s.Slice(pos).IndexOf('@');
                 if (nameEnd < 0) break;
                 nameEnd += pos;
-                var templateName = new string(s[pos..nameEnd]);
+                var templateName = s.Slice(pos, nameEnd - pos).ToString();
                 pos = nameEnd + 1;
 
                 // Add template name to the global name table
@@ -221,9 +236,11 @@ internal sealed class MsvcDemangler
                             pos += 2;
                             break;
                         }
+
                         pos++;
                         continue;
                     }
+
                     pos++;
                 }
 
@@ -239,13 +256,14 @@ internal sealed class MsvcDemangler
                     pos += 2;
                     return parts;
                 }
+
                 continue;
             }
 
-            int end = s[pos..].IndexOf('@');
+            int end = s.Slice(pos).IndexOf('@');
             if (end < 0) break;
             end += pos;
-            var name = new string(s[pos..end]);
+            var name = s.Slice(pos, end - pos).ToString();
             parts.Add(name);
 
             // Add to the global name table (max 10 entries per MSVC spec)
@@ -261,6 +279,7 @@ internal sealed class MsvcDemangler
                 return parts;
             }
         }
+
         return parts;
     }
 
@@ -278,13 +297,13 @@ internal sealed class MsvcDemangler
         for (int i = 0; i < parts.Count; i++)
         {
             var p = parts[i];
-            if (p.Contains('|'))
+            if (p.IndexOf('|') >= 0)
             {
-                var segments = p.Split('|', 4);
+                var segments = p.Split(['|'], 4);
                 cleanParts.Add(segments[0]);
                 if (i == 0 && segments.Length == 4) // only care about template arg on the leaf type
                 {
-                    var kind = Enum.Parse<TypeKind>(segments[1]);
+                    var kind = (TypeKind)Enum.Parse(typeof(TypeKind), segments[1]);
                     var innerName = segments[2];
                     var qualName = segments[3].Length > 0 ? segments[3] : null;
                     templateArg = new DemangledType(kind, innerName, qualName);
@@ -303,18 +322,20 @@ internal sealed class MsvcDemangler
         return (unqualified, qualified, templateArg);
     }
 
+    // ── Type parsing ───────────────────────────────────────────────
+
     private static DemangledType ReadType(ReadOnlySpan<char> s, ref int pos, List<string> nameTable)
     {
-        if (pos >= s.Length) return new(TypeKind.Primitive, "void");
+        if (pos >= s.Length) return new DemangledType(TypeKind.Primitive, "void");
 
         // Two-char basic types
         if (pos + 1 < s.Length)
         {
-            var twoChar = new string(s[pos..(pos + 2)]);
+            var twoChar = s.Slice(pos, 2).ToString();
             if (TwoCharBasicTypes.TryGetValue(twoChar, out var tc))
             {
                 pos += 2;
-                return new(TypeKind.Primitive, tc);
+                return new DemangledType(TypeKind.Primitive, tc);
             }
         }
 
@@ -324,7 +345,7 @@ internal sealed class MsvcDemangler
         if (BasicTypes.TryGetValue(c, out var basic))
         {
             pos++;
-            return new(TypeKind.Primitive, basic);
+            return new DemangledType(TypeKind.Primitive, basic);
         }
 
         // W0-W7 = enum (digit encodes underlying type width)
@@ -344,102 +365,107 @@ internal sealed class MsvcDemangler
                 _ => "int"
             };
             pos += 2;
-            var parts = ReadQualifiedName(s, ref pos, nameTable);
-            var (unqual, qual, _) = BuildTypeName(parts);
-            return new(TypeKind.Enum, unqual, qual, UnderlyingType: underlying);
+            var enumParts = ReadQualifiedName(s, ref pos, nameTable);
+            var (unqual, qual, _) = BuildTypeName(enumParts);
+            return new DemangledType(TypeKind.Enum, unqual, qual, UnderlyingType: underlying);
         }
 
         // Pointers / references
         if (c is 'P' or 'Q' or 'A')
         {
             pos++;
-            if (pos >= s.Length) return new(TypeKind.Pointer, "void");
+            if (pos >= s.Length) return new DemangledType(TypeKind.Pointer, "void");
 
             // Function pointer: P6...
             if (s[pos] == '6')
             {
                 pos++;
                 ReadFuncPtr(s, ref pos, nameTable);
-                return new(TypeKind.FuncPtr, "funcptr");
+                return new DemangledType(TypeKind.FuncPtr, "funcptr");
             }
 
             // Const qualifier (A=non-const, B=const)
             if (pos < s.Length && s[pos] is 'A' or 'B')
                 pos++;
 
-            if (pos >= s.Length) return new(TypeKind.Pointer, "void");
+            if (pos >= s.Length) return new DemangledType(TypeKind.Pointer, "void");
 
             var inner = s[pos];
 
-            if (inner == 'X') { pos++; return new(TypeKind.Pointer, "void"); } // void*
+            if (inner == 'X') { pos++; return new DemangledType(TypeKind.Pointer, "void"); } // void*
 
             // Two-char under pointer
             if (inner == '_' && pos + 1 < s.Length)
             {
-                var twoInner = new string(s[pos..(pos + 2)]);
+                var twoInner = s.Slice(pos, 2).ToString();
                 if (TwoCharBasicTypes.TryGetValue(twoInner, out var tc))
                 {
                     pos += 2;
-                    return new(TypeKind.Pointer, tc);
+                    return new DemangledType(TypeKind.Pointer, tc);
                 }
             }
 
             if (BasicTypes.TryGetValue(inner, out var basicInner))
             {
                 pos++;
-                return new(TypeKind.Pointer, basicInner);
+                return new DemangledType(TypeKind.Pointer, basicInner);
             }
 
             if (inner is 'U' or 'V') // struct/class pointer
             {
                 pos++;
-                var parts = ReadQualifiedName(s, ref pos, nameTable);
-                var (unqual, qual, templateArg) = BuildTypeName(parts);
-                return new(TypeKind.Pointer, unqual, qual, templateArg);
+                var ptrParts = ReadQualifiedName(s, ref pos, nameTable);
+                var (unqual, qual, templateArg) = BuildTypeName(ptrParts);
+                return new DemangledType(TypeKind.Pointer, unqual, qual, templateArg);
             }
 
             if (inner is 'P' or 'Q' or 'A') // nested pointer
             {
                 ReadType(s, ref pos, nameTable);
-                return new(TypeKind.Pointer, "void");
+                return new DemangledType(TypeKind.Pointer, "void");
             }
 
             // Back-reference digit
-            if (char.IsDigit(inner)) { pos++; return new(TypeKind.Pointer, "void"); }
+            if (char.IsDigit(inner)) { pos++; return new DemangledType(TypeKind.Pointer, "void"); }
 
             pos++;
-            return new(TypeKind.Pointer, "void");
+            return new DemangledType(TypeKind.Pointer, "void");
         }
 
         // Struct/class by value
         if (c is 'U' or 'V')
         {
             pos++;
-            var parts = ReadQualifiedName(s, ref pos, nameTable);
-            var (unqual, qual, templateArg) = BuildTypeName(parts);
-            return new(TypeKind.Struct, unqual, qual, templateArg);
+            var structParts = ReadQualifiedName(s, ref pos, nameTable);
+            var (unqual, qual, templateArg) = BuildTypeName(structParts);
+            return new DemangledType(TypeKind.Struct, unqual, qual, templateArg);
         }
 
         // Back-reference digit
-        if (char.IsDigit(c)) { pos++; return new(TypeKind.Primitive, "nint"); }
+        if (char.IsDigit(c)) { pos++; return new DemangledType(TypeKind.Primitive, "nint"); }
 
         pos++;
-        return new(TypeKind.Primitive, "nint");
+        return new DemangledType(TypeKind.Primitive, "nint");
     }
+
+    // ── Function pointer ───────────────────────────────────────────
 
     private static void ReadFuncPtr(ReadOnlySpan<char> s, ref int pos, List<string> nameTable)
     {
         // Calling convention
-        if (pos < s.Length && char.IsAsciiLetterUpper(s[pos])) pos++;
+        if (pos < s.Length && s[pos] >= 'A' && s[pos] <= 'Z') pos++;
         // Return type
         ReadType(s, ref pos, nameTable);
         // Params until @ or Z
         while (pos < s.Length)
         {
             if (s[pos] is '@' or 'Z') { pos++; break; }
+
             ReadType(s, ref pos, nameTable);
         }
     }
+
+    // ── Parameter list ─────────────────────────────────────────────
 
     private static List<DemangledType> ReadParams(ReadOnlySpan<char> s, ref int pos, List<string> nameTable)
     {
@@ -447,16 +473,21 @@ internal sealed class MsvcDemangler
         while (pos < s.Length)
         {
             if (s[pos] == 'Z') { pos++; return parms; }
+
             if (s[pos] == '@')
             {
                 if (pos + 1 < s.Length && s[pos + 1] == 'Z') { pos += 2; return parms; }
+
                 pos++;
                 continue;
             }
+
             if (s[pos] == 'X') { pos++; return parms; } // void = no params
 
             parms.Add(ReadType(s, ref pos, nameTable));
         }
+
         return parms;
     }
 }
+
