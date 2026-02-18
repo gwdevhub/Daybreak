@@ -3,6 +3,7 @@
 namespace Daybreak.API.Interop.GuildWars;
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
+[GWCAEquivalent("Inventory")]
 public readonly unsafe struct Inventory
 {
     public readonly Bag* UnusedBag;

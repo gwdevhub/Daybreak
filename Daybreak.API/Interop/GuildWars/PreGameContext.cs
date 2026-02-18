@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 namespace Daybreak.API.Interop.GuildWars;
 
 [StructLayout(LayoutKind.Explicit, Pack = 1)]
+[GWCAEquivalent("PreGameContext")]
 public readonly struct PreGameContext
 {
     [FieldOffset(0x0000)]

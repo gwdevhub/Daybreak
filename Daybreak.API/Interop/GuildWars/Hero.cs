@@ -22,6 +22,7 @@ public readonly struct HeroFlag
 }
 
 [StructLayout(LayoutKind.Explicit, Pack = 1, Size = 0x78)]
+[GWCAEquivalent("HeroInfo")]
 public readonly struct HeroInfo
 {
     [FieldOffset(0x0000)]

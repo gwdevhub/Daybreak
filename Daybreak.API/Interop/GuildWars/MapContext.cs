@@ -3,6 +3,7 @@
 namespace Daybreak.API.Interop.GuildWars;
 
 [StructLayout(LayoutKind.Explicit, Pack = 1)]
+[GWCAEquivalent("MapContext")]
 public readonly struct MapContext
 {
 }

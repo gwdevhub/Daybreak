@@ -19,7 +19,7 @@ public sealed class UIService(
     private readonly UIContextService uIContextService = uIContextService;
     private readonly ILogger<UIService> logger = logger;
 
-    public async Task<bool> Keypress(UIAction action, WrappedPointer<Frame> frame, CancellationToken cancellationToken)
+    public async Task<bool> Keypress(ControlAction action, WrappedPointer<Frame> frame, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         var keyDownResult = await this.gameThreadService.QueueOnGameThread(() =>
@@ -176,18 +176,18 @@ public sealed class UIService(
         }
     }
 
-    private static UIAction GetUIActionFromFrameLabel(string frameLabel)
+    private static ControlAction GetUIActionFromFrameLabel(string frameLabel)
     {
         return frameLabel switch
         {
-            "AgentCommander0" => UIAction.OpenHeroCommander1,
-            "AgentCommander1" => UIAction.OpenHeroCommander2,
-            "AgentCommander2" => UIAction.OpenHeroCommander3,
-            "AgentCommander3" => UIAction.OpenHeroCommander4,
-            "AgentCommander4" => UIAction.OpenHeroCommander5,
-            "AgentCommander5" => UIAction.OpenHeroCommander6,
-            "AgentCommander6" => UIAction.OpenHeroCommander7,
-            _ => UIAction.None
+            "AgentCommander0" => ControlAction.OpenHeroCommander1,
+            "AgentCommander1" => ControlAction.OpenHeroCommander2,
+            "AgentCommander2" => ControlAction.OpenHeroCommander3,
+            "AgentCommander3" => ControlAction.OpenHeroCommander4,
+            "AgentCommander4" => ControlAction.OpenHeroCommander5,
+            "AgentCommander5" => ControlAction.OpenHeroCommander6,
+            "AgentCommander6" => ControlAction.OpenHeroCommander7,
+            _ => ControlAction.None
         };
     }
 }

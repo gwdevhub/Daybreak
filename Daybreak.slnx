@@ -47,4 +47,7 @@
   <Project Path="Daybreak.Tests/Daybreak.Tests.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="Daybreak.Generators/Daybreak.Generators.csproj">
+    <Platform Project="x64" />
+  </Project>
 </Solution>

@@ -12,6 +12,7 @@ public enum TitleProps : uint
 }
 
 [StructLayout(LayoutKind.Explicit, Pack = 1, Size = 0x2C)]
+[GWCAEquivalent("Title")]
 public readonly struct TitleContext
 {
     [FieldOffset(0x0000)]
@@ -33,6 +34,7 @@ public readonly struct TitleContext
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0xC)]
+[GWCAEquivalent("TitleTier")]
 public readonly unsafe struct TitleTier
 {
     public readonly TitleProps Props;
@@ -41,6 +43,7 @@ public readonly unsafe struct TitleTier
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
+[GWCAEquivalent("TitleClientData")]
 public readonly struct TitleClientData
 {
     public readonly uint TitleId;

@@ -10,6 +10,7 @@ public enum PlayerContextFlags : uint
 }
 
 [StructLayout(LayoutKind.Explicit, Pack = 1, Size = 0x50)]
+[GWCAEquivalent("PlayerContext")]
 public readonly unsafe struct PlayerContext
 {
     [FieldOffset(0x0000)]

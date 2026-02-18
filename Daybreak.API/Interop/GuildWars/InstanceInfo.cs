@@ -2,6 +2,7 @@
 
 namespace Daybreak.API.Interop.GuildWars;
 
+[GWCAEquivalent("InstanceType")]
 public enum InstanceType
 {
     Outpost,
@@ -19,6 +20,7 @@ public readonly unsafe struct InstanceInfoContext
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
+[GWCAEquivalent("AreaInfo")]
 public readonly struct AreaInfo
 {
     public readonly uint Campaign;

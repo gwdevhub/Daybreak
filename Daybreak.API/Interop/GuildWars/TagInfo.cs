@@ -3,6 +3,7 @@
 namespace Daybreak.API.Interop.GuildWars;
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
+[GWCAEquivalent("TagInfo")]
 public readonly struct TagInfo
 {
     public readonly ushort GuildId;
