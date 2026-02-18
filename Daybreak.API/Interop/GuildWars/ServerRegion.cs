@@ -1,5 +1,6 @@
 ﻿namespace Daybreak.API.Interop.GuildWars;
 
+[GWCAEquivalent("ServerRegion")]
 public enum ServerRegion
 {
     International = -2,

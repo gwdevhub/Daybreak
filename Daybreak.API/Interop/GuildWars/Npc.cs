@@ -3,6 +3,7 @@
 namespace Daybreak.API.Interop.GuildWars;
 
 [StructLayout(LayoutKind.Explicit)]
+[GWCAEquivalent("NPC")]
 public readonly unsafe struct NpcContext
 {
     [FieldOffset(0x0000)]
@@ -42,6 +43,7 @@ public readonly unsafe struct NpcContext
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
+[GWCAEquivalent("PetInfo")]
 public readonly unsafe struct PetContext
 {
     public readonly uint AgentId;

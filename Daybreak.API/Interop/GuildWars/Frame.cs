@@ -6,6 +6,7 @@ namespace Daybreak.API.Interop.GuildWars;
 
 // Very incomplete. GWCA contains a much better definition
 [StructLayout(LayoutKind.Explicit, Pack = 1, Size = 0x1AC)]
+[GWCAEquivalent("Frame")]
 public readonly struct Frame
 {
     [FieldOffset(0x0008)]

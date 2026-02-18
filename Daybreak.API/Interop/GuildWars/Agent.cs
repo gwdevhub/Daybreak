@@ -87,6 +87,7 @@ public enum LivingAgentModelState : ushort
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
+[GWCAEquivalent("AgentEffects")]
 public readonly struct AgentEffects
 {
     public readonly uint AgentId;
@@ -95,6 +96,7 @@ public readonly struct AgentEffects
 }
 
 [StructLayout(LayoutKind.Explicit, Pack = 1)]
+[GWCAEquivalent("AgentContext")]
 public readonly struct AgentGameContext
 {
     [FieldOffset(0x01AC)]
@@ -102,6 +104,7 @@ public readonly struct AgentGameContext
 }
 
 [StructLayout(LayoutKind.Explicit, Pack = 1, Size = 196)]
+[GWCAEquivalent("Agent")]
 public readonly struct AgentContext
 {
     [FieldOffset(0x0014)]
@@ -121,6 +124,7 @@ public readonly struct AgentContext
 }
 
 [StructLayout(LayoutKind.Explicit, Pack = 1, Size = 212)]
+[GWCAEquivalent("AgentItem")]
 public readonly struct AgentItemContext
 {
     [FieldOffset(0x00C4)]
@@ -134,6 +138,7 @@ public readonly struct AgentItemContext
 }
 
 [StructLayout(LayoutKind.Explicit, Pack = 1, Size = 228)]
+[GWCAEquivalent("AgentGadget")]
 public readonly struct AgentGadgetContext
 {
     [FieldOffset(0x00CC)]
@@ -144,6 +149,7 @@ public readonly struct AgentGadgetContext
 }
 
 [StructLayout(LayoutKind.Explicit, Pack = 1, Size = 0x1C0)]
+[GWCAEquivalent("AgentLiving")]
 public readonly unsafe struct AgentLivingContext
 {
     [FieldOffset(0x00C4)]
@@ -211,6 +217,7 @@ public readonly unsafe struct AgentLivingContext
 }
 
 [StructLayout(LayoutKind.Explicit, Pack = 1, Size = 52)]
+[GWCAEquivalent("MapAgent")]
 public readonly struct MapAgentContext
 {
     [FieldOffset(0x0000)]
@@ -239,6 +246,7 @@ public readonly struct MapAgentContext
 }
 
 [StructLayout(LayoutKind.Explicit, Pack = 1, Size = 0x38)]
+[GWCAEquivalent("AgentInfo")]
 public readonly unsafe struct AgentInfo
 {
     [FieldOffset(0x0034)]

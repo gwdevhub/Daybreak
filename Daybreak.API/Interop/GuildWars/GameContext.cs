@@ -3,6 +3,7 @@
 namespace Daybreak.API.Interop.GuildWars;
 
 [StructLayout(LayoutKind.Explicit, Pack = 1)]
+[GWCAEquivalent("GameContext")]
 public readonly unsafe struct GameContext
 {
     [FieldOffset(0x0008)]

@@ -254,7 +254,7 @@ public sealed class UIContextService
         return true;
     }
 
-    public unsafe bool KeyDown(UIAction action, WrappedPointer<Frame> frame)
+    public unsafe bool KeyDown(ControlAction action, WrappedPointer<Frame> frame)
     {
         if (frame.IsNull)
         {
@@ -268,7 +268,7 @@ public sealed class UIContextService
         return true;
     }
 
-    public unsafe bool KeyUp(UIAction action, WrappedPointer<Frame> frame)
+    public unsafe bool KeyUp(ControlAction action, WrappedPointer<Frame> frame)
     {
         if (frame.IsNull)
         {

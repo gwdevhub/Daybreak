@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 namespace Daybreak.API.Interop.GuildWars;
 
 [StructLayout(LayoutKind.Explicit, Pack = 1, Size = 0x0034)]
+[GWCAEquivalent("Quest")]
 public readonly struct QuestContext
 {
     [FieldOffset(0x0000)]

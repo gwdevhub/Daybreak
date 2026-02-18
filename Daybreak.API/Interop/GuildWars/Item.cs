@@ -43,6 +43,7 @@ public enum ItemType : byte
 };
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
+[GWCAEquivalent("ItemModifier")]
 public readonly struct ItemModifier(uint mod)
 {
     public static readonly ItemModifier Zero = new();
@@ -56,6 +57,7 @@ public readonly struct ItemModifier(uint mod)
 }
 
 [StructLayout(LayoutKind.Explicit, Pack = 1)]
+[GWCAEquivalent("Item")]
 public readonly unsafe struct Item
 {
     [FieldOffset(0x0000)]

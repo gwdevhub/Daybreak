@@ -1,5 +1,6 @@
 ﻿namespace Daybreak.API.Interop.GuildWars;
 
+[GWCAEquivalent("District")]
 public enum District
 {
     Current,

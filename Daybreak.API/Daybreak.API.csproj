@@ -8,6 +8,7 @@
     <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win-x86</RuntimeIdentifier>
     <StripSymbols>true</StripSymbols>
     <InteropExports>true</InteropExports>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <EnableRequestDelegateGenerator>true</EnableRequestDelegateGenerator>
     
     <PublishAot>true</PublishAot>
@@ -49,9 +50,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Using Include="Daybreak.Generators" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Configuration\appsettings.Debug.json" />
     <EmbeddedResource Include="Configuration\appsettings.json" />
     <EmbeddedResource Include="Configuration\appsettings.Release.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\Dependencies\GWCA\gwca.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>gwca.dll</Link>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -79,5 +91,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Daybreak.Shared\Daybreak.Shared.csproj" />
+    <ProjectReference Include="..\Daybreak.Generators\Daybreak.Generators.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
   </ItemGroup>
 </Project>
