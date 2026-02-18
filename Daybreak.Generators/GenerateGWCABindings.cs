@@ -79,8 +79,8 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
             .Select(static (f, _) =>
             {
 #pragma warning disable RS1035 // AdditionalText has no binary read API; file IO is required for PE parsing
-                try { return PeExportReader.ReadExportNames(File.ReadAllBytes(f.Path)); }
-                catch { return []; }
+                try { return (f.Path, Exports: PeExportReader.ReadExportNames(File.ReadAllBytes(f.Path))); }
+                catch { return (f.Path, Exports: ImmutableArray<string>.Empty); }
 #pragma warning restore RS1035
             });
 
@@ -107,7 +107,7 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         // Combine each matching DLL with all type mappings and generate
         var combined = exportsProvider.Combine(typeMappingsProvider);
         context.RegisterSourceOutput(combined, static (ctx, source) =>
-            EmitSource(ctx, source.Left, source.Right));
+            EmitSource(ctx, source.Left.Path, source.Left.Exports, source.Right));
     }
 
     // ════════════════════════════════════════════════════════════════
@@ -116,6 +116,7 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
 
     private static void EmitSource(
         SourceProductionContext context,
+        string dllPath,
         ImmutableArray<string> exports,
         ImmutableArray<TypeMapping> mappings)
     {
@@ -130,6 +131,14 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
                 ? m.CsName
                 : "global::" + m.CsNamespace + "." + m.CsName;
             typeMap[m.GwcaName] = fqn;
+        }
+
+        // Build set of C export names (non-mangled exports)
+        var cExports = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var name in exports)
+        {
+            if (name.Length > 0 && name[0] != '?')
+                cExports.Add(name);
         }
 
         // Build namespace tree from mangled exports
@@ -174,12 +183,18 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         // Emit the tree recursively (starting from GWCA's children)
         foreach (var child in root.Children.Values.OrderBy(c => c.Name, StringComparer.Ordinal))
         {
-            EmitNamespaceNode(sb, child, typeMap, 4);
+            EmitNamespaceNode(sb, child, typeMap, cExports, 4);
         }
 
         sb.AppendLine("}");
 
-        context.AddSource("GWCA.g.cs", sb.ToString());
+        // Write to Daybreak.API/Interop/GWCA.cs so LibraryImport generator can process it
+        // DLL is at Dependencies/GWCA/gwca.dll, so go up 2 levels to repo root
+        var repoRoot = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(dllPath)));
+        var outputPath = Path.Combine(repoRoot!, "Daybreak.API", "Interop", "GWCA.cs");
+#pragma warning disable RS1035 // File IO required to emit source that LibraryImport generator can process
+        File.WriteAllText(outputPath, sb.ToString());
+#pragma warning restore RS1035
     }
 
     // ── File header ────────────────────────────────────────────────
@@ -195,15 +210,16 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         sb.AppendLine();
         sb.AppendLine("using System.Runtime.CompilerServices;");
         sb.AppendLine("using System.Runtime.InteropServices;");
+        sb.AppendLine("using System.Runtime.InteropServices.Marshalling;");
         sb.AppendLine();
-        sb.AppendLine("namespace Daybreak.Generators;");
+        sb.AppendLine("namespace Daybreak.API.Interop;");
         sb.AppendLine();
         sb.AppendLine("/// <summary>");
         sb.AppendLine($"/// P/Invoke bindings for {exportCount} C++ exports from gwca.dll ({skippedCount} skipped).");
         sb.AppendLine("/// Nested classes mirror the C++ namespace hierarchy (e.g. GW::Agents → GWCA.GW.Agents).");
         sb.AppendLine("/// Types annotated with [GWCAEquivalent] are used in signatures where available.");
         sb.AppendLine("/// </summary>");
-        sb.AppendLine("internal static unsafe class GWCA");
+        sb.AppendLine("internal static unsafe partial class GWCA");
         sb.AppendLine("{");
         sb.AppendLine("    private const string DllName = \"gwca.dll\";");
     }
@@ -214,12 +230,13 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         StringBuilder sb,
         NamespaceNode node,
         Dictionary<string, string> typeMap,
+        HashSet<string> cExports,
         int indent)
     {
         var pad = new string(' ', indent);
 
         sb.AppendLine();
-        sb.AppendLine($"{pad}internal static class {SanitizeIdentifier(node.Name)}");
+        sb.AppendLine($"{pad}internal static partial class {SanitizeIdentifier(node.Name)}");
         sb.AppendLine($"{pad}{{");
 
         // Emit functions in this namespace, disambiguating overloads that
@@ -227,13 +244,13 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         var signatureCounts = new Dictionary<string, int>(StringComparer.Ordinal);
         foreach (var entry in node.Functions.OrderBy(e => e.Info.FunctionName, StringComparer.Ordinal))
         {
-            EmitFunction(sb, entry, typeMap, indent + 4, signatureCounts);
+            EmitFunction(sb, entry, typeMap, cExports, indent + 4, signatureCounts);
         }
 
         // Emit child namespaces
         foreach (var child in node.Children.Values.OrderBy(c => c.Name, StringComparer.Ordinal))
         {
-            EmitNamespaceNode(sb, child, typeMap, indent + 4);
+            EmitNamespaceNode(sb, child, typeMap, cExports, indent + 4);
         }
 
         sb.AppendLine($"{pad}}}");
@@ -245,6 +262,7 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         StringBuilder sb,
         ExportEntry entry,
         Dictionary<string, string> typeMap,
+        HashSet<string> cExports,
         int indent,
         Dictionary<string, int> signatureCounts)
     {
@@ -266,6 +284,16 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         bool hasUnmapped = HasUnmappedStruct(info.ReturnType, typeMap)
             || info.ParameterTypes.Any(pt => HasUnmappedStruct(pt, typeMap));
 
+        // Check if this function has std::function params and a matching C export exists
+        bool hasStdFunction = HasStdFunction(info.ReturnType) || info.ParameterTypes.Any(HasStdFunction);
+        bool useCExport = hasStdFunction && cExports.Contains(info.FunctionName);
+        if (useCExport)
+        {
+            // Re-evaluate hasUnmapped ignoring std::function (which becomes nint in C export)
+            hasUnmapped = HasUnmappedStructIgnoringStdFunction(info.ReturnType, typeMap)
+                || info.ParameterTypes.Any(pt => HasUnmappedStructIgnoringStdFunction(pt, typeMap));
+        }
+
         // Build parameter list
         var parms = new List<string>();
         var paramComments = new List<string>();
@@ -280,13 +308,18 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         var usedNames = new HashSet<string>();
         foreach (var pt in info.ParameterTypes)
         {
-            var csType = ResolveCsType(pt, typeMap);
+            // When using C export, std::function becomes a raw function pointer (nint)
+            var csType = (useCExport && IsStdFunction(pt))
+                ? "nint"
+                : ResolveCsType(pt, typeMap);
             var name = MakeParamName(pt, typeMap, pIdx,
                 info.ParameterTypes.Length + (info.IsMember ? 1 : 0));
             while (!usedNames.Add(name))
                 name += "_" + pIdx;
 
-            var comment = TypeComment(pt, typeMap);
+            var comment = (useCExport && IsStdFunction(pt))
+                ? null  // Don't add "unmapped" comment for std::function when using C export
+                : TypeComment(pt, typeMap);
             if (comment is not null)
                 paramComments.Add(name + ": " + comment);
 
@@ -298,16 +331,12 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         }
 
         var paramStr = string.Join(", ", parms);
-        var retAttr = csRet == "bool" ? "[return: MarshalAs(UnmanagedType.U1)] " : "";
-
-        // Calling convention: ThisCall for member functions, Cdecl for free/static
-        var convention = info.IsMember
-            ? ", CallingConvention = CallingConvention.ThisCall"
-            : "";
 
         // Comment lines
         sb.AppendLine();
         var commentParts = new List<string> { info.QualifiedCppName };
+        if (useCExport)
+            commentParts.Add("via C export");
         if (retComment is not null)
             commentParts.Add("returns " + retComment);
         commentParts.AddRange(paramComments);
@@ -321,10 +350,25 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
             ? SanitizeIdentifier(info.FunctionName)
             : SanitizeIdentifier(info.FunctionName) + "_" + count;
 
+        // Use C export name when available for std::function params
+        var entryPoint = useCExport ? info.FunctionName : entry.MangledName;
+
+        // Build LibraryImport attribute and calling convention
+        var conventionAttr = info.IsMember
+            ? $"[UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]"
+            : "";
+
+        // Bool return type needs explicit marshalling
+        var retAttr = csRet == "bool" ? "[return: MarshalAs(UnmanagedType.U1)]" : "";
+
         var prefix = hasUnmapped ? "// " : "";
         sb.AppendLine($"{pad}// {string.Join(" | ", commentParts)}");
-        sb.AppendLine($"{pad}{prefix}[DllImport(DllName, EntryPoint = \"{entry.MangledName}\"{convention})]");
-        sb.AppendLine($"{pad}{prefix}{retAttr}internal static extern {csRet} {methodName}({paramStr});");
+        sb.AppendLine($"{pad}{prefix}[LibraryImport(DllName, EntryPoint = \"{entryPoint}\")]");
+        if (conventionAttr.Length > 0)
+            sb.AppendLine($"{pad}{prefix}{conventionAttr}");
+        if (retAttr.Length > 0)
+            sb.AppendLine($"{pad}{prefix}{retAttr}");
+        sb.AppendLine($"{pad}{prefix}internal static partial {csRet} {methodName}({paramStr});");
     }
 
     // ════════════════════════════════════════════════════════════════
@@ -364,6 +408,62 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
     private static bool HasUnmappedStruct(DemangledType dt, Dictionary<string, string> typeMap)
     {
         if (dt.TemplateArg is not null && HasUnmappedStruct(dt.TemplateArg, typeMap))
+            return true;
+
+        if (dt.Kind is TypeKind.Struct)
+        {
+            if (dt.Name is "Array") return false;
+            return !typeMap.ContainsKey(dt.Name);
+        }
+
+        if (dt.Kind is TypeKind.Pointer)
+        {
+            if (dt.Name is "void" or "byte" or "ushort" or "short" or "int" or "uint"
+                or "long" or "ulong" or "float" or "double" or "bool" or "funcptr")
+                return false;
+            if (dt.Name is "Array") return false;
+            return !typeMap.ContainsKey(dt.Name);
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Returns true if the type is a std::function (struct named "function").
+    /// </summary>
+    private static bool IsStdFunction(DemangledType dt)
+    {
+        // std::function is demangled as a Struct with name "function"
+        if (dt.Kind is TypeKind.Struct && dt.Name == "function")
+            return true;
+        // Also check pointer to std::function (const ref)
+        if (dt.Kind is TypeKind.Pointer && dt.Name == "function")
+            return true;
+        return false;
+    }
+
+    /// <summary>
+    /// Returns true if any parameter or return type involves std::function.
+    /// </summary>
+    private static bool HasStdFunction(DemangledType dt)
+    {
+        if (IsStdFunction(dt))
+            return true;
+        if (dt.TemplateArg is not null && HasStdFunction(dt.TemplateArg))
+            return true;
+        return false;
+    }
+
+    /// <summary>
+    /// Like HasUnmappedStruct but ignores std::function types (which will be converted to nint via C export).
+    /// </summary>
+    private static bool HasUnmappedStructIgnoringStdFunction(DemangledType dt, Dictionary<string, string> typeMap)
+    {
+        // Skip std::function types entirely
+        if (IsStdFunction(dt))
+            return false;
+
+        if (dt.TemplateArg is not null && HasUnmappedStructIgnoringStdFunction(dt.TemplateArg, typeMap))
             return true;
 
         if (dt.Kind is TypeKind.Struct)

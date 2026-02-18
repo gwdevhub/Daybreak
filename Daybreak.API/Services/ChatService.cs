@@ -23,7 +23,7 @@ public sealed class ChatService(
     public async ValueTask AddMessageAsync(string message, string? sender, Channel channel, CancellationToken cancellationToken)
     {
         using var ctx = await this.semaphoreSlim.Acquire(cancellationToken);
-        await this.gameThreadService.QueueOnGameThread(() =>
+        await this.gameThreadService.QueueOnGameThread2(() =>
         {
             if (this.instanceContextService.GetInstanceType() is InstanceType.Loading)
             {
