@@ -7,6 +7,7 @@ using Daybreak.API.Configuration;
 using Daybreak.API.Extensions;
 using Daybreak.API.Health;
 using Daybreak.API.Hosting;
+using Daybreak.API.Interop;
 using Daybreak.API.Logging;
 using Daybreak.API.Serialization;
 using Daybreak.API.Services;
@@ -133,12 +134,15 @@ public class EntryPoint
     {
         try
         {
-            GWCA.GW.Initialize();
+            Console.WriteLine("[Daybreak.API] Calling GWCA.GW.Initialize()...");
+            var result = GWCA.GW.Initialize();
+            Console.WriteLine($"[Daybreak.API] GWCA.GW.Initialize() returned: {result}");
             await app.RunAsync();
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine(ex);
+            Console.Error.WriteLine($"[Daybreak.API] FATAL ERROR in StartServer: {ex}");
+            throw; // Re-throw so the task faults
         }
     }
 

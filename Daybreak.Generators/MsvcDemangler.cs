@@ -250,14 +250,8 @@ internal sealed class MsvcDemangler
                 else
                     parts.Add(templateName);
 
-                // Check if next char starts @@
-                if (pos < s.Length && s[pos] == '@' && pos + 1 < s.Length && s[pos + 1] == '@')
-                {
-                    pos += 2;
-                    return parts;
-                }
-
-                continue;
+                // The @@ we just consumed terminates this qualified name
+                return parts;
             }
 
             int end = s.Slice(pos).IndexOf('@');
