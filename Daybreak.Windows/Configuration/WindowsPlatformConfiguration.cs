@@ -1,12 +1,12 @@
 using Daybreak.Configuration;
 using Daybreak.Extensions;
-using Daybreak.Services.MDns;
+using Daybreak.Windows.Services.Api;
 using Daybreak.Shared.Models.Plugins;
 using Daybreak.Shared.Services.Credentials;
 using Daybreak.Shared.Services.Initialization;
 using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.Keyboard;
-using Daybreak.Shared.Services.MDns;
+using Daybreak.Shared.Services.Api;
 using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Services.Screens;
 using Daybreak.Shared.Services.Shortcuts;
@@ -77,7 +77,7 @@ public sealed class WindowsPlatformConfiguration : PluginConfigurationBase
         services.AddScoped<IRegistryService, RegistryService>();
         services.AddSingleton<ISystemThemeDetector, SystemThemeDetector>();
         services.AddSingleton<ISevenZipExtractor, SevenZipArchiveExtractor>();
-        services.AddHostedSingleton<IMDomainRegistrar, MDomainRegistrar>();
+        services.AddSingleton<IPidProvider, PidProvider>();
         services.AddSingleton<IWindowManipulationService, WindowManipulationService>();
         services.AddSingleton<ICrashDumpService, CrashDumpService>();
         services.AddSingleton<IDaybreakRestartingService, DaybreakRestartingService>();

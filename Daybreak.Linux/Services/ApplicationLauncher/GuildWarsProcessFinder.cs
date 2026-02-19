@@ -121,19 +121,6 @@ public sealed class GuildWarsProcessFinder(
                     continue;
                 }
 
-                // Verify this process belongs to our Wine prefix
-                var environPath = Path.Combine(procDir, "environ");
-                if (!File.Exists(environPath))
-                {
-                    continue;
-                }
-
-                var environ = File.ReadAllText(environPath);
-                if (!environ.Contains(prefixPath, StringComparison.Ordinal))
-                {
-                    continue;
-                }
-
                 // Extract the executable path from cmdline
                 // cmdline is null-separated; find the segment containing Gw.exe
                 var segments = cmdline.Split('\0', StringSplitOptions.RemoveEmptyEntries);

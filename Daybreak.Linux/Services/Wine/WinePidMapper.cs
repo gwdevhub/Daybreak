@@ -19,8 +19,6 @@ public sealed class WinePidMapper(
     /// <inheritdoc />
     public int? WinePidToLinuxPid(int winePid, string executableName)
     {
-        var prefixPath = this.winePrefixManager.GetWinePrefixPath();
-
         try
         {
             foreach (var procDir in Directory.EnumerateDirectories("/proc"))
@@ -41,19 +39,6 @@ public sealed class WinePidMapper(
 
                     var cmdline = File.ReadAllText(cmdlinePath);
                     if (!cmdline.Contains(executableName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        continue;
-                    }
-
-                    // Verify this process belongs to our Wine prefix
-                    var environPath = Path.Combine(procDir, "environ");
-                    if (!File.Exists(environPath))
-                    {
-                        continue;
-                    }
-
-                    var environ = File.ReadAllText(environPath);
-                    if (!environ.Contains(prefixPath, StringComparison.Ordinal))
                     {
                         continue;
                     }
