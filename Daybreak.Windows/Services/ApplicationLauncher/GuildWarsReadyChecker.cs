@@ -36,6 +36,7 @@ internal sealed class GuildWarsReadyChecker(
                 continue;
             }
 
+            scopedLogger.LogInformation("Guild Wars process is ready and running");
             return true;
         }
 
