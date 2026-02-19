@@ -439,6 +439,7 @@ internal sealed class ApplicationLauncher(
             return (default, []);
         }
 
+        scopedLogger.LogDebug("Waiting for Guild Wars to be ready...");
         var sw = Stopwatch.StartNew();
         var isReady = await this.guildWarsReadyChecker.WaitForReady(
             process,
