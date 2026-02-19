@@ -1,47 +1,42 @@
 using System.Net.Http.Json;
 using System.Text.Json;
-using Daybreak.Linux.Services.Wine;
 using Daybreak.Shared.Models.Api;
-using Daybreak.Shared.Services.MDns;
+using Daybreak.Shared.Services.Api;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Extensions.Core;
 
-namespace Daybreak.Linux.Services.MDns;
+namespace Daybreak.Services.Api;
 
 /// <summary>
-/// Linux-specific implementation of <see cref="IMDomainRegistrar"/>.
-/// Since mDNS announcements from Wine don't propagate to the host,
-/// this implementation scans a known port range (5080–5100) for running
-/// Daybreak API instances and matches them to Guild Wars processes
-/// by querying the API's health endpoint for its Wine PID, then
-/// converting it to a Linux PID via <see cref="IWinePidMapper"/>.
+/// Scans a known port range (5080–5100) for running Daybreak API instances
+/// and matches them to Guild Wars processes by querying the API's health endpoint.
 /// All probes fire in parallel with a 500ms total timeout.
 /// </summary>
-public sealed class PortScanningDomainRegistrar(
-    IWinePidMapper winePidMapper,
-    ILogger<PortScanningDomainRegistrar> logger)
-    : IMDomainRegistrar, IHostedService, IDisposable
+public sealed class ApiScanningService(
+    IPidProvider pidProvider,
+    ILogger<ApiScanningService> logger)
+    : IApiScanningService, IHostedService, IDisposable
 {
     private const int StartPort = 5080;
     private const int EndPort = 5100;
     private const string HealthPath = "/api/v1/rest/health";
-    private const string DaybreakApiServicePrefix = "daybreak-api-";
-    private static readonly TimeSpan ProbeTimeout = TimeSpan.FromMilliseconds(500);
-    private static readonly TimeSpan ScanInterval = TimeSpan.FromSeconds(15);
+    private const string GuildWarsExecutable = "Gw.exe";
+    private static readonly TimeSpan ProbeTimeout = TimeSpan.FromMilliseconds(2000);
+    private static readonly TimeSpan ScanInterval = TimeSpan.FromSeconds(10);
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
-    private readonly IWinePidMapper winePidMapper = winePidMapper;
-    private readonly ILogger<PortScanningDomainRegistrar> logger = logger;
+    private readonly IPidProvider pidProvider = pidProvider;
+    private readonly ILogger<ApiScanningService> logger = logger;
     private readonly HttpClient httpClient = new() { Timeout = ProbeTimeout };
 
     // Rebuilt on each scan — survives Daybreak restarts since it's based on live port probing.
-    private volatile Dictionary<string, List<Uri>> discoveredServices = [];
+    private volatile Dictionary<int, Uri> discoveredApis = [];
     private CancellationTokenSource? backgroundCts;
 
     Task IHostedService.StartAsync(CancellationToken cancellationToken)
     {
-        this.backgroundCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        this.backgroundCts = new CancellationTokenSource();
         _ = Task.Factory.StartNew(
             () => this.ScanPeriodically(this.backgroundCts.Token),
             this.backgroundCts.Token,
@@ -62,31 +57,31 @@ public sealed class PortScanningDomainRegistrar(
         this.httpClient.Dispose();
     }
 
-    public IReadOnlyList<Uri>? Resolve(string service)
+    public Uri? GetApiUriByProcessId(int processId)
     {
-        if (this.discoveredServices.TryGetValue(service, out var uris) && uris.Count > 0)
+        if (this.discoveredApis.TryGetValue(processId, out var uri))
         {
-            return uris;
+            return uri;
         }
 
         return default;
     }
 
-    public IReadOnlyList<Uri>? QueryByServiceName(Func<string, bool> query)
+    public IReadOnlyList<(int ProcessId, Uri Uri)>? QueryByProcessId(Func<int, bool> predicate)
     {
-        var results = new List<Uri>();
-        foreach (var (serviceName, uris) in this.discoveredServices)
+        var results = new List<(int ProcessId, Uri Uri)>();
+        foreach (var (processId, uri) in this.discoveredApis)
         {
-            if (query(serviceName))
+            if (predicate(processId))
             {
-                results.AddRange(uris);
+                results.Add((processId, uri));
             }
         }
 
         return results.Count > 0 ? results : default;
     }
 
-    public void QueryAllServices()
+    public void RequestScan()
     {
         _ = Task.Run(() => this.ScanPortsAsync(CancellationToken.None));
     }
@@ -103,7 +98,7 @@ public sealed class PortScanningDomainRegistrar(
     private async Task ScanPortsAsync(CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        var newServices = new Dictionary<string, List<Uri>>();
+        var newApis = new Dictionary<int, Uri>();
 
         using var timeoutCts = new CancellationTokenSource(ProbeTimeout);
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
@@ -129,36 +124,27 @@ public sealed class PortScanningDomainRegistrar(
                 continue;
             }
 
-            var (port, processId) = task.Result;
-            if (processId is null)
+            var (port, reportedPid) = task.Result;
+            if (reportedPid is null)
             {
                 continue;
             }
 
-            // The API reports its Wine PID. Convert to Linux PID.
-            var linuxPid = this.winePidMapper.WinePidToLinuxPid(processId.Value, "Gw.exe");
-            var effectivePid = linuxPid ?? processId.Value;
-
-            var serviceName = $"{DaybreakApiServicePrefix}{effectivePid}";
+            // Convert the reported PID (Wine PID on Linux) to system PID
+            var systemPid = this.pidProvider.ResolveSystemPid(reportedPid.Value, GuildWarsExecutable);
             var uri = new Uri($"http://localhost:{port}");
 
             scopedLogger.LogDebug(
-                "Found Daybreak API on port {Port} with Wine PID {WinePid} (Linux PID {LinuxPid})",
+                "Found Daybreak API on port {Port} with reported PID {ReportedPid} (system PID {SystemPid})",
                 port,
-                processId.Value,
-                effectivePid);
+                reportedPid.Value,
+                systemPid);
 
-            if (!newServices.TryGetValue(serviceName, out var uriList))
-            {
-                uriList = [];
-                newServices[serviceName] = uriList;
-            }
-
-            uriList.Add(uri);
+            newApis[systemPid] = uri;
         }
 
-        this.discoveredServices = newServices;
-        scopedLogger.LogDebug("Port scan complete. Found {Count} Daybreak API instance(s)", newServices.Count);
+        this.discoveredApis = newApis;
+        scopedLogger.LogDebug("Port scan complete. Found {Count} Daybreak API instance(s)", newApis.Count);
     }
 
     private async Task<(int Port, int? ProcessId)> ProbePortAsync(int port, CancellationToken cancellationToken)

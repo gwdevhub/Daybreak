@@ -40,7 +40,6 @@
 
   <ItemGroup>
     <PackageReference Include="Elastic.OpenTelemetry" />
-    <PackageReference Include="ksemenenko.ColorThief" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" />
     <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" />
     <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" />

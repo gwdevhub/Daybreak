@@ -1,9 +1,9 @@
 using Daybreak.Extensions;
+using Daybreak.Linux.Services.Api;
 using Daybreak.Linux.Services.ApplicationLauncher;
 using Daybreak.Linux.Services.Credentials;
 using Daybreak.Linux.Services.Injection;
 using Daybreak.Linux.Services.Keyboard;
-using Daybreak.Linux.Services.MDns;
 using Daybreak.Linux.Services.Privilege;
 using Daybreak.Linux.Services.Screens;
 using Daybreak.Linux.Services.Startup.Actions;
@@ -27,7 +27,7 @@ using Daybreak.Shared.Services.FileProviders;
 using Daybreak.Shared.Services.Initialization;
 using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.Keyboard;
-using Daybreak.Shared.Services.MDns;
+using Daybreak.Shared.Services.Api;
 using Daybreak.Shared.Services.Privilege;
 using Daybreak.Shared.Services.Screens;
 using Daybreak.Shared.Services.Themes;
@@ -60,7 +60,7 @@ public sealed class LinuxPlatformConfiguration : PluginConfigurationBase
         services.AddScoped<IRegistryService, RegistryService>();
         services.AddSingleton<ISystemThemeDetector, SystemThemeDetector>();
         services.AddSingleton<ISevenZipExtractor, SevenZipArchiveExtractor>();
-        services.AddHostedSingleton<IMDomainRegistrar, PortScanningDomainRegistrar>();
+        services.AddSingleton<IPidProvider, PidProvider>();
         services.AddSingleton<IWindowManipulationService, WindowManipulationService>();
         services.AddSingleton<ICrashDumpService, CrashDumpService>();
         services.AddSingleton<IDaybreakRestartingService, DaybreakRestartingService>();

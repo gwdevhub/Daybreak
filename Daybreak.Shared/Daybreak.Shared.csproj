@@ -16,7 +16,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MeaMod.DNS" />
     <PackageReference Include="MemoryPack" />
     <PackageReference Include="MemoryPack.Generator">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

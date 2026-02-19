@@ -1,6 +1,5 @@
 ﻿using Daybreak.API.Services.Interop;
 using Daybreak.Shared.Services.BuildTemplates;
-using Daybreak.Shared.Services.MDns;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Daybreak.API.Services;
@@ -11,8 +10,6 @@ public static class WebApplicationBuilderExtensions
     {
         builder.Services.AddSingleton<HashingService>();
         builder.Services.AddSingleton<IBuildTemplateManager, BuildTemplateManager>();
-        builder.Services.AddSingleton<IMDomainNameService, MDomainNameService>();
-        builder.Services.AddHostedService<ApiAdvertisingService>();
         builder.Services.AddSingleton<MemoryScanningService>();
         builder.Services.AddSingleton<ChatService>();
         builder.Services.AddSingleton<MainPlayerService>();
