@@ -67,7 +67,6 @@ using Daybreak.Shared.Services.Initialization;
 using Daybreak.Shared.Services.Injection;
 using Daybreak.Shared.Services.InternetChecker;
 using Daybreak.Shared.Services.LaunchConfigurations;
-using Daybreak.Shared.Services.MDns;
 using Daybreak.Shared.Services.Menu;
 using Daybreak.Shared.Services.Metrics;
 using Daybreak.Shared.Services.Mods;
@@ -159,7 +158,6 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddSingleton<INotificationStorage, InMemoryNotificationStorage>();
         services.AddSingleton<IModsManager, ModsManager>();
         services.AddSingleton<IPluginsService, PluginsService>();
-        services.AddSingleton<IMDomainNameService, MDomainNameService>();
         services.AddSingleton<IAttachedApiAccessor, AttachedApiAccessor>();
         services.AddSingleton<PrivilegeContext>();
         services.AddSingleton<ViewRedirectContext>();
@@ -255,6 +253,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         services.AddHostedSingleton<ITradeAlertingService, TradeAlertingService>();
         services.AddHostedSingleton<IGuildWarsExecutableManager, GuildWarsExecutableManager>();
         services.AddHostedSingleton<IEventNotifierService, EventNotifierService>();
+        services.AddHostedSingleton<IApiScanningService, ApiScanningService>();
         services.AddHostedSingleton<GameScreenshotsTheme>();
         services.AddHostedService<StartupActionManager>();
         services.AddHostedService<ProcessorUsageMonitor>();

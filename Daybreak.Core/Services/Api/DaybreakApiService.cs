@@ -5,7 +5,6 @@ using Daybreak.Shared.Models.LaunchConfigurations;
 using Daybreak.Shared.Models.Mods;
 using Daybreak.Shared.Services.Api;
 using Daybreak.Shared.Services.Injection;
-using Daybreak.Shared.Services.MDns;
 using Daybreak.Shared.Services.Notifications;
 using Daybreak.Shared.Services.Options;
 using Daybreak.Shared.Utils;
@@ -20,7 +19,7 @@ namespace Daybreak.Services.Api;
 public sealed class DaybreakApiService(
     IOptionsProvider optionsProvider,
     IAttachedApiAccessor attachedApiAccessor,
-    IMDomainRegistrar mDomainRegistrar,
+    IApiScanningService apiScanningService,
     IStubInjector stubInjector,
     INotificationService notificationService,
     IHttpClient<ScopedApiContext> scopedApiClient,
@@ -32,13 +31,10 @@ public sealed class DaybreakApiService(
     private const string EntryPoint = "ThreadInit";
     private const string LocalHost = "localhost";
     private const string DaybreakApiName = "Api/Daybreak.API.dll";
-    private const string ProcessIdPlaceholder = "{PID}";
-    private const string DaybreakApiServiceName = $"daybreak-api-{ProcessIdPlaceholder}";
-    private const string ServiceSubType = "daybreak-api";
 
     private readonly IOptionsProvider optionsProvider = optionsProvider.ThrowIfNull();
     private readonly IAttachedApiAccessor attachedApiAccessor = attachedApiAccessor.ThrowIfNull();
-    private readonly IMDomainRegistrar mDomainRegistrar = mDomainRegistrar.ThrowIfNull();
+    private readonly IApiScanningService apiScanningService = apiScanningService.ThrowIfNull();
     private readonly IStubInjector stubInjector = stubInjector.ThrowIfNull();
     private readonly INotificationService notificationService = notificationService.ThrowIfNull();
     private readonly IHttpClient<ScopedApiContext> scopedApiClient = scopedApiClient.ThrowIfNull();
@@ -124,12 +120,10 @@ public sealed class DaybreakApiService(
             return default;
         }
 
-        var serviceName = DaybreakApiServiceName.Replace(ProcessIdPlaceholder, guildWarsProcess.Id.ToString());
-        var serviceUris = this.mDomainRegistrar.Resolve(serviceName);
-        var serviceUri = serviceUris?.Count > 0 ? serviceUris[0] : default;
+        var serviceUri = this.apiScanningService.GetApiUriByProcessId(guildWarsProcess.Id);
         if (serviceUri is null)
         {
-            scopedLogger.LogWarning("Failed to find Daybreak API service by name {serviceName}", serviceName);
+            scopedLogger.LogWarning("Failed to find Daybreak API service for process {ProcessId}", guildWarsProcess.Id);
             return default;
         }
 
@@ -150,8 +144,8 @@ public sealed class DaybreakApiService(
     public async Task<ScopedApiContext?> FindDaybreakApiContextByCredentials(LoginCredentials loginCredentials, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        var serviceUris = this.mDomainRegistrar.QueryByServiceName(n => n.StartsWith(ServiceSubType));
-        foreach(var uri in serviceUris ?? [])
+        var discoveredApis = this.apiScanningService.QueryByProcessId(_ => true);
+        foreach (var (_, uri) in discoveredApis ?? [])
         {
             var uriBuilder = new UriBuilder(uri)
             {
@@ -173,7 +167,7 @@ public sealed class DaybreakApiService(
 
     public void RequestInstancesAnnouncement()
     {
-        this.mDomainRegistrar.QueryAllServices();
+        this.apiScanningService.RequestScan();
     }
 
     public Task OnGuildWarsCreated(GuildWarsCreatedContext guildWarsCreatedContext, CancellationToken cancellationToken) =>
