@@ -541,12 +541,6 @@ public sealed class LaunchViewModel(
         CancellationToken cancellationToken
     )
     {
-        // Only attach if Daybreak API was enabled for this launch
-        if (!context.EnabledMods.OfType<IDaybreakApiService>().Any())
-        {
-            return;
-        }
-
         using var notificationToken = this.notificationService.NotifyInformation(
             title: "Attaching to Guild Wars process...",
             description: "Attempting to attach to Guild Wars process"
