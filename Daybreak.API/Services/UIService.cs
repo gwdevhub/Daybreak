@@ -3,8 +3,6 @@ using Daybreak.API.Interop.GuildWars;
 using Daybreak.API.Models;
 using Daybreak.API.Services.Interop;
 using System.Extensions.Core;
-using System.Runtime.InteropServices;
-using static Daybreak.API.Services.Interop.UIContextService;
 
 namespace Daybreak.API.Services;
 
@@ -93,87 +91,61 @@ public sealed class UIService(
     public async Task<string?> DecodeString(string encoded, Language language, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        var taskCompletionSource = new TaskCompletionSource<string?>();
-        var byteCount = (encoded.Length + 1) * sizeof(char);
-        var encodedPtr = Marshal.AllocHGlobal(byteCount);
-        unsafe
+        var prevLanguage = await this.gameThreadService.QueueOnGameThread<Language?>(() =>
         {
-            var encodedPtrC = (char*)encodedPtr;
-            fixed (char* src = encoded)
+            unsafe
             {
-                Buffer.MemoryCopy(src, encodedPtrC, byteCount, encoded.Length * sizeof(char));
+                var gameContext = this.gameContextService.GetGameContext();
+                if (gameContext.IsNull)
+                {
+                    scopedLogger.LogError("Game context is null");
+                    return null;
+                }
+
+                var textParser = gameContext.Pointer->TextParserContext;
+                if (textParser is null)
+                {
+                    scopedLogger.LogError("Text parser context is null");
+                    return null;
+                }
+
+                var prevLanguage = textParser->Language;
+                if (language is not Language.Unknown)
+                {
+                    textParser->Language = language;
+                }
+
+                return prevLanguage;
             }
+        }, cancellationToken);
 
-            encodedPtrC[encoded.Length] = '\0';
-        }
-
-        GCHandle callbackHandle = default;
-        DecodeStrCallback callback;
-        unsafe
+        var decoded = await this.uIContextService.AsyncDecodeStringAsync(encoded, cancellationToken);
+        await this.gameThreadService.QueueOnGameThread(() =>
         {
-            callback = (_, decodePtr) =>
+            unsafe
             {
-                try
+                var gameContext = this.gameContextService.GetGameContext();
+                if (gameContext.IsNull)
                 {
-                    if (decodePtr is null)
-                    {
-                        taskCompletionSource.TrySetResult(null);
-                        return;
-                    }
-
-                    var decoded = new string(decodePtr);
-                    taskCompletionSource.TrySetResult(decoded);
+                    scopedLogger.LogError("Game context is null");
+                    return;
                 }
-                catch (Exception ex)
+
+                var textParser = gameContext.Pointer->TextParserContext;
+                if (textParser is null)
                 {
-                    taskCompletionSource.TrySetException(ex);
+                    scopedLogger.LogError("Text parser context is null");
+                    return;
                 }
-            };
 
-            callbackHandle = GCHandle.Alloc(callback);
-        }
-
-        try
-        {
-            await this.gameThreadService.QueueOnGameThread(() =>
-            {
-                unsafe
+                if (prevLanguage.HasValue)
                 {
-                    var gameContext = this.gameContextService.GetGameContext();
-                    if (gameContext.IsNull)
-                    {
-                        scopedLogger.LogError("Game context is null");
-                        return;
-                    }
-
-                    var textParser = gameContext.Pointer->TextParserContext;
-                    if (textParser is null)
-                    {
-                        scopedLogger.LogError("Text parser context is null");
-                        return;
-                    }
-
-                    var prevLanguage = textParser->Language;
-                    if (language is not Language.Unknown)
-                    {
-                        textParser->Language = language;
-                    }
-
-                    this.uIContextService.ValidateDecodeString((char*)encodedPtr, callback, nuint.Zero);
-                    textParser->Language = prevLanguage;
+                    textParser->Language = prevLanguage.Value;
                 }
-            }, cancellationToken);
-
-            return await taskCompletionSource.Task;
-        }
-        finally
-        {
-            Marshal.FreeHGlobal(encodedPtr);
-            if (callbackHandle.IsAllocated)
-            {
-                callbackHandle.Free();
             }
-        }
+        }, cancellationToken);
+
+        return decoded;
     }
 
     private static ControlAction GetUIActionFromFrameLabel(string frameLabel)

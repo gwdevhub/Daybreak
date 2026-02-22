@@ -2249,26 +2249,26 @@ internal static unsafe partial class GWCA
             [LibraryImport(DllName, EntryPoint = "?GetParentFrame@UI@GW@@YAPAUFrame@12@PAU312@@Z")]
             internal static partial global::Daybreak.API.Interop.GuildWars.Frame* GetParentFrame(global::Daybreak.API.Interop.GuildWars.Frame* frame);
 
-            // GW::UI::GetPreference | value: enum GW::UI::EnumPreference (as int)
+            // GW::UI::GetPreference
             [LibraryImport(DllName, EntryPoint = "?GetPreference@UI@GW@@YAIW4EnumPreference@12@@Z")]
-            internal static partial uint GetPreference(int value);
+            internal static partial uint GetPreference(global::Daybreak.API.Interop.GuildWars.EnumPreference enumPreference);
 
-            // GW::UI::GetPreference | value: enum GW::UI::NumberPreference (as int)
+            // GW::UI::GetPreference
             [LibraryImport(DllName, EntryPoint = "?GetPreference@UI@GW@@YAIW4NumberPreference@12@@Z")]
-            internal static partial uint GetPreference_1(int value);
+            internal static partial uint GetPreference(global::Daybreak.API.Interop.GuildWars.NumberPreference numberPreference);
 
-            // GW::UI::GetPreference | value: enum GW::UI::StringPreference (as int)
+            // GW::UI::GetPreference
             [LibraryImport(DllName, EntryPoint = "?GetPreference@UI@GW@@YAPA_WW4StringPreference@12@@Z")]
-            internal static partial ushort* GetPreference_2(int value);
+            internal static partial ushort* GetPreference(global::Daybreak.API.Interop.GuildWars.StringPreference stringPreference);
 
-            // GW::UI::GetPreference | value: enum GW::UI::FlagPreference (as int)
+            // GW::UI::GetPreference
             [LibraryImport(DllName, EntryPoint = "?GetPreference@UI@GW@@YA_NW4FlagPreference@12@@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool GetPreference_3(int value);
+            internal static partial bool GetPreference(global::Daybreak.API.Interop.GuildWars.FlagPreference flagPreference);
 
-            // GW::UI::GetPreferenceOptions | value1: enum GW::UI::EnumPreference (as int)
+            // GW::UI::GetPreferenceOptions
             [LibraryImport(DllName, EntryPoint = "?GetPreferenceOptions@UI@GW@@YAIW4EnumPreference@12@PAPAI@Z")]
-            internal static partial uint GetPreferenceOptions(int value1, void* ptr2);
+            internal static partial uint GetPreferenceOptions(global::Daybreak.API.Interop.GuildWars.EnumPreference enumPreference1, void* ptr2);
 
             // GW::UI::GetRootFrame
             [LibraryImport(DllName, EntryPoint = "?GetRootFrame@UI@GW@@YAPAUFrame@12@XZ")]
@@ -2405,25 +2405,25 @@ internal static unsafe partial class GWCA
             [LibraryImport(DllName, EntryPoint = "?SetOpenLinks@UI@GW@@YAX_N@Z")]
             internal static partial void SetOpenLinks([MarshalAs(UnmanagedType.U1)] bool flag);
 
-            // GW::UI::SetPreference | value1: enum GW::UI::EnumPreference (as int)
+            // GW::UI::SetPreference
             [LibraryImport(DllName, EntryPoint = "?SetPreference@UI@GW@@YA_NW4EnumPreference@12@I@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetPreference(int value1, uint value2);
+            internal static partial bool SetPreference(global::Daybreak.API.Interop.GuildWars.EnumPreference enumPreference1, uint value2);
 
-            // GW::UI::SetPreference | value1: enum GW::UI::FlagPreference (as int)
+            // GW::UI::SetPreference
             [LibraryImport(DllName, EntryPoint = "?SetPreference@UI@GW@@YA_NW4FlagPreference@12@_N@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetPreference(int value1, [MarshalAs(UnmanagedType.U1)] bool flag2);
+            internal static partial bool SetPreference(global::Daybreak.API.Interop.GuildWars.FlagPreference flagPreference1, [MarshalAs(UnmanagedType.U1)] bool flag2);
 
-            // GW::UI::SetPreference | value1: enum GW::UI::NumberPreference (as int)
+            // GW::UI::SetPreference
             [LibraryImport(DllName, EntryPoint = "?SetPreference@UI@GW@@YA_NW4NumberPreference@12@I@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetPreference_1(int value1, uint value2);
+            internal static partial bool SetPreference(global::Daybreak.API.Interop.GuildWars.NumberPreference numberPreference1, uint value2);
 
-            // GW::UI::SetPreference | value1: enum GW::UI::StringPreference (as int)
+            // GW::UI::SetPreference
             [LibraryImport(DllName, EntryPoint = "?SetPreference@UI@GW@@YA_NW4StringPreference@12@PA_W@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SetPreference(int value1, ushort* ptr2);
+            internal static partial bool SetPreference(global::Daybreak.API.Interop.GuildWars.StringPreference stringPreference1, ushort* ptr2);
 
             // GW::UI::SetWindowPosition | value1: enum GW::UI::WindowID (as int) | windowPosition2: TODO: map struct GW::UI::WindowPosition
             // [LibraryImport(DllName, EntryPoint = "?SetWindowPosition@UI@GW@@YA_NW4WindowID@12@PAUWindowPosition@12@@Z")]

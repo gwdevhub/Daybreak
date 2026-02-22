@@ -1,64 +1,53 @@
-﻿using Daybreak.API.Interop;
-using Daybreak.API.Models;
-using System.Core.Extensions;
-using System.Extensions.Core;
+﻿using System.Text;
 
 namespace Daybreak.API.Services.Interop;
 
-public sealed class PlatformContextService
-    : IAddressHealthService
+public sealed unsafe class PlatformContextService
 {
-    private const string WindowHandleAddressMask = "xxxxx????xxx";
-    private const int WindowHandleAddressOffset = -0xC;
-    private static readonly byte[] WindowHandleAddressPattern = [0x83, 0xC4, 0x04, 0x83, 0x3D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x75, 0x31];
+    private const string GuildWarsWindowClassName = "ArenaNet_Dx_Window_Class";
 
-    private readonly MemoryScanningService memoryScanningService;
-    private readonly GWAddressCache windowHandleAddress;
-    private readonly ILogger<PlatformContextService> logger;
+    private nint cachedHwnd = 0;
 
-    public PlatformContextService(
-        MemoryScanningService memoryScanningService,
-        ILogger<PlatformContextService> logger)
+    public nint GetWindowHandle()
     {
-        this.logger = logger.ThrowIfNull();
-        this.memoryScanningService = memoryScanningService.ThrowIfNull();
-        this.windowHandleAddress = new GWAddressCache(this.GetWindowHandleAddress);
+        if (this.cachedHwnd == 0)
+        {
+            NativeMethods.EnumWindows(this.EnumWindowsCallback, 0);
+        }
+
+        return this.cachedHwnd;
     }
 
-    public List<AddressState> GetAddressStates()
+    private bool EnumWindowsCallback(nint hwnd, nint lParam)
     {
-        return [
-            new AddressState
+        NativeMethods.GetWindowThreadProcessId(hwnd, out var processId);
+
+        if (processId == NativeMethods.GetCurrentProcessId())
+        {
+            var classNameBuffer = stackalloc byte[256];
+            NativeMethods.GetClassNameA(hwnd, classNameBuffer, 256);
+            var className = Encoding.UTF8.GetString(classNameBuffer, GetNullTerminatedLength(classNameBuffer, 256));
+
+            if (className == GuildWarsWindowClassName)
             {
-                Address = this.windowHandleAddress.GetAddress() ?? 0,
-                Name = nameof(this.windowHandleAddress),
-            },
-            ];
-    }
-
-    public unsafe uint? GetWindowHandle()
-    {
-        var windowHandlePtr = this.windowHandleAddress.GetAddress();
-        if (windowHandlePtr is null)
-        {
-            this.logger.LogError("Failed to get window handle");
-            return null;
+                this.cachedHwnd = hwnd;
+                return false;
+            }
         }
 
-        return *(uint*)windowHandlePtr;
+        return true;
     }
 
-    private nuint GetWindowHandleAddress()
+    private static int GetNullTerminatedLength(byte* buffer, int maxLength)
     {
-        var scopedLogger = this.logger.CreateScopedLogger();
-        var baseAddress = this.memoryScanningService.FindAndResolveAddress(WindowHandleAddressPattern, WindowHandleAddressMask, WindowHandleAddressOffset);
-        if (baseAddress is 0)
+        for (var i = 0; i < maxLength; i++)
         {
-            scopedLogger.LogError("Failed to find window handle address");
-            return 0U;
+            if (buffer[i] == 0)
+            {
+                return i;
+            }
         }
 
-        scopedLogger.LogInformation("Window handle address: 0x{address:X8}", baseAddress);
-        return baseAddress;
+        return maxLength;
     }
 }

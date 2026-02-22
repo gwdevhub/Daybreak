@@ -7,33 +7,14 @@ using System.Security;
 namespace Daybreak.API.Services.Interop;
 
 public sealed class GameThreadService
-    : IHostedService, IHookHealthService
 {
-
     // Delegate type matching GWCA's GW_GameThreadCallback: void(__cdecl*)()
     [SuppressUnmanagedCodeSecurity]
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate void GameThreadCallback();
 
-    private readonly ConcurrentDictionary<Guid, Action> registeredCallbacks = [];
     // Prevent GC of delegates passed to native code
     private readonly ConcurrentDictionary<GameThreadCallback, bool> prevent_GC_callbacks = [];
-
-    private CancellationTokenSource? cts = default;
-
-    public Task StartAsync(CancellationToken cancellationToken)
-    {
-        this.cts?.Dispose();
-        this.cts = new CancellationTokenSource();
-        return Task.CompletedTask;
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        this.cts?.Cancel();
-        this.cts?.Dispose();
-        return Task.CompletedTask;
-    }
 
     public Task QueueOnGameThread(Action action, CancellationToken cancellationToken)
     {
@@ -113,20 +94,5 @@ public sealed class GameThreadService
         GWCA.GW.GameThread.Enqueue(funcPtr, false);
 
         return taskCompletionSource.Task;
-    }
-
-    public CallbackRegistration RegisterCallback(Action action)
-    {
-        var uid = new Guid();
-        var registration = new CallbackRegistration(uid, () => this.registeredCallbacks.TryRemove(uid, out _));
-        this.registeredCallbacks[uid] = action;
-        return registration;
-    }
-
-    public List<HookState> GetHookStates()
-    {
-        return
-            [
-            ];
     }
 }

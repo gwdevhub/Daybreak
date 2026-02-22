@@ -213,15 +213,15 @@ public sealed class CharacterSelectService(
 
                 // TODO: This needs to be reworked to use UI messages to click on Play
                 var hwnd = this.platformContextService.GetWindowHandle();
-                if (!hwnd.HasValue)
+                if (hwnd == 0)
                 {
                     scopedLogger.LogError("Failed to get game window handle");
                     return false;
                 }
 
-                NativeMethods.SendMessageW((nint)hwnd.Value, NativeMethods.WM_KEYDOWN, 0x50, 0x00190001);
-                NativeMethods.SendMessageW((nint)hwnd.Value, NativeMethods.WM_CHAR, 0x70, 0x00190001);
-                NativeMethods.SendMessageW((nint)hwnd.Value, NativeMethods.WM_KEYUP, 0x50, 0x00190001);
+                NativeMethods.SendMessageW(hwnd, NativeMethods.WM_KEYDOWN, 0x50, 0x00190001);
+                NativeMethods.SendMessageW(hwnd, NativeMethods.WM_CHAR, 0x70, 0x00190001);
+                NativeMethods.SendMessageW(hwnd, NativeMethods.WM_KEYUP, 0x50, 0x00190001);
                 return true;
             }
         }, cancellationToken);
