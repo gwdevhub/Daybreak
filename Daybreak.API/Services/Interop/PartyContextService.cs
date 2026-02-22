@@ -14,7 +14,7 @@ public sealed class PartyContextService
         return GWCA.GW.PartyMgr.KickHero((int)heroId);
     }
 
-    public bool KickAllHeroes() => this.KickHero(0x26);
+    public bool KickAllHeroes() => GWCA.GW.PartyMgr.KickAllHeroes();
 
     public bool LeaveParty()
     {
