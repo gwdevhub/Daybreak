@@ -62,7 +62,6 @@ public sealed class UIContextService
     private readonly HashingService hashingService;
     private readonly GWDelegateCache<GetChildFrameIdFunc> getChildFrameId;
     private readonly GWAddressCache frameArrayAddressCache;
-    private readonly GWHook<SendUIMessageFunc> sendUiMessageHook;
     private readonly GWDelegateCache<GetRootFrameFunc> getRootFrame;
     private readonly GWDelegateCache<ValidateAsyncDecodeStr> validateAsyncDecodeStr;
     // This fastcall equivalent is <GuildWarsArray<FrameInteractionCallback>*, void*, UIMessage, void*, void*>
@@ -80,10 +79,6 @@ public sealed class UIContextService
         this.memoryScanningService = memoryScanningService.ThrowIfNull();
         this.hashingService = hashingService.ThrowIfNull();
         this.frameArrayAddressCache = new GWAddressCache(() => this.memoryScanningService.FindAssertion(FrameArrayFile, FrameArrayAssertion, 0, -0x14));
-        this.sendUiMessageHook = new GWHook<SendUIMessageFunc>(
-            new GWAddressCache(() => this.memoryScanningService.ToFunctionStart(
-                this.memoryScanningService.FindAddress(SendUIMessageSeq, SendUIMessageMask))),
-            this.OnSendUIMessage);
         this.sendFrameUIMessage = new(
             new GWAddressCache(() => this.memoryScanningService.FunctionFromNearCall(
                 this.memoryScanningService.FindAddress(SendFrameUiMessageSeq, SendFrameUiMessageMask, SendFrameUiMessageOffset))));
@@ -138,14 +133,6 @@ public sealed class UIContextService
     {
         return
             [
-                new HookState
-                {
-                    Hooked = this.sendUiMessageHook.Hooked,
-                    Name = nameof(this.sendUiMessageHook),
-                    TargetAddress = this.sendUiMessageHook.TargetAddress,
-                    ContinueAddress = this.sendUiMessageHook.ContinueAddress,
-                    DetourAddress = this.sendUiMessageHook.DetourAddress
-                }
             ];
     }
 
@@ -153,14 +140,13 @@ public sealed class UIContextService
     {
         this.cts?.Dispose();
         this.cts = new CancellationTokenSource();
-        return Task.Factory.StartNew(() => this.InitializeHooks(this.cts.Token), this.cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        return Task.CompletedTask;
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
         this.cts?.Cancel();
         this.cts?.Dispose();
-        this.sendUiMessageHook.Dispose();
         return Task.CompletedTask;
     }
 
@@ -354,10 +340,10 @@ public sealed class UIContextService
         return this.hashingService.Hash(value);
     }
 
-    public void SendMessage(UIMessage message, nuint wParam, nuint lParam)
+    public unsafe void SendMessage(UIMessage message, nuint wParam, nuint lParam)
     {
         this.sendUiMessageSemaphore.Wait();
-        this.sendUiMessageHook.Continue(message, wParam, lParam);
+        GWCA.GW.UI.SendUIMessage(message, (void*)wParam, (nint)lParam);
         this.sendUiMessageSemaphore.Release();
     }
 
@@ -390,24 +376,6 @@ public sealed class UIContextService
         {
             this.decodeStringSemaphore.Release();
         }
-    }
-
-    private async ValueTask InitializeHooks(CancellationToken cancellationToken)
-    {
-        var scopedLogger = this.logger.CreateScopedLogger();
-        scopedLogger.LogInformation("Initializing hooks");
-        while (!this.sendUiMessageHook.EnsureInitialized())
-        {
-            scopedLogger.LogDebug("Waiting for hook to initialize: {hook}", nameof(this.sendUiMessageHook));
-            await Task.Delay(1000, cancellationToken);
-        }
-
-        scopedLogger.LogInformation("Hooks initialized");
-    }
-
-    private void OnSendUIMessage(UIMessage uiMessage, nuint wParam, nuint lParam)
-    {
-        this.sendUiMessageHook.Continue(uiMessage, wParam, lParam);
     }
 
     private static unsafe void SetFrameVisibleInternal(WrappedPointer<Frame> frame, bool visible)

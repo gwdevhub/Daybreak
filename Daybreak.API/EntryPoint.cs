@@ -33,9 +33,9 @@ public class EntryPoint
     {
         Environment.SetEnvironmentVariable("ASPNETCORE_HOSTINGSTARTUPASSEMBLIES", null, EnvironmentVariableTarget.Process);
         Environment.SetEnvironmentVariable("ASPNETCORE_PREVENTHOSTINGSTARTUP", "true", EnvironmentVariableTarget.Process);
-#if DEBUG
+
         ConsoleExtensions.AllocateAnsiConsole();
-#endif
+
         var port = FindAvailablePort(StartPort);
         var app = CreateApplication(port);
         var runTask = Task.Run(() => StartServer(app), CancellationTokenSource.Token);
@@ -135,6 +135,7 @@ public class EntryPoint
         try
         {
             Console.WriteLine("[Daybreak.API] Calling GWCA.GW.Initialize()...");
+            PreloadNativeDependencies();
             var result = GWCA.GW.Initialize();
             Console.WriteLine($"[Daybreak.API] GWCA.GW.Initialize() returned: {result}");
             await app.RunAsync();
@@ -177,5 +178,28 @@ public class EntryPoint
         }
 
         return true;
+    }
+
+    private static void PreloadNativeDependencies()
+    {
+        foreach (ProcessModule module in Process.GetCurrentProcess().Modules)
+        {
+            if (module.ModuleName?.Contains("Daybreak.API", StringComparison.OrdinalIgnoreCase) is true)
+            {
+                var moduleDir = Path.GetDirectoryName(module.FileName)!;
+                var gwcaPath = Path.Combine(moduleDir, "gwca.dll");
+                if (File.Exists(gwcaPath))
+                {
+                    NativeLibrary.Load(gwcaPath);
+                    Console.WriteLine($"[Daybreak.API] Preloaded gwca.dll from {gwcaPath}");
+                }
+                else
+                {
+                    Console.Error.WriteLine($"[Daybreak.API] gwca.dll not found at {gwcaPath}");
+                }
+
+                break;
+            }
+        }
     }
 }
