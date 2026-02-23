@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Extensions.Core;
+using System.Logging;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using Daybreak.API.Configuration;
@@ -33,9 +34,9 @@ public class EntryPoint
     {
         Environment.SetEnvironmentVariable("ASPNETCORE_HOSTINGSTARTUPASSEMBLIES", null, EnvironmentVariableTarget.Process);
         Environment.SetEnvironmentVariable("ASPNETCORE_PREVENTHOSTINGSTARTUP", "true", EnvironmentVariableTarget.Process);
-#if DEBUG
+
         ConsoleExtensions.AllocateAnsiConsole();
-#endif
+
         var port = FindAvailablePort(StartPort);
         var app = CreateApplication(port);
         var runTask = Task.Run(() => StartServer(app), CancellationTokenSource.Token);
@@ -132,18 +133,19 @@ public class EntryPoint
 
     private static async Task StartServer(WebApplication app)
     {
+        var scopedLogger = app.Services.GetRequiredService<ILogger<EntryPoint>>().CreateScopedLogger();
         try
         {
-            Console.WriteLine("[Daybreak.API] Calling GWCA.GW.Initialize()...");
-            PreloadNativeDependencies();
+            scopedLogger.LogDebug("Initializing GWCA");
+            PreloadNativeDependencies(scopedLogger);
             var result = GWCA.GW.Initialize();
-            Console.WriteLine($"[Daybreak.API] GWCA.GW.Initialize() returned: {result}");
+            scopedLogger.LogDebug($"GWCA.GW.Initialize() returned: {result}");
             await app.RunAsync();
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"[Daybreak.API] FATAL ERROR in StartServer: {ex}");
-            throw; // Re-throw so the task faults
+            scopedLogger.LogCritical(ex, $"Encountered fatal error while starting API server {ex}");
+            throw;
         }
     }
 
@@ -180,7 +182,7 @@ public class EntryPoint
         return true;
     }
 
-    private static void PreloadNativeDependencies()
+    private static void PreloadNativeDependencies(ScopedLogger<EntryPoint> logger)
     {
         foreach (ProcessModule module in Process.GetCurrentProcess().Modules)
         {
@@ -191,11 +193,11 @@ public class EntryPoint
                 if (File.Exists(gwcaPath))
                 {
                     NativeLibrary.Load(gwcaPath);
-                    Console.WriteLine($"[Daybreak.API] Preloaded gwca.dll from {gwcaPath}");
+                    logger.LogDebug($"Preloaded gwca.dll from {gwcaPath}");
                 }
                 else
                 {
-                    Console.Error.WriteLine($"[Daybreak.API] gwca.dll not found at {gwcaPath}");
+                    logger.LogError($"gwca.dll not found at {gwcaPath}");
                 }
 
                 break;

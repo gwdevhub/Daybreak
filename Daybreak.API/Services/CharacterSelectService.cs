@@ -172,6 +172,11 @@ public sealed class CharacterSelectService(
                 for (uint i = 0; !chosen && i < ctx.Pointer->Chars.Size; i++)
                 {
                     var c = ctx.Pointer->Chars.Buffer[i];
+                    if (c.IsNull)
+                    {
+                        continue;
+                    }
+
                     var charNameSpan = c.Pointer->Name.AsSpan();
                     var nullIdx = charNameSpan.IndexOf('\0');
                     if (nullIdx <= 0)
@@ -187,7 +192,7 @@ public sealed class CharacterSelectService(
 
                     while (selectedIdx != i)
                     {
-                        var keyAction = new UIPackets.KeyAction(0x1c);
+                        var keyAction = new UIPackets.KeyAction(0x1d);
                         this.uiContextService.SendFrameUIMessage(panesFrame, UIMessage.KeyDown, &keyAction);
 
                         var newIdx = selectedIdx;
