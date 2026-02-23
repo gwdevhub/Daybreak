@@ -109,7 +109,7 @@ public sealed class UIContextService(ILogger<UIContextService> logger)
 
     public unsafe void SendMessage(UIMessage message, nuint wParam, nuint lParam) => GWCA.GW.UI.SendUIMessage(message, (void*)wParam, (nint)lParam);
 
-    public unsafe Task<string> AsyncDecodeStringAsync(ushort* encodedString, CancellationToken cancellationToken = default)
+    public unsafe Task<string> AsyncDecodeStringAsync(ushort* encodedString, Language language = Language.Unknown, CancellationToken cancellationToken = default)
     {
         var taskCompletionSource = new TaskCompletionSource<string>();
         cancellationToken.Register(() => taskCompletionSource.TrySetCanceled(cancellationToken));
@@ -144,17 +144,18 @@ public sealed class UIContextService(ILogger<UIContextService> logger)
         this.prevent_GC_callbacks[callback] = true;
 
         var funcPtr = Marshal.GetFunctionPointerForDelegate(callback);
-        GWCA.GW.UI.AsyncDecodeStr(encodedString, funcPtr);
+        // GWCA's AsyncDecodeStr handles language switching internally (sets language, decodes, restores)
+        GWCA.GW.UI.AsyncDecodeStr(encodedString, funcPtr, 0, language);
 
         return taskCompletionSource.Task;
     }
 
-    public unsafe Task<string> AsyncDecodeStringAsync(string encodedString, CancellationToken cancellationToken = default)
+    public unsafe Task<string> AsyncDecodeStringAsync(string encodedString, Language language = Language.Unknown, CancellationToken cancellationToken = default)
     {
         // Pin the string and convert to ushort*
         fixed (char* encodedPtr = encodedString)
         {
-            return this.AsyncDecodeStringAsync((ushort*)encodedPtr, cancellationToken);
+            return this.AsyncDecodeStringAsync((ushort*)encodedPtr, language, cancellationToken);
         }
     }
 }

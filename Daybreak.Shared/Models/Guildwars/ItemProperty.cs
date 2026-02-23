@@ -85,8 +85,10 @@ public abstract class ItemProperty
                 ItemModifierIdentifier.Armor1                                       => new ArmorProperty { Armor =(int)m.Argument1 },
                 ItemModifierIdentifier.Armor2                                       => new ArmorProperty { Armor = (int)m.Argument1 },
                 ItemModifierIdentifier.Energy                                       => new EnergyProperty { Energy = (int)m.Argument1 },
-                ItemModifierIdentifier.Upgrade1                                     => ParseUpgradeProperty(m),
-                ItemModifierIdentifier.Upgrade2                                     => ParseUpgradeProperty(m),
+                ItemModifierIdentifier.UpgradeSuffix                                => ParseUpgradeProperty(m, type: ItemUpgradeType.Suffix),
+                ItemModifierIdentifier.UpgradePrefix                                => ParseUpgradeProperty(m, type: ItemUpgradeType.Prefix),
+                ItemModifierIdentifier.UpgradeSuffix2                               => ParseUpgradeProperty(m, type: ItemUpgradeType.Suffix, flag: (ItemUpgradeFlag)m.Param),
+                ItemModifierIdentifier.UpgradeSuffix3                               => ParseUpgradeProperty(m, ItemUpgradeType.Suffix, flag: ItemUpgradeFlag.Stat),
                 ItemModifierIdentifier.OfTheProfession                              => ParseOfTheProfessionProperty(m),
                 ItemModifierIdentifier.DamageType                                   => new DamageTypeProperty { DamageType = (DamageType)m.Argument1 },
 
@@ -176,9 +178,9 @@ public abstract class ItemProperty
         return new OfTheProfessionProperty { Profession = (attribute.Profession ?? Profession.None).Name ?? string.Empty, Attribute = attribute.Name ?? string.Empty, Value = (int)m.Argument2 };
     }
 
-    private static ItemProperty ParseUpgradeProperty(ItemModifier m)
+    private static ItemProperty ParseUpgradeProperty(ItemModifier m, ItemUpgradeType type = ItemUpgradeType.Unknown, ItemUpgradeFlag flag = ItemUpgradeFlag.Default)
     {
-        if (!ItemUpgrade.TryParse((int)m.UpgradeId, out var upgrade) ||
+        if (!ItemUpgrade.TryParse((int)m.UpgradeId, type, flag, out var upgrade) ||
             upgrade == ItemUpgrade.Unknown)
         {
             return new UnknownUpgradeProperty { RawModifier = m };

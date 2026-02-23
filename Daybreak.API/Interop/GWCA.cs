@@ -128,11 +128,11 @@ internal static unsafe partial class GWCA
 
         // GW::RegisterLogHandler
         [LibraryImport(DllName, EntryPoint = "?RegisterLogHandler@GW@@YAXP6AXPAXW4LogLevel@1@PBD2I2@Z0@Z")]
-        internal static partial void RegisterLogHandler(nint callback);
+        internal static partial void RegisterLogHandler(nint callback1, nint ptr2);
 
         // GW::RegisterPanicHandler
         [LibraryImport(DllName, EntryPoint = "?RegisterPanicHandler@GW@@YAXP6AXPAXPBD1I1@Z0@Z")]
-        internal static partial void RegisterPanicHandler(nint callback);
+        internal static partial void RegisterPanicHandler(nint callback1, nint ptr2);
 
         // GW::Terminate
         [LibraryImport(DllName, EntryPoint = "?Terminate@GW@@YAXXZ")]
@@ -2041,7 +2041,7 @@ internal static unsafe partial class GWCA
             // GW::TabsFrame::AddTab
             [LibraryImport(DllName, EntryPoint = "?AddTab@TabsFrame@GW@@QAEPAUFrame@UI@2@PB_WIIP6AXPAUInteractionMessage@42@PAX2@Z2@Z")]
             [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-            internal static partial global::Daybreak.API.Interop.GuildWars.Frame* AddTab(nint self, ushort* ptr2, uint value3, uint value4, nint callback5);
+            internal static partial global::Daybreak.API.Interop.GuildWars.Frame* AddTab(nint self, ushort* ptr2, uint value3, uint value4, nint callback5, nint ptr6);
 
             // GW::TabsFrame::ChooseTab
             [LibraryImport(DllName, EntryPoint = "?ChooseTab@TabsFrame@GW@@QAE_NI@Z")]
@@ -2171,11 +2171,11 @@ internal static unsafe partial class GWCA
             // GW::UI::AddFrameUIInteractionCallback
             [LibraryImport(DllName, EntryPoint = "?AddFrameUIInteractionCallback@UI@GW@@YA_NPAUFrame@12@P6AXPAUInteractionMessage@12@PAX2@Z2@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool AddFrameUIInteractionCallback(global::Daybreak.API.Interop.GuildWars.Frame* frame1, nint callback2);
+            internal static partial bool AddFrameUIInteractionCallback(global::Daybreak.API.Interop.GuildWars.Frame* frame1, nint callback2, nint ptr3);
 
             // GW::UI::AsyncDecodeStr
             [LibraryImport(DllName, EntryPoint = "?AsyncDecodeStr@UI@GW@@YAXPB_WP6AXPAX0@Z1W4Language@Constants@2@@Z")]
-            internal static partial void AsyncDecodeStr(ushort* ptr1, nint callback2);
+            internal static partial void AsyncDecodeStr(ushort* ptr1, nint callback2, nint ptr3, global::Daybreak.API.Interop.GuildWars.Language language4);
 
             // GW::UI::AsyncDecodeStr
             [LibraryImport(DllName, EntryPoint = "?AsyncDecodeStr@UI@GW@@YAXPB_WPA_WI@Z")]
@@ -2188,7 +2188,7 @@ internal static unsafe partial class GWCA
 
             // GW::UI::CreateUIComponent
             [LibraryImport(DllName, EntryPoint = "?CreateUIComponent@UI@GW@@YAIIIIP6AXPAUInteractionMessage@12@PAX1@Z1PB_W@Z")]
-            internal static partial uint CreateUIComponent(uint value1, uint value2, uint value3, nint callback4);
+            internal static partial uint CreateUIComponent(uint value1, uint value2, uint value3, nint callback4, nint ptr5, ushort* ptr6);
 
             // GW::UI::Default_UICallback | interactionMessage1: TODO: map struct GW::UI::InteractionMessage
             // [LibraryImport(DllName, EntryPoint = "?Default_UICallback@UI@GW@@YA_NPAUInteractionMessage@12@PAX1@Z")]
