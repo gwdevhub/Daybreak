@@ -34,9 +34,9 @@ public class EntryPoint
     {
         Environment.SetEnvironmentVariable("ASPNETCORE_HOSTINGSTARTUPASSEMBLIES", null, EnvironmentVariableTarget.Process);
         Environment.SetEnvironmentVariable("ASPNETCORE_PREVENTHOSTINGSTARTUP", "true", EnvironmentVariableTarget.Process);
-
+#if DEBUG
         ConsoleExtensions.AllocateAnsiConsole();
-
+#endif
         var port = FindAvailablePort(StartPort);
         var app = CreateApplication(port);
         var runTask = Task.Run(() => StartServer(app), CancellationTokenSource.Token);

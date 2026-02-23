@@ -8,12 +8,10 @@ namespace Daybreak.API.Services;
 
 public sealed class UIService(
     GameThreadService gameThreadService,
-    GameContextService gameContextService,
     UIContextService uIContextService,
     ILogger<UIService> logger)
 {
     private readonly GameThreadService gameThreadService = gameThreadService;
-    private readonly GameContextService gameContextService = gameContextService;
     private readonly UIContextService uIContextService = uIContextService;
     private readonly ILogger<UIService> logger = logger;
 
@@ -90,62 +88,8 @@ public sealed class UIService(
 
     public async Task<string?> DecodeString(string encoded, Language language, CancellationToken cancellationToken)
     {
-        var scopedLogger = this.logger.CreateScopedLogger();
-        var prevLanguage = await this.gameThreadService.QueueOnGameThread<Language?>(() =>
-        {
-            unsafe
-            {
-                var gameContext = this.gameContextService.GetGameContext();
-                if (gameContext.IsNull)
-                {
-                    scopedLogger.LogError("Game context is null");
-                    return null;
-                }
-
-                var textParser = gameContext.Pointer->TextParserContext;
-                if (textParser is null)
-                {
-                    scopedLogger.LogError("Text parser context is null");
-                    return null;
-                }
-
-                var prevLanguage = textParser->Language;
-                if (language is not Language.Unknown)
-                {
-                    textParser->Language = language;
-                }
-
-                return prevLanguage;
-            }
-        }, cancellationToken);
-
-        var decoded = await this.uIContextService.AsyncDecodeStringAsync(encoded, cancellationToken);
-        await this.gameThreadService.QueueOnGameThread(() =>
-        {
-            unsafe
-            {
-                var gameContext = this.gameContextService.GetGameContext();
-                if (gameContext.IsNull)
-                {
-                    scopedLogger.LogError("Game context is null");
-                    return;
-                }
-
-                var textParser = gameContext.Pointer->TextParserContext;
-                if (textParser is null)
-                {
-                    scopedLogger.LogError("Text parser context is null");
-                    return;
-                }
-
-                if (prevLanguage.HasValue)
-                {
-                    textParser->Language = prevLanguage.Value;
-                }
-            }
-        }, cancellationToken);
-
-        return decoded;
+        // GWCA's AsyncDecodeStr handles language switching internally (sets language, decodes, restores)
+        return await this.uIContextService.AsyncDecodeStringAsync(encoded, language, cancellationToken);
     }
 
     private static ControlAction GetUIActionFromFrameLabel(string frameLabel)
