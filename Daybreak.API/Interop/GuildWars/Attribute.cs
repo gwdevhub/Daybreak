@@ -3,6 +3,7 @@
 namespace Daybreak.API.Interop.GuildWars;
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
+[GWCAEquivalent("Attribute")]
 public readonly struct AttributeContext
 {
     public readonly uint Id;
@@ -13,6 +14,7 @@ public readonly struct AttributeContext
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
+[GWCAEquivalent("AttributeInfo")]
 public readonly struct AttributeInfo
 {
     public readonly uint ProfessionId;
@@ -23,6 +25,7 @@ public readonly struct AttributeInfo
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
+[GWCAEquivalent("PartyAttribute")]
 public readonly struct PartyAttribute
 {
     public readonly uint AgentId;

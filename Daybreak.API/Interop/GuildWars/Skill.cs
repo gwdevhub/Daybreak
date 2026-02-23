@@ -3,6 +3,7 @@
 namespace Daybreak.API.Interop.GuildWars;
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
+[GWCAEquivalent("SkillbarSkill")]
 public readonly struct SkillContext
 {
     public readonly uint Adrenaline1;
@@ -13,6 +14,7 @@ public readonly struct SkillContext
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0xBC)]
+[GWCAEquivalent("Skillbar")]
 public readonly struct SkillbarContext
 {
     public readonly uint AgentId;
@@ -29,6 +31,7 @@ public readonly struct SkillbarContext
 }
 
 [StructLayout(LayoutKind.Explicit, Pack = 1, Size = 0x10)]
+[GWCAEquivalent("Buff")]
 public readonly struct Buff
 {
     [FieldOffset(0x0000)]
@@ -40,6 +43,7 @@ public readonly struct Buff
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x18)]
+[GWCAEquivalent("Effect")]
 public readonly struct Effect
 {
     public readonly uint SkillId;

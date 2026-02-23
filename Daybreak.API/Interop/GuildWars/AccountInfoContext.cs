@@ -3,6 +3,7 @@
 namespace Daybreak.API.Interop.GuildWars;
 
 [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 0x1C)]
+[GWCAEquivalent("AccountInfo")]
 public readonly unsafe struct AccountInfoContext
 {
     public readonly char* AccountName;

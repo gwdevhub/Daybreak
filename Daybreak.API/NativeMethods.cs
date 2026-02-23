@@ -49,4 +49,20 @@ internal unsafe static partial class NativeMethods
     public static partial bool VirtualProtect(
         void* lpAddress, nuint dwSize,
         uint flNewProtect, out uint lpflOldProtect);
+
+    // Window enumeration
+    public delegate bool EnumWindowsProc(nint hwnd, nint lParam);
+
+    [LibraryImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool EnumWindows(EnumWindowsProc lpEnumFunc, nint lParam);
+
+    [LibraryImport("user32.dll", SetLastError = true)]
+    public static partial uint GetWindowThreadProcessId(nint hWnd, out uint lpdwProcessId);
+
+    [LibraryImport("user32.dll", SetLastError = true, StringMarshalling = StringMarshalling.Utf8)]
+    public static partial int GetClassNameA(nint hWnd, byte* lpClassName, int nMaxCount);
+
+    [LibraryImport("kernel32.dll")]
+    public static partial uint GetCurrentProcessId();
 }

@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 namespace Daybreak.API.Interop.GuildWars;
 
 [StructLayout(LayoutKind.Explicit, Pack = 1)]
+[GWCAEquivalent("CharacterInformation")]
 public readonly struct CharInfoContext
 {
     [FieldOffset(0x0008)]

@@ -1,5 +1,6 @@
 ﻿namespace Daybreak.API.Interop.GuildWars;
 
+[GWCAEquivalent("EnumPreference")]
 public enum EnumPreference : uint
 {
     CharSortOrder = 0,
@@ -13,6 +14,7 @@ public enum EnumPreference : uint
     Count = 8
 }
 
+[GWCAEquivalent("CharSortOrder")]
 public enum CharSortOrder : uint
 {
     None = 0,
@@ -20,6 +22,7 @@ public enum CharSortOrder : uint
     PvPRP = 2
 }
 
+[GWCAEquivalent("NumberPreference")]
 public enum NumberPreference : uint
 {
     AutoTournPartySort = 0,
@@ -27,10 +30,12 @@ public enum NumberPreference : uint
     Count = 0x2b
 }
 
+[GWCAEquivalent("FlagPreference")]
 public enum FlagPreference : uint
 {
 }
 
+[GWCAEquivalent("StringPreference")]
 public enum StringPreference : uint
 {
     Unk1 = 0,

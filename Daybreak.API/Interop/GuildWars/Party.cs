@@ -46,6 +46,7 @@ public readonly struct PartyMemberMoraleInfo
 }
 
 [StructLayout(LayoutKind.Explicit, Pack = 1, Size = 0x58)]
+[GWCAEquivalent("PartyContext")]
 public readonly unsafe struct PartyContext
 {
     [FieldOffset(0x0014)]
@@ -91,6 +92,7 @@ public readonly struct HenchmanPartyMember
 }
 
 [StructLayout(LayoutKind.Explicit, Pack = 1, Size = 0x84)]
+[GWCAEquivalent("PartyInfo")]
 public readonly struct PartyInfo
 {
     [FieldOffset(0x0000)]
@@ -106,6 +108,7 @@ public readonly struct PartyInfo
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
+[GWCAEquivalent("PartySearch")]
 public readonly struct PartySearch
 {
     public readonly uint PartySearchId;

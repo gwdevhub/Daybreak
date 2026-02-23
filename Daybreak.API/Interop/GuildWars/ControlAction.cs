@@ -1,6 +1,7 @@
 ﻿namespace Daybreak.API.Interop.GuildWars;
 
-public enum UIAction : uint
+[GWCAEquivalent("ControlAction")]
+public enum ControlAction : uint
 {
     None = 0,
     Screenshot = 0xAE,

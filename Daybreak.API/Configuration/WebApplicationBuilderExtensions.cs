@@ -7,6 +7,10 @@ public static class WebApplicationBuilderExtensions
         var config = BuildInfo.Configuration;
         var appSettingsStream = GetManifestResourceStream($"Daybreak.API.Configuration.appsettings.json") ?? throw new InvalidOperationException("Failed to load appsettings.json");
         var appSettingsConfigStream = GetManifestResourceStream($"Daybreak.API.Configuration.appsettings.{config}.json") ?? throw new InvalidOperationException($"Failed to load appsettings.{config}.json");
+        
+        // Clear default file-based configuration sources that cause unnecessary reload events
+        builder.Configuration.Sources.Clear();
+        
         builder.Configuration
             .AddJsonStream(appSettingsStream)
             .AddJsonStream(appSettingsConfigStream)

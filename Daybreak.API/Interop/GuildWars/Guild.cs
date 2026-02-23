@@ -4,7 +4,8 @@ using System.Runtime.InteropServices;
 namespace Daybreak.API.Interop.GuildWars;
 
 [StructLayout(LayoutKind.Explicit, Pack = 1)]
-public readonly unsafe struct GuildContext
+[GWCAEquivalent("GuildContext")]
+public readonly struct GuildContext
 {
     [FieldOffset(0x0034)]
     public readonly Array20Char PlayerName;

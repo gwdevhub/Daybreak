@@ -1,5 +1,8 @@
-﻿namespace Daybreak.API.Models;
+﻿using Daybreak.API.Interop;
 
+namespace Daybreak.API.Models;
+
+[GWCAEquivalent("Channel")]
 public enum Channel : uint
 {
     Alliance = 0,

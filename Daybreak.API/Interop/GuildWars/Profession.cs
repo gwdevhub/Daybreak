@@ -2,6 +2,7 @@
 
 namespace Daybreak.API.Interop.GuildWars;
 
+[GWCAEquivalent("Profession")]
 public enum Profession : uint
 {
     None,
