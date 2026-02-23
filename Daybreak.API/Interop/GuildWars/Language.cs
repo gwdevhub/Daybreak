@@ -1,5 +1,6 @@
 ﻿namespace Daybreak.API.Interop.GuildWars;
 
+[GWCAEquivalent("Language")]
 public enum Language
 {
     English,

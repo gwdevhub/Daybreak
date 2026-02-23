@@ -136,6 +136,13 @@ public sealed class CharacterSelectService(
         return true;
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    private unsafe struct CharSelectButtonParam
+    {
+        public char* Name;
+        public uint Play;
+    }
+
     private async Task<bool> SelectCharacterToPlay(string characterName, bool play, CancellationToken cancellationToken)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
@@ -165,13 +172,21 @@ public sealed class CharacterSelectService(
                 }
 
                 // Get current selected index
-                var selectedIdx = 0;
+                uint selectedIdx = 0;
                 this.uiContextService.SendFrameUIMessage(panesFrame, UIMessage.FrameMessage_QuerySelectedIndex, null, &selectedIdx);
 
-                var chosen = false;
-                for (uint i = 0; !chosen && i < ctx.Pointer->Chars.Size; i++)
+                // Find target character index
+                uint targetIdx = 0xFFFF;
+                var charCount = ctx.Pointer->Chars.Size;
+
+                for (uint i = 0; i < charCount; i++)
                 {
                     var c = ctx.Pointer->Chars.Buffer[i];
+                    if (c.IsNull)
+                    {
+                        continue;
+                    }
+
                     var charNameSpan = c.Pointer->Name.AsSpan();
                     var nullIdx = charNameSpan.IndexOf('\0');
                     if (nullIdx <= 0)
@@ -180,49 +195,115 @@ public sealed class CharacterSelectService(
                     }
 
                     var charName = new string(charNameSpan[..nullIdx]);
-                    if (!charName.StartsWith(characterName, StringComparison.OrdinalIgnoreCase))
+                    if (!charName.Equals(characterName, StringComparison.OrdinalIgnoreCase))
                     {
                         continue;
                     }
 
-                    while (selectedIdx != i)
-                    {
-                        var keyAction = new UIPackets.KeyAction(0x1c);
-                        this.uiContextService.SendFrameUIMessage(panesFrame, UIMessage.KeyDown, &keyAction);
-
-                        var newIdx = selectedIdx;
-                        this.uiContextService.SendFrameUIMessage(panesFrame, UIMessage.FrameMessage_QuerySelectedIndex, null, &newIdx);
-
-                        if (newIdx == selectedIdx)
-                        {
-                            break; // This shouldn't happen - the character should have changed
-                        }
-
-                        selectedIdx = newIdx;
-                    }
-
-                    chosen = selectedIdx == i;
+                    targetIdx = i;
                     break;
                 }
 
+                if (targetIdx >= charCount)
+                {
+                    scopedLogger.LogError("Character {name} not found in character list", characterName);
+                    return false;
+                }
+
+                var parentFrame = this.uiContextService.GetParentFrame(selectorFrame);
+                if (parentFrame.IsNull)
+                {
+                    scopedLogger.LogError("Parent frame not found");
+                    return false;
+                }
+
+                // Helper function to select a character at a specific index
+                bool SelectChar(uint idx)
+                {
+                    var charToSelect = ctx.Pointer->Chars.Buffer[idx];
+                    if (charToSelect.IsNull)
+                    {
+                        return false;
+                    }
+
+                    fixed (char* namePtr = charToSelect.Pointer->Name.AsSpan())
+                    {
+                        var buttonParam = new CharSelectButtonParam
+                        {
+                            Name = namePtr,
+                            Play = 0
+                        };
+
+                        var action = new UIPackets.MouseAction(
+                            selectorFrame->FrameId,
+                            selectorFrame->ChildOffsetId,
+                            UIPackets.ActionState.MouseClick,
+                            (nuint)(&buttonParam));
+
+                        if (!this.uiContextService.SendFrameUIMessage(parentFrame, UIMessage.MouseClick2, &action))
+                        {
+                            return false;
+                        }
+
+                        uint newSelectedIdx = 0;
+                        this.uiContextService.SendFrameUIMessage(panesFrame, UIMessage.FrameMessage_QuerySelectedIndex, null, &newSelectedIdx);
+                        return newSelectedIdx == idx;
+                    }
+                }
+
+                // Navigate to target character by selecting previous/next until we reach it
+                while (targetIdx < selectedIdx)
+                {
+                    if (selectedIdx == 0)
+                    {
+                        break;
+                    }
+
+                    if (!SelectChar(selectedIdx - 1))
+                    {
+                        scopedLogger.LogError("Failed to select previous character");
+                        return false;
+                    }
+
+                    selectedIdx--;
+                }
+
+                while (targetIdx > selectedIdx)
+                {
+                    if (selectedIdx >= charCount - 1)
+                    {
+                        break;
+                    }
+
+                    if (!SelectChar(selectedIdx + 1))
+                    {
+                        scopedLogger.LogError("Failed to select next character");
+                        return false;
+                    }
+
+                    selectedIdx++;
+                }
+
+                var chosen = selectedIdx == targetIdx;
                 if (!chosen)
                 {
                     scopedLogger.LogError("Failed to select character {name}", characterName);
                     return false;
                 }
 
-                // TODO: This needs to be reworked to use UI messages to click on Play
-                var hwnd = this.platformContextService.GetWindowHandle();
-                if (!hwnd.HasValue)
+                if (!play)
                 {
-                    scopedLogger.LogError("Failed to get game window handle");
+                    return true;
+                }
+
+                var playButton = this.uiContextService.GetFrameByLabel("Play");
+                if (playButton.IsNull)
+                {
+                    scopedLogger.LogError("Play button not found");
                     return false;
                 }
 
-                NativeMethods.SendMessageW((nint)hwnd.Value, NativeMethods.WM_KEYDOWN, 0x50, 0x00190001);
-                NativeMethods.SendMessageW((nint)hwnd.Value, NativeMethods.WM_CHAR, 0x70, 0x00190001);
-                NativeMethods.SendMessageW((nint)hwnd.Value, NativeMethods.WM_KEYUP, 0x50, 0x00190001);
-                return true;
+                return this.uiContextService.ButtonClick(playButton);
             }
         }, cancellationToken);
     }

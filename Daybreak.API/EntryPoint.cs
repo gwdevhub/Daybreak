@@ -1,12 +1,14 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Extensions.Core;
+using System.Logging;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using Daybreak.API.Configuration;
 using Daybreak.API.Extensions;
 using Daybreak.API.Health;
 using Daybreak.API.Hosting;
+using Daybreak.API.Interop;
 using Daybreak.API.Logging;
 using Daybreak.API.Serialization;
 using Daybreak.API.Services;
@@ -32,9 +34,9 @@ public class EntryPoint
     {
         Environment.SetEnvironmentVariable("ASPNETCORE_HOSTINGSTARTUPASSEMBLIES", null, EnvironmentVariableTarget.Process);
         Environment.SetEnvironmentVariable("ASPNETCORE_PREVENTHOSTINGSTARTUP", "true", EnvironmentVariableTarget.Process);
-#if DEBUG
+
         ConsoleExtensions.AllocateAnsiConsole();
-#endif
+
         var port = FindAvailablePort(StartPort);
         var app = CreateApplication(port);
         var runTask = Task.Run(() => StartServer(app), CancellationTokenSource.Token);
@@ -131,13 +133,19 @@ public class EntryPoint
 
     private static async Task StartServer(WebApplication app)
     {
+        var scopedLogger = app.Services.GetRequiredService<ILogger<EntryPoint>>().CreateScopedLogger();
         try
         {
+            scopedLogger.LogDebug("Initializing GWCA");
+            PreloadNativeDependencies(scopedLogger);
+            var result = GWCA.GW.Initialize();
+            scopedLogger.LogDebug($"GWCA.GW.Initialize() returned: {result}");
             await app.RunAsync();
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine(ex);
+            scopedLogger.LogCritical(ex, $"Encountered fatal error while starting API server {ex}");
+            throw;
         }
     }
 
@@ -172,5 +180,28 @@ public class EntryPoint
         }
 
         return true;
+    }
+
+    private static void PreloadNativeDependencies(ScopedLogger<EntryPoint> logger)
+    {
+        foreach (ProcessModule module in Process.GetCurrentProcess().Modules)
+        {
+            if (module.ModuleName?.Contains("Daybreak.API", StringComparison.OrdinalIgnoreCase) is true)
+            {
+                var moduleDir = Path.GetDirectoryName(module.FileName)!;
+                var gwcaPath = Path.Combine(moduleDir, "gwca.dll");
+                if (File.Exists(gwcaPath))
+                {
+                    NativeLibrary.Load(gwcaPath);
+                    logger.LogDebug($"Preloaded gwca.dll from {gwcaPath}");
+                }
+                else
+                {
+                    logger.LogError($"gwca.dll not found at {gwcaPath}");
+                }
+
+                break;
+            }
+        }
     }
 }

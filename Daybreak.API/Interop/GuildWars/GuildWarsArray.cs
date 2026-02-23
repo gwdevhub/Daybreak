@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 namespace Daybreak.API.Interop.GuildWars;
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
+[GWCAEquivalent("Array")]
 public readonly unsafe struct GuildWarsArray<T> : IEnumerable<T>
     where T : unmanaged
 {

@@ -13,6 +13,7 @@ public enum BagType
 }
 
 [StructLayout(LayoutKind.Explicit, Pack = 1)]
+[GWCAEquivalent("Bag")]
 public readonly unsafe struct Bag
 {
     [FieldOffset(0x0000)]

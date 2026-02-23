@@ -6,9 +6,6 @@ using Daybreak.Shared.Models;
 using Daybreak.Shared.Models.Api;
 using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Services.BuildTemplates;
-using MemoryPack;
-using System.Buffers;
-using System.Collections.Concurrent;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
@@ -25,19 +22,9 @@ public sealed class MainPlayerService : IDisposable
     private readonly IBuildTemplateManager buildTemplateManager;
     private readonly SkillbarContextService skillbarContextService;
     private readonly AgentContextService agentContextService;
-    private readonly CallbackRegistration callbackRegistration;
     private readonly GameContextService gameContextService;
     private readonly GameThreadService gameThreadService;
     private readonly ILogger<MainPlayerService> logger;
-
-    private readonly ConcurrentQueue<TaskCompletionSource<MainPlayerState>> pendingRequests = new();
-    private readonly ConcurrentDictionary<Guid, ByteConsumerEntry> consumers = new();
-    private readonly ArrayBufferWriter<byte> bufferWriter = new();
-
-    private TimeSpan minUpdateFrequency = TimeSpan.MaxValue;
-    private MainPlayerState? mainPlayerState;
-    private DateTime lastUpdateTime = DateTime.MinValue;
-    private DateTime lastFrequencyUpdate = DateTime.MinValue;
 
     public MainPlayerService(
         ChatService chatService,
@@ -57,12 +44,10 @@ public sealed class MainPlayerService : IDisposable
         this.agentContextService = agentContextService.ThrowIfNull();
         this.gameContextService = gameContextService.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
-        this.callbackRegistration = this.gameThreadService.RegisterCallback(this.OnGameThreadProc);
     }
 
     public void Dispose()
     {
-        this.callbackRegistration?.Dispose();
     }
 
     public async Task<bool> SetCurrentBuild(string buildCode, CancellationToken cancellationToken)
@@ -307,16 +292,81 @@ public sealed class MainPlayerService : IDisposable
         }, cancellationToken);
     }
 
-    public Task<MainPlayerState> GetMainPlayerState(CancellationToken cancellationToken)
+    public Task<MainPlayerState?> GetMainPlayerState(CancellationToken cancellationToken)
     {
-        var tcs = new TaskCompletionSource<MainPlayerState>();
-        if (cancellationToken.CanBeCanceled)
+        var scopedLogger = this.logger.CreateScopedLogger();
+        return this.gameThreadService.QueueOnGameThread(() =>
         {
-            cancellationToken.Register(() => tcs.TrySetCanceled(cancellationToken));
-        }
+            unsafe
+            {
+                if (this.instanceContextService.GetInstanceType() is InstanceType.Loading)
+                {
+                    scopedLogger.LogError("Not loaded");
+                    return default;
+                }
 
-        this.pendingRequests.Enqueue(tcs);
-        return tcs.Task;
+                var gameContext = this.gameContextService.GetGameContext();
+                var agentArray = this.agentContextService.GetAgentArray();
+                var playerAgentId = this.agentContextService.GetPlayerAgentId();
+                if (gameContext.IsNull ||
+                    gameContext.Pointer->WorldContext is null ||
+                    gameContext.Pointer->CharContext is null ||
+                    gameContext.Pointer->WorldContext->MapAgents.Buffer is null ||
+                    agentArray.IsNull ||
+                    agentArray.Pointer->Buffer is null ||
+                    playerAgentId is 0x0)
+                {
+                    scopedLogger.LogDebug("Game data is not yet initialized");
+                    return default;
+                }
+
+                var playerAgent = this.GetAgentContext(playerAgentId);
+                if (playerAgent is null ||
+                    playerAgent->Type is not AgentType.Living ||
+                    playerAgent->AgentId != playerAgentId)
+                {
+                    scopedLogger.LogError("Player agent {playerAgentId} not found in agent array", playerAgentId);
+                    return default;
+                }
+
+                var livingAgent = (AgentLivingContext*)playerAgent;
+                if (livingAgent->Level != gameContext.Pointer->WorldContext->Level)
+                {
+                    scopedLogger.LogError("Player agent not found. Player level mismatch: {level} != {gameLevel}", livingAgent->Level, gameContext.Pointer->WorldContext->Level);
+                    return default;
+                }
+
+                return new MainPlayerState(
+                    gameContext.Pointer->WorldContext->Experience,
+                    gameContext.Pointer->WorldContext->Level,
+
+                    gameContext.Pointer->WorldContext->CurrentLuxon,
+                    gameContext.Pointer->WorldContext->CurrentKurzick,
+                    gameContext.Pointer->WorldContext->CurrentImperial,
+                    gameContext.Pointer->WorldContext->CurrentBalthazar,
+                    gameContext.Pointer->WorldContext->MaxLuxon,
+                    gameContext.Pointer->WorldContext->MaxKurzick,
+                    gameContext.Pointer->WorldContext->MaxImperial,
+                    gameContext.Pointer->WorldContext->MaxBalthazar,
+                    gameContext.Pointer->WorldContext->TotalLuxon,
+                    gameContext.Pointer->WorldContext->TotalKurzick,
+                    gameContext.Pointer->WorldContext->TotalImperial,
+                    gameContext.Pointer->WorldContext->TotalBalthazar,
+
+                    // Energy and health are percentages of Max
+                    livingAgent->Health * livingAgent->MaxHealth,
+                    livingAgent->MaxHealth,
+                    livingAgent->Energy * livingAgent->MaxEnergy,
+                    livingAgent->MaxEnergy,
+
+                    livingAgent->Primary,
+                    livingAgent->Secondary,
+
+                    playerAgent->Pos.X,
+                    playerAgent->Pos.Y
+                );
+            }
+        }, cancellationToken);
     }
 
     public Task<InstanceInfo> GetMainPlayerInstance(CancellationToken cancellationToken)
@@ -333,14 +383,13 @@ public sealed class MainPlayerService : IDisposable
                 }
 
                 var gameContext = this.gameContextService.GetGameContext();
-                var instanceInfoContext = this.instanceContextService.GetInstanceInfoContext();
+                var currentMapInfo = this.instanceContextService.GetAreaInfo();
                 var serverRegion = this.instanceContextService.GetServerRegion();
                 if (gameContext.IsNull ||
                     gameContext.Pointer->CharContext is null ||
                     gameContext.Pointer->WorldContext is null ||
                     gameContext.Pointer->PartyContext is null ||
-                    instanceInfoContext.IsNull ||
-                    instanceInfoContext.Pointer->CurrentMapInfo is null)
+                    currentMapInfo.IsNull)
                 {
                     scopedLogger.LogError("Game context is not initialized");
                     return new InstanceInfo(0, 0, 0, 0, Shared.Models.Api.InstanceType.Loading, DistrictRegionInfo.Unknown, LanguageInfo.Unknown, CampaignInfo.Unknown, ContinentInfo.Unknown, RegionInfo.Unknown, DifficultyInfo.Unknown);
@@ -349,7 +398,7 @@ public sealed class MainPlayerService : IDisposable
                 var charContext = *gameContext.Pointer->CharContext;
                 var worldContext = *gameContext.Pointer->WorldContext;
                 var partyContext = *gameContext.Pointer->PartyContext;
-                var instanceInfo = *instanceInfoContext.Pointer;
+                var mapInfo = *currentMapInfo.Pointer;
                 var mapId = charContext.MapId;
                 var language = charContext.Language;
                 var districtNumber = charContext.DistrictNumber;
@@ -364,9 +413,9 @@ public sealed class MainPlayerService : IDisposable
                     Type: (Shared.Models.Api.InstanceType)instanceType,
                     DistrictRegion: (DistrictRegionInfo)serverRegion,
                     Language: (LanguageInfo)charContext.Language,
-                    Campaign: (CampaignInfo)instanceInfo.CurrentMapInfo->Campaign,
-                    Continent: (ContinentInfo)instanceInfo.CurrentMapInfo->Continent,
-                    Region: (RegionInfo)instanceInfo.CurrentMapInfo->Region,
+                    Campaign: (CampaignInfo)mapInfo.Campaign,
+                    Continent: (ContinentInfo)mapInfo.Continent,
+                    Region: (RegionInfo)mapInfo.Region,
                     Difficulty: partyContext.Flags.HasFlag(PartyFlags.HardMode) ? DifficultyInfo.Hard : DifficultyInfo.Normal);
             }
         }, cancellationToken);
@@ -482,154 +531,6 @@ public sealed class MainPlayerService : IDisposable
 
             }
         }, cancellationToken);
-    }
-
-    public CallbackRegistration RegisterMainStateConsumer(TimeSpan frequency, Action<ReadOnlySpan<byte>> onUpdate)
-    {
-        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(frequency, TimeSpan.Zero);
-
-        var id = Guid.NewGuid();
-        var now = DateTime.UtcNow;
-        var entry = new ByteConsumerEntry(id, frequency, onUpdate);
-
-        this.consumers[id] = entry;
-        this.RecalculateMinFrequency();
-
-        return new CallbackRegistration(id, () =>
-        {
-            this.consumers.TryRemove(id, out _);
-            this.RecalculateMinFrequency();
-        });
-    }
-
-    private unsafe void OnGameThreadProc()
-    {
-        var scopedLogger = this.logger.CreateScopedLogger();
-        var now = DateTime.UtcNow;
-
-        /*
-         * Periodically adjust the frequency of updates based on connected clients.
-         * Sometimes clients crash and disconnect in a way that the server wasn't able
-         * to trigger a frequency recalculation, so this periodic recalculation should
-         * take care of inconsistent state.
-         */
-        if (now - this.lastFrequencyUpdate > TimeSpan.FromSeconds(10))
-        {
-            this.RecalculateMinFrequency();
-        }
-
-        /*
-         * Only rebuild the state when we do not have one yet or the shortest required frequency has elapsed.
-         * If we have any pending request (excluding consumers), we should also rebuild the state
-         * to return the latest data to the request
-         */
-        if (this.mainPlayerState is not null &&
-            this.minUpdateFrequency is TimeSpan minFreq &&
-            now - this.lastUpdateTime < minFreq &&
-            this.pendingRequests.IsEmpty)
-        {
-            return;
-        }
-
-        if (this.instanceContextService.GetInstanceType() is InstanceType.Loading)
-        {
-            scopedLogger.LogError("Not loaded");
-            return;
-        }
-
-        var gameContext = this.gameContextService.GetGameContext();
-        var agentArray = this.agentContextService.GetAgentArray();
-        var playerAgentId = this.agentContextService.GetPlayerAgentId();
-        if (gameContext.IsNull ||
-            gameContext.Pointer->WorldContext is null ||
-            gameContext.Pointer->CharContext is null ||
-            gameContext.Pointer->WorldContext->MapAgents.Buffer is null ||
-            agentArray.IsNull ||
-            agentArray.Pointer->Buffer is null ||
-            playerAgentId is 0x0)
-        {
-            scopedLogger.LogDebug("Game data is not yet initialized");
-            return;
-        }
-
-        var playerMapAgent = gameContext.Pointer->WorldContext->MapAgents.AsValueEnumerable().Skip((int)playerAgentId).FirstOrDefault();
-        var playerAgent = this.GetAgentContext(playerAgentId);
-        if (playerAgent is null ||
-            playerAgent->Type is not AgentType.Living ||
-            playerAgent->AgentId != playerAgentId)
-        {
-            scopedLogger.LogError("Player agent {playerAgentId} not found in agent array", playerAgentId);
-            return;
-        }
-
-        var livingAgent = (AgentLivingContext*)playerAgent;
-        if (livingAgent->Level != gameContext.Pointer->WorldContext->Level)
-        {
-            scopedLogger.LogError("Player agent not found. Player level mismatch: {level} != {gameLevel}", livingAgent->Level, gameContext.Pointer->WorldContext->Level);
-            return;
-        }
-
-        this.mainPlayerState = new MainPlayerState(
-            gameContext.Pointer->WorldContext->Experience,
-            gameContext.Pointer->WorldContext->Level,
-
-            gameContext.Pointer->WorldContext->CurrentLuxon,
-            gameContext.Pointer->WorldContext->CurrentKurzick,
-            gameContext.Pointer->WorldContext->CurrentImperial,
-            gameContext.Pointer->WorldContext->CurrentBalthazar,
-            gameContext.Pointer->WorldContext->MaxLuxon,
-            gameContext.Pointer->WorldContext->MaxKurzick,
-            gameContext.Pointer->WorldContext->MaxImperial,
-            gameContext.Pointer->WorldContext->MaxBalthazar,
-            gameContext.Pointer->WorldContext->TotalLuxon,
-            gameContext.Pointer->WorldContext->TotalKurzick,
-            gameContext.Pointer->WorldContext->TotalImperial,
-            gameContext.Pointer->WorldContext->TotalBalthazar,
-
-            // Energy and health are percentages of Max
-            livingAgent->Health * livingAgent->MaxHealth,
-            livingAgent->MaxHealth,
-            livingAgent->Energy * livingAgent->MaxEnergy,
-            livingAgent->MaxEnergy,
-
-            livingAgent->Primary,
-            livingAgent->Secondary,
-
-            playerAgent->Pos.X,
-            playerAgent->Pos.Y
-        );
-
-        this.bufferWriter.ResetWrittenCount();
-        MemoryPackSerializer.Serialize(this.bufferWriter, this.mainPlayerState);
-        this.lastUpdateTime = now;
-
-        while (this.pendingRequests.TryDequeue(out var tcs))
-        {
-            tcs.TrySetResult(this.mainPlayerState);
-        }
-
-        foreach (var kvp in this.consumers)
-        {
-            var entry = kvp.Value;
-            entry.TryConsume(now, this.bufferWriter.WrittenSpan);
-        }
-    }
-
-    private void RecalculateMinFrequency()
-    {
-        var scopedLogger = this.logger.CreateScopedLogger();
-        var noConsumers = this.consumers.IsEmpty;
-        if (noConsumers)
-        {
-            this.minUpdateFrequency = TimeSpan.MaxValue;
-            scopedLogger.LogDebug("No consumers registered, disabling updates");
-            this.lastFrequencyUpdate = DateTime.UtcNow;
-            return;
-        }
-
-        var minValue = this.consumers.Values.Min(c => c.Frequency);
-        scopedLogger.LogDebug("Adjusted update frequency to {frequency}", minValue);
-        this.lastFrequencyUpdate = DateTime.UtcNow;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

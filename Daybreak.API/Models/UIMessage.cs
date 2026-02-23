@@ -1,5 +1,8 @@
-﻿namespace Daybreak.API.Models;
+﻿using Daybreak.API.Interop;
 
+namespace Daybreak.API.Models;
+
+[GWCAEquivalent("UIMessage")]
 public enum UIMessage : uint
 {
     None = 0x0,

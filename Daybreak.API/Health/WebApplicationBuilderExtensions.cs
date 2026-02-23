@@ -4,9 +4,7 @@ public static class WebApplicationBuilderExtensions
 {
     public static WebApplicationBuilder WithHealthChecks(this WebApplicationBuilder builder)
     {
-        builder.Services.AddHealthChecks()
-            .AddCheck<HooksHealthCheck>(nameof(HooksHealthCheck))
-            .AddCheck<AddressHealthCheck>(nameof(AddressHealthCheck));
+        builder.Services.AddHealthChecks();
         return builder;
     }
 }

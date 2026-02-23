@@ -10,6 +10,7 @@ public readonly struct AccountUnlockedCount
 }
 
 [StructLayout(LayoutKind.Explicit, Pack = 1, Size = 0x138)]
+[GWCAEquivalent("AccountContext")]
 public readonly struct AccountGameContext
 {
     [FieldOffset(0x0000)]
