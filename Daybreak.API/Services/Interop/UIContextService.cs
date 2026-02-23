@@ -87,6 +87,26 @@ public sealed class UIContextService(ILogger<UIContextService> logger)
 
     public unsafe WrappedPointer<Frame> GetFrameById(uint frameId) => GWCA.GW.UI.GetFrameById(frameId);
 
+    public unsafe WrappedPointer<Frame> GetParentFrame(WrappedPointer<Frame> frame)
+    {
+        if (frame.IsNull)
+        {
+            return null;
+        }
+
+        return GWCA.GW.UI.GetParentFrame(frame);
+    }
+
+    public unsafe bool ButtonClick(WrappedPointer<Frame> frame)
+    {
+        if (frame.IsNull)
+        {
+            return false;
+        }
+
+        return GWCA.GW.UI.ButtonClick(frame);
+    }
+
     public unsafe void SendMessage(UIMessage message, nuint wParam, nuint lParam) => GWCA.GW.UI.SendUIMessage(message, (void*)wParam, (nint)lParam);
 
     public unsafe Task<string> AsyncDecodeStringAsync(ushort* encodedString, CancellationToken cancellationToken = default)
