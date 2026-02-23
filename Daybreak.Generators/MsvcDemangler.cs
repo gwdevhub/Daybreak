@@ -450,10 +450,22 @@ internal sealed class MsvcDemangler
         if (pos < s.Length && s[pos] >= 'A' && s[pos] <= 'Z') pos++;
         // Return type
         ReadType(s, ref pos, nameTable);
-        // Params until @ or Z
+        // Params until @Z (function pointer terminator)
         while (pos < s.Length)
         {
-            if (s[pos] is '@' or 'Z') { pos++; break; }
+            // Function pointers are terminated by @Z
+            if (s[pos] == '@')
+            {
+                pos++; // skip @
+                if (pos < s.Length && s[pos] == 'Z')
+                {
+                    pos++; // skip Z - this terminates the function pointer, not the outer param list
+                }
+                break;
+            }
+
+            // Single Z also terminates (void params case)
+            if (s[pos] == 'Z') { pos++; break; }
 
             ReadType(s, ref pos, nameTable);
         }

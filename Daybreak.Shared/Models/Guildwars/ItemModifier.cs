@@ -23,8 +23,10 @@ public enum ItemModifierIdentifier : uint
     Armor1                              = 0x27B,    // Armor value (arg1)
     Armor2                              = 0x23C,    // Armor value (arg1)
     Energy                              = 0x27C,    // Energy value (arg1)
-    Upgrade1                            = 0x21E,    // Suffix/Prefix/Inscription upgrade (upgrade id)
-    Upgrade2                            = 0x240,    // Suffix/Prefix/Inscription upgrade (upgrade id)
+    UpgradeSuffix                       = 0x21E,    // Suffix upgrade (upgrade id)
+    UpgradePrefix                       = 0x240,    // Prefix upgrade (upgrade id)
+    UpgradeSuffix2                      = 0x27E,    // Suffix upgrade. Param: 8=Minor, 9=Major, A=Superior (upgrade id)
+    UpgradeSuffix3                      = 0x253,    // Suffix rule. This is normally not correct but for now we'll use this to map runes that alter stats such as hp or energy
     OfTheProfession                     = 0x28A,    // +5 to primary of profession (arg2) (arg1)
     DamageType                          = 0x24B,    // Damage type (arg1)
 
@@ -104,5 +106,7 @@ public enum ItemModifierIdentifier : uint
 public enum ItemModifierParam : uint
 {
     LabelInName = 0x0,
-    Description = 0x8
+    Description = 0x8,
+    Superior = 0x9,
+    Major = 0xA,
 }

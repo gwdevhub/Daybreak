@@ -274,29 +274,28 @@ public sealed class ItemUpgrade
     public static readonly ItemUpgrade Windwalker                           = new(0x0202, "Windwalker", ItemUpgradeType.Prefix);
     public static readonly ItemUpgrade Forsaken                             = new(0x0203, "Forsaken", ItemUpgradeType.Prefix);
     public static readonly ItemUpgrade Centurions                           = new(0x0207, "Centurion's", ItemUpgradeType.Prefix);
-    public static readonly ItemUpgrade OfAttunement                         = new(0x0211, "of Attunement", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfRecovery                           = new(0x0213, "of Recovery", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfRestoration                        = new(0x0214, "of Restoration", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfClarity                            = new(0x0215, "of Clarity", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfPurity                             = new(0x0216, "of Purity", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorVigor                         = new(0x00FF, "of Minor Vigor", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorVigor2                        = new(0x00C2, "of Minor Vigor", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorVigor                      = new(0x0101, "of Superior Vigor", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorVigor                         = new(0x0100, "of Major Vigor", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfVitae                              = new(0x0212, "of Vitae", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMinorAbsorption                    = new(0x00FC, "of Minor Absorption", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfAttunement                         = new(0x0423, "of Attunement", ItemUpgradeType.Suffix, ItemUpgradeFlag.Stat);
+    public static readonly ItemUpgrade OfRecovery                           = new(0x0427, "of Recovery", ItemUpgradeType.Suffix, ItemUpgradeFlag.Stat);
+    public static readonly ItemUpgrade OfRestoration                        = new(0x0429, "of Restoration", ItemUpgradeType.Suffix, ItemUpgradeFlag.Stat);
+    public static readonly ItemUpgrade OfClarity                            = new(0x042B, "of Clarity", ItemUpgradeType.Suffix, ItemUpgradeFlag.Stat);
+    public static readonly ItemUpgrade OfPurity                             = new(0x042D, "of Purity", ItemUpgradeType.Suffix, ItemUpgradeFlag.Stat);
+    public static readonly ItemUpgrade OfMinorVigor                         = new(0x02C2, "of Minor Vigor", ItemUpgradeType.Suffix, ItemUpgradeFlag.Base);
+    public static readonly ItemUpgrade OfSuperiorVigor                      = new(0x02C2, "of Superior Vigor", ItemUpgradeType.Suffix, ItemUpgradeFlag.Superior);
+    public static readonly ItemUpgrade OfMajorVigor                         = new(0x02C2, "of Major Vigor", ItemUpgradeType.Suffix, ItemUpgradeFlag.Major);
+    public static readonly ItemUpgrade OfVitae                              = new(0x0425, "of Vitae", ItemUpgradeType.Suffix, ItemUpgradeFlag.Stat);
+    public static readonly ItemUpgrade OfMinorAbsorption                    = new(0x02EA, "of Minor Absorption", ItemUpgradeType.Suffix, ItemUpgradeFlag.Base);
     public static readonly ItemUpgrade OfMinorTactics                       = new(0x1501, "of Minor Tactics", ItemUpgradeType.Suffix);
     public static readonly ItemUpgrade OfMinorStrength                      = new(0x1101, "of Minor Strength", ItemUpgradeType.Suffix);
     public static readonly ItemUpgrade OfMinorAxeMastery                    = new(0x1201, "of Minor Axe Mastery", ItemUpgradeType.Suffix);
     public static readonly ItemUpgrade OfMinorHammerMastery                 = new(0x1301, "of Minor Hammer Mastery", ItemUpgradeType.Suffix);
     public static readonly ItemUpgrade OfMinorSwordsmanship                 = new(0x1401, "of Minor Swordsmanship", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfMajorAbsorption                    = new(0x00FD, "of Major Absorption", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfMajorAbsorption                    = new(0x02EA, "of Major Absorption", ItemUpgradeType.Suffix, ItemUpgradeFlag.Major);
     public static readonly ItemUpgrade OfMajorTactics                       = new(0x1502, "of Major Tactics", ItemUpgradeType.Suffix);
     public static readonly ItemUpgrade OfMajorStrength                      = new(0x1102, "of Major Strength", ItemUpgradeType.Suffix);
     public static readonly ItemUpgrade OfMajorAxeMastery                    = new(0x1202, "of Major Axe Mastery", ItemUpgradeType.Suffix);
     public static readonly ItemUpgrade OfMajorHammerMastery                 = new(0x1302, "of Major Hammer Mastery", ItemUpgradeType.Suffix);
     public static readonly ItemUpgrade OfMajorSwordsmanship                 = new(0x1402, "of Major Swordsmanship", ItemUpgradeType.Suffix);
-    public static readonly ItemUpgrade OfSuperiorAbsorption                 = new(0x00FE, "of Superior Absorption", ItemUpgradeType.Suffix);
+    public static readonly ItemUpgrade OfSuperiorAbsorption                 = new(0x02EA, "of Superior Absorption", ItemUpgradeType.Suffix, ItemUpgradeFlag.Superior);
     public static readonly ItemUpgrade OfSuperiorTactics                    = new(0x1503, "of Superior Tactics", ItemUpgradeType.Suffix);
     public static readonly ItemUpgrade OfSuperiorStrength                   = new(0x1103, "of Superior Strength", ItemUpgradeType.Suffix);
     public static readonly ItemUpgrade OfSuperiorAxeMastery                 = new(0x1203, "of Superior Axe Mastery", ItemUpgradeType.Suffix);
@@ -758,7 +757,6 @@ public sealed class ItemUpgrade
         OfClarity,
         OfPurity,
         OfMinorVigor,
-        OfMinorVigor2,
         OfSuperiorVigor,
         OfMajorVigor,
         OfVitae,
@@ -969,6 +967,47 @@ public sealed class ItemUpgrade
         return upgrade is not null;
     }
 
+    public static bool TryParse(int id, ItemUpgradeType type, [NotNullWhen(true)] out ItemUpgrade? upgrade)
+    {
+        if (type is ItemUpgradeType.Unknown)
+        {
+            return TryParse(id, out upgrade);
+        }
+
+        upgrade = ItemUpgrades.FirstOrDefault(u => u.Id == id && u.Type == type);
+        return upgrade is not null;
+    }
+
+    public static bool TryParse(int id, ItemUpgradeFlag flag, [NotNullWhen(true)] out ItemUpgrade? upgrade)
+    {
+        if (flag is ItemUpgradeFlag.Default)
+        {
+            return TryParse(id, out upgrade);
+        }
+
+        upgrade = ItemUpgrades.FirstOrDefault(u => u.Id == id && u.Flag == flag);
+        return upgrade is not null;
+    }
+
+    public static bool TryParse(int id, ItemUpgradeType type, ItemUpgradeFlag flag, [NotNullWhen(true)] out ItemUpgrade? upgrade)
+    {
+        if (flag is ItemUpgradeFlag.Default && type is ItemUpgradeType.Unknown)
+        {
+            return TryParse(id, out upgrade);
+        }
+        else if (flag is ItemUpgradeFlag.Default)
+        {
+            return TryParse(id, type, out upgrade);
+        }
+        else if (type is ItemUpgradeType.Unknown)
+        {
+            return TryParse(id, flag, out upgrade);
+        }
+
+        upgrade = ItemUpgrades.FirstOrDefault(u => u.Id == id && u.Type == type && u.Flag == flag);
+        return upgrade is not null;
+    }
+
     [JsonPropertyName("id")]
     [JsonConverter(typeof(HexIntConverter))]
     public int Id { get; }
@@ -979,10 +1018,14 @@ public sealed class ItemUpgrade
     [JsonPropertyName("type")]
     public ItemUpgradeType Type { get; }
 
-    private ItemUpgrade(int id, string name, ItemUpgradeType type)
+    [JsonPropertyName("flag")]
+    public ItemUpgradeFlag Flag { get; }
+
+    private ItemUpgrade(int id, string name, ItemUpgradeType type, ItemUpgradeFlag flag = ItemUpgradeFlag.Default)
     {
         this.Id = id;
         this.Name = name;
         this.Type = type;
+        this.Flag = flag;
     }
 }

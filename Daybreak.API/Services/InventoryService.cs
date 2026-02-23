@@ -83,17 +83,21 @@ public sealed class InventoryService(
             return default;
         }
 
-        var decodedItemTuples = await Task.WhenAll(itemTuples.Select(async tuple =>
+        // Decode strings sequentially to avoid race conditions with the game's TextParser language field.
+        // Parallel decoding causes crashes because multiple operations race to set/restore the language.
+        var decodedItemTuples = new List<(BagType Type, List<(uint ModelId, string EncodedName, string? DecodedName, string EncodedSingleName, string? DecodedSingleName, string EncodedCompleteName, string? DecodedCompleteName, bool Inscribable, int Quantity, uint[] Modifiers, ItemType ItemType)> Items)>();
+        foreach (var tuple in itemTuples)
         {
-            var decodedItems = await Task.WhenAll(tuple.Item2.Select(async item =>
+            var decodedItems = new List<(uint ModelId, string EncodedName, string? DecodedName, string EncodedSingleName, string? DecodedSingleName, string EncodedCompleteName, string? DecodedCompleteName, bool Inscribable, int Quantity, uint[] Modifiers, ItemType ItemType)>();
+            foreach (var item in tuple.Item2)
             {
                 var decodedName = await this.uIService.DecodeString(item.EncodedName, Language.English, cancellationToken);
                 var decodedCompleteName = await this.uIService.DecodeString(item.EncodedCompleteName, Language.English, cancellationToken);
                 var decodedSingleName = await this.uIService.DecodeString(item.EncodedSingleName, Language.English, cancellationToken);
-                return (item.ModelId, item.EncodedName, DecodedName: decodedName, item.EncodedSingleName, DecodedSingleName: decodedSingleName, item.EncodedCompleteName, DecodedCompleteName: decodedCompleteName, item.Inscribable, item.Quantity, item.Modifiers, item.ItemType);
-            }));
-            return (tuple.Type, Items: decodedItems.ToList());
-        }));
+                decodedItems.Add((item.ModelId, item.EncodedName, decodedName, item.EncodedSingleName, decodedSingleName, item.EncodedCompleteName, decodedCompleteName, item.Inscribable, item.Quantity, item.Modifiers, item.ItemType));
+            }
+            decodedItemTuples.Add((tuple.Type, decodedItems));
+        }
 
         return new InventoryInformation(
             Bags: [.. decodedItemTuples.Select(tuple =>
