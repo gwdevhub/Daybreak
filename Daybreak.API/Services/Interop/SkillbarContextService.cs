@@ -5,8 +5,5 @@ namespace Daybreak.API.Services.Interop;
 
 public sealed class SkillbarContextService
 {
-    public unsafe void LoadBuild(uint agentId, SkillTemplate* template)
-    {
-        GWCA.GW.SkillbarMgr.LoadSkillTemplate(agentId, template);
-    }
+    public unsafe void LoadBuild(uint agentId, SkillTemplate* template) => GWCA.GW.SkillbarMgr.LoadSkillTemplate(agentId, template);
 }

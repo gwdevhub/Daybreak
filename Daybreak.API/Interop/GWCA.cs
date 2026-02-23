@@ -12,7 +12,7 @@ using System.Runtime.InteropServices.Marshalling;
 namespace Daybreak.API.Interop;
 
 /// <summary>
-/// P/Invoke bindings for 519 C++ exports from gwca.dll (0 skipped).
+/// P/Invoke bindings for 521 C++ exports from gwca.dll (0 skipped).
 /// Nested classes mirror the C++ namespace hierarchy (e.g. GW::Agents → GWCA.GW.Agents).
 /// Types annotated with [GWCAEquivalent] are used in signatures where available.
 /// </summary>
@@ -42,6 +42,10 @@ internal static unsafe partial class GWCA
         // GW::GetAgentContext
         [LibraryImport(DllName, EntryPoint = "?GetAgentContext@GW@@YAPAUAgentContext@1@XZ")]
         internal static partial global::Daybreak.API.Interop.GuildWars.AgentGameContext* GetAgentContext();
+
+        // GW::GetAvailableChars
+        [LibraryImport(DllName, EntryPoint = "?GetAvailableChars@GW@@YAPAV?$Array@UCharacterInformation@GW@@@1@XZ")]
+        internal static partial global::Daybreak.API.Interop.GuildWars.GuildWarsArray<global::Daybreak.API.Interop.GuildWars.CharInfoContext>* GetAvailableChars();
 
         // GW::GetCharContext
         [LibraryImport(DllName, EntryPoint = "?GetCharContext@GW@@YAPAUCharContext@1@XZ")]
@@ -387,14 +391,19 @@ internal static unsafe partial class GWCA
             internal static partial bool GetIsTyping();
 
             // GW::Chat::SendChat
-            [LibraryImport(DllName, EntryPoint = "?SendChat@Chat@GW@@YA_NW4Channel@12@PB_W@Z")]
+            [LibraryImport(DllName, EntryPoint = "?SendChat@Chat@GW@@YA_NDPBD@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SendChat(global::Daybreak.API.Models.Channel channel1, ushort* ptr2);
+            internal static partial bool SendChat(byte value1, byte* ptr2);
 
-            // GW::Chat::SendWhisper
-            [LibraryImport(DllName, EntryPoint = "?SendWhisper@Chat@GW@@YA_NPB_W0@Z")]
+            // GW::Chat::SendChat
+            [LibraryImport(DllName, EntryPoint = "?SendChat@Chat@GW@@YA_NDPB_W@Z")]
             [return: MarshalAs(UnmanagedType.U1)]
-            internal static partial bool SendWhisper(ushort* ptr1, nint ptr2);
+            internal static partial bool SendChat(byte value1, ushort* ptr2);
+
+            // GW::Chat::SendChat
+            [LibraryImport(DllName, EntryPoint = "?SendChat@Chat@GW@@YA_NPB_W0@Z")]
+            [return: MarshalAs(UnmanagedType.U1)]
+            internal static partial bool SendChat(ushort* ptr1, nint ptr2);
 
             // GW::Chat::SetMessageColor
             [LibraryImport(DllName, EntryPoint = "?SetMessageColor@Chat@GW@@YAIW4Channel@12@I@Z")]
@@ -715,9 +724,9 @@ internal static unsafe partial class GWCA
             [return: MarshalAs(UnmanagedType.U1)]
             internal static partial bool IsInGameThread();
 
-            // GW::GameThread::RegisterGameThreadCallback | function2: TODO: map struct function
-            // [LibraryImport(DllName, EntryPoint = "?RegisterGameThreadCallback@GameThread@GW@@YAXPAUHookEntry@2@ABV?$function@$$A6AXPAUHookStatus@GW@@@Z@std@@H@Z")]
-            // internal static partial void RegisterGameThreadCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, function* function2);
+            // GW::GameThread::RegisterGameThreadCallback | via C export
+            [LibraryImport(DllName, EntryPoint = "RegisterGameThreadCallback")]
+            internal static partial void RegisterGameThreadCallback(global::Daybreak.API.Interop.HookEntry* hookEntry1, nint function2);
 
             // GW::GameThread::RemoveGameThreadCallback
             [LibraryImport(DllName, EntryPoint = "?RemoveGameThreadCallback@GameThread@GW@@YAXPAUHookEntry@2@@Z")]
@@ -1184,9 +1193,9 @@ internal static unsafe partial class GWCA
             [LibraryImport(DllName, EntryPoint = "?GetGWVersion@MemoryMgr@GW@@YAIXZ")]
             internal static partial uint GetGWVersion();
 
-            // GW::MemoryMgr::GetGWWindowHandle | returns TODO: map struct HWND__
-            // [LibraryImport(DllName, EntryPoint = "?GetGWWindowHandle@MemoryMgr@GW@@YAPAUHWND__@@XZ")]
-            // internal static partial HWND__* GetGWWindowHandle();
+            // GW::MemoryMgr::GetGWWindowHandle
+            [LibraryImport(DllName, EntryPoint = "?GetGWWindowHandle@MemoryMgr@GW@@YAPAUHWND__@@XZ")]
+            internal static partial global::Daybreak.API.Interop.GWHwnd* GetGWWindowHandle();
 
             // GW::MemoryMgr::GetPersonalDir
             [LibraryImport(DllName, EntryPoint = "?GetPersonalDir@MemoryMgr@GW@@YA_NIPA_W@Z")]
@@ -1680,9 +1689,9 @@ internal static unsafe partial class GWCA
             [LibraryImport(DllName, EntryPoint = "?GetViewportWidth@Render@GW@@YAIXZ")]
             internal static partial uint GetViewportWidth();
 
-            // GW::Render::GetWindowHandle | returns TODO: map struct HWND__
-            // [LibraryImport(DllName, EntryPoint = "?GetWindowHandle@Render@GW@@YAPAUHWND__@@XZ")]
-            // internal static partial HWND__* GetWindowHandle();
+            // GW::Render::GetWindowHandle
+            [LibraryImport(DllName, EntryPoint = "?GetWindowHandle@Render@GW@@YAPAUHWND__@@XZ")]
+            internal static partial global::Daybreak.API.Interop.GWHwnd* GetWindowHandle();
 
             // GW::Render::SetFog
             [LibraryImport(DllName, EntryPoint = "?SetFog@Render@GW@@YA_N_N@Z")]

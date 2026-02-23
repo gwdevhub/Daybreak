@@ -8,7 +8,6 @@ namespace Daybreak.API.Services.Interop;
 
 public sealed class GameThreadService
 {
-    // Delegate type matching GWCA's GW_GameThreadCallback: void(__cdecl*)()
     [SuppressUnmanagedCodeSecurity]
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate void GameThreadCallback();
@@ -20,8 +19,7 @@ public sealed class GameThreadService
     {
         var taskCompletionSource = new TaskCompletionSource();
         var item = new WorkItem(action, taskCompletionSource, cancellationToken);
-        
-        // Define the callback delegate - MUST match void(__cdecl*)()
+
         GameThreadCallback callback = null!;
         callback = () =>
         {
@@ -41,7 +39,6 @@ public sealed class GameThreadService
             }
             finally
             {
-                // Remove from prevent-GC set after execution
                 this.prevent_GC_callbacks.TryRemove(callback, out _);
             }
         };
@@ -49,7 +46,6 @@ public sealed class GameThreadService
         // CRITICAL: Keep delegate alive until callback executes
         this.prevent_GC_callbacks[callback] = true;
 
-        // Get function pointer and enqueue
         var funcPtr = Marshal.GetFunctionPointerForDelegate(callback);
         GWCA.GW.GameThread.Enqueue(funcPtr, false);
 
@@ -61,7 +57,6 @@ public sealed class GameThreadService
         var taskCompletionSource = new TaskCompletionSource<T>();
         var item = new WorkItem<T>(action, taskCompletionSource, cancellationToken);
 
-        // Define the callback delegate - MUST match void(__cdecl*)()
         GameThreadCallback callback = null!;
         callback = () =>
         {
@@ -89,7 +84,6 @@ public sealed class GameThreadService
         // CRITICAL: Keep delegate alive until callback executes
         this.prevent_GC_callbacks[callback] = true;
 
-        // Get function pointer and enqueue
         var funcPtr = Marshal.GetFunctionPointerForDelegate(callback);
         GWCA.GW.GameThread.Enqueue(funcPtr, false);
 

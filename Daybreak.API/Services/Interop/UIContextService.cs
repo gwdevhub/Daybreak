@@ -69,25 +69,13 @@ public sealed class UIContextService(ILogger<UIContextService> logger)
         return GWCA.GW.UI.SendFrameUIMessage(frame, messageId, arg1, (nint)arg2);
     }
 
-    public unsafe bool SetFrameDisabled(WrappedPointer<Frame> frame, bool disabled)
-    {
-        return GWCA.GW.UI.SetFrameDisabled(frame, disabled);
-    }
+    public unsafe bool SetFrameDisabled(WrappedPointer<Frame> frame, bool disabled) => GWCA.GW.UI.SetFrameDisabled(frame, disabled);
 
-    public unsafe bool SetFrameVisible(WrappedPointer<Frame> frame, bool visible)
-    {
-        return GWCA.GW.UI.SetFrameVisible(frame, visible);
-    }
+    public unsafe bool SetFrameVisible(WrappedPointer<Frame> frame, bool visible) => GWCA.GW.UI.SetFrameVisible(frame, visible);
 
-    public unsafe bool KeyDown(ControlAction action, WrappedPointer<Frame> frame)
-    {
-        return GWCA.GW.UI.Keydown(action, frame);
-    }
+    public unsafe bool KeyDown(ControlAction action, WrappedPointer<Frame> frame) => GWCA.GW.UI.Keydown(action, frame);
 
-    public unsafe bool KeyUp(ControlAction action, WrappedPointer<Frame> frame)
-    {
-        return GWCA.GW.UI.Keyup(action, frame);
-    }
+    public unsafe bool KeyUp(ControlAction action, WrappedPointer<Frame> frame) => GWCA.GW.UI.Keyup(action, frame);
 
     public unsafe WrappedPointer<Frame> GetFrameByLabel(string label)
     {
@@ -97,15 +85,9 @@ public sealed class UIContextService(ILogger<UIContextService> logger)
         }
     }
 
-    public unsafe WrappedPointer<Frame> GetFrameById(uint frameId)
-    {
-        return GWCA.GW.UI.GetFrameById(frameId);
-    }
+    public unsafe WrappedPointer<Frame> GetFrameById(uint frameId) => GWCA.GW.UI.GetFrameById(frameId);
 
-    public unsafe void SendMessage(UIMessage message, nuint wParam, nuint lParam)
-    {
-        GWCA.GW.UI.SendUIMessage(message, (void*)wParam, (nint)lParam);
-    }
+    public unsafe void SendMessage(UIMessage message, nuint wParam, nuint lParam) => GWCA.GW.UI.SendUIMessage(message, (void*)wParam, (nint)lParam);
 
     public unsafe Task<string> AsyncDecodeStringAsync(ushort* encodedString, CancellationToken cancellationToken = default)
     {
