@@ -678,25 +678,25 @@ public sealed class BuildTemplateManager(
         if (primaryProfession != Profession.None)
         {
             build.Attributes.Add(new AttributeEntry { Attribute = primaryProfession.PrimaryAttribute });
-            build.Attributes.AddRange(primaryProfession.Attributes!.Select(a => new AttributeEntry { Attribute = a }));
+            build.Attributes.AddRange(primaryProfession.Attributes?.Select(a => new AttributeEntry { Attribute = a }) ?? []);
         }
         
         if (secondaryProfession != Profession.None)
         {
-            build.Attributes.AddRange(secondaryProfession.Attributes!.Select(a => new AttributeEntry { Attribute = a }));
+            build.Attributes.AddRange(secondaryProfession.Attributes?.Select(a => new AttributeEntry { Attribute = a }) ?? []);
         }
 
         for(int i = 0; i < buildMetadata.AttributeCount; i++)
         {
             var attributeId = buildMetadata.AttributesIds[i];
-            var maybeAttribute = build.Attributes.FirstOrDefault(a => a.Attribute!.Id == attributeId);
+            var maybeAttribute = build.Attributes.FirstOrDefault(a => a.Attribute?.Id == attributeId);
             if (maybeAttribute is null)
             {
                 scopedLogger.LogError("Failed to parse attribute with id {attributeId} for professions {primaryProfession.Name}/{secondaryProfession.Name}", attributeId, primaryProfession.Name ?? string.Empty, secondaryProfession.Name ?? string.Empty);
                 return default;
             }
 
-            maybeAttribute!.Points = buildMetadata.AttributePoints[i];
+            maybeAttribute.Points = buildMetadata.AttributePoints[i];
         }
 
         for(int i = 0; i < 8; i++)
@@ -725,9 +725,9 @@ public sealed class BuildTemplateManager(
             Header = 14,
             PrimaryProfessionId = build.Primary.Id,
             SecondaryProfessionId = build.Secondary.Id,
-            AttributeCount = build.Attributes.Where(attrEntry => attrEntry.Points > 0).Count(),
-            AttributesIds = [.. build.Attributes.Where(attrEntry => attrEntry.Points > 0).OrderBy(attrEntry => attrEntry.Attribute!.Id).Select(attrEntry => attrEntry.Attribute!.Id)],
-            AttributePoints = [.. build.Attributes.Where(attrEntry => attrEntry.Points > 0).OrderBy(attrEntry => attrEntry.Attribute!.Id).Select(attrEntry => attrEntry.Points)],
+            AttributeCount = build.Attributes.Count(attrEntry => attrEntry.Points > 0),
+            AttributesIds = [.. build.Attributes.Where(attrEntry => attrEntry.Points > 0).OrderBy(attrEntry => attrEntry.Attribute?.Id).Select(attrEntry => attrEntry.Attribute?.Id ?? -1)],
+            AttributePoints = [.. build.Attributes.Where(attrEntry => attrEntry.Points > 0).OrderBy(attrEntry => attrEntry.Attribute?.Id).Select(attrEntry => attrEntry.Points)],
             SkillIds = [.. build.Skills.Select(skill => skill.Id)],
             TailPresent = true
         };
