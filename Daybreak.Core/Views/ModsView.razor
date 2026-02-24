@@ -28,7 +28,7 @@
         <div class="mod-row-right">
           <div class="mod-toggle @((mod.IsInstalled && mod.CanDisable ? string.Empty : "disabled"))">
             <FluentLabel class="label">@(mod.IsEnabled ? "Enabled" : "Disabled")</FluentLabel>
-            <FluentSwitch Value="@(mod.IsEnabled)" Disabled="@(!mod.CanDisable)" @onchange="() => this.ViewModel.ToggleMod(mod)" />
+            <FluentSwitch Value="@(mod.IsEnabled)" Disabled="@(!mod.IsInstalled || !mod.CanDisable)" @onchange="() => this.ViewModel.ToggleMod(mod)" />
           </div>
           @if (mod.Loading)
           {
