@@ -11,12 +11,14 @@ using TrailBlazr.ViewModels;
 namespace Daybreak.Views;
 public abstract class BuildTemplateViewModelBase<TViewModel, TView>(
     IBuildTemplateManager buildTemplateManager,
+    IAttributePointCalculator attributePointCalculator,
     IViewManager viewManager)
     : ViewModelBase<TViewModel, TView>
         where TViewModel : BuildTemplateViewModelBase<TViewModel, TView>
         where TView : BuildTemplateViewBase<TView, TViewModel>
 {
     private readonly IBuildTemplateManager buildTemplateManager = buildTemplateManager;
+    private readonly IAttributePointCalculator attributePointCalculator = attributePointCalculator;
     private readonly IViewManager viewManager = viewManager;
 
     public SingleBuildEntry? BuildEntry
@@ -26,6 +28,19 @@ public abstract class BuildTemplateViewModelBase<TViewModel, TView>(
         {
             field = value;
             this.NotifyPropertyChanged(nameof(this.BuildEntry));
+        }
+    }
+
+    public int RemainingAttributePoints
+    {
+        get
+        {
+            if (this.BuildEntry is null)
+            {
+                return 0;
+            }
+
+            return this.attributePointCalculator.GetRemainingFreePoints(this.BuildEntry);
         }
     }
 
@@ -124,7 +139,8 @@ public abstract class BuildTemplateViewModelBase<TViewModel, TView>(
 
     public void AttributeIncreased(AttributeEntry attributeEntry)
     {
-        if (attributeEntry.Points < 12)
+        var pointsRequired = this.attributePointCalculator.GetPointsRequiredToIncreaseRank(attributeEntry.Points);
+        if (attributeEntry.Points < 12 && this.RemainingAttributePoints >= pointsRequired)
         {
             attributeEntry.Points += 1;
             this.UpdateBuildCode();
