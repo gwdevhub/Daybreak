@@ -1,6 +1,7 @@
 ﻿using Daybreak.Shared.Models.LaunchConfigurations;
 
 namespace Daybreak.Shared.Services.LaunchConfigurations;
+
 public interface ILaunchConfigurationService
 {
     IEnumerable<LaunchConfigurationWithCredentials> GetLaunchConfigurations();
@@ -8,6 +9,8 @@ public interface ILaunchConfigurationService
     LaunchConfigurationWithCredentials? CreateConfiguration();
 
     bool SaveConfiguration(LaunchConfigurationWithCredentials launchConfigurationWithCredentials);
+
+    void SaveLaunchConfigurations(List<LaunchConfigurationWithCredentials> launchConfigurations);
 
     bool DeleteConfiguration(LaunchConfigurationWithCredentials launchConfigurationWithCredentials);
 
