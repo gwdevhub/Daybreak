@@ -42,7 +42,7 @@ internal sealed class LaunchConfigurationService(
     public bool SaveConfiguration(LaunchConfigurationWithCredentials launchConfigurationWithCredentials)
     {
         launchConfigurationWithCredentials.ThrowIfNull();
-        if (!this.credentialManager.TryGetCredentialsByIdentifier(launchConfigurationWithCredentials.Credentials?.Identifier!, out var _))
+        if (!this.credentialManager.TryGetCredentialsByIdentifier(launchConfigurationWithCredentials.Credentials?.Identifier ?? string.Empty, out var _))
         {
             return false;
         }
@@ -53,6 +53,19 @@ internal sealed class LaunchConfigurationService(
         }
 
         return this.SaveConfigurationInternal(launchConfigurationWithCredentials);
+    }
+
+    public void SaveLaunchConfigurations(List<LaunchConfigurationWithCredentials> launchConfigurations)
+    {
+        var validConfigs = launchConfigurations
+            .Where(this.IsValid)
+            .Where(c => this.credentialManager.TryGetCredentialsByIdentifier(c.Credentials?.Identifier ?? string.Empty, out _))
+            .Select(ConvertToConfiguration)
+            .OfType<LaunchConfiguration>()
+            .ToList();
+        var options = this.liveUpdateableOptions.CurrentValue;
+        options.LaunchConfigurations = validConfigs;
+        this.optionsProvider.SaveOption(options);
     }
 
     public bool DeleteConfiguration(LaunchConfigurationWithCredentials launchConfigurationWithCredentials)
@@ -162,6 +175,27 @@ internal sealed class LaunchConfigurationService(
             EnabledMods = launchConfiguration.EnabledMods,
             CustomModLoadoutEnabled = launchConfiguration.CustomModLoadoutEnabled ?? false,
             Color = launchConfiguration.Color
+        };
+    }
+
+    private static LaunchConfiguration? ConvertToConfiguration(LaunchConfigurationWithCredentials launchConfigurationWithCredentials)
+    {
+        if (launchConfigurationWithCredentials.Credentials is null)
+        {
+            return default;
+        }
+
+        return new LaunchConfiguration
+        {
+            Identifier = launchConfigurationWithCredentials.Identifier,
+            CredentialsIdentifier = launchConfigurationWithCredentials.Credentials.Identifier,
+            Executable = launchConfigurationWithCredentials.ExecutablePath,
+            Arguments = launchConfigurationWithCredentials.Arguments,
+            Name = launchConfigurationWithCredentials.Name,
+            SteamSupport = launchConfigurationWithCredentials.SteamSupport,
+            EnabledMods = launchConfigurationWithCredentials.EnabledMods,
+            CustomModLoadoutEnabled = launchConfigurationWithCredentials.CustomModLoadoutEnabled,
+            Color = launchConfigurationWithCredentials.Color
         };
     }
 }

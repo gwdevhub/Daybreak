@@ -10,9 +10,36 @@
       <h3>Launch Configurations</h3>
     </div>
     <div class="launch-configs-list">
-      @foreach (var config in this.ViewModel.LaunchConfigurations)
+      @for (var i = 0; i < this.ViewModel.LaunchConfigurations.Count; i++)
       {
-        <div class="launch-configs-row">
+        var config = this.ViewModel.LaunchConfigurations[i];
+        var index = i;
+        <div class="launch-configs-row" id="launch-config-@config.Identifier">
+          <div class="launch-config-reorder">
+            <div class="launch-config-reorder-label">
+              <FluentLabel>Reorder</FluentLabel>
+            </div>
+            <div class="launch-config-reorder-buttons">
+              @if (index > 0)
+              {
+                <FluentButton Appearance="Appearance.Stealth"
+                              IconOnly="true"
+                              Title="Move up"
+                              OnClick="@(() => this.ViewModel.MoveConfigUp(config))">
+                  <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowUp())" />
+                </FluentButton>
+              }
+              @if (index < this.ViewModel.LaunchConfigurations.Count - 1)
+              {
+                <FluentButton Appearance="Appearance.Stealth"
+                              IconOnly="true"
+                              Title="Move down"
+                              OnClick="@(() => this.ViewModel.MoveConfigDown(config))">
+                  <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowDown())" />
+                </FluentButton>
+              }
+            </div>
+          </div>
           <div class="launch-config-identifier">
             <div class="launch-config-identifier-label">
               <FluentLabel>Identifier</FluentLabel>
@@ -133,3 +160,17 @@
 @using Daybreak.Shared.Models;
 @page "/launch-configurations"
 @inherits ViewBase<LaunchConfigurationsView, LaunchConfigurationsViewModel>
+@inject IJSRuntime JSRuntime
+@code {
+    public async Task ScrollToConfigAsync(string identifier)
+    {
+        try
+        {
+            await this.JSRuntime.InvokeVoidAsync("eval",
+                $"setTimeout(() => document.getElementById('launch-config-{identifier}')?.scrollIntoView({{ behavior: 'smooth', block: 'start' }}), 50)");
+        }
+        catch
+        {
+        }
+    }
+}

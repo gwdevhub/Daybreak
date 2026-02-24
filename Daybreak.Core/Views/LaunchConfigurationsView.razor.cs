@@ -47,12 +47,14 @@ public sealed class LaunchConfigurationsViewModel(
         config.ExecutablePath = this.Executables.FirstOrDefault();
         this.launchConfigurationService.SaveConfiguration(config);
         this.LaunchConfigurations.Insert(0, config);
+        this.RefreshView();
     }
 
     public void ExecutableChanged(LaunchConfigurationWithCredentials configuration, string newValue)
     {
         configuration.ExecutablePath = string.IsNullOrWhiteSpace(newValue) ? null : newValue;
         this.launchConfigurationService.SaveConfiguration(configuration);
+        this.RefreshView();
     }
 
     public void CredentialsChanged(LaunchConfigurationWithCredentials configuration, string newCredsId)
@@ -64,36 +66,42 @@ public sealed class LaunchConfigurationsViewModel(
 
         configuration.Credentials = newCreds;
         this.launchConfigurationService.SaveConfiguration(configuration);
+        this.RefreshView();
     }
 
     public void CustomArgsChanged(LaunchConfigurationWithCredentials configuration, string newArgs)
     {
         configuration.Arguments = newArgs;
         this.launchConfigurationService.SaveConfiguration(configuration);
+        this.RefreshView();
     }
 
     public void DeleteLaunchConfiguration(LaunchConfigurationWithCredentials configuration)
     {
         this.launchConfigurationService.DeleteConfiguration(configuration);
-        this.LaunchConfigurations.Remove(configuration);
+        this.LaunchConfigurations.RemoveAt(this.LaunchConfigurations.FindIndex(c => c.Identifier == configuration.Identifier));
+        this.RefreshView();
     }
 
     public void CustomNameChanged(LaunchConfigurationWithCredentials configuration, string newName)
     {
         configuration.Name = newName;
         this.launchConfigurationService.SaveConfiguration(configuration);
+        this.RefreshView();
     }
 
     public void SteamSupportChanged(LaunchConfigurationWithCredentials configuration, bool isEnabled)
     {
         configuration.SteamSupport = isEnabled;
         this.launchConfigurationService.SaveConfiguration(configuration);
+        this.RefreshView();
     }
 
     public void CustomModLoadoutChanged(LaunchConfigurationWithCredentials configuration, bool isEnabled)
     {
         configuration.CustomModLoadoutEnabled = isEnabled;
         this.launchConfigurationService.SaveConfiguration(configuration);
+        this.RefreshView();
     }
 
     public void ManageCustomMods(LaunchConfigurationWithCredentials configuration)
@@ -105,10 +113,49 @@ public sealed class LaunchConfigurationsViewModel(
     {
         configuration.Color = string.IsNullOrWhiteSpace(newColor) ? null : newColor;
         this.launchConfigurationService.SaveConfiguration(configuration);
+        this.RefreshView();
     }
 
     public string GetColorDisplayName(string colorName)
     {
         return string.IsNullOrWhiteSpace(colorName) ? "Default" : colorName;
+    }
+
+    public async Task MoveConfigUp(LaunchConfigurationWithCredentials config)
+    {
+        var currentIndex = this.LaunchConfigurations.FindIndex(c => c.Identifier == config.Identifier);
+        if (currentIndex <= 0)
+        {
+            return;
+        }
+
+        this.LaunchConfigurations.RemoveAt(currentIndex);
+        this.LaunchConfigurations.Insert(currentIndex - 1, config);
+        this.launchConfigurationService.SaveLaunchConfigurations(this.LaunchConfigurations);
+        await this.RefreshViewAsync();
+        if (config.Identifier is string identifier &&
+            this.View is not null)
+        {
+            await this.View.ScrollToConfigAsync(identifier);
+        }
+    }
+
+    public async Task MoveConfigDown(LaunchConfigurationWithCredentials config)
+    {
+        var currentIndex = this.LaunchConfigurations.FindIndex(c => c.Identifier == config.Identifier);
+        if (currentIndex < 0 || currentIndex >= this.LaunchConfigurations.Count - 1)
+        {
+            return;
+        }
+
+        this.LaunchConfigurations.RemoveAt(currentIndex);
+        this.LaunchConfigurations.Insert(currentIndex + 1, config);
+        this.launchConfigurationService.SaveLaunchConfigurations(this.LaunchConfigurations);
+        await this.RefreshViewAsync();
+        if (config.Identifier is string identifier &&
+            this.View is not null)
+        {
+            await this.View.ScrollToConfigAsync(identifier);
+        }
     }
 }
