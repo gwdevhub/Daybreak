@@ -3,6 +3,9 @@
         <button class="title-bar-btn" @onclick="this.ViewModel.CreateNewSingleBuild" title="Create build">
             <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.PersonAdd()" />
         </button>
+        <button class="title-bar-btn" @onclick="this.ViewModel.OpenBuildsSynchronizationView" title="Synchronize builds">
+            <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.CloudArchive()" />
+        </button>
     </div>
     <div class="stretch-container backdrop-panel">
         <div class="header-section" @onmouseenter="this.ViewModel.CloseSnippet">
