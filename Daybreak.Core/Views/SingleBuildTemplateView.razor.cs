@@ -5,8 +5,9 @@ using TrailBlazr.Services;
 namespace Daybreak.Views;
 public sealed class SingleBuildTemplateViewModel(
     IViewManager viewManager,
-    IBuildTemplateManager buildTemplateManager)
-    : BuildTemplateViewModelBase<SingleBuildTemplateViewModel, SingleBuildTemplateView>(buildTemplateManager, viewManager)
+    IBuildTemplateManager buildTemplateManager,
+    IAttributePointCalculator attributePointCalculator)
+    : BuildTemplateViewModelBase<SingleBuildTemplateViewModel, SingleBuildTemplateView>(buildTemplateManager, attributePointCalculator, viewManager)
 {
     protected override void LoadBuild(IBuildEntry? buildEntry)
     {

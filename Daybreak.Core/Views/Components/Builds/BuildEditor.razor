@@ -56,7 +56,7 @@
                             <button class="attribute-btn increase" 
                                     @onclick="() => this.OnAttributeIncreased(attributeEntry)"
                                     @onclick:stopPropagation="true"
-                                    disabled="@(attributeEntry.Points >= 12)">
+                                    disabled="@(attributeEntry.Points >= 12 || !this.CanIncreaseAttribute(attributeEntry.Points))">
                                 +
                             </button>
                         </div>
@@ -190,6 +190,9 @@
     [Parameter]
     public required Action<string> BuildCodeChanged { get; init; }
 
+    [Parameter]
+    public int RemainingAttributePoints { get; set; }
+
     private bool isSkillsPanelExpanded = false;
     private int selectedSkillIndex = -1;
     private string searchTerm = string.Empty;
@@ -267,5 +270,19 @@
         {
             this.BuildCodeChanged(newCode);
         }
+    }
+
+    // Points required to increase from rank N to N+1 (based on GW wiki)
+    private static readonly int[] PointsRequiredToIncreaseRank = [1, 2, 3, 4, 5, 6, 7, 9, 11, 13, 16, 20];
+
+    private bool CanIncreaseAttribute(int currentPoints)
+    {
+        if (currentPoints >= 12)
+        {
+            return false;
+        }
+
+        var pointsRequired = PointsRequiredToIncreaseRank[currentPoints];
+        return this.RemainingAttributePoints >= pointsRequired;
     }
 }

@@ -9,8 +9,9 @@ namespace Daybreak.Views;
 
 public sealed class TeamBuildTemplateViewModel(
     IBuildTemplateManager buildTemplateManager,
+    IAttributePointCalculator attributePointCalculator,
     IViewManager viewManager)
-    : BuildTemplateViewModelBase<TeamBuildTemplateViewModel, TeamBuildTemplateView>(buildTemplateManager, viewManager)
+    : BuildTemplateViewModelBase<TeamBuildTemplateViewModel, TeamBuildTemplateView>(buildTemplateManager, attributePointCalculator, viewManager)
 {
     public TeamBuildEntry? TeamEntry
     {
