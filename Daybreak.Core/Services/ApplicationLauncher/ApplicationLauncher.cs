@@ -183,9 +183,9 @@ internal sealed class ApplicationLauncher(
         var enabledMods = mods
             .Where(m =>
             {
-                var willRun = launchConfigurationWithCredentials.CustomModLoadoutEnabled
-                    ? !m.CanDisable || (launchConfigurationWithCredentials.EnabledMods?.Contains(m.Name) is true)
-                    : m.IsEnabled;
+                var willRun = m.IsInstalled && (launchConfigurationWithCredentials.CustomModLoadoutEnabled
+                        ? !m.CanDisable || (launchConfigurationWithCredentials.EnabledMods?.Contains(m.Name) is true)
+                        : m.IsEnabled);
                 scopedLogger.LogDebug(
                         "Checking {ModName}.\nIsInstalled: {isInstalled}.\nCanDisable: {canDisable}.\nIsEnabled: {isEnabled}.\nWillRun: {willRun}",
                         m.Name, m.IsInstalled, m.CanDisable, m.IsEnabled, willRun);
