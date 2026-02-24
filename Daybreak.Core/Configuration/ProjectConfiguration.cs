@@ -305,6 +305,7 @@ public class ProjectConfiguration : PluginConfigurationBase
         viewProducer.RegisterView<WikiView, WikiViewModel>();
         viewProducer.RegisterView<ReShadeManagementView, ReShadeManagementViewModel>();
         viewProducer.RegisterView<GuildWarsMarketView, GuildWarsMarketViewModel>();
+        viewProducer.RegisterView<BuildsSynchronizationView, BuildsSynchronizationViewModel>();
     }
 
     public override void RegisterStartupActions(IStartupActionProducer startupActionProducer)
@@ -425,8 +426,6 @@ public class ProjectConfiguration : PluginConfigurationBase
             );
         menuServiceProducer
             .CreateIfNotExistCategory("Daybreak")
-            //TODO: Implement Notifications view
-            //.RegisterButton("Notifications", "Open notifications view", sp => { })
             .RegisterButton(
                 "Manage Plugins",
                 "Open plugins view",

@@ -93,7 +93,7 @@ internal sealed class GraphClient : IGraphClient
                         <head><title>Daybreak - Authentication Successful</title></head>
                         <body style="font-family: system-ui, -apple-system, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                             <div style="text-align: center; color: white; padding: 40px;">
-                                <h1 style="margin-bottom: 20px;">✓ Authentication Successful</h1>
+                                <h1 style="margin-bottom: 20px;">Authentication Successful</h1>
                                 <p>You can now close this window and return to Daybreak.</p>
                             </div>
                         </body>
@@ -104,7 +104,7 @@ internal sealed class GraphClient : IGraphClient
                         <head><title>Daybreak - Authentication Failed</title></head>
                         <body style="font-family: system-ui, -apple-system, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: linear-gradient(135deg, #f44336 0%, #e91e63 100%);">
                             <div style="text-align: center; color: white; padding: 40px;">
-                                <h1 style="margin-bottom: 20px;">✗ Authentication Failed</h1>
+                                <h1 style="margin-bottom: 20px;">Authentication Failed</h1>
                                 <p>Please close this window and try again in Daybreak.</p>
                             </div>
                         </body>
@@ -202,6 +202,7 @@ internal sealed class GraphClient : IGraphClient
                 build.SourceUrl = buildFile.SourceUrl;
                 build.Name = buildFile.FileName;
                 build.PreviousName = buildFile.FileName;
+                build.Metadata = buildFile.Metadata;
                 return build;
             })
             .Where(entry => entry is not null)
@@ -239,6 +240,7 @@ internal sealed class GraphClient : IGraphClient
                 build.SourceUrl = buildFile.SourceUrl;
                 build.Name = buildFile.FileName;
                 build.PreviousName = buildFile.FileName;
+                build.Metadata = buildFile.Metadata;
                 return build;
             })
             .Where(entry => entry is not null)
@@ -397,6 +399,7 @@ internal sealed class GraphClient : IGraphClient
                 FileName = buildEntry.Name,
                 TemplateCode = this.buildTemplateManager.EncodeTemplate(buildEntry),
                 SourceUrl = buildEntry.SourceUrl,
+                Metadata = buildEntry.Metadata,
             };
 
             var buildList = this.buildsCache ?? [];
@@ -441,6 +444,7 @@ internal sealed class GraphClient : IGraphClient
                 FileName = buildEntry.Name,
                 TemplateCode = this.buildTemplateManager.EncodeTemplate(buildEntry),
                 SourceUrl = buildEntry.SourceUrl,
+                Metadata = buildEntry.Metadata,
             });
 
             var buildList = new List<BuildFile>();
