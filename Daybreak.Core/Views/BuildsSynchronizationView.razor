@@ -1,0 +1,97 @@
+<div class="container" @onmouseenter="this.ViewModel.CloseSnippet">
+    <div class="title-bar-additional-btns-left">
+        <button class="title-bar-btn" @onclick="this.ViewModel.UploadAllBuilds" title="Upload all local builds to remote">
+            <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowUpload()" />
+        </button>
+        <button class="title-bar-btn" @onclick="this.ViewModel.DownloadAllBuilds" title="Download all remote builds to local">
+            <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowDownload()" />
+        </button>
+    </div>
+    <div class="stretch-container backdrop-panel">
+        @if (this.ViewModel.Loading)
+        {
+            <div class="loading-overlay">
+                <SpinnerWidget IsLoading="true" />
+            </div>
+        }
+        <div class="builds-container" style="@(this.ViewModel.Loading ? "pointer-events: none; opacity: 0.5;" : "")">
+            <div class="builds-headers">
+                <div class="panel-header">
+                    <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Desktop()" />
+                    <h4>Local Builds (@this.ViewModel.LocalBuilds.Count(b => b.Status != BuildDiffStatus.Placeholder))</h4>
+                </div>
+                <div class="panel-header">
+                    <FluentIcon Value="new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Cloud()" />
+                    <h4>Remote Builds (@this.ViewModel.RemoteBuilds.Count(b => b.Status != BuildDiffStatus.Placeholder))</h4>
+                </div>
+            </div>
+            <div class="builds-scroll-container" @onmouseenter="this.ViewModel.CloseSnippet">
+                    <div class="builds-panels">
+                        <div class="builds-column">
+                            @if (this.ViewModel.LocalBuilds.Count == 0)
+                            {
+                                <div class="no-builds">
+                                    <span>No local builds found</span>
+                                </div>
+                            }
+                            else
+                            {
+                                @foreach (var build in this.ViewModel.LocalBuilds)
+                                {
+                                    <div class="build-row @GetStatusClass(build.Status) @(build.BuildEntry is not null && build.Status != BuildDiffStatus.InSync ? "clickable" : "")"
+                                         @onclick="() => this.ViewModel.UploadSingleBuild(build)"
+                                         @onmouseenter="(e) => { if (build.BuildEntry is not null) { this.ViewModel.OpenSnippet(build, e); } else { this.ViewModel.CloseSnippet(); } }"
+                                         @onmousemove="(e) => this.ViewModel.MouseMoveBuildEntry(e)">
+                                        <span class="build-name">@build.Name</span>
+                                        <span class="build-code">@build.TemplateCode</span>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <div class="builds-column">
+                            @if (this.ViewModel.RemoteBuilds.Count == 0)
+                            {
+                                <div class="no-builds">
+                                    <span>No remote builds found</span>
+                                </div>
+                            }
+                            else
+                            {
+                                @foreach (var build in this.ViewModel.RemoteBuilds)
+                                {
+                                    <div class="build-row @GetStatusClass(build.Status) @(build.BuildEntry is not null && build.Status != BuildDiffStatus.InSync ? "clickable" : "")"
+                                         @onclick="() => this.ViewModel.DownloadSingleBuild(build)"
+                                         @onmouseenter="(e) => { if (build.BuildEntry is not null) { this.ViewModel.OpenSnippet(build, e); } else { this.ViewModel.CloseSnippet(); } }"
+                                         @onmousemove="(e) => this.ViewModel.MouseMoveBuildEntry(e)">
+                                        <span class="build-name">@build.Name</span>
+                                        <span class="build-code">@build.TemplateCode</span>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+                @if (this.ViewModel.ShowSnippet && this.ViewModel.HoveredEntry?.BuildEntry is not null && this.ViewModel.SnippetPosition.HasValue)
+                {
+                    <div class="build-snippet-overlay" style="top: @(this.ViewModel.SnippetPosition.Value.Y)px; left: @(this.ViewModel.SnippetPosition.Value.X)px;">
+                        <BuildSnippet BuildEntry="this.ViewModel.HoveredEntry.BuildEntry" />
+                    </div>
+                }
+            </div>
+    </div>
+</div>
+
+@page "/synchronization/builds"
+@inherits ViewBase<BuildsSynchronizationView, BuildsSynchronizationViewModel>
+
+@code {
+    private static string GetStatusClass(BuildDiffStatus status) => status switch
+    {
+        BuildDiffStatus.InSync => "status-in-sync",
+        BuildDiffStatus.LocalOnly => "status-local-only",
+        BuildDiffStatus.RemoteOnly => "status-remote-only",
+        BuildDiffStatus.Modified => "status-modified",
+        BuildDiffStatus.Placeholder => "status-placeholder",
+        _ => ""
+    };
+}

@@ -120,6 +120,11 @@ public sealed class BuildListViewModel
         this.RefreshView();
     }
 
+    public void OpenBuildsSynchronizationView()
+    {
+        this.viewManager.ShowView<BuildsSynchronizationView>();
+    }
+
     public void CreateNewSingleBuild()
     {
         var build = this.buildTemplateManager.CreateSingleBuild();
