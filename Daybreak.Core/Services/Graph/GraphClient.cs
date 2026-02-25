@@ -202,7 +202,6 @@ internal sealed class GraphClient : IGraphClient
                 build.SourceUrl = buildFile.SourceUrl;
                 build.Name = buildFile.FileName;
                 build.PreviousName = buildFile.FileName;
-                build.Metadata = buildFile.Metadata;
                 return build;
             })
             .Where(entry => entry is not null)
@@ -240,7 +239,6 @@ internal sealed class GraphClient : IGraphClient
                 build.SourceUrl = buildFile.SourceUrl;
                 build.Name = buildFile.FileName;
                 build.PreviousName = buildFile.FileName;
-                build.Metadata = buildFile.Metadata;
                 return build;
             })
             .Where(entry => entry is not null)
@@ -399,7 +397,6 @@ internal sealed class GraphClient : IGraphClient
                 FileName = buildEntry.Name,
                 TemplateCode = this.buildTemplateManager.EncodeTemplate(buildEntry),
                 SourceUrl = buildEntry.SourceUrl,
-                Metadata = buildEntry.Metadata,
             };
 
             var buildList = this.buildsCache ?? [];
@@ -444,7 +441,6 @@ internal sealed class GraphClient : IGraphClient
                 FileName = buildEntry.Name,
                 TemplateCode = this.buildTemplateManager.EncodeTemplate(buildEntry),
                 SourceUrl = buildEntry.SourceUrl,
-                Metadata = buildEntry.Metadata,
             });
 
             var buildList = new List<BuildFile>();

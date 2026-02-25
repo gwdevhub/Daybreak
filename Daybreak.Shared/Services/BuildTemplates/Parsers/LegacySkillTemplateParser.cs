@@ -7,7 +7,7 @@ namespace Daybreak.Shared.Services.BuildTemplates.Parsers;
 /// Parser for legacy skill templates (header values 0, 2-13).
 /// See <see cref="Templates.md"/> for details on the skill template format.
 /// </summary>
-public sealed class LegacySkillTemplateParser : ITemplateParser<SkillTemplateMetadata>
+public sealed class LegacySkillTemplateParser : SkillTemplateParserBase, ITemplateParser<SkillTemplateMetadata>
 {
     public bool CanDecode(TemplateHeader header)
     {
@@ -34,31 +34,16 @@ public sealed class LegacySkillTemplateParser : ITemplateParser<SkillTemplateMet
     {
         // For legacy templates, header was already read and IS the version
         // The stream position is already past the header (4 bits)
-        // We need to reconstruct the version from the header that was read
-        
-        // Read profession length and professions
-        var professionIdLength = (context.DecodeCharStream.Read(2) * 2) + 4;
-        var primaryProfessionId = context.DecodeCharStream.Read(professionIdLength);
-        var secondaryProfessionId = context.DecodeCharStream.Read(professionIdLength);
+        // Decode embedded build (professions, attributes, skills)
+        var (primaryProfessionId, secondaryProfessionId, attributeIds, attributePoints, skillIds) = DecodeEmbeddedBuild(context);
 
-        // Read attributes
-        var attributeCount = context.DecodeCharStream.Read(4);
-        var attributesLength = context.DecodeCharStream.Read(4) + 4;
-        var attributeIds = new List<int>();
-        var attributePoints = new List<int>();
-        for (int i = 0; i < attributeCount; i++)
-        {
-            attributeIds.Add(context.DecodeCharStream.Read(attributesLength));
-            attributePoints.Add(context.DecodeCharStream.Read(4));
-        }
-
-        // Read skills
-        var skillsLength = context.DecodeCharStream.Read(4) + 8;
-        var skillIds = new List<int>();
-        for (int i = 0; i < 8; i++)
-        {
-            skillIds.Add(context.DecodeCharStream.Read(skillsLength));
-        }
+        // Calculate lengths for metadata (reverse the formulas)
+        var professionIdLength = GetBitLength(Math.Max(primaryProfessionId, secondaryProfessionId));
+        professionIdLength = Math.Max(4, ((professionIdLength - 4) / 2 * 2) + 4); // Normalize to valid length
+        var attributesLength = GetBitLength(attributeIds.Count > 0 ? attributeIds.Max() : 0);
+        attributesLength = Math.Max(4, attributesLength);
+        var skillsLength = GetBitLength(skillIds.Count > 0 ? skillIds.Max() : 0);
+        skillsLength = Math.Max(8, skillsLength);
 
         // Check for tail
         var tailPresent = context.DecodeCharStream.Position < context.DecodeCharStream.Length - 1;
@@ -70,7 +55,7 @@ public sealed class LegacySkillTemplateParser : ITemplateParser<SkillTemplateMet
             professionIdLength: professionIdLength,
             primaryProfessionId: primaryProfessionId,
             secondaryProfessionId: secondaryProfessionId,
-            attributeCount: attributeCount,
+            attributeCount: attributeIds.Count,
             attributesLength: attributesLength,
             skillLength: skillsLength,
             tailPresent: tailPresent,

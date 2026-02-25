@@ -2,9 +2,10 @@
 
 public interface IBuildEntry
 {
-    public DateTime CreationTime { get; set; }
-    public Dictionary<string, string>? Metadata { get; set; }
-    public string? SourceUrl { get; set; }
-    public string? PreviousName { get; set; }
-    public string? Name { get; set; }
+    DateTime CreationTime { get; set; }
+    string? SourceUrl { get; set; }
+    string? PreviousName { get; set; }
+    string? Name { get; set; }
+    int? ToolboxBuildId { get; set; }
+    bool IsToolboxBuild { get; set; }
 }

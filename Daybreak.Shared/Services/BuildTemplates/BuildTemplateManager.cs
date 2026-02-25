@@ -133,7 +133,9 @@ public sealed class BuildTemplateManager(
         singleBuildEntry.Name = teamBuildEntry.Name;
         singleBuildEntry.PreviousName = teamBuildEntry.PreviousName;
         singleBuildEntry.SourceUrl = teamBuildEntry.SourceUrl;
-        singleBuildEntry.Metadata = teamBuildEntry.Metadata;
+        singleBuildEntry.ToolboxBuildId = teamBuildEntry.ToolboxBuildId;
+        singleBuildEntry.IsToolboxBuild = teamBuildEntry.IsToolboxBuild;
+        singleBuildEntry.CreationTime = teamBuildEntry.CreationTime;
 
         return singleBuildEntry;
     }
@@ -146,7 +148,9 @@ public sealed class BuildTemplateManager(
             PreviousName = singleBuildEntry.PreviousName,
             SourceUrl = singleBuildEntry.SourceUrl,
             Builds = [ singleBuildEntry ],
-            Metadata = singleBuildEntry.Metadata
+            ToolboxBuildId = singleBuildEntry.ToolboxBuildId,
+            IsToolboxBuild = singleBuildEntry.IsToolboxBuild,
+            CreationTime = singleBuildEntry.CreationTime
         };
 
         return teamBuildEntry;
@@ -252,18 +256,7 @@ public sealed class BuildTemplateManager(
 
     public void SaveBuild(IBuildEntry buildEntry)
     {
-        var encodedBuild = new StringBuilder();
-        if (buildEntry is SingleBuildEntry singleBuild)
-        {
-            encodedBuild.Append(this.EncodeTemplateInner(singleBuild));
-        }
-        else if (buildEntry is TeamBuildEntry teamBuild)
-        {
-            foreach(var singleBuildEntry in teamBuild.Builds)
-            {
-                encodedBuild.Append(this.EncodeTemplateInner(singleBuildEntry)).Append(' ');
-            }
-        }
+        var encodedBuild = this.EncodeTemplate(buildEntry);
 
         var newPath = Path.Combine(BuildsPath, $"{buildEntry.Name}.txt");
         if (string.IsNullOrWhiteSpace(buildEntry.PreviousName) is false)
@@ -276,12 +269,7 @@ public sealed class BuildTemplateManager(
         }
 
         Directory.CreateDirectory(Path.GetDirectoryName(newPath)!);
-        var metadata = buildEntry.Metadata is not null
-            ? Convert.ToBase64String(
-                Encoding.UTF8.GetBytes(
-                    JsonSerializer.Serialize(buildEntry.Metadata)))
-            : string.Empty;
-        File.WriteAllText(newPath, $"{encodedBuild.ToString().Trim()}\n{metadata}");
+        File.WriteAllText(newPath, encodedBuild);
 
         // Remove the build from the memory cache once it's created on disk
         this.BuildMemoryCache.Remove(buildEntry);
@@ -587,7 +575,7 @@ public sealed class BuildTemplateManager(
 
         build.Name = buildName;
         build.PreviousName = buildName;
-        if (content.Length > 1)
+        if (content.Length > 1 && !string.IsNullOrWhiteSpace(content[1]))
         {
             // This check has to stay in place for backwards compatibility. If the second line in a build is url, it is the source Url of the build. Otherwise, it is a base64 encoded metadata of the build
             if (Uri.TryCreate(content[1], UriKind.Absolute, out var sourceUrl))
@@ -598,10 +586,44 @@ public sealed class BuildTemplateManager(
             {
                 try
                 {
-                    build.Metadata =
-                        JsonSerializer.Deserialize<Dictionary<string, string>>(
+                    var legacyMetadata = JsonSerializer.Deserialize<Dictionary<string, string>>(
                             Encoding.UTF8.GetString(
                                 Convert.FromBase64String(content[1])));
+
+                    // Extract legacy metadata into proper properties
+                    if (legacyMetadata is not null)
+                    {
+                        if (legacyMetadata.TryGetValue("SourceUrl", out var sourceUrlValue))
+                        {
+                            build.SourceUrl = sourceUrlValue;
+                        }
+
+                        if (legacyMetadata.TryGetValue("CreationTime", out var creationTimeString) &&
+                            int.TryParse(creationTimeString, out var creationTimeUnix))
+                        {
+                            build.CreationTime = DateTimeOffset.FromUnixTimeSeconds(creationTimeUnix).DateTime;
+                        }
+
+                        if (legacyMetadata.TryGetValue("ToolboxBuildId", out var toolboxIdString) &&
+                            int.TryParse(toolboxIdString, out var toolboxId))
+                        {
+                            build.ToolboxBuildId = toolboxId;
+                        }
+
+                        if (legacyMetadata.TryGetValue("IsToolboxBuild", out var isToolboxBuildString) &&
+                            bool.TryParse(isToolboxBuildString, out var isToolboxBuild))
+                        {
+                            build.IsToolboxBuild = isToolboxBuild;
+                        }
+
+                        // Extract party composition for team builds
+                        if (build is TeamBuildEntry teamBuild &&
+                            legacyMetadata.TryGetValue("PartyComposition", out var partyCompositionJson) &&
+                            !string.IsNullOrWhiteSpace(partyCompositionJson))
+                        {
+                            teamBuild.PartyComposition = JsonSerializer.Deserialize<List<PartyCompositionMetadataEntry>>(partyCompositionJson);
+                        }
+                    }
                 }
                 catch(Exception ex)
                 {
