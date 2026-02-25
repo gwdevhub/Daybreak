@@ -21,13 +21,25 @@
                             {
                                 <option value="@index">@build.Primary.Alias / @build.Secondary.Alias Main Player</option>
                             }
+                            else if (composition?.Type is Shared.Models.Guildwars.PartyCompositionMemberType.Player)
+                            {
+                                <option value="@index">@build.Primary.Alias / @build.Secondary.Alias Player</option>
+                            }
                             else if (composition?.Type is Shared.Models.Guildwars.PartyCompositionMemberType.Hero)
                             {
                                 _ = Shared.Models.Guildwars.Hero.TryParse(composition?.HeroId ?? -1, out var hero);
                                 <option value="@index">@build.Primary.Alias / @build.Secondary.Alias @hero.Name</option>
                             }
+                            else if (composition?.Type is Shared.Models.Guildwars.PartyCompositionMemberType.Henchman)
+                            {
+                                <option value="@index">@build.Primary.Alias / @build.Secondary.Alias Henchman</option>
+                            }
                         }
                     </select>
+                </div>
+                <div class="team-code">
+                    <label for="team-code">Team Code:</label>
+                    <textarea id="team-code" class="team-code-input" @onchange="e => this.ViewModel.TeamCodeChanged(e.Value?.ToString() ?? string.Empty)">@this.ViewModel.TeamCode</textarea>
                 </div>
             </div>
         }
@@ -63,7 +75,9 @@
                 var name = composition?.Type switch
                 {
                     Shared.Models.Guildwars.PartyCompositionMemberType.MainPlayer => "Main Player",
+                    Shared.Models.Guildwars.PartyCompositionMemberType.Player => "Player",
                     Shared.Models.Guildwars.PartyCompositionMemberType.Hero => Shared.Models.Guildwars.Hero.TryParse(composition?.HeroId ?? -1, out var hero) ? hero.Name : "Unknown Hero",
+                    Shared.Models.Guildwars.PartyCompositionMemberType.Henchman => "Henchman",
                     _ => "Unknown Member"
                 };
                 var attributesString = string.Join(", ", build.Attributes.Where(a => a.Points > 0).Select(a => $"{a.Attribute?.AlternativeName ?? string.Empty}: {a.Points}"));

@@ -31,6 +31,7 @@
 
 .build-selection {
     display: flex;
+    align-items: stretch;
     margin-top: 10px;
     padding: 20px 20px 0 20px;
 }
@@ -49,12 +50,37 @@
     }
 
 .build-select {
+    flex: 1;
+}
+
+.team-code {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-left: 20px;
+}
+
+    .team-code label {
+        font-weight: bold;
+        font-size: var(--font-size-medium);
+        color: var(--neutral-input-rest);
+    }
+
+.team-code-input {
+    flex: 1;
     padding: 8px 12px;
     border-radius: 4px;
     font-size: var(--font-size-medium);
     background-color: var(--neutral-fill-rest);
     color: var(--neutral-input-rest);
     border: 1px solid var(--neutral-foreground-rest);
+    font-family: monospace;
+    overflow-x: hidden;
+    overflow-y: auto;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    resize: none;
 }
 
 .summary-popup {

@@ -62,7 +62,7 @@ public sealed class PartyLoadoutTemplateParser : SkillTemplateParserBase, ITempl
         // Read behavior (2 bits)
         var behavior = context.DecodeCharStream.Read(2);
 
-        // Read embedded build (no header/version)
+        // Read embedded build
         var (primaryId, secondaryId, attributeIds, attributePoints, skillIds) = DecodeEmbeddedBuild(context);
 
         return new PartyLoadoutMemberMetadata(
@@ -75,8 +75,6 @@ public sealed class PartyLoadoutTemplateParser : SkillTemplateParserBase, ITempl
             attributePoints,
             skillIds);
     }
-
-    // DecodeEmbeddedBuild is inherited from SkillTemplateParserBase
 
     public IBuildEntry CreateBuildEntry(PartyLoadoutTemplateMetadata templateContext)
     {
@@ -112,9 +110,14 @@ public sealed class PartyLoadoutTemplateParser : SkillTemplateParserBase, ITempl
                 _ => HeroBehavior.Undefined
             };
 
+            // The first player in the party is the main player
+            var memberType = member.MemberType == PartyCompositionMemberType.Player && i == 0
+                ? PartyCompositionMemberType.MainPlayer
+                : member.MemberType;
+
             partyComposition.Add(new PartyCompositionMetadataEntry
             {
-                Type = member.MemberType,
+                Type = memberType,
                 Index = i,
                 HeroId = member.MemberType == PartyCompositionMemberType.Hero ? member.HeroId : null,
                 Behavior = behavior
