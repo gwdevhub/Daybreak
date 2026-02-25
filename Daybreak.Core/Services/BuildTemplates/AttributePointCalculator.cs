@@ -1,5 +1,4 @@
 ﻿using Daybreak.Shared.Models.Builds;
-using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.BuildTemplates;
 
 namespace Daybreak.Services.BuildTemplates;
@@ -31,28 +30,9 @@ internal sealed class AttributePointCalculator : IAttributePointCalculator
         return PointsRequiredToIncreaseRankMapping[currentRank];
     }
 
-    public int GetRemainingFreePoints(Build build)
-    {
-        return this.MaximumAttributePoints - this.GetUsedPoints(build);
-    }
-
     public int GetRemainingFreePoints(SingleBuildEntry build)
     {
         return this.MaximumAttributePoints - this.GetUsedPoints(build);
-    }
-
-    public int GetUsedPoints(Build build)
-    {
-        var totalPoints = 0;
-        foreach(var attribute in build.Attributes)
-        {
-            for(var i = 0; i < attribute.Points; i++)
-            {
-                totalPoints += this.GetPointsRequiredToIncreaseRank(i);
-            }
-        }
-
-        return totalPoints;
     }
 
     public int GetUsedPoints(SingleBuildEntry build)

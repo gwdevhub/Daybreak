@@ -3,8 +3,63 @@ using System.ComponentModel;
 using Attribute = Daybreak.Shared.Models.Guildwars.Attribute;
 
 namespace Daybreak.Shared.Models.Builds;
-public sealed class SingleBuildEntry : BuildEntryBase, IBuildEntry, INotifyPropertyChanged, IEquatable<SingleBuildEntry>
+
+public sealed class SingleBuildEntry : IBuildEntry, INotifyPropertyChanged, IEquatable<SingleBuildEntry>
 {
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public string? Name
+    {
+        get;
+        set
+        {
+            field = value;
+            this.OnPropertyChanged(nameof(this.Name));
+        }
+    }
+
+    public string? PreviousName { get; set; }
+
+    public string? SourceUrl
+    {
+        get;
+        set
+        {
+            field = value;
+            this.OnPropertyChanged(nameof(this.SourceUrl));
+        }
+    }
+
+    public DateTime CreationTime
+    {
+        get;
+        set
+        {
+            field = value;
+            this.OnPropertyChanged(nameof(this.CreationTime));
+        }
+    }
+
+    public int? ToolboxBuildId
+    {
+        get;
+        set
+        {
+            field = value;
+            this.OnPropertyChanged(nameof(this.ToolboxBuildId));
+        }
+    }
+
+    public bool IsToolboxBuild
+    {
+        get;
+        set
+        {
+            field = value;
+            this.OnPropertyChanged(nameof(this.IsToolboxBuild));
+        }
+    }
+
     public Profession Primary
     {
         get;
@@ -275,5 +330,10 @@ public sealed class SingleBuildEntry : BuildEntryBase, IBuildEntry, INotifyPrope
     public override int GetHashCode()
     {
         return HashCode.Combine(this.Name, this.PreviousName, this.SourceUrl, this.Primary.Name, this.Secondary.Name, string.Join(';', this.Skills.Select(s => s.Id)));
+    }
+
+    private void OnPropertyChanged(string propertyName)
+    {
+        this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
