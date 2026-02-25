@@ -207,7 +207,6 @@ public sealed class BuildsSynchronizationViewModel
             {
                 build.Name = buildFile.FileName;
                 build.SourceUrl = buildFile.SourceUrl;
-                build.Metadata = buildFile.Metadata;
                 this.remoteBuildEntries[buildFile.FileName] = build;
             }
         }

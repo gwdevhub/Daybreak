@@ -3,18 +3,19 @@ using Daybreak.Shared.Models.Api;
 using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.BuildTemplates.Models;
+using Daybreak.Shared.Services.BuildTemplates.Parsers;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
 using System.Extensions;
 using System.Extensions.Core;
 using System.Text;
 using System.Text.Json;
-using AttributeEntry = Daybreak.Shared.Models.Builds.AttributeEntry;
 using Convert = System.Convert;
 
 namespace Daybreak.Shared.Services.BuildTemplates;
 
 public sealed class BuildTemplateManager(
+    IEnumerable<ITemplateParser> templateParsers,
     ILogger<BuildTemplateManager> logger) : IBuildTemplateManager
 {
     private const string DecodingLookupTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
@@ -22,6 +23,7 @@ public sealed class BuildTemplateManager(
 
     private List<IBuildEntry> BuildMemoryCache { get; } = [];
 
+    private readonly IEnumerable<ITemplateParser> templateParsers = templateParsers.ThrowIfNull(nameof(templateParsers));
     private readonly ILogger<BuildTemplateManager> logger = logger.ThrowIfNull(nameof(logger));
 
     public bool IsTemplate(string template)
@@ -31,7 +33,7 @@ public sealed class BuildTemplateManager(
             return false;
         }
 
-        if (template.Where(c => DecodingLookupTable.Contains(c) is false).Any())
+        if (template.Any(c => DecodingLookupTable.Contains(c) is false))
         {
             return false;
         }
@@ -41,14 +43,11 @@ public sealed class BuildTemplateManager(
 
     public SingleBuildEntry CreateSingleBuild()
     {
-        var emptyBuild = new Build();
         var name = Guid.NewGuid().ToString();
         var entry = new SingleBuildEntry
         {
             Name = name,
             PreviousName = string.Empty,
-            Attributes = emptyBuild.Attributes,
-            Skills = emptyBuild.Skills,
             CreationTime = DateTime.UtcNow
         };
 
@@ -58,13 +57,10 @@ public sealed class BuildTemplateManager(
 
     public SingleBuildEntry CreateSingleBuild(string name)
     {
-        var emptyBuild = new Build();
         var entry = new SingleBuildEntry
         {
             Name = name,
             PreviousName = string.Empty,
-            Attributes = emptyBuild.Attributes,
-            Skills = emptyBuild.Skills,
             CreationTime = DateTime.UtcNow
         };
 
@@ -137,7 +133,9 @@ public sealed class BuildTemplateManager(
         singleBuildEntry.Name = teamBuildEntry.Name;
         singleBuildEntry.PreviousName = teamBuildEntry.PreviousName;
         singleBuildEntry.SourceUrl = teamBuildEntry.SourceUrl;
-        singleBuildEntry.Metadata = teamBuildEntry.Metadata;
+        singleBuildEntry.ToolboxBuildId = teamBuildEntry.ToolboxBuildId;
+        singleBuildEntry.IsToolboxBuild = teamBuildEntry.IsToolboxBuild;
+        singleBuildEntry.CreationTime = teamBuildEntry.CreationTime;
 
         return singleBuildEntry;
     }
@@ -150,7 +148,9 @@ public sealed class BuildTemplateManager(
             PreviousName = singleBuildEntry.PreviousName,
             SourceUrl = singleBuildEntry.SourceUrl,
             Builds = [ singleBuildEntry ],
-            Metadata = singleBuildEntry.Metadata
+            ToolboxBuildId = singleBuildEntry.ToolboxBuildId,
+            IsToolboxBuild = singleBuildEntry.IsToolboxBuild,
+            CreationTime = singleBuildEntry.CreationTime
         };
 
         return teamBuildEntry;
@@ -256,34 +256,7 @@ public sealed class BuildTemplateManager(
 
     public void SaveBuild(IBuildEntry buildEntry)
     {
-        var encodedBuild = new StringBuilder();
-        if (buildEntry is SingleBuildEntry singleBuild)
-        {
-            var build = new Build
-            {
-                Attributes = singleBuild.Attributes,
-                Primary = singleBuild.Primary,
-                Secondary = singleBuild.Secondary,
-                Skills = singleBuild.Skills
-            };
-
-            encodedBuild.Append(this.EncodeTemplateInner(build));
-        }
-        else if (buildEntry is TeamBuildEntry teamBuild)
-        {
-            foreach(var singleBuildEntry in teamBuild.Builds)
-            {
-                var build = new Build
-                {
-                    Attributes = singleBuildEntry.Attributes,
-                    Primary = singleBuildEntry.Primary,
-                    Secondary = singleBuildEntry.Secondary,
-                    Skills = singleBuildEntry.Skills
-                };
-
-                encodedBuild.Append(this.EncodeTemplateInner(build)).Append(' ');
-            }
-        }
+        var encodedBuild = this.EncodeTemplate(buildEntry);
 
         var newPath = Path.Combine(BuildsPath, $"{buildEntry.Name}.txt");
         if (string.IsNullOrWhiteSpace(buildEntry.PreviousName) is false)
@@ -296,12 +269,7 @@ public sealed class BuildTemplateManager(
         }
 
         Directory.CreateDirectory(Path.GetDirectoryName(newPath)!);
-        var metadata = buildEntry.Metadata is not null
-            ? Convert.ToBase64String(
-                Encoding.UTF8.GetBytes(
-                    JsonSerializer.Serialize(buildEntry.Metadata)))
-            : string.Empty;
-        File.WriteAllText(newPath, $"{encodedBuild.ToString().Trim()}\n{metadata}");
+        File.WriteAllText(newPath, encodedBuild);
 
         // Remove the build from the memory cache once it's created on disk
         this.BuildMemoryCache.Remove(buildEntry);
@@ -371,32 +339,48 @@ public sealed class BuildTemplateManager(
     {
         var randomName = Guid.NewGuid().ToString();
         var builds = this.DecodeTemplatesInner(template);
-        return builds is null
-            ? throw new InvalidOperationException("Failed to decode build template")
-            : builds.Length == 1 ?
-                new SingleBuildEntry
-                {
-                    Name = randomName,
-                    PreviousName = randomName,
-                    Primary = builds[0].Primary,
-                    Secondary = builds[0].Secondary,
-                    Attributes = builds[0].Attributes,
-                    Skills = builds[0].Skills
-                } :
-                new TeamBuildEntry
-                {
-                    Name = randomName,
-                    PreviousName = randomName,
-                    Builds = [.. builds.Select(b => new SingleBuildEntry
-                    {
-                        Name = randomName,
-                        PreviousName = randomName,
-                        Primary = b.Primary,
-                        Secondary = b.Secondary,
-                        Attributes = b.Attributes,
-                        Skills = b.Skills
-                    })]
-                };
+        if (builds is null)
+        {
+            throw new InvalidOperationException("Failed to decode build template");
+        }
+
+        // If we got a single TeamBuildEntry (e.g., from party loadout), return it directly
+        if (builds.Length == 1 && builds[0] is TeamBuildEntry teamBuild)
+        {
+            teamBuild.Name = randomName;
+            teamBuild.PreviousName = randomName;
+            return teamBuild;
+        }
+
+        // Otherwise, handle as before: single or multiple skill templates
+        if (builds.Length == 1 && builds[0] is SingleBuildEntry single)
+        {
+            return new SingleBuildEntry
+            {
+                Name = randomName,
+                PreviousName = randomName,
+                Primary = single.Primary,
+                Secondary = single.Secondary,
+                Attributes = single.Attributes,
+                Skills = single.Skills
+            };
+        }
+
+        // Multiple templates -> TeamBuildEntry
+        return new TeamBuildEntry
+        {
+            Name = randomName,
+            PreviousName = randomName,
+            Builds = [.. builds.OfType<SingleBuildEntry>().Select(b => new SingleBuildEntry
+            {
+                Name = randomName,
+                PreviousName = randomName,
+                Primary = b.Primary,
+                Secondary = b.Secondary,
+                Attributes = b.Attributes,
+                Skills = b.Skills
+            })]
+        };
     }
 
     public bool TryDecodeTemplate(string template, [NotNullWhen(true)] out IBuildEntry? build)
@@ -407,30 +391,46 @@ public sealed class BuildTemplateManager(
             if (maybeBuilds is not null)
             {
                 var randomName = Guid.NewGuid().ToString();
-                build = maybeBuilds.Length == 1 ?
-                    new SingleBuildEntry
+
+                // If we got a single TeamBuildEntry (e.g., from party loadout), return it directly
+                if (maybeBuilds.Length == 1 && maybeBuilds[0] is TeamBuildEntry teamBuild)
+                {
+                    teamBuild.Name = randomName;
+                    teamBuild.PreviousName = randomName;
+                    build = teamBuild;
+                    return true;
+                }
+
+                // Otherwise, handle as before: single or multiple skill templates
+                if (maybeBuilds.Length == 1 && maybeBuilds[0] is SingleBuildEntry single)
+                {
+                    build = new SingleBuildEntry
                     {
                         Name = randomName,
                         PreviousName = randomName,
-                        Primary = maybeBuilds[0].Primary,
-                        Secondary = maybeBuilds[0].Secondary,
-                        Attributes = maybeBuilds[0].Attributes,
-                        Skills = maybeBuilds[0].Skills
-                    } :
-                    new TeamBuildEntry
-                    {
-                        Name = randomName,
-                        PreviousName = randomName,
-                        Builds = maybeBuilds.Select(b => new SingleBuildEntry
-                        {
-                            Name = randomName,
-                            PreviousName = randomName,
-                            Primary = b.Primary,
-                            Secondary = b.Secondary,
-                            Attributes = b.Attributes,
-                            Skills = b.Skills
-                        }).ToList()
+                        Primary = single.Primary,
+                        Secondary = single.Secondary,
+                        Attributes = single.Attributes,
+                        Skills = single.Skills
                     };
+                    return true;
+                }
+
+                // Multiple templates -> TeamBuildEntry
+                build = new TeamBuildEntry
+                {
+                    Name = randomName,
+                    PreviousName = randomName,
+                    Builds = maybeBuilds.OfType<SingleBuildEntry>().Select(b => new SingleBuildEntry
+                    {
+                        Name = randomName,
+                        PreviousName = randomName,
+                        Primary = b.Primary,
+                        Secondary = b.Secondary,
+                        Attributes = b.Attributes,
+                        Skills = b.Skills
+                    }).ToList()
+                };
 
                 return true;
             }
@@ -449,30 +449,21 @@ public sealed class BuildTemplateManager(
     {
         if (build is SingleBuildEntry singleBuildEntry)
         {
-            var preparedBuild = new Build
-            {
-                Primary = singleBuildEntry.Primary,
-                Secondary = singleBuildEntry.Secondary,
-                Attributes = singleBuildEntry.Attributes,
-                Skills = singleBuildEntry.Skills
-            };
-
-            return this.EncodeTemplateInner(preparedBuild);
+            return this.EncodeTemplateInner(singleBuildEntry);
         }
         else if (build is TeamBuildEntry teamBuildEntry)
         {
+            // If the team build has party composition, encode as party loadout
+            if (teamBuildEntry.PartyComposition is { Count: > 0 })
+            {
+                return this.EncodeTemplateInner(teamBuildEntry);
+            }
+
+            // Otherwise, encode as space-separated skill templates
             var encodedString = new StringBuilder();
             foreach(var teamBuild in teamBuildEntry.Builds)
             {
-                var preparedBuild = new Build
-                {
-                    Primary = teamBuild.Primary,
-                    Secondary = teamBuild.Secondary,
-                    Attributes = teamBuild.Attributes,
-                    Skills = teamBuild.Skills
-                };
-
-                encodedString.Append(this.EncodeTemplateInner(preparedBuild)).Append(' ');
+                encodedString.Append(this.EncodeTemplateInner(teamBuild)).Append(' ');
             }
 
             return encodedString.ToString().Trim();
@@ -584,7 +575,7 @@ public sealed class BuildTemplateManager(
 
         build.Name = buildName;
         build.PreviousName = buildName;
-        if (content.Length > 1)
+        if (content.Length > 1 && !string.IsNullOrWhiteSpace(content[1]))
         {
             // This check has to stay in place for backwards compatibility. If the second line in a build is url, it is the source Url of the build. Otherwise, it is a base64 encoded metadata of the build
             if (Uri.TryCreate(content[1], UriKind.Absolute, out var sourceUrl))
@@ -595,10 +586,44 @@ public sealed class BuildTemplateManager(
             {
                 try
                 {
-                    build.Metadata =
-                        JsonSerializer.Deserialize<Dictionary<string, string>>(
+                    var legacyMetadata = JsonSerializer.Deserialize<Dictionary<string, string>>(
                             Encoding.UTF8.GetString(
                                 Convert.FromBase64String(content[1])));
+
+                    // Extract legacy metadata into proper properties
+                    if (legacyMetadata is not null)
+                    {
+                        if (legacyMetadata.TryGetValue("SourceUrl", out var sourceUrlValue))
+                        {
+                            build.SourceUrl = sourceUrlValue;
+                        }
+
+                        if (legacyMetadata.TryGetValue("CreationTime", out var creationTimeString) &&
+                            int.TryParse(creationTimeString, out var creationTimeUnix))
+                        {
+                            build.CreationTime = DateTimeOffset.FromUnixTimeSeconds(creationTimeUnix).DateTime;
+                        }
+
+                        if (legacyMetadata.TryGetValue("ToolboxBuildId", out var toolboxIdString) &&
+                            int.TryParse(toolboxIdString, out var toolboxId))
+                        {
+                            build.ToolboxBuildId = toolboxId;
+                        }
+
+                        if (legacyMetadata.TryGetValue("IsToolboxBuild", out var isToolboxBuildString) &&
+                            bool.TryParse(isToolboxBuildString, out var isToolboxBuild))
+                        {
+                            build.IsToolboxBuild = isToolboxBuild;
+                        }
+
+                        // Extract party composition for team builds
+                        if (build is TeamBuildEntry teamBuild &&
+                            legacyMetadata.TryGetValue("PartyComposition", out var partyCompositionJson) &&
+                            !string.IsNullOrWhiteSpace(partyCompositionJson))
+                        {
+                            teamBuild.PartyComposition = JsonSerializer.Deserialize<List<PartyCompositionMetadataEntry>>(partyCompositionJson);
+                        }
+                    }
                 }
                 catch(Exception ex)
                 {
@@ -616,7 +641,7 @@ public sealed class BuildTemplateManager(
         return build;
     }
 
-    private Build[]? DecodeTemplatesInner(string template)
+    private IBuildEntry[]? DecodeTemplatesInner(string template)
     {
         var buildTemplates = template.Split(' ').Where(s => !s.IsNullOrWhiteSpace()).ToArray();
         if (buildTemplates.Length == 0)
@@ -624,8 +649,8 @@ public sealed class BuildTemplateManager(
             return [];
         }
 
-        var builds = new Build[buildTemplates.Length];
-        for(var i = 0; i < builds.Length; i++)
+        var builds = new List<IBuildEntry>();
+        for(var i = 0; i < buildTemplates.Length; i++)
         {
             var result = this.DecodeTemplateInner(buildTemplates[i]);
             if (result is null)
@@ -633,107 +658,81 @@ public sealed class BuildTemplateManager(
                 return default;
             }
 
-            builds[i] = result;
+            builds.Add(result);
         }
 
-        return builds;
+        return [.. builds];
     }
 
-    private Build? DecodeTemplateInner(string template)
+    private IBuildEntry? DecodeTemplateInner(string template)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         scopedLogger.LogDebug("Attempting to decode template");
-        var buildMetadata = ParseEncodedTemplate(template);
-        scopedLogger.LogDebug("Decoded template. Beginning parsing");
-        if (buildMetadata.VersionNumber != 0)
-        {
-            scopedLogger.LogError("Expected version number to be 0 but found {buildMetadata.VersionNumber}", buildMetadata.VersionNumber);
-            return default;
-        }
-
-        var build = new Build()
-        {
-            BuildMetadata = buildMetadata,
-            Skills = []
-        };
-
-        if (Profession.TryParse(buildMetadata.PrimaryProfessionId, out var primaryProfession) is false)
-        {
-            scopedLogger.LogError("Failed to parse profession with id {buildMetadata.PrimaryProfessionId}", buildMetadata.PrimaryProfessionId);
-            return default;
-        }
-
-        build.Primary = primaryProfession;
-        if (Profession.TryParse(buildMetadata.SecondaryProfessionId, out var secondaryProfession) is false)
-        {
-            scopedLogger.LogError("Failed to parse profession with id {buildMetadata.SecondaryProfessionId}", buildMetadata.SecondaryProfessionId);
-            return default;
-        }
-
-        build.Secondary = secondaryProfession;
-        /*
-         * Prepopulate the attributes first and then populate the attribute points based on ids.
-         */
-
-        if (primaryProfession != Profession.None)
-        {
-            build.Attributes.Add(new AttributeEntry { Attribute = primaryProfession.PrimaryAttribute });
-            build.Attributes.AddRange(primaryProfession.Attributes?.Select(a => new AttributeEntry { Attribute = a }) ?? []);
-        }
         
-        if (secondaryProfession != Profession.None)
+        // Decode base64 to binary
+        var base64Decoded = template.Select(c => DecodingLookupTable.IndexOf(c)).ToList();
+        var binaryDecoded = base64Decoded.Select(ToBitString).ToList();
+        var bitString = string.Join("", binaryDecoded);
+        var stream = new DecodeCharStream([.. binaryDecoded]);
+        
+        // Read header to determine template type
+        var headerValue = stream.Read(4);
+        var header = (TemplateHeader)headerValue;
+        
+        // Create decode context
+        var context = new DecodeContext(template, bitString, stream);
+
+        // Try skill template parsers first
+        var skillParser = this.templateParsers.OfType<ITemplateParser<SkillTemplateMetadata>>().FirstOrDefault(p => p.CanDecode(header));
+        if (skillParser is not null)
         {
-            build.Attributes.AddRange(secondaryProfession.Attributes?.Select(a => new AttributeEntry { Attribute = a }) ?? []);
+            var buildMetadata = skillParser.Decode(context);
+            scopedLogger.LogDebug("Decoded skill template. Creating build entry");
+            return skillParser.CreateBuildEntry(buildMetadata);
         }
 
-        for(int i = 0; i < buildMetadata.AttributeCount; i++)
+        // Try party loadout parser
+        var partyLoadoutParser = this.templateParsers.OfType<ITemplateParser<PartyLoadoutTemplateMetadata>>().FirstOrDefault(p => p.CanDecode(header));
+        if (partyLoadoutParser is not null)
         {
-            var attributeId = buildMetadata.AttributesIds[i];
-            var maybeAttribute = build.Attributes.FirstOrDefault(a => a.Attribute?.Id == attributeId);
-            if (maybeAttribute is null)
-            {
-                scopedLogger.LogError("Failed to parse attribute with id {attributeId} for professions {primaryProfession.Name}/{secondaryProfession.Name}", attributeId, primaryProfession.Name ?? string.Empty, secondaryProfession.Name ?? string.Empty);
-                return default;
-            }
-
-            maybeAttribute.Points = buildMetadata.AttributePoints[i];
+            var partyMetadata = partyLoadoutParser.Decode(context);
+            scopedLogger.LogDebug("Decoded party loadout template. Creating build entry");
+            return partyLoadoutParser.CreateBuildEntry(partyMetadata);
         }
 
-        for(int i = 0; i < 8; i++)
-        {
-            if (Skill.TryParse(buildMetadata.SkillIds[i], out var skill) is false)
-            {
-                scopedLogger.LogError("Failed to parse skill with id {skillId}", buildMetadata.SkillIds[i]);
-                return default;
-            }
-
-            build.Skills.Add(skill);
-        }
-
-        scopedLogger.LogDebug("Successfully parsed build template");
-        return build;
+        scopedLogger.LogError("No parser found for template header {header}", header);
+        return default;
     }
 
-    private string EncodeTemplateInner(Build build)
+    private string EncodeTemplateInner(SingleBuildEntry buildEntry)
+    {
+        return this.EncodeTemplateInner((IBuildEntry)buildEntry);
+    }
+
+    private string EncodeTemplateInner(TeamBuildEntry buildEntry)
+    {
+        return this.EncodeTemplateInner((IBuildEntry)buildEntry);
+    }
+
+    private string EncodeTemplateInner(IBuildEntry buildEntry)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        scopedLogger.LogDebug("Building build metadata");
-        var buildMetadata = new BuildMetadata
+        scopedLogger.LogDebug("Encoding build to template");
+        
+        // Find the appropriate parser for encoding
+        var parser = this.templateParsers.FirstOrDefault(p => p.CanEncode(buildEntry));
+        if (parser is null)
         {
-            VersionNumber = 0,
-            NewTemplate = true,
-            Header = 14,
-            PrimaryProfessionId = build.Primary.Id,
-            SecondaryProfessionId = build.Secondary.Id,
-            AttributeCount = build.Attributes.Count(attrEntry => attrEntry.Points > 0),
-            AttributesIds = [.. build.Attributes.Where(attrEntry => attrEntry.Points > 0).OrderBy(attrEntry => attrEntry.Attribute?.Id).Select(attrEntry => attrEntry.Attribute?.Id ?? -1)],
-            AttributePoints = [.. build.Attributes.Where(attrEntry => attrEntry.Points > 0).OrderBy(attrEntry => attrEntry.Attribute?.Id).Select(attrEntry => attrEntry.Points)],
-            SkillIds = [.. build.Skills.Select(skill => skill.Id)],
-            TailPresent = true
-        };
-
-        scopedLogger.LogDebug("Encoding metadata into binary");
-        var encodedBinary = BuildEncodedString(buildMetadata);
+            scopedLogger.LogError("No parser found that can encode this build");
+            throw new InvalidOperationException("No parser found that can encode this build");
+        }
+        
+        // Create encode context and encode
+        var stream = new EncodeCharStream();
+        var context = new EncodeContext(buildEntry, stream);
+        var encodedBinary = parser.Encode(context);
+        
+        // Convert binary string to base64
         int index = 0;
         var encodedBase64 = new List<int>();
         while (index < encodedBinary.Length)
@@ -762,112 +761,6 @@ public sealed class BuildTemplateManager(
         }
 
         return sb.ToString();
-    }
-
-    private static BuildMetadata ParseEncodedTemplate(string template)
-    {
-        var curedTemplate = template.Trim();
-
-        var buildMetadata = new BuildMetadata
-        {
-            Base64Decoded = [.. template.Select(c => DecodingLookupTable.IndexOf(c))],
-        };
-        buildMetadata.BinaryDecoded = [.. buildMetadata.Base64Decoded.Select(ToBitString)];
-
-        var stream = new DecodeCharStream([.. buildMetadata.BinaryDecoded]);
-        buildMetadata.Header = stream.Read(4);
-        if (buildMetadata.Header == 14)
-        {
-            buildMetadata.VersionNumber = stream.Read(4);
-            buildMetadata.NewTemplate = true;
-        }
-        else
-        {
-            buildMetadata.VersionNumber = buildMetadata.Header;
-            buildMetadata.NewTemplate = false;
-        }
-
-        buildMetadata.ProfessionIdLength = (stream.Read(2) * 2) + 4;
-        buildMetadata.PrimaryProfessionId = stream.Read(buildMetadata.ProfessionIdLength);
-        buildMetadata.SecondaryProfessionId = stream.Read(buildMetadata.ProfessionIdLength);
-        buildMetadata.AttributeCount = stream.Read(4);
-        buildMetadata.AttributesLength = stream.Read(4) + 4;
-        for (int i = 0; i < buildMetadata.AttributeCount; i++)
-        {
-            buildMetadata.AttributesIds.Add(stream.Read(buildMetadata.AttributesLength));
-            buildMetadata.AttributePoints.Add(stream.Read(4));
-        }
-
-        buildMetadata.SkillsLength = stream.Read(4) + 8;
-        for (int i = 0; i < 8; i++)
-        {
-            buildMetadata.SkillIds.Add(stream.Read(buildMetadata.SkillsLength));
-        }
-
-        if (stream.Position < stream.Length - 1)
-        {
-            buildMetadata.TailPresent = true;
-        }
-
-        return buildMetadata;
-    } 
-
-    private static string BuildEncodedString(BuildMetadata buildMetadata)
-    {
-        var stream = new EncodeCharStream();
-        if(buildMetadata.NewTemplate || buildMetadata.Header == 14)
-        {
-            stream.Write(14, 4);
-        }
-
-        stream.Write(0, 4);
-        
-        var desiredProfessionIdLength = GetBitLength(new List<int> { buildMetadata.PrimaryProfessionId, buildMetadata.SecondaryProfessionId }.Max());
-        var professionIdLength = Math.Max((desiredProfessionIdLength - 4) / 2, 0);
-        var finalProfessionIdLength = (professionIdLength * 2) + 4;
-        stream.Write(professionIdLength, 2);
-        stream.Write(buildMetadata.PrimaryProfessionId, finalProfessionIdLength);
-        stream.Write(buildMetadata.SecondaryProfessionId, finalProfessionIdLength);
-        
-        stream.Write(buildMetadata.AttributeCount, 4);
-        var desiredAttributesLength = GetBitLength(buildMetadata.AttributesIds.Count != 0 ? buildMetadata.AttributesIds.Max() : 0);
-        var attributesLength = Math.Max(desiredAttributesLength - 4, 0);
-        var finalAttributesLength = attributesLength + 4;
-        stream.Write(attributesLength, 4);
-        for(int i = 0; i < buildMetadata.AttributeCount; i++)
-        {
-            stream.Write(buildMetadata.AttributesIds[i], finalAttributesLength);
-            stream.Write(buildMetadata.AttributePoints[i], 4);
-        }
-
-        var desiredSkillsLength = GetBitLength(buildMetadata.SkillIds.Max());
-        var skillsLength = Math.Max(desiredSkillsLength - 8, 0);
-        var finalSkillsLength = skillsLength + 8;
-        stream.Write(skillsLength, 4);
-        for(int i = 0; i < 8; i++)
-        {
-            stream.Write(buildMetadata.SkillIds[i], finalSkillsLength);
-        }
-
-        if (buildMetadata.TailPresent)
-        {
-            stream.Write(0, 1);
-        }
-
-        return stream.GetEncodedString();
-    }
-
-    private static int GetBitLength(int value)
-    {
-        int decimals = 1;
-        value /= 2;
-        while (value > 0)
-        {
-            decimals++;
-            value /= 2;
-        }
-
-        return decimals;
     }
 
     private static int FromBitString(string bitString)

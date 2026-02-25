@@ -20,8 +20,19 @@ public sealed class TeamBuildTemplateViewModel(
         {
             field = value;
             this.NotifyPropertyChanged(nameof(this.TeamEntry));
+            this.UpdateTeamCode();
         }
     }
+
+    public string TeamCode
+    {
+        get;
+        set
+        {
+            field = value;
+            this.NotifyPropertyChanged(nameof(this.TeamCode));
+        }
+    } = string.Empty;
 
     public int BuildEntryIndex
     {
@@ -118,6 +129,47 @@ public sealed class TeamBuildTemplateViewModel(
     public void HideSummary()
     {
         this.SummaryVisible = false;
+        this.RefreshView();
+    }
+
+    protected override void UpdateBuildCode()
+    {
+        base.UpdateBuildCode();
+        this.UpdateTeamCode();
+    }
+
+    private void UpdateTeamCode()
+    {
+        if (this.TeamEntry is null)
+        {
+            this.TeamCode = string.Empty;
+            return;
+        }
+
+        this.TeamCode = this.buildTemplateManager.EncodeTemplate(this.TeamEntry);
+    }
+
+    public void TeamCodeChanged(string teamCode)
+    {
+        if (string.IsNullOrWhiteSpace(teamCode))
+        {
+            return;
+        }
+
+        if (!this.buildTemplateManager.TryDecodeTemplate(teamCode, out var buildEntry))
+        {
+            return;
+        }
+
+        if (buildEntry is not TeamBuildEntry teamBuildEntry)
+        {
+            return;
+        }
+
+        this.TeamEntry = teamBuildEntry;
+        this.BuildEntry = teamBuildEntry.Builds.FirstOrDefault();
+        this.BuildEntryIndex = 0;
+        this.FilterSkillsByProfessionsAndString();
         this.RefreshView();
     }
 }

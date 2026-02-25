@@ -2,7 +2,7 @@
 
 namespace Daybreak.Shared.Services.BuildTemplates.Models;
 
-internal sealed class EncodeCharStream
+public sealed class EncodeCharStream
 {
     private readonly StringBuilder innerStringBuilder = new();
 
@@ -18,7 +18,7 @@ internal sealed class EncodeCharStream
 
     private void EncodeToBinary(int value, int count)
     {
-        while(value > 0 && count > 0)
+        while (value > 0 && count > 0)
         {
             this.innerStringBuilder.Append(value % 2 == 1 ? '1' : '0');
             value /= 2;

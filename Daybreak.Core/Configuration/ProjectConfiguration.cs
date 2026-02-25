@@ -54,6 +54,7 @@ using Daybreak.Shared.Services.Api;
 using Daybreak.Shared.Services.ApplicationArguments;
 using Daybreak.Shared.Services.ApplicationLauncher;
 using Daybreak.Shared.Services.BuildTemplates;
+using Daybreak.Shared.Services.BuildTemplates.Parsers;
 using Daybreak.Shared.Services.Credentials;
 using Daybreak.Shared.Services.DirectSong;
 using Daybreak.Shared.Services.Downloads;
@@ -140,8 +141,11 @@ public class ProjectConfiguration : PluginConfigurationBase
         });
 
         services.AddSingleton<AppViewModel>();
-
         services.AddSingleton<ViewManager>();
+
+        services.AddSingleton<ITemplateParser, LegacySkillTemplateParser>();
+        services.AddSingleton<ITemplateParser, SkillTemplateParser>();
+        services.AddSingleton<ITemplateParser, PartyLoadoutTemplateParser>();
         services.AddSingleton<IMenuService, MenuService>();
         services.AddSingleton<IMenuServiceInitializer, MenuService>(sp =>
             sp.GetRequiredService<IMenuService>().Cast<MenuService>()

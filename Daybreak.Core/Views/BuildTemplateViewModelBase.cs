@@ -17,7 +17,7 @@ public abstract class BuildTemplateViewModelBase<TViewModel, TView>(
         where TViewModel : BuildTemplateViewModelBase<TViewModel, TView>
         where TView : BuildTemplateViewBase<TView, TViewModel>
 {
-    private readonly IBuildTemplateManager buildTemplateManager = buildTemplateManager;
+    protected readonly IBuildTemplateManager buildTemplateManager = buildTemplateManager;
     private readonly IAttributePointCalculator attributePointCalculator = attributePointCalculator;
     private readonly IViewManager viewManager = viewManager;
 
@@ -220,7 +220,7 @@ public abstract class BuildTemplateViewModelBase<TViewModel, TView>(
         this.RefreshView();
     }
 
-    protected void UpdateBuildCode()
+    protected virtual void UpdateBuildCode()
     {
         if (this.BuildEntry is null)
         {
