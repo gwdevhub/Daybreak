@@ -73,6 +73,24 @@ public sealed class SkillTemplateParser : ITemplateParser<SkillTemplateMetadata>
         );
     }
 
+    public IBuildEntry CreateBuildEntry(SkillTemplateMetadata templateContext)
+    {
+        var singleBuildEntry = new SingleBuildEntry();
+        Profession.TryParse(templateContext.PrimaryProfessionId, out var primary);
+        Profession.TryParse(templateContext.SecondaryProfessionId, out var secondary);
+
+        singleBuildEntry.Primary = primary ?? Profession.None;
+        singleBuildEntry.Secondary = secondary ?? Profession.None;
+        singleBuildEntry.Attributes = [.. templateContext.AttributesIds
+            .Select((id, index) => new AttributeEntry
+            {
+                Attribute = Shared.Models.Guildwars.Attribute.TryParse(id, out var attr) ? attr : Shared.Models.Guildwars.Attribute.None,
+                Points = templateContext.AttributePoints[index]
+            })];
+        singleBuildEntry.Skills = [.. templateContext.SkillIds.Select(id => Skill.TryParse(id, out var skill) ? skill : Skill.None)];
+        return singleBuildEntry;
+    }
+
     public bool CanEncode(IBuildEntry buildEntry)
     {
         return buildEntry is SingleBuildEntry;

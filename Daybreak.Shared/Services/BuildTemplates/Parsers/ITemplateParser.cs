@@ -7,6 +7,7 @@ public interface ITemplateParser<TTemplateContext>
     where TTemplateContext : struct
 {
     TTemplateContext Decode(DecodeContext context);
+    IBuildEntry CreateBuildEntry(TTemplateContext templateContext);
 }
 
 public interface ITemplateParser

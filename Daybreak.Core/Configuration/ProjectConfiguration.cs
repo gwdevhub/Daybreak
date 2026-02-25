@@ -54,6 +54,7 @@ using Daybreak.Shared.Services.Api;
 using Daybreak.Shared.Services.ApplicationArguments;
 using Daybreak.Shared.Services.ApplicationLauncher;
 using Daybreak.Shared.Services.BuildTemplates;
+using Daybreak.Shared.Services.BuildTemplates.Parsers;
 using Daybreak.Shared.Services.Credentials;
 using Daybreak.Shared.Services.DirectSong;
 using Daybreak.Shared.Services.Downloads;
@@ -100,7 +101,6 @@ using TrailBlazr.Services;
 using IMenuService = Daybreak.Shared.Services.Menu.IMenuService;
 using MenuService = Daybreak.Services.Menu.MenuService;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
-using Daybreak.Shared.Services.BuildTemplates.Parsers;
 
 namespace Daybreak.Configuration;
 
@@ -145,6 +145,7 @@ public class ProjectConfiguration : PluginConfigurationBase
 
         services.AddSingleton<ITemplateParser, LegacySkillTemplateParser>();
         services.AddSingleton<ITemplateParser, SkillTemplateParser>();
+        services.AddSingleton<ITemplateParser, PartyLoadoutTemplateParser>();
         services.AddSingleton<IMenuService, MenuService>();
         services.AddSingleton<IMenuServiceInitializer, MenuService>(sp =>
             sp.GetRequiredService<IMenuService>().Cast<MenuService>()
