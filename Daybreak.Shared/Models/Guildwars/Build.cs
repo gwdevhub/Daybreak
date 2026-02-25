@@ -4,7 +4,6 @@ namespace Daybreak.Shared.Models.Guildwars;
 
 public sealed class Build
 {
-    public BuildMetadata? BuildMetadata { get; set; }
     public Profession Primary { get; set; } = Profession.None;
     public Profession Secondary { get; set; } = Profession.None;
     public List<AttributeEntry> Attributes { get; set; } = [];

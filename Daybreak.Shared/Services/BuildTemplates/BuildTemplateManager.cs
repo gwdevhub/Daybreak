@@ -3,6 +3,7 @@ using Daybreak.Shared.Models.Api;
 using Daybreak.Shared.Models.Builds;
 using Daybreak.Shared.Models.Guildwars;
 using Daybreak.Shared.Services.BuildTemplates.Models;
+using Daybreak.Shared.Services.BuildTemplates.Parsers;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
 using System.Extensions;
@@ -15,6 +16,7 @@ using Convert = System.Convert;
 namespace Daybreak.Shared.Services.BuildTemplates;
 
 public sealed class BuildTemplateManager(
+    IEnumerable<ITemplateParser> templateParsers,
     ILogger<BuildTemplateManager> logger) : IBuildTemplateManager
 {
     private const string DecodingLookupTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
@@ -22,6 +24,7 @@ public sealed class BuildTemplateManager(
 
     private List<IBuildEntry> BuildMemoryCache { get; } = [];
 
+    private readonly IEnumerable<ITemplateParser> templateParsers = templateParsers.ThrowIfNull(nameof(templateParsers));
     private readonly ILogger<BuildTemplateManager> logger = logger.ThrowIfNull(nameof(logger));
 
     public bool IsTemplate(string template)
@@ -259,29 +262,13 @@ public sealed class BuildTemplateManager(
         var encodedBuild = new StringBuilder();
         if (buildEntry is SingleBuildEntry singleBuild)
         {
-            var build = new Build
-            {
-                Attributes = singleBuild.Attributes,
-                Primary = singleBuild.Primary,
-                Secondary = singleBuild.Secondary,
-                Skills = singleBuild.Skills
-            };
-
-            encodedBuild.Append(this.EncodeTemplateInner(build));
+            encodedBuild.Append(this.EncodeTemplateInner(singleBuild));
         }
         else if (buildEntry is TeamBuildEntry teamBuild)
         {
             foreach(var singleBuildEntry in teamBuild.Builds)
             {
-                var build = new Build
-                {
-                    Attributes = singleBuildEntry.Attributes,
-                    Primary = singleBuildEntry.Primary,
-                    Secondary = singleBuildEntry.Secondary,
-                    Skills = singleBuildEntry.Skills
-                };
-
-                encodedBuild.Append(this.EncodeTemplateInner(build)).Append(' ');
+                encodedBuild.Append(this.EncodeTemplateInner(singleBuildEntry)).Append(' ');
             }
         }
 
@@ -449,30 +436,14 @@ public sealed class BuildTemplateManager(
     {
         if (build is SingleBuildEntry singleBuildEntry)
         {
-            var preparedBuild = new Build
-            {
-                Primary = singleBuildEntry.Primary,
-                Secondary = singleBuildEntry.Secondary,
-                Attributes = singleBuildEntry.Attributes,
-                Skills = singleBuildEntry.Skills
-            };
-
-            return this.EncodeTemplateInner(preparedBuild);
+            return this.EncodeTemplateInner(singleBuildEntry);
         }
         else if (build is TeamBuildEntry teamBuildEntry)
         {
             var encodedString = new StringBuilder();
             foreach(var teamBuild in teamBuildEntry.Builds)
             {
-                var preparedBuild = new Build
-                {
-                    Primary = teamBuild.Primary,
-                    Secondary = teamBuild.Secondary,
-                    Attributes = teamBuild.Attributes,
-                    Skills = teamBuild.Skills
-                };
-
-                encodedString.Append(this.EncodeTemplateInner(preparedBuild)).Append(' ');
+                encodedString.Append(this.EncodeTemplateInner(teamBuild)).Append(' ');
             }
 
             return encodedString.ToString().Trim();
@@ -643,7 +614,29 @@ public sealed class BuildTemplateManager(
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         scopedLogger.LogDebug("Attempting to decode template");
-        var buildMetadata = ParseEncodedTemplate(template);
+        
+        // Decode base64 to binary
+        var base64Decoded = template.Select(c => DecodingLookupTable.IndexOf(c)).ToList();
+        var binaryDecoded = base64Decoded.Select(ToBitString).ToList();
+        var bitString = string.Join("", binaryDecoded);
+        var stream = new DecodeCharStream([.. binaryDecoded]);
+        
+        // Read header to determine template type
+        var headerValue = stream.Read(4);
+        var header = (TemplateHeader)headerValue;
+        
+        // Find the appropriate parser
+        var parser = this.templateParsers.OfType<ITemplateParser<SkillTemplateMetadata>>().FirstOrDefault(p => p.CanDecode(header));
+        if (parser is null)
+        {
+            scopedLogger.LogError("No parser found for template header {header}", header);
+            return default;
+        }
+        
+        // Create decode context and parse
+        var context = new DecodeContext(template, bitString, stream);
+        var buildMetadata = parser.Decode(context);
+        
         scopedLogger.LogDebug("Decoded template. Beginning parsing");
         if (buildMetadata.VersionNumber != 0)
         {
@@ -653,7 +646,6 @@ public sealed class BuildTemplateManager(
 
         var build = new Build()
         {
-            BuildMetadata = buildMetadata,
             Skills = []
         };
 
@@ -714,26 +706,25 @@ public sealed class BuildTemplateManager(
         return build;
     }
 
-    private string EncodeTemplateInner(Build build)
+    private string EncodeTemplateInner(SingleBuildEntry buildEntry)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        scopedLogger.LogDebug("Building build metadata");
-        var buildMetadata = new BuildMetadata
+        scopedLogger.LogDebug("Encoding build to template");
+        
+        // Find the appropriate parser for encoding
+        var parser = this.templateParsers.FirstOrDefault(p => p.CanEncode(buildEntry));
+        if (parser is null)
         {
-            VersionNumber = 0,
-            NewTemplate = true,
-            Header = 14,
-            PrimaryProfessionId = build.Primary.Id,
-            SecondaryProfessionId = build.Secondary.Id,
-            AttributeCount = build.Attributes.Count(attrEntry => attrEntry.Points > 0),
-            AttributesIds = [.. build.Attributes.Where(attrEntry => attrEntry.Points > 0).OrderBy(attrEntry => attrEntry.Attribute?.Id).Select(attrEntry => attrEntry.Attribute?.Id ?? -1)],
-            AttributePoints = [.. build.Attributes.Where(attrEntry => attrEntry.Points > 0).OrderBy(attrEntry => attrEntry.Attribute?.Id).Select(attrEntry => attrEntry.Points)],
-            SkillIds = [.. build.Skills.Select(skill => skill.Id)],
-            TailPresent = true
-        };
-
-        scopedLogger.LogDebug("Encoding metadata into binary");
-        var encodedBinary = BuildEncodedString(buildMetadata);
+            scopedLogger.LogError("No parser found that can encode this build");
+            throw new InvalidOperationException("No parser found that can encode this build");
+        }
+        
+        // Create encode context and encode
+        var stream = new EncodeCharStream();
+        var context = new EncodeContext(buildEntry, stream);
+        var encodedBinary = parser.Encode(context);
+        
+        // Convert binary string to base64
         int index = 0;
         var encodedBase64 = new List<int>();
         while (index < encodedBinary.Length)
@@ -762,99 +753,6 @@ public sealed class BuildTemplateManager(
         }
 
         return sb.ToString();
-    }
-
-    private static BuildMetadata ParseEncodedTemplate(string template)
-    {
-        var curedTemplate = template.Trim();
-
-        var buildMetadata = new BuildMetadata
-        {
-            Base64Decoded = [.. template.Select(c => DecodingLookupTable.IndexOf(c))],
-        };
-        buildMetadata.BinaryDecoded = [.. buildMetadata.Base64Decoded.Select(ToBitString)];
-
-        var stream = new DecodeCharStream([.. buildMetadata.BinaryDecoded]);
-        buildMetadata.Header = stream.Read(4);
-        if (buildMetadata.Header == 14)
-        {
-            buildMetadata.VersionNumber = stream.Read(4);
-            buildMetadata.NewTemplate = true;
-        }
-        else
-        {
-            buildMetadata.VersionNumber = buildMetadata.Header;
-            buildMetadata.NewTemplate = false;
-        }
-
-        buildMetadata.ProfessionIdLength = (stream.Read(2) * 2) + 4;
-        buildMetadata.PrimaryProfessionId = stream.Read(buildMetadata.ProfessionIdLength);
-        buildMetadata.SecondaryProfessionId = stream.Read(buildMetadata.ProfessionIdLength);
-        buildMetadata.AttributeCount = stream.Read(4);
-        buildMetadata.AttributesLength = stream.Read(4) + 4;
-        for (int i = 0; i < buildMetadata.AttributeCount; i++)
-        {
-            buildMetadata.AttributesIds.Add(stream.Read(buildMetadata.AttributesLength));
-            buildMetadata.AttributePoints.Add(stream.Read(4));
-        }
-
-        buildMetadata.SkillsLength = stream.Read(4) + 8;
-        for (int i = 0; i < 8; i++)
-        {
-            buildMetadata.SkillIds.Add(stream.Read(buildMetadata.SkillsLength));
-        }
-
-        if (stream.Position < stream.Length - 1)
-        {
-            buildMetadata.TailPresent = true;
-        }
-
-        return buildMetadata;
-    } 
-
-    private static string BuildEncodedString(BuildMetadata buildMetadata)
-    {
-        var stream = new EncodeCharStream();
-        if(buildMetadata.NewTemplate || buildMetadata.Header == 14)
-        {
-            stream.Write(14, 4);
-        }
-
-        stream.Write(0, 4);
-        
-        var desiredProfessionIdLength = GetBitLength(new List<int> { buildMetadata.PrimaryProfessionId, buildMetadata.SecondaryProfessionId }.Max());
-        var professionIdLength = Math.Max((desiredProfessionIdLength - 4) / 2, 0);
-        var finalProfessionIdLength = (professionIdLength * 2) + 4;
-        stream.Write(professionIdLength, 2);
-        stream.Write(buildMetadata.PrimaryProfessionId, finalProfessionIdLength);
-        stream.Write(buildMetadata.SecondaryProfessionId, finalProfessionIdLength);
-        
-        stream.Write(buildMetadata.AttributeCount, 4);
-        var desiredAttributesLength = GetBitLength(buildMetadata.AttributesIds.Count != 0 ? buildMetadata.AttributesIds.Max() : 0);
-        var attributesLength = Math.Max(desiredAttributesLength - 4, 0);
-        var finalAttributesLength = attributesLength + 4;
-        stream.Write(attributesLength, 4);
-        for(int i = 0; i < buildMetadata.AttributeCount; i++)
-        {
-            stream.Write(buildMetadata.AttributesIds[i], finalAttributesLength);
-            stream.Write(buildMetadata.AttributePoints[i], 4);
-        }
-
-        var desiredSkillsLength = GetBitLength(buildMetadata.SkillIds.Max());
-        var skillsLength = Math.Max(desiredSkillsLength - 8, 0);
-        var finalSkillsLength = skillsLength + 8;
-        stream.Write(skillsLength, 4);
-        for(int i = 0; i < 8; i++)
-        {
-            stream.Write(buildMetadata.SkillIds[i], finalSkillsLength);
-        }
-
-        if (buildMetadata.TailPresent)
-        {
-            stream.Write(0, 1);
-        }
-
-        return stream.GetEncodedString();
     }
 
     private static int GetBitLength(int value)

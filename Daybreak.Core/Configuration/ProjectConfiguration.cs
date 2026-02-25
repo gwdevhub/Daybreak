@@ -100,6 +100,7 @@ using TrailBlazr.Services;
 using IMenuService = Daybreak.Shared.Services.Menu.IMenuService;
 using MenuService = Daybreak.Services.Menu.MenuService;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
+using Daybreak.Shared.Services.BuildTemplates.Parsers;
 
 namespace Daybreak.Configuration;
 
@@ -140,8 +141,10 @@ public class ProjectConfiguration : PluginConfigurationBase
         });
 
         services.AddSingleton<AppViewModel>();
-
         services.AddSingleton<ViewManager>();
+
+        services.AddSingleton<ITemplateParser, LegacySkillTemplateParser>();
+        services.AddSingleton<ITemplateParser, SkillTemplateParser>();
         services.AddSingleton<IMenuService, MenuService>();
         services.AddSingleton<IMenuServiceInitializer, MenuService>(sp =>
             sp.GetRequiredService<IMenuService>().Cast<MenuService>()
