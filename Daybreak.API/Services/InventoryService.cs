@@ -1,4 +1,4 @@
-﻿using Daybreak.API.Interop.GuildWars;
+using Daybreak.API.Interop.GuildWars;
 using Daybreak.API.Services.Interop;
 using Daybreak.Shared.Models.Api;
 using Daybreak.Shared.Models.Guildwars;
@@ -39,7 +39,7 @@ public sealed class InventoryService(
                     return default;
                 }
 
-                var itemTuples = new List<(BagType Type,List<(uint ModelId, string EncodedCompleteName, string EncodedSingleName, string EncodedName, bool Inscribable, int Quantity, uint[] Modifiers, ItemType ItemType)>)>();
+                var itemTuples = new List<(BagType Type, List<(uint ModelId, string EncodedCompleteName, string EncodedSingleName, string EncodedName, bool Inscribable, int Quantity, uint[] Modifiers, ItemType ItemType, uint Interaction, uint ModelFileId)>)>();
                 foreach (var bag in inventory.Pointer->Bags)
                 {
                     if (bag is null)
@@ -47,14 +47,14 @@ public sealed class InventoryService(
                         continue;
                     }
 
-                    var retBag = new List<(uint ModelId, string EncodedCompleteName, string EncodedSingleName, string EncodedName, bool Inscribable, int Quantity, uint[] Modifiers, ItemType ItemType)>();
+                    var retBag = new List<(uint ModelId, string EncodedCompleteName, string EncodedSingleName, string EncodedName, bool Inscribable, int Quantity, uint[] Modifiers, ItemType ItemType, uint Interaction, uint ModelFileId)>();
                     itemTuples.Add((bag->Type, retBag));
                     if (bag->ItemsCount is 0)
                     {
                         continue;
                     }
 
-                    foreach(var item in bag->Items)
+                    foreach (var item in bag->Items)
                     {
                         if (item.IsNull)
                         {
@@ -65,12 +65,12 @@ public sealed class InventoryService(
                         var nameEncoded = new string(item.Pointer->NameEncoded);
                         var completeNameEncoded = new string(item.Pointer->CompleteNameEncoded);
                         var modifiers = new uint[item.Pointer->ModifiersCount];
-                        for(var j = 0; j < item.Pointer->ModifiersCount; j++)
+                        for (var j = 0; j < item.Pointer->ModifiersCount; j++)
                         {
                             modifiers[j] = item.Pointer->Modifiers[j].Mod;
                         }
 
-                        retBag.Add((item.Pointer->ModelId, completeNameEncoded, singleItemName, nameEncoded, item.Pointer->Inscribable, item.Pointer->Quantity, modifiers, item.Pointer->Type));
+                        retBag.Add((item.Pointer->ModelId, completeNameEncoded, singleItemName, nameEncoded, item.Pointer->Inscribable, item.Pointer->Quantity, modifiers, item.Pointer->Type, item.Pointer->Interaction, item.Pointer->ModelFileId));
                     }
                 }
 
@@ -85,16 +85,16 @@ public sealed class InventoryService(
 
         // Decode strings sequentially to avoid race conditions with the game's TextParser language field.
         // Parallel decoding causes crashes because multiple operations race to set/restore the language.
-        var decodedItemTuples = new List<(BagType Type, List<(uint ModelId, string EncodedName, string? DecodedName, string EncodedSingleName, string? DecodedSingleName, string EncodedCompleteName, string? DecodedCompleteName, bool Inscribable, int Quantity, uint[] Modifiers, ItemType ItemType)> Items)>();
+        var decodedItemTuples = new List<(BagType Type, List<(uint ModelId, string EncodedName, string? DecodedName, string EncodedSingleName, string? DecodedSingleName, string EncodedCompleteName, string? DecodedCompleteName, bool Inscribable, int Quantity, uint[] Modifiers, ItemType ItemType, uint Interaction, uint ModelFileId)> Items)>();
         foreach (var tuple in itemTuples)
         {
-            var decodedItems = new List<(uint ModelId, string EncodedName, string? DecodedName, string EncodedSingleName, string? DecodedSingleName, string EncodedCompleteName, string? DecodedCompleteName, bool Inscribable, int Quantity, uint[] Modifiers, ItemType ItemType)>();
+            var decodedItems = new List<(uint ModelId, string EncodedName, string? DecodedName, string EncodedSingleName, string? DecodedSingleName, string EncodedCompleteName, string? DecodedCompleteName, bool Inscribable, int Quantity, uint[] Modifiers, ItemType ItemType, uint Interaction, uint ModelFileId)>();
             foreach (var item in tuple.Item2)
             {
                 var decodedName = await this.uIService.DecodeString(item.EncodedName, Language.English, cancellationToken);
                 var decodedCompleteName = await this.uIService.DecodeString(item.EncodedCompleteName, Language.English, cancellationToken);
                 var decodedSingleName = await this.uIService.DecodeString(item.EncodedSingleName, Language.English, cancellationToken);
-                decodedItems.Add((item.ModelId, item.EncodedName, decodedName, item.EncodedSingleName, decodedSingleName, item.EncodedCompleteName, decodedCompleteName, item.Inscribable, item.Quantity, item.Modifiers, item.ItemType));
+                decodedItems.Add((item.ModelId, item.EncodedName, decodedName, item.EncodedSingleName, decodedSingleName, item.EncodedCompleteName, decodedCompleteName, item.Inscribable, item.Quantity, item.Modifiers, item.ItemType, item.Interaction, item.ModelFileId));
             }
             decodedItemTuples.Add((tuple.Type, decodedItems));
         }
@@ -116,7 +116,9 @@ public sealed class InventoryService(
                             Quantity: item.Quantity,
                             Modifiers: item.Modifiers,
                             Properties: [.. ItemProperty.ParseItemModifiers([.. item.Modifiers.Select(m => (Shared.Models.Guildwars.ItemModifier)m)])],
-                            ItemType: item.ItemType.ToString()))]))]);
+                            ItemType: item.ItemType.ToString(),
+                            Interaction: item.Interaction,
+                            ModelFileId: item.ModelFileId))]))]);
     }
 
     private static string ToBase64(string encoded)
