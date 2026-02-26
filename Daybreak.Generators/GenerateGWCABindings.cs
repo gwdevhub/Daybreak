@@ -222,8 +222,10 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
 
         // Register generated enums in the typeMap so demangled signatures
         // resolve to the generated C# enum types instead of falling back
-        // to int/uint.  GWCAEquivalent entries take priority (already in map).
-        CollectGeneratedEnumMappings(headerRoot, "GWCA", typeMap, namespaceClassNames);
+        // to int/uint. GWCAEquivalent entries take priority (already in map).
+        // IMPORTANT: Collect enums FIRST, then structs, so struct collision detection works.
+        CollectEnumMappings(headerRoot, "GWCA", typeMap);
+        CollectStructMappings(headerRoot, "GWCA", typeMap, namespaceClassNames, new HashSet<string>(StringComparer.Ordinal));
 
         // Collect diagnostic info about parsed structs
         var structDiagnostics = new List<string>();
@@ -292,6 +294,7 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         // Emit enums first - they're often referenced by structs (e.g. Attribute enum vs Attribute struct)
         EmitEnumsToGuildWarsNamespace(sb, headerRoot, 4, emittedNames);
         EmitStructsToGuildWarsNamespace(sb, headerRoot, typeMap, 4, emittedNames, inlineArrayTypes);
+        sb.AppendLine();
         EmitTypeAliasesToGuildWarsNamespace(sb, headerRoot, typeMap, 4, emittedNames);
         sb.AppendLine("}");
 
@@ -575,16 +578,14 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
     }
 
     /// <summary>
-    /// Walks the constants tree and adds each named enum to the type map
-    /// so that <see cref="ResolveCsType"/> can resolve demangled enum
-    /// references to the generated C# enum type.  Existing entries
-    /// (from <c>[GWCAEquivalent]</c>) are never overwritten.
+    /// Walks the constants tree and adds each named enum to the type map.
+    /// Enums take priority over structs - this must be called first.
+    /// Existing entries (from <c>[GWCAEquivalent]</c>) are never overwritten.
     /// </summary>
-    private static void CollectGeneratedEnumMappings(
+    private static void CollectEnumMappings(
         ConstantsNode node,
         string csPath,
-        Dictionary<string, string> typeMap,
-        HashSet<string> namespaceClassNames)
+        Dictionary<string, string> typeMap)
     {
         foreach (var enumDef in node.Enums)
         {
@@ -595,34 +596,88 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
                 typeMap[enumDef.Name] = "global::Daybreak.API.Interop." + csPath + "." + SanitizeIdentifier(enumDef.Name);
         }
 
+        foreach (var child in node.Children.Values)
+        {
+            CollectEnumMappings(child, csPath + "." + SanitizeIdentifier(child.Name), typeMap);
+        }
+    }
+
+    /// <summary>
+    /// Walks the constants tree and adds each struct to the type map.
+    /// Must be called AFTER CollectEnumMappings so struct collision detection works.
+    /// </summary>
+    private static void CollectStructMappings(
+        ConstantsNode node,
+        string csPath,
+        Dictionary<string, string> typeMap,
+        HashSet<string> namespaceClassNames,
+        HashSet<string> usedGuildWarsNames)
+    {
         // First, collect all struct names in this node to avoid collisions
         var structNamesInNode = new HashSet<string>(node.Structs.Select(s => s.Name), StringComparer.Ordinal);
 
         foreach (var structDef in node.Structs)
         {
             // Only add structs that can actually be emitted
-            if (CanEmitStruct(structDef) && !typeMap.ContainsKey(structDef.Name))
+            if (!CanEmitStruct(structDef))
+                continue;
+                
+            // Determine the C# name, handling collisions with namespace classes or enums
+            var csName = SanitizeIdentifier(structDef.Name);
+            
+            // Check if name collides with a namespace class, enum, or ANOTHER struct already using this name
+            if (namespaceClassNames.Contains(structDef.Name))
             {
-                // If name collides with a namespace class, use a suffixed name
-                var csName = SanitizeIdentifier(structDef.Name);
-                if (namespaceClassNames.Contains(structDef.Name))
-                {
-                    // Try "Data" suffix first, then "Struct" if that also collides
-                    if (!structNamesInNode.Contains(structDef.Name + "Data"))
-                        csName += "Data";
-                    else if (!structNamesInNode.Contains(structDef.Name + "Struct"))
-                        csName += "Struct";
-                    else
-                        csName += "_"; // Last resort
-                }
-                // Structs go into GuildWars namespace (flat), not nested GWCA classes
-                typeMap[structDef.Name] = "global::Daybreak.API.Interop.GuildWars." + csName;
+                // Try "Data" suffix first, then "Struct" if that also collides
+                if (!structNamesInNode.Contains(structDef.Name + "Data") && !usedGuildWarsNames.Contains(csName + "Data"))
+                    csName += "Data";
+                else if (!structNamesInNode.Contains(structDef.Name + "Struct") && !usedGuildWarsNames.Contains(csName + "Struct"))
+                    csName += "Struct";
+                else
+                    csName += "_"; // Last resort
             }
+            // Check if name collides with an enum already in typeMap (different namespace, e.g. Constants::Attribute vs GW::Attribute)
+            // OR another struct already using this name in GuildWars namespace
+            else if (typeMap.ContainsKey(structDef.Name) || usedGuildWarsNames.Contains(csName))
+            {
+                // An enum or other type with this name exists - suffix the struct
+                if (!structNamesInNode.Contains(structDef.Name + "Struct") && !usedGuildWarsNames.Contains(csName + "Struct"))
+                    csName += "Struct";
+                else if (!structNamesInNode.Contains(structDef.Name + "Data") && !usedGuildWarsNames.Contains(csName + "Data"))
+                    csName += "Data";
+                else
+                    csName += "_";
+            }
+            
+            usedGuildWarsNames.Add(csName);
+            
+            // Use a qualified key that includes the C++ path to distinguish structs with the same name
+            // from different namespaces (e.g., GW::Attribute vs GW::SkillbarMgr::Attribute)
+            var mapKey = structDef.Name;
+            var fqCsType = "global::Daybreak.API.Interop.GuildWars." + csName;
+            var simpleStructKey = "struct " + structDef.Name;
+            
+            if (typeMap.ContainsKey(mapKey))
+            {
+                // Use qualified key to distinguish this struct from enum or another struct
+                // Include the csPath to make it unique (e.g., "struct GW.Attribute" vs "struct GW.SkillbarMgr.Attribute")
+                mapKey = "struct " + csPath.Replace("GWCA.", "") + "." + structDef.Name;
+                
+                // Also add simple "struct X" key if not already taken (for field type resolution)
+                // This allows MapCppFieldTypeToCs to find the struct without knowing the full path
+                if (!typeMap.ContainsKey(simpleStructKey))
+                {
+                    typeMap[simpleStructKey] = fqCsType;
+                }
+            }
+            
+            // Structs go into GuildWars namespace (flat), not nested GWCA classes
+            typeMap[mapKey] = fqCsType;
         }
 
         foreach (var child in node.Children.Values)
         {
-            CollectGeneratedEnumMappings(child, csPath + "." + SanitizeIdentifier(child.Name), typeMap, namespaceClassNames);
+            CollectStructMappings(child, csPath + "." + SanitizeIdentifier(child.Name), typeMap, namespaceClassNames, usedGuildWarsNames);
         }
     }
 
@@ -800,10 +855,11 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
     /// </summary>
     private static void EmitStructsToGuildWarsNamespace(StringBuilder sb, ConstantsNode node, Dictionary<string, string> typeMap, int indent, HashSet<string> emittedNames, HashSet<(string csType, int size)> inlineArrayTypes)
     {
-        EmitStructsRecursive(sb, node, typeMap, indent, emittedNames, inlineArrayTypes);
+        // Start with the node's own name as the path base (GWCA for headerRoot)
+        EmitStructsRecursive(sb, node, node.Name, typeMap, indent, emittedNames, inlineArrayTypes);
     }
     
-    private static void EmitStructsRecursive(StringBuilder sb, ConstantsNode node, Dictionary<string, string> typeMap, int indent, HashSet<string> emittedNames, HashSet<(string csType, int size)> inlineArrayTypes)
+    private static void EmitStructsRecursive(StringBuilder sb, ConstantsNode node, string currentPath, Dictionary<string, string> typeMap, int indent, HashSet<string> emittedNames, HashSet<(string csType, int size)> inlineArrayTypes)
     {
         foreach (var structDef in node.Structs.OrderBy(s => s.Name, StringComparer.Ordinal))
         {
@@ -812,8 +868,20 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
                 continue;
             
             // Get the C# name from typeMap (which includes collision-resolution suffixes like "Struct")
-            // If not in typeMap, the struct wasn't registered (shouldn't happen for emittable structs)
-            if (!typeMap.TryGetValue(structDef.Name, out var fqCsName))
+            // Try direct name first, then qualified struct key (for collision cases)
+            string? fqCsName;
+            var directLookup = typeMap.TryGetValue(structDef.Name, out fqCsName);
+            var containsGuildWars = fqCsName?.Contains("GuildWars.") ?? false;
+            
+            if (!directLookup || !containsGuildWars)
+            {
+                // If direct lookup failed or returned an enum (not in GuildWars namespace), 
+                // try qualified struct key: "struct GW.StructName"
+                var qualifiedKey = "struct " + currentPath.Replace("GWCA.", "") + "." + structDef.Name;
+                typeMap.TryGetValue(qualifiedKey, out fqCsName);
+            }
+            
+            if (fqCsName is null)
                 continue;
                 
             // Extract just the struct name from the fully-qualified name
@@ -828,10 +896,10 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
             EmitStruct(sb, structDef, typeMap, indent, inlineArrayTypes, csName);
         }
         
-        // Recurse into children
+        // Recurse into children, appending the child's name to the current path
         foreach (var child in node.Children.Values)
         {
-            EmitStructsRecursive(sb, child, typeMap, indent, emittedNames, inlineArrayTypes);
+            EmitStructsRecursive(sb, child, currentPath + "." + child.Name, typeMap, indent, emittedNames, inlineArrayTypes);
         }
     }
 
@@ -1160,6 +1228,10 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
             return csInner + "*";
         }
 
+        // Check if original type is from Constants namespace (typically enums)
+        // In this case, prefer enum mapping over struct mapping
+        var isFromConstantsNamespace = cppType.Contains("Constants::");
+        
         // Strip namespace qualifiers (GW::, GW::Constants::, etc.)
         if (cppType.Contains("::"))
         {
@@ -1169,6 +1241,20 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
 
         // Check if this type is in our generated enums/structs map
         if (typeMap.TryGetValue(cppType, out var mapped))
+        {
+            // If original was from Constants:: namespace, it's an enum - use enum mapping
+            if (isFromConstantsNamespace)
+                return mapped;
+            // Otherwise, if it's a GuildWars type (struct), use it
+            if (mapped.Contains("GuildWars."))
+                return mapped;
+        }
+        // Try struct-prefixed key only if NOT from Constants namespace
+        // (for collision cases like Attribute struct vs enum)
+        if (!isFromConstantsNamespace && typeMap.TryGetValue("struct " + cppType, out var structAlt))
+            return structAlt;
+        // Fall back to original mapping (could be an enum)
+        if (mapped is not null)
             return mapped;
 
         // Handle common C++ types
@@ -1445,7 +1531,7 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
                         "float" => "float",
                         "double" => "double",
                         "bool" => "byte", // bool* not blittable
-                        _ => typeMap.TryGetValue(dt.Name, out var mapped) ? mapped : dt.Name,
+                        _ => ResolveStructOrEnumPointerInner(dt.Name, typeMap),
                     };
                     return inner + "*";
                 }
@@ -1462,7 +1548,18 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
                     return "global::Daybreak.API.Interop.GuildWars.GuildWarsArray<" + innerType + ">";
                 }
 
+                // First try direct lookup, but ensure we get a struct (GuildWars namespace), not an enum
                 if (typeMap.TryGetValue(dt.Name, out var structCs))
+                {
+                    // If it's a GuildWars type, use it (it's the struct)
+                    if (structCs.Contains("GuildWars."))
+                        return structCs;
+                }
+                // If direct lookup returned an enum, try struct-prefixed key
+                if (typeMap.TryGetValue("struct " + dt.Name, out var structCsAlt))
+                    return structCsAlt;
+                // Fall back to direct lookup result or name
+                if (structCs is not null)
                     return structCs;
                 return dt.Name;
 
@@ -1477,10 +1574,41 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         {
             TypeKind.Primitive => MapPrimitiveType(arg.Name),
             TypeKind.Enum => typeMap.TryGetValue(arg.Name, out var e) ? e : arg.Name,
-            TypeKind.Struct => typeMap.TryGetValue(arg.Name, out var s) ? s : "nint", // unmapped struct -> nint
+            TypeKind.Struct => ResolveStructType(arg.Name, typeMap),
             TypeKind.Pointer => "nint", // C# does NOT allow pointer types as generic type arguments (CS0306)
             _ => "nint",
         };
+    }
+    
+    /// <summary>
+    /// Resolves a struct name to its C# type, handling name collisions with enums.
+    /// </summary>
+    private static string ResolveStructType(string name, Dictionary<string, string> typeMap)
+    {
+        // Try direct lookup - if it's in GuildWars namespace, it's the struct
+        if (typeMap.TryGetValue(name, out var direct) && direct.Contains("GuildWars."))
+            return direct;
+        // Try struct-prefixed key (for collision cases like Attribute struct vs enum)
+        if (typeMap.TryGetValue("struct " + name, out var structAlt))
+            return structAlt;
+        // Unmapped struct -> nint
+        return "nint";
+    }
+    
+    /// <summary>
+    /// Resolves a pointer inner type (the pointee) for struct or enum types,
+    /// handling name collisions between structs and enums.
+    /// </summary>
+    private static string ResolveStructOrEnumPointerInner(string name, Dictionary<string, string> typeMap)
+    {
+        // Try direct lookup - if it's in GuildWars namespace, it's a struct
+        if (typeMap.TryGetValue(name, out var direct) && direct.Contains("GuildWars."))
+            return direct;
+        // Try struct-prefixed key (for collision cases like Attribute struct vs enum)
+        if (typeMap.TryGetValue("struct " + name, out var structAlt))
+            return structAlt;
+        // Fall back to direct lookup result (could be an enum) or just the name
+        return direct ?? name;
     }
     
     /// <summary>
@@ -1492,9 +1620,10 @@ public sealed class GenerateGWCABindings : IIncrementalGenerator
         // arg.Name is the inner type (e.g., "Agent" for Agent*)
         var innerName = arg.Name;
         
-        // Check if the inner type is mapped
-        if (typeMap.TryGetValue(innerName, out var mapped))
-            return mapped + "*";
+        // Check if the inner type is mapped (prefer struct mapping for GuildWars types)
+        var resolved = ResolveStructOrEnumPointerInner(innerName, typeMap);
+        if (resolved != innerName)
+            return resolved + "*";
         
         // Check for primitives
         var primitive = MapPrimitiveType(innerName);
