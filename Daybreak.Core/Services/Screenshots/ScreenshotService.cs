@@ -66,7 +66,7 @@ public sealed class ScreenshotService(
         {
             using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
             using var image = Image.Load<Rgba32>(fileStream);
-            
+
             var (dominantColor, isDark) = GetDominantColor(image);
             var closestAccent = GetClosestAccentColor(dominantColor);
             var entry = new ScreenshotEntry(path, closestAccent, isDark ? LightDarkMode.Dark : LightDarkMode.Light);
@@ -108,13 +108,15 @@ public sealed class ScreenshotService(
                     var sumB = Vector<long>.Zero;
                     int simdPixelCount = 0;
 
+                    // Gather sampled pixels into arrays for vectorization
+                    Span<int> rValues = stackalloc int[Vector<int>.Count];
+                    Span<int> gValues = stackalloc int[Vector<int>.Count];
+                    Span<int> bValues = stackalloc int[Vector<int>.Count];
+
                     // Collect sampled pixels for SIMD processing
                     while (x + (Vector<int>.Count * SampleQuality) <= rowSpan.Length)
                     {
-                        // Gather sampled pixels into arrays for vectorization
-                        Span<int> rValues = stackalloc int[Vector<int>.Count];
-                        Span<int> gValues = stackalloc int[Vector<int>.Count];
-                        Span<int> bValues = stackalloc int[Vector<int>.Count];
+
 
                         for (int i = 0; i < Vector<int>.Count && x < rowSpan.Length; i++, x += SampleQuality)
                         {
@@ -146,6 +148,7 @@ public sealed class ScreenshotService(
                         totalG += sumG[i];
                         totalB += sumB[i];
                     }
+
                     pixelCount += simdPixelCount;
                 }
 
@@ -171,7 +174,7 @@ public sealed class ScreenshotService(
         var avgB = (byte)(totalB / pixelCount);
 
         var color = Color.FromArgb(255, avgR, avgG, avgB);
-        
+
         // Calculate perceived brightness using standard formula
         // Values > 128 are generally considered "light"
         var brightness = (0.299 * avgR) + (0.587 * avgG) + (0.114 * avgB);
