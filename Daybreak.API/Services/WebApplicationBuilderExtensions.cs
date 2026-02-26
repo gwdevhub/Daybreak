@@ -1,6 +1,6 @@
 ﻿using Daybreak.API.Services.Interop;
 using Daybreak.Shared.Services.BuildTemplates;
-using System.Diagnostics.CodeAnalysis;
+using Daybreak.Shared.Services.BuildTemplates.Parsers;
 
 namespace Daybreak.API.Services;
 
@@ -8,6 +8,9 @@ public static class WebApplicationBuilderExtensions
 {
     public static WebApplicationBuilder WithDaybreakServices(this WebApplicationBuilder builder)
     {
+        builder.Services.AddSingleton<ITemplateParser, LegacySkillTemplateParser>();
+        builder.Services.AddSingleton<ITemplateParser, SkillTemplateParser>();
+        builder.Services.AddSingleton<ITemplateParser, PartyLoadoutTemplateParser>();
         builder.Services.AddSingleton<IBuildTemplateManager, BuildTemplateManager>();
         builder.Services.AddSingleton<MemoryScanningService>();
         builder.Services.AddSingleton<ChatService>();

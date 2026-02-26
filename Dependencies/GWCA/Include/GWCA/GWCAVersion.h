@@ -2,9 +2,9 @@
 
 #define GWCA_VERSION_MAJOR 3
 #define GWCA_VERSION_MINOR 2
-#define GWCA_VERSION_PATCH 0
+#define GWCA_VERSION_PATCH 1
 #define GWCA_VERSION_BUILD 1
-#define GWCA_VERSION "3.2.0.1"
+#define GWCA_VERSION "3.2.1.1"
 
 namespace GWCA {
     constexpr int VersionMajor = GWCA_VERSION_MAJOR;
